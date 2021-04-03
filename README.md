@@ -1,4 +1,4 @@
-# borefieldSizing: A open-source sizing tool for borefields for Python
+# borefield: A open-source tool for borefields for Python
 
-## What is *borefieldSizing*?
-*borefieldSizing* is a Python module for the sizing of borefields given a certain load. It calculates the depth of the borefield, based on the borehole configuration, ground parameters and a monthly load profile. The values for rectangular fields (up to 20x20) are precalculated.
+## What is *borefield*?
+*borefield* is a Python module for both the sizing of geothermal borefields and plotting the temperature profile of the ground. It can calculate the required depth of the borefield, based on the borehole configuration, ground parameters, a monthly load profile and a temperature limitation. Also given a load and a certain field, it can plot the temperature profile.
