@@ -6,8 +6,6 @@ import os.path
 import matplotlib.pyplot as plt
 import functools
 
-
-
 def timeValues():
     """This function calculates the default time values for the gfunction."""
     dt = 3600.  # Time step (s)
@@ -45,8 +43,9 @@ class Borefield():
 
     gfunctionInterpolationArray=[]
 
-    def __init__(self, simulationPeriod, borefield, peakHeating=[0] * 12, peakCooling=[0] * 12,
-                 baseloadHeating=[0] * 12, baseloadCooling=[0] * 12, investementCost=None):
+    def __init__(self, simulationPeriod, numberOfBoreholes, peakHeating=[0] * 12, peakCooling=[0] * 12,
+                 baseloadHeating=[0] * 12, baseloadCooling=[0] * 12, investementCost=None,borefield=None):
+        """This function initiates the Borefield class"""
 
         # initiate vars
         self.baseloadHeating = [0] * 12
@@ -65,12 +64,23 @@ class Borefield():
         # set length of the peak
         self.setLengthPeak()
 
+        self.setNumberOfBoreholes(numberOfBoreholes)
+
         self.setBorefield(borefield)
 
         self.H = 0
-    def setBorefield(self, borefield):
-        """This function sets the borefield configuration"""
-        self.borefield = borefield
+
+    def setNumberOfBoreholes(self,numberOfBoreholes):
+        """This functions sets the number of boreholes"""
+        self.numberOfBoreholes = numberOfBoreholes
+
+    def setBorefield(self, borefield=None):
+        """This function sets the borefield configuration. When no input, an empty array of length N_1 * N_2 will be made"""
+        if borefield==None:
+            pass
+        else:
+            self.borefield = borefield
+            self.setNumberOfBoreholes(len(borefield))
 
     def setInvestementCost(self, investementCost=defaultInvestement):
         """This function sets the investement cost. This is linear with respect to the total field length."""
@@ -81,28 +91,6 @@ class Borefield():
         self.lengthPeak = length
         self.th = length * 3600.  # length of peak in seconds
 
-    # def __init__(self,grondparameters,simulatieperiode,borefield,piekvermogen_H=[0]*12,piekvermogen_C=[0]*12,basisbelasting_H=[0]*12,basisbelasting_C=[0]*12,kosten_investering=None):
-    #
-    #     self.piekvermogen_H = piekvermogen_H
-    #     self.piekvermogen_C = piekvermogen_C
-    #     self.basisbelasting_H = basisbelasting_H
-    #     self.set_basisbelasting_C(basisbelasting_C) #dit definieert ook onbalans etc
-    #     self.set_basisbelasting_H(basisbelasting_H)
-    #
-    #     self.simulatieperiode = simulatieperiode
-    #     self.borefield = borefield
-    #
-    #     self.set_grondparameters(grondparameters)
-    #     self.limiterende_maand =0
-    #
-    #     if kosten_investering ==None:
-    #         self.kosten_investering = [35,0]
-    #     else:
-    #         self.kosten_investering = kosten_investering
-    #
-    #     self.lengte_piek = 6
-
-
     def setGroundParameters(self,data):
         # Borehole dimensions
         self.D = data["D"]  # Borehole buried depth (m)
@@ -110,8 +98,8 @@ class Borefield():
         self.r_b = data["r_b"]  # Borehole radius (m)
         self.B = data["B"]  # Borehole spacing (m)
 
-        self.N_1 = 10
-        self.N_2 = 12
+        self.N_1 = data["N_1"]
+        self.N_2 = data["N_2"]
 
         # Pipe dimensions
         self.rp_out = data["rp_out"]  # Pipe outer radius (m)
@@ -145,7 +133,7 @@ class Borefield():
         # Number of segments per borehole
         self.nSegments = data["nSegments"]
         self.ty = self.simulationPeriod * 8760.*3600
-        self.tm = Borefield.UPM * 3600.#744
+        self.tm = Borefield.UPM * 3600.
         self.td = 6*3600.
         self.time = np.array([self.td, self.td + self.tm, self.ty + self.tm + self.td])
 
@@ -167,7 +155,8 @@ class Borefield():
         if self.H < 1:
             self.H = 50
 
-        # Herhaal zolang geen convergentie (convergentie indien verschil <1m diepte)
+        # Iterates as long as there is no convergence
+        # (convergence if difference between depth in iterations is smaller than thresholTemperature)
         while abs(self.H - H_prev) >= Borefield.thresholdTemperature:
             # calculate the required gfunction values
             gfunc_uniform_T = self.gfunction(self.time, self.H)
@@ -182,7 +171,7 @@ class Borefield():
 
             # updating the depth values
             H_prev = self.H
-            self.H = L / (len(self.borefield))
+            self.H = L / self.numberOfBoreholes
 
         return self.H
 
@@ -196,7 +185,8 @@ class Borefield():
         if self.H < 1:
             self.H = 50
 
-        # Herhaal zolang geen convergentie (convergentie indien verschil <1m diepte)
+        # Iterates as long as there is no convergence
+        # (convergence if difference between depth in iterations is smaller than thresholTemperature)
         while abs(self.H - H_prev) >= Borefield.thresholdTemperature:
             # get the gfunction values
             gfunc_uniform_T = self.gfunction(timeSteps, self.H)
@@ -211,48 +201,45 @@ class Borefield():
 
             # updating the depth values
             H_prev = self.H
-            self.H = L / (len(self.borefield))
+            self.H = L / self.numberOfBoreholes
 
         return self.H
 
     def size(self,H_init):
 
-        """This function sizes the borefield of the given configuration. It returns the borefield depth."""
+        """This function sizes the borefield of the given configuration according to the methodology explained in (Peere et al., 2021).
+        It returns the borefield depth."""
 
         # initiate with a given depth
         self.H_init = H_init
 
-        # dimensioneer laatste jaar
-        self.calculateL2Params(True)  # bereken parameters voor verwarmingsgelimiteerd
-        self.qa = self.qa
-        self.H_H_Bernier = self._Bernier  # Dimensioneer
-        self.calculateL2Params(False)  # bereken parameters voor koelgelimiteerd
-        self.qa = self.qa
-        self.H_C_bernier = self._Bernier  # Dimensioneer
-        self.H_Bernier = max(self.H_H_Bernier, self.H_C_bernier)  # Neem maximale lengte van deze twee dimensioneringen
+        def sizeQuadrant1():
+            self.calculateL3Params(False)  # calculate parameters
+            return self._Carcel  # size
 
-        # dimensioneer eerste jaar
-        self.calculateL3Params(True)  # bereken parameters voor verwarmingsgelimiteerd
-        self.H_H_Carcel = self._Carcel  # Dimensioneer
-        self.calculateL3Params(False)  # bereken parameters voor koelgelimiteerd
-        self.H_C_Carcel = self._Carcel  # Dimensioneer
-        self.H_Carcel = max(self.H_H_Carcel, self.H_C_Carcel)  # Neem maximale lengte van deze twee dimensioneringen
+        def sizeQuadrant2():
+            self.calculateL2Params(False)  # calculate parameters
+            self.qa = self.qa
+            return self._Bernier  # size
 
-        self.H = max(self.H_Bernier,
-                     self.H_Carcel)  # Neem maximale lengte van dimensionering in eerste of laatste werkingsjaar
+        def sizeQuadrant3():
+            self.calculateL3Params(True)  # calculate parameters
+            return  self._Carcel  # size
+
+        def sizeQuadrant4():
+            self.calculateL2Params(True)  # calculate parameters
+            self.qa = self.qa
+            return self._Bernier  # size
+
+        if self.imbalance<=0:
+            # extraction dominated, so quadrants 1 and 4 are relevant
+            self.H = max(sizeQuadrant1(),sizeQuadrant4())
+        else:
+            # injection dominated, so quadrants 2 and 3 are relevant
+            self.H = max(sizeQuadrant2,sizeQuadrant3)
 
         return self.H
-    # def gfunction(self, timeInstance, H):
-    #     """This function returns the gfunction value at a time instance timeInstance and a depth H for a given configuration.
-    #     If there is no data file available, it will ask to calculate it first, otherwise it will calculate it along the way and save it."""
-    #
-    #     raw_data = pickle.load(open("data_6m_spacing.txt", "rb"))
-    #     H_array = [i.get("H") for i in raw_data]
-    #     timeArray = raw_data[0].get("Time")
-    #     respons = [i.get("Gfunc") for i in raw_data]
-    #
-    #     f = interpolate.interp2d(timeArray, H_array, respons)
-    #     return f(timeInstance, H)
+
 
     def calculateMontlyLoad(self):
         """This function calculates the average monthly load in kW"""
@@ -265,6 +252,9 @@ class Borefield():
         self.calculateMontlyLoad()
         self.calculateImbalance()
 
+        # new peak heating if baseload is larger than the peak
+        self.setPeakHeating([max(self.peakHeating[i], self.monthlyLoadHeating[i]) for i in range(12)])
+
     def setBaseloadCooling(self, baseload):
         """This function defines the baseload in cooling both in an energy as in an average power perspective"""
         self.baseloadCooling = [i if i >= 0 else 0 for i in baseload]  # kWh
@@ -272,236 +262,223 @@ class Borefield():
         self.calculateMontlyLoad()
         self.calculateImbalance()
 
+        # new peak cooling if baseload is larger than the peak
+        self.setPeakCooling([max(self.peakCooling[i],self.monthlyLoadCooling[i]) for i in range(12)])
+
     def setPeakHeating(self, peakload):
         """This function sets the peak heating to peakload"""
         self.peakHeating = [i if i >= 0 else 0 for i in peakload]
 
     def setPeakCooling(self, peakload):
-        """This function sets the peak cooling to peakload"""
+        """This function sets the peak cooling to peak load"""
         self.peakCooling = [i if i >= 0 else 0 for i in peakload]
 
     @property
     def investementCost(self):
         """This function calculates the investement cost based on a cost profile lineair to the total borehole length."""
-        return np.polyval(self.costInvestement, self.H * len(self.borefield))
+        return np.polyval(self.costInvestement, self.H * self.numberOfBoreholes)
 
     def calculateImbalance(self):
         """This function calculates the imbalance of the field.
-        A positive imbalance means that the field is cooling dominated, i.e. it heats up every year."""
+        A positive imbalance means that the field is injection dominated, i.e. it heats up every year."""
         self.imbalance = functools.reduce(lambda x, y: x + y, self.baseloadCooling) - \
                          functools.reduce(lambda x, y: x + y,self.baseloadHeating)
 
     def calculateL2Params(self, HC):
-        # Deze functie berekend de nodige parameters voor de dimensionering in het laatste werkingsjaar
-        # Vooral de tekens zijn hier van belang.
+        """This function calculates the parameters for the sizing based on the last year of operation"""
+
+        # convert imbalance to Watt
         self.qa = self.imbalance / 8760. * 1000
 
         if HC:
-            # Gelimiteerd door verwarming
-            # Tempeartuur ingesteld op minimale temperatuur Tf_C
+            # limited by extraction load
+
+            # temperature limit is set to the minimum temperature
             self.Tf = self.Tf_C
 
-            # Selecteer de maand waarin de hoogste piek voorkomt. Het is mogelijk dat er een bepaalde maand is
-            # waarin het gemiddeld vermogen hoger is dan de piek. In praktijk mogen jullie ervan uitgaan
-            # dat het altijd true gaat zijn.
-            if max(self.peakHeating) > max(self.monthlyLoadHeating):
-                maand_index = self.peakHeating.index(max(self.peakHeating))
-                self.qm = self.montlyLoad[maand_index] * 1000.
-                self.qh = max(self.peakHeating) * 1000.
-                self.peak = True
-            else:
-                maand_index = self.monthlyLoadHeating.index(max(self.monthlyLoadHeating))
-                self.qm = self.montlyLoad[maand_index] * 1000.
-                self.qh = self.monthlyLoadHeating[maand_index] * 1000.
-                self.peak = False
+            # Select month with highest peak load and take both the peak and average load from that month
+            monthIndex = self.peakHeating.index(max(self.peakHeating))
+            self.qm = self.montlyLoad[monthIndex] * 1000.
+            self.qh = max(self.peakHeating) * 1000.
 
+            # correct signs
             self.qm = -self.qm
             self.qa = -self.qa
-            # print "Heating", self.qa, self.qm, self.qh,self.H
+
         else:
-            # Gelimiteerd door koeling
-            # Temperatuur ingesteld op maximale temperatuur Tf_H
+            # limited by injection load
+
+            # temperature limit set to maximum temperature
             self.Tf = self.Tf_H
 
-            # Selecteer de maand waarin de hoogste piek voorkomt. Het is mogelijk dat er een bepaalde maand is
-            # waarin het gemiddeld vermogen hoger is dan de piek. In praktijk mogen jullie ervan uitgaan
-            # dat het altijd true gaat zijn.
-            if max(self.peakCooling) > max(self.monthlyLoadCooling):
-                maand_index = self.peakCooling.index(max(self.peakCooling))
-                self.qm = self.montlyLoad[maand_index] * 1000.
-                self.qh = max(self.peakCooling) * 1000.
-                self.peak = True
-            else:
-                maand_index = self.monthlyLoadCooling.index(max(self.monthlyLoadCooling))
-                self.qm = self.montlyLoad[maand_index] * 1000.
-                self.qh = self.monthlyLoadCooling[maand_index] * 1000.
-                self.peak = False
+            # Select month with highest peak load and take both the peak and average load from that month
+            monthIndex = self.peakCooling.index(max(self.peakCooling))
+            self.qm = self.montlyLoad[monthIndex] * 1000.
+            self.qh = max(self.peakCooling) * 1000.
 
     def calculateL3Params(self, HC, monthIndex=None):
+        """This function calculates the parameters for the sizing based on the first year of operation"""
 
         if HC:
-            # Gelimiteerd door verwarming
-            # Temperatuur ingesteld op minimale temperatuur Tf_C
+            # limited by extraction load
+
+            # temperature limit is set to the minimum temperature
             self.Tf = self.Tf_C
 
-            # Selecteer de maand waarin de hoogste piek voorkomt. Het is mogelijk dat er een bepaalde maand is
-            # waarin het gemiddeld vermogen hoger is dan de piek. In praktijk mogen jullie ervan uitgaan
-            # dat het altijd true gaat zijn.
-            if max(self.peakHeating) > max(self.monthlyLoadHeating):
-                maand_index = self.peakHeating.index(max(self.peakHeating)) if monthIndex == None else monthIndex
-                self.qh = max(self.peakHeating) * 1000.
-                self.peak = True
-            else:
-                maand_index = self.monthlyLoadHeating.index(
-                    max(self.monthlyLoadHeating)) if monthIndex == None else monthIndex
-                self.qh = self.monthlyLoadHeating[maand_index] * 1000.
-                self.peak = False
+            # Select month with highest peak load and take both the peak and average load from that month
+            monthIndex = self.peakHeating.index(max(self.peakHeating)) if monthIndex == None else monthIndex
+            self.qh = max(self.peakHeating) * 1000.
 
-            self.qm = self.montlyLoad[maand_index] * 1000.
-            if maand_index < 1:
+            self.qm = self.montlyLoad[monthIndex] * 1000.
+
+            if monthIndex < 1:
                 self.qpm = 0
             else:
-                self.qpm = functools.reduce(lambda x, y: x + y, self.montlyLoad[:maand_index]) * 1000. / (maand_index + 1)
+                self.qpm = functools.reduce(lambda x, y: x + y, self.montlyLoad[:monthIndex]) * 1000. / (monthIndex + 1)
 
             self.qm = -self.qm
         else:
-            # Gelimiteerd door koeling
-            # Temperatuursgrens ingesteld op maximale temperatuur tf_H
+            # limited by injection
+
+            # temperature limit set to maximum temperatue
             self.Tf = self.Tf_H
 
-            # Selecteer de maand waarin de hoogste piek voorkomt. Het is mogelijk dat er een bepaalde maand is
-            # waarin het gemiddeld vermogen hoger is dan de piek. In praktijk mogen jullie ervan uitgaan
-            # dat het altijd true gaat zijn.
-            if max(self.peakCooling) > max(self.monthlyLoadCooling):
-                maand_index = self.peakCooling.index(max(self.peakCooling)) if monthIndex == None else monthIndex
-                self.qh = max(self.peakCooling) * 1000.
-                self.peak = True
-            else:
-                maand_index = self.monthlyLoadCooling.index(
-                    max(self.monthlyLoadCooling)) if monthIndex == None else monthIndex
-                self.qh = self.monthlyLoadCooling[maand_index] * 1000.
-                self.peak = False
+            # Select month with highest peak load and take both the peak and average load from that month
+            monthIndex = self.peakCooling.index(max(self.peakCooling)) if monthIndex == None else monthIndex
+            self.qh = max(self.peakCooling) * 1000.
 
-            self.qm = self.montlyLoad[maand_index] * 1000.
-            if maand_index < 1:
+            self.qm = self.montlyLoad[monthIndex] * 1000.
+            if monthIndex < 1:
                 self.qpm = 0
             else:
-                self.qpm = functools.reduce(lambda x, y: x + y, self.montlyLoad[:maand_index]) * 1000. / (maand_index + 1)
-        self.tcm = (maand_index + 1) * Borefield.UPM * 3600
-        self.tpm = maand_index * Borefield.UPM * 3600
+                self.qpm = functools.reduce(lambda x, y: x + y, self.montlyLoad[:monthIndex]) * 1000. / (monthIndex + 1)
+        self.tcm = (monthIndex + 1) * Borefield.UPM * 3600
+        self.tpm = monthIndex * Borefield.UPM * 3600
 
-        return maand_index
+        return monthIndex
+
+    def calculateTemperatures(self,depth=None):
+        """Calculate all the temperatures without plotting the figure. When depth is given, it calculates it for a given depth."""
+        self._printTemperatureProfile(figure=False,H=depth)
 
     def printTemperatureProfile(self,legend=True):
         """This function plots the temperature profile for the calculated depth."""
         self._printTemperatureProfile(legend=legend)
 
-    def printTemperatureProfileFixedDepth(self,depth,lengend=True):
+    def printTemperatureProfileFixedDepth(self,depth,legend=True):
         """This function plots the temperature profile for a fixed depth depth."""
-        self._printTemperatureProfile(legend=lengend,H=depth)
+        self._printTemperatureProfile(legend=legend,H=depth)
 
-    def _printTemperatureProfile(self, legend=True, H=None):
+    def _printTemperatureProfile(self, legend=True, H=None,figure=True):
         """
         This function would calculate a new length of the borefield using temporal superposition.
         Now it justs outputs the temperature graphs
         """
 
         # making a numpy array of the monthly balance (self.montlyLoad) for a period of 20 years [kW]
-        maandbelasting_array = np.asarray(self.montlyLoad * self.simulationPeriod)
+        monthlyLoadsArray = np.asarray(self.montlyLoad * self.simulationPeriod)
 
         # calculation of all the different times at which the gfunction should be calculated.
-        # this is equal to 730 hours a month * 3600 seconds/hours for a period of 20 years
-        gwaarden_tijd = [i * 730 * 3600. for i in range(1, 12 * self.simulationPeriod + 1)]
+        # this is equal to 'UPM' hours a month * 3600 seconds/hours for the simulationPeriod
+        timeForgValues = [i * Borefield.UPM * 3600. for i in range(1, 12 * self.simulationPeriod + 1)]
 
-        # self.gfunction is a function that uses the data in data_k3.5.txt to interpolate the correct values of the gfunction.
+        # self.gfunction is a function that uses the precalculated data to interpolate the correct values of the gfunction.
         # this dataset is checked over and over again and is correct
-        gwaarden = self.gfunction(gwaarden_tijd, self.H if H == None else H)
+        gValues = self.gfunction(timeForgValues, self.H if H == None else H)
 
-        # the gfunction value of the peak with 6 hours
-        gwaarde_piek = self.gfunction(6 * 3600., self.H if H == None else H)
+        # the gfunction value of the peak with lengthPeak hours
+        gValuePeak = self.gfunction(self.lengthPeak * 3600., self.H if H == None else H)
 
         # calculation of needed differences of the gfunction values. These are the weight factors in the calculation of Tb.
-        lijst = [gwaarden[i] if i == 0 else gwaarden[i] - gwaarden[i - 1] for i in range(len(gwaarden))]
+        gValueDifferences = [gValues[i] if i == 0 else gValues[i] - gValues[i - 1] for i in range(len(gValues))]
 
-        self.factoren_temperature_profile = lijst
+        self.factoren_temperature_profile = gValueDifferences
         results = []
         temp = []
 
         # calculation of the product for every month in order to obtain a temperature profile
-        for i in range(len(maandbelasting_array)):
-            temp.insert(0, maandbelasting_array[i] * 1000.)
-            results.append(np.dot(temp, lijst[:i + 1]))
+        for i in range(len(monthlyLoadsArray)):
+            temp.insert(0, monthlyLoadsArray[i] * 1000.)
+            results.append(np.dot(temp, gValueDifferences[:i + 1]))
 
-        results_C = []
-        results_H = []
-        results_piek_C = []
-        results_piek_H = []
-        results_month_C = []
-        results_month_H = []
+        resultsCooling = []
+        resultsHeating = []
+        resultsPeakCooling = []
+        resultsPeakHeating = []
+        resultsMonthCooling = []
+        resultsMonthHeating = []
 
         # calculation the borehole wall temperature for every month i
-        Tb = [i / (2 * pi * self.k_s) / ((self.H if H == None else H) * len(self.borefield)) + self.Tg for i in results]
+        Tb = [i / (2 * pi * self.k_s) / ((self.H if H == None else H) * self.numberOfBoreholes) + self.Tg for i in results]
 
         # now the Tf will be calculated based on
-        # Tf = Tb + QR_b
+        # Tf = Tb + Q * R_b
         for i in range(240):
-            results_C.append(Tb[i] + self.monthlyLoadCooling[i % 12] * 1000. * (
-                        self.Rb / len(self.borefield) / (self.H if H == None else H)))
-            results_H.append(Tb[i] - self.monthlyLoadHeating[i % 12] * 1000. * (
-                        self.Rb / len(self.borefield) / (self.H if H == None else H)))
-            results_month_C.append(Tb[i] + self.monthlyLoadCooling[i % 12] * 1000. * (
-                        self.Rb / len(self.borefield) / (self.H if H == None else H)))
-            results_month_H.append(Tb[i] - self.monthlyLoadHeating[i % 12] * 1000. * (
-                        self.Rb / len(self.borefield) / (self.H if H == None else H)))
+            resultsCooling.append(Tb[i] + self.monthlyLoadCooling[i % 12] * 1000. * (
+                        self.Rb / self.numberOfBoreholes / (self.H if H == None else H)))
+            resultsHeating.append(Tb[i] - self.monthlyLoadHeating[i % 12] * 1000. * (
+                        self.Rb / self.numberOfBoreholes / (self.H if H == None else H)))
+            resultsMonthCooling.append(Tb[i] + self.monthlyLoadCooling[i % 12] * 1000. * (
+                        self.Rb / self.numberOfBoreholes / (self.H if H == None else H)))
+            resultsMonthHeating.append(Tb[i] - self.monthlyLoadHeating[i % 12] * 1000. * (
+                        self.Rb / self.numberOfBoreholes / (self.H if H == None else H)))
 
         # extra sommation if the gfunction value for the peak is included
 
         for i in range(240):
-            results_piek_C.append(results_C[i] + ((self.peakCooling[i % 12] - self.monthlyLoadCooling[i % 12] if
+            resultsPeakCooling.append(resultsCooling[i] + ((self.peakCooling[i % 12] - self.monthlyLoadCooling[i % 12] if
                                                    self.peakCooling[i % 12] > self.monthlyLoadCooling[
                                                        i % 12] else 0) * 1000. * (
-                                                              gwaarde_piek[0] / self.k_s / 2 / pi + self.Rb)) / len(
-                self.borefield) / (self.H if H == None else H))
-            results_piek_H.append(results_H[i] - ((self.peakHeating[i % 12] - self.monthlyLoadHeating[i % 12] if
+                                                              gValuePeak[0] / self.k_s / 2 / pi + self.Rb)) / self.numberOfBoreholes / (self.H if H == None else H))
+            resultsPeakHeating.append(resultsHeating[i] - ((self.peakHeating[i % 12] - self.monthlyLoadHeating[i % 12] if
                                                    self.peakHeating[i % 12] > self.monthlyLoadHeating[
                                                        i % 12] else 0) * 1000. * (
-                                                              gwaarde_piek[0] / self.k_s / 2 / pi + self.Rb)) / len(
-                self.borefield) / (self.H if H == None else H))
+                                                              gValuePeak[0] / self.k_s / 2 / pi + self.Rb)) / self.numberOfBoreholes / (self.H if H == None else H))
 
-        # definieer de tijd
-        tijd = [i / 12 / 730. / 3600. for i in gwaarden_tijd]
+        # save temperatures under variable
+        self.resultsCooling = resultsCooling
+        self.resultsHeating = resultsHeating
+        self.resultsPeakHeating = resultsPeakHeating
+        self.resultsPeakCooling = resultsPeakCooling
+        self.resultsMonthCooling = resultsMonthCooling
+        self.resultsMonthHeating = resultsMonthHeating
 
-        plt.rc('figure')
-        fig = plt.figure()
+        ## initiate figure
+        if figure:
+            # make a time array
+            timeArray = [i / 12 / 730. / 3600. for i in timeForgValues]
 
-        ax1 = fig.add_subplot(111)
-        ax1.set_xlabel(r'Time (year)')
-        ax1.set_ylabel(r'Temperature ($^\circ C$)')
+            plt.rc('figure')
+            fig = plt.figure()
 
-        # Plot Temperatures
-        ax1.step(tijd, Tb, 'k-', where="pre", lw=1.5, label="Tb")
-        ax1.step(tijd, results_piek_C, 'b-', where="pre", lw=1.5, label='Tf peak cooling')
-        ax1.step(tijd, results_piek_H, 'r-', where="pre", lw=1.5, label='Tf peak heating')
+            ax1 = fig.add_subplot(111)
+            ax1.set_xlabel(r'Time (year)')
+            ax1.set_ylabel(r'Temperature ($^\circ C$)')
 
-        # Teken temperatuursgrenzen
-        ax1.step(tijd, Tb, 'k-', where="pre", lw=1.5, label="Tb")
-        ax1.step(tijd, results_month_C, color='b', linestyle="dashed", where="pre", lw=1.5, label='Tf basis cooling')
-        ax1.step(tijd, results_month_H, color='r', linestyle="dashed", where="pre", lw=1.5, label='Tf basis heating')
-        ax1.hlines(self.Tf_C, 0, 20, colors='r', linestyles='dashed', label='', lw=1)
-        ax1.hlines(self.Tf_H, 0, 20, colors='b', linestyles='dashed', label='', lw=1)
-        ax1.set_xticks(range(0, 21, 2))
+            # plot Temperatures
+            ax1.step(timeArray, Tb, 'k-', where="pre", lw=1.5, label="Tb")
+            ax1.step(timeArray, resultsPeakCooling, 'b-', where="pre", lw=1.5, label='Tf peak cooling')
+            ax1.step(timeArray, resultsPeakHeating, 'r-', where="pre", lw=1.5, label='Tf peak heating')
 
-        # Plot legend
-        if legend:
-            ax1.legend()
-        ax1.set_xlim(left=0, right=20)
-        plt.show()
+            # define temperature bounds
+            ax1.step(timeArray, Tb, 'k-', where="pre", lw=1.5, label="Tb")
+            ax1.step(timeArray, resultsMonthCooling, color='b', linestyle="dashed", where="pre", lw=1.5, label='Tf basis cooling')
+            ax1.step(timeArray, resultsMonthHeating, color='r', linestyle="dashed", where="pre", lw=1.5, label='Tf basis heating')
+            ax1.hlines(self.Tf_C, 0, 20, colors='r', linestyles='dashed', label='', lw=1)
+            ax1.hlines(self.Tf_H, 0, 20, colors='b', linestyles='dashed', label='', lw=1)
+            ax1.set_xticks(range(0, 21, 2))
 
-    def gfunction(self,tijd, H):
-        # Deze functie berekend de g-waarden indien ze gegeven zijn
+            # Plot legend
+            if legend:
+                ax1.legend()
+            ax1.set_xlim(left=0, right=20)
+            plt.show()
 
-        def relevant(H_values,H,threshold):
-            # print H_values,H,threshold
+    def gfunction(self, timeValue, H):
+        """This function calculated the gfunction based on interpolation of the precalculated data"""
+
+        def relevance(H_values,H,threshold):
+
             if H_values==[] or (H >= max(H_values) + threshold) or (H<=min(H_values) - threshold):
                 return (True,)
 
@@ -543,14 +520,14 @@ class Borefield():
         lijst = list(data.keys())
         lijst.sort()
         # print "To ask",relevant(lijst,self.B,boorveld.thresholdBoreholeSpacing)[0]
-        if not toAsk and relevant(lijst,self.B,boorveld.thresholdBoreholeSpacing)[0]:
+        if not toAsk and relevance(lijst,self.B,boorveld.thresholdBoreholeSpacing)[0]:
             data[self.B] = dict([])
             toAsk = True
 
         # see if k_s exists
         lijst = list(data[lijst[0]].keys())
         lijst.sort()
-        if not toAsk and relevant(lijst,self.k_s,boorveld.thresholdSoilConductivity)[0]:
+        if not toAsk and relevance(lijst,self.k_s,boorveld.thresholdSoilConductivity)[0]:
             data[self.B][self.k_s] = dict([])
             toAsk = True
 
@@ -605,10 +582,10 @@ class Borefield():
         #     print np.array([self.B, self.k_s, H, t]),H
         #     times.append(interpolate.interpn(points, values, np.array([self.B, self.k_s, H, t])))
         #
-        if not isinstance(tijd,float):
-            times = interpolate.interpn(points, values, np.array([[self.B, self.k_s, H, t] for t in tijd]))
+        if not isinstance(timeValue, float):
+            times = interpolate.interpn(points, values, np.array([[self.B, self.k_s, H, t] for t in timeValue]))
         else:
-            times = interpolate.interpn(points, values, np.array([self.B, self.k_s, H, tijd]))
+            times = interpolate.interpn(points, values, np.array([self.B, self.k_s, H, timeValue]))
         # print times
         return times
 
@@ -622,43 +599,6 @@ class Borefield():
         #
         # f = interpolate.interp2d(tijd_array, H_array, respons)
         # return f(tijd, H)
-
-    # def set_basisbelasting_H(self,basisbelasting):
-    #     self.basisbelasting_H=[i if i>=0 else 0 for i in basisbelasting]
-    #     self.maandbelasting = [(-self.basisbelasting_H[i]+self.basisbelasting_C[i]) / Borefield.UPM for i in range(12)]
-    #     self.maandbelasting_H = list(map(lambda x: x / Borefield.UPM, self.basisbelasting_H))
-    #     self.jaarenergie_H = functools.reduce(lambda x,y : x+y,self.basisbelasting_H)
-    #     self.bereken_onbalans()
-    #
-    # def set_basisbelasting_C(self,basisbelasting):
-    #     self.basisbelasting_C=[i if i>=0 else 0 for i in basisbelasting]
-    #     self.maandbelasting = [(-self.basisbelasting_H[i]+self.basisbelasting_C[i]) / Borefield.UPM for i in range(12)]
-    #     self.maandbelasting_C = list(map(lambda x: x / Borefield.UPM, self.basisbelasting_C))
-    #     self.jaarenergie_C = functools.reduce(lambda x,y : x+y,self.basisbelasting_C)
-    #     self.bereken_onbalans()
-    #
-    # def set_piekbelasting_H(self,piekbelasting,duur=None):
-    #     self.piekvermogen_H=[i if i>=0 else 0 for i in piekbelasting]
-    #     if duur!=None:
-    #         self.td = duur*3600.
-    #         self.lengte_piek = duur
-    #
-    # def set_piekbelasting_C(self,piekbelasting,duur=None):
-    #     self.piekvermogen_C=[i if i>=0 else 0 for i in piekbelasting]
-    #     if duur!=None:
-    #         self.td = duur*3600.
-    #         self.lengte_piek = duur
-    #
-    # @property
-    # def investeringskost(self):
-    #     return np.polyval(self.kosten_investering,self.H*len(self.borefield))
-    #
-    # def bereken_onbalans(self):
-    #     try:
-    #         self.onbalans = self.jaarenergie_C-self.jaarenergie_H
-    #         self.C_dom = self.onbalans>0
-    #     except:
-    #         pass
 
     def makeDatafile(self,data=None,thresholdBoreholeDepth=thresholdBoreholeDepth,timeArray=defaultTimeArray,depthArray=defaultDepthArray):
         """This function makes a datafile for a given borefield spacing and ground conductivity."""
@@ -742,328 +682,72 @@ class Borefield():
 
         pickle.dump(data,open("Data/"+name,"wb"))
 
-    # def bereken_L2_params(self, HC):
-    #     # Deze functie berekend de nodige parameters voor de dimensionering in het laatste werkingsjaar
-    #     # Vooral de tekens zijn hier van belang.
-    #     self.qa = self.onbalans/8760.*1000
-    #
-    #     if HC:
-    #         # Gelimiteerd door verwarming
-    #         # Tempeartuur ingesteld op minimale temperatuur Tf_C
-    #         self.Tf=self.Tf_C
-    #
-    #         # Selecteer de maand waarin de hoogste piek voorkomt. Het is mogelijk dat er een bepaalde maand is
-    #         # waarin het gemiddeld vermogen hoger is dan de piek. In praktijk mogen jullie ervan uitgaan
-    #         # dat het altijd true gaat zijn.
-    #         if max(self.piekvermogen_H) > max(self.maandbelasting_H):
-    #             maand_index = self.piekvermogen_H.index(max(self.piekvermogen_H))
-    #             self.qm = self.maandbelasting[maand_index] * 1000.
-    #             self.qh = max(self.piekvermogen_H) * 1000.
-    #             self.peak=True
-    #         else:
-    #             maand_index = self.maandbelasting_H.index(max(self.maandbelasting_H))
-    #             self.qm = self.maandbelasting[maand_index] * 1000.
-    #             self.qh = self.maandbelasting_H[maand_index] * 1000.
-    #             self.peak=False
-    #
-    #         self.qm = -self.qm
-    #         self.qa = -self.qa
-    #         # print "Heating", self.qa, self.qm, self.qh,self.H
-    #     else:
-    #         # Gelimiteerd door koeling
-    #         # Temperatuur ingesteld op maximale temperatuur Tf_H
-    #         self.Tf=self.Tf_H
-    #
-    #         # Selecteer de maand waarin de hoogste piek voorkomt. Het is mogelijk dat er een bepaalde maand is
-    #         # waarin het gemiddeld vermogen hoger is dan de piek. In praktijk mogen jullie ervan uitgaan
-    #         # dat het altijd true gaat zijn.
-    #         if max(self.piekvermogen_C) > max(self.maandbelasting_C):
-    #             maand_index = self.piekvermogen_C.index(max(self.piekvermogen_C))
-    #             self.qm = self.maandbelasting[maand_index] * 1000.
-    #             self.qh = max(self.piekvermogen_C) * 1000.
-    #             self.peak=True
-    #         else:
-    #             maand_index = self.maandbelasting_C.index(max(self.maandbelasting_C))
-    #             self.qm = self.maandbelasting[maand_index] * 1000.
-    #             self.qh = self.maandbelasting_C[maand_index] * 1000.
-    #             self.peak=False
-    #
-    # def bereken_L3_params(self,HC,maandindex=None):
-    #
-    #     if HC:
-    #         # Gelimiteerd door verwarming
-    #         # Temperatuur ingesteld op minimale temperatuur Tf_C
-    #         self.Tf = self.Tf_C
-    #
-    #         # Selecteer de maand waarin de hoogste piek voorkomt. Het is mogelijk dat er een bepaalde maand is
-    #         # waarin het gemiddeld vermogen hoger is dan de piek. In praktijk mogen jullie ervan uitgaan
-    #         # dat het altijd true gaat zijn.
-    #         if max(self.piekvermogen_H) > max(self.maandbelasting_H):
-    #             maand_index = self.piekvermogen_H.index(max(self.piekvermogen_H)) if maandindex==None else maandindex
-    #             self.qh = max(self.piekvermogen_H) * 1000.
-    #             self.peak = True
-    #         else:
-    #             maand_index = self.maandbelasting_H.index(max(self.maandbelasting_H)) if maandindex==None else maandindex
-    #             self.qh = self.maandbelasting_H[maand_index] * 1000.
-    #             self.peak = False
-    #
-    #         self.qm = self.maandbelasting[maand_index] * 1000.
-    #         if maand_index < 1:
-    #             self.qpm = 0
-    #         else:
-    #             self.qpm = functools.reduce(lambda x, y: x + y, self.maandbelasting[:maand_index])*1000./(maand_index+1)
-    #
-    #         self.qm = -self.qm
-    #     else:
-    #         # Gelimiteerd door koeling
-    #         # Temperatuursgrens ingesteld op maximale temperatuur tf_H
-    #         self.Tf = self.Tf_H
-    #
-    #         # Selecteer de maand waarin de hoogste piek voorkomt. Het is mogelijk dat er een bepaalde maand is
-    #         # waarin het gemiddeld vermogen hoger is dan de piek. In praktijk mogen jullie ervan uitgaan
-    #         # dat het altijd true gaat zijn.
-    #         if max(self.piekvermogen_C) > max(self.maandbelasting_C):
-    #             maand_index = self.piekvermogen_C.index(max(self.piekvermogen_C)) if maandindex==None else maandindex
-    #             self.qh = max(self.piekvermogen_C) * 1000.
-    #             self.peak = True
-    #         else:
-    #             maand_index = self.maandbelasting_C.index(max(self.maandbelasting_C)) if maandindex==None else maandindex
-    #             self.qh = self.maandbelasting_C[maand_index] * 1000.
-    #             self.peak = False
-    #
-    #         self.qm = self.maandbelasting[maand_index] * 1000.
-    #         if maand_index < 1:
-    #             self.qpm = 0
-    #         else:
-    #             self.qpm = functools.reduce(lambda x, y: x + y, self.maandbelasting[:maand_index])*1000./(maand_index+1)
-    #     self.tcm = (maand_index + 1) * Borefield.UPM * 3600
-    #     self.tpm = maand_index * Borefield.UPM * 3600
-    #
-    #     return maand_index
-
     def printTemperatureProfile(self, legend=True):
         """This function plots the temperature profile for the calculated depth."""
         self._printTemperatureProfile(legend=legend)
 
-    def printTemperatureProfileFixedDepth(self, depth, lengend=True):
+    def printTemperatureProfileFixedDepth(self, depth, legend=True):
         """This function plots the temperature profile for a fixed depth depth."""
-        self._printTemperatureProfile(legend=lengend, H=depth)
-
-    def _printTemperatureProfile(self, legend=True, H=None):
-        """
-        This function would calculate a new length of the borefield using temporal superposition.
-        Now it justs outputs the temperature graphs
-        """
-
-        # making a numpy array of the monthly balance (self.montlyLoad) for a period of 20 years [kW]
-        maandbelasting_array = np.asarray(self.montlyLoad * self.simulationPeriod)
-
-        # calculation of all the different times at which the gfunction should be calculated.
-        # this is equal to 730 hours a month * 3600 seconds/hours for a period of 20 years
-        gwaarden_tijd = [i * 730 * 3600. for i in range(1, 12 * self.simulationPeriod + 1)]
-
-        # self.gfunction is a function that uses the data in data_k3.5.txt to interpolate the correct values of the gfunction.
-        # this dataset is checked over and over again and is correct
-        gwaarden = self.gfunction(gwaarden_tijd, self.H if H == None else H)
-
-        # the gfunction value of the peak with 6 hours
-        gwaarde_piek = self.gfunction(6 * 3600., self.H if H == None else H)
-
-        # calculation of needed differences of the gfunction values. These are the weight factors in the calculation of Tb.
-        lijst = [gwaarden[i] if i == 0 else gwaarden[i] - gwaarden[i - 1] for i in range(len(gwaarden))]
-
-        self.factoren_temperature_profile = lijst
-        results = []
-        temp = []
-
-        # calculation of the product for every month in order to obtain a temperature profile
-        for i in range(len(maandbelasting_array)):
-            temp.insert(0, maandbelasting_array[i] * 1000.)
-            results.append(np.dot(temp, lijst[:i + 1]))
-
-        results_C = []
-        results_H = []
-        results_piek_C = []
-        results_piek_H = []
-        results_month_C = []
-        results_month_H = []
-
-        # calculation the borehole wall temperature for every month i
-        Tb = [i / (2 * pi * self.k_s) / ((self.H if H == None else H) * len(self.borefield)) + self.Tg for i in results]
-
-        # now the Tf will be calculated based on
-        # Tf = Tb + QR_b
-        for i in range(240):
-            results_C.append(Tb[i] + self.monthlyLoadCooling[i % 12] * 1000. * (
-                    self.Rb / len(self.borefield) / (self.H if H == None else H)))
-            results_H.append(Tb[i] - self.monthlyLoadHeating[i % 12] * 1000. * (
-                    self.Rb / len(self.borefield) / (self.H if H == None else H)))
-            results_month_C.append(Tb[i] + self.monthlyLoadCooling[i % 12] * 1000. * (
-                    self.Rb / len(self.borefield) / (self.H if H == None else H)))
-            results_month_H.append(Tb[i] - self.monthlyLoadHeating[i % 12] * 1000. * (
-                    self.Rb / len(self.borefield) / (self.H if H == None else H)))
-
-        # extra sommation if the gfunction value for the peak is included
-
-        for i in range(240):
-            results_piek_C.append(results_C[i] + ((self.peakCooling[i % 12] - self.monthlyLoadCooling[i % 12] if
-                                                   self.peakCooling[i % 12] > self.monthlyLoadCooling[
-                                                       i % 12] else 0) * 1000. * (
-                                                          gwaarde_piek[0] / self.k_s / 2 / pi + self.Rb)) / len(
-                self.borefield) / (self.H if H == None else H))
-            results_piek_H.append(results_H[i] - ((self.peakHeating[i % 12] - self.monthlyLoadHeating[i % 12] if
-                                                   self.peakHeating[i % 12] > self.monthlyLoadHeating[
-                                                       i % 12] else 0) * 1000. * (
-                                                          gwaarde_piek[0] / self.k_s / 2 / pi + self.Rb)) / len(
-                self.borefield) / (self.H if H == None else H))
-
-        # definieer de tijd
-        tijd = [i / 12 / 730. / 3600. for i in gwaarden_tijd]
-
-        plt.rc('figure')
-        fig = plt.figure()
-
-        ax1 = fig.add_subplot(111)
-        ax1.set_xlabel(r'Time (year)')
-        ax1.set_ylabel(r'Temperature ($^\circ C$)')
-
-        # Plot Temperatures
-        ax1.step(tijd, Tb, 'k-', where="pre", lw=1.5, label="Tb")
-        ax1.step(tijd, results_piek_C, 'b-', where="pre", lw=1.5, label='Tf peak cooling')
-        ax1.step(tijd, results_piek_H, 'r-', where="pre", lw=1.5, label='Tf peak heating')
-
-        # Teken temperatuursgrenzen
-        ax1.step(tijd, Tb, 'k-', where="pre", lw=1.5, label="Tb")
-        ax1.step(tijd, results_month_C, color='b', linestyle="dashed", where="pre", lw=1.5, label='Tf basis cooling')
-        ax1.step(tijd, results_month_H, color='r', linestyle="dashed", where="pre", lw=1.5, label='Tf basis heating')
-        ax1.hlines(self.Tf_C, 0, 20, colors='r', linestyles='dashed', label='', lw=1)
-        ax1.hlines(self.Tf_H, 0, 20, colors='b', linestyles='dashed', label='', lw=1)
-        ax1.set_xticks(range(0, 21, 2))
-
-        # Plot legend
-        if legend:
-            ax1.legend()
-        ax1.set_xlim(left=0, right=20)
-        plt.show()
-
-
+        self._printTemperatureProfile(legend=legend, H=depth)
 
 if __name__=='__main__':
-    data = {"D": 4.0,
-            "H": 110,
-            "B": 6,
-            "r_b": 0.075,
-            "rp_out": 0.0167,
-            "rp_in": 0.013,
-            "D_s": 0.031,
+
+    # data voor het boorveld (alle conductiviteiten etc.)
+    # deze zijn nog niet allemaal actief in de code
+    # de parameters waarvan het effect meegenomen is zijn N_1 en N_2, Rb, k_s, Tg, Tinit en B
+
+    data = {"D": 4.0,           # afstand vanwaar het boorgat begint (i.e. 4 meter onder de grond start de verticale leiding)
+            "H": 110,           # diepte
+            "B": 6,             # spaciëring: wat is de afstand tussen de boringen
+            "r_b": 0.075,       # straal van het boorgat
+            "rp_out": 0.0167,   # buitendiameter van de leiding
+            "rp_in": 0.013,     # binnendiameter van de leiding
+            "D_s": 0.031,       # afstand van het centrum van de leiding tot het centrum van het boorgat
             "epsilon": 1.0e-6,
             "alpha": 1.62e-6,
-            "k_s": 3,
-            "k_g": 1.0,
-            "k_p": 0.4,
-            "m_flow": 3.98,
-            "cp_f": 4000.,
-            "den_f": 1016.,
-            "visc_f": 0.00179,
-            "k_f": 0.513,
-            "nSegments": 12,
-            "T_init": 10,
-            "Tg":10,
-            "Rb":0.2}
-    data["pos_pipes"] = [(-data["D_s"], 0.), (data["D_s"], 0.)]
+            "k_s": 3,           # conductiviteit van de bodem
+            "k_g": 1.0,         # conductiviteit van de vulling
+            "k_p": 0.4,         # conductiviteit van de leiding
+            "m_flow": 3.98,     # massadebiet
+            "cp_f": 4000.,      # soortelijke warmte van de vloeistof
+            "den_f": 1016.,     # dichtheid van de vloeistof
+            "visc_f": 0.00179,  # viscositeit van de vloeistof
+            "k_f": 0.513,       # thermische conductiviteit van de vloeistof
+            "nSegments": 12,    # aantal discretisatiesegmenten (standaard 12)
+            "T_init": 10,       # initiële bodemtemperatuur (varieert typisch van 10-13 graden)
+            "Tg":10,            # grondtemperatuur op oneiding, eigenlijk dezelfde als T_init
+            "Rb":0.2,           # equivalente boorgatweerstand --> groot effect op dimensionering! 0.2 is een vrij slecht boorgat, 0.07 is een zeer goed boorgat
+            "N_1":10,           # breedte rechthoekig veld
+            "N_2":12}           # lengte rechthoekig veld
+
+    data["pos_pipes"] = [(-data["D_s"], 0.), (data["D_s"], 0.)] # positie van de leidingen in het boorgat
 
     #Montly loading values
     piek_koel = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]            # Peak cooling in kW
-    piek_verwarming = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]    # Peak heating in kW #530
-    # piek_koel = [0, 0, 22, 44, 83, 117, 134, 150, 100, 23, 0, 0]
-    # piek_verwarming = [300, 268, 191, 103, 75, 0, 0, 38, 76, 160, 224, 255]
+    piek_verwarming = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]     # Peak heating in kW
 
-    # piek_koel = [0]*12
-    maandbelasting_H_E = [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144] #0.155
+    maandbelasting_H_E = [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144] # procentuele verdeling van de jaarenergie per maand (15.5% voor januari ...)
     maandbelasting_C_E = [0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025]
     maandbelasting_H_E = list(map(lambda x: x * 300 * 10 ** 3, maandbelasting_H_E))  # kWh
     maandbelasting_C_E = list(map(lambda x: x * 160* 10 ** 3, maandbelasting_C_E))  # kWh
-    # piek_koel = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]  # kW
-    # piek_verwarming = [160., 143., 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]  # kW
 
-    # piek_koel = [0]*12
+    # aanmaak van het object
 
-    #
-    piek_koel=[piek_koel[i] if piek_koel[i]>maandbelasting_C_E[i]/730. else maandbelasting_C_E[i]/730. for i in range(12)]
-    piek_verwarming=[piek_verwarming[i] if piek_verwarming[i]>maandbelasting_H_E[i]/730. else maandbelasting_H_E[i]/730. for i in range(12)]
-    #
-    # maandbelasting_C_E =[0.0, 0.0, 0.0, 0.0, 24.65753424657534, 32.87671232876713, 65.75342465753425, 60.47191246575342, 32.87671232876713, 0.0, 0.0, 0.0]
-    #
-    # maandbelasting_H_E=[33.83413108624657, 32.255937582794516, 27.160361020821917, 21.433251792438355, 13.741615901369862, 0.0, 0.0, 0.0, 13.138064054136986, 18.88257253709589, 25.493912723178088, 31.428355705315067]
-    #
-    # piek_koel=[0, 0, 9.342450849412101, 52.56163, 75.355208, 75.35521, 65.75342465753425, 61.07019, 75.355208, 12.342450849412101, 0, 0]
-    #
-    # piek_verwarming=[133.966373944, 131.346465416, 101.763100744, 54.734621656, 13.741615901369864, 0.0, 0.0, 0.0, 40.16820104, 84.814079384, 118.85007710400001, 133.96637379199998]
+    boorveld = Borefield(simulationPeriod=20,
+                         numberOfBoreholes=data["N_1"]*data["N_2"],
+                         peakHeating=piek_verwarming,
+                         peakCooling=piek_koel,
+                         baseloadHeating=maandbelasting_H_E,
+                         baseloadCooling=maandbelasting_C_E)
 
-
-
-
-    # maandbelasting_C_E = map(lambda x:x*730.,maandbelasting_C_E)
-    # maandbelasting_H_E = map(lambda x:x*730.,maandbelasting_H_E)
-    # print sum(maandbelasting_C_E),sum(maandbelasting_H_E)
-
-    # piek_koel[7] -= 33.119579313166184
-
-
-    temp = piek_verwarming
-
-    boreField = gt.boreholes.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)  # setting up the borefield
-
-    boorveld = Borefield(20,boreField,piek_verwarming,piek_koel,maandbelasting_H_E,maandbelasting_C_E)  #making of an object
     boorveld.setGroundParameters(data)
-    #set temperature boundaries
-    boorveld.setMaxGroundTemperature(16)
+
+    # set temperature boundaries
+    boorveld.setMaxGroundTemperature(16) # 16/17 voor passief koelen, 25 voor actief koelen
     boorveld.setMinGroundTemperature(0)
 
-    # boorveld.dimensioneer_boorveld(100,old=True)
-    # print boorveld.H
-
-    # a_pool = MyPool(4)
-    # a_pool.map(boorveld.makeDatafile,[{"B": 3, "N_1": 5,"N_2":5,"k_s":1.5}])
-    # a_pool.close()
-    # a_pool.join()
-
-    #boorveld.dimensioneer_boorveld(100)
-    # for N_1 in range(1,21):
-    #     for N_2 in range (1,21):
-    #         for ks in (1.5,2,2.5,3,3.5):
-    #             # data3 = {"B": 3, "N_1": N_1,"N_2":N_2,"k_s":ks}
-    #             # p1 = Process(target=boorveld.makeDatafile,args=(data3,))
-    #             # data6 = {"B": 6, "N_1": N_1, "N_2": N_2, "k_s": ks}
-    #             # p2 = Process(target=boorveld.makeDatafile,args=(data6,))
-    #             # data9 = {"B": 9, "N_1": N_1, "N_2": N_2, "k_s": ks}
-    #             # p3 = Process(target=boorveld.makeDatafile,args=(data9,))
-    #             # p1.start()
-    #             # p2.start()
-    #             # p3.start()
-    #             # p1.join()
-    #             # p2.join()
-    #             # p3.join()
-    #             for B in (3,6,9):
-    #                 print("test")
-    #                 boorveld.N_1=N_1
-    #                 boorveld.N_2=N_2
-    #                 boorveld.k_s=ks
-    #                 boorveld.B=B
-    #                 boorveld.makeDatafile()
-
-
-    # print (boorveld.H)
-    print (boorveld.gfunction(np.array([120000]),105))
-    print (boorveld.size(100))
-    # # print boorveld.limiterende_maand_heating,boorveld.limiterende_maand_cooling,boorveld.cooling_lim,boorveld.heating_lim
-    boorveld.printTemperatureProfile(legend=True)
-    # # print boorveld.actief_koelen_referentietemperatuur
-    # # print boorveld.bepaal_baseloadopties((((0,)*12,(0,)*12),((0,)*12,(0,)*12),"",93.8405439071284))
-    # print (boorveld.H)
-    # temp = boorveld.bepaal_opties(boorveld.H,True,optimale_reductie = True)
-    # # boorveld.cooling_lim = False
-    # # temp = boorveld.zuiver_gelimiteerd(boorveld.H,reductie=True,optimale_reductie=True,recursief=True)
-    # for _,i in enumerate(temp):
-    #     print (i)
-    #     print (boorveld.bepaal_baseloadopties(i))
+    print (boorveld.size(100)) # print depth of borefield
+    print (boorveld.imbalance) # print imbalance
+    boorveld.printTemperatureProfile(legend=True) # plot temperature profile for the calculated depth
+    boorveld.printTemperatureProfileFixedDepth(depth=75,legend=False)
+    print (boorveld.resultsPeakCooling) # waarden voor de piekkoeling
