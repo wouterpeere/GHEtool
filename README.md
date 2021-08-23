@@ -13,7 +13,7 @@ This tool comes with precalculated g-functions for all borefields of type nxm (f
 
 * Depth: 25 - 200m in increments of 25m (will shortly be extended to 300m)
 * Thermal conductivity of the soil: 1.5 - 3.5 in increments of 0.5W/mk
-* Spacings (equal): 3 - 9m in increments of m-1m
+* Spacings (equal): 3 - 9m in increments of 1m
 
 It is possible to calculate your own dataset to your specific project based on the *pygfunction* tool and use this one in the code.
 
