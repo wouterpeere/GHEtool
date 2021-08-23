@@ -70,7 +70,7 @@ if __name__ == "__main__":
     """
 
     # Montly loading values
-    peakCooling = [0., 0, 3.4, 6.9, 13., 18., 21., 50., 16., 3.7., 0., 0.]  # Peak cooling in kW
+    peakCooling = [0., 0, 3.4, 6.9, 13., 18., 21., 50., 16., 3.7, 0., 0.]  # Peak cooling in kW
     peakHeating = [60., 42., 10., 5., 0., 0., 0., 0., 4.4, 8.5, 19., 36.]  # Peak heating in kW
 
     # annual heating and cooling load
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     borefield.setMinGroundTemperature(0)  # minimum temperature
 
     customField = gt.boreholes.L_shaped_field(N_1=3, N_2=3, B_1=5., B_2=5.,H=100., D=4, r_b=0.05)
-    Borefield.createCustomDataset(borefield,customField,"customField")
+    borefield.createCustomDataset(customField,"customField")
     borefield.setCustomGfunction("customfield")
     borefield.setBorefield(customField)
     borefield.printTemperatureProfileFixedDepth(100)
