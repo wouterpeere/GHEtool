@@ -43,8 +43,8 @@ class Borefield():
 
     gfunctionInterpolationArray=[]
 
-    def __init__(self, simulationPeriod, numberOfBoreholes, peakHeating=[0] * 12, peakCooling=[0] * 12,
-                 baseloadHeating=[0] * 12, baseloadCooling=[0] * 12, investementCost=None,borefield=None):
+    def __init__(self, simulationPeriod, numberOfBoreholes=None, peakHeating=[0] * 12, peakCooling=[0] * 12,
+                 baseloadHeating=[0] * 12, baseloadCooling=[0] * 12, investementCost=None,borefield=None,customGfunction=None):
         """This function initiates the Borefield class"""
 
         # initiate vars
@@ -68,6 +68,8 @@ class Borefield():
 
         self.setBorefield(borefield)
 
+        self.setCustomGfunction(customGfunction)
+
         self.H = 0
 
     def setNumberOfBoreholes(self,numberOfBoreholes):
@@ -82,6 +84,11 @@ class Borefield():
             self.borefield = borefield
             self.setNumberOfBoreholes(len(borefield))
 
+    def setCustomGfunction(self,customGfunction):
+        """This functions sets the custom g-function."""
+        self.customGfunction = customGfunction
+        Borefield.gfunctionInterpolationArray=[]
+
     def setInvestementCost(self, investementCost=defaultInvestement):
         """This function sets the investement cost. This is linear with respect to the total field length."""
         self.costInvestement = investementCost
@@ -92,50 +99,29 @@ class Borefield():
         self.th = length * 3600.  # length of peak in seconds
 
     def setGroundParameters(self,data):
-        # Borehole dimensions
-        self.D = data["D"]  # Borehole buried depth (m)
+        """This function sets the relevant borefield characteristics."""
+
         self.H = data["H"]  # Borehole length (m)
-        self.r_b = data["r_b"]  # Borehole radius (m)
         self.B = data["B"]  # Borehole spacing (m)
 
         self.N_1 = data["N_1"]
         self.N_2 = data["N_2"]
 
-        # Pipe dimensions
-        self.rp_out = data["rp_out"]  # Pipe outer radius (m)
-        self.rp_in = data["rp_in"]  # Pipe inner radius (m)
-        self.D_s = data["D_s"]  # Shank spacing (m)
-        self.epsilon = data["epsilon"]  # Pipe roughness (m)
         self.Rb =data["Rb"]
 
-        # Pipe positions
-        # Single U-tube [(x_in, y_in), (x_out, y_out)]
-        self.pos_pipes = data["pos_pipes"]
-
         # Ground properties
-        self.alpha = data["alpha"]  # Ground thermal diffusivity (m2/s)
         self.k_s = data["k_s"]  # Ground thermal conductivity (W/m.K)
-        self.Tg = data["Tg"]    # Grondtemperatuur (c)
-
-        # Grout properties
-        self.k_g = data["k_g"]  # Grout thermal conductivity (W/m.K)
-
-        # Pipe properties
-        self.k_p = data["k_p"]  # Pipe thermal conductivity (W/m.K)
-
-        # Fluid properties
-        self.m_flow = data["m_flow"]  # Total fluid mass flow rate (kg/s)
-        self.cp_f = data["cp_f"]  # Fluid specific isobaric heat capacity (J/kg.K)
-        self.den_f = data["den_f"]  # Fluid density (kg/m3)
-        self.visc_f = data["visc_f"]  # Fluid dynamic viscosity (kg/m.s)
-        self.k_f = data["k_f"]  # Fluid thermal conductivity (W/m.K)
+        self.Tg = data["Tg"]    # Ground temperature at infinity (C)
 
         # Number of segments per borehole
-        self.nSegments = data["nSegments"]
         self.ty = self.simulationPeriod * 8760.*3600
         self.tm = Borefield.UPM * 3600.
         self.td = 6*3600.
         self.time = np.array([self.td, self.td + self.tm, self.ty + self.tm + self.td])
+
+        # sets the number of boreholes as if it was a rectangular field, iff there is not yet a number of boreholes defined by a custom configuration
+        if self.numberOfBoreholes==None:
+            self.setNumberOfBoreholes(self.N_1*self.N_2)
 
     def setMaxGroundTemperature(self, temp):
         """This function sets the maximal ground temperature to temp"""
@@ -156,7 +142,7 @@ class Borefield():
             self.H = 50
 
         # Iterates as long as there is no convergence
-        # (convergence if difference between depth in iterations is smaller than thresholTemperature)
+        # (convergence if difference between depth in iterations is smaller than thresholdTemperature)
         while abs(self.H - H_prev) >= Borefield.thresholdTemperature:
             # calculate the required gfunction values
             gfunc_uniform_T = self.gfunction(self.time, self.H)
@@ -475,77 +461,30 @@ class Borefield():
             plt.show()
 
     def gfunction(self, timeValue, H):
-        """This function calculated the gfunction based on interpolation of the precalculated data"""
-
-        def relevance(H_values,H,threshold):
-
-            if H_values==[] or (H >= max(H_values) + threshold) or (H<=min(H_values) - threshold):
-                return (True,)
-
-            val_above,val_below = 0,0
-
-            for i in H_values:
-                if i<H:
-                    val_below=i
-                elif val_above==0:
-                    val_above = i
-                    return False,val_below,val_above
-
-        def ask(prompt):
-            while True:
-                try:
-                    return {1: True, 0: False}[input(prompt).lower()]
-                except KeyError:
-                    print ("Invalid input please enter True or False!")
-
-
-        toAsk = False
+        """This function calculated the gfunction based on interpolation of the precalculated data."""
 
         # get the name of the data file
-        name = configurationString(self.N_1,self.N_2)+".txt"
+        if self.customGfunction==None:
+            name = configurationString(self.N_1,self.N_2)+".txt"
+        else:
+            name = self.customGfunction+".txt"
 
         # check if datafile exists
         if not os.path.isfile("Data/"+name):
-            # does not exist, so create
-            pickle.dump(dict([]),open("Data/"+name,"wb"))
-            toAsk = True
+            print(name)
+            raise Exception('There is no precalculated data available. Please use the createCustomDatafile.')
 
+        # load data file
         data = pickle.load(open("Data/"+name,"rb"))
 
-        # see if there is a spacing between the lines
-
-        Time = boorveld.defaultTimeArray
-        # print data.keys()
+        # remove the time value
+        Time = Borefield.defaultTimeArray
         data.pop("Time")
-        lijst = list(data.keys())
-        lijst.sort()
-        # print "To ask",relevant(lijst,self.B,boorveld.thresholdBoreholeSpacing)[0]
-        if not toAsk and relevance(lijst,self.B,boorveld.thresholdBoreholeSpacing)[0]:
-            data[self.B] = dict([])
-            toAsk = True
 
-        # see if k_s exists
-        lijst = list(data[lijst[0]].keys())
-        lijst.sort()
-        if not toAsk and relevance(lijst,self.k_s,boorveld.thresholdSoilConductivity)[0]:
-            data[self.B][self.k_s] = dict([])
-            toAsk = True
-
-        if boorveld.defaultMelden and toAsk:
-            # answer = ask("Deze data is niet geprecalculeerd. Wilt u deze data nu berekenen? (1 of 0)")
-            # if True: # answer:
-                # bereken nieuwe data
-            self.makeDatafile()
-            data = pickle.load(open("Data/" + name, "rb"))
-
-        # 3D - interpolatie over zowel spacing, ks en H
-        # https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.griddata.html
-
-        if boorveld.gfunctionInterpolationArray==[]:
-            # maak interpolatielijst aan
-            def makeInterpolationList():
-                """Deze functie maakt een interpolatielijst aan en stokkeert deze onder
-                de variabele gfunctionInterpolationArray"""
+        if Borefield.gfunctionInterpolationArray==[]:
+            # if no interpolation array exists, it creates one
+            def makeInterpolationListDefault():
+                """This function creates an interpolation list and saves it under gfunctionInterpolationArray."""
 
                 B_array = list(data.keys())
                 ks_array = list(data[B_array[0]].keys())
@@ -565,121 +504,86 @@ class Borefield():
                             temp_H.append(data[B][ks][H])
                         temp_ks.append(temp_H)
                     values.append(temp_ks)
-                boorveld.gfunctionInterpolationArray=(points,values)
-                # print values
-                # if self.B in B_array and self.k_s in ks_array:
-                #     gfunctionTemp = [data[self.B][self.k_s][H] for H in H_array]
-                #     boorveld.gfunctionInterpolationArray= (Time,H_array,gfunctionTemp)
-                # elif self.B in B_array and not self.k_s in ks_array:
-                #     # interpolate in ks
+                Borefield.gfunctionInterpolationArray=(points,values)
 
-            makeInterpolationList()
+            def makeInterpolationListCustom():
+                """This function creates an interpolation list from a custom dataset and saves it under gfunctionInterpolationArray."""
 
-        points,values = boorveld.gfunctionInterpolationArray
+                H_array = list(data["Data"].keys())
+                H_array.sort()
 
-        # times = []
-        # for t in tijd:
-        #     print np.array([self.B, self.k_s, H, t]),H
-        #     times.append(interpolate.interpn(points, values, np.array([self.B, self.k_s, H, t])))
-        #
-        if not isinstance(timeValue, float):
-            times = interpolate.interpn(points, values, np.array([[self.B, self.k_s, H, t] for t in timeValue]))
+                points = (H_array,Time)
+
+                values = []
+
+                for H in H_array:
+                    values.append(data["Data"][H])
+
+                Borefield.gfunctionInterpolationArray=(points,values)
+
+            if self.customGfunction==None:
+                makeInterpolationListDefault()
+            else:
+                makeInterpolationListCustom()
+
+        if self.customGfunction==None:
+            # interpolate
+            points,values = Borefield.gfunctionInterpolationArray
+
+            if not isinstance(timeValue, float):
+                # multiple values are requested
+                gvalue = interpolate.interpn(points, values, np.array([[self.B, self.k_s, H, t] for t in timeValue]))
+            else:
+                # only one value is requested
+                gvalue = interpolate.interpn(points, values, np.array([self.B, self.k_s, H, timeValue]))
         else:
-            times = interpolate.interpn(points, values, np.array([self.B, self.k_s, H, timeValue]))
-        # print times
-        return times
+            # interpolate
+            points, values = Borefield.gfunctionInterpolationArray
+            if not isinstance(timeValue, float):
+                # multiple values are requested
+                gvalue = interpolate.interpn(points, values, np.array([[H, t] for t in timeValue]))
+            else:
+                # only one value is requested
+                gvalue = interpolate.interpn(points, values, np.array([H, timeValue]))
+        return gvalue
 
-        # B_array = data.keys().sort()
-        # ks_array = data[B_array[0]].sort()
-        # H_array = data[B_array[0]][ks_array[0]].sort()
-        #
-        # H_array = [i.get("H") for i in raw_data]
-        # tijd_array = raw_data[0].get("Time")
-        # respons = [i.get("Gfunc") for i in raw_data]
-        #
-        # f = interpolate.interp2d(tijd_array, H_array, respons)
-        # return f(tijd, H)
-
-    def makeDatafile(self,data=None,thresholdBoreholeDepth=thresholdBoreholeDepth,timeArray=defaultTimeArray,depthArray=defaultDepthArray):
-        """This function makes a datafile for a given borefield spacing and ground conductivity."""
-        if data==None:
-            N_1=self.N_1
-            N_2 = self.N_2
-            k_s = self.k_s
-            B = self.B
-        else:
-            N_1 = data["N_1"]
-            N_2 = data["N_2"]
-            k_s = data["k_s"]
-            B = data["B"]
-        def relevant(H_values,H):
-
-            if H_values==[] or (H >= max(H_values) + thresholdBoreholeDepth) or (H<=min(H_values) - thresholdBoreholeDepth+1):
-                return (True,)
-
-            val_above,val_below = 0,0
-
-            for i in H_values:
-                if i<H:
-                    val_below=i
-                    if len(H_values)==1:
-                        return True,
-                elif val_above==0:
-                    val_above = i
-                    return False,val_below,val_above
+    def createCustomDataset(self,customBorefield,nameDatafile,nSegments=12,timeArray=defaultTimeArray,depthArray=defaultDepthArray):
+        """This function makes a datafile for a given custom borefield."""
 
         # make filename
-        name = configurationString(N_1, N_2) + ".txt"
+        name = nameDatafile + ".txt"
         # check if file exists
         if not os.path.isfile("Data/"+name):
             # does not exist, so create
             pickle.dump(dict([]), open("Data/"+name, "wb"))
+        else:
+            raise Exception("The dataset " + name + " already exists. Please chose a different name.")
+
         data = pickle.load(open("Data/"+name, "rb"),encoding='latin1')
 
 
-        # see if spacing exists
-        if not B in data:
-            data[B]=dict([])
-
         # see if k_s exists
-        if not k_s in data[B]:
-            data[B][k_s] = dict([])
+        data["Data"] = dict([])
 
         data["Time"]= timeArray
-        H_values = list(data[B][k_s].keys())
-        H_values.sort()
 
         for H in depthArray:
-            print ("Start H: ", H, "B: ", B, "k_s: ",k_s, "N_1 :", N_1, "N_2: ", N_2)
-            # print ("Bereken de gfunctiewaarden voor H: ", H, "m")
-            _relevant = relevant(H_values,H)
-            # bekijk of deze waarde moet uitgerekend worden
-            if H in data[B][k_s]:
-                # bestaat al dus we slaan deze waarde over
-                print ("De gfunctie is reeds bepaald voor H: ",H,"m!")
-            elif not _relevant[0]:
-                print ("Deze gfunctie wordt niet berekend daar deze te dicht ligt bij de berekende waarden van ", _relevant[1], " en ", _relevant[2])
-            else:
-                # Calculate the g-function for uniform borehole wall temperature
-                boreFieldTemp = gt.boreholes.rectangle_field(N_1, N_2, B, B, H, self.D, self.r_b)
+            print ("Start H: ", H)
 
-                alpha = k_s / (2.4 * 10 ** 6)
+            # Calculate the g-function for uniform borehole wall temperature
+            alpha = self.k_s / (2.4 * 10 ** 6)
 
-                # p1  = Process(target=gt.gfunction.uniform_temperature, args=(boreFieldTemp, timeArray, alpha,12,'linear',True,0.01,1e-06,None,True))
-                # p2 = Process(target=gt.gfunction.uniform_temperature, args=(boreFieldTemp, timeArray, alpha,12,'linear',True,0.01,1e-06,None,True))
-                # p1.start()
-                # p2.start()
-                # p1.join()
-                # p2.join()
-                # print ("Done")
-                gfunc_uniform_T = gt.gfunction.uniform_temperature(
-                        boreFieldTemp, timeArray, alpha, nSegments=self.nSegments, disp=False)
+            # set borehole depth in borefield
+            for borehole in customBorefield:
+                borehole.H=H
 
-                data[B][k_s][H]=gfunc_uniform_T
-                H_values.append(H)
-                H_values.sort()
-        # print ("Start H: ", H, "B: ", B, "k_s: ",k_s, "N_1 :", N_1, "N_2: ", N_2)
+            gfunc_uniform_T = gt.gfunction.uniform_temperature(
+                    customBorefield, timeArray, alpha, nSegments=nSegments, disp=True)
 
+            data["Data"][H]=gfunc_uniform_T
+
+        self.setCustomGfunction(name)
+        print("A new dataset with name " + name + " has been created in " + os.getcwd()+"\Data.")
         pickle.dump(data,open("Data/"+name,"wb"))
 
     def printTemperatureProfile(self, legend=True):
@@ -689,65 +593,3 @@ class Borefield():
     def printTemperatureProfileFixedDepth(self, depth, legend=True):
         """This function plots the temperature profile for a fixed depth depth."""
         self._printTemperatureProfile(legend=legend, H=depth)
-
-if __name__=='__main__':
-
-    # data voor het boorveld (alle conductiviteiten etc.)
-    # deze zijn nog niet allemaal actief in de code
-    # de parameters waarvan het effect meegenomen is zijn N_1 en N_2, Rb, k_s, Tg, Tinit en B
-
-    data = {"D": 4.0,           # afstand vanwaar het boorgat begint (i.e. 4 meter onder de grond start de verticale leiding)
-            "H": 110,           # diepte
-            "B": 6,             # spaciëring: wat is de afstand tussen de boringen
-            "r_b": 0.075,       # straal van het boorgat
-            "rp_out": 0.0167,   # buitendiameter van de leiding
-            "rp_in": 0.013,     # binnendiameter van de leiding
-            "D_s": 0.031,       # afstand van het centrum van de leiding tot het centrum van het boorgat
-            "epsilon": 1.0e-6,
-            "alpha": 1.62e-6,
-            "k_s": 3,           # conductiviteit van de bodem
-            "k_g": 1.0,         # conductiviteit van de vulling
-            "k_p": 0.4,         # conductiviteit van de leiding
-            "m_flow": 3.98,     # massadebiet
-            "cp_f": 4000.,      # soortelijke warmte van de vloeistof
-            "den_f": 1016.,     # dichtheid van de vloeistof
-            "visc_f": 0.00179,  # viscositeit van de vloeistof
-            "k_f": 0.513,       # thermische conductiviteit van de vloeistof
-            "nSegments": 12,    # aantal discretisatiesegmenten (standaard 12)
-            "T_init": 10,       # initiële bodemtemperatuur (varieert typisch van 10-13 graden)
-            "Tg":10,            # grondtemperatuur op oneiding, eigenlijk dezelfde als T_init
-            "Rb":0.2,           # equivalente boorgatweerstand --> groot effect op dimensionering! 0.2 is een vrij slecht boorgat, 0.07 is een zeer goed boorgat
-            "N_1":10,           # breedte rechthoekig veld
-            "N_2":12}           # lengte rechthoekig veld
-
-    data["pos_pipes"] = [(-data["D_s"], 0.), (data["D_s"], 0.)] # positie van de leidingen in het boorgat
-
-    #Montly loading values
-    piek_koel = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]            # Peak cooling in kW
-    piek_verwarming = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]     # Peak heating in kW
-
-    maandbelasting_H_E = [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144] # procentuele verdeling van de jaarenergie per maand (15.5% voor januari ...)
-    maandbelasting_C_E = [0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025]
-    maandbelasting_H_E = list(map(lambda x: x * 300 * 10 ** 3, maandbelasting_H_E))  # kWh
-    maandbelasting_C_E = list(map(lambda x: x * 160* 10 ** 3, maandbelasting_C_E))  # kWh
-
-    # aanmaak van het object
-
-    boorveld = Borefield(simulationPeriod=20,
-                         numberOfBoreholes=data["N_1"]*data["N_2"],
-                         peakHeating=piek_verwarming,
-                         peakCooling=piek_koel,
-                         baseloadHeating=maandbelasting_H_E,
-                         baseloadCooling=maandbelasting_C_E)
-
-    boorveld.setGroundParameters(data)
-
-    # set temperature boundaries
-    boorveld.setMaxGroundTemperature(16) # 16/17 voor passief koelen, 25 voor actief koelen
-    boorveld.setMinGroundTemperature(0)
-
-    print (boorveld.size(100)) # print depth of borefield
-    print (boorveld.imbalance) # print imbalance
-    boorveld.printTemperatureProfile(legend=True) # plot temperature profile for the calculated depth
-    boorveld.printTemperatureProfileFixedDepth(depth=75,legend=False)
-    print (boorveld.resultsPeakCooling) # waarden voor de piekkoeling
