@@ -10,7 +10,6 @@ def timeValues():
     """This function calculates the default time values for the gfunction."""
     dt = 3600.  # Time step (s)
     tmax = 20. * 8760. * 3600.  # Maximum time (s)
-    Nt = int(np.ceil(tmax / dt))  # Number of time steps
 
     # Load aggregation scheme
     LoadAgg = gt.load_aggregation.ClaessonJaved(dt, tmax)
@@ -26,20 +25,15 @@ def configurationString(N_1,N_2):
 
 class Borefield():
 
-    UPM = 730.
-    threshold_temperatuur = 0.05
-    threshold_passief_koelen = 15.5
-    thresholdTemperature = 0.05  # threshold for iteration
-    thresholdSoilConductivity = 0.05  # W/mK
-    thresholdBoreholeSpacing = 0.5  # m
-    thresholdBoreholeDepth = 25  # m
+    UPM = 730. # number of hours per month
+    thresholdBorholeDepth = 0.05  # threshold for iteration
+
 
     # define default values
     defaultInvestement = [35, 0]  # 35 EUR/m
     defaultLengthPeak = 6  # hours
     defaultDepthArray = [1]+list(range(25, 201, 25))  # m
     defaultTimeArray = timeValues()  # sec
-    defaultMelden = True
 
     gfunctionInterpolationArray=[]
 
@@ -143,7 +137,7 @@ class Borefield():
 
         # Iterates as long as there is no convergence
         # (convergence if difference between depth in iterations is smaller than thresholdTemperature)
-        while abs(self.H - H_prev) >= Borefield.thresholdTemperature:
+        while abs(self.H - H_prev) >= Borefield.thresholdBorholeDepth:
             # calculate the required gfunction values
             gfunc_uniform_T = self.gfunction(self.time, self.H)
 
@@ -173,7 +167,7 @@ class Borefield():
 
         # Iterates as long as there is no convergence
         # (convergence if difference between depth in iterations is smaller than thresholTemperature)
-        while abs(self.H - H_prev) >= Borefield.thresholdTemperature:
+        while abs(self.H - H_prev) >= Borefield.thresholdBorholeDepth:
             # get the gfunction values
             gfunc_uniform_T = self.gfunction(timeSteps, self.H)
 
