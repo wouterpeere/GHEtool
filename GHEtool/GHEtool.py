@@ -136,7 +136,7 @@ class Borefield():
             self.H = 50
 
         # Iterates as long as there is no convergence
-        # (convergence if difference between depth in iterations is smaller than thresholdTemperature)
+        # (convergence if difference between depth in iterations is smaller than thresholdBorholeDepth)
         while abs(self.H - H_prev) >= Borefield.thresholdBorholeDepth:
             # calculate the required gfunction values
             gfunc_uniform_T = self.gfunction(self.time, self.H)
@@ -166,7 +166,7 @@ class Borefield():
             self.H = 50
 
         # Iterates as long as there is no convergence
-        # (convergence if difference between depth in iterations is smaller than thresholTemperature)
+        # (convergence if difference between depth in iterations is smaller than thresholdBorholeDepth)
         while abs(self.H - H_prev) >= Borefield.thresholdBorholeDepth:
             # get the gfunction values
             gfunc_uniform_T = self.gfunction(timeSteps, self.H)
@@ -221,7 +221,7 @@ class Borefield():
         return self.H
 
 
-    def calculateMontlyLoad(self):
+    def calculateMonthlyLoad(self):
         """This function calculates the average monthly load in kW"""
         self.montlyLoad = [(-self.baseloadHeating[i] + self.baseloadCooling[i]) / Borefield.UPM for i in range(12)]
 
@@ -229,7 +229,7 @@ class Borefield():
         """This function defines the baseload in heating both in an energy as in an average power perspective"""
         self.baseloadHeating = [i if i >= 0 else 0 for i in baseload]  # kWh
         self.monthlyLoadHeating = list(map(lambda x: x / Borefield.UPM, self.baseloadHeating)) # kW
-        self.calculateMontlyLoad()
+        self.calculateMonthlyLoad()
         self.calculateImbalance()
 
         # new peak heating if baseload is larger than the peak
@@ -239,7 +239,7 @@ class Borefield():
         """This function defines the baseload in cooling both in an energy as in an average power perspective"""
         self.baseloadCooling = [i if i >= 0 else 0 for i in baseload]  # kWh
         self.monthlyLoadCooling = list(map(lambda x: x / Borefield.UPM, self.baseloadCooling))  # kW
-        self.calculateMontlyLoad()
+        self.calculateMonthlyLoad()
         self.calculateImbalance()
 
         # new peak cooling if baseload is larger than the peak
