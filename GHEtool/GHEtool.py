@@ -216,7 +216,7 @@ class Borefield():
             self.H = max(sizeQuadrant1(),sizeQuadrant4())
         else:
             # injection dominated, so quadrants 2 and 3 are relevant
-            self.H = max(sizeQuadrant2,sizeQuadrant3)
+            self.H = max(sizeQuadrant2(),sizeQuadrant3())
 
         return self.H
 
