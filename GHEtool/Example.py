@@ -23,16 +23,16 @@ if __name__ == "__main__":
     montlyLoadCoolingPercentage = [0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025]
 
     # resulting load per month
-    montlyLoadHeating = list(map(lambda x: x * annualHeatingLoad, montlyLoadHeatingPercentage))   # kWh
-    montlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, montlyLoadCoolingPercentage))   # kWh
+    monthlyLoadHeating = list(map(lambda x: x * annualHeatingLoad, montlyLoadHeatingPercentage))   # kWh
+    monthlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, montlyLoadCoolingPercentage))   # kWh
 
     # create the borefield object
 
     borefield = Borefield(simulationPeriod=20,
-                         peakHeating=peakHeating,
-                         peakCooling=peakCooling,
-                         baseloadHeating=montlyLoadHeating,
-                         baseloadCooling=montlyLoadCooling)
+                          peakHeating=peakHeating,
+                          peakCooling=peakCooling,
+                          baseloadHeating=monthlyLoadHeating,
+                          baseloadCooling=monthlyLoadCooling)
 
     borefield.setGroundParameters(data)
 
@@ -82,16 +82,16 @@ if __name__ == "__main__":
     montlyLoadCoolingPercentage = [0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025]
 
     # resulting load per month
-    montlyLoadHeating = list(map(lambda x: x * annualHeatingLoad, montlyLoadHeatingPercentage))  # kWh
-    montlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, montlyLoadCoolingPercentage))  # kWh
+    monthlyLoadHeating = list(map(lambda x: x * annualHeatingLoad, montlyLoadHeatingPercentage))  # kWh
+    monthlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, montlyLoadCoolingPercentage))  # kWh
 
     # create the borefield object
 
     borefield = Borefield(simulationPeriod=20,
                           peakHeating=peakHeating,
                           peakCooling=peakCooling,
-                          baseloadHeating=montlyLoadHeating,
-                          baseloadCooling=montlyLoadCooling)
+                          baseloadHeating=monthlyLoadHeating,
+                          baseloadCooling=monthlyLoadCooling)
 
     borefield.setGroundParameters(data)
 
