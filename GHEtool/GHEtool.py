@@ -441,9 +441,8 @@ class Borefield():
             ax1.step(timeArray, resultsPeakHeating, 'r-', where="pre", lw=1.5, label='Tf peak heating')
 
             # define temperature bounds
-            ax1.step(timeArray, Tb, 'k-', where="pre", lw=1.5, label="Tb")
-            ax1.step(timeArray, resultsMonthCooling, color='b', linestyle="dashed", where="pre", lw=1.5, label='Tf basis cooling')
-            ax1.step(timeArray, resultsMonthHeating, color='r', linestyle="dashed", where="pre", lw=1.5, label='Tf basis heating')
+            ax1.step(timeArray, resultsMonthCooling, color='b', linestyle="dashed", where="pre", lw=1.5, label='Tf base cooling')
+            ax1.step(timeArray, resultsMonthHeating, color='r', linestyle="dashed", where="pre", lw=1.5, label='Tf base heating')
             ax1.hlines(self.Tf_C, 0, 20, colors='r', linestyles='dashed', label='', lw=1)
             ax1.hlines(self.Tf_H, 0, 20, colors='b', linestyles='dashed', label='', lw=1)
             ax1.set_xticks(range(0, 21, 2))
