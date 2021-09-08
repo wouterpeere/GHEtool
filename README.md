@@ -6,7 +6,7 @@
 At its core, *GHEtool* is based on the ground thermal response functions (g-functions in short). These were precalculated for rectangular fields up to 20x20 boreholes with the python package *pygfunction* (Cimmino, 2018) so the code can interpolate from these data. Because of a lot of iterations, such precalculated database is useful. One can also add its own configurations.
 Using temporal superposition of the load, *GHEtool* calculates the required depth of the borefield in order to stay between the given temperature limits. It can, on the other hand, also calculate the temperature profile for a given depth. 
 
-It is also possible to use a fixed borefield and an hourly load profile to calculate which peak (based on a load-duration curve) can be put on the field.
+It is also possible to use a fixed borefield and an hourly load profile to calculate the maximum peak (based on a load-duration curve) that can be put on the field.
 
 This tool is based on the work of (Peere et al., 2021).
 
