@@ -213,13 +213,26 @@ class Borefield():
 
         if self.imbalance<=0:
             # extraction dominated, so quadrants 1 and 4 are relevant
-            self.H = max(sizeQuadrant1(),sizeQuadrant4())
+            quadrant1 = sizeQuadrant1()
+            quadrant4 = sizeQuadrant4()
+            self.H = max(quadrant1,quadrant4)
+
+            if self.H==quadrant1:
+                self.limitingQuadrant = 1
+            else:
+                self.limitingQuadrant = 4
         else:
             # injection dominated, so quadrants 2 and 3 are relevant
-            self.H = max(sizeQuadrant2(),sizeQuadrant3())
+            quadrant2 = sizeQuadrant2()
+            quadrant3 = sizeQuadrant3()
+            self.H = max(quadrant2,quadrant3)
+
+            if self.H==quadrant2:
+                self.limitingQuadrant = 2
+            else:
+                self.limitingQuadrant = 3
 
         return self.H
-
 
     def calculateMonthlyLoad(self):
         """This function calculates the average monthly load in kW"""
