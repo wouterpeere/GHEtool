@@ -101,7 +101,15 @@ class Borefield():
     def setLengthPeak(self, length=defaultLengthPeak):
         """This function sets the length of the peak to length."""
         self.lengthPeak = length
-        self.th = length * 3600.  # length of peak in seconds
+        self.setTimeConstants()
+
+    def setTimeConstants(self):
+        # Number of segments per borehole
+        self.th = self.lengthPeak * 3600.  # length of peak in seconds
+        self.ty = self.simulationPeriod * 8760. * 3600
+        self.tm = Borefield.UPM * 3600.
+        self.td = self.lengthPeak * 3600.
+        self.time = np.array([self.td, self.td + self.tm, self.ty + self.tm + self.td])
 
     def setGroundParameters(self,data):
         """This function sets the relevant borefield characteristics."""
@@ -117,12 +125,6 @@ class Borefield():
         # Ground properties
         self.k_s = data["k_s"]  # Ground thermal conductivity (W/m.K)
         self.Tg = data["Tg"]    # Ground temperature at infinity (C)
-
-        # Number of segments per borehole
-        self.ty = self.simulationPeriod * 8760.*3600
-        self.tm = Borefield.UPM * 3600.
-        self.td = 6*3600.
-        self.time = np.array([self.td, self.td + self.tm, self.ty + self.tm + self.td])
 
         # sets the number of boreholes as if it was a rectangular field, iff there is not yet a number of boreholes defined by a custom configuration
         if self.numberOfBoreholes==None:
