@@ -30,6 +30,7 @@ class Borefield():
     UPM = 730. # number of hours per month
     thresholdBorholeDepth = 0.05  # threshold for iteration
     H_max = 0 # max threshold for interpolation
+    maxSimulationPeriod = 20 # maximal value for simulation
 
     # define default values
     defaultInvestement = [35, 0]  # 35 EUR/m
@@ -381,7 +382,7 @@ class Borefield():
         Now it justs outputs the temperature graphs
         """
 
-        # making a numpy array of the monthly balance (self.montlyLoad) for a period of 20 years [kW]
+        # making a numpy array of the monthly balance (self.montlyLoad) for a period of self.simulationPeriod years [kW]
         monthlyLoadsArray = np.asarray(self.montlyLoad * self.simulationPeriod)
 
         # calculation of all the different times at which the gfunction should be calculated.
@@ -419,7 +420,7 @@ class Borefield():
 
         # now the Tf will be calculated based on
         # Tf = Tb + Q * R_b
-        for i in range(240):
+        for i in range(12*self.simulationPeriod):
             resultsCooling.append(Tb[i] + self.monthlyLoadCooling[i % 12] * 1000. * (
                         self.Rb / self.numberOfBoreholes / (self.H if H == None else H)))
             resultsHeating.append(Tb[i] - self.monthlyLoadHeating[i % 12] * 1000. * (
@@ -431,7 +432,7 @@ class Borefield():
 
         # extra sommation if the gfunction value for the peak is included
 
-        for i in range(240):
+        for i in range(12*self.simulationPeriod):
             resultsPeakCooling.append(resultsCooling[i] + ((self.peakCooling[i % 12] - self.monthlyLoadCooling[i % 12] if
                                                    self.peakCooling[i % 12] > self.monthlyLoadCooling[
                                                        i % 12] else 0) * 1000. * (
@@ -469,14 +470,14 @@ class Borefield():
             # define temperature bounds
             ax1.step(timeArray, resultsMonthCooling, color='b', linestyle="dashed", where="pre", lw=1.5, label='Tf base cooling')
             ax1.step(timeArray, resultsMonthHeating, color='r', linestyle="dashed", where="pre", lw=1.5, label='Tf base heating')
-            ax1.hlines(self.Tf_C, 0, 20, colors='r', linestyles='dashed', label='', lw=1)
-            ax1.hlines(self.Tf_H, 0, 20, colors='b', linestyles='dashed', label='', lw=1)
-            ax1.set_xticks(range(0, 21, 2))
+            ax1.hlines(self.Tf_C, 0, self.simulationPeriod, colors='r', linestyles='dashed', label='', lw=1)
+            ax1.hlines(self.Tf_H, 0, self.simulationPeriod, colors='b', linestyles='dashed', label='', lw=1)
+            ax1.set_xticks(range(0, self.simulationPeriod +1, 2))
 
             # Plot legend
             if legend:
                 ax1.legend()
-            ax1.set_xlim(left=0, right=20)
+            ax1.set_xlim(left=0, right=self.simulationPeriod)
             plt.show()
 
     def gfunction(self, timeValue, H):
@@ -566,11 +567,16 @@ class Borefield():
                     # only one value is requested
                     gvalue = interpolate.interpn(points, values, np.array([H, timeValue]))
             return gvalue
-        except ValueError:
-            print("Your requested depth of " + str(H) + "m is beyond the limit " + str(Borefield.H_max) + "m of the precalculated data.")
-            print("Please change your borefield configuration accordingly.")
+        except ValueError as e:
+
+            if self.simulationPeriod > Borefield.maxSimulationPeriod:
+                print("Your requested simulationperiod of " + str(self.simulationPeriod) + " years is beyond the limit of " + str(Borefield.maxSimulationPeriod) + " years of the precalculated data.")
+            else:
+                print("Your requested depth of " + str(H) + "m is beyond the limit " + str(Borefield.H_max) + "m of the precalculated data.")
+                print("Please change your borefield configuration accordingly.")
             print("-------------------------")
             print("This calculation stopped.")
+            raise ValueError
             exit()
 
 
