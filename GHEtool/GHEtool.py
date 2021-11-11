@@ -29,7 +29,7 @@ class Borefield():
 
     UPM = 730. # number of hours per month
     thresholdBorholeDepth = 0.05  # threshold for iteration
-
+    H_max = 0 # max threshold for interpolation
 
     # define default values
     defaultInvestement = [35, 0]  # 35 EUR/m
@@ -508,6 +508,7 @@ class Borefield():
                 B_array = list(data.keys())
                 ks_array = list(data[B_array[0]].keys())
                 H_array = list(data[B_array[0]][ks_array[0]].keys())
+                Borefield.H_max = max(H_array)
                 B_array.sort()
                 ks_array.sort()
                 H_array.sort()
@@ -529,6 +530,7 @@ class Borefield():
                 """This function creates an interpolation list from a custom dataset and saves it under gfunctionInterpolationArray."""
 
                 H_array = list(data["Data"].keys())
+                H_max = max(H_array)
                 H_array.sort()
 
                 points = (H_array,Time)
@@ -544,27 +546,34 @@ class Borefield():
                 makeInterpolationListDefault()
             else:
                 makeInterpolationListCustom()
-
-        if self.customGfunction==None:
-            # interpolate
-            points,values = Borefield.gfunctionInterpolationArray
-
-            if not isinstance(timeValue, float):
-                # multiple values are requested
-                gvalue = interpolate.interpn(points, values, np.array([[self.B, self.k_s, H, t] for t in timeValue]))
+        try:
+            if self.customGfunction==None:
+                # interpolate
+                points,values = Borefield.gfunctionInterpolationArray
+                if not isinstance(timeValue, float):
+                    # multiple values are requested
+                    gvalue = interpolate.interpn(points, values, np.array([[self.B, self.k_s, H, t] for t in timeValue]))
+                else:
+                    # only one value is requested
+                    gvalue = interpolate.interpn(points, values, np.array([self.B, self.k_s, H, timeValue]))
             else:
-                # only one value is requested
-                gvalue = interpolate.interpn(points, values, np.array([self.B, self.k_s, H, timeValue]))
-        else:
-            # interpolate
-            points, values = Borefield.gfunctionInterpolationArray
-            if not isinstance(timeValue, float):
-                # multiple values are requested
-                gvalue = interpolate.interpn(points, values, np.array([[H, t] for t in timeValue]))
-            else:
-                # only one value is requested
-                gvalue = interpolate.interpn(points, values, np.array([H, timeValue]))
-        return gvalue
+                # interpolate
+                points, values = Borefield.gfunctionInterpolationArray
+                if not isinstance(timeValue, float):
+                    # multiple values are requested
+                    gvalue = interpolate.interpn(points, values, np.array([[H, t] for t in timeValue]))
+                else:
+                    # only one value is requested
+                    gvalue = interpolate.interpn(points, values, np.array([H, timeValue]))
+            return gvalue
+        except ValueError:
+            print("Your requested depth of " + str(H) + "m is beyond the limit " + str(Borefield.H_max) + "m of the precalculated data.")
+            print("Please change your borefield configuration accordingly.")
+            print("-------------------------")
+            print("This calculation stopped.")
+            exit()
+
+
 
     def createCustomDataset(self,customBorefield,nameDatafile,nSegments=12,timeArray=defaultTimeArray,depthArray=defaultDepthArray):
         """This function makes a datafile for a given custom borefield."""
