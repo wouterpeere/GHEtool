@@ -485,9 +485,9 @@ class Borefield():
 
         # get the name of the data file
         if self.customGfunction==None:
-            name = configurationString(self.N_1,self.N_2)+".txt"
+            name = configurationString(self.N_1,self.N_2)+".pickle"
         else:
-            name = self.customGfunction+".txt"
+            name = self.customGfunction+".pickle"
 
         # check if datafile exists
         if not os.path.isfile("Data/"+name):
@@ -585,7 +585,7 @@ class Borefield():
         """This function makes a datafile for a given custom borefield."""
 
         # make filename
-        name = nameDatafile + ".txt"
+        name = nameDatafile + ".pickle"
         # check if file exists
         if not os.path.isfile("Data/"+name):
             # does not exist, so create
