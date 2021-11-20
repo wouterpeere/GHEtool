@@ -11,11 +11,13 @@ It is also possible to use a fixed borefield and an hourly load profile to calcu
 This tool is based on the work of (Peere et al., 2021).
 
 ## Precalculated data
-This tool comes with precalculated g-functions for all borefields of type nxm (for 0<n,m<21). For these borefield configurations, the g-functions are calculated for different depth-thermal conductivity-spacing combinations. The ranges are:
+This tool comes with precalculated g-functions for all borefields of type nxm (for 0<n,m<13). For these borefield configurations, the g-functions are calculated for different depth-thermal conductivity-spacing combinations. The ranges are:
 
-* Depth: 25 - 200m in increments of 25m (will shortly be extended to 300m)
+* Depth: 25 - 350m in increments of 25m
 * Thermal conductivity of the soil: 1.5 - 3.5 in increments of 0.5W/mk
 * Spacings (equal): 3 - 9m in increments of 1m
+
+The precalculated dataset will be extended for borefields up to 20x20 boreholes.
 
 It is possible to calculate your own dataset to your specific project based on the *pygfunction* tool and use this one in the code.
 

@@ -11,7 +11,7 @@ import openpyxl
 def timeValues():
     """This function calculates the default time values for the gfunction."""
     dt = 3600.  # Time step (s)
-    tmax = 20. * 8760. * 3600.  # Maximum time (s)
+    tmax = 100. * 8760. * 3600.  # Maximum time (s)
 
     # Load aggregation scheme
     LoadAgg = gt.load_aggregation.ClaessonJaved(dt, tmax)
