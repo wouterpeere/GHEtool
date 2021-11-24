@@ -1,123 +1,58 @@
-from numpy import array as np_array, polyval as np_polyval, asarray as np_asarray, dot as np_dot
-from pickle import load as pk_load, dump as pk_dump
-from scipy.interpolate import interpn as interpolate_interpn
-from math import pi
-from pygfunction import load_aggregation as gt_load_aggregation, gfunction as gt_gfunction
-from os.path import isfile as os_isfile
-from os import getcwd as os_getcwd
-from matplotlib.pyplot import rc as plt_rc, figure as plt_figure, show as plt_show
-from functools import reduce as functools_reduce
+import numpy as np
+import pickle
+from scipy import interpolate,pi
+import pygfunction as gt
+import os.path
+import matplotlib.pyplot as plt
+import functools
 from tkinter import filedialog
-from openpyxl import load_workbook as openpyxl_load_workbook
+import openpyxl
 
-
-def timeValues(years: int):
+def timeValues():
     """This function calculates the default time values for the gfunction."""
     dt = 3600.  # Time step (s)
-    tmax = years * 8760. * 3600.  # Maximum time (s)
+    tmax = 100. * 8760. * 3600.  # Maximum time (s)
 
     # Load aggregation scheme
-    LoadAgg = gt_load_aggregation.ClaessonJaved(dt, tmax)
+    LoadAgg = gt.load_aggregation.ClaessonJaved(dt, tmax)
 
     return LoadAgg.get_times_for_simulation()
 
 
-def configurationString(N_1, N_2):
+def configurationString(N_1,N_2):
     """This functions returns the filename for the given configuration N_1, N_2."""
-    string = str(max(N_1, N_2)) + "x" + str(min(N_1, N_2))
+    string = str(max(N_1,N_2)) + "x" + str(min(N_1,N_2))
     return string
 
 
-class GroundData:
-    __slots__ = 'H', 'B', 'k_s', 'Tg', 'Rb', 'N_1', 'N_2'
+class Borefield():
 
-    def __init__(self, H: float, B: float, k_s: float, Tg: float, Rb: float, N_1: int, N_2: int):
-        self.H = H  # m
-        self.B = B  # m
-        self.k_s = k_s  # W/mK
-        self.Tg = Tg  # °C
-        self.Rb = Rb  # mK/W
-        self.N_1 = N_1  # #
-        self.N_2 = N_2  # #
+    UPM = 730. # number of hours per month
+    thresholdBorholeDepth = 0.05  # threshold for iteration
+    H_max = 0 # max threshold for interpolation
+    maxSimulationPeriod = 20 # maximal value for simulation
 
+    # define default values
+    defaultInvestement = [35, 0]  # 35 EUR/m
+    defaultLengthPeak = 6  # hours
+    defaultDepthArray = [1]+list(range(25, 201, 25))  # m
+    defaultTimeArray = timeValues()  # sec
 
-class Borefield:
-    __slots__ = 'baseloadHeating', 'baseloadCooling', 'H', 'H_init', 'B', 'N_1', 'N_2', 'Rb', 'k_s', 'Tg', 'ty', 'tm',\
-                'td', 'time', 'UPM', 'thresholdBorholeDepth', 'defaultTimeArray', 'hourlyHeatingLoad', \
-                'hourlyCoolingLoad', 'numberOfBoreholes', 'borefield', 'customGfunction', 'costInvestement', \
-                'lengthPeak', 'th', 'Tf_H', 'Tf_C', 'limitingQuadrant', 'montlyLoad', 'monthlyLoadHeating', \
-                'monthlyLoadCooling', 'peakHeating', 'imbalance', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm',\
-                'gfunctionInterpolationArray', 'hourlyLoadArray', 'peakCooling', 'simulationPeriod', \
-                'factoren_temperature_profile', 'resultsCooling', 'resultsHeating', 'resultsPeakHeating', \
-                'resultsPeakCooling', 'resultsMonthCooling', 'resultsMonthHeating', 'Tb'
+    temp = 0
+    hourlyLoadArray = []
+    for i in [0,24*31,24*28,24*31,24*30,24*31,24*30,24*31,24*31,24*30,24*31,24*30,24*31]:
+        temp += i
+        hourlyLoadArray.append(temp)
 
-    def __init__(self, simulationPeriod: int, numberOfBoreholes: int = None, peakHeating: list = None,
-                 peakCooling: list = None, baseloadHeating: list = None, baseloadCooling: list = None,
-                 investementCost: list = None, borefield=None, customGfunction=None):
+    gfunctionInterpolationArray=[]
+
+    def __init__(self, simulationPeriod, numberOfBoreholes=None, peakHeating=[0] * 12, peakCooling=[0] * 12,
+                 baseloadHeating=[0] * 12, baseloadCooling=[0] * 12, investementCost=None,borefield=None,customGfunction=None):
         """This function initiates the Borefield class"""
 
         # initiate vars
-        listOfZeros = [0] * 12
-        if baseloadCooling is None:
-            baseloadCooling = listOfZeros
-        if baseloadHeating is None:
-            baseloadHeating = listOfZeros
-        if peakCooling is None:
-            peakCooling = listOfZeros
-        if peakHeating is None:
-            peakHeating = listOfZeros
-
-        self.baseloadHeating = listOfZeros
-        self.baseloadCooling = listOfZeros
-        self.H: int = 0
-        self.H_init: int = 0
-        self.B: int = 0
-        self.N_1: int = 0
-        self.N_2: int = 0
-        self.Rb: float = 0.0
-        self.k_s: float = 0.0  # Ground thermal conductivity (W/m.K)
-        self.Tg: float = 10.0  # Ground temperature at infinity (C)
-        self.ty: float = 0.0
-        self.tm: float = 0.0
-        self.td: float = 0.0
-        self.time: float = 0.0
-        self.Tb: list = []
-        self.UPM = 730.  # number of hours per month
-        self.thresholdBorholeDepth = 0.05  # threshold for iteration
-        self.defaultTimeArray = timeValues(simulationPeriod)  # sec
-
-        self.hourlyHeatingLoad: list = []
-        self.hourlyCoolingLoad: list = []
-        self.numberOfBoreholes: int = 0
-        self.borefield = None
-        self.customGfunction = None
-        self.costInvestement: list = []
-        self.lengthPeak: float = 0.0
-        self.th: float = 0.0
-        self.Tf_H: float = 0.0
-        self.Tf_C: float = 0.0
-        self.limitingQuadrant: int = 0
-        self.montlyLoad: list = []
-        self.monthlyLoadHeating: list = []
-        self.monthlyLoadCooling: list = []
-        self.peakHeating: list = []
-        self.peakCooling: list = []
-        self.imbalance: float = 0.0
-        self.qa: float = 0.0
-        self.Tf: float = 0.0
-        self.qm: float = 0.0
-        self.qh: float = 0.0
-        self.qpm: float = 0.0
-        self.tcm: float = 0.0
-        self.tpm: float = 0.0
-        self.gfunctionInterpolationArray: list = []
-        self.factoren_temperature_profile: list = []
-        temp = 0
-        self.hourlyLoadArray = []
-        for i in [0, 24 * 31, 24 * 28, 24 * 31, 24 * 30, 24 * 31, 24 * 30, 24 * 31, 24 * 31, 24 * 30, 24 * 31, 24 * 30,
-                  24 * 31]:
-            temp += i
-            self.hourlyLoadArray.append(temp)
+        self.baseloadHeating = [0] * 12
+        self.baseloadCooling = [0] * 12
 
         # define vars
         self.setPeakHeating(peakHeating)
@@ -138,67 +73,69 @@ class Borefield:
 
         self.setCustomGfunction(customGfunction)
 
-    def setNumberOfBoreholes(self, numberOfBoreholes: int):
+        self.H = 0
+
+        self.hourlyHeatingLoad = []
+        self.hourlyCoolingLoad = []
+
+    def setNumberOfBoreholes(self,numberOfBoreholes):
         """This functions sets the number of boreholes"""
         self.numberOfBoreholes = numberOfBoreholes
 
     def setBorefield(self, borefield=None):
-        """This function sets the borefield configuration. When no input, an empty array of length N_1 * N_2 will be
-         made"""
-        if borefield is None:
-            return
-        self.borefield = borefield
-        self.setNumberOfBoreholes(len(borefield))
+        """This function sets the borefield configuration. When no input, an empty array of length N_1 * N_2 will be made"""
+        if borefield==None:
+            pass
+        else:
+            self.borefield = borefield
+            self.setNumberOfBoreholes(len(borefield))
 
-    def setCustomGfunction(self, customGfunction):
+    def setCustomGfunction(self,customGfunction):
         """This functions sets the custom g-function."""
         self.customGfunction = customGfunction
-        self.gfunctionInterpolationArray: list = []
+        Borefield.gfunctionInterpolationArray=[]
 
-    def setInvestementCost(self, investementCost: list = None):
+    def setInvestementCost(self, investementCost=defaultInvestement):
         """This function sets the investement cost. This is linear with respect to the total field length."""
-        if investementCost is None:
-            investementCost = [35, 0]
         self.costInvestement = investementCost
 
-    def setLengthPeak(self, length: float = None):
-        if length is None:
-            length: int = 6
+    def setLengthPeak(self, length=defaultLengthPeak):
         """This function sets the length of the peak to length."""
         self.lengthPeak = length
-        self.th = length * 3600.  # length of peak in seconds
+        self.setTimeConstants()
 
-    def setGroundParameters(self, data: GroundData):
+    def setTimeConstants(self):
+        # Number of segments per borehole
+        self.th = self.lengthPeak * 3600.  # length of peak in seconds
+        self.ty = self.simulationPeriod * 8760. * 3600
+        self.tm = Borefield.UPM * 3600.
+        self.td = self.lengthPeak * 3600.
+        self.time = np.array([self.td, self.td + self.tm, self.ty + self.tm + self.td])
+
+    def setGroundParameters(self,data):
         """This function sets the relevant borefield characteristics."""
 
-        self.H = data.H  # Borehole length (m)
-        self.B = data.B  # Borehole spacing (m)
+        self.H = data["H"]  # Borehole length (m)
+        self.B = data["B"]  # Borehole spacing (m)
 
-        self.N_1 = data.N_1
-        self.N_2 = data.N_2
+        self.N_1 = data["N_1"]
+        self.N_2 = data["N_2"]
 
-        self.Rb = data.Rb
+        self.Rb =data["Rb"]
 
         # Ground properties
-        self.k_s = data.k_s  # Ground thermal conductivity (W/m.K)
-        self.Tg = data.Tg    # Ground temperature at infinity (C)
+        self.k_s = data["k_s"]  # Ground thermal conductivity (W/m.K)
+        self.Tg = data["Tg"]    # Ground temperature at infinity (C)
 
-        # Number of segments per borehole
-        self.ty = self.simulationPeriod * 8760.*3600
-        self.tm = self.UPM * 3600.
-        self.td = 6*3600.
-        self.time = np_array([self.td, self.td + self.tm, self.ty + self.tm + self.td])
-
-        # sets the number of boreholes as if it was a rectangular field, iff there is not yet a number of boreholes
-        # defined by a custom configuration
-        if self.numberOfBoreholes is None:
+        # sets the number of boreholes as if it was a rectangular field, iff there is not yet a number of boreholes defined by a custom configuration
+        if self.numberOfBoreholes==None:
             self.setNumberOfBoreholes(self.N_1*self.N_2)
 
-    def setMaxGroundTemperature(self, temp: float):
+    def setMaxGroundTemperature(self, temp):
         """This function sets the maximal ground temperature to temp"""
         self.Tf_H = temp
 
-    def setMinGroundTemperature(self, temp: float):
+    def setMinGroundTemperature(self, temp):
         """This function sets the minimal ground temperature to temp"""
         self.Tf_C = temp
 
@@ -214,7 +151,7 @@ class Borefield:
 
         # Iterates as long as there is no convergence
         # (convergence if difference between depth in iterations is smaller than thresholdBorholeDepth)
-        while abs(self.H - H_prev) >= self.thresholdBorholeDepth:
+        while abs(self.H - H_prev) >= Borefield.thresholdBorholeDepth:
             # calculate the required gfunction values
             gfunc_uniform_T = self.gfunction(self.time, self.H)
 
@@ -238,13 +175,13 @@ class Borefield:
 
         # initiate iteration
         H_prev = 0
-        timeSteps = np_array([self.th, self.th + self.tm, self.tcm + self.th])
+        timeSteps = np.array([self.th, self.th + self.tm, self.tcm + self.th])
         if self.H < 1:
             self.H = 50
 
         # Iterates as long as there is no convergence
         # (convergence if difference between depth in iterations is smaller than thresholdBorholeDepth)
-        while abs(self.H - H_prev) >= self.thresholdBorholeDepth:
+        while abs(self.H - H_prev) >= Borefield.thresholdBorholeDepth:
             # get the gfunction values
             gfunc_uniform_T = self.gfunction(timeSteps, self.H)
 
@@ -262,99 +199,99 @@ class Borefield:
 
         return self.H
 
-    def sizeQuadrant1(self):
-        self.calculateL3Params(False)  # calculate parameters
-        return self._Carcel  # size
+    def size(self,H_init):
 
-    def sizeQuadrant2(self):
-        self.calculateL2Params(False)  # calculate parameters
-        self.qa = self.qa
-        return self._Bernier  # size
-
-    def sizeQuadrant3(self):
-        self.calculateL3Params(True)  # calculate parameters
-        return self._Carcel  # size
-
-    def sizeQuadrant4(self):
-        self.calculateL2Params(True)  # calculate parameters
-        self.qa = self.qa
-        return self._Bernier  # size
-
-    def size(self, H_init):
-
-        """This function sizes the borefield of the given configuration according to the methodology explained in
-        (Peere et al., 2021). It returns the borefield depth."""
+        """This function sizes the borefield of the given configuration according to the methodology explained in (Peere et al., 2021).
+        It returns the borefield depth."""
 
         # initiate with a given depth
         self.H_init = H_init
 
-        if self.imbalance <= 0:
+        def sizeQuadrant1():
+            self.calculateL3Params(False)  # calculate parameters
+            return self._Carcel  # size
+
+        def sizeQuadrant2():
+            self.calculateL2Params(False)  # calculate parameters
+            self.qa = self.qa
+            return self._Bernier  # size
+
+        def sizeQuadrant3():
+            self.calculateL3Params(True)  # calculate parameters
+            return  self._Carcel  # size
+
+        def sizeQuadrant4():
+            self.calculateL2Params(True)  # calculate parameters
+            self.qa = self.qa
+            return self._Bernier  # size
+
+        if self.imbalance<=0:
             # extraction dominated, so quadrants 1 and 4 are relevant
-            quadrant1 = self.sizeQuadrant1()
-            quadrant4 = self.sizeQuadrant4()
-            self.H = max(quadrant1, quadrant4)
+            quadrant1 = sizeQuadrant1()
+            quadrant4 = sizeQuadrant4()
+            self.H = max(quadrant1,quadrant4)
 
-            if self.H == quadrant1:
+            if self.H==quadrant1:
                 self.limitingQuadrant = 1
-                return self.H
-            self.limitingQuadrant = 4
-            return self.H
-        # injection dominated, so quadrants 2 and 3 are relevant
-        quadrant2 = self.sizeQuadrant2()
-        quadrant3 = self.sizeQuadrant3()
-        self.H = max(quadrant2, quadrant3)
+            else:
+                self.limitingQuadrant = 4
+        else:
+            # injection dominated, so quadrants 2 and 3 are relevant
+            quadrant2 = sizeQuadrant2()
+            quadrant3 = sizeQuadrant3()
+            self.H = max(quadrant2,quadrant3)
 
-        if self.H == quadrant2:
-            self.limitingQuadrant = 2
-            return self.H
-        self.limitingQuadrant = 3
+            if self.H==quadrant2:
+                self.limitingQuadrant = 2
+            else:
+                self.limitingQuadrant = 3
+
         return self.H
 
     def calculateMonthlyLoad(self):
         """This function calculates the average monthly load in kW"""
-        self.montlyLoad = [(-self.baseloadHeating[i] + self.baseloadCooling[i]) / self.UPM for i in range(12)]
+        self.montlyLoad = [(-self.baseloadHeating[i] + self.baseloadCooling[i]) / Borefield.UPM for i in range(12)]
 
-    def setBaseloadHeating(self, baseload: list):
+    def setBaseloadHeating(self, baseload):
         """This function defines the baseload in heating both in an energy as in an average power perspective"""
         self.baseloadHeating = [i if i >= 0 else 0 for i in baseload]  # kWh
-        self.monthlyLoadHeating = list(map(lambda x: x / self.UPM, self.baseloadHeating))  # kW
+        self.monthlyLoadHeating = list(map(lambda x: x / Borefield.UPM, self.baseloadHeating)) # kW
         self.calculateMonthlyLoad()
         self.calculateImbalance()
 
         # new peak heating if baseload is larger than the peak
         self.setPeakHeating([max(self.peakHeating[i], self.monthlyLoadHeating[i]) for i in range(12)])
 
-    def setBaseloadCooling(self, baseload: list):
+    def setBaseloadCooling(self, baseload):
         """This function defines the baseload in cooling both in an energy as in an average power perspective"""
         self.baseloadCooling = [i if i >= 0 else 0 for i in baseload]  # kWh
-        self.monthlyLoadCooling = list(map(lambda x: x / self.UPM, self.baseloadCooling))  # kW
+        self.monthlyLoadCooling = list(map(lambda x: x / Borefield.UPM, self.baseloadCooling))  # kW
         self.calculateMonthlyLoad()
         self.calculateImbalance()
 
         # new peak cooling if baseload is larger than the peak
-        self.setPeakCooling([max(self.peakCooling[i], self.monthlyLoadCooling[i]) for i in range(12)])
+        self.setPeakCooling([max(self.peakCooling[i],self.monthlyLoadCooling[i]) for i in range(12)])
 
-    def setPeakHeating(self, peakload: list):
+    def setPeakHeating(self, peakload):
         """This function sets the peak heating to peakload"""
         self.peakHeating = [i if i >= 0 else 0 for i in peakload]
 
-    def setPeakCooling(self, peakload: list):
+    def setPeakCooling(self, peakload):
         """This function sets the peak cooling to peak load"""
         self.peakCooling = [i if i >= 0 else 0 for i in peakload]
 
     @property
     def investementCost(self):
-        """This function calculates the investement cost based on a cost profile lineair to the total borehole
-        length."""
-        return np_polyval(self.costInvestement, self.H * self.numberOfBoreholes)
+        """This function calculates the investement cost based on a cost profile lineair to the total borehole length."""
+        return np.polyval(self.costInvestement, self.H * self.numberOfBoreholes)
 
     def calculateImbalance(self):
         """This function calculates the imbalance of the field.
         A positive imbalance means that the field is injection dominated, i.e. it heats up every year."""
-        self.imbalance = functools_reduce(lambda x, y: x + y, self.baseloadCooling) - functools_reduce(
-            lambda x, y: x + y, self.baseloadHeating)
+        self.imbalance = functools.reduce(lambda x, y: x + y, self.baseloadCooling) - \
+                         functools.reduce(lambda x, y: x + y,self.baseloadHeating)
 
-    def calculateL2Params(self, HC: bool):
+    def calculateL2Params(self, HC):
         """This function calculates the parameters for the sizing based on the last year of operation"""
 
         # convert imbalance to Watt
@@ -374,18 +311,19 @@ class Borefield:
             # correct signs
             self.qm = -self.qm
             self.qa = -self.qa
-            return
-        # limited by injection load
 
-        # temperature limit set to maximum temperature
-        self.Tf = self.Tf_H
+        else:
+            # limited by injection load
 
-        # Select month with highest peak load and take both the peak and average load from that month
-        monthIndex = self.peakCooling.index(max(self.peakCooling))
-        self.qm = self.montlyLoad[monthIndex] * 1000.
-        self.qh = max(self.peakCooling) * 1000.
+            # temperature limit set to maximum temperature
+            self.Tf = self.Tf_H
 
-    def calculateL3Params(self, HC: bool, monthIndex: int = None):
+            # Select month with highest peak load and take both the peak and average load from that month
+            monthIndex = self.peakCooling.index(max(self.peakCooling))
+            self.qm = self.montlyLoad[monthIndex] * 1000.
+            self.qh = max(self.peakCooling) * 1000.
+
+    def calculateL3Params(self, HC, monthIndex=None):
         """This function calculates the parameters for the sizing based on the first year of operation"""
 
         if HC:
@@ -395,7 +333,7 @@ class Borefield:
             self.Tf = self.Tf_C
 
             # Select month with highest peak load and take both the peak and average load from that month
-            monthIndex = self.peakHeating.index(max(self.peakHeating)) if monthIndex is None else monthIndex
+            monthIndex = self.peakHeating.index(max(self.peakHeating)) if monthIndex == None else monthIndex
             self.qh = max(self.peakHeating) * 1000.
 
             self.qm = self.montlyLoad[monthIndex] * 1000.
@@ -403,7 +341,7 @@ class Borefield:
             if monthIndex < 1:
                 self.qpm = 0
             else:
-                self.qpm = functools_reduce(lambda x, y: x + y, self.montlyLoad[:monthIndex]) * 1000. / (monthIndex + 1)
+                self.qpm = functools.reduce(lambda x, y: x + y, self.montlyLoad[:monthIndex]) * 1000. / (monthIndex + 1)
 
             self.qm = -self.qm
         else:
@@ -413,91 +351,96 @@ class Borefield:
             self.Tf = self.Tf_H
 
             # Select month with highest peak load and take both the peak and average load from that month
-            monthIndex = self.peakCooling.index(max(self.peakCooling)) if monthIndex is None else monthIndex
+            monthIndex = self.peakCooling.index(max(self.peakCooling)) if monthIndex == None else monthIndex
             self.qh = max(self.peakCooling) * 1000.
 
             self.qm = self.montlyLoad[monthIndex] * 1000.
             if monthIndex < 1:
                 self.qpm = 0
             else:
-                self.qpm = functools_reduce(lambda x, y: x + y, self.montlyLoad[:monthIndex]) * 1000. / (monthIndex + 1)
-        self.tcm = (monthIndex + 1) * self.UPM * 3600
-        self.tpm = monthIndex * self.UPM * 3600
+                self.qpm = functools.reduce(lambda x, y: x + y, self.montlyLoad[:monthIndex]) * 1000. / (monthIndex + 1)
+        self.tcm = (monthIndex + 1) * Borefield.UPM * 3600
+        self.tpm = monthIndex * Borefield.UPM * 3600
 
         return monthIndex
 
-    def calculateTemperatures(self, depth: float = None):
-        """Calculate all the temperatures without plotting the figure. When depth is given, it calculates it for a
-        given depth."""
-        self._printTemperatureProfile(figure=False, H=depth)
+    def calculateTemperatures(self,depth=None):
+        """Calculate all the temperatures without plotting the figure. When depth is given, it calculates it for a given depth."""
+        self._printTemperatureProfile(figure=False,H=depth)
 
-    def printTemperatureProfile(self, legend: bool = True):
+    def printTemperatureProfile(self,legend=True):
         """This function plots the temperature profile for the calculated depth."""
         self._printTemperatureProfile(legend=legend)
 
-    def printTemperatureProfileFixedDepth(self, depth: float, legend: bool = True):
+    def printTemperatureProfileFixedDepth(self,depth,legend=True):
         """This function plots the temperature profile for a fixed depth depth."""
-        self._printTemperatureProfile(legend=legend, H=depth)
+        self._printTemperatureProfile(legend=legend,H=depth)
 
-    def _printTemperatureProfile(self, legend: bool = True, H=None, figure=True):
+    def _printTemperatureProfile(self, legend=True, H=None,figure=True):
         """
         This function would calculate a new length of the borefield using temporal superposition.
         Now it justs outputs the temperature graphs
         """
 
-        # making a numpy array of the monthly balance (self.montlyLoad) for a period of 20 years [kW]
-        monthlyLoadsArray = np_asarray(self.montlyLoad * self.simulationPeriod)
+        # making a numpy array of the monthly balance (self.montlyLoad) for a period of self.simulationPeriod years [kW]
+        monthlyLoadsArray = np.asarray(self.montlyLoad * self.simulationPeriod)
 
         # calculation of all the different times at which the gfunction should be calculated.
         # this is equal to 'UPM' hours a month * 3600 seconds/hours for the simulationPeriod
-        timeForgValues = [i * self.UPM * 3600. for i in range(1, 12 * self.simulationPeriod + 1)]
+        timeForgValues = [i * Borefield.UPM * 3600. for i in range(1, 12 * self.simulationPeriod + 1)]
 
-        # self.gfunction is a function that uses the precalculated data to interpolate the correct values of the
-        # gfunction.
+        # self.gfunction is a function that uses the precalculated data to interpolate the correct values of the gfunction.
         # this dataset is checked over and over again and is correct
-        gValues = self.gfunction(timeForgValues, self.H if H is None else H)
+        gValues = self.gfunction(timeForgValues, self.H if H == None else H)
 
         # the gfunction value of the peak with lengthPeak hours
-        gValuePeak = self.gfunction(self.lengthPeak * 3600., self.H if H is None else H)
+        gValuePeak = self.gfunction(self.lengthPeak * 3600., self.H if H == None else H)
 
-        # calculation of needed differences of the gfunction values. These are the weight factors in the calculation
-        # of Tb.
+        # calculation of needed differences of the gfunction values. These are the weight factors in the calculation of Tb.
         gValueDifferences = [gValues[i] if i == 0 else gValues[i] - gValues[i - 1] for i in range(len(gValues))]
 
         self.factoren_temperature_profile = gValueDifferences
-        results: list = []
-        temp: list = []
+        results = []
+        temp = []
 
         # calculation of the product for every month in order to obtain a temperature profile
         for i in range(len(monthlyLoadsArray)):
             temp.insert(0, monthlyLoadsArray[i] * 1000.)
-            results.append(np_dot(temp, gValueDifferences[:i + 1]))
+            results.append(np.dot(temp, gValueDifferences[:i + 1]))
+
+        resultsCooling = []
+        resultsHeating = []
+        resultsPeakCooling = []
+        resultsPeakHeating = []
+        resultsMonthCooling = []
+        resultsMonthHeating = []
 
         # calculation the borehole wall temperature for every month i
-        Tb = [i / (2 * pi * self.k_s) / ((self.H if H is None else H) * self.numberOfBoreholes) + self.Tg for i
-              in results]
-        self.Tb = Tb
+        Tb = [i / (2 * pi * self.k_s) / ((self.H if H == None else H) * self.numberOfBoreholes) + self.Tg for i in results]
+
         # now the Tf will be calculated based on
         # Tf = Tb + Q * R_b
-        ran_Simu = range(self.simulationPeriod*12)
-        resultsCooling = [Tb[i] + self.monthlyLoadCooling[i % 12] * 1000. * (
-                         self.Rb / self.numberOfBoreholes / (self.H if H is None else H)) for i in ran_Simu]
-        resultsHeating = [Tb[i] - self.monthlyLoadHeating[i % 12] * 1000. * (
-                        self.Rb / self.numberOfBoreholes / (self.H if H is None else H)) for i in ran_Simu]
-        resultsMonthCooling = [Tb[i] + self.monthlyLoadCooling[i % 12] * 1000. * (
-                        self.Rb / self.numberOfBoreholes / (self.H if H is None else H)) for i in ran_Simu]
-        resultsMonthHeating = [Tb[i] - self.monthlyLoadHeating[i % 12] * 1000. * (
-                        self.Rb / self.numberOfBoreholes / (self.H if H is None else H)) for i in ran_Simu]
+        for i in range(12*self.simulationPeriod):
+            resultsCooling.append(Tb[i] + self.monthlyLoadCooling[i % 12] * 1000. * (
+                        self.Rb / self.numberOfBoreholes / (self.H if H == None else H)))
+            resultsHeating.append(Tb[i] - self.monthlyLoadHeating[i % 12] * 1000. * (
+                        self.Rb / self.numberOfBoreholes / (self.H if H == None else H)))
+            resultsMonthCooling.append(Tb[i] + self.monthlyLoadCooling[i % 12] * 1000. * (
+                        self.Rb / self.numberOfBoreholes / (self.H if H == None else H)))
+            resultsMonthHeating.append(Tb[i] - self.monthlyLoadHeating[i % 12] * 1000. * (
+                        self.Rb / self.numberOfBoreholes / (self.H if H == None else H)))
 
         # extra sommation if the gfunction value for the peak is included
-        resultsPeakCooling = [resultsCooling[i] + ((self.peakCooling[i % 12] - self.monthlyLoadCooling[i % 12] if
-                                                    self.peakCooling[i % 12] > self.monthlyLoadCooling[i % 12]
-                                                    else 0) * 1000. * (gValuePeak[0] / self.k_s / 2 / pi + self.Rb))
-                              / self.numberOfBoreholes / (self.H if H is None else H) for i in ran_Simu]
-        resultsPeakHeating = [resultsHeating[i] - ((self.peakHeating[i % 12] - self.monthlyLoadHeating[i % 12] if
-                                                    self.peakHeating[i % 12] > self.monthlyLoadHeating[i % 12]
-                                                    else 0) * 1000. * (gValuePeak[0] / self.k_s / 2 / pi + self.Rb)) /
-                              self.numberOfBoreholes / (self.H if H is None else H) for i in ran_Simu]
+
+        for i in range(12*self.simulationPeriod):
+            resultsPeakCooling.append(resultsCooling[i] + ((self.peakCooling[i % 12] - self.monthlyLoadCooling[i % 12] if
+                                                   self.peakCooling[i % 12] > self.monthlyLoadCooling[
+                                                       i % 12] else 0) * 1000. * (
+                                                              gValuePeak[0] / self.k_s / 2 / pi + self.Rb)) / self.numberOfBoreholes / (self.H if H == None else H))
+            resultsPeakHeating.append(resultsHeating[i] - ((self.peakHeating[i % 12] - self.monthlyLoadHeating[i % 12] if
+                                                   self.peakHeating[i % 12] > self.monthlyLoadHeating[
+                                                       i % 12] else 0) * 1000. * (
+                                                              gValuePeak[0] / self.k_s / 2 / pi + self.Rb)) / self.numberOfBoreholes / (self.H if H == None else H))
 
         # save temperatures under variable
         self.resultsCooling = resultsCooling
@@ -507,13 +450,13 @@ class Borefield:
         self.resultsMonthCooling = resultsMonthCooling
         self.resultsMonthHeating = resultsMonthHeating
 
-        # initiate figure
+        ## initiate figure
         if figure:
             # make a time array
             timeArray = [i / 12 / 730. / 3600. for i in timeForgValues]
 
-            plt_rc('figure')
-            fig = plt_figure()
+            plt.rc('figure')
+            fig = plt.figure()
 
             ax1 = fig.add_subplot(111)
             ax1.set_xlabel(r'Time (year)')
@@ -525,157 +468,174 @@ class Borefield:
             ax1.step(timeArray, resultsPeakHeating, 'r-', where="pre", lw=1.5, label='Tf peak heating')
 
             # define temperature bounds
-            ax1.step(timeArray, resultsMonthCooling, color='b', linestyle="dashed", where="pre", lw=1.5,
-                     label='Tf base cooling')
-            ax1.step(timeArray, resultsMonthHeating, color='r', linestyle="dashed", where="pre", lw=1.5,
-                     label='Tf base heating')
-            ax1.hlines(self.Tf_C, 0, 20, colors='r', linestyles='dashed', label='', lw=1)
-            ax1.hlines(self.Tf_H, 0, 20, colors='b', linestyles='dashed', label='', lw=1)
-            ax1.set_xticks(range(0, 21, 2))
+            ax1.step(timeArray, resultsMonthCooling, color='b', linestyle="dashed", where="pre", lw=1.5, label='Tf base cooling')
+            ax1.step(timeArray, resultsMonthHeating, color='r', linestyle="dashed", where="pre", lw=1.5, label='Tf base heating')
+            ax1.hlines(self.Tf_C, 0, self.simulationPeriod, colors='r', linestyles='dashed', label='', lw=1)
+            ax1.hlines(self.Tf_H, 0, self.simulationPeriod, colors='b', linestyles='dashed', label='', lw=1)
+            ax1.set_xticks(range(0, self.simulationPeriod +1, 2))
 
             # Plot legend
             if legend:
                 ax1.legend()
-            ax1.set_xlim(left=0, right=20)
-            plt_show()
-
-    # if no interpolation array exists, it creates one
-    def makeInterpolationListDefault(self, data, Time):
-        """This function creates an interpolation list and saves it under gfunctionInterpolationArray."""
-
-        B_array = list(data.keys())
-        ks_array = list(data[B_array[0]].keys())
-        H_array = list(data[B_array[0]][ks_array[0]].keys())
-        B_array.sort()
-        ks_array.sort()
-        H_array.sort()
-
-        points = (B_array, ks_array, H_array, Time)
-
-        values = []
-        for B in B_array:
-            temp_ks = []
-            for ks in ks_array:
-                temp_H = []
-                for H in H_array:
-                    temp_H.append(data[B][ks][H])
-                temp_ks.append(temp_H)
-            values.append(temp_ks)
-        self.gfunctionInterpolationArray = (points, values)
-
-    def makeInterpolationListCustom(self, data, Time):
-        """This function creates an interpolation list from a custom dataset and saves it under
-        gfunctionInterpolationArray."""
-
-        H_array = list(data["Data"].keys())
-        H_array.sort()
-
-        points = (H_array, Time)
-
-        values = [data["Data"][i] for i in H_array]
-
-        self.gfunctionInterpolationArray = (points, values)
+            ax1.set_xlim(left=0, right=self.simulationPeriod)
+            plt.show()
 
     def gfunction(self, timeValue, H):
         """This function calculated the gfunction based on interpolation of the precalculated data."""
 
         # get the name of the data file
-        if self.customGfunction is None:
-            name = f'{configurationString(self.N_1, self.N_2)}.txt'
+        if self.customGfunction==None:
+            name = configurationString(self.N_1,self.N_2)+".pickle"
         else:
-            name = self.customGfunction+".txt"
+            name = self.customGfunction+".pickle"
 
         # check if datafile exists
-        if not os_isfile("Data/"+name):
+        if not os.path.isfile("Data/"+name):
             print(name)
             raise Exception('There is no precalculated data available. Please use the createCustomDatafile.')
 
         # load data file
-        data = pk_load(open("Data/"+name, "rb"))
+        data = pickle.load(open("Data/"+name,"rb"))
 
         # remove the time value
-        Time = self.defaultTimeArray
+        Time = Borefield.defaultTimeArray
         data.pop("Time")
 
-        if not self.gfunctionInterpolationArray:
+        if Borefield.gfunctionInterpolationArray==[]:
+            # if no interpolation array exists, it creates one
+            def makeInterpolationListDefault():
+                """This function creates an interpolation list and saves it under gfunctionInterpolationArray."""
 
-            if self.customGfunction is None:
-                self.makeInterpolationListDefault(data, Time)
+                B_array = list(data.keys())
+                ks_array = list(data[B_array[0]].keys())
+                H_array = list(data[B_array[0]][ks_array[0]].keys())
+                Borefield.H_max = max(H_array)
+                B_array.sort()
+                ks_array.sort()
+                H_array.sort()
+
+                points = (B_array,ks_array,H_array,Time)
+
+                values = []
+                for B in B_array:
+                    temp_ks = []
+                    for ks in ks_array:
+                        temp_H = []
+                        for H in H_array:
+                            temp_H.append(data[B][ks][H])
+                        temp_ks.append(temp_H)
+                    values.append(temp_ks)
+                Borefield.gfunctionInterpolationArray=(points,values)
+
+            def makeInterpolationListCustom():
+                """This function creates an interpolation list from a custom dataset and saves it under gfunctionInterpolationArray."""
+
+                H_array = list(data["Data"].keys())
+                H_max = max(H_array)
+                H_array.sort()
+
+                points = (H_array,Time)
+
+                values = []
+
+                for H in H_array:
+                    values.append(data["Data"][H])
+
+                Borefield.gfunctionInterpolationArray=(points,values)
+
+            if self.customGfunction==None:
+                makeInterpolationListDefault()
             else:
-                self.makeInterpolationListCustom(data, Time)
-
-        if self.customGfunction is None:
-            # interpolate
-            points, values = self.gfunctionInterpolationArray
-
-            if not isinstance(timeValue, float):
-                # multiple values are requested
-                gvalue = interpolate_interpn(points, values, np_array([[self.B, self.k_s, H, t] for t in timeValue]))
-                return gvalue
-            # only one value is requested
-            gvalue = interpolate_interpn(points, values, np_array([self.B, self.k_s, H, timeValue]))
+                makeInterpolationListCustom()
+        try:
+            if self.customGfunction==None:
+                # interpolate
+                points,values = Borefield.gfunctionInterpolationArray
+                if not isinstance(timeValue, float):
+                    # multiple values are requested
+                    gvalue = interpolate.interpn(points, values, np.array([[self.B, self.k_s, H, t] for t in timeValue]))
+                else:
+                    # only one value is requested
+                    gvalue = interpolate.interpn(points, values, np.array([self.B, self.k_s, H, timeValue]))
+            else:
+                # interpolate
+                points, values = Borefield.gfunctionInterpolationArray
+                if not isinstance(timeValue, float):
+                    # multiple values are requested
+                    gvalue = interpolate.interpn(points, values, np.array([[H, t] for t in timeValue]))
+                else:
+                    # only one value is requested
+                    gvalue = interpolate.interpn(points, values, np.array([H, timeValue]))
             return gvalue
-        # interpolate
-        points, values = self.gfunctionInterpolationArray
-        if not isinstance(timeValue, float):
-            # multiple values are requested
-            gvalue = interpolate_interpn(points, values, np_array([[H, t] for t in timeValue]))
-            return gvalue
-        # only one value is requested
-        gvalue = interpolate_interpn(points, values, np_array([H, timeValue]))
-        return gvalue
+        except ValueError as e:
 
-    def createCustomDataset(self, customBorefield: list, nameDatafile: str, nSegments: int = 12,
-                            timeArray=None, depthArray=None):
+            if self.simulationPeriod > Borefield.maxSimulationPeriod:
+                print("Your requested simulationperiod of " + str(self.simulationPeriod) + " years is beyond the limit of " + str(Borefield.maxSimulationPeriod) + " years of the precalculated data.")
+            else:
+                print("Your requested depth of " + str(H) + "m is beyond the limit " + str(Borefield.H_max) + "m of the precalculated data.")
+                print("Please change your borefield configuration accordingly.")
+            print("-------------------------")
+            print("This calculation stopped.")
+            raise ValueError
+            exit()
+
+
+
+    def createCustomDataset(self,customBorefield,nameDatafile,nSegments=12,timeArray=defaultTimeArray,depthArray=defaultDepthArray):
         """This function makes a datafile for a given custom borefield."""
-        if timeArray is None:
-            timeArray = self.defaultTimeArray
+
         # make filename
-        if depthArray is None:
-            depthArray = [1]+list(range(25, 201, 25))  # m
-        name = nameDatafile + ".txt"
+        name = nameDatafile + ".pickle"
         # check if file exists
-        if not os_isfile("Data/"+name):
+        if not os.path.isfile("Data/"+name):
             # does not exist, so create
-            pk_dump(dict([]), open("Data/"+name, "wb"))
+            pickle.dump(dict([]), open("Data/"+name, "wb"))
         else:
             raise Exception("The dataset " + name + " already exists. Please chose a different name.")
 
-        data = pk_load(open("Data/"+name, "rb"), encoding='latin1')
+        data = pickle.load(open("Data/"+name, "rb"),encoding='latin1')
+
 
         # see if k_s exists
         data["Data"] = dict([])
 
-        data["Time"] = timeArray
+        data["Time"]= timeArray
 
         for H in depthArray:
-            print("Start H: ", H)
+            print ("Start H: ", H)
 
             # Calculate the g-function for uniform borehole wall temperature
             alpha = self.k_s / (2.4 * 10 ** 6)
 
             # set borehole depth in borefield
             for borehole in customBorefield:
-                borehole.H = H
+                borehole.H=H
 
-            gfunc_uniform_T = gt_gfunction.uniform_temperature(
+            gfunc_uniform_T = gt.gfunction.uniform_temperature(
                     customBorefield, timeArray, alpha, nSegments=nSegments, disp=True)
 
-            data["Data"][H] = gfunc_uniform_T
+            data["Data"][H]=gfunc_uniform_T
 
         self.setCustomGfunction(name)
-        print(f"A new dataset with name {name} has been created in {os_getcwd()}\Data.")
-        pk_dump(data, open("Data/"+name, "wb"))
+        print("A new dataset with name " + name + " has been created in " + os.getcwd()+"\Data.")
+        pickle.dump(data,open("Data/"+name,"wb"))
+
+    def printTemperatureProfile(self, legend=True):
+        """This function plots the temperature profile for the calculated depth."""
+        self._printTemperatureProfile(legend=legend)
+
+    def printTemperatureProfileFixedDepth(self, depth, legend=True):
+        """This function plots the temperature profile for a fixed depth depth."""
+        self._printTemperatureProfile(legend=legend, H=depth)
 
     def loadHourlyProfile(self):
-        """This function loads in an hourly load profile. It opens a csv and asks for the relevant column where the
-        data is in."""
+        """This function loads in an hourly load profile. It opens a csv and asks for the relevant column where the data is in."""
 
         # give the location of the file
         filePath = filedialog.askopenfilename(title="Select csv-file with hourly load.")
 
         # workbook object is created
-        wb_obj = openpyxl_load_workbook(filePath)
+        wb_obj = openpyxl.load_workbook(filePath)
 
         sheet_obj = wb_obj.active
         max_row = sheet_obj.max_row
@@ -684,31 +644,31 @@ class Borefield:
         for i in range(2, max_row + 1):
             cell_obj = sheet_obj.cell(row=i, column=1)
             self.hourlyHeatingLoad.append(cell_obj.value)
-        for i in range(2, max_row + 1):
+        for i in range(2,max_row + 1):
             cell_obj = sheet_obj.cell(row=i, column=2)
             self.hourlyCoolingLoad.append(cell_obj.value)
 
-    def reduceToMonthLoad(self, load: list, peak):
-        """This function calculates the monthly load based, taking a maximum peak value into account."""
-        monthLoad = []
-        for i in range(12):
-            temp = load[self.hourlyLoadArray[i]:self.hourlyLoadArray[i + 1] + 1]
-            monthLoad.append(functools_reduce(lambda x, y: x + y, [min(j, peak) for j in temp]))
-        return monthLoad
-
-    def reduceToPeakLoad(self, load, peak):
-        """This function calculates the monthly peak load, taking a maximum peak value into account."""
-        peakLoad = []
-        for i in range(12):
-            temp = load[self.hourlyLoadArray[i]:self.hourlyLoadArray[i + 1] + 1]
-            peakLoad.append(max([min(j, peak) for j in temp]))
-        return peakLoad
-
-    def optimiseLoadProfile(self, depth: float = 150.):
+    def optimiseLoadProfile(self,depth=150,lengthPeak = defaultLengthPeak):
         """This function optimises the load based on the given borefield and the given hourly load."""
 
+        def reduceToMonthLoad(load,peak):
+            """This function calculates the monthly load based, taking a maximum peak value into account."""
+            monthLoad = []
+            for i in range(12):
+                temp = load[Borefield.hourlyLoadArray[i]:Borefield.hourlyLoadArray[i+1]+1]
+                monthLoad.append(functools.reduce(lambda x,y:x+y,[min(j,peak) for j in temp]))
+            return monthLoad
+
+        def reduceToPeakLoad(load,peak):
+            """This function calculates the monthly peak load, taking a maximum peak value into account."""
+            peakLoad = []
+            for i in range(12):
+                temp = load[Borefield.hourlyLoadArray[i]:Borefield.hourlyLoadArray[i+1]+1]
+                peakLoad.append(max([min(j,peak) for j in temp]))
+            return peakLoad
+
         # if no hourly profile is given, load one
-        if not self.hourlyCoolingLoad:
+        if self.hourlyCoolingLoad == []:
             self.loadHourlyProfile()
 
         # set initial peak loads
@@ -720,49 +680,47 @@ class Borefield:
         peakCoolLoad = initPeakCoolLoad
 
         # set iteration criteria
-        coolOK, heatOK = False, False
+        coolOK,heatOK = False,False
 
         while not coolOK or not heatOK:
             # calculate peak and base loads
-            self.setPeakCooling(self.reduceToPeakLoad(self.hourlyCoolingLoad, peakCoolLoad))
-            self.setPeakHeating(self.reduceToPeakLoad(self.hourlyHeatingLoad, peakHeatLoad))
-            self.setBaseloadCooling(self.reduceToMonthLoad(self.hourlyCoolingLoad, peakCoolLoad))
-            self.setBaseloadHeating(self.reduceToMonthLoad(self.hourlyHeatingLoad, peakHeatLoad))
+            self.setPeakCooling(reduceToPeakLoad(self.hourlyCoolingLoad,peakCoolLoad))
+            self.setPeakHeating(reduceToPeakLoad(self.hourlyHeatingLoad,peakHeatLoad))
+            self.setBaseloadCooling(reduceToMonthLoad(self.hourlyCoolingLoad,peakCoolLoad))
+            self.setBaseloadHeating(reduceToMonthLoad(self.hourlyHeatingLoad,peakHeatLoad))
 
             # calculate temperature profile, just for the results
-            self._printTemperatureProfile(legend=False, H=depth, figure=False)
+            self._printTemperatureProfile(legend=False,H=depth,figure=False)
 
             # deviation from minimum temperature
-            if abs(min(self.resultsPeakHeating)-self.Tf_C) > 0.05:
+            if abs(min(self.resultsPeakHeating)-self.Tf_C)>0.05:
 
                 # check if it goes below the threshold
-                if min(self.resultsPeakHeating) < self.Tf_C:
-                    peakHeatLoad -= 1*max(1, 10*(self.Tf_C - min(self.resultsPeakHeating)))
+                if min(self.resultsPeakHeating)<self.Tf_C:
+                    peakHeatLoad-=1*max(1,10*(self.Tf_C - min(self.resultsPeakHeating)))
                 else:
-                    peakHeatLoad = min(initPeakHeatLoad, peakHeatLoad+1)
+                    peakHeatLoad = min(initPeakHeatLoad,peakHeatLoad+1)
                     if peakHeatLoad == initPeakHeatLoad:
                         heatOK = True
             else:
                 heatOK = True
 
             # deviation from maximum temperature
-            if abs(max(self.resultsPeakCooling)-self.Tf_H) > 0.05:
+            if abs(max(self.resultsPeakCooling)-self.Tf_H)>0.05:
 
                 # check if it goes above the threshold
-                if max(self.resultsPeakCooling) > self.Tf_H:
-                    peakCoolLoad -= 1*max(1, 10*(-self.Tf_H + max(self.resultsPeakCooling)))
+                if max(self.resultsPeakCooling)>self.Tf_H:
+                    peakCoolLoad-=1*max(1,10*(-self.Tf_H + max(self.resultsPeakCooling)))
                 else:
-                    peakCoolLoad = min(initPeakCoolLoad, peakCoolLoad+1)
+                    peakCoolLoad = min(initPeakCoolLoad,peakCoolLoad+1)
                     if peakCoolLoad == initPeakCoolLoad:
                         coolOK = True
             else:
                 coolOK = True
 
         # print results
-        print(f"The peak load heating is: {peakHeatLoad}kW, leading to "
-              f"{functools_reduce(lambda x, y: x + y, self.baseloadHeating)} kWh of heating.")
-        print(f"The peak load cooling is: {peakCoolLoad} kW, leading to "
-              f"{functools_reduce(lambda x, y: x + y, self.peakCooling)} kWh of cooling.")
+        print("The peak load heating is: ",int(peakHeatLoad),"kW, leading to ",int(functools.reduce(lambda x,y:x+y,self.baseloadHeating)), "kWh of heating.")
+        print("The peak load cooling is: ", int(peakCoolLoad), "kW, leading to ",int(functools.reduce(lambda x, y: x + y, self.peakCooling)), "kWh of cooling.")
 
         # plot results
         self._printTemperatureProfile(H=depth)
