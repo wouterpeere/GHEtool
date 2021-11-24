@@ -30,7 +30,7 @@ class Borefield():
     UPM = 730. # number of hours per month
     thresholdBorholeDepth = 0.05  # threshold for iteration
     H_max = 0 # max threshold for interpolation
-    maxSimulationPeriod = 20 # maximal value for simulation
+    maxSimulationPeriod = 100 # maximal value for simulation
 
     # define default values
     defaultInvestement = [35, 0]  # 35 EUR/m
@@ -577,8 +577,6 @@ class Borefield():
             print("-------------------------")
             print("This calculation stopped.")
             raise ValueError
-            exit()
-
 
 
     def createCustomDataset(self,customBorefield,nameDatafile,nSegments=12,timeArray=defaultTimeArray,depthArray=defaultDepthArray):
