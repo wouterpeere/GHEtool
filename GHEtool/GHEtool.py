@@ -8,6 +8,8 @@ import functools
 from tkinter import filedialog
 import openpyxl
 
+FOLDER = os.path.dirname(os.path.realpath(__file__)) # solve problem with importing GHEtool from subfolders
+
 def timeValues():
     """This function calculates the default time values for the gfunction."""
     dt = 3600.  # Time step (s)
@@ -250,7 +252,7 @@ class Borefield():
 
     def calculateMonthlyLoad(self):
         """This function calculates the average monthly load in kW"""
-        self.montlyLoad = [(-self.baseloadHeating[i] + self.baseloadCooling[i]) / Borefield.UPM for i in range(12)]
+        self.monthlyLoad = [(-self.baseloadHeating[i] + self.baseloadCooling[i]) / Borefield.UPM for i in range(12)]
 
     def setBaseloadHeating(self, baseload):
         """This function defines the baseload in heating both in an energy as in an average power perspective"""
@@ -305,7 +307,7 @@ class Borefield():
 
             # Select month with highest peak load and take both the peak and average load from that month
             monthIndex = self.peakHeating.index(max(self.peakHeating))
-            self.qm = self.montlyLoad[monthIndex] * 1000.
+            self.qm = self.monthlyLoad[monthIndex] * 1000.
             self.qh = max(self.peakHeating) * 1000.
 
             # correct signs
@@ -320,7 +322,7 @@ class Borefield():
 
             # Select month with highest peak load and take both the peak and average load from that month
             monthIndex = self.peakCooling.index(max(self.peakCooling))
-            self.qm = self.montlyLoad[monthIndex] * 1000.
+            self.qm = self.monthlyLoad[monthIndex] * 1000.
             self.qh = max(self.peakCooling) * 1000.
 
     def calculateL3Params(self, HC, monthIndex=None):
@@ -336,12 +338,12 @@ class Borefield():
             monthIndex = self.peakHeating.index(max(self.peakHeating)) if monthIndex == None else monthIndex
             self.qh = max(self.peakHeating) * 1000.
 
-            self.qm = self.montlyLoad[monthIndex] * 1000.
+            self.qm = self.monthlyLoad[monthIndex] * 1000.
 
             if monthIndex < 1:
                 self.qpm = 0
             else:
-                self.qpm = functools.reduce(lambda x, y: x + y, self.montlyLoad[:monthIndex]) * 1000. / (monthIndex + 1)
+                self.qpm = functools.reduce(lambda x, y: x + y, self.monthlyLoad[:monthIndex]) * 1000. / (monthIndex + 1)
 
             self.qm = -self.qm
         else:
@@ -354,11 +356,11 @@ class Borefield():
             monthIndex = self.peakCooling.index(max(self.peakCooling)) if monthIndex == None else monthIndex
             self.qh = max(self.peakCooling) * 1000.
 
-            self.qm = self.montlyLoad[monthIndex] * 1000.
+            self.qm = self.monthlyLoad[monthIndex] * 1000.
             if monthIndex < 1:
                 self.qpm = 0
             else:
-                self.qpm = functools.reduce(lambda x, y: x + y, self.montlyLoad[:monthIndex]) * 1000. / (monthIndex + 1)
+                self.qpm = functools.reduce(lambda x, y: x + y, self.monthlyLoad[:monthIndex]) * 1000. / (monthIndex + 1)
         self.tcm = (monthIndex + 1) * Borefield.UPM * 3600
         self.tpm = monthIndex * Borefield.UPM * 3600
 
@@ -383,7 +385,7 @@ class Borefield():
         """
 
         # making a numpy array of the monthly balance (self.montlyLoad) for a period of self.simulationPeriod years [kW]
-        monthlyLoadsArray = np.asarray(self.montlyLoad * self.simulationPeriod)
+        monthlyLoadsArray = np.asarray(self.monthlyLoad * self.simulationPeriod)
 
         # calculation of all the different times at which the gfunction should be calculated.
         # this is equal to 'UPM' hours a month * 3600 seconds/hours for the simulationPeriod
@@ -490,12 +492,12 @@ class Borefield():
             name = self.customGfunction+".pickle"
 
         # check if datafile exists
-        if not os.path.isfile("Data/"+name):
+        if not os.path.isfile(FOLDER + "/Data/"+name):
             print(name)
             raise Exception('There is no precalculated data available. Please use the createCustomDatafile.')
 
         # load data file
-        data = pickle.load(open("Data/"+name,"rb"))
+        data = pickle.load(open(FOLDER + "/Data/"+name,"rb"))
 
         # remove the time value
         Time = Borefield.defaultTimeArray
@@ -531,7 +533,6 @@ class Borefield():
                 """This function creates an interpolation list from a custom dataset and saves it under gfunctionInterpolationArray."""
 
                 H_array = list(data["Data"].keys())
-                H_max = max(H_array)
                 H_array.sort()
 
                 points = (H_array,Time)
@@ -587,11 +588,11 @@ class Borefield():
         # check if file exists
         if not os.path.isfile("Data/"+name):
             # does not exist, so create
-            pickle.dump(dict([]), open("Data/"+name, "wb"))
+            pickle.dump(dict([]), open(FOLDER + "/Data/"+name, "wb"))
         else:
             raise Exception("The dataset " + name + " already exists. Please chose a different name.")
 
-        data = pickle.load(open("Data/"+name, "rb"),encoding='latin1')
+        data = pickle.load(open(FOLDER + "/Data/"+name, "rb"),encoding='latin1')
 
 
         # see if k_s exists
@@ -615,8 +616,8 @@ class Borefield():
             data["Data"][H]=gfunc_uniform_T
 
         self.setCustomGfunction(name)
-        print("A new dataset with name " + name + " has been created in " + os.getcwd()+"\Data.")
-        pickle.dump(data,open("Data/"+name,"wb"))
+        print("A new dataset with name " + name + " has been created in " + os.path.dirname(os.path.realpath(__file__))+"\Data.")
+        pickle.dump(data,open(FOLDER + "/Data/"+name,"wb"))
 
     def printTemperatureProfile(self, legend=True):
         """This function plots the temperature profile for the calculated depth."""
