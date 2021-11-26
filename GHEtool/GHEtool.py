@@ -37,7 +37,7 @@ class Borefield():
     # define default values
     defaultInvestement = [35, 0]  # 35 EUR/m
     defaultLengthPeak = 6  # hours
-    defaultDepthArray = [1]+list(range(25, 201, 25))  # m
+    defaultDepthArray = [1]+list(range(25, 350, 25))  # m
     defaultTimeArray = timeValues()  # sec
 
     temp = 0
@@ -291,7 +291,7 @@ class Borefield():
         """This function calculates the imbalance of the field.
         A positive imbalance means that the field is injection dominated, i.e. it heats up every year."""
         self.imbalance = functools.reduce(lambda x, y: x + y, self.baseloadCooling) - \
-                         functools.reduce(lambda x, y: x + y,self.baseloadHeating)
+                         functools.reduce(lambda x, y: x + y, self.baseloadHeating)
 
     def calculateL2Params(self, HC):
         """This function calculates the parameters for the sizing based on the last year of operation"""

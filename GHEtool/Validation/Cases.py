@@ -1,7 +1,6 @@
 """
 
 This document contains 4 different cases referring to the paper: Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. Validated combined first and last year borefield sizing methodology. In Proceedings of International Building Simulation Conference 2021 (2021). Brugge (Belgium), 1-3 September 2021.
-This file can be used to check whether or not adaptations to the code are correct or not for the calculated depths below were verified.
 
 """
 
@@ -69,6 +68,7 @@ if __name__ == "__main__":
         """
         This function checks whether the borefield sizing gives the correct (i.e. validated) results for the 4 cases.
         If not, an assertion error is raised.
+        NOTE: these values differ slightly from the values in the mentioned paper. This is due to
         """
 
         correctAnswers = (56.64, 118.7, 66.88, 92.67)
