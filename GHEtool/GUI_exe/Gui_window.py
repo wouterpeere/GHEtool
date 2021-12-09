@@ -234,7 +234,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # reset progress bar
         self.updateBar(0, False)
         # set language options and link them to the comboBox
-        options = ([('English', ''), ('Deutsch', 'eng-de')])  # , ('Russian', 'en-ru'), ('Spanish', 'en-es'),
+        options = ([('English', ''), ('Deutsch', 'eng-de'),('Dutch','eng-du')])  # , ('Russian', 'en-ru'), ('Spanish', 'en-es'),
         # ('Chinese', 'en-zh'), ('French', 'en-fr'), ('Bahasa Indonesia', 'en-id')])
         for i, (text, lang) in enumerate(options):
             self.comboBox_Language.addItem(text)
