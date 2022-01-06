@@ -9,6 +9,8 @@ if __name__ == "__main__":
             "Rb":0.2,           # equivalent borehole resistance (K/W)
             "N_1":12,           # width of rectangular field (#)
             "N_2":10}           # length of rectangular field (#)}
+    # The new, more efficient way, is to work with the class of GroundData
+    data = GroundData(110,6,3,10,0.2,10,12)
 
     # Montly loading values
     peakCooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]              # Peak cooling in kW
