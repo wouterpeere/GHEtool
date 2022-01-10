@@ -5,7 +5,7 @@ This document contains 4 different cases referring to the paper: Peere, W., Pica
 """
 
 from GHEtool.GHEtool import Borefield
-
+import pygfunction as gt
 if __name__ == "__main__":
     # relevant borefield data for the calculations
     data = {"H": 110,           # depth (m)
@@ -91,7 +91,50 @@ if __name__ == "__main__":
             borefield.size(100)
             assert round(borefield.H,2) == correctAnswers[i-1]
 
+    def checkCustomDatafile():
+        """
+        This function checks whether the borefield sizing gives the correct (i.e. validated) results for the 4 cases given the custom datafile.
+        If not, an assertion error is raised.
+        NOTE: these values differ slightly from the values in the mentioned paper. This is due to
+        """
+
+        # create custom datafile
+
+        correctAnswers = (56.64, 118.7, 66.88, 92.67)
+        borefield = Borefield(simulationPeriod=20,
+                              peakHeating=peakHeating,
+                              peakCooling=peakCooling,
+                              baseloadHeating=monthlyLoadHeating,
+                              baseloadCooling=monthlyLoadCooling)
+
+        borefield.setGroundParameters(data)
+
+        customField = gt.boreholes.rectangle_field(N_1 = 10, N_2 = 12, B_1 = 6.5, B_2=6.5, H=100., D=4, r_b=0.075)
+        borefield.createCustomDataset(customField, "customField")
+
+        for i in (1, 2, 3, 4):
+            monthlyLoadCooling, monthlyLoadHeating, peakCooling, peakHeating = loadCase(i)
+
+            borefield = Borefield(simulationPeriod=20,
+                                  peakHeating=peakHeating,
+                                  peakCooling=peakCooling,
+                                  baseloadHeating=monthlyLoadHeating,
+                                  baseloadCooling=monthlyLoadCooling)
+
+            borefield.setGroundParameters(data)
+
+            # set temperature boundaries
+            borefield.setMaxGroundTemperature(16)  # maximum temperature
+            borefield.setMinGroundTemperature(0)  # minimum temperature
+
+            # set the custom field
+            borefield.setCustomGfunction("customfield")
+
+            borefield.size(100)
+            assert round(borefield.H, 2) == correctAnswers[i - 1]
+
     checkCases() # check different cases
+    checkCustomDatafile() # check if the custom datafile is correct
 
     monthlyLoadCooling, monthlyLoadHeating, peakCooling, peakHeating = loadCase(1) # load case 1
 

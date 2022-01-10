@@ -49,7 +49,7 @@ class Borefield():
     # define default values
     defaultInvestement: list = [35, 0]  # 35 EUR/m
     defaultLengthPeak: int = 6  # hours
-    defaultDepthArray: list = [1]+list(range(25, 350, 25))  # m
+    defaultDepthArray: list = [1]+list(range(25, 351, 25))  # m
     defaultTimeArray: list = timeValues()  # sec
 
     temp: int = 0
@@ -67,7 +67,7 @@ class Borefield():
                 'monthlyLoadCooling', 'peakHeating', 'imbalance', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm',\
                 'peakCooling', 'simulationPeriod', \
                 'factoren_temperature_profile', 'resultsCooling', 'resultsHeating', 'resultsPeakHeating', \
-                'resultsPeakCooling', 'resultsMonthCooling', 'resultsMonthHeating', 'Tb'
+                'resultsPeakCooling', 'resultsMonthCooling', 'resultsMonthHeating', 'Tb', 'thresholdWarningShallowField'
 
     def __init__(self, simulationPeriod: int, numberOfBoreholes: int = None, peakHeating: list = None, peakCooling: list = None,
                  baseloadHeating: list = None, baseloadCooling: list = None, investementCost: list = None, borefield = None, customGfunction = None):
@@ -88,12 +88,13 @@ class Borefield():
         self.baseloadCooling: list = listOfZeros
         self.limitingQuadrant: int = 0
         self.Tf: float = 0.
+        self.thresholdWarningShallowField: int = 50 # m hereafter one needs to chance to fewer boreholes with more depth, because the calculations are no longer that accurate.
 
         # define vars
         self.UPM: float = 730.
         self.setPeakHeating(peakHeating)
         self.setPeakCooling(peakCooling)
-        self.setBaseloadCooling(baseloadCooling)  # dit definieert ook imbalance etc
+        self.setBaseloadCooling(baseloadCooling)  # defines the imbalance
         self.setBaseloadHeating(baseloadHeating)
 
         self.simulationPeriod = simulationPeriod
@@ -248,7 +249,7 @@ class Borefield():
 
         return self.H
 
-    def size(self,H_init):
+    def size(self,H_init: float):
 
         """This function sizes the borefield of the given configuration according to the methodology explained in (Peere et al., 2021).
         It returns the borefield depth."""
@@ -267,7 +268,7 @@ class Borefield():
 
         def sizeQuadrant3():
             self.calculateL3Params(True)  # calculate parameters
-            return  self._Carcel  # size
+            return self._Carcel  # size
 
         def sizeQuadrant4():
             self.calculateL2Params(True)  # calculate parameters
@@ -278,9 +279,9 @@ class Borefield():
             # extraction dominated, so quadrants 1 and 4 are relevant
             quadrant1 = sizeQuadrant1()
             quadrant4 = sizeQuadrant4()
-            self.H = max(quadrant1,quadrant4)
+            self.H = max(quadrant1, quadrant4)
 
-            if self.H==quadrant1:
+            if self.H == quadrant1:
                 self.limitingQuadrant = 1
             else:
                 self.limitingQuadrant = 4
@@ -288,12 +289,17 @@ class Borefield():
             # injection dominated, so quadrants 2 and 3 are relevant
             quadrant2 = sizeQuadrant2()
             quadrant3 = sizeQuadrant3()
-            self.H = max(quadrant2,quadrant3)
+            self.H = max(quadrant2, quadrant3)
 
-            if self.H==quadrant2:
+            if self.H == quadrant2:
                 self.limitingQuadrant = 2
             else:
                 self.limitingQuadrant = 3
+
+        # check if the field is not shallow
+        if self.H < self.thresholdWarningShallowField:
+            print("The field has a calculated depth of ", str(round(self.H, 2)), " m which is lower than the proposed minimum of ", str(self.thresholdWarningShallowField), " m.")
+            print("Please change your configuration accordingly to have a not so shallow field.")
 
         return self.H
 
@@ -662,7 +668,7 @@ class Borefield():
 
             data["Data"][H]=gfunc_uniform_T
 
-        self.setCustomGfunction(name)
+        self.setCustomGfunction(nameDatafile)
         print("A new dataset with name " + name + " has been created in " + os.path.dirname(os.path.realpath(__file__))+"\Data.")
         pickle.dump(data,open(FOLDER + "/Data/"+name,"wb"))
 
