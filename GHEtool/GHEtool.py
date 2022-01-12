@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import functools
 from tkinter import filedialog
 import openpyxl
+from typing import Optional, Union
 
 FOLDER = os.path.dirname(os.path.realpath(__file__)) # solve problem with importing GHEtool from subfolders
 
@@ -39,7 +40,8 @@ class GroundData:
         self.N_1 = N_1  # #
         self.N_2 = N_2  # #
 
-class Borefield():
+
+class Borefield:
 
     # UPM: float = 730. # number of hours per month
     thresholdBorholeDepth: float = 0.05  # threshold for iteration
@@ -67,7 +69,8 @@ class Borefield():
                 'monthlyLoadCooling', 'peakHeating', 'imbalance', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm',\
                 'peakCooling', 'simulationPeriod', \
                 'factoren_temperature_profile', 'resultsCooling', 'resultsHeating', 'resultsPeakHeating', \
-                'resultsPeakCooling', 'resultsMonthCooling', 'resultsMonthHeating', 'Tb', 'thresholdWarningShallowField', 'GUI'
+                'resultsPeakCooling', 'resultsMonthCooling', 'resultsMonthHeating', 'Tb', \
+                'thresholdWarningShallowField', 'GUI', 'printing'
 
     def __init__(self, simulationPeriod: int, numberOfBoreholes: int = None, peakHeating: list = None, peakCooling: list = None,
                  baseloadHeating: list = None, baseloadCooling: list = None, investementCost: list = None, borefield = None, customGfunction = None, GUI: bool = False):
@@ -115,7 +118,8 @@ class Borefield():
         self.hourlyHeatingLoad: list = []
         self.hourlyCoolingLoad: list = []
         self.Tb: list = []
-        self.GUI = GUI # check if the GHEtool is used by the GUI i
+        self.GUI = GUI  # check if the GHEtool is used by the GUI i
+        self.printing: bool = True
 
     def setNumberOfBoreholes(self,numberOfBoreholes: int):
         """This functions sets the number of boreholes"""
@@ -150,7 +154,7 @@ class Borefield():
         self.td: float = self.lengthPeak * 3600.
         self.time: list = np.array([self.td, self.td + self.tm, self.ty + self.tm + self.td])
 
-    def setGroundParameters(self,data):
+    def setGroundParameters(self, data: Union[dict, GroundData]):
         """This function sets the relevant borefield characteristics."""
         if isinstance(data, GroundData):
             self.H: float = data.H  # Borehole length (m)
@@ -164,24 +168,23 @@ class Borefield():
             # Ground properties
             self.k_s: float = data.k_s  # Ground thermal conductivity (W/m.K)
             self.Tg: float = data.Tg  # Ground temperature at infinity (C)
+            # sets the number of boreholes as if it was a rectangular field, iff there is not yet a number of boreholes defined by a custom configuration
+            self.setNumberOfBoreholes(self.N_1 * self.N_2)
+            return
 
-        else:
-            # backup for backwards compatibility
-            self.H: float = data["H"]  # Borehole length (m)
-            self.B: float = data["B"]  # Borehole spacing (m)
+        # backup for backwards compatibility
+        self.H: float = data["H"]  # Borehole length (m)
+        self.B: float = data["B"]  # Borehole spacing (m)
 
-            self.N_1: int = data["N_1"]
-            self.N_2: int = data["N_2"]
+        self.N_1: int = data["N_1"]
+        self.N_2: int = data["N_2"]
 
-            self.Rb: float =data["Rb"]
+        self.Rb: float =data["Rb"]
 
-            # Ground properties
-            self.k_s: float = data["k_s"]  # Ground thermal conductivity (W/m.K)
-            self.Tg: float = data["Tg"]    # Ground temperature at infinity (C)
-
-        # sets the number of boreholes as if it was a rectangular field, iff there is not yet a number of boreholes defined by a custom configuration
-        if self.numberOfBoreholes is None:
-            self.setNumberOfBoreholes(self.N_1*self.N_2)
+        # Ground properties
+        self.k_s: float = data["k_s"]  # Ground thermal conductivity (W/m.K)
+        self.Tg: float = data["Tg"]    # Ground temperature at infinity (C)
+        self.setNumberOfBoreholes(self.N_1 * self.N_2)
 
     def setMaxGroundTemperature(self, temp: float):
         """This function sets the maximal ground temperature to temp"""
@@ -198,8 +201,7 @@ class Borefield():
         # initiate iteration
         H_prev = 0
 
-        if self.H < 1:
-            self.H = 50
+        self.H = 50 if self.H < 1 else self.H
 
         # Iterates as long as there is no convergence
         # (convergence if difference between depth in iterations is smaller than thresholdBorholeDepth)
@@ -228,14 +230,15 @@ class Borefield():
         # initiate iteration
         H_prev = 0
         timeSteps = np.array([self.th, self.th + self.tm, self.tcm + self.th])
-        if self.H < 1:
-            self.H = 50
+        self.H = 50 if self.H < 1 else self.H
+
 
         # Iterates as long as there is no convergence
         # (convergence if difference between depth in iterations is smaller than thresholdBorholeDepth)
         while abs(self.H - H_prev) >= Borefield.thresholdBorholeDepth:
             # get the gfunction values
             gfunc_uniform_T = self.gfunction(timeSteps, self.H)
+            
 
             # calculate the thermal resistances
             Rpm = (gfunc_uniform_T[2] - gfunc_uniform_T[1]) / (2 * pi * self.k_s)
@@ -251,13 +254,14 @@ class Borefield():
 
         return self.H
 
-    def size(self,H_init: float):
+    def size(self, H_init: float):
 
         """This function sizes the borefield of the given configuration according to the methodology explained in (Peere et al., 2021).
         It returns the borefield depth."""
 
         # initiate with a given depth
         self.H_init: float = H_init
+        self.H = self.H_init
 
         def sizeQuadrant1():
             self.calculateL3Params(False)  # calculate parameters
@@ -299,7 +303,7 @@ class Borefield():
                 self.limitingQuadrant = 3
 
         # check if the field is not shallow
-        if self.H < self.thresholdWarningShallowField:
+        if self.H < self.thresholdWarningShallowField and self.printing:
             print("The field has a calculated depth of ", str(round(self.H, 2)), " m which is lower than the proposed minimum of ", str(self.thresholdWarningShallowField), " m.")
             print("Please change your configuration accordingly to have a not so shallow field.")
 
@@ -507,7 +511,7 @@ class Borefield():
         self.resultsMonthCooling: list = resultsMonthCooling
         self.resultsMonthHeating: list = resultsMonthHeating
 
-        ## initiate figure
+        # initiate figure
         if figure:
             # make a time array
             timeArray = [i / 12 / 730. / 3600. for i in timeForgValues]
@@ -565,12 +569,10 @@ class Borefield():
                 name = configurationString(self.N_1,self.N_2)+".pickle"
             else:
                 name = self.customGfunction+".pickle"
-    
             # check if datafile exists
             if not os.path.isfile(FOLDER + "/Data/"+name):
                 print(name)
                 raise Exception('There is no precalculated data available. Please use the createCustomDatafile.')
-    
             # load data file
             data = pickle.load(open(FOLDER + "/Data/"+name,"rb"))
 
@@ -647,14 +649,14 @@ class Borefield():
                     gvalue = interpolate.interpn(points, values, np.array([H, timeValue]))
             return gvalue
         except ValueError as e:
-
-            if self.simulationPeriod > Borefield.maxSimulationPeriod:
-                print("Your requested simulationperiod of " + str(self.simulationPeriod) + " years is beyond the limit of " + str(Borefield.maxSimulationPeriod) + " years of the precalculated data.")
-            else:
-                print("Your requested depth of " + str(H) + "m is beyond the limit " + str(Borefield.H_max) + "m of the precalculated data.")
-                print("Please change your borefield configuration accordingly.")
-            print("-------------------------")
-            print("This calculation stopped.")
+            if self.printing:
+                if self.simulationPeriod > Borefield.maxSimulationPeriod:
+                    print("Your requested simulationperiod of " + str(self.simulationPeriod) + " years is beyond the limit of " + str(Borefield.maxSimulationPeriod) + " years of the precalculated data.")
+                else:
+                    print("Your requested depth of " + str(H) + "m is beyond the limit " + str(Borefield.H_max) + "m of the precalculated data.")
+                    print("Please change your borefield configuration accordingly.")
+                print("-------------------------")
+                print("This calculation stopped.")
             raise ValueError
 
 
@@ -801,3 +803,47 @@ class Borefield():
 
         # plot results
         self._printTemperatureProfile(H=depth)
+        
+    def SizeCompleteField(self, H_max: float, L_1: float, L_2: float, B_min: float = 3.0, B_max: float = 9.0) -> tuple:
+        L_2_bigger_then_L_1: bool = True if L_2 > L_1 else False
+        if L_2 > L_1:
+            L_1, L_2 = L_2, L_1
+        N_N_max_start: int = 20 * 20
+        N_N_max: int = N_N_max_start
+        combo_start: tuple = (20, 20, 9)
+        combo = combo_start
+        self.printing: bool = False
+        product_min = 0
+        for B in np.arange(B_max, B_min * 0.99999, -0.5):
+            N_1_max = min(int(L_1/B), 20)
+            N_2_max = min(int(L_2/B), 20)
+            for N_1 in range(N_1_max, 0, -1):
+                for N_2 in range(min(N_2_max, N_1), 0, -1):
+                    self.N_1 = N_1
+                    self.N_2 = N_2
+                    product = N_1 * N_2
+                    if product > N_N_max:
+                        continue
+                    if product < product_min:
+                        break
+                    self.setNumberOfBoreholes(product)
+                    self.B = B
+                    try:
+                        depth = self.size(H_max)
+                    except ValueError:
+                        product_min = product
+                        break
+                    if depth > H_max:
+                        break
+                    if product < N_N_max:
+                        N_N_max = product
+                        combo = (N_1, N_2, B)
+        if N_N_max == N_N_max_start:
+            return 0, 0, 0
+        self.N_1 = combo[1] if L_2_bigger_then_L_1 else combo[0]
+        self.N_2 = combo[0] if L_2_bigger_then_L_1 else combo[1]
+        self.B = combo[2]
+        self.setNumberOfBoreholes(self.N_1 * self.N_2)
+        self.H = self.size(H_max)
+        self.printing: bool = True
+        return self.N_1, self.N_2, self.B, self.H

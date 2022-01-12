@@ -5,12 +5,12 @@ if __name__ == "__main__":
     data = {"H": 110,           # depth (m)
             "B": 6,             # borehole spacing (m)
             "k_s": 3,           # conductivity of the soil (W/mK)
-            "Tg":10,            # Ground temperature at infinity (degrees C)
-            "Rb":0.2,           # equivalent borehole resistance (K/W)
-            "N_1":12,           # width of rectangular field (#)
-            "N_2":10}           # length of rectangular field (#)}
+            "Tg": 10,           # Ground temperature at infinity (degrees C)
+            "Rb": 0.2,          # equivalent borehole resistance (K/W)
+            "N_1": 12,          # width of rectangular field (#)
+            "N_2": 10}          # length of rectangular field (#)}
     # The new, more efficient way, is to work with the class of GroundData
-    data = GroundData(110,6,3,10,0.2,10,12)
+    data = GroundData(110, 6, 3, 10, 0.2, 10, 12)
 
     # Montly loading values
     peakCooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]              # Peak cooling in kW
@@ -44,32 +44,20 @@ if __name__ == "__main__":
 
     # size borefield
     depth = borefield.size(100)
-    print (depth)
+    print(depth)
 
-    #print imbalance
-    print (borefield.imbalance) # print imbalance
+    # print imbalance
+    print(borefield.imbalance)  # print imbalance
 
     # plot temperature profile for the calculated depth
     borefield.printTemperatureProfile(legend=True)
 
-    #plot temperature profile for a fixed depth
+    # plot temperature profile for a fixed depth
     borefield.printTemperatureProfileFixedDepth(depth=75,legend=False)
 
     # print gives the array of montly tempartures for peak cooling without showing the plot
     borefield.calculateTemperatures(depth=90)
-    print (borefield.resultsPeakCooling)
-
-    ### Custom field
-    """When working on a custom borefield configuration, one needs to import this configuration into the GHEtool.
-    Based on the pygfunction, one creates his custom borefield and gives it as an argument to the class initiater Borefield of GHEtool.
-    
-    You also need a custom g-function file for interpolation. This can also be given as an argument to the class initiater as customGfunction.
-    This custom variable, must contain gfunctions for all time steps in Borefield.defaultTimeArray, and should be structured as follows:
-    {"Time":Borefield.defaultTimeArray,"Data":[[Depth1,[Gfunc1,Gfunc2 ...]],[Depth2,[Gfunc1, Gfunc2 ...]]]}.
-    
-    However, one can use the function 'createCustomDataset' when a custom borefield is given. This will make the required dataset for the optimisation.
-    Please note that, depending on the complexity of the custom field, this can range between 5 minutes and 5 hours. 
-    """
+    print(borefield.resultsPeakCooling)
 
     # Montly loading values
     peakCooling = [0., 0, 3.4, 6.9, 13., 18., 21., 50., 16., 3.7, 0., 0.]  # Peak cooling in kW
@@ -87,6 +75,40 @@ if __name__ == "__main__":
     monthlyLoadHeating = list(map(lambda x: x * annualHeatingLoad, montlyLoadHeatingPercentage))  # kWh
     monthlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, montlyLoadCoolingPercentage))  # kWh
 
+    # size borefield by length, width and maximal borehole depth
+
+    borefield = Borefield(simulationPeriod=20,
+                          peakHeating=peakHeating,
+                          peakCooling=peakCooling,
+                          baseloadHeating=monthlyLoadHeating,
+                          baseloadCooling=monthlyLoadCooling)
+
+    borefield.setGroundParameters(data)
+
+    # set temperature boundaries
+    borefield.setMaxGroundTemperature(16)  # maximum temperature
+    borefield.setMinGroundTemperature(0)  # minimum temperature
+
+    H_max = 90  # maximal depth of borehole
+    L_1 = 140  # maximal length of borehole field
+    L_2 = 140  # maximal width of borehole field
+    B_min = 3  # minimal borehole spacing
+    B_max = 9  # maximal borehole spacing
+    N_1, N_2, B, H = borefield.SizeCompleteField(H_max, L_1, L_2, B_min, B_max)
+    print(N_1, N_2, B, H)
+
+    # Custom field
+    """When working on a custom borefield configuration, one needs to import this configuration into the GHEtool.
+    Based on the pygfunction, one creates his custom borefield and gives it as an argument to the class initiater Borefield of GHEtool.
+
+    You also need a custom g-function file for interpolation. This can also be given as an argument to the class initiater as customGfunction.
+    This custom variable, must contain gfunctions for all time steps in Borefield.defaultTimeArray, and should be structured as follows:
+    {"Time":Borefield.defaultTimeArray,"Data":[[Depth1,[Gfunc1,Gfunc2 ...]],[Depth2,[Gfunc1, Gfunc2 ...]]]}.
+
+    However, one can use the function 'createCustomDataset' when a custom borefield is given. This will make the required dataset for the optimisation.
+    Please note that, depending on the complexity of the custom field, this can range between 5 minutes and 5 hours. 
+    """
+
     # create the borefield object
 
     borefield = Borefield(simulationPeriod=20,
@@ -101,8 +123,8 @@ if __name__ == "__main__":
     borefield.setMaxGroundTemperature(16)  # maximum temperature
     borefield.setMinGroundTemperature(0)  # minimum temperature
 
-    customField = gt.boreholes.L_shaped_field(N_1=3, N_2=3, B_1=5., B_2=5.,H=100., D=4, r_b=0.05)
-    borefield.createCustomDataset(customField,"customField")
+    customField = gt.boreholes.L_shaped_field(N_1=3, N_2=3, B_1=5., B_2=5., H=100., D=4, r_b=0.05)
+    borefield.createCustomDataset(customField, "customField")
     borefield.setCustomGfunction("customfield")
     borefield.setBorefield(customField)
     borefield.printTemperatureProfileFixedDepth(100)
