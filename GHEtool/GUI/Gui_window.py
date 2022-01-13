@@ -15,6 +15,7 @@ currentdir = dirname(realpath(__file__))
 parentdir = dirname(currentdir)
 path.append(parentdir)
 
+
 class BoundsOfPrecalculatedData:
     """
     class to check if selected values are within the bounds for the precalculated data
@@ -23,7 +24,7 @@ class BoundsOfPrecalculatedData:
 
     def __init__(self):
         self.H: float = 350.0
-        self.B_Max: float = 6.0
+        self.B_Max: float = 9.0
         self.B_Min: float = 3.0
         self.k_s_Min: float = 1.5
         self.k_s_Max: float = 3.5
@@ -53,7 +54,8 @@ class BoundsOfPrecalculatedData:
 class DataStorage:
     __slots__ = 'H', 'B', 'k_s', 'Tg', 'Rb', 'N_1', 'N_2', 'T_max', 'T_min', 'simulationPeriod', 'peakHeating', \
                 'peakCooling', 'monthlyLoadHeating', 'monthlyLoadHeating', 'monthlyLoadCooling', 'borefield', 'ui',\
-                'DetermineDepth', 'unitDemand', 'unitPeak', 'FactorDemand', 'FactorPeak'
+                'DetermineDepth', 'unitDemand', 'unitPeak', 'FactorDemand', 'FactorPeak', 'SizeBorefield', 'H_max',\
+                'B_max', 'B_min', 'L_max', 'W_max'
 
     # init class and store input data
     def __init__(self, ui: int) -> None:
@@ -86,6 +88,12 @@ class DataStorage:
         self.T_min: float = getattr(obj, 'doubleSpinBox_TMin').value()  # °C
         self.simulationPeriod: int = getattr(obj, 'spinBox_Years').value()  # years
         self.DetermineDepth: bool = getattr(obj, 'checkBox_CalcDepth').isChecked()  # boolean
+        self.SizeBorefield: bool = getattr(obj, 'checkBox_SizeBorefield').isChecked()
+        self.H_max: float = getattr(obj, 'doubleSpinBox_H').value()  # m
+        self.B_max: float = getattr(obj, 'doubleSpinBox_B_max').value()  # m
+        self.B_min: float = getattr(obj, 'doubleSpinBox_B').value()  # m
+        self.L_max: float = getattr(obj, 'doubleSpinBox_W_max').value()  # m
+        self.W_max: float = getattr(obj, 'doubleSpinBox_L_max').value()  # m
         self.unitPeak: str = getattr(obj, 'label_Unit_pH').text()
         self.unitDemand: str = getattr(obj, 'label_Unit_HL').text()
         uP = self.unitPeak[1:-1]
@@ -223,6 +231,16 @@ class DataStorage:
         getattr(obj, 'doubleSpinBox_CL_Oct').setValue(self.monthlyLoadCooling[9] / self.FactorDemand)
         getattr(obj, 'doubleSpinBox_CL_Nov').setValue(self.monthlyLoadCooling[10] / self.FactorDemand)
         getattr(obj, 'doubleSpinBox_CL_Dec').setValue(self.monthlyLoadCooling[11] / self.FactorDemand)
+        try:
+            getattr(obj, 'checkBox_SizeBorefield').setChecked(self.SizeBorefield)
+            if self.SizeBorefield:
+                getattr(obj, 'doubleSpinBox_H').setValue(self.H_max)  # m
+                getattr(obj, 'doubleSpinBox_B_max').setValue(self.B_max)  # m
+                getattr(obj, 'doubleSpinBox_B').setValue(self.B_min)  # m
+                getattr(obj, 'doubleSpinBox_W_max').setValue(self.L_max)  # m
+                getattr(obj, 'doubleSpinBox_L_max').setValue(self.W_max)  # m
+        except AttributeError:
+            return
 
 
 # main GUI class
@@ -243,6 +261,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.pushButton_thermalDemands.clicked.connect(self.changeToThermalPage)
         self.pushButton_Results.clicked.connect(self.changeToResultsPage)
         self.checkBox_CalcDepth.clicked.connect(self.checkDetermineDepth)
+        self.checkBox_SizeBorefield.clicked.connect(self.checkSizeBorefield)
         self.pushButton_General.clicked.connect(self.changeToGeneralPage)
         self.pushButton_SaveFigure.clicked.connect(self.SaveFigure)
         self.pushButton_SaveData.clicked.connect(self.SaveData)
@@ -255,7 +274,6 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.checkBox_Legend.clicked.connect(self.checkLegend)
         self.pushButton_NextGeneral.clicked.connect(self.changeToThermalPage)
         self.pushButton_PreviousThermal.clicked.connect(self.changeToGeneralPage)
-        self.comboBox_Language.currentIndexChanged.connect(self.change_Language)
         self.comboBox_Datentyp.currentIndexChanged.connect(self.dataType)
         self.pushButton_loadCsv.clicked.connect(self.funChooseFile)
 
@@ -292,6 +310,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # set language options and link them to the comboBox
         options = ['English', 'German', 'Dutch', 'French', 'Italian']
         self.comboBox_Language.addItems(options)
+        self.comboBox_Language.currentIndexChanged.connect(self.change_Language)
         from IconClass import IconClass
         IC = IconClass()
 
@@ -352,7 +371,6 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.LoadList()
 
     def checkBounds(self):
-
         Outside_Bounds: bool = self.BOPD.check_If_Outside_Bounds(self.doubleSpinBox_H.value(),
                                                                  self.doubleSpinBox_B.value(),
                                                                  self.doubleSpinBox_k_s.value(),
@@ -502,6 +520,19 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.pushButton_calculate.setText(self.translations.pushButton_calculate)
         self.label_WarningCustomBorefield.setText(self.translations.label_WarningCustomBorefield)
         self.label_WarningDepth.setText(self.translations.label_WarningDepth)
+        try:
+            self.checkBox_SizeBorefield.setText(self.translations.checkBox_SizeBorefield)
+            if self.checkBox_SizeBorefield.isChecked():
+                self.label_H.setText(self.translations.label_H_max)
+                self.label_BS.setText(self.translations.label_B_min)
+                self.label_B_max.setText(self.translations.label_B_max)
+                self.label_MaxWidthField.setText(self.translations.label_MaxWidthField)
+                self.label_MaxLengthField.setText(self.translations.label_MaxLengthField)
+            else:
+                self.label_H.setText(self.translations.label_H)
+                self.label_BS.setText(self.translations.label_BS)
+        except AttributeError:
+            pass
 
         self.comboBox_dataColumn.clear()
         self.comboBox_dataColumn.addItems(self.translations.comboBox_dataColumn)
@@ -511,7 +542,8 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         amount: int = self.comboBox_Scenario.count()
         scenarios: list = [f'{self.scenarioStr}: {i}' for i in range(1, amount + 1)]
         self.comboBox_Scenario.clear()
-        self.comboBox_Scenario.addItems(scenarios)
+        if amount > 0:
+            self.comboBox_Scenario.addItems(scenarios)
 
     def LoadList(self):
         # try to open the file
@@ -531,8 +563,11 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             self.comboBox_Scenario.setCurrentIndex(0)
             self.ListDS[0].setValues()
             self.checkDetermineDepth()
+            self.checkSizeBorefield()
             f.close()
         except FileNotFoundError:
+            self.checkDetermineDepth()
+            self.checkSizeBorefield()
             print('no backup file')
 
     def funSaveAuto(self):
@@ -1025,6 +1060,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             self.comboBox_Scenario.setCurrentIndex(0)
             self.ListDS[0].setValues()
             self.checkDetermineDepth()
+            self.checkSizeBorefield()
             f.close()
         except FileNotFoundError:
             error_dialog = QtWidgets_QMessageBox(QtWidgets_QMessageBox.Warning, self.translations.ErrorMassage,
@@ -1053,9 +1089,12 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
     # update GUI if a new scenario at the comboBox is selected
     def ChangeScenario(self) -> None:
         idx = self.comboBox_Scenario.currentIndex()
+        if idx < 0:
+            return
         DS: DataStorage = self.ListDS[idx]
         DS.setValues()
         self.checkDetermineDepth()
+        self.checkSizeBorefield()
         if self.stackedWidget.currentWidget() == self.page_Results:
             if DS.borefield is not None:
                 self.displayResults()
@@ -1094,9 +1133,58 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         if self.checkBox_CalcDepth.isChecked():
             self.label_H.hide()
             self.doubleSpinBox_H.hide()
+            if self.checkBox_SizeBorefield.isChecked():
+                self.checkBox_SizeBorefield.setChecked(False)
+                self.label_H.setText(self.translations.label_H)
+                self.label_BS.setText(self.translations.label_BS)
+                self.label_WidthField.show()
+                self.spinBox_N_1.show()
+                self.label_LengthField.show()
+                self.spinBox_N_2.show()
+                self.label_B_max.hide()
+                self.doubleSpinBox_B_max.hide()
+                self.label_MaxWidthField.hide()
+                self.doubleSpinBox_W_max.hide()
+                self.label_MaxLengthField.hide()
+                self.doubleSpinBox_L_max.hide()
             return
         self.label_H.show()
         self.doubleSpinBox_H.show()
+
+    # show hide fixed calculation depth
+    def checkSizeBorefield(self) -> None:
+        if self.checkBox_SizeBorefield.isChecked():
+            self.checkBox_CalcDepth.setChecked(False)
+            self.label_H.show()
+            self.doubleSpinBox_H.show()
+            self.label_B_max.show()
+            self.doubleSpinBox_B_max.show()
+            self.label_MaxWidthField.show()
+            self.doubleSpinBox_W_max.show()
+            self.label_MaxLengthField.show()
+            self.doubleSpinBox_L_max.show()
+            self.label_WidthField.hide()
+            self.spinBox_N_1.hide()
+            self.label_LengthField.hide()
+            self.spinBox_N_2.hide()
+            try:
+                self.label_H.setText(self.translations.label_H_max)
+                self.label_BS.setText(self.translations.label_B_min)
+            except AttributeError:
+                pass
+            return
+        self.label_B_max.hide()
+        self.doubleSpinBox_B_max.hide()
+        self.label_MaxWidthField.hide()
+        self.doubleSpinBox_W_max.hide()
+        self.label_MaxLengthField.hide()
+        self.doubleSpinBox_L_max.hide()
+        self.label_WidthField.show()
+        self.spinBox_N_1.show()
+        self.label_LengthField.show()
+        self.spinBox_N_2.show()
+        self.label_H.setText(self.translations.label_H)
+        self.label_BS.setText(self.translations.label_BS)
 
     # change page to settings page
     def changeToGeneralPage(self) -> None:
@@ -1229,8 +1317,14 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         ax.spines['right'].set_color('w')
         ax.spines['left'].set_color('w')
         ax.set_facecolor(greyColor)
-        self.label_Size.setText(f'{self.translations.label_Size}{round(borefield.H,2)} m')
-        self.label_WarningDepth.show() if borefield.H < 15 else self.label_WarningDepth.hide()
+        stringSize: str = f'{self.translations.label_Size}{round(borefield.H,2)} m \n'\
+                          f'{self.translations.label_Size_B}{round(borefield.B,2)} m \n' \
+                          f'{self.translations.label_Size_W}{round(borefield.N_1, 2)} \n' \
+                          f'{self.translations.label_Size_L}{round(borefield.N_2, 2)} \n'\
+            if DS.SizeBorefield else f'{self.translations.label_Size}{round(borefield.H,2)} m'
+        self.label_Size.setText(stringSize)
+
+        self.label_WarningDepth.show() if borefield.H < 50 else self.label_WarningDepth.hide()
 
         self.ax = ax
         self.gridLayout_8.addWidget(canvas, 1, 0) if self.canvas is None else None
@@ -1382,17 +1476,18 @@ class CalcProblem(QtCore_QThread):
         # create the borefield object
         borefield = Borefield(simulationPeriod=self.DS.simulationPeriod, peakHeating=self.DS.peakHeating,
                               peakCooling=self.DS.peakCooling, baseloadHeating=self.DS.monthlyLoadHeating,
-                              baseloadCooling=self.DS.monthlyLoadCooling, GUI = True)
+                              baseloadCooling=self.DS.monthlyLoadCooling, GUI=True)
         # set temperature boundaries
         borefield.setMaxGroundTemperature(self.DS.T_max)  # maximum temperature
         borefield.setMinGroundTemperature(self.DS.T_min)  # minimum temperature
         BOPD: BoundsOfPrecalculatedData = BoundsOfPrecalculatedData()
         Outside_Bounds: bool = BOPD.check_If_Outside_Bounds(self.DS.H, self.DS.B, self.DS.k_s, max(self.DS.N_1,
                                                                                                    self.DS.N_2))
+        borefield.setGroundParameters(GD)
         if Outside_Bounds:
             from pygfunction import boreholes as gt_boreholes
             from pickle import load as pk_load
-            borefield.setGroundParameters(GD)
+
             N_Max: int = max(GD.N_1, GD.N_2)
             N_Min: int = max(GD.N_1, GD.N_2)
             Borefield_Custom: str = f'customField_{N_Max}_{N_Min}_{GD.B}_{GD.k_s}'
@@ -1405,11 +1500,10 @@ class CalcProblem(QtCore_QThread):
                 borefield.createCustomDataset(customField, Borefield_Custom)
             borefield.setCustomGfunction(Borefield_Custom)
             borefield.setBorefield(customField)
-            borefield.size(GD.H) if self.DS.DetermineDepth else None
-        else:
-            borefield.setGroundParameters(GD)
-            # size borefield
-            borefield.size(GD.H) if self.DS.DetermineDepth else None
+
+        borefield.size(GD.H) if self.DS.DetermineDepth else None
+        borefield.SizeCompleteField(self.DS.H_max, self.DS.W_max, self.DS.L_max, self.DS.B_min, self.DS.B_max) if \
+            self.DS.SizeBorefield else None
         # calculate temperatures
         borefield.calculateTemperatures(borefield.H)
         self.DS.borefield = borefield

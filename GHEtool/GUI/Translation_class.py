@@ -17,7 +17,9 @@ class TrClass:
                 'label_CoolingLoadLine', 'label_combined', 'label_TimeStep', 'label_DateLine', 'comboBox_dataColumn',\
                 'comboBox_timeStep', 'pushButton_calculate', 'ErrorMassage', 'UnableDataFormat', 'ChooseCSV',\
                 'ChooseXLS', 'ChooseXLSX', 'NoFileSelected', 'ValueError', 'ColumnError', 'ChoosePKL', 'SaveFigure', \
-                'SaveData', 'SavePKL', 'label_WarningCustomBorefield', 'label_WarningDepth'
+                'SaveData', 'SavePKL', 'label_WarningCustomBorefield', 'label_WarningDepth', 'checkBox_SizeBorefield', \
+                'label_H_max', 'label_B_min', 'label_B_max', 'label_MaxWidthField', 'label_MaxLengthField', \
+                'label_Size_B', 'label_Size_L', 'label_Size_W'
 
     def __init__(self) -> None:
         """This function initialize the translation class"""
@@ -113,6 +115,15 @@ class TrClass:
         self.SavePKL: str = ''
         self.label_WarningCustomBorefield: str = ''
         self.label_WarningDepth: str = ''
+        self.checkBox_SizeBorefield: str = ''
+        self.label_H_max: str = ''
+        self.label_B_min: str = ''
+        self.label_B_max: str = ''
+        self.label_MaxWidthField: str = ''
+        self.label_MaxLengthField: str = ''
+        self.label_Size_B: str = ''
+        self.label_Size_L: str = ''
+        self.label_Size_W: str = ''
         self.ChangeLanguage(self.Language)
 
     def ChangeLanguage(self, Lang: int) -> None:
@@ -231,8 +242,17 @@ class TrClass:
             self.SavePKL: str = 'Choose pkl location to save scenarios'
             self.label_WarningCustomBorefield: str = 'With the selected values a customized bore field will be ' \
                                                      'calculated. This will dramatically increase the calculation time.'
-            self.label_WarningDepth: str = 'The calculated size is below the suggested minimum of 15 m. The ' \
+            self.label_WarningDepth: str = 'The calculated size is below the suggested minimum of 50 m. The ' \
                                            'calculation may be incorrect.'
+            self.checkBox_SizeBorefield: str = 'Size borefield by length and width'
+            self.label_H_max: str = 'Maximal borehole depth [m]: '
+            self.label_B_min: str = 'Minimal borehole spacing [m]: '
+            self.label_B_max: str = 'Maximal borehole spacing [m]: '
+            self.label_MaxWidthField: str = 'Maximal width of rectangular field [m]: '
+            self.label_MaxLengthField: str = 'Maximal length of rectangular field [m]: '
+            self.label_Size_B: str = 'Borehole spacing: '
+            self.label_Size_L: str = 'Length of rectangular field: '
+            self.label_Size_W: str = 'Width of rectangular field: '
             return
         if Lang == 1:  # german
             self.label_Language: str = 'Sprache:'
@@ -326,8 +346,17 @@ class TrClass:
             self.SavePKL: str = 'Wählen Sie den pkl-Speicherort zum Speichern von Szenarien'
             self.label_WarningCustomBorefield: str = 'Mit den gewählten Werten wird ein individuelles Borefeld ' \
                                                      'berechnet. Dadurch wird die Berechnungszeit drastisch erhöht.'
-            self.label_WarningDepth: str = 'Die berechnete Größe liegt unter dem empfohlenen Minimum von 15 m. Die ' \
+            self.label_WarningDepth: str = 'Die berechnete Größe liegt unter dem empfohlenen Minimum von 50 m. Die ' \
                                            'Berechnung ist möglicherweise fehlerhaft.'
+            self.checkBox_SizeBorefield: str = 'Dimensionierung des Bohrlochfeldes nach Länge und Breite'
+            self.label_H_max: str = 'Maximale Bohrlochtiefe [m]: '
+            self.label_B_min: str = 'Minimaler Bohrlochabstand [m]: '
+            self.label_B_max: str = 'Maximaler Bohrlochabstand [m]: '
+            self.label_MaxWidthField: str = 'Maximale Breite des rechteckigen Feldes [m]: '
+            self.label_MaxLengthField: str = 'Maximale Länge des rechteckigen Feldes [m]: '
+            self.label_Size_B: str = 'Bohrlochabstand: '
+            self.label_Size_L: str = 'Länge des rechteckigen Feldes: '
+            self.label_Size_W: str = 'Breite des rechteckigen Feldes: '
             return
         if Lang == 2:  # Dutch # thanks to Wouter
             self.label_Language: str = 'Taal:'
@@ -421,8 +450,17 @@ class TrClass:
             self.SavePKL: str = 'Kies gewenste pkl locatie'
             self.label_WarningCustomBorefield: str = 'With the selected values a customized bore field will be ' \
                                                      'calculated. This will dramatically increase the calculation time.'
-            self.label_WarningDepth: str = 'The calculated size is below the suggested minimum of 15 m. The ' \
+            self.label_WarningDepth: str = 'The calculated size is below the suggested minimum of 50 m. The ' \
                                            'calculation may be incorrect.'
+            self.checkBox_SizeBorefield: str = 'Size borefield by length and width'
+            self.label_H_max: str = 'Maximal borehole depth [m]: '
+            self.label_B_min: str = 'Minimal borehole spacing [m]: '
+            self.label_B_max: str = 'Maximal borehole spacing [m]: '
+            self.label_MaxWidthField: str = 'Maximal width of rectangular field [m]: '
+            self.label_MaxLengthField: str = 'Maximal length of rectangular field [m]: '
+            self.label_Size_B: str = 'Borehole spacing: '
+            self.label_Size_L: str = 'Length of rectangular field: '
+            self.label_Size_W: str = 'Width of rectangular field: '
             return
         if Lang == 3:  # French # Thanks to Felix Arjuna
             self.label_Language: str = 'Languange:'
@@ -516,8 +554,17 @@ class TrClass:
             self.SavePKL: str = 'Choisissez un emplacement pkl pour enregistrer les scénarios'
             self.label_WarningCustomBorefield: str = 'With the selected values a customized bore field will be ' \
                                                      'calculated. This will dramatically increase the calculation time.'
-            self.label_WarningDepth: str = 'The calculated size is below the suggested minimum of 15 m. The ' \
+            self.label_WarningDepth: str = 'The calculated size is below the suggested minimum of 50 m. The ' \
                                            'calculation may be incorrect.'
+            self.checkBox_SizeBorefield: str = 'Size borefield by length and width'
+            self.label_H_max: str = 'Maximal borehole depth [m]: '
+            self.label_B_min: str = 'Minimal borehole spacing [m]: '
+            self.label_B_max: str = 'Maximal borehole spacing [m]: '
+            self.label_MaxWidthField: str = 'Maximal width of rectangular field [m]: '
+            self.label_MaxLengthField: str = 'Maximal length of rectangular field [m]: '
+            self.label_Size_B: str = 'Borehole spacing: '
+            self.label_Size_L: str = 'Length of rectangular field: '
+            self.label_Size_W: str = 'Width of rectangular field: '
             return
         if Lang == 4:  # Italian # Thanks to Felix Arjuna
             self.label_Language: str = 'Languange:'
@@ -611,6 +658,15 @@ class TrClass:
             self.SavePKL: str = 'Scegli il percorso pkl per salvare gli scenari'
             self.label_WarningCustomBorefield: str = 'With the selected values a customized bore field will be ' \
                                                      'calculated. This will dramatically increase the calculation time.'
-            self.label_WarningDepth: str = 'The calculated size is below the suggested minimum of 15 m. The ' \
+            self.label_WarningDepth: str = 'The calculated size is below the suggested minimum of 50 m. The ' \
                                            'calculation may be incorrect.'
+            self.checkBox_SizeBorefield: str = 'Size borefield by length and width'
+            self.label_H_max: str = 'Maximal borehole depth [m]: '
+            self.label_B_min: str = 'Minimal borehole spacing [m]: '
+            self.label_B_max: str = 'Maximal borehole spacing [m]: '
+            self.label_MaxWidthField: str = 'Maximal width of rectangular field [m]: '
+            self.label_MaxLengthField: str = 'Maximal length of rectangular field [m]: '
+            self.label_Size_B: str = 'Borehole spacing: '
+            self.label_Size_L: str = 'Length of rectangular field: '
+            self.label_Size_W: str = 'Width of rectangular field: '
             return
