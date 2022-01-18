@@ -37,7 +37,7 @@ This code is tested with Python 3.9 and requires the following libraries (the ve
 
 ## Main contributors
 Wouter Peere, KU Leuven & Boydens Engineering (part of Sweco), wouter.peere@kuleuven.be
-Tobias Blanke, RWTH Aachen, blanke@sij.fh-aachen.de
+Tobias Blanke, FH Aachen, blanke@sij.fh-aachen.de
 
 ## References
 Cimmino, M. (2018). _pygfunction: an open-source toolbox for the evaluation of thermal response factors for geothermal borehole fields_. In _Proceedings of eSim 2018, the 10th conference of IBPSA- Canada_. Montréal, QC, Canada, May 9-10.
