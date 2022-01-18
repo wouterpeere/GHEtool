@@ -19,7 +19,7 @@ class TrClass:
                 'ChooseXLS', 'ChooseXLSX', 'NoFileSelected', 'ValueError', 'ColumnError', 'ChoosePKL', 'SaveFigure', \
                 'SaveData', 'SavePKL', 'label_WarningCustomBorefield', 'label_WarningDepth', 'checkBox_SizeBorefield', \
                 'label_H_max', 'label_B_min', 'label_B_max', 'label_MaxWidthField', 'label_MaxLengthField', \
-                'label_Size_B', 'label_Size_L', 'label_Size_W'
+                'label_Size_B', 'label_Size_L', 'label_Size_W', 'comboBox_Size_Method'
 
     def __init__(self) -> None:
         """This function initialize the translation class"""
@@ -124,6 +124,7 @@ class TrClass:
         self.label_Size_B: str = ''
         self.label_Size_L: str = ''
         self.label_Size_W: str = ''
+        self.comboBox_Size_Method: list = []
         self.ChangeLanguage(self.Language)
 
     def ChangeLanguage(self, Lang: int) -> None:
@@ -253,6 +254,7 @@ class TrClass:
             self.label_Size_B: str = 'Borehole spacing: '
             self.label_Size_L: str = 'Length of rectangular field: '
             self.label_Size_W: str = 'Width of rectangular field: '
+            self.comboBox_Size_Method: list = ['Fast', 'Robust']
             return
         if Lang == 1:  # german
             self.label_Language: str = 'Sprache:'
@@ -357,6 +359,7 @@ class TrClass:
             self.label_Size_B: str = 'Bohrlochabstand: '
             self.label_Size_L: str = 'Länge des rechteckigen Feldes: '
             self.label_Size_W: str = 'Breite des rechteckigen Feldes: '
+            self.comboBox_Size_Method: list = ['Schnell', 'Robust']
             return
         if Lang == 2:  # Dutch # thanks to Wouter
             self.label_Language: str = 'Taal:'
@@ -461,6 +464,7 @@ class TrClass:
             self.label_Size_B: str = 'Borehole spacing: '
             self.label_Size_L: str = 'Length of rectangular field: '
             self.label_Size_W: str = 'Width of rectangular field: '
+            self.comboBox_Size_Method: list = ['Fast', 'Robust']
             return
         if Lang == 3:  # French # Thanks to Felix Arjuna
             self.label_Language: str = 'Languange:'
@@ -565,6 +569,7 @@ class TrClass:
             self.label_Size_B: str = 'Borehole spacing: '
             self.label_Size_L: str = 'Length of rectangular field: '
             self.label_Size_W: str = 'Width of rectangular field: '
+            self.comboBox_Size_Method: list = ['Fast', 'Robust']
             return
         if Lang == 4:  # Italian # Thanks to Felix Arjuna
             self.label_Language: str = 'Languange:'
@@ -669,4 +674,5 @@ class TrClass:
             self.label_Size_B: str = 'Borehole spacing: '
             self.label_Size_L: str = 'Length of rectangular field: '
             self.label_Size_W: str = 'Width of rectangular field: '
+            self.comboBox_Size_Method: list = ['Fast', 'Robust']
             return

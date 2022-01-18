@@ -339,6 +339,17 @@ class Ui_GHEtool(object):
         self.checkBox_SizeBorefield = QtWidgets.QCheckBox(self.frame_2)
         self.checkBox_SizeBorefield.setObjectName("checkBox_SizeBorefield")
         self.gridLayout.addWidget(self.checkBox_SizeBorefield, 1, 0, 1, 1)
+        self.comboBox_Size_Method = QtWidgets.QComboBox(self.frame_2)
+        self.comboBox_Size_Method.setStyleSheet("QFrame {\n"
+"    border: 1px solid #ffffff;\n"
+"    border-bottom-left-radius: 0px;\n"
+"    border-bottom-right-radius: 0px;\n"
+"}\n"
+"QLabel{border: 0px solid rgb(255,255,255);}")
+        self.comboBox_Size_Method.setObjectName("comboBox_Size_Method")
+        self.comboBox_Size_Method.addItem("")
+        self.comboBox_Size_Method.addItem("")
+        self.gridLayout.addWidget(self.comboBox_Size_Method, 1, 2, 1, 1)
         self.verticalLayout_4.addLayout(self.gridLayout)
         self.verticalLayout_8.addWidget(self.frame_2)
         self.label_37 = QtWidgets.QLabel(self.scrollAreaWidgetContents_3)
@@ -1901,6 +1912,8 @@ class Ui_GHEtool(object):
         self.label_MaxWidthField.setText(_translate("GHEtool", "Maximal width of rectangular field [m]: "))
         self.label_MaxLengthField.setText(_translate("GHEtool", "Maximal length of rectangular field [m]: "))
         self.checkBox_SizeBorefield.setText(_translate("GHEtool", "Size borefield by length and width"))
+        self.comboBox_Size_Method.setItemText(0, _translate("GHEtool", "Fast"))
+        self.comboBox_Size_Method.setItemText(1, _translate("GHEtool", "Robust"))
         self.label_TempConstraints.setText(_translate("GHEtool", "Temperature constraints and simulation period"))
         self.label_TempMin.setText(_translate("GHEtool", "Minimal temperature [°C]: "))
         self.label_TempMax.setText(_translate("GHEtool", "Maximal temperature [°C]: "))

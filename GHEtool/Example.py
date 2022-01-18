@@ -94,7 +94,9 @@ if __name__ == "__main__":
     L_2 = 140  # maximal width of borehole field
     B_min = 3  # minimal borehole spacing
     B_max = 9  # maximal borehole spacing
-    N_1, N_2, B, H = borefield.SizeCompleteField(H_max, L_1, L_2, B_min, B_max)
+    N_1, N_2, B, H = borefield.Size_Complete_Field_Robust(H_max, L_1, L_2, B_min, B_max)
+    print(N_1, N_2, B, H)
+    N_1, N_2, B, H = borefield.Size_Complete_Field_Fast(H_max, L_1, L_2, B_min, B_max)
     print(N_1, N_2, B, H)
 
     # Custom field

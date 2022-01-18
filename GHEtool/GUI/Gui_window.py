@@ -55,7 +55,7 @@ class DataStorage:
     __slots__ = 'H', 'B', 'k_s', 'Tg', 'Rb', 'N_1', 'N_2', 'T_max', 'T_min', 'simulationPeriod', 'peakHeating', \
                 'peakCooling', 'monthlyLoadHeating', 'monthlyLoadHeating', 'monthlyLoadCooling', 'borefield', 'ui',\
                 'DetermineDepth', 'unitDemand', 'unitPeak', 'FactorDemand', 'FactorPeak', 'SizeBorefield', 'H_max',\
-                'B_max', 'B_min', 'L_max', 'W_max'
+                'B_max', 'B_min', 'L_max', 'W_max', 'Size_Method'
 
     # init class and store input data
     def __init__(self, ui: int) -> None:
@@ -92,8 +92,9 @@ class DataStorage:
         self.H_max: float = getattr(obj, 'doubleSpinBox_H').value()  # m
         self.B_max: float = getattr(obj, 'doubleSpinBox_B_max').value()  # m
         self.B_min: float = getattr(obj, 'doubleSpinBox_B').value()  # m
-        self.L_max: float = getattr(obj, 'doubleSpinBox_W_max').value()  # m
-        self.W_max: float = getattr(obj, 'doubleSpinBox_L_max').value()  # m
+        self.W_max: float = getattr(obj, 'doubleSpinBox_W_max').value()  # m
+        self.L_max: float = getattr(obj, 'doubleSpinBox_L_max').value()  # m
+        self.Size_Method: int = getattr(obj, 'comboBox_Size_Method').currentIndex()  # #
         self.unitPeak: str = getattr(obj, 'label_Unit_pH').text()
         self.unitDemand: str = getattr(obj, 'label_Unit_HL').text()
         uP = self.unitPeak[1:-1]
@@ -236,9 +237,10 @@ class DataStorage:
             if self.SizeBorefield:
                 getattr(obj, 'doubleSpinBox_H').setValue(self.H_max)  # m
                 getattr(obj, 'doubleSpinBox_B_max').setValue(self.B_max)  # m
+                getattr(obj, 'comboBox_Size_Method').setCurrentIndex(self.Size_Method)  # #
                 getattr(obj, 'doubleSpinBox_B').setValue(self.B_min)  # m
-                getattr(obj, 'doubleSpinBox_W_max').setValue(self.L_max)  # m
-                getattr(obj, 'doubleSpinBox_L_max').setValue(self.W_max)  # m
+                getattr(obj, 'doubleSpinBox_W_max').setValue(self.W_max)  # m
+                getattr(obj, 'doubleSpinBox_L_max').setValue(self.L_max)  # m
         except AttributeError:
             return
 
@@ -528,6 +530,8 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
                 self.label_B_max.setText(self.translations.label_B_max)
                 self.label_MaxWidthField.setText(self.translations.label_MaxWidthField)
                 self.label_MaxLengthField.setText(self.translations.label_MaxLengthField)
+                self.comboBox_Size_Method.clear()
+                self.comboBox_Size_Method.addItems(self.translations.comboBox_Size_Method)
             else:
                 self.label_H.setText(self.translations.label_H)
                 self.label_BS.setText(self.translations.label_BS)
@@ -1142,6 +1146,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
                 self.label_LengthField.show()
                 self.spinBox_N_2.show()
                 self.label_B_max.hide()
+                self.comboBox_Size_Method.hide()
                 self.doubleSpinBox_B_max.hide()
                 self.label_MaxWidthField.hide()
                 self.doubleSpinBox_W_max.hide()
@@ -1158,6 +1163,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             self.label_H.show()
             self.doubleSpinBox_H.show()
             self.label_B_max.show()
+            self.comboBox_Size_Method.show()
             self.doubleSpinBox_B_max.show()
             self.label_MaxWidthField.show()
             self.doubleSpinBox_W_max.show()
@@ -1174,6 +1180,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
                 pass
             return
         self.label_B_max.hide()
+        self.comboBox_Size_Method.hide()
         self.doubleSpinBox_B_max.hide()
         self.label_MaxWidthField.hide()
         self.doubleSpinBox_W_max.hide()
@@ -1317,10 +1324,14 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         ax.spines['right'].set_color('w')
         ax.spines['left'].set_color('w')
         ax.set_facecolor(greyColor)
-        stringSize: str = f'{self.translations.label_Size}{round(borefield.H,2)} m \n'\
-                          f'{self.translations.label_Size_B}{round(borefield.B,2)} m \n' \
-                          f'{self.translations.label_Size_W}{round(borefield.N_1, 2)} \n' \
-                          f'{self.translations.label_Size_L}{round(borefield.N_2, 2)} \n'\
+        li_Size = [str(round(i[3], 2)) for i in borefield.combo]
+        li_B = [str(round(i[2], 2)) for i in borefield.combo]
+        li_N_1 = [str(round(i[0], 2)) for i in borefield.combo]
+        li_N_2 = [str(round(i[1], 2)) for i in borefield.combo]
+        stringSize: str = f'{self.translations.label_Size}{"; ".join(li_Size)} m \n'\
+                          f'{self.translations.label_Size_B}{"; ".join(li_B)} m \n' \
+                          f'{self.translations.label_Size_W}{"; ".join(li_N_1)} \n' \
+                          f'{self.translations.label_Size_L}{"; ".join(li_N_2)} \n'\
             if DS.SizeBorefield else f'{self.translations.label_Size}{round(borefield.H,2)} m'
         self.label_Size.setText(stringSize)
 
@@ -1502,8 +1513,12 @@ class CalcProblem(QtCore_QThread):
             borefield.setBorefield(customField)
 
         borefield.size(GD.H) if self.DS.DetermineDepth else None
-        borefield.SizeCompleteField(self.DS.H_max, self.DS.W_max, self.DS.L_max, self.DS.B_min, self.DS.B_max) if \
-            self.DS.SizeBorefield else None
+        if self.DS.Size_Method == 0:
+            borefield.Size_Complete_Field_Fast(self.DS.H_max, self.DS.W_max, self.DS.L_max, self.DS.B_min,
+                                               self.DS.B_max) if self.DS.SizeBorefield else None
+        else:
+            borefield.Size_Complete_Field_Robust(self.DS.H_max, self.DS.W_max, self.DS.L_max, self.DS.B_min,
+                                                 self.DS.B_max) if self.DS.SizeBorefield else None
         # calculate temperatures
         borefield.calculateTemperatures(borefield.H)
         self.DS.borefield = borefield
