@@ -1,6 +1,6 @@
 import numpy as np
 import pickle
-from scipy import interpolate,pi
+from scipy import interpolate, pi
 import pygfunction as gt
 import os.path
 import matplotlib.pyplot as plt
@@ -8,7 +8,7 @@ import functools
 from tkinter import filedialog
 import openpyxl
 
-FOLDER = os.path.dirname(os.path.realpath(__file__)) # solve problem with importing GHEtool from subfolders
+FOLDER = os.path.dirname(os.path.realpath(__file__)) # solves problem with importing GHEtool from subfolders
 
 def timeValues():
     """This function calculates the default time values for the gfunction."""
@@ -148,7 +148,7 @@ class Borefield():
         self.ty: float = self.simulationPeriod * 8760. * 3600
         self.tm: float = self.UPM * 3600.
         self.td: float = self.lengthPeak * 3600.
-        self.time: list = np.array([self.td, self.td + self.tm, self.ty + self.tm + self.td])
+        self.time = np.array([self.td, self.td + self.tm, self.ty + self.tm + self.td])
 
     def setGroundParameters(self,data):
         """This function sets the relevant borefield characteristics."""
@@ -697,14 +697,6 @@ class Borefield():
         print("A new dataset with name " + name + " has been created in " + os.path.dirname(os.path.realpath(__file__))+"\Data.")
         pickle.dump(data,open(FOLDER + "/Data/"+name,"wb"))
 
-    def printTemperatureProfile(self, legend: bool = True):
-        """This function plots the temperature profile for the calculated depth."""
-        self._printTemperatureProfile(legend=legend)
-
-    def printTemperatureProfileFixedDepth(self, depth: float, legend: bool = True):
-        """This function plots the temperature profile for a fixed depth depth."""
-        self._printTemperatureProfile(legend=legend, H=depth)
-
     def loadHourlyProfile(self):
         """This function loads in an hourly load profile. It opens a csv and asks for the relevant column where the data is in."""
 
@@ -725,7 +717,7 @@ class Borefield():
             cell_obj = sheet_obj.cell(row=i, column=2)
             self.hourlyCoolingLoad.append(cell_obj.value)
 
-    def optimiseLoadProfile(self,depth: float =150,lengthPeak = defaultLengthPeak):
+    def optimiseLoadProfile(self,depth: float = 150, lengthPeak = defaultLengthPeak):
         """This function optimises the load based on the given borefield and the given hourly load."""
 
         def reduceToMonthLoad(load: list,peak: float):
