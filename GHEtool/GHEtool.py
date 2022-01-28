@@ -67,7 +67,7 @@ class Borefield():
                 'monthlyLoadCooling', 'peakHeating', 'imbalance', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm',\
                 'peakCooling', 'simulationPeriod', \
                 'factoren_temperature_profile', 'resultsCooling', 'resultsHeating', 'resultsPeakHeating', \
-                'resultsPeakCooling', 'resultsMonthCooling', 'resultsMonthHeating', 'Tb', 'thresholdWarningShallowField', 'GUI'
+                'resultsPeakCooling', 'resultsMonthCooling', 'resultsMonthHeating', 'Tb', 'thresholdWarningShallowField', 'GUI', 'timeL3FirstYear', 'timeL3LastYear'
 
     def __init__(self, simulationPeriod: int, numberOfBoreholes: int = None, peakHeating: list = None, peakCooling: list = None,
                  baseloadHeating: list = None, baseloadCooling: list = None, investementCost: list = None, borefield = None, customGfunction = None, GUI: bool = False):
@@ -149,6 +149,11 @@ class Borefield():
         self.tm: float = self.UPM * 3600.
         self.td: float = self.lengthPeak * 3600.
         self.time = np.array([self.td, self.td + self.tm, self.ty + self.tm + self.td])
+
+        # set the time array for the L3 sizing
+        # This is one time for every month in the whole simulation period
+        self.timeL3FirstYear = [i * self.UPM * 3600. for i in range(1, 12 + 1)]
+        self.timeL3LastYear = [i * self.UPM * 3600. for i in range(1, self.simulationPeriod * 12 + 1)]
 
     def setGroundParameters(self,data):
         """This function sets the relevant borefield characteristics."""
@@ -251,9 +256,18 @@ class Borefield():
 
         return self.H
 
-    def size(self,H_init: float):
+    def size(self, H_init: float, L2Sizing: bool = 1, quadrantSizing: int = 0):
+        """This function lets the user chose between two sizing options.
+        * The L2 sizing is the one explained in (Peere et al., 2021) and is quicker
+        * The L3 sizing is a more general approach which is slower but more accurate"""
 
-        """This function sizes the borefield of the given configuration according to the methodology explained in (Peere et al., 2021).
+        if L2Sizing:
+            return self.sizeL2(H_init, quadrantSizing)
+        return self.sizeL3(H_init, quadrantSizing)
+
+    def sizeL2(self, H_init: float, quadrantSizing: int = 0):
+        """This function sizes the borefield of the given configuration according to the methodology explained in (Peere et al., 2021), which is a L2 method.
+        When quadrantsizing is other than 0, it sizes the field based on the asked quadrant.
         It returns the borefield depth."""
 
         # initiate with a given depth
@@ -277,31 +291,173 @@ class Borefield():
             self.qa = self.qa
             return self._Bernier  # size
 
-        if self.imbalance <= 0:
-            # extraction dominated, so quadrants 1 and 4 are relevant
-            quadrant1 = sizeQuadrant1()
-            quadrant4 = sizeQuadrant4()
-            self.H = max(quadrant1, quadrant4)
-
-            if self.H == quadrant1:
-                self.limitingQuadrant = 1
+        if quadrantSizing != 0:
+            # size according to a specific quadrant
+            if quadrantSizing == 1:
+                self.H = sizeQuadrant1()
+            elif quadrantSizing == 2:
+                self.H = sizeQuadrant2()
+            elif quadrantSizing == 3:
+                self.H = sizeQuadrant3()
             else:
-                self.limitingQuadrant = 4
+                self.H = sizeQuadrant4()
         else:
-            # injection dominated, so quadrants 2 and 3 are relevant
-            quadrant2 = sizeQuadrant2()
-            quadrant3 = sizeQuadrant3()
-            self.H = max(quadrant2, quadrant3)
+            # size accoring to the biggest quadrant
+            # determine which quadrants are relevant
+            if self.imbalance <= 0:
+                # extraction dominated, so quadrants 1 and 4 are relevant
+                quadrant1 = sizeQuadrant1()
+                quadrant4 = sizeQuadrant4()
+                self.H = max(quadrant1, quadrant4)
 
-            if self.H == quadrant2:
-                self.limitingQuadrant = 2
+                if self.H == quadrant1:
+                    self.limitingQuadrant = 1
+                else:
+                    self.limitingQuadrant = 4
             else:
-                self.limitingQuadrant = 3
+                # injection dominated, so quadrants 2 and 3 are relevant
+                quadrant2 = sizeQuadrant2()
+                quadrant3 = sizeQuadrant3()
+                self.H = max(quadrant2, quadrant3)
+
+                if self.H == quadrant2:
+                    self.limitingQuadrant = 2
+                else:
+                    self.limitingQuadrant = 3
 
         # check if the field is not shallow
         if self.H < self.thresholdWarningShallowField:
             print("The field has a calculated depth of ", str(round(self.H, 2)), " m which is lower than the proposed minimum of ", str(self.thresholdWarningShallowField), " m.")
             print("Please change your configuration accordingly to have a not so shallow field.")
+
+        return self.H
+
+    def sizeL3(self, H_init: float, quadrantSizing: int = 0):
+        """This functions sizes the borefield based on a L3 method."""
+
+        # initiate with a given depth
+        self.H_init: float = H_init
+
+        if quadrantSizing != 0:
+            # size according to a specific quadrant
+            self.H = self._sizeL3quadrants(quadrantSizing)
+        else:
+            # size accoring to the biggest quadrant
+            # determine which quadrants are relevant
+            if self.imbalance <= 0:
+                # extraction dominated, so quadrants 1 and 4 are relevant
+                quadrant1 = self._sizeL3quadrants(1)
+                quadrant4 = self._sizeL3quadrants(4)
+                self.H = max(quadrant1, quadrant4)
+
+                if self.H == quadrant1:
+                    self.limitingQuadrant = 1
+                else:
+                    self.limitingQuadrant = 4
+            else:
+                # injection dominated, so quadrants 2 and 3 are relevant
+                quadrant2 = self._sizeL3quadrants(2)
+                quadrant3 = self._sizeL3quadrants(3)
+                self.H = max(quadrant2, quadrant3)
+
+                if self.H == quadrant2:
+                    self.limitingQuadrant = 2
+                else:
+                    self.limitingQuadrant = 3
+
+        # check if the field is not shallow
+        if self.H < self.thresholdWarningShallowField:
+            print("The field has a calculated depth of ", str(round(self.H, 2)),
+                  " m which is lower than the proposed minimum of ", str(self.thresholdWarningShallowField), " m.")
+            print("Please change your configuration accordingly to have a not so shallow field.")
+
+        return self.H
+
+    def _sizeL3quadrants(self, quadrant: int):
+        """This function sizes based on the L3 method for a specific quadrant.
+        It uses 24 thermal pulses for each year, while the L2-sizing method only uses 3 pulses for the whole simulation period.
+        It returns a borefield depth."""
+
+        # make a numpy array of the monthly average loads for the whole simulation period
+        # in case of quadrants 1 and 3, the array can stop after the first year
+        # in case of quadrants 2 and 4, we need the whole simulation period
+        if quadrant == 1 or quadrant == 3:
+            monthlyLoadArray = np.asarray(self.monthlyLoad)
+            time = self.timeL3FirstYear
+        else:
+            monthlyLoadArray = np.asarray(self.monthlyLoad * self.simulationPeriod)
+            time = self.timeL3LastYear
+
+        # initiate iteration
+        H_prev = 0
+
+        if self.H < 1:
+            self.H = 50
+
+        # in case of quadrants 1 and 3, we need the first year only
+        # in case of quadrants 2 and 4, we need the last year only
+        if quadrant == 1 or quadrant == 3:
+            relevantPeriod = (0, 12)
+        else:
+            relevantPeriod = (12 * (self.simulationPeriod - 1), 12 * self.simulationPeriod)
+
+        # Iterates as long as there is no convergence
+        # (convergence if difference between depth in iterations is smaller than thresholdBorholeDepth)
+        while abs(self.H - H_prev) >= Borefield.thresholdBorholeDepth:
+
+            # define and reset
+            temperatureProfile = []
+
+            # calculate the required gfunction values
+            gfunc_uniform_T = self.gfunction(time, self.H)
+
+            # calculate the gvalue for the peak
+            gvaluePeak = self.gfunction(self.lengthPeak * 3600., self.H)
+
+            # calculation of needed differences of the gfunction values. These are the weight factors in the calculation of Tb.
+            # (Tb_i - Tg) * 120 boreholes * length  = 1/2pi k_s [ q_i * g(1 month) + q_(i-1)*[g(2 months)-g(1month)] + q_(i-2)*[g(3 months) - g(2 months)]]
+            gvalueDifferences = [gfunc_uniform_T[i] if i == 0 else gfunc_uniform_T[i] - gfunc_uniform_T[i-1] for i in range(len(gfunc_uniform_T))]
+
+            # calculation of the differences in borehole wall temperature for every month i w.r.t. the Tg
+            boreholeWallTemperature = []
+            temp = []
+
+            for i in range(len(monthlyLoadArray)):
+                temp.insert(0, monthlyLoadArray[i] * 1000.)
+                boreholeWallTemperature.append(np.dot(temp, gvalueDifferences[:i+1]) / (2 * pi * self.k_s))
+
+            # calculate the Tf = Tb + QR_b
+
+            for i in range(relevantPeriod[0], relevantPeriod[1]):
+                # in case of quadrants 1 and 2, we want the maximum temperature
+                # in case of quadrants 3 and 4, we want the minimum temperature
+
+                # influence of the average montlhy load
+                if quadrant == 1 or quadrant == 2:
+                    temperatureProfile.append(boreholeWallTemperature[i] + self.monthlyLoadCooling[i % 12] * 1000. * self.Rb)
+                else:
+                    temperatureProfile.append(boreholeWallTemperature[i] - self.monthlyLoadHeating[i % 12] * 1000. * self.Rb)
+
+                # influence of the peak load
+                if quadrant == 1 or quadrant == 2:
+                    temperatureProfile[i % 12] = temperatureProfile[i % 12] + ((self.peakCooling[i % 12] - self.monthlyLoadCooling[i % 12]) if self.peakCooling[i % 12] > self. monthlyLoadCooling[i % 12]\
+                                                    else 0) * 1000. * (gvaluePeak[0] / (2 * pi * self.k_s) + self.Rb)
+                else:
+                    temperatureProfile[i % 12] = temperatureProfile[i % 12] - ((self.peakHeating[i % 12] - self.monthlyLoadHeating[i % 12]) if self.peakHeating[i % 12] > self.monthlyLoadHeating[i % 12] \
+                        else 0) * 1000. * (gvaluePeak[0] / (2 * pi * self.k_s) + self.Rb)
+
+            # convert to temperature
+            temp = [i / self.numberOfBoreholes / self.H + self.Tg for i in temperatureProfile]
+
+            H_prev = self.H
+            if quadrant == 1 or quadrant == 2:
+                # maximum temperature
+                # convert back to required length
+                self.H = abs(temperatureProfile[temp.index(max(temp))] / (self.Tf_H - self.Tg) / self.numberOfBoreholes)
+            else:
+                # minimum temperature
+                # convert back to required length
+                self.H = abs(temperatureProfile[temp.index(min(temp))] / (self.Tf_C - self.Tg) / self.numberOfBoreholes)
 
         return self.H
 
@@ -423,7 +579,7 @@ class Borefield():
 
     def calculateTemperatures(self,depth: float = None):
         """Calculate all the temperatures without plotting the figure. When depth is given, it calculates it for a given depth."""
-        self._printTemperatureProfile(figure=False,H=depth)
+        self._printTemperatureProfile(figure=False, H=depth)
 
     def printTemperatureProfile(self,legend: bool = True):
         """This function plots the temperature profile for the calculated depth."""
@@ -431,7 +587,7 @@ class Borefield():
 
     def printTemperatureProfileFixedDepth(self,depth,legend: bool = True):
         """This function plots the temperature profile for a fixed depth depth."""
-        self._printTemperatureProfile(legend=legend,H=depth)
+        self._printTemperatureProfile(legend=legend, H=depth)
 
     def _printTemperatureProfile(self, legend: bool = True, H: float = None, figure: bool = True):
         """
@@ -442,13 +598,9 @@ class Borefield():
         # making a numpy array of the monthly balance (self.montlyLoad) for a period of self.simulationPeriod years [kW]
         monthlyLoadsArray = np.asarray(self.monthlyLoad * self.simulationPeriod)
 
-        # calculation of all the different times at which the gfunction should be calculated.
-        # this is equal to 'UPM' hours a month * 3600 seconds/hours for the simulationPeriod
-        timeForgValues = [i * self.UPM * 3600. for i in range(1, 12 * self.simulationPeriod + 1)]
-
         # self.gfunction is a function that uses the precalculated data to interpolate the correct values of the gfunction.
         # this dataset is checked over and over again and is correct
-        gValues = self.gfunction(timeForgValues, self.H if H is None else H)
+        gValues = self.gfunction(self.timeL3LastYear, self.H if H is None else H)
 
         # the gfunction value of the peak with lengthPeak hours
         gValuePeak = self.gfunction(self.lengthPeak * 3600., self.H if H is None else H)
@@ -510,7 +662,7 @@ class Borefield():
         ## initiate figure
         if figure:
             # make a time array
-            timeArray = [i / 12 / 730. / 3600. for i in timeForgValues]
+            timeArray = [i / 12 / 730. / 3600. for i in self.timeL3LastYear]
 
             plt.rc('figure')
             fig = plt.figure()
