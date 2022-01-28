@@ -6,6 +6,7 @@ import os.path
 import matplotlib.pyplot as plt
 import functools
 from tkinter import filedialog
+import pandas as pd
 import openpyxl
 
 FOLDER = os.path.dirname(os.path.realpath(__file__)) # solves problem with importing GHEtool from subfolders
@@ -67,9 +68,12 @@ class Borefield():
                 'monthlyLoadCooling', 'peakHeating', 'imbalance', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm',\
                 'peakCooling', 'simulationPeriod', \
                 'factoren_temperature_profile', 'resultsCooling', 'resultsHeating', 'resultsPeakHeating', \
-                'resultsPeakCooling', 'resultsMonthCooling', 'resultsMonthHeating', 'Tb', 'thresholdWarningShallowField', 'GUI', 'timeL3FirstYear', 'timeL3LastYear'
+                'resultsPeakCooling', 'resultsMonthCooling', 'resultsMonthHeating', 'Tb', 'thresholdWarningShallowField', \
+                'GUI', 'timeL3FirstYear', 'timeL3LastYear', 'peakHeatingExternal', 'peakCoolingExternal', 'monthlyLoadHeatingExternal',\
+                'monthlyLoadCoolingExternal', 'hourlyHeatingLoadExternal', 'hourlyCoolingLoadExternal', 'hourlyHeatingLoadOnTheBorefield', \
+                'hourlyCoolingLoadOnTheBorefield'
 
-    def __init__(self, simulationPeriod: int, numberOfBoreholes: int = None, peakHeating: list = None, peakCooling: list = None,
+    def __init__(self, simulationPeriod: int = 20, numberOfBoreholes: int = None, peakHeating: list = None, peakCooling: list = None,
                  baseloadHeating: list = None, baseloadCooling: list = None, investementCost: list = None, borefield = None, customGfunction = None, GUI: bool = False):
         """This function initiates the Borefield class"""
 
@@ -88,6 +92,8 @@ class Borefield():
         self.baseloadCooling: list = listOfZeros
         self.limitingQuadrant: int = 0
         self.Tf: float = 0.
+        self.Tf_H: float = 16.
+        self.Tf_C: float = 0.
         self.thresholdWarningShallowField: int = 50 # m hereafter one needs to chance to fewer boreholes with more depth, because the calculations are no longer that accurate.
 
         # define vars
@@ -187,6 +193,9 @@ class Borefield():
         # sets the number of boreholes as if it was a rectangular field, iff there is not yet a number of boreholes defined by a custom configuration
         if self.numberOfBoreholes is None:
             self.setNumberOfBoreholes(self.N_1*self.N_2)
+
+        # new ground data implies that a new gfunction should be loaded
+        Borefield.gfunctionInterpolationArray = []
 
     def setMaxGroundTemperature(self, temp: float):
         """This function sets the maximal ground temperature to temp"""
@@ -849,44 +858,69 @@ class Borefield():
         print("A new dataset with name " + name + " has been created in " + os.path.dirname(os.path.realpath(__file__))+"\Data.")
         pickle.dump(data,open(FOLDER + "/Data/"+name,"wb"))
 
-    def loadHourlyProfile(self):
-        """This function loads in an hourly load profile. It opens a csv and asks for the relevant column where the data is in."""
+    def loadHourlyProfile(self, filePath: str = None, header: bool = True, seperator: str = ";", firstColumnHeating: bool = True):
+        """This function loads in an hourly load profile. It opens a csv and asks for the relevant column where the data is in.
+        firstColumnHeating is true if the first column in the datafile is for the heating values.
+        header is true if there is a header in the csv file.
+        seperator is the seperator in the csv file."""
 
-        # give the location of the file
-        filePath = filedialog.askopenfilename(title="Select csv-file with hourly load.")
+        # if there is no given location, open a filedialog box
+        if filePath is None:
+            filePath = filedialog.askopenfilename(title="Select csv-file with hourly load.")
 
-        # workbook object is created
-        wb_obj = openpyxl.load_workbook(filePath)
+        if header:
+            header: int = 0
+        else:
+            header = None
 
-        sheet_obj = wb_obj.active
-        max_row = sheet_obj.max_row
+        db = pd.read_csv(filePath, sep=seperator, header=header)
 
-        # Loop will create lists with the hourly loads
-        for i in range(2, max_row + 1):
-            cell_obj = sheet_obj.cell(row=i, column=1)
-            self.hourlyHeatingLoad.append(cell_obj.value)
-        for i in range(2,max_row + 1):
-            cell_obj = sheet_obj.cell(row=i, column=2)
-            self.hourlyCoolingLoad.append(cell_obj.value)
+        if firstColumnHeating:
+            self.hourlyHeatingLoad = db.iloc[:,0].tolist()
+            self.hourlyCoolingLoad = db.iloc[:,1].tolist()
+        else:
+            self.hourlyHeatingLoad = db.iloc[:,1].tolist()
+            self.hourlyCoolingLoad = db.iloc[:,0].tolist()
+
+    def convertHourlyToMonthly(self, peakCoolLoad: float = None, peakHeatLoad: float = None):
+        """This function converts an hourly loadprofile to the monthly profiles used in the sizing."""
+
+        try:
+            self.hourlyCoolingLoad[0]
+            self.hourlyHeatingLoad[0]
+        except:
+            self.loadHourlyProfile()
+
+        if peakCoolLoad is None:
+            peakCoolLoad = max(self.hourlyCoolingLoad)
+        if peakHeatLoad is None:
+            peakHeatLoad = max(self.hourlyHeatingLoad)
+
+        # calculate peak and base loads
+        self.setPeakCooling(self._reduceToPeakLoad(self.hourlyCoolingLoad,peakCoolLoad))
+        self.setPeakHeating(self._reduceToPeakLoad(self.hourlyHeatingLoad,peakHeatLoad))
+        self.setBaseloadCooling(self._reduceToMonthLoad(self.hourlyCoolingLoad,peakCoolLoad))
+        self.setBaseloadHeating(self._reduceToMonthLoad(self.hourlyHeatingLoad,peakHeatLoad))
+
+    def _reduceToMonthLoad(self, load: list, peak: float):
+        """This function calculates the monthly load based, taking a maximum peak value into account."""
+        monthLoad = []
+        for i in range(12):
+            temp = load[Borefield.hourlyLoadArray[i]:Borefield.hourlyLoadArray[i + 1] + 1]
+            monthLoad.append(functools.reduce(lambda x, y: x + y, [min(j, peak) for j in temp]))
+        return monthLoad
+
+    def _reduceToPeakLoad(self, load: list, peak: float):
+        """This function calculates the monthly peak load, taking a maximum peak value into account."""
+        peakLoad = []
+        for i in range(12):
+            temp = load[Borefield.hourlyLoadArray[i]:Borefield.hourlyLoadArray[i + 1] + 1]
+            peakLoad.append(max([min(j, peak) for j in temp]))
+        return peakLoad
 
     def optimiseLoadProfile(self,depth: float = 150, lengthPeak = defaultLengthPeak):
-        """This function optimises the load based on the given borefield and the given hourly load."""
-
-        def reduceToMonthLoad(load: list,peak: float):
-            """This function calculates the monthly load based, taking a maximum peak value into account."""
-            monthLoad = []
-            for i in range(12):
-                temp = load[Borefield.hourlyLoadArray[i]:Borefield.hourlyLoadArray[i+1]+1]
-                monthLoad.append(functools.reduce(lambda x,y:x+y,[min(j,peak) for j in temp]))
-            return monthLoad
-
-        def reduceToPeakLoad(load: list,peak: float):
-            """This function calculates the monthly peak load, taking a maximum peak value into account."""
-            peakLoad = []
-            for i in range(12):
-                temp = load[Borefield.hourlyLoadArray[i]:Borefield.hourlyLoadArray[i+1]+1]
-                peakLoad.append(max([min(j,peak) for j in temp]))
-            return peakLoad
+        """This function optimises the load based on the given borefield and the given hourly load.
+        It does so based on a load-duration curve."""
 
         # if no hourly profile is given, load one
         if self.hourlyCoolingLoad == []:
@@ -905,10 +939,7 @@ class Borefield():
 
         while not coolOK or not heatOK:
             # calculate peak and base loads
-            self.setPeakCooling(reduceToPeakLoad(self.hourlyCoolingLoad,peakCoolLoad))
-            self.setPeakHeating(reduceToPeakLoad(self.hourlyHeatingLoad,peakHeatLoad))
-            self.setBaseloadCooling(reduceToMonthLoad(self.hourlyCoolingLoad,peakCoolLoad))
-            self.setBaseloadHeating(reduceToMonthLoad(self.hourlyHeatingLoad,peakHeatLoad))
+            self.convertHourlyToMonthly(peakCoolLoad,peakHeatLoad)
 
             # calculate temperature profile, just for the results
             self._printTemperatureProfile(legend=False,H=depth,figure=False)
@@ -939,9 +970,35 @@ class Borefield():
             else:
                 coolOK = True
 
+        # calculate the resulting hourly profile that can be put on the field
+        self.hourlyCoolingLoadOnTheBorefield = [max(i,peakCoolLoad) for i in self.hourlyCoolingLoad]
+        self.hourlyHeatingLoadOnTheBorefield = [max(i,peakHeatLoad) for i in self.hourlyHeatingLoad]
+
+        # calculate the resulting hourly profile that cannot be put on the field
+        self.hourlyCoolingLoadExternal = [max(0, i - peakCoolLoad) for i in self.hourlyCoolingLoad]
+        self.hourlyHeatingLoadExternal = [max(0, i - peakHeatLoad) for i in self.hourlyHeatingLoad]
+
+        # calculate the resulting monthly profile that cannot be put on the field
+        temp = self._reduceToMonthLoad(self.hourlyCoolingLoad,max(self.hourlyCoolingLoad))
+        self.monthlyLoadCoolingExternal = [temp[i] - self.baseloadCooling[i] for i in range(12)]
+        temp = self._reduceToMonthLoad(self.hourlyHeatingLoad,max(self.hourlyHeatingLoad))
+        self.monthlyLoadHeatingExternal = [temp[i] - self.baseloadHeating[i] for i in range(12)]
+        temp = self._reduceToPeakLoad(self.hourlyCoolingLoad,max(self.hourlyCoolingLoad))
+        self.peakCoolingExternal = [temp[i] - self.peakCooling[i] for i in range(12)]
+        temp = self._reduceToPeakLoad(self.hourlyHeatingLoad,max(self.hourlyHeatingLoad))
+        self.peakHeatingExternal = [temp[i] - self.peakHeating[i] for i in range(12)]
+
         # print results
-        print("The peak load heating is: ",int(peakHeatLoad),"kW, leading to ",int(functools.reduce(lambda x,y:x+y,self.baseloadHeating)), "kWh of heating.")
-        print("The peak load cooling is: ", int(peakCoolLoad), "kW, leading to ",int(functools.reduce(lambda x, y: x + y, self.peakCooling)), "kWh of cooling.")
+        print("The peak load heating is: ",int(peakHeatLoad),"kW, leading to", np.round(np.sum(self.baseloadHeating),2), "kWh of heating.")
+        print("This is", np.round(np.sum(self.baseloadHeating)/np.sum(self.hourlyHeatingLoad)*100,2), "% of the total heating load.")
+        print("Another", np.round(-np.sum(self.baseloadHeating) + np.sum(self.hourlyHeatingLoad),2), "kWh of heating should come from another source, with a peak of", int(max(self.hourlyHeatingLoad)) - int(peakHeatLoad), "kW.")
+        print("------------------------------------------")
+        print("The peak load cooling is: ", int(peakCoolLoad), "kW, leading to", np.round(np.sum(self.baseloadCooling),2), "kWh of cooling.")
+        print("This is", np.round(np.sum(self.baseloadCooling) / np.sum(self.hourlyCoolingLoad) * 100, 2),
+              "% of the total cooling load.")
+        print("Another", np.round(-np.sum(self.baseloadCooling) + np.sum(self.hourlyCoolingLoad), 2),
+              "kWh of cooling should come from another source, with a peak of",
+              int(max(self.hourlyCoolingLoad)) - int(peakCoolLoad), "kW.")
 
         # plot results
         self._printTemperatureProfile(H=depth)
