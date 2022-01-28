@@ -1,4 +1,6 @@
 """
+This document contains checks to see whether or not adaptations to the code still comply with some specific cases.
+It also show the difference between the original L2 sizing methode (Peere et al., 2021) and a more general L3 one.
 
 This document contains 4 different cases referring to the paper: Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. Validated combined first and last year borefield sizing methodology. In Proceedings of International Building Simulation Conference 2021 (2021). Brugge (Belgium), 1-3 September 2021.
 
@@ -77,7 +79,8 @@ if __name__ == "__main__":
         NOTE: these values differ slightly from the values in the mentioned paper. This is due to
         """
 
-        correctAnswers = (56.64, 118.7, 66.88, 92.67)
+        correctAnswersL2 = (56.64, 118.7, 66.88, 92.67)
+        correctAnswersL3 = (56.77, 119.23, 66.48, 91.63)
 
         for i in (1,2,3,4):
             monthlyLoadCooling, monthlyLoadHeating, peakCooling, peakHeating = loadCase(i)
@@ -95,8 +98,13 @@ if __name__ == "__main__":
             borefield.setMinGroundTemperature(0)  # minimum temperature
 
             borefield.size(100)
-            print(f'correct answer: {correctAnswers[i-1]}; calculated answer: {round(borefield.H,2)}')
-            assert round(borefield.H,2) == correctAnswers[i-1]
+            print(f'correct answer L2: {correctAnswersL2[i-1]}; calculated answer L2: {round(borefield.H,2)}; error: ' \
+            f'{round(abs(1 - borefield.H / correctAnswersL2[i - 1]) * 100, 4)} %')
+            assert round(borefield.H,2) == correctAnswersL2[i-1]
+            borefield.size(100,0)
+            print(f'correct answer L3: {correctAnswersL3[i - 1]}; calculated answer L3: {round(borefield.H, 2)}; error: ' \
+            f'{round(abs(1 - borefield.H / correctAnswersL3[i - 1]) * 100, 4)} %')
+            assert round(borefield.H, 2) == correctAnswersL3[i - 1]
 
     def checkCustomDatafile():
         """
