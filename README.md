@@ -15,10 +15,10 @@ In the GUI folder, one can find a graphical interface which makes it easy to int
 This graphical interface is made by Tobias Blanke from RWTH Aachen. 
 
 ## Precalculated data
-This tool comes with precalculated g-functions for all borefields of type nxm (for 0<n,m<20). For these borefield configurations, the g-functions are calculated for different depth-thermal conductivity-spacing combinations. The ranges are:
+This tool comes with precalculated g-functions for all borefields of type nxm (for 0<n,m<20) for which the boreholes are connected in parallel. For these borefield configurations, the g-functions are calculated for different depth-thermal conductivity-spacing combinations. The ranges are:
 
 * Depth: 25 - 350m in increments of 25m
-* Thermal conductivity of the soil: 1.5 - 3.5 in increments of 0.5W/mk
+* Thermal conductivity of the soil: 1 - 4 in increments of 0.5W/mk
 * Spacings (equal): 3 - 9m in increments of 1m
 
 Here a burial depth (D) of 4.0m is assumed even as a borehole radius of 7.5cm.
@@ -34,6 +34,7 @@ This code is tested with Python 3.9 and requires the following libraries (the ve
 * Pygfunction (>=1.1.2)
 * Tkinter (>=0.1.0)
 * Openpyxl (>=3.0.7)
+* Pandas (>=1.2.4)
 
 ## Main contributors
 Wouter Peere, KU Leuven & Boydens Engineering (part of Sweco), wouter.peere@kuleuven.be
