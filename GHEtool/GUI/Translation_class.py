@@ -1,9 +1,9 @@
 
 class TrClass:
-    __slots__ = 'Language', 'scenarioStr', 'label_Language', 'pushButton_SaveScenario', 'pushButton_AddScenario',\
+    __slots__ = 'Language', 'scenarioStr', 'label_Language', 'pushButton_SaveScenario', 'pushButton_AddScenario', \
                 'pushButton_DeleteScenario', 'pushButton_Start', 'pushButton_Cancel', 'pushButton_General', \
-                'pushButton_thermalDemands', 'pushButton_Results', 'label_Status', 'pushButton_SaveScenariosExternal', \
-                'pushButton_LoadScenarios', 'label_Borehole_earth', 'label_Earth_Properties', 'checkBox_CalcDepth', \
+                'pushButton_thermalDemands', 'pushButton_Results', 'label_Status', 'label_File', 'label_Calculation', \
+                'label_Borehole_earth', 'label_Earth_Properties', 'checkBox_CalcDepth', 'label_Settings', \
                 'label_H', 'label_BS', 'label_lambdaEarth', 'label_GroundTemp', 'label_BoreholeResistance', \
                 'label_WidthField', 'label_LengthField', 'label_TempConstraints', 'label_TempMin', 'label_TempMax', \
                 'label_SimulationTime', 'pushButton_NextGeneral', 'pushButton_PreviousThermal', 'label_Size', \
@@ -19,7 +19,10 @@ class TrClass:
                 'ChooseXLS', 'ChooseXLSX', 'NoFileSelected', 'ValueError', 'ColumnError', 'ChoosePKL', 'SaveFigure', \
                 'SaveData', 'SavePKL', 'label_WarningCustomBorefield', 'label_WarningDepth', 'checkBox_SizeBorefield', \
                 'label_H_max', 'label_B_min', 'label_B_max', 'label_MaxWidthField', 'label_MaxLengthField', \
-                'label_Size_B', 'label_Size_L', 'label_Size_W', 'comboBox_Size_Method'
+                'label_Size_B', 'label_Size_L', 'label_Size_W', 'comboBox_Size_Method', 'label_German', \
+                'label_English', 'label_New', 'label_Save', 'label_Open', 'label_Save_As', 'Calculation_Finished', \
+                'GHE_tool_imported', 'GHE_tool_imported_start', 'label_Dutch', 'label_Italian', 'label_French', \
+                'comboBox_Language', 'label_new_scenario', 'new_name', 'label_okay', 'label_abort'
 
     def __init__(self) -> None:
         """This function initialize the translation class"""
@@ -35,8 +38,9 @@ class TrClass:
         self.pushButton_thermalDemands: str = ''
         self.pushButton_Results: str = ''
         self.label_Status: str = ''
-        self.pushButton_SaveScenariosExternal: str = ''
-        self.pushButton_LoadScenarios: str = ''
+        self.label_File: str = ''
+        self.label_Calculation: str = ''
+        self.label_Settings: str = ''
         self.label_Borehole_earth: str = ''
         self.label_Earth_Properties: str = ''
         self.checkBox_CalcDepth: str = ''
@@ -125,9 +129,30 @@ class TrClass:
         self.label_Size_L: str = ''
         self.label_Size_W: str = ''
         self.comboBox_Size_Method: list = []
-        self.ChangeLanguage(self.Language)
+        self.label_German: str = ''
+        self.label_English: str = ''
+        self.label_Dutch: str = ''
+        self.label_Italian: str = ''
+        self.label_French: str = ''
+        self.label_New: str = ''
+        self.label_Save: str = ''
+        self.label_Open: str = ''
+        self.label_Save_As: str = ''
+        self.Calculation_Finished: str = ''
+        self.GHE_tool_imported: str = ''
+        self.GHE_tool_imported_start: str = ''
+        self.label_new_scenario: str = ''
+        self.new_name: str = ''
+        self.label_okay: str = ''
+        self.label_abort: str = ''
+        self.comboBox_Language: list = []
+        self.change_language(self.Language)
 
-    def ChangeLanguage(self, Lang: int) -> None:
+    def create_language_list(self):
+        self.comboBox_Language: list = [self.label_English, self.label_German, self.label_Dutch, self.label_Italian,
+                                        self.label_French]
+
+    def change_language(self, lang: int) -> None:
         """
         Change language to:
         0: English
@@ -138,7 +163,7 @@ class TrClass:
 
         Parameters
         ----------
-        Lang : int
+        lang : int
             Integer of language 0: English; 1: German
 
         Returns
@@ -147,24 +172,25 @@ class TrClass:
 
         Examples
         --------
-        ChangeLanguage(0)
+        change_language(0)
 
         """
-        self.Language: int = Lang
-        if Lang == 0:  # english
-            self.label_Language: str = 'Language:'
+        self.Language: int = lang
+        if lang == 0:  # english
+            self.label_Language: str = 'Language'
             self.pushButton_SaveScenario: str = 'Update scenario'
             self.pushButton_AddScenario: str = 'Add scenario'
             self.pushButton_DeleteScenario: str = 'Delete scenario'
             self.scenarioStr: str = 'Scenario'
-            self.pushButton_Start: str = 'Start'
+            self.pushButton_Start: str = 'Run calculation'
             self.pushButton_Cancel: str = 'Exit'
             self.pushButton_General: str = 'Borehole \nand earth'
             self.pushButton_thermalDemands: str = 'Thermal \ndemands'
             self.pushButton_Results: str = 'Results'
             self.label_Status: str = 'Progress: '
-            self.pushButton_SaveScenariosExternal: str = 'Save Scenarios \nexternally'
-            self.pushButton_LoadScenarios: str = 'Load Scenarios \nfrom extern'
+            self.label_File: str = 'File'
+            self.label_Calculation: str = 'Calculation'
+            self.label_Settings: str = 'Settings'
             self.label_Borehole_earth: str = 'Borehole and earth'
             self.label_Earth_Properties: str = 'Borehole and earth properties'
             self.checkBox_CalcDepth: str = 'Determine the required depth'
@@ -254,22 +280,40 @@ class TrClass:
             self.label_Size_B: str = 'Borehole spacing: '
             self.label_Size_L: str = 'Length of rectangular field: '
             self.label_Size_W: str = 'Width of rectangular field: '
+            self.label_German: str = 'German'
+            self.label_English: str = 'English'
+            self.label_Dutch: str = 'Dutch'
+            self.label_Italian: str = 'Italian'
+            self.label_French: str = 'French'
+            self.label_New: str = 'New Project'
+            self.label_Save: str = 'Save Project'
+            self.label_Open: str = 'Open Project'
+            self.label_Save_As: str = 'Save as'
+            self.Calculation_Finished: str = 'Calculation finished'
+            self.GHE_tool_imported: str = 'GHEtool imported'
+            self.GHE_tool_imported_start: str = 'Start importing GHEtool'
+            self.label_new_scenario: str = 'Enter new scenario name'
+            self.new_name: str = 'New name for '
+            self.label_okay: str = ' Okay '
+            self.label_abort: str = ' Abort '
             self.comboBox_Size_Method: list = ['Fast', 'Robust']
+            self.create_language_list()
             return
-        if Lang == 1:  # german
-            self.label_Language: str = 'Sprache:'
+        if lang == 1:  # german
+            self.label_Language: str = 'Sprache'
             self.pushButton_SaveScenario: str = 'Szenario aktualisieren'
             self.pushButton_AddScenario: str = 'Szenario hinzufügen'
             self.pushButton_DeleteScenario: str = 'Szenario löschen'
             self.scenarioStr: str = 'Szenario'
-            self.pushButton_Start: str = 'Starten'
+            self.pushButton_Start: str = 'Starte Berechnung'
             self.pushButton_Cancel: str = 'Verlassen'
             self.pushButton_General: str = 'Bohrloch \nund Erdreich'
             self.pushButton_thermalDemands: str = 'Thermischer \nBedarf'
             self.pushButton_Results: str = 'Ergebnisse'
             self.label_Status: str = 'Fortschritt: '
-            self.pushButton_SaveScenariosExternal: str = 'Speichere Szenarios \nextern'
-            self.pushButton_LoadScenarios: str = 'Lade externe \nSzenarios'
+            self.label_File: str = 'Datei'
+            self.label_Calculation: str = 'Berechnung'
+            self.label_Settings: str = 'Einstellungen'
             self.label_Borehole_earth: str = 'Bohrloch und Erdreich'
             self.label_Earth_Properties: str = 'Bohrloch und Erdreicheigenschaften'
             self.checkBox_CalcDepth: str = 'Notwendige Bohrlochlänge bestimmen'
@@ -359,10 +403,27 @@ class TrClass:
             self.label_Size_B: str = 'Bohrlochabstand: '
             self.label_Size_L: str = 'Länge des rechteckigen Feldes: '
             self.label_Size_W: str = 'Breite des rechteckigen Feldes: '
+            self.label_German: str = 'Deutsch'
+            self.label_English: str = 'Englisch'
+            self.label_Dutch: str = 'Niederländisch'
+            self.label_Italian: str = 'Italienisch'
+            self.label_French: str = 'französisch'
+            self.label_New: str = 'Neues Projekt'
+            self.label_Save: str = 'Speichere Projekt'
+            self.label_Open: str = 'Öffne Projekt'
+            self.label_Save_As: str = 'Speichere Projekt unter ...'
+            self.Calculation_Finished: str = 'Berechnung fertiggestellt'
+            self.GHE_tool_imported: str = 'GHEtool importiert'
+            self.GHE_tool_imported_start: str = 'Starte GHEtool zu importieren'
             self.comboBox_Size_Method: list = ['Schnell', 'Robust']
+            self.label_new_scenario: str = 'Neuer Name für das Szenario'
+            self.new_name: str = 'Neuer Name für '
+            self.label_okay: str = ' Okay '
+            self.label_abort: str = ' Abbruch '
+            self.create_language_list()
             return
-        if Lang == 2:  # Dutch # thanks to Wouter
-            self.label_Language: str = 'Taal:'
+        if lang == 2:  # Dutch # thanks to Wouter
+            self.label_Language: str = 'Taal'
             self.pushButton_SaveScenario: str = 'Update scenario'
             self.pushButton_AddScenario: str = 'Nieuw scenario'
             self.pushButton_DeleteScenario: str = 'Verwijder scenario'
@@ -373,8 +434,6 @@ class TrClass:
             self.pushButton_thermalDemands: str = 'Thermische \nvraag'
             self.pushButton_Results: str = 'Resultaten'
             self.label_Status: str = 'Vooruitgang: '
-            self.pushButton_SaveScenariosExternal: str = 'Sla scenarios \nop'
-            self.pushButton_LoadScenarios: str = 'Laad externe scenarios'
             self.label_Borehole_earth: str = 'Boorveld en grond'
             self.label_Earth_Properties: str = 'Eigenschappen van boorveld en grond'
             self.checkBox_CalcDepth: str = 'Bepaal de benodigde diepte'
@@ -465,9 +524,29 @@ class TrClass:
             self.label_Size_L: str = 'Length of rectangular field: '
             self.label_Size_W: str = 'Width of rectangular field: '
             self.comboBox_Size_Method: list = ['Fast', 'Robust']
+            self.label_File: str = 'File'
+            self.label_Calculation: str = 'Calculation'
+            self.label_Settings: str = 'Settings'
+            self.label_German: str = 'German'
+            self.label_English: str = 'English'
+            self.label_Dutch: str = 'Dutch'
+            self.label_Italian: str = 'Italian'
+            self.label_French: str = 'French'
+            self.label_New: str = 'New Project'
+            self.label_Save: str = 'Save Project'
+            self.label_Open: str = 'Open Project'
+            self.label_Save_As: str = 'Save as'
+            self.Calculation_Finished: str = 'Calculation finished'
+            self.GHE_tool_imported: str = 'GHEtool imported'
+            self.GHE_tool_imported_start: str = 'Start importing GHEtool'
+            self.label_new_scenario: str = 'Enter new scenario name'
+            self.new_name: str = 'New name for '
+            self.label_okay: str = ' Okay '
+            self.label_abort: str = ' Abort '
+            self.create_language_list()
             return
-        if Lang == 3:  # French # Thanks to Felix Arjuna
-            self.label_Language: str = 'Languange:'
+        if lang == 3:  # French # Thanks to Felix Arjuna
+            self.label_Language: str = 'Languange'
             self.pushButton_SaveScenario: str = 'Mettre à jour le scénario'
             self.pushButton_AddScenario: str = 'Ajouter un scénario'
             self.pushButton_DeleteScenario: str = 'Supprimer un scénario'
@@ -478,8 +557,6 @@ class TrClass:
             self.pushButton_thermalDemands: str = 'Demande \nthermique'
             self.pushButton_Results: str = 'Résultats'
             self.label_Status: str = 'Progrès: '
-            self.pushButton_SaveScenariosExternal: str = 'Enregistrer les scénarios \nen externe'
-            self.pushButton_LoadScenarios: str = 'Charger les scénarios \nde l\'extérieur'
             self.label_Borehole_earth: str = 'Forage et terre'
             self.label_Earth_Properties: str = 'Propriétés du trou de sonde et de la terre'
             self.checkBox_CalcDepth: str = 'Déterminer la profondeur requise'
@@ -570,9 +647,29 @@ class TrClass:
             self.label_Size_L: str = 'Length of rectangular field: '
             self.label_Size_W: str = 'Width of rectangular field: '
             self.comboBox_Size_Method: list = ['Fast', 'Robust']
+            self.label_File: str = 'File'
+            self.label_Calculation: str = 'Calculation'
+            self.label_Settings: str = 'Settings'
+            self.label_German: str = 'German'
+            self.label_English: str = 'English'
+            self.label_Dutch: str = 'Dutch'
+            self.label_Italian: str = 'Italian'
+            self.label_French: str = 'French'
+            self.label_New: str = 'New Project'
+            self.label_Save: str = 'Save Project'
+            self.label_Open: str = 'Open Project'
+            self.label_Save_As: str = 'Save as'
+            self.Calculation_Finished: str = 'Calculation finished'
+            self.GHE_tool_imported: str = 'GHEtool imported'
+            self.GHE_tool_imported_start: str = 'Start importing GHEtool'
+            self.label_new_scenario: str = 'Enter new scenario name'
+            self.new_name: str = 'New name for '
+            self.label_okay: str = ' Okay '
+            self.label_abort: str = ' Abort '
+            self.create_language_list()
             return
-        if Lang == 4:  # Italian # Thanks to Felix Arjuna
-            self.label_Language: str = 'Languange:'
+        if lang == 4:  # Italian # Thanks to Felix Arjuna
+            self.label_Language: str = 'Languange'
             self.pushButton_SaveScenario: str = 'Aggiorna scenario'
             self.pushButton_AddScenario: str = 'Aggiungi scenario'
             self.pushButton_DeleteScenario: str = 'Cancella scenario'
@@ -583,8 +680,6 @@ class TrClass:
             self.pushButton_thermalDemands: str = 'Richieste \ntermiche'
             self.pushButton_Results: str = 'Risultati'
             self.label_Status: str = 'Progressi: '
-            self.pushButton_SaveScenariosExternal: str = 'Salva scenari \nesternamente'
-            self.pushButton_LoadScenarios: str = 'Carica scenari \ndall\'esterno'
             self.label_Borehole_earth: str = 'Foro e terra'
             self.label_Earth_Properties: str = 'Proprietà del foro e della terra'
             self.checkBox_CalcDepth: str = 'Determinare la profondità richiesta'
@@ -675,4 +770,24 @@ class TrClass:
             self.label_Size_L: str = 'Length of rectangular field: '
             self.label_Size_W: str = 'Width of rectangular field: '
             self.comboBox_Size_Method: list = ['Fast', 'Robust']
+            self.label_File: str = 'File'
+            self.label_Calculation: str = 'Calculation'
+            self.label_Settings: str = 'Settings'
+            self.label_German: str = 'German'
+            self.label_English: str = 'English'
+            self.label_Dutch: str = 'Dutch'
+            self.label_Italian: str = 'Italian'
+            self.label_French: str = 'French'
+            self.label_New: str = 'New Project'
+            self.label_Save: str = 'Save Project'
+            self.label_Open: str = 'Open Project'
+            self.label_Save_As: str = 'Save as'
+            self.Calculation_Finished: str = 'Calculation finished'
+            self.GHE_tool_imported: str = 'GHEtool imported'
+            self.GHE_tool_imported_start: str = 'Start importing GHEtool'
+            self.label_new_scenario: str = 'Enter new scenario name'
+            self.new_name: str = 'New name for '
+            self.label_okay: str = ' Okay '
+            self.label_abort: str = ' Abort '
+            self.create_language_list()
             return
