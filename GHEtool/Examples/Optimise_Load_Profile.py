@@ -28,7 +28,7 @@ if __name__ == "__main__":
     borefield.loadHourlyProfile("Hourly_Profile.csv", header=True, seperator=";", firstColumnHeating=True)
 
     # optimise the load for a 10x10 field (see data above) and a fixed depth of 150m.
-    borefield.optimiseLoadProfile(depth=150)
+    borefield.optimiseLoadProfile(depth=150, printResults=True)
 
     # print resulting external peak cooling profile
     print(borefield.peakCoolingExternal)

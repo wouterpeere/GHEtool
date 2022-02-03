@@ -280,12 +280,11 @@ class Borefield():
         """This function gives back the equivalent borehole resistance."""
         if self.useConstantRb:
             return self.Rb
-
         # calculate Rb
         return self.calculateRb()
 
     def calculateRb(self):
-        """This function returns the calculated _Rb value"""
+        """This function returns the calculated equivalent borehole thermal resistance Rb value"""
         # initiate temporary borefield
         borehole = gt.boreholes.Borehole(self.H, self.D, self.r_b, 0, 0)
         # initiate pipe
@@ -1019,9 +1018,18 @@ class Borefield():
             peakLoad.append(max([min(j, peak) for j in temp]))
         return peakLoad
 
-    def optimiseLoadProfile(self,depth: float = 150, lengthPeak = defaultLengthPeak):
+    def optimiseLoadProfile(self,depth: float = 150, printResults: bool = False):
         """This function optimises the load based on the given borefield and the given hourly load.
         It does so based on a load-duration curve."""
+
+        # since the depth does not change, the Rb* value is constant
+        # set to use a constant Rb* value but save the initial parameters
+        Rb_backup = self.Rb
+        if not self.useConstantRb:
+            self.Rb = self.calculateRb()
+        useConstantRb_backup = self.useConstantRb
+        self.useConstantRb = True
+
 
         # if no hourly profile is given, load one
         if self.hourlyCoolingLoad == []:
@@ -1089,17 +1097,21 @@ class Borefield():
         temp = self._reduceToPeakLoad(self.hourlyHeatingLoad,max(self.hourlyHeatingLoad))
         self.peakHeatingExternal = [temp[i] - self.peakHeating[i] for i in range(12)]
 
-        # print results
-        print("The peak load heating is: ",int(peakHeatLoad),"kW, leading to", np.round(np.sum(self.baseloadHeating),2), "kWh of heating.")
-        print("This is", np.round(np.sum(self.baseloadHeating)/np.sum(self.hourlyHeatingLoad)*100,2), "% of the total heating load.")
-        print("Another", np.round(-np.sum(self.baseloadHeating) + np.sum(self.hourlyHeatingLoad),2), "kWh of heating should come from another source, with a peak of", int(max(self.hourlyHeatingLoad)) - int(peakHeatLoad), "kW.")
-        print("------------------------------------------")
-        print("The peak load cooling is: ", int(peakCoolLoad), "kW, leading to", np.round(np.sum(self.baseloadCooling),2), "kWh of cooling.")
-        print("This is", np.round(np.sum(self.baseloadCooling) / np.sum(self.hourlyCoolingLoad) * 100, 2),
-              "% of the total cooling load.")
-        print("Another", np.round(-np.sum(self.baseloadCooling) + np.sum(self.hourlyCoolingLoad), 2),
-              "kWh of cooling should come from another source, with a peak of",
-              int(max(self.hourlyCoolingLoad)) - int(peakCoolLoad), "kW.")
+        # restore the initial parameters
+        self.Rb = Rb_backup
+        self.useConstantRb = useConstantRb_backup
+        if printResults:
+            # print results
+            print("The peak load heating is: ",int(peakHeatLoad),"kW, leading to", np.round(np.sum(self.baseloadHeating),2), "kWh of heating.")
+            print("This is", np.round(np.sum(self.baseloadHeating)/np.sum(self.hourlyHeatingLoad)*100,2), "% of the total heating load.")
+            print("Another", np.round(-np.sum(self.baseloadHeating) + np.sum(self.hourlyHeatingLoad),2), "kWh of heating should come from another source, with a peak of", int(max(self.hourlyHeatingLoad)) - int(peakHeatLoad), "kW.")
+            print("------------------------------------------")
+            print("The peak load cooling is: ", int(peakCoolLoad), "kW, leading to", np.round(np.sum(self.baseloadCooling),2), "kWh of cooling.")
+            print("This is", np.round(np.sum(self.baseloadCooling) / np.sum(self.hourlyCoolingLoad) * 100, 2),
+                  "% of the total cooling load.")
+            print("Another", np.round(-np.sum(self.baseloadCooling) + np.sum(self.hourlyCoolingLoad), 2),
+                  "kWh of cooling should come from another source, with a peak of",
+                  int(max(self.hourlyCoolingLoad)) - int(peakCoolLoad), "kW.")
 
-        # plot results
-        self._printTemperatureProfile(H=depth)
+            # plot results
+            self._printTemperatureProfile(H=depth)
