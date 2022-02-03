@@ -40,6 +40,33 @@ class GroundData:
         self.N_1 = N_1  # #
         self.N_2 = N_2  # #
 
+class FluidData:
+
+    __slots__ = 'k_f', 'rho', 'Cp', 'mu', 'mfr'
+
+    def __init__(self, mfr: float, k_f: float, rho: float, Cp: float, mu: float):
+        self.k_f = k_f  # Thermal conductivity W/mK
+        self.mfr = mfr  # Mass flow rate kg/s
+        self.rho = rho  # Density kg/m3
+        self.Cp = Cp    # Thermal capacity J/kgK
+        self.mu = mu    # Dynamic viscosity Pa/s
+
+class PipeData:
+
+    __slots__ = 'r_in', 'r_out', 'k_p', 'D_s', 'r_b', 'numberOfPipes', 'epsilon', 'k_g', 'D'
+
+    def __init__(self, k_g: float, r_in: float, r_out: float, k_p: float, D_s: float, r_b: float, numberOfPipes: int, epsilon: float = 1e-6, D: float = 4):
+
+        self.k_g = k_g                      # grout thermal conductivity W/mK
+        self.r_in = r_in                    # inner pipe radius m
+        self.r_out = r_out                  # outer pipe radius m
+        self.k_p = k_p                      # pipe thermal conductivity W/mK
+        self.D_s = D_s                      # distance of pipe until center m
+        self.r_b = r_b                      # borehole radius m
+        self.numberOfPipes = numberOfPipes  # number of pipes #
+        self.epsilon = epsilon              # pipe roughness
+        self.D = D                          # burrial depth m
+
 class Borefield():
 
     # UPM: float = 730. # number of hours per month
@@ -71,7 +98,8 @@ class Borefield():
                 'resultsPeakCooling', 'resultsMonthCooling', 'resultsMonthHeating', 'Tb', 'thresholdWarningShallowField', \
                 'GUI', 'timeL3FirstYear', 'timeL3LastYear', 'peakHeatingExternal', 'peakCoolingExternal', 'monthlyLoadHeatingExternal',\
                 'monthlyLoadCoolingExternal', 'hourlyHeatingLoadExternal', 'hourlyCoolingLoadExternal', 'hourlyHeatingLoadOnTheBorefield', \
-                'hourlyCoolingLoadOnTheBorefield'
+                'hourlyCoolingLoadOnTheBorefield', 'k_f', 'mfr', 'Cp', 'mu', 'rho', 'useConstantRb', 'h_f', 'R_f', 'R_p', 'Re', \
+                'r_in', 'r_out', 'k_p', 'D_s', 'r_b', 'numberOfPipes', 'epsilon', 'k_g', 'pos', 'D'
 
     def __init__(self, simulationPeriod: int = 20, numberOfBoreholes: int = None, peakHeating: list = None, peakCooling: list = None,
                  baseloadHeating: list = None, baseloadCooling: list = None, investementCost: list = None, borefield = None, customGfunction = None, GUI: bool = False):
@@ -95,6 +123,8 @@ class Borefield():
         self.Tf_H: float = 16.
         self.Tf_C: float = 0.
         self.thresholdWarningShallowField: int = 50 # m hereafter one needs to chance to fewer boreholes with more depth, because the calculations are no longer that accurate.
+        self.useConstantRb = True # parameter that determines whether or not the Rb-value should be altered in the optimisation
+        self.epsilon = 1e-6 # pipe roughness
 
         # define vars
         self.UPM: float = 730.
@@ -122,6 +152,8 @@ class Borefield():
         self.hourlyCoolingLoad: list = []
         self.Tb: list = []
         self.GUI = GUI # check if the GHEtool is used by the GUI i
+
+        self.r_in = 0.015
 
     def setNumberOfBoreholes(self,numberOfBoreholes: int):
         """This functions sets the number of boreholes"""
@@ -161,7 +193,7 @@ class Borefield():
         self.timeL3FirstYear = [i * self.UPM * 3600. for i in range(1, 12 + 1)]
         self.timeL3LastYear = [i * self.UPM * 3600. for i in range(1, self.simulationPeriod * 12 + 1)]
 
-    def setGroundParameters(self,data):
+    def setGroundParameters(self, data):
         """This function sets the relevant borefield characteristics."""
         if isinstance(data, GroundData):
             self.H: float = data.H  # Borehole length (m)
@@ -197,6 +229,31 @@ class Borefield():
         # new ground data implies that a new gfunction should be loaded
         Borefield.gfunctionInterpolationArray = []
 
+    def setFluidParameters(self, data):
+        """This function sets the relevant fluid characteristics."""
+
+        self.k_f = data.k_f  # Thermal conductivity W/mK
+        self.rho = data.rho  # Density kg/m3
+        self.Cp = data.Cp  # Thermal capacity J/kgK
+        self.mu = data.mu  # Dynamic viscosity Pa/s
+        self.setMassFlowRate(data.mfr)
+
+    def setPipeParameters(self, data):
+        """This function sets the pipe parameters."""
+
+        self.r_in = data.r_in           # inner pipe radius m
+        self.r_out = data.r_out         # outer pipe radius m
+        self.k_p = data.k_p             # pipe thermal conductivity W/mK
+        self.D_s = data.D_s             # distance of pipe until center m
+        self.r_b = data.r_b             # borehole radius m
+        self.numberOfPipes = data.numberOfPipes # number of pipes #
+        self.epsilon = data.epsilon     # pipe roughness
+        self.k_g = data.k_g             # grout thermal conductivity W/mK
+        self.D = data.D                 # burrial depth m
+        self.calculateFluidThermalResistance()
+        self.calculatePipethermalResistance()
+        self.pos = self._axisymmetricalPipe
+
     def setMaxGroundTemperature(self, temp: float):
         """This function sets the maximal ground temperature to temp"""
         self.Tf_H: float = temp
@@ -204,6 +261,47 @@ class Borefield():
     def setMinGroundTemperature(self, temp: float):
         """This function sets the minimal ground temperature to temp"""
         self.Tf_C: float = temp
+
+    def setMassFlowRate(self, mfr: float):
+        """This function sets the mass flow rate"""
+        self.mfr = mfr
+
+    def calculateFluidThermalResistance(self):
+        """This function calcules and sets the fluid thermal resistance R_f."""
+        self.h_f = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(self.mfr, self.r_in, self.mu, self.rho, self.k_f, self.Cp, self.epsilon)
+        self.R_f = 1./(self.h_f * 2 * pi * self.r_in)
+
+    def calculatePipethermalResistance(self):
+        """This function calculates and sets the pipe thermal resistance R_p"""
+        self.R_p = gt.pipes.conduction_thermal_resistance_circular_pipe(self.r_in, self.r_out, self.k_p)
+
+    @property
+    def _Rb(self):
+        """This function gives back the equivalent borehole resistance."""
+        if self.useConstantRb:
+            return self.Rb
+
+        # calculate Rb
+        return self.calculateRb()
+
+    def calculateRb(self):
+        """This function returns the calculated _Rb value"""
+        # initiate temporary borefield
+        borehole = gt.boreholes.Borehole(self.H, self.D, self.r_b, 0, 0)
+        # initiate pipe
+        pipe = gt.pipes.MultipleUTube(self.pos, self.r_in, self.r_out, borehole, self.k_s, self.k_g, self.R_p + self.R_f,
+                                      self.numberOfPipes, J=2)
+        return gt.pipes.borehole_thermal_resistance(pipe, self.mfr, self.Cp)
+
+    @property
+    def _axisymmetricalPipe(self):
+        """This function gives back the coordinates of the pipes in an axisymmetrical pipe."""
+        dt = pi / float(self.numberOfPipes)
+        pos = [(0., 0.) for i in range(2 * self.numberOfPipes)]
+        for i in range(self.numberOfPipes):
+            pos[i] = (self.D_s*np.cos(2.0*i*dt+pi), self.D_s*np.sin(2.0*i*dt+pi))
+            pos[i + self.numberOfPipes] = (self.D_s * np.cos(2.0 * i * dt + pi + dt), self.D_s * np.sin(2.0 * i * dt + pi + dt))
+        return pos
 
     @property
     def _Bernier(self):
@@ -227,7 +325,7 @@ class Borefield():
             Rd = (gfunc_uniform_T[0]) / (2 * pi * self.k_s)
 
             # calculate the totale borehole length
-            L = (self.qa * Ra + self.qm * Rm + self.qh * Rd + self.qh * self.Rb) / abs(self.Tf - self.Tg)
+            L = (self.qa * Ra + self.qm * Rm + self.qh * Rd + self.qh * self._Rb) / abs(self.Tf - self.Tg)
 
             # updating the depth values
             H_prev = self.H
@@ -257,7 +355,7 @@ class Borefield():
             Rh = (gfunc_uniform_T[0]) / (2 * pi * self.k_s)
 
             # calculate the total length
-            L = (self.qh * self.Rb + self.qh * Rh + self.qm * Rcm + self.qpm * Rpm) / abs(self.Tf - self.Tg)
+            L = (self.qh * self._Rb + self.qh * Rh + self.qm * Rcm + self.qpm * Rpm) / abs(self.Tf - self.Tg)
 
             # updating the depth values
             H_prev = self.H
@@ -413,6 +511,9 @@ class Borefield():
         # Iterates as long as there is no convergence
         # (convergence if difference between depth in iterations is smaller than thresholdBorholeDepth)
         while abs(self.H - H_prev) >= Borefield.thresholdBorholeDepth:
+
+            # set Rb value
+            self.Rb = self._Rb
 
             # define and reset
             temperatureProfile = []
