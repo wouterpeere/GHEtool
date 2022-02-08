@@ -32,13 +32,13 @@ class GroundData:
     __slots__ = 'H', 'B', 'k_s', 'Tg', 'Rb', 'N_1', 'N_2'
 
     def __init__(self, H: float, B: float, k_s: float, Tg: float, Rb: float, N_1: int, N_2: int):
-        self.H = H  # m
-        self.B = B  # m
-        self.k_s = k_s  # W/mK
-        self.Tg = Tg  # °C
-        self.Rb = Rb  # mK/W
-        self.N_1 = N_1  # #
-        self.N_2 = N_2  # #
+        self.H = H      # borehole depth m
+        self.B = B      # borehole spacing m
+        self.k_s = k_s  # ground thermal conductivity W/mK
+        self.Tg = Tg    # ground temperature at infinity °C
+        self.Rb = Rb    # effective borehole thermal resistance mK/W
+        self.N_1 = N_1  # number of boreholes in one direction #
+        self.N_2 = N_2  # number of boreholes in the other direction #
 
 class FluidData:
 
@@ -65,14 +65,13 @@ class PipeData:
         self.r_b = r_b                      # borehole radius m
         self.numberOfPipes = numberOfPipes  # number of pipes #
         self.epsilon = epsilon              # pipe roughness
-        self.D = D                          # burrial depth m
+        self.D = D                          # burial depth m
 
 class Borefield():
 
-    # UPM: float = 730. # number of hours per month
+    UPM: float = 730. # number of hours per month
     thresholdBorholeDepth: float = 0.05  # threshold for iteration
-    H_max:float = 0 # max threshold for interpolation
-    maxSimulationPeriod:int = 100 # maximal value for simulation
+    maxSimulationPeriod: int = 100 # maximal value for simulation
 
     # define default values
     defaultInvestement: list = [35, 0]  # 35 EUR/m
@@ -86,19 +85,17 @@ class Borefield():
         temp += i
         hourlyLoadArray.append(temp)
 
-    gfunctionInterpolationArray: list = []
-
     __slots__ = 'baseloadHeating', 'baseloadCooling', 'H', 'H_init', 'B', 'N_1', 'N_2', 'Rb', 'k_s', 'Tg', 'ty', 'tm',\
-                'td', 'time', 'hourlyHeatingLoad', 'UPM', \
+                'td', 'time', 'hourlyHeatingLoad', 'H_max',\
                 'hourlyCoolingLoad', 'numberOfBoreholes', 'borefield', 'customGfunction', 'costInvestement', \
                 'lengthPeak', 'th', 'Tf_H', 'Tf_C', 'limitingQuadrant', 'monthlyLoad', 'monthlyLoadHeating', \
                 'monthlyLoadCooling', 'peakHeating', 'imbalance', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm',\
-                'peakCooling', 'simulationPeriod', \
-                'factoren_temperature_profile', 'resultsCooling', 'resultsHeating', 'resultsPeakHeating', \
+                'peakCooling', 'simulationPeriod', 'gfunctionInterpolationArray', 'fluidDataAvailable',\
+                'resultsCooling', 'resultsHeating', 'resultsPeakHeating', 'pipeDataAvailable',\
                 'resultsPeakCooling', 'resultsMonthCooling', 'resultsMonthHeating', 'Tb', 'thresholdWarningShallowField', \
                 'GUI', 'timeL3FirstYear', 'timeL3LastYear', 'peakHeatingExternal', 'peakCoolingExternal', 'monthlyLoadHeatingExternal',\
                 'monthlyLoadCoolingExternal', 'hourlyHeatingLoadExternal', 'hourlyCoolingLoadExternal', 'hourlyHeatingLoadOnTheBorefield', \
-                'hourlyCoolingLoadOnTheBorefield', 'k_f', 'mfr', 'Cp', 'mu', 'rho', 'useConstantRb', 'h_f', 'R_f', 'R_p', 'Re', \
+                'hourlyCoolingLoadOnTheBorefield', 'k_f', 'mfr', 'Cp', 'mu', 'rho', 'useConstantRb', 'h_f', 'R_f', 'R_p', \
                 'r_in', 'r_out', 'k_p', 'D_s', 'r_b', 'numberOfPipes', 'epsilon', 'k_g', 'pos', 'D'
 
     def __init__(self, simulationPeriod: int = 20, numberOfBoreholes: int = None, peakHeating: list = None, peakCooling: list = None,
@@ -116,44 +113,117 @@ class Borefield():
         if peakHeating is None:
             peakHeating: list = listOfZeros
 
-        self.baseloadHeating: list = listOfZeros
-        self.baseloadCooling: list = listOfZeros
-        self.limitingQuadrant: int = 0
-        self.Tf: float = 0.
-        self.Tf_H: float = 16.
-        self.Tf_C: float = 0.
+        self.limitingQuadrant: int = 0  # parameter that tells in which quadrant the field is limited
         self.thresholdWarningShallowField: int = 50 # m hereafter one needs to chance to fewer boreholes with more depth, because the calculations are no longer that accurate.
         self.useConstantRb = True # parameter that determines whether or not the Rb-value should be altered in the optimisation
-        self.epsilon = 1e-6 # pipe roughness
 
-        # define vars
-        self.UPM: float = 730.
+        self.H_max: float = 0  # max threshold for interpolation (will with first sizing)
+
+        self.gfunctionInterpolationArray: list = []
+
+        # initiate variables for temperature plotting
+        self.resultsHeating: list = [] # list with the minimum temperatures
+        self.resultsCooling: list = [] # list with the maximum temperatures
+        self.resultsPeakHeating: list = [] # list with the minimum temperatures due to the peak heating
+        self.resultsPeakCooling: list = [] # list with the maximum temperatures due to peak cooling
+        self.Tb: list = [] # list of borehole wall temperatures
+
+        # initiate variables for optimal sizing
+        self.hourlyHeatingLoad: list = []
+        self.hourlyCoolingLoad: list = []
+        self.hourlyCoolingLoadExternal: list = []
+        self.hourlyHeatingLoadExternal: list = []
+        self.peakHeatingExternal: list = []
+        self.peakCoolingExternal: list = []
+        self.monthlyLoadHeatingExternal: list = []
+        self.monthlyLoadCoolingExternal: list = []
+        self.hourlyHeatingLoadOnTheBorefield: list = []
+        self.hourlyCoolingLoadOnTheBorefield: list = []
+
+        # initiate load variables
+        self.baseloadHeating: list = listOfZeros     # list with baseload heating kWh
+        self.baseloadCooling: list = listOfZeros     # list with baseload cooling kWh
+        self.peakCooling: list = listOfZeros        # list with the peak load cooling kW
+        self.peakHeating: list = listOfZeros        # list with peak load heating kW
+
+        # initiate time variables
+        self.ty: float = 0. # yearly time value
+        self.tm: float = 0. # monthly time value
+        self.td: float = 0. # daily time value
+        self.th: float = 0. # duration of peak in seconds
+        self.lengthPeak: float = 0. # duration of the peak in hours
+        self.time: list = [] #list of time values
+        self.tcm: float = 0. # time constant for first year sizing
+        self.tpm: float = 0. # time constant for first year sizing
+        self.timeL3FirstYear: list = [] # list with time values for L3 sizing
+        self.timeL3LastYear: list = [] # list with time values for L3 sizing
+
+        # initiate ground loads
+        self.qa: float = 0. # yearly load W
+        self.qm: float = 0. # monthly load W
+        self.qh: float = 0. # peak load W
+        self.qpm: float = 0. # cummulative load first year sizing
+        self.imbalance: float = 0. # imbalance kWh
+
+        # initiate ground parameters
+        self.H = 0.   # borehole depth m
+        self.B = 0.   # borehole spacing m
+        self.k_s = 0. # ground thermal conductivity W/mK
+        self.Tg = 0.  # ground temperature at infinity °C
+        self.Rb = 0.  # effective borehole thermal resistance mK/W
+        self.N_1 = 0  # number of boreholes in one direction #
+        self.N_2 = 0  # number of boreholes in the other direction #
+
+        # initiate fluid parameters
+        self.k_f = 0.           # Thermal conductivity W/mK
+        self.mfr = 0.           # Mass flow rate kg/s
+        self.rho = 0.           # Density kg/m3
+        self.Cp = 0.            # Thermal capacity J/kgK
+        self.mu = 0.            # Dynamic viscosity Pa/s.
+        self.Tf: float = 0.     # temperature of the fluid
+        self.Tf_H: float = 16.  # maximum temperature of the fluid
+        self.Tf_C: float = 0.   # minimum temperature of the fluid
+        self.fluidDataAvailable: bool = False # needs to be True in order to calculate Rb*
+
+        # initiate borehole parameters
+        self.r_in: float = 0.015    # inner pipe radius m
+        self.r_out: float = 0.      # outer pipe radius m
+        self.r_b: float = 0.        # borehole radius m
+        self.k_g: float = 0.        # grout thermal conductivity W/mK
+        self.k_p:float = 0.         # pipe thermal conductivity W/mK
+        self.D_s: float = 0.        # distance of pipe until center of the borehole
+        self.numberOfPipes: int = 0 # number of pipes in the borehole (single = 1, double = 2 etc.)
+        self.D: float = 4.          # burial depth m
+        self.epsilon = 1e-6         # pipe roughness
+        self.pipeDataAvailable: bool = False # needs to be True in order to calculate Rb*
+
+        # check if the GHEtool is used by the GUI i
+        self.GUI = GUI
+
+        ### define vars
+        # set load profiles
         self.setPeakHeating(peakHeating)
         self.setPeakCooling(peakCooling)
-        self.setBaseloadCooling(baseloadCooling)  # defines the imbalance
+        self.setBaseloadCooling(baseloadCooling)
         self.setBaseloadHeating(baseloadHeating)
 
-        self.simulationPeriod = simulationPeriod
+        # set simulation period
+        self.simulationPeriod: int = simulationPeriod
 
+        # set investement cost
         self.setInvestementCost(investementCost)
 
         # set length of the peak
         self.setLengthPeak()
 
+        # calculate number of boreholes
         self.setNumberOfBoreholes(numberOfBoreholes)
 
+        # set a custom borefield
         self.setBorefield(borefield)
 
+        # set a custom gfunction
         self.setCustomGfunction(customGfunction)
-
-        self.H: int = 0
-
-        self.hourlyHeatingLoad: list = []
-        self.hourlyCoolingLoad: list = []
-        self.Tb: list = []
-        self.GUI = GUI # check if the GHEtool is used by the GUI i
-
-        self.r_in = 0.015
 
     def setNumberOfBoreholes(self,numberOfBoreholes: int):
         """This functions sets the number of boreholes"""
@@ -169,7 +239,7 @@ class Borefield():
     def setCustomGfunction(self,customGfunction):
         """This functions sets the custom g-function."""
         self.customGfunction = customGfunction
-        Borefield.gfunctionInterpolationArray: list = []
+        self.gfunctionInterpolationArray: list = []
 
     def setInvestementCost(self, investementCost: list = defaultInvestement):
         """This function sets the investement cost. This is linear with respect to the total field length."""
@@ -184,14 +254,14 @@ class Borefield():
         # Number of segments per borehole
         self.th: float = self.lengthPeak * 3600.  # length of peak in seconds
         self.ty: float = self.simulationPeriod * 8760. * 3600
-        self.tm: float = self.UPM * 3600.
+        self.tm: float = Borefield.UPM * 3600.
         self.td: float = self.lengthPeak * 3600.
         self.time = np.array([self.td, self.td + self.tm, self.ty + self.tm + self.td])
 
         # set the time array for the L3 sizing
         # This is one time for every month in the whole simulation period
-        self.timeL3FirstYear = [i * self.UPM * 3600. for i in range(1, 12 + 1)]
-        self.timeL3LastYear = [i * self.UPM * 3600. for i in range(1, self.simulationPeriod * 12 + 1)]
+        self.timeL3FirstYear = [i * Borefield.UPM * 3600. for i in range(1, 12 + 1)]
+        self.timeL3LastYear = [i * Borefield.UPM * 3600. for i in range(1, self.simulationPeriod * 12 + 1)]
 
     def setGroundParameters(self, data):
         """This function sets the relevant borefield characteristics."""
@@ -227,7 +297,7 @@ class Borefield():
             self.setNumberOfBoreholes(self.N_1*self.N_2)
 
         # new ground data implies that a new gfunction should be loaded
-        Borefield.gfunctionInterpolationArray = []
+        self.gfunctionInterpolationArray = []
 
     def setFluidParameters(self, data):
         """This function sets the relevant fluid characteristics."""
@@ -237,6 +307,10 @@ class Borefield():
         self.Cp = data.Cp  # Thermal capacity J/kgK
         self.mu = data.mu  # Dynamic viscosity Pa/s
         self.setMassFlowRate(data.mfr)
+        self.fluidDataAvailable = True
+
+        if self.pipeDataAvailable:
+            self.calculateFluidThermalResistance()
 
     def setPipeParameters(self, data):
         """This function sets the pipe parameters."""
@@ -249,21 +323,25 @@ class Borefield():
         self.numberOfPipes = data.numberOfPipes # number of pipes #
         self.epsilon = data.epsilon     # pipe roughness
         self.k_g = data.k_g             # grout thermal conductivity W/mK
-        self.D = data.D                 # burrial depth m
-        self.calculateFluidThermalResistance()
+        self.D = data.D                 # burial depth m
+        self.pos = self._axisymmetricalPipe # calculates the position of the pipes based on an axisymmetrical positioning
+
+        self.pipeDataAvailable = True
+        # calculate the different resistances
+        if self.fluidDataAvailable:
+            self.calculateFluidThermalResistance()
         self.calculatePipethermalResistance()
-        self.pos = self._axisymmetricalPipe
 
     def setMaxGroundTemperature(self, temp: float):
-        """This function sets the maximal ground temperature to temp"""
+        """This function sets the maximal ground temperature to temp."""
         self.Tf_H: float = temp
 
     def setMinGroundTemperature(self, temp: float):
-        """This function sets the minimal ground temperature to temp"""
+        """This function sets the minimal ground temperature to temp."""
         self.Tf_C: float = temp
 
     def setMassFlowRate(self, mfr: float):
-        """This function sets the mass flow rate"""
+        """This function sets the mass flow rate."""
         self.mfr = mfr
 
     def calculateFluidThermalResistance(self):
@@ -272,19 +350,26 @@ class Borefield():
         self.R_f = 1./(self.h_f * 2 * pi * self.r_in)
 
     def calculatePipethermalResistance(self):
-        """This function calculates and sets the pipe thermal resistance R_p"""
+        """This function calculates and sets the pipe thermal resistance R_p."""
         self.R_p = gt.pipes.conduction_thermal_resistance_circular_pipe(self.r_in, self.r_out, self.k_p)
 
     @property
     def _Rb(self):
         """This function gives back the equivalent borehole resistance."""
+        # use a constant Rb*
         if self.useConstantRb:
             return self.Rb
-        # calculate Rb
+
+        # calculate Rb*
         return self.calculateRb()
 
     def calculateRb(self):
-        """This function returns the calculated equivalent borehole thermal resistance Rb value"""
+        """This function returns the calculated equivalent borehole thermal resistance Rb* value."""
+        # check if all data is available
+        if not self.pipeDataAvailable or not self.fluidDataAvailable:
+            print("Please make sure you set al the pipe and fluid data.")
+            raise ValueError
+
         # initiate temporary borefield
         borehole = gt.boreholes.Borehole(self.H, self.D, self.r_b, 0, 0)
         # initiate pipe
@@ -316,12 +401,12 @@ class Borefield():
         # (convergence if difference between depth in iterations is smaller than thresholdBorholeDepth)
         while abs(self.H - H_prev) >= Borefield.thresholdBorholeDepth:
             # calculate the required gfunction values
-            gfunc_uniform_T = self.gfunction(self.time, self.H)
+            gfuncUniformT = self.gfunction(self.time, self.H)
 
             # calculate the thermal resistances
-            Ra = (gfunc_uniform_T[2] - gfunc_uniform_T[1]) / (2 * pi * self.k_s)
-            Rm = (gfunc_uniform_T[1] - gfunc_uniform_T[0]) / (2 * pi * self.k_s)
-            Rd = (gfunc_uniform_T[0]) / (2 * pi * self.k_s)
+            Ra = (gfuncUniformT[2] - gfuncUniformT[1]) / (2 * pi * self.k_s)
+            Rm = (gfuncUniformT[1] - gfuncUniformT[0]) / (2 * pi * self.k_s)
+            Rd = (gfuncUniformT[0]) / (2 * pi * self.k_s)
 
             # calculate the totale borehole length
             L = (self.qa * Ra + self.qm * Rm + self.qh * Rd + self.qh * self._Rb) / abs(self.Tf - self.Tg)
@@ -346,12 +431,12 @@ class Borefield():
         # (convergence if difference between depth in iterations is smaller than thresholdBorholeDepth)
         while abs(self.H - H_prev) >= Borefield.thresholdBorholeDepth:
             # get the gfunction values
-            gfunc_uniform_T = self.gfunction(timeSteps, self.H)
+            gfuncUniformT = self.gfunction(timeSteps, self.H)
 
             # calculate the thermal resistances
-            Rpm = (gfunc_uniform_T[2] - gfunc_uniform_T[1]) / (2 * pi * self.k_s)
-            Rcm = (gfunc_uniform_T[1] - gfunc_uniform_T[0]) / (2 * pi * self.k_s)
-            Rh = (gfunc_uniform_T[0]) / (2 * pi * self.k_s)
+            Rpm = (gfuncUniformT[2] - gfuncUniformT[1]) / (2 * pi * self.k_s)
+            Rcm = (gfuncUniformT[1] - gfuncUniformT[0]) / (2 * pi * self.k_s)
+            Rh = (gfuncUniformT[0]) / (2 * pi * self.k_s)
 
             # calculate the total length
             L = (self.qh * self._Rb + self.qh * Rh + self.qm * Rcm + self.qpm * Rpm) / abs(self.Tf - self.Tg)
@@ -359,17 +444,31 @@ class Borefield():
             # updating the depth values
             H_prev = self.H
             self.H = L / self.numberOfBoreholes
-
         return self.H
 
-    def size(self, H_init: float, L2Sizing: bool = 1, quadrantSizing: int = 0):
+    def size(self, H_init: float, L2Sizing: bool = 1, quadrantSizing: int = 0, useConstantRb: bool = None):
         """This function lets the user chose between two sizing options.
         * The L2 sizing is the one explained in (Peere et al., 2021) and is quicker
-        * The L3 sizing is a more general approach which is slower but more accurate"""
+        * The L3 sizing is a more general approach which is slower but more accurate
+        - quadrantSizing lets you size the borefield according to a specific quadrant
+        - useConstantRb makes sure that the self.useConstantRb = True.
+        Note, the constant Rb* value will be overwritten!"""
+
+        # sets the constant Rb
+        useConstantRbBackup = self.useConstantRb
+        if not useConstantRb is None:
+            self.useConstantRb = useConstantRb
 
         if L2Sizing:
-            return self.sizeL2(H_init, quadrantSizing)
-        return self.sizeL3(H_init, quadrantSizing)
+            result = self.sizeL2(H_init, quadrantSizing)
+        else:
+            result = self.sizeL3(H_init, quadrantSizing)
+
+        self.Rb = self._Rb
+
+        # reset useConstantRb
+        self.useConstantRb = useConstantRbBackup
+        return result
 
     def sizeL2(self, H_init: float, quadrantSizing: int = 0):
         """This function sizes the borefield of the given configuration according to the methodology explained in (Peere et al., 2021), which is a L2 method.
@@ -541,7 +640,7 @@ class Borefield():
                 # in case of quadrants 1 and 2, we want the maximum temperature
                 # in case of quadrants 3 and 4, we want the minimum temperature
 
-                # influence of the average montlhy load
+                # influence of the average monthly load
                 if quadrant == 1 or quadrant == 2:
                     temperatureProfile.append(boreholeWallTemperature[i] + self.monthlyLoadCooling[i % 12] * 1000. * self.Rb)
                 else:
@@ -572,12 +671,12 @@ class Borefield():
 
     def calculateMonthlyLoad(self):
         """This function calculates the average monthly load in kW"""
-        self.monthlyLoad = [(-self.baseloadHeating[i] + self.baseloadCooling[i]) / self.UPM for i in range(12)]
+        self.monthlyLoad = [(-self.baseloadHeating[i] + self.baseloadCooling[i]) / Borefield.UPM for i in range(12)]
 
     def setBaseloadHeating(self, baseload: list):
         """This function defines the baseload in heating both in an energy as in an average power perspective"""
         self.baseloadHeating = [i if i >= 0 else 0 for i in baseload]  # kWh
-        self.monthlyLoadHeating = list(map(lambda x: x / self.UPM, self.baseloadHeating)) # kW
+        self.monthlyLoadHeating = list(map(lambda x: x / Borefield.UPM, self.baseloadHeating)) # kW
         self.calculateMonthlyLoad()
         self.calculateImbalance()
 
@@ -587,12 +686,12 @@ class Borefield():
     def setBaseloadCooling(self, baseload: list):
         """This function defines the baseload in cooling both in an energy as in an average power perspective"""
         self.baseloadCooling = [i if i >= 0 else 0 for i in baseload]  # kWh
-        self.monthlyLoadCooling = list(map(lambda x: x / self.UPM, self.baseloadCooling))  # kW
+        self.monthlyLoadCooling = list(map(lambda x: x / Borefield.UPM, self.baseloadCooling))  # kW
         self.calculateMonthlyLoad()
         self.calculateImbalance()
 
         # new peak cooling if baseload is larger than the peak
-        self.setPeakCooling([max(self.peakCooling[i],self.monthlyLoadCooling[i]) for i in range(12)])
+        self.setPeakCooling([max(self.peakCooling[i], self.monthlyLoadCooling[i]) for i in range(12)])
 
     def setPeakHeating(self, peakload: list):
         """This function sets the peak heating to peakload"""
@@ -681,8 +780,8 @@ class Borefield():
                 self.qpm = 0
             else:
                 self.qpm = functools.reduce(lambda x, y: x + y, self.monthlyLoad[:monthIndex]) * 1000. / (monthIndex + 1)
-        self.tcm = (monthIndex + 1) * self.UPM * 3600
-        self.tpm = monthIndex * self.UPM * 3600
+        self.tcm = (monthIndex + 1) * Borefield.UPM * 3600
+        self.tpm = monthIndex * Borefield.UPM * 3600
 
         return monthIndex
 
@@ -704,6 +803,9 @@ class Borefield():
         Now it justs outputs the temperature graphs
         """
 
+        # set Rb* value
+        self.Rb = self._Rb
+
         # making a numpy array of the monthly balance (self.montlyLoad) for a period of self.simulationPeriod years [kW]
         monthlyLoadsArray = np.asarray(self.monthlyLoad * self.simulationPeriod)
 
@@ -717,7 +819,6 @@ class Borefield():
         # calculation of needed differences of the gfunction values. These are the weight factors in the calculation of Tb.
         gValueDifferences = [gValues[i] if i == 0 else gValues[i] - gValues[i - 1] for i in range(len(gValues))]
 
-        self.factoren_temperature_profile = gValueDifferences
         results = []
         temp = []
 
@@ -842,7 +943,7 @@ class Borefield():
         except KeyError:
             data = data
 
-        if Borefield.gfunctionInterpolationArray==[]:
+        if self.gfunctionInterpolationArray==[]:
             # if no interpolation array exists, it creates one
             def makeInterpolationListDefault():
                 """This function creates an interpolation list and saves it under gfunctionInterpolationArray."""
@@ -850,7 +951,7 @@ class Borefield():
                 B_array = list(data.keys())
                 ks_array = list(data[B_array[0]].keys())
                 H_array = list(data[B_array[0]][ks_array[0]].keys())
-                Borefield.H_max = max(H_array)
+                self.H_max = max(H_array)
                 B_array.sort()
                 ks_array.sort()
                 H_array.sort()
@@ -866,7 +967,7 @@ class Borefield():
                             temp_H.append(data[B][ks][H])
                         temp_ks.append(temp_H)
                     values.append(temp_ks)
-                Borefield.gfunctionInterpolationArray=(points,values)
+                self.gfunctionInterpolationArray=(points,values)
 
             def makeInterpolationListCustom():
                 """This function creates an interpolation list from a custom dataset and saves it under gfunctionInterpolationArray."""
@@ -881,7 +982,7 @@ class Borefield():
                 for H in H_array:
                     values.append(data["Data"][H])
 
-                Borefield.gfunctionInterpolationArray=(points,values)
+                self.gfunctionInterpolationArray=(points,values)
 
             if self.customGfunction is None:
                 makeInterpolationListDefault()
@@ -890,7 +991,7 @@ class Borefield():
         try:
             if self.customGfunction is None:
                 # interpolate
-                points,values = Borefield.gfunctionInterpolationArray
+                points,values = self.gfunctionInterpolationArray
                 if not isinstance(timeValue, float):
                     # multiple values are requested
                     gvalue = interpolate.interpn(points, values, np.array([[self.B, self.k_s, H, t] for t in timeValue]))
@@ -899,7 +1000,7 @@ class Borefield():
                     gvalue = interpolate.interpn(points, values, np.array([self.B, self.k_s, H, timeValue]))
             else:
                 # interpolate
-                points, values = Borefield.gfunctionInterpolationArray
+                points, values = self.gfunctionInterpolationArray
                 if not isinstance(timeValue, float):
                     # multiple values are requested
                     gvalue = interpolate.interpn(points, values, np.array([[H, t] for t in timeValue]))
@@ -912,7 +1013,7 @@ class Borefield():
             if self.simulationPeriod > Borefield.maxSimulationPeriod:
                 print("Your requested simulationperiod of " + str(self.simulationPeriod) + " years is beyond the limit of " + str(Borefield.maxSimulationPeriod) + " years of the precalculated data.")
             else:
-                print("Your requested depth of " + str(H) + "m is beyond the limit " + str(Borefield.H_max) + "m of the precalculated data.")
+                print("Your requested depth of " + str(H) + "m is beyond the limit " + str(self.H_max) + "m of the precalculated data.")
                 print("Please change your borefield configuration accordingly.")
             print("-------------------------")
             print("This calculation stopped.")

@@ -39,7 +39,7 @@ if __name__ == "__main__":
             peakLoadHeatingArray[i, j] = np.random.randint(monthlyLoadHeatingArray[i, j], maxValueHeating)
 
     # initiate borefield model
-    data = GroundData(185,6,3,10,0.2,10,12) # ground data with an accurate guess of 185m for the depth of the borefield
+    data = GroundData(100,6,3,10,0.2,10,12) # ground data with an accurate guess of 185m for the depth of the borefield
     fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
     pipeData = PipeData(1, 0.015, 0.02, 0.4, 0.05, 0.075, 2)
 
@@ -74,8 +74,10 @@ if __name__ == "__main__":
     borefield.setMaxGroundTemperature(16)   # maximum temperature
     borefield.setMinGroundTemperature(0)    # minimum temperature
 
-    # size according to L2 method
-    # calculate the Rb value
+    # size with constant Rb* value
+    borefield.useConstantRb = True # True by default, you can also give 'useConstantRb = True' as an argument to the size function
+
+    # calculate the Rb* value
     borefield.Rb = borefield.calculateRb()
 
     startRbConstant = time.time()
@@ -87,7 +89,7 @@ if __name__ == "__main__":
         resultsRbStatic[i] = borefield.size(100)
     endRbConstant = time.time()
 
-    # size according to L3 method
+    # size with a dynamic Rb* value
     borefield.useConstantRb = False
 
     startRbDynamic = time.time()
@@ -96,7 +98,7 @@ if __name__ == "__main__":
         borefield.setBaseloadHeating(monthlyLoadHeatingArray[i])
         borefield.setPeakCooling(peakLoadCoolingArray[i])
         borefield.setPeakHeating(peakLoadHeatingArray[i])
-        resultsRbDynamic[i] = borefield.size(100, 0)
+        resultsRbDynamic[i] = borefield.size(100)
     endRbDynamic = time.time()
 
     print("These are the results when an accurate constant Rb* value is used.")
@@ -111,12 +113,15 @@ if __name__ == "__main__":
     print("The mean difference between the sizing with a constant and a dynamic Rb* value:", np.round(np.mean(differenceResults), 3), "m or", np.round(np.mean(differenceResults) / np.mean(resultsRbStatic) * 100, 3), "% w.r.t. the constant Rb* approach.")
     print("------------------------------------------------------------------------------")
 
-    data = GroundData(100, 6, 3, 10, 0.2, 10,12)  # ground data with an inaccurate guess of 185m for the depth of the borefield
+    # Do the same thing but with another constant Rb* value based on a borehole depth of 185m.
+
+    data = GroundData(185, 6, 3, 10, 0.2, 10, 12)  # ground data with an inaccurate guess of 185m for the depth of the borefield
     borefield.setGroundParameters(data)
+
+    # size with a constant Rb* value
     borefield.useConstantRb = True
 
-    # size according to L2 method
-    # calculate the Rb value
+    # calculate the Rb* value
     borefield.Rb = borefield.calculateRb()
 
     startRbConstant = time.time()
@@ -128,7 +133,7 @@ if __name__ == "__main__":
         resultsRbStatic[i] = borefield.size(100)
     endRbConstant = time.time()
 
-    # size according to L3 method
+    # size with a dynamic Rb* value
     borefield.useConstantRb = False
 
     startRbDynamic = time.time()
@@ -137,7 +142,7 @@ if __name__ == "__main__":
         borefield.setBaseloadHeating(monthlyLoadHeatingArray[i])
         borefield.setPeakCooling(peakLoadCoolingArray[i])
         borefield.setPeakHeating(peakLoadHeatingArray[i])
-        resultsRbDynamic[i] = borefield.size(100, 0)
+        resultsRbDynamic[i] = borefield.size(100)
     endRbDynamic = time.time()
 
     print("These are the results when an inaccurate constant Rb* value is used.")

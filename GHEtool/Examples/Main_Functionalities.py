@@ -75,10 +75,24 @@ if __name__ == "__main__":
     borefield.calculateTemperatures(depth=90)
     print("Result array for cooling peaks")
     print(borefield.resultsPeakCooling)
+    print("---------------------------------------------")
 
-    # size the borefield for quadrant 2
+    # size the borefield for quadrant 3
     # for more information about borefield quadrants, see (Peere et al., 2021)
-    depth = borefield.size(100, quadrantSizing = 3)
-    print("The borehole depth is: ", depth, "m for a sizing in quadrant 3")
+    depth = borefield.size(100, quadrantSizing=3)
+    print("The borehole depth is: ", str(round(depth, 2)), "m for a sizing in quadrant 3")
     # plot temperature profile for the calculated depth
+    borefield.printTemperatureProfile(legend=True)
+
+    # size with a dynamic Rb* value
+    # note that the original Rb* value will be overwritten!
+
+    # this requires pipe and fluid data
+    fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    pipeData = PipeData(1, 0.015, 0.02, 0.4, 0.05, 0.075, 2)
+    borefield.setFluidParameters(fluidData)
+    borefield.setPipeParameters(pipeData)
+
+    depth = borefield.size(100, useConstantRb=False)
+    print("The borehole depth is: ", str(round(depth, 2)), "m for a sizing with dynamic Rb*.")
     borefield.printTemperatureProfile(legend=True)
