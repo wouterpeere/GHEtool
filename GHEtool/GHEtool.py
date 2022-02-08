@@ -799,12 +799,17 @@ class Borefield():
 
     def _printTemperatureProfile(self, legend: bool = True, H: float = None, figure: bool = True):
         """
-        This function would calculate a new length of the borefield using temporal superposition.
-        Now it justs outputs the temperature graphs
+        This function calculates the temperature evolution in the borefield using temporal superposition.
+        It is possible to calculate this for a certain depth H, otherwise self.H will be used.
+        If Figure = True than a figure will be plotted.
         """
-
+        H_backup = self.H
+        if H is not None:
+            self.H = H
         # set Rb* value
         self.Rb = self._Rb
+
+        self.H = H_backup
 
         # making a numpy array of the monthly balance (self.montlyLoad) for a period of self.simulationPeriod years [kW]
         monthlyLoadsArray = np.asarray(self.monthlyLoad * self.simulationPeriod)
