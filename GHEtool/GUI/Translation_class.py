@@ -1,7 +1,7 @@
 
 class TrClass:
-    __slots__ = 'Language', 'scenarioStr', 'label_Language', 'pushButton_SaveScenario', 'pushButton_AddScenario', \
-                'pushButton_DeleteScenario', 'pushButton_Start', 'pushButton_Cancel', 'pushButton_General', \
+    __slots__ = 'Language', 'scenarioString', 'label_Language', 'pushButton_SaveScenario', 'pushButton_AddScenario', \
+                'pushButton_DeleteScenario', 'pushButton_start_multiple', 'pushButton_Cancel', 'pushButton_General', \
                 'pushButton_thermalDemands', 'pushButton_Results', 'label_Status', 'label_File', 'label_Calculation', \
                 'label_Borehole_earth', 'label_Earth_Properties', 'checkBox_CalcDepth', 'label_Settings', \
                 'label_H', 'label_BS', 'label_lambdaEarth', 'label_GroundTemp', 'label_BoreholeResistance', \
@@ -12,17 +12,37 @@ class TrClass:
                 'checkBox_Import', 'label_ThermalDemands', 'label_pH', 'label_pC', 'label_HL', 'label_CL', \
                 'label_UnitPeak', 'label_UnitLoad', 'label_Jan', 'label_Feb', 'label_Mar', 'label_Apr', 'label_May', \
                 'label_Jun', 'label_Jul', 'label_Aug', 'label_Sep', 'label_Oct', 'label_Nov', 'label_Dec', \
-                'label_DataType', 'label_Filename', 'label_SheetName', 'pushButton_load', 'page_File', \
-                'page_DataLocation', 'label_dataColumn', 'label_DataUnit', 'label_HeatingLoadLine', \
-                'label_CoolingLoadLine', 'label_combined', 'label_TimeStep', 'label_DateLine', 'comboBox_dataColumn',\
-                'comboBox_timeStep', 'pushButton_calculate', 'ErrorMassage', 'UnableDataFormat', 'ChooseCSV',\
+                'label_DataType', 'label_Filename', 'label_SheetName', 'pushButton_load', 'toolBoxFile', \
+                'toolBoxDataLocation', 'label_dataColumn', 'label_DataUnit', 'label_HeatingLoadLine', \
+                'label_CoolingLoadLine', 'label_combined', 'label_TimeStep', 'label_DateLine', 'comboBoxDataColumnList', \
+                'comboBoxTimeStepList', 'pushButton_calculate', 'ErrorMassage', 'UnableDataFormat', 'ChooseCSV', \
                 'ChooseXLS', 'ChooseXLSX', 'NoFileSelected', 'ValueError', 'ColumnError', 'ChoosePKL', 'SaveFigure', \
                 'SaveData', 'SavePKL', 'label_WarningCustomBorefield', 'label_WarningDepth', 'checkBox_SizeBorefield', \
                 'label_H_max', 'label_B_min', 'label_B_max', 'label_MaxWidthField', 'label_MaxLengthField', \
-                'label_Size_B', 'label_Size_L', 'label_Size_W', 'comboBox_Size_Method', 'label_German', \
+                'label_Size_B', 'label_Size_L', 'label_Size_W', 'comboBoxSizeMethodList', 'label_German', \
                 'label_English', 'label_New', 'label_Save', 'label_Open', 'label_Save_As', 'Calculation_Finished', \
                 'GHE_tool_imported', 'GHE_tool_imported_start', 'label_Dutch', 'label_Italian', 'label_French', \
-                'comboBox_Language', 'label_new_scenario', 'new_name', 'label_okay', 'label_abort'
+                'comboBoxLanguageList', 'label_new_scenario', 'new_name', 'label_okay', 'label_abort', 'NoBackupFile', \
+                'pushButton_borehole_resistance', 'label_Spanish', 'label_close', 'label_cancel', 'label_CancelText', \
+                'label_CancelTitle', 'label_LeaveScenarioText', 'label_LeaveScenario', 'label_StayScenario', \
+                'X_Axis_Load', 'Y_Axis_Load_P', 'Y_Axis_Load_Q', 'label_aim', 'menuLanguage', 'menuSettings', \
+                'menuCalculation', 'menuFile', 'menuScenario', 'action_start_multiple', 'actionGerman', \
+                'actionEnglish', 'actionDutch', 'actionFrench', 'actionItalian', 'actionNew', 'actionSave', \
+                'actionOpen', 'actionUpdate_Scenario', 'actionAdd_Scenario', 'actionDelete_scenario', 'actionSave_As', \
+                'actionRename_scenario', 'button_rename_scenario', 'label_Language_Head', 'label_aim_question',\
+                'pushButton_PreviousResistance', 'pushButton_NextResistance', 'comboBox_AimList', 'label_Seperator', \
+                'label_SeperatorDataFile', 'comboBox_SeperatorList', 'label_data_file', 'label_Filename_2', \
+                'label_dataColumn_2', 'label_HeatingLoadLine_2', 'label_CoolingLoadLine_2', 'label_combined_2', \
+                'label_DataUnit_2', 'label_Scenario_Head', 'checkBox_AutoSaving', 'label_Scenario_Hint', \
+                'label_Borehole_Resistance', 'label_Borehole_Resistance_Head', 'label_Rb_calculation_method', \
+                'comboBox_Rb_methodList', 'label_fluid_data', 'label_fluid_lambda', 'label_fluid_mass_flow_rate', \
+                'label_fluid_density', 'label_fluid_thermal_capacity', 'label_fluid_viscosity', 'label_pipe_data', \
+                'label_NumberOfPipes', 'label_grout_conductivity', 'label_pipe_conductivity',\
+                'label_pipe_outer_radius', 'label_pipe_inner_radius', 'label_borehole_radius', 'label_pipe_distance', \
+                'label_pipe_roughness', 'label_borehole_burial_depth', 'label_ResOptimizeLoad1', \
+                'label_ResOptimizeLoad2', 'label_ResOptimizeLoad3', 'label_ResOptimizeLoad4', \
+                'label_ResOptimizeLoad5', 'label_ResOptimizeLoad6', 'pushButton_start_single', 'NotCalculated', \
+                'NoSolution', 'comboBox_decimalList', 'label_decimalDataFile', 'label_decimal'
 
     def __init__(self) -> None:
         """This function initialize the translation class"""
@@ -31,8 +51,9 @@ class TrClass:
         self.pushButton_SaveScenario: str = ''
         self.pushButton_AddScenario: str = ''
         self.pushButton_DeleteScenario: str = ''
-        self.scenarioStr: str = ''
-        self.pushButton_Start: str = ''
+        self.scenarioString: str = ''
+        self.pushButton_start_multiple: str = ''
+        self.pushButton_start_single: str = ''
         self.pushButton_Cancel: str = ''
         self.pushButton_General: str = ''
         self.pushButton_thermalDemands: str = ''
@@ -93,8 +114,8 @@ class TrClass:
         self.label_Filename: str = ''
         self.label_SheetName: str = ''
         self.pushButton_load: str = ''
-        self.page_File: str = ''
-        self.page_DataLocation: str = ''
+        self.toolBoxFile: str = ''
+        self.toolBoxDataLocation: str = ''
         self.label_dataColumn: str = ''
         self.label_DataUnit: str = ''
         self.label_HeatingLoadLine: str = ''
@@ -102,8 +123,8 @@ class TrClass:
         self.label_combined: str = ''
         self.label_TimeStep: str = ''
         self.label_DateLine: str = ''
-        self.comboBox_dataColumn: list = ['', '']
-        self.comboBox_timeStep: list = ['', '', '']
+        self.comboBoxDataColumnList: list = ['', '']
+        self.comboBoxTimeStepList: list = ['', '', '']
         self.pushButton_calculate: str = ''
         self.ErrorMassage: str = ''
         self.UnableDataFormat: str = ''
@@ -128,12 +149,13 @@ class TrClass:
         self.label_Size_B: str = ''
         self.label_Size_L: str = ''
         self.label_Size_W: str = ''
-        self.comboBox_Size_Method: list = []
+        self.comboBoxSizeMethodList: list = []
         self.label_German: str = ''
         self.label_English: str = ''
         self.label_Dutch: str = ''
         self.label_Italian: str = ''
         self.label_French: str = ''
+        self.label_Spanish: str = ''
         self.label_New: str = ''
         self.label_Save: str = ''
         self.label_Open: str = ''
@@ -145,14 +167,131 @@ class TrClass:
         self.new_name: str = ''
         self.label_okay: str = ''
         self.label_abort: str = ''
-        self.comboBox_Language: list = []
-        self.change_language(self.Language)
+        self.NoBackupFile: str = ''
+        self.pushButton_borehole_resistance: str = ''
+        self.label_close: str = ''
+        self.label_cancel: str = ''
+        self.label_CancelText: str = ''
+        self.label_CancelTitle: str = ''
+        self.label_LeaveScenarioText: str = ''
+        self.label_LeaveScenario: str = ''
+        self.label_StayScenario: str = ''
+        self.X_Axis_Load: str = ''
+        self.Y_Axis_Load_P: str = ''
+        self.Y_Axis_Load_Q: str = ''
+        self.label_aim: str = ''
+        self.comboBoxLanguageList: list = []
+        self.comboBox_AimList: list = []
+        self.menuLanguage: str = ''
+        self.menuSettings: str = ''
+        self.menuCalculation: str = ''
+        self.menuFile: str = ''
+        self.menuScenario: str = ''
+        self.action_start_multiple: str = ''
+        self.actionGerman: str = ''
+        self.actionEnglish: str = ''
+        self.actionDutch: str = ''
+        self.actionFrench: str = ''
+        self.actionItalian: str = ''
+        self.actionNew: str = ''
+        self.actionSave: str = ''
+        self.actionOpen: str = ''
+        self.actionUpdate_Scenario: str = ''
+        self.actionAdd_Scenario: str = ''
+        self.actionDelete_scenario: str = ''
+        self.actionSave_As: str = ''
+        self.button_rename_scenario: str = ''
+        self.actionRename_scenario: str = ''
+        self.label_Language_Head: str = ''
+        self.label_aim_question: str = ''
+        self.pushButton_PreviousResistance: str = ''
+        self.pushButton_NextResistance: str = ''
+        self.label_Seperator: str = ''
+        self.label_SeperatorDataFile: str = ''
+        self.label_data_file: str = ''
+        self.label_Filename_2: str = ''
+        self.label_dataColumn_2: str = ''
+        self.label_HeatingLoadLine_2: str = ''
+        self.label_CoolingLoadLine_2: str = ''
+        self.label_combined_2: str = ''
+        self.label_DataUnit_2: str = ''
+        self.label_Scenario_Head: str = ''
+        self.checkBox_AutoSaving: str = ''
+        self.label_Scenario_Hint: str = ''
+        self.label_Borehole_Resistance: str = ''
+        self.label_Borehole_Resistance_Head: str = ''
+        self.label_Rb_calculation_method: str = ''
+        self.comboBox_Rb_methodList: list = []
+        self.comboBox_SeperatorList: list = []
+        self.label_fluid_data: str = ''
+        self.label_fluid_lambda: str = ''
+        self.label_fluid_mass_flow_rate: str = ''
+        self.label_fluid_density: str = ''
+        self.label_fluid_thermal_capacity: str = ''
+        self.label_fluid_viscosity: str = ''
+        self.label_pipe_data: str = ''
+        self.label_NumberOfPipes: str = ''
+        self.label_grout_conductivity: str = ''
+        self.label_pipe_conductivity: str = ''
+        self.label_pipe_outer_radius: str = ''
+        self.label_pipe_inner_radius: str = ''
+        self.label_borehole_radius: str = ''
+        self.label_pipe_distance: str = ''
+        self.label_pipe_roughness: str = ''
+        self.label_borehole_burial_depth: str = ''
+        self.label_ResOptimizeLoad1: str = ''
+        self.label_ResOptimizeLoad2: str = ''
+        self.label_ResOptimizeLoad3: str = ''
+        self.label_ResOptimizeLoad4: str = ''
+        self.label_ResOptimizeLoad5: str = ''
+        self.label_ResOptimizeLoad6: str = ''
+        self.NotCalculated: str = ''
+        self.NoSolution: str = ''
+        self.label_decimalDataFile: str = ''
+        self.label_decimal: str = ''
+        self.comboBox_decimalList: list = []
+        self.changeLanguage(self.Language)
 
-    def create_language_list(self):
-        self.comboBox_Language: list = [self.label_English, self.label_German, self.label_Dutch, self.label_Italian,
-                                        self.label_French]
+    def createLists(self) -> None:
+        """
+        function to create language list and set two times the same label to avoid translating the same twice
+        :return: None
+        """
+        self.comboBoxLanguageList: list = [self.label_English, self.label_German, self.label_Dutch, self.label_Italian,
+                                           self.label_French, self.label_Spanish]
+        self.menuLanguage: str = self.label_Language[:-2]
+        self.label_Language_Head: str = self.label_Language[:-2]
+        self.menuSettings: str = self.label_Settings
+        self.menuCalculation: str = self.label_Calculation
+        self.menuFile: str = self.label_File
+        self.menuScenario: str = self.scenarioString
+        self.action_start_multiple: str = self.pushButton_start_multiple
+        self.actionGerman: str = self.label_German
+        self.actionEnglish: str = self.label_English
+        self.actionDutch: str = self.label_Dutch
+        self.actionFrench: str = self.label_French
+        self.actionItalian: str = self.label_Italian
+        self.actionNew: str = self.label_New
+        self.actionSave: str = self.label_Save
+        self.actionOpen: str = self.label_Open
+        self.actionUpdate_Scenario: str = self.pushButton_SaveScenario
+        self.actionAdd_Scenario: str = self.pushButton_AddScenario
+        self.actionDelete_scenario: str = self.pushButton_DeleteScenario
+        self.actionSave_As: str = self.label_Save_As
+        self.actionRename_scenario: str = self.button_rename_scenario
+        self.pushButton_PreviousResistance: str = self.pushButton_PreviousThermal
+        self.pushButton_NextResistance: str = self.pushButton_NextGeneral
+        self.label_SeperatorDataFile: str = self.label_Seperator
+        self.label_Filename_2: str = self.label_Filename
+        self.label_dataColumn_2: str = self.label_dataColumn
+        self.label_HeatingLoadLine_2: str = self.label_HeatingLoadLine
+        self.label_CoolingLoadLine_2: str = self.label_CoolingLoadLine
+        self.label_combined_2: str = self.label_combined
+        self.label_DataUnit_2: str = self.label_DataUnit
+        self.label_Borehole_Resistance_Head: str = self.label_Borehole_Resistance
+        self.label_decimalDataFile: str = self.label_decimal
 
-    def change_language(self, lang: int) -> None:
+    def changeLanguage(self, lang: int) -> None:
         """
         Change language to:
         0: English
@@ -172,17 +311,18 @@ class TrClass:
 
         Examples
         --------
-        change_language(0)
+        changeLanguage(0)
 
         """
         self.Language: int = lang
         if lang == 0:  # english
-            self.label_Language: str = 'Language'
+            self.label_Language: str = 'Language: '
             self.pushButton_SaveScenario: str = 'Update scenario'
             self.pushButton_AddScenario: str = 'Add scenario'
             self.pushButton_DeleteScenario: str = 'Delete scenario'
-            self.scenarioStr: str = 'Scenario'
-            self.pushButton_Start: str = 'Run calculation'
+            self.scenarioString: str = 'Scenario'
+            self.pushButton_start_multiple: str = 'Calculate all scenarios'
+            self.pushButton_start_single: str = 'Calculate current scenario'
             self.pushButton_Cancel: str = 'Exit'
             self.pushButton_General: str = 'Borehole \nand earth'
             self.pushButton_thermalDemands: str = 'Thermal \ndemands'
@@ -243,8 +383,8 @@ class TrClass:
             self.label_Filename: str = 'Filename: '
             self.label_SheetName: str = 'Sheet name: '
             self.pushButton_load: str = 'Load'
-            self.page_File: str = 'Data file'
-            self.page_DataLocation: str = 'Data location in file'
+            self.toolBoxFile: str = 'Data fileImport'
+            self.toolBoxDataLocation: str = 'Data location in fileImport'
             self.label_dataColumn: str = 'Thermal demands: '
             self.label_DataUnit: str = 'Unit data: '
             self.label_HeatingLoadLine: str = 'Heating load line: '
@@ -252,14 +392,14 @@ class TrClass:
             self.label_combined: str = 'Load line: '
             self.label_TimeStep: str = 'Time step: '
             self.label_DateLine: str = 'Date line: '
-            self.comboBox_dataColumn: list = ['2 columns', '1 column']
-            self.comboBox_timeStep: list = ['1 hr.', '15 Min.', 'Automatic']
+            self.comboBoxDataColumnList: list = ['2 columns', '1 column']
+            self.comboBoxTimeStepList: list = ['1 hr.', '15 Min.', 'Automatic']
             self.pushButton_calculate: str = 'Calculate'
             self.ErrorMassage: str = 'Error!'
             self.UnableDataFormat: str = 'Unable to open selected data format!'
-            self.ChooseCSV: str = 'Choose csv to load data file'
-            self.ChooseXLS: str = 'Choose xlsx to load data file'
-            self.ChooseXLSX: str = 'Choose xls to load data file'
+            self.ChooseCSV: str = 'Choose csv to load data fileImport'
+            self.ChooseXLS: str = 'Choose xlsx to load data fileImport'
+            self.ChooseXLSX: str = 'Choose xls to load data fileImport'
             self.NoFileSelected: str = 'No file selected.'
             self.ValueError: str = 'Value error: check selected columns'
             self.ColumnError: str = 'Wrong column: check selected columns'
@@ -285,6 +425,7 @@ class TrClass:
             self.label_Dutch: str = 'Dutch'
             self.label_Italian: str = 'Italian'
             self.label_French: str = 'French'
+            self.label_Spanish: str = 'Spanish'
             self.label_New: str = 'New Project'
             self.label_Save: str = 'Save Project'
             self.label_Open: str = 'Open Project'
@@ -294,18 +435,76 @@ class TrClass:
             self.GHE_tool_imported_start: str = 'Start importing GHEtool'
             self.label_new_scenario: str = 'Enter new scenario name'
             self.new_name: str = 'New name for '
-            self.label_okay: str = ' Okay '
-            self.label_abort: str = ' Abort '
-            self.comboBox_Size_Method: list = ['Fast', 'Robust']
-            self.create_language_list()
+            self.label_okay: str = 'Okay '
+            self.label_abort: str = 'Abort '
+            self.NoBackupFile: str = 'no backup fileImport'
+            self.pushButton_borehole_resistance: str = 'Borehole\nresistance'
+            self.label_close: str = 'Close'
+            self.label_cancel: str = 'Cancel'
+            self.label_CancelText: str = 'Are you sure you want to quit? Any unsaved work will be lost.'
+            self.label_CancelTitle: str = 'Warning'
+            self.label_LeaveScenarioText: str = 'Are you sure you want to leave scenario? Any unsaved work will be ' \
+                                                'lost.'
+            self.label_LeaveScenario: str = 'Leave scenario'
+            self.label_StayScenario: str = 'Stay by scenario'
+            self.X_Axis_Load: str = 'Month of year'
+            self.Y_Axis_Load_P: str = 'Remaining peak thermal power [kW]'
+            self.Y_Axis_Load_Q: str = 'Remaining thermal energy [kWh]'
+            self.label_aim: str = 'Aim of simulation'
+            self.button_rename_scenario: str = 'Rename scenario'
+            self.label_aim_question: str = 'What is the purpose of the simulation?'
+            self.comboBoxSizeMethodList: list = ['Fast', 'Robust']
+            self.comboBox_AimList: list = ['Determine temperature profile', 'Determine required depth',
+                                           'Size bore field by length and width', 'Optimize load profile']
+            self.label_Seperator: str = 'Seperator in CSV-fileImport:'
+            self.comboBox_SeperatorList: list = ["Semicolon ';'", "Comma ','"]
+            self.label_data_file: str = 'Select data fileImport'
+            self.label_Scenario_Head: str = 'Scenario saving settings'
+            self.checkBox_AutoSaving: str = 'Automatic saving'
+            self.label_Scenario_Hint: str = 'If Auto saving is selected the scenario will automatically saved if a ' \
+                                            'scenario is changed. Otherwise the scenario has to be saved with the ' \
+                                            'Update scenario button in the upper left corner if the changes should' \
+                                            ' not be lost.'
+            self.label_Borehole_Resistance: str = 'Equivalent borehole resistance'
+            self.label_Rb_calculation_method: str = 'Calculation method:'
+            self.comboBox_Rb_methodList: list = ['Known constant value', 'Unknown constant value',
+                                                 'During calculation updating value']
+            self.label_fluid_data: str = 'Fluid data'
+            self.label_fluid_lambda: str = 'Thermal conductivity [W/mK]: '
+            self.label_fluid_mass_flow_rate: str = 'Mass flow rate [kg/s]: '
+            self.label_fluid_density: str = 'Density [kg/m³]:'
+            self.label_fluid_thermal_capacity: str = 'Thermal capacity [J/kg K]:'
+            self.label_fluid_viscosity: str = 'Dynamic viscosity [Pa s]:'
+            self.label_pipe_data: str = 'Pipe data'
+            self.label_NumberOfPipes: str = 'Number of pipes [#]:'
+            self.label_grout_conductivity: str = 'Grout thermal conductivity [W/mK]: '
+            self.label_pipe_conductivity: str = 'Pipe thermal conductivity [W/mK]: '
+            self.label_pipe_outer_radius: str = 'Outer pipe radius [m]: '
+            self.label_pipe_inner_radius: str = 'Inner pipe radius [m]: '
+            self.label_borehole_radius: str = 'Borehole radius [m]:'
+            self.label_pipe_distance: str = 'Distance of pipe until center [m]:'
+            self.label_pipe_roughness: str = 'Pipe roughness [m]:'
+            self.label_borehole_burial_depth: str = 'Burial depth [m]:'
+            self.label_ResOptimizeLoad1: str = 'The peak heating / cooling load is: '
+            self.label_ResOptimizeLoad2: str = 'The heating / cooling load is: '
+            self.label_ResOptimizeLoad3: str = 'This is '
+            self.label_ResOptimizeLoad4: str = '% of the total load. '
+            self.label_ResOptimizeLoad5: str = 'The remaining peak heating / cooling load is: '
+            self.label_ResOptimizeLoad6: str = 'The remaining heating / cooling load is: '
+            self.NotCalculated: str = 'Not calculated'
+            self.NoSolution: str = 'No Solution found'
+            self.label_decimal: str = 'Decimal sign in CSV-fileImport:'
+            self.comboBox_decimalList: list = ["Point '.'", "Comma ','"]
+            self.createLists()
             return
         if lang == 1:  # german
-            self.label_Language: str = 'Sprache'
+            self.label_Language: str = 'Sprache: '
             self.pushButton_SaveScenario: str = 'Szenario aktualisieren'
             self.pushButton_AddScenario: str = 'Szenario hinzufügen'
             self.pushButton_DeleteScenario: str = 'Szenario löschen'
-            self.scenarioStr: str = 'Szenario'
-            self.pushButton_Start: str = 'Starte Berechnung'
+            self.scenarioString: str = 'Szenario'
+            self.pushButton_start_multiple: str = 'Berechne alle Szenarios'
+            self.pushButton_start_single: str = 'Berechne ausgewähltes Szenario'
             self.pushButton_Cancel: str = 'Verlassen'
             self.pushButton_General: str = 'Bohrloch \nund Erdreich'
             self.pushButton_thermalDemands: str = 'Thermischer \nBedarf'
@@ -366,8 +565,8 @@ class TrClass:
             self.label_Filename: str = 'Dateiname: '
             self.label_SheetName: str = 'Tabellenblattname: '
             self.pushButton_load: str = 'Laden'
-            self.page_File: str = 'Datendatei'
-            self.page_DataLocation: str = 'Speicherort der Daten in der Datei'
+            self.toolBoxFile: str = 'Datendatei'
+            self.toolBoxDataLocation: str = 'Speicherort der Daten in der Datei'
             self.label_dataColumn: str = 'Thermische Lasten: '
             self.label_DataUnit: str = 'Dateneinheit: '
             self.label_HeatingLoadLine: str = 'Heizlastspalte: '
@@ -375,8 +574,8 @@ class TrClass:
             self.label_combined: str = 'Load line: '
             self.label_TimeStep: str = 'Zeitschritt: '
             self.label_DateLine: str = 'Datumsspalte: '
-            self.comboBox_dataColumn: list = ['2 Spalten', '1 Spalte']
-            self.comboBox_timeStep: list = ['1 Std.', '15 Min.', 'Automatisch']
+            self.comboBoxDataColumnList: list = ['2 Spalten', '1 Spalte']
+            self.comboBoxTimeStepList: list = ['1 Std.', '15 Min.', 'Automatisch']
             self.pushButton_calculate: str = 'Berechne'
             self.ErrorMassage: str = 'Fehler!'
             self.UnableDataFormat: str = 'Das ausgewählte Datenformat kann nicht geöffnet werden!'
@@ -407,7 +606,8 @@ class TrClass:
             self.label_English: str = 'Englisch'
             self.label_Dutch: str = 'Niederländisch'
             self.label_Italian: str = 'Italienisch'
-            self.label_French: str = 'französisch'
+            self.label_French: str = 'Französisch'
+            self.label_Spanish: str = 'Spanisch'
             self.label_New: str = 'Neues Projekt'
             self.label_Save: str = 'Speichere Projekt'
             self.label_Open: str = 'Öffne Projekt'
@@ -415,20 +615,78 @@ class TrClass:
             self.Calculation_Finished: str = 'Berechnung fertiggestellt'
             self.GHE_tool_imported: str = 'GHEtool importiert'
             self.GHE_tool_imported_start: str = 'Starte GHEtool zu importieren'
-            self.comboBox_Size_Method: list = ['Schnell', 'Robust']
+            self.comboBoxSizeMethodList: list = ['Schnell', 'Robust']
             self.label_new_scenario: str = 'Neuer Name für das Szenario'
             self.new_name: str = 'Neuer Name für '
-            self.label_okay: str = ' Okay '
-            self.label_abort: str = ' Abbruch '
-            self.create_language_list()
+            self.label_okay: str = 'Okay '
+            self.label_abort: str = 'Abbruch '
+            self.NoBackupFile: str = 'Keine Sicherungsdatei gefunden'
+            self.pushButton_borehole_resistance: str = 'Bohrloch-\nwiderstand'
+            self.label_close: str = 'Schließen'
+            self.label_cancel: str = 'Abbrechen'
+            self.label_CancelText: str = 'Bist du sicher das Programm zu schließen? Alle ungesicherten Änderungen ' \
+                                         'gehen sonst verloren.'
+            self.label_CancelTitle: str = 'Warnung'
+            self.label_LeaveScenarioText: str = 'Bist du sicher das Szenario zu verlasen? Alle ungesicherten ' \
+                                                'Änderungen gehen sonst verloren.'
+            self.label_LeaveScenario: str = 'Szenario verlassen'
+            self.label_StayScenario: str = 'Beim Szenario bleiben'
+            self.X_Axis_Load: str = 'Monat des Jahres'
+            self.Y_Axis_Load_P: str = 'Übriggebliebene Spitzenleistung [kW]'
+            self.Y_Axis_Load_Q: str = 'Übriggebliebene thermische Last [kWh]'
+            self.label_aim: str = 'Ziel der Simulation'
+            self.button_rename_scenario: str = 'Szenario umbenennen'
+            self.label_aim_question: str = 'Was ist das Ziel der Simulation?'
+            self.comboBox_AimList: list = ['Bestimme Temperaturprofil', 'Bestimme notwendige Tiefe',
+                                           'Dimensioniere Bohrfeld nach Länge und Breite', 'Optimiere Lastprofil']
+            self.label_Seperator: str = 'Trenner in der CSV-Datei:'
+            self.comboBox_SeperatorList: list = ["Semikolon ';'", "Komma ','"]
+            self.label_data_file: str = 'Wähle Datendatei'
+            self.label_Scenario_Head: str = 'Szenarioeinstellungen für das Speichern'
+            self.checkBox_AutoSaving: str = 'Automatisches speichern'
+            self.label_Scenario_Hint: str = 'Wenn Automatisch speichern ausgewählt ist, wird das Szenario automatisch' \
+                                            ' gespeichert, wenn ein Szenario geändert wird. Andernfalls muss das ' \
+                                            'Szenario mit der Schaltfläche Szenario aktualisieren in der oberen ' \
+                                            'linken Ecke gespeichert werden, wenn die Änderungen nicht verloren ' \
+                                            'gehen sollen.'
+            self.label_Borehole_Resistance: str = 'Equivalänter Bohrlochwiderstand'
+            self.label_Rb_calculation_method: str = 'Berechnungsmethode:'
+            self.comboBox_Rb_methodList: list = ['Bekannter konstanter Wert', 'Unbekannter konstanter Wert',
+                                                 'Während der Berechnung aktualisierender Wert']
+            self.label_fluid_data: str = 'Fluiddaten'
+            self.label_fluid_lambda: str = 'Wärmeleitfähigkeit [W/mK]: '
+            self.label_fluid_mass_flow_rate: str = 'Massenstrom [kg/s]: '
+            self.label_fluid_density: str = 'Dichte [kg/m³]:'
+            self.label_fluid_thermal_capacity: str = 'Wärmekapazität [J/kg K]:'
+            self.label_fluid_viscosity: str = 'Dynamische Viskosität [Pa s]:'
+            self.label_pipe_data: str = 'Rohrdaten'
+            self.label_NumberOfPipes: str = 'Anzahl an Rohren [#]:'
+            self.label_grout_conductivity: str = 'Wärmeleitfähigkeit der Füllung [W/mK]: '
+            self.label_pipe_conductivity: str = 'Wärmeleitfähigkeit der Rohre [W/mK]: '
+            self.label_pipe_outer_radius: str = 'Äußerer Rohrradius [m]: '
+            self.label_pipe_inner_radius: str = 'Innerer Rohrradius [m]: '
+            self.label_borehole_radius: str = 'Bohrlochradius [m]:'
+            self.label_pipe_distance: str = 'Distanz zwischen Rohr und Mittelpunkt [m]:'
+            self.label_pipe_roughness: str = 'Rohrrauhigkeit [m]:'
+            self.label_borehole_burial_depth: str = 'Vergrabungstiefe [m]:'
+            self.label_ResOptimizeLoad1: str = 'Die Spitzenheiz-/kühllast ist: '
+            self.label_ResOptimizeLoad2: str = 'Die Heiz-/Kühllast: '
+            self.label_ResOptimizeLoad3: str = 'Dies ist '
+            self.label_ResOptimizeLoad4: str = '% der kompletten Last. '
+            self.label_ResOptimizeLoad5: str = 'Die übrigbleibende Spitzenheiz-/kühllast ist: '
+            self.label_ResOptimizeLoad6: str = 'Die übrigbleibende Heiz-/Kühllast:  '
+            self.NotCalculated: str = 'Noch nicht berechnet'
+            self.NoSolution: str = 'Keine Lösung gefunden'
+            self.label_decimal: str = 'Dezimalzeichen in CSV-Datei:'
+            self.comboBox_decimalList: list = ["Punkt '.'", "Komma ','"]
+            self.createLists()
             return
         if lang == 2:  # Dutch # thanks to Wouter
-            self.label_Language: str = 'Taal'
+            self.label_Language: str = 'Taal: '
             self.pushButton_SaveScenario: str = 'Update scenario'
             self.pushButton_AddScenario: str = 'Nieuw scenario'
             self.pushButton_DeleteScenario: str = 'Verwijder scenario'
-            self.scenarioStr: str = 'Scenario'
-            self.pushButton_Start: str = 'Start'
+            self.scenarioString: str = 'Scenario'
             self.pushButton_Cancel: str = 'Sluit'
             self.pushButton_General: str = 'Boorveld \n en grond'
             self.pushButton_thermalDemands: str = 'Thermische \nvraag'
@@ -486,8 +744,8 @@ class TrClass:
             self.label_Filename: str = 'Bestandsnaam: '
             self.label_SheetName: str = 'Naam van het blad: '
             self.pushButton_load: str = 'Laad'
-            self.page_File: str = 'Databestand'
-            self.page_DataLocation: str = 'Locatie van de data in bestand'
+            self.toolBoxFile: str = 'Databestand'
+            self.toolBoxDataLocation: str = 'Locatie van de data in bestand'
             self.label_dataColumn: str = 'Thermische vraag: '
             self.label_DataUnit: str = 'Eenheid data: '
             self.label_HeatingLoadLine: str = 'Belastingslijn verwarming: '
@@ -495,8 +753,8 @@ class TrClass:
             self.label_combined: str = 'Belastingslijn: '
             self.label_TimeStep: str = 'Tijdsstap: '
             self.label_DateLine: str = 'Datumlijn: '
-            self.comboBox_dataColumn: list = ['2 kolommen', '1 kolom']
-            self.comboBox_timeStep: list = ['1 uur', '15 min.', 'Automatisch']
+            self.comboBoxDataColumnList: list = ['2 kolommen', '1 kolom']
+            self.comboBoxTimeStepList: list = ['1 uur', '15 min.', 'Automatisch']
             self.pushButton_calculate: str = 'Bereken'
             self.ErrorMassage: str = 'Error!'
             self.UnableDataFormat: str = 'Het is niet mogelijk het geselecteerde dataformaat te openen!'
@@ -523,7 +781,7 @@ class TrClass:
             self.label_Size_B: str = 'Borehole spacing: '
             self.label_Size_L: str = 'Length of rectangular field: '
             self.label_Size_W: str = 'Width of rectangular field: '
-            self.comboBox_Size_Method: list = ['Fast', 'Robust']
+            self.comboBoxSizeMethodList: list = ['Fast', 'Robust']
             self.label_File: str = 'File'
             self.label_Calculation: str = 'Calculation'
             self.label_Settings: str = 'Settings'
@@ -532,6 +790,7 @@ class TrClass:
             self.label_Dutch: str = 'Dutch'
             self.label_Italian: str = 'Italian'
             self.label_French: str = 'French'
+            self.label_Spanish: str = 'Spanish'
             self.label_New: str = 'New Project'
             self.label_Save: str = 'Save Project'
             self.label_Open: str = 'Open Project'
@@ -541,17 +800,75 @@ class TrClass:
             self.GHE_tool_imported_start: str = 'Start importing GHEtool'
             self.label_new_scenario: str = 'Enter new scenario name'
             self.new_name: str = 'New name for '
-            self.label_okay: str = ' Okay '
-            self.label_abort: str = ' Abort '
-            self.create_language_list()
+            self.label_okay: str = 'Okay '
+            self.label_abort: str = 'Abort '
+            self.NoBackupFile: str = 'no backup fileImport'
+            self.pushButton_borehole_resistance: str = 'Borehole\nresistance'
+            self.label_close: str = 'Close'
+            self.label_cancel: str = 'Cancel'
+            self.label_CancelText: str = 'Are you sure you want to quit? Any unsaved work will be lost.'
+            self.label_CancelTitle: str = 'Warning'
+            self.label_LeaveScenarioText: str = 'Are you sure you want to leave scenario? Any unsaved work will be ' \
+                                                'lost.'
+            self.label_LeaveScenario: str = 'Leave scenario'
+            self.label_StayScenario: str = 'Stay by scenario'
+            self.X_Axis_Load: str = 'Month of year'
+            self.Y_Axis_Load_P: str = 'Remaining peak thermal power [kW]'
+            self.Y_Axis_Load_Q: str = 'Remaining thermal energy [kWh]'
+            self.label_aim: str = 'Aim of simulation'
+            self.button_rename_scenario: str = 'Rename scenario'
+            self.label_aim_question: str = 'What is the purpose of the simulation?'
+            self.comboBox_AimList: list = ['Determine temperature profile', 'Determine required depth',
+                                           'Size bore field by length and width', 'Optimize load profile']
+            self.label_Seperator: str = 'Seperator in CSV-fileImport:'
+            self.comboBox_SeperatorList: list = ["Semicolon ';'", "Comma ','"]
+            self.label_data_file: str = 'Select data fileImport'
+            self.label_Scenario_Head: str = 'Scenario saving settings'
+            self.checkBox_AutoSaving: str = 'Automatic saving'
+            self.label_Scenario_Hint: str = 'If Auto saving is selected the scenario will automatically saved if a ' \
+                                            'scenario is changed. Otherwise the scenario has to be saved with the ' \
+                                            'Update scenario butten in the upper left corner if the changes should not' \
+                                            ' be lost.'
+            self.label_Borehole_Resistance: str = 'Equivalent borehole resistance'
+            self.label_Rb_calculation_method: str = 'Calculation method:'
+            self.comboBox_Rb_methodList: list = ['Known constant value', 'Unknown constant value',
+                                                 'During calculation updating value']
+            self.label_fluid_data: str = 'Fluid data'
+            self.label_fluid_lambda: str = 'Thermal conductivity [W/mK]: '
+            self.label_fluid_mass_flow_rate: str = 'Mass flow rate [kg/s]: '
+            self.label_fluid_density: str = 'Density [kg/m³]:'
+            self.label_fluid_thermal_capacity: str = 'Thermal capacity [J/kg K]:'
+            self.label_fluid_viscosity: str = 'Dynamic viscosity [Pa s]:'
+            self.label_pipe_data: str = 'Pipe data'
+            self.label_NumberOfPipes: str = 'Number of pipes [#]:'
+            self.label_grout_conductivity: str = 'Grout thermal conductivity [W/mK]: '
+            self.label_pipe_conductivity: str = 'Pipe thermal conductivity [W/mK]: '
+            self.label_pipe_outer_radius: str = 'Outer pipe radius [m]: '
+            self.label_pipe_inner_radius: str = 'Inner pipe radius [m]: '
+            self.label_borehole_radius: str = 'Borehole radius [m]:'
+            self.label_pipe_distance: str = 'Distance of pipe until center [m]:'
+            self.label_pipe_roughness: str = 'Pipe roughness [m]:'
+            self.label_borehole_burial_depth: str = 'Burial depth [m]:'
+            self.label_ResOptimizeLoad1: str = 'The peak heating / cooling load is: '
+            self.label_ResOptimizeLoad2: str = 'The heating / cooling load is: '
+            self.label_ResOptimizeLoad3: str = 'This is '
+            self.label_ResOptimizeLoad4: str = '% of the total load. '
+            self.label_ResOptimizeLoad5: str = 'The remaining peak heating / cooling load is: '
+            self.label_ResOptimizeLoad6: str = 'The remaining heating / cooling load is: '
+            self.pushButton_start_multiple: str = 'Calculate all scenarios'
+            self.pushButton_start_single: str = 'Calculate current scenario'
+            self.NotCalculated: str = 'Not calculated'
+            self.NoSolution: str = 'No Solution found'
+            self.label_decimal: str = 'Decimal sign in der CSV-fileImport:'
+            self.comboBox_decimalList: list = ["Point '.'", "Comma ','"]
+            self.createLists()
             return
         if lang == 3:  # French # Thanks to Felix Arjuna
-            self.label_Language: str = 'Languange'
+            self.label_Language: str = 'Languange: '
             self.pushButton_SaveScenario: str = 'Mettre à jour le scénario'
             self.pushButton_AddScenario: str = 'Ajouter un scénario'
             self.pushButton_DeleteScenario: str = 'Supprimer un scénario'
-            self.scenarioStr: str = 'Scénario'
-            self.pushButton_Start: str = 'Démarrer'
+            self.scenarioString: str = 'Scénario'
             self.pushButton_Cancel: str = 'Sortie'
             self.pushButton_General: str = 'Forage \net terre'
             self.pushButton_thermalDemands: str = 'Demande \nthermique'
@@ -609,8 +926,8 @@ class TrClass:
             self.label_Filename: str = 'Nom de fichier: '
             self.label_SheetName: str = 'Nom de la feuille: '
             self.pushButton_load: str = 'Chargement'
-            self.page_File: str = 'Fichier de données'
-            self.page_DataLocation: str = 'Emplacement des données dans le fichier'
+            self.toolBoxFile: str = 'Fichier de données'
+            self.toolBoxDataLocation: str = 'Emplacement des données dans le fichier'
             self.label_dataColumn: str = 'Demande thermique: '
             self.label_DataUnit: str = 'Données de l\'unité: '
             self.label_HeatingLoadLine: str = 'Ligne de charge de chauffage: '
@@ -618,8 +935,8 @@ class TrClass:
             self.label_combined: str = 'Ligne de charge: '
             self.label_TimeStep: str = 'Pas de temps: '
             self.label_DateLine: str = 'Ligne de date: '
-            self.comboBox_dataColumn: list = ['2 colonnes', '1 colonne']
-            self.comboBox_timeStep: list = ['1 Std.', '15 Min.', 'Automatique']
+            self.comboBoxDataColumnList: list = ['2 colonnes', '1 colonne']
+            self.comboBoxTimeStepList: list = ['1 Std.', '15 Min.', 'Automatique']
             self.pushButton_calculate: str = 'Calculer'
             self.ErrorMassage: str = 'Erreur!'
             self.UnableDataFormat: str = 'Impossible d\'ouvrir le format de données sélectionné!'
@@ -646,7 +963,7 @@ class TrClass:
             self.label_Size_B: str = 'Borehole spacing: '
             self.label_Size_L: str = 'Length of rectangular field: '
             self.label_Size_W: str = 'Width of rectangular field: '
-            self.comboBox_Size_Method: list = ['Fast', 'Robust']
+            self.comboBoxSizeMethodList: list = ['Fast', 'Robust']
             self.label_File: str = 'File'
             self.label_Calculation: str = 'Calculation'
             self.label_Settings: str = 'Settings'
@@ -655,6 +972,7 @@ class TrClass:
             self.label_Dutch: str = 'Dutch'
             self.label_Italian: str = 'Italian'
             self.label_French: str = 'French'
+            self.label_Spanish: str = 'Spanish'
             self.label_New: str = 'New Project'
             self.label_Save: str = 'Save Project'
             self.label_Open: str = 'Open Project'
@@ -664,17 +982,75 @@ class TrClass:
             self.GHE_tool_imported_start: str = 'Start importing GHEtool'
             self.label_new_scenario: str = 'Enter new scenario name'
             self.new_name: str = 'New name for '
-            self.label_okay: str = ' Okay '
-            self.label_abort: str = ' Abort '
-            self.create_language_list()
+            self.label_okay: str = 'Okay '
+            self.label_abort: str = 'Abort '
+            self.NoBackupFile: str = 'no backup fileImport'
+            self.pushButton_borehole_resistance: str = 'Borehole\nresistance'
+            self.label_close: str = 'Close'
+            self.label_cancel: str = 'Cancel'
+            self.label_CancelText: str = 'Are you sure you want to quit? Any unsaved work will be lost.'
+            self.label_CancelTitle: str = 'Warning'
+            self.label_LeaveScenarioText: str = 'Are you sure you want to leave scenario? Any unsaved work will be ' \
+                                                'lost.'
+            self.label_LeaveScenario: str = 'Leave scenario'
+            self.label_StayScenario: str = 'Stay by scenario'
+            self.X_Axis_Load: str = 'Month of year'
+            self.Y_Axis_Load_P: str = 'Remaining peak thermal power [kW]'
+            self.Y_Axis_Load_Q: str = 'Remaining thermal energy [kWh]'
+            self.label_aim: str = 'Aim of simulation'
+            self.button_rename_scenario: str = 'Rename scenario'
+            self.label_aim_question: str = 'What is the purpose of the simulation?'
+            self.comboBox_AimList: list = ['Determine temperature profile', 'Determine required depth',
+                                           'Size bore field by length and width', 'Optimize load profile']
+            self.label_Seperator: str = 'Seperator in CSV-fileImport:'
+            self.comboBox_SeperatorList: list = ["Semicolon ';'", "Comma ','"]
+            self.label_data_file: str = 'Select data fileImport'
+            self.label_Scenario_Head: str = 'Scenario saving settings'
+            self.checkBox_AutoSaving: str = 'Automatic saving'
+            self.label_Scenario_Hint: str = 'If Auto saving is selected the scenario will automatically saved if a ' \
+                                            'scenario is changed. Otherwise the scenario has to be saved with the ' \
+                                            'Update scenario butten in the upper left corner if the changes should not' \
+                                            ' be lost.'
+            self.label_Borehole_Resistance: str = 'Equivalent borehole resistance'
+            self.label_Rb_calculation_method: str = 'Calculation method:'
+            self.comboBox_Rb_methodList: list = ['Known constant value', 'Unknown constant value',
+                                                 'During calculation updating value']
+            self.label_fluid_data: str = 'Fluid data'
+            self.label_fluid_lambda: str = 'Thermal conductivity [W/mK]: '
+            self.label_fluid_mass_flow_rate: str = 'Mass flow rate [kg/s]: '
+            self.label_fluid_density: str = 'Density [kg/m³]:'
+            self.label_fluid_thermal_capacity: str = 'Thermal capacity [J/kg K]:'
+            self.label_fluid_viscosity: str = 'Dynamic viscosity [Pa s]:'
+            self.label_pipe_data: str = 'Pipe data'
+            self.label_NumberOfPipes: str = 'Number of pipes [#]:'
+            self.label_grout_conductivity: str = 'Grout thermal conductivity [W/mK]: '
+            self.label_pipe_conductivity: str = 'Pipe thermal conductivity [W/mK]: '
+            self.label_pipe_outer_radius: str = 'Outer pipe radius [m]: '
+            self.label_pipe_inner_radius: str = 'Inner pipe radius [m]: '
+            self.label_borehole_radius: str = 'Borehole radius [m]:'
+            self.label_pipe_distance: str = 'Distance of pipe until center [m]:'
+            self.label_pipe_roughness: str = 'Pipe roughness [m]:'
+            self.label_borehole_burial_depth: str = 'Burial depth [m]:'
+            self.label_ResOptimizeLoad1: str = 'The peak heating / cooling load is: '
+            self.label_ResOptimizeLoad2: str = 'The heating / cooling load is: '
+            self.label_ResOptimizeLoad3: str = 'This is '
+            self.label_ResOptimizeLoad4: str = '% of the total load. '
+            self.label_ResOptimizeLoad5: str = 'The remaining peak heating / cooling load is: '
+            self.label_ResOptimizeLoad6: str = 'The remaining heating / cooling load is: '
+            self.pushButton_start_multiple: str = 'Calculate all scenarios'
+            self.pushButton_start_single: str = 'Calculate current scenario'
+            self.NotCalculated: str = 'Not calculated'
+            self.NoSolution: str = 'No Solution found'
+            self.label_decimal: str = 'Decimal sign in CSV-fileImport:'
+            self.comboBox_decimalList: list = ["Point '.'", "Comma ','"]
+            self.createLists()
             return
         if lang == 4:  # Italian # Thanks to Felix Arjuna
-            self.label_Language: str = 'Languange'
+            self.label_Language: str = 'Languange: '
             self.pushButton_SaveScenario: str = 'Aggiorna scenario'
             self.pushButton_AddScenario: str = 'Aggiungi scenario'
             self.pushButton_DeleteScenario: str = 'Cancella scenario'
-            self.scenarioStr: str = 'Scenario'
-            self.pushButton_Start: str = 'Inizia'
+            self.scenarioString: str = 'Scenario'
             self.pushButton_Cancel: str = 'Esci'
             self.pushButton_General: str = 'Foro e \nterra'
             self.pushButton_thermalDemands: str = 'Richieste \ntermiche'
@@ -728,12 +1104,12 @@ class TrClass:
             self.label_Oct: str = 'Ottobre'
             self.label_Nov: str = 'Novembre'
             self.label_Dec: str = 'Dicembre'
-            self.label_DataType: str = 'Tipo di file: '
-            self.label_Filename: str = 'Nome file: '
+            self.label_DataType: str = 'Tipo di fileImport: '
+            self.label_Filename: str = 'Nome fileImport: '
             self.label_SheetName: str = 'Nome foglio:  '
             self.pushButton_load: str = 'Caricare'
-            self.page_File: str = 'File dati'
-            self.page_DataLocation: str = 'Posizione dati nel file'
+            self.toolBoxFile: str = 'File dati'
+            self.toolBoxDataLocation: str = 'Posizione dati nel fileImport'
             self.label_dataColumn: str = 'Richieste termiche: '
             self.label_DataUnit: str = 'Dati \ndell\'unità:  '
             self.label_HeatingLoadLine: str = 'Linea di carico di riscaldamento: '
@@ -741,15 +1117,15 @@ class TrClass:
             self.label_combined: str = 'Linea di carico: '
             self.label_TimeStep: str = 'Passo temporale: '
             self.label_DateLine: str = 'Linea della data: '
-            self.comboBox_dataColumn: list = ['2 colonne', '1 colonna']
-            self.comboBox_timeStep: list = ['1 Ora', '15 Min.', 'Automatico']
+            self.comboBoxDataColumnList: list = ['2 colonne', '1 colonna']
+            self.comboBoxTimeStepList: list = ['1 Ora', '15 Min.', 'Automatico']
             self.pushButton_calculate: str = 'Calcola'
             self.ErrorMassage: str = 'Errore!'
             self.UnableDataFormat: str = 'Impossibile aprire il formato dati selezionato!'
-            self.ChooseCSV: str = 'Scegli csv per caricare il file dei dati'
-            self.ChooseXLS: str = 'Scegli xlsx per caricare il file di dati'
-            self.ChooseXLSX: str = 'Scegli xls per caricare il file di dati'
-            self.NoFileSelected: str = 'Nessun file selezionato.'
+            self.ChooseCSV: str = 'Scegli csv per caricare il fileImport dei dati'
+            self.ChooseXLS: str = 'Scegli xlsx per caricare il fileImport di dati'
+            self.ChooseXLSX: str = 'Scegli xls per caricare il fileImport di dati'
+            self.NoFileSelected: str = 'Nessun il file selezionato.'
             self.ValueError: str = 'Errore di valore: controlla le colonne selezionate'
             self.ColumnError: str = 'Colonna errata: controlla le colonne selezionate'
             self.ChoosePKL: str = 'Scegliere pkl per caricare gli scenari'
@@ -769,7 +1145,7 @@ class TrClass:
             self.label_Size_B: str = 'Borehole spacing: '
             self.label_Size_L: str = 'Length of rectangular field: '
             self.label_Size_W: str = 'Width of rectangular field: '
-            self.comboBox_Size_Method: list = ['Fast', 'Robust']
+            self.comboBoxSizeMethodList: list = ['Fast', 'Robust']
             self.label_File: str = 'File'
             self.label_Calculation: str = 'Calculation'
             self.label_Settings: str = 'Settings'
@@ -778,6 +1154,7 @@ class TrClass:
             self.label_Dutch: str = 'Dutch'
             self.label_Italian: str = 'Italian'
             self.label_French: str = 'French'
+            self.label_Spanish: str = 'Spanish'
             self.label_New: str = 'New Project'
             self.label_Save: str = 'Save Project'
             self.label_Open: str = 'Open Project'
@@ -787,7 +1164,66 @@ class TrClass:
             self.GHE_tool_imported_start: str = 'Start importing GHEtool'
             self.label_new_scenario: str = 'Enter new scenario name'
             self.new_name: str = 'New name for '
-            self.label_okay: str = ' Okay '
-            self.label_abort: str = ' Abort '
-            self.create_language_list()
+            self.label_okay: str = 'Okay '
+            self.label_abort: str = 'Abort '
+            self.NoBackupFile: str = 'no backup fileImport'
+            self.pushButton_borehole_resistance: str = 'Borehole\nresistance'
+            self.label_close: str = 'Close'
+            self.label_cancel: str = 'Cancel'
+            self.label_CancelText: str = 'Are you sure you want to quit? Any unsaved work will be lost.'
+            self.label_CancelTitle: str = 'Warning'
+            self.label_LeaveScenarioText: str = 'Are you sure you want to leave scenario? Any unsaved work will be ' \
+                                                'lost.'
+            self.label_LeaveScenario: str = 'Leave scenario'
+            self.label_StayScenario: str = 'Stay by scenario'
+            self.X_Axis_Load: str = 'Month of year'
+            self.Y_Axis_Load_P: str = 'Remaining peak thermal power [kW]'
+            self.Y_Axis_Load_Q: str = 'Remaining thermal energy [kWh]'
+            self.label_aim: str = 'Aim of simulation'
+            self.button_rename_scenario: str = 'Rename scenario'
+            self.label_aim_question: str = 'What is the purpose of the simulation?'
+            self.comboBox_AimList: list = ['Determine temperature profile', 'Determine required depth',
+                                           'Size bore field by length and width', 'Optimize load profile']
+            self.label_Seperator: str = 'Seperator in CSV-fileImport:'
+            self.comboBox_SeperatorList: list = ["Semicolon ';'", "Comma ','"]
+            self.label_data_file: str = 'Select data fileImport'
+            self.label_Scenario_Head: str = 'Scenario saving settings'
+            self.checkBox_AutoSaving: str = 'Automatic saving'
+            self.label_Scenario_Hint: str = 'If Auto saving is selected the scenario will automatically saved if a ' \
+                                            'scenario is changed. Otherwise the scenario has to be saved with the ' \
+                                            'Update scenario butten in the upper left corner if the changes should not' \
+                                            ' be lost.'
+            self.label_Borehole_Resistance: str = 'Equivalent borehole resistance'
+            self.label_Rb_calculation_method: str = 'Calculation method:'
+            self.comboBox_Rb_methodList: list = ['Known constant value', 'Unknown constant value',
+                                                 'During calculation updating value']
+            self.label_fluid_data: str = 'Fluid data'
+            self.label_fluid_lambda: str = 'Thermal conductivity [W/mK]: '
+            self.label_fluid_mass_flow_rate: str = 'Mass flow rate [kg/s]: '
+            self.label_fluid_density: str = 'Density [kg/m³]:'
+            self.label_fluid_thermal_capacity: str = 'Thermal capacity [J/kg K]:'
+            self.label_fluid_viscosity: str = 'Dynamic viscosity [Pa s]:'
+            self.label_pipe_data: str = 'Pipe data'
+            self.label_NumberOfPipes: str = 'Number of pipes [#]:'
+            self.label_grout_conductivity: str = 'Grout thermal conductivity [W/mK]: '
+            self.label_pipe_conductivity: str = 'Pipe thermal conductivity [W/mK]: '
+            self.label_pipe_outer_radius: str = 'Outer pipe radius [m]: '
+            self.label_pipe_inner_radius: str = 'Inner pipe radius [m]: '
+            self.label_borehole_radius: str = 'Borehole radius [m]:'
+            self.label_pipe_distance: str = 'Distance of pipe until center [m]:'
+            self.label_pipe_roughness: str = 'Pipe roughness [m]:'
+            self.label_borehole_burial_depth: str = 'Burial depth [m]:'
+            self.label_ResOptimizeLoad1: str = 'The peak heating / cooling load is: '
+            self.label_ResOptimizeLoad2: str = 'The heating / cooling load is:  '
+            self.label_ResOptimizeLoad3: str = 'This is '
+            self.label_ResOptimizeLoad4: str = '% of the total load. '
+            self.label_ResOptimizeLoad5: str = 'The remaining peak heating / cooling load is: '
+            self.label_ResOptimizeLoad6: str = 'The remaining heating / cooling load is: '
+            self.pushButton_start_multiple: str = 'Calculate all scenarios'
+            self.pushButton_start_single: str = 'Calculate current scenario'
+            self.NotCalculated: str = 'Not calculated'
+            self.NoSolution: str = 'No Solution found'
+            self.label_decimal: str = 'Decimal sign in CSV-fileImport:'
+            self.comboBox_decimalList: list = ["Point '.'", "Comma ','"]
+            self.createLists()
             return
