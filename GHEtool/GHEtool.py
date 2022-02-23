@@ -946,7 +946,6 @@ class Borefield:
 
         # check if datafile exists
         if not os.path.isfile(f'{folder}/Data/{name}'):
-            print(name)
             raise Exception('There is no precalculated data available. Please use the createCustomDatafile.')
 
         # load data fileImport
@@ -1268,6 +1267,7 @@ class Borefield:
         # list of possible combinations
         combo: list = []
         # deactivate printing
+        printingBackup = self.printing
         self.printing: bool = False
         # minimal product to break loop
         product_min = 0
@@ -1320,8 +1320,8 @@ class Borefield:
         self.H = combo[0][3]
         # reset variables for further calculations
         self._resetForSizing(self.N_1, self.N_2)
-        # activate printing
-        self.printing: bool = True
+        # reset printing
+        self.printing: bool = printingBackup
         # save result list
         self.combo = combo
         # return results list
@@ -1352,6 +1352,7 @@ class Borefield:
         # list of possible combinations
         combo: list = []
         # deactivate printing
+        printingBackup = self.printing
         self.printing: bool = False
         # start loop over borehole spacing
         for B in np.arange(BMax, BMin * 0.99999, -0.5):
@@ -1467,7 +1468,7 @@ class Borefield:
         # reset variables for further calculations
         self._resetForSizing(self.N_1, self.N_2)
         # activate printing
-        self.printing: bool = True
+        self.printing: bool = printingBackup
         # save result list
         self.combo = combo
         # return results list
