@@ -407,7 +407,7 @@ class Borefield:
             L = (self.qa * Ra + self.qm * Rm + self.qh * Rd + self.qh * self._Rb) / abs(self.Tf - self.Tg)
             # updating the depth values
             H_prev = self.H
-            self.H = min(L / self.numberOfBoreholes, self.H_max)
+            self.H = L / self.numberOfBoreholes
         return self.H
 
     @property
@@ -436,7 +436,7 @@ class Borefield:
 
             # updating the depth values
             H_prev = self.H
-            self.H = min(L / self.numberOfBoreholes, self.H_max)
+            self.H = L / self.numberOfBoreholes
         return self.H
 
     def size(self, H_init: float, L2Sizing: bool = 1, quadrantSizing: int = 0, useConstantRb: bool = None):
