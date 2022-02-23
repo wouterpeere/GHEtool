@@ -7,7 +7,11 @@ import os.path
 import matplotlib.pyplot as plt
 import functools
 from tkinter import filedialog
-from VariableClasses.VariableClasses import GroundData, PipeData, FluidData
+
+if __name__ == "__main__":
+    from VariableClasses import *
+else:
+    from .VariableClasses import *
 
 FOLDER = os.path.dirname(os.path.realpath(__file__))  # solve problem with importing GHEtool from sub-folders
 
@@ -1511,3 +1515,4 @@ class Borefield:
                     res.append((i, j))
         # return list of possible solutions
         return res
+

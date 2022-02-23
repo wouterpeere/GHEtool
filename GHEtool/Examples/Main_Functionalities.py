@@ -9,12 +9,8 @@ This file contains all the main functionalities of GHEtool being:
 """
 
 # import all the relevant functions
-from os.path import dirname, realpath
-from sys import path
-currentdir = dirname(realpath(__file__))
-parentdir = dirname(currentdir)
-path.append(parentdir)
-from GHEtool import *
+
+from GHEtool import Borefield, GroundData
 
 if __name__ == "__main__":
     # relevant borefield data for the calculations
