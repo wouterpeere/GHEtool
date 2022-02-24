@@ -3,11 +3,6 @@ This document is an example of how the borefield configuration can influence the
 """
 
 # import all the relevant functions
-from os.path import dirname, realpath
-from sys import path
-currentdir = dirname(realpath(__file__))
-parentdir = dirname(currentdir)
-path.append(parentdir)
 from GHEtool import *
 
 if __name__ == "__main__":

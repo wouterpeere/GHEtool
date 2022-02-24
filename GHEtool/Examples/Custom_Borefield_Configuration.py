@@ -13,18 +13,13 @@ Please note that, depending on the complexity of the custom field, this can rang
  """
 
 # import all the relevant functions
-from os.path import dirname, realpath
-from sys import path
-
-currentdir = dirname(realpath(__file__))
-parentdir = dirname(currentdir)
-path.append(parentdir)
 from GHEtool import *
+import pygfunction as gt
 
 if __name__ == "__main__":
 
     # set the relevant ground data for the calculations
-    data = GroundData(110, 6, 3, 10, 0.2, 10, 12)
+    data = GroundData(110, 6, 3, 10, 0.12, 10, 12)
 
     # Montly loading values
     peakCooling = [0., 0, 3.4, 6.9, 13., 18., 21., 50., 16., 3.7, 0., 0.]  # Peak cooling in kW
