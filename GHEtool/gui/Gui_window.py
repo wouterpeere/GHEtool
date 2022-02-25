@@ -1,6 +1,6 @@
 from sys import path
 from typing import Optional, TYPE_CHECKING
-from .Translation_class import TrClass
+from Translation_class import TrClass
 from PyQt5.QtWidgets import QMainWindow as QtWidgets_QMainWindow, QWidget as QtWidgets_QWidget, QApplication as \
     QtWidgets_QApplication, QPushButton as QtWidgets_QPushButton, QMessageBox as QtWidgets_QMessageBox, QFileDialog as \
     QtWidgets_QFileDialog, QInputDialog as QtWidgets_QInputDialog, QDialog as QtWidgets_QDialog, QMenu as \
@@ -9,10 +9,10 @@ from pickle import dump as pk_dump, HIGHEST_PROTOCOL as pk_HP, load as pk_load
 from PyQt5.QtCore import QSize as QtCore_QSize, QEvent as QtCore_QEvent, QThread as QtCore_QThread, \
     pyqtSignal as QtCore_pyqtSignal, QModelIndex as QtCore_QModelIndex
 from PyQt5.QtGui import QIcon as QtGui_QIcon, QPixmap as QtGui_QPixmap
-from .gui_Main import Ui_GHEtool
+from gui_Main import Ui_GHEtool
 from os.path import dirname, realpath, split as os_split
 from functools import partial as ft_partial
-from .DataStorage_v1_0_0 import DataStorage
+from DataStorage_v1_0_0 import DataStorage
 from time import sleep
 
 if TYPE_CHECKING:

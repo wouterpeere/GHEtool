@@ -1,7 +1,7 @@
 def run():
     from sys import argv, exit as sys_exit
     from PyQt5.QtWidgets import QApplication as QtWidgets_QApplication
-    from gui.Gui_window import MainWindow
+    from Gui_window import MainWindow
     from PyQt5.QtWidgets import QMainWindow as QtWidgets_QMainWindow
     from ctypes import windll as ctypes_windll
     # init application

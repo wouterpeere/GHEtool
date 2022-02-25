@@ -8,7 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from .icons_rc import *
+from icons_rc import *
 
 class Ui_GHEtool(object):
     def setupUi(self, GHEtool):

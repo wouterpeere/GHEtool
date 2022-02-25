@@ -937,7 +937,7 @@ class Borefield:
         """This function calculated the g-function based on interpolation of the precalculated data."""
 
         # set folder if no GUI is used
-        folder = '.' if self.GUI else FOLDER
+        folder = FOLDER
         # get the name of the data fileImport
         if self.customGfunction is None:
             name = f'{self.configurationString(self.N_1, self.N_2)}.pickle'
