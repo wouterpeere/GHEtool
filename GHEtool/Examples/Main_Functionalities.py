@@ -57,16 +57,16 @@ if __name__ == "__main__":
     depth = borefield.size(100)
     print("The borehole depth is: ", depth, "m")
 
-    #print imbalance
+    # print imbalance
     print("The borefield imbalance is: ", borefield.imbalance, "kWh/y. (A negative imbalance means the the field is heat extraction dominated so it cools down year after year.)") # print imbalance
 
     # plot temperature profile for the calculated depth
     borefield.printTemperatureProfile(legend=True)
 
-    #plot temperature profile for a fixed depth
+    # plot temperature profile for a fixed depth
     borefield.printTemperatureProfileFixedDepth(depth=75, legend=False)
 
-    # print gives the array of montly tempartures for peak cooling without showing the plot
+    # print gives the array of monthly temperatures for peak cooling without showing the plot
     borefield.calculateTemperatures(depth=90)
     print("Result array for cooling peaks")
     print(borefield.resultsPeakCooling)

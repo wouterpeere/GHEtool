@@ -338,7 +338,7 @@ class Borefield:
         self.Tf_C: float = temp
 
     def setMassFlowRate(self, mfr: float):
-        """This function sets the mass flow rate."""
+        """This function sets the mass flow rate per borehole."""
         self.mfr = mfr
 
     def calculateFluidThermalResistance(self):

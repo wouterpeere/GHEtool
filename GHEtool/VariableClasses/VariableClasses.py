@@ -37,7 +37,7 @@ class FluidData:
     def __init__(self, mfr: float, k_f: float, rho: float, Cp: float, mu: float) -> None:
         """
         Data for storage of ground data
-        :param mfr: Mass flow rate [kg/s]
+        :param mfr: Mass flow rate per borehole [kg/s]
         :param k_f: Borehole spacing [m]
         :param rho: Density [kg/m3]
         :param Cp: Thermal capacity [J/kgK]
@@ -45,7 +45,7 @@ class FluidData:
         """
 
         self.k_f = k_f  # Thermal conductivity W/mK
-        self.mfr = mfr  # Mass flow rate kg/s
+        self.mfr = mfr  # Mass flow rate per borehole kg/s
         self.rho = rho  # Density kg/m3
         self.Cp = Cp    # Thermal capacity J/kgK
         self.mu = mu    # Dynamic viscosity Pa/s
