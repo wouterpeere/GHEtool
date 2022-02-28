@@ -1517,3 +1517,49 @@ class Borefield:
         # return list of possible solutions
         return res
 
+
+    def drawBoreholeInternal(self):
+        """This function plots the position of the pipes in the borehole."""
+
+        # calculate the pipe positions
+        pos = self._axisSymmetricalPipe()
+
+        # set figure
+        figure, axes = plt.subplots()
+
+        # initate circles
+        circlesOuter = []
+        circlesInner = []
+
+        # color inner circles and outer circles
+        for i in range(self.numberOfPipes):
+            circlesOuter.append(plt.Circle(pos[i], self.r_out, color="black"))
+            circlesInner.append(plt.Circle(pos[i], self.r_in, color="red"))
+            circlesOuter.append(plt.Circle(pos[i+self.numberOfPipes], self.r_out, color="black"))
+            circlesInner.append(plt.Circle(pos[i+self.numberOfPipes], self.r_in, color="blue"))
+
+        # set visual settings for figure
+        axes.set_aspect('equal')
+        axes.set_xlim([-self.r_b, self.r_b])
+        axes.set_ylim([-self.r_b, self.r_b])
+        axes.get_xaxis().set_visible(False)
+        axes.get_yaxis().set_visible(False)
+        plt.tight_layout()
+
+        # define borehole circle
+        boreholeCircle = plt.Circle((0, 0), self.r_b, color="white")
+
+        # add borehole circle to canvas
+        axes.add_artist(boreholeCircle)
+
+        # add other circles to canvas
+        for i in circlesOuter:
+            axes.add_artist(i)
+        for i in circlesInner:
+            axes.add_artist(i)
+
+        # set background color
+        axes.set_facecolor("grey")
+
+        # show plot
+        plt.show()
