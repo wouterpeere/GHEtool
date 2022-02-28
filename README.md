@@ -2,17 +2,23 @@
 
 
 ## What is *GHEtool*?
-*GHEtool* is a Python module for both the sizing of geothermal borefields and for plotting the temperature profile of the ground for a given load. Currently, the code is in full development and this version includes the core functions, so developers, researchers and practitioners can use it in their workflow. A graphical interface is being developed at this stage.
-At its core, *GHEtool* is based on the ground thermal response functions (g-functions in short). These were precalculated for rectangular fields up to 20x20 boreholes with the python package *pygfunction* (Cimmino, 2018) so the code can interpolate from these data. Because of a lot of iterations, such precalculated database is useful. One can also add its own configurations.
-Using temporal superposition of the load, *GHEtool* calculates the required depth of the borefield in order to stay between the given temperature limits. It can, on the other hand, also calculate the temperature profile for a given depth. 
+GHEtool is a python package that contains all the functionalities needed to deal with borefield design. It is developed for both researchers and practitioners.
+The core of this package is the automated sizing of borefield under different conditions. The sizing of a borefield is typically slow due to the high complexity of the mathematical background. Because this tool has a lot of precalculated data (cf. infra), GHEtool can size a borefield in the order of tenths of milliseconds. This sizing typically takes the order of minutes. Therefore, this tool is suited for being implemented in typical workflows where iterations are required.
 
-It is also possible to use a fixed borefield and an hourly load profile to calculate the maximum peak (based on a load-duration curve) that can be put on the field.
+GHEtool also comes with a *graphical user interface (GUI)*. This GUI is prebuilt as an exe-file because this provides access to all the functionalities without coding. A setup to install the GUI at the user-defined place is also implemented and available here.
+This graphical interface is made by Tobias Blanke from FH Aachen.
 
-This tool is based on the work of (Peere et al., 2021).
+## Functionalities
+GHEtool offers functionalities of value to all different disciplines working with borefields. The features are available both in the code environment and in the GUI. These features are:
+* Sizing the borefield (i.e. calculating the required depth) for a given injection and extraction load for the borefield (two sizing methods are available). The tool can work with monthly and hourly load profiles
+* Finding the optimal rectangular borefield configuration for a given heating and cooling load
+* Optimising the load profile for a given heating and cooling load
+* Using dynamically calculated borehole thermal resistance
+* Calculating the temperature evolution of the ground for a given building load and borefield configuration
+* Importing heating and cooling loads from *.csv and *.xlsx files
+* Using your custom borefield configuration
 
-## Graphical user interface
-In the GUI folder, one can find a graphical interface which makes it easy to interact with the code environment. The graphical tool is also available as a stand-alone *.exe with and without the command interface.
-This graphical interface is made by Tobias Blanke from RWTH Aachen. 
+In the example and validation folder, one can find information on how to use this functionalities.
 
 ## Precalculated data
 This tool comes with precalculated g-functions for all borefields of type nxm (for 0<n,m<20) for which the boreholes are connected in parallel. For these borefield configurations, the g-functions are calculated for different depth-thermal conductivity-spacing combinations. The ranges are:
@@ -21,7 +27,7 @@ This tool comes with precalculated g-functions for all borefields of type nxm (f
 * Thermal conductivity of the soil: 1 - 4 in increments of 0.5W/mk
 * Spacings (equal): 3 - 9m in increments of 1m
 
-Here a burial depth (D) of 4.0m is assumed even as a borehole radius of 7.5cm.
+Here a burial depth (D) of 4.0m is assumed even as a borehole radius of 7.5cm for all the precalculated data.
 
 It is possible to calculate your own dataset to your specific project based on the *pygfunction* tool and use this one in the code.
 
@@ -35,6 +41,32 @@ This code is tested with Python 3.9 and requires the following libraries (the ve
 * Tkinter (>=0.1.0)
 * Openpyxl (>=3.0.7)
 * Pandas (>=1.2.4)
+
+For the GUI
+
+* PyQt5 (>=5.10)
+
+## Quick start
+
+One can install GHEtool by running Pip and running the command
+
+```
+pip install GHEtool
+```
+
+Developers can clone this repository.
+
+## License
+
+*GHEtool* is licensed under the terms of the 3-clause BSD-license.
+See [GHEtool license](LICENSE).
+
+## Contributing to *GHEtool*
+
+You can report bugs and propose enhancements on the
+[issue tracker](https://github.com/wouterpeere/GHEtool/issues).
+If you want to add new features and contribute to the code,
+please contact Wouter Peere (wouter.peere@kuleuven.be).
 
 ## Main contributors
 Wouter Peere, KU Leuven & Boydens Engineering (part of Sweco), wouter.peere@kuleuven.be
