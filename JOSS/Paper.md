@@ -18,8 +18,8 @@ affiliations:
    index: 2
  - name: Solar-Institute Jülich, FH Aachen, Aachen, Germany
    index: 3
-date: 25 February 2022
-bibliography: paper.bib
+date: 28 February 2022
+bibliography: Paper.bib
 
 ---
 
@@ -36,7 +36,7 @@ A setup to install the GUI at the user-defined place is also implemented.
 
 # Statement of need
 
-The building sector uses 36 % of global energy and is responsible for 39 % of energy-related CO2 emissions when upstream power generation is included, with more than half of this energy used by space heating, space cooling and water heating [IEA].
+The building sector uses 36 % of global energy and is responsible for 39 % of energy-related CO2 emissions when upstream power generation is included, with more than half of this energy used by space heating, space cooling and water heating [@IEA].
 This sector should decarbonize to reach the climate goals in 2050. One of the promising ways to achieve this goal is by using shallow geothermal energy, thereby storing heat/cold in borefields, enabling seasonal thermal energy storage.
 Therefore, much interest exists from academia and practitioners in this field.
 
@@ -45,7 +45,7 @@ Borefield sizing plays a central role in research. In particular, this is a topi
 
 GHEtool is a python package with a graphical counterpart centred around borefield sizing and the evaluation of temperature evolution. 
 
-The main advantage of GHEtool is that the ground response functions (gfunctions [gfunctions]), which are needed to size a borefield, are already precalculated for more than 140 000 borefield – ground combinations. This precalculation saves much time.
+The main advantage of GHEtool is that the ground response functions (gfunctions [@gfunctions]), which are needed to size a borefield, are already precalculated for more than 140 000 borefield – ground combinations. This precalculation saves much time.
 This saving can take a couple of seconds to several minutes to calculate the gfunction for even one borefield. On the other hand, the tool provides the option to provide your gfunction data for your own custom borefield configuration. 
 
 GHEtool aims to be used both by academic researchers in thermal systems integration and as a tool for educational purposes. It offers all the code and functions needed to size a borefield.
@@ -59,13 +59,13 @@ Furthermore, practitioners in the HVAC domain can use it to size their borefield
 # Comparison with existing tools
 
 Multiple tools are available for sizing borefields:
-* EED and GLHEPRO are commercial, standalone tools for borefields. They allow the user, a.o., to plot the mean fluid and borehole wall temperature evolution [EED, GLHEPRO]. Furthermore, the user can size a borefield [EED, GLHEPRO]. The automated sizing in EED sometimes leads to an undersized borefield [Peere]. GLHEPRO does not have this problem [GLHEPRO].
-* geoSIM is a free tool for simulating and sizing borefields but only with one particular type of tubing (geoKOAX). It is also standalone [geoSIM].
-* Ground Loop Design software (GLDTM) ‘is the world’s leading commercial GHX software design tool’ [igshpsa]. It allows the user, a.o., to plot the mean fluid and borehole wall temperature evolution [GLDTM]. Furthermore, the user can size the borefield [GLDTM].
-* A commonly used package in the borefield domain is pygfunction. Pygfunction is an open-source python package to calculate the thermal response factors of the ground. This function forms the basis of many borefield simulation and sizing programs [pygfunction]. With this python package, we generated the precalculated data of the GHEtool.
+* EED and GLHEPRO are commercial, standalone tools for borefields. They allow the user, a.o., to plot the mean fluid and borehole wall temperature evolution [@EED; @GLHEPRO]. Furthermore, the user can size a borefield [@EED; @GLHEPRO]. The automated sizing in EED sometimes leads to an undersized borefield [@Peere]. GLHEPRO does not have this problem since it calculates the temperature in every month [@GLHEPRO].
+* geoSIM is a free tool for simulating and sizing borefields but only with one particular type of tubing (geoKOAX). It is also standalone [@geoSIM].
+* Ground Loop Design software (GLDTM) ‘is the world’s leading commercial GHX software design tool’ [@igshpsa]. It allows the user, a.o., to plot the mean fluid and borehole wall temperature evolution. Furthermore, the user can size the borefield.
+* A commonly used package in the borefield domain is pygfunction. Pygfunction is an open-source python package to calculate the thermal response factors of the ground. This function forms the basis of many borefield simulation and sizing programs [@pygfunction]. With this python package, the data of the GHEtool was precalculated.
 
-From the mentioned tools, only EED, GLHEPRO, geosSIM and GLDTM can size borefields, but none of them is open source nor easy to be integrated into your workflow since they are standalone. From all the borefield sizing tools listed above, only geoSIM is free, but it only works with one specific type of borehole tubing [geoSIM].
-(Bernier, 2019) has reviewed exhaustive literature of all existing borefield sizing methods and tools [Bernier].
+From the mentioned tools, only EED, GLHEPRO, geoSIM and GLDTM can size borefields, but none of them is open source nor easy to be integrated into your workflow since they are standalone. From all the borefield sizing tools listed above, only geoSIM is free, but it only works with one specific type of borehole tubing [@geoSIM].
+(Bernier, 2019) has reviewed exhaustive literature of all existing borefield sizing methods and tools [@Bernier].
 
 # Features
 GHEtool offers functionalities of value to all different disciplines working with borefields. The features are available both in the code environment and in the GUI. These features are:
@@ -77,32 +77,8 @@ GHEtool offers functionalities of value to all different disciplines working wit
 * Importing heating and cooling loads from *.csv and *.xlsx files
 * Using your custom borefield configuration
 
-
-# Citations
-
-Citations to entries in paper.bib should be in
-[rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
-format.
-
-If you want to cite a software repository URL (e.g. something on GitHub without a preferred
-citation) then you can do it with the example BibTeX entry below for @fidgit.
-
-For a quick reference, the following citation commands can be used:
-- `@author:2001`  ->  "Author et al. (2001)"
-- `[@author:2001]` -> "(Author et al., 2001)"
-- `[@author1:2001; @author2:2001]` -> "(Author1 et al., 2001; Author2 et al., 2002)"
-
-# Figures
-
-Figures can be included like this:
-![Caption for example figure.\label{fig:example}](figure.png)
-and referenced from text using \autoref{fig:example}.
-
-Figure sizes can be customized by adding an optional second parameter:
-![Caption for example figure.](figure.png){ width=20% }
-
 # Acknowledgements
 
 The first author would like to thank his supervisors Lieve Helsen and Wim Boydens and his coaches Damien Picard and Iago Cupeiro Figueroa for the guidance during his master thesis, which led to this package development.
-
+The authors would like to thank Felix Arjuna and Iago Cupeiro Figueroa for the translation of the GUI.
 # References
