@@ -1,15 +1,10 @@
 """
 This document contains checks to see whether or not adaptations to the code still comply with some specific cases.
-It also show the difference between the original L2 sizing methode (Peere et al., 2021) and a more general L3 one.
+It also shows the difference between the original L2 sizing methode (Peere et al., 2021) and a more general L3 one.
 
 This document contains 4 different cases referring to the paper: Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. Validated combined first and last year borefield sizing methodology. In Proceedings of International Building Simulation Conference 2021 (2021). Brugge (Belgium), 1-3 September 2021.
 
 """
-from os.path import dirname, realpath
-from sys import path
-currentdir = dirname(realpath(__file__))
-parentdir = dirname(currentdir)
-path.append(parentdir)
 
 from GHEtool import Borefield, GroundData
 import pygfunction as gt
@@ -76,7 +71,7 @@ if __name__ == "__main__":
         """
         This function checks whether the borefield sizing gives the correct (i.e. validated) results for the 4 cases.
         If not, an assertion error is raised.
-        NOTE: these values differ slightly from the values in the mentioned paper. This is due to
+        NOTE: these values differ slightly from the values in the mentioned paper. This is due to the fact that GHEtool uses slightly different precalculated data.
         """
 
         correctAnswersL2 = (56.64, 118.7, 66.88, 92.67)
@@ -110,7 +105,6 @@ if __name__ == "__main__":
         """
         This function checks whether the borefield sizing gives the correct (i.e. validated) results for the 4 cases given the custom datafile.
         If not, an assertion error is raised.
-        NOTE: these values differ slightly from the values in the mentioned paper. This is due to
         """
 
         # create custom datafile
@@ -126,7 +120,7 @@ if __name__ == "__main__":
         borefield.setGroundParameters(data)
 
         customField = gt.boreholes.rectangle_field(N_1 = 12, N_2 = 10, B_1 = 6.5, B_2=6.5, H=110., D=4, r_b=0.075)
-        #borefield.createCustomDataset(customField, "customField")
+        borefield.createCustomDataset(customField, "customField")
 
         for i in (1, 2, 3, 4):
             monthlyLoadCooling, monthlyLoadHeating, peakCooling, peakHeating = loadCase(i)

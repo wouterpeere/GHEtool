@@ -9,7 +9,7 @@ This file contains all the main functionalities of GHEtool being:
 """
 
 # import all the relevant functions
-from GHEtool import Borefield, GroundData
+from GHEtool import Borefield, GroundData, FluidData, PipeData
 
 if __name__ == "__main__":
     # relevant borefield data for the calculations

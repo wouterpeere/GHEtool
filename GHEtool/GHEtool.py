@@ -119,8 +119,8 @@ class Borefield:
         self.hourlyCoolingLoadOnTheBorefield: list = []
 
         # initiate load variables
-        self.baseloadHeating: list = listOfZeros  # list with baseLoad heating kWh
-        self.baseloadCooling: list = listOfZeros  # list with baseLoad cooling kWh
+        self.baseloadHeating: list = listOfZeros  # list with baseload heating kWh
+        self.baseloadCooling: list = listOfZeros  # list with baseload cooling kWh
         self.peakCooling: list = listOfZeros  # list with the peak load cooling kW
         self.peakHeating: list = listOfZeros  # list with peak load heating kW
 
@@ -188,7 +188,7 @@ class Borefield:
         # set load profiles
         self.setPeakHeating(peakHeating)
         self.setPeakCooling(peakCooling)
-        self.setBaseLoadCooling(baseloadCooling)
+        self.setBaseloadCooling(baseloadCooling)
         self.setBaseloadHeating(baseloadHeating)
 
         # set simulation period
@@ -677,24 +677,24 @@ class Borefield:
         self.monthlyLoad: list = [(-self.baseloadHeating[i] + self.baseloadCooling[i]) / Borefield.UPM for i in
                                   range(12)]
 
-    def setBaseloadHeating(self, baseLoad: list):
-        """This function defines the baseLoad in heating both in an energy as in an average power perspective"""
-        self.baseloadHeating: list = [i if i >= 0 else 0 for i in baseLoad]  # kWh
+    def setBaseloadHeating(self, baseload: list):
+        """This function defines the baseload in heating both in an energy as in an average power perspective"""
+        self.baseloadHeating: list = [i if i >= 0 else 0 for i in baseload]  # kWh
         self.monthlyLoadHeating: list = list(map(lambda x: x / Borefield.UPM, self.baseloadHeating))  # kW
         self.calculateMonthlyLoad()
         self.calculateImbalance()
 
-        # new peak heating if baseLoad is larger than the peak
+        # new peak heating if baseload is larger than the peak
         self.setPeakHeating([max(self.peakHeating[i], self.monthlyLoadHeating[i]) for i in range(12)])
 
-    def setBaseLoadCooling(self, baseload: list):
-        """This function defines the baseLoad in cooling both in an energy as in an average power perspective"""
+    def setBaseloadCooling(self, baseload: list):
+        """This function defines the baseload in cooling both in an energy as in an average power perspective"""
         self.baseloadCooling: list = [i if i >= 0 else 0 for i in baseload]  # kWh
         self.monthlyLoadCooling: list = list(map(lambda x: x / Borefield.UPM, self.baseloadCooling))  # kW
         self.calculateMonthlyLoad()
         self.calculateImbalance()
 
-        # new peak cooling if baseLoad is larger than the peak
+        # new peak cooling if baseload is larger than the peak
         self.setPeakCooling([max(self.peakCooling[i], self.monthlyLoadCooling[i]) for i in range(12)])
 
     def setPeakHeating(self, peakLoad: list):
@@ -1118,7 +1118,7 @@ class Borefield:
         # calculate peak and base loads
         self.setPeakCooling(self._reduceToPeakLoad(self.hourlyCoolingLoad, peakCoolLoad))
         self.setPeakHeating(self._reduceToPeakLoad(self.hourlyHeatingLoad, peakHeatLoad))
-        self.setBaseLoadCooling(self._reduceToMonthLoad(self.hourlyCoolingLoad, peakCoolLoad))
+        self.setBaseloadCooling(self._reduceToMonthLoad(self.hourlyCoolingLoad, peakCoolLoad))
         self.setBaseloadHeating(self._reduceToMonthLoad(self.hourlyHeatingLoad, peakHeatLoad))
 
     @staticmethod

@@ -6,13 +6,8 @@ It is shown that the speed difference is significant, but so is the difference i
 """
 if __name__ == "__main__":
 
-    from os.path import dirname, realpath
-    from sys import path
     import numpy as np
     import time
-    currentdir = dirname(realpath(__file__))
-    parentdir = dirname(currentdir)
-    path.append(parentdir)
 
     from GHEtool import Borefield, GroundData, FluidData, PipeData
 

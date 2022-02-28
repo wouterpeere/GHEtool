@@ -4,13 +4,8 @@ The comparison is based on speed and relative accuracy in the result.
 """
 if __name__ == "__main__":
 
-    from os.path import dirname, realpath
-    from sys import path
     import numpy as np
     import time
-    currentdir = dirname(realpath(__file__))
-    parentdir = dirname(currentdir)
-    path.append(parentdir)
 
     from GHEtool import Borefield, GroundData
 
