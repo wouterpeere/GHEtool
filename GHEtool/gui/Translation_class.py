@@ -862,7 +862,7 @@ class TrClass:
             self.comboBox_decimalList: list = ["Punt '.'", "Komma ','"]
             self.createLists()
             return
-        if lang == 3:  # French # Thanks to Felix Arjuna
+        if lang == 4:  # French # Thanks to Felix Arjuna
             self.label_Language: str = 'Languange: '
             self.pushButton_SaveScenario: str = 'Mettre à jour le scénario'
             self.pushButton_AddScenario: str = 'Ajouter un scénario'
@@ -1044,7 +1044,7 @@ class TrClass:
             self.comboBox_decimalList: list = ["Point '.'", "Comma ','"]
             self.createLists()
             return
-        if lang == 4:  # Italian # Thanks to Felix Arjuna
+        if lang == 3:  # Italian # Thanks to Felix Arjuna
             self.label_Language: str = 'Languange: '
             self.pushButton_SaveScenario: str = 'Aggiorna scenario'
             self.pushButton_AddScenario: str = 'Aggiungi scenario'
