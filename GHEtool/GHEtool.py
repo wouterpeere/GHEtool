@@ -213,40 +213,61 @@ class Borefield:
         self.setCustomGfunction(customGfunction)
 
     @staticmethod
-    def configurationString(N_1: int, N_2: int):
-        """This functions returns the filename for the given configuration N_1, N_2."""
+    def configurationString(N_1: int, N_2: int) -> str:
+        """
+        This functions returns the filename for the given configuration N_1, N_2.
+        :return: the name of the datafile
+        """
         string: str = str(max(N_1, N_2)) + "x" + str(min(N_1, N_2))
         return string
 
-    def setNumberOfBoreholes(self, numberOfBoreholes: int = 1):
-        """This functions sets the number of boreholes"""
+    def setNumberOfBoreholes(self, numberOfBoreholes: int = 1) -> None:
+        """
+        This functions sets the number of boreholes
+        :return None
+        """
         self.numberOfBoreholes = numberOfBoreholes if numberOfBoreholes > 1 else self.N_1 * self.N_2
 
-    def setBorefield(self, borefield=None):
-        """This function sets the bore field configuration. When no input, an empty array of length N_1 * N_2 will be
-        made"""
+    def setBorefield(self, borefield=None) -> None:
+        """
+        This function sets the bore field configuration. When no input, an empty array of length N_1 * N_2 will be made.
+        :return None
+        """
         if borefield is None:
             return
         self.borefield = borefield
         self.setNumberOfBoreholes(len(borefield))
 
-    def setCustomGfunction(self, customGfunction):
-        """This functions sets the custom g-function."""
+    def setCustomGfunction(self, customGfunction) -> None:
+        """
+        This functions sets the custom g-function.
+        :return None
+        """
         self.customGfunction = customGfunction
         self.gfunctionInterpolationArray: list = []
 
-    def setInvestmentCost(self, investmentCost=None):
-        """This function sets the investment cost. This is linear with respect to the total field length."""
+    def setInvestmentCost(self, investmentCost=None) -> None:
+        """
+        This function sets the investment cost. This is linear with respect to the total field length.
+        :return None
+        """
         if investmentCost is None:
             investmentCost = Borefield.defaultInvestment
         self.costInvestment: list = investmentCost
 
-    def setLengthPeak(self, length: float = defaultLengthPeak):
-        """This function sets the length of the peak to length."""
+    def setLengthPeak(self, length: float = defaultLengthPeak) -> None:
+        """
+        This function sets the length of the peak to length.
+        :return None
+        """
         self.lengthPeak: float = length
         self.setTimeConstants()
 
-    def setTimeConstants(self):
+    def setTimeConstants(self) -> None:
+        """
+        This function sets the time constants
+        :return: None
+        """
         # Number of segments per borehole
         self.th: float = self.lengthPeak * 3600.  # length of peak in seconds
         self.ty: float = self.simulationPeriod * 8760. * 3600
@@ -259,8 +280,11 @@ class Borefield:
         self.timeL3FirstYear = [i * Borefield.UPM * 3600. for i in range(1, 12 + 1)]
         self.timeL3LastYear = [i * Borefield.UPM * 3600. for i in range(1, self.simulationPeriod * 12 + 1)]
 
-    def setGroundParameters(self, data):
-        """This function sets the relevant bore field characteristics."""
+    def setGroundParameters(self, data) -> None:
+        """
+        This function sets the relevant ground and borefield characteristics.
+        :return None
+        """
         if isinstance(data, GroundData):
             self.H: float = data.H  # Borehole length (m)
             self.B: float = data.B  # Borehole spacing (m)
@@ -295,8 +319,11 @@ class Borefield:
         # new ground data implies that a new g-function should be loaded
         self.gfunctionInterpolationArray = []
 
-    def setFluidParameters(self, data: FluidData):
-        """This function sets the relevant fluid characteristics."""
+    def setFluidParameters(self, data: FluidData) -> None:
+        """
+        This function sets the relevant fluid characteristics.
+        :return None
+        """
 
         self.k_f = data.k_f  # Thermal conductivity W/mK
         self.rho = data.rho  # Density kg/m3
@@ -308,8 +335,11 @@ class Borefield:
         if self.pipeDataAvailable:
             self.calculateFluidThermalResistance()
 
-    def setPipeParameters(self, data: PipeData):
-        """This function sets the pipe parameters."""
+    def setPipeParameters(self, data: PipeData) -> None:
+        """
+        This function sets the pipe parameters.
+        :return None
+        """
 
         self.r_in = data.r_in  # inner pipe radius m
         self.r_out = data.r_out  # outer pipe radius m
@@ -329,32 +359,49 @@ class Borefield:
             self.calculateFluidThermalResistance()
         self.calculatePipeThermalResistance()
 
-    def setMaxGroundTemperature(self, temp: float):
-        """This function sets the maximal ground temperature to temp."""
+    def setMaxGroundTemperature(self, temp: float) -> None:
+        """
+        This function sets the maximal ground temperature to temp.
+        :return None
+        """
         self.Tf_H: float = temp
 
-    def setMinGroundTemperature(self, temp: float):
-        """This function sets the minimal ground temperature to temp."""
+    def setMinGroundTemperature(self, temp: float) -> None:
+        """
+        This function sets the minimal ground temperature to temp.
+        :return None
+        """
         self.Tf_C: float = temp
 
-    def setMassFlowRate(self, mfr: float):
-        """This function sets the mass flow rate per borehole."""
+    def setMassFlowRate(self, mfr: float) -> None:
+        """
+        This function sets the mass flow rate per borehole.
+        :return None
+        """
         self.mfr = mfr
 
-    def calculateFluidThermalResistance(self):
-        """This function calculates and sets the fluid thermal resistance R_f."""
+    def calculateFluidThermalResistance(self) -> None:
+        """
+        This function calculates and sets the fluid thermal resistance R_f.
+        :return: None"""
         self.h_f: float = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(self.mfr, self.r_in, self.mu,
                                                                                       self.rho, self.k_f, self.Cp,
                                                                                       self.epsilon)
         self.R_f: float = 1. / (self.h_f * 2 * pi * self.r_in)
 
-    def calculatePipeThermalResistance(self):
-        """This function calculates and sets the pipe thermal resistance R_p."""
+    def calculatePipeThermalResistance(self) -> None:
+        """
+        This function calculates and sets the pipe thermal resistance R_p.
+        :return: None
+        """
         self.R_p: float = gt.pipes.conduction_thermal_resistance_circular_pipe(self.r_in, self.r_out, self.k_p)
 
     @property
-    def _Rb(self):
-        """This function gives back the equivalent borehole resistance."""
+    def _Rb(self) -> float:
+        """
+        This function gives back the equivalent borehole resistance.
+        :return: the borehole equivalent thermal resistance
+        """
         # use a constant Rb*
         if self.useConstantRb:
             return self.Rb
@@ -362,8 +409,11 @@ class Borefield:
         # calculate Rb*
         return self.calculateRb()
 
-    def calculateRb(self):
-        """This function returns the calculated equivalent borehole thermal resistance Rb* value."""
+    def calculateRb(self) -> float:
+        """
+        This function returns the calculated equivalent borehole thermal resistance Rb* value.
+        :return: the borehole equivalent thermal resistance
+        """
         # check if all data is available
         if not self.pipeDataAvailable or not self.fluidDataAvailable:
             print("Please make sure you set al the pipe and fluid data.")
@@ -378,7 +428,9 @@ class Borefield:
 
     @property
     def _axisSymmetricalPipe(self) -> list:
-        """This function gives back the coordinates of the pipes in an axis-symmetrical pipe."""
+        """
+        This function gives back the coordinates of the pipes in an axis-symmetrical pipe.
+        :return: list of coordinates of the pipes in the borehole"""
         dt: float = pi / float(self.numberOfPipes)
         pos: list = [(0., 0.)] * 2 * self.numberOfPipes
         for i in range(self.numberOfPipes):
@@ -389,7 +441,10 @@ class Borefield:
 
     @property
     def _Bernier(self) -> float:
-        """This function sizes the field based on the last year of operation, i.e. quadrants 2 and 4."""
+        """
+        This function sizes the field based on the last year of operation, i.e. quadrants 2 and 4.
+        :return: borefield depth
+        """
         # initiate iteration
         H_prev = 0
         # set minimal depth to 50 m
@@ -411,8 +466,12 @@ class Borefield:
         return self.H
 
     @property
-    def _Carcel(self):
-        """This function sizes the field based on the first year of operation, i.e. quadrants 1 and 3."""
+    def _Carcel(self) -> float:
+        """
+        This function sizes the field based on the first year of operation, i.e. quadrants 1 and 3.
+        :return: borefield depth
+        """
+
 
         # initiate iteration
         H_prev = 0
@@ -439,13 +498,20 @@ class Borefield:
             self.H = L / self.numberOfBoreholes
         return self.H
 
-    def size(self, H_init: float, L2Sizing: bool = 1, quadrantSizing: int = 0, useConstantRb: bool = None):
-        """This function lets the user chose between two sizing options.
+    def size(self, H_init: float, L2Sizing: bool = 1, quadrantSizing: int = 0, useConstantRb: bool = None) -> float:
+        """
+        This function lets the user chose between two sizing options.
         * The L2 sizing is the one explained in (Peere et al., 2021) and is quicker
         * The L3 sizing is a more general approach which is slower but more accurate
         - quadrantSizing lets you size the bore field according to a specific quadrant
         - useConstantRb makes sure that the self.useConstantRb = True.
-        Note, the constant Rb* value will be overwritten!"""
+        Note, the constant Rb* value will be overwritten!
+        :param H_init: initial depth of the borefield to start the iteratation
+        :param L2Sizing: true if a sizing with the L2 method is needed, false if L3 is needed
+        :param quadrantSizing: differs from 0 when a sizing in a certain quadrant is desired
+        :param useConstantRb: true if a constant Rb* value should be used
+        :return: borefield depth
+        """
 
         # sets the constant Rb
         useConstantRbBackup = self.useConstantRb
@@ -459,14 +525,14 @@ class Borefield:
         self.useConstantRb = useConstantRbBackup
         return result
 
-    def sizeL2(self, H_init: float, quadrantSizing: int = 0) -> None:
+    def sizeL2(self, H_init: float, quadrantSizing: int = 0) -> float:
         """
         This function sizes the bore field of the given configuration according to the methodology explained in
         (Peere et al., 2021), which is a L2 method. When quadrant sizing is other than 0, it sizes the field based on
         the asked quadrant. It returns the bore field depth.
         :param H_init: initialize depth for sizing
         :param quadrantSizing: if a quadrant is given the sizing is performed for this quadrant else for the relevant
-        :return: None
+        :return: borefield depth
         """
 
         # initiate with a given depth
@@ -532,8 +598,13 @@ class Borefield:
 
         return self.H
 
-    def sizeL3(self, H_init: float, quadrantSizing: int = 0):
-        """This functions sizes the bore field based on a L3 method."""
+    def sizeL3(self, H_init: float, quadrantSizing: int = 0) -> float:
+        """
+        This functions sizes the bore field based on a L3 method.
+        :param H_init: initial value for the depth of the borefield to start iteration
+        :param quadrantSizing: differs from 0 if a sizing in a certain quadrant is desired
+        :return: borefield depth
+        """
 
         # initiate with a given depth
         self.H_init: float = H_init
@@ -573,10 +644,13 @@ class Borefield:
 
         return self.H
 
-    def _sizeL3quadrants(self, quadrant: int):
-        """This function sizes based on the L3 method for a specific quadrant.
+    def _sizeL3quadrants(self, quadrant: int) -> float:
+        """
+        This function sizes based on the L3 method for a specific quadrant.
         It uses 24 thermal pulses for each year, while the L2-sizing method only uses 3 pulses for the whole simulation
-        period. It returns a bore field depth."""
+        period. It returns a bore field depth.
+        :return: depth of the borefield
+        """
 
         # make a numpy array of the monthly average loads for the whole simulation period
         # in case of quadrants 1 and 3, the array can stop after the first year
@@ -672,13 +746,19 @@ class Borefield:
 
         return self.H
 
-    def calculateMonthlyLoad(self):
-        """This function calculates the average monthly load in kW"""
+    def calculateMonthlyLoad(self) -> None:
+        """
+        This function calculates the average monthly load in kW.
+        :return: None
+        """
         self.monthlyLoad: list = [(-self.baseloadHeating[i] + self.baseloadCooling[i]) / Borefield.UPM for i in
                                   range(12)]
 
-    def setBaseloadHeating(self, baseload: list):
-        """This function defines the baseload in heating both in an energy as in an average power perspective"""
+    def setBaseloadHeating(self, baseload: list) -> None:
+        """
+        This function defines the baseload in heating both in an energy as in an average power perspective.
+        :return: None
+        """
         self.baseloadHeating: list = [i if i >= 0 else 0 for i in baseload]  # kWh
         self.monthlyLoadHeating: list = list(map(lambda x: x / Borefield.UPM, self.baseloadHeating))  # kW
         self.calculateMonthlyLoad()
@@ -687,8 +767,11 @@ class Borefield:
         # new peak heating if baseload is larger than the peak
         self.setPeakHeating([max(self.peakHeating[i], self.monthlyLoadHeating[i]) for i in range(12)])
 
-    def setBaseloadCooling(self, baseload: list):
-        """This function defines the baseload in cooling both in an energy as in an average power perspective"""
+    def setBaseloadCooling(self, baseload: list) -> None:
+        """
+        This function defines the baseload in cooling both in an energy as in an average power perspective.
+        :return None
+        """
         self.baseloadCooling: list = [i if i >= 0 else 0 for i in baseload]  # kWh
         self.monthlyLoadCooling: list = list(map(lambda x: x / Borefield.UPM, self.baseloadCooling))  # kW
         self.calculateMonthlyLoad()
@@ -697,27 +780,42 @@ class Borefield:
         # new peak cooling if baseload is larger than the peak
         self.setPeakCooling([max(self.peakCooling[i], self.monthlyLoadCooling[i]) for i in range(12)])
 
-    def setPeakHeating(self, peakLoad: list):
-        """This function sets the peak heating to peak load"""
+    def setPeakHeating(self, peakLoad: list) -> None:
+        """
+        This function sets the peak heating to peak load.
+        :return: None
+        """
         self.peakHeating = [i if i >= 0 else 0 for i in peakLoad]
 
-    def setPeakCooling(self, peakLoad: list):
-        """This function sets the peak cooling to peak load"""
+    def setPeakCooling(self, peakLoad: list) -> None:
+        """
+        This function sets the peak cooling to peak load.
+        :return: None
+        """
         self.peakCooling = [i if i >= 0 else 0 for i in peakLoad]
 
     @property
-    def investmentCost(self):
-        """This function calculates the investment cost based on a cost profile linear to the total borehole length."""
+    def investmentCost(self) -> float:
+        """
+        This function calculates the investment cost based on a cost profile linear to the total borehole length.
+        :return: investementcost"""
         return np.polyval(self.costInvestment, self.H * self.numberOfBoreholes)
 
-    def calculateImbalance(self):
-        """This function calculates the imbalance of the field.
-        A positive imbalance means that the field is injection dominated, i.e. it heats up every year."""
+    def calculateImbalance(self) -> None:
+        """
+        This function calculates the imbalance of the field.
+        A positive imbalance means that the field is injection dominated, i.e. it heats up every year.
+        :return: None
+        """
         self.imbalance = functools.reduce(lambda x, y: x + y, self.baseloadCooling) - functools.reduce(
             lambda x, y: x + y, self.baseloadHeating)
 
-    def calculateL2Params(self, HC: bool):
-        """This function calculates the parameters for the sizing based on the last year of operation"""
+    def calculateL2Params(self, HC: bool) -> None:
+        """
+        This function calculates the parameters for the sizing based on the last year of operation.
+        :param HC: true if the borefield is limited by extraction load
+        :return: None
+        """
 
         # convert imbalance to Watt
         self.qa = self.imbalance / 8760. * 1000
@@ -748,8 +846,13 @@ class Borefield:
             self.qm = self.monthlyLoad[monthIndex] * 1000.
             self.qh = max(self.peakCooling) * 1000.
 
-    def calculateL3Params(self, HC: bool, monthIndex: int = None):
-        """This function calculates the parameters for the sizing based on the first year of operation"""
+    def calculateL3Params(self, HC: bool, monthIndex: int = None) -> int:
+        """
+        This function calculates the parameters for the sizing based on the first year of operation.
+        :param HC: true if the field is limited by extraction load
+        :param monthIndex: month with the highest peak load
+        :return: month with the highest peak load
+        """
 
         if HC:
             # limited by extraction load
@@ -817,11 +920,15 @@ class Borefield:
         """
         self._printTemperatureProfile(legend=legend, H=depth)
 
-    def _printTemperatureProfile(self, legend: bool = True, H: float = None, figure: bool = True):
+    def _printTemperatureProfile(self, legend: bool = True, H: float = None, figure: bool = True) -> None:
         """
         This function calculates the temperature evolution in the bore field using temporal superposition.
         It is possible to calculate this for a certain depth H, otherwise self.H will be used.
         If Figure = True than a figure will be plotted.
+        :param legend: true if the legend should be shown
+        :param H: depth of the borefield to evaluate the temperature profile
+        :param figure: true if a figure should be shown
+        :return: None
         """
         H_backup = self.H
         if H is not None:
@@ -933,8 +1040,13 @@ class Borefield:
             ax1.set_xlim(left=0, right=self.simulationPeriod)
             plt.show()
 
-    def gfunction(self, timeValue: list, H: float):
-        """This function calculated the g-function based on interpolation of the precalculated data."""
+    def gfunction(self, timeValue: list, H: float) -> np.ndarray:
+        """
+        This function calculated the g-function based on interpolation of the precalculated data.
+        :param timeValue: list of seconds at which the gfunctions should be evaluated
+        :param H: depth at which the gfunctions should be evaluated
+        :return: array of gfunction values
+        """
 
         # set folder if no GUI is used
         folder = FOLDER
@@ -1032,9 +1144,17 @@ class Borefield:
                 print("This calculation stopped.")
             raise ValueError
 
-    def createCustomDataset(self, customBorefield: str, nameDatafile: str, nSegments: int = 12,
-                            timeArray=None, depthArray=None):
-        """This function makes a datafile for a given custom bore field."""
+    def createCustomDataset(self, customBorefield, nameDatafile: str, nSegments: int = 12,
+                            timeArray=None, depthArray=None) -> None:
+        """
+        This function makes a datafile for a given custom borefield.
+        :param customBorefield: borefield object from pygfunction
+        :param nameDatafile: name of the custom datafile
+        :param nSegments: number of segments used in creating the datafile
+        :param timeArray: timevalues used for the calculation of the datafile
+        :param depthArray: the values for the borefield depth used to calculate the datafile
+        :return: None
+        """
         # set folder if no GUI is used
         if depthArray is None:
             depthArray = Borefield.defaultDepthArray
@@ -1076,12 +1196,19 @@ class Borefield:
         print(f"A new dataset with name {name} has been created in {os.path.dirname(os.path.realpath(__file__))}\Data.")
         pickle.dump(data, open(f'{folder}/Data/{name}', "wb"))
 
-    def loadHourlyProfile(self, filePath: str = None, header: bool = True, seperator: str = ";",
-                          firstColumnHeating: bool = True):
-        """This function loads in an hourly load profile. It opens a csv and asks for the relevant column where the data
+    def loadHourlyProfile(self, filePath: str = None, header: bool = True, separator: str = ";",
+                          firstColumnHeating: bool = True) -> None:
+        """
+        This function loads in an hourly load profile. It opens a csv and asks for the relevant column where the data
         is in. firstColumnHeating is true if the first column in the datafile is for the heating values.
         header is true if there is a header in the csv fileImport.
-        seperator is the seperator in the csv fileImport."""
+        separator is the separator in the csv fileImport.
+        :param filePath: location of the hourly load file
+        :param header: true if the file contains a header
+        :param separator: symbol used in the file to separate columns
+        :param firstColumnHeating: true if the first column in the file is the column with heating loads
+        :return: None
+        """
 
         # if there is no given location, open a filedialog box
         if filePath is None:
@@ -1092,7 +1219,7 @@ class Borefield:
         else:
             header = None
         from pandas import read_csv
-        db = read_csv(filePath, sep=seperator, header=header)
+        db = read_csv(filePath, sep=separator, header=header)
 
         if firstColumnHeating:
             self.hourlyHeatingLoad = db.iloc[:, 0].tolist()
@@ -1101,8 +1228,13 @@ class Borefield:
             self.hourlyHeatingLoad = db.iloc[:, 1].tolist()
             self.hourlyCoolingLoad = db.iloc[:, 0].tolist()
 
-    def convertHourlyToMonthly(self, peakCoolLoad: float = None, peakHeatLoad: float = None):
-        """This function converts an hourly load profile to the monthly profiles used in the sizing."""
+    def convertHourlyToMonthly(self, peakCoolLoad: float = None, peakHeatLoad: float = None) -> None:
+        """
+        This function converts an hourly load profile to the monthly profiles used in the sizing.
+        :param peakCoolLoad: peak power in cooling [kW]
+        :param peakHeatLoad: peak power in heating [kW]
+        :return: None
+        """
 
         try:
             self.hourlyCoolingLoad[0]
@@ -1122,8 +1254,13 @@ class Borefield:
         self.setBaseloadHeating(self._reduceToMonthLoad(self.hourlyHeatingLoad, peakHeatLoad))
 
     @staticmethod
-    def _reduceToMonthLoad(load: list, peak: float):
-        """This function calculates the monthly load based, taking a maximum peak value into account."""
+    def _reduceToMonthLoad(load: list, peak: float) -> list:
+        """
+        This function calculates the monthly load based, taking a maximum peak value into account.
+        :param load: a list of hourly loads
+        :param peak: a maximum peak power [kW]
+        :return: list of monthly peak loads
+        """
         monthLoad = []
         for i in range(12):
             temp = load[Borefield.hourlyLoadArray[i]:Borefield.hourlyLoadArray[i + 1] + 1]
@@ -1131,17 +1268,27 @@ class Borefield:
         return monthLoad
 
     @staticmethod
-    def _reduceToPeakLoad(load: list, peak: float):
-        """This function calculates the monthly peak load, taking a maximum peak value into account."""
+    def _reduceToPeakLoad(load: list, peak: float) -> list:
+        """
+        This function calculates the monthly peak load, taking a maximum peak value into account.
+        :param load: a list of hourly loads
+        :param peak: a maximum peak power [kW]
+        :return: list of monthly peak loads
+        """
         peakLoad = []
         for i in range(12):
             temp = load[Borefield.hourlyLoadArray[i]:Borefield.hourlyLoadArray[i + 1] + 1]
             peakLoad.append(max([min(j, peak) for j in temp]))
         return peakLoad
 
-    def optimiseLoadProfile(self, depth: float = 150, printResults: bool = False):
-        """This function optimises the load based on the given bore field and the given hourly load.
-        It does so base on a load-duration curve."""
+    def optimiseLoadProfile(self, depth: float = 150, printResults: bool = False) -> None:
+        """
+        This function optimises the load based on the given bore field and the given hourly load.
+        It does so base on a load-duration curve.
+        :param depth: depth of the borefield [m]
+        :param printResults: True if results need to be plotted
+        :return: None
+        """
 
         # since the depth does not change, the Rb* value is constant
         # set to use a constant Rb* value but save the initial parameters
@@ -1245,7 +1392,7 @@ class Borefield:
     def size_complete_field_robust(self, h_max: float, l_1: float, l_2: float, b_min: float = 3.0, b_max: float = 9.0,
                                    L2Sizing: bool = True, useConstantRb: bool = False) -> list:
         """
-        function to size the minimal number of bore field by bore field length and width on a robust and more
+        function to size the minimal number of borefield by borefield length and width on a robust and more
         time-consuming way
         :param h_max: maximal borehole depth [m]
         :param l_1: maximal width of borehole field [m]
@@ -1330,7 +1477,7 @@ class Borefield:
     def size_complete_field_fast(self, HMax: float, L1: float, L2: float, BMin: float = 3.0, BMax: float = 9.0,
                                  L2Sizing: bool = True, useConstantRb: bool = False) -> list:
         """
-        function to size the minimal number of bore field by bore field length and width on a fast and not robust way.
+        function to size the minimal number of borefield by borefield length and width on a fast and not robust way.
         There are possible solution that can not be found
         :param HMax: maximal borehole depth [m]
         :param L1: maximal width of borehole field [m]
@@ -1518,8 +1665,11 @@ class Borefield:
         return res
 
 
-    def drawBoreholeInternal(self):
-        """This function plots the position of the pipes in the borehole."""
+    def drawBoreholeInternal(self) -> None:
+        """
+        plots the position of the pipes in the borehole
+        :return: None
+        """
 
         # calculate the pipe positions
         pos = self._axisSymmetricalPipe()

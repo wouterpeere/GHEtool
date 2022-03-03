@@ -104,7 +104,7 @@ class DataStorage:
         if self.optimizeLoadProfile:
             # get filename and path of data fileImport
             self.dataFile: str = getattr(obj, 'lineEdit_filename_data_file').text()
-            # get seperator for data fileImport
+            # get separator for data fileImport
             self.dataSeperator: int = getattr(obj, 'comboBox_SeperatorDataFile').currentIndex()
             # get decimal sign for data fileImport
             self.dataDecimal: int = getattr(obj, 'comboBox_decimalDataFile').currentIndex()
@@ -247,7 +247,7 @@ class DataStorage:
         if self.optimizeLoadProfile:
             # set filename and path of data fileImport
             getattr(obj, 'lineEdit_filename_data_file').setText(self.dataFile)
-            # set seperator for data fileImport
+            # set separator for data fileImport
             getattr(obj, 'comboBox_SeperatorDataFile').setCurrentIndex(self.dataSeperator)
             # get decimal sign for data fileImport
             getattr(obj, 'comboBox_decimalDataFile').setCurrentIndex(self.dataDecimal)

@@ -20,7 +20,7 @@ if __name__ == "__main__":
     borefield.setGroundParameters(data)
 
     # load the hourly profile
-    borefield.loadHourlyProfile("Hourly_Profile.csv", header=True, seperator=";", firstColumnHeating=True)
+    borefield.loadHourlyProfile("Hourly_Profile.csv", header=True, separator=";", firstColumnHeating=True)
 
     # optimise the load for a 10x10 field (see data above) and a fixed depth of 150m.
     borefield.optimiseLoadProfile(depth=150, printResults=True)

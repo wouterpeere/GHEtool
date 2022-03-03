@@ -74,7 +74,7 @@ class PipeData:
         :param D_s: Distance of the pipe until center [m]
         :param r_b: Borehole radius [m]
         :param numberOfPipes: Number of pipes [#] (single U-tube: 1, double U-tube:2)
-        :param epsilon: Pipe roughness
+        :param epsilon: Pipe roughness [m]
         :param D: Burrial depth [m]
         """
 
@@ -85,7 +85,7 @@ class PipeData:
         self.D_s = D_s                      # distance of pipe until center m
         self.r_b = r_b                      # borehole radius m
         self.numberOfPipes = numberOfPipes  # number of pipes #
-        self.epsilon = epsilon              # pipe roughness
+        self.epsilon = epsilon              # pipe roughness m
         self.D = D                          # burial depth m
 
     def __eq__(self, other):

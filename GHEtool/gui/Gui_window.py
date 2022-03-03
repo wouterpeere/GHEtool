@@ -682,7 +682,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         """
         # import pandas here to save start up time
         from pandas import read_csv as pd_read_csv
-        # get decimal and column seperator
+        # get decimal and column separator
         sep: str = ';' if self.comboBox_SeperatorDataFile.currentIndex() == 0 else ','
         dec: str = '.' if self.comboBox_decimalDataFile.currentIndex() == 0 else ','
         # try to read CSV-File
@@ -756,7 +756,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.comboBox_dataColumn.setCurrentIndex(-1)
         self.comboBox_timeStep.setCurrentIndex(-1)
         try:
-            # open filename by sheet or with column and decimal seperator
+            # open filename by sheet or with column and decimal separator
             if ".xlsx" in filename:
                 # import pandas here to save start up time
                 sheet_name = self.comboBox_sheetName.currentText()
@@ -1922,7 +1922,7 @@ class CalcProblem(QtCore_QThread):
             boreField.setBorefield(custom_field)
         # if load should be optimized do this
         if self.DS.optimizeLoadProfile:
-            # get column and decimal seperator
+            # get column and decimal separator
             sep: str = ';' if self.DS.dataSeperator == 0 else ','
             dec: str = '.' if self.DS.dataDecimal == 0 else ','
             # import pandas here to save start up time
