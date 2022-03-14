@@ -38,7 +38,7 @@ class FluidData:
         """
         Data for storage of ground data
         :param mfr: Mass flow rate per borehole [kg/s]
-        :param k_f: Borehole spacing [m]
+        :param k_f: Thermal Conductivity [W/mK]
         :param rho: Density [kg/m3]
         :param Cp: Thermal capacity [J/kgK]
         :param mu: EDynamic viscosity [Pa/s]

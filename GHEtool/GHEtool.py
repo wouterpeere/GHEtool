@@ -384,7 +384,7 @@ class Borefield:
         """
         This function calculates and sets the fluid thermal resistance R_f.
         :return: None"""
-        self.h_f: float = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(self.mfr, self.r_in, self.mu,
+        self.h_f: float = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(self.mfr / self.numberOfPipes, self.r_in, self.mu,
                                                                                       self.rho, self.k_f, self.Cp,
                                                                                       self.epsilon)
         self.R_f: float = 1. / (self.h_f * 2 * pi * self.r_in)
@@ -424,7 +424,7 @@ class Borefield:
         # initiate pipe
         pipe = gt.pipes.MultipleUTube(self.pos, self.r_in, self.r_out, borehole, self.k_s, self.k_g,
                                       self.R_p + self.R_f, self.numberOfPipes, J=2)
-        return gt.pipes.borehole_thermal_resistance(pipe, self.mfr, self.Cp)
+        return gt.pipes.borehole_thermal_resistance(pipe, self.mfr / self.numberOfPipes, self.Cp)
 
     @property
     def _axisSymmetricalPipe(self) -> list:
@@ -1672,7 +1672,7 @@ class Borefield:
         """
 
         # calculate the pipe positions
-        pos = self._axisSymmetricalPipe()
+        pos = self._axisSymmetricalPipe
 
         # set figure
         figure, axes = plt.subplots()
