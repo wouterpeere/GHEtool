@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui fileImport 'ui\gui_Main.ui'
+# Form implementation generated from reading ui file 'ui\gui_Main.ui'
 #
 # Created by: PyQt5 UI code generator 5.9.2
 #
-# WARNING! All changes made in this fileImport will be lost!
+# WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
-from icons_rc import *
 
 class Ui_GHEtool(object):
     def setupUi(self, GHEtool):
         GHEtool.setObjectName("GHEtool")
-        GHEtool.resize(1381, 903)
+        GHEtool.resize(1097, 802)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -44,7 +42,8 @@ class Ui_GHEtool(object):
 "font-weight:500;}\n"
 "QPushButton:hover{background-color: rgb(0, 64, 122);}\n"
 "QPushButton:disabled{border: 3px solid rgb(100, 100, 100);\n"
-"border-radius: 5px;color: rgb(255, 255, 255);\n"
+"border-radius: 5px;\n"
+"color: rgb(255, 255, 255);\n"
 "gridline-color: rgb(100, 100, 100);\n"
 "background-color: rgb(100, 100, 100);}\n"
 "QPushButton:disabled:hover{background-color: rgb(0, 64, 122);}\n"
@@ -65,7 +64,8 @@ class Ui_GHEtool(object):
 "color: rgb(255, 255, 255);\n"
 "gridline-color: rgb(84, 188, 235);\n"
 "background-color: rgb(84, 188, 235);\n"
-"font-weight:500;}\n"
+"font-weight:500;\n"
+"selection-background-color: rgb(42, 126, 179);}\n"
 "QLineEdit:hover{background-color: rgb(0, 64, 122);}")
         self.centralwidget = QtWidgets.QWidget(GHEtool)
         self.centralwidget.setStyleSheet("")
@@ -619,7 +619,7 @@ class Ui_GHEtool(object):
         self.scrollArea_2.setWidgetResizable(True)
         self.scrollArea_2.setObjectName("scrollArea_2")
         self.scrollAreaWidgetContents_5 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_5.setGeometry(QtCore.QRect(0, 0, 781, 793))
+        self.scrollAreaWidgetContents_5.setGeometry(QtCore.QRect(0, 0, 540, 795))
         self.scrollAreaWidgetContents_5.setObjectName("scrollAreaWidgetContents_5")
         self.verticalLayout_17 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_5)
         self.verticalLayout_17.setContentsMargins(0, 0, 0, 0)
@@ -840,58 +840,24 @@ class Ui_GHEtool(object):
         self.frame_pipe_data.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_pipe_data.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_pipe_data.setObjectName("frame_pipe_data")
-        self.gridLayout_10 = QtWidgets.QGridLayout(self.frame_pipe_data)
-        self.gridLayout_10.setObjectName("gridLayout_10")
-        self.label_pipe_conductivity = QtWidgets.QLabel(self.frame_pipe_data)
-        self.label_pipe_conductivity.setObjectName("label_pipe_conductivity")
-        self.gridLayout_10.addWidget(self.label_pipe_conductivity, 2, 0, 1, 1)
-        self.label_borehole_burial_depth = QtWidgets.QLabel(self.frame_pipe_data)
-        self.label_borehole_burial_depth.setObjectName("label_borehole_burial_depth")
-        self.gridLayout_10.addWidget(self.label_borehole_burial_depth, 10, 0, 1, 1)
-        self.doubleSpinBox_pipe_conductivity = QtWidgets.QDoubleSpinBox(self.frame_pipe_data)
-        self.doubleSpinBox_pipe_conductivity.setStyleSheet("")
-        self.doubleSpinBox_pipe_conductivity.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.doubleSpinBox_pipe_conductivity.setDecimals(3)
-        self.doubleSpinBox_pipe_conductivity.setMinimum(0.0)
-        self.doubleSpinBox_pipe_conductivity.setMaximum(100000.0)
-        self.doubleSpinBox_pipe_conductivity.setSingleStep(0.1)
-        self.doubleSpinBox_pipe_conductivity.setProperty("value", 0.42)
-        self.doubleSpinBox_pipe_conductivity.setObjectName("doubleSpinBox_pipe_conductivity")
-        self.gridLayout_10.addWidget(self.doubleSpinBox_pipe_conductivity, 2, 2, 1, 1)
-        self.spinBox_number_pipes = QtWidgets.QSpinBox(self.frame_pipe_data)
-        self.spinBox_number_pipes.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.spinBox_number_pipes.setStyleSheet("")
-        self.spinBox_number_pipes.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.spinBox_number_pipes.setMinimum(1)
-        self.spinBox_number_pipes.setProperty("value", 2)
-        self.spinBox_number_pipes.setObjectName("spinBox_number_pipes")
-        self.gridLayout_10.addWidget(self.spinBox_number_pipes, 0, 2, 1, 1)
-        self.doubleSpinBox_borehole_burial_depth = QtWidgets.QDoubleSpinBox(self.frame_pipe_data)
-        self.doubleSpinBox_borehole_burial_depth.setStyleSheet("")
-        self.doubleSpinBox_borehole_burial_depth.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.doubleSpinBox_borehole_burial_depth.setDecimals(1)
-        self.doubleSpinBox_borehole_burial_depth.setMinimum(0.0)
-        self.doubleSpinBox_borehole_burial_depth.setMaximum(1000.0)
-        self.doubleSpinBox_borehole_burial_depth.setSingleStep(0.5)
-        self.doubleSpinBox_borehole_burial_depth.setProperty("value", 4.0)
-        self.doubleSpinBox_borehole_burial_depth.setObjectName("doubleSpinBox_borehole_burial_depth")
-        self.gridLayout_10.addWidget(self.doubleSpinBox_borehole_burial_depth, 10, 2, 1, 1)
+        self.horizontalLayout_35 = QtWidgets.QHBoxLayout(self.frame_pipe_data)
+        self.horizontalLayout_35.setObjectName("horizontalLayout_35")
+        self.graphicsView = QtWidgets.QGraphicsView(self.frame_pipe_data)
+        self.graphicsView.setMinimumSize(QtCore.QSize(0, 0))
+        self.graphicsView.setMaximumSize(QtCore.QSize(100, 16777215))
+        self.graphicsView.setStyleSheet("QFrame {\n"
+"    border: 1px solid #54bceb;\n"
+"    border-bottom-left-radius: 0px;\n"
+"    border-bottom-right-radius: 0px;\n"
+"}\n"
+"QLabel{border: 0px solid rgb(255,255,255);}")
+        self.graphicsView.setObjectName("graphicsView")
+        self.horizontalLayout_35.addWidget(self.graphicsView)
+        self.gridLayout = QtWidgets.QGridLayout()
+        self.gridLayout.setObjectName("gridLayout")
         self.label_NumberOfPipes = QtWidgets.QLabel(self.frame_pipe_data)
         self.label_NumberOfPipes.setObjectName("label_NumberOfPipes")
-        self.gridLayout_10.addWidget(self.label_NumberOfPipes, 0, 0, 1, 1)
-        self.label_pipe_roughness = QtWidgets.QLabel(self.frame_pipe_data)
-        self.label_pipe_roughness.setObjectName("label_pipe_roughness")
-        self.gridLayout_10.addWidget(self.label_pipe_roughness, 9, 0, 1, 1)
-        self.doubleSpinBox_pipe_distance = QtWidgets.QDoubleSpinBox(self.frame_pipe_data)
-        self.doubleSpinBox_pipe_distance.setStyleSheet("")
-        self.doubleSpinBox_pipe_distance.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.doubleSpinBox_pipe_distance.setDecimals(4)
-        self.doubleSpinBox_pipe_distance.setMinimum(0.0)
-        self.doubleSpinBox_pipe_distance.setMaximum(1000.0)
-        self.doubleSpinBox_pipe_distance.setSingleStep(0.001)
-        self.doubleSpinBox_pipe_distance.setProperty("value", 0.03)
-        self.doubleSpinBox_pipe_distance.setObjectName("doubleSpinBox_pipe_distance")
-        self.gridLayout_10.addWidget(self.doubleSpinBox_pipe_distance, 7, 2, 1, 1)
+        self.gridLayout.addWidget(self.label_NumberOfPipes, 0, 0, 1, 1)
         self.doubleSpinBox_pipe_roughness = QtWidgets.QDoubleSpinBox(self.frame_pipe_data)
         self.doubleSpinBox_pipe_roughness.setStyleSheet("")
         self.doubleSpinBox_pipe_roughness.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
@@ -901,28 +867,17 @@ class Ui_GHEtool(object):
         self.doubleSpinBox_pipe_roughness.setSingleStep(1e-06)
         self.doubleSpinBox_pipe_roughness.setProperty("value", 1e-06)
         self.doubleSpinBox_pipe_roughness.setObjectName("doubleSpinBox_pipe_roughness")
-        self.gridLayout_10.addWidget(self.doubleSpinBox_pipe_roughness, 9, 2, 1, 1)
-        spacerItem8 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_10.addItem(spacerItem8, 1, 1, 1, 1)
-        self.label_pipe_distance = QtWidgets.QLabel(self.frame_pipe_data)
-        self.label_pipe_distance.setObjectName("label_pipe_distance")
-        self.gridLayout_10.addWidget(self.label_pipe_distance, 7, 0, 1, 1)
-        self.label_pipe_inner_radius = QtWidgets.QLabel(self.frame_pipe_data)
-        self.label_pipe_inner_radius.setObjectName("label_pipe_inner_radius")
-        self.gridLayout_10.addWidget(self.label_pipe_inner_radius, 4, 0, 1, 1)
-        self.doubleSpinBox_grout_conductivity = QtWidgets.QDoubleSpinBox(self.frame_pipe_data)
-        self.doubleSpinBox_grout_conductivity.setStyleSheet("")
-        self.doubleSpinBox_grout_conductivity.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.doubleSpinBox_grout_conductivity.setDecimals(3)
-        self.doubleSpinBox_grout_conductivity.setMinimum(0.0)
-        self.doubleSpinBox_grout_conductivity.setMaximum(100000.0)
-        self.doubleSpinBox_grout_conductivity.setSingleStep(0.1)
-        self.doubleSpinBox_grout_conductivity.setProperty("value", 1.5)
-        self.doubleSpinBox_grout_conductivity.setObjectName("doubleSpinBox_grout_conductivity")
-        self.gridLayout_10.addWidget(self.doubleSpinBox_grout_conductivity, 1, 2, 1, 1)
-        self.label_grout_conductivity = QtWidgets.QLabel(self.frame_pipe_data)
-        self.label_grout_conductivity.setObjectName("label_grout_conductivity")
-        self.gridLayout_10.addWidget(self.label_grout_conductivity, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.doubleSpinBox_pipe_roughness, 7, 2, 1, 1)
+        self.doubleSpinBox_pipe_distance = QtWidgets.QDoubleSpinBox(self.frame_pipe_data)
+        self.doubleSpinBox_pipe_distance.setStyleSheet("")
+        self.doubleSpinBox_pipe_distance.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.doubleSpinBox_pipe_distance.setDecimals(4)
+        self.doubleSpinBox_pipe_distance.setMinimum(0.0)
+        self.doubleSpinBox_pipe_distance.setMaximum(1000.0)
+        self.doubleSpinBox_pipe_distance.setSingleStep(0.001)
+        self.doubleSpinBox_pipe_distance.setProperty("value", 0.04)
+        self.doubleSpinBox_pipe_distance.setObjectName("doubleSpinBox_pipe_distance")
+        self.gridLayout.addWidget(self.doubleSpinBox_pipe_distance, 6, 2, 1, 1)
         self.doubleSpinBox_pipe_inner_radius = QtWidgets.QDoubleSpinBox(self.frame_pipe_data)
         self.doubleSpinBox_pipe_inner_radius.setStyleSheet("")
         self.doubleSpinBox_pipe_inner_radius.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
@@ -932,10 +887,7 @@ class Ui_GHEtool(object):
         self.doubleSpinBox_pipe_inner_radius.setSingleStep(0.001)
         self.doubleSpinBox_pipe_inner_radius.setProperty("value", 0.02)
         self.doubleSpinBox_pipe_inner_radius.setObjectName("doubleSpinBox_pipe_inner_radius")
-        self.gridLayout_10.addWidget(self.doubleSpinBox_pipe_inner_radius, 4, 2, 1, 1)
-        self.label_borehole_radius = QtWidgets.QLabel(self.frame_pipe_data)
-        self.label_borehole_radius.setObjectName("label_borehole_radius")
-        self.gridLayout_10.addWidget(self.label_borehole_radius, 6, 0, 1, 1)
+        self.gridLayout.addWidget(self.doubleSpinBox_pipe_inner_radius, 4, 2, 1, 1)
         self.doubleSpinBox_borehole_radius = QtWidgets.QDoubleSpinBox(self.frame_pipe_data)
         self.doubleSpinBox_borehole_radius.setStyleSheet("")
         self.doubleSpinBox_borehole_radius.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
@@ -945,10 +897,40 @@ class Ui_GHEtool(object):
         self.doubleSpinBox_borehole_radius.setSingleStep(0.001)
         self.doubleSpinBox_borehole_radius.setProperty("value", 0.075)
         self.doubleSpinBox_borehole_radius.setObjectName("doubleSpinBox_borehole_radius")
-        self.gridLayout_10.addWidget(self.doubleSpinBox_borehole_radius, 6, 2, 1, 1)
-        self.label_pipe_outer_radius = QtWidgets.QLabel(self.frame_pipe_data)
-        self.label_pipe_outer_radius.setObjectName("label_pipe_outer_radius")
-        self.gridLayout_10.addWidget(self.label_pipe_outer_radius, 3, 0, 1, 1)
+        self.gridLayout.addWidget(self.doubleSpinBox_borehole_radius, 5, 2, 1, 1)
+        self.spinBox_number_pipes = QtWidgets.QSpinBox(self.frame_pipe_data)
+        self.spinBox_number_pipes.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.spinBox_number_pipes.setStyleSheet("")
+        self.spinBox_number_pipes.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.spinBox_number_pipes.setMinimum(1)
+        self.spinBox_number_pipes.setProperty("value", 2)
+        self.spinBox_number_pipes.setObjectName("spinBox_number_pipes")
+        self.gridLayout.addWidget(self.spinBox_number_pipes, 0, 2, 1, 1)
+        self.label_grout_conductivity = QtWidgets.QLabel(self.frame_pipe_data)
+        self.label_grout_conductivity.setObjectName("label_grout_conductivity")
+        self.gridLayout.addWidget(self.label_grout_conductivity, 1, 0, 1, 1)
+        spacerItem8 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout.addItem(spacerItem8, 0, 1, 1, 1)
+        self.doubleSpinBox_pipe_conductivity = QtWidgets.QDoubleSpinBox(self.frame_pipe_data)
+        self.doubleSpinBox_pipe_conductivity.setStyleSheet("")
+        self.doubleSpinBox_pipe_conductivity.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.doubleSpinBox_pipe_conductivity.setDecimals(3)
+        self.doubleSpinBox_pipe_conductivity.setMinimum(0.0)
+        self.doubleSpinBox_pipe_conductivity.setMaximum(100000.0)
+        self.doubleSpinBox_pipe_conductivity.setSingleStep(0.1)
+        self.doubleSpinBox_pipe_conductivity.setProperty("value", 0.42)
+        self.doubleSpinBox_pipe_conductivity.setObjectName("doubleSpinBox_pipe_conductivity")
+        self.gridLayout.addWidget(self.doubleSpinBox_pipe_conductivity, 2, 2, 1, 1)
+        self.doubleSpinBox_grout_conductivity = QtWidgets.QDoubleSpinBox(self.frame_pipe_data)
+        self.doubleSpinBox_grout_conductivity.setStyleSheet("")
+        self.doubleSpinBox_grout_conductivity.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.doubleSpinBox_grout_conductivity.setDecimals(3)
+        self.doubleSpinBox_grout_conductivity.setMinimum(0.0)
+        self.doubleSpinBox_grout_conductivity.setMaximum(100000.0)
+        self.doubleSpinBox_grout_conductivity.setSingleStep(0.1)
+        self.doubleSpinBox_grout_conductivity.setProperty("value", 1.5)
+        self.doubleSpinBox_grout_conductivity.setObjectName("doubleSpinBox_grout_conductivity")
+        self.gridLayout.addWidget(self.doubleSpinBox_grout_conductivity, 1, 2, 1, 1)
         self.doubleSpinBox_pipe_outer_radius = QtWidgets.QDoubleSpinBox(self.frame_pipe_data)
         self.doubleSpinBox_pipe_outer_radius.setStyleSheet("")
         self.doubleSpinBox_pipe_outer_radius.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
@@ -958,7 +940,39 @@ class Ui_GHEtool(object):
         self.doubleSpinBox_pipe_outer_radius.setSingleStep(0.001)
         self.doubleSpinBox_pipe_outer_radius.setProperty("value", 0.022)
         self.doubleSpinBox_pipe_outer_radius.setObjectName("doubleSpinBox_pipe_outer_radius")
-        self.gridLayout_10.addWidget(self.doubleSpinBox_pipe_outer_radius, 3, 2, 1, 1)
+        self.gridLayout.addWidget(self.doubleSpinBox_pipe_outer_radius, 3, 2, 1, 1)
+        self.doubleSpinBox_borehole_burial_depth = QtWidgets.QDoubleSpinBox(self.frame_pipe_data)
+        self.doubleSpinBox_borehole_burial_depth.setStyleSheet("")
+        self.doubleSpinBox_borehole_burial_depth.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.doubleSpinBox_borehole_burial_depth.setDecimals(1)
+        self.doubleSpinBox_borehole_burial_depth.setMinimum(0.0)
+        self.doubleSpinBox_borehole_burial_depth.setMaximum(1000.0)
+        self.doubleSpinBox_borehole_burial_depth.setSingleStep(0.5)
+        self.doubleSpinBox_borehole_burial_depth.setProperty("value", 4.0)
+        self.doubleSpinBox_borehole_burial_depth.setObjectName("doubleSpinBox_borehole_burial_depth")
+        self.gridLayout.addWidget(self.doubleSpinBox_borehole_burial_depth, 8, 2, 1, 1)
+        self.label_pipe_conductivity = QtWidgets.QLabel(self.frame_pipe_data)
+        self.label_pipe_conductivity.setObjectName("label_pipe_conductivity")
+        self.gridLayout.addWidget(self.label_pipe_conductivity, 2, 0, 1, 1)
+        self.label_pipe_outer_radius = QtWidgets.QLabel(self.frame_pipe_data)
+        self.label_pipe_outer_radius.setObjectName("label_pipe_outer_radius")
+        self.gridLayout.addWidget(self.label_pipe_outer_radius, 3, 0, 1, 1)
+        self.label_pipe_inner_radius = QtWidgets.QLabel(self.frame_pipe_data)
+        self.label_pipe_inner_radius.setObjectName("label_pipe_inner_radius")
+        self.gridLayout.addWidget(self.label_pipe_inner_radius, 4, 0, 1, 1)
+        self.label_borehole_radius = QtWidgets.QLabel(self.frame_pipe_data)
+        self.label_borehole_radius.setObjectName("label_borehole_radius")
+        self.gridLayout.addWidget(self.label_borehole_radius, 5, 0, 1, 1)
+        self.label_pipe_distance = QtWidgets.QLabel(self.frame_pipe_data)
+        self.label_pipe_distance.setObjectName("label_pipe_distance")
+        self.gridLayout.addWidget(self.label_pipe_distance, 6, 0, 1, 1)
+        self.label_pipe_roughness = QtWidgets.QLabel(self.frame_pipe_data)
+        self.label_pipe_roughness.setObjectName("label_pipe_roughness")
+        self.gridLayout.addWidget(self.label_pipe_roughness, 7, 0, 1, 1)
+        self.label_borehole_burial_depth = QtWidgets.QLabel(self.frame_pipe_data)
+        self.label_borehole_burial_depth.setObjectName("label_borehole_burial_depth")
+        self.gridLayout.addWidget(self.label_borehole_burial_depth, 8, 0, 1, 1)
+        self.horizontalLayout_35.addLayout(self.gridLayout)
         self.verticalLayout_17.addWidget(self.frame_pipe_data)
         spacerItem9 = QtWidgets.QSpacerItem(20, 442, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_17.addItem(spacerItem9)
@@ -1006,7 +1020,7 @@ class Ui_GHEtool(object):
         self.scrollArea_thermal.setWidgetResizable(True)
         self.scrollArea_thermal.setObjectName("scrollArea_thermal")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, -524, 1019, 1239))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 884, 1239))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout_20 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_20.setContentsMargins(0, 0, 0, 0)
@@ -1076,7 +1090,7 @@ class Ui_GHEtool(object):
 "border-bottom-right-radius: 0px;}")
         self.toolBox.setObjectName("toolBox")
         self.page_File = QtWidgets.QWidget()
-        self.page_File.setGeometry(QtCore.QRect(0, -67, 982, 241))
+        self.page_File.setGeometry(QtCore.QRect(0, 0, 847, 241))
         self.page_File.setObjectName("page_File")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.page_File)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -1115,7 +1129,14 @@ class Ui_GHEtool(object):
         self.horizontalLayout_11.addWidget(self.label_Filename)
         self.lineEdit_displayCsv = QtWidgets.QLineEdit(self.page_File)
         self.lineEdit_displayCsv.setMaximumSize(QtCore.QSize(10000000, 25))
-        self.lineEdit_displayCsv.setStyleSheet("")
+        self.lineEdit_displayCsv.setStyleSheet("QLineEdit{border: 3px solid rgb(84, 188, 235);\n"
+"border-radius: 5px;\n"
+"color: rgb(255, 255, 255);\n"
+"gridline-color: rgb(84, 188, 235);\n"
+"background-color: rgb(84, 188, 235);\n"
+"font-weight:500;\n"
+"selection-background-color: rgb(42, 126, 179);}\n"
+"QLineEdit:hover{background-color: rgb(0, 64, 122);}")
         self.lineEdit_displayCsv.setText("")
         self.lineEdit_displayCsv.setObjectName("lineEdit_displayCsv")
         self.horizontalLayout_11.addWidget(self.lineEdit_displayCsv)
@@ -1145,6 +1166,7 @@ class Ui_GHEtool(object):
         spacerItem12 = QtWidgets.QSpacerItem(477, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_26.addItem(spacerItem12)
         self.comboBox_Seperator = QtWidgets.QComboBox(self.frame_Seperator)
+        self.comboBox_Seperator.setMinimumSize(QtCore.QSize(120, 0))
         self.comboBox_Seperator.setStyleSheet("QFrame {\n"
 "    border: 1px solid rgb(255, 255, 255);\n"
 "    border-bottom-left-radius: 0px;\n"
@@ -1169,6 +1191,7 @@ class Ui_GHEtool(object):
         spacerItem13 = QtWidgets.QSpacerItem(477, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_27.addItem(spacerItem13)
         self.comboBox_decimal = QtWidgets.QComboBox(self.frame_decimal)
+        self.comboBox_decimal.setMinimumSize(QtCore.QSize(120, 0))
         self.comboBox_decimal.setStyleSheet("QFrame {\n"
 "    border: 1px solid rgb(255, 255, 255);\n"
 "    border-bottom-left-radius: 0px;\n"
@@ -1196,14 +1219,15 @@ class Ui_GHEtool(object):
         spacerItem14 = QtWidgets.QSpacerItem(477, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_19.addItem(spacerItem14)
         self.comboBox_sheetName = QtWidgets.QComboBox(self.frame_sheetName)
-        self.comboBox_sheetName.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_sheetName.setMaximumSize(QtCore.QSize(200, 300))
+        self.comboBox_sheetName.setMinimumSize(QtCore.QSize(120, 30))
+        self.comboBox_sheetName.setMaximumSize(QtCore.QSize(300, 300))
         self.comboBox_sheetName.setStyleSheet("QFrame {\n"
 "    border: 1px solid rgb(255, 255, 255);\n"
 "    border-bottom-left-radius: 0px;\n"
 "    border-bottom-right-radius: 0px;\n"
 "}")
         self.comboBox_sheetName.setEditable(True)
+        self.comboBox_sheetName.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToContents)
         self.comboBox_sheetName.setFrame(True)
         self.comboBox_sheetName.setObjectName("comboBox_sheetName")
         self.horizontalLayout_19.addWidget(self.comboBox_sheetName)
@@ -1222,7 +1246,13 @@ class Ui_GHEtool(object):
         self.pushButton_load.setSizePolicy(sizePolicy)
         self.pushButton_load.setMinimumSize(QtCore.QSize(100, 35))
         self.pushButton_load.setMaximumSize(QtCore.QSize(100, 35))
-        self.pushButton_load.setStyleSheet("")
+        self.pushButton_load.setStyleSheet("QPushButton{border: 3px solid rgb(84, 188, 235);\n"
+"border-radius: 5px;\n"
+"color: rgb(255, 255, 255);\n"
+"gridline-color: rgb(84, 188, 235);\n"
+"background-color: rgb(84, 188, 235);\n"
+"font-weight:500;}\n"
+"QPushButton:hover{background-color: rgb(0, 64, 122);}")
         icon12 = QtGui.QIcon()
         icon12.addPixmap(QtGui.QPixmap(":/icons/icons/Download.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton_load.setIcon(icon12)
@@ -1233,7 +1263,7 @@ class Ui_GHEtool(object):
         self.verticalLayout.addLayout(self.horizontalLayout_16)
         self.toolBox.addItem(self.page_File, "")
         self.page_DataLocation = QtWidgets.QWidget()
-        self.page_DataLocation.setGeometry(QtCore.QRect(0, 0, 982, 188))
+        self.page_DataLocation.setGeometry(QtCore.QRect(0, 0, 882, 188))
         self.page_DataLocation.setObjectName("page_DataLocation")
         self.verticalLayout_10 = QtWidgets.QVBoxLayout(self.page_DataLocation)
         self.verticalLayout_10.setObjectName("verticalLayout_10")
@@ -1439,7 +1469,13 @@ class Ui_GHEtool(object):
         self.pushButton_calculate.setMinimumSize(QtCore.QSize(100, 35))
         self.pushButton_calculate.setMaximumSize(QtCore.QSize(100, 35))
         self.pushButton_calculate.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.pushButton_calculate.setStyleSheet("")
+        self.pushButton_calculate.setStyleSheet("QPushButton{border: 3px solid rgb(84, 188, 235);\n"
+"border-radius: 5px;\n"
+"color: rgb(255, 255, 255);\n"
+"gridline-color: rgb(84, 188, 235);\n"
+"background-color: rgb(84, 188, 235);\n"
+"font-weight:500;}\n"
+"QPushButton:hover{background-color: rgb(0, 64, 122);}")
         self.pushButton_calculate.setIcon(icon8)
         self.pushButton_calculate.setFlat(False)
         self.pushButton_calculate.setObjectName("pushButton_calculate")
@@ -2107,6 +2143,7 @@ class Ui_GHEtool(object):
         spacerItem23 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_10.addItem(spacerItem23)
         self.comboBox_SeperatorDataFile = QtWidgets.QComboBox(self.frame_data_file)
+        self.comboBox_SeperatorDataFile.setMinimumSize(QtCore.QSize(120, 0))
         self.comboBox_SeperatorDataFile.setStyleSheet("QFrame {\n"
 "    border: 1px solid rgb(255, 255, 255);\n"
 "    border-bottom-left-radius: 0px;\n"
@@ -2126,6 +2163,7 @@ class Ui_GHEtool(object):
         spacerItem24 = QtWidgets.QSpacerItem(477, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_36.addItem(spacerItem24)
         self.comboBox_decimalDataFile = QtWidgets.QComboBox(self.frame_data_file)
+        self.comboBox_decimalDataFile.setMinimumSize(QtCore.QSize(120, 0))
         self.comboBox_decimalDataFile.setStyleSheet("QFrame {\n"
 "    border: 1px solid rgb(255, 255, 255);\n"
 "    border-bottom-left-radius: 0px;\n"
@@ -2335,7 +2373,7 @@ class Ui_GHEtool(object):
 "    border-bottom-right-radius: 0px;\n"
 "}")
         self.comboBox_dataUnit_data_file.setEditable(False)
-        self.comboBox_dataUnit_data_file.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToContentsOnFirstShow)
+        self.comboBox_dataUnit_data_file.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToContents)
         self.comboBox_dataUnit_data_file.setFrame(True)
         self.comboBox_dataUnit_data_file.setObjectName("comboBox_dataUnit_data_file")
         self.comboBox_dataUnit_data_file.addItem("")
@@ -2605,7 +2643,7 @@ class Ui_GHEtool(object):
         GHEtool.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(GHEtool)
         self.menubar.setEnabled(True)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1381, 30))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1097, 30))
         self.menubar.setStyleSheet("QMenuBar::item{\n"
 "    background-color: rgb(0, 64, 122);\n"
 "}\n"
@@ -2760,6 +2798,13 @@ class Ui_GHEtool(object):
         self.actionInputChanged.setObjectName("actionInputChanged")
         self.actionCheckUDistance = QtWidgets.QAction(GHEtool)
         self.actionCheckUDistance.setObjectName("actionCheckUDistance")
+        self.actionUpdateBoreholeGraph = QtWidgets.QAction(GHEtool)
+        self.actionUpdateBoreholeGraph.setObjectName("actionUpdateBoreholeGraph")
+        self.actionGalician = QtWidgets.QAction(GHEtool)
+        icon34 = QtGui.QIcon()
+        icon34.addPixmap(QtGui.QPixmap(":/icons/icons/Flag_Galicia.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionGalician.setIcon(icon34)
+        self.actionGalician.setObjectName("actionGalician")
         self.menuFile.addAction(self.actionNew)
         self.menuFile.addAction(self.actionSave)
         self.menuFile.addAction(self.actionSave_As)
@@ -2772,6 +2817,7 @@ class Ui_GHEtool(object):
         self.menuLanguage.addAction(self.actionItalian)
         self.menuLanguage.addAction(self.actionFrench)
         self.menuLanguage.addAction(self.actionSpanish)
+        self.menuLanguage.addAction(self.actionGalician)
         self.menuSettings.addAction(self.menuLanguage.menuAction())
         self.menuScenario.addAction(self.actionUpdate_Scenario)
         self.menuScenario.addAction(self.actionAdd_Scenario)
@@ -2900,6 +2946,12 @@ class Ui_GHEtool(object):
         self.comboBox_dataUnit_data_file.currentIndexChanged['int'].connect(self.actionInputChanged.trigger)
         self.comboBox_dataColumn_data_file.currentIndexChanged['int'].connect(self.actionInputChanged.trigger)
         self.comboBox_decimalDataFile.currentIndexChanged['int'].connect(self.actionInputChanged.trigger)
+        self.spinBox_number_pipes.valueChanged['int'].connect(self.actionUpdateBoreholeGraph.trigger)
+        self.doubleSpinBox_pipe_inner_radius.valueChanged['double'].connect(self.actionUpdate_Scenario.trigger)
+        self.doubleSpinBox_pipe_outer_radius.valueChanged['double'].connect(self.actionUpdateBoreholeGraph.trigger)
+        self.doubleSpinBox_borehole_radius.valueChanged['double'].connect(self.actionUpdateBoreholeGraph.trigger)
+        self.doubleSpinBox_pipe_distance.valueChanged['double'].connect(self.actionUpdateBoreholeGraph.trigger)
+        self.doubleSpinBox_pipe_inner_radius.valueChanged['double'].connect(self.actionUpdateBoreholeGraph.trigger)
         QtCore.QMetaObject.connectSlotsByName(GHEtool)
 
     def retranslateUi(self, GHEtool):
@@ -2968,15 +3020,15 @@ class Ui_GHEtool(object):
         self.label_fluid_density.setText(_translate("GHEtool", "Density [kg/m³]:"))
         self.label_fluid_viscosity.setText(_translate("GHEtool", "Dynamic viscosity [Pa s]:"))
         self.label_pipe_data.setText(_translate("GHEtool", "Pipe data"))
-        self.label_pipe_conductivity.setText(_translate("GHEtool", "Pipe thermal conductivity [W/mK]: "))
-        self.label_borehole_burial_depth.setText(_translate("GHEtool", "Burial depth [m]:"))
         self.label_NumberOfPipes.setText(_translate("GHEtool", "Number of pipes [#]:"))
-        self.label_pipe_roughness.setText(_translate("GHEtool", "Pipe roughness [m]:"))
-        self.label_pipe_distance.setText(_translate("GHEtool", "Distance of pipe until center [m]:"))
-        self.label_pipe_inner_radius.setText(_translate("GHEtool", "Inner pipe radius [m]: "))
         self.label_grout_conductivity.setText(_translate("GHEtool", "Grout thermal conductivity [W/mK]: "))
-        self.label_borehole_radius.setText(_translate("GHEtool", "Borehole radius [m]:"))
+        self.label_pipe_conductivity.setText(_translate("GHEtool", "Pipe thermal conductivity [W/mK]: "))
         self.label_pipe_outer_radius.setText(_translate("GHEtool", "Outer pipe radius [m]: "))
+        self.label_pipe_inner_radius.setText(_translate("GHEtool", "Inner pipe radius [m]: "))
+        self.label_borehole_radius.setText(_translate("GHEtool", "Borehole radius [m]:"))
+        self.label_pipe_distance.setText(_translate("GHEtool", "Distance of pipe until center [m]:"))
+        self.label_pipe_roughness.setText(_translate("GHEtool", "Pipe roughness [m]:"))
+        self.label_borehole_burial_depth.setText(_translate("GHEtool", "Burial depth [m]:"))
         self.pushButton_PreviousResistance.setText(_translate("GHEtool", "  previous  "))
         self.pushButton_NextResistance.setText(_translate("GHEtool", "  next  "))
         self.label_ThermalDemandsTitle.setText(_translate("GHEtool", "Thermal demands"))
@@ -2984,22 +3036,22 @@ class Ui_GHEtool(object):
         self.checkBox_Import.setText(_translate("GHEtool", "Import Demands?"))
         self.label_DataType.setText(_translate("GHEtool", "File type: "))
         self.comboBox_Datentyp.setCurrentText(_translate("GHEtool", ".csv"))
-        self.comboBox_Datentyp.setProperty("placeholderText", _translate("GHEtool", "choose your fileImport ..."))
+        self.comboBox_Datentyp.setProperty("placeholderText", _translate("GHEtool", "choose your file ..."))
         self.comboBox_Datentyp.setItemText(0, _translate("GHEtool", ".csv"))
         self.comboBox_Datentyp.setItemText(1, _translate("GHEtool", ".xlsx"))
         self.comboBox_Datentyp.setItemText(2, _translate("GHEtool", ".xls"))
         self.label_Filename.setText(_translate("GHEtool", "Filename: "))
         self.pushButton_loadCsv.setText(_translate("GHEtool", "..."))
-        self.label_Seperator.setText(_translate("GHEtool", "Seperator in CSV-fileImport:"))
+        self.label_Seperator.setText(_translate("GHEtool", "Seperator in CSV-file:"))
         self.comboBox_Seperator.setItemText(0, _translate("GHEtool", "Semicolon \';\'"))
         self.comboBox_Seperator.setItemText(1, _translate("GHEtool", "Comma \',\'"))
-        self.label_decimal.setText(_translate("GHEtool", "Decimal sign in CSV-fileImport:"))
+        self.label_decimal.setText(_translate("GHEtool", "Decimal sign in CSV-file:"))
         self.comboBox_decimal.setItemText(0, _translate("GHEtool", "Point \'.\'"))
         self.comboBox_decimal.setItemText(1, _translate("GHEtool", "Comma \',\'"))
         self.label_SheetName.setText(_translate("GHEtool", "Sheet Name"))
         self.comboBox_sheetName.setProperty("placeholderText", _translate("GHEtool", "choose your excel sheet name "))
         self.pushButton_load.setText(_translate("GHEtool", "Load"))
-        self.toolBox.setItemText(self.toolBox.indexOf(self.page_File), _translate("GHEtool", "Data fileImport"))
+        self.toolBox.setItemText(self.toolBox.indexOf(self.page_File), _translate("GHEtool", "Data file"))
         self.label_dataColumn.setText(_translate("GHEtool", "Thermal demands: "))
         self.comboBox_dataColumn.setCurrentText(_translate("GHEtool", "2 columns"))
         self.comboBox_dataColumn.setItemText(0, _translate("GHEtool", "2 columns"))
@@ -3019,7 +3071,7 @@ class Ui_GHEtool(object):
         self.comboBox_dataUnit.setItemText(1, _translate("GHEtool", "kW"))
         self.comboBox_dataUnit.setItemText(2, _translate("GHEtool", "MW"))
         self.pushButton_calculate.setText(_translate("GHEtool", "Calculate"))
-        self.toolBox.setItemText(self.toolBox.indexOf(self.page_DataLocation), _translate("GHEtool", "Data location in fileImport"))
+        self.toolBox.setItemText(self.toolBox.indexOf(self.page_DataLocation), _translate("GHEtool", "Data location in file"))
         self.label_ThermalDemands.setText(_translate("GHEtool", "Thermal demands"))
         self.label_Oct.setText(_translate("GHEtool", "October"))
         self.label_Aug.setText(_translate("GHEtool", "August"))
@@ -3052,11 +3104,11 @@ class Ui_GHEtool(object):
         self.comboBox_Unit_Load.setItemText(1, _translate("GHEtool", "kWh"))
         self.comboBox_Unit_Load.setItemText(2, _translate("GHEtool", "MWh"))
         self.pushButton_Unit.setText(_translate("GHEtool", "OK"))
-        self.label_data_file.setText(_translate("GHEtool", "Select data fileImport"))
-        self.label_SeperatorDataFile.setText(_translate("GHEtool", "Seperator in CSV-fileImport:"))
+        self.label_data_file.setText(_translate("GHEtool", "Select data file"))
+        self.label_SeperatorDataFile.setText(_translate("GHEtool", "Seperator in CSV-file:"))
         self.comboBox_SeperatorDataFile.setItemText(0, _translate("GHEtool", "Semicolon \';\'"))
         self.comboBox_SeperatorDataFile.setItemText(1, _translate("GHEtool", "Comma \',\'"))
-        self.label_decimalDataFile.setText(_translate("GHEtool", "Decimal sign in CSV-fileImport:"))
+        self.label_decimalDataFile.setText(_translate("GHEtool", "Decimal sign in CSV-file:"))
         self.comboBox_decimalDataFile.setItemText(0, _translate("GHEtool", "Point \'.\'"))
         self.comboBox_decimalDataFile.setItemText(1, _translate("GHEtool", "Comma \',\'"))
         self.label_Filename_2.setText(_translate("GHEtool", "Filename: "))
@@ -3096,7 +3148,7 @@ class Ui_GHEtool(object):
         self.menuScenario.setTitle(_translate("GHEtool", "Scenario"))
         self.toolBar.setWindowTitle(_translate("GHEtool", "toolBar"))
         self.actionNew.setText(_translate("GHEtool", "New"))
-        self.actionNew.setToolTip(_translate("GHEtool", "Create new project fileImport"))
+        self.actionNew.setToolTip(_translate("GHEtool", "Create new project file"))
         self.actionNew.setShortcut(_translate("GHEtool", "Ctrl+N"))
         self.actionSave.setText(_translate("GHEtool", "Save"))
         self.actionSave.setShortcut(_translate("GHEtool", "Ctrl+S"))
@@ -3130,4 +3182,8 @@ class Ui_GHEtool(object):
         self.actionSpanish.setShortcut(_translate("GHEtool", "Ctrl+Alt+S"))
         self.actionInputChanged.setText(_translate("GHEtool", "InputChanged"))
         self.actionCheckUDistance.setText(_translate("GHEtool", "CheckUDistance"))
+        self.actionUpdateBoreholeGraph.setText(_translate("GHEtool", "UpdateBoreholeGraph"))
+        self.actionGalician.setText(_translate("GHEtool", "Galician"))
+        self.actionGalician.setShortcut(_translate("GHEtool", "Ctrl+Alt+A"))
 
+from .icons_rc import *

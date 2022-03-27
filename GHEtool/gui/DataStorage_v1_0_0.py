@@ -1,5 +1,5 @@
 from ctypes import cast as ctypes_cast, py_object as ctypes_py_object
-from GHEtool import *
+from VariableClasses.VariableClasses import GroundData, PipeData, FluidData
 from typing import Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from GHEtool import Borefield
@@ -14,7 +14,7 @@ class DataStorage:
                 'determineDepth', 'unitDemand', 'unitPeak', 'FactorDemand', 'FactorPeak', 'size_bore_field', 'H_max',\
                 'B_max', 'B_min', 'L_max', 'W_max', 'Size_Method', 'fluidData', 'pipeData', 'R_b_calculation_method', \
                 'Depth_Method', 'optimizeLoadProfile', 'dataFile', 'headerHeating', 'headerCooling', 'numberColumns', \
-                'dataUnit', 'dataSeperator', 'dataDecimal'
+                'dataUnit', 'dataSeperator', 'dataDecimal', 'fileSelected'
 
     def __init__(self, ui: int) -> None:
         """
@@ -104,7 +104,7 @@ class DataStorage:
         if self.optimizeLoadProfile:
             # get filename and path of data fileImport
             self.dataFile: str = getattr(obj, 'lineEdit_filename_data_file').text()
-            # get separator for data fileImport
+            # get seperator for data fileImport
             self.dataSeperator: int = getattr(obj, 'comboBox_SeperatorDataFile').currentIndex()
             # get decimal sign for data fileImport
             self.dataDecimal: int = getattr(obj, 'comboBox_decimalDataFile').currentIndex()
@@ -184,6 +184,8 @@ class DataStorage:
                                          getattr(obj, 'doubleSpinBox_CL_Dec').value() * self.FactorDemand]
         # initialize bore field
         self.boreField: Optional[Borefield, None] = None
+        # check if a file for optimizing the load profile has been selected
+        self.fileSelected: bool = (self.optimizeLoadProfile and self.dataFile == '')
 
     def set_values(self) -> None:
         """Set Values to GUI"""
@@ -247,7 +249,7 @@ class DataStorage:
         if self.optimizeLoadProfile:
             # set filename and path of data fileImport
             getattr(obj, 'lineEdit_filename_data_file').setText(self.dataFile)
-            # set separator for data fileImport
+            # set seperator for data fileImport
             getattr(obj, 'comboBox_SeperatorDataFile').setCurrentIndex(self.dataSeperator)
             # get decimal sign for data fileImport
             getattr(obj, 'comboBox_decimalDataFile').setCurrentIndex(self.dataDecimal)
@@ -315,6 +317,11 @@ class DataStorage:
         getattr(obj, 'doubleSpinBox_CL_Dec').setValue(self.monthlyLoadCooling[11] / self.FactorDemand)
 
     def __eq__(self, other) -> bool:
+        """
+        equality function to check if values are equal
+        :param other: to compare Datastorage
+        :return: boolean which is true if self has the same values as other
+        """
         # if not of same class return false
         if not isinstance(other, DataStorage):
             return False

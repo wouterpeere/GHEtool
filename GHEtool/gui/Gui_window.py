@@ -1,18 +1,19 @@
 from sys import path
 from typing import Optional, TYPE_CHECKING
-from Translation_class import TrClass
+from .Translation_class import TrClass
 from PyQt5.QtWidgets import QMainWindow as QtWidgets_QMainWindow, QWidget as QtWidgets_QWidget, QApplication as \
     QtWidgets_QApplication, QPushButton as QtWidgets_QPushButton, QMessageBox as QtWidgets_QMessageBox, QFileDialog as \
     QtWidgets_QFileDialog, QInputDialog as QtWidgets_QInputDialog, QDialog as QtWidgets_QDialog, QMenu as \
-    QtWidgets_QMenu, QDoubleSpinBox as QtWidgets_QDoubleSpinBox, QListWidgetItem as QtWidgets_QListWidgetItem
+    QtWidgets_QMenu, QDoubleSpinBox as QtWidgets_QDoubleSpinBox, QListWidgetItem as QtWidgets_QListWidgetItem, \
+    QHBoxLayout as QtWidgets_QHBoxLayout
 from pickle import dump as pk_dump, HIGHEST_PROTOCOL as pk_HP, load as pk_load
 from PyQt5.QtCore import QSize as QtCore_QSize, QEvent as QtCore_QEvent, QThread as QtCore_QThread, \
     pyqtSignal as QtCore_pyqtSignal, QModelIndex as QtCore_QModelIndex
 from PyQt5.QtGui import QIcon as QtGui_QIcon, QPixmap as QtGui_QPixmap
-from gui_Main import Ui_GHEtool
+from .gui_Main import Ui_GHEtool
 from os.path import dirname, realpath, split as os_split
 from functools import partial as ft_partial
-from DataStorage_v1_0_0 import DataStorage
+from .DataStorage_v1_0_0 import DataStorage
 from time import sleep
 
 if TYPE_CHECKING:
@@ -82,6 +83,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.changedScenario: bool = False  # set change scenario variable to false
         self.changedFile: bool = False  # set change file variable to false
         self.ax: list = []  # axes of figure
+        self.axBorehole = None
         self.canvas = None  # canvas class of figure
         self.fig = None  # figure
         self.NumberOfScenarios: int = 1  # number of scenarios
@@ -189,6 +191,8 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.actionDutch.triggered.connect(ft_partial(self.comboBox_Language.setCurrentIndex, 2))
         self.actionItalian.triggered.connect(ft_partial(self.comboBox_Language.setCurrentIndex, 3))
         self.actionFrench.triggered.connect(ft_partial(self.comboBox_Language.setCurrentIndex, 4))
+        self.actionSpanish.triggered.connect(ft_partial(self.comboBox_Language.setCurrentIndex, 5))
+        self.actionGalician.triggered.connect(ft_partial(self.comboBox_Language.setCurrentIndex, 6))
         self.doubleSpinBox_pipe_outer_radius.valueChanged.connect(self.doubleSpinBox_pipe_inner_radius.setMaximum)
         self.doubleSpinBox_pipe_inner_radius.valueChanged.connect(self.doubleSpinBox_pipe_outer_radius.setMinimum)
         self.doubleSpinBox_H.valueChanged.connect(self.checkBounds)
@@ -215,6 +219,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.comboBox_dataColumn_data_file.setCurrentIndex(not self.comboBox_dataColumn_data_file.currentIndex())
         self.actionCheckUDistance.triggered.connect(self.checkDistanceBetweenPipes)
         self.comboBox_Language.currentIndexChanged.connect(self.changeLanguage)
+        self.actionUpdateBoreholeGraph.triggered.connect(self.updateBorehole)
         self.Dia.closeEvent = self.closeEvent
         self.checkBox_Import.toggle()
         self.checkBox_Import.toggle()
@@ -682,7 +687,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         """
         # import pandas here to save start up time
         from pandas import read_csv as pd_read_csv
-        # get decimal and column separator
+        # get decimal and column seperator
         sep: str = ';' if self.comboBox_SeperatorDataFile.currentIndex() == 0 else ','
         dec: str = '.' if self.comboBox_decimalDataFile.currentIndex() == 0 else ','
         # try to read CSV-File
@@ -756,7 +761,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.comboBox_dataColumn.setCurrentIndex(-1)
         self.comboBox_timeStep.setCurrentIndex(-1)
         try:
-            # open filename by sheet or with column and decimal separator
+            # open filename by sheet or with column and decimal seperator
             if ".xlsx" in filename:
                 # import pandas here to save start up time
                 sheet_name = self.comboBox_sheetName.currentText()
@@ -819,6 +824,72 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         if idx == 2:
             self.comboBox_date.clear()
             self.comboBox_date.addItems(columns)
+
+    def updateBorehole(self) -> None:
+        """
+        plots the position of the pipes in the borehole
+        :return: None
+        """
+        # import all that is needed
+        from math import pi
+        from numpy import cos, sin
+        from PyQt5.QtWidgets import QGraphicsScene, QGraphicsEllipseItem
+        from PyQt5.QtGui import QColor, QPen
+        # get variables from gui
+        numberOfPipes = self.spinBox_number_pipes.value()
+        rOut = self.doubleSpinBox_pipe_outer_radius.value() * 10
+        rIn = self.doubleSpinBox_pipe_inner_radius.value() * 10
+        rBore = self.doubleSpinBox_borehole_radius.value() * 10
+        dis = self.doubleSpinBox_pipe_distance.value() * 10
+        # calculate scale from graphic view size
+        max_l = min(self.graphicsView.width(), self.graphicsView.height())
+        scale = max_l/rBore/1.25  # leave 25 % space
+        # set colors
+        blue_color = QColor(0, 64, 122)
+        blue_light = QColor(84, 188, 235)
+        white_color = QColor(255, 255, 255)
+        grey = QColor(100, 100, 100)
+        brown = QColor(145, 124, 111)
+        # create graphic scene if not exits otherwise get scene and delete items
+        if self.graphicsView.scene() is None:
+            scene = QGraphicsScene()
+            self.graphicsView.setScene(scene)
+            self.graphicsView.setBackgroundBrush(brown)
+        else:
+            scene = self.graphicsView.scene()
+            scene.clear()
+        # create borehole circle in grey wih no border
+        circle = QGraphicsEllipseItem(-rBore*scale/2, -rBore*scale/2, rBore*scale, rBore*scale)
+        circle.setPen(QPen(grey, 0))
+        circle.setBrush(grey)
+        scene.addItem(circle)
+        # calculate pipe position and draw circle (white for outer pipe and blue for inner pipe)
+        dt: float = pi / float(numberOfPipes)
+        for i in range(numberOfPipes):
+            pos_1 = dis * cos(2.0 * i * dt + pi)/2
+            pos_2 = dis * sin(2.0 * i * dt + pi)/2
+            circle = QGraphicsEllipseItem((pos_1 - rOut / 2) * scale, (pos_2 - rOut / 2) * scale,
+                                          rOut * scale, rOut * scale)
+            circle.setPen(white_color)
+            circle.setBrush(white_color)
+            scene.addItem(circle)
+            circle = QGraphicsEllipseItem((pos_1 - rIn / 2) * scale, (pos_2 - rIn / 2) * scale,
+                                          rIn * scale, rIn * scale)
+            circle.setPen(blue_color)
+            circle.setBrush(blue_color)
+            scene.addItem(circle)
+            pos_1 = dis * cos(2.0 * i * dt + pi + dt)/2
+            pos_2 = dis * sin(2.0 * i * dt + pi + dt)/2
+            circle = QGraphicsEllipseItem((pos_1 - rOut / 2) * scale, (pos_2 - rOut / 2) * scale,
+                                          rOut * scale, rOut * scale)
+            circle.setPen(white_color)
+            circle.setBrush(white_color)
+            scene.addItem(circle)
+            circle = QGraphicsEllipseItem((pos_1 - rIn / 2) * scale, (pos_2 - rIn / 2) * scale,
+                                          rIn * scale, rIn * scale)
+            circle.setPen(blue_light)
+            circle.setBrush(blue_light)
+            scene.addItem(circle)
 
     def funDisplayData(self) -> None:
         """
@@ -1399,14 +1470,19 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         start calculation of all not calculated scenarios
         :return: None
         """
+        # add scenario if no list of scenarios exits else save current scenario
+        self.addScenario() if not self.ListDS else self.saveScenario()
+        # return to thermal demands page if no file is selected
+        if any([i.fileSelected for i in self.ListDS]):
+            self.stackedWidget.setCurrentWidget(self.page_thermal)
+            self.status_bar.showMessage(self.translations.NoFileSelected)
+            return
         # disable buttons and actions to avoid two calculation at once
         self.pushButton_start_multiple.setEnabled(False)
         self.pushButton_start_single.setEnabled(False)
         self.pushButton_SaveScenario.setEnabled(False)
         self.action_start_single.setEnabled(False)
         self.action_start_multiple.setEnabled(False)
-        # add scenario if no list of scenarios exits else save current scenario
-        self.addScenario() if not self.ListDS else self.saveScenario()
         # initialize finished scenarios counting variable
         self.finished: int = 0
         # update progress bar
@@ -1426,14 +1502,19 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         start calculation of selected scenario
         :return: None
         """
+        # add scenario if no list of scenarios exits else save current scenario
+        self.addScenario() if not self.ListDS else self.saveScenario()
+        # return to thermal demands page if no file is selected
+        if self.ListDS[self.list_widget_scenario.currentRow()].fileSelected:
+            self.stackedWidget.setCurrentWidget(self.page_thermal)
+            self.status_bar.showMessage(self.translations.NoFileSelected)
+            return
         # disable buttons and actions to avoid two calculation at once
         self.pushButton_start_multiple.setEnabled(False)
         self.pushButton_start_single.setEnabled(False)
         self.pushButton_SaveScenario.setEnabled(False)
         self.action_start_single.setEnabled(False)
         self.action_start_multiple.setEnabled(False)
-        # add scenario if no list of scenarios exits else save current scenario
-        self.addScenario() if not self.ListDS else self.saveScenario()
         # initialize finished scenarios counting variable
         self.finished: int = 0
         # update progress bar
@@ -1922,13 +2003,17 @@ class CalcProblem(QtCore_QThread):
             boreField.setBorefield(custom_field)
         # if load should be optimized do this
         if self.DS.optimizeLoadProfile:
-            # get column and decimal separator
+            # get column and decimal seperator
             sep: str = ';' if self.DS.dataSeperator == 0 else ','
             dec: str = '.' if self.DS.dataDecimal == 0 else ','
             # import pandas here to save start up time
             from pandas import read_csv as pd_read_csv
             # load data from csv file
-            data = pd_read_csv(self.DS.dataFile, sep=sep, decimal=dec)
+            try:
+                data = pd_read_csv(self.DS.dataFile, sep=sep, decimal=dec)
+            except FileNotFoundError:
+                self.any_signal.emit(self.DS)
+                return
             # get data unit factor of energy demand
             unit: float = 0.001 if self.DS.dataUnit == 0 else 1 if self.DS.dataUnit == 1 else 1_000
             # if data is in 2 column create a list of the loaded data else sepperate data by >0 and <0 and then create a
@@ -1988,8 +2073,8 @@ class ImportGHEtool(QtCore_QThread):
         start import
         :return: None
         """
-        from GHEtool import GroundData  # import GHEtool
-        GroundData(100, 6, 1.5, 10, 0.05, 12, 10)  # set example data
+        import GHEtool  # import GHEtool
+        GHEtool.FOLDER = './'
         self.any_signal.emit(True)  # emit true signal
 
 
