@@ -1395,6 +1395,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.label_48.show() if idx > 0 else self.label_48.hide()
         self.label_pipe_data.show() if idx > 0 else self.label_pipe_data.hide()
         self.frame_pipe_data.show() if idx > 0 else self.frame_pipe_data.hide()
+        self.updateBorehole() if idx > 0 else None
 
     def updateBar(self, val: int, opt_start: bool = False) -> None:
         """
