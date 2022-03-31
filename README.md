@@ -10,11 +10,15 @@ It is also possible to use a fixed borefield and an hourly load profile to calcu
 
 This tool is based on the work of (Peere et al., 2021).
 
+## Graphical user interface
+In the GUI folder, one can find a graphical interface which makes it easy to interact with the code environment. The graphical tool is also available as a stand-alone *.exe with and without the command interface.
+This graphical interface is made by Tobias Blanke from FH Aachen. 
+
 ## Precalculated data
-This tool comes with precalculated g-functions for all borefields of type nxm (for 0<n,m<20). For these borefield configurations, the g-functions are calculated for different depth-thermal conductivity-spacing combinations. The ranges are:
+This tool comes with precalculated g-functions for all borefields of type nxm (for 0<n,m<21). For these borefield configurations, the g-functions are calculated for different depth-thermal conductivity-spacing combinations. The ranges are:
 
 * Depth: 25 - 350m in increments of 25m
-* Thermal conductivity of the soil: 1.5 - 3.5 in increments of 0.5W/mk
+* Thermal conductivity of the soil: 1 - 4 in increments of 0.5W/mk
 * Spacings (equal): 3 - 9m in increments of 1m
 
 Here a burial depth (D) of 4.0m is assumed even as a borehole radius of 7.5cm.
@@ -30,6 +34,15 @@ This code is tested with Python 3.9 and requires the following libraries (the ve
 * Pygfunction (>=1.1.2)
 * Tkinter (>=0.1.0)
 * Openpyxl (>=3.0.7)
+* Pandas (>=1.2.4)
+
+For the GUI
+* PyQt5 (>=5.10)
+
+## Main contributors
+Wouter Peere, KU Leuven & Boydens Engineering (part of Sweco), wouter.peere@kuleuven.be
+Tobias Blanke, Solar-Institute Jülich, FH Aachen, blanke@sij.fh-aachen.de
+
 
 ## References
 Cimmino, M. (2018). _pygfunction: an open-source toolbox for the evaluation of thermal response factors for geothermal borehole fields_. In _Proceedings of eSim 2018, the 10th conference of IBPSA- Canada_. Montréal, QC, Canada, May 9-10.
