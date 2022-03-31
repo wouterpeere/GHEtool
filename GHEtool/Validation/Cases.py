@@ -1,20 +1,23 @@
 """
+This document contains checks to see whether or not adaptations to the code still comply with some specific cases.
+It also shows the difference between the original L2 sizing methode (Peere et al., 2021) and a more general L3 one.
 
 This document contains 4 different cases referring to the paper: Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. Validated combined first and last year borefield sizing methodology. In Proceedings of International Building Simulation Conference 2021 (2021). Brugge (Belgium), 1-3 September 2021.
 
 """
 
-from GHEtool.GHEtool import Borefield
+from GHEtool import Borefield, GroundData
 import pygfunction as gt
+
 if __name__ == "__main__":
     # relevant borefield data for the calculations
-    data = {"H": 110,           # depth (m)
-            "B": 6.5,             # borehole spacing (m)
-            "k_s": 3.5,           # conductivity of the soil (W/mK)
-            "Tg":10,            # Ground temperature at infinity (degrees C)
-            "Rb":0.2,           # equivalent borehole resistance (K/W)
-            "N_1":12,           # width of rectangular field (#)
-            "N_2":10}           # length of rectangular field (#)}
+    data = GroundData(110,  # depth (m)
+                      6.5,  # borehole spacing (m)
+                      3.5,  # conductivity of the soil (W/mK)
+                      10,   # Ground temperature at infinity (degrees C)
+                      0.2,  # equivalent borehole resistance (K/W)
+                      12,   # width of rectangular field (#)
+                      10)   # length of rectangular field (#)
 
     def loadCase(number):
         """This function returns the values for one of the four cases."""
@@ -68,10 +71,11 @@ if __name__ == "__main__":
         """
         This function checks whether the borefield sizing gives the correct (i.e. validated) results for the 4 cases.
         If not, an assertion error is raised.
-        NOTE: these values differ slightly from the values in the mentioned paper. This is due to
+        NOTE: these values differ slightly from the values in the mentioned paper. This is due to the fact that GHEtool uses slightly different precalculated data.
         """
 
-        correctAnswers = (56.64, 118.7, 66.88, 92.67)
+        correctAnswersL2 = (56.64, 118.7, 66.88, 92.67)
+        correctAnswersL3 = (56.77, 119.23, 66.48, 91.63)
 
         for i in (1,2,3,4):
             monthlyLoadCooling, monthlyLoadHeating, peakCooling, peakHeating = loadCase(i)
@@ -89,27 +93,33 @@ if __name__ == "__main__":
             borefield.setMinGroundTemperature(0)  # minimum temperature
 
             borefield.size(100)
-            assert round(borefield.H,2) == correctAnswers[i-1]
+            print(f'correct answer L2: {correctAnswersL2[i-1]}; calculated answer L2: {round(borefield.H,2)}; error: ' \
+            f'{round(abs(1 - borefield.H / correctAnswersL2[i - 1]) * 100, 4)} %')
+            assert round(borefield.H,2) == correctAnswersL2[i-1]
+            borefield.size(100,0)
+            print(f'correct answer L3: {correctAnswersL3[i - 1]}; calculated answer L3: {round(borefield.H, 2)}; error: ' \
+            f'{round(abs(1 - borefield.H / correctAnswersL3[i - 1]) * 100, 4)} %')
+            assert round(borefield.H, 2) == correctAnswersL3[i - 1]
 
     def checkCustomDatafile():
         """
         This function checks whether the borefield sizing gives the correct (i.e. validated) results for the 4 cases given the custom datafile.
         If not, an assertion error is raised.
-        NOTE: these values differ slightly from the values in the mentioned paper. This is due to
         """
 
         # create custom datafile
 
         correctAnswers = (56.64, 118.7, 66.88, 92.67)
+        li = [i for i in range(0,12)]
         borefield = Borefield(simulationPeriod=20,
-                              peakHeating=peakHeating,
-                              peakCooling=peakCooling,
-                              baseloadHeating=monthlyLoadHeating,
-                              baseloadCooling=monthlyLoadCooling)
+                              peakHeating=li,
+                              peakCooling=li,
+                              baseloadHeating=li,
+                              baseloadCooling=li)
 
         borefield.setGroundParameters(data)
 
-        customField = gt.boreholes.rectangle_field(N_1 = 10, N_2 = 12, B_1 = 6.5, B_2=6.5, H=100., D=4, r_b=0.075)
+        customField = gt.boreholes.rectangle_field(N_1 = 12, N_2 = 10, B_1 = 6.5, B_2=6.5, H=110., D=4, r_b=0.075)
         borefield.createCustomDataset(customField, "customField")
 
         for i in (1, 2, 3, 4):
@@ -131,7 +141,10 @@ if __name__ == "__main__":
             borefield.setCustomGfunction("customfield")
 
             borefield.size(100)
-            assert round(borefield.H, 2) == correctAnswers[i - 1]
+            print(f'correct answer: {correctAnswers[i-1]}; calculated '\
+                  f'answer: {round(borefield.H,2)}; error: '\
+                      f'{round(abs(1-borefield.H/correctAnswers[i - 1])*100,4)} %')
+            assert abs(1-borefield.H/correctAnswers[i - 1])<=0.002
 
     checkCases() # check different cases
     checkCustomDatafile() # check if the custom datafile is correct
