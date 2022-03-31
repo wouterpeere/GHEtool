@@ -427,7 +427,7 @@ class Borefield:
         # initiate pipe
         pipe = gt.pipes.MultipleUTube(self.pos, self.r_in, self.r_out, borehole, self.k_s, self.k_g,
                                       self.R_p + self.R_f, self.numberOfPipes, J=2)
-        return gt.pipes.borehole_thermal_resistance(pipe, self.mfr / self.numberOfPipes, self.Cp)
+        return gt.pipes.borehole_thermal_resistance(pipe, self.mfr, self.Cp)
 
     @property
     def _axisSymmetricalPipe(self) -> list:
