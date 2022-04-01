@@ -63,7 +63,7 @@ Multiple tools are available for sizing borefields:
 
 - EED and GLHEPRO are commercial, standalone tools for borefields. They allow the user, a.o., to plot the mean fluid and borehole wall temperature evolution [@EED; @GLHEPRO]. Furthermore, the user can size a borefield [@EED; @GLHEPRO]. The automated sizing in EED sometimes leads to an undersized borefield [@Peere]. GLHEPRO does not have this problem since it calculates the temperature in every month [@GLHEPRO].
 - geoSIM is a free tool for simulating and sizing borefields but only with one particular type of tubing (geoKOAX). It is also standalone [@geoSIM].
-- Ground Loop Design software (GLDTM) ‘is the world’s leading commercial GHX software design tool’ [@igshpsa]. It allows the user, a.o., to plot the mean fluid and borehole wall temperature evolution. Furthermore, the user can size the borefield.
+- Ground Loop Design software (GLDTM) ‘is the world’s leading commercial GHX software design tool’ [@igshpa]. It allows the user, a.o., to plot the mean fluid and borehole wall temperature evolution. Furthermore, the user can size the borefield.
 - A commonly used package in the borefield domain is pygfunction. Pygfunction is an open-source python package to calculate the thermal response factors of the ground. This function forms the basis of many borefield simulation and sizing programs [@pygfunction]. With this python package, the data of the GHEtool was precalculated.
 
 From the mentioned tools, only EED, GLHEPRO, geoSIM and GLDTM can size borefields, but none of them is open source nor easy to be integrated into your workflow since they are standalone. From all the borefield sizing tools listed above, only geoSIM is free, but it only works with one specific type of borehole tubing [@geoSIM].
