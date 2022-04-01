@@ -4,6 +4,7 @@ tags:
   - geothermal
   - energy
   - borefields
+  - sizing
 authors:
   - name: Wouter Peere^[corresponding author]
     orcid: 0000-0002-2311-5981
