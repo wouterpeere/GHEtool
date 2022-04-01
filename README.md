@@ -22,7 +22,7 @@ GHEtool offers functionalities of value to all different disciplines working wit
 * Sizing the borefield (i.e. calculating the required depth) for a given injection and extraction load for the borefield (two sizing methods are available). The tool can work with monthly and hourly load profiles
 * Finding the optimal rectangular borefield configuration for a given heating and cooling load
 * Optimising the load profile for a given heating and cooling load
-* Using dynamically calculated borehole thermal resistance
+* Using dynamically calculated borehole thermal resistance (this is directly based on the code of pygfunction)
 * Calculating the temperature evolution of the ground for a given building load and borefield configuration
 * Importing heating and cooling loads from *.csv and *.xlsx files
 * Using your custom borefield configuration
