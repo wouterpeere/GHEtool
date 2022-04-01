@@ -60,6 +60,7 @@ Furthermore, practitioners in the HVAC domain can use it to size their borefield
 # Comparison with existing tools
 
 Multiple tools are available for sizing borefields:
+
 - EED and GLHEPRO are commercial, standalone tools for borefields. They allow the user, a.o., to plot the mean fluid and borehole wall temperature evolution [@EED; @GLHEPRO]. Furthermore, the user can size a borefield [@EED; @GLHEPRO]. The automated sizing in EED sometimes leads to an undersized borefield [@Peere]. GLHEPRO does not have this problem since it calculates the temperature in every month [@GLHEPRO].
 - geoSIM is a free tool for simulating and sizing borefields but only with one particular type of tubing (geoKOAX). It is also standalone [@geoSIM].
 - Ground Loop Design software (GLDTM) ‘is the world’s leading commercial GHX software design tool’ [@igshpsa]. It allows the user, a.o., to plot the mean fluid and borehole wall temperature evolution. Furthermore, the user can size the borefield.
@@ -70,6 +71,7 @@ From the mentioned tools, only EED, GLHEPRO, geoSIM and GLDTM can size borefield
 
 # Features
 GHEtool offers functionalities of value to all different disciplines working with borefields. The features are available both in the code environment and in the GUI. These features are:
+
 - Sizing the borefield (i.e. calculating the required depth) for a given injection and extraction load for the borefield (two sizing methods are available). The tool can work with monthly and hourly load profiles
 - Finding the optimal rectangular borefield configuration for a given heating and cooling load
 - Optimising the load profile for a given heating and cooling load
