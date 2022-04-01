@@ -78,7 +78,7 @@ If you want to add new features and contribute to the code,
 please contact Wouter Peere (wouter.peere@kuleuven.be).
 
 ## Main contributors
-Wouter Peere, KU Leuven & Boydens Engineering (part of Sweco), wouter.peere@kuleuven.be.
+Wouter Peere, KU Leuven & Boydens Engineering (part of Sweco), wouter.peere@kuleuven.be
 
 Tobias Blanke, Solar-Institute Jülich, FH Aachen, blanke@sij.fh-aachen.de
 
