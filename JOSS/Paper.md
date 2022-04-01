@@ -81,4 +81,5 @@ GHEtool offers functionalities of value to all different disciplines working wit
 
 The first author would like to thank his supervisors Lieve Helsen and Wim Boydens and his coaches Damien Picard and Iago Cupeiro Figueroa for the guidance during his master thesis, which led to this package development.
 The authors would like to thank Felix Arjuna and Iago Cupeiro Figueroa for the translation of the GUI.
+
 # References
