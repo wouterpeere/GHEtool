@@ -2,11 +2,20 @@
 
 
 ## What is *GHEtool*?
-GHEtool is a python package that contains all the functionalities needed to deal with borefield design. It is developed for both researchers and practitioners.
-The core of this package is the automated sizing of borefield under different conditions. The sizing of a borefield is typically slow due to the high complexity of the mathematical background. Because this tool has a lot of precalculated data (cf. infra), GHEtool can size a borefield in the order of tenths of milliseconds. This sizing typically takes the order of minutes. Therefore, this tool is suited for being implemented in typical workflows where iterations are required.
+<img src="https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/Icon.png" width="110" align="left">
 
+GHEtool is a python package that contains all the functionalities needed to deal with borefield design. It is developed for both researchers and practitioners.
+The core of this package is the automated sizing of borefield under different conditions. The sizing of a borefield is typically slow due to the high complexity of the mathematical background. Because this tool has a lot of precalculated data (cf. infra), GHEtool can size a borefield in the order of tenths of milliseconds. This sizing typically takes the order of minutes. Therefore, this tool is suited for being implemented in workflows where iterations are required.
+
+#### Graphical user interface
 GHEtool also comes with a *graphical user interface (GUI)*. This GUI is prebuilt as an exe-file because this provides access to all the functionalities without coding. A setup to install the GUI at the user-defined place is also implemented and available [here](https://www.mech.kuleuven.be/en/tme/research/thermal_systems/ghetool).
 This graphical interface is made by Tobias Blanke from FH Aachen.
+
+<p align="center">
+<img src="https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/GHEtool.PNG" width="600"></br>
+  Screenshot of the GUI.
+</p>
+
 
 ## Functionalities
 GHEtool offers functionalities of value to all different disciplines working with borefields. The features are available both in the code environment and in the GUI. These features are:
