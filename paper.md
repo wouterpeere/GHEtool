@@ -20,7 +20,7 @@ affiliations:
  - name: Solar-Institute Jülich, FH Aachen, Aachen, Germany
    index: 3
 date: 01 April 2022
-bibliography: Paper.bib
+bibliography: paper.bib
 
 ---
 
