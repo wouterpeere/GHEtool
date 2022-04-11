@@ -32,7 +32,7 @@ The sizing of a borefield is typically slow due to the high complexity of the ma
 This sizing typically takes the order of minutes. Therefore, this tool is suited for being implemented in typical workflows where iterations are required.
 
 GHEtool also comes with a graphical user interface (GUI). This GUI is prebuilt as an exe-file because this provides access to all the functionalities without coding.
-A setup to install the GUI at the user-defined place is also implemented and available at: [https://www.mech.kuleuven.be/en/tme/research/thermal_systems/ghetool](https://www.mech.kuleuven.be/en/tme/research/thermal_systems/ghetool).
+A setup to install the GUI at the user-defined place is also implemented and available at: [https://www.mech.kuleuven.be/en/tme/research/thermal_systems/tools/ghetool](https://www.mech.kuleuven.be/en/tme/research/thermal_systems/ghetool).
 
 
 # Statement of need
