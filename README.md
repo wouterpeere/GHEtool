@@ -8,7 +8,7 @@ GHEtool is a python package that contains all the functionalities needed to deal
 The core of this package is the automated sizing of borefield under different conditions. The sizing of a borefield is typically slow due to the high complexity of the mathematical background. Because this tool has a lot of precalculated data (cf. infra), GHEtool can size a borefield in the order of tenths of milliseconds. This sizing typically takes the order of minutes. Therefore, this tool is suited for being implemented in workflows where iterations are required.
 
 #### Graphical user interface
-GHEtool also comes with a *graphical user interface (GUI)*. This GUI is prebuilt as an exe-file because this provides access to all the functionalities without coding. A setup to install the GUI at the user-defined place is also implemented and available [here](https://www.mech.kuleuven.be/en/tme/research/thermal_systems/ghetool).
+GHEtool also comes with a *graphical user interface (GUI)*. This GUI is prebuilt as an exe-file because this provides access to all the functionalities without coding. A setup to install the GUI at the user-defined place is also implemented and available [here](https://www.mech.kuleuven.be/en/tme/research/thermal_systems/tools/ghetool).
 This graphical interface is made by Tobias Blanke from FH Aachen.
 
 <p align="center">
