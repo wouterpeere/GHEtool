@@ -1,4 +1,4 @@
-# GHEtool: A open-source tool for borefield sizing in Python
+# GHEtool: An open-source tool for borefield sizing in Python
 
 
 ## What is *GHEtool*?
