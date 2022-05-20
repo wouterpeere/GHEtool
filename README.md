@@ -1,5 +1,5 @@
 # GHEtool: An open-source tool for borefield sizing in Python
-
+[![status](https://joss.theoj.org/papers/0ae2224874ee0139d6f28baa48fe9127/status.svg)](https://joss.theoj.org/papers/0ae2224874ee0139d6f28baa48fe9127)
 
 ## What is *GHEtool*?
 <img src="https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/Icon.png" width="110" align="left">
