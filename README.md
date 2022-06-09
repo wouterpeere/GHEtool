@@ -1,4 +1,5 @@
 # GHEtool: An open-source tool for borefield sizing in Python
+[![PyPI version](https://badge.fury.io/py/GHEtool.svg)](https://badge.fury.io/py/GHEtool)
 [![status](https://joss.theoj.org/papers/0ae2224874ee0139d6f28baa48fe9127/status.svg)](https://joss.theoj.org/papers/0ae2224874ee0139d6f28baa48fe9127)
 
 ## What is *GHEtool*?
@@ -64,6 +65,8 @@ pip install GHEtool
 ```
 
 Developers can clone this repository.
+
+It is a good practise to use virtual environments (venv) when working on a (new) python project so different python and package versions don't conflict with eachother. For GHEtool, python 3.9 is recommended. General information about python virtual environments can be found [here](https://docs.python.org/3.9/library/venv.html) and in [this article](https://www.freecodecamp.org/news/how-to-setup-virtual-environments-in-python/).
 
 ## License
 
