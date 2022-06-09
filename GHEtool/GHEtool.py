@@ -124,6 +124,8 @@ class Borefield:
         # initiate load variables
         self.baseloadHeating: list = listOfZeros  # list with baseload heating kWh
         self.baseloadCooling: list = listOfZeros  # list with baseload cooling kWh
+        self.monthlyLoadCooling: list = listOfZeros
+        self.monthlyLoadHeating: list = listOfZeros
         self.peakCooling: list = listOfZeros  # list with the peak load cooling kW
         self.peakHeating: list = listOfZeros  # list with peak load heating kW
 
@@ -415,6 +417,7 @@ class Borefield:
     def calculateRb(self) -> float:
         """
         This function returns the calculated equivalent borehole thermal resistance Rb* value.
+
         :return: the borehole equivalent thermal resistance
         """
         # check if all data is available
@@ -433,6 +436,7 @@ class Borefield:
     def _axisSymmetricalPipe(self) -> list:
         """
         This function gives back the coordinates of the pipes in an axis-symmetrical pipe.
+
         :return: list of coordinates of the pipes in the borehole"""
         dt: float = pi / float(self.numberOfPipes)
         pos: list = [(0., 0.)] * 2 * self.numberOfPipes
@@ -446,6 +450,7 @@ class Borefield:
     def _Bernier(self) -> float:
         """
         This function sizes the field based on the last year of operation, i.e. quadrants 2 and 4.
+
         :return: borefield depth
         """
         # initiate iteration
@@ -472,9 +477,9 @@ class Borefield:
     def _Carcel(self) -> float:
         """
         This function sizes the field based on the first year of operation, i.e. quadrants 1 and 3.
+
         :return: borefield depth
         """
-
 
         # initiate iteration
         H_prev = 0
@@ -509,6 +514,7 @@ class Borefield:
         - quadrantSizing lets you size the bore field according to a specific quadrant
         - useConstantRb makes sure that the self.useConstantRb = True.
         Note, the constant Rb* value will be overwritten!
+
         :param H_init: initial depth of the borefield to start the iteratation
         :param L2Sizing: true if a sizing with the L2 method is needed, false if L3 is needed
         :param quadrantSizing: differs from 0 when a sizing in a certain quadrant is desired
@@ -533,6 +539,7 @@ class Borefield:
         This function sizes the bore field of the given configuration according to the methodology explained in
         (Peere et al., 2021), which is a L2 method. When quadrant sizing is other than 0, it sizes the field based on
         the asked quadrant. It returns the bore field depth.
+
         :param H_init: initialize depth for sizing
         :param quadrantSizing: if a quadrant is given the sizing is performed for this quadrant else for the relevant
         :return: borefield depth
@@ -786,16 +793,18 @@ class Borefield:
     def setPeakHeating(self, peakLoad: list) -> None:
         """
         This function sets the peak heating to peak load.
+
         :return: None
         """
-        self.peakHeating = [i if i >= 0 else 0 for i in peakLoad]
+        self.peakHeating = [max(peakLoad[i], self.monthlyLoadHeating[i]) for i in range(12)]
 
     def setPeakCooling(self, peakLoad: list) -> None:
         """
         This function sets the peak cooling to peak load.
+
         :return: None
         """
-        self.peakCooling = [i if i >= 0 else 0 for i in peakLoad]
+        self.peakCooling = [max(peakLoad[i], self.monthlyLoadCooling[i]) for i in range(12)]
 
     @property
     def investmentCost(self) -> float:
