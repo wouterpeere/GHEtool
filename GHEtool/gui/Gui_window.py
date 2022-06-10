@@ -986,6 +986,8 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             # resample to a monthly resolution as sum and maximal load
             df3 = df2.resample("M").agg({"Heating Load": "sum", "Cooling Load": "sum",
                                          "peak Heating": "max", "peak Cooling": "max"})
+            # replace nan with 0
+            df3 = df3.fillna(0)
             # ----------------------- Data Unit Section --------------------------
             # Get the Data Unit and set the label in the thermal Demand Box to follow
             data_unit = self.comboBox_dataUnit.currentText()
