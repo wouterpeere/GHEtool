@@ -57,6 +57,7 @@ For the GUI
 * PyQt5 (>=5.10)
 
 ## Quick start
+### Installation
 
 One can install GHEtool by running Pip and running the command
 
@@ -67,6 +68,16 @@ pip install GHEtool
 Developers can clone this repository.
 
 It is a good practise to use virtual environments (venv) when working on a (new) python project so different python and package versions don't conflict with eachother. For GHEtool, python 3.9 is recommended. General information about python virtual environments can be found [here](https://docs.python.org/3.9/library/venv.html) and in [this article](https://www.freecodecamp.org/news/how-to-setup-virtual-environments-in-python/).
+
+### Check installation
+
+To check whether everything is installed correctly, run the following command
+
+```
+pytest --pyargs GHEtool
+```
+
+This runs some predefined cases to see whether all the internal dependencies work correctly. 9 test should pass successfully.
 
 ## License
 
