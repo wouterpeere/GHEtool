@@ -17,30 +17,6 @@ This graphical interface is made by Tobias Blanke from FH Aachen.
   Screenshot of the GUI.
 </p>
 
-
-## Functionalities
-GHEtool offers functionalities of value to all different disciplines working with borefields. The features are available both in the code environment and in the GUI. These features are:
-* Sizing the borefield (i.e. calculating the required depth) for a given injection and extraction load for the borefield (two sizing methods are available). The tool can work with monthly and hourly load profiles
-* Finding the optimal rectangular borefield configuration for a given heating and cooling load
-* Optimising the load profile for a given heating and cooling load
-* Using dynamically calculated borehole thermal resistance (this is directly based on the code of pygfunction)
-* Calculating the temperature evolution of the ground for a given building load and borefield configuration
-* Importing heating and cooling loads from *.csv and *.xlsx files
-* Using your custom borefield configuration
-
-In the example and validation folder, one can find information on how to use this functionalities.
-
-## Precalculated data
-This tool comes with precalculated g-functions for all borefields of type nxm (for 0<n,m<21) for which the boreholes are connected in parallel. For these borefield configurations, the g-functions are calculated for different depth-thermal conductivity-spacing combinations. The ranges are:
-
-* Depth: 25 - 350m in increments of 25m
-* Thermal conductivity of the soil: 1 - 4 in increments of 0.5W/mk
-* Spacings (equal): 3 - 9m in increments of 1m
-
-Here a burial depth (D) of 4.0m is assumed even as a borehole radius of 7.5cm for all the precalculated data.
-
-It is possible to calculate your own dataset to your specific project based on the *pygfunction* tool and use this one in the code.
-
 ## Requirements
 This code is tested with Python 3.9 and requires the following libraries (the versions mentioned are the ones with which the code is tested)
 
@@ -78,6 +54,91 @@ pytest --pyargs GHEtool
 ```
 
 This runs some predefined cases to see whether all the internal dependencies work correctly. 9 test should pass successfully.
+
+### Get started
+
+To get started with GHEtool, one needs to create a Borefield object. This is done in the following steps.
+
+```python
+from GHEtool import Borefield, GroundData
+```
+
+After importing the necessary classes, one sets all the relevant ground data.
+
+```python
+data = GroundData(110, # depth of the field (m)
+                  6,   # distance between the boreholes (m)
+                  3,   # ground thermal conductivity (W/mK)
+                  10,  # initial/undisturbed ground temperature (deg C)
+                  0.2, # borehole equivalent resistance (mK/W)
+                  10,  # number of boreholes in width direction of the field (/)
+                  12)  # number of boreholes in the length direction of the field (/)
+```
+
+Furthermore, one needs to set the peak and monthly baseload for both heating and cooling.
+
+```python
+peakCooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]   # Peak cooling in kW
+peakHeating = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]  # Peak heating in kW
+
+monthlyLoadHeating = [46500.0, 44400.0, 37500.0, 29700.0, 19200.0, 0.0, 0.0, 0.0, 18300.0, 26100.0, 35100.0, 43200.0]        # in kWh
+monthlyLoadCooling = [4000.0, 8000.0, 8000.0, 8000.0, 12000.0, 16000.0, 32000.0, 32000.0, 16000.0, 12000.0, 8000.0, 4000.0]  # in kWh
+```
+
+Next, one creates the borefield object and sets the temperature constraints and the ground data.
+
+```python
+# create the borefield object
+borefield = Borefield(simulationPeriod=20,
+                      peakHeating=peakHeating,
+                      peakCooling=peakCooling,
+                      baseloadHeating=monthlyLoadHeating,
+                      baseloadCooling=monthlyLoadCooling)
+
+borefield.setGroundParameters(data)
+
+# set temperature boundaries
+borefield.setMaxGroundTemperature(16)   # maximum temperature
+borefield.setMinGroundTemperature(0)    # minimum temperature
+```
+
+Once a Borefield object is created, one can make use of all the functionalities of GHEtool. One can for example size the borefield using:
+
+```python
+depth = borefield.size(100)
+print("The borehole depth is: ", depth, "m")
+```
+
+Or one can plot the temperature profile by using
+
+```python
+borefield.printTemperatureProfile(legend=True)
+```
+
+A full list of functionalities is given below.
+
+## Functionalities
+GHEtool offers functionalities of value to all different disciplines working with borefields. The features are available both in the code environment and in the GUI. These features are:
+* Sizing the borefield (i.e. calculating the required depth) for a given injection and extraction load for the borefield (two sizing methods are available). The tool can work with monthly and hourly load profiles
+* Finding the optimal rectangular borefield configuration for a given heating and cooling load
+* Optimising the load profile for a given heating and cooling load
+* Using dynamically calculated borehole thermal resistance (this is directly based on the code of pygfunction)
+* Calculating the temperature evolution of the ground for a given building load and borefield configuration
+* Importing heating and cooling loads from *.csv and *.xlsx files
+* Using your custom borefield configuration
+
+In the example and validation folder, one can find information on how to use this functionalities.
+
+## Precalculated data
+This tool comes with precalculated g-functions for all borefields of type nxm (for 0<n,m<21) for which the boreholes are connected in parallel. For these borefield configurations, the g-functions are calculated for different depth-thermal conductivity-spacing combinations. The ranges are:
+
+* Depth: 25 - 350m in increments of 25m
+* Thermal conductivity of the soil: 1 - 4 in increments of 0.5W/mk
+* Spacings (equal): 3 - 9m in increments of 1m
+
+Here a burial depth (D) of 4.0m is assumed even as a borehole radius of 7.5cm for all the precalculated data.
+
+It is possible to calculate your own dataset to your specific project based on the *pygfunction* tool and use this one in the code.
 
 ## License
 
