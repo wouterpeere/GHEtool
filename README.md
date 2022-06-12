@@ -55,7 +55,7 @@ pytest --pyargs GHEtool
 
 This runs some predefined cases to see whether all the internal dependencies work correctly. 9 test should pass successfully.
 
-### Get started
+### Get started with GHEtool
 
 To get started with GHEtool, one needs to create a Borefield object. This is done in the following steps.
 
@@ -118,16 +118,17 @@ borefield.printTemperatureProfile(legend=True)
 A full list of functionalities is given below.
 
 ## Functionalities
-GHEtool offers functionalities of value to all different disciplines working with borefields. The features are available both in the code environment and in the GUI. These features are:
-* Sizing the borefield (i.e. calculating the required depth) for a given injection and extraction load for the borefield (two sizing methods are available). The tool can work with monthly and hourly load profiles
-* Finding the optimal rectangular borefield configuration for a given heating and cooling load
-* Optimising the load profile for a given heating and cooling load
-* Using dynamically calculated borehole thermal resistance (this is directly based on the code of pygfunction)
-* Calculating the temperature evolution of the ground for a given building load and borefield configuration
-* Importing heating and cooling loads from *.csv and *.xlsx files
-* Using your custom borefield configuration
+GHEtool offers functionalities of value to all different disciplines working with borefields. The features are available both in the code environment and in the GUI. These functions are listed in the table below, alongside with a link to an example document where one can find how these functionalities can be used.
 
-In the example and validation folder, one can find information on how to use this functionalities.
+| Functionality | Example document |
+| --- | --- |
+| Sizing the borefield (i.e. calculating the required depth) for a given injection and extraction load for the borefield (two sizing methods are available). | [Main_Functionalities.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/Main_Functionalities.py) |
+| Calculating the temperature evolution of the ground for a given building load and borefield configuration | [Main_Functionalities.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/Main_Functionalities.py) |
+| Using dynamically calculated borehole thermal resistance (this is directly based on the code of pygfunction) | [Sizing_With_Rb_Calculation.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Validation/Sizing_With_Rb_Calculation.py) |
+| Optimising the load profile for a given heating and cooling load | [Optimise_Load_Profile.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/Optimise_Load_Profile.py)|
+| Finding the optimal rectangular borefield configuration for a given heating and cooling load | |
+| Importing heating and cooling loads from .csv and .xlsx files | [Import_Data.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/Import_Data.py) |
+| Using your custom borefield configuration | [Custom_Borefield_Configuration.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/Custom_Borefield_Configuration.py) |
 
 ## Precalculated data
 This tool comes with precalculated g-functions for all borefields of type nxm (for 0<n,m<21) for which the boreholes are connected in parallel. For these borefield configurations, the g-functions are calculated for different depth-thermal conductivity-spacing combinations. The ranges are:
