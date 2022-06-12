@@ -1401,11 +1401,88 @@ class Borefield:
             # plot results
             self._printTemperatureProfile(H=depth)
 
+    def sizeByLengthAndWidth(self, HMax: float, L1: float, L2: float, BMin: float = 3.0,
+                             BMax: float = 9.0, L2Sizing: bool = True, nbOfOptions: int = 5) -> list:
+        """
+        Function to size the borefield by length and with. It returns a list of possible borefield sizes,
+        with increasing total length.
+
+        :param HMax: maximal borehole depth [m]
+        :param L1: maximal width of borehole field [m]
+        :param L2: maximal length of borehole field [m]
+        :param BMin: minimal borehole spacing [m]
+        :param BMax: maximal borehole spacing [m]
+        :param L2Sizing: boolean to check if level two or level three sizing method should be used
+        :param nbOfOptions: number of options that should be returned.
+        :return: list of possible combinations (each combination is a tuple where the first two elements are the
+        number of boreholes in each direction, the third element the borehole spacing and the fourth element
+        the depth of the borefield and the last element is the total borefield length).
+        An Empty list is returned if no result is found
+        """
+
+        # set larger one of L1 and L2 to the width
+        maxWidth = max(L1, L2)
+        maxLength = min(L1, L2)
+
+        # calculate max borefield size
+        N1Max = min(int(maxWidth / BMin), 20)
+        N2Max = min(int(maxLength / BMin), 20)
+
+        # set depth to maximum depth
+        self.H = HMax
+
+        # calculate set of possible options
+        options = set([])
+        for N1 in range(1, N1Max + 1):
+            N2 = N1
+            while N2 <= N2Max:
+                # calculate possible spacings
+                B = min(maxWidth / N1, maxLength / N2, BMax)
+
+                # iterate over all possible B's
+                for B in np.arange(BMin, B + 0.1, 0.5):
+                    # set borefield parameters
+                    self.B = B
+                    self._resetForSizing(N1, N2)
+                    self._printTemperatureProfile(figure=False)
+                    if max(self.resultsPeakCooling) < self.Tf_H and max(self.resultsPeakHeating) > self.Tf_C:
+                        options.add((N1, N2, B))
+
+                N2 += 1
+
+        # return empty list if options = {}
+        if options == set([]):
+            return []
+
+        # set result dictionary
+        results = {}
+
+        # size all options
+        for option in options:
+            self._resetForSizing(option[0], option[1])
+            self.B = option[2]
+            depth = self.size(H_init=100, L2Sizing=L2Sizing)
+
+            # save result in results dictionary with the total length as key
+            results[depth * self.numberOfBoreholes] = (option[0], option[1], option[2], depth)
+
+        # get all the solutions
+        lengths = list(results.keys())
+        lengths.sort()
+        # reverse for decending order
+        lengths[::-1]
+
+        # cut to right length
+        lengths = lengths[0:nbOfOptions]
+
+        return [results[i] for i in lengths]
+
     def size_complete_field_robust(self, h_max: float, l_1: float, l_2: float, b_min: float = 3.0, b_max: float = 9.0,
                                    L2Sizing: bool = True, useConstantRb: bool = False) -> list:
         """
-        function to size the minimal number of borefield by borefield length and width on a robust and more
-        time-consuming way
+        Function to size the minimal number of borefield by borefield length and width on a robust and more
+        time-consuming way.
+
         :param h_max: maximal borehole depth [m]
         :param l_1: maximal width of borehole field [m]
         :param l_2: maximal length of borehole field [m]
@@ -1413,7 +1490,9 @@ class Borefield:
         :param b_max: maximal borehole spacing [m]
         :param L2Sizing: boolean to check if level two or level three sizing method should be used
         :param useConstantRb: boolean to check if a constant borehole resistance should be used
-        :return: list of possible combinations. An Empty list is returned if no result is found
+        :return: list of possible combinations (each combination is a tuple where the first two elements are the
+        number of boreholes in each direction, the third element the borehole spacing and the last element
+        the depth of the borefield). An Empty list is returned if no result is found
         """
         # check if length > width
         l_2_bigger_then_l_1: bool = l_2 > l_1
@@ -1489,8 +1568,9 @@ class Borefield:
     def size_complete_field_fast(self, HMax: float, L1: float, L2: float, BMin: float = 3.0, BMax: float = 9.0,
                                  L2Sizing: bool = True, useConstantRb: bool = False) -> list:
         """
-        function to size the minimal number of borefield by borefield length and width on a fast and not robust way.
-        There are possible solution that can not be found
+        Function to size the minimal number of borefield by borefield length and width on a fast and not robust way.
+        There are possible solution that can not be found.
+
         :param HMax: maximal borehole depth [m]
         :param L1: maximal width of borehole field [m]
         :param L2: maximal length of borehole field [m]
@@ -1498,7 +1578,9 @@ class Borefield:
         :param BMax: maximal borehole spacing [m]
         :param L2Sizing: boolean to check if level two or level three sizing method should be used
         :param useConstantRb: boolean to check if a constant borehole resistance should be used
-        :return: list of possible combinations. An Empty list is returned if no results is found
+        :return: list of possible combinations (each combination is a tuple where the first two elements are the
+        number of boreholes in each direction, the third element the borehole spacing and the last element
+        the depth of the borefield). An Empty list is returned if no results is found
         """
         # check if length > width
         L2BiggerThenL1: bool = L2 > L1
@@ -1636,6 +1718,7 @@ class Borefield:
     def _resetForSizing(self, N_1: int, N_2: int) -> None:
         """
         function to reset borehole
+
         :param N_1: width of rectangular field (#)
         :param N_2: length of rectangular field (#)
         :return: None
@@ -1651,6 +1734,7 @@ class Borefield:
     def _calcNumberHoles(nMin: int, N1Max: int, N2Max: int) -> list:
         """
         calculation for number of boreholes which is higher than n but minimal total number
+
         :param nMin: minimal number of boreholes
         :param N1Max: maximal width of rectangular field (#)
         :param N2Max: maximal length of rectangular field (#)
@@ -1675,7 +1759,6 @@ class Borefield:
                     res.append((i, j))
         # return list of possible solutions
         return res
-
 
     def drawBoreholeInternal(self) -> None:
         """

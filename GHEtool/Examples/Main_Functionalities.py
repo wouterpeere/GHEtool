@@ -20,10 +20,10 @@ if __name__ == "__main__":
             "Rb":0.2,           # equivalent borehole resistance (K/W)
             "N_1":12,           # width of rectangular field (#)
             "N_2":10}           # length of rectangular field (#)}
-    # The new, more efficient way, is to work with the class of GroundData
+    # the new, more efficient way, is to work with the class of GroundData
     data = GroundData(110, 6, 3, 10, 0.2, 10, 12)
 
-    # Montly loading values
+    # montly loading values
     peakCooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]              # Peak cooling in kW
     peakHeating = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]             # Peak heating in kW
 
@@ -40,7 +40,6 @@ if __name__ == "__main__":
     monthlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, montlyLoadCoolingPercentage))   # kWh
 
     # create the borefield object
-
     borefield = Borefield(simulationPeriod=20,
                           peakHeating=peakHeating,
                           peakCooling=peakCooling,
