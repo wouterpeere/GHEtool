@@ -46,7 +46,7 @@ pip install GHEtool
 
 Developers can clone this repository.
 
-It is a good practise to use virtual environments (venv) when working on a (new) python project so different python and package versions don't conflict with eachother. For GHEtool, python 3.9 is recommended. General information about python virtual environments can be found [here](https://docs.python.org/3.9/library/venv.html) and in [this article](https://www.freecodecamp.org/news/how-to-setup-virtual-environments-in-python/).
+It is a good practise to use virtual environments (venv) when working on a (new) python project so different python and package versions don't conflict with eachother. For GHEtool, python 3.8 is recommended. General information about python virtual environments can be found [here](https://docs.python.org/3.9/library/venv.html) and in [this article](https://www.freecodecamp.org/news/how-to-setup-virtual-environments-in-python/).
 
 ### Check installation
 
@@ -125,13 +125,13 @@ GHEtool offers functionalities of value to all different disciplines working wit
 
 | Functionality | Example document |
 | --- | --- |
-| Sizing the borefield (i.e. calculating the required depth) for a given injection and extraction load for the borefield (two sizing methods are available). | [Main_Functionalities.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/Main_Functionalities.py) |
-| Calculating the temperature evolution of the ground for a given building load and borefield configuration | [Main_Functionalities.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/Main_Functionalities.py) |
-| Using dynamically calculated borehole thermal resistance (this is directly based on the code of pygfunction) | [Sizing_With_Rb_Calculation.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Validation/Sizing_With_Rb_Calculation.py) |
-| Optimising the load profile for a given heating and cooling load | [Optimise_Load_Profile.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/Optimise_Load_Profile.py)|
-| Finding the optimal rectangular borefield configuration for a given heating and cooling load | [Size_Borefield_By_Length_And_Width.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/Size_Borefield_By_Length_And_Width.py) |
-| Importing heating and cooling loads from .csv and .xlsx files | [Import_Data.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/Import_Data.py) |
-| Using your custom borefield configuration | [Custom_Borefield_Configuration.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/Custom_Borefield_Configuration.py) |
+| Sizing the borefield (i.e. calculating the required depth) for a given injection and extraction load for the borefield (two sizing methods are available). | [Main_Functionalities.py](Examples/Main_Functionalities.py) |
+| Calculating the temperature evolution of the ground for a given building load and borefield configuration | [Main_Functionalities.py](Examples/Main_Functionalities.py) |
+| Using dynamically calculated borehole thermal resistance (this is directly based on the code of pygfunction) | [Sizing_With_Rb_Calculation.py](Validation/Sizing_With_Rb_Calculation.py) |
+| Optimising the load profile for a given heating and cooling load | [Optimise_Load_Profile.py](Examples/Optimise_Load_Profile.py)|
+| Finding the optimal rectangular borefield configuration for a given heating and cooling load | [Size_Borefield_By_Length_And_Width.py](Examples/Size_Borefield_By_Length_And_Width.py) |
+| Importing heating and cooling loads from .csv and .xlsx files | [Import_Data.py](Examples/Import_Data.py) |
+| Using your custom borefield configuration | [Custom_Borefield_Configuration.py](Examples/Custom_Borefield_Configuration.py) |
 
 ## Precalculated data
 This tool comes with precalculated g-functions for all borefields of type nxm (for 0<n,m<21) for which the boreholes are connected in parallel. For these borefield configurations, the g-functions are calculated for different depth-thermal conductivity-spacing combinations. The ranges are:
