@@ -18,19 +18,22 @@ This graphical interface is made by Tobias Blanke from FH Aachen.
 </p>
 
 ## Requirements
-This code is tested with Python 3.9 and requires the following libraries (the versions mentioned are the ones with which the code is tested)
+This code is tested with Python 3.8 and requires the following libraries (the versions mentioned are the ones with which the code is tested)
 
 * Numpy (>=1.20.2)
 * Scipy (>=1.6.2)
 * Matplotlib (>=3.4.1)
 * Pygfunction (>=1.1.2)
-* Tkinter (>=0.1.0)
 * Openpyxl (>=3.0.7)
 * Pandas (>=1.2.4)
 
 For the GUI
 
 * PyQt5 (>=5.10)
+
+For the tests
+
+* Pytest (>=7.1.2)
 
 ## Quick start
 ### Installation

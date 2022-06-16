@@ -6,7 +6,6 @@ import pygfunction as gt
 import os.path
 import matplotlib.pyplot as plt
 import functools
-from tkinter import filedialog
 
 if __name__ == "__main__":
     from VariableClasses import *
@@ -1208,7 +1207,7 @@ class Borefield:
         print(f"A new dataset with name {name} has been created in {os.path.dirname(os.path.realpath(__file__))}\Data.")
         pickle.dump(data, open(f'{folder}/Data/{name}', "wb"))
 
-    def loadHourlyProfile(self, filePath: str = None, header: bool = True, separator: str = ";",
+    def loadHourlyProfile(self, filePath, header: bool = True, separator: str = ";",
                           firstColumnHeating: bool = True) -> None:
         """
         This function loads in an hourly load profile. It opens a csv and asks for the relevant column where the data
@@ -1221,10 +1220,6 @@ class Borefield:
         :param firstColumnHeating: true if the first column in the file is the column with heating loads
         :return: None
         """
-
-        # if there is no given location, open a filedialog box
-        if filePath is None:
-            filePath = filedialog.askopenfilename(title="Select csv-fileImport with hourly load.")
 
         if header:
             header: int = 0
