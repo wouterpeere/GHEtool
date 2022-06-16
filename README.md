@@ -48,6 +48,12 @@ Developers can clone this repository.
 
 It is a good practise to use virtual environments (venv) when working on a (new) python project so different python and package versions don't conflict with eachother. For GHEtool, python 3.8 is recommended. General information about python virtual environments can be found [here](https://docs.python.org/3.9/library/venv.html) and in [this article](https://www.freecodecamp.org/news/how-to-setup-virtual-environments-in-python/).
 
+When working with python 3.9 and higher, installing a newer version of pygfunction (>1.1.2) can lead to problem due to the fact that its dependency CoolProp is not compatible with python 3.9 and higher (see also <https://github.com/CoolProp/CoolProp/issues/1992> and <https://github.com/CoolProp/CoolProp/issues/2119>). If one wants to work with the newer version of pygfunction and with python 3.9 or higher, one can install a development version of CoolProp using
+
+```
+pip install -i https://test.pypi.org/simple/ CoolProp==6.4.2.dev0
+```
+
 ### Check installation
 
 To check whether everything is installed correctly, run the following command
