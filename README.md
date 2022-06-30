@@ -5,7 +5,7 @@
 ## What is *GHEtool*?
 <img src="https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/Icon.png" width="110" align="left">
 
-GHEtool is a python package that contains all the functionalities needed to deal with borefield design. It is developed for both researchers and practitioners.
+GHEtool is a Python package that contains all the functionalities needed to deal with borefield design. It is developed for both researchers and practitioners.
 The core of this package is the automated sizing of borefield under different conditions. The sizing of a borefield is typically slow due to the high complexity of the mathematical background. Because this tool has a lot of precalculated data (cf. infra), GHEtool can size a borefield in the order of tenths of milliseconds. This sizing typically takes the order of minutes. Therefore, this tool is suited for being implemented in workflows where iterations are required.
 
 #### Graphical user interface
@@ -23,7 +23,7 @@ This code is tested with Python 3.8 and requires the following libraries (the ve
 * Numpy (>=1.20.2)
 * Scipy (>=1.6.2)
 * Matplotlib (>=3.4.1)
-* Pygfunction (>=1.1.2)
+* Pygfunction (>=2.1.0)
 * Openpyxl (>=3.0.7)
 * Pandas (>=1.2.4)
 
@@ -35,6 +35,12 @@ For the tests
 
 * Pytest (>=7.1.2)
 
+When working with Python 3.9 and higher, installing a newer version of pygfunction (>2.1.0) can lead to problems due to the fact that its dependency CoolProp is not compatible with Python 3.9 and higher (see also <https://github.com/CoolProp/CoolProp/issues/1992> and <https://github.com/CoolProp/CoolProp/issues/2119>). If one wants to work with the newer version of pygfunction and with Python 3.9 or higher, one can install a development version of CoolProp using
+
+```
+pip install -i https://test.pypi.org/simple/ CoolProp==6.4.2.dev0
+```
+
 ## Quick start
 ### Installation
 
@@ -44,15 +50,15 @@ One can install GHEtool by running Pip and running the command
 pip install GHEtool
 ```
 
+or one can install a newer development version using
+
+```
+pip install --extra-index-url https://test.pypi.org/simple/ GHEtool
+```
+
 Developers can clone this repository.
 
-It is a good practise to use virtual environments (venv) when working on a (new) python project so different python and package versions don't conflict with eachother. For GHEtool, python 3.8 is recommended. General information about python virtual environments can be found [here](https://docs.python.org/3.9/library/venv.html) and in [this article](https://www.freecodecamp.org/news/how-to-setup-virtual-environments-in-python/).
-
-When working with python 3.9 and higher, installing a newer version of pygfunction (>1.1.2) can lead to problem due to the fact that its dependency CoolProp is not compatible with python 3.9 and higher (see also <https://github.com/CoolProp/CoolProp/issues/1992> and <https://github.com/CoolProp/CoolProp/issues/2119>). If one wants to work with the newer version of pygfunction and with python 3.9 or higher, one can install a development version of CoolProp using
-
-```
-pip install -i https://test.pypi.org/simple/ CoolProp==6.4.2.dev0
-```
+It is a good practise to use virtual environments (venv) when working on a (new) Python project so different Python and package versions don't conflict with eachother. For GHEtool, Python 3.8 is recommended. General information about Python virtual environments can be found [here](https://docs.Python.org/3.9/library/venv.html) and in [this article](https://www.freecodecamp.org/news/how-to-setup-virtual-environments-in-Python/).
 
 ### Check installation
 
@@ -68,13 +74,13 @@ This runs some predefined cases to see whether all the internal dependencies wor
 
 To get started with GHEtool, one needs to create a Borefield object. This is done in the following steps.
 
-```python
+```Python
 from GHEtool import Borefield, GroundData
 ```
 
 After importing the necessary classes, one sets all the relevant ground data.
 
-```python
+```Python
 data = GroundData(110, # depth of the field (m)
                   6,   # distance between the boreholes (m)
                   3,   # ground thermal conductivity (W/mK)
@@ -86,7 +92,7 @@ data = GroundData(110, # depth of the field (m)
 
 Furthermore, one needs to set the peak and monthly baseload for both heating and cooling.
 
-```python
+```Python
 peakCooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]   # Peak cooling in kW
 peakHeating = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]  # Peak heating in kW
 
@@ -96,7 +102,7 @@ monthlyLoadCooling = [4000.0, 8000.0, 8000.0, 8000.0, 12000.0, 16000.0, 32000.0,
 
 Next, one creates the borefield object and sets the temperature constraints and the ground data.
 
-```python
+```Python
 # create the borefield object
 borefield = Borefield(simulationPeriod=20,
                       peakHeating=peakHeating,
@@ -113,14 +119,14 @@ borefield.setMinGroundTemperature(0)    # minimum temperature
 
 Once a Borefield object is created, one can make use of all the functionalities of GHEtool. One can for example size the borefield using:
 
-```python
+```Python
 depth = borefield.size(100)
 print("The borehole depth is: ", depth, "m")
 ```
 
 Or one can plot the temperature profile by using
 
-```python
+```Python
 borefield.printTemperatureProfile(legend=True)
 ```
 
