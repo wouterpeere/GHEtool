@@ -546,7 +546,7 @@ class Borefield:
         """
 
         # check if just one sizing is given
-        if np.sum([1 if L2sizing is not None else 0, 1 if L3sizing is not None else 0, 1 if L4sizing is not None else 0]) > 1:
+        if np.sum([L2sizing if L2sizing is not None else 0, L3sizing if L3sizing is not None else 0, L4sizing if L4sizing is not None else 0]) > 1:
             raise ValueError("Please check if just one sizing method is chosen!")
 
         # set variables
@@ -573,6 +573,8 @@ class Borefield:
         * The L3 sizing is a more general approach which is slower but more accurate (it uses 24 pulses/year)
         * The L4 sizing is the most exact one, since it uses hourly data (8760 pulses/year)
 
+        Please note that the changes sizing setup changes here are not saved! Use self.setupSizing for this.
+
         :param H_init: initial depth of the borefield to start the iteratation (m)
         :param useConstantRb: true if a constant Rb* value should be used
         :param useConstantTg: true if a constant Tg value should be used (the geothermal flux is neglected)
@@ -582,18 +584,26 @@ class Borefield:
         :param quadrantSizing: differs from 0 when a sizing in a certain quadrant is desired
         :return: borefield depth
         """
+        # make backup of initial parameter states
+        backup = (self.H_init, self.useConstantRb, self.useConstantTg, self.L2sizing, self.L3sizing, self.L4sizing, self.quadrantSizing)
 
         # run the sizing setup
         self.sizingSetup(H_init=H_init, useConstantRb=useConstantRb, useConstantTg=useConstantTg,
-                         L3sizing=L3sizing, L4sizing=L4sizing, quadrantSizing=quadrantSizing)
+                         L2sizing=L2sizing, L3sizing=L3sizing, L4sizing=L4sizing, quadrantSizing=quadrantSizing)
 
         # sizes according to the correct algorithm
         if self.L2sizing:
-            return self.sizeL2(self.H_init, self.quadrantSizing)
+            depth = self.sizeL2(self.H_init, self.quadrantSizing)
         if self.L3sizing:
-            return self.sizeL3(self.H_init, self.quadrantSizing)
+            depth = self.sizeL3(self.H_init, self.quadrantSizing)
         if self.L4sizing:
-            return self.sizeL4(self.H_init, self.quadrantSizing)
+            depth = self.sizeL4(self.H_init, self.quadrantSizing)
+
+        # reset initial parameters
+        self.sizingSetup(H_init=backup[0], useConstantRb=backup[1], useConstantTg=backup[2], L2sizing=backup[3],
+                         L3sizing=backup[4], L4sizing=backup[5], quadrantSizing=backup[6])
+
+        return depth
 
     def sizeL2(self, H_init: float, quadrantSizing: int = 0) -> float:
         """
