@@ -184,6 +184,14 @@ class Borefield:
         self.epsilon = 1e-6  # pipe roughness
         self.pipeDataAvailable: bool = False  # needs to be True in order to calculate Rb*
 
+        # initiate different sizing
+        self.L2sizing: bool = True
+        self.L3sizing: bool = False
+        self.L4sizing: bool = False
+        self.quadrantSizing: int = 0
+        self.H_init: float = 100.
+        self.sizingSetup()
+
         # check if the GHEtool is used by the GUI i
         self.GUI = GUI
 
@@ -293,32 +301,23 @@ class Borefield:
         This function sets the relevant ground and borefield characteristics.
         :return None
         """
-        if isinstance(data, GroundData):
-            self.H: float = data.H  # Borehole length (m)
-            self.B: float = data.B  # Borehole spacing (m)
+        self.H: float = data.H  # Borehole length (m)
+        self.B: float = data.B  # Borehole spacing (m)
 
-            self.N_1: int = data.N_1
-            self.N_2: int = data.N_2
+        self.N_1: int = data.N_1
+        self.N_2: int = data.N_2
 
-            self.Rb: float = data.Rb
+        self.Rb: float = data.Rb
 
-            # Ground properties
-            self.k_s: float = data.k_s  # Ground thermal conductivity (W/m.K)
-            self.Tg: float = data.Tg  # Ground temperature at infinity (C)
+        # Ground properties
+        self.k_s: float = data.k_s  # Ground thermal conductivity (W/m.K)
+        self.Tg: float = data.Tg  # Ground temperature at infinity (C)
 
-        else:
-            # backup for backwards compatibility
-            self.H: float = data["H"]  # Borehole length (m)
-            self.B: float = data["B"]  # Borehole spacing (m)
-
-            self.N_1: int = data["N_1"]
-            self.N_2: int = data["N_2"]
-
-            self.Rb: float = data["Rb"]
-
-            # Ground properties
-            self.k_s: float = data["k_s"]  # Ground thermal conductivity (W/m.K)
-            self.Tg: float = data["Tg"]  # Ground temperature at infinity (C)
+        # try statement because of backwards compatibility
+        try:
+            self.flux: float = data.flux  # Ground thermal heat flux
+        except:
+            pass
 
         # sets the number of boreholes as if it was a rectangular field, iff there is not yet a number of boreholes
         # defined by a custom configuration
@@ -408,6 +407,7 @@ class Borefield:
     def _Rb(self) -> float:
         """
         This function gives back the equivalent borehole resistance.
+
         :return: the borehole equivalent thermal resistance
         """
         # use a constant Rb*
@@ -672,6 +672,7 @@ class Borefield:
     def sizeL3(self, H_init: float, quadrantSizing: int = 0) -> float:
         """
         This functions sizes the bore field based on a L3 method.
+
         :param H_init: initial value for the depth of the borefield to start iteration
         :param quadrantSizing: differs from 0 if a sizing in a certain quadrant is desired
         :return: borefield depth
@@ -715,11 +716,24 @@ class Borefield:
 
         return self.H
 
+    def sizeL4(self, H_init: float, quadrantSizing: int = 0) -> float:
+        """
+        This functions sizes the bore field based on a L4 method (hourly method).
+
+        :param H_init: initial value for the depth of the borefield to start iteration
+        :param quadrantSizing: differs from 0 if a sizing in a certain quadrant is desired
+        :return: borefield depth
+        """
+
+        ### TODO implement
+        # check if hourly data is given
+
     def _sizeL3quadrants(self, quadrant: int) -> float:
         """
         This function sizes based on the L3 method for a specific quadrant.
         It uses 24 thermal pulses for each year, while the L2-sizing method only uses 3 pulses for the whole simulation
-        period. It returns a bore field depth.
+        period. It returns a borefield depth.
+
         :return: depth of the borefield
         """
 

@@ -16,10 +16,10 @@ if __name__ == "__main__":
     data = {"H": 110,           # depth (m)
             "B": 6,             # borehole spacing (m)
             "k_s": 3,           # conductivity of the soil (W/mK)
-            "Tg":10,            # Ground temperature at infinity (degrees C)
-            "Rb":0.2,           # equivalent borehole resistance (K/W)
-            "N_1":12,           # width of rectangular field (#)
-            "N_2":10}           # length of rectangular field (#)}
+            "Tg": 10,            # Ground temperature at infinity (degrees C)
+            "Rb": 0.2,           # equivalent borehole resistance (K/W)
+            "N_1": 12,           # width of rectangular field (#)
+            "N_2": 10}           # length of rectangular field (#)}
     # the new, more efficient way, is to work with the class of GroundData
     data = GroundData(110, 6, 3, 10, 0.2, 10, 12)
 
