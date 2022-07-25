@@ -1,14 +1,15 @@
 
 class GroundData:
-    __slots__ = 'H', 'B', 'k_s', 'Tg', 'Rb', 'N_1', 'N_2'
+    __slots__ = 'H', 'B', 'k_s', 'Tg', 'Rb', 'N_1', 'N_2', 'flux'
 
-    def __init__(self, h: float, b: float, k_s: float, t_g: float, r_b: float, n_1: int, n_2: int) -> None:
+    def __init__(self, h: float, b: float, k_s: float, t_g: float, r_b: float, n_1: int, n_2: int, flux: float = 0) -> None:
         """
         Data for storage of ground data
         :param h: Depth of boreholes [m]
         :param b: Borehole spacing [m]
         :param k_s: Ground thermal conductivity [W/m.K]
-        :param t_g: Ground temperature at infinity [°C]
+        :param t_g: Surface ground temperature [deg C]
+        (this is equal to the ground temperature at infinity when no heat flux is given (default))
         :param r_b: Equivalent borehole resistance [m K/W]
         :param n_1: Width of rectangular field [#]
         :param n_2: Length of rectangular field [#]
@@ -20,6 +21,7 @@ class GroundData:
         self.Rb = r_b  # mK/W
         self.N_1 = n_1  # #
         self.N_2 = n_2  # #
+        self.flux = flux  # W/m2
 
     def __eq__(self, other):
         if not isinstance(other, GroundData):

@@ -48,7 +48,7 @@ class Borefield:
         hourlyLoadArray.append(temp)
 
     __slots__ = 'baseloadHeating', 'baseloadCooling', 'H', 'H_init', 'B', 'N_1', 'N_2', 'Rb', 'k_s', 'Tg', 'ty', 'tm', \
-                'td', 'time', 'hourlyHeatingLoad', 'H_max', \
+                'td', 'time', 'hourlyHeatingLoad', 'H_max', 'useConstantTg', 'flux', \
                 'hourlyCoolingLoad', 'numberOfBoreholes', 'borefield', 'customGfunction', 'costInvestment', \
                 'lengthPeak', 'th', 'Tf_H', 'Tf_C', 'limitingQuadrant', 'monthlyLoad', 'monthlyLoadHeating', \
                 'monthlyLoadCooling', 'peakHeating', 'imbalance', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm', \
@@ -59,7 +59,8 @@ class Borefield:
                 'monthlyLoadHeatingExternal', 'monthlyLoadCoolingExternal', 'hourlyHeatingLoadExternal', \
                 'hourlyCoolingLoadExternal', 'hourlyHeatingLoadOnTheBorefield', 'hourlyCoolingLoadOnTheBorefield', \
                 'k_f', 'mfr', 'Cp', 'mu', 'rho', 'useConstantRb', 'h_f', 'R_f', 'R_p', 'printing', 'combo', \
-                'r_in', 'r_out', 'k_p', 'D_s', 'r_b', 'numberOfPipes', 'epsilon', 'k_g', 'pos', 'D'
+                'r_in', 'r_out', 'k_p', 'D_s', 'r_b', 'numberOfPipes', 'epsilon', 'k_g', 'pos', 'D', \
+                'L2sizing', 'L3sizing', 'L4sizing', 'quadrantSizing', 'H_init'
 
     def __init__(self, simulationPeriod: int = 20, numberOfBoreholes: int = None, peakHeating: list = None,
                  peakCooling: list = None,
@@ -84,6 +85,8 @@ class Borefield:
         self.thresholdWarningShallowField: int = 50
         # parameter that determines whether or not the Rb-value should be altered in the optimisation
         self.useConstantRb = True
+        # parameter that determines whether or not the Tg should be calculated with a heat flux or without
+        self.useConstantTg = True
 
         self.H_max: float = 350  # max threshold for interpolation (will with first sizing)
 
@@ -155,6 +158,7 @@ class Borefield:
         self.Rb = 0.  # effective borehole thermal resistance mK/W
         self.N_1 = 0  # number of boreholes in one direction #
         self.N_2 = 0  # number of boreholes in the other direction #
+        self.flux = 0.  # geothermal heat flux W/m2
         self.numberOfBoreholes = 0  # number of total boreholes #
 
         # initiate fluid parameters
@@ -413,6 +417,24 @@ class Borefield:
         # calculate Rb*
         return self.calculateRb()
 
+    def _Tg(self, H: float = None) -> float:
+        """
+        This function gives back the ground temperature
+        When useConstantTg is False, the thermal heat flux is taken into account.
+
+        :param H: depth of the field (optional)
+        :return: ground temperature
+        """
+        if self.useConstantTg:
+            return self.Tg
+
+        # check if specific depth is given
+        if H is None:
+            H is self.H
+
+        # geothermal gradient is equal to the geothermal heat flux divided by the thermal conductivity
+        return self.Tg + H * self.flux / self.k_s
+
     def calculateRb(self) -> float:
         """
         This function returns the calculated equivalent borehole thermal resistance Rb* value.
@@ -466,7 +488,7 @@ class Borefield:
             Rm = (gfuncUniformT[1] - gfuncUniformT[0]) / (2 * pi * self.k_s)
             Rd = (gfuncUniformT[0]) / (2 * pi * self.k_s)
             # calculate the total borehole length
-            L = (self.qa * Ra + self.qm * Rm + self.qh * Rd + self.qh * self._Rb) / abs(self.Tf - self.Tg)
+            L = (self.qa * Ra + self.qm * Rm + self.qh * Rd + self.qh * self._Rb) / abs(self.Tf - self._Tg())
             # updating the depth values
             H_prev = self.H
             self.H = L / self.numberOfBoreholes
@@ -498,40 +520,80 @@ class Borefield:
             Rh = (gfuncUniformT[0]) / (2 * pi * self.k_s)
 
             # calculate the total length
-            L = (self.qh * self._Rb + self.qh * Rh + self.qm * Rcm + self.qpm * Rpm) / abs(self.Tf - self.Tg)
+            L = (self.qh * self._Rb + self.qh * Rh + self.qm * Rcm + self.qpm * Rpm) / abs(self.Tf - self._Tg())
 
             # updating the depth values
             H_prev = self.H
             self.H = L / self.numberOfBoreholes
         return self.H
 
-    def size(self, H_init: float, L2Sizing: bool = 1, quadrantSizing: int = 0, useConstantRb: bool = None) -> float:
+    def sizingSetup(self, H_init: float = 100, useConstantRb: bool = None, useConstantTg: bool = None, quadrantSizing: int = 0,
+                    L2sizing: bool = None, L3sizing: bool = None, L4sizing: bool = None) -> None:
         """
-        This function lets the user chose between two sizing options.
-        * The L2 sizing is the one explained in (Peere et al., 2021) and is quicker
-        * The L3 sizing is a more general approach which is slower but more accurate
-        - quadrantSizing lets you size the bore field according to a specific quadrant
-        - useConstantRb makes sure that the self.useConstantRb = True.
-        Note, the constant Rb* value will be overwritten!
+        This function sets the options for the sizing function.
+        * The L2 sizing is the one explained in (Peere et al., 2021) and is the quickest method (it uses 3 pulses)
+        * The L3 sizing is a more general approach which is slower but more accurate (it uses 24 pulses/year)
+        * The L4 sizing is the most exact one, since it uses hourly data (8760 pulses/year)
 
-        :param H_init: initial depth of the borefield to start the iteratation
-        :param L2Sizing: true if a sizing with the L2 method is needed, false if L3 is needed
-        :param quadrantSizing: differs from 0 when a sizing in a certain quadrant is desired
+        :param H_init: initial depth of the borefield to start the iteratation (m)
         :param useConstantRb: true if a constant Rb* value should be used
+        :param useConstantTg: true if a constant Tg value should be used (the geothermal flux is neglected)
+        :param quadrantSizing: differs from 0 when a sizing in a certain quadrant is desired
+        :param L2sizing: true if a sizing with the L2 method is needed
+        :param L3sizing: true if a sizing with the L3 method is needed
+        :param L4sizing: true if a sizing with the L4 method is needed
+        :return: None
+        """
+
+        # check if just one sizing is given
+        if np.sum([1 if L2sizing is not None else 0, 1 if L3sizing is not None else 0, 1 if L4sizing is not None else 0]) > 1:
+            raise ValueError("Please check if just one sizing method is chosen!")
+
+        # set variables
+        if useConstantRb is not None:
+            self.useConstantRb = useConstantRb
+        if useConstantTg is not None:
+            self.useConstantTg = useConstantTg
+        if quadrantSizing is not None:
+            self.quadrantSizing = quadrantSizing
+        if self.H_init is not None:
+            self.H_init = H_init
+        if L2sizing is not None:
+            self.L2sizing = L2sizing
+        if L3sizing is not None:
+            self.L3sizing = L3sizing
+        if L4sizing is not None:
+            self.L4sizing = L4sizing
+
+    def size(self, H_init: float = 100, useConstantRb: bool = None, useConstantTg: bool = None,
+             L2sizing: bool = None, L3sizing: bool = None, L4sizing: bool = None, quadrantSizing: int = None) -> float:
+        """
+        This function sizes the borefield. It lets the user chose between three sizing methods.
+        * The L2 sizing is the one explained in (Peere et al., 2021) and is the quickest method (it uses 3 pulses)
+        * The L3 sizing is a more general approach which is slower but more accurate (it uses 24 pulses/year)
+        * The L4 sizing is the most exact one, since it uses hourly data (8760 pulses/year)
+
+        :param H_init: initial depth of the borefield to start the iteratation (m)
+        :param useConstantRb: true if a constant Rb* value should be used
+        :param useConstantTg: true if a constant Tg value should be used (the geothermal flux is neglected)
+        :param L2sizing: true if a sizing with the L2 method is needed
+        :param L3sizing: true if a sizing with the L3 method is needed
+        :param L4sizing: true if a sizing with the L4 method is needed
+        :param quadrantSizing: differs from 0 when a sizing in a certain quadrant is desired
         :return: borefield depth
         """
 
-        # sets the constant Rb
-        useConstantRbBackup = self.useConstantRb
-        self.useConstantRb = useConstantRb if useConstantRb is not None else self.useConstantRb
+        # run the sizing setup
+        self.sizingSetup(H_init=H_init, useConstantRb=useConstantRb, useConstantTg=useConstantTg,
+                         L3sizing=L3sizing, L4sizing=L4sizing, quadrantSizing=quadrantSizing)
 
-        result = self.sizeL2(H_init, quadrantSizing) if L2Sizing else self.sizeL3(H_init, quadrantSizing)
-
-        self.Rb = self._Rb
-
-        # reset useConstantRb
-        self.useConstantRb = useConstantRbBackup
-        return result
+        # sizes according to the correct algorithm
+        if self.L2sizing:
+            return self.sizeL2(self.H_init, self.quadrantSizing)
+        if self.L3sizing:
+            return self.sizeL3(self.H_init, self.quadrantSizing)
+        if self.L4sizing:
+            return self.sizeL4(self.H_init, self.quadrantSizing)
 
     def sizeL2(self, H_init: float, quadrantSizing: int = 0) -> float:
         """
@@ -741,17 +803,17 @@ class Borefield:
                             gValuePeak[0] / (2 * pi * self.k_s) + self.Rb)
 
             # convert to temperature
-            temp = [i / self.numberOfBoreholes / self.H + self.Tg for i in temperatureProfile]
+            temp = [i / self.numberOfBoreholes / self.H + self._Tg() for i in temperatureProfile]
 
             H_prev = self.H
             if quadrant == 1 or quadrant == 2:
                 # maximum temperature
                 # convert back to required length
-                self.H = abs(temperatureProfile[temp.index(max(temp))] / (self.Tf_H - self.Tg) / self.numberOfBoreholes)
+                self.H = abs(temperatureProfile[temp.index(max(temp))] / (self.Tf_H - self._Tg()) / self.numberOfBoreholes)
             else:
                 # minimum temperature
                 # convert back to required length
-                self.H = abs(temperatureProfile[temp.index(min(temp))] / (self.Tf_C - self.Tg) / self.numberOfBoreholes)
+                self.H = abs(temperatureProfile[temp.index(min(temp))] / (self.Tf_C - self._Tg()) / self.numberOfBoreholes)
 
         return self.H
 
@@ -980,7 +1042,7 @@ class Borefield:
         resultsMonthHeating = []
 
         # calculation the borehole wall temperature for every month i
-        Tb = [i / (2 * pi * self.k_s) / ((self.H if H is None else H) * self.numberOfBoreholes) + self.Tg for i in
+        Tb = [i / (2 * pi * self.k_s) / ((self.H if H is None else H) * self.numberOfBoreholes) + self._Tg(H) for i in
               results]
         self.Tb = Tb
         # now the Tf will be calculated based on
