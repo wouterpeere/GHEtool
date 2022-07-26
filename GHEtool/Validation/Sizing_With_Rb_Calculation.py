@@ -34,7 +34,7 @@ if __name__ == "__main__":
             peakLoadHeatingArray[i, j] = np.random.randint(monthlyLoadHeatingArray[i, j], maxValueHeating)
 
     # initiate borefield model
-    data = GroundData(100,6,3,10,0.2,10,12) # ground data with an accurate guess of 185m for the depth of the borefield
+    data = GroundData(100, 6, 3, 10, 0.2, 10, 12)  # ground data with an inaccurate guess of 100m for the depth of the borefield
     fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
     pipeData = PipeData(1, 0.015, 0.02, 0.4, 0.05, 0.075, 2)
 
@@ -43,8 +43,8 @@ if __name__ == "__main__":
     peakHeating = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]             # Peak heating in kW
 
     # annual heating and cooling load
-    annualHeatingLoad = 300*10**3 # kWh
-    annualCoolingLoad = 160*10**3 # kWh
+    annualHeatingLoad = 300*10**3  # kWh
+    annualCoolingLoad = 160*10**3  # kWh
 
     # percentage of annual load per month (15.5% for January ...)
     montlyLoadHeatingPercentage = [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144]
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     borefield.setMinGroundTemperature(0)    # minimum temperature
 
     # size with constant Rb* value
-    borefield.useConstantRb = True # True by default, you can also give 'useConstantRb = True' as an argument to the size function
+    borefield.useConstantRb = True  # True by default, you can also give 'useConstantRb = True' as an argument to the size function
 
     # calculate the Rb* value
     borefield.Rb = borefield.calculateRb()
@@ -95,8 +95,9 @@ if __name__ == "__main__":
         borefield.setPeakHeating(peakLoadHeatingArray[i])
         resultsRbDynamic[i] = borefield.size(100)
     endRbDynamic = time.time()
+    print(resultsRbDynamic[1])
 
-    print("These are the results when an accurate constant Rb* value is used.")
+    print("These are the results when an inaccurate constant Rb* value is used.")
     print("Time for sizing with a constant Rb* value:", endRbConstant - startRbConstant, "s")
     print("Time for sizing with a dynamic Rb* value:", endRbDynamic - startRbDynamic, "s")
 
@@ -110,7 +111,7 @@ if __name__ == "__main__":
 
     # Do the same thing but with another constant Rb* value based on a borehole depth of 185m.
 
-    data = GroundData(185, 6, 3, 10, 0.2, 10, 12)  # ground data with an inaccurate guess of 185m for the depth of the borefield
+    data = GroundData(185, 6, 3, 10, 0.2, 10, 12)  # ground data with an accurate guess of 185m for the depth of the borefield
     borefield.setGroundParameters(data)
 
     # size with a constant Rb* value
@@ -140,7 +141,7 @@ if __name__ == "__main__":
         resultsRbDynamic[i] = borefield.size(100)
     endRbDynamic = time.time()
 
-    print("These are the results when an inaccurate constant Rb* value is used.")
+    print("These are the results when an accurate constant Rb* value is used.")
     print("Time for sizing with a constant Rb* value:", endRbConstant - startRbConstant, "s")
     print("Time for sizing with a dynamic Rb* value:", endRbDynamic - startRbDynamic, "s")
 

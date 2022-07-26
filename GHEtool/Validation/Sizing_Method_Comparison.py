@@ -32,7 +32,7 @@ if __name__ == "__main__":
             peakLoadHeatingArray[i, j] = np.random.randint(monthlyLoadHeatingArray[i, j], maxValueHeating)
 
     # initiate borefield model
-    data = GroundData(110,6,3,10,0.2,10,12)
+    data = GroundData(110, 6, 3, 10, 0.2, 10, 12)
 
     # Montly loading values
     peakCooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]              # Peak cooling in kW
@@ -70,7 +70,7 @@ if __name__ == "__main__":
         borefield.setBaseloadHeating(monthlyLoadHeatingArray[i])
         borefield.setPeakCooling(peakLoadCoolingArray[i])
         borefield.setPeakHeating(peakLoadHeatingArray[i])
-        resultsL2[i] = borefield.size(100)
+        resultsL2[i] = borefield.size(100, L2sizing=True)
     endL2 = time.time()
 
     # size according to L3 method
@@ -80,11 +80,11 @@ if __name__ == "__main__":
         borefield.setBaseloadHeating(monthlyLoadHeatingArray[i])
         borefield.setPeakCooling(peakLoadCoolingArray[i])
         borefield.setPeakHeating(peakLoadHeatingArray[i])
-        resultsL3[i] = borefield.size(100,0)
+        resultsL3[i] = borefield.size(100, L3sizing=True)
     endL3 = time.time()
 
-    print("Time for sizing according to L2:", endL2 - startL2, "s")
-    print("Time for sizing according to L3:", endL3 - startL3, "s")
+    print("Time for sizing according to L2:", endL2 - startL2, "s (or ", round((endL2 - startL2)/numberOfIterations*1000, 3), "ms/sizing)")
+    print("Time for sizing according to L3:", endL3 - startL3, "s (or ", round((endL3 - startL3)/numberOfIterations*1000, 3), "ms/sizing)")
 
     # calculate differences
     for i in range(numberOfIterations):

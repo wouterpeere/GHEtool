@@ -28,8 +28,8 @@ if __name__ == "__main__":
     peakHeating = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]             # Peak heating in kW
 
     # annual heating and cooling load
-    annualHeatingLoad = 300*10**3 # kWh
-    annualCoolingLoad = 160*10**3 # kWh
+    annualHeatingLoad = 300*10**3  # kWh
+    annualCoolingLoad = 160*10**3  # kWh
 
     # percentage of annual load per month (15.5% for January ...)
     montlyLoadHeatingPercentage = [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144]

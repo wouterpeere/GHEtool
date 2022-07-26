@@ -60,7 +60,7 @@ class Borefield:
                 'hourlyCoolingLoadExternal', 'hourlyHeatingLoadOnTheBorefield', 'hourlyCoolingLoadOnTheBorefield', \
                 'k_f', 'mfr', 'Cp', 'mu', 'rho', 'useConstantRb', 'h_f', 'R_f', 'R_p', 'printing', 'combo', \
                 'r_in', 'r_out', 'k_p', 'D_s', 'r_b', 'numberOfPipes', 'epsilon', 'k_g', 'pos', 'D', \
-                'L2sizing', 'L3sizing', 'L4sizing', 'quadrantSizing', 'H_init'
+                'L2sizing', 'L3sizing', 'L4sizing', 'quadrantSizing', 'H_init', 'usePrecalculatedData'
 
     def __init__(self, simulationPeriod: int = 20, numberOfBoreholes: int = None, peakHeating: list = None,
                  peakCooling: list = None,
@@ -89,6 +89,9 @@ class Borefield:
         self.useConstantTg = True
 
         self.H_max: float = 350  # max threshold for interpolation (will with first sizing)
+        # setting this to False will make sure every gvalue is calculated on the spot
+        # this will make everything way slower!
+        self.usePrecalculatedData: bool = True
 
         # initialize variables for equivalent borehole resistance calculation
         self.pos: list = []
@@ -603,6 +606,12 @@ class Borefield:
         self.sizingSetup(H_init=backup[0], useConstantRb=backup[1], useConstantTg=backup[2], L2sizing=backup[3],
                          L3sizing=backup[4], L4sizing=backup[5], quadrantSizing=backup[6])
 
+        # check if the field is not shallow
+        if depth < self.thresholdWarningShallowField and self.printing:
+            print(f"The field has a calculated depth of {round(depth, 2)} m which is lower than the proposed minimum "
+                  f"of {self.thresholdWarningShallowField} m.")
+            print("Please change your configuration accordingly to have a not so shallow field.")
+
         return depth
 
     def sizeL2(self, H_init: float, quadrantSizing: int = 0) -> float:
@@ -671,12 +680,6 @@ class Borefield:
                 else:
                     self.limitingQuadrant = 3
 
-        # check if the field is not shallow
-        if self.H < self.thresholdWarningShallowField and self.printing:
-            print(f"The field has a calculated depth of {round(self.H, 2)} m which is lower than the proposed minimum "
-                  f"of {self.thresholdWarningShallowField} m.")
-            print("Please change your configuration accordingly to have a not so shallow field.")
-
         return self.H
 
     def sizeL3(self, H_init: float, quadrantSizing: int = 0) -> float:
@@ -718,25 +721,7 @@ class Borefield:
                 else:
                     self.limitingQuadrant = 3
 
-        # check if the field is not shallow
-        if self.H < self.thresholdWarningShallowField and self.printing:
-            print("The field has a calculated depth of ", str(round(self.H, 2)),
-                  " m which is lower than the proposed minimum of ", str(self.thresholdWarningShallowField), " m.")
-            print("Please change your configuration accordingly to have a not so shallow field.")
-
         return self.H
-
-    def sizeL4(self, H_init: float, quadrantSizing: int = 0) -> float:
-        """
-        This functions sizes the bore field based on a L4 method (hourly method).
-
-        :param H_init: initial value for the depth of the borefield to start iteration
-        :param quadrantSizing: differs from 0 if a sizing in a certain quadrant is desired
-        :return: borefield depth
-        """
-
-        ### TODO implement
-        # check if hourly data is given
 
     def _sizeL3quadrants(self, quadrant: int) -> float:
         """
@@ -819,12 +804,12 @@ class Borefield:
                     temperatureProfile[i % 12] = temperatureProfile[i % 12] + (
                         (self.peakCooling[i % 12] - self.monthlyLoadCooling[i % 12]) if
                         self.peakCooling[i % 12] > self.monthlyLoadCooling[i % 12] else 0) * 1000. * (
-                            gValuePeak[0] / (2 * pi * self.k_s) + self.Rb)
+                                                         gValuePeak[0] / (2 * pi * self.k_s) + self.Rb)
                 else:
                     temperatureProfile[i % 12] = temperatureProfile[i % 12] - (
                         (self.peakHeating[i % 12] - self.monthlyLoadHeating[i % 12]) if
                         self.peakHeating[i % 12] > self.monthlyLoadHeating[i % 12] else 0) * 1000. * (
-                            gValuePeak[0] / (2 * pi * self.k_s) + self.Rb)
+                                                         gValuePeak[0] / (2 * pi * self.k_s) + self.Rb)
 
             # convert to temperature
             temp = [i / self.numberOfBoreholes / self.H + self._Tg() for i in temperatureProfile]
@@ -833,13 +818,27 @@ class Borefield:
             if quadrant == 1 or quadrant == 2:
                 # maximum temperature
                 # convert back to required length
-                self.H = abs(temperatureProfile[temp.index(max(temp))] / (self.Tf_H - self._Tg()) / self.numberOfBoreholes)
+                self.H = abs(
+                    temperatureProfile[temp.index(max(temp))] / (self.Tf_H - self._Tg()) / self.numberOfBoreholes)
             else:
                 # minimum temperature
                 # convert back to required length
-                self.H = abs(temperatureProfile[temp.index(min(temp))] / (self.Tf_C - self._Tg()) / self.numberOfBoreholes)
+                self.H = abs(
+                    temperatureProfile[temp.index(min(temp))] / (self.Tf_C - self._Tg()) / self.numberOfBoreholes)
 
         return self.H
+
+    def sizeL4(self, H_init: float, quadrantSizing: int = 0) -> float:
+        """
+        This functions sizes the bore field based on a L4 method (hourly method).
+
+        :param H_init: initial value for the depth of the borefield to start iteration
+        :param quadrantSizing: differs from 0 if a sizing in a certain quadrant is desired
+        :return: borefield depth
+        """
+
+        ### TODO implement
+        # check if hourly data is given
 
     def calculateMonthlyLoad(self) -> None:
         """
@@ -1140,10 +1139,25 @@ class Borefield:
     def gfunction(self, timeValue: list, H: float) -> np.ndarray:
         """
         This function calculated the g-function based on interpolation of the precalculated data.
+
         :param timeValue: list of seconds at which the gfunctions should be evaluated
         :param H: depth at which the gfunctions should be evaluated
         :return: array of gfunction values
         """
+
+        # if calculate is False, than the gfunctions are calculated on the spot
+        if not self.usePrecalculatedData:
+            # Calculate the g-function for uniform borehole wall temperature
+            alpha = self.k_s / (2.4 * 10 ** 6)
+
+            # create custom Borefield
+            customBorefield = gt.boreholes.rectangle_field(self.N_1, self.N_2, self.B, self.B, H, D=4, r_b=0.075)
+
+            # calculate gfunction
+            gfunc_uniform_T = gt.gfunction.uniform_temperature(
+                customBorefield, timeValue, alpha, nSegments=12, disp=False)
+
+            return gfunc_uniform_T
 
         # set folder if no GUI is used
         folder = FOLDER
@@ -1245,6 +1259,7 @@ class Borefield:
                             timeArray=None, depthArray=None) -> None:
         """
         This function makes a datafile for a given custom borefield.
+
         :param customBorefield: borefield object from pygfunction
         :param nameDatafile: name of the custom datafile
         :param nSegments: number of segments used in creating the datafile
@@ -1300,6 +1315,7 @@ class Borefield:
         is in. firstColumnHeating is true if the first column in the datafile is for the heating values.
         header is true if there is a header in the csv fileImport.
         separator is the separator in the csv fileImport.
+
         :param filePath: location of the hourly load file
         :param header: true if the file contains a header
         :param separator: symbol used in the file to separate columns
@@ -1324,6 +1340,7 @@ class Borefield:
     def convertHourlyToMonthly(self, peakCoolLoad: float = None, peakHeatLoad: float = None) -> None:
         """
         This function converts an hourly load profile to the monthly profiles used in the sizing.
+
         :param peakCoolLoad: peak power in cooling [kW]
         :param peakHeatLoad: peak power in heating [kW]
         :return: None
@@ -1350,6 +1367,7 @@ class Borefield:
     def _reduceToMonthLoad(load: list, peak: float) -> list:
         """
         This function calculates the monthly load based, taking a maximum peak value into account.
+
         :param load: a list of hourly loads
         :param peak: a maximum peak power [kW]
         :return: list of monthly peak loads
@@ -1364,6 +1382,7 @@ class Borefield:
     def _reduceToPeakLoad(load: list, peak: float) -> list:
         """
         This function calculates the monthly peak load, taking a maximum peak value into account.
+
         :param load: a list of hourly loads
         :param peak: a maximum peak power [kW]
         :return: list of monthly peak loads
@@ -1378,6 +1397,7 @@ class Borefield:
         """
         This function optimises the load based on the given bore field and the given hourly load.
         It does so base on a load-duration curve.
+
         :param depth: depth of the borefield [m]
         :param printResults: True if results need to be plotted
         :return: None
@@ -1542,7 +1562,7 @@ class Borefield:
         for option in options:
             self._resetForSizing(option[0], option[1])
             self.B = option[2]
-            depth = self.size(H_init=100, L2Sizing=L2Sizing)
+            depth = self.size(H_init=100, L2sizing=L2Sizing)
 
             # save result in results dictionary with the total length as key
             results[depth * self.numberOfBoreholes] = (option[0], option[1], option[2], depth)
@@ -1798,7 +1818,7 @@ class Borefield:
 
     def _resetForSizing(self, N_1: int, N_2: int) -> None:
         """
-        function to reset borehole
+        Function to reset borehole
 
         :param N_1: width of rectangular field (#)
         :param N_2: length of rectangular field (#)

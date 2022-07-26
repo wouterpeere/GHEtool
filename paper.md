@@ -37,12 +37,12 @@ A setup to install the GUI at the user-defined place is also implemented and ava
 
 # Statement of need
 
-The building sector uses 36 % of global energy and is responsible for 39 % of energy-related CO2 emissions when upstream power generation is included, with more than half of this energy used by space heating, space cooling and water heating [@IEA].
+The building sector uses 36 % of global energy and is responsible for 39 % of energy-related CO<sub>2</sub> emissions when upstream power generation is included, with more than half of this energy used by space heating, space cooling and water heating [@IEA].
 In order to reach the climate goals in 2050, as set by the European Green Deal, the building sector should decarbonise [@greenDeal]. One of the promising ways to achieve this goal is by using shallow geothermal energy, thereby storing heat/cold in borefields, enabling seasonal thermal energy storage.
 Therefore, much interest exists from academia and practitioners in this field.
 
-One of the main challenges in this domain is to size a borefield, which is critical since borefields have a very high investment cost, so we want them to be as small as possible to increase their (economic) feasibility.
-In all research related to optimising borefield loads, studying sensitivity on borefield configurations, and integrating seasonal thermal energy storage in fifth-generation district heating etc. borefield sizing plays a central role.
+One of the main challenges in this domain is to size a borefield, which is critical since borefields have a very high investment cost, so we want them to be as small as possible to increase their (economic) feasibility [@investmentcost].
+In all research related to optimising borefield loads [@loads], studying sensitivity on borefield configurations [@sensitivity], and integrating seasonal thermal energy storage in (fifth-generation) district heating [@districtHeating] etc. borefield sizing plays a central role.
 
 GHEtool is a Python package with a graphical counterpart centred around borefield sizing and the evaluation of temperature evolution. 
 
@@ -52,10 +52,10 @@ Due to this precalculation, one can save from a couple of seconds to several min
 GHEtool aims to be used both by academic researchers in thermal systems integration and as a tool for educational purposes. It offers all the code and functions needed to size a borefield.
 Also, it evaluates the mean fluid and borehole wall temperature evolution. Therefore, GHEtool is beneficial for research activities relating to fifth-generation district heating, seasonal thermal energy storage and sensitivity analysis on borefield parameters.
 
-The tool comes with a graphical user interface. This interface is particularly beneficial for educational purposes, where students (and trained engineers) can play around to see how specific decisions influence the behaviour of the borefield.
+The tool comes with a GUI. This interface is particularly beneficial for educational purposes, where students (and trained engineers) can play around to see how specific decisions influence the behaviour of the borefield.
 It is used at the University of Leuven (Belgium) for all master thesis students that work in the geothermal study domain and in the course B-KUL-H0H00A Thermal Systems.
 
-Furthermore, practitioners in the HVAC domain can use it to size their borefields correctly, so they become more economically feasible and ready to play an essential role in the energy transition and  of the built environment.
+Furthermore, practitioners in the heating, ventilation and air condition (HVAC) domain can use it to size their borefields correctly, so they become more economically feasible and ready to play an essential role in the energy transition and  of the built environment.
 
 # Comparison with existing tools
 
@@ -77,7 +77,7 @@ GHEtool offers functionalities of value to all different disciplines working wit
 - Optimising the load profile for a given heating and cooling load
 - Using dynamically calculated borehole thermal resistance (using directly the code from pygfunction [@pygfunction])
 - Calculating the temperature evolution of the ground for a given building load and borefield configuration
-- Importing heating and cooling loads from *.csv and *.xlsx files
+- Importing heating and cooling loads from \*.csv and \*.xlsx files
 - Using your custom borefield configuration
 
 # Acknowledgements
