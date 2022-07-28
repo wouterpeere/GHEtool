@@ -223,7 +223,7 @@ class Borefield:
         # calculate number of boreholes
         self.setNumberOfBoreholes(numberOfBoreholes if numberOfBoreholes is not None else 1)
 
-        # set a custom bore field
+        # set a custom borefield
         self.borefield = None
         self.setBorefield(borefield)
 
@@ -249,7 +249,7 @@ class Borefield:
 
     def setBorefield(self, borefield=None) -> None:
         """
-        This function sets the bore field configuration. When no input, an empty array of length N_1 * N_2 will be made.
+        This function sets the borefield configuration. When no input, an empty array of length N_1 * N_2 will be made.
         :return None
         """
         if borefield is None:
@@ -433,7 +433,7 @@ class Borefield:
 
         # check if specific depth is given
         if H is None:
-            H is self.H
+            H = self.H
 
         # geothermal gradient is equal to the geothermal heat flux divided by the thermal conductivity
         return self.Tg + H * self.flux / self.k_s
@@ -449,7 +449,7 @@ class Borefield:
             print("Please make sure you set al the pipe and fluid data.")
             raise ValueError
 
-        # initiate temporary bore field
+        # initiate temporary borefield
         borehole = gt.boreholes.Borehole(self.H, self.D, self.r_b, 0, 0)
         # initiate pipe
         pipe = gt.pipes.MultipleUTube(self.pos, self.r_in, self.r_out, borehole, self.k_s, self.k_g,
@@ -531,7 +531,7 @@ class Borefield:
         return self.H
 
     def sizingSetup(self, H_init: float = 100, useConstantRb: bool = None, useConstantTg: bool = None, quadrantSizing: int = 0,
-                    L2sizing: bool = None, L3sizing: bool = None, L4sizing: bool = None) -> None:
+                    L2sizing: bool = None, L3sizing: bool = None) -> None:
         """
         This function sets the options for the sizing function.
         * The L2 sizing is the one explained in (Peere et al., 2021) and is the quickest method (it uses 3 pulses)
@@ -544,12 +544,11 @@ class Borefield:
         :param quadrantSizing: differs from 0 when a sizing in a certain quadrant is desired
         :param L2sizing: true if a sizing with the L2 method is needed
         :param L3sizing: true if a sizing with the L3 method is needed
-        :param L4sizing: true if a sizing with the L4 method is needed
         :return: None
         """
 
         # check if just one sizing is given
-        if np.sum([L2sizing if L2sizing is not None else 0, L3sizing if L3sizing is not None else 0, L4sizing if L4sizing is not None else 0]) > 1:
+        if np.sum([L2sizing if L2sizing is not None else 0, L3sizing if L3sizing is not None else 0]) > 1:
             raise ValueError("Please check if just one sizing method is chosen!")
 
         # set variables
@@ -565,25 +564,25 @@ class Borefield:
             self.L2sizing = L2sizing
         if L3sizing is not None:
             self.L3sizing = L3sizing
-        if L4sizing is not None:
-            self.L4sizing = L4sizing
+        # if L4sizing is not None:
+        #     self.L4sizing = L4sizing
 
     def size(self, H_init: float = 100, useConstantRb: bool = None, useConstantTg: bool = None,
-             L2sizing: bool = None, L3sizing: bool = None, L4sizing: bool = None, quadrantSizing: int = None) -> float:
+             L2sizing: bool = None, L3sizing: bool = None, quadrantSizing: int = None) -> float:
         """
         This function sizes the borefield. It lets the user chose between three sizing methods.
         * The L2 sizing is the one explained in (Peere et al., 2021) and is the quickest method (it uses 3 pulses)
         * The L3 sizing is a more general approach which is slower but more accurate (it uses 24 pulses/year)
-        * The L4 sizing is the most exact one, since it uses hourly data (8760 pulses/year)
 
         Please note that the changes sizing setup changes here are not saved! Use self.setupSizing for this.
+        (e.g. if you size by putting the constantTg param to True but it was False, if you plot the results afterwards
+        the constantTg will be False again and your results will seem off!)
 
         :param H_init: initial depth of the borefield to start the iteratation (m)
         :param useConstantRb: true if a constant Rb* value should be used
         :param useConstantTg: true if a constant Tg value should be used (the geothermal flux is neglected)
         :param L2sizing: true if a sizing with the L2 method is needed
         :param L3sizing: true if a sizing with the L3 method is needed
-        :param L4sizing: true if a sizing with the L4 method is needed
         :param quadrantSizing: differs from 0 when a sizing in a certain quadrant is desired
         :return: borefield depth
         """
@@ -592,19 +591,19 @@ class Borefield:
 
         # run the sizing setup
         self.sizingSetup(H_init=H_init, useConstantRb=useConstantRb, useConstantTg=useConstantTg,
-                         L2sizing=L2sizing, L3sizing=L3sizing, L4sizing=L4sizing, quadrantSizing=quadrantSizing)
+                         L2sizing=L2sizing, L3sizing=L3sizing, quadrantSizing=quadrantSizing)
 
         # sizes according to the correct algorithm
         if self.L2sizing:
             depth = self.sizeL2(self.H_init, self.quadrantSizing)
         if self.L3sizing:
             depth = self.sizeL3(self.H_init, self.quadrantSizing)
-        if self.L4sizing:
-            depth = self.sizeL4(self.H_init, self.quadrantSizing)
+        # if self.L4sizing:
+        #     depth = self.sizeL4(self.H_init, self.quadrantSizing)
 
         # reset initial parameters
         self.sizingSetup(H_init=backup[0], useConstantRb=backup[1], useConstantTg=backup[2], L2sizing=backup[3],
-                         L3sizing=backup[4], L4sizing=backup[5], quadrantSizing=backup[6])
+                         L3sizing=backup[4], quadrantSizing=backup[6])
 
         # check if the field is not shallow
         if depth < self.thresholdWarningShallowField and self.printing:
@@ -616,9 +615,9 @@ class Borefield:
 
     def sizeL2(self, H_init: float, quadrantSizing: int = 0) -> float:
         """
-        This function sizes the bore field of the given configuration according to the methodology explained in
+        This function sizes the borefield of the given configuration according to the methodology explained in
         (Peere et al., 2021), which is a L2 method. When quadrant sizing is other than 0, it sizes the field based on
-        the asked quadrant. It returns the bore field depth.
+        the asked quadrant. It returns the borefield depth.
 
         :param H_init: initialize depth for sizing
         :param quadrantSizing: if a quadrant is given the sizing is performed for this quadrant else for the relevant
@@ -684,7 +683,7 @@ class Borefield:
 
     def sizeL3(self, H_init: float, quadrantSizing: int = 0) -> float:
         """
-        This functions sizes the bore field based on a L3 method.
+        This functions sizes the borefield based on a L3 method.
 
         :param H_init: initial value for the depth of the borefield to start iteration
         :param quadrantSizing: differs from 0 if a sizing in a certain quadrant is desired
@@ -830,7 +829,7 @@ class Borefield:
 
     def sizeL4(self, H_init: float, quadrantSizing: int = 0) -> float:
         """
-        This functions sizes the bore field based on a L4 method (hourly method).
+        This functions sizes the borefield based on a L4 method (hourly method).
 
         :param H_init: initial value for the depth of the borefield to start iteration
         :param quadrantSizing: differs from 0 if a sizing in a certain quadrant is desired
@@ -1018,9 +1017,10 @@ class Borefield:
 
     def _printTemperatureProfile(self, legend: bool = True, H: float = None, figure: bool = True) -> None:
         """
-        This function calculates the temperature evolution in the bore field using temporal superposition.
+        This function calculates the temperature evolution in the borefield using temporal superposition.
         It is possible to calculate this for a certain depth H, otherwise self.H will be used.
         If Figure = True than a figure will be plotted.
+
         :param legend: true if the legend should be shown
         :param H: depth of the borefield to evaluate the temperature profile
         :param figure: true if a figure should be shown
@@ -1065,6 +1065,7 @@ class Borefield:
         resultsMonthHeating = []
 
         # calculation the borehole wall temperature for every month i
+        print(self._Tg(H))
         Tb = [i / (2 * pi * self.k_s) / ((self.H if H is None else H) * self.numberOfBoreholes) + self._Tg(H) for i in
               results]
         self.Tb = Tb
@@ -1250,7 +1251,7 @@ class Borefield:
                 else:
                     print(f"Your requested depth of {H} m is beyond the limit {self.H_max} m of the precalculated "
                           f"data.")
-                    print("Please change your bore field configuration accordingly.")
+                    print("Please change your borefield configuration accordingly.")
                 print("-------------------------")
                 print("This calculation stopped.")
             raise ValueError
@@ -1295,7 +1296,7 @@ class Borefield:
             # Calculate the g-function for uniform borehole wall temperature
             alpha = self.k_s / (2.4 * 10 ** 6)
 
-            # set borehole depth in bore field
+            # set borehole depth in borefield
             for borehole in customBorefield:
                 borehole.H = H
 
@@ -1395,7 +1396,7 @@ class Borefield:
 
     def optimiseLoadProfile(self, depth: float = 150, printResults: bool = False) -> None:
         """
-        This function optimises the load based on the given bore field and the given hourly load.
+        This function optimises the load based on the given borefield and the given hourly load.
         It does so base on a load-duration curve.
 
         :param depth: depth of the borefield [m]
@@ -1620,7 +1621,7 @@ class Borefield:
             # start loop over number of boreholes in length and width direction
             for N_1 in range(n_1_max, 0, -1):
                 for N_2 in range(min(n_2_max, N_1), 0, -1):
-                    # reset bore field values for sizing
+                    # reset borefield values for sizing
                     self._resetForSizing(N_1, N_2)
                     # calculate number of total boreholes which should be minimal
                     product = N_1 * N_2
@@ -1630,9 +1631,9 @@ class Borefield:
                     # break loop id product is less than the current minima to avoid calculation
                     if product < product_min:
                         break
-                    # try to size current bore field configuration else set minimal product
+                    # try to size current borefield configuration else set minimal product
                     try:
-                        depth = self.size(h_max, L2Sizing, useConstantRb=useConstantRb)
+                        depth = self.size(h_max, L2Sizing=L2Sizing, L3sizing=not L2Sizing, useConstantRb=useConstantRb)
                     except ValueError:
                         product_min = product
                         continue
@@ -1709,8 +1710,8 @@ class Borefield:
             totalNumberBoreholesOld = self.N_1 * self.N_2
             # try to determine depth and break loop if unsuccessful
             try:
-                # size current bore field configuration
-                depth = self.size(HMax, L2Sizing, useConstantRb=useConstantRb)
+                # size current borefield configuration
+                depth = self.size(HMax, L2sizing=L2Sizing, L3sizing=not L2Sizing, useConstantRb=useConstantRb)
                 # determine required number of boreholes
                 numberBoreholes = int(depth * totalNumberBoreholesOld / HMax) + 1
                 # determine number of boreholes in length and width direction which accomplish the total number of
@@ -1722,7 +1723,7 @@ class Borefield:
                 totalNumberBoreholesNew = self.N_1 * self.N_2
                 # start counter
                 counter = 0
-                # start while loop to size bore field
+                # start while loop to size borefield
                 while totalNumberBoreholesOld != totalNumberBoreholesNew:
                     # determine gradient to calculate new total borehole number if counter > 4 with a gradient of 0.51
                     # else 1
@@ -1736,7 +1737,7 @@ class Borefield:
                     numberBoreholes = int(depth * totalNumberBoreholesNew / HMax) + 1
                     # determine number of boreholes in length and width directions
                     res = self._calcNumberHoles(numberBoreholes, N1Max, N2Max)
-                    # reset bore field variables for sizing
+                    # reset borefield variables for sizing
                     self._resetForSizing(res[0][0], res[0][1])
                     # set old total number of boreholes
                     totalNumberBoreholesOld = self.N_1 * self.N_2

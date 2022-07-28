@@ -2,7 +2,7 @@
 class GroundData:
     __slots__ = 'H', 'B', 'k_s', 'Tg', 'Rb', 'N_1', 'N_2', 'flux'
 
-    def __init__(self, h: float, b: float, k_s: float, t_g: float, r_b: float, n_1: int, n_2: int, flux: float = 0) -> None:
+    def __init__(self, h: float, b: float, k_s: float, t_g: float, r_b: float, n_1: int, n_2: int, flux: float = 0.06) -> None:
         """
         Data for storage of ground data
         :param h: Depth of boreholes [m]
