@@ -145,6 +145,12 @@ GHEtool offers functionalities of value to all different disciplines working wit
 | Importing heating and cooling loads from .csv and .xlsx files | [Import_Data.py](GHEtool/Examples/Import_Data.py) |
 | Using your custom borefield configuration | [Custom_Borefield_Configuration.py](GHEtool/Examples/Custom_Borefield_Configuration.py) |
 
+| Comparisons | Example document |
+| --- | --- |
+| Comparison in calculation time and accuracy between the simplified L2 sizing methodology and the more accurate L3 method. | [Sizing_Method_Comparison.py](GHEtool/Validation/Sizing_Method_Comparison.py) |
+| Comparison in calculation time and accuracy between using the precalculated gfunction data or not. | [Speed_Comparison.py](GHEtool/Validation/Speed_Comparison.py) |
+
+
 ## Precalculated data
 This tool comes with precalculated g-functions for all borefields of type nxm (for 0<n,m<21) for which the boreholes are connected in parallel. For these borefield configurations, the g-functions are calculated for different depth-thermal conductivity-spacing combinations. The ranges are:
 

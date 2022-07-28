@@ -37,7 +37,7 @@ A setup to install the GUI at the user-defined place is also implemented and ava
 
 # Statement of need
 
-The building sector uses 36 % of global energy and is responsible for 39 % of energy-related CO<sub>2</sub> emissions when upstream power generation is included, with more than half of this energy used by space heating, space cooling and water heating [@IEA].
+The building sector uses 36 % of global energy and is responsible for 39 % of energy-related CO~2~ emissions when upstream power generation is included, with more than half of this energy used by space heating, space cooling and water heating [@IEA].
 In order to reach the climate goals in 2050, as set by the European Green Deal, the building sector should decarbonise [@greenDeal]. One of the promising ways to achieve this goal is by using shallow geothermal energy, thereby storing heat/cold in borefields, enabling seasonal thermal energy storage.
 Therefore, much interest exists from academia and practitioners in this field.
 
@@ -55,7 +55,7 @@ Also, it evaluates the mean fluid and borehole wall temperature evolution. There
 The tool comes with a GUI. This interface is particularly beneficial for educational purposes, where students (and trained engineers) can play around to see how specific decisions influence the behaviour of the borefield.
 It is used at the University of Leuven (Belgium) for all master thesis students that work in the geothermal study domain and in the course B-KUL-H0H00A Thermal Systems.
 
-Furthermore, practitioners in the heating, ventilation and air condition (HVAC) domain can use it to size their borefields correctly, so they become more economically feasible and ready to play an essential role in the energy transition and  of the built environment.
+Furthermore, practitioners in the heating, ventilation and air condition (HVAC) domain can use it to size their borefields correctly, so they become more economically feasible and ready to play an essential role in the energy transition of the built environment.
 
 # Comparison with existing tools
 
@@ -67,7 +67,7 @@ Multiple tools are available for sizing borefields:
 - A commonly used package in the borefield domain is pygfunction. Pygfunction is an open-source Python package to calculate the thermal response factors of the ground. This function forms the basis of many borefield simulation and sizing programs [@pygfunction]. With this Python package, the data of GHEtool was precalculated.
 
 From the mentioned tools, only EED, GLHEPRO, geoSIM and GLDTM can size borefields, but none of them is open source nor easy to be integrated into your workflow since they are standalone. From all the borefield sizing tools listed above, only geoSIM is free, but it only works with one specific type of borehole tubing [@geoSIM].
-(Bernier, 2019) has reviewed exhaustive literature of all existing borefield sizing methods and tools [@Bernier].
+[@Bernier] has reviewed exhaustive literature of all existing borefield sizing methods and tools.
 
 # Features
 GHEtool offers functionalities of value to all different disciplines working with borefields. The features are available both in the code environment and in the GUI. These features are:
