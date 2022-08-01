@@ -436,7 +436,8 @@ class Borefield:
             H = self.H
 
         # geothermal gradient is equal to the geothermal heat flux divided by the thermal conductivity
-        return self.Tg + H * self.flux / self.k_s
+        # avg ground temperature is (Tg + gradient + Tg) / 2
+        return self.Tg + H * self.flux / self.k_s / 2
 
     def calculateRb(self) -> float:
         """
