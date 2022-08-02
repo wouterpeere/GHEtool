@@ -179,11 +179,11 @@ Wouter Peere, KU Leuven & boydens engineering (part of Sweco), wouter.peere@kule
 
 Tobias Blanke, Solar-Institute Jülich, FH Aachen, blanke@sij.fh-aachen.de
 
-
-## Development of GHEtool
+## References
+### Development of GHEtool
 Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. _Validated combined first and last year borefield sizing methodology._ In _Proceedings of International Building Simulation Conference 2021_ (2021). Brugge (Belgium), 1-3 September 2021.
 
-## Applications of GHEtool
+### Applications of GHEtool
 Coninx M., De Nies J. (2022) Cost-efficient Cooling of Buildings by means of Borefields with Active and Passive Cooling. Master thesis, Departement of Mechanical Engineering, KU Leuven, Belgium.
 
 Michiels E., (2022) Dimensionering van meerdere gekoppelde boorvelden op basis van het type vraagprofiel en de verbinding met de gebruikers. Master thesis, Departement of Mechanical Engineering, KU Leuven, Belgium.
