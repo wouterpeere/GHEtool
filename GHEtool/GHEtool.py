@@ -532,7 +532,7 @@ class Borefield:
         return self.H
 
     def sizingSetup(self, H_init: float = 100, useConstantRb: bool = None, useConstantTg: bool = None, quadrantSizing: int = 0,
-                    L2sizing: bool = None, L3sizing: bool = None) -> None:
+                    L2sizing: bool = None, L3sizing: bool = None, L4sizing: bool = None) -> None:
         """
         This function sets the options for the sizing function.
         * The L2 sizing is the one explained in (Peere et al., 2021) and is the quickest method (it uses 3 pulses)
@@ -545,11 +545,12 @@ class Borefield:
         :param quadrantSizing: differs from 0 when a sizing in a certain quadrant is desired
         :param L2sizing: true if a sizing with the L2 method is needed
         :param L3sizing: true if a sizing with the L3 method is needed
+        :param L4sizing: true if a sizing with the L4 method is needed
         :return: None
         """
 
         # check if just one sizing is given
-        if np.sum([L2sizing if L2sizing is not None else 0, L3sizing if L3sizing is not None else 0]) > 1:
+        if np.sum([L2sizing if L2sizing is not None else 0, L3sizing if L3sizing is not None else 0, L4sizing if L4sizing is not None else 0]) > 1:
             raise ValueError("Please check if just one sizing method is chosen!")
 
         # set variables
@@ -565,15 +566,16 @@ class Borefield:
             self.L2sizing = L2sizing
         if L3sizing is not None:
             self.L3sizing = L3sizing
-        # if L4sizing is not None:
-        #     self.L4sizing = L4sizing
+        if L4sizing is not None:
+            self.L4sizing = L4sizing
 
     def size(self, H_init: float = 100, useConstantRb: bool = None, useConstantTg: bool = None,
-             L2sizing: bool = None, L3sizing: bool = None, quadrantSizing: int = None) -> float:
+             L2sizing: bool = None, L3sizing: bool = None, L4sizing: bool = None, quadrantSizing: int = None) -> float:
         """
         This function sizes the borefield. It lets the user chose between three sizing methods.
         * The L2 sizing is the one explained in (Peere et al., 2021) and is the quickest method (it uses 3 pulses)
         * The L3 sizing is a more general approach which is slower but more accurate (it uses 24 pulses/year)
+        * The L4 sizing is the most exact one, since it uses hourly data (8760 pulses/year)
 
         Please note that the changes sizing setup changes here are not saved! Use self.setupSizing for this.
         (e.g. if you size by putting the constantTg param to True but it was False, if you plot the results afterwards
@@ -584,6 +586,7 @@ class Borefield:
         :param useConstantTg: true if a constant Tg value should be used (the geothermal flux is neglected)
         :param L2sizing: true if a sizing with the L2 method is needed
         :param L3sizing: true if a sizing with the L3 method is needed
+        :param L4sizing: true if a sizing with the L4 method is needed
         :param quadrantSizing: differs from 0 when a sizing in a certain quadrant is desired
         :return: borefield depth
         """
@@ -592,19 +595,19 @@ class Borefield:
 
         # run the sizing setup
         self.sizingSetup(H_init=H_init, useConstantRb=useConstantRb, useConstantTg=useConstantTg,
-                         L2sizing=L2sizing, L3sizing=L3sizing, quadrantSizing=quadrantSizing)
+                         L2sizing=L2sizing, L3sizing=L3sizing, L4sizing=L4sizing, quadrantSizing=quadrantSizing)
 
         # sizes according to the correct algorithm
         if self.L2sizing:
             depth = self.sizeL2(self.H_init, self.quadrantSizing)
         if self.L3sizing:
             depth = self.sizeL3(self.H_init, self.quadrantSizing)
-        # if self.L4sizing:
-        #     depth = self.sizeL4(self.H_init, self.quadrantSizing)
+        if self.L4sizing:
+            depth = self.sizeL4(self.H_init, self.quadrantSizing)
 
         # reset initial parameters
         self.sizingSetup(H_init=backup[0], useConstantRb=backup[1], useConstantTg=backup[2], L2sizing=backup[3],
-                         L3sizing=backup[4], quadrantSizing=backup[6])
+                         L3sizing=backup[4], L4sizing=backup[5], quadrantSizing=backup[6])
 
         # check if the field is not shallow
         if depth < self.thresholdWarningShallowField and self.printing:
@@ -828,17 +831,21 @@ class Borefield:
 
         return self.H
 
-    def sizeL4(self, H_init: float, quadrantSizing: int = 0) -> float:
+    def sizeL4(self, H_init: float, quadrantSizing: int = 0, implementation: int = 0) -> float:
         """
         This functions sizes the borefield based on a L4 method (hourly method).
 
         :param H_init: initial value for the depth of the borefield to start iteration
         :param quadrantSizing: differs from 0 if a sizing in a certain quadrant is desired
+        :param implementation: 0 for convolution implementation, 1 for
         :return: borefield depth
         """
 
-        ### TODO implement
         # check if hourly data is given
+        if not self.hourlyHeatingLoad or not self.hourlyCoolingLoad:
+            raise ValueError("Please provide an hourly heating and cooling load.")
+
+        ### TODO implement
 
     def calculateMonthlyLoad(self) -> None:
         """
@@ -1310,6 +1317,32 @@ class Borefield:
         print(f"A new dataset with name {name} has been created in {os.path.dirname(os.path.realpath(__file__))}\Data.")
         pickle.dump(data, open(f'{folder}/Data/{name}', "wb"))
 
+    def setHourlyHeatingLoad(self, heatingLoad: np.array) -> None:
+        """
+        This function sets the hourly heating load.
+
+        :param heatingLoad: the hourly heating load as an array/list
+        :return None
+        """
+        self.hourlyHeatingLoad = heatingLoad
+
+        # set monthly loads
+        self.setPeakHeating(self._reduceToPeakLoad(self.hourlyHeatingLoad, max(heatingLoad)))
+        self.setBaseloadHeating(self._reduceToMonthLoad(self.hourlyHeatingLoad, max(heatingLoad)))
+
+    def setHourlyCoolingLoad(self, coolingLoad: np.array) -> None:
+        """
+        This function sets the hourly heating load.
+
+        :param coolingLoad: the hourly heating load as an array/list
+        :return None
+        """
+        self.hourlyCoolingLoad = coolingLoad
+
+        # set monthly loads
+        self.setPeakCooling(self._reduceToPeakLoad(self.hourlyCoolingLoad, max(coolingLoad)))
+        self.setBaseloadCooling(self._reduceToMonthLoad(self.hourlyCoolingLoad, max(coolingLoad)))
+
     def loadHourlyProfile(self, filePath, header: bool = True, separator: str = ";",
                           firstColumnHeating: bool = True) -> None:
         """
@@ -1333,11 +1366,14 @@ class Borefield:
         db = read_csv(filePath, sep=separator, header=header)
 
         if firstColumnHeating:
-            self.hourlyHeatingLoad = db.iloc[:, 0].tolist()
-            self.hourlyCoolingLoad = db.iloc[:, 1].tolist()
+            self.setHourlyHeatingLoad(db.iloc[:, 0].tolist())
+            self.setHourlyCoolingLoad(db.iloc[:, 1].tolist())
         else:
-            self.hourlyHeatingLoad = db.iloc[:, 1].tolist()
-            self.hourlyCoolingLoad = db.iloc[:, 0].tolist()
+            self.setHourlyHeatingLoad(db.iloc[:, 1].tolist())
+            self.setHourlyCoolingLoad(db.iloc[:, 0].tolist())
+
+        # reduce to monthly load
+        self.convertHourlyToMonthly()
 
     def convertHourlyToMonthly(self, peakCoolLoad: float = None, peakHeatLoad: float = None) -> None:
         """
