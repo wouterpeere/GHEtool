@@ -38,7 +38,7 @@ A setup to install the GUI at the user-defined place is also implemented and ava
 # Statement of need
 
 The building sector uses 36 % of global energy and is responsible for 39 % of energy-related CO~2~ emissions when upstream power generation is included, with more than half of this energy used by space heating, space cooling and water heating [@IEA].
-In order to reach the climate goals in 2050, as set by the European Green Deal, the building sector should decarbonise [@greenDeal]. One of the promising ways to achieve this goal is by using shallow geothermal energy, thereby storing heat/cold in borefields, enabling seasonal thermal energy storage.
+In order to reach the climate goals, as set by the European Green Deal, the building sector should strive towards decarbonisation in order to achieve a zero-emission building stock by 2050[@greenDeal; @greenDeal2]. One of the promising ways to achieve this goal is by using shallow geothermal energy, thereby storing heat/cold in borefields, enabling seasonal thermal energy storage.
 Therefore, much interest exists from academia and practitioners in this field.
 
 One of the main challenges in this domain is to size a borefield, which is critical since borefields have a very high investment cost, so we want them to be as small as possible to increase their (economic) feasibility [@investmentcost].
