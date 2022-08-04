@@ -17,16 +17,16 @@ if __name__ == "__main__":
     borefield = Borefield()
 
     # set ground data in borefield
-    borefield.setGroundParameters(data)
+    borefield.set_ground_parameters(data)
 
     # load the hourly profile
-    borefield.loadHourlyProfile("Hourly_Profile.csv", header=True, separator=";", firstColumnHeating=True)
+    borefield.load_hourly_profile("Hourly_Profile.csv", header=True, separator=";", first_column_heating=True)
 
     # optimise the load for a 10x10 field (see data above) and a fixed depth of 150m.
-    borefield.optimiseLoadProfile(depth=150, printResults=True)
+    borefield.optimise_load_profile(depth=150, print_results=True)
 
     # print resulting external peak cooling profile
-    print(borefield.peakCoolingExternal)
+    print(borefield.peak_cooling_external)
 
     # print resulting monthly load for an external heating source
-    print(borefield.monthlyLoadHeatingExternal)
+    print(borefield.monthly_load_heating_external)

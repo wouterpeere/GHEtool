@@ -18,10 +18,10 @@ class DataStorage:
 
     def __init__(self, ui: int) -> None:
         """
-        Get Values from GUI and initialize DataStorage class Parameters
+        Get Values from gui and initialize DataStorage class Parameters
         :param ui: Integer of user interface ID
         """
-        # get user interface id and get GUI object
+        # get user interface id and get gui object
         self.ui = ui
         obj = ctypes_cast(self.ui, ctypes_py_object).value
         # get purpose of simulation
@@ -29,7 +29,7 @@ class DataStorage:
         self.determineDepth: bool = idx == 1  # aim is to determine required depth
         self.size_bore_field: bool = idx == 2  # aim is to size bore field by length and width in meter
         self.optimizeLoadProfile: bool = idx == 3  # aim is to optimize load profile by selected load profile
-        # get Ground data values from GUI
+        # get Ground data values from gui
         h: float = getattr(obj, 'doubleSpinBox_H').value() if idx != 1 else 100  # depth [m]
         b: float = getattr(obj, 'doubleSpinBox_B').value()  # borehole spacing [m]
         k_s: float = getattr(obj, 'doubleSpinBox_k_s').value()  # conductivity of the soil [W/mK]
@@ -39,7 +39,7 @@ class DataStorage:
         n_2: int = getattr(obj, 'spinBox_N_2').value()  # length of rectangular field [#]
         # create GroundData class from inputs
         self.GD: GroundData = GroundData(h, b, k_s, tg, rb, n_1, n_2)
-        # get maximal and minimal temperature as well as simulation period from GUI
+        # get maximal and minimal temperature as well as simulation period from gui
         self.T_max: float = getattr(obj, 'doubleSpinBox_TMax').value()  # maximum temperature [°C]
         self.T_min: float = getattr(obj, 'doubleSpinBox_TMin').value()  # minimum temperature [°C]
         self.simulationPeriod: int = getattr(obj, 'spinBox_Years').value()  # simulation period [years]
@@ -188,8 +188,8 @@ class DataStorage:
         self.fileSelected: bool = (self.optimizeLoadProfile and self.dataFile == '')
 
     def set_values(self) -> None:
-        """Set Values to GUI"""
-        # get GUI object
+        """Set Values to gui"""
+        # get gui object
         obj = ctypes_cast(self.ui, ctypes_py_object).value
         # determine and set purpose of simulation
         idx: int = 1 if self.determineDepth else 2 if self.size_bore_field else 3 if self.optimizeLoadProfile else 0
@@ -242,7 +242,7 @@ class DataStorage:
             getattr(obj, 'doubleSpinBox_pipe_conductivity').setValue(self.pipeData.k_p)
             getattr(obj, 'doubleSpinBox_pipe_distance').setValue(self.pipeData.D_s)  # distance of pipe until center [m]
             getattr(obj, 'doubleSpinBox_borehole_radius').setValue(self.pipeData.r_b)  # borehole radius [m]
-            getattr(obj, 'spinBox_number_pipes').setValue(self.pipeData.numberOfPipes)  # number of pipes [#]
+            getattr(obj, 'spinBox_number_pipes').setValue(self.pipeData.number_of_pipes)  # number of pipes [#]
             getattr(obj, 'doubleSpinBox_pipe_roughness').setValue(self.pipeData.epsilon)  # pipe roughness [m]
             getattr(obj, 'doubleSpinBox_borehole_burial_depth').setValue(self.pipeData.D)  # burial depth [m]
         # if load profile should be optimized get fileImport data

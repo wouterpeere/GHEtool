@@ -110,11 +110,11 @@ borefield = Borefield(simulationPeriod=20,
                       baseloadHeating=monthlyLoadHeating,
                       baseloadCooling=monthlyLoadCooling)
 
-borefield.setGroundParameters(data)
+borefield.set_ground_parameters(data)
 
 # set temperature boundaries
-borefield.setMaxGroundTemperature(16)   # maximum temperature
-borefield.setMinGroundTemperature(0)    # minimum temperature
+borefield.set_max_ground_temperature(16)  # maximum temperature
+borefield.set_min_ground_temperature(0)  # minimum temperature
 ```
 
 Once a Borefield object is created, one can make use of all the functionalities of GHEtool. One can for example size the borefield using:
@@ -127,7 +127,7 @@ print("The borehole depth is: ", depth, "m")
 Or one can plot the temperature profile by using
 
 ```Python
-borefield.printTemperatureProfile(legend=True)
+borefield.print_temperature_profile(legend=True)
 ```
 
 A full list of functionalities is given below.
@@ -137,18 +137,18 @@ GHEtool offers functionalities of value to all different disciplines working wit
 
 | Functionality | Example document |
 | --- | --- |
-| Sizing the borefield (i.e. calculating the required depth) for a given injection and extraction load for the borefield (two sizing methods are available). | [Main_Functionalities.py](GHEtool/Examples/Main_Functionalities.py) |
-| Calculating the temperature evolution of the ground for a given building load and borefield configuration | [Main_Functionalities.py](GHEtool/Examples/Main_Functionalities.py) |
-| Using dynamically calculated borehole thermal resistance (this is directly based on the code of pygfunction) | [Sizing_With_Rb_Calculation.py](GHEtool/Validation/Sizing_With_Rb_Calculation.py) |
-| Optimising the load profile for a given heating and cooling load | [Optimise_Load_Profile.py](GHEtool/Examples/Optimise_Load_Profile.py)|
-| Finding the optimal rectangular borefield configuration for a given heating and cooling load | [Size_Borefield_By_Length_And_Width.py](GHEtool/Examples/Size_Borefield_By_Length_And_Width.py) |
-| Importing heating and cooling loads from .csv and .xlsx files | [Import_Data.py](GHEtool/Examples/Import_Data.py) |
-| Using your custom borefield configuration | [Custom_Borefield_Configuration.py](GHEtool/Examples/Custom_Borefield_Configuration.py) |
+| Sizing the borefield (i.e. calculating the required depth) for a given injection and extraction load for the borefield (two sizing methods are available). | [main_functionalities.py](GHEtool/Examples/main_functionalities.py) |
+| Calculating the temperature evolution of the ground for a given building load and borefield configuration | [main_functionalities.py](GHEtool/Examples/main_functionalities.py) |
+| Using dynamically calculated borehole thermal resistance (this is directly based on the code of pygfunction) | [sizing_with_Rb_calculation.py](GHEtool/Validation/sizing_with_Rb_calculation.py) |
+| Optimising the load profile for a given heating and cooling load | [optimise_load_profile.py](GHEtool/Examples/optimise_load_profile.py)|
+| Finding the optimal rectangular borefield configuration for a given heating and cooling load | [size_borefield_by_length_and_width.py](GHEtool/Examples/size_borefield_by_length_and_width.py) |
+| Importing heating and cooling loads from .csv and .xlsx files | [import_data.py](GHEtool/Examples/import_data.py) |
+| Using your custom borefield configuration | [custom_borefield_configuration.py](GHEtool/Examples/custom_borefield_configuration.py) |
 
 | Comparisons | Example document |
 | --- | --- |
-| Comparison in calculation time and accuracy between the simplified L2 sizing methodology and the more accurate L3 method. | [Sizing_Method_Comparison.py](GHEtool/Validation/Sizing_Method_Comparison.py) |
-| Comparison in calculation time and accuracy between using the precalculated gfunction data or not. | [Speed_Comparison.py](GHEtool/Validation/Speed_Comparison.py) |
+| Comparison in calculation time and accuracy between the simplified L2 sizing methodology and the more accurate L3 method. | [sizing_method_comparison.py](GHEtool/Validation/sizing_method_comparison.py) |
+| Comparison in calculation time and accuracy between using the precalculated gfunction data or not. | [speed_comparison.py](GHEtool/Validation/speed_comparison.py) |
 
 
 ## Precalculated data

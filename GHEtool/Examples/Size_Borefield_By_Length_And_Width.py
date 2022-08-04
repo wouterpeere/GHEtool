@@ -8,45 +8,45 @@ if __name__ == "__main__":
     # set ground data
     data = GroundData(110, 6, 3, 10, 0.2, 10, 12)
 
-    # montly loading values
-    peakCooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]  # Peak cooling in kW
-    peakHeating = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]  # Peak heating in kW
+    # monthly loading values
+    peak_cooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]  # Peak cooling in kW
+    peak_heating = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]  # Peak heating in kW
 
     # annual heating and cooling load
-    annualHeatingLoad = 300 * 10 ** 3  # kWh
-    annualCoolingLoad = 160 * 10 ** 3  # kWh
+    annual_heating_load = 300 * 10 ** 3  # kWh
+    annual_cooling_load = 160 * 10 ** 3  # kWh
 
     # percentage of annual load per month (15.5% for January ...)
-    montlyLoadHeatingPercentage = [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144]
-    montlyLoadCoolingPercentage = [0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025]
+    monthly_load_heating_percentage = [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144]
+    monthly_load_cooling_percentage = [0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025]
 
     # resulting load per month
-    monthlyLoadHeating = list(map(lambda x: x * annualHeatingLoad, montlyLoadHeatingPercentage))  # kWh
-    monthlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, montlyLoadCoolingPercentage))  # kWh
+    monthly_load_heating = list(map(lambda x: x * annual_heating_load, monthly_load_heating_percentage))  # kWh
+    monthly_load_cooling = list(map(lambda x: x * annual_cooling_load, monthly_load_cooling_percentage))  # kWh
 
     # create the borefield object
-    borefield = Borefield(simulationPeriod=20,
-                          peakHeating=peakHeating,
-                          peakCooling=peakCooling,
-                          baseloadHeating=monthlyLoadHeating,
-                          baseloadCooling=monthlyLoadCooling)
+    borefield = Borefield(simulation_period=20,
+                          peak_heating=peak_heating,
+                          peak_cooling=peak_cooling,
+                          baseload_heating=monthly_load_heating,
+                          baseload_cooling=monthly_load_cooling)
 
-    borefield.setGroundParameters(data)
+    borefield.set_ground_parameters(data)
 
     # set temperature boundaries
-    borefield.setMaxGroundTemperature(16)  # maximum temperature
-    borefield.setMinGroundTemperature(0)  # minimum temperature
+    borefield.set_max_ground_temperature(16)  # maximum temperature
+    borefield.set_min_ground_temperature(0)  # minimum temperature
 
     # set parameters for sizing
-    maxWidth = 60
-    maxLength = 60
-    minSpacing = 5
-    maxSpacing = 8
-    maxDepth = 250
+    max_width = 60  # m
+    max_length = 60  # m
+    min_spacing = 5  # m
+    max_spacing = 8  # m
+    max_depth = 250  # m
 
     # size by length and width
-    result = borefield.sizeByLengthAndWidth(maxDepth, maxWidth, maxLength, minSpacing,
-                                            maxSpacing)
+    result = borefield.size_by_length_and_width(max_depth, max_width, max_length, min_spacing,
+                                                max_spacing)
     # print the possible solutions
     if not result:
         print("There are no possible solutions!")

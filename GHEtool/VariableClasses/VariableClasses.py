@@ -5,6 +5,7 @@ class GroundData:
     def __init__(self, h: float, b: float, k_s: float, t_g: float, r_b: float, n_1: int, n_2: int, flux: float = 0.06) -> None:
         """
         Data for storage of ground data
+
         :param h: Depth of boreholes [m]
         :param b: Borehole spacing [m]
         :param k_s: Ground thermal conductivity [W/m.K]
@@ -13,6 +14,7 @@ class GroundData:
         :param r_b: Equivalent borehole resistance [m K/W]
         :param n_1: Width of rectangular field [#]
         :param n_2: Length of rectangular field [#]
+        :return: None
         """
         self.H = h  # m
         self.B = b  # m
@@ -39,11 +41,13 @@ class FluidData:
     def __init__(self, mfr: float, k_f: float, rho: float, Cp: float, mu: float) -> None:
         """
         Data for storage of ground data
+
         :param mfr: Mass flow rate per borehole [kg/s]
         :param k_f: Thermal Conductivity [W/mK]
         :param rho: Density [kg/m3]
         :param Cp: Thermal capacity [J/kgK]
         :param mu: EDynamic viscosity [Pa/s]
+        :return: None
         """
 
         self.k_f = k_f  # Thermal conductivity W/mK
@@ -63,21 +67,23 @@ class FluidData:
 
 class PipeData:
 
-    __slots__ = 'r_in', 'r_out', 'k_p', 'D_s', 'r_b', 'numberOfPipes', 'epsilon', 'k_g', 'D'
+    __slots__ = 'r_in', 'r_out', 'k_p', 'D_s', 'r_b', 'number_of_pipes', 'epsilon', 'k_g', 'D'
 
-    def __init__(self, k_g: float, r_in: float, r_out: float, k_p: float, D_s: float, r_b: float, numberOfPipes: int,
+    def __init__(self, k_g: float, r_in: float, r_out: float, k_p: float, D_s: float, r_b: float, number_of_pipes: int,
                  epsilon: float = 1e-6, D: float = 4) -> None:
         """
         Data for storage of ground data
+
         :param k_g: Grout thermal conductivity [W/mK]
         :param r_in: Inner pipe radius [m]
         :param r_out: Outer pipe radius [m]
         :param k_p: Pipe thermal conductivity [W/mK]
         :param D_s: Distance of the pipe until center [m]
         :param r_b: Borehole radius [m]
-        :param numberOfPipes: Number of pipes [#] (single U-tube: 1, double U-tube:2)
+        :param number_of_pipes: Number of pipes [#] (single U-tube: 1, double U-tube:2)
         :param epsilon: Pipe roughness [m]
-        :param D: Burrial depth [m]
+        :param D: burrial depth [m]
+        :return: None
         """
 
         self.k_g = k_g                      # grout thermal conductivity W/mK
@@ -86,7 +92,7 @@ class PipeData:
         self.k_p = k_p                      # pipe thermal conductivity W/mK
         self.D_s = D_s                      # distance of pipe until center m
         self.r_b = r_b                      # borehole radius m
-        self.numberOfPipes = numberOfPipes  # number of pipes #
+        self.number_of_pipes = number_of_pipes  # number of pipes #
         self.epsilon = epsilon              # pipe roughness m
         self.D = D                          # burial depth m
 
