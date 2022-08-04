@@ -93,22 +93,22 @@ data = GroundData(110, # depth of the field (m)
 Furthermore, one needs to set the peak and monthly baseload for both heating and cooling.
 
 ```Python
-peakCooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]   # Peak cooling in kW
-peakHeating = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]  # Peak heating in kW
+peak_cooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]   # Peak cooling in kW
+peak_heating = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]  # Peak heating in kW
 
-monthlyLoadHeating = [46500.0, 44400.0, 37500.0, 29700.0, 19200.0, 0.0, 0.0, 0.0, 18300.0, 26100.0, 35100.0, 43200.0]        # in kWh
-monthlyLoadCooling = [4000.0, 8000.0, 8000.0, 8000.0, 12000.0, 16000.0, 32000.0, 32000.0, 16000.0, 12000.0, 8000.0, 4000.0]  # in kWh
+monthly_load_heating = [46500.0, 44400.0, 37500.0, 29700.0, 19200.0, 0.0, 0.0, 0.0, 18300.0, 26100.0, 35100.0, 43200.0]        # in kWh
+monthly_load_cooling = [4000.0, 8000.0, 8000.0, 8000.0, 12000.0, 16000.0, 32000.0, 32000.0, 16000.0, 12000.0, 8000.0, 4000.0]  # in kWh
 ```
 
 Next, one creates the borefield object and sets the temperature constraints and the ground data.
 
 ```Python
 # create the borefield object
-borefield = Borefield(simulationPeriod=20,
-                      peakHeating=peakHeating,
-                      peakCooling=peakCooling,
-                      baseloadHeating=monthlyLoadHeating,
-                      baseloadCooling=monthlyLoadCooling)
+borefield = Borefield(simulation_period=20,
+                      peak_heating=peak_heating,
+                      peak_cooling=peak_cooling,
+                      baseload_heating=monthly_load_heating,
+                      baseload_cooling=monthly_load_cooling)
 
 borefield.set_ground_parameters(data)
 
