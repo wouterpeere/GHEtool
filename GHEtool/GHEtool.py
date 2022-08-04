@@ -1066,7 +1066,6 @@ class Borefield:
         resultsMonthHeating = []
 
         # calculation the borehole wall temperature for every month i
-        print(self._Tg(H))
         Tb = [i / (2 * pi * self.k_s) / ((self.H if H is None else H) * self.numberOfBoreholes) + self._Tg(H) for i in
               results]
         self.Tb = Tb
