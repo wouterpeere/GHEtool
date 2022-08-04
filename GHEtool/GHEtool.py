@@ -910,6 +910,8 @@ class Borefield:
         A positive imbalance means that the field is injection dominated, i.e. it heats up every year.
         :return: None
         """
+        # TODO replace all the functools.reduce with np.sum
+        # TODO replace all lists with numpy arrays
         self.imbalance = functools.reduce(lambda x, y: x + y, self.baseloadCooling) - functools.reduce(
             lambda x, y: x + y, self.baseloadHeating)
 
@@ -997,33 +999,42 @@ class Borefield:
 
         return monthIndex
 
-    def calculateTemperatures(self, depth: float = None) -> None:
+    def calculateTemperatures(self, depth: float = None, hourly: bool = False) -> None:
         """
         Calculate all the temperatures without plotting the figure. When depth is given, it calculates it for a given
         depth.
+
         :param depth: depth for which the temperature profile should be calculated for.
+        :param hourly: if True, then the temperatures are calculated based on the hourly data
         :return: None
         """
-        self._printTemperatureProfile(figure=False, H=depth)
+        self._printTemperatureProfile(figure=False, H=depth, plotHourly=hourly)
 
-    def printTemperatureProfile(self, legend: bool = True) -> None:
+    def printTemperatureProfile(self, legend: bool = True, plotHourly: bool = True) -> None:
         """
         This function plots the temperature profile for the calculated depth.
+
         :param legend: bool if True a legend is printed
+        :param plotHourly: bool if True, then the temperature profile is calculated based on the hourly load
+        if there is any.
         :return: None
         """
-        self._printTemperatureProfile(legend=legend)
+        self._printTemperatureProfile(legend=legend, plotHourly=plotHourly)
 
-    def printTemperatureProfileFixedDepth(self, depth, legend: bool = True) -> None:
+    def printTemperatureProfileFixedDepth(self, depth, legend: bool = True, plotHourly: bool = True) -> None:
         """
         This function plots the temperature profile for a fixed depth.
+
         :param depth: depth for which the temperature profile is calculated for
         :param legend: bool if True a legend is printed
+        :param plotHourly: bool if True, then the temperature profile is calculated based on the hourly load
+        if there is any.
         :return: None
         """
-        self._printTemperatureProfile(legend=legend, H=depth)
+        self._printTemperatureProfile(legend=legend, H=depth, plotHourly=plotHourly)
 
-    def _printTemperatureProfile(self, legend: bool = True, H: float = None, figure: bool = True) -> None:
+    def _printTemperatureProfile(self, legend: bool = True, H: float = None, figure: bool = True,
+                                 plotHourly: bool = True) -> None:
         """
         This function calculates the temperature evolution in the borefield using temporal superposition.
         It is possible to calculate this for a certain depth H, otherwise self.H will be used.
@@ -1032,8 +1043,13 @@ class Borefield:
         :param legend: true if the legend should be shown
         :param H: depth of the borefield to evaluate the temperature profile
         :param figure: true if a figure should be shown
+        :param plotHourly: bool if True, then the temperature profile is calculated based on the hourly load
+        if there is any.
         :return: None
         """
+
+        # TODO implement hourly time temperature profile
+
         H_backup = self.H
         if H is not None:
             self.H = H
@@ -1061,6 +1077,7 @@ class Borefield:
         temp = []
 
         # calculation of the product for every month in order to obtain a temperature profile
+        # TODO can be optimised by using convolution
         for i in range(len(monthlyLoadsArray)):
             temp.insert(0, monthlyLoadsArray[i] * 1000.)
             results.append(np.dot(temp, gValueDifferences[:i + 1]))
@@ -1073,7 +1090,7 @@ class Borefield:
         resultsMonthHeating = []
 
         # calculation the borehole wall temperature for every month i
-        print(self._Tg(H))
+        # TODO optimise this part by using concatenated lists
         Tb = [i / (2 * pi * self.k_s) / ((self.H if H is None else H) * self.numberOfBoreholes) + self._Tg(H) for i in
               results]
         self.Tb = Tb
