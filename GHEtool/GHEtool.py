@@ -48,12 +48,12 @@ class Borefield:
         HOURLY_LOAD_ARRAY.append(temp)
 
     __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'H_init', 'B', 'N_1', 'N_2', 'Rb', 'k_s', 'Tg', 'ty', 'tm', \
-                'td', 'time', 'hourly_heating_load', 'H_max', 'use_constant_Tg', 'flux', \
+                'td', 'time', 'hourly_heating_load', 'H_max', 'use_constant_Tg', 'flux', 'volumetric_heat_capacity',\
                 'hourly_cooling_load', 'number_of_boreholes', 'borefield', 'custom_gfunction', 'cost_investment', \
                 'length_peak', 'th', 'Tf_H', 'Tf_C', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
                 'monthly_load_cooling', 'peak_heating', 'imbalance', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm', \
                 'peak_cooling', 'simulation_period', 'gfunction_interpolation_array', 'fluid_data_available', \
-                'results_cooling', 'results_heating', 'results_peak_heating', 'pipe_data_available', \
+                'results_cooling', 'results_heating', 'results_peak_heating', 'pipe_data_available', 'alpha',\
                 'results_peak_cooling', 'results_month_cooling', 'results_month_heating', 'Tb', 'THRESHOLD_WARNING_SHALLOW_FIELD', \
                 'gui', 'time_L3_first_year', 'time_L3_last_year', 'peak_heating_external', 'peak_cooling_external', \
                 'monthly_load_heating_external', 'monthly_load_cooling_external', 'hourly_heating_load_external', \
@@ -159,6 +159,8 @@ class Borefield:
         self.N_1 = 0  # number of boreholes in one direction #
         self.N_2 = 0  # number of boreholes in the other direction #
         self.flux = 0.  # geothermal heat flux W/m2
+        self.volumetric_heat_capacity = 0.  # ground volumetric heat capacity (J/m3K)
+        self.alpha = 0.  # ground diffusivity (m2/s)
         self.number_of_boreholes = 0  # number of total boreholes #
 
         # initiate fluid parameters
@@ -319,12 +321,9 @@ class Borefield:
         # Ground properties
         self.k_s: float = data.k_s  # Ground thermal conductivity (W/m.K)
         self.Tg: float = data.Tg  # Ground temperature at infinity (C)
-
-        # try statement because of backwards compatibility
-        try:
-            self.flux: float = data.flux  # Ground thermal heat flux
-        except:
-            pass
+        self.volumetric_heat_capacity: float = data.volumetric_heat_capacity  # Ground volumetric heat capacity (W/m3K)
+        self.alpha: float = data.alpha  # Ground difussivity (defined as k_s/volumetric_heat_capacity)
+        self.flux: float = data.flux  # Ground thermal heat flux (W/m2)
 
         # sets the number of boreholes as if it was a rectangular field, iff there is not yet a number of boreholes
         # defined by a custom configuration
@@ -1161,20 +1160,19 @@ class Borefield:
 
         :param time_value: list of seconds at which the gfunctions should be evaluated
         :param H: depth at which the gfunctions should be evaluated
-        :return: array of gfunction values
+        :return: np.array of gfunction values
         """
 
         # if calculate is False, than the gfunctions are calculated on the spot
         if not self.use_precalculated_data:
             # Calculate the g-function for uniform borehole wall temperature
-            alpha = self.k_s / (2.4 * 10 ** 6)
 
             # create custom Borefield
             custom_borefield = gt.boreholes.rectangle_field(self.N_1, self.N_2, self.B, self.B, H, D=4, r_b=0.075)
 
             # calculate gfunction
             gfunc_uniform_T = gt.gfunction.uniform_temperature(
-                custom_borefield, np.asarray(time_value), alpha, nSegments=12, disp=False)
+                custom_borefield, np.asarray(time_value), self.alpha, nSegments=12, disp=False)
 
             return gfunc_uniform_T
 
@@ -1210,16 +1208,16 @@ class Borefield:
                 """
 
                 B_array = list(data.keys())
-                ks_array = list(data[B_array[0]].keys())
-                H_array = list(data[B_array[0]][ks_array[0]].keys())
+                alpha_array = list(data[B_array[0]].keys())
+                H_array = list(data[B_array[0]][alpha_array[0]].keys())
                 self.H_max = max(H_array)
                 B_array.sort()
-                ks_array.sort()
+                alpha_array.sort()
                 H_array.sort()
 
-                points = (B_array, ks_array, H_array, Time)
+                points = (B_array, alpha_array, H_array, Time)
 
-                values: list = [[[data[B][ks][h] for h in H_array] for ks in ks_array] for B in B_array]
+                values: list = [[[data[B][alpha][h] for h in H_array] for alpha in alpha_array] for B in B_array]
                 self.gfunction_interpolation_array = (points, values)
 
             def make_interpolation_list_custom() -> None:
@@ -1249,10 +1247,10 @@ class Borefield:
                 if not isinstance(time_value, float):
                     # multiple values are requested
                     g_value = interpolate.interpn(points, values,
-                                                 np.array([[self.B, self.k_s, H, t] for t in time_value]))
+                                                 np.array([[self.B, self.alpha, H, t] for t in time_value]))
                 else:
                     # only one value is requested
-                    g_value = interpolate.interpn(points, values, np.array([self.B, self.k_s, H, time_value]))
+                    g_value = interpolate.interpn(points, values, np.array([self.B, self.alpha, H, time_value]))
             else:
                 # interpolate
                 points, values = self.gfunction_interpolation_array
@@ -1263,6 +1261,7 @@ class Borefield:
                     # only one value is requested
                     g_value = interpolate.interpn(points, values, np.array([H, time_value]))
             return g_value
+
         except ValueError:
             if self.printing:
                 if self.simulation_period > Borefield.MAX_SIMULATION_PERIOD:
@@ -1314,14 +1313,13 @@ class Borefield:
             print("Start H: ", H)
 
             # Calculate the g-function for uniform borehole wall temperature
-            alpha = self.k_s / (2.4 * 10 ** 6)
 
             # set borehole depth in borefield
             for borehole in custom_borefield:
                 borehole.H = H
 
             gfunc_uniform_T = gt.gfunction.uniform_temperature(
-                custom_borefield, time_array, alpha, nSegments=n_segments, disp=True)
+                custom_borefield, time_array, self.alpha, nSegments=n_segments, disp=True)
 
             data["Data"][H] = gfunc_uniform_T
 
