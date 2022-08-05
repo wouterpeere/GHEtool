@@ -8,18 +8,18 @@ from GHEtool import *
 if __name__ == "__main__":
 
     # initiate ground data
-    data = GroundData(110, 6, 3, 10, 0.2, 10, 10)
+    data = GroundData(110, 6, 3, 10, 0.2, 10, 10, 2.4*10**6)
 
     # initiate borefield
     borefield = Borefield()
 
     # set ground data in borefield
-    borefield.setGroundParameters(data)
+    borefield.set_ground_parameters(data)
 
     # load the hourly profile
-    borefield.loadHourlyProfile("Hourly_Profile.csv", header=True, separator=";", firstColumnHeating=True)
-    borefield.convertHourlyToMonthly()
+    borefield.load_hourly_profile("hourly_profile.csv", header=True, separator=";", first_column_heating=True)
+    borefield.convert_hourly_to_monthly()
 
     # size the borefield and plot the resulting temperature evolution
     borefield.size(100)
-    borefield.printTemperatureProfile()
+    borefield.print_temperature_profile()

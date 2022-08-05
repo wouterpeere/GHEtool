@@ -11,7 +11,7 @@ def run():
     ctypes_windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
     # init window
     window = QtWidgets_QMainWindow()
-    # init GUI window
+    # init gui window
     MainWindow(window, app)
 
     # show window

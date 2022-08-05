@@ -59,7 +59,7 @@ class BoundsOfPrecalculatedData:
         return False
 
 
-# main GUI class
+# main gui class
 class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
     filenameDefault: tuple = ('', '')
 
@@ -893,7 +893,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
 
     def funDisplayData(self) -> None:
         """
-        Load the Data to Display in the GUI
+        Load the Data to Display in the gui
         :return: None
         """
         try:
@@ -970,7 +970,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             # ------------------- Calculate Section --------------------
             # Choose path between Single or Combined Column and create new columns
             if thermalDemand == 0:
-                # Resample the Data for peakHeating and peakCooling
+                # Resample the Data for peak_heating and peak_cooling
                 df2.rename(columns={heatingLoad: "Heating Load", coolingLoad: "Cooling Load"}, inplace=True)
                 df2["peak Heating"] = df2["Heating Load"]
                 df2["peak Cooling"] = df2["Cooling Load"]
@@ -1249,7 +1249,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
 
     def funNew(self) -> None:
         """
-        create new data file and reset GUI
+        create new data file and reset gui
         :return: None
         """
         self.filename: tuple = MainWindow.filenameDefault  # reset filename
@@ -1259,7 +1259,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
 
     def changeScenario(self, idx: int) -> None:
         """
-        update GUI if a new scenario at the comboBox is selected
+        update gui if a new scenario at the comboBox is selected
         :param idx: index of selected scenario
         :return: None
         """
@@ -1591,10 +1591,10 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # defined so far
         self.pushButton_SaveData.hide() if ds.optimizeLoadProfile else self.pushButton_SaveData.show()
         # get peak heating and cooling and monthly loads as well as Tb temperature
-        results_peak_cooling = boreField.resultsPeakCooling
-        results_peak_heating = boreField.resultsPeakHeating
-        results_month_cooling = boreField.resultsMonthCooling
-        results_month_heating = boreField.resultsMonthHeating
+        results_peak_cooling = boreField.results_peak_cooling
+        results_peak_heating = boreField.results_peak_heating
+        results_month_cooling = boreField.results_month_cooling
+        results_month_heating = boreField.results_month_heating
         t_b = boreField.Tb
         # set colors for graph
         grey_color = '#00407a'
@@ -1618,13 +1618,13 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             # clear the axe
             ax2.clear()
             # plot load and peaks
-            ax.step(np_array(time_array), np_array(boreField.peakCoolingExternal), where="pre", lw=1.5,
+            ax.step(np_array(time_array), np_array(boreField.peak_cooling_external), where="pre", lw=1.5,
                     label=f'P {self.translations.PeakCooling}', color='#54bceb')
-            ax.step(np_array(time_array), np_array(boreField.peakHeatingExternal), where="pre", lw=1.5,
+            ax.step(np_array(time_array), np_array(boreField.peak_heating_external), where="pre", lw=1.5,
                     label=f'P {self.translations.PeakHeating}', color='#ffc857')
-            ax2.step(np_array(time_array), np_array(boreField.monthlyLoadCoolingExternal), color='#54bceb',
+            ax2.step(np_array(time_array), np_array(boreField.monthly_load_cooling_external), color='#54bceb',
                      linestyle="dashed", where="pre", lw=1.5, label=f'Q {self.translations.BaseCooling}')
-            ax2.step(np_array(time_array), np_array(boreField.monthlyLoadHeatingExternal), color='#ffc857',
+            ax2.step(np_array(time_array), np_array(boreField.monthly_load_heating_external), color='#ffc857',
                      linestyle="dashed", where="pre", lw=1.5, label=f'Q {self.translations.BaseHeating}')
             # set x-axe limits
             ax.set_xlim(left=1, right=12)
@@ -1652,26 +1652,26 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             import numpy as np
             # create string for result explanation
             string_size: str = f"{self.translations.label_ResOptimizeLoad1}" \
-                               f"{int(max(boreField.hourlyHeatingLoad)) - int(np.max(boreField.peakHeatingExternal))}" \
-                               f" / {int(max(boreField.hourlyCoolingLoad)) - int(np.max(boreField.peakCoolingExternal))} kW\n" \
-                               f"{self.translations.label_ResOptimizeLoad2}{np.round(np.sum(boreField.baseloadHeating), 2)} / " \
-                               f"{np.round(np.sum(boreField.baseloadCooling), 2)}   kWh\n" \
+                               f"{int(max(boreField.hourly_heating_load)) - int(np.max(boreField.peak_heating_external))}" \
+                               f" / {int(max(boreField.hourly_cooling_load)) - int(np.max(boreField.peak_cooling_external))} kW\n" \
+                               f"{self.translations.label_ResOptimizeLoad2}{np.round(np.sum(boreField.baseload_heating), 2)} / " \
+                               f"{np.round(np.sum(boreField.baseload_cooling), 2)}   kWh\n" \
                                f"{self.translations.label_ResOptimizeLoad3}" \
-                               f"{np.round(np.sum(boreField.baseloadHeating) / np.sum(boreField.hourlyHeatingLoad) * 100, 2)} / " \
-                               f"{np.round(np.sum(boreField.baseloadCooling) / np.sum(boreField.hourlyCoolingLoad) * 100, 2)} " \
+                               f"{np.round(np.sum(boreField.baseload_heating) / np.sum(boreField.hourly_heating_load) * 100, 2)} / " \
+                               f"{np.round(np.sum(boreField.baseload_cooling) / np.sum(boreField.hourly_cooling_load) * 100, 2)} " \
                                f"{self.translations.label_ResOptimizeLoad4}\n" \
                                f"{self.translations.label_ResOptimizeLoad5}" \
-                               f"{int(np.max(boreField.peakHeatingExternal))} / " \
-                               f"{int(np.max(boreField.peakCoolingExternal))} kW\n" \
+                               f"{int(np.max(boreField.peak_heating_external))} / " \
+                               f"{int(np.max(boreField.peak_cooling_external))} kW\n" \
                                f"{self.translations.label_ResOptimizeLoad6}" \
-                               f"{np.round(-np.sum(boreField.baseloadHeating) + np.sum(boreField.hourlyHeatingLoad), 2)} / " \
-                               f"{np.round(-np.sum(boreField.baseloadCooling) + np.sum(boreField.hourlyCoolingLoad), 2)} kWh"
+                               f"{np.round(-np.sum(boreField.baseload_heating) + np.sum(boreField.hourly_heating_load), 2)} / " \
+                               f"{np.round(-np.sum(boreField.baseload_cooling) + np.sum(boreField.hourly_cooling_load), 2)} kWh"
         else:
             # remove second axes if exist
             self.ax[1].remove() if len(self.ax) > 1 else None
             # calculation of all the different times at which the g_function should be calculated.
-            # this is equal to 'UPM' hours a month * 3600 seconds/hours for the simulationPeriod
-            time_for_g_values = [i * boreField.UPM * 3600. for i in range(1, 12 * boreField.simulationPeriod + 1)]
+            # this is equal to 'UPM' hours a month * 3600 seconds/hours for the simulation_period
+            time_for_g_values = [i * boreField.UPM * 3600. for i in range(1, 12 * boreField.simulation_period + 1)]
             # make a time array
             time_array = [i / 12 / 730. / 3600. for i in time_for_g_values]
             # plot Temperatures
@@ -1775,7 +1775,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
             return
         # get maximal simulation period
-        simulationTime = max([i.simulationPeriod for i in self.ListDS])
+        simulationTime = max([i.simulation_period for i in self.ListDS])
         # create first two column entries
         toWrite = [['name', 'unit'],  # 0
                    ['depth', 'm'],  # 1
@@ -1855,25 +1855,25 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             for j in ran_simu:
                 i += 1
                 try:
-                    toWrite[i].append(f'{round(ds.boreField.resultsPeakHeating[j], 2)}')
+                    toWrite[i].append(f'{round(ds.boreField.results_peak_heating[j], 2)}')
                 except IndexError:
                     toWrite[i].append(self.translations.NotCalculated)
             for j in ran_simu:
                 i += 1
                 try:
-                    toWrite[i].append(f'{round(ds.boreField.resultsPeakCooling[j], 2)}')
+                    toWrite[i].append(f'{round(ds.boreField.results_peak_cooling[j], 2)}')
                 except IndexError:
                     toWrite[i].append(self.translations.NotCalculated)
             for j in ran_simu:
                 i += 1
                 try:
-                    toWrite[i].append(f'{round(ds.boreField.resultsMonthHeating[j], 2)}')
+                    toWrite[i].append(f'{round(ds.boreField.results_month_heating[j], 2)}')
                 except IndexError:
                     toWrite[i].append(self.translations.NotCalculated)
             for j in ran_simu:
                 i += 1
                 try:
-                    toWrite[i].append(f'{round(ds.boreField.resultsMonthCooling[j], 2)}')
+                    toWrite[i].append(f'{round(ds.boreField.results_month_cooling[j], 2)}')
                 except IndexError:
                     toWrite[i].append(self.translations.NotCalculated)
         # try to write the data else show error message in status bar
@@ -1959,14 +1959,14 @@ class CalcProblem(QtCore_QThread):
         # import bore field class from GHEtool and not in start up to save time
         from GHEtool import Borefield
         # create the bore field object
-        boreField = Borefield(simulationPeriod=self.DS.simulationPeriod, peakHeating=self.DS.peakHeating,
-                              peakCooling=self.DS.peakCooling, baseloadHeating=self.DS.monthlyLoadHeating,
-                              baseloadCooling=self.DS.monthlyLoadCooling, GUI=True)
+        boreField = Borefield(simulation_period=self.DS.simulationPeriod, peak_heating=self.DS.peakHeating,
+                              peak_cooling=self.DS.peakCooling, baseload_heating=self.DS.monthlyLoadHeating,
+                              baseload_cooling=self.DS.monthlyLoadCooling, gui=True)
         # set temperature boundaries
-        boreField.setMaxGroundTemperature(self.DS.T_max)  # maximum temperature
-        boreField.setMinGroundTemperature(self.DS.T_min)  # minimum temperature
+        boreField.set_max_ground_temperature(self.DS.T_max)  # maximum temperature
+        boreField.set_min_ground_temperature(self.DS.T_min)  # minimum temperature
         # set ground data
-        boreField.setGroundParameters(self.DS.GD)
+        boreField.set_ground_parameters(self.DS.GD)
         # check bounds of precalculated data
         bopd: BoundsOfPrecalculatedData = BoundsOfPrecalculatedData()
         outside_bounds: bool = bopd.check_if_outside_bounds(self.DS.GD.H, self.DS.GD.B, self.DS.GD.k_s,
@@ -1976,12 +1976,12 @@ class CalcProblem(QtCore_QThread):
         # check if Rb is unknown
         if self.DS.R_b_calculation_method > 0:
             # set fluid and pipe data
-            boreField.setFluidParameters(self.DS.fluidData)
-            boreField.setPipeParameters(self.DS.pipeData)
-            # set useConstantRb to False if R_b_calculation_method == 2
+            boreField.set_fluid_parameters(self.DS.fluidData)
+            boreField.set_pipe_parameters(self.DS.pipeData)
+            # set use_constant_Rb to False if R_b_calculation_method == 2
             useConstantRb: bool = self.DS.R_b_calculation_method == 1
             # set Rb to the new calculated one if a constant unknown Rb is selected
-            boreField.Rb = boreField.calculateRb() if useConstantRb else self.DS.GD.Rb
+            boreField.Rb = boreField.calculate_Rb() if useConstantRb else self.DS.GD.Rb
         # create custom rectangle bore field if no precalculated data is available
         if outside_bounds:
             # import boreholes from pygfuntion here to save start up time
@@ -1999,11 +1999,11 @@ class CalcProblem(QtCore_QThread):
                 from GHEtool import FOLDER
                 pk_load(open(f'{FOLDER}/Data/{boreFieldCustom}.pickle', "rb"))
             except FileNotFoundError:
-                boreField.createCustomDataset(custom_field, boreFieldCustom)
+                boreField.create_custom_dataset(custom_field, boreFieldCustom)
             # set new bore field g-function
-            boreField.setCustomGfunction(boreFieldCustom)
+            boreField.set_custom_gfunction(boreFieldCustom)
             # set bore field to custom one
-            boreField.setBorefield(custom_field)
+            boreField.set_borefield(custom_field)
         # if load should be optimized do this
         if self.DS.optimizeLoadProfile:
             # get column and decimal seperator
@@ -2022,20 +2022,20 @@ class CalcProblem(QtCore_QThread):
             # if data is in 2 column create a list of the loaded data else sepperate data by >0 and <0 and then create a
             # list and muliplty in both cases with the unit factor to achive data in kW
             if self.DS.numberColumns == 0:
-                boreField.hourlyHeatingLoad = list(data[self.DS.headerHeating] * unit)
-                boreField.hourlyCoolingLoad = list(data[self.DS.headerCooling] * unit)
+                boreField.hourly_heating_load = list(data[self.DS.headerHeating] * unit)
+                boreField.hourly_cooling_load = list(data[self.DS.headerCooling] * unit)
             else:
-                boreField.hourlyHeatingLoad = list(data[self.DS.headerHeating].apply(lambda x: x >= 0) * unit)
-                boreField.hourlyCoolingLoad = list(data[self.DS.headerHeating].apply(lambda x: x < 0) * unit)
+                boreField.hourly_heating_load = list(data[self.DS.headerHeating].apply(lambda x: x >= 0) * unit)
+                boreField.hourly_cooling_load = list(data[self.DS.headerHeating].apply(lambda x: x < 0) * unit)
             # optimize load profile without printing the results
-            boreField.optimiseLoadProfile(depth=self.DS.GD.H, printResults=False)
+            boreField.optimise_load_profile(depth=self.DS.GD.H, print_results=False)
             # save bore field in Datastorage
             self.DS.boreField = boreField
             # return Datastorage as signal
             self.any_signal.emit(self.DS)
             return
         # size the borehole depth if wished
-        boreField.size(self.DS.GD.H, L2Sizing=self.DS.Depth_Method == 0, useConstantRb=useConstantRb) if \
+        boreField.size(self.DS.GD.H, L2Sizing=self.DS.Depth_Method == 0, use_constant_Rb=useConstantRb) if \
             self.DS.determineDepth else None
         # size bore field by length and width either fast (Size_Method == 0) or robust (Size_Method == 1)
         if self.DS.Size_Method == 0:
@@ -2048,7 +2048,7 @@ class CalcProblem(QtCore_QThread):
                 self.DS.size_bore_field else None
         # try to calculate temperatures
         try:
-            boreField.calculateTemperatures(boreField.H)
+            boreField.calculate_temperatures(boreField.H)
         except ValueError:
             pass
         # save bore field in Datastorage
