@@ -88,7 +88,7 @@ data = GroundData(110, # depth of the field (m)
                   0.2, # borehole equivalent resistance (mK/W)
                   10,  # number of boreholes in width direction of the field (/)
                   12,  # number of boreholes in the length direction of the field (/)
-				  2.4*10**6) # volumetric heat capacity of the ground (J/m3K) 
+                  2.4*10**6) # volumetric heat capacity of the ground (J/m3K) 
 ```
 
 Furthermore, one needs to set the peak and monthly baseload for both heating and cooling.
