@@ -5,7 +5,6 @@ This file contains all the main functionalities of GHEtool being:
     * plotting the temperature evolution
     * plotting the temperature evolution for a specific depth
     * printing the array of the temperature
-
 """
 
 # import all the relevant functions
@@ -19,7 +18,8 @@ if __name__ == "__main__":
                       10,            # Ground temperature at infinity (degrees C)
                       0.2,           # equivalent borehole resistance (K/W)
                       12,            # width of rectangular field (#)
-                      10)            # length of rectangular field (#)}
+                      10,            # length of rectangular field (#)
+                      2.4 * 10**6)   # ground volumetric heat capacity (J/m3K)
 
     # monthly loading values
     peak_cooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]              # Peak cooling in kW

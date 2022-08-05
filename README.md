@@ -87,7 +87,8 @@ data = GroundData(110, # depth of the field (m)
                   10,  # initial/undisturbed ground temperature (deg C)
                   0.2, # borehole equivalent resistance (mK/W)
                   10,  # number of boreholes in width direction of the field (/)
-                  12)  # number of boreholes in the length direction of the field (/)
+                  12,  # number of boreholes in the length direction of the field (/)
+				  2.4*10**6) # volumetric heat capacity of the ground (J/m3K) 
 ```
 
 Furthermore, one needs to set the peak and monthly baseload for both heating and cooling.
@@ -152,10 +153,11 @@ GHEtool offers functionalities of value to all different disciplines working wit
 
 
 ## Precalculated data
-This tool comes with precalculated g-functions for all borefields of type nxm (for 0<n,m<21) for which the boreholes are connected in parallel. For these borefield configurations, the g-functions are calculated for different depth-thermal conductivity-spacing combinations. The ranges are:
+This tool comes with precalculated g-functions for all borefields of type nxm (for 0<n,m<21) for which the boreholes are connected in parallel. For these borefield configurations, the g-functions are calculated for different depth-thermal diffusivity-spacing combinations. The ranges are:
 
 * Depth: 25 - 350m in increments of 25m
-* Thermal conductivity of the soil: 1 - 4 in increments of 0.5W/mk
+* Thermal diffusivity of the soil (defined as thermal conductivity / volumetric heat capacity): 0.036 - 0.144m²/day in increments of 0.018m²/day
+(This is equal to a range of thermal conductivity from 1-4W/mK with a constant volumetric heat capacity of 2.4MJ/m³K)
 * Spacings (equal): 3 - 9m in increments of 1m
 
 Here a burial depth (D) of 4.0m is assumed even as a borehole radius of 7.5cm for all the precalculated data.

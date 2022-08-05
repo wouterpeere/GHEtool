@@ -6,7 +6,7 @@ from GHEtool import Borefield, GroundData
 
 if __name__ == "__main__":
     # set ground data
-    data = GroundData(110, 6, 3, 10, 0.2, 10, 12)
+    data = GroundData(110, 6, 3, 10, 0.2, 10, 12, 2.4 * 10**6)
 
     # monthly loading values
     peak_cooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]  # Peak cooling in kW

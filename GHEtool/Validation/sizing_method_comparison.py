@@ -32,7 +32,7 @@ if __name__ == "__main__":
             peak_load_heating_array[i, j] = np.random.randint(monthly_load_heating_array[i, j], max_value_heating)
 
     # initiate borefield model
-    data = GroundData(110, 6, 3, 10, 0.2, 10, 12)
+    data = GroundData(110, 6, 3, 10, 0.2, 10, 12, 2.4 * 10**6)
 
     # Monthly loading values
     peak_cooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]              # Peak cooling in kW
