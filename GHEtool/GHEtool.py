@@ -1215,8 +1215,6 @@ class Borefield:
                 alpha_array.sort()
                 H_array.sort()
 
-                print(np.array(alpha_array)*3600*24)
-
                 points = (B_array, alpha_array, H_array, Time)
 
                 values: list = [[[data[B][alpha][h] for h in H_array] for alpha in alpha_array] for B in B_array]
