@@ -3,7 +3,7 @@
 [![status](https://joss.theoj.org/papers/0ae2224874ee0139d6f28baa48fe9127/status.svg)](https://joss.theoj.org/papers/0ae2224874ee0139d6f28baa48fe9127)
 
 ## What is *GHEtool*?
-<img src="https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/Icon.png" width="110" align="left">
+<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/GHEtool/gui/Icon.png" width="110" align="left">
 
 GHEtool is a Python package that contains all the functionalities needed to deal with borefield design. It is developed for both researchers and practitioners.
 The core of this package is the automated sizing of borefield under different conditions. The sizing of a borefield is typically slow due to the high complexity of the mathematical background. Because this tool has a lot of precalculated data (cf. infra), GHEtool can size a borefield in the order of tenths of milliseconds. This sizing typically takes the order of minutes. Therefore, this tool is suited for being implemented in workflows where iterations are required.
@@ -13,7 +13,7 @@ GHEtool also comes with a *graphical user interface (GUI)*. This GUI is prebuilt
 This graphical interface is made by Tobias Blanke from FH Aachen.
 
 <p align="center">
-<img src="https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/GHEtool.PNG" width="600"></br>
+<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/GHEtool/gui/GHEtool.PNG" width="600"></br>
   Screenshot of the GUI.
 </p>
 
