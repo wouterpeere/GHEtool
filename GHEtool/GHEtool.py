@@ -39,6 +39,7 @@ class Borefield:
     DEFAULT_LENGTH_PEAK: int = 6  # hours
     DEFAULT_DEPTH_ARRAY: list = [1] + list(range(25, 351, 25))  # m
     DEFAULT_TIME_ARRAY: list = timeValues()  # sec
+    DEFAULT_CONVERGENCE_MINIMAL_DEPTH: int = 5
 
     temp: int = 0
     HOURLY_LOAD_ARRAY: list = []
@@ -60,7 +61,7 @@ class Borefield:
                 'hourly_cooling_load_external', 'hourly_heating_load_on_the_borefield', 'hourly_cooling_load_on_the_borefield', \
                 'k_f', 'mfr', 'Cp', 'mu', 'rho', 'use_constant_Rb', 'h_f', 'R_f', 'R_p', 'printing', 'combo', \
                 'r_in', 'r_out', 'k_p', 'D_s', 'r_b', 'number_of_pipes', 'epsilon', 'k_g', 'pos', 'D', \
-                'L2_sizing', 'L3_sizing', 'L4_sizing', 'quadrant_sizing', 'H_init', 'use_precalculated_data'
+                'L2_sizing', 'L3_sizing', 'L4_sizing', 'quadrant_sizing', 'H_init', 'use_precalculated_data', 'convergence'
 
     def __init__(self, simulation_period: int = 20, number_of_boreholes: int = None, peak_heating: list = None,
                  peak_cooling: list = None, baseload_heating: list = None, baseload_cooling: list = None, investement_cost: list = None,
@@ -101,6 +102,7 @@ class Borefield:
         #
         self.monthly_load: list = []
         self.H_init: float = 0.
+        self.convergence = 0
 
         self.gfunction_interpolation_array: list = []
 
@@ -1162,6 +1164,21 @@ class Borefield:
         :param H: depth at which the gfunctions should be evaluated
         :return: np.array of gfunction values
         """
+
+        # check for value of H < 1
+        if H < 1:
+            self.convergence += 1
+            # check if the requested value is already DEFAULT_CONVERGENCE_MINIMAL_DEPTH below 1m
+            if self.convergence == Borefield.DEFAULT_CONVERGENCE_MINIMAL_DEPTH:
+                raise RuntimeError("Already ",
+                                   Borefield.DEFAULT_CONVERGENCE_MINIMAL_DEPTH,
+                                   "a depth smaller than 1m has been asked. This will lead to a convergence to a way to small"
+                                   "field. Please check your borefield dimensions and load!")
+        else:
+            self.convergence = 0
+
+        # set depth to minimum 1m
+        H = max(H, 1)
 
         # if calculate is False, than the gfunctions are calculated on the spot
         if not self.use_precalculated_data:
