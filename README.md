@@ -1,6 +1,6 @@
 # GHEtool: An open-source tool for borefield sizing in Python
 [![PyPI version](https://badge.fury.io/py/GHEtool.svg)](https://badge.fury.io/py/GHEtool)
-[![status](https://joss.theoj.org/papers/0ae2224874ee0139d6f28baa48fe9127/status.svg)](https://joss.theoj.org/papers/0ae2224874ee0139d6f28baa48fe9127)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.04406/status.svg)](https://doi.org/10.21105/joss.04406)
 
 ## What is *GHEtool*?
 <img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/GHEtool/gui/Icon.png" width="110" align="left">
@@ -178,6 +178,11 @@ please contact Wouter Peere (wouter.peere@kuleuven.be).
 Wouter Peere, KU Leuven & boydens engineering (part of Sweco), wouter.peere@kuleuven.be
 
 Tobias Blanke, Solar-Institute Jülich, FH Aachen, blanke@sij.fh-aachen.de
+
+## Citation
+Please cite GHEtool using the JOSS paper.
+
+Peere et al., (2022). _GHEtool: An open-source tool for borefield sizing in Python._ Journal of Open Source Software, 7(76), 4406, https://doi.org/10.21105/joss.04406
 
 ## References
 ### Development of GHEtool
