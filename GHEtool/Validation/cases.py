@@ -1,6 +1,6 @@
 """
 This document contains checks to see whether or not adaptations to the code still comply with some specific cases.
-It also shows the difference between the original l_2 sizing methode (Peere et al., 2021) and a more general L3 one.
+It also shows the difference between the original L2 sizing methode (Peere et al., 2021) and a more general L3 one.
 
 This document contains 4 different cases referring to the paper: Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. Validated combined first and last year borefield sizing methodology. In Proceedings of International Building Simulation Conference 2021 (2021). Brugge (Belgium), 1-3 September 2021.
 
@@ -94,7 +94,7 @@ if __name__ == "__main__":
             borefield.set_min_ground_temperature(0)  # minimum temperature
 
             borefield.size(100, L2_sizing=True)
-            print(f'correct answer l_2: {correct_answers_L2[i-1]}; calculated answer l_2: {round(borefield.H,2)}; error: '
+            print(f'correct answer L2: {correct_answers_L2[i-1]}; calculated answer L2: {round(borefield.H,2)}; error: '
                   f'{round(abs(1 - borefield.H / correct_answers_L2[i - 1]) * 100, 4)} %')
             assert round(borefield.H, 2) == correct_answers_L2[i-1]
 

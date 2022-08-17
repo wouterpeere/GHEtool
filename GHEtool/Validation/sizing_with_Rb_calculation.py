@@ -1,6 +1,6 @@
 """
 This document compares the sizing with a constant Rb*-value with sizing where the Rb*-value is being recalculated.
-For the test, the l_2 sizing method is used.
+For the test, the L2 sizing method is used.
 The comparison is based on speed and relative accuracy in the result.
 It is shown that the speed difference is significant, but so is the difference in the result. With a constant Rb* value, it is important that the initial depth is rather accurate.
 """

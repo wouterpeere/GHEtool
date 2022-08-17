@@ -19,7 +19,7 @@ import pygfunction as gt
 if __name__ == "__main__":
 
     # set the relevant ground data for the calculations
-    data = GroundData(110, 6, 3, 10, 0.12, 10, 12, 2.4 * 10**6)
+    data = GroundData(110, 6, 3, 10, 0.12, 10, 12, 2.4 * 10**6f)
 
     # Monthly loading values
     peak_cooling = [0., 0, 3.4, 6.9, 13., 18., 21., 50., 16., 3.7, 0., 0.]  # Peak cooling in kW
