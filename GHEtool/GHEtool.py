@@ -708,14 +708,14 @@ class Borefield:
 
         if quadrant_sizing != 0:
             # size according to a specific quadrant
-            self.H = self._size_L3_quadrants(quadrant_sizing)
+            self.H = self._size_based_on_temperature_profile(quadrant_sizing)
         else:
             # size according to the biggest quadrant
             # determine which quadrants are relevant
             if self.imbalance <= 0:
                 # extraction dominated, so quadrants 1 and 4 are relevant
-                quadrant1 = self._size_L3_quadrants(1)
-                quadrant4 = self._size_L3_quadrants(4)
+                quadrant1 = self._size_based_on_temperature_profile(1)
+                quadrant4 = self._size_based_on_temperature_profile(4)
                 self.H = max(quadrant1, quadrant4)
 
                 if self.H == quadrant1:
@@ -724,62 +724,14 @@ class Borefield:
                     self.limiting_quadrant = 4
             else:
                 # injection dominated, so quadrants 2 and 3 are relevant
-                quadrant2 = self._size_L3_quadrants(2)
-                quadrant3 = self._size_L3_quadrants(3)
+                quadrant2 = self._size_based_on_temperature_profile(2)
+                quadrant3 = self._size_based_on_temperature_profile(3)
                 self.H = max(quadrant2, quadrant3)
 
                 if self.H == quadrant2:
                     self.limiting_quadrant = 2
                 else:
                     self.limiting_quadrant = 3
-
-        return self.H
-
-    def _size_L3_quadrants(self, quadrant: int) -> float:
-        """
-        This function sizes based on the L3 method for a specific quadrant.
-        It uses 24 thermal pulses for each year, while the L2-sizing method only uses 3 pulses for the whole simulation
-        period. It returns a borefield depth.
-
-        :return: depth of the borefield
-        """
-
-        # initiate iteration
-        H_prev = 0
-
-        if self.H < 1:
-            self.H = 50
-
-        # Iterates as long as there is no convergence
-        # (convergence if difference between depth in iterations is smaller than THRESHOLD_BOREHOLE_DEPTH)
-        while abs(self.H - H_prev) >= Borefield.THRESHOLD_BOREHOLE_DEPTH:
-
-            # calculate temperature profile
-            self.calculate_temperatures(depth=self.H)
-
-            # in case of quadrant 1 and 2, we are interested in the maximum temperature
-            if quadrant == 1 or quadrant == 2:
-                temperature_profile = self.results_peak_cooling
-            else:
-                temperature_profile = self.results_peak_heating
-
-            # in case of quadrants 1 and 3, we need the first year only
-            # in case of quadrants 2 and 4, we need the last year only
-            if quadrant == 1 or quadrant == 3:
-                temperature_profile = temperature_profile[:12]
-            else:
-                temperature_profile = temperature_profile[-12:]
-
-            H_prev = self.H
-
-            if quadrant == 1 or quadrant == 2:
-                # maximum temperature
-                # convert back to required length
-                self.H = (max(temperature_profile) - self._Tg()) / (self.Tf_H - self._Tg()) * H_prev
-            else:
-                # minimum temperature
-                # convert back to required length
-                self.H = (min(temperature_profile) - self._Tg()) / (self.Tf_C - self._Tg()) * H_prev
 
         return self.H
 
@@ -796,7 +748,88 @@ class Borefield:
         if not self._check_hourly_load():
             raise Exception("The hourly data is incorrect.")
 
-        ### TODO implement
+        # initiate with a given depth
+        self.H_init: float = H_init
+
+        if quadrant_sizing != 0:
+            # size according to a specific quadrant
+            self.H = self._size_based_on_temperature_profile(quadrant_sizing, hourly=True)
+        else:
+            # size according to the biggest quadrant
+            # determine which quadrants are relevant
+            if self.imbalance <= 0:
+                # extraction dominated, so quadrants 1 and 4 are relevant
+                quadrant1 = self._size_based_on_temperature_profile(1, hourly=True)
+                quadrant4 = self._size_based_on_temperature_profile(4, hourly=True)
+                self.H = max(quadrant1, quadrant4)
+
+                if self.H == quadrant1:
+                    self.limiting_quadrant = 1
+                else:
+                    self.limiting_quadrant = 4
+            else:
+                # injection dominated, so quadrants 2 and 3 are relevant
+                quadrant2 = self._size_based_on_temperature_profile(2, hourly=True)
+                quadrant3 = self._size_based_on_temperature_profile(3, hourly=True)
+                self.H = max(quadrant2, quadrant3)
+
+                if self.H == quadrant2:
+                    self.limiting_quadrant = 2
+                else:
+                    self.limiting_quadrant = 3
+
+        return self.H
+
+    def _size_based_on_temperature_profile(self, quadrant: int, hourly: bool = False) -> float:
+        """
+        This function sizes based on the temperature profile.
+        It sizes for a specific quadrant and can both size with a monthly or an hourly resolution.
+
+        :param quadrant: integer for the specific quadrant to be sized for (see (Peere et al., 2021) doi: 10.26868/25222708.2021.30180)
+        :param hourly: True if an hourly resolution should be used
+        :return: depth of the borefield
+        """
+
+        # initiate iteration
+        H_prev = 0
+
+        if self.H < 1:
+            self.H = 50
+
+        # Iterates as long as there is no convergence
+        # (convergence if difference between depth in iterations is smaller than THRESHOLD_BOREHOLE_DEPTH)
+        while abs(self.H - H_prev) >= Borefield.THRESHOLD_BOREHOLE_DEPTH:
+
+            # calculate temperature profile
+            self.calculate_temperatures(depth=self.H, hourly=hourly)
+
+            # in case of quadrant 1 and 2, we are interested in the maximum temperature
+            if quadrant == 1 or quadrant == 2:
+                temperature_profile = self.results_peak_cooling
+            else:
+                temperature_profile = self.results_peak_heating
+
+            nb_of_steps = 12 if not hourly else 8760
+
+            # in case of quadrants 1 and 3, we need the first year only
+            # in case of quadrants 2 and 4, we need the last year only
+            if quadrant == 1 or quadrant == 3:
+                temperature_profile = temperature_profile[:nb_of_steps]
+            else:
+                temperature_profile = temperature_profile[-nb_of_steps:]
+
+            H_prev = self.H
+
+            if quadrant == 1 or quadrant == 2:
+                # maximum temperature
+                # convert back to required length
+                self.H = (max(temperature_profile) - self._Tg()) / (self.Tf_H - self._Tg()) * H_prev
+            else:
+                # minimum temperature
+                # convert back to required length
+                self.H = (min(temperature_profile) - self._Tg()) / (self.Tf_C - self._Tg()) * H_prev
+
+        return self.H
 
     def calculate_monthly_load(self) -> None:
         """
@@ -1016,7 +1049,7 @@ class Borefield:
         self.H = H_backup
 
         H = self.H if H is None else H
-        print(H)
+
         # making a numpy array of the monthly balance (self.monthly_load) for a period of self.simulation_period years
         # [kW]
         monthly_loads_array = np.tile(self.monthly_load, self.simulation_period)
