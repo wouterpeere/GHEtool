@@ -90,5 +90,5 @@ if __name__ == "__main__":
     for i in range(number_of_iterations):
         difference_results[i] = results_L3[i] - results_L2[i]
 
-    print("The maximal difference between the sizing of L2 and L3 was:", np.round(np.max(difference_results), 3), "m or", np.round(np.max(difference_results) / results_L2[np.argmax(difference_results)] * 100, 3), "% w.r.t. the l_2 sizing.")
-    print("The mean difference between the sizing of L2 and L3 was:", np.round(np.mean(difference_results), 3), "m or", np.round(np.mean(difference_results) / np.mean(results_L2) * 100, 3), "% w.r.t. the l_2 sizing.")
+    print("The maximal difference between the sizing of L2 and L3 was:", np.round(np.max(difference_results), 3), "m or", np.round(np.max(difference_results) / results_L2[np.argmax(difference_results)] * 100, 3), "% w.r.t. the L2 sizing.")
+    print("The mean difference between the sizing of L2 and L3 was:", np.round(np.mean(difference_results), 3), "m or", np.round(np.mean(difference_results) / np.mean(results_L2) * 100, 3), "% w.r.t. the L2 sizing.")
