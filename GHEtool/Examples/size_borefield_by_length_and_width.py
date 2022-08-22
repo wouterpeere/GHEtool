@@ -3,6 +3,7 @@ This file is an example on how to use the functionality of GHEtool of sizing a b
 """
 # import all the relevant functions
 from GHEtool import Borefield, GroundData
+import numpy as np
 
 if __name__ == "__main__":
     # set ground data
