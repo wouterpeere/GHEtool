@@ -1,5 +1,5 @@
 """
-This document compares the speed of the l_2 sizing method of (Peere et al., 2021) with and without the precalculated gfunction data.
+This document compares the speed of the L2 sizing method of (Peere et al., 2021) with and without the precalculated gfunction data.
 This is done for two fields with different sizes. It shows that, specifically for the larger fields, the precalculated data is way faster.
 """
 
