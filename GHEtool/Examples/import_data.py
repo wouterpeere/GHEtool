@@ -1,6 +1,5 @@
 """
 This document is an example on how to import hourly load profiles into GHEtool.
-
 """
 # import all the relevant functions
 from GHEtool import *
@@ -8,7 +7,7 @@ from GHEtool import *
 if __name__ == "__main__":
 
     # initiate ground data
-    data = GroundData(110, 6, 3, 10, 0.2, 10, 10, 2.4*10**6)
+    data = GroundData(110, 6, 3, 10, 0.12, 10, 12, 2.4*10**6)
 
     # initiate borefield
     borefield = Borefield()
@@ -21,5 +20,6 @@ if __name__ == "__main__":
     borefield.convert_hourly_to_monthly()
 
     # size the borefield and plot the resulting temperature evolution
-    borefield.size(100)
+    depth = borefield.size(100, L2_sizing=True)
+    print(depth)
     borefield.print_temperature_profile()

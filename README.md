@@ -138,7 +138,7 @@ GHEtool offers functionalities of value to all different disciplines working wit
 
 | Functionality | Example document |
 | --- | --- |
-| Sizing the borefield (i.e. calculating the required depth) for a given injection and extraction load for the borefield (two sizing methods are available). | [main_functionalities.py](GHEtool/Examples/main_functionalities.py) |
+| Sizing the borefield (i.e. calculating the required depth) for a given injection and extraction load for the borefield (three sizing methods are available). | [main_functionalities.py](GHEtool/Examples/main_functionalities.py) |
 | Calculating the temperature evolution of the ground for a given building load and borefield configuration | [main_functionalities.py](GHEtool/Examples/main_functionalities.py) |
 | Using dynamically calculated borehole thermal resistance (this is directly based on the code of pygfunction) | [sizing_with_Rb_calculation.py](GHEtool/Validation/sizing_with_Rb_calculation.py) |
 | Optimising the load profile for a given heating and cooling load | [optimise_load_profile.py](GHEtool/Examples/optimise_load_profile.py)|
@@ -148,8 +148,9 @@ GHEtool offers functionalities of value to all different disciplines working wit
 
 | Comparisons | Example document |
 | --- | --- |
+| Comparison of different sizing methods (L2, L3 and L4) for the same hourly profile | [speed_comparison.py](GHEtool/Validation/speed_comparison.py) |
 | Comparison in calculation time and accuracy between the simplified L2 sizing methodology and the more accurate L3 method. | [sizing_method_comparison.py](GHEtool/Validation/sizing_method_comparison.py) |
-| Comparison in calculation time and accuracy between using the precalculated gfunction data or not. | [speed_comparison.py](GHEtool/Validation/speed_comparison.py) |
+| Comparison in calculation time and accuracy between using the precalculated gfunction data or not. | [sizing_method_comparison_L2_L3_L4.py](GHEtool/Examples/sizing_method_comparison_L2_L3_L4.py) |
 
 
 ## Precalculated data
