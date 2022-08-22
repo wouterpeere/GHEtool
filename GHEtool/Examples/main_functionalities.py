@@ -85,6 +85,10 @@ if __name__ == "__main__":
     borefield.set_fluid_parameters(fluid_data)
     borefield.set_pipe_parameters(pipe_data)
 
-    depth = borefield.size(100, use_constant_Rb=False)
+    # disable the use of constant_Rb with the setup, in order to plot the profile correctly
+    # when it is given as an argument to the size function, it will size correctly, but the plot will be with
+    # constant Rb* since it has not been changed in the setup function
+    borefield.sizing_setup(use_constant_Rb=False)
+    depth = borefield.size(100)
     print("The borehole depth is: ", str(round(depth, 2)), "m for a sizing with dynamic Rb*.")
     borefield.print_temperature_profile(legend=True)
