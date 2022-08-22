@@ -289,9 +289,20 @@ class Borefield:
         self.length_peak: float = length
         self.set_time_constants()
 
+    def set_simulation_period(self, simulation_period: int) -> None:
+        """
+        This function sets the simulation period and updates the time constants.
+
+        :param simulation_period: simulation period in years
+        :return: None
+        """
+        self.simulation_period = simulation_period
+        self.set_time_constants()
+
     def set_time_constants(self) -> None:
         """
         This function sets the time constants
+
         :return: None
         """
         # Number of segments per borehole
@@ -744,6 +755,8 @@ class Borefield:
         :return: depth of the borefield
         """
 
+        # TODO can be optimised using numpy and convolution can make use of the _print_temperature_profile function
+
         # make a numpy array of the monthly average loads for the whole simulation period
         # in case of quadrants 1 and 3, the array can stop after the first year
         # in case of quadrants 2 and 4, we need the whole simulation period
@@ -849,7 +862,7 @@ class Borefield:
         :return: borefield depth
         """
 
-        ### TODO implement
+        ### TODO implement, can be done by implementing hourly plotting function (implemented in same function, other argument?)
         # check if hourly data is given
 
     def calculate_monthly_load(self) -> None:
@@ -863,6 +876,7 @@ class Borefield:
     def set_baseload_heating(self, baseload: list) -> None:
         """
         This function defines the baseload in heating both in an energy as in an average power perspective.
+
         :return: None
         """
         self.baseload_heating: list = [i if i >= 0 else 0 for i in baseload]  # kWh
@@ -876,6 +890,7 @@ class Borefield:
     def set_baseload_cooling(self, baseload: list) -> None:
         """
         This function defines the baseload in cooling both in an energy as in an average power perspective.
+
         :return None
         """
         self.baseload_cooling: list = [i if i >= 0 else 0 for i in baseload]  # kWh
@@ -907,7 +922,8 @@ class Borefield:
         """
         This function calculates the investment cost based on a cost profile linear to the total borehole length.
 
-        :return: investementcost"""
+        :return: investement cost
+        """
         return np.polyval(self.cost_investment, self.H * self.number_of_boreholes)
 
     def calculate_imbalance(self) -> None:
@@ -1046,6 +1062,9 @@ class Borefield:
         :param figure: true if a figure should be shown
         :return: None
         """
+
+        # TODO can be optimised using numpy
+
         H_backup = self.H
         if H is not None:
             self.H = H
