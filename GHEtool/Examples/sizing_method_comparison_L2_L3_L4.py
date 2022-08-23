@@ -42,3 +42,5 @@ if __name__ == "__main__":
     print("The sizing according to L2 took", round((L2_stop-L2_start) * 1000, 4), "ms and was", depth_L2, "m.")
     print("The sizing according to L3 took", round((L3_stop-L3_start) * 1000, 4), "ms and was", depth_L3, "m.")
     print("The sizing according to L4 took", round((L4_stop-L4_start) * 1000, 4), "ms and was", depth_L4, "m.")
+
+    borefield.print_temperature_profile(plot_hourly=True)

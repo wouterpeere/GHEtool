@@ -2040,3 +2040,36 @@ class Borefield:
 
         # show plot
         plt.show()
+
+    def plot_load_duration(self) -> None:
+        """
+        This function makes a load-duration curve from the hourly values.
+
+        :return: None
+        """
+
+        # check if there are hourly values
+        if not self._check_hourly_load():
+            return
+
+        heating = self.hourly_heating_load.copy()
+        heating[::-1].sort()
+
+        cooling = self.hourly_cooling_load.copy()
+        cooling.sort()
+        cooling = cooling * (-1)
+        print(np.average(cooling[-10:]), cooling[-10])
+
+        plt.figure()
+        plt.step(np.arange(0, 8760, 1), heating, 'r-', label="Heating")
+        plt.step(np.arange(0, 8760, 1), cooling, 'b-', label="Heating")
+        plt.hlines(0, 0, 8759, color="black")
+
+        plt.xlabel("Time [hours]")
+        plt.ylabel("Power [kW]")
+
+        plt.xlim(0, 8760)
+
+        plt.title("Load-duration curve")
+
+        plt.show()
