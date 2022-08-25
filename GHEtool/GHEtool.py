@@ -482,7 +482,11 @@ class Borefield:
         # initiate pipe
         pipe = gt.pipes.MultipleUTube(self.pos, self.r_in, self.r_out, borehole, self.k_s, self.k_g,
                                       self.R_p + self.R_f, self.number_of_pipes, J=2)
-        return gt.pipes.borehole_thermal_resistance(pipe, self.mfr, self.Cp)
+        try:
+            # only in pygfunction >= v2.2.1
+            return pipe.effective_borehole_thermal_resistance(self.mfr, self.Cp)
+        except AttributeError:
+            return gt.pipes.borehole_thermal_resistance(pipe, self.mfr, self.Cp)
 
     @property
     def _axis_symmetrical_pipe(self) -> list:
