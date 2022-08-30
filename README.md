@@ -87,7 +87,8 @@ data = GroundData(110, # depth of the field (m)
                   10,  # initial/undisturbed ground temperature (deg C)
                   0.2, # borehole equivalent resistance (mK/W)
                   10,  # number of boreholes in width direction of the field (/)
-                  12)  # number of boreholes in the length direction of the field (/)
+                  12,  # number of boreholes in the length direction of the field (/)
+                  2.4*10**6) # volumetric heat capacity of the ground (J/m3K) 
 ```
 
 Furthermore, one needs to set the peak and monthly baseload for both heating and cooling.
@@ -137,7 +138,7 @@ GHEtool offers functionalities of value to all different disciplines working wit
 
 | Functionality | Example document |
 | --- | --- |
-| Sizing the borefield (i.e. calculating the required depth) for a given injection and extraction load for the borefield (two sizing methods are available). | [main_functionalities.py](GHEtool/Examples/main_functionalities.py) |
+| Sizing the borefield (i.e. calculating the required depth) for a given injection and extraction load for the borefield (three sizing methods are available). | [main_functionalities.py](GHEtool/Examples/main_functionalities.py) |
 | Calculating the temperature evolution of the ground for a given building load and borefield configuration | [main_functionalities.py](GHEtool/Examples/main_functionalities.py) |
 | Using dynamically calculated borehole thermal resistance (this is directly based on the code of pygfunction) | [sizing_with_Rb_calculation.py](GHEtool/Validation/sizing_with_Rb_calculation.py) |
 | Optimising the load profile for a given heating and cooling load | [optimise_load_profile.py](GHEtool/Examples/optimise_load_profile.py)|
@@ -147,15 +148,17 @@ GHEtool offers functionalities of value to all different disciplines working wit
 
 | Comparisons | Example document |
 | --- | --- |
+| Comparison of different sizing methods (L2, L3 and L4) for the same hourly profile | [speed_comparison.py](GHEtool/Validation/speed_comparison.py) |
 | Comparison in calculation time and accuracy between the simplified L2 sizing methodology and the more accurate L3 method. | [sizing_method_comparison.py](GHEtool/Validation/sizing_method_comparison.py) |
-| Comparison in calculation time and accuracy between using the precalculated gfunction data or not. | [speed_comparison.py](GHEtool/Validation/speed_comparison.py) |
+| Comparison in calculation time and accuracy between using the precalculated gfunction data or not. | [sizing_method_comparison_L2_L3_L4.py](GHEtool/Examples/sizing_method_comparison_L2_L3_L4.py) |
 
 
 ## Precalculated data
-This tool comes with precalculated g-functions for all borefields of type nxm (for 0<n,m<21) for which the boreholes are connected in parallel. For these borefield configurations, the g-functions are calculated for different depth-thermal conductivity-spacing combinations. The ranges are:
+This tool comes with precalculated g-functions for all borefields of type nxm (for 0<n,m<21) for which the boreholes are connected in parallel. For these borefield configurations, the g-functions are calculated for different depth-thermal diffusivity-spacing combinations. The ranges are:
 
 * Depth: 25 - 350m in increments of 25m
-* Thermal conductivity of the soil: 1 - 4 in increments of 0.5W/mk
+* Thermal diffusivity of the soil (defined as thermal conductivity / volumetric heat capacity): 0.036 - 0.144m²/day in increments of 0.018m²/day
+(This is equal to a range of thermal conductivity from 1-4W/mK with a constant volumetric heat capacity of 2.4MJ/m³K)
 * Spacings (equal): 3 - 9m in increments of 1m
 
 Here a burial depth (D) of 4.0m is assumed even as a borehole radius of 7.5cm for all the precalculated data.

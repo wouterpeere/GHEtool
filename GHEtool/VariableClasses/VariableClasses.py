@@ -1,8 +1,9 @@
 
 class GroundData:
-    __slots__ = 'H', 'B', 'k_s', 'Tg', 'Rb', 'N_1', 'N_2', 'flux'
+    __slots__ = 'H', 'B', 'k_s', 'Tg', 'Rb', 'N_1', 'N_2', 'flux', 'volumetric_heat_capacity', 'alpha'
 
-    def __init__(self, h: float, b: float, k_s: float, t_g: float, r_b: float, n_1: int, n_2: int, flux: float = 0.06) -> None:
+    def __init__(self, h: float, b: float, k_s: float, t_g: float, r_b: float, n_1: int, n_2: int,
+                 volumetric_heat_capacity: float = 2.4 * 10**6, flux: float = 0.06) -> None:
         """
         Data for storage of ground data
 
@@ -14,6 +15,8 @@ class GroundData:
         :param r_b: Equivalent borehole resistance [m K/W]
         :param n_1: Width of rectangular field [#]
         :param n_2: Length of rectangular field [#]
+        :param volumetric_heat_capacity: The volumetric heat capacity of the ground (J/m3K)
+        :param flux: the geothermal heat flux (W/m2)
         :return: None
         """
         self.H = h  # m
@@ -23,6 +26,8 @@ class GroundData:
         self.Rb = r_b  # mK/W
         self.N_1 = n_1  # #
         self.N_2 = n_2  # #
+        self.volumetric_heat_capacity = volumetric_heat_capacity  # J/m3K
+        self.alpha = self.k_s / self.volumetric_heat_capacity  # m2/s
         self.flux = flux  # W/m2
 
     def __eq__(self, other):
