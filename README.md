@@ -148,9 +148,11 @@ GHEtool offers functionalities of value to all different disciplines working wit
 
 | Comparisons | Example document |
 | --- | --- |
-| Comparison of different sizing methods (L2, L3 and L4) for the same hourly profile | [speed_comparison.py](GHEtool/Validation/speed_comparison.py) |
+| Comparison of different sizing methods (L2, L3) for different random profiles| [sizing_method_comparison.py](GHEtool/Validation/sizing_method_comparison.py) |
+| Comparison in calculation time and accuracy between using the precalculated gfunction data or not | [speed_comparison.py](GHEtool/Validation/speed_comparison.py) |
+| Comparison of different sizing methods (L2, L3 and L4) for the same hourly profile | [sizing_method_comparison_L2_L3_L4.py](GHEtool/Examples/sizing_method_comparison_L2_L3_L4.py) |
 | Comparison in calculation time and accuracy between the simplified L2 sizing methodology and the more accurate L3 method. | [sizing_method_comparison.py](GHEtool/Validation/sizing_method_comparison.py) |
-| Comparison in calculation time and accuracy between using the precalculated gfunction data or not. | [sizing_method_comparison_L2_L3_L4.py](GHEtool/Examples/sizing_method_comparison_L2_L3_L4.py) |
+| Comparison of Rb* calculation between GHEtool and EED. | [validation_effective_borehole_thermal_resistance.py](GHEtool/Validation/validation_effective_borehole_thermal_resistance.py) |
 
 
 ## Precalculated data
