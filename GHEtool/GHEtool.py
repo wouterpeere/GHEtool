@@ -41,6 +41,7 @@ class Borefield:
     DEFAULT_DEPTH_ARRAY: list = [1] + list(range(25, 351, 25))  # m
     DEFAULT_TIME_ARRAY: list = timeValues()  # sec
     DEFAULT_CONVERGENCE_MINIMAL_DEPTH: int = 15
+    DEFAULT_CONVERGENCE_MAXIMAL_DEPTH: int = 15
 
     temp: int = 0
     HOURLY_LOAD_ARRAY: list = []
@@ -1219,13 +1220,25 @@ class Borefield:
             if self.convergence == Borefield.DEFAULT_CONVERGENCE_MINIMAL_DEPTH:
                 raise RuntimeError("Already ",
                                    Borefield.DEFAULT_CONVERGENCE_MINIMAL_DEPTH,
-                                   "a depth smaller than 1m has been asked. This will lead to a convergence to a way to small"
+                                   "a depth smaller than 1m has been asked. This will lead to a convergence to a way to small "
+                                   "field. Please check your borefield dimensions and load!")
+        # check if H exceeds the maximum depth
+        elif H > Borefield.DEFAULT_DEPTH_ARRAY[-1]:
+            self.convergence += 1
+            # check if the requested value is already DEFAULT_CONVERGENCE_MAXIMAL_DEPTH below 1m
+            if self.convergence == Borefield.DEFAULT_CONVERGENCE_MAXIMAL_DEPTH:
+                raise RuntimeError("Already ",
+                                   Borefield.DEFAULT_CONVERGENCE_MAXIMAL_DEPTH,
+                                   "a depth larger than ", Borefield.DEFAULT_DEPTH_ARRAY[-1],
+                                   "m has been asked. This will lead to a convergence to a way to small "
                                    "field. Please check your borefield dimensions and load!")
         else:
             self.convergence = 0
 
-        # set depth to minimum 1m
+        # set depth to minimum 5m
         H = max(H, 5)
+        # set max depth to Borefield.DEFAULT_DEPTH_ARRAY[-1]
+        H = min(H, Borefield.DEFAULT_DEPTH_ARRAY[-1])
 
         # if calculate is False, than the gfunctions are calculated on the spot
         if not self.use_precalculated_data:
