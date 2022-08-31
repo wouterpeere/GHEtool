@@ -7,7 +7,6 @@ import pygfunction as gt
 import os.path
 import matplotlib.pyplot as plt
 import functools
-import warnings
 
 if __name__ == "__main__":
     from VariableClasses import *
@@ -42,7 +41,7 @@ class Borefield:
     DEFAULT_DEPTH_ARRAY: list = [1] + list(range(25, 351, 25))  # m
     DEFAULT_TIME_ARRAY: list = timeValues()  # sec
     DEFAULT_CONVERGENCE_MINIMAL_DEPTH: int = 15
-    DEFAULT_CONVERGENCE_MAXIMAL_DEPTH: int = 10
+    DEFAULT_CONVERGENCE_MAXIMAL_DEPTH: int = 15
 
     temp: int = 0
     HOURLY_LOAD_ARRAY: list = []
@@ -648,11 +647,6 @@ class Borefield:
                   f"of {self.THRESHOLD_WARNING_SHALLOW_FIELD} m.")
             print("Please change your configuration accordingly to have a not so shallow field.")
 
-        # check if there is convergence
-        if self.convergence != 0:
-            raise RuntimeError("A solution could not be found. The field that is needed in order to cope with your load,"
-                               "cannot be found.")
-
         return depth
 
     def size_L2(self, H_init: float, quadrant_sizing: int = 0) -> float:
@@ -1233,18 +1227,11 @@ class Borefield:
             self.convergence += 1
             # check if the requested value is already DEFAULT_CONVERGENCE_MAXIMAL_DEPTH below 1m
             if self.convergence == Borefield.DEFAULT_CONVERGENCE_MAXIMAL_DEPTH:
-
-                # check if variable Tg is taken into account
-                if not self.use_constant_Tg:
-                    warnings.warn("Your sizing makes use of a variable ground temperature. When your field is limited by the",
-                                  "maximum temperature, it will try to increase the size by making the field deeper in order to cope"
-                                  "with this limitation. This however increases the average temperature, making the limit even"
-                                  "worse. Debug tip: Please check this by trying to size your field with a constant temperature.")
-
                 raise RuntimeError("Already ",
                                    Borefield.DEFAULT_CONVERGENCE_MAXIMAL_DEPTH,
                                    "a depth larger than ", Borefield.DEFAULT_DEPTH_ARRAY[-1],
-                                   "m has been asked. The field is hence to large for the dataset.")
+                                   "m has been asked. This will lead to a convergence to a way to small "
+                                   "field. Please check your borefield dimensions and load!")
         else:
             self.convergence = 0
 
