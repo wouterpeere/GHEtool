@@ -193,7 +193,10 @@ Peere, W., Blanke, T.(2022). _GHEtool: An open-source tool for borefield sizing 
 ### Development of GHEtool
 Peere, W., Blanke, T. (2022). _GHEtool: An open-source tool for borefield sizing in Python._ Journal of Open Source Software, 7(76), 4406, https://doi.org/10.21105/joss.04406
 
-Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. (2021) _Validated combined first and last year borefield sizing methodology._ In _Proceedings of International Building Simulation Conference 2021_. Brugge (Belgium), 1-3 September 2021.
+Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. (2021) _Validated combined first and last year borefield sizing methodology._ In _Proceedings of International Building Simulation Conference 2021_. Brugge (Belgium), 1-3 September 2021. https://doi.org/10.26868/25222708.2021.30180
+
+Peere, W. (2020) Methode voor economische optimalisatie van geothermische verwarmings- en koelsystemen. Master thesis, Departement of Mechanical Engineering,
+KU Leuven, Belgium.
 
 ### Applications/Mentions of GHEtool
 M. Sharifi. (2022) Early-Stage Integrated Design Methods for Hybrid GEOTABS Buildings. PhD thesis, Department of Architecture and Urban Planning, Faculty of Engineering and Architecture, Ghent University.
