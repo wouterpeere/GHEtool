@@ -1,0 +1,2 @@
+[run]
+omit = gui/*,GUI.py,change_pickle_data.py

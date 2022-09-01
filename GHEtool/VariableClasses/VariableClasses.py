@@ -102,7 +102,7 @@ class PipeData:
         self.D = D                          # burial depth m
 
     def __eq__(self, other):
-        if not isinstance(other, FluidData):
+        if not isinstance(other, PipeData):
             return False
         for i in self.__slots__:
             if getattr(self, i) != getattr(other, i):
