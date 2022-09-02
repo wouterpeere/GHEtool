@@ -20,7 +20,7 @@ import numpy as np
 if __name__ == "__main__":
 
     # set the relevant ground data for the calculations
-    data = GroundData(110, 6, 3, 10, 0.12, 10, 12, 2.4 * 10**6f)
+    data = GroundData(110, 6, 3, 10, 0.12, 10, 12, 2.4 * 10**6)
 
     # Monthly loading values
     peak_cooling = np.array([0., 0, 3.4, 6.9, 13., 18., 21., 50., 16., 3.7, 0., 0.])  # Peak cooling in kW
@@ -54,10 +54,10 @@ if __name__ == "__main__":
 
     # create custom borefield based on pygfunction
     custom_field = gt.boreholes.L_shaped_field(N_1=4, N_2=5, B_1=5., B_2=5., H=100., D=4, r_b=0.05)
-    borefield.create_custom_dataset(custom_field, "customfield")
+    borefield.create_custom_dataset(custom_field, "custom_field")
 
     # set the custom dataset
-    borefield.set_custom_gfunction("customfield")
+    borefield.set_custom_gfunction("custom_field")
 
     # set the custom borefield (so the number of boreholes is correct)
     borefield.set_borefield(custom_field)
