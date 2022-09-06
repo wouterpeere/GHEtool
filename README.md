@@ -12,7 +12,7 @@
 [![Last Commit](https://img.shields.io/github/last-commit/wouterpeere/ghetool?style=flat-square)](https://github.com/wouterpeere/GHEtool)
 [![Release Date](https://img.shields.io/github/release-date/wouterpeere/ghetool?style=flat-square)](https://github.com/wouterpeere/GHEtool)
 [![Release Date](https://img.shields.io/github/issues/wouterpeere/ghetool?style=flat-square)](https://github.com/wouterpeere/GHEtool/issues)
-
+[![Documentation Status](https://readthedocs.org/projects/ghetool-test/badge/?version=latest)](https://ghetool-test.readthedocs.io/en/latest/?badge=latest)
 
 ## What is *GHEtool*?
 <img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/GHEtool/gui/Icon.png" width="110" align="left">
