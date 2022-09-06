@@ -8,13 +8,13 @@ on Linux/macOS systems are however quite similar and can be, hopefully easily, d
 You can also directly install tssm package from PyPi with the following command:
 
 ```console
-pip install tssm
+pip install GHEtool
 ```
 
 Alternatively, download or clone a local copy of the repository to your computer:
 
 ```console
-git clone https://git.fh-aachen.de/tb5152e/tssm
+git clone https://github.com/wouterpeere/GHEtool
 ```
 
 And afterwards install (in the folder where the setup.py is located) as editable using:
