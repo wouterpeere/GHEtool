@@ -1,12 +1,13 @@
-import numpy as np
+import os.path
 import pickle
+import warnings
+from math import pi
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pygfunction as gt
 from scipy import interpolate
 from scipy.signal import convolve
-from math import pi
-import pygfunction as gt
-import os.path
-import matplotlib.pyplot as plt
-import warnings
 
 if __name__ == "__main__":
     from VariableClasses import *

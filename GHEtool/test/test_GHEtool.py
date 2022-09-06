@@ -1,7 +1,9 @@
 # test if model can be imported
-from GHEtool import *
-import pytest
 import numpy as np
+import pytest
+
+from GHEtool import *
+
 
 def test_grounddata():
     data = GroundData(110, 6, 3, 10, 0.2, 10, 12)

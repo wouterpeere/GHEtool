@@ -1,24 +1,42 @@
-from sys import path
-from typing import Optional, TYPE_CHECKING
-from .Translation_class import TrClass
-from PyQt5.QtWidgets import QMainWindow as QtWidgets_QMainWindow, QWidget as QtWidgets_QWidget, QApplication as \
-    QtWidgets_QApplication, QPushButton as QtWidgets_QPushButton, QMessageBox as QtWidgets_QMessageBox, QFileDialog as \
-    QtWidgets_QFileDialog, QInputDialog as QtWidgets_QInputDialog, QDialog as QtWidgets_QDialog, QMenu as \
-    QtWidgets_QMenu, QDoubleSpinBox as QtWidgets_QDoubleSpinBox, QListWidgetItem as QtWidgets_QListWidgetItem, \
-    QHBoxLayout as QtWidgets_QHBoxLayout
-from pickle import dump as pk_dump, HIGHEST_PROTOCOL as pk_HP, load as pk_load
-from PyQt5.QtCore import QSize as QtCore_QSize, QEvent as QtCore_QEvent, QThread as QtCore_QThread, \
-    pyqtSignal as QtCore_pyqtSignal, QModelIndex as QtCore_QModelIndex
-from PyQt5.QtGui import QIcon as QtGui_QIcon, QPixmap as QtGui_QPixmap
-from .gui_Main import Ui_GHEtool
-from os.path import dirname, realpath, split as os_split
 from functools import partial as ft_partial
-from .DataStorage_v1_0_0 import DataStorage
+from os.path import dirname, realpath
+from os.path import split as os_split
+from pickle import HIGHEST_PROTOCOL as pk_HP
+from pickle import dump as pk_dump
+from pickle import load as pk_load
+from sys import path
 from time import sleep
+from typing import TYPE_CHECKING, Optional
+
+from PyQt5.QtCore import QEvent as QtCore_QEvent
+from PyQt5.QtCore import QModelIndex as QtCore_QModelIndex
+from PyQt5.QtCore import QSize as QtCore_QSize
+from PyQt5.QtCore import QThread as QtCore_QThread
+from PyQt5.QtCore import pyqtSignal as QtCore_pyqtSignal
+from PyQt5.QtGui import QIcon as QtGui_QIcon
+from PyQt5.QtGui import QPixmap as QtGui_QPixmap
+from PyQt5.QtWidgets import QApplication as QtWidgets_QApplication
+from PyQt5.QtWidgets import QDialog as QtWidgets_QDialog
+from PyQt5.QtWidgets import QDoubleSpinBox as QtWidgets_QDoubleSpinBox
+from PyQt5.QtWidgets import QFileDialog as QtWidgets_QFileDialog
+from PyQt5.QtWidgets import QHBoxLayout as QtWidgets_QHBoxLayout
+from PyQt5.QtWidgets import QInputDialog as QtWidgets_QInputDialog
+from PyQt5.QtWidgets import QListWidgetItem as QtWidgets_QListWidgetItem
+from PyQt5.QtWidgets import QMainWindow as QtWidgets_QMainWindow
+from PyQt5.QtWidgets import QMenu as QtWidgets_QMenu
+from PyQt5.QtWidgets import QMessageBox as QtWidgets_QMessageBox
+from PyQt5.QtWidgets import QPushButton as QtWidgets_QPushButton
+from PyQt5.QtWidgets import QWidget as QtWidgets_QWidget
+
+from .DataStorage_v1_0_0 import DataStorage
+from .gui_Main import Ui_GHEtool
+from .Translation_class import TrClass
 
 if TYPE_CHECKING:
+    from pandas import DataFrame as pd_DataFrame
+    from pandas import ExcelFile as pd_ExcelFile
+
     from GHEtool import Borefield
-    from pandas import DataFrame as pd_DataFrame, ExcelFile as pd_ExcelFile
 
 currentdir = dirname(realpath(__file__))
 parentdir = dirname(currentdir)
@@ -339,7 +357,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         :return: None
         """
         # import math stuff
-        from math import pi, sin, cos, tan
+        from math import cos, pi, sin, tan
         nU: int = self.spinBox_number_pipes.value()  # get number of U pipes
         rBorehole: float = self.doubleSpinBox_borehole_radius.value()  # get borehole radius
         rOuterPipe: float = self.doubleSpinBox_pipe_outer_radius.value()  # get outer pipe radius
@@ -687,6 +705,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         """
         # import pandas here to save start up time
         from pandas import read_csv as pd_read_csv
+
         # get decimal and column seperator
         sep: str = ';' if self.comboBox_SeperatorDataFile.currentIndex() == 0 else ','
         dec: str = '.' if self.comboBox_decimalDataFile.currentIndex() == 0 else ','
@@ -832,9 +851,11 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         """
         # import all that is needed
         from math import pi
+
         from numpy import cos, sin
-        from PyQt5.QtWidgets import QGraphicsScene, QGraphicsEllipseItem
         from PyQt5.QtGui import QColor, QPen
+        from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsScene
+
         # get variables from gui
         numberOfPipes = self.spinBox_number_pipes.value()
         rOut = self.doubleSpinBox_pipe_outer_radius.value() * 10
@@ -938,7 +959,10 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             # get time step index
             timeStepIdx = self.comboBox_timeStep.currentIndex()
             # import pandas here to save start up time
-            from pandas import to_datetime as pd_to_datetime, date_range as pd_date_range, Series as pd_Series
+            from pandas import Series as pd_Series
+            from pandas import date_range as pd_date_range
+            from pandas import to_datetime as pd_to_datetime
+
             # create date array of either 1 hour, 15 minute, or automatic
             if timeStepIdx == 0:  # 1 hour time step
                 # Define start and end date
@@ -1553,10 +1577,12 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             self.canvas.hide() if self.canvas is not None else None
             return
         # import here to save start up time
-        from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
         import matplotlib.pyplot as plt
         from matplotlib import axes as matplotlib_axes
+        from matplotlib.backends.backend_qt5agg import \
+            FigureCanvasQTAgg as FigureCanvas
         from numpy import array as np_array
+
         # get Datastorage of selected scenario
         ds: DataStorage = self.ListDS[self.list_widget_scenario.currentRow()]
         # get bore field of selected scenario
@@ -1650,6 +1676,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             ax2.set_facecolor(grey_color)
             # import numpy here to save start up time
             import numpy as np
+
             # create string for result explanation
             string_size: str = f"{self.translations.label_ResOptimizeLoad1}" \
                                f"{int(max(boreField.hourly_heating_load)) - int(np.max(boreField.peak_heating_external))}" \
@@ -1767,6 +1794,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         """
         # import csv writer here to save start up time
         from csv import writer as csv_writer
+
         # get filename at storage place
         filename = QtWidgets_QFileDialog.getSaveFileName(caption=self.translations.SaveData,
                                                          filter='csv (*.csv)')
@@ -1958,6 +1986,7 @@ class CalcProblem(QtCore_QThread):
         """
         # import bore field class from GHEtool and not in start up to save time
         from GHEtool import Borefield
+
         # create the bore field object
         boreField = Borefield(simulation_period=self.DS.simulationPeriod, peak_heating=self.DS.peakHeating,
                               peak_cooling=self.DS.peakCooling, baseload_heating=self.DS.monthlyLoadHeating,
@@ -1986,6 +2015,7 @@ class CalcProblem(QtCore_QThread):
         if outside_bounds:
             # import boreholes from pygfuntion here to save start up time
             from pygfunction import boreholes as gt_boreholes
+
             # get minimum and maximal number of boreholes in one direction
             n_max: int = max(self.DS.GD.N_1, self.DS.GD.N_2)
             n_min: int = max(self.DS.GD.N_1, self.DS.GD.N_2)
@@ -2011,6 +2041,7 @@ class CalcProblem(QtCore_QThread):
             dec: str = '.' if self.DS.dataDecimal == 0 else ','
             # import pandas here to save start up time
             from pandas import read_csv as pd_read_csv
+
             # load data from csv file
             try:
                 data = pd_read_csv(self.DS.dataFile, sep=sep, decimal=dec)

@@ -12,10 +12,11 @@ However, one can use the function 'create_custom_dataset' when a custom borefiel
 Please note that, depending on the complexity of the custom field, this can range between 5 minutes and 5 hours.
  """
 
+import numpy as np
+import pygfunction as gt
+
 # import all the relevant functions
 from GHEtool import *
-import pygfunction as gt
-import numpy as np
 
 if __name__ == "__main__":
 

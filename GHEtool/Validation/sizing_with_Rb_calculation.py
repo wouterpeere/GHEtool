@@ -6,10 +6,11 @@ It is shown that the speed difference is significant, but so is the difference i
 """
 if __name__ == "__main__":
 
-    import numpy as np
     import time
 
-    from GHEtool import Borefield, GroundData, FluidData, PipeData
+    import numpy as np
+
+    from GHEtool import Borefield, FluidData, GroundData, PipeData
 
     number_of_iterations = 50
     max_value_cooling = 700

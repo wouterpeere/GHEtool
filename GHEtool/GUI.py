@@ -1,9 +1,12 @@
 def run():
-    from sys import argv, exit as sys_exit
-    from PyQt5.QtWidgets import QApplication as QtWidgets_QApplication
-    from gui.Gui_window import MainWindow
-    from PyQt5.QtWidgets import QMainWindow as QtWidgets_QMainWindow
     from ctypes import windll as ctypes_windll
+    from sys import argv
+    from sys import exit as sys_exit
+
+    from gui.Gui_window import MainWindow
+    from PyQt5.QtWidgets import QApplication as QtWidgets_QApplication
+    from PyQt5.QtWidgets import QMainWindow as QtWidgets_QMainWindow
+
     # init application
     app = QtWidgets_QApplication(argv)
     # Create and display the splash screen

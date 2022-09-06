@@ -6,9 +6,10 @@ This document contains 4 different cases referring to the paper: Peere, W., Pica
 
 """
 
-from GHEtool import Borefield, GroundData
-import pygfunction as gt
 import numpy as np
+import pygfunction as gt
+
+from GHEtool import Borefield, GroundData
 
 if __name__ == "__main__":
     # relevant borefield data for the calculations

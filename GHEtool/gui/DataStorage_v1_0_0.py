@@ -1,6 +1,9 @@
-from ctypes import cast as ctypes_cast, py_object as ctypes_py_object
-from VariableClasses.VariableClasses import GroundData, PipeData, FluidData
-from typing import Optional, TYPE_CHECKING
+from ctypes import cast as ctypes_cast
+from ctypes import py_object as ctypes_py_object
+from typing import TYPE_CHECKING, Optional
+
+from VariableClasses.VariableClasses import FluidData, GroundData, PipeData
+
 if TYPE_CHECKING:
     from GHEtool import Borefield
 

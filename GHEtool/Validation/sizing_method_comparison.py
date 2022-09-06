@@ -4,8 +4,9 @@ The comparison is based on speed and relative accuracy in the result.
 """
 if __name__ == "__main__":
 
-    import numpy as np
     import time
+
+    import numpy as np
 
     from GHEtool import Borefield, GroundData
 
