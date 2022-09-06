@@ -1,13 +1,18 @@
 # GHEtool: An open-source tool for borefield sizing in Python
-[![Status](https://img.shields.io/pypi/status/ghetool?style=flat-square)](https://pypi.python.org/pypi/tssm)
-[![Version](https://img.shields.io/pypi/v/ghetool.svg?style=flat-square)](https://pypi.python.org/pypi/tssm)
-[![Python Version](https://img.shields.io/pypi/pyversions/ghetool?style=flat-square)](https://pypi.python.org/pypi/tssm)
-[![Wheel](https://img.shields.io/pypi/wheel/ghetool?style=flat-square)](https://pypi.python.org/pypi/tssm)
+[![Status](https://img.shields.io/github/workflow/status/wouterpeere/ghetool/test?style=flat-square)](https://pypi.python.org/pypi/ghetool)
+[![Status](https://img.shields.io/pypi/status/ghetool?style=flat-square)](https://pypi.python.org/pypi/ghetool)
+[![Version](https://img.shields.io/pypi/v/ghetool.svg?style=flat-square)](https://pypi.python.org/pypi/ghetool)
+[![Python Version](https://img.shields.io/pypi/pyversions/ghetool?style=flat-square)](https://pypi.python.org/pypi/ghetool)
+[![Wheel](https://img.shields.io/pypi/wheel/ghetool?style=flat-square)](https://pypi.python.org/pypi/ghetool)
 [![PyPI - License](https://img.shields.io/pypi/l/ghetool?style=flat-square)](https://opensource.org/licenses/BSD-3-Clause)
 [![DOI](https://img.shields.io/badge/JOSS-10.21105%2Fjoss.04406-brightgreen?style=flat-square)](https://doi.org/10.21105/joss.04406)
 [![codecov](https://img.shields.io/codecov/c/github/tblanke/GHEtool_test?style=flat-square)](https://app.codecov.io/github/tblanke/GHEtool_test)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat-square&labelColor=ef8336)](https://pycqa.github.io/isort/)
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg?style=flat-square)](https://www.python.org/)
+[![Last Commit](https://img.shields.io/github/last-commit/wouterpeere/ghetool?style=flat-square)](https://github.com/wouterpeere/GHEtool)
+[![Release Date](https://img.shields.io/github/release-date/wouterpeere/ghetool?style=flat-square)](https://github.com/wouterpeere/GHEtool)
+[![Release Date](https://img.shields.io/github/issues/wouterpeere/ghetool?style=flat-square)](https://github.com/wouterpeere/GHEtool/issues)
+
 
 ## What is *GHEtool*?
 <img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/GHEtool/gui/Icon.png" width="110" align="left">
