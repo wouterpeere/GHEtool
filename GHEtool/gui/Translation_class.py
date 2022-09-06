@@ -43,7 +43,7 @@ class TrClass:
                 'label_ResOptimizeLoad2', 'label_ResOptimizeLoad3', 'label_ResOptimizeLoad4', 'label_CancelText', \
                 'label_ResOptimizeLoad5', 'label_ResOptimizeLoad6', 'pushButton_start_single', 'NotCalculated', \
                 'NoSolution', 'comboBox_decimalList', 'label_decimalDataFile', 'label_decimal', 'actionSpanish', \
-                'actionGalician'
+                'actionGalician', 'pushButton_Aim'
 
     def __init__(self) -> None:
         """This function initialize the translation class"""
@@ -253,6 +253,7 @@ class TrClass:
         self.NoSolution: str = ''
         self.label_decimalDataFile: str = ''
         self.label_decimal: str = ''
+        self.pushButton_Aim: str = ''
         self.comboBox_decimalList: list = []
         self.changeLanguage(self.Language)
 
@@ -503,6 +504,7 @@ class TrClass:
             self.NotCalculated: str = 'Not calculated'
             self.NoSolution: str = 'No Solution found'
             self.label_decimal: str = 'Decimal sign in CSV-fileImport:'
+            self.pushButton_Aim: str = 'Aim'
             self.comboBox_decimalList: list = ["Point '.'", "Comma ','"]
             self.createLists()
             return
@@ -689,6 +691,7 @@ class TrClass:
             self.NoSolution: str = 'Keine Lösung gefunden'
             self.label_decimal: str = 'Dezimalzeichen in CSV-Datei:'
             self.comboBox_decimalList: list = ["Punkt '.'", "Komma ','"]
+            self.pushButton_Aim: str = 'Ziel'
             self.createLists()
             return
         if lang == 2:  # Dutch # thanks to Wouter
@@ -871,6 +874,7 @@ class TrClass:
             self.NoSolution: str = 'Geen oplossing gevonden'
             self.label_decimal: str = 'Decimaal teken in de CSV-fileImport:'
             self.comboBox_decimalList: list = ["Punt '.'", "Komma ','"]
+            self.pushButton_Aim: str = 'Aim'
             self.createLists()
             return
         if lang == 3:  # Italian # Thanks to Felix Arjuna
@@ -1054,6 +1058,7 @@ class TrClass:
             self.NoSolution: str = 'No Solution found'
             self.label_decimal: str = 'Decimal sign in CSV-fileImport:'
             self.comboBox_decimalList: list = ["Point '.'", "Comma ','"]
+            self.pushButton_Aim: str = 'Aim'
             self.createLists()
             return
         if lang == 4:  # French # Thanks to Felix Arjuna
@@ -1237,6 +1242,7 @@ class TrClass:
             self.NoSolution: str = 'No Solution found'
             self.label_decimal: str = 'Decimal sign in CSV-fileImport:'
             self.comboBox_decimalList: list = ["Point '.'", "Comma ','"]
+            self.pushButton_Aim: str = 'Aim'
             self.createLists()
             return
         if lang == 5:  # spanish thanks to Iago
@@ -1598,4 +1604,5 @@ class TrClass:
             self.NoSolution: str = 'No Solution found'
             self.label_decimal: str = 'Decimal sign in CSV-fileImport:'
             self.comboBox_decimalList: list = ["Point '.'", "Comma ','"]
+            self.pushButton_Aim: str = 'Aim'
             self.createLists()

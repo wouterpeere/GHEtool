@@ -4,8 +4,8 @@ def run():
     from sys import exit as sys_exit
 
     from gui.Gui_window import MainWindow
-    from PyQt5.QtWidgets import QApplication as QtWidgets_QApplication
-    from PyQt5.QtWidgets import QMainWindow as QtWidgets_QMainWindow
+    from PySide6.QtWidgets import QApplication as QtWidgets_QApplication
+    from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
 
     # init application
     app = QtWidgets_QApplication(argv)
@@ -25,7 +25,7 @@ def run():
         pass
     window.showMaximized()
     # close app
-    sys_exit(app.exec_())
+    sys_exit(app.exec())
 
 
 if __name__ == "__main__":

@@ -2,13 +2,12 @@
   <qresource prefix="icons">
     <file>icons/Optimize_Profile.svg</file>
     <file>icons/Size_Length.svg</file>
+    <file>icons/Options.svg</file>
     <file>icons/Depth_determination.svg</file>
     <file>icons/Temp_Profile.svg</file>
     <file>icons/Flag_Galicia.svg</file>
     <file>icons/Aim.svg</file>
     <file>icons/Aim_Inv.svg</file>
-    <file>icons/Okay.svg</file>
-    <file>icons/Abort.svg</file>
     <file>icons/Okay.svg</file>
     <file>icons/Abort.svg</file>
     <file>icons/Flag_Spain.svg</file>
@@ -50,7 +49,6 @@
     <file>icons/Update.svg</file>
     <file>icons/New.svg</file>
     <file>icons/Open.svg</file>
-    <file>icons/Result.svg</file>
     <file>icons/Save.svg</file>
     <file>icons/Settings.svg</file>
   </qresource>

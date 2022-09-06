@@ -8,29 +8,32 @@ from sys import path
 from time import sleep
 from typing import TYPE_CHECKING, Optional
 
-from PyQt5.QtCore import QEvent as QtCore_QEvent
-from PyQt5.QtCore import QModelIndex as QtCore_QModelIndex
-from PyQt5.QtCore import QSize as QtCore_QSize
-from PyQt5.QtCore import QThread as QtCore_QThread
-from PyQt5.QtCore import pyqtSignal as QtCore_pyqtSignal
-from PyQt5.QtGui import QIcon as QtGui_QIcon
-from PyQt5.QtGui import QPixmap as QtGui_QPixmap
-from PyQt5.QtWidgets import QApplication as QtWidgets_QApplication
-from PyQt5.QtWidgets import QDialog as QtWidgets_QDialog
-from PyQt5.QtWidgets import QDoubleSpinBox as QtWidgets_QDoubleSpinBox
-from PyQt5.QtWidgets import QFileDialog as QtWidgets_QFileDialog
-from PyQt5.QtWidgets import QHBoxLayout as QtWidgets_QHBoxLayout
-from PyQt5.QtWidgets import QInputDialog as QtWidgets_QInputDialog
-from PyQt5.QtWidgets import QListWidgetItem as QtWidgets_QListWidgetItem
-from PyQt5.QtWidgets import QMainWindow as QtWidgets_QMainWindow
-from PyQt5.QtWidgets import QMenu as QtWidgets_QMenu
-from PyQt5.QtWidgets import QMessageBox as QtWidgets_QMessageBox
-from PyQt5.QtWidgets import QPushButton as QtWidgets_QPushButton
-from PyQt5.QtWidgets import QWidget as QtWidgets_QWidget
+from PySide6.QtCore import QEvent as QtCore_QEvent
+from PySide6.QtCore import QModelIndex as QtCore_QModelIndex
+from PySide6.QtCore import QSize as QtCore_QSize
+from PySide6.QtCore import QThread as QtCore_QThread
+from PySide6.QtCore import Signal as QtCore_pyqtSignal
+from PySide6.QtCore import QSettings as QtCore_QSettings
+from PySide6.QtGui import QIcon as QtGui_QIcon
+from PySide6.QtGui import QPixmap as QtGui_QPixmap
+from PySide6.QtWidgets import QApplication as QtWidgets_QApplication
+from PySide6.QtWidgets import QDialog as QtWidgets_QDialog
+from PySide6.QtWidgets import QDoubleSpinBox as QtWidgets_QDoubleSpinBox
+from PySide6.QtWidgets import QFileDialog as QtWidgets_QFileDialog
+from PySide6.QtWidgets import QHBoxLayout as QtWidgets_QHBoxLayout
+from PySide6.QtWidgets import QInputDialog as QtWidgets_QInputDialog
+from PySide6.QtWidgets import QListWidgetItem as QtWidgets_QListWidgetItem
+from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
+from PySide6.QtWidgets import QMenu as QtWidgets_QMenu
+from PySide6.QtWidgets import QMessageBox as QtWidgets_QMessageBox
+from PySide6.QtWidgets import QPushButton as QtWidgets_QPushButton
+from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
 
 from .DataStorage_v1_0_0 import DataStorage
-from .gui_Main import Ui_GHEtool
+from .gui_Main_new import Ui_GHEtool
 from .Translation_class import TrClass
+
+from typing import List, Tuple
 
 if TYPE_CHECKING:
     from pandas import DataFrame as pd_DataFrame
@@ -77,7 +80,7 @@ class BoundsOfPrecalculatedData:
         return False
 
 
-# main gui class
+# main GUI class
 class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
     filenameDefault: tuple = ('', '')
 
@@ -90,6 +93,14 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # init windows of parent class
         super(MainWindow, self).__init__()
         super().setupUi(dialog)
+        # 'E:/Git/GHEtool_test/GHEtool/gui/ui/icons/Options.svg'
+        # pyside6-rcc icons.qrc -o icons_rc.py
+        list_of_buttons: List[Tuple[str, str, str]] = [('pushButton_temp_profile', 'Determine temperature profile', ':/icons/icons/Options.svg'),
+                                                       ('pushButton_req_depth', 'Determine required depth', ':/icons/icons/Depth_determination.svg'),
+                                                       ('pushButton_size_length', 'Size borefield by length and width', ':/icons/icons/Size_Length.svg'),
+                                                       ('pushButton_optimize', 'Optimize load profile', ':/icons/icons/Optimize_Profile.svg'), ]
+        list_button: List[QtWidgets_QPushButton] = [self.create_push_button_aim(values[0], values[1], values[2]) for values in list_of_buttons]
+        self.add_aims(list_button)
         # set app and dialog
         self.app: QtWidgets_QApplication = app
         self.Dia = dialog
@@ -146,8 +157,6 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.changeWindowTitle()
         # add action shortcut for changing language to english
         self.actionEnglish.setShortcut("Ctrl+Alt+E")
-        # show / hide frames
-        self.showSimulationVariables(self.comboBox_aim.currentIndex())
         self.showBoreholeResistanceBoxes(self.comboBox_Rb_method.currentIndex())
         # set links to check if changes happen
         self.actionInputChanged.triggered.connect(self.change)
@@ -156,7 +165,52 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # reset push button size
         self.setPush(False)
         # set start page to general page
-        self.pushButton_General.click()
+        self.pushButton_Aim.click()
+
+        self.settings: QtCore_QSettings = QtCore_QSettings('GHEtool', 'GHEtoolApp')
+
+        try:
+            self.resize(self.settings.value('window size'))
+
+            self.move(self.settings.value('window position'))
+        except TypeError:
+            pass
+
+    def create_push_button_aim(self, name: str, label: str, icon: str) -> QtWidgets_QPushButton:
+        icon11 = QtGui_QIcon()
+        #icon11.addPixmap(QtGui_QPixmap(icon), QtGui_QIcon.Normal, QtGui_QIcon.Off)
+        icon11.addFile(icon)
+        push_button = QtWidgets_QPushButton(icon11, label, self.frame_aims)
+        push_button.setMinimumSize(QtCore_QSize(0, 60))
+        push_button.setMaximumSize(QtCore_QSize(16777215, 60))
+        push_button.setStyleSheet("QPushButton{border: 3px solid rgb(0, 64, 122);\n"
+                                                   "border-radius: 15px;\n"
+                                                   "color: rgb(255, 255, 255);\n"
+                                                   "gridline-color: rgb(84, 188, 235);\n"
+                                                   "background-color: rgb(100, 100, 100);\n"
+                                                   "font-weight:500;}\n"
+                                                   "QPushButton:hover{border: 3px solid rgb(0, 64, 122);\n"
+                                                   "background-color:rgb(84, 188, 235);}\n"
+                                                   "QPushButton:checked{border:3px solid rgb(84, 188, 235);\n"
+                                                   "background-color:rgb(84, 188, 235);}\n"
+                                                   "QPushButton:disabled{border: 3px solid rgb(100, 100, 100);\n"
+                                                   "border-radius: 5px;\n"
+                                                   "color: rgb(255, 255, 255);\n"
+                                                   "gridline-color: rgb(100, 100, 100);\n"
+                                                   "background-color: rgb(100, 100, 100);}\n"
+                                                   "QPushButton:disabled:hover{background-color: rgb(0, 64, 122);}")
+        #push_button.setIcon(icon11)
+        #push_button.setIcon(QtGui_QIcon(QtGui_QPixmap(icon)))
+        push_button.setIconSize(QtCore_QSize(30, 30))
+        push_button.setCheckable(True)
+        push_button.setObjectName(name)
+        push_button.setText(label)
+        setattr(self, name, push_button)
+        return push_button
+
+    def add_aims(self, elements: List[QtWidgets_QPushButton]):
+        for counter, element in enumerate(elements):
+            self.gridLayout_14.addWidget(element, int((counter)/2), 0 if divmod(counter, 2)[1] == 0 else 1, 1, 1) # , int(counter/2)
 
     def eventFilterInstall(self) -> None:
         """
@@ -164,6 +218,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         :return: None
         """
         self.pushButton_General.installEventFilter(self)
+        self.pushButton_Aim.installEventFilter(self)
         self.pushButton_thermalDemands.installEventFilter(self)
         self.pushButton_Results.installEventFilter(self)
         self.pushButton_Settings.installEventFilter(self)
@@ -186,10 +241,13 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.pushButton_borehole_resistance.clicked.connect(ft_partial(self.stackedWidget.setCurrentWidget,
                                                                        self.page_borehole_resistance))
         self.pushButton_General.clicked.connect(ft_partial(self.stackedWidget.setCurrentWidget, self.page_General))
+        self.pushButton_Aim.clicked.connect(ft_partial(self.stackedWidget.setCurrentWidget, self.page_aim))
         self.pushButton_NextGeneral.clicked.connect(self.pushButton_borehole_resistance.click)
         self.pushButton_PreviousThermal.clicked.connect(self.pushButton_borehole_resistance.click)
         self.pushButton_PreviousResistance.clicked.connect(self.pushButton_General.click)
+        self.pushButton_PreviousGeneral.clicked.connect(self.pushButton_Aim.click)
         self.pushButton_NextResistance.clicked.connect(self.pushButton_thermalDemands.click)
+        self.pushButton_NextAim.clicked.connect(self.pushButton_General.click)
         self.pushButton_SaveFigure.clicked.connect(self.saveFigure)
         self.pushButton_SaveData.clicked.connect(self.save_data)
         self.actionAdd_Scenario.triggered.connect(self.addScenario)
@@ -224,7 +282,6 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.pushButton_calculate.clicked.connect(self.funDisplayData)
         self.pushButton_Unit.clicked.connect(self.funChangeUnit)
         self.actionRename_scenario.triggered.connect(self.funRenameScenario)
-        self.comboBox_aim.currentIndexChanged.connect(self.showSimulationVariables)
         self.comboBox_Rb_method.currentIndexChanged.connect(self.showBoreholeResistanceBoxes)
         self.list_widget_scenario.model().rowsMoved.connect(self.funMoveScenario)
         self.list_widget_scenario.currentItemChanged.connect(self.funAutoSaveScenario)
@@ -238,9 +295,57 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.actionCheckUDistance.triggered.connect(self.checkDistanceBetweenPipes)
         self.comboBox_Language.currentIndexChanged.connect(self.changeLanguage)
         self.actionUpdateBoreholeGraph.triggered.connect(self.updateBorehole)
+        self.pushButton_temp_profile.clicked.connect(ft_partial(self.update_aim, self.pushButton_temp_profile))
+        self.pushButton_size_length.clicked.connect(ft_partial(self.update_aim, self.pushButton_size_length))
+        self.pushButton_req_depth.clicked.connect(ft_partial(self.update_aim, self.pushButton_req_depth))
+        self.pushButton_optimize.clicked.connect(ft_partial(self.update_aim, self.pushButton_optimize))
+        self.pushButton_monthly_data.clicked.connect(ft_partial(self.update_opponent, self.pushButton_hourly_data))
+        self.pushButton_hourly_data.clicked.connect(ft_partial(self.update_opponent, self.pushButton_monthly_data))
+
         self.Dia.closeEvent = self.closeEvent
+        self.update_aim(self.pushButton_temp_profile)
         self.checkBox_Import.toggle()
         self.checkBox_Import.toggle()
+        self.pushButton_simulation_period.toggle()
+        self.pushButton_simulation_period.toggle()
+
+    @staticmethod
+    def update_opponent(button_opponent: QtWidgets_QPushButton, status: bool):
+        button_opponent.setChecked(not status)
+
+    def update_aim(self, button: QtWidgets_QPushButton) -> None:
+        status: bool = button.isChecked()
+        if self.pushButton_temp_profile != button:
+            self.pushButton_temp_profile.setChecked(False)
+        if self.pushButton_size_length != button:
+            self.pushButton_size_length.setChecked(False)
+            self.label_Options.setVisible(False)
+            self.frame_Options.setVisible(False)
+            self.label_calc_method_depth_sizing.setVisible(False)
+            self.frame_calc_method_depth_sizing.setVisible(False)
+            self.label_calc_method_length_sizing.setVisible(False)
+            self.frame_calc_method_length_sizing.setVisible(False)
+        if self.pushButton_req_depth != button:
+            self.pushButton_req_depth.setChecked(False)
+            self.label_Options.setVisible(False)
+            self.frame_Options.setVisible(False)
+            self.label_calc_method_depth_sizing.setVisible(False)
+            self.frame_calc_method_depth_sizing.setVisible(False)
+        if self.pushButton_optimize != button:
+            self.pushButton_optimize.setChecked(False)
+        if self.pushButton_size_length == button and status:
+            self.label_Options.setVisible(True)
+            self.frame_Options.setVisible(True)
+            self.label_calc_method_depth_sizing.setVisible(True)
+            self.frame_calc_method_depth_sizing.setVisible(True)
+            self.label_calc_method_length_sizing.setVisible(True)
+            self.frame_calc_method_length_sizing.setVisible(True)
+            return
+        if self.pushButton_req_depth == button and status:
+            self.label_Options.setVisible(True)
+            self.frame_Options.setVisible(True)
+            self.label_calc_method_depth_sizing.setVisible(True)
+            self.frame_calc_method_depth_sizing.setVisible(True)
 
     def change(self) -> None:
         """
@@ -357,7 +462,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         :return: None
         """
         # import math stuff
-        from math import cos, pi, sin, tan
+        from math import pi, sin, cos, tan
         nU: int = self.spinBox_number_pipes.value()  # get number of U pipes
         rBorehole: float = self.doubleSpinBox_borehole_radius.value()  # get borehole radius
         rOuterPipe: float = self.doubleSpinBox_pipe_outer_radius.value()  # get outer pipe radius
@@ -428,7 +533,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # hide results buttons if no results where found
         if any([(i.boreField is None) for i in self.ListDS]) or self.ListDS == []:
             self.pushButton_SaveData.hide()
-            self.pushButton_General.click()
+            self.pushButton_Aim.click()
             return
         # display results otherwise
         self.displayResults()
@@ -521,6 +626,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # if Mouse is over PushButton change size to big otherwise to small
         if mouseOver:
             self.setPushButtonIconSize(self.pushButton_General, True, self.translations.pushButton_General)
+            self.setPushButtonIconSize(self.pushButton_Aim, True, self.translations.pushButton_Aim)
             self.setPushButtonIconSize(self.pushButton_thermalDemands, True,
                                        self.translations.pushButton_thermalDemands)
             self.setPushButtonIconSize(self.pushButton_Results, True, self.translations.pushButton_Results)
@@ -529,6 +635,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
                                        self.translations.pushButton_borehole_resistance)
             return
         self.setPushButtonIconSize(self.pushButton_General)
+        self.setPushButtonIconSize(self.pushButton_Aim)
         self.setPushButtonIconSize(self.pushButton_thermalDemands)
         self.setPushButtonIconSize(self.pushButton_Results)
         self.setPushButtonIconSize(self.pushButton_Settings)
@@ -576,7 +683,6 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
          enumerate(self.translations.comboBoxSizeMethodList)]
         [self.comboBox_Size_Method.setItemText(i, name) for i, name in
          enumerate(self.translations.comboBoxSizeMethodList)]
-        [self.comboBox_aim.setItemText(i, name) for i, name in enumerate(self.translations.comboBox_AimList)]
         [self.comboBox_Seperator.setItemText(i, name) for i, name in
          enumerate(self.translations.comboBox_SeperatorList)]
         [self.comboBox_SeperatorDataFile.setItemText(i, name) for i, name in
@@ -592,8 +698,6 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         [self.comboBox_timeStep.setItemText(i, name) for i, name in enumerate(self.translations.comboBoxTimeStepList)]
         [self.comboBox_Rb_method.setItemText(i, name) for i, name in
          enumerate(self.translations.comboBox_Rb_methodList)]
-        # update labels depending on selected scenario
-        self.showSimulationVariables(self.comboBox_aim.currentIndex())
         # set small PushButtons
         self.setPush(False)
         # replace scenario names if they are not unique
@@ -705,7 +809,6 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         """
         # import pandas here to save start up time
         from pandas import read_csv as pd_read_csv
-
         # get decimal and column seperator
         sep: str = ';' if self.comboBox_SeperatorDataFile.currentIndex() == 0 else ','
         dec: str = '.' if self.comboBox_decimalDataFile.currentIndex() == 0 else ','
@@ -851,11 +954,9 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         """
         # import all that is needed
         from math import pi
-
         from numpy import cos, sin
+        from PyQt5.QtWidgets import QGraphicsScene, QGraphicsEllipseItem
         from PyQt5.QtGui import QColor, QPen
-        from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsScene
-
         # get variables from gui
         numberOfPipes = self.spinBox_number_pipes.value()
         rOut = self.doubleSpinBox_pipe_outer_radius.value() * 10
@@ -914,7 +1015,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
 
     def funDisplayData(self) -> None:
         """
-        Load the Data to Display in the gui
+        Load the Data to Display in the GUI
         :return: None
         """
         try:
@@ -959,10 +1060,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             # get time step index
             timeStepIdx = self.comboBox_timeStep.currentIndex()
             # import pandas here to save start up time
-            from pandas import Series as pd_Series
-            from pandas import date_range as pd_date_range
-            from pandas import to_datetime as pd_to_datetime
-
+            from pandas import to_datetime as pd_to_datetime, date_range as pd_date_range, Series as pd_Series
             # create date array of either 1 hour, 15 minute, or automatic
             if timeStepIdx == 0:  # 1 hour time step
                 # Define start and end date
@@ -994,7 +1092,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             # ------------------- Calculate Section --------------------
             # Choose path between Single or Combined Column and create new columns
             if thermalDemand == 0:
-                # Resample the Data for peak_heating and peak_cooling
+                # Resample the Data for peakHeating and peakCooling
                 df2.rename(columns={heatingLoad: "Heating Load", coolingLoad: "Cooling Load"}, inplace=True)
                 df2["peak Heating"] = df2["Heating Load"]
                 df2["peak Cooling"] = df2["Cooling Load"]
@@ -1273,7 +1371,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
 
     def funNew(self) -> None:
         """
-        create new data file and reset gui
+        create new data file and reset GUI
         :return: None
         """
         self.filename: tuple = MainWindow.filenameDefault  # reset filename
@@ -1283,7 +1381,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
 
     def changeScenario(self, idx: int) -> None:
         """
-        update gui if a new scenario at the comboBox is selected
+        update GUI if a new scenario at the comboBox is selected
         :param idx: index of selected scenario
         :return: None
         """
@@ -1577,12 +1675,10 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             self.canvas.hide() if self.canvas is not None else None
             return
         # import here to save start up time
+        from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
         import matplotlib.pyplot as plt
         from matplotlib import axes as matplotlib_axes
-        from matplotlib.backends.backend_qt5agg import \
-            FigureCanvasQTAgg as FigureCanvas
         from numpy import array as np_array
-
         # get Datastorage of selected scenario
         ds: DataStorage = self.ListDS[self.list_widget_scenario.currentRow()]
         # get bore field of selected scenario
@@ -1676,7 +1772,6 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             ax2.set_facecolor(grey_color)
             # import numpy here to save start up time
             import numpy as np
-
             # create string for result explanation
             string_size: str = f"{self.translations.label_ResOptimizeLoad1}" \
                                f"{int(max(boreField.hourly_heating_load)) - int(np.max(boreField.peak_heating_external))}" \
@@ -1697,7 +1792,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             # remove second axes if exist
             self.ax[1].remove() if len(self.ax) > 1 else None
             # calculation of all the different times at which the g_function should be calculated.
-            # this is equal to 'UPM' hours a month * 3600 seconds/hours for the simulation_period
+            # this is equal to 'UPM' hours a month * 3600 seconds/hours for the simulationPeriod
             time_for_g_values = [i * boreField.UPM * 3600. for i in range(1, 12 * boreField.simulation_period + 1)]
             # make a time array
             time_array = [i / 12 / 730. / 3600. for i in time_for_g_values]
@@ -1794,7 +1889,6 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         """
         # import csv writer here to save start up time
         from csv import writer as csv_writer
-
         # get filename at storage place
         filename = QtWidgets_QFileDialog.getSaveFileName(caption=self.translations.SaveData,
                                                          filter='csv (*.csv)')
@@ -1803,7 +1897,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
             return
         # get maximal simulation period
-        simulationTime = max([i.simulation_period for i in self.ListDS])
+        simulationTime = max([i.simulationPeriod for i in self.ListDS])
         # create first two column entries
         toWrite = [['name', 'unit'],  # 0
                    ['depth', 'm'],  # 1
@@ -1883,25 +1977,25 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             for j in ran_simu:
                 i += 1
                 try:
-                    toWrite[i].append(f'{round(ds.boreField.results_peak_heating[j], 2)}')
+                    toWrite[i].append(f'{round(ds.boreField.resultsPeakHeating[j], 2)}')
                 except IndexError:
                     toWrite[i].append(self.translations.NotCalculated)
             for j in ran_simu:
                 i += 1
                 try:
-                    toWrite[i].append(f'{round(ds.boreField.results_peak_cooling[j], 2)}')
+                    toWrite[i].append(f'{round(ds.boreField.resultsPeakCooling[j], 2)}')
                 except IndexError:
                     toWrite[i].append(self.translations.NotCalculated)
             for j in ran_simu:
                 i += 1
                 try:
-                    toWrite[i].append(f'{round(ds.boreField.results_month_heating[j], 2)}')
+                    toWrite[i].append(f'{round(ds.boreField.resultsMonthHeating[j], 2)}')
                 except IndexError:
                     toWrite[i].append(self.translations.NotCalculated)
             for j in ran_simu:
                 i += 1
                 try:
-                    toWrite[i].append(f'{round(ds.boreField.results_month_cooling[j], 2)}')
+                    toWrite[i].append(f'{round(ds.boreField.resultsMonthCooling[j], 2)}')
                 except IndexError:
                     toWrite[i].append(self.translations.NotCalculated)
         # try to write the data else show error message in status bar
@@ -1920,6 +2014,8 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         :param event: closing event
         :return: None
         """
+        self.settings.setValue('window size', self.size())
+        self.settings.setValue('window position', self.pos())
         # close app if nothing has been changed
         if not self.changedFile:
             event.accept()
@@ -1986,7 +2082,6 @@ class CalcProblem(QtCore_QThread):
         """
         # import bore field class from GHEtool and not in start up to save time
         from GHEtool import Borefield
-
         # create the bore field object
         boreField = Borefield(simulation_period=self.DS.simulationPeriod, peak_heating=self.DS.peakHeating,
                               peak_cooling=self.DS.peakCooling, baseload_heating=self.DS.monthlyLoadHeating,
@@ -2007,7 +2102,7 @@ class CalcProblem(QtCore_QThread):
             # set fluid and pipe data
             boreField.set_fluid_parameters(self.DS.fluidData)
             boreField.set_pipe_parameters(self.DS.pipeData)
-            # set use_constant_Rb to False if R_b_calculation_method == 2
+            # set useConstantRb to False if R_b_calculation_method == 2
             useConstantRb: bool = self.DS.R_b_calculation_method == 1
             # set Rb to the new calculated one if a constant unknown Rb is selected
             boreField.Rb = boreField.calculate_Rb() if useConstantRb else self.DS.GD.Rb
@@ -2015,7 +2110,6 @@ class CalcProblem(QtCore_QThread):
         if outside_bounds:
             # import boreholes from pygfuntion here to save start up time
             from pygfunction import boreholes as gt_boreholes
-
             # get minimum and maximal number of boreholes in one direction
             n_max: int = max(self.DS.GD.N_1, self.DS.GD.N_2)
             n_min: int = max(self.DS.GD.N_1, self.DS.GD.N_2)
@@ -2041,7 +2135,6 @@ class CalcProblem(QtCore_QThread):
             dec: str = '.' if self.DS.dataDecimal == 0 else ','
             # import pandas here to save start up time
             from pandas import read_csv as pd_read_csv
-
             # load data from csv file
             try:
                 data = pd_read_csv(self.DS.dataFile, sep=sep, decimal=dec)
@@ -2066,7 +2159,7 @@ class CalcProblem(QtCore_QThread):
             self.any_signal.emit(self.DS)
             return
         # size the borehole depth if wished
-        boreField.size(self.DS.GD.H, L2Sizing=self.DS.Depth_Method == 0, use_constant_Rb=useConstantRb) if \
+        boreField.size(self.DS.GD.H, L2_sizing=self.DS.Depth_Method == 0, use_constant_Rb=useConstantRb) if \
             self.DS.determineDepth else None
         # size bore field by length and width either fast (Size_Method == 0) or robust (Size_Method == 1)
         if self.DS.Size_Method == 0:
@@ -2126,7 +2219,7 @@ class SetItem(QtCore_QThread):
         :param parent: parent class
         """
         super(SetItem, self).__init__(parent)
-        self.widget = widget
+        self.widget: QtWidgets_QWidget = widget
         self.item = item
 
     def run(self) -> None:
