@@ -17,12 +17,12 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'TSSM'
+project = 'GHEtool'
 copyright = '2022, Tobias Blanke'
 author = 'Tobias Blanke'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.2-pre'
+release = '2.0.5'
 
 
 # -- General configuration ---------------------------------------------------
@@ -60,11 +60,3 @@ html_theme = 'sphinx_rtd_theme'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['sources/_static']
 
-html_context = {
-    "display_gitlab": True,  # Integrate Gitlab
-    "gitlab_host": "git.fh-aachen.de",
-    "gitlab_user": "tb5152e",  # Username
-    "gitlab_repo": "tssm",  # Repo name
-    "gitlab_version": "main",  # Version
-    "conf_py_path": "/source/",  # Path in the checkout to the docs root
-}

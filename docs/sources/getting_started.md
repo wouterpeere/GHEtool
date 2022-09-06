@@ -3,7 +3,7 @@
 In the following, instructions for installing and using the tssm package on Windows are given. The installation instructions for installing and using tssm 
 on Linux/macOS systems are however quite similar and can be, hopefully easily, derived from the instructions below.
 
-## tssm installation
+## GHEtool installation
 
 You can also directly install tssm package from PyPi with the following command:
 
