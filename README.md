@@ -1,6 +1,11 @@
 # GHEtool: An open-source tool for borefield sizing in Python
-[![PyPI version](https://badge.fury.io/py/GHEtool.svg)](https://badge.fury.io/py/GHEtool)
-[![DOI](https://joss.theoj.org/papers/10.21105/joss.04406/status.svg)](https://doi.org/10.21105/joss.04406)
+[![Status](https://img.shields.io/pypi/status/ghetool?style=flat-square)](https://pypi.python.org/pypi/tssm)
+[![Version](https://img.shields.io/pypi/v/ghetool.svg?style=flat-square)](https://pypi.python.org/pypi/tssm)
+[![Python Version](https://img.shields.io/pypi/pyversions/ghetool?style=flat-square)](https://pypi.python.org/pypi/tssm)
+[![Wheel](https://img.shields.io/pypi/wheel/ghetool?style=flat-square)](https://pypi.python.org/pypi/tssm)
+[![PyPI - License](https://img.shields.io/pypi/l/ghetool?style=flat-square)](https://opensource.org/licenses/BSD-3-Clause)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.04406/status.svg?style=flat-square)](https://doi.org/10.21105/joss.04406)
+[![codecov](https://codecov.io/github/tblanke/GHEtool_test/branch/main/graph/badge.svg)](https://app.codecov.io/github/tblanke/GHEtool_test)
 
 ## What is *GHEtool*?
 <img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/GHEtool/gui/Icon.png" width="110" align="left">

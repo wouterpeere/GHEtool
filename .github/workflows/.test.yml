@@ -28,4 +28,6 @@ jobs:
       run: pytest --cov
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v2
+      with:
+        token: 2ac65167-3651-4b1f-95ce-9611ea1c3420 # not required for public repos
       
