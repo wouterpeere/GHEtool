@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="21.991667mm"
+   height="21.991669mm"
+   viewBox="0 0 21.991667 21.991669"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.2 (b8e25be833, 2022-02-05)"
+   sodipodi:docname="Aim_Inv.svg"
+   inkscape:export-filename="E:\sciebo_FH\GHEtool-main\GHEtool\z_old\ui\icons\Aim_Inv.png"
+   inkscape:export-xdpi="200"
+   inkscape:export-ydpi="200"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     fit-margin-top="2"
+     fit-margin-left="2"
+     fit-margin-bottom="2"
+     fit-margin-right="2"
+     inkscape:zoom="3.0930415"
+     inkscape:cx="67.086071"
+     inkscape:cy="94.405459"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-78.309466,-97.128591)">
+    <g
+       id="g2969"
+       transform="matrix(0.84827315,0,0,0.84827315,65.361717,-1.7690304)"
+       style="fill:#ffffff">
+      <path
+         d="m 21.611682,118.99273 c -0.449792,0 -0.79375,0.34396 -0.79375,0.79376 v 20.37291 h 1.5875 v -20.37291 c 0,-0.4498 -0.343959,-0.79376 -0.79375,-0.79376 z"
+         id="path924"
+         style="fill:#ffffff;fill-opacity:1;stroke-width:0.264583" />
+      <path
+         d="m 26.823973,118.93982 c -2.328333,0 -3.360208,0.76729 -3.360208,0.76729 v 8.75771 c 0,0 1.005417,-0.76729 3.360208,-0.76729 2.804584,0 5.55625,1.53458 8.810625,0.0529 v -8.75771 c -4.101041,1.21709 -6.006041,-0.0529 -8.810625,-0.0529 z"
+         id="path926"
+         style="fill:#ffffff;fill-opacity:1;stroke-width:0.264583" />
+    </g>
+  </g>
+</svg>

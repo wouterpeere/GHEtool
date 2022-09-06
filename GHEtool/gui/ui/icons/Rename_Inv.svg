@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="200mm"
+   height="200mm"
+   viewBox="0 0 200 200"
+   version="1.1"
+   id="svg8"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="Rename_Inv.svg"
+   inkscape:export-filename="E:\scieboFH\PL2\GHEtool-main\GHEtool\pics\Add.png"
+   inkscape:export-xdpi="130"
+   inkscape:export-ydpi="130"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.7"
+     inkscape:cx="533.57143"
+     inkscape:cy="597.85714"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1027"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:pagecheckerboard="0" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#ffffff;stroke:#ffffff;stroke-width:0.0879999;stroke-linecap:round;stroke-linejoin:round"
+       id="rect847"
+       width="165.79465"
+       height="100.51785"
+       x="18.142857"
+       y="69.547623" />
+    <g
+       id="g913"
+       transform="matrix(2.375,0,0,2.375,-14,-14)"
+       style="fill:#54bceb;fill-opacity:1">
+      <path
+         d="m 50,30 h -4 c -2.2,0 -4,-1.8 -4,-4 v -8 c 0,-2.2 1.8,-4 4,-4 h 4 c 2.2,0 4,1.8 4,4 v 8 c 0,2.2 -1.8,4 -4,4 z"
+         id="path909"
+         style="fill:#54bceb;fill-opacity:1" />
+      <path
+         d="M 80,50 H 56 v -4 h 24 z m 0,12 H 56 v -4 h 24 z m 0,12 H 56 V 70 H 80 Z M 48,74 H 16 v -8 c 0,-1.2 0.6,-2.4 1.6,-3.2 2.2,-1.6 5,-3 7.8,-3.8 2.2,-0.6 4.4,-1 6.6,-1 2.4,0 4.6,0.4 6.6,1 2.8,0.8 5.6,2 7.8,3.8 1,0.8 1.6,2 1.6,3.2 z M 32,40 c 4.4,0 8,3.6 8,8 0,4.4 -3.6,8 -8,8 -4.4,0 -8,-3.6 -8,-8 0,-4.4 3.6,-8 8,-8 z M 84,26 H 58 c 0,4.4 -3.6,8 -8,8 h -4 c -4.4,0 -8,-3.6 -8,-8 H 12 c -2.2,0 -4,1.8 -4,4 v 48 c 0,2.2 1.8,4 4,4 h 72 c 2.2,0 4,-1.8 4,-4 V 30 c 0,-2.2 -1.8,-4 -4,-4 z"
+         id="path911"
+         style="fill:#54bceb;fill-opacity:1" />
+    </g>
+  </g>
+</svg>

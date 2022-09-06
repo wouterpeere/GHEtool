@@ -6,7 +6,6 @@ from math import pi
 import pygfunction as gt
 import os.path
 import matplotlib.pyplot as plt
-import functools
 import warnings
 
 if __name__ == "__main__":

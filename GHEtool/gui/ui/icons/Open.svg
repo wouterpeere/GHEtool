@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="25.737499mm"
+   height="19.91667mm"
+   viewBox="0 0 25.737499 19.916669"
+   version="1.1"
+   id="svg5124"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="Open.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview5126"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     fit-margin-top="2"
+     fit-margin-left="2"
+     fit-margin-right="2"
+     fit-margin-bottom="2"
+     inkscape:zoom="2"
+     inkscape:cx="103.25"
+     inkscape:cy="35.75"
+     inkscape:window-width="1920"
+     inkscape:window-height="1027"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g5198" />
+  <defs
+     id="defs5121" />
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-76.094384,-128.27669)">
+    <g
+       id="g5198"
+       style="fill:#02b9ad;fill-opacity:1">
+      <path
+         d="m 83.909592,135.32461 h 13.255625 v -1.32292 c 0,-0.58208 -0.47625,-1.05833 -1.058333,-1.05833 h -7.9375 l -2.910417,-1.93146 c -0.185208,-0.10584 -0.370417,-0.18521 -0.582083,-0.18521 h -4.974167 c -0.582083,0 -1.058333,0.47625 -1.058333,1.05833 v 12.96459 c 0,0.0529 3.413125,-8.28146 3.413125,-8.28146 0.3175,-0.74083 1.031875,-1.24354 1.852083,-1.24354 z"
+         id="path5185"
+         style="fill:#ffffff;fill-opacity:1;stroke:#54bceb;stroke-width:1.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill" />
+      <path
+         d="m 99.281884,137.44127 c 0,-0.55562 -0.396875,-1.00541 -0.9525,-1.05833 H 83.909592 c -0.396875,0 -0.740833,0.23813 -0.899583,0.58208 l -3.571875,8.67834 h 16.139583 l 3.598334,-7.72584 c 0.07937,-0.15875 0.105833,-0.3175 0.105833,-0.47625 z"
+         id="path5187"
+         style="fill:#ffffff;fill-opacity:1;stroke:#54bceb;stroke-width:1.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill" />
+    </g>
+  </g>
+</svg>
