@@ -4,9 +4,10 @@
 [![Python Version](https://img.shields.io/pypi/pyversions/ghetool?style=flat-square)](https://pypi.python.org/pypi/tssm)
 [![Wheel](https://img.shields.io/pypi/wheel/ghetool?style=flat-square)](https://pypi.python.org/pypi/tssm)
 [![PyPI - License](https://img.shields.io/pypi/l/ghetool?style=flat-square)](https://opensource.org/licenses/BSD-3-Clause)
-[![DOI](https://joss.theoj.org/papers/10.21105/joss.04406/status.svg?style=flat-square)](https://doi.org/10.21105/joss.04406)
-[![codecov](https://codecov.io/github/tblanke/GHEtool_test/branch/main/graph/badge.svg)](https://app.codecov.io/github/tblanke/GHEtool_test)
+[![DOI](https://img.shields.io/badge/JOSS-10.21105%2Fjoss.04406-brightgreen?style=flat-square)](https://doi.org/10.21105/joss.04406)
+[![codecov](https://img.shields.io/codecov/c/github/tblanke/GHEtool_test?style=flat-square)](https://app.codecov.io/github/tblanke/GHEtool_test)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat-square&labelColor=ef8336)](https://pycqa.github.io/isort/)
+[![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg?style=flat-square)](https://www.python.org/)
 
 ## What is *GHEtool*?
 <img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/GHEtool/gui/Icon.png" width="110" align="left">
