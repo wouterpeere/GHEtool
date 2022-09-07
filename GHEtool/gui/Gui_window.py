@@ -108,9 +108,10 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         iv = IntValue(widget_name='obj_name_int', label='int valeu:', default_value=1, minimal_value=0, maximal_value=10, step=1)
 
         lb = ListBox(widget_name='obj_name_list', label='list valeu:', default_index=1, entries=['1', '2', '3'])
+        lb.linked_options = [(dv, 0), (iv, 1), ([iv, dv], 2)]
         option1 = Category('testing', 'Option name', [dv, iv, lb])
         #option1.create_widget(self.scrollAreaWidgetContents_6, self.verticalLayout_24)
-        option2 = Category('testing2', 'Option name2', [dv, iv, lb])
+        option2 = Category('testing2', 'Option name2', [dv, iv])
         #option2.create_widget(self.scrollAreaWidgetContents_6, self.verticalLayout_24)
 
         page = Page('Gernale', 'Generanl', 'General', ':/icons/icons/Options.svg', [option1, option2])

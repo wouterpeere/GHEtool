@@ -19,6 +19,7 @@ class Option(metaclass=abc.ABCMeta):
         self.default_value: Union[bool, int, float, str] = default_value
         self.widget: qt_w.QWidget = qt_w.QWidget()
         self.frame: qt_w.QFrame = qt_w.QFrame()
+        self.linked_options: List[(Option, int)] = []
 
     @abc.abstractmethod
     def get_value(self) -> Union[bool, int, float, str]:
@@ -54,6 +55,25 @@ class Option(metaclass=abc.ABCMeta):
         self.frame.show()
 
 
+def check(linked_options: List[(Union[Option, List[Option]], int)], index: int):
+    print(index)
+    list_false = [(option, idx) for option, idx in linked_options if idx != index]
+    list_true = [(option, idx) for option, idx in linked_options if idx == index]
+    for option, idx in list_false:
+        if isinstance(option, list):
+            for opt in option:
+                opt.hide()
+            continue
+        option.hide()
+    for option, idx in list_true:
+        if isinstance(option, list):
+            for opt in option:
+                opt.show()
+            continue
+        option.show()
+
+
+
 class DoubleValue(Option):
 
     def __init__(self, widget_name: str, label: str, default_value: float, decimal_number: int = 0, minimal_value: float = 0., maximal_value: float = 100.,
@@ -84,6 +104,7 @@ class DoubleValue(Option):
         self.widget.setSingleStep(self.step)
         self.widget.setMaximumWidth(100)
         self.widget.setMinimumWidth(100)
+        #self.widget.valueChanged.connect()
         setattr(frame.window(), self.widget_name, self.widget)
         layout.addWidget(self.widget)
 
@@ -119,6 +140,18 @@ class IntValue(Option):
         layout.addWidget(self.widget)
 
 
+class ButtonBox(Option):
+
+    def __init__(self, widget_name: str, label: str, default_index: int, entries: List[str]):
+        super().__init__(widget_name, label, default_index)
+        self.entries: List[str] = entries
+        self.widget: qt_w.QComboBox = qt_w.QComboBox()
+
+    def get_value(self) -> float:
+        return self.widget.currentIndex()
+
+
+
 class ListBox(Option):
 
     def __init__(self, widget_name: str, label: str, default_index: int, entries: List[str]):
@@ -147,8 +180,12 @@ class ListBox(Option):
         self.widget.setCurrentIndex(self.default_value)
         self.widget.setMaximumWidth(100)
         self.widget.setMinimumWidth(100)
+        self.widget.currentIndexChanged.connect(ft_partial(check, self.linked_options))
         setattr(frame.window(), self.widget_name, self.widget)
         layout.addWidget(self.widget)
+
+    def testing(self):
+        print('There')
 
 
 class Category:
