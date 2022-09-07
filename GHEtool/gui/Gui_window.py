@@ -32,7 +32,7 @@ from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
 from .DataStorage_v1_0_0 import DataStorage
 from .gui_Main_new import Ui_GHEtool
 from .Translation_class import TrClass
-from .gui_classes import DoubleValue, IntValue, ListBox, Option
+from .gui_classes import DoubleValue, IntValue, ListBox, Category, Page
 
 from typing import List, Tuple
 
@@ -108,8 +108,19 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         iv = IntValue(widget_name='obj_name_int', label='int valeu:', default_value=1, minimal_value=0, maximal_value=10, step=1)
 
         lb = ListBox(widget_name='obj_name_list', label='list valeu:', default_index=1, entries=['1', '2', '3'])
-        option = Option('testing', 'Option name', [dv, iv, lb])
-        option.create_widget(self.scrollAreaWidgetContents_6, self.verticalLayout_24)
+        option1 = Category('testing', 'Option name', [dv, iv, lb])
+        #option1.create_widget(self.scrollAreaWidgetContents_6, self.verticalLayout_24)
+        option2 = Category('testing2', 'Option name2', [dv, iv, lb])
+        #option2.create_widget(self.scrollAreaWidgetContents_6, self.verticalLayout_24)
+
+        page = Page('Gernale', 'Generanl', 'General', ':/icons/icons/Options.svg', [option1, option2])
+
+        page2 = Page('Gerna', 'Generl', 'Genl', ':/icons/icons/Options.svg', [])
+
+        page.set_next_page(page2)
+        page.set_previous_page(page2)
+        page2.create_page(self.centralwidget, self.stackedWidget, self.verticalLayout_menu)
+        page.create_page(self.centralwidget, self.stackedWidget, self.verticalLayout_menu)
         #dv.create_widget(option)
         #iv.create_widget(option)
         #lb.create_widget(option)
@@ -312,8 +323,9 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.pushButton_size_length.clicked.connect(ft_partial(self.update_aim, self.pushButton_size_length))
         self.pushButton_req_depth.clicked.connect(ft_partial(self.update_aim, self.pushButton_req_depth))
         self.pushButton_optimize.clicked.connect(ft_partial(self.update_aim, self.pushButton_optimize))
-        self.pushButton_monthly_data.clicked.connect(ft_partial(self.update_opponent, self.pushButton_hourly_data))
-        self.pushButton_hourly_data.clicked.connect(ft_partial(self.update_opponent, self.pushButton_monthly_data))
+        self.pushButton_monthly_data.clicked.connect(ft_partial(self.update_opponent, self.pushButton_monthly_data, self.pushButton_hourly_data))
+        self.pushButton_hourly_data.clicked.connect(ft_partial(self.update_opponent, self.pushButton_hourly_data, self.pushButton_monthly_data))
+        self.pushButton_hourly_data2.clicked.connect(ft_partial(self.update_opponent, self.pushButton_hourly_data2, self.pushButton_monthly_data))
 
         self.Dia.closeEvent = self.closeEvent
         self.update_aim(self.pushButton_temp_profile)
@@ -323,8 +335,8 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.pushButton_simulation_period.toggle()
 
     @staticmethod
-    def update_opponent(button_opponent: QtWidgets_QPushButton, status: bool):
-        button_opponent.setChecked(not status)
+    def update_opponent(button: QtWidgets_QPushButton, button_opponent: QtWidgets_QPushButton):
+        button_opponent.setChecked(not button.isChecked())
 
     def update_aim(self, button: QtWidgets_QPushButton) -> None:
         status: bool = button.isChecked()

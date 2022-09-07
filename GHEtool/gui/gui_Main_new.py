@@ -201,8 +201,8 @@ class Ui_GHEtool(object):
         self.centralwidget.setStyleSheet(u"")
         self.horizontalLayout_23 = QHBoxLayout(self.centralwidget)
         self.horizontalLayout_23.setObjectName(u"horizontalLayout_23")
-        self.verticalLayout_13 = QVBoxLayout()
-        self.verticalLayout_13.setObjectName(u"verticalLayout_13")
+        self.verticalLayout_scenario = QVBoxLayout()
+        self.verticalLayout_scenario.setObjectName(u"verticalLayout_scenario")
         self.pushButton_SaveScenario = QPushButton(self.centralwidget)
         self.pushButton_SaveScenario.setObjectName(u"pushButton_SaveScenario")
         sizePolicy1 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
@@ -218,7 +218,7 @@ class Ui_GHEtool(object):
         self.pushButton_SaveScenario.setIcon(icon18)
         self.pushButton_SaveScenario.setIconSize(QSize(20, 20))
 
-        self.verticalLayout_13.addWidget(self.pushButton_SaveScenario)
+        self.verticalLayout_scenario.addWidget(self.pushButton_SaveScenario)
 
         self.pushButton_AddScenario = QPushButton(self.centralwidget)
         self.pushButton_AddScenario.setObjectName(u"pushButton_AddScenario")
@@ -230,7 +230,7 @@ class Ui_GHEtool(object):
         self.pushButton_AddScenario.setIcon(icon19)
         self.pushButton_AddScenario.setIconSize(QSize(20, 20))
 
-        self.verticalLayout_13.addWidget(self.pushButton_AddScenario)
+        self.verticalLayout_scenario.addWidget(self.pushButton_AddScenario)
 
         self.pushButton_DeleteScenario = QPushButton(self.centralwidget)
         self.pushButton_DeleteScenario.setObjectName(u"pushButton_DeleteScenario")
@@ -242,7 +242,7 @@ class Ui_GHEtool(object):
         self.pushButton_DeleteScenario.setIcon(icon20)
         self.pushButton_DeleteScenario.setIconSize(QSize(20, 20))
 
-        self.verticalLayout_13.addWidget(self.pushButton_DeleteScenario)
+        self.verticalLayout_scenario.addWidget(self.pushButton_DeleteScenario)
 
         self.button_rename_scenario = QPushButton(self.centralwidget)
         self.button_rename_scenario.setObjectName(u"button_rename_scenario")
@@ -254,7 +254,7 @@ class Ui_GHEtool(object):
         self.button_rename_scenario.setIcon(icon21)
         self.button_rename_scenario.setIconSize(QSize(20, 20))
 
-        self.verticalLayout_13.addWidget(self.button_rename_scenario)
+        self.verticalLayout_scenario.addWidget(self.button_rename_scenario)
 
         self.list_widget_scenario = QListWidget(self.centralwidget)
         QListWidgetItem(self.list_widget_scenario)
@@ -274,14 +274,14 @@ class Ui_GHEtool(object):
         self.list_widget_scenario.setSelectionBehavior(QAbstractItemView.SelectItems)
         self.list_widget_scenario.setSelectionRectVisible(False)
 
-        self.verticalLayout_13.addWidget(self.list_widget_scenario)
+        self.verticalLayout_scenario.addWidget(self.list_widget_scenario)
 
 
-        self.horizontalLayout_23.addLayout(self.verticalLayout_13)
+        self.horizontalLayout_23.addLayout(self.verticalLayout_scenario)
 
-        self.verticalLayout_3 = QVBoxLayout()
-        self.verticalLayout_3.setSpacing(0)
-        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.verticalLayout_menu = QVBoxLayout()
+        self.verticalLayout_menu.setSpacing(0)
+        self.verticalLayout_menu.setObjectName(u"verticalLayout_menu")
         self.pushButton_Aim = QPushButton(self.centralwidget)
         self.pushButton_Aim.setObjectName(u"pushButton_Aim")
         self.pushButton_Aim.setMinimumSize(QSize(100, 100))
@@ -291,14 +291,14 @@ class Ui_GHEtool(object):
         self.pushButton_Aim.setIcon(icon22)
         self.pushButton_Aim.setIconSize(QSize(24, 24))
 
-        self.verticalLayout_3.addWidget(self.pushButton_Aim)
+        self.verticalLayout_menu.addWidget(self.pushButton_Aim)
 
         self.label_Gap_Aim = QLabel(self.centralwidget)
         self.label_Gap_Aim.setObjectName(u"label_Gap_Aim")
         self.label_Gap_Aim.setMinimumSize(QSize(0, 6))
         self.label_Gap_Aim.setMaximumSize(QSize(16777215, 6))
 
-        self.verticalLayout_3.addWidget(self.label_Gap_Aim)
+        self.verticalLayout_menu.addWidget(self.label_Gap_Aim)
 
         self.pushButton_General = QPushButton(self.centralwidget)
         self.pushButton_General.setObjectName(u"pushButton_General")
@@ -309,14 +309,14 @@ class Ui_GHEtool(object):
         self.pushButton_General.setIcon(icon23)
         self.pushButton_General.setIconSize(QSize(24, 24))
 
-        self.verticalLayout_3.addWidget(self.pushButton_General)
+        self.verticalLayout_menu.addWidget(self.pushButton_General)
 
         self.label_GapBR_Res = QLabel(self.centralwidget)
         self.label_GapBR_Res.setObjectName(u"label_GapBR_Res")
         self.label_GapBR_Res.setMinimumSize(QSize(0, 6))
         self.label_GapBR_Res.setMaximumSize(QSize(16777215, 6))
 
-        self.verticalLayout_3.addWidget(self.label_GapBR_Res)
+        self.verticalLayout_menu.addWidget(self.label_GapBR_Res)
 
         self.pushButton_borehole_resistance = QPushButton(self.centralwidget)
         self.pushButton_borehole_resistance.setObjectName(u"pushButton_borehole_resistance")
@@ -327,14 +327,14 @@ class Ui_GHEtool(object):
         self.pushButton_borehole_resistance.setIcon(icon24)
         self.pushButton_borehole_resistance.setIconSize(QSize(24, 24))
 
-        self.verticalLayout_3.addWidget(self.pushButton_borehole_resistance)
+        self.verticalLayout_menu.addWidget(self.pushButton_borehole_resistance)
 
         self.label_GapGenTh = QLabel(self.centralwidget)
         self.label_GapGenTh.setObjectName(u"label_GapGenTh")
         self.label_GapGenTh.setMinimumSize(QSize(0, 6))
         self.label_GapGenTh.setMaximumSize(QSize(16777215, 6))
 
-        self.verticalLayout_3.addWidget(self.label_GapGenTh)
+        self.verticalLayout_menu.addWidget(self.label_GapGenTh)
 
         self.pushButton_thermalDemands = QPushButton(self.centralwidget)
         self.pushButton_thermalDemands.setObjectName(u"pushButton_thermalDemands")
@@ -345,14 +345,14 @@ class Ui_GHEtool(object):
         self.pushButton_thermalDemands.setIcon(icon25)
         self.pushButton_thermalDemands.setIconSize(QSize(24, 24))
 
-        self.verticalLayout_3.addWidget(self.pushButton_thermalDemands)
+        self.verticalLayout_menu.addWidget(self.pushButton_thermalDemands)
 
         self.label_GapThRes = QLabel(self.centralwidget)
         self.label_GapThRes.setObjectName(u"label_GapThRes")
         self.label_GapThRes.setMinimumSize(QSize(0, 6))
         self.label_GapThRes.setMaximumSize(QSize(16777215, 6))
 
-        self.verticalLayout_3.addWidget(self.label_GapThRes)
+        self.verticalLayout_menu.addWidget(self.label_GapThRes)
 
         self.pushButton_Results = QPushButton(self.centralwidget)
         self.pushButton_Results.setObjectName(u"pushButton_Results")
@@ -363,14 +363,14 @@ class Ui_GHEtool(object):
         self.pushButton_Results.setIcon(icon26)
         self.pushButton_Results.setIconSize(QSize(24, 24))
 
-        self.verticalLayout_3.addWidget(self.pushButton_Results)
+        self.verticalLayout_menu.addWidget(self.pushButton_Results)
 
         self.label_GapResSet = QLabel(self.centralwidget)
         self.label_GapResSet.setObjectName(u"label_GapResSet")
         self.label_GapResSet.setMinimumSize(QSize(0, 6))
         self.label_GapResSet.setMaximumSize(QSize(16777215, 6))
 
-        self.verticalLayout_3.addWidget(self.label_GapResSet)
+        self.verticalLayout_menu.addWidget(self.label_GapResSet)
 
         self.pushButton_Settings = QPushButton(self.centralwidget)
         self.pushButton_Settings.setObjectName(u"pushButton_Settings")
@@ -382,14 +382,14 @@ class Ui_GHEtool(object):
         self.pushButton_Settings.setIcon(icon27)
         self.pushButton_Settings.setIconSize(QSize(24, 24))
 
-        self.verticalLayout_3.addWidget(self.pushButton_Settings)
+        self.verticalLayout_menu.addWidget(self.pushButton_Settings)
 
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-        self.verticalLayout_3.addItem(self.verticalSpacer)
+        self.verticalLayout_menu.addItem(self.verticalSpacer)
 
 
-        self.horizontalLayout_23.addLayout(self.verticalLayout_3)
+        self.horizontalLayout_23.addLayout(self.verticalLayout_menu)
 
         self.verticalLayout_21 = QVBoxLayout()
         self.verticalLayout_21.setObjectName(u"verticalLayout_21")
@@ -493,6 +493,28 @@ class Ui_GHEtool(object):
         self.pushButton_hourly_data.setCheckable(True)
 
         self.gridLayout_13.addWidget(self.pushButton_hourly_data, 0, 1, 1, 1)
+
+        self.pushButton_hourly_data2 = QPushButton(self.frame_7)
+        self.pushButton_hourly_data2.setObjectName(u"pushButton_hourly_data2")
+        self.pushButton_hourly_data2.setStyleSheet(u"QPushButton{border: 3px solid rgb(84, 188, 235);\n"
+                                                  "border-radius: 5px;\n"
+                                                  "color: rgb(255, 255, 255);\n"
+                                                  "gridline-color: rgb(84, 188, 235);\n"
+                                                  "background-color: rgb(0, 64, 122);\n"
+                                                  "font-weight:500;}\n"
+                                                  "QPushButton:hover{\n"
+                                                  "border: 3px solid  rgb(0, 64, 122);\n"
+                                                  "background-color:rgb(84, 188, 235);}\n"
+                                                  "QPushButton:checked{background-color:rgb(84, 188, 235);}\n"
+                                                  "QPushButton:disabled{border: 3px solid rgb(100, 100, 100);\n"
+                                                  "border-radius: 5px;\n"
+                                                  "color: rgb(255, 255, 255);\n"
+                                                  "gridline-color: rgb(100, 100, 100);\n"
+                                                  "background-color: rgb(100, 100, 100);}\n"
+                                                  "QPushButton:disabled:hover{background-color: rgb(0, 64, 122);}")
+        self.pushButton_hourly_data2.setCheckable(True)
+
+        self.gridLayout_13.addWidget(self.pushButton_hourly_data2, 0, 2, 1, 1)
 
         self.label_Gap_Aim_5 = QLabel(self.frame_7)
         self.label_Gap_Aim_5.setObjectName(u"label_Gap_Aim_5")
@@ -4252,6 +4274,7 @@ class Ui_GHEtool(object):
         self.label_4.setText("")
         self.label_Earth_Properties_7.setText(QCoreApplication.translate("GHEtool", u"Thermal data format", None))
         self.pushButton_hourly_data.setText(QCoreApplication.translate("GHEtool", u"hourly data", None))
+        self.pushButton_hourly_data2.setText(QCoreApplication.translate("GHEtool", u"hourly data2", None))
         self.label_Gap_Aim_5.setText("")
         self.pushButton_monthly_data.setText(QCoreApplication.translate("GHEtool", u"monthly data", None))
         self.label_3.setText("")
