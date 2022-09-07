@@ -32,6 +32,7 @@ from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
 from .DataStorage_v1_0_0 import DataStorage
 from .gui_Main_new import Ui_GHEtool
 from .Translation_class import TrClass
+from .gui_classes import DoubleValue, IntValue, ListBox, Option
 
 from typing import List, Tuple
 
@@ -100,6 +101,18 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
                                                        ('pushButton_size_length', 'Size borefield by length and width', ':/icons/icons/Size_Length.svg'),
                                                        ('pushButton_optimize', 'Optimize load profile', ':/icons/icons/Optimize_Profile.svg'), ]
         list_button: List[QtWidgets_QPushButton] = [self.create_push_button_aim(values[0], values[1], values[2]) for values in list_of_buttons]
+
+        dv = DoubleValue(widget_name='obj_name_double', label='doueble valeu:', default_value=0.1, decimal_number=2, minimal_value=0, maximal_value=10,
+                         step=0.1)
+
+        iv = IntValue(widget_name='obj_name_int', label='int valeu:', default_value=1, minimal_value=0, maximal_value=10, step=1)
+
+        lb = ListBox(widget_name='obj_name_list', label='list valeu:', default_index=1, entries=['1', '2', '3'])
+        option = Option('testing', 'Option name', [dv, iv, lb])
+        option.create_widget(self.scrollAreaWidgetContents_6, self.verticalLayout_24)
+        #dv.create_widget(option)
+        #iv.create_widget(option)
+        #lb.create_widget(option)
         self.add_aims(list_button)
         # set app and dialog
         self.app: QtWidgets_QApplication = app

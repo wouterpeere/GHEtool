@@ -70,11 +70,7 @@ class Ui_GHEtool(object):
 "border-bottom-left-radius: 0px;\n"
 "border-bottom-right-radius: 0px;\n"
 "}\n"
-"QDoubleSpinBox{selection-color: rgb(255, 255, 255);\n"
-"selection-background-color: rgb(84, 188, 23"
-                        "5);\n"
-"border: 1px solid rgb(255, 255, 255);\n"
-"font: 11pt \"Lexend Deca Light\";}\n"
+
 "QSpinBox{selection-color: rgb(255, 255, 255);\n"
 "selection-background-color: rgb(84, 188, 235);\n"
 "border: 1px solid rgb(255, 255, 255);\n"
