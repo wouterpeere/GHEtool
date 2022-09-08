@@ -42,7 +42,7 @@ class Option(metaclass=abc.ABCMeta):
     def create_widget(self, frame: qt_w.QFrame, layout: qt_w.QLayout) -> None:
         pass
 
-    def create_frame(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout) -> qt_w.QHBoxLayout:
+    def create_frame(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout, create_spacer: bool = True) -> qt_w.QHBoxLayout:
         self.frame.setParent(frame)
         self.frame.setObjectName(f"frame_{self.widget_name}")
         self.frame.setFrameShape(qt_w.QFrame.StyledPanel)
@@ -57,8 +57,9 @@ class Option(metaclass=abc.ABCMeta):
         layout.setObjectName(f"verticalLayout_{self.widget_name}")
         label = qt_w.QLabel(self.label)
         layout.addWidget(label)
-        spacer = qt_w.QSpacerItem(1, 1, qt_w.QSizePolicy.Expanding, qt_w.QSizePolicy.Minimum)
-        layout.addItem(spacer)
+        if create_spacer:
+            spacer = qt_w.QSpacerItem(1, 1, qt_w.QSizePolicy.Expanding, qt_w.QSizePolicy.Minimum)
+            layout.addItem(spacer)
         layout_parent.addWidget(self.frame)
         return layout
 
@@ -71,7 +72,6 @@ class Option(metaclass=abc.ABCMeta):
 
 def check(linked_options: List[(Union[Option, List[Option]], int)], option: Option, index: int):
     index = index if option.get_value() == index else option.get_value()
-    print(index)
     list_false = [(option, idx) for option, idx in linked_options if idx != index]
     list_true = [(option, idx) for option, idx in linked_options if idx == index]
     for option, idx in list_false:
@@ -116,8 +116,8 @@ class DoubleValue(Option):
         self.widget.setAlignment(qt_c.Qt.AlignRight | qt_c.Qt.AlignTrailing | qt_c.Qt.AlignVCenter)
         self.widget.setMinimum(self.minimal_value)
         self.widget.setMaximum(self.maximal_value)
-        self.widget.setValue(self.default_value)
         self.widget.setDecimals(self.decimal_number)
+        self.widget.setValue(self.default_value)
         self.widget.setSingleStep(self.step)
         self.widget.setMaximumWidth(100)
         self.widget.setMinimumWidth(100)
@@ -185,7 +185,7 @@ class ButtonBox(Option):
         for idx, (entry, widget) in enumerate(zip(self.entries, self.widget)):
             widget.setParent(self.frame)
             widget.setObjectName(f'{self.widget_name}_{idx}')
-            widget.setText(entry)
+            widget.setText(f' {entry} ')
             widget.setStyleSheet("QPushButton{\n"
                                  f"border: 3px solid {DARK};\n"
                                                    "border-radius: 5px;\n"
@@ -223,7 +223,6 @@ class ButtonBox(Option):
             button.clicked.connect(ft_partial(check, self.linked_options, self, self.get_value()))
 
 
-
 class ListBox(Option):
 
     def __init__(self, default_parent: qt_w.QWidget, widget_name: str, label: str, default_index: int, entries: List[str]):
@@ -236,6 +235,7 @@ class ListBox(Option):
 
     def set_value(self, index: int) -> None:
         self.widget.setCurrentIndex(index)
+
 
     def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout) -> None:
         layout = self.create_frame(frame, layout_parent)
@@ -260,8 +260,70 @@ class ListBox(Option):
         setattr(frame.window(), self.widget_name, self.widget)
         layout.addWidget(self.widget)
 
-    def testing(self):
-        print('There')
+
+class FileName(Option):
+
+    def __init__(self, default_parent: qt_w.QWidget, widget_name: str, label: str, default_value: str, dialog_text: str, error_text: str,
+                 status_bar: qt_w.QStatusBar):
+        super().__init__(default_parent, widget_name, label, default_value)
+        self.widget: qt_w.QLineEdit = qt_w.QLineEdit(default_parent)
+        self.dialog_text: str = dialog_text
+        self.error_text: str = error_text
+        self.status_bar: qt_w.QStatusBar = status_bar
+
+    def get_value(self) -> str:
+        return self.widget.text()
+
+    def set_value(self, filename: str) -> None:
+        self.widget.setText(filename)
+
+    def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout) -> None:
+        layout = self.create_frame(frame, layout_parent, False)
+        self.widget.setParent(self.frame)
+        self.widget.setObjectName(self.widget_name)
+        self.widget.setStyleSheet(u"QLineEdit{border: 3px solid rgb(84, 188, 235);\n"
+                                  "border-radius: 5px;\n"
+                                  f"color: {WHITE};\n"
+                                  "gridline-color: rgb(84, 188, 235);\n"
+                                  "background-color: rgb(84, 188, 235);\n"
+                                  "font-weight:500;\n"
+                                  "selection-background-color: rgb(42, 126, 179);}\n"
+                                  "QLineEdit:hover{background-color: rgb(0, 64, 122);}")
+        layout.addWidget(self.widget)
+        button = qt_w.QPushButton(self.frame)
+        button.setMinimumSize(qt_c.QSize(30, 30))
+        button.setMaximumSize(qt_c.QSize(30, 30))
+        button.setText('...')
+        button.clicked.connect(self.fun_choose_file)
+        layout.addWidget(button)
+        setattr(frame.window(), self.widget_name, self.widget)
+
+    def fun_choose_file(self) -> None:
+        """
+        function to choose data file Import
+        :return: None
+        """
+        # try to ask for a file otherwise show message in status bar
+        try:
+            filename = qt_w.QFileDialog.getOpenFileName(self.frame, caption=self.dialog_text, filter='(*.csv)')
+            self.widget.setText(filename[0])
+        # show warning if no file is selected in status bar for 5 seconds
+        except FileNotFoundError:
+            self.status_bar.showMessage(self.error_text, 5000)
+
+
+class Hint:
+
+    def __init__(self, default_parent: qt_w.QWidget, widget_name: str, hint: str):
+        self.hint: str = hint
+        self.obj_name: str = widget_name
+        self.label: qt_w.QLabel = qt_w.QLabel(default_parent)
+
+    def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout) -> None:
+        self.label.setParent(frame)
+        self.label.setText(self.hint)
+        self.label.setWordWrap(True)
+        layout_parent.addWidget(self.label)
 
 
 class Category:
@@ -272,10 +334,14 @@ class Category:
         self.label: qt_w.QLabel = qt_w.QLabel(default_parent)
         self.list_of_options: List[Option] = list_of_options
         self.frame: qt_w.QFrame = qt_w.QFrame(default_parent)
-        """
-        self.category: category = category
-        self.object: GuiObject = object
-        """
+        self.graphic_left: Optional[Union[qt_w.QGraphicsView, bool]] = None
+        self.graphic_right: Optional[Union[qt_w.QGraphicsView, bool]] = None
+
+    def activate_graphic_left(self):
+        self.graphic_left = True
+
+    def activate_graphic_right(self):
+        self.graphic_right = True
 
     def create_widget(self, page: qt_w.QWidget, layout: qt_w.QLayout):
         self.label.setParent(page)
@@ -309,9 +375,31 @@ class Category:
         spacer_label.setMinimumHeight(6)
         spacer_label.setMaximumHeight(6)
         layout.addWidget(spacer_label)
-        layout = qt_w.QVBoxLayout(self.frame)
+        layout_frame_horizontal = qt_w.QHBoxLayout(self.frame)
+        if self.graphic_left is not None:
+            self.graphic_left = self.create_graphic_view(layout_frame_horizontal)
+        layout_frane = qt_w.QVBoxLayout(self.frame)
+        layout_frame_horizontal.addLayout(layout_frane)
         for option in self.list_of_options:
-            option.create_widget(self.frame, layout)
+            option.create_widget(self.frame, layout_frane)
+
+        if self.graphic_right is not None:
+            self.graphic_right = self.create_graphic_view(layout_frame_horizontal)
+
+    def create_graphic_view(self, layout: qt_w.QLayout) -> qt_w.QGraphicsView:
+        graphic_view = qt_w.QGraphicsView(self.frame)
+        graphic_view.setObjectName(f"graphicsView_left_{self.obj_name}")
+        graphic_view.setMinimumSize(qt_c.QSize(0, 0))
+        graphic_view.setMaximumSize(qt_c.QSize(100, 16777215))
+        graphic_view.setStyleSheet(u"QFrame {\n"
+                                        "	border: 1px solid #54bceb;\n"
+                                        "	border-bottom-left-radius: 0px;\n"
+                                        "	border-bottom-right-radius: 0px;\n"
+                                        "}\n"
+                                        "QLabel{border: 0px solid rgb(255,255,255);}")
+
+        layout.addWidget(graphic_view)
+        return graphic_view
 
     def hide(self) -> None:
         self.frame.hide()
@@ -395,6 +483,7 @@ class Page:
         self.list_categories: List[Category] = list_categories
         self.button: qt_w.QPushButton = qt_w.QPushButton(default_parent)
         self.label: qt_w.QLabel = qt_w.QLabel(default_parent)
+        self.label_gap: qt_w.QLabel = qt_w.QLabel(default_parent)
         self.previous_page: Optional[Page] = None
         self.next_page: Optional[Page] = None
         self.upper_frame: Optional[List[Union[Aim, Option, Category]]] = None
@@ -492,12 +581,12 @@ class Page:
         self.button.setIcon(icon23)
         self.button.setIconSize(qt_c.QSize(24, 24))
         self.button.setText(self.button_name)
-        label_gap = qt_w.QLabel(central_widget)
-        label_gap.setMinimumSize(qt_c.QSize(0, 6))
-        label_gap.setMaximumSize(qt_c.QSize(16777215, 6))
+        self.label_gap.setParent(central_widget)
+        self.label_gap.setMinimumSize(qt_c.QSize(0, 6))
+        self.label_gap.setMaximumSize(qt_c.QSize(16777215, 6))
 
         vertical_layout_menu.addWidget(self.button)
-        vertical_layout_menu.addWidget(label_gap)
+        vertical_layout_menu.addWidget(self.label_gap)
         self.button.clicked.connect(ft_partial(stacked_widget.setCurrentWidget, page))
 
     def create_links_to_other_pages(self, central_widget: qt_w.QWidget, scroll_area_layout: qt_w.QVBoxLayout):

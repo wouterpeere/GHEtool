@@ -28,6 +28,11 @@ from PySide6.QtWidgets import QMenu as QtWidgets_QMenu
 from PySide6.QtWidgets import QMessageBox as QtWidgets_QMessageBox
 from PySide6.QtWidgets import QPushButton as QtWidgets_QPushButton
 from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
+from PySide6.QtWidgets import QGraphicsView as QtWidgets_QGraphicsView
+from math import pi
+from numpy import cos, sin
+from PySide6.QtWidgets import QGraphicsScene, QGraphicsEllipseItem
+from PySide6.QtGui import QColor, QPen
 
 from GHEtool.gui.DataStorage_v1_0_0 import DataStorage
 from GHEtool.gui.data_storage_new import DataStorageNew
@@ -98,7 +103,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # 'E:/Git/GHEtool_test/GHEtool/gui/ui/icons/Options.svg'
         # pyside6-rcc icons.qrc -o icons_rc.py
 
-        self.gui_structure = GuiStructure(self.centralwidget)
+        self.gui_structure = GuiStructure(self.centralwidget, self.status_bar)
         for page in self.gui_structure.list_of_pages:
             page.create_page(self.centralwidget, self.stackedWidget, self.verticalLayout_menu)
 
@@ -170,11 +175,13 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # allow checking of changes
         self.checking: bool = True
         # reset push button size
-        self.setPush(False)
+        self.set_push(False)
         # set start page to general page
-        self.pushButton_Aim.click()
+        self.gui_structure.page_aim.button.click()
 
         self.settings: QtCore_QSettings = QtCore_QSettings('GHEtool', 'GHEtoolApp')
+
+        self.update_borehole()
 
         try:
             self.resize(self.settings.value('window size'))
@@ -224,35 +231,38 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         install event filter for push button sizing
         :return: None
         """
-        self.pushButton_General.installEventFilter(self)
-        self.pushButton_Aim.installEventFilter(self)
-        self.pushButton_thermalDemands.installEventFilter(self)
-        self.pushButton_Results.installEventFilter(self)
-        self.pushButton_Settings.installEventFilter(self)
-        self.pushButton_borehole_resistance.installEventFilter(self)
-        self.label_GapGenTh.installEventFilter(self)
-        self.label_GapThRes.installEventFilter(self)
-        self.label_GapResSet.installEventFilter(self)
-        self.label_GapBR_Res.installEventFilter(self)
+        for page in self.gui_structure.list_of_pages:
+            page.button.installEventFilter(self)
+            page.label_gap.installEventFilter(self)
 
     def setLinks(self) -> None:
         """
         set links of buttons and actions to function
         :return: None
         """
+        self.gui_structure.option_pipe_number.widget.valueChanged.connect(self.update_borehole)
+        self.gui_structure.option_pipe_outer_radius.widget.valueChanged.connect(self.update_borehole)
+        self.gui_structure.option_pipe_inner_radius.widget.valueChanged.connect(self.update_borehole)
+        self.gui_structure.option_pipe_borehole_radius.widget.valueChanged.connect(self.update_borehole)
+        self.gui_structure.option_pipe_distance.widget.valueChanged.connect(self.update_borehole)
+        self.gui_structure.option_pipe_number.widget.valueChanged.connect(self.check_distance_between_pipes)
+        self.gui_structure.option_pipe_outer_radius.widget.valueChanged.connect(self.check_distance_between_pipes)
+        self.gui_structure.option_pipe_inner_radius.widget.valueChanged.connect(self.check_distance_between_pipes)
+        self.gui_structure.option_pipe_borehole_radius.widget.valueChanged.connect(self.check_distance_between_pipes)
+        self.gui_structure.option_pipe_distance.widget.valueChanged.connect(self.check_distance_between_pipes)
+        self.gui_structure.option_pipe_outer_radius.widget.valueChanged.connect(self.gui_structure.option_pipe_inner_radius.widget.setMaximum)
+        self.gui_structure.option_pipe_inner_radius.widget.valueChanged.connect(self.gui_structure.option_pipe_outer_radius.widget.setMinimum)
         self.pushButton_thermalDemands.clicked.connect(ft_partial(self.stackedWidget.setCurrentWidget,
                                                                   self.page_thermal))
         self.pushButton_Results.clicked.connect(ft_partial(self.stackedWidget.setCurrentWidget, self.page_Results))
         self.pushButton_Results.clicked.connect(self.displayResults)
-        self.pushButton_Settings.clicked.connect(ft_partial(self.stackedWidget.setCurrentWidget, self.page_Settings))
+        #self.pushButton_Settings.clicked.connect(ft_partial(self.stackedWidget.setCurrentWidget, self.page_Settings))
         self.pushButton_borehole_resistance.clicked.connect(ft_partial(self.stackedWidget.setCurrentWidget,
                                                                        self.page_borehole_resistance))
         self.pushButton_General.clicked.connect(ft_partial(self.stackedWidget.setCurrentWidget, self.page_General))
-        self.pushButton_Aim.clicked.connect(ft_partial(self.stackedWidget.setCurrentWidget, self.page_aim))
         self.pushButton_NextGeneral.clicked.connect(self.pushButton_borehole_resistance.click)
         self.pushButton_PreviousThermal.clicked.connect(self.pushButton_borehole_resistance.click)
         self.pushButton_PreviousResistance.clicked.connect(self.pushButton_General.click)
-        self.pushButton_PreviousGeneral.clicked.connect(self.pushButton_Aim.click)
         self.pushButton_NextResistance.clicked.connect(self.pushButton_thermalDemands.click)
         self.pushButton_NextAim.clicked.connect(self.pushButton_General.click)
         self.pushButton_SaveFigure.clicked.connect(self.saveFigure)
@@ -276,8 +286,6 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.actionFrench.triggered.connect(ft_partial(self.comboBox_Language.setCurrentIndex, 4))
         self.actionSpanish.triggered.connect(ft_partial(self.comboBox_Language.setCurrentIndex, 5))
         self.actionGalician.triggered.connect(ft_partial(self.comboBox_Language.setCurrentIndex, 6))
-        self.doubleSpinBox_pipe_outer_radius.valueChanged.connect(self.doubleSpinBox_pipe_inner_radius.setMaximum)
-        self.doubleSpinBox_pipe_inner_radius.valueChanged.connect(self.doubleSpinBox_pipe_outer_radius.setMinimum)
         self.doubleSpinBox_H.valueChanged.connect(self.checkBounds)
         self.doubleSpinBox_B.valueChanged.connect(self.checkBounds)
         self.doubleSpinBox_k_s.valueChanged.connect(self.checkBounds)
@@ -299,9 +307,9 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.comboBox_dataColumn_data_file.currentIndexChanged.connect(self.frame_combined_data_file.setVisible)
         self.comboBox_dataColumn_data_file.setCurrentIndex(not self.comboBox_dataColumn_data_file.currentIndex())
         self.comboBox_dataColumn_data_file.setCurrentIndex(not self.comboBox_dataColumn_data_file.currentIndex())
-        self.actionCheckUDistance.triggered.connect(self.checkDistanceBetweenPipes)
+        # self.actionCheckUDistance.triggered.connect(self.check_distance_between_pipes)
         self.comboBox_Language.currentIndexChanged.connect(self.changeLanguage)
-        self.actionUpdateBoreholeGraph.triggered.connect(self.updateBorehole)
+
         #self.pushButton_temp_profile.clicked.connect(ft_partial(self.update_aim, self.pushButton_temp_profile))
         #self.pushButton_size_length.clicked.connect(ft_partial(self.update_aim, self.pushButton_size_length))
         #self.pushButton_req_depth.clicked.connect(ft_partial(self.update_aim, self.pushButton_req_depth))
@@ -464,16 +472,16 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.changeScenario(self.list_widget_scenario.row(newRowItem))
         return
 
-    def checkDistanceBetweenPipes(self) -> None:
+    def check_distance_between_pipes(self) -> None:
         """
         calculate and set minimal and maximal distance between U pipes and center
         :return: None
         """
         # import math stuff
         from math import pi, sin, cos, tan
-        nU: int = self.spinBox_number_pipes.value()  # get number of U pipes
-        rBorehole: float = self.doubleSpinBox_borehole_radius.value()  # get borehole radius
-        rOuterPipe: float = self.doubleSpinBox_pipe_outer_radius.value()  # get outer pipe radius
+        nU: int = self.gui_structure.option_pipe_number.get_value()  # get number of U pipes
+        rBorehole: float = self.gui_structure.option_pipe_borehole_radius.get_value()  # get borehole radius
+        rOuterPipe: float = self.gui_structure.option_pipe_outer_radius.get_value()  # get outer pipe radius
         rOuterPipeMax: float = rBorehole/(1+1/sin(pi/(2*nU)))  # calculate maximal outer pipe radius(see Circle packing)
         distanceMax: float = rBorehole - rOuterPipeMax  # calculate maximal distance between pipe and center
         alpha: float = pi/nU  # determine equal angle between pipes
@@ -481,8 +489,8 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # borehole radius
         distanceMin: float = 2*rOuterPipe*(cos((pi-alpha)/2)+sin((pi-alpha)/2)/tan(alpha)) if nU > 1 else rBorehole/2
         # set minimal and maximal value for pipe distance
-        self.doubleSpinBox_pipe_distance.setMinimum(distanceMin)
-        self.doubleSpinBox_pipe_distance.setMaximum(distanceMax)
+        self.gui_structure.option_pipe_distance.widget.setMinimum(distanceMin)
+        self.gui_structure.option_pipe_distance.widget.setMaximum(distanceMax)
 
     def funMoveScenario(self, startItem: QtCore_QModelIndex, startIndex: int, startIndex2: int,
                         endItem: QtCore_QModelIndex, targetIndex: int) -> None:
@@ -542,7 +550,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # hide results buttons if no results where found
         if any([(i.boreField is None) for i in self.ListDS]) or self.ListDS == []:
             self.pushButton_SaveData.hide()
-            self.pushButton_Aim.click()
+            self.gui_structure.page_aim.button.click()
             return
         # display results otherwise
         self.displayResults()
@@ -599,15 +607,15 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         """
         if event.type() == QtCore_QEvent.Enter:
             # Mouse is over the label
-            self.setPush(True)
+            self.set_push(True)
             return True
         elif event.type() == QtCore_QEvent.Leave:
             # Mouse is not over the label
-            self.setPush(False)
+            self.set_push(False)
             return True
         return False
 
-    def setPushButtonIconSize(self, button: QtWidgets_QPushButton, big: bool = False, name: str = '') -> None:
+    def set_push_button_icon_size(self, button: QtWidgets_QPushButton, big: bool = False, name: str = '') -> None:
         """
         set button name and size
         :param button: QPushButton to set name and icon size for
@@ -626,29 +634,19 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         button.setMaximumSize(self.sizePushS)
         button.setMinimumSize(self.sizePushS)
 
-    def setPush(self, mouseOver: bool) -> None:
+    def set_push(self, mouse_over: bool) -> None:
         """
         function to Set PushButton Text if MouseOver
-        :param mouseOver: bool true if Mouse is over PushButton
+        :param mouse_over: bool true if Mouse is over PushButton
         :return: None
         """
         # if Mouse is over PushButton change size to big otherwise to small
-        if mouseOver:
-            self.setPushButtonIconSize(self.pushButton_General, True, self.translations.pushButton_General)
-            self.setPushButtonIconSize(self.pushButton_Aim, True, self.translations.pushButton_Aim)
-            self.setPushButtonIconSize(self.pushButton_thermalDemands, True,
-                                       self.translations.pushButton_thermalDemands)
-            self.setPushButtonIconSize(self.pushButton_Results, True, self.translations.pushButton_Results)
-            self.setPushButtonIconSize(self.pushButton_Settings, True, self.translations.label_Settings)
-            self.setPushButtonIconSize(self.pushButton_borehole_resistance, True,
-                                       self.translations.pushButton_borehole_resistance)
+        if mouse_over:
+            for page in self.gui_structure.list_of_pages:
+                self.set_push_button_icon_size(page.button, True, page.button_name)
             return
-        self.setPushButtonIconSize(self.pushButton_General)
-        self.setPushButtonIconSize(self.pushButton_Aim)
-        self.setPushButtonIconSize(self.pushButton_thermalDemands)
-        self.setPushButtonIconSize(self.pushButton_Results)
-        self.setPushButtonIconSize(self.pushButton_Settings)
-        self.setPushButtonIconSize(self.pushButton_borehole_resistance)
+        for page in self.gui_structure.list_of_pages:
+            self.set_push_button_icon_size(page.button)
 
     @staticmethod
     def displayValuesWithFloatingDecimal(spinbox: QtWidgets_QDoubleSpinBox, factor: float) -> None:
@@ -708,7 +706,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         [self.comboBox_Rb_method.setItemText(i, name) for i, name in
          enumerate(self.translations.comboBox_Rb_methodList)]
         # set small PushButtons
-        self.setPush(False)
+        self.set_push(False)
         # replace scenario names if they are not unique
         scenarios: list = [f'{self.translations.scenarioString}: {i}' if liStrMatch[i - 1] else
                            self.list_widget_scenario.item(i-1).text() for i in range(1, amount + 1)]
@@ -957,71 +955,68 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             self.comboBox_date.clear()
             self.comboBox_date.addItems(columns)
 
-    def updateBorehole(self) -> None:
+    def update_borehole(self) -> None:
         """
         plots the position of the pipes in the borehole
         :return: None
         """
-        # import all that is needed
-        from math import pi
-        from numpy import cos, sin
-        from PyQt5.QtWidgets import QGraphicsScene, QGraphicsEllipseItem
-        from PyQt5.QtGui import QColor, QPen
-        # get variables from gui
-        numberOfPipes = self.spinBox_number_pipes.value()
-        rOut = self.doubleSpinBox_pipe_outer_radius.value() * 10
-        rIn = self.doubleSpinBox_pipe_inner_radius.value() * 10
-        rBore = self.doubleSpinBox_borehole_radius.value() * 10
-        dis = self.doubleSpinBox_pipe_distance.value() * 10
-        # calculate scale from graphic view size
-        max_l = min(self.graphicsView.width(), self.graphicsView.height())
-        scale = max_l/rBore/1.25  # leave 25 % space
-        # set colors
-        blue_color = QColor(0, 64, 122)
-        blue_light = QColor(84, 188, 235)
-        white_color = QColor(255, 255, 255)
-        grey = QColor(100, 100, 100)
-        brown = QColor(145, 124, 111)
-        # create graphic scene if not exits otherwise get scene and delete items
-        if self.graphicsView.scene() is None:
-            scene = QGraphicsScene()
-            self.graphicsView.setScene(scene)
-            self.graphicsView.setBackgroundBrush(brown)
-        else:
-            scene = self.graphicsView.scene()
-            scene.clear()
-        # create borehole circle in grey wih no border
-        circle = QGraphicsEllipseItem(-rBore*scale/2, -rBore*scale/2, rBore*scale, rBore*scale)
-        circle.setPen(QPen(grey, 0))
-        circle.setBrush(grey)
-        scene.addItem(circle)
-        # calculate pipe position and draw circle (white for outer pipe and blue for inner pipe)
-        dt: float = pi / float(numberOfPipes)
-        for i in range(numberOfPipes):
-            pos_1 = dis * cos(2.0 * i * dt + pi)/2
-            pos_2 = dis * sin(2.0 * i * dt + pi)/2
-            circle = QGraphicsEllipseItem((pos_1 - rOut / 2) * scale, (pos_2 - rOut / 2) * scale,
-                                          rOut * scale, rOut * scale)
-            circle.setPen(white_color)
-            circle.setBrush(white_color)
+        if isinstance(self.gui_structure.category_pipe_data.graphic_left, QtWidgets_QGraphicsView):
+            # import all that is needed
+            # get variables from gui
+            numberOfPipes = self.gui_structure.option_pipe_number.get_value()
+            rOut = self.gui_structure.option_pipe_outer_radius.get_value() * 10
+            rIn = self.gui_structure.option_pipe_inner_radius.get_value() * 10
+            rBore = self.gui_structure.option_pipe_borehole_radius.get_value() * 10
+            dis = self.gui_structure.option_pipe_distance.get_value() * 10
+            # calculate scale from graphic view size
+            max_l = min(self.gui_structure.category_pipe_data.graphic_left.width(), self.gui_structure.category_pipe_data.graphic_left.height())
+            scale = max_l/rBore/1.25  # leave 25 % space
+            # set colors
+            blue_color = QColor(0, 64, 122)
+            blue_light = QColor(84, 188, 235)
+            white_color = QColor(255, 255, 255)
+            grey = QColor(100, 100, 100)
+            brown = QColor(145, 124, 111)
+            # create graphic scene if not exits otherwise get scene and delete items
+            if self.gui_structure.category_pipe_data.graphic_left.scene() is None:
+                scene = QGraphicsScene()#parent=self.centralwidget)
+                self.gui_structure.category_pipe_data.graphic_left.setScene(scene)
+                self.gui_structure.category_pipe_data.graphic_left.setBackgroundBrush(brown)
+            else:
+                scene = self.gui_structure.category_pipe_data.graphic_left.scene()
+                scene.clear()
+            # create borehole circle in grey wih no border
+            circle = QGraphicsEllipseItem(-rBore*scale/2, -rBore*scale/2, rBore*scale, rBore*scale)
+            circle.setPen(QPen(grey, 0))
+            circle.setBrush(grey)
             scene.addItem(circle)
-            circle = QGraphicsEllipseItem((pos_1 - rIn / 2) * scale, (pos_2 - rIn / 2) * scale,
-                                          rIn * scale, rIn * scale)
-            circle.setPen(blue_color)
-            circle.setBrush(blue_color)
-            scene.addItem(circle)
-            pos_1 = dis * cos(2.0 * i * dt + pi + dt)/2
-            pos_2 = dis * sin(2.0 * i * dt + pi + dt)/2
-            circle = QGraphicsEllipseItem((pos_1 - rOut / 2) * scale, (pos_2 - rOut / 2) * scale,
-                                          rOut * scale, rOut * scale)
-            circle.setPen(white_color)
-            circle.setBrush(white_color)
-            scene.addItem(circle)
-            circle = QGraphicsEllipseItem((pos_1 - rIn / 2) * scale, (pos_2 - rIn / 2) * scale,
-                                          rIn * scale, rIn * scale)
-            circle.setPen(blue_light)
-            circle.setBrush(blue_light)
-            scene.addItem(circle)
+            # calculate pipe position and draw circle (white for outer pipe and blue for inner pipe)
+            dt: float = pi / float(numberOfPipes)
+            for i in range(numberOfPipes):
+                pos_1 = dis * cos(2.0 * i * dt + pi)/2
+                pos_2 = dis * sin(2.0 * i * dt + pi)/2
+                circle = QGraphicsEllipseItem((pos_1 - rOut / 2) * scale, (pos_2 - rOut / 2) * scale,
+                                              rOut * scale, rOut * scale)
+                circle.setPen(white_color)
+                circle.setBrush(white_color)
+                scene.addItem(circle)
+                circle = QGraphicsEllipseItem((pos_1 - rIn / 2) * scale, (pos_2 - rIn / 2) * scale,
+                                              rIn * scale, rIn * scale)
+                circle.setPen(blue_color)
+                circle.setBrush(blue_color)
+                scene.addItem(circle)
+                pos_1 = dis * cos(2.0 * i * dt + pi + dt)/2
+                pos_2 = dis * sin(2.0 * i * dt + pi + dt)/2
+                circle = QGraphicsEllipseItem((pos_1 - rOut / 2) * scale, (pos_2 - rOut / 2) * scale,
+                                              rOut * scale, rOut * scale)
+                circle.setPen(white_color)
+                circle.setBrush(white_color)
+                scene.addItem(circle)
+                circle = QGraphicsEllipseItem((pos_1 - rIn / 2) * scale, (pos_2 - rIn / 2) * scale,
+                                              rIn * scale, rIn * scale)
+                circle.setPen(blue_light)
+                circle.setBrush(blue_light)
+                scene.addItem(circle)
 
     def funDisplayData(self) -> None:
         """
@@ -1540,7 +1535,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.label_48.show() if idx > 0 else self.label_48.hide()
         self.label_pipe_data.show() if idx > 0 else self.label_pipe_data.hide()
         self.frame_pipe_data.show() if idx > 0 else self.frame_pipe_data.hide()
-        self.updateBorehole() if idx > 0 else None
+        self.update_borehole() if idx > 0 else None
 
     def updateBar(self, val: int, opt_start: bool = False) -> None:
         """

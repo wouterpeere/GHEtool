@@ -1,10 +1,16 @@
-from GHEtool.gui.gui_classes import DoubleValue, IntValue, ListBox, Category, Page, ButtonBox, Aim, qt_w, Option
+from GHEtool.gui.gui_classes import DoubleValue, IntValue, ListBox, Category, Page, ButtonBox, Aim, qt_w, qt_c, Option, Hint, FileName
 from typing import List, Tuple
 import pandas as pd
 
 class GuiStructure:
 
-    def __init__(self, default_parent: qt_w.QWidget):
+    def __init__(self, default_parent: qt_w.QWidget, status_bar: qt_w.QStatusBar):
+
+        self.sizeB = qt_c.QSize(48, 48)  # size of big logo on push button
+        self.sizeS = qt_c.QSize(24, 24)  # size of small logo on push button
+        self.sizePushB = qt_c.QSize(150, 75)  # size of big push button
+        self.sizePushS = qt_c.QSize(75, 75)  # size of small push button
+
         self.option_data = ButtonBox(default_parent, widget_name='import_format', label='Data format:', default_index=0, entries=[' monthly data ',
                                                                                                                                  ' hourly data '])
         self.category_import_data = Category(default_parent, obj_name='category_import_data', label='Import data format', list_of_options=[self.option_data])
@@ -97,7 +103,7 @@ class GuiStructure:
                                                   decimal_number=3, minimal_value=0, maximal_value=100000, step=0.1)
 
         self.category_fluid_data = Category(default_parent, obj_name='category_fluid_data', label='Fluid data', list_of_options=[
-            self.option_fluid_conductivity, self.option_fluid_density, self.option_fluid_capacity, self.option_fluid_viscosity, self.option_fluid_mass_flow])
+            self.option_fluid_conductivity, self.option_fluid_density, self.option_fluid_capacity, self.option_fluid_viscosity, self.option_fluid_mass_flow,])
         self.option_method_rb_calc.linked_options.append((self.category_fluid_data, 1))
         self.option_method_rb_calc.linked_options.append((self.category_fluid_data, 2))
 
@@ -106,11 +112,59 @@ class GuiStructure:
         self.option_pipe_grout_conductivity = DoubleValue(default_parent, widget_name='Double_pipe_grout_conductivity',
                                                           label='Grout thermal conductivity [W/mK]: ', default_value=1.5, decimal_number=3, minimal_value=0,
                                                           maximal_value=10000, step=0.1)
+        self.option_pipe_conductivity = DoubleValue(default_parent, widget_name='Double_pipe_conductivity', label='Pipe thermal conductivity [W/mK]: ',
+                                                    default_value=0.42, decimal_number=3, minimal_value=0, maximal_value=10000, step=0.1)
+        self.option_pipe_inner_radius = DoubleValue(default_parent, widget_name='Double_pipe_inner_radius', label='Inner pipe radius [m]: ',
+                                                    default_value=0.02, decimal_number=4, minimal_value=0, maximal_value=10000, step=0.001)
+        self.option_pipe_outer_radius = DoubleValue(default_parent, widget_name='Double_pipe_outer_radius', label='Outer pipe radius [m]: ',
+                                                    default_value=0.022, decimal_number=4, minimal_value=0, maximal_value=10000, step=0.001)
+        self.option_pipe_borehole_radius = DoubleValue(default_parent, widget_name='Double_pipe_borehole_radius', label='Borehole radius [m]: ',
+                                                       default_value=0.075, decimal_number=4, minimal_value=0, maximal_value=10000, step=0.001)
+        self.option_pipe_distance = DoubleValue(default_parent, widget_name='Double_pipe_distance', label='Distance of pipe until center [m]: ',
+                                                default_value=0.04, decimal_number=4, minimal_value=0, maximal_value=10000, step=0.001)
+        self.option_pipe_roughness = DoubleValue(default_parent, widget_name='Double_pipe_roughness', label='Pipe roughness [m]: ',
+                                                 default_value=0.000_001, decimal_number=7, minimal_value=0, maximal_value=10000, step=0.000001)
+        self.option_pipe_depth = DoubleValue(default_parent, widget_name='Double_pipe_depth', label='Burial depth [m]: ', default_value=4, decimal_number=1,
+                                             minimal_value=0, maximal_value=10000, step=0.1)
 
         self.category_pipe_data = Category(default_parent, obj_name='category_pipe_data', label='Pipe data', list_of_options=[
-            self.option_pipe_number, self.option_pipe_grout_conductivity])
+            self.option_pipe_number, self.option_pipe_grout_conductivity, self.option_pipe_conductivity, self.option_pipe_inner_radius,
+            self.option_pipe_outer_radius, self.option_pipe_borehole_radius, self.option_pipe_distance, self.option_pipe_roughness,
+            self.option_pipe_depth])
+        self.category_pipe_data.activate_graphic_left()
         self.option_method_rb_calc.linked_options.append((self.category_pipe_data, 1))
         self.option_method_rb_calc.linked_options.append((self.category_pipe_data, 2))
+
+        self.option_seperator_csv = ButtonBox(default_parent, widget_name='button_seperator_csv', label='Seperator in CSV-file:', default_index=0,
+                                              entries=['Semicolon ";"', 'Comma ","'])
+        self.option_decimal_csv = ButtonBox(default_parent, widget_name='button_decimal_csv', label='Decimal sign in CSV-file:', default_index=0,
+                                            entries=['Point "."', 'Comma ","'])
+        self.filename = FileName(default_parent, 'filename', 'Filename: ', '', 'Choose csv file', 'error', status_bar)
+        self.option_column = ButtonBox(default_parent, widget_name='button_column', label='Thermal demand in one or two columns: ', default_index=0,
+                                       entries=['1 column', '2 columns'])
+        self.option_heating_column = ListBox(default_parent, widget_name='button_heating_column', label='Heating load line: ', default_index=0, entries=[])
+        self.option_cooling_column = ListBox(default_parent, widget_name='button_cooling_column', label='Cooling load line: ', default_index=0, entries=[])
+        self.option_single_column = ListBox(default_parent, widget_name='button_single_column', label='Load line: ', default_index=0, entries=[])
+        self.option_unit_data = ButtonBox(default_parent, widget_name='button_unit_data', label='Unit data: ', default_index=1, entries=['W', 'kW', 'MW'])
+
+        self.option_column.linked_options.append((self.option_single_column, 0))
+        self.option_column.linked_options.append((self.option_heating_column, 1))
+        self.option_column.linked_options.append((self.option_cooling_column, 1))
+        self.category_select_file = Category(default_parent, obj_name='select_data', label='Select data file', list_of_options=[
+            self.option_seperator_csv, self.option_decimal_csv, self.filename, self.option_column, self.option_heating_column, self.option_cooling_column,
+            self.option_single_column, self.option_unit_data])
+
+        self.option_language = ListBox(default_parent, widget_name='list_language', label='Language: ', default_index=0, entries=['english', 'german'])
+        self.category_language = Category(default_parent, obj_name='category_language', label='Language', list_of_options=[self.option_language])
+
+        self.option_auto_saving = ButtonBox(default_parent, widget_name='option_auto_saving', label='Use automatic saving?:', default_index=0,
+                                            entries=[' no ', ' yes '])
+        self.hint_saving = Hint(default_parent, widget_name='hint_saving', hint='If Auto saving is selected the scenario will automatically saved if a scenario'
+                                                                                ' is changed. Otherwise the scenario has to be saved with the Update scenario '
+                                                                                'butten in the upper left corner if the changes should not be lost. ')
+
+        self.category_save_scenario = Category(default_parent, obj_name='category_save_scenario', label='Scenario saving settings', list_of_options=[
+            self.option_auto_saving, self.hint_saving])
 
         self.aim_temp_profile = Aim(default_parent, 'pushButton_temp_profile', 'Determine temperature profile', ':/icons/icons/Options.svg',
                                     [self.category_import_data, self.option_depth, self.option_spacing, self.option_width, self.option_length])
@@ -130,6 +184,10 @@ class GuiStructure:
                                   [self.category_borehole, self.category_temperatures])
         self.page_borehole_resistance = Page(default_parent, 'Borehole_resistance', 'Equivalent borehole resistance', 'Borehole\nresistance', ':/icons/icons/Resistance.png',
                                              [self.category_constant_rb, self.category_fluid_data, self.category_pipe_data])
+        self.page_thermal = Page(default_parent, 'thermal_demands', 'Thermal demands', 'Thermal\ndemands', ':/icons/icons/Thermal.svg',
+                                             [self.category_select_file])
+        self.page_settings = Page(default_parent, 'settings', 'Settings', 'Settings', ':/icons/icons/Settings.svg', [
+            self.category_language, self.category_save_scenario])
 
         self.page_aim.set_next_page(self.page_options)
         self.page_options.set_previous_page(self.page_aim)
@@ -137,6 +195,8 @@ class GuiStructure:
         self.page_borehole.set_previous_page(self.page_options)
         self.page_borehole.set_next_page(self.page_borehole_resistance)
         self.page_borehole_resistance.set_previous_page(self.page_borehole)
+        self.page_borehole_resistance.set_next_page(self.page_thermal)
+        self.page_thermal.set_previous_page(self.page_borehole)
 
         self.list_of_options: List[Tuple[Option, str]] = [(getattr(self, name), name) for name in self.__dict__ if isinstance(getattr(self, name), Option)]
         self.list_of_pages: List[Page] = [getattr(self, name) for name in self.__dict__ if isinstance(getattr(self, name), Page)]
@@ -153,3 +213,57 @@ class GuiStructure:
             if isinstance(entry, Page):
                 name: Tuple[str, str] = data[column][i].split(',')
                 entry.set_text(name[0], name[1])
+
+
+    def event_filter(self, obj: qt_w.QPushButton, event) -> bool:
+        """
+        function to check mouse over event
+        :param obj:
+        PushButton obj
+        :param event:
+        event to check if mouse over event is entering or leaving
+        :return:
+        Boolean to check if the function worked
+        """
+        if event.type() == qt_c.QEvent.Enter:
+            # Mouse is over the label
+            self.set_push(True)
+            return True
+        elif event.type() == qt_c.QEvent.Leave:
+            # Mouse is not over the label
+            self.set_push(False)
+            return True
+        return False
+
+    def set_push(self, mouse_over: bool) -> None:
+        """
+        function to Set PushButton Text if MouseOver
+        :param mouse_over: bool true if Mouse is over PushButton
+        :return: None
+        """
+        # if Mouse is over PushButton change size to big otherwise to small
+        if mouse_over:
+            for page in self.list_of_pages:
+                self.set_push_button_icon_size(page.button, True, page.button.setText(page.button_name))
+            return
+        for page in self.list_of_pages:
+            self.set_push_button_icon_size(page.button)
+
+    def set_push_button_icon_size(self, button: qt_w.QPushButton, big: bool = False, name: str = '') -> None:
+        """
+        set button name and size
+        :param button: QPushButton to set name and icon size for
+        :param big: big or small icon size (True = big)
+        :param name: name to set to QPushButton
+        :return: None
+        """
+        button.setText(name)  # set name to button
+        # size big or small QPushButton depending on input
+        if big:
+            button.setIconSize(self.sizeS)
+            button.setMaximumSize(self.sizePushB)
+            button.setMinimumSize(self.sizePushB)
+            return
+        button.setIconSize(self.sizeB)
+        button.setMaximumSize(self.sizePushS)
+        button.setMinimumSize(self.sizePushS)

@@ -304,16 +304,6 @@ f"selection-background-color: {LIGHT_SELECT};\n"
         self.verticalLayout_menu = QVBoxLayout()
         self.verticalLayout_menu.setSpacing(0)
         self.verticalLayout_menu.setObjectName(u"verticalLayout_menu")
-        self.pushButton_Aim = QPushButton(self.centralwidget)
-        self.pushButton_Aim.setObjectName(u"pushButton_Aim")
-        self.pushButton_Aim.setMinimumSize(QSize(100, 100))
-        self.pushButton_Aim.setStyleSheet(u"")
-        icon22 = QIcon()
-        icon22.addFile(u":/icons/icons/Aim_Inv.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.pushButton_Aim.setIcon(icon22)
-        self.pushButton_Aim.setIconSize(QSize(24, 24))
-
-        self.verticalLayout_menu.addWidget(self.pushButton_Aim)
 
         self.label_Gap_Aim = QLabel(self.centralwidget)
         self.label_Gap_Aim.setObjectName(u"label_Gap_Aim")
@@ -393,18 +383,6 @@ f"selection-background-color: {LIGHT_SELECT};\n"
         self.label_GapResSet.setMaximumSize(QSize(16777215, 6))
 
         self.verticalLayout_menu.addWidget(self.label_GapResSet)
-
-        self.pushButton_Settings = QPushButton(self.centralwidget)
-        self.pushButton_Settings.setObjectName(u"pushButton_Settings")
-        self.pushButton_Settings.setEnabled(True)
-        self.pushButton_Settings.setMinimumSize(QSize(100, 100))
-        self.pushButton_Settings.setStyleSheet(u"")
-        icon27 = QIcon()
-        icon27.addFile(u":/icons/icons/Settings.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.pushButton_Settings.setIcon(icon27)
-        self.pushButton_Settings.setIconSize(QSize(24, 24))
-
-        self.verticalLayout_menu.addWidget(self.pushButton_Settings)
 
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -4030,8 +4008,7 @@ f"color: {WHITE};\n"
         QWidget.setTabOrder(self.pushButton_General, self.pushButton_borehole_resistance)
         QWidget.setTabOrder(self.pushButton_borehole_resistance, self.pushButton_thermalDemands)
         QWidget.setTabOrder(self.pushButton_thermalDemands, self.pushButton_Results)
-        QWidget.setTabOrder(self.pushButton_Results, self.pushButton_Settings)
-        QWidget.setTabOrder(self.pushButton_Settings, self.pushButton_SaveScenario)
+        QWidget.setTabOrder(self.pushButton_Results, self.pushButton_SaveScenario)
         QWidget.setTabOrder(self.pushButton_SaveScenario, self.pushButton_AddScenario)
         QWidget.setTabOrder(self.pushButton_AddScenario, self.pushButton_DeleteScenario)
         QWidget.setTabOrder(self.pushButton_DeleteScenario, self.button_rename_scenario)
@@ -4289,7 +4266,6 @@ f"color: {WHITE};\n"
         ___qlistwidgetitem.setText(QCoreApplication.translate("GHEtool", u"Scenario: 1", None));
         self.list_widget_scenario.setSortingEnabled(__sortingEnabled)
 
-        self.pushButton_Aim.setText(QCoreApplication.translate("GHEtool", u"Aim", None))
         self.label_Gap_Aim.setText("")
         self.pushButton_General.setText(QCoreApplication.translate("GHEtool", u"Borehole \n"
 "and earth", None))
@@ -4302,7 +4278,6 @@ f"color: {WHITE};\n"
         self.label_GapThRes.setText("")
         self.pushButton_Results.setText(QCoreApplication.translate("GHEtool", u"Results", None))
         self.label_GapResSet.setText("")
-        self.pushButton_Settings.setText(QCoreApplication.translate("GHEtool", u"Settings", None))
         self.label.setText(QCoreApplication.translate("GHEtool", u"Aim of simulation", None))
         self.label_4.setText("")
         self.label_Earth_Properties_7.setText(QCoreApplication.translate("GHEtool", u"Thermal data format", None))
