@@ -29,10 +29,10 @@ from PySide6.QtWidgets import QMessageBox as QtWidgets_QMessageBox
 from PySide6.QtWidgets import QPushButton as QtWidgets_QPushButton
 from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
 
-from .DataStorage_v1_0_0 import DataStorage
-from .gui_Main_new import Ui_GHEtool
-from .Translation_class import TrClass
-from .gui_classes import DoubleValue, IntValue, ListBox, Category, Page
+from GHEtool.gui.DataStorage_v1_0_0 import DataStorage
+from GHEtool.gui.gui_Main_new import Ui_GHEtool
+from GHEtool.gui.Translation_class import TrClass
+from GHEtool.gui.gui_structure import GuiStructure
 
 from typing import List, Tuple
 
@@ -96,36 +96,12 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         super().setupUi(dialog)
         # 'E:/Git/GHEtool_test/GHEtool/gui/ui/icons/Options.svg'
         # pyside6-rcc icons.qrc -o icons_rc.py
-        list_of_buttons: List[Tuple[str, str, str]] = [('pushButton_temp_profile', 'Determine temperature profile', ':/icons/icons/Options.svg'),
-                                                       ('pushButton_req_depth', 'Determine required depth', ':/icons/icons/Depth_determination.svg'),
-                                                       ('pushButton_size_length', 'Size borefield by length and width', ':/icons/icons/Size_Length.svg'),
-                                                       ('pushButton_optimize', 'Optimize load profile', ':/icons/icons/Optimize_Profile.svg'), ]
-        list_button: List[QtWidgets_QPushButton] = [self.create_push_button_aim(values[0], values[1], values[2]) for values in list_of_buttons]
 
-        dv = DoubleValue(widget_name='obj_name_double', label='doueble valeu:', default_value=0.1, decimal_number=2, minimal_value=0, maximal_value=10,
-                         step=0.1)
+        self.gui_structure = GuiStructure(self.centralwidget)
+        for page in self.gui_structure.list_of_pages:
+            page.create_page(self.centralwidget, self.stackedWidget, self.verticalLayout_menu)
 
-        iv = IntValue(widget_name='obj_name_int', label='int valeu:', default_value=1, minimal_value=0, maximal_value=10, step=1)
-
-        lb = ListBox(widget_name='obj_name_list', label='list valeu:', default_index=1, entries=['1', '2', '3'])
-        lb.linked_options = [(dv, 0), (iv, 1), ([iv, dv], 2)]
-        option1 = Category('testing', 'Option name', [dv, iv, lb])
-        #option1.create_widget(self.scrollAreaWidgetContents_6, self.verticalLayout_24)
-        option2 = Category('testing2', 'Option name2', [dv, iv])
-        #option2.create_widget(self.scrollAreaWidgetContents_6, self.verticalLayout_24)
-
-        page = Page('Gernale', 'Generanl', 'General', ':/icons/icons/Options.svg', [option1, option2])
-
-        page2 = Page('Gerna', 'Generl', 'Genl', ':/icons/icons/Options.svg', [])
-
-        page.set_next_page(page2)
-        page.set_previous_page(page2)
-        page2.create_page(self.centralwidget, self.stackedWidget, self.verticalLayout_menu)
-        page.create_page(self.centralwidget, self.stackedWidget, self.verticalLayout_menu)
-        #dv.create_widget(option)
-        #iv.create_widget(option)
-        #lb.create_widget(option)
-        self.add_aims(list_button)
+        # self.add_aims(list_button)
         # set app and dialog
         self.app: QtWidgets_QApplication = app
         self.Dia = dialog
@@ -320,16 +296,16 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.actionCheckUDistance.triggered.connect(self.checkDistanceBetweenPipes)
         self.comboBox_Language.currentIndexChanged.connect(self.changeLanguage)
         self.actionUpdateBoreholeGraph.triggered.connect(self.updateBorehole)
-        self.pushButton_temp_profile.clicked.connect(ft_partial(self.update_aim, self.pushButton_temp_profile))
-        self.pushButton_size_length.clicked.connect(ft_partial(self.update_aim, self.pushButton_size_length))
-        self.pushButton_req_depth.clicked.connect(ft_partial(self.update_aim, self.pushButton_req_depth))
-        self.pushButton_optimize.clicked.connect(ft_partial(self.update_aim, self.pushButton_optimize))
+        #self.pushButton_temp_profile.clicked.connect(ft_partial(self.update_aim, self.pushButton_temp_profile))
+        #self.pushButton_size_length.clicked.connect(ft_partial(self.update_aim, self.pushButton_size_length))
+        #self.pushButton_req_depth.clicked.connect(ft_partial(self.update_aim, self.pushButton_req_depth))
+        #self.pushButton_optimize.clicked.connect(ft_partial(self.update_aim, self.pushButton_optimize))
         self.pushButton_monthly_data.clicked.connect(ft_partial(self.update_opponent, self.pushButton_monthly_data, self.pushButton_hourly_data))
         self.pushButton_hourly_data.clicked.connect(ft_partial(self.update_opponent, self.pushButton_hourly_data, self.pushButton_monthly_data))
         self.pushButton_hourly_data2.clicked.connect(ft_partial(self.update_opponent, self.pushButton_hourly_data2, self.pushButton_monthly_data))
 
         self.Dia.closeEvent = self.closeEvent
-        self.update_aim(self.pushButton_temp_profile)
+        #self.update_aim(self.pushButton_temp_profile)
         self.checkBox_Import.toggle()
         self.checkBox_Import.toggle()
         self.pushButton_simulation_period.toggle()

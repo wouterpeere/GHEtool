@@ -9,13 +9,7 @@ import pygfunction as gt
 from scipy import interpolate
 from scipy.signal import convolve
 
-if __name__ == "__main__":
-    from VariableClasses import *
-else:
-    try:
-        from .VariableClasses import *
-    except ImportError:
-        from VariableClasses import *
+from GHEtool.VariableClasses.VariableClasses import *
 
 FOLDER = os.path.dirname(os.path.realpath(__file__))  # solve problem with importing GHEtool from sub-folders
 

@@ -27,6 +27,12 @@ from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplicat
 
 import icons_rc
 
+WHITE: str = "rgb(255, 255, 255)"
+LIGHT: str = "rgb(84, 188, 235)"
+LIGHT_SELECT: str = "rgb(42, 126, 179)"
+DARK: str = "rgb(0, 64, 122)"
+GREY: str = "rgb(100, 100, 100)"
+
 class Ui_GHEtool(object):
     def setupUi(self, GHETool):
         if not GHETool.objectName():
@@ -47,42 +53,56 @@ class Ui_GHEtool(object):
         icon = QIcon()
         icon.addFile(u":/icons/icons/icon_05.svg", QSize(), QIcon.Normal, QIcon.Off)
         GHETool.setWindowIcon(icon)
-        GHETool.setStyleSheet(u"*{color: rgb(255, 255, 255);\n"
+        GHETool.setStyleSheet("*{\n"
+                              f"color: {WHITE};\n"
 "font: 11pt \"Lexend\";\n"
-"background-color: rgb(0, 64, 122);\n"
-"selection-background-color: rgb(84, 188, 235);\n"
-"alternate-background-color: rgb(84, 188, 235);}\n"
-"QToolTip { color: #fff; background-color: #000; border: none; }\n"
-"QPushButton{border: 3px solid rgb(84, 188, 235);\n"
+f"background-color: {DARK};\n"
+f"selection-background-color: {LIGHT};\n"
+f"alternate-background-color: {LIGHT};\n"
+                              "}\n"
+"QPushButton{\n"
+                              f"border: 3px solid {LIGHT};\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
-"gridline-color: rgb(84, 188, 235);\n"
-"background-color: rgb(84, 188, 235);\n"
+f"color: {WHITE};\n"
+f"gridline-color: {LIGHT};\n"
+f"background-color: {LIGHT};\n"
 "font-weight:500;}\n"
-"QPushButton:hover{background-color: rgb(0, 64, 122);}\n"
-"QPushButton:disabled{border: 3px solid rgb(100, 100, 100);\n"
+"QPushButton:hover{\n"
+                              f"background-color: {DARK};\n"
+                              "}\n"
+"QPushButton:disabled{\n"
+                              f"border: 3px solid {GREY};\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
-"gridline-color: rgb(100, 100, 100);\n"
-"background-color: rgb(100, 100, 100);}\n"
-"QPushButton:disabled:hover{background-color: rgb(0, 64, 122);}\n"
-"QComboBox{border: 1px solid #ffffff;\n"
+f"color: {WHITE};\n"
+f"gridline-color: {GREY};\n"
+f"background-color: {GREY};\n"
+                              "}\n"
+"QPushButton:disabled:hover{\n"
+                              f"background-color: {DARK};\n"
+                              "}\n"
+"QComboBox{\n"
+                              f"border: 1px solid {WHITE};\n"
 "border-bottom-left-radius: 0px;\n"
 "border-bottom-right-radius: 0px;\n"
 "}\n"
 
-"QSpinBox{selection-color: rgb(255, 255, 255);\n"
-"selection-background-color: rgb(84, 188, 235);\n"
-"border: 1px solid rgb(255, 255, 255);\n"
+"QSpinBox{\n"
+                              f"selection-color: {WHITE};\n"
+f"selection-background-color: {LIGHT};\n"
+f"border: 1px solid {WHITE};\n"
 "font: 11pt \"Lexend Deca Light\";}\n"
-"QLineEdit{border: 3px solid rgb(84, 188, 235);\n"
+"QLineEdit{\n"
+                              f"border: 3px solid {LIGHT};\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
-"gridline-color: rgb(84, 188, 235);\n"
-"background-color: rgb(84, 188, 235);\n"
+f"color: {WHITE};\n"
+f"gridline-color: {LIGHT};\n"
+f"background-color: {LIGHT};\n"
 "font-weight:500;\n"
-"selection-background-color: rgb(42, 126, 179);}\n"
-"QLineEdit:hover{background-color: rgb(0, 64, 122);}")
+f"selection-background-color: {LIGHT_SELECT};\n"
+                              "}\n"
+"QLineEdit:hover{\n"
+                              f"background-color: {DARK};\n"
+                              "}")
         self.actionNew = QAction(GHETool)
         self.actionNew.setObjectName(u"actionNew")
         self.actionNew.setCheckable(False)
@@ -264,7 +284,9 @@ class Ui_GHEtool(object):
         self.list_widget_scenario.setMaximumSize(QSize(16666711, 16666711))
         self.list_widget_scenario.setStyleSheet(u"*{border: 1px solid white;}\n"
 "QListWidget{outline: 0;}\n"
-"QListWidget::item:selected{background:rgb(84, 188, 235);color: rgb(255, 255, 255);border: 0px solid white;}\n"
+"QListWidget::item:selected{\n"
+                                                f"background:{LIGHT};color: {WHITE};border: 0px solid white;\n"
+                                                "}\n"
 "QListWidget::item:hover{border: 1px solid white;color: rgb(255, 255, 255);}")
         self.list_widget_scenario.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
         self.list_widget_scenario.setAutoScrollMargin(10)
@@ -448,10 +470,10 @@ class Ui_GHEtool(object):
         self.label_Earth_Properties_7.setObjectName(u"label_Earth_Properties_7")
         self.label_Earth_Properties_7.setStyleSheet(u"QLabel {\n"
 "        qproperty-alignment: AlignCenter;\n"
-"	border: 1px solid  rgb(84, 188, 235);\n"
+f"	border: 1px solid  {LIGHT};\n"
 "	border-top-left-radius: 15px;\n"
 "	border-top-right-radius: 15px;\n"
-"	background-color:  rgb(84, 188, 235);\n"
+f"	background-color:  {LIGHT};\n"
 "	padding: 5px 0px;\n"
 "	color:  rgb(255, 255, 235);\n"
 "font-weight:500;\n"
@@ -474,20 +496,24 @@ class Ui_GHEtool(object):
         self.gridLayout_13.setVerticalSpacing(0)
         self.pushButton_hourly_data = QPushButton(self.frame_7)
         self.pushButton_hourly_data.setObjectName(u"pushButton_hourly_data")
-        self.pushButton_hourly_data.setStyleSheet(u"QPushButton{border: 3px solid rgb(84, 188, 235);\n"
+        self.pushButton_hourly_data.setStyleSheet(u"QPushButton{\n"
+                                                  f"border: 3px solid {LIGHT};\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
-"gridline-color: rgb(84, 188, 235);\n"
+f"color: {WHITE};\n"
+f"gridline-color: {LIGHT};\n"
 "background-color: rgb(0, 64, 122);\n"
 "font-weight:500;}\n"
 "QPushButton:hover{\n"
 "border: 3px solid  rgb(0, 64, 122);\n"
-"background-color:rgb(84, 188, 235);}\n"
-"QPushButton:checked{background-color:rgb(84, 188, 235);}\n"
+f"background-color:{LIGHT};\n"
+                                                  "}\n"
+"QPushButton:checked{\n"
+                                                  f"background-color:{LIGHT};"
+                                                  "}\n"
 "QPushButton:disabled{border: 3px solid rgb(100, 100, 100);\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
-"gridline-color: rgb(100, 100, 100);\n"
+f"color: {WHITE};\n"
+f"gridline-color: {GREY};\n"
 "background-color: rgb(100, 100, 100);}\n"
 "QPushButton:disabled:hover{background-color: rgb(0, 64, 122);}")
         self.pushButton_hourly_data.setCheckable(True)
@@ -496,20 +522,23 @@ class Ui_GHEtool(object):
 
         self.pushButton_hourly_data2 = QPushButton(self.frame_7)
         self.pushButton_hourly_data2.setObjectName(u"pushButton_hourly_data2")
-        self.pushButton_hourly_data2.setStyleSheet(u"QPushButton{border: 3px solid rgb(84, 188, 235);\n"
+        self.pushButton_hourly_data2.setStyleSheet(u"QPushButton{border: 3px solid {LIGHT};\n"
                                                   "border-radius: 5px;\n"
-                                                  "color: rgb(255, 255, 255);\n"
-                                                  "gridline-color: rgb(84, 188, 235);\n"
+                                                  f"color: {WHITE};\n"
+                                                  f"gridline-color: {LIGHT};\n"
                                                   "background-color: rgb(0, 64, 122);\n"
                                                   "font-weight:500;}\n"
                                                   "QPushButton:hover{\n"
                                                   "border: 3px solid  rgb(0, 64, 122);\n"
-                                                  "background-color:rgb(84, 188, 235);}\n"
-                                                  "QPushButton:checked{background-color:rgb(84, 188, 235);}\n"
+                                                  f"background-color:{LIGHT};\n"
+                                                   "}\n"
+                                                  "QPushButton:checked{\n"
+                                                   f"background-color:{LIGHT};\n"
+                                                   "}\n"
                                                   "QPushButton:disabled{border: 3px solid rgb(100, 100, 100);\n"
                                                   "border-radius: 5px;\n"
-                                                  "color: rgb(255, 255, 255);\n"
-                                                  "gridline-color: rgb(100, 100, 100);\n"
+                                                  f"color: {WHITE};\n"
+                                                  f"gridline-color: {GREY};\n"
                                                   "background-color: rgb(100, 100, 100);}\n"
                                                   "QPushButton:disabled:hover{background-color: rgb(0, 64, 122);}")
         self.pushButton_hourly_data2.setCheckable(True)
@@ -525,20 +554,24 @@ class Ui_GHEtool(object):
 
         self.pushButton_monthly_data = QPushButton(self.frame_7)
         self.pushButton_monthly_data.setObjectName(u"pushButton_monthly_data")
-        self.pushButton_monthly_data.setStyleSheet(u"QPushButton{border: 3px solid rgb(84, 188, 235);\n"
+        self.pushButton_monthly_data.setStyleSheet("QPushButton{\n"
+                                                   "border: 3px solid {LIGHT};\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
-"gridline-color: rgb(84, 188, 235);\n"
+f"color: {WHITE};\n"
+f"gridline-color: {LIGHT};\n"
 "background-color: rgb(0, 64, 122);\n"
 "font-weight:500;}\n"
 "QPushButton:hover{\n"
 "border: 3px solid  rgb(0, 64, 122);\n"
-"background-color:rgb(84, 188, 235);}\n"
-"QPushButton:checked{background-color:rgb(84, 188, 235);}\n"
+f"background-color:{LIGHT};\n"
+                                                   "}\n"
+"QPushButton:checked{\n"
+                                                   f"background-color:{LIGHT};\n"
+                                                   "}\n"
 "QPushButton:disabled{border: 3px solid rgb(100, 100, 100);\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
-"gridline-color: rgb(100, 100, 100);\n"
+f"color: {WHITE};\n"
+f"gridline-color: {GREY};\n"
 "background-color: rgb(100, 100, 100);}\n"
 "QPushButton:disabled:hover{background-color: rgb(0, 64, 122);}")
         self.pushButton_monthly_data.setCheckable(True)
@@ -619,7 +652,7 @@ class Ui_GHEtool(object):
         self.pushButton_9.setObjectName(u"pushButton_9")
         self.pushButton_9.setStyleSheet(u"QPushButton{border: 3px solid rgb(84, 188, 235);\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
+f"color: {WHITE};\n"
 "gridline-color: rgb(84, 188, 235);\n"
 "background-color: rgb(0, 64, 122);\n"
 "font-weight:500;}\n"
@@ -629,8 +662,8 @@ class Ui_GHEtool(object):
 "QPushButton:checked{background-color:rgb(84, 188, 235);}\n"
 "QPushButton:disabled{border: 3px solid rgb(100, 100, 100);\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
-"gridline-color: rgb(100, 100, 100);\n"
+f"color: {WHITE};\n"
+f"gridline-color: {GREY};\n"
 "background-color: rgb(100, 100, 100);}\n"
 "QPushButton:disabled:hover{background-color: rgb(0, 64, 122);}")
         self.pushButton_9.setCheckable(True)
@@ -641,7 +674,7 @@ class Ui_GHEtool(object):
         self.pushButton_11.setObjectName(u"pushButton_11")
         self.pushButton_11.setStyleSheet(u"QPushButton{border: 3px solid rgb(84, 188, 235);\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
+f"color: {WHITE};\n"
 "gridline-color: rgb(84, 188, 235);\n"
 "background-color: rgb(0, 64, 122);\n"
 "font-weight:500;}\n"
@@ -651,8 +684,8 @@ class Ui_GHEtool(object):
 "QPushButton:checked{background-color:rgb(84, 188, 235);}\n"
 "QPushButton:disabled{border: 3px solid rgb(100, 100, 100);\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
-"gridline-color: rgb(100, 100, 100);\n"
+f"color: {WHITE};\n"
+f"gridline-color: {GREY};\n"
 "background-color: rgb(100, 100, 100);}\n"
 "QPushButton:disabled:hover{background-color: rgb(0, 64, 122);}")
         self.pushButton_11.setCheckable(True)
@@ -704,7 +737,7 @@ class Ui_GHEtool(object):
         self.pushButton_10.setObjectName(u"pushButton_10")
         self.pushButton_10.setStyleSheet(u"QPushButton{border: 3px solid rgb(84, 188, 235);\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
+f"color: {WHITE};\n"
 "gridline-color: rgb(84, 188, 235);\n"
 "background-color: rgb(0, 64, 122);\n"
 "font-weight:500;}\n"
@@ -714,8 +747,8 @@ class Ui_GHEtool(object):
 "QPushButton:checked{background-color:rgb(84, 188, 235);}\n"
 "QPushButton:disabled{border: 3px solid rgb(100, 100, 100);\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
-"gridline-color: rgb(100, 100, 100);\n"
+f"color: {WHITE};\n"
+f"gridline-color: {GREY};\n"
 "background-color: rgb(100, 100, 100);}\n"
 "QPushButton:disabled:hover{background-color: rgb(0, 64, 122);}")
         self.pushButton_10.setCheckable(True)
@@ -726,7 +759,7 @@ class Ui_GHEtool(object):
         self.pushButton_12.setObjectName(u"pushButton_12")
         self.pushButton_12.setStyleSheet(u"QPushButton{border: 3px solid rgb(84, 188, 235);\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
+f"color: {WHITE};\n"
 "gridline-color: rgb(84, 188, 235);\n"
 "background-color: rgb(0, 64, 122);\n"
 "font-weight:500;}\n"
@@ -736,8 +769,8 @@ class Ui_GHEtool(object):
 "QPushButton:checked{background-color:rgb(84, 188, 235);}\n"
 "QPushButton:disabled{border: 3px solid rgb(100, 100, 100);\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
-"gridline-color: rgb(100, 100, 100);\n"
+f"color: {WHITE};\n"
+f"gridline-color: {GREY};\n"
 "background-color: rgb(100, 100, 100);}\n"
 "QPushButton:disabled:hover{background-color: rgb(0, 64, 122);}")
         self.pushButton_12.setCheckable(True)
@@ -784,7 +817,7 @@ class Ui_GHEtool(object):
         self.pushButton_13.setMinimumSize(QSize(100, 30))
         self.pushButton_13.setStyleSheet(u"QPushButton{border: 3px solid rgb(84, 188, 235);\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
+f"color: {WHITE};\n"
 "gridline-color: rgb(84, 188, 235);\n"
 "background-color: rgb(0, 64, 122);\n"
 "font-weight:500;}\n"
@@ -794,8 +827,8 @@ class Ui_GHEtool(object):
 "QPushButton:checked{background-color:rgb(84, 188, 235);}\n"
 "QPushButton:disabled{border: 3px solid rgb(100, 100, 100);\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
-"gridline-color: rgb(100, 100, 100);\n"
+f"color: {WHITE};\n"
+f"gridline-color: {GREY};\n"
 "background-color: rgb(100, 100, 100);}\n"
 "QPushButton:disabled:hover{background-color: rgb(0, 64, 122);}")
         self.pushButton_13.setCheckable(True)
@@ -807,7 +840,7 @@ class Ui_GHEtool(object):
         self.pushButton_14.setMinimumSize(QSize(100, 30))
         self.pushButton_14.setStyleSheet(u"QPushButton{border: 3px solid rgb(84, 188, 235);\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
+f"color: {WHITE};\n"
 "gridline-color: rgb(84, 188, 235);\n"
 "background-color: rgb(0, 64, 122);\n"
 "font-weight:500;}\n"
@@ -817,8 +850,8 @@ class Ui_GHEtool(object):
 "QPushButton:checked{background-color:rgb(84, 188, 235);}\n"
 "QPushButton:disabled{border: 3px solid rgb(100, 100, 100);\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
-"gridline-color: rgb(100, 100, 100);\n"
+f"color: {WHITE};\n"
+f"gridline-color: {GREY};\n"
 "background-color: rgb(100, 100, 100);}\n"
 "QPushButton:disabled:hover{background-color: rgb(0, 64, 122);}")
         self.pushButton_14.setCheckable(True)
@@ -1133,7 +1166,7 @@ class Ui_GHEtool(object):
 "	border-top-left-radius: 10px;\n"
 "	border-bottom-left-radius: 10px;\n"
 "	border-bottom-right-radius: 10px;\n"
-"color: rgb(255, 255, 255);\n"
+f"color: {WHITE};\n"
 "gridline-color: rgb(84, 188, 235);\n"
 "background-color: rgb(0, 64, 122);\n"
 "font-weight:500;}\n"
@@ -1144,8 +1177,8 @@ class Ui_GHEtool(object):
 "	border-bottom-left-radius: 0px;\n"
 "	border-bottom-right-radius: 0px;}\n"
 "QPushButton:disabled{border: 3px solid rgb(100, 100, 100);\n"
-"color: rgb(255, 255, 255);\n"
-"gridline-color: rgb(100, 100, 100);\n"
+f"color: {WHITE};\n"
+f"gridline-color: {GREY};\n"
 "background-color: rgb(100, 100, 100);}\n"
 "QPushButton:disabled:hover{background-color: rgb(0, 64, 122);}")
         self.pushButton_simulation_period.setCheckable(True)
@@ -1935,7 +1968,7 @@ class Ui_GHEtool(object):
         self.lineEdit_displayCsv.setMaximumSize(QSize(10000000, 25))
         self.lineEdit_displayCsv.setStyleSheet(u"QLineEdit{border: 3px solid rgb(84, 188, 235);\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
+f"color: {WHITE};\n"
 "gridline-color: rgb(84, 188, 235);\n"
 "background-color: rgb(84, 188, 235);\n"
 "font-weight:500;\n"
@@ -1950,7 +1983,7 @@ class Ui_GHEtool(object):
         self.pushButton_loadCsv.setMaximumSize(QSize(30, 30))
         self.pushButton_loadCsv.setStyleSheet(u"*{border: 3px solid rgb(84, 188, 235);\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
+f"color: {WHITE};\n"
 "gridline-color: rgb(84, 188, 235);\n"
 "background-color: rgb(84, 188, 235);\n"
 "font: 75;}\n"
@@ -2082,7 +2115,7 @@ class Ui_GHEtool(object):
         self.pushButton_load.setMaximumSize(QSize(100, 35))
         self.pushButton_load.setStyleSheet(u"QPushButton{border: 3px solid rgb(84, 188, 235);\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
+f"color: {WHITE};\n"
 "gridline-color: rgb(84, 188, 235);\n"
 "background-color: rgb(84, 188, 235);\n"
 "font-weight:500;}\n"
@@ -2365,7 +2398,7 @@ class Ui_GHEtool(object):
         self.pushButton_calculate.setLayoutDirection(Qt.LeftToRight)
         self.pushButton_calculate.setStyleSheet(u"QPushButton{border: 3px solid rgb(84, 188, 235);\n"
 "border-radius: 5px;\n"
-"color: rgb(255, 255, 255);\n"
+f"color: {WHITE};\n"
 "gridline-color: rgb(84, 188, 235);\n"
 "background-color: rgb(84, 188, 235);\n"
 "font-weight:500;}\n"
