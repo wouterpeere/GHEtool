@@ -394,9 +394,16 @@ class Page:
         self.icon: str = icon
         self.list_categories: List[Category] = list_categories
         self.button: qt_w.QPushButton = qt_w.QPushButton(default_parent)
+        self.label: qt_w.QLabel = qt_w.QLabel(default_parent)
         self.previous_page: Optional[Page] = None
         self.next_page: Optional[Page] = None
         self.upper_frame: Optional[List[Union[Aim, Option, Category]]] = None
+
+    def set_text(self, name: str, button_name: str):
+        self.name = name
+        self.button_name = button_name
+        self.label.setText(self.name)
+        self.button.setText(self.button_name)
 
     def set_previous_page(self, previous_page: Page):
         self.previous_page = previous_page
@@ -412,7 +419,8 @@ class Page:
         page.setObjectName(f"page_{self.obj_name}")
         layout = qt_w.QVBoxLayout(page)
         layout.setSpacing(0)
-        label: qt_w.QLabel = qt_w.QLabel(central_widget)
+        self.label.setParent(central_widget)
+        label: qt_w.QLabel = self.label
         label.setObjectName(f"label_{self.obj_name}")
         label.setStyleSheet("font: 63 16pt \"Lexend SemiBold\";")
         label.setText(self.name)
@@ -474,7 +482,7 @@ class Page:
         spacer = qt_w.QSpacerItem(1, 1, qt_w.QSizePolicy.Minimum, qt_w.QSizePolicy.Expanding)
         scroll_area_layout.addItem(spacer)
 
-        self.create_links_to_other_pages(central_widget, stacked_widget, layout)
+        self.create_links_to_other_pages(central_widget, layout)
 
         self.button.setParent(central_widget)
         self.button.setObjectName(f"pushButton_General_{self.obj_name}")
@@ -492,9 +500,7 @@ class Page:
         vertical_layout_menu.addWidget(label_gap)
         self.button.clicked.connect(ft_partial(stacked_widget.setCurrentWidget, page))
 
-
-
-    def create_links_to_other_pages(self, central_widget: qt_w.QWidget, stacked_widget: qt_w.QStackedWidget, scroll_area_layout: qt_w.QVBoxLayout):
+    def create_links_to_other_pages(self, central_widget: qt_w.QWidget, scroll_area_layout: qt_w.QVBoxLayout):
         if self.previous_page is None and self.next_page is None:
             return
 

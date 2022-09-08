@@ -30,6 +30,7 @@ from PySide6.QtWidgets import QPushButton as QtWidgets_QPushButton
 from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
 
 from GHEtool.gui.DataStorage_v1_0_0 import DataStorage
+from GHEtool.gui.data_storage_new import DataStorageNew
 from GHEtool.gui.gui_Main_new import Ui_GHEtool
 from GHEtool.gui.Translation_class import TrClass
 from GHEtool.gui.gui_structure import GuiStructure
@@ -101,6 +102,10 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         for page in self.gui_structure.list_of_pages:
             page.create_page(self.centralwidget, self.stackedWidget, self.verticalLayout_menu)
 
+        self.gui_structure.translate(1)
+
+        ds = DataStorageNew(self.gui_structure)
+        ds.save()
         # self.add_aims(list_button)
         # set app and dialog
         self.app: QtWidgets_QApplication = app
@@ -120,6 +125,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.finished: int = 1  # number of finished scenarios
         self.threads: list = []  # list of calculation threads
         self.ListDS: list = []  # list of data storages
+        self.list_ds: List[DataStorageNew] = [DataStorageNew(self.gui_structure)]  # list of data storages
         self.sizeB = QtCore_QSize(48, 48)  # size of big logo on push button
         self.sizeS = QtCore_QSize(24, 24)  # size of small logo on push button
         self.sizePushB = QtCore_QSize(150, 75)  # size of big push button
@@ -490,6 +496,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         :return: None
         """
         self.ListDS.insert(targetIndex, self.ListDS.pop(startIndex))
+        self.list_ds.insert(targetIndex, self.list_ds.pop(startIndex))
 
     @staticmethod
     def setPushButtonIcon(button: QtWidgets_QPushButton, iconName: str) -> None:
@@ -751,6 +758,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # append scenario if no scenario is in list
         if len(self.ListDS) < 1:
             self.ListDS.append(DataStorage(id(self)))
+            self.list_ds.append(DataStorageNew(self.gui_structure))
         # create list of scenario names
         li: list = [self.list_widget_scenario.item(idx).text() for idx in range(self.list_widget_scenario.count())]
         # create list of settings with language and autosave option
@@ -1354,6 +1362,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.funSaveAuto()
         # Create list if no scenario is stored
         self.ListDS.append(DataStorage(id(self))) if len(self.ListDS) < 1 else None
+        self.list_ds.append(DataStorageNew(self.gui_structure)) if len(self.list_ds) < 1 else None
         # try to store the data in the pickle file
         try:
             # create list of all scenario names
@@ -1379,6 +1388,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.filename: tuple = MainWindow.filenameDefault  # reset filename
         self.funSave()  # get and save filename
         self.ListDS: list = []  # reset list of data storages
+        self.list_ds = []
         self.list_widget_scenario.clear()  # clear list widget with scenario list
 
     def changeScenario(self, idx: int) -> None:
@@ -1396,6 +1406,10 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         ds: DataStorage = self.ListDS[idx]
         # set values of selected Datastorage
         ds.set_values()
+        # get selected Datastorage from list
+        ds: DataStorageNew = self.list_ds[idx]
+        # set values of selected Datastorage
+        ds.set_values(self.gui_structure)
         # activate checking for changed
         self.checking: bool = True
         # refresh results if results page is selected
@@ -1416,6 +1430,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             self.addScenario()
         else:
             self.ListDS[idx] = DataStorage(id(self))
+            self.list_ds[idx] = DataStorageNew(self.gui_structure)
         # create auto backup
         self.funSaveAuto()
         # remove * from scenario if not Auto save is checked and if the last char is a *
@@ -1435,6 +1450,8 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         if idx > 0 or (len(self.ListDS) > 1 and idx == 0):
             # delete scenario from list
             del self.ListDS[idx]
+
+            del self.list_ds[idx]
             # delete scenario form list widget
             self.list_widget_scenario.takeItem(idx)
             # rename remaining scenarios if the name has not be changed
@@ -1454,6 +1471,8 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         number: int = max(len(self.ListDS), 0)
         # append new scenario to List of DataStorages
         self.ListDS.append(DataStorage(id(self)))
+
+        self.list_ds.append(DataStorageNew(self.gui_structure))
         # add new scenario name and item to list widget
         self.list_widget_scenario.addItem(f'{self.translations.scenarioString}: {number + 1}')
         # select new list item

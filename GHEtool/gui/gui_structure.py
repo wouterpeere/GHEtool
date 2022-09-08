@@ -1,6 +1,6 @@
-from GHEtool.gui.gui_classes import DoubleValue, IntValue, ListBox, Category, Page, ButtonBox, Aim, qt_w
-from typing import List
-
+from GHEtool.gui.gui_classes import DoubleValue, IntValue, ListBox, Category, Page, ButtonBox, Aim, qt_w, Option
+from typing import List, Tuple
+import pandas as pd
 
 class GuiStructure:
 
@@ -138,4 +138,18 @@ class GuiStructure:
         self.page_borehole.set_next_page(self.page_borehole_resistance)
         self.page_borehole_resistance.set_previous_page(self.page_borehole)
 
+        self.list_of_options: List[Tuple[Option, str]] = [(getattr(self, name), name) for name in self.__dict__ if isinstance(getattr(self, name), Option)]
         self.list_of_pages: List[Page] = [getattr(self, name) for name in self.__dict__ if isinstance(getattr(self, name), Page)]
+
+    def translate(self, index: int):
+        from GHEtool.main_class import FOLDER
+        data = pd.read_csv(f'{FOLDER}/gui/Translations.csv', sep=';')
+        column = data.columns[index+1]
+        for i in range(len(data)):
+            try:
+                entry = getattr(self, data['name'][i])
+            except AttributeError:
+                continue
+            if isinstance(entry, Page):
+                name: Tuple[str, str] = data[column][i].split(',')
+                entry.set_text(name[0], name[1])
