@@ -40,7 +40,7 @@ class Option(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def create_widget(self, frame: qt_w.QFrame, layout: qt_w.QLayout) -> None:
+    def create_widget(self, frame: qt_w.QFrame, layout: qt_w.QLayout, row: int = None, column: int = None) -> None:
         pass
 
     def deactivate_size_limit(self):
@@ -48,6 +48,7 @@ class Option(metaclass=abc.ABCMeta):
 
     def create_frame(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout, create_spacer: bool = True) -> qt_w.QHBoxLayout:
         if self.label == '':
+            self.frame.setParent(None)
             self.frame = frame
             return frame.layout()
         self.frame.setParent(frame)
@@ -112,7 +113,7 @@ class DoubleValue(Option):
     def set_value(self, value: float) -> None:
         self.widget.setValue(value)
 
-    def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout) -> None:
+    def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout, row: int = None, column: int = None) -> None:
         layout = self.create_frame(frame, layout_parent)
         self.widget.setParent(self.frame)
         self.widget.setObjectName(self.widget_name)
@@ -131,6 +132,9 @@ class DoubleValue(Option):
             self.widget.setMinimumWidth(100)
         self.widget.setMinimumHeight(28)
         setattr(frame.window(), self.widget_name, self.widget)
+        if row is not None and isinstance(layout_parent, qt_w.QGridLayout):
+            layout_parent.addWidget(self.widget, column, row)
+            return
         layout.addWidget(self.widget)
 
 
@@ -150,7 +154,7 @@ class IntValue(Option):
     def set_value(self, value: int) -> None:
         self.widget.setValue(value)
 
-    def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout) -> None:
+    def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout, row: int = None, column: int = None) -> None:
         layout = self.create_frame(frame, layout_parent)
         self.widget.setParent(self.frame)
         self.widget.setObjectName(self.widget_name)
@@ -168,6 +172,9 @@ class IntValue(Option):
         self.widget.setMinimumWidth(100)
         self.widget.setMinimumHeight(28)
         setattr(frame.window(), self.widget_name, self.widget)
+        if row is not None and isinstance(layout_parent, qt_w.QGridLayout):
+            layout_parent.addWidget(self.widget, column, row)
+            return
         layout.addWidget(self.widget)
 
 
@@ -188,7 +195,7 @@ class ButtonBox(Option):
         for idx, button in enumerate(self.widget):
             button.setChecked(idx == index)
 
-    def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout) -> None:
+    def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout, row: int = None, column: int = None) -> None:
         layout = self.create_frame(frame, layout_parent)
         for idx, (entry, widget) in enumerate(zip(self.entries, self.widget)):
             widget.setParent(self.frame)
@@ -244,7 +251,7 @@ class ListBox(Option):
     def set_value(self, index: int) -> None:
         self.widget.setCurrentIndex(index)
 
-    def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout) -> None:
+    def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout, row: int = None, column: int = None) -> None:
         layout = self.create_frame(frame, layout_parent)
         self.widget.setParent(self.frame)
         self.widget.setObjectName(self.widget_name)
@@ -265,6 +272,9 @@ class ListBox(Option):
         self.widget.setMinimumWidth(100)
         self.widget.currentIndexChanged.connect(ft_partial(check, self, self.linked_options))
         setattr(frame.window(), self.widget_name, self.widget)
+        if row is not None and isinstance(layout_parent, qt_w.QGridLayout):
+            layout_parent.addWidget(self.widget, column, row)
+            return
         layout.addWidget(self.widget)
 
 
@@ -284,7 +294,7 @@ class FileName(Option):
     def set_value(self, filename: str) -> None:
         self.widget.setText(filename)
 
-    def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout) -> None:
+    def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout, row: int = None, column: int = None) -> None:
         layout = self.create_frame(frame, layout_parent, False)
         self.widget.setParent(self.frame)
         self.widget.setObjectName(self.widget_name)
@@ -332,6 +342,7 @@ class Hint:
         self.label.setWordWrap(True)
         if row is not None and isinstance(layout_parent, qt_w.QGridLayout):
             layout_parent.addWidget(self.label, column, row)
+            return
         layout_parent.addWidget(self.label)
 
 
@@ -401,8 +412,7 @@ class Category:
                     option.create_widget(self.frame, layout_frane, row, column)
                 else:
                     option.deactivate_size_limit() if option.label == '' else None
-                    option.create_widget(self.frame, layout_frane)
-                    layout_frane.addWidget(option.widget if self.frame == option.frame else option.frame, column, row)
+                    option.create_widget(self.frame, layout_frane, row, column)
                 print(column, row)
                 if row == self.grid_layout - 1:
                     row = 0
