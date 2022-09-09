@@ -16,10 +16,10 @@ class GuiStructure:
                                                                                                                                  ' hourly data '])
         self.category_import_data = Category(default_parent, obj_name='category_import_data', label='Import data format', list_of_options=[self.option_data])
 
-        self.option_method_size_length = ButtonBox(default_parent, widget_name='method_size_length', label='Method for size width and length :', default_index=0,
-                                                   entries=[' L2 ', ' L3 '])
         self.option_method_size_depth = ButtonBox(default_parent, widget_name='method_size_depth', label='Method for size borehole depth :', default_index=0,
                                                   entries=[' L2 ', ' L3 ', '  L4  '])
+        self.option_method_size_length = ButtonBox(default_parent, widget_name='method_size_length', label='Method for size width and length :',
+                                                   default_index=0, entries=[' L2 ', ' L3 '])
         self.option_method_temp_gradient = ButtonBox(default_parent, widget_name='use_temp_gradient', label='Should a temperature gradient over depth be considered?:',
                                                      default_index=0, entries=[' no ', ' yes  '])
         self.option_method_rb_calc = ButtonBox(default_parent, widget_name='method_rb_calc', label='Borehole resistance calculation method:',
@@ -30,26 +30,25 @@ class GuiStructure:
 
         self.option_depth = DoubleValue(default_parent, widget_name='double_depth', label='Borehole depth [m]: ', default_value=100, decimal_number=2, minimal_value=0,
                                         maximal_value=500, step=1)
+        self.option_max_depth = DoubleValue(default_parent, widget_name='double_max_depth', label='Maximal borehole depth [m]: ', default_value=150,
+                                            decimal_number=2,
+                                        minimal_value=0, maximal_value=500, step=1)
         self.option_spacing = DoubleValue(default_parent, widget_name='double_spacing', label='Borehole spacing [m]: ', default_value=6, decimal_number=2, minimal_value=1,
                                           maximal_value=99, step=0.1)
         self.option_min_spacing = DoubleValue(default_parent, widget_name='double_min_spacing', label='Minimal borehole spacing [m]: ', default_value=3, decimal_number=2,
                                               minimal_value=1, maximal_value=99, step=0.1)
-        self.option_max_spacing = DoubleValue(default_parent, widget_name='double_max_spacing', label='Maximal borehole spacing [m]: ', default_value=3, decimal_number=2,
+        self.option_max_spacing = DoubleValue(default_parent, widget_name='double_max_spacing', label='Maximal borehole spacing [m]: ', default_value=9,
+                                              decimal_number=2,
                                               minimal_value=1, maximal_value=99, step=0.1)
         self.option_width = IntValue(default_parent, widget_name='int_width', label='Width of rectangular field [#]: ', default_value=9, minimal_value=1, maximal_value=40)
         self.option_length = IntValue(default_parent, widget_name='int_length', label='Length of rectangular field [#]: ', default_value=12, minimal_value=1, maximal_value=40)
 
-        self.option_min_width = DoubleValue(default_parent, widget_name='double_min_width', label='Minimal width of rectangular field [m]: ', default_value=10,
-                                            decimal_number=2,
-                                            minimal_value=1, maximal_value=1000, step=1)
-        self.option_max_width = DoubleValue(default_parent, widget_name='double_max_width', label='Maximal width of rectangular field [m]: ', default_value=100,
+        self.option_max_width = DoubleValue(default_parent, widget_name='double_max_width', label='Maximal width of rectangular field [m]: ', default_value=160,
                                             decimal_number=2,
                                             minimal_value=1, maximal_value=1000, step=1)
 
-        self.option_min_length = DoubleValue(default_parent, widget_name='double_min_length', label='Minimal length of rectangular field [m]: ', default_value=12,
-                                             decimal_number=2,
-                                             minimal_value=1, maximal_value=1000, step=1)
-        self.option_max_length = DoubleValue(default_parent, widget_name='double_max_length', label='Maximal length of rectangular field [m]: ', default_value=110,
+        self.option_max_length = DoubleValue(default_parent, widget_name='double_max_length', label='Maximal length of rectangular field [m]: ',
+                                             default_value=150,
                                              decimal_number=2,
                                              minimal_value=1, maximal_value=1000, step=1)
 
@@ -63,9 +62,9 @@ class GuiStructure:
                                                                                       'This will dramatically increase the calculation time.', warning=True)
 
         self.category_borehole = Category(default_parent, obj_name='category_borehole_earth', label='Borehole and earth properties',
-                                          list_of_options=[self.option_depth, self.option_spacing, self.option_min_spacing, self.option_max_spacing,
+                                          list_of_options=[self.option_depth, self.option_max_depth, self.option_spacing, self.option_min_spacing, self.option_max_spacing,
                                                            self.option_width, self.option_length,
-                                                           self.option_min_width, self.option_max_width, self.option_min_length, self.option_max_length,
+                                                           self.option_max_width, self.option_max_length,
                                                            self.option_conductivity,
                                                            self.option_heat_capacity, self.hint_calc_time])
 
@@ -329,13 +328,12 @@ class GuiStructure:
             self.option_auto_saving, self.hint_saving])
 
         self.aim_temp_profile = Aim(default_parent, 'pushButton_temp_profile', 'Determine temperature profile', ':/icons/icons/Options.svg',
-                                    [self.category_import_data, self.option_depth, self.option_spacing, self.option_width, self.option_length])
+                                    [self.category_import_data, self.option_depth, self.option_spacing, self.option_width, self.option_length, self.button_load_csv, self.category_th_demand])
         self.aim_req_depth = Aim(default_parent, 'pushButton_req_depth', 'Determine required depth', ':/icons/icons/Depth_determination.svg',
-                                 [self.category_import_data, self.option_method_size_depth, self.option_spacing, self.option_width, self.option_length])
+                                 [self.category_import_data, self.option_method_size_depth, self.option_spacing, self.option_width, self.option_length, self.button_load_csv, self.category_th_demand])
         self.aim_size_length = Aim(default_parent, 'pushButton_size_length', 'Size borefield by length and width', ':/icons/icons/Size_Length.svg',
-                                   [self.category_import_data, self.option_method_size_length, self.option_min_spacing, self.option_max_spacing,
-                                    self.option_min_width, self.option_max_width,
-                                    self.option_min_length, self.option_max_length])
+                                   [self.category_import_data, self.option_method_size_length, self.option_max_depth, self.option_min_spacing,
+                                    self.option_max_spacing, self.option_max_width, self.option_max_length, self.button_load_csv, self.category_th_demand])
         self.aim_optimize = Aim(default_parent, 'pushButton_optimize', 'Optimize load profile', ':/icons/icons/Optimize_Profile.svg',
                                 [self.option_depth, self.option_spacing, self.option_width, self.option_length])
 

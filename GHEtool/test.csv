@@ -1,96 +1,1020 @@
-,0,1
-0,option_data,0
-1,option_method_size_length,0
-2,option_method_size_depth,0
-3,option_method_temp_gradient,0
-4,option_method_rb_calc,0
-5,option_depth,100.0
-6,option_spacing,6.0
-7,option_min_spacing,3.0
-8,option_max_spacing,3.0
-9,option_width,9
-10,option_length,12
-11,option_min_width,10.0
-12,option_max_width,100.0
-13,option_min_length,12.0
-14,option_max_length,110.0
-15,option_conductivity,1.5
-16,option_heat_capacity,2400.0
-17,option_ground_temp,10.0
-18,option_min_temp,0.0
-19,option_max_temp,16.0
-20,option_temp_gradient,2.0
-21,option_simu_period,20
-22,option_constant_rb,0.015
-23,option_fluid_conductivity,0.5
-24,option_fluid_density,1000.0
-25,option_fluid_capacity,4182.0
-26,option_fluid_viscosity,0.001
-27,option_fluid_mass_flow,0.5
-28,option_pipe_number,2
-29,option_pipe_grout_conductivity,1.5
-30,option_pipe_conductivity,0.42
-31,option_pipe_inner_radius,0.02
-32,option_pipe_outer_radius,0.022
-33,option_pipe_borehole_radius,0.075
-34,option_pipe_distance,0.04
-35,option_pipe_roughness,1e-06
-36,option_pipe_depth,4.0
-37,option_seperator_csv,0
-38,option_decimal_csv,0
-39,filename,
-40,option_column,0
-41,option_heating_column,-1
-42,option_cooling_column,-1
-43,option_single_column,-1
-44,option_unit_data,1
-45,option_hp_jan,160.0
-46,option_hp_feb,142.0
-47,option_hp_mar,102.0
-48,option_hp_apr,55.0
-49,option_hp_may,0.0
-50,option_hp_jun,0.0
-51,option_hp_jul,0.0
-52,option_hp_aug,0.0
-53,option_hp_sep,40.4
-54,option_hp_oct,85.0
-55,option_hp_nov,119.0
-56,option_hp_dec,136.0
-57,option_cp_jan,0.0
-58,option_cp_feb,0.0
-59,option_cp_mar,34.0
-60,option_cp_apr,69.0
-61,option_cp_may,133.0
-62,option_cp_jun,187.0
-63,option_cp_jul,213.0
-64,option_cp_aug,240.0
-65,option_cp_sep,160.0
-66,option_cp_oct,37.0
-67,option_cp_nov,0.0
-68,option_cp_dec,0.0
-69,option_hl_jan,46500.0
-70,option_hl_feb,44400.0
-71,option_hl_mar,37500.0
-72,option_hl_apr,29700.0
-73,option_hl_may,19200.0
-74,option_hl_jun,0.0
-75,option_hl_jul,0.0
-76,option_hl_aug,0.0
-77,option_hl_sep,18300.0
-78,option_hl_oct,26100.0
-79,option_hl_nov,35100.0
-80,option_hl_dec,43200.0
-81,option_cl_jan,4000.0
-82,option_cl_feb,8000.0
-83,option_cl_mar,8000.0
-84,option_cl_apr,8000.0
-85,option_cl_may,12000.0
-86,option_cl_jun,16000.0
-87,option_cl_jul,32000.0
-88,option_cl_aug,32000.0
-89,option_cl_sep,16000.0
-90,option_cl_oct,12000.0
-91,option_cl_nov,8000.0
-92,option_cl_dec,4000.0
-93,option_language,0
-94,option_auto_saving,0
+name;unit;Scenario: 1
+depth;m;101.0
+borehole spacing;m;6.0
+conductivity of the soil;W/mK;1.5
+Ground temperature at infinity;C;10.0
+Equivalent borehole resistance;mK/W;0.015
+width of rectangular field;#;9
+length of rectangular field;#;12
+Determine length;0/1;0
+Simulation Period;years;20
+Minimal temperature;C;0.0
+Maximal temperature;C;16.0
+Peak heating Jan;kW;160.0
+Peak heating Feb;kW;142.0
+Peak heating Mar;kW;102.0
+Peak heating Apr;kW;55.0
+Peak heating May;kW;0.0
+Peak heating Jun;kW;0.0
+Peak heating Jul;kW;0.0
+Peak heating Aug;kW;0.0
+Peak heating Sep;kW;40.4
+Peak heating Oct;kW;85.0
+Peak heating Nov;kW;119.0
+Peak heating Dec;kW;136.0
+Peak cooling Jan;kW;0.0
+Peak cooling Feb;kW;0.0
+Peak cooling Mar;kW;34.0
+Peak cooling Apr;kW;69.0
+Peak cooling May;kW;133.0
+Peak cooling Jun;kW;187.0
+Peak cooling Jul;kW;213.0
+Peak cooling Aug;kW;240.0
+Peak cooling Sep;kW;160.0
+Peak cooling Oct;kW;37.0
+Peak cooling Nov;kW;0.0
+Peak cooling Dec;kW;0.0
+Load heating Jan;kWh;46500.0
+Load heating Feb;kWh;44400.0
+Load heating Mar;kWh;37500.0
+Load heating Apr;kWh;55.0
+Load heating May;kWh;19200.0
+Load heating Jun;kWh;0.0
+Load heating Jul;kWh;0.0
+Load heating Aug;kWh;0.0
+Load heating Sep;kWh;18300.0
+Load heating Oct;kWh;26100.0
+Load heating Nov;kWh;35100.0
+Load heating Dec;kWh;43200.0
+Load cooling Jan;kWh;4000.0
+Load cooling Feb;kWh;8000.0
+Load cooling Mar;kWh;8000.0
+Load cooling Apr;kWh;8000.0
+Load cooling May;kWh;12000.0
+Load cooling Jun;kWh;16000.0
+Load cooling Jul;kWh;32000.0
+Load cooling Aug;kWh;32000.0
+Load cooling Sep;kWh;16000.0
+Load cooling Oct;kWh;12000.0
+Load cooling Nov;kWh;8000.0
+Load cooling Dec;kWh;4000.0
+Results peak heating Jan_1;C;7.12
+Results peak heating Feb_1;C;7.33
+Results peak heating Mar_1;C;7.81
+Results peak heating Apr_1;C;9.36
+Results peak heating May_1;C;9.31
+Results peak heating Jun_1;C;10.31
+Results peak heating Jul_1;C;11.09
+Results peak heating Aug_1;C;11.24
+Results peak heating Sep_1;C;9.7
+Results peak heating Oct_1;C;8.79
+Results peak heating Nov_1;C;7.92
+Results peak heating Dec_1;C;7.2
+Results peak heating Jan_2;C;6.7
+Results peak heating Feb_2;C;6.96
+Results peak heating Mar_2;C;7.46
+Results peak heating Apr_2;C;9.01
+Results peak heating May_2;C;8.97
+Results peak heating Jun_2;C;9.98
+Results peak heating Jul_2;C;10.76
+Results peak heating Aug_2;C;10.92
+Results peak heating Sep_2;C;9.38
+Results peak heating Oct_2;C;8.47
+Results peak heating Nov_2;C;7.6
+Results peak heating Dec_2;C;6.89
+Results peak heating Jan_3;C;6.39
+Results peak heating Feb_3;C;6.66
+Results peak heating Mar_3;C;7.16
+Results peak heating Apr_3;C;8.72
+Results peak heating May_3;C;8.68
+Results peak heating Jun_3;C;9.69
+Results peak heating Jul_3;C;10.48
+Results peak heating Aug_3;C;10.63
+Results peak heating Sep_3;C;9.09
+Results peak heating Oct_3;C;8.19
+Results peak heating Nov_3;C;7.33
+Results peak heating Dec_3;C;6.62
+Results peak heating Jan_4;C;6.12
+Results peak heating Feb_4;C;6.39
+Results peak heating Mar_4;C;6.9
+Results peak heating Apr_4;C;8.46
+Results peak heating May_4;C;8.42
+Results peak heating Jun_4;C;9.43
+Results peak heating Jul_4;C;10.22
+Results peak heating Aug_4;C;10.38
+Results peak heating Sep_4;C;8.84
+Results peak heating Oct_4;C;7.94
+Results peak heating Nov_4;C;7.08
+Results peak heating Dec_4;C;6.37
+Results peak heating Jan_5;C;5.88
+Results peak heating Feb_5;C;6.15
+Results peak heating Mar_5;C;6.66
+Results peak heating Apr_5;C;8.22
+Results peak heating May_5;C;8.18
+Results peak heating Jun_5;C;9.2
+Results peak heating Jul_5;C;9.99
+Results peak heating Aug_5;C;10.15
+Results peak heating Sep_5;C;8.62
+Results peak heating Oct_5;C;7.72
+Results peak heating Nov_5;C;6.86
+Results peak heating Dec_5;C;6.15
+Results peak heating Jan_6;C;5.66
+Results peak heating Feb_6;C;5.93
+Results peak heating Mar_6;C;6.44
+Results peak heating Apr_6;C;8.0
+Results peak heating May_6;C;7.96
+Results peak heating Jun_6;C;8.98
+Results peak heating Jul_6;C;9.77
+Results peak heating Aug_6;C;9.94
+Results peak heating Sep_6;C;8.42
+Results peak heating Oct_6;C;7.52
+Results peak heating Nov_6;C;6.66
+Results peak heating Dec_6;C;5.96
+Results peak heating Jan_7;C;5.47
+Results peak heating Feb_7;C;5.73
+Results peak heating Mar_7;C;6.23
+Results peak heating Apr_7;C;7.79
+Results peak heating May_7;C;7.75
+Results peak heating Jun_7;C;8.77
+Results peak heating Jul_7;C;9.58
+Results peak heating Aug_7;C;9.75
+Results peak heating Sep_7;C;8.23
+Results peak heating Oct_7;C;7.34
+Results peak heating Nov_7;C;6.48
+Results peak heating Dec_7;C;5.77
+Results peak heating Jan_8;C;5.28
+Results peak heating Feb_8;C;5.54
+Results peak heating Mar_8;C;6.04
+Results peak heating Apr_8;C;7.6
+Results peak heating May_8;C;7.57
+Results peak heating Jun_8;C;8.59
+Results peak heating Jul_8;C;9.4
+Results peak heating Aug_8;C;9.58
+Results peak heating Sep_8;C;8.06
+Results peak heating Oct_8;C;7.17
+Results peak heating Nov_8;C;6.31
+Results peak heating Dec_8;C;5.6
+Results peak heating Jan_9;C;5.1
+Results peak heating Feb_9;C;5.36
+Results peak heating Mar_9;C;5.87
+Results peak heating Apr_9;C;7.43
+Results peak heating May_9;C;7.39
+Results peak heating Jun_9;C;8.43
+Results peak heating Jul_9;C;9.24
+Results peak heating Aug_9;C;9.42
+Results peak heating Sep_9;C;7.9
+Results peak heating Oct_9;C;7.01
+Results peak heating Nov_9;C;6.15
+Results peak heating Dec_9;C;5.44
+Results peak heating Jan_10;C;4.94
+Results peak heating Feb_10;C;5.2
+Results peak heating Mar_10;C;5.7
+Results peak heating Apr_10;C;7.26
+Results peak heating May_10;C;7.24
+Results peak heating Jun_10;C;8.28
+Results peak heating Jul_10;C;9.1
+Results peak heating Aug_10;C;9.28
+Results peak heating Sep_10;C;7.76
+Results peak heating Oct_10;C;6.86
+Results peak heating Nov_10;C;6.0
+Results peak heating Dec_10;C;5.29
+Results peak heating Jan_11;C;4.78
+Results peak heating Feb_11;C;5.05
+Results peak heating Mar_11;C;5.55
+Results peak heating Apr_11;C;7.12
+Results peak heating May_11;C;7.1
+Results peak heating Jun_11;C;8.13
+Results peak heating Jul_11;C;8.95
+Results peak heating Aug_11;C;9.13
+Results peak heating Sep_11;C;7.62
+Results peak heating Oct_11;C;6.72
+Results peak heating Nov_11;C;5.86
+Results peak heating Dec_11;C;5.14
+Results peak heating Jan_12;C;4.64
+Results peak heating Feb_12;C;4.9
+Results peak heating Mar_12;C;5.41
+Results peak heating Apr_12;C;6.98
+Results peak heating May_12;C;6.97
+Results peak heating Jun_12;C;8.0
+Results peak heating Jul_12;C;8.82
+Results peak heating Aug_12;C;9.0
+Results peak heating Sep_12;C;7.49
+Results peak heating Oct_12;C;6.58
+Results peak heating Nov_12;C;5.72
+Results peak heating Dec_12;C;5.0
+Results peak heating Jan_13;C;4.5
+Results peak heating Feb_13;C;4.77
+Results peak heating Mar_13;C;5.28
+Results peak heating Apr_13;C;6.86
+Results peak heating May_13;C;6.84
+Results peak heating Jun_13;C;7.88
+Results peak heating Jul_13;C;8.7
+Results peak heating Aug_13;C;8.88
+Results peak heating Sep_13;C;7.36
+Results peak heating Oct_13;C;6.46
+Results peak heating Nov_13;C;5.59
+Results peak heating Dec_13;C;4.88
+Results peak heating Jan_14;C;4.38
+Results peak heating Feb_14;C;4.65
+Results peak heating Mar_14;C;5.16
+Results peak heating Apr_14;C;6.74
+Results peak heating May_14;C;6.72
+Results peak heating Jun_14;C;7.76
+Results peak heating Jul_14;C;8.58
+Results peak heating Aug_14;C;8.76
+Results peak heating Sep_14;C;7.23
+Results peak heating Oct_14;C;6.33
+Results peak heating Nov_14;C;5.47
+Results peak heating Dec_14;C;4.76
+Results peak heating Jan_15;C;4.26
+Results peak heating Feb_15;C;4.53
+Results peak heating Mar_15;C;5.05
+Results peak heating Apr_15;C;6.63
+Results peak heating May_15;C;6.61
+Results peak heating Jun_15;C;7.65
+Results peak heating Jul_15;C;8.47
+Results peak heating Aug_15;C;8.64
+Results peak heating Sep_15;C;7.12
+Results peak heating Oct_15;C;6.22
+Results peak heating Nov_15;C;5.35
+Results peak heating Dec_15;C;4.64
+Results peak heating Jan_16;C;4.15
+Results peak heating Feb_16;C;4.43
+Results peak heating Mar_16;C;4.94
+Results peak heating Apr_16;C;6.52
+Results peak heating May_16;C;6.5
+Results peak heating Jun_16;C;7.54
+Results peak heating Jul_16;C;8.35
+Results peak heating Aug_16;C;8.53
+Results peak heating Sep_16;C;7.01
+Results peak heating Oct_16;C;6.11
+Results peak heating Nov_16;C;5.25
+Results peak heating Dec_16;C;4.54
+Results peak heating Jan_17;C;4.05
+Results peak heating Feb_17;C;4.32
+Results peak heating Mar_17;C;4.84
+Results peak heating Apr_17;C;6.42
+Results peak heating May_17;C;6.4
+Results peak heating Jun_17;C;7.44
+Results peak heating Jul_17;C;8.25
+Results peak heating Aug_17;C;8.43
+Results peak heating Sep_17;C;6.9
+Results peak heating Oct_17;C;6.0
+Results peak heating Nov_17;C;5.15
+Results peak heating Dec_17;C;4.44
+Results peak heating Jan_18;C;3.95
+Results peak heating Feb_18;C;4.23
+Results peak heating Mar_18;C;4.75
+Results peak heating Apr_18;C;6.32
+Results peak heating May_18;C;6.3
+Results peak heating Jun_18;C;7.34
+Results peak heating Jul_18;C;8.15
+Results peak heating Aug_18;C;8.33
+Results peak heating Sep_18;C;6.81
+Results peak heating Oct_18;C;5.91
+Results peak heating Nov_18;C;5.05
+Results peak heating Dec_18;C;4.35
+Results peak heating Jan_19;C;3.86
+Results peak heating Feb_19;C;4.13
+Results peak heating Mar_19;C;4.65
+Results peak heating Apr_19;C;6.23
+Results peak heating May_19;C;6.21
+Results peak heating Jun_19;C;7.24
+Results peak heating Jul_19;C;8.06
+Results peak heating Aug_19;C;8.23
+Results peak heating Sep_19;C;6.71
+Results peak heating Oct_19;C;5.82
+Results peak heating Nov_19;C;4.97
+Results peak heating Dec_19;C;4.27
+Results peak heating Jan_20;C;3.78
+Results peak heating Feb_20;C;4.05
+Results peak heating Mar_20;C;4.57
+Results peak heating Apr_20;C;6.14
+Results peak heating May_20;C;6.12
+Results peak heating Jun_20;C;7.15
+Results peak heating Jul_20;C;7.97
+Results peak heating Aug_20;C;8.15
+Results peak heating Sep_20;C;6.63
+Results peak heating Oct_20;C;5.74
+Results peak heating Nov_20;C;4.89
+Results peak heating Dec_20;C;4.18
+Results peak cooling Jan_1;C;8.18
+Results peak cooling Feb_1;C;8.24
+Results peak cooling Mar_1;C;8.63
+Results peak cooling Apr_1;C;10.5
+Results peak cooling May_1;C;10.53
+Results peak cooling Jun_1;C;11.99
+Results peak cooling Jul_1;C;12.85
+Results peak cooling Aug_1;C;13.26
+Results peak cooling Sep_1;C;11.3
+Results peak cooling Oct_1;C;9.55
+Results peak cooling Nov_1;C;8.71
+Results peak cooling Dec_1;C;8.06
+Results peak cooling Jan_2;C;7.76
+Results peak cooling Feb_2;C;7.87
+Results peak cooling Mar_2;C;8.28
+Results peak cooling Apr_2;C;10.16
+Results peak cooling May_2;C;10.19
+Results peak cooling Jun_2;C;11.66
+Results peak cooling Jul_2;C;12.52
+Results peak cooling Aug_2;C;12.94
+Results peak cooling Sep_2;C;10.98
+Results peak cooling Oct_2;C;9.24
+Results peak cooling Nov_2;C;8.39
+Results peak cooling Dec_2;C;7.75
+Results peak cooling Jan_3;C;7.45
+Results peak cooling Feb_3;C;7.57
+Results peak cooling Mar_3;C;7.98
+Results peak cooling Apr_3;C;9.86
+Results peak cooling May_3;C;9.9
+Results peak cooling Jun_3;C;11.37
+Results peak cooling Jul_3;C;12.23
+Results peak cooling Aug_3;C;12.65
+Results peak cooling Sep_3;C;10.69
+Results peak cooling Oct_3;C;8.96
+Results peak cooling Nov_3;C;8.12
+Results peak cooling Dec_3;C;7.48
+Results peak cooling Jan_4;C;7.18
+Results peak cooling Feb_4;C;7.3
+Results peak cooling Mar_4;C;7.72
+Results peak cooling Apr_4;C;9.6
+Results peak cooling May_4;C;9.64
+Results peak cooling Jun_4;C;11.11
+Results peak cooling Jul_4;C;11.97
+Results peak cooling Aug_4;C;12.4
+Results peak cooling Sep_4;C;10.44
+Results peak cooling Oct_4;C;8.71
+Results peak cooling Nov_4;C;7.87
+Results peak cooling Dec_4;C;7.23
+Results peak cooling Jan_5;C;6.94
+Results peak cooling Feb_5;C;7.06
+Results peak cooling Mar_5;C;7.48
+Results peak cooling Apr_5;C;9.37
+Results peak cooling May_5;C;9.41
+Results peak cooling Jun_5;C;10.88
+Results peak cooling Jul_5;C;11.74
+Results peak cooling Aug_5;C;12.17
+Results peak cooling Sep_5;C;10.22
+Results peak cooling Oct_5;C;8.49
+Results peak cooling Nov_5;C;7.65
+Results peak cooling Dec_5;C;7.01
+Results peak cooling Jan_6;C;6.72
+Results peak cooling Feb_6;C;6.84
+Results peak cooling Mar_6;C;7.26
+Results peak cooling Apr_6;C;9.14
+Results peak cooling May_6;C;9.18
+Results peak cooling Jun_6;C;10.66
+Results peak cooling Jul_6;C;11.52
+Results peak cooling Aug_6;C;11.96
+Results peak cooling Sep_6;C;10.02
+Results peak cooling Oct_6;C;8.29
+Results peak cooling Nov_6;C;7.45
+Results peak cooling Dec_6;C;6.81
+Results peak cooling Jan_7;C;6.52
+Results peak cooling Feb_7;C;6.64
+Results peak cooling Mar_7;C;7.06
+Results peak cooling Apr_7;C;8.94
+Results peak cooling May_7;C;8.98
+Results peak cooling Jun_7;C;10.45
+Results peak cooling Jul_7;C;11.33
+Results peak cooling Aug_7;C;11.77
+Results peak cooling Sep_7;C;9.83
+Results peak cooling Oct_7;C;8.11
+Results peak cooling Nov_7;C;7.27
+Results peak cooling Dec_7;C;6.63
+Results peak cooling Jan_8;C;6.34
+Results peak cooling Feb_8;C;6.45
+Results peak cooling Mar_8;C;6.87
+Results peak cooling Apr_8;C;8.75
+Results peak cooling May_8;C;8.79
+Results peak cooling Jun_8;C;10.27
+Results peak cooling Jul_8;C;11.15
+Results peak cooling Aug_8;C;11.6
+Results peak cooling Sep_8;C;9.66
+Results peak cooling Oct_8;C;7.94
+Results peak cooling Nov_8;C;7.1
+Results peak cooling Dec_8;C;6.46
+Results peak cooling Jan_9;C;6.16
+Results peak cooling Feb_9;C;6.28
+Results peak cooling Mar_9;C;6.69
+Results peak cooling Apr_9;C;8.57
+Results peak cooling May_9;C;8.62
+Results peak cooling Jun_9;C;10.11
+Results peak cooling Jul_9;C;10.99
+Results peak cooling Aug_9;C;11.44
+Results peak cooling Sep_9;C;9.5
+Results peak cooling Oct_9;C;7.78
+Results peak cooling Nov_9;C;6.94
+Results peak cooling Dec_9;C;6.3
+Results peak cooling Jan_10;C;6.0
+Results peak cooling Feb_10;C;6.11
+Results peak cooling Mar_10;C;6.52
+Results peak cooling Apr_10;C;8.41
+Results peak cooling May_10;C;8.46
+Results peak cooling Jun_10;C;9.96
+Results peak cooling Jul_10;C;10.85
+Results peak cooling Aug_10;C;11.3
+Results peak cooling Sep_10;C;9.36
+Results peak cooling Oct_10;C;7.63
+Results peak cooling Nov_10;C;6.79
+Results peak cooling Dec_10;C;6.14
+Results peak cooling Jan_11;C;5.84
+Results peak cooling Feb_11;C;5.96
+Results peak cooling Mar_11;C;6.37
+Results peak cooling Apr_11;C;8.26
+Results peak cooling May_11;C;8.32
+Results peak cooling Jun_11;C;9.81
+Results peak cooling Jul_11;C;10.71
+Results peak cooling Aug_11;C;11.15
+Results peak cooling Sep_11;C;9.22
+Results peak cooling Oct_11;C;7.49
+Results peak cooling Nov_11;C;6.65
+Results peak cooling Dec_11;C;6.0
+Results peak cooling Jan_12;C;5.7
+Results peak cooling Feb_12;C;5.81
+Results peak cooling Mar_12;C;6.23
+Results peak cooling Apr_12;C;8.13
+Results peak cooling May_12;C;8.19
+Results peak cooling Jun_12;C;9.69
+Results peak cooling Jul_12;C;10.58
+Results peak cooling Aug_12;C;11.03
+Results peak cooling Sep_12;C;9.08
+Results peak cooling Oct_12;C;7.35
+Results peak cooling Nov_12;C;6.51
+Results peak cooling Dec_12;C;5.86
+Results peak cooling Jan_13;C;5.56
+Results peak cooling Feb_13;C;5.68
+Results peak cooling Mar_13;C;6.1
+Results peak cooling Apr_13;C;8.0
+Results peak cooling May_13;C;8.06
+Results peak cooling Jun_13;C;9.56
+Results peak cooling Jul_13;C;10.45
+Results peak cooling Aug_13;C;10.9
+Results peak cooling Sep_13;C;8.96
+Results peak cooling Oct_13;C;7.23
+Results peak cooling Nov_13;C;6.38
+Results peak cooling Dec_13;C;5.73
+Results peak cooling Jan_14;C;5.43
+Results peak cooling Feb_14;C;5.56
+Results peak cooling Mar_14;C;5.99
+Results peak cooling Apr_14;C;7.89
+Results peak cooling May_14;C;7.95
+Results peak cooling Jun_14;C;9.44
+Results peak cooling Jul_14;C;10.33
+Results peak cooling Aug_14;C;10.78
+Results peak cooling Sep_14;C;8.83
+Results peak cooling Oct_14;C;7.1
+Results peak cooling Nov_14;C;6.26
+Results peak cooling Dec_14;C;5.61
+Results peak cooling Jan_15;C;5.32
+Results peak cooling Feb_15;C;5.44
+Results peak cooling Mar_15;C;5.87
+Results peak cooling Apr_15;C;7.77
+Results peak cooling May_15;C;7.83
+Results peak cooling Jun_15;C;9.33
+Results peak cooling Jul_15;C;10.22
+Results peak cooling Aug_15;C;10.66
+Results peak cooling Sep_15;C;8.72
+Results peak cooling Oct_15;C;6.99
+Results peak cooling Nov_15;C;6.14
+Results peak cooling Dec_15;C;5.5
+Results peak cooling Jan_16;C;5.21
+Results peak cooling Feb_16;C;5.34
+Results peak cooling Mar_16;C;5.77
+Results peak cooling Apr_16;C;7.67
+Results peak cooling May_16;C;7.73
+Results peak cooling Jun_16;C;9.22
+Results peak cooling Jul_16;C;10.11
+Results peak cooling Aug_16;C;10.55
+Results peak cooling Sep_16;C;8.61
+Results peak cooling Oct_16;C;6.88
+Results peak cooling Nov_16;C;6.04
+Results peak cooling Dec_16;C;5.4
+Results peak cooling Jan_17;C;5.11
+Results peak cooling Feb_17;C;5.23
+Results peak cooling Mar_17;C;5.66
+Results peak cooling Apr_17;C;7.56
+Results peak cooling May_17;C;7.62
+Results peak cooling Jun_17;C;9.12
+Results peak cooling Jul_17;C;10.0
+Results peak cooling Aug_17;C;10.45
+Results peak cooling Sep_17;C;8.5
+Results peak cooling Oct_17;C;6.77
+Results peak cooling Nov_17;C;5.94
+Results peak cooling Dec_17;C;5.3
+Results peak cooling Jan_18;C;5.01
+Results peak cooling Feb_18;C;5.14
+Results peak cooling Mar_18;C;5.57
+Results peak cooling Apr_18;C;7.47
+Results peak cooling May_18;C;7.53
+Results peak cooling Jun_18;C;9.02
+Results peak cooling Jul_18;C;9.9
+Results peak cooling Aug_18;C;10.35
+Results peak cooling Sep_18;C;8.41
+Results peak cooling Oct_18;C;6.68
+Results peak cooling Nov_18;C;5.84
+Results peak cooling Dec_18;C;5.21
+Results peak cooling Jan_19;C;4.92
+Results peak cooling Feb_19;C;5.05
+Results peak cooling Mar_19;C;5.47
+Results peak cooling Apr_19;C;7.37
+Results peak cooling May_19;C;7.43
+Results peak cooling Jun_19;C;8.92
+Results peak cooling Jul_19;C;9.81
+Results peak cooling Aug_19;C;10.25
+Results peak cooling Sep_19;C;8.31
+Results peak cooling Oct_19;C;6.59
+Results peak cooling Nov_19;C;5.76
+Results peak cooling Dec_19;C;5.12
+Results peak cooling Jan_20;C;4.84
+Results peak cooling Feb_20;C;4.96
+Results peak cooling Mar_20;C;5.39
+Results peak cooling Apr_20;C;7.28
+Results peak cooling May_20;C;7.34
+Results peak cooling Jun_20;C;8.83
+Results peak cooling Jul_20;C;9.72
+Results peak cooling Aug_20;C;10.17
+Results peak cooling Sep_20;C;8.23
+Results peak cooling Oct_20;C;6.51
+Results peak cooling Nov_20;C;5.68
+Results peak cooling Dec_20;C;5.04
+Results load heating Jan_1;C;8.08
+Results load heating Feb_1;C;8.14
+Results load heating Mar_1;C;8.32
+Results load heating Apr_1;C;9.91
+Results load heating May_1;C;9.31
+Results load heating Jun_1;C;10.31
+Results load heating Jul_1;C;11.09
+Results load heating Aug_1;C;11.24
+Results load heating Sep_1;C;9.85
+Results load heating Oct_1;C;9.28
+Results load heating Nov_1;C;8.63
+Results load heating Dec_1;C;7.97
+Results load heating Jan_2;C;7.66
+Results load heating Feb_2;C;7.77
+Results load heating Mar_2;C;7.97
+Results load heating Apr_2;C;9.56
+Results load heating May_2;C;8.97
+Results load heating Jun_2;C;9.98
+Results load heating Jul_2;C;10.76
+Results load heating Aug_2;C;10.92
+Results load heating Sep_2;C;9.53
+Results load heating Oct_2;C;8.96
+Results load heating Nov_2;C;8.31
+Results load heating Dec_2;C;7.66
+Results load heating Jan_3;C;7.36
+Results load heating Feb_3;C;7.47
+Results load heating Mar_3;C;7.67
+Results load heating Apr_3;C;9.27
+Results load heating May_3;C;8.68
+Results load heating Jun_3;C;9.69
+Results load heating Jul_3;C;10.48
+Results load heating Aug_3;C;10.63
+Results load heating Sep_3;C;9.25
+Results load heating Oct_3;C;8.68
+Results load heating Nov_3;C;8.04
+Results load heating Dec_3;C;7.39
+Results load heating Jan_4;C;7.09
+Results load heating Feb_4;C;7.2
+Results load heating Mar_4;C;7.4
+Results load heating Apr_4;C;9.01
+Results load heating May_4;C;8.42
+Results load heating Jun_4;C;9.43
+Results load heating Jul_4;C;10.22
+Results load heating Aug_4;C;10.38
+Results load heating Sep_4;C;9.0
+Results load heating Oct_4;C;8.43
+Results load heating Nov_4;C;7.79
+Results load heating Dec_4;C;7.14
+Results load heating Jan_5;C;6.84
+Results load heating Feb_5;C;6.96
+Results load heating Mar_5;C;7.16
+Results load heating Apr_5;C;8.77
+Results load heating May_5;C;8.18
+Results load heating Jun_5;C;9.2
+Results load heating Jul_5;C;9.99
+Results load heating Aug_5;C;10.15
+Results load heating Sep_5;C;8.77
+Results load heating Oct_5;C;8.21
+Results load heating Nov_5;C;7.57
+Results load heating Dec_5;C;6.92
+Results load heating Jan_6;C;6.63
+Results load heating Feb_6;C;6.75
+Results load heating Mar_6;C;6.95
+Results load heating Apr_6;C;8.55
+Results load heating May_6;C;7.96
+Results load heating Jun_6;C;8.98
+Results load heating Jul_6;C;9.77
+Results load heating Aug_6;C;9.94
+Results load heating Sep_6;C;8.57
+Results load heating Oct_6;C;8.01
+Results load heating Nov_6;C;7.37
+Results load heating Dec_6;C;6.73
+Results load heating Jan_7;C;6.43
+Results load heating Feb_7;C;6.54
+Results load heating Mar_7;C;6.74
+Results load heating Apr_7;C;8.34
+Results load heating May_7;C;7.75
+Results load heating Jun_7;C;8.77
+Results load heating Jul_7;C;9.58
+Results load heating Aug_7;C;9.75
+Results load heating Sep_7;C;8.39
+Results load heating Oct_7;C;7.83
+Results load heating Nov_7;C;7.19
+Results load heating Dec_7;C;6.54
+Results load heating Jan_8;C;6.24
+Results load heating Feb_8;C;6.35
+Results load heating Mar_8;C;6.55
+Results load heating Apr_8;C;8.15
+Results load heating May_8;C;7.57
+Results load heating Jun_8;C;8.59
+Results load heating Jul_8;C;9.4
+Results load heating Aug_8;C;9.58
+Results load heating Sep_8;C;8.22
+Results load heating Oct_8;C;7.66
+Results load heating Nov_8;C;7.02
+Results load heating Dec_8;C;6.37
+Results load heating Jan_9;C;6.07
+Results load heating Feb_9;C;6.18
+Results load heating Mar_9;C;6.37
+Results load heating Apr_9;C;7.98
+Results load heating May_9;C;7.39
+Results load heating Jun_9;C;8.43
+Results load heating Jul_9;C;9.24
+Results load heating Aug_9;C;9.42
+Results load heating Sep_9;C;8.06
+Results load heating Oct_9;C;7.5
+Results load heating Nov_9;C;6.86
+Results load heating Dec_9;C;6.21
+Results load heating Jan_10;C;5.9
+Results load heating Feb_10;C;6.01
+Results load heating Mar_10;C;6.21
+Results load heating Apr_10;C;7.81
+Results load heating May_10;C;7.24
+Results load heating Jun_10;C;8.28
+Results load heating Jul_10;C;9.1
+Results load heating Aug_10;C;9.28
+Results load heating Sep_10;C;7.91
+Results load heating Oct_10;C;7.36
+Results load heating Nov_10;C;6.71
+Results load heating Dec_10;C;6.05
+Results load heating Jan_11;C;5.75
+Results load heating Feb_11;C;5.86
+Results load heating Mar_11;C;6.06
+Results load heating Apr_11;C;7.67
+Results load heating May_11;C;7.1
+Results load heating Jun_11;C;8.13
+Results load heating Jul_11;C;8.95
+Results load heating Aug_11;C;9.13
+Results load heating Sep_11;C;7.77
+Results load heating Oct_11;C;7.21
+Results load heating Nov_11;C;6.57
+Results load heating Dec_11;C;5.91
+Results load heating Jan_12;C;5.6
+Results load heating Feb_12;C;5.71
+Results load heating Mar_12;C;5.92
+Results load heating Apr_12;C;7.53
+Results load heating May_12;C;6.97
+Results load heating Jun_12;C;8.0
+Results load heating Jul_12;C;8.82
+Results load heating Aug_12;C;9.0
+Results load heating Sep_12;C;7.64
+Results load heating Oct_12;C;7.08
+Results load heating Nov_12;C;6.43
+Results load heating Dec_12;C;5.77
+Results load heating Jan_13;C;5.47
+Results load heating Feb_13;C;5.58
+Results load heating Mar_13;C;5.79
+Results load heating Apr_13;C;7.41
+Results load heating May_13;C;6.84
+Results load heating Jun_13;C;7.88
+Results load heating Jul_13;C;8.7
+Results load heating Aug_13;C;8.88
+Results load heating Sep_13;C;7.51
+Results load heating Oct_13;C;6.95
+Results load heating Nov_13;C;6.3
+Results load heating Dec_13;C;5.64
+Results load heating Jan_14;C;5.34
+Results load heating Feb_14;C;5.46
+Results load heating Mar_14;C;5.67
+Results load heating Apr_14;C;7.29
+Results load heating May_14;C;6.72
+Results load heating Jun_14;C;7.76
+Results load heating Jul_14;C;8.58
+Results load heating Aug_14;C;8.76
+Results load heating Sep_14;C;7.39
+Results load heating Oct_14;C;6.82
+Results load heating Nov_14;C;6.18
+Results load heating Dec_14;C;5.52
+Results load heating Jan_15;C;5.22
+Results load heating Feb_15;C;5.34
+Results load heating Mar_15;C;5.55
+Results load heating Apr_15;C;7.18
+Results load heating May_15;C;6.61
+Results load heating Jun_15;C;7.65
+Results load heating Jul_15;C;8.47
+Results load heating Aug_15;C;8.64
+Results load heating Sep_15;C;7.27
+Results load heating Oct_15;C;6.71
+Results load heating Nov_15;C;6.06
+Results load heating Dec_15;C;5.41
+Results load heating Jan_16;C;5.12
+Results load heating Feb_16;C;5.24
+Results load heating Mar_16;C;5.45
+Results load heating Apr_16;C;7.07
+Results load heating May_16;C;6.5
+Results load heating Jun_16;C;7.54
+Results load heating Jul_16;C;8.35
+Results load heating Aug_16;C;8.53
+Results load heating Sep_16;C;7.16
+Results load heating Oct_16;C;6.6
+Results load heating Nov_16;C;5.96
+Results load heating Dec_16;C;5.31
+Results load heating Jan_17;C;5.01
+Results load heating Feb_17;C;5.14
+Results load heating Mar_17;C;5.35
+Results load heating Apr_17;C;6.97
+Results load heating May_17;C;6.4
+Results load heating Jun_17;C;7.44
+Results load heating Jul_17;C;8.25
+Results load heating Aug_17;C;8.43
+Results load heating Sep_17;C;7.06
+Results load heating Oct_17;C;6.5
+Results load heating Nov_17;C;5.86
+Results load heating Dec_17;C;5.21
+Results load heating Jan_18;C;4.92
+Results load heating Feb_18;C;5.04
+Results load heating Mar_18;C;5.25
+Results load heating Apr_18;C;6.87
+Results load heating May_18;C;6.3
+Results load heating Jun_18;C;7.34
+Results load heating Jul_18;C;8.15
+Results load heating Aug_18;C;8.33
+Results load heating Sep_18;C;6.96
+Results load heating Oct_18;C;6.4
+Results load heating Nov_18;C;5.76
+Results load heating Dec_18;C;5.12
+Results load heating Jan_19;C;4.82
+Results load heating Feb_19;C;4.95
+Results load heating Mar_19;C;5.16
+Results load heating Apr_19;C;6.78
+Results load heating May_19;C;6.21
+Results load heating Jun_19;C;7.24
+Results load heating Jul_19;C;8.06
+Results load heating Aug_19;C;8.23
+Results load heating Sep_19;C;6.87
+Results load heating Oct_19;C;6.31
+Results load heating Nov_19;C;5.68
+Results load heating Dec_19;C;5.03
+Results load heating Jan_20;C;4.74
+Results load heating Feb_20;C;4.86
+Results load heating Mar_20;C;5.07
+Results load heating Apr_20;C;6.69
+Results load heating May_20;C;6.12
+Results load heating Jun_20;C;7.15
+Results load heating Jul_20;C;7.97
+Results load heating Aug_20;C;8.15
+Results load heating Sep_20;C;6.79
+Results load heating Oct_20;C;6.23
+Results load heating Nov_20;C;5.6
+Results load heating Dec_20;C;4.95
+Results load cooling Jan_1;C;8.18
+Results load cooling Feb_1;C;8.24
+Results load cooling Mar_1;C;8.4
+Results load cooling Apr_1;C;9.92
+Results load cooling May_1;C;9.37
+Results load cooling Jun_1;C;10.34
+Results load cooling Jul_1;C;11.15
+Results load cooling Aug_1;C;11.3
+Results load cooling Sep_1;C;9.92
+Results load cooling Oct_1;C;9.35
+Results load cooling Nov_1;C;8.71
+Results load cooling Dec_1;C;8.06
+Results load cooling Jan_2;C;7.76
+Results load cooling Feb_2;C;7.87
+Results load cooling Mar_2;C;8.05
+Results load cooling Apr_2;C;9.58
+Results load cooling May_2;C;9.03
+Results load cooling Jun_2;C;10.01
+Results load cooling Jul_2;C;10.82
+Results load cooling Aug_2;C;10.98
+Results load cooling Sep_2;C;9.6
+Results load cooling Oct_2;C;9.03
+Results load cooling Nov_2;C;8.39
+Results load cooling Dec_2;C;7.75
+Results load cooling Jan_3;C;7.45
+Results load cooling Feb_3;C;7.57
+Results load cooling Mar_3;C;7.75
+Results load cooling Apr_3;C;9.28
+Results load cooling May_3;C;8.74
+Results load cooling Jun_3;C;9.72
+Results load cooling Jul_3;C;10.54
+Results load cooling Aug_3;C;10.69
+Results load cooling Sep_3;C;9.31
+Results load cooling Oct_3;C;8.75
+Results load cooling Nov_3;C;8.12
+Results load cooling Dec_3;C;7.48
+Results load cooling Jan_4;C;7.18
+Results load cooling Feb_4;C;7.3
+Results load cooling Mar_4;C;7.49
+Results load cooling Apr_4;C;9.02
+Results load cooling May_4;C;8.48
+Results load cooling Jun_4;C;9.46
+Results load cooling Jul_4;C;10.28
+Results load cooling Aug_4;C;10.44
+Results load cooling Sep_4;C;9.06
+Results load cooling Oct_4;C;8.5
+Results load cooling Nov_4;C;7.87
+Results load cooling Dec_4;C;7.23
+Results load cooling Jan_5;C;6.94
+Results load cooling Feb_5;C;7.06
+Results load cooling Mar_5;C;7.25
+Results load cooling Apr_5;C;8.79
+Results load cooling May_5;C;8.24
+Results load cooling Jun_5;C;9.23
+Results load cooling Jul_5;C;10.05
+Results load cooling Aug_5;C;10.21
+Results load cooling Sep_5;C;8.84
+Results load cooling Oct_5;C;8.28
+Results load cooling Nov_5;C;7.65
+Results load cooling Dec_5;C;7.01
+Results load cooling Jan_6;C;6.72
+Results load cooling Feb_6;C;6.84
+Results load cooling Mar_6;C;7.03
+Results load cooling Apr_6;C;8.56
+Results load cooling May_6;C;8.02
+Results load cooling Jun_6;C;9.01
+Results load cooling Jul_6;C;9.83
+Results load cooling Aug_6;C;10.0
+Results load cooling Sep_6;C;8.64
+Results load cooling Oct_6;C;8.08
+Results load cooling Nov_6;C;7.45
+Results load cooling Dec_6;C;6.81
+Results load cooling Jan_7;C;6.52
+Results load cooling Feb_7;C;6.64
+Results load cooling Mar_7;C;6.83
+Results load cooling Apr_7;C;8.36
+Results load cooling May_7;C;7.81
+Results load cooling Jun_7;C;8.8
+Results load cooling Jul_7;C;9.64
+Results load cooling Aug_7;C;9.81
+Results load cooling Sep_7;C;8.45
+Results load cooling Oct_7;C;7.9
+Results load cooling Nov_7;C;7.27
+Results load cooling Dec_7;C;6.63
+Results load cooling Jan_8;C;6.34
+Results load cooling Feb_8;C;6.45
+Results load cooling Mar_8;C;6.64
+Results load cooling Apr_8;C;8.17
+Results load cooling May_8;C;7.63
+Results load cooling Jun_8;C;8.62
+Results load cooling Jul_8;C;9.46
+Results load cooling Aug_8;C;9.64
+Results load cooling Sep_8;C;8.28
+Results load cooling Oct_8;C;7.73
+Results load cooling Nov_8;C;7.1
+Results load cooling Dec_8;C;6.46
+Results load cooling Jan_9;C;6.16
+Results load cooling Feb_9;C;6.28
+Results load cooling Mar_9;C;6.46
+Results load cooling Apr_9;C;7.99
+Results load cooling May_9;C;7.45
+Results load cooling Jun_9;C;8.46
+Results load cooling Jul_9;C;9.3
+Results load cooling Aug_9;C;9.48
+Results load cooling Sep_9;C;8.12
+Results load cooling Oct_9;C;7.57
+Results load cooling Nov_9;C;6.94
+Results load cooling Dec_9;C;6.3
+Results load cooling Jan_10;C;6.0
+Results load cooling Feb_10;C;6.11
+Results load cooling Mar_10;C;6.29
+Results load cooling Apr_10;C;7.83
+Results load cooling May_10;C;7.3
+Results load cooling Jun_10;C;8.31
+Results load cooling Jul_10;C;9.16
+Results load cooling Aug_10;C;9.34
+Results load cooling Sep_10;C;7.98
+Results load cooling Oct_10;C;7.43
+Results load cooling Nov_10;C;6.79
+Results load cooling Dec_10;C;6.14
+Results load cooling Jan_11;C;5.84
+Results load cooling Feb_11;C;5.96
+Results load cooling Mar_11;C;6.14
+Results load cooling Apr_11;C;7.68
+Results load cooling May_11;C;7.16
+Results load cooling Jun_11;C;8.16
+Results load cooling Jul_11;C;9.01
+Results load cooling Aug_11;C;9.19
+Results load cooling Sep_11;C;7.84
+Results load cooling Oct_11;C;7.28
+Results load cooling Nov_11;C;6.65
+Results load cooling Dec_11;C;6.0
+Results load cooling Jan_12;C;5.7
+Results load cooling Feb_12;C;5.81
+Results load cooling Mar_12;C;6.0
+Results load cooling Apr_12;C;7.55
+Results load cooling May_12;C;7.02
+Results load cooling Jun_12;C;8.04
+Results load cooling Jul_12;C;8.88
+Results load cooling Aug_12;C;9.06
+Results load cooling Sep_12;C;7.7
+Results load cooling Oct_12;C;7.15
+Results load cooling Nov_12;C;6.51
+Results load cooling Dec_12;C;5.86
+Results load cooling Jan_13;C;5.56
+Results load cooling Feb_13;C;5.68
+Results load cooling Mar_13;C;5.87
+Results load cooling Apr_13;C;7.42
+Results load cooling May_13;C;6.9
+Results load cooling Jun_13;C;7.91
+Results load cooling Jul_13;C;8.76
+Results load cooling Aug_13;C;8.94
+Results load cooling Sep_13;C;7.58
+Results load cooling Oct_13;C;7.02
+Results load cooling Nov_13;C;6.38
+Results load cooling Dec_13;C;5.73
+Results load cooling Jan_14;C;5.43
+Results load cooling Feb_14;C;5.56
+Results load cooling Mar_14;C;5.76
+Results load cooling Apr_14;C;7.3
+Results load cooling May_14;C;6.78
+Results load cooling Jun_14;C;7.79
+Results load cooling Jul_14;C;8.64
+Results load cooling Aug_14;C;8.82
+Results load cooling Sep_14;C;7.45
+Results load cooling Oct_14;C;6.9
+Results load cooling Nov_14;C;6.26
+Results load cooling Dec_14;C;5.61
+Results load cooling Jan_15;C;5.32
+Results load cooling Feb_15;C;5.44
+Results load cooling Mar_15;C;5.64
+Results load cooling Apr_15;C;7.19
+Results load cooling May_15;C;6.67
+Results load cooling Jun_15;C;7.68
+Results load cooling Jul_15;C;8.53
+Results load cooling Aug_15;C;8.7
+Results load cooling Sep_15;C;7.34
+Results load cooling Oct_15;C;6.78
+Results load cooling Nov_15;C;6.14
+Results load cooling Dec_15;C;5.5
+Results load cooling Jan_16;C;5.21
+Results load cooling Feb_16;C;5.34
+Results load cooling Mar_16;C;5.54
+Results load cooling Apr_16;C;7.09
+Results load cooling May_16;C;6.56
+Results load cooling Jun_16;C;7.57
+Results load cooling Jul_16;C;8.42
+Results load cooling Aug_16;C;8.59
+Results load cooling Sep_16;C;7.23
+Results load cooling Oct_16;C;6.67
+Results load cooling Nov_16;C;6.04
+Results load cooling Dec_16;C;5.4
+Results load cooling Jan_17;C;5.11
+Results load cooling Feb_17;C;5.23
+Results load cooling Mar_17;C;5.43
+Results load cooling Apr_17;C;6.98
+Results load cooling May_17;C;6.46
+Results load cooling Jun_17;C;7.47
+Results load cooling Jul_17;C;8.31
+Results load cooling Aug_17;C;8.49
+Results load cooling Sep_17;C;7.12
+Results load cooling Oct_17;C;6.57
+Results load cooling Nov_17;C;5.94
+Results load cooling Dec_17;C;5.3
+Results load cooling Jan_18;C;5.01
+Results load cooling Feb_18;C;5.14
+Results load cooling Mar_18;C;5.34
+Results load cooling Apr_18;C;6.89
+Results load cooling May_18;C;6.36
+Results load cooling Jun_18;C;7.37
+Results load cooling Jul_18;C;8.21
+Results load cooling Aug_18;C;8.39
+Results load cooling Sep_18;C;7.02
+Results load cooling Oct_18;C;6.47
+Results load cooling Nov_18;C;5.84
+Results load cooling Dec_18;C;5.21
+Results load cooling Jan_19;C;4.92
+Results load cooling Feb_19;C;5.05
+Results load cooling Mar_19;C;5.24
+Results load cooling Apr_19;C;6.79
+Results load cooling May_19;C;6.27
+Results load cooling Jun_19;C;7.27
+Results load cooling Jul_19;C;8.12
+Results load cooling Aug_19;C;8.29
+Results load cooling Sep_19;C;6.93
+Results load cooling Oct_19;C;6.39
+Results load cooling Nov_19;C;5.76
+Results load cooling Dec_19;C;5.12
+Results load cooling Jan_20;C;4.84
+Results load cooling Feb_20;C;4.96
+Results load cooling Mar_20;C;5.16
+Results load cooling Apr_20;C;6.7
+Results load cooling May_20;C;6.17
+Results load cooling Jun_20;C;7.18
+Results load cooling Jul_20;C;8.03
+Results load cooling Aug_20;C;8.21
+Results load cooling Sep_20;C;6.85
+Results load cooling Oct_20;C;6.3
+Results load cooling Nov_20;C;5.68
+Results load cooling Dec_20;C;5.04

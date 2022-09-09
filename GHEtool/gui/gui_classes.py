@@ -195,7 +195,8 @@ class ButtonBox(Option):
     def set_value(self, index: int) -> None:
         for idx, button in enumerate(self.widget):
             if idx == index:
-                button.click()
+                if not button.isChecked():
+                    button.click()
                 break
 
     def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout, row: int = None, column: int = None) -> None:
@@ -393,8 +394,8 @@ class FunctionButton:
         layout.addItem(spacer1)
 
         layout.addWidget(self.button)
-        spacer1 = qt_w.QSpacerItem(1, 1, qt_w.QSizePolicy.Expanding, qt_w.QSizePolicy.Minimum)
-        layout.addItem(spacer1)
+        spacer2 = qt_w.QSpacerItem(1, 1, qt_w.QSizePolicy.Expanding, qt_w.QSizePolicy.Minimum)
+        layout.addItem(spacer2)
 
         layout_parent.addWidget(self.frame)
 

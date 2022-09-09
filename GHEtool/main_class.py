@@ -1349,9 +1349,11 @@ class Borefield:
         except ValueError:
             if self.printing:
                 if self.simulation_period > Borefield.MAX_SIMULATION_PERIOD:
+                    print(self.H, self.B, self.Rb, self.N_1, self.N_2, self.Tg)
                     print(f'Your requested simulation period of {self.simulation_period} years is beyond the limit of '
                           f'{Borefield.MAX_SIMULATION_PERIOD}) years of the precalculated data.')
                 else:
+                    print(self.H, self.B, self.Rb, self.N_1, self.N_2, self.Tg)
                     print(f"Your requested depth of {H} m is beyond the limit {self.H_max} m of the precalculated "
                           f"data.")
                     print("Please change your borefield configuration accordingly.")
@@ -1786,7 +1788,7 @@ class Borefield:
                         break
                     # try to size current borefield configuration else set minimal product
                     try:
-                        depth = self.size(H_max, L2Sizing=L2_sizing, L3_sizing=not L2_sizing, use_constant_Rb=use_constant_Rb)
+                        depth = self.size(H_max, L2_sizing=L2_sizing, L3_sizing=not L2_sizing, use_constant_Rb=use_constant_Rb)
                     except ValueError:
                         product_min = product
                         continue
