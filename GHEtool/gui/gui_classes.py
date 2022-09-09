@@ -122,6 +122,7 @@ class DoubleValue(Option):
                                   f"border: 1px solid {WHITE};\n"
                                   "font: 11pt \"Lexend Deca Light\";}\n")
         self.widget.setAlignment(qt_c.Qt.AlignRight | qt_c.Qt.AlignTrailing | qt_c.Qt.AlignVCenter)
+        self.widget.setProperty("showGroupSeparator", True)
         self.widget.setMinimum(self.minimal_value)
         self.widget.setMaximum(self.maximal_value)
         self.widget.setDecimals(self.decimal_number)
@@ -346,13 +347,61 @@ class Hint:
         layout_parent.addWidget(self.label)
 
 
+class FunctionButton:
+
+    def __init__(self, default_parent: qt_w.QWidget, widget_name: str, button_text: str, icon: str):
+        self.button_text: str = button_text
+        self.widget_name: str = widget_name
+        self.icon: str = icon
+        self.frame: qt_w.QFrame = qt_w.QFrame(default_parent)
+        self.button: qt_w.QPushButton = qt_w.QPushButton(default_parent)
+
+    def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout):
+        self.button.setParent(frame)
+        self.button.setObjectName(f"button_{self.widget_name}")
+        self.button.setText(f'  {self.button_text}  ')
+        icon = qt_g.QIcon()
+        # icon11.addPixmap(QtGui_QPixmap(icon), QtGui_QIcon.Normal, QtGui_QIcon.Off)
+        icon.addFile(self.icon)
+        self.button.setIcon(icon)
+        self.button.setIconSize(qt_c.QSize(20, 20))
+        self.button.setMinimumWidth(100)
+        self.button.setMinimumHeight(35)
+        self.frame.setParent(frame)
+        self.frame.setObjectName(f"frame_{self.widget_name}")
+        self.frame.setFrameShape(qt_w.QFrame.StyledPanel)
+        self.frame.setFrameShadow(qt_w.QFrame.Raised)
+        self.frame.setStyleSheet("QFrame {\n"
+                                 f"	border: 0px solid {WHITE};\n"
+                                 "	border-radius: 0px;\n"
+                                 "  }\n")
+        layout = qt_w.QHBoxLayout(self.frame)
+        layout.setSpacing(6)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setObjectName(f"verticalLayout_{self.widget_name}")
+        spacer1 = qt_w.QSpacerItem(1, 1, qt_w.QSizePolicy.Expanding, qt_w.QSizePolicy.Minimum)
+        layout.addItem(spacer1)
+
+        layout.addWidget(self.button)
+        spacer1 = qt_w.QSpacerItem(1, 1, qt_w.QSizePolicy.Expanding, qt_w.QSizePolicy.Minimum)
+        layout.addItem(spacer1)
+
+        layout_parent.addWidget(self.frame)
+
+    def hide(self) -> None:
+        self.frame.hide()
+
+    def show(self) -> None:
+        self.frame.show()
+
+
 class Category:
 
-    def __init__(self, default_parent: qt_w.QWidget, obj_name: str, label: str, list_of_options: List[Option]):
+    def __init__(self, default_parent: qt_w.QWidget, obj_name: str, label: str, list_of_options: List[Union[Option, Hint, FunctionButton]]):
         self.obj_name: str = obj_name
         self.label_text: str = label
         self.label: qt_w.QLabel = qt_w.QLabel(default_parent)
-        self.list_of_options: List[Option] = list_of_options
+        self.list_of_options: List[Union[Option, Hint, FunctionButton]] = list_of_options
         self.frame: qt_w.QFrame = qt_w.QFrame(default_parent)
         self.graphic_left: Optional[Union[qt_w.QGraphicsView, bool]] = None
         self.graphic_right: Optional[Union[qt_w.QGraphicsView, bool]] = None
@@ -406,14 +455,12 @@ class Category:
             layout_frane = qt_w.QGridLayout(self.frame)
             row = 0
             column = 0
-            print(self.list_of_options)
             for option in self.list_of_options:
                 if isinstance(option, Hint):
                     option.create_widget(self.frame, layout_frane, row, column)
                 else:
                     option.deactivate_size_limit() if option.label == '' else None
                     option.create_widget(self.frame, layout_frane, row, column)
-                print(column, row)
                 if row == self.grid_layout - 1:
                     row = 0
                     column += 1

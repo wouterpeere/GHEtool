@@ -1,4 +1,4 @@
-from GHEtool.gui.gui_classes import DoubleValue, IntValue, ListBox, Category, Page, ButtonBox, Aim, qt_w, qt_c, Option, Hint, FileName
+from GHEtool.gui.gui_classes import DoubleValue, IntValue, ListBox, Category, Page, ButtonBox, Aim, qt_w, qt_c, Option, Hint, FileName, FunctionButton
 from typing import List, Tuple
 import pandas as pd
 
@@ -147,12 +147,15 @@ class GuiStructure:
         self.option_single_column = ListBox(default_parent, widget_name='button_single_column', label='Load line: ', default_index=0, entries=[])
         self.option_unit_data = ButtonBox(default_parent, widget_name='button_unit_data', label='Unit data: ', default_index=1, entries=['W', 'kW', 'MW'])
 
+        self.button_load_csv = FunctionButton(default_parent, widget_name='load_csv', button_text='Load', icon=':/icons/icons/Download.svg')
+        self.option_data.linked_options.append((self.button_load_csv, 0))
+
         self.option_column.linked_options.append((self.option_single_column, 0))
         self.option_column.linked_options.append((self.option_heating_column, 1))
         self.option_column.linked_options.append((self.option_cooling_column, 1))
         self.category_select_file = Category(default_parent, obj_name='select_data', label='Select data file', list_of_options=[
             self.option_seperator_csv, self.option_decimal_csv, self.filename, self.option_column, self.option_heating_column, self.option_cooling_column,
-            self.option_single_column, self.option_unit_data])
+            self.option_single_column, self.option_unit_data, self.button_load_csv])
 
         self.hint_none_1 = Hint(default_parent, 'hint_none_1', '  ')
         self.hint_peak_heating = Hint(default_parent, 'hint_pH', 'Heating peak')
@@ -195,88 +198,88 @@ class GuiStructure:
                                          maximal_value=1000000, step=1)
         self.option_hp_aug = DoubleValue(default_parent, widget_name='Double_hp_aug', label='', default_value=0, decimal_number=3, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_hp_sep = DoubleValue(default_parent, widget_name='Double_hp_sep', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_hp_sep = DoubleValue(default_parent, widget_name='Double_hp_sep', label='', default_value=40.4, decimal_number=3, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_hp_oct = DoubleValue(default_parent, widget_name='Double_hp_oct', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_hp_oct = DoubleValue(default_parent, widget_name='Double_hp_oct', label='', default_value=85, decimal_number=3, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_hp_nov = DoubleValue(default_parent, widget_name='Double_hp_nov', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_hp_nov = DoubleValue(default_parent, widget_name='Double_hp_nov', label='', default_value=119, decimal_number=3, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_hp_dec = DoubleValue(default_parent, widget_name='Double_hp_dec', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_hp_dec = DoubleValue(default_parent, widget_name='Double_hp_dec', label='', default_value=136, decimal_number=3, minimal_value=0,
                                          maximal_value=1000000, step=1)
 
-        self.option_cp_jan = DoubleValue(default_parent, widget_name='Double_cp_jan', label='', default_value=160, decimal_number=3, minimal_value=0,
+        self.option_cp_jan = DoubleValue(default_parent, widget_name='Double_cp_jan', label='', default_value=0, decimal_number=3, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_cp_feb = DoubleValue(default_parent, widget_name='Double_cp_feb', label='', default_value=142, decimal_number=3, minimal_value=0,
+        self.option_cp_feb = DoubleValue(default_parent, widget_name='Double_cp_feb', label='', default_value=0, decimal_number=3, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_cp_mar = DoubleValue(default_parent, widget_name='Double_cp_mar', label='', default_value=102, decimal_number=3, minimal_value=0,
+        self.option_cp_mar = DoubleValue(default_parent, widget_name='Double_cp_mar', label='', default_value=34, decimal_number=3, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_cp_apr = DoubleValue(default_parent, widget_name='Double_cp_apr', label='', default_value=55, decimal_number=3, minimal_value=0,
+        self.option_cp_apr = DoubleValue(default_parent, widget_name='Double_cp_apr', label='', default_value=69, decimal_number=3, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_cp_may = DoubleValue(default_parent, widget_name='Double_cp_may', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_cp_may = DoubleValue(default_parent, widget_name='Double_cp_may', label='', default_value=133, decimal_number=3, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_cp_jun = DoubleValue(default_parent, widget_name='Double_cp_jun', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_cp_jun = DoubleValue(default_parent, widget_name='Double_cp_jun', label='', default_value=187, decimal_number=3, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_cp_jul = DoubleValue(default_parent, widget_name='Double_cp_jul', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_cp_jul = DoubleValue(default_parent, widget_name='Double_cp_jul', label='', default_value=213, decimal_number=3, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_cp_aug = DoubleValue(default_parent, widget_name='Double_cp_aug', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_cp_aug = DoubleValue(default_parent, widget_name='Double_cp_aug', label='', default_value=240, decimal_number=3, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_cp_sep = DoubleValue(default_parent, widget_name='Double_cp_sep', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_cp_sep = DoubleValue(default_parent, widget_name='Double_cp_sep', label='', default_value=160, decimal_number=3, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_cp_oct = DoubleValue(default_parent, widget_name='Double_cp_oct', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_cp_oct = DoubleValue(default_parent, widget_name='Double_cp_oct', label='', default_value=37, decimal_number=3, minimal_value=0,
                                          maximal_value=1000000, step=1)
         self.option_cp_nov = DoubleValue(default_parent, widget_name='Double_cp_nov', label='', default_value=0, decimal_number=3, minimal_value=0,
                                          maximal_value=1000000, step=1)
         self.option_cp_dec = DoubleValue(default_parent, widget_name='Double_cp_dec', label='', default_value=0, decimal_number=3, minimal_value=0,
                                          maximal_value=1000000, step=1)
 
-        self.option_hl_jan = DoubleValue(default_parent, widget_name='Double_hl_jan', label='', default_value=160, decimal_number=3, minimal_value=0,
+        self.option_hl_jan = DoubleValue(default_parent, widget_name='Double_hl_jan', label='', default_value=46500, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_hl_feb = DoubleValue(default_parent, widget_name='Double_hl_feb', label='', default_value=142, decimal_number=3, minimal_value=0,
+        self.option_hl_feb = DoubleValue(default_parent, widget_name='Double_hl_feb', label='', default_value=44400, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_hl_mar = DoubleValue(default_parent, widget_name='Double_hl_mar', label='', default_value=102, decimal_number=3, minimal_value=0,
+        self.option_hl_mar = DoubleValue(default_parent, widget_name='Double_hl_mar', label='', default_value=37500, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_hl_apr = DoubleValue(default_parent, widget_name='Double_hl_apr', label='', default_value=55, decimal_number=3, minimal_value=0,
+        self.option_hl_apr = DoubleValue(default_parent, widget_name='Double_hl_apr', label='', default_value=29700, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_hl_may = DoubleValue(default_parent, widget_name='Double_hl_may', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_hl_may = DoubleValue(default_parent, widget_name='Double_hl_may', label='', default_value=19200, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_hl_jun = DoubleValue(default_parent, widget_name='Double_hl_jun', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_hl_jun = DoubleValue(default_parent, widget_name='Double_hl_jun', label='', default_value=0, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_hl_jul = DoubleValue(default_parent, widget_name='Double_hl_jul', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_hl_jul = DoubleValue(default_parent, widget_name='Double_hl_jul', label='', default_value=0, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_hl_aug = DoubleValue(default_parent, widget_name='Double_hl_aug', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_hl_aug = DoubleValue(default_parent, widget_name='Double_hl_aug', label='', default_value=0, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_hl_sep = DoubleValue(default_parent, widget_name='Double_hl_sep', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_hl_sep = DoubleValue(default_parent, widget_name='Double_hl_sep', label='', default_value=18300, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_hl_oct = DoubleValue(default_parent, widget_name='Double_hl_oct', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_hl_oct = DoubleValue(default_parent, widget_name='Double_hl_oct', label='', default_value=26100, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_hl_nov = DoubleValue(default_parent, widget_name='Double_hl_nov', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_hl_nov = DoubleValue(default_parent, widget_name='Double_hl_nov', label='', default_value=35100, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_hl_dec = DoubleValue(default_parent, widget_name='Double_hl_dec', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_hl_dec = DoubleValue(default_parent, widget_name='Double_hl_dec', label='', default_value=43200, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
 
-        self.option_cl_jan = DoubleValue(default_parent, widget_name='Double_cl_jan', label='', default_value=160, decimal_number=3, minimal_value=0,
+        self.option_cl_jan = DoubleValue(default_parent, widget_name='Double_cl_jan', label='', default_value=4000, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_cl_feb = DoubleValue(default_parent, widget_name='Double_cl_feb', label='', default_value=142, decimal_number=3, minimal_value=0,
+        self.option_cl_feb = DoubleValue(default_parent, widget_name='Double_cl_feb', label='', default_value=8000, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_cl_mar = DoubleValue(default_parent, widget_name='Double_cl_mar', label='', default_value=102, decimal_number=3, minimal_value=0,
+        self.option_cl_mar = DoubleValue(default_parent, widget_name='Double_cl_mar', label='', default_value=8000, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_cl_apr = DoubleValue(default_parent, widget_name='Double_cl_apr', label='', default_value=55, decimal_number=3, minimal_value=0,
+        self.option_cl_apr = DoubleValue(default_parent, widget_name='Double_cl_apr', label='', default_value=8000, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_cl_may = DoubleValue(default_parent, widget_name='Double_cl_may', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_cl_may = DoubleValue(default_parent, widget_name='Double_cl_may', label='', default_value=12000, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_cl_jun = DoubleValue(default_parent, widget_name='Double_cl_jun', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_cl_jun = DoubleValue(default_parent, widget_name='Double_cl_jun', label='', default_value=16000, decimal_number=0, minimal_value=0,
                                         maximal_value=1000000, step=1)
-        self.option_cl_jul = DoubleValue(default_parent, widget_name='Double_cl_jul', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_cl_jul = DoubleValue(default_parent, widget_name='Double_cl_jul', label='', default_value=32000, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_cl_aug = DoubleValue(default_parent, widget_name='Double_cl_aug', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_cl_aug = DoubleValue(default_parent, widget_name='Double_cl_aug', label='', default_value=32000, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_cl_sep = DoubleValue(default_parent, widget_name='Double_cl_sep', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_cl_sep = DoubleValue(default_parent, widget_name='Double_cl_sep', label='', default_value=16000, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_cl_oct = DoubleValue(default_parent, widget_name='Double_cl_oct', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_cl_oct = DoubleValue(default_parent, widget_name='Double_cl_oct', label='', default_value=12000, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_cl_nov = DoubleValue(default_parent, widget_name='Double_cl_nov', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_cl_nov = DoubleValue(default_parent, widget_name='Double_cl_nov', label='', default_value=8000, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
-        self.option_cl_dec = DoubleValue(default_parent, widget_name='Double_cl_dec', label='', default_value=0, decimal_number=3, minimal_value=0,
+        self.option_cl_dec = DoubleValue(default_parent, widget_name='Double_cl_dec', label='', default_value=4000, decimal_number=0, minimal_value=0,
                                          maximal_value=1000000, step=1)
 
         self.category_th_demand = Category(default_parent, obj_name='th_demand', label='Thermal demands', list_of_options=[
@@ -297,6 +300,17 @@ class GuiStructure:
         ])
         self.category_th_demand.activate_grid_layout(5)
         self.option_data.linked_options.append((self.category_th_demand, 0))
+
+        self.hint_depth = Hint(default_parent, widget_name='hint_saving', hint='Size')
+        self.option_show_legend = ButtonBox(default_parent, widget_name='Button_legend', label='Show legend?', default_index=0, entries=['yes', 'no'])
+        self.function_save_results = FunctionButton(default_parent, widget_name='function_save_res', button_text='Save results',
+                                                    icon=":/icons/icons/Save_Inv.svg")
+        self.function_save_figure = FunctionButton(default_parent, widget_name='function_save_figure', button_text='Save figure',
+                                                   icon=":/icons/icons/Save_Inv.svg")
+
+        self.category_options_result = Category(default_parent, obj_name='category_option_res', label='Options results', list_of_options=[
+            self.hint_depth, self.option_show_legend, self.function_save_results, self.function_save_figure])
+        self.category_result_figure = Category(default_parent, obj_name='category_result_figure', label='Figure', list_of_options=[])
 
         self.option_language = ListBox(default_parent, widget_name='list_language', label='Language: ', default_index=0, entries=['english', 'german'])
         self.category_language = Category(default_parent, obj_name='category_language', label='Language', list_of_options=[self.option_language])
@@ -321,8 +335,9 @@ class GuiStructure:
         self.aim_optimize = Aim(default_parent, 'pushButton_optimize', 'Optimize load profile', ':/icons/icons/Optimize_Profile.svg',
                                 [self.option_depth, self.option_spacing, self.option_width, self.option_length])
 
+        self.list_of_aims: List[Tuple[Aim, str]] = [(getattr(self, name), name) for name in self.__dict__ if isinstance(getattr(self, name), Aim)]
         self.page_aim = Page(default_parent, 'Aim', 'Aim of simulation', 'Aim', ':/icons/icons/Aim_Inv.svg', [])
-        self.page_aim.set_upper_frame([self.aim_temp_profile, self.aim_req_depth, self.aim_size_length, self.aim_optimize])
+        self.page_aim.set_upper_frame([aim for aim, name in self.list_of_aims])
         self.page_options = Page(default_parent, 'Options', 'Options', 'Options', ':/icons/icons/Options.svg', [self.category_import_data, self.category_calculation])
         self.page_borehole = Page(default_parent, 'Borehole', 'Borehole and earth', 'Borehole\nand earth', ':/icons/icons/Borehole.png',
                                   [self.category_borehole, self.category_temperatures])
@@ -330,6 +345,8 @@ class GuiStructure:
                                              [self.category_constant_rb, self.category_fluid_data, self.category_pipe_data])
         self.page_thermal = Page(default_parent, 'thermal_demands', 'Thermal demands', 'Thermal\ndemands', ':/icons/icons/Thermal.svg',
                                  [self.category_select_file, self.category_th_demand])
+        self.page_result = Page(default_parent, 'page_result', 'Results', 'Results', ':/icons/icons/Result.svg',
+                                 [self.category_options_result, self.category_result_figure])
         self.page_settings = Page(default_parent, 'settings', 'Settings', 'Settings', ':/icons/icons/Settings.svg', [
             self.category_language, self.category_save_scenario])
 

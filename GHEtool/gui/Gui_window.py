@@ -109,8 +109,8 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
 
         self.gui_structure.translate(1)
 
-        ds = DataStorageNew(self.gui_structure)
-        ds.save()
+        #ds = DataStorageNew(self.gui_structure)
+        #ds.save()
         # self.add_aims(list_button)
         # set app and dialog
         self.app: QtWidgets_QApplication = app
