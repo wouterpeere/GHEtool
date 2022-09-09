@@ -29,6 +29,7 @@ class Option(metaclass=abc.ABCMeta):
         self.widget: Optional[qt_w.QWidget] = None
         self.frame: qt_w.QFrame = qt_w.QFrame(default_parent)
         self.linked_options: List[(Option, int)] = []
+        self.limit_size: bool = True
 
     @abc.abstractmethod
     def get_value(self) -> Union[bool, int, float, str]:
@@ -42,7 +43,13 @@ class Option(metaclass=abc.ABCMeta):
     def create_widget(self, frame: qt_w.QFrame, layout: qt_w.QLayout) -> None:
         pass
 
+    def deactivate_size_limit(self):
+        self.limit_size = False
+
     def create_frame(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout, create_spacer: bool = True) -> qt_w.QHBoxLayout:
+        if self.label == '':
+            self.frame = frame
+            return frame.layout()
         self.frame.setParent(frame)
         self.frame.setObjectName(f"frame_{self.widget_name}")
         self.frame.setFrameShape(qt_w.QFrame.StyledPanel)
@@ -90,8 +97,8 @@ def check(linked_options: List[(Union[Option, List[Option]], int)], option: Opti
 
 class DoubleValue(Option):
 
-    def __init__(self, default_parent: qt_w.QWidget, widget_name: str, label: str, default_value: float, decimal_number: int = 0, minimal_value: float = 0., maximal_value: float = 100.,
-                 step: float = 1.):
+    def __init__(self, default_parent: qt_w.QWidget, widget_name: str, label: str, default_value: float, decimal_number: int = 0, minimal_value: float = 0.,
+                 maximal_value: float = 100., step: float = 1.):
         super().__init__(default_parent, widget_name, label, default_value)
         self.decimal_number: int = decimal_number
         self.minimal_value: float = minimal_value
@@ -119,8 +126,9 @@ class DoubleValue(Option):
         self.widget.setDecimals(self.decimal_number)
         self.widget.setValue(self.default_value)
         self.widget.setSingleStep(self.step)
-        self.widget.setMaximumWidth(100)
-        self.widget.setMinimumWidth(100)
+        if self.limit_size:
+            self.widget.setMaximumWidth(100)
+            self.widget.setMinimumWidth(100)
         self.widget.setMinimumHeight(28)
         setattr(frame.window(), self.widget_name, self.widget)
         layout.addWidget(self.widget)
@@ -236,7 +244,6 @@ class ListBox(Option):
     def set_value(self, index: int) -> None:
         self.widget.setCurrentIndex(index)
 
-
     def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout) -> None:
         layout = self.create_frame(frame, layout_parent)
         self.widget.setParent(self.frame)
@@ -319,10 +326,12 @@ class Hint:
         self.obj_name: str = widget_name
         self.label: qt_w.QLabel = qt_w.QLabel(default_parent)
 
-    def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout) -> None:
+    def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout, row: int = None, column: int = None) -> None:
         self.label.setParent(frame)
         self.label.setText(self.hint)
         self.label.setWordWrap(True)
+        if row is not None and isinstance(layout_parent, qt_w.QGridLayout):
+            layout_parent.addWidget(self.label, column, row)
         layout_parent.addWidget(self.label)
 
 
@@ -336,12 +345,16 @@ class Category:
         self.frame: qt_w.QFrame = qt_w.QFrame(default_parent)
         self.graphic_left: Optional[Union[qt_w.QGraphicsView, bool]] = None
         self.graphic_right: Optional[Union[qt_w.QGraphicsView, bool]] = None
+        self.grid_layout: int = 0
 
     def activate_graphic_left(self):
         self.graphic_left = True
 
     def activate_graphic_right(self):
         self.graphic_right = True
+
+    def activate_grid_layout(self, column: int):
+        self.grid_layout = column
 
     def create_widget(self, page: qt_w.QWidget, layout: qt_w.QLayout):
         self.label.setParent(page)
@@ -378,10 +391,30 @@ class Category:
         layout_frame_horizontal = qt_w.QHBoxLayout(self.frame)
         if self.graphic_left is not None:
             self.graphic_left = self.create_graphic_view(layout_frame_horizontal)
-        layout_frane = qt_w.QVBoxLayout(self.frame)
+        if self.grid_layout > 0:
+            layout_frane = qt_w.QGridLayout(self.frame)
+            row = 0
+            column = 0
+            print(self.list_of_options)
+            for option in self.list_of_options:
+                if isinstance(option, Hint):
+                    option.create_widget(self.frame, layout_frane, row, column)
+                else:
+                    option.deactivate_size_limit() if option.label == '' else None
+                    option.create_widget(self.frame, layout_frane)
+                    layout_frane.addWidget(option.widget if self.frame == option.frame else option.frame, column, row)
+                print(column, row)
+                if row == self.grid_layout - 1:
+                    row = 0
+                    column += 1
+                    continue
+                row += 1
+        else:
+            layout_frane = qt_w.QVBoxLayout(self.frame)
+            for option in self.list_of_options:
+                option.create_widget(self.frame, layout_frane)
+
         layout_frame_horizontal.addLayout(layout_frane)
-        for option in self.list_of_options:
-            option.create_widget(self.frame, layout_frane)
 
         if self.graphic_right is not None:
             self.graphic_right = self.create_graphic_view(layout_frame_horizontal)

@@ -44,5 +44,10 @@
 42,option_cooling_column,-1
 43,option_single_column,-1
 44,option_unit_data,1
-45,option_language,0
-46,option_auto_saving,0
+45,option_hp_jan,160.0
+46,option_hp_feb,142.0
+47,option_hp_mar,102.0
+48,option_hp_apr,55.0
+49,option_hp_may,0.0
+50,option_language,0
+51,option_auto_saving,0

@@ -154,6 +154,43 @@ class GuiStructure:
             self.option_seperator_csv, self.option_decimal_csv, self.filename, self.option_column, self.option_heating_column, self.option_cooling_column,
             self.option_single_column, self.option_unit_data])
 
+        self.hint_none_1 = Hint(default_parent, 'hint_none_1', '  ')
+        self.hint_peak_heating = Hint(default_parent, 'hint_pH', 'Heating peak')
+        self.hint_peak_cooling = Hint(default_parent, 'hint_pC', 'Cooling peak')
+        self.hint_load_heating = Hint(default_parent, 'hint_lH', 'Heating load')
+        self.hint_load_cooling = Hint(default_parent, 'hint_lH', 'Cooling load')
+
+        self.hint_none_2 = Hint(default_parent, 'hint_none_2', '  ')
+
+        self.hint_jan = Hint(default_parent, 'hint_january', 'January')
+        self.hint_feb = Hint(default_parent, 'hint_February', 'February')
+        self.hint_mar = Hint(default_parent, 'hint_March', 'March')
+        self.hint_apr = Hint(default_parent, 'hint_April', 'April')
+        self.hint_may = Hint(default_parent, 'hint_May', 'May')
+        self.hint_jun = Hint(default_parent, 'hint_June', 'June')
+        self.hint_jul = Hint(default_parent, 'hint_July', 'July')
+        self.hint_aug = Hint(default_parent, 'hint_August', 'August')
+        self.hint_sep = Hint(default_parent, 'hint_September', 'September')
+        self.hint_oct = Hint(default_parent, 'hint_October', 'October')
+        self.hint_nov = Hint(default_parent, 'hint_November', 'November')
+        self.hint_dec = Hint(default_parent, 'hint_December', 'December')
+
+        self.option_hp_jan = DoubleValue(default_parent, widget_name='Double_hp_jan', label='', default_value=160, decimal_number=3, minimal_value=0,
+                                         maximal_value=1000000, step=1)
+        self.option_hp_feb = DoubleValue(default_parent, widget_name='Double_hp_feb', label='', default_value=142, decimal_number=3, minimal_value=0,
+                                         maximal_value=1000000, step=1)
+        self.option_hp_mar = DoubleValue(default_parent, widget_name='Double_hp_mar', label='', default_value=102, decimal_number=3, minimal_value=0,
+                                         maximal_value=1000000, step=1)
+        self.option_hp_apr = DoubleValue(default_parent, widget_name='Double_hp_apr', label='', default_value=55, decimal_number=3, minimal_value=0,
+                                         maximal_value=1000000, step=1)
+        self.option_hp_may = DoubleValue(default_parent, widget_name='Double_hp_may', label='', default_value=0, decimal_number=3, minimal_value=0,
+                                         maximal_value=1000000, step=1)
+
+        self.category_th_demand = Category(default_parent, obj_name='th_demand', label='Thermal demands', list_of_options=[
+            self.hint_none_1, self.hint_peak_heating, self.hint_peak_cooling, self.hint_load_heating, self.hint_load_cooling, self.hint_jan,
+            self.option_hp_jan, self.option_hp_feb, self.option_hp_mar, self.option_hp_apr, self.option_hp_may])
+        self.category_th_demand.activate_grid_layout(5)
+
         self.option_language = ListBox(default_parent, widget_name='list_language', label='Language: ', default_index=0, entries=['english', 'german'])
         self.category_language = Category(default_parent, obj_name='category_language', label='Language', list_of_options=[self.option_language])
 
@@ -185,7 +222,7 @@ class GuiStructure:
         self.page_borehole_resistance = Page(default_parent, 'Borehole_resistance', 'Equivalent borehole resistance', 'Borehole\nresistance', ':/icons/icons/Resistance.png',
                                              [self.category_constant_rb, self.category_fluid_data, self.category_pipe_data])
         self.page_thermal = Page(default_parent, 'thermal_demands', 'Thermal demands', 'Thermal\ndemands', ':/icons/icons/Thermal.svg',
-                                             [self.category_select_file])
+                                 [self.category_select_file, self.category_th_demand])
         self.page_settings = Page(default_parent, 'settings', 'Settings', 'Settings', ':/icons/icons/Settings.svg', [
             self.category_language, self.category_save_scenario])
 
