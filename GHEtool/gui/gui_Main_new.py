@@ -26,7 +26,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea,
     QStatusBar, QToolBar,  QVBoxLayout,
     QWidget)
 
-import icons_rc
+import GHEtool.gui.icons_rc
 
 WHITE: str = "rgb(255, 255, 255)"
 LIGHT: str = "rgb(84, 188, 235)"

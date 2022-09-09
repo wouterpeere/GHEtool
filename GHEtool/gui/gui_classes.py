@@ -1,8 +1,7 @@
 from __future__ import annotations
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Callable
 
 from functools import partial as ft_partial
-from dataclasses import dataclass
 from .gui_Main_new import WHITE, LIGHT, DARK, GREY, WARNING
 
 import abc
@@ -77,6 +76,10 @@ class Option(metaclass=abc.ABCMeta):
     def show(self) -> None:
         self.frame.show()
 
+    @abc.abstractmethod
+    def change_event(self, function_to_be_called: Callable) -> None:
+        pass
+
 
 def check(linked_options: List[(Union[Option, List[Option]], int)], option: Option, index: int):
     index = index if option.get_value() == index else option.get_value()
@@ -112,6 +115,9 @@ class DoubleValue(Option):
 
     def set_value(self, value: float) -> None:
         self.widget.setValue(value)
+
+    def change_event(self, function_to_be_called: Callable) -> None:
+        self.widget.valueChanged.connect(function_to_be_called)
 
     def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout, row: int = None, column: int = None) -> None:
         layout = self.create_frame(frame, layout_parent)
@@ -154,6 +160,9 @@ class IntValue(Option):
 
     def set_value(self, value: int) -> None:
         self.widget.setValue(value)
+
+    def change_event(self, function_to_be_called: Callable) -> None:
+        self.widget.valueChanged.connect(function_to_be_called)
 
     def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout, row: int = None, column: int = None) -> None:
         layout = self.create_frame(frame, layout_parent)
@@ -198,6 +207,10 @@ class ButtonBox(Option):
                 if not button.isChecked():
                     button.click()
                 break
+
+    def change_event(self, function_to_be_called: Callable) -> None:
+        for button in self.widget:
+            button.clicked.connect(function_to_be_called)
 
     def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout, row: int = None, column: int = None) -> None:
         layout = self.create_frame(frame, layout_parent)
@@ -255,6 +268,9 @@ class ListBox(Option):
     def set_value(self, index: int) -> None:
         self.widget.setCurrentIndex(index)
 
+    def change_event(self, function_to_be_called: Callable) -> None:
+        self.widget.currentIndexChanged.connect(function_to_be_called)
+
     def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout, row: int = None, column: int = None) -> None:
         layout = self.create_frame(frame, layout_parent)
         self.widget.setParent(self.frame)
@@ -297,6 +313,9 @@ class FileName(Option):
 
     def set_value(self, filename: str) -> None:
         self.widget.setText(filename)
+
+    def change_event(self, function_to_be_called: Callable) -> None:
+        self.widget.textChanged.connect(function_to_be_called)
 
     def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout, row: int = None, column: int = None) -> None:
         layout = self.create_frame(frame, layout_parent, False)
@@ -358,8 +377,8 @@ class Hint:
     def show(self) -> None:
         self.label.show()
 
-class FunctionButton:
 
+class FunctionButton:
     def __init__(self, default_parent: qt_w.QWidget, widget_name: str, button_text: str, icon: str):
         self.button_text: str = button_text
         self.widget_name: str = widget_name
@@ -520,6 +539,9 @@ class Aim:
         self.widget: qt_w.QPushButton = qt_w.QPushButton(default_parent)
         self.list_options: List[Union[Option, Category]] = list_options
 
+    def change_event(self, function_to_be_called: Callable) -> None:
+        self.widget.clicked.connect(function_to_be_called)
+
     def create_widget(self, frame: qt_w.QFrame, layout: qt_w.QGridLayout, idx: int) -> None:
         icon11 = qt_g.QIcon()
         # icon11.addPixmap(QtGui_QPixmap(icon), QtGui_QIcon.Normal, QtGui_QIcon.Off)
@@ -585,6 +607,7 @@ class Page:
         self.button: qt_w.QPushButton = qt_w.QPushButton(default_parent)
         self.label: qt_w.QLabel = qt_w.QLabel(default_parent)
         self.label_gap: qt_w.QLabel = qt_w.QLabel(default_parent)
+        self.page: qt_w.QWidget = qt_w.QWidget(default_parent)
         self.previous_page: Optional[Page] = None
         self.next_page: Optional[Page] = None
         self.upper_frame: Optional[List[Union[Aim, Option, Category]]] = None
@@ -605,9 +628,9 @@ class Page:
         self.upper_frame: List[Union[Aim, Option, Category]] = options
 
     def create_page(self, central_widget: qt_w.QWidget, stacked_widget: qt_w.QStackedWidget, vertical_layout_menu: qt_w.QVBoxLayout):
-        page = qt_w.QWidget(central_widget)
-        page.setObjectName(f"page_{self.obj_name}")
-        layout = qt_w.QVBoxLayout(page)
+        self.page.setParent(central_widget)
+        self.page.setObjectName(f"page_{self.obj_name}")
+        layout = qt_w.QVBoxLayout(self.page)
         layout.setSpacing(0)
         self.label.setParent(central_widget)
         label: qt_w.QLabel = self.label
@@ -615,11 +638,11 @@ class Page:
         label.setStyleSheet("font: 63 16pt \"Lexend SemiBold\";")
         label.setText(self.name)
         layout.addWidget(label)
-        spacer_label = qt_w.QLabel(page)
+        spacer_label = qt_w.QLabel(self.page)
         spacer_label.setMinimumHeight(6)
         spacer_label.setMaximumHeight(6)
         layout.addWidget(spacer_label)
-        scroll_area = qt_w.QScrollArea(page)
+        scroll_area = qt_w.QScrollArea(self.page)
         scroll_area.setObjectName(f"scrollArea_{self.obj_name}")
         scroll_area.setFrameShape(qt_w.QFrame.NoFrame)
         scroll_area.setLineWidth(0)
@@ -633,7 +656,7 @@ class Page:
         scroll_area_layout.setSpacing(0)
         scroll_area_layout.setObjectName(f"scroll_area_layout_{self.obj_name}")
         scroll_area_layout.setContentsMargins(0, 0, 0, 0)
-        stacked_widget.addWidget(page)
+        stacked_widget.addWidget(self.page)
         if self.upper_frame is not None:
             upper_frame = qt_w.QFrame(scroll_area_content)
             upper_frame.setStyleSheet("QFrame {\n"
@@ -688,7 +711,7 @@ class Page:
 
         vertical_layout_menu.addWidget(self.button)
         vertical_layout_menu.addWidget(self.label_gap)
-        self.button.clicked.connect(ft_partial(stacked_widget.setCurrentWidget, page))
+        self.button.clicked.connect(ft_partial(stacked_widget.setCurrentWidget, self.page))
 
     def create_links_to_other_pages(self, central_widget: qt_w.QWidget, scroll_area_layout: qt_w.QVBoxLayout):
         if self.previous_page is None and self.next_page is None:

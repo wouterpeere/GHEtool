@@ -377,7 +377,6 @@ class GuiStructure:
                 name: Tuple[str, str] = data[column][i].split(',')
                 entry.set_text(name[0], name[1])
 
-
     def event_filter(self, obj: qt_w.QPushButton, event) -> bool:
         """
         function to check mouse over event

@@ -119,6 +119,8 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.app: QtWidgets_QApplication = app
         self.Dia = dialog
         # init variables of class
+        # allow checking of changes
+        self.checking: bool = False
         self.translations: TrClass = TrClass()  # init translation class
         self.fileImport = None  # init import file
         self.filename: tuple = MainWindow.filenameDefault  # filename of stored inputs
@@ -178,16 +180,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # set start page to general page
         self.gui_structure.page_aim.button.click()
 
-        self.settings: QtCore_QSettings = QtCore_QSettings('GHEtool', 'GHEtoolApp')
-
         self.update_borehole()
-
-        try:
-            self.resize(self.settings.value('window size'))
-
-            self.move(self.settings.value('window position'))
-        except TypeError:
-            pass
 
     def eventFilterInstall(self) -> None:
         """
@@ -203,27 +196,41 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         set links of buttons and actions to function
         :return: None
         """
-        self.gui_structure.option_pipe_number.widget.valueChanged.connect(self.update_borehole)
-        self.gui_structure.option_pipe_outer_radius.widget.valueChanged.connect(self.update_borehole)
-        self.gui_structure.option_pipe_inner_radius.widget.valueChanged.connect(self.update_borehole)
-        self.gui_structure.option_pipe_borehole_radius.widget.valueChanged.connect(self.update_borehole)
-        self.gui_structure.option_pipe_distance.widget.valueChanged.connect(self.update_borehole)
-        self.gui_structure.option_pipe_number.widget.valueChanged.connect(self.check_distance_between_pipes)
-        self.gui_structure.option_pipe_outer_radius.widget.valueChanged.connect(self.check_distance_between_pipes)
-        self.gui_structure.option_pipe_inner_radius.widget.valueChanged.connect(self.check_distance_between_pipes)
-        self.gui_structure.option_pipe_borehole_radius.widget.valueChanged.connect(self.check_distance_between_pipes)
-        self.gui_structure.option_pipe_distance.widget.valueChanged.connect(self.check_distance_between_pipes)
-        self.gui_structure.option_pipe_outer_radius.widget.valueChanged.connect(self.gui_structure.option_pipe_inner_radius.widget.setMaximum)
-        self.gui_structure.option_pipe_inner_radius.widget.valueChanged.connect(self.gui_structure.option_pipe_outer_radius.widget.setMinimum)
+        for option, name in self.gui_structure.list_of_options:
+            option.change_event(self.change)
+        for option, name in self.gui_structure.list_of_aims:
+            option.change_event(self.change)
+        self.gui_structure.option_pipe_number.change_event(self.update_borehole)
+        self.gui_structure.option_pipe_outer_radius.change_event(self.update_borehole)
+        self.gui_structure.option_pipe_inner_radius.change_event(self.update_borehole)
+        self.gui_structure.option_pipe_borehole_radius.change_event(self.update_borehole)
+        self.gui_structure.option_pipe_distance.change_event(self.update_borehole)
+        self.gui_structure.option_pipe_number.change_event(self.check_distance_between_pipes)
+        self.gui_structure.option_pipe_outer_radius.change_event(self.check_distance_between_pipes)
+        self.gui_structure.option_pipe_inner_radius.change_event(self.check_distance_between_pipes)
+        self.gui_structure.option_pipe_borehole_radius.change_event(self.check_distance_between_pipes)
+        self.gui_structure.option_pipe_distance.change_event(self.check_distance_between_pipes)
+        self.gui_structure.option_pipe_outer_radius.change_event(self.gui_structure.option_pipe_inner_radius.widget.setMaximum)
+        self.gui_structure.option_pipe_inner_radius.change_event(self.gui_structure.option_pipe_outer_radius.widget.setMinimum)
         self.gui_structure.page_result.button.clicked.connect(self.displayResults)
         self.gui_structure.function_save_figure.button.clicked.connect(self.saveFigure)
         self.gui_structure.function_save_results.button.clicked.connect(self.save_data)
-        self.gui_structure.filename.widget.textChanged.connect(self.fun_update_combo_box_data_file)
+        self.gui_structure.option_seperator_csv.change_event(self.fun_update_combo_box_data_file)
+        self.gui_structure.option_decimal_csv.change_event(self.fun_update_combo_box_data_file)
+        self.gui_structure.filename.change_event(self.fun_update_combo_box_data_file)
+        self.gui_structure.option_auto_saving.change_event(self.changeAutoSave)
+        self.gui_structure.option_show_legend.change_event(self.checkLegend)
+        self.gui_structure.option_depth.change_event(self.check_bounds)
+        self.gui_structure.option_spacing.change_event(self.check_bounds)
+        self.gui_structure.option_conductivity.change_event(self.check_bounds)
+        self.gui_structure.option_length.change_event(self.check_bounds)
+        self.gui_structure.option_width.change_event(self.check_bounds)
+        self.gui_structure.button_load_csv.button.clicked.connect(self.funDisplayData)
+        self.gui_structure.option_language.change_event(self.changeLanguage)
+        self.gui_structure.page_result.button.clicked.connect(self.displayResults)
         self.actionAdd_Scenario.triggered.connect(self.addScenario)
         self.actionUpdate_Scenario.triggered.connect(self.saveScenario)
         self.actionDelete_scenario.triggered.connect(self.deleteScenario)
-        for button in self.gui_structure.option_show_legend.widget:
-            button.clicked.connect(self.checkLegend)
         self.action_start_multiple.triggered.connect(self.startMultipleScenariosCalculation)
         self.action_start_single.triggered.connect(self.startCurrentScenarioCalculation)
         self.actionSave.triggered.connect(self.funSave)
@@ -237,20 +244,13 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.actionFrench.triggered.connect(ft_partial(self.gui_structure.option_language.widget.setCurrentIndex, 4))
         self.actionSpanish.triggered.connect(ft_partial(self.gui_structure.option_language.widget.setCurrentIndex, 5))
         self.actionGalician.triggered.connect(ft_partial(self.gui_structure.option_language.widget.setCurrentIndex, 6))
-        self.gui_structure.option_depth.widget.valueChanged.connect(self.check_bounds)
-        self.gui_structure.option_spacing.widget.valueChanged.connect(self.check_bounds)
-        self.gui_structure.option_conductivity.widget.valueChanged.connect(self.check_bounds)
-        self.gui_structure.option_length.widget.valueChanged.connect(self.check_bounds)
-        self.gui_structure.option_width.widget.valueChanged.connect(self.check_bounds)
-        self.gui_structure.button_load_csv.button.clicked.connect(self.funDisplayData)
         self.actionRename_scenario.triggered.connect(self.funRenameScenario)
         self.list_widget_scenario.model().rowsMoved.connect(self.funMoveScenario)
         self.list_widget_scenario.currentItemChanged.connect(self.funAutoSaveScenario)
         # self.actionCheckUDistance.triggered.connect(self.check_distance_between_pipes)
-        self.gui_structure.option_language.widget.currentIndexChanged.connect(self.changeLanguage)
+
 
         self.Dia.closeEvent = self.closeEvent
-        self.gui_structure.page_result.button.clicked.connect(self.displayResults)
         #self.update_aim(self.pushButton_temp_profile)
         #self.checkBox_Import.toggle()
         #self.checkBox_Import.toggle()
@@ -311,7 +311,8 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # check if the auto saving should be performed and then save the last selected scenario
         if self.gui_structure.option_auto_saving.get_value() == 1:
             # save old scenario
-            self.list_ds[self.list_widget_scenario.row(oldRowItem)] = DataStorageNew(self.gui_structure)
+            if DataStorageNew(self.gui_structure) != self.list_ds[self.list_widget_scenario.row(oldRowItem)]:
+                self.list_ds[self.list_widget_scenario.row(oldRowItem)] = DataStorageNew(self.gui_structure)
             # update backup fileImport
             self.funSaveAuto()
             # change values to new scenario values
@@ -555,6 +556,10 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         spinbox.setMaximum(max(value*10, 1_000_000))  # set maximal value to maximal value * 10 or 1_000_000
         spinbox.setValue(value)  # set new value
 
+    def changeAutoSave(self):
+        for ds in self.list_ds:
+            ds.option_auto_saving = self.gui_structure.option_auto_saving.get_value()
+
     def changeLanguage(self) -> None:
         """
         function to change language on labels and push buttons
@@ -562,6 +567,9 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         """
         scenarioIndex: int = self.list_widget_scenario.currentRow()  # get current selected scenario
         amount: int = self.list_widget_scenario.count()  # number of scenario elements
+
+        for ds in self.list_ds:
+            ds.option_language = self.gui_structure.option_language.get_value()
         # check if list scenario names are not unique
         liStrMatch: list = [self.list_widget_scenario.item(idx).text() ==
                             f'{self.translations.scenarioString}: {idx + 1}' for idx in range(amount)]
@@ -985,7 +993,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # activate checking for changed
         self.checking: bool = True
         # refresh results if results page is selected
-        self.gui_structure.page_result.button.click() if self.stackedWidget.currentWidget() == self.gui_structure.page_result else None
+        self.gui_structure.page_result.button.click() if self.stackedWidget.currentWidget() == self.gui_structure.page_result.page else None
 
     def saveScenario(self) -> None:
         """
@@ -1543,8 +1551,6 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         :param event: closing event
         :return: None
         """
-        self.settings.setValue('window size', self.size())
-        self.settings.setValue('window position', self.pos())
         # close app if nothing has been changed
         if not self.changedFile:
             event.accept()

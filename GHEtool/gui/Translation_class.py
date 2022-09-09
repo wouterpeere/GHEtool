@@ -46,6 +46,7 @@ class TrClass:
                 'actionGalician', 'pushButton_Aim'
 
     def __init__(self) -> None:
+        # print([i for i in li if i in GuiStructure(qt_w.QWidget(None), qt_w.QStatusBar(None)).__dict__])
         """This function initialize the translation class"""
         self.Language: int = 0  # 0: English; 1: German; 2: Dutch; 3: French; 4: Italian
         self.label_Language: str = ''

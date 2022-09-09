@@ -12,6 +12,8 @@ class DataStorageNew:
         for aim, name in gui_structure.list_of_aims:
             setattr(self, name, aim.widget.isChecked())
 
+        self.list_options_aims = [name for option, name in gui_structure.list_of_options] + [name for option, name in gui_structure.list_of_aims]
+
         self.borefield: Optional[Borefield] = None
 
         self.peakHeating: list = [self.option_hp_jan, self.option_hp_feb, self.option_hp_mar, self.option_hp_apr, self.option_hp_may, self.option_hp_jun,
@@ -25,7 +27,7 @@ class DataStorageNew:
         self.ground_data: GroundData = GroundData(self.option_depth, self.option_spacing, self.option_conductivity, self.option_ground_temp,
                                                   self.option_constant_rb, self.option_width, self.option_length, self.option_heat_capacity * 1000,
                                                   2 * self.option_temp_gradient * self.option_conductivity / 100 if self.option_method_temp_gradient == 1
-                                                  else 0) #H * self.flux / self.k_s / 2
+                                                  else 0)
         self.fluid_data: FluidData = FluidData(self.option_fluid_mass_flow, self.option_fluid_conductivity, self.option_fluid_density,
                                                self.option_fluid_capacity, self.option_fluid_viscosity)
         self.pipe_data: PipeData = PipeData(self.option_pipe_grout_conductivity, self.option_pipe_inner_radius, self.option_pipe_outer_radius,
@@ -43,3 +45,19 @@ class DataStorageNew:
     def save(self):
         data = pd.DataFrame([(name, getattr(self, name)) for name in self.__dict__])
         data.to_csv('test.csv')
+
+    def __eq__(self, other) -> bool:
+        """
+        equality function to check if values are equal
+        :param other: to compare Datastorage
+        :return: boolean which is true if self has the same values as other
+        """
+        # if not of same class return false
+        if not isinstance(other, DataStorageNew):
+            return False
+        # compare all slot values if one not match return false
+        for i in self.list_options_aims:
+            if getattr(self, i) != getattr(other, i):
+                return False
+        # if all match return true
+        return True
