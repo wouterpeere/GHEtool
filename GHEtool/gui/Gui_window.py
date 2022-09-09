@@ -23,12 +23,13 @@ from PySide6.QtWidgets import QFileDialog as QtWidgets_QFileDialog
 from PySide6.QtWidgets import QHBoxLayout as QtWidgets_QHBoxLayout
 from PySide6.QtWidgets import QInputDialog as QtWidgets_QInputDialog
 from PySide6.QtWidgets import QListWidgetItem as QtWidgets_QListWidgetItem
+from PySide6.QtWidgets import QListWidget as QtWidgets_QListWidget
 from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
 from PySide6.QtWidgets import QMenu as QtWidgets_QMenu
 from PySide6.QtWidgets import QMessageBox as QtWidgets_QMessageBox
 from PySide6.QtWidgets import QPushButton as QtWidgets_QPushButton
 from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
-from PySide6.QtWidgets import QGraphicsView as QtWidgets_QGraphicsView
+from PySide6.QtWidgets import QGraphicsView as QtWidgets_QGraphicsView, QSpacerItem, QSizePolicy
 from math import pi
 from numpy import cos, sin
 from PySide6.QtWidgets import QGraphicsScene, QGraphicsEllipseItem
@@ -109,6 +110,9 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
 
         self.gui_structure.translate(1)
 
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalLayout_menu.addItem(self.verticalSpacer)
+
         #ds = DataStorageNew(self.gui_structure)
         #ds.save()
         # self.add_aims(list_button)
@@ -128,7 +132,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.fig = None  # figure
         self.NumberOfScenarios: int = 1  # number of scenarios
         self.finished: int = 1  # number of finished scenarios
-        self.threads: list = []  # list of calculation threads
+        self.threads: List[CalcProblem] = []  # list of calculation threads
         self.ListDS: list = []  # list of data storages
         self.list_ds: List[DataStorageNew] = [DataStorageNew(self.gui_structure)]  # list of data storages
         self.sizeB = QtCore_QSize(48, 48)  # size of big logo on push button
@@ -142,8 +146,6 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.updateBar(0, False)
         # set event filter for push button sizing
         self.eventFilterInstall()
-        # reset data type frames for importing of data
-        self.dataType()
         # start importing GHEtool by a thread to save start up time
         self.IG: ImportGHEtool = ImportGHEtool()
         self.IG.start()
@@ -156,9 +158,9 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.action_start_multiple.setEnabled(False)
         self.action_start_single.setEnabled(False)
         # add languages to combo box
-        self.comboBox_Language.addItems(self.translations.comboBoxLanguageList)
+        self.gui_structure.option_language.widget.addItems(self.translations.comboBoxLanguageList)
         # hide warning for custom bore field calculation
-        self.label_WarningCustomBorefield.hide()
+        self.gui_structure.hint_calc_time.hide()
         # load backup data
         self.loadList()
         # add progress bar and label to statusbar
@@ -169,7 +171,6 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.changeWindowTitle()
         # add action shortcut for changing language to english
         self.actionEnglish.setShortcut("Ctrl+Alt+E")
-        self.showBoreholeResistanceBoxes(self.comboBox_Rb_method.currentIndex())
         # set links to check if changes happen
         self.actionInputChanged.triggered.connect(self.change)
         # allow checking of changes
@@ -189,42 +190,6 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             self.move(self.settings.value('window position'))
         except TypeError:
             pass
-
-    def create_push_button_aim(self, name: str, label: str, icon: str) -> QtWidgets_QPushButton:
-        icon11 = QtGui_QIcon()
-        #icon11.addPixmap(QtGui_QPixmap(icon), QtGui_QIcon.Normal, QtGui_QIcon.Off)
-        icon11.addFile(icon)
-        push_button = QtWidgets_QPushButton(icon11, label, self.frame_aims)
-        push_button.setMinimumSize(QtCore_QSize(0, 60))
-        push_button.setMaximumSize(QtCore_QSize(16777215, 60))
-        push_button.setStyleSheet("QPushButton{border: 3px solid rgb(0, 64, 122);\n"
-                                                   "border-radius: 15px;\n"
-                                                   "color: rgb(255, 255, 255);\n"
-                                                   "gridline-color: rgb(84, 188, 235);\n"
-                                                   "background-color: rgb(100, 100, 100);\n"
-                                                   "font-weight:500;}\n"
-                                                   "QPushButton:hover{border: 3px solid rgb(0, 64, 122);\n"
-                                                   "background-color:rgb(84, 188, 235);}\n"
-                                                   "QPushButton:checked{border:3px solid rgb(84, 188, 235);\n"
-                                                   "background-color:rgb(84, 188, 235);}\n"
-                                                   "QPushButton:disabled{border: 3px solid rgb(100, 100, 100);\n"
-                                                   "border-radius: 5px;\n"
-                                                   "color: rgb(255, 255, 255);\n"
-                                                   "gridline-color: rgb(100, 100, 100);\n"
-                                                   "background-color: rgb(100, 100, 100);}\n"
-                                                   "QPushButton:disabled:hover{background-color: rgb(0, 64, 122);}")
-        #push_button.setIcon(icon11)
-        #push_button.setIcon(QtGui_QIcon(QtGui_QPixmap(icon)))
-        push_button.setIconSize(QtCore_QSize(30, 30))
-        push_button.setCheckable(True)
-        push_button.setObjectName(name)
-        push_button.setText(label)
-        setattr(self, name, push_button)
-        return push_button
-
-    def add_aims(self, elements: List[QtWidgets_QPushButton]):
-        for counter, element in enumerate(elements):
-            self.gridLayout_14.addWidget(element, int((counter)/2), 0 if divmod(counter, 2)[1] == 0 else 1, 1, 1) # , int(counter/2)
 
     def eventFilterInstall(self) -> None:
         """
@@ -252,116 +217,44 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.gui_structure.option_pipe_distance.widget.valueChanged.connect(self.check_distance_between_pipes)
         self.gui_structure.option_pipe_outer_radius.widget.valueChanged.connect(self.gui_structure.option_pipe_inner_radius.widget.setMaximum)
         self.gui_structure.option_pipe_inner_radius.widget.valueChanged.connect(self.gui_structure.option_pipe_outer_radius.widget.setMinimum)
-        self.pushButton_thermalDemands.clicked.connect(ft_partial(self.stackedWidget.setCurrentWidget,
-                                                                  self.page_thermal))
-        self.pushButton_Results.clicked.connect(ft_partial(self.stackedWidget.setCurrentWidget, self.page_Results))
-        self.pushButton_Results.clicked.connect(self.displayResults)
-        #self.pushButton_Settings.clicked.connect(ft_partial(self.stackedWidget.setCurrentWidget, self.page_Settings))
-        self.pushButton_borehole_resistance.clicked.connect(ft_partial(self.stackedWidget.setCurrentWidget,
-                                                                       self.page_borehole_resistance))
-        self.pushButton_General.clicked.connect(ft_partial(self.stackedWidget.setCurrentWidget, self.page_General))
-        self.pushButton_NextGeneral.clicked.connect(self.pushButton_borehole_resistance.click)
-        self.pushButton_PreviousThermal.clicked.connect(self.pushButton_borehole_resistance.click)
-        self.pushButton_PreviousResistance.clicked.connect(self.pushButton_General.click)
-        self.pushButton_NextResistance.clicked.connect(self.pushButton_thermalDemands.click)
-        self.pushButton_NextAim.clicked.connect(self.pushButton_General.click)
-        self.pushButton_SaveFigure.clicked.connect(self.saveFigure)
-        self.pushButton_SaveData.clicked.connect(self.save_data)
+        self.gui_structure.page_result.button.clicked.connect(self.displayResults)
+        self.gui_structure.function_save_figure.button.clicked.connect(self.saveFigure)
+        self.gui_structure.function_save_results.button.clicked.connect(self.save_data)
+        self.gui_structure.filename.widget.textChanged.connect(self.fun_update_combo_box_data_file)
         self.actionAdd_Scenario.triggered.connect(self.addScenario)
         self.actionUpdate_Scenario.triggered.connect(self.saveScenario)
         self.actionDelete_scenario.triggered.connect(self.deleteScenario)
-        self.checkBox_Legend.clicked.connect(self.checkLegend)
-        self.comboBox_Datentyp.currentIndexChanged.connect(self.dataType)
-        self.pushButton_loadCsv.clicked.connect(self.funChooseFile)
+        for button in self.gui_structure.option_show_legend.widget:
+            button.clicked.connect(self.checkLegend)
         self.action_start_multiple.triggered.connect(self.startMultipleScenariosCalculation)
         self.action_start_single.triggered.connect(self.startCurrentScenarioCalculation)
         self.actionSave.triggered.connect(self.funSave)
         self.actionSave_As.triggered.connect(self.funSaveAs)
         self.actionOpen.triggered.connect(self.funLoad)
         self.actionNew.triggered.connect(self.funNew)
-        self.actionEnglish.triggered.connect(ft_partial(self.comboBox_Language.setCurrentIndex, 0))
-        self.actionGerman.triggered.connect(ft_partial(self.comboBox_Language.setCurrentIndex, 1))
-        self.actionDutch.triggered.connect(ft_partial(self.comboBox_Language.setCurrentIndex, 2))
-        self.actionItalian.triggered.connect(ft_partial(self.comboBox_Language.setCurrentIndex, 3))
-        self.actionFrench.triggered.connect(ft_partial(self.comboBox_Language.setCurrentIndex, 4))
-        self.actionSpanish.triggered.connect(ft_partial(self.comboBox_Language.setCurrentIndex, 5))
-        self.actionGalician.triggered.connect(ft_partial(self.comboBox_Language.setCurrentIndex, 6))
-        self.doubleSpinBox_H.valueChanged.connect(self.checkBounds)
-        self.doubleSpinBox_B.valueChanged.connect(self.checkBounds)
-        self.doubleSpinBox_k_s.valueChanged.connect(self.checkBounds)
-        self.spinBox_N_1.valueChanged.connect(self.checkBounds)
-        self.spinBox_N_2.valueChanged.connect(self.checkBounds)
-        self.pushButton_load.clicked.connect(self.funLoadFile)
-        self.comboBox_dataColumn.currentIndexChanged.connect(self.funChooseColumnDemand)
-        self.comboBox_timeStep.currentIndexChanged.connect(self.funChooseColumnTimeStep)
-        self.pushButton_calculate.clicked.connect(self.funDisplayData)
-        self.pushButton_Unit.clicked.connect(self.funChangeUnit)
+        self.actionEnglish.triggered.connect(ft_partial(self.gui_structure.option_language.widget.setCurrentIndex, 0))
+        self.actionGerman.triggered.connect(ft_partial(self.gui_structure.option_language.widget.setCurrentIndex, 1))
+        self.actionDutch.triggered.connect(ft_partial(self.gui_structure.option_language.widget.setCurrentIndex, 2))
+        self.actionItalian.triggered.connect(ft_partial(self.gui_structure.option_language.widget.setCurrentIndex, 3))
+        self.actionFrench.triggered.connect(ft_partial(self.gui_structure.option_language.widget.setCurrentIndex, 4))
+        self.actionSpanish.triggered.connect(ft_partial(self.gui_structure.option_language.widget.setCurrentIndex, 5))
+        self.actionGalician.triggered.connect(ft_partial(self.gui_structure.option_language.widget.setCurrentIndex, 6))
+        self.gui_structure.option_depth.widget.valueChanged.connect(self.check_bounds)
+        self.gui_structure.option_spacing.widget.valueChanged.connect(self.check_bounds)
+        self.gui_structure.option_conductivity.widget.valueChanged.connect(self.check_bounds)
+        self.gui_structure.option_length.widget.valueChanged.connect(self.check_bounds)
+        self.gui_structure.option_width.widget.valueChanged.connect(self.check_bounds)
+        self.gui_structure.button_load_csv.button.clicked.connect(self.funDisplayData)
         self.actionRename_scenario.triggered.connect(self.funRenameScenario)
-        self.comboBox_Rb_method.currentIndexChanged.connect(self.showBoreholeResistanceBoxes)
         self.list_widget_scenario.model().rowsMoved.connect(self.funMoveScenario)
         self.list_widget_scenario.currentItemChanged.connect(self.funAutoSaveScenario)
-        self.pushButton_data_file_select.clicked.connect(self.funChooseDataFile)
-        self.lineEdit_filename_data_file.textChanged.connect(self.funUpdateComboBoxDataFile)
-        self.comboBox_dataColumn_data_file.currentIndexChanged.connect(self.frame_heatingLoad_data_File.setHidden)
-        self.comboBox_dataColumn_data_file.currentIndexChanged.connect(self.frame_coolingLoad_data_file.setHidden)
-        self.comboBox_dataColumn_data_file.currentIndexChanged.connect(self.frame_combined_data_file.setVisible)
-        self.comboBox_dataColumn_data_file.setCurrentIndex(not self.comboBox_dataColumn_data_file.currentIndex())
-        self.comboBox_dataColumn_data_file.setCurrentIndex(not self.comboBox_dataColumn_data_file.currentIndex())
         # self.actionCheckUDistance.triggered.connect(self.check_distance_between_pipes)
-        self.comboBox_Language.currentIndexChanged.connect(self.changeLanguage)
-
-        #self.pushButton_temp_profile.clicked.connect(ft_partial(self.update_aim, self.pushButton_temp_profile))
-        #self.pushButton_size_length.clicked.connect(ft_partial(self.update_aim, self.pushButton_size_length))
-        #self.pushButton_req_depth.clicked.connect(ft_partial(self.update_aim, self.pushButton_req_depth))
-        #self.pushButton_optimize.clicked.connect(ft_partial(self.update_aim, self.pushButton_optimize))
-        self.pushButton_monthly_data.clicked.connect(ft_partial(self.update_opponent, self.pushButton_monthly_data, self.pushButton_hourly_data))
-        self.pushButton_hourly_data.clicked.connect(ft_partial(self.update_opponent, self.pushButton_hourly_data, self.pushButton_monthly_data))
-        self.pushButton_hourly_data2.clicked.connect(ft_partial(self.update_opponent, self.pushButton_hourly_data2, self.pushButton_monthly_data))
+        self.gui_structure.option_language.widget.currentIndexChanged.connect(self.changeLanguage)
 
         self.Dia.closeEvent = self.closeEvent
         #self.update_aim(self.pushButton_temp_profile)
-        self.checkBox_Import.toggle()
-        self.checkBox_Import.toggle()
-        self.pushButton_simulation_period.toggle()
-        self.pushButton_simulation_period.toggle()
-
-    @staticmethod
-    def update_opponent(button: QtWidgets_QPushButton, button_opponent: QtWidgets_QPushButton):
-        button_opponent.setChecked(not button.isChecked())
-
-    def update_aim(self, button: QtWidgets_QPushButton) -> None:
-        status: bool = button.isChecked()
-        if self.pushButton_temp_profile != button:
-            self.pushButton_temp_profile.setChecked(False)
-        if self.pushButton_size_length != button:
-            self.pushButton_size_length.setChecked(False)
-            self.label_Options.setVisible(False)
-            self.frame_Options.setVisible(False)
-            self.label_calc_method_depth_sizing.setVisible(False)
-            self.frame_calc_method_depth_sizing.setVisible(False)
-            self.label_calc_method_length_sizing.setVisible(False)
-            self.frame_calc_method_length_sizing.setVisible(False)
-        if self.pushButton_req_depth != button:
-            self.pushButton_req_depth.setChecked(False)
-            self.label_Options.setVisible(False)
-            self.frame_Options.setVisible(False)
-            self.label_calc_method_depth_sizing.setVisible(False)
-            self.frame_calc_method_depth_sizing.setVisible(False)
-        if self.pushButton_optimize != button:
-            self.pushButton_optimize.setChecked(False)
-        if self.pushButton_size_length == button and status:
-            self.label_Options.setVisible(True)
-            self.frame_Options.setVisible(True)
-            self.label_calc_method_depth_sizing.setVisible(True)
-            self.frame_calc_method_depth_sizing.setVisible(True)
-            self.label_calc_method_length_sizing.setVisible(True)
-            self.frame_calc_method_length_sizing.setVisible(True)
-            return
-        if self.pushButton_req_depth == button and status:
-            self.label_Options.setVisible(True)
-            self.frame_Options.setVisible(True)
-            self.label_calc_method_depth_sizing.setVisible(True)
-            self.frame_calc_method_depth_sizing.setVisible(True)
+        #self.checkBox_Import.toggle()
+        #self.checkBox_Import.toggle()
 
     def change(self) -> None:
         """
@@ -376,7 +269,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             self.changedFile: bool = True
             self.changeWindowTitle()
         # abort here if autosave scenarios is used
-        if self.checkBox_AutoSaving.isChecked():
+        if self.gui_structure.option_auto_saving.get_value() == 0:
             return
         # if list is empty return
         if not self.ListDS:
@@ -417,7 +310,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             self.changeScenario(self.list_widget_scenario.row(newRowItem))
             return
         # check if the auto saving should be performed and then save the last selected scenario
-        if self.checkBox_AutoSaving.isChecked():
+        if self.gui_structure.option_auto_saving.get_value() == 0:
             # save old scenario
             self.ListDS[self.list_widget_scenario.row(oldRowItem)] = DataStorage(id(self))
             # update backup fileImport
@@ -549,7 +442,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         """
         # hide results buttons if no results where found
         if any([(i.boreField is None) for i in self.ListDS]) or self.ListDS == []:
-            self.pushButton_SaveData.hide()
+            self.gui_structure.function_save_results.hide()
             self.gui_structure.page_aim.button.click()
             return
         # display results otherwise
@@ -581,19 +474,19 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             return
         self.status_bar.show()
 
-    def checkBounds(self) -> None:
+    def check_bounds(self) -> None:
         """
         check if precalculated bounds are extended then show warning
         :return: None
         """
         # check if current selection is outside the precalculated data
-        outside_bounds: bool = self.BOPD.check_if_outside_bounds(self.doubleSpinBox_H.value(),
-                                                                 self.doubleSpinBox_B.value(),
-                                                                 self.doubleSpinBox_k_s.value(),
-                                                                 max(self.spinBox_N_1.value(), self.spinBox_N_2.value())
+        outside_bounds: bool = self.BOPD.check_if_outside_bounds(self.gui_structure.option_depth.get_value(),
+                                                                 self.gui_structure.option_spacing.get_value(),
+                                                                 self.gui_structure.option_conductivity.get_value(),
+                                                                 max(self.gui_structure.option_length.get_value(), self.gui_structure.option_width.get_value())
                                                                  )
         # if so show label with warning message
-        self.label_WarningCustomBorefield.show() if outside_bounds else self.label_WarningCustomBorefield.hide()
+        self.gui_structure.hint_calc_time.show() if outside_bounds else self.gui_structure.hint_calc_time.hide()
 
     def eventFilter(self, obj: QtWidgets_QPushButton, event) -> bool:
         """
@@ -674,7 +567,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         liStrMatch: list = [self.list_widget_scenario.item(idx).text() ==
                             f'{self.translations.scenarioString}: {idx + 1}' for idx in range(amount)]
         # change language to the selected one
-        self.translations.changeLanguage(self.comboBox_Language.currentIndex())
+        self.translations.changeLanguage(self.gui_structure.option_language.get_value())
         # update all label, pushButtons, action and Menu names
         for i in [j for j in self.translations.__slots__ if hasattr(self, j)]:
             if isinstance(getattr(self, i), QtWidgets_QMenu):
@@ -682,29 +575,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
                 continue
             getattr(self, i).setText(getattr(self.translations, i))
         # set translation of toolbox items
-        self.toolBox.setItemText(self.toolBox.indexOf(self.page_File), self.translations.toolBoxFile)
-        self.toolBox.setItemText(self.toolBox.indexOf(self.page_DataLocation), self.translations.toolBoxDataLocation)
-        # update lists in comboBoxs
-        [self.comboBox_Language.setItemText(i, name) for i, name in enumerate(self.translations.comboBoxLanguageList)]
-        [self.comboBox_depth_Method.setItemText(i, name) for i, name in
-         enumerate(self.translations.comboBoxSizeMethodList)]
-        [self.comboBox_Size_Method.setItemText(i, name) for i, name in
-         enumerate(self.translations.comboBoxSizeMethodList)]
-        [self.comboBox_Seperator.setItemText(i, name) for i, name in
-         enumerate(self.translations.comboBox_SeperatorList)]
-        [self.comboBox_SeperatorDataFile.setItemText(i, name) for i, name in
-         enumerate(self.translations.comboBox_SeperatorList)]
-        [self.comboBox_decimal.setItemText(i, name) for i, name in
-         enumerate(self.translations.comboBox_decimalList)]
-        [self.comboBox_decimalDataFile.setItemText(i, name) for i, name in
-         enumerate(self.translations.comboBox_decimalList)]
-        [self.comboBox_dataColumn.setItemText(i, name) for i, name in
-         enumerate(self.translations.comboBoxDataColumnList)]
-        [self.comboBox_dataColumn_data_file.setItemText(i, name) for i, name in
-         enumerate(self.translations.comboBoxDataColumnList)]
-        [self.comboBox_timeStep.setItemText(i, name) for i, name in enumerate(self.translations.comboBoxTimeStepList)]
-        [self.comboBox_Rb_method.setItemText(i, name) for i, name in
-         enumerate(self.translations.comboBox_Rb_methodList)]
+        self.gui_structure.translate(self.gui_structure.option_language.get_value())
         # set small PushButtons
         self.set_push(False)
         # replace scenario names if they are not unique
@@ -729,8 +600,8 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
                 saving: tuple = pk_load(f)
             self.filename, li, settings = saving  # get saved data and unpack tuple
             self.ListDS, li = li[0], li[1]  # unpack tuple to get list of data-storages and scenario names
-            self.comboBox_Language.setCurrentIndex(settings[0])  # set last time selected language
-            self.checkBox_AutoSaving.setChecked(settings[1])  # set last time selected automatic saving scenario option
+            self.gui_structure.option_language.set_value(settings[0])  # set last time selected language
+            self.gui_structure.option_auto_saving.set_value(settings[1])  # set last time selected automatic saving scenario option
             # replace uer window id
             for DS in self.ListDS:
                 DS.ui = id(self)
@@ -742,7 +613,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             self.checkResults()
         except FileNotFoundError:
             # hide custom bore field warning
-            self.label_WarningCustomBorefield.hide()
+            self.gui_structure.hint_calc_time.hide()
             # change language to english
             self.changeLanguage()
             # show message that no backup file is found
@@ -760,7 +631,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # create list of scenario names
         li: list = [self.list_widget_scenario.item(idx).text() for idx in range(self.list_widget_scenario.count())]
         # create list of settings with language and autosave option
-        settings: list = [self.comboBox_Language.currentIndex(), self.checkBox_AutoSaving.isChecked()]
+        settings: list = [self.gui_structure.option_language.get_value(), self.gui_structure.option_auto_saving.get_value()]
         # try to write data to back up file
         try:
             # write data to back up file
@@ -770,46 +641,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         except FileNotFoundError:
             self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
 
-    def dataType(self) -> str:
-        """
-        function to choose Datatype of selected data
-        :return: str
-        """
-        # get current index of data file
-        index = self.comboBox_Datentyp.currentText()
-        # hide labels and reset line edit text
-        self.lineEdit_displayCsv.setText("")
-        self.frame_heatingLoad.hide()
-        self.frame_coolingLoad.hide()
-        self.frame_date.hide()
-        # clear all comboBox
-        self.comboBox_sheetName.clear()
-        self.comboBox_dataColumn.setCurrentIndex(-1)
-        self.comboBox_coolingLoad.clear()
-        self.comboBox_heatingLoad.clear()
-        self.comboBox_combined.clear()
-        self.comboBox_timeStep.setCurrentIndex(-1)
-        # show and hide comboBoxes depending on index selected
-        self.frame_Seperator.show() if index == '.csv' else self.frame_Seperator.hide()
-        self.frame_decimal.show() if index == '.csv' else self.frame_decimal.hide()
-        self.frame_sheetName.show() if index == '.xlsx' or index == '.xls' else self.frame_sheetName.hide()
-        # return index
-        return index
-
-    def funChooseDataFile(self) -> None:
-        """
-        select csv fileImport for optimise load profile
-        :return: None
-        """
-        # choose datafile to optimize load for
-        filename = QtWidgets_QFileDialog.getOpenFileName(caption=self.translations.ChooseCSV,
-                                                         filter='(*.csv)')
-        # set filename to line edit
-        self.lineEdit_filename_data_file.setText(filename[0])
-        # update comboBoxes
-        self.funUpdateComboBoxDataFile(filename[0])
-
-    def funUpdateComboBoxDataFile(self, filename: str) -> None:
+    def fun_update_combo_box_data_file(self, filename: str) -> None:
         """
         update comboBox if new data file is selected
         :param filename: filename of data file
@@ -818,142 +650,28 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # import pandas here to save start up time
         from pandas import read_csv as pd_read_csv
         # get decimal and column seperator
-        sep: str = ';' if self.comboBox_SeperatorDataFile.currentIndex() == 0 else ','
-        dec: str = '.' if self.comboBox_decimalDataFile.currentIndex() == 0 else ','
+        sep: str = ';' if self.gui_structure.option_seperator_csv.get_value() == 0 else ','
+        dec: str = '.' if self.gui_structure.option_decimal_csv.get_value() == 0 else ','
         # try to read CSV-File
         try:
             data: pd_DataFrame = pd_read_csv(filename, sep=sep, decimal=dec)
         except FileNotFoundError:
             self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
             return
+        except PermissionError:
+            self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
+            return
         # get data column names to set them to comboBoxes
         columns = data.columns
         # clear comboBoxes and add column names
-        self.comboBox_heatingLoad_data_file.clear()
-        self.comboBox_coolingLoad_data_file.clear()
-        self.comboBox_combined_data_file.clear()
-        self.comboBox_heatingLoad_data_file.addItems(columns)
-        self.comboBox_coolingLoad_data_file.addItems(columns)
-        self.comboBox_combined_data_file.addItems(columns)
+        self.gui_structure.option_heating_column.widget.clear()
+        self.gui_structure.option_cooling_column.widget.clear()
+        self.gui_structure.option_single_column.widget.clear()
+        self.gui_structure.option_heating_column.widget.addItems(columns)
+        self.gui_structure.option_cooling_column.widget.addItems(columns)
+        self.gui_structure.option_single_column.widget.addItems(columns)
         # set column selection mode to 2 columns if more than one line exists
-        self.comboBox_dataColumn_data_file.setCurrentIndex(0 if len(columns) > 0 else 1)
-
-    def funChooseFile(self) -> None:
-        """
-        function to choose data file Import
-        :return: None
-        """
-        # try to ask for a file otherwise show message in status bar
-        try:
-            # get file data file type
-            file_index = self.comboBox_Datentyp.currentText()
-            # ask for a csv file if selected and set filename in line edit
-            if file_index == '.csv':
-                filename = QtWidgets_QFileDialog.getOpenFileName(caption=self.translations.ChooseCSV,
-                                                                 filter='(*.csv)')
-                self.lineEdit_displayCsv.setText(filename[0])
-            # ask for excel file if selected and set filename in line edit
-            elif file_index == '.xlsx' or file_index == '.xls':
-                if file_index == '.xlsx':
-                    filename = QtWidgets_QFileDialog.getOpenFileName(caption=self.translations.ChooseXLSX,
-                                                                     filter='(*.xlsx)')
-                else:
-                    filename = QtWidgets_QFileDialog.getOpenFileName(caption=self.translations.ChooseXLS,
-                                                                     filter='(*.xls)')
-                self.lineEdit_displayCsv.setText(filename[0])
-                # Retrieve the filename
-                file = pd_ExcelFile(filename[0])
-                # Get the sheet name and let the user choose in the comboBox
-                sheet_name = file.sheet_names
-                self.comboBox_sheetName.clear()
-                self.comboBox_sheetName.addItems(sheet_name)
-            else:
-                pass
-        # show warning if no file is selected in status bar for 5 seconds
-        except FileNotFoundError:
-            self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
-
-    def funLoadFile(self) -> None:
-        """
-        function to load data file import
-        :return: None
-        """
-        # get filename from line edit
-        filename = self.lineEdit_displayCsv.text()
-
-        self.frame_heatingLoad.hide()
-        self.frame_coolingLoad.hide()
-        self.frame_date.hide()
-        # clear all comboBox
-        self.comboBox_coolingLoad.clear()
-        self.comboBox_heatingLoad.clear()
-        self.comboBox_combined.clear()
-        self.comboBox_dataColumn.setCurrentIndex(-1)
-        self.comboBox_timeStep.setCurrentIndex(-1)
-        try:
-            # open filename by sheet or with column and decimal seperator
-            if ".xlsx" in filename:
-                # import pandas here to save start up time
-                sheet_name = self.comboBox_sheetName.currentText()
-                from pandas import read_excel as pd_read_excel
-                df = pd_read_excel(filename, sheet_name=sheet_name, nrows=1)
-            elif ".csv" in filename:
-                # import pandas here to save start up time
-                from pandas import read_csv as pd_read_csv
-                sep: str = ';' if self.comboBox_Seperator.currentIndex() == 0 else ','
-                dec: str = '.' if self.comboBox_decimal.currentIndex() == 0 else ','
-                df = pd_read_csv(filename, nrows=1, sep=sep, decimal=dec)
-            else:
-                df = None
-            self.toolBox.setCurrentWidget(self.page_DataLocation)
-            # Make the filename a Global variable so that it only load once
-            self.fileImport = df
-        # show warning if no file is selected in status bar for 5 seconds
-        except FileNotFoundError:
-            self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
-
-    def funChooseColumnDemand(self) -> None:
-        """
-        Show / hide / fill Column demand combo Boxes which includes the demand
-        :return: None
-        """
-        # get imported data
-        df = self.fileImport
-        # if column list is empty create one
-        columns: list = [''] if df is None else df.columns
-        # get idx of current selection
-        idx: int = self.comboBox_dataColumn.currentIndex()
-        # show / hide load column combo Boxes / frames depending on index selectes
-        self.frame_heatingLoad.show() if idx == 0 else self.frame_heatingLoad.hide()
-        self.frame_coolingLoad.show() if idx == 0 else self.frame_coolingLoad.hide()
-        self.frame_combined.show() if idx == 1 else self.frame_combined.hide()
-        # clear combo Boxes
-        self.comboBox_heatingLoad.clear()
-        self.comboBox_coolingLoad.clear()
-        self.comboBox_combined.clear()
-        # Add the column names as items
-        if idx == 0:
-            self.comboBox_heatingLoad.addItems(columns)
-            self.comboBox_coolingLoad.addItems(columns)
-        elif idx == 1:
-            self.comboBox_combined.addItems(columns)
-
-    def funChooseColumnTimeStep(self) -> None:
-        """
-        Choose Column which includes the time step
-        :return: None
-        """
-        # get file of to be imported data
-        df = self.fileImport
-        # get columns of import file
-        columns = [''] if df is None else df.columns
-        # index of time step selected
-        idx: int = self.comboBox_timeStep.currentIndex()
-        # if index is 2 (automatic time step by column) show comboBox/ frame and add columns
-        self.frame_date.show() if idx == 2 else self.frame_date.hide()
-        if idx == 2:
-            self.comboBox_date.clear()
-            self.comboBox_date.addItems(columns)
+        self.gui_structure.option_column.set_value(0 if len(columns) > 0 else 1)
 
     def update_borehole(self) -> None:
         """
@@ -1025,84 +743,53 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         """
         try:
             # get filename from line edit
-            filename: str = self.lineEdit_displayCsv.text()
+            filename: str = self.gui_structure.filename.get_value()
             # raise error if no filename exists
             if filename == '':
                 raise FileNotFoundError
             # get thermal demands index (1 = 2 columns, 2 = 1 column)
-            thermalDemand: int = self.comboBox_dataColumn.currentIndex()
+            thermalDemand: int = self.gui_structure.option_column.get_value()
             # Generate list of columns that have to be imported
             cols: list = []
-            heatingLoad: str = self.comboBox_heatingLoad.currentText()
+            heatingLoad: str = self.gui_structure.option_heating_column.widget.currentText()
             if len(heatingLoad) >= 1:
                 cols.append(heatingLoad)
-            coolingLoad: str = self.comboBox_coolingLoad.currentText()
+            coolingLoad: str = self.gui_structure.option_cooling_column.widget.currentText()
             if len(coolingLoad) >= 1:
                 cols.append(coolingLoad)
-            combined: str = self.comboBox_combined.currentText()
+            combined: str = self.gui_structure.option_single_column.widget.currentText()
             if len(combined) >= 1:
                 cols.append(combined)
-            date: str = self.comboBox_date.currentText()
-            if len(date) >= 1:
-                cols.append(date)
-            else:
-                date: str = 'Date'
-            # read data either from excel file or csv file
-            if ".xlsx" in filename or ".xls" in filename:
-                # import pandas here to save start up time
-                from pandas import read_excel as pd_read_excel
-                sheet_name = self.comboBox_sheetName.currentText()
-                df2: pd_DataFrame = pd_read_excel(filename, sheet_name=sheet_name, usecols=cols)
-            elif ".csv" in filename:
-                # import pandas here to save start up time
-                from pandas import read_csv as pd_read_csv
-                sep: str = ';' if self.comboBox_Seperator.currentIndex() == 0 else ','
-                dec: str = '.' if self.comboBox_decimal.currentIndex() == 0 else ','
-                df2: pd_DataFrame = pd_read_csv(filename, usecols=cols, sep=sep, decimal=dec)
-            else:
-                df2: pd_DataFrame = pd_DataFrame()
+            date: str = 'Date'
+            # import pandas here to save start up time
+            from pandas import read_csv as pd_read_csv
+            sep: str = ';' if self.gui_structure.option_seperator_csv.get_value() == 0 else ','
+            dec: str = '.' if self.gui_structure.option_decimal_csv.get_value() == 0 else ','
+            df2: pd_DataFrame = pd_read_csv(filename, usecols=cols, sep=sep, decimal=dec)
             # ---------------------- Time Step Section  ----------------------
-            # get time step index
-            timeStepIdx = self.comboBox_timeStep.currentIndex()
             # import pandas here to save start up time
             from pandas import to_datetime as pd_to_datetime, date_range as pd_date_range, Series as pd_Series
-            # create date array of either 1 hour, 15 minute, or automatic
-            if timeStepIdx == 0:  # 1 hour time step
-                # Define start and end date
-                start = pd_to_datetime("2019-01-01 00:00:00")
-                end = pd_to_datetime("2019-12-31 23:59:00")
-                # add date column
-                df2[date] = pd_Series(pd_date_range(start, end, freq="1H"))
-                # Create no dict to create mean values for
-                dictAgg: Optional[None, dict] = None
-            elif timeStepIdx == 1:  # 15 minute time step
-                # Define start and end date
-                start = pd_to_datetime("2019-01-01 00:00:00")
-                end = pd_to_datetime("2019-12-31 23:59:00")
-                # add date column
-                df2[date] = pd_Series(pd_date_range(start, end, freq="15T"))
-                # Create dict to create mean values for depending on selected columns
-                dictAgg: Optional[None, dict] = {combined: 'mean'} if thermalDemand == 1 else {heatingLoad: 'mean',
-                                                                                               coolingLoad: 'mean'}
-            else:
-                # Cast Date column to datetime format so pandas can work with it
-                df2[date] = pd_to_datetime(df2[date])
-                # Create dict to create mean values for depending on selected columns
-                dictAgg: Optional[None, dict] = {combined: 'mean'} if thermalDemand == 1 else {heatingLoad: 'mean',
-                                                                                               coolingLoad: 'mean'}
+            # Define start and end date
+            start = pd_to_datetime("2019-01-01 00:00:00")
+            end = pd_to_datetime("2019-12-31 23:59:00")
+            # add date column
+            df2[date] = pd_Series(pd_date_range(start, end, freq="1H"))
+            # Create no dict to create mean values for
+            dictAgg: Optional[None, dict] = None
+
             # set date to index
             df2.set_index(date, inplace=True)
             # resample data to hourly resolution if necessary
             df2 = df2 if dictAgg is None else df2.resample("H").agg(dictAgg)
             # ------------------- Calculate Section --------------------
             # Choose path between Single or Combined Column and create new columns
-            if thermalDemand == 0:
+            if thermalDemand == 1:
                 # Resample the Data for peakHeating and peakCooling
                 df2.rename(columns={heatingLoad: "Heating Load", coolingLoad: "Cooling Load"}, inplace=True)
                 df2["peak Heating"] = df2["Heating Load"]
                 df2["peak Cooling"] = df2["Cooling Load"]
             # by single column split by 0 to heating (>0) and cooling (<0)
-            elif thermalDemand == 1:
+            elif thermalDemand == 0:
                 # Create Filter for heating and cooling load ( Heating Load +, Cooling Load -)
                 heatingLoad = df2[combined].apply(lambda x: x >= 0)
                 coolingLoad = df2[combined].apply(lambda x: x < 0)
@@ -1117,14 +804,9 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             df3 = df3.fillna(0)
             # ----------------------- Data Unit Section --------------------------
             # Get the Data Unit and set the label in the thermal Demand Box to follow
-            data_unit = self.comboBox_dataUnit.currentText()
+            data_unit = self.gui_structure.option_unit_data.get_value()
             # define unit factors
-            fac = 0.001 if data_unit == 'W' else 1 if data_unit == 'kW' else 1000
-            # set label unit to kW
-            self.label_Unit_pH.setText(f'[kW]')
-            self.label_Unit_pC.setText(f'[kW]')
-            self.label_Unit_HL.setText(f'[kWh]')
-            self.label_Unit_CL.setText(f'[kWh]')
+            fac = 0.001 if data_unit == 0 else 1 if data_unit == 1 else 1000
             # multiply dataframe with unit factor and collect data
             df3 = df3 * fac
             peak_heating = df3["peak Heating"]
@@ -1132,57 +814,57 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             heatingLoad = df3["Heating Load"]
             coolingLoad = df3["Cooling Load"]
             # set heating loads to double spinBoxes
-            self.doubleSpinBox_HL_Jan.setValue(heatingLoad[0])
-            self.doubleSpinBox_HL_Feb.setValue(heatingLoad[1])
-            self.doubleSpinBox_HL_Mar.setValue(heatingLoad[2])
-            self.doubleSpinBox_HL_Apr.setValue(heatingLoad[3])
-            self.doubleSpinBox_HL_May.setValue(heatingLoad[4])
-            self.doubleSpinBox_HL_Jun.setValue(heatingLoad[5])
-            self.doubleSpinBox_HL_Jul.setValue(heatingLoad[6])
-            self.doubleSpinBox_HL_Aug.setValue(heatingLoad[7])
-            self.doubleSpinBox_HL_Sep.setValue(heatingLoad[8])
-            self.doubleSpinBox_HL_Oct.setValue(heatingLoad[9])
-            self.doubleSpinBox_HL_Nov.setValue(heatingLoad[10])
-            self.doubleSpinBox_HL_Dec.setValue(heatingLoad[11])
+            self.gui_structure.option_hl_jan.set_value(heatingLoad[0])
+            self.gui_structure.option_hl_feb.set_value(heatingLoad[1])
+            self.gui_structure.option_hl_mar.set_value(heatingLoad[2])
+            self.gui_structure.option_hl_apr.set_value(heatingLoad[3])
+            self.gui_structure.option_hl_may.set_value(heatingLoad[4])
+            self.gui_structure.option_hl_jun.set_value(heatingLoad[5])
+            self.gui_structure.option_hl_jul.set_value(heatingLoad[6])
+            self.gui_structure.option_hl_aug.set_value(heatingLoad[7])
+            self.gui_structure.option_hl_sep.set_value(heatingLoad[8])
+            self.gui_structure.option_hl_oct.set_value(heatingLoad[9])
+            self.gui_structure.option_hl_nov.set_value(heatingLoad[10])
+            self.gui_structure.option_hl_dec.set_value(heatingLoad[11])
             # set cooling loads to double spinBoxes
-            self.doubleSpinBox_CL_Jan.setValue(coolingLoad[0])
-            self.doubleSpinBox_CL_Feb.setValue(coolingLoad[1])
-            self.doubleSpinBox_CL_Mar.setValue(coolingLoad[2])
-            self.doubleSpinBox_CL_Apr.setValue(coolingLoad[3])
-            self.doubleSpinBox_CL_May.setValue(coolingLoad[4])
-            self.doubleSpinBox_CL_Jun.setValue(coolingLoad[5])
-            self.doubleSpinBox_CL_Jul.setValue(coolingLoad[6])
-            self.doubleSpinBox_CL_Aug.setValue(coolingLoad[7])
-            self.doubleSpinBox_CL_Sep.setValue(coolingLoad[8])
-            self.doubleSpinBox_CL_Oct.setValue(coolingLoad[9])
-            self.doubleSpinBox_CL_Nov.setValue(coolingLoad[10])
-            self.doubleSpinBox_CL_Dec.setValue(coolingLoad[11])
+            self.gui_structure.option_cl_jan.set_value(coolingLoad[0])
+            self.gui_structure.option_cl_feb.set_value(coolingLoad[1])
+            self.gui_structure.option_cl_mar.set_value(coolingLoad[2])
+            self.gui_structure.option_cl_apr.set_value(coolingLoad[3])
+            self.gui_structure.option_cl_may.set_value(coolingLoad[4])
+            self.gui_structure.option_cl_jun.set_value(coolingLoad[5])
+            self.gui_structure.option_cl_jul.set_value(coolingLoad[6])
+            self.gui_structure.option_cl_aug.set_value(coolingLoad[7])
+            self.gui_structure.option_cl_sep.set_value(coolingLoad[8])
+            self.gui_structure.option_cl_oct.set_value(coolingLoad[9])
+            self.gui_structure.option_cl_nov.set_value(coolingLoad[10])
+            self.gui_structure.option_cl_dec.set_value(coolingLoad[11])
             # set peak heating load to double spinBoxes
-            self.doubleSpinBox_Hp_Jan.setValue(peak_heating[0])
-            self.doubleSpinBox_Hp_Feb.setValue(peak_heating[1])
-            self.doubleSpinBox_Hp_Mar.setValue(peak_heating[2])
-            self.doubleSpinBox_Hp_Apr.setValue(peak_heating[3])
-            self.doubleSpinBox_Hp_May.setValue(peak_heating[4])
-            self.doubleSpinBox_Hp_Jun.setValue(peak_heating[5])
-            self.doubleSpinBox_Hp_Jul.setValue(peak_heating[6])
-            self.doubleSpinBox_Hp_Aug.setValue(peak_heating[7])
-            self.doubleSpinBox_Hp_Sep.setValue(peak_heating[8])
-            self.doubleSpinBox_Hp_Oct.setValue(peak_heating[9])
-            self.doubleSpinBox_Hp_Nov.setValue(peak_heating[10])
-            self.doubleSpinBox_Hp_Dec.setValue(peak_heating[11])
+            self.gui_structure.option_hp_jan.set_value(peak_heating[0])
+            self.gui_structure.option_hp_feb.set_value(peak_heating[1])
+            self.gui_structure.option_hp_mar.set_value(peak_heating[2])
+            self.gui_structure.option_hp_apr.set_value(peak_heating[3])
+            self.gui_structure.option_hp_may.set_value(peak_heating[4])
+            self.gui_structure.option_hp_jun.set_value(peak_heating[5])
+            self.gui_structure.option_hp_jul.set_value(peak_heating[6])
+            self.gui_structure.option_hp_aug.set_value(peak_heating[7])
+            self.gui_structure.option_hp_sep.set_value(peak_heating[8])
+            self.gui_structure.option_hp_oct.set_value(peak_heating[9])
+            self.gui_structure.option_hp_nov.set_value(peak_heating[10])
+            self.gui_structure.option_hp_dec.set_value(peak_heating[11])
             # set peak cooling load to double spinBoxes
-            self.doubleSpinBox_Cp_Jan.setValue(peak_cooling[0])
-            self.doubleSpinBox_Cp_Feb.setValue(peak_cooling[1])
-            self.doubleSpinBox_Cp_Mar.setValue(peak_cooling[2])
-            self.doubleSpinBox_Cp_Apr.setValue(peak_cooling[3])
-            self.doubleSpinBox_Cp_May.setValue(peak_cooling[4])
-            self.doubleSpinBox_Cp_Jun.setValue(peak_cooling[5])
-            self.doubleSpinBox_Cp_Jul.setValue(peak_cooling[6])
-            self.doubleSpinBox_Cp_Aug.setValue(peak_cooling[7])
-            self.doubleSpinBox_Cp_Sep.setValue(peak_cooling[8])
-            self.doubleSpinBox_Cp_Oct.setValue(peak_cooling[9])
-            self.doubleSpinBox_Cp_Nov.setValue(peak_cooling[10])
-            self.doubleSpinBox_Cp_Dec.setValue(peak_cooling[11])
+            self.gui_structure.option_cp_jan.set_value(peak_cooling[0])
+            self.gui_structure.option_cp_feb.set_value(peak_cooling[1])
+            self.gui_structure.option_cp_mar.set_value(peak_cooling[2])
+            self.gui_structure.option_cp_apr.set_value(peak_cooling[3])
+            self.gui_structure.option_cp_may.set_value(peak_cooling[4])
+            self.gui_structure.option_cp_jun.set_value(peak_cooling[5])
+            self.gui_structure.option_cp_jul.set_value(peak_cooling[6])
+            self.gui_structure.option_cp_aug.set_value(peak_cooling[7])
+            self.gui_structure.option_cp_sep.set_value(peak_cooling[8])
+            self.gui_structure.option_cp_oct.set_value(peak_cooling[9])
+            self.gui_structure.option_cp_nov.set_value(peak_cooling[10])
+            self.gui_structure.option_cp_dec.set_value(peak_cooling[11])
         # raise error and display error massage in status bar
         except FileNotFoundError:
             self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
@@ -1191,103 +873,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         except KeyError:
             self.status_bar.showMessage(self.translations.ColumnError, 5000)
 
-    def funChangeUnit(self) -> None:
-        """
-        function to change the unit
-        :return: None
-        """
-        # get new and old unit from comboBox und labels
-        peakNew = self.comboBox_Unit_peak.currentText()
-        loadNew = self.comboBox_Unit_Load.currentText()
-        peakOld = self.label_Unit_pH.text()
-        peakOld = peakOld.replace('[', '')
-        peakOld = peakOld.replace(']', '')
-        loadOld = self.label_Unit_HL.text()
-        loadOld = loadOld.replace('[', '')
-        loadOld = loadOld.replace(']', '')
-        # set new unit to labels
-        self.label_Unit_HL.setText(f'[{loadNew}]')
-        self.label_Unit_CL.setText(f'[{loadNew}]')
-        self.label_Unit_pH.setText(f'[{peakNew}]')
-        self.label_Unit_pC.setText(f'[{peakNew}]')
-        # determine load converting factor
-        if loadNew == loadOld:
-            factorLoad = 1
-        elif loadOld == 'Wh' and loadNew == 'MWh':
-            factorLoad = 0.000_001
-        elif (loadOld == 'Wh' and loadNew == 'kWh') or (loadOld == 'kWh' and loadNew == 'MWh'):
-            factorLoad = 0.001
-        elif (loadOld == 'kWh' and loadNew == 'Wh') or (loadOld == 'MWh' and loadNew == 'kWh'):
-            factorLoad = 1_000
-        elif loadOld == 'MWh' and loadNew == 'Wh':
-            factorLoad = 1_000_000
-        else:
-            factorLoad = 0
-        # determine peak converting factor
-        if peakOld == peakNew:
-            factorPeak = 1
-        elif peakOld == 'W' and peakNew == 'MW':
-            factorPeak = 0.000_001
-        elif (peakOld == 'W' and peakNew == 'kW') or (peakOld == 'kW' and peakNew == 'MW'):
-            factorPeak = 0.001
-        elif (peakOld == 'kW' and peakNew == 'W') or (peakOld == 'MW' and peakNew == 'kW'):
-            factorPeak = 1_000
-        elif peakOld == 'MW' and peakNew == 'W':
-            factorPeak = 1_000_000
-        else:
-            factorPeak = 0
-        # set new values with a floating decimal to heating load
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_HL_Jan, factorLoad)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_HL_Feb, factorLoad)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_HL_Mar, factorLoad)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_HL_Apr, factorLoad)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_HL_May, factorLoad)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_HL_Jun, factorLoad)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_HL_Jul, factorLoad)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_HL_Aug, factorLoad)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_HL_Sep, factorLoad)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_HL_Oct, factorLoad)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_HL_Nov, factorLoad)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_HL_Dec, factorLoad)
-        # set new values with a floating decimal to cooling load
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_CL_Jan, factorLoad)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_CL_Feb, factorLoad)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_CL_Mar, factorLoad)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_CL_Apr, factorLoad)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_CL_May, factorLoad)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_CL_Jun, factorLoad)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_CL_Jul, factorLoad)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_CL_Aug, factorLoad)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_CL_Sep, factorLoad)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_CL_Oct, factorLoad)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_CL_Nov, factorLoad)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_CL_Dec, factorLoad)
-        # set new values with a floating decimal to peak heating
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Hp_Jan, factorPeak)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Hp_Feb, factorPeak)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Hp_Mar, factorPeak)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Hp_Apr, factorPeak)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Hp_May, factorPeak)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Hp_Jun, factorPeak)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Hp_Jul, factorPeak)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Hp_Aug, factorPeak)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Hp_Sep, factorPeak)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Hp_Oct, factorPeak)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Hp_Nov, factorPeak)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Hp_Dec, factorPeak)
-        # set new values with a floating decimal to peak cooling
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Cp_Jan, factorPeak)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Cp_Feb, factorPeak)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Cp_Mar, factorPeak)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Cp_Apr, factorPeak)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Cp_May, factorPeak)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Cp_Jun, factorPeak)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Cp_Jul, factorPeak)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Cp_Aug, factorPeak)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Cp_Sep, factorPeak)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Cp_Oct, factorPeak)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Cp_Nov, factorPeak)
-        self.displayValuesWithFloatingDecimal(self.doubleSpinBox_Cp_Dec, factorPeak)
+
 
     def funLoad(self) -> None:
         """
@@ -1295,8 +881,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         :return: None
         """
         # open interface and get file name
-        self.filename = QtWidgets_QFileDialog.getOpenFileName(caption=self.translations.ChoosePKL,
-                                                              filter='Pickle (*.pkl)')
+        self.filename = QtWidgets_QFileDialog.getOpenFileName(self.centralwidget, caption=self.translations.ChoosePKL, filter='Pickle (*.pkl)')
         # load selected data
         self.funLoadKnownFilename()
 
@@ -1346,8 +931,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         """
         # ask for pickle file if the filename is still the default
         if self.filename == MainWindow.filenameDefault:
-            self.filename: tuple = QtWidgets_QFileDialog.getSaveFileName(caption=self.translations.SavePKL,
-                                                                         filter='Pickle (*.pkl)')
+            self.filename: tuple = QtWidgets_QFileDialog.getSaveFileName(self.centralwidget, caption=self.translations.SavePKL, filter='Pickle (*.pkl)')
             # break function if no file is selected
             if self.filename == MainWindow.filenameDefault:
                 return False
@@ -1408,8 +992,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # activate checking for changed
         self.checking: bool = True
         # refresh results if results page is selected
-        if self.stackedWidget.currentWidget() == self.page_Results:
-            self.pushButton_Results.click()
+        self.gui_structure.page_result.button.click()
 
     def saveScenario(self) -> None:
         """
@@ -1429,7 +1012,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # create auto backup
         self.funSaveAuto()
         # remove * from scenario if not Auto save is checked and if the last char is a *
-        if not self.checkBox_AutoSaving.isChecked():
+        if not self.gui_structure.option_auto_saving.get_value() == 1:
             text = self.list_widget_scenario.item(idx).text()
             if text[-1] == '*':
                 self.list_widget_scenario.item(idx).setText(text[:-1])
@@ -1474,68 +1057,6 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.list_widget_scenario.setCurrentRow(number)
         # run change function to mark unsaved inputs
         self.change()
-
-    def showSimulationVariables(self, idx: int) -> None:
-        """
-        show or hide input boxes depending on the purpose of simulation selected in comboBox_AimList
-        :param idx: selected index
-        :return: None
-        """
-        # hide import and thermal demands frames and label if optmize load profile is selected
-        self.label_Import.hide() if idx == 3 else self.label_Import.show()
-        self.frame_import.hide() if idx == 3 else self.frame_import.show()
-        self.label_39.hide() if idx == 3 else self.label_39.show()
-        self.label_ThermalDemands.hide() if idx == 3 else self.label_ThermalDemands.show()
-        self.frame_thermal_demand.hide() if idx == 3 else self.frame_thermal_demand.show()
-        self.label_51.hide() if idx == 3 else self.label_51.show()
-        # show select datafile frame and label
-        self.label_data_file.show() if idx == 3 else self.label_data_file.hide()
-        self.frame_data_file.show() if idx == 3 else self.frame_data_file.hide()
-        # hide borehole depth label and spin box if determination of depth is selected
-        self.label_H.hide() if idx == 1 else self.label_H.show()
-        self.doubleSpinBox_H.hide() if idx == 1 else self.doubleSpinBox_H.show()
-        # show label and combo box for selecting depth calculation method
-        self.label_calc_method_depth.show() if idx == 1 or idx == 2 else self.label_calc_method_depth.hide()
-        self.comboBox_depth_Method.show() if idx == 1 or idx == 2 else self.comboBox_depth_Method.hide()
-        # set borehole spacing name to minimal borehole spacing if sizing by length and width is selected
-        self.label_BS.setText(self.translations.label_B_min) if idx == 2 else \
-            self.label_BS.setText(self.translations.label_BS)
-        # set borehole depth name to maximal borehole depth if sizing by length and width is selected
-        self.label_H.setText(self.translations.label_H_max) if idx == 2 else \
-            self.label_H.setText(self.translations.label_H)
-        # show labels and boxes for sizing by length and width
-        self.label_calc_method_sizing.show() if idx == 2 else self.label_calc_method_sizing.hide()
-        self.comboBox_Size_Method.show() if idx == 2 else self.comboBox_Size_Method.hide()
-        self.label_B_max.show() if idx == 2 else self.label_B_max.hide()
-        self.doubleSpinBox_B_max.show() if idx == 2 else self.doubleSpinBox_B_max.hide()
-        self.label_MaxWidthField.show() if idx == 2 else self.label_MaxWidthField.hide()
-        self.doubleSpinBox_W_max.show() if idx == 2 else self.doubleSpinBox_W_max.hide()
-        self.label_MaxLengthField.show() if idx == 2 else self.label_MaxLengthField.hide()
-        self.doubleSpinBox_L_max.show() if idx == 2 else self.doubleSpinBox_L_max.hide()
-        # hide width and length label and spin boxes for number of boreholes if sizing by length and width is selected
-        self.label_WidthField.hide() if idx == 2 else self.label_WidthField.show()
-        self.spinBox_N_1.hide() if idx == 2 else self.spinBox_N_1.show()
-        self.label_LengthField.hide() if idx == 2 else self.label_LengthField.show()
-        self.spinBox_N_2.hide() if idx == 2 else self.spinBox_N_2.show()
-
-    def showBoreholeResistanceBoxes(self, idx: int):
-        """
-        show or hide input boxes depending on the borehole resistance calculation method selected in comboBox_Rb_method
-        :param idx: selected index
-        :return: None
-        """
-        # hide label and spinBox for constant known thermal resistance if thermal resistance is unknown
-        self.label_BoreholeResistance.hide() if idx > 0 else self.label_BoreholeResistance.show()
-        self.label_2.hide() if idx > 0 else self.label_2.show()
-        self.doubleSpinBox_Rb.hide() if idx > 0 else self.doubleSpinBox_Rb.show()
-        # show frames and labels for fluid and pipe data if thermal resistance is unknown
-        self.label_fluid_data.show() if idx > 0 else self.label_fluid_data.hide()
-        self.frame_fluid_data.show() if idx > 0 else self.frame_fluid_data.hide()
-        self.label_47.show() if idx > 0 else self.label_47.hide()
-        self.label_48.show() if idx > 0 else self.label_48.hide()
-        self.label_pipe_data.show() if idx > 0 else self.label_pipe_data.hide()
-        self.frame_pipe_data.show() if idx > 0 else self.frame_pipe_data.hide()
-        self.update_borehole() if idx > 0 else None
 
     def updateBar(self, val: int, opt_start: bool = False) -> None:
         """
@@ -1600,7 +1121,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             self.pushButton_SaveScenario.setEnabled(True)
             self.action_start_single.setEnabled(True)
             self.action_start_multiple.setEnabled(True)
-            self.pushButton_Results.click()
+            self.gui_structure.page_result.button.click()
             return
         # start new thread
         self.threads[self.finished].start()
@@ -1615,7 +1136,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.addScenario() if not self.ListDS else self.saveScenario()
         # return to thermal demands page if no file is selected
         if any([i.fileSelected for i in self.ListDS]):
-            self.stackedWidget.setCurrentWidget(self.page_thermal)
+            self.gui_structure.page_thermal.button.click()
             self.status_bar.showMessage(self.translations.NoFileSelected)
             return
         # disable buttons and actions to avoid two calculation at once
@@ -1647,7 +1168,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.addScenario() if not self.ListDS else self.saveScenario()
         # return to thermal demands page if no file is selected
         if self.ListDS[self.list_widget_scenario.currentRow()].fileSelected:
-            self.stackedWidget.setCurrentWidget(self.page_thermal)
+            self.gui_structure.page_thermal.button.click()
             self.status_bar.showMessage(self.translations.NoFileSelected)
             return
         # disable buttons and actions to avoid two calculation at once
@@ -1666,7 +1187,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         ds: DataStorage = self.ListDS[idx]
         # if calculation is already done just show results
         if ds.boreField is not None:
-            self.pushButton_Results.click()
+            self.gui_structure.page_result.button.click()
             return
         # create list of threads with calculation to be made
         self.threads = [CalcProblem(ds, idx)]
@@ -1683,11 +1204,11 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         """
         # hide widgets if no list of scenarios exists and display not calculated text
         if not self.ListDS:
-            self.label_Size.setText(self.translations.NotCalculated)
-            self.label_WarningDepth.hide()
-            self.checkBox_Legend.hide()
-            self.pushButton_SaveData.hide()
-            self.pushButton_SaveFigure.hide()
+            self.gui_structure.hint_depth.label.setText(self.translations.NotCalculated)
+            # self.label_WarningDepth.hide()
+            self.gui_structure.option_show_legend.hide()
+            self.gui_structure.function_save_results.hide()
+            self.gui_structure.function_save_figure.hide()
             self.canvas.hide() if self.canvas is not None else None
             return
         # import here to save start up time
@@ -1701,11 +1222,11 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         boreField: Borefield = ds.boreField
         # hide widgets if no results bore field exists and display not calculated text
         if boreField is None:
-            self.label_Size.setText(self.translations.NotCalculated)
-            self.label_WarningDepth.hide()
-            self.checkBox_Legend.hide()
-            self.pushButton_SaveData.hide()
-            self.pushButton_SaveFigure.hide()
+            self.gui_structure.hint_depth.label.setText(self.translations.NotCalculated)
+            # self.label_WarningDepth.hide()
+            self.gui_structure.option_show_legend.hide()
+            self.gui_structure.function_save_results.hide()
+            self.gui_structure.function_save_figure.hide()
             self.canvas.hide() if self.canvas is not None else None
             return
         # get results of bore field sizing by length and width
@@ -1715,19 +1236,20 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         li_n_2 = [str(round(i[1], 2)) for i in boreField.combo]
         # hide widgets if no solution exists and display no solution text
         if (ds.size_bore_field and not li_size) or (ds.determineDepth and boreField.H == boreField.H_max):
-            self.label_Size.setText(self.translations.NoSolution)
-            self.label_WarningDepth.hide()
-            self.checkBox_Legend.hide()
-            self.pushButton_SaveData.hide()
-            self.pushButton_SaveFigure.hide()
+            self.gui_structure.hint_depth.label.setText(self.translations.NotCalculated)
+            # self.label_WarningDepth.hide()
+            self.gui_structure.option_show_legend.hide()
+            self.gui_structure.function_save_results.hide()
+            self.gui_structure.function_save_figure.hide()
             self.canvas.hide() if self.canvas is not None else None
             return
         # show checkBox for legend and save figure button
-        self.checkBox_Legend.show()
-        self.pushButton_SaveFigure.show()
+        self.gui_structure.option_show_legend.show()
+        self.gui_structure.function_save_figure.show()
         # just show save Data button if not optmize load profile is selected because the output for this is not
         # defined so far
-        self.pushButton_SaveData.hide() if ds.optimizeLoadProfile else self.pushButton_SaveData.show()
+        self.gui_structure.function_save_results.hide() if self.gui_structure.aim_optimize.widget.isChecked() else \
+            self.gui_structure.function_save_results.show()
         # get peak heating and cooling and monthly loads as well as Tb temperature
         results_peak_cooling = boreField.results_peak_cooling
         results_peak_heating = boreField.results_peak_heating
@@ -1848,12 +1370,12 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             # not use axe 2
             ax2 = None
         # set string to depth size label
-        self.label_Size.setText(string_size)
+        self.gui_structure.hint_depth.label.setText(string_size)
         # display warning if depth is to small
-        self.label_WarningDepth.show() if boreField.H < 50 else self.label_WarningDepth.hide()
+        # self.label_WarningDepth.show() if boreField.H < 50 else self.label_WarningDepth.hide()
         # save variables
         self.ax = [ax] if not ds.optimizeLoadProfile else [ax, ax2]
-        self.gridLayout_8.addWidget(canvas, 1, 0) if self.canvas is None else None
+        self.gui_structure.category_result_figure.frame.layout().addWidget(canvas, 1, 0) if self.canvas is None else None
         self.canvas.show() if self.canvas is not None else None
         self.canvas = canvas
         # draw new plot
@@ -1866,7 +1388,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         :return: None
         """
         # check if the legend should be displayed
-        if self.checkBox_Legend.isChecked():
+        if self.gui_structure.option_show_legend.get_value() == 0:
             # set grey color
             grey_color = '#00407a'
             # set legend to graph either two if load is optimized or one otherwise with their locations
@@ -1889,8 +1411,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         :return: None
         """
         # get filename at storage place
-        filename = QtWidgets_QFileDialog.getSaveFileName(caption=self.translations.SaveFigure,
-                                                         filter='png (*.png)')
+        filename = QtWidgets_QFileDialog.getSaveFileName(self.centralwidget, caption=self.translations.SaveFigure, filter='png (*.png)')
         # display message and return if no file is selected
         if filename == MainWindow.filenameDefault:
             self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
@@ -1906,8 +1427,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # import csv writer here to save start up time
         from csv import writer as csv_writer
         # get filename at storage place
-        filename = QtWidgets_QFileDialog.getSaveFileName(caption=self.translations.SaveData,
-                                                         filter='csv (*.csv)')
+        filename = QtWidgets_QFileDialog.getSaveFileName(self.centralwidget, caption=self.translations.SaveData, filter='csv (*.csv)')
         # display message and return if no file is selected
         if filename == MainWindow.filenameDefault:
             self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
@@ -2227,7 +1747,7 @@ class SetItem(QtCore_QThread):
     """
     any_signal: QtCore_pyqtSignal = QtCore_pyqtSignal(QtCore_QThread)
 
-    def __init__(self, widget: QtWidgets_QWidget, item: QtWidgets_QListWidgetItem, parent=None) -> None:
+    def __init__(self, widget: QtWidgets_QListWidget, item: QtWidgets_QListWidgetItem, parent=None) -> None:
         """
         initialize change scenario / item class
         :param widget: widget to set later item for
@@ -2235,7 +1755,7 @@ class SetItem(QtCore_QThread):
         :param parent: parent class
         """
         super(SetItem, self).__init__(parent)
-        self.widget: QtWidgets_QWidget = widget
+        self.widget: QtWidgets_QListWidget = widget
         self.item = item
 
     def run(self) -> None:

@@ -3,7 +3,7 @@ from typing import List, Optional, Union
 
 from functools import partial as ft_partial
 from dataclasses import dataclass
-from .gui_Main_new import WHITE, LIGHT, DARK, GREY
+from .gui_Main_new import WHITE, LIGHT, DARK, GREY, WARNING
 
 import abc
 
@@ -194,7 +194,9 @@ class ButtonBox(Option):
 
     def set_value(self, index: int) -> None:
         for idx, button in enumerate(self.widget):
-            button.setChecked(idx == index)
+            if idx == index:
+                button.click()
+                break
 
     def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout, row: int = None, column: int = None) -> None:
         layout = self.create_frame(frame, layout_parent)
@@ -271,7 +273,7 @@ class ListBox(Option):
         self.widget.setCurrentIndex(self.default_value)
         self.widget.setMaximumWidth(100)
         self.widget.setMinimumWidth(100)
-        self.widget.currentIndexChanged.connect(ft_partial(check, self, self.linked_options))
+        self.widget.currentIndexChanged.connect(ft_partial(check, self.linked_options, self))
         setattr(frame.window(), self.widget_name, self.widget)
         if row is not None and isinstance(layout_parent, qt_w.QGridLayout):
             layout_parent.addWidget(self.widget, column, row)
@@ -332,20 +334,28 @@ class FileName(Option):
 
 class Hint:
 
-    def __init__(self, default_parent: qt_w.QWidget, widget_name: str, hint: str):
+    def __init__(self, default_parent: qt_w.QWidget, widget_name: str, hint: str, warning: bool = False):
         self.hint: str = hint
         self.obj_name: str = widget_name
         self.label: qt_w.QLabel = qt_w.QLabel(default_parent)
+        self.warning = warning
 
     def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout, row: int = None, column: int = None) -> None:
         self.label.setParent(frame)
         self.label.setText(self.hint)
+        if self.warning:
+            self.label.setStyleSheet(f"color: {WARNING};")
         self.label.setWordWrap(True)
         if row is not None and isinstance(layout_parent, qt_w.QGridLayout):
             layout_parent.addWidget(self.label, column, row)
             return
         layout_parent.addWidget(self.label)
 
+    def hide(self) -> None:
+        self.label.hide()
+
+    def show(self) -> None:
+        self.label.show()
 
 class FunctionButton:
 
