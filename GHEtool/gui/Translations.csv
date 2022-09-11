@@ -1,5 +1,6 @@
 ﻿name;English;German;Dutch;Italian;French;Spanish;Galician
-Language;0;1;2;3;4;5;6
+icon;:/icons/icons/Flag_English.svg;:/icons/icons/Flag_German.svg;:/icons/icons/Flag_Dutch.svg;:/icons/icons/Flag_Italian.svg;:/icons/icons/Flag_French.svg;:/icons/icons/Flag_Spain.svg;:/icons/icons/Flag_Galicia.svg
+short_cut;Ctrl+Alt+E;Ctrl+Alt+G;Ctrl+Alt+D;Ctrl+Alt+I;Ctrl+Alt+F;Ctrl+Alt+S;Ctrl+Alt+A
 scenarioString;Scenario;Szenario;Scenario;Scenario;Scénario;Escenario;Escenario
 label_Language;Language: ;Sprache: ;Taal: ;Languange: ;Languange: ;Idioma:;Lingua: 
 pushButton_SaveScenario;Update scenario;Szenario aktualisieren;Update scenario;Aggiorna scenario;Mettre à jour le scénario;Actualizar escenario;Actualizar escenario
@@ -7,13 +8,13 @@ pushButton_AddScenario;Add scenario;Szenario hinzufügen;Nieuw scenario;Aggiungi
 pushButton_DeleteScenario;Delete scenario;Szenario löschen;Verwijder scenario;Cancella scenario;Supprimer un scénario;Borrar escenario;Eliminar escenario
 pushButton_start_multiple;Calculate all scenarios;Berechne alle Szenarios;Bereken alle scenarios;Calculate all scenarios;Calculate all scenarios;Calculate all scenarios;Calculate all scenarios
 pushButton_Cancel;Exit;Verlassen;Sluit;Esci;Sortie;Salir;Saír
-page_borehole;Borehole \nand earth;Bohrloch \nund Erdreich;Boorveld \n en grond;Foro e \nterra;Forage \net terre;Pozo \ny terreno;Pozo \ne chan
-page_borehole_resistance;Thermal \ndemands;Thermischer \nBedarf;Thermische \nvraag;Richieste \ntermiche;Demande \nthermique;Cargas \ntérmicas;Cargas \ntérmicas
+page_borehole;Borehole @and earth,Borehole and earth;Bohrloch @und Erdreich,Bohrloch und Erdreich;Boorveld @ en grond,Boorveld en grond;Foro e @terra,Foro e terra;Forage @et terre,Forage et terre;Pozo @y terreno,Pozo y terreno;Pozo @e chan,Pozo e chan
+page_borehole_resistance;Borehole @resistance,Equivalent borehole resistance;Bohrloch-@widerstand,Equivalänter Bohrlochwiderstand;Boorgat-@weerstand,Equivalente boorgatweerstand;Borehole@resistance,Equivalent borehole resistance;Borehole@resistance,Equivalent borehole resistance;Borehole@resistance,Equivalent borehole resistance;Borehole@resistance,Equivalent borehole resistance
+page_thermal;Thermal @demand,Thermal demands;Thermischer @Bedarf,Thermische Last;Thermische @vraag,Thermische vraag;Richieste @termiche,Richieste termiche;Demande @thermique,Demande thermique;Cargas @térmicas,Cargas térmicas;Cargas @térmicas,Cargas térmicas
 pushButton_Results;Results;Ergebnisse;Resultaten;Risultati;Résultats;Resultados;Resultados
 label_Status;Progress: ;Fortschritt: ;Vooruitgang: ;Progressi: ;Progrès: ;Progreso: ;Progreso: 
 label_File;File;Datei;Bestand;File;File;File;File
 label_Calculation;Calculation;Berechnung;Berekening;Calculation;Calculation;Calculation;Calculation
-label_Borehole_earth;Borehole and earth;Bohrloch und Erdreich;Boorveld en grond;Foro e terra;Forage et terre;Pozo y terreno;Pozo e chan
 label_Earth_Properties;Borehole and earth properties;Bohrloch und Erdreicheigenschaften;Eigenschappen van boorveld en grond;Proprietà del foro e della terra;Propriétés du trou de sonde et de la terre;Propiedades del pozo y terreno;Propiedades do pozo e do chan
 checkBox_CalcDepth;Determine the required depth;Notwendige Bohrlochlänge bestimmen;Bepaal de benodigde diepte;Determinare la profondità richiesta;Déterminer la profondeur requise;Determinar la longitud requerida;Determinar a lonxitude necesaria
 label_Settings;Settings;Einstellungen;Instellingen;Settings;Settings;Settings;Settings
@@ -42,8 +43,7 @@ PeakCooling;peak cooling;Kühlspitzen;piekkoeling;Picco raffreddamento;Refroidis
 PeakHeating;peak heating;Heizspitzen;piekverwarming;Picco di riscaldamento;Pic de chauffage;Pico de calefacción;Pico de calefacción
 label_ThermalDemandsTitle;Thermal demands;Thermische Last;Thermische vraag;Richieste termiche;Demande thermique;Cargas térmicas;Cargas térmicas
 label_Import;Import;Importieren;Importeer;Importazione;Importation;Importar;Importar
-checkBox_Import;Import Demands?;Lasten importieren?;Importeer vraag?;Richieste di \nimportazione?;Demande d'importation?;Importar cargas?;Importar cargas?
-label_ThermalDemands;Thermal demands;Thermische Last;Thermische vraag;Richieste termiche;Demande thermique;Cargas térmicas;Cargas térmicas
+checkBox_Import;Import Demands?;Lasten importieren?;Importeer vraag?;Richieste di @importazione?;Demande d'importation?;Importar cargas?;Importar cargas?
 label_pH;Heating peak;Heizspitzen;Verwarmingspiek;Picco di riscaldamento;Pic de chauffage;Pico de calefacción;Pico de calefacción
 label_pC;Cooling peak;Kühlspitzen;Koelpiek;Picco di raffreddamento;Pic de refroidissement;Pico de refrigeración;Pico de refrixeración
 label_HL;Heating load;Heizlast;Belasting verwarming;Carico di riscaldamento;Charge de chauffage;Carga de calefacción;Carga de calefacción
@@ -69,7 +69,7 @@ pushButton_load;Load;Laden;Laad;Caricare;Chargement;Cargar;Cargar
 toolBoxFile;Data fileImport;Datendatei;Databestand;File dati;Fichier de données;Fichier de données;Fichier de données
 toolBoxDataLocation;Data location in fileImport;Speicherort der Daten in der Datei;Locatie van de data in bestand;Posizione dati nel fileImport;Emplacement des données dans le fichier;Data location in fileImport;Data location in fileImport
 label_dataColumn;Thermal demands: ;Thermische Lasten: ;Thermische vraag: ;Richieste termiche: ;Demande thermique: ;Cargas térmicas: ;Cargas térmicas: 
-label_DataUnit;Unit data: ;Dateneinheit: ;Eenheid data: ;Dati \ndell'unità:  ;Données de l'unité: ;Datos de unidad: ;Datos de unidade: 
+label_DataUnit;Unit data: ;Dateneinheit: ;Eenheid data: ;Dati @dell'unità:  ;Données de l'unité: ;Datos de unidad: ;Datos de unidade: 
 label_HeatingLoadLine;Heating load line: ;Heizlastspalte: ;Belastingslijn verwarming: ;Linea di carico di riscaldamento: ;Ligne de charge de chauffage: ;Línea de carga de calefacción: ;Liña de carga de calefacción: 
 label_CoolingLoadLine;Cooling load line: ;Kühllastspalte: ;Belastingslijn koeling: ;Linea del carico di raffreddamento: ;Ligne de charge de refroidissement: ;Línea de carga de refrigeración: ;Liña de carga de refrixeración: 
 label_combined;Load line: ;Load line: ;Belastingslijn: ;Linea di carico: ;Ligne de charge: ;Línea de carga: ;Liña de carga: 
@@ -120,7 +120,6 @@ new_name;New name for ;Neuer Name für ;Nieuwe naam voor ;New name for ;New name
 label_okay;Okay ;Okay ;Oke ;Okay ;Okay ;Okay ;Okay 
 label_abort;Abort ;Abbruch ;Geannuleerd ;Abort ;Abort ;Abort ;Abort 
 NoBackupFile;no backup fileImport;Keine Sicherungsdatei gefunden;geen backup fileImport;no backup fileImport;no backup fileImport;no backup fileImport;no backup fileImport
-pushButton_borehole_resistance;Borehole\nresistance;Bohrloch-\nwiderstand;Boorgat-\nweerstand;Borehole\nresistance;Borehole\nresistance;Borehole\nresistance;Borehole\nresistance
 label_Spanish;Spanish;Spanisch;Spaans;Spanish;Spanish;Spanish;Spanish
 label_Galician;Galician;Galizisch;Galisisch;Galician;Galician;Galician;Galician
 label_close;Close;Schließen;Sluit;Close;Close;Close;Close
@@ -167,11 +166,10 @@ label_dataColumn_2;Thermal demands: ;Thermische Lasten: ;Thermische vraag: ;Rich
 label_HeatingLoadLine_2;Heating load line: ;Heizlastspalte: ;Belastingslijn verwarming: ;Linea di carico di riscaldamento: ;Ligne de charge de chauffage: ;Línea de carga de calefacción: ;Liña de carga de calefacción: 
 label_CoolingLoadLine_2;Cooling load line: ;Kühllastspalte: ;Belastingslijn koeling: ;Linea del carico di raffreddamento: ;Ligne de charge de refroidissement: ;Línea de carga de refrigeración: ;Liña de carga de refrixeración: 
 label_combined_2;Load line: ;Load line: ;Belastingslijn: ;Linea di carico: ;Ligne de charge: ;Línea de carga: ;Liña de carga: 
-label_DataUnit_2;Unit data: ;Dateneinheit: ;Eenheid data: ;Dati \ndell'unità:  ;Données de l'unité: ;Datos de unidad: ;Datos de unidade: 
+label_DataUnit_2;Unit data: ;Dateneinheit: ;Eenheid data: ;Dati @dell'unità:  ;Données de l'unité: ;Datos de unidad: ;Datos de unidade: 
 label_Scenario_Head;Scenario saving settings;Szenarioeinstellungen für das Speichern;Instellingen opslaan scenario;Scenario saving settings;Scenario saving settings;Scenario saving settings;Scenario saving settings
 checkBox_AutoSaving;Automatic saving;Automatisches speichern;Automatisch opslaan;Automatic saving;Automatic saving;Automatic saving;Automatic saving
 label_Scenario_Hint;If Auto saving is selected the scenario will automatically saved if a scenario is changed. Otherwise the scenario has to be saved with the Update scenario button in the upper left corner if the changes should not be lost.;Wenn Automatisch speichern ausgewählt ist, wird das Szenario automatisch gespeichert, wenn ein Szenario geändert wird. Andernfalls muss das Szenario mit der Schaltfläche Szenario aktualisieren in der oberen linken Ecke gespeichert werden, wenn die Änderungen nicht verloren gehen sollen.;"Als auto-opslaan is geselecteerd, zal het scenario automatisch worden opgeslagen alshet wordt gewijzigd. Anders kan het scenario opgeslagen worden als op de ""update scenario""-kopwordt gedrukt als deze niet verloren mogen gaan.";If Auto saving is selected the scenario will automatically saved if a scenario is changed. Otherwise the scenario has to be saved with the Update scenario button in the upper left corner if the changes should not be lost.;If Auto saving is selected the scenario will automatically saved if a scenario is changed. Otherwise the scenario has to be saved with the Update scenario button in the upper left corner if the changes should not be lost.;If Auto saving is selected the scenario will automatically saved if a scenario is changed. Otherwise the scenario has to be saved with the Update scenario button in the upper left corner if the changes should not be lost.;If Auto saving is selected the scenario will automatically saved if a scenario is changed. Otherwise the scenario has to be saved with the Update scenario button in the upper left corner if the changes should not be lost.
-label_Borehole_Resistance;Equivalent borehole resistance;Equivalänter Bohrlochwiderstand;Equivalente boorgatweerstand;Equivalent borehole resistance;Equivalent borehole resistance;Equivalent borehole resistance;Equivalent borehole resistance
 label_Borehole_Resistance_Head;Equivalent borehole resistance;Equivalänter Bohrlochwiderstand;Equivalente boorgatweerstand;Equivalent borehole resistance;Equivalent borehole resistance;Equivalent borehole resistance;Equivalent borehole resistance
 label_Rb_calculation_method;Calculation method:;Berechnungsmethode:;Berekeningsmethode:;Calculation method:;Calculation method:;Calculation method:;Calculation method:
 comboBox_Rb_methodList;['Known constant value', 'Unknown constant value', 'During calculation updating value'];['Bekannter konstanter Wert', 'Unbekannter konstanter Wert', 'Während der Berechnung aktualisierender Wert'];['Constante waarde (gegeven)', 'Constante waarde (berekend)', 'Dynamische waarde'];['Known constant value', 'Unknown constant value', 'During calculation updating value'];['Known constant value', 'Unknown constant value', 'During calculation updating value'];['Known constant value', 'Unknown constant value', 'During calculation updating value'];['Known constant value', 'Unknown constant value', 'During calculation updating value']

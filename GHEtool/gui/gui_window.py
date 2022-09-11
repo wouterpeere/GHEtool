@@ -20,6 +20,7 @@ from PySide6.QtWidgets import QApplication as QtWidgets_QApplication
 from PySide6.QtWidgets import QDialog as QtWidgets_QDialog
 from PySide6.QtWidgets import QDoubleSpinBox as QtWidgets_QDoubleSpinBox
 from PySide6.QtWidgets import QFileDialog as QtWidgets_QFileDialog
+from PySide6.QtGui import QAction as QtGui_QAction
 from PySide6.QtWidgets import QHBoxLayout as QtWidgets_QHBoxLayout
 from PySide6.QtWidgets import QInputDialog as QtWidgets_QInputDialog
 from PySide6.QtWidgets import QListWidgetItem as QtWidgets_QListWidgetItem
@@ -36,7 +37,7 @@ from PySide6.QtWidgets import QGraphicsScene, QGraphicsEllipseItem
 from PySide6.QtGui import QColor, QPen
 
 from GHEtool.gui.data_storage_new import DataStorageNew
-from GHEtool.gui.gui_Main_new import Ui_GHEtool
+from GHEtool.gui.gui_main_new import UiGhetool
 from GHEtool.gui.translation_class import Translations
 from GHEtool.gui.gui_structure import GuiStructure
 
@@ -57,7 +58,8 @@ class BoundsOfPrecalculatedData:
     """
     class to check if selected values are within the bounds for the precalculated data
     """
-    __slots__ = 'H', 'B_Min', 'B_Max', 'k_s_Min', 'k_s_Max', 'N_Max'
+
+    __slots__ = "H", "B_Min", "B_Max", "k_s_Min", "k_s_Max", "N_Max"
 
     def __init__(self) -> None:
         self.H: float = 350.0  # Maximal depth [m]
@@ -78,9 +80,9 @@ class BoundsOfPrecalculatedData:
         """
         if h > self.H:
             return True
-        if not(self.B_Min <= b <= self.B_Max):
+        if not (self.B_Min <= b <= self.B_Max):
             return True
-        if not(self.k_s_Min <= k_s <= self.k_s_Max):
+        if not (self.k_s_Min <= k_s <= self.k_s_Max):
             return True
         if n > self.N_Max:
             return True
@@ -88,8 +90,8 @@ class BoundsOfPrecalculatedData:
 
 
 # main GUI class
-class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
-    filenameDefault: tuple = ('', '')
+class MainWindow(QtWidgets_QMainWindow, UiGhetool):
+    filenameDefault: tuple = ("", "")
 
     def __init__(self, dialog: QtWidgets_QWidget, app: QtWidgets_QApplication) -> None:
         """
@@ -99,21 +101,17 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         """
         # init windows of parent class
         super(MainWindow, self).__init__()
-        super().setupUi(dialog)
+        super().setup_ui(dialog)
         # 'E:/Git/GHEtool_test/GHEtool/gui/ui/icons/Options.svg'
         # pyside6-rcc icons.qrc -o icons_rc.py
 
-        self.gui_structure = GuiStructure(self.centralwidget, self.status_bar)
+        self.gui_structure = GuiStructure(self.central_widget, self.status_bar)
         for page in self.gui_structure.list_of_pages:
-            page.create_page(self.centralwidget, self.stackedWidget, self.verticalLayout_menu)
-
-        self.gui_structure.translate(1)
+            page.create_page(self.central_widget, self.stackedWidget, self.verticalLayout_menu)
 
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         self.verticalLayout_menu.addItem(self.verticalSpacer)
 
-        #ds = DataStorageNew(self.gui_structure)
-        #ds.save()
         # self.add_aims(list_button)
         # set app and dialog
         self.app: QtWidgets_QApplication = app
@@ -122,6 +120,11 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # allow checking of changes
         self.checking: bool = False
         self.translations: Translations = Translations()  # init translation class
+        for idx, (name, icon, short_cut) in enumerate(zip(self.translations.option_language, self.translations.icon, self.translations.short_cut)):
+            self.create_action_language(idx, name, icon, short_cut)
+        # add languages to combo box
+        self.gui_structure.option_language.widget.addItems(self.translations.option_language)
+        self.gui_structure.translate(1, self.translations)
         self.fileImport = None  # init import file
         self.filename: tuple = MainWindow.filenameDefault  # filename of stored inputs
         self.list_widget_scenario.clear()  # reset list widget with stored scenarios
@@ -141,15 +144,15 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.sizePushS = QtCore_QSize(75, 75)  # size of small push button
         self.BOPD: BoundsOfPrecalculatedData = BoundsOfPrecalculatedData()  # init bounds of precalculated data class
         # init links from buttons to functions
-        self.setLinks()
+        self.set_links()
         # reset progress bar
-        self.updateBar(0, False)
+        self.update_bar(0, False)
         # set event filter for push button sizing
-        self.eventFilterInstall()
+        self.event_filter_install()
         # start importing GHEtool by a thread to save start up time
         self.IG: ImportGHEtool = ImportGHEtool()
         self.IG.start()
-        self.IG.any_signal.connect(self.checkGHEtool)
+        self.IG.any_signal.connect(self.check_ghe_tool)
         # show loading GHEtool message in statusbar
         self.status_bar.showMessage(self.translations.GHE_tool_imported_start[self.gui_structure.option_language.get_value()], 5000)
         # enable push button because GHEtool ist not imported
@@ -157,22 +160,16 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.pushButton_start_single.setEnabled(False)
         self.action_start_multiple.setEnabled(False)
         self.action_start_single.setEnabled(False)
-        # add languages to combo box
-        self.gui_structure.option_language.widget.addItems(self.translations.option_language)
         # hide warning for custom bore field calculation
         self.gui_structure.hint_calc_time.hide()
         # load backup data
-        self.loadList()
+        self.load_list()
         # add progress bar and label to statusbar
         self.status_bar.addPermanentWidget(self.label_Status, 0)
         self.status_bar.addPermanentWidget(self.progressBar, 1)
-        self.status_bar.messageChanged.connect(self.statusHide)
+        self.status_bar.messageChanged.connect(self.status_hide)
         # change window title to saved filename
-        self.changeWindowTitle()
-        # add action shortcut for changing language to english
-        self.actionEnglish.setShortcut("Ctrl+Alt+E")
-        # set links to check if changes happen
-        self.actionInputChanged.triggered.connect(self.change)
+        self.change_window_title()
         # allow checking of changes
         self.checking: bool = True
         # reset push button size
@@ -182,7 +179,17 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
 
         self.update_borehole()
 
-    def eventFilterInstall(self) -> None:
+    def create_action_language(self, idx: int, name: str, icon_name: str, short_cut: str):
+        action = QtGui_QAction(self.central_widget)
+        icon = QtGui_QIcon()
+        icon.addFile(icon_name, QtCore_QSize(), QtGui_QIcon.Normal, QtGui_QIcon.Off)
+        action.setIcon(icon)
+        self.menuLanguage.addAction(action)
+        action.setText(name)
+        action.setShortcut(short_cut)
+        action.triggered.connect(ft_partial(self.gui_structure.option_language.widget.setCurrentIndex, idx))
+
+    def event_filter_install(self) -> None:
         """
         install event filter for push button sizing
         :return: None
@@ -191,7 +198,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             page.button.installEventFilter(self)
             page.label_gap.installEventFilter(self)
 
-    def setLinks(self) -> None:
+    def set_links(self) -> None:
         """
         set links of buttons and actions to function
         :return: None
@@ -212,48 +219,35 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.gui_structure.option_pipe_distance.change_event(self.check_distance_between_pipes)
         self.gui_structure.option_pipe_outer_radius.change_event(self.gui_structure.option_pipe_inner_radius.widget.setMaximum)
         self.gui_structure.option_pipe_inner_radius.change_event(self.gui_structure.option_pipe_outer_radius.widget.setMinimum)
-        self.gui_structure.page_result.button.clicked.connect(self.displayResults)
-        self.gui_structure.function_save_figure.button.clicked.connect(self.saveFigure)
+        self.gui_structure.page_result.button.clicked.connect(self.display_results)
+        self.gui_structure.function_save_figure.button.clicked.connect(self.save_figure)
         self.gui_structure.function_save_results.button.clicked.connect(self.save_data)
         self.gui_structure.option_seperator_csv.change_event(self.fun_update_combo_box_data_file)
         self.gui_structure.option_decimal_csv.change_event(self.fun_update_combo_box_data_file)
         self.gui_structure.filename.change_event(self.fun_update_combo_box_data_file)
-        self.gui_structure.option_auto_saving.change_event(self.changeAutoSave)
-        self.gui_structure.option_show_legend.change_event(self.checkLegend)
+        self.gui_structure.option_auto_saving.change_event(self.change_auto_save)
+        self.gui_structure.option_show_legend.change_event(self.check_legend)
         self.gui_structure.option_depth.change_event(self.check_bounds)
         self.gui_structure.option_spacing.change_event(self.check_bounds)
         self.gui_structure.option_conductivity.change_event(self.check_bounds)
         self.gui_structure.option_length.change_event(self.check_bounds)
         self.gui_structure.option_width.change_event(self.check_bounds)
-        self.gui_structure.button_load_csv.button.clicked.connect(self.funDisplayData)
+        self.gui_structure.button_load_csv.button.clicked.connect(self.fun_display_data)
         self.gui_structure.option_language.change_event(self.changeLanguage)
-        self.gui_structure.page_result.button.clicked.connect(self.displayResults)
-        self.actionAdd_Scenario.triggered.connect(self.addScenario)
-        self.actionUpdate_Scenario.triggered.connect(self.saveScenario)
-        self.actionDelete_scenario.triggered.connect(self.deleteScenario)
-        self.action_start_multiple.triggered.connect(self.startMultipleScenariosCalculation)
-        self.action_start_single.triggered.connect(self.startCurrentScenarioCalculation)
-        self.actionSave.triggered.connect(self.funSave)
-        self.actionSave_As.triggered.connect(self.funSaveAs)
-        self.actionOpen.triggered.connect(self.funLoad)
-        self.actionNew.triggered.connect(self.funNew)
-        self.actionEnglish.triggered.connect(ft_partial(self.gui_structure.option_language.widget.setCurrentIndex, 0))
-        self.actionGerman.triggered.connect(ft_partial(self.gui_structure.option_language.widget.setCurrentIndex, 1))
-        self.actionDutch.triggered.connect(ft_partial(self.gui_structure.option_language.widget.setCurrentIndex, 2))
-        self.actionItalian.triggered.connect(ft_partial(self.gui_structure.option_language.widget.setCurrentIndex, 3))
-        self.actionFrench.triggered.connect(ft_partial(self.gui_structure.option_language.widget.setCurrentIndex, 4))
-        self.actionSpanish.triggered.connect(ft_partial(self.gui_structure.option_language.widget.setCurrentIndex, 5))
-        self.actionGalician.triggered.connect(ft_partial(self.gui_structure.option_language.widget.setCurrentIndex, 6))
-        self.actionRename_scenario.triggered.connect(self.funRenameScenario)
-        self.list_widget_scenario.model().rowsMoved.connect(self.funMoveScenario)
-        self.list_widget_scenario.currentItemChanged.connect(self.funAutoSaveScenario)
-        # self.actionCheckUDistance.triggered.connect(self.check_distance_between_pipes)
-
-
+        self.gui_structure.page_result.button.clicked.connect(self.display_results)
+        self.actionAdd_Scenario.triggered.connect(self.add_scenario)
+        self.actionUpdate_Scenario.triggered.connect(self.save_scenario)
+        self.actionDelete_scenario.triggered.connect(self.delete_scenario)
+        self.action_start_multiple.triggered.connect(self.start_multiple_scenarios_calculation)
+        self.action_start_single.triggered.connect(self.start_current_scenario_calculation)
+        self.actionSave.triggered.connect(self.fun_save)
+        self.actionSave_As.triggered.connect(self.fun_save_as)
+        self.actionOpen.triggered.connect(self.fun_load)
+        self.actionNew.triggered.connect(self.fun_new)
+        self.actionRename_scenario.triggered.connect(self.fun_rename_scenario)
+        self.list_widget_scenario.model().rowsMoved.connect(self.fun_move_scenario)
+        self.list_widget_scenario.currentItemChanged.connect(self.fun_auto_save_scenario)
         self.Dia.closeEvent = self.closeEvent
-        #self.update_aim(self.pushButton_temp_profile)
-        #self.checkBox_Import.toggle()
-        #self.checkBox_Import.toggle()
 
     def event_filter(self, obj: QtWidgets_QPushButton, event) -> bool:
         """
@@ -284,12 +278,12 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # if Mouse is over PushButton change size to big otherwise to small
         if mouse_over:
             for page in self.gui_structure.list_of_pages:
-                self.set_push_button_icon_size(page.button, True, page.button.setText(page.button_name))
+                self.set_push_button_icon_size(page.button, True, page.button_name)
             return
         for page in self.gui_structure.list_of_pages:
             self.set_push_button_icon_size(page.button)
 
-    def set_push_button_icon_size(self, button: QtWidgets_QPushButton, big: bool = False, name: str = '') -> None:
+    def set_push_button_icon_size(self, button: QtWidgets_QPushButton, big: bool = False, name: str = "") -> None:
         """
         set button name and size
         :param button: QPushButton to set name and icon size for
@@ -308,7 +302,6 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         button.setMaximumSize(self.sizePushS)
         button.setMinimumSize(self.sizePushS)
 
-
     def change(self) -> None:
         """
         check if changes to scenario or saved file happened
@@ -320,7 +313,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # if changed File is not already True set it to True and update window title
         if self.changedFile is False:
             self.changedFile: bool = True
-            self.changeWindowTitle()
+            self.change_window_title()
         # abort here if autosave scenarios is used
         if self.gui_structure.option_auto_saving.get_value() == 1:
             return
@@ -339,44 +332,44 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # check if current data storage is equal to the previous one then delete the *
         if self.list_ds:
             if ds == self.list_ds[idx]:
-                if text[-1] != '*':
+                if text[-1] != "*":
                     return
                 self.list_widget_scenario.item(idx).setText(text[:-1])
                 return
         # if scenario is already marked as changed return
-        if text[-1] == '*':
+        if text[-1] == "*":
             return
         # else add * to current item string
-        self.list_widget_scenario.item(idx).setText(f'{text}*')
+        self.list_widget_scenario.item(idx).setText(f"{text}*")
 
-    def funAutoSaveScenario(self, newRowItem: QtWidgets_QListWidgetItem, oldRowItem: QtWidgets_QListWidgetItem) -> None:
+    def fun_auto_save_scenario(self, new_row_item: QtWidgets_QListWidgetItem, old_row_item: QtWidgets_QListWidgetItem) -> None:
         """
         function to save a scenario when the item in the list Widget is changed and the checkBox to save automatic is
         checked or ask to save unsaved scenario changes
-        :param newRowItem: new selected scenario item (not used)
-        :param oldRowItem: old scenario item
+        :param new_row_item: new selected scenario item (not used)
+        :param old_row_item: old scenario item
         :return: None
         """
         # if no old item is selected do nothing and return
-        if oldRowItem is None:
+        if old_row_item is None:
             # change entries to new scenario values
-            self.changeScenario(self.list_widget_scenario.row(newRowItem))
+            self.change_scenario(self.list_widget_scenario.row(new_row_item))
             return
         # check if the auto saving should be performed and then save the last selected scenario
         if self.gui_structure.option_auto_saving.get_value() == 1:
             # save old scenario
-            if DataStorageNew(self.gui_structure) != self.list_ds[self.list_widget_scenario.row(oldRowItem)]:
-                self.list_ds[self.list_widget_scenario.row(oldRowItem)] = DataStorageNew(self.gui_structure)
+            if DataStorageNew(self.gui_structure) != self.list_ds[self.list_widget_scenario.row(old_row_item)]:
+                self.list_ds[self.list_widget_scenario.row(old_row_item)] = DataStorageNew(self.gui_structure)
             # update backup fileImport
-            self.funSaveAuto()
+            self.fun_save_auto()
             # change values to new scenario values
-            self.changeScenario(self.list_widget_scenario.row(newRowItem))
+            self.change_scenario(self.list_widget_scenario.row(new_row_item))
             # abort function
             return
         # get test of old scenario (item)
-        text = oldRowItem.text()
+        text = old_row_item.text()
         # check if the old scenario is unsaved then create message box
-        if text[-1] == '*':
+        if text[-1] == "*":
             # create message box
             msg: QtWidgets_QMessageBox = QtWidgets_QMessageBox(self.Dia)
             # set Icon to question mark icon
@@ -386,37 +379,36 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             # set window text to  leave scenario text depending on language selected
             msg.setWindowTitle(self.translations.label_CancelTitle)
             # set standard buttons to save, close and cancel
-            msg.setStandardButtons(
-                QtWidgets_QMessageBox.Save | QtWidgets_QMessageBox.Close | QtWidgets_QMessageBox.Cancel)
+            msg.setStandardButtons(QtWidgets_QMessageBox.Save | QtWidgets_QMessageBox.Close | QtWidgets_QMessageBox.Cancel)
             # get save, close and cancel button
-            buttonS = msg.button(QtWidgets_QMessageBox.Save)
-            buttonCl = msg.button(QtWidgets_QMessageBox.Close)
-            buttonCa = msg.button(QtWidgets_QMessageBox.Cancel)
+            button_s = msg.button(QtWidgets_QMessageBox.Save)
+            button_cl = msg.button(QtWidgets_QMessageBox.Close)
+            button_ca = msg.button(QtWidgets_QMessageBox.Cancel)
             # set save, close and cancel button text depending on language selected
-            buttonS.setText(f'{self.translations.pushButton_SaveScenario} ')
-            buttonCl.setText(f'{self.translations.label_LeaveScenario} ')
-            buttonCa.setText(f'{self.translations.label_StayScenario} ')
+            button_s.setText(f"{self.translations.pushButton_SaveScenario} ")
+            button_cl.setText(f"{self.translations.label_LeaveScenario} ")
+            button_ca.setText(f"{self.translations.label_StayScenario} ")
             # set  save, close and cancel button icon
-            self.setPushButtonIcon(buttonS, 'Save_Inv')
-            self.setPushButtonIcon(buttonCl, 'Exit')
-            self.setPushButtonIcon(buttonCa, 'Abort')
+            self.set_push_button_icon(button_s, "Save_Inv")
+            self.set_push_button_icon(button_cl, "Exit")
+            self.set_push_button_icon(button_ca, "Abort")
             # execute message box and save response
             reply = msg.exec_()
             # check if closing should be canceled
             if reply == QtWidgets_QMessageBox.Cancel:
                 # change item to old item by thread, because I have not found a direct way which is not lost after
                 # return
-                SI = SetItem(self.list_widget_scenario, oldRowItem)  # create class
-                SI.start()  # start thread
-                SI.any_signal.connect(SI.terminate)  # stop thread if finished
+                si = SetItem(self.list_widget_scenario, old_row_item)  # create class
+                si.start()  # start thread
+                si.any_signal.connect(si.terminate)  # stop thread if finished
                 # abort the rest
                 return
             # save scenario if wanted
-            self.saveScenario() if reply == QtWidgets_QMessageBox.Save else None
+            self.save_scenario() if reply == QtWidgets_QMessageBox.Save else None
             # remove * symbol
-            oldRowItem.setText(text[:-1])
+            old_row_item.setText(text[:-1])
         # change entries to new scenario values
-        self.changeScenario(self.list_widget_scenario.row(newRowItem))
+        self.change_scenario(self.list_widget_scenario.row(new_row_item))
         return
 
     def check_distance_between_pipes(self) -> None:
@@ -426,47 +418,47 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         """
         # import math stuff
         from math import pi, sin, cos, tan
-        nU: int = self.gui_structure.option_pipe_number.get_value()  # get number of U pipes
-        rBorehole: float = self.gui_structure.option_pipe_borehole_radius.get_value()  # get borehole radius
-        rOuterPipe: float = self.gui_structure.option_pipe_outer_radius.get_value()  # get outer pipe radius
-        rOuterPipeMax: float = rBorehole/(1+1/sin(pi/(2*nU)))  # calculate maximal outer pipe radius(see Circle packing)
-        distanceMax: float = rBorehole - rOuterPipeMax  # calculate maximal distance between pipe and center
-        alpha: float = pi/nU  # determine equal angle between pipes
+
+        n_u: int = self.gui_structure.option_pipe_number.get_value()  # get number of U pipes
+        r_borehole: float = self.gui_structure.option_pipe_borehole_radius.get_value()  # get borehole radius
+        r_outer_pipe: float = self.gui_structure.option_pipe_outer_radius.get_value()  # get outer pipe radius
+        r_outer_pipe_max: float = r_borehole / (1 + 1 / sin(pi / (2 * n_u)))  # calculate maximal outer pipe radius(see Circle packing)
+        distance_max: float = r_borehole - r_outer_pipe_max  # calculate maximal distance between pipe and center
+        alpha: float = pi / n_u  # determine equal angle between pipes
         # determine minimal distance between pipe and center if number of pipes is bigger than one else set to half
         # borehole radius
-        distanceMin: float = 2*rOuterPipe*(cos((pi-alpha)/2)+sin((pi-alpha)/2)/tan(alpha)) if nU > 1 else rBorehole/2
+        distance_min: float = 2 * r_outer_pipe * (cos((pi - alpha) / 2) + sin((pi - alpha) / 2) / tan(alpha)) if n_u > 1 else r_borehole / 2
         # set minimal and maximal value for pipe distance
-        self.gui_structure.option_pipe_distance.widget.setMinimum(distanceMin)
-        self.gui_structure.option_pipe_distance.widget.setMaximum(distanceMax)
+        self.gui_structure.option_pipe_distance.widget.setMinimum(distance_min)
+        self.gui_structure.option_pipe_distance.widget.setMaximum(distance_max)
 
-    def funMoveScenario(self, startItem: QtCore_QModelIndex, startIndex: int, startIndex2: int,
-                        endItem: QtCore_QModelIndex, targetIndex: int) -> None:
+    def fun_move_scenario(self, start_item: QtCore_QModelIndex, start_index: int, start_index2: int, end_item: QtCore_QModelIndex, target_index: int) -> None:
         """
         change list of ds entry if scenario is moved (more inputs than needed, because the list widget returns that much
-        :param startItem: start item of moving
-        :param startIndex: start index of moving
-        :param startIndex2: start index of moving
-        :param endItem: start end of moving
-        :param targetIndex: target index of moving
+        :param start_item: start item of moving
+        :param start_index: start index of moving
+        :param start_index2: start index of moving
+        :param end_item: start end of moving
+        :param target_index: target index of moving
         :return: None
         """
-        self.list_ds.insert(targetIndex, self.list_ds.pop(startIndex))
-        self.list_ds.insert(targetIndex, self.list_ds.pop(startIndex))
+        self.list_ds.insert(target_index, self.list_ds.pop(start_index))
+        self.list_ds.insert(target_index, self.list_ds.pop(start_index))
 
     @staticmethod
-    def setPushButtonIcon(button: QtWidgets_QPushButton, iconName: str) -> None:
+    def set_push_button_icon(button: QtWidgets_QPushButton, icon_name: str) -> None:
         """
         set QPushButton icon
         :param button: QPushButton to change to icon for
-        :param iconName: icon name as string
+        :param icon_name: icon name as string
         :return: None
         """
         icon = QtGui_QIcon()  # create icon class
         # add pixmap to icon
-        icon.addPixmap(QtGui_QPixmap(f":/icons/icons/{iconName}.svg"), QtGui_QIcon.Normal, QtGui_QIcon.Off)
+        icon.addPixmap(QtGui_QPixmap(f":/icons/icons/{icon_name}.svg"), QtGui_QIcon.Normal, QtGui_QIcon.Off)
         button.setIcon(icon)  # set icon to button
 
-    def funRenameScenario(self) -> None:
+    def fun_rename_scenario(self) -> None:
         """
         function to rename current scenario with a dialog box to ask for new name
         :return: None
@@ -482,14 +474,14 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         dialog.setOkButtonText(self.translations.label_okay)  # +++
         dialog.setCancelButtonText(self.translations.label_abort)  # +++
         li = dialog.findChildren(QtWidgets_QPushButton)
-        self.setPushButtonIcon(li[0], 'Okay')
-        self.setPushButtonIcon(li[1], 'Abort')
+        self.set_push_button_icon(li[0], "Okay")
+        self.set_push_button_icon(li[1], "Abort")
         # set new name if the dialog is not canceled and the text is not None
         if dialog.exec_() == QtWidgets_QDialog.Accepted:
             text = dialog.textValue()
-            item.setText(text) if text != '' else None
+            item.setText(text) if text != "" else None
 
-    def checkResults(self) -> None:
+    def check_results(self) -> None:
         """
         check if results exists and then display them
         :return:
@@ -500,30 +492,29 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             self.gui_structure.page_aim.button.click()
             return
         # display results otherwise
-        self.displayResults()
+        self.display_results()
 
-    def changeWindowTitle(self) -> None:
+    def change_window_title(self) -> None:
         """
         change window title to filename and mark with * if unsaved changes exists
         :return: None
         """
         # get filename separated from path
-        path, filename = MainWindow.filenameDefault if self.filename == MainWindow.filenameDefault else \
-            os_split(self.filename[0])
+        _, filename = MainWindow.filenameDefault if self.filename == MainWindow.filenameDefault else os_split(self.filename[0])
         # title determine new title if a filename is not empty
-        title: str = '' if filename == '' else f' - {filename.replace(".pkl", "")}'
+        title: str = "" if filename == "" else f' - {filename.replace(".pkl", "")}'
         # create new title name
-        name: str = f'GHEtool {title}*' if self.changedFile else f'GHEtool {title}'
+        name: str = f"GHEtool {title}*" if self.changedFile else f"GHEtool {title}"
         # set new title name
         self.Dia.setWindowTitle(name)
 
-    def statusHide(self, text) -> None:
+    def status_hide(self, text) -> None:
         """
         show or hide statusbar if no text exists
         :param text: text in status bar
         :return: None
         """
-        if text == '':
+        if text == "":
             self.status_bar.hide()
             return
         self.status_bar.show()
@@ -534,11 +525,12 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         :return: None
         """
         # check if current selection is outside the precalculated data
-        outside_bounds: bool = self.BOPD.check_if_outside_bounds(self.gui_structure.option_depth.get_value(),
-                                                                 self.gui_structure.option_spacing.get_value(),
-                                                                 self.gui_structure.option_conductivity.get_value(),
-                                                                 max(self.gui_structure.option_length.get_value(), self.gui_structure.option_width.get_value())
-                                                                 )
+        outside_bounds: bool = self.BOPD.check_if_outside_bounds(
+            self.gui_structure.option_depth.get_value(),
+            self.gui_structure.option_spacing.get_value(),
+            self.gui_structure.option_conductivity.get_value(),
+            max(self.gui_structure.option_length.get_value(), self.gui_structure.option_width.get_value()),
+        )
         # if so show label with warning message
         self.gui_structure.hint_calc_time.show() if outside_bounds else self.gui_structure.hint_calc_time.hide()
 
@@ -562,41 +554,8 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             return True
         return False
 
-    def set_push_button_icon_size(self, button: QtWidgets_QPushButton, big: bool = False, name: str = '') -> None:
-        """
-        set button name and size
-        :param button: QPushButton to set name and icon size for
-        :param big: big or small icon size (True = big)
-        :param name: name to set to QPushButton
-        :return: None
-        """
-        button.setText(name)  # set name to button
-        # size big or small QPushButton depending on input
-        if big:
-            button.setIconSize(self.sizeS)
-            button.setMaximumSize(self.sizePushB)
-            button.setMinimumSize(self.sizePushB)
-            return
-        button.setIconSize(self.sizeB)
-        button.setMaximumSize(self.sizePushS)
-        button.setMinimumSize(self.sizePushS)
-
-    def set_push(self, mouse_over: bool) -> None:
-        """
-        function to Set PushButton Text if MouseOver
-        :param mouse_over: bool true if Mouse is over PushButton
-        :return: None
-        """
-        # if Mouse is over PushButton change size to big otherwise to small
-        if mouse_over:
-            for page in self.gui_structure.list_of_pages:
-                self.set_push_button_icon_size(page.button, True, page.button_name)
-            return
-        for page in self.gui_structure.list_of_pages:
-            self.set_push_button_icon_size(page.button)
-
     @staticmethod
-    def displayValuesWithFloatingDecimal(spinbox: QtWidgets_QDoubleSpinBox, factor: float) -> None:
+    def display_values_with_floating_decimal(spinbox: QtWidgets_QDoubleSpinBox, factor: float) -> None:
         """
         change decimal of spinbox to given factor
         :param spinbox: QSpinbox to change value for
@@ -607,10 +566,10 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # determine decimal location depending on value
         decimal_loc = 0 if value >= 1_000 else 1 if value >= 100 else 2 if value >= 10 else 3 if value >= 1 else 4
         spinbox.setDecimals(decimal_loc)  # set decimal location
-        spinbox.setMaximum(max(value*10, 1_000_000))  # set maximal value to maximal value * 10 or 1_000_000
+        spinbox.setMaximum(max(value * 10, 1_000_000))  # set maximal value to maximal value * 10 or 1_000_000
         spinbox.setValue(value)  # set new value
 
-    def changeAutoSave(self):
+    def change_auto_save(self):
         for ds in self.list_ds:
             ds.option_auto_saving = self.gui_structure.option_auto_saving.get_value()
 
@@ -619,36 +578,35 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         function to change language on labels and push buttons
         :return: None
         """
-        scenarioIndex: int = self.list_widget_scenario.currentRow()  # get current selected scenario
+        scenario_index: int = self.list_widget_scenario.currentRow()  # get current selected scenario
         amount: int = self.list_widget_scenario.count()  # number of scenario elements
 
         for ds in self.list_ds:
             ds.option_language = self.gui_structure.option_language.get_value()
         # check if list scenario names are not unique
-        liStrMatch: list = [self.list_widget_scenario.item(idx).text() ==
-                            f'{self.translations.scenarioString}: {idx + 1}' for idx in range(amount)]
+        li_str_match: list = [self.list_widget_scenario.item(idx).text() == f"{self.translations.scenarioString}: {idx + 1}" for idx in range(amount)]
         # update all label, pushButtons, action and Menu names
         for i in [j for j in self.translations.__slots__ if hasattr(self, j)]:
-            print(i)
             if isinstance(getattr(self, i), QtWidgets_QMenu):
                 getattr(self, i).setTitle(getattr(self.translations, i)[self.gui_structure.option_language.get_value()])
                 continue
             getattr(self, i).setText(getattr(self.translations, i)[self.gui_structure.option_language.get_value()])
         # set translation of toolbox items
-        self.gui_structure.translate(self.gui_structure.option_language.get_value())
+        self.gui_structure.translate(self.gui_structure.option_language.get_value(), self.translations)
         # set small PushButtons
         self.set_push(False)
         # replace scenario names if they are not unique
-        scenarios: list = [f'{self.translations.scenarioString}: {i}' if liStrMatch[i - 1] else
-                           self.list_widget_scenario.item(i-1).text() for i in range(1, amount + 1)]
+        scenarios: list = [
+            f"{self.translations.scenarioString}: {i}" if li_str_match[i - 1] else self.list_widget_scenario.item(i - 1).text() for i in range(1, amount + 1)
+        ]
         # clear list widget with scenario and write new ones
         self.list_widget_scenario.clear()
         if amount > 0:
             self.list_widget_scenario.addItems(scenarios)
         # select current scenario
-        self.list_widget_scenario.setCurrentRow(scenarioIndex) if scenarioIndex >= 0 else None
+        self.list_widget_scenario.setCurrentRow(scenario_index) if scenario_index >= 0 else None
 
-    def loadList(self) -> None:
+    def load_list(self) -> None:
         """
         try to open the backup file and set the old values
         :return: None
@@ -670,16 +628,16 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             self.list_widget_scenario.addItems(li)
             self.list_widget_scenario.setCurrentRow(0)
             # check if results exits and then display them
-            self.checkResults()
+            self.check_results()
         except FileNotFoundError:
             # hide custom bore field warning
             self.gui_structure.hint_calc_time.hide()
             # change language to english
             self.changeLanguage()
             # show message that no backup file is found
-            self.status_bar.showMessage(self.translations.NoBackupFile)
+            self.status_bar.showMessage(self.translations.NoBackupFile[self.gui_structure.option_language.get_value()])
 
-    def funSaveAuto(self) -> None:
+    def fun_save_auto(self) -> None:
         """
         function to automatically save data in backup file
         :return: None
@@ -708,9 +666,10 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         """
         # import pandas here to save start up time
         from pandas import read_csv as pd_read_csv
+
         # get decimal and column seperator
-        sep: str = ';' if self.gui_structure.option_seperator_csv.get_value() == 0 else ','
-        dec: str = '.' if self.gui_structure.option_decimal_csv.get_value() == 0 else ','
+        sep: str = ";" if self.gui_structure.option_seperator_csv.get_value() == 0 else ","
+        dec: str = "." if self.gui_structure.option_decimal_csv.get_value() == 0 else ","
         # try to read CSV-File
         try:
             data: pd_DataFrame = pd_read_csv(filename, sep=sep, decimal=dec)
@@ -740,14 +699,14 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         if isinstance(self.gui_structure.category_pipe_data.graphic_left, QtWidgets_QGraphicsView):
             # import all that is needed
             # get variables from gui
-            numberOfPipes = self.gui_structure.option_pipe_number.get_value()
-            rOut = self.gui_structure.option_pipe_outer_radius.get_value() * 10
-            rIn = self.gui_structure.option_pipe_inner_radius.get_value() * 10
-            rBore = self.gui_structure.option_pipe_borehole_radius.get_value() * 10
+            number_of_pipes = self.gui_structure.option_pipe_number.get_value()
+            r_out = self.gui_structure.option_pipe_outer_radius.get_value() * 10
+            r_in = self.gui_structure.option_pipe_inner_radius.get_value() * 10
+            r_bore = self.gui_structure.option_pipe_borehole_radius.get_value() * 10
             dis = self.gui_structure.option_pipe_distance.get_value() * 10
             # calculate scale from graphic view size
             max_l = min(self.gui_structure.category_pipe_data.graphic_left.width(), self.gui_structure.category_pipe_data.graphic_left.height())
-            scale = max_l/rBore/1.25  # leave 25 % space
+            scale = max_l / r_bore / 1.25  # leave 25 % space
             # set colors
             blue_color = QColor(0, 64, 122)
             blue_light = QColor(84, 188, 235)
@@ -756,46 +715,42 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             brown = QColor(145, 124, 111)
             # create graphic scene if not exits otherwise get scene and delete items
             if self.gui_structure.category_pipe_data.graphic_left.scene() is None:
-                scene = QGraphicsScene()#parent=self.centralwidget)
+                scene = QGraphicsScene()  # parent=self.central_widget)
                 self.gui_structure.category_pipe_data.graphic_left.setScene(scene)
                 self.gui_structure.category_pipe_data.graphic_left.setBackgroundBrush(brown)
             else:
                 scene = self.gui_structure.category_pipe_data.graphic_left.scene()
                 scene.clear()
             # create borehole circle in grey wih no border
-            circle = QGraphicsEllipseItem(-rBore*scale/2, -rBore*scale/2, rBore*scale, rBore*scale)
+            circle = QGraphicsEllipseItem(-r_bore * scale / 2, -r_bore * scale / 2, r_bore * scale, r_bore * scale)
             circle.setPen(QPen(grey, 0))
             circle.setBrush(grey)
             scene.addItem(circle)
             # calculate pipe position and draw circle (white for outer pipe and blue for inner pipe)
-            dt: float = pi / float(numberOfPipes)
-            for i in range(numberOfPipes):
-                pos_1 = dis * cos(2.0 * i * dt + pi)/2
-                pos_2 = dis * sin(2.0 * i * dt + pi)/2
-                circle = QGraphicsEllipseItem((pos_1 - rOut / 2) * scale, (pos_2 - rOut / 2) * scale,
-                                              rOut * scale, rOut * scale)
+            dt: float = pi / float(number_of_pipes)
+            for i in range(number_of_pipes):
+                pos_1 = dis * cos(2.0 * i * dt + pi) / 2
+                pos_2 = dis * sin(2.0 * i * dt + pi) / 2
+                circle = QGraphicsEllipseItem((pos_1 - r_out / 2) * scale, (pos_2 - r_out / 2) * scale, r_out * scale, r_out * scale)
                 circle.setPen(white_color)
                 circle.setBrush(white_color)
                 scene.addItem(circle)
-                circle = QGraphicsEllipseItem((pos_1 - rIn / 2) * scale, (pos_2 - rIn / 2) * scale,
-                                              rIn * scale, rIn * scale)
+                circle = QGraphicsEllipseItem((pos_1 - r_in / 2) * scale, (pos_2 - r_in / 2) * scale, r_in * scale, r_in * scale)
                 circle.setPen(blue_color)
                 circle.setBrush(blue_color)
                 scene.addItem(circle)
-                pos_1 = dis * cos(2.0 * i * dt + pi + dt)/2
-                pos_2 = dis * sin(2.0 * i * dt + pi + dt)/2
-                circle = QGraphicsEllipseItem((pos_1 - rOut / 2) * scale, (pos_2 - rOut / 2) * scale,
-                                              rOut * scale, rOut * scale)
+                pos_1 = dis * cos(2.0 * i * dt + pi + dt) / 2
+                pos_2 = dis * sin(2.0 * i * dt + pi + dt) / 2
+                circle = QGraphicsEllipseItem((pos_1 - r_out / 2) * scale, (pos_2 - r_out / 2) * scale, r_out * scale, r_out * scale)
                 circle.setPen(white_color)
                 circle.setBrush(white_color)
                 scene.addItem(circle)
-                circle = QGraphicsEllipseItem((pos_1 - rIn / 2) * scale, (pos_2 - rIn / 2) * scale,
-                                              rIn * scale, rIn * scale)
+                circle = QGraphicsEllipseItem((pos_1 - r_in / 2) * scale, (pos_2 - r_in / 2) * scale, r_in * scale, r_in * scale)
                 circle.setPen(blue_light)
                 circle.setBrush(blue_light)
                 scene.addItem(circle)
 
-    def funDisplayData(self) -> None:
+    def fun_display_data(self) -> None:
         """
         Load the Data to Display in the GUI
         :return: None
@@ -804,61 +759,62 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             # get filename from line edit
             filename: str = self.gui_structure.filename.get_value()
             # raise error if no filename exists
-            if filename == '':
+            if filename == "":
                 raise FileNotFoundError
             # get thermal demands index (1 = 2 columns, 2 = 1 column)
-            thermalDemand: int = self.gui_structure.option_column.get_value()
+            thermal_demand: int = self.gui_structure.option_column.get_value()
             # Generate list of columns that have to be imported
             cols: list = []
-            heatingLoad: str = self.gui_structure.option_heating_column.widget.currentText()
-            if len(heatingLoad) >= 1:
-                cols.append(heatingLoad)
-            coolingLoad: str = self.gui_structure.option_cooling_column.widget.currentText()
-            if len(coolingLoad) >= 1:
-                cols.append(coolingLoad)
+            heating_load: str = self.gui_structure.option_heating_column.widget.currentText()
+            if len(heating_load) >= 1:
+                cols.append(heating_load)
+            cooling_load: str = self.gui_structure.option_cooling_column.widget.currentText()
+            if len(cooling_load) >= 1:
+                cols.append(cooling_load)
             combined: str = self.gui_structure.option_single_column.widget.currentText()
             if len(combined) >= 1:
                 cols.append(combined)
-            date: str = 'Date'
+            date: str = "Date"
             # import pandas here to save start up time
             from pandas import read_csv as pd_read_csv
-            sep: str = ';' if self.gui_structure.option_seperator_csv.get_value() == 0 else ','
-            dec: str = '.' if self.gui_structure.option_decimal_csv.get_value() == 0 else ','
+
+            sep: str = ";" if self.gui_structure.option_seperator_csv.get_value() == 0 else ","
+            dec: str = "." if self.gui_structure.option_decimal_csv.get_value() == 0 else ","
             df2: pd_DataFrame = pd_read_csv(filename, usecols=cols, sep=sep, decimal=dec)
             # ---------------------- Time Step Section  ----------------------
             # import pandas here to save start up time
             from pandas import to_datetime as pd_to_datetime, date_range as pd_date_range, Series as pd_Series
+
             # Define start and end date
             start = pd_to_datetime("2019-01-01 00:00:00")
             end = pd_to_datetime("2019-12-31 23:59:00")
             # add date column
             df2[date] = pd_Series(pd_date_range(start, end, freq="1H"))
             # Create no dict to create mean values for
-            dictAgg: Optional[None, dict] = None
+            dict_agg: Optional[None, dict] = None
 
             # set date to index
             df2.set_index(date, inplace=True)
             # resample data to hourly resolution if necessary
-            df2 = df2 if dictAgg is None else df2.resample("H").agg(dictAgg)
+            df2 = df2 if dict_agg is None else df2.resample("H").agg(dict_agg)
             # ------------------- Calculate Section --------------------
             # Choose path between Single or Combined Column and create new columns
-            if thermalDemand == 1:
+            if thermal_demand == 1:
                 # Resample the Data for peakHeating and peakCooling
-                df2.rename(columns={heatingLoad: "Heating Load", coolingLoad: "Cooling Load"}, inplace=True)
+                df2.rename(columns={heating_load: "Heating Load", cooling_load: "Cooling Load"}, inplace=True)
                 df2["peak Heating"] = df2["Heating Load"]
                 df2["peak Cooling"] = df2["Cooling Load"]
             # by single column split by 0 to heating (>0) and cooling (<0)
-            elif thermalDemand == 0:
+            elif thermal_demand == 0:
                 # Create Filter for heating and cooling load ( Heating Load +, Cooling Load -)
-                heatingLoad = df2[combined].apply(lambda x: x >= 0)
-                coolingLoad = df2[combined].apply(lambda x: x < 0)
-                df2["Heating Load"] = df2.loc[heatingLoad, combined]
-                df2["Cooling Load"] = df2.loc[coolingLoad, combined] * -1
+                heating_load = df2[combined].apply(lambda x: x >= 0)
+                cooling_load = df2[combined].apply(lambda x: x < 0)
+                df2["Heating Load"] = df2.loc[heating_load, combined]
+                df2["Cooling Load"] = df2.loc[cooling_load, combined] * -1
                 df2["peak Heating"] = df2["Heating Load"]
                 df2["peak Cooling"] = df2["Cooling Load"]
             # resample to a monthly resolution as sum and maximal load
-            df3 = df2.resample("M").agg({"Heating Load": "sum", "Cooling Load": "sum",
-                                         "peak Heating": "max", "peak Cooling": "max"})
+            df3 = df2.resample("M").agg({"Heating Load": "sum", "Cooling Load": "sum", "peak Heating": "max", "peak Cooling": "max"})
             # replace nan with 0
             df3 = df3.fillna(0)
             # ----------------------- Data Unit Section --------------------------
@@ -870,34 +826,34 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             df3 = df3 * fac
             peak_heating = df3["peak Heating"]
             peak_cooling = df3["peak Cooling"]
-            heatingLoad = df3["Heating Load"]
-            coolingLoad = df3["Cooling Load"]
+            heating_load = df3["Heating Load"]
+            cooling_load = df3["Cooling Load"]
             # set heating loads to double spinBoxes
-            self.gui_structure.option_hl_jan.set_value(heatingLoad[0])
-            self.gui_structure.option_hl_feb.set_value(heatingLoad[1])
-            self.gui_structure.option_hl_mar.set_value(heatingLoad[2])
-            self.gui_structure.option_hl_apr.set_value(heatingLoad[3])
-            self.gui_structure.option_hl_may.set_value(heatingLoad[4])
-            self.gui_structure.option_hl_jun.set_value(heatingLoad[5])
-            self.gui_structure.option_hl_jul.set_value(heatingLoad[6])
-            self.gui_structure.option_hl_aug.set_value(heatingLoad[7])
-            self.gui_structure.option_hl_sep.set_value(heatingLoad[8])
-            self.gui_structure.option_hl_oct.set_value(heatingLoad[9])
-            self.gui_structure.option_hl_nov.set_value(heatingLoad[10])
-            self.gui_structure.option_hl_dec.set_value(heatingLoad[11])
+            self.gui_structure.option_hl_jan.set_value(heating_load[0])
+            self.gui_structure.option_hl_feb.set_value(heating_load[1])
+            self.gui_structure.option_hl_mar.set_value(heating_load[2])
+            self.gui_structure.option_hl_apr.set_value(heating_load[3])
+            self.gui_structure.option_hl_may.set_value(heating_load[4])
+            self.gui_structure.option_hl_jun.set_value(heating_load[5])
+            self.gui_structure.option_hl_jul.set_value(heating_load[6])
+            self.gui_structure.option_hl_aug.set_value(heating_load[7])
+            self.gui_structure.option_hl_sep.set_value(heating_load[8])
+            self.gui_structure.option_hl_oct.set_value(heating_load[9])
+            self.gui_structure.option_hl_nov.set_value(heating_load[10])
+            self.gui_structure.option_hl_dec.set_value(heating_load[11])
             # set cooling loads to double spinBoxes
-            self.gui_structure.option_cl_jan.set_value(coolingLoad[0])
-            self.gui_structure.option_cl_feb.set_value(coolingLoad[1])
-            self.gui_structure.option_cl_mar.set_value(coolingLoad[2])
-            self.gui_structure.option_cl_apr.set_value(coolingLoad[3])
-            self.gui_structure.option_cl_may.set_value(coolingLoad[4])
-            self.gui_structure.option_cl_jun.set_value(coolingLoad[5])
-            self.gui_structure.option_cl_jul.set_value(coolingLoad[6])
-            self.gui_structure.option_cl_aug.set_value(coolingLoad[7])
-            self.gui_structure.option_cl_sep.set_value(coolingLoad[8])
-            self.gui_structure.option_cl_oct.set_value(coolingLoad[9])
-            self.gui_structure.option_cl_nov.set_value(coolingLoad[10])
-            self.gui_structure.option_cl_dec.set_value(coolingLoad[11])
+            self.gui_structure.option_cl_jan.set_value(cooling_load[0])
+            self.gui_structure.option_cl_feb.set_value(cooling_load[1])
+            self.gui_structure.option_cl_mar.set_value(cooling_load[2])
+            self.gui_structure.option_cl_apr.set_value(cooling_load[3])
+            self.gui_structure.option_cl_may.set_value(cooling_load[4])
+            self.gui_structure.option_cl_jun.set_value(cooling_load[5])
+            self.gui_structure.option_cl_jul.set_value(cooling_load[6])
+            self.gui_structure.option_cl_aug.set_value(cooling_load[7])
+            self.gui_structure.option_cl_sep.set_value(cooling_load[8])
+            self.gui_structure.option_cl_oct.set_value(cooling_load[9])
+            self.gui_structure.option_cl_nov.set_value(cooling_load[10])
+            self.gui_structure.option_cl_dec.set_value(cooling_load[11])
             # set peak heating load to double spinBoxes
             self.gui_structure.option_hp_jan.set_value(peak_heating[0])
             self.gui_structure.option_hp_feb.set_value(peak_heating[1])
@@ -932,19 +888,19 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         except KeyError:
             self.status_bar.showMessage(self.translations.ColumnError, 5000)
 
-
-
-    def funLoad(self) -> None:
+    def fun_load(self) -> None:
         """
         function to load externally stored scenario
         :return: None
         """
         # open interface and get file name
-        self.filename = QtWidgets_QFileDialog.getOpenFileName(self.centralwidget, caption=self.translations.ChoosePKL, filter='Pickle (*.pkl)')
+        self.filename = QtWidgets_QFileDialog.getOpenFileName(self.central_widget,
+                                                              caption=self.translations.ChoosePKL[self.gui_structure.option_language.get_value()],
+                                                              filter="Pickle (*.pkl)")
         # load selected data
-        self.funLoadKnownFilename()
+        self.fun_load_known_filename()
 
-    def funLoadKnownFilename(self) -> None:
+    def fun_load_known_filename(self) -> None:
         """
         load stored scenarios from external pickle file
         :return: None
@@ -959,7 +915,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             # write data to variables
             self.list_ds, li = li[0], li[1]
             # change window title to new loaded filename
-            self.changeWindowTitle()
+            self.change_window_title()
             # replace user window id
             for DS in self.list_ds:
                 DS.ui = id(self)
@@ -967,37 +923,38 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             self.list_widget_scenario.clear()
             self.list_widget_scenario.addItems(li)
             self.list_widget_scenario.setCurrentRow(0)
-            self.checkResults()
+            self.check_results()
             # activate checking
             self.checking: bool = True
         # if no file is found display error message is status bar
         except FileNotFoundError:
             self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
 
-    def funSaveAs(self) -> None:
+    def fun_save_as(self) -> None:
         """
         function to save under new filename
         :return: None
         """
         # reset filename because then the funSave function ask for a new filename
         self.filename = MainWindow.filenameDefault
-        self.funSave()  # save data under a new filename
+        self.fun_save()  # save data under a new filename
 
-    def funSave(self) -> bool:
+    def fun_save(self) -> bool:
         """
         save all scenarios externally in a pickle file
         :return: boolean which is true if saving was successful
         """
         # ask for pickle file if the filename is still the default
         if self.filename == MainWindow.filenameDefault:
-            self.filename: tuple = QtWidgets_QFileDialog.getSaveFileName(self.centralwidget, caption=self.translations.SavePKL, filter='Pickle (*.pkl)')
+            self.filename: tuple = QtWidgets_QFileDialog.getSaveFileName(self.central_widget, caption=self.translations.SavePKL[
+                self.gui_structure.option_language.get_value()], filter="Pickle (*.pkl)")
             # break function if no file is selected
             if self.filename == MainWindow.filenameDefault:
                 return False
         # save scenarios
-        self.saveScenario()
+        self.save_scenario()
         # update backup file
-        self.funSaveAuto()
+        self.fun_save_auto()
         # Create list if no scenario is stored
         self.list_ds.append(DataStorageNew(self.gui_structure)) if len(self.list_ds) < 1 else None
         # try to store the data in the pickle file
@@ -1009,7 +966,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
                 pk_dump([self.list_ds, li], f, pk_HP)
             # deactivate changed file * from window title
             self.changedFile: bool = False
-            self.changeWindowTitle()
+            self.change_window_title()
             # return true because everything was successful
             return True
         # show file not found message in status bar if an error appears
@@ -1017,18 +974,18 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
             return False
 
-    def funNew(self) -> None:
+    def fun_new(self) -> None:
         """
         create new data file and reset GUI
         :return: None
         """
         self.filename: tuple = MainWindow.filenameDefault  # reset filename
-        self.funSave()  # get and save filename
+        self.fun_save()  # get and save filename
         self.list_ds: list = []  # reset list of data storages
         self.list_ds = []
         self.list_widget_scenario.clear()  # clear list widget with scenario list
 
-    def changeScenario(self, idx: int) -> None:
+    def change_scenario(self, idx: int) -> None:
         """
         update GUI if a new scenario at the comboBox is selected
         :param idx: index of selected scenario
@@ -1048,7 +1005,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # refresh results if results page is selected
         self.gui_structure.page_result.button.click() if self.stackedWidget.currentWidget() == self.gui_structure.page_result.page else None
 
-    def saveScenario(self) -> None:
+    def save_scenario(self) -> None:
         """
         function to save selected scenario
         :return: None
@@ -1059,18 +1016,18 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         idx = max(self.list_widget_scenario.currentRow(), 0)
         # if no scenario exists create a new one else save DataStorage with new inputs in list of scenarios
         if len(self.list_ds) == idx:
-            self.addScenario()
+            self.add_scenario()
         else:
             self.list_ds[idx] = DataStorageNew(self.gui_structure)
         # create auto backup
-        self.funSaveAuto()
+        self.fun_save_auto()
         # remove * from scenario if not Auto save is checked and if the last char is a *
         if not self.gui_structure.option_auto_saving.get_value() == 1:
             text = self.list_widget_scenario.item(idx).text()
-            if text[-1] == '*':
+            if text[-1] == "*":
                 self.list_widget_scenario.item(idx).setText(text[:-1])
 
-    def deleteScenario(self) -> None:
+    def delete_scenario(self) -> None:
         """
         function to delete the selected scenario
         :return: None
@@ -1086,12 +1043,12 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             # rename remaining scenarios if the name has not be changed
             for i in range(idx, self.list_widget_scenario.count()):
                 item = self.list_widget_scenario.item(i)
-                if item.text() == f'{self.translations.scenarioString}: {i + 2}':
-                    item.setText(f'{self.translations.scenarioString}: {i + 1}')
+                if item.text() == f"{self.translations.scenarioString}: {i + 2}":
+                    item.setText(f"{self.translations.scenarioString}: {i + 1}")
             # select previous scenario then the deleted one but at least the first one
             self.list_widget_scenario.setCurrentRow(max(idx - 1, 0))
 
-    def addScenario(self) -> None:
+    def add_scenario(self) -> None:
         """
         function to add a scenario
         :return: None
@@ -1101,13 +1058,13 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # append new scenario to List of DataStorages
         self.list_ds.append(DataStorageNew(self.gui_structure))
         # add new scenario name and item to list widget
-        self.list_widget_scenario.addItem(f'{self.translations.scenarioString}: {number + 1}')
+        self.list_widget_scenario.addItem(f"{self.translations.scenarioString}: {number + 1}")
         # select new list item
         self.list_widget_scenario.setCurrentRow(number)
         # run change function to mark unsaved inputs
         self.change()
 
-    def updateBar(self, val: int, opt_start: bool = False) -> None:
+    def update_bar(self, val: int, opt_start: bool = False) -> None:
         """
         update progress bar or hide them if not needed
         :param val: int of successfully calculated scenarios
@@ -1123,7 +1080,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             self.label_Status.hide()
             self.progressBar.hide()
         # calculate percentage of calculated scenario
-        val = val/self.NumberOfScenarios
+        val = val / self.NumberOfScenarios
         # set percentage to progress bar
         self.progressBar.setValue(round(val * 100))
         # hide labels and progressBar if all scenarios are calculated
@@ -1133,7 +1090,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             # show message that calculation is finished
             self.status_bar.showMessage(self.translations.Calculation_Finished, 5000)
 
-    def checkGHEtool(self, finished: bool) -> None:
+    def check_ghe_tool(self, finished: bool) -> None:
         """
         check if GHEtool import is finished
         :param finished: bool which is true if import is finished
@@ -1150,7 +1107,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             # show message that the GHEtool has been successfully imported
             self.status_bar.showMessage(self.translations.GHE_tool_imported[self.gui_structure.option_language.get_value()], 5000)
 
-    def threadFunction(self, ds: DataStorageNew) -> None:
+    def thread_function(self, ds: DataStorageNew) -> None:
         """
         turn on and off the old and new threads for the calculation
         :param ds: DataStorage of current thread
@@ -1164,7 +1121,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # count number of finished calculated scenarios
         self.finished += 1
         # update progress bar
-        self.updateBar(self.finished, True)
+        self.update_bar(self.finished, True)
         # if number of finished is the number that has to be calculated enable buttons and actions and change page to
         # results page
         if self.finished == self.NumberOfScenarios:
@@ -1177,15 +1134,15 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             return
         # start new thread
         self.threads[self.finished].start()
-        self.threads[self.finished].any_signal.connect(self.threadFunction)
+        self.threads[self.finished].any_signal.connect(self.thread_function)
 
-    def startMultipleScenariosCalculation(self) -> None:
+    def start_multiple_scenarios_calculation(self) -> None:
         """
         start calculation of all not calculated scenarios
         :return: None
         """
         # add scenario if no list of scenarios exits else save current scenario
-        self.addScenario() if not self.list_ds else self.saveScenario()
+        self.add_scenario() if not self.list_ds else self.save_scenario()
         # return to thermal demands page if no file is selected
         if any([i.fileSelected for i in self.list_ds]):
             self.gui_structure.page_thermal.button.click()
@@ -1200,7 +1157,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # initialize finished scenarios counting variable
         self.finished: int = 0
         # update progress bar
-        self.updateBar(0, True)
+        self.update_bar(0, True)
         # create list of threads with scenarios that have not been calculated
         self.threads = [CalcProblem(DS, idx) for idx, DS in enumerate(self.list_ds) if DS.borefield is None]
         # set number of to calculate scenarios
@@ -1208,16 +1165,16 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # start calculation if at least one scenario has to be calculated
         if self.NumberOfScenarios > 0:
             self.threads[0].start()
-            self.threads[0].any_signal.connect(self.threadFunction)
+            self.threads[0].any_signal.connect(self.thread_function)
             return
 
-    def startCurrentScenarioCalculation(self) -> None:
+    def start_current_scenario_calculation(self) -> None:
         """
         start calculation of selected scenario
         :return: None
         """
         # add scenario if no list of scenarios exits else save current scenario
-        self.addScenario() if not self.list_ds else self.saveScenario()
+        self.add_scenario() if not self.list_ds else self.save_scenario()
         # return to thermal demands page if no file is selected
         if self.list_ds[self.list_widget_scenario.currentRow()].fileSelected:
             self.gui_structure.page_thermal.button.click()
@@ -1232,7 +1189,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # initialize finished scenarios counting variable
         self.finished: int = 0
         # update progress bar
-        self.updateBar(0, True)
+        self.update_bar(0, True)
         # get index of selected scenario
         idx: int = self.list_widget_scenario.currentRow()
         # get Datastorage of selected scenario
@@ -1247,9 +1204,9 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.NumberOfScenarios: int = len(self.threads)
         # start calculation
         self.threads[0].start()
-        self.threads[0].any_signal.connect(self.threadFunction)
+        self.threads[0].any_signal.connect(self.thread_function)
 
-    def displayResults(self) -> None:
+    def display_results(self) -> None:
         """
         display results of the current selected scenario
         :return: None
@@ -1268,12 +1225,13 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         import matplotlib.pyplot as plt
         from matplotlib import axes as matplotlib_axes
         from numpy import array as np_array
+
         # get Datastorage of selected scenario
         ds: DataStorageNew = self.list_ds[self.list_widget_scenario.currentRow()]
         # get bore field of selected scenario
-        boreField: Borefield = ds.borefield
+        borefield: Borefield = ds.borefield
         # hide widgets if no results bore field exists and display not calculated text
-        if boreField is None:
+        if borefield is None:
             self.gui_structure.hint_depth.label.setText(self.translations.NotCalculated)
             # self.label_WarningDepth.hide()
             self.gui_structure.option_show_legend.hide()
@@ -1282,12 +1240,12 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             self.canvas.hide() if self.canvas is not None else None
             return
         # get results of bore field sizing by length and width
-        li_size = [str(round(i[3], 2)) for i in boreField.combo]
-        li_b = [str(round(i[2], 2)) for i in boreField.combo]
-        li_n_1 = [str(round(i[0], 2)) for i in boreField.combo]
-        li_n_2 = [str(round(i[1], 2)) for i in boreField.combo]
+        li_size = [str(round(i[3], 2)) for i in borefield.combo]
+        li_b = [str(round(i[2], 2)) for i in borefield.combo]
+        li_n_1 = [str(round(i[0], 2)) for i in borefield.combo]
+        li_n_2 = [str(round(i[1], 2)) for i in borefield.combo]
         # hide widgets if no solution exists and display no solution text
-        if (ds.aim_size_length and not li_size) or (ds.aim_req_depth and boreField.H == boreField.H_max):
+        if (ds.aim_size_length and not li_size) or (ds.aim_req_depth and borefield.H == borefield.H_max):
             self.gui_structure.hint_depth.label.setText(self.translations.NotCalculated)
             # self.label_WarningDepth.hide()
             self.gui_structure.option_show_legend.hide()
@@ -1300,21 +1258,20 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.gui_structure.function_save_figure.show()
         # just show save Data button if not optmize load profile is selected because the output for this is not
         # defined so far
-        self.gui_structure.function_save_results.hide() if self.gui_structure.aim_optimize.widget.isChecked() else \
-            self.gui_structure.function_save_results.show()
+        self.gui_structure.function_save_results.hide() if self.gui_structure.aim_optimize.widget.isChecked() else self.gui_structure.function_save_results.show()
         # get peak heating and cooling and monthly loads as well as Tb temperature
-        results_peak_cooling = boreField.results_peak_cooling
-        results_peak_heating = boreField.results_peak_heating
-        results_month_cooling = boreField.results_month_cooling
-        results_month_heating = boreField.results_month_heating
-        t_b = boreField.Tb
+        results_peak_cooling = borefield.results_peak_cooling
+        results_peak_heating = borefield.results_peak_heating
+        results_month_cooling = borefield.results_month_cooling
+        results_month_heating = borefield.results_month_heating
+        t_b = borefield.Tb
         # set colors for graph
-        grey_color = '#00407a'
-        color: str = 'w'
-        plt.rcParams['text.color'] = color
-        plt.rcParams['axes.labelcolor'] = color
-        plt.rcParams['xtick.color'] = color
-        plt.rcParams['ytick.color'] = color
+        grey_color = "#00407a"
+        color: str = "w"
+        plt.rcParams["text.color"] = color
+        plt.rcParams["axes.labelcolor"] = color
+        plt.rcParams["xtick.color"] = color
+        plt.rcParams["ytick.color"] = color
         # create figure and axe if not already exists
         self.fig = plt.Figure(facecolor=grey_color) if self.fig is None else self.fig
         canvas = FigureCanvas(self.fig) if self.canvas is None else self.canvas
@@ -1324,107 +1281,151 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # plot remaining peak heating and cooling as well as loads if the profile is optimized instead of temperatures
         if ds.aim_optimize:
             # create new x-axe
-            time_array: list = [i+1 for i in range(12)]
+            time_array: list = [i + 1 for i in range(12)]
             # create second y-axe if not already exists
             ax2 = ax.twinx() if len(self.ax) < 2 else self.ax[1]
             # clear the axe
             ax2.clear()
             # plot load and peaks
-            ax.step(np_array(time_array), np_array(boreField.peak_cooling_external), where="pre", lw=1.5,
-                    label=f'P {self.translations.PeakCooling}', color='#54bceb')
-            ax.step(np_array(time_array), np_array(boreField.peak_heating_external), where="pre", lw=1.5,
-                    label=f'P {self.translations.PeakHeating}', color='#ffc857')
-            ax2.step(np_array(time_array), np_array(boreField.monthly_load_cooling_external), color='#54bceb',
-                     linestyle="dashed", where="pre", lw=1.5, label=f'Q {self.translations.BaseCooling}')
-            ax2.step(np_array(time_array), np_array(boreField.monthly_load_heating_external), color='#ffc857',
-                     linestyle="dashed", where="pre", lw=1.5, label=f'Q {self.translations.BaseHeating}')
+            ax.step(
+                np_array(time_array),
+                np_array(borefield.peak_cooling_external),
+                where="pre",
+                lw=1.5,
+                label=f"P {self.translations.PeakCooling}",
+                color="#54bceb",
+            )
+            ax.step(
+                np_array(time_array),
+                np_array(borefield.peak_heating_external),
+                where="pre",
+                lw=1.5,
+                label=f"P {self.translations.PeakHeating}",
+                color="#ffc857",
+            )
+            ax2.step(
+                np_array(time_array),
+                np_array(borefield.monthly_load_cooling_external),
+                color="#54bceb",
+                linestyle="dashed",
+                where="pre",
+                lw=1.5,
+                label=f"Q {self.translations.BaseCooling}",
+            )
+            ax2.step(
+                np_array(time_array),
+                np_array(borefield.monthly_load_heating_external),
+                color="#ffc857",
+                linestyle="dashed",
+                where="pre",
+                lw=1.5,
+                label=f"Q {self.translations.BaseHeating}",
+            )
             # set x-axe limits
             ax.set_xlim(left=1, right=12)
             ax2.set_xlim(left=1, right=12)
             # create legends
-            ax.legend(facecolor=grey_color, loc='upper left')
-            ax2.legend(facecolor=grey_color, loc='upper right')
+            ax.legend(facecolor=grey_color, loc="upper left")
+            ax2.legend(facecolor=grey_color, loc="upper right")
             # set labels of axes
-            ax.set_xlabel(self.translations.X_Axis_Load, color='white')
-            ax.set_ylabel(self.translations.Y_Axis_Load_P, color='white')
-            ax2.set_xlabel(self.translations.X_Axis_Load, color='white')
-            ax2.set_ylabel(self.translations.Y_Axis_Load_Q, color='white')
+            ax.set_xlabel(self.translations.X_Axis_Load, color="white")
+            ax.set_ylabel(self.translations.Y_Axis_Load_P, color="white")
+            ax2.set_xlabel(self.translations.X_Axis_Load, color="white")
+            ax2.set_ylabel(self.translations.Y_Axis_Load_Q, color="white")
             # set axe colors
-            ax.spines['bottom'].set_color('w')
-            ax.spines['top'].set_color('w')
-            ax.spines['right'].set_color('w')
-            ax.spines['left'].set_color('w')
-            ax2.spines['bottom'].set_color('w')
-            ax2.spines['top'].set_color('w')
-            ax2.spines['right'].set_color('w')
-            ax2.spines['left'].set_color('w')
+            ax.spines["bottom"].set_color("w")
+            ax.spines["top"].set_color("w")
+            ax.spines["right"].set_color("w")
+            ax.spines["left"].set_color("w")
+            ax2.spines["bottom"].set_color("w")
+            ax2.spines["top"].set_color("w")
+            ax2.spines["right"].set_color("w")
+            ax2.spines["left"].set_color("w")
             ax.set_facecolor(grey_color)
             ax2.set_facecolor(grey_color)
             # import numpy here to save start up time
             import numpy as np
+
             # create string for result explanation
-            string_size: str = f"{self.translations.label_ResOptimizeLoad1}" \
-                               f"{int(max(boreField.hourly_heating_load)) - int(np.max(boreField.peak_heating_external))}" \
-                               f" / {int(max(boreField.hourly_cooling_load)) - int(np.max(boreField.peak_cooling_external))} kW\n" \
-                               f"{self.translations.label_ResOptimizeLoad2}{np.round(np.sum(boreField.baseload_heating), 2)} / " \
-                               f"{np.round(np.sum(boreField.baseload_cooling), 2)}   kWh\n" \
-                               f"{self.translations.label_ResOptimizeLoad3}" \
-                               f"{np.round(np.sum(boreField.baseload_heating) / np.sum(boreField.hourly_heating_load) * 100, 2)} / " \
-                               f"{np.round(np.sum(boreField.baseload_cooling) / np.sum(boreField.hourly_cooling_load) * 100, 2)} " \
-                               f"{self.translations.label_ResOptimizeLoad4}\n" \
-                               f"{self.translations.label_ResOptimizeLoad5}" \
-                               f"{int(np.max(boreField.peak_heating_external))} / " \
-                               f"{int(np.max(boreField.peak_cooling_external))} kW\n" \
-                               f"{self.translations.label_ResOptimizeLoad6}" \
-                               f"{np.round(-np.sum(boreField.baseload_heating) + np.sum(boreField.hourly_heating_load), 2)} / " \
-                               f"{np.round(-np.sum(boreField.baseload_cooling) + np.sum(boreField.hourly_cooling_load), 2)} kWh"
+            string_size: str = (
+                f"{self.translations.label_ResOptimizeLoad1}"
+                f"{int(max(borefield.hourly_heating_load)) - int(np.max(borefield.peak_heating_external))}"
+                f" / {int(max(borefield.hourly_cooling_load)) - int(np.max(borefield.peak_cooling_external))} kW\n"
+                f"{self.translations.label_ResOptimizeLoad2}{np.round(np.sum(borefield.baseload_heating), 2)} / "
+                f"{np.round(np.sum(borefield.baseload_cooling), 2)}   kWh\n"
+                f"{self.translations.label_ResOptimizeLoad3}"
+                f"{np.round(np.sum(borefield.baseload_heating) / np.sum(borefield.hourly_heating_load) * 100, 2)} / "
+                f"{np.round(np.sum(borefield.baseload_cooling) / np.sum(borefield.hourly_cooling_load) * 100, 2)} "
+                f"{self.translations.label_ResOptimizeLoad4}\n"
+                f"{self.translations.label_ResOptimizeLoad5}"
+                f"{int(np.max(borefield.peak_heating_external))} / "
+                f"{int(np.max(borefield.peak_cooling_external))} kW\n"
+                f"{self.translations.label_ResOptimizeLoad6}"
+                f"{np.round(-np.sum(borefield.baseload_heating) + np.sum(borefield.hourly_heating_load), 2)} / "
+                f"{np.round(-np.sum(borefield.baseload_cooling) + np.sum(borefield.hourly_cooling_load), 2)} kWh"
+            )
         else:
             # remove second axes if exist
             self.ax[1].remove() if len(self.ax) > 1 else None
             # calculation of all the different times at which the g_function should be calculated.
             # this is equal to 'UPM' hours a month * 3600 seconds/hours for the simulationPeriod
-            time_for_g_values = [i * boreField.UPM * 3600. for i in range(1, 12 * boreField.simulation_period + 1)]
+            time_for_g_values = [i * borefield.UPM * 3600.0 for i in range(1, 12 * borefield.simulation_period + 1)]
             # make a time array
-            time_array = [i / 12 / 730. / 3600. for i in time_for_g_values]
+            time_array = [i / 12 / 730.0 / 3600.0 for i in time_for_g_values]
             # plot Temperatures
-            ax.step(np_array(time_array), np_array(t_b), 'w-', where="pre", lw=1.5, label="Tb")
-            ax.step(np_array(time_array), np_array(results_peak_cooling), where="pre", lw=1.5,
-                    label=f'Tf {self.translations.PeakCooling}', color='#54bceb')
-            ax.step(np_array(time_array), np_array(results_peak_heating), where="pre", lw=1.5,
-                    label=f'Tf {self.translations.PeakHeating}', color='#ffc857')
+            ax.step(np_array(time_array), np_array(t_b), "w-", where="pre", lw=1.5, label="Tb")
+            ax.step(np_array(time_array), np_array(results_peak_cooling), where="pre", lw=1.5, label=f"Tf {self.translations.PeakCooling}", color="#54bceb")
+            ax.step(np_array(time_array), np_array(results_peak_heating), where="pre", lw=1.5, label=f"Tf {self.translations.PeakHeating}", color="#ffc857")
             # define temperature bounds
-            ax.step(np_array(time_array), np_array(results_month_cooling), color='#54bceb', linestyle="dashed",
-                    where="pre", lw=1.5, label=f'Tf {self.translations.BaseCooling}')
-            ax.step(np_array(time_array), np_array(results_month_heating), color='#ffc857', linestyle="dashed",
-                    where="pre", lw=1.5, label=f'Tf {self.translations.BaseHeating}')
-            ax.hlines(boreField.Tf_C, 0, ds.option_simu_period, colors='#ffc857', linestyles='dashed', label='', lw=1)
-            ax.hlines(boreField.Tf_H, 0, ds.option_simu_period, colors='#54bceb', linestyles='dashed', label='', lw=1)
-            ax.set_xticks(range(0, ds.option_simu_period+1, 2))
+            ax.step(
+                np_array(time_array),
+                np_array(results_month_cooling),
+                color="#54bceb",
+                linestyle="dashed",
+                where="pre",
+                lw=1.5,
+                label=f"Tf {self.translations.BaseCooling}",
+            )
+            ax.step(
+                np_array(time_array),
+                np_array(results_month_heating),
+                color="#ffc857",
+                linestyle="dashed",
+                where="pre",
+                lw=1.5,
+                label=f"Tf {self.translations.BaseHeating}",
+            )
+            ax.hlines(borefield.Tf_C, 0, ds.option_simu_period, colors="#ffc857", linestyles="dashed", label="", lw=1)
+            ax.hlines(borefield.Tf_H, 0, ds.option_simu_period, colors="#54bceb", linestyles="dashed", label="", lw=1)
+            ax.set_xticks(range(0, ds.option_simu_period + 1, 2))
             # Plot legend
             ax.set_xlim(left=0, right=ds.option_simu_period)
             # create legend
-            ax.legend(facecolor=grey_color, loc='best')
+            ax.legend(facecolor=grey_color, loc="best")
             # set axes names
-            ax.set_xlabel(self.translations.X_Axis, color='white')
-            ax.set_ylabel(self.translations.Y_Axis, color='white')
+            ax.set_xlabel(self.translations.X_Axis, color="white")
+            ax.set_ylabel(self.translations.Y_Axis, color="white")
             # set colors
-            ax.spines['bottom'].set_color('w')
-            ax.spines['top'].set_color('w')
-            ax.spines['right'].set_color('w')
-            ax.spines['left'].set_color('w')
+            ax.spines["bottom"].set_color("w")
+            ax.spines["top"].set_color("w")
+            ax.spines["right"].set_color("w")
+            ax.spines["left"].set_color("w")
             ax.set_facecolor(grey_color)
             # create result display string
-            string_size: str = f'{self.translations.label_Size}{"; ".join(li_size)} m \n'\
-                               f'{self.translations.label_Size_B}{"; ".join(li_b)} m \n' \
-                               f'{self.translations.label_Size_W}{"; ".join(li_n_1)} \n' \
-                               f'{self.translations.label_Size_L}{"; ".join(li_n_2)} \n'\
-                if ds.aim_size_length else f'{self.translations.label_Size}{round(boreField.H, 2)} m'
+            string_size: str = (
+                f'{self.translations.label_Size}{"; ".join(li_size)} m \n'
+                f'{self.translations.label_Size_B}{"; ".join(li_b)} m \n'
+                f'{self.translations.label_Size_W}{"; ".join(li_n_1)} \n'
+                f'{self.translations.label_Size_L}{"; ".join(li_n_2)} \n'
+                if ds.aim_size_length
+                else f"{self.translations.label_Size}{round(borefield.H, 2)} m"
+            )
             # not use axe 2
             ax2 = None
         # set string to depth size label
         self.gui_structure.hint_depth.label.setText(string_size)
         # display warning if depth is to small
-        # self.label_WarningDepth.show() if boreField.H < 50 else self.label_WarningDepth.hide()
+        # self.label_WarningDepth.show() if borefield.H < 50 else self.label_WarningDepth.hide()
         # save variables
         self.ax = [ax] if not ds.aim_optimize else [ax, ax2]
         self.gui_structure.category_result_figure.frame.layout().addWidget(canvas) if self.canvas is None else None
@@ -1434,7 +1435,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         plt.tight_layout()
         canvas.draw()
 
-    def checkLegend(self) -> None:
+    def check_legend(self) -> None:
         """
         function to check if a legend should be displayed
         :return: None
@@ -1444,13 +1445,13 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # check if the legend should be displayed
         if self.gui_structure.option_show_legend.get_value() == 0:
             # set grey color
-            grey_color = '#00407a'
+            grey_color = "#00407a"
             # set legend to graph either two if load is optimized or one otherwise with their locations
             if len(self.ax) > 1:
-                self.ax[0].legend(facecolor=grey_color, loc='upper left')
-                self.ax[1].legend(facecolor=grey_color, loc='upper right')
+                self.ax[0].legend(facecolor=grey_color, loc="upper left")
+                self.ax[1].legend(facecolor=grey_color, loc="upper right")
             else:
-                self.ax[0].legend(facecolor=grey_color, loc='best')
+                self.ax[0].legend(facecolor=grey_color, loc="best")
             # redraw graph
             self.canvas.draw()
             return
@@ -1459,13 +1460,14 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             i.get_legend().remove()
         self.canvas.draw()
 
-    def saveFigure(self) -> None:
+    def save_figure(self) -> None:
         """
         save figure to the QFileDialog asked location
         :return: None
         """
         # get filename at storage place
-        filename = QtWidgets_QFileDialog.getSaveFileName(self.centralwidget, caption=self.translations.SaveFigure, filter='png (*.png)')
+        filename = QtWidgets_QFileDialog.getSaveFileName(self.central_widget, caption=self.translations.SaveFigure[
+            self.gui_structure.option_language.get_value()], filter="png (*.png)")
         # display message and return if no file is selected
         if filename == MainWindow.filenameDefault:
             self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
@@ -1480,122 +1482,126 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         """
         # import csv writer here to save start up time
         from csv import writer as csv_writer
+
         # get filename at storage place
-        filename = QtWidgets_QFileDialog.getSaveFileName(self.centralwidget, caption=self.translations.SaveData, filter='csv (*.csv)')
+        filename = QtWidgets_QFileDialog.getSaveFileName(self.central_widget, caption=self.translations.SaveData[
+            self.gui_structure.option_language.get_value()], filter="csv (*.csv)")
         # display message and return if no file is selected
         if filename == MainWindow.filenameDefault:
             self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
             return
         # get maximal simulation period
-        simulationTime = max([i.option_simu_period for i in self.list_ds])
+        simulation_time = max([i.option_simu_period for i in self.list_ds])
         # create first two column entries
-        toWrite = [['name', 'unit'],  # 0
-                   ['depth', 'm'],  # 1
-                   ['borehole spacing', 'm'],  # 2
-                   ['conductivity of the soil', 'W/mK'],  # 3
-                   ['Ground temperature at infinity', 'C'],  # 4
-                   ['Equivalent borehole resistance', 'mK/W'],  # 5
-                   ['width of rectangular field', '#'],  # 6
-                   ['length of rectangular field', '#'],  # 7
-                   ['Determine length', '0/1'],
-                   ['Simulation Period', 'years'],
-                   ['Minimal temperature', 'C'],
-                   ['Maximal temperature', 'C']]
-        month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-        month_yrs = [f'{mon}_{int(idx/12)+1}' for idx, mon in enumerate(month*simulationTime)]
-        toWrite = toWrite + [[f'Peak heating {mon}', 'kW'] for mon in month]
-        toWrite = toWrite + [[f'Peak cooling {mon}', 'kW'] for mon in month]
-        toWrite = toWrite + [[f'Load heating {mon}', 'kWh'] for mon in month]
-        toWrite = toWrite + [[f'Load cooling {mon}', 'kWh'] for mon in month]
-        toWrite = toWrite + [[f'Results peak heating {mon}', 'C'] for mon in month_yrs]
-        toWrite = toWrite + [[f'Results peak cooling {mon}', 'C'] for mon in month_yrs]
-        toWrite = toWrite + [[f'Results load heating {mon}', 'C'] for mon in month_yrs]
-        toWrite = toWrite + [[f'Results load cooling {mon}', 'C'] for mon in month_yrs]
+        to_write = [
+            ["name", "unit"],  # 0
+            ["depth", "m"],  # 1
+            ["borehole spacing", "m"],  # 2
+            ["conductivity of the soil", "W/mK"],  # 3
+            ["Ground temperature at infinity", "C"],  # 4
+            ["Equivalent borehole resistance", "mK/W"],  # 5
+            ["width of rectangular field", "#"],  # 6
+            ["length of rectangular field", "#"],  # 7
+            ["Determine length", "0/1"],
+            ["Simulation Period", "years"],
+            ["Minimal temperature", "C"],
+            ["Maximal temperature", "C"],
+        ]
+        month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        month_yrs = [f"{mon}_{int(idx/12)+1}" for idx, mon in enumerate(month * simulation_time)]
+        to_write = to_write + [[f"Peak heating {mon}", "kW"] for mon in month]
+        to_write = to_write + [[f"Peak cooling {mon}", "kW"] for mon in month]
+        to_write = to_write + [[f"Load heating {mon}", "kWh"] for mon in month]
+        to_write = to_write + [[f"Load cooling {mon}", "kWh"] for mon in month]
+        to_write = to_write + [[f"Results peak heating {mon}", "C"] for mon in month_yrs]
+        to_write = to_write + [[f"Results peak cooling {mon}", "C"] for mon in month_yrs]
+        to_write = to_write + [[f"Results load heating {mon}", "C"] for mon in month_yrs]
+        to_write = to_write + [[f"Results load cooling {mon}", "C"] for mon in month_yrs]
         # define ranges for results
         ran_yr = range(12)
-        ran_simu = range(12 * simulationTime)
-        # start looping over results in list_ds and append them to toWrite
+        ran_simu = range(12 * simulation_time)
+        # start looping over results in list_ds and append them to to_write
         for idx, ds in enumerate(self.list_ds):
             ds: DataStorageNew = ds
             i = 0
-            toWrite[i].append(f'{self.list_widget_scenario.item(idx).text()}')
+            to_write[i].append(f"{self.list_widget_scenario.item(idx).text()}")
             i += 1
-            toWrite[i].append(f'{round(ds.ground_data.H, 2)}')
+            to_write[i].append(f"{round(ds.ground_data.H, 2)}")
             i += 1
-            toWrite[i].append(f'{round(ds.ground_data.B, 2)}')
+            to_write[i].append(f"{round(ds.ground_data.B, 2)}")
             i += 1
-            toWrite[i].append(f'{round(ds.ground_data.k_s, 2)}')
+            to_write[i].append(f"{round(ds.ground_data.k_s, 2)}")
             i += 1
-            toWrite[i].append(f'{round(ds.ground_data.Tg, 2)}')
+            to_write[i].append(f"{round(ds.ground_data.Tg, 2)}")
             i += 1
-            toWrite[i].append(f'{round(ds.ground_data.Rb, 4)}')
+            to_write[i].append(f"{round(ds.ground_data.Rb, 4)}")
             i += 1
-            toWrite[i].append(f'{round(ds.ground_data.N_1, 0)}')
+            to_write[i].append(f"{round(ds.ground_data.N_1, 0)}")
             i += 1
-            toWrite[i].append(f'{round(ds.ground_data.N_2, 0)}')
+            to_write[i].append(f"{round(ds.ground_data.N_2, 0)}")
             i += 1
-            toWrite[i].append(f'{round(ds.aim_req_depth, 0)}')
+            to_write[i].append(f"{round(ds.aim_req_depth, 0)}")
             i += 1
-            toWrite[i].append(f'{round(ds.option_simu_period, 0)}')
+            to_write[i].append(f"{round(ds.option_simu_period, 0)}")
             i += 1
-            toWrite[i].append(f'{round(ds.option_min_temp, 2)}')
+            to_write[i].append(f"{round(ds.option_min_temp, 2)}")
             i += 1
-            toWrite[i].append(f'{round(ds.option_max_temp, 2)}')
+            to_write[i].append(f"{round(ds.option_max_temp, 2)}")
             for j in ran_yr:
                 i += 1
-                toWrite[i].append(f'{round(ds.peakHeating[j], 2)}')
+                to_write[i].append(f"{round(ds.peakHeating[j], 2)}")
             for j in ran_yr:
                 i += 1
-                toWrite[i].append(f'{round(ds.peakCooling[j], 2)}')
+                to_write[i].append(f"{round(ds.peakCooling[j], 2)}")
             for j in ran_yr:
                 i += 1
-                toWrite[i].append(f'{round(ds.monthlyLoadHeating[j], 2)}')
+                to_write[i].append(f"{round(ds.monthlyLoadHeating[j], 2)}")
             for j in ran_yr:
                 i += 1
-                toWrite[i].append(f'{round(ds.monthlyLoadCooling[j], 2)}')
+                to_write[i].append(f"{round(ds.monthlyLoadCooling[j], 2)}")
             if ds.borefield is None:
                 i += 1
-                [toWrite[i+j].append(self.translations.NotCalculated) for j in ran_simu]
+                [to_write[i + j].append(self.translations.NotCalculated[self.gui_structure.option_language.get_value()]) for j in ran_simu]
                 i += len(ran_simu)
-                [toWrite[i+j].append(self.translations.NotCalculated) for j in ran_simu]
+                [to_write[i + j].append(self.translations.NotCalculated[self.gui_structure.option_language.get_value()]) for j in ran_simu]
                 i += len(ran_simu)
-                [toWrite[i+j].append(self.translations.NotCalculated) for j in ran_simu]
+                [to_write[i + j].append(self.translations.NotCalculated[self.gui_structure.option_language.get_value()]) for j in ran_simu]
                 i += len(ran_simu)
-                [toWrite[i+j].append(self.translations.NotCalculated) for j in ran_simu]
+                [to_write[i + j].append(self.translations.NotCalculated[self.gui_structure.option_language.get_value()]) for j in ran_simu]
                 i += len(ran_simu)
                 continue
             for j in ran_simu:
                 i += 1
                 try:
-                    toWrite[i].append(f'{round(ds.borefield.results_peak_heating[j], 2)}')
+                    to_write[i].append(f"{round(ds.borefield.results_peak_heating[j], 2)}")
                 except IndexError:
-                    toWrite[i].append(self.translations.NotCalculated)
+                    to_write[i].append(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
             for j in ran_simu:
                 i += 1
                 try:
-                    toWrite[i].append(f'{round(ds.borefield.results_peak_cooling[j], 2)}')
+                    to_write[i].append(f"{round(ds.borefield.results_peak_cooling[j], 2)}")
                 except IndexError:
-                    toWrite[i].append(self.translations.NotCalculated)
+                    to_write[i].append(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
             for j in ran_simu:
                 i += 1
                 try:
-                    toWrite[i].append(f'{round(ds.borefield.results_month_heating[j], 2)}')
+                    to_write[i].append(f"{round(ds.borefield.results_month_heating[j], 2)}")
                 except IndexError:
-                    toWrite[i].append(self.translations.NotCalculated)
+                    to_write[i].append(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
             for j in ran_simu:
                 i += 1
                 try:
-                    toWrite[i].append(f'{round(ds.borefield.results_month_cooling[j], 2)}')
+                    to_write[i].append(f"{round(ds.borefield.results_month_cooling[j], 2)}")
                 except IndexError:
-                    toWrite[i].append(self.translations.NotCalculated)
+                    to_write[i].append(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
         # try to write the data else show error message in status bar
         try:
-            with open(filename[0], 'w', newline='') as f:
-                writer = csv_writer(f, delimiter=';')
-                for row in toWrite:
+            with open(filename[0], "w", newline="") as f:
+                writer = csv_writer(f, delimiter=";")
+                for row in to_write:
                     writer.writerow(row)
         except FileNotFoundError:
-            self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
+            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
             return
 
     def closeEvent(self, event) -> None:
@@ -1619,17 +1625,17 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # set standard buttons to save, close and cancel
         msg.setStandardButtons(QtWidgets_QMessageBox.Save | QtWidgets_QMessageBox.Close | QtWidgets_QMessageBox.Cancel)
         # get save, close and cancel button
-        buttonS = msg.button(QtWidgets_QMessageBox.Save)
-        buttonCl = msg.button(QtWidgets_QMessageBox.Close)
-        buttonCa = msg.button(QtWidgets_QMessageBox.Cancel)
+        button_s = msg.button(QtWidgets_QMessageBox.Save)
+        button_cl = msg.button(QtWidgets_QMessageBox.Close)
+        button_ca = msg.button(QtWidgets_QMessageBox.Cancel)
         # set save, close and cancel button text depending on language selected
-        buttonS.setText(f'{self.translations.label_Save[self.gui_structure.option_language.get_value()]} ')
-        buttonCl.setText(f'{self.translations.label_close[self.gui_structure.option_language.get_value()]} ')
-        buttonCa.setText(f'{self.translations.label_cancenl[self.gui_structure.option_language.get_value()]} ')
+        button_s.setText(f"{self.translations.label_Save[self.gui_structure.option_language.get_value()]} ")
+        button_cl.setText(f"{self.translations.label_close[self.gui_structure.option_language.get_value()]} ")
+        button_ca.setText(f"{self.translations.label_cancel[self.gui_structure.option_language.get_value()]} ")
         # set  save, close and cancel button icon
-        self.setPushButtonIcon(buttonS, 'Save_Inv')
-        self.setPushButtonIcon(buttonCl, 'Exit')
-        self.setPushButtonIcon(buttonCa, 'Abort')
+        self.set_push_button_icon(button_s, "Save_Inv")
+        self.set_push_button_icon(button_cl, "Exit")
+        self.set_push_button_icon(button_ca, "Abort")
         # execute message box and save response
         reply = msg.exec_()
         # check if closing should be canceled
@@ -1638,7 +1644,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             event.ignore()
             return
         # check if inputs should be saved and if successfully set closing variable to true
-        close: bool = self.funSave() if reply == QtWidgets_QMessageBox.Save else True
+        close: bool = self.fun_save() if reply == QtWidgets_QMessageBox.Save else True
         # stop all calculation threads
         [i.terminate() for i in self.threads]
         # close window if close variable is true else not
@@ -1649,6 +1655,7 @@ class CalcProblem(QtCore_QThread):
     """
     class to calculate the problem in an external thread
     """
+
     any_signal = QtCore_pyqtSignal(DataStorageNew)
 
     def __init__(self, ds: DataStorageNew, idx: int, parent=None) -> None:
@@ -1670,59 +1677,70 @@ class CalcProblem(QtCore_QThread):
         """
         # import bore field class from GHEtool and not in start up to save time
         from GHEtool import Borefield
+
         # create the bore field object
-        boreField = Borefield(simulation_period=self.DS.option_simu_period, peak_heating=self.DS.peakHeating,
-                              peak_cooling=self.DS.peakCooling, baseload_heating=self.DS.monthlyLoadHeating,
-                              baseload_cooling=self.DS.monthlyLoadCooling, gui=True)
+        borefield = Borefield(
+            simulation_period=self.DS.option_simu_period,
+            peak_heating=self.DS.peakHeating,
+            peak_cooling=self.DS.peakCooling,
+            baseload_heating=self.DS.monthlyLoadHeating,
+            baseload_cooling=self.DS.monthlyLoadCooling,
+            gui=True,
+        )
         # set temperature boundaries
-        boreField.set_max_ground_temperature(self.DS.option_max_temp)  # maximum temperature
-        boreField.set_min_ground_temperature(self.DS.option_min_temp)  # minimum temperature
+        borefield.set_max_ground_temperature(self.DS.option_max_temp)  # maximum temperature
+        borefield.set_min_ground_temperature(self.DS.option_min_temp)  # minimum temperature
         # set ground data
-        boreField.set_ground_parameters(self.DS.ground_data)
+        borefield.set_ground_parameters(self.DS.ground_data)
         # check bounds of precalculated data
         bopd: BoundsOfPrecalculatedData = BoundsOfPrecalculatedData()
-        outside_bounds: bool = bopd.check_if_outside_bounds(self.DS.ground_data.H, self.DS.ground_data.B, self.DS.ground_data.k_s,
-                                                            max(self.DS.ground_data.N_1, self.DS.ground_data.N_2))
+        outside_bounds: bool = bopd.check_if_outside_bounds(
+            self.DS.ground_data.H, self.DS.ground_data.B, self.DS.ground_data.k_s, max(self.DS.ground_data.N_1, self.DS.ground_data.N_2)
+        )
         # set default value for constant Rb calculation
-        useConstantRb: bool = True
+        use_constant_rb: bool = True
         # check if Rb is unknown
         if self.DS.option_method_rb_calc > 0:
             # set fluid and pipe data
-            boreField.set_fluid_parameters(self.DS.fluid_data)
-            boreField.set_pipe_parameters(self.DS.pipe_data)
-            # set useConstantRb to False if R_b_calculation_method == 2
-            useConstantRb: bool = self.DS.option_method_rb_calc == 1
+            borefield.set_fluid_parameters(self.DS.fluid_data)
+            borefield.set_pipe_parameters(self.DS.pipe_data)
+            # set use_constant_rb to False if R_b_calculation_method == 2
+            use_constant_rb: bool = self.DS.option_method_rb_calc == 1
             # set Rb to the new calculated one if a constant unknown Rb is selected
-            boreField.Rb = boreField.calculate_Rb() if useConstantRb else self.DS.ground_data.Rb
+            borefield.Rb = borefield.calculate_Rb() if use_constant_rb else self.DS.ground_data.Rb
         # create custom rectangle bore field if no precalculated data is available
         if outside_bounds:
             # import boreholes from pygfuntion here to save start up time
             from pygfunction import boreholes as gt_boreholes
+
             # get minimum and maximal number of boreholes in one direction
             n_max: int = max(self.DS.ground_data.N_1, self.DS.ground_data.N_2)
             n_min: int = max(self.DS.ground_data.N_1, self.DS.ground_data.N_2)
             # initialize custom field with variables selected
-            custom_field = gt_boreholes.rectangle_field(N_1=n_max, N_2=n_min, B_1=self.DS.ground_data.B, B_2=self.DS.ground_data.B,
-                                                        H=self.DS.ground_data.H, D=4, r_b=0.075)
+            custom_field = gt_boreholes.rectangle_field(
+                N_1=n_max, N_2=n_min, B_1=self.DS.ground_data.B, B_2=self.DS.ground_data.B, H=self.DS.ground_data.H, D=4, r_b=0.075
+            )
             # create name of custom bore field to save it later
-            boreFieldCustom: str = f'customField_{n_max}_{n_min}_{self.DS.ground_data.B}_{self.DS.ground_data.k_s}'
+            borefield_custom: str = f"customField_{n_max}_{n_min}_{self.DS.ground_data.B}_{self.DS.ground_data.k_s}"
             # try if the bore field has already be calculated then open this otherwise calculate it
             try:
                 from GHEtool import FOLDER
-                pk_load(open(f'{FOLDER}/Data/{boreFieldCustom}.pickle', "rb"))
+
+                pk_load(open(f"{FOLDER}/Data/{borefield_custom}.pickle", "rb"))
             except FileNotFoundError:
-                boreField.create_custom_dataset(custom_field, boreFieldCustom)
+                borefield.create_custom_dataset(custom_field, borefield_custom)
             # set new bore field g-function
-            boreField.set_custom_gfunction(boreFieldCustom)
+            borefield.set_custom_gfunction(borefield_custom)
             # set bore field to custom one
-            boreField.set_borefield(custom_field)
+            borefield.set_borefield(custom_field)
         # if load should be optimized do this
         if self.DS.aim_optimize:
             # get column and decimal seperator
-            sep: str = ';' if self.DS.option_seperator_csv == 0 else ','
-            dec: str = '.' if self.DS.option_decimal_csv == 0 else ','
+            sep: str = ";" if self.DS.option_seperator_csv == 0 else ","
+            dec: str = "." if self.DS.option_decimal_csv == 0 else ","
             # import pandas here to save start up time
             from pandas import read_csv as pd_read_csv
+
             # load data from csv file
             try:
                 data = pd_read_csv(self.DS.filename, sep=sep, decimal=dec)
@@ -1735,38 +1753,57 @@ class CalcProblem(QtCore_QThread):
             # list and muliplty in both cases with the unit factor to achive data in kW
             if self.DS.option_column == 1:
                 print(data.columns[self.DS.option_heating_column])
-                boreField.hourly_heating_load = data[data.columns[self.DS.option_heating_column]] * unit
-                boreField.hourly_cooling_load = data[data.columns[self.DS.option_cooling_column]] * unit
+                borefield.hourly_heating_load = data[data.columns[self.DS.option_heating_column]] * unit
+                borefield.hourly_cooling_load = data[data.columns[self.DS.option_cooling_column]] * unit
             else:
-                boreField.hourly_heating_load = data[data.columns[self.DS.option_single_column]].apply(lambda x: x >= 0) * unit
-                boreField.hourly_cooling_load = data[data.columns[self.DS.option_single_column]].apply(lambda x: x < 0) * unit
+                borefield.hourly_heating_load = data[data.columns[self.DS.option_single_column]].apply(lambda x: x >= 0) * unit
+                borefield.hourly_cooling_load = data[data.columns[self.DS.option_single_column]].apply(lambda x: x < 0) * unit
             # optimize load profile without printing the results
-            boreField.optimise_load_profile(depth=self.DS.ground_data.H, print_results=False)
+            borefield.optimise_load_profile(depth=self.DS.ground_data.H, print_results=False)
             # save bore field in Datastorage
-            self.DS.borefield = boreField
+            self.DS.borefield = borefield
             # return Datastorage as signal
             self.any_signal.emit(self.DS)
             return
         if self.DS.aim_req_depth:
             # size the borehole depth if wished
-            boreField.size(self.DS.ground_data.H, L2_sizing=self.DS.option_method_size_depth == 0, L3_sizing=self.DS.option_method_size_depth == 1,
-                           L4_sizing=self.DS.option_method_size_depth == 2, use_constant_Rb=useConstantRb)
+            borefield.size(
+                self.DS.ground_data.H,
+                L2_sizing=self.DS.option_method_size_depth == 0,
+                L3_sizing=self.DS.option_method_size_depth == 1,
+                L4_sizing=self.DS.option_method_size_depth == 2,
+                use_constant_Rb=use_constant_rb,
+            )
 
         if self.DS.aim_size_length:
             # size bore field by length and width either fast (Size_Method == 0) or robust (Size_Method == 1)
             if self.DS.option_method_size_length == 0:
-                boreField.size_complete_field_fast(self.DS.option_max_depth, self.DS.option_max_width, self.DS.option_max_length, self.DS.option_min_spacing,
-                                                   self.DS.option_max_spacing, self.DS.option_method_size_depth == 0, useConstantRb)
+                borefield.size_complete_field_fast(
+                    self.DS.option_max_depth,
+                    self.DS.option_max_width,
+                    self.DS.option_max_length,
+                    self.DS.option_min_spacing,
+                    self.DS.option_max_spacing,
+                    self.DS.option_method_size_depth == 0,
+                    use_constant_rb,
+                )
             else:
-                boreField.size_complete_field_robust(self.DS.option_max_depth, self.DS.option_max_width, self.DS.option_max_length, self.DS.option_min_spacing,
-                                                     self.DS.option_max_spacing, self.DS.option_method_size_depth == 0, useConstantRb)
+                borefield.size_complete_field_robust(
+                    self.DS.option_max_depth,
+                    self.DS.option_max_width,
+                    self.DS.option_max_length,
+                    self.DS.option_min_spacing,
+                    self.DS.option_max_spacing,
+                    self.DS.option_method_size_depth == 0,
+                    use_constant_rb,
+                )
         # try to calculate temperatures
         try:
-            boreField.calculate_temperatures(boreField.H)
+            borefield.calculate_temperatures(borefield.H)
         except ValueError:
             pass
         # save bore field in Datastorage
-        self.DS.borefield = boreField
+        self.DS.borefield = borefield
         # return Datastorage as signal
         self.any_signal.emit(self.DS)
         return
@@ -1776,6 +1813,7 @@ class ImportGHEtool(QtCore_QThread):
     """
     class to import GHEtool in an external thread
     """
+
     any_signal = QtCore_pyqtSignal(bool)
 
     def __init__(self, parent=None) -> None:
@@ -1783,7 +1821,7 @@ class ImportGHEtool(QtCore_QThread):
         initialize importing class
         :param parent: parent class
         """
-        super(ImportGHEtool, self).__init__(parent) # init parent class
+        super(ImportGHEtool, self).__init__(parent)  # init parent class
 
     def run(self) -> None:
         """
@@ -1791,7 +1829,8 @@ class ImportGHEtool(QtCore_QThread):
         :return: None
         """
         import GHEtool  # import GHEtool
-        GHEtool.FOLDER = './'
+
+        GHEtool.FOLDER = "./"
         self.any_signal.emit(True)  # emit true signal
 
 
@@ -1799,6 +1838,7 @@ class SetItem(QtCore_QThread):
     """
     class to reset item a bit later
     """
+
     any_signal: QtCore_pyqtSignal = QtCore_pyqtSignal(QtCore_QThread)
 
     def __init__(self, widget: QtWidgets_QListWidget, item: QtWidgets_QListWidgetItem, parent=None) -> None:

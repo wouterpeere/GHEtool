@@ -3,7 +3,7 @@ def run():
     from sys import argv
     from sys import exit as sys_exit
 
-    from GHEtool.gui.Gui_window import MainWindow
+    from GHEtool.gui.gui_window import MainWindow
     from PySide6.QtWidgets import QApplication as QtWidgets_QApplication
     from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
 

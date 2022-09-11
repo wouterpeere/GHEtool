@@ -1,5 +1,6 @@
 from GHEtool.gui.gui_classes import DoubleValue, IntValue, ListBox, Category, Page, ButtonBox, Aim, qt_w, qt_c, Option, Hint, FileName, FunctionButton
-from typing import List, Tuple
+from GHEtool.gui.translation_class import Translations
+from typing import List, Tuple, Optional
 import pandas as pd
 
 
@@ -364,16 +365,10 @@ class GuiStructure:
         self.list_of_options: List[Tuple[Option, str]] = [(getattr(self, name), name) for name in self.__dict__ if isinstance(getattr(self, name), Option)]
         self.list_of_pages: List[Page] = [getattr(self, name) for name in self.__dict__ if isinstance(getattr(self, name), Page)]
 
-    def translate(self, index: int):
-        from GHEtool.main_class import FOLDER
-        data = pd.read_csv(f'{FOLDER}/gui/Translations.csv', sep=';')
-        column = data.columns[index+1]
-        for i in range(len(data)):
-            try:
-                entry = getattr(self, data['name'][i])
-            except AttributeError:
-                continue
+    def translate(self, index: int, translation: Translations):
+        for name in [j for j in translation.__slots__ if hasattr(self, j)]:
+            entry: Optional[Option, Hint, FunctionButton, Page, Category] = getattr(self, name)
             if isinstance(entry, Page):
-                name: str = data[column][i].split(',')
-                entry.set_text(name, '')
+                entry_name: Tuple[str, str] = getattr(translation, name)[index].split(',')
+                entry.set_text(entry_name[0].replace('@', '\n'), entry_name[1])
 

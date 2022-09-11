@@ -1,4 +1,4 @@
-from PySide6.QtCore import QCoreApplication, QMetaObject, QRect, QSize, Qt
+from PySide6.QtCore import QMetaObject, QRect, QSize, Qt
 from PySide6.QtGui import QAction, QFont, QIcon
 from PySide6.QtWidgets import (
     QAbstractItemView,
@@ -31,27 +31,65 @@ GREY: str = "rgb(100, 100, 100)"
 WARNING: str = "rgb(255, 200, 87)"
 
 
-class Ui_GHEtool:
-    def setupUi(self, GHETool):
-        if not GHETool.objectName():
-            GHETool.setObjectName("GHEtool")
-        GHETool.resize(1226, 869)
-        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(GHETool.sizePolicy().hasHeightForWidth())
-        GHETool.setSizePolicy(sizePolicy)
-        GHETool.setMaximumSize(QSize(16777215, 16777215))
+class UiGhetool:
+    menuLanguage: QMenu
+    status_bar: QStatusBar
+    toolBar: QToolBar
+    menuScenario: QMenu
+    menuSettings: QMenu
+    menuCalculation: QMenu
+    pushButton_Cancel: QPushButton
+    menuFile: QMenu
+    pushButton_start_multiple: QPushButton
+    pushButton_start_single: QPushButton
+    horizontalSpacer_2: QSpacerItem
+    progressBar: QProgressBar
+    horizontalLayout_2: QHBoxLayout
+    label_Status: QLabel
+    horizontalLayout_7: QHBoxLayout
+    stackedWidget: QStackedWidget
+    verticalLayout_21: QVBoxLayout
+    verticalLayout_menu: QVBoxLayout
+    list_widget_scenario: QListWidget
+    button_rename_scenario: QPushButton
+    pushButton_SaveScenario: QPushButton
+    verticalLayout_scenario: QVBoxLayout
+    horizontalLayout_23: QHBoxLayout
+    central_widget: QWidget
+    pushButton_DeleteScenario: QPushButton
+    action_start_single: QAction
+    actionRename_scenario: QAction
+    actionSave_As: QAction
+    actionDelete_scenario: QAction
+    actionAdd_Scenario: QAction
+    actionUpdate_Scenario: QAction
+    menubar: QMenuBar
+    pushButton_AddScenario: QPushButton
+    action_start_multiple: QAction
+    actionOpen: QAction
+    actionSave: QAction
+    actionNew: QAction
+
+    def setup_ui(self, ghe_tool):
+        if not ghe_tool.objectName():
+            ghe_tool.setObjectName("GHEtool")
+        ghe_tool.resize(1226, 869)
+        size_policy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        size_policy.setHorizontalStretch(0)
+        size_policy.setVerticalStretch(0)
+        size_policy.setHeightForWidth(ghe_tool.sizePolicy().hasHeightForWidth())
+        ghe_tool.setSizePolicy(size_policy)
+        ghe_tool.setMaximumSize(QSize(16777215, 16777215))
         font = QFont()
         font.setFamilies(["Lexend"])
         font.setPointSize(11)
         font.setBold(False)
         font.setItalic(False)
-        GHETool.setFont(font)
+        ghe_tool.setFont(font)
         icon = QIcon()
         icon.addFile(":/icons/icons/icon_05.svg", QSize(), QIcon.Normal, QIcon.Off)
-        GHETool.setWindowIcon(icon)
-        GHETool.setStyleSheet(
+        ghe_tool.setWindowIcon(icon)
+        ghe_tool.setStyleSheet(
             "*{\n"
             f"color: {WHITE};\n"
             'font: 11pt "Lexend";\n'
@@ -102,7 +140,7 @@ class Ui_GHEtool:
             f"background-color: {DARK};\n"
             "}"
         )
-        self.actionNew = QAction(GHETool)
+        self.actionNew = QAction(ghe_tool)
         self.actionNew.setObjectName("actionNew")
         self.actionNew.setCheckable(False)
         self.actionNew.setChecked(False)
@@ -111,118 +149,77 @@ class Ui_GHEtool:
         icon1.addFile(":/icons/icons/New.svg", QSize(), QIcon.Normal, QIcon.Off)
         icon1.addFile(":/icons/icons/New_Inv.svg", QSize(), QIcon.Active, QIcon.Off)
         self.actionNew.setIcon(icon1)
-        self.actionSave = QAction(GHETool)
+        self.actionSave = QAction(ghe_tool)
         self.actionSave.setObjectName("actionSave")
         self.actionSave.setEnabled(True)
         icon2 = QIcon()
         icon2.addFile(":/icons/icons/Save.svg", QSize(), QIcon.Normal, QIcon.Off)
         icon2.addFile(":/icons/icons/Save_Inv.svg", QSize(), QIcon.Active, QIcon.Off)
         self.actionSave.setIcon(icon2)
-        self.actionOpen = QAction(GHETool)
+        self.actionOpen = QAction(ghe_tool)
         self.actionOpen.setObjectName("actionOpen")
         self.actionOpen.setEnabled(True)
         icon3 = QIcon()
         icon3.addFile(":/icons/icons/Open.svg", QSize(), QIcon.Normal, QIcon.Off)
         icon3.addFile(":/icons/icons/Open_Inv.svg", QSize(), QIcon.Active, QIcon.Off)
         self.actionOpen.setIcon(icon3)
-        self.action_start_multiple = QAction(GHETool)
+        self.action_start_multiple = QAction(ghe_tool)
         self.action_start_multiple.setObjectName("action_start_multiple")
         self.action_start_multiple.setEnabled(True)
         icon4 = QIcon()
         icon4.addFile(":/icons/icons/Start_multiple_inv.svg", QSize(), QIcon.Normal, QIcon.Off)
         icon4.addFile(":/icons/icons/Start_multiple.svg", QSize(), QIcon.Active, QIcon.Off)
         self.action_start_multiple.setIcon(icon4)
-        self.actionGerman = QAction(GHETool)
-        self.actionGerman.setObjectName("actionGerman")
-        icon5 = QIcon()
-        icon5.addFile(":/icons/icons/Flag_German.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.actionGerman.setIcon(icon5)
-        self.actionEnglish = QAction(GHETool)
-        self.actionEnglish.setObjectName("actionEnglish")
-        icon6 = QIcon()
-        icon6.addFile(":/icons/icons/Flag_English.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.actionEnglish.setIcon(icon6)
-        self.actionUpdate_Scenario = QAction(GHETool)
+        self.actionUpdate_Scenario = QAction(ghe_tool)
         self.actionUpdate_Scenario.setObjectName("actionUpdate_Scenario")
         icon7 = QIcon()
         icon7.addFile(":/icons/icons/Update_Inv.svg", QSize(), QIcon.Normal, QIcon.Off)
         icon7.addFile(":/icons/icons/Update.svg", QSize(), QIcon.Active, QIcon.Off)
         self.actionUpdate_Scenario.setIcon(icon7)
-        self.actionAdd_Scenario = QAction(GHETool)
+        self.actionAdd_Scenario = QAction(ghe_tool)
         self.actionAdd_Scenario.setObjectName("actionAdd_Scenario")
         icon8 = QIcon()
         icon8.addFile(":/icons/icons/Add_Inv.svg", QSize(), QIcon.Normal, QIcon.Off)
         icon8.addFile(":/icons/icons/Add.svg", QSize(), QIcon.Active, QIcon.Off)
         self.actionAdd_Scenario.setIcon(icon8)
-        self.actionDelete_scenario = QAction(GHETool)
+        self.actionDelete_scenario = QAction(ghe_tool)
         self.actionDelete_scenario.setObjectName("actionDelete_scenario")
         icon9 = QIcon()
         icon9.addFile(":/icons/icons/Delete_Inv.svg", QSize(), QIcon.Normal, QIcon.Off)
         icon9.addFile(":/icons/icons/Delete.svg", QSize(), QIcon.Active, QIcon.Off)
         self.actionDelete_scenario.setIcon(icon9)
-        self.actionSave_As = QAction(GHETool)
+        self.actionSave_As = QAction(ghe_tool)
         self.actionSave_As.setObjectName("actionSave_As")
         icon10 = QIcon()
         icon10.addFile(":/icons/icons/SaveAs.svg", QSize(), QIcon.Normal, QIcon.Off)
         icon10.addFile(":/icons/icons/Save_As_Inv.svg", QSize(), QIcon.Active, QIcon.Off)
         self.actionSave_As.setIcon(icon10)
-        self.actionDutch = QAction(GHETool)
-        self.actionDutch.setObjectName("actionDutch")
-        icon11 = QIcon()
-        icon11.addFile(":/icons/icons/Flag_Dutch.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.actionDutch.setIcon(icon11)
-        self.actionItalian = QAction(GHETool)
-        self.actionItalian.setObjectName("actionItalian")
-        icon12 = QIcon()
-        icon12.addFile(":/icons/icons/Flag_Italian.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.actionItalian.setIcon(icon12)
-        self.actionFrench = QAction(GHETool)
-        self.actionFrench.setObjectName("actionFrench")
-        icon13 = QIcon()
-        icon13.addFile(":/icons/icons/Flag_French.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.actionFrench.setIcon(icon13)
-        self.actionRename_scenario = QAction(GHETool)
+        self.actionRename_scenario = QAction(ghe_tool)
         self.actionRename_scenario.setObjectName("actionRename_scenario")
         icon14 = QIcon()
         icon14.addFile(":/icons/icons/Rename_Inv.svg", QSize(), QIcon.Normal, QIcon.Off)
         icon14.addFile(":/icons/icons/Rename.svg", QSize(), QIcon.Active, QIcon.Off)
         self.actionRename_scenario.setIcon(icon14)
-        self.action_start_single = QAction(GHETool)
+        self.action_start_single = QAction(ghe_tool)
         self.action_start_single.setObjectName("action_start_single")
         icon15 = QIcon()
         icon15.addFile(":/icons/icons/Start_inv.svg", QSize(), QIcon.Normal, QIcon.Off)
         icon15.addFile(":/icons/icons/Start.svg", QSize(), QIcon.Active, QIcon.Off)
         self.action_start_single.setIcon(icon15)
-        self.actionSpanish = QAction(GHETool)
-        self.actionSpanish.setObjectName("actionSpanish")
-        icon16 = QIcon()
-        icon16.addFile(":/icons/icons/Flag_Spain.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.actionSpanish.setIcon(icon16)
-        self.actionInputChanged = QAction(GHETool)
-        self.actionInputChanged.setObjectName("actionInputChanged")
-        self.actionCheckUDistance = QAction(GHETool)
-        self.actionCheckUDistance.setObjectName("actionCheckUDistance")
-        self.actionUpdateBoreholeGraph = QAction(GHETool)
-        self.actionUpdateBoreholeGraph.setObjectName("actionUpdateBoreholeGraph")
-        self.actionGalician = QAction(GHETool)
-        self.actionGalician.setObjectName("actionGalician")
-        icon17 = QIcon()
-        icon17.addFile(":/icons/icons/Flag_Galicia.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.actionGalician.setIcon(icon17)
-        self.centralwidget = QWidget(GHETool)
-        self.centralwidget.setObjectName("centralwidget")
-        self.centralwidget.setStyleSheet("")
-        self.horizontalLayout_23 = QHBoxLayout(self.centralwidget)
+        self.central_widget = QWidget(ghe_tool)
+        self.central_widget.setObjectName("central_widget")
+        self.central_widget.setStyleSheet("")
+        self.horizontalLayout_23 = QHBoxLayout(self.central_widget)
         self.horizontalLayout_23.setObjectName("horizontalLayout_23")
         self.verticalLayout_scenario = QVBoxLayout()
         self.verticalLayout_scenario.setObjectName("verticalLayout_scenario")
-        self.pushButton_SaveScenario = QPushButton(self.centralwidget)
+        self.pushButton_SaveScenario = QPushButton(self.central_widget)
         self.pushButton_SaveScenario.setObjectName("pushButton_SaveScenario")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.pushButton_SaveScenario.sizePolicy().hasHeightForWidth())
-        self.pushButton_SaveScenario.setSizePolicy(sizePolicy1)
+        size_policy1 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        size_policy1.setHorizontalStretch(0)
+        size_policy1.setVerticalStretch(0)
+        size_policy1.setHeightForWidth(self.pushButton_SaveScenario.sizePolicy().hasHeightForWidth())
+        self.pushButton_SaveScenario.setSizePolicy(size_policy1)
         self.pushButton_SaveScenario.setMinimumSize(QSize(180, 30))
         self.pushButton_SaveScenario.setMaximumSize(QSize(250, 30))
         self.pushButton_SaveScenario.setStyleSheet("text-align:left;")
@@ -233,7 +230,7 @@ class Ui_GHEtool:
 
         self.verticalLayout_scenario.addWidget(self.pushButton_SaveScenario)
 
-        self.pushButton_AddScenario = QPushButton(self.centralwidget)
+        self.pushButton_AddScenario = QPushButton(self.central_widget)
         self.pushButton_AddScenario.setObjectName("pushButton_AddScenario")
         self.pushButton_AddScenario.setMinimumSize(QSize(180, 30))
         self.pushButton_AddScenario.setMaximumSize(QSize(250, 30))
@@ -245,7 +242,7 @@ class Ui_GHEtool:
 
         self.verticalLayout_scenario.addWidget(self.pushButton_AddScenario)
 
-        self.pushButton_DeleteScenario = QPushButton(self.centralwidget)
+        self.pushButton_DeleteScenario = QPushButton(self.central_widget)
         self.pushButton_DeleteScenario.setObjectName("pushButton_DeleteScenario")
         self.pushButton_DeleteScenario.setMinimumSize(QSize(180, 30))
         self.pushButton_DeleteScenario.setMaximumSize(QSize(250, 30))
@@ -257,7 +254,7 @@ class Ui_GHEtool:
 
         self.verticalLayout_scenario.addWidget(self.pushButton_DeleteScenario)
 
-        self.button_rename_scenario = QPushButton(self.centralwidget)
+        self.button_rename_scenario = QPushButton(self.central_widget)
         self.button_rename_scenario.setObjectName("button_rename_scenario")
         self.button_rename_scenario.setMinimumSize(QSize(180, 30))
         self.button_rename_scenario.setMaximumSize(QSize(250, 30))
@@ -269,11 +266,11 @@ class Ui_GHEtool:
 
         self.verticalLayout_scenario.addWidget(self.button_rename_scenario)
 
-        self.list_widget_scenario = QListWidget(self.centralwidget)
+        self.list_widget_scenario = QListWidget(self.central_widget)
         QListWidgetItem(self.list_widget_scenario)
         self.list_widget_scenario.setObjectName("list_widget_scenario")
-        sizePolicy.setHeightForWidth(self.list_widget_scenario.sizePolicy().hasHeightForWidth())
-        self.list_widget_scenario.setSizePolicy(sizePolicy)
+        size_policy.setHeightForWidth(self.list_widget_scenario.sizePolicy().hasHeightForWidth())
+        self.list_widget_scenario.setSizePolicy(size_policy)
         self.list_widget_scenario.setMaximumSize(QSize(16666711, 16666711))
         self.list_widget_scenario.setStyleSheet(
             "*{border: 1px solid white;}\n"
@@ -303,7 +300,7 @@ class Ui_GHEtool:
 
         self.verticalLayout_21 = QVBoxLayout()
         self.verticalLayout_21.setObjectName("verticalLayout_21")
-        self.stackedWidget = QStackedWidget(self.centralwidget)
+        self.stackedWidget = QStackedWidget(self.central_widget)
         self.stackedWidget.setObjectName("stackedWidget")
         self.stackedWidget.setStyleSheet("")
         self.stackedWidget.setFrameShadow(QFrame.Plain)
@@ -313,12 +310,12 @@ class Ui_GHEtool:
 
         self.horizontalLayout_7 = QHBoxLayout()
         self.horizontalLayout_7.setObjectName("horizontalLayout_7")
-        self.label_Status = QLabel(self.centralwidget)
+        self.label_Status = QLabel(self.central_widget)
         self.label_Status.setObjectName("label_Status")
 
         self.horizontalLayout_7.addWidget(self.label_Status)
 
-        self.progressBar = QProgressBar(self.centralwidget)
+        self.progressBar = QProgressBar(self.central_widget)
         self.progressBar.setObjectName("progressBar")
         self.progressBar.setStyleSheet(
             "QProgressBar{border: 1px solid white;\n"
@@ -339,7 +336,7 @@ class Ui_GHEtool:
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer_2)
 
-        self.pushButton_start_single = QPushButton(self.centralwidget)
+        self.pushButton_start_single = QPushButton(self.central_widget)
         self.pushButton_start_single.setObjectName("pushButton_start_single")
         self.pushButton_start_single.setMinimumSize(QSize(100, 40))
         self.pushButton_start_single.setMaximumSize(QSize(16777215, 40))
@@ -351,7 +348,7 @@ class Ui_GHEtool:
 
         self.horizontalLayout_2.addWidget(self.pushButton_start_single)
 
-        self.pushButton_start_multiple = QPushButton(self.centralwidget)
+        self.pushButton_start_multiple = QPushButton(self.central_widget)
         self.pushButton_start_multiple.setObjectName("pushButton_start_multiple")
         self.pushButton_start_multiple.setMinimumSize(QSize(100, 40))
         self.pushButton_start_multiple.setMaximumSize(QSize(16777215, 40))
@@ -363,7 +360,7 @@ class Ui_GHEtool:
 
         self.horizontalLayout_2.addWidget(self.pushButton_start_multiple)
 
-        self.pushButton_Cancel = QPushButton(self.centralwidget)
+        self.pushButton_Cancel = QPushButton(self.central_widget)
         self.pushButton_Cancel.setObjectName("pushButton_Cancel")
         self.pushButton_Cancel.setMinimumSize(QSize(100, 40))
         self.pushButton_Cancel.setMaximumSize(QSize(16777215, 40))
@@ -379,8 +376,8 @@ class Ui_GHEtool:
 
         self.horizontalLayout_23.addLayout(self.verticalLayout_21)
 
-        GHETool.setCentralWidget(self.centralwidget)
-        self.menubar = QMenuBar(GHETool)
+        ghe_tool.setCentralWidget(self.central_widget)
+        self.menubar = QMenuBar(ghe_tool)
         self.menubar.setObjectName("menubar")
         self.menubar.setEnabled(True)
         self.menubar.setGeometry(QRect(0, 0, 1226, 30))
@@ -415,8 +412,8 @@ class Ui_GHEtool:
         self.menuLanguage.setIcon(icon35)
         self.menuScenario = QMenu(self.menubar)
         self.menuScenario.setObjectName("menuScenario")
-        GHETool.setMenuBar(self.menubar)
-        self.toolBar = QToolBar(GHETool)
+        ghe_tool.setMenuBar(self.menubar)
+        self.toolBar = QToolBar(ghe_tool)
         self.toolBar.setObjectName("toolBar")
         self.toolBar.setStyleSheet(
             "*{\n"
@@ -426,11 +423,11 @@ class Ui_GHEtool:
             "QToolTip { color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);border: 1px solid rgb(84, 188, 235); }"
         )
         self.toolBar.setMovable(False)
-        GHETool.addToolBar(Qt.TopToolBarArea, self.toolBar)
-        self.status_bar = QStatusBar(GHETool)
+        ghe_tool.addToolBar(Qt.TopToolBarArea, self.toolBar)
+        self.status_bar = QStatusBar(ghe_tool)
         self.status_bar.setObjectName("status_bar")
         self.status_bar.setStyleSheet("QStatusBar::item{border:None;}")
-        GHETool.setStatusBar(self.status_bar)
+        ghe_tool.setStatusBar(self.status_bar)
 
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuCalculation.menuAction())
@@ -443,13 +440,6 @@ class Ui_GHEtool:
         self.menuCalculation.addAction(self.action_start_multiple)
         self.menuCalculation.addAction(self.action_start_single)
         self.menuSettings.addAction(self.menuLanguage.menuAction())
-        self.menuLanguage.addAction(self.actionEnglish)
-        self.menuLanguage.addAction(self.actionGerman)
-        self.menuLanguage.addAction(self.actionDutch)
-        self.menuLanguage.addAction(self.actionItalian)
-        self.menuLanguage.addAction(self.actionFrench)
-        self.menuLanguage.addAction(self.actionSpanish)
-        self.menuLanguage.addAction(self.actionGalician)
         self.menuScenario.addAction(self.actionUpdate_Scenario)
         self.menuScenario.addAction(self.actionAdd_Scenario)
         self.menuScenario.addAction(self.actionDelete_scenario)
@@ -465,9 +455,8 @@ class Ui_GHEtool:
         self.toolBar.addAction(self.actionDelete_scenario)
         self.toolBar.addAction(self.actionRename_scenario)
 
-        self.retranslateUi(GHETool)
         self.button_rename_scenario.clicked.connect(self.actionRename_scenario.trigger)
-        self.pushButton_Cancel.clicked.connect(GHETool.close)
+        self.pushButton_Cancel.clicked.connect(ghe_tool.close)
         self.pushButton_start_multiple.clicked.connect(self.action_start_multiple.trigger)
         self.pushButton_AddScenario.clicked.connect(self.actionAdd_Scenario.trigger)
         self.pushButton_DeleteScenario.clicked.connect(self.actionDelete_scenario.trigger)
@@ -476,104 +465,70 @@ class Ui_GHEtool:
         self.pushButton_start_single.clicked.connect(self.action_start_single.trigger)
 
         self.stackedWidget.setCurrentIndex(0)
-        QMetaObject.connectSlotsByName(GHETool)
+        QMetaObject.connectSlotsByName(ghe_tool)
 
-    # setupUi
-
-    def retranslateUi(self, GHEtool):
-        GHEtool.setWindowTitle(QCoreApplication.translate("GHEtool", "GHEtool", None))
-        self.actionNew.setText(QCoreApplication.translate("GHEtool", "New", None))
+        ghe_tool.setWindowTitle("GHEtool")
+        self.actionNew.setText("New")
         # if QT_CONFIG(tooltip)
-        self.actionNew.setToolTip(QCoreApplication.translate("GHEtool", "Create new project file", None))
+        self.actionNew.setToolTip("Create new project file")
         # endif // QT_CONFIG(tooltip)
         # if QT_CONFIG(shortcut)
-        self.actionNew.setShortcut(QCoreApplication.translate("GHEtool", "Ctrl+N", None))
+        self.actionNew.setShortcut("Ctrl+N")
         # endif // QT_CONFIG(shortcut)
-        self.actionSave.setText(QCoreApplication.translate("GHEtool", "Save", None))
+        self.actionSave.setText("Save")
         # if QT_CONFIG(shortcut)
-        self.actionSave.setShortcut(QCoreApplication.translate("GHEtool", "Ctrl+S", None))
+        self.actionSave.setShortcut("Ctrl+S")
         # endif // QT_CONFIG(shortcut)
-        self.actionOpen.setText(QCoreApplication.translate("GHEtool", "Open", None))
+        self.actionOpen.setText("Open")
         # if QT_CONFIG(shortcut)
-        self.actionOpen.setShortcut(QCoreApplication.translate("GHEtool", "Ctrl+O", None))
+        self.actionOpen.setShortcut("Ctrl+O")
         # endif // QT_CONFIG(shortcut)
-        self.action_start_multiple.setText(QCoreApplication.translate("GHEtool", "Calculate all scenarios", None))
+        self.action_start_multiple.setText("Calculate all scenarios")
         # if QT_CONFIG(shortcut)
-        self.action_start_multiple.setShortcut(QCoreApplication.translate("GHEtool", "Ctrl+R", None))
+        self.action_start_multiple.setShortcut("Ctrl+R")
         # endif // QT_CONFIG(shortcut)
-        self.actionGerman.setText(QCoreApplication.translate("GHEtool", "German", None))
+        self.actionUpdate_Scenario.setText("Update scenario")
         # if QT_CONFIG(shortcut)
-        self.actionGerman.setShortcut(QCoreApplication.translate("GHEtool", "Ctrl+Alt+G", None))
+        self.actionUpdate_Scenario.setShortcut("Ctrl+Shift+S")
         # endif // QT_CONFIG(shortcut)
-        self.actionEnglish.setText(QCoreApplication.translate("GHEtool", "English", None))
+        self.actionAdd_Scenario.setText("Add scenario")
         # if QT_CONFIG(shortcut)
-        self.actionEnglish.setShortcut(QCoreApplication.translate("GHEtool", "Ctrl+Alt+\u20ac", None))
+        self.actionAdd_Scenario.setShortcut("Ctrl+Shift+A")
         # endif // QT_CONFIG(shortcut)
-        self.actionUpdate_Scenario.setText(QCoreApplication.translate("GHEtool", "Update scenario", None))
+        self.actionDelete_scenario.setText("Delete scenario")
         # if QT_CONFIG(shortcut)
-        self.actionUpdate_Scenario.setShortcut(QCoreApplication.translate("GHEtool", "Ctrl+Shift+S", None))
+        self.actionDelete_scenario.setShortcut("Ctrl+Shift+D")
         # endif // QT_CONFIG(shortcut)
-        self.actionAdd_Scenario.setText(QCoreApplication.translate("GHEtool", "Add scenario", None))
+        self.actionSave_As.setText("Save As")
         # if QT_CONFIG(shortcut)
-        self.actionAdd_Scenario.setShortcut(QCoreApplication.translate("GHEtool", "Ctrl+Shift+A", None))
+        self.actionSave_As.setShortcut("F12")
         # endif // QT_CONFIG(shortcut)
-        self.actionDelete_scenario.setText(QCoreApplication.translate("GHEtool", "Delete scenario", None))
+        self.actionRename_scenario.setText("Rename scenario")
         # if QT_CONFIG(shortcut)
-        self.actionDelete_scenario.setShortcut(QCoreApplication.translate("GHEtool", "Ctrl+Shift+D", None))
+        self.actionRename_scenario.setShortcut("Ctrl+Shift+R")
         # endif // QT_CONFIG(shortcut)
-        self.actionSave_As.setText(QCoreApplication.translate("GHEtool", "Save As", None))
+        self.action_start_single.setText("Calculate current scenario")
         # if QT_CONFIG(shortcut)
-        self.actionSave_As.setShortcut(QCoreApplication.translate("GHEtool", "F12", None))
+        self.action_start_single.setShortcut("Ctrl+Shift+R")
         # endif // QT_CONFIG(shortcut)
-        self.actionDutch.setText(QCoreApplication.translate("GHEtool", "Dutch", None))
-        # if QT_CONFIG(shortcut)
-        self.actionDutch.setShortcut(QCoreApplication.translate("GHEtool", "Ctrl+Alt+D", None))
-        # endif // QT_CONFIG(shortcut)
-        self.actionItalian.setText(QCoreApplication.translate("GHEtool", "Italian", None))
-        # if QT_CONFIG(shortcut)
-        self.actionItalian.setShortcut(QCoreApplication.translate("GHEtool", "Ctrl+Alt+I", None))
-        # endif // QT_CONFIG(shortcut)
-        self.actionFrench.setText(QCoreApplication.translate("GHEtool", "French", None))
-        # if QT_CONFIG(shortcut)
-        self.actionFrench.setShortcut(QCoreApplication.translate("GHEtool", "Ctrl+Alt+F", None))
-        # endif // QT_CONFIG(shortcut)
-        self.actionRename_scenario.setText(QCoreApplication.translate("GHEtool", "Rename scenario", None))
-        # if QT_CONFIG(shortcut)
-        self.actionRename_scenario.setShortcut(QCoreApplication.translate("GHEtool", "Ctrl+Shift+R", None))
-        # endif // QT_CONFIG(shortcut)
-        self.action_start_single.setText(QCoreApplication.translate("GHEtool", "Calculate current scenario", None))
-        # if QT_CONFIG(shortcut)
-        self.action_start_single.setShortcut(QCoreApplication.translate("GHEtool", "Ctrl+Shift+R", None))
-        # endif // QT_CONFIG(shortcut)
-        self.actionSpanish.setText(QCoreApplication.translate("GHEtool", "Spanish", None))
-        # if QT_CONFIG(shortcut)
-        self.actionSpanish.setShortcut(QCoreApplication.translate("GHEtool", "Ctrl+Alt+S", None))
-        # endif // QT_CONFIG(shortcut)
-        self.actionInputChanged.setText(QCoreApplication.translate("GHEtool", "InputChanged", None))
-        self.actionCheckUDistance.setText(QCoreApplication.translate("GHEtool", "CheckUDistance", None))
-        self.actionUpdateBoreholeGraph.setText(QCoreApplication.translate("GHEtool", "UpdateBoreholeGraph", None))
-        self.actionGalician.setText(QCoreApplication.translate("GHEtool", "Galician", None))
-        # if QT_CONFIG(shortcut)
-        self.actionGalician.setShortcut(QCoreApplication.translate("GHEtool", "Ctrl+Alt+A", None))
-        # endif // QT_CONFIG(shortcut)
-        self.pushButton_SaveScenario.setText(QCoreApplication.translate("GHEtool", "Update scenario", None))
-        self.pushButton_AddScenario.setText(QCoreApplication.translate("GHEtool", "Add scenario", None))
-        self.pushButton_DeleteScenario.setText(QCoreApplication.translate("GHEtool", "Delete scenario", None))
-        self.button_rename_scenario.setText(QCoreApplication.translate("GHEtool", "Rename scenario", None))
+        self.pushButton_SaveScenario.setText("Update scenario")
+        self.pushButton_AddScenario.setText("Add scenario")
+        self.pushButton_DeleteScenario.setText("Delete scenario")
+        self.button_rename_scenario.setText("Rename scenario")
 
         __sortingEnabled = self.list_widget_scenario.isSortingEnabled()
         self.list_widget_scenario.setSortingEnabled(False)
         ___qlistwidgetitem = self.list_widget_scenario.item(0)
-        ___qlistwidgetitem.setText(QCoreApplication.translate("GHEtool", "Scenario: 1", None))
+        ___qlistwidgetitem.setText("Scenario: 1")
         self.list_widget_scenario.setSortingEnabled(__sortingEnabled)
-        self.label_Status.setText(QCoreApplication.translate("GHEtool", "Progress: ", None))
-        self.pushButton_start_single.setText(QCoreApplication.translate("GHEtool", "Calculate current scenario", None))
-        self.pushButton_start_multiple.setText(QCoreApplication.translate("GHEtool", "Calculate all scenarios", None))
-        self.pushButton_Cancel.setText(QCoreApplication.translate("GHEtool", "Exit", None))
-        self.menuFile.setTitle(QCoreApplication.translate("GHEtool", "File", None))
-        self.menuCalculation.setTitle(QCoreApplication.translate("GHEtool", "Calculation", None))
-        self.menuSettings.setTitle(QCoreApplication.translate("GHEtool", "Settings", None))
-        self.menuLanguage.setTitle(QCoreApplication.translate("GHEtool", "Language", None))
-        self.menuScenario.setTitle(QCoreApplication.translate("GHEtool", "Scenario", None))
-        self.toolBar.setWindowTitle(QCoreApplication.translate("GHEtool", "toolBar", None))
+        self.label_Status.setText("Progress: ")
+        self.pushButton_start_single.setText("Calculate current scenario")
+        self.pushButton_start_multiple.setText("Calculate all scenarios")
+        self.pushButton_Cancel.setText("Exit")
+        self.menuFile.setTitle("File")
+        self.menuCalculation.setTitle("Calculation")
+        self.menuSettings.setTitle("Settings")
+        self.menuLanguage.setTitle("Language")
+        self.menuScenario.setTitle("Scenario")
+        self.toolBar.setWindowTitle("toolBar")
 

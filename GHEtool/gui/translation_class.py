@@ -2,8 +2,9 @@ from typing import List
 
 
 class Translations:
-    __slots__ = [
-        "Language",
+    __slots__ = (
+        "icon",
+        "short_cut",
         "scenarioString",
         "label_Language",
         "pushButton_SaveScenario",
@@ -13,11 +14,11 @@ class Translations:
         "pushButton_Cancel",
         "page_borehole",
         "page_borehole_resistance",
+        "page_thermal",
         "pushButton_Results",
         "label_Status",
         "label_File",
         "label_Calculation",
-        "label_Borehole_earth",
         "label_Earth_Properties",
         "checkBox_CalcDepth",
         "label_Settings",
@@ -47,7 +48,6 @@ class Translations:
         "label_ThermalDemandsTitle",
         "label_Import",
         "checkBox_Import",
-        "label_ThermalDemands",
         "label_pH",
         "label_pC",
         "label_HL",
@@ -124,7 +124,6 @@ class Translations:
         "label_okay",
         "label_abort",
         "NoBackupFile",
-        "pushButton_borehole_resistance",
         "label_Spanish",
         "label_Galician",
         "label_close",
@@ -175,7 +174,6 @@ class Translations:
         "label_Scenario_Head",
         "checkBox_AutoSaving",
         "label_Scenario_Hint",
-        "label_Borehole_Resistance",
         "label_Borehole_Resistance_Head",
         "label_Rb_calculation_method",
         "comboBox_Rb_methodList",
@@ -211,11 +209,20 @@ class Translations:
         "actionSpanish",
         "actionGalician",
         "option_language",
-    ]
+    )
 
     def __init__(self):
         self.option_language: List[str] = ["English", "German", "Dutch", "Italian", "French", "Spanish", "Galician"]
-        self.Language: List[str] = ["0", "1", "2", "3", "4", "5", "6"]
+        self.icon: List[str] = [
+            ":/icons/icons/Flag_English.svg",
+            ":/icons/icons/Flag_German.svg",
+            ":/icons/icons/Flag_Dutch.svg",
+            ":/icons/icons/Flag_Italian.svg",
+            ":/icons/icons/Flag_French.svg",
+            ":/icons/icons/Flag_Spain.svg",
+            ":/icons/icons/Flag_Galicia.svg",
+        ]
+        self.short_cut: List[str] = ["Ctrl+Alt+E", "Ctrl+Alt+G", "Ctrl+Alt+D", "Ctrl+Alt+I", "Ctrl+Alt+F", "Ctrl+Alt+S", "Ctrl+Alt+A"]
         self.scenarioString: List[str] = ["Scenario", "Szenario", "Scenario", "Scenario", "Scénario", "Escenario", "Escenario"]
         self.label_Language: List[str] = ["Language: ", "Sprache: ", "Taal: ", "Languange: ", "Languange: ", "Idioma:", "Lingua: "]
         self.pushButton_SaveScenario: List[str] = [
@@ -256,36 +263,36 @@ class Translations:
         ]
         self.pushButton_Cancel: List[str] = ["Exit", "Verlassen", "Sluit", "Esci", "Sortie", "Salir", "Saír"]
         self.page_borehole: List[str] = [
-            "Borehole \\nand earth",
-            "Bohrloch \\nund Erdreich",
-            "Boorveld \\n en grond",
-            "Foro e \\nterra",
-            "Forage \\net terre",
-            "Pozo \\ny terreno",
-            "Pozo \\ne chan",
+            "Borehole @and earth,Borehole and earth",
+            "Bohrloch @und Erdreich,Bohrloch und Erdreich",
+            "Boorveld @ en grond,Boorveld en grond",
+            "Foro e @terra,Foro e terra",
+            "Forage @et terre,Forage et terre",
+            "Pozo @y terreno,Pozo y terreno",
+            "Pozo @e chan,Pozo e chan",
         ]
         self.page_borehole_resistance: List[str] = [
-            "Thermal \\ndemands",
-            "Thermischer \\nBedarf",
-            "Thermische \\nvraag",
-            "Richieste \\ntermiche",
-            "Demande \\nthermique",
-            "Cargas \\ntérmicas",
-            "Cargas \\ntérmicas",
+            "Borehole @resistance,Equivalent borehole resistance",
+            "Bohrloch-@widerstand,Equivalänter Bohrlochwiderstand",
+            "Boorgat-@weerstand,Equivalente boorgatweerstand",
+            "Borehole@resistance,Equivalent borehole resistance",
+            "Borehole@resistance,Equivalent borehole resistance",
+            "Borehole@resistance,Equivalent borehole resistance",
+            "Borehole@resistance,Equivalent borehole resistance",
+        ]
+        self.page_thermal: List[str] = [
+            "Thermal @demand,Thermal demands",
+            "Thermischer @Bedarf,Thermische Last",
+            "Thermische @vraag,Thermische vraag",
+            "Richieste @termiche,Richieste termiche",
+            "Demande @thermique,Demande thermique",
+            "Cargas @térmicas,Cargas térmicas",
+            "Cargas @térmicas,Cargas térmicas",
         ]
         self.pushButton_Results: List[str] = ["Results", "Ergebnisse", "Resultaten", "Risultati", "Résultats", "Resultados", "Resultados"]
         self.label_Status: List[str] = ["Progress: ", "Fortschritt: ", "Vooruitgang: ", "Progressi: ", "Progrès: ", "Progreso: ", "Progreso: "]
         self.label_File: List[str] = ["File", "Datei", "Bestand", "File", "File", "File", "File"]
         self.label_Calculation: List[str] = ["Calculation", "Berechnung", "Berekening", "Calculation", "Calculation", "Calculation", "Calculation"]
-        self.label_Borehole_earth: List[str] = [
-            "Borehole and earth",
-            "Bohrloch und Erdreich",
-            "Boorveld en grond",
-            "Foro e terra",
-            "Forage et terre",
-            "Pozo y terreno",
-            "Pozo e chan",
-        ]
         self.label_Earth_Properties: List[str] = [
             "Borehole and earth properties",
             "Bohrloch und Erdreicheigenschaften",
@@ -510,19 +517,10 @@ class Translations:
             "Import Demands?",
             "Lasten importieren?",
             "Importeer vraag?",
-            "Richieste di \\nimportazione?",
+            "Richieste di @importazione?",
             "Demande d'importation?",
             "Importar cargas?",
             "Importar cargas?",
-        ]
-        self.label_ThermalDemands: List[str] = [
-            "Thermal demands",
-            "Thermische Last",
-            "Thermische vraag",
-            "Richieste termiche",
-            "Demande thermique",
-            "Cargas térmicas",
-            "Cargas térmicas",
         ]
         self.label_pH: List[str] = [
             "Heating peak",
@@ -649,7 +647,7 @@ class Translations:
             "Unit data: ",
             "Dateneinheit: ",
             "Eenheid data: ",
-            "Dati \\ndell'unità:  ",
+            "Dati @dell'unità:  ",
             "Données de l'unité: ",
             "Datos de unidad: ",
             "Datos de unidade: ",
@@ -992,15 +990,6 @@ class Translations:
             "no backup fileImport",
             "no backup fileImport",
         ]
-        self.pushButton_borehole_resistance: List[str] = [
-            "Borehole\\nresistance",
-            "Bohrloch-\\nwiderstand",
-            "Boorgat-\\nweerstand",
-            "Borehole\\nresistance",
-            "Borehole\\nresistance",
-            "Borehole\\nresistance",
-            "Borehole\\nresistance",
-        ]
         self.label_Spanish: List[str] = ["Spanish", "Spanisch", "Spaans", "Spanish", "Spanish", "Spanish", "Spanish"]
         self.label_Galician: List[str] = ["Galician", "Galizisch", "Galisisch", "Galician", "Galician", "Galician", "Galician"]
         self.label_close: List[str] = ["Close", "Schließen", "Sluit", "Close", "Close", "Close", "Close"]
@@ -1259,7 +1248,7 @@ class Translations:
             "Unit data: ",
             "Dateneinheit: ",
             "Eenheid data: ",
-            "Dati \\ndell'unità:  ",
+            "Dati @dell'unità:  ",
             "Données de l'unité: ",
             "Datos de unidad: ",
             "Datos de unidade: ",
@@ -1290,15 +1279,6 @@ class Translations:
             "If Auto saving is selected the scenario will automatically saved if a scenario is changed. Otherwise the scenario has to be saved with the Update scenario button in the upper left corner if the changes should not be lost.",
             "If Auto saving is selected the scenario will automatically saved if a scenario is changed. Otherwise the scenario has to be saved with the Update scenario button in the upper left corner if the changes should not be lost.",
             "If Auto saving is selected the scenario will automatically saved if a scenario is changed. Otherwise the scenario has to be saved with the Update scenario button in the upper left corner if the changes should not be lost.",
-        ]
-        self.label_Borehole_Resistance: List[str] = [
-            "Equivalent borehole resistance",
-            "Equivalänter Bohrlochwiderstand",
-            "Equivalente boorgatweerstand",
-            "Equivalent borehole resistance",
-            "Equivalent borehole resistance",
-            "Equivalent borehole resistance",
-            "Equivalent borehole resistance",
         ]
         self.label_Borehole_Resistance_Head: List[str] = [
             "Equivalent borehole resistance",

@@ -9,12 +9,12 @@ with open(file_name, 'w', encoding='utf-8') as file:
     file.write('class Translations:\n')
     list_of_options = df1["name"].to_list()
     list_of_options.append('option_language')
-    text = f'__slots__ = {list_of_options}'
+    text = f'__slots__ = {tuple(list_of_options)}'
     file.write(f'   {text}\n')
     file.write('   def __init__(self):\n')
     file.write(f'      self.option_language: List[str] = {df1.columns[1:].to_list()}\n')
     for name, translations in zip(df1['name'], df1.iloc[:, 1:].to_numpy()):
-        text = f'self.{name}: List[str] = {translations.tolist()}'#[translantion.replace(",", "@") for translantion in translations]}'
+        text = f'self.{name}: List[str] = {translations.tolist()}'
         file.write(f'      {text}\n')
 
 system(f'py -m black --line-length 160 {file_name}')
