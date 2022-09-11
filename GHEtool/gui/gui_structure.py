@@ -374,58 +374,6 @@ class GuiStructure:
             except AttributeError:
                 continue
             if isinstance(entry, Page):
-                name: Tuple[str, str] = data[column][i].split(',')
-                entry.set_text(name[0], name[1])
+                name: str = data[column][i].split(',')
+                entry.set_text(name, '')
 
-    def event_filter(self, obj: qt_w.QPushButton, event) -> bool:
-        """
-        function to check mouse over event
-        :param obj:
-        PushButton obj
-        :param event:
-        event to check if mouse over event is entering or leaving
-        :return:
-        Boolean to check if the function worked
-        """
-        if event.type() == qt_c.QEvent.Enter:
-            # Mouse is over the label
-            self.set_push(True)
-            return True
-        elif event.type() == qt_c.QEvent.Leave:
-            # Mouse is not over the label
-            self.set_push(False)
-            return True
-        return False
-
-    def set_push(self, mouse_over: bool) -> None:
-        """
-        function to Set PushButton Text if MouseOver
-        :param mouse_over: bool true if Mouse is over PushButton
-        :return: None
-        """
-        # if Mouse is over PushButton change size to big otherwise to small
-        if mouse_over:
-            for page in self.list_of_pages:
-                self.set_push_button_icon_size(page.button, True, page.button.setText(page.button_name))
-            return
-        for page in self.list_of_pages:
-            self.set_push_button_icon_size(page.button)
-
-    def set_push_button_icon_size(self, button: qt_w.QPushButton, big: bool = False, name: str = '') -> None:
-        """
-        set button name and size
-        :param button: QPushButton to set name and icon size for
-        :param big: big or small icon size (True = big)
-        :param name: name to set to QPushButton
-        :return: None
-        """
-        button.setText(name)  # set name to button
-        # size big or small QPushButton depending on input
-        if big:
-            button.setIconSize(self.sizeS)
-            button.setMaximumSize(self.sizePushB)
-            button.setMinimumSize(self.sizePushB)
-            return
-        button.setIconSize(self.sizeB)
-        button.setMaximumSize(self.sizePushS)
-        button.setMinimumSize(self.sizePushS)

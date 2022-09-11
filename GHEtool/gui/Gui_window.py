@@ -37,7 +37,7 @@ from PySide6.QtGui import QColor, QPen
 
 from GHEtool.gui.data_storage_new import DataStorageNew
 from GHEtool.gui.gui_Main_new import Ui_GHEtool
-from GHEtool.gui.Translation_class import TrClass
+from GHEtool.gui.translation_class import Translations
 from GHEtool.gui.gui_structure import GuiStructure
 
 from typing import List, Tuple
@@ -121,7 +121,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # init variables of class
         # allow checking of changes
         self.checking: bool = False
-        self.translations: TrClass = TrClass()  # init translation class
+        self.translations: Translations = Translations()  # init translation class
         self.fileImport = None  # init import file
         self.filename: tuple = MainWindow.filenameDefault  # filename of stored inputs
         self.list_widget_scenario.clear()  # reset list widget with stored scenarios
@@ -151,14 +151,14 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         self.IG.start()
         self.IG.any_signal.connect(self.checkGHEtool)
         # show loading GHEtool message in statusbar
-        self.status_bar.showMessage(self.translations.GHE_tool_imported_start, 5000)
+        self.status_bar.showMessage(self.translations.GHE_tool_imported_start[self.gui_structure.option_language.get_value()], 5000)
         # enable push button because GHEtool ist not imported
         self.pushButton_start_multiple.setEnabled(False)
         self.pushButton_start_single.setEnabled(False)
         self.action_start_multiple.setEnabled(False)
         self.action_start_single.setEnabled(False)
         # add languages to combo box
-        self.gui_structure.option_language.widget.addItems(self.translations.comboBoxLanguageList)
+        self.gui_structure.option_language.widget.addItems(self.translations.option_language)
         # hide warning for custom bore field calculation
         self.gui_structure.hint_calc_time.hide()
         # load backup data
@@ -254,6 +254,60 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         #self.update_aim(self.pushButton_temp_profile)
         #self.checkBox_Import.toggle()
         #self.checkBox_Import.toggle()
+
+    def event_filter(self, obj: QtWidgets_QPushButton, event) -> bool:
+        """
+        function to check mouse over event
+        :param obj:
+        PushButton obj
+        :param event:
+        event to check if mouse over event is entering or leaving
+        :return:
+        Boolean to check if the function worked
+        """
+        if event.type() == QtCore_QEvent.Enter:
+            # Mouse is over the label
+            self.set_push(True)
+            return True
+        elif event.type() == QtCore_QEvent.Leave:
+            # Mouse is not over the label
+            self.set_push(False)
+            return True
+        return False
+
+    def set_push(self, mouse_over: bool) -> None:
+        """
+        function to Set PushButton Text if MouseOver
+        :param mouse_over: bool true if Mouse is over PushButton
+        :return: None
+        """
+        # if Mouse is over PushButton change size to big otherwise to small
+        if mouse_over:
+            for page in self.gui_structure.list_of_pages:
+                self.set_push_button_icon_size(page.button, True, page.button.setText(page.button_name))
+            return
+        for page in self.gui_structure.list_of_pages:
+            self.set_push_button_icon_size(page.button)
+
+    def set_push_button_icon_size(self, button: QtWidgets_QPushButton, big: bool = False, name: str = '') -> None:
+        """
+        set button name and size
+        :param button: QPushButton to set name and icon size for
+        :param big: big or small icon size (True = big)
+        :param name: name to set to QPushButton
+        :return: None
+        """
+        button.setText(name)  # set name to button
+        # size big or small QPushButton depending on input
+        if big:
+            button.setIconSize(self.sizeS)
+            button.setMaximumSize(self.sizePushB)
+            button.setMinimumSize(self.sizePushB)
+            return
+        button.setIconSize(self.sizeB)
+        button.setMaximumSize(self.sizePushS)
+        button.setMinimumSize(self.sizePushS)
+
 
     def change(self) -> None:
         """
@@ -573,14 +627,13 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # check if list scenario names are not unique
         liStrMatch: list = [self.list_widget_scenario.item(idx).text() ==
                             f'{self.translations.scenarioString}: {idx + 1}' for idx in range(amount)]
-        # change language to the selected one
-        self.translations.changeLanguage(self.gui_structure.option_language.get_value())
         # update all label, pushButtons, action and Menu names
         for i in [j for j in self.translations.__slots__ if hasattr(self, j)]:
+            print(i)
             if isinstance(getattr(self, i), QtWidgets_QMenu):
-                getattr(self, i).setTitle(getattr(self.translations, i))
+                getattr(self, i).setTitle(getattr(self.translations, i)[self.gui_structure.option_language.get_value()])
                 continue
-            getattr(self, i).setText(getattr(self.translations, i))
+            getattr(self, i).setText(getattr(self.translations, i)[self.gui_structure.option_language.get_value()])
         # set translation of toolbox items
         self.gui_structure.translate(self.gui_structure.option_language.get_value())
         # set small PushButtons
@@ -662,10 +715,10 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         try:
             data: pd_DataFrame = pd_read_csv(filename, sep=sep, decimal=dec)
         except FileNotFoundError:
-            self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
+            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
             return
         except PermissionError:
-            self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
+            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
             return
         # get data column names to set them to comboBoxes
         columns = data.columns
@@ -1095,7 +1148,7 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
             self.action_start_multiple.setEnabled(True)
             self.action_start_single.setEnabled(True)
             # show message that the GHEtool has been successfully imported
-            self.status_bar.showMessage(self.translations.GHE_tool_imported, 5000)
+            self.status_bar.showMessage(self.translations.GHE_tool_imported[self.gui_structure.option_language.get_value()], 5000)
 
     def threadFunction(self, ds: DataStorageNew) -> None:
         """
@@ -1560,9 +1613,9 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         # set Icon to question mark icon
         msg.setIcon(QtWidgets_QMessageBox.Question)
         # set label text to cancel text depending on language selected
-        msg.setText(self.translations.label_CancelText)
+        msg.setText(self.translations.label_CancelText[self.gui_structure.option_language.get_value()])
         # set window text to cancel text depending on language selected
-        msg.setWindowTitle(self.translations.label_CancelTitle)
+        msg.setWindowTitle(self.translations.label_CancelTitle[self.gui_structure.option_language.get_value()])
         # set standard buttons to save, close and cancel
         msg.setStandardButtons(QtWidgets_QMessageBox.Save | QtWidgets_QMessageBox.Close | QtWidgets_QMessageBox.Cancel)
         # get save, close and cancel button
@@ -1570,9 +1623,9 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
         buttonCl = msg.button(QtWidgets_QMessageBox.Close)
         buttonCa = msg.button(QtWidgets_QMessageBox.Cancel)
         # set save, close and cancel button text depending on language selected
-        buttonS.setText(f'{self.translations.label_Save} ')
-        buttonCl.setText(f'{self.translations.label_close} ')
-        buttonCa.setText(f'{self.translations.label_cancel} ')
+        buttonS.setText(f'{self.translations.label_Save[self.gui_structure.option_language.get_value()]} ')
+        buttonCl.setText(f'{self.translations.label_close[self.gui_structure.option_language.get_value()]} ')
+        buttonCa.setText(f'{self.translations.label_cancenl[self.gui_structure.option_language.get_value()]} ')
         # set  save, close and cancel button icon
         self.setPushButtonIcon(buttonS, 'Save_Inv')
         self.setPushButtonIcon(buttonCl, 'Exit')
