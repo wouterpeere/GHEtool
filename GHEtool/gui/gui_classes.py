@@ -22,10 +22,11 @@ class Option(metaclass=abc.ABCMeta):
     def __init__(self, default_parent: qt_w.QWidget, widget_name: str, label: str, default_value: Union[bool, int, float, str]):
 
         self.widget_name: str = widget_name
-        self.label: str = label
+        self.label_text: str = label
         self.default_value: Union[bool, int, float, str] = default_value
         self.widget: Optional[qt_w.QWidget] = None
         self.frame: qt_w.QFrame = qt_w.QFrame(default_parent)
+        self.label = qt_w.QLabel(self.frame)
         self.linked_options: List[(Option, int)] = []
         self.limit_size: bool = True
 
@@ -41,11 +42,15 @@ class Option(metaclass=abc.ABCMeta):
     def create_widget(self, frame: qt_w.QFrame, layout: qt_w.QLayout, row: int = None, column: int = None) -> None:
         pass
 
+    def set_text(self, name: str):
+        self.label_text = name
+        self.label.setText(name)
+
     def deactivate_size_limit(self):
         self.limit_size = False
 
     def create_frame(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout, create_spacer: bool = True) -> qt_w.QHBoxLayout:
-        if self.label == "":
+        if self.label_text == "":
             self.frame.setParent(None)
             self.frame = frame
             return frame.layout()
@@ -58,8 +63,9 @@ class Option(metaclass=abc.ABCMeta):
         layout.setSpacing(6)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setObjectName(f"verticalLayout_{self.widget_name}")
-        label = qt_w.QLabel(self.label)
-        layout.addWidget(label)
+        self.label.setParent(frame)
+        self.label.setText(self.label_text)
+        layout.addWidget(self.label)
         if create_spacer:
             spacer = qt_w.QSpacerItem(1, 1, qt_w.QSizePolicy.Expanding, qt_w.QSizePolicy.Minimum)
             layout.addItem(spacer)
@@ -218,6 +224,13 @@ class ButtonBox(Option):
     def change_event(self, function_to_be_called: Callable) -> None:
         for button in self.widget:
             button.clicked.connect(function_to_be_called)
+
+    def set_text(self, name: str):
+        entry_name: List[str, str] = name.split(',')
+        self.label_text = entry_name[0]
+        self.label.setText(self.label_text)
+        for button, button_name in zip(self.widget, entry_name[1:]):
+            button.setText(button_name)
 
     def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout, row: int = None, column: int = None) -> None:
         layout = self.create_frame(frame, layout_parent)
@@ -388,6 +401,10 @@ class Hint:
     def show(self) -> None:
         self.label.show()
 
+    def set_text(self, name: str):
+        self.hint: str = name
+        self.label.setText(self.hint)
+
 
 class FunctionButton:
     def __init__(self, default_parent: qt_w.QWidget, widget_name: str, button_text: str, icon: str):
@@ -432,6 +449,10 @@ class FunctionButton:
     def show(self) -> None:
         self.frame.show()
 
+    def set_text(self, name: str):
+        self.button_text: str = name
+        self.button.setText(self.button_text)
+
 
 class Category:
     def __init__(self, default_parent: qt_w.QWidget, obj_name: str, label: str, list_of_options: List[Union[Option, Hint, FunctionButton]]):
@@ -452,6 +473,10 @@ class Category:
 
     def activate_grid_layout(self, column: int):
         self.grid_layout = column
+
+    def set_text(self, name: str):
+        self.label_text = name
+        self.label.setText(name)
 
     def create_widget(self, page: qt_w.QWidget, layout: qt_w.QLayout):
         self.label.setParent(page)
@@ -500,7 +525,7 @@ class Category:
                 if isinstance(option, Hint):
                     option.create_widget(self.frame, layout_frane, row, column)
                 else:
-                    option.deactivate_size_limit() if option.label == "" else None
+                    option.deactivate_size_limit() if option.label_text == "" else None
                     option.create_widget(self.frame, layout_frane, row, column)
                 if row == self.grid_layout - 1:
                     row = 0
@@ -625,11 +650,12 @@ class Page:
         self.next_page: Optional[Page] = None
         self.upper_frame: Optional[List[Union[Aim, Option, Category]]] = None
 
-    def set_text(self, button_name: str, name: str):
-        self.name = name
-        self.button_name = button_name
-        self.label.setText(name)
-        self.button.setText(button_name)
+    def set_text(self, name: str):
+        entry_name: List[str, str] = name.split(',')
+        self.name = entry_name[1]
+        self.button_name = entry_name[0].replace('@', '\n')
+        self.label.setText(self.name)
+        self.button.setText(self.button_name)
 
     def set_previous_page(self, previous_page: Page):
         self.previous_page = previous_page

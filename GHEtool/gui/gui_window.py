@@ -13,7 +13,6 @@ from PySide6.QtCore import QModelIndex as QtCore_QModelIndex
 from PySide6.QtCore import QSize as QtCore_QSize
 from PySide6.QtCore import QThread as QtCore_QThread
 from PySide6.QtCore import Signal as QtCore_pyqtSignal
-from PySide6.QtCore import QSettings as QtCore_QSettings
 from PySide6.QtGui import QIcon as QtGui_QIcon
 from PySide6.QtGui import QPixmap as QtGui_QPixmap
 from PySide6.QtWidgets import QApplication as QtWidgets_QApplication
@@ -21,7 +20,6 @@ from PySide6.QtWidgets import QDialog as QtWidgets_QDialog
 from PySide6.QtWidgets import QDoubleSpinBox as QtWidgets_QDoubleSpinBox
 from PySide6.QtWidgets import QFileDialog as QtWidgets_QFileDialog
 from PySide6.QtGui import QAction as QtGui_QAction
-from PySide6.QtWidgets import QHBoxLayout as QtWidgets_QHBoxLayout
 from PySide6.QtWidgets import QInputDialog as QtWidgets_QInputDialog
 from PySide6.QtWidgets import QListWidgetItem as QtWidgets_QListWidgetItem
 from PySide6.QtWidgets import QListWidget as QtWidgets_QListWidget
@@ -41,7 +39,7 @@ from GHEtool.gui.gui_main_new import UiGhetool
 from GHEtool.gui.translation_class import Translations
 from GHEtool.gui.gui_structure import GuiStructure
 
-from typing import List, Tuple
+from typing import List
 
 if TYPE_CHECKING:
     from pandas import DataFrame as pd_DataFrame
@@ -1219,7 +1217,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         """
         # hide widgets if no list of scenarios exists and display not calculated text
         if not self.list_ds:
-            self.gui_structure.hint_depth.label.setText(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
+            self.gui_structure.hint_depth.label_text.setText(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
             # self.label_WarningDepth.hide()
             self.gui_structure.option_show_legend.hide()
             self.gui_structure.function_save_results.hide()
@@ -1238,7 +1236,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         borefield: Borefield = ds.borefield
         # hide widgets if no results bore field exists and display not calculated text
         if borefield is None:
-            self.gui_structure.hint_depth.label.setText(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
+            self.gui_structure.hint_depth.set_text(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
             # self.label_WarningDepth.hide()
             self.gui_structure.option_show_legend.hide()
             self.gui_structure.function_save_results.hide()
@@ -1252,7 +1250,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         li_n_2 = [str(round(i[1], 2)) for i in borefield.combo]
         # hide widgets if no solution exists and display no solution text
         if (ds.aim_size_length and not li_size) or (ds.aim_req_depth and borefield.H == borefield.H_max):
-            self.gui_structure.hint_depth.label.setText(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
+            self.gui_structure.hint_depth.label_text.setText(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
             # self.label_WarningDepth.hide()
             self.gui_structure.option_show_legend.hide()
             self.gui_structure.function_save_results.hide()
@@ -1433,17 +1431,17 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             ax.set_facecolor(grey_color)
             # create result display string
             string_size: str = (
-                f'{self.translations.label_Size[self.gui_structure.option_language.get_value()]}{"; ".join(li_size)} m \n'
+                f'{self.translations.hint_depth[self.gui_structure.option_language.get_value()]}{"; ".join(li_size)} m \n'
                 f'{self.translations.label_Size_B[self.gui_structure.option_language.get_value()]}{"; ".join(li_b)} m \n'
                 f'{self.translations.label_Size_W[self.gui_structure.option_language.get_value()]}{"; ".join(li_n_1)} \n'
                 f'{self.translations.label_Size_L[self.gui_structure.option_language.get_value()]}{"; ".join(li_n_2)} \n'
                 if ds.aim_size_length
-                else f"{self.translations.label_Size[self.gui_structure.option_language.get_value()]}{round(borefield.H, 2)} m"
+                else f"{self.translations.hint_depth[self.gui_structure.option_language.get_value()]}{round(borefield.H, 2)} m"
             )
             # not use axe 2
             ax2 = None
         # set string to depth size label
-        self.gui_structure.hint_depth.label.setText(string_size)
+        self.gui_structure.hint_depth.set_text(string_size)
         # display warning if depth is to small
         # self.label_WarningDepth.show() if borefield.H < 50 else self.label_WarningDepth.hide()
         # save variables

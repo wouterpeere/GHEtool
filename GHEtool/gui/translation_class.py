@@ -12,60 +12,66 @@ class Translations:
         "pushButton_DeleteScenario",
         "pushButton_start_multiple",
         "pushButton_Cancel",
+        "page_aim",
         "page_borehole",
         "page_borehole_resistance",
         "page_thermal",
-        "pushButton_Results",
+        "page_result",
+        "page_options",
         "label_Status",
         "label_File",
         "label_Calculation",
-        "label_Earth_Properties",
-        "checkBox_CalcDepth",
-        "label_Settings",
-        "label_H",
-        "label_BS",
-        "label_lambdaEarth",
-        "label_GroundTemp",
-        "label_BoreholeResistance",
-        "label_WidthField",
-        "label_LengthField",
-        "label_TempConstraints",
-        "label_TempMin",
-        "label_TempMax",
-        "label_SimulationTime",
+        "category_borehole",
+        "option_depth",
+        "option_spacing",
+        "option_conductivity",
+        "option_ground_temp",
+        "option_max_depth",
+        "option_min_spacing",
+        "option_max_spacing",
+        "option_max_width",
+        "option_max_length",
+        "option_heat_capacity",
+        "option_width",
+        "option_length",
+        "category_temperatures",
+        "option_min_temp",
+        "option_max_temp",
+        "option_temp_gradient",
+        "option_simu_period",
+        "option_constant_rb",
         "pushButton_NextGeneral",
         "pushButton_PreviousThermal",
-        "label_Size",
-        "checkBox_Legend",
-        "pushButton_SaveData",
-        "pushButton_SaveFigure",
+        "hint_depth",
+        "option_show_legend",
+        "function_save_results",
+        "function_save_figure",
         "X_Axis",
         "Y_Axis",
         "BaseCooling",
         "BaseHeating",
         "PeakCooling",
         "PeakHeating",
-        "label_ThermalDemandsTitle",
         "label_Import",
         "checkBox_Import",
-        "label_pH",
-        "label_pC",
-        "label_HL",
-        "label_CL",
+        "hint_peak_heating",
+        "hint_peak_cooling",
+        "hint_load_heating",
+        "hint_load_cooling",
         "label_UnitPeak",
         "label_UnitLoad",
-        "label_Jan",
-        "label_Feb",
-        "label_Mar",
-        "label_Apr",
-        "label_May",
-        "label_Jun",
-        "label_Jul",
-        "label_Aug",
-        "label_Sep",
-        "label_Oct",
-        "label_Nov",
-        "label_Dec",
+        "hint_jan",
+        "hint_feb",
+        "hint_mar",
+        "hint_apr",
+        "hint_may",
+        "hint_jun",
+        "hint_jul",
+        "hint_aug",
+        "hint_sep",
+        "hint_oct",
+        "hint_nov",
+        "hint_dec",
         "label_DataType",
         "label_Filename",
         "label_SheetName",
@@ -97,11 +103,6 @@ class Translations:
         "label_WarningCustomBorefield",
         "label_WarningDepth",
         "checkBox_SizeBorefield",
-        "label_H_max",
-        "label_B_min",
-        "label_B_max",
-        "label_MaxWidthField",
-        "label_MaxLengthField",
         "label_Size_B",
         "label_Size_L",
         "label_Size_W",
@@ -115,17 +116,12 @@ class Translations:
         "Calculation_Finished",
         "GHE_tool_imported",
         "GHE_tool_imported_start",
-        "label_Dutch",
-        "label_Italian",
-        "label_French",
         "comboBoxLanguageList",
         "label_new_scenario",
         "new_name",
         "label_okay",
         "label_abort",
         "NoBackupFile",
-        "label_Spanish",
-        "label_Galician",
         "label_close",
         "label_cancel",
         "label_CancelTitle",
@@ -142,11 +138,6 @@ class Translations:
         "menuFile",
         "menuScenario",
         "action_start_multiple",
-        "actionGerman",
-        "actionEnglish",
-        "actionDutch",
-        "actionFrench",
-        "actionItalian",
         "actionNew",
         "actionSave",
         "actionOpen",
@@ -206,8 +197,6 @@ class Translations:
         "comboBox_decimalList",
         "label_decimalDataFile",
         "label_decimal",
-        "actionSpanish",
-        "actionGalician",
         "option_language",
     )
 
@@ -262,6 +251,15 @@ class Translations:
             "Calculate all scenarios",
         ]
         self.pushButton_Cancel: List[str] = ["Exit", "Verlassen", "Sluit", "Esci", "Sortie", "Salir", "Saír"]
+        self.page_aim: List[str] = [
+            "Aim,Aim of simulation",
+            "Ziel,Ziel der Simulation",
+            "Aim,Aim of simulation",
+            "Aim,Aim of simulation",
+            "Aim,Aim of simulation",
+            "Aim,Aim of simulation",
+            "Aim,Aim of simulation",
+        ]
         self.page_borehole: List[str] = [
             "Borehole @and earth,Borehole and earth",
             "Bohrloch @und Erdreich,Bohrloch und Erdreich",
@@ -289,11 +287,28 @@ class Translations:
             "Cargas @térmicas,Cargas térmicas",
             "Cargas @térmicas,Cargas térmicas",
         ]
-        self.pushButton_Results: List[str] = ["Results", "Ergebnisse", "Resultaten", "Risultati", "Résultats", "Resultados", "Resultados"]
+        self.page_result: List[str] = [
+            "Results,Results",
+            "Ergebnisse,Ergebnisse",
+            "Resultaten,Resultaten",
+            "Risultati,Risultati",
+            "Résultats,Résultats",
+            "Resultados,Resultados",
+            "Resultados,Resultados",
+        ]
+        self.page_options: List[str] = [
+            "Options,Options",
+            "Optionen,Optionen",
+            "Options,Options",
+            "Options,Options",
+            "Options,Options",
+            "Options,Options",
+            "Options,Options",
+        ]
         self.label_Status: List[str] = ["Progress: ", "Fortschritt: ", "Vooruitgang: ", "Progressi: ", "Progrès: ", "Progreso: ", "Progreso: "]
         self.label_File: List[str] = ["File", "Datei", "Bestand", "File", "File", "File", "File"]
         self.label_Calculation: List[str] = ["Calculation", "Berechnung", "Berekening", "Calculation", "Calculation", "Calculation", "Calculation"]
-        self.label_Earth_Properties: List[str] = [
+        self.category_borehole: List[str] = [
             "Borehole and earth properties",
             "Bohrloch und Erdreicheigenschaften",
             "Eigenschappen van boorveld en grond",
@@ -302,17 +317,7 @@ class Translations:
             "Propiedades del pozo y terreno",
             "Propiedades do pozo e do chan",
         ]
-        self.checkBox_CalcDepth: List[str] = [
-            "Determine the required depth",
-            "Notwendige Bohrlochlänge bestimmen",
-            "Bepaal de benodigde diepte",
-            "Determinare la profondità richiesta",
-            "Déterminer la profondeur requise",
-            "Determinar la longitud requerida",
-            "Determinar a lonxitude necesaria",
-        ]
-        self.label_Settings: List[str] = ["Settings", "Einstellungen", "Instellingen", "Settings", "Settings", "Settings", "Settings"]
-        self.label_H: List[str] = [
+        self.option_depth: List[str] = [
             "Borehole depth [m]: ",
             "Bohrlochtiefe [m]: ",
             "Boorgatdiepte [m]: ",
@@ -321,7 +326,7 @@ class Translations:
             "Profundidad del pozo [m]: ",
             "Profundidade do pozo [m]: ",
         ]
-        self.label_BS: List[str] = [
+        self.option_spacing: List[str] = [
             "Borehole spacing [m]: ",
             "Bohrlochabstand [m]: ",
             "Boorgatspatiring [m]: ",
@@ -330,7 +335,7 @@ class Translations:
             "Espaciado entre pozos [m]: ",
             "Espazamento entre pozos [m]: ",
         ]
-        self.label_lambdaEarth: List[str] = [
+        self.option_conductivity: List[str] = [
             "Conductivity of the soil [W/mK]: ",
             "Wärmeleitfähigkeit des Erdreiches [W/mK]: ",
             "Conductiviteit van de bodem [W/mK]: ",
@@ -339,7 +344,7 @@ class Translations:
             "Conductividad del suelo [W/mK]: ",
             "Conductividade do chan [W/mK]: ",
         ]
-        self.label_GroundTemp: List[str] = [
+        self.option_ground_temp: List[str] = [
             "Ground temperature at infinity [°C]: ",
             "Erdreichtemperatur in der Unendlichkeit [°C]: ",
             "Grondtemperatuur op oneindig [°C]: ",
@@ -348,16 +353,61 @@ class Translations:
             "Temperatura del suelo en el infinito [°C]: ",
             "Temperatura do chan no infinito [°C]: ",
         ]
-        self.label_BoreholeResistance: List[str] = [
-            "Equivalent borehole resistance [mK/W]: ",
-            "Äquivalenter Bohrlochwiderstand [mK/W]: ",
-            "Equivalente boorgatweerstand [mK/W]: ",
-            "Resistenza equivalente del foro [mK/W]: ",
-            "Résistance équivalente du trou de forage [mK/W]: ",
-            "Resistencia del pozo equivalente [mK/W]: ",
-            "Resistencia do pozo equivalente [mK/W]: ",
+        self.option_max_depth: List[str] = [
+            "Maximal borehole depth [m]: ",
+            "Maximale Bohrlochtiefe [m]: ",
+            "Maximale boorvelddiepte[m]: ",
+            "Maximal borehole depth [m]: ",
+            "Maximal borehole depth [m]: ",
+            "Maximal borehole depth [m]: ",
+            "Maximal borehole depth [m]: ",
         ]
-        self.label_WidthField: List[str] = [
+        self.option_min_spacing: List[str] = [
+            "Minimal borehole spacing [m]: ",
+            "Minimaler Bohrlochabstand [m]: ",
+            "Minimale boorgatspatiëring [m]: ",
+            "Minimal borehole spacing [m]: ",
+            "Minimal borehole spacing [m]: ",
+            "Minimal borehole spacing [m]: ",
+            "Minimal borehole spacing [m]: ",
+        ]
+        self.option_max_spacing: List[str] = [
+            "Maximal borehole spacing [m]: ",
+            "Maximaler Bohrlochabstand [m]: ",
+            "Maximale boorgatspatiëring [m]: ",
+            "Maximal borehole spacing [m]: ",
+            "Maximal borehole spacing [m]: ",
+            "Maximal borehole spacing [m]: ",
+            "Maximal borehole spacing [m]: ",
+        ]
+        self.option_max_width: List[str] = [
+            "Maximal width of rectangular field [m]: ",
+            "Maximale Breite des rechteckigen Feldes [m]: ",
+            "Maximale breedte van het rechthoekig boorveld [m]: ",
+            "Maximal width of rectangular field [m]: ",
+            "Maximal width of rectangular field [m]: ",
+            "Maximal width of rectangular field [m]: ",
+            "Maximal width of rectangular field [m]: ",
+        ]
+        self.option_max_length: List[str] = [
+            "Maximal length of rectangular field [m]: ",
+            "Maximale Länge des rechteckigen Feldes [m]: ",
+            "Maximale lengte van het rechthoekig boorveld [m]: ",
+            "Maximal length of rectangular field [m]: ",
+            "Maximal length of rectangular field [m]: ",
+            "Maximal length of rectangular field [m]: ",
+            "Maximal length of rectangular field [m]: ",
+        ]
+        self.option_heat_capacity: List[str] = [
+            "Ground volumetric heat capacity [kJ / m³ K]:",
+            "Spezifische Wärmekapazität des Erdreiches [kJ / m³ K]:",
+            "Ground volumetric heat capacity [kJ / m³ K]:",
+            "Ground volumetric heat capacity [kJ / m³ K]:",
+            "Ground volumetric heat capacity [kJ / m³ K]:",
+            "Ground volumetric heat capacity [kJ / m³ K]:",
+            "Ground volumetric heat capacity [kJ / m³ K]:",
+        ]
+        self.option_width: List[str] = [
             "Width of rectangular field [#]: ",
             "Breite des rechteckigen Feldes [#]: ",
             "Breedte van het rechthoekige veld [#]: ",
@@ -366,7 +416,7 @@ class Translations:
             "Ancho del campo rectangular [#]: ",
             "Ancho do campo rectangular [#]: ",
         ]
-        self.label_LengthField: List[str] = [
+        self.option_length: List[str] = [
             "Length of rectangular field [#]: ",
             "Länge des rechteckigen Feldes [#]: ",
             "Lengte van het rechthoekige veld [#]: ",
@@ -375,7 +425,7 @@ class Translations:
             "Longitud del campo rectangular [#]: ",
             "Lonxitude do campo rectangular [#]: ",
         ]
-        self.label_TempConstraints: List[str] = [
+        self.category_temperatures: List[str] = [
             "Temperature constraints and simulation period",
             "Temperaturgrenzwerte und Simulationszeit",
             "Temperatuursgrenzen en simulatieperiode",
@@ -384,7 +434,7 @@ class Translations:
             "Restricciones de temperatura y período de simulación",
             "Restriccións de temperatura e período de simulación",
         ]
-        self.label_TempMin: List[str] = [
+        self.option_min_temp: List[str] = [
             "Minimal temperature [°C]: ",
             "Minimaltemperatur [°C]: ",
             "Minimale temperatuur [°C]: ",
@@ -393,7 +443,7 @@ class Translations:
             "Temperatura mínima [°C]: ",
             "Temperatura mínima[°C]: ",
         ]
-        self.label_TempMax: List[str] = [
+        self.option_max_temp: List[str] = [
             "Maximal temperature [°C]: ",
             "Maximaltemperatur [°C]: ",
             "Maximale temperatuur [°C]: ",
@@ -402,7 +452,16 @@ class Translations:
             "Temperatura máxima [°C]: ",
             "Temperatura máxima [°C]: ",
         ]
-        self.label_SimulationTime: List[str] = [
+        self.option_temp_gradient: List[str] = [
+            "Temperature gradient [K/100m]: ",
+            "Temperaturgradient [K/100m]: ",
+            "Temperature gradient [K/100m]: ",
+            "Temperature gradient [K/100m]: ",
+            "Temperature gradient [K/100m]: ",
+            "Temperature gradient [K/100m]: ",
+            "Temperature gradient [K/100m]: ",
+        ]
+        self.option_simu_period: List[str] = [
             "Simulation period [yrs]: ",
             "Simulationszeit [Jahre]: ",
             "Simulatieperiode [jaar]: ",
@@ -410,6 +469,15 @@ class Translations:
             "Période de simulation [années]: ",
             "Período de simulación [años]: ",
             "Período de simulación [anos]: ",
+        ]
+        self.option_constant_rb: List[str] = [
+            "Equivalent borehole resistance [mK/W]: ",
+            "Äquivalenter Bohrlochwiderstand [mK/W]: ",
+            "Equivalente boorgatweerstand [mK/W]: ",
+            "Resistenza equivalente del foro [mK/W]: ",
+            "Résistance équivalente du trou de forage [mK/W]: ",
+            "Resistencia del pozo equivalente [mK/W]: ",
+            "Resistencia do pozo equivalente [mK/W]: ",
         ]
         self.pushButton_NextGeneral: List[str] = ["  next  ", "  nächstes  ", "  volgende  ", "  successivo  ", "  suivant  ", "  siguiente  ", "  seguinte  "]
         self.pushButton_PreviousThermal: List[str] = [
@@ -421,7 +489,7 @@ class Translations:
             "  anterior  ",
             "  anterior  ",
         ]
-        self.label_Size: List[str] = [
+        self.hint_depth: List[str] = [
             "Borehole depth: ",
             "Bohrlochtiefe: ",
             "Boorgatdiepte: ",
@@ -430,16 +498,16 @@ class Translations:
             "Profundidad del pozo: ",
             "Profundidade do pozo: ",
         ]
-        self.checkBox_Legend: List[str] = [
-            "Show legend?",
-            "Legende zeigen?",
-            "Toon legende?",
-            "Mostra la legenda?",
-            "Afficher la légende?",
-            "Mostrar leyenda?",
-            "Mostrar lenda?",
+        self.option_show_legend: List[str] = [
+            "Show legend?,yes,no",
+            "Legende zeigen?,Ja,Nein",
+            "Toon legende?,yes,no",
+            "Mostra la legenda?,yes,no",
+            "Afficher la légende?,yes,no",
+            "Mostrar leyenda?,yes,no",
+            "Mostrar lenda?,yes,no",
         ]
-        self.pushButton_SaveData: List[str] = [
+        self.function_save_results: List[str] = [
             "Save results",
             "Ergebnisse speichern",
             "Bewaar resultaten",
@@ -448,7 +516,7 @@ class Translations:
             "Guardar resultados",
             "Gardar resultados",
         ]
-        self.pushButton_SaveFigure: List[str] = [
+        self.function_save_figure: List[str] = [
             "Save figure",
             "Abbildung speichern",
             "Bewaar figuren",
@@ -503,15 +571,6 @@ class Translations:
             "Pico de calefacción",
             "Pico de calefacción",
         ]
-        self.label_ThermalDemandsTitle: List[str] = [
-            "Thermal demands",
-            "Thermische Last",
-            "Thermische vraag",
-            "Richieste termiche",
-            "Demande thermique",
-            "Cargas térmicas",
-            "Cargas térmicas",
-        ]
         self.label_Import: List[str] = ["Import", "Importieren", "Importeer", "Importazione", "Importation", "Importar", "Importar"]
         self.checkBox_Import: List[str] = [
             "Import Demands?",
@@ -522,7 +581,7 @@ class Translations:
             "Importar cargas?",
             "Importar cargas?",
         ]
-        self.label_pH: List[str] = [
+        self.hint_peak_heating: List[str] = [
             "Heating peak",
             "Heizspitzen",
             "Verwarmingspiek",
@@ -531,7 +590,7 @@ class Translations:
             "Pico de calefacción",
             "Pico de calefacción",
         ]
-        self.label_pC: List[str] = [
+        self.hint_peak_cooling: List[str] = [
             "Cooling peak",
             "Kühlspitzen",
             "Koelpiek",
@@ -540,7 +599,7 @@ class Translations:
             "Pico de refrigeración",
             "Pico de refrixeración",
         ]
-        self.label_HL: List[str] = [
+        self.hint_load_heating: List[str] = [
             "Heating load",
             "Heizlast",
             "Belasting verwarming",
@@ -549,7 +608,7 @@ class Translations:
             "Carga de calefacción",
             "Carga de calefacción",
         ]
-        self.label_CL: List[str] = [
+        self.hint_load_cooling: List[str] = [
             "Cooling load",
             "Kühllast",
             "Belasting koeling",
@@ -576,18 +635,18 @@ class Translations:
             "Unidad de carga: ",
             "Unidade de carga: ",
         ]
-        self.label_Jan: List[str] = ["January", "Januar", "Januari", "Gennaio", "Janvier", "Enero", "Xaneiro"]
-        self.label_Feb: List[str] = ["February", "Februar", "Februari", "Febbraio", "Février", "Febrero", "Febreiro"]
-        self.label_Mar: List[str] = ["March", "März", "Maart", "Marzo", "Mars", "Marzo", "Marzo"]
-        self.label_Apr: List[str] = ["April", "April", "April", "Aprile", "Avril", "Abril", "Abril"]
-        self.label_May: List[str] = ["May", "Mai", "Mei", "Maggio", "Mai", "Mayo", "Maio"]
-        self.label_Jun: List[str] = ["June", "Juni", "Juni", "Giugno", "Juin", "Junio", "Xuño"]
-        self.label_Jul: List[str] = ["July", "Juli", "Juli", "Luglio", "Juillet", "Julio", "Xullo"]
-        self.label_Aug: List[str] = ["August", "August", "Augustus", "Agosto", "Août", "Agosto", "Agosto"]
-        self.label_Sep: List[str] = ["September", "September", "September", "Settembre", "Septembre", "Septiembre", "Setembro"]
-        self.label_Oct: List[str] = ["October", "Oktober", "Oktober", "Ottobre", "Octobre", "Octubre", "Outubro"]
-        self.label_Nov: List[str] = ["November", "November", "November", "Novembre", "Novembre", "Noviembre", "Novembro"]
-        self.label_Dec: List[str] = ["December", "Dezember", "December", "Dicembre", "Décembre", "Diciembre", "Decembro"]
+        self.hint_jan: List[str] = ["January", "Januar", "Januari", "Gennaio", "Janvier", "Enero", "Xaneiro"]
+        self.hint_feb: List[str] = ["February", "Februar", "Februari", "Febbraio", "Février", "Febrero", "Febreiro"]
+        self.hint_mar: List[str] = ["March", "März", "Maart", "Marzo", "Mars", "Marzo", "Marzo"]
+        self.hint_apr: List[str] = ["April", "April", "April", "Aprile", "Avril", "Abril", "Abril"]
+        self.hint_may: List[str] = ["May", "Mai", "Mei", "Maggio", "Mai", "Mayo", "Maio"]
+        self.hint_jun: List[str] = ["June", "Juni", "Juni", "Giugno", "Juin", "Junio", "Xuño"]
+        self.hint_jul: List[str] = ["July", "Juli", "Juli", "Luglio", "Juillet", "Julio", "Xullo"]
+        self.hint_aug: List[str] = ["August", "August", "Augustus", "Agosto", "Août", "Agosto", "Agosto"]
+        self.hint_sep: List[str] = ["September", "September", "September", "Settembre", "Septembre", "Septiembre", "Setembro"]
+        self.hint_oct: List[str] = ["October", "Oktober", "Oktober", "Ottobre", "Octobre", "Octubre", "Outubro"]
+        self.hint_nov: List[str] = ["November", "November", "November", "Novembre", "Novembre", "Noviembre", "Novembro"]
+        self.hint_dec: List[str] = ["December", "Dezember", "December", "Dicembre", "Décembre", "Diciembre", "Decembro"]
         self.label_DataType: List[str] = [
             "File type: ",
             "Dateityp: ",
@@ -843,51 +902,6 @@ class Translations:
             "Size borefield by length and width",
             "Size borefield by length and width",
         ]
-        self.label_H_max: List[str] = [
-            "Maximal borehole depth [m]: ",
-            "Maximale Bohrlochtiefe [m]: ",
-            "Maximale boorvelddiepte[m]: ",
-            "Maximal borehole depth [m]: ",
-            "Maximal borehole depth [m]: ",
-            "Maximal borehole depth [m]: ",
-            "Maximal borehole depth [m]: ",
-        ]
-        self.label_B_min: List[str] = [
-            "Minimal borehole spacing [m]: ",
-            "Minimaler Bohrlochabstand [m]: ",
-            "Minimale boorgatspatiëring [m]: ",
-            "Minimal borehole spacing [m]: ",
-            "Minimal borehole spacing [m]: ",
-            "Minimal borehole spacing [m]: ",
-            "Minimal borehole spacing [m]: ",
-        ]
-        self.label_B_max: List[str] = [
-            "Maximal borehole spacing [m]: ",
-            "Maximaler Bohrlochabstand [m]: ",
-            "Maximale boorgatspatiëring [m]: ",
-            "Maximal borehole spacing [m]: ",
-            "Maximal borehole spacing [m]: ",
-            "Maximal borehole spacing [m]: ",
-            "Maximal borehole spacing [m]: ",
-        ]
-        self.label_MaxWidthField: List[str] = [
-            "Maximal width of rectangular field [m]: ",
-            "Maximale Breite des rechteckigen Feldes [m]: ",
-            "Maximale breedte van het rechthoekig boorveld [m]: ",
-            "Maximal width of rectangular field [m]: ",
-            "Maximal width of rectangular field [m]: ",
-            "Maximal width of rectangular field [m]: ",
-            "Maximal width of rectangular field [m]: ",
-        ]
-        self.label_MaxLengthField: List[str] = [
-            "Maximal length of rectangular field [m]: ",
-            "Maximale Länge des rechteckigen Feldes [m]: ",
-            "Maximale lengte van het rechthoekig boorveld [m]: ",
-            "Maximal length of rectangular field [m]: ",
-            "Maximal length of rectangular field [m]: ",
-            "Maximal length of rectangular field [m]: ",
-            "Maximal length of rectangular field [m]: ",
-        ]
         self.label_Size_B: List[str] = [
             "Borehole spacing: ",
             "Bohrlochabstand: ",
@@ -957,9 +971,6 @@ class Translations:
             "Start importing GHEtool",
             "Start importing GHEtool",
         ]
-        self.label_Dutch: List[str] = ["Dutch", "Niederländisch", "Nederlands", "Dutch", "Dutch", "Dutch", "Dutch"]
-        self.label_Italian: List[str] = ["Italian", "Italienisch", "Italiaans", "Italian", "Italian", "Italian", "Italian"]
-        self.label_French: List[str] = ["French", "Französisch", "Frans", "French", "French", "French", "French"]
         self.comboBoxLanguageList: List[str] = [
             "['English', 'German', 'Dutch', 'Italian', 'French', 'Spanish', 'Galician']",
             "['Englisch', 'Deutsch', 'Niederländisch', 'Italienisch', 'Französisch', 'Spanisch', 'Galizisch']",
@@ -990,8 +1001,6 @@ class Translations:
             "no backup fileImport",
             "no backup fileImport",
         ]
-        self.label_Spanish: List[str] = ["Spanish", "Spanisch", "Spaans", "Spanish", "Spanish", "Spanish", "Spanish"]
-        self.label_Galician: List[str] = ["Galician", "Galizisch", "Galisisch", "Galician", "Galician", "Galician", "Galician"]
         self.label_close: List[str] = ["Close", "Schließen", "Sluit", "Close", "Close", "Close", "Close"]
         self.label_cancel: List[str] = ["Cancel", "Abbrechen", "Annuleer", "Cancel", "Cancel", "Cancel", "Cancel"]
         self.label_CancelTitle: List[str] = ["Warning", "Warnung", "Waarschuwing", "Warning", "Warning", "Warning", "Warning"]
@@ -1072,11 +1081,6 @@ class Translations:
             "Calculate all scenarios",
             "Calculate all scenarios",
         ]
-        self.actionGerman: List[str] = ["German", "Deutsch", "Duits", "German", "German", "German", "German"]
-        self.actionEnglish: List[str] = ["English", "Englisch", "Engels", "English", "English", "English", "English"]
-        self.actionDutch: List[str] = ["Dutch", "Niederländisch", "Nederlands", "Dutch", "Dutch", "Dutch", "Dutch"]
-        self.actionFrench: List[str] = ["French", "Französisch", "Frans", "French", "French", "French", "French"]
-        self.actionItalian: List[str] = ["Italian", "Italienisch", "Italiaans", "Italian", "Italian", "Italian", "Italian"]
         self.actionNew: List[str] = ["New Project", "Neues Projekt", "Nieuw project", "New Project", "New Project", "New Project", "New Project"]
         self.actionSave: List[str] = ["Save Project", "Speichere Projekt", "Bewaar project", "Save Project", "Save Project", "Save Project", "Save Project"]
         self.actionOpen: List[str] = ["Open Project", "Öffne Projekt", "Open project", "Open Project", "Open Project", "Open Project", "Open Project"]
@@ -1544,5 +1548,3 @@ class Translations:
             "Decimal sign in CSV-fileImport:",
             "Decimal sign in CSV-fileImport:",
         ]
-        self.actionSpanish: List[str] = ["Spanish", "Spanisch", "Spaans", "Spanish", "Spanish", "Spanish", "Spanish"]
-        self.actionGalician: List[str] = ["Galician", "Galizisch", "Galisisch", "Galician", "Galician", "Galician", "Galician"]

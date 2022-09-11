@@ -368,7 +368,6 @@ class GuiStructure:
     def translate(self, index: int, translation: Translations):
         for name in [j for j in translation.__slots__ if hasattr(self, j)]:
             entry: Optional[Option, Hint, FunctionButton, Page, Category] = getattr(self, name)
-            if isinstance(entry, Page):
-                entry_name: Tuple[str, str] = getattr(translation, name)[index].split(',')
-                entry.set_text(entry_name[0].replace('@', '\n'), entry_name[1])
+            entry.set_text(getattr(translation, name)[index])
+
 

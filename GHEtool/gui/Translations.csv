@@ -8,60 +8,66 @@ pushButton_AddScenario;Add scenario;Szenario hinzufügen;Nieuw scenario;Aggiungi
 pushButton_DeleteScenario;Delete scenario;Szenario löschen;Verwijder scenario;Cancella scenario;Supprimer un scénario;Borrar escenario;Eliminar escenario
 pushButton_start_multiple;Calculate all scenarios;Berechne alle Szenarios;Bereken alle scenarios;Calculate all scenarios;Calculate all scenarios;Calculate all scenarios;Calculate all scenarios
 pushButton_Cancel;Exit;Verlassen;Sluit;Esci;Sortie;Salir;Saír
+page_aim;Aim,Aim of simulation;Ziel,Ziel der Simulation;Aim,Aim of simulation;Aim,Aim of simulation;Aim,Aim of simulation;Aim,Aim of simulation;Aim,Aim of simulation
 page_borehole;Borehole @and earth,Borehole and earth;Bohrloch @und Erdreich,Bohrloch und Erdreich;Boorveld @ en grond,Boorveld en grond;Foro e @terra,Foro e terra;Forage @et terre,Forage et terre;Pozo @y terreno,Pozo y terreno;Pozo @e chan,Pozo e chan
 page_borehole_resistance;Borehole @resistance,Equivalent borehole resistance;Bohrloch-@widerstand,Equivalänter Bohrlochwiderstand;Boorgat-@weerstand,Equivalente boorgatweerstand;Borehole@resistance,Equivalent borehole resistance;Borehole@resistance,Equivalent borehole resistance;Borehole@resistance,Equivalent borehole resistance;Borehole@resistance,Equivalent borehole resistance
 page_thermal;Thermal @demand,Thermal demands;Thermischer @Bedarf,Thermische Last;Thermische @vraag,Thermische vraag;Richieste @termiche,Richieste termiche;Demande @thermique,Demande thermique;Cargas @térmicas,Cargas térmicas;Cargas @térmicas,Cargas térmicas
-pushButton_Results;Results;Ergebnisse;Resultaten;Risultati;Résultats;Resultados;Resultados
+page_result;Results,Results;Ergebnisse,Ergebnisse;Resultaten,Resultaten;Risultati,Risultati;Résultats,Résultats;Resultados,Resultados;Resultados,Resultados
+page_options;Options,Options;Optionen,Optionen;Options,Options;Options,Options;Options,Options;Options,Options;Options,Options
 label_Status;Progress: ;Fortschritt: ;Vooruitgang: ;Progressi: ;Progrès: ;Progreso: ;Progreso: 
 label_File;File;Datei;Bestand;File;File;File;File
 label_Calculation;Calculation;Berechnung;Berekening;Calculation;Calculation;Calculation;Calculation
-label_Earth_Properties;Borehole and earth properties;Bohrloch und Erdreicheigenschaften;Eigenschappen van boorveld en grond;Proprietà del foro e della terra;Propriétés du trou de sonde et de la terre;Propiedades del pozo y terreno;Propiedades do pozo e do chan
-checkBox_CalcDepth;Determine the required depth;Notwendige Bohrlochlänge bestimmen;Bepaal de benodigde diepte;Determinare la profondità richiesta;Déterminer la profondeur requise;Determinar la longitud requerida;Determinar a lonxitude necesaria
-label_Settings;Settings;Einstellungen;Instellingen;Settings;Settings;Settings;Settings
-label_H;Borehole depth [m]: ;Bohrlochtiefe [m]: ;Boorgatdiepte [m]: ;Profondità foro [m]: ;Profondeur du forage [m]: ;Profundidad del pozo [m]: ;Profundidade do pozo [m]: 
-label_BS;Borehole spacing [m]: ;Bohrlochabstand [m]: ;Boorgatspatiring [m]: ;Spaziatura del foro [m]: ;Espacement des trous de forage [m]: ;Espaciado entre pozos [m]: ;Espazamento entre pozos [m]: 
-label_lambdaEarth;Conductivity of the soil [W/mK]: ;Wärmeleitfähigkeit des Erdreiches [W/mK]: ;Conductiviteit van de bodem [W/mK]: ;Conducibilità del terreno [W/mK]: ;Conductivité du sol [W/mK]: ;Conductividad del suelo [W/mK]: ;Conductividade do chan [W/mK]: 
-label_GroundTemp;Ground temperature at infinity [°C]: ;Erdreichtemperatur in der Unendlichkeit [°C]: ;Grondtemperatuur op oneindig [°C]: ;Temperatura del terreno all'infinito [°C]: ;Température du sol à l'infini [°C]: ;Temperatura del suelo en el infinito [°C]: ;Temperatura do chan no infinito [°C]: 
-label_BoreholeResistance;Equivalent borehole resistance [mK/W]: ;Äquivalenter Bohrlochwiderstand [mK/W]: ;Equivalente boorgatweerstand [mK/W]: ;Resistenza equivalente del foro [mK/W]: ;Résistance équivalente du trou de forage [mK/W]: ;Resistencia del pozo equivalente [mK/W]: ;Resistencia do pozo equivalente [mK/W]: 
-label_WidthField;Width of rectangular field [#]: ;Breite des rechteckigen Feldes [#]: ;Breedte van het rechthoekige veld [#]: ;Larghezza del campo rettangolare [#]: ;Largeur du champ rectangulaire [#]: ;Ancho del campo rectangular [#]: ;Ancho do campo rectangular [#]: 
-label_LengthField;Length of rectangular field [#]: ;Länge des rechteckigen Feldes [#]: ;Lengte van het rechthoekige veld [#]: ;Lunghezza del campo rettangolare [#]: ;Longueur du champ rectangulaire [#]: ;Longitud del campo rectangular [#]: ;Lonxitude do campo rectangular [#]: 
-label_TempConstraints;Temperature constraints and simulation period;Temperaturgrenzwerte und Simulationszeit;Temperatuursgrenzen en simulatieperiode;Vincoli di temperatura e periodo di simulazione;Contraintes de température et période de simulation;Restricciones de temperatura y período de simulación;Restriccións de temperatura e período de simulación
-label_TempMin;Minimal temperature [°C]: ;Minimaltemperatur [°C]: ;Minimale temperatuur [°C]: ;Temperatura minima [°C]: ;Température minimale [°C]: ;Temperatura mínima [°C]: ;Temperatura mínima[°C]: 
-label_TempMax;Maximal temperature [°C]: ;Maximaltemperatur [°C]: ;Maximale temperatuur [°C]: ;Temperatura massima [°C]: ;Température maximale [°C]: ;Temperatura máxima [°C]: ;Temperatura máxima [°C]: 
-label_SimulationTime;Simulation period [yrs]: ;Simulationszeit [Jahre]: ;Simulatieperiode [jaar]: ;Periodo di simulazione [anni]: ;Période de simulation [années]: ;Período de simulación [años]: ;Período de simulación [anos]: 
+category_borehole;Borehole and earth properties;Bohrloch und Erdreicheigenschaften;Eigenschappen van boorveld en grond;Proprietà del foro e della terra;Propriétés du trou de sonde et de la terre;Propiedades del pozo y terreno;Propiedades do pozo e do chan
+option_depth;Borehole depth [m]: ;Bohrlochtiefe [m]: ;Boorgatdiepte [m]: ;Profondità foro [m]: ;Profondeur du forage [m]: ;Profundidad del pozo [m]: ;Profundidade do pozo [m]: 
+option_spacing;Borehole spacing [m]: ;Bohrlochabstand [m]: ;Boorgatspatiring [m]: ;Spaziatura del foro [m]: ;Espacement des trous de forage [m]: ;Espaciado entre pozos [m]: ;Espazamento entre pozos [m]: 
+option_conductivity;Conductivity of the soil [W/mK]: ;Wärmeleitfähigkeit des Erdreiches [W/mK]: ;Conductiviteit van de bodem [W/mK]: ;Conducibilità del terreno [W/mK]: ;Conductivité du sol [W/mK]: ;Conductividad del suelo [W/mK]: ;Conductividade do chan [W/mK]: 
+option_ground_temp;Ground temperature at infinity [°C]: ;Erdreichtemperatur in der Unendlichkeit [°C]: ;Grondtemperatuur op oneindig [°C]: ;Temperatura del terreno all'infinito [°C]: ;Température du sol à l'infini [°C]: ;Temperatura del suelo en el infinito [°C]: ;Temperatura do chan no infinito [°C]: 
+option_max_depth;Maximal borehole depth [m]: ;Maximale Bohrlochtiefe [m]: ;Maximale boorvelddiepte[m]: ;Maximal borehole depth [m]: ;Maximal borehole depth [m]: ;Maximal borehole depth [m]: ;Maximal borehole depth [m]: 
+option_min_spacing;Minimal borehole spacing [m]: ;Minimaler Bohrlochabstand [m]: ;Minimale boorgatspatiëring [m]: ;Minimal borehole spacing [m]: ;Minimal borehole spacing [m]: ;Minimal borehole spacing [m]: ;Minimal borehole spacing [m]: 
+option_max_spacing;Maximal borehole spacing [m]: ;Maximaler Bohrlochabstand [m]: ;Maximale boorgatspatiëring [m]: ;Maximal borehole spacing [m]: ;Maximal borehole spacing [m]: ;Maximal borehole spacing [m]: ;Maximal borehole spacing [m]: 
+option_max_width;Maximal width of rectangular field [m]: ;Maximale Breite des rechteckigen Feldes [m]: ;Maximale breedte van het rechthoekig boorveld [m]: ;Maximal width of rectangular field [m]: ;Maximal width of rectangular field [m]: ;Maximal width of rectangular field [m]: ;Maximal width of rectangular field [m]: 
+option_max_length;Maximal length of rectangular field [m]: ;Maximale Länge des rechteckigen Feldes [m]: ;Maximale lengte van het rechthoekig boorveld [m]: ;Maximal length of rectangular field [m]: ;Maximal length of rectangular field [m]: ;Maximal length of rectangular field [m]: ;Maximal length of rectangular field [m]: 
+option_heat_capacity;Ground volumetric heat capacity [kJ / m³ K]:;Spezifische Wärmekapazität des Erdreiches [kJ / m³ K]:;Ground volumetric heat capacity [kJ / m³ K]:;Ground volumetric heat capacity [kJ / m³ K]:;Ground volumetric heat capacity [kJ / m³ K]:;Ground volumetric heat capacity [kJ / m³ K]:;Ground volumetric heat capacity [kJ / m³ K]:
+option_width;Width of rectangular field [#]: ;Breite des rechteckigen Feldes [#]: ;Breedte van het rechthoekige veld [#]: ;Larghezza del campo rettangolare [#]: ;Largeur du champ rectangulaire [#]: ;Ancho del campo rectangular [#]: ;Ancho do campo rectangular [#]: 
+option_length;Length of rectangular field [#]: ;Länge des rechteckigen Feldes [#]: ;Lengte van het rechthoekige veld [#]: ;Lunghezza del campo rettangolare [#]: ;Longueur du champ rectangulaire [#]: ;Longitud del campo rectangular [#]: ;Lonxitude do campo rectangular [#]: 
+category_temperatures;Temperature constraints and simulation period;Temperaturgrenzwerte und Simulationszeit;Temperatuursgrenzen en simulatieperiode;Vincoli di temperatura e periodo di simulazione;Contraintes de température et période de simulation;Restricciones de temperatura y período de simulación;Restriccións de temperatura e período de simulación
+option_min_temp;Minimal temperature [°C]: ;Minimaltemperatur [°C]: ;Minimale temperatuur [°C]: ;Temperatura minima [°C]: ;Température minimale [°C]: ;Temperatura mínima [°C]: ;Temperatura mínima[°C]: 
+option_max_temp;Maximal temperature [°C]: ;Maximaltemperatur [°C]: ;Maximale temperatuur [°C]: ;Temperatura massima [°C]: ;Température maximale [°C]: ;Temperatura máxima [°C]: ;Temperatura máxima [°C]: 
+option_temp_gradient;Temperature gradient [K/100m]: ;Temperaturgradient [K/100m]: ;Temperature gradient [K/100m]: ;Temperature gradient [K/100m]: ;Temperature gradient [K/100m]: ;Temperature gradient [K/100m]: ;Temperature gradient [K/100m]: 
+option_simu_period;Simulation period [yrs]: ;Simulationszeit [Jahre]: ;Simulatieperiode [jaar]: ;Periodo di simulazione [anni]: ;Période de simulation [années]: ;Período de simulación [años]: ;Período de simulación [anos]: 
+option_constant_rb;Equivalent borehole resistance [mK/W]: ;Äquivalenter Bohrlochwiderstand [mK/W]: ;Equivalente boorgatweerstand [mK/W]: ;Resistenza equivalente del foro [mK/W]: ;Résistance équivalente du trou de forage [mK/W]: ;Resistencia del pozo equivalente [mK/W]: ;Resistencia do pozo equivalente [mK/W]: 
 pushButton_NextGeneral;  next  ;  nächstes  ;  volgende  ;  successivo  ;  suivant  ;  siguiente  ;  seguinte  
 pushButton_PreviousThermal;  previous  ;  vorheriges  ;  vorige  ;  precedente  ;  précédente  ;  anterior  ;  anterior  
-label_Size;Borehole depth: ;Bohrlochtiefe: ;Boorgatdiepte: ;Profondità del foro:  ;Profondeur du trou de sonde: ;Profundidad del pozo: ;Profundidade do pozo: 
-checkBox_Legend;Show legend?;Legende zeigen?;Toon legende?;Mostra la legenda?;Afficher la légende?;Mostrar leyenda?;Mostrar lenda?
-pushButton_SaveData;Save results;Ergebnisse speichern;Bewaar resultaten;Salva i risultati;Enregistrer les résultats;Guardar resultados;Gardar resultados
-pushButton_SaveFigure;Save figure;Abbildung speichern;Bewaar figuren;Salva figura;Sauvegarder la figure;Guardar figura;Gardar figura
+hint_depth;Borehole depth: ;Bohrlochtiefe: ;Boorgatdiepte: ;Profondità del foro:  ;Profondeur du trou de sonde: ;Profundidad del pozo: ;Profundidade do pozo: 
+option_show_legend;Show legend?,yes,no;Legende zeigen?,Ja,Nein;Toon legende?,yes,no;Mostra la legenda?,yes,no;Afficher la légende?,yes,no;Mostrar leyenda?,yes,no;Mostrar lenda?,yes,no
+function_save_results;Save results;Ergebnisse speichern;Bewaar resultaten;Salva i risultati;Enregistrer les résultats;Guardar resultados;Gardar resultados
+function_save_figure;Save figure;Abbildung speichern;Bewaar figuren;Salva figura;Sauvegarder la figure;Guardar figura;Gardar figura
 X_Axis;Time [year];Zeit [Jahr];Tijd [jaar];Tempo [anno];Heure [année];Tiempo [año];Tempo [ano]
 Y_Axis;Temperature [°C];Temperatur [°C];Temperatuur [°C];Temperatura [°C];Température [°C];Temperatura [°C];Temperatura [°C]
 BaseCooling;base cooling;Grundkühlung;basisbelasting koeling;Base raffreddamento;Base de refroidissement;Base de refrigeración;Base de refrixeración
 BaseHeating;base heating;Grundheizung;basisbelasting verwarming;Base riscaldamento;Chauffage de base;Base de calefacción;Base de calefacción
 PeakCooling;peak cooling;Kühlspitzen;piekkoeling;Picco raffreddamento;Refroidissement maximal;Pico de refrigeración;Pico de refrixeración
 PeakHeating;peak heating;Heizspitzen;piekverwarming;Picco di riscaldamento;Pic de chauffage;Pico de calefacción;Pico de calefacción
-label_ThermalDemandsTitle;Thermal demands;Thermische Last;Thermische vraag;Richieste termiche;Demande thermique;Cargas térmicas;Cargas térmicas
 label_Import;Import;Importieren;Importeer;Importazione;Importation;Importar;Importar
 checkBox_Import;Import Demands?;Lasten importieren?;Importeer vraag?;Richieste di @importazione?;Demande d'importation?;Importar cargas?;Importar cargas?
-label_pH;Heating peak;Heizspitzen;Verwarmingspiek;Picco di riscaldamento;Pic de chauffage;Pico de calefacción;Pico de calefacción
-label_pC;Cooling peak;Kühlspitzen;Koelpiek;Picco di raffreddamento;Pic de refroidissement;Pico de refrigeración;Pico de refrixeración
-label_HL;Heating load;Heizlast;Belasting verwarming;Carico di riscaldamento;Charge de chauffage;Carga de calefacción;Carga de calefacción
-label_CL;Cooling load;Kühllast;Belasting koeling;Carico di raffreddamento;Charge de refroidissement;Carga de refrigeración;Carga de refrixeración
+hint_peak_heating;Heating peak;Heizspitzen;Verwarmingspiek;Picco di riscaldamento;Pic de chauffage;Pico de calefacción;Pico de calefacción
+hint_peak_cooling;Cooling peak;Kühlspitzen;Koelpiek;Picco di raffreddamento;Pic de refroidissement;Pico de refrigeración;Pico de refrixeración
+hint_load_heating;Heating load;Heizlast;Belasting verwarming;Carico di riscaldamento;Charge de chauffage;Carga de calefacción;Carga de calefacción
+hint_load_cooling;Cooling load;Kühllast;Belasting koeling;Carico di raffreddamento;Charge de refroidissement;Carga de refrigeración;Carga de refrixeración
 label_UnitPeak;Peak unit: ;Einheit Spitze: ;Eenheid piek: ;Unità di picco: ;Unité de pointe: ;Unidad de pico: ;Unidade de pico: 
 label_UnitLoad;Load unit: ;Einheit Last: ;Eenheid belasting: ;Unità di carico: ;Unité de charge: ;Unidad de carga: ;Unidade de carga: 
-label_Jan;January;Januar;Januari;Gennaio;Janvier;Enero;Xaneiro
-label_Feb;February;Februar;Februari;Febbraio;Février;Febrero;Febreiro
-label_Mar;March;März;Maart;Marzo;Mars;Marzo;Marzo
-label_Apr;April;April;April;Aprile;Avril;Abril;Abril
-label_May;May;Mai;Mei;Maggio;Mai;Mayo;Maio
-label_Jun;June;Juni;Juni;Giugno;Juin;Junio;Xuño
-label_Jul;July;Juli;Juli;Luglio;Juillet;Julio;Xullo
-label_Aug;August;August;Augustus;Agosto;Août;Agosto;Agosto
-label_Sep;September;September;September;Settembre;Septembre;Septiembre;Setembro
-label_Oct;October;Oktober;Oktober;Ottobre;Octobre;Octubre;Outubro
-label_Nov;November;November;November;Novembre;Novembre;Noviembre;Novembro
-label_Dec;December;Dezember;December;Dicembre;Décembre;Diciembre;Decembro
+hint_jan;January;Januar;Januari;Gennaio;Janvier;Enero;Xaneiro
+hint_feb;February;Februar;Februari;Febbraio;Février;Febrero;Febreiro
+hint_mar;March;März;Maart;Marzo;Mars;Marzo;Marzo
+hint_apr;April;April;April;Aprile;Avril;Abril;Abril
+hint_may;May;Mai;Mei;Maggio;Mai;Mayo;Maio
+hint_jun;June;Juni;Juni;Giugno;Juin;Junio;Xuño
+hint_jul;July;Juli;Juli;Luglio;Juillet;Julio;Xullo
+hint_aug;August;August;Augustus;Agosto;Août;Agosto;Agosto
+hint_sep;September;September;September;Settembre;Septembre;Septiembre;Setembro
+hint_oct;October;Oktober;Oktober;Ottobre;Octobre;Octubre;Outubro
+hint_nov;November;November;November;Novembre;Novembre;Noviembre;Novembro
+hint_dec;December;Dezember;December;Dicembre;Décembre;Diciembre;Decembro
 label_DataType;File type: ;Dateityp: ;Bestandstype: ;Tipo di fileImport: ;Type de fichier: ;Tipo de archivo: ;Tipo de ficheiro: 
 label_Filename;Filename: ;Dateiname: ;Bestandsnaam: ;Nome fileImport: ;Nom de fichier: ;Nombre de archivo: ;Nome de ficheiro: 
 label_SheetName;Sheet name: ;Tabellenblattname: ;Naam van het blad: ;Nome foglio:  ;Nom de la feuille: ;Nombre de hoja: ;Nome de folla: 
@@ -93,11 +99,6 @@ SavePKL;Choose pkl location to save scenarios;Wählen Sie den pkl-Speicherort zu
 label_WarningCustomBorefield;With the selected values a customized bore field will be calculated. This will dramatically increase the calculation time.;Mit den gewählten Werten wird ein individuelles Borefeld berechnet. Dadurch wird die Berechnungszeit drastisch erhöht.;Met de geselecteerde waarden moet een aangepast boorveld worden berekend.Dit zal de berekentijd drastisch doen toenemen.;With the selected values a customized bore field will be calculated. This will dramatically increase the calculation time.;With the selected values a customized bore field will be calculated. This will dramatically increase the calculation time.;Un campo de captación será calculado con los valores seleccionados. El tiempo de computación aumentará drásticamente.;Calcularase un campo de captación cos valores escollidos. O tempo de cálculo aumentará drásticamente.
 label_WarningDepth;The calculated size is below the suggested minimum of 50 m. The calculation may be incorrect.;Die berechnete Größe liegt unter dem empfohlenen Minimum von 50 m. Die Berechnung ist möglicherweise fehlerhaft.;De berekende diepte is lager dan het voorgestelde minimum van 50m.De berekening kan inaccuraat zijn.;The calculated size is below the suggested minimum of 50 m. The calculation may be incorrect.;The calculated size is below the suggested minimum of 50 m. The calculation may be incorrect.;El tamaño calculado se encuentra por debajo del mínimo sugerido de 15 m. El dimensionado puede no ser correcto.;O tamaño calculado está por debaixo do mínimo suxerido de 15 m. O dimensionado pode non ser o correcto.
 checkBox_SizeBorefield;Size borefield by length and width;Dimensionierung des Bohrlochfeldes nach Länge und Breite;Dimensioneer boorveld met breedte en lengte;Size borefield by length and width;Size borefield by length and width;Size borefield by length and width;Size borefield by length and width
-label_H_max;Maximal borehole depth [m]: ;Maximale Bohrlochtiefe [m]: ;Maximale boorvelddiepte[m]: ;Maximal borehole depth [m]: ;Maximal borehole depth [m]: ;Maximal borehole depth [m]: ;Maximal borehole depth [m]: 
-label_B_min;Minimal borehole spacing [m]: ;Minimaler Bohrlochabstand [m]: ;Minimale boorgatspatiëring [m]: ;Minimal borehole spacing [m]: ;Minimal borehole spacing [m]: ;Minimal borehole spacing [m]: ;Minimal borehole spacing [m]: 
-label_B_max;Maximal borehole spacing [m]: ;Maximaler Bohrlochabstand [m]: ;Maximale boorgatspatiëring [m]: ;Maximal borehole spacing [m]: ;Maximal borehole spacing [m]: ;Maximal borehole spacing [m]: ;Maximal borehole spacing [m]: 
-label_MaxWidthField;Maximal width of rectangular field [m]: ;Maximale Breite des rechteckigen Feldes [m]: ;Maximale breedte van het rechthoekig boorveld [m]: ;Maximal width of rectangular field [m]: ;Maximal width of rectangular field [m]: ;Maximal width of rectangular field [m]: ;Maximal width of rectangular field [m]: 
-label_MaxLengthField;Maximal length of rectangular field [m]: ;Maximale Länge des rechteckigen Feldes [m]: ;Maximale lengte van het rechthoekig boorveld [m]: ;Maximal length of rectangular field [m]: ;Maximal length of rectangular field [m]: ;Maximal length of rectangular field [m]: ;Maximal length of rectangular field [m]: 
 label_Size_B;Borehole spacing: ;Bohrlochabstand: ;Boorgatspatiëring: ;Borehole spacing: ;Borehole spacing: ;Borehole spacing: ;Borehole spacing: 
 label_Size_L;Length of rectangular field: ;Länge des rechteckigen Feldes: ;Lengte van het rechthoekig veld: ;Length of rectangular field: ;Length of rectangular field: ;Length of rectangular field: ;Length of rectangular field: 
 label_Size_W;Width of rectangular field: ;Breite des rechteckigen Feldes: ;Breedte van het rechthoekig veld: ;Width of rectangular field: ;Width of rectangular field: ;Width of rectangular field: ;Width of rectangular field: 
@@ -111,17 +112,12 @@ label_Save_As;Save as;Speichere Projekt unter ...;Sla op als;Save as;Save as;Sav
 Calculation_Finished;Calculation finished;Berechnung fertiggestellt;Berekening beëindigd;Calculation finished;Calculation finished;Calculation finished;Calculation finished
 GHE_tool_imported;GHEtool imported;GHEtool importiert;GHEtool geïmporteerd;GHEtool imported;GHEtool imported;GHEtool imported;GHEtool imported
 GHE_tool_imported_start;Start importing GHEtool;Starte GHEtool zu importieren;Start importering GHEtool;Start importing GHEtool;Start importing GHEtool;Start importing GHEtool;Start importing GHEtool
-label_Dutch;Dutch;Niederländisch;Nederlands;Dutch;Dutch;Dutch;Dutch
-label_Italian;Italian;Italienisch;Italiaans;Italian;Italian;Italian;Italian
-label_French;French;Französisch;Frans;French;French;French;French
 comboBoxLanguageList;['English', 'German', 'Dutch', 'Italian', 'French', 'Spanish', 'Galician'];['Englisch', 'Deutsch', 'Niederländisch', 'Italienisch', 'Französisch', 'Spanisch', 'Galizisch'];['Engels', 'Duits', 'Nederlands', 'Italiaans', 'Frans', 'Spaans', 'Galisisch'];['English', 'German', 'Dutch', 'Italian', 'French', 'Spanish', 'Galician'];['English', 'German', 'Dutch', 'Italian', 'French', 'Spanish', 'Galician'];['English', 'German', 'Dutch', 'Italian', 'French', 'Spanish', 'Galician'];['English', 'German', 'Dutch', 'Italian', 'French', 'Spanish', 'Galician']
 label_new_scenario;Enter new scenario name;Neuer Name für das Szenario;Nieuwe naam scenario;Enter new scenario name;Enter new scenario name;Enter new scenario name;Enter new scenario name
 new_name;New name for ;Neuer Name für ;Nieuwe naam voor ;New name for ;New name for ;New name for ;New name for 
 label_okay;Okay ;Okay ;Oke ;Okay ;Okay ;Okay ;Okay 
 label_abort;Abort ;Abbruch ;Geannuleerd ;Abort ;Abort ;Abort ;Abort 
 NoBackupFile;no backup fileImport;Keine Sicherungsdatei gefunden;geen backup fileImport;no backup fileImport;no backup fileImport;no backup fileImport;no backup fileImport
-label_Spanish;Spanish;Spanisch;Spaans;Spanish;Spanish;Spanish;Spanish
-label_Galician;Galician;Galizisch;Galisisch;Galician;Galician;Galician;Galician
 label_close;Close;Schließen;Sluit;Close;Close;Close;Close
 label_cancel;Cancel;Abbrechen;Annuleer;Cancel;Cancel;Cancel;Cancel
 label_CancelTitle;Warning;Warnung;Waarschuwing;Warning;Warning;Warning;Warning
@@ -138,11 +134,6 @@ menuCalculation;Calculation;Berechnung;Berekening;Calculation;Calculation;Calcul
 menuFile;File;Datei;Bestand;File;File;File;File
 menuScenario;Scenario;Szenario;Scenario;Scenario;Scénario;Escenario;Escenario
 action_start_multiple;Calculate all scenarios;Berechne alle Szenarios;Bereken alle scenarios;Calculate all scenarios;Calculate all scenarios;Calculate all scenarios;Calculate all scenarios
-actionGerman;German;Deutsch;Duits;German;German;German;German
-actionEnglish;English;Englisch;Engels;English;English;English;English
-actionDutch;Dutch;Niederländisch;Nederlands;Dutch;Dutch;Dutch;Dutch
-actionFrench;French;Französisch;Frans;French;French;French;French
-actionItalian;Italian;Italienisch;Italiaans;Italian;Italian;Italian;Italian
 actionNew;New Project;Neues Projekt;Nieuw project;New Project;New Project;New Project;New Project
 actionSave;Save Project;Speichere Projekt;Bewaar project;Save Project;Save Project;Save Project;Save Project
 actionOpen;Open Project;Öffne Projekt;Open project;Open Project;Open Project;Open Project;Open Project
@@ -202,5 +193,3 @@ NoSolution;No Solution found;Keine Lösung gefunden;Geen oplossing gevonden;No S
 comboBox_decimalList;"[""Point '.'"", ""Comma ','""]";"[""Punkt '.'"", ""Komma ','""]";"[""Punt '.'"", ""Komma ','""]";"[""Point '.'"", ""Comma ','""]";"[""Point '.'"", ""Comma ','""]";"[""Point '.'"", ""Comma ','""]";"[""Point '.'"", ""Comma ','""]"
 label_decimalDataFile;Decimal sign in CSV-fileImport:;Dezimalzeichen in CSV-Datei:;Decimaal teken in de CSV-fileImport:;Decimal sign in CSV-fileImport:;Decimal sign in CSV-fileImport:;Decimal sign in CSV-fileImport:;Decimal sign in CSV-fileImport:
 label_decimal;Decimal sign in CSV-fileImport:;Dezimalzeichen in CSV-Datei:;Decimaal teken in de CSV-fileImport:;Decimal sign in CSV-fileImport:;Decimal sign in CSV-fileImport:;Decimal sign in CSV-fileImport:;Decimal sign in CSV-fileImport:
-actionSpanish;Spanish;Spanisch;Spaans;Spanish;Spanish;Spanish;Spanish
-actionGalician;Galician;Galizisch;Galisisch;Galician;Galician;Galician;Galician
