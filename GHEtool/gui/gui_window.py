@@ -36,7 +36,7 @@ from numpy import cos, sin
 from PySide6.QtWidgets import QGraphicsScene, QGraphicsEllipseItem
 from PySide6.QtGui import QColor, QPen
 
-from GHEtool.gui.data_storage_new import DataStorageNew
+from GHEtool.gui.data_storage import DataStorageNew
 from GHEtool.gui.gui_main_new import UiGhetool
 from GHEtool.gui.translation_class import Translations
 from GHEtool.gui.gui_structure import GuiStructure
@@ -102,7 +102,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # init windows of parent class
         super(MainWindow, self).__init__()
         super().setup_ui(dialog)
-        # 'E:/Git/GHEtool_test/GHEtool/gui/ui/icons/Options.svg'
         # pyside6-rcc icons.qrc -o icons_rc.py
 
         self.gui_structure = GuiStructure(self.central_widget, self.status_bar)
@@ -375,9 +374,9 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             # set Icon to question mark icon
             msg.setIcon(QtWidgets_QMessageBox.Question)
             # set label text to leave scenario text depending on language selected
-            msg.setText(self.translations.label_LeaveScenarioText)
+            msg.setText(self.translations.label_LeaveScenarioText[self.gui_structure.option_language.get_value()])
             # set window text to  leave scenario text depending on language selected
-            msg.setWindowTitle(self.translations.label_CancelTitle)
+            msg.setWindowTitle(self.translations.label_CancelTitle[self.gui_structure.option_language.get_value()])
             # set standard buttons to save, close and cancel
             msg.setStandardButtons(QtWidgets_QMessageBox.Save | QtWidgets_QMessageBox.Close | QtWidgets_QMessageBox.Cancel)
             # get save, close and cancel button
@@ -385,9 +384,9 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             button_cl = msg.button(QtWidgets_QMessageBox.Close)
             button_ca = msg.button(QtWidgets_QMessageBox.Cancel)
             # set save, close and cancel button text depending on language selected
-            button_s.setText(f"{self.translations.pushButton_SaveScenario} ")
-            button_cl.setText(f"{self.translations.label_LeaveScenario} ")
-            button_ca.setText(f"{self.translations.label_StayScenario} ")
+            button_s.setText(f"{self.translations.pushButton_SaveScenario[self.gui_structure.option_language.get_value()]} ")
+            button_cl.setText(f"{self.translations.label_LeaveScenario[self.gui_structure.option_language.get_value()]} ")
+            button_ca.setText(f"{self.translations.label_StayScenario[self.gui_structure.option_language.get_value()]} ")
             # set  save, close and cancel button icon
             self.set_push_button_icon(button_s, "Save_Inv")
             self.set_push_button_icon(button_cl, "Exit")
@@ -469,10 +468,10 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         item = self.list_widget_scenario.item(0) if item is None else item
         # create dialog box to ask for a new name
         dialog = QtWidgets_QInputDialog(self.Dia)
-        dialog.setWindowTitle(self.translations.label_new_scenario)
-        dialog.setLabelText(f"{self.translations.new_name}{item.text()}:")
-        dialog.setOkButtonText(self.translations.label_okay)  # +++
-        dialog.setCancelButtonText(self.translations.label_abort)  # +++
+        dialog.setWindowTitle(self.translations.label_new_scenario[self.gui_structure.option_language.get_value()])
+        dialog.setLabelText(f"{self.translations.new_name[self.gui_structure.option_language.get_value()]}{item.text()}:")
+        dialog.setOkButtonText(self.translations.label_okay[self.gui_structure.option_language.get_value()])  # +++
+        dialog.setCancelButtonText(self.translations.label_abort[self.gui_structure.option_language.get_value()])  # +++
         li = dialog.findChildren(QtWidgets_QPushButton)
         self.set_push_button_icon(li[0], "Okay")
         self.set_push_button_icon(li[1], "Abort")
@@ -584,7 +583,10 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         for ds in self.list_ds:
             ds.option_language = self.gui_structure.option_language.get_value()
         # check if list scenario names are not unique
-        li_str_match: list = [self.list_widget_scenario.item(idx).text() == f"{self.translations.scenarioString}: {idx + 1}" for idx in range(amount)]
+        li_str_match: List[bool] = [
+            self.list_widget_scenario.item(idx).text() == f"{self.translations.scenarioString[self.gui_structure.option_language.get_value()]}: {idx + 1}"
+            for idx in range(amount)
+        ]
         # update all label, pushButtons, action and Menu names
         for i in [j for j in self.translations.__slots__ if hasattr(self, j)]:
             if isinstance(getattr(self, i), QtWidgets_QMenu):
@@ -597,7 +599,10 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.set_push(False)
         # replace scenario names if they are not unique
         scenarios: list = [
-            f"{self.translations.scenarioString}: {i}" if li_str_match[i - 1] else self.list_widget_scenario.item(i - 1).text() for i in range(1, amount + 1)
+            f"{self.translations.scenarioString[self.gui_structure.option_language.get_value()]}: {i}"
+            if li_str_match[i - 1]
+            else self.list_widget_scenario.item(i - 1).text()
+            for i in range(1, amount + 1)
         ]
         # clear list widget with scenario and write new ones
         self.list_widget_scenario.clear()
@@ -656,7 +661,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                 saving = self.filename, [self.list_ds, li], settings
                 pk_dump(saving, f, pk_HP)
         except FileNotFoundError:
-            self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
+            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
 
     def fun_update_combo_box_data_file(self, filename: str) -> None:
         """
@@ -882,11 +887,11 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.gui_structure.option_cp_dec.set_value(peak_cooling[11])
         # raise error and display error massage in status bar
         except FileNotFoundError:
-            self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
+            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
         except IndexError:
-            self.status_bar.showMessage(self.translations.ValueError, 5000)
+            self.status_bar.showMessage(self.translations.ValueError[self.gui_structure.option_language.get_value()], 5000)
         except KeyError:
-            self.status_bar.showMessage(self.translations.ColumnError, 5000)
+            self.status_bar.showMessage(self.translations.ColumnError[self.gui_structure.option_language.get_value()], 5000)
 
     def fun_load(self) -> None:
         """
@@ -894,9 +899,9 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         :return: None
         """
         # open interface and get file name
-        self.filename = QtWidgets_QFileDialog.getOpenFileName(self.central_widget,
-                                                              caption=self.translations.ChoosePKL[self.gui_structure.option_language.get_value()],
-                                                              filter="Pickle (*.pkl)")
+        self.filename = QtWidgets_QFileDialog.getOpenFileName(
+            self.central_widget, caption=self.translations.ChoosePKL[self.gui_structure.option_language.get_value()], filter="Pickle (*.pkl)"
+        )
         # load selected data
         self.fun_load_known_filename()
 
@@ -928,7 +933,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.checking: bool = True
         # if no file is found display error message is status bar
         except FileNotFoundError:
-            self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
+            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
 
     def fun_save_as(self) -> None:
         """
@@ -946,8 +951,9 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         """
         # ask for pickle file if the filename is still the default
         if self.filename == MainWindow.filenameDefault:
-            self.filename: tuple = QtWidgets_QFileDialog.getSaveFileName(self.central_widget, caption=self.translations.SavePKL[
-                self.gui_structure.option_language.get_value()], filter="Pickle (*.pkl)")
+            self.filename: tuple = QtWidgets_QFileDialog.getSaveFileName(
+                self.central_widget, caption=self.translations.SavePKL[self.gui_structure.option_language.get_value()], filter="Pickle (*.pkl)"
+            )
             # break function if no file is selected
             if self.filename == MainWindow.filenameDefault:
                 return False
@@ -971,7 +977,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             return True
         # show file not found message in status bar if an error appears
         except FileNotFoundError:
-            self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
+            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
             return False
 
     def fun_new(self) -> None:
@@ -1043,8 +1049,8 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             # rename remaining scenarios if the name has not be changed
             for i in range(idx, self.list_widget_scenario.count()):
                 item = self.list_widget_scenario.item(i)
-                if item.text() == f"{self.translations.scenarioString}: {i + 2}":
-                    item.setText(f"{self.translations.scenarioString}: {i + 1}")
+                if item.text() == f"{self.translations.scenarioString[self.gui_structure.option_language.get_value()]}: {i + 2}":
+                    item.setText(f"{self.translations.scenarioString[self.gui_structure.option_language.get_value()]}: {i + 1}")
             # select previous scenario then the deleted one but at least the first one
             self.list_widget_scenario.setCurrentRow(max(idx - 1, 0))
 
@@ -1058,7 +1064,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # append new scenario to List of DataStorages
         self.list_ds.append(DataStorageNew(self.gui_structure))
         # add new scenario name and item to list widget
-        self.list_widget_scenario.addItem(f"{self.translations.scenarioString}: {number + 1}")
+        self.list_widget_scenario.addItem(f"{self.translations.scenarioString[self.gui_structure.option_language.get_value()]}: {number + 1}")
         # select new list item
         self.list_widget_scenario.setCurrentRow(number)
         # run change function to mark unsaved inputs
@@ -1088,7 +1094,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.label_Status.hide()
             self.progressBar.hide()
             # show message that calculation is finished
-            self.status_bar.showMessage(self.translations.Calculation_Finished, 5000)
+            self.status_bar.showMessage(self.translations.Calculation_Finished[self.gui_structure.option_language.get_value()], 5000)
 
     def check_ghe_tool(self, finished: bool) -> None:
         """
@@ -1146,7 +1152,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # return to thermal demands page if no file is selected
         if any([i.fileSelected for i in self.list_ds]):
             self.gui_structure.page_thermal.button.click()
-            self.status_bar.showMessage(self.translations.NoFileSelected)
+            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()])
             return
         # disable buttons and actions to avoid two calculation at once
         self.pushButton_start_multiple.setEnabled(False)
@@ -1178,7 +1184,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # return to thermal demands page if no file is selected
         if self.list_ds[self.list_widget_scenario.currentRow()].fileSelected:
             self.gui_structure.page_thermal.button.click()
-            self.status_bar.showMessage(self.translations.NoFileSelected)
+            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()])
             return
         # disable buttons and actions to avoid two calculation at once
         self.pushButton_start_multiple.setEnabled(False)
@@ -1213,7 +1219,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         """
         # hide widgets if no list of scenarios exists and display not calculated text
         if not self.list_ds:
-            self.gui_structure.hint_depth.label.setText(self.translations.NotCalculated)
+            self.gui_structure.hint_depth.label.setText(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
             # self.label_WarningDepth.hide()
             self.gui_structure.option_show_legend.hide()
             self.gui_structure.function_save_results.hide()
@@ -1232,7 +1238,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         borefield: Borefield = ds.borefield
         # hide widgets if no results bore field exists and display not calculated text
         if borefield is None:
-            self.gui_structure.hint_depth.label.setText(self.translations.NotCalculated)
+            self.gui_structure.hint_depth.label.setText(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
             # self.label_WarningDepth.hide()
             self.gui_structure.option_show_legend.hide()
             self.gui_structure.function_save_results.hide()
@@ -1246,7 +1252,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         li_n_2 = [str(round(i[1], 2)) for i in borefield.combo]
         # hide widgets if no solution exists and display no solution text
         if (ds.aim_size_length and not li_size) or (ds.aim_req_depth and borefield.H == borefield.H_max):
-            self.gui_structure.hint_depth.label.setText(self.translations.NotCalculated)
+            self.gui_structure.hint_depth.label.setText(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
             # self.label_WarningDepth.hide()
             self.gui_structure.option_show_legend.hide()
             self.gui_structure.function_save_results.hide()
@@ -1292,7 +1298,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                 np_array(borefield.peak_cooling_external),
                 where="pre",
                 lw=1.5,
-                label=f"P {self.translations.PeakCooling}",
+                label=f"P {self.translations.PeakCooling[self.gui_structure.option_language.get_value()]}",
                 color="#54bceb",
             )
             ax.step(
@@ -1300,7 +1306,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                 np_array(borefield.peak_heating_external),
                 where="pre",
                 lw=1.5,
-                label=f"P {self.translations.PeakHeating}",
+                label=f"P {self.translations.PeakHeating[self.gui_structure.option_language.get_value()]}",
                 color="#ffc857",
             )
             ax2.step(
@@ -1310,7 +1316,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                 linestyle="dashed",
                 where="pre",
                 lw=1.5,
-                label=f"Q {self.translations.BaseCooling}",
+                label=f"Q {self.translations.BaseCooling[self.gui_structure.option_language.get_value()]}",
             )
             ax2.step(
                 np_array(time_array),
@@ -1328,10 +1334,10 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             ax.legend(facecolor=grey_color, loc="upper left")
             ax2.legend(facecolor=grey_color, loc="upper right")
             # set labels of axes
-            ax.set_xlabel(self.translations.X_Axis_Load, color="white")
-            ax.set_ylabel(self.translations.Y_Axis_Load_P, color="white")
-            ax2.set_xlabel(self.translations.X_Axis_Load, color="white")
-            ax2.set_ylabel(self.translations.Y_Axis_Load_Q, color="white")
+            ax.set_xlabel(self.translations.X_Axis_Load[self.gui_structure.option_language.get_value()], color="white")
+            ax.set_ylabel(self.translations.Y_Axis_Load_P[self.gui_structure.option_language.get_value()], color="white")
+            ax2.set_xlabel(self.translations.X_Axis_Load[self.gui_structure.option_language.get_value()], color="white")
+            ax2.set_ylabel(self.translations.Y_Axis_Load_Q[self.gui_structure.option_language.get_value()], color="white")
             # set axe colors
             ax.spines["bottom"].set_color("w")
             ax.spines["top"].set_color("w")
@@ -1348,19 +1354,19 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
 
             # create string for result explanation
             string_size: str = (
-                f"{self.translations.label_ResOptimizeLoad1}"
+                f"{self.translations.label_ResOptimizeLoad1[self.gui_structure.option_language.get_value()]}"
                 f"{int(max(borefield.hourly_heating_load)) - int(np.max(borefield.peak_heating_external))}"
                 f" / {int(max(borefield.hourly_cooling_load)) - int(np.max(borefield.peak_cooling_external))} kW\n"
-                f"{self.translations.label_ResOptimizeLoad2}{np.round(np.sum(borefield.baseload_heating), 2)} / "
+                f"{self.translations.label_ResOptimizeLoad2[self.gui_structure.option_language.get_value()]}{np.round(np.sum(borefield.baseload_heating), 2)} / "
                 f"{np.round(np.sum(borefield.baseload_cooling), 2)}   kWh\n"
-                f"{self.translations.label_ResOptimizeLoad3}"
+                f"{self.translations.label_ResOptimizeLoad3[self.gui_structure.option_language.get_value()]}"
                 f"{np.round(np.sum(borefield.baseload_heating) / np.sum(borefield.hourly_heating_load) * 100, 2)} / "
                 f"{np.round(np.sum(borefield.baseload_cooling) / np.sum(borefield.hourly_cooling_load) * 100, 2)} "
-                f"{self.translations.label_ResOptimizeLoad4}\n"
-                f"{self.translations.label_ResOptimizeLoad5}"
+                f"{self.translations.label_ResOptimizeLoad4[self.gui_structure.option_language.get_value()]}\n"
+                f"{self.translations.label_ResOptimizeLoad5[self.gui_structure.option_language.get_value()]}"
                 f"{int(np.max(borefield.peak_heating_external))} / "
                 f"{int(np.max(borefield.peak_cooling_external))} kW\n"
-                f"{self.translations.label_ResOptimizeLoad6}"
+                f"{self.translations.label_ResOptimizeLoad6[self.gui_structure.option_language.get_value()]}"
                 f"{np.round(-np.sum(borefield.baseload_heating) + np.sum(borefield.hourly_heating_load), 2)} / "
                 f"{np.round(-np.sum(borefield.baseload_cooling) + np.sum(borefield.hourly_cooling_load), 2)} kWh"
             )
@@ -1374,8 +1380,22 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             time_array = [i / 12 / 730.0 / 3600.0 for i in time_for_g_values]
             # plot Temperatures
             ax.step(np_array(time_array), np_array(t_b), "w-", where="pre", lw=1.5, label="Tb")
-            ax.step(np_array(time_array), np_array(results_peak_cooling), where="pre", lw=1.5, label=f"Tf {self.translations.PeakCooling}", color="#54bceb")
-            ax.step(np_array(time_array), np_array(results_peak_heating), where="pre", lw=1.5, label=f"Tf {self.translations.PeakHeating}", color="#ffc857")
+            ax.step(
+                np_array(time_array),
+                np_array(results_peak_cooling),
+                where="pre",
+                lw=1.5,
+                label=f"Tf {self.translations.PeakCooling[self.gui_structure.option_language.get_value()]}",
+                color="#54bceb",
+            )
+            ax.step(
+                np_array(time_array),
+                np_array(results_peak_heating),
+                where="pre",
+                lw=1.5,
+                label=f"Tf {self.translations.PeakHeating[self.gui_structure.option_language.get_value()]}",
+                color="#ffc857",
+            )
             # define temperature bounds
             ax.step(
                 np_array(time_array),
@@ -1384,7 +1404,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                 linestyle="dashed",
                 where="pre",
                 lw=1.5,
-                label=f"Tf {self.translations.BaseCooling}",
+                label=f"Tf {self.translations.BaseCooling[self.gui_structure.option_language.get_value()]}",
             )
             ax.step(
                 np_array(time_array),
@@ -1393,7 +1413,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                 linestyle="dashed",
                 where="pre",
                 lw=1.5,
-                label=f"Tf {self.translations.BaseHeating}",
+                label=f"Tf {self.translations.BaseHeating[self.gui_structure.option_language.get_value()]}",
             )
             ax.hlines(borefield.Tf_C, 0, ds.option_simu_period, colors="#ffc857", linestyles="dashed", label="", lw=1)
             ax.hlines(borefield.Tf_H, 0, ds.option_simu_period, colors="#54bceb", linestyles="dashed", label="", lw=1)
@@ -1403,8 +1423,8 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             # create legend
             ax.legend(facecolor=grey_color, loc="best")
             # set axes names
-            ax.set_xlabel(self.translations.X_Axis, color="white")
-            ax.set_ylabel(self.translations.Y_Axis, color="white")
+            ax.set_xlabel(self.translations.X_Axis[self.gui_structure.option_language.get_value()], color="white")
+            ax.set_ylabel(self.translations.Y_Axis[self.gui_structure.option_language.get_value()], color="white")
             # set colors
             ax.spines["bottom"].set_color("w")
             ax.spines["top"].set_color("w")
@@ -1413,12 +1433,12 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             ax.set_facecolor(grey_color)
             # create result display string
             string_size: str = (
-                f'{self.translations.label_Size}{"; ".join(li_size)} m \n'
-                f'{self.translations.label_Size_B}{"; ".join(li_b)} m \n'
-                f'{self.translations.label_Size_W}{"; ".join(li_n_1)} \n'
-                f'{self.translations.label_Size_L}{"; ".join(li_n_2)} \n'
+                f'{self.translations.label_Size[self.gui_structure.option_language.get_value()]}{"; ".join(li_size)} m \n'
+                f'{self.translations.label_Size_B[self.gui_structure.option_language.get_value()]}{"; ".join(li_b)} m \n'
+                f'{self.translations.label_Size_W[self.gui_structure.option_language.get_value()]}{"; ".join(li_n_1)} \n'
+                f'{self.translations.label_Size_L[self.gui_structure.option_language.get_value()]}{"; ".join(li_n_2)} \n'
                 if ds.aim_size_length
-                else f"{self.translations.label_Size}{round(borefield.H, 2)} m"
+                else f"{self.translations.label_Size[self.gui_structure.option_language.get_value()]}{round(borefield.H, 2)} m"
             )
             # not use axe 2
             ax2 = None
@@ -1466,11 +1486,12 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         :return: None
         """
         # get filename at storage place
-        filename = QtWidgets_QFileDialog.getSaveFileName(self.central_widget, caption=self.translations.SaveFigure[
-            self.gui_structure.option_language.get_value()], filter="png (*.png)")
+        filename = QtWidgets_QFileDialog.getSaveFileName(
+            self.central_widget, caption=self.translations.SaveFigure[self.gui_structure.option_language.get_value()], filter="png (*.png)"
+        )
         # display message and return if no file is selected
         if filename == MainWindow.filenameDefault:
-            self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
+            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
             return
         # save the figure
         self.fig.savefig(filename[0])
@@ -1484,11 +1505,12 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         from csv import writer as csv_writer
 
         # get filename at storage place
-        filename = QtWidgets_QFileDialog.getSaveFileName(self.central_widget, caption=self.translations.SaveData[
-            self.gui_structure.option_language.get_value()], filter="csv (*.csv)")
+        filename = QtWidgets_QFileDialog.getSaveFileName(
+            self.central_widget, caption=self.translations.SaveData[self.gui_structure.option_language.get_value()], filter="csv (*.csv)"
+        )
         # display message and return if no file is selected
         if filename == MainWindow.filenameDefault:
-            self.status_bar.showMessage(self.translations.NoFileSelected, 5000)
+            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
             return
         # get maximal simulation period
         simulation_time = max([i.option_simu_period for i in self.list_ds])
