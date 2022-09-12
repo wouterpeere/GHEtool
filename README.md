@@ -25,7 +25,7 @@ GHEtool also comes with a *graphical user interface (GUI)*. This GUI is prebuilt
 This graphical interface is made by Tobias Blanke from FH Aachen.
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/GHEtool/gui/GHEtool.PNG" width="600"></br>
+<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/GHEtool/gui/GHEtool.PNG" width="600">
   Screenshot of the GUI.
 </p>
 
