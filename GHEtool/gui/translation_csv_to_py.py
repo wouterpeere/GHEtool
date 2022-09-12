@@ -1,5 +1,7 @@
-from pandas import read_csv
 from os import system
+
+from pandas import read_csv
+
 df1 = read_csv('Translations.csv', sep=';', encoding='utf-8')
 
 file_name = 'translation_class.py'

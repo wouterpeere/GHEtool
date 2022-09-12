@@ -1,25 +1,11 @@
 from PySide6.QtCore import QMetaObject, QRect, QSize, Qt
 from PySide6.QtGui import QAction, QFont, QIcon
-from PySide6.QtWidgets import (
-    QAbstractItemView,
-    QAbstractScrollArea,
-    QFrame,
-    QHBoxLayout,
-    QLabel,
-    QListWidget,
-    QListWidgetItem,
-    QMenu,
-    QMenuBar,
-    QProgressBar,
-    QPushButton,
-    QSizePolicy,
-    QSpacerItem,
-    QStackedWidget,
-    QStatusBar,
-    QToolBar,
-    QVBoxLayout,
-    QWidget,
-)
+from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QFrame,
+                               QHBoxLayout, QLabel, QListWidget,
+                               QListWidgetItem, QMenu, QMenuBar, QProgressBar,
+                               QPushButton, QSizePolicy, QSpacerItem,
+                               QStackedWidget, QStatusBar, QToolBar,
+                               QVBoxLayout, QWidget)
 
 import GHEtool.gui.icons_rc
 

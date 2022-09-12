@@ -1,47 +1,48 @@
 from functools import partial as ft_partial
+from math import pi
 from os.path import dirname, realpath
 from os.path import split as os_split
+from pathlib import Path, PurePath
 from pickle import HIGHEST_PROTOCOL as pk_HP
 from pickle import dump as pk_dump
 from pickle import load as pk_load
 from sys import path
 from time import sleep
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, List, Optional, Tuple
 
+from numpy import cos, sin
 from PySide6.QtCore import QEvent as QtCore_QEvent
 from PySide6.QtCore import QModelIndex as QtCore_QModelIndex
 from PySide6.QtCore import QSize as QtCore_QSize
 from PySide6.QtCore import QThread as QtCore_QThread
 from PySide6.QtCore import Signal as QtCore_pyqtSignal
+from PySide6.QtGui import QAction as QtGui_QAction
+from PySide6.QtGui import QColor
 from PySide6.QtGui import QIcon as QtGui_QIcon
+from PySide6.QtGui import QPen
 from PySide6.QtGui import QPixmap as QtGui_QPixmap
 from PySide6.QtWidgets import QApplication as QtWidgets_QApplication
 from PySide6.QtWidgets import QDialog as QtWidgets_QDialog
 from PySide6.QtWidgets import QDoubleSpinBox as QtWidgets_QDoubleSpinBox
 from PySide6.QtWidgets import QFileDialog as QtWidgets_QFileDialog
-from PySide6.QtGui import QAction as QtGui_QAction
+from PySide6.QtWidgets import QGraphicsEllipseItem, QGraphicsScene
+from PySide6.QtWidgets import QGraphicsView as QtWidgets_QGraphicsView
 from PySide6.QtWidgets import QInputDialog as QtWidgets_QInputDialog
-from PySide6.QtWidgets import QListWidgetItem as QtWidgets_QListWidgetItem
 from PySide6.QtWidgets import QListWidget as QtWidgets_QListWidget
+from PySide6.QtWidgets import QListWidgetItem as QtWidgets_QListWidgetItem
 from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
 from PySide6.QtWidgets import QMenu as QtWidgets_QMenu
 from PySide6.QtWidgets import QMessageBox as QtWidgets_QMessageBox
 from PySide6.QtWidgets import QPushButton as QtWidgets_QPushButton
+from PySide6.QtWidgets import QSizePolicy, QSpacerItem
 from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
-from PySide6.QtWidgets import QGraphicsView as QtWidgets_QGraphicsView, QSpacerItem, QSizePolicy
-from math import pi
-from numpy import cos, sin
-from PySide6.QtWidgets import QGraphicsScene, QGraphicsEllipseItem
-from PySide6.QtGui import QColor, QPen
-from pathlib import Path, PurePath
 
+from GHEtool.gui.gui_calculation_thread import (BoundsOfPrecalculatedData,
+                                                CalcProblem)
 from GHEtool.gui.gui_data_storage import DataStorage
 from GHEtool.gui.gui_main_new import UiGhetool
-from GHEtool.gui.translation_class import Translations
 from GHEtool.gui.gui_structure import GuiStructure
-from GHEtool.gui.gui_calculation_thread import BoundsOfPrecalculatedData, CalcProblem
-
-from typing import List, Tuple
+from GHEtool.gui.translation_class import Translations
 
 if TYPE_CHECKING:
     from pandas import DataFrame as pd_DataFrame
@@ -393,7 +394,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         :return: None
         """
         # import math stuff
-        from math import pi, sin, cos, tan
+        from math import cos, pi, sin, tan
 
         n_u: int = self.gui_structure.option_pipe_number.get_value()  # get number of U pipes
         r_borehole: float = self.gui_structure.option_pipe_borehole_radius.get_value()  # get borehole radius
@@ -765,7 +766,9 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             df2: pd_DataFrame = pd_read_csv(filename, usecols=cols, sep=sep, decimal=dec)
             # ---------------------- Time Step Section  ----------------------
             # import pandas here to save start up time
-            from pandas import to_datetime as pd_to_datetime, date_range as pd_date_range, Series as pd_Series
+            from pandas import Series as pd_Series
+            from pandas import date_range as pd_date_range
+            from pandas import to_datetime as pd_to_datetime
 
             # Define start and end date
             start = pd_to_datetime("2019-01-01 00:00:00")
@@ -1203,9 +1206,10 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.canvas.hide() if self.canvas is not None else None
             return
         # import here to save start up time
-        from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
         import matplotlib.pyplot as plt
         from matplotlib import axes as matplotlib_axes
+        from matplotlib.backends.backend_qt5agg import \
+            FigureCanvasQTAgg as FigureCanvas
         from numpy import array as np_array
 
         # get Datastorage of selected scenario

@@ -1,7 +1,10 @@
-from PySide6.QtCore import QThread as QtCore_QThread, Signal as QtCore_pyqtSignal
 from pickle import load as pk_load
-from GHEtool.gui.gui_data_storage import DataStorage
 from typing import Tuple
+
+from PySide6.QtCore import QThread as QtCore_QThread
+from PySide6.QtCore import Signal as QtCore_pyqtSignal
+
+from GHEtool.gui.gui_data_storage import DataStorage
 
 
 class BoundsOfPrecalculatedData:

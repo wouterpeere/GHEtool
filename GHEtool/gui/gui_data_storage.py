@@ -1,7 +1,9 @@
-from GHEtool.gui.gui_structure import GuiStructure
-from GHEtool import Borefield, GroundData, FluidData, PipeData
 from typing import Optional
+
 import pandas as pd
+
+from GHEtool import Borefield, FluidData, GroundData, PipeData
+from GHEtool.gui.gui_structure import GuiStructure
 
 
 class DataStorage:
@@ -38,8 +40,8 @@ class DataStorage:
 
     def set_values(self, gui_structure: GuiStructure):
         [option.set_value(getattr(self, name)) for option, name in gui_structure.list_of_options]
+        [aim.widget.setChecked(False) for aim, _ in gui_structure.list_of_aims]
         [aim.widget.click() for aim, name in gui_structure.list_of_aims if getattr(self, name)]
-        [aim.widget.setChecked(getattr(self, name)) for aim, name in gui_structure.list_of_aims]
 
     def save(self):
         data = pd.DataFrame([(name, getattr(self, name)) for name in self.__dict__])
