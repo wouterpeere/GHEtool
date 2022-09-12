@@ -69,11 +69,10 @@ hint_oct;October;Oktober;Oktober;Ottobre;Octobre;Octubre;Outubro
 hint_nov;November;November;November;Novembre;Novembre;Noviembre;Novembro
 hint_dec;December;Dezember;December;Dicembre;Décembre;Diciembre;Decembro
 label_DataType;File type: ;Dateityp: ;Bestandstype: ;Tipo di fileImport: ;Type de fichier: ;Tipo de archivo: ;Tipo de ficheiro: 
-label_Filename;Filename: ;Dateiname: ;Bestandsnaam: ;Nome fileImport: ;Nom de fichier: ;Nombre de archivo: ;Nome de ficheiro: 
-label_SheetName;Sheet name: ;Tabellenblattname: ;Naam van het blad: ;Nome foglio:  ;Nom de la feuille: ;Nombre de hoja: ;Nome de folla: 
-pushButton_load;Load;Laden;Laad;Caricare;Chargement;Cargar;Cargar
-toolBoxFile;Data fileImport;Datendatei;Databestand;File dati;Fichier de données;Fichier de données;Fichier de données
-toolBoxDataLocation;Data location in fileImport;Speicherort der Daten in der Datei;Locatie van de data in bestand;Posizione dati nel fileImport;Emplacement des données dans le fichier;Data location in fileImport;Data location in fileImport
+option_seperator_csv;"Seperator in CSV-file:,Semicolon ';',Comma '++'";"Trenner in der CSV-Datei:,Semikolon ';',Komma '++'";"Scheidingsteken in CSV-file:,Puntkomma ';',Komma '++'";"Seperator in CSV-file:,Semicolon ';',Comma '++'";"Seperator in CSV-file:,Semicolon ';',Comma '++'";"Seperator in CSV-file:,Semicolon ';',Comma '++'";"Seperator in CSV-file:,Semicolon ';',Comma '++'"
+option_filename;Filename: ;Dateiname: ;Bestandsnaam: ;Nome fileImport: ;Nom de fichier: ;Nombre de archivo: ;Nome de ficheiro: 
+button_load_csv;Load;Laden;Laad;Caricare;Chargement;Cargar;Cargar
+option_decimal_csv;Decimal sign in CSV-file:,Point '.',Comma '++';Dezimalzeichen in CSV-Datei:,Punkt '.',Komma '++';Decimaal teken in de CSV-file:,Punt '.',Komma '++';Decimal sign in CSV-file:,Point '.',Comma '++';Decimal sign in CSV-file:,Point '.',Comma '++';Decimal sign in CSV-file:,Point '.',Comma '++';Decimal sign in CSV-file:,Point '.',Comma '++'
 label_dataColumn;Thermal demands: ;Thermische Lasten: ;Thermische vraag: ;Richieste termiche: ;Demande thermique: ;Cargas térmicas: ;Cargas térmicas: 
 label_DataUnit;Unit data: ;Dateneinheit: ;Eenheid data: ;Dati @dell'unità:  ;Données de l'unité: ;Datos de unidad: ;Datos de unidade: 
 label_HeatingLoadLine;Heating load line: ;Heizlastspalte: ;Belastingslijn verwarming: ;Linea di carico di riscaldamento: ;Ligne de charge de chauffage: ;Línea de carga de calefacción: ;Liña de carga de calefacción: 
@@ -81,8 +80,7 @@ label_CoolingLoadLine;Cooling load line: ;Kühllastspalte: ;Belastingslijn koeli
 label_combined;Load line: ;Load line: ;Belastingslijn: ;Linea di carico: ;Ligne de charge: ;Línea de carga: ;Liña de carga: 
 label_TimeStep;Time step: ;Zeitschritt: ;Tijdsstap: ;Passo temporale: ;Pas de temps: ;Paso temporal: ;Paso temporal: 
 label_DateLine;Date line: ;Datumsspalte: ;Datumlijn: ;Linea della data: ;Ligne de date: ;Línea de fecha: ;Liña de data: 
-comboBoxDataColumnList;['2 columns', '1 column'];['2 Spalten', '1 Spalte'];['2 kolommen', '1 kolom'];['2 colonne', '1 colonna'];['2 colonnes', '1 colonne'];['2 columnas', '1 columna'];['2 columnas', '1 columna']
-comboBoxTimeStepList;['1 hr.', '15 Min.', 'Automatic'];['1 Std.', '15 Min.', 'Automatisch'];['1 uur', '15 min.', 'Automatisch'];['1 Ora', '15 Min.', 'Automatico'];['1 Std.', '15 Min.', 'Automatique'];['1 hr.', '15 Min.', 'Automático'];['1 hr.', '15 Min.', 'Automático']
+option_column;Thermal demand in one or two columns?:,2 columns,1 column;Thermischer Bedarf einer oder zwei Spalten?:,2 Spalten,1 Spalte;Thermal demand in one or two columns?:,2 kolommen,1 kolom;Thermal demand in one or two columns?:,2 colonne,1 colonna;Thermal demand in one or two columns?:,2 colonnes,1 colonne;Thermal demand in one or two columns?:,2 columnas,1 columna;Thermal demand in one or two columns?:,2 columnas,1 columna
 pushButton_calculate;Calculate;Berechne;Bereken;Calcola;Calculer;Calcular;Calcular
 ErrorMassage;Error!;Fehler!;Error!;Errore!;Erreur!;Error!;Erro!
 UnableDataFormat;Unable to open selected data format!;Das ausgewählte Datenformat kann nicht geöffnet werden!;Het is niet mogelijk het geselecteerde dataformaat te openen!;Impossibile aprire il formato dati selezionato!;Impossible d'ouvrir le format de données sélectionné!;No se puede abrir el formato de datos seleccionado!;Non se pode abrir o formato de datos escollido!
@@ -102,9 +100,6 @@ checkBox_SizeBorefield;Size borefield by length and width;Dimensionierung des Bo
 label_Size_B;Borehole spacing: ;Bohrlochabstand: ;Boorgatspatiëring: ;Borehole spacing: ;Borehole spacing: ;Borehole spacing: ;Borehole spacing: 
 label_Size_L;Length of rectangular field: ;Länge des rechteckigen Feldes: ;Lengte van het rechthoekig veld: ;Length of rectangular field: ;Length of rectangular field: ;Length of rectangular field: ;Length of rectangular field: 
 label_Size_W;Width of rectangular field: ;Breite des rechteckigen Feldes: ;Breedte van het rechthoekig veld: ;Width of rectangular field: ;Width of rectangular field: ;Width of rectangular field: ;Width of rectangular field: 
-comboBoxSizeMethodList;['Fast', 'Robust'];['Schnell', 'Robust'];['Snel', 'Robuust'];['Fast', 'Robust'];['Fast', 'Robust'];['Fast', 'Robust'];['Fast', 'Robust']
-label_German;German;Deutsch;Duits;German;German;German;German
-label_English;English;Englisch;Engels;English;English;English;English
 label_New;New Project;Neues Projekt;Nieuw project;New Project;New Project;New Project;New Project
 label_Save;Save Project;Speichere Projekt;Bewaar project;Save Project;Save Project;Save Project;Save Project
 label_Open;Open Project;Öffne Projekt;Open project;Open Project;Open Project;Open Project;Open Project
@@ -127,7 +122,6 @@ label_StayScenario;Stay by scenario;Beim Szenario bleiben;Blijf bij scenario;Sta
 X_Axis_Load;Month of year;Monat des Jahres;Maand van het jaar;Month of year;Month of year;Month of year;Month of year
 Y_Axis_Load_P;Remaining peak thermal power [kW];Übriggebliebene Spitzenleistung [kW];Overblijvende piek [kW];Remaining peak thermal power [kW];Remaining peak thermal power [kW];Remaining peak thermal power [kW];Remaining peak thermal power [kW]
 Y_Axis_Load_Q;Remaining thermal energy [kWh];Übriggebliebene thermische Last [kWh];Overblijvende energie energy [kWh];Remaining thermal energy [kWh];Remaining thermal energy [kWh];Remaining thermal energy [kWh];Remaining thermal energy [kWh]
-label_aim;Aim of simulation;Ziel der Simulation;Doel van de berekening;Aim of simulation;Aim of simulation;Aim of simulation;Aim of simulation
 menuLanguage;Language;Sprache;Taal;Languange;Languange;Idiom;Lingua
 menuSettings;Settings;Einstellungen;Instellingen;Settings;Settings;Settings;Settings
 menuCalculation;Calculation;Berechnung;Berekening;Calculation;Calculation;Calculation;Calculation
@@ -148,9 +142,6 @@ label_aim_question;What is the purpose of the simulation?;Was ist das Ziel der S
 pushButton_PreviousResistance;  previous  ;  vorheriges  ;  vorige  ;  precedente  ;  précédente  ;  anterior  ;  anterior  
 pushButton_NextResistance;  next  ;  nächstes  ;  volgende  ;  successivo  ;  suivant  ;  siguiente  ;  seguinte  
 comboBox_AimList;['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile'];['Bestimme Temperaturprofil', 'Bestimme notwendige Tiefe', 'Dimensioniere Bohrfeld nach Länge und Breite', 'Optimiere Lastprofil'];['Bepaal temperatuursprofiel', 'Bepaal de benodigde diepte', 'Dimensioneer boorveld bij lengte en breedte', 'Optimaliseer belastingsprofiel'];['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile'];['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile'];['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile'];['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile']
-label_Seperator;Seperator in CSV-fileImport:;Trenner in der CSV-Datei:;Scheidingsteken in CSV-fileImport:;Seperator in CSV-fileImport:;Seperator in CSV-fileImport:;Seperator in CSV-fileImport:;Seperator in CSV-fileImport:
-label_SeperatorDataFile;Seperator in CSV-fileImport:;Trenner in der CSV-Datei:;Scheidingsteken in CSV-fileImport:;Seperator in CSV-fileImport:;Seperator in CSV-fileImport:;Seperator in CSV-fileImport:;Seperator in CSV-fileImport:
-comboBox_SeperatorList;"[""Semicolon ';'"", ""Comma ','""]";"[""Semikolon ';'"", ""Komma ','""]";"[""Puntkomma ';'"", ""Komma ','""]";"[""Semicolon ';'"", ""Comma ','""]";"[""Semicolon ';'"", ""Comma ','""]";"[""Semicolon ';'"", ""Comma ','""]";"[""Semicolon ';'"", ""Comma ','""]"
 label_data_file;Select data fileImport;Wähle Datendatei;Selecteer data fileImport;Select data fileImport;Select data fileImport;Select data fileImport;Select data fileImport
 label_Filename_2;Filename: ;Dateiname: ;Bestandsnaam: ;Nome fileImport: ;Nom de fichier: ;Nombre de archivo: ;Nome de ficheiro: 
 label_dataColumn_2;Thermal demands: ;Thermische Lasten: ;Thermische vraag: ;Richieste termiche: ;Demande thermique: ;Cargas térmicas: ;Cargas térmicas: 
@@ -190,6 +181,3 @@ label_ResOptimizeLoad6;The remaining heating / cooling load is: ;Die übrigbleib
 pushButton_start_single;Calculate current scenario;Berechne ausgewähltes Szenario;Bereken huidig scenario;Calculate current scenario;Calculate current scenario;Calculate current scenario;Calculate current scenario
 NotCalculated;Not calculated;Noch nicht berechnet;Niet berekend;Not calculated;Not calculated;Not calculated;Not calculated
 NoSolution;No Solution found;Keine Lösung gefunden;Geen oplossing gevonden;No Solution found;No Solution found;No Solution found;No Solution found
-comboBox_decimalList;"[""Point '.'"", ""Comma ','""]";"[""Punkt '.'"", ""Komma ','""]";"[""Punt '.'"", ""Komma ','""]";"[""Point '.'"", ""Comma ','""]";"[""Point '.'"", ""Comma ','""]";"[""Point '.'"", ""Comma ','""]";"[""Point '.'"", ""Comma ','""]"
-label_decimalDataFile;Decimal sign in CSV-fileImport:;Dezimalzeichen in CSV-Datei:;Decimaal teken in de CSV-fileImport:;Decimal sign in CSV-fileImport:;Decimal sign in CSV-fileImport:;Decimal sign in CSV-fileImport:;Decimal sign in CSV-fileImport:
-label_decimal;Decimal sign in CSV-fileImport:;Dezimalzeichen in CSV-Datei:;Decimaal teken in de CSV-fileImport:;Decimal sign in CSV-fileImport:;Decimal sign in CSV-fileImport:;Decimal sign in CSV-fileImport:;Decimal sign in CSV-fileImport:

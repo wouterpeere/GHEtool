@@ -143,7 +143,7 @@ class GuiStructure:
                                               entries=['Semicolon ";"', 'Comma ","'])
         self.option_decimal_csv = ButtonBox(default_parent, widget_name='button_decimal_csv', label='Decimal sign in CSV-file:', default_index=0,
                                             entries=['Point "."', 'Comma ","'])
-        self.filename = FileName(default_parent, 'filename', 'Filename: ', '', 'Choose csv file', 'error', status_bar)
+        self.option_filename = FileName(default_parent, 'filename', 'Filename: ', '', 'Choose csv file', 'error', status_bar)
         self.option_column = ButtonBox(default_parent, widget_name='button_column', label='Thermal demand in one or two columns: ', default_index=0,
                                        entries=['1 column', '2 columns'])
         self.option_heating_column = ListBox(default_parent, widget_name='button_heating_column', label='Heating load line: ', default_index=0, entries=[])
@@ -158,7 +158,7 @@ class GuiStructure:
         self.option_column.linked_options.append((self.option_heating_column, 1))
         self.option_column.linked_options.append((self.option_cooling_column, 1))
         self.category_select_file = Category(default_parent, obj_name='select_data', label='Select data file', list_of_options=[
-            self.option_seperator_csv, self.option_decimal_csv, self.filename, self.option_column, self.option_heating_column, self.option_cooling_column,
+            self.option_seperator_csv, self.option_decimal_csv, self.option_filename, self.option_column, self.option_heating_column, self.option_cooling_column,
             self.option_single_column, self.option_unit_data, self.button_load_csv])
 
         self.hint_none_1 = Hint(default_parent, 'hint_none_1', '  ')

@@ -73,11 +73,10 @@ class Translations:
         "hint_nov",
         "hint_dec",
         "label_DataType",
-        "label_Filename",
-        "label_SheetName",
-        "pushButton_load",
-        "toolBoxFile",
-        "toolBoxDataLocation",
+        "option_seperator_csv",
+        "option_filename",
+        "button_load_csv",
+        "option_decimal_csv",
         "label_dataColumn",
         "label_DataUnit",
         "label_HeatingLoadLine",
@@ -85,8 +84,7 @@ class Translations:
         "label_combined",
         "label_TimeStep",
         "label_DateLine",
-        "comboBoxDataColumnList",
-        "comboBoxTimeStepList",
+        "option_column",
         "pushButton_calculate",
         "ErrorMassage",
         "UnableDataFormat",
@@ -106,9 +104,6 @@ class Translations:
         "label_Size_B",
         "label_Size_L",
         "label_Size_W",
-        "comboBoxSizeMethodList",
-        "label_German",
-        "label_English",
         "label_New",
         "label_Save",
         "label_Open",
@@ -131,7 +126,6 @@ class Translations:
         "X_Axis_Load",
         "Y_Axis_Load_P",
         "Y_Axis_Load_Q",
-        "label_aim",
         "menuLanguage",
         "menuSettings",
         "menuCalculation",
@@ -152,9 +146,6 @@ class Translations:
         "pushButton_PreviousResistance",
         "pushButton_NextResistance",
         "comboBox_AimList",
-        "label_Seperator",
-        "label_SeperatorDataFile",
-        "comboBox_SeperatorList",
         "label_data_file",
         "label_Filename_2",
         "label_dataColumn_2",
@@ -194,9 +185,6 @@ class Translations:
         "pushButton_start_single",
         "NotCalculated",
         "NoSolution",
-        "comboBox_decimalList",
-        "label_decimalDataFile",
-        "label_decimal",
         "option_language",
     )
 
@@ -656,7 +644,16 @@ class Translations:
             "Tipo de archivo: ",
             "Tipo de ficheiro: ",
         ]
-        self.label_Filename: List[str] = [
+        self.option_seperator_csv: List[str] = [
+            "Seperator in CSV-file:,Semicolon ';',Comma '++'",
+            "Trenner in der CSV-Datei:,Semikolon ';',Komma '++'",
+            "Scheidingsteken in CSV-file:,Puntkomma ';',Komma '++'",
+            "Seperator in CSV-file:,Semicolon ';',Comma '++'",
+            "Seperator in CSV-file:,Semicolon ';',Comma '++'",
+            "Seperator in CSV-file:,Semicolon ';',Comma '++'",
+            "Seperator in CSV-file:,Semicolon ';',Comma '++'",
+        ]
+        self.option_filename: List[str] = [
             "Filename: ",
             "Dateiname: ",
             "Bestandsnaam: ",
@@ -665,33 +662,15 @@ class Translations:
             "Nombre de archivo: ",
             "Nome de ficheiro: ",
         ]
-        self.label_SheetName: List[str] = [
-            "Sheet name: ",
-            "Tabellenblattname: ",
-            "Naam van het blad: ",
-            "Nome foglio:  ",
-            "Nom de la feuille: ",
-            "Nombre de hoja: ",
-            "Nome de folla: ",
-        ]
-        self.pushButton_load: List[str] = ["Load", "Laden", "Laad", "Caricare", "Chargement", "Cargar", "Cargar"]
-        self.toolBoxFile: List[str] = [
-            "Data fileImport",
-            "Datendatei",
-            "Databestand",
-            "File dati",
-            "Fichier de données",
-            "Fichier de données",
-            "Fichier de données",
-        ]
-        self.toolBoxDataLocation: List[str] = [
-            "Data location in fileImport",
-            "Speicherort der Daten in der Datei",
-            "Locatie van de data in bestand",
-            "Posizione dati nel fileImport",
-            "Emplacement des données dans le fichier",
-            "Data location in fileImport",
-            "Data location in fileImport",
+        self.button_load_csv: List[str] = ["Load", "Laden", "Laad", "Caricare", "Chargement", "Cargar", "Cargar"]
+        self.option_decimal_csv: List[str] = [
+            "Decimal sign in CSV-file:,Point '.',Comma '++'",
+            "Dezimalzeichen in CSV-Datei:,Punkt '.',Komma '++'",
+            "Decimaal teken in de CSV-file:,Punt '.',Komma '++'",
+            "Decimal sign in CSV-file:,Point '.',Comma '++'",
+            "Decimal sign in CSV-file:,Point '.',Comma '++'",
+            "Decimal sign in CSV-file:,Point '.',Comma '++'",
+            "Decimal sign in CSV-file:,Point '.',Comma '++'",
         ]
         self.label_dataColumn: List[str] = [
             "Thermal demands: ",
@@ -756,23 +735,14 @@ class Translations:
             "Línea de fecha: ",
             "Liña de data: ",
         ]
-        self.comboBoxDataColumnList: List[str] = [
-            "['2 columns', '1 column']",
-            "['2 Spalten', '1 Spalte']",
-            "['2 kolommen', '1 kolom']",
-            "['2 colonne', '1 colonna']",
-            "['2 colonnes', '1 colonne']",
-            "['2 columnas', '1 columna']",
-            "['2 columnas', '1 columna']",
-        ]
-        self.comboBoxTimeStepList: List[str] = [
-            "['1 hr.', '15 Min.', 'Automatic']",
-            "['1 Std.', '15 Min.', 'Automatisch']",
-            "['1 uur', '15 min.', 'Automatisch']",
-            "['1 Ora', '15 Min.', 'Automatico']",
-            "['1 Std.', '15 Min.', 'Automatique']",
-            "['1 hr.', '15 Min.', 'Automático']",
-            "['1 hr.', '15 Min.', 'Automático']",
+        self.option_column: List[str] = [
+            "Thermal demand in one or two columns?:,2 columns,1 column",
+            "Thermischer Bedarf einer oder zwei Spalten?:,2 Spalten,1 Spalte",
+            "Thermal demand in one or two columns?:,2 kolommen,1 kolom",
+            "Thermal demand in one or two columns?:,2 colonne,1 colonna",
+            "Thermal demand in one or two columns?:,2 colonnes,1 colonne",
+            "Thermal demand in one or two columns?:,2 columnas,1 columna",
+            "Thermal demand in one or two columns?:,2 columnas,1 columna",
         ]
         self.pushButton_calculate: List[str] = ["Calculate", "Berechne", "Bereken", "Calcola", "Calculer", "Calcular", "Calcular"]
         self.ErrorMassage: List[str] = ["Error!", "Fehler!", "Error!", "Errore!", "Erreur!", "Error!", "Erro!"]
@@ -929,17 +899,6 @@ class Translations:
             "Width of rectangular field: ",
             "Width of rectangular field: ",
         ]
-        self.comboBoxSizeMethodList: List[str] = [
-            "['Fast', 'Robust']",
-            "['Schnell', 'Robust']",
-            "['Snel', 'Robuust']",
-            "['Fast', 'Robust']",
-            "['Fast', 'Robust']",
-            "['Fast', 'Robust']",
-            "['Fast', 'Robust']",
-        ]
-        self.label_German: List[str] = ["German", "Deutsch", "Duits", "German", "German", "German", "German"]
-        self.label_English: List[str] = ["English", "Englisch", "Engels", "English", "English", "English", "English"]
         self.label_New: List[str] = ["New Project", "Neues Projekt", "Nieuw project", "New Project", "New Project", "New Project", "New Project"]
         self.label_Save: List[str] = ["Save Project", "Speichere Projekt", "Bewaar project", "Save Project", "Save Project", "Save Project", "Save Project"]
         self.label_Open: List[str] = ["Open Project", "Öffne Projekt", "Open project", "Open Project", "Open Project", "Open Project", "Open Project"]
@@ -1058,15 +1017,6 @@ class Translations:
             "Remaining thermal energy [kWh]",
             "Remaining thermal energy [kWh]",
         ]
-        self.label_aim: List[str] = [
-            "Aim of simulation",
-            "Ziel der Simulation",
-            "Doel van de berekening",
-            "Aim of simulation",
-            "Aim of simulation",
-            "Aim of simulation",
-            "Aim of simulation",
-        ]
         self.menuLanguage: List[str] = ["Language", "Sprache", "Taal", "Languange", "Languange", "Idiom", "Lingua"]
         self.menuSettings: List[str] = ["Settings", "Einstellungen", "Instellingen", "Settings", "Settings", "Settings", "Settings"]
         self.menuCalculation: List[str] = ["Calculation", "Berechnung", "Berekening", "Calculation", "Calculation", "Calculation", "Calculation"]
@@ -1166,33 +1116,6 @@ class Translations:
             "['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile']",
             "['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile']",
             "['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile']",
-        ]
-        self.label_Seperator: List[str] = [
-            "Seperator in CSV-fileImport:",
-            "Trenner in der CSV-Datei:",
-            "Scheidingsteken in CSV-fileImport:",
-            "Seperator in CSV-fileImport:",
-            "Seperator in CSV-fileImport:",
-            "Seperator in CSV-fileImport:",
-            "Seperator in CSV-fileImport:",
-        ]
-        self.label_SeperatorDataFile: List[str] = [
-            "Seperator in CSV-fileImport:",
-            "Trenner in der CSV-Datei:",
-            "Scheidingsteken in CSV-fileImport:",
-            "Seperator in CSV-fileImport:",
-            "Seperator in CSV-fileImport:",
-            "Seperator in CSV-fileImport:",
-            "Seperator in CSV-fileImport:",
-        ]
-        self.comboBox_SeperatorList: List[str] = [
-            "[\"Semicolon ';'\", \"Comma ','\"]",
-            "[\"Semikolon ';'\", \"Komma ','\"]",
-            "[\"Puntkomma ';'\", \"Komma ','\"]",
-            "[\"Semicolon ';'\", \"Comma ','\"]",
-            "[\"Semicolon ';'\", \"Comma ','\"]",
-            "[\"Semicolon ';'\", \"Comma ','\"]",
-            "[\"Semicolon ';'\", \"Comma ','\"]",
         ]
         self.label_data_file: List[str] = [
             "Select data fileImport",
@@ -1520,31 +1443,4 @@ class Translations:
             "No Solution found",
             "No Solution found",
             "No Solution found",
-        ]
-        self.comboBox_decimalList: List[str] = [
-            "[\"Point '.'\", \"Comma ','\"]",
-            "[\"Punkt '.'\", \"Komma ','\"]",
-            "[\"Punt '.'\", \"Komma ','\"]",
-            "[\"Point '.'\", \"Comma ','\"]",
-            "[\"Point '.'\", \"Comma ','\"]",
-            "[\"Point '.'\", \"Comma ','\"]",
-            "[\"Point '.'\", \"Comma ','\"]",
-        ]
-        self.label_decimalDataFile: List[str] = [
-            "Decimal sign in CSV-fileImport:",
-            "Dezimalzeichen in CSV-Datei:",
-            "Decimaal teken in de CSV-fileImport:",
-            "Decimal sign in CSV-fileImport:",
-            "Decimal sign in CSV-fileImport:",
-            "Decimal sign in CSV-fileImport:",
-            "Decimal sign in CSV-fileImport:",
-        ]
-        self.label_decimal: List[str] = [
-            "Decimal sign in CSV-fileImport:",
-            "Dezimalzeichen in CSV-Datei:",
-            "Decimaal teken in de CSV-fileImport:",
-            "Decimal sign in CSV-fileImport:",
-            "Decimal sign in CSV-fileImport:",
-            "Decimal sign in CSV-fileImport:",
-            "Decimal sign in CSV-fileImport:",
         ]

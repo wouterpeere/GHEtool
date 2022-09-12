@@ -230,7 +230,7 @@ class ButtonBox(Option):
         self.label_text = entry_name[0]
         self.label.setText(self.label_text)
         for button, button_name in zip(self.widget, entry_name[1:]):
-            button.setText(button_name)
+            button.setText(f" {button_name.replace('++', ',')} ")
 
     def create_widget(self, frame: qt_w.QFrame, layout_parent: qt_w.QLayout, row: int = None, column: int = None) -> None:
         layout = self.create_frame(frame, layout_parent)

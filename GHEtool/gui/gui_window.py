@@ -221,7 +221,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.gui_structure.function_save_results.button.clicked.connect(self.save_data)
         self.gui_structure.option_seperator_csv.change_event(self.fun_update_combo_box_data_file)
         self.gui_structure.option_decimal_csv.change_event(self.fun_update_combo_box_data_file)
-        self.gui_structure.filename.change_event(self.fun_update_combo_box_data_file)
+        self.gui_structure.option_filename.change_event(self.fun_update_combo_box_data_file)
         self.gui_structure.option_auto_saving.change_event(self.change_auto_save)
         self.gui_structure.option_show_legend.change_event(self.check_legend)
         self.gui_structure.option_depth.change_event(self.check_bounds)
@@ -760,7 +760,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         """
         try:
             # get filename from line edit
-            filename: str = self.gui_structure.filename.get_value()
+            filename: str = self.gui_structure.option_filename.get_value()
             # raise error if no filename exists
             if filename == "":
                 raise FileNotFoundError
