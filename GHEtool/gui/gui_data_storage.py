@@ -4,7 +4,7 @@ from typing import Optional
 import pandas as pd
 
 
-class DataStorageNew:
+class DataStorage:
 
     def __init__(self, gui_structure: GuiStructure):
         for option, name in gui_structure.list_of_options:
@@ -34,13 +34,12 @@ class DataStorageNew:
                                             self.option_pipe_conductivity, self.option_pipe_distance, self.option_pipe_borehole_radius,
                                             self.option_pipe_number, self.option_pipe_roughness, self.option_pipe_depth)
         # check if a file for optimizing the load profile has been selected
-        self.fileSelected: bool = (self.aim_optimize and self.filename == '')
+        self.fileSelected: bool = (self.aim_optimize and self.option_filename == '')
 
     def set_values(self, gui_structure: GuiStructure):
-        for option, name in gui_structure.list_of_options:
-            option.set_value(getattr(self, name))
-        for aim, name in gui_structure.list_of_aims:
-            aim.widget.setChecked(getattr(self, name))
+        [option.set_value(getattr(self, name)) for option, name in gui_structure.list_of_options]
+        [aim.widget.click() for aim, name in gui_structure.list_of_aims if getattr(self, name)]
+        [aim.widget.setChecked(getattr(self, name)) for aim, name in gui_structure.list_of_aims]
 
     def save(self):
         data = pd.DataFrame([(name, getattr(self, name)) for name in self.__dict__])
@@ -53,7 +52,7 @@ class DataStorageNew:
         :return: boolean which is true if self has the same values as other
         """
         # if not of same class return false
-        if not isinstance(other, DataStorageNew):
+        if not isinstance(other, DataStorage):
             return False
         # compare all slot values if one not match return false
         for i in self.list_options_aims:

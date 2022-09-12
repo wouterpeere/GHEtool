@@ -18,6 +18,171 @@ def update_opponent(button: qt_w.QPushButton, button_opponent: qt_w.QPushButton,
             false_button.setChecked(False)
 
 
+class Page:
+    def __init__(self, default_parent: qt_w.QWidget, obj_name: str, name: str, button_name: str, icon: str, list_categories: List[Category]):
+        self.obj_name: str = obj_name
+        self.name: str = name
+        self.button_name: str = button_name
+        self.icon: str = icon
+        self.list_categories: List[Category] = list_categories
+        self.button: qt_w.QPushButton = qt_w.QPushButton(default_parent)
+        self.label: qt_w.QLabel = qt_w.QLabel(default_parent)
+        self.label_gap: qt_w.QLabel = qt_w.QLabel(default_parent)
+        self.page: qt_w.QWidget = qt_w.QWidget(default_parent)
+        self.previous_page: Optional[Page] = None
+        self.next_page: Optional[Page] = None
+        self.upper_frame: Optional[List[Union[Aim, Option, Category]]] = None
+
+    def set_text(self, name: str):
+        entry_name: List[str, str] = name.split(',')
+        self.name = entry_name[1]
+        self.button_name = entry_name[0].replace('@', '\n')
+        self.label.setText(self.name)
+        self.button.setText(self.button_name)
+
+    def set_previous_page(self, previous_page: Page):
+        self.previous_page = previous_page
+
+    def set_next_page(self, next_page: Page):
+        self.next_page = next_page
+
+    def set_upper_frame(self, options: List[Union[Aim, Option, Category]]):
+        self.upper_frame: List[Union[Aim, Option, Category]] = options
+
+    def create_page(self, central_widget: qt_w.QWidget, stacked_widget: qt_w.QStackedWidget, vertical_layout_menu: qt_w.QVBoxLayout):
+        self.page.setParent(central_widget)
+        self.page.setObjectName(f"page_{self.obj_name}")
+        layout = qt_w.QVBoxLayout(self.page)
+        layout.setSpacing(0)
+        self.label.setParent(central_widget)
+        label: qt_w.QLabel = self.label
+        label.setObjectName(f"label_{self.obj_name}")
+        label.setStyleSheet('font: 63 16pt "Lexend SemiBold";')
+        label.setText(self.name)
+        layout.addWidget(label)
+        spacer_label = qt_w.QLabel(self.page)
+        spacer_label.setMinimumHeight(6)
+        spacer_label.setMaximumHeight(6)
+        layout.addWidget(spacer_label)
+        scroll_area = qt_w.QScrollArea(self.page)
+        scroll_area.setObjectName(f"scrollArea_{self.obj_name}")
+        scroll_area.setFrameShape(qt_w.QFrame.NoFrame)
+        scroll_area.setLineWidth(0)
+        scroll_area.setWidgetResizable(True)
+        scroll_area_content = qt_w.QWidget()
+        scroll_area_content.setObjectName(f"scrollAreaWidgetContents_{self.obj_name}")
+        scroll_area_content.setGeometry(qt_c.QRect(0, 0, 864, 695))
+        scroll_area.setWidget(scroll_area_content)
+        layout.addWidget(scroll_area)
+        scroll_area_layout = qt_w.QVBoxLayout(scroll_area_content)
+        scroll_area_layout.setSpacing(0)
+        scroll_area_layout.setObjectName(f"scroll_area_layout_{self.obj_name}")
+        scroll_area_layout.setContentsMargins(0, 0, 0, 0)
+        stacked_widget.addWidget(self.page)
+        if self.upper_frame is not None:
+            upper_frame = qt_w.QFrame(scroll_area_content)
+            upper_frame.setStyleSheet(
+                "QFrame {\n"
+                f"	border: 1px solid {LIGHT};\n"
+                "	border-top-left-radius: 15px;\n"
+                "	border-top-right-radius: 15px;\n"
+                "	border-bottom-left-radius: 15px;\n"
+                "	border-bottom-right-radius: 15px;\n"
+                "}\n"
+                f"QLabel{'{'}border: 0px solid {WHITE};{'}'}"
+            )
+            upper_frame.setFrameShape(qt_w.QFrame.StyledPanel)
+            upper_frame.setFrameShadow(qt_w.QFrame.Raised)
+            upper_frame.setSizePolicy(qt_w.QSizePolicy.Minimum, qt_w.QSizePolicy.Minimum)
+            grid_layout = qt_w.QGridLayout(upper_frame)
+            grid_layout.setVerticalSpacing(6)
+            grid_layout.setHorizontalSpacing(6)
+            scroll_area_layout.addWidget(upper_frame)
+            for idx, option in enumerate(self.upper_frame):
+                if isinstance(option, Aim):
+                    option.create_widget(upper_frame, grid_layout, idx)
+                    continue
+                option.create_widget(upper_frame, grid_layout)
+
+            list_aims: List[Aim] = [aim for aim in self.upper_frame if isinstance(aim, Aim)]
+            if list_aims:
+                for idx, aim in enumerate(list_aims):
+                    default_value = 1 if idx == 0 else 0
+                    aim.widget.clicked.connect(
+                        ft_partial(
+                            update_opponent,
+                            aim.widget,
+                            list_aims[default_value].widget,
+                            [wid.widget for i, wid in enumerate(list_aims) if i not in [idx, default_value]],
+                        )
+                    )
+                    aim.widget.clicked.connect(ft_partial(check_aim_options, list_aims))
+                list_aims[0].widget.click()
+
+        for category in self.list_categories:
+            category.create_widget(scroll_area_content, scroll_area_layout)
+
+        spacer = qt_w.QSpacerItem(1, 1, qt_w.QSizePolicy.Minimum, qt_w.QSizePolicy.Expanding)
+        scroll_area_layout.addItem(spacer)
+
+        self.create_links_to_other_pages(central_widget, layout)
+
+        self.button.setParent(central_widget)
+        self.button.setObjectName(f"pushButton_General_{self.obj_name}")
+        self.button.setMinimumSize(qt_c.QSize(100, 100))
+        icon23 = qt_g.QIcon()
+        icon23.addFile(self.icon, qt_c.QSize(), qt_g.QIcon.Normal, qt_g.QIcon.Off)
+        self.button.setIcon(icon23)
+        self.button.setIconSize(qt_c.QSize(24, 24))
+        self.button.setText(self.button_name)
+        self.label_gap.setParent(central_widget)
+        self.label_gap.setMinimumSize(qt_c.QSize(0, 6))
+        self.label_gap.setMaximumSize(qt_c.QSize(16777215, 6))
+
+        vertical_layout_menu.addWidget(self.button)
+        vertical_layout_menu.addWidget(self.label_gap)
+        self.button.clicked.connect(ft_partial(stacked_widget.setCurrentWidget, self.page))
+
+    def create_links_to_other_pages(self, central_widget: qt_w.QWidget, scroll_area_layout: qt_w.QVBoxLayout):
+        if self.previous_page is None and self.next_page is None:
+            return
+
+        horizontal_layout = qt_w.QHBoxLayout(central_widget)
+
+        if self.previous_page is not None:
+            push_button_previous = qt_w.QPushButton(central_widget)
+            push_button_previous.setMinimumSize(qt_c.QSize(0, 30))
+            push_button_previous.setMaximumSize(qt_c.QSize(16777215, 30))
+            icon = qt_g.QIcon()
+            icon.addFile(":/icons/icons/ArrowLeft2.svg", qt_c.QSize(), qt_g.QIcon.Normal, qt_g.QIcon.Off)
+            push_button_previous.setIcon(icon)
+            push_button_previous.setIconSize(qt_c.QSize(20, 20))
+            push_button_previous.setText("  previous  ")
+
+            horizontal_layout.addWidget(push_button_previous)
+            push_button_previous.clicked.connect(self.previous_page.button.click)
+
+        horizontal_spacer = qt_w.QSpacerItem(1, 1, qt_w.QSizePolicy.Expanding, qt_w.QSizePolicy.Minimum)
+
+        horizontal_layout.addItem(horizontal_spacer)
+        if self.next_page is not None:
+            push_button_next = qt_w.QPushButton(central_widget)
+            push_button_next.setMinimumSize(qt_c.QSize(0, 30))
+            push_button_next.setMaximumSize(qt_c.QSize(16777215, 30))
+            push_button_next.setLayoutDirection(qt_c.Qt.RightToLeft)
+            icon = qt_g.QIcon()
+            icon.addFile(":/icons/icons/ArrowRight2.svg", qt_c.QSize(), qt_g.QIcon.Normal, qt_g.QIcon.Off)
+            push_button_next.setIcon(icon)
+            push_button_next.setIconSize(qt_c.QSize(20, 20))
+            push_button_next.setText("  next  ")
+
+            horizontal_layout.addWidget(push_button_next)
+            push_button_next.clicked.connect(self.next_page.button.click)
+
+        scroll_area_layout.addLayout(horizontal_layout)
+
+
+
 class Option(metaclass=abc.ABCMeta):
     def __init__(self, default_parent: qt_w.QWidget, widget_name: str, label: str, default_value: Union[bool, int, float, str]):
 
@@ -41,6 +206,14 @@ class Option(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def create_widget(self, frame: qt_w.QFrame, layout: qt_w.QLayout, row: int = None, column: int = None) -> None:
         pass
+
+    @abc.abstractmethod
+    def _init_links(self) -> None:
+        pass
+
+    def init_links(self) -> None:
+        if self.linked_options:
+            self._init_links()
 
     def set_text(self, name: str):
         self.label_text = name
@@ -126,6 +299,11 @@ class DoubleValue(Option):
     def set_value(self, value: float) -> None:
         self.widget.setValue(value)
 
+    def _init_links(self) -> None:
+        current_value: float = self.get_value()
+        self.set_value(current_value*1.1)
+        self.set_value(current_value)
+
     def change_event(self, function_to_be_called: Callable) -> None:
         self.widget.valueChanged.connect(function_to_be_called)
 
@@ -167,11 +345,16 @@ class IntValue(Option):
         self.step: int = step
         self.widget: qt_w.QSpinBox = qt_w.QSpinBox(default_parent)
 
-    def get_value(self) -> float:
+    def get_value(self) -> int:
         return self.widget.value()
 
     def set_value(self, value: int) -> None:
         self.widget.setValue(value)
+
+    def _init_links(self) -> None:
+        current_value: int = self.get_value()
+        self.set_value(self.minimal_value if current_value == self.minimal_value else self.minimal_value)
+        self.set_value(current_value)
 
     def change_event(self, function_to_be_called: Callable) -> None:
         self.widget.valueChanged.connect(function_to_be_called)
@@ -220,6 +403,11 @@ class ButtonBox(Option):
                 if not button.isChecked():
                     button.click()
                 break
+
+    def _init_links(self) -> None:
+        current_value: int = self.get_value()
+        self.set_value(0 if current_value != 0 else 1)
+        self.set_value(current_value)
 
     def change_event(self, function_to_be_called: Callable) -> None:
         for button in self.widget:
@@ -284,11 +472,16 @@ class ListBox(Option):
         self.entries: List[str] = entries
         self.widget: qt_w.QComboBox = qt_w.QComboBox(default_parent)
 
-    def get_value(self) -> float:
+    def get_value(self) -> int:
         return self.widget.currentIndex()
 
     def set_value(self, index: int) -> None:
         self.widget.setCurrentIndex(index)
+
+    def _init_links(self) -> None:
+        current_value: int = self.get_value()
+        self.set_value(0 if current_value != 0 else 1)
+        self.set_value(current_value)
 
     def change_event(self, function_to_be_called: Callable) -> None:
         self.widget.currentIndexChanged.connect(function_to_be_called)
@@ -336,6 +529,11 @@ class FileName(Option):
 
     def set_value(self, filename: str) -> None:
         self.widget.setText(filename)
+
+    def _init_links(self) -> None:
+        current_value: str = self.get_value()
+        self.set_value('test')
+        self.set_value(current_value)
 
     def change_event(self, function_to_be_called: Callable) -> None:
         self.widget.textChanged.connect(function_to_be_called)
@@ -634,166 +832,3 @@ def check_aim_options(list_aim: List[Aim]):
                 continue
             option.show()
 
-
-class Page:
-    def __init__(self, default_parent: qt_w.QWidget, obj_name: str, name: str, button_name: str, icon: str, list_categories: List[Category]):
-        self.obj_name: str = obj_name
-        self.name: str = name
-        self.button_name: str = button_name
-        self.icon: str = icon
-        self.list_categories: List[Category] = list_categories
-        self.button: qt_w.QPushButton = qt_w.QPushButton(default_parent)
-        self.label: qt_w.QLabel = qt_w.QLabel(default_parent)
-        self.label_gap: qt_w.QLabel = qt_w.QLabel(default_parent)
-        self.page: qt_w.QWidget = qt_w.QWidget(default_parent)
-        self.previous_page: Optional[Page] = None
-        self.next_page: Optional[Page] = None
-        self.upper_frame: Optional[List[Union[Aim, Option, Category]]] = None
-
-    def set_text(self, name: str):
-        entry_name: List[str, str] = name.split(',')
-        self.name = entry_name[1]
-        self.button_name = entry_name[0].replace('@', '\n')
-        self.label.setText(self.name)
-        self.button.setText(self.button_name)
-
-    def set_previous_page(self, previous_page: Page):
-        self.previous_page = previous_page
-
-    def set_next_page(self, next_page: Page):
-        self.next_page = next_page
-
-    def set_upper_frame(self, options: List[Union[Aim, Option, Category]]):
-        self.upper_frame: List[Union[Aim, Option, Category]] = options
-
-    def create_page(self, central_widget: qt_w.QWidget, stacked_widget: qt_w.QStackedWidget, vertical_layout_menu: qt_w.QVBoxLayout):
-        self.page.setParent(central_widget)
-        self.page.setObjectName(f"page_{self.obj_name}")
-        layout = qt_w.QVBoxLayout(self.page)
-        layout.setSpacing(0)
-        self.label.setParent(central_widget)
-        label: qt_w.QLabel = self.label
-        label.setObjectName(f"label_{self.obj_name}")
-        label.setStyleSheet('font: 63 16pt "Lexend SemiBold";')
-        label.setText(self.name)
-        layout.addWidget(label)
-        spacer_label = qt_w.QLabel(self.page)
-        spacer_label.setMinimumHeight(6)
-        spacer_label.setMaximumHeight(6)
-        layout.addWidget(spacer_label)
-        scroll_area = qt_w.QScrollArea(self.page)
-        scroll_area.setObjectName(f"scrollArea_{self.obj_name}")
-        scroll_area.setFrameShape(qt_w.QFrame.NoFrame)
-        scroll_area.setLineWidth(0)
-        scroll_area.setWidgetResizable(True)
-        scroll_area_content = qt_w.QWidget()
-        scroll_area_content.setObjectName(f"scrollAreaWidgetContents_{self.obj_name}")
-        scroll_area_content.setGeometry(qt_c.QRect(0, 0, 864, 695))
-        scroll_area.setWidget(scroll_area_content)
-        layout.addWidget(scroll_area)
-        scroll_area_layout = qt_w.QVBoxLayout(scroll_area_content)
-        scroll_area_layout.setSpacing(0)
-        scroll_area_layout.setObjectName(f"scroll_area_layout_{self.obj_name}")
-        scroll_area_layout.setContentsMargins(0, 0, 0, 0)
-        stacked_widget.addWidget(self.page)
-        if self.upper_frame is not None:
-            upper_frame = qt_w.QFrame(scroll_area_content)
-            upper_frame.setStyleSheet(
-                "QFrame {\n"
-                f"	border: 1px solid {LIGHT};\n"
-                "	border-top-left-radius: 15px;\n"
-                "	border-top-right-radius: 15px;\n"
-                "	border-bottom-left-radius: 15px;\n"
-                "	border-bottom-right-radius: 15px;\n"
-                "}\n"
-                f"QLabel{'{'}border: 0px solid {WHITE};{'}'}"
-            )
-            upper_frame.setFrameShape(qt_w.QFrame.StyledPanel)
-            upper_frame.setFrameShadow(qt_w.QFrame.Raised)
-            upper_frame.setSizePolicy(qt_w.QSizePolicy.Minimum, qt_w.QSizePolicy.Minimum)
-            grid_layout = qt_w.QGridLayout(upper_frame)
-            grid_layout.setVerticalSpacing(6)
-            grid_layout.setHorizontalSpacing(6)
-            scroll_area_layout.addWidget(upper_frame)
-            for idx, option in enumerate(self.upper_frame):
-                if isinstance(option, Aim):
-                    option.create_widget(upper_frame, grid_layout, idx)
-                    continue
-                option.create_widget(upper_frame, grid_layout)
-
-            list_aims: List[Aim] = [aim for aim in self.upper_frame if isinstance(aim, Aim)]
-            if list_aims:
-                for idx, aim in enumerate(list_aims):
-                    default_value = 1 if idx == 0 else 0
-                    aim.widget.clicked.connect(
-                        ft_partial(
-                            update_opponent,
-                            aim.widget,
-                            list_aims[default_value].widget,
-                            [wid.widget for i, wid in enumerate(list_aims) if i not in [idx, default_value]],
-                        )
-                    )
-                    aim.widget.clicked.connect(ft_partial(check_aim_options, list_aims))
-                list_aims[0].widget.click()
-
-        for category in self.list_categories:
-            category.create_widget(scroll_area_content, scroll_area_layout)
-
-        spacer = qt_w.QSpacerItem(1, 1, qt_w.QSizePolicy.Minimum, qt_w.QSizePolicy.Expanding)
-        scroll_area_layout.addItem(spacer)
-
-        self.create_links_to_other_pages(central_widget, layout)
-
-        self.button.setParent(central_widget)
-        self.button.setObjectName(f"pushButton_General_{self.obj_name}")
-        self.button.setMinimumSize(qt_c.QSize(100, 100))
-        icon23 = qt_g.QIcon()
-        icon23.addFile(self.icon, qt_c.QSize(), qt_g.QIcon.Normal, qt_g.QIcon.Off)
-        self.button.setIcon(icon23)
-        self.button.setIconSize(qt_c.QSize(24, 24))
-        self.button.setText(self.button_name)
-        self.label_gap.setParent(central_widget)
-        self.label_gap.setMinimumSize(qt_c.QSize(0, 6))
-        self.label_gap.setMaximumSize(qt_c.QSize(16777215, 6))
-
-        vertical_layout_menu.addWidget(self.button)
-        vertical_layout_menu.addWidget(self.label_gap)
-        self.button.clicked.connect(ft_partial(stacked_widget.setCurrentWidget, self.page))
-
-    def create_links_to_other_pages(self, central_widget: qt_w.QWidget, scroll_area_layout: qt_w.QVBoxLayout):
-        if self.previous_page is None and self.next_page is None:
-            return
-
-        horizontal_layout = qt_w.QHBoxLayout(central_widget)
-
-        if self.previous_page is not None:
-            push_button_previous = qt_w.QPushButton(central_widget)
-            push_button_previous.setMinimumSize(qt_c.QSize(0, 30))
-            push_button_previous.setMaximumSize(qt_c.QSize(16777215, 30))
-            icon = qt_g.QIcon()
-            icon.addFile(":/icons/icons/ArrowLeft2.svg", qt_c.QSize(), qt_g.QIcon.Normal, qt_g.QIcon.Off)
-            push_button_previous.setIcon(icon)
-            push_button_previous.setIconSize(qt_c.QSize(20, 20))
-            push_button_previous.setText("  previous  ")
-
-            horizontal_layout.addWidget(push_button_previous)
-            push_button_previous.clicked.connect(self.previous_page.button.click)
-
-        horizontal_spacer = qt_w.QSpacerItem(1, 1, qt_w.QSizePolicy.Expanding, qt_w.QSizePolicy.Minimum)
-
-        horizontal_layout.addItem(horizontal_spacer)
-        if self.next_page is not None:
-            push_button_next = qt_w.QPushButton(central_widget)
-            push_button_next.setMinimumSize(qt_c.QSize(0, 30))
-            push_button_next.setMaximumSize(qt_c.QSize(16777215, 30))
-            push_button_next.setLayoutDirection(qt_c.Qt.RightToLeft)
-            icon = qt_g.QIcon()
-            icon.addFile(":/icons/icons/ArrowRight2.svg", qt_c.QSize(), qt_g.QIcon.Normal, qt_g.QIcon.Off)
-            push_button_next.setIcon(icon)
-            push_button_next.setIconSize(qt_c.QSize(20, 20))
-            push_button_next.setText("  next  ")
-
-            horizontal_layout.addWidget(push_button_next)
-            push_button_next.clicked.connect(self.next_page.button.click)
-
-        scroll_area_layout.addLayout(horizontal_layout)

@@ -1887,7 +1887,7 @@ class Borefield:
                     # determine new total borehole number
                     total_number_boreholes_new = total_number_boreholes_old + np.sign(gradient) * min(abs(gradient), 1)
                     # determine depth for the new configuration
-                    depth = self.size(H_max, L2_sizing, use_constant_Rb=use_constant_Rb)
+                    depth = self.size(H_max, L2_sizing=L2_sizing, L3_sizing=not L2_sizing, use_constant_Rb=use_constant_Rb)
                     # determine new total number of boreholes
                     number_boreholes = int(depth * total_number_boreholes_new / H_max) + 1
                     # determine number of boreholes in length and width directions
@@ -1922,7 +1922,7 @@ class Borefield:
                             # if not first element reset variables and determine new depth and then append if it fits
                             # the maximal depth
                             self._reset_for_sizing(i[0], i[1])
-                            self.size(H_max, L2_sizing, use_constant_Rb=use_constant_Rb)
+                            self.size(H_max, L2_sizing=L2_sizing, L3_sizing=not L2_sizing, use_constant_Rb=use_constant_Rb)
                             if self.H < H_max:
                                 combo.append([i[0], i[1], B, self.H])
                     else:
@@ -1943,7 +1943,7 @@ class Borefield:
                             # if not first element reset variables and determine new depth and then append if it fits
                             # the maximal depth
                             self._reset_for_sizing(i[0], i[1])
-                            self.size(H_max, L2_sizing, use_constant_Rb=use_constant_Rb)
+                            self.size(H_max, L2_sizing=L2_sizing, L3_sizing=not L2_sizing, use_constant_Rb=use_constant_Rb)
                             if self.H < H_max:
                                 combo.append([i[0], i[1], B, self.H])
                     else:
