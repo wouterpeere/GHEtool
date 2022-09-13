@@ -1,10 +1,10 @@
 # Graphical Using Interface (GUI)
 
-```console
+```shell 
 python -m PyInstaller --noconfirm --onefile --windowed --splash "./GHEtool/gui/icons/Icon.ico" --name "GHEtool" --icon "./GHEtool/gui/icons/Icon.ico" "./GHEtool/gui/start_gui.py"
 ```
 
-```console
+```shell 
 python -m PyInstaller --noconfirm --onefile --console --splash "./GHEtool/gui/icons/Icon.ico" --name "GHEtool_with_command_line" --icon "./GHEtool/gui/icons/Icon.ico" "./GHEtool/gui/start_gui.py"
 ```
 
@@ -20,7 +20,7 @@ add 'example_icon.svg' icon to 'icons.qrc' file which has to be located in the i
 
 Afterwards the 'icons_rc.py' has to be recompiled using the following command line:
 
-```console
+```sh
 pyside6-rcc ./GHEtool/gui/icons.qrc -o ./GHEtool/gui/icons_rc.py
 ```
 

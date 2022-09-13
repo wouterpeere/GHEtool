@@ -49,7 +49,7 @@ For the tests
 
 When working with Python 3.9 and higher, installing a newer version of pygfunction (>=2.1.0) can lead to problems due to the fact that its dependency CoolProp is not compatible with Python 3.9 and higher (see also <https://github.com/CoolProp/CoolProp/issues/1992> and <https://github.com/CoolProp/CoolProp/issues/2119>). If one wants to work with the newer version of pygfunction and with Python 3.9 or higher, one can install a development version of CoolProp using
 
-```
+```sh
 pip install -i https://test.pypi.org/simple/ CoolProp==6.4.2.dev0
 ```
 
@@ -58,13 +58,13 @@ pip install -i https://test.pypi.org/simple/ CoolProp==6.4.2.dev0
 
 One can install GHEtool by running Pip and running the command
 
-```
+```sh
 pip install GHEtool
 ```
 
 or one can install a newer development version using
 
-```
+```sh
 pip install --extra-index-url https://test.pypi.org/simple/ GHEtool
 ```
 
