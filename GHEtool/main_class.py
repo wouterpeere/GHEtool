@@ -2,6 +2,7 @@ import os.path
 import pickle
 import warnings
 from math import pi
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,7 +12,11 @@ from scipy.signal import convolve
 
 from GHEtool.VariableClasses.VariableClasses import *
 
-FOLDER = os.path.dirname(os.path.realpath(__file__))  # solve problem with importing GHEtool from sub-folders
+
+if getattr(sys, 'frozen', False):
+    FOLDER = os.path.dirname(sys.executable)  # cx_Freeze frozen
+else:
+    FOLDER = os.path.dirname(os.path.realpath(__file__))  # Other packers
 
 
 def timeValues():
@@ -1270,7 +1275,7 @@ class Borefield:
 
         # check if datafile exists
         if not os.path.isfile(f'{folder}/Data/{name}'):
-            raise Exception('There is no precalculated data available. Please use the create_custom_datafile.')
+            raise Exception(f'There is no precalculated data available. Please use the create_custom_datafile in: {folder}/Data/{name}')
 
         # load data fileImport
         data = pickle.load(open(f'{folder}/Data/{name}', "rb"))

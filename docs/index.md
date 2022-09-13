@@ -16,6 +16,7 @@
 self
 sources/getting_started
 sources/approaches
+sources/gui
 sources/changelog
 sources/legal_notice
 ```

@@ -107,7 +107,7 @@ def check(linked_options: List[(Union[Option, List[Option]], int)], option: Opti
         option.show()
 
 
-class DoubleValue(Option):
+class FloatBox(Option):
     def __init__(
         self,
         default_parent: QtW.QWidget,
@@ -166,7 +166,7 @@ class DoubleValue(Option):
         layout.addWidget(self.widget)
 
 
-class IntValue(Option):
+class IntBox(Option):
     def __init__(
         self, default_parent: QtW.QWidget, label: str, default_value: int, category: Category, minimal_value: int = 0, maximal_value: int = 100, step: int = 1
     ):
@@ -338,7 +338,7 @@ class ListBox(Option):
         layout.addWidget(self.widget)
 
 
-class FileName(Option):
+class FileNameBox(Option):
     def __init__(
             self, default_parent: QtW.QWidget, label: str, default_value: str, dialog_text: str, error_text: str, status_bar: QtW.QStatusBar,
             category: Category

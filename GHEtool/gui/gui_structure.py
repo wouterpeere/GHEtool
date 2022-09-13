@@ -2,7 +2,7 @@ from typing import List, Optional, Tuple
 
 from PySide6.QtWidgets import QStatusBar, QWidget
 
-from GHEtool.gui.gui_classes import (Aim, ButtonBox, Category, DoubleValue, FileName, FunctionButton, Hint, IntValue, ListBox, Option, Page)
+from GHEtool.gui.gui_classes import (Aim, ButtonBox, Category, FloatBox, FileNameBox, FunctionButton, Hint, IntBox, ListBox, Option, Page)
 from GHEtool.gui.translation_class import Translations
 
 
@@ -64,7 +64,7 @@ class GuiStructure:
             label="Borehole and earth properties",
         )
 
-        self.option_depth = DoubleValue(
+        self.option_depth = FloatBox(
             default_parent,
             category=self.category_borehole,
             label="Borehole depth [m]: ",
@@ -76,7 +76,7 @@ class GuiStructure:
         )
         self.aim_temp_profile.add_linked_option(self.option_depth)
         self.aim_optimize.add_linked_option(self.option_depth)
-        self.option_max_depth = DoubleValue(
+        self.option_max_depth = FloatBox(
             default_parent,
             category=self.category_borehole,
             label="Maximal borehole depth [m]: ",
@@ -87,7 +87,7 @@ class GuiStructure:
             step=1,
         )
         self.aim_size_length.add_linked_option(self.option_max_depth)
-        self.option_spacing = DoubleValue(
+        self.option_spacing = FloatBox(
             default_parent,
             category=self.category_borehole,
             label="Borehole spacing [m]: ",
@@ -100,7 +100,7 @@ class GuiStructure:
         self.aim_temp_profile.add_linked_option(self.option_spacing)
         self.aim_req_depth.add_linked_option(self.option_spacing)
         self.aim_optimize.add_linked_option(self.option_spacing)
-        self.option_min_spacing = DoubleValue(
+        self.option_min_spacing = FloatBox(
             default_parent,
             category=self.category_borehole,
             label="Minimal borehole spacing [m]: ",
@@ -111,7 +111,7 @@ class GuiStructure:
             step=0.1,
         )
         self.aim_size_length.add_linked_option(self.option_min_spacing)
-        self.option_max_spacing = DoubleValue(
+        self.option_max_spacing = FloatBox(
             default_parent,
             category=self.category_borehole,
             label="Maximal borehole spacing [m]: ",
@@ -122,19 +122,19 @@ class GuiStructure:
             step=0.1,
         )
         self.aim_size_length.add_linked_option(self.option_max_spacing)
-        self.option_width = IntValue(
+        self.option_width = IntBox(
             default_parent, category=self.category_borehole, label="Width of rectangular field [#]: ", default_value=9, minimal_value=1, maximal_value=40
         )
         self.aim_temp_profile.add_linked_option(self.option_width)
         self.aim_req_depth.add_linked_option(self.option_width)
         self.aim_optimize.add_linked_option(self.option_width)
-        self.option_length = IntValue(
+        self.option_length = IntBox(
             default_parent, category=self.category_borehole, label="Length of rectangular field [#]: ", default_value=12, minimal_value=1, maximal_value=40
         )
         self.aim_temp_profile.add_linked_option(self.option_width)
         self.aim_req_depth.add_linked_option(self.option_width)
         self.aim_optimize.add_linked_option(self.option_width)
-        self.option_max_width = DoubleValue(
+        self.option_max_width = FloatBox(
             default_parent,
             category=self.category_borehole,
             label="Maximal width of rectangular field [m]: ",
@@ -145,7 +145,7 @@ class GuiStructure:
             step=1,
         )
         self.aim_size_length.add_linked_option(self.option_max_width)
-        self.option_max_length = DoubleValue(
+        self.option_max_length = FloatBox(
             default_parent,
             category=self.category_borehole,
             label="Maximal length of rectangular field [m]: ",
@@ -156,7 +156,7 @@ class GuiStructure:
             step=1,
         )
         self.aim_size_length.add_linked_option(self.option_max_length)
-        self.option_conductivity = DoubleValue(
+        self.option_conductivity = FloatBox(
             default_parent,
             category=self.category_borehole,
             label="Conductivity of the soil [W/mK]: ",
@@ -166,7 +166,7 @@ class GuiStructure:
             maximal_value=10,
             step=0.1,
         )
-        self.option_heat_capacity = DoubleValue(
+        self.option_heat_capacity = FloatBox(
             default_parent,
             category=self.category_borehole,
             label="Ground volumetric heat capacity [kJ / m³ K]: ",
@@ -186,7 +186,7 @@ class GuiStructure:
 
         self.category_temperatures = Category(default_parent, page=self.page_borehole, label="Temperature constraints and simulation period")
 
-        self.option_ground_temp = DoubleValue(
+        self.option_ground_temp = FloatBox(
             default_parent,
             category=self.category_temperatures,
             label="Ground temperature at infinity [°C]: ",
@@ -196,7 +196,7 @@ class GuiStructure:
             maximal_value=100,
             step=0.1,
         )
-        self.option_min_temp = DoubleValue(
+        self.option_min_temp = FloatBox(
             default_parent,
             category=self.category_temperatures,
             label="Minimal temperature [°C]: ",
@@ -206,7 +206,7 @@ class GuiStructure:
             maximal_value=100,
             step=0.1,
         )
-        self.option_max_temp = DoubleValue(
+        self.option_max_temp = FloatBox(
             default_parent,
             category=self.category_temperatures,
             label="Maximal temperature [°C]: ",
@@ -216,7 +216,7 @@ class GuiStructure:
             maximal_value=100,
             step=0.1,
         )
-        self.option_temp_gradient = DoubleValue(
+        self.option_temp_gradient = FloatBox(
             default_parent,
             category=self.category_temperatures,
             label="Temperature gradient [K/100m]: ",
@@ -226,7 +226,7 @@ class GuiStructure:
             maximal_value=100,
             step=0.1,
         )
-        self.option_simu_period = IntValue(
+        self.option_simu_period = IntBox(
             default_parent, category=self.category_temperatures, label="Simulation period [yrs]: ", default_value=20, minimal_value=1, maximal_value=100
         )
 
@@ -238,7 +238,7 @@ class GuiStructure:
 
         self.category_constant_rb = Category(default_parent, page=self.page_borehole_resistance, label="Konstant equivalent borehole resistance")
 
-        self.option_constant_rb = DoubleValue(
+        self.option_constant_rb = FloatBox(
             default_parent,
             category=self.category_constant_rb,
             label="Equivalent borehole resistance [mK/W]: ",
@@ -254,7 +254,7 @@ class GuiStructure:
         self.option_method_rb_calc.linked_options.append((self.category_fluid_data, 1))
         self.option_method_rb_calc.linked_options.append((self.category_fluid_data, 2))
 
-        self.option_fluid_conductivity = DoubleValue(
+        self.option_fluid_conductivity = FloatBox(
             default_parent,
             category=self.category_fluid_data,
             label="Thermal conductivity [W/mK]: ",
@@ -264,7 +264,7 @@ class GuiStructure:
             maximal_value=100,
             step=0.1,
         )
-        self.option_fluid_density = DoubleValue(
+        self.option_fluid_density = FloatBox(
             default_parent,
             category=self.category_fluid_data,
             label="Density [kg/m³]: ",
@@ -274,7 +274,7 @@ class GuiStructure:
             maximal_value=10000000,
             step=100,
         )
-        self.option_fluid_capacity = DoubleValue(
+        self.option_fluid_capacity = FloatBox(
             default_parent,
             category=self.category_fluid_data,
             label="Thermal capacity [J/kg K]: ",
@@ -284,7 +284,7 @@ class GuiStructure:
             maximal_value=10000000,
             step=100,
         )
-        self.option_fluid_viscosity = DoubleValue(
+        self.option_fluid_viscosity = FloatBox(
             default_parent,
             category=self.category_fluid_data,
             label="Dynamic viscosity [Pa s]:",
@@ -295,7 +295,7 @@ class GuiStructure:
             step=0.0001,
         )
 
-        self.option_fluid_mass_flow = DoubleValue(
+        self.option_fluid_mass_flow = FloatBox(
             default_parent,
             category=self.category_fluid_data,
             label="Mass flow rate [kg/s]: ",
@@ -311,10 +311,10 @@ class GuiStructure:
         self.option_method_rb_calc.linked_options.append((self.category_pipe_data, 1))
         self.option_method_rb_calc.linked_options.append((self.category_pipe_data, 2))
 
-        self.option_pipe_number = IntValue(
+        self.option_pipe_number = IntBox(
             default_parent, category=self.category_pipe_data, label="Number of pipes [#]: ", default_value=2, minimal_value=1, maximal_value=99
         )
-        self.option_pipe_grout_conductivity = DoubleValue(
+        self.option_pipe_grout_conductivity = FloatBox(
             default_parent,
             category=self.category_pipe_data,
             label="Grout thermal conductivity [W/mK]: ",
@@ -324,7 +324,7 @@ class GuiStructure:
             maximal_value=10000,
             step=0.1,
         )
-        self.option_pipe_conductivity = DoubleValue(
+        self.option_pipe_conductivity = FloatBox(
             default_parent,
             category=self.category_pipe_data,
             label="Pipe thermal conductivity [W/mK]: ",
@@ -334,7 +334,7 @@ class GuiStructure:
             maximal_value=10000,
             step=0.1,
         )
-        self.option_pipe_inner_radius = DoubleValue(
+        self.option_pipe_inner_radius = FloatBox(
             default_parent,
             category=self.category_pipe_data,
             label="Inner pipe radius [m]: ",
@@ -344,7 +344,7 @@ class GuiStructure:
             maximal_value=10000,
             step=0.001,
         )
-        self.option_pipe_outer_radius = DoubleValue(
+        self.option_pipe_outer_radius = FloatBox(
             default_parent,
             category=self.category_pipe_data,
             label="Outer pipe radius [m]: ",
@@ -354,7 +354,7 @@ class GuiStructure:
             maximal_value=10000,
             step=0.001,
         )
-        self.option_pipe_borehole_radius = DoubleValue(
+        self.option_pipe_borehole_radius = FloatBox(
             default_parent,
             category=self.category_pipe_data,
             label="Borehole radius [m]: ",
@@ -364,7 +364,7 @@ class GuiStructure:
             maximal_value=10000,
             step=0.001,
         )
-        self.option_pipe_distance = DoubleValue(
+        self.option_pipe_distance = FloatBox(
             default_parent,
             category=self.category_pipe_data,
             label="Distance of pipe until center [m]: ",
@@ -374,7 +374,7 @@ class GuiStructure:
             maximal_value=10000,
             step=0.001,
         )
-        self.option_pipe_roughness = DoubleValue(
+        self.option_pipe_roughness = FloatBox(
             default_parent,
             category=self.category_pipe_data,
             label="Pipe roughness [m]: ",
@@ -384,7 +384,7 @@ class GuiStructure:
             maximal_value=10000,
             step=0.000001,
         )
-        self.option_pipe_depth = DoubleValue(
+        self.option_pipe_depth = FloatBox(
             default_parent,
             category=self.category_pipe_data,
             label="Burial depth [m]: ",
@@ -406,7 +406,7 @@ class GuiStructure:
         self.option_decimal_csv = ButtonBox(
             default_parent, category=self.category_select_file, label="Decimal sign in CSV-file:", default_index=0, entries=['Point "."', 'Comma ","']
         )
-        self.option_filename = FileName(
+        self.option_filename = FileNameBox(
             default_parent,
             category=self.category_select_file,
             label="Filename: ",
@@ -456,13 +456,13 @@ class GuiStructure:
         self.hint_load_cooling_unit = Hint(default_parent, category=self.category_th_demand, hint="[kWh]")
 
         self.hint_jan = Hint(default_parent, category=self.category_th_demand, hint="January")
-        self.option_hp_jan = DoubleValue(
+        self.option_hp_jan = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=160, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_cp_jan = DoubleValue(
+        self.option_cp_jan = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_hl_jan = DoubleValue(
+        self.option_hl_jan = FloatBox(
             default_parent,
             category=self.category_th_demand,
             label="",
@@ -472,7 +472,7 @@ class GuiStructure:
             maximal_value=1_000_000_000,
             step=1,
         )
-        self.option_cl_jan = DoubleValue(
+        self.option_cl_jan = FloatBox(
             default_parent,
             category=self.category_th_demand,
             label="",
@@ -483,13 +483,13 @@ class GuiStructure:
             step=1,
         )
         self.hint_feb = Hint(default_parent, category=self.category_th_demand, hint="February")
-        self.option_hp_feb = DoubleValue(
+        self.option_hp_feb = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=142, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_cp_feb = DoubleValue(
+        self.option_cp_feb = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_hl_feb = DoubleValue(
+        self.option_hl_feb = FloatBox(
             default_parent,
             category=self.category_th_demand,
             label="",
@@ -499,7 +499,7 @@ class GuiStructure:
             maximal_value=1_000_000_000,
             step=1,
         )
-        self.option_cl_feb = DoubleValue(
+        self.option_cl_feb = FloatBox(
             default_parent,
             category=self.category_th_demand,
             label="",
@@ -510,13 +510,13 @@ class GuiStructure:
             step=1,
         )
         self.hint_mar = Hint(default_parent, category=self.category_th_demand, hint="March")
-        self.option_hp_mar = DoubleValue(
+        self.option_hp_mar = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=102, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_cp_mar = DoubleValue(
+        self.option_cp_mar = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=34, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_hl_mar = DoubleValue(
+        self.option_hl_mar = FloatBox(
             default_parent,
             category=self.category_th_demand,
             label="",
@@ -526,7 +526,7 @@ class GuiStructure:
             maximal_value=1_000_000_000,
             step=1,
         )
-        self.option_cl_mar = DoubleValue(
+        self.option_cl_mar = FloatBox(
             default_parent,
             category=self.category_th_demand,
             label="",
@@ -537,13 +537,13 @@ class GuiStructure:
             step=1,
         )
         self.hint_apr = Hint(default_parent, category=self.category_th_demand, hint="April")
-        self.option_hp_apr = DoubleValue(
+        self.option_hp_apr = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=55, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_cp_apr = DoubleValue(
+        self.option_cp_apr = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=69, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_hl_apr = DoubleValue(
+        self.option_hl_apr = FloatBox(
             default_parent,
             category=self.category_th_demand,
             label="",
@@ -553,7 +553,7 @@ class GuiStructure:
             maximal_value=1_000_000_000,
             step=1,
         )
-        self.option_cl_apr = DoubleValue(
+        self.option_cl_apr = FloatBox(
             default_parent,
             category=self.category_th_demand,
             label="",
@@ -564,13 +564,13 @@ class GuiStructure:
             step=1,
         )
         self.hint_may = Hint(default_parent, category=self.category_th_demand, hint="May")
-        self.option_hp_may = DoubleValue(
+        self.option_hp_may = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_cp_may = DoubleValue(
+        self.option_cp_may = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=133, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_hl_may = DoubleValue(
+        self.option_hl_may = FloatBox(
             default_parent,
             category=self.category_th_demand,
             label="",
@@ -580,7 +580,7 @@ class GuiStructure:
             maximal_value=1_000_000_000,
             step=1,
         )
-        self.option_cl_may = DoubleValue(
+        self.option_cl_may = FloatBox(
             default_parent,
             category=self.category_th_demand,
             label="",
@@ -591,16 +591,16 @@ class GuiStructure:
             step=1,
         )
         self.hint_jun = Hint(default_parent, category=self.category_th_demand, hint="June")
-        self.option_hp_jun = DoubleValue(
+        self.option_hp_jun = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_cp_jun = DoubleValue(
+        self.option_cp_jun = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=187, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_hl_jun = DoubleValue(
+        self.option_hl_jun = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
         )
-        self.option_cl_jun = DoubleValue(
+        self.option_cl_jun = FloatBox(
             default_parent,
             category=self.category_th_demand,
             label="",
@@ -611,16 +611,16 @@ class GuiStructure:
             step=1,
         )
         self.hint_jul = Hint(default_parent, category=self.category_th_demand, hint="July")
-        self.option_hp_jul = DoubleValue(
+        self.option_hp_jul = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_cp_jul = DoubleValue(
+        self.option_cp_jul = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=213, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_hl_jul = DoubleValue(
+        self.option_hl_jul = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
         )
-        self.option_cl_jul = DoubleValue(
+        self.option_cl_jul = FloatBox(
             default_parent,
             category=self.category_th_demand,
             label="",
@@ -631,16 +631,16 @@ class GuiStructure:
             step=1,
         )
         self.hint_aug = Hint(default_parent, category=self.category_th_demand, hint="August")
-        self.option_hp_aug = DoubleValue(
+        self.option_hp_aug = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_cp_aug = DoubleValue(
+        self.option_cp_aug = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=240, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_hl_aug = DoubleValue(
+        self.option_hl_aug = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
         )
-        self.option_cl_aug = DoubleValue(
+        self.option_cl_aug = FloatBox(
             default_parent,
             category=self.category_th_demand,
             label="",
@@ -651,13 +651,13 @@ class GuiStructure:
             step=1,
         )
         self.hint_sep = Hint(default_parent, category=self.category_th_demand, hint="September")
-        self.option_hp_sep = DoubleValue(
+        self.option_hp_sep = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=40.4, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_cp_sep = DoubleValue(
+        self.option_cp_sep = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=160, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_hl_sep = DoubleValue(
+        self.option_hl_sep = FloatBox(
             default_parent,
             category=self.category_th_demand,
             label="",
@@ -667,7 +667,7 @@ class GuiStructure:
             maximal_value=1_000_000_000,
             step=1,
         )
-        self.option_cl_sep = DoubleValue(
+        self.option_cl_sep = FloatBox(
             default_parent,
             category=self.category_th_demand,
             label="",
@@ -678,13 +678,13 @@ class GuiStructure:
             step=1,
         )
         self.hint_oct = Hint(default_parent, category=self.category_th_demand, hint="October")
-        self.option_hp_oct = DoubleValue(
+        self.option_hp_oct = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=85, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_cp_oct = DoubleValue(
+        self.option_cp_oct = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=37, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_hl_oct = DoubleValue(
+        self.option_hl_oct = FloatBox(
             default_parent,
             category=self.category_th_demand,
             label="",
@@ -694,7 +694,7 @@ class GuiStructure:
             maximal_value=1_000_000_000,
             step=1,
         )
-        self.option_cl_oct = DoubleValue(
+        self.option_cl_oct = FloatBox(
             default_parent,
             category=self.category_th_demand,
             label="",
@@ -705,13 +705,13 @@ class GuiStructure:
             step=1,
         )
         self.hint_nov = Hint(default_parent, category=self.category_th_demand, hint="November")
-        self.option_hp_nov = DoubleValue(
+        self.option_hp_nov = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=119, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_cp_nov = DoubleValue(
+        self.option_cp_nov = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_hl_nov = DoubleValue(
+        self.option_hl_nov = FloatBox(
             default_parent,
             category=self.category_th_demand,
             label="",
@@ -721,7 +721,7 @@ class GuiStructure:
             maximal_value=1_000_000_000,
             step=1,
         )
-        self.option_cl_nov = DoubleValue(
+        self.option_cl_nov = FloatBox(
             default_parent,
             category=self.category_th_demand,
             label="",
@@ -732,13 +732,13 @@ class GuiStructure:
             step=1,
         )
         self.hint_dec = Hint(default_parent, category=self.category_th_demand, hint="December")
-        self.option_hp_dec = DoubleValue(
+        self.option_hp_dec = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=136, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_cp_dec = DoubleValue(
+        self.option_cp_dec = FloatBox(
             default_parent, category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
-        self.option_hl_dec = DoubleValue(
+        self.option_hl_dec = FloatBox(
             default_parent,
             category=self.category_th_demand,
             label="",
@@ -748,7 +748,7 @@ class GuiStructure:
             maximal_value=1_000_000_000,
             step=1,
         )
-        self.option_cl_dec = DoubleValue(
+        self.option_cl_dec = FloatBox(
             default_parent,
             category=self.category_th_demand,
             label="",
