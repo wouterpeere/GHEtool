@@ -1,16 +1,17 @@
 # Graphical Using Interface (GUI)
 
-# How to add translations?
-
-Translations for the GUI can be added in a new column in the `.\GHEtool\gui\Translations.csv` file. 
-Also, an icon and shortcut can be linked there. An explanation how to add an icon can be found [here](#how-to-add-an-icon?)
+<!--sphinx-autobuild docs/ docs/build/html--->
 
 ## How to create the *.exe file?
+
+The exe can be created using [PyInstaller](https://pyinstaller.org/en/stable/).
+
+The following line will create a windowed version of the executable:
 
 ```
 python -m PyInstaller --noconfirm --onefile --windowed --splash "./GHEtool/gui/icons/Icon.ico" --name "GHEtool" --icon "./GHEtool/gui/icons/Icon.ico" "./GHEtool/gui/start_gui.py"
 ```
-
+The following line will create a version which also displays a windows console with error messages of the executable. 
 ``` 
 python -m PyInstaller --noconfirm --onefile --console --splash "./GHEtool/gui/icons/Icon.ico" --name "GHEtool_with_command_line" --icon "./GHEtool/gui/icons/Icon.ico" "./GHEtool/gui/start_gui.py"
 ```
@@ -117,9 +118,31 @@ option_list = ListBox(
 option_list.add_linked_option(option=option_linked, index=0)
 ```
 
+# How to add or correct translations?
+
+Translations for the GUI can be added in a new column in the 
+[.\GHEtool\gui\Translations.csv](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/Translations.csv) file. Correction can be made there as well. 
+Important is that the seperator in the CSV-file is not comma but semicolon `;`.
+Also, an icon and shortcut can be linked there. An explanation how to add an icon can be found here: {ref}`How to add an icon?`. 
+The name of the variable to be translated is shown in column 1 and afterwards the different translations. 
+The variable's name is the name in the 
+[.\GHEtool\gui\gui_structure.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_structure.py)
+or 
+[.\GHEtool\gui\gui_window.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_window.py) 
+script. Options with multiple inputs are created by separated the different inputs with comma `,`. 
+So for an ListBox this can seem like this: 
+```
+option_list;Option of list,First Option,Second Option;Optionen der Liste,Erste Option,Zweite Option
+```
+
+Afterwards the [.\GHEtool\gui\translation_csv_to_py.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/translation_csv_to_py.py) script needs 
+to be run. This will add the changes to the `Translations` class in `./GHEtool/gui/translation_class.py`.
+
+Know the translation or correction is available in the GUI.
+
 ## How to add an icon?
 
-add `example_icon.svg` icon to `icons.qrc` file which has to be located in the icons folder:
+An Icon can be added to the gui by adding `example_icon.svg` icon to `icons.qrc` file and locating in the icon in the icons folder:
 
 ```xml
 <file>icons/example_icon.svg</file>
@@ -130,3 +153,5 @@ Afterwards the `icons_rc.py` has to be recompiled using the following command li
 ```
 pyside6-rcc ./GHEtool/gui/icons.qrc -o ./GHEtool/gui/icons_rc.py
 ```
+
+Know the icon can be used in the GUI.
