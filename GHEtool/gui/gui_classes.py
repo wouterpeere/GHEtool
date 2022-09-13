@@ -8,7 +8,7 @@ import PySide6.QtCore as QtC
 import PySide6.QtGui as QtG
 import PySide6.QtWidgets as QtW
 
-from .gui_main_new import DARK, GREY, LIGHT, WARNING, WHITE
+from .gui_main_new import DARK, GREY, LIGHT, WARNING, WHITE, LIGHT_SELECT
 
 
 def update_opponent(button: QtW.QPushButton, button_opponent: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
@@ -367,14 +367,14 @@ class FileName(Option):
         layout = self.create_frame(frame, layout_parent, False)
         self.widget.setParent(self.frame)
         self.widget.setStyleSheet(
-            "QLineEdit{border: 3px solid rgb(84, 188, 235);\n"
+            f"QLineEdit{'{'}border: 3px solid {LIGHT};\n"
             "border-radius: 5px;\n"
             f"color: {WHITE};\n"
-            "gridline-color: rgb(84, 188, 235);\n"
-            "background-color: rgb(84, 188, 235);\n"
+            f"gridline-color: {LIGHT};\n"
+            f"background-color: {LIGHT};\n"
             "font-weight:500;\n"
-            "selection-background-color: rgb(42, 126, 179);}\n"
-            "QLineEdit:hover{background-color: rgb(0, 64, 122);}"
+            f"selection-background-color: {LIGHT_SELECT};{'}'}\n"
+            f"QLineEdit:hover{'{'}background-color: {DARK};{'}'}"
         )
         layout.addWidget(self.widget)
         button = QtW.QPushButton(self.frame)
@@ -564,11 +564,11 @@ class Category:
         graphic_view.setMaximumSize(QtC.QSize(100, 16777215))
         graphic_view.setStyleSheet(
             "QFrame {\n"
-            "	border: 1px solid #54bceb;\n"
+            f"	border: 1px solid {LIGHT};\n"
             "	border-bottom-left-radius: 0px;\n"
             "	border-bottom-right-radius: 0px;\n"
             "}\n"
-            "QLabel{border: 0px solid rgb(255,255,255);}"
+            f"QLabel{'{'}border: 0px solid {WHITE};{'}'}"
         )
 
         layout.addWidget(graphic_view)
@@ -607,22 +607,22 @@ class Aim:
         push_button.setMinimumSize(QtC.QSize(0, 60))
         push_button.setMaximumSize(QtC.QSize(16777215, 60))
         push_button.setStyleSheet(
-            "QPushButton{border: 3px solid rgb(0, 64, 122);\n"
+            f"QPushButton{'{'}border: 3px solid {DARK};\n"
             "border-radius: 15px;\n"
-            "color: rgb(255, 255, 255);\n"
-            "gridline-color: rgb(84, 188, 235);\n"
-            "background-color: rgb(100, 100, 100);\n"
+            f"color: {WHITE};\n"
+            f"gridline-color: {LIGHT};\n"
+            f"background-color: {GREY};\n"
             "font-weight:500;}\n"
-            "QPushButton:hover{border: 3px solid rgb(0, 64, 122);\n"
-            "background-color:rgb(84, 188, 235);}\n"
-            "QPushButton:checked{border:3px solid rgb(84, 188, 235);\n"
-            "background-color:rgb(84, 188, 235);}\n"
-            "QPushButton:disabled{border: 3px solid rgb(100, 100, 100);\n"
+            f"QPushButton:hover{'{'}border: 3px solid {DARK};\n"
+            f"background-color:{LIGHT};{'}'}\n"
+            f"QPushButton:checked{'{'}border:3px solid {LIGHT};\n"
+            f"background-color:{LIGHT};{'}'}\n"
+            f"QPushButton:disabled{'{'}border: 3px solid {GREY};\n"
             "border-radius: 5px;\n"
-            "color: rgb(255, 255, 255);\n"
-            "gridline-color: rgb(100, 100, 100);\n"
-            "background-color: rgb(100, 100, 100);}\n"
-            "QPushButton:disabled:hover{background-color: rgb(0, 64, 122);}"
+            f"color: {WHITE};\n"
+            f"gridline-color: {GREY};\n"
+            f"background-color: {GREY};{'}'}\n"
+            f"QPushButton:disabled:hover{'{'}background-color: {DARK};{'}'}"
         )
         # push_button.setIcon(icon11)
         # push_button.setIcon(QtGui_QIcon(QtGui_QPixmap(icon)))

@@ -2,6 +2,7 @@ from functools import partial as ft_partial
 from math import pi
 from os.path import dirname, realpath
 from os.path import split as os_split
+from os import makedirs
 from pathlib import Path, PurePath
 from pickle import HIGHEST_PROTOCOL as pk_HP
 from pickle import dump as pk_dump
@@ -10,7 +11,7 @@ from sys import path
 from time import sleep
 from typing import TYPE_CHECKING, List, Optional, Tuple
 
-from numpy import cos, sin
+from numpy import cos, sin, array, float64, int64
 from PySide6.QtCore import QEvent as QtCore_QEvent
 from PySide6.QtCore import QModelIndex as QtCore_QModelIndex
 from PySide6.QtCore import QSize as QtCore_QSize
@@ -40,7 +41,7 @@ from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
 from GHEtool.gui.gui_calculation_thread import (BoundsOfPrecalculatedData,
                                                 CalcProblem)
 from GHEtool.gui.gui_data_storage import DataStorage
-from GHEtool.gui.gui_main_new import UiGhetool
+from GHEtool.gui.gui_main_new import UiGhetool, GREY, WHITE, DARK, LIGHT, WARNING
 from GHEtool.gui.gui_structure import GuiStructure
 from GHEtool.gui.translation_class import Translations
 
@@ -84,7 +85,10 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # init variables of class
         # allow checking of changes
         self.checking: bool = False
+        # create backup path in home documents directory
         self.backup_path: str = str(PurePath(Path.home(), 'Documents/GHEtool', 'backup.pkl'))
+        # check if backup folder exits and otherwise create it
+        makedirs(dirname(self.backup_path), exist_ok=True)
         self.translations: Translations = Translations()  # init translation class
         for idx, (name, icon, short_cut) in enumerate(zip(self.translations.option_language, self.translations.icon, self.translations.short_cut)):
             self.create_action_language(idx, name, icon, short_cut)
@@ -154,7 +158,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
 
         # allow checking of changes
         self.checking: bool = True
-
 
     def create_action_language(self, idx: int, name: str, icon_name: str, short_cut: str):
         action = QtGui_QAction(self.central_widget)
@@ -691,10 +694,14 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             max_l = min(self.gui_structure.category_pipe_data.graphic_left.width(), self.gui_structure.category_pipe_data.graphic_left.height())
             scale = max_l / r_bore / 1.25  # leave 25 % space
             # set colors
-            blue_color = QColor(0, 64, 122)
-            blue_light = QColor(84, 188, 235)
-            white_color = QColor(255, 255, 255)
-            grey = QColor(100, 100, 100)
+            dark_color = array(DARK.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
+            white_color = array(WHITE.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
+            light_color = array(LIGHT.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
+            grey_color = array(GREY.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
+            blue_color = QColor(dark_color[0], dark_color[1], dark_color[2])
+            blue_light = QColor(light_color[0], light_color[1], light_color[2])
+            white_color = QColor(white_color[0], white_color[1], white_color[2])
+            grey = QColor(grey_color[0], grey_color[1], grey_color[2])
             brown = QColor(145, 124, 111)
             # create graphic scene if not exits otherwise get scene and delete items
             if self.gui_structure.category_pipe_data.graphic_left.scene() is None:
@@ -1252,14 +1259,16 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         results_month_heating = borefield.results_month_heating
         t_b = borefield.Tb
         # set colors for graph
-        grey_color = "#00407a"
-        color: str = "w"
-        plt.rcParams["text.color"] = color
-        plt.rcParams["axes.labelcolor"] = color
-        plt.rcParams["xtick.color"] = color
-        plt.rcParams["ytick.color"] = color
+        background_color: str = array(DARK.replace('rgb(', '').replace(')', '').split(','), dtype=float64)/255
+        white_color: str = array(WHITE.replace('rgb(', '').replace(')', '').split(','), dtype=float64)/255
+        light_color: str = array(LIGHT.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255
+        bright_color: str = array(WARNING.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255
+        plt.rcParams["text.color"] = white_color
+        plt.rcParams["axes.labelcolor"] = white_color
+        plt.rcParams["xtick.color"] = white_color
+        plt.rcParams["ytick.color"] = white_color
         # create figure and axe if not already exists
-        self.fig = plt.Figure(facecolor=grey_color) if self.fig is None else self.fig
+        self.fig = plt.Figure(facecolor=background_color) if self.fig is None else self.fig
         canvas = FigureCanvas(self.fig) if self.canvas is None else self.canvas
         ax: matplotlib_axes._subplots.AxesSubplot = canvas.figure.subplots() if self.ax == [] else self.ax[0]
         # clear axces for new plot
@@ -1279,7 +1288,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                 where="pre",
                 lw=1.5,
                 label=f"P {self.translations.PeakCooling[self.gui_structure.option_language.get_value()]}",
-                color="#54bceb",
+                color=light_color,
             )
             ax.step(
                 np_array(time_array),
@@ -1287,7 +1296,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                 where="pre",
                 lw=1.5,
                 label=f"P {self.translations.PeakHeating[self.gui_structure.option_language.get_value()]}",
-                color="#ffc857",
+                color=bright_color,
             )
             ax2.step(
                 np_array(time_array),
@@ -1301,7 +1310,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             ax2.step(
                 np_array(time_array),
                 np_array(borefield.monthly_load_heating_external),
-                color="#ffc857",
+                color=bright_color,
                 linestyle="dashed",
                 where="pre",
                 lw=1.5,
@@ -1311,24 +1320,24 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             ax.set_xlim(left=1, right=12)
             ax2.set_xlim(left=1, right=12)
             # create legends
-            ax.legend(facecolor=grey_color, loc="upper left")
-            ax2.legend(facecolor=grey_color, loc="upper right")
+            ax.legend(facecolor=background_color, loc="upper left")
+            ax2.legend(facecolor=background_color, loc="upper right")
             # set labels of axes
-            ax.set_xlabel(self.translations.X_Axis_Load[self.gui_structure.option_language.get_value()], color="white")
-            ax.set_ylabel(self.translations.Y_Axis_Load_P[self.gui_structure.option_language.get_value()], color="white")
-            ax2.set_xlabel(self.translations.X_Axis_Load[self.gui_structure.option_language.get_value()], color="white")
-            ax2.set_ylabel(self.translations.Y_Axis_Load_Q[self.gui_structure.option_language.get_value()], color="white")
+            ax.set_xlabel(self.translations.X_Axis_Load[self.gui_structure.option_language.get_value()], color=white_color)
+            ax.set_ylabel(self.translations.Y_Axis_Load_P[self.gui_structure.option_language.get_value()], color=white_color)
+            ax2.set_xlabel(self.translations.X_Axis_Load[self.gui_structure.option_language.get_value()], color=white_color)
+            ax2.set_ylabel(self.translations.Y_Axis_Load_Q[self.gui_structure.option_language.get_value()], color=white_color)
             # set axe colors
-            ax.spines["bottom"].set_color("w")
-            ax.spines["top"].set_color("w")
-            ax.spines["right"].set_color("w")
-            ax.spines["left"].set_color("w")
-            ax2.spines["bottom"].set_color("w")
-            ax2.spines["top"].set_color("w")
-            ax2.spines["right"].set_color("w")
-            ax2.spines["left"].set_color("w")
-            ax.set_facecolor(grey_color)
-            ax2.set_facecolor(grey_color)
+            ax.spines["bottom"].set_color(white_color)
+            ax.spines["top"].set_color(white_color)
+            ax.spines["right"].set_color(white_color)
+            ax.spines["left"].set_color(white_color)
+            ax2.spines["bottom"].set_color(white_color)
+            ax2.spines["top"].set_color(white_color)
+            ax2.spines["right"].set_color(white_color)
+            ax2.spines["left"].set_color(white_color)
+            ax.set_facecolor(background_color)
+            ax2.set_facecolor(background_color)
             # import numpy here to save start up time
             import numpy as np
 
@@ -1366,7 +1375,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                 where="pre",
                 lw=1.5,
                 label=f"Tf {self.translations.PeakCooling[self.gui_structure.option_language.get_value()]}",
-                color="#54bceb",
+                color=light_color,
             )
             ax.step(
                 np_array(time_array),
@@ -1374,13 +1383,13 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                 where="pre",
                 lw=1.5,
                 label=f"Tf {self.translations.PeakHeating[self.gui_structure.option_language.get_value()]}",
-                color="#ffc857",
+                color=bright_color,
             )
             # define temperature bounds
             ax.step(
                 np_array(time_array),
                 np_array(results_month_cooling),
-                color="#54bceb",
+                color=light_color,
                 linestyle="dashed",
                 where="pre",
                 lw=1.5,
@@ -1389,28 +1398,28 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             ax.step(
                 np_array(time_array),
                 np_array(results_month_heating),
-                color="#ffc857",
+                color=bright_color,
                 linestyle="dashed",
                 where="pre",
                 lw=1.5,
                 label=f"Tf {self.translations.BaseHeating[self.gui_structure.option_language.get_value()]}",
             )
-            ax.hlines(borefield.Tf_C, 0, ds.option_simu_period, colors="#ffc857", linestyles="dashed", label="", lw=1)
-            ax.hlines(borefield.Tf_H, 0, ds.option_simu_period, colors="#54bceb", linestyles="dashed", label="", lw=1)
+            ax.hlines(borefield.Tf_C, 0, ds.option_simu_period, colors=bright_color, linestyles="dashed", label="", lw=1)
+            ax.hlines(borefield.Tf_H, 0, ds.option_simu_period, colors=light_color, linestyles="dashed", label="", lw=1)
             ax.set_xticks(range(0, ds.option_simu_period + 1, 2))
             # Plot legend
             ax.set_xlim(left=0, right=ds.option_simu_period)
             # create legend
-            ax.legend(facecolor=grey_color, loc="best")
+            ax.legend(facecolor=background_color, loc="best")
             # set axes names
-            ax.set_xlabel(self.translations.X_Axis[self.gui_structure.option_language.get_value()], color="white")
-            ax.set_ylabel(self.translations.Y_Axis[self.gui_structure.option_language.get_value()], color="white")
+            ax.set_xlabel(self.translations.X_Axis[self.gui_structure.option_language.get_value()], color=white_color)
+            ax.set_ylabel(self.translations.Y_Axis[self.gui_structure.option_language.get_value()], color=white_color)
             # set colors
-            ax.spines["bottom"].set_color("w")
-            ax.spines["top"].set_color("w")
-            ax.spines["right"].set_color("w")
-            ax.spines["left"].set_color("w")
-            ax.set_facecolor(grey_color)
+            ax.spines["bottom"].set_color(white_color)
+            ax.spines["top"].set_color(white_color)
+            ax.spines["right"].set_color(white_color)
+            ax.spines["left"].set_color(white_color)
+            ax.set_facecolor(background_color)
             # create result display string
             string_size: str = (
                 f'{self.translations.hint_depth[self.gui_structure.option_language.get_value()]}{"; ".join(li_size)} m \n'
@@ -1445,7 +1454,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # check if the legend should be displayed
         if self.gui_structure.option_show_legend.get_value() == 0:
             # set grey color
-            grey_color = "#00407a"
+            grey_color = GREY
             # set legend to graph either two if load is optimized or one otherwise with their locations
             if len(self.ax) > 1:
                 self.ax[0].legend(facecolor=grey_color, loc="upper left")

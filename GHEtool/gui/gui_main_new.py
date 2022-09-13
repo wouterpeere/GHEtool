@@ -15,6 +15,7 @@ LIGHT_SELECT: str = "rgb(42, 126, 179)"
 DARK: str = "rgb(0, 64, 122)"
 GREY: str = "rgb(100, 100, 100)"
 WARNING: str = "rgb(255, 200, 87)"
+BLACK: str = "rgb(0, 0, 0)"
 
 
 class UiGhetool:
@@ -259,12 +260,14 @@ class UiGhetool:
         self.list_widget_scenario.setSizePolicy(size_policy)
         self.list_widget_scenario.setMaximumSize(QSize(16666711, 16666711))
         self.list_widget_scenario.setStyleSheet(
-            "*{border: 1px solid white;}\n"
+            f"*{'{'}border: 1px solid {WHITE};{'}'}\n"
             "QListWidget{outline: 0;}\n"
             "QListWidget::item:selected{\n"
-            f"background:{LIGHT};color: {WHITE};border: 0px solid white;\n"
+            f"background:{LIGHT};color: {WHITE};border: 0px solid {WHITE};\n"
             "}\n"
-            "QListWidget::item:hover{border: 1px solid white;color: rgb(255, 255, 255);}"
+            "QListWidget::item:hover{\n"
+            f"border: 1px solid {WHITE};color: {WHITE};\n"
+            "}"
         )
         self.list_widget_scenario.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
         self.list_widget_scenario.setAutoScrollMargin(10)
@@ -304,11 +307,11 @@ class UiGhetool:
         self.progressBar = QProgressBar(self.central_widget)
         self.progressBar.setObjectName("progressBar")
         self.progressBar.setStyleSheet(
-            "QProgressBar{border: 1px solid white;\n"
+            f"QProgressBar{'{'}border: 1px solid {WHITE};\n"
             " border-radius: 10px;\n"
             "text-align: center;\n"
-            " color: #ffffff;\n"
-            "}QProgressBar::chunk{background-color: #54bceb; border-radius: 10px;}"
+            f" color: {WHITE};\n"
+            f"{'}'}QProgressBar::chunk{'{'}background-color: {LIGHT}; border-radius: 10px;{'}'}"
         )
         self.progressBar.setValue(24)
 
@@ -369,20 +372,24 @@ class UiGhetool:
         self.menubar.setGeometry(QRect(0, 0, 1226, 30))
         self.menubar.setStyleSheet(
             "QMenuBar::item{\n"
-            "    background-color: rgb(0, 64, 122);\n"
+            f"    background-color: {DARK};\n"
             "}\n"
-            "QMenuBar::item:pressed {	background-color:rgb(84, 188, 235);}\n"
-            "QMenuBar::item:selected{	background-color:rgb(84, 188, 235);}\n"
-            "QToolTip { color: #fff; background-color: #000; border: none; }"
+            "QMenuBar::item:pressed{\n"
+            f"	background-color: {LIGHT};\n"
+            "}\n"
+            "QMenuBar::item:selected{\n"
+            f"background-color: {LIGHT};\n"
+            "}\n"
+            f"QToolTip{'{'} color: {WHITE}; background-color: {BLACK}; border: none; {'}'}"
         )
         self.menubar.setNativeMenuBar(True)
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
         self.menuFile.setStyleSheet(
-            "QAction::icon { background-color:rgb(84, 188, 235);\n"
-            "selection-background-color: rgb(84, 188, 235);}\n"
-            "*{	background-color: rgb(0, 64, 122);}\n"
-            "*:hover{background-color: rgb(84, 188, 235);}"
+            f"QAction::icon {'{'} background-color:{LIGHT};\n"
+            f"selection-background-color: {LIGHT};{'}'}\n"
+            f"*{'{'}	background-color: {DARK};{'}'}\n"
+            f"*:hover{'{'}background-color: {LIGHT};{'}'}"
         )
         self.menuFile.setTearOffEnabled(False)
         self.menuCalculation = QMenu(self.menubar)
@@ -403,10 +410,10 @@ class UiGhetool:
         self.toolBar.setObjectName("toolBar")
         self.toolBar.setStyleSheet(
             "*{\n"
-            "	background-color: rgb(0, 64, 122);\n"
+            f"	background-color: {DARK};\n"
             "}\n"
-            "*:hover{background-color: rgb(84, 188, 235);}\n"
-            "QToolTip { color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);border: 1px solid rgb(84, 188, 235); }"
+            f"*:hover{'{'}background-color: {LIGHT};{'}'}\n"
+            f"QToolTip {'{'} color: rgb(0, 0, 0); background-color: {WHITE};border: 1px solid {LIGHT}; {'}'}"
         )
         self.toolBar.setMovable(False)
         ghe_tool.addToolBar(Qt.TopToolBarArea, self.toolBar)
