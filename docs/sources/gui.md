@@ -1,28 +1,25 @@
 # Graphical Using Interface (GUI)
 
-```shell 
+# How to add translations?
+
+Translations for the GUI can be added in a new column in the `.\GHEtool\gui\Translations.csv` file. 
+Also, an icon and shortcut can be linked there. An explanation how to add an icon can be found [here](#how-to-add-an-icon)
+
+## How to create the *.exe file?
+
+```
 python -m PyInstaller --noconfirm --onefile --windowed --splash "./GHEtool/gui/icons/Icon.ico" --name "GHEtool" --icon "./GHEtool/gui/icons/Icon.ico" "./GHEtool/gui/start_gui.py"
 ```
 
-```shell 
+``` 
 python -m PyInstaller --noconfirm --onefile --console --splash "./GHEtool/gui/icons/Icon.ico" --name "GHEtool_with_command_line" --icon "./GHEtool/gui/icons/Icon.ico" "./GHEtool/gui/start_gui.py"
 ```
 
 
 
+## GUI structure
+
 ### Page
-
-add 'example_icon.svg' icon to 'icons.qrc' file which has to be located in the icons folder:
-
-```xml
-<file>icons/example_icon.svg</file>
-```
-
-Afterwards the 'icons_rc.py' has to be recompiled using the following command line:
-
-```sh
-pyside6-rcc ./GHEtool/gui/icons.qrc -o ./GHEtool/gui/icons_rc.py
-```
 
 ```python
 from GHEtool.gui.gui_classes import Page
@@ -38,13 +35,13 @@ page_example = Page(
 
 ```python
 from GHEtool.gui.gui_classes import Aim
-page_example = Aim(
+aim_example = Aim(
     default_parent=default_parent, 
     label='Example category',
     icon=":/icons/icons/example_icon.svg",
     page=page_example,
 )
-page_example.add_linked_option(option=option_example)
+aim_example.add_linked_option(option=option_example)
 ```
 
 ### Category
@@ -118,4 +115,18 @@ option_list = ListBox(
     category=category_example,
 )
 option_list.add_linked_option(option=option_linked, index=0)
+```
+
+## How to add an icon?
+
+add `example_icon.svg` icon to `icons.qrc` file which has to be located in the icons folder:
+
+```xml
+<file>icons/example_icon.svg</file>
+```
+
+Afterwards the `icons_rc.py` has to be recompiled using the following command line:
+
+```
+pyside6-rcc ./GHEtool/gui/icons.qrc -o ./GHEtool/gui/icons_rc.py
 ```
