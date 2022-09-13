@@ -230,7 +230,7 @@ class GuiStructure:
             default_parent, category=self.category_temperatures, label="Simulation period [yrs]: ", default_value=20, minimal_value=1, maximal_value=100
         )
 
-        self.option_method_temp_gradient.linked_options.append((self.option_temp_gradient, 1))
+        self.option_method_temp_gradient.add_linked_option(self.option_temp_gradient, 1)
 
         self.page_borehole_resistance = Page(default_parent, "Equivalent borehole resistance", "Borehole\nresistance", ":/icons/icons/Resistance.png")
         self.page_borehole.set_next_page(self.page_borehole_resistance)
@@ -248,11 +248,11 @@ class GuiStructure:
             maximal_value=100,
             step=0.01,
         )
-        self.option_method_rb_calc.linked_options.append((self.category_constant_rb, 0))
+        self.option_method_rb_calc.add_linked_option(self.category_constant_rb, 0)
 
         self.category_fluid_data = Category(default_parent, page=self.page_borehole_resistance, label="Fluid data")
-        self.option_method_rb_calc.linked_options.append((self.category_fluid_data, 1))
-        self.option_method_rb_calc.linked_options.append((self.category_fluid_data, 2))
+        self.option_method_rb_calc.add_linked_option(self.category_fluid_data, 1)
+        self.option_method_rb_calc.add_linked_option(self.category_fluid_data, 2)
 
         self.option_fluid_conductivity = FloatBox(
             default_parent,
@@ -308,8 +308,8 @@ class GuiStructure:
 
         self.category_pipe_data = Category(default_parent, page=self.page_borehole_resistance, label="Pipe data")
         self.category_pipe_data.activate_graphic_left()
-        self.option_method_rb_calc.linked_options.append((self.category_pipe_data, 1))
-        self.option_method_rb_calc.linked_options.append((self.category_pipe_data, 2))
+        self.option_method_rb_calc.add_linked_option(self.category_pipe_data, 1)
+        self.option_method_rb_calc.add_linked_option(self.category_pipe_data, 2)
 
         self.option_pipe_number = IntBox(
             default_parent, category=self.category_pipe_data, label="Number of pipes [#]: ", default_value=2, minimal_value=1, maximal_value=99
@@ -425,20 +425,20 @@ class GuiStructure:
         self.option_heating_column = ListBox(default_parent, category=self.category_select_file, label="Heating load line: ", default_index=0, entries=[])
         self.option_cooling_column = ListBox(default_parent, category=self.category_select_file, label="Cooling load line: ", default_index=0, entries=[])
         self.option_single_column = ListBox(default_parent, category=self.category_select_file, label="Load line: ", default_index=0, entries=[])
-        self.option_column.linked_options.append((self.option_single_column, 0))
-        self.option_column.linked_options.append((self.option_heating_column, 1))
-        self.option_column.linked_options.append((self.option_cooling_column, 1))
+        self.option_column.add_linked_option(self.option_single_column, 0)
+        self.option_column.add_linked_option(self.option_heating_column, 1)
+        self.option_column.add_linked_option(self.option_cooling_column, 1)
         self.option_unit_data = ButtonBox(default_parent, category=self.category_select_file, label="Unit data: ", default_index=1, entries=["W", "kW", "MW"])
 
         self.button_load_csv = FunctionButton(default_parent, category=self.category_select_file, button_text="Load", icon=":/icons/icons/Download.svg")
-        self.option_data.linked_options.append((self.button_load_csv, 0))
+        self.option_data.add_linked_option(self.button_load_csv, 0)
         self.aim_temp_profile.add_linked_option(self.button_load_csv)
         self.aim_req_depth.add_linked_option(self.button_load_csv)
         self.aim_size_length.add_linked_option(self.button_load_csv)
 
         self.category_th_demand = Category(default_parent, page=self.page_thermal, label="Thermal demands")
         self.category_th_demand.activate_grid_layout(5)
-        self.option_data.linked_options.append((self.category_th_demand, 0))
+        self.option_data.add_linked_option(self.category_th_demand, 0)
         self.aim_temp_profile.add_linked_option(self.category_th_demand)
         self.aim_req_depth.add_linked_option(self.category_th_demand)
         self.aim_size_length.add_linked_option(self.category_th_demand)

@@ -238,6 +238,9 @@ class ButtonBox(Option):
         self.set_value(0 if current_value != 0 else 1)
         self.set_value(current_value)
 
+    def add_linked_option(self, option: Union[Option, Category, FunctionButton], index: int):
+        self.linked_options.append([option, index])
+
     def change_event(self, function_to_be_called: Callable) -> None:
         for button in self.widget:
             button.clicked.connect(function_to_be_called)
@@ -308,6 +311,9 @@ class ListBox(Option):
         current_value: int = self.get_value()
         self.set_value(0 if current_value != 0 else 1)
         self.set_value(current_value)
+
+    def add_linked_option(self, option: Union[Option, Category, FunctionButton], index: int):
+        self.linked_options.append([option, index])
 
     def change_event(self, function_to_be_called: Callable) -> None:
         self.widget.currentIndexChanged.connect(function_to_be_called)
