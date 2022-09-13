@@ -21,7 +21,7 @@ add 'example_icon.svg' icon to 'icons.qrc' file which has to be located in the i
 Afterwards the 'icons_rc.py' has to be recompiled using the following command line:
 
 ```{commandline}
-pyside6-rcc icons.qrc -o icons_rc.py
+pyside6-rcc ./GHEtool/gui/icons.qrc -o ./GHEtool/gui/icons_rc.py
 ```
 
 
