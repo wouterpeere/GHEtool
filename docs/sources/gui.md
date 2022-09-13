@@ -3,7 +3,7 @@
 # How to add translations?
 
 Translations for the GUI can be added in a new column in the `.\GHEtool\gui\Translations.csv` file. 
-Also, an icon and shortcut can be linked there. An explanation how to add an icon can be found [here](#how-to-add-an-icon)
+Also, an icon and shortcut can be linked there. An explanation how to add an icon can be found [here](#how-to-add-an-icon?)
 
 ## How to create the *.exe file?
 
