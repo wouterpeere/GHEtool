@@ -69,7 +69,7 @@ nothing
 
 ## [1.0.1] - 2021-12-11
 
-# Changed
+### Changed
 - longer simulation period up to 100 years
 
 ### Fixed 
