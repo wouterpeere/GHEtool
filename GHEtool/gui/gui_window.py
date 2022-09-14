@@ -41,7 +41,7 @@ from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
 from GHEtool.gui.gui_calculation_thread import (BoundsOfPrecalculatedData,
                                                 CalcProblem)
 from GHEtool.gui.gui_data_storage import DataStorage
-from GHEtool.gui.gui_main_new import UiGhetool, GREY, WHITE, DARK, LIGHT, WARNING
+from GHEtool.gui.gui_main import UiGhetool, GREY, WHITE, DARK, LIGHT, WARNING
 from GHEtool.gui.gui_structure import GuiStructure
 from GHEtool.gui.translation_class import Translations
 
@@ -1205,7 +1205,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         """
         # hide widgets if no list of scenarios exists and display not calculated text
         if not self.list_ds:
-            self.gui_structure.hint_depth.label_text.setText(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
+            self.gui_structure.hint_depth.set_text(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
             # self.label_WarningDepth.hide()
             self.gui_structure.option_show_legend.hide()
             self.gui_structure.function_save_results.hide()
@@ -1239,7 +1239,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         li_n_2 = [str(round(i[1], 2)) for i in borefield.combo]
         # hide widgets if no solution exists and display no solution text
         if (ds.aim_size_length and not li_size) or (ds.aim_req_depth and borefield.H == borefield.H_max):
-            self.gui_structure.hint_depth.label_text.setText(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
+            self.gui_structure.hint_depth.set_text(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
             # self.label_WarningDepth.hide()
             self.gui_structure.option_show_legend.hide()
             self.gui_structure.function_save_results.hide()
