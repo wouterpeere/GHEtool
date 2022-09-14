@@ -477,6 +477,9 @@ class FunctionButton:
         self.button_text: str = name
         self.button.setText(self.button_text)
 
+    def change_event(self, function_to_be_called: Callable) -> None:
+        self.button.clicked.connect(function_to_be_called)
+
 
 class Category:
     def __init__(self, default_parent: QtW.QWidget, label: str, page: Page):
