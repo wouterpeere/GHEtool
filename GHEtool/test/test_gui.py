@@ -5,13 +5,9 @@ from typing import List, Union
 from math import isclose
 
 def test_gui(qtbot):
-    from ctypes import windll as ctypes_windll
-    from sys import argv
-    from sys import exit as sys_exit
     import sys
     sys.setrecursionlimit(1500)
 
-    from PySide6.QtWidgets import QApplication as QtWidgets_QApplication
     from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
 
     from GHEtool.gui.gui_window import MainWindow
