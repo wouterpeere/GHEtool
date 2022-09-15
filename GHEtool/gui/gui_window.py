@@ -1,8 +1,8 @@
 from functools import partial as ft_partial
 from math import pi
-from os.path import dirname, realpath
+from os.path import dirname, realpath, exists
 from os.path import split as os_split
-from os import makedirs
+from os import makedirs, remove
 from pathlib import Path, PurePath
 from pickle import HIGHEST_PROTOCOL as pk_HP
 from pickle import dump as pk_dump
@@ -592,6 +592,10 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # select current scenario
         self.list_widget_scenario.setCurrentRow(scenario_index) if scenario_index >= 0 else None
 
+    def delete_backup(self):
+        if exists(self.backup_path):
+            remove(self.backup_path)
+
     def load_list(self) -> None:
         """
         try to open the backup file and set the old values
@@ -650,6 +654,8 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         :param filename: filename of data file
         :return: None
         """
+        if not isinstance(filename, str):
+            return
         # import pandas here to save start up time
         from pandas import read_csv as pd_read_csv
 
@@ -1160,7 +1166,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.threads[0].any_signal.connect(self.thread_function)
             return
 
-    def start_current_scenario_calculation(self) -> None:
+    def start_current_scenario_calculation(self, run: bool = True) -> None:
         """
         start calculation of selected scenario
         :return: None
@@ -1195,8 +1201,9 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # set number of to calculate scenarios
         self.NumberOfScenarios: int = len(self.threads)
         # start calculation
-        self.threads[0].start()
-        self.threads[0].any_signal.connect(self.thread_function)
+        if run:
+            self.threads[0].start()
+            self.threads[0].any_signal.connect(self.thread_function)
 
     def display_results(self) -> None:
         """

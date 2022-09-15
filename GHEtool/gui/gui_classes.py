@@ -707,7 +707,7 @@ class Page:
         scroll_area.setFrameShape(QtW.QFrame.NoFrame)
         scroll_area.setLineWidth(0)
         scroll_area.setWidgetResizable(True)
-        scroll_area_content = QtW.QWidget()
+        scroll_area_content = QtW.QWidget(self.page)
         scroll_area_content.setGeometry(QtC.QRect(0, 0, 864, 695))
         scroll_area.setWidget(scroll_area_content)
         layout.addWidget(scroll_area)
@@ -782,7 +782,7 @@ class Page:
         if self.previous_page is None and self.next_page is None:
             return
 
-        horizontal_layout = QtW.QHBoxLayout(central_widget)
+        horizontal_layout = QtW.QHBoxLayout(scroll_area_layout.parent())
 
         if self.previous_page is not None:
             push_button_previous = QtW.QPushButton(central_widget)

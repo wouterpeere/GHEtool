@@ -736,13 +736,13 @@ class Translations:
             "Liña de data: ",
         ]
         self.option_column: List[str] = [
-            "Thermal demand in one or two columns?:,2 columns,1 column",
-            "Thermischer Bedarf einer oder zwei Spalten?:,2 Spalten,1 Spalte",
-            "Thermal demand in one or two columns?:,2 kolommen,1 kolom",
-            "Thermal demand in one or two columns?:,2 colonne,1 colonna",
-            "Thermal demand in one or two columns?:,2 colonnes,1 colonne",
-            "Thermal demand in one or two columns?:,2 columnas,1 columna",
-            "Thermal demand in one or two columns?:,2 columnas,1 columna",
+            "Thermal demand in one or two columns?:,1 column,2 columns",
+            "Thermischer Bedarf einer oder zwei Spalten?:,1 Spalte,2 Spalten",
+            "Thermal demand in one or two columns?:,1 kolom,2 kolommen",
+            "Thermal demand in one or two columns?:,1 colonna,2 colonne",
+            "Thermal demand in one or two columns?;,1 colonne,2 colonnes",
+            "Thermal demand in one or two columns?:,1 columna,2 columnas",
+            "Thermal demand in one or two columns?:,1 columna,2 columnas",
         ]
         self.pushButton_calculate: List[str] = ["Calculate", "Berechne", "Bereken", "Calcola", "Calculer", "Calcular", "Calcular"]
         self.ErrorMassage: List[str] = ["Error!", "Fehler!", "Error!", "Errore!", "Erreur!", "Error!", "Erro!"]
