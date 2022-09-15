@@ -73,7 +73,7 @@ def test_gui(qtbot):
 
     main_window.gui_structure.aim_req_depth.widget.click()
     main_window.save_scenario()
-    main_window.start_current_scenario_calculation(False)
+    main_window.start_current_scenario_calculation(True)
     with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
         main_window.threads[0].run()
         main_window.threads[0].any_signal.connect(main_window.thread_function)

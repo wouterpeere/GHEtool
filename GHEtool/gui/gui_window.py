@@ -1166,7 +1166,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.threads[0].any_signal.connect(self.thread_function)
             return
 
-    def start_current_scenario_calculation(self, run: bool = True) -> None:
+    def start_current_scenario_calculation(self, no_run: bool = False) -> None:
         """
         start calculation of selected scenario
         :return: None
@@ -1201,7 +1201,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # set number of to calculate scenarios
         self.NumberOfScenarios: int = len(self.threads)
         # start calculation
-        if run:
+        if not no_run:
             self.threads[0].start()
             self.threads[0].any_signal.connect(self.thread_function)
 
