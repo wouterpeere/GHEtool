@@ -1224,6 +1224,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         from matplotlib import axes as matplotlib_axes
         from matplotlib.backends.backend_qt5agg import \
             FigureCanvasQTAgg as FigureCanvas
+        from matplotlib.colors import to_rgb
         from numpy import array as np_array
 
         # get Datastorage of selected scenario
@@ -1266,10 +1267,10 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         results_month_heating = borefield.results_month_heating
         t_b = borefield.Tb
         # set colors for graph
-        background_color: str = array(DARK.replace('rgb(', '').replace(')', '').split(','), dtype=float64)/255
-        white_color: str = array(WHITE.replace('rgb(', '').replace(')', '').split(','), dtype=float64)/255
-        light_color: str = array(LIGHT.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255
-        bright_color: str = array(WARNING.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255
+        background_color: str = to_rgb(array(DARK.replace('rgb(', '').replace(')', '').split(','), dtype=float64)/255)
+        white_color: str = to_rgb(array(WHITE.replace('rgb(', '').replace(')', '').split(','), dtype=float64)/255)
+        light_color: str = to_rgb(array(LIGHT.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
+        bright_color: str = to_rgb(array(WARNING.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
         plt.rcParams["text.color"] = white_color
         plt.rcParams["axes.labelcolor"] = white_color
         plt.rcParams["xtick.color"] = white_color
@@ -1481,9 +1482,14 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         save figure to the QFileDialog asked location
         :return: None
         """
+        import PySide6.QtGui as opt
+
         # get filename at storage place
         filename = QtWidgets_QFileDialog.getSaveFileName(
-            self.central_widget, caption=self.translations.SaveFigure[self.gui_structure.option_language.get_value()], filter="png (*.png)"
+            self.central_widget, caption=self.translations.SaveFigure[self.gui_structure.option_language.get_value()],
+            dir=self.backup_path.replace('backup.pkl', ''),
+            filter="PNG (*.png);;svg (*.svg);;PDF (*.pdf)",
+            selectedFilter="png (*.png);;svg (*.svg);;PDF (*.pdf)",
         )
         # display message and return if no file is selected
         if filename == MainWindow.filenameDefault:
