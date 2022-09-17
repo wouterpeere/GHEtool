@@ -5,11 +5,10 @@ on:
   - pull_request
 
 jobs:
-  test:
-    runs-on: ${{ matrix.os }}
+  test_all_coverage:
+    runs-on: windows-latest
     strategy:
       matrix:
-        os: [windows-latest]
         python-version: ['3.10']
     steps:
     - uses: actions/checkout@v2
@@ -30,11 +29,11 @@ jobs:
       with:
         token: 2ac65167-3651-4b1f-95ce-9611ea1c3420 # not required for public repos
 
-  test_linux:
+  test_GHEtool:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-          os: [ubuntu-latest, windows-latest, macos-latest ]
+        os: [ubuntu-latest, windows-latest, macos-latest ]
         python-version: [ '3.8', '3.9', '3.10' ]
 
     steps:
