@@ -5,7 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [unreleased]
 
-nothing
+### Added
+- Documentation with ReadTheDocs
+- GUI Documentation
+- Changelog
+- New features in the GUI
+
+### Changed
+- GUI workflow to be simpler
 
 ## [2.0.5] - 2022-08-31
 
