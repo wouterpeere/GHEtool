@@ -8,7 +8,7 @@ import PySide6.QtCore as QtC
 import PySide6.QtGui as QtG
 import PySide6.QtWidgets as QtW
 
-from .gui_main import DARK, GREY, LIGHT, WARNING, WHITE, LIGHT_SELECT
+from .gui_base_class import DARK, GREY, LIGHT, WARNING, WHITE, LIGHT_SELECT
 
 
 def update_opponent(button: QtW.QPushButton, button_opponent: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):

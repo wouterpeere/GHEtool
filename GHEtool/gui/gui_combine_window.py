@@ -41,7 +41,7 @@ from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
 from GHEtool.gui.gui_calculation_thread import (BoundsOfPrecalculatedData,
                                                 CalcProblem)
 from GHEtool.gui.gui_data_storage import DataStorage
-from GHEtool.gui.gui_main import UiGhetool, GREY, WHITE, DARK, LIGHT, WARNING
+from GHEtool.gui.gui_base_class import UiGhetool, GREY, WHITE, DARK, LIGHT, WARNING
 from GHEtool.gui.gui_structure import GuiStructure
 from GHEtool.gui.translation_class import Translations
 

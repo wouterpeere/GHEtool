@@ -1,16 +1,16 @@
 from GHEtool.gui.gui_classes import FloatBox, IntBox, ListBox, ButtonBox, FileNameBox
-from GHEtool.gui.gui_calculation_thread import CalcProblem
 from GHEtool.main_class import FOLDER
 from typing import List, Union
 from math import isclose
 
-def test_gui(qtbot):
+
+def test_gui_values(qtbot):
     import sys
     sys.setrecursionlimit(1500)
 
     from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
 
-    from GHEtool.gui.gui_window import MainWindow
+    from GHEtool.gui.gui_combine_window import MainWindow
 
     # init window
     # window =
@@ -84,4 +84,34 @@ def test_gui(qtbot):
     print('end')
     # close app
     # sys_exit(qtbot.exec())
+
+
+def test_gui_scenarion_properties(qtbot):
+    import sys
+    sys.setrecursionlimit(1500)
+
+    from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
+
+    from GHEtool.gui.gui_combine_window import MainWindow
+
+    # init gui window
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.delete_backup()
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+
+    assert len(main_window.list_ds) == 0
+
+    main_window.save_scenario()
+    assert len(main_window.list_ds) == 1
+
+    for i in range(10):
+        main_window.add_scenario()
+        assert len(main_window.list_ds) == 2 + i
+
+    for i in range(10):
+        main_window.delete_scenario()
+        assert len(main_window.list_ds) == 10 - i
+
+    main_window.delete_scenario()
+    assert len(main_window.list_ds) == 1
 
