@@ -8,10 +8,76 @@ from GHEtool.gui.translation_class import Translations
 
 class GuiStructure:
     def __init__(self, default_parent: QWidget, status_bar: QStatusBar):
+        """
+        self.page_example = Page(default_parent=default_parent,name='Example page',button_name='Name of\nthe button', icon=":/icons/icons/Aim_Inv.svg")
 
+        self.aim_example = Aim(default_parent=default_parent,label='Example aim',icon=":/icons/icons/Depth_determination.svg",page=self.page_example)
+        self.aim_example = Aim(default_parent=default_parent, label='Example aim', icon=":/icons/icons/Depth_determination.svg", page=self.page_example)
+        self.aim_example = Aim(default_parent=default_parent, label='Example aim', icon=":/icons/icons/Depth_determination.svg", page=self.page_example)
+        self.category_example = Category(
+            default_parent=default_parent,
+            label='Example category',
+            page=self.page_example,
+        )
+
+        self.option_float = FloatBox(
+            default_parent=default_parent,
+            label='Float label text',
+            default_value=0.5,
+            category=self.category_example,
+            decimal_number=2,
+            minimal_value=0,
+            maximal_value=1,
+            step=0.1,
+        )
+        self.option_int = IntBox(
+            default_parent=default_parent,
+            label='Int label text',
+            default_value=2,
+            category=self.category_example,
+            minimal_value=0,
+            maximal_value=12,
+            step=2,
+        )
+        self.option_buttons = ButtonBox(
+            default_parent=default_parent,
+            label='Button box label text',
+            default_index=0,
+            entries=['option 1', 'option 2'],
+            category=self.category_example,
+        )
+        self.option_list = ListBox(
+            default_parent=default_parent,
+            label='List box label text',
+            default_index=0,
+            entries=['Option 1', 'Option 2'],
+            category=self.category_example,
+        )
+        self.option_file = FileNameBox(
+            default_parent=default_parent,
+            label='File name box label text',
+            default_value='example_file.XX',
+            dialog_text='Choose *.XX file',
+            error_text='no file found',
+            status_bar=status_bar,
+            category=self.category_example,
+        )
+        self.function_example = FunctionButton(
+            default_parent=default_parent,
+            button_text='Press Here to activate function',
+            icon=':/icons/icons/example_icon.svg',
+            category=self.category_example,
+        )
+        self.hint_example = Hint(
+            default_parent=default_parent,
+            hint='This is a hint to something important.',
+            category=self.category_example,
+            warning=True,
+        )
+        """
         self.page_aim = Page(default_parent, "Aim of simulation", "Aim", ":/icons/icons/Aim_Inv.svg")
 
-        self.aim_temp_profile = Aim(default_parent, page=self.page_aim, label="Determine temperature profile", icon=":/icons/icons/Options.svg")
+        self.aim_temp_profile = Aim(default_parent, page=self.page_aim, label="Determine temperature profile", icon=":/icons/icons/Temp_Profile.svg")
         self.aim_req_depth = Aim(default_parent, page=self.page_aim, label="Determine required depth", icon=":/icons/icons/Depth_determination.svg")
         self.aim_size_length = Aim(default_parent, page=self.page_aim, label="Size borefield by length and width", icon=":/icons/icons/Size_Length.svg")
         self.aim_optimize = Aim(default_parent, page=self.page_aim, label="Optimize load profile", icon=":/icons/icons/Optimize_Profile.svg")

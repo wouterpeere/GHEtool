@@ -40,6 +40,9 @@ page_example.set_previous_page(page_previous)
 page_example.set_next_page(page_next)
 ```
 
+Example Page
+![Python Logo](_static/Example_Page.png)
+
 ### Aim
 
 To create an aim the Aim class has to be imported from 
@@ -62,6 +65,9 @@ aim_example = Aim(
 aim_example.add_linked_option(option=option_example)
 ```
 
+Example Aim
+![Python Logo](_static/Example_Aim.png)
+
 ### Category
 
 To create a category the Category class has to be imported from 
@@ -79,6 +85,8 @@ category_example = Category(
 )
 ```
 
+Example Category
+![Python Logo](_static/Example_Category.png)
 
 ### Float box
 
@@ -109,6 +117,9 @@ option_float = FloatBox(
 )
 ```
 
+Example float box
+![Python Logo](_static/Example_Float_Box.png)
+
 ### Integer box
 
 To create a integer box the IntegerBox class has to be imported from 
@@ -135,6 +146,9 @@ option_int = IntBox(
 )
 ```
 
+Example integer box
+![Python Logo](_static/Example_Int_Box.png)
+
 ### Button box
 
 To create a button box the ButtonBox class has to be imported from 
@@ -159,6 +173,9 @@ option_buttons = ButtonBox(
 )
 option_buttons.add_linked_option(option=option_linked, index=0)
 ```
+
+Example button box
+![Python Logo](_static/Example_Button_Box.png)
 
 ### List box
 
@@ -186,6 +203,9 @@ option_list = ListBox(
 option_list.add_linked_option(option=option_linked, index=0)
 ```
 
+Example list box
+![Python Logo](_static/Example_List_Box.png)
+
 ### Filename
 
 To create a filename box the FileNameBox class has to be imported from 
@@ -211,6 +231,9 @@ option_file = FileNameBox(
 )
 ```
 
+Example filename box
+![Python Logo](_static/Example_Filename.png)
+
 ### Function button
 
 To create a function button the FunctionButton class has to be imported from 
@@ -232,6 +255,9 @@ function_example = FunctionButton(
 function_example.change_event(function_to_be_called())
 ```
 
+Example function button
+![Python Logo](_static/Example_Function_Button.png)
+
 ### Hint
 
 To create a hint the Hint class has to be imported from 
@@ -244,7 +270,7 @@ color.
 
 ```python
 from GHEtool.gui.gui_classes import Hint
-function_example = Hint(
+hint_example = Hint(
     default_parent=default_parent,
     hint='This is a hint to something important.',
     category=category_example,
@@ -253,6 +279,8 @@ function_example = Hint(
 function_example.change_event(function_to_be_called())
 ```
 
+Example Hint
+![Python Logo](_static/Example_Hint.png)
 
 ## How to add or correct translations?
 

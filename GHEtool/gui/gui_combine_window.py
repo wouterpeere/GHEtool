@@ -578,7 +578,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.gui_structure.translate(self.gui_structure.option_language.get_value(), self.translations)
         for idx, name in enumerate(self.translations.languages):
             self.gui_structure.option_language.widget.setItemText(idx, name)
-            print(idx, name)
         # set small PushButtons
         self.set_push(False)
         # replace scenario names if they are not unique

@@ -859,6 +859,11 @@ class Page:
         stacked_widget.addWidget(self.page)
         if self.upper_frame:
             self.create_upper_frame(scroll_area_content, scroll_area_layout)
+        label_gap = QtW.QLabel(central_widget)
+        label_gap.setMinimumSize(QtC.QSize(0, 6))
+        label_gap.setMaximumSize(QtC.QSize(16777215, 6))
+
+        scroll_area_layout.addWidget(label_gap)
 
         for category in self.list_categories:
             category.create_widget(scroll_area_content, scroll_area_layout)
