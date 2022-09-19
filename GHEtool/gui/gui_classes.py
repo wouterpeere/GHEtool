@@ -7,6 +7,7 @@ from __future__ import annotations
 import abc
 from functools import partial as ft_partial
 from typing import Callable, List, Optional, Union
+from os.path import exists
 
 import PySide6.QtCore as QtC  # type: ignore
 import PySide6.QtGui as QtG  # type: ignore
@@ -55,6 +56,22 @@ class Option(metaclass=abc.ABCMeta):
         set value of option.\n
         :param value: value to be set
         """
+
+    @abc.abstractmethod
+    def _check_value(self) -> bool:
+        """
+        Checks if the value of the option is valid
+        :return: boolean which is true if the option value is valid
+        """
+
+    def check_value(self) -> bool:
+        """
+        Checks if the value of the option is valid
+        :return: boolean which is true if the option value is valid
+        """
+        if self.frame.isVisible():
+            return self._check_value()
+        return True
 
     @abc.abstractmethod
     def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, *, row: int = None, column: int = None) -> None:
@@ -209,6 +226,9 @@ class FloatBox(Option):
         self.set_value(current_value*1.1)
         self.set_value(current_value)
 
+    def _check_value(self) -> bool:
+        return self.minimal_value <= self.get_value() <= self.maximal_value
+
     def change_event(self, function_to_be_called: Callable) -> None:
         """
         Function for the change event\n
@@ -275,6 +295,9 @@ class IntBox(Option):
         self.set_value(self.minimal_value if current_value == self.minimal_value else self.minimal_value)
         self.set_value(current_value)
 
+    def _check_value(self) -> bool:
+        return self.minimal_value <= self.get_value() <= self.maximal_value
+
     def change_event(self, function_to_be_called: Callable) -> None:
         """
         Function for the change event\n
@@ -339,6 +362,9 @@ class ButtonBox(Option):
         current_value: int = self.get_value()
         self.set_value(0 if current_value != 0 else 1)
         self.set_value(current_value)
+
+    def _check_value(self) -> bool:
+        return any(button.isChecked() for button in self.widget)
 
     def add_linked_option(self, option: Union[Option, Category, FunctionButton], index: int):
         """
@@ -417,6 +443,9 @@ class ListBox(Option):
         current_value: int = self.get_value()
         self.set_value(0 if current_value != 0 else 1)
         self.set_value(current_value)
+
+    def _check_value(self) -> bool:
+        return self.widget.currentIndex() >= 0
 
     def set_text(self, name: str):
         entry_name: List[str, str] = name.split(',')
@@ -499,6 +528,9 @@ class FileNameBox(Option):
         current_value: str = self.get_value()
         self.set_value('test')
         self.set_value(current_value)
+
+    def _check_value(self) -> bool:
+        return exists(self.widget.text())
 
     def change_event(self, function_to_be_called: Callable) -> None:
         """
@@ -716,10 +748,14 @@ class Category:
     def hide(self) -> None:
         self.frame.hide()
         self.label.hide()
+        for option in self.list_of_options:
+            option.hide()
 
     def show(self) -> None:
         self.frame.show()
         self.label.show()
+        for option in self.list_of_options:
+            option.show()
 
 
 class Aim:
