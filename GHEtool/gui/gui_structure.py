@@ -798,6 +798,8 @@ class GuiStructure:
         self.list_of_pages: List[Page] = [getattr(self, name) for name in self.__dict__ if isinstance(getattr(self, name), Page)]
 
     def translate(self, index: int, translation: Translations):
+        Page.next_label = translation.label_next[index]
+        Page.previous_label = translation.label_previous[index]
         for name in [j for j in translation.__slots__ if hasattr(self, j)]:
             entry: Optional[Option, Hint, FunctionButton, Page, Category] = getattr(self, name)
             entry.set_text(getattr(translation, name)[index])

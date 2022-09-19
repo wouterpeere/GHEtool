@@ -1,17 +1,27 @@
+"""
+GUI classes to be used in the gui structure
+"""
+
 from __future__ import annotations
 
 import abc
 from functools import partial as ft_partial
 from typing import Callable, List, Optional, Union
 
-import PySide6.QtCore as QtC
-import PySide6.QtGui as QtG
-import PySide6.QtWidgets as QtW
+import PySide6.QtCore as QtC  # type: ignore
+import PySide6.QtGui as QtG  # type: ignore
+import PySide6.QtWidgets as QtW  # type: ignore
 
-from .gui_base_class import DARK, GREY, LIGHT, WARNING, WHITE, LIGHT_SELECT
+from GHEtool.gui.gui_base_class import DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE
 
 
 def update_opponent(button: QtW.QPushButton, button_opponent: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
+    """
+    update the opponent button\n
+    :param button:
+    :param button_opponent:
+    :param false_button_list:
+    """
     button_opponent.setChecked(not button.isChecked())
     if false_button_list is not None:
         for false_button in false_button_list:
@@ -19,8 +29,10 @@ def update_opponent(button: QtW.QPushButton, button_opponent: QtW.QPushButton, f
 
 
 class Option(metaclass=abc.ABCMeta):
+    """
+    Abstract base class for a gui option.\n
+    """
     def __init__(self, default_parent: QtW.QWidget, label: str, default_value: Union[bool, int, float, str], category: Category):
-
         self.label_text: str = label
         self.default_value: Union[bool, int, float, str] = default_value
         self.widget: Optional[QtW.QWidget] = None
@@ -32,32 +44,62 @@ class Option(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_value(self) -> Union[bool, int, float, str]:
-        pass
+        """
+        get value of option.\n
+        :return: return value of option
+        """
 
     @abc.abstractmethod
     def set_value(self, value: Union[bool, int, float, str]) -> None:
-        pass
+        """
+        set value of option.\n
+        :param value: value to be set
+        """
 
     @abc.abstractmethod
-    def create_widget(self, frame: QtW.QFrame, layout: QtW.QLayout, row: int = None, column: int = None) -> None:
-        pass
+    def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, *, row: int = None, column: int = None) -> None:
+        """
+        create the widget in the frame.\n
+        :param frame: frame in which the widget should be created
+        :param layout_parent: parent layout
+        :param row: row if layout is a grid layout
+        :param column: column if layout is a grid layout
+        """
 
     @abc.abstractmethod
     def _init_links(self) -> None:
-        pass
+        """
+        abstract function to init the links of specific option\n
+        """
 
     def init_links(self) -> None:
+        """
+        init the links\n
+        """
         if self.linked_options:
             self._init_links()
 
     def set_text(self, name: str):
+        """
+        set the label text\n
+        :param name: name of the label
+        """
         self.label_text = name
         self.label.setText(name)
 
     def deactivate_size_limit(self):
+        """
+        deactivate size limit\n
+        """
         self.limit_size = False
 
     def create_frame(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, create_spacer: bool = True) -> QtW.QHBoxLayout:
+        """
+        Create the frame in the category.\n
+        :param frame:
+        :param layout_parent:
+        :param create_spacer:
+        """
         if self.label_text == "":
             self.frame.setParent(None)
             self.frame = frame
@@ -79,18 +121,33 @@ class Option(metaclass=abc.ABCMeta):
         return layout
 
     def hide(self) -> None:
+        """
+        hide option\n
+        """
         self.frame.hide()
 
     def show(self) -> None:
+        """
+        show option
+        """
         self.frame.show()
 
     @abc.abstractmethod
     def change_event(self, function_to_be_called: Callable) -> None:
-        pass
+        """
+        abstract method for the change event\n
+        :param function_to_be_called: function to be called if option has changed
+        """
 
 
-def check(linked_options: List[(Union[Option, List[Option]], int)], option: Option, index: int):
-    index = index if option.get_value() == index else option.get_value()
+def check(linked_options: List[(Union[Option, List[Option]], int)], option_input: Option, index: int):
+    """
+    check the list of options should be hidden or shown.\n
+    :param linked_options:
+    :param option_input:
+    :param index:
+    """
+    index = index if option_input.get_value() == index else option_input.get_value()
     list_false = [(option, idx) for option, idx in linked_options if idx != index]
     list_true = [(option, idx) for option, idx in linked_options if idx == index]
     for option, idx in list_false:
@@ -108,12 +165,16 @@ def check(linked_options: List[(Union[Option, List[Option]], int)], option: Opti
 
 
 class FloatBox(Option):
+    """
+    Float input box\n
+    """
     def __init__(
         self,
         default_parent: QtW.QWidget,
         label: str,
         default_value: float,
         category: Category,
+        *,
         decimal_number: int = 0,
         minimal_value: float = 0.0,
         maximal_value: float = 100.0,
@@ -127,27 +188,39 @@ class FloatBox(Option):
         self.widget: QtW.QDoubleSpinBox = QtW.QDoubleSpinBox(default_parent)
 
     def get_value(self) -> float:
+        """
+        get value of option.\n
+        :return: return value of option
+        """
         return self.widget.value()
 
     def set_value(self, value: float) -> None:
+        """
+        set value of option.\n
+        :param value: value to be set
+        """
         self.widget.setValue(value)
 
     def _init_links(self) -> None:
+        """
+        Set way on which the links should be set\n
+        """
         current_value: float = self.get_value()
         self.set_value(current_value*1.1)
         self.set_value(current_value)
 
     def change_event(self, function_to_be_called: Callable) -> None:
-        self.widget.valueChanged.connect(function_to_be_called)
+        """
+        Function for the change event\n
+        :param function_to_be_called: function to be called if option has changed
+        """
+        self.widget.valueChanged.connect(function_to_be_called)  # pylint: disable=E1101
 
-    def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, row: int = None, column: int = None) -> None:
+    def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, *, row: int = None, column: int = None) -> None:
         layout = self.create_frame(frame, layout_parent)
         self.widget.setParent(self.frame)
         self.widget.setStyleSheet(
-            f"QDoubleSpinBox{'{'}selection-color: {WHITE};\n"
-            f"selection-background-color: {LIGHT};\n"
-            f"border: 1px solid {WHITE};\n"
-            'font: 11pt "Lexend Deca Light";}\n'
+            f'QDoubleSpinBox{"{"}selection-color: {WHITE};selection-background-color: {LIGHT};border: 1px solid {WHITE};font: 11pt "Lexend Deca Light";{"}"}'
         )
         self.widget.setAlignment(QtC.Qt.AlignRight | QtC.Qt.AlignTrailing | QtC.Qt.AlignVCenter)
         self.widget.setProperty("showGroupSeparator", True)
@@ -167,8 +240,12 @@ class FloatBox(Option):
 
 
 class IntBox(Option):
+    """
+    Integer input box\n
+    """
     def __init__(
-        self, default_parent: QtW.QWidget, label: str, default_value: int, category: Category, minimal_value: int = 0, maximal_value: int = 100, step: int = 1
+        self, default_parent: QtW.QWidget, label: str, default_value: int, category: Category, *, minimal_value: int = 0, maximal_value: int = 100,
+            step: int = 1
     ):
         super().__init__(default_parent, label, default_value, category)
         self.minimal_value: int = minimal_value
@@ -177,28 +254,39 @@ class IntBox(Option):
         self.widget: QtW.QSpinBox = QtW.QSpinBox(default_parent)
 
     def get_value(self) -> int:
+        """
+        get value of option.\n
+        :return: return value of option
+        """
         return self.widget.value()
 
     def set_value(self, value: int) -> None:
+        """
+        set value of option.\n
+        :param value: value to be set
+        """
         self.widget.setValue(value)
 
     def _init_links(self) -> None:
+        """
+        Set way on which the links should be set\n
+        """
         current_value: int = self.get_value()
         self.set_value(self.minimal_value if current_value == self.minimal_value else self.minimal_value)
         self.set_value(current_value)
 
     def change_event(self, function_to_be_called: Callable) -> None:
-        self.widget.valueChanged.connect(function_to_be_called)
+        """
+        Function for the change event\n
+        :param function_to_be_called: function to be called if option has changed
+        """
+        self.widget.valueChanged.connect(function_to_be_called)  # pylint: disable=E1101
 
-    def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, row: int = None, column: int = None) -> None:
+    def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout,  *, row: int = None, column: int = None) -> None:
         layout = self.create_frame(frame, layout_parent)
         self.widget.setParent(self.frame)
         self.widget.setStyleSheet(
-            "QSpinBox{\n"
-            f"selection-color: {WHITE};\n"
-            f"selection-background-color: {LIGHT};\n"
-            f"border: 1px solid {WHITE};\n"
-            'font: 11pt "Lexend Deca Light";}\n'
+            f'QSpinBox{"{"}selection-color: {WHITE};selection-background-color: {LIGHT};border: 1px solid {WHITE};font: 11pt "Lexend Deca Light";{"}"}'
         )
         self.widget.setAlignment(QtC.Qt.AlignRight | QtC.Qt.AlignTrailing | QtC.Qt.AlignVCenter)
         self.widget.setMinimum(self.minimal_value)
@@ -215,35 +303,58 @@ class IntBox(Option):
 
 
 class ButtonBox(Option):
-    def __init__(self, default_parent: QtW.QWidget, label: str, default_index: int, entries: List[str], category: Category):
+    """
+    Button input box\n
+    """
+    def __init__(self, default_parent: QtW.QWidget, label: str, default_index: int, entries: List[str], *, category: Category):
         super().__init__(default_parent, label, default_index, category)
         self.entries: List[str] = entries
         self.widget: List[QtW.QPushButton] = [QtW.QPushButton(default_parent) for _ in self.entries]
 
     def get_value(self) -> int:
+        """
+        get value of option.\n
+        :return: return value of option
+        """
         for idx, button in enumerate(self.widget):
             if button.isChecked():
                 return idx
         return -1
 
-    def set_value(self, index: int) -> None:
+    def set_value(self, value: int) -> None:
+        """
+        set value of option.\n
+        :param value: value to be set
+        """
         for idx, button in enumerate(self.widget):
-            if idx == index:
+            if idx == value:
                 if not button.isChecked():
                     button.click()
                 break
 
     def _init_links(self) -> None:
+        """
+        Set way on which the links should be set\n
+        """
         current_value: int = self.get_value()
         self.set_value(0 if current_value != 0 else 1)
         self.set_value(current_value)
 
     def add_linked_option(self, option: Union[Option, Category, FunctionButton], index: int):
+        """
+        Add link to the index\n
+        :param option: option which should be linked
+        :param index: index on which the option should be shown
+        """
         self.linked_options.append([option, index])
 
     def change_event(self, function_to_be_called: Callable) -> None:
+        """
+        Function for the change event\n
+        :param function_to_be_called: function to be called if option has changed
+        """
         for button in self.widget:
-            button.clicked.connect(function_to_be_called)
+            button.clicked.connect(function_to_be_called)  # pylint: disable=E1101
 
     def set_text(self, name: str):
         entry_name: List[str, str] = name.split(',')
@@ -252,36 +363,17 @@ class ButtonBox(Option):
         for button, button_name in zip(self.widget, entry_name[1:]):
             button.setText(f" {button_name.replace('++', ',')} ")
 
-    def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, row: int = None, column: int = None) -> None:
+    def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, *, row: int = None, column: int = None) -> None:
         layout = self.create_frame(frame, layout_parent)
         for idx, (entry, widget) in enumerate(zip(self.entries, self.widget)):
             widget.setParent(self.frame)
             widget.setText(f" {entry} ")
             widget.setStyleSheet(
-                "QPushButton{\n"
-                f"border: 3px solid {DARK};\n"
-                "border-radius: 5px;\n"
-                f"gridline-color: {LIGHT};\n"
-                f"background-color: {GREY};\n"
-                "font-weight:500;}\n"
-                "QPushButton:hover{\n"
-                f"border: 3px solid {DARK};\n"
-                f"background-color:{LIGHT};\n"
-                "}\n"
-                "QPushButton:checked{\n"
-                f"border:3px solid {LIGHT};\n"
-                f"background-color:{LIGHT};\n"
-                "}\n"
-                "QPushButton:disabled{\n"
-                f"border: 3px solid {GREY};\n"
-                "border-radius: 5px;\n"
-                f"color: {WHITE};\n"
-                f"gridline-color: {GREY};\n"
-                f"background-color: {GREY};\n"
-                "}\n"
-                "QPushButton:disabled:hover{\n"
-                f"background-color: {DARK};\n"
-                "}"
+                f"QPushButton{'{'}border: 3px solid {DARK};border-radius: 5px;gridline-color: {LIGHT};background-color: {GREY};font-weight:500;{'}'}"
+                f"QPushButton:hover{'{'}border: 3px solid {DARK};background-color:{LIGHT};{'}'}"
+                f"QPushButton:checked{'{'}border:3px solid {LIGHT};background-color:{LIGHT};{'}'}\n"
+                f"QPushButton:disabled{'{'}border: 3px solid {GREY};border-radius: 5px;color: {WHITE};gridline-color: {GREY};background-color: {GREY};{'}'}\n"
+                f"QPushButton:disabled:hover{'{'}background-color: {DARK};{'}'}"
             )
             widget.setCheckable(True)
             widget.setChecked(idx == self.default_value)
@@ -296,48 +388,70 @@ class ButtonBox(Option):
 
 
 class ListBox(Option):
-    def __init__(self, default_parent: QtW.QWidget, label: str, default_index: int, entries: List[str], category: Category):
+    """
+    List input box\n
+    """
+    def __init__(self, default_parent: QtW.QWidget, label: str, default_index: int, entries: List[str], *, category: Category):
         super().__init__(default_parent, label, default_index, category)
         self.entries: List[str] = entries
         self.widget: QtW.QComboBox = QtW.QComboBox(default_parent)
 
     def get_value(self) -> int:
+        """
+        get value of option.\n
+        :return: return value of option
+        """
         return self.widget.currentIndex()
 
-    def set_value(self, index: int) -> None:
-        self.widget.setCurrentIndex(index)
+    def set_value(self, value: int) -> None:
+        """
+        set value of option.\n
+        :param value: value to be set
+        """
+        self.widget.setCurrentIndex(value)
 
     def _init_links(self) -> None:
+        """
+        Set way on which the links should be set\n
+        """
         current_value: int = self.get_value()
         self.set_value(0 if current_value != 0 else 1)
         self.set_value(current_value)
 
+    def set_text(self, name: str):
+        entry_name: List[str, str] = name.split(',')
+        self.label_text = entry_name[0]
+        self.label.setText(self.label_text)
+        for idx, name in enumerate(entry_name[1:]):
+            self.widget.setItemText(idx, name)
+
     def add_linked_option(self, option: Union[Option, Category, FunctionButton], index: int):
+        """
+        Add link to the index\n
+        :param option: option which should be linked
+        :param index: index on which the option should be shown
+        """
         self.linked_options.append([option, index])
 
     def change_event(self, function_to_be_called: Callable) -> None:
-        self.widget.currentIndexChanged.connect(function_to_be_called)
+        """
+        Function for the change event\n
+        :param function_to_be_called: function to be called if option has changed
+        """
+        self.widget.currentIndexChanged.connect(function_to_be_called)  # pylint: disable=E1101
 
-    def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, row: int = None, column: int = None) -> None:
+    def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, *, row: int = None, column: int = None) -> None:
         layout = self.create_frame(frame, layout_parent)
         self.widget.setParent(self.frame)
         self.widget.setStyleSheet(
-            "QFrame {\n"
-            f"	border: 1px solid {WHITE};\n"
-            "	border-bottom-left-radius: 0px;\n"
-            "	border-bottom-right-radius: 0px;\n"
-            "}"
-            "QComboBox{\n"
-            f"border: 1px solid {WHITE};\n"
-            "border-bottom-left-radius: 0px;\n"
-            "border-bottom-right-radius: 0px;\n"
-            "}\n"
+            f"QFrame {'{'}border: 1px solid {WHITE};border-bottom-left-radius: 0px;border-bottom-right-radius: 0px;{'}'}"
+            f"QComboBox{'{'}border: 1px solid {WHITE};border-bottom-left-radius: 0px;border-bottom-right-radius: 0px;{'}'}"
         )
         self.widget.addItems(self.entries)
         self.widget.setCurrentIndex(self.default_value)
         self.widget.setMaximumWidth(100)
         self.widget.setMinimumWidth(100)
-        self.widget.currentIndexChanged.connect(ft_partial(check, self.linked_options, self))
+        self.widget.currentIndexChanged.connect(ft_partial(check, self.linked_options, self))  # pylint: disable=E1101
         if row is not None and isinstance(layout_parent, QtW.QGridLayout):
             layout_parent.addWidget(self.widget, column, row)
             return
@@ -345,9 +459,18 @@ class ListBox(Option):
 
 
 class FileNameBox(Option):
+    """
+    Filename input box\n
+    """
     def __init__(
-            self, default_parent: QtW.QWidget, label: str, default_value: str, dialog_text: str, error_text: str, status_bar: QtW.QStatusBar,
-            category: Category
+            self,
+            default_parent: QtW.QWidget,
+            label: str,
+            default_value: str,
+            *, dialog_text: str,
+            error_text: str,
+            status_bar: QtW.QStatusBar,
+            category: Category,
     ):
         super().__init__(default_parent, label, default_value, category)
         self.widget: QtW.QLineEdit = QtW.QLineEdit(default_parent)
@@ -356,29 +479,39 @@ class FileNameBox(Option):
         self.status_bar: QtW.QStatusBar = status_bar
 
     def get_value(self) -> str:
+        """
+        get value of option.\n
+        :return: return value of option
+        """
         return self.widget.text()
 
-    def set_value(self, filename: str) -> None:
-        self.widget.setText(filename)
+    def set_value(self, value: str) -> None:
+        """
+        set value of option.\n
+        :param value: value to be set
+        """
+        self.widget.setText(value)
 
     def _init_links(self) -> None:
+        """
+        Set way on which the links should be set\n
+        """
         current_value: str = self.get_value()
         self.set_value('test')
         self.set_value(current_value)
 
     def change_event(self, function_to_be_called: Callable) -> None:
-        self.widget.textChanged.connect(function_to_be_called)
+        """
+        Function for the change event\n
+        :param function_to_be_called: function to be called if option has changed
+        """
+        self.widget.textChanged.connect(function_to_be_called)  # pylint: disable=E1101
 
-    def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, row: int = None, column: int = None) -> None:
+    def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, *, row: int = None, column: int = None) -> None:
         layout = self.create_frame(frame, layout_parent, False)
         self.widget.setParent(self.frame)
         self.widget.setStyleSheet(
-            f"QLineEdit{'{'}border: 3px solid {LIGHT};\n"
-            "border-radius: 5px;\n"
-            f"color: {WHITE};\n"
-            f"gridline-color: {LIGHT};\n"
-            f"background-color: {LIGHT};\n"
-            "font-weight:500;\n"
+            f"QLineEdit{'{'}border: 3px solid {LIGHT};border-radius: 5px;color: {WHITE};gridline-color: {LIGHT};background-color: {LIGHT};font-weight:500;\n"
             f"selection-background-color: {LIGHT_SELECT};{'}'}\n"
             f"QLineEdit:hover{'{'}background-color: {DARK};{'}'}"
         )
@@ -387,7 +520,7 @@ class FileNameBox(Option):
         button.setMinimumSize(QtC.QSize(30, 30))
         button.setMaximumSize(QtC.QSize(30, 30))
         button.setText("...")
-        button.clicked.connect(self.fun_choose_file)
+        button.clicked.connect(self.fun_choose_file)  # pylint: disable=E1101
         layout.addWidget(button)
 
     def fun_choose_file(self) -> None:
@@ -405,13 +538,16 @@ class FileNameBox(Option):
 
 
 class Hint:
+    """
+    Hint class to add hint texts in categories\n
+    """
     def __init__(self, default_parent: QtW.QWidget, hint: str, category: Category, warning: bool = False):
         self.hint: str = hint
         self.label: QtW.QLabel = QtW.QLabel(default_parent)
         self.warning = warning
         category.list_of_options.append(self)
 
-    def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, row: int = None, column: int = None) -> None:
+    def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, *, row: int = None, column: int = None) -> None:
         self.label.setParent(frame)
         self.label.setText(self.hint)
         if self.warning:
@@ -434,6 +570,9 @@ class Hint:
 
 
 class FunctionButton:
+    """
+    Function button to link function to\n
+    """
     def __init__(self, default_parent: QtW.QWidget, button_text: str, icon: str, category: Category):
         self.button_text: str = button_text
         self.icon: str = icon
@@ -454,7 +593,7 @@ class FunctionButton:
         self.frame.setParent(frame)
         self.frame.setFrameShape(QtW.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtW.QFrame.Raised)
-        self.frame.setStyleSheet("QFrame {\n" f"	border: 0px solid {WHITE};\n" "	border-radius: 0px;\n" "  }\n")
+        self.frame.setStyleSheet(f"QFrame{'{'}border: 0px solid {WHITE};border-radius: 0px;{'}'}")
         layout = QtW.QHBoxLayout(self.frame)
         layout.setSpacing(6)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -478,10 +617,17 @@ class FunctionButton:
         self.button.setText(self.button_text)
 
     def change_event(self, function_to_be_called: Callable) -> None:
-        self.button.clicked.connect(function_to_be_called)
+        """
+        Function for the change event\n
+        :param function_to_be_called: function to be called if option has changed
+        """
+        self.button.clicked.connect(function_to_be_called)  # pylint: disable=E1101
 
 
 class Category:
+    """
+    Category which consists of options\n
+    """
     def __init__(self, default_parent: QtW.QWidget, label: str, page: Page):
         self.label_text: str = label
         self.label: QtW.QLabel = QtW.QLabel(default_parent)
@@ -509,28 +655,15 @@ class Category:
         self.label.setParent(page)
         self.label.setText(self.label_text)
         self.label.setStyleSheet(
-            "QLabel {\n"
-            f"	border: 1px solid  {LIGHT};\n"
-            "	border-top-left-radius: 15px;\n"
-            "	border-top-right-radius: 15px;\n"
-            f"	background-color:  {LIGHT};\n"
-            "	padding: 5px 0px;\n"
-            f"	color:  {WHITE};\n"
-            "font-weight:500;\n"
-            "}"
+            f"QLabel {'{'}border: 1px solid  {LIGHT};border-top-left-radius: 15px;border-top-right-radius: 15px;background-color:  {LIGHT};padding: 5px 0px;\n"
+            f"	color:  {WHITE};font-weight:500;{'}'}"
         )
         self.label.setAlignment(QtC.Qt.AlignCenter | QtC.Qt.AlignVCenter)
         layout.addWidget(self.label)
         self.frame.setParent(page)
         self.frame.setStyleSheet(
-            "QFrame {\n"
-            f"	border: 1px solid {LIGHT};\n"
-            "	border-bottom-left-radius: 15px;\n"
-            "	border-bottom-right-radius: 15px;\n"
-            "}\n"
-            "QLabel{\n"
-            f"border: 0px solid {WHITE};"
-            "\n}"
+            f"QFrame{'{'}border: 1px solid {LIGHT};border-bottom-left-radius: 15px;border-bottom-right-radius: 15px;{'}'}\n"
+            f"QLabel{'{'}border: 0px solid {WHITE};{'}'}"
         )
         self.frame.setFrameShape(QtW.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtW.QFrame.Raised)
@@ -548,10 +681,11 @@ class Category:
             column = 0
             for option in self.list_of_options:
                 if isinstance(option, Hint):
-                    option.create_widget(self.frame, layout_frane, row, column)
+                    option.create_widget(self.frame, layout_frane, row=row, column=column)
                 else:
-                    option.deactivate_size_limit() if option.label_text == "" else None
-                    option.create_widget(self.frame, layout_frane, row, column)
+                    if option.label_text == "":
+                        option.deactivate_size_limit()
+                    option.create_widget(self.frame, layout_frane, row=row, column=column)
                 if row == self.grid_layout - 1:
                     row = 0
                     column += 1
@@ -572,11 +706,7 @@ class Category:
         graphic_view.setMinimumSize(QtC.QSize(0, 0))
         graphic_view.setMaximumSize(QtC.QSize(100, 16777215))
         graphic_view.setStyleSheet(
-            "QFrame {\n"
-            f"	border: 1px solid {LIGHT};\n"
-            "	border-bottom-left-radius: 0px;\n"
-            "	border-bottom-right-radius: 0px;\n"
-            "}\n"
+            f"QFrame{'{'}border: 1px solid {LIGHT};border-bottom-left-radius: 0px;border-bottom-right-radius: 0px;{'}'}\n"
             f"QLabel{'{'}border: 0px solid {WHITE};{'}'}"
         )
 
@@ -593,6 +723,9 @@ class Category:
 
 
 class Aim:
+    """
+    Aim of simulation\n
+    """
     def __init__(self, default_parent: QtW.QWidget, label: str, icon: str, page: Page):
         self.label: str = label
         self.icon: str = icon
@@ -601,9 +734,17 @@ class Aim:
         page.upper_frame.append(self)
 
     def change_event(self, function_to_be_called: Callable) -> None:
-        self.widget.clicked.connect(function_to_be_called)
+        """
+        Function for the change event\n
+        :param function_to_be_called: function to be called if option has changed
+        """
+        self.widget.clicked.connect(function_to_be_called)  # pylint: disable=E1101
 
     def add_linked_option(self, option: Union[Option, Category, FunctionButton]):
+        """
+        Add link to the aim\n
+        :param option: option which should be linked
+        """
         self.list_options.append(option)
 
     def create_widget(self, frame: QtW.QFrame, layout: QtW.QGridLayout, idx: int) -> None:
@@ -616,21 +757,10 @@ class Aim:
         push_button.setMinimumSize(QtC.QSize(0, 60))
         push_button.setMaximumSize(QtC.QSize(16777215, 60))
         push_button.setStyleSheet(
-            f"QPushButton{'{'}border: 3px solid {DARK};\n"
-            "border-radius: 15px;\n"
-            f"color: {WHITE};\n"
-            f"gridline-color: {LIGHT};\n"
-            f"background-color: {GREY};\n"
-            "font-weight:500;}\n"
-            f"QPushButton:hover{'{'}border: 3px solid {DARK};\n"
-            f"background-color:{LIGHT};{'}'}\n"
-            f"QPushButton:checked{'{'}border:3px solid {LIGHT};\n"
-            f"background-color:{LIGHT};{'}'}\n"
-            f"QPushButton:disabled{'{'}border: 3px solid {GREY};\n"
-            "border-radius: 5px;\n"
-            f"color: {WHITE};\n"
-            f"gridline-color: {GREY};\n"
-            f"background-color: {GREY};{'}'}\n"
+            f"QPushButton{'{'}border: 3px solid {DARK};border-radius: 15px;color:{WHITE};gridline-color: {LIGHT};background-color: {GREY};font-weight:500;{'}'}"
+            f"QPushButton:hover{'{'}border: 3px solid {DARK};background-color:{LIGHT};{'}'}"
+            f"QPushButton:checked{'{'}border:3px solid {LIGHT};background-color:{LIGHT};{'}'}\n"
+            f"QPushButton:disabled{'{'}border: 3px solid {GREY};border-radius: 5px;color: {WHITE};gridline-color: {GREY};background-color: {GREY};{'}'}\n"
             f"QPushButton:disabled:hover{'{'}background-color: {DARK};{'}'}"
         )
         # push_button.setIcon(icon11)
@@ -661,10 +791,18 @@ def check_aim_options(list_aim: List[Aim]):
 
 
 class Page:
+    """
+    Page which consists of aim and categories\n
+    """
+    next_label: str = 'next'
+    previous_label: str = 'previous'
+
     def __init__(self, default_parent: QtW.QWidget, name: str, button_name: str, icon: str):
         self.name: str = name
         self.button_name: str = button_name
         self.icon: str = icon
+        self.push_button_next: Optional[QtW.QPushButton] = None
+        self.push_button_previous: Optional[QtW.QPushButton] = None
         self.list_categories: List[Category] = []
         self.button: QtW.QPushButton = QtW.QPushButton(default_parent)
         self.label: QtW.QLabel = QtW.QLabel(default_parent)
@@ -680,6 +818,10 @@ class Page:
         self.button_name = entry_name[0].replace('@', '\n')
         self.label.setText(self.name)
         self.button.setText(self.button_name)
+        if self.push_button_previous is not None:
+            self.push_button_previous.setText(self.previous_label)
+        if self.push_button_next is not None:
+            self.push_button_next.setText(self.next_label)
 
     def set_previous_page(self, previous_page: Page):
         self.previous_page = previous_page
@@ -716,44 +858,7 @@ class Page:
         scroll_area_layout.setContentsMargins(0, 0, 0, 0)
         stacked_widget.addWidget(self.page)
         if self.upper_frame:
-            upper_frame = QtW.QFrame(scroll_area_content)
-            upper_frame.setStyleSheet(
-                "QFrame {\n"
-                f"	border: 1px solid {LIGHT};\n"
-                "	border-top-left-radius: 15px;\n"
-                "	border-top-right-radius: 15px;\n"
-                "	border-bottom-left-radius: 15px;\n"
-                "	border-bottom-right-radius: 15px;\n"
-                "}\n"
-                f"QLabel{'{'}border: 0px solid {WHITE};{'}'}"
-            )
-            upper_frame.setFrameShape(QtW.QFrame.StyledPanel)
-            upper_frame.setFrameShadow(QtW.QFrame.Raised)
-            upper_frame.setSizePolicy(QtW.QSizePolicy.Minimum, QtW.QSizePolicy.Minimum)
-            grid_layout = QtW.QGridLayout(upper_frame)
-            grid_layout.setVerticalSpacing(6)
-            grid_layout.setHorizontalSpacing(6)
-            scroll_area_layout.addWidget(upper_frame)
-            for idx, option in enumerate(self.upper_frame):
-                if isinstance(option, Aim):
-                    option.create_widget(upper_frame, grid_layout, idx)
-                    continue
-                option.create_widget(upper_frame, grid_layout)
-
-            list_aims: List[Aim] = [aim for aim in self.upper_frame if isinstance(aim, Aim)]
-            if list_aims:
-                for idx, aim in enumerate(list_aims):
-                    default_value = 1 if idx == 0 else 0
-                    aim.widget.clicked.connect(
-                        ft_partial(
-                            update_opponent,
-                            aim.widget,
-                            list_aims[default_value].widget,
-                            [wid.widget for i, wid in enumerate(list_aims) if i not in [idx, default_value]],
-                        )
-                    )
-                    aim.widget.clicked.connect(ft_partial(check_aim_options, list_aims))
-                list_aims[0].widget.click()
+            self.create_upper_frame(scroll_area_content, scroll_area_layout)
 
         for category in self.list_categories:
             category.create_widget(scroll_area_content, scroll_area_layout)
@@ -776,42 +881,87 @@ class Page:
 
         vertical_layout_menu.addWidget(self.button)
         vertical_layout_menu.addWidget(self.label_gap)
-        self.button.clicked.connect(ft_partial(stacked_widget.setCurrentWidget, self.page))
+        self.button.clicked.connect(ft_partial(stacked_widget.setCurrentWidget, self.page))  # pylint: disable=E1101
+
+    def create_upper_frame(self, scroll_area_content: QtW.QWidget, scroll_area_layout: QtW.QVBoxLayout):
+        """
+        create the upper frame\n
+        :param scroll_area_content:
+        :param scroll_area_layout:
+        """
+        upper_frame = QtW.QFrame(scroll_area_content)
+        upper_frame.setStyleSheet(
+            f"QFrame {'{'}border: 1px solid {LIGHT};border-top-left-radius: 15px;border-top-right-radius: 15px;"
+            f"border-bottom-left-radius: 15px;border-bottom-right-radius: 15px;{'}'}\n"
+            f"QLabel{'{'}border: 0px solid {WHITE};{'}'}"
+        )
+        upper_frame.setFrameShape(QtW.QFrame.StyledPanel)
+        upper_frame.setFrameShadow(QtW.QFrame.Raised)
+        upper_frame.setSizePolicy(QtW.QSizePolicy.Minimum, QtW.QSizePolicy.Minimum)
+        grid_layout = QtW.QGridLayout(upper_frame)
+        grid_layout.setVerticalSpacing(6)
+        grid_layout.setHorizontalSpacing(6)
+        scroll_area_layout.addWidget(upper_frame)
+        for idx, option in enumerate(self.upper_frame):
+            if isinstance(option, Aim):
+                option.create_widget(upper_frame, grid_layout, idx)
+                continue
+            option.create_widget(upper_frame, grid_layout)
+
+        list_aims: List[Aim] = [aim for aim in self.upper_frame if isinstance(aim, Aim)]
+        if list_aims:
+            for idx, aim in enumerate(list_aims):
+                default_value = 1 if idx == 0 else 0
+                aim.widget.clicked.connect(
+                    ft_partial(
+                        update_opponent,
+                        aim.widget,
+                        list_aims[default_value].widget,
+                        [wid.widget for i, wid in enumerate(list_aims) if i not in [idx, default_value]],
+                    )
+                )  # pylint: disable=E1101
+                aim.widget.clicked.connect(ft_partial(check_aim_options, list_aims))  # pylint: disable=E1101
+            list_aims[0].widget.click()
 
     def create_links_to_other_pages(self, central_widget: QtW.QWidget, scroll_area_layout: QtW.QVBoxLayout):
+        """
+        create link on the bottom to other pages.\n
+        :param central_widget: central widget
+        :param scroll_area_layout: scroll area layout
+        """
         if self.previous_page is None and self.next_page is None:
             return
 
         horizontal_layout = QtW.QHBoxLayout(scroll_area_layout.parent())
 
         if self.previous_page is not None:
-            push_button_previous = QtW.QPushButton(central_widget)
-            push_button_previous.setMinimumSize(QtC.QSize(0, 30))
-            push_button_previous.setMaximumSize(QtC.QSize(16777215, 30))
+            self.push_button_previous = QtW.QPushButton(central_widget)
+            self.push_button_previous.setMinimumSize(QtC.QSize(0, 30))
+            self.push_button_previous.setMaximumSize(QtC.QSize(16777215, 30))
             icon = QtG.QIcon()
             icon.addFile(":/icons/icons/ArrowLeft2.svg", QtC.QSize(), QtG.QIcon.Normal, QtG.QIcon.Off)
-            push_button_previous.setIcon(icon)
-            push_button_previous.setIconSize(QtC.QSize(20, 20))
-            push_button_previous.setText("  previous  ")
+            self.push_button_previous.setIcon(icon)
+            self.push_button_previous.setIconSize(QtC.QSize(20, 20))
+            self.push_button_previous.setText(f"  {self.previous_label}  ")
 
-            horizontal_layout.addWidget(push_button_previous)
-            push_button_previous.clicked.connect(self.previous_page.button.click)
+            horizontal_layout.addWidget(self.push_button_previous)
+            self.push_button_previous.clicked.connect(self.previous_page.button.click)  # pylint: disable=E1101
 
         horizontal_spacer = QtW.QSpacerItem(1, 1, QtW.QSizePolicy.Expanding, QtW.QSizePolicy.Minimum)
 
         horizontal_layout.addItem(horizontal_spacer)
         if self.next_page is not None:
-            push_button_next = QtW.QPushButton(central_widget)
-            push_button_next.setMinimumSize(QtC.QSize(0, 30))
-            push_button_next.setMaximumSize(QtC.QSize(16777215, 30))
-            push_button_next.setLayoutDirection(QtC.Qt.RightToLeft)
+            self.push_button_next = QtW.QPushButton(central_widget)
+            self.push_button_next.setMinimumSize(QtC.QSize(0, 30))
+            self.push_button_next.setMaximumSize(QtC.QSize(16777215, 30))
+            self.push_button_next.setLayoutDirection(QtC.Qt.RightToLeft)
             icon = QtG.QIcon()
             icon.addFile(":/icons/icons/ArrowRight2.svg", QtC.QSize(), QtG.QIcon.Normal, QtG.QIcon.Off)
-            push_button_next.setIcon(icon)
-            push_button_next.setIconSize(QtC.QSize(20, 20))
-            push_button_next.setText("  next  ")
+            self.push_button_next.setIcon(icon)
+            self.push_button_next.setIconSize(QtC.QSize(20, 20))
+            self.push_button_next.setText(f"  {self.next_label}  ")
 
-            horizontal_layout.addWidget(push_button_next)
-            push_button_next.clicked.connect(self.next_page.button.click)
+            horizontal_layout.addWidget(self.push_button_next)
+            self.push_button_next.clicked.connect(self.next_page.button.click)  # pylint: disable=E1101
 
         scroll_area_layout.addLayout(horizontal_layout)

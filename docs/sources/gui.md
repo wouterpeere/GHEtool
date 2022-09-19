@@ -32,6 +32,7 @@ script. The value of the option get be get by the `get_value()` function.
 The GUI is based on pages which consists of categories which consists of options. 
 An example for a page is the borehole resistance page. Where the fluid data category can be found. 
 This category has a double spin box option to set the mass flow rate.
+The order in which the options are created is also the tab order.
 
 ### Page
 

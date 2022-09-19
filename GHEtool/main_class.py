@@ -658,8 +658,7 @@ class Borefield:
         """
         This function sizes the borefield of the given configuration according to the methodology explained in
         (Peere et al., 2021), which is a L2 method. When quadrant sizing is other than 0, it sizes the field based on
-        the asked quadrant. It returns the borefield depth.
-
+        the asked quadrant. It returns the borefield depth.\n
         :param H_init: initialize depth for sizing
         :param quadrant_sizing: if a quadrant is given the sizing is performed for this quadrant else for the relevant
         :return: borefield depth

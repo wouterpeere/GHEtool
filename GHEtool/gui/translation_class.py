@@ -7,6 +7,8 @@ class Translations:
         "short_cut",
         "scenarioString",
         "label_Language",
+        "category_language",
+        "option_language",
         "pushButton_SaveScenario",
         "pushButton_AddScenario",
         "pushButton_DeleteScenario",
@@ -18,6 +20,7 @@ class Translations:
         "page_thermal",
         "page_result",
         "page_options",
+        "page_settings",
         "label_Status",
         "label_File",
         "label_Calculation",
@@ -40,8 +43,8 @@ class Translations:
         "option_temp_gradient",
         "option_simu_period",
         "option_constant_rb",
-        "pushButton_NextGeneral",
-        "pushButton_PreviousThermal",
+        "label_next",
+        "label_previous",
         "hint_depth",
         "option_show_legend",
         "function_save_results",
@@ -111,7 +114,6 @@ class Translations:
         "Calculation_Finished",
         "GHE_tool_imported",
         "GHE_tool_imported_start",
-        "comboBoxLanguageList",
         "label_new_scenario",
         "new_name",
         "label_okay",
@@ -143,8 +145,6 @@ class Translations:
         "button_rename_scenario",
         "label_Language_Head",
         "label_aim_question",
-        "pushButton_PreviousResistance",
-        "pushButton_NextResistance",
         "comboBox_AimList",
         "label_data_file",
         "label_Filename_2",
@@ -185,11 +185,11 @@ class Translations:
         "pushButton_start_single",
         "NotCalculated",
         "NoSolution",
-        "option_language",
+        "languages",
     )
 
     def __init__(self):
-        self.option_language: List[str] = ["English", "German", "Dutch", "Italian", "French", "Spanish", "Galician"]
+        self.languages: List[str] = ["English", "German", "Dutch", "Italian", "French", "Spanish", "Galician"]
         self.icon: List[str] = [
             ":/icons/icons/Flag_English.svg",
             ":/icons/icons/Flag_German.svg",
@@ -202,6 +202,16 @@ class Translations:
         self.short_cut: List[str] = ["Ctrl+Alt+E", "Ctrl+Alt+G", "Ctrl+Alt+D", "Ctrl+Alt+I", "Ctrl+Alt+F", "Ctrl+Alt+S", "Ctrl+Alt+A"]
         self.scenarioString: List[str] = ["Scenario", "Szenario", "Scenario", "Scenario", "Scénario", "Escenario", "Escenario"]
         self.label_Language: List[str] = ["Language: ", "Sprache: ", "Taal: ", "Languange: ", "Languange: ", "Idioma:", "Lingua: "]
+        self.category_language: List[str] = ["Language: ", "Sprache: ", "Taal: ", "Languange: ", "Languange: ", "Idioma:", "Lingua: "]
+        self.option_language: List[str] = [
+            "Language:,English,German,Dutch,Italian,French,Spanish,Galician",
+            "Sprache:,English,German,Dutch,Italian,French,Spanish,Galician",
+            "Taal:,English,German,Dutch,Italian,French,Spanish,Galician",
+            "Languange:,English,German,Dutch,Italian,French,Spanish,Galician",
+            "Languange:,English,German,Dutch,Italian,French,Spanish,Galician",
+            "Idioma:,English,German,Dutch,Italian,French,Spanish,Galician",
+            "Lingua:,English,German,Dutch,Italian,French,Spanish,Galician",
+        ]
         self.pushButton_SaveScenario: List[str] = [
             "Update scenario",
             "Szenario aktualisieren",
@@ -292,6 +302,15 @@ class Translations:
             "Options,Options",
             "Options,Options",
             "Options,Options",
+        ]
+        self.page_settings: List[str] = [
+            "Settings,Settings",
+            "Einstellungen,Einstellungen",
+            "Instellingen,Instellingen",
+            "Settings,Settings",
+            "Settings,Settings",
+            "Settings,Settings",
+            "Settings,Settings",
         ]
         self.label_Status: List[str] = ["Progress: ", "Fortschritt: ", "Vooruitgang: ", "Progressi: ", "Progrès: ", "Progreso: ", "Progreso: "]
         self.label_File: List[str] = ["File", "Datei", "Bestand", "File", "File", "File", "File"]
@@ -467,16 +486,8 @@ class Translations:
             "Resistencia del pozo equivalente [mK/W]: ",
             "Resistencia do pozo equivalente [mK/W]: ",
         ]
-        self.pushButton_NextGeneral: List[str] = ["  next  ", "  nächstes  ", "  volgende  ", "  successivo  ", "  suivant  ", "  siguiente  ", "  seguinte  "]
-        self.pushButton_PreviousThermal: List[str] = [
-            "  previous  ",
-            "  vorheriges  ",
-            "  vorige  ",
-            "  precedente  ",
-            "  précédente  ",
-            "  anterior  ",
-            "  anterior  ",
-        ]
+        self.label_next: List[str] = ["next", "nächstes", "volgende", "successivo", "suivant", "siguiente", "seguinte"]
+        self.label_previous: List[str] = ["previous", "vorheriges", "vorige", "precedente", "précédente", "anterior", "anterior"]
         self.hint_depth: List[str] = [
             "Borehole depth: ",
             "Bohrlochtiefe: ",
@@ -930,15 +941,6 @@ class Translations:
             "Start importing GHEtool",
             "Start importing GHEtool",
         ]
-        self.comboBoxLanguageList: List[str] = [
-            "['English', 'German', 'Dutch', 'Italian', 'French', 'Spanish', 'Galician']",
-            "['Englisch', 'Deutsch', 'Niederländisch', 'Italienisch', 'Französisch', 'Spanisch', 'Galizisch']",
-            "['Engels', 'Duits', 'Nederlands', 'Italiaans', 'Frans', 'Spaans', 'Galisisch']",
-            "['English', 'German', 'Dutch', 'Italian', 'French', 'Spanish', 'Galician']",
-            "['English', 'German', 'Dutch', 'Italian', 'French', 'Spanish', 'Galician']",
-            "['English', 'German', 'Dutch', 'Italian', 'French', 'Spanish', 'Galician']",
-            "['English', 'German', 'Dutch', 'Italian', 'French', 'Spanish', 'Galician']",
-        ]
         self.label_new_scenario: List[str] = [
             "Enter new scenario name",
             "Neuer Name für das Szenario",
@@ -1089,24 +1091,6 @@ class Translations:
             "What is the purpose of the simulation?",
             "What is the purpose of the simulation?",
             "What is the purpose of the simulation?",
-        ]
-        self.pushButton_PreviousResistance: List[str] = [
-            "  previous  ",
-            "  vorheriges  ",
-            "  vorige  ",
-            "  precedente  ",
-            "  précédente  ",
-            "  anterior  ",
-            "  anterior  ",
-        ]
-        self.pushButton_NextResistance: List[str] = [
-            "  next  ",
-            "  nächstes  ",
-            "  volgende  ",
-            "  successivo  ",
-            "  suivant  ",
-            "  siguiente  ",
-            "  seguinte  ",
         ]
         self.comboBox_AimList: List[str] = [
             "['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile']",

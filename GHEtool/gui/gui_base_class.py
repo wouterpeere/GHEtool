@@ -77,55 +77,16 @@ class UiGhetool:
         icon.addFile(":/icons/icons/icon_05.svg", QSize(), QIcon.Normal, QIcon.Off)
         ghe_tool.setWindowIcon(icon)
         ghe_tool.setStyleSheet(
-            "*{\n"
-            f"color: {WHITE};\n"
-            'font: 11pt "Lexend";\n'
-            f"background-color: {DARK};\n"
-            f"selection-background-color: {LIGHT};\n"
-            f"alternate-background-color: {LIGHT};\n"
-            "}\n"
-            "QPushButton{\n"
-            f"border: 3px solid {LIGHT};\n"
-            "border-radius: 5px;\n"
-            f"color: {WHITE};\n"
-            f"gridline-color: {LIGHT};\n"
-            f"background-color: {LIGHT};\n"
-            "font-weight:500;}\n"
-            "QPushButton:hover{\n"
-            f"background-color: {DARK};\n"
-            "}\n"
-            "QPushButton:disabled{\n"
-            f"border: 3px solid {GREY};\n"
-            "border-radius: 5px;\n"
-            f"color: {WHITE};\n"
-            f"gridline-color: {GREY};\n"
-            f"background-color: {GREY};\n"
-            "}\n"
-            "QPushButton:disabled:hover{\n"
-            f"background-color: {DARK};\n"
-            "}\n"
-            "QComboBox{\n"
-            f"border: 1px solid {WHITE};\n"
-            "border-bottom-left-radius: 0px;\n"
-            "border-bottom-right-radius: 0px;\n"
-            "}\n"
-            "QSpinBox{\n"
-            f"selection-color: {WHITE};\n"
-            f"selection-background-color: {LIGHT};\n"
-            f"border: 1px solid {WHITE};\n"
-            'font: 11pt "Lexend Deca Light";}\n'
-            "QLineEdit{\n"
-            f"border: 3px solid {LIGHT};\n"
-            "border-radius: 5px;\n"
-            f"color: {WHITE};\n"
-            f"gridline-color: {LIGHT};\n"
-            f"background-color: {LIGHT};\n"
-            "font-weight:500;\n"
-            f"selection-background-color: {LIGHT_SELECT};\n"
-            "}\n"
-            "QLineEdit:hover{\n"
-            f"background-color: {DARK};\n"
-            "}"
+            f"*{'{'}color: {WHITE};font: 11pt 'Lexend';background-color: {DARK};selection-background-color: {LIGHT};alternate-background-color: {LIGHT};{'}'}\n"
+            f"QPushButton{'{'}border: 3px solid {LIGHT};border-radius: 5px;color:{WHITE};gridline-color:{LIGHT};background-color:{LIGHT};font-weight:500;{'}'}"
+            f"QPushButton:hover{'{'}background-color: {DARK};{'}'}\n"
+            f"QPushButton:disabled{'{'}border: 3px solid {GREY};border-radius: 5px;color: {WHITE};gridline-color: {GREY};background-color: {GREY};{'}'}\n"
+            f"QPushButton:disabled:hover{'{'}background-color: {DARK};{'}'}\n"
+            f"QComboBox{'{'}border: 1px solid {WHITE};border-bottom-left-radius: 0px;border-bottom-right-radius: 0px;{'}'}\n"
+            f"QSpinBox{'{'}selection-color: {WHITE};selection-background-color: {LIGHT};border: 1px solid {WHITE};font: 11pt 'Lexend Deca Light';{'}'}\n"
+            f"QLineEdit{'{'}border: 3px solid {LIGHT};border-radius: 5px;color: {WHITE};gridline-color: {LIGHT};background-color: {LIGHT};font-weight:500;\n"
+            f"selection-background-color: {LIGHT_SELECT};{'}'}\n"
+            f"QLineEdit:hover{'{'}background-color: {DARK};{'}'}"
         )
         self.actionNew = QAction(ghe_tool)
         self.actionNew.setObjectName("actionNew")
@@ -195,7 +156,6 @@ class UiGhetool:
         self.action_start_single.setIcon(icon15)
         self.central_widget = QWidget(ghe_tool)
         self.central_widget.setObjectName("central_widget")
-        self.central_widget.setStyleSheet("")
         self.horizontalLayout_23 = QHBoxLayout(self.central_widget)
         self.horizontalLayout_23.setObjectName("horizontalLayout_23")
         self.verticalLayout_scenario = QVBoxLayout()
@@ -262,12 +222,8 @@ class UiGhetool:
         self.list_widget_scenario.setStyleSheet(
             f"*{'{'}border: 1px solid {WHITE};{'}'}\n"
             "QListWidget{outline: 0;}\n"
-            "QListWidget::item:selected{\n"
-            f"background:{LIGHT};color: {WHITE};border: 0px solid {WHITE};\n"
-            "}\n"
-            "QListWidget::item:hover{\n"
-            f"border: 1px solid {WHITE};color: {WHITE};\n"
-            "}"
+            f"QListWidget::item:selected{'{'}background:{LIGHT};color: {WHITE};border: 0px solid {WHITE};{'}'}\n"
+            f"QListWidget::item:hover{'{'}border: 1px solid {WHITE};color: {WHITE};{'}'}"
         )
         self.list_widget_scenario.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
         self.list_widget_scenario.setAutoScrollMargin(10)
@@ -291,7 +247,6 @@ class UiGhetool:
         self.verticalLayout_21.setObjectName("verticalLayout_21")
         self.stackedWidget = QStackedWidget(self.central_widget)
         self.stackedWidget.setObjectName("stackedWidget")
-        self.stackedWidget.setStyleSheet("")
         self.stackedWidget.setFrameShadow(QFrame.Plain)
         self.stackedWidget.setLineWidth(0)
 
@@ -307,11 +262,8 @@ class UiGhetool:
         self.progressBar = QProgressBar(self.central_widget)
         self.progressBar.setObjectName("progressBar")
         self.progressBar.setStyleSheet(
-            f"QProgressBar{'{'}border: 1px solid {WHITE};\n"
-            " border-radius: 10px;\n"
-            "text-align: center;\n"
-            f" color: {WHITE};\n"
-            f"{'}'}QProgressBar::chunk{'{'}background-color: {LIGHT}; border-radius: 10px;{'}'}"
+            f"QProgressBar{'{'}border: 1px solid {WHITE};border-radius: 10px;text-align: center;color: {WHITE};{'}'}\n"
+            f"QProgressBar::chunk{'{'}background-color: {LIGHT}; border-radius: 10px;{'}'}"
         )
         self.progressBar.setValue(24)
 
@@ -329,7 +281,6 @@ class UiGhetool:
         self.pushButton_start_single.setObjectName("pushButton_start_single")
         self.pushButton_start_single.setMinimumSize(QSize(100, 40))
         self.pushButton_start_single.setMaximumSize(QSize(16777215, 40))
-        self.pushButton_start_single.setStyleSheet("")
         icon32 = QIcon()
         icon32.addFile(":/icons/icons/Start.svg", QSize(), QIcon.Normal, QIcon.Off)
         self.pushButton_start_single.setIcon(icon32)
@@ -341,7 +292,6 @@ class UiGhetool:
         self.pushButton_start_multiple.setObjectName("pushButton_start_multiple")
         self.pushButton_start_multiple.setMinimumSize(QSize(100, 40))
         self.pushButton_start_multiple.setMaximumSize(QSize(16777215, 40))
-        self.pushButton_start_multiple.setStyleSheet("")
         icon33 = QIcon()
         icon33.addFile(":/icons/icons/Start_multiple.svg", QSize(), QIcon.Normal, QIcon.Off)
         self.pushButton_start_multiple.setIcon(icon33)
@@ -353,7 +303,6 @@ class UiGhetool:
         self.pushButton_Cancel.setObjectName("pushButton_Cancel")
         self.pushButton_Cancel.setMinimumSize(QSize(100, 40))
         self.pushButton_Cancel.setMaximumSize(QSize(16777215, 40))
-        self.pushButton_Cancel.setStyleSheet("")
         icon34 = QIcon()
         icon34.addFile(":/icons/icons/Exit.svg", QSize(), QIcon.Normal, QIcon.Off)
         self.pushButton_Cancel.setIcon(icon34)
@@ -371,23 +320,16 @@ class UiGhetool:
         self.menubar.setEnabled(True)
         self.menubar.setGeometry(QRect(0, 0, 1226, 30))
         self.menubar.setStyleSheet(
-            "QMenuBar::item{\n"
-            f"    background-color: {DARK};\n"
-            "}\n"
-            "QMenuBar::item:pressed{\n"
-            f"	background-color: {LIGHT};\n"
-            "}\n"
-            "QMenuBar::item:selected{\n"
-            f"background-color: {LIGHT};\n"
-            "}\n"
+            f"QMenuBar::item{'{'}background-color: {DARK};{'}'}\n"
+            f"QMenuBar::item:pressed{'{'}background-color: {LIGHT};{'}'}\n"
+            f"QMenuBar::item:selected{'{'}background-color: {LIGHT};{'}'}\n"
             f"QToolTip{'{'} color: {WHITE}; background-color: {BLACK}; border: none; {'}'}"
         )
         self.menubar.setNativeMenuBar(True)
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
         self.menuFile.setStyleSheet(
-            f"QAction::icon {'{'} background-color:{LIGHT};\n"
-            f"selection-background-color: {LIGHT};{'}'}\n"
+            f"QAction::icon {'{'} background-color:{LIGHT};selection-background-color: {LIGHT};{'}'}\n"
             f"*{'{'}	background-color: {DARK};{'}'}\n"
             f"*:hover{'{'}background-color: {LIGHT};{'}'}"
         )
@@ -409,11 +351,9 @@ class UiGhetool:
         self.toolBar = QToolBar(ghe_tool)
         self.toolBar.setObjectName("toolBar")
         self.toolBar.setStyleSheet(
-            "*{\n"
-            f"	background-color: {DARK};\n"
-            "}\n"
-            f"*:hover{'{'}background-color: {LIGHT};{'}'}\n"
-            f"QToolTip {'{'} color: rgb(0, 0, 0); background-color: {WHITE};border: 1px solid {LIGHT}; {'}'}"
+            f"QAction::icon {'{'} background-color:{LIGHT};selection-background-color: {LIGHT};{'}'}\n"
+            f"*{'{'}	background-color: {DARK};{'}'}\n"
+            f"*:hover{'{'}background-color: {LIGHT};{'}'}"
         )
         self.toolBar.setMovable(False)
         ghe_tool.addToolBar(Qt.TopToolBarArea, self.toolBar)
@@ -524,4 +464,3 @@ class UiGhetool:
         self.menuLanguage.setTitle("Language")
         self.menuScenario.setTitle("Scenario")
         self.toolBar.setWindowTitle("toolBar")
-

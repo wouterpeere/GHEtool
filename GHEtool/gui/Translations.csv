@@ -3,6 +3,8 @@ icon;:/icons/icons/Flag_English.svg;:/icons/icons/Flag_German.svg;:/icons/icons/
 short_cut;Ctrl+Alt+E;Ctrl+Alt+G;Ctrl+Alt+D;Ctrl+Alt+I;Ctrl+Alt+F;Ctrl+Alt+S;Ctrl+Alt+A
 scenarioString;Scenario;Szenario;Scenario;Scenario;Scénario;Escenario;Escenario
 label_Language;Language: ;Sprache: ;Taal: ;Languange: ;Languange: ;Idioma:;Lingua: 
+category_language;Language: ;Sprache: ;Taal: ;Languange: ;Languange: ;Idioma:;Lingua: 
+option_language;Language:,English,German,Dutch,Italian,French,Spanish,Galician;Sprache:,English,German,Dutch,Italian,French,Spanish,Galician;Taal:,English,German,Dutch,Italian,French,Spanish,Galician;Languange:,English,German,Dutch,Italian,French,Spanish,Galician;Languange:,English,German,Dutch,Italian,French,Spanish,Galician;Idioma:,English,German,Dutch,Italian,French,Spanish,Galician;Lingua:,English,German,Dutch,Italian,French,Spanish,Galician
 pushButton_SaveScenario;Update scenario;Szenario aktualisieren;Update scenario;Aggiorna scenario;Mettre à jour le scénario;Actualizar escenario;Actualizar escenario
 pushButton_AddScenario;Add scenario;Szenario hinzufügen;Nieuw scenario;Aggiungi scenario;Ajouter un scénario;Añadir escenario;Engadir escenario
 pushButton_DeleteScenario;Delete scenario;Szenario löschen;Verwijder scenario;Cancella scenario;Supprimer un scénario;Borrar escenario;Eliminar escenario
@@ -14,6 +16,7 @@ page_borehole_resistance;Borehole @resistance,Equivalent borehole resistance;Boh
 page_thermal;Thermal @demand,Thermal demands;Thermischer @Bedarf,Thermische Last;Thermische @vraag,Thermische vraag;Richieste @termiche,Richieste termiche;Demande @thermique,Demande thermique;Cargas @térmicas,Cargas térmicas;Cargas @térmicas,Cargas térmicas
 page_result;Results,Results;Ergebnisse,Ergebnisse;Resultaten,Resultaten;Risultati,Risultati;Résultats,Résultats;Resultados,Resultados;Resultados,Resultados
 page_options;Options,Options;Optionen,Optionen;Options,Options;Options,Options;Options,Options;Options,Options;Options,Options
+page_settings;Settings,Settings;Einstellungen,Einstellungen;Instellingen,Instellingen;Settings,Settings;Settings,Settings;Settings,Settings;Settings,Settings
 label_Status;Progress: ;Fortschritt: ;Vooruitgang: ;Progressi: ;Progrès: ;Progreso: ;Progreso: 
 label_File;File;Datei;Bestand;File;File;File;File
 label_Calculation;Calculation;Berechnung;Berekening;Calculation;Calculation;Calculation;Calculation
@@ -36,8 +39,8 @@ option_max_temp;Maximal temperature [°C]: ;Maximaltemperatur [°C]: ;Maximale t
 option_temp_gradient;Temperature gradient [K/100m]: ;Temperaturgradient [K/100m]: ;Temperature gradient [K/100m]: ;Temperature gradient [K/100m]: ;Temperature gradient [K/100m]: ;Temperature gradient [K/100m]: ;Temperature gradient [K/100m]: 
 option_simu_period;Simulation period [yrs]: ;Simulationszeit [Jahre]: ;Simulatieperiode [jaar]: ;Periodo di simulazione [anni]: ;Période de simulation [années]: ;Período de simulación [años]: ;Período de simulación [anos]: 
 option_constant_rb;Equivalent borehole resistance [mK/W]: ;Äquivalenter Bohrlochwiderstand [mK/W]: ;Equivalente boorgatweerstand [mK/W]: ;Resistenza equivalente del foro [mK/W]: ;Résistance équivalente du trou de forage [mK/W]: ;Resistencia del pozo equivalente [mK/W]: ;Resistencia do pozo equivalente [mK/W]: 
-pushButton_NextGeneral;  next  ;  nächstes  ;  volgende  ;  successivo  ;  suivant  ;  siguiente  ;  seguinte  
-pushButton_PreviousThermal;  previous  ;  vorheriges  ;  vorige  ;  precedente  ;  précédente  ;  anterior  ;  anterior  
+label_next;next;nächstes;volgende;successivo;suivant;siguiente;seguinte
+label_previous;previous;vorheriges;vorige;precedente;précédente;anterior;anterior
 hint_depth;Borehole depth: ;Bohrlochtiefe: ;Boorgatdiepte: ;Profondità del foro:  ;Profondeur du trou de sonde: ;Profundidad del pozo: ;Profundidade do pozo: 
 option_show_legend;Show legend?,yes,no;Legende zeigen?,Ja,Nein;Toon legende?,yes,no;Mostra la legenda?,yes,no;Afficher la légende?,yes,no;Mostrar leyenda?,yes,no;Mostrar lenda?,yes,no
 function_save_results;Save results;Ergebnisse speichern;Bewaar resultaten;Salva i risultati;Enregistrer les résultats;Guardar resultados;Gardar resultados
@@ -107,7 +110,6 @@ label_Save_As;Save as;Speichere Projekt unter ...;Sla op als;Save as;Save as;Sav
 Calculation_Finished;Calculation finished;Berechnung fertiggestellt;Berekening beëindigd;Calculation finished;Calculation finished;Calculation finished;Calculation finished
 GHE_tool_imported;GHEtool imported;GHEtool importiert;GHEtool geïmporteerd;GHEtool imported;GHEtool imported;GHEtool imported;GHEtool imported
 GHE_tool_imported_start;Start importing GHEtool;Starte GHEtool zu importieren;Start importering GHEtool;Start importing GHEtool;Start importing GHEtool;Start importing GHEtool;Start importing GHEtool
-comboBoxLanguageList;['English', 'German', 'Dutch', 'Italian', 'French', 'Spanish', 'Galician'];['Englisch', 'Deutsch', 'Niederländisch', 'Italienisch', 'Französisch', 'Spanisch', 'Galizisch'];['Engels', 'Duits', 'Nederlands', 'Italiaans', 'Frans', 'Spaans', 'Galisisch'];['English', 'German', 'Dutch', 'Italian', 'French', 'Spanish', 'Galician'];['English', 'German', 'Dutch', 'Italian', 'French', 'Spanish', 'Galician'];['English', 'German', 'Dutch', 'Italian', 'French', 'Spanish', 'Galician'];['English', 'German', 'Dutch', 'Italian', 'French', 'Spanish', 'Galician']
 label_new_scenario;Enter new scenario name;Neuer Name für das Szenario;Nieuwe naam scenario;Enter new scenario name;Enter new scenario name;Enter new scenario name;Enter new scenario name
 new_name;New name for ;Neuer Name für ;Nieuwe naam voor ;New name for ;New name for ;New name for ;New name for 
 label_okay;Okay ;Okay ;Oke ;Okay ;Okay ;Okay ;Okay 
@@ -139,8 +141,6 @@ actionRename_scenario;Rename scenario;Szenario umbenennen;Hernoem scenario;Renam
 button_rename_scenario;Rename scenario;Szenario umbenennen;Hernoem scenario;Rename scenario;Rename scenario;Rename scenario;Rename scenario
 label_Language_Head;Language;Sprache;Taal;Languange;Languange;Idiom;Lingua
 label_aim_question;What is the purpose of the simulation?;Was ist das Ziel der Simulation?;Wat is het doel van de berekening?;What is the purpose of the simulation?;What is the purpose of the simulation?;What is the purpose of the simulation?;What is the purpose of the simulation?
-pushButton_PreviousResistance;  previous  ;  vorheriges  ;  vorige  ;  precedente  ;  précédente  ;  anterior  ;  anterior  
-pushButton_NextResistance;  next  ;  nächstes  ;  volgende  ;  successivo  ;  suivant  ;  siguiente  ;  seguinte  
 comboBox_AimList;['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile'];['Bestimme Temperaturprofil', 'Bestimme notwendige Tiefe', 'Dimensioniere Bohrfeld nach Länge und Breite', 'Optimiere Lastprofil'];['Bepaal temperatuursprofiel', 'Bepaal de benodigde diepte', 'Dimensioneer boorveld bij lengte en breedte', 'Optimaliseer belastingsprofiel'];['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile'];['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile'];['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile'];['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile']
 label_data_file;Select data fileImport;Wähle Datendatei;Selecteer data fileImport;Select data fileImport;Select data fileImport;Select data fileImport;Select data fileImport
 label_Filename_2;Filename: ;Dateiname: ;Bestandsnaam: ;Nome fileImport: ;Nom de fichier: ;Nombre de archivo: ;Nome de ficheiro: 

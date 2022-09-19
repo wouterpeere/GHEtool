@@ -90,11 +90,10 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # check if backup folder exits and otherwise create it
         makedirs(dirname(self.backup_path), exist_ok=True)
         self.translations: Translations = Translations()  # init translation class
-        for idx, (name, icon, short_cut) in enumerate(zip(self.translations.option_language, self.translations.icon, self.translations.short_cut)):
+        for idx, (name, icon, short_cut) in enumerate(zip(self.translations.languages, self.translations.icon, self.translations.short_cut)):
             self.create_action_language(idx, name, icon, short_cut)
         # add languages to combo box
-        self.gui_structure.option_language.widget.addItems(self.translations.option_language)
-        self.gui_structure.translate(1, self.translations)
+        self.gui_structure.option_language.widget.addItems(self.translations.languages)
         self.fileImport = None  # init import file
         self.filename: tuple = MainWindow.filenameDefault  # filename of stored inputs
         self.list_widget_scenario.clear()  # reset list widget with stored scenarios
@@ -213,7 +212,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.gui_structure.option_length.change_event(self.check_bounds)
         self.gui_structure.option_width.change_event(self.check_bounds)
         self.gui_structure.button_load_csv.change_event(self.fun_display_data)
-        self.gui_structure.option_language.change_event(self.changeLanguage)
+        self.gui_structure.option_language.change_event(self.change_language)
         self.gui_structure.page_result.button.clicked.connect(self.display_results)
         self.actionAdd_Scenario.triggered.connect(self.add_scenario)
         self.actionUpdate_Scenario.triggered.connect(self.save_scenario)
@@ -553,11 +552,12 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         for ds in self.list_ds:
             ds.option_auto_saving = self.gui_structure.option_auto_saving.get_value()
 
-    def changeLanguage(self) -> None:
+    def change_language(self) -> None:
         """
         function to change language on labels and push buttons
         :return: None
         """
+        self.checking = False
         scenario_index: int = self.list_widget_scenario.currentRow()  # get current selected scenario
         amount: int = self.list_widget_scenario.count()  # number of scenario elements
 
@@ -576,6 +576,9 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             getattr(self, i).setText(getattr(self.translations, i)[self.gui_structure.option_language.get_value()])
         # set translation of toolbox items
         self.gui_structure.translate(self.gui_structure.option_language.get_value(), self.translations)
+        for idx, name in enumerate(self.translations.languages):
+            self.gui_structure.option_language.widget.setItemText(idx, name)
+            print(idx, name)
         # set small PushButtons
         self.set_push(False)
         # replace scenario names if they are not unique
@@ -591,6 +594,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.list_widget_scenario.addItems(scenarios)
         # select current scenario
         self.list_widget_scenario.setCurrentRow(scenario_index) if scenario_index >= 0 else None
+        self.checking = True
 
     def delete_backup(self):
         if exists(self.backup_path):
@@ -623,7 +627,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             # hide custom bore field warning
             self.gui_structure.hint_calc_time.hide()
             # change language to english
-            self.changeLanguage()
+            self.change_language()
             # show message that no backup file is found
             self.status_bar.showMessage(self.translations.NoBackupFile[self.gui_structure.option_language.get_value()])
 
