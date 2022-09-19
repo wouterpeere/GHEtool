@@ -1,21 +1,5 @@
 # Graphical Using Interface (GUI)
 
-<!--sphinx-autobuild docs/ docs/build/html--->
-
-## How to create the *.exe file?
-
-The exe can be created using [PyInstaller](https://pyinstaller.org/en/stable/).
-
-The following line will create a windowed version of the executable:
-
-```
-python -m PyInstaller --noconfirm --onefile --windowed --splash "./GHEtool/gui/icons/Icon.ico" --name "GHEtool" --icon "./GHEtool/gui/icons/Icon.ico" "./GHEtool/gui/start_gui.py"
-```
-The following line will create a version which also displays a windows console with error messages of the executable. 
-``` 
-python -m PyInstaller --noconfirm --onefile --console --splash "./GHEtool/gui/icons/Icon.ico" --name "GHEtool_with_command_line" --icon "./GHEtool/gui/icons/Icon.ico" "./GHEtool/gui/start_gui.py"
-```
-
 ## How to add new options in the GUI?
 
 New options can be added in the 
@@ -38,7 +22,7 @@ The order in which the options are created is also the tab order.
 
 To create a page the Page class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
-Then a default widget parent has to be set. This can be just copied from the previous pages or set to ´default_parent´.
+Then a default widget parent has to be set. This can be just copied from the previous pages or set to `default_parent`.
 As second option the name of the page can be set. In the example below `Example page`.
 The third option is the button name for the page. In the example below `Name of\nthe button`. The `\n` can be used to create a new line.
 The last option is the icon. In this case `:/icons/icons/example_icon.svg`. An explanation how to add an icon can be found here: {ref}`How to add an icon?`.
@@ -60,7 +44,7 @@ page_example.set_next_page(page_next)
 
 To create an aim the Aim class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
-Then a default widget parent has to be set. This can be just copied from the previous aims or set to ´default_parent´.
+Then a default widget parent has to be set. This can be just copied from the previous aims or set to `default_parent`.
 As second option the name of the aim can be set. In the example below `Example aim`.
 The third option is the icon. In this case `:/icons/icons/example_icon.svg`. An explanation how to add an icon can be found here: {ref}`How to add an icon?`.
 The last option is the page where the aim should be located. In this case `page_aim`. 
@@ -82,7 +66,7 @@ aim_example.add_linked_option(option=option_example)
 
 To create a category the Category class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
-Then a default widget parent has to be set. This can be just copied from the previous categories or set to ´default_parent´.
+Then a default widget parent has to be set. This can be just copied from the previous categories or set to `default_parent`.
 As second option the name of the category can be set. In the example below `Example category`.
 The last option is the page where the category should be located. In this case `page_example`. 
 
@@ -100,7 +84,7 @@ category_example = Category(
 
 To create a float box the FloatBox class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
-Then a default widget parent has to be set. This can be just copied from the previous options or set to ´default_parent´.
+Then a default widget parent has to be set. This can be just copied from the previous options or set to `default_parent`.
 As second option the name of the float box can be set. In the example below `Float label text`.
 The next option is a default value. In this case `0.5`.
 The next option is the category which should contain the option. In this case `category_example`.
@@ -129,7 +113,7 @@ option_float = FloatBox(
 
 To create a integer box the IntegerBox class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
-Then a default widget parent has to be set. This can be just copied from the previous options or set to ´default_parent´.
+Then a default widget parent has to be set. This can be just copied from the previous options or set to `default_parent`.
 As second option the name of the integer box can be set. In the example below `Int label text`.
 The next option is a default value. In this case `2`.
 The next option is the category which should contain the option. In this case `category_example`.
@@ -155,7 +139,7 @@ option_int = IntBox(
 
 To create a button box the ButtonBox class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
-Then a default widget parent has to be set. This can be just copied from the previous options or set to ´default_parent´.
+Then a default widget parent has to be set. This can be just copied from the previous options or set to `default_parent`.
 As second option the name of the button box can be set. In the example below `Button box label text`.
 The next option is a default index. In this case `0`.
 The next option are the entries. In this case `Option 1, Option 2`.
@@ -180,7 +164,7 @@ option_buttons.add_linked_option(option=option_linked, index=0)
 
 To create a list box the ListBox class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
-Then a default widget parent has to be set. This can be just copied from the previous options or set to ´default_parent´.
+Then a default widget parent has to be set. This can be just copied from the previous options or set to `default_parent`.
 As second option the name of the list box can be set. In the example below `List box label text`.
 The next option is a default index. In this case `0`.
 The next option are the entries. In this case `Option 1, Option 2`.
@@ -206,7 +190,7 @@ option_list.add_linked_option(option=option_linked, index=0)
 
 To create a filename box the FileNameBox class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
-Then a default widget parent has to be set. This can be just copied from the previous file name boxes or set to ´default_parent´.
+Then a default widget parent has to be set. This can be just copied from the previous file name boxes or set to `default_parent`.
 As second option the name of the file name box can be set. In the example below `File name box label text`.
 The next option is a default filename. In this case `example_file.XX`.
 The next option is the dialog text which will be shown if the button to select a file is selected. In this case `Choose *.XX file`.
@@ -231,7 +215,7 @@ option_file = FileNameBox(
 
 To create a function button the FunctionButton class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
-Then a default widget parent has to be set. This can be just copied from the previous file function buttons or set to ´default_parent´.
+Then a default widget parent has to be set. This can be just copied from the previous file function buttons or set to `default_parent`.
 As second option the name of the button text can be set. In the example below `Press Here to activate function`.
 The next option is the icon. In this case `:/icons/icons/example_icon.svg`. An explanation how to add an icon can be found here: {ref}`How to add an icon?`.
 The last option is the category which should contain the option. In this case `category_example`.
@@ -252,7 +236,7 @@ function_example.change_event(function_to_be_called())
 
 To create a hint the Hint class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
-Then a default widget parent has to be set. This can be just copied from the previous hints or set to ´default_parent´.
+Then a default widget parent has to be set. This can be just copied from the previous hints or set to `default_parent`.
 As second option the hint can be set. In the example below `This is a hint to something important.`.
 The next option is the category which should contain the option. In this case `category_example`.
 The last option is a boolean to set if the hint is a warning or not. In this case it is (`True`). So the hint will be display in a yellow and not white text 
@@ -307,3 +291,17 @@ pyside6-rcc ./GHEtool/gui/icons.qrc -o ./GHEtool/gui/icons_rc.py
 ```
 
 Know the icon can be used in the GUI.
+
+## How to create the *.exe file?
+
+The exe can be created using [PyInstaller](https://pyinstaller.org/en/stable/).
+
+The following line will create a windowed version of the executable:
+
+```
+python -m PyInstaller --noconfirm --onefile --windowed --splash "./GHEtool/gui/icons/Icon.ico" --name "GHEtool" --icon "./GHEtool/gui/icons/Icon.ico" "./GHEtool/gui/start_gui.py"
+```
+The following line will create a version which also displays a windows console with error messages of the executable. 
+``` 
+python -m PyInstaller --noconfirm --onefile --console --splash "./GHEtool/gui/icons/Icon.ico" --name "GHEtool_with_command_line" --icon "./GHEtool/gui/icons/Icon.ico" "./GHEtool/gui/start_gui.py"
+```
