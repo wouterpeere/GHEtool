@@ -18,66 +18,6 @@ from pandas import DataFrame as pd_DataFrame, read_csv as pd_read_csv
 
 class GuiStructure:
     def __init__(self, default_parent: QWidget, status_bar: QStatusBar):
-        """
-        self.page_example = Page(default_parent=name='Example page',button_name='Name of\nthe button', icon=":/icons/icons/Aim_Inv.svg")
-
-        self.aim_example = Aim(default_parent=label='Example aim',icon=":/icons/icons/Depth_determination.svg",page=self.page_example)
-        self.aim_example = Aim(default_parent=label='Example aim', icon=":/icons/icons/Depth_determination.svg", page=self.page_example)
-        self.aim_example = Aim(default_parent=label='Example aim', icon=":/icons/icons/Depth_determination.svg", page=self.page_example)
-        self.category_example = Category(
-            default_parent=
-            label='Example category',
-            page=self.page_example,
-        )
-
-        self.option_float = FloatBox(
-            label='Float label text',
-            default_value=0.5,
-            category=self.category_example,
-            decimal_number=2,
-            minimal_value=0,
-            maximal_value=1,
-            step=0.1,
-        )
-        self.option_int = IntBox(
-            label='Int label text',
-            default_value=2,
-            category=self.category_example,
-            minimal_value=0,
-            maximal_value=12,
-            step=2,
-        )
-        self.option_buttons = ButtonBox(
-            label='Button box label text',
-            default_index=0,
-            entries=['option 1', 'option 2'],
-            category=self.category_example,
-        )
-        self.option_list = ListBox(
-            label='List box label text',
-            default_index=0,
-            entries=['Option 1', 'Option 2'],
-            category=self.category_example,
-        )
-        self.option_file = FileNameBox(
-            label='File name box label text',
-            default_value='example_file.XX',
-            dialog_text='Choose *.XX file',
-            error_text='no file found',
-            status_bar=status_bar,
-            category=self.category_example,
-        )
-        self.function_example = FunctionButton(
-            button_text='Press Here to activate function',
-            icon=':/icons/icons/example_icon.svg',
-            category=self.category_example,
-        )
-        self.hint_example = Hint(
-            hint='This is a hint to something important.',
-            category=self.category_example,
-            warning=True,
-        )
-        """
         # set default parent for the class variables to avoid widgets creation not in the main window
         Page.default_parent = default_parent
         Aim.default_parent = default_parent
@@ -103,8 +43,6 @@ class GuiStructure:
         self.aim_temp_profile.add_link_2_show(self.category_import_data)
         self.aim_req_depth.add_link_2_show(self.category_import_data)
         self.aim_size_length.add_link_2_show(self.category_import_data)
-
-        self.function_testing = FunctionButton(category=self.category_import_data, button_text='test', icon=":/icons/icons/Optimize_Profile.svg")
 
         self.option_data = ButtonBox(
             category=self.category_import_data, label="Data format:", default_index=0, entries=["monthly data", "hourly data"]

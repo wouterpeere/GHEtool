@@ -136,7 +136,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # set start page to general page
         self.gui_structure.page_aim.button.click()
 
-
         current_aim = [aim for aim, _ in self.gui_structure.list_of_aims if aim.widget.isChecked()]
         for aim, _ in self.gui_structure.list_of_aims:
             if aim not in current_aim:
@@ -948,79 +947,19 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.ax.clear()
         if self.fig is not None:
             plt.close(self.fig)
-        # create figure and axe if not already exists
-        self.fig, ax = borefield.print_temperature_profile(self.gui_structure.option_show_legend.get_value() == 0)
-        canvas = FigureCanvas(self.fig)
+
         if self.canvas is not None:
             self.gui_structure.category_result_figure.frame.layout().removeWidget(self.canvas)
             self.canvas.setParent(None)
             self.canvas = None
-        # clear axces for new plot
-        # ax.clear()
-        # plot remaining peak heating and cooling as well as loads if the profile is optimized instead of temperatures
-        """
-        # remove second axes if exist
-        self.ax[1].remove() if len(self.ax) > 1 else None
-        # calculation of all the different times at which the g_function should be calculated.
-        # this is equal to 'UPM' hours a month * 3600 seconds/hours for the simulationPeriod
-        time_for_g_values = [i * borefield.UPM * 3600.0 for i in range(1, 12 * borefield.simulation_period + 1)]
-        # make a time array
-        time_array = [i / 12 / 730.0 / 3600.0 for i in time_for_g_values]
-        # plot Temperatures
-        ax.step(np_array(time_array), np_array(t_b), "w-", where="pre", lw=1.5, label="Tb")
-        ax.step(
-            np_array(time_array),
-            np_array(results_peak_cooling),
-            where="pre",
-            lw=1.5,
-            label=f"Tf {self.translations.PeakCooling[self.gui_structure.option_language.get_value()]}",
-            color=light_color,
-        )
-        ax.step(
-            np_array(time_array),
-            np_array(results_peak_heating),
-            where="pre",
-            lw=1.5,
-            label=f"Tf {self.translations.PeakHeating[self.gui_structure.option_language.get_value()]}",
-            color=bright_color,
-        )
-        # define temperature bounds
-        ax.step(
-            np_array(time_array),
-            np_array(results_month_cooling),
-            color=light_color,
-            linestyle="dashed",
-            where="pre",
-            lw=1.5,
-            label=f"Tf {self.translations.BaseCooling[self.gui_structure.option_language.get_value()]}",
-        )
-        ax.step(
-            np_array(time_array),
-            np_array(results_month_heating),
-            color=bright_color,
-            linestyle="dashed",
-            where="pre",
-            lw=1.5,
-            label=f"Tf {self.translations.BaseHeating[self.gui_structure.option_language.get_value()]}",
-        )
-        """
-        #ax.hlines(borefield.Tf_C, 0, ds.option_simu_period, colors=bright_color, linestyles="dashed", label="", lw=1)
-        #ax.hlines(borefield.Tf_H, 0, ds.option_simu_period, colors=light_color, linestyles="dashed", label="", lw=1)
-        #ax.set_xticks(range(0, ds.option_simu_period + 1, 2))
-        # Plot legend
-        # ax.set_xlim(left=0, right=ds.option_simu_period)
-        # create legend
-        # ax.legend(facecolor=background_color, loc="best")
-        # set axes names
-
+        # create figure and axe if not already exists
+        self.fig, self.ax = borefield.print_temperature_profile(self.gui_structure.option_show_legend.get_value() == 0)
+        canvas = FigureCanvas(self.fig)
         # create result display string
         string_size: str = f"{self.translations.hint_depth[self.gui_structure.option_language.get_value()]}{round(borefield.H, 2)} m"
         # set string to depth size label
         self.gui_structure.hint_depth.set_text(string_size)
-        # display warning if depth is to small
-        # self.label_WarningDepth.show() if borefield.H < 50 else self.label_WarningDepth.hide()
         # save variables
-        self.ax = ax
         self.gui_structure.category_result_figure.frame.layout().addWidget(canvas) if self.canvas is None else None
         self.canvas = canvas
         self.canvas.show()
@@ -1033,8 +972,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         save figure to the QFileDialog asked location
         :return: None
         """
-        import PySide6.QtGui as opt
-
         # get filename at storage place
         filename = QtWidgets_QFileDialog.getSaveFileName(
             self.central_widget, caption=self.translations.SaveFigure[self.gui_structure.option_language.get_value()],
