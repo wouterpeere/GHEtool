@@ -23,6 +23,16 @@ def test_gui_values(qtbot):
     main_window.gui_structure.option_filename.set_value(f'{FOLDER}/Examples/hourly_profile.csv')
 
     for option, _ in main_window.gui_structure.list_of_options:
+        # check if option is hidden and disabled
+        option.hide()
+        assert option.is_hidden()
+        if isinstance(option.widget, list):
+            for widget in option.widget:
+                assert not widget.isEnabled()
+        else:
+            assert not option.widget.isEnabled()
+        # show option and check values
+        option.show()
         if isinstance(option, FloatBox) or isinstance(option, IntBox):
             if option.linked_options:
                 option.set_value(option.maximal_value)

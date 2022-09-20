@@ -33,11 +33,14 @@ class Option(metaclass=abc.ABCMeta):
     """
     Abstract base class for a gui option.\n
     """
-    def __init__(self, default_parent: QtW.QWidget, label: str, default_value: Union[bool, int, float, str], category: Category):
+
+    default_parent: Optional[QtW.QWidget] = None
+
+    def __init__(self, label: str, default_value: Union[bool, int, float, str], category: Category):
         self.label_text: str = label
         self.default_value: Union[bool, int, float, str] = default_value
         self.widget: Optional[QtW.QWidget] = None
-        self.frame: QtW.QFrame = QtW.QFrame(default_parent)
+        self.frame: QtW.QFrame = QtW.QFrame(self.default_parent)
         self.label = QtW.QLabel(self.frame)
         self.linked_options: List[(Option, int)] = []
         self.limit_size: bool = True
@@ -50,11 +53,6 @@ class Option(metaclass=abc.ABCMeta):
         get value of option.\n
         :return: return value of option
         """
-
-    def check_value(self):
-        if self.frame.isVisible():
-            return False
-        return True
 
     @abc.abstractmethod
     def set_value(self, value: Union[bool, int, float, str]) -> None:
@@ -161,6 +159,9 @@ class Option(metaclass=abc.ABCMeta):
         self.frame.hide()
         self.frame.setEnabled(False)
 
+    def is_hidden(self) -> bool:
+        return self.frame.isHidden()
+
     def show(self) -> None:
         """
         show option
@@ -174,6 +175,12 @@ class Option(metaclass=abc.ABCMeta):
         abstract method for the change event\n
         :param function_to_be_called: function to be called if option has changed
         """
+
+    def __repr__(self):
+        return f'{type(self).__name__}; Label: {self.label_text}; Value: {self.get_value()}'
+
+    def __str__(self):
+        return self.__repr__
 
 
 def check(linked_options: List[(Union[Option, List[Option]], int)], option_input: Option, index: int):
@@ -206,7 +213,6 @@ class FloatBox(Option):
     """
     def __init__(
         self,
-        default_parent: QtW.QWidget,
         label: str,
         default_value: float,
         category: Category,
@@ -216,12 +222,12 @@ class FloatBox(Option):
         maximal_value: float = 100.0,
         step: float = 1.0,
     ):
-        super().__init__(default_parent, label, default_value, category)
+        super().__init__(label, default_value, category)
         self.decimal_number: int = decimal_number
         self.minimal_value: float = minimal_value
         self.maximal_value: float = maximal_value
         self.step: float = step
-        self.widget: QtW.QDoubleSpinBox = QtW.QDoubleSpinBox(default_parent)
+        self.widget: QtW.QDoubleSpinBox = QtW.QDoubleSpinBox(self.default_parent)
 
     def get_value(self) -> float:
         """
@@ -304,15 +310,12 @@ class IntBox(Option):
     """
     Integer input box\n
     """
-    def __init__(
-        self, default_parent: QtW.QWidget, label: str, default_value: int, category: Category, *, minimal_value: int = 0, maximal_value: int = 100,
-            step: int = 1
-    ):
-        super().__init__(default_parent, label, default_value, category)
+    def __init__(self, label: str, default_value: int, category: Category, *, minimal_value: int = 0, maximal_value: int = 100,step: int = 1):
+        super().__init__(label, default_value, category)
         self.minimal_value: int = minimal_value
         self.maximal_value: int = maximal_value
         self.step: int = step
-        self.widget: QtW.QSpinBox = QtW.QSpinBox(default_parent)
+        self.widget: QtW.QSpinBox = QtW.QSpinBox(self.default_parent)
 
     def get_value(self) -> int:
         """
@@ -355,7 +358,6 @@ class IntBox(Option):
         :param below:
         :param above:
         """
-        print(option, below, above)
         if below is not None and self.get_value() < below:
             return option.show()
         if above is not None and self.get_value() > above:
@@ -393,10 +395,10 @@ class ButtonBox(Option):
     """
     Button input box\n
     """
-    def __init__(self, default_parent: QtW.QWidget, label: str, default_index: int, entries: List[str], *, category: Category):
-        super().__init__(default_parent, label, default_index, category)
+    def __init__(self, label: str, default_index: int, entries: List[str], *, category: Category):
+        super().__init__(label, default_index, category)
         self.entries: List[str] = entries
-        self.widget: List[QtW.QPushButton] = [QtW.QPushButton(default_parent) for _ in self.entries]
+        self.widget: List[QtW.QPushButton] = [QtW.QPushButton(self.default_parent) for _ in self.entries]
 
     def get_value(self) -> int:
         """
@@ -481,10 +483,10 @@ class ListBox(Option):
     """
     List input box\n
     """
-    def __init__(self, default_parent: QtW.QWidget, label: str, default_index: int, entries: List[str], *, category: Category):
-        super().__init__(default_parent, label, default_index, category)
+    def __init__(self, label: str, default_index: int, entries: List[str], *, category: Category):
+        super().__init__(label, default_index, category)
         self.entries: List[str] = entries
-        self.widget: QtW.QComboBox = QtW.QComboBox(default_parent)
+        self.widget: QtW.QComboBox = QtW.QComboBox(self.default_parent)
 
     def get_value(self) -> int:
         """
@@ -555,18 +557,9 @@ class FileNameBox(Option):
     """
     Filename input box\n
     """
-    def __init__(
-            self,
-            default_parent: QtW.QWidget,
-            label: str,
-            default_value: str,
-            *, dialog_text: str,
-            error_text: str,
-            status_bar: QtW.QStatusBar,
-            category: Category,
-    ):
-        super().__init__(default_parent, label, default_value, category)
-        self.widget: QtW.QLineEdit = QtW.QLineEdit(default_parent)
+    def __init__(self, label: str,default_value: str, *, dialog_text: str, error_text: str, status_bar: QtW.QStatusBar,category: Category):
+        super().__init__(label, default_value, category)
+        self.widget: QtW.QLineEdit = QtW.QLineEdit(self.default_parent)
         self.dialog_text: str = dialog_text
         self.error_text: str = error_text
         self.status_bar: QtW.QStatusBar = status_bar
@@ -637,9 +630,12 @@ class Hint:
     """
     Hint class to add hint texts in categories\n
     """
-    def __init__(self, default_parent: QtW.QWidget, hint: str, category: Category, warning: bool = False):
+
+    default_parent: Optional[QtW.QWidget] = None
+
+    def __init__(self, hint: str, category: Category, warning: bool = False):
         self.hint: str = hint
-        self.label: QtW.QLabel = QtW.QLabel(default_parent)
+        self.label: QtW.QLabel = QtW.QLabel(self.default_parent)
         self.warning = warning
         category.list_of_options.append(self)
 
@@ -660,6 +656,9 @@ class Hint:
     def show(self) -> None:
         self.label.show()
 
+    def is_hidden(self) -> bool:
+        return self.label.isHidden()
+
     def set_text(self, name: str):
         self.hint: str = name
         self.label.setText(self.hint)
@@ -669,11 +668,13 @@ class FunctionButton:
     """
     Function button to link function to\n
     """
-    def __init__(self, default_parent: QtW.QWidget, button_text: str, icon: str, category: Category):
+    default_parent: Optional[QtW.QWidget] = None
+
+    def __init__(self, button_text: str, icon: str, category: Category):
         self.button_text: str = button_text
         self.icon: str = icon
-        self.frame: QtW.QFrame = QtW.QFrame(default_parent)
-        self.button: QtW.QPushButton = QtW.QPushButton(default_parent)
+        self.frame: QtW.QFrame = QtW.QFrame(self.default_parent)
+        self.button: QtW.QPushButton = QtW.QPushButton(self.default_parent)
         category.list_of_options.append(self)
 
     def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout):
@@ -708,6 +709,9 @@ class FunctionButton:
     def show(self) -> None:
         self.frame.show()
 
+    def is_hidden(self) -> bool:
+        return self.frame.isHidden()
+
     def set_text(self, name: str):
         self.button_text: str = name
         self.button.setText(self.button_text)
@@ -724,11 +728,14 @@ class Category:
     """
     Category which consists of options\n
     """
-    def __init__(self, default_parent: QtW.QWidget, label: str, page: Page):
+
+    default_parent: Optional[QtW.QWidget] = None
+
+    def __init__(self, label: str, page: Page):
         self.label_text: str = label
-        self.label: QtW.QLabel = QtW.QLabel(default_parent)
+        self.label: QtW.QLabel = QtW.QLabel(self.default_parent)
         self.list_of_options: List[Union[Option, Hint, FunctionButton]] = []
-        self.frame: QtW.QFrame = QtW.QFrame(default_parent)
+        self.frame: QtW.QFrame = QtW.QFrame(self.default_parent)
         self.graphic_left: Optional[Union[QtW.QGraphicsView, bool]] = None
         self.graphic_right: Optional[Union[QtW.QGraphicsView, bool]] = None
         self.grid_layout: int = 0
@@ -821,15 +828,21 @@ class Category:
         for option in self.list_of_options:
             option.show()
 
+    def is_hidden(self) -> bool:
+        return self.frame.isHidden()
+
 
 class Aim:
     """
     Aim of simulation\n
     """
-    def __init__(self, default_parent: QtW.QWidget, label: str, icon: str, page: Page):
+
+    default_parent: Optional[QtW.QWidget] = None
+
+    def __init__(self, label: str, icon: str, page: Page):
         self.label: str = label
         self.icon: str = icon
-        self.widget: QtW.QPushButton = QtW.QPushButton(default_parent)
+        self.widget: QtW.QPushButton = QtW.QPushButton(self.default_parent)
         self.list_options: List[Union[Option, Category, FunctionButton]] = []
         page.upper_frame.append(self)
 
@@ -896,21 +909,26 @@ class Page:
     """
     next_label: str = 'next'
     previous_label: str = 'previous'
+    default_parent: Optional[QtW.QWidget] = None
 
-    def __init__(self, default_parent: QtW.QWidget, name: str, button_name: str, icon: str):
+    def __init__(self, name: str, button_name: str, icon: str):
         self.name: str = name
         self.button_name: str = button_name
         self.icon: str = icon
         self.push_button_next: Optional[QtW.QPushButton] = None
         self.push_button_previous: Optional[QtW.QPushButton] = None
         self.list_categories: List[Category] = []
-        self.button: QtW.QPushButton = QtW.QPushButton(default_parent)
-        self.label: QtW.QLabel = QtW.QLabel(default_parent)
-        self.label_gap: QtW.QLabel = QtW.QLabel(default_parent)
-        self.page: QtW.QWidget = QtW.QWidget(default_parent)
+        self.button: QtW.QPushButton = QtW.QPushButton(self.default_parent)
+        self.label: QtW.QLabel = QtW.QLabel(self.default_parent)
+        self.label_gap: QtW.QLabel = QtW.QLabel(self.default_parent)
+        self.page: QtW.QWidget = QtW.QWidget(self.default_parent)
         self.previous_page: Optional[Page] = None
         self.next_page: Optional[Page] = None
         self.upper_frame: List[Union[Aim, Option, Category]] = []
+        self.functions_button_clicked: List[Callable] = []
+
+    def add_function_called_if_button_clicked(self, function_2_be_called: Callable):
+        self.functions_button_clicked.append(function_2_be_called)
 
     def set_text(self, name: str):
         entry_name: List[str, str] = name.split(',')
@@ -987,6 +1005,8 @@ class Page:
         vertical_layout_menu.addWidget(self.button)
         vertical_layout_menu.addWidget(self.label_gap)
         self.button.clicked.connect(ft_partial(stacked_widget.setCurrentWidget, self.page))  # pylint: disable=E1101
+        for function_2_be_called in self.functions_button_clicked:
+            self.button.clicked.connect(function_2_be_called)  # pylint: disable=E1101
 
     def create_upper_frame(self, scroll_area_content: QtW.QWidget, scroll_area_layout: QtW.QVBoxLayout):
         """

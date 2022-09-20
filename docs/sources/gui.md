@@ -31,7 +31,6 @@ Furthermore, the next and previous page can be set by using `set_previous_page()
 ```python
 from GHEtool.gui.gui_classes import Page
 page_example = Page(
-    default_parent=default_parent, 
     name='Example page',
     button_name='Name of\nthe button',
     icon=":/icons/icons/example_icon.svg",
@@ -58,7 +57,6 @@ This can be an option, hint, category or function button.
 from GHEtool.gui.gui_classes import Aim
 
 aim_example = Aim(
-    default_parent=default_parent,
     label='Example aim',
     icon=":/icons/icons/example_icon.svg",
     page=page_aim,
@@ -80,7 +78,6 @@ The last option is the page where the category should be located. In this case `
 ```python
 from GHEtool.gui.gui_classes import Category
 category_example = Category(
-    default_parent=default_parent, 
     label='Example category', 
     page=page_example,
 )
@@ -107,7 +104,6 @@ In this case `0.1`.
 ```python
 from GHEtool.gui.gui_classes import FloatBox
 option_float = FloatBox(
-    default_parent=default_parent, 
     label='Float label text', 
     default_value=0.5, 
     category=category_example,
@@ -137,7 +133,6 @@ In this case `2`.
 ```python
 from GHEtool.gui.gui_classes import IntBox
 option_int = IntBox(
-    default_parent=default_parent, 
     label='Int label text', 
     default_value=2, 
     category=category_example,
@@ -167,7 +162,6 @@ first (`0`) option is selected.
 from GHEtool.gui.gui_classes import ButtonBox
 
 option_buttons = ButtonBox(
-    default_parent=default_parent,
     label='Button box label text',
     default_index=0,
     entries=['option 1', 'option 2'],
@@ -196,7 +190,6 @@ first (`0`) option is selected.
 ```python
 from GHEtool.gui.gui_classes import ListBox
 option_list = ListBox(
-    default_parent=default_parent,
     label='List box label text',
     default_index=0,
     entries=['Option 1', 'Option 2'],
@@ -223,7 +216,6 @@ The last option is the category which should contain the option. In this case `c
 ```python
 from GHEtool.gui.gui_classes import FileNameBox
 option_file = FileNameBox(
-    default_parent=default_parent,
     label='File name box label text',
     default_value='example_file.XX',
     dialog_text='Choose *.XX file',
@@ -249,7 +241,6 @@ The button can be linked to a function using `change_event()`. In this case ever
 ```python
 from GHEtool.gui.gui_classes import FunctionButton
 function_example = FunctionButton(
-    default_parent=default_parent,
     button_text='Press Here to activate function',
     icon=':/icons/icons/example_icon.svg',
     category=category_example,
@@ -273,7 +264,6 @@ color.
 ```python
 from GHEtool.gui.gui_classes import Hint
 hint_example = Hint(
-    default_parent=default_parent,
     hint='This is a hint to something important.',
     category=category_example,
     warning=True,

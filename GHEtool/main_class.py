@@ -10,6 +10,8 @@ import pygfunction as gt
 from scipy import interpolate
 from scipy.signal import convolve
 
+from typing import Optional, Tuple
+
 from GHEtool.VariableClasses.VariableClasses import *
 
 
@@ -1030,7 +1032,7 @@ class Borefield:
         """
         self._print_temperature_profile(figure=False, H=depth, plot_hourly=hourly)
 
-    def print_temperature_profile(self, legend: bool = True, plot_hourly: bool = False) -> None:
+    def print_temperature_profile(self, legend: bool = True, plot_hourly: bool = False) -> Optional[Tuple[plt.figure, plt.axes]]:
         """
         This function plots the temperature profile for the calculated depth.
 
@@ -1044,7 +1046,7 @@ class Borefield:
         if plot_hourly:
             self._check_hourly_load()
 
-        self._print_temperature_profile(legend=legend, plot_hourly=plot_hourly)
+        return self._print_temperature_profile(legend=legend, plot_hourly=plot_hourly)
 
     def print_temperature_profile_fixed_depth(self, depth, legend: bool = True, plot_hourly: bool = False) -> None:
         """
@@ -1059,7 +1061,7 @@ class Borefield:
         self._print_temperature_profile(legend=legend, H=depth, plot_hourly=plot_hourly)
 
     def _print_temperature_profile(self, legend: bool = True, H: float = None,
-                                   plot_hourly: bool = False, figure: bool = True) -> None:
+                                   plot_hourly: bool = False, figure: bool = True) -> Optional[Tuple[plt.figure, plt.axes]]:
         """
         This function calculates the temperature evolution in the borefield using temporal superposition.
         It is possible to calculate this for a certain depth H, otherwise self.H will be used.
@@ -1174,39 +1176,60 @@ class Borefield:
                 time_array = self.time_L4 / 12 / 3600 / 730
             else:
                 time_array = self.time_L3_last_year / 12 / 730. / 3600.
+            from matplotlib.colors import to_rgb
+            from numpy import array, float64
+            from GHEtool.gui.gui_base_class import UiGhetool, GREY, WHITE, DARK, LIGHT, WARNING
+            background_color: str = to_rgb(array(DARK.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
+            white_color: str = to_rgb(array(WHITE.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
+            light_color: str = to_rgb(array(LIGHT.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
+            bright_color: str = to_rgb(array(WARNING.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
+            plt.rcParams["text.color"] = white_color
+            plt.rcParams["axes.labelcolor"] = white_color
+            plt.rcParams["xtick.color"] = white_color
+            plt.rcParams["ytick.color"] = white_color
 
             plt.rc('figure')
-            fig = plt.figure()
+            fig = plt.figure(facecolor=background_color)
+
 
             ax1 = fig.add_subplot(111)
-            ax1.set_xlabel(r'Time (year)')
-            ax1.set_ylabel(r'Temperature ($^\circ C$)')
 
             # plot Temperatures
-            ax1.step(time_array, Tb, 'k-', where="pre", lw=1.5, label="Tb")
+            ax1.step(time_array, Tb, 'w-', where="pre", lw=1.5, label="Tb")
 
             if plot_hourly:
-                ax1.step(time_array, temperature_result, 'b-', where="pre", lw=1, label='Tf')
+                ax1.step(time_array, temperature_result, "w-", where="pre", lw=1.5, label='Tf')
             else:
-                ax1.step(time_array, results_peak_cooling, 'b-', where="pre", lw=1.5, label='Tf peak cooling')
-                ax1.step(time_array, results_peak_heating, 'r-', where="pre", lw=1.5, label='Tf peak heating')
+                ax1.step(time_array, results_peak_cooling, color=light_color, where="pre", lw=1.5, label='Tf peak cooling')
+                ax1.step(time_array, results_peak_heating, color=bright_color, where="pre", lw=1.5, label='Tf peak heating')
 
-
-                ax1.step(time_array, results_month_cooling, color='b', linestyle="dashed", where="pre", lw=1.5,
+                ax1.step(time_array, results_month_cooling, linestyle="dashed", where="pre", lw=1.5, color=light_color,
                          label='Tf base cooling')
-                ax1.step(time_array, results_month_heating, color='r', linestyle="dashed", where="pre", lw=1.5,
+                ax1.step(time_array, results_month_heating, linestyle="dashed", where="pre", lw=1.5,color=bright_color,
                          label='Tf base heating')
 
             # define temperature bounds
-            ax1.hlines(self.Tf_C, 0, self.simulation_period, colors='r', linestyles='dashed', label='', lw=1)
-            ax1.hlines(self.Tf_H, 0, self.simulation_period, colors='b', linestyles='dashed', label='', lw=1)
+            ax1.hlines(self.Tf_C, 0, self.simulation_period, colors=bright_color, linestyles="dashed", label="", lw=1)
+            ax1.hlines(self.Tf_H, 0, self.simulation_period, colors=light_color, linestyles="dashed", label="", lw=1)
             ax1.set_xticks(range(0, self.simulation_period + 1, 2))
+
+            ax1.set_xlabel(r'Time (year)', color=white_color)
+            ax1.set_ylabel(r'Temperature ($^\circ C$)', color=white_color)
+            # set colors
+            ax1.spines["bottom"].set_color(white_color)
+            ax1.spines["top"].set_color(white_color)
+            ax1.spines["right"].set_color(white_color)
+            ax1.spines["left"].set_color(white_color)
+            ax1.set_facecolor(background_color)
 
             # Plot legend
             if legend:
-                ax1.legend()
+                ax1.legend(facecolor=background_color, loc="best")
             ax1.set_xlim(left=0, right=self.simulation_period)
-            plt.show()
+            if not self.gui:
+                plt.show()
+                return
+            return fig, ax1
 
     def gfunction(self, time_value: list, H: float) -> np.ndarray:
         """

@@ -1,5 +1,4 @@
 from functools import partial as ft_partial
-from math import pi
 from os.path import dirname, realpath, exists
 from os.path import split as os_split
 from os import makedirs, remove
@@ -11,23 +10,18 @@ from sys import path
 from time import sleep
 from typing import TYPE_CHECKING, List, Optional, Tuple
 
-from numpy import cos, sin, array, float64, int64
 from PySide6.QtCore import QEvent as QtCore_QEvent
 from PySide6.QtCore import QModelIndex as QtCore_QModelIndex
 from PySide6.QtCore import QSize as QtCore_QSize
 from PySide6.QtCore import QThread as QtCore_QThread
 from PySide6.QtCore import Signal as QtCore_pyqtSignal
 from PySide6.QtGui import QAction as QtGui_QAction
-from PySide6.QtGui import QColor
 from PySide6.QtGui import QIcon as QtGui_QIcon
-from PySide6.QtGui import QPen
 from PySide6.QtGui import QPixmap as QtGui_QPixmap
 from PySide6.QtWidgets import QApplication as QtWidgets_QApplication
 from PySide6.QtWidgets import QDialog as QtWidgets_QDialog
 from PySide6.QtWidgets import QDoubleSpinBox as QtWidgets_QDoubleSpinBox
 from PySide6.QtWidgets import QFileDialog as QtWidgets_QFileDialog
-from PySide6.QtWidgets import QGraphicsEllipseItem, QGraphicsScene
-from PySide6.QtWidgets import QGraphicsView as QtWidgets_QGraphicsView
 from PySide6.QtWidgets import QInputDialog as QtWidgets_QInputDialog
 from PySide6.QtWidgets import QListWidget as QtWidgets_QListWidget
 from PySide6.QtWidgets import QListWidgetItem as QtWidgets_QListWidgetItem
@@ -41,10 +35,9 @@ from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
 from GHEtool.gui.gui_calculation_thread import (BoundsOfPrecalculatedData,
                                                 CalcProblem)
 from GHEtool.gui.gui_data_storage import DataStorage
-from GHEtool.gui.gui_base_class import UiGhetool, GREY, WHITE, DARK, LIGHT, WARNING
-from GHEtool.gui.gui_structure import GuiStructure
+from GHEtool.gui.gui_base_class import UiGhetool
+from GHEtool.gui.gui_structure import GuiStructure, Option
 from GHEtool.gui.translation_class import Translations
-from GHEtool.gui.gui_classes import Option
 
 if TYPE_CHECKING:
     from pandas import DataFrame as pd_DataFrame
@@ -143,7 +136,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # set start page to general page
         self.gui_structure.page_aim.button.click()
 
-        self.update_borehole()
 
         current_aim = [aim for aim, _ in self.gui_structure.list_of_aims if aim.widget.isChecked()]
         for aim, _ in self.gui_structure.list_of_aims:
@@ -185,27 +177,13 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             option.change_event(self.change)
         for option, name in self.gui_structure.list_of_aims:
             option.change_event(self.change)
-        self.gui_structure.option_pipe_number.change_event(self.update_borehole)
-        self.gui_structure.option_pipe_outer_radius.change_event(self.update_borehole)
-        self.gui_structure.option_pipe_inner_radius.change_event(self.update_borehole)
-        self.gui_structure.option_pipe_borehole_radius.change_event(self.update_borehole)
-        self.gui_structure.option_pipe_distance.change_event(self.update_borehole)
-        self.gui_structure.option_pipe_number.change_event(self.check_distance_between_pipes)
-        self.gui_structure.option_pipe_outer_radius.change_event(self.check_distance_between_pipes)
-        self.gui_structure.option_pipe_inner_radius.change_event(self.check_distance_between_pipes)
-        self.gui_structure.option_pipe_borehole_radius.change_event(self.check_distance_between_pipes)
-        self.gui_structure.option_pipe_distance.change_event(self.check_distance_between_pipes)
-        self.gui_structure.option_pipe_outer_radius.change_event(self.gui_structure.option_pipe_inner_radius.widget.setMaximum)
-        self.gui_structure.option_pipe_inner_radius.change_event(self.gui_structure.option_pipe_outer_radius.widget.setMinimum)
-        self.gui_structure.page_result.button.clicked.connect(self.display_results)
+
         self.gui_structure.function_save_figure.change_event(self.save_figure)
         self.gui_structure.function_save_results.change_event(self.save_data)
-        self.gui_structure.option_seperator_csv.change_event(self.fun_update_combo_box_data_file)
-        self.gui_structure.option_decimal_csv.change_event(self.fun_update_combo_box_data_file)
-        self.gui_structure.option_filename.change_event(self.fun_update_combo_box_data_file)
         self.gui_structure.option_auto_saving.change_event(self.change_auto_save)
-        self.gui_structure.option_show_legend.change_event(self.check_legend)
-        self.gui_structure.button_load_csv.change_event(self.fun_display_data)
+        for option in self.gui_structure.category_options_result.list_of_options:
+            if isinstance(option, Option):
+                option.change_event(self.display_results)
         self.gui_structure.option_language.change_event(self.change_language)
         self.gui_structure.page_result.button.clicked.connect(self.display_results)
         self.actionAdd_Scenario.triggered.connect(self.add_scenario)
@@ -384,27 +362,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.change_scenario(self.list_widget_scenario.row(new_row_item))
         return
 
-    def check_distance_between_pipes(self) -> None:
-        """
-        calculate and set minimal and maximal distance between U pipes and center
-        :return: None
-        """
-        # import math stuff
-        from math import cos, pi, sin, tan
-
-        n_u: int = self.gui_structure.option_pipe_number.get_value()  # get number of U pipes
-        r_borehole: float = self.gui_structure.option_pipe_borehole_radius.get_value()  # get borehole radius
-        r_outer_pipe: float = self.gui_structure.option_pipe_outer_radius.get_value()  # get outer pipe radius
-        r_outer_pipe_max: float = r_borehole / (1 + 1 / sin(pi / (2 * n_u)))  # calculate maximal outer pipe radius(see Circle packing)
-        distance_max: float = r_borehole - r_outer_pipe_max  # calculate maximal distance between pipe and center
-        alpha: float = pi / n_u  # determine equal angle between pipes
-        # determine minimal distance between pipe and center if number of pipes is bigger than one else set to half
-        # borehole radius
-        distance_min: float = 2 * r_outer_pipe * (cos((pi - alpha) / 2) + sin((pi - alpha) / 2) / tan(alpha)) if n_u > 1 else r_borehole / 2
-        # set minimal and maximal value for pipe distance
-        self.gui_structure.option_pipe_distance.widget.setMinimum(distance_min)
-        self.gui_structure.option_pipe_distance.widget.setMaximum(distance_max)
-
     def fun_move_scenario(self, start_item: QtCore_QModelIndex, start_index: int, start_index2: int, end_item: QtCore_QModelIndex, target_index: int) -> None:
         """
         change list of ds entry if scenario is moved (more inputs than needed, because the list widget returns that much
@@ -491,21 +448,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.status_bar.hide()
             return
         self.status_bar.show()
-
-    def check_bounds(self) -> None:
-        """
-        check if precalculated bounds are extended then show warning
-        :return: None
-        """
-        # check if current selection is outside the precalculated data
-        outside_bounds: bool = self.BOPD.check_if_outside_bounds(
-            self.gui_structure.option_depth.get_value(),
-            self.gui_structure.option_spacing.get_value(),
-            self.gui_structure.option_conductivity.get_value(),
-            max(self.gui_structure.option_length.get_value(), self.gui_structure.option_width.get_value()),
-        )
-        # if so show label with warning message
-        self.gui_structure.hint_calc_time.show() if outside_bounds else self.gui_structure.hint_calc_time.hide()
 
     def eventFilter(self, obj: QtWidgets_QPushButton, event) -> bool:
         """
@@ -599,7 +541,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         :return: None
         """
         # try to open backup file if it exits
-        try:
+        if exists(self.backup_path):
             # open backup file
             with open(self.backup_path, "rb") as f:
                 saving: tuple = pk_load(f)
@@ -616,13 +558,11 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.list_widget_scenario.setCurrentRow(0)
             # check if results exits and then display them
             self.check_results()
-        except FileNotFoundError:
-            # hide custom bore field warning
-            self.gui_structure.hint_calc_time.hide()
-            # change language to english
-            self.change_language()
-            # show message that no backup file is found
-            self.status_bar.showMessage(self.translations.NoBackupFile[self.gui_structure.option_language.get_value()])
+            return
+        # change language to english
+        self.change_language()
+        # show message that no backup file is found
+        self.status_bar.showMessage(self.translations.NoBackupFile[self.gui_structure.option_language.get_value()])
 
     def fun_save_auto(self) -> None:
         """
@@ -644,244 +584,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                 pk_dump(saving, f, pk_HP)
         except FileNotFoundError:
             self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
-
-    def fun_update_combo_box_data_file(self, filename: str) -> None:
-        """
-        update comboBox if new data file is selected
-        :param filename: filename of data file
-        :return: None
-        """
-        if not isinstance(filename, str):
-            return
-        # import pandas here to save start up time
-        from pandas import read_csv as pd_read_csv
-
-        # get decimal and column seperator
-        sep: str = ";" if self.gui_structure.option_seperator_csv.get_value() == 0 else ","
-        dec: str = "." if self.gui_structure.option_decimal_csv.get_value() == 0 else ","
-        # try to read CSV-File
-        try:
-            data: pd_DataFrame = pd_read_csv(filename, sep=sep, decimal=dec)
-        except FileNotFoundError:
-            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
-            return
-        except PermissionError:
-            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
-            return
-        # get data column names to set them to comboBoxes
-        columns = data.columns
-        # clear comboBoxes and add column names
-        self.gui_structure.option_heating_column.widget.clear()
-        self.gui_structure.option_cooling_column.widget.clear()
-        self.gui_structure.option_single_column.widget.clear()
-        self.gui_structure.option_heating_column.widget.addItems(columns)
-        self.gui_structure.option_cooling_column.widget.addItems(columns)
-        self.gui_structure.option_single_column.widget.addItems(columns)
-        # set column selection mode to 2 columns if more than one line exists
-        self.gui_structure.option_column.set_value(0 if len(columns) > 0 else 1)
-
-    def update_borehole(self) -> None:
-        """
-        plots the position of the pipes in the borehole
-        :return: None
-        """
-        if isinstance(self.gui_structure.category_pipe_data.graphic_left, QtWidgets_QGraphicsView):
-            # import all that is needed
-            # get variables from gui
-            number_of_pipes = self.gui_structure.option_pipe_number.get_value()
-            r_out = self.gui_structure.option_pipe_outer_radius.get_value() * 10
-            r_in = self.gui_structure.option_pipe_inner_radius.get_value() * 10
-            r_bore = self.gui_structure.option_pipe_borehole_radius.get_value() * 10
-            dis = self.gui_structure.option_pipe_distance.get_value() * 10
-            # calculate scale from graphic view size
-            max_l = min(self.gui_structure.category_pipe_data.graphic_left.width(), self.gui_structure.category_pipe_data.graphic_left.height())
-            scale = max_l / r_bore / 1.25  # leave 25 % space
-            # set colors
-            dark_color = array(DARK.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
-            white_color = array(WHITE.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
-            light_color = array(LIGHT.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
-            grey_color = array(GREY.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
-            blue_color = QColor(dark_color[0], dark_color[1], dark_color[2])
-            blue_light = QColor(light_color[0], light_color[1], light_color[2])
-            white_color = QColor(white_color[0], white_color[1], white_color[2])
-            grey = QColor(grey_color[0], grey_color[1], grey_color[2])
-            brown = QColor(145, 124, 111)
-            # create graphic scene if not exits otherwise get scene and delete items
-            if self.gui_structure.category_pipe_data.graphic_left.scene() is None:
-                scene = QGraphicsScene()  # parent=self.central_widget)
-                self.gui_structure.category_pipe_data.graphic_left.setScene(scene)
-                self.gui_structure.category_pipe_data.graphic_left.setBackgroundBrush(brown)
-            else:
-                scene = self.gui_structure.category_pipe_data.graphic_left.scene()
-                scene.clear()
-            # create borehole circle in grey wih no border
-            circle = QGraphicsEllipseItem(-r_bore * scale / 2, -r_bore * scale / 2, r_bore * scale, r_bore * scale)
-            circle.setPen(QPen(grey, 0))
-            circle.setBrush(grey)
-            scene.addItem(circle)
-            # calculate pipe position and draw circle (white for outer pipe and blue for inner pipe)
-            dt: float = pi / float(number_of_pipes)
-            for i in range(number_of_pipes):
-                pos_1 = dis * cos(2.0 * i * dt + pi) / 2
-                pos_2 = dis * sin(2.0 * i * dt + pi) / 2
-                circle = QGraphicsEllipseItem((pos_1 - r_out / 2) * scale, (pos_2 - r_out / 2) * scale, r_out * scale, r_out * scale)
-                circle.setPen(white_color)
-                circle.setBrush(white_color)
-                scene.addItem(circle)
-                circle = QGraphicsEllipseItem((pos_1 - r_in / 2) * scale, (pos_2 - r_in / 2) * scale, r_in * scale, r_in * scale)
-                circle.setPen(blue_color)
-                circle.setBrush(blue_color)
-                scene.addItem(circle)
-                pos_1 = dis * cos(2.0 * i * dt + pi + dt) / 2
-                pos_2 = dis * sin(2.0 * i * dt + pi + dt) / 2
-                circle = QGraphicsEllipseItem((pos_1 - r_out / 2) * scale, (pos_2 - r_out / 2) * scale, r_out * scale, r_out * scale)
-                circle.setPen(white_color)
-                circle.setBrush(white_color)
-                scene.addItem(circle)
-                circle = QGraphicsEllipseItem((pos_1 - r_in / 2) * scale, (pos_2 - r_in / 2) * scale, r_in * scale, r_in * scale)
-                circle.setPen(blue_light)
-                circle.setBrush(blue_light)
-                scene.addItem(circle)
-
-    def fun_display_data(self) -> None:
-        """
-        Load the Data to Display in the GUI
-        :return: None
-        """
-        try:
-            # get filename from line edit
-            filename: str = self.gui_structure.option_filename.get_value()
-            # raise error if no filename exists
-            if filename == "":
-                raise FileNotFoundError
-            # get thermal demands index (1 = 2 columns, 2 = 1 column)
-            thermal_demand: int = self.gui_structure.option_column.get_value()
-            # Generate list of columns that have to be imported
-            cols: list = []
-            heating_load: str = self.gui_structure.option_heating_column.widget.currentText()
-            if len(heating_load) >= 1:
-                cols.append(heating_load)
-            cooling_load: str = self.gui_structure.option_cooling_column.widget.currentText()
-            if len(cooling_load) >= 1:
-                cols.append(cooling_load)
-            combined: str = self.gui_structure.option_single_column.widget.currentText()
-            if len(combined) >= 1:
-                cols.append(combined)
-            date: str = "Date"
-            # import pandas here to save start up time
-            from pandas import read_csv as pd_read_csv
-
-            sep: str = ";" if self.gui_structure.option_seperator_csv.get_value() == 0 else ","
-            dec: str = "." if self.gui_structure.option_decimal_csv.get_value() == 0 else ","
-            df2: pd_DataFrame = pd_read_csv(filename, usecols=cols, sep=sep, decimal=dec)
-            # ---------------------- Time Step Section  ----------------------
-            # import pandas here to save start up time
-            from pandas import Series as pd_Series
-            from pandas import date_range as pd_date_range
-            from pandas import to_datetime as pd_to_datetime
-
-            # Define start and end date
-            start = pd_to_datetime("2019-01-01 00:00:00")
-            end = pd_to_datetime("2019-12-31 23:59:00")
-            # add date column
-            df2[date] = pd_Series(pd_date_range(start, end, freq="1H"))
-            # Create no dict to create mean values for
-            dict_agg: Optional[None, dict] = None
-
-            # set date to index
-            df2.set_index(date, inplace=True)
-            # resample data to hourly resolution if necessary
-            df2 = df2 if dict_agg is None else df2.resample("H").agg(dict_agg)
-            # ------------------- Calculate Section --------------------
-            # Choose path between Single or Combined Column and create new columns
-            if thermal_demand == 1:
-                # Resample the Data for peakHeating and peakCooling
-                df2.rename(columns={heating_load: "Heating Load", cooling_load: "Cooling Load"}, inplace=True)
-                df2["peak Heating"] = df2["Heating Load"]
-                df2["peak Cooling"] = df2["Cooling Load"]
-            # by single column split by 0 to heating (>0) and cooling (<0)
-            elif thermal_demand == 0:
-                # Create Filter for heating and cooling load ( Heating Load +, Cooling Load -)
-                heating_load = df2[combined].apply(lambda x: x >= 0)
-                cooling_load = df2[combined].apply(lambda x: x < 0)
-                df2["Heating Load"] = df2.loc[heating_load, combined]
-                df2["Cooling Load"] = df2.loc[cooling_load, combined] * -1
-                df2["peak Heating"] = df2["Heating Load"]
-                df2["peak Cooling"] = df2["Cooling Load"]
-            # resample to a monthly resolution as sum and maximal load
-            df3 = df2.resample("M").agg({"Heating Load": "sum", "Cooling Load": "sum", "peak Heating": "max", "peak Cooling": "max"})
-            # replace nan with 0
-            df3 = df3.fillna(0)
-            # ----------------------- Data Unit Section --------------------------
-            # Get the Data Unit and set the label in the thermal Demand Box to follow
-            data_unit = self.gui_structure.option_unit_data.get_value()
-            # define unit factors
-            fac = 0.001 if data_unit == 0 else 1 if data_unit == 1 else 1000
-            # multiply dataframe with unit factor and collect data
-            df3 = df3 * fac
-            peak_heating = df3["peak Heating"]
-            peak_cooling = df3["peak Cooling"]
-            heating_load = df3["Heating Load"]
-            cooling_load = df3["Cooling Load"]
-            # set heating loads to double spinBoxes
-            self.gui_structure.option_hl_jan.set_value(heating_load[0])
-            self.gui_structure.option_hl_feb.set_value(heating_load[1])
-            self.gui_structure.option_hl_mar.set_value(heating_load[2])
-            self.gui_structure.option_hl_apr.set_value(heating_load[3])
-            self.gui_structure.option_hl_may.set_value(heating_load[4])
-            self.gui_structure.option_hl_jun.set_value(heating_load[5])
-            self.gui_structure.option_hl_jul.set_value(heating_load[6])
-            self.gui_structure.option_hl_aug.set_value(heating_load[7])
-            self.gui_structure.option_hl_sep.set_value(heating_load[8])
-            self.gui_structure.option_hl_oct.set_value(heating_load[9])
-            self.gui_structure.option_hl_nov.set_value(heating_load[10])
-            self.gui_structure.option_hl_dec.set_value(heating_load[11])
-            # set cooling loads to double spinBoxes
-            self.gui_structure.option_cl_jan.set_value(cooling_load[0])
-            self.gui_structure.option_cl_feb.set_value(cooling_load[1])
-            self.gui_structure.option_cl_mar.set_value(cooling_load[2])
-            self.gui_structure.option_cl_apr.set_value(cooling_load[3])
-            self.gui_structure.option_cl_may.set_value(cooling_load[4])
-            self.gui_structure.option_cl_jun.set_value(cooling_load[5])
-            self.gui_structure.option_cl_jul.set_value(cooling_load[6])
-            self.gui_structure.option_cl_aug.set_value(cooling_load[7])
-            self.gui_structure.option_cl_sep.set_value(cooling_load[8])
-            self.gui_structure.option_cl_oct.set_value(cooling_load[9])
-            self.gui_structure.option_cl_nov.set_value(cooling_load[10])
-            self.gui_structure.option_cl_dec.set_value(cooling_load[11])
-            # set peak heating load to double spinBoxes
-            self.gui_structure.option_hp_jan.set_value(peak_heating[0])
-            self.gui_structure.option_hp_feb.set_value(peak_heating[1])
-            self.gui_structure.option_hp_mar.set_value(peak_heating[2])
-            self.gui_structure.option_hp_apr.set_value(peak_heating[3])
-            self.gui_structure.option_hp_may.set_value(peak_heating[4])
-            self.gui_structure.option_hp_jun.set_value(peak_heating[5])
-            self.gui_structure.option_hp_jul.set_value(peak_heating[6])
-            self.gui_structure.option_hp_aug.set_value(peak_heating[7])
-            self.gui_structure.option_hp_sep.set_value(peak_heating[8])
-            self.gui_structure.option_hp_oct.set_value(peak_heating[9])
-            self.gui_structure.option_hp_nov.set_value(peak_heating[10])
-            self.gui_structure.option_hp_dec.set_value(peak_heating[11])
-            # set peak cooling load to double spinBoxes
-            self.gui_structure.option_cp_jan.set_value(peak_cooling[0])
-            self.gui_structure.option_cp_feb.set_value(peak_cooling[1])
-            self.gui_structure.option_cp_mar.set_value(peak_cooling[2])
-            self.gui_structure.option_cp_apr.set_value(peak_cooling[3])
-            self.gui_structure.option_cp_may.set_value(peak_cooling[4])
-            self.gui_structure.option_cp_jun.set_value(peak_cooling[5])
-            self.gui_structure.option_cp_jul.set_value(peak_cooling[6])
-            self.gui_structure.option_cp_aug.set_value(peak_cooling[7])
-            self.gui_structure.option_cp_sep.set_value(peak_cooling[8])
-            self.gui_structure.option_cp_oct.set_value(peak_cooling[9])
-            self.gui_structure.option_cp_nov.set_value(peak_cooling[10])
-            self.gui_structure.option_cp_dec.set_value(peak_cooling[11])
-        # raise error and display error massage in status bar
-        except FileNotFoundError:
-            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
-        except IndexError:
-            self.status_bar.showMessage(self.translations.ValueError[self.gui_structure.option_language.get_value()], 5000)
-        except KeyError:
-            self.status_bar.showMessage(self.translations.ColumnError[self.gui_structure.option_language.get_value()], 5000)
 
     def fun_load(self) -> None:
         """
@@ -1221,11 +923,8 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             return
         # import here to save start up time
         import matplotlib.pyplot as plt
-        from matplotlib import axes as matplotlib_axes
         from matplotlib.backends.backend_qt5agg import \
             FigureCanvasQTAgg as FigureCanvas
-        from matplotlib.colors import to_rgb
-        from numpy import array as np_array
 
         # get Datastorage of selected scenario
         ds: DataStorage = self.list_ds[self.list_widget_scenario.currentRow()]
@@ -1240,242 +939,94 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.gui_structure.function_save_figure.hide()
             self.canvas.hide() if self.canvas is not None else None
             return
-        # get results of bore field sizing by length and width
-        li_size = [str(round(i[3], 2)) for i in borefield.combo]
-        li_b = [str(round(i[2], 2)) for i in borefield.combo]
-        li_n_1 = [str(round(i[0], 2)) for i in borefield.combo]
-        li_n_2 = [str(round(i[1], 2)) for i in borefield.combo]
-        # hide widgets if no solution exists and display no solution text
-        if (ds.aim_size_length and not li_size) or (ds.aim_req_depth and borefield.H == borefield.H_max):
-            self.gui_structure.hint_depth.set_text(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
-            # self.label_WarningDepth.hide()
-            self.gui_structure.option_show_legend.hide()
-            self.gui_structure.function_save_results.hide()
-            self.gui_structure.function_save_figure.hide()
-            self.canvas.hide() if self.canvas is not None else None
-            return
         # show checkBox for legend and save figure button
-        self.gui_structure.option_show_legend.show()
-        self.gui_structure.function_save_figure.show()
-        # just show save Data button if not optmize load profile is selected because the output for this is not
-        # defined so far
-        self.gui_structure.function_save_results.hide() if self.gui_structure.aim_optimize.widget.isChecked() else self.gui_structure.function_save_results.show()
+        for category in self.gui_structure.page_result.list_categories:
+            category.show()
         # get peak heating and cooling and monthly loads as well as Tb temperature
-        results_peak_cooling = borefield.results_peak_cooling
-        results_peak_heating = borefield.results_peak_heating
-        results_month_cooling = borefield.results_month_cooling
-        results_month_heating = borefield.results_month_heating
-        t_b = borefield.Tb
         # set colors for graph
-        background_color: str = to_rgb(array(DARK.replace('rgb(', '').replace(')', '').split(','), dtype=float64)/255)
-        white_color: str = to_rgb(array(WHITE.replace('rgb(', '').replace(')', '').split(','), dtype=float64)/255)
-        light_color: str = to_rgb(array(LIGHT.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-        bright_color: str = to_rgb(array(WARNING.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-        plt.rcParams["text.color"] = white_color
-        plt.rcParams["axes.labelcolor"] = white_color
-        plt.rcParams["xtick.color"] = white_color
-        plt.rcParams["ytick.color"] = white_color
+        if self.ax is not None:
+            self.ax.clear()
+        if self.fig is not None:
+            plt.close(self.fig)
         # create figure and axe if not already exists
-        self.fig = plt.figure(facecolor=background_color) if self.fig is None else self.fig
-        canvas = FigureCanvas(self.fig) if self.canvas is None else self.canvas
-        ax: matplotlib_axes._subplots.AxesSubplot = canvas.figure.subplots() if self.ax == [] else self.ax[0]
+        self.fig, ax = borefield.print_temperature_profile(self.gui_structure.option_show_legend.get_value() == 0)
+        canvas = FigureCanvas(self.fig)
+        if self.canvas is not None:
+            self.gui_structure.category_result_figure.frame.layout().removeWidget(self.canvas)
+            self.canvas.setParent(None)
+            self.canvas = None
         # clear axces for new plot
-        ax.clear()
+        # ax.clear()
         # plot remaining peak heating and cooling as well as loads if the profile is optimized instead of temperatures
-        if ds.aim_optimize:
-            # create new x-axe
-            time_array: list = [i + 1 for i in range(12)]
-            # create second y-axe if not already exists
-            ax2 = ax.twinx() if len(self.ax) < 2 else self.ax[1]
-            # clear the axe
-            ax2.clear()
-            # plot load and peaks
-            ax.step(
-                np_array(time_array),
-                np_array(borefield.peak_cooling_external),
-                where="pre",
-                lw=1.5,
-                label=f"P {self.translations.PeakCooling[self.gui_structure.option_language.get_value()]}",
-                color=light_color,
-            )
-            ax.step(
-                np_array(time_array),
-                np_array(borefield.peak_heating_external),
-                where="pre",
-                lw=1.5,
-                label=f"P {self.translations.PeakHeating[self.gui_structure.option_language.get_value()]}",
-                color=bright_color,
-            )
-            ax2.step(
-                np_array(time_array),
-                np_array(borefield.monthly_load_cooling_external),
-                color="#54bceb",
-                linestyle="dashed",
-                where="pre",
-                lw=1.5,
-                label=f"Q {self.translations.BaseCooling[self.gui_structure.option_language.get_value()]}",
-            )
-            ax2.step(
-                np_array(time_array),
-                np_array(borefield.monthly_load_heating_external),
-                color=bright_color,
-                linestyle="dashed",
-                where="pre",
-                lw=1.5,
-                label=f"Q {self.translations.BaseHeating}",
-            )
-            # set x-axe limits
-            ax.set_xlim(left=1, right=12)
-            ax2.set_xlim(left=1, right=12)
-            # create legends
-            ax.legend(facecolor=background_color, loc="upper left")
-            ax2.legend(facecolor=background_color, loc="upper right")
-            # set labels of axes
-            ax.set_xlabel(self.translations.X_Axis_Load[self.gui_structure.option_language.get_value()], color=white_color)
-            ax.set_ylabel(self.translations.Y_Axis_Load_P[self.gui_structure.option_language.get_value()], color=white_color)
-            ax2.set_xlabel(self.translations.X_Axis_Load[self.gui_structure.option_language.get_value()], color=white_color)
-            ax2.set_ylabel(self.translations.Y_Axis_Load_Q[self.gui_structure.option_language.get_value()], color=white_color)
-            # set axe colors
-            ax.spines["bottom"].set_color(white_color)
-            ax.spines["top"].set_color(white_color)
-            ax.spines["right"].set_color(white_color)
-            ax.spines["left"].set_color(white_color)
-            ax2.spines["bottom"].set_color(white_color)
-            ax2.spines["top"].set_color(white_color)
-            ax2.spines["right"].set_color(white_color)
-            ax2.spines["left"].set_color(white_color)
-            ax.set_facecolor(background_color)
-            ax2.set_facecolor(background_color)
-            # import numpy here to save start up time
-            import numpy as np
+        """
+        # remove second axes if exist
+        self.ax[1].remove() if len(self.ax) > 1 else None
+        # calculation of all the different times at which the g_function should be calculated.
+        # this is equal to 'UPM' hours a month * 3600 seconds/hours for the simulationPeriod
+        time_for_g_values = [i * borefield.UPM * 3600.0 for i in range(1, 12 * borefield.simulation_period + 1)]
+        # make a time array
+        time_array = [i / 12 / 730.0 / 3600.0 for i in time_for_g_values]
+        # plot Temperatures
+        ax.step(np_array(time_array), np_array(t_b), "w-", where="pre", lw=1.5, label="Tb")
+        ax.step(
+            np_array(time_array),
+            np_array(results_peak_cooling),
+            where="pre",
+            lw=1.5,
+            label=f"Tf {self.translations.PeakCooling[self.gui_structure.option_language.get_value()]}",
+            color=light_color,
+        )
+        ax.step(
+            np_array(time_array),
+            np_array(results_peak_heating),
+            where="pre",
+            lw=1.5,
+            label=f"Tf {self.translations.PeakHeating[self.gui_structure.option_language.get_value()]}",
+            color=bright_color,
+        )
+        # define temperature bounds
+        ax.step(
+            np_array(time_array),
+            np_array(results_month_cooling),
+            color=light_color,
+            linestyle="dashed",
+            where="pre",
+            lw=1.5,
+            label=f"Tf {self.translations.BaseCooling[self.gui_structure.option_language.get_value()]}",
+        )
+        ax.step(
+            np_array(time_array),
+            np_array(results_month_heating),
+            color=bright_color,
+            linestyle="dashed",
+            where="pre",
+            lw=1.5,
+            label=f"Tf {self.translations.BaseHeating[self.gui_structure.option_language.get_value()]}",
+        )
+        """
+        #ax.hlines(borefield.Tf_C, 0, ds.option_simu_period, colors=bright_color, linestyles="dashed", label="", lw=1)
+        #ax.hlines(borefield.Tf_H, 0, ds.option_simu_period, colors=light_color, linestyles="dashed", label="", lw=1)
+        #ax.set_xticks(range(0, ds.option_simu_period + 1, 2))
+        # Plot legend
+        # ax.set_xlim(left=0, right=ds.option_simu_period)
+        # create legend
+        # ax.legend(facecolor=background_color, loc="best")
+        # set axes names
 
-            # create string for result explanation
-            string_size: str = (
-                f"{self.translations.label_ResOptimizeLoad1[self.gui_structure.option_language.get_value()]}"
-                f"{int(max(borefield.hourly_heating_load)) - int(np.max(borefield.peak_heating_external))}"
-                f" / {int(max(borefield.hourly_cooling_load)) - int(np.max(borefield.peak_cooling_external))} kW\n"
-                f"{self.translations.label_ResOptimizeLoad2[self.gui_structure.option_language.get_value()]}{np.round(np.sum(borefield.baseload_heating), 2)} / "
-                f"{np.round(np.sum(borefield.baseload_cooling), 2)}   kWh\n"
-                f"{self.translations.label_ResOptimizeLoad3[self.gui_structure.option_language.get_value()]}"
-                f"{np.round(np.sum(borefield.baseload_heating) / np.sum(borefield.hourly_heating_load) * 100, 2)} / "
-                f"{np.round(np.sum(borefield.baseload_cooling) / np.sum(borefield.hourly_cooling_load) * 100, 2)} "
-                f"{self.translations.label_ResOptimizeLoad4[self.gui_structure.option_language.get_value()]}\n"
-                f"{self.translations.label_ResOptimizeLoad5[self.gui_structure.option_language.get_value()]}"
-                f"{int(np.max(borefield.peak_heating_external))} / "
-                f"{int(np.max(borefield.peak_cooling_external))} kW\n"
-                f"{self.translations.label_ResOptimizeLoad6[self.gui_structure.option_language.get_value()]}"
-                f"{np.round(-np.sum(borefield.baseload_heating) + np.sum(borefield.hourly_heating_load), 2)} / "
-                f"{np.round(-np.sum(borefield.baseload_cooling) + np.sum(borefield.hourly_cooling_load), 2)} kWh"
-            )
-        else:
-            # remove second axes if exist
-            self.ax[1].remove() if len(self.ax) > 1 else None
-            # calculation of all the different times at which the g_function should be calculated.
-            # this is equal to 'UPM' hours a month * 3600 seconds/hours for the simulationPeriod
-            time_for_g_values = [i * borefield.UPM * 3600.0 for i in range(1, 12 * borefield.simulation_period + 1)]
-            # make a time array
-            time_array = [i / 12 / 730.0 / 3600.0 for i in time_for_g_values]
-            # plot Temperatures
-            ax.step(np_array(time_array), np_array(t_b), "w-", where="pre", lw=1.5, label="Tb")
-            ax.step(
-                np_array(time_array),
-                np_array(results_peak_cooling),
-                where="pre",
-                lw=1.5,
-                label=f"Tf {self.translations.PeakCooling[self.gui_structure.option_language.get_value()]}",
-                color=light_color,
-            )
-            ax.step(
-                np_array(time_array),
-                np_array(results_peak_heating),
-                where="pre",
-                lw=1.5,
-                label=f"Tf {self.translations.PeakHeating[self.gui_structure.option_language.get_value()]}",
-                color=bright_color,
-            )
-            # define temperature bounds
-            ax.step(
-                np_array(time_array),
-                np_array(results_month_cooling),
-                color=light_color,
-                linestyle="dashed",
-                where="pre",
-                lw=1.5,
-                label=f"Tf {self.translations.BaseCooling[self.gui_structure.option_language.get_value()]}",
-            )
-            ax.step(
-                np_array(time_array),
-                np_array(results_month_heating),
-                color=bright_color,
-                linestyle="dashed",
-                where="pre",
-                lw=1.5,
-                label=f"Tf {self.translations.BaseHeating[self.gui_structure.option_language.get_value()]}",
-            )
-            ax.hlines(borefield.Tf_C, 0, ds.option_simu_period, colors=bright_color, linestyles="dashed", label="", lw=1)
-            ax.hlines(borefield.Tf_H, 0, ds.option_simu_period, colors=light_color, linestyles="dashed", label="", lw=1)
-            ax.set_xticks(range(0, ds.option_simu_period + 1, 2))
-            # Plot legend
-            ax.set_xlim(left=0, right=ds.option_simu_period)
-            # create legend
-            ax.legend(facecolor=background_color, loc="best")
-            # set axes names
-            ax.set_xlabel(self.translations.X_Axis[self.gui_structure.option_language.get_value()], color=white_color)
-            ax.set_ylabel(self.translations.Y_Axis[self.gui_structure.option_language.get_value()], color=white_color)
-            # set colors
-            ax.spines["bottom"].set_color(white_color)
-            ax.spines["top"].set_color(white_color)
-            ax.spines["right"].set_color(white_color)
-            ax.spines["left"].set_color(white_color)
-            ax.set_facecolor(background_color)
-            # create result display string
-            string_size: str = (
-                f'{self.translations.hint_depth[self.gui_structure.option_language.get_value()]}{"; ".join(li_size)} m \n'
-                f'{self.translations.label_Size_B[self.gui_structure.option_language.get_value()]}{"; ".join(li_b)} m \n'
-                f'{self.translations.label_Size_W[self.gui_structure.option_language.get_value()]}{"; ".join(li_n_1)} \n'
-                f'{self.translations.label_Size_L[self.gui_structure.option_language.get_value()]}{"; ".join(li_n_2)} \n'
-                if ds.aim_size_length
-                else f"{self.translations.hint_depth[self.gui_structure.option_language.get_value()]}{round(borefield.H, 2)} m"
-            )
-            # not use axe 2
-            ax2 = None
+        # create result display string
+        string_size: str = f"{self.translations.hint_depth[self.gui_structure.option_language.get_value()]}{round(borefield.H, 2)} m"
         # set string to depth size label
         self.gui_structure.hint_depth.set_text(string_size)
         # display warning if depth is to small
         # self.label_WarningDepth.show() if borefield.H < 50 else self.label_WarningDepth.hide()
         # save variables
-        self.ax = [ax] if not ds.aim_optimize else [ax, ax2]
+        self.ax = ax
         self.gui_structure.category_result_figure.frame.layout().addWidget(canvas) if self.canvas is None else None
-        self.canvas.show() if self.canvas is not None else None
         self.canvas = canvas
+        self.canvas.show()
         # draw new plot
         plt.tight_layout()
         canvas.draw()
-
-    def check_legend(self) -> None:
-        """
-        function to check if a legend should be displayed
-        :return: None
-        """
-        if self.canvas is None:
-            return
-        # check if the legend should be displayed
-        if self.gui_structure.option_show_legend.get_value() == 0:
-            # set grey color
-            grey_color = GREY
-            # set legend to graph either two if load is optimized or one otherwise with their locations
-            if len(self.ax) > 1:
-                self.ax[0].legend(facecolor=grey_color, loc="upper left")
-                self.ax[1].legend(facecolor=grey_color, loc="upper right")
-            else:
-                self.ax[0].legend(facecolor=grey_color, loc="best")
-            # redraw graph
-            self.canvas.draw()
-            return
-        # otherwise, remove legend and redraw graph
-        for i in self.ax:
-            i.get_legend().remove()
-        self.canvas.draw()
 
     def save_figure(self) -> None:
         """
