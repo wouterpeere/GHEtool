@@ -87,9 +87,9 @@ class GuiStructure:
         self.page_options.set_previous_page(self.page_aim)
 
         self.category_import_data = Category(default_parent, page=self.page_options, label="Import data format")
-        self.aim_temp_profile.add_linked_option(self.category_import_data)
-        self.aim_req_depth.add_linked_option(self.category_import_data)
-        self.aim_size_length.add_linked_option(self.category_import_data)
+        self.aim_temp_profile.add_link_2_show(self.category_import_data)
+        self.aim_req_depth.add_link_2_show(self.category_import_data)
+        self.aim_size_length.add_link_2_show(self.category_import_data)
 
         self.option_data = ButtonBox(
             default_parent, category=self.category_import_data, label="Data format:", default_index=0, entries=[" monthly data ", " hourly data "]
@@ -100,11 +100,11 @@ class GuiStructure:
         self.option_method_size_depth = ButtonBox(
             default_parent, category=self.category_calculation, label="Method for size borehole depth :", default_index=0, entries=[" L2 ", " L3 ", "  L4  "]
         )
-        self.aim_req_depth.add_linked_option(self.option_method_size_depth)
+        self.aim_req_depth.add_link_2_show(self.option_method_size_depth)
         self.option_method_size_length = ButtonBox(
             default_parent, category=self.category_calculation, label="Method for size width and length :", default_index=0, entries=[" L2 ", " L3 "]
         )
-        self.aim_size_length.add_linked_option(self.option_method_size_length)
+        self.aim_size_length.add_link_2_show(self.option_method_size_length)
         self.option_method_temp_gradient = ButtonBox(
             default_parent,
             category=self.category_calculation,
@@ -140,8 +140,8 @@ class GuiStructure:
             maximal_value=500,
             step=1,
         )
-        self.aim_temp_profile.add_linked_option(self.option_depth)
-        self.aim_optimize.add_linked_option(self.option_depth)
+        self.aim_temp_profile.add_link_2_show(self.option_depth)
+        self.aim_optimize.add_link_2_show(self.option_depth)
         self.option_max_depth = FloatBox(
             default_parent,
             category=self.category_borehole,
@@ -152,7 +152,7 @@ class GuiStructure:
             maximal_value=500,
             step=1,
         )
-        self.aim_size_length.add_linked_option(self.option_max_depth)
+        self.aim_size_length.add_link_2_show(self.option_max_depth)
         self.option_spacing = FloatBox(
             default_parent,
             category=self.category_borehole,
@@ -163,9 +163,9 @@ class GuiStructure:
             maximal_value=99,
             step=0.1,
         )
-        self.aim_temp_profile.add_linked_option(self.option_spacing)
-        self.aim_req_depth.add_linked_option(self.option_spacing)
-        self.aim_optimize.add_linked_option(self.option_spacing)
+        self.aim_temp_profile.add_link_2_show(self.option_spacing)
+        self.aim_req_depth.add_link_2_show(self.option_spacing)
+        self.aim_optimize.add_link_2_show(self.option_spacing)
         self.option_min_spacing = FloatBox(
             default_parent,
             category=self.category_borehole,
@@ -176,7 +176,7 @@ class GuiStructure:
             maximal_value=99,
             step=0.1,
         )
-        self.aim_size_length.add_linked_option(self.option_min_spacing)
+        self.aim_size_length.add_link_2_show(self.option_min_spacing)
         self.option_max_spacing = FloatBox(
             default_parent,
             category=self.category_borehole,
@@ -187,19 +187,19 @@ class GuiStructure:
             maximal_value=99,
             step=0.1,
         )
-        self.aim_size_length.add_linked_option(self.option_max_spacing)
+        self.aim_size_length.add_link_2_show(self.option_max_spacing)
         self.option_width = IntBox(
             default_parent, category=self.category_borehole, label="Width of rectangular field [#]: ", default_value=9, minimal_value=1, maximal_value=40
         )
-        self.aim_temp_profile.add_linked_option(self.option_width)
-        self.aim_req_depth.add_linked_option(self.option_width)
-        self.aim_optimize.add_linked_option(self.option_width)
+        self.aim_temp_profile.add_link_2_show(self.option_width)
+        self.aim_req_depth.add_link_2_show(self.option_width)
+        self.aim_optimize.add_link_2_show(self.option_width)
         self.option_length = IntBox(
             default_parent, category=self.category_borehole, label="Length of rectangular field [#]: ", default_value=12, minimal_value=1, maximal_value=40
         )
-        self.aim_temp_profile.add_linked_option(self.option_width)
-        self.aim_req_depth.add_linked_option(self.option_width)
-        self.aim_optimize.add_linked_option(self.option_width)
+        self.aim_temp_profile.add_link_2_show(self.option_width)
+        self.aim_req_depth.add_link_2_show(self.option_width)
+        self.aim_optimize.add_link_2_show(self.option_width)
         self.option_max_width = FloatBox(
             default_parent,
             category=self.category_borehole,
@@ -210,7 +210,7 @@ class GuiStructure:
             maximal_value=1000,
             step=1,
         )
-        self.aim_size_length.add_linked_option(self.option_max_width)
+        self.aim_size_length.add_link_2_show(self.option_max_width)
         self.option_max_length = FloatBox(
             default_parent,
             category=self.category_borehole,
@@ -221,7 +221,7 @@ class GuiStructure:
             maximal_value=1000,
             step=1,
         )
-        self.aim_size_length.add_linked_option(self.option_max_length)
+        self.aim_size_length.add_link_2_show(self.option_max_length)
         self.option_conductivity = FloatBox(
             default_parent,
             category=self.category_borehole,
@@ -246,9 +246,16 @@ class GuiStructure:
         self.hint_calc_time = Hint(
             default_parent,
             category=self.category_borehole,
-            hint="With the selected values a customized bore field will be calculated. " "This will dramatically increase the calculation time.",
+            hint="With the selected values a customized bore field will be calculated. This will dramatically increase the calculation time.",
             warning=True,
         )
+        self.option_depth.add_link_2_show(self.hint_calc_time, above=350)
+        self.option_spacing.add_link_2_show(self.hint_calc_time, below=3, above=9)
+        self.option_conductivity.add_link_2_show(self.hint_calc_time, below=1, above=4)
+        self.option_length.add_link_2_show(self.hint_calc_time, above=20)
+        self.option_width.add_link_2_show(self.hint_calc_time, above=20)
+        self.option_min_spacing.add_link_2_show(self.hint_calc_time, below=3, above=9)
+        self.option_max_spacing.add_link_2_show(self.hint_calc_time, below=3, above=9)
 
         self.category_temperatures = Category(default_parent, page=self.page_borehole, label="Temperature constraints and simulation period")
 
@@ -296,7 +303,7 @@ class GuiStructure:
             default_parent, category=self.category_temperatures, label="Simulation period [yrs]: ", default_value=20, minimal_value=1, maximal_value=100
         )
 
-        self.option_method_temp_gradient.add_linked_option(self.option_temp_gradient, 1)
+        self.option_method_temp_gradient.add_link_2_show(self.option_temp_gradient, on_index=1)
 
         self.page_borehole_resistance = Page(default_parent, "Equivalent borehole resistance", "Borehole\nresistance", ":/icons/icons/Resistance.png")
         self.page_borehole.set_next_page(self.page_borehole_resistance)
@@ -314,11 +321,11 @@ class GuiStructure:
             maximal_value=100,
             step=0.01,
         )
-        self.option_method_rb_calc.add_linked_option(self.category_constant_rb, 0)
+        self.option_method_rb_calc.add_link_2_show(self.category_constant_rb, on_index=0)
 
         self.category_fluid_data = Category(default_parent, page=self.page_borehole_resistance, label="Fluid data")
-        self.option_method_rb_calc.add_linked_option(self.category_fluid_data, 1)
-        self.option_method_rb_calc.add_linked_option(self.category_fluid_data, 2)
+        self.option_method_rb_calc.add_link_2_show(self.category_fluid_data, on_index=1)
+        self.option_method_rb_calc.add_link_2_show(self.category_fluid_data, on_index=2)
 
         self.option_fluid_conductivity = FloatBox(
             default_parent,
@@ -374,8 +381,8 @@ class GuiStructure:
 
         self.category_pipe_data = Category(default_parent, page=self.page_borehole_resistance, label="Pipe data")
         self.category_pipe_data.activate_graphic_left()
-        self.option_method_rb_calc.add_linked_option(self.category_pipe_data, 1)
-        self.option_method_rb_calc.add_linked_option(self.category_pipe_data, 2)
+        self.option_method_rb_calc.add_link_2_show(self.category_pipe_data, on_index=1)
+        self.option_method_rb_calc.add_link_2_show(self.category_pipe_data, on_index=2)
 
         self.option_pipe_number = IntBox(
             default_parent, category=self.category_pipe_data, label="Number of pipes [#]: ", default_value=2, minimal_value=1, maximal_value=99
@@ -481,6 +488,8 @@ class GuiStructure:
             error_text="error",
             status_bar=status_bar,
         )
+        self.option_filename.add_aim_option_2_be_set_for_check(self.aim_optimize)
+        self.option_filename.add_aim_option_2_be_set_for_check((self.option_data, 1))
         self.option_column = ButtonBox(
             default_parent,
             category=self.category_select_file,
@@ -491,23 +500,23 @@ class GuiStructure:
         self.option_heating_column = ListBox(default_parent, category=self.category_select_file, label="Heating load line: ", default_index=0, entries=[])
         self.option_cooling_column = ListBox(default_parent, category=self.category_select_file, label="Cooling load line: ", default_index=0, entries=[])
         self.option_single_column = ListBox(default_parent, category=self.category_select_file, label="Load line: ", default_index=0, entries=[])
-        self.option_column.add_linked_option(self.option_single_column, 0)
-        self.option_column.add_linked_option(self.option_heating_column, 1)
-        self.option_column.add_linked_option(self.option_cooling_column, 1)
+        self.option_column.add_link_2_show(self.option_single_column, on_index=0)
+        self.option_column.add_link_2_show(self.option_heating_column, on_index=1)
+        self.option_column.add_link_2_show(self.option_cooling_column, on_index=1)
         self.option_unit_data = ButtonBox(default_parent, category=self.category_select_file, label="Unit data: ", default_index=1, entries=["W", "kW", "MW"])
 
         self.button_load_csv = FunctionButton(default_parent, category=self.category_select_file, button_text="Load", icon=":/icons/icons/Download.svg")
-        self.option_data.add_linked_option(self.button_load_csv, 0)
-        self.aim_temp_profile.add_linked_option(self.button_load_csv)
-        self.aim_req_depth.add_linked_option(self.button_load_csv)
-        self.aim_size_length.add_linked_option(self.button_load_csv)
+        self.option_data.add_link_2_show(self.button_load_csv, on_index=0)
+        self.aim_temp_profile.add_link_2_show(self.button_load_csv)
+        self.aim_req_depth.add_link_2_show(self.button_load_csv)
+        self.aim_size_length.add_link_2_show(self.button_load_csv)
 
         self.category_th_demand = Category(default_parent, page=self.page_thermal, label="Thermal demands")
         self.category_th_demand.activate_grid_layout(5)
-        self.option_data.add_linked_option(self.category_th_demand, 0)
-        self.aim_temp_profile.add_linked_option(self.category_th_demand)
-        self.aim_req_depth.add_linked_option(self.category_th_demand)
-        self.aim_size_length.add_linked_option(self.category_th_demand)
+        self.option_data.add_link_2_show(self.category_th_demand, on_index=0)
+        self.aim_temp_profile.add_link_2_show(self.category_th_demand)
+        self.aim_req_depth.add_link_2_show(self.category_th_demand)
+        self.aim_size_length.add_link_2_show(self.category_th_demand)
 
         self.hint_none_1 = Hint(default_parent, category=self.category_th_demand, hint="  ")
         self.hint_peak_heating = Hint(default_parent, category=self.category_th_demand, hint="Heating peak")

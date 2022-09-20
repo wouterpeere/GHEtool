@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import abc
 from functools import partial as ft_partial
-from typing import Callable, List, Optional, Union
+from typing import Callable, List, Optional, Union, Tuple
 from os.path import exists
 
 import PySide6.QtCore as QtC  # type: ignore
@@ -42,6 +42,7 @@ class Option(metaclass=abc.ABCMeta):
         self.linked_options: List[(Option, int)] = []
         self.limit_size: bool = True
         category.list_of_options.append(self)
+        self.list_2_check_before_value: List[Tuple[Option, int], Aim] = []
 
     @abc.abstractmethod
     def get_value(self) -> Union[bool, int, float, str]:
@@ -64,13 +65,24 @@ class Option(metaclass=abc.ABCMeta):
         :return: boolean which is true if the option value is valid
         """
 
+    def add_aim_option_2_be_set_for_check(self, aim_or_option: Union[Tuple[Option, int], Aim]):
+        """
+        Add aim or index which should be checked before the option value is checked
+        :param aim_or_option: aim or option with corresponding index
+        """
+        self.list_2_check_before_value.append(aim_or_option)
+
     def check_value(self) -> bool:
         """
         Checks if the value of the option is valid
         :return: boolean which is true if the option value is valid
         """
-        if self.frame.isVisible():
-            return self._check_value()
+        if self.frame.isEnabled():
+            if not self.list_2_check_before_value:
+                return self._check_value()
+            if any(aim.widget.isChecked() for aim in self.list_2_check_before_value if isinstance(aim, Aim)) or any(
+                    value[0].get_value() == value[1] for value in self.list_2_check_before_value if isinstance(value, tuple)):
+                return self._check_value()
         return True
 
     @abc.abstractmethod
@@ -142,12 +154,14 @@ class Option(metaclass=abc.ABCMeta):
         hide option\n
         """
         self.frame.hide()
+        self.frame.setEnabled(False)
 
     def show(self) -> None:
         """
         show option
         """
         self.frame.show()
+        self.frame.setEnabled(True)
 
     @abc.abstractmethod
     def change_event(self, function_to_be_called: Callable) -> None:
@@ -229,6 +243,28 @@ class FloatBox(Option):
     def _check_value(self) -> bool:
         return self.minimal_value <= self.get_value() <= self.maximal_value
 
+    def add_link_2_show(self, option: Union[Option, Category, FunctionButton, Hint], *, below: float = None, above: float = None):
+        """
+        Add link to the index\n
+        :param option: option which should be linked
+        :param below: float value to be show option if below
+        :param above: float value to be show option if above
+        """
+        self.widget.valueChanged.connect(ft_partial(self.show_option, option, below=below, above=above))
+
+    def show_option(self, option: Union[Option, Category, FunctionButton, Hint], *args, below: Optional[float], above: Optional[float]):
+        """
+        show option if below and above limits
+        :param option:
+        :param below:
+        :param above:
+        """
+        if below is not None and self.get_value() < below:
+            return option.show()
+        if above is not None and self.get_value() > above:
+            return option.show()
+        option.hide()
+
     def change_event(self, function_to_be_called: Callable) -> None:
         """
         Function for the change event\n
@@ -298,6 +334,29 @@ class IntBox(Option):
     def _check_value(self) -> bool:
         return self.minimal_value <= self.get_value() <= self.maximal_value
 
+    def add_link_2_show(self, option: Union[Option, Category, FunctionButton, Hint], *, below: int = None, above: int = None):
+        """
+        Add link to the index\n
+        :param option: option which should be linked
+        :param below: int value to be show option if below
+        :param above: int value to be show option if above
+        """
+        self.widget.valueChanged.connect(ft_partial(self.show_option, option, below=below, above=above))
+
+    def show_option(self, option: Union[Option, Category, FunctionButton, Hint], *args, below: Optional[int], above: Optional[int]):
+        """
+        show option if below and above limits
+        :param option:
+        :param below:
+        :param above:
+        """
+        print(option, below, above)
+        if below is not None and self.get_value() < below:
+            return option.show()
+        if above is not None and self.get_value() > above:
+            return option.show()
+        option.hide()
+
     def change_event(self, function_to_be_called: Callable) -> None:
         """
         Function for the change event\n
@@ -366,13 +425,13 @@ class ButtonBox(Option):
     def _check_value(self) -> bool:
         return any(button.isChecked() for button in self.widget)
 
-    def add_linked_option(self, option: Union[Option, Category, FunctionButton], index: int):
+    def add_link_2_show(self, option: Union[Option, Category, FunctionButton, Hint], *, on_index: int):
         """
         Add link to the index\n
         :param option: option which should be linked
-        :param index: index on which the option should be shown
+        :param on_index: index on which the option should be shown
         """
-        self.linked_options.append([option, index])
+        self.linked_options.append([option, on_index])
 
     def change_event(self, function_to_be_called: Callable) -> None:
         """
@@ -454,13 +513,13 @@ class ListBox(Option):
         for idx, name in enumerate(entry_name[1:]):
             self.widget.setItemText(idx, name)
 
-    def add_linked_option(self, option: Union[Option, Category, FunctionButton], index: int):
+    def add_link_2_show(self, option: Union[Option, Category, FunctionButton, Hint], *, on_index: int):
         """
         Add link to the index\n
         :param option: option which should be linked
-        :param index: index on which the option should be shown
+        :param on_index: index on which the option should be shown
         """
-        self.linked_options.append([option, index])
+        self.linked_options.append([option, on_index])
 
     def change_event(self, function_to_be_called: Callable) -> None:
         """
@@ -776,7 +835,7 @@ class Aim:
         """
         self.widget.clicked.connect(function_to_be_called)  # pylint: disable=E1101
 
-    def add_linked_option(self, option: Union[Option, Category, FunctionButton]):
+    def add_link_2_show(self, option: Union[Option, Category, FunctionButton, Hint]):
         """
         Add link to the aim\n
         :param option: option which should be linked
