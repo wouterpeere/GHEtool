@@ -60,7 +60,7 @@ class UiGhetool:
     def setup_ui(self, ghe_tool):
         if not ghe_tool.objectName():
             ghe_tool.setObjectName("GHEtool")
-        ghe_tool.resize(1226, 869)
+        ghe_tool.resize(1920, 1080)
         size_policy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         size_policy.setHorizontalStretch(0)
         size_policy.setVerticalStretch(0)

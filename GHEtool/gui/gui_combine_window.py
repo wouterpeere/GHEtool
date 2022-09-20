@@ -44,6 +44,7 @@ from GHEtool.gui.gui_data_storage import DataStorage
 from GHEtool.gui.gui_base_class import UiGhetool, GREY, WHITE, DARK, LIGHT, WARNING
 from GHEtool.gui.gui_structure import GuiStructure
 from GHEtool.gui.translation_class import Translations
+from GHEtool.gui.gui_classes import Option
 
 if TYPE_CHECKING:
     from pandas import DataFrame as pd_DataFrame
@@ -129,8 +130,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.pushButton_start_single.setEnabled(False)
         self.action_start_multiple.setEnabled(False)
         self.action_start_single.setEnabled(False)
-        # hide warning for custom bore field calculation
-        self.gui_structure.hint_calc_time.hide()
         # load backup data
         self.load_list()
         # add progress bar and label to statusbar
@@ -206,11 +205,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.gui_structure.option_filename.change_event(self.fun_update_combo_box_data_file)
         self.gui_structure.option_auto_saving.change_event(self.change_auto_save)
         self.gui_structure.option_show_legend.change_event(self.check_legend)
-        self.gui_structure.option_depth.change_event(self.check_bounds)
-        self.gui_structure.option_spacing.change_event(self.check_bounds)
-        self.gui_structure.option_conductivity.change_event(self.check_bounds)
-        self.gui_structure.option_length.change_event(self.check_bounds)
-        self.gui_structure.option_width.change_event(self.check_bounds)
         self.gui_structure.button_load_csv.change_event(self.fun_display_data)
         self.gui_structure.option_language.change_event(self.change_language)
         self.gui_structure.page_result.button.clicked.connect(self.display_results)
@@ -1007,6 +1001,15 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # refresh results if results page is selected
         self.gui_structure.page_result.button.click() if self.stackedWidget.currentWidget() == self.gui_structure.page_result.page else None
 
+    def check_values(self) -> bool:
+        if not all(option.check_value() for option, _ in self.gui_structure.list_of_options):
+            for option, _ in self.gui_structure.list_of_options:
+                if not option.check_value():
+                    self.status_bar.showMessage(f'Wrong value in option with label: {option.label_text}', 5000)
+                    break
+            return False
+        return True
+
     def save_scenario(self, idx: int = None) -> None:
         """
         function to save selected scenario
@@ -1014,6 +1017,9 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         """
         # set boolean for unsaved scenario changes to False, because we save them now
         self.changedScenario: bool = False
+
+        if not self.check_values():
+            return
         # get selected scenario index
         idx = max(self.list_widget_scenario.currentRow(), 0) if idx is None or isinstance(idx, bool) else idx
         # if no scenario exists create a new one else save DataStorage with new inputs in list of scenarios
@@ -1144,11 +1150,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         """
         # add scenario if no list of scenarios exits else save current scenario
         self.add_scenario() if not self.list_ds else self.save_scenario()
-        # return to thermal demands page if no file is selected
-        if any([i.fileSelected for i in self.list_ds]):
-            self.gui_structure.page_thermal.button.click()
-            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()])
-            return
         # disable buttons and actions to avoid two calculation at once
         self.pushButton_start_multiple.setEnabled(False)
         self.pushButton_start_single.setEnabled(False)
@@ -1177,10 +1178,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # add scenario if no list of scenarios exits else save current scenario
         self.add_scenario() if not self.list_ds else self.save_scenario()
         # return to thermal demands page if no file is selected
-        if self.list_ds[self.list_widget_scenario.currentRow()].fileSelected:
-            self.gui_structure.page_thermal.button.click()
-            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()])
-            return
         # disable buttons and actions to avoid two calculation at once
         self.pushButton_start_multiple.setEnabled(False)
         self.pushButton_start_single.setEnabled(False)

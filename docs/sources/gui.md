@@ -52,17 +52,18 @@ As second option the name of the aim can be set. In the example below `Example a
 The third option is the icon. In this case `:/icons/icons/example_icon.svg`. An explanation how to add an icon can be found here: {ref}`How to add an icon?`.
 The last option is the page where the aim should be located. In this case `page_aim`. 
 An option, which should be show and disappear if the aim is selected or not can be added using `add_linked_option()`. 
-This can be an option, hint, category or function button. 
+This can be an option, hint, category or function button.
 
 ```python
 from GHEtool.gui.gui_classes import Aim
+
 aim_example = Aim(
-    default_parent=default_parent, 
+    default_parent=default_parent,
     label='Example aim',
     icon=":/icons/icons/example_icon.svg",
     page=page_aim,
 )
-aim_example.add_linked_option(option=option_example)
+aim_example.add_link_2_show(option=option_example)
 ```
 
 Example Aim
@@ -164,6 +165,7 @@ first (`0`) option is selected.
 
 ```python
 from GHEtool.gui.gui_classes import ButtonBox
+
 option_buttons = ButtonBox(
     default_parent=default_parent,
     label='Button box label text',
@@ -171,7 +173,7 @@ option_buttons = ButtonBox(
     entries=['option 1', 'option 2'],
     category=category_example,
 )
-option_buttons.add_linked_option(option=option_linked, index=0)
+option_buttons.add_link_2_show(option=option_linked, on_index=0)
 ```
 
 Example button box
@@ -200,7 +202,7 @@ option_list = ListBox(
     entries=['Option 1', 'Option 2'],
     category=category_example,
 )
-option_list.add_linked_option(option=option_linked, index=0)
+option_list.add_link_2_show(option=option_linked, on_index==0)
 ```
 
 Example list box

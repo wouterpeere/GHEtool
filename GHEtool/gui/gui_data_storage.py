@@ -35,8 +35,6 @@ class DataStorage:
         self.pipe_data: PipeData = PipeData(self.option_pipe_grout_conductivity, self.option_pipe_inner_radius, self.option_pipe_outer_radius,
                                             self.option_pipe_conductivity, self.option_pipe_distance, self.option_pipe_borehole_radius,
                                             self.option_pipe_number, self.option_pipe_roughness, self.option_pipe_depth)
-        # check if a file for optimizing the load profile has been selected
-        self.fileSelected: bool = (self.aim_optimize and self.option_filename == '')
 
     def set_values(self, gui_structure: GuiStructure):
         [option.set_value(getattr(self, name)) for option, name in gui_structure.list_of_options]
