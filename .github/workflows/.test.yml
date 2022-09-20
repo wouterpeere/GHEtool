@@ -24,7 +24,7 @@ jobs:
         pip install -r requirements_dev.txt
         pip install -e .
     - name: Test with pytest
-      run: pytest GHEtool/test GHEtool/test_gui --cov
+      run: pytest GHEtool/test GHEtool/gui/test_gui --cov
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
@@ -34,7 +34,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest ]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: [ '3.8', '3.9', '3.10' ]
 
     steps:

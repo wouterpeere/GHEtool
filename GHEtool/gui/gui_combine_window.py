@@ -1279,7 +1279,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         plt.rcParams["xtick.color"] = white_color
         plt.rcParams["ytick.color"] = white_color
         # create figure and axe if not already exists
-        self.fig = plt.Figure(facecolor=background_color) if self.fig is None else self.fig
+        self.fig = plt.figure(facecolor=background_color) if self.fig is None else self.fig
         canvas = FigureCanvas(self.fig) if self.canvas is None else self.canvas
         ax: matplotlib_axes._subplots.AxesSubplot = canvas.figure.subplots() if self.ax == [] else self.ax[0]
         # clear axces for new plot

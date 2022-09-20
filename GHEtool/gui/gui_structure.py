@@ -75,6 +75,7 @@ class GuiStructure:
             warning=True,
         )
         """
+        # Page.default_parent = default_parent
         self.page_aim = Page(default_parent, "Aim of simulation", "Aim", ":/icons/icons/Aim_Inv.svg")
 
         self.aim_temp_profile = Aim(default_parent, page=self.page_aim, label="Determine temperature profile", icon=":/icons/icons/Temp_Profile.svg")
@@ -91,8 +92,13 @@ class GuiStructure:
         self.aim_req_depth.add_linked_option(self.category_import_data)
         self.aim_size_length.add_linked_option(self.category_import_data)
 
+        self.function_testing = FunctionButton(default_parent, category=self.category_import_data, button_text='test', icon=":/icons/icons/Optimize_Profile.svg")
+        def function_to_be_called():
+            print('Hello World')
+        self.function_testing.change_event(function_to_be_called=function_to_be_called)
+
         self.option_data = ButtonBox(
-            default_parent, category=self.category_import_data, label="Data format:", default_index=0, entries=[" monthly data ", " hourly data "]
+            default_parent, category=self.category_import_data, label="Data format:", default_index=0, entries=["monthly data", "hourly data"]
         )
 
         self.category_calculation = Category(default_parent, page=self.page_options, label="Calculation options")

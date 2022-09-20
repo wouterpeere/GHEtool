@@ -49,6 +49,11 @@ class Option(metaclass=abc.ABCMeta):
         :return: return value of option
         """
 
+    def check_value(self):
+        if self.frame.isVisible():
+            return False
+        return True
+
     @abc.abstractmethod
     def set_value(self, value: Union[bool, int, float, str]) -> None:
         """

@@ -124,6 +124,7 @@ class CalcProblem(QtCore_QThread):
             borefield.set_custom_gfunction(borefield_custom)
             # set bore field to custom one
             borefield.set_borefield(custom_field)
+
         # if load should be optimized do this
         if self.DS.aim_optimize:
             # get column and decimal seperator
@@ -169,6 +170,8 @@ class CalcProblem(QtCore_QThread):
             except RuntimeError or ValueError:
                 # save bore field in Datastorage
                 self.DS.borefield = None
+
+                self.DS.ErrorMessage = self.translation.NotCalculated
                 # return Datastorage as signal
                 self.any_signal.emit((self.DS, self.idx))
                 return
