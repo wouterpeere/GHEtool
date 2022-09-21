@@ -117,7 +117,6 @@ class GuiStructure:
             step=0.1,
         )
         self.hint_calc_time_spacing = Hint(
-            
             category=self.category_borehole,
             hint="With the selected spacing a customized bore field will be calculated. This will dramatically increase the calculation time.",
             warning=True,
@@ -127,7 +126,6 @@ class GuiStructure:
         self.aim_req_depth.add_link_2_show(self.option_spacing)
         self.aim_optimize.add_link_2_show(self.option_spacing)
         self.option_min_spacing = FloatBox(
-            
             category=self.category_borehole,
             label="Minimal borehole spacing [m]: ",
             default_value=3,
@@ -137,7 +135,6 @@ class GuiStructure:
             step=0.1,
         )
         self.hint_calc_time_spacing_min = Hint(
-            
             category=self.category_borehole,
             hint="With the selected spacing a customized bore field will be calculated. This will dramatically increase the calculation time.",
             warning=True,
@@ -145,7 +142,6 @@ class GuiStructure:
         self.option_min_spacing.add_link_2_show(self.hint_calc_time_spacing_min, below=3, above=9)
         self.aim_size_length.add_link_2_show(self.option_min_spacing)
         self.option_max_spacing = FloatBox(
-            
             category=self.category_borehole,
             label="Maximal borehole spacing [m]: ",
             default_value=9,
@@ -155,7 +151,6 @@ class GuiStructure:
             step=0.1,
         )
         self.hint_calc_time_spacing_max = Hint(
-            
             category=self.category_borehole,
             hint="With the selected spacing a customized bore field will be calculated. This will dramatically increase the calculation time.",
             warning=True,
@@ -166,7 +161,6 @@ class GuiStructure:
             category=self.category_borehole, label="Width of rectangular field [#]: ", default_value=9, minimal_value=1, maximal_value=40
         )
         self.hint_calc_time_width = Hint(
-            
             category=self.category_borehole,
             hint="With the selected width a customized bore field will be calculated. This will dramatically increase the calculation time.",
             warning=True,
@@ -179,7 +173,6 @@ class GuiStructure:
             category=self.category_borehole, label="Length of rectangular field [#]: ", default_value=12, minimal_value=1, maximal_value=40
         )
         self.hint_calc_time_length = Hint(
-            
             category=self.category_borehole,
             hint="With the selected length a customized bore field will be calculated. This will dramatically increase the calculation time.",
             warning=True,
@@ -189,7 +182,6 @@ class GuiStructure:
         self.aim_req_depth.add_link_2_show(self.option_length)
         self.aim_optimize.add_link_2_show(self.option_length)
         self.option_max_width = FloatBox(
-            
             category=self.category_borehole,
             label="Maximal width of rectangular field [m]: ",
             default_value=160,
@@ -200,7 +192,6 @@ class GuiStructure:
         )
         self.aim_size_length.add_link_2_show(self.option_max_width)
         self.option_max_length = FloatBox(
-            
             category=self.category_borehole,
             label="Maximal length of rectangular field [m]: ",
             default_value=150,
@@ -211,7 +202,6 @@ class GuiStructure:
         )
         self.aim_size_length.add_link_2_show(self.option_max_length)
         self.option_conductivity = FloatBox(
-            
             category=self.category_borehole,
             label="Conductivity of the soil [W/mK]: ",
             default_value=1.5,
@@ -221,14 +211,12 @@ class GuiStructure:
             step=0.1,
         )
         self.hint_calc_time_conductivity = Hint(
-            
             category=self.category_borehole,
             hint="With the selected conductivity a customized bore field will be calculated. This will dramatically increase the calculation time.",
             warning=True,
         )
         self.option_conductivity.add_link_2_show(self.hint_calc_time_conductivity, below=1, above=4)
         self.option_heat_capacity = FloatBox(
-            
             category=self.category_borehole,
             label="Ground volumetric heat capacity [kJ / m³ K]: ",
             default_value=2400,
@@ -241,7 +229,6 @@ class GuiStructure:
         self.category_temperatures = Category(page=self.page_borehole, label="Temperature constraints and simulation period")
 
         self.option_ground_temp = FloatBox(
-            
             category=self.category_temperatures,
             label="Ground temperature at infinity [°C]: ",
             default_value=10,
@@ -251,7 +238,6 @@ class GuiStructure:
             step=0.1,
         )
         self.option_min_temp = FloatBox(
-            
             category=self.category_temperatures,
             label="Minimal temperature [°C]: ",
             default_value=0,
@@ -261,7 +247,6 @@ class GuiStructure:
             step=0.1,
         )
         self.option_max_temp = FloatBox(
-            
             category=self.category_temperatures,
             label="Maximal temperature [°C]: ",
             default_value=16,
@@ -271,7 +256,6 @@ class GuiStructure:
             step=0.1,
         )
         self.option_temp_gradient = FloatBox(
-            
             category=self.category_temperatures,
             label="Temperature gradient [K/100m]: ",
             default_value=2,
@@ -293,7 +277,6 @@ class GuiStructure:
         self.category_constant_rb = Category(page=self.page_borehole_resistance, label="Konstant equivalent borehole resistance")
 
         self.option_constant_rb = FloatBox(
-            
             category=self.category_constant_rb,
             label="Equivalent borehole resistance [mK/W]: ",
             default_value=0.0150,
@@ -309,7 +292,6 @@ class GuiStructure:
         self.option_method_rb_calc.add_link_2_show(self.category_fluid_data, on_index=2)
 
         self.option_fluid_conductivity = FloatBox(
-            
             category=self.category_fluid_data,
             label="Thermal conductivity [W/mK]: ",
             default_value=0.5,
@@ -319,7 +301,6 @@ class GuiStructure:
             step=0.1,
         )
         self.option_fluid_density = FloatBox(
-            
             category=self.category_fluid_data,
             label="Density [kg/m³]: ",
             default_value=1000,
@@ -329,7 +310,6 @@ class GuiStructure:
             step=100,
         )
         self.option_fluid_capacity = FloatBox(
-            
             category=self.category_fluid_data,
             label="Thermal capacity [J/kg K]: ",
             default_value=4182,
@@ -339,7 +319,6 @@ class GuiStructure:
             step=100,
         )
         self.option_fluid_viscosity = FloatBox(
-            
             category=self.category_fluid_data,
             label="Dynamic viscosity [Pa s]:",
             default_value=0.001,
@@ -350,7 +329,6 @@ class GuiStructure:
         )
 
         self.option_fluid_mass_flow = FloatBox(
-            
             category=self.category_fluid_data,
             label="Mass flow rate [kg/s]: ",
             default_value=0.5,
@@ -369,7 +347,6 @@ class GuiStructure:
             category=self.category_pipe_data, label="Number of pipes [#]: ", default_value=2, minimal_value=1, maximal_value=99
         )
         self.option_pipe_grout_conductivity = FloatBox(
-            
             category=self.category_pipe_data,
             label="Grout thermal conductivity [W/mK]: ",
             default_value=1.5,
@@ -379,7 +356,6 @@ class GuiStructure:
             step=0.1,
         )
         self.option_pipe_conductivity = FloatBox(
-            
             category=self.category_pipe_data,
             label="Pipe thermal conductivity [W/mK]: ",
             default_value=0.42,
@@ -389,7 +365,6 @@ class GuiStructure:
             step=0.1,
         )
         self.option_pipe_inner_radius = FloatBox(
-            
             category=self.category_pipe_data,
             label="Inner pipe radius [m]: ",
             default_value=0.02,
@@ -399,7 +374,6 @@ class GuiStructure:
             step=0.001,
         )
         self.option_pipe_outer_radius = FloatBox(
-            
             category=self.category_pipe_data,
             label="Outer pipe radius [m]: ",
             default_value=0.022,
@@ -411,7 +385,6 @@ class GuiStructure:
         self.option_pipe_outer_radius.change_event(self.option_pipe_inner_radius.widget.setMaximum)
         self.option_pipe_inner_radius.change_event(self.option_pipe_outer_radius.widget.setMinimum)
         self.option_pipe_borehole_radius = FloatBox(
-            
             category=self.category_pipe_data,
             label="Borehole radius [m]: ",
             default_value=0.075,
@@ -421,7 +394,6 @@ class GuiStructure:
             step=0.001,
         )
         self.option_pipe_distance = FloatBox(
-            
             category=self.category_pipe_data,
             label="Distance of pipe until center [m]: ",
             default_value=0.04,
@@ -431,7 +403,6 @@ class GuiStructure:
             step=0.001,
         )
         self.option_pipe_roughness = FloatBox(
-            
             category=self.category_pipe_data,
             label="Pipe roughness [m]: ",
             default_value=0.000_001,
@@ -441,7 +412,6 @@ class GuiStructure:
             step=0.000001,
         )
         self.option_pipe_depth = FloatBox(
-            
             category=self.category_pipe_data,
             label="Burial depth [m]: ",
             default_value=4,
@@ -488,7 +458,6 @@ class GuiStructure:
         self.option_filename.add_aim_option_2_be_set_for_check(self.aim_optimize)
         self.option_filename.add_aim_option_2_be_set_for_check((self.option_data, 1))
         self.option_column = ButtonBox(
-            
             category=self.category_select_file,
             label="Thermal demand in one or two columns: ",
             default_index=0,
@@ -548,7 +517,6 @@ class GuiStructure:
             category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
         self.option_hl_jan = FloatBox(
-            
             category=self.category_th_demand,
             label="",
             default_value=46500,
@@ -558,7 +526,6 @@ class GuiStructure:
             step=1,
         )
         self.option_cl_jan = FloatBox(
-            
             category=self.category_th_demand,
             label="",
             default_value=4000,
@@ -575,7 +542,6 @@ class GuiStructure:
             category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
         self.option_hl_feb = FloatBox(
-            
             category=self.category_th_demand,
             label="",
             default_value=44400,
@@ -585,7 +551,6 @@ class GuiStructure:
             step=1,
         )
         self.option_cl_feb = FloatBox(
-            
             category=self.category_th_demand,
             label="",
             default_value=8000,
@@ -602,7 +567,6 @@ class GuiStructure:
             category=self.category_th_demand, label="", default_value=34, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
         self.option_hl_mar = FloatBox(
-            
             category=self.category_th_demand,
             label="",
             default_value=37500,
@@ -612,7 +576,6 @@ class GuiStructure:
             step=1,
         )
         self.option_cl_mar = FloatBox(
-            
             category=self.category_th_demand,
             label="",
             default_value=8000,
@@ -629,7 +592,6 @@ class GuiStructure:
             category=self.category_th_demand, label="", default_value=69, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
         self.option_hl_apr = FloatBox(
-            
             category=self.category_th_demand,
             label="",
             default_value=29700,
@@ -639,7 +601,6 @@ class GuiStructure:
             step=1,
         )
         self.option_cl_apr = FloatBox(
-            
             category=self.category_th_demand,
             label="",
             default_value=8000,
@@ -656,7 +617,6 @@ class GuiStructure:
             category=self.category_th_demand, label="", default_value=133, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
         self.option_hl_may = FloatBox(
-            
             category=self.category_th_demand,
             label="",
             default_value=19200,
@@ -666,7 +626,6 @@ class GuiStructure:
             step=1,
         )
         self.option_cl_may = FloatBox(
-            
             category=self.category_th_demand,
             label="",
             default_value=12000,
@@ -686,7 +645,6 @@ class GuiStructure:
             category=self.category_th_demand, label="", default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
         )
         self.option_cl_jun = FloatBox(
-            
             category=self.category_th_demand,
             label="",
             default_value=16000,
@@ -706,7 +664,6 @@ class GuiStructure:
             category=self.category_th_demand, label="", default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
         )
         self.option_cl_jul = FloatBox(
-            
             category=self.category_th_demand,
             label="",
             default_value=32000,
@@ -726,7 +683,6 @@ class GuiStructure:
             category=self.category_th_demand, label="", default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
         )
         self.option_cl_aug = FloatBox(
-            
             category=self.category_th_demand,
             label="",
             default_value=32000,
@@ -743,7 +699,6 @@ class GuiStructure:
             category=self.category_th_demand, label="", default_value=160, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
         self.option_hl_sep = FloatBox(
-            
             category=self.category_th_demand,
             label="",
             default_value=18300,
@@ -753,7 +708,6 @@ class GuiStructure:
             step=1,
         )
         self.option_cl_sep = FloatBox(
-            
             category=self.category_th_demand,
             label="",
             default_value=16000,
@@ -770,7 +724,6 @@ class GuiStructure:
             category=self.category_th_demand, label="", default_value=37, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
         self.option_hl_oct = FloatBox(
-            
             category=self.category_th_demand,
             label="",
             default_value=26100,
@@ -780,7 +733,6 @@ class GuiStructure:
             step=1,
         )
         self.option_cl_oct = FloatBox(
-            
             category=self.category_th_demand,
             label="",
             default_value=12000,
@@ -797,7 +749,6 @@ class GuiStructure:
             category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
         self.option_hl_nov = FloatBox(
-            
             category=self.category_th_demand,
             label="",
             default_value=35100,
@@ -807,7 +758,6 @@ class GuiStructure:
             step=1,
         )
         self.option_cl_nov = FloatBox(
-            
             category=self.category_th_demand,
             label="",
             default_value=8000,
@@ -824,7 +774,6 @@ class GuiStructure:
             category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
         )
         self.option_hl_dec = FloatBox(
-            
             category=self.category_th_demand,
             label="",
             default_value=43200,
@@ -834,7 +783,6 @@ class GuiStructure:
             step=1,
         )
         self.option_cl_dec = FloatBox(
-            
             category=self.category_th_demand,
             label="",
             default_value=4000,
@@ -871,7 +819,6 @@ class GuiStructure:
             category=self.category_save_scenario, label="Use automatic saving?:", default_index=0, entries=[" no ", " yes "]
         )
         self.hint_saving = Hint(
-            
             category=self.category_save_scenario,
             hint="If Auto saving is selected the scenario will automatically saved if a scenario"
             " is changed. Otherwise the scenario has to be saved with the Update scenario "

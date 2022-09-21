@@ -50,7 +50,7 @@ Then a default widget parent has to be set. This can be just copied from the pre
 As second option the name of the aim can be set. In the example below `Example aim`.
 The third option is the icon. In this case `:/icons/icons/example_icon.svg`. An explanation how to add an icon can be found here: {ref}`How to add an icon?`.
 The last option is the page where the aim should be located. In this case `page_aim`. 
-An option, which should be show and disappear if the aim is selected or not can be added using `add_linked_option()`. 
+An option, which should be show and disappear if the aim is selected or not can be added using `add_link_2_show()`. 
 This can be an option, hint, category or function button.
 
 ```python
@@ -99,6 +99,8 @@ The next option is a minimal value. In this case `0`.
 The next option is a maximal value. In this case `1`.
 The next option is a step value in which the value is increased if the arrows of the box are used. 
 In this case `0.1`.
+The function `add_link_2_show()` can be used to couple the float value to other options, hints, function buttons or categories. 
+So in the example `option_linked` will be shown if the float value is below 0.1 or above 0.9.
 
 
 ```python
@@ -112,6 +114,7 @@ option_float = FloatBox(
     maximal_value=1,
     step=0.1,
 )
+option_float.add_link_2_show(option=option_linked, below=0.1, above=0.9)
 ```
 
 Example float box
@@ -129,6 +132,8 @@ The next option is a minimal value. In this case `0`.
 The next option is a maximal value. In this case `12`.
 The next option is a step value in which the value is increased if the arrows of the box are used. 
 In this case `2`.
+The function `add_link_2_show()` can be used to couple the integer value to other options, hints, function buttons or categories. 
+So in the example `option_linked` will be shown if the integer value is below 1 or above 10.
 
 ```python
 from GHEtool.gui.gui_classes import IntBox
@@ -140,6 +145,7 @@ option_int = IntBox(
     maximal_value=12,
     step=2,
 )
+option_int.add_link_2_show(option=option_linked, below=1, above=10)
 ```
 
 Example integer box
@@ -154,9 +160,8 @@ As second option the name of the button box can be set. In the example below `Bu
 The next option is a default index. In this case `0`.
 The next option are the entries. In this case `Option 1, Option 2`.
 The next option is the category which should contain the option. In this case `category_example`.
-The function `add_linked_option()` can be used to couple the selected index to other options, hints, function buttons or categories. 
-So in the example `option_linked` will be shown if the 
-first (`0`) option is selected.
+The function `add_link_2_show()` can be used to couple the selected index to other options, hints, function buttons or categories. 
+So in the example `option_linked` will be shown if the first (`0`) option is selected.
 
 ```python
 from GHEtool.gui.gui_classes import ButtonBox
@@ -182,7 +187,7 @@ As second option the name of the list box can be set. In the example below `List
 The next option is a default index. In this case `0`.
 The next option are the entries. In this case `Option 1, Option 2`.
 The next option is the category which should contain the option. In this case `category_example`.
-The function `add_linked_option()` can be used to couple the selected index to other options, hints, function buttons or categories. So in the example 
+The function `add_link_2_show()` can be used to couple the selected index to other options, hints, function buttons or categories. So in the example 
 `option_linked` will be 
 shown if the 
 first (`0`) option is selected.
