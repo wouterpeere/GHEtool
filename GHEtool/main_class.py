@@ -33,16 +33,11 @@ def timeValues():
 
 from dataclasses import dataclass
 
-if sys.version_info.minor < 10:
-    @dataclass
-    class PrintSettings:
-        legend: bool = False
-        plot_hourly: bool = False
-else:
-    @dataclass(slots=True)
-    class PrintSettings:
-        legend: bool = False
-        plot_hourly: bool = False
+
+@dataclass if sys.version_info.minor < 10 else dataclass(slots=True)
+class PrintSettings:
+    legend: bool = False
+    plot_hourly: bool = False
 
 
 class Borefield:
