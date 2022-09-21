@@ -199,12 +199,14 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.Dia.closeEvent = self.closeEvent
 
     def update_graph(self, option: Union[Option, FunctionButton], function_to_be_called: str):
-        ds = self.list_ds[self.list_widget_scenario.currentRow()]
-        if isinstance(option, Option):
-            getattr(ds.borefield, function_to_be_called)(option.get_value())
-        elif isinstance(option, FunctionButton):
-            getattr(ds.borefield, function_to_be_called)()
-        self.display_results()
+        if self.list_ds:
+            ds = self.list_ds[self.list_widget_scenario.currentRow()]
+            if ds.borefield is not None:
+                if isinstance(option, Option):
+                    getattr(ds.borefield, function_to_be_called)(option.get_value())
+                elif isinstance(option, FunctionButton):
+                    getattr(ds.borefield, function_to_be_called)()
+                self.display_results()
 
     def event_filter(self, obj: QtWidgets_QPushButton, event) -> bool:
         """
