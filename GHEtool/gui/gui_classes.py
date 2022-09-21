@@ -739,6 +739,7 @@ class Category:
         self.graphic_left: Optional[Union[QtW.QGraphicsView, bool]] = None
         self.graphic_right: Optional[Union[QtW.QGraphicsView, bool]] = None
         self.grid_layout: int = 0
+        self.layout_frane: Optional[QtW.QVBoxLayout] = None
         page.list_categories.append(self)
 
     def activate_graphic_left(self):
@@ -779,27 +780,27 @@ class Category:
         if self.graphic_left is not None:
             self.graphic_left = self.create_graphic_view(layout_frame_horizontal)
         if self.grid_layout > 0:
-            layout_frane = QtW.QGridLayout(self.frame)
+            self.layout_frane = QtW.QGridLayout(self.frame)
             row = 0
             column = 0
             for option in self.list_of_options:
                 if isinstance(option, Hint):
-                    option.create_widget(self.frame, layout_frane, row=row, column=column)
+                    option.create_widget(self.frame, self.layout_frane, row=row, column=column)
                 else:
                     if option.label_text == "":
                         option.deactivate_size_limit()
-                    option.create_widget(self.frame, layout_frane, row=row, column=column)
+                    option.create_widget(self.frame, self.layout_frane, row=row, column=column)
                 if row == self.grid_layout - 1:
                     row = 0
                     column += 1
                     continue
                 row += 1
         else:
-            layout_frane = QtW.QVBoxLayout(self.frame)
+            self.layout_frane = QtW.QVBoxLayout(self.frame)
             for option in self.list_of_options:
-                option.create_widget(self.frame, layout_frane)
+                option.create_widget(self.frame, self.layout_frane)
 
-        layout_frame_horizontal.addLayout(layout_frane)
+        layout_frame_horizontal.addLayout(self.layout_frane)
 
         if self.graphic_right is not None:
             self.graphic_right = self.create_graphic_view(layout_frame_horizontal)

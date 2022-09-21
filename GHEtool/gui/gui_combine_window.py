@@ -8,7 +8,7 @@ from pickle import dump as pk_dump
 from pickle import load as pk_load
 from sys import path
 from time import sleep
-from typing import TYPE_CHECKING, List, Optional, Tuple
+from typing import TYPE_CHECKING, List, Optional, Tuple, Union
 
 from PySide6.QtCore import QEvent as QtCore_QEvent
 from PySide6.QtCore import QModelIndex as QtCore_QModelIndex
@@ -36,7 +36,7 @@ from GHEtool.gui.gui_calculation_thread import (BoundsOfPrecalculatedData,
                                                 CalcProblem)
 from GHEtool.gui.gui_data_storage import DataStorage
 from GHEtool.gui.gui_base_class import UiGhetool
-from GHEtool.gui.gui_structure import GuiStructure, Option
+from GHEtool.gui.gui_structure import * # GuiStructure, Option, FunctionButton,
 from GHEtool.gui.translation_class import Translations
 
 if TYPE_CHECKING:
@@ -180,9 +180,8 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.gui_structure.function_save_figure.change_event(self.save_figure)
         self.gui_structure.function_save_results.change_event(self.save_data)
         self.gui_structure.option_auto_saving.change_event(self.change_auto_save)
-        for option in self.gui_structure.category_options_result.list_of_options:
-            if isinstance(option, Option):
-                option.change_event(self.display_results)
+        for option, function_to_be_called in self.gui_structure.list_of_result_plot_options:
+            option.change_event(ft_partial(self.update_graph, option, function_to_be_called))
         self.gui_structure.option_language.change_event(self.change_language)
         self.gui_structure.page_result.button.clicked.connect(self.display_results)
         self.actionAdd_Scenario.triggered.connect(self.add_scenario)
@@ -198,6 +197,14 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.list_widget_scenario.model().rowsMoved.connect(self.fun_move_scenario)
         self.list_widget_scenario.currentItemChanged.connect(self.fun_auto_save_scenario)
         self.Dia.closeEvent = self.closeEvent
+
+    def update_graph(self, option: Union[Option, FunctionButton], function_to_be_called: str):
+        ds = self.list_ds[self.list_widget_scenario.currentRow()]
+        if isinstance(option, Option):
+            getattr(ds.borefield, function_to_be_called)(option.get_value())
+        elif isinstance(option, FunctionButton):
+            getattr(ds.borefield, function_to_be_called)()
+        self.display_results()
 
     def event_filter(self, obj: QtWidgets_QPushButton, event) -> bool:
         """
@@ -913,11 +920,12 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         """
         # hide widgets if no list of scenarios exists and display not calculated text
         if not self.list_ds:
+            self.gui_structure.category_result_figure.frame.show()
+            self.gui_structure.category_result_figure.label.show()
+            for option in self.gui_structure.category_options_result.list_of_options:
+                option.hide()
+            self.gui_structure.hint_depth.show()
             self.gui_structure.hint_depth.set_text(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
-            # self.label_WarningDepth.hide()
-            self.gui_structure.option_show_legend.hide()
-            self.gui_structure.function_save_results.hide()
-            self.gui_structure.function_save_figure.hide()
             self.canvas.hide() if self.canvas is not None else None
             return
         # import here to save start up time
@@ -931,16 +939,21 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         borefield: Borefield = ds.borefield
         # hide widgets if no results bore field exists and display not calculated text
         if borefield is None:
-            self.gui_structure.hint_depth.set_text(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
             # self.label_WarningDepth.hide()
-            self.gui_structure.option_show_legend.hide()
-            self.gui_structure.function_save_results.hide()
-            self.gui_structure.function_save_figure.hide()
+            self.gui_structure.category_result_figure.frame.hide()
+            self.gui_structure.category_result_figure.label.hide()
+            for option in self.gui_structure.category_options_result.list_of_options:
+                option.hide()
+            self.gui_structure.hint_depth.show()
+            self.gui_structure.hint_depth.set_text(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
             self.canvas.hide() if self.canvas is not None else None
             return
         # show checkBox for legend and save figure button
-        for category in self.gui_structure.page_result.list_categories:
-            category.show()
+        self.gui_structure.category_result_figure.frame.show()
+        self.gui_structure.category_result_figure.label.show()
+        for option in self.gui_structure.category_options_result.list_of_options:
+            option.show()
+
         # get peak heating and cooling and monthly loads as well as Tb temperature
         # set colors for graph
         if self.ax is not None:
@@ -953,14 +966,14 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.canvas.setParent(None)
             self.canvas = None
         # create figure and axe if not already exists
-        self.fig, self.ax = borefield.print_temperature_profile(self.gui_structure.option_show_legend.get_value() == 0)
+        self.fig, self.ax = borefield.print_graph()
         canvas = FigureCanvas(self.fig)
         # create result display string
         string_size: str = f"{self.translations.hint_depth[self.gui_structure.option_language.get_value()]}{round(borefield.H, 2)} m"
         # set string to depth size label
         self.gui_structure.hint_depth.set_text(string_size)
         # save variables
-        self.gui_structure.category_result_figure.frame.layout().addWidget(canvas) if self.canvas is None else None
+        self.gui_structure.category_result_figure.layout_frane.addWidget(canvas)
         self.canvas = canvas
         self.canvas.show()
         # draw new plot
