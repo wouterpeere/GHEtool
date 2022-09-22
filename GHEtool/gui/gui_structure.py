@@ -68,7 +68,7 @@ class GuiStructure:
             category=self.category_calculation,
             label="Borehole resistance calculation method:",
             default_index=0,
-            entries=[" constant ", " constant but unknown ", " flexibel during calculation "],
+            entries=[" constant ", " constant but unknown ", " flexible during calculation "],
         )
 
         self.page_borehole = Page("Borehole and earth", "Borehole\nand earth", ":/icons/icons/Borehole.png")
