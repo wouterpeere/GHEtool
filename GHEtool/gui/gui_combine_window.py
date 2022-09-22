@@ -316,6 +316,12 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             return
         # check if the auto saving should be performed and then save the last selected scenario
         if self.gui_structure.option_auto_saving.get_value() == 1:
+            if not self.check_values():
+                self.list_widget_scenario.row(old_row_item)
+                si = SetItem(self.list_widget_scenario, old_row_item)  # create class
+                si.start()  # start thread
+                si.any_signal.connect(si.terminate)  # stop thread if finished
+                return
             # save old scenario
             if DataStorage(self.gui_structure) != self.list_ds[self.list_widget_scenario.row(old_row_item)]:
                 self.list_ds[self.list_widget_scenario.row(old_row_item)] = DataStorage(self.gui_structure)
@@ -476,21 +482,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.set_push(False)
             return True
         return False
-
-    @staticmethod
-    def display_values_with_floating_decimal(spinbox: QtWidgets_QDoubleSpinBox, factor: float) -> None:
-        """
-        change decimal of spinbox to given factor
-        :param spinbox: QSpinbox to change value for
-        :param factor: factor to change spinbox value with
-        :return: None
-        """
-        value = spinbox.value() * factor  # determine new value by multiply with factor
-        # determine decimal location depending on value
-        decimal_loc = 0 if value >= 1_000 else 1 if value >= 100 else 2 if value >= 10 else 3 if value >= 1 else 4
-        spinbox.setDecimals(decimal_loc)  # set decimal location
-        spinbox.setMaximum(max(value * 10, 1_000_000))  # set maximal value to maximal value * 10 or 1_000_000
-        spinbox.setValue(value)  # set new value
 
     def change_auto_save(self):
         for ds in self.list_ds:
@@ -858,8 +849,12 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         start calculation of all not calculated scenarios
         :return: None
         """
+        if not self.check_values():
+            return
         # add scenario if no list of scenarios exits else save current scenario
         self.add_scenario() if not self.list_ds else self.save_scenario()
+        if self.list_widget_scenario.currentItem().text()[-1] == '*':
+            return
         # disable buttons and actions to avoid two calculation at once
         self.pushButton_start_multiple.setEnabled(False)
         self.pushButton_start_single.setEnabled(False)
@@ -885,8 +880,12 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         start calculation of selected scenario
         :return: None
         """
+        if not self.check_values():
+            return
         # add scenario if no list of scenarios exits else save current scenario
         self.add_scenario() if not self.list_ds else self.save_scenario()
+        if self.list_widget_scenario.currentItem().text()[-1] == '*':
+            return
         # return to thermal demands page if no file is selected
         # disable buttons and actions to avoid two calculation at once
         self.pushButton_start_multiple.setEnabled(False)
