@@ -31,6 +31,14 @@ def timeValues():
 
     return load_agg.get_times_for_simulation()
 
+from dataclasses import dataclass
+
+
+@dataclass if sys.version_info.minor < 10 else dataclass(slots=True)
+class PrintSettings:
+    legend: bool = False
+    plot_hourly: bool = False
+
 
 class Borefield:
     UPM: float = 730.  # number of hours per month
@@ -65,7 +73,7 @@ class Borefield:
                 'hourly_cooling_load_external', 'hourly_heating_load_on_the_borefield', 'hourly_cooling_load_on_the_borefield', \
                 'k_f', 'mfr', 'Cp', 'mu', 'rho', 'use_constant_Rb', 'h_f', 'R_f', 'R_p', 'printing', 'combo', \
                 'r_in', 'r_out', 'k_p', 'D_s', 'r_b', 'number_of_pipes', 'epsilon', 'k_g', 'pos', 'D', \
-                'L2_sizing', 'L3_sizing', 'L4_sizing', 'quadrant_sizing', 'H_init', 'use_precalculated_data', 'convergence'
+                'L2_sizing', 'L3_sizing', 'L4_sizing', 'quadrant_sizing', 'H_init', 'use_precalculated_data', 'convergence', 'print_setting'
 
     def __init__(self, simulation_period: int = 20, number_of_boreholes: int = None, peak_heating: list = None,
                  peak_cooling: list = None, baseload_heating: list = None, baseload_cooling: list = None, investement_cost: list = None,
@@ -235,6 +243,7 @@ class Borefield:
         # set a custom g-function
         self.custom_gfunction = None
         self.set_custom_gfunction(custom_gfunction)
+        self.print_setting: PrintSettings = PrintSettings()
 
     @staticmethod
     def configuration_string(N_1: int, N_2: int) -> str:
@@ -1047,6 +1056,15 @@ class Borefield:
             self._check_hourly_load()
 
         return self._print_temperature_profile(legend=legend, plot_hourly=plot_hourly)
+
+    def print_graph(self) -> Optional[Tuple[plt.figure, plt.axes]]:
+        return self.print_temperature_profile(self.print_setting.legend, self.print_setting.plot_hourly)
+
+    def show_legend(self, show: bool):
+        self.print_setting.legend = show
+
+    def change_plot_hourly(self, plot_hourly: bool):
+        self.print_setting.plot_hourly = plot_hourly
 
     def print_temperature_profile_fixed_depth(self, depth, legend: bool = True, plot_hourly: bool = False) -> None:
         """

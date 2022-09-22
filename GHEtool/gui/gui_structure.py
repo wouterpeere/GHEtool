@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 
 from PySide6.QtWidgets import QStatusBar, QWidget
 from PySide6.QtWidgets import QGraphicsEllipseItem, QGraphicsScene
@@ -797,7 +797,6 @@ class GuiStructure:
         self.category_options_result = Category(page=self.page_result, label="Options results")
 
         self.hint_depth = Hint(category=self.category_options_result, hint="Size")
-        self.option_show_legend = ButtonBox(category=self.category_options_result, label="Show legend?", default_index=0, entries=["yes", "no"])
         self.function_save_results = FunctionButton(
             category=self.category_options_result, button_text="Save results", icon=":/icons/icons/Save_Inv.svg"
         )
@@ -806,6 +805,11 @@ class GuiStructure:
         )
 
         self.category_result_figure = Category(page=self.page_result, label="Figure")
+
+        self.option_show_legend = ButtonBox(category=self.category_result_figure, label="Show legend?", default_index=0, entries=["no", "yes"])
+        self.option_plot_hourly = ButtonBox(category=self.category_result_figure, label="plot hourly?", default_index=0, entries=["no", "yes"])
+
+        self.option_data.add_link_2_show(self.option_plot_hourly, on_index=1)
 
         self.page_settings = Page("Settings", "Settings", ":/icons/icons/Settings.svg")
 
@@ -828,6 +832,9 @@ class GuiStructure:
         self.list_of_aims: List[Tuple[Aim, str]] = [(getattr(self, name), name) for name in self.__dict__ if isinstance(getattr(self, name), Aim)]
         self.list_of_options: List[Tuple[Option, str]] = [(getattr(self, name), name) for name in self.__dict__ if isinstance(getattr(self, name), Option)]
         self.list_of_pages: List[Page] = [getattr(self, name) for name in self.__dict__ if isinstance(getattr(self, name), Page)]
+
+        self.list_of_result_plot_options: List[Tuple[Union[Option, FunctionButton], str]] = [(self.option_show_legend, 'show_legend'),
+                                                                                             (self.option_plot_hourly, 'change_plot_hourly')]
 
     def check_distance_between_pipes(self, *args) -> None:
         """
