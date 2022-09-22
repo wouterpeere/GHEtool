@@ -1,5 +1,5 @@
 matplotlib>=3.5.2
-numpy>=1.23.2
+numpy>=1.21.6
 pandas>=1.4.4
 pygfunction>=2.2.1
 scipy>=1.8.1
