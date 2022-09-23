@@ -112,17 +112,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.update_bar(0, False)
         # set event filter for push button sizing
         self.event_filter_install()
-        # start importing GHEtool by a thread to save start up time
-        self.IG: ImportGHEtool = ImportGHEtool()
-        self.IG.start()
-        self.IG.any_signal.connect(self.check_ghe_tool)
-        # show loading GHEtool message in statusbar
-        self.status_bar.showMessage(self.translations.GHE_tool_imported_start[self.gui_structure.option_language.get_value()], 5000)
-        # enable push button because GHEtool ist not imported
-        self.pushButton_start_multiple.setEnabled(False)
-        self.pushButton_start_single.setEnabled(False)
-        self.action_start_multiple.setEnabled(False)
-        self.action_start_single.setEnabled(False)
         # load backup data
         self.load_list()
         # add progress bar and label to statusbar
@@ -145,6 +134,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
 
         [option.init_links() for option, _ in self.gui_structure.list_of_options]
 
+        self.status_bar.showMessage(self.translations.GHE_tool_imported[self.gui_structure.option_language.get_value()], 5000)
         # allow checking of changes
         self.checking: bool = True
 
@@ -825,23 +815,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             # show message that calculation is finished
             self.status_bar.showMessage(self.translations.Calculation_Finished[self.gui_structure.option_language.get_value()], 5000)
 
-    def check_ghe_tool(self, finished: bool) -> None:
-        """
-        check if GHEtool import is finished
-        :param finished: bool which is true if import is finished
-        :return: None
-        """
-        if finished:
-            # stop thread which imported the GHEtool
-            self.IG.terminate()
-            # Enable the buttons and action again
-            self.pushButton_start_multiple.setEnabled(True)
-            self.pushButton_start_single.setEnabled(True)
-            self.action_start_multiple.setEnabled(True)
-            self.action_start_single.setEnabled(True)
-            # show message that the GHEtool has been successfully imported
-            self.status_bar.showMessage(self.translations.GHE_tool_imported[self.gui_structure.option_language.get_value()], 5000)
-
     def thread_function(self, results: Tuple[DataStorage, int]) -> None:
         """
         turn on and off the old and new threads for the calculation
@@ -1201,28 +1174,3 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         [i.terminate() for i in self.threads]
         # close window if close variable is true else not
         event.accept() if close else event.ignore()
-
-
-class ImportGHEtool(QtCore_QThread):
-    """
-    class to import GHEtool in an external thread
-    """
-
-    any_signal = QtCore_pyqtSignal(bool)
-
-    def __init__(self, parent=None) -> None:
-        """
-        initialize importing class
-        :param parent: parent class
-        """
-        super(ImportGHEtool, self).__init__(parent)  # init parent class
-
-    def run(self) -> None:
-        """
-        start import
-        :return: None
-        """
-        import GHEtool  # import GHEtool
-
-        GHEtool.FOLDER = "./"
-        self.any_signal.emit(True)  # emit true signal

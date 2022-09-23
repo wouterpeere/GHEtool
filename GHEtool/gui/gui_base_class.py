@@ -256,7 +256,7 @@ class UiGhetool:
         self.horizontalLayout_7.setObjectName("horizontalLayout_7")
         self.label_Status = QLabel(self.central_widget)
         self.label_Status.setObjectName("label_Status")
-
+        self.label_Status.setStyleSheet(f"*{'{'}background-color: {LIGHT};{'}'}")
         self.horizontalLayout_7.addWidget(self.label_Status)
 
         self.progressBar = QProgressBar(self.central_widget)
