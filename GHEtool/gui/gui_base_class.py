@@ -359,7 +359,7 @@ class UiGhetool:
         ghe_tool.addToolBar(Qt.TopToolBarArea, self.toolBar)
         self.status_bar = QStatusBar(ghe_tool)
         self.status_bar.setObjectName("status_bar")
-        self.status_bar.setStyleSheet("QStatusBar::item{border:None;}")
+        self.status_bar.setStyleSheet(f"QStatusBar::item{'{'}border:None;{'}'}QStatusBar{'{'}color:{BLACK};background-color: {LIGHT};{'}'}")
         ghe_tool.setStatusBar(self.status_bar)
 
         self.menubar.addAction(self.menuFile.menuAction())

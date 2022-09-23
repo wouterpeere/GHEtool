@@ -10,7 +10,7 @@ from sys import path
 from time import sleep
 from typing import TYPE_CHECKING, List, Optional, Tuple, Union
 
-from PySide6.QtCore import QEvent as QtCore_QEvent
+from PySide6.QtCore import QEvent as QtCore_QEvent, QTimer
 from PySide6.QtCore import QModelIndex as QtCore_QModelIndex
 from PySide6.QtCore import QSize as QtCore_QSize
 from PySide6.QtCore import QThread as QtCore_QThread
@@ -314,13 +314,29 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             # change entries to new scenario values
             self.change_scenario(self.list_widget_scenario.row(new_row_item))
             return
+
+        def return_2_old_item():
+            # change item to old item by thread, because I have not found a direct way which is not lost after
+            # return
+            ds = DataStorage(self.gui_structure)
+            t = QTimer(self)
+
+            def hello():
+                self.list_widget_scenario.blockSignals(True)
+                self.checking = False
+                self.list_widget_scenario.setCurrentItem(old_row_item)
+                # set values of selected Datastorage
+                ds.set_values(self.gui_structure)
+                self.checking = True
+                self.list_widget_scenario.blockSignals(False)
+                t.stop()
+
+            t.timeout.connect(hello)
+            t.start(10)  # after 30 seconds, "hello, world" will be printed
         # check if the auto saving should be performed and then save the last selected scenario
         if self.gui_structure.option_auto_saving.get_value() == 1:
             if not self.check_values():
-                self.list_widget_scenario.row(old_row_item)
-                si = SetItem(self.list_widget_scenario, old_row_item)  # create class
-                si.start()  # start thread
-                si.any_signal.connect(si.terminate)  # stop thread if finished
+                return_2_old_item()
                 return
             # save old scenario
             if DataStorage(self.gui_structure) != self.list_ds[self.list_widget_scenario.row(old_row_item)]:
@@ -361,15 +377,12 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             reply = msg.exec_()
             # check if closing should be canceled
             if reply == QtWidgets_QMessageBox.Cancel:
-                # change item to old item by thread, because I have not found a direct way which is not lost after
-                # return
-                si = SetItem(self.list_widget_scenario, old_row_item)  # create class
-                si.start()  # start thread
-                si.any_signal.connect(si.terminate)  # stop thread if finished
-                # abort the rest
+                return_2_old_item()
                 return
             # save scenario if wanted
-            self.save_scenario(self.list_widget_scenario.row(old_row_item)) if reply == QtWidgets_QMessageBox.Save else None
+            if reply == QtWidgets_QMessageBox.Save:
+                if not self.save_scenario(self.list_widget_scenario.row(old_row_item)):
+                    return_2_old_item()
             # remove * symbol
             old_row_item.setText(text[:-1])
         # change entries to new scenario values
@@ -643,7 +656,8 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # ask for pickle file if the filename is still the default
         if self.filename == MainWindow.filenameDefault:
             self.filename: tuple = QtWidgets_QFileDialog.getSaveFileName(
-                self.central_widget, caption=self.translations.SavePKL[self.gui_structure.option_language.get_value()], filter="Pickle (*.pkl)"
+                self.central_widget, caption=self.translations.SavePKL[self.gui_structure.option_language.get_value()], filter="Pickle (*.pkl)",
+                dir=self.backup_path.replace('backup.pkl', ''),
             )
             # break function if no file is selected
             if self.filename == MainWindow.filenameDefault:
@@ -707,11 +721,10 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             for option, _ in self.gui_structure.list_of_options:
                 if not option.check_value():
                     self.status_bar.showMessage(f'Wrong value in option with label: {option.label_text}', 5000)
-                    break
-            return False
+                    return False
         return True
 
-    def save_scenario(self, idx: int = None) -> None:
+    def save_scenario(self, idx: int = None) -> bool:
         """
         function to save selected scenario
         :return: None
@@ -720,7 +733,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.changedScenario: bool = False
 
         if not self.check_values():
-            return
+            return False
         # get selected scenario index
         idx = max(self.list_widget_scenario.currentRow(), 0) if idx is None or isinstance(idx, bool) else idx
         # if no scenario exists create a new one else save DataStorage with new inputs in list of scenarios
@@ -735,6 +748,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             text = self.list_widget_scenario.item(idx).text()
             if text[-1] == "*":
                 self.list_widget_scenario.item(idx).setText(text[:-1])
+        return True
 
     def delete_scenario(self) -> None:
         """
@@ -1200,32 +1214,3 @@ class ImportGHEtool(QtCore_QThread):
 
         GHEtool.FOLDER = "./"
         self.any_signal.emit(True)  # emit true signal
-
-
-class SetItem(QtCore_QThread):
-    """
-    class to reset item a bit later
-    """
-
-    any_signal: QtCore_pyqtSignal = QtCore_pyqtSignal(QtCore_QThread)
-
-    def __init__(self, widget: QtWidgets_QListWidget, item: QtWidgets_QListWidgetItem, parent=None) -> None:
-        """
-        initialize change scenario / item class
-        :param widget: widget to set later item for
-        :param item: item to set
-        :param parent: parent class
-        """
-        super(SetItem, self).__init__(parent)
-        self.widget: QtWidgets_QListWidget = widget
-        self.item = item
-
-    def run(self) -> None:
-        """
-        change item after 0.01 seconds
-        :return: None
-        """
-        sleep(0.01)  # wait for a little time
-        self.widget.setCurrentItem(self.item)  # change current item
-        self.any_signal.emit(self)  # return itself as signal
-        return
