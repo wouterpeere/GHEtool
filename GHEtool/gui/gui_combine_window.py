@@ -269,6 +269,18 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # return if checking is not allowed
         if not self.checking:
             return
+        if self.check_values():
+            self.pushButton_start_multiple.setEnabled(True)
+            self.pushButton_start_single.setEnabled(True)
+            self.pushButton_AddScenario.setEnabled(True)
+            self.pushButton_SaveScenario.setEnabled(True)
+            self.list_widget_scenario.setEnabled(True)
+        else:
+            self.pushButton_start_multiple.setEnabled(False)
+            self.pushButton_start_single.setEnabled(False)
+            self.pushButton_AddScenario.setEnabled(False)
+            self.pushButton_SaveScenario.setEnabled(False)
+            self.list_widget_scenario.setEnabled(False)
         # if changed File is not already True set it to True and update window title
         if self.changedFile is False:
             self.changedFile: bool = True

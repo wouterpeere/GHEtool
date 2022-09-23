@@ -223,7 +223,7 @@ class UiGhetool:
             f"*{'{'}border: 1px solid {WHITE};{'}'}\n"
             "QListWidget{outline: 0;}\n"
             f"QListWidget::item:selected{'{'}background:{LIGHT};color: {WHITE};border: 0px solid {WHITE};{'}'}\n"
-            f"QListWidget::item:hover{'{'}border: 1px solid {WHITE};color: {WHITE};{'}'}"
+            f"QListWidget::item:hover{'{'}border: 1px solid {WHITE};color: {WHITE};{'}'}QListWidget:disabled{'{'}background-color: {GREY};{'}'}"
         )
         self.list_widget_scenario.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
         self.list_widget_scenario.setAutoScrollMargin(10)
