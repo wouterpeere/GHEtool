@@ -2,6 +2,7 @@
 This document contains all the scripts for coming up with the figures of the article written by
 Verleyen L., Peere W. and Helsen L.
 """
+import math
 
 from GHEtool import Borefield, GroundData
 import matplotlib.pyplot as plt
@@ -40,14 +41,29 @@ def figure_1():
 
     # create figure
     plt.figure()
+
+    # plot g-functions
     plt.plot(time_dimensionless, results[0], label="25m")
     plt.plot(time_dimensionless, results[1], label="50m")
     plt.plot(time_dimensionless, results[2], label="100m")
     plt.plot(time_dimensionless, results[3], label="150m")
     plt.plot(time_dimensionless, results[4], label="200m")
+
+    # plot lines for Ra
+    line1 = math.log(6*3600/ts)
+    line2 = math.log((20 * 8760 + 730) * 3600 / ts)
+    plt.vlines(line1, ymin=-5, ymax=5, colors="black", lw=0.75, ls="--")
+    plt.vlines(line2, ymin=-5, ymax=50, colors="black", lw=0.75, ls="--")
+
+    plt.annotate('', xy=(line1, -0.4), xytext=(line2, -0.4),
+                 arrowprops=dict(arrowstyle='<->', color='black'))
+    plt.text((line1+line2)/2, 0.2, "Ra", horizontalalignment='center')
+
+    # layout
     plt.title("G-function values for different borefield depths")
     plt.xlabel("ln(t/ts)")
     plt.ylabel("g-function value")
+    plt.ylim(-2, 60)
     plt.legend()
     plt.show()
 
