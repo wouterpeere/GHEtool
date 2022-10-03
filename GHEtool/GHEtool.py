@@ -57,7 +57,7 @@ class Borefield:
                 'length_peak', 'th', 'Tf_H', 'Tf_C', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
                 'monthly_load_cooling', 'peak_heating', 'imbalance', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm', \
                 'peak_cooling', 'simulation_period', 'gfunction_interpolation_array', 'fluid_data_available', \
-                'results_peak_heating', 'pipe_data_available', 'alpha', 'time_L4', 'temperature_result',\
+                'results_peak_heating', 'pipe_data_available', 'alpha', 'time_L4', 'temperature_result', 'convergence_flag',\
                 'results_peak_cooling', 'results_month_cooling', 'results_month_heating', 'Tb', 'THRESHOLD_WARNING_SHALLOW_FIELD', \
                 'gui', 'time_L3_first_year', 'time_L3_last_year', 'peak_heating_external', 'peak_cooling_external', \
                 'monthly_load_heating_external', 'monthly_load_cooling_external', 'hourly_heating_load_external', \
@@ -106,6 +106,7 @@ class Borefield:
         self.monthly_load = np.array([])
         self.H_init: float = 0.
         self.convergence = 0
+        self.convergence_flag = False
 
         self.gfunction_interpolation_array = np.array([])
 
@@ -350,7 +351,7 @@ class Borefield:
 
         # new ground data implies that a new g-function should be loaded
         self.gfunction_interpolation_array = []
-
+        pass
     def set_fluid_parameters(self, data: FluidData) -> None:
         """
         This function sets the relevant fluid characteristics.
@@ -511,6 +512,9 @@ class Borefield:
 
         :return: borefield depth
         """
+        # reset convergence
+        self.convergence = 0
+
         # initiate iteration
         H_prev = 0
         # set minimal depth to 50 m
@@ -529,6 +533,10 @@ class Borefield:
             # updating the depth values
             H_prev = self.H
             self.H = L / self.number_of_boreholes
+
+        # check convergence
+        self._convergence_flag()
+
         return self.H
 
     @property
@@ -538,6 +546,8 @@ class Borefield:
 
         :return: borefield depth
         """
+        # reset convergence
+        self.convergence = 0
 
         # initiate iteration
         H_prev = 0
@@ -562,6 +572,10 @@ class Borefield:
             # updating the depth values
             H_prev = self.H
             self.H = L / self.number_of_boreholes
+
+        # check convergence
+        self._convergence_flag()
+
         return self.H
 
     def sizing_setup(self, H_init: float = 100, use_constant_Rb: bool = None, use_constant_Tg: bool = None, quadrant_sizing: int = 0,
@@ -623,6 +637,9 @@ class Borefield:
         :param quadrant_sizing: differs from 0 when a sizing in a certain quadrant is desired
         :return: borefield depth
         """
+        # reset convergence flag
+        self.convergence_flag = False
+
         # make backup of initial parameter states
         backup = (self.H_init, self.use_constant_Rb, self.use_constant_Tg, self.L2_sizing, self.L3_sizing, self.L4_sizing, self.quadrant_sizing)
 
@@ -649,7 +666,7 @@ class Borefield:
             print("Please change your configuration accordingly to have a not so shallow field.")
 
         # check if there is convergence
-        if self.convergence != 0:
+        if self.convergence_flag:
             raise RuntimeError("A solution could not be found. The field that is needed in order to cope with your load,"
                                "cannot be found.")
 
@@ -818,6 +835,8 @@ class Borefield:
         :param hourly: True if an hourly resolution should be used
         :return: depth of the borefield
         """
+        # reset convergence
+        self.convergence = 0
 
         # initiate iteration
         H_prev = 0
@@ -860,7 +879,16 @@ class Borefield:
                 # convert back to required length
                 self.H = (min(temperature_profile) - self._Tg()) / (self.Tf_C - self._Tg()) * H_prev
 
+        # check convergence
+        self._convergence_flag()
+
         return self.H
+
+    def _convergence_flag(self):
+        """
+        This function checks the convergence.
+        """
+        self.convergence_flag = self.convergence != 0 or self.convergence_flag
 
     def calculate_monthly_load(self) -> None:
         """
