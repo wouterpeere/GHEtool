@@ -135,9 +135,70 @@ def figure_3():
     """
     This code creates the third figure of the article
     """
-    pass
+    # initiate borefield
+    borefield = Borefield()
+
+    # set the correct sizing method
+    borefield.sizing_setup(L2_sizing=True)
+
+    # initiate array with imbalances
+    imbalance_array = np.linspace(200, 1600, 20)
+
+    # initiate list of borefield configurations
+    configs = [(10, 10), (11, 11), (12, 12), (14, 14),
+               (15, 15), (18, 18), (20, 20)]
+
+    # initiate loads
+    monthly_load_heating_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, .117, 0.144])
+    monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
+    monthly_load_heating = monthly_load_heating_percentage * 100 * 10 ** 3  # kWh
+    monthly_load_cooling_init = monthly_load_cooling_percentage * 100 * 10 ** 3  # kWh
+    peak_cooling_init = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak cooling in kW
+    peak_heating = np.array([160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.])
+
+    # set heating loads
+    borefield.set_peak_heating(peak_heating)
+    borefield.set_baseload_heating(monthly_load_heating)
+
+    results = []
+    for i, config in enumerate(configs):
+        depth_array = []
+        for imbalance in imbalance_array:
+            # initiate ground data
+            ground_data = GroundData(100, 7, 2.4, 10, 0.12, config[0], config[1])
+
+            # set ground data
+            borefield.set_ground_parameters(ground_data)
+
+            # calculate loads
+            extra_load = imbalance / 12 * 10 ** 3  # kWh
+            monthly_load_cooling = monthly_load_cooling_init + extra_load
+            peak_cooling = peak_cooling_init + extra_load / 730
+
+            # set cooling loads
+            borefield.set_peak_cooling(peak_cooling)
+            borefield.set_baseload_cooling(monthly_load_cooling)
+            try:
+                depth = borefield.size()
+                depth_array.append(depth)
+            except:
+                pass
+
+        results.append(depth_array)
+
+    # create figure
+    plt.figure()
+    for i, config in enumerate(configs):
+        plt.plot(imbalance_array[:len(results[i])], results[i], label=str(config[0]) + "x" + str(config[1]))
+
+    plt.title("Depth for different imbalances")
+    plt.xlabel("Imbalance (MWh/y)")
+    plt.ylabel("Depth (m)")
+
+    plt.legend()
+    plt.show()
 
 if __name__ == "__main__":
     # figure_1()
-    figure_2()
+    # figure_2()
     figure_3()
