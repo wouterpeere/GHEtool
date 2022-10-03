@@ -1,6 +1,6 @@
 # GHEtool: An open-source tool for borefield sizing in Python
 [![PyPI version](https://badge.fury.io/py/GHEtool.svg)](https://badge.fury.io/py/GHEtool)
-[![status](https://joss.theoj.org/papers/0ae2224874ee0139d6f28baa48fe9127/status.svg)](https://joss.theoj.org/papers/0ae2224874ee0139d6f28baa48fe9127)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.04406/status.svg)](https://doi.org/10.21105/joss.04406)
 
 ## What is *GHEtool*?
 <img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/GHEtool/gui/Icon.png" width="110" align="left">
@@ -87,7 +87,8 @@ data = GroundData(110, # depth of the field (m)
                   10,  # initial/undisturbed ground temperature (deg C)
                   0.2, # borehole equivalent resistance (mK/W)
                   10,  # number of boreholes in width direction of the field (/)
-                  12)  # number of boreholes in the length direction of the field (/)
+                  12,  # number of boreholes in the length direction of the field (/)
+                  2.4*10**6) # volumetric heat capacity of the ground (J/m3K) 
 ```
 
 Furthermore, one needs to set the peak and monthly baseload for both heating and cooling.
@@ -137,7 +138,7 @@ GHEtool offers functionalities of value to all different disciplines working wit
 
 | Functionality | Example document |
 | --- | --- |
-| Sizing the borefield (i.e. calculating the required depth) for a given injection and extraction load for the borefield (two sizing methods are available). | [main_functionalities.py](GHEtool/Examples/main_functionalities.py) |
+| Sizing the borefield (i.e. calculating the required depth) for a given injection and extraction load for the borefield (three sizing methods are available). | [main_functionalities.py](GHEtool/Examples/main_functionalities.py) |
 | Calculating the temperature evolution of the ground for a given building load and borefield configuration | [main_functionalities.py](GHEtool/Examples/main_functionalities.py) |
 | Using dynamically calculated borehole thermal resistance (this is directly based on the code of pygfunction) | [sizing_with_Rb_calculation.py](GHEtool/Validation/sizing_with_Rb_calculation.py) |
 | Optimising the load profile for a given heating and cooling load | [optimise_load_profile.py](GHEtool/Examples/optimise_load_profile.py)|
@@ -147,15 +148,19 @@ GHEtool offers functionalities of value to all different disciplines working wit
 
 | Comparisons | Example document |
 | --- | --- |
+| Comparison of different sizing methods (L2, L3) for different random profiles| [sizing_method_comparison.py](GHEtool/Validation/sizing_method_comparison.py) |
+| Comparison in calculation time and accuracy between using the precalculated gfunction data or not | [speed_comparison.py](GHEtool/Validation/speed_comparison.py) |
+| Comparison of different sizing methods (L2, L3 and L4) for the same hourly profile | [sizing_method_comparison_L2_L3_L4.py](GHEtool/Examples/sizing_method_comparison_L2_L3_L4.py) |
 | Comparison in calculation time and accuracy between the simplified L2 sizing methodology and the more accurate L3 method. | [sizing_method_comparison.py](GHEtool/Validation/sizing_method_comparison.py) |
-| Comparison in calculation time and accuracy between using the precalculated gfunction data or not. | [speed_comparison.py](GHEtool/Validation/speed_comparison.py) |
+| Comparison of Rb* calculation between GHEtool and EED. | [validation_effective_borehole_thermal_resistance.py](GHEtool/Validation/validation_effective_borehole_thermal_resistance.py) |
 
 
 ## Precalculated data
-This tool comes with precalculated g-functions for all borefields of type nxm (for 0<n,m<21) for which the boreholes are connected in parallel. For these borefield configurations, the g-functions are calculated for different depth-thermal conductivity-spacing combinations. The ranges are:
+This tool comes with precalculated g-functions for all borefields of type nxm (for 0<n,m<21) for which the boreholes are connected in parallel. For these borefield configurations, the g-functions are calculated for different depth-thermal diffusivity-spacing combinations. The ranges are:
 
 * Depth: 25 - 350m in increments of 25m
-* Thermal conductivity of the soil: 1 - 4 in increments of 0.5W/mk
+* Thermal diffusivity of the soil (defined as thermal conductivity / volumetric heat capacity): 0.036 - 0.144m²/day in increments of 0.018m²/day
+(This is equal to a range of thermal conductivity from 1-4W/mK with a constant volumetric heat capacity of 2.4MJ/m³K)
 * Spacings (equal): 3 - 9m in increments of 1m
 
 Here a burial depth (D) of 4.0m is assumed even as a borehole radius of 7.5cm for all the precalculated data.
@@ -179,15 +184,27 @@ Wouter Peere, KU Leuven & boydens engineering (part of Sweco), wouter.peere@kule
 
 Tobias Blanke, Solar-Institute Jülich, FH Aachen, blanke@sij.fh-aachen.de
 
+## Citation
+Please cite GHEtool using the JOSS paper.
+
+Peere, W., Blanke, T.(2022). _GHEtool: An open-source tool for borefield sizing in Python._ Journal of Open Source Software, 7(76), 4406, https://doi.org/10.21105/joss.04406
+
 ## References
 ### Development of GHEtool
-Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. _Validated combined first and last year borefield sizing methodology._ In _Proceedings of International Building Simulation Conference 2021_ (2021). Brugge (Belgium), 1-3 September 2021.
+Peere, W., Blanke, T. (2022). _GHEtool: An open-source tool for borefield sizing in Python._ Journal of Open Source Software, 7(76), 4406, https://doi.org/10.21105/joss.04406
 
-### Applications of GHEtool
-Coninx M., De Nies J. (2022) Cost-efficient Cooling of Buildings by means of Borefields with Active and Passive Cooling. Master thesis, Departement of Mechanical Engineering, KU Leuven, Belgium.
+Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. (2021) _Validated combined first and last year borefield sizing methodology._ In _Proceedings of International Building Simulation Conference 2021_. Brugge (Belgium), 1-3 September 2021. https://doi.org/10.26868/25222708.2021.30180
 
-Michiels E., (2022) Dimensionering van meerdere gekoppelde boorvelden op basis van het type vraagprofiel en de verbinding met de gebruikers. Master thesis, Departement of Mechanical Engineering, KU Leuven, Belgium.
+Peere, W. (2020) Methode voor economische optimalisatie van geothermische verwarmings- en koelsystemen. Master thesis, Department of Mechanical Engineering,
+KU Leuven, Belgium.
 
-Vanpoucke B. (2022) Optimale dimensionering van boorvelden door een variabel massadebiet. Master thesis, Departement of Mechanical Engineering, KU Leuven, Belgium.
+### Applications/Mentions of GHEtool
+M. Sharifi. (2022) Early-Stage Integrated Design Methods for Hybrid GEOTABS Buildings. PhD thesis, Department of Architecture and Urban Planning, Faculty of Engineering and Architecture, Ghent University.
 
-Haesen R., Hermans L. (2021) Design and Assessment of Low-carbon Residential District Concepts with(Collective) Seasonal Thermal Energy Storage. Master thesis, Departement of Mechanical Engineering, KU Leuven, Belgium.
+Coninx M., De Nies J. (2022) Cost-efficient Cooling of Buildings by means of Borefields with Active and Passive Cooling. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
+
+Michiels E. (2022) Dimensionering van meerdere gekoppelde boorvelden op basis van het type vraagprofiel en de verbinding met de gebruikers. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
+
+Vanpoucke B. (2022) Optimale dimensionering van boorvelden door een variabel massadebiet. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
+
+Haesen R., Hermans L. (2021) Design and Assessment of Low-carbon Residential District Concepts with (Collective) Seasonal Thermal Energy Storage. Master thesis, Departement of Mechanical Engineering, KU Leuven, Belgium.
