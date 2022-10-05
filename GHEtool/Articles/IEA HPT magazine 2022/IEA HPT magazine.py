@@ -21,7 +21,64 @@ plt.rcParams['lines.markersize'] = 8
 
 def figure_1():
     """
-    This function generates Figure 1 of the article.
+    This function generates the first figure (part a/b) of the article.
+    """
+
+    # initiate ground data
+    ground_data = GroundData(100, 6, 2.4, 10, 0.12, 10, 10)
+
+    # initiate borefield model
+    borefield = Borefield()
+    borefield.set_ground_parameters(ground_data)
+
+    # initiate depth array
+    depth = 150
+
+    # dimensionless time
+    ts = 150**2 / (9 * ground_data.k_s)
+
+    # time array
+    nb_of_timesteps = 50
+    time_dimensionless = np.linspace(2, 14, nb_of_timesteps)
+
+    # convert to seconds
+    time_in_seconds = np.exp(time_dimensionless) * ts
+
+    # calculate g-functions
+    result = np.zeros(nb_of_timesteps)
+    result = borefield.gfunction(time_in_seconds, depth)
+
+    # create figure
+    fig, axs = plt.subplots(1, 2, figsize=(10, 3), constrained_layout=True)
+
+    # create figure g-function (lin)
+    # plot g-functions
+    axs[0].plot(time_in_seconds/8760/3600, result / (2 * math.pi * 2.4))
+
+    # layout
+    axs[0].set_title("Step response when applying a constant heat injection")
+    axs[0].set_xlabel("Time (years)")
+    axs[0].set_ylabel("Temperature difference (K)")
+    axs[0].set_ylim(0, 5)
+    axs[0].set_xlim(0, 40)
+
+    # create figure g-function (semi-log)
+    # plot g-functions
+    axs[1].plot(time_dimensionless, result)
+
+    # layout
+    axs[1].set_title("Equivalent g-function for the step response")
+    axs[1].set_xlabel("ln(t/ts)")
+    axs[1].set_ylabel("g-function value")
+    axs[1].set_ylim(-2, 60)
+
+    # plt.legend()
+    plt.show()
+
+
+def figure_2():
+    """
+    This function generates the second figure of the article.
     """
 
     # initiate ground data
@@ -79,9 +136,9 @@ def figure_1():
     plt.show()
 
 
-def figure_2():
+def figure_3():
     """
-    This function creates the second figure of the article.
+    This function creates the third figure of the article.
     """
 
     # initiate borefield model
@@ -131,9 +188,9 @@ def figure_2():
     plt.show()
 
 
-def figure_3():
+def figure_4():
     """
-    This code creates the third figure of the article
+    This code creates the fourth figure of the article
     """
     # initiate borefield
     borefield = Borefield()
@@ -201,4 +258,5 @@ def figure_3():
 if __name__ == "__main__":
     # figure_1()
     # figure_2()
-    figure_3()
+    # figure_3()
+    # figure_4()
