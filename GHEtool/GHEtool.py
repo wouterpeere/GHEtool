@@ -57,13 +57,13 @@ class Borefield:
                 'length_peak', 'th', 'Tf_H', 'Tf_C', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
                 'monthly_load_cooling', 'peak_heating', 'imbalance', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm', \
                 'peak_cooling', 'simulation_period', 'gfunction_interpolation_array', 'fluid_data_available', \
-                'results_peak_heating', 'pipe_data_available', 'alpha', 'time_L4', 'temperature_result',\
+                'results_peak_heating', 'pipe_data_available', 'alpha', 'time_L4', 'temperature_result', 'options_pygfunction',\
                 'results_peak_cooling', 'results_month_cooling', 'results_month_heating', 'Tb', 'THRESHOLD_WARNING_SHALLOW_FIELD', \
                 'gui', 'time_L3_first_year', 'time_L3_last_year', 'peak_heating_external', 'peak_cooling_external', \
                 'monthly_load_heating_external', 'monthly_load_cooling_external', 'hourly_heating_load_external', \
                 'hourly_cooling_load_external', 'hourly_heating_load_on_the_borefield', 'hourly_cooling_load_on_the_borefield', \
                 'k_f', 'mfr', 'Cp', 'mu', 'rho', 'use_constant_Rb', 'h_f', 'R_f', 'R_p', 'printing', 'combo', \
-                'r_in', 'r_out', 'k_p', 'D_s', 'r_b', 'number_of_pipes', 'epsilon', 'k_g', 'pos', 'D', \
+                'r_in', 'r_out', 'k_p', 'D_s', 'r_b', 'number_of_pipes', 'epsilon', 'k_g', 'pos', 'D', 'jit_calculation',\
                 'L2_sizing', 'L3_sizing', 'L4_sizing', 'quadrant_sizing', 'H_init', 'use_precalculated_data', 'convergence'
 
     def __init__(self, simulation_period: int = 20, number_of_boreholes: int = None, peak_heating: list = None,
@@ -106,6 +106,12 @@ class Borefield:
         self.monthly_load = np.array([])
         self.H_init: float = 0.
         self.convergence = 0
+
+        ## params w.r.t. pygfunction
+        # true if the gfunctions should be calculated in the iteration when they
+        # are not precalculated
+        self.jit_calculation: bool = True
+        self.options_pygfunction: dict = {"method":"equivalent"}
 
         self.gfunction_interpolation_array = np.array([])
 
@@ -1210,6 +1216,28 @@ class Borefield:
             ax1.set_xlim(left=0, right=self.simulation_period)
             plt.show()
 
+    def set_options_gfunction_calculation(self, options: dict) -> None:
+        """
+        This function sets the options for the gfunction calculation of pygfunction.
+        This dictionary is directly passed through to the gFunction class of pygfunction.
+        For more information, please visit the documentation of pygfunction.
+
+        :param options: dictionary with options for the gFunction class of pygfunction
+        :return: None
+        """
+        self.options_pygfunction = options
+
+    def set_jit_gfunction_calculation(self, jit: bool) -> None:
+        """
+        This function sets the just-in-time calculation parameter.
+        When this is true, the gfunctions are calculated jit when sizing a borefield for which
+        precalculated data is not available.
+
+        :param jit: True/False
+        :return: None
+        """
+        self.jit_calculation = jit
+
     def gfunction(self, time_value: list, H: float) -> np.ndarray:
         """
         This function calculated the g-function based on interpolation of the precalculated data.
@@ -1253,7 +1281,7 @@ class Borefield:
         # set max depth to Borefield.DEFAULT_DEPTH_ARRAY[-1]
         H = min(H, Borefield.DEFAULT_DEPTH_ARRAY[-1])
 
-        # if calculate is False, than the gfunctions are calculated on the spot
+        # if calculate is False, than the gfunctions are calculated jit
         if not self.use_precalculated_data:
             # Calculate the g-function for uniform borehole wall temperature
 
@@ -1261,8 +1289,11 @@ class Borefield:
             custom_borefield = gt.boreholes.rectangle_field(self.N_1, self.N_2, self.B, self.B, H, D=4, r_b=0.075)
 
             # calculate gfunction
-            gfunc_uniform_T = gt.gfunction.uniform_temperature(
-                custom_borefield, np.asarray(time_value), self.alpha, nSegments=12, disp=False)
+            # gfunc_uniform_T = gt.gfunction.uniform_temperature(
+            #     custom_borefield, np.asarray(time_value), self.alpha, nSegments=12, disp=False)
+
+            gfunc_uniform_T = gt.gfunction.gFunction(custom_borefield, self.alpha, np.asarray(time_value),
+                                                     options=self.options_pygfunction).gFunc
 
             return gfunc_uniform_T
 
@@ -1276,6 +1307,14 @@ class Borefield:
 
         # check if datafile exists
         if not os.path.isfile(f'{folder}/Data/{name}'):
+            # check if jit calculation is available
+            if self.jit_calculation:
+                # create custom Borefield
+                custom_borefield = gt.boreholes.rectangle_field(self.N_1, self.N_2, self.B, self.B, H, D=4, r_b= self.r_b if self.r_b != 0. else 0.075)
+                # return the gfunctions
+                return gt.gfunction.gFunction(custom_borefield, self.alpha, np.asarray(time_value),
+                                                     options=self.options_pygfunction).gFunc
+
             raise Exception('There is no precalculated data available. Please use the create_custom_datafile.')
 
         # load data fileImport
@@ -1365,23 +1404,36 @@ class Borefield:
                 print("This calculation stopped.")
             raise ValueError
 
-    def create_custom_dataset(self, custom_borefield, name_datafile: str, n_segments: int = 12,
+    def create_custom_dataset(self, custom_borefield, name_datafile: str, options: dict=None,
                               time_array=None, depth_array=None) -> None:
         """
         This function makes a datafile for a given custom borefield.
 
         :param custom_borefield: borefield object from pygfunction
         :param name_datafile: name of the custom datafile
-        :param n_segments: number of segments used in creating the datafile
+        :param options: options for the gfunction calculation
+        (check pygfunction.gfunction.gFunction() for more information)
         :param time_array: timevalues used for the calculation of the datafile
         :param depth_array: the values for the borefield depth used to calculate the datafile
         :return: None
         """
+
+        # check if options are given
+        if options is None:
+            options = self.options_pygfunction
+            # set the display option to True
+            options["disp"] = True
+
+        # chek if there is a method in options
+        if not "method" in options:
+            options["method"] = "equivalent"
+
         # set folder if no gui is used
         if depth_array is None:
             depth_array = Borefield.DEFAULT_DEPTH_ARRAY
         if time_array is None:
             time_array = Borefield.DEFAULT_TIME_ARRAY
+
         folder = '.' if self.gui else FOLDER
         # make filename
         name = f'{name_datafile}.pickle'
@@ -1408,10 +1460,10 @@ class Borefield:
             for borehole in custom_borefield:
                 borehole.H = H
 
-            gfunc_uniform_T = gt.gfunction.uniform_temperature(
-                custom_borefield, time_array, self.alpha, nSegments=n_segments, disp=True)
+            gfunc_uniform_T = gt.gfunction.gFunction(custom_borefield, self.alpha,
+                                                     time_array, options=options, method=options["method"])
 
-            data["Data"][H] = gfunc_uniform_T
+            data["Data"][H] = gfunc_uniform_T.gFunc
 
         self.set_custom_gfunction(name_datafile)
         print(f"A new dataset with name {name} has been created in {os.path.dirname(os.path.realpath(__file__))}\Data.")
