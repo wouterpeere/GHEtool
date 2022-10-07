@@ -127,7 +127,7 @@ def figure_2():
     plt.text((line1+line2)/2, 0.2, "Ra", horizontalalignment='center')
 
     # layout
-    plt.title("G-function values for different borefield depths")
+    # plt.title("G-function values for different borefield depths")
     plt.xlabel("ln(t/ts)")
     plt.ylabel("g-function value")
     plt.ylim(-2, 60)
@@ -180,7 +180,7 @@ def figure_3():
     for i, config in enumerate(configs):
         plt.plot(depth_array, results[i], label=str(config[0]) + "x" + str(config[1]))
 
-    plt.title("Ra for different borefield configurations")
+    # plt.title("Ra for different borefield configurations")
     plt.xlabel("Depth (m)")
     plt.ylabel("Ra (mK/W)")
 
@@ -248,7 +248,7 @@ def figure_4():
     for i, config in enumerate(configs):
         plt.plot(imbalance_array[:len(results[i])], results[i], label=str(config[0]) + "x" + str(config[1]))
 
-    plt.title("Depth for different imbalances")
+    # plt.title("Depth for different imbalances")
     plt.xlabel("Imbalance (MWh/y)")
     plt.ylabel("Depth (m)")
 
@@ -324,7 +324,7 @@ def figure_5():
     for i, config in enumerate(configs):
         plt.plot(imbalance_array[:len(results[i])], results[i], label=str(config[0]) + "x" + str(config[1]))
 
-    plt.title("Ra for different borefield configurations")
+    # plt.title("Ra for different borefield configurations")
     plt.xlabel("Imbalance (MWh/y)")
     plt.ylabel("Ra (mK/W)")
 
@@ -399,11 +399,9 @@ def figure_7():
     for i, config in enumerate(configs):
         plt.plot(imbalance_array[:len(results[i])], results[i], label=str(config[0]) + "x" + str(config[1]))
 
-    plt.title("Ra for different borefield configurations")
+    # plt.title("Ra for different borefield configurations")
     plt.xlabel("Imbalance (MWh/y)")
     plt.ylabel("Ra (mK/W)")
-
-
 
     plt.annotate('', xy=(300, 2.167), xytext=(350, 2.205),
                  arrowprops=dict(arrowstyle='<-', color='black'))
@@ -414,10 +412,100 @@ def figure_7():
     plt.show()
 
 
+def figure_8():
+    """
+    This function creates the eight figure of the article.
+    """
+
+    # initiate borefield
+    borefield1 = Borefield()
+    borefield2 = Borefield()
+
+    # set the correct sizing method
+    borefield1.sizing_setup(L2_sizing=True)
+    borefield2.sizing_setup(L2_sizing=True)
+
+    # initiate array with imbalances percentages
+    imbalance_array = np.linspace(30, 70, 20)
+
+    # initiate list of borefield configurations
+    configs = [((20, 6), (20, 6)),
+               ((18, 8), (16, 6)),
+               ((14, 12), (18, 4)),
+               ((16, 12), (16, 5))]
+
+    # initiate imbalance
+    imbalance = 800
+
+    # initiate loads
+    monthly_load_heating_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
+    monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
+    monthly_load_heating = monthly_load_heating_percentage * (100 + imbalance) * 10 ** 3
+    monthly_load_cooling = monthly_load_cooling_percentage * 100 * 10 ** 3  # kWh
+    peak_cooling = np.array([0., 0., 22., 44., 83., 117., 134., 150., 100., 23., 0., 0.])
+    peak_heating = np.array([300., 268., 191., 103., 75., 0., 0., 38., 76., 160., 224., 255.])
+
+    results = []
+    for i, config_pair in enumerate(configs):
+        config1, config2 = config_pair
+        ratio_of_nb_of_boreholes = config1[0] * config1[1] / (config2[0] * config2[0] + config1[0] * config1[1])
+
+        # initiate ground data
+        ground_data1 = GroundData(100, 7, 2.4, 10, 0.14, config1[0], config1[1])
+        ground_data2 = GroundData(100, 7, 2.4, 10, 0.14, config2[0], config2[1])
+
+        # set ground data
+        borefield1.set_ground_parameters(ground_data1)
+        borefield2.set_ground_parameters(ground_data2)
+
+        # set cooling peak according to the ratio of nb_of_boreholes
+        borefield1.set_peak_cooling(peak_cooling * ratio_of_nb_of_boreholes)
+        borefield2.set_peak_cooling(peak_cooling * (1-ratio_of_nb_of_boreholes))
+
+        results_temp = []
+
+        for imbalance_percentage in imbalance_array:
+
+            # set the imbalance loads
+            borefield1.set_baseload_heating(monthly_load_heating * imbalance_percentage/100)
+            borefield2.set_baseload_heating(monthly_load_heating * (100 - imbalance_percentage)/100)
+
+            # set peak load heating
+            borefield1.set_peak_heating((peak_heating + imbalance_percentage/100 * imbalance / 12 / 730 * 10 ** 3))
+            borefield2.set_peak_heating((peak_heating + (100 - imbalance_percentage) / 100 * imbalance / 12 / 730 * 10 ** 3))
+
+            # set baseload cooling equally over the fields
+            borefield1.set_baseload_cooling(monthly_load_cooling * imbalance_percentage/100)
+            borefield2.set_baseload_cooling(monthly_load_cooling * (100 - imbalance_percentage)/100)
+
+            try:
+                depth1 = borefield1.size()
+                depth2 = borefield2.size()
+
+                results_temp.append(depth1 * config1[0] * config1[1] + depth2 * config2[0] * config2[1])
+            except:
+                results_temp.append(0)
+
+        results.append(results_temp)
+
+    # create figure
+    plt.figure()
+    for i, config in enumerate(configs):
+        plt.plot(imbalance_array[:len(results[i])], results[i], label=str(config[0]) + "x" + str(config[1]))
+
+    # plt.title("Effect of imbalance distribution on total borefield length")
+    plt.xlabel("Percentage of imbalance on field with largest number of boreholes")
+    plt.ylabel("Total borefield length (m)")
+
+    plt.legend()
+    plt.show()
+
+
 if __name__ == "__main__":
     # figure_1()
     # figure_2()
     # figure_3()
     # figure_4()
-    # figure_5()
-    # figure_7()
+    figure_5()
+    figure_7()
+    figure_8()

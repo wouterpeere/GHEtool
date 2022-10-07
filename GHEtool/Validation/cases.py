@@ -59,8 +59,8 @@ if __name__ == "__main__":
             # limited in the last year by heating
             monthly_load_heating_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
             monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
-            monthly_load_heating = monthly_load_heating_percentage * 300 * 10 ** 3 # kWh
-            monthly_load_cooling = monthly_load_cooling_percentage * 150 * 10 ** 3 # kWh
+            monthly_load_heating = monthly_load_heating_percentage * 300 * 10 ** 3  # kWh
+            monthly_load_cooling = monthly_load_cooling_percentage * 150 * 10 ** 3  # kWh
             peak_cooling = np.array([0., 0., 22., 44., 83., 117., 134., 150., 100., 23., 0., 0.])
             peak_heating = np.array([300., 268., 191., 103., 75., 0., 0., 38., 76., 160., 224., 255.])
 
