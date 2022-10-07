@@ -1758,7 +1758,7 @@ class Borefield:
                     self.B = B
                     self._reset_for_sizing(N1, N2)
                     self._print_temperature_profile(figure=False)
-                    if max(self.results_peak_cooling) < self.Tf_H and max(self.results_peak_heating) > self.Tf_C:
+                    if max(self.results_peak_cooling) < self.Tf_H and min(self.results_peak_heating) > self.Tf_C:
                         options.add((N1, N2, B))
 
                 N2 += 1
