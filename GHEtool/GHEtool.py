@@ -111,7 +111,7 @@ class Borefield:
         # true if the gfunctions should be calculated in the iteration when they
         # are not precalculated
         self.jit_calculation: bool = True
-        self.options_pygfunction: dict = {"method":"similarities"}
+        self.options_pygfunction: dict = {"method":"equivalent"}
 
         self.gfunction_interpolation_array = np.array([])
 
@@ -1423,7 +1423,10 @@ class Borefield:
             options = self.options_pygfunction
             # set the display option to True
             options["disp"] = True
-            print(options)
+
+        # chek if there is a method in options
+        if not "method" in options:
+            options["method"] = "equivalent"
 
         # set folder if no gui is used
         if depth_array is None:
@@ -1458,7 +1461,7 @@ class Borefield:
                 borehole.H = H
 
             gfunc_uniform_T = gt.gfunction.gFunction(custom_borefield, self.alpha,
-                                                     time_array, options=options)
+                                                     time_array, options=options, method=options["method"])
 
             data["Data"][H] = gfunc_uniform_T.gFunc
 
