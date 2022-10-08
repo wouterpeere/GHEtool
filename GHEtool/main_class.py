@@ -588,7 +588,7 @@ class Borefield:
         :param quadrant_sizing: differs from 0 when a sizing in a certain quadrant is desired
         :param L2_sizing: true if a sizing with the l_2 method is needed
         :param L3_sizing: true if a sizing with the L3 method is needed
-	:param L4_sizing: true if a sizing with the L4 method is needed
+	    :param L4_sizing: true if a sizing with the L4 method is needed
         :return: None
         """
 

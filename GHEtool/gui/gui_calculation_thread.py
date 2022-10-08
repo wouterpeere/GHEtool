@@ -81,24 +81,17 @@ class CalcProblem(QtCore_QThread):
         # set temperature boundaries
         borefield.set_max_ground_temperature(self.DS.option_max_temp)  # maximum temperature
         borefield.set_min_ground_temperature(self.DS.option_min_temp)  # minimum temperature
-        # set ground data
+
+        # set ground data (note that the flux is already calculated in gui_data_storage if
+        # a gradient is taken into account)
         borefield.set_ground_parameters(self.DS.ground_data)
+
         # check bounds of precalculated data
         bopd: BoundsOfPrecalculatedData = BoundsOfPrecalculatedData()
         outside_bounds: bool = bopd.check_if_outside_bounds(
             self.DS.ground_data.H, self.DS.ground_data.B, self.DS.ground_data.k_s, max(self.DS.ground_data.N_1, self.DS.ground_data.N_2)
         )
-        # set default value for constant Rb calculation
-        use_constant_rb: bool = True
-        # check if Rb is unknown
-        if self.DS.option_method_rb_calc > 0:
-            # set fluid and pipe data
-            borefield.set_fluid_parameters(self.DS.fluid_data)
-            borefield.set_pipe_parameters(self.DS.pipe_data)
-            # set use_constant_rb to False if R_b_calculation_method == 2
-            use_constant_rb: bool = self.DS.option_method_rb_calc == 1
-            # set Rb to the new calculated one if a constant unknown Rb is selected
-            borefield.Rb = borefield.calculate_Rb() if use_constant_rb else self.DS.ground_data.Rb
+
         # create custom rectangle bore field if no precalculated data is available
         if outside_bounds:
             # import boreholes from pygfuntion here to save start up time
@@ -124,6 +117,25 @@ class CalcProblem(QtCore_QThread):
             borefield.set_custom_gfunction(borefield_custom)
             # set bore field to custom one
             borefield.set_borefield(custom_field)
+
+        ### GENERAL SETUPS
+
+        # check if Rb is a constant, otherwise set the fluid/pipe parameters
+        if self.DS.option_method_rb_calc > 0:
+            # Rb will be dynamically calculated
+            # set fluid and pipe data
+            borefield.set_fluid_parameters(self.DS.fluid_data)
+            borefield.set_pipe_parameters(self.DS.pipe_data)
+
+        # setup the borefield sizing
+        borefield.sizing_setup(H_init=self.DS.ground_data.H,
+                               use_constant_Rb=self.DS.option_method_rb_calc == 0,
+                               use_constant_Tg=self.DS.option_method_temp_gradient == 0,
+                               L2_sizing=self.DS.option_method_size_depth == 0,
+                               L3_sizing=self.DS.option_method_size_depth == 1,
+                               L4_sizing=self.DS.option_method_size_depth == 2)
+
+        ### FUNCTIONALITIES (i.e. aims)
 
         # if load should be optimized do this
         if self.DS.aim_optimize:
@@ -157,60 +169,43 @@ class CalcProblem(QtCore_QThread):
             # return Datastorage as signal
             self.any_signal.emit((self.DS, self.idx))
             return
+
+        ### Size borefield
         if self.DS.aim_req_depth:
             try:
-                # size the borehole depth if wished
-                borefield.size(
-                    self.DS.ground_data.H,
-                    L2_sizing=self.DS.option_method_size_depth == 0,
-                    L3_sizing=self.DS.option_method_size_depth == 1,
-                    L4_sizing=self.DS.option_method_size_depth == 2,
-                    use_constant_Rb=use_constant_rb,
-                )
+                # size the borehole
+                borefield.size()
+
             except RuntimeError or ValueError:
                 # save bore field in Datastorage
                 self.DS.borefield = None
-
                 self.DS.ErrorMessage = self.translation.NotCalculated
                 # return Datastorage as signal
                 self.any_signal.emit((self.DS, self.idx))
                 return
 
+        ### Size borefield by length and width
         if self.DS.aim_size_length:
             try:
-                # size bore field by length and width either fast (Size_Method == 0) or robust (Size_Method == 1)
-                if self.DS.option_method_size_length == 0:
-                    borefield.size_complete_field_fast(
-                        H_max=self.DS.option_max_depth,
-                        l_1=self.DS.option_max_width,
-                        l_2=self.DS.option_max_length,
-                        B_min= self.DS.option_min_spacing,
-                        B_max=self.DS.option_max_spacing,
-                        L2_sizing=self.DS.option_method_size_depth == 0,
-                        use_constant_Rb=use_constant_rb,
-                    )
-                else:
-                    borefield.size_complete_field_robust(
-                        H_max=self.DS.option_max_depth,
-                        l_1=self.DS.option_max_width,
-                        l_2=self.DS.option_max_length,
-                        B_min= self.DS.option_min_spacing,
-                        B_max=self.DS.option_max_spacing,
-                        L2_sizing=self.DS.option_method_size_depth == 0,
-                        use_constant_Rb=use_constant_rb,
-                    )
+                # To be implemented
+                # option_method_size_length
+                pass
             except RuntimeError or ValueError:
                 # save bore field in Datastorage
                 self.DS.borefield = None
                 # return Datastorage as signal
                 self.any_signal.emit((self.DS, self.idx))
                 return
-        # try to calculate temperatures
-        try:
-            borefield.calculate_temperatures(borefield.H)
-        except ValueError:
-            pass
-        # save bore field in Datastorage
+
+        ### Plot temperature profile
+        if self.DS.aim_temp_profile:
+            # try to calculate temperatures
+            try:
+                borefield.calculate_temperatures(borefield.H)
+            except ValueError:
+                pass
+
+        # save borefield in Datastorage
         self.DS.borefield = borefield
         # return Datastorage as signal
         self.any_signal.emit((self.DS, self.idx))
