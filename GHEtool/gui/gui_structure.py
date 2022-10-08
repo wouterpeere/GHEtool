@@ -68,7 +68,7 @@ class GuiStructure:
             category=self.category_calculation,
             label="Borehole resistance calculation method:",
             default_index=0,
-            entries=[" constant ", " constant but unknown ", " flexible during calculation "],
+            entries=[" constant ", " dynamic "],
         )
 
         self.page_borehole = Page("Borehole and earth", "Borehole\nand earth", ":/icons/icons/Borehole.png")
@@ -341,7 +341,6 @@ class GuiStructure:
         self.category_pipe_data = Category(page=self.page_borehole_resistance, label="Pipe data")
         self.category_pipe_data.activate_graphic_left()
         self.option_method_rb_calc.add_link_2_show(self.category_pipe_data, on_index=1)
-        self.option_method_rb_calc.add_link_2_show(self.category_pipe_data, on_index=2)
 
         self.option_pipe_number = IntBox(
             category=self.category_pipe_data, label="Number of pipes [#]: ", default_value=2, minimal_value=1, maximal_value=99
