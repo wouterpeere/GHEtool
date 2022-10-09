@@ -72,10 +72,6 @@ class CalcProblem(QtCore_QThread):
         # create the bore field object
         borefield = Borefield(
             simulation_period=self.DS.option_simu_period,
-            peak_heating=self.DS.peakHeating,
-            peak_cooling=self.DS.peakCooling,
-            baseload_heating=self.DS.monthlyLoadHeating,
-            baseload_cooling=self.DS.monthlyLoadCooling,
             gui=True,
         )
         # set temperature boundaries
@@ -86,6 +82,8 @@ class CalcProblem(QtCore_QThread):
         borefield.set_ground_parameters(self.DS.ground_data)
 
         # check bounds of precalculated data
+        # TODO this boundary check can be deleted, because JIT-calculation is implemented in GHEtool
+        # to be done after the general PR
         bopd: BoundsOfPrecalculatedData = BoundsOfPrecalculatedData()
         outside_bounds: bool = bopd.check_if_outside_bounds(
             self.DS.ground_data.H, self.DS.ground_data.B, self.DS.ground_data.k_s, max(self.DS.ground_data.N_1, self.DS.ground_data.N_2)
@@ -125,6 +123,18 @@ class CalcProblem(QtCore_QThread):
             # set fluid and pipe data
             borefield.set_fluid_parameters(self.DS.fluid_data)
             borefield.set_pipe_parameters(self.DS.pipe_data)
+
+        # set monthly loads
+        borefield.set_peak_heating(self.DS.peakHeating)
+        borefield.set_peak_cooling(self.DS.peakCooling)
+        borefield.set_baseload_heating(self.DS.monthlyLoadHeating)
+        borefield.set_baseload_cooling(self.DS.monthlyLoadCooling)
+
+        # set hourly loads if available
+        if self.DS.option_method_size_depth == 2:
+            # hourly data to be loaded
+            borefield.set_hourly_heating_load()
+            borefield.set_hourly_cooling_load()
 
         # setup the borefield sizing
         borefield.sizing_setup(H_init=self.DS.ground_data.H,
