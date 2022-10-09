@@ -39,14 +39,14 @@ class GuiStructure:
         self.page_aim.set_next_page(self.page_options)
         self.page_options.set_previous_page(self.page_aim)
 
-        self.category_import_data = Category(page=self.page_options, label="Import data format")
-        self.aim_temp_profile.add_link_2_show(self.category_import_data)
-        self.aim_req_depth.add_link_2_show(self.category_import_data)
-        self.aim_size_length.add_link_2_show(self.category_import_data)
-
-        self.option_data = ButtonBox(
-            category=self.category_import_data, label="Data format:", default_index=0, entries=["monthly data", "hourly data"]
-        )
+        # self.category_import_data = Category(page=self.page_options, label="Import data format")
+        # self.aim_temp_profile.add_link_2_show(self.category_import_data)
+        # self.aim_req_depth.add_link_2_show(self.category_import_data)
+        # self.aim_size_length.add_link_2_show(self.category_import_data)
+        #
+        # self.option_data = ButtonBox(
+        #     category=self.category_import_data, label="Data format:", default_index=0, entries=["monthly data", "hourly data"]
+        # )
 
         self.category_calculation = Category(page=self.page_options, label="Calculation options")
 
@@ -274,7 +274,7 @@ class GuiStructure:
         self.page_borehole.set_next_page(self.page_borehole_resistance)
         self.page_borehole_resistance.set_previous_page(self.page_borehole)
 
-        self.category_constant_rb = Category(page=self.page_borehole_resistance, label="Konstant equivalent borehole resistance")
+        self.category_constant_rb = Category(page=self.page_borehole_resistance, label="Constant equivalent borehole resistance")
 
         self.option_constant_rb = FloatBox(
             category=self.category_constant_rb,
@@ -455,7 +455,7 @@ class GuiStructure:
             status_bar=status_bar,
         )
         self.option_filename.add_aim_option_2_be_set_for_check(self.aim_optimize)
-        self.option_filename.add_aim_option_2_be_set_for_check((self.option_data, 1))
+        self.option_filename.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
         self.option_column = ButtonBox(
             category=self.category_select_file,
             label="Thermal demand in one or two columns: ",
@@ -465,20 +465,21 @@ class GuiStructure:
         self.option_heating_column = ListBox(category=self.category_select_file, label="Heating load line: ", default_index=0, entries=[])
         self.option_column.add_link_2_show(self.option_heating_column, on_index=1)
         self.option_heating_column.add_aim_option_2_be_set_for_check(self.aim_optimize)
-        self.option_heating_column.add_aim_option_2_be_set_for_check((self.option_data, 1))
+        self.option_heating_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
         self.option_cooling_column = ListBox(category=self.category_select_file, label="Cooling load line: ", default_index=0, entries=[])
         self.option_column.add_link_2_show(self.option_cooling_column, on_index=1)
         self.option_cooling_column.add_aim_option_2_be_set_for_check(self.aim_optimize)
-        self.option_cooling_column.add_aim_option_2_be_set_for_check((self.option_data, 1))
+        self.option_cooling_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
         self.option_single_column = ListBox(category=self.category_select_file, label="Load line: ", default_index=0, entries=[])
         self.option_column.add_link_2_show(self.option_single_column, on_index=0)
         self.option_single_column.add_aim_option_2_be_set_for_check(self.aim_optimize)
-        self.option_single_column.add_aim_option_2_be_set_for_check((self.option_data, 1))
+        self.option_single_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
 
         self.option_unit_data = ButtonBox(category=self.category_select_file, label="Unit data: ", default_index=1, entries=["W", "kW", "MW"])
 
         self.button_load_csv = FunctionButton(category=self.category_select_file, button_text="Load", icon=":/icons/icons/Download.svg")
-        self.option_data.add_link_2_show(self.button_load_csv, on_index=0)
+        self.option_method_size_depth.add_link_2_show(self.button_load_csv, on_index=0)
+        self.option_method_size_depth.add_link_2_show(self.button_load_csv, on_index=1)
         self.aim_temp_profile.add_link_2_show(self.button_load_csv)
         self.aim_req_depth.add_link_2_show(self.button_load_csv)
         self.aim_size_length.add_link_2_show(self.button_load_csv)
@@ -491,7 +492,11 @@ class GuiStructure:
 
         self.category_th_demand = Category(page=self.page_thermal, label="Thermal demands")
         self.category_th_demand.activate_grid_layout(5)
-        self.option_data.add_link_2_show(self.category_th_demand, on_index=0)
+
+        # visible when L2 or L3
+        self.option_method_size_depth.add_link_2_show(self.category_th_demand, on_index=0)
+        self.option_method_size_depth.add_link_2_show(self.category_th_demand, on_index=1)
+
         self.aim_temp_profile.add_link_2_show(self.category_th_demand)
         self.aim_req_depth.add_link_2_show(self.category_th_demand)
         self.aim_size_length.add_link_2_show(self.category_th_demand)
@@ -808,7 +813,7 @@ class GuiStructure:
         self.option_show_legend = ButtonBox(category=self.category_result_figure, label="Show legend?", default_index=0, entries=["no", "yes"])
         self.option_plot_hourly = ButtonBox(category=self.category_result_figure, label="plot hourly?", default_index=0, entries=["no", "yes"])
 
-        self.option_data.add_link_2_show(self.option_plot_hourly, on_index=1)
+        self.option_method_size_depth.add_link_2_show(self.option_plot_hourly, on_index=2)
 
         self.page_settings = Page("Settings", "Settings", ":/icons/icons/Settings.svg")
 
@@ -920,6 +925,7 @@ class GuiStructure:
                 circle.setBrush(blue_light)
                 scene.addItem(circle)
 
+    # TODO, one (or both) of the functions beneath should run if L4 is selected / or 
     def fun_update_combo_box_data_file(self, filename: str) -> None:
         """
         update comboBox if new data file is selected
