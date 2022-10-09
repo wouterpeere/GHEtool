@@ -82,8 +82,7 @@ class CalcProblem(QtCore_QThread):
         borefield.set_max_ground_temperature(self.DS.option_max_temp)  # maximum temperature
         borefield.set_min_ground_temperature(self.DS.option_min_temp)  # minimum temperature
 
-        # set ground data (note that the flux is already calculated in gui_data_storage if
-        # a gradient is taken into account)
+        # set ground data
         borefield.set_ground_parameters(self.DS.ground_data)
 
         # check bounds of precalculated data
