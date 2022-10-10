@@ -37,7 +37,7 @@ def test_ground_data_equal():
 
 def test_ground_data_unequal():
     data = GroundData(3, 10, 0.2)
-    data2 = GroundData(3, 10, 0.2)
+    data2 = GroundData(3, 11, 0.2)
     assert data != data2
 
 
