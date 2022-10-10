@@ -34,9 +34,9 @@ if __name__ == "__main__":
             peak_load_heating_array[i, j] = np.random.randint(monthly_load_heating_array[i, j], max_value_heating)
 
     # initiate borefield model
-    data = GroundData(100, 6, 3, 10, 0.2, 10, 12, 2.4 * 10**6)  # ground data with an inaccurate guess of 100m for the depth of the borefield
+    data = GroundData(100, 6, 3, 10, 0.2, 10, 12, 0.075)  # ground data with an inaccurate guess of 100m for the depth of the borefield
     fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-    pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, 0.075, 2)
+    pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, number_of_pipes=2)
 
     # Monthly loading values
     peak_cooling = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak cooling in kW

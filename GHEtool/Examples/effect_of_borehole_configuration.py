@@ -8,7 +8,7 @@ import numpy as np
 
 if __name__ == "__main__":
     # GroundData for an initial field of 11 x 11
-    data = GroundData(110, 6, 3, 10, 0.2, 11, 11, 2.4 * 10**6)
+    data = GroundData(110, 6, 3, 10, 0.2, 11, 11)
 
     # Monthly loading values
     peak_cooling = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak cooling in kW

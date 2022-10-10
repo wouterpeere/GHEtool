@@ -11,7 +11,7 @@ from GHEtool import *
 if __name__ == "__main__":
 
     # initiate ground data
-    data = GroundData(110, 6, 3, 10, 0.2, 10, 10, 2.4 * 10**6)
+    data = GroundData(110, 6, 3, 10, 0.2, 10, 10)
 
     # initiate borefield
     borefield = Borefield()

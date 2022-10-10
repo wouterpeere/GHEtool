@@ -9,7 +9,7 @@ from GHEtool import Borefield, GroundData
 
 
 def test_64_boreholes():
-    data = GroundData(110, 6, 3, 10, 0.2, 8, 8, 2.4 * 10**6)
+    data = GroundData(110, 6, 3, 10, 0.2, 8, 8)
 
     # monthly loading values
     peak_cooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]  # Peak cooling in kW

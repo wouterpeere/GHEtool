@@ -1,9 +1,11 @@
+import warnings
+
 
 class GroundData:
-    __slots__ = 'H', 'B', 'k_s', 'Tg', 'Rb', 'N_1', 'N_2', 'flux', 'volumetric_heat_capacity', 'alpha'
+    __slots__ = 'H', 'B', 'k_s', 'Tg', 'Rb', 'N_1', 'N_2', 'flux', 'volumetric_heat_capacity', 'alpha', 'D', 'r_b'
 
-    def __init__(self, h: float, b: float, k_s: float, T_g: float, R_b: float, n_1: int, n_2: int,
-                 volumetric_heat_capacity: float = 2.4 * 10**6, flux: float = 0.06) -> None:
+    def __init__(self, h: float, b: float, k_s: float, T_g: float, R_b: float, n_1: int, n_2: int, r_b: float = 0.075,
+                 burial_depth: float = 4, volumetric_heat_capacity: float = 2.4 * 10**6, flux: float = 0.06) -> None:
         """
         Data for storage of ground data
 
@@ -15,6 +17,8 @@ class GroundData:
         :param R_b: Equivalent borehole resistance [m K/W]
         :param n_1: Width of rectangular field [#]
         :param n_2: Length of rectangular field [#]
+        :param r_b: Borehole radius [m]
+        :param burial_depth: Burial depth of the borefield [m]
         :param volumetric_heat_capacity: The volumetric heat capacity of the ground (J/m3K)
         :param flux: the geothermal heat flux (W/m2)
         :return: None
@@ -26,6 +30,8 @@ class GroundData:
         self.Rb = R_b  # mK/W
         self.N_1 = n_1  # #
         self.N_2 = n_2  # #
+        self.r_b = r_b  # borehole radius m
+        self.D = burial_depth  # m
         self.volumetric_heat_capacity = volumetric_heat_capacity  # J/m3K
         self.alpha = self.k_s / self.volumetric_heat_capacity  # m2/s
         self.flux = flux  # W/m2
@@ -72,10 +78,10 @@ class FluidData:
 
 class PipeData:
 
-    __slots__ = 'r_in', 'r_out', 'k_p', 'D_s', 'r_b', 'number_of_pipes', 'epsilon', 'k_g', 'D'
+    __slots__ = 'r_in', 'r_out', 'k_p', 'D_s', 'number_of_pipes', 'epsilon', 'k_g', 'D', 'r_b'
 
-    def __init__(self, k_g: float, r_in: float, r_out: float, k_p: float, D_s: float, r_b: float, number_of_pipes: int,
-                 epsilon: float = 1e-6, D: float = 4) -> None:
+    def __init__(self, k_g: float, r_in: float, r_out: float, k_p: float, D_s: float, r_b: float = None, number_of_pipes: int = 1,
+                 epsilon: float = 1e-6, D: float = None) -> None:
         """
         Data for storage of ground data
 
@@ -96,10 +102,10 @@ class PipeData:
         self.r_out = r_out                  # outer pipe radius m
         self.k_p = k_p                      # pipe thermal conductivity W/mK
         self.D_s = D_s                      # distance of pipe until center m
-        self.r_b = r_b                      # borehole radius m
         self.number_of_pipes = number_of_pipes  # number of pipes #
         self.epsilon = epsilon              # pipe roughness m
         self.D = D                          # burial depth m
+        self.r_b = r_b                      # borehole radius m
 
     def __eq__(self, other):
         if not isinstance(other, PipeData):

@@ -56,7 +56,7 @@ class Borefield:
                 'hourly_cooling_load', 'number_of_boreholes', 'borefield', 'custom_gfunction', 'cost_investment', \
                 'length_peak', 'th', 'Tf_H', 'Tf_C', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
                 'monthly_load_cooling', 'peak_heating', 'imbalance', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm', \
-                'peak_cooling', 'simulation_period', 'gfunction_interpolation_array', 'fluid_data_available', \
+                'peak_cooling', 'simulation_period', 'gfunction_interpolation_array', 'fluid_data_available',\
                 'results_peak_heating', 'pipe_data_available', 'alpha', 'time_L4', 'temperature_result', 'options_pygfunction',\
                 'results_peak_cooling', 'results_month_cooling', 'results_month_heating', 'Tb', 'THRESHOLD_WARNING_SHALLOW_FIELD', \
                 'gui', 'time_L3_first_year', 'time_L3_last_year', 'peak_heating_external', 'peak_cooling_external', \
@@ -169,6 +169,7 @@ class Borefield:
         self.Rb = 0.  # effective borehole thermal resistance mK/W
         self.N_1 = 0  # number of boreholes in one direction #
         self.N_2 = 0  # number of boreholes in the other direction #
+        self.D: float = 0.  # burial depth m
         self.flux = 0.  # geothermal heat flux W/m2
         self.volumetric_heat_capacity = 0.  # ground volumetric heat capacity (J/m3K)
         self.alpha = 0.  # ground diffusivity (m2/s)
@@ -193,7 +194,6 @@ class Borefield:
         self.k_p: float = 0.  # pipe thermal conductivity W/mK
         self.D_s: float = 0.  # distance of pipe until center of the borehole
         self.number_of_pipes: int = 0  # number of pipes in the borehole (single = 1, double = 2 etc.)
-        self.D: float = 4.  # burial depth m
         self.epsilon = 1e-6  # pipe roughness
         self.pipe_data_available: bool = False  # needs to be True in order to calculate Rb*
 
@@ -347,6 +347,8 @@ class Borefield:
         self.k_s: float = data.k_s  # Ground thermal conductivity (W/m.K)
         self.Tg: float = data.Tg  # Ground temperature at infinity (C)
         self.volumetric_heat_capacity: float = data.volumetric_heat_capacity  # Ground volumetric heat capacity (W/m3K)
+        self.D: float = data.D  # Burial depth of the borehole (m)
+        self.r_b: float = data.r_b
         self.alpha: float = data.alpha  # Ground difussivity (defined as k_s/volumetric_heat_capacity)
         self.flux: float = data.flux  # Ground thermal heat flux (W/m2)
 
@@ -385,11 +387,22 @@ class Borefield:
         self.r_out = data.r_out  # outer pipe radius m
         self.k_p = data.k_p  # pipe thermal conductivity W/mK
         self.D_s = data.D_s  # distance of pipe until center m
-        self.r_b = data.r_b  # borehole radius m
         self.number_of_pipes = data.number_of_pipes  # number of pipes #
         self.epsilon = data.epsilon  # pipe roughness
         self.k_g = data.k_g  # grout thermal conductivity W/mK
-        self.D = data.D  # burial depth m
+
+        warnings.filterwarnings("always", category=DeprecationWarning)
+
+        if data.r_b is not None:
+            warnings.warn("Borehole radius is now a parameter in the ground data."
+                          "The functionality to define the borehole radius here, will be depreciated.", DeprecationWarning)
+            self.r_b = data.r_b  # borehole radius m
+
+        if not data.D is None:
+            warnings.warn("Burial depth is now a parameter in the ground data."
+                          "The functionality to define the borehole radius here, will be depreciated.", DeprecationWarning)
+            self.D = data.D  # burial depth m
+
         # calculates the position of the pipes based on an axis-symmetrical positioning
         self.pos: list = self._axis_symmetrical_pipe
 
@@ -1295,8 +1308,6 @@ class Borefield:
             custom_borefield = gt.boreholes.rectangle_field(self.N_1, self.N_2, self.B, self.B, H, D=4, r_b=0.075)
 
             # calculate gfunction
-            # gfunc_uniform_T = gt.gfunction.uniform_temperature(
-            #     custom_borefield, np.asarray(time_value), self.alpha, nSegments=12, disp=False)
 
             gfunc_uniform_T = gt.gfunction.gFunction(custom_borefield, self.alpha, np.asarray(time_value),
                                                      options=self.options_pygfunction).gFunc

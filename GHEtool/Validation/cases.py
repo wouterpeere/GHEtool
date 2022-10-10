@@ -18,8 +18,7 @@ if __name__ == "__main__":
                       10,   # Ground temperature at infinity (degrees C)
                       0.2,  # equivalent borehole resistance (K/W)
                       12,   # width of rectangular field (#)
-                      10,  # length of rectangular field (#)
-                      2.4 * 10 ** 6)  # ground volumetric heat capacity (J/m3K)
+                      10)  # length of rectangular field (#)
 
     def load_case(number):
         """This function returns the values for one of the four cases."""

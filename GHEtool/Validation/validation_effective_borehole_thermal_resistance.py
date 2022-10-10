@@ -6,8 +6,8 @@ from GHEtool import Borefield
 from GHEtool.VariableClasses import FluidData, PipeData, GroundData
 
 # initiate parameters
-ground_data = GroundData(100, 6, 3, 10, 0.12, 10, 12, 2.4 * 10 ** 6)  # ground data with an inaccurate guess of 100m for the depth of the borefield
-pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, 0.075, 2, epsilon=1e-6)
+ground_data = GroundData(100, 6, 3, 10, 0.12, 10, 12, 0.075)  # ground data with an inaccurate guess of 100m for the depth of the borefield
+pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, number_of_pipes=2, epsilon=1e-6)
 
 # initiate borefield model
 borefield = Borefield()

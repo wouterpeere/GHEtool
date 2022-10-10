@@ -20,6 +20,8 @@ if __name__ == "__main__":
                       0.2,           # equivalent borehole resistance (K/W)
                       12,            # width of rectangular field (#)
                       10,            # length of rectangular field (#)
+                      0.075,         # borehole radius (m)
+                      4,             # borehole burial depth (m)
                       2.4 * 10**6)   # ground volumetric heat capacity (J/m3K)
 
     # monthly loading values
@@ -82,7 +84,7 @@ if __name__ == "__main__":
 
     # this requires pipe and fluid data
     fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-    pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, 0.075, 2)
+    pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, number_of_pipes=2)
     borefield.set_fluid_parameters(fluid_data)
     borefield.set_pipe_parameters(pipe_data)
 
