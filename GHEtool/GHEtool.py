@@ -248,14 +248,13 @@ class Borefield:
         string: str = str(max(N_1, N_2)) + "x" + str(min(N_1, N_2))
         return string
 
-    @property
-    def number_of_boreholes(self) -> int:
+    def set_number_of_boreholes(self, number_of_boreholes: int = 1) -> None:
         """
-        This function returns the number of boreholes
+        This functions sets the number of boreholes.
 
-        :return: number of boreholes (int)
+        :return None
         """
-        return len(self.borefield)
+        self.number_of_boreholes = len(self.borefield) if self.borefield is not None else 0
 
     def set_borefield(self, borefield=None) -> None:
         """
