@@ -1402,16 +1402,6 @@ class Borefield:
             time_array = Borefield.DEFAULT_TIME_ARRAY
 
         folder = '.' if self.gui else FOLDER
-        # # make filename
-        # name = f'{name_datafile}.pickle'
-        # # check if fileImport exists
-        # if not os.path.isfile(f"Data/{name}"):
-        #     # does not exist, so create
-        #     pickle.dump(dict([]), open(f'{folder}/Data/{name}', "wb"))
-        # else:
-        #     raise Exception(f"The dataset {name} already exists. Please chose a different name.")
-        #
-        # data = pickle.load(open(f'{folder}/Data/{name}', "rb"), encoding='latin1')
 
         data = dict([])
         data["Data"] = dict([])
@@ -1437,6 +1427,7 @@ class Borefield:
             name = f'{name_datafile}.pickle'
             pickle.dump(data, open(f'{folder}/Data/{name}', "wb"))
             print(f"A new dataset with name {name} has been created in {os.path.dirname(os.path.realpath(__file__))}\Data.")
+            return f"{os.path.dirname(os.path.realpath(__file__))}\Data/"+name
 
     def set_hourly_heating_load(self, heating_load: np.array) -> None:
         """
