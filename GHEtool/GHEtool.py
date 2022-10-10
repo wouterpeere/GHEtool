@@ -582,7 +582,7 @@ class Borefield:
         :param use_constant_Rb: true if a constant Rb* value should be used
         :param use_constant_Tg: true if a constant Tg value should be used (the geothermal flux is neglected)
         :param quadrant_sizing: differs from 0 when a sizing in a certain quadrant is desired
-        :param L2_sizing: true if a sizing with the l_2 method is needed
+        :param L2_sizing: true if a sizing with the L2 method is needed
         :param L3_sizing: true if a sizing with the L3 method is needed
 	    :param L4_sizing: true if a sizing with the L4 method is needed
         :return: None
@@ -601,15 +601,15 @@ class Borefield:
             self.quadrant_sizing = quadrant_sizing
         if self.H_init is not None:
             self.H_init = H_init
-        if L2_sizing is not None:
+        if L2_sizing:
             self.L2_sizing = L2_sizing
             self.L3_sizing = False
             self.L4_sizing = False
-        if L3_sizing is not None:
+        if L3_sizing:
             self.L3_sizing = L3_sizing
             self.L2_sizing = False
             self.L4_sizing = False
-        if L4_sizing is not None:
+        if L4_sizing:
             self.L4_sizing = L4_sizing
             self.L2_sizing = False
             self.L3_sizing = False
