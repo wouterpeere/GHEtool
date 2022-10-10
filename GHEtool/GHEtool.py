@@ -230,9 +230,6 @@ class Borefield:
         # set length of the peak
         self.set_length_peak()
 
-        # calculate number of boreholes
-        self.set_number_of_boreholes(number_of_boreholes if number_of_boreholes is not None else 1)
-
         # set a custom borefield
         self.borefield = None
         self.set_borefield(borefield)
@@ -251,13 +248,14 @@ class Borefield:
         string: str = str(max(N_1, N_2)) + "x" + str(min(N_1, N_2))
         return string
 
-    def set_number_of_boreholes(self, number_of_boreholes: int = 1) -> None:
+    @property
+    def number_of_boreholes(self) -> int:
         """
-        This functions sets the number of boreholes.
+        This function returns the number of boreholes
 
-        :return None
+        :return: number of boreholes (int)
         """
-        self.number_of_boreholes = number_of_boreholes if number_of_boreholes > 1 else self.N_1 * self.N_2
+        return len(self.borefield)
 
     def set_borefield(self, borefield=None) -> None:
         """
@@ -335,26 +333,14 @@ class Borefield:
 
         :return None
         """
-        self.H: float = data.H  # Borehole length (m)
-        self.B: float = data.B  # Borehole spacing (m)
-
-        self.N_1: int = data.N_1
-        self.N_2: int = data.N_2
-
         self.Rb: float = data.Rb
 
         # Ground properties
         self.k_s: float = data.k_s  # Ground thermal conductivity (W/m.K)
         self.Tg: float = data.Tg  # Ground temperature at infinity (C)
         self.volumetric_heat_capacity: float = data.volumetric_heat_capacity  # Ground volumetric heat capacity (W/m3K)
-        self.D: float = data.D  # Burial depth of the borehole (m)
-        self.r_b: float = data.r_b
         self.alpha: float = data.alpha  # Ground difussivity (defined as k_s/volumetric_heat_capacity)
         self.flux: float = data.flux  # Ground thermal heat flux (W/m2)
-
-        # sets the number of boreholes as if it was a rectangular field, iff there is not yet a number of boreholes
-        # defined by a custom configuration
-        self.set_number_of_boreholes(self.N_1 * self.N_2)
 
         # new ground data implies that a new g-function should be loaded
         self.gfunction_interpolation_array = []
@@ -390,18 +376,6 @@ class Borefield:
         self.number_of_pipes = data.number_of_pipes  # number of pipes #
         self.epsilon = data.epsilon  # pipe roughness
         self.k_g = data.k_g  # grout thermal conductivity W/mK
-
-        warnings.filterwarnings("always", category=DeprecationWarning)
-
-        if data.r_b is not None:
-            warnings.warn("Borehole radius is now a parameter in the ground data."
-                          "The functionality to define the borehole radius here, will be depreciated.", DeprecationWarning)
-            self.r_b = data.r_b  # borehole radius m
-
-        if not data.D is None:
-            warnings.warn("Burial depth is now a parameter in the ground data."
-                          "The functionality to define the borehole radius here, will be depreciated.", DeprecationWarning)
-            self.D = data.D  # burial depth m
 
         # calculates the position of the pipes based on an axis-symmetrical positioning
         self.pos: list = self._axis_symmetrical_pipe
