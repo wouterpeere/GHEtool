@@ -5,7 +5,7 @@ This document is an example of how the borefield configuration can influence the
 # import all the relevant functions
 from GHEtool import GroundData, Borefield
 import numpy as np
-
+# TODO to be adapted
 if __name__ == "__main__":
     # GroundData for an initial field of 11 x 11
     data = GroundData(110, 6, 3, 10, 0.2, 11, 11)
