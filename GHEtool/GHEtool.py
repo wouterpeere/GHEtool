@@ -271,6 +271,8 @@ class Borefield:
             return
         self._borefield = borefield
         self.set_number_of_boreholes(len(borefield))
+        self.D = borefield[0].D
+        self.r_b = borefield[0].r_b
 
     @borefield.deleter
     def borefield(self):
