@@ -1,14 +1,14 @@
 """
-This file gives an example on how to work with a custom borefield within GHEtool using pygfunction.
+This file gives an example on how to work with a custom _borefield within GHEtool using pygfunction.
 
-When working on a custom borefield configuration, one needs to import this configuration into the GHEtool.
-Based on the pygfunction, one creates his custom borefield and gives it as an argument to the class initiater Borefield of GHEtool.
+When working on a custom _borefield configuration, one needs to import this configuration into the GHEtool.
+Based on the pygfunction, one creates his custom _borefield and gives it as an argument to the class initiater Borefield of GHEtool.
 
-You also need a custom g-function file for interpolation. This can also be given as an argument to the class initiater as custom_gfunction.
+You also need a custom g-function file for interpolation. This can also be given as an argument to the class initiater as _custom_gfunction.
 This custom variable, must contain gfunctions for all time steps in Borefield.DEFAULT_TIME_ARRAY, and should be structured as follows:
 {"Time":Borefield.DEFAULT_TIME_ARRAY,"Data":[[Depth1,[Gfunc1,Gfunc2 ...]],[Depth2,[Gfunc1, Gfunc2 ...]]]}.
 
-However, one can use the function 'create_custom_dataset' when a custom borefield is given. This will make the required dataset for the optimisation.
+However, one can use the function 'create_custom_dataset' when a custom _borefield is given. This will make the required dataset for the optimisation.
 Please note that, depending on the complexity of the custom field, this can range between 5 minutes and 5 hours.
  """
 
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     monthly_load_heating = annual_heating_load * monthly_load_heating_percentage  # kWh
     monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage  # kWh
 
-    # create the borefield object
+    # create the _borefield object
 
     borefield = Borefield(simulation_period=20,
                           peak_heating=peak_heating,
@@ -54,13 +54,10 @@ if __name__ == "__main__":
 
     # create custom borefield based on pygfunction
     custom_field = gt.boreholes.L_shaped_field(N_1=4, N_2=5, B_1=5., B_2=5., H=100., D=4, r_b=0.05)
-    borefield.create_custom_dataset(custom_field, "custom_field")
-
-    # set the custom dataset
-    borefield.set_custom_gfunction("custom_field")
 
     # set the custom borefield (so the number of boreholes is correct)
     borefield.set_borefield(custom_field)
+    borefield.create_custom_dataset("custom_field", save=True)
 
     # size borefield
     depth = borefield.size(100)

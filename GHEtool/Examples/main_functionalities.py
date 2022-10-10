@@ -1,7 +1,7 @@
 """
 This file contains all the main functionalities of GHEtool being:
-    * sizing of the borefield
-    * sizing of the borefield for a specific quadrant
+    * sizing of the _borefield
+    * sizing of the _borefield for a specific quadrant
     * plotting the temperature evolution
     * plotting the temperature evolution for a specific depth
     * printing the array of the temperature
@@ -10,9 +10,10 @@ This file contains all the main functionalities of GHEtool being:
 # import all the relevant functions
 from GHEtool import Borefield, GroundData, FluidData, PipeData
 import numpy as np
+import pygfunction as gt
 
 if __name__ == "__main__":
-    # relevant borefield data for the calculations
+    # relevant _borefield data for the calculations
     data = GroundData(110,           # depth (m)
                       6,             # borehole spacing (m)
                       3,             # conductivity of the soil (W/mK)
@@ -23,7 +24,7 @@ if __name__ == "__main__":
                       0.075,         # borehole radius (m)
                       4,             # borehole burial depth (m)
                       2.4 * 10**6)   # ground volumetric heat capacity (J/m3K)
-
+    borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
     # monthly loading values
     peak_cooling = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak cooling in kW
     peak_heating = np.array([160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.])  # Peak heating in kW
@@ -40,7 +41,7 @@ if __name__ == "__main__":
     monthly_load_heating = annual_heating_load * monthly_load_heating_percentage   # kWh
     monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage   # kWh
 
-    # create the borefield object
+    # create the _borefield object
     borefield = Borefield(simulation_period=20,
                           peak_heating=peak_heating,
                           peak_cooling=peak_cooling,
@@ -48,17 +49,18 @@ if __name__ == "__main__":
                           baseload_cooling=monthly_load_cooling)
 
     borefield.set_ground_parameters(data)
+    borefield.set_borefield(borefield_gt)
 
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)   # maximum temperature
     borefield.set_min_ground_temperature(0)    # minimum temperature
 
-    # size borefield
+    # size _borefield
     depth = borefield.size(100)
     print("The borehole depth is: ", depth, "m")
 
     # print imbalance
-    print("The borefield imbalance is: ", borefield.imbalance, "kWh/y. (A negative imbalance means the the field is heat extraction dominated so it cools down year after year.)") # print imbalance
+    print("The _borefield imbalance is: ", borefield.imbalance, "kWh/y. (A negative imbalance means the the field is heat extraction dominated so it cools down year after year.)") # print imbalance
 
     # plot temperature profile for the calculated depth
     borefield.print_temperature_profile(legend=True)
@@ -72,8 +74,8 @@ if __name__ == "__main__":
     print(borefield.results_peak_cooling)
     print("---------------------------------------------")
 
-    # size the borefield for quadrant 3
-    # for more information about borefield quadrants, see (Peere et al., 2021)
+    # size the _borefield for quadrant 3
+    # for more information about _borefield quadrants, see (Peere et al., 2021)
     depth = borefield.size(100, quadrant_sizing=3)
     print("The borehole depth is: ", str(round(depth, 2)), "m for a sizing in quadrant 3")
     # plot temperature profile for the calculated depth
