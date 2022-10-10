@@ -584,7 +584,7 @@ class Borefield:
         :param quadrant_sizing: differs from 0 when a sizing in a certain quadrant is desired
         :param L2_sizing: true if a sizing with the l_2 method is needed
         :param L3_sizing: true if a sizing with the L3 method is needed
-	:param L4_sizing: true if a sizing with the L4 method is needed
+	    :param L4_sizing: true if a sizing with the L4 method is needed
         :return: None
         """
 
@@ -603,10 +603,16 @@ class Borefield:
             self.H_init = H_init
         if L2_sizing is not None:
             self.L2_sizing = L2_sizing
+            self.L3_sizing = False
+            self.L4_sizing = False
         if L3_sizing is not None:
             self.L3_sizing = L3_sizing
+            self.L2_sizing = False
+            self.L4_sizing = False
         if L4_sizing is not None:
             self.L4_sizing = L4_sizing
+            self.L2_sizing = False
+            self.L3_sizing = False
 
     def size(self, H_init: float = 100, use_constant_Rb: bool = None, use_constant_Tg: bool = None,
              L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None, quadrant_sizing: int = None) -> float:
