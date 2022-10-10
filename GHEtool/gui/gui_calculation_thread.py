@@ -115,9 +115,12 @@ class CalcProblem(QtCore_QThread):
             borefield_custom: str = f"customField_{n_max}_{n_min}_{self.DS.ground_data.B}_{self.DS.ground_data.k_s}"
             # try if the bore field has already be calculated then open this otherwise calculate it
             try:
-                from GHEtool import FOLDER
-
-                pk_load(open(f"{FOLDER}/Data/{borefield_custom}.pickle", "rb"))
+                from pathlib import Path, PurePath
+                from os.path import dirname, realpath, exists
+                from os import makedirs
+                file_path: str = str(PurePath(Path.home(), 'Documents/GHEtool/Data/', "{borefield_custom}.pickle"))
+                makedirs(dirname(file_path), exist_ok=True)
+                pk_load(open(file_path, "rb"))
             except FileNotFoundError:
                 borefield.create_custom_dataset(custom_field, borefield_custom)
             # set new bore field g-function

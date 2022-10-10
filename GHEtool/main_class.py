@@ -1311,6 +1311,12 @@ class Borefield:
         if self.custom_gfunction is None:
             name = f'{self.configuration_string(self.N_1, self.N_2)}.pickle'
         else:
+            from pathlib import Path, PurePath
+            from os.path import dirname, realpath, exists
+            from os import makedirs
+            file_path: str = str(PurePath(Path.home(), 'Documents/GHEtool/', ""))
+            makedirs(dirname(file_path), exist_ok=True)
+            folder = file_path if self.gui else FOLDER
             name = f'{self.custom_gfunction}.pickle'
 
         # check if datafile exists
@@ -1423,7 +1429,13 @@ class Borefield:
             depth_array = Borefield.DEFAULT_DEPTH_ARRAY
         if time_array is None:
             time_array = Borefield.DEFAULT_TIME_ARRAY
-        folder = '.' if self.gui else FOLDER
+
+        from pathlib import Path, PurePath
+        from os.path import dirname, realpath, exists
+        from os import makedirs
+        file_path: str = str(PurePath(Path.home(), 'Documents/GHEtool/', ""))
+        makedirs(dirname(file_path), exist_ok=True)
+        folder = file_path if self.gui else FOLDER
         # make filename
         name = f'{name_datafile}.pickle'
         # check if fileImport exists
