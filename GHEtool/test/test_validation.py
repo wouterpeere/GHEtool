@@ -7,11 +7,13 @@ def test_validation_cases(monkeypatch):
     import GHEtool.Validation.cases
 
 
+@pytest.mark.slow
 def test_sizing_method_comparison(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     import GHEtool.Validation.sizing_method_comparison
 
 
+@pytest.mark.slow
 def test_sizing_with_Rb(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     import GHEtool.Validation.sizing_with_Rb_calculation

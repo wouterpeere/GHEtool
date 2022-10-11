@@ -27,7 +27,7 @@ This code is tested with Python 3.8 and requires the following libraries (the ve
 * Numpy (>=1.20.2)
 * Scipy (>=1.6.2)
 * Matplotlib (>=3.4.1)
-* Pygfunction (>=2.1.0)
+* Pygfunction (>=2.2.1)
 * Openpyxl (>=3.0.7)
 * Pandas (>=1.2.4)
 
@@ -80,19 +80,22 @@ To get started with GHEtool, one needs to create a Borefield object. This is don
 
 ```Python
 from GHEtool import Borefield, GroundData
+import pygfunction as gt
 ```
 
-After importing the necessary classes, one sets all the relevant ground data.
+After importing the necessary classes, one sets all the relevant ground data and borehole equivalent resistance.
 
 ```Python
-data = GroundData(110, # depth of the field (m)
-                  6,   # distance between the boreholes (m)
-                  3,   # ground thermal conductivity (W/mK)
+data = GroundData(3,   # ground thermal conductivity (W/mK)
                   10,  # initial/undisturbed ground temperature (deg C)
                   0.2, # borehole equivalent resistance (mK/W)
-                  10,  # number of boreholes in width direction of the field (/)
-                  12,  # number of boreholes in the length direction of the field (/)
                   2.4*10**6) # volumetric heat capacity of the ground (J/m3K) 
+```
+
+Using pygfunction, a borefield object is created.
+
+```Python
+borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 1, 0.075) 
 ```
 
 Furthermore, one needs to set the peak and monthly baseload for both heating and cooling.
@@ -105,7 +108,7 @@ monthly_load_heating = [46500.0, 44400.0, 37500.0, 29700.0, 19200.0, 0.0, 0.0, 0
 monthly_load_cooling = [4000.0, 8000.0, 8000.0, 8000.0, 12000.0, 16000.0, 32000.0, 32000.0, 16000.0, 12000.0, 8000.0, 4000.0]  # in kWh
 ```
 
-Next, one creates the borefield object and sets the temperature constraints and the ground data.
+Next, one creates the borefield object in GHEtool and sets the temperature constraints and the ground data.
 
 ```Python
 # create the borefield object
@@ -116,6 +119,8 @@ borefield = Borefield(simulation_period=20,
                       baseload_cooling=monthly_load_cooling)
 
 borefield.set_ground_parameters(data)
+
+borefield.set_borefield(borefield_gt)
 
 # set temperature boundaries
 borefield.set_max_ground_temperature(16)  # maximum temperature
