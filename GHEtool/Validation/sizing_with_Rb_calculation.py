@@ -68,6 +68,9 @@ borefield.set_fluid_parameters(fluid_data)
 borefield.set_pipe_parameters(pipe_data)
 borefield.set_borefield(borefield_gt)
 
+# create custom gfunction to speed up the calculation
+borefield.create_custom_dataset()
+
 # set temperature boundaries
 borefield.set_max_ground_temperature(16)   # maximum temperature
 borefield.set_min_ground_temperature(0)    # minimum temperature

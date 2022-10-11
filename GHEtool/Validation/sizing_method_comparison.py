@@ -61,6 +61,9 @@ borefield = Borefield(simulation_period=20,
 borefield.set_ground_parameters(data)
 borefield.set_borefield(borefield_gt)
 
+# create custom gfunction to speed up the calculation
+borefield.create_custom_dataset()
+
 # set temperature boundaries
 borefield.set_max_ground_temperature(16)   # maximum temperature
 borefield.set_min_ground_temperature(0)    # minimum temperature
