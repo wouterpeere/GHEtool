@@ -3,6 +3,7 @@ from GHEtool import *
 import pytest
 import numpy as np
 import pygfunction as gt
+import matplotlib.pyplot as plt
 
 data = GroundData(3, 10, 0.2)
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
@@ -76,7 +77,8 @@ def empty_borefield():
 def hourly_borefield():
     borefield = Borefield()
     borefield.set_ground_parameters(data)
-    borefield.load_hourly_profile("./Examples/hourly_profile.csv")
+    borefield.set_borefield(borefield_gt)
+    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv")
     return borefield
 
 
@@ -91,6 +93,8 @@ def borefield_cooling_dom():
     borefield.set_baseload_cooling(np.array(monthlyLoadCooling)*2)
 
     borefield.set_ground_parameters(data)
+    borefield.set_borefield(borefield_gt)
+
     return borefield
 
 
@@ -161,48 +165,52 @@ def test_size_L3(borefield):
     borefield.size(L3_sizing=True)
 
 
-# def test_size_L4(hourly_borefield):
-#     hourly_borefield.size(L4_sizing=True)
-#
-#
-# def test_cooling_dom(borefield_cooling_dom):
-#     borefield_cooling_dom.size()
-#
-#
-# def test_sizing_different_quadrants(borefield):
-#     borefield.size(quadrant_sizing=1)
-#     borefield.size(quadrant_sizing=2)
-#     borefield.size(quadrant_sizing=3)
-#     borefield.size(quadrant_sizing=4)
-#     borefield.size(quadrant_sizing=1, L3_sizing=True)
-#
-#
-# def test_convergence(borefield_cooling_dom):
-#     try:
-#         borefield_cooling_dom.set_peak_heating(np.array(peakHeating)*15)
-#         borefield_cooling_dom.size()
-#     except RuntimeError:
-#         assert True
-#
-#
-# def test_quadrant_4(borefield):
-#     borefield.set_peak_heating(np.array(peakHeating)*8)
-#     borefield.size()
-#
-#
-# def test_sizing_L3(borefield):
-#     borefield.set_peak_heating(np.array(peakHeating)*8)
-#     borefield.size(L3_sizing=True)
-#
-#
-# def test_sizing_L32(borefield_cooling_dom):
-#     borefield_cooling_dom.size(L3_sizing=True)
-#     borefield_cooling_dom.set_peak_heating(np.array(peakHeating) * 5)
-#     borefield_cooling_dom.size(L3_sizing=True)
-#
-#
-# def test_size_L4(borefield):
-#     try:
-#         borefield.size(L4_sizing=True)
-#     except ValueError:
-#         assert True
+def test_draw_internals(monkeypatch, borefield):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    borefield.set_fluid_parameters(fluidData)
+    borefield.set_pipe_parameters(pipeData)
+    borefield.draw_borehole_internal()
+
+
+def test_size_L4(hourly_borefield):
+    hourly_borefield.size(L4_sizing=True)
+
+
+def test_cooling_dom(borefield_cooling_dom):
+    borefield_cooling_dom.size()
+
+
+def test_sizing_different_quadrants(borefield):
+    borefield.size(quadrant_sizing=1)
+    borefield.size(quadrant_sizing=2)
+    borefield.size(quadrant_sizing=3)
+    borefield.size(quadrant_sizing=4)
+    borefield.size(quadrant_sizing=1, L3_sizing=True)
+
+
+def test_quadrant_4(borefield):
+    borefield.set_peak_heating(np.array(peakHeating)*8)
+    borefield.size()
+
+
+def test_sizing_L3(borefield):
+    borefield.set_peak_heating(np.array(peakHeating)*8)
+    borefield.size(L3_sizing=True)
+
+
+def test_sizing_L32(borefield_cooling_dom):
+    borefield_cooling_dom.size(L3_sizing=True)
+    borefield_cooling_dom.set_peak_heating(np.array(peakHeating) * 5)
+    borefield_cooling_dom.size(L3_sizing=True)
+
+
+def test_size_L4(borefield):
+    try:
+        borefield.size(L4_sizing=True)
+    except ValueError:
+        assert True
+
+
+def test_load_duration(monkeypatch, hourly_borefield):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    hourly_borefield.plot_load_duration()

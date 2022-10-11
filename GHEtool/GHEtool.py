@@ -1673,7 +1673,7 @@ class Borefield:
             self._print_temperature_profile(H=depth)
 
     def size_by_length_and_width(self, H_max: float, L1: float, L2: float, B_min: float = 3.0,
-                                 B_max: float = 9.0, L2_sizing: bool = True, nb_of_options: int = 5) -> list:
+                                 B_max: float = 9.0, nb_of_options: int = 5) -> list:
         """
         Function to size the borefield by length and with. It returns a list of possible borefield sizes,
         with increasing total length.
@@ -1683,7 +1683,6 @@ class Borefield:
         :param L2: maximal length of borehole field [m]
         :param B_min: minimal borehole spacing [m]
         :param B_max: maximal borehole spacing [m]
-        :param L2_sizing: boolean to check if level two or level three sizing method should be used
         :param nb_of_options: number of options that should be returned.
         :return: list of possible combinations (each combination is a tuple where the first two elements are the
         number of boreholes in each direction, the third element the borehole spacing and the fourth element
