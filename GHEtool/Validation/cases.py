@@ -12,13 +12,11 @@ import numpy as np
 
 if __name__ == "__main__":
     # relevant borefield data for the calculations
-    data = GroundData(110,  # depth (m)
-                      6.5,  # borehole spacing (m)
-                      3.5,  # conductivity of the soil (W/mK)
+    data = GroundData(3.5,  # conductivity of the soil (W/mK)
                       10,   # Ground temperature at infinity (degrees C)
-                      0.2,  # equivalent borehole resistance (K/W)
-                      12,   # width of rectangular field (#)
-                      10)  # length of rectangular field (#)
+                      0.2)  # equivalent borehole resistance (K/W)
+
+    borefield_gt = gt.boreholes.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)
 
     def load_case(number):
         """This function returns the values for one of the four cases."""
@@ -58,8 +56,8 @@ if __name__ == "__main__":
             # limited in the last year by heating
             monthly_load_heating_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
             monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
-            monthly_load_heating = monthly_load_heating_percentage * 300 * 10 ** 3 # kWh
-            monthly_load_cooling = monthly_load_cooling_percentage * 150 * 10 ** 3 # kWh
+            monthly_load_heating = monthly_load_heating_percentage * 300 * 10 ** 3  # kWh
+            monthly_load_cooling = monthly_load_cooling_percentage * 150 * 10 ** 3  # kWh
             peak_cooling = np.array([0., 0., 22., 44., 83., 117., 134., 150., 100., 23., 0., 0.])
             peak_heating = np.array([300., 268., 191., 103., 75., 0., 0., 38., 76., 160., 224., 255.])
 
@@ -73,8 +71,8 @@ if __name__ == "__main__":
         NOTE: these values differ slightly from the values in the mentioned paper. This is due to the fact that GHEtool uses slightly different precalculated data.
         """
 
-        correct_answers_L2 = (56.64, 118.7, 66.88, 92.67)
-        correct_answers_L3 = (56.77, 119.23, 66.48, 91.63)
+        correct_answers_L2 = (56.64, 116.7, 66.97, 93.10)
+        correct_answers_L3 = (56.6, 118.17, 66.56, 93.22)
 
         for i in (1, 2, 3, 4):
             monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(i)
@@ -86,6 +84,7 @@ if __name__ == "__main__":
                                   baseload_cooling=monthly_load_cooling)
 
             borefield.set_ground_parameters(data)
+            borefield.set_borefield(borefield_gt)
 
             # set temperature boundaries
             borefield.set_max_ground_temperature(16)  # maximum temperature
@@ -109,7 +108,7 @@ if __name__ == "__main__":
 
         # create custom datafile
 
-        correct_answers = (56.64, 118.7, 66.88, 92.67)
+        correct_answers = (56.64, 116.7, 66.97, 93.1)
         li = [i for i in range(0, 12)]
         borefield = Borefield(simulation_period=20,
                               peak_heating=li,
@@ -120,7 +119,6 @@ if __name__ == "__main__":
         borefield.set_ground_parameters(data)
 
         customField = gt.boreholes.rectangle_field(N_1=12, N_2=10, B_1=6.5, B_2=6.5, H=110., D=4, r_b=0.075)
-        borefield.create_custom_dataset(customField, "custom_field")
 
         for i in (1, 2, 3, 4):
             monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(i)
@@ -132,13 +130,11 @@ if __name__ == "__main__":
                                   baseload_cooling=monthly_load_cooling)
 
             borefield.set_ground_parameters(data)
+            borefield.set_borefield(customField)
 
             # set temperature boundaries
             borefield.set_max_ground_temperature(16)  # maximum temperature
             borefield.set_min_ground_temperature(0)  # minimum temperature
-
-            # set the custom field
-            borefield.set_custom_gfunction("customfield")
 
             borefield.size(100)
             print(f'correct answer: {correct_answers[i-1]}; calculated '
@@ -158,6 +154,7 @@ if __name__ == "__main__":
                           baseload_cooling=monthly_load_cooling)
 
     borefield.set_ground_parameters(data)
+    borefield.set_borefield(borefield_gt)
 
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)  # maximum temperature
