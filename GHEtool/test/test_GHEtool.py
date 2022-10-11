@@ -66,6 +66,23 @@ def borefield():
     borefield.set_min_ground_temperature(0)  # minimum temperature
     return borefield
 
+@pytest.fixture
+def borefield_custom_data():
+    borefield = Borefield(simulation_period=20,
+                          peak_heating=peakHeating,
+                          peak_cooling=peakCooling,
+                          baseload_heating=monthlyLoadHeating,
+                          baseload_cooling=monthlyLoadCooling)
+
+    borefield.set_ground_parameters(data)
+    borefield.set_borefield(borefield_gt)
+    borefield.create_custom_dataset()
+
+    # set temperature boundaries
+    borefield.set_max_ground_temperature(16)  # maximum temperature
+    borefield.set_min_ground_temperature(0)  # minimum temperature
+    return borefield
+
 
 @pytest.fixture
 def empty_borefield():
@@ -173,7 +190,9 @@ def test_draw_internals(monkeypatch, borefield):
 
 
 def test_size_L4(hourly_borefield):
-    hourly_borefield.size(L4_sizing=True)
+    assert hourly_borefield._check_hourly_load()
+    hourly_borefield.sizing_setup(L4_sizing=True)
+    hourly_borefield.size()
 
 
 def test_cooling_dom(borefield_cooling_dom):
@@ -204,7 +223,7 @@ def test_sizing_L32(borefield_cooling_dom):
     borefield_cooling_dom.size(L3_sizing=True)
 
 
-def test_size_L4(borefield):
+def test_size_L4_without_data(borefield):
     try:
         borefield.size(L4_sizing=True)
     except ValueError:
@@ -214,3 +233,31 @@ def test_size_L4(borefield):
 def test_load_duration(monkeypatch, hourly_borefield):
     monkeypatch.setattr(plt, 'show', lambda: None)
     hourly_borefield.plot_load_duration()
+
+
+def test_optimise_load_profile_without_data(borefield):
+    try:
+        borefield.optimise_load_profile()
+    except ValueError:
+        assert True
+
+
+def test_precalculated_out_of_bound_1(borefield_custom_data):
+    borefield_custom_data.gfunction(10**10, H=100)
+
+
+def test_precalculated_out_of_bound_2(borefield_custom_data):
+    borefield_custom_data.gfunction(1, H=100)
+
+
+def test_precalculated_out_of_bound_3(borefield_custom_data):
+    borefield_custom_data.gfunction(10 ** 10, H=100)
+
+
+def test_precalculated_data_1(borefield_custom_data):
+    borefield_custom_data.gfunction([3600*100, 3600*100], 100)
+
+
+def test_precalculated_data_2(borefield_custom_data):
+    borefield_custom_data.gfunction([3600*100, 3600*100, 3600*101], 100)
+

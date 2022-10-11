@@ -829,7 +829,7 @@ class Borefield:
 
         # check if hourly data is given
         if not self._check_hourly_load():
-            raise Exception("The hourly data is incorrect.")
+            raise ValueError("The hourly data is incorrect.")
 
         # initiate with a given depth
         self.H_init: float = H_init
@@ -1302,7 +1302,7 @@ class Borefield:
             return: np.ndarray with gfunction values
             """
             time_value_np = np.array(time_value)
-            if not isinstance(time_value, float) and len(time_value_np) > Borefield.DEFAULT_NUMBER_OF_TIMESTEPS:
+            if not isinstance(time_value, (float, int)) and len(time_value_np) > Borefield.DEFAULT_NUMBER_OF_TIMESTEPS:
                 # due to this many requested time values, the calculation will be slow.
                 # there will be interpolation
 
@@ -1315,7 +1315,7 @@ class Borefield:
                 return np.interp(time_value, time_value_new, gfunc_uniform_T)
 
             # check if there are double values
-            if not isinstance(time_value, float) and len(time_value_np) != len(np.unique(np.asarray(time_value))):
+            if not isinstance(time_value, (float, int)) and len(time_value_np) != len(np.unique(np.asarray(time_value))):
                 gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.alpha, np.unique(time_value_np),
                                                          options=self.options_pygfunction).gFunc
 
@@ -1339,6 +1339,9 @@ class Borefield:
             # interpolate
             points, values = self.custom_gfunction
 
+            max_time_value = time_value if isinstance(time_value, (float, int)) else max(time_value)
+            min_time_value = time_value if isinstance(time_value, (float, int)) else min(time_value)
+
             # check if H in precalculated data range
             if H > max(points[0]) or H < min(points[0]):
                 warnings.warn("The requested depth of " + str(H) + "m is outside the bounds of " + str(min(points[0])) +
@@ -1346,18 +1349,18 @@ class Borefield:
                 return jit_gfunction_calculation()
 
             # check if max time in precalculated data range
-            if not isinstance(time_value, float) and max(time_value) > max(points[1]):
-                warnings.warn("The requested time of " + str(max(time_value)) + "s is outside the bounds of " + str(min(points[1])) +\
+            if max_time_value > max(points[1]):
+                warnings.warn("The requested time of " + str(max_time_value) + "s is outside the bounds of " + str(min(points[1])) +\
                               " and " + str(max(points[1])) + " of the precalculated data. The gfunctions will be calculated jit.", UserWarning)
                 return jit_gfunction_calculation()
 
             # check if min time in precalculated data range
-            if not isinstance(time_value, float) and min(time_value) < min(points[1]):
-                warnings.warn("The requested time of " + str(min(time_value)) + "s is outside the bounds of " + str(min(points[1])) +\
+            if min_time_value < min(points[1]):
+                warnings.warn("The requested time of " + str(min_time_value) + "s is outside the bounds of " + str(min(points[1])) +\
                               " and " + str(max(points[1])) + " of the precalculated data. The gfunctions will be calculated jit.", UserWarning)
                 return jit_gfunction_calculation()
 
-            if not isinstance(time_value, float):
+            if not isinstance(time_value, (float, int)):
                 # multiple values are requested
                 g_value = interpolate.interpn(points, values, np.array([[H, t] for t in time_value]))
             else:
@@ -1581,7 +1584,7 @@ class Borefield:
         use_constant_Rb_backup = self.use_constant_Rb
         self.use_constant_Rb = True
 
-        # if no hourly profile is given, load one
+        # check if hourly profile is given
         if not self._check_hourly_load():
             return
 

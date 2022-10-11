@@ -72,7 +72,7 @@ To check whether everything is installed correctly, run the following command
 pytest --pyargs GHEtool
 ```
 
-This runs some predefined cases to see whether all the internal dependencies work correctly. 9 test should pass successfully.
+This runs some predefined cases to see whether all the internal dependencies work correctly. All test should pass successfully.
 
 ### Get started with GHEtool
 
