@@ -1,2 +1,2 @@
 [run]
-omit = gui/*,GUI.py,change_pickle_data.py
+omit = gui/*,Examples/*,Validation/*,GUI.py,change_pickle_data.py

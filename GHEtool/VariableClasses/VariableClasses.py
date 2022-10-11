@@ -1,6 +1,3 @@
-import warnings
-
-
 class GroundData:
     __slots__ = 'k_s', 'Tg', 'Rb', 'flux', 'volumetric_heat_capacity', 'alpha'
 
