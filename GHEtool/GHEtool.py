@@ -39,7 +39,7 @@ class Borefield:
     # define default values
     DEFAULT_INVESTMENT: list = [35, 0]  # 35 EUR/m
     DEFAULT_LENGTH_PEAK: int = 6  # hours
-    DEFAULT_DEPTH_ARRAY: list = [1] + list(range(25, 351, 25))  # m
+    DEFAULT_DEPTH_ARRAY: list = list(range(25, 351, 25))  # m
     DEFAULT_TIME_ARRAY: list = timeValues()  # sec
     DEFAULT_NUMBER_OF_TIMESTEPS: int = 100
 
@@ -273,6 +273,7 @@ class Borefield:
         self.set_number_of_boreholes(len(borefield))
         self.D = borefield[0].D
         self.r_b = borefield[0].r_b
+        self.H = borefield[0].H
 
     @borefield.deleter
     def borefield(self):
@@ -539,11 +540,8 @@ class Borefield:
         # initiate pipe
         pipe = gt.pipes.MultipleUTube(self.pos, self.r_in, self.r_out, borehole, self.k_s, self.k_g,
                                       self.R_p + self.R_f, self.number_of_pipes, J=2)
-        try:
-            # only in pygfunction >= v2.2.1
-            return pipe.effective_borehole_thermal_resistance(self.mfr, self.Cp)
-        except AttributeError:
-            return gt.pipes.borehole_thermal_resistance(pipe, self.mfr, self.Cp)
+
+        return pipe.effective_borehole_thermal_resistance(self.mfr, self.Cp)
 
     @property
     def _axis_symmetrical_pipe(self) -> list:
