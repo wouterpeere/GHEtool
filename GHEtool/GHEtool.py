@@ -42,6 +42,7 @@ class Borefield:
     DEFAULT_DEPTH_ARRAY: list = list(range(25, 351, 25))  # m
     DEFAULT_TIME_ARRAY: list = timeValues()  # sec
     DEFAULT_NUMBER_OF_TIMESTEPS: int = 100
+    THRESHOLD_DEPTH_ERROR: int = 10000  # m
 
     temp: int = 0
     HOURLY_LOAD_ARRAY: list = []
@@ -1294,6 +1295,13 @@ class Borefield:
         :param H: depth at which the gfunctions should be evaluated
         :return: np.array of gfunction values
         """
+
+        # when using a variable ground temperature, sometimes no solution can be found
+        if not self.use_constant_Tg and H > Borefield.THRESHOLD_DEPTH_ERROR:
+            raise ValueError("Due to the use of a variable ground temperature, no solution can be found."
+                             "To see the temperature profile, one can plot it using the depth of ",
+                             str(Borefield.THRESHOLD_DEPTH_ERROR), "m.")
+
 
         def jit_gfunction_calculation() -> np.ndarray:
             """
