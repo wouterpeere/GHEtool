@@ -262,3 +262,11 @@ def test_precalculated_data_1(borefield_custom_data):
 def test_precalculated_data_2(borefield_custom_data):
     borefield_custom_data.gfunction([3600*100, 3600*100, 3600*101], 100)
 
+
+def test_error_variable_Tg(borefield):
+    try:
+        borefield.Tg = 14
+        borefield.sizing_setup(use_constant_Tg=False)
+    except ValueError:
+        assert True
+
