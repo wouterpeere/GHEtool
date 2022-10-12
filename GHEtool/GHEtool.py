@@ -1679,7 +1679,7 @@ class Borefield:
         DT_min = self.Tf_min - min_temp + 1000
 
         # if the temperature limit is not crossed, return None
-        if not DT_min < 1000 or not DT_max < 1000:
+        if self.Tf_max - 0.1 > max_temp and self.Tf_min + 0.1 < min_temp:
             return
 
         # True if heating/extraction dominated
