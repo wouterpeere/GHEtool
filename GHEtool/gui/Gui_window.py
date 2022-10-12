@@ -1685,8 +1685,8 @@ class MainWindow(QtWidgets_QMainWindow, Ui_GHEtool):
                     where="pre", lw=1.5, label=f'Tf {self.translations.BaseCooling}')
             ax.step(np_array(time_array), np_array(results_month_heating), color='#ffc857', linestyle="dashed",
                     where="pre", lw=1.5, label=f'Tf {self.translations.BaseHeating}')
-            ax.hlines(boreField.Tf_C, 0, ds.simulationPeriod, colors='#ffc857', linestyles='dashed', label='', lw=1)
-            ax.hlines(boreField.Tf_H, 0, ds.simulationPeriod, colors='#54bceb', linestyles='dashed', label='', lw=1)
+            ax.hlines(boreField.Tf_min, 0, ds.simulationPeriod, colors='#ffc857', linestyles='dashed', label='', lw=1)
+            ax.hlines(boreField.Tf_max, 0, ds.simulationPeriod, colors='#54bceb', linestyles='dashed', label='', lw=1)
             ax.set_xticks(range(0, ds.simulationPeriod+1, 2))
             # Plot legend
             ax.set_xlim(left=0, right=ds.simulationPeriod)
