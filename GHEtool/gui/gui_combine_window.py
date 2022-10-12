@@ -600,6 +600,8 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                 pk_dump(saving, f, pk_HP)
         except FileNotFoundError:
             self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
+        except PermissionError:
+            return
 
     def fun_load(self) -> None:
         """
