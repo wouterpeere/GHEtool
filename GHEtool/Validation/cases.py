@@ -6,9 +6,10 @@ This document contains 4 different cases referring to the paper: Peere, W., Pica
 
 """
 
-from GHEtool import Borefield, GroundData
-import pygfunction as gt
 import numpy as np
+import pygfunction as gt
+
+from GHEtool import Borefield, GroundData
 
 # relevant borefield data for the calculations
 data = GroundData(3.5,  # conductivity of the soil (W/mK)

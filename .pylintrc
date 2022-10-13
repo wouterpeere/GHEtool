@@ -1,0 +1,4 @@
+[FORMAT]
+max-line-length=160
+ignored-modules=scipy.special
+extension-pkg-whitelist=PySide6

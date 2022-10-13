@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="52mm"
+   height="35.571426mm"
+   viewBox="0 0 52 35.571425"
+   version="1.1"
+   id="svg11708"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="Flag_English.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview11710"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     fit-margin-top="1"
+     fit-margin-left="1"
+     fit-margin-right="1"
+     fit-margin-bottom="1"
+     inkscape:zoom="2.8284271"
+     inkscape:cx="54.623999"
+     inkscape:cy="66.291261"
+     inkscape:window-width="1920"
+     inkscape:window-height="1027"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="united_kingdon" />
+  <defs
+     id="defs11705">
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath1901">
+      <path
+         id="path1903"
+         d="M 1727.4838,-30.750004 V 569.25 h 1000 V -30.750004 Z"
+         inkscape:connector-curvature="0"
+         style="fill:#00247d;stroke-width:20" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath1897">
+      <path
+         id="path1899"
+         d="M 1727.4838,-30.750004 V 569.25 h 1000 V -30.750004 Z"
+         inkscape:connector-curvature="0"
+         style="fill:#00247d;stroke-width:20" />
+    </clipPath>
+  </defs>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-25.667004,-110.82952)">
+    <g
+       style="display:inline"
+       id="united_kingdon"
+       transform="matrix(0.01852083,0,0,0.02072569,-5.32743,112.46684)"
+       inkscape:label="united_kingdon">
+      <path
+         id="path1865"
+         d="M 1727.4838,-30.750004 V 1589.0478 h 2699.663 V -30.750004 Z"
+         inkscape:connector-curvature="0"
+         style="fill:#4758a9;fill-opacity:1;stroke-width:53.9933" />
+      <path
+         clip-path="url(#clipPath1901)"
+         id="path1867"
+         d="m 1727.4838,-30.750004 1000,600.000004 m 0,-600.000004 -1000,600.000004"
+         inkscape:connector-curvature="0"
+         style="stroke:#ffffff;stroke-width:120;stroke-opacity:1"
+         transform="matrix(2.699663,0,0,2.699663,-2936.1403,52.264645)" />
+      <path
+         id="path1869"
+         clip-path="url(#clipPath1897)"
+         d="m 1727.4838,-30.750004 1000,600.000004 m 0,-600.000004 -1000,600.000004"
+         inkscape:connector-curvature="0"
+         style="stroke:#ed5565;stroke-width:80;stroke-opacity:1"
+         transform="matrix(2.699663,0,0,2.699663,-2936.1403,52.264645)" />
+      <path
+         id="path1871"
+         d="M 3077.3153,-30.750004 V 1589.0478 M 1727.4838,779.14892 h 2699.663"
+         inkscape:connector-curvature="0"
+         style="stroke:#ffffff;stroke-width:539.933;stroke-opacity:1" />
+      <path
+         id="path1873"
+         d="M 3077.3153,-30.750004 V 1589.0478 M 1727.4838,779.14892 h 2699.663"
+         inkscape:connector-curvature="0"
+         style="stroke:#ed5565;stroke-width:323.96;stroke-opacity:1" />
+    </g>
+  </g>
+</svg>
