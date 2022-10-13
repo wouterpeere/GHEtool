@@ -49,6 +49,8 @@ currentdir = dirname(realpath(__file__))
 parentdir = dirname(currentdir)
 path.append(parentdir)
 
+BACKUP_FILENAME: str = 'backup.GHEtool'
+
 
 # main GUI class
 class MainWindow(QtWidgets_QMainWindow, UiGhetool):
@@ -80,7 +82,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # allow checking of changes
         self.checking: bool = False
         # create backup path in home documents directory
-        self.backup_path: str = str(PurePath(Path.home(), 'Documents/GHEtool', 'backup.pkl'))
+        self.backup_path: str = str(PurePath(Path.home(), 'Documents/GHEtool', BACKUP_FILENAME))
         # check if backup folder exits and otherwise create it
         makedirs(dirname(self.backup_path), exist_ok=True)
         self.translations: Translations = Translations()  # init translation class
@@ -461,7 +463,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # get filename separated from path
         _, filename = MainWindow.filenameDefault if self.filename == MainWindow.filenameDefault else os_split(self.filename[0])
         # title determine new title if a filename is not empty
-        title: str = "" if filename == "" else f' - {filename.replace(".pkl", "")}'
+        title: str = "" if filename == "" else f' - {filename.replace(".GHEtool", "")}'
         # create new title name
         name: str = f"GHEtool {title}*" if self.changedFile else f"GHEtool {title}"
         # set new title name
@@ -598,6 +600,8 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                 pk_dump(saving, f, pk_HP)
         except FileNotFoundError:
             self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
+        except PermissionError:
+            return
 
     def fun_load(self) -> None:
         """
@@ -606,7 +610,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         """
         # open interface and get file name
         self.filename = QtWidgets_QFileDialog.getOpenFileName(
-            self.central_widget, caption=self.translations.ChoosePKL[self.gui_structure.option_language.get_value()], filter="Pickle (*.pkl)"
+            self.central_widget, caption=self.translations.ChoosePKL[self.gui_structure.option_language.get_value()], filter="GHEtool (*.GHEtool)"
         )
         # load selected data
         self.fun_load_known_filename()
@@ -658,8 +662,8 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # ask for pickle file if the filename is still the default
         if self.filename == MainWindow.filenameDefault:
             self.filename: tuple = QtWidgets_QFileDialog.getSaveFileName(
-                self.central_widget, caption=self.translations.SavePKL[self.gui_structure.option_language.get_value()], filter="Pickle (*.pkl)",
-                dir=self.backup_path.replace('backup.pkl', ''),
+                self.central_widget, caption=self.translations.SavePKL[self.gui_structure.option_language.get_value()], filter="GHEtool (*.GHEtool)",
+                dir=self.backup_path.replace(BACKUP_FILENAME, ''),
             )
             # break function if no file is selected
             if self.filename == MainWindow.filenameDefault:
@@ -988,7 +992,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # get filename at storage place
         filename = QtWidgets_QFileDialog.getSaveFileName(
             self.central_widget, caption=self.translations.SaveFigure[self.gui_structure.option_language.get_value()],
-            dir=self.backup_path.replace('backup.pkl', ''),
+            dir=self.backup_path.replace(BACKUP_FILENAME, ''),
             filter="PNG (*.png);;svg (*.svg);;PDF (*.pdf)",
             selectedFilter="png (*.png);;svg (*.svg);;PDF (*.pdf)",
         )
