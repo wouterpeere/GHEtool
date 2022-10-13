@@ -5,4 +5,3 @@ pygfunction>=2.2.1
 PyQt5>=5.15.7
 scipy>=1.8.1
 openpyxl>=3.0.7
-PySide6>=6.3.1
