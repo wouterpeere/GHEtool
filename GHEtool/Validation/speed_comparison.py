@@ -4,12 +4,14 @@ This is done for two fields with different sizes. It shows that, specifically fo
 """
 
 import time
+import pygfunction as gt
 
 from GHEtool import Borefield, GroundData
 
 
 def test_64_boreholes():
-    data = GroundData(110, 6, 3, 10, 0.2, 8, 8, 2.4 * 10**6)
+    data = GroundData(3, 10, 0.2)
+    borefield_64 = gt.boreholes.rectangle_field(8, 8, 6, 6, 110, 1, 0.075)
 
     # monthly loading values
     peak_cooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]  # Peak cooling in kW
@@ -35,20 +37,24 @@ def test_64_boreholes():
                           baseload_cooling=monthly_load_cooling)
 
     borefield.set_ground_parameters(data)
+    borefield.set_borefield(borefield_64)
 
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)  # maximum temperature
     borefield.set_min_ground_temperature(0)  # minimum temperature
+
+    # precalculate
+    borefield.create_custom_dataset()
 
     # size borefield
     t1 = time.time()
     depth_precalculated = borefield.size(100)
     t1_end = time.time()
 
-    ### size without the precalculation
+    # delete precalculated data
+    del borefield.custom_gfunction
 
-    borefield.use_precalculated_data = False
-    # size borefield
+    ### size without the precalculation
     t2 = time.time()
     depth_calculated = borefield.size(100)
     t2_end = time.time()
@@ -60,7 +66,8 @@ def test_64_boreholes():
 
 
 def test_10_boreholes():
-    data = GroundData(110, 6, 3, 10, 0.2, 2, 5)
+    data = GroundData(3, 10, 0.2)
+    borefield_10 = gt.boreholes.rectangle_field(2, 5, 6, 6, 110, 1, 0.075)
 
     # monthly loading values
     peak_cooling = [0., 0, 3., 9., 13., 20., 43., 30., 16., 7., 0., 0.]  # Peak cooling in kW
@@ -86,20 +93,24 @@ def test_10_boreholes():
                           baseload_cooling=monthly_load_cooling)
 
     borefield.set_ground_parameters(data)
+    borefield.set_borefield(borefield_10)
 
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)  # maximum temperature
     borefield.set_min_ground_temperature(0)  # minimum temperature
+
+    # precalculate
+    borefield.create_custom_dataset()
 
     # size borefield
     t1 = time.time()
     depth_precalculated = borefield.size(100)
     t1_end = time.time()
 
-    ### size without the precalculation
+    # delete precalculated data
+    del borefield.custom_gfunction
 
-    borefield.use_precalculated_data = False
-    # size borefield
+    ### size without the precalculation
     t2 = time.time()
     depth_calculated = borefield.size(100)
     t2_end = time.time()

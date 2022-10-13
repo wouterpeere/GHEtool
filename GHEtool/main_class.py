@@ -1,43 +1,34 @@
-import os.path
-import pickle
-import warnings
-from math import pi
-import sys
-
-import matplotlib.pyplot as plt
 import numpy as np
-import pygfunction as gt
+import pickle
 from scipy import interpolate
 from scipy.signal import convolve
+from math import pi
+import pygfunction as gt
+import os.path
+import matplotlib.pyplot as plt
+import functools
+import warnings
 
-from typing import Optional, Tuple
-
-from GHEtool.VariableClasses.VariableClasses import *
-
-
-if getattr(sys, 'frozen', False):
-    FOLDER = os.path.dirname(sys.executable)  # cx_Freeze frozen
+if __name__ == "__main__":
+    from VariableClasses import *
 else:
-    FOLDER = os.path.dirname(os.path.realpath(__file__))  # Other packers
+    try:
+        from .VariableClasses import *
+    except ImportError:
+        from VariableClasses import *
+
+FOLDER = os.path.dirname(os.path.realpath(__file__))  # solve problem with importing GHEtool from sub-folders
 
 
-def timeValues():
+def timeValues(dt = 3600., t_max = 100. * 8760 * 3600.):
     """This function calculates the default time values for the g-function."""
-    dt: float = 3600.  # Time step (s)
-    t_max: float = 100. * 8760. * 3600.  # Maximum time (s)
+    dt: float = dt  # Time step (s)
+    t_max: float = t_max  # Maximum time (s)
 
     # Load aggregation scheme
     load_agg = gt.load_aggregation.ClaessonJaved(dt, t_max)
 
     return load_agg.get_times_for_simulation()
-
-from dataclasses import dataclass
-
-
-@dataclass(**{'slots': True} if sys.version_info.minor > 9 else {})
-class PrintSettings:
-    legend: bool = False
-    plot_hourly: bool = False
 
 
 class Borefield:
@@ -48,10 +39,10 @@ class Borefield:
     # define default values
     DEFAULT_INVESTMENT: list = [35, 0]  # 35 EUR/m
     DEFAULT_LENGTH_PEAK: int = 6  # hours
-    DEFAULT_DEPTH_ARRAY: list = [1] + list(range(25, 351, 25))  # m
+    DEFAULT_DEPTH_ARRAY: list = list(range(25, 351, 25))  # m
     DEFAULT_TIME_ARRAY: list = timeValues()  # sec
-    DEFAULT_CONVERGENCE_MINIMAL_DEPTH: int = 15
-    DEFAULT_CONVERGENCE_MAXIMAL_DEPTH: int = 10
+    DEFAULT_NUMBER_OF_TIMESTEPS: int = 100
+    THRESHOLD_DEPTH_ERROR: int = 10000  # m
 
     temp: int = 0
     HOURLY_LOAD_ARRAY: list = []
@@ -62,18 +53,18 @@ class Borefield:
 
     __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'H_init', 'B', 'N_1', 'N_2', 'Rb', 'k_s', 'Tg', 'ty', 'tm', \
                 'td', 'time', 'hourly_heating_load', 'H_max', 'use_constant_Tg', 'flux', 'volumetric_heat_capacity',\
-                'hourly_cooling_load', 'number_of_boreholes', 'borefield', 'custom_gfunction', 'cost_investment', \
-                'length_peak', 'th', 'Tf_H', 'Tf_C', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
+                'hourly_cooling_load', 'number_of_boreholes', '_borefield', '_custom_gfunction', 'cost_investment', \
+                'length_peak', 'th', 'Tf_max', 'Tf_min', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
                 'monthly_load_cooling', 'peak_heating', 'imbalance', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm', \
-                'peak_cooling', 'simulation_period', 'gfunction_interpolation_array', 'fluid_data_available', \
-                'results_peak_heating', 'pipe_data_available', 'alpha', 'time_L4', 'temperature_result',\
+                'peak_cooling', 'simulation_period', 'fluid_data_available',\
+                'results_peak_heating', 'pipe_data_available', 'alpha', 'time_L4', 'options_pygfunction',\
                 'results_peak_cooling', 'results_month_cooling', 'results_month_heating', 'Tb', 'THRESHOLD_WARNING_SHALLOW_FIELD', \
                 'gui', 'time_L3_first_year', 'time_L3_last_year', 'peak_heating_external', 'peak_cooling_external', \
                 'monthly_load_heating_external', 'monthly_load_cooling_external', 'hourly_heating_load_external', \
                 'hourly_cooling_load_external', 'hourly_heating_load_on_the_borefield', 'hourly_cooling_load_on_the_borefield', \
                 'k_f', 'mfr', 'Cp', 'mu', 'rho', 'use_constant_Rb', 'h_f', 'R_f', 'R_p', 'printing', 'combo', \
-                'r_in', 'r_out', 'k_p', 'D_s', 'r_b', 'number_of_pipes', 'epsilon', 'k_g', 'pos', 'D', \
-                'L2_sizing', 'L3_sizing', 'L4_sizing', 'quadrant_sizing', 'H_init', 'use_precalculated_data', 'convergence', 'print_setting'
+                'r_in', 'r_out', 'k_p', 'D_s', 'r_b', 'number_of_pipes', 'epsilon', 'k_g', 'pos', 'D', 'jit_calculation', \
+                'L2_sizing', 'L3_sizing', 'L4_sizing', 'quadrant_sizing', 'H_init', 'use_precalculated_data'
 
     def __init__(self, simulation_period: int = 20, number_of_boreholes: int = None, peak_heating: list = None,
                  peak_cooling: list = None, baseload_heating: list = None, baseload_cooling: list = None, investement_cost: list = None,
@@ -114,14 +105,16 @@ class Borefield:
         #
         self.monthly_load = np.array([])
         self.H_init: float = 0.
-        self.convergence = 0
 
-        self.gfunction_interpolation_array = np.array([])
+        ## params w.r.t. pygfunction
+        # true if the gfunctions should be calculated in the iteration when they
+        # are not precalculated
+        self.jit_calculation: bool = True
+        self.options_pygfunction: dict = {"method":"equivalent"}
 
         # initialize variables for temperature plotting
         self.results_peak_heating = np.array([])  # list with the minimum temperatures due to the peak heating
         self.results_peak_cooling = np.array([]) # list with the maximum temperatures due to peak cooling
-        self.temperature_result = np.array([])  # list with the temperatures with an hourly profile
         self.Tb = np.array([])  # list of borehole wall temperatures
 
         # initiate variables for optimal sizing
@@ -172,6 +165,7 @@ class Borefield:
         self.Rb = 0.  # effective borehole thermal resistance mK/W
         self.N_1 = 0  # number of boreholes in one direction #
         self.N_2 = 0  # number of boreholes in the other direction #
+        self.D: float = 0.  # burial depth m
         self.flux = 0.  # geothermal heat flux W/m2
         self.volumetric_heat_capacity = 0.  # ground volumetric heat capacity (J/m3K)
         self.alpha = 0.  # ground diffusivity (m2/s)
@@ -184,8 +178,8 @@ class Borefield:
         self.Cp = 0.  # Thermal capacity J/kgK
         self.mu = 0.  # Dynamic viscosity Pa/s.
         self.Tf: float = 0.  # temperature of the fluid
-        self.Tf_H: float = 16.  # maximum temperature of the fluid
-        self.Tf_C: float = 0.  # minimum temperature of the fluid
+        self.Tf_max: float = 16.  # maximum temperature of the fluid
+        self.Tf_min: float = 0.  # minimum temperature of the fluid
         self.fluid_data_available: bool = False  # needs to be True in order to calculate Rb*
 
         # initiate borehole parameters
@@ -196,7 +190,6 @@ class Borefield:
         self.k_p: float = 0.  # pipe thermal conductivity W/mK
         self.D_s: float = 0.  # distance of pipe until center of the borehole
         self.number_of_pipes: int = 0  # number of pipes in the borehole (single = 1, double = 2 etc.)
-        self.D: float = 4.  # burial depth m
         self.epsilon = 1e-6  # pipe roughness
         self.pipe_data_available: bool = False  # needs to be True in order to calculate Rb*
 
@@ -233,17 +226,11 @@ class Borefield:
         # set length of the peak
         self.set_length_peak()
 
-        # calculate number of boreholes
-        self.set_number_of_boreholes(number_of_boreholes if number_of_boreholes is not None else 1)
-
         # set a custom borefield
-        self.borefield = None
-        self.set_borefield(borefield)
+        self.borefield = borefield
 
         # set a custom g-function
-        self.custom_gfunction = None
-        self.set_custom_gfunction(custom_gfunction)
-        self.print_setting: PrintSettings = PrintSettings()
+        self.custom_gfunction = custom_gfunction
 
     @staticmethod
     def configuration_string(N_1: int, N_2: int) -> str:
@@ -261,27 +248,97 @@ class Borefield:
 
         :return None
         """
-        self.number_of_boreholes = number_of_boreholes if number_of_boreholes > 1 else self.N_1 * self.N_2
+        self.number_of_boreholes = len(self.borefield) if self.borefield is not None else 0
 
     def set_borefield(self, borefield=None) -> None:
+        if borefield is None:
+            return
+        self.borefield = borefield
+
+    @property
+    def borefield(self):
+        return self._borefield
+
+    @borefield.setter
+    def borefield(self, borefield=None) -> None:
         """
         This function sets the borefield configuration. When no input, an empty array of length N_1 * N_2 will be made.
 
         :return None
         """
         if borefield is None:
+            del self.borefield
             return
-        self.borefield = borefield
+        self._borefield = borefield
         self.set_number_of_boreholes(len(borefield))
+        self.D = borefield[0].D
+        self.r_b = borefield[0].r_b
+        self.H = borefield[0].H
 
-    def set_custom_gfunction(self, custom_gfunction) -> None:
-        """
-        This functions sets the custom gfunction.
+    @borefield.deleter
+    def borefield(self):
+        self._borefield = None
+        self.set_number_of_boreholes(0)
 
-        :return None
+    def load_custom_gfunction(self, location) -> None:
         """
-        self.custom_gfunction = custom_gfunction
-        self.gfunction_interpolation_array: list = []
+        This function loads the custom gfunction.
+
+        :param location: location of the custom_gfunction file
+        :return: None
+        """
+
+        # load data fileImport
+        data = pickle.load(open(location, "rb"))
+        self.custom_gfunction = data
+
+    @property
+    def custom_gfunction(self):
+        return self._custom_gfunction
+
+    @custom_gfunction.setter
+    def custom_gfunction(self, custom_gfunction) -> None:
+        """
+         This functions sets the custom gfunction.
+
+         :param custom_gfunction: custom gfunction datafile
+         :return None
+         """
+        # if custom_gfunction is empty, the value has to be removed
+        if custom_gfunction is None:
+            del self.custom_gfunction
+            return
+
+        def make_interpolation_list_custom(custom_gfunction) -> tuple:
+            """
+            This function creates an interpolation list from a custom dataset and saves it under
+            gfunction_interpolation_array.
+
+            :return: Tuple with datapoints and their corresponding values
+            """
+
+            # remove the time value
+            Time = Borefield.DEFAULT_TIME_ARRAY
+            try:
+                custom_gfunction.pop("Time")
+            except KeyError:
+                custom_gfunction = custom_gfunction
+
+            H_array = list(custom_gfunction["Data"].keys())
+            H_array.sort()
+
+            points = (H_array, Time)
+
+            values = [custom_gfunction["Data"][h] for h in H_array]
+
+            return (points, values)
+
+        self._custom_gfunction = make_interpolation_list_custom(custom_gfunction)
+
+
+    @custom_gfunction.deleter
+    def custom_gfunction(self) -> None:
+        self._custom_gfunction = None
 
     def set_investment_cost(self, investement_cost=None) -> None:
         """
@@ -339,12 +396,6 @@ class Borefield:
 
         :return None
         """
-        self.H: float = data.H  # Borehole length (m)
-        self.B: float = data.B  # Borehole spacing (m)
-
-        self.N_1: int = data.N_1
-        self.N_2: int = data.N_2
-
         self.Rb: float = data.Rb
 
         # Ground properties
@@ -354,12 +405,8 @@ class Borefield:
         self.alpha: float = data.alpha  # Ground difussivity (defined as k_s/volumetric_heat_capacity)
         self.flux: float = data.flux  # Ground thermal heat flux (W/m2)
 
-        # sets the number of boreholes as if it was a rectangular field, iff there is not yet a number of boreholes
-        # defined by a custom configuration
-        self.set_number_of_boreholes(self.N_1 * self.N_2)
-
         # new ground data implies that a new g-function should be loaded
-        self.gfunction_interpolation_array = []
+        del self.custom_gfunction
 
     def set_fluid_parameters(self, data: FluidData) -> None:
         """
@@ -389,11 +436,10 @@ class Borefield:
         self.r_out = data.r_out  # outer pipe radius m
         self.k_p = data.k_p  # pipe thermal conductivity W/mK
         self.D_s = data.D_s  # distance of pipe until center m
-        self.r_b = data.r_b  # borehole radius m
         self.number_of_pipes = data.number_of_pipes  # number of pipes #
         self.epsilon = data.epsilon  # pipe roughness
         self.k_g = data.k_g  # grout thermal conductivity W/mK
-        self.D = data.D  # burial depth m
+
         # calculates the position of the pipes based on an axis-symmetrical positioning
         self.pos: list = self._axis_symmetrical_pipe
 
@@ -409,7 +455,7 @@ class Borefield:
 
         :return None
         """
-        self.Tf_H: float = temp
+        self.Tf_max: float = temp
 
     def set_min_ground_temperature(self, temp: float) -> None:
         """
@@ -417,7 +463,7 @@ class Borefield:
 
         :return None
         """
-        self.Tf_C: float = temp
+        self.Tf_min: float = temp
 
     def set_mass_flow_rate(self, mfr: float) -> None:
         """
@@ -494,11 +540,8 @@ class Borefield:
         # initiate pipe
         pipe = gt.pipes.MultipleUTube(self.pos, self.r_in, self.r_out, borehole, self.k_s, self.k_g,
                                       self.R_p + self.R_f, self.number_of_pipes, J=2)
-        try:
-            # only in pygfunction >= v2.2.1
-            return pipe.effective_borehole_thermal_resistance(self.mfr, self.Cp)
-        except AttributeError:
-            return gt.pipes.borehole_thermal_resistance(pipe, self.mfr, self.Cp)
+
+        return pipe.effective_borehole_thermal_resistance(self.mfr, self.Cp)
 
     @property
     def _axis_symmetrical_pipe(self) -> list:
@@ -586,7 +629,7 @@ class Borefield:
         :param use_constant_Rb: true if a constant Rb* value should be used
         :param use_constant_Tg: true if a constant Tg value should be used (the geothermal flux is neglected)
         :param quadrant_sizing: differs from 0 when a sizing in a certain quadrant is desired
-        :param L2_sizing: true if a sizing with the l_2 method is needed
+        :param L2_sizing: true if a sizing with the L2 method is needed
         :param L3_sizing: true if a sizing with the L3 method is needed
 	    :param L4_sizing: true if a sizing with the L4 method is needed
         :return: None
@@ -605,12 +648,18 @@ class Borefield:
             self.quadrant_sizing = quadrant_sizing
         if self.H_init is not None:
             self.H_init = H_init
-        if L2_sizing is not None:
+        if L2_sizing:
             self.L2_sizing = L2_sizing
-        if L3_sizing is not None:
+            self.L3_sizing = False
+            self.L4_sizing = False
+        if L3_sizing:
             self.L3_sizing = L3_sizing
-        if L4_sizing is not None:
+            self.L2_sizing = False
+            self.L4_sizing = False
+        if L4_sizing:
             self.L4_sizing = L4_sizing
+            self.L2_sizing = False
+            self.L3_sizing = False
 
     def size(self, H_init: float = 100, use_constant_Rb: bool = None, use_constant_Tg: bool = None,
              L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None, quadrant_sizing: int = None) -> float:
@@ -658,18 +707,14 @@ class Borefield:
                   f"of {self.THRESHOLD_WARNING_SHALLOW_FIELD} m.")
             print("Please change your configuration accordingly to have a not so shallow field.")
 
-        # check if there is convergence
-        if self.convergence != 0:
-            raise RuntimeError("A solution could not be found. The field that is needed in order to cope with your load,"
-                               "cannot be found.")
-
         return depth
 
     def size_L2(self, H_init: float, quadrant_sizing: int = 0) -> float:
         """
-        This function sizes the borefield of the given configuration according to the methodology explained in
+        This function sizes the  of the given configuration according to the methodology explained in
         (Peere et al., 2021), which is a L2 method. When quadrant sizing is other than 0, it sizes the field based on
-        the asked quadrant. It returns the borefield depth.\n
+        the asked quadrant. It returns the borefield depth.
+
         :param H_init: initialize depth for sizing
         :param quadrant_sizing: if a quadrant is given the sizing is performed for this quadrant else for the relevant
         :return: borefield depth
@@ -784,7 +829,7 @@ class Borefield:
 
         # check if hourly data is given
         if not self._check_hourly_load():
-            raise Exception("The hourly data is incorrect.")
+            raise ValueError("The hourly data is incorrect.")
 
         # initiate with a given depth
         self.H_init: float = H_init
@@ -840,34 +885,16 @@ class Borefield:
             # calculate temperature profile
             self.calculate_temperatures(depth=self.H, hourly=hourly)
 
-            # in case of quadrant 1 and 2, we are interested in the maximum temperature
-            if quadrant == 1 or quadrant == 2:
-                temperature_profile = self.results_peak_cooling
-            else:
-                temperature_profile = self.results_peak_heating
-
-            if hourly:
-                temperature_profile = self.temperature_result
-
-            nb_of_steps = 12 if not hourly else 8760
-
-            # in case of quadrants 1 and 3, we need the first year only
-            # in case of quadrants 2 and 4, we need the last year only
-            if quadrant == 1 or quadrant == 3:
-                temperature_profile = temperature_profile[:nb_of_steps]
-            else:
-                temperature_profile = temperature_profile[-nb_of_steps:]
-
             H_prev = self.H
 
             if quadrant == 1 or quadrant == 2:
                 # maximum temperature
                 # convert back to required length
-                self.H = (max(temperature_profile) - self._Tg()) / (self.Tf_H - self._Tg()) * H_prev
+                self.H = (max(self.results_peak_cooling) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
             else:
                 # minimum temperature
                 # convert back to required length
-                self.H = (min(temperature_profile) - self._Tg()) / (self.Tf_C - self._Tg()) * H_prev
+                self.H = (min(self.results_peak_heating) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
 
         return self.H
 
@@ -960,7 +987,7 @@ class Borefield:
             # limited by extraction load
 
             # temperature limit is set to the minimum temperature
-            self.Tf = self.Tf_C
+            self.Tf = self.Tf_min
 
             # Select month with the highest peak load and take both the peak and average load from that month
             month_index = np.where(self.peak_heating == max(self.peak_heating))[0][0]
@@ -975,7 +1002,7 @@ class Borefield:
             # limited by injection load
 
             # temperature limit set to maximum temperature
-            self.Tf = self.Tf_H
+            self.Tf = self.Tf_max
 
             # Select month with the highest peak load and take both the peak and average load from that month
             month_index = np.where(self.peak_cooling == max(self.peak_cooling))[0][0]
@@ -995,7 +1022,7 @@ class Borefield:
             # limited by extraction load
 
             # temperature limit is set to the minimum temperature
-            self.Tf = self.Tf_C
+            self.Tf = self.Tf_min
 
             # Select month with the highest peak load and take both the peak and average load from that month
             month_index = np.where(self.peak_heating == max(self.peak_heating))[0][0] if month_index is None else month_index
@@ -1013,7 +1040,7 @@ class Borefield:
             # limited by injection
 
             # temperature limit set to maximum temperature
-            self.Tf = self.Tf_H
+            self.Tf = self.Tf_max
 
             # Select month with the highest peak load and take both the peak and average load from that month
             month_index = np.where(self.peak_cooling == max(self.peak_cooling))[0][0] if month_index is None else month_index
@@ -1041,7 +1068,7 @@ class Borefield:
         """
         self._print_temperature_profile(figure=False, H=depth, plot_hourly=hourly)
 
-    def print_temperature_profile(self, legend: bool = True, plot_hourly: bool = False) -> Optional[Tuple[plt.figure, plt.axes]]:
+    def print_temperature_profile(self, legend: bool = True, plot_hourly: bool = False) -> None:
         """
         This function plots the temperature profile for the calculated depth.
 
@@ -1055,16 +1082,7 @@ class Borefield:
         if plot_hourly:
             self._check_hourly_load()
 
-        return self._print_temperature_profile(legend=legend, plot_hourly=plot_hourly)
-
-    def print_graph(self) -> Optional[Tuple[plt.figure, plt.axes]]:
-        return self.print_temperature_profile(self.print_setting.legend, self.print_setting.plot_hourly)
-
-    def show_legend(self, show: bool):
-        self.print_setting.legend = show
-
-    def change_plot_hourly(self, plot_hourly: bool):
-        self.print_setting.plot_hourly = plot_hourly
+        self._print_temperature_profile(legend=legend, plot_hourly=plot_hourly)
 
     def print_temperature_profile_fixed_depth(self, depth, legend: bool = True, plot_hourly: bool = False) -> None:
         """
@@ -1079,9 +1097,9 @@ class Borefield:
         self._print_temperature_profile(legend=legend, H=depth, plot_hourly=plot_hourly)
 
     def _print_temperature_profile(self, legend: bool = True, H: float = None,
-                                   plot_hourly: bool = False, figure: bool = True) -> Optional[Tuple[plt.figure, plt.axes]]:
+                                   plot_hourly: bool = False, figure: bool = True) -> None:
         """
-        This function calculates the temperature evolution in the borefield using temporal superposition.
+        This function calculates the temperature evolution in the using temporal superposition.
         It is possible to calculate this for a certain depth H, otherwise self.H will be used.
         If Figure = True than a figure will be plotted.
 
@@ -1148,9 +1166,6 @@ class Borefield:
             self.results_month_cooling = results_month_cooling
             self.results_month_heating = results_month_heating
 
-            # reset other variables
-            self.temperature_result = np.array([])
-
         if plot_hourly:
             # making a numpy array of the monthly balance (self.monthly_load) for a period of self.simulation_period years
             # [kW]
@@ -1178,12 +1193,9 @@ class Borefield:
             # Tf = Tb + Q * R_b
             temperature_result = Tb + hourly_load * 1000 * (self.Rb / self.number_of_boreholes / H)
 
-            # save variables
-            self.temperature_result = temperature_result
-
             # reset other variables
-            self.results_peak_heating = np.array([])
-            self.results_peak_cooling = np.array([])
+            self.results_peak_heating = temperature_result
+            self.results_peak_cooling = temperature_result
             self.results_month_cooling = np.array([])
             self.results_month_heating = np.array([])
 
@@ -1194,60 +1206,61 @@ class Borefield:
                 time_array = self.time_L4 / 12 / 3600 / 730
             else:
                 time_array = self.time_L3_last_year / 12 / 730. / 3600.
-            from matplotlib.colors import to_rgb
-            from numpy import array, float64
-            from GHEtool.gui.gui_base_class import UiGhetool, GREY, WHITE, DARK, LIGHT, WARNING
-            background_color: str = to_rgb(array(DARK.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-            white_color: str = to_rgb(array(WHITE.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-            light_color: str = to_rgb(array(LIGHT.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-            bright_color: str = to_rgb(array(WARNING.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-            plt.rcParams["text.color"] = white_color
-            plt.rcParams["axes.labelcolor"] = white_color
-            plt.rcParams["xtick.color"] = white_color
-            plt.rcParams["ytick.color"] = white_color
 
             plt.rc('figure')
-            fig = plt.figure(facecolor=background_color)
-
+            fig = plt.figure()
 
             ax1 = fig.add_subplot(111)
+            ax1.set_xlabel(r'Time (year)')
+            ax1.set_ylabel(r'Temperature ($^\circ C$)')
 
             # plot Temperatures
-            ax1.step(time_array, Tb, 'w-', where="pre", lw=1.5, label="Tb")
+            ax1.step(time_array, Tb, 'k-', where="pre", lw=1.5, label="Tb")
 
             if plot_hourly:
-                ax1.step(time_array, temperature_result, "w-", where="pre", lw=1.5, label='Tf')
+                ax1.step(time_array, temperature_result, 'b-', where="pre", lw=1, label='Tf')
             else:
-                ax1.step(time_array, results_peak_cooling, color=light_color, where="pre", lw=1.5, label='Tf peak cooling')
-                ax1.step(time_array, results_peak_heating, color=bright_color, where="pre", lw=1.5, label='Tf peak heating')
+                ax1.step(time_array, results_peak_cooling, 'b-', where="pre", lw=1.5, label='Tf peak cooling')
+                ax1.step(time_array, results_peak_heating, 'r-', where="pre", lw=1.5, label='Tf peak heating')
 
-                ax1.step(time_array, results_month_cooling, linestyle="dashed", where="pre", lw=1.5, color=light_color,
+
+                ax1.step(time_array, results_month_cooling, color='b', linestyle="dashed", where="pre", lw=1.5,
                          label='Tf base cooling')
-                ax1.step(time_array, results_month_heating, linestyle="dashed", where="pre", lw=1.5,color=bright_color,
+                ax1.step(time_array, results_month_heating, color='r', linestyle="dashed", where="pre", lw=1.5,
                          label='Tf base heating')
 
             # define temperature bounds
-            ax1.hlines(self.Tf_C, 0, self.simulation_period, colors=bright_color, linestyles="dashed", label="", lw=1)
-            ax1.hlines(self.Tf_H, 0, self.simulation_period, colors=light_color, linestyles="dashed", label="", lw=1)
+            ax1.hlines(self.Tf_min, 0, self.simulation_period, colors='r', linestyles='dashed', label='', lw=1)
+            ax1.hlines(self.Tf_max, 0, self.simulation_period, colors='b', linestyles='dashed', label='', lw=1)
             ax1.set_xticks(range(0, self.simulation_period + 1, 2))
-
-            ax1.set_xlabel(r'Time (year)', color=white_color)
-            ax1.set_ylabel(r'Temperature ($^\circ C$)', color=white_color)
-            # set colors
-            ax1.spines["bottom"].set_color(white_color)
-            ax1.spines["top"].set_color(white_color)
-            ax1.spines["right"].set_color(white_color)
-            ax1.spines["left"].set_color(white_color)
-            ax1.set_facecolor(background_color)
 
             # Plot legend
             if legend:
-                ax1.legend(facecolor=background_color, loc="best")
+                ax1.legend()
             ax1.set_xlim(left=0, right=self.simulation_period)
-            if not self.gui:
-                plt.show()
-                return
-            return fig, ax1
+            plt.show()
+
+    def set_options_gfunction_calculation(self, options: dict) -> None:
+        """
+        This function sets the options for the gfunction calculation of pygfunction.
+        This dictionary is directly passed through to the gFunction class of pygfunction.
+        For more information, please visit the documentation of pygfunction.
+
+        :param options: dictionary with options for the gFunction class of pygfunction
+        :return: None
+        """
+        self.options_pygfunction = options
+
+    def set_jit_gfunction_calculation(self, jit: bool) -> None:
+        """
+        This function sets the just-in-time calculation parameter.
+        When this is true, the gfunctions are calculated jit when sizing a for which
+        precalculated data is not available.
+
+        :param jit: True/False
+        :return: None
+        """
+        self.jit_calculation = jit
 
     def gfunction(self, time_value: list, H: float) -> np.ndarray:
         """
@@ -1258,186 +1271,124 @@ class Borefield:
         :return: np.array of gfunction values
         """
 
-        # check for value of H < 1
-        if H < 1:
-            self.convergence += 1
-            # check if the requested value is already DEFAULT_CONVERGENCE_MINIMAL_DEPTH below 1m
-            if self.convergence == Borefield.DEFAULT_CONVERGENCE_MINIMAL_DEPTH:
-                raise RuntimeError("Already ",
-                                   Borefield.DEFAULT_CONVERGENCE_MINIMAL_DEPTH,
-                                   "a depth smaller than 1m has been asked. This will lead to a convergence to a way to small "
-                                   "field. Please check your borefield dimensions and load!")
-        # check if H exceeds the maximum depth
-        elif H > Borefield.DEFAULT_DEPTH_ARRAY[-1]:
-            self.convergence += 1
-            # check if the requested value is already DEFAULT_CONVERGENCE_MAXIMAL_DEPTH below 1m
-            if self.convergence == Borefield.DEFAULT_CONVERGENCE_MAXIMAL_DEPTH:
+        # when using a variable ground temperature, sometimes no solution can be found
+        if not self.use_constant_Tg and H > Borefield.THRESHOLD_DEPTH_ERROR:
+            raise ValueError("Due to the use of a variable ground temperature, no solution can be found."
+                             "To see the temperature profile, one can plot it using the depth of ",
+                             str(Borefield.THRESHOLD_DEPTH_ERROR), "m.")
 
-                # check if variable Tg is taken into account
-                if not self.use_constant_Tg:
-                    warnings.warn("Your sizing makes use of a variable ground temperature. When your field is limited by the",
-                                  "maximum temperature, it will try to increase the size by making the field deeper in order to cope"
-                                  "with this limitation. This however increases the average temperature, making the limit even"
-                                  "worse. Debug tip: Please check this by trying to size your field with a constant temperature.")
 
-                raise RuntimeError("Already ",
-                                   Borefield.DEFAULT_CONVERGENCE_MAXIMAL_DEPTH,
-                                   "a depth larger than ", Borefield.DEFAULT_DEPTH_ARRAY[-1],
-                                   "m has been asked. The field is hence to large for the dataset.")
-        else:
-            self.convergence = 0
+        def jit_gfunction_calculation() -> np.ndarray:
+            """
+            This function calculates the gfunction just-in-time.
 
-        # set depth to minimum 5m
-        H = max(H, 5)
-        # set max depth to Borefield.DEFAULT_DEPTH_ARRAY[-1]
-        H = min(H, Borefield.DEFAULT_DEPTH_ARRAY[-1])
+            return: np.ndarray with gfunction values
+            """
+            time_value_np = np.array(time_value)
+            if not isinstance(time_value, (float, int)) and len(time_value_np) > Borefield.DEFAULT_NUMBER_OF_TIMESTEPS:
+                # due to this many requested time values, the calculation will be slow.
+                # there will be interpolation
 
-        # if calculate is False, than the gfunctions are calculated on the spot
-        if not self.use_precalculated_data:
+                time_value_new = timeValues(t_max = time_value[-1])
+                # Calculate the g-function for uniform borehole wall temperature
+                gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.alpha, time_value_new,
+                                                         options=self.options_pygfunction).gFunc
+
+                # return interpolated values
+                return np.interp(time_value, time_value_new, gfunc_uniform_T)
+
+            # check if there are double values
+            if not isinstance(time_value, (float, int)) and len(time_value_np) != len(np.unique(np.asarray(time_value))):
+                gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.alpha, np.unique(time_value_np),
+                                                         options=self.options_pygfunction).gFunc
+
+                return np.interp(time_value, np.unique(time_value_np), gfunc_uniform_T)
+
             # Calculate the g-function for uniform borehole wall temperature
-
-            # create custom Borefield
-            custom_borefield = gt.boreholes.rectangle_field(self.N_1, self.N_2, self.B, self.B, H, D=4, r_b=0.075)
-
-            # calculate gfunction
-            gfunc_uniform_T = gt.gfunction.uniform_temperature(
-                custom_borefield, np.asarray(time_value), self.alpha, nSegments=12, disp=False)
+            gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.alpha, time_value_np,
+                                                     options=self.options_pygfunction).gFunc
 
             return gfunc_uniform_T
 
-        # set folder if no gui is used
-        folder = FOLDER
-        # get the name of the data fileImport
-        if self.custom_gfunction is None:
-            name = f'{self.configuration_string(self.N_1, self.N_2)}.pickle'
-        else:
-            name = f'{self.custom_gfunction}.pickle'
+        ## 1 bypass any possible precalculated g-functions
 
-        # check if datafile exists
-        if not os.path.isfile(f'{folder}/Data/{name}'):
-            raise Exception(f'There is no precalculated data available. Please use the create_custom_datafile in: {folder}/Data/{name}')
+        # if calculate is False, than the gfunctions are calculated jit
+        if not self.use_precalculated_data:
+            return jit_gfunction_calculation()
 
-        # load data fileImport
-        data = pickle.load(open(f'{folder}/Data/{name}', "rb"))
+        ## 2 use precalculated g-functions when available
+        if not self.custom_gfunction is None:
+            # there is precalculated data available
+            # interpolate
+            points, values = self.custom_gfunction
 
-        # remove the time value
-        Time = Borefield.DEFAULT_TIME_ARRAY
-        try:
-            data.pop("Time")
-        except KeyError:
-            data = data
+            max_time_value = time_value if isinstance(time_value, (float, int)) else max(time_value)
+            min_time_value = time_value if isinstance(time_value, (float, int)) else min(time_value)
 
-        if not self.gfunction_interpolation_array:
-            # if no interpolation array exists, it creates one
-            def make_interpolation_list_default() -> None:
-                """
-                This function creates an interpolation list and saves it under gfunction_interpolation_array.
+            # check if H in precalculated data range
+            if H > max(points[0]) or H < min(points[0]):
+                warnings.warn("The requested depth of " + str(H) + "m is outside the bounds of " + str(min(points[0])) +
+                              " and " + str(max(points[0])) + " of the precalculated data. The gfunctions will be calculated jit.", UserWarning)
+                return jit_gfunction_calculation()
 
-                :return: None
-                """
+            # check if max time in precalculated data range
+            if max_time_value > max(points[1]):
+                warnings.warn("The requested time of " + str(max_time_value) + "s is outside the bounds of " + str(min(points[1])) +\
+                              " and " + str(max(points[1])) + " of the precalculated data. The gfunctions will be calculated jit.", UserWarning)
+                return jit_gfunction_calculation()
 
-                B_array = list(data.keys())
-                alpha_array = list(data[B_array[0]].keys())
-                H_array = list(data[B_array[0]][alpha_array[0]].keys())
-                self.H_max = max(H_array)
-                B_array.sort()
-                alpha_array.sort()
-                H_array.sort()
+            # check if min time in precalculated data range
+            if min_time_value < min(points[1]):
+                warnings.warn("The requested time of " + str(min_time_value) + "s is outside the bounds of " + str(min(points[1])) +\
+                              " and " + str(max(points[1])) + " of the precalculated data. The gfunctions will be calculated jit.", UserWarning)
+                return jit_gfunction_calculation()
 
-                points = (B_array, alpha_array, H_array, Time)
-
-                values: list = [[[data[B][alpha][h] for h in H_array] for alpha in alpha_array] for B in B_array]
-                self.gfunction_interpolation_array = (points, values)
-
-            def make_interpolation_list_custom() -> None:
-                """
-                This function creates an interpolation list from a custom dataset and saves it under
-                gfunction_interpolation_array.
-
-                :return: None
-                """
-                H_array = list(data["Data"].keys())
-                H_array.sort()
-
-                points = (H_array, Time)
-
-                values = [data["Data"][h] for h in H_array]
-
-                self.gfunction_interpolation_array = (points, values)
-
-            if self.custom_gfunction is None:
-                make_interpolation_list_default()
+            if not isinstance(time_value, (float, int)):
+                # multiple values are requested
+                g_value = interpolate.interpn(points, values, np.array([[H, t] for t in time_value]))
             else:
-                make_interpolation_list_custom()
-        try:
-            if self.custom_gfunction is None:
-                # interpolate
-                points, values = self.gfunction_interpolation_array
-                if not isinstance(time_value, float):
-                    # multiple values are requested
-                    g_value = interpolate.interpn(points, values,
-                                                 np.array([[self.B, self.alpha, H, t] for t in time_value]))
-                else:
-                    # only one value is requested
-                    g_value = interpolate.interpn(points, values, np.array([self.B, self.alpha, H, time_value]))
-            else:
-                # interpolate
-                points, values = self.gfunction_interpolation_array
-                if not isinstance(time_value, float):
-                    # multiple values are requested
-                    g_value = interpolate.interpn(points, values, np.array([[H, t] for t in time_value]))
-                else:
-                    # only one value is requested
-                    g_value = interpolate.interpn(points, values, np.array([H, time_value]))
+                # only one value is requested
+                g_value = interpolate.interpn(points, values, np.array([H, time_value]))
             return g_value
 
-        except ValueError:
-            if self.printing:
-                if self.simulation_period > Borefield.MAX_SIMULATION_PERIOD:
-                    print(self.H, self.B, self.Rb, self.N_1, self.N_2, self.Tg)
-                    print(f'Your requested simulation period of {self.simulation_period} years is beyond the limit of '
-                          f'{Borefield.MAX_SIMULATION_PERIOD}) years of the precalculated data.')
-                else:
-                    print(self.H, self.B, self.Rb, self.N_1, self.N_2, self.Tg)
-                    print(f"Your requested depth of {H} m is beyond the limit {self.H_max} m of the precalculated "
-                          f"data.")
-                    print("Please change your borefield configuration accordingly.")
-                print("-------------------------")
-                print("This calculation stopped.")
-            raise ValueError
+        ## 3 calculate g-function jit
+        return jit_gfunction_calculation()
 
-    def create_custom_dataset(self, custom_borefield, name_datafile: str, n_segments: int = 12,
-                              time_array=None, depth_array=None) -> None:
+
+    def create_custom_dataset(self, name_datafile: str=None, options: dict=None,
+                              time_array=None, depth_array=None, save=False) -> None:
         """
-        This function makes a datafile for a given custom borefield.
+        This function makes a datafile for a given custom borefield and sets it for the borefield object.
 
-        :param custom_borefield: borefield object from pygfunction
         :param name_datafile: name of the custom datafile
-        :param n_segments: number of segments used in creating the datafile
+        :param options: options for the gfunction calculation
+        (check pygfunction.gfunction.gFunction() for more information)
         :param time_array: timevalues used for the calculation of the datafile
         :param depth_array: the values for the borefield depth used to calculate the datafile
+        :param save: True if the datafile should be dumped
         :return: None
         """
+
+        # check if options are given
+        if options is None:
+            options = self.options_pygfunction
+            # set the display option to True
+            options["disp"] = True
+
+        # chek if there is a method in options
+        if not "method" in options:
+            options["method"] = "equivalent"
+
         # set folder if no gui is used
         if depth_array is None:
             depth_array = Borefield.DEFAULT_DEPTH_ARRAY
         if time_array is None:
             time_array = Borefield.DEFAULT_TIME_ARRAY
+
         folder = '.' if self.gui else FOLDER
-        # make filename
-        name = f'{name_datafile}.pickle'
-        # check if fileImport exists
-        if not os.path.isfile(f"Data/{name}"):
-            # does not exist, so create
-            pickle.dump(dict([]), open(f'{folder}/Data/{name}', "wb"))
-        else:
-            raise Exception(f"The dataset {name} already exists. Please chose a different name.")
 
-        data = pickle.load(open(f'{folder}/Data/{name}', "rb"), encoding='latin1')
-
-        # see if k_s exists
+        data = dict([])
         data["Data"] = dict([])
-
         data["Time"] = time_array
 
         for H in depth_array:
@@ -1446,17 +1397,21 @@ class Borefield:
             # Calculate the g-function for uniform borehole wall temperature
 
             # set borehole depth in borefield
-            for borehole in custom_borefield:
+            for borehole in self.borefield:
                 borehole.H = H
 
-            gfunc_uniform_T = gt.gfunction.uniform_temperature(
-                custom_borefield, time_array, self.alpha, nSegments=n_segments, disp=True)
+            gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.alpha,
+                                                     time_array, options=options, method=options["method"])
 
-            data["Data"][H] = gfunc_uniform_T
+            data["Data"][H] = gfunc_uniform_T.gFunc
 
-        self.set_custom_gfunction(name_datafile)
-        print(f"A new dataset with name {name} has been created in {os.path.dirname(os.path.realpath(__file__))}\Data.")
-        pickle.dump(data, open(f'{folder}/Data/{name}', "wb"))
+        self.custom_gfunction = data
+
+        if save:
+            name = f'{name_datafile}.pickle'
+            pickle.dump(data, open(f'{folder}/Data/{name}', "wb"))
+            print(f"A new dataset with name {name} has been created in {os.path.dirname(os.path.realpath(__file__))}\Data.")
+            return f"{os.path.dirname(os.path.realpath(__file__))}\Data/"+name
 
     def set_hourly_heating_load(self, heating_load: np.array) -> None:
         """
@@ -1612,7 +1567,7 @@ class Borefield:
         use_constant_Rb_backup = self.use_constant_Rb
         self.use_constant_Rb = True
 
-        # if no hourly profile is given, load one
+        # check if hourly profile is given
         if not self._check_hourly_load():
             return
 
@@ -1635,11 +1590,11 @@ class Borefield:
             self._print_temperature_profile(legend=False, H=depth, figure=False)
 
             # deviation from minimum temperature
-            if abs(min(self.results_peak_heating) - self.Tf_C) > 0.05:
+            if abs(min(self.results_peak_heating) - self.Tf_min) > 0.05:
 
                 # check if it goes below the threshold
-                if min(self.results_peak_heating) < self.Tf_C:
-                    peak_heat_load -= 1 * max(1, 10 * (self.Tf_C - min(self.results_peak_heating)))
+                if min(self.results_peak_heating) < self.Tf_min:
+                    peak_heat_load -= 1 * max(1, 10 * (self.Tf_min - min(self.results_peak_heating)))
                 else:
                     peak_heat_load = min(init_peak_heat_load, peak_heat_load + 1)
                     if peak_heat_load == init_peak_heat_load:
@@ -1648,11 +1603,11 @@ class Borefield:
                 heat_ok = True
 
             # deviation from maximum temperature
-            if abs(max(self.results_peak_cooling) - self.Tf_H) > 0.05:
+            if abs(max(self.results_peak_cooling) - self.Tf_max) > 0.05:
 
                 # check if it goes above the threshold
-                if max(self.results_peak_cooling) > self.Tf_H:
-                    peak_cool_load -= 1 * max(1, 10 * (-self.Tf_H + max(self.results_peak_cooling)))
+                if max(self.results_peak_cooling) > self.Tf_max:
+                    peak_cool_load -= 1 * max(1, 10 * (-self.Tf_max + max(self.results_peak_cooling)))
                 else:
                     peak_cool_load = min(init_peak_cool_load, peak_cool_load + 1)
                     if peak_cool_load == init_peak_cool_load:
@@ -1703,8 +1658,46 @@ class Borefield:
             # plot results
             self._print_temperature_profile(H=depth)
 
+    def _calculate_quadrant(self) -> int:
+        """
+        This function returns the quadrant based on the calculated temperature profile.
+        If there is no limiting quadrant, None is returned
+        Quadrant 1 is limited in the first year by the maximum temperature
+        Quadrant 2 is limited in the last year by the maximum temperature
+        Quadrant 3 is limited in the first year by the minimum temperature
+        Quadrant 4 is limited in the last year by the maximum temperature
+
+        :return: quadrant (int)
+        """
+
+        # calculate max/min fluid temperatures
+        max_temp = np.max(self.results_peak_cooling)
+        min_temp = np.min(self.results_peak_heating)
+
+        # calculate temperature difference w.r.t. the limits
+        DT_max = self.Tf_max - max_temp + 1000  # + 1000 to have no problems with negative temperatures
+        DT_min = self.Tf_min - min_temp + 1000
+
+        # if the temperature limit is not crossed, return None
+        if self.Tf_max - 0.1 > max_temp and self.Tf_min + 0.1 < min_temp:
+            return
+
+        # True if heating/extraction dominated
+        if self.imbalance < 0:
+            # either quadrant 1 or 4
+            if DT_min < DT_max:
+                # limited by minimum temperature
+                return 4
+            return 1
+
+        # quadrant 2 or 3
+        if DT_min < DT_max:
+            # limited by minimum temperature
+            return 3
+        return 2
+
     def size_by_length_and_width(self, H_max: float, L1: float, L2: float, B_min: float = 3.0,
-                                 B_max: float = 9.0, L2_sizing: bool = True, nb_of_options: int = 5) -> list:
+                                 B_max: float = 9.0, nb_of_options: int = 5) -> list:
         """
         Function to size the borefield by length and with. It returns a list of possible borefield sizes,
         with increasing total length.
@@ -1714,7 +1707,6 @@ class Borefield:
         :param L2: maximal length of borehole field [m]
         :param B_min: minimal borehole spacing [m]
         :param B_max: maximal borehole spacing [m]
-        :param L2_sizing: boolean to check if level two or level three sizing method should be used
         :param nb_of_options: number of options that should be returned.
         :return: list of possible combinations (each combination is a tuple where the first two elements are the
         number of boreholes in each direction, the third element the borehole spacing and the fourth element
@@ -1747,7 +1739,7 @@ class Borefield:
                     self.B = B
                     self._reset_for_sizing(N1, N2)
                     self._print_temperature_profile(figure=False)
-                    if max(self.results_peak_cooling) < self.Tf_H and max(self.results_peak_heating) > self.Tf_C:
+                    if max(self.results_peak_cooling) < self.Tf_max and min(self.results_peak_heating) > self.Tf_min:
                         options.add((N1, N2, B))
 
                 N2 += 1
@@ -1779,244 +1771,6 @@ class Borefield:
 
         return [results[i] for i in lengths]
 
-    def size_complete_field_robust(self, H_max: float, l_1: float, l_2: float, B_min: float = 3.0, B_max: float = 9.0,
-                                   L2_sizing: bool = True, use_constant_Rb: bool = False) -> list:
-        """
-        Function to size the minimal number of borefield by borefield length and width on a robust and more
-        time-consuming way.
-
-        :param H_max: maximal borehole depth [m]
-        :param l_1: maximal width of borehole field [m]
-        :param l_2: maximal length of borehole field [m]
-        :param B_min: minimal borehole spacing [m]
-        :param B_max: maximal borehole spacing [m]
-        :param L2_sizing: boolean to check if level two or level three sizing method should be used
-        :param use_constant_Rb: boolean to check if a constant borehole resistance should be used
-        :return: list of possible combinations (each combination is a tuple where the first two elements are the
-        number of boreholes in each direction, the third element the borehole spacing and the last element
-        the depth of the borefield). An Empty list is returned if no result is found
-        """
-        # check if length > width
-        l_2_bigger_then_l_1: bool = l_2 > l_1
-        # change length and width if length > width
-        (l_1, l_2) = (l_2, l_1) if l_2_bigger_then_l_1 else (l_1, l_2)
-        # set start maximal number of boreholes
-        n_n_max_start: int = 20 * 20
-        # set maximal number of boreholes
-        n_n_max: int = n_n_max_start
-        # list of possible combinations
-        combo: list = []
-        # deactivate printing
-        printing_backup = self.printing
-        self.printing: bool = False
-        # minimal product to break loop
-        product_min = 0
-        # start loop over borehole spacing
-        for B in np.arange(B_max, B_min * 0.99999, -0.5):
-            # calculate maximal number of boreholes in length and width direction
-            n_1_max = min(int(l_1 / B), 20)
-            n_2_max = min(int(l_2 / B), 20)
-            # set borehole spacing
-            self.B = B
-            # start loop over number of boreholes in length and width direction
-            for N_1 in range(n_1_max, 0, -1):
-                for N_2 in range(min(n_2_max, N_1), 0, -1):
-                    # reset borefield values for sizing
-                    self._reset_for_sizing(N_1, N_2)
-                    # calculate number of total boreholes which should be minimal
-                    product = N_1 * N_2
-                    # continue loop if product is higher than current maxima to avoid calculation
-                    if product > n_n_max:
-                        continue
-                    # break loop id product is less than the current minima to avoid calculation
-                    if product < product_min:
-                        break
-                    # try to size current borefield configuration else set minimal product
-                    try:
-                        depth = self.size(H_max, L2_sizing=L2_sizing, L3_sizing=not L2_sizing, use_constant_Rb=use_constant_Rb)
-                    except ValueError:
-                        product_min = product
-                        continue
-                    # break loop if depth is higher than the maxima
-                    if depth > H_max:
-                        break
-                    # save result in combo list and update maximal number of boreholes if current product is less the
-                    # maxima
-                    if product < n_n_max:
-                        n_n_max = product
-                        combo = [[N_1, N_2, B, depth]]
-                    # append solution which leads to the same number of boreholes
-                    elif product == n_n_max:
-                        combo.append([N_1, N_2, B, depth])
-        # if no solution is found return an empty list
-        if n_n_max == n_n_max_start:
-            return []
-        # change N_1 and N_2 if length > width
-        combo = [[i[1], i[0], i[2], i[3]] for i in combo] if l_2_bigger_then_l_1 else combo
-        # set number of boreholes in length and width, borehole spacing and depth of first solution
-        self.N_1 = combo[0][0]
-        self.N_2 = combo[0][1]
-        self.B = combo[0][2]
-        self.H = combo[0][3]
-        # reset variables for further calculations
-        self._reset_for_sizing(self.N_1, self.N_2)
-        # reset printing
-        self.printing: bool = printing_backup
-        # save result list
-        self.combo = combo
-        # return results list
-        return combo
-
-    def size_complete_field_fast(self, H_max: float, l_1: float, l_2: float, B_min: float = 3.0, B_max: float = 9.0,
-                                 L2_sizing: bool = True, use_constant_Rb: bool = False) -> list:
-        """
-        Function to size the minimal number of borefield by borefield length and width on a fast and not robust way.
-        There are possible solution that can not be found.
-
-        :param H_max: maximal borehole depth [m]
-        :param l_1: maximal width of borehole field [m]
-        :param l_2: maximal length of borehole field [m]
-        :param B_min: minimal borehole spacing [m]
-        :param B_max: maximal borehole spacing [m]
-        :param L2_sizing: boolean to check if level two or level three sizing method should be used
-        :param use_constant_Rb: boolean to check if a constant borehole resistance should be used
-        :return: list of possible combinations (each combination is a tuple where the first two elements are the
-        number of boreholes in each direction, the third element the borehole spacing and the last element
-        the depth of the borefield). An Empty list is returned if no results is found
-        """
-        # check if length > width
-        l2_bigger_then_l1: bool = l_2 > l_1
-        # change length and width if length > width
-        (l_1, l_2) = (l_2, l_1) if l2_bigger_then_l1 else (l_1, l_2)
-        # set start maximal number of boreholes
-        n_n_max_start: int = 21 * 21
-        # set maximal number of boreholes
-        n_n_max: int = n_n_max_start
-        # list of possible combinations
-        combo: list = []
-        # deactivate printing
-        printing_backup = self.printing
-        self.printing: bool = False
-        # start loop over borehole spacing
-        for B in np.arange(B_max, B_min * 0.99999, -0.5):
-            # calculate maximal number of boreholes in length and width direction
-            N1_max = min(int(l_1 / B), 20)
-            N2_max = min(int(l_2 / B), 20)
-            # reset variables for sizing
-            self._reset_for_sizing(N1_max, N2_max)
-            # set borehole spacing
-            self.B = B
-            # save start configuration to product old
-            total_number_boreholes_old = self.N_1 * self.N_2
-            # try to determine depth and break loop if unsuccessful
-            try:
-                # size current borefield configuration
-                depth = self.size(H_max, L2_sizing=L2_sizing, L3_sizing=not L2_sizing, use_constant_Rb=use_constant_Rb)
-                # determine required number of boreholes
-                number_boreholes = int(depth * total_number_boreholes_old / H_max) + 1
-                # determine number of boreholes in length and width direction which accomplish the total number of
-                # boreholes
-                res = self._calc_number_boreholes(number_boreholes, N1_max, N2_max)
-                # reset variables for sizing
-                self._reset_for_sizing(res[0][0], res[0][1])
-                # determine new total number of boreholes
-                total_number_boreholes_new = self.N_1 * self.N_2
-                # start counter
-                counter = 0
-                # start while loop to size borefield
-                while total_number_boreholes_old != total_number_boreholes_new:
-                    # determine gradient to calculate new total borehole number if counter > 4 with a gradient of 0.51
-                    # else 1
-                    gradient = int(0.51 * (total_number_boreholes_new - total_number_boreholes_old)) if counter > 4 \
-                        else int(total_number_boreholes_new - total_number_boreholes_old)
-                    # determine new total borehole number
-                    total_number_boreholes_new = total_number_boreholes_old + np.sign(gradient) * min(abs(gradient), 1)
-                    # determine depth for the new configuration
-                    depth = self.size(H_max, L2_sizing=L2_sizing, L3_sizing=not L2_sizing, use_constant_Rb=use_constant_Rb)
-                    # determine new total number of boreholes
-                    number_boreholes = int(depth * total_number_boreholes_new / H_max) + 1
-                    # determine number of boreholes in length and width directions
-                    res = self._calc_number_boreholes(number_boreholes, N1_max, N2_max)
-                    # reset borefield variables for sizing
-                    self._reset_for_sizing(res[0][0], res[0][1])
-                    # set old total number of boreholes
-                    total_number_boreholes_old = self.N_1 * self.N_2
-                    # count counter
-                    counter += 1
-                    # break loop if counter is higher than 20 and the depth is below the maximal depth
-                    if counter > 20 and depth <= H_max:
-                        break
-                # save configuration if new total number of boreholes is smaller than the maximal number so far
-                if total_number_boreholes_new < n_n_max:
-                    # save new maximal number
-                    n_n_max = total_number_boreholes_new
-                    # if more than 1 result is found calculate the depth and append the solution if it fits maximal
-                    # depth
-                    if len(res) > 1:
-                        # reset list
-                        combo: list = []
-                        # reset boolean for first element
-                        first: bool = True
-                        # start loop over possible solutions
-                        for i in res:
-                            # if first element just append results
-                            if first:
-                                combo.append([i[0], i[1], B, self.H])
-                                first = False
-                                continue
-                            # if not first element reset variables and determine new depth and then append if it fits
-                            # the maximal depth
-                            self._reset_for_sizing(i[0], i[1])
-                            self.size(H_max, L2_sizing=L2_sizing, L3_sizing=not L2_sizing, use_constant_Rb=use_constant_Rb)
-                            if self.H < H_max:
-                                combo.append([i[0], i[1], B, self.H])
-                    else:
-                        # just create the list if just one solution is found
-                        combo = [[res[0][0], res[0][1], B, self.H]]
-                # append solutions if the same total number of boreholes is found as the current maximal number
-                elif total_number_boreholes_new == n_n_max:
-                    # if more than 1 result is found calculate the depth and append the solution if it fits maximal
-                    # depth
-                    if len(res) > 1:
-                        first: bool = True
-                        for i in res:
-                            # if first element just append results
-                            if first:
-                                combo.append([i[0], i[1], B, self.H])
-                                first = False
-                                continue
-                            # if not first element reset variables and determine new depth and then append if it fits
-                            # the maximal depth
-                            self._reset_for_sizing(i[0], i[1])
-                            self.size(H_max, L2_sizing=L2_sizing, L3_sizing=not L2_sizing, use_constant_Rb=use_constant_Rb)
-                            if self.H < H_max:
-                                combo.append([i[0], i[1], B, self.H])
-                    else:
-                        # just append list if just one solution is found
-                        combo += [[res[0][0], res[0][1], B, self.H]]
-
-            except ValueError:
-                # break if no result can be found, because depth is too deep for precalculated data
-                break
-        # if no solution is found return an empty list
-        if n_n_max == n_n_max_start:
-            return []
-        # change N_1 and N_2 if length > width
-        combo = [[i[1], i[0], i[2], i[3]] for i in combo] if l2_bigger_then_l1 else combo
-        # set number of boreholes in length and width, borehole spacing and depth
-        self.N_1 = combo[0][1]
-        self.N_2 = combo[0][0]
-        self.B = combo[0][2]
-        self.H = combo[0][3]
-        # reset variables for further calculations
-        self._reset_for_sizing(self.N_1, self.N_2)
-        # activate printing
-        self.printing: bool = printing_backup
-        # save result list
-        self.combo = combo
-        # return results list
-        return combo
-
     def _reset_for_sizing(self, N_1: int, N_2: int) -> None:
         """
         Function to reset borehole
@@ -2028,7 +1782,7 @@ class Borefield:
         # set number of boreholes
         self.N_1, self.N_2 = N_1, N_2
         # reset interpolation array
-        self.gfunction_interpolation_array = []
+        del self.custom_gfunction
         # set number of boreholes because number of boreholes has changed
         self.set_number_of_boreholes()
 

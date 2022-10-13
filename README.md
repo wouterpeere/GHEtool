@@ -1,18 +1,11 @@
 # GHEtool: An open-source tool for borefield sizing in Python
-[![Status](https://img.shields.io/github/workflow/status/wouterpeere/ghetool/test?style=flat-square)](https://pypi.python.org/pypi/ghetool)
-[![Status](https://img.shields.io/pypi/status/ghetool?style=flat-square)](https://pypi.python.org/pypi/ghetool)
-[![Version](https://img.shields.io/pypi/v/ghetool.svg?style=flat-square)](https://pypi.python.org/pypi/ghetool)
-[![Python Version](https://img.shields.io/pypi/pyversions/ghetool?style=flat-square)](https://pypi.python.org/pypi/ghetool)
-[![Wheel](https://img.shields.io/pypi/wheel/ghetool?style=flat-square)](https://pypi.python.org/pypi/ghetool)
-[![PyPI - License](https://img.shields.io/pypi/l/ghetool?style=flat-square)](https://opensource.org/licenses/BSD-3-Clause)
-[![DOI](https://img.shields.io/badge/JOSS-10.21105%2Fjoss.04406-brightgreen?style=flat-square)](https://doi.org/10.21105/joss.04406)
-[![codecov](https://img.shields.io/codecov/c/github/tblanke/GHEtool_test?style=flat-square)](https://app.codecov.io/github/tblanke/GHEtool_test)
-[![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat-square&labelColor=ef8336)](https://pycqa.github.io/isort/)
-[![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg?style=flat-square)](https://www.python.org/)
-[![Last Commit](https://img.shields.io/github/last-commit/wouterpeere/ghetool?style=flat-square)](https://github.com/wouterpeere/GHEtool)
-[![Release Date](https://img.shields.io/github/release-date/wouterpeere/ghetool?style=flat-square)](https://github.com/wouterpeere/GHEtool)
-[![Release Date](https://img.shields.io/github/issues/wouterpeere/ghetool?style=flat-square)](https://github.com/wouterpeere/GHEtool/issues)
-[![Documentation Status](https://readthedocs.org/projects/ghetool-test/badge/?version=latest)](https://ghetool-test.readthedocs.io/en/latest/?badge=latest)
+
+[![PyPI version](https://badge.fury.io/py/GHEtool.svg)](https://badge.fury.io/py/GHEtool)
+[![Tests](https://github.com/wouterpeere/GHEtool/actions/workflows/test.yml/badge.svg)](https://github.com/wouterpeere/GHEtool/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/wouterpeere/GHEtool/branch/main/graph/badge.svg?token=I9WWHW60OD)](https://codecov.io/gh/wouterpeere/GHEtool)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.04406/status.svg)](https://doi.org/10.21105/joss.04406)
+[![Downloads](https://static.pepy.tech/personalized-badge/ghetool?period=total&units=international_system&left_color=black&right_color=blue&left_text=Downloads)](https://pepy.tech/project/ghetool)
+[![Downloads](https://static.pepy.tech/personalized-badge/ghetool?period=week&units=international_system&left_color=black&right_color=orange&left_text=Downloads%20last%20week)](https://pepy.tech/project/ghetool)
 
 ## What is *GHEtool*?
 <img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/GHEtool/gui/Icon.png" width="110" align="left">
@@ -35,7 +28,7 @@ This code is tested with Python 3.8 and requires the following libraries (the ve
 * Numpy (>=1.20.2)
 * Scipy (>=1.6.2)
 * Matplotlib (>=3.4.1)
-* Pygfunction (>=2.1.0)
+* Pygfunction (>=2.2.1)
 * Openpyxl (>=3.0.7)
 * Pandas (>=1.2.4)
 
@@ -80,7 +73,7 @@ To check whether everything is installed correctly, run the following command
 pytest --pyargs GHEtool
 ```
 
-This runs some predefined cases to see whether all the internal dependencies work correctly. 9 test should pass successfully.
+This runs some predefined cases to see whether all the internal dependencies work correctly. All test should pass successfully.
 
 ### Get started with GHEtool
 
@@ -88,19 +81,22 @@ To get started with GHEtool, one needs to create a Borefield object. This is don
 
 ```Python
 from GHEtool import Borefield, GroundData
+import pygfunction as gt
 ```
 
-After importing the necessary classes, one sets all the relevant ground data.
+After importing the necessary classes, one sets all the relevant ground data and borehole equivalent resistance.
 
 ```Python
-data = GroundData(110, # depth of the field (m)
-                  6,   # distance between the boreholes (m)
-                  3,   # ground thermal conductivity (W/mK)
+data = GroundData(3,   # ground thermal conductivity (W/mK)
                   10,  # initial/undisturbed ground temperature (deg C)
                   0.2, # borehole equivalent resistance (mK/W)
-                  10,  # number of boreholes in width direction of the field (/)
-                  12,  # number of boreholes in the length direction of the field (/)
                   2.4*10**6) # volumetric heat capacity of the ground (J/m3K) 
+```
+
+Using pygfunction, a borefield object is created.
+
+```Python
+borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 1, 0.075) 
 ```
 
 Furthermore, one needs to set the peak and monthly baseload for both heating and cooling.
@@ -113,7 +109,7 @@ monthly_load_heating = [46500.0, 44400.0, 37500.0, 29700.0, 19200.0, 0.0, 0.0, 0
 monthly_load_cooling = [4000.0, 8000.0, 8000.0, 8000.0, 12000.0, 16000.0, 32000.0, 32000.0, 16000.0, 12000.0, 8000.0, 4000.0]  # in kWh
 ```
 
-Next, one creates the borefield object and sets the temperature constraints and the ground data.
+Next, one creates the borefield object in GHEtool and sets the temperature constraints and the ground data.
 
 ```Python
 # create the borefield object
@@ -124,6 +120,8 @@ borefield = Borefield(simulation_period=20,
                       baseload_cooling=monthly_load_cooling)
 
 borefield.set_ground_parameters(data)
+
+borefield.set_borefield(borefield_gt)
 
 # set temperature boundaries
 borefield.set_max_ground_temperature(16)  # maximum temperature
@@ -150,21 +148,21 @@ GHEtool offers functionalities of value to all different disciplines working wit
 
 | Functionality | Example document |
 | --- | --- |
-| Sizing the borefield (i.e. calculating the required depth) for a given injection and extraction load for the borefield (three sizing methods are available). | [main_functionalities.py](GHEtool/Examples/main_functionalities.py) |
-| Calculating the temperature evolution of the ground for a given building load and borefield configuration | [main_functionalities.py](GHEtool/Examples/main_functionalities.py) |
-| Using dynamically calculated borehole thermal resistance (this is directly based on the code of pygfunction) | [sizing_with_Rb_calculation.py](GHEtool/Validation/sizing_with_Rb_calculation.py) |
-| Optimising the load profile for a given heating and cooling load | [optimise_load_profile.py](GHEtool/Examples/optimise_load_profile.py)|
-| Finding the optimal rectangular borefield configuration for a given heating and cooling load | [size_borefield_by_length_and_width.py](GHEtool/Examples/size_borefield_by_length_and_width.py) |
-| Importing heating and cooling loads from .csv and .xlsx files | [import_data.py](GHEtool/Examples/import_data.py) |
-| Using your custom borefield configuration | [custom_borefield_configuration.py](GHEtool/Examples/custom_borefield_configuration.py) |
+| Sizing the borefield (i.e. calculating the required depth) for a given injection and extraction load for the borefield (three sizing methods are available). | [main_functionalities.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/main_functionalities.py) |
+| Calculating the temperature evolution of the ground for a given building load and borefield configuration | [main_functionalities.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/main_functionalities.py) |
+| Using dynamically calculated borehole thermal resistance (this is directly based on the code of pygfunction) | [sizing_with_Rb_calculation.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Validation/sizing_with_Rb_calculation.py) |
+| Optimising the load profile for a given heating and cooling load | [optimise_load_profile.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/optimise_load_profile.py)|
+| Finding the optimal rectangular borefield configuration for a given heating and cooling load | [size_borefield_by_length_and_width.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/size_borefield_by_length_and_width.py) |
+| Importing heating and cooling loads from .csv and .xlsx files | [import_data.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/import_data.py) |
+| Using your custom borefield configuration | [custom_borefield_configuration.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/custom_borefield_configuration.py) |
 
 | Comparisons | Example document |
 | --- | --- |
-| Comparison of different sizing methods (L2, L3) for different random profiles| [sizing_method_comparison.py](GHEtool/Validation/sizing_method_comparison.py) |
-| Comparison in calculation time and accuracy between using the precalculated gfunction data or not | [speed_comparison.py](GHEtool/Validation/speed_comparison.py) |
-| Comparison of different sizing methods (L2, L3 and L4) for the same hourly profile | [sizing_method_comparison_L2_L3_L4.py](GHEtool/Examples/sizing_method_comparison_L2_L3_L4.py) |
-| Comparison in calculation time and accuracy between the simplified L2 sizing methodology and the more accurate L3 method. | [sizing_method_comparison.py](GHEtool/Validation/sizing_method_comparison.py) |
-| Comparison of Rb* calculation between GHEtool and EED. | [validation_effective_borehole_thermal_resistance.py](GHEtool/Validation/validation_effective_borehole_thermal_resistance.py) |
+| Comparison of different sizing methods (L2, L3) for different random profiles| [sizing_method_comparison.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Validation/sizing_method_comparison.py) |
+| Comparison in calculation time and accuracy between using the precalculated gfunction data or not | [speed_comparison.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Validation/speed_comparison.py) |
+| Comparison of different sizing methods (L2, L3 and L4) for the same hourly profile | [sizing_method_comparison_L2_L3_L4.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/sizing_method_comparison_L2_L3_L4.py) |
+| Comparison in calculation time and accuracy between the simplified L2 sizing methodology and the more accurate L3 method. | [sizing_method_comparison.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Validation/sizing_method_comparison.py) |
+| Comparison of Rb* calculation between GHEtool and EED. | [validation_effective_borehole_thermal_resistance.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Validation/validation_effective_borehole_thermal_resistance.py) |
 
 
 ## Precalculated data
@@ -207,16 +205,16 @@ Peere, W., Blanke, T. (2022). _GHEtool: An open-source tool for borefield sizing
 
 Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. (2021) _Validated combined first and last year borefield sizing methodology._ In _Proceedings of International Building Simulation Conference 2021_. Brugge (Belgium), 1-3 September 2021. https://doi.org/10.26868/25222708.2021.30180
 
-Peere, W. (2020) Methode voor economische optimalisatie van geothermische verwarmings- en koelsystemen. Master thesis, Departement of Mechanical Engineering,
+Peere, W. (2020) Methode voor economische optimalisatie van geothermische verwarmings- en koelsystemen. Master thesis, Department of Mechanical Engineering,
 KU Leuven, Belgium.
 
 ### Applications/Mentions of GHEtool
 M. Sharifi. (2022) Early-Stage Integrated Design Methods for Hybrid GEOTABS Buildings. PhD thesis, Department of Architecture and Urban Planning, Faculty of Engineering and Architecture, Ghent University.
 
-Coninx M., De Nies J. (2022) Cost-efficient Cooling of Buildings by means of Borefields with Active and Passive Cooling. Master thesis, Departement of Mechanical Engineering, KU Leuven, Belgium.
+Coninx M., De Nies J. (2022) Cost-efficient Cooling of Buildings by means of Borefields with Active and Passive Cooling. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
 
-Michiels E. (2022) Dimensionering van meerdere gekoppelde boorvelden op basis van het type vraagprofiel en de verbinding met de gebruikers. Master thesis, Departement of Mechanical Engineering, KU Leuven, Belgium.
+Michiels E. (2022) Dimensionering van meerdere gekoppelde boorvelden op basis van het type vraagprofiel en de verbinding met de gebruikers. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
 
-Vanpoucke B. (2022) Optimale dimensionering van boorvelden door een variabel massadebiet. Master thesis, Departement of Mechanical Engineering, KU Leuven, Belgium.
+Vanpoucke B. (2022) Optimale dimensionering van boorvelden door een variabel massadebiet. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
 
-Haesen R., Hermans L. (2021) Design and Assessment of Low-carbon Residential District Concepts with(Collective) Seasonal Thermal Energy Storage. Master thesis, Departement of Mechanical Engineering, KU Leuven, Belgium.
+Haesen R., Hermans L. (2021) Design and Assessment of Low-carbon Residential District Concepts with (Collective) Seasonal Thermal Energy Storage. Master thesis, Departement of Mechanical Engineering, KU Leuven, Belgium.
