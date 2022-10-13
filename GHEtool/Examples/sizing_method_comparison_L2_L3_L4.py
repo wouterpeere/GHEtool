@@ -2,11 +2,8 @@
 This document is an example of the different sizing methods in GHEtool.
 The example load profile is for a profile limited in the first year of operation.
 """
-import time
-
 # import all the relevant functions
 from GHEtool import *
-
 import time
 import pygfunction as gt
 
