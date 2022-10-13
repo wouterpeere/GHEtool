@@ -1,7 +1,9 @@
 import math
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+
 from GHEtool import Borefield
 from GHEtool.VariableClasses import FluidData, PipeData, GroundData
 import pygfunction as gt

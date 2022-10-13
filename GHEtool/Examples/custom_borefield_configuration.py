@@ -11,10 +11,11 @@ This custom variable, must contain gfunctions for all time steps in Borefield.DE
 However, one can use the function 'create_custom_dataset' when a custom _borefield is given. This will make the required dataset for the optimisation.
  """
 
+import numpy as np
+import pygfunction as gt
+
 # import all the relevant functions
 from GHEtool import *
-import pygfunction as gt
-import numpy as np
 
 # set the relevant ground data for the calculations
 data = GroundData(3, 10, 0.12)

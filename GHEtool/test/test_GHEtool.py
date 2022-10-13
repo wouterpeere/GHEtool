@@ -1,9 +1,12 @@
 # test if model can be imported
-from GHEtool import *
-import pytest
 import numpy as np
+import pytest
+
+from GHEtool import *
+
 import pygfunction as gt
 import matplotlib.pyplot as plt
+
 
 data = GroundData(3, 10, 0.2)
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
