@@ -169,9 +169,14 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         for option, name in self.gui_structure.list_of_aims:
             option.change_event(self.change)
 
-        self.gui_structure.function_save_figure.change_event(self.save_figure)
+        # couple every ResultFigure to the save_figure button
+        for cat in self.gui_structure.page_result.list_categories:
+            if isinstance(cat, ResultFigure) and cat.save_fig:
+                cat.save_fig.change_event(self.save_figure, cat)
         self.gui_structure.function_save_results.change_event(self.save_data)
         self.gui_structure.option_auto_saving.change_event(self.change_auto_save)
+        # TODO change this to work with self.gui_structure.page_results_list_categories
+        # print(self.gui_structure.page_borehole.list_categories)
         for option, function_to_be_called in self.gui_structure.list_of_result_plot_options:
             option.change_event(ft_partial(self.update_graph, option, function_to_be_called))
         self.gui_structure.option_language.change_event(self.change_language)
@@ -943,7 +948,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         borefield: Borefield = ds.borefield
         # hide widgets if no results bore field exists and display not calculated text
         if borefield is None:
-            # self.label_WarningDepth.hide()
             self.gui_structure.category_result_figure.frame.hide()
             self.gui_structure.category_result_figure.label.hide()
             for option in self.gui_structure.category_options_result.list_of_options:
@@ -970,6 +974,8 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.canvas.setParent(None)
             self.canvas = None
         # create figure and axe if not already exists
+        # TODO iets in de zin van
+        # getattr(borefield, 'print_temperature_profile')(optie1, optie2 ...)
         self.fig, self.ax = borefield.print_graph()
         canvas = FigureCanvas(self.fig)
         # create result display string
@@ -977,14 +983,14 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # set string to depth size label
         self.gui_structure.hint_depth.set_text(string_size)
         # save variables
-        self.gui_structure.category_result_figure.layout_frane.addWidget(canvas)
+        self.gui_structure.category_result_figure.layout_frame.addWidget(canvas)
         self.canvas = canvas
         self.canvas.show()
         # draw new plot
         plt.tight_layout()
         canvas.draw()
 
-    def save_figure(self) -> None:
+    def save_figure(self, result_figure) -> None:
         """
         save figure to the QFileDialog asked location
         :return: None
@@ -1001,7 +1007,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
             return
         # save the figure
-        self.fig.savefig(filename[0])
+        result_figure.fig.savefig(filename[0])
 
     def save_data(self) -> None:
         """

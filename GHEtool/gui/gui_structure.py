@@ -7,7 +7,7 @@ from PySide6.QtGui import QPen
 from PySide6.QtGui import QColor
 from numpy import cos, sin, array, int64, float64
 
-from GHEtool.gui.gui_classes import (Aim, ButtonBox, Category, FloatBox, FileNameBox, FunctionButton, Hint, IntBox, ListBox, Option, Page)
+from GHEtool.gui.gui_classes import (Aim, ButtonBox, Category, FloatBox, FileNameBox, FunctionButton, Hint, IntBox, ListBox, Option, Page, ResultFigure, ResultText)
 from GHEtool.gui.translation_class import Translations
 from GHEtool.gui.gui_base_class import DARK, GREY, LIGHT, WHITE
 
@@ -134,6 +134,8 @@ class GuiStructure:
             page=self.page_borehole,
             label="Borehole properties",
         )
+
+
 
         self.option_depth = FloatBox(
             category=self.category_borehole,
@@ -273,7 +275,6 @@ class GuiStructure:
             category=self.category_temperatures, label="Simulation period [yrs]: ", default_value=20, minimal_value=1, maximal_value=100
         )
 
-
         self.page_borehole_resistance = Page("Equivalent borehole resistance", "Borehole\nresistance", ":/icons/icons/Resistance.png")
         self.page_borehole.set_next_page(self.page_borehole_resistance)
         self.page_borehole_resistance.set_previous_page(self.page_borehole)
@@ -282,7 +283,7 @@ class GuiStructure:
 
         self.option_constant_rb = FloatBox(
             category=self.category_constant_rb,
-            label="Equivalent borehole resistance [mK/W]: ",
+            label="Equivalent borehole resistance (e.g. from TRT) [mK/W]: ",
             default_value=0.0150,
             decimal_number=4,
             minimal_value=0,
@@ -798,6 +799,9 @@ class GuiStructure:
 
         self.option_show_legend = ButtonBox(category=self.category_result_figure, label="Show legend?", default_index=0, entries=["no", "yes"])
         self.option_plot_hourly = ButtonBox(category=self.category_result_figure, label="plot hourly?", default_index=0, entries=["no", "yes"])
+
+        self.figure_test = ResultFigure(label="Test",
+            page=self.page_result, save_figure_button=True)
 
         self.option_method_size_depth.add_link_2_show(self.option_plot_hourly, on_index=2)
 

@@ -12,6 +12,9 @@ from os.path import exists
 import PySide6.QtCore as QtC  # type: ignore
 import PySide6.QtGui as QtG  # type: ignore
 import PySide6.QtWidgets as QtW  # type: ignore
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import \
+            FigureCanvasQTAgg as FigureCanvas
 
 from GHEtool.gui.gui_base_class import DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE
 
@@ -716,12 +719,18 @@ class FunctionButton:
         self.button_text: str = name
         self.button.setText(self.button_text)
 
-    def change_event(self, function_to_be_called: Callable) -> None:
+    def change_event(self, function_to_be_called: Callable, *args) -> None:
         """
         Function for the change event\n
         :param function_to_be_called: function to be called if option has changed
         """
-        self.button.clicked.connect(function_to_be_called)  # pylint: disable=E1101
+        self.button.clicked.connect(lambda: function_to_be_called(*args))
+
+
+class ResultText(Hint):
+
+    def __init__(self, result_name: str, category: Category):
+        super().__init__(result_name, category, warning=False)
 
 
 class Category:
@@ -739,7 +748,7 @@ class Category:
         self.graphic_left: Optional[Union[QtW.QGraphicsView, bool]] = None
         self.graphic_right: Optional[Union[QtW.QGraphicsView, bool]] = None
         self.grid_layout: int = 0
-        self.layout_frane: Optional[QtW.QVBoxLayout] = None
+        self.layout_frame: Optional[QtW.QVBoxLayout] = None
         page.list_categories.append(self)
 
     def activate_graphic_left(self):
@@ -780,27 +789,27 @@ class Category:
         if self.graphic_left is not None:
             self.graphic_left = self.create_graphic_view(layout_frame_horizontal)
         if self.grid_layout > 0:
-            self.layout_frane = QtW.QGridLayout(self.frame)
+            self.layout_frame = QtW.QGridLayout(self.frame)
             row = 0
             column = 0
             for option in self.list_of_options:
                 if isinstance(option, Hint):
-                    option.create_widget(self.frame, self.layout_frane, row=row, column=column)
+                    option.create_widget(self.frame, self.layout_frame, row=row, column=column)
                 else:
                     if option.label_text == "":
                         option.deactivate_size_limit()
-                    option.create_widget(self.frame, self.layout_frane, row=row, column=column)
+                    option.create_widget(self.frame, self.layout_frame, row=row, column=column)
                 if row == self.grid_layout - 1:
                     row = 0
                     column += 1
                     continue
                 row += 1
         else:
-            self.layout_frane = QtW.QVBoxLayout(self.frame)
+            self.layout_frame = QtW.QVBoxLayout(self.frame)
             for option in self.list_of_options:
-                option.create_widget(self.frame, self.layout_frane)
+                option.create_widget(self.frame, self.layout_frame)
 
-        layout_frame_horizontal.addLayout(self.layout_frane)
+        layout_frame_horizontal.addLayout(self.layout_frame)
 
         if self.graphic_right is not None:
             self.graphic_right = self.create_graphic_view(layout_frame_horizontal)
@@ -833,6 +842,27 @@ class Category:
         return self.frame.isHidden()
 
 
+class ResultFigure(Category):
+
+    def __init__(self, label: str, page, save_figure_button: bool = True):
+
+        super().__init__(label, page)
+        self.fig = None
+        self.ax = None
+        self.canvas = None
+        self.save_fig: bool = False
+        self.kwargs: dict = {}
+        self.function_name: str = ""
+        self.class_name: str = ""
+
+        if save_figure_button:
+            self.save_fig = FunctionButton(category=self, button_text="Save figure", icon=":/icons/icons/Save_Inv.svg")
+
+    def fig_to_be_shown(self, class_name: str = "Borefield", function_name: str = "print_temperature_profile", *kwargs):
+        self.function_name = function_name
+        self.kwargs = kwargs
+
+
 class Aim:
     """
     Aim of simulation\n
@@ -847,12 +877,12 @@ class Aim:
         self.list_options: List[Union[Option, Category, FunctionButton]] = []
         page.upper_frame.append(self)
 
-    def change_event(self, function_to_be_called: Callable) -> None:
+    def change_event(self, function_to_be_called: Callable, *args) -> None:
         """
         Function for the change event\n
         :param function_to_be_called: function to be called if option has changed
         """
-        self.widget.clicked.connect(function_to_be_called)  # pylint: disable=E1101
+        self.widget.clicked.connect(lambda: function_to_be_called(*args))  # pylint: disable=E1101
 
     def add_link_2_show(self, option: Union[Option, Category, FunctionButton, Hint]):
         """
