@@ -800,12 +800,12 @@ class GuiStructure:
         self.option_show_legend = ButtonBox(category=self.category_result_figure, label="Show legend?", default_index=0, entries=["no", "yes"])
         self.option_plot_hourly = ButtonBox(category=self.category_result_figure, label="plot hourly?", default_index=0, entries=["no", "yes"])
 
-        self.figure_test = ResultFigure(label="Test",
+        self.figure_temperature_profile = ResultFigure(label="Temperature evolution",
             page=self.page_result, save_figure_button=True)
+        self.figure_temperature_profile.fig_to_be_shown(class_name="Borefield", function_name="print_temperature_profile")
 
-        self.text_result = ResultText("Depth", category=self.figure_test, prefix="Depth: ", suffix="m")
-        self.text_result.text_to_be_shown("Borefield", "peak_cooling")
-        # self.text_result.function_to_convert_to_text(lambda x: max(x))
+        self.text_result = ResultText("Depth", category=self.figure_temperature_profile, prefix="Depth: ", suffix="m")
+        self.text_result.text_to_be_shown("Borefield", "H")
 
         self.option_method_size_depth.add_link_2_show(self.option_plot_hourly, on_index=2)
 

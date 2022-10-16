@@ -965,33 +965,26 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
 
         # create figure for every ResultFigure object
         for fig_obj, fig_name in self.gui_structure.list_of_result_figures:
+            plt.rc('figure')
+            if fig_obj.ax is not None:
+                fig_obj.ax.clear()
+            if fig_obj.fig is not None:
+                plt.close(fig_obj.fig)
 
-            # get peak heating and cooling and monthly loads as well as Tb temperature
-            # set colors for graph
-            if self.ax is not None:
-                self.ax.clear()
-            if self.fig is not None:
-                plt.close(self.fig)
+            if fig_obj.canvas is not None:
+                fig_obj.frame.layout().removeWidget(fig_obj.canvas)
+                fig_obj.canvas.setParent(None)
+                fig_obj.canvas = None
 
-            if self.canvas is not None:
-                self.gui_structure.category_result_figure.frame.layout().removeWidget(self.canvas)
-                self.canvas.setParent(None)
-                self.canvas = None
             # create figure and axe if not already exists
-            # getattr(borefield, 'print_temperature_profile')(optie1, optie2 ...)
-            # self.fig, self.ax = borefield.print_graph()
-            # canvas = FigureCanvas(self.fig)
-            # # create result display string
-            # string_size: str = f"{self.translations.hint_depth[self.gui_structure.option_language.get_value()]}{round(borefield.H, 2)} m"
-            # # set string to depth size label
-            # self.gui_structure.hint_depth.set_text(string_size)
-            # # save variables
-            # self.gui_structure.category_result_figure.layout_frame.addWidget(canvas)
-            # self.canvas = canvas
-            # self.canvas.show()
-            # # draw new plot
-            # plt.tight_layout()
-            # canvas.draw()
+            fig_obj.fig, fig_obj.ax = getattr(borefield, fig_obj.function_name)(fig_obj.kwargs)
+            canvas = FigureCanvas(fig_obj.fig)
+            # save variables
+            fig_obj.layout_frame.addWidget(canvas)
+            fig_obj.canvas = canvas
+            fig_obj.canvas.show()
+            # draw new plot
+            canvas.draw()
 
         # update result for every ResultText object
         for result_text_obj, result_text_name in self.gui_structure.list_of_result_texts:

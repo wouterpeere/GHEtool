@@ -874,6 +874,7 @@ class ResultFigure(Category):
             self.save_fig = FunctionButton(category=self, button_text="Save figure", icon=":/icons/icons/Save_Inv.svg")
 
     def fig_to_be_shown(self, class_name: str = "Borefield", function_name: str = "print_temperature_profile", *kwargs):
+        self.class_name = class_name
         self.function_name = function_name
         self.kwargs = kwargs
 
