@@ -997,7 +997,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         for result_text_obj, result_text_name in self.gui_structure.list_of_result_texts:
             if not result_text_obj.is_hidden():
                 text = borefield.__getattribute__(result_text_obj.var_name)  # currently only borefield
-                result_text_obj.set_text(str(text))
+                result_text_obj.set_text(text)
 
     def save_figure(self, result_figure) -> None:
         """

@@ -804,7 +804,8 @@ class GuiStructure:
             page=self.page_result, save_figure_button=True)
 
         self.text_result = ResultText("Depth", category=self.figure_test, prefix="Depth: ", suffix="m")
-        self.text_result.text_to_be_shown("Borefield", "H")
+        self.text_result.text_to_be_shown("Borefield", "peak_cooling")
+        # self.text_result.function_to_convert_to_text(lambda x: max(x))
 
         self.option_method_size_depth.add_link_2_show(self.option_plot_hourly, on_index=2)
 

@@ -735,17 +735,17 @@ class ResultText(Hint):
         self.var_name: str = ""
         self.prefix: str = prefix
         self.suffix: str = suffix
-        self.callable = lambda x: str(x)
+        self._callable = lambda x: str(x)
 
     def text_to_be_shown(self, class_name: str = "Borefield", var_name: str = "H") -> None:
         self.class_name = class_name
         self.var_name = var_name
 
     def function_to_convert_to_text(self, function) -> None:
-        self.callable = function
+        self._callable = function
 
     def set_text(self, data) -> None:
-        super().set_text(self.prefix + self.callable(data) + self.suffix)
+        super().set_text(self.prefix + str(self._callable(data)) + self.suffix)
 
 
 class Category:
