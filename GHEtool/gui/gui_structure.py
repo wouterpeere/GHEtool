@@ -75,9 +75,53 @@ class GuiStructure:
         self.page_options.set_next_page(self.page_borehole)
         self.page_borehole.set_previous_page(self.page_options)
 
+        self.category_earth = Category(
+            page=self.page_borehole,
+            label="Earth properties",
+        )
+
+        self.option_conductivity = FloatBox(
+            category=self.category_earth,
+            label="Conductivity of the soil [W/mK]: ",
+            default_value=1.5,
+            decimal_number=3,
+            minimal_value=0.1,
+            maximal_value=10,
+            step=0.1,
+        )
+
+        self.option_heat_capacity = FloatBox(
+            category=self.category_earth,
+            label="Ground volumetric heat capacity [kJ / m³ K]: ",
+            default_value=2400,
+            decimal_number=1,
+            minimal_value=1,
+            maximal_value=100000,
+            step=100,
+        )
+        self.option_ground_temp = FloatBox(
+            category=self.category_earth,
+            label="Ground temperature at infinity [°C]: ",
+            default_value=10,
+            decimal_number=2,
+            minimal_value=-273.15,
+            maximal_value=100,
+            step=0.1,
+        )
+
+        self.option_temp_gradient = FloatBox(
+            category=self.category_earth,
+            label="Temperature gradient [K/100m]: ",
+            default_value=2,
+            decimal_number=3,
+            minimal_value=-273.15,
+            maximal_value=100,
+            step=0.1,
+        )
+
         self.category_borehole = Category(
             page=self.page_borehole,
-            label="Borehole and earth properties",
+            label="Borehole properties",
         )
 
         self.option_depth = FloatBox(
@@ -89,12 +133,7 @@ class GuiStructure:
             maximal_value=500,
             step=1,
         )
-        self.hint_calc_time_depth = Hint(
-            category=self.category_borehole,
-            hint="With the selected depth a customized bore field will be calculated. This will dramatically increase the calculation time.",
-            warning=True,
-        )
-        self.option_depth.add_link_2_show(self.hint_calc_time_depth, above=350)
+
         self.aim_temp_profile.add_link_2_show(self.option_depth)
         self.aim_optimize.add_link_2_show(self.option_depth)
         self.option_max_depth = FloatBox(
@@ -116,12 +155,7 @@ class GuiStructure:
             maximal_value=99,
             step=0.1,
         )
-        self.hint_calc_time_spacing = Hint(
-            category=self.category_borehole,
-            hint="With the selected spacing a customized bore field will be calculated. This will dramatically increase the calculation time.",
-            warning=True,
-        )
-        self.option_spacing.add_link_2_show(self.hint_calc_time_spacing, below=3, above=9)
+
         self.aim_temp_profile.add_link_2_show(self.option_spacing)
         self.aim_req_depth.add_link_2_show(self.option_spacing)
         self.aim_optimize.add_link_2_show(self.option_spacing)
@@ -134,12 +168,7 @@ class GuiStructure:
             maximal_value=99,
             step=0.1,
         )
-        self.hint_calc_time_spacing_min = Hint(
-            category=self.category_borehole,
-            hint="With the selected spacing a customized bore field will be calculated. This will dramatically increase the calculation time.",
-            warning=True,
-        )
-        self.option_min_spacing.add_link_2_show(self.hint_calc_time_spacing_min, below=3, above=9)
+
         self.aim_size_length.add_link_2_show(self.option_min_spacing)
         self.option_max_spacing = FloatBox(
             category=self.category_borehole,
@@ -150,34 +179,19 @@ class GuiStructure:
             maximal_value=99,
             step=0.1,
         )
-        self.hint_calc_time_spacing_max = Hint(
-            category=self.category_borehole,
-            hint="With the selected spacing a customized bore field will be calculated. This will dramatically increase the calculation time.",
-            warning=True,
-        )
-        self.option_max_spacing.add_link_2_show(self.hint_calc_time_spacing_max, below=3, above=9)
+
         self.aim_size_length.add_link_2_show(self.option_max_spacing)
         self.option_width = IntBox(
             category=self.category_borehole, label="Width of rectangular field [#]: ", default_value=9, minimal_value=1, maximal_value=40
         )
-        self.hint_calc_time_width = Hint(
-            category=self.category_borehole,
-            hint="With the selected width a customized bore field will be calculated. This will dramatically increase the calculation time.",
-            warning=True,
-        )
-        self.option_width.add_link_2_show(self.hint_calc_time_width, above=20)
+
         self.aim_temp_profile.add_link_2_show(self.option_width)
         self.aim_req_depth.add_link_2_show(self.option_width)
         self.aim_optimize.add_link_2_show(self.option_width)
         self.option_length = IntBox(
             category=self.category_borehole, label="Length of rectangular field [#]: ", default_value=12, minimal_value=1, maximal_value=40
         )
-        self.hint_calc_time_length = Hint(
-            category=self.category_borehole,
-            hint="With the selected length a customized bore field will be calculated. This will dramatically increase the calculation time.",
-            warning=True,
-        )
-        self.option_length.add_link_2_show(self.hint_calc_time_length, above=20)
+
         self.aim_temp_profile.add_link_2_show(self.option_length)
         self.aim_req_depth.add_link_2_show(self.option_length)
         self.aim_optimize.add_link_2_show(self.option_length)
@@ -201,42 +215,30 @@ class GuiStructure:
             step=1,
         )
         self.aim_size_length.add_link_2_show(self.option_max_length)
-        self.option_conductivity = FloatBox(
+
+        self.option_pipe_depth = FloatBox(
             category=self.category_borehole,
-            label="Conductivity of the soil [W/mK]: ",
-            default_value=1.5,
-            decimal_number=3,
-            minimal_value=0.1,
-            maximal_value=10,
+            label="Burial depth [m]: ",
+            default_value=1,
+            decimal_number=1,
+            minimal_value=0,
+            maximal_value=10000,
             step=0.1,
         )
-        self.hint_calc_time_conductivity = Hint(
+
+        self.option_pipe_borehole_radius = FloatBox(
             category=self.category_borehole,
-            hint="With the selected conductivity a customized bore field will be calculated. This will dramatically increase the calculation time.",
-            warning=True,
+            label="Borehole radius [m]: ",
+            default_value=0.075,
+            decimal_number=4,
+            minimal_value=0,
+            maximal_value=10000,
+            step=0.001,
         )
-        self.option_conductivity.add_link_2_show(self.hint_calc_time_conductivity, below=1, above=4)
-        self.option_heat_capacity = FloatBox(
-            category=self.category_borehole,
-            label="Ground volumetric heat capacity [kJ / m³ K]: ",
-            default_value=2400,
-            decimal_number=1,
-            minimal_value=1,
-            maximal_value=100000,
-            step=100,
-        )
+        self.option_pipe_borehole_radius.change_event(self.check_distance_between_pipes)
 
         self.category_temperatures = Category(page=self.page_borehole, label="Temperature constraints and simulation period")
 
-        self.option_ground_temp = FloatBox(
-            category=self.category_temperatures,
-            label="Ground temperature at infinity [°C]: ",
-            default_value=10,
-            decimal_number=2,
-            minimal_value=-273.15,
-            maximal_value=100,
-            step=0.1,
-        )
         self.option_min_temp = FloatBox(
             category=self.category_temperatures,
             label="Minimal temperature [°C]: ",
@@ -255,15 +257,7 @@ class GuiStructure:
             maximal_value=100,
             step=0.1,
         )
-        self.option_temp_gradient = FloatBox(
-            category=self.category_temperatures,
-            label="Temperature gradient [K/100m]: ",
-            default_value=2,
-            decimal_number=3,
-            minimal_value=-273.15,
-            maximal_value=100,
-            step=0.1,
-        )
+
         self.option_simu_period = IntBox(
             category=self.category_temperatures, label="Simulation period [yrs]: ", default_value=20, minimal_value=1, maximal_value=100
         )
@@ -383,15 +377,7 @@ class GuiStructure:
         )
         self.option_pipe_outer_radius.change_event(self.option_pipe_inner_radius.widget.setMaximum)
         self.option_pipe_inner_radius.change_event(self.option_pipe_outer_radius.widget.setMinimum)
-        self.option_pipe_borehole_radius = FloatBox(
-            category=self.category_pipe_data,
-            label="Borehole radius [m]: ",
-            default_value=0.075,
-            decimal_number=4,
-            minimal_value=0,
-            maximal_value=10000,
-            step=0.001,
-        )
+
         self.option_pipe_distance = FloatBox(
             category=self.category_pipe_data,
             label="Distance of pipe until center [m]: ",
@@ -410,19 +396,9 @@ class GuiStructure:
             maximal_value=10000,
             step=0.000001,
         )
-        self.option_pipe_depth = FloatBox(
-            category=self.category_pipe_data,
-            label="Burial depth [m]: ",
-            default_value=4,
-            decimal_number=1,
-            minimal_value=0,
-            maximal_value=10000,
-            step=0.1,
-        )
 
         self.option_pipe_number.change_event(self.check_distance_between_pipes)
         self.option_pipe_outer_radius.change_event(self.check_distance_between_pipes)
-        self.option_pipe_borehole_radius.change_event(self.check_distance_between_pipes)
         self.option_pipe_distance.change_event(self.check_distance_between_pipes)
 
         self.option_pipe_number.change_event(self.update_borehole)
@@ -848,6 +824,8 @@ class GuiStructure:
         if self.option_pipe_distance.is_hidden():
             return
         n_u: int = self.option_pipe_number.get_value()  # get number of U pipes
+        if n_u == 0:
+            return
         r_borehole: float = self.option_pipe_borehole_radius.get_value()  # get borehole radius
         r_outer_pipe: float = self.option_pipe_outer_radius.get_value()  # get outer pipe radius
         r_outer_pipe_max: float = r_borehole / (1 + 1 / sin(pi / (2 * n_u)))  # calculate maximal outer pipe radius(see Circle packing)

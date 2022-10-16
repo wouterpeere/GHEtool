@@ -11,7 +11,7 @@ def run():
     # init application
     app = QtWidgets_QApplication(argv)
     # Create and display the splash screen
-    myAppID = 'GHEtool.0.9'  # arbitrary string
+    myAppID = 'GHEtool v2.1.0'  # arbitrary string
     ctypes_windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
     # init window
     window = QtWidgets_QMainWindow()

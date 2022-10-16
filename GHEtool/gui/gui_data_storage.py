@@ -1,6 +1,7 @@
 from typing import Optional
 
 import pandas as pd
+import pygfunction as gt
 
 from GHEtool import Borefield, FluidData, GroundData, PipeData
 from GHEtool.gui.gui_structure import GuiStructure
@@ -26,14 +27,15 @@ class DataStorage:
                                          self.option_hl_jul, self.option_hl_aug, self.option_hl_sep, self.option_hl_oct, self.option_hl_nov, self.option_hl_dec]
         self.monthlyLoadCooling: list = [self.option_cl_jan, self.option_cl_feb, self.option_cl_mar, self.option_cl_apr, self.option_cl_may, self.option_cl_jun,
                                          self.option_cl_jul, self.option_cl_aug, self.option_cl_sep, self.option_cl_oct, self.option_cl_nov, self.option_cl_dec]
-        self.ground_data: GroundData = GroundData(self.option_depth, self.option_spacing, self.option_conductivity, self.option_ground_temp,
-                                                  self.option_constant_rb, self.option_width, self.option_length, self.option_heat_capacity * 1000,
+        self.ground_data: GroundData = GroundData(self.option_conductivity, self.option_ground_temp, self.option_constant_rb, self.option_heat_capacity * 1000,
                                                   self._calculate_flux())
+        self.borefield = gt.boreholes.rectangle_field(self.option_width, self.option_length, self.option_spacing, self.option_spacing,
+                                                      self.option_depth, self.option_pipe_depth, self.option_pipe_borehole_radius)
+
         self.fluid_data: FluidData = FluidData(self.option_fluid_mass_flow, self.option_fluid_conductivity, self.option_fluid_density,
                                                self.option_fluid_capacity, self.option_fluid_viscosity)
         self.pipe_data: PipeData = PipeData(self.option_pipe_grout_conductivity, self.option_pipe_inner_radius, self.option_pipe_outer_radius,
-                                            self.option_pipe_conductivity, self.option_pipe_distance, self.option_pipe_borehole_radius,
-                                            self.option_pipe_number, self.option_pipe_roughness, self.option_pipe_depth)
+                                            self.option_pipe_conductivity, self.option_pipe_distance, self.option_pipe_number, self.option_pipe_roughness)
 
     def _calculate_flux(self) -> float:
         """ This function calculates the flux"""

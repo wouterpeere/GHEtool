@@ -72,6 +72,7 @@ class CalcProblem(QtCore_QThread):
         # create the bore field object
         borefield = Borefield(
             simulation_period=self.DS.option_simu_period,
+            borefield=self.DS.borefield,
             gui=True,
         )
         # set temperature boundaries
@@ -80,40 +81,6 @@ class CalcProblem(QtCore_QThread):
 
         # set ground data
         borefield.set_ground_parameters(self.DS.ground_data)
-
-        # check bounds of precalculated data
-        # TODO this boundary check can be deleted, because JIT-calculation is implemented in GHEtool
-        # to be done after the general PR
-        bopd: BoundsOfPrecalculatedData = BoundsOfPrecalculatedData()
-        outside_bounds: bool = bopd.check_if_outside_bounds(
-            self.DS.ground_data.H, self.DS.ground_data.B, self.DS.ground_data.k_s, max(self.DS.ground_data.N_1, self.DS.ground_data.N_2)
-        )
-
-        # create custom rectangle bore field if no precalculated data is available
-        if outside_bounds:
-            # import boreholes from pygfuntion here to save start up time
-            from pygfunction import boreholes as gt_boreholes
-
-            # get minimum and maximal number of boreholes in one direction
-            n_max: int = max(self.DS.ground_data.N_1, self.DS.ground_data.N_2)
-            n_min: int = max(self.DS.ground_data.N_1, self.DS.ground_data.N_2)
-            # initialize custom field with variables selected
-            custom_field = gt_boreholes.rectangle_field(
-                N_1=n_max, N_2=n_min, B_1=self.DS.ground_data.B, B_2=self.DS.ground_data.B, H=self.DS.ground_data.H, D=4, r_b=0.075
-            )
-            # create name of custom bore field to save it later
-            borefield_custom: str = f"customField_{n_max}_{n_min}_{self.DS.ground_data.B}_{self.DS.ground_data.k_s}"
-            # try if the bore field has already be calculated then open this otherwise calculate it
-            try:
-                from GHEtool import FOLDER
-
-                pk_load(open(f"{FOLDER}/Data/{borefield_custom}.pickle", "rb"))
-            except FileNotFoundError:
-                borefield.create_custom_dataset(custom_field, borefield_custom)
-            # set new bore field g-function
-            borefield.set_custom_gfunction(borefield_custom)
-            # set bore field to custom one
-            borefield.set_borefield(custom_field)
 
         ### GENERAL SETUPS
 
