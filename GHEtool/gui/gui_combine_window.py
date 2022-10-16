@@ -170,8 +170,8 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             option.change_event(self.change)
 
         # couple every ResultFigure to the save_figure button
-        for cat in self.gui_structure.page_result.list_categories:
-            if isinstance(cat, ResultFigure) and cat.save_fig:
+        for cat, cat_name in self.gui_structure.list_of_result_figures:
+            if cat.save_fig:
                 cat.save_fig.change_event(self.save_figure, cat)
         self.gui_structure.function_save_results.change_event(self.save_data)
         self.gui_structure.option_auto_saving.change_event(self.change_auto_save)
@@ -929,6 +929,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         """
         # hide widgets if no list of scenarios exists and display not calculated text
         if not self.list_ds:
+            # TODO deze lijst moet verandert worden
             self.gui_structure.category_result_figure.frame.show()
             self.gui_structure.category_result_figure.label.show()
             for option in self.gui_structure.category_options_result.list_of_options:
@@ -944,9 +945,9 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
 
         # get Datastorage of selected scenario
         ds: DataStorage = self.list_ds[self.list_widget_scenario.currentRow()]
-        # get bore field of selected scenario
+        # get borefield of selected scenario
         borefield: Borefield = ds.borefield
-        # hide widgets if no results bore field exists and display not calculated text
+        # hide widgets if no results borefield exists and display not calculated text
         if borefield is None:
             self.gui_structure.category_result_figure.frame.hide()
             self.gui_structure.category_result_figure.label.hide()
@@ -962,33 +963,41 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         for option in self.gui_structure.category_options_result.list_of_options:
             option.show()
 
-        # get peak heating and cooling and monthly loads as well as Tb temperature
-        # set colors for graph
-        if self.ax is not None:
-            self.ax.clear()
-        if self.fig is not None:
-            plt.close(self.fig)
+        # create figure for every ResultFigure object
+        for fig_obj, fig_name in self.gui_structure.list_of_result_figures:
 
-        if self.canvas is not None:
-            self.gui_structure.category_result_figure.frame.layout().removeWidget(self.canvas)
-            self.canvas.setParent(None)
-            self.canvas = None
-        # create figure and axe if not already exists
-        # TODO iets in de zin van
-        # getattr(borefield, 'print_temperature_profile')(optie1, optie2 ...)
-        self.fig, self.ax = borefield.print_graph()
-        canvas = FigureCanvas(self.fig)
-        # create result display string
-        string_size: str = f"{self.translations.hint_depth[self.gui_structure.option_language.get_value()]}{round(borefield.H, 2)} m"
-        # set string to depth size label
-        self.gui_structure.hint_depth.set_text(string_size)
-        # save variables
-        self.gui_structure.category_result_figure.layout_frame.addWidget(canvas)
-        self.canvas = canvas
-        self.canvas.show()
-        # draw new plot
-        plt.tight_layout()
-        canvas.draw()
+            # get peak heating and cooling and monthly loads as well as Tb temperature
+            # set colors for graph
+            if self.ax is not None:
+                self.ax.clear()
+            if self.fig is not None:
+                plt.close(self.fig)
+
+            if self.canvas is not None:
+                self.gui_structure.category_result_figure.frame.layout().removeWidget(self.canvas)
+                self.canvas.setParent(None)
+                self.canvas = None
+            # create figure and axe if not already exists
+            # getattr(borefield, 'print_temperature_profile')(optie1, optie2 ...)
+            # self.fig, self.ax = borefield.print_graph()
+            # canvas = FigureCanvas(self.fig)
+            # # create result display string
+            # string_size: str = f"{self.translations.hint_depth[self.gui_structure.option_language.get_value()]}{round(borefield.H, 2)} m"
+            # # set string to depth size label
+            # self.gui_structure.hint_depth.set_text(string_size)
+            # # save variables
+            # self.gui_structure.category_result_figure.layout_frame.addWidget(canvas)
+            # self.canvas = canvas
+            # self.canvas.show()
+            # # draw new plot
+            # plt.tight_layout()
+            # canvas.draw()
+
+        # update result for every ResultText object
+        for result_text_obj, result_text_name in self.gui_structure.list_of_result_texts:
+            if not result_text_obj.is_hidden():
+                text = borefield.__getattribute__(result_text_obj.var_name)  # currently only borefield
+                result_text_obj.set_text(str(text))
 
     def save_figure(self, result_figure) -> None:
         """

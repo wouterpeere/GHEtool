@@ -803,6 +803,9 @@ class GuiStructure:
         self.figure_test = ResultFigure(label="Test",
             page=self.page_result, save_figure_button=True)
 
+        self.text_result = ResultText("Depth", category=self.figure_test, prefix="Depth: ", suffix="m")
+        self.text_result.text_to_be_shown("Borefield", "H")
+
         self.option_method_size_depth.add_link_2_show(self.option_plot_hourly, on_index=2)
 
         self.page_settings = Page("Settings", "Settings", ":/icons/icons/Settings.svg")
@@ -826,6 +829,9 @@ class GuiStructure:
         self.list_of_aims: List[Tuple[Aim, str]] = [(getattr(self, name), name) for name in self.__dict__ if isinstance(getattr(self, name), Aim)]
         self.list_of_options: List[Tuple[Option, str]] = [(getattr(self, name), name) for name in self.__dict__ if isinstance(getattr(self, name), Option)]
         self.list_of_pages: List[Page] = [getattr(self, name) for name in self.__dict__ if isinstance(getattr(self, name), Page)]
+
+        self.list_of_result_texts: List[Tuple[ResultText, str]] = [(getattr(self, name), name) for name in self.__dict__ if isinstance(getattr(self, name), ResultText)]
+        self.list_of_result_figures: List[Tuple[ResultFigure, str]] = [(getattr(self, name), name) for name in self.__dict__ if isinstance(getattr(self, name), ResultFigure)]
 
         self.list_of_result_plot_options: List[Tuple[Union[Option, FunctionButton], str]] = [(self.option_show_legend, 'show_legend'),
                                                                                              (self.option_plot_hourly, 'change_plot_hourly')]

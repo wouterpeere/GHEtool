@@ -72,7 +72,7 @@ class CalcProblem(QtCore_QThread):
         # create the bore field object
         borefield = Borefield(
             simulation_period=self.DS.option_simu_period,
-            borefield=self.DS.borefield,
+            borefield=self.DS.borefield_pygfunction,
             gui=True,
         )
         # set temperature boundaries
@@ -104,7 +104,7 @@ class CalcProblem(QtCore_QThread):
             borefield.set_hourly_cooling_load()
 
         # setup the borefield sizing
-        borefield.sizing_setup(H_init=self.DS.ground_data.H,
+        borefield.sizing_setup(H_init=self.DS.borefield_pygfunction[0].H,
                                use_constant_Rb=self.DS.option_method_rb_calc == 0,
                                use_constant_Tg=self.DS.option_method_temp_gradient == 0,
                                L2_sizing=self.DS.option_method_size_depth == 0,

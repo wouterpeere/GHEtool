@@ -29,8 +29,8 @@ class DataStorage:
                                          self.option_cl_jul, self.option_cl_aug, self.option_cl_sep, self.option_cl_oct, self.option_cl_nov, self.option_cl_dec]
         self.ground_data: GroundData = GroundData(self.option_conductivity, self.option_ground_temp if self.option_method_temp_gradient ==0 else self.option_ground_temp_gradient,
                                                   self.option_constant_rb, self.option_heat_capacity * 1000, self._calculate_flux())
-        print(self.option_ground_temp, self.option_method_temp_gradient, self.option_ground_temp_gradient)
-        self.borefield = gt.boreholes.rectangle_field(self.option_width, self.option_length, self.option_spacing, self.option_spacing,
+
+        self.borefield_pygfunction = gt.boreholes.rectangle_field(self.option_width, self.option_length, self.option_spacing, self.option_spacing,
                                                       self.option_depth, self.option_pipe_depth, self.option_pipe_borehole_radius)
 
         self.fluid_data: FluidData = FluidData(self.option_fluid_mass_flow, self.option_fluid_conductivity, self.option_fluid_density,
