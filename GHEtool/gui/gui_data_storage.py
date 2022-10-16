@@ -27,8 +27,9 @@ class DataStorage:
                                          self.option_hl_jul, self.option_hl_aug, self.option_hl_sep, self.option_hl_oct, self.option_hl_nov, self.option_hl_dec]
         self.monthlyLoadCooling: list = [self.option_cl_jan, self.option_cl_feb, self.option_cl_mar, self.option_cl_apr, self.option_cl_may, self.option_cl_jun,
                                          self.option_cl_jul, self.option_cl_aug, self.option_cl_sep, self.option_cl_oct, self.option_cl_nov, self.option_cl_dec]
-        self.ground_data: GroundData = GroundData(self.option_conductivity, self.option_ground_temp, self.option_constant_rb, self.option_heat_capacity * 1000,
-                                                  self._calculate_flux())
+        self.ground_data: GroundData = GroundData(self.option_conductivity, self.option_ground_temp if self.option_method_temp_gradient ==0 else self.option_ground_temp_gradient,
+                                                  self.option_constant_rb, self.option_heat_capacity * 1000, self._calculate_flux())
+        print(self.option_ground_temp, self.option_method_temp_gradient, self.option_ground_temp_gradient)
         self.borefield = gt.boreholes.rectangle_field(self.option_width, self.option_length, self.option_spacing, self.option_spacing,
                                                       self.option_depth, self.option_pipe_depth, self.option_pipe_borehole_radius)
 

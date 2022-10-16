@@ -102,13 +102,21 @@ class GuiStructure:
         self.option_ground_temp = FloatBox(
             category=self.category_earth,
             label="Ground temperature at infinity [°C]: ",
+            default_value=12,
+            decimal_number=2,
+            minimal_value=-273.15,
+            maximal_value=100,
+            step=0.1,
+        )
+        self.option_ground_temp_gradient = FloatBox(
+            category=self.category_earth,
+            label="Ground surface temperature [°C]: ",
             default_value=10,
             decimal_number=2,
             minimal_value=-273.15,
             maximal_value=100,
             step=0.1,
         )
-
         self.option_temp_gradient = FloatBox(
             category=self.category_earth,
             label="Temperature gradient [K/100m]: ",
@@ -118,6 +126,9 @@ class GuiStructure:
             maximal_value=100,
             step=0.1,
         )
+        self.option_method_temp_gradient.add_link_2_show(self.option_ground_temp_gradient, on_index=1)
+        self.option_method_temp_gradient.add_link_2_show(self.option_temp_gradient, on_index=1)
+        self.option_method_temp_gradient.add_link_2_show(self.option_ground_temp, on_index=0)
 
         self.category_borehole = Category(
             page=self.page_borehole,
@@ -262,7 +273,6 @@ class GuiStructure:
             category=self.category_temperatures, label="Simulation period [yrs]: ", default_value=20, minimal_value=1, maximal_value=100
         )
 
-        self.option_method_temp_gradient.add_link_2_show(self.option_temp_gradient, on_index=1)
 
         self.page_borehole_resistance = Page("Equivalent borehole resistance", "Borehole\nresistance", ":/icons/icons/Resistance.png")
         self.page_borehole.set_next_page(self.page_borehole_resistance)
