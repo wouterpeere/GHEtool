@@ -801,15 +801,26 @@ class GuiStructure:
         self.result_Rb_calculated.text_to_be_shown("Borefield", "Rb")
         self.result_Rb_calculated.function_to_convert_to_text(lambda x: round(x, 2))
 
+        self.results_ground_temperature = ResultText("Ground temperature", category=self.numerical_results,
+                                               prefix="Average ground temperature: ", suffix=" deg C")
+        self.results_ground_temperature.text_to_be_shown("Borefield", "_Tg")
+        self.results_ground_temperature.function_to_convert_to_text(lambda x: round(x, 2))
+        self.option_method_temp_gradient.add_link_2_show(self.results_ground_temperature, on_index=1)
+
         self.figure_temperature_profile = ResultFigure(label="Temperature evolution",
-            page=self.page_result, save_figure_button=True)
-        self.figure_temperature_profile.fig_to_be_shown(class_name="Borefield", function_name="print_temperature_profile", legend=False)
+                                                       page=self.page_result,
+                                                       save_figure_button=True)
+
+        self.figure_temperature_profile.fig_to_be_shown(class_name="Borefield",
+                                                        function_name="print_temperature_profile")
+
         self.legend_figure_temperature_profile = FigureOption(category=self.figure_temperature_profile,
                                                               label="Legend on",
                                                               param="legend",
                                                               default=0,
                                                               entries=["No", "Yes"],
                                                               entries_values=[False, True])
+
         self.hourly_figure_temperature_profile = FigureOption(category=self.figure_temperature_profile,
                                                               label="Hourly profile",
                                                               param="plot_hourly",
@@ -818,7 +829,6 @@ class GuiStructure:
                                                               entries_values=[False, True])
 
         self.option_method_size_depth.add_link_2_show(self.hourly_figure_temperature_profile, on_index=2)
-        self.aim_req_depth.add_link_2_show(self.result_text_depth)
 
         self.page_settings = Page("Settings", "Settings", ":/icons/icons/Settings.svg")
 
