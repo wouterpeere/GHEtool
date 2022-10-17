@@ -10,7 +10,6 @@ import functools
 import warnings
 
 from GHEtool.VariableClasses import GroundData, FluidData, PipeData
-from gui.gui_base_class import set_graph_layout
 
 FOLDER = os.path.dirname(os.path.realpath(__file__))  # solve problem with importing GHEtool from sub-folders
 
@@ -229,6 +228,8 @@ class Borefield:
 
         # create plotlayout if gui
         if self.gui:
+            from gui.gui_base_class import set_graph_layout
+
             set_graph_layout()
 
     @staticmethod

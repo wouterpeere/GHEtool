@@ -19,6 +19,15 @@ from matplotlib.backends.backend_qt5agg import \
 from GHEtool.gui.gui_base_class import DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE
 
 
+def update_opponent_new(button: QtW.QPushButton, button_list):
+    if not button.isChecked():
+        button.setChecked(True)
+        return
+    for but in button_list:
+        if not but == button:
+            but.setChecked(False)
+
+
 def update_opponent(button: QtW.QPushButton, button_opponent: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
     """
     update the opponent button\n
@@ -26,6 +35,8 @@ def update_opponent(button: QtW.QPushButton, button_opponent: QtW.QPushButton, f
     :param button_opponent:
     :param false_button_list:
     """
+    if button.isChecked():
+        return
     button_opponent.setChecked(not button.isChecked())
     if false_button_list is not None:
         for false_button in false_button_list:
@@ -476,9 +487,7 @@ class ButtonBox(Option):
             layout.addWidget(widget)
         for idx, button in enumerate(self.widget):
             default_value = self.default_value if idx != self.default_value else idx - 1 if idx > 0 else 1
-            button.clicked.connect(
-                ft_partial(update_opponent, button, self.widget[default_value], [but for i, but in enumerate(self.widget) if i not in [idx, default_value]])
-            )
+            button.clicked.connect(ft_partial(update_opponent_new, button, [but for _, but in enumerate(self.widget)]))
             button.clicked.connect(ft_partial(check, self.linked_options, self, self.get_value()))
 
 
@@ -1086,10 +1095,9 @@ class Page:
                 default_value = 1 if idx == 0 else 0
                 aim.widget.clicked.connect(
                     ft_partial(
-                        update_opponent,
+                        update_opponent_new,
                         aim.widget,
-                        list_aims[default_value].widget,
-                        [wid.widget for i, wid in enumerate(list_aims) if i not in [idx, default_value]],
+                        [wid.widget for i, wid in enumerate(list_aims)],
                     )
                 )  # pylint: disable=E1101
                 aim.widget.clicked.connect(ft_partial(check_aim_options, list_aims))  # pylint: disable=E1101
