@@ -5,9 +5,9 @@ from PySide6.QtWidgets import QGraphicsEllipseItem, QGraphicsScene
 from PySide6.QtWidgets import QGraphicsView as QtWidgets_QGraphicsView
 from PySide6.QtGui import QPen
 from PySide6.QtGui import QColor
-from numpy import cos, sin, array, int64, float64
+from numpy import cos, sin, array, int64, float64, round
 
-from GHEtool.gui.gui_classes import (Aim, ButtonBox, Category, FloatBox, FileNameBox, FunctionButton, Hint, IntBox, ListBox, Option, Page, ResultFigure, ResultText)
+from GHEtool.gui.gui_classes import (Aim, ButtonBox, Category, FloatBox, FileNameBox, FunctionButton, Hint, IntBox, ListBox, Option, Page, ResultFigure, ResultText, FigureOption)
 from GHEtool.gui.translation_class import Translations
 from GHEtool.gui.gui_base_class import DARK, GREY, LIGHT, WHITE
 
@@ -785,29 +785,43 @@ class GuiStructure:
 
         self.page_result = Page("Results", "Results", ":/icons/icons/Result.svg")
 
-        self.category_options_result = Category(page=self.page_result, label="Options results")
+        # self.category_options_result = Category(page=self.page_result, label="Options results")
+        #
+        # self.hint_depth = Hint(category=self.category_options_result, hint="Size")
+        # self.function_save_results = FunctionButton(
+        #     category=self.category_options_result, button_text="Save results", icon=":/icons/icons/Save_Inv.svg"
+        # )
+        # self.function_save_figure = FunctionButton(
+        #     category=self.category_options_result, button_text="Save figure", icon=":/icons/icons/Save_Inv.svg"
+        # )
 
-        self.hint_depth = Hint(category=self.category_options_result, hint="Size")
-        self.function_save_results = FunctionButton(
-            category=self.category_options_result, button_text="Save results", icon=":/icons/icons/Save_Inv.svg"
-        )
-        self.function_save_figure = FunctionButton(
-            category=self.category_options_result, button_text="Save figure", icon=":/icons/icons/Save_Inv.svg"
-        )
+        # self.category_result_figure = Category(page=self.page_result, label="Figure")
 
-        self.category_result_figure = Category(page=self.page_result, label="Figure")
+        # TODO restructure
+        # TODO add other results (e.g. for the optimise load profile)
+        self.cat_no_result = Category(page=self.page_result, label="No results")
+        self.text_no_result = Hint("No results are yet calculated", category=self.cat_no_result, warning=True)
 
-        self.option_show_legend = ButtonBox(category=self.category_result_figure, label="Show legend?", default_index=0, entries=["no", "yes"])
-        self.option_plot_hourly = ButtonBox(category=self.category_result_figure, label="plot hourly?", default_index=0, entries=["no", "yes"])
+        self.numerical_results = Category(page=self.page_result, label="Numerical results")
+
+        self.result_text_depth = ResultText("Depth", category=self.numerical_results, prefix="Depth: ", suffix="m")
+        self.result_text_depth.text_to_be_shown("Borefield", "H")
+        self.result_text_depth.function_to_convert_to_text(lambda x: round(x, 2))
+
+        self.result_Rb_calculated = ResultText("Depth", category=self.numerical_results,
+                                               prefix="Equivalent borehole thermal resistance: ", suffix="Wm/K")
+        self.result_Rb_calculated.text_to_be_shown("Borefield", "Rb")
+        self.result_Rb_calculated.function_to_convert_to_text(lambda x: round(x, 2))
 
         self.figure_temperature_profile = ResultFigure(label="Temperature evolution",
             page=self.page_result, save_figure_button=True)
-        self.figure_temperature_profile.fig_to_be_shown(class_name="Borefield", function_name="print_temperature_profile")
-
-        self.text_result = ResultText("Depth", category=self.figure_temperature_profile, prefix="Depth: ", suffix="m")
-        self.text_result.text_to_be_shown("Borefield", "H")
-
-        self.option_method_size_depth.add_link_2_show(self.option_plot_hourly, on_index=2)
+        self.figure_temperature_profile.fig_to_be_shown(class_name="Borefield", function_name="print_temperature_profile", legend=False)
+        self.legend_figure_temperature_profile = FigureOption(category=self.figure_temperature_profile,
+                                                              label="Legend on",
+                                                              param="legend",
+                                                              default=0,
+                                                              entries=["No", "Yes"],
+                                                              entries_values=[False, True])
 
         self.page_settings = Page("Settings", "Settings", ":/icons/icons/Settings.svg")
 
@@ -833,9 +847,6 @@ class GuiStructure:
 
         self.list_of_result_texts: List[Tuple[ResultText, str]] = [(getattr(self, name), name) for name in self.__dict__ if isinstance(getattr(self, name), ResultText)]
         self.list_of_result_figures: List[Tuple[ResultFigure, str]] = [(getattr(self, name), name) for name in self.__dict__ if isinstance(getattr(self, name), ResultFigure)]
-
-        self.list_of_result_plot_options: List[Tuple[Union[Option, FunctionButton], str]] = [(self.option_show_legend, 'show_legend'),
-                                                                                             (self.option_plot_hourly, 'change_plot_hourly')]
 
     def check_distance_between_pipes(self, *args) -> None:
         """

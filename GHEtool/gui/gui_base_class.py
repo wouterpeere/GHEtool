@@ -30,7 +30,6 @@ def set_graph_layout():
         array(LIGHT.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
     bright_color: str = to_rgb(
         array(WARNING.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-    plt.rcParams["text.color"] = white_color
     plt.rcParams["axes.labelcolor"] = white_color
     plt.rcParams["xtick.color"] = white_color
     plt.rcParams["ytick.color"] = white_color

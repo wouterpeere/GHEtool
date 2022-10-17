@@ -173,12 +173,13 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         for cat, cat_name in self.gui_structure.list_of_result_figures:
             if cat.save_fig:
                 cat.save_fig.change_event(self.save_figure, cat)
-        self.gui_structure.function_save_results.change_event(self.save_data)
         self.gui_structure.option_auto_saving.change_event(self.change_auto_save)
-        # TODO change this to work with self.gui_structure.page_results_list_categories
-        # print(self.gui_structure.page_borehole.list_categories)
-        for option, function_to_be_called in self.gui_structure.list_of_result_plot_options:
-            option.change_event(ft_partial(self.update_graph, option, function_to_be_called))
+
+        for fig, _ in self.gui_structure.list_of_result_figures:
+            for option in fig.list_of_options:
+                if option != fig.save_fig:
+                    option.change_event(self.display_results)
+
         self.gui_structure.option_language.change_event(self.change_language)
         self.gui_structure.page_result.button.clicked.connect(self.display_results)
         self.actionAdd_Scenario.triggered.connect(self.add_scenario)
@@ -454,7 +455,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         """
         # hide results buttons if no results where found
         if any([(i.borefield is None) for i in self.list_ds]) or self.list_ds == []:
-            self.gui_structure.function_save_results.hide()
+            # self.gui_structure.function_save_results.hide()
             self.gui_structure.page_aim.button.click()
             return
         # display results otherwise
@@ -928,15 +929,20 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         :return: None
         """
         # hide widgets if no list of scenarios exists and display not calculated text
+
+        def hide_no_result(hide: bool = True):
+            if hide:
+                for cat in self.gui_structure.page_result.list_categories:
+                    cat.hide()
+                self.gui_structure.cat_no_result.show()
+                self.gui_structure.cat_no_result.set_text(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
+                return
+            for cat in self.gui_structure.page_result.list_categories:
+                cat.show()
+            self.gui_structure.cat_no_result.hide()
+
         if not self.list_ds:
-            # TODO deze lijst moet verandert worden
-            self.gui_structure.category_result_figure.frame.show()
-            self.gui_structure.category_result_figure.label.show()
-            for option in self.gui_structure.category_options_result.list_of_options:
-                option.hide()
-            self.gui_structure.hint_depth.show()
-            self.gui_structure.hint_depth.set_text(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
-            self.canvas.hide() if self.canvas is not None else None
+            hide_no_result(True)
             return
         # import here to save start up time
         import matplotlib.pyplot as plt
@@ -949,20 +955,11 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         borefield: Borefield = ds.borefield
         # hide widgets if no results borefield exists and display not calculated text
         if borefield is None:
-            self.gui_structure.category_result_figure.frame.hide()
-            self.gui_structure.category_result_figure.label.hide()
-            for option in self.gui_structure.category_options_result.list_of_options:
-                option.hide()
-            self.gui_structure.hint_depth.show()
-            self.gui_structure.hint_depth.set_text(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
-            self.canvas.hide() if self.canvas is not None else None
+            hide_no_result(True)
             return
-        # show checkBox for legend and save figure button
-        self.gui_structure.category_result_figure.frame.show()
-        self.gui_structure.category_result_figure.label.show()
-        for option in self.gui_structure.category_options_result.list_of_options:
-            option.show()
 
+        # no errors, so proceed with showing the results
+        hide_no_result(False)
         # create figure for every ResultFigure object
         for fig_obj, fig_name in self.gui_structure.list_of_result_figures:
             plt.rc('figure')
@@ -977,7 +974,8 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                 fig_obj.canvas = None
 
             # create figure and axe if not already exists
-            fig_obj.fig, fig_obj.ax = getattr(borefield, fig_obj.function_name)(fig_obj.kwargs)
+            fig_obj.fig, fig_obj.ax = getattr(borefield, fig_obj.function_name)(**fig_obj.kwargs)
+            fig_obj.show()
             canvas = FigureCanvas(fig_obj.fig)
             # save variables
             fig_obj.layout_frame.addWidget(canvas)
@@ -1009,7 +1007,12 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
             return
         # save the figure
+        import matplotlib.pyplot as plt
+        plt.rcParams['savefig.facecolor'] = 'white'
+        result_figure.ax.tick_params(axis='x', colors='black')
         result_figure.fig.savefig(filename[0])
+        from gui_base_class import set_graph_layout
+        set_graph_layout(result_figure.ax)
 
     def save_data(self) -> None:
         """

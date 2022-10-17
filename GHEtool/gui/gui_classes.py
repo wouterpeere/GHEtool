@@ -866,6 +866,20 @@ class Category:
         return self.frame.isHidden()
 
 
+class FigureOption(ButtonBox):
+
+    def __init__(self, category, label, param, default, entries, entries_values):
+        super(FigureOption, self).__init__(category=category, label=label, default_index=default, entries=entries)
+        self.values = entries_values
+        self.param = param
+
+    def get_value(self) -> int:
+        for idx, button in enumerate(self.widget):
+            if button.isChecked():
+                return self.param, self.values[idx]
+        return
+
+
 class ResultFigure(Category):
 
     def __init__(self, label: str, page, save_figure_button: bool = True):
@@ -875,17 +889,30 @@ class ResultFigure(Category):
         self.ax = None
         self.canvas = None
         self.save_fig: bool = False
-        self.kwargs: dict = {}
+        self._kwargs: dict = {}
         self.function_name: str = ""
         self.class_name: str = ""
 
         if save_figure_button:
             self.save_fig = FunctionButton(category=self, button_text="Save figure", icon=":/icons/icons/Save_Inv.svg")
 
-    def fig_to_be_shown(self, class_name: str = "Borefield", function_name: str = "print_temperature_profile", *kwargs):
+    def fig_to_be_shown(self, class_name: str = "Borefield", function_name: str = "print_temperature_profile", **kwargs):
         self.class_name = class_name
         self.function_name = function_name
-        self.kwargs = kwargs
+        self._kwargs = kwargs
+
+    @property
+    def kwargs(self):
+        kwargs_temp = {}
+        for i in self.list_of_options:
+            if i != self.save_fig:
+                key, value = i.get_value()
+                kwargs_temp[key] = value
+        return self._kwargs | kwargs_temp
+
+    def options_to_show(self, label: str, param: str, default_index: int, entries_text: List[str], entries_values: List) -> None:
+        self.options.append(FigureOption(category=self, param=param, label=label, default=default_index,
+                                         entries=entries_text, entries_values=entries_values))
 
 
 class Aim:
