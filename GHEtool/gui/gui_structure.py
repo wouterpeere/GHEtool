@@ -284,7 +284,7 @@ class GuiStructure:
         self.option_constant_rb = FloatBox(
             category=self.category_constant_rb,
             label="Equivalent borehole resistance (e.g. from TRT) [mK/W]: ",
-            default_value=0.0150,
+            default_value=0.08,
             decimal_number=4,
             minimal_value=0,
             maximal_value=100,
