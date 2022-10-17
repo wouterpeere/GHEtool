@@ -18,6 +18,27 @@ WARNING: str = "rgb(255, 200, 87)"
 BLACK: str = "rgb(0, 0, 0)"
 
 
+def set_graph_layout():
+    from matplotlib.colors import to_rgb
+    from numpy import array, float64
+    import matplotlib.pyplot as plt
+    background_color: str = to_rgb(
+        array(DARK.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
+    white_color: str = to_rgb(
+        array(WHITE.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
+    light_color: str = to_rgb(
+        array(LIGHT.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
+    bright_color: str = to_rgb(
+        array(WARNING.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
+    plt.rcParams["text.color"] = white_color
+    plt.rcParams["axes.labelcolor"] = white_color
+    plt.rcParams["xtick.color"] = white_color
+    plt.rcParams["ytick.color"] = white_color
+
+    plt.rc('figure')
+    plt.rcParams['figure.facecolor'] = background_color
+
+
 class UiGhetool:
     menuLanguage: QMenu
     status_bar: QStatusBar

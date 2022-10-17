@@ -10,6 +10,7 @@ import functools
 import warnings
 
 from GHEtool.VariableClasses import GroundData, FluidData, PipeData
+from gui.gui_base_class import set_graph_layout
 
 FOLDER = os.path.dirname(os.path.realpath(__file__))  # solve problem with importing GHEtool from sub-folders
 
@@ -225,6 +226,10 @@ class Borefield:
 
         # set a custom g-function
         self.custom_gfunction = custom_gfunction
+
+        # create plotlayout if gui
+        if self.gui:
+            set_graph_layout()
 
     @staticmethod
     def configuration_string(N_1: int, N_2: int) -> str:
@@ -1201,28 +1206,28 @@ class Borefield:
             else:
                 time_array = self.time_L3_last_year / 12 / 730. / 3600.
 
-            if self.gui:
-                from matplotlib.colors import to_rgb
-                from numpy import array, float64
-                from GHEtool.gui.gui_base_class import UiGhetool, GREY, WHITE, DARK, LIGHT, WARNING
-                background_color: str = to_rgb(
-                    array(DARK.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-                white_color: str = to_rgb(
-                    array(WHITE.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-                light_color: str = to_rgb(
-                    array(LIGHT.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-                bright_color: str = to_rgb(
-                    array(WARNING.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-                plt.rcParams["text.color"] = white_color
-                plt.rcParams["axes.labelcolor"] = white_color
-                plt.rcParams["xtick.color"] = white_color
-                plt.rcParams["ytick.color"] = white_color
-
-                plt.rc('figure')
-                fig = plt.figure(facecolor=background_color)
-            else:
-                plt.rc('figure')
-                fig = plt.figure()
+            # if self.gui:
+            #     from matplotlib.colors import to_rgb
+            #     from numpy import array, float64
+            #     from GHEtool.gui.gui_base_class import UiGhetool, GREY, WHITE, DARK, LIGHT, WARNING
+            #     background_color: str = to_rgb(
+            #         array(DARK.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
+            #     white_color: str = to_rgb(
+            #         array(WHITE.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
+            #     light_color: str = to_rgb(
+            #         array(LIGHT.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
+            #     bright_color: str = to_rgb(
+            #         array(WARNING.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
+            #     plt.rcParams["text.color"] = white_color
+            #     plt.rcParams["axes.labelcolor"] = white_color
+            #     plt.rcParams["xtick.color"] = white_color
+            #     plt.rcParams["ytick.color"] = white_color
+            #
+            #     plt.rc('figure')
+            #     fig = plt.figure(facecolor=background_color)
+            # else:
+            plt.rc('figure')
+            fig = plt.figure()
 
             ax1 = fig.add_subplot(111)
             ax1.set_xlabel(r'Time (year)')
