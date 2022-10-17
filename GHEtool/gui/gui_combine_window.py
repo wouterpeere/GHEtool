@@ -39,6 +39,10 @@ from GHEtool.gui.gui_base_class import UiGhetool
 from GHEtool.gui.gui_structure import * # GuiStructure, Option, FunctionButton,
 from GHEtool.gui.translation_class import Translations
 
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import \
+    FigureCanvasQTAgg as FigureCanvas
+
 if TYPE_CHECKING:
     from pandas import DataFrame as pd_DataFrame
     from pandas import ExcelFile as pd_ExcelFile
@@ -944,10 +948,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         if not self.list_ds:
             hide_no_result(True)
             return
-        # import here to save start up time
-        import matplotlib.pyplot as plt
-        from matplotlib.backends.backend_qt5agg import \
-            FigureCanvasQTAgg as FigureCanvas
 
         # get Datastorage of selected scenario
         ds: DataStorage = self.list_ds[self.list_widget_scenario.currentRow()]

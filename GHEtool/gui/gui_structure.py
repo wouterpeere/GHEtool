@@ -25,15 +25,24 @@ class GuiStructure:
         Option.default_parent = default_parent
         Hint.default_parent = default_parent
         FunctionButton.default_parent = default_parent
+
         self.status_bar = status_bar
         self.no_file_selected = 'No file Selected'
-        # start coding of structure
-        self.page_aim = Page(name="Aim of simulation", button_name="Aim", icon=":/icons/icons/Aim_Inv.svg")
 
-        self.aim_temp_profile = Aim(page=self.page_aim, label="Determine temperature profile", icon=":/icons/icons/Temp_Profile.svg")
-        self.aim_req_depth = Aim(page=self.page_aim, label="Determine required depth", icon=":/icons/icons/Depth_determination.svg")
-        self.aim_size_length = Aim(page=self.page_aim, label="Size borefield by length and width", icon=":/icons/icons/Size_Length.svg")
-        self.aim_optimize = Aim(page=self.page_aim, label="Optimize load profile", icon=":/icons/icons/Optimize_Profile.svg")
+        #################################################################################################################
+        #                                                                                                               #
+        # GUI STRUCTURE                                                                                                 #
+        #                                                                                                               #
+        #################################################################################################################
+
+        def create_page_aim():
+            # create page
+            self.page_aim = Page(name="Aim of simulation", button_name="Aim", icon=":/icons/icons/Aim_Inv.svg")
+
+            self.aim_temp_profile = Aim(page=self.page_aim, label="Determine temperature profile", icon=":/icons/icons/Temp_Profile.svg")
+            self.aim_req_depth = Aim(page=self.page_aim, label="Determine required depth", icon=":/icons/icons/Depth_determination.svg")
+            self.aim_size_length = Aim(page=self.page_aim, label="Size borefield by length and width", icon=":/icons/icons/Size_Length.svg")
+            self.aim_optimize = Aim(page=self.page_aim, label="Optimize load profile", icon=":/icons/icons/Optimize_Profile.svg")
 
         def create_page_options():
             # create page
@@ -900,7 +909,13 @@ class GuiStructure:
                 "button in the upper left corner if the changes should not be lost. ",
             )
 
-        # create pages
+        #################################################################################################################
+        #                                                                                                               #
+        # CREATE PAGES                                                                                                  #
+        #                                                                                                               #
+        #################################################################################################################
+
+        create_page_aim()
         create_page_options()
         create_page_borehole()
         create_page_borehole_resistance()

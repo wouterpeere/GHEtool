@@ -12,9 +12,6 @@ from os.path import exists
 import PySide6.QtCore as QtC  # type: ignore
 import PySide6.QtGui as QtG  # type: ignore
 import PySide6.QtWidgets as QtW  # type: ignore
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt5agg import \
-            FigureCanvasQTAgg as FigureCanvas
 
 from GHEtool.gui.gui_base_class import DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE
 
