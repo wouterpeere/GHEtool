@@ -774,6 +774,7 @@ class Category:
         self.grid_layout: int = 0
         self.layout_frame: Optional[QtW.QVBoxLayout] = None
         page.list_categories.append(self)
+        self.options_hidden = []
 
     def activate_graphic_left(self):
         self.graphic_left = True
@@ -854,13 +855,19 @@ class Category:
         self.frame.hide()
         self.label.hide()
         for option in self.list_of_options:
+            # only hide the options that were not already hidden
+            # this since otherwise there can be problems with options at the results page
+            if option.is_hidden():
+                continue
+            self.options_hidden.append(option)
             option.hide()
 
     def show(self) -> None:
         self.frame.show()
         self.label.show()
-        for option in self.list_of_options:
+        for option in self.options_hidden:
             option.show()
+        self.options_hidden = []
 
     def is_hidden(self) -> bool:
         return self.frame.isHidden()
@@ -905,7 +912,7 @@ class ResultFigure(Category):
     def kwargs(self):
         kwargs_temp = {}
         for i in self.list_of_options:
-            if i != self.save_fig:
+            if i != self.save_fig and not i.is_hidden():
                 key, value = i.get_value()
                 kwargs_temp[key] = value
         return self._kwargs | kwargs_temp

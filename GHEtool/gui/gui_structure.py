@@ -785,18 +785,6 @@ class GuiStructure:
 
         self.page_result = Page("Results", "Results", ":/icons/icons/Result.svg")
 
-        # self.category_options_result = Category(page=self.page_result, label="Options results")
-        #
-        # self.hint_depth = Hint(category=self.category_options_result, hint="Size")
-        # self.function_save_results = FunctionButton(
-        #     category=self.category_options_result, button_text="Save results", icon=":/icons/icons/Save_Inv.svg"
-        # )
-        # self.function_save_figure = FunctionButton(
-        #     category=self.category_options_result, button_text="Save figure", icon=":/icons/icons/Save_Inv.svg"
-        # )
-
-        # self.category_result_figure = Category(page=self.page_result, label="Figure")
-
         # TODO restructure
         # TODO add other results (e.g. for the optimise load profile)
         self.cat_no_result = Category(page=self.page_result, label="No results")
@@ -822,6 +810,15 @@ class GuiStructure:
                                                               default=0,
                                                               entries=["No", "Yes"],
                                                               entries_values=[False, True])
+        self.hourly_figure_temperature_profile = FigureOption(category=self.figure_temperature_profile,
+                                                              label="Hourly profile",
+                                                              param="plot_hourly",
+                                                              default=1,
+                                                              entries=["No", "Yes"],
+                                                              entries_values=[False, True])
+
+        self.option_method_size_depth.add_link_2_show(self.hourly_figure_temperature_profile, on_index=2)
+        self.aim_req_depth.add_link_2_show(self.result_text_depth)
 
         self.page_settings = Page("Settings", "Settings", ":/icons/icons/Settings.svg")
 
