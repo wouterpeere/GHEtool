@@ -102,9 +102,9 @@ class CalcProblem(QtCore_QThread):
             peak_heating, peak_cooling = load_data_GUI(
                 filename=self.DS.option_filename,
                 thermal_demand=self.DS.option_column,
-                heating_load_column=self.DS.option_heating_column,
-                cooling_load_column=self.DS.option_cooling_column,
-                combined=self.DS.option_single_column,
+                heating_load_column=self.DS.option_heating_column_text,
+                cooling_load_column=self.DS.option_cooling_column_text,
+                combined=self.DS.option_single_column_text,
                 sep=";" if self.DS.option_seperator_csv == 0 else ",",
                 dec="." if self.DS.option_decimal_csv == 0 else ",",
                 fac=0.001 if data_unit == 0 else 1 if data_unit == 1 else 1000,
