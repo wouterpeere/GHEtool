@@ -5,7 +5,8 @@ from PySide6.QtWidgets import QGraphicsEllipseItem, QGraphicsScene
 from PySide6.QtWidgets import QGraphicsView as QtWidgets_QGraphicsView
 from PySide6.QtGui import QPen
 from PySide6.QtGui import QColor
-from numpy import cos, sin, array, int64, float64, round
+from numpy import cos, sin, array, int64, float64, round, sum
+from numpy import max as npmax
 
 from GHEtool.gui.gui_classes import (Aim, ButtonBox, Category, FloatBox, FileNameBox, FunctionButton, Hint, IntBox, ListBox, Option, Page, ResultFigure, ResultText, FigureOption)
 from GHEtool.gui.translation_class import Translations
@@ -935,12 +936,57 @@ class GuiStructure:
                 self.result_Rb_calculated.function_to_convert_to_text(lambda x: round(x, 2))
 
                 self.results_ground_temperature = ResultText("Ground temperature", category=self.numerical_results,
-                                                       prefix="Average ground temperature: ", suffix=" deg C")
+                                                             prefix="Average ground temperature: ", suffix=" deg C")
                 self.results_ground_temperature.text_to_be_shown("Borefield", "_Tg")
                 self.results_ground_temperature.function_to_convert_to_text(lambda x: round(x, 2))
 
+                self.results_heating_load = ResultText("Heating load", category=self.numerical_results,
+                                                       prefix="Heating load on the borefield: ", suffix=" kWh")
+                self.results_heating_load.text_to_be_shown("Borefield", "baseload_heating")
+                self.results_heating_load.function_to_convert_to_text(lambda x: round(sum(x), 2))
+                self.results_heating_load_percentage = ResultText("Percentage", category=self.numerical_results,
+                                                                  prefix="This is ", suffix="% of the heating load")
+                self.results_heating_load_percentage.text_to_be_shown("Borefield", "_percentage_heating")
+                self.results_heating_load_percentage.function_to_convert_to_text(lambda x: round(x, 2))
+                self.results_heating_ext = ResultText("Heating ext", category=self.numerical_results,
+                                                      prefix="heating load external: ", suffix=" kWh")
+                self.results_heating_ext.text_to_be_shown("Borefield", "monthly_load_heating_external")
+                self.results_heating_ext.function_to_convert_to_text(lambda x: round(sum(x), 2))
+                self.results_heating_peak = ResultText("Heating ext peak", category=self.numerical_results,
+                                                       prefix="with a peak of: ", suffix=" kW")
+                self.results_heating_peak.text_to_be_shown("Borefield", "peak_heating_external")
+                self.results_heating_peak.function_to_convert_to_text(lambda x: round(max(x), 2))
+
+                self.results_cooling_load = ResultText("Cooling load", category=self.numerical_results,
+                                                       prefix="Cooling load on the borefield: ", suffix=" kWh")
+                self.results_cooling_load.text_to_be_shown("Borefield", "baseload_cooling")
+                self.results_cooling_load.function_to_convert_to_text(lambda x: round(sum(x), 2))
+                self.results_cooling_load_percentage = ResultText("Percentage", category=self.numerical_results,
+                                                                  prefix="This is ", suffix="% of the cooling load")
+                self.results_cooling_load_percentage.text_to_be_shown("Borefield", "_percentage_cooling")
+                self.results_cooling_load_percentage.function_to_convert_to_text(lambda x: round(x, 2))
+                self.results_cooling_ext = ResultText("Cooling ext", category=self.numerical_results,
+                                                      prefix="cooling load external: ", suffix=" kWh")
+                self.results_cooling_ext.text_to_be_shown("Borefield", "monthly_load_cooling_external")
+                self.results_cooling_ext.function_to_convert_to_text(lambda x: round(sum(x), 2))
+                self.results_cooling_peak = ResultText("Cooling ext peak", category=self.numerical_results,
+                                                      prefix="with a peak of: ", suffix=" kW")
+                self.results_cooling_peak.text_to_be_shown("Borefield", "peak_cooling_external")
+                self.results_cooling_peak.function_to_convert_to_text(lambda x: round(max(x), 2))
+
                 # add dependency
                 self.option_method_temp_gradient.add_link_2_show(self.results_ground_temperature, on_index=1)
+                self.option_method_rb_calc.add_link_2_show(self.result_Rb_calculated, on_index=1)
+                self.aim_req_depth.add_link_2_show(self.result_text_depth)
+
+                self.aim_optimize.add_link_2_show(self.results_heating_ext)
+                self.aim_optimize.add_link_2_show(self.results_heating_load_percentage)
+                self.aim_optimize.add_link_2_show(self.results_heating_load)
+                self.aim_optimize_add_link_2_show(self.results_heating_peak)
+                self.aim_optimize.add_link_2_show(self.results_cooling_ext)
+                self.aim_optimize.add_link_2_show(self.results_cooling_load_percentage)
+                self.aim_optimize.add_link_2_show(self.results_cooling_load)
+                self.aim_optimize.add_link_2_show(self.results_heating_peak)
 
             def create_figure_temperature_profile():
                 self.figure_temperature_profile = ResultFigure(label="Temperature evolution",
@@ -968,25 +1014,27 @@ class GuiStructure:
                 self.option_method_size_depth.add_link_2_show(self.hourly_figure_temperature_profile, on_index=2)
                 self.aim_req_depth.add_link_2_show(self.hourly_figure_temperature_profile)
                 self.option_temperature_profile_hourly.add_link_2_show(self.hourly_figure_temperature_profile, on_index=1)
+                self.aim_optimize.add_link_2_show(self.hourly_figure_temperature_profile)
 
             def create_figure_load_duration():
                 self.figure_load_duration = ResultFigure(label="Load-duration curve",
-                                                               page=self.page_result,
-                                                               save_figure_button=True)
+                                                         page=self.page_result,
+                                                         save_figure_button=True)
 
                 self.figure_load_duration.fig_to_be_shown(class_name="Borefield",
-                                                            function_name="plot_load_duration")
+                                                          function_name="plot_load_duration")
 
                 self.legend_figure_load_duration = FigureOption(category=self.figure_load_duration,
-                                                                      label="Legend on",
-                                                                      param="legend",
-                                                                      default=0,
-                                                                      entries=["No", "Yes"],
-                                                                      entries_values=[False, True])
+                                                                label="Legend on",
+                                                                param="legend",
+                                                                default=0,
+                                                                entries=["No", "Yes"],
+                                                                entries_values=[False, True])
 
                 # add dependencies
                 self.option_method_size_depth.add_link_2_show(self.figure_load_duration, on_index=2)
                 self.option_temperature_profile_hourly.add_link_2_show(self.figure_load_duration, on_index=1)
+                self.aim_optimize.add_link_2_show(self.figure_load_duration)
 
             # create categories
             create_category_no_result()

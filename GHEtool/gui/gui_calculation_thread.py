@@ -62,7 +62,8 @@ class CalcProblem(QtCore_QThread):
 
         # set hourly loads if available
         if self.DS.option_method_size_depth == 2 or \
-                (self.DS.option_temperature_profile_hourly == 1 and self.DS.aim_temp_profile):
+                (self.DS.option_temperature_profile_hourly == 1 and self.DS.aim_temp_profile) or \
+                self.DS.aim_optimize:
             data_unit = self.DS.option_unit_data
 
             peak_heating, peak_cooling = load_data_GUI(
@@ -92,36 +93,23 @@ class CalcProblem(QtCore_QThread):
 
         # if load should be optimized do this
         if self.DS.aim_optimize:
-            # get column and decimal seperator
-            sep: str = ";" if self.DS.option_seperator_csv == 0 else ","
-            dec: str = "." if self.DS.option_decimal_csv == 0 else ","
-            # import pandas here to save start up time
-            from pandas import read_csv as pd_read_csv
-
-            # load data from csv file
             try:
-                data = pd_read_csv(self.DS.filename, sep=sep, decimal=dec)
-            except FileNotFoundError:
+                # optimize load profile without printing the results
+                borefield.optimise_load_profile()
+            except ValueError as err:
+                self.DS.debug_message = err
+                # save bore field in Datastorage
+                self.DS.borefield = None
+                # return Datastorage as signal
                 self.any_signal.emit((self.DS, self.idx))
                 return
-            # get data unit factor of energy demand
-            unit: float = 0.001 if self.DS.option_unit_data == 0 else 1 if self.DS.option_unit_data == 1 else 1_000
-            # if data is in 2 column create a list of the loaded data else sepperate data by >0 and <0 and then create a
-            # list and muliplty in both cases with the unit factor to achive data in kW
-            if self.DS.option_column == 1:
-                print(data.columns[self.DS.option_heating_column])
-                borefield.hourly_heating_load = data[data.columns[self.DS.option_heating_column]] * unit
-                borefield.hourly_cooling_load = data[data.columns[self.DS.option_cooling_column]] * unit
-            else:
-                borefield.hourly_heating_load = data[data.columns[self.DS.option_single_column]].apply(lambda x: x >= 0) * unit
-                borefield.hourly_cooling_load = data[data.columns[self.DS.option_single_column]].apply(lambda x: x < 0) * unit
-            # optimize load profile without printing the results
-            borefield.optimise_load_profile(depth=self.DS.ground_data.H, print_results=False)
-            # save bore field in Datastorage
-            self.DS.borefield = borefield
-            # return Datastorage as signal
-            self.any_signal.emit((self.DS, self.idx))
-            return
+            except RuntimeError:
+                # save bore field in Datastorage
+                self.DS.borefield = None
+                self.DS.ErrorMessage = self.translation.NotCalculated
+                # return Datastorage as signal
+                self.any_signal.emit((self.DS, self.idx))
+                return
 
         ### Size borefield
         if self.DS.aim_req_depth:

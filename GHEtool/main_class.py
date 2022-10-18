@@ -1551,7 +1551,7 @@ class Borefield:
             peak_load.append(max(np.minimum(peak, temp)))
         return peak_load
 
-    def optimise_load_profile(self, depth: float = 150, print_results: bool = False) -> None:
+    def optimise_load_profile(self, depth: float = None, print_results: bool = False) -> None:
         """
         This function optimises the load based on the given borefield and the given hourly load.
         It does so base on a load-duration curve.
@@ -1560,6 +1560,9 @@ class Borefield:
         :param print_results: True if results need to be plotted
         :return: None
         """
+
+        if depth is None:
+            depth = self.H
 
         # since the depth does not change, the Rb* value is constant
         # set to use a constant Rb* value but save the initial parameters
@@ -1639,26 +1642,34 @@ class Borefield:
         self.Rb = Rb_backup
         self.use_constant_Rb = use_constant_Rb_backup
 
-        # print results
-        print("The peak load heating is: ", int(peak_heat_load), "kW, leading to",
-              np.round(np.sum(self.baseload_heating), 2), "kWh of heating.")
-        print("This is", np.round(np.sum(self.baseload_heating) / np.sum(self.hourly_heating_load) * 100, 2),
-              "% of the total heating load.")
-        print("Another", np.round(-np.sum(self.baseload_heating) + np.sum(self.hourly_heating_load), 2),
-              "kWh of heating should come from another source, with a peak of",
-              int(max(self.hourly_heating_load)) - int(peak_heat_load), "kW.")
-        print("------------------------------------------")
-        print("The peak load cooling is: ", int(peak_cool_load), "kW, leading to",
-              np.round(np.sum(self.baseload_cooling), 2), "kWh of cooling.")
-        print("This is", np.round(np.sum(self.baseload_cooling) / np.sum(self.hourly_cooling_load) * 100, 2),
-              "% of the total cooling load.")
-        print("Another", np.round(-np.sum(self.baseload_cooling) + np.sum(self.hourly_cooling_load), 2),
-              "kWh of cooling should come from another source, with a peak of",
-              int(max(self.hourly_cooling_load)) - int(peak_cool_load), "kW.")
-
         if print_results:
+            # print results
+            print("The peak load heating is: ", int(peak_heat_load), "kW, leading to",
+                  np.round(np.sum(self.baseload_heating), 2), "kWh of heating.")
+            print("This is", np.round(np.sum(self.baseload_heating) / np.sum(self.hourly_heating_load) * 100, 2),
+                  "% of the total heating load.")
+            print("Another", np.round(-np.sum(self.baseload_heating) + np.sum(self.hourly_heating_load), 2),
+                  "kWh of heating should come from another source, with a peak of",
+                  int(max(self.hourly_heating_load)) - int(peak_heat_load), "kW.")
+            print("------------------------------------------")
+            print("The peak load cooling is: ", int(peak_cool_load), "kW, leading to",
+                  np.round(np.sum(self.baseload_cooling), 2), "kWh of cooling.")
+            print("This is", np.round(np.sum(self.baseload_cooling) / np.sum(self.hourly_cooling_load) * 100, 2),
+                  "% of the total cooling load.")
+            print("Another", np.round(-np.sum(self.baseload_cooling) + np.sum(self.hourly_cooling_load), 2),
+                  "kWh of cooling should come from another source, with a peak of",
+                  int(max(self.hourly_cooling_load)) - int(peak_cool_load), "kW.")
+
             # plot results
             self._print_temperature_profile(H=depth)
+
+    @property
+    def _percentage_heating(self) -> float:
+        return np.sum(self.baseload_heating) / np.sum(self.hourly_heating_load) * 100
+
+    @property
+    def _percentage_cooling(self) -> float:
+        return np.sum(self.baseload_cooling) / np.sum(self.hourly_cooling_load) * 100
 
     def _calculate_quadrant(self) -> int:
         """
@@ -1765,7 +1776,7 @@ class Borefield:
         # get all the solutions
         lengths = list(results.keys())
         lengths.sort()
-        # reverse for decending order
+        # reverse for descending order
         lengths[::-1]
 
         # cut to right length
@@ -1888,7 +1899,7 @@ class Borefield:
         fig = plt.figure()
         ax = fig.add_subplot(111)
         ax.step(np.arange(0, 8760, 1), heating, 'r-', label="Heating")
-        ax.step(np.arange(0, 8760, 1), cooling, 'b-', label="Heating")
+        ax.step(np.arange(0, 8760, 1), cooling, 'b-', label="Cooling")
         ax.hlines(0, 0, 8759, color="black")
 
         ax.set_xlabel("Time [hours]")
