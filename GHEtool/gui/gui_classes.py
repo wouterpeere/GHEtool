@@ -851,7 +851,7 @@ class Category:
         layout.addWidget(graphic_view)
         return graphic_view
 
-    def hide(self) -> None:
+    def hide(self, **kwargs) -> None:
         self.frame.hide()
         self.label.hide()
         for option in self.list_of_options:
@@ -862,7 +862,7 @@ class Category:
             self.options_hidden.append(option)
             option.hide()
 
-    def show(self) -> None:
+    def show(self, **kwargs) -> None:
         self.frame.show()
         self.label.show()
         for option in self.options_hidden:
@@ -899,6 +899,7 @@ class ResultFigure(Category):
         self._kwargs: dict = {}
         self.function_name: str = ""
         self.class_name: str = ""
+        self.to_show: bool = True
 
         if save_figure_button:
             self.save_fig = FunctionButton(category=self, button_text="Save figure", icon=":/icons/icons/Save_Inv.svg")
@@ -920,6 +921,19 @@ class ResultFigure(Category):
     def options_to_show(self, label: str, param: str, default_index: int, entries_text: List[str], entries_values: List) -> None:
         self.options.append(FigureOption(category=self, param=param, label=label, default=default_index,
                                          entries=entries_text, entries_values=entries_values))
+
+    def show(self, results: bool = False) -> None:
+        if self.to_show:
+            super(ResultFigure, self).show()
+        if results:
+            return
+        self.to_show = True
+
+    def hide(self, results: bool = False) -> None:
+        super(ResultFigure, self).hide()
+        if results:
+            return
+        self.to_show = False
 
 
 class Aim:

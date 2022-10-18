@@ -42,6 +42,8 @@ class DataStorage:
         self.pipe_data: PipeData = PipeData(self.option_pipe_grout_conductivity, self.option_pipe_inner_radius, self.option_pipe_outer_radius,
                                             self.option_pipe_conductivity, self.option_pipe_distance, self.option_pipe_number, self.option_pipe_roughness)
 
+        self.debug_message: str = ""
+
     def _calculate_flux(self) -> float:
         """ This function calculates the flux"""
         return 2 * self.option_temp_gradient * self.option_conductivity / 100

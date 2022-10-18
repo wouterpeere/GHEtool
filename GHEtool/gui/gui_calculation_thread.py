@@ -5,41 +5,6 @@ from GHEtool.gui.gui_data_storage import DataStorage
 from GHEtool.gui.gui_structure import load_data_GUI
 
 
-class BoundsOfPrecalculatedData:
-    """
-    class to check if selected values are within the bounds for the precalculated data
-    """
-
-    __slots__ = "H", "B_Min", "B_Max", "k_s_Min", "k_s_Max", "N_Max"
-
-    def __init__(self) -> None:
-        self.H: float = 350.0  # Maximal depth [m]
-        self.B_Max: float = 9.0  # Maximal borehole spacing [m]
-        self.B_Min: float = 3.0  # Minimal borehole spacing [m]
-        self.k_s_Min: float = 1  # Minimal thermal conductivity of the soil [W/mK]
-        self.k_s_Max: float = 4  # Maximal thermal conductivity of the soil [W/mK]
-        self.N_Max: int = 20  # Maximal number of boreholes in one direction [#]
-
-    def check_if_outside_bounds(self, h: float, b: float, k_s: float, n: int) -> bool:
-        """
-        Check if selected values are within the bounds for the precalculated data
-        :param h: depth [m]
-        :param b: Spacings [m]
-        :param k_s: Thermal conductivity of the soil [W/mK]
-        :param n: Maximal number of borehole in one rectangular field direction
-        :return: true if outside of bounds
-        """
-        if h > self.H:
-            return True
-        if not (self.B_Min <= b <= self.B_Max):
-            return True
-        if not (self.k_s_Min <= k_s <= self.k_s_Max):
-            return True
-        if n > self.N_Max:
-            return True
-        return False
-
-
 class CalcProblem(QtCore_QThread):
     """
     class to calculate the problem in an external thread
@@ -163,7 +128,14 @@ class CalcProblem(QtCore_QThread):
                 # size the borehole
                 borefield.size()
 
-            except RuntimeError or ValueError:
+            except ValueError as err:
+                self.DS.debug_message = err
+                # save bore field in Datastorage
+                self.DS.borefield = None
+                # return Datastorage as signal
+                self.any_signal.emit((self.DS, self.idx))
+                return
+            except RuntimeError:
                 # save bore field in Datastorage
                 self.DS.borefield = None
                 self.DS.ErrorMessage = self.translation.NotCalculated
@@ -191,6 +163,9 @@ class CalcProblem(QtCore_QThread):
                 borefield.calculate_temperatures(borefield.H)
             except ValueError:
                 pass
+
+        # set debug message to ""
+        self.DS.debug_message = ""
 
         # save borefield in Datastorage
         self.DS.borefield = borefield

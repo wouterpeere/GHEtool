@@ -32,8 +32,7 @@ from PySide6.QtWidgets import QPushButton as QtWidgets_QPushButton
 from PySide6.QtWidgets import QSizePolicy, QSpacerItem
 from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
 
-from GHEtool.gui.gui_calculation_thread import (BoundsOfPrecalculatedData,
-                                                CalcProblem)
+from GHEtool.gui.gui_calculation_thread import (CalcProblem)
 from GHEtool.gui.gui_data_storage import DataStorage
 from GHEtool.gui.gui_base_class import UiGhetool
 from GHEtool.gui.gui_structure import * # GuiStructure, Option, FunctionButton,
@@ -111,7 +110,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.sizeS = QtCore_QSize(24, 24)  # size of small logo on push button
         self.sizePushB = QtCore_QSize(150, 75)  # size of big push button
         self.sizePushS = QtCore_QSize(75, 75)  # size of small push button
-        self.BOPD: BoundsOfPrecalculatedData = BoundsOfPrecalculatedData()  # init bounds of precalculated data class
         # init links from buttons to functions
         self.set_links()
         # reset progress bar
@@ -937,12 +935,12 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         def hide_no_result(hide: bool = True):
             if hide:
                 for cat in self.gui_structure.page_result.list_categories:
-                    cat.hide()
+                    cat.hide(results=True)
                 self.gui_structure.cat_no_result.show()
-                self.gui_structure.cat_no_result.set_text(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
+                self.gui_structure.text_no_result.set_text(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
                 return
             for cat in self.gui_structure.page_result.list_categories:
-                cat.show()
+                cat.show(results=True)
             self.gui_structure.cat_no_result.hide()
 
         if not self.list_ds:
@@ -953,6 +951,13 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         ds: DataStorage = self.list_ds[self.list_widget_scenario.currentRow()]
         # get borefield of selected scenario
         borefield: Borefield = ds.borefield
+
+        # set debug message
+        if ds.debug_message != "":
+            hide_no_result(True)
+            self.gui_structure.text_no_result.set_text(str(ds.debug_message))
+            return
+
         # hide widgets if no results borefield exists and display not calculated text
         if borefield is None:
             hide_no_result(True)
@@ -962,6 +967,10 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         hide_no_result(False)
         # create figure for every ResultFigure object
         for fig_obj, fig_name in self.gui_structure.list_of_result_figures:
+
+            if fig_obj.is_hidden():
+                continue
+
             plt.rc('figure')
             if fig_obj.ax is not None:
                 fig_obj.ax.clear()

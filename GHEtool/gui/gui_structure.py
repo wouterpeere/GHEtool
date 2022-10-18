@@ -918,7 +918,7 @@ class GuiStructure:
                 self.result_text_depth.text_to_be_shown("Borefield", "H")
                 self.result_text_depth.function_to_convert_to_text(lambda x: round(x, 2))
 
-                self.result_Rb_calculated = ResultText("Depth", category=self.numerical_results,
+                self.result_Rb_calculated = ResultText("Equivalent borehole thermal resistance", category=self.numerical_results,
                                                        prefix="Equivalent borehole thermal resistance: ", suffix="Wm/K")
                 self.result_Rb_calculated.text_to_be_shown("Borefield", "Rb")
                 self.result_Rb_calculated.function_to_convert_to_text(lambda x: round(x, 2))
@@ -957,10 +957,29 @@ class GuiStructure:
                 self.option_method_size_depth.add_link_2_show(self.hourly_figure_temperature_profile, on_index=2)
                 self.aim_req_depth.add_link_2_show(self.hourly_figure_temperature_profile)
 
+            def create_figure_load_duration():
+                self.figure_load_duration = ResultFigure(label="Load-duration curve",
+                                                               page=self.page_result,
+                                                               save_figure_button=True)
+
+                self.figure_load_duration.fig_to_be_shown(class_name="Borefield",
+                                                            function_name="plot_load_duration")
+
+                self.legend_figure_load_duration = FigureOption(category=self.figure_load_duration,
+                                                                      label="Legend on",
+                                                                      param="legend",
+                                                                      default=0,
+                                                                      entries=["No", "Yes"],
+                                                                      entries_values=[False, True])
+
+                # add dependencies
+                self.option_method_size_depth.add_link_2_show(self.figure_load_duration, on_index=2)
+
             # create categories
             create_category_no_result()
             create_category_numerical_results()
             create_figure_temperature_profile()
+            create_figure_load_duration()
 
         def create_page_settings():
             # create page

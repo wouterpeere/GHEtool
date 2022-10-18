@@ -1207,26 +1207,6 @@ class Borefield:
             else:
                 time_array = self.time_L3_last_year / 12 / 730. / 3600.
 
-            # if self.gui:
-            #     from matplotlib.colors import to_rgb
-            #     from numpy import array, float64
-            #     from GHEtool.gui.gui_base_class import UiGhetool, GREY, WHITE, DARK, LIGHT, WARNING
-            #     background_color: str = to_rgb(
-            #         array(DARK.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-            #     white_color: str = to_rgb(
-            #         array(WHITE.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-            #     light_color: str = to_rgb(
-            #         array(LIGHT.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-            #     bright_color: str = to_rgb(
-            #         array(WARNING.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-            #     plt.rcParams["text.color"] = white_color
-            #     plt.rcParams["axes.labelcolor"] = white_color
-            #     plt.rcParams["xtick.color"] = white_color
-            #     plt.rcParams["ytick.color"] = white_color
-            #
-            #     plt.rc('figure')
-            #     fig = plt.figure(facecolor=background_color)
-            # else:
             plt.rc('figure')
             fig = plt.figure()
 
@@ -1299,7 +1279,6 @@ class Borefield:
             raise ValueError("Due to the use of a variable ground temperature, no solution can be found."
                              "To see the temperature profile, one can plot it using the depth of ",
                              str(Borefield.THRESHOLD_DEPTH_ERROR), "m.")
-
 
         def jit_gfunction_calculation() -> np.ndarray:
             """
@@ -1889,13 +1868,12 @@ class Borefield:
         # show plot
         plt.show()
 
-    def plot_load_duration(self) -> None:
+    def plot_load_duration(self, legend: bool = False) -> None:
         """
         This function makes a load-duration curve from the hourly values.
 
         :return: None
         """
-
         # check if there are hourly values
         if not self._check_hourly_load():
             return
@@ -1906,18 +1884,21 @@ class Borefield:
         cooling = self.hourly_cooling_load.copy()
         cooling.sort()
         cooling = cooling * (-1)
-        print(np.average(cooling[-10:]), cooling[-10])
 
-        plt.figure()
-        plt.step(np.arange(0, 8760, 1), heating, 'r-', label="Heating")
-        plt.step(np.arange(0, 8760, 1), cooling, 'b-', label="Heating")
-        plt.hlines(0, 0, 8759, color="black")
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.step(np.arange(0, 8760, 1), heating, 'r-', label="Heating")
+        ax.step(np.arange(0, 8760, 1), cooling, 'b-', label="Heating")
+        ax.hlines(0, 0, 8759, color="black")
 
-        plt.xlabel("Time [hours]")
-        plt.ylabel("Power [kW]")
+        ax.set_xlabel("Time [hours]")
+        ax.set_ylabel("Power [kW]")
 
-        plt.xlim(0, 8760)
+        ax.set_xlim(0, 8760)
 
-        plt.title("Load-duration curve")
+        if legend:
+            ax.legend()
 
-        plt.show()
+        if not self.gui:
+            plt.show()
+        return fig, ax
