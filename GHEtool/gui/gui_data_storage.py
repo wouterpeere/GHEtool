@@ -5,12 +5,17 @@ import pygfunction as gt
 
 from GHEtool import Borefield, FluidData, GroundData, PipeData
 from GHEtool.gui.gui_structure import GuiStructure
+from GHEtool.gui.gui_classes import ListBox
 
 
 class DataStorage:
 
     def __init__(self, gui_structure: GuiStructure):
         for option, name in gui_structure.list_of_options:
+            # for a listbox, not the value but the text is relevant
+            if isinstance(option, ListBox):
+                setattr(self, name, option.get_text())
+                continue
             setattr(self, name, option.get_value())
         for aim, name in gui_structure.list_of_aims:
             setattr(self, name, aim.widget.isChecked())

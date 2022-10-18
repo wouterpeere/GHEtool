@@ -2,6 +2,7 @@ from PySide6.QtCore import QThread as QtCore_QThread
 from PySide6.QtCore import Signal as QtCore_pyqtSignal
 
 from GHEtool.gui.gui_data_storage import DataStorage
+from GHEtool.gui.gui_structure import load_data_GUI
 
 
 class BoundsOfPrecalculatedData:
@@ -96,9 +97,22 @@ class CalcProblem(QtCore_QThread):
 
         # set hourly loads if available
         if self.DS.option_method_size_depth == 2:
+            data_unit = self.DS.option_unit_data
+
+            peak_heating, peak_cooling = load_data_GUI(
+                filename=self.DS.option_filename,
+                thermal_demand=self.DS.option_column,
+                heating_load_column=self.DS.option_heating_column,
+                cooling_load_column=self.DS.option_cooling_column,
+                combined=self.DS.option_single_column,
+                sep=";" if self.DS.option_seperator_csv == 0 else ",",
+                dec="." if self.DS.option_decimal_csv == 0 else ",",
+                fac=0.001 if data_unit == 0 else 1 if data_unit == 1 else 1000,
+                hourly=True)
+
             # hourly data to be loaded
-            borefield.set_hourly_heating_load()
-            borefield.set_hourly_cooling_load()
+            borefield.set_hourly_heating_load(peak_heating)
+            borefield.set_hourly_cooling_load(peak_cooling)
 
         # setup the borefield sizing
         borefield.sizing_setup(H_init=self.DS.borefield_pygfunction[0].H,

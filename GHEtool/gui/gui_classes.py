@@ -497,6 +497,9 @@ class ListBox(Option):
         self.entries: List[str] = entries
         self.widget: QtW.QComboBox = QtW.QComboBox(self.default_parent)
 
+    def get_text(self) -> str:
+        return self.widget.currentText()
+
     def get_value(self) -> int:
         """
         get value of option.\n

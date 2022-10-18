@@ -16,6 +16,79 @@ from math import cos, pi, sin, tan
 from pandas import DataFrame as pd_DataFrame, read_csv as pd_read_csv
 
 
+def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, cooling_load_column: str, combined: str, sep: str,
+                   dec: str, fac: float, hourly: bool = False):
+    # raise error if no filename exists
+    if filename == "":
+        raise FileNotFoundError
+    # Generate list of columns that have to be imported
+    cols: list = []
+    if len(heating_load_column) >= 1:
+        cols.append(heating_load_column)
+    if len(cooling_load_column) >= 1:
+        cols.append(cooling_load_column)
+    if len(combined) >= 1:
+        cols.append(combined)
+    date: str = "Date"
+
+    df2: pd_DataFrame = pd_read_csv(filename, usecols=cols, sep=sep, decimal=dec)
+    # ---------------------- Time Step Section  ----------------------
+    # import pandas here to save start up time
+    from pandas import Series as pd_Series
+    from pandas import date_range as pd_date_range
+    from pandas import to_datetime as pd_to_datetime
+
+    # Define start and end date
+    start = pd_to_datetime("2019-01-01 00:00:00")
+    end = pd_to_datetime("2019-12-31 23:59:00")
+    # add date column
+    df2[date] = pd_Series(pd_date_range(start, end, freq="1H"))
+    # Create no dict to create mean values for
+    dict_agg: Optional[None, dict] = None
+
+    # set date to index
+    df2.set_index(date, inplace=True)
+    # resample data to hourly resolution if necessary
+    df2 = df2 if dict_agg is None else df2.resample("H").agg(dict_agg)
+    # ------------------- Calculate Section --------------------
+    # Choose path between Single or Combined Column and create new columns
+    if thermal_demand == 1:
+        # Resample the Data for peakHeating and peakCooling
+        df2.rename(columns={heating_load_column: "Heating Load", cooling_load_column: "Cooling Load"}, inplace=True)
+        df2["peak Heating"] = df2["Heating Load"]
+        df2["peak Cooling"] = df2["Cooling Load"]
+    # by single column split by 0 to heating (>0) and cooling (<0)
+    elif thermal_demand == 0:
+        # Create Filter for heating and cooling load ( Heating Load +, Cooling Load -)
+        heating_load = df2[combined].apply(lambda x: x >= 0)
+        cooling_load = df2[combined].apply(lambda x: x < 0)
+        df2["Heating Load"] = df2.loc[heating_load, combined]
+        df2["Cooling Load"] = df2.loc[cooling_load, combined] * -1
+        df2["peak Heating"] = df2["Heating Load"]
+        df2["peak Cooling"] = df2["Cooling Load"]
+
+    # ----------------------- Data Unit Section --------------------------
+    # multiply dataframe with unit factor and collect data
+    df2 = df2 * fac
+    df2 = df2.fillna(0)
+
+    if hourly:
+        return df2["peak Heating"], df2["peak Cooling"]
+
+    # resample to a monthly resolution as sum and maximal load
+    df3: pd_DataFrame = df2.resample("M").agg(
+        {"Heating Load": "sum", "Cooling Load": "sum", "peak Heating": "max", "peak Cooling": "max"})
+    # replace nan with 0
+    df3 = df3.fillna(0)
+
+    peak_heating = df3["peak Heating"]
+    peak_cooling = df3["peak Cooling"]
+    heating_load = df3["Heating Load"]
+    cooling_load = df3["Cooling Load"]
+
+    return peak_heating, peak_cooling, heating_load, cooling_load
+
+
 class GuiStructure:
     def __init__(self, default_parent: QWidget, status_bar: QStatusBar):
         # set default parent for the class variables to avoid widgets creation not in the main window
@@ -1058,78 +1131,18 @@ class GuiStructure:
         :return: None
         """
         try:
-            # get filename from line edit
-            filename: str = self.option_filename.get_value()
-            # raise error if no filename exists
-            if filename == "":
-                raise FileNotFoundError
-            # get thermal demands index (1 = 2 columns, 2 = 1 column)
-            thermal_demand: int = self.option_column.get_value()
-            # Generate list of columns that have to be imported
-            cols: list = []
-            heating_load_column: str = self.option_heating_column.widget.currentText()
-            if len(heating_load_column) >= 1:
-                cols.append(heating_load_column)
-            cooling_load_column: str = self.option_cooling_column.widget.currentText()
-            if len(cooling_load_column) >= 1:
-                cols.append(cooling_load_column)
-            combined: str = self.option_single_column.widget.currentText()
-            if len(combined) >= 1:
-                cols.append(combined)
-            date: str = "Date"
-
-            sep: str = ";" if self.option_seperator_csv.get_value() == 0 else ","
-            dec: str = "." if self.option_decimal_csv.get_value() == 0 else ","
-            df2: pd_DataFrame = pd_read_csv(filename, usecols=cols, sep=sep, decimal=dec)
-            # ---------------------- Time Step Section  ----------------------
-            # import pandas here to save start up time
-            from pandas import Series as pd_Series
-            from pandas import date_range as pd_date_range
-            from pandas import to_datetime as pd_to_datetime
-
-            # Define start and end date
-            start = pd_to_datetime("2019-01-01 00:00:00")
-            end = pd_to_datetime("2019-12-31 23:59:00")
-            # add date column
-            df2[date] = pd_Series(pd_date_range(start, end, freq="1H"))
-            # Create no dict to create mean values for
-            dict_agg: Optional[None, dict] = None
-
-            # set date to index
-            df2.set_index(date, inplace=True)
-            # resample data to hourly resolution if necessary
-            df2 = df2 if dict_agg is None else df2.resample("H").agg(dict_agg)
-            # ------------------- Calculate Section --------------------
-            # Choose path between Single or Combined Column and create new columns
-            if thermal_demand == 1:
-                # Resample the Data for peakHeating and peakCooling
-                df2.rename(columns={heating_load_column: "Heating Load", cooling_load_column: "Cooling Load"}, inplace=True)
-                df2["peak Heating"] = df2["Heating Load"]
-                df2["peak Cooling"] = df2["Cooling Load"]
-            # by single column split by 0 to heating (>0) and cooling (<0)
-            elif thermal_demand == 0:
-                # Create Filter for heating and cooling load ( Heating Load +, Cooling Load -)
-                heating_load = df2[combined].apply(lambda x: x >= 0)
-                cooling_load = df2[combined].apply(lambda x: x < 0)
-                df2["Heating Load"] = df2.loc[heating_load, combined]
-                df2["Cooling Load"] = df2.loc[cooling_load, combined] * -1
-                df2["peak Heating"] = df2["Heating Load"]
-                df2["peak Cooling"] = df2["Cooling Load"]
-            # resample to a monthly resolution as sum and maximal load
-            df3: pd_DataFrame = df2.resample("M").agg({"Heating Load": "sum", "Cooling Load": "sum", "peak Heating": "max", "peak Cooling": "max"})
-            # replace nan with 0
-            df3 = df3.fillna(0)
-            # ----------------------- Data Unit Section --------------------------
-            # Get the Data Unit and set the label in the thermal Demand Box to follow
             data_unit = self.option_unit_data.get_value()
-            # define unit factors
-            fac = 0.001 if data_unit == 0 else 1 if data_unit == 1 else 1000
-            # multiply dataframe with unit factor and collect data
-            df3 = df3 * fac
-            peak_heating = df3["peak Heating"]
-            peak_cooling = df3["peak Cooling"]
-            heating_load = df3["Heating Load"]
-            cooling_load = df3["Cooling Load"]
+
+            loaded_data = load_data_GUI(filename=self.option_filename.get_value(),
+                                        thermal_demand=self.option_column.get_value(),
+                                        heating_load_column=self.option_heating_column.widget.currentText(),
+                                        cooling_load_column=self.option_cooling_column.widget.currentText(),
+                                        combined=self.option_single_column.widget.currentText(),
+                                        sep=";" if self.option_seperator_csv.get_value() == 0 else ",",
+                                        dec="." if self.option_decimal_csv.get_value() == 0 else ",",
+                                        fac=0.001 if data_unit == 0 else 1 if data_unit == 1 else 1000)
+
+            peak_heating, peak_cooling, heating_load, cooling_load = loaded_data
             # set heating loads to double spinBoxes
             self.option_hl_jan.set_value(heating_load[0])
             self.option_hl_feb.set_value(heating_load[1])

@@ -14,7 +14,7 @@ from GHEtool.VariableClasses import GroundData, FluidData, PipeData
 FOLDER = os.path.dirname(os.path.realpath(__file__))  # solve problem with importing GHEtool from sub-folders
 
 
-def timeValues(dt = 3600., t_max = 100. * 8760 * 3600.):
+def timeValues(dt=3600., t_max=100. * 8760 * 3600.):
     """This function calculates the default time values for the g-function."""
     dt: float = dt  # Time step (s)
     t_max: float = t_max  # Maximum time (s)
