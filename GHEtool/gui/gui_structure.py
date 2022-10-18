@@ -970,9 +970,18 @@ class GuiStructure:
                 self.results_cooling_ext.text_to_be_shown("Borefield", "monthly_load_cooling_external")
                 self.results_cooling_ext.function_to_convert_to_text(lambda x: round(sum(x), 2))
                 self.results_cooling_peak = ResultText("Cooling ext peak", category=self.numerical_results,
-                                                      prefix="with a peak of: ", suffix=" kW")
+                                                       prefix="with a peak of: ", suffix=" kW")
                 self.results_cooling_peak.text_to_be_shown("Borefield", "peak_cooling_external")
                 self.results_cooling_peak.function_to_convert_to_text(lambda x: round(max(x), 2))
+
+                self.max_temp = ResultText("Max temp", category=self.numerical_results,
+                                           prefix="The maximum average fluid temperature is ", suffix=" deg C")
+                self.max_temp.text_to_be_shown("Borefield", "results_peak_cooling")
+                self.max_temp.function_to_convert_to_text(lambda x: round(max(x), 2))
+                self.min_temp = ResultText("Max temp", category=self.numerical_results,
+                                           prefix="The minimum average fluid temperature is ", suffix=" deg C")
+                self.min_temp.text_to_be_shown("Borefield", "results_peak_heating")
+                self.min_temp.function_to_convert_to_text(lambda x: round(min(x), 2))
 
                 # add dependency
                 self.option_method_temp_gradient.add_link_2_show(self.results_ground_temperature, on_index=1)
@@ -982,11 +991,14 @@ class GuiStructure:
                 self.aim_optimize.add_link_2_show(self.results_heating_ext)
                 self.aim_optimize.add_link_2_show(self.results_heating_load_percentage)
                 self.aim_optimize.add_link_2_show(self.results_heating_load)
-                self.aim_optimize_add_link_2_show(self.results_heating_peak)
+                self.aim_optimize.add_link_2_show(self.results_heating_peak)
                 self.aim_optimize.add_link_2_show(self.results_cooling_ext)
                 self.aim_optimize.add_link_2_show(self.results_cooling_load_percentage)
                 self.aim_optimize.add_link_2_show(self.results_cooling_load)
-                self.aim_optimize.add_link_2_show(self.results_heating_peak)
+                self.aim_optimize.add_link_2_show(self.results_cooling_peak)
+
+                self.aim_temp_profile.add_link_2_show(self.max_temp)
+                self.aim_temp_profile.add_link_2_show(self.min_temp)
 
             def create_figure_temperature_profile():
                 self.figure_temperature_profile = ResultFigure(label="Temperature evolution",
@@ -1171,7 +1183,6 @@ class GuiStructure:
                 circle.setBrush(blue_light)
                 scene.addItem(circle)
 
-    # TODO, one (or both) of the functions beneath should run if L4 is selected / or 
     def fun_update_combo_box_data_file(self, filename: str) -> None:
         """
         update comboBox if new data file is selected
