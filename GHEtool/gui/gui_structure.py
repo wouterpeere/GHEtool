@@ -144,10 +144,16 @@ class GuiStructure:
                     default_index=0,
                     entries=[" constant ", " dynamic "],
                 )
-
+                self.option_temperature_profile_hourly = ButtonBox(
+                    category=self.category_calculation,
+                    label="Should hourly data be used for the temperature profile?:",
+                    default_index=0,
+                    entries=[" no ", " yes "]
+                )
                 # add dependencies
                 self.aim_size_length.add_link_2_show(self.option_method_size_length)
                 self.aim_req_depth.add_link_2_show(self.option_method_size_depth)
+                self.aim_temp_profile.add_link_2_show(self.option_temperature_profile_hourly)
 
             # create categories
             create_category_calculation()
@@ -570,18 +576,22 @@ class GuiStructure:
                 self.option_column.add_link_2_show(self.option_heating_column, on_index=1)
                 self.option_heating_column.add_aim_option_2_be_set_for_check(self.aim_optimize)
                 self.option_heating_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
+                self.option_heating_column.add_aim_option_2_be_set_for_check((self.option_temperature_profile_hourly, 1))
 
                 self.option_column.add_link_2_show(self.option_cooling_column, on_index=1)
                 self.option_cooling_column.add_aim_option_2_be_set_for_check(self.aim_optimize)
                 self.option_cooling_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
+                self.option_cooling_column.add_aim_option_2_be_set_for_check((self.option_temperature_profile_hourly, 1))
 
                 self.option_column.add_link_2_show(self.option_single_column, on_index=0)
                 self.option_single_column.add_aim_option_2_be_set_for_check(self.aim_optimize)
                 self.option_single_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
+                self.option_single_column.add_aim_option_2_be_set_for_check((self.option_temperature_profile_hourly, 1))
 
                 self.option_method_size_depth.add_link_2_show(self.button_load_csv, on_index=0)
                 self.option_method_size_depth.add_link_2_show(self.button_load_csv, on_index=1)
                 self.aim_temp_profile.add_link_2_show(self.button_load_csv)
+                self.option_temperature_profile_hourly.add_link_2_show(self.button_load_csv, on_index=0)
                 self.aim_req_depth.add_link_2_show(self.button_load_csv)
                 self.aim_size_length.add_link_2_show(self.button_load_csv)
 
@@ -894,6 +904,7 @@ class GuiStructure:
                 # add dependencies
                 self.option_method_size_depth.add_link_2_show(self.category_th_demand, on_index=0)
                 self.option_method_size_depth.add_link_2_show(self.category_th_demand, on_index=1)
+                self.option_temperature_profile_hourly.add_link_2_show(self.category_th_demand, on_index=0)
 
                 self.aim_temp_profile.add_link_2_show(self.category_th_demand)
                 self.aim_req_depth.add_link_2_show(self.category_th_demand)
@@ -956,6 +967,7 @@ class GuiStructure:
                 # add dependencies
                 self.option_method_size_depth.add_link_2_show(self.hourly_figure_temperature_profile, on_index=2)
                 self.aim_req_depth.add_link_2_show(self.hourly_figure_temperature_profile)
+                self.option_temperature_profile_hourly.add_link_2_show(self.hourly_figure_temperature_profile, on_index=1)
 
             def create_figure_load_duration():
                 self.figure_load_duration = ResultFigure(label="Load-duration curve",
@@ -974,6 +986,7 @@ class GuiStructure:
 
                 # add dependencies
                 self.option_method_size_depth.add_link_2_show(self.figure_load_duration, on_index=2)
+                self.option_temperature_profile_hourly.add_link_2_show(self.figure_load_duration, on_index=1)
 
             # create categories
             create_category_no_result()
