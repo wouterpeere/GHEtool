@@ -61,9 +61,7 @@ class CalcProblem(QtCore_QThread):
         borefield.set_baseload_cooling(self.DS.monthlyLoadCooling)
 
         # set hourly loads if available
-        if self.DS.option_method_size_depth == 2 or \
-                (self.DS.option_temperature_profile_hourly == 1 and self.DS.aim_temp_profile) or \
-                self.DS.aim_optimize:
+        if self.DS.hourly_data:
             data_unit = self.DS.option_unit_data
 
             peak_heating, peak_cooling = load_data_GUI(
@@ -116,7 +114,6 @@ class CalcProblem(QtCore_QThread):
             try:
                 # size the borehole
                 borefield.size()
-
             except ValueError as err:
                 self.DS.debug_message = err
                 # save bore field in Datastorage

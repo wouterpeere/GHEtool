@@ -38,7 +38,7 @@ option_min_temp;Minimal temperature [°C]: ;Minimaltemperatur [°C]: ;Minimale t
 option_max_temp;Maximal temperature [°C]: ;Maximaltemperatur [°C]: ;Maximale temperatuur [°C]: ;Temperatura massima [°C]: ;Température maximale [°C]: ;Temperatura máxima [°C]: ;Temperatura máxima [°C]: 
 option_temp_gradient;Temperature gradient [K/100m]: ;Temperaturgradient [K/100m]: ;Temperature gradient [K/100m]: ;Temperature gradient [K/100m]: ;Temperature gradient [K/100m]: ;Temperature gradient [K/100m]: ;Temperature gradient [K/100m]: 
 option_simu_period;Simulation period [yrs]: ;Simulationszeit [Jahre]: ;Simulatieperiode [jaar]: ;Periodo di simulazione [anni]: ;Période de simulation [années]: ;Período de simulación [años]: ;Período de simulación [anos]: 
-option_constant_rb;Equivalent borehole resistance [mK/W]: ;Äquivalenter Bohrlochwiderstand [mK/W]: ;Equivalente boorgatweerstand [mK/W]: ;Resistenza equivalente del foro [mK/W]: ;Résistance équivalente du trou de forage [mK/W]: ;Resistencia del pozo equivalente [mK/W]: ;Resistencia do pozo equivalente [mK/W]: 
+option_constant_rb;Equivalent borehole resistance (e.g. from TRT) [mK/W]: ;Äquivalenter Bohrlochwiderstand [mK/W]: ;Equivalente boorgatweerstand [mK/W]: ;Resistenza equivalente del foro [mK/W]: ;Résistance équivalente du trou de forage [mK/W]: ;Resistencia del pozo equivalente [mK/W]: ;Resistencia do pozo equivalente [mK/W]:
 label_next;next;nächstes;volgende;successivo;suivant;siguiente;seguinte
 label_previous;previous;vorheriges;vorige;precedente;précédente;anterior;anterior
 hint_depth;Borehole depth: ;Bohrlochtiefe: ;Boorgatdiepte: ;Profondità del foro:  ;Profondeur du trou de sonde: ;Profundidad del pozo: ;Profundidade do pozo: 

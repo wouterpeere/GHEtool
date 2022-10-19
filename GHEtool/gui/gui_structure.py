@@ -6,7 +6,6 @@ from PySide6.QtWidgets import QGraphicsView as QtWidgets_QGraphicsView
 from PySide6.QtGui import QPen
 from PySide6.QtGui import QColor
 from numpy import cos, sin, array, int64, float64, round, sum
-from numpy import max as npmax
 
 from GHEtool.gui.gui_classes import (Aim, ButtonBox, Category, FloatBox, FileNameBox, FunctionButton, Hint, IntBox, ListBox, Option, Page, ResultFigure, ResultText, FigureOption)
 from GHEtool.gui.translation_class import Translations
@@ -1024,7 +1023,6 @@ class GuiStructure:
 
                 # add dependencies
                 self.option_method_size_depth.add_link_2_show(self.hourly_figure_temperature_profile, on_index=2)
-                self.aim_req_depth.add_link_2_show(self.hourly_figure_temperature_profile)
                 self.option_temperature_profile_hourly.add_link_2_show(self.hourly_figure_temperature_profile, on_index=1)
                 self.aim_optimize.add_link_2_show(self.hourly_figure_temperature_profile)
 

@@ -44,6 +44,11 @@ class DataStorage:
 
         self.debug_message: str = ""
 
+        # params for which hourly data should be loaded
+        self.hourly_data: bool = self.option_method_size_depth == 2 or\
+                                 (self.option_temperature_profile_hourly == 1 and self.aim_temp_profile) or \
+                                 self.aim_optimize
+
     def _calculate_flux(self) -> float:
         """ This function calculates the flux"""
         return 2 * self.option_temp_gradient * self.option_conductivity / 100

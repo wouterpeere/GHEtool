@@ -100,8 +100,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.changedFile: bool = False  # set change file variable to false
         self.ax: list = []  # axes of figure
         self.axBorehole = None
-        self.canvas = None  # canvas class of figure
-        self.fig = None  # figure
         self.NumberOfScenarios: int = 1  # number of scenarios
         self.finished: int = 1  # number of finished scenarios
         self.threads: List[CalcProblem] = []  # list of calculation threads
