@@ -32,8 +32,6 @@ def update_opponent(button: QtW.QPushButton, button_opponent: QtW.QPushButton, f
     :param button_opponent:
     :param false_button_list:
     """
-    if button.isChecked():
-        return
     button_opponent.setChecked(not button.isChecked())
     if false_button_list is not None:
         for false_button in false_button_list:
@@ -426,11 +424,9 @@ class ButtonBox(Option):
         set value of option.\n
         :param value: value to be set
         """
-        for idx, button in enumerate(self.widget):
-            if idx == value:
-                if not button.isChecked():
-                    button.click()
-                break
+        button = self.widget[value]
+        if not button.isChecked():
+            button.click()
 
     def _init_links(self) -> None:
         """
@@ -484,7 +480,9 @@ class ButtonBox(Option):
             layout.addWidget(widget)
         for idx, button in enumerate(self.widget):
             default_value = self.default_value if idx != self.default_value else idx - 1 if idx > 0 else 1
-            button.clicked.connect(ft_partial(update_opponent_new, button, [but for _, but in enumerate(self.widget)]))
+            button.clicked.connect(
+                ft_partial(update_opponent, button, self.widget[default_value], [but for i, but in enumerate(self.widget) if i not in [idx, default_value]])
+            )
             button.clicked.connect(ft_partial(check, self.linked_options, self, self.get_value()))
 
 
@@ -880,10 +878,19 @@ class FigureOption(ButtonBox):
         self.values = entries_values
         self.param = param
 
-    def get_value(self) -> int:
+    def get_value(self) -> Tuple[str, int]:
         for idx, button in enumerate(self.widget):
             if button.isChecked():
                 return self.param, self.values[idx]
+        return "", -1
+
+    def set_value(self, values: Tuple[str, int]):
+        value = values[1]
+        for idx, button in enumerate(self.widget):
+            if self.values[idx] == value:
+                if not button.isChecked():
+                    button.click()
+                break
         return
 
 

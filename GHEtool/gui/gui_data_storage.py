@@ -54,9 +54,9 @@ class DataStorage:
         return 2 * self.option_temp_gradient * self.option_conductivity / 100
 
     def set_values(self, gui_structure: GuiStructure):
-        [option.set_value(getattr(self, name)) for option, name in gui_structure.list_of_options]
         [aim.widget.setChecked(False) for aim, _ in gui_structure.list_of_aims]
         [aim.widget.click() for aim, name in gui_structure.list_of_aims if getattr(self, name)]
+        [option.set_value(getattr(self, name)) for option, name in gui_structure.list_of_options if hasattr(self, name)]
 
     def save(self):
         data = pd.DataFrame([(name, getattr(self, name)) for name in self.__dict__])
@@ -73,6 +73,8 @@ class DataStorage:
             return False
         # compare all slot values if one not match return false
         for i in self.list_options_aims:
+            if not hasattr(self, i) or not hasattr(other, i):
+                return False
             if getattr(self, i) != getattr(other, i):
                 return False
         # if all match return true

@@ -127,10 +127,10 @@ class GuiStructure:
                 self.category_calculation = Category(page=self.page_options, label="Calculation options")
 
                 self.option_method_size_depth = ButtonBox(
-                    category=self.category_calculation, label="Method for size borehole depth :", default_index=0, entries=[" L2 ", " L3 ", "  L4  "]
+                    category=self.category_calculation, label="Method for size borehole depth:", default_index=0, entries=[" L2 ", " L3 ", "  L4  "]
                 )
                 self.option_method_size_length = ButtonBox(
-                    category=self.category_calculation, label="Method for size width and length :", default_index=0, entries=[" L2 ", " L3 "]
+                    category=self.category_calculation, label="Method for size width and length:", default_index=0, entries=[" L2 ", " L3 "]
                 )
                 self.option_method_temp_gradient = ButtonBox(
                     category=self.category_calculation,
