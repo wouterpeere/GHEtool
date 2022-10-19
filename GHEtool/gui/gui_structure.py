@@ -932,7 +932,7 @@ class GuiStructure:
                 self.result_Rb_calculated = ResultText("Equivalent borehole thermal resistance", category=self.numerical_results,
                                                        prefix="Equivalent borehole thermal resistance: ", suffix="Wm/K")
                 self.result_Rb_calculated.text_to_be_shown("Borefield", "Rb")
-                self.result_Rb_calculated.function_to_convert_to_text(lambda x: round(x, 2))
+                self.result_Rb_calculated.function_to_convert_to_text(lambda x: round(x, 4))
 
                 self.results_ground_temperature = ResultText("Ground temperature", category=self.numerical_results,
                                                              prefix="Average ground temperature: ", suffix=" deg C")
