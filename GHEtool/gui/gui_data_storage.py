@@ -31,7 +31,7 @@ class DataStorage:
                                          self.option_hl_jul, self.option_hl_aug, self.option_hl_sep, self.option_hl_oct, self.option_hl_nov, self.option_hl_dec]
         self.monthlyLoadCooling: list = [self.option_cl_jan, self.option_cl_feb, self.option_cl_mar, self.option_cl_apr, self.option_cl_may, self.option_cl_jun,
                                          self.option_cl_jul, self.option_cl_aug, self.option_cl_sep, self.option_cl_oct, self.option_cl_nov, self.option_cl_dec]
-        self.ground_data: GroundData = GroundData(self.option_conductivity, self.option_ground_temp if self.option_method_temp_gradient ==0 else self.option_ground_temp_gradient,
+        self.ground_data: GroundData = GroundData(self.option_conductivity, self.option_ground_temp if self.option_method_temp_gradient == 0 else self.option_ground_temp_gradient,
                                                   self.option_constant_rb, self.option_heat_capacity * 1000, self._calculate_flux())
 
         self.borefield_pygfunction = gt.boreholes.rectangle_field(self.option_width, self.option_length, self.option_spacing, self.option_spacing,
@@ -45,9 +45,8 @@ class DataStorage:
         self.debug_message: str = ""
 
         # params for which hourly data should be loaded
-        self.hourly_data: bool = self.option_method_size_depth == 2 or\
-                                 (self.option_temperature_profile_hourly == 1 and self.aim_temp_profile) or \
-                                 self.aim_optimize
+        self.hourly_data: bool = self.option_method_size_depth == 2 or (
+                self.option_temperature_profile_hourly == 1 and self.aim_temp_profile) or self.aim_optimize
 
     def _calculate_flux(self) -> float:
         """ This function calculates the flux"""
@@ -57,6 +56,7 @@ class DataStorage:
         [aim.widget.setChecked(False) for aim, _ in gui_structure.list_of_aims]
         [aim.widget.click() for aim, name in gui_structure.list_of_aims if getattr(self, name)]
         [option.set_value(getattr(self, name)) for option, name in gui_structure.list_of_options if hasattr(self, name)]
+        gui_structure.change_toggle_button()
 
     def save(self):
         data = pd.DataFrame([(name, getattr(self, name)) for name in self.__dict__])

@@ -17,7 +17,7 @@ from pandas import DataFrame as pd_DataFrame, read_csv as pd_read_csv
 
 
 def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, cooling_load_column: str, combined: str, sep: str,
-                   dec: str, fac: float, hourly: bool = False):
+                  dec: str, fac: float, hourly: bool = False):
     # raise error if no filename exists
     if filename == "":
         raise FileNotFoundError
@@ -1062,6 +1062,10 @@ class GuiStructure:
 
             self.category_save_scenario = Category(page=self.page_settings, label="Scenario saving settings")
 
+            self.option_toggle_buttons = ButtonBox(
+                category=self.category_save_scenario, label="Toggle buttons?:", default_index=1, entries=[" no ", " yes "]
+            )
+            self.option_toggle_buttons.change_event(self.change_toggle_button)
             self.option_auto_saving = ButtonBox(
                 category=self.category_save_scenario, label="Use automatic saving?:", default_index=0, entries=[" no ", " yes "]
             )
@@ -1093,6 +1097,17 @@ class GuiStructure:
 
         self.list_of_result_texts: List[Tuple[ResultText, str]] = [(getattr(self, name), name) for name in self.__dict__ if isinstance(getattr(self, name), ResultText)]
         self.list_of_result_figures: List[Tuple[ResultFigure, str]] = [(getattr(self, name), name) for name in self.__dict__ if isinstance(getattr(self, name), ResultFigure)]
+
+    def change_toggle_button(self) -> None:
+        """
+        changes the button box and aim selection behaviour to either toggle or not changeable
+        """
+        if self.option_toggle_buttons.get_value() == 0:
+            ButtonBox.TOGGLE = False
+            Page.TOGGLE = False
+            return
+        ButtonBox.TOGGLE = True
+        Page.TOGGLE = True
 
     def check_distance_between_pipes(self, *args) -> None:
         """
