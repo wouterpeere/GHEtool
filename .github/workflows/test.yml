@@ -25,7 +25,7 @@ jobs:
           pip install -r requirements_dev.txt
           pip install -e .
       - name: Test with pytest
-        run: pytest GHEtool/test GHEtool/gui/test_gui --cov
+        run: pytest --cov
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
@@ -50,7 +50,6 @@ jobs:
         pip install -r requirements.txt
         pip install pytest
         pip install -e .
-        pip install pytest-cov
     - name: Test with pytest
-      run: pytest GHEtool/test --cov
+      run: pytest GHEtool/test
       
