@@ -25,7 +25,7 @@ jobs:
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
-          files: ./coverage.xml
+          files: ./coverage1.xml,./coverage2.xml
           token: 8e6f48b5-8534-4f9a-894b-0a2d226dab26 # not required for public repos
 
   test_GHEtool:
