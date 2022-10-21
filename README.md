@@ -1,4 +1,5 @@
 # GHEtool: An open-source tool for borefield sizing in Python
+
 [![PyPI version](https://badge.fury.io/py/GHEtool.svg)](https://badge.fury.io/py/GHEtool)
 [![Tests](https://github.com/wouterpeere/GHEtool/actions/workflows/test.yml/badge.svg)](https://github.com/wouterpeere/GHEtool/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/wouterpeere/GHEtool/branch/main/graph/badge.svg?token=I9WWHW60OD)](https://codecov.io/gh/wouterpeere/GHEtool)
@@ -17,7 +18,7 @@ GHEtool also comes with a *graphical user interface (GUI)*. This GUI is prebuilt
 This graphical interface is made by Tobias Blanke from FH Aachen.
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/GHEtool/gui/GHEtool.PNG" width="600"></br>
+<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/GHEtool/gui/GHEtool.PNG" width="600">
   Screenshot of the GUI.
 </p>
 
@@ -72,7 +73,7 @@ To check whether everything is installed correctly, run the following command
 pytest --pyargs GHEtool
 ```
 
-This runs some predefined cases to see whether all the internal dependencies work correctly. 9 test should pass successfully.
+This runs some predefined cases to see whether all the internal dependencies work correctly. All test should pass successfully.
 
 ### Get started with GHEtool
 

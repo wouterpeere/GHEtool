@@ -1,8 +1,12 @@
 # test if model can be imported
-from GHEtool import *
-import pytest
 import numpy as np
+import pytest
+
+from GHEtool import *
+
 import pygfunction as gt
+import matplotlib.pyplot as plt
+
 
 data = GroundData(3, 10, 0.2)
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
@@ -28,6 +32,50 @@ monthlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, montlyLoadCooling
 
 custom_field = gt.boreholes.L_shaped_field(N_1=4, N_2=5, B_1=5., B_2=5., H=100., D=4, r_b=0.05)
 
+def load_case(number):
+    """This function returns the values for one of the four cases."""
+
+    if number == 1:
+        # case 1
+        # limited in the first year by cooling
+        monthly_load_heating_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
+        monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
+        monthly_load_heating = monthly_load_heating_percentage * 300 * 10 ** 3  # kWh
+        monthly_load_cooling = monthly_load_cooling_percentage * 150 * 10 ** 3  # kWh
+        peak_cooling = np.array([0., 0., 22., 44., 83., 117., 134., 150., 100., 23., 0., 0.])
+        peak_heating = np.zeros(12)
+
+    elif number == 2:
+        # case 2
+        # limited in the last year by cooling
+        monthly_load_heating_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, .117, 0.144])
+        monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
+        monthly_load_heating = monthly_load_heating_percentage * 160 * 10 ** 3  # kWh
+        monthly_load_cooling = monthly_load_cooling_percentage * 240 * 10 ** 3  # kWh
+        peak_cooling = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak cooling in kW
+        peak_heating = np.array([160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.])
+
+    elif number == 3:
+        # case 3
+        # limited in the first year by heating
+        monthly_load_heating_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, .117, 0.144])
+        monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
+        monthly_load_heating = monthly_load_heating_percentage * 160 * 10 ** 3  # kWh
+        monthly_load_cooling = monthly_load_cooling_percentage * 240 * 10 ** 3  # kWh
+        peak_cooling = np.zeros(12)
+        peak_heating = np.array([300.0, 266.25, 191.25, 103.125, 0.0, 0.0, 0.0, 0.0, 75.75, 159.375, 223.125, 255.0])
+
+    else:
+        # case 4
+        # limited in the last year by heating
+        monthly_load_heating_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
+        monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
+        monthly_load_heating = monthly_load_heating_percentage * 300 * 10 ** 3  # kWh
+        monthly_load_cooling = monthly_load_cooling_percentage * 150 * 10 ** 3  # kWh
+        peak_cooling = np.array([0., 0., 22., 44., 83., 117., 134., 150., 100., 23., 0., 0.])
+        peak_heating = np.array([300., 268., 191., 103., 75., 0., 0., 38., 76., 160., 224., 255.])
+
+    return monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating
 
 def test_borefield():
     borefield = Borefield(simulation_period=20,
@@ -44,9 +92,24 @@ def test_borefield():
     borefield.set_min_ground_temperature(0)  # minimum temperature
 
     assert borefield.simulation_period == 20
-    assert borefield.Tf_C == 0
-    assert borefield.Tf_H == 16
+    assert borefield.Tf_min == 0
+    assert borefield.Tf_max == 16
     np.testing.assert_array_equal(borefield.peak_heating, np.array([160., 142, 102., 55., 26.301369863013697, 0., 0., 0., 40.4, 85., 119., 136.]))
+
+
+@pytest.fixture
+def borefield_quadrants():
+    data = GroundData(3.5,  # conductivity of the soil (W/mK)
+                      10,  # Ground temperature at infinity (degrees C)
+                      0.2)  # equivalent borehole resistance (K/W)
+
+    borefield_gt = gt.boreholes.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)
+
+    borefield = Borefield()
+    borefield.set_ground_parameters(data)
+    borefield.set_borefield(borefield_gt)
+
+    return borefield
 
 
 @pytest.fixture
@@ -67,6 +130,24 @@ def borefield():
 
 
 @pytest.fixture
+def borefield_custom_data():
+    borefield = Borefield(simulation_period=20,
+                          peak_heating=peakHeating,
+                          peak_cooling=peakCooling,
+                          baseload_heating=monthlyLoadHeating,
+                          baseload_cooling=monthlyLoadCooling)
+
+    borefield.set_ground_parameters(data)
+    borefield.set_borefield(borefield_gt)
+    borefield.create_custom_dataset()
+
+    # set temperature boundaries
+    borefield.set_max_ground_temperature(16)  # maximum temperature
+    borefield.set_min_ground_temperature(0)  # minimum temperature
+    return borefield
+
+
+@pytest.fixture
 def empty_borefield():
     borefield = Borefield()
     return borefield
@@ -76,7 +157,8 @@ def empty_borefield():
 def hourly_borefield():
     borefield = Borefield()
     borefield.set_ground_parameters(data)
-    borefield.load_hourly_profile("./Examples/hourly_profile.csv")
+    borefield.set_borefield(borefield_gt)
+    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv")
     return borefield
 
 
@@ -91,6 +173,8 @@ def borefield_cooling_dom():
     borefield.set_baseload_cooling(np.array(monthlyLoadCooling)*2)
 
     borefield.set_ground_parameters(data)
+    borefield.set_borefield(borefield_gt)
+
     return borefield
 
 
@@ -161,48 +245,149 @@ def test_size_L3(borefield):
     borefield.size(L3_sizing=True)
 
 
-# def test_size_L4(hourly_borefield):
-#     hourly_borefield.size(L4_sizing=True)
-#
-#
-# def test_cooling_dom(borefield_cooling_dom):
-#     borefield_cooling_dom.size()
-#
-#
-# def test_sizing_different_quadrants(borefield):
-#     borefield.size(quadrant_sizing=1)
-#     borefield.size(quadrant_sizing=2)
-#     borefield.size(quadrant_sizing=3)
-#     borefield.size(quadrant_sizing=4)
-#     borefield.size(quadrant_sizing=1, L3_sizing=True)
-#
-#
-# def test_convergence(borefield_cooling_dom):
-#     try:
-#         borefield_cooling_dom.set_peak_heating(np.array(peakHeating)*15)
-#         borefield_cooling_dom.size()
-#     except RuntimeError:
-#         assert True
-#
-#
-# def test_quadrant_4(borefield):
-#     borefield.set_peak_heating(np.array(peakHeating)*8)
-#     borefield.size()
-#
-#
-# def test_sizing_L3(borefield):
-#     borefield.set_peak_heating(np.array(peakHeating)*8)
-#     borefield.size(L3_sizing=True)
-#
-#
-# def test_sizing_L32(borefield_cooling_dom):
-#     borefield_cooling_dom.size(L3_sizing=True)
-#     borefield_cooling_dom.set_peak_heating(np.array(peakHeating) * 5)
-#     borefield_cooling_dom.size(L3_sizing=True)
-#
-#
-# def test_size_L4(borefield):
-#     try:
-#         borefield.size(L4_sizing=True)
-#     except ValueError:
-#         assert True
+def test_draw_internals(monkeypatch, borefield):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    borefield.set_fluid_parameters(fluidData)
+    borefield.set_pipe_parameters(pipeData)
+    borefield.draw_borehole_internal()
+
+
+def test_size_L4(hourly_borefield):
+    assert hourly_borefield._check_hourly_load()
+    hourly_borefield.sizing_setup(L4_sizing=True)
+    hourly_borefield.size()
+
+
+def test_cooling_dom(borefield_cooling_dom):
+    borefield_cooling_dom.size()
+
+
+def test_sizing_different_quadrants(borefield):
+    borefield.size(quadrant_sizing=1)
+    borefield.size(quadrant_sizing=2)
+    borefield.size(quadrant_sizing=3)
+    borefield.size(quadrant_sizing=4)
+    borefield.size(quadrant_sizing=1, L3_sizing=True)
+
+
+def test_quadrant_4(borefield):
+    borefield.set_peak_heating(np.array(peakHeating)*8)
+    borefield.size()
+
+
+def test_sizing_L3(borefield):
+    borefield.set_peak_heating(np.array(peakHeating)*8)
+    borefield.size(L3_sizing=True)
+
+
+def test_sizing_L32(borefield_cooling_dom):
+    borefield_cooling_dom.size(L3_sizing=True)
+    borefield_cooling_dom.set_peak_heating(np.array(peakHeating) * 5)
+    borefield_cooling_dom.size(L3_sizing=True)
+
+
+def test_size_L4_without_data(borefield):
+    try:
+        borefield.size(L4_sizing=True)
+    except ValueError:
+        assert True
+
+
+def test_load_duration(monkeypatch, hourly_borefield):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    hourly_borefield.plot_load_duration()
+
+
+def test_optimise_load_profile_without_data(borefield):
+    try:
+        borefield.optimise_load_profile()
+    except ValueError:
+        assert True
+
+
+def test_precalculated_out_of_bound_2(borefield_custom_data):
+    borefield_custom_data.gfunction(2, H=100)
+
+
+def test_precalculated_out_of_bound_1(borefield_custom_data):
+    borefield_custom_data.gfunction(10**10, H=100)
+
+
+def test_precalculated_out_of_bound_3(borefield_custom_data):
+    borefield_custom_data.gfunction([3600*100, 3600*101], H=500)
+
+
+def test_precalculated_data_1(borefield_custom_data):
+    borefield_custom_data.gfunction([3600*100, 3600*100], 100)
+
+
+def test_precalculated_data_2(borefield_custom_data):
+    borefield_custom_data.gfunction([3600*100, 3600*100, 3600*101], 100)
+
+
+def test_error_variable_Tg(borefield):
+    try:
+        borefield.Tg = 14
+        borefield.sizing_setup(use_constant_Tg=False)
+    except ValueError:
+        assert True
+
+
+def test_choose_quadrant_1(borefield_quadrants):
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(1)
+
+    borefield_quadrants.set_peak_heating(peak_heating)
+    borefield_quadrants.set_peak_cooling(peak_cooling)
+    borefield_quadrants.set_baseload_cooling(monthly_load_cooling)
+    borefield_quadrants.set_baseload_heating(monthly_load_heating)
+
+    borefield_quadrants.size(100, L3_sizing=True)
+    assert 1 == borefield_quadrants._calculate_quadrant()
+
+
+def test_choose_quadrant_2(borefield_quadrants):
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
+
+    borefield_quadrants.set_peak_heating(peak_heating)
+    borefield_quadrants.set_peak_cooling(peak_cooling)
+    borefield_quadrants.set_baseload_cooling(monthly_load_cooling)
+    borefield_quadrants.set_baseload_heating(monthly_load_heating)
+
+    borefield_quadrants.size(100, L3_sizing=True)
+    assert 2 == borefield_quadrants._calculate_quadrant()
+
+
+def test_choose_quadrant_3(borefield_quadrants):
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(3)
+
+    borefield_quadrants.set_peak_heating(peak_heating)
+    borefield_quadrants.set_peak_cooling(peak_cooling)
+    borefield_quadrants.set_baseload_cooling(monthly_load_cooling)
+    borefield_quadrants.set_baseload_heating(monthly_load_heating)
+
+    borefield_quadrants.size(100, L3_sizing=True)
+    assert 3 == borefield_quadrants._calculate_quadrant()
+
+
+def test_choose_quadrant_4(borefield_quadrants):
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(4)
+
+    borefield_quadrants.set_peak_heating(peak_heating)
+    borefield_quadrants.set_peak_cooling(peak_cooling)
+    borefield_quadrants.set_baseload_cooling(monthly_load_cooling)
+    borefield_quadrants.set_baseload_heating(monthly_load_heating)
+
+    borefield_quadrants.size(100, L3_sizing=True)
+    assert 4 == borefield_quadrants._calculate_quadrant()
+
+
+def test_choose_quadrant_None(borefield_quadrants):
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(4)
+
+    borefield_quadrants.set_peak_heating(peak_heating)
+    borefield_quadrants.set_peak_cooling(peak_cooling)
+    borefield_quadrants.set_baseload_cooling(monthly_load_cooling)
+    borefield_quadrants.set_baseload_heating(monthly_load_heating)
+
+    borefield_quadrants.calculate_temperatures(200)
+    assert None is borefield_quadrants._calculate_quadrant()
