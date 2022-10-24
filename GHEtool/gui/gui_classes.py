@@ -16,18 +16,26 @@ import PySide6.QtWidgets as QtW  # type: ignore
 from GHEtool.gui.gui_base_class import DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE
 
 
-def update_opponent_new(button: QtW.QPushButton, button_list):
+def update_opponent_not_change(button: QtW.QPushButton, button_opponent: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
+    """
+    do not allow to change the button if is already checked\n
+    :param button:
+    :param button_opponent:
+    :param false_button_list:
+    """
     if not button.isChecked():
         button.setChecked(True)
         return
+    button_list = [but for but in false_button_list] if false_button_list is not None else []
+    button_list.append(button_opponent)
     for but in button_list:
         if not but == button:
             but.setChecked(False)
 
 
-def update_opponent(button: QtW.QPushButton, button_opponent: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
+def update_opponent_toggle(button: QtW.QPushButton, button_opponent: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
     """
-    update the opponent button\n
+    update the opponent button in a toggle behaviour\n
     :param button:
     :param button_opponent:
     :param false_button_list:
@@ -404,10 +412,20 @@ class ButtonBox(Option):
     """
     Button input box\n
     """
+
+    TOGGLE: bool = True
+
     def __init__(self, label: str, default_index: int, entries: List[str], *, category: Category):
         super().__init__(label, default_index, category)
         self.entries: List[str] = entries
         self.widget: List[QtW.QPushButton] = [QtW.QPushButton(self.default_parent) for _ in self.entries]
+        for idx, button in enumerate(self.widget):
+            default_value = self.default_value if idx != self.default_value else idx - 1 if idx > 0 else 1
+            button.clicked.connect(
+                ft_partial(self.update_function, *(button, self.widget[default_value], [but for but in self.widget if but not in [
+                    button, self.widget[default_value]]]))
+            )
+            button.clicked.connect(ft_partial(check, self.linked_options, self, self.get_value()))
 
     def get_value(self) -> int:
         """
@@ -478,12 +496,12 @@ class ButtonBox(Option):
             widget.setChecked(idx == self.default_value)
             widget.setMinimumHeight(30)
             layout.addWidget(widget)
-        for idx, button in enumerate(self.widget):
-            default_value = self.default_value if idx != self.default_value else idx - 1 if idx > 0 else 1
-            button.clicked.connect(
-                ft_partial(update_opponent, button, self.widget[default_value], [but for i, but in enumerate(self.widget) if i not in [idx, default_value]])
-            )
-            button.clicked.connect(ft_partial(check, self.linked_options, self, self.get_value()))
+
+    def update_function(self, button: QtW.QPushButton, button_opponent: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
+        if self.TOGGLE:
+            update_opponent_toggle(button, button_opponent, false_button_list)
+            return
+        update_opponent_not_change(button, button_opponent, false_button_list)
 
 
 class ListBox(Option):
@@ -1021,6 +1039,7 @@ class Page:
     next_label: str = 'next'
     previous_label: str = 'previous'
     default_parent: Optional[QtW.QWidget] = None
+    TOGGLE: bool = True
 
     def __init__(self, name: str, button_name: str, icon: str):
         self.name: str = name
@@ -1149,14 +1168,17 @@ class Page:
             for idx, aim in enumerate(list_aims):
                 default_value = 1 if idx == 0 else 0
                 aim.widget.clicked.connect(
-                    ft_partial(
-                        update_opponent_new,
-                        aim.widget,
-                        [wid.widget for i, wid in enumerate(list_aims)],
-                    )
+                    ft_partial(self.update_function, aim.widget, list_aims[default_value].widget,
+                               [aim.widget for i, aim in enumerate(list_aims) if i not in [idx, default_value]])
                 )  # pylint: disable=E1101
                 aim.widget.clicked.connect(ft_partial(check_aim_options, list_aims))  # pylint: disable=E1101
             list_aims[0].widget.click()
+
+    def update_function(self, button: QtW.QPushButton, button_opponent: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
+        if self.TOGGLE:
+            update_opponent_toggle(button, button_opponent, false_button_list)
+            return
+        update_opponent_not_change(button, button_opponent, false_button_list)
 
     def create_links_to_other_pages(self, central_widget: QtW.QWidget, scroll_area_layout: QtW.QVBoxLayout):
         """

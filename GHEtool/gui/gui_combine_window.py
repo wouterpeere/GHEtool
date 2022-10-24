@@ -173,7 +173,11 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         for cat, cat_name in self.gui_structure.list_of_result_figures:
             if cat.save_fig:
                 cat.save_fig.change_event(self.save_figure, cat)
-        self.gui_structure.option_auto_saving.change_event(self.change_auto_save)
+
+        for category in self.gui_structure.page_settings.list_categories:
+            for option, name in [(opt_cat, name) for opt_cat in category.list_of_options if isinstance(
+                    opt_cat, Option) for opt_glob, name in self.gui_structure.list_of_options if opt_cat == opt_glob]:
+                option.change_event(ft_partial(self.change_settings_in_all_data_storages, name))
 
         for fig, _ in self.gui_structure.list_of_result_figures:
             for option in fig.list_of_options:
@@ -506,9 +510,9 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             return True
         return False
 
-    def change_auto_save(self):
+    def change_settings_in_all_data_storages(self, name_of_option: str, *args):
         for ds in self.list_ds:
-            ds.option_auto_saving = self.gui_structure.option_auto_saving.get_value()
+            setattr(ds, name_of_option, getattr(self.gui_structure, name_of_option).get_value() if len(args) < 1 else args[0])
 
     def change_language(self) -> None:
         """
@@ -519,8 +523,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         scenario_index: int = self.list_widget_scenario.currentRow()  # get current selected scenario
         amount: int = self.list_widget_scenario.count()  # number of scenario elements
 
-        for ds in self.list_ds:
-            ds.option_language = self.gui_structure.option_language.get_value()
         # check if list scenario names are not unique
         li_str_match: List[bool] = [
             self.list_widget_scenario.item(idx).text() == f"{self.translations.scenarioString[self.gui_structure.option_language.get_value()]}: {idx + 1}"
