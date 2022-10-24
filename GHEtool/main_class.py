@@ -228,7 +228,7 @@ class Borefield:
 
         # create plotlayout if gui
         if self.gui:
-            from gui.gui_base_class import set_graph_layout
+            from GHEtool.gui.gui_base_class import set_graph_layout
 
             set_graph_layout()
 
