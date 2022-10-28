@@ -1,8 +1,6 @@
 # Graphical User Interface (GUI) of GHEtool
 
 Besides the code version of GHEtool, a graphical user interface (mainly developped by Tobias Blanke) is also available.
-
-## Features
 The functionalities, currently included in the graphical version of GHEtool are:
 
 - comparing multiple scenario's next to eachother
@@ -21,6 +19,7 @@ For features that are in development, please see the Change Log of GHEtool.
 :caption: 'Content'
 :maxdepth: 2
 
+self
 gui/gui_installation_guide.md
 gui/gui_manual.md
 gui/gui_contribute.md
