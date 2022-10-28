@@ -45,7 +45,7 @@ page_example.set_next_page(page_next)
 ```
 
 Example Page
-![Python Logo](_figure/Example_Page.png)
+![Python Logo](../../_figure/Example_Page.png)
 
 #### Aim
 
