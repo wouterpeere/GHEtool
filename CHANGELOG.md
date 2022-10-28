@@ -1,5 +1,5 @@
-# GHEtool's Change Log
-All notable changes to this project will be documented in this file.
+# GHEtool's Change Log and future developments
+All notable changes to this project will be documented in this file including planned future developments.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
@@ -10,9 +10,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - GUI Documentation
 - Changelog
 - New features in the GUI
+- JIT calculation of g-functions is implemented
+- general speed improvements
+
 
 ### Changed
 - GUI workflow to be simpler
+- precalculated data is removed
 
 ## [2.0.5] - 2022-08-31
 
