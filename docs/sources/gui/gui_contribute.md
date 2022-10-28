@@ -70,7 +70,7 @@ aim_example.add_link_2_show(option=option_example)
 ```
 
 Example Aim
-![Python Logo](_static/Example_Aim.png)
+![Python Logo](_static/Example_Aim.PNG)
 
 #### Category
 
