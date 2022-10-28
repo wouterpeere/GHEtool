@@ -1,6 +1,11 @@
 # Graphical Using Interface (GUI)
 
-## How to add new options in the GUI?
+## Installation guide
+
+## Contribute to the GUI
+
+
+### How to add new options in the GUI?
 
 New options can be added in the 
 [.\GHEtool\gui\gui_structure.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_structure.py)
@@ -11,14 +16,14 @@ The implemented options can then be used in the CalcProblem class in the
 [.\GHEtool\gui\gui_calculation_thread.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_calculation_thread.py) 
 script. The value of the option get be get by the `get_value()` function.
 
-### GUI structure
+#### GUI structure
 
 The GUI is based on pages which consists of categories which consists of options. 
 An example for a page is the borehole resistance page. Where the fluid data category can be found. 
 This category has a double spin box option to set the mass flow rate.
 The order in which the options are created is also the tab order.
 
-### Page
+#### Page
 
 To create a page the Page class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).

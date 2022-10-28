@@ -941,7 +941,13 @@ class ResultFigure(Category):
             if i != self.save_fig and not i.is_hidden():
                 key, value = i.get_value()
                 kwargs_temp[key] = value
-        return self._kwargs | kwargs_temp
+        # try:
+        #     # works only in python 3.9 and higher
+        #     return self._kwargs | kwargs_temp
+        # except TypeError:
+        #     temp = {**self._kwargs, **kwargs_temp}
+        #     print(temp)
+        return {**self._kwargs, **kwargs_temp}
 
     def options_to_show(self, label: str, param: str, default_index: int, entries_text: List[str], entries_values: List) -> None:
         self.options.append(FigureOption(category=self, param=param, label=label, default=default_index,

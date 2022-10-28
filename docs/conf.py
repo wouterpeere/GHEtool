@@ -18,11 +18,11 @@
 # -- Project information -----------------------------------------------------
 
 project = 'GHEtool'
-copyright = '2022, Tobias Blanke'
-author = 'Tobias Blanke'
+copyright = '2022, Tobias Blanke & Wouter Peere'
+author = 'Tobias Blanke, Wouter Peere'
 
 # The full version, including alpha/beta/rc tags
-release = '2.0.5'
+release = '2.1.0dev'
 
 
 # -- General configuration ---------------------------------------------------
