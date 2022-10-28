@@ -3,6 +3,5 @@
 ```{toctree}
 :maxdepth: 2
 
-self
 code/getting_started.md
 ```
