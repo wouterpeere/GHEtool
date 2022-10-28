@@ -45,7 +45,7 @@ page_example.set_next_page(page_next)
 ```
 
 Example Page
-![Python Logo](../../_figure/Example_Page.png)
+![Python Logo](_static/Example_Page.PNG)
 
 #### Aim
 
@@ -89,7 +89,7 @@ category_example = Category(
 ```
 
 Example Category
-![Python Logo](_static/Example_Category.png)
+![Python Logo](_static/Example_Category.PNG)
 
 #### Float box
 
@@ -123,7 +123,7 @@ option_float.add_link_2_show(option=option_linked, below=0.1, above=0.9)
 ```
 
 Example float box
-![Python Logo](_static/Example_Float_Box.png)
+![Python Logo](_static/Example_Float_Box.PNG)
 
 #### Integer box
 
@@ -154,7 +154,7 @@ option_int.add_link_2_show(option=option_linked, below=1, above=10)
 ```
 
 Example integer box
-![Python Logo](_static/Example_Int_Box.png)
+![Python Logo](_static/Example_Int_Box.PNG)
 
 #### Button box
 
@@ -181,7 +181,7 @@ option_buttons.add_link_2_show(option=option_linked, on_index=0)
 ```
 
 Example button box
-![Python Logo](_static/Example_Button_Box.png)
+![Python Logo](_static/Example_Button_Box.PNG)
 
 #### List box
 
@@ -209,7 +209,7 @@ option_list.add_link_2_show(option=option_linked, on_index==0)
 ```
 
 Example list box
-![Python Logo](_static/Example_List_Box.png)
+![Python Logo](_static/Example_List_Box.PNG)
 
 #### Filename
 
@@ -236,7 +236,7 @@ option_file = FileNameBox(
 ```
 
 Example filename box
-![Python Logo](_static/Example_Filename.png)
+![Python Logo](_static/Example_Filename.PNG)
 
 #### Function button
 
@@ -259,7 +259,7 @@ function_example.change_event(function_to_be_called())
 ```
 
 Example function button
-![Python Logo](_static/Example_Function_Button.png)
+![Python Logo](_static/Example_Function_Button.PNG)
 
 #### Hint
 
@@ -282,7 +282,7 @@ function_example.change_event(function_to_be_called())
 ```
 
 Example Hint
-![Python Logo](_static/Example_Hint.png)
+![Python Logo](_static/Example_Hint.PNG)
 
 ### How to add or correct translations?
 
