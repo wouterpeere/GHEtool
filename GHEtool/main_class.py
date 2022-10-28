@@ -228,7 +228,7 @@ class Borefield:
 
         # create plotlayout if gui
         if self.gui:
-            from gui.gui_base_class import set_graph_layout
+            from GHEtool.gui.gui_base_class import set_graph_layout
 
             set_graph_layout()
 
@@ -1450,17 +1450,14 @@ class Borefield:
         # check whether there is data given
         if self.hourly_cooling_load is None or self.hourly_heating_load is None:
             raise ValueError("No data is given for either the heating or cooling load.")
-            return False
 
         # check whether the data is hourly
         if len(self.hourly_heating_load) != 8760 or len(self.hourly_cooling_load) != 8760:
             raise ValueError("Incorrect length for either the heating or cooling load")
-            return False
 
         # check whether or not there are negative values in the data
         if min(self.hourly_cooling_load) < 0 or min(self.hourly_heating_load) < 0:
             raise ValueError("There are negative values in either the heating or cooling load.")
-            return False
 
         return True
 
