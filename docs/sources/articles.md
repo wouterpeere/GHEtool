@@ -1,6 +1,8 @@
 # GHEtool and literature
 
 ## Cite GHEtool
+
+### General citation
 Whenever you work with GHEtool (in general), please reference this tool using the JOSS paper.
 
 > Peere, W., Blanke, T.(2022). _GHEtool: An open-source tool for borefield sizing in Python._ Journal of Open Source Software, 7(76), 4406, https://doi.org/10.21105/joss.04406
@@ -17,7 +19,7 @@ Whenever you use the hybrid sizing methodology (L2 in GHEtool) or make use of bo
 KU Leuven, Belgium.
 
 
-### Applications/Mentions of GHEtool
+## Applications/Mentions of GHEtool
 Below is a general list of all the articles which use or mention GHEtool in literature. Please let us know if we missed a contribution.
 
 > M. Sharifi. (2022) Early-Stage Integrated Design Methods for Hybrid GEOTABS Buildings. PhD thesis, Department of Architecture and Urban Planning, Faculty of Engineering and Architecture, Ghent University.

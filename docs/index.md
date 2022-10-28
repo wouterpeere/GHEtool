@@ -3,12 +3,14 @@
 % You can adapt this file completely to your liking, but it should at least
 % contain the root `toctree` directive.
 
+# Welcome to GHEtool's documentation!
+
+
 ```{toctree}
 :caption: 'Contents:'
 :maxdepth: 2
 
 self
-sources/home
 sources/getting_started
 sources/gui_index
 sources/articles
