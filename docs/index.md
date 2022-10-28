@@ -10,7 +10,7 @@
 self
 sources/home
 sources/getting_started
-sources/gui
+sources/gui_index
 sources/articles
 sources/changelog
 sources/legal_notice
