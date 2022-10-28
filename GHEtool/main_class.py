@@ -6,7 +6,6 @@ from math import pi
 import pygfunction as gt
 import os.path
 import matplotlib.pyplot as plt
-import functools
 import warnings
 
 from GHEtool.VariableClasses import GroundData, FluidData, PipeData
@@ -38,12 +37,8 @@ class Borefield:
     DEFAULT_NUMBER_OF_TIMESTEPS: int = 100
     THRESHOLD_DEPTH_ERROR: int = 10000  # m
 
-    temp: int = 0
-    HOURLY_LOAD_ARRAY: list = []
-    for i in [0, 24 * 31, 24 * 28, 24 * 31, 24 * 30, 24 * 31, 24 * 30, 24 * 31, 24 * 31, 24 * 30, 24 * 31, 24 * 30,
-              24 * 31]:
-        temp += i
-        HOURLY_LOAD_ARRAY.append(temp)
+    HOURLY_LOAD_ARRAY: np.ndarray = np.array([0, 24 * 31, 24 * 28, 24 * 31, 24 * 30, 24 * 31, 24 * 30, 24 * 31, 24 * 31, 24 * 30, 24 * 31, 24 * 30,
+                                              24 * 31]).cumsum()
 
     __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'H_init', 'B', 'N_1', 'N_2', 'Rb', 'k_s', 'Tg', 'ty', 'tm', \
                 'td', 'time', 'hourly_heating_load', 'H_max', 'use_constant_Tg', 'flux', 'volumetric_heat_capacity',\
@@ -104,7 +99,7 @@ class Borefield:
         # true if the gfunctions should be calculated in the iteration when they
         # are not precalculated
         self.jit_calculation: bool = True
-        self.options_pygfunction: dict = {"method":"equivalent"}
+        self.options_pygfunction: dict = {"method": "equivalent"}
 
         # initialize variables for temperature plotting
         self.results_peak_heating = np.array([])  # list with the minimum temperatures due to the peak heating
@@ -479,8 +474,7 @@ class Borefield:
 
         :return: None"""
         self.h_f: float = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(self.mfr / self.number_of_pipes, self.r_in, self.mu,
-                                                                                      self.rho, self.k_f, self.Cp,
-                                                                                      self.epsilon)
+                                                                                      self.rho, self.k_f, self.Cp, self.epsilon)
         self.R_f: float = 1. / (self.h_f * 2 * pi * self.r_in)
 
     def calculate_pipe_thermal_resistance(self) -> None:
@@ -538,8 +532,7 @@ class Borefield:
         # initiate temporary borefield
         borehole = gt.boreholes.Borehole(self.H, self.D, self.r_b, 0, 0)
         # initiate pipe
-        pipe = gt.pipes.MultipleUTube(self.pos, self.r_in, self.r_out, borehole, self.k_s, self.k_g,
-                                      self.R_p + self.R_f, self.number_of_pipes, J=2)
+        pipe = gt.pipes.MultipleUTube(self.pos, self.r_in, self.r_out, borehole, self.k_s, self.k_g, self.R_p + self.R_f, self.number_of_pipes, J=2)
 
         return pipe.effective_borehole_thermal_resistance(self.mfr, self.Cp)
 
@@ -553,8 +546,7 @@ class Borefield:
         pos: list = [(0., 0.)] * 2 * self.number_of_pipes
         for i in range(self.number_of_pipes):
             pos[i] = (self.D_s * np.cos(2.0 * i * dt + pi), self.D_s * np.sin(2.0 * i * dt + pi))
-            pos[i + self.number_of_pipes] = (self.D_s * np.cos(2.0 * i * dt + pi + dt),
-                                             self.D_s * np.sin(2.0 * i * dt + pi + dt))
+            pos[i + self.number_of_pipes] = (self.D_s * np.cos(2.0 * i * dt + pi + dt), self.D_s * np.sin(2.0 * i * dt + pi + dt))
         return pos
 
     @property
@@ -1138,8 +1130,6 @@ class Borefield:
             g_value_previous_step = np.concatenate((np.array([0]), g_values))[:-1]
             g_value_differences = g_values - g_value_previous_step
 
-            temp = []
-
             # convolution to get the monthly results
             results = convolve(monthly_loads_array * 1000, g_value_differences)[:len(monthly_loads_array)]
 
@@ -1179,8 +1169,6 @@ class Borefield:
             # of Tb. Last element removed in order to make arrays the same length
             g_value_previous_step = np.concatenate((np.array([0]), g_values))[:-1]
             g_value_differences = g_values - g_value_previous_step
-
-            temp = []
 
             # convolution to get the monthly results
             results = convolve(hourly_load * 1000, g_value_differences)[:len(hourly_load)]
@@ -1526,10 +1514,8 @@ class Borefield:
         :param peak: a maximum peak power [kW]
         :return: list of monthly loads [kWh]
         """
-        month_load = []
-        for i in range(12):
-            temp = load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1] + 1]
-            month_load.append(np.sum(np.minimum(temp, peak)))
+
+        month_load = [np.sum(np.minimum(peak, load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1] + 1])) for i in range(12)]
 
         return month_load
 
@@ -1542,10 +1528,8 @@ class Borefield:
         :param peak: a maximum peak power [kW]
         :return: list of monthly peak loads
         """
-        peak_load = []
-        for i in range(12):
-            temp = load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1] + 1]
-            peak_load.append(max(np.minimum(peak, temp)))
+
+        peak_load = [max(np.minimum(peak, load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1] + 1])) for i in range(12)]
         return peak_load
 
     def optimise_load_profile(self, depth: float = None, print_results: bool = False) -> None:

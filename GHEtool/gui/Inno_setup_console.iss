@@ -3,7 +3,7 @@
 
 #define LinkToGHEtool "C:\Users\u0139027\Documents\Python\GHEtool"
 #define MyAppName "GHEtool"
-#define MyAppVersion "1.0.2"
+#define MyAppVersion "2.1.0"
 #define MyAppPublisher "KU Leuven"
 #define MyAppURL "https://github.com/wouterpeere/GHEtool"
 #define MyAppExeName "GHEtool_with_command_line.exe"
@@ -28,7 +28,7 @@ DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
 OutputDir="{#LinkToGHEtool}\Output\"
-OutputBaseFilename=GHEtool_setup
+OutputBaseFilename={#MyAppAssocName}
 SetupIconFile="{#LinkToGHEtool}\GHEtool\gui\icons\Icon.ico"
 Compression=lzma
 SolidCompression=yes
