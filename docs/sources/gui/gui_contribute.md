@@ -47,7 +47,7 @@ page_example.set_next_page(page_next)
 Example Page
 ![Python Logo](_static/Example_Page.png)
 
-### Aim
+#### Aim
 
 To create an aim the Aim class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -72,7 +72,7 @@ aim_example.add_link_2_show(option=option_example)
 Example Aim
 ![Python Logo](_static/Example_Aim.png)
 
-### Category
+#### Category
 
 To create a category the Category class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -91,7 +91,7 @@ category_example = Category(
 Example Category
 ![Python Logo](_static/Example_Category.png)
 
-### Float box
+#### Float box
 
 To create a float box the FloatBox class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -125,7 +125,7 @@ option_float.add_link_2_show(option=option_linked, below=0.1, above=0.9)
 Example float box
 ![Python Logo](_static/Example_Float_Box.png)
 
-### Integer box
+#### Integer box
 
 To create a integer box the IntegerBox class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -156,7 +156,7 @@ option_int.add_link_2_show(option=option_linked, below=1, above=10)
 Example integer box
 ![Python Logo](_static/Example_Int_Box.png)
 
-### Button box
+#### Button box
 
 To create a button box the ButtonBox class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -183,7 +183,7 @@ option_buttons.add_link_2_show(option=option_linked, on_index=0)
 Example button box
 ![Python Logo](_static/Example_Button_Box.png)
 
-### List box
+#### List box
 
 To create a list box the ListBox class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -211,7 +211,7 @@ option_list.add_link_2_show(option=option_linked, on_index==0)
 Example list box
 ![Python Logo](_static/Example_List_Box.png)
 
-### Filename
+#### Filename
 
 To create a filename box the FileNameBox class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -238,7 +238,7 @@ option_file = FileNameBox(
 Example filename box
 ![Python Logo](_static/Example_Filename.png)
 
-### Function button
+#### Function button
 
 To create a function button the FunctionButton class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -261,7 +261,7 @@ function_example.change_event(function_to_be_called())
 Example function button
 ![Python Logo](_static/Example_Function_Button.png)
 
-### Hint
+#### Hint
 
 To create a hint the Hint class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -284,7 +284,7 @@ function_example.change_event(function_to_be_called())
 Example Hint
 ![Python Logo](_static/Example_Hint.png)
 
-## How to add or correct translations?
+### How to add or correct translations?
 
 Translations for the GUI can be added in a new column in the 
 [.\GHEtool\gui\Translations.csv](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/Translations.csv) file. Correction can be made there as well. 
@@ -306,7 +306,7 @@ to be run. This will add the changes to the `Translations` class in `./GHEtool/g
 
 Know the translation or correction is available in the GUI.
 
-## How to add an icon?
+### How to add an icon?
 
 An Icon can be added to the gui by adding `example_icon.svg` icon to `icons.qrc` file and locating in the icon in the icons folder:
 
@@ -322,7 +322,7 @@ pyside6-rcc ./GHEtool/gui/icons.qrc -o ./GHEtool/gui/icons_rc.py
 
 Know the icon can be used in the GUI.
 
-## How to create the *.exe file?
+### How to create the *.exe file?
 
 The exe can be created using [PyInstaller](https://pyinstaller.org/en/stable/).
 

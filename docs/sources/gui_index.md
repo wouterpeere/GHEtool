@@ -18,9 +18,9 @@ The functionalities, currently included in the graphical version of GHEtool are:
 For features that are in development, please see the Change Log of GHEtool.
 
 ```{toctree}
+:caption: 'Content'
 :maxdepth: 2
 
-self
 gui/gui_installation_guide.md
 gui/gui_manual.md
 gui/gui_contribute.md

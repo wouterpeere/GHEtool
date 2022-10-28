@@ -7,11 +7,11 @@
 
 
 ```{toctree}
-:caption: 'Contents:'
+:caption: 'Content'
 :maxdepth: 2
 
 self
-sources/getting_started
+sources/code_index
 sources/gui_index
 sources/articles
 sources/changelog
