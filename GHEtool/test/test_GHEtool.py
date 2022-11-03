@@ -2,7 +2,8 @@
 import numpy as np
 import pytest
 
-from GHEtool import *
+from GHEtool import GroundData, FluidData, PipeData, Borefield
+from GHEtool.main_class import FOLDER
 
 import pygfunction as gt
 import matplotlib.pyplot as plt
@@ -158,7 +159,7 @@ def hourly_borefield():
     borefield = Borefield()
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)
-    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv")
+    borefield.load_hourly_profile(f"{FOLDER}/Examples/hourly_profile.csv")
     return borefield
 
 

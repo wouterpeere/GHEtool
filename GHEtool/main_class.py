@@ -7,7 +7,6 @@ import pygfunction as gt
 import os.path
 import matplotlib.pyplot as plt
 import warnings
-
 from GHEtool.VariableClasses import GroundData, FluidData, PipeData
 
 FOLDER = os.path.dirname(os.path.realpath(__file__))  # solve problem with importing GHEtool from sub-folders
@@ -383,7 +382,7 @@ class Borefield:
         self.time_L3_last_year = Borefield.UPM * 3600 * np.arange(1, self.simulation_period * 12 + 1)
 
         # set the time constant for the L4 sizing
-        self.time_L4 = 3600 * np.arange(1, 8760 * self.simulation_period + 1)
+        self.time_L4 = 3600 * np.arange(1, 8760 * self.simulation_period + 1, dtype=np.float64)
 
     def set_ground_parameters(self, data: GroundData) -> None:
         """
@@ -623,7 +622,7 @@ class Borefield:
         :param quadrant_sizing: differs from 0 when a sizing in a certain quadrant is desired
         :param L2_sizing: true if a sizing with the L2 method is needed
         :param L3_sizing: true if a sizing with the L3 method is needed
-	    :param L4_sizing: true if a sizing with the L4 method is needed
+        :param L4_sizing: true if a sizing with the L4 method is needed
         :return: None
         """
 
@@ -871,11 +870,96 @@ class Borefield:
         if self.H < 1:
             self.H = 50
 
+        loads_short = self.hourly_cooling_load - self.hourly_heating_load if hourly else self.monthly_load
+        loads_short_rev = loads_short[::-1]
+        loads_long = np.tile(loads_short, 2)
+
+        results = np.zeros(loads_short.size * 2)
+
         # Iterates as long as there is no convergence
         # (convergence if difference between depth in iterations is smaller than THRESHOLD_BOREHOLE_DEPTH)
         while abs(self.H - H_prev) >= Borefield.THRESHOLD_BOREHOLE_DEPTH:
             # calculate temperature profile
-            self.calculate_temperatures(depth=self.H, hourly=hourly)
+            # self.calculate_temperatures(depth=self.H, hourly=hourly)
+
+            if hourly:
+                # self.calculate_temperatures(depth=self.H, hourly=hourly)
+
+                # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
+                # g-function. This dataset is checked over and over again and is correct
+                g_values = self.gfunction(self.time_L4, self.H)
+                # calculation of needed differences of the g-function values. These are the weight factors in the calculation
+                # of Tb. Last element removed in order to make arrays the same length
+                g_value_previous_step = np.concatenate((np.array([0]), g_values))[:-1]
+                g_value_differences = g_values - g_value_previous_step
+
+                # convolution to get the monthly results
+                results[:8760] = convolve(loads_short * 1000, g_value_differences[:8760])[:8760]
+
+                g_sum_n1 = g_value_differences[:8760*(self.simulation_period - 1)].reshape(self.simulation_period - 1, 8760).sum(axis=0)
+                g_sum = g_sum_n1 + g_value_differences[8760*(self.simulation_period - 1):]
+                g_sum_n2 = np.concatenate((np.array([0]), g_sum_n1[::-1]))[:-1]
+
+                results[8760:] = convolve(loads_short * 1000, g_sum)[:8760] + convolve(loads_short_rev * 1000, g_sum_n2)[:8760][::-1]
+
+                # calculation the borehole wall temperature for every month i
+                Tb = results / (2 * pi * self.k_s) / (self.H * self.number_of_boreholes) + self._Tg(self.H)
+
+                self.Tb = Tb
+                # now the Tf will be calculated based on
+                # Tf = Tb + Q * R_b
+                temperature_result = Tb + loads_long * 1000 * (self.Rb / self.number_of_boreholes / self.H)
+                # reset other variables
+                self.results_peak_heating = temperature_result
+                self.results_peak_cooling = temperature_result
+
+            else:
+                # self.calculate_temperatures(depth=self.H, hourly=hourly)
+
+                # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
+                # g-function. This dataset is checked over and over again and is correct
+                g_values = self.gfunction(self.time_L3_last_year, self.H)
+
+                # the g-function value of the peak with length_peak hours
+                g_value_peak = self.gfunction(self.length_peak * 3600., self.H)
+
+                # calculation of needed differences of the g-function values. These are the weight factors in the calculation
+                # of Tb. Last element removed in order to make arrays the same length
+                g_value_previous_step = np.concatenate((np.array([0]), g_values))[:-1]
+                g_value_differences = g_values - g_value_previous_step
+
+                # convolution to get the monthly results
+                # convolution to get the monthly results
+                # convolution to get the monthly results
+                results[:12] = convolve(loads_short * 1000, g_value_differences[:12])[:12]
+
+                g_sum_n1 = g_value_differences[:12 * (self.simulation_period - 1)].reshape(self.simulation_period - 1, 12).sum(axis=0)
+                g_sum = g_sum_n1 + g_value_differences[12 * (self.simulation_period - 1):]
+                g_sum_n2 = np.concatenate((np.array([0]), g_sum_n1[::-1]))[:-1]
+
+                results[12:] = convolve(loads_short * 1000, g_sum)[:12] + convolve(loads_short_rev * 1000, g_sum_n2)[:12][::-1]
+
+                # calculation the borehole wall temperature for every month i
+                Tb = results / (2 * pi * self.k_s) / (self.H * self.number_of_boreholes) + self._Tg(self.H)
+
+                self.Tb = Tb
+                # now the Tf will be calculated based on
+                # Tf = Tb + Q * R_b
+                results_month_cooling = Tb + np.tile(self.monthly_load_cooling, 2) * 1000 \
+                                        * (self.Rb / self.number_of_boreholes / self.H)
+                results_month_heating = Tb - np.tile(self.monthly_load_heating, 2) * 1000 \
+                                        * (self.Rb / self.number_of_boreholes / self.H)
+
+                # extra summation if the g-function value for the peak is included
+                results_peak_cooling = results_month_cooling + np.tile(self.peak_cooling - self.monthly_load_cooling, 2) * 1000 \
+                                       * (g_value_peak[0] / self.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / self.H
+                results_peak_heating = results_month_heating - np.tile(self.peak_heating - self.monthly_load_heating, 2) * 1000 \
+                                       * (g_value_peak[0] / self.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / self.H
+
+                # save temperatures under variable
+                self.results_peak_heating = results_peak_heating
+                self.results_peak_cooling = results_peak_cooling
+
 
             H_prev = self.H
 
@@ -1164,14 +1248,13 @@ class Borefield:
             # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
             # g-function. This dataset is checked over and over again and is correct
             g_values = self.gfunction(self.time_L4, H)
-
             # calculation of needed differences of the g-function values. These are the weight factors in the calculation
             # of Tb. Last element removed in order to make arrays the same length
             g_value_previous_step = np.concatenate((np.array([0]), g_values))[:-1]
             g_value_differences = g_values - g_value_previous_step
 
             # convolution to get the monthly results
-            results = convolve(hourly_load * 1000, g_value_differences)[:len(hourly_load)]
+            results = convolve(hourly_load * 1000, g_value_differences)[:hourly_load.size]
 
             # calculation the borehole wall temperature for every month i
             Tb = results / (2 * pi * self.k_s) / (H * self.number_of_boreholes) + self._Tg(H)
@@ -1253,7 +1336,7 @@ class Borefield:
         """
         self.jit_calculation = jit
 
-    def gfunction(self, time_value: list, H: float) -> np.ndarray:
+    def gfunction(self, time_value: np.ndarray, H: float) -> np.ndarray:
         """
         This function calculated the g-function based on interpolation of the precalculated data.
 
@@ -1261,7 +1344,6 @@ class Borefield:
         :param H: depth at which the gfunctions should be evaluated
         :return: np.array of gfunction values
         """
-
         # when using a variable ground temperature, sometimes no solution can be found
         if not self.use_constant_Tg and H > Borefield.THRESHOLD_DEPTH_ERROR:
             raise ValueError("Due to the use of a variable ground temperature, no solution can be found."
@@ -1274,16 +1356,13 @@ class Borefield:
 
             return: np.ndarray with gfunction values
             """
-            time_value_np = np.array(time_value)
-            if not isinstance(time_value, (float, int)) and len(time_value_np) > Borefield.DEFAULT_NUMBER_OF_TIMESTEPS:
+            time_value_np = np.array(time_value) if not isinstance(time_value, np.ndarray) else time_value
+            if not isinstance(time_value, (float, int)) and time_value_np.size > Borefield.DEFAULT_NUMBER_OF_TIMESTEPS:
                 # due to this many requested time values, the calculation will be slow.
                 # there will be interpolation
-
                 time_value_new = timeValues(t_max = time_value[-1])
                 # Calculate the g-function for uniform borehole wall temperature
-                gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.alpha, time_value_new,
-                                                         options=self.options_pygfunction).gFunc
-
+                gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.alpha, time_value_new, options=self.options_pygfunction).gFunc
                 # return interpolated values
                 return np.interp(time_value, time_value_new, gfunc_uniform_T)
 
@@ -1291,17 +1370,13 @@ class Borefield:
             if not isinstance(time_value, (float, int)) and len(time_value_np) != len(np.unique(np.asarray(time_value))):
                 gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.alpha, np.unique(time_value_np),
                                                          options=self.options_pygfunction).gFunc
-
                 return np.interp(time_value, np.unique(time_value_np), gfunc_uniform_T)
-
             # Calculate the g-function for uniform borehole wall temperature
             gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.alpha, time_value_np,
                                                      options=self.options_pygfunction).gFunc
-
             return gfunc_uniform_T
 
         ## 1 bypass any possible precalculated g-functions
-
         # if calculate is False, than the gfunctions are calculated jit
         if not self.use_precalculated_data:
             return jit_gfunction_calculation()

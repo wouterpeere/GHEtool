@@ -1,5 +1,6 @@
 import pytest
-from GHEtool import *
+from GHEtool import GroundData, Borefield
+from GHEtool.main_class import FOLDER
 import matplotlib.pyplot as plt
 import pygfunction as gt
 
@@ -43,7 +44,7 @@ def test_optimise_load_profile(monkeypatch):
     borefield.set_borefield(borefield_gt)
 
     # load the hourly profile
-    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv", header=True, separator=";", first_column_heating=True)
+    borefield.load_hourly_profile(f"{FOLDER}/Examples/hourly_profile.csv", header=True, separator=";", first_column_heating=True)
 
     # optimise the load for a 10x10 field (see data above) and a fixed depth of 150m.
     borefield.optimise_load_profile(depth=150, print_results=True)
