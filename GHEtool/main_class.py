@@ -8,6 +8,7 @@ import os.path
 import matplotlib.pyplot as plt
 import warnings
 from GHEtool.VariableClasses import GroundData, FluidData, PipeData
+from typing import Optional
 
 FOLDER = os.path.dirname(os.path.realpath(__file__))  # solve problem with importing GHEtool from sub-folders
 
@@ -36,8 +37,13 @@ class Borefield:
     DEFAULT_NUMBER_OF_TIMESTEPS: int = 100
     THRESHOLD_DEPTH_ERROR: int = 10000  # m
 
-    HOURLY_LOAD_ARRAY: np.ndarray = np.array([0, 24 * 31, 24 * 28, 24 * 31, 24 * 30, 24 * 31, 24 * 30, 24 * 31, 24 * 31, 24 * 30, 24 * 31, 24 * 30,
-                                              24 * 31]).cumsum()
+    HOURLY_LOAD_ARRAY: np.ndarray = np.arange(0, 8761, 730).astype(np.uint32) #np.array([0, 24 * 31, 24 * 28, 24 * 31, 24 * 30, 24 * 31, 24 * 30, 24 * 31,
+    # 24 * 31,
+    # 24 * 30,
+    # 24 * 31, 24 * 30, 24 * 31]).cumsum()
+
+    DIV_T: np.ndarray = 1/np.arange(1, UPM + 1, 1)
+    WEIGHTS: np.ndarray = np.convolve(np.ones(730), DIV_T)[:730]/np.convolve(np.ones(730), DIV_T)[:730].sum()
 
     __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'H_init', 'B', 'N_1', 'N_2', 'Rb', 'k_s', 'Tg', 'ty', 'tm', \
                 'td', 'time', 'hourly_heating_load', 'H_max', 'use_constant_Tg', 'flux', 'volumetric_heat_capacity',\
@@ -52,7 +58,7 @@ class Borefield:
                 'hourly_cooling_load_external', 'hourly_heating_load_on_the_borefield', 'hourly_cooling_load_on_the_borefield', \
                 'k_f', 'mfr', 'Cp', 'mu', 'rho', 'use_constant_Rb', 'h_f', 'R_f', 'R_p', 'printing', 'combo', \
                 'r_in', 'r_out', 'k_p', 'D_s', 'r_b', 'number_of_pipes', 'epsilon', 'k_g', 'pos', 'D', 'jit_calculation', \
-                'L2_sizing', 'L3_sizing', 'L4_sizing', 'quadrant_sizing', 'H_init', 'use_precalculated_data'
+                'L2_sizing', 'L3_sizing', 'L4_sizing', 'quadrant_sizing', 'H_init', 'use_precalculated_data', 'len_peak_heating', 'len_peak_cooling'
 
     def __init__(self, simulation_period: int = 20, number_of_boreholes: int = None, peak_heating: list = None,
                  peak_cooling: list = None, baseload_heating: list = None, baseload_cooling: list = None, investement_cost: list = None,
@@ -220,6 +226,9 @@ class Borefield:
         # set a custom g-function
         self.custom_gfunction = custom_gfunction
 
+        self.len_peak_heating: Optional[np.ndarray] = None
+        self.len_peak_cooling: Optional[np.ndarray] = None
+
         # create plotlayout if gui
         if self.gui:
             from GHEtool.gui.gui_base_class import set_graph_layout
@@ -328,7 +337,6 @@ class Borefield:
             return (points, values)
 
         self._custom_gfunction = make_interpolation_list_custom(custom_gfunction)
-
 
     @custom_gfunction.deleter
     def custom_gfunction(self) -> None:
@@ -981,6 +989,15 @@ class Borefield:
         :return: None
         """
         self.monthly_load = (self.baseload_cooling - self.baseload_heating) / Borefield.UPM
+        if self.hourly_heating_load.size > 8000 and self.hourly_cooling_load.size > 8000 :
+            g_values = self.gfunction(self.time_L4[:730], 100)
+            # calculation of needed differences of the g-function values. These are the weight factors in the calculation
+            # of Tb. Last element removed in order to make arrays the same length
+            g_value_previous_step = np.concatenate((np.array([0]), g_values))[:-1]
+            g_value_differences = g_values - g_value_previous_step
+            diff = self.hourly_cooling_load - self.hourly_heating_load
+            self.monthly_load = np.array([diff[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1]].dot(
+                Borefield.DIV_T[::-1]) / Borefield.DIV_T.sum()for i in range(12)])
 
     def set_baseload_heating(self, baseload: np.array) -> None:
         """
@@ -991,6 +1008,16 @@ class Borefield:
         """
         self.baseload_heating = np.maximum(baseload, np.zeros(12))  # kWh
         self.monthly_load_heating = self.baseload_heating / Borefield.UPM  # kW
+        if self.hourly_heating_load.size > 8000:
+            g_values = self.gfunction(self.time_L4[:730*2], 100)
+            # calculation of needed differences of the g-function values. These are the weight factors in the calculation
+            # of Tb. Last element removed in order to make arrays the same length
+            g_value_previous_step = np.concatenate((np.array([0]), g_values))[:-1]
+            g_value_differences = (g_values - g_value_previous_step)[730:730*2]
+            self.monthly_load_heating = np.array([self.hourly_heating_load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1]].dot(
+                Borefield.DIV_T[::-1]) / Borefield.DIV_T.sum() for i in range(12)])
+            #self.monthly_load_heating = np.array([np.average(self.hourly_heating_load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i+1]],
+            #                                                 weights=Borefield.WEIGHTS) for i in range(12)])
         self.calculate_monthly_load()
         self.calculate_imbalance()
 
@@ -1005,7 +1032,17 @@ class Borefield:
         :return None
         """
         self.baseload_cooling = np.maximum(baseload, np.zeros(12))  # kWh
-        self.monthly_load_cooling = self.baseload_cooling / Borefield.UPM # kW
+        self.monthly_load_cooling = self.baseload_cooling / Borefield.UPM  # kW
+        if self.hourly_cooling_load.size > 8000:
+            g_values = self.gfunction(self.time_L4[:730], 100)
+            # calculation of needed differences of the g-function values. These are the weight factors in the calculation
+            # of Tb. Last element removed in order to make arrays the same length
+            g_value_previous_step = np.concatenate((np.array([0]), g_values))[:-1]
+            g_value_differences = g_values - g_value_previous_step
+            self.monthly_load_cooling = np.array([self.hourly_cooling_load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1]].dot(
+             Borefield.DIV_T[::-1]) / Borefield.DIV_T.sum() for i in range(12)])
+            #self.monthly_load_cooling = np.array([np.average(self.hourly_cooling_load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i+1]],
+            #                                                 weights=Borefield.WEIGHTS) for i in range(12)])
         self.calculate_monthly_load()
         self.calculate_imbalance()
 
@@ -1172,8 +1209,7 @@ class Borefield:
         """
         return self._print_temperature_profile(legend=legend, H=depth, plot_hourly=plot_hourly)
 
-    def _print_temperature_profile(self, legend: bool = True, H: float = None,
-                                   plot_hourly: bool = False, figure: bool = True) -> None:
+    def _print_temperature_profile(self, legend: bool = True, H: float = None, plot_hourly: bool = False, figure: bool = True) -> None:
         """
         This function calculates the temperature evolution in the using temporal superposition.
         It is possible to calculate this for a certain depth H, otherwise self.H will be used.
@@ -1207,7 +1243,14 @@ class Borefield:
             g_values = self.gfunction(self.time_L3_last_year, H)
 
             # the g-function value of the peak with length_peak hours
-            g_value_peak = self.gfunction(self.length_peak * 3600., H)
+            if self.len_peak_heating is None:
+                g_value_peak = np.array([self.gfunction(self.length_peak * 3600., H)[0]] * 12 * self.simulation_period)
+                g_value_peak_heating = g_value_peak
+                g_value_peak_cooling = g_value_peak
+            else:
+                g_value_peak_heating = np.tile(np.array([self.gfunction(length * 3600., H)[0] for length in self.len_peak_heating]),
+                                               self.simulation_period)
+                g_value_peak_cooling = np.tile(np.array([self.gfunction(length * 3600., H)[0] for length in self.len_peak_cooling]), self.simulation_period)
 
             # calculation of needed differences of the g-function values. These are the weight factors in the calculation
             # of Tb. Last element removed in order to make arrays the same length
@@ -1223,16 +1266,16 @@ class Borefield:
             self.Tb = Tb
             # now the Tf will be calculated based on
             # Tf = Tb + Q * R_b
-            results_month_cooling = Tb + np.tile(self.monthly_load_cooling, self.simulation_period) * 1000 \
+            results_month_cooling = Tb + np.tile(self.monthly_load_cooling - self.monthly_load_heating, self.simulation_period) * 1000 \
                               * (self.Rb / self.number_of_boreholes / H)
-            results_month_heating = Tb - np.tile(self.monthly_load_heating, self.simulation_period) * 1000 \
-                              * (self.Rb / self.number_of_boreholes / H)
+            results_month_heating = results_month_cooling # Tb - np.tile(self.monthly_load_heating, self.simulation_period) * 1000 \
+                              # * (self.Rb / self.number_of_boreholes / H)
 
             # extra summation if the g-function value for the peak is included
             results_peak_cooling = results_month_cooling + np.tile(self.peak_cooling - self.monthly_load_cooling, self.simulation_period) * 1000 \
-                                     * (g_value_peak[0] / self.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / H
+                                     * (g_value_peak_heating / self.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / H
             results_peak_heating = results_month_heating - np.tile(self.peak_heating - self.monthly_load_heating, self.simulation_period) * 1000 \
-                                   * (g_value_peak[0] / self.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / H
+                                   * (g_value_peak_cooling / self.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / H
 
             # save temperatures under variable
             self.results_peak_heating = results_peak_heating
@@ -1419,7 +1462,6 @@ class Borefield:
         ## 3 calculate g-function jit
         return jit_gfunction_calculation()
 
-
     def create_custom_dataset(self, name_datafile: str=None, options: dict=None,
                               time_array=None, depth_array=None, save=False) -> None:
         """
@@ -1580,6 +1622,15 @@ class Borefield:
         self.set_baseload_cooling(self._reduce_to_monthly_load(self.hourly_cooling_load, peak_cooling_load))
         self.set_baseload_heating(self._reduce_to_monthly_load(self.hourly_heating_load, peak_heating_load))
 
+    def determine_peak_length_from_hourly_data(self):
+
+        max_values = np.array([np.convolve(self.hourly_heating_load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i+1]] -
+                                           self.monthly_load_heating[i], Borefield.DIV_T).max(initial=0) for i in range(12)])
+        self.len_peak_heating = np.exp(max_values/np.maximum(self.peak_heating - self.monthly_load_heating, 1))
+        max_values = np.array([np.convolve(self.hourly_cooling_load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1]] -
+                                           self.monthly_load_cooling[i], Borefield.DIV_T).max(initial=0) for i in range(12)])
+        self.len_peak_cooling = np.exp(max_values / np.maximum(self.peak_cooling - self.monthly_load_cooling, 1))
+
     @staticmethod
     def _reduce_to_monthly_load(load: list, peak: float) -> list:
         """
@@ -1590,7 +1641,9 @@ class Borefield:
         :return: list of monthly loads [kWh]
         """
 
-        month_load = [np.sum(np.minimum(peak, load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1] + 1])) for i in range(12)]
+        month_load = [np.sum(np.minimum(peak, load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1]])) for i in range(12)]
+
+        # np.convolve(self.hourly_heating_load[730:730 * 2], Borefield.DIV_T)[:730].sum() / 730 / (np.convolve(np.ones(730), Borefield.DIV_T)[:730].sum() / 730)
 
         return month_load
 
@@ -1604,7 +1657,7 @@ class Borefield:
         :return: list of monthly peak loads
         """
 
-        peak_load = [max(np.minimum(peak, load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1] + 1])) for i in range(12)]
+        peak_load = [max(np.minimum(peak, load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1]])) for i in range(12)]
         return peak_load
 
     def optimise_load_profile(self, depth: float = None, print_results: bool = False) -> None:
