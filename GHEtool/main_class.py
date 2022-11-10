@@ -37,13 +37,7 @@ class Borefield:
     DEFAULT_NUMBER_OF_TIMESTEPS: int = 100
     THRESHOLD_DEPTH_ERROR: int = 10000  # m
 
-    HOURLY_LOAD_ARRAY: np.ndarray = np.arange(0, 8761, 730).astype(np.uint32) #np.array([0, 24 * 31, 24 * 28, 24 * 31, 24 * 30, 24 * 31, 24 * 30, 24 * 31,
-    # 24 * 31,
-    # 24 * 30,
-    # 24 * 31, 24 * 30, 24 * 31]).cumsum()
-
-    DIV_T: np.ndarray = 1/np.arange(1, UPM + 1, 1)
-    WEIGHTS: np.ndarray = np.convolve(np.ones(730), DIV_T)[:730]/np.convolve(np.ones(730), DIV_T)[:730].sum()
+    HOURLY_LOAD_ARRAY: np.ndarray = np.arange(0, 8761, 730).astype(np.uint32)
 
     __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'H_init', 'B', 'N_1', 'N_2', 'Rb', 'k_s', 'Tg', 'ty', 'tm', \
                 'td', 'time', 'hourly_heating_load', 'H_max', 'use_constant_Tg', 'flux', 'volumetric_heat_capacity',\
@@ -989,15 +983,6 @@ class Borefield:
         :return: None
         """
         self.monthly_load = (self.baseload_cooling - self.baseload_heating) / Borefield.UPM
-        if self.hourly_heating_load.size > 8000 and self.hourly_cooling_load.size > 8000 :
-            g_values = self.gfunction(self.time_L4[:730], 100)
-            # calculation of needed differences of the g-function values. These are the weight factors in the calculation
-            # of Tb. Last element removed in order to make arrays the same length
-            g_value_previous_step = np.concatenate((np.array([0]), g_values))[:-1]
-            g_value_differences = g_values - g_value_previous_step
-            diff = self.hourly_cooling_load - self.hourly_heating_load
-            self.monthly_load = np.array([diff[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1]].dot(
-                Borefield.DIV_T[::-1]) / Borefield.DIV_T.sum()for i in range(12)])
 
     def set_baseload_heating(self, baseload: np.array) -> None:
         """
@@ -1008,16 +993,6 @@ class Borefield:
         """
         self.baseload_heating = np.maximum(baseload, np.zeros(12))  # kWh
         self.monthly_load_heating = self.baseload_heating / Borefield.UPM  # kW
-        if self.hourly_heating_load.size > 8000:
-            g_values = self.gfunction(self.time_L4[:730*2], 100)
-            # calculation of needed differences of the g-function values. These are the weight factors in the calculation
-            # of Tb. Last element removed in order to make arrays the same length
-            g_value_previous_step = np.concatenate((np.array([0]), g_values))[:-1]
-            g_value_differences = (g_values - g_value_previous_step)[730:730*2]
-            self.monthly_load_heating = np.array([self.hourly_heating_load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1]].dot(
-                Borefield.DIV_T[::-1]) / Borefield.DIV_T.sum() for i in range(12)])
-            #self.monthly_load_heating = np.array([np.average(self.hourly_heating_load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i+1]],
-            #                                                 weights=Borefield.WEIGHTS) for i in range(12)])
         self.calculate_monthly_load()
         self.calculate_imbalance()
 
@@ -1033,16 +1008,7 @@ class Borefield:
         """
         self.baseload_cooling = np.maximum(baseload, np.zeros(12))  # kWh
         self.monthly_load_cooling = self.baseload_cooling / Borefield.UPM  # kW
-        if self.hourly_cooling_load.size > 8000:
-            g_values = self.gfunction(self.time_L4[:730], 100)
-            # calculation of needed differences of the g-function values. These are the weight factors in the calculation
-            # of Tb. Last element removed in order to make arrays the same length
-            g_value_previous_step = np.concatenate((np.array([0]), g_values))[:-1]
-            g_value_differences = g_values - g_value_previous_step
-            self.monthly_load_cooling = np.array([self.hourly_cooling_load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1]].dot(
-             Borefield.DIV_T[::-1]) / Borefield.DIV_T.sum() for i in range(12)])
-            #self.monthly_load_cooling = np.array([np.average(self.hourly_cooling_load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i+1]],
-            #                                                 weights=Borefield.WEIGHTS) for i in range(12)])
+
         self.calculate_monthly_load()
         self.calculate_imbalance()
 
