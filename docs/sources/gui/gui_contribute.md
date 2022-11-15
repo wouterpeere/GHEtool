@@ -4,8 +4,40 @@ This document contains all the information needed for someone who wants to contr
 It explains the general way the GUI is setup, how options can be added and how (new) translations can be included.
 
 ## General structure of the GUI
+When looking in the [gui folder](https://github.com/wouterpeere/GHEtool/tree/main/GHEtool/gui) on the GitHub page, one will find a couple of documents that together make the gui work. In this section, the general structure of the GUI will be explained.
 
-### How to add new options in the GUI?
+### start_gui.py
+This file does nothing but to start the gui. When creating a new GUI version, please update the version in this document as well.
+
+### gui_base_classes.py
+This document should normally not be altered. It contains some general information about the used color schemes etc.
+
+### gui_classes.py
+All of the elements you can use on the GUI (the buttons, text inputs etc.) have been defined in this document.
+Everything related to the behaviour of the different elements used in *gui_structure.py* can be found and changed here.
+This class is only needed when one wants to change the general behaviour of an element.
+
+### gui_structure.py
+This document is the center of the GUI. It contains in order all the different elements that appear inside the GUI and the relationship between them.
+Adding new options to the GUI, will be done here. For more detailed information about how to change the *gui_structure.py*, click [here](#gui_structure).
+
+### gui_data_structure.py
+This document makes sure that all the elements, put in the gui_structure, will be saved when the gui is used. It stores all the values of the gui in a variable (which will then later be dumped into an *.GHEtool file).
+This document also adds some extra variables to the ones comming from the gui_structure. For example, when entering monthly loads, every month is a variable and will also be saved as such. However, inside the datastorage class, a new variable is created to combine all these different monthly variables into one in order to make life easier.
+One can hence also create variables here that can be useful for the calculation itself.
+
+### gui_calculation_thread.py
+This document is the core of the GUI when it comes to the real calculation. In the function _run_ one defines the functionality of the GUI. For each aim (cf. infra), one creates a borefield object and does some calculations to it.
+Here, all the variables from gui_structure can be used by using *self.DS.NameOfTheGuiStructureVariable*. Also, variables directly created inside the datastorage class can be used here.
+
+### gui_combine_window.py
+This document creates the GUI itself. It makes sure that all the elements (defined in *gui_structure.py*) are placed correctly, and that all the navigation works.
+
+### translation_class.py
+This document is automatically created and takes care of different translations for the gui. For more information, see [here](#translations).
+
+
+## How to add new options in the GUI?
 
 New options can be added in the 
 [.\GHEtool\gui\gui_structure.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_structure.py)
@@ -16,14 +48,14 @@ The implemented options can then be used in the CalcProblem class in the
 [.\GHEtool\gui\gui_calculation_thread.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_calculation_thread.py) 
 script. The value of the option get be get by the `get_value()` function.
 
-#### GUI structure
+## GUI structure <a name="gui_structure"></a>
 
 The GUI is based on pages which consists of categories which consists of options. 
 An example for a page is the borehole resistance page. Where the fluid data category can be found. 
 This category has a double spin box option to set the mass flow rate.
 The order in which the options are created is also the tab order.
 
-#### Page
+### Page
 
 To create a page the Page class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -47,7 +79,7 @@ page_example.set_next_page(page_next)
 Example Page
 ![Python Logo](_static/Example_Page.PNG)
 
-#### Aim
+### Aim
 
 To create an aim the Aim class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -72,7 +104,7 @@ aim_example.add_link_2_show(option=option_example)
 Example Aim
 ![Python Logo](_static/Example_Aim.PNG)
 
-#### Category
+### Category
 
 To create a category the Category class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -91,7 +123,7 @@ category_example = Category(
 Example Category
 ![Python Logo](_static/Example_Category.PNG)
 
-#### Float box
+### Float box
 
 To create a float box the FloatBox class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -125,7 +157,7 @@ option_float.add_link_2_show(option=option_linked, below=0.1, above=0.9)
 Example float box
 ![Python Logo](_static/Example_Float_Box.PNG)
 
-#### Integer box
+### Integer box
 
 To create a integer box the IntegerBox class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -156,7 +188,7 @@ option_int.add_link_2_show(option=option_linked, below=1, above=10)
 Example integer box
 ![Python Logo](_static/Example_Int_Box.PNG)
 
-#### Button box
+### Button box
 
 To create a button box the ButtonBox class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -183,7 +215,7 @@ option_buttons.add_link_2_show(option=option_linked, on_index=0)
 Example button box
 ![Python Logo](_static/Example_Button_Box.PNG)
 
-#### List box
+### List box
 
 To create a list box the ListBox class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -211,7 +243,7 @@ option_list.add_link_2_show(option=option_linked, on_index==0)
 Example list box
 ![Python Logo](_static/Example_List_Box.PNG)
 
-#### Filename
+### Filename
 
 To create a filename box the FileNameBox class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -238,7 +270,7 @@ option_file = FileNameBox(
 Example filename box
 ![Python Logo](_static/Example_Filename.PNG)
 
-#### Function button
+### Function button
 
 To create a function button the FunctionButton class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -261,7 +293,7 @@ function_example.change_event(function_to_be_called())
 Example function button
 ![Python Logo](_static/Example_Function_Button.PNG)
 
-#### Hint
+### Hint
 
 To create a hint the Hint class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -284,7 +316,7 @@ function_example.change_event(function_to_be_called())
 Example Hint
 ![Python Logo](_static/Example_Hint.PNG)
 
-### How to add or correct translations?
+## How to add or correct translations? <a name="translations"></a>
 
 Translations for the GUI can be added in a new column in the 
 [.\GHEtool\gui\Translations.csv](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/Translations.csv) file. Correction can be made there as well. 
@@ -306,7 +338,7 @@ to be run. This will add the changes to the `Translations` class in `./GHEtool/g
 
 Know the translation or correction is available in the GUI.
 
-### How to add an icon?
+## How to add an icon?
 
 An Icon can be added to the gui by adding `example_icon.svg` icon to `icons.qrc` file and locating in the icon in the icons folder:
 
@@ -322,7 +354,7 @@ pyside6-rcc ./GHEtool/gui/icons.qrc -o ./GHEtool/gui/icons_rc.py
 
 Know the icon can be used in the GUI.
 
-### How to create the *.exe file?
+## How to create the *.exe file?
 
 The exe can be created using [PyInstaller](https://pyinstaller.org/en/stable/).
 

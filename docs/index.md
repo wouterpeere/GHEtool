@@ -34,13 +34,7 @@ sources/code_index
 :caption: 'Graphical User Interface'
 :maxdepth: 2
 
-sources/gui_index
-```
-
-```{toctree}
-:caption: 'Graphical User Interface 2 '
-:maxdepth: 2
-
+sources/gui/gui_functionalities.md
 sources/gui/gui_installation_guide.md
 sources/gui/gui_manual.md
 sources/gui/gui_contribute.md
