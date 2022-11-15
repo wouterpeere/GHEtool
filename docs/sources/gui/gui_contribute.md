@@ -1,9 +1,9 @@
-## Contribute to the GUI
+# Contribute to the GUI
 
 This document contains all the information needed for someone who wants to contribute to the GUI.
 It explains the general way the GUI is setup, how options can be added and how (new) translations can be included.
 
-### General structure of the GUI
+## General structure of the GUI
 
 ### How to add new options in the GUI?
 

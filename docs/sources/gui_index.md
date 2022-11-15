@@ -1,4 +1,4 @@
-# Graphical User Interface (GUI) of GHEtool
+# Functionalities of the Graphical User Interface
 
 Besides the code version of GHEtool, a graphical user interface (mainly developped by Tobias Blanke) is also available.
 The functionalities, currently included in the graphical version of GHEtool are:
@@ -16,7 +16,7 @@ The functionalities, currently included in the graphical version of GHEtool are:
 For features that are in development, please see the Change Log of GHEtool.
 
 ```{toctree}
-:caption: 'GUI'
+:caption: 'Graphical User Interface (GUI)'
 :maxdepth: 2
 
 self

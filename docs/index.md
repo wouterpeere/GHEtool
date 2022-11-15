@@ -4,7 +4,15 @@
 % contain the root `toctree` directive.
 
 # Welcome to GHEtool's documentation!
+Dear visitor
 
+Welcome on this ReadTheDocs for the open-source borefield sizing tool GHEtool.
+Currently, this ReadTheDocs is under construction and will be changed on a regular basis.
+
+Currently, most of the available information can be found under the Graphical User Interface section.
+
+
+Please find below the content of this ReadTheDocs.
 
 ```{toctree}
 :caption: 'GHEtool'
@@ -14,6 +22,30 @@ self
 sources/code_index
 sources/gui_index
 ```
+
+```{toctree}
+:caption: 'Code version'
+:maxdepth: 2
+
+sources/code_index
+```
+
+```{toctree}
+:caption: 'Graphical User Interface'
+:maxdepth: 2
+
+sources/gui_index
+```
+
+```{toctree}
+:caption: 'Graphical User Interface 2 '
+:maxdepth: 2
+
+sources/gui/gui_installation_guide.md
+sources/gui/gui_manual.md
+sources/gui/gui_contribute.md
+```
+
 
 ```{toctree}
 :caption: 'General'
