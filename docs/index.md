@@ -19,8 +19,6 @@ Please find below the content of this ReadTheDocs.
 :maxdepth: 2
 
 self
-sources/code_index
-sources/gui_index
 ```
 
 ```{toctree}
