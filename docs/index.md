@@ -41,3 +41,14 @@ sources/gui/gui_installation_guide.md
 sources/gui/gui_manual.md
 sources/gui/gui_contribute.md
 ```
+
+```{toctree}
+:caption: 'Contribute to GHEtool (GUI)'
+:maxdepth: 2
+
+sources/gui/gui_contribute.md
+sources/gui/gui_structure.md
+sources/gui/gui_new_options.md
+sources/gui/gui_translations.md
+sources/gui/gui_FAQ.md
+```
