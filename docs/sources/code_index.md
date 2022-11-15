@@ -2,6 +2,7 @@
 
 ```{toctree}
 :maxdepth: 2
+:caption: 'Code'
 
 code/getting_started.md
 ```

@@ -7,14 +7,19 @@
 
 
 ```{toctree}
-:caption: 'Content'
+:caption: 'GHEtool'
 :maxdepth: 2
 
 self
 sources/code_index
 sources/gui_index
+```
+
+```{toctree}
+:caption: 'General'
+:maxdepth: 2
+
 sources/articles
 sources/changelog
 sources/legal_notice
 ```
-
