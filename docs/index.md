@@ -19,13 +19,17 @@ Please find below the content of this ReadTheDocs.
 :maxdepth: 2
 
 self
+sources/cite
+sources/articles
+sources/changelog
+sources/legal_notice
 ```
 
 ```{toctree}
 :caption: 'Code version'
 :maxdepth: 2
 
-sources/code_index
+sources/code/getting_started.md
 ```
 
 ```{toctree}
@@ -36,14 +40,4 @@ sources/gui/gui_functionalities.md
 sources/gui/gui_installation_guide.md
 sources/gui/gui_manual.md
 sources/gui/gui_contribute.md
-```
-
-
-```{toctree}
-:caption: 'General'
-:maxdepth: 2
-
-sources/articles
-sources/changelog
-sources/legal_notice
 ```
