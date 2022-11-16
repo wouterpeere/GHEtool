@@ -1,11 +1,18 @@
 # How to add new options in the GUI?
 The GUI is based on pages which consists of categories which consists of options. 
-An example for a page is the borehole resistance page. Where the fluid data category can be found. 
+An example for a page is the borehole resistance page. Here the fluid data category can be found. 
 This category has a double spin box option to set the mass flow rate.
-The order in which the options are created is also the tab order.
+The order in which the options are put in the gui_structure.py document is also the order in which they will appear in the GUI itself
+(and with the correct tab order).
 
-## Page
+On this page, one can find how one can create a page, an aim and a category - the structural elements.
+Then, the different options (float box, integer box, button box, list box, filename, function button and hint) are explained.
+This page ends with an explanation
 
+## Structural elements
+All the objects below (being pages, aims and categories) serve as the backbone of the GUI and can hence be interpreted as structural elements.
+
+### Page
 To create a page the Page class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
 Then a default widget parent has to be set. This can be just copied from the previous pages or set to `default_parent`.
@@ -28,7 +35,7 @@ page_example.set_next_page(page_next)
 Example Page
 ![Python Logo](_static/Example_Page.PNG)
 
-## Aim
+### Aim
 
 To create an aim the Aim class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -53,7 +60,7 @@ aim_example.add_link_2_show(option=option_example)
 Example Aim
 ![Python Logo](_static/Example_Aim.PNG)
 
-## Category
+### Category
 
 To create a category the Category class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -72,7 +79,10 @@ category_example = Category(
 Example Category
 ![Python Logo](_static/Example_Category.PNG)
 
-## Float box
+## Option elements
+In this section, all different option elements will be discussed. These are elements that can be used to set values (or show them).
+
+### Float box
 
 To create a float box the FloatBox class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -106,7 +116,7 @@ option_float.add_link_2_show(option=option_linked, below=0.1, above=0.9)
 Example float box
 ![Python Logo](_static/Example_Float_Box.PNG)
 
-## Integer box
+### Integer box
 
 To create a integer box the IntegerBox class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -137,7 +147,7 @@ option_int.add_link_2_show(option=option_linked, below=1, above=10)
 Example integer box
 ![Python Logo](_static/Example_Int_Box.PNG)
 
-## Button box
+### Button box
 
 To create a button box the ButtonBox class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -164,7 +174,7 @@ option_buttons.add_link_2_show(option=option_linked, on_index=0)
 Example button box
 ![Python Logo](_static/Example_Button_Box.PNG)
 
-## List box
+### List box
 
 To create a list box the ListBox class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -192,7 +202,7 @@ option_list.add_link_2_show(option=option_linked, on_index==0)
 Example list box
 ![Python Logo](_static/Example_List_Box.PNG)
 
-## Filename
+### Filename
 
 To create a filename box the FileNameBox class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -219,7 +229,7 @@ option_file = FileNameBox(
 Example filename box
 ![Python Logo](_static/Example_Filename.PNG)
 
-## Function button
+### Function button
 
 To create a function button the FunctionButton class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -242,7 +252,7 @@ function_example.change_event(function_to_be_called())
 Example function button
 ![Python Logo](_static/Example_Function_Button.PNG)
 
-## Hint
+### Hint
 
 To create a hint the Hint class has to be imported from 
 [.\GHEtool\gui\gui_classes.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/gui_classes.py).
@@ -264,3 +274,10 @@ function_example.change_event(function_to_be_called())
 
 Example Hint
 ![Python Logo](_static/Example_Hint.PNG)
+
+## Result elements
+Finally, there is a specific type of elements for the GUI related to the results. These are explained here.
+
+### Figure results
+
+### Text results
