@@ -46,8 +46,8 @@ extensions = [
     'sphinx.ext.autosectionlabel',
     'sphinx_rtd_theme',
     'sphinx.ext.imgmath',
-    'numpydoc',
-    'sphinx.ext.autodoc'
+    'sphinx.ext.autodoc',
+    'numpydoc'
 ]
 
 
