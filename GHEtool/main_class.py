@@ -1400,7 +1400,7 @@ class Borefield:
         if save:
             name = f'{name_datafile}.pickle'
             pickle.dump(data, open(f'{folder}/Data/{name}', "wb"))
-            print(f"A new dataset with name {name} has been created in {os.path.dirname(os.path.realpath(__file__))}\Data.")
+            # print(f"A new dataset with name {name} has been created in {os.path.dirname(os.path.realpath(__file__))}\Data.")
             return f"{os.path.dirname(os.path.realpath(__file__))}\Data/"+name
 
     def set_hourly_heating_load(self, heating_load: np.array) -> None:
@@ -1749,7 +1749,7 @@ class Borefield:
         for option in options:
             self._reset_for_sizing(option[0], option[1])
             self.B = option[2]
-            depth = self.size(H_init=100, L2_sizing=L2_sizing)
+            depth = self.size(H_init=100, L2_sizing=self.L2_sizing)
 
             # save result in results dictionary with the total length as key
             results[depth * self.number_of_boreholes] = (option[0], option[1], option[2], depth)
