@@ -11,16 +11,15 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 
-import mock
 from unittest.mock import Mock, MagicMock
 import os
 import sys
 
 MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'matplotlib.pyplot', 'scipy.interpolate', 'pygfunction', 'pickle',
-                'warnings', 'scipy.signal', 'math', 'os.path', 'functools', 'PySide6.QtCore',
+                'warnings', 'scipy.signal', 'math', 'functools', 'PySide6.QtCore',
                 'PySide6.QtGui', 'PySide6.QtWidgets']
 for mod_name in MOCK_MODULES:
-    sys.modules[mod_name] = mock.Mock()
+    sys.modules[mod_name] = Mock()
 
 
 sys.path.insert(0, os.path.abspath('..'))
