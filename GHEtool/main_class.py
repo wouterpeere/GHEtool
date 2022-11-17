@@ -1593,7 +1593,7 @@ class Borefield:
             list with monthly peak loads [kW]
         """
 
-        peak_load = [np.minimum(peak, load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1] + 1]) for i in range(12)]
+        peak_load = [max(np.minimum(peak, load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1] + 1])) for i in range(12)]
         return peak_load
 
     def optimise_load_profile(self, depth: float = None, print_results: bool = False) -> None:
@@ -1743,10 +1743,10 @@ class Borefield:
         """
         This function returns the borefield quadrant (as defined by Peere et al., 2021 [#PeereEtAl]_)
         based on the calculated temperature profile.
-        If there is no limiting quadrant, None is returned
-        Quadrant 1 is limited in the first year by the maximum temperature
-        Quadrant 2 is limited in the last year by the maximum temperature
-        Quadrant 3 is limited in the first year by the minimum temperature
+        If there is no limiting quadrant, None is returned.\n
+        Quadrant 1 is limited in the first year by the maximum temperature\n
+        Quadrant 2 is limited in the last year by the maximum temperature\n
+        Quadrant 3 is limited in the first year by the minimum temperature\n
         Quadrant 4 is limited in the last year by the maximum temperature
 
         Returns
@@ -1756,10 +1756,7 @@ class Borefield:
 
         References
         ----------
-        .. [#PeereEtAl] Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. (2021)
-        Validated combined first and last year borefield sizing methodology.
-        In Proceedings of International Building Simulation Conference 2021. Brugge (Belgium), 1-3 September 2021.
-        https://doi.org/10.26868/25222708.2021.30180
+        .. [#PeereEtAl] Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. (2021) Validated combined first and last year borefield sizing methodology. In Proceedings of International Building Simulation Conference 2021. Brugge (Belgium), 1-3 September 2021. https://doi.org/10.26868/25222708.2021.30180
         """
 
         # calculate max/min fluid temperatures
