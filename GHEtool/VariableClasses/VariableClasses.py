@@ -1,4 +1,24 @@
 class GroundData:
+    """
+    Contains information regarding the dimensions and position of a borehole.
+    Attributes
+    ----------
+    H : float
+        Borehole length (in meters).
+    D : float
+        Borehole buried depth (in meters).
+    r_b : float
+        Borehole radius (in meters).
+    x : float
+        Position (in meters) of the head of the borehole along the x-axis.
+    y : float
+        Position (in meters) of the head of the borehole along the y-axis.
+    tilt : float
+        Angle (in radians) from vertical of the axis of the borehole.
+    orientation : float
+        Direction (in radians) of the tilt of the borehole.
+    """
+
     __slots__ = 'k_s', 'Tg', 'Rb', 'flux', 'volumetric_heat_capacity', 'alpha'
 
     def __init__(self, k_s: float, T_g: float, R_b: float, volumetric_heat_capacity: float = 2.4 * 10**6, flux: float = 0.06) -> None:

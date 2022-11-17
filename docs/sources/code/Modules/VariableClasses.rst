@@ -4,6 +4,6 @@
 VariableClasses
 ***************
 
-.. autoclass:: GHEtool.VariableClasses.VariableClasses
+.. automodule:: GHEtool.VariableClasses.VariableClasses
     :members:
     :show-inheritance:

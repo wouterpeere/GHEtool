@@ -25,6 +25,7 @@ def timeValues(dt=3600., t_max=100. * 8760 * 3600.):
 
 
 class Borefield:
+    """Main borefield class"""
     UPM: float = 730.  # number of hours per month
     THRESHOLD_BOREHOLE_DEPTH: float = 0.05  # threshold for iteration
     MAX_SIMULATION_PERIOD: int = 100  # maximal value for simulation
