@@ -1344,7 +1344,6 @@ class Borefield:
         ## 3 calculate g-function jit
         return jit_gfunction_calculation()
 
-
     def create_custom_dataset(self, name_datafile: str=None, options: dict=None,
                               time_array=None, depth_array=None, save=False) -> None:
         """
@@ -1401,7 +1400,7 @@ class Borefield:
             name = f'{name_datafile}.pickle'
             pickle.dump(data, open(f'{folder}/Data/{name}', "wb"))
             # print(f"A new dataset with name {name} has been created in {os.path.dirname(os.path.realpath(__file__))}\Data.")
-            return f"{os.path.dirname(os.path.realpath(__file__))}\Data/"+name
+            return f'{os.path.dirname(os.path.realpath(__file__))}\Data/ {name}'
 
     def set_hourly_heating_load(self, heating_load: np.array) -> None:
         """
