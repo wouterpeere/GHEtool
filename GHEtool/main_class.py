@@ -257,30 +257,27 @@ class Borefield:
         """
         self.number_of_boreholes = len(self.borefield) if self.borefield is not None else 0
 
-    def set_borefield(self, borefield=None) -> None:
+    def set_number_of_boreholes(self, number_of_boreholes: int = 1) -> None:
         """
-        This function sets the borefield configuration.
-        When no input is provided, the borefield attribute is deleted.
+        This functions sets the number of boreholes.
 
-        :param borefield: pygfunction borefield object
         :return None
         """
+        self.number_of_boreholes = len(self.borefield) if self.borefield is not None else 0
+
+    def set_borefield(self, borefield=None) -> None:
+        if borefield is None:
+            return
         self.borefield = borefield
 
     @property
     def borefield(self):
-        """
-        Returns the borefield attribute.
-
-        :return: pygfunction borefield attribute
-        """
         return self._borefield
 
     @borefield.setter
     def borefield(self, borefield=None) -> None:
         """
-        This function sets the borefield configuration.
-        When no input is provided, the borefield attribute is deleted.
+        This function sets the borefield configuration. When no input, an empty array of length N_1 * N_2 will be made.
 
         :return None
         """
