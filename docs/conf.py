@@ -49,6 +49,7 @@ extensions = [
     'numpydoc'
 ]
 
+numpydoc_show_class_members = False
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
