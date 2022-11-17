@@ -1,5 +1,5 @@
 """
-GUI classes to be used in the gui structure
+GUI classes which can be used in the gui_structure.py file.
 """
 
 from __future__ import annotations
@@ -48,7 +48,7 @@ def update_opponent_toggle(button: QtW.QPushButton, button_opponent: QtW.QPushBu
 
 class Option(metaclass=abc.ABCMeta):
     """
-    Abstract base class for a gui option.\n
+    Abstract base class for a gui option.
     """
 
     default_parent: Optional[QtW.QWidget] = None
@@ -94,7 +94,7 @@ class Option(metaclass=abc.ABCMeta):
 
     def check_value(self) -> bool:
         """
-        Checks if the value of the option is valid
+        Checks if the value of the option is valid.\n
         :return: boolean which is true if the option value is valid
         """
         if self.frame.isEnabled():
