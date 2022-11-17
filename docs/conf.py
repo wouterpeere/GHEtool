@@ -44,9 +44,9 @@ extensions = [
     'myst_parser',
     'sphinx.ext.autosectionlabel',
     'sphinx_rtd_theme',
-    'sphinx.ext.imgmath'
-    # 'sphinx.ext.autodoc',
-    # 'numpydoc'
+    'sphinx.ext.imgmath',
+    'sphinx.ext.autodoc',
+    'numpydoc'
 ]
 
 
