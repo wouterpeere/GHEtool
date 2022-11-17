@@ -11,7 +11,7 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 import sys, os
 packagePath = os.path.normpath(
-        os.path.join(os.path.normpath(os.path.dirname(__file__)), '..', '..'))
+        os.path.join(os.path.normpath(os.path.dirname(__file__)), '.', '.'))
 sys.path.append(packagePath)
 import GHEtool
 
