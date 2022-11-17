@@ -16,7 +16,7 @@ import PySide6.QtWidgets as QtW  # type: ignore
 from GHEtool.gui.gui_base_class import DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE
 
 
-def update_opponent_not_change(button: QtW.QPushButton, button_opponent: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
+def _update_opponent_not_change(button: QtW.QPushButton, button_opponent: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
     """
     do not allow to change the button if is already checked\n
     :param button:
@@ -33,7 +33,7 @@ def update_opponent_not_change(button: QtW.QPushButton, button_opponent: QtW.QPu
             but.setChecked(False)
 
 
-def update_opponent_toggle(button: QtW.QPushButton, button_opponent: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
+def _update_opponent_toggle(button: QtW.QPushButton, button_opponent: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
     """
     update the opponent button in a toggle behaviour\n
     :param button:
@@ -499,9 +499,9 @@ class ButtonBox(Option):
 
     def update_function(self, button: QtW.QPushButton, button_opponent: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
         if self.TOGGLE:
-            update_opponent_toggle(button, button_opponent, false_button_list)
+            _update_opponent_toggle(button, button_opponent, false_button_list)
             return
-        update_opponent_not_change(button, button_opponent, false_button_list)
+        _update_opponent_not_change(button, button_opponent, false_button_list)
 
 
 class ListBox(Option):
@@ -1182,9 +1182,9 @@ class Page:
 
     def update_function(self, button: QtW.QPushButton, button_opponent: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
         if self.TOGGLE:
-            update_opponent_toggle(button, button_opponent, false_button_list)
+            _update_opponent_toggle(button, button_opponent, false_button_list)
             return
-        update_opponent_not_change(button, button_opponent, false_button_list)
+        _update_opponent_not_change(button, button_opponent, false_button_list)
 
     def create_links_to_other_pages(self, central_widget: QtW.QWidget, scroll_area_layout: QtW.QVBoxLayout):
         """

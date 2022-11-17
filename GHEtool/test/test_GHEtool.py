@@ -342,7 +342,7 @@ def test_choose_quadrant_1(borefield_quadrants):
     borefield_quadrants.set_baseload_heating(monthly_load_heating)
 
     borefield_quadrants.size(100, L3_sizing=True)
-    assert 1 == borefield_quadrants._calculate_quadrant()
+    assert 1 == borefield_quadrants.calculate_quadrant()
 
 
 def test_choose_quadrant_2(borefield_quadrants):
@@ -354,7 +354,7 @@ def test_choose_quadrant_2(borefield_quadrants):
     borefield_quadrants.set_baseload_heating(monthly_load_heating)
 
     borefield_quadrants.size(100, L3_sizing=True)
-    assert 2 == borefield_quadrants._calculate_quadrant()
+    assert 2 == borefield_quadrants.calculate_quadrant()
 
 
 def test_choose_quadrant_3(borefield_quadrants):
@@ -366,7 +366,7 @@ def test_choose_quadrant_3(borefield_quadrants):
     borefield_quadrants.set_baseload_heating(monthly_load_heating)
 
     borefield_quadrants.size(100, L3_sizing=True)
-    assert 3 == borefield_quadrants._calculate_quadrant()
+    assert 3 == borefield_quadrants.calculate_quadrant()
 
 
 def test_choose_quadrant_4(borefield_quadrants):
@@ -378,7 +378,7 @@ def test_choose_quadrant_4(borefield_quadrants):
     borefield_quadrants.set_baseload_heating(monthly_load_heating)
 
     borefield_quadrants.size(100, L3_sizing=True)
-    assert 4 == borefield_quadrants._calculate_quadrant()
+    assert 4 == borefield_quadrants.calculate_quadrant()
 
 
 def test_choose_quadrant_None(borefield_quadrants):
@@ -390,4 +390,4 @@ def test_choose_quadrant_None(borefield_quadrants):
     borefield_quadrants.set_baseload_heating(monthly_load_heating)
 
     borefield_quadrants.calculate_temperatures(200)
-    assert None is borefield_quadrants._calculate_quadrant()
+    assert None is borefield_quadrants.calculate_quadrant()

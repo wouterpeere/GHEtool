@@ -249,17 +249,9 @@ class Borefield:
 
             set_graph_layout()
 
-    def set_number_of_boreholes(self) -> None:
+    def _set_number_of_boreholes(self) -> None:
         """
         This functions sets the number of boreholes based on the length of the borefield attribute.
-
-        :return None
-        """
-        self.number_of_boreholes = len(self.borefield) if self.borefield is not None else 0
-
-    def set_number_of_boreholes(self, number_of_boreholes: int = 1) -> None:
-        """
-        This functions sets the number of boreholes.
 
         :return None
         """
@@ -285,7 +277,7 @@ class Borefield:
             del self.borefield
             return
         self._borefield = borefield
-        self.set_number_of_boreholes(len(borefield))
+        self._set_number_of_boreholes()
         self.D = borefield[0].D
         self.r_b = borefield[0].r_b
         self.H = borefield[0].H
@@ -293,7 +285,7 @@ class Borefield:
     @borefield.deleter
     def borefield(self):
         self._borefield = None
-        self.set_number_of_boreholes(0)
+        self._set_number_of_boreholes()
 
     def load_custom_gfunction(self, location: str) -> None:
         """
@@ -649,7 +641,7 @@ class Borefield:
         * The L3 sizing is a more general approach which is slower but more accurate (it uses 24 pulses/year)
         * The L4 sizing is the most exact one, since it uses hourly data (8760 pulses/year)
 
-        :param H_init: initial depth of the borefield to start the iteratation (m)
+        :param H_init: initial depth of the borefield to start the iteration (m)
         :param use_constant_Rb: true if a constant Rb* value should be used
         :param use_constant_Tg: true if a constant Tg value should be used (the geothermal flux is neglected)
         :param quadrant_sizing: differs from 0 when a sizing in a certain quadrant is desired
@@ -1528,11 +1520,18 @@ class Borefield:
 
     def convert_hourly_to_monthly(self, peak_cooling_load: float = None, peak_heating_load: float = None) -> None:
         """
-        This function converts an hourly load profile to the monthly profiles used in the sizing.
+        This function converts self.hourly_cooling_load and self.hourly_heating_load to the monthly profiles used in the sizing.
 
-        :param peak_cooling_load: peak power in cooling [kW]
-        :param peak_heating_load: peak power in heating [kW]
-        :return: None
+        Parameters
+        ----------
+        peak_cooling_load : float
+            peak power in cooling [kW]
+        peak_heating_load : float
+            peak power in heating [kW]
+
+        Returns
+        -------
+        None
         """
 
         try:
@@ -1556,12 +1555,21 @@ class Borefield:
     def _reduce_to_monthly_load(load: list, peak: float) -> list:
         """
         This function calculates the monthly load based, taking a maximum peak value into account.
+        This means that it sums the hourly load for each month, and if a peak occurs larger than the given peak,
+        it is limited to the the last one.
 
-        :param load: a list of hourly loads
-        :param peak: a maximum peak power [kW]
-        :return: list of monthly loads [kWh]
+        Parameters
+        ----------
+        load : list or numpy.array
+            hourly load values [kW]
+        peak : float
+            maximum peak power [kW]
+
+        Returns
+        -------
+        monthly baseloads : list
+            list with monthly baseloads [kW]
         """
-
         month_load = [np.sum(np.minimum(peak, load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1] + 1])) for i in range(12)]
 
         return month_load
@@ -1570,13 +1578,22 @@ class Borefield:
     def _reduce_to_peak_load(load: list, peak: float) -> list:
         """
         This function calculates the monthly peak load, taking a maximum peak value into account.
+        This means that for each month, it takes the minimum of either the peak in that month or the given peak.
 
-        :param load: a list of hourly loads
-        :param peak: a maximum peak power [kW]
-        :return: list of monthly peak loads
+        Parameters
+        ----------
+        load : list or numpy.array
+            hourly loads [kW]
+        peak : float
+            maximum peak power [kW]
+
+        Returns
+        -------
+        peak loads : list
+            list with monthly peak loads [kW]
         """
 
-        peak_load = [max(np.minimum(peak, load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1] + 1])) for i in range(12)]
+        peak_load = [np.minimum(peak, load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1] + 1]) for i in range(12)]
         return peak_load
 
     def optimise_load_profile(self, depth: float = None, print_results: bool = False) -> None:
@@ -1584,9 +1601,16 @@ class Borefield:
         This function optimises the load based on the given borefield and the given hourly load.
         It does so base on a load-duration curve.
 
-        :param depth: depth of the borefield [m]
-        :param print_results: True if results need to be plotted
-        :return: None
+        Parameters
+        ----------
+        depth : float
+
+        print_results : bool
+            True when the results of this optimisation are to be printed in the terminal
+
+        Returns
+        -------
+        None
         """
 
         if depth is None:
@@ -1693,22 +1717,49 @@ class Borefield:
 
     @property
     def _percentage_heating(self) -> float:
+        """
+        This function returns the percentage of heating load that can be done geothermally.
+
+        Returns
+        -------
+        float
+            Percentage of heating load that can be done geothermally.
+        """
         return np.sum(self.baseload_heating) / np.sum(self.hourly_heating_load) * 100
 
     @property
     def _percentage_cooling(self) -> float:
+        """
+        This function returns the percentage of cooling load that can be done geothermally.
+
+        Returns
+        -------
+        float
+            Percentage of cooling load that can be done geothermally.
+        """
         return np.sum(self.baseload_cooling) / np.sum(self.hourly_cooling_load) * 100
 
-    def _calculate_quadrant(self) -> int:
+    def calculate_quadrant(self) -> int:
         """
-        This function returns the quadrant based on the calculated temperature profile.
+        This function returns the borefield quadrant (as defined by Peere et al., 2021 [#PeereEtAl]_)
+        based on the calculated temperature profile.
         If there is no limiting quadrant, None is returned
         Quadrant 1 is limited in the first year by the maximum temperature
         Quadrant 2 is limited in the last year by the maximum temperature
         Quadrant 3 is limited in the first year by the minimum temperature
         Quadrant 4 is limited in the last year by the maximum temperature
 
-        :return: quadrant (int)
+        Returns
+        ----------
+        quadrant : int
+            The quadrant which limits the borefield
+
+        References
+        ----------
+        .. [#PeereEtAl] Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. (2021)
+        Validated combined first and last year borefield sizing methodology.
+        In Proceedings of International Building Simulation Conference 2021. Brugge (Belgium), 1-3 September 2021.
+        https://doi.org/10.26868/25222708.2021.30180
         """
 
         # calculate max/min fluid temperatures
@@ -1825,7 +1876,7 @@ class Borefield:
         # reset interpolation array
         del self.custom_gfunction
         # set number of boreholes because number of boreholes has changed
-        self.set_number_of_boreholes()
+        self._set_number_of_boreholes()
 
     @staticmethod
     def _calc_number_boreholes(n_min: int, N1_max: int, N2_max: int) -> list:
@@ -1859,9 +1910,12 @@ class Borefield:
 
     def draw_borehole_internal(self) -> None:
         """
-        plots the position of the pipes in the borehole
+        This function draws the internal structure of a borehole.
+        This means, it draws the pipes inside the borehole.
 
-        :return: None
+        Returns
+        ----------
+        None
         """
 
         # calculate the pipe positions
@@ -1911,7 +1965,14 @@ class Borefield:
         """
         This function makes a load-duration curve from the hourly values.
 
-        :return: None
+        Parameters
+        ----------
+        legend : bool
+            True if the figure should have a legend
+
+        Returns
+        ----------
+        None
         """
         # check if there are hourly values
         if not self._check_hourly_load():

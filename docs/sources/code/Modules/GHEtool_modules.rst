@@ -1,5 +1,5 @@
 ***************
-Main borefield class
+Main class
 ***************
 
 .. automodule:: GHEtool.main_class
