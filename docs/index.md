@@ -30,6 +30,7 @@ sources/legal_notice
 :maxdepth: 2
 
 sources/code/getting_started.md
+sources/code/modules.md
 ```
 
 ```{toctree}
@@ -51,5 +52,5 @@ sources/gui/gui_new_options.md
 sources/gui/gui_translations.md
 sources/gui/gui_icon.md
 sources/gui/gui_exe.md
-sources/gui/gui_module.rst
+sources/gui/gui_modules.md
 ```
