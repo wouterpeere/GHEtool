@@ -1,22 +1,20 @@
 class GroundData:
     """
-    Contains information regarding the dimensions and position of a borehole.
+    Contains information regarding the ground data of the borefield.
+
     Attributes
     ----------
-    H : float
-        Borehole length (in meters).
-    D : float
-        Borehole buried depth (in meters).
-    r_b : float
-        Borehole radius (in meters).
-    x : float
-        Position (in meters) of the head of the borehole along the x-axis.
-    y : float
-        Position (in meters) of the head of the borehole along the y-axis.
-    tilt : float
-        Angle (in radians) from vertical of the axis of the borehole.
-    orientation : float
-        Direction (in radians) of the tilt of the borehole.
+    k_s : float
+        Ground thermal conductivity [W/m.K]
+    T_g : float
+        Surface ground temperature [deg C]
+        (this is equal to the ground temperature at infinity when no heat flux is given (default))
+    R_b : float
+        Equivalent borehole resistance [m K/W]
+    volumetric_heat_capacity : float
+        The volumetric heat capacity of the ground [J/m3K]
+    flux : float
+        the geothermal heat flux [W/m2]
     """
 
     __slots__ = 'k_s', 'Tg', 'Rb', 'flux', 'volumetric_heat_capacity', 'alpha'
@@ -29,8 +27,8 @@ class GroundData:
         :param T_g: Surface ground temperature [deg C]
         (this is equal to the ground temperature at infinity when no heat flux is given (default))
         :param R_b: Equivalent borehole resistance [m K/W]
-        :param volumetric_heat_capacity: The volumetric heat capacity of the ground (J/m3K)
-        :param flux: the geothermal heat flux (W/m2)
+        :param volumetric_heat_capacity: The volumetric heat capacity of the ground [J/m3K]
+        :param flux: the geothermal heat flux [W/m2]
         :return: None
         """
 
@@ -51,6 +49,22 @@ class GroundData:
 
 
 class FluidData:
+    """
+    Contains information regarding the fluid data of the borefield.
+
+    Attributes
+    ----------
+    mfr : float
+        Mass flow rate per borehole [kg/s]
+    k_f : float
+        Thermal Conductivity of the fluid [W/mK]
+    rho : float
+        Density of the fluid [kg/m3]
+    Cp : float
+        Thermal capacity of the fluid [J/kgK]
+    mu : float
+        Dynamic viscosity of the fluid [Pa/s]
+    """
 
     __slots__ = 'k_f', 'rho', 'Cp', 'mu', 'mfr'
 
@@ -62,7 +76,7 @@ class FluidData:
         :param k_f: Thermal Conductivity [W/mK]
         :param rho: Density [kg/m3]
         :param Cp: Thermal capacity [J/kgK]
-        :param mu: EDynamic viscosity [Pa/s]
+        :param mu: Dynamic viscosity [Pa/s]
         :return: None
         """
 
@@ -82,6 +96,26 @@ class FluidData:
 
 
 class PipeData:
+    """
+    Contains information regarding the pipe data of the borefield.
+
+    Attributes
+    ----------
+    k_g : float
+        Grout thermal conductivity [W/mK]
+    r_in : float
+        Inner pipe radius [m]
+    r_out : float
+        Outer pipe radius [m]
+    k_p : float
+        Pipe thermal conductivity [W/mK]
+    D_s : float
+        Distance of the pipe until center [m]
+    number_of_pipes : int
+        Number of pipes [#] (single U-tube: 1, double U-tube:2)
+    epsilon : float
+        Pipe roughness [m]
+    """
 
     __slots__ = 'r_in', 'r_out', 'k_p', 'D_s', 'number_of_pipes', 'epsilon', 'k_g'
 
