@@ -12,6 +12,7 @@
 #
 
 import mock
+from unittest.mock import Mock, MagicMock
 import os
 import sys
 
@@ -19,7 +20,7 @@ MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'matplotlib.pyplot', 'scipy.inte
                 'warnings', 'scipy.signal', 'math', 'os.path', 'abc', 'functools', 'typing', 'PySide6.QtCore',
                 'PySide6.QtGui', 'PySide6.QtWidgets']
 for mod_name in MOCK_MODULES:
-    sys.modules[mod_name] = mock.Mock()
+    sys.modules[mod_name] = mock.MagicMock()
 
 
 sys.path.insert(0, os.path.abspath('..'))
