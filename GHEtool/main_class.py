@@ -969,8 +969,14 @@ class Borefield:
         """
         This function calculates the parameters for the sizing based on the last year of operation.
 
-        :param HC: true if the borefield is limited by extraction load
-        :return: None
+        Parameters
+        ----------
+        HC : bool
+            True if the borefield is limited by extraction load
+
+        Returns
+        -------
+        None
         """
 
         # convert imbalance to Watt
