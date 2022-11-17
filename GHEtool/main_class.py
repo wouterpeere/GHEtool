@@ -136,8 +136,8 @@ class Borefield:
         self.tcm: float = 0.  # time constant for first year sizing
         self.tpm: float = 0.  # time constant for first year sizing
         self.time_L3_first_year = np.array([])  # list with time values for L3 sizing
-        self.time_L3_last_year = np.array([]) # list with time values for L3 sizing
-        self.time_L4 = np.array([]) # list with all the time values for the L4 sizing
+        self.time_L3_last_year = np.array([])  # list with time values for L3 sizing
+        self.time_L4 = np.array([])  # list with all the time values for the L4 sizing
 
         # initiate ground loads
         self.qa: float = 0.  # yearly load W
