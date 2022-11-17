@@ -43,19 +43,19 @@ release = '2.1.0dev'
 # ones.
 
 # prevent circular imports...
-import sphinx.builders.html
-import sphinx.builders.latex
-import sphinx.builders.texinfo
-import sphinx.builders.text
-import sphinx.ext.autodoc
+# import sphinx.builders.html
+# import sphinx.builders.latex
+# import sphinx.builders.texinfo
+# import sphinx.builders.text
+# import sphinx.ext.autodoc
 
 extensions = [
     'myst_parser',
     'sphinx.ext.autosectionlabel',
     'sphinx_rtd_theme',
-    'sphinx.ext.imgmath',
-    'sphinx.ext.autodoc',
-    'numpydoc'
+    'sphinx.ext.imgmath'
+    # 'sphinx.ext.autodoc',
+    # 'numpydoc'
 ]
 
 
