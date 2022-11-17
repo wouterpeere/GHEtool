@@ -119,12 +119,12 @@ class Borefield:
         self.hourly_cooling_load_on_the_borefield = np.array([])
 
         # initiate load variables
-        self.baseload_heating = LIST_OF_ZEROS  # list with baseload heating kWh
-        self.baseload_cooling = LIST_OF_ZEROS  # list with baseload cooling kWh
+        self.baseload_heating = LIST_OF_ZEROS  #: list with baseload heating kWh
+        self.baseload_cooling = LIST_OF_ZEROS  #: list with baseload cooling kWh
         self.monthly_load_cooling = LIST_OF_ZEROS
         self.monthly_load_heating = LIST_OF_ZEROS
-        self.peak_cooling = LIST_OF_ZEROS  # list with the peak load cooling kW
-        self.peak_heating = LIST_OF_ZEROS  # list with peak load heating kW
+        self.peak_cooling = LIST_OF_ZEROS  #: list with the peak load cooling kW
+        self.peak_heating = LIST_OF_ZEROS  #: list with peak load heating kW
 
         # initiate time variables
         self.ty: float = 0.  # yearly time value
