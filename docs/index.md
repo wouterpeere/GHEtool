@@ -16,7 +16,7 @@ Please find below the content of this ReadTheDocs.
 
 ```{toctree}
 :caption: 'GHEtool'
-:maxdepth: 2
+:maxdepth: 1
 
 self
 sources/cite
@@ -39,7 +39,6 @@ sources/code/getting_started.md
 sources/gui/gui_functionalities.md
 sources/gui/gui_installation_guide.md
 sources/gui/gui_manual.md
-sources/gui/gui_contribute.md
 ```
 
 ```{toctree}
@@ -50,5 +49,7 @@ sources/gui/gui_contribute.md
 sources/gui/gui_structure.md
 sources/gui/gui_new_options.md
 sources/gui/gui_translations.md
-sources/gui/gui_FAQ.md
+sources/gui/gui_icon.md
+sources/gui/gui_exe.md
+sources/gui/gui_module.rst
 ```

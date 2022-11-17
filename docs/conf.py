@@ -9,11 +9,11 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
-
+import sys, os
+packagePath = os.path.normpath(
+        os.path.join(os.path.normpath(os.path.dirname(__file__)), '..', '..'))
+sys.path.append(packagePath)
+import GHEtool
 
 # -- Project information -----------------------------------------------------
 
@@ -35,6 +35,7 @@ extensions = [
     'sphinx.ext.autosectionlabel',
     'sphinx_rtd_theme',
     'sphinx.ext.imgmath',
+    'numpydoc'
 ]
 
 
