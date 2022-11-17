@@ -1,4 +1,6 @@
-## Main borefield class
+***************
+Main borefield class
+***************
 
 .. automodule:: GHEtool.main_class
     :members:
