@@ -1,5 +1,14 @@
 """
 GUI classes which can be used in the gui_structure.py file.
+
+There are three types of objects that can be put on the GUI.
+1) Structural objects
+    Page, Aim and Category (provide some structuring to the GUI)
+2) Options
+    FloatBox, IntegerBox, ButtonBox, ListBox, Filename, FunctionButton and Hint
+3) Result elements
+    ResultFigure and ResultText (related to the results page)
+
 """
 
 from __future__ import annotations
@@ -54,6 +63,18 @@ class Option(metaclass=abc.ABCMeta):
     default_parent: Optional[QtW.QWidget] = None
 
     def __init__(self, label: str, default_value: Union[bool, int, float, str], category: Category):
+        """
+        This function initiates the option.
+
+        Parameters
+        ----------
+        label : str
+            The label related to the option
+        default_value : bool, int, float, str
+            The default value of the option
+        category : Category
+            The category in which the option should be placed
+        """
         self.label_text: str = label
         self.default_value: Union[bool, int, float, str] = default_value
         self.widget: Optional[QtW.QWidget] = None
@@ -67,35 +88,70 @@ class Option(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def get_value(self) -> Union[bool, int, float, str]:
         """
-        get value of option.\n
-        :return: return value of option
+        This function gets the value of the option.
+
+        Returns
+        -------
+        The value of the option, either a bool, int, float or str
         """
 
     @abc.abstractmethod
     def set_value(self, value: Union[bool, int, float, str]) -> None:
         """
-        set value of option.\n
-        :param value: value to be set
+        This function sets the value of the option.
+        Parameters
+        ----------
+        value : bool, int, float, str
+            The value to which the option should be set.
+
+        Returns
+        -------
+        None
         """
 
     @abc.abstractmethod
     def _check_value(self) -> bool:
         """
-        Checks if the value of the option is valid
-        :return: boolean which is true if the option value is valid
+        Abstract function to check whether or not the current value of the option is a valid value.
+
+        Returns
+        -------
+        bool
+            True if the option value is valid
         """
 
     def add_aim_option_2_be_set_for_check(self, aim_or_option: Union[Tuple[Option, int], Aim]):
         """
-        Add aim or index which should be checked before the option value is checked
-        :param aim_or_option: aim or option with corresponding index
+        Sometimes, an option should not be check on its valid value. This can be the case when,
+        for a specific aim or in a specific case, the current option is not needed. (e.g.,
+        the FileNameBox should only be checked whenever an aim is chosen which requires a
+        filename).
+        This function adds a list of dependencies to the current object, which will be checked
+        (meaning: it will be checked if their value is correct) before the value of the self-option
+        will be checked.
+
+        Parameters
+        ----------
+        aim_or_option : aim, (option, int)
+            aim or option (with its corresponding index)
+
+        Returns
+        -------
+        None
         """
         self.list_2_check_before_value.append(aim_or_option)
 
     def check_value(self) -> bool:
         """
-        Checks if the value of the option is valid.\n
-        :return: boolean which is true if the option value is valid
+        This function check whether the value of the option is valid.
+        Before it checks the value, it makes sure to check all the dependencies in list_2_check_before_value.
+        If the check of one of the aims or options in this list is True, True is returned.
+        Otherwise the value of the current option is checked.
+
+        Returns
+        -------
+        bool
+            True if the value of the current option is valid.
         """
         if self.frame.isEnabled():
             if not self.list_2_check_before_value:
@@ -108,47 +164,93 @@ class Option(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, *, row: int = None, column: int = None) -> None:
         """
-        create the widget in the frame.\n
-        :param frame: frame in which the widget should be created
-        :param layout_parent: parent layout
-        :param row: row if layout is a grid layout
-        :param column: column if layout is a grid layout
+        This functions creates the widget, related to the current object, in the frame.
+
+        Parameters
+        ----------
+        frame : QtW.QFrame
+            The frame object in which the widget should be created
+        layout_parent : QtW.QLayout
+            The parent layout of the current widget
+        row : int
+            The index of the row in which the widget should be created
+            (only needed when there is a grid layout)
+        column : int
+            The index of the column in which the widget should be created
+            (only needed when there is a grid layout)
+
+        Returns
+        -------
+        None
         """
 
     @abc.abstractmethod
     def _init_links(self) -> None:
         """
-        abstract function to init the links of specific option\n
+        Abstract function on how the links for this particular object should be set.
+
+        Returns
+        -------
+        None
         """
 
     def init_links(self) -> None:
         """
-        init the links\n
+        This function initiates the links.
+
+        Returns
+        -------
+        None
         """
         if self.linked_options:
             self._init_links()
 
-    def set_text(self, name: str):
+    def set_text(self, name: str) -> None:
         """
-        set the label text\n
-        :param name: name of the label
+        This function sets the label text
+
+        Parameters
+        ----------
+        name : str
+            Label name of the object
+
+        Returns
+        -------
+        None
         """
         self.label_text = name
         self.label.setText(name)
 
-    def deactivate_size_limit(self):
+    def deactivate_size_limit(self) -> None:
         """
-        deactivate size limit\n
+        This function sets the size limit to False.
+
+        Returns
+        -------
+        None
         """
         self.limit_size = False
 
     def create_frame(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, create_spacer: bool = True) -> QtW.QHBoxLayout:
         """
-        Create the frame in the category.\n
-        :param frame:
-        :param layout_parent:
-        :param create_spacer:
+        This function creates the frame for this option in a given frame (can be a page or category).
+        If the current label text is "", then the frame attribute is set to the given frame.
+
+        Parameters
+        ----------
+        frame : QtW.QFrame
+            Frame in which this option should be created
+        layout_parent : QtW.QLayout
+            The layout parent of the current frame
+        create_spacer : bool
+            True if a spacer should be made
+
+        Returns
+        -------
+        QtW.QHBoxLayout
+            The frame created for this option
         """
+
         if self.label_text == "":
             self.frame.setParent(None)
             self.frame = frame
@@ -171,17 +273,33 @@ class Option(metaclass=abc.ABCMeta):
 
     def hide(self) -> None:
         """
-        hide option\n
+        This function makes the current frame invisible.
+
+        Returns
+        -------
+        None
         """
         self.frame.hide()
         self.frame.setEnabled(False)
 
     def is_hidden(self) -> bool:
+        """
+        This function returns a boolean value related to whether or not the option is hidden.
+
+        Returns
+        -------
+        Bool
+            True if the option is hidden
+        """
         return self.frame.isHidden()
 
     def show(self) -> None:
         """
-        show option
+        This function makes the current frame visible.
+
+        Returns
+        -------
+        None
         """
         self.frame.show()
         self.frame.setEnabled(True)
@@ -189,8 +307,16 @@ class Option(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def change_event(self, function_to_be_called: Callable) -> None:
         """
-        abstract method for the change event\n
-        :param function_to_be_called: function to be called if option has changed
+        This function calls the function_to_be_called whenever the option is changed.
+
+        Parameters
+        ----------
+        function_to_be_called : callable
+            Function which should be called
+
+        Returns
+        -------
+        None
         """
 
     def __repr__(self):
@@ -202,10 +328,22 @@ class Option(metaclass=abc.ABCMeta):
 
 def check(linked_options: List[(Union[Option, List[Option]], int)], option_input: Option, index: int):
     """
-    check the list of options should be hidden or shown.\n
-    :param linked_options:
-    :param option_input:
-    :param index:
+    This function makes sure that the linked_options will be hidden when the index of the option_input
+    is different from the index provided per Option in the linked_options list.
+    When it is equal, the linked_option is shown.
+
+    Parameters
+    ----------
+    linked_options : List[(Options, int) or  (List[Options], int)]
+        List with linked option, composed of either an Option-index pair or a list of options-index pair
+    option_input : Option
+        The option which determines the visibility of the linked_options
+    index : int
+        The index which determines the visibility of the linked_options
+
+    Returns
+    -------
+    None
     """
     index = index if option_input.get_value() == index else option_input.get_value()
     list_false = [(option, idx) for option, idx in linked_options if idx != index]

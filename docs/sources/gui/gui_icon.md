@@ -12,4 +12,4 @@ Afterwards the `icons_rc.py` has to be recompiled using the following command li
 pyside6-rcc ./GHEtool/gui/icons.qrc -o ./GHEtool/gui/icons_rc.py
 ```
 
-Know the icon can be used in the GUI.
+Now the icon can be used in the GUI.

@@ -14,7 +14,14 @@ This class is only needed when one wants to change the general behaviour of an e
 
 ## gui_structure.py
 This document is the center of the GUI. It contains in order all the different elements that appear inside the GUI and the relationship between them.
-Adding new options to the GUI, will be done here. For more detailed information about how to change the *gui_structure.py*, see the section about how to add new options.
+Adding new options to the GUI, will be done here.
+
+The GUI is based on pages which consists of categories which consists of options.
+An example for a page is the borehole resistance page. Here the fluid data category can be found.
+This category has a double spin box option to set the mass flow rate.
+The order in which the options are put in the *gui_structure.py* document is also the order in which they will appear in the GUI itself (and with the correct tab order).
+
+For more information about all the elements one can use for the GUI, please look at the modules page.
 
 ## gui_data_structure.py
 This document makes sure that all the elements, put in the gui_structure, will be saved when the gui is used. It stores all the values of the gui in a variable (which will then later be dumped into an *.GHEtool file).
