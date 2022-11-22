@@ -1299,6 +1299,15 @@ class Category:
             Label of the category
         page : Page
             Page on which the category should be placed
+
+        Examples
+        --------
+        >>> category_example = Category(label='Example category',
+        >>>                             page=page_example)
+
+        Gives:
+
+        .. figure:: _static/Example_Category.PNG
         """
         self.label_text: str = label
         self.label: QtW.QLabel = QtW.QLabel(self.default_parent)
@@ -1460,7 +1469,7 @@ class Category:
         """
         This function creates a graphic view for the case a figure will be shown in the
         Category.
-        
+
         Parameters
         ----------
         layout : QtW.QLayout
