@@ -50,6 +50,7 @@ extensions = [
 ]
 
 numpydoc_show_class_members = False
+autoclass_content = 'both'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

@@ -90,7 +90,8 @@ class DataStorage:
         """
         This function calculates the geothermal flux.
         This is calculated based on:
-        .. math:: 2 * \mathtt{temperature gradient} * \mathtt{conductivity} / 100
+
+        2 * temperature gradient * conductivity / 100
 
         Returns
         -------

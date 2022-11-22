@@ -2,6 +2,7 @@
 GUI classes which can be used in the gui_structure.py file.
 
 There are three types of objects that can be put on the GUI.
+
 1) Structural objects
     Page, Aim and Category (provide some structuring to the GUI)
 2) Options
@@ -64,7 +65,7 @@ class Option(metaclass=abc.ABCMeta):
 
     def __init__(self, label: str, default_value: Union[bool, int, float, str], category: Category):
         """
-        This function initiates the option.
+        This function initialises the option.
 
         Parameters
         ----------
