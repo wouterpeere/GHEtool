@@ -26,29 +26,50 @@ import PySide6.QtWidgets as QtW  # type: ignore
 from GHEtool.gui.gui_base_class import DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE
 
 
-def _update_opponent_not_change(button: QtW.QPushButton, button_opponent: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
+def _update_opponent_not_change(button: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
     """
-    do not allow to change the button if is already checked\n
-    :param button:
-    :param button_opponent:
-    :param false_button_list:
+    This function controls the behaviour of the buttons.
+    This function makes sure that whenever a button is active, all other buttons except the current one,
+    are inactive. If the current button is already active, nothing changes.
+
+    Parameters
+    ----------
+    button : QtW.QPushButton
+        Button which is activated (or pressed on)
+    false_button_list : List[QtW.QPushButton]
+        List with other buttons which aren't active
+
+    Returns
+    -------
+    None
     """
     if not button.isChecked():
         button.setChecked(True)
         return
-    button_list = [but for but in false_button_list] if false_button_list is not None else []
-    button_list.append(button_opponent)
-    for but in button_list:
+    for but in false_button_list:
         if not but == button:
             but.setChecked(False)
 
 
 def _update_opponent_toggle(button: QtW.QPushButton, button_opponent: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
     """
-    update the opponent button in a toggle behaviour\n
-    :param button:
-    :param button_opponent:
-    :param false_button_list:
+    This function controls the behaviour of the buttons, specifically the toggle behaviour.
+    This function makes sure that whenever a button is pressed, all other buttons except the current one,
+    are inactive. If the current button is already active and it is still pressed, the current button
+    is turned inactive and the button_opponent is made active.
+
+    Parameters
+    ----------
+    button : QtW.QPushButton
+        Button which is activated (iff it was not already), and which is deactivated if it was active and is pressed on
+    button_opponent : QtW.QPushButton
+        Button which is activated if the current button was active and is pressed on
+    false_button_list : List[QtW.QPushButton]
+        List with other buttons which aren't active
+
+    Returns
+    -------
+    None
     """
     button_opponent.setChecked(not button.isChecked())
     if false_button_list is not None:
@@ -65,8 +86,6 @@ class Option(metaclass=abc.ABCMeta):
 
     def __init__(self, label: str, default_value: Union[bool, int, float, str], category: Category):
         """
-        This function initialises the option.
-
         Parameters
         ----------
         label : str
@@ -640,7 +659,7 @@ class ButtonBox(Option):
         if self.TOGGLE:
             _update_opponent_toggle(button, button_opponent, false_button_list)
             return
-        _update_opponent_not_change(button, button_opponent, false_button_list)
+        _update_opponent_not_change(button, false_button_list + [button_opponent])
 
 
 class ListBox(Option):
@@ -1323,7 +1342,7 @@ class Page:
         if self.TOGGLE:
             _update_opponent_toggle(button, button_opponent, false_button_list)
             return
-        _update_opponent_not_change(button, button_opponent, false_button_list)
+        _update_opponent_not_change(button, false_button_list + [button_opponent])
 
     def create_links_to_other_pages(self, central_widget: QtW.QWidget, scroll_area_layout: QtW.QVBoxLayout):
         """
