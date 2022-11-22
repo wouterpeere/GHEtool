@@ -1179,12 +1179,15 @@ class GuiStructure:
     def update_borehole(self) -> None:
         """
         This function plots the position of the pipe in the borehole.
+        This figure can be either left or right of the options in the category
 
         Returns
         -------
         None
         """
-        if isinstance(self.category_pipe_data.graphic_left, QtWidgets_QGraphicsView):
+        frame = self.category_pipe_data.graphic_left if self.category_pipe_data.graphic_left is not None else \
+            self.category_pipe_data.graphic_right
+        if isinstance(frame, QtWidgets_QGraphicsView):
             # import all that is needed
             # get variables from gui
             number_of_pipes = self.option_pipe_number.get_value()
@@ -1193,7 +1196,7 @@ class GuiStructure:
             r_bore = max(self.option_pipe_borehole_radius.get_value() * 10, 0.001)
             dis = self.option_pipe_distance.get_value() * 10
             # calculate scale from graphic view size
-            max_l = min(self.category_pipe_data.graphic_left.width(), self.category_pipe_data.graphic_left.height())
+            max_l = min(frame.width(), frame.height())
             scale = max_l / r_bore / 1.25  # leave 25 % space
             # set colors
             dark_color = array(DARK.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
@@ -1206,12 +1209,12 @@ class GuiStructure:
             grey = QColor(grey_color[0], grey_color[1], grey_color[2])
             brown = QColor(145, 124, 111)
             # create graphic scene if not exits otherwise get scene and delete items
-            if self.category_pipe_data.graphic_left.scene() is None:
+            if frame.scene() is None:
                 scene = QGraphicsScene()  # parent=self.central_widget)
-                self.category_pipe_data.graphic_left.setScene(scene)
-                self.category_pipe_data.graphic_left.setBackgroundBrush(brown)
+                frame.setScene(scene)
+                frame.setBackgroundBrush(brown)
             else:
-                scene = self.category_pipe_data.graphic_left.scene()
+                scene = frame.scene()
                 scene.clear()
             # create borehole circle in grey wih no border
             circle = QGraphicsEllipseItem(-r_bore * scale / 2, -r_bore * scale / 2, r_bore * scale, r_bore * scale)

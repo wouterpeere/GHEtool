@@ -1284,12 +1284,22 @@ class ResultText(Hint):
 
 class Category:
     """
-    Category which consists of options\n
+    This class contains all the information for categories - the place where
+    options are put.
     """
 
     default_parent: Optional[QtW.QWidget] = None
 
     def __init__(self, label: str, page: Page):
+        """
+
+        Parameters
+        ----------
+        label : str
+            Label of the category
+        page : Page
+            Page on which the category should be placed
+        """
         self.label_text: str = label
         self.label: QtW.QLabel = QtW.QLabel(self.default_parent)
         self.list_of_options: List[Union[Option, Hint, FunctionButton]] = []
@@ -1301,20 +1311,99 @@ class Category:
         page.list_categories.append(self)
         self.options_hidden = []
 
-    def activate_graphic_left(self):
+    def activate_graphic_left(self) -> None:
+        """
+        This function activates the possibility to show a figure next to the options in
+        the category. The figure is shown on the left side of the options.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+
+        >>> self.category_pipe_data.activate_graphic_left()
+
+        The code above makes sure that the plot of the pipe internals is on the left
+        of the options within the catgory.
+        """
         self.graphic_left = True
 
-    def activate_graphic_right(self):
+    def activate_graphic_right(self) -> None:
+        """
+        This function activates the possibility to show a figure next to the options in
+        the category. The figure is shown on the right side of the options.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+
+        >>> self.category_pipe_data.activate_graphic_right()
+
+        The code above makes sure that the plot of the pipe internals is on the right
+        of the options within the catgory.
+        """
         self.graphic_right = True
 
-    def activate_grid_layout(self, column: int):
+    def activate_grid_layout(self, column: int) -> None:
+        """
+        This function activates the grid layout of the Category.
+
+        Parameters
+        ----------
+        column : int
+            Number of columns in the grid layout.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        The code below is used to create a grid layout with 5 columns for the monthly
+        thermal demands.
+
+        >>> self.category_th_demand.activate_grid_layout(5)
+        """
         self.grid_layout = column
 
-    def set_text(self, name: str):
+    def set_text(self, name: str) -> None:
+        """
+        This function sets the text in the Category label.
+
+        Parameters
+        ----------
+        name : str
+            Name of the Category
+
+        Returns
+        -------
+        None
+        """
         self.label_text = name
         self.label.setText(name)
 
     def create_widget(self, page: QtW.QWidget, layout: QtW.QLayout):
+        """
+        This function creates the frame for this Category on a given page.
+        If the current label text is "", then the frame attribute is set to the given frame.
+        It populates this category widget with all the options within this category.
+
+        Parameters
+        ----------
+        page : QtW.QFrame
+            Frame in which this option should be created
+        layout : QtW.QLayout
+            The layout parent of the current frame
+
+        Returns
+        -------
+        None
+        """
         self.label.setParent(page)
         self.label.setText(self.label_text)
         self.label.setStyleSheet(
@@ -1338,6 +1427,8 @@ class Category:
         layout_frame_horizontal = QtW.QHBoxLayout(self.frame)
         if self.graphic_left is not None:
             self.graphic_left = self.create_graphic_view(layout_frame_horizontal)
+
+        # check if the category should be made with a grid layout
         if self.grid_layout > 0:
             self.layout_frame = QtW.QGridLayout(self.frame)
             row = 0
@@ -1355,6 +1446,7 @@ class Category:
                     continue
                 row += 1
         else:
+            # create category with grid layout
             self.layout_frame = QtW.QVBoxLayout(self.frame)
             for option in self.list_of_options:
                 option.create_widget(self.frame, self.layout_frame)
@@ -1365,6 +1457,20 @@ class Category:
             self.graphic_right = self.create_graphic_view(layout_frame_horizontal)
 
     def create_graphic_view(self, layout: QtW.QLayout) -> QtW.QGraphicsView:
+        """
+        This function creates a graphic view for the case a figure will be shown in the
+        Category.
+        
+        Parameters
+        ----------
+        layout : QtW.QLayout
+            The layout element where the graphic view should be created in
+
+        Returns
+        -------
+        QtW.QGraphicsView
+            The box where the graphical element will be drawn into
+        """
         graphic_view = QtW.QGraphicsView(self.frame)
         graphic_view.setMinimumSize(QtC.QSize(0, 0))
         graphic_view.setMaximumSize(QtC.QSize(100, 16777215))
@@ -1377,6 +1483,15 @@ class Category:
         return graphic_view
 
     def hide(self, **kwargs) -> None:
+        """
+        This function makes the current category invisible and everything on them.
+        It makes sure that it only hides the objects that were not already hidden
+        due to some links with other options.
+
+        Returns
+        -------
+        None
+        """
         self.frame.hide()
         self.label.hide()
         for option in self.list_of_options:
@@ -1388,6 +1503,13 @@ class Category:
             option.hide()
 
     def show(self, **kwargs) -> None:
+        """
+        This function makes the current category visible.
+
+        Returns
+        -------
+        None
+        """
         self.frame.show()
         self.label.show()
         for option in self.options_hidden:
@@ -1395,6 +1517,14 @@ class Category:
         self.options_hidden = []
 
     def is_hidden(self) -> bool:
+        """
+        This function returns a boolean value related to whether or not the category is hidden.
+
+        Returns
+        -------
+        Bool
+            True if the option is hidden
+        """
         return self.frame.isHidden()
 
 
@@ -1450,12 +1580,6 @@ class ResultFigure(Category):
             if i != self.save_fig and not i.is_hidden():
                 key, value = i.get_value()
                 kwargs_temp[key] = value
-        # try:
-        #     # works only in python 3.9 and higher
-        #     return self._kwargs | kwargs_temp
-        # except TypeError:
-        #     temp = {**self._kwargs, **kwargs_temp}
-        #     print(temp)
         return {**self._kwargs, **kwargs_temp}
 
     def options_to_show(self, label: str, param: str, default_index: int, entries_text: List[str], entries_values: List) -> None:
@@ -1506,7 +1630,6 @@ class Aim:
 
     def create_widget(self, frame: QtW.QFrame, layout: QtW.QGridLayout, idx: int) -> None:
         icon11 = QtG.QIcon()
-        # icon11.addPixmap(QtGui_QPixmap(icon), QtGui_QIcon.Normal, QtGui_QIcon.Off)
         icon11.addFile(self.icon)
         self.widget.setParent(frame)
         push_button = self.widget
@@ -1520,8 +1643,6 @@ class Aim:
             f"QPushButton:disabled{'{'}border: 3px solid {GREY};border-radius: 5px;color: {WHITE};gridline-color: {GREY};background-color: {GREY};{'}'}\n"
             f"QPushButton:disabled:hover{'{'}background-color: {DARK};{'}'}"
         )
-        # push_button.setIcon(icon11)
-        # push_button.setIcon(QtGui_QIcon(QtGui_QPixmap(icon)))
         push_button.setIconSize(QtC.QSize(30, 30))
         push_button.setCheckable(True)
         push_button.setText(self.label)
@@ -1690,6 +1811,23 @@ class Page:
             list_aims[0].widget.click()
 
     def update_function(self, button: QtW.QPushButton, button_opponent: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
+        """
+        This function updates which button should be checked/activated or unchecked/deactivated
+        This can be done by either the toggle behaviour or not-change behaviour.
+
+        Parameters
+        ----------
+        button : QtW.QPushButton
+            Button which is activated (iff it was not already), and which is deactivated if it was active and is pressed on
+        button_opponent : QtW.QPushButton
+            Button which is activated if the current button was active and is pressed on
+        false_button_list : List[QtW.QPushButton]
+            List with other buttons which aren't active
+
+        Returns
+        -------
+        None
+        """
         if self.TOGGLE:
             _update_opponent_toggle(button, button_opponent, false_button_list)
             return
