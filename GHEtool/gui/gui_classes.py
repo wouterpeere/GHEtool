@@ -420,6 +420,7 @@ class FloatBox(Option):
         >>>                         step=0.1)
 
         Gives:
+        
         .. figure:: _static/Example_Float_Box.PNG
 
         """
@@ -501,6 +502,7 @@ class FloatBox(Option):
         --------
         This function can be used to couple the FloatBox value to other options, hints, function buttons or categories.
         In the example below, 'option linked' will be shown if the float value is below 0.1 or above 0.9.
+
         >>> option_float.add_link_2_show(option=option_linked, below=0.1, above=0.9)
         """
 
@@ -703,6 +705,7 @@ class IntBox(Option):
         --------
         This function can be used to couple the IntBox value to other options, hints, function buttons or categories.
         So in the example `option_linked` will be shown if the integer value is below 1 or above 10.
+
         >>> option_int.add_link_2_show(option=option_linked, below=1, above=10)
         """
         self.widget.valueChanged.connect(ft_partial(self.show_option, option, below=below, above=above))
