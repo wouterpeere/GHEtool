@@ -533,7 +533,7 @@ class FloatBox(Option):
 
     def change_event(self, function_to_be_called: Callable) -> None:
         """
-        This function calls the function_to_be_called whenever the option is changed.
+        This function calls the function_to_be_called whenever the FloatBox is changed.
 
         Parameters
         ----------
@@ -591,9 +591,41 @@ class FloatBox(Option):
 
 class IntBox(Option):
     """
-    Integer input box\n
+    This class contains all the functionalities of the IntBox (integer box) option in the GUI.
+    The IntBox can be used to input integer numbers.
     """
-    def __init__(self, label: str, default_value: int, category: Category, *, minimal_value: int = 0, maximal_value: int = 100,step: int = 1):
+    def __init__(self, label: str, default_value: int, category: Category, minimal_value: int = 0, maximal_value: int = 100, step: int = 1):
+        """
+
+        Parameters
+        ----------
+        label : str
+            The label of the IntBox
+        default_value : int
+            The default value of the IntBox
+        category : Category
+            Category in which the IntBox should be placed
+        minimal_value : int
+            Minimal value of the IntBox
+        maximal_value : int
+            Maximal value of the IntBox
+        step : int
+            The step by which the value of the IntBox should change when the
+            increase or decrease buttons are pressed.
+
+        Examples
+        --------
+        >>> option_float = IntBox(label='Int label text',
+        >>>                       default_value=2,
+        >>>                       category=category_example,
+        >>>                       minimal_value=0,
+        >>>                       maximal_value=12,
+        >>>                       step=2)
+
+        Gives:
+        .. figure:: _static/Example_Int_Box.PNG
+
+        """
         super().__init__(label, default_value, category)
         self.minimal_value: int = minimal_value
         self.maximal_value: int = maximal_value
@@ -602,44 +634,97 @@ class IntBox(Option):
 
     def get_value(self) -> int:
         """
-        get value of option.\n
-        :return: return value of option
+        This function gets the value of the IntBox.
+
+        Returns
+        -------
+        int
+            Value of the IntBox
         """
         return self.widget.value()
 
     def set_value(self, value: int) -> None:
         """
-        set value of option.\n
-        :param value: value to be set
+        This function sets the value of the IntBox.
+
+        Parameters
+        ----------
+        value : int
+            Value to which the IntBox should be set.
+
+        Returns
+        -------
+        None
         """
         self.widget.setValue(value)
 
     def _init_links(self) -> None:
         """
-        Set way on which the links should be set\n
+        Function on how the links for the IntBox should be set.
+
+        Returns
+        -------
+        None
         """
         current_value: int = self.get_value()
         self.set_value(self.minimal_value if current_value == self.minimal_value else self.minimal_value)
         self.set_value(current_value)
 
     def _check_value(self) -> bool:
+        """
+        This function checks if the value of the IntBox is between the minimal_value
+        and maximal_value.
+
+        Returns
+        -------
+        bool
+            True if the value is between the minimal and maximal value
+        """
         return self.minimal_value <= self.get_value() <= self.maximal_value
 
     def add_link_2_show(self, option: Union[Option, Category, FunctionButton, Hint], *, below: int = None, above: int = None):
         """
-        Add link to the index\n
-        :param option: option which should be linked
-        :param below: int value to be show option if below
-        :param above: int value to be show option if above
+        This function couples the visibility of an option to the value of the IntBox object.
+
+        Parameters
+        ----------
+        option : Option, Category, FunctionButton, Hint
+            Option which visibility should be linked to the value of the IntBox.
+        below : float
+            Lower threshold of the FloatBox value below which the linked option will be hidden
+        above : float
+            Higher threshold of the FloatBox value above which the linked option will be hidden
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        This function can be used to couple the IntBox value to other options, hints, function buttons or categories.
+        So in the example `option_linked` will be shown if the integer value is below 1 or above 10.
+        >>> option_int.add_link_2_show(option=option_linked, below=1, above=10)
         """
         self.widget.valueChanged.connect(ft_partial(self.show_option, option, below=below, above=above))
 
-    def show_option(self, option: Union[Option, Category, FunctionButton, Hint], *args, below: Optional[int], above: Optional[int]):
+    def show_option(self, option: Union[Option, Category, FunctionButton, Hint], below: Optional[int], above: Optional[int]):
         """
-        show option if below and above limits
-        :param option:
-        :param below:
-        :param above:
+        This function shows the option if the value of the IntBox is between the below and above value.
+        If no below or above values are given, no boundary is taken into account for respectively the lower and
+        upper boundary.
+
+        Parameters
+        ----------
+        option : Option, Category, FunctionButton, Hint
+            Option to be shown or hidden
+        below : float (optional)
+            Lower threshold of the IntBox value below which the linked option will be hidden
+        above : float (optional)
+            Higher threshold of the IntBox value above which the linked option will be hidden
+
+        Returns
+        -------
+        None
         """
         if below is not None and self.get_value() < below:
             return option.show()
@@ -649,12 +734,40 @@ class IntBox(Option):
 
     def change_event(self, function_to_be_called: Callable) -> None:
         """
-        Function for the change event\n
-        :param function_to_be_called: function to be called if option has changed
+        This function calls the function_to_be_called whenever the IntBox is changed.
+
+        Parameters
+        ----------
+        function_to_be_called : callable
+            Function which should be called
+
+        Returns
+        -------
+        None
         """
         self.widget.valueChanged.connect(function_to_be_called)  # pylint: disable=E1101
 
     def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout,  *, row: int = None, column: int = None) -> None:
+        """
+        This functions creates the IntBox widget in the frame.
+
+        Parameters
+        ----------
+        frame : QtW.QFrame
+            The frame object in which the widget should be created
+        layout_parent : QtW.QLayout
+            The parent layout of the current widget
+        row : int
+            The index of the row in which the widget should be created
+            (only needed when there is a grid layout)
+        column : int
+            The index of the column in which the widget should be created
+            (only needed when there is a grid layout)
+
+        Returns
+        -------
+        None
+        """
         layout = self.create_frame(frame, layout_parent)
         self.widget.setParent(self.frame)
         self.widget.setStyleSheet(
