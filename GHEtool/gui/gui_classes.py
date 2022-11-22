@@ -384,19 +384,45 @@ def check(linked_options: List[(Union[Option, List[Option]], int)], option_input
 
 class FloatBox(Option):
     """
-    Float input box\n
+    This class contains all the functionalities of the FloatBox option in the GUI.
+    The FloatBox can be used to input floating point numbers.
     """
-    def __init__(
-        self,
-        label: str,
-        default_value: float,
-        category: Category,
-        *,
-        decimal_number: int = 0,
-        minimal_value: float = 0.0,
-        maximal_value: float = 100.0,
-        step: float = 1.0,
-    ):
+    def __init__(self, label: str, default_value: float, category: Category, decimal_number: int = 0,
+                 minimal_value: float = 0.0, maximal_value: float = 100.0, step: float = 1.0):
+        """
+
+        Parameters
+        ----------
+        label : str
+            The label of the FloatBox
+        default_value : float
+            The default value of the FloatBox
+        category : Category
+            Category in which the FloatBox should be placed
+        decimal_number : int
+            Number of decimal points in the FloatBox
+        minimal_value : float
+            Minimal value of the FloatBox
+        maximal_value : float
+            Maximal value of the FloatBox
+        step : float
+            The step by which the value of the FloatBox should change when the
+            increase or decrease buttons are pressed.
+
+        Examples
+        --------
+        >>> option_float = FloatBox(
+        >>> label='Float label text',
+        >>> default_value=0.5,
+        >>> category=category_example,
+        >>> decimal_number=2,
+        >>> minimal_value=0,
+        >>> maximal_value=1,
+        >>> step=0.1)
+
+        .. figure:: _static/Example_Float_Box.PNG
+
+        """
         super().__init__(label, default_value, category)
         self.decimal_number: int = decimal_number
         self.minimal_value: float = minimal_value
