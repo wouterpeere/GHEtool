@@ -1,4 +1,4 @@
-# How to add or correct translations? <a name="translations"></a>
+# How to add or correct translations?
 
 Translations for the GUI can be added in a new column in the 
 [.\GHEtool\gui\Translations.csv](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/gui/Translations.csv) file. Correction can be made there as well. 
