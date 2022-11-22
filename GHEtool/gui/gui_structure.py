@@ -1,3 +1,7 @@
+"""
+This document contains all the information relevant for the GUI.
+It contains all the options, categories etc. that should appear on the GUI.
+"""
 from typing import List, Optional, Tuple, Union
 
 from PySide6.QtWidgets import QStatusBar, QWidget
@@ -18,6 +22,41 @@ from pandas import DataFrame as pd_DataFrame, read_csv as pd_read_csv
 
 def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, cooling_load_column: str, combined: str, sep: str,
                   dec: str, fac: float, hourly: bool = False):
+    """
+    This function loads hourly thermal data from a given file.
+    This data can have one or two columns, can be in W, kW or MW.
+
+    Parameters
+    ----------
+    filename : str
+        Location of the file which should be loaded
+    thermal_demand : int
+        1 if the thermal demand has two columns, 0 if it has one
+    heating_load_column : str
+        Name of the column that has the heating values
+    cooling_load_column : str
+        Name of the column that has the cooling values
+    combined : str
+    sep : str
+        Character used for the seperation of values in the vile
+    dec : str
+        Character used for decimal sperator in the file
+    fac : float
+        A factor to convert the data to [kW]
+    hourly : bool
+        True if hourly data should be returned
+
+    Returns
+    -------
+    peak_heating, peak_cooling, heating_load, cooling_load : array, array, array, array
+        It returns the peak heating and peak cooling load per month [kW] and the monthly heating and cooling load in [kWh]
+        If hourly is True, it only returns the peak heating and peak cooling load [kW]
+
+    Raises
+    ------
+    FileNotFoundError
+        If the filename is empty or it cannot be found
+    """
     # raise error if no filename exists
     if filename == "":
         raise FileNotFoundError
@@ -30,8 +69,11 @@ def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, 
     if len(combined) >= 1:
         cols.append(combined)
     date: str = "Date"
+    try:
+        df2: pd_DataFrame = pd_read_csv(filename, usecols=cols, sep=sep, decimal=dec)
+    except:
+        raise FileNotFoundError
 
-    df2: pd_DataFrame = pd_read_csv(filename, usecols=cols, sep=sep, decimal=dec)
     # ---------------------- Time Step Section  ----------------------
     # import pandas here to save start up time
     from pandas import Series as pd_Series
@@ -90,7 +132,14 @@ def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, 
 
 
 class GuiStructure:
+    """
+    This class contains all the elements that are relevant for the GUI.
+    """
     def __init__(self, default_parent: QWidget, status_bar: QStatusBar):
+        """
+        All the elements that should be placed on the GUI, should be written in
+        chronologial order, in this __init__ function.
+        """
         # set default parent for the class variables to avoid widgets creation not in the main window
         Page.default_parent = default_parent
         Aim.default_parent = default_parent
@@ -126,30 +175,20 @@ class GuiStructure:
             def create_category_calculation():
                 self.category_calculation = Category(page=self.page_options, label="Calculation options")
 
-                self.option_method_size_depth = ButtonBox(
-                    category=self.category_calculation, label="Method for size borehole depth:", default_index=0, entries=[" L2 ", " L3 ", "  L4  "]
-                )
-                self.option_method_size_length = ButtonBox(
-                    category=self.category_calculation, label="Method for size width and length:", default_index=0, entries=[" L2 ", " L3 "]
-                )
+                self.option_method_size_depth = ButtonBox(label="Method for size borehole depth:", default_index=0,
+                                                          entries=[" L2 ", " L3 ", "  L4  "],
+                                                          category=self.category_calculation)
+                self.option_method_size_length = ButtonBox(label="Method for size width and length:", default_index=0,
+                                                           entries=[" L2 ", " L3 "], category=self.category_calculation)
                 self.option_method_temp_gradient = ButtonBox(
-                    category=self.category_calculation,
-                    label="Should a temperature gradient over depth be considered?:",
-                    default_index=0,
-                    entries=[" no ", " yes  "],
-                )
-                self.option_method_rb_calc = ButtonBox(
-                    category=self.category_calculation,
-                    label="Borehole resistance calculation method:",
-                    default_index=0,
-                    entries=[" constant ", " dynamic "],
-                )
+                    label="Should a temperature gradient over depth be considered?:", default_index=0,
+                    entries=[" no ", " yes  "], category=self.category_calculation)
+                self.option_method_rb_calc = ButtonBox(label="Borehole resistance calculation method:", default_index=0,
+                                                       entries=[" constant ", " dynamic "],
+                                                       category=self.category_calculation)
                 self.option_temperature_profile_hourly = ButtonBox(
-                    category=self.category_calculation,
-                    label="Should hourly data be used for the temperature profile?:",
-                    default_index=0,
-                    entries=[" no ", " yes "]
-                )
+                    label="Should hourly data be used for the temperature profile?:", default_index=0,
+                    entries=[" no ", " yes "], category=self.category_calculation)
                 # add dependencies
                 self.aim_size_length.add_link_2_show(self.option_method_size_length)
                 self.aim_req_depth.add_link_2_show(self.option_method_size_depth)
@@ -541,12 +580,12 @@ class GuiStructure:
             def create_category_select_datafile():
                 self.category_select_file = Category(page=self.page_thermal, label="Select data file")
 
-                self.option_seperator_csv = ButtonBox(
-                    category=self.category_select_file, label="Seperator in CSV-file:", default_index=0, entries=['Semicolon ";"', 'Comma ","']
-                )
-                self.option_decimal_csv = ButtonBox(
-                    category=self.category_select_file, label="Decimal sign in CSV-file:", default_index=0, entries=['Point "."', 'Comma ","']
-                )
+                self.option_seperator_csv = ButtonBox(label="Seperator in CSV-file:", default_index=0,
+                                                      entries=['Semicolon ";"', 'Comma ","'],
+                                                      category=self.category_select_file)
+                self.option_decimal_csv = ButtonBox(label="Decimal sign in CSV-file:", default_index=0,
+                                                    entries=['Point "."', 'Comma ","'],
+                                                    category=self.category_select_file)
                 self.option_filename = FileNameBox(
                     category=self.category_select_file,
                     label="Filename: ",
@@ -555,17 +594,14 @@ class GuiStructure:
                     error_text="error",
                     status_bar=status_bar,
                 )
-                self.option_column = ButtonBox(
-                    category=self.category_select_file,
-                    label="Thermal demand in one or two columns: ",
-                    default_index=0,
-                    entries=["1 column", "2 columns"],
-                )
+                self.option_column = ButtonBox(label="Thermal demand in one or two columns: ", default_index=0,
+                                               entries=["1 column", "2 columns"], category=self.category_select_file)
                 self.option_heating_column = ListBox(category=self.category_select_file, label="Heating load line: ", default_index=0, entries=[])
                 self.option_cooling_column = ListBox(category=self.category_select_file, label="Cooling load line: ", default_index=0, entries=[])
                 self.option_single_column = ListBox(category=self.category_select_file, label="Load line: ", default_index=0, entries=[])
 
-                self.option_unit_data = ButtonBox(category=self.category_select_file, label="Unit data: ", default_index=1, entries=["W", "kW", "MW"])
+                self.option_unit_data = ButtonBox(label="Unit data: ", default_index=1, entries=["W", "kW", "MW"],
+                                                  category=self.category_select_file)
 
                 self.button_load_csv = FunctionButton(category=self.category_select_file, button_text="Load", icon=":/icons/icons/Download.svg")
 
@@ -1062,13 +1098,11 @@ class GuiStructure:
 
             self.category_save_scenario = Category(page=self.page_settings, label="Scenario saving settings")
 
-            self.option_toggle_buttons = ButtonBox(
-                category=self.category_save_scenario, label="Toggle buttons?:", default_index=1, entries=[" no ", " yes "]
-            )
+            self.option_toggle_buttons = ButtonBox(label="Toggle buttons?:", default_index=1, entries=[" no ", " yes "],
+                                                   category=self.category_save_scenario)
             self.option_toggle_buttons.change_event(self.change_toggle_button)
-            self.option_auto_saving = ButtonBox(
-                category=self.category_save_scenario, label="Use automatic saving?:", default_index=0, entries=[" no ", " yes "]
-            )
+            self.option_auto_saving = ButtonBox(label="Use automatic saving?:", default_index=0,
+                                                entries=[" no ", " yes "], category=self.category_save_scenario)
             self.hint_saving = Hint(
                 category=self.category_save_scenario,
                 hint="If Auto saving is selected the scenario will automatically saved if a scenario"
@@ -1100,7 +1134,12 @@ class GuiStructure:
 
     def change_toggle_button(self) -> None:
         """
-        changes the button box and aim selection behaviour to either toggle or not changeable
+        This function changes the behaviour of both the ButtonBox and aim selection
+        from either toggle behaviour to not-change behaviour.
+
+        Returns
+        -------
+        None
         """
         if self.option_toggle_buttons.get_value() == 0:
             ButtonBox.TOGGLE = False
@@ -1109,10 +1148,14 @@ class GuiStructure:
         ButtonBox.TOGGLE = True
         Page.TOGGLE = True
 
-    def check_distance_between_pipes(self, *args) -> None:
+    def check_distance_between_pipes(self) -> None:
         """
-        calculate and set minimal and maximal distance between U pipes and center
-        :return: None
+        This function calculates and sets the minimal and maximal distance between the U pipes
+        and the center of the borehole.
+
+        Returns
+        -------
+        None
         """
         if self.option_pipe_distance.is_hidden():
             return
@@ -1135,8 +1178,11 @@ class GuiStructure:
 
     def update_borehole(self) -> None:
         """
-        plots the position of the pipes in the borehole
-        :return: None
+        This function plots the position of the pipe in the borehole.
+
+        Returns
+        -------
+        None
         """
         if isinstance(self.category_pipe_data.graphic_left, QtWidgets_QGraphicsView):
             # import all that is needed
@@ -1198,9 +1244,16 @@ class GuiStructure:
 
     def fun_update_combo_box_data_file(self, filename: str) -> None:
         """
-        update comboBox if new data file is selected
-        :param filename: filename of data file
-        :return: None
+        This function updates the combo box of the file selector when a new file is selected.
+
+        Parameters
+        ----------
+        filename : str
+            Location of the file
+
+        Returns
+        -------
+        None
         """
         if not isinstance(filename, str):
             return
@@ -1231,8 +1284,11 @@ class GuiStructure:
 
     def fun_display_data(self) -> None:
         """
-        Load the Data to Display in the GUI
-        :return: None
+        This function loads the data and displays it (in a monthly format) in the GUI.
+
+        Returns
+        -------
+        None
         """
         try:
             data_unit = self.option_unit_data.get_value()
@@ -1307,7 +1363,21 @@ class GuiStructure:
         except KeyError:
             self.status_bar.showMessage(self.translations.ColumnError[self.option_language.get_value()], 5000)
 
-    def translate(self, index: int, translation: Translations):
+    def translate(self, index: int, translation: Translations) -> None:
+        """
+        This function translates the GUI.
+
+        Parameters
+        ----------
+        index : int
+            Index of the language
+        translation : Translations
+            Class with all the translations
+
+        Returns
+        -------
+        None
+        """
         Page.next_label = translation.label_next[index]
         Page.previous_label = translation.label_previous[index]
         self.no_file_selected = translation.NoFileSelected[index]
