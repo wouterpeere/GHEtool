@@ -118,17 +118,6 @@ class DataStorage:
         [option.set_value(getattr(self, name)) for option, name in gui_structure.list_of_options if hasattr(self, name)]
         gui_structure.change_toggle_button()
 
-    def save(self) -> None:
-        """
-        This function saves the DataStorage object as a csv document.
-
-        Returns
-        -------
-        None
-        """
-        data = pd.DataFrame([(name, getattr(self, name)) for name in self.__dict__])
-        data.to_csv('test.csv')
-
     def __eq__(self, other) -> bool:
         """
         This function checks whether or not the current DataStorage object is equal to another one.
