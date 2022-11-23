@@ -183,7 +183,7 @@ class Option(metaclass=abc.ABCMeta):
         return True
 
     @abc.abstractmethod
-    def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, *, row: int = None, column: int = None) -> None:
+    def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, row: int = None, column: int = None) -> None:
         """
         This functions creates the widget, related to the current object, in the frame.
 
@@ -228,7 +228,7 @@ class Option(metaclass=abc.ABCMeta):
 
     def set_text(self, name: str) -> None:
         """
-        This function sets the label text
+        This function sets the label text.
 
         Parameters
         ----------
@@ -1415,11 +1415,34 @@ class Hint:
 
 class FunctionButton:
     """
-    Function button to link function to\n
+    This class contains all the functionalities of the FunctionButton option in the GUI.
+    The FunctionButton can be used to couple a button press to a function call.
     """
     default_parent: Optional[QtW.QWidget] = None
 
     def __init__(self, button_text: str, icon: str, category: Category):
+        """
+
+        Parameters
+        ----------
+        button_text : str
+            The label of the IntBox
+        icon : str
+            The default value of the IntBox
+        category : Category
+            Category in which the IntBox should be placed
+
+        Examples
+        --------
+        >>> function_example = FunctionButton(button_text='Press Here to activate function',
+        >>>                                   icon=':/icons/icons/example_icon.svg',
+        >>>                                   category=category_example)
+
+        Gives:
+
+        .. figure:: _static/Example_Function_Button.PNG
+
+        """
         self.button_text: str = button_text
         self.icon: str = icon
         self.frame: QtW.QFrame = QtW.QFrame(self.default_parent)
@@ -1427,6 +1450,20 @@ class FunctionButton:
         category.list_of_options.append(self)
 
     def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout):
+        """
+        This functions creates the FunctionButton in the frame.
+
+        Parameters
+        ----------
+        frame : QtW.QFrame
+            The frame object in which the widget should be created
+        layout_parent : QtW.QLayout
+            The parent layout of the current widget
+
+        Returns
+        -------
+        None
+        """
         self.button.setParent(frame)
         self.button.setText(f"  {self.button_text}  ")
         icon = QtG.QIcon()
@@ -1453,22 +1490,66 @@ class FunctionButton:
         layout_parent.addWidget(self.frame)
 
     def hide(self) -> None:
+        """
+        This function makes the FunctionButton invisible.
+
+        Returns
+        -------
+        None
+        """
         self.frame.hide()
 
     def show(self) -> None:
+        """
+        This function makes the current FunctionButton visible.
+
+        Returns
+        -------
+        None
+        """
         self.frame.show()
 
     def is_hidden(self) -> bool:
+        """
+        This function returns a boolean value related to whether or not the FunctionButton is hidden.
+
+        Returns
+        -------
+        Bool
+            True if the option is hidden
+        """
         return self.frame.isHidden()
 
     def set_text(self, name: str):
+        """
+        This function sets the text of the FunctionButton.
+
+        Parameters
+        ----------
+        name : str
+            Text of the FunctionButton
+
+        Returns
+        -------
+        None
+        """
         self.button_text: str = name
         self.button.setText(self.button_text)
 
     def change_event(self, function_to_be_called: Callable, *args) -> None:
         """
-        Function for the change event\n
-        :param function_to_be_called: function to be called if option has changed
+        This function calls the function_to_be_called whenever the FunctionButton is pressed.
+
+        Parameters
+        ----------
+        function_to_be_called : callable
+            Function which should be called
+        args
+            Arguments to be passed through to the function_to_be_called
+
+        Returns
+        -------
+        None
         """
         self.button.clicked.connect(lambda: function_to_be_called(*args))
 
