@@ -1168,7 +1168,7 @@ class ListBox(Option):
         """
         self.widget.currentIndexChanged.connect(function_to_be_called)  # pylint: disable=E1101
 
-    def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, *, row: int = None, column: int = None) -> None:
+    def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, row: int = None, column: int = None) -> None:
         """
         This functions creates the ListBox widget in the frame.
 
@@ -1208,9 +1208,10 @@ class ListBox(Option):
 
 class FileNameBox(Option):
     """
-    Filename input box\n
+    This class contains all the functionalities of the FileNameBox (filename input box) option in the GUI.
+    The FileNameBox can be used to import a datafile.
     """
-    def __init__(self, label: str,default_value: str, *, dialog_text: str, error_text: str, status_bar: QtW.QStatusBar,category: Category):
+    def __init__(self, label: str, default_value: str, dialog_text: str, error_text: str, status_bar: QtW.QStatusBar, category: Category):
         super().__init__(label, default_value, category)
         self.widget: QtW.QLineEdit = QtW.QLineEdit(self.default_parent)
         self.dialog_text: str = dialog_text
@@ -1219,37 +1220,97 @@ class FileNameBox(Option):
 
     def get_value(self) -> str:
         """
-        get value of option.\n
-        :return: return value of option
+        This function returns the filename (with path) which is put into the FileNameBox.
+
+        Returns
+        -------
+        str
+            Filename (with path)
         """
         return self.widget.text()
 
     def set_value(self, value: str) -> None:
         """
-        set value of option.\n
-        :param value: value to be set
+        This function sets the value of the FileNameBox.
+
+        Parameters
+        ----------
+        value : int
+            Value to which the the FileNameBox should be set.
+
+        Returns
+        -------
+        None
         """
         self.widget.setText(value)
 
     def _init_links(self) -> None:
         """
-        Set way on which the links should be set\n
+        Function on how the links for the FileNameBox should be set.
+
+        Returns
+        -------
+        None
         """
         current_value: str = self.get_value()
         self.set_value('test')
         self.set_value(current_value)
 
     def _check_value(self) -> bool:
+        """
+        This function checks whether or not a value is given in the FileNameBox.
+
+        Returns
+        -------
+        bool
+            True if a value is given in the FileNameBox. False otherwise
+        """
         return exists(self.widget.text())
 
     def change_event(self, function_to_be_called: Callable) -> None:
         """
-        Function for the change event\n
-        :param function_to_be_called: function to be called if option has changed
+        This function calls the function_to_be_called whenever the FileNameBox is changed.
+
+        Parameters
+        ----------
+        function_to_be_called : callable
+            Function which should be called
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        >>> self.option_filename.change_event(self.fun_update_combo_box_data_file)
+
+        The code above is used in gui_structure.py to update the information related to the input of hourly data,
+        whenever a new file is selected.
+
         """
         self.widget.textChanged.connect(function_to_be_called)  # pylint: disable=E1101
 
-    def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, *, row: int = None, column: int = None) -> None:
+    def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, row: int = None, column: int = None) -> None:
+        """
+        This functions creates the ButtonBox widget in the frame.
+
+        Parameters
+        ----------
+        frame : QtW.QFrame
+            The frame object in which the widget should be created
+        layout_parent : QtW.QLayout
+            The parent layout of the current widget
+        row : int
+            The index of the row in which the widget should be created
+            (only needed when there is a grid layout)
+        column : int
+            The index of the column in which the widget should be created
+            (only needed when there is a grid layout)
+
+        Returns
+        -------
+        None
+        """
         layout = self.create_frame(frame, layout_parent, False)
         self.widget.setParent(self.frame)
         self.widget.setStyleSheet(
@@ -1267,8 +1328,12 @@ class FileNameBox(Option):
 
     def fun_choose_file(self) -> None:
         """
-        function to choose data file Import
-        :return: None
+        This function opens a file selector, with which the filename path can be selected.
+        This is automatically added to the FileNameBox.
+
+        Returns
+        -------
+        None
         """
         # try to ask for a file otherwise show message in status bar
         try:
