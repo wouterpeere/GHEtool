@@ -735,6 +735,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             for option, _ in self.gui_structure.list_of_options:
                 if not option.check_value():
                     self.status_bar.showMessage(f'Wrong value in option with label: {option.label_text}', 5000)
+                    print("False")
                     return False
         return True
 

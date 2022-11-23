@@ -36,7 +36,7 @@ class DataStorage:
         True if hourly data should be used
     """
 
-    def __init__(self, gui_structure: GuiStructure) -> None:
+    def __init__(self, gui_structure: GuiStructure):
         """
         This creates an instance of the DataStorage Class
 

@@ -178,7 +178,7 @@ class Option(metaclass=abc.ABCMeta):
             if not self.list_2_check_before_value:
                 return self._check_value()
             if any(aim.widget.isChecked() for aim in self.list_2_check_before_value if isinstance(aim, Aim)) or any(
-                    value[0].get_value() == value[1] for value in self.list_2_check_before_value if isinstance(value, tuple)):
+                    value[0].get_value() == value[1] and not value[0].is_hidden() for value in self.list_2_check_before_value if isinstance(value, tuple)):
                 return self._check_value()
         return True
 
@@ -1212,6 +1212,37 @@ class FileNameBox(Option):
     The FileNameBox can be used to import a datafile.
     """
     def __init__(self, label: str, default_value: str, dialog_text: str, error_text: str, status_bar: QtW.QStatusBar, category: Category):
+        """
+
+        Parameters
+        ----------
+        label : str
+            The label of the IntBox
+        default_value : int
+            The default value of the IntBox
+        dialog_text : str
+            Text to be displayed in the top bar of the dialog box
+        error_text : str
+            Error text be be shown in the status_bar
+        status_bar : QtW.QStatusBar
+            Status bar to put in an error message related to the file import
+        category : Category
+            Category in which the IntBox should be placed
+
+        Examples
+        --------
+        >>> option_file = FileNameBox(label='File name box label text',
+        >>>                           default_value='example_file.XX',
+        >>>                           dialog_text='Choose *.XX file',
+        >>>                           error_text='no file found',
+        >>>                           status_bar=status_bar,
+        >>>                           category=category_example)
+
+        Gives:
+
+        .. figure:: _static/Example_Filename.PNG
+
+        """
         super().__init__(label, default_value, category)
         self.widget: QtW.QLineEdit = QtW.QLineEdit(self.default_parent)
         self.dialog_text: str = dialog_text
