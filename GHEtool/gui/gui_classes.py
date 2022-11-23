@@ -1024,11 +1024,11 @@ class ListBox(Option):
         Parameters
         ----------
         label : str
-            The label of the ButtonBox
+            The label of the ListBox
         default_index : int
-            The default index of the ButtonBox
+            The default index of the ListBox
         entries : List[str]
-            The list of all the different buttons in the ButtonBox
+            The list of all the different buttons in the ListBox
         category : Category
             Category in which the ButtonBox should be placed
 
@@ -1217,9 +1217,9 @@ class FileNameBox(Option):
         Parameters
         ----------
         label : str
-            The label of the IntBox
+            The label of the FileNameBox
         default_value : int
-            The default value of the IntBox
+            The default value of the FileNameBox
         dialog_text : str
             Text to be displayed in the top bar of the dialog box
         error_text : str
@@ -1227,7 +1227,7 @@ class FileNameBox(Option):
         status_bar : QtW.QStatusBar
             Status bar to put in an error message related to the file import
         category : Category
-            Category in which the IntBox should be placed
+            Category in which the FileNameBox should be placed
 
         Examples
         --------
@@ -1377,18 +1377,60 @@ class FileNameBox(Option):
 
 class Hint:
     """
-    Hint class to add hint texts in categories\n
+    This class contains all the functionalities of the Hint option in the GUI.
+    Hints can be used to show text (for information or warnings) inside the category.
     """
 
     default_parent: Optional[QtW.QWidget] = None
 
     def __init__(self, hint: str, category: Category, warning: bool = False):
+        """
+
+        Parameters
+        ----------
+        hint : str
+            Text of the hint
+        category : Category
+            Category in which the Hint should be placed
+        warning : bool
+            True if the Hint should be shown
+        Examples
+        --------
+        >>> hint_example = Hint(hint='This is a hint to something important.',
+        >>>                     category=category_example,
+        >>>                     warning=True)
+
+        Gives:
+
+        .. figure:: _static/Example_Hint.PNG
+
+        """
         self.hint: str = hint
         self.label: QtW.QLabel = QtW.QLabel(self.default_parent)
         self.warning = warning
         category.list_of_options.append(self)
 
-    def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, *, row: int = None, column: int = None) -> None:
+    def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, row: int = None, column: int = None) -> None:
+        """
+        This functions creates the ButtonBox widget in the frame.
+
+        Parameters
+        ----------
+        frame : QtW.QFrame
+            The frame object in which the widget should be created
+        layout_parent : QtW.QLayout
+            The parent layout of the current widget
+        row : int
+            The index of the row in which the widget should be created
+            (only needed when there is a grid layout)
+        column : int
+            The index of the column in which the widget should be created
+            (only needed when there is a grid layout)
+
+        Returns
+        -------
+        None
+        """
         self.label.setParent(frame)
         self.label.setText(self.hint)
         if self.warning:
@@ -1400,15 +1442,49 @@ class Hint:
         layout_parent.addWidget(self.label)
 
     def hide(self) -> None:
+        """
+        This function makes the Hint invisible.
+
+        Returns
+        -------
+        None
+        """
         self.label.hide()
 
     def show(self) -> None:
+        """
+        This function makes the current Hint visible.
+
+        Returns
+        -------
+        None
+        """
         self.label.show()
 
     def is_hidden(self) -> bool:
+        """
+        This function returns a boolean value related to whether or not the Hint is hidden.
+
+        Returns
+        -------
+        Bool
+            True if the option is hidden
+        """
         return self.label.isHidden()
 
     def set_text(self, name: str):
+        """
+        This function sets the text of the Hint.
+
+        Parameters
+        ----------
+        name : str
+            Text of the Hint
+
+        Returns
+        -------
+        None
+        """
         self.hint: str = name
         self.label.setText(self.hint)
 
@@ -1426,11 +1502,11 @@ class FunctionButton:
         Parameters
         ----------
         button_text : str
-            The label of the IntBox
+            The label of the FunctionButton
         icon : str
-            The default value of the IntBox
+            Location of the icon for the FunctionButton
         category : Category
-            Category in which the IntBox should be placed
+            Category in which the FunctionButton should be placed
 
         Examples
         --------
