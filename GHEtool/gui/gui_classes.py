@@ -954,7 +954,7 @@ class ButtonBox(Option):
 
     def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, row: int = None, column: int = None) -> None:
         """
-        This functions creates the buttonBox widget in the frame.
+        This functions creates the ButtonBox widget in the frame.
 
         Parameters
         ----------
@@ -1015,42 +1015,113 @@ class ButtonBox(Option):
 
 class ListBox(Option):
     """
-    List input box\n
+    This class contains all the functionalities of the ListBox option in the GUI.
+    The ListBox can be used to select one option out of many (sort of like the ButtonBox)
     """
-    def __init__(self, label: str, default_index: int, entries: List[str], *, category: Category):
+    def __init__(self, label: str, default_index: int, entries: List[str], category: Category):
+        """
+
+        Parameters
+        ----------
+        label : str
+            The label of the ButtonBox
+        default_index : int
+            The default index of the ButtonBox
+        entries : List[str]
+            The list of all the different buttons in the ButtonBox
+        category : Category
+            Category in which the ButtonBox should be placed
+
+        Examples
+        --------
+        >>> option_list = ListBox(label='List box label text',
+        >>>                       default_index=0,
+        >>>                       entries=['Option 1', 'Option 2'],
+        >>>                       category=category_example)
+
+        Gives:
+
+        .. figure:: _static/Example_List_Box.PNG
+
+        """
         super().__init__(label, default_index, category)
         self.entries: List[str] = entries
         self.widget: QtW.QComboBox = QtW.QComboBox(self.default_parent)
 
     def get_text(self) -> str:
+        """
+        This function returns the current text of the ListBox.
+
+        Returns
+        -------
+        str
+            Current text on the ListBox
+        """
         return self.widget.currentText()
 
     def get_value(self) -> int:
         """
-        get value of option.\n
-        :return: return value of option
+        This function gets the value (i.e. index) of the ListBox.
+
+        Returns
+        -------
+        int
+            Value/index of the ListBox
         """
         return self.widget.currentIndex()
 
     def set_value(self, value: int) -> None:
         """
-        set value of option.\n
-        :param value: value to be set
+        This function sets the value/index of the ListBox.
+
+        Parameters
+        ----------
+        value : int
+            Index of the ListBox
+
+        Returns
+        -------
+        None
         """
         self.widget.setCurrentIndex(value)
 
     def _init_links(self) -> None:
         """
-        Set way on which the links should be set\n
+        Function on how the links for the ListBox should be set.
+
+        Returns
+        -------
+        None
         """
         current_value: int = self.get_value()
         self.set_value(0 if current_value != 0 else 1)
         self.set_value(current_value)
 
     def _check_value(self) -> bool:
+        """
+        This function checks whether a correct value is selected.
+
+        Returns
+        -------
+        bool
+            True if the current index of the ListBox is larger than zero. False otherwise
+        """
         return self.widget.currentIndex() >= 0
 
     def set_text(self, name: str):
+        """
+        This function sets the text of the label and of the different buttons in the ListBox.
+
+        Parameters
+        ----------
+        name: str
+            String with the names of all the buttons (in order) and the label name at position 0.
+            These strings are separated by ","
+
+        Returns
+        -------
+        None
+        """
         entry_name: List[str, str] = name.split(',')
         self.label_text = entry_name[0]
         self.label.setText(self.label_text)
@@ -1059,20 +1130,65 @@ class ListBox(Option):
 
     def add_link_2_show(self, option: Union[Option, Category, FunctionButton, Hint], *, on_index: int):
         """
-        Add link to the index\n
-        :param option: option which should be linked
-        :param on_index: index on which the option should be shown
+        This function couples the visibility of an option to the value of the ButtonBox object.
+
+        Parameters
+        ----------
+        option : Option, Category, FunctionButton, Hint
+            Option which visibility should be linked to the value of the FloatBox.
+        on_index : int
+            The index on which the linked options should be made visible.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        This function can be used to couple the ButtonBox value to other options, hints, function buttons or categories.
+        In the example below, 'option linked' will be shown if the first ('0') option is selected in the ListBox.
+
+        >>> option_list.add_link_2_show(option=option_linked, on_index=0)
+
         """
         self.linked_options.append([option, on_index])
 
     def change_event(self, function_to_be_called: Callable) -> None:
         """
-        Function for the change event\n
-        :param function_to_be_called: function to be called if option has changed
+        This function calls the function_to_be_called whenever the index of the ListBox is changed.
+
+        Parameters
+        ----------
+        function_to_be_called : callable
+            Function which should be called
+
+        Returns
+        -------
+        None
         """
         self.widget.currentIndexChanged.connect(function_to_be_called)  # pylint: disable=E1101
 
     def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, *, row: int = None, column: int = None) -> None:
+        """
+        This functions creates the ListBox widget in the frame.
+
+        Parameters
+        ----------
+        frame : QtW.QFrame
+            The frame object in which the widget should be created
+        layout_parent : QtW.QLayout
+            The parent layout of the current widget
+        row : int
+            The index of the row in which the widget should be created
+            (only needed when there is a grid layout)
+        column : int
+            The index of the column in which the widget should be created
+            (only needed when there is a grid layout)
+
+        Returns
+        -------
+        None
+        """
         layout = self.create_frame(frame, layout_parent)
         self.widget.setParent(self.frame)
         self.widget.setStyleSheet(
