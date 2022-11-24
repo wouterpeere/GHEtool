@@ -1671,7 +1671,7 @@ class ResultText(Hint):
 
     def text_to_be_shown(self, class_name: str = "Borefield", var_name: str = "H") -> None:
         """
-        This function sets the result that should be explained. It refers to a certain variable (var_name) inside the class class_name.
+        This function sets the result that should be shown. It refers to a certain variable (var_name) inside the class class_name.
 
         Parameters
         ----------
@@ -1992,21 +1992,35 @@ class FigureOption(ButtonBox):
     Such an element is not placed in itself on the GUI, but is part of the ResultFigure category.
     It can be used to add an extra option to alter the figure shown.
     """
-    def __init__(self, category: ResultFigure, label: str, param, default, entries, entries_values):
+    def __init__(self, category: ResultFigure, label: str, param: str, default: int, entries: List[str], entries_values: List):
         """
 
-                Parameters
-                ----------
-                category : ResultFigure
-                    Category in which the ButtonBox should be placed
-                label : str
-                    The label of the ButtonBox
-                default : int
-                    The default index of the ButtonBox
-                entries : List[str]
-                    The list of all the different buttons in the ButtonBox
-                entries_values
-                """
+        Parameters
+        ----------
+        category : ResultFigure
+            Category in which the FigureOption should be placed
+        label : str
+            The label of the FigureOption
+        param : str
+            Name of the argument in the function that is used to generate the figure
+        default : int
+            The default index of the FigureOption
+        entries : List[str]
+            The list of all the different buttons in the FigureOption
+        entries_values : List
+            The list of all the corresponding values (w.r.t. entries) for the argument defined in param
+
+        Examples
+        --------
+        The example below adds the legende on/off option to the temperature profile figure.
+
+        >>> FigureOption(category=self.figure_temperature_profile,
+        >>>              label="Legend on",
+        >>>              param="legend",
+        >>>              default=0,
+        >>>              entries=["No", "Yes"],
+        >>>              entries_values=[False, True])
+        """
         super(FigureOption, self).__init__(label=label, default_index=default, entries=entries, category=category)
         self.values = entries_values
         self.param = param
@@ -2050,9 +2064,31 @@ class FigureOption(ButtonBox):
 
 
 class ResultFigure(Category):
+    """
+    This class contains all the functionalities of the ResultFigure option in the GUI.
+    The ResultFigure option can be used to show figurative results in the results page.
+    It is a category showing a figure and optionally a couple of FigureOptions to alter this figure.
+    """
+    def __init__(self, label: str, page: Page, save_figure_button: bool = True):
+        """
 
-    def __init__(self, label: str, page, save_figure_button: bool = True):
+        Parameters
+        ----------
+        label : str
+            Label text of the ResultFigure
+        page : Page
+            Page where the ResultFigure should be placed (the result page)
+        save_figure_button : bool
+            True if a button to save the figure should be shown
 
+        Examples
+        --------
+        The code below generates a ResultFigure category named 'Temperature evolution'.
+
+        >>> ResultFigure(label="Temperature evolution",
+        >>>              page=self.page_result,
+        >>>              save_figure_button=True)
+        """
         super().__init__(label, page)
         self.fig = None
         self.ax = None
@@ -2066,13 +2102,47 @@ class ResultFigure(Category):
         if save_figure_button:
             self.save_fig = FunctionButton(category=self, button_text="Save figure", icon=":/icons/icons/Save_Inv.svg")
 
-    def fig_to_be_shown(self, class_name: str = "Borefield", function_name: str = "print_temperature_profile", **kwargs):
+    def fig_to_be_shown(self, class_name: str = "Borefield", function_name: str = "print_temperature_profile", **kwargs) -> None:
+        """
+        This function sets the result that should be shown. It refers to a certain function (function_name) inside the class class_name.
+        It is possible to pass through fixed arguments to this function by using **kwargs.
+        Arguments that do change, have to be set using a FigureOption.
+
+        Parameters
+        ----------
+        class_name : str
+            The class which contains the variable that should be shown (currently only Borefield)
+        function_name : str
+            Function that creates the figure. This should be a function existing in the class_name Class.
+        **kwargs : dict
+            A dictionary with keys being the function arguments which have preset values and the corresponding value.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        The example below shows the temperature profile by calling on the 'print_temperature_profile' function in the Borefield class.
+
+        >>> self.figure_temperature_profile.fig_to_be_shown(class_name="Borefield",
+        >>>                                                 function_name="print_temperature_profile")
+        """
         self.class_name = class_name
         self.function_name = function_name
         self._kwargs = kwargs
 
     @property
-    def kwargs(self):
+    def kwargs(self) -> dict:
+        """
+        This function returns the argument-value pairs for the function that generates the figure
+        for this ResultFigure.
+
+        Returns
+        -------
+        dict
+            Dictionary with all the argument names (as keys) and the corresponding values
+        """
         kwargs_temp = {}
         for i in self.list_of_options:
             if i != self.save_fig and not i.is_hidden():
@@ -2080,11 +2150,21 @@ class ResultFigure(Category):
                 kwargs_temp[key] = value
         return {**self._kwargs, **kwargs_temp}
 
-    def options_to_show(self, label: str, param: str, default_index: int, entries_text: List[str], entries_values: List) -> None:
-        self.options.append(FigureOption(category=self, param=param, label=label, default=default_index,
-                                         entries=entries_text, entries_values=entries_values))
-
     def show(self, results: bool = False) -> None:
+        """
+        This function shows the ResultFigure option.
+        It makes sure that the figure is not shown when loading the entire GUI,
+        but only when the result page is opened.
+
+        Parameters
+        ----------
+        results : bool
+            True if this function is called w.r.t. result page.
+
+        Returns
+        -------
+        None
+        """
         if self.to_show:
             super(ResultFigure, self).show()
         if results:
@@ -2092,6 +2172,20 @@ class ResultFigure(Category):
         self.to_show = True
 
     def hide(self, results: bool = False) -> None:
+        """
+        This function hides the ResultFigure option.
+        It also sets the to_show parameter to False, so the Figure is not randomly showed
+        when the result page is opened.
+
+        Parameters
+        ----------
+        results : bool
+            True if the hide function is called w.r.t. result page
+
+        Returns
+        -------
+        None
+        """
         super(ResultFigure, self).hide()
         if results:
             return
