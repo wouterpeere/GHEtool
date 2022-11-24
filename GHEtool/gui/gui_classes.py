@@ -1987,19 +1987,59 @@ class Category:
 
 
 class FigureOption(ButtonBox):
+    """
+    This class contains all the functionalities of the FigureOption.
+    Such an element is not placed in itself on the GUI, but is part of the ResultFigure category.
+    It can be used to add an extra option to alter the figure shown.
+    """
+    def __init__(self, category: ResultFigure, label: str, param, default, entries, entries_values):
+        """
 
-    def __init__(self, category, label, param, default, entries, entries_values):
+                Parameters
+                ----------
+                category : ResultFigure
+                    Category in which the ButtonBox should be placed
+                label : str
+                    The label of the ButtonBox
+                default : int
+                    The default index of the ButtonBox
+                entries : List[str]
+                    The list of all the different buttons in the ButtonBox
+                entries_values
+                """
         super(FigureOption, self).__init__(label=label, default_index=default, entries=entries, category=category)
         self.values = entries_values
         self.param = param
 
     def get_value(self) -> Tuple[str, int]:
+        """
+        This functions returns the value of the FigureOption.
+        This is used to update the finale results figure.
+
+        Returns
+        -------
+        key_name, key_value : str, int
+            Name of the variable and its value as an argument for the function in the Borefield Class that creates the figure.
+        """
         for idx, button in enumerate(self.widget):
             if button.isChecked():
                 return self.param, self.values[idx]
         return "", -1
 
-    def set_value(self, values: Tuple[str, int]):
+    def set_value(self, values: Tuple[str, int]) -> None:
+        """
+        This function sets the value of the FigureOption.
+
+        Parameters
+        ----------
+        values : Tuple[str, int]
+            Tuple containing the value of the FigureOption and its selected index.
+            Only the index is used.
+
+        Returns
+        -------
+        None
+        """
         value = values[1]
         for idx, button in enumerate(self.widget):
             if self.values[idx] == value:
