@@ -35,7 +35,7 @@ from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
 from GHEtool.gui.gui_calculation_thread import (CalcProblem)
 from GHEtool.gui.gui_data_storage import DataStorage
 from GHEtool.gui.gui_base_class import UiGhetool
-from GHEtool.gui.gui_structure import * # GuiStructure, Option, FunctionButton,
+from GHEtool.gui.gui_structure import *  # GuiStructure, Option, FunctionButton,
 from GHEtool.gui.translation_class import Translations
 
 import matplotlib.pyplot as plt

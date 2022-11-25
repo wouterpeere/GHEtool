@@ -1853,8 +1853,8 @@ class Category:
 
         Parameters
         ----------
-        page : QtW.QFrame
-            Frame in which this option should be created
+        page : QtW.QWidget
+            Widget (i.e. page) in which this option should be created
         layout : QtW.QLayout
             The layout parent of the current frame
 
@@ -2020,6 +2020,11 @@ class FigureOption(ButtonBox):
         >>>              default=0,
         >>>              entries=["No", "Yes"],
         >>>              entries_values=[False, True])
+
+        Gives:
+
+        .. figure:: _static/Example_FigureOption.PNG
+
         """
         super(FigureOption, self).__init__(label=label, default_index=default, entries=entries, category=category)
         self.values = entries_values
@@ -2088,6 +2093,10 @@ class ResultFigure(Category):
         >>> ResultFigure(label="Temperature evolution",
         >>>              page=self.page_result,
         >>>              save_figure_button=True)
+
+        Gives (note that the FigureOption for the legend is also included):
+
+        .. figure:: _static/Example_ResultFigure.PNG
         """
         super().__init__(label, page)
         self.fig = None
@@ -2194,12 +2203,35 @@ class ResultFigure(Category):
 
 class Aim:
     """
-    Aim of simulation\n
+    This class contains all the functionalities of the Aim option in the GUI.
+    The Aim option is central in the GHEtool GUI for it determines the possible 'things' one can do with the tool.
     """
 
     default_parent: Optional[QtW.QWidget] = None
 
     def __init__(self, label: str, icon: str, page: Page):
+        """
+
+        Parameters
+        ----------
+        label : str
+            Name of the Aim
+        icon : str
+            Path to the icon for the Aim
+        page : Page
+            Page on which the Aim should be shown (normally, this is the first page)
+
+        Examples
+        --------
+        >>> aim_example = Aim(label='Example aim',
+        >>>                   icon=":/icons/icons/example_icon.svg",
+        >>>                   page=page_aim)
+
+        Gives:
+
+        .. figure:: _static/Example_Aim.PNG
+
+        """
         self.label: str = label
         self.icon: str = icon
         self.widget: QtW.QPushButton = QtW.QPushButton(self.default_parent)
@@ -2208,19 +2240,60 @@ class Aim:
 
     def change_event(self, function_to_be_called: Callable, *args) -> None:
         """
-        Function for the change event\n
-        :param function_to_be_called: function to be called if option has changed
+        This function calls the function_to_be_called whenever the Aim is changed.
+
+        Parameters
+        ----------
+        function_to_be_called : callable
+            Function which should be called
+        *args
+            Arguments which are passed through to the function_to_be_called
+
+        Returns
+        -------
+        None
         """
         self.widget.clicked.connect(lambda: function_to_be_called(*args))  # pylint: disable=E1101
 
     def add_link_2_show(self, option: Union[Option, Category, FunctionButton, Hint]):
         """
-        Add link to the aim\n
-        :param option: option which should be linked
+        This function couples the visibility of an option to the value of the Aim object.
+
+        Parameters
+        ----------
+        option : Option, Category, FunctionButton, Hint
+            Option which visibility should be linked to the value of the FloatBox.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        This function can be used to couple the Aim value to other options, hints, function buttons or categories.
+        In the example below, 'option_example' will be shown if the Aim is selected.
+
+        >>> aim_example.add_link_2_show(option=option_example)
         """
         self.list_options.append(option)
 
     def create_widget(self, frame: QtW.QFrame, layout: QtW.QGridLayout, idx: int) -> None:
+        """
+        This functions creates the Aim widget in the grid layout.
+
+        Parameters
+        ----------
+        frame : QtW.QFrame
+            The frame object in which is the parent of the current widget
+        layout : QtW.QGridLayout
+            The grid layout in which the widget should be created
+        idx : int
+            Index of the current Aim
+
+        Returns
+        -------
+        None
+        """
         icon11 = QtG.QIcon()
         icon11.addFile(self.icon)
         self.widget.setParent(frame)
@@ -2241,9 +2314,24 @@ class Aim:
         layout.addWidget(push_button, int(idx / 2), 0 if divmod(idx, 2)[1] == 0 else 1, 1, 1)
 
 
-def check_aim_options(list_aim: List[Aim]):
+def check_aim_options(list_aim: List[Aim]) -> None:
+    """
+    This function makes sure that all the options, that are linked to the Aim, are made invisible
+    when the aim is not selected and that the options, linked to the Aim, will be shown whenever this Aim
+    is selected.
+
+    Parameters
+    ----------
+    list_aim : List[Aim]
+        List with all the aims in the GUI
+
+    Returns
+    -------
+    None
+    """
     list_false = [aim for aim in list_aim if not aim.widget.isChecked()]
     list_true = [aim for aim in list_aim if aim.widget.isChecked()]
+    # hide all the options related to the not-checked aims
     for aim in list_false:
         for option in aim.list_options:
             if isinstance(option, list):
@@ -2251,6 +2339,7 @@ def check_aim_options(list_aim: List[Aim]):
                     opt.hide()
                 continue
             option.hide()
+    # show all the options related to the checked aims
     for aim in list_true:
         for option in aim.list_options:
             if isinstance(option, list):
@@ -2262,7 +2351,8 @@ def check_aim_options(list_aim: List[Aim]):
 
 class Page:
     """
-    Page which consists of aim and categories\n
+    This class contains all the functionalities of the Page option in the GUI.
+    The Page is the most high-level object of the GUI for it contains Categories and Aims.
     """
     next_label: str = 'next'
     previous_label: str = 'previous'
@@ -2270,6 +2360,28 @@ class Page:
     TOGGLE: bool = True
 
     def __init__(self, name: str, button_name: str, icon: str):
+        """
+
+        Parameters
+        ----------
+        name : str
+            Name of the page (shown on top of the Page)
+        button_name : str
+            Text to be shown on the button for the Page
+        icon : str
+            Path to the icon that is used for the Page
+
+        Examples
+        --------
+
+        >>> page_example = Page(name='Example page',
+        >>>                     button_name='Name of\\nthe button',
+        >>>                     icon=":/icons/icons/example_icon.svg")
+
+        Gives:
+
+        .. figure:: _static/Example_Page.PNG
+        """
         self.name: str = name
         self.button_name: str = button_name
         self.icon: str = icon
@@ -2285,10 +2397,35 @@ class Page:
         self.upper_frame: List[Union[Aim, Option, Category]] = []
         self.functions_button_clicked: List[Callable] = []
 
-    def add_function_called_if_button_clicked(self, function_2_be_called: Callable):
-        self.functions_button_clicked.append(function_2_be_called)
+    def add_function_called_if_button_clicked(self, function_to_be_called: Callable) -> None:
+        """
+        This function calls the function_to_be_called whenever the Page is changed.
 
-    def set_text(self, name: str):
+        Parameters
+        ----------
+        function_to_be_called : callable
+            Function which should be called
+
+        Returns
+        -------
+        None
+        """
+        self.functions_button_clicked.append(function_to_be_called)
+
+    def set_text(self, name: str) -> None:
+        """
+        This function sets the text of the Page and the page button.
+
+        Parameters
+        ----------
+        name : str
+            String with the text of the button at position 0 and the page name at position 1.
+            These strings are separated by ","
+
+        Returns
+        -------
+        None
+        """
         entry_name: List[str, str] = name.split(',')
         self.name = entry_name[1]
         self.button_name = entry_name[0].replace('@', '\n')
@@ -2299,16 +2436,53 @@ class Page:
         if self.push_button_next is not None:
             self.push_button_next.setText(self.next_label)
 
-    def set_previous_page(self, previous_page: Page):
+    def set_previous_page(self, previous_page: Page) -> None:
+        """
+        This function sets the previous page.
+
+        Parameters
+        ----------
+        previous_page : Page
+            The page that should be shown when the previous-button is pressed
+
+        Returns
+        -------
+        None
+        """
         self.previous_page = previous_page
 
-    def set_next_page(self, next_page: Page):
+    def set_next_page(self, next_page: Page) -> None:
+        """
+        This function sets the next page.
+
+        Parameters
+        ----------
+        next_page : Page
+            The page that should be shown when the next-button is pressed
+
+        Returns
+        -------
+        None
+        """
         self.next_page = next_page
 
-    def set_upper_frame(self, options: List[Union[Aim, Option, Category]]):
-        self.upper_frame: List[Union[Aim, Option, Category]] = options
+    def create_page(self, central_widget: QtW.QWidget, stacked_widget: QtW.QStackedWidget, vertical_layout_menu: QtW.QVBoxLayout) -> None:
+        """
+        This function creates the Page onto the central_widget.
 
-    def create_page(self, central_widget: QtW.QWidget, stacked_widget: QtW.QStackedWidget, vertical_layout_menu: QtW.QVBoxLayout):
+        Parameters
+        ----------
+        central_widget : QtW.QWidget
+            The base framework of the GUI (with the top bar and scenario options) onto which this page should be placed.
+        stacked_widget : QtW.QStackedWidget
+            The stacked widget in which this page will be placed (all pages are stacked into this stacked_widget)
+        vertical_layout_menu : QtW.QVBoxLayout
+            The navigation box where all the different page buttons are placed.
+
+        Returns
+        -------
+        None
+        """
         self.page.setParent(central_widget)
         layout = QtW.QVBoxLayout(self.page)
         layout.setSpacing(0)
@@ -2347,7 +2521,7 @@ class Page:
         spacer = QtW.QSpacerItem(1, 1, QtW.QSizePolicy.Minimum, QtW.QSizePolicy.Expanding)
         scroll_area_layout.addItem(spacer)
 
-        self.create_links_to_other_pages(central_widget, layout)
+        self.create_navigation_buttons(central_widget, layout)
 
         self.button.setParent(central_widget)
         self.button.setMinimumSize(QtC.QSize(100, 100))
@@ -2368,9 +2542,18 @@ class Page:
 
     def create_upper_frame(self, scroll_area_content: QtW.QWidget, scroll_area_layout: QtW.QVBoxLayout):
         """
-        create the upper frame\n
-        :param scroll_area_content:
-        :param scroll_area_layout:
+        This function creates the upper frame of the GUI, i.e. the first visible screen.
+
+        Parameters
+        ----------
+        scroll_area_content : QtW.QWidget
+            Widget in which the upper frame should be created
+        scroll_area_layout : QtW.QVBoxLayout
+            Layout into which this widget should be placed
+
+        Returns
+        -------
+        None
         """
         upper_frame = QtW.QFrame(scroll_area_content)
         upper_frame.setStyleSheet(
@@ -2402,7 +2585,7 @@ class Page:
                 aim.widget.clicked.connect(ft_partial(check_aim_options, list_aims))  # pylint: disable=E1101
             list_aims[0].widget.click()
 
-    def update_function(self, button: QtW.QPushButton, button_opponent: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
+    def update_function(self, button: QtW.QPushButton, button_opponent: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None) -> None:
         """
         This function updates which button should be checked/activated or unchecked/deactivated
         This can be done by either the toggle behaviour or not-change behaviour.
@@ -2425,11 +2608,20 @@ class Page:
             return
         _update_opponent_not_change(button, false_button_list + [button_opponent])
 
-    def create_links_to_other_pages(self, central_widget: QtW.QWidget, scroll_area_layout: QtW.QVBoxLayout):
+    def create_navigation_buttons(self, central_widget: QtW.QWidget, scroll_area_layout: QtW.QVBoxLayout) -> None:
         """
-        create link on the bottom to other pages.\n
-        :param central_widget: central widget
-        :param scroll_area_layout: scroll area layout
+        This function creates the navigation button (previous and next) on the bottom of each Page.
+
+        Parameters
+        ----------
+        central_widget : QtW.QWidget
+
+        scroll_area_layout : QtW.QVBoxLayout
+            The layout on which parent the navigation buttons will be placed.
+
+        Returns
+        -------
+        None
         """
         if self.previous_page is None and self.next_page is None:
             return
