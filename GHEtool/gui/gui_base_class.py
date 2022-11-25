@@ -1,3 +1,8 @@
+"""
+This document contains some base functionality for the GUI.
+It contains a function to reformat the graphs to a layout for the gui,
+and it contains the main class that creates the framework for the GUI (top bar etc.)
+"""
 from PySide6.QtCore import QMetaObject, QRect, QSize, Qt
 from PySide6.QtGui import QAction, QFont, QIcon
 from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QFrame,
@@ -18,7 +23,14 @@ WARNING: str = "rgb(255, 200, 87)"
 BLACK: str = "rgb(0, 0, 0)"
 
 
-def set_graph_layout():
+def set_graph_layout() -> None:
+    """
+    This function sets the graph layout to the correct format when the GUI is used.
+
+    Returns
+    -------
+    None
+    """
     from matplotlib.colors import to_rgb
     from numpy import array, float64
     import matplotlib.pyplot as plt
@@ -39,6 +51,11 @@ def set_graph_layout():
 
 
 class UiGhetool:
+    """
+    This class contains the framework of the GUI, with the top bar,
+    the scenario/run/ ... buttons and the shortcuts.
+    """
+
     menuLanguage: QMenu
     status_bar: QStatusBar
     toolBar: QToolBar
