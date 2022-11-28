@@ -8,6 +8,7 @@ from time import process_time_ns
 
 
 def test_new_calc_method():
+    """test the new calculation method which is just considering the first and last year"""
 
     h = 110
 
