@@ -12,17 +12,14 @@ Belgium
 .. grid:: 1 2 3 4
 
     .. grid-item-card::  Boydens Engineering - part of sweco
-
         :img-bottom: _logo's/boydens_engineering.jpg
 
 
     .. grid-item-card::  KU Leuven
-
         :img-bottom: _logo's/KULeuven.png
 
         
     .. grid-item-card::  Sweco Belgium
-
         :img-bottom: _logo's/Sweco.png
 
 
@@ -38,6 +35,6 @@ Germany
 
     .. grid-item:: 
         FH Aachen
-        
+
     .. grid-item::
          Solar-Institute Jülich
