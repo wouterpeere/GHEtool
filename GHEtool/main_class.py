@@ -70,19 +70,18 @@ class Borefield:
     HOURLY_LOAD_ARRAY: np.ndarray = np.array([0, 24 * 31, 24 * 28, 24 * 31, 24 * 30, 24 * 31, 24 * 30, 24 * 31, 24 * 31, 24 * 30, 24 * 31, 24 * 30,
                                               24 * 31]).cumsum()
 
-    __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'H_init', 'B', 'N_1', 'N_2', 'Rb', 'k_s', 'Tg', 'ty', 'tm', \
+    __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'H_init', 'Rb', 'ty', 'tm', \
                 'td', 'time', 'hourly_heating_load', 'H_max', 'use_constant_Tg', 'flux', 'volumetric_heat_capacity',\
                 'hourly_cooling_load', 'number_of_boreholes', '_borefield', '_custom_gfunction', 'cost_investment', \
                 'length_peak', 'th', 'Tf_max', 'Tf_min', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
                 'monthly_load_cooling', 'peak_heating', 'imbalance', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm', \
-                'peak_cooling', 'simulation_period', 'fluid_data_available',\
-                'results_peak_heating', 'pipe_data_available', 'alpha', 'time_L4', 'options_pygfunction',\
+                'peak_cooling', 'simulation_period', 'fluid_data_available', 'ground_data', 'pipe_data', 'fluid_data',\
+                'results_peak_heating', 'pipe_data_available', 'time_L4', 'options_pygfunction',\
                 'results_peak_cooling', 'results_month_cooling', 'results_month_heating', 'Tb', 'THRESHOLD_WARNING_SHALLOW_FIELD', \
                 'gui', 'time_L3_first_year', 'time_L3_last_year', 'peak_heating_external', 'peak_cooling_external', \
                 'monthly_load_heating_external', 'monthly_load_cooling_external', 'hourly_heating_load_external', \
                 'hourly_cooling_load_external', 'hourly_heating_load_on_the_borefield', 'hourly_cooling_load_on_the_borefield', \
-                'k_f', 'mfr', 'Cp', 'mu', 'rho', 'use_constant_Rb', 'h_f', 'R_f', 'R_p', 'printing', 'combo', \
-                'r_in', 'r_out', 'k_p', 'D_s', 'r_b', 'number_of_pipes', 'epsilon', 'k_g', 'pos', 'D', 'jit_calculation', \
+                'use_constant_Rb', 'printing', 'combo', 'jit_calculation', 'D', 'r_b', \
                 'L2_sizing', 'L3_sizing', 'L4_sizing', 'quadrant_sizing', 'H_init', 'use_precalculated_data'
 
     def __init__(self, simulation_period: int = 20, peak_heating: list = None,
@@ -161,15 +160,9 @@ class Borefield:
         # this will make everything way slower!
         self.use_precalculated_data: bool = True
 
-        # initialize variables for equivalent borehole resistance calculation
-        self.pos: list = []
-        self.h_f: float = 0.
-        self.R_f: float = 0.
-        self.R_p: float = 0.
-
-        #
         self.monthly_load = np.array([])
         self.H_init: float = 0.
+        self._custom_gfunction: tuple = ()
 
         ## params w.r.t. pygfunction
         # true if the gfunctions should be calculated in the iteration when they
@@ -226,39 +219,22 @@ class Borefield:
 
         # initiate ground parameters
         self.H = 0.  # borehole depth m
-        self.B = 0.  # borehole spacing m
-        self.k_s = 0.  # ground thermal conductivity W/mK
-        self.Tg = 0.  # ground temperature at infinity °C
         self.Rb = 0.  # effective borehole thermal resistance mK/W
-        self.N_1 = 0  # number of boreholes in one direction #
-        self.N_2 = 0  # number of boreholes in the other direction #
-        self.D: float = 0.  # burial depth m
-        self.flux = 0.  # geothermal heat flux W/m2
-        self.volumetric_heat_capacity = 0.  # ground volumetric heat capacity (J/m3K)
-        self.alpha = 0.  # ground diffusivity (m2/s)
         self.number_of_boreholes = 0  # number of total boreholes #
+        self.ground_data: GroundData = None
+        self.D: float = 0.  # buried depth of the borehole [m]
+        self.r_b: float = 0.  # borehole radius [m]
 
         # initiate fluid parameters
-        self.k_f = 0.  # Thermal conductivity W/mK
-        self.mfr = 0.  # Mass flow rate kg/s
-        self.rho = 0.  # Density kg/m3
-        self.Cp = 0.  # Thermal capacity J/kgK
-        self.mu = 0.  # Dynamic viscosity Pa/s.
         self.Tf: float = 0.  # temperature of the fluid
         self.Tf_max: float = 16.  # maximum temperature of the fluid
         self.Tf_min: float = 0.  # minimum temperature of the fluid
         self.fluid_data_available: bool = False  # needs to be True in order to calculate Rb*
+        self.fluid_data: FluidData = None
 
         # initiate borehole parameters
-        self.r_in: float = 0.015  # inner pipe radius m
-        self.r_out: float = 0.  # outer pipe radius m
-        self.r_b: float = 0.  # borehole radius m
-        self.k_g: float = 0.  # grout thermal conductivity W/mK
-        self.k_p: float = 0.  # pipe thermal conductivity W/mK
-        self.D_s: float = 0.  # distance of pipe until center of the borehole
-        self.number_of_pipes: int = 0  # number of pipes in the borehole (single = 1, double = 2 etc.)
-        self.epsilon = 1e-6  # pipe roughness
         self.pipe_data_available: bool = False  # needs to be True in order to calculate Rb*
+        self.pipe_data: PipeData = None
 
         # initiate different sizing
         self.L2_sizing: bool = True
@@ -469,11 +445,18 @@ class Borefield:
     @custom_gfunction.setter
     def custom_gfunction(self, custom_gfunction) -> None:
         """
-         This functions sets the custom gfunction.
+        This function sets the custom gfunction.
+        If custom_gfunction is None, than the variable will be deleted.
 
-         :param custom_gfunction: custom gfunction datafile
-         :return None
-         """
+        Parameters
+        ----------
+        custom_gfunction
+            Custom gfunction datafile
+
+        Returns
+        -------
+        None
+        """
         # if custom_gfunction is empty, the value has to be removed
         if custom_gfunction is None:
             del self.custom_gfunction
@@ -482,9 +465,18 @@ class Borefield:
         def make_interpolation_list_custom(custom_gfunction) -> tuple:
             """
             This function creates an interpolation list from a custom dataset and saves it under
-            gfunction_interpolation_array.
+            the hidden _custom_gfunction variable.
 
-            :return: Tuple with datapoints and their corresponding values
+            Parameters
+            ----------
+            custom_gfunction
+                Custom gfunction datafile
+
+            Returns
+            -------
+            Tuple
+                Tuple with on first index a tuple with all the different depths (index 0) and time steps (index 1)
+                and on the second index a 2D-list with all the gfunction values for all the different depths.
             """
 
             # remove the time value
@@ -507,17 +499,32 @@ class Borefield:
 
     @custom_gfunction.deleter
     def custom_gfunction(self) -> None:
+        """
+        This function deletes the custom_gfunction.
+
+        Returns
+        -------
+
+        """
         self._custom_gfunction = None
 
-    def set_investment_cost(self, investement_cost=None) -> None:
+    def set_investment_cost(self, investment_cost: list =None) -> None:
         """
         This function sets the investment cost. This is linear with respect to the total field length.
+        If None, the default is set.
 
-        :return None
+        Parameters
+        ----------
+        investment_cost : list
+            1D array of polynomial coefficients (including coefficients equal to zero) from highest degree to the constant term
+
+        Returns
+        -------
+        None
         """
-        if investement_cost is None:
-            investement_cost = Borefield.DEFAULT_INVESTMENT
-        self.cost_investment: list = investement_cost
+        if investment_cost is None:
+            investment_cost = Borefield.DEFAULT_INVESTMENT
+        self.cost_investment: list = investment_cost
 
     def set_length_peak(self, length: float = DEFAULT_LENGTH_PEAK) -> None:
         """
@@ -529,7 +536,7 @@ class Borefield:
             Length of the peak (in seconds)
 
         Returns
-        __________
+        _______
         None
         """
         self.length_peak: float = length
@@ -539,17 +546,25 @@ class Borefield:
         """
         This function sets the simulation period and updates the time constants.
 
-        :param simulation_period: simulation period in years
-        :return: None
+        Parameters
+        ----------
+        simulation_period : int
+            Simulation period [years]
+
+        Returns
+        -------
+        None
         """
         self.simulation_period = simulation_period
         self._set_time_constants()
 
     def _set_time_constants(self) -> None:
         """
-        This function sets the time constants
+        This function calculates and sets the time constants for the L2 and L3 sizing.
 
-        :return: None
+        Returns
+        -------
+        None
         """
         # Number of segments per borehole
         self.th: float = self.length_peak * 3600.  # length of peak in seconds
@@ -568,34 +583,39 @@ class Borefield:
 
     def set_ground_parameters(self, data: GroundData) -> None:
         """
-        This function sets the relevant ground and borefield characteristics.
+        This function sets the relevant ground parameters.
 
-        :return None
+        Parameters
+        ----------
+        data : GroundData
+            All the relevant ground data
+
+        Returns
+        -------
+        None
         """
         self.Rb: float = data.Rb
 
         # Ground properties
-        self.k_s: float = data.k_s  # Ground thermal conductivity (W/m.K)
-        self.Tg: float = data.Tg  # Ground temperature at infinity (C)
-        self.volumetric_heat_capacity: float = data.volumetric_heat_capacity  # Ground volumetric heat capacity (W/m3K)
-        self.alpha: float = data.alpha  # Ground difussivity (defined as k_s/volumetric_heat_capacity)
-        self.flux: float = data.flux  # Ground thermal heat flux (W/m2)
+        self.ground_data = data
 
         # new ground data implies that a new g-function should be loaded
         del self.custom_gfunction
 
     def set_fluid_parameters(self, data: FluidData) -> None:
         """
-        This function sets the relevant fluid characteristics.
+        This function sets the fluid parameters.
 
-        :return None
+        Parameters
+        ----------
+        data : FluidData
+            All the relevant fluid data
+
+        Returns
+        -------
+        None
         """
-
-        self.k_f = data.k_f  # Thermal conductivity W/mK
-        self.rho = data.rho  # Density kg/m3
-        self.Cp = data.Cp  # Thermal capacity J/kgK
-        self.mu = data.mu  # Dynamic viscosity Pa/s
-        self.set_mass_flow_rate(data.mfr)
+        self.fluid_data = data
         self.fluid_data_available = True
 
         if self.pipe_data_available:
@@ -605,73 +625,79 @@ class Borefield:
         """
         This function sets the pipe parameters.
 
-        :return None
+        Parameters
+        ----------
+        data : PipeData
+            All the relevant pipe parameters
+
+        Returns
+        -------
+        None
         """
-
-        self.r_in = data.r_in  # inner pipe radius m
-        self.r_out = data.r_out  # outer pipe radius m
-        self.k_p = data.k_p  # pipe thermal conductivity W/mK
-        self.D_s = data.D_s  # distance of pipe until center m
-        self.number_of_pipes = data.number_of_pipes  # number of pipes #
-        self.epsilon = data.epsilon  # pipe roughness
-        self.k_g = data.k_g  # grout thermal conductivity W/mK
-
-        # calculates the position of the pipes based on an axis-symmetrical positioning
-        self.pos: list = self._axis_symmetrical_pipe
+        self.pipe_data = data
 
         self.pipe_data_available = True
         # calculate the different resistances
         if self.fluid_data_available:
             self.calculate_fluid_thermal_resistance()
-        self.calculate_pipe_thermal_resistance()
+        self.pipe_data.calculate_pipe_thermal_resistance()
 
     def set_max_ground_temperature(self, temp: float) -> None:
         """
-        This function sets the maximal ground temperature to temp.
+        This functions sets the maximal ground temperature to temp.
 
-        :return None
+        Parameters
+        ----------
+        temp : float
+            Maximal ground temperature [deg C]
+
+        Returns
+        -------
+        None
         """
         self.Tf_max: float = temp
 
     def set_min_ground_temperature(self, temp: float) -> None:
         """
-        This function sets the minimal ground temperature to temp.
+        This functions sets the minimal ground temperature to temp.
 
-        :return None
+        Parameters
+        ----------
+        temp : float
+            Minimal ground temperature [deg C]
+
+        Returns
+        -------
+        None
         """
         self.Tf_min: float = temp
-
-    def set_mass_flow_rate(self, mfr: float) -> None:
-        """
-        This function sets the mass flow rate per borehole.
-
-        :return None
-        """
-        self.mfr = mfr
 
     def calculate_fluid_thermal_resistance(self) -> None:
         """
         This function calculates and sets the fluid thermal resistance R_f.
 
         :return: None"""
-        self.h_f: float = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(self.mfr / self.number_of_pipes, self.r_in, self.mu,
-                                                                                      self.rho, self.k_f, self.Cp, self.epsilon)
-        self.R_f: float = 1. / (self.h_f * 2 * pi * self.r_in)
-
-    def calculate_pipe_thermal_resistance(self) -> None:
-        """
-        This function calculates and sets the pipe thermal resistance R_p.
-
-        :return: None
-        """
-        self.R_p: float = gt.pipes.conduction_thermal_resistance_circular_pipe(self.r_in, self.r_out, self.k_p)
+        self.fluid_data.h_f: float =\
+            gt.pipes.convective_heat_transfer_coefficient_circular_pipe(self.fluid_data.mfr /
+                                                                        self.pipe_data.number_of_pipes,
+                                                                        self.pipe_data.r_in,
+                                                                        self.fluid_data.mu,
+                                                                        self.fluid_data.rho,
+                                                                        self.fluid_data.k_f,
+                                                                        self.fluid_data.Cp,
+                                                                        self.pipe_data.epsilon)
+        self.fluid_data.R_f: float = 1. / (self.fluid_data.h_f * 2 * pi * self.pipe_data.r_in)
 
     @property
     def _Rb(self) -> float:
         """
         This function gives back the equivalent borehole resistance.
+        If self.use_constant_Rb is False, it calculates the equivalent borehole thermal resistance.
 
-        :return: the borehole equivalent thermal resistance
+        Returns
+        -------
+        Rb : float
+            Equivalent borehole thermal resistance [mK/W]
         """
         # use a constant Rb*
         if self.use_constant_Rb:
@@ -685,25 +711,29 @@ class Borefield:
         This function gives back the ground temperature
         When use_constant_Tg is False, the thermal heat flux is taken into account.
 
-        :param H: depth of the field (optional)
-        :return: ground temperature
-        """
-        if self.use_constant_Tg:
-            return self.Tg
+        Parameters
+        ----------
+        H : float
+            Depth of the field at which the temperature is to be evaluated
 
+        Returns
+        -------
+        Temperature of the ground : float
+        """
         # check if specific depth is given
         if H is None:
             H = self.H
 
-        # geothermal gradient is equal to the geothermal heat flux divided by the thermal conductivity
-        # avg ground temperature is (Tg + gradient + Tg) / 2
-        return self.Tg + H * self.flux / self.k_s / 2
+        return self.ground_data.calculate_Tg(H, use_constant_Tg=self.use_constant_Tg)
 
     def calculate_Rb(self) -> float:
         """
         This function returns the calculated equivalent borehole thermal resistance Rb* value.
 
-        :return: the borehole equivalent thermal resistance
+        Returns
+        -------
+        Rb* : float
+            Equivalent borehole thermal resistance [mK/W]
         """
         # check if all data is available
         if not self.pipe_data_available or not self.fluid_data_available:
@@ -713,29 +743,31 @@ class Borefield:
         # initiate temporary borefield
         borehole = gt.boreholes.Borehole(self.H, self.D, self.r_b, 0, 0)
         # initiate pipe
-        pipe = gt.pipes.MultipleUTube(self.pos, self.r_in, self.r_out, borehole, self.k_s, self.k_g, self.R_p + self.R_f, self.number_of_pipes, J=2)
+        pipe = gt.pipes.MultipleUTube(self.pipe_data.pos, self.pipe_data.r_in, self.pipe_data.r_out,
+                                      borehole, self.ground_data.k_s, self.pipe_data.k_g,
+                                      self.pipe_data.R_p + self.fluid_data.R_f, self.pipe_data.number_of_pipes, J=2)
 
-        return pipe.effective_borehole_thermal_resistance(self.mfr, self.Cp)
-
-    @property
-    def _axis_symmetrical_pipe(self) -> list:
-        """
-        This function gives back the coordinates of the pipes in an axis-symmetrical pipe.
-
-        :return: list of coordinates of the pipes in the borehole"""
-        dt: float = pi / float(self.number_of_pipes)
-        pos: list = [(0., 0.)] * 2 * self.number_of_pipes
-        for i in range(self.number_of_pipes):
-            pos[i] = (self.D_s * np.cos(2.0 * i * dt + pi), self.D_s * np.sin(2.0 * i * dt + pi))
-            pos[i + self.number_of_pipes] = (self.D_s * np.cos(2.0 * i * dt + pi + dt), self.D_s * np.sin(2.0 * i * dt + pi + dt))
-        return pos
+        return pipe.effective_borehole_thermal_resistance(self.fluid_data.mfr, self.fluid_data.Cp)
 
     @property
-    def _Bernier(self) -> float:
+    def _Ahmadfard(self) -> float:
         """
         This function sizes the field based on the last year of operation, i.e. quadrants 2 and 4.
 
-        :return: borefield depth
+        It uses the methodology developed by (Ahmadfard and Bernier, 2019) [#Ahmadfard2019]_.
+        The concept of borefield quadrants is developped by (Peere et al., 2020) [#PeereBS]_, [#PeereThesis]_.
+
+        Returns
+        -------
+        H : float
+            Required borehole depth [m]
+
+        References
+        ----------
+        .. [#Ahmadfard2019] Ahmadfard M. and Bernier M., A review of vertical ground heat exchanger sizing tools including an inter-model comparison,
+        Renewable and Sustainable Energy Reviews, Volume 110, 2019, Pages 247-265, ISSN 1364-0321, https://doi.org/10.1016/j.rser.2019.04.045
+        .. [#PeereBS] Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. (2021) Validated combined first and last year borefield sizing methodology. In Proceedings of International Building Simulation Conference 2021. Brugge (Belgium), 1-3 September 2021. https://doi.org/10.26868/25222708.2021.30180
+        .. [#PeereThesis] Peere, W. (2020) Methode voor economische optimalisatie van geothermische verwarmings- en koelsystemen. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
         """
         # initiate iteration
         H_prev = 0
@@ -747,9 +779,9 @@ class Borefield:
             # calculate the required g-function values
             gfunct_uniform_T = self.gfunction(self.time, self.H)
             # calculate the thermal resistances
-            Ra = (gfunct_uniform_T[2] - gfunct_uniform_T[1]) / (2 * pi * self.k_s)
-            Rm = (gfunct_uniform_T[1] - gfunct_uniform_T[0]) / (2 * pi * self.k_s)
-            Rd = (gfunct_uniform_T[0]) / (2 * pi * self.k_s)
+            Ra = (gfunct_uniform_T[2] - gfunct_uniform_T[1]) / (2 * pi * self.ground_data.k_s)
+            Rm = (gfunct_uniform_T[1] - gfunct_uniform_T[0]) / (2 * pi * self.ground_data.k_s)
+            Rd = (gfunct_uniform_T[0]) / (2 * pi * self.ground_data.k_s)
             # calculate the total borehole length
             L = (self.qa * Ra + self.qm * Rm + self.qh * Rd + self.qh * self._Rb) / abs(self.Tf - self._Tg())
             # updating the depth values
@@ -762,7 +794,19 @@ class Borefield:
         """
         This function sizes the field based on the first year of operation, i.e. quadrants 1 and 3.
 
-        :return: borefield depth
+        It uses the methodology developed by (Monzo et al., 2016) [#Monzo]_ and adapted by (Peere et al., 2021) [#PeereBS]_.
+        The concept of borefield quadrants is developped by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]_.
+
+        Returns
+        -------
+        H : float
+            Required borehole depth [m]
+
+        References
+        ----------
+        .. [#Monzo] Monzo, P., M. Bernier, J. Acuna, and P. Mogensen. (2016). A monthly based bore field sizing methodology with applications to optimum borehole spacing. ASHRAE Transactions 122, 111–126.
+        .. [#PeereBS] Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. (2021) Validated combined first and last year borefield sizing methodology. In Proceedings of International Building Simulation Conference 2021. Brugge (Belgium), 1-3 September 2021. https://doi.org/10.26868/25222708.2021.30180
+        .. [#PeereThesis] Peere, W. (2020) Methode voor economische optimalisatie van geothermische verwarmings- en koelsystemen. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
         """
 
         # initiate iteration
@@ -778,9 +822,9 @@ class Borefield:
             gfunc_uniform_T = self.gfunction(time_steps, self.H)
 
             # calculate the thermal resistances
-            Rpm = (gfunc_uniform_T[2] - gfunc_uniform_T[1]) / (2 * pi * self.k_s)
-            Rcm = (gfunc_uniform_T[1] - gfunc_uniform_T[0]) / (2 * pi * self.k_s)
-            Rh = (gfunc_uniform_T[0]) / (2 * pi * self.k_s)
+            Rpm = (gfunc_uniform_T[2] - gfunc_uniform_T[1]) / (2 * pi * self.ground_data.k_s)
+            Rcm = (gfunc_uniform_T[1] - gfunc_uniform_T[0]) / (2 * pi * self.ground_data.k_s)
+            Rh = (gfunc_uniform_T[0]) / (2 * pi * self.ground_data.k_s)
 
             # calculate the total length
             L = (self.qh * self._Rb + self.qh * Rh + self.qm * Rcm + self.qpm * Rpm) / abs(self.Tf - self._Tg())
@@ -794,20 +838,37 @@ class Borefield:
                      L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None) -> None:
         """
         This function sets the options for the sizing function.
-        * The L2 sizing is the one explained in (Peere et al., 2021) and is the quickest method (it uses 3 pulses)
+        * The L2 sizing is the one explained in (Peere et al., 2021) [#PeereBS]_ and is the quickest method (it uses 3 pulses)
         * The L3 sizing is a more general approach which is slower but more accurate (it uses 24 pulses/year)
         * The L4 sizing is the most exact one, since it uses hourly data (8760 pulses/year)
 
-        :param H_init: initial depth of the borefield to start the iteration (m)
-        :param use_constant_Rb: true if a constant Rb* value should be used
-        :param use_constant_Tg: true if a constant Tg value should be used (the geothermal flux is neglected)
-        :param quadrant_sizing: differs from 0 when a sizing in a certain quadrant is desired
-        :param L2_sizing: true if a sizing with the L2 method is needed
-        :param L3_sizing: true if a sizing with the L3 method is needed
-	    :param L4_sizing: true if a sizing with the L4 method is needed
-        :return: None
-        """
+        Parameters
+        ----------
+        H_init : float
+            Initial depth of the borefield to start the iteration (m)
+        use_constant_Rb : bool
+            True if a constant borehole equivalen resistance (Rb*) value should be used
+        use_constant_Tg : bool
+            True if a constant Tg value should be used (the geothermal flux is neglected)
+        quadrant_sizing : int
+            Differs from 0 when a sizing in a certain quadrant is desired.
+            Quadrants are developed by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]
+        L2_sizing : bool
+            True if a sizing with the L2 method is needed
+        L3_sizing : bool
+            True if a sizing with the L3 method is needed
+        L4_sizing : bool
+            True if a sizing with the L4 method is needed
 
+        Returns
+        -------
+        None
+
+        References
+        ----------
+        .. [#PeereBS] Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. (2021) Validated combined first and last year borefield sizing methodology. In Proceedings of International Building Simulation Conference 2021. Brugge (Belgium), 1-3 September 2021. https://doi.org/10.26868/25222708.2021.30180
+        .. [#PeereThesis] Peere, W. (2020) Methode voor economische optimalisatie van geothermische verwarmings- en koelsystemen. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
+        """
         # check if just one sizing is given
         if np.sum([L2_sizing if L2_sizing is not None else 0, L3_sizing if L3_sizing is not None else 0, L4_sizing if L4_sizing is not None else 0]) > 1:
             raise ValueError("Please check if just one sizing method is chosen!")
@@ -837,8 +898,8 @@ class Borefield:
     def size(self, H_init: float = 100, use_constant_Rb: bool = None, use_constant_Tg: bool = None,
              L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None, quadrant_sizing: int = None) -> float:
         """
-        This function sizes the borefield. It lets the user chose between three sizing methods.
-        * The L2 sizing is the one explained in (Peere et al., 2021) and is the quickest method (it uses 3 pulses)
+        This function sets the options for the sizing function.
+        * The L2 sizing is the one explained in (Peere et al., 2021) [#PeereBS]_ and is the quickest method (it uses 3 pulses)
         * The L3 sizing is a more general approach which is slower but more accurate (it uses 24 pulses/year)
         * The L4 sizing is the most exact one, since it uses hourly data (8760 pulses/year)
 
@@ -846,14 +907,32 @@ class Borefield:
         (e.g. if you size by putting the constantTg param to True but it was False, if you plot the results afterwards
         the constantTg will be False again and your results will seem off!)
 
-        :param H_init: initial depth of the borefield to start the iteratation (m)
-        :param use_constant_Rb: true if a constant Rb* value should be used
-        :param use_constant_Tg: true if a constant Tg value should be used (the geothermal flux is neglected)
-        :param L2_sizing: true if a sizing with the L2 method is needed
-        :param L3_sizing: true if a sizing with the L3 method is needed
-        :param L4_sizing: true if a sizing with the L4 method is needed
-        :param quadrant_sizing: differs from 0 when a sizing in a certain quadrant is desired
-        :return: borefield depth
+        Parameters
+        ----------
+        H_init : float
+            Initial depth of the borefield to start the iteration (m)
+        use_constant_Rb : bool
+            True if a constant borehole equivalen resistance (Rb*) value should be used
+        use_constant_Tg : bool
+            True if a constant Tg value should be used (the geothermal flux is neglected)
+        quadrant_sizing : int
+            Differs from 0 when a sizing in a certain quadrant is desired.
+            Quadrants are developed by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]
+        L2_sizing : bool
+            True if a sizing with the L2 method is needed
+        L3_sizing : bool
+            True if a sizing with the L3 method is needed
+        L4_sizing : bool
+            True if a sizing with the L4 method is needed
+
+        Returns
+        -------
+        None
+
+        References
+        ----------
+        .. [#PeereBS] Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. (2021) Validated combined first and last year borefield sizing methodology. In Proceedings of International Building Simulation Conference 2021. Brugge (Belgium), 1-3 September 2021. https://doi.org/10.26868/25222708.2021.30180
+        .. [#PeereThesis] Peere, W. (2020) Methode voor economische optimalisatie van geothermische verwarmings- en koelsystemen. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
         """
         # make backup of initial parameter states
         backup = (self.H_init, self.use_constant_Rb, self.use_constant_Tg, self.L2_sizing, self.L3_sizing, self.L4_sizing, self.quadrant_sizing)
@@ -903,7 +982,7 @@ class Borefield:
         def size_quadrant2():
             self._calculate_last_year_params(False)  # calculate parameters
             self.qa = self.qa
-            return self._Bernier  # size
+            return self._Ahmadfard  # size
 
         def size_quadrant3():
             self._calculate_first_year_params(True)  # calculate parameters
@@ -912,7 +991,7 @@ class Borefield:
         def size_quadrant4():
             self._calculate_last_year_params(True)  # calculate parameters
             self.qa = self.qa
-            return self._Bernier  # size
+            return self._Ahmadfard  # size
 
         if quadrant_sizing != 0:
             # size according to a specific quadrant
@@ -1444,7 +1523,7 @@ class Borefield:
             results = convolve(monthly_loads_array * 1000, g_value_differences)[:len(monthly_loads_array)]
 
             # calculation the borehole wall temperature for every month i
-            Tb = results / (2 * pi * self.k_s) / (H * self.number_of_boreholes) + self._Tg(H)
+            Tb = results / (2 * pi * self.ground_data.k_s) / (H * self.number_of_boreholes) + self._Tg(H)
 
             self.Tb = Tb
             # now the Tf will be calculated based on
@@ -1456,9 +1535,9 @@ class Borefield:
 
             # extra summation if the g-function value for the peak is included
             results_peak_cooling = results_month_cooling + np.tile(self.peak_cooling - self.monthly_load_cooling, self.simulation_period) * 1000 \
-                                     * (g_value_peak[0] / self.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / H
+                                     * (g_value_peak[0] / self.ground_data.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / H
             results_peak_heating = results_month_heating - np.tile(self.peak_heating - self.monthly_load_heating, self.simulation_period) * 1000 \
-                                   * (g_value_peak[0] / self.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / H
+                                   * (g_value_peak[0] / self.ground_data.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / H
 
             # save temperatures under variable
             self.results_peak_heating = results_peak_heating
@@ -1488,7 +1567,7 @@ class Borefield:
             results = convolve(hourly_load * 1000, g_value_differences)[:len(hourly_load)]
 
             # calculation the borehole wall temperature for every month i
-            Tb = results / (2 * pi * self.k_s) / (H * self.number_of_boreholes) + self._Tg(H)
+            Tb = results / (2 * pi * self.ground_data.k_s) / (H * self.number_of_boreholes) + self._Tg(H)
 
             self.Tb = Tb
             # now the Tf will be calculated based on
@@ -1551,7 +1630,7 @@ class Borefield:
 
                 time_value_new = _timeValues(t_max=time_value[-1])
                 # Calculate the g-function for uniform borehole wall temperature
-                gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.alpha, time_value_new,
+                gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.ground_data.alpha, time_value_new,
                                                          options=self.options_pygfunction).gFunc
 
                 # return interpolated values
@@ -1559,13 +1638,13 @@ class Borefield:
 
             # check if there are double values
             if not isinstance(time_value, (float, int)) and len(time_value_np) != len(np.unique(np.asarray(time_value))):
-                gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.alpha, np.unique(time_value_np),
+                gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.ground_data.alpha, np.unique(time_value_np),
                                                          options=self.options_pygfunction).gFunc
 
                 return np.interp(time_value, np.unique(time_value_np), gfunc_uniform_T)
 
             # Calculate the g-function for uniform borehole wall temperature
-            gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.alpha, time_value_np,
+            gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.ground_data.alpha, time_value_np,
                                                      options=self.options_pygfunction).gFunc
 
             return gfunc_uniform_T
@@ -1659,7 +1738,7 @@ class Borefield:
             for borehole in self.borefield:
                 borehole.H = H
 
-            gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.alpha,
+            gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.ground_data.alpha,
                                                      time_array, options=options, method=options["method"])
 
             data["Data"][H] = gfunc_uniform_T.gFunc
@@ -1702,7 +1781,10 @@ class Borefield:
         """
         This function checks if there is correct hourly data available.
 
-        :return: True if the data is correct
+        Returns
+        -------
+        bool
+            True if the data is correct
         """
         # check whether there is data given
         if self.hourly_cooling_load is None or self.hourly_heating_load is None:
@@ -1718,7 +1800,7 @@ class Borefield:
 
         return True
 
-    def load_hourly_profile(self, file_path, header: bool = True, separator: str = ";",
+    def load_hourly_profile(self, file_path: str, header: bool = True, separator: str = ";",
                             first_column_heating: bool = True) -> None:
         """
         This function loads in an hourly load profile. It opens a csv and asks for the relevant column where the data
@@ -1727,13 +1809,21 @@ class Borefield:
         separator is the separator in the csv fileImport.
         the load should be provided in kW.
 
-        :param file_path: location of the hourly load file
-        :param header: true if the file contains a header
-        :param separator: symbol used in the file to separate columns
-        :param first_column_heating: true if the first column in the file is the column with heating loads
-        :return: None
-        """
+        Parameters
+        ----------
+        file_path : str
+            Path to the hourly load file
+        header : bool
+            True if this file contains a header row
+        separator : str
+            Symbol used in the file to seperate the columns
+        first_column_heating : bool
+            True if the first column in the file is for the heating load
 
+        Returns
+        -------
+        None
+        """
         if header:
             header: int = 0
         else:
@@ -2146,7 +2236,7 @@ class Borefield:
         """
 
         # calculate the pipe positions
-        pos = self._axis_symmetrical_pipe
+        pos = self.pipe_data._axis_symmetrical_pipe
 
         # set figure
         figure, axes = plt.subplots()
@@ -2156,11 +2246,11 @@ class Borefield:
         circles_inner = []
 
         # color inner circles and outer circles
-        for i in range(self.number_of_pipes):
-            circles_outer.append(plt.Circle(pos[i], self.r_out, color="black"))
-            circles_inner.append(plt.Circle(pos[i], self.r_in, color="red"))
-            circles_outer.append(plt.Circle(pos[i + self.number_of_pipes], self.r_out, color="black"))
-            circles_inner.append(plt.Circle(pos[i + self.number_of_pipes], self.r_in, color="blue"))
+        for i in range(self.pipe_data.number_of_pipes):
+            circles_outer.append(plt.Circle(pos[i], self.pipe_data.r_out, color="black"))
+            circles_inner.append(plt.Circle(pos[i], self.pipe_data.r_in, color="red"))
+            circles_outer.append(plt.Circle(pos[i + self.pipe_data.number_of_pipes], self.pipe_data.r_out, color="black"))
+            circles_inner.append(plt.Circle(pos[i + self.pipe_data.number_of_pipes], self.pipe_data.r_in, color="blue"))
 
         # set visual settings for figure
         axes.set_aspect('equal')
