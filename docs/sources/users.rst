@@ -33,7 +33,7 @@ Belgium
         +++
         Footer
 
-    .. grid-item-card:: Test
+    .. grid-item-card:: 
         :img-top: _logo's/The_SySi.png
         :text-align: center
 
