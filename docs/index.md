@@ -21,6 +21,7 @@ Please find below the content of this ReadTheDocs.
 self
 sources/cite
 sources/articles
+sources/users.rst
 sources/changelog
 sources/legal_notice
 ```

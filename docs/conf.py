@@ -20,8 +20,8 @@ import GHEtool
 # -- Project information -----------------------------------------------------
 
 project = 'GHEtool'
-copyright = '2022, Tobias Blanke & Wouter Peere'
-author = 'Tobias Blanke, Wouter Peere'
+copyright = '2022, Wouter Peere and Tobias Blanke'
+author = 'Wouter Peere and Tobias Blanke'
 
 # The full version, including alpha/beta/rc tags
 release = '2.1.0dev'
