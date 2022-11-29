@@ -1052,7 +1052,7 @@ class GuiStructure:
 
                 self.hourly_figure_temperature_profile = FigureOption(category=self.figure_temperature_profile,
                                                                       label="Hourly profile",
-                                                                      param="plot_hourly",
+                                                                      param="hourly",
                                                                       default=0,
                                                                       entries=["No", "Yes"],
                                                                       entries_values=[False, True])

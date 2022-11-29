@@ -1,3 +1,11 @@
+"""
+This file contains all the code for the borefield calculations.
+
+Notes
+-----
+In a future release, this file will be split into a Borefield class, a GeothermalSystem class and a HybridGeothermalSystem class.
+This will be done in v2.1.1.
+"""
 import numpy as np
 import pickle
 from scipy import interpolate
@@ -78,9 +86,55 @@ class Borefield:
                 'L2_sizing', 'L3_sizing', 'L4_sizing', 'quadrant_sizing', 'H_init', 'use_precalculated_data'
 
     def __init__(self, simulation_period: int = 20, peak_heating: list = None,
-                 peak_cooling: list = None, baseload_heating: list = None, baseload_cooling: list = None, investement_cost: list = None,
-                 borefield=None, custom_gfunction=None, gui: bool = False):
-        """This function initiates the Borefield class"""
+                 peak_cooling: list = None, baseload_heating: list = None, baseload_cooling: list = None,
+                 borefield=None, custom_gfunction: str=None, gui: bool = False):
+        """
+
+        Parameters
+        ----------
+        simulation_period : int
+            Simulation period in years
+        peak_heating : list, numpy array
+            Monthly peak heating values [kW]
+        peak_cooling : list, numpy array
+            Monthly peak cooling values [kW]
+        baseload_heating : list, numpy array
+            Monthly baseload heating values [kWh]
+        baseload_cooling : list, numpy array
+            Monthly baseload heating values [kWh]
+        borefield : pygfunction borehole/borefield object
+            Set the borefield for which the calculations will be carried out
+        custom_gfunction : str
+            Path to the custom_gfunction file which will be loaded.
+        gui : bool
+            True if the Borefield object is created by the GUI. This should not be used in the code version
+            of GHEtool itself.
+
+        Examples
+        --------
+        monthly peak values [kW]
+        >>> peak_cooling = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])
+        >>> peak_heating = np.array([160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.])
+
+        annual heating and cooling load [kWh]
+        >>> annual_heating_load = 300 * 10 ** 3
+        >>> annual_cooling_load = 160 * 10 ** 3
+
+        percentage of annual load per month (15.5% for January ...)
+        >>> monthly_load_heating_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
+        >>> monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
+
+        resulting load per month [kWh]
+        >>> monthly_load_heating = annual_heating_load * monthly_load_heating_percentage   # kWh
+        >>> monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage   # kWh
+
+        create the borefield object
+        >>> borefield = Borefield(simulation_period=20,
+        >>>                      peak_heating=peak_heating,
+        >>>                      peak_cooling=peak_cooling,
+        >>>                      baseload_heating=monthly_load_heating,
+        >>>                      baseload_cooling=monthly_load_cooling)
+        """
 
         # initiate vars
         LIST_OF_ZEROS = np.zeros(12)
@@ -125,7 +179,9 @@ class Borefield:
 
         # initialize variables for temperature plotting
         self.results_peak_heating = np.array([])  # list with the minimum temperatures due to the peak heating
-        self.results_peak_cooling = np.array([]) # list with the maximum temperatures due to peak cooling
+        self.results_peak_cooling = np.array([])  # list with the maximum temperatures due to peak cooling
+        self.results_month_heating = np.array([])
+        self.results_month_cooling = np.array([])
         self.Tb = np.array([])  # list of borehole wall temperatures
 
         # initiate variables for optimal sizing
@@ -232,7 +288,6 @@ class Borefield:
 
         # set investment cost
         self.cost_investment: list = Borefield.DEFAULT_INVESTMENT
-        self.set_investment_cost(investement_cost)
 
         # set length of the peak
         self.set_length_peak()
@@ -241,7 +296,7 @@ class Borefield:
         self.borefield = borefield
 
         # set a custom g-function
-        self.custom_gfunction = custom_gfunction
+        self.load_custom_gfunction(custom_gfunction)
 
         # create plotlayout if gui
         if self.gui:
@@ -253,11 +308,25 @@ class Borefield:
         """
         This functions sets the number of boreholes based on the length of the borefield attribute.
 
-        :return None
+        Returns
+        -------
+        None
         """
         self.number_of_boreholes = len(self.borefield) if self.borefield is not None else 0
 
     def set_borefield(self, borefield=None) -> None:
+        """
+        This function set the borefield object.
+
+        Parameters
+        ----------
+        borefield : pygfunction.Boreholes object
+            Borefield created with the pygfunction package
+
+        Returns
+        -------
+        None
+        """
         if borefield is None:
             return
         self.borefield = borefield
@@ -322,14 +391,28 @@ class Borefield:
 
     @property
     def borefield(self):
+        """
+        Returns the hidden _borefield variable.
+
+        Returns
+        -------
+        Hidden _borefield object
+        """
         return self._borefield
 
     @borefield.setter
     def borefield(self, borefield=None) -> None:
         """
-        This function sets the borefield configuration. When no input, an empty array of length N_1 * N_2 will be made.
+        This function sets the borefield configuration. When no input is given, the borefield variable will be deleted.
 
-        :return None
+        Parameters
+        ----------
+        borefield : pygfunction.Boreholes object
+            Borefield created with the pygfunction package
+
+        Returns
+        -------
+        None
         """
         if borefield is None:
             del self.borefield
@@ -342,6 +425,14 @@ class Borefield:
 
     @borefield.deleter
     def borefield(self):
+        """
+        This function deletes the hidden _borefield object.
+        It also sets the number of boreholes to zero
+
+        Returns
+        -------
+        None
+        """
         self._borefield = None
         self._set_number_of_boreholes()
 
@@ -359,12 +450,20 @@ class Borefield:
         None
         """
 
-        # load data fileImport
-        data = pickle.load(open(location, "rb"))
-        self.custom_gfunction = data
+        if location is not None:
+            # load data fileImport
+            data = pickle.load(open(location, "rb"))
+            self.custom_gfunction = data
 
     @property
     def custom_gfunction(self):
+        """
+        This function returns the hidden _custom_gfunction variable.
+
+        Returns
+        -------
+        Hidden _custom_gfunction variable
+        """
         return self._custom_gfunction
 
     @custom_gfunction.setter
@@ -1450,7 +1549,7 @@ class Borefield:
                 # due to this many requested time values, the calculation will be slow.
                 # there will be interpolation
 
-                time_value_new = _timeValues(t_max = time_value[-1])
+                time_value_new = _timeValues(t_max=time_value[-1])
                 # Calculate the g-function for uniform borehole wall temperature
                 gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.alpha, time_value_new,
                                                          options=self.options_pygfunction).gFunc
