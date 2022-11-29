@@ -111,6 +111,7 @@ class Borefield:
 
         Examples
         --------
+
         monthly peak values [kW]
 
         >>> peak_cooling = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])
@@ -128,8 +129,8 @@ class Borefield:
 
         resulting load per month [kWh]
 
-        >>> monthly_load_heating = annual_heating_load * monthly_load_heating_percentage   # kWh
-        >>> monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage   # kWh
+        >>> monthly_load_heating = annual_heating_load * monthly_load_heating_percentage
+        >>> monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage
 
         create the borefield object
 

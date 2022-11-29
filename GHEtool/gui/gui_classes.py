@@ -1394,6 +1394,7 @@ class Hint:
             Category in which the Hint should be placed
         warning : bool
             True if the Hint should be shown
+
         Examples
         --------
         >>> hint_example = Hint(hint='This is a hint to something important.',
