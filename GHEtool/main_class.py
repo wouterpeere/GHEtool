@@ -1098,47 +1098,160 @@ class Borefield:
         :param hourly: if True, then the temperatures are calculated based on the hourly data
         :return: None
         """
-        self._calculate_temperature_profile(figure=False, H=depth, plot_hourly=hourly)
+        self._calculate_temperature_profile(H=depth, hourly=hourly)
 
-    def print_temperature_profile(self, legend: bool = True, plot_hourly: bool = False) -> None:
+    def print_temperature_profile(self, legend: bool = True, plot_hourly: bool = False, recalculate: bool = False) -> None:
         """
         This function plots the temperature profile for the calculated depth.
+        It uses the available temperature profile data.
 
-        :param legend: bool if True a legend is printed
-        :param plot_hourly: bool if True, then the temperature profile is calculated based on the hourly load
-        if there is any.
-        :return: None
+        Parameters
+        ----------
+        legend : bool
+            True if the legend should be printed
+        plot_hourly : bool
+            True if the temperature profile printed should be based on the hourly load profile.
+        recalculate : bool
+            True if the temperature profile should be calculated, regardless of this temperature profile
+            is already calculated.
+        Returns
+        -------
+        fig, ax
+            If the borefield object is part of the GUI, it returns the figure object
         """
 
-        # check for hourly data if this is requested
-        if plot_hourly:
-            self._check_hourly_load()
+        # check if the data should be recalculated or no correct temperature profile is available
+        if recalculate or not self._check_temperature_profile_available(plot_hourly):
+            self._calculate_temperature_profile(hourly=plot_hourly)
 
-        return self._calculate_temperature_profile(legend=legend, plot_hourly=plot_hourly)
+        return self._plot_temperature_profile(legend=legend, plot_hourly=plot_hourly)
 
-    def print_temperature_profile_fixed_depth(self, depth, legend: bool = True, plot_hourly: bool = False) -> None:
+    def print_temperature_profile_fixed_depth(self, depth: float, legend: bool = True, plot_hourly: bool = False,
+                                              recalculate: bool = False):
         """
         This function plots the temperature profile for a fixed depth.
+        It uses the already calculated temperature profile data, if available.
 
-        :param depth: depth for which the temperature profile is calculated for
-        :param legend: bool if True a legend is printed
-        :param plot_hourly: bool if True, then the temperature profile is calculated based on the hourly load
-        if there is any.
-        :return: None
+        Parameters
+        ----------
+        depth : float
+            Depth at which the temperature profile should be shown
+        legend : bool
+            True if the legend should be printed
+        plot_hourly : bool
+            True if the temperature profile printed should be based on the hourly load profile.
+        recalculate : bool
+            True if the temperature profile should be calculated, regardless of this temperature profile
+            is already calculated.
+        Returns
+        -------
+        fig, ax
+            If the borefield object is part of the GUI, it returns the figure object
         """
-        return self._calculate_temperature_profile(legend=legend, H=depth, plot_hourly=plot_hourly)
+        # check if the data should be recalculated or no correct temperature profile is available
+        # or the depth is different from the one already calculated
+        if recalculate or not self._check_temperature_profile_available(plot_hourly) or self.H != depth:
+            self._calculate_temperature_profile(H=depth, hourly=plot_hourly)
 
-    def _calculate_temperature_profile(self, legend: bool = True, H: float = None,
-                                       plot_hourly: bool = False, figure: bool = True) -> None:
+        return self._plot_temperature_profile(legend=legend, plot_hourly=plot_hourly)
+
+    def _check_temperature_profile_available(self, hourly: bool = True) -> bool:
+        """
+        This function checks whether or not the temperature profile is already calculated.
+
+        Parameters
+        ----------
+        hourly : bool
+            True if an hourly profile is wanted.
+
+        Returns
+        -------
+        bool
+            True if the needed temperatures are available
+        """
+
+        # always true if the borefield object is part of the GUI
+        if self.gui:
+            return True
+
+        if hourly and np.array_equal(self.results_peak_heating, self.results_peak_cooling)\
+                and self.results_peak_cooling.any():
+            # this equals whenever an hourly calculation has been preformed
+            return True
+
+        if self.results_month_heating.any():
+            return True
+
+        return False
+
+    def _plot_temperature_profile(self, legend: bool = True, plot_hourly: bool = False):
+        """
+        This function plots the temperature profile.
+        If the Borefield object exists as part of the GUI, than the figure is returned,
+        otherwise it is shown.
+
+        Parameters
+        ----------
+        legend : bool
+            True if the legend should be printed
+        plot_hourly : bool
+            True if the temperature profile printed should be based on the hourly load profile.
+
+        Returns
+        -------
+        fig, ax
+            If the borefield object is part of the GUI, it returns the figure object
+        """
+
+        # make a time array
+        if plot_hourly:
+            time_array = self.time_L4 / 12 / 3600 / 730
+        else:
+            time_array = self.time_L3_last_year / 12 / 730. / 3600.
+
+        plt.rc('figure')
+        fig = plt.figure()
+
+        ax1 = fig.add_subplot(111)
+        ax1.set_xlabel(r'Time (year)')
+        ax1.set_ylabel(r'Temperature ($^\circ C$)')
+
+        # plot Temperatures
+        ax1.step(time_array, self.Tb, 'k-', where="pre", lw=1.5, label="Tb")
+
+        if plot_hourly:
+            ax1.step(time_array, self.results_peak_cooling, 'b-', where="pre", lw=1, label='Tf')
+        else:
+            ax1.step(time_array, self.results_peak_cooling, 'b-', where="pre", lw=1.5, label='Tf peak cooling')
+            ax1.step(time_array, self.results_peak_heating, 'r-', where="pre", lw=1.5, label='Tf peak heating')
+
+            ax1.step(time_array, self.results_month_cooling, color='b', linestyle="dashed", where="pre", lw=1.5,
+                     label='Tf base cooling')
+            ax1.step(time_array, self.results_month_heating, color='r', linestyle="dashed", where="pre", lw=1.5,
+                     label='Tf base heating')
+
+        # define temperature bounds
+        ax1.hlines(self.Tf_min, 0, self.simulation_period, colors='r', linestyles='dashed', label='', lw=1)
+        ax1.hlines(self.Tf_max, 0, self.simulation_period, colors='b', linestyles='dashed', label='', lw=1)
+        ax1.set_xticks(range(0, self.simulation_period + 1, 2))
+
+        # Plot legend
+        if legend:
+            ax1.legend()
+        ax1.set_xlim(left=0, right=self.simulation_period)
+
+        if not self.gui:
+            plt.show()
+            return
+        return fig, ax1
+
+    def _calculate_temperature_profile(self, H: float = None, hourly: bool = False) -> None:
         """
         This function calculates the temperature evolution in the using temporal superposition.
         It is possible to calculate this for a certain depth H, otherwise self.H will be used.
-        If Figure = True than a figure will be plotted.
 
-        :param legend: true if the legend should be shown
         :param H: depth of the borefield to evaluate the temperature profile
-        :param figure: true if a figure should be shown
-        :param plot_hourly: bool if True, then the temperature profile is calculated based on the hourly load
+        :param hourly: bool if True, then the temperature profile is calculated based on the hourly load
         if there is any.
         :return: None
         """
@@ -1153,7 +1266,7 @@ class Borefield:
 
         H = self.H if H is None else H
 
-        if not plot_hourly:
+        if not hourly:
             # making a numpy array of the monthly balance (self.monthly_load) for a period of self.simulation_period years
             # [kW]
             monthly_loads_array = np.tile(self.monthly_load, self.simulation_period)
@@ -1196,7 +1309,11 @@ class Borefield:
             self.results_month_cooling = results_month_cooling
             self.results_month_heating = results_month_heating
 
-        if plot_hourly:
+        if hourly:
+
+            # check for hourly data if this is requested
+            self._check_hourly_load()
+
             # making a numpy array of the monthly balance (self.monthly_load) for a period of self.simulation_period years
             # [kW]
             hourly_load = np.tile(self.hourly_cooling_load - self.hourly_heating_load, self.simulation_period)
@@ -1226,50 +1343,6 @@ class Borefield:
             self.results_peak_cooling = temperature_result
             self.results_month_cooling = np.array([])
             self.results_month_heating = np.array([])
-
-        # initiate figure
-        if figure:
-            # make a time array
-            if plot_hourly:
-                time_array = self.time_L4 / 12 / 3600 / 730
-            else:
-                time_array = self.time_L3_last_year / 12 / 730. / 3600.
-
-            plt.rc('figure')
-            fig = plt.figure()
-
-            ax1 = fig.add_subplot(111)
-            ax1.set_xlabel(r'Time (year)')
-            ax1.set_ylabel(r'Temperature ($^\circ C$)')
-
-            # plot Temperatures
-            ax1.step(time_array, Tb, 'k-', where="pre", lw=1.5, label="Tb")
-
-            if plot_hourly:
-                ax1.step(time_array, temperature_result, 'b-', where="pre", lw=1, label='Tf')
-            else:
-                ax1.step(time_array, results_peak_cooling, 'b-', where="pre", lw=1.5, label='Tf peak cooling')
-                ax1.step(time_array, results_peak_heating, 'r-', where="pre", lw=1.5, label='Tf peak heating')
-
-                ax1.step(time_array, results_month_cooling, color='b', linestyle="dashed", where="pre", lw=1.5,
-                         label='Tf base cooling')
-                ax1.step(time_array, results_month_heating, color='r', linestyle="dashed", where="pre", lw=1.5,
-                         label='Tf base heating')
-
-            # define temperature bounds
-            ax1.hlines(self.Tf_min, 0, self.simulation_period, colors='r', linestyles='dashed', label='', lw=1)
-            ax1.hlines(self.Tf_max, 0, self.simulation_period, colors='b', linestyles='dashed', label='', lw=1)
-            ax1.set_xticks(range(0, self.simulation_period + 1, 2))
-
-            # Plot legend
-            if legend:
-                ax1.legend()
-            ax1.set_xlim(left=0, right=self.simulation_period)
-
-            if not self.gui:
-                plt.show()
-                return
-            return fig, ax1
 
     def set_options_gfunction_calculation(self, options: dict) -> None:
         """
@@ -1644,7 +1717,7 @@ class Borefield:
             self.convert_hourly_to_monthly(peak_cool_load, peak_heat_load)
 
             # calculate temperature profile, just for the results
-            self._calculate_temperature_profile(legend=False, H=depth, figure=False)
+            self.calculate_temperatures(depth=depth)
 
             # deviation from minimum temperature
             if abs(min(self.results_peak_heating) - self.Tf_min) > 0.05:
@@ -1713,7 +1786,7 @@ class Borefield:
                   int(max(self.hourly_cooling_load)) - int(peak_cool_load), "kW.")
 
             # plot results
-            self._calculate_temperature_profile(H=depth)
+            self.print_temperature_profile_fixed_depth(depth=depth)
 
     @property
     def _percentage_heating(self) -> float:
