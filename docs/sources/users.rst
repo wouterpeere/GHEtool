@@ -24,7 +24,6 @@ Belgium
         .. figure:: _logo's/Sweco.png
 
     .. grid-item-card::  Thermal Systems Simulation Research Group (The SySi's)
-
         :img-bottom: _logo's/The_SySi.png
 
         Test
