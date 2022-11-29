@@ -10,7 +10,7 @@ Belgium
 ------------------
 
 .. grid:: 1 2 3 3
-    :margin: 0 50 0 0
+    :margin: 0 5 0 0
 
     .. grid-item-card::  Boydens Engineering - part of sweco
         :img-top: _logo's/boydens_engineering.jpg
@@ -35,6 +35,7 @@ Belgium
 
     .. grid-item-card:: Test
         :img-top: _logo's/The_SySi.png
+        :text-align: center
 
         +++
         Thermal Systems Simulation Research Group (The SySi's)
