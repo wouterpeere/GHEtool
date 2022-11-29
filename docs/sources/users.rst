@@ -10,34 +10,30 @@ Belgium
 ------------------
 
 .. grid:: 1 2 3 3
-    :margin: 0 5 0 0
+    :gutter: 2
 
     .. grid-item-card:: 
         :img-top: _logo's/boydens_engineering.jpg
         :text-align: center
 
-        +++
         Boydens Engineering - part of sweco
 
     .. grid-item-card:: 
         :img-top: _logo's/KULeuven.png
         :text-align: center
 
-        +++
         KU Leuven
         
     .. grid-item-card:: 
         :img-top: _logo's/Sweco.png
         :text-align: center
 
-        +++
         Sweco Belgium
 
     .. grid-item-card:: 
         :img-top: _logo's/The_SySi.png
         :text-align: center
 
-        +++
         Thermal Systems Simulation Research Group (The SySi's)
 
 
