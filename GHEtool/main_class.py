@@ -262,6 +262,64 @@ class Borefield:
             return
         self.borefield = borefield
 
+    def create_rectangular_borefield(self, N_1: int, N_2: int, B_1: int, B_2: int, H: float, D: float = 1, r_b: float = 0.075):
+        """
+        This function creates a rectangular borefield.
+        It calls the pygfunction module in the background.
+        The documentation of this function is based on pygfunction.
+
+        Parameters
+        ----------
+        N_1 : int
+            Number of boreholes in the x direction
+        N_2 : int
+            Number of boreholes in the y direction
+        B_1 : int
+            Distance between adjacent boreholes in the x direction [m]
+        B_2 : int
+            Distance between adjacent boreholes in the y direction [m]
+        H : float
+            Borehole depth [m]
+        D : float
+            Borehole buried depth [m]
+        r_b : float
+            Borehole radius [m]
+
+        Returns
+        -------
+        pygfunction borefield object
+        """
+        borefield = gt.boreholes.rectangle_field(N_1, N_2, B_1, B_2, H, D, r_b)
+        self.set_borefield(borefield)
+        return borefield
+
+    def create_circular_borefield(self, N: int, R: float, H: float, D: float = 1, r_b: float = 0.075):
+        """
+        This function creates a circular borefield.
+        It calls the pygfunction module in the background.
+        The documentation of this function is based on pygfunction.
+
+        Parameters
+        ----------
+        N : int
+            Number of boreholes in the borefield
+        R : float
+            Distance of boreholes from the center of the field
+        H : float
+            Borehole depth [m]
+        D : float
+            Borehole buried depth [m]
+        r_b : float
+            Borehole radius [m]
+
+        Returns
+        -------
+        pygfunction borefield object
+        """
+        borefield = gt.boreholes.circle_field(N, R, H, D, r_b)
+        self.set_borefield(borefield)
+        return borefield
+
     @property
     def borefield(self):
         return self._borefield

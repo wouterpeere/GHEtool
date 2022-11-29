@@ -84,7 +84,6 @@ To get started with GHEtool, one needs to create a Borefield object. This is don
 
 ```Python
 from GHEtool import Borefield, GroundData
-import pygfunction as gt
 ```
 
 After importing the necessary classes, one sets all the relevant ground data and borehole equivalent resistance.
@@ -94,12 +93,6 @@ data = GroundData(3,   # ground thermal conductivity (W/mK)
                   10,  # initial/undisturbed ground temperature (deg C)
                   0.2, # borehole equivalent resistance (mK/W)
                   2.4*10**6) # volumetric heat capacity of the ground (J/m3K) 
-```
-
-Using pygfunction, a borefield object is created.
-
-```Python
-borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 1, 0.075) 
 ```
 
 Furthermore, one needs to set the peak and monthly baseload for both heating and cooling.
@@ -124,11 +117,24 @@ borefield = Borefield(simulation_period=20,
 
 borefield.set_ground_parameters(data)
 
-borefield.set_borefield(borefield_gt)
-
 # set temperature boundaries
 borefield.set_max_ground_temperature(16)  # maximum temperature
 borefield.set_min_ground_temperature(0)  # minimum temperature
+```
+
+```Python
+# set a rectangular borefield
+borefield.create_rectangular_borefield(10, 12, 6, 6, 110, 4, 0.075)
+```
+
+Note that the a borefield can also be set using the pygfunction package.
+
+```Python
+import pygfunction as gt
+
+# set a rectangular borefield
+borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 1, 0.075) 
+borefield.set_borefield(borefield_gt)
 ```
 
 Once a Borefield object is created, one can make use of all the functionalities of GHEtool. One can for example size the borefield using:

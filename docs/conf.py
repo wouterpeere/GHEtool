@@ -46,6 +46,7 @@ extensions = [
     'sphinx_rtd_theme',
     'sphinx.ext.imgmath',
     'sphinx.ext.autodoc',
+    'sphinx_panels',
     'numpydoc'
 ]
 

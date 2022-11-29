@@ -12,17 +12,14 @@ import pygfunction as gt
 # initiate ground data
 data = GroundData(3, 10, 0.2)
 
-# initiate pygfunction borefield model
-borefield_gt = gt.boreholes.rectangle_field(10, 10, 6, 6, 110, 1, 0.075)
-
 # initiate borefield
 borefield = Borefield()
 
 # set ground data in borefield
 borefield.set_ground_parameters(data)
 
-# set pygfunction borefield
-borefield.set_borefield(borefield_gt)
+# set borefield
+borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 1, 0.075)
 
 # load the hourly profile
 borefield.load_hourly_profile("Hourly_Profile.csv", header=True, separator=";", first_column_heating=True)

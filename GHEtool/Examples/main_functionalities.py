@@ -10,15 +10,12 @@ This file contains all the main functionalities of GHEtool being:
 # import all the relevant functions
 from GHEtool import Borefield, GroundData, FluidData, PipeData
 import numpy as np
-import pygfunction as gt
 
 # relevant _borefield data for the calculations
 data = GroundData(3,             # conductivity of the soil (W/mK)
                   10,            # Ground temperature at infinity (degrees C)
                   0.2,           # equivalent borehole resistance (K/W)
                   2.4 * 10**6)   # ground volumetric heat capacity (J/m3K)
-
-borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
 
 # monthly loading values
 peak_cooling = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak cooling in kW
@@ -44,7 +41,7 @@ borefield = Borefield(simulation_period=20,
                       baseload_cooling=monthly_load_cooling)
 
 borefield.set_ground_parameters(data)
-borefield.set_borefield(borefield_gt)
+borefield.create_rectangular_borefield(10, 12, 6, 6, 110, 4, 0.075)
 
 # set temperature boundaries
 borefield.set_max_ground_temperature(16)   # maximum temperature
