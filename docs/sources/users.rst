@@ -10,31 +10,29 @@ Belgium
 ------------------
 
 .. grid:: 1 2 3 3
-    :gutter: 2
+    :gutter: 3
+    :margin: 2
 
-    .. grid-item-card:: 
-        :img-top: _logo's/boydens_engineering.jpg
+    .. grid-item-card:: Boydens Engineering - part of sweco
         :text-align: center
 
-        Boydens Engineering - part of sweco
+        .. figure:: _logo's/boydens_engineering.jpg
+ 
 
-    .. grid-item-card:: 
+    .. grid-item-card:: KU Leuven
         :img-top: _logo's/KULeuven.png
         :text-align: center
 
-        KU Leuven
         
-    .. grid-item-card:: 
+    .. grid-item-card:: Sweco Belgium
         :img-top: _logo's/Sweco.png
         :text-align: center
 
-        Sweco Belgium
 
-    .. grid-item-card:: 
+    .. grid-item-card:: Thermal Systems Simulation Research Group (The SySi's)
         :img-top: _logo's/The_SySi.png
         :text-align: center
 
-        Thermal Systems Simulation Research Group (The SySi's)
 
 
 ------------------
@@ -42,6 +40,8 @@ Germany
 ------------------
 
 .. grid:: 1 2 3 3
+    :gutter: 3
+    :margin: 2
 
     .. grid-item-card:: 
         :img-top: _logo's/FHAachen.png
