@@ -12,26 +12,26 @@ Belgium
 .. grid:: 1 2 3 3
     :margin: 0 5 0 0
 
-    .. grid-item-card::  Boydens Engineering - part of sweco
+    .. grid-item-card:: 
         :img-top: _logo's/boydens_engineering.jpg
         :text-align: center
 
         +++
-        Footer
+        Boydens Engineering - part of sweco
 
-    .. grid-item-card::  KU Leuven
+    .. grid-item-card:: 
         :img-top: _logo's/KULeuven.png
         :text-align: center
 
         +++
-        Footer
+        KU Leuven
         
-    .. grid-item-card::  Sweco Belgium
+    .. grid-item-card:: 
         :img-top: _logo's/Sweco.png
         :text-align: center
 
         +++
-        Footer
+        Sweco Belgium
 
     .. grid-item-card:: 
         :img-top: _logo's/The_SySi.png
@@ -47,6 +47,9 @@ Germany
 
 .. grid:: 1 2 3 3
 
-    .. grid-item-card::  Solar-Institute Jülich         
+    .. grid-item-card:: 
         :img-top: _logo's/FHAachen.png
         :text-align: center
+
+        +++
+        Solar-Institute Jülich
