@@ -9,23 +9,25 @@ If you want your institution to be on this list, please do contact us, via woute
 Belgium
 ------------------
 
-.. grid:: 1 2 3 
+.. grid:: 1 2 3 4 
 
     .. grid-item-card::  Boydens Engineering - part of sweco
 
-        :img-bottom: _logo's/boydens_engineering.jpg
+        .. figure:: _logo's/boydens_engineering.jpg
 
     .. grid-item-card::  KU Leuven
 
-        :img-bottom: _logo's/KULeuven.png
+        .. figure:: _logo's/KULeuven.png
         
     .. grid-item-card::  Sweco Belgium
 
-        .:img-bottom: _logo's/Sweco.png
+        .. figure:: _logo's/Sweco.png
 
     .. grid-item-card::  Thermal Systems Simulation Research Group (The SySi's)
 
-        :img-bottom: _logo's/The_SySi.png   
+        :img-bottom: _logo's/The_SySi.png
+
+        Test
 
 ------------------
 Germany
