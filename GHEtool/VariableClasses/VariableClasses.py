@@ -44,8 +44,17 @@ class GroundData:
         This function gives back the ground temperature
         When use_constant_Tg is False, the thermal heat flux is taken into account.
 
-        :param H: depth of the field (optional)
-        :return: ground temperature
+        Parameters
+        ----------
+        H : float
+            Depth at which the temperature should be calculated [m]
+        use_constant_Tg : bool
+            True if a constant ground temperature should be used
+
+        Returns
+        -------
+        Tg : float
+            Ground temperature [deg C]
         """
         if use_constant_Tg:
             return self.Tg
@@ -162,7 +171,11 @@ class PipeData:
         """
         This function gives back the coordinates of the pipes in an axis-symmetrical pipe.
 
-        :return: list of coordinates of the pipes in the borehole"""
+        Returns
+        -------
+        Positions : list
+            List of coordinates tuples of the pipes in the borehole
+        """
         dt: float = pi / float(self.number_of_pipes)
         pos: list = [(0., 0.)] * 2 * self.number_of_pipes
         for i in range(self.number_of_pipes):
@@ -177,7 +190,7 @@ class PipeData:
         Returns
         -------
         R_p : float
-            The pipe thermal resistance [K/mW]
+            The pipe thermal resistance [mK/W]
         """
         self.R_p: float = gt.pipes.conduction_thermal_resistance_circular_pipe(self.r_in, self.r_out, self.k_p)
 

@@ -133,6 +133,7 @@ class Borefield:
         >>>                      peak_cooling=peak_cooling,
         >>>                      baseload_heating=monthly_load_heating,
         >>>                      baseload_cooling=monthly_load_cooling)
+
         """
 
         # initiate vars
@@ -838,8 +839,11 @@ class Borefield:
                      L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None) -> None:
         """
         This function sets the options for the sizing function.
+
         * The L2 sizing is the one explained in (Peere et al., 2021) [#PeereBS]_ and is the quickest method (it uses 3 pulses)
+
         * The L3 sizing is a more general approach which is slower but more accurate (it uses 24 pulses/year)
+
         * The L4 sizing is the most exact one, since it uses hourly data (8760 pulses/year)
 
         Parameters
@@ -847,12 +851,12 @@ class Borefield:
         H_init : float
             Initial depth of the borefield to start the iteration (m)
         use_constant_Rb : bool
-            True if a constant borehole equivalen resistance (Rb*) value should be used
+            True if a constant borehole equivalent resistance (Rb*) value should be used
         use_constant_Tg : bool
             True if a constant Tg value should be used (the geothermal flux is neglected)
         quadrant_sizing : int
             Differs from 0 when a sizing in a certain quadrant is desired.
-            Quadrants are developed by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]
+            Quadrants are developed by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]_
         L2_sizing : bool
             True if a sizing with the L2 method is needed
         L3_sizing : bool
@@ -899,8 +903,11 @@ class Borefield:
              L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None, quadrant_sizing: int = None) -> float:
         """
         This function sets the options for the sizing function.
+
         * The L2 sizing is the one explained in (Peere et al., 2021) [#PeereBS]_ and is the quickest method (it uses 3 pulses)
+
         * The L3 sizing is a more general approach which is slower but more accurate (it uses 24 pulses/year)
+
         * The L4 sizing is the most exact one, since it uses hourly data (8760 pulses/year)
 
         Please note that the changes sizing setup changes here are not saved! Use self.setupSizing for this.
@@ -912,12 +919,12 @@ class Borefield:
         H_init : float
             Initial depth of the borefield to start the iteration (m)
         use_constant_Rb : bool
-            True if a constant borehole equivalen resistance (Rb*) value should be used
+            True if a constant borehole equivalent resistance (Rb*) value should be used
         use_constant_Tg : bool
             True if a constant Tg value should be used (the geothermal flux is neglected)
         quadrant_sizing : int
             Differs from 0 when a sizing in a certain quadrant is desired.
-            Quadrants are developed by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]
+            Quadrants are developed by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]_
         L2_sizing : bool
             True if a sizing with the L2 method is needed
         L3_sizing : bool
