@@ -756,7 +756,7 @@ class Borefield:
         This function sizes the field based on the last year of operation, i.e. quadrants 2 and 4.
 
         It uses the methodology developed by (Ahmadfard and Bernier, 2019) [#Ahmadfard2019]_.
-        The concept of borefield quadrants is developped by (Peere et al., 2020) [#PeereBS]_, [#PeereThesis]_.
+        The concept of borefield quadrants is developped by (Peere et al., 2020) [#PeereBS]_ [#PeereThesis]_.
 
         Returns
         -------
@@ -1805,11 +1805,7 @@ class Borefield:
     def load_hourly_profile(self, file_path: str, header: bool = True, separator: str = ";",
                             first_column_heating: bool = True) -> None:
         """
-        This function loads in an hourly load profile. It opens a csv and asks for the relevant column where the data
-        is in. first_column_heating is true if the first column in the datafile is for the heating values.
-        header is true if there is a header in the csv fileImport.
-        separator is the separator in the csv fileImport.
-        the load should be provided in kW.
+        This function loads in an hourly load profile [kW].
 
         Parameters
         ----------

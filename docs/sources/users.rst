@@ -20,20 +20,19 @@ Belgium
  
 
     .. grid-item-card:: KU Leuven
-        :img-top: _logo's/KULeuven.png
         :text-align: center
 
+        .. figure:: _logo's/KULeuven.png
         
     .. grid-item-card:: Sweco Belgium
-        :img-top: _logo's/Sweco.png
         :text-align: center
 
+        .. figure:: _logo's/Sweco.png
 
     .. grid-item-card:: Thermal Systems Simulation Research Group (The SySi's)
-        :img-top: _logo's/The_SySi.png
         :text-align: center
 
-
+        .. figure:: _logo's/The_SySi.png
 
 ------------------
 Germany
@@ -43,9 +42,9 @@ Germany
     :gutter: 3
     :margin: 2
 
-    .. grid-item-card:: 
-        :img-top: _logo's/FHAachen.png
+    .. grid-item-card:: Solar-Institute Jülich
         :text-align: center
 
-        +++
-        Solar-Institute Jülich
+        .. figure:: _logo's/FHAachen.png
+
+       
