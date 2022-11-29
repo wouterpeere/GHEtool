@@ -7,4 +7,4 @@ pygfunction>=2.2.1
 PySide6==6.3.1
 scipy>=1.8.1
 numpydoc >= 1.2.0
-sphinx-panels >= 0.6.0
+sphinx_design >= 0.3.0
