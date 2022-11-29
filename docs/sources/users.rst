@@ -9,7 +9,7 @@ If you want your institution to be on this list, please do contact us, via woute
 Belgium
 ------------------
 
-.. grid:: 1 2 3 3
+.. grid:: 3 3 3 3
     :gutter: 3
     :margin: 2
 
@@ -38,7 +38,7 @@ Belgium
 Germany
 ------------------
 
-.. grid:: 1 2 3 3
+.. grid:: 3 3 3 3
     :gutter: 3
     :margin: 2
 
