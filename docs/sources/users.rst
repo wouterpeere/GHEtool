@@ -10,22 +10,22 @@ Belgium
 ------------------
 
 .. grid:: 1 2 3 3
+    :margin: 0 5 0 0
 
     .. grid-item-card::  Boydens Engineering - part of sweco
         :img-top: _logo's/boydens_engineering.jpg
-
+        :text-align: center
 
     .. grid-item-card::  KU Leuven
         :img-top: _logo's/KULeuven.png
-
+        :text-align: center
         
     .. grid-item-card::  Sweco Belgium
         :img-top: _logo's/Sweco.png
-
+        :text-align: center
 
     .. grid-item-card::  Thermal Systems Simulation Research Group (The SySi's)
         :img-top: _logo's/The_SySi.png
-        :text-align: center
 
 
 ------------------
@@ -34,8 +34,6 @@ Germany
 
 .. grid:: 1 2
 
-    .. grid-item:: 
-        FH Aachen
-
-    .. grid-item::
-         Solar-Institute Jülich
+    .. grid-item-card::  Solar-Institute Jülich         
+        :img-top: _logo's/FHAachen.png
+        :text-align: center
