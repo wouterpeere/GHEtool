@@ -1,4 +1,4 @@
-# Main functionalities
+# Functionalities of GHEtool
 
 GHEtool has a couple of different functionalities, all centered around borefield sizing.
 In the examples listed below, one can find example code on how to use the different functionalities.

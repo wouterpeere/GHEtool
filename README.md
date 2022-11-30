@@ -147,25 +147,8 @@ borefield.print_temperature_profile(legend=True)
 A full list of functionalities is given below.
 
 ## Functionalities
-GHEtool offers functionalities of value to all different disciplines working with borefields. The features are available both in the code environment and in the GUI. These functions are listed in the table below, alongside with a link to an example document where one can find how these functionalities can be used.
-
-| Functionality | Example document |
-| --- | --- |
-| Sizing the borefield (i.e. calculating the required depth) for a given injection and extraction load for the borefield (three sizing methods are available). | [main_functionalities.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/main_functionalities.py) |
-| Calculating the temperature evolution of the ground for a given building load and borefield configuration | [main_functionalities.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/main_functionalities.py) |
-| Using dynamically calculated borehole thermal resistance (this is directly based on the code of pygfunction) | [sizing_with_Rb_calculation.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Validation/sizing_with_Rb_calculation.py) |
-| Optimising the load profile for a given heating and cooling load | [optimise_load_profile.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/optimise_load_profile.py)|
-| Importing heating and cooling loads from .csv and .xlsx files | [import_data.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/import_data.py) |
-| Using your custom borefield configuration | [custom_borefield_configuration.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/custom_borefield_configuration.py) |
-
-| Comparisons | Example document |
-| --- | --- |
-| Comparison of different sizing methods (L2, L3) for different random profiles| [sizing_method_comparison.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Validation/sizing_method_comparison.py) |
-| Comparison in calculation time and accuracy between using the precalculated gfunction data or not | [speed_comparison.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Validation/speed_comparison.py) |
-| Comparison of different sizing methods (L2, L3 and L4) for the same hourly profile | [sizing_method_comparison_L2_L3_L4.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/sizing_method_comparison_L2_L3_L4.py) |
-| Comparison in calculation time and accuracy between the simplified L2 sizing methodology and the more accurate L3 method. | [sizing_method_comparison.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Validation/sizing_method_comparison.py) |
-| Comparison of Rb* calculation between GHEtool and EED. | [validation_effective_borehole_thermal_resistance.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Validation/validation_effective_borehole_thermal_resistance.py) |
-
+GHEtool offers functionalities of value to all different disciplines working with borefields. The features are available both in the code environment and in the GUI.
+For more information about the functionalities of GHEtool, please visit the [ReadTheDocs](https://ghetool.readthedocs.org).
 ## License
 
 *GHEtool* is licensed under the terms of the 3-clause BSD-license.
