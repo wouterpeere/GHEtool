@@ -2239,6 +2239,22 @@ class Aim:
         self.list_options: List[Union[Option, Category, FunctionButton]] = []
         page.upper_frame.append(self)
 
+    def set_text(self, name: str) -> None:
+        """
+        This function sets the label text.
+
+        Parameters
+        ----------
+        name : str
+            Label name of the object
+
+        Returns
+        -------
+        None
+        """
+        self.label = name
+        self.widget.setText(name)
+
     def change_event(self, function_to_be_called: Callable, *args) -> None:
         """
         This function calls the function_to_be_called whenever the Aim is changed.

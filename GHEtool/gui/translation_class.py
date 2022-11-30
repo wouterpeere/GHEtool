@@ -145,36 +145,34 @@ class Translations:
         "button_rename_scenario",
         "label_Language_Head",
         "label_aim_question",
-        "comboBox_AimList",
-        "label_data_file",
+        "category_select_file",
         "label_Filename_2",
-        "label_dataColumn_2",
-        "label_HeatingLoadLine_2",
-        "label_CoolingLoadLine_2",
-        "label_combined_2",
-        "label_DataUnit_2",
-        "label_Scenario_Head",
-        "checkBox_AutoSaving",
-        "label_Scenario_Hint",
-        "label_Borehole_Resistance_Head",
-        "label_Rb_calculation_method",
-        "comboBox_Rb_methodList",
-        "label_fluid_data",
-        "label_fluid_lambda",
-        "label_fluid_mass_flow_rate",
-        "label_fluid_density",
-        "label_fluid_thermal_capacity",
-        "label_fluid_viscosity",
-        "label_pipe_data",
-        "label_NumberOfPipes",
-        "label_grout_conductivity",
-        "label_pipe_conductivity",
-        "label_pipe_outer_radius",
-        "label_pipe_inner_radius",
-        "label_borehole_radius",
-        "label_pipe_distance",
-        "label_pipe_roughness",
-        "label_borehole_burial_depth",
+        "category_th_demand",
+        "option_heating_column",
+        "option_cooling_column",
+        "option_single_column",
+        "option_unit_data",
+        "category_save_scenario",
+        "option_toggle_buttons",
+        "option_auto_saving",
+        "hint_saving",
+        "category_constant_rb",
+        "category_fluid_data",
+        "option_fluid_conductivity",
+        "option_fluid_mass_flow",
+        "option_fluid_density",
+        "option_fluid_capacity",
+        "option_fluid_viscosity",
+        "category_pipe_data",
+        "option_pipe_number",
+        "option_pipe_grout_conductivity",
+        "option_pipe_conductivity",
+        "option_pipe_outer_radius",
+        "option_pipe_inner_radius",
+        "option_pipe_borehole_radius",
+        "option_pipe_distance",
+        "option_pipe_roughness",
+        "option_pipe_depth",
         "label_ResOptimizeLoad1",
         "label_ResOptimizeLoad2",
         "label_ResOptimizeLoad3",
@@ -185,6 +183,16 @@ class Translations:
         "pushButton_start_single",
         "NotCalculated",
         "NoSolution",
+        "aim_temp_profile",
+        "aim_req_depth",
+        "aim_size_length",
+        "aim_optimize",
+        "category_calculation",
+        "option_method_size_depth",
+        "option_method_size_length",
+        "option_method_temp_gradient",
+        "option_method_rb_calc",
+        "category_earth",
         "languages",
     )
 
@@ -478,13 +486,13 @@ class Translations:
             "Período de simulación [anos]: ",
         ]
         self.option_constant_rb: List[str] = [
-            "Equivalent borehole resistance [mK/W]: ",
+            "Equivalent borehole resistance (e.g. from TRT) [mK/W]: ",
             "Äquivalenter Bohrlochwiderstand [mK/W]: ",
             "Equivalente boorgatweerstand [mK/W]: ",
             "Resistenza equivalente del foro [mK/W]: ",
             "Résistance équivalente du trou de forage [mK/W]: ",
             "Resistencia del pozo equivalente [mK/W]: ",
-            "Resistencia do pozo equivalente [mK/W]: ",
+            "Resistencia do pozo equivalente [mK/W]:",
         ]
         self.label_next: List[str] = ["next", "nächstes", "volgende", "successivo", "suivant", "siguiente", "seguinte"]
         self.label_previous: List[str] = ["previous", "vorheriges", "vorige", "precedente", "précédente", "anterior", "anterior"]
@@ -1092,23 +1100,14 @@ class Translations:
             "What is the purpose of the simulation?",
             "What is the purpose of the simulation?",
         ]
-        self.comboBox_AimList: List[str] = [
-            "['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile']",
-            "['Bestimme Temperaturprofil', 'Bestimme notwendige Tiefe', 'Dimensioniere Bohrfeld nach Länge und Breite', 'Optimiere Lastprofil']",
-            "['Bepaal temperatuursprofiel', 'Bepaal de benodigde diepte', 'Dimensioneer boorveld bij lengte en breedte', 'Optimaliseer belastingsprofiel']",
-            "['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile']",
-            "['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile']",
-            "['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile']",
-            "['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile']",
-        ]
-        self.label_data_file: List[str] = [
-            "Select data fileImport",
+        self.category_select_file: List[str] = [
+            "Select data file",
             "Wähle Datendatei",
             "Selecteer data fileImport",
-            "Select data fileImport",
-            "Select data fileImport",
-            "Select data fileImport",
-            "Select data fileImport",
+            "Select data file",
+            "Select data file",
+            "Select data file",
+            "Select data file",
         ]
         self.label_Filename_2: List[str] = [
             "Filename: ",
@@ -1119,16 +1118,16 @@ class Translations:
             "Nombre de archivo: ",
             "Nome de ficheiro: ",
         ]
-        self.label_dataColumn_2: List[str] = [
-            "Thermal demands: ",
-            "Thermische Lasten: ",
-            "Thermische vraag: ",
-            "Richieste termiche: ",
-            "Demande thermique: ",
-            "Cargas térmicas: ",
-            "Cargas térmicas: ",
+        self.category_th_demand: List[str] = [
+            "Thermal demands",
+            "Thermische Lasten",
+            "Thermische vraag",
+            "Richieste termiche",
+            "Demande thermique",
+            "Cargas térmicas",
+            "Cargas térmicas",
         ]
-        self.label_HeatingLoadLine_2: List[str] = [
+        self.option_heating_column: List[str] = [
             "Heating load line: ",
             "Heizlastspalte: ",
             "Belastingslijn verwarming: ",
@@ -1137,7 +1136,7 @@ class Translations:
             "Línea de carga de calefacción: ",
             "Liña de carga de calefacción: ",
         ]
-        self.label_CoolingLoadLine_2: List[str] = [
+        self.option_cooling_column: List[str] = [
             "Cooling load line: ",
             "Kühllastspalte: ",
             "Belastingslijn koeling: ",
@@ -1146,16 +1145,16 @@ class Translations:
             "Línea de carga de refrigeración: ",
             "Liña de carga de refrixeración: ",
         ]
-        self.label_combined_2: List[str] = [
+        self.option_single_column: List[str] = [
             "Load line: ",
-            "Load line: ",
+            "Lastspalte: ",
             "Belastingslijn: ",
             "Linea di carico: ",
             "Ligne de charge: ",
             "Línea de carga: ",
             "Liña de carga: ",
         ]
-        self.label_DataUnit_2: List[str] = [
+        self.option_unit_data: List[str] = [
             "Unit data: ",
             "Dateneinheit: ",
             "Eenheid data: ",
@@ -1164,25 +1163,34 @@ class Translations:
             "Datos de unidad: ",
             "Datos de unidade: ",
         ]
-        self.label_Scenario_Head: List[str] = [
-            "Scenario saving settings",
-            "Szenarioeinstellungen für das Speichern",
+        self.category_save_scenario: List[str] = [
+            "Scenario settings",
+            "Szenarioeinstellungen",
             "Instellingen opslaan scenario",
             "Scenario saving settings",
             "Scenario saving settings",
             "Scenario saving settings",
             "Scenario saving settings",
         ]
-        self.checkBox_AutoSaving: List[str] = [
-            "Automatic saving",
-            "Automatisches speichern",
-            "Automatisch opslaan",
-            "Automatic saving",
-            "Automatic saving",
-            "Automatic saving",
-            "Automatic saving",
+        self.option_toggle_buttons: List[str] = [
+            "Use toggle buttons?:, no , yes ",
+            "Umschalterbutton?:, no , yes ",
+            "Toggle buttons?:, no , yes ",
+            "Toggle buttons?:, no , yes ",
+            "Toggle buttons?:, no , yes ",
+            "Toggle buttons?:, no , yes ",
+            "Toggle buttons?:, no , yes ",
         ]
-        self.label_Scenario_Hint: List[str] = [
+        self.option_auto_saving: List[str] = [
+            "Use automatic saving?, no , yes ",
+            "Automatisches speichern nutzen?, Nein, Ja ",
+            "Automatisch opslaan, no , yes ",
+            "Automatic saving, no , yes ",
+            "Automatic saving, no , yes ",
+            "Automatic saving, no , yes ",
+            "Automatic saving, no , yes ",
+        ]
+        self.hint_saving: List[str] = [
             "If Auto saving is selected the scenario will automatically saved if a scenario is changed. Otherwise the scenario has to be saved with the Update scenario button in the upper left corner if the changes should not be lost.",
             "Wenn Automatisch speichern ausgewählt ist, wird das Szenario automatisch gespeichert, wenn ein Szenario geändert wird. Andernfalls muss das Szenario mit der Schaltfläche Szenario aktualisieren in der oberen linken Ecke gespeichert werden, wenn die Änderungen nicht verloren gehen sollen.",
             'Als auto-opslaan is geselecteerd, zal het scenario automatisch worden opgeslagen alshet wordt gewijzigd. Anders kan het scenario opgeslagen worden als op de "update scenario"-kopwordt gedrukt als deze niet verloren mogen gaan.',
@@ -1191,35 +1199,17 @@ class Translations:
             "If Auto saving is selected the scenario will automatically saved if a scenario is changed. Otherwise the scenario has to be saved with the Update scenario button in the upper left corner if the changes should not be lost.",
             "If Auto saving is selected the scenario will automatically saved if a scenario is changed. Otherwise the scenario has to be saved with the Update scenario button in the upper left corner if the changes should not be lost.",
         ]
-        self.label_Borehole_Resistance_Head: List[str] = [
-            "Equivalent borehole resistance",
-            "Equivalänter Bohrlochwiderstand",
+        self.category_constant_rb: List[str] = [
+            "Constant equivalent borehole resistance",
+            "Konstanter equivalänter Bohrlochwiderstand",
             "Equivalente boorgatweerstand",
             "Equivalent borehole resistance",
             "Equivalent borehole resistance",
             "Equivalent borehole resistance",
             "Equivalent borehole resistance",
         ]
-        self.label_Rb_calculation_method: List[str] = [
-            "Calculation method:",
-            "Berechnungsmethode:",
-            "Berekeningsmethode:",
-            "Calculation method:",
-            "Calculation method:",
-            "Calculation method:",
-            "Calculation method:",
-        ]
-        self.comboBox_Rb_methodList: List[str] = [
-            "['Known constant value', 'Unknown constant value', 'During calculation updating value']",
-            "['Bekannter konstanter Wert', 'Unbekannter konstanter Wert', 'Während der Berechnung aktualisierender Wert']",
-            "['Constante waarde (gegeven)', 'Constante waarde (berekend)', 'Dynamische waarde']",
-            "['Known constant value', 'Unknown constant value', 'During calculation updating value']",
-            "['Known constant value', 'Unknown constant value', 'During calculation updating value']",
-            "['Known constant value', 'Unknown constant value', 'During calculation updating value']",
-            "['Known constant value', 'Unknown constant value', 'During calculation updating value']",
-        ]
-        self.label_fluid_data: List[str] = ["Fluid data", "Fluiddaten", "Fluidumdata", "Fluid data", "Fluid data", "Fluid data", "Fluid data"]
-        self.label_fluid_lambda: List[str] = [
+        self.category_fluid_data: List[str] = ["Fluid data", "Fluiddaten", "Fluidumdata", "Fluid data", "Fluid data", "Fluid data", "Fluid data"]
+        self.option_fluid_conductivity: List[str] = [
             "Thermal conductivity [W/mK]: ",
             "Wärmeleitfähigkeit [W/mK]: ",
             "Thermische conductiviteit [W/mK]: ",
@@ -1228,7 +1218,7 @@ class Translations:
             "Thermal conductivity [W/mK]: ",
             "Thermal conductivity [W/mK]: ",
         ]
-        self.label_fluid_mass_flow_rate: List[str] = [
+        self.option_fluid_mass_flow: List[str] = [
             "Mass flow rate [kg/s]: ",
             "Massenstrom [kg/s]: ",
             "Massadebiet [kg/s]: ",
@@ -1237,7 +1227,7 @@ class Translations:
             "Mass flow rate [kg/s]: ",
             "Mass flow rate [kg/s]: ",
         ]
-        self.label_fluid_density: List[str] = [
+        self.option_fluid_density: List[str] = [
             "Density [kg/m³]:",
             "Dichte [kg/m³]:",
             "Dichtheid [kg/m³]:",
@@ -1246,7 +1236,7 @@ class Translations:
             "Density [kg/m³]:",
             "Density [kg/m³]:",
         ]
-        self.label_fluid_thermal_capacity: List[str] = [
+        self.option_fluid_capacity: List[str] = [
             "Thermal capacity [J/kg K]:",
             "Wärmekapazität [J/kg K]:",
             "Thermalisch warmtecapaciteit [J/kg K]:",
@@ -1255,7 +1245,7 @@ class Translations:
             "Thermal capacity [J/kg K]:",
             "Thermal capacity [J/kg K]:",
         ]
-        self.label_fluid_viscosity: List[str] = [
+        self.option_fluid_viscosity: List[str] = [
             "Dynamic viscosity [Pa s]:",
             "Dynamische Viskosität [Pa s]:",
             "Dynamische viscositeit [Pa s]:",
@@ -1264,8 +1254,8 @@ class Translations:
             "Dynamic viscosity [Pa s]:",
             "Dynamic viscosity [Pa s]:",
         ]
-        self.label_pipe_data: List[str] = ["Pipe data", "Rohrdaten", "Boorgatdata", "Pipe data", "Pipe data", "Pipe data", "Pipe data"]
-        self.label_NumberOfPipes: List[str] = [
+        self.category_pipe_data: List[str] = ["Pipe data", "Rohrdaten", "Boorgatdata", "Pipe data", "Pipe data", "Pipe data", "Pipe data"]
+        self.option_pipe_number: List[str] = [
             "Number of pipes [#]:",
             "Anzahl an Rohren [#]:",
             "Aantal U-buizen [#]:",
@@ -1274,7 +1264,7 @@ class Translations:
             "Number of pipes [#]:",
             "Number of pipes [#]:",
         ]
-        self.label_grout_conductivity: List[str] = [
+        self.option_pipe_grout_conductivity: List[str] = [
             "Grout thermal conductivity [W/mK]: ",
             "Wärmeleitfähigkeit der Füllung [W/mK]: ",
             "Thermische conductiviteit van de vulling [W/mK]: ",
@@ -1283,7 +1273,7 @@ class Translations:
             "Grout thermal conductivity [W/mK]: ",
             "Grout thermal conductivity [W/mK]: ",
         ]
-        self.label_pipe_conductivity: List[str] = [
+        self.option_pipe_conductivity: List[str] = [
             "Pipe thermal conductivity [W/mK]: ",
             "Wärmeleitfähigkeit der Rohre [W/mK]: ",
             "Thermische conductiviteit van de leiding [W/mK]: ",
@@ -1292,7 +1282,7 @@ class Translations:
             "Pipe thermal conductivity [W/mK]: ",
             "Pipe thermal conductivity [W/mK]: ",
         ]
-        self.label_pipe_outer_radius: List[str] = [
+        self.option_pipe_outer_radius: List[str] = [
             "Outer pipe radius [m]: ",
             "Äußerer Rohrradius [m]: ",
             "Straal buitenkant leiding [m]: ",
@@ -1301,7 +1291,7 @@ class Translations:
             "Outer pipe radius [m]: ",
             "Outer pipe radius [m]: ",
         ]
-        self.label_pipe_inner_radius: List[str] = [
+        self.option_pipe_inner_radius: List[str] = [
             "Inner pipe radius [m]: ",
             "Innerer Rohrradius [m]: ",
             "Straal binnenkant leiding [m]: ",
@@ -1310,7 +1300,7 @@ class Translations:
             "Inner pipe radius [m]: ",
             "Inner pipe radius [m]: ",
         ]
-        self.label_borehole_radius: List[str] = [
+        self.option_pipe_borehole_radius: List[str] = [
             "Borehole radius [m]:",
             "Bohrlochradius [m]:",
             "Boorgatstraal [m]:",
@@ -1319,7 +1309,7 @@ class Translations:
             "Borehole radius [m]:",
             "Borehole radius [m]:",
         ]
-        self.label_pipe_distance: List[str] = [
+        self.option_pipe_distance: List[str] = [
             "Distance of pipe until center [m]:",
             "Distanz zwischen Rohr und Mittelpunkt [m]:",
             "Afstand van de leiding tot het centrum van het boorgat [m]:",
@@ -1328,7 +1318,7 @@ class Translations:
             "Distance of pipe until center [m]:",
             "Distance of pipe until center [m]:",
         ]
-        self.label_pipe_roughness: List[str] = [
+        self.option_pipe_roughness: List[str] = [
             "Pipe roughness [m]:",
             "Rohrrauhigkeit [m]:",
             "Ruwheid leiding [m]:",
@@ -1337,7 +1327,7 @@ class Translations:
             "Pipe roughness [m]:",
             "Pipe roughness [m]:",
         ]
-        self.label_borehole_burial_depth: List[str] = [
+        self.option_pipe_depth: List[str] = [
             "Burial depth [m]:",
             "Vergrabungstiefe [m]:",
             "Begraven diepte [m]:",
@@ -1427,4 +1417,94 @@ class Translations:
             "No Solution found",
             "No Solution found",
             "No Solution found",
+        ]
+        self.aim_temp_profile: List[str] = [
+            "Determine temperature profile",
+            "Temperaturprofil berechnen",
+            "Determine temperature profile",
+            "Determine temperature profile",
+            "Determine temperature profile",
+            "Determine temperature profile",
+            "Determine temperature profile",
+        ]
+        self.aim_req_depth: List[str] = [
+            "Determine required depth",
+            "Notwendige Tiefe berechnen",
+            "Determine required depth",
+            "Determine required depth",
+            "Determine required depth",
+            "Determine required depth",
+            "Determine required depth",
+        ]
+        self.aim_size_length: List[str] = [
+            "Size by length and width",
+            "Bestimme Länge und Breite des Bohrfeldes",
+            "Size by length and width",
+            "Size by length and width",
+            "Size by length and width",
+            "Size by length and width",
+            "Size by length and width",
+        ]
+        self.aim_optimize: List[str] = [
+            "Optimize load profile",
+            "Optimiere Lastprofil",
+            "Optimize load profile",
+            "Optimize load profile",
+            "Optimize load profile",
+            "Optimize load profile",
+            "Optimize load profile",
+        ]
+        self.category_calculation: List[str] = [
+            "Calculation options",
+            "Berechnungsoptionen",
+            "Calculation options",
+            "Calculation options",
+            "Calculation options",
+            "Calculation options",
+            "Calculation options",
+        ]
+        self.option_method_size_depth: List[str] = [
+            "Method for size borehole depth:,  L2  ,  L3  ,  L4  ",
+            "Methode zur Bohrlochtiefendimensionierung:,  L2  ,  L3  ,  L4  ",
+            "Method for size borehole depth:,  L2  ,  L3  ,  L5  ",
+            "Method for size borehole depth:,  L2  ,  L3  ,  L5  ",
+            "Method for size borehole depth:,  L2  ,  L3  ,  L5  ",
+            "Method for size borehole depth:,  L2  ,  L3  ,  L5  ",
+            "Method for size borehole depth:,  L2  ,  L3  ,  L5  ",
+        ]
+        self.option_method_size_length: List[str] = [
+            "Method for size width and length:,  L2  ,  L3  ",
+            "Methode für Längen- und Breitendimensionierung:,  L2  ,  L3  ",
+            "Method for size width and length:,  L2  ,  L3  ",
+            "Method for size width and length:,  L2  ,  L3  ",
+            "Method for size width and length:,  L2  ,  L3  ",
+            "Method for size width and length:,  L2  ,  L3  ",
+            "Method for size width and length:,  L2  ,  L3  ",
+        ]
+        self.option_method_temp_gradient: List[str] = [
+            "Should a temperature gradient over depth be considered?:, no , yes ",
+            "Soll ein Temperaturgradient berücksichtigt werden?:, Nein , Ja ",
+            "Should a temperature gradient over depth be considered?:, no , yes ",
+            "Should a temperature gradient over depth be considered?:, no , yes ",
+            "Should a temperature gradient over depth be considered?:, no , yes ",
+            "Should a temperature gradient over depth be considered?:, no , yes ",
+            "Should a temperature gradient over depth be considered?:, no , yes ",
+        ]
+        self.option_method_rb_calc: List[str] = [
+            "Borehole resistance calculation method:, constant , dynamic ",
+            "Mehtode zur Bohrlochwiderstangsberechnung:, Konstant , Dynamisch ",
+            "Borehole resistance calculation method:, constant , dynamic ",
+            "Borehole resistance calculation method:, constant , dynamic ",
+            "Borehole resistance calculation method:, constant , dynamic ",
+            "Borehole resistance calculation method:, constant , dynamic ",
+            "Borehole resistance calculation method:, constant , dynamic ",
+        ]
+        self.category_earth: List[str] = [
+            "Earth properties",
+            "Erdeigenschaften",
+            "Earth properties",
+            "Earth properties",
+            "Earth properties",
+            "Earth properties",
+            "Earth properties",
         ]
