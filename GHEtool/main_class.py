@@ -2105,133 +2105,13 @@ class Borefield:
             return 3
         return 2
 
-    def size_by_length_and_width(self, H_max: float, L1: float, L2: float, B_min: float = 3.0,
-                                 B_max: float = 9.0, nb_of_options: int = 5) -> list:
-        """
-        Function to size the borefield by length and with. It returns a list of possible borefield sizes,
-        with increasing total length.
-
-        :param H_max: maximal borehole depth [m]
-        :param L1: maximal width of borehole field [m]
-        :param L2: maximal length of borehole field [m]
-        :param B_min: minimal borehole spacing [m]
-        :param B_max: maximal borehole spacing [m]
-        :param nb_of_options: number of options that should be returned.
-        :return: list of possible combinations (each combination is a tuple where the first two elements are the
-        number of boreholes in each direction, the third element the borehole spacing and the fourth element
-        the depth of the borefield and the last element is the total borefield length).
-        An Empty list is returned if no result is found
-        """
-
-        # set larger one of l_1 and l_2 to the width
-        max_width = max(L1, L2)
-        max_length = min(L1, L2)
-
-        # calculate max borefield size
-        N1_max = min(int(max_width / B_min), 20)
-        N2_max = min(int(max_length / B_min), 20)
-
-        # set depth to maximum depth
-        self.H = H_max
-
-        # calculate set of possible options
-        options = set([])
-        for N1 in range(1, N1_max + 1):
-            N2 = N1
-            while N2 <= N2_max:
-                # calculate possible spacings
-                B = min(max_width / N1, max_length / N2, B_max)
-
-                # iterate over all possible B's
-                for B in np.arange(B_min, B + 0.1, 0.5):
-                    # set borefield parameters
-                    self.B = B
-                    self._reset_for_sizing(N1, N2)
-                    self._calculate_temperature_profile(figure=False)
-                    if max(self.results_peak_cooling) < self.Tf_max and min(self.results_peak_heating) > self.Tf_min:
-                        options.add((N1, N2, B))
-
-                N2 += 1
-
-        # return empty list if options = {}
-        if options == set([]):
-            return []
-
-        # set result dictionary
-        results = {}
-
-        # size all options
-        for option in options:
-            self._reset_for_sizing(option[0], option[1])
-            self.B = option[2]
-            depth = self.size(H_init=100, L2_sizing=self.L2_sizing)
-
-            # save result in results dictionary with the total length as key
-            results[depth * self.number_of_boreholes] = (option[0], option[1], option[2], depth)
-
-        # get all the solutions
-        lengths = list(results.keys())
-        lengths.sort()
-        # reverse for descending order
-        lengths[::-1]
-
-        # cut to right length
-        lengths = lengths[0:nb_of_options]
-
-        return [results[i] for i in lengths]
-
-    def _reset_for_sizing(self, N_1: int, N_2: int) -> None:
-        """
-        Function to reset borehole
-
-        :param N_1: width of rectangular field (#)
-        :param N_2: length of rectangular field (#)
-        :return: None
-        """
-        # set number of boreholes
-        self.N_1, self.N_2 = N_1, N_2
-        # reset interpolation array
-        del self.custom_gfunction
-        # set number of boreholes because number of boreholes has changed
-        self._set_number_of_boreholes()
-
-    @staticmethod
-    def _calc_number_boreholes(n_min: int, N1_max: int, N2_max: int) -> list:
-        """
-        calculation for number of boreholes which is higher than n but minimal total number
-
-        :param n_min: minimal number of boreholes
-        :param N1_max: maximal width of rectangular field (#)
-        :param N2_max: maximal length of rectangular field (#)
-        :return: list of possible solutions
-        """
-        # set default result
-        res = [(20, 20)]
-        # set maximal number
-        max_val = 20 * 20
-        # loop over maximal number in width and length
-        for i in range(1, N1_max + 1):
-            for j in range(1, min(N2_max, i) + 1):
-                # determine current number
-                current_number: int = i * j
-                # save number of boreholes  and maximal value if is lower than current maximal value and higher than
-                # minimal value
-                if n_min <= current_number < max_val:
-                    res = [(i, j)]
-                    max_val = current_number
-                # also append combination if current number is equal to current maximal value
-                elif current_number == max_val:
-                    res.append((i, j))
-        # return list of possible solutions
-        return res
-
     def draw_borehole_internal(self) -> None:
         """
         This function draws the internal structure of a borehole.
         This means, it draws the pipes inside the borehole.
 
         Returns
-        ----------
+        -------
         None
         """
 

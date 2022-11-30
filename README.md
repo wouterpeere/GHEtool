@@ -161,7 +161,6 @@ GHEtool offers functionalities of value to all different disciplines working wit
 | Calculating the temperature evolution of the ground for a given building load and borefield configuration | [main_functionalities.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/main_functionalities.py) |
 | Using dynamically calculated borehole thermal resistance (this is directly based on the code of pygfunction) | [sizing_with_Rb_calculation.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Validation/sizing_with_Rb_calculation.py) |
 | Optimising the load profile for a given heating and cooling load | [optimise_load_profile.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/optimise_load_profile.py)|
-| Finding the optimal rectangular borefield configuration for a given heating and cooling load | [size_borefield_by_length_and_width.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/size_borefield_by_length_and_width.py) |
 | Importing heating and cooling loads from .csv and .xlsx files | [import_data.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/import_data.py) |
 | Using your custom borefield configuration | [custom_borefield_configuration.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/custom_borefield_configuration.py) |
 
