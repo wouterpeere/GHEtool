@@ -8,7 +8,7 @@
 [![Downloads](https://static.pepy.tech/personalized-badge/ghetool?period=week&units=international_system&left_color=black&right_color=orange&left_text=Downloads%20last%20week)](https://pepy.tech/project/ghetool)
 [![Read the Docs](https://readthedocs.org/projects/ghetool/badge/?version=stable)](https://ghetool.readthedocs.io/en/stable/)
 ## What is *GHEtool*?
-<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/GHEtool/gui/Icon.png" width="110" align="left">
+<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/sources/gui/_figure/Icon.png" width="110" align="left">
 
 GHEtool is a Python package that contains all the functionalities needed to deal with borefield design. It is developed for both researchers and practitioners.
 The core of this package is the automated sizing of borefield under different conditions. The sizing of a borefield is typically slow due to the high complexity of the mathematical background. Because this tool has a lot of precalculated data (cf. infra), GHEtool can size a borefield in the order of tenths of milliseconds. This sizing typically takes the order of minutes. Therefore, this tool is suited for being implemented in workflows where iterations are required.
@@ -21,8 +21,7 @@ This can be found on [GHEtool.readthedocs.io](GHEtool.readthedocs.io).
 GHEtool also comes with a *graphical user interface (GUI)*. This GUI is prebuilt as an exe-file (only for Windows platforms currently) because this provides access to all the functionalities without coding. A setup to install the GUI at the user-defined place is also implemented and available at [https://GHEtool.sysi.be](https://www.mech.kuleuven.be/en/tme/research/thermal_systems/tools/ghetool).
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/GHEtool/gui/GHEtool.PNG" width="600">
-  Screenshot of the GUI.
+<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/sources/gui/_figure/GHEtool.PNG" width="600">
 </p>
 
 ## Requirements
