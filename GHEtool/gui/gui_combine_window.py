@@ -35,7 +35,7 @@ from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
 from GHEtool.gui.gui_calculation_thread import (CalcProblem)
 from GHEtool.gui.gui_data_storage import DataStorage
 from GHEtool.gui.gui_base_class import UiGhetool
-from GHEtool.gui.gui_structure import * # GuiStructure, Option, FunctionButton,
+from GHEtool.gui.gui_structure import *  # GuiStructure, Option, FunctionButton,
 from GHEtool.gui.translation_class import Translations
 
 import matplotlib.pyplot as plt
@@ -725,10 +725,10 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         ds: DataStorage = self.list_ds[idx]
         # set values of selected Datastorage
         ds.set_values(self.gui_structure)
-        # activate checking for changed
-        self.checking: bool = True
         # refresh results if results page is selected
         self.gui_structure.page_result.button.click() if self.stackedWidget.currentWidget() == self.gui_structure.page_result.page else None
+        # activate checking for changed
+        self.checking: bool = True
 
     def check_values(self) -> bool:
         if not all(option.check_value() for option, _ in self.gui_structure.list_of_options):
@@ -999,7 +999,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                 text = borefield.__getattribute__(result_text_obj.var_name)  # currently only borefield
                 if callable(text):
                     text = getattr(borefield, result_text_obj.var_name)()
-                result_text_obj.set_text(text)
+                result_text_obj.set_text_value(text)
 
     def save_figure(self, result_figure) -> None:
         """

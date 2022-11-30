@@ -1,3 +1,7 @@
+"""
+This document contains all the code related to calculating the solution to the different
+aims in the GUI.
+"""
 from PySide6.QtCore import QThread as QtCore_QThread
 from PySide6.QtCore import Signal as QtCore_pyqtSignal
 
@@ -14,10 +18,16 @@ class CalcProblem(QtCore_QThread):
 
     def __init__(self, ds: DataStorage, idx: int, parent=None) -> None:
         """
-        initialize calculation class
-        :param ds: datastorage to perform calculation for
-        :param idx: index of current thread
-        :param parent: parent class
+        This function initialises the calculation class.
+
+        Parameters
+        ----------
+        ds : DataStorage
+            DataStorage object with all the date to perform the calculation for
+        idx : int
+            Index of the current calculation thread
+        parent :
+            Parent class of the calculation problem
         """
         super(CalcProblem, self).__init__(parent)  # init parent class
         # set datastorage and index
@@ -26,9 +36,16 @@ class CalcProblem(QtCore_QThread):
 
     def run(self) -> None:
         """
-        run calculations
-        :return: None
+        This function contains the actual code to run the different calculations.
+        For each aim in the GUI, a new if statement is used. Here, one can put all the code
+        needed to run the simulation/calculation with the all the functionalities of GHEtool.
+        This function should return the DataStorage as a signal.
+
+        Returns
+        -------
+        None
         """
+
         # import bore field class from GHEtool and not in start up to save time
         from GHEtool import Borefield
 
@@ -130,17 +147,17 @@ class CalcProblem(QtCore_QThread):
                 return
 
         ### Size borefield by length and width
-        if self.DS.aim_size_length:
-            try:
-                # To be implemented
-                # option_method_size_length
-                pass
-            except RuntimeError or ValueError:
-                # save bore field in Datastorage
-                self.DS.borefield = None
-                # return Datastorage as signal
-                self.any_signal.emit((self.DS, self.idx))
-                return
+        # if self.DS.aim_size_length:
+        #     try:
+        #         # To be implemented
+        #         # option_method_size_length
+        #         pass
+        #     except RuntimeError or ValueError:
+        #         # save bore field in Datastorage
+        #         self.DS.borefield = None
+        #         # return Datastorage as signal
+        #         self.any_signal.emit((self.DS, self.idx))
+        #         return
 
         ### Plot temperature profile
         if self.DS.aim_temp_profile:

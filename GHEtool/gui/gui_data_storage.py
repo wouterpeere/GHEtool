@@ -9,8 +9,46 @@ from GHEtool.gui.gui_classes import ListBox
 
 
 class DataStorage:
+    """
+    An instance of this class contains all the information available in the GuiStructure.
+    It also contains some extra information that is based on the direct inputs of the GuiStructure, given
+    in the attributes below.
+
+    Attributes
+    ----------
+    peakHeating : List
+        List with monthly peak heating values [kW]
+    peakCooling : List
+        List with monthly peak cooling values [kW]
+    monthlyLoadHeating : List
+        List with monthly heating load values [kWh]
+    monthlyLoadCooling : List
+        List with monthly cooling load values [kWh]
+    ground_data : GroundData
+        Ground data object based on multiple inputs in the GUI
+    fluid_data : FluidData
+        Fluid data object based on multiple inputs in the GUI
+    pipe_data : PipeData
+        Pipe data object based on multiple inputs in the GUI
+    borefield_pygfunction : pygfunction borefield object
+        Borefield object based on multiple inputs in the GUI
+    hourly_data : bool
+        True if hourly data should be used
+    """
 
     def __init__(self, gui_structure: GuiStructure):
+        """
+        This creates an instance of the DataStorage Class
+
+        Parameters
+        ----------
+        gui_structure : GuiStructure
+            GUI structure for which a data storage object should be created
+
+        Returns
+        -------
+        None
+        """
         for option, name in gui_structure.list_of_options:
             # for a listbox, not the value but the text is relevant
             if isinstance(option, ListBox):
@@ -49,24 +87,50 @@ class DataStorage:
                 self.option_temperature_profile_hourly == 1 and self.aim_temp_profile) or self.aim_optimize
 
     def _calculate_flux(self) -> float:
-        """ This function calculates the flux"""
+        """
+        This function calculates the geothermal flux.
+        This is calculated based on:
+
+        2 * temperature gradient * conductivity / 100
+
+        Returns
+        -------
+        Geothermal flux : float
+            Geothermal flux in [W/m2]
+        """
         return 2 * self.option_temp_gradient * self.option_conductivity / 100
 
-    def set_values(self, gui_structure: GuiStructure):
+    def set_values(self, gui_structure: GuiStructure) -> None:
+        """
+        This function sets the values in the gui_structure according to the one stored in this class.
+
+        Parameters
+        ----------
+        gui_structure : GuiStructure
+            Gui structure for which the values in this DataStorage class should be set
+
+        Returns
+        -------
+        None
+        """
         [aim.widget.setChecked(False) for aim, _ in gui_structure.list_of_aims]
         [aim.widget.click() for aim, name in gui_structure.list_of_aims if getattr(self, name)]
         [option.set_value(getattr(self, name)) for option, name in gui_structure.list_of_options if hasattr(self, name)]
         gui_structure.change_toggle_button()
 
-    def save(self):
-        data = pd.DataFrame([(name, getattr(self, name)) for name in self.__dict__])
-        data.to_csv('test.csv')
-
     def __eq__(self, other) -> bool:
         """
-        equality function to check if values are equal
-        :param other: to compare Datastorage
-        :return: boolean which is true if self has the same values as other
+        This function checks whether or not the current DataStorage object is equal to another one.
+
+        Parameters
+        ----------
+        other : DataStorage
+            Other data storage object to which the current one should be compared to
+
+        Returns
+        -------
+        bool
+            True if the current object has the same values as another object
         """
         # if not of same class return false
         if not isinstance(other, DataStorage):

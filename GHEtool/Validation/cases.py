@@ -73,8 +73,8 @@ def check_cases():
     NOTE: these values differ slightly from the values in the mentioned paper. This is due to the fact that GHEtool uses slightly different precalculated data.
     """
 
-    correct_answers_L2 = (56.64, 116.7, 66.97, 93.10)
-    correct_answers_L3 = (56.6, 118.17, 66.56, 93.22)
+    correct_answers_L2 = (56.75, 117.23, 66.94, 91.32)
+    correct_answers_L3 = (56.81, 118.82, 66.54, 91.4)
 
     for i in (1, 2, 3, 4):
         monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(i)
@@ -111,7 +111,7 @@ def check_custom_datafile():
 
     # create custom datafile
 
-    correct_answers = (56.64, 116.7, 66.97, 93.1)
+    correct_answers = (56.75, 117.23, 66.94, 91.32)
     li = [i for i in range(0, 12)]
     borefield = Borefield(simulation_period=20,
                           peak_heating=li,

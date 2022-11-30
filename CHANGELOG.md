@@ -1,9 +1,22 @@
-# GHEtool's Change Log
-All notable changes to this project will be documented in this file.
+# GHEtool's Change Log and future developments
+All notable changes to this project will be documented in this file including planned future developments.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [unreleased]
+## [2.1.2] - [expected] feb 2023
+
+### Added
+- Coaxial pipes
+- Variable temperature sizing (at least in the code version)
+- Reimplemented size by length and width
+
+## [2.1.1] - [expected] jan 2023
+
+### Changed
+- Created a new structure for the package, thereby splitting the main_py.file into more subclasses.
+- Create a class for the custom g-functions.
+
+## [2.1.0] - 2022-11-30
 
 ### Added
 - Documentation with ReadTheDocs
@@ -13,6 +26,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 - GUI workflow to be simpler
+- precalculated data is removed
+- general speed improvements
+
+### Removed
+- size by length and width for it is not compatible with the just-in-time calculation of the g-functions.
+
+
+## [2.0.6] - 2022-10-07
+
+### Added
+- new functionalities for g-function calculation (inherited from pygfunction) are implemented
+
+### Changed
+- just-in-time calculation of g-functions is included (and will be expanded later)
+- custom borefields can be way faster calculated
+
+### Fixed
+- Hyperlinks in PyPi should work now
+- Sizing by length and width had problems with temperatures below the minimum temperature
+
 
 ## [2.0.5] - 2022-08-31
 
@@ -34,8 +67,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Varia
 - New validation document for the effective thermal borehole resistance, comparison with EED
-
-
 
 ## [2.0.4] - 2022-08-17
 
