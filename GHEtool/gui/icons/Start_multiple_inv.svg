@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="200mm"
+   height="200mm"
+   viewBox="0 0 200 200"
+   version="1.1"
+   id="svg8"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="Start_multiple_inv.svg"
+   inkscape:export-filename="E:\scieboFH\PL2\GHEtool-main\GHEtool\pics\Start.png"
+   inkscape:export-xdpi="130"
+   inkscape:export-ydpi="130"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994948"
+     inkscape:cx="2.5253814"
+     inkscape:cy="438.91129"
+     inkscape:document-units="mm"
+     inkscape:current-layer="g835-5-4"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1027"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:pagecheckerboard="0" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g861"
+       transform="matrix(5.4285704,0,0,5.4285704,-681.76243,-782.3043)">
+      <g
+         id="g910"
+         transform="matrix(1.727273,0,0,1.727273,-91.211025,-105.47624)">
+        <g
+           id="g835"
+           transform="matrix(0.26315792,0,0,0.26315792,93.217112,106.86404)">
+          <ellipse
+             style="fill:#ffffff;fill-opacity:1;stroke:#54bceb;stroke-width:1.7359;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+             id="path857"
+             cx="144.0089"
+             cy="162.52977"
+             rx="16.632004"
+             ry="16.632051" />
+          <path
+             d="m 138.53208,152.74018 15.18709,9.78958 -15.18709,9.78959 z"
+             id="path847"
+             style="fill:#54bceb;fill-opacity:1;stroke:#54bceb;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+        </g>
+        <g
+           id="g835-5"
+           transform="matrix(0.26315792,0,0,0.26315792,103.34864,111.4693)">
+          <ellipse
+             style="fill:#ffffff;fill-opacity:1;stroke:#54bceb;stroke-width:1.7359;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+             id="path857-1"
+             cx="144.0089"
+             cy="162.52977"
+             rx="16.632004"
+             ry="16.632051" />
+          <path
+             d="m 138.53208,152.74018 15.18709,9.78958 -15.18709,9.78959 z"
+             id="path847-1"
+             style="fill:#54bceb;fill-opacity:1;stroke:#54bceb;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+        </g>
+        <g
+           id="g835-5-4"
+           transform="matrix(0.26315792,0,0,0.26315792,93.217063,117.91667)">
+          <ellipse
+             style="fill:#ffffff;fill-opacity:1;stroke:#54bceb;stroke-width:1.7359;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+             id="path857-1-6"
+             cx="144.0089"
+             cy="162.52977"
+             rx="16.632004"
+             ry="16.632051" />
+          <path
+             d="m 138.53208,152.74018 15.18709,9.78958 -15.18709,9.78959 z"
+             id="path847-1-4"
+             style="fill:#54bceb;fill-opacity:1;stroke:#54bceb;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

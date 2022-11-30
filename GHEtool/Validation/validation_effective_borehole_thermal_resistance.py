@@ -1,18 +1,29 @@
+"""
+This document contains the code to compare the equivalent borehole thermal resistance calculated with GHEtool
+(based on pygfunction) with the results from Earth Energy Designer. The differences can be explained by using other
+correlations and another assumption for the Nusselt number in the laminar regime.
+"""
+
 import math
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+
 from GHEtool import Borefield
 from GHEtool.VariableClasses import FluidData, PipeData, GroundData
+import pygfunction as gt
 
 # initiate parameters
-ground_data = GroundData(100, 6, 3, 10, 0.12, 10, 12, 2.4 * 10 ** 6)  # ground data with an inaccurate guess of 100m for the depth of the borefield
-pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, 0.075, 2, epsilon=1e-6)
+ground_data = GroundData(3, 10, 0.12)  # ground data with an inaccurate guess of 100m for the depth of the borefield
+borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 100, 1, 0.075)
+pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, number_of_pipes=2, epsilon=1e-6)
 
 # initiate borefield model
 borefield = Borefield()
 borefield.set_ground_parameters(ground_data)
 borefield.set_pipe_parameters(pipe_data)
+borefield.set_borefield(borefield_gt)
 
 # initialise variables
 R_fp = []

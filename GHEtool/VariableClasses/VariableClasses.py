@@ -1,34 +1,67 @@
+"""
+This document contains the variable classes for the ground data, fluid data and pipe data.
+"""
+
+import numpy as np
+from math import pi
+import pygfunction as gt
+
 
 class GroundData:
-    __slots__ = 'H', 'B', 'k_s', 'Tg', 'Rb', 'N_1', 'N_2', 'flux', 'volumetric_heat_capacity', 'alpha'
+    """
+    Contains information regarding the ground data of the borefield.
+    """
 
-    def __init__(self, h: float, b: float, k_s: float, T_g: float, R_b: float, n_1: int, n_2: int,
-                 volumetric_heat_capacity: float = 2.4 * 10**6, flux: float = 0.06) -> None:
-        """
-        Data for storage of ground data
+    __slots__ = 'k_s', 'Tg', 'Rb', 'flux', 'volumetric_heat_capacity', 'alpha'
 
-        :param h: Depth of boreholes [m]
-        :param b: Borehole spacing [m]
-        :param k_s: Ground thermal conductivity [W/m.K]
-        :param T_g: Surface ground temperature [deg C]
-        (this is equal to the ground temperature at infinity when no heat flux is given (default))
-        :param R_b: Equivalent borehole resistance [m K/W]
-        :param n_1: Width of rectangular field [#]
-        :param n_2: Length of rectangular field [#]
-        :param volumetric_heat_capacity: The volumetric heat capacity of the ground (J/m3K)
-        :param flux: the geothermal heat flux (W/m2)
-        :return: None
+    def __init__(self, k_s: float, T_g: float, R_b: float, volumetric_heat_capacity: float = 2.4 * 10**6, flux: float = 0.06):
         """
-        self.H = h  # m
-        self.B = b  # m
+
+        Parameters
+        ----------
+        k_s : float
+            Ground thermal conductivity [W/mK]
+        T_g : float
+            Surface ground temperature [deg C]
+            (this is equal to the ground temperature at infinity when no heat flux is given (default))
+        R_b : float
+            Equivalent borehole resistance [mK/W]
+        volumetric_heat_capacity : float
+            The volumetric heat capacity of the ground [J/m3K]
+        flux : float
+            The geothermal heat flux [W/m2]
+        """
+
         self.k_s = k_s  # W/mK
         self.Tg = T_g  # °C
         self.Rb = R_b  # mK/W
-        self.N_1 = n_1  # #
-        self.N_2 = n_2  # #
         self.volumetric_heat_capacity = volumetric_heat_capacity  # J/m3K
         self.alpha = self.k_s / self.volumetric_heat_capacity  # m2/s
         self.flux = flux  # W/m2
+
+    def calculate_Tg(self, H: float, use_constant_Tg: bool) -> float:
+        """
+        This function gives back the ground temperature
+        When use_constant_Tg is False, the thermal heat flux is taken into account.
+
+        Parameters
+        ----------
+        H : float
+            Depth at which the temperature should be calculated [m]
+        use_constant_Tg : bool
+            True if a constant ground temperature should be used
+
+        Returns
+        -------
+        Tg : float
+            Ground temperature [deg C]
+        """
+        if use_constant_Tg:
+            return self.Tg
+
+        # geothermal gradient is equal to the geothermal heat flux divided by the thermal conductivity
+        # avg ground temperature is (Tg + gradient + Tg) / 2
+        return self.Tg + H * self.flux / self.k_s / 2
 
     def __eq__(self, other):
         if not isinstance(other, GroundData):
@@ -40,26 +73,50 @@ class GroundData:
 
 
 class FluidData:
+    """
+    Contains information regarding the fluid data of the borefield.
+    """
 
-    __slots__ = 'k_f', 'rho', 'Cp', 'mu', 'mfr'
+    __slots__ = 'k_f', 'rho', 'Cp', 'mu', 'mfr', 'h_f', 'R_f'
 
-    def __init__(self, mfr: float, k_f: float, rho: float, Cp: float, mu: float) -> None:
-        """
-        Data for storage of ground data
-
-        :param mfr: Mass flow rate per borehole [kg/s]
-        :param k_f: Thermal Conductivity [W/mK]
-        :param rho: Density [kg/m3]
-        :param Cp: Thermal capacity [J/kgK]
-        :param mu: EDynamic viscosity [Pa/s]
-        :return: None
+    def __init__(self, mfr: float, k_f: float, rho: float, Cp: float, mu: float):
         """
 
+        Parameters
+        ----------
+        mfr : float
+            Mass flow rate per borehole [kg/s]
+        k_f : float
+            Thermal Conductivity of the fluid [W/mK]
+        rho : float
+            Density of the fluid [kg/m3]
+        Cp : float
+            Thermal capacity of the fluid [J/kgK]
+        mu : float
+            Dynamic viscosity of the fluid [Pa/s]
+        """
         self.k_f = k_f  # Thermal conductivity W/mK
         self.mfr = mfr  # Mass flow rate per borehole kg/s
         self.rho = rho  # Density kg/m3
         self.Cp = Cp    # Thermal capacity J/kgK
         self.mu = mu    # Dynamic viscosity Pa/s
+        self.h_f: float = 0.  # convective heat transfer coefficient
+        self.R_f: float = 0.  # fluid thermal resistance
+
+    def set_mass_flow_rate(self, mfr: float) -> None:
+        """
+        This function sets the mass flow rate per borehole.
+
+        Parameters
+        ----------
+        mfr : fluid
+            Mass flow rate per borehole [kg/s]
+
+        Returns
+        -------
+        None
+        """
+        self.mfr = mfr
 
     def __eq__(self, other):
         if not isinstance(other, FluidData):
@@ -71,24 +128,32 @@ class FluidData:
 
 
 class PipeData:
+    """
+    Contains information regarding the pipe data of the borefield.
+    """
 
-    __slots__ = 'r_in', 'r_out', 'k_p', 'D_s', 'r_b', 'number_of_pipes', 'epsilon', 'k_g', 'D'
+    __slots__ = 'r_in', 'r_out', 'k_p', 'D_s', 'number_of_pipes', 'epsilon', 'k_g', 'R_p', 'pos'
 
-    def __init__(self, k_g: float, r_in: float, r_out: float, k_p: float, D_s: float, r_b: float, number_of_pipes: int,
-                 epsilon: float = 1e-6, D: float = 4) -> None:
+    def __init__(self, k_g: float, r_in: float, r_out: float, k_p: float, D_s: float, number_of_pipes: int = 1,
+                 epsilon: float = 1e-6):
         """
-        Data for storage of ground data
 
-        :param k_g: Grout thermal conductivity [W/mK]
-        :param r_in: Inner pipe radius [m]
-        :param r_out: Outer pipe radius [m]
-        :param k_p: Pipe thermal conductivity [W/mK]
-        :param D_s: Distance of the pipe until center [m]
-        :param r_b: Borehole radius [m]
-        :param number_of_pipes: Number of pipes [#] (single U-tube: 1, double U-tube:2)
-        :param epsilon: Pipe roughness [m]
-        :param D: burrial depth [m]
-        :return: None
+        Parameters
+        ----------
+        k_g : float
+            Grout thermal conductivity [W/mK]
+        r_in : float
+            Inner pipe radius [m]
+        r_out : float
+            Outer pipe radius [m]
+        k_p : float
+            Pipe thermal conductivity [W/mK]
+        D_s : float
+            Distance of the pipe until center [m]
+        number_of_pipes : int
+            Number of pipes [#] (single U-tube: 1, double U-tube:2)
+        epsilon : float
+            Pipe roughness [m]
         """
 
         self.k_g = k_g                      # grout thermal conductivity W/mK
@@ -96,10 +161,38 @@ class PipeData:
         self.r_out = r_out                  # outer pipe radius m
         self.k_p = k_p                      # pipe thermal conductivity W/mK
         self.D_s = D_s                      # distance of pipe until center m
-        self.r_b = r_b                      # borehole radius m
         self.number_of_pipes = number_of_pipes  # number of pipes #
         self.epsilon = epsilon              # pipe roughness m
-        self.D = D                          # burial depth m
+        self.pos = self._axis_symmetrical_pipe  # position of the pipes
+        self.R_p: float = 0.
+
+    @property
+    def _axis_symmetrical_pipe(self) -> list:
+        """
+        This function gives back the coordinates of the pipes in an axis-symmetrical pipe.
+
+        Returns
+        -------
+        Positions : list
+            List of coordinates tuples of the pipes in the borehole
+        """
+        dt: float = pi / float(self.number_of_pipes)
+        pos: list = [(0., 0.)] * 2 * self.number_of_pipes
+        for i in range(self.number_of_pipes):
+            pos[i] = (self.D_s * np.cos(2.0 * i * dt + pi), self.D_s * np.sin(2.0 * i * dt + pi))
+            pos[i + self.number_of_pipes] = (self.D_s * np.cos(2.0 * i * dt + pi + dt), self.D_s * np.sin(2.0 * i * dt + pi + dt))
+        return pos
+
+    def calculate_pipe_thermal_resistance(self) -> None:
+        """
+        This function calculates and sets the pipe thermal resistance R_p.
+
+        Returns
+        -------
+        R_p : float
+            The pipe thermal resistance [mK/W]
+        """
+        self.R_p: float = gt.pipes.conduction_thermal_resistance_circular_pipe(self.r_in, self.r_out, self.k_p)
 
     def __eq__(self, other):
         if not isinstance(other, PipeData):
