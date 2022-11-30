@@ -416,11 +416,33 @@ class Borefield:
         self._borefield = None
         self._set_number_of_boreholes()
 
+    def _update_borefield_depth(self, H: float = None) -> None:
+        """
+        This function updates the borehole depth.
+
+        Parameters
+        ----------
+        H : float
+            Borehole depth.
+
+        Returns
+        -------
+        None
+        """
+        H = H if H is not None else self.H
+
+        if self._borefield[0].H == H:
+            # the borefield is already at the correct depth
+            return
+
+        for bor in self._borefield:
+            bor.H = H
+
     def load_custom_gfunction(self, location: str) -> None:
         """
         This function loads the custom gfunction.
 
-        Attributes
+        Parameters
         ----------
         location : str
             Path to the location of the custom gfunction file
@@ -1626,7 +1648,7 @@ class Borefield:
         """
         self.options_pygfunction = options
 
-    def gfunction(self, time_value: Union[list, float, np.ndarray], H: float) -> np.ndarray:
+    def gfunction(self, time_value: Union[list, float, np.ndarray], H: float = None) -> np.ndarray:
         """
         This function returns the gfunction value.
         It can do so by either calculating the gfunctions just-in-time or by interpolating from a
@@ -1637,7 +1659,8 @@ class Borefield:
         time_value : list, float, np.ndarray
             Time value(s) in seconds at which the gfunctions should be calculated
         H : float
-            Depth at which the gfunctions should be calculated
+            Depth [m] at which the gfunctions should be calculated.
+            If no depth is given, the current depth is taken.
 
         Returns
         -------
@@ -1654,8 +1677,14 @@ class Borefield:
             """
             This function calculates the gfunction just-in-time.
 
-            return: np.ndarray with gfunction values
+            Returns
+            -------
+            gvalues : np.ndarray
+                1D array with the gvalues for the requested time intervals
             """
+            # set the correct depth of the borefield
+            self._update_borefield_depth(H=H)
+
             time_value_np = np.array(time_value)
             if not isinstance(time_value, (float, int)) and len(time_value_np) > Borefield.DEFAULT_NUMBER_OF_TIMESTEPS:
                 # due to this many requested time values, the calculation will be slow.
