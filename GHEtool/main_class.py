@@ -1357,7 +1357,7 @@ class Borefield:
         recalculate : bool
             True if the temperature profile should be calculated, regardless of this temperature profile
             is already calculated.
-            
+
         Returns
         -------
         fig, ax
@@ -1414,16 +1414,12 @@ class Borefield:
             True if the needed temperatures are available
         """
 
-        # always true if the borefield object is part of the GUI
-        if self.gui:
-            return True
-
         if hourly and np.array_equal(self.results_peak_heating, self.results_peak_cooling)\
-                and self.results_peak_cooling.any():
+                and self.results_peak_cooling.any() and len(self.results_peak_cooling) == len(self.Tb):
             # this equals whenever an hourly calculation has been preformed
             return True
 
-        if self.results_month_heating.any():
+        if self.results_month_heating.any() and not hourly:
             return True
 
         return False

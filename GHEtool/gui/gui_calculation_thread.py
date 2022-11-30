@@ -147,17 +147,17 @@ class CalcProblem(QtCore_QThread):
                 return
 
         ### Size borefield by length and width
-        if self.DS.aim_size_length:
-            try:
-                # To be implemented
-                # option_method_size_length
-                pass
-            except RuntimeError or ValueError:
-                # save bore field in Datastorage
-                self.DS.borefield = None
-                # return Datastorage as signal
-                self.any_signal.emit((self.DS, self.idx))
-                return
+        # if self.DS.aim_size_length:
+        #     try:
+        #         # To be implemented
+        #         # option_method_size_length
+        #         pass
+        #     except RuntimeError or ValueError:
+        #         # save bore field in Datastorage
+        #         self.DS.borefield = None
+        #         # return Datastorage as signal
+        #         self.any_signal.emit((self.DS, self.idx))
+        #         return
 
         ### Plot temperature profile
         if self.DS.aim_temp_profile:

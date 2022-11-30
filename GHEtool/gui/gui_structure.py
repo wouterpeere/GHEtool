@@ -37,10 +37,11 @@ def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, 
     cooling_load_column : str
         Name of the column that has the cooling values
     combined : str
+        Name of the column that has both heating and cooling values
     sep : str
-        Character used for the seperation of values in the vile
+        Character used for the separation of values in the vile
     dec : str
-        Character used for decimal sperator in the file
+        Character used for decimal separator in the file
     fac : float
         A factor to convert the data to [kW]
     hourly : bool
@@ -163,7 +164,7 @@ class GuiStructure:
 
             self.aim_temp_profile = Aim(page=self.page_aim, label="Determine temperature profile", icon=":/icons/icons/Temp_Profile.svg")
             self.aim_req_depth = Aim(page=self.page_aim, label="Determine required depth", icon=":/icons/icons/Depth_determination.svg")
-            self.aim_size_length = Aim(page=self.page_aim, label="Size borefield by length and width", icon=":/icons/icons/Size_Length.svg")
+            # self.aim_size_length = Aim(page=self.page_aim, label="Size borefield by length and width", icon=":/icons/icons/Size_Length.svg")
             self.aim_optimize = Aim(page=self.page_aim, label="Optimize load profile", icon=":/icons/icons/Optimize_Profile.svg")
 
         def create_page_options():
@@ -190,7 +191,7 @@ class GuiStructure:
                     label="Should hourly data be used for the temperature profile?:", default_index=0,
                     entries=[" no ", " yes "], category=self.category_calculation)
                 # add dependencies
-                self.aim_size_length.add_link_2_show(self.option_method_size_length)
+                # self.aim_size_length.add_link_2_show(self.option_method_size_length)
                 self.aim_req_depth.add_link_2_show(self.option_method_size_depth)
                 self.aim_temp_profile.add_link_2_show(self.option_temperature_profile_hourly)
 
@@ -360,14 +361,14 @@ class GuiStructure:
                 self.aim_temp_profile.add_link_2_show(self.option_depth)
                 self.aim_optimize.add_link_2_show(self.option_depth)
 
-                self.aim_size_length.add_link_2_show(self.option_max_depth)
+                # self.aim_size_length.add_link_2_show(self.option_max_depth)
 
                 self.aim_temp_profile.add_link_2_show(self.option_spacing)
                 self.aim_req_depth.add_link_2_show(self.option_spacing)
                 self.aim_optimize.add_link_2_show(self.option_spacing)
 
-                self.aim_size_length.add_link_2_show(self.option_min_spacing)
-                self.aim_size_length.add_link_2_show(self.option_max_spacing)
+                # self.aim_size_length.add_link_2_show(self.option_min_spacing)
+                # self.aim_size_length.add_link_2_show(self.option_max_spacing)
 
                 self.aim_temp_profile.add_link_2_show(self.option_width)
                 self.aim_req_depth.add_link_2_show(self.option_width)
@@ -377,8 +378,8 @@ class GuiStructure:
                 self.aim_req_depth.add_link_2_show(self.option_length)
                 self.aim_optimize.add_link_2_show(self.option_length)
 
-                self.aim_size_length.add_link_2_show(self.option_max_width)
-                self.aim_size_length.add_link_2_show(self.option_max_length)
+                # self.aim_size_length.add_link_2_show(self.option_max_width)
+                # self.aim_size_length.add_link_2_show(self.option_max_length)
 
             def create_category_temperatures():
                 self.category_temperatures = Category(page=self.page_borehole, label="Temperature constraints and simulation period")
@@ -629,7 +630,7 @@ class GuiStructure:
                 self.aim_temp_profile.add_link_2_show(self.button_load_csv)
                 self.option_temperature_profile_hourly.add_link_2_show(self.button_load_csv, on_index=0)
                 self.aim_req_depth.add_link_2_show(self.button_load_csv)
-                self.aim_size_length.add_link_2_show(self.button_load_csv)
+                # self.aim_size_length.add_link_2_show(self.button_load_csv)
 
                 # add change events
                 self.option_seperator_csv.change_event(self.fun_update_combo_box_data_file)
@@ -944,7 +945,7 @@ class GuiStructure:
 
                 self.aim_temp_profile.add_link_2_show(self.category_th_demand)
                 self.aim_req_depth.add_link_2_show(self.category_th_demand)
-                self.aim_size_length.add_link_2_show(self.category_th_demand)
+                # self.aim_size_length.add_link_2_show(self.category_th_demand)
 
             # create categories
             create_category_select_datafile()
@@ -1052,7 +1053,7 @@ class GuiStructure:
 
                 self.hourly_figure_temperature_profile = FigureOption(category=self.figure_temperature_profile,
                                                                       label="Hourly profile",
-                                                                      param="hourly",
+                                                                      param="plot_hourly",
                                                                       default=0,
                                                                       entries=["No", "Yes"],
                                                                       entries_values=[False, True])
