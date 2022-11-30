@@ -30,7 +30,7 @@ def figure_1():
     # initiate borefield model
     borefield = Borefield()
     borefield.set_ground_parameters(ground_data)
-    borefield.create_rectangular_borefield(10, 10, 6, 6, 100)
+    borefield.create_rectangular_borefield(10, 10, 6, 6, 100, 4)
 
     # initiate depth array
     depth = 150
@@ -88,7 +88,7 @@ def figure_2():
     # initiate borefield model
     borefield = Borefield()
     borefield.set_ground_parameters(ground_data)
-    borefield.create_rectangular_borefield(10, 10, 6, 6, 100)
+    borefield.create_rectangular_borefield(10, 10, 6, 6, 100, 4)
 
     # initiate depth array
     depths = np.array([25, 50, 100, 150, 200])
@@ -166,7 +166,7 @@ def figure_3():
             borefield.set_ground_parameters(ground_data)
 
             # set borefield
-            borefield.create_rectangular_borefield(n1, n2, 7, 7, H)
+            borefield.create_rectangular_borefield(n1, n2, 7, 7, H, 4)
 
             # calculate gfunction
             gfunction = borefield.gfunction(borefield.time, H)
@@ -233,7 +233,7 @@ def figure_4():
             borefield.set_ground_parameters(ground_data)
 
             # set borefield
-            borefield.create_rectangular_borefield(config[0], config[1], 7, 7, 100)
+            borefield.create_rectangular_borefield(config[0], config[1], 7, 7, 100, 4)
 
             # calculate loads
             extra_load = imbalance / 12 * 10 ** 3  # kWh
@@ -305,7 +305,7 @@ def figure_5():
             borefield.set_ground_parameters(ground_data)
 
             # set borefield
-            borefield.create_rectangular_borefield(config[0], config[1], 7, 7, 100)
+            borefield.create_rectangular_borefield(config[0], config[1], 7, 7, 100, 4)
 
             # calculate loads
             extra_load = imbalance / 12 * 10 ** 3  # kWh
@@ -383,7 +383,7 @@ def figure_7():
             borefield.set_ground_parameters(ground_data)
 
             # set borefield
-            borefield.create_rectangular_borefield(config[0], config[1], 7, 7, 100)
+            borefield.create_rectangular_borefield(config[0], config[1], 7, 7, 100, 4)
 
             # calculate loads
             extra_load = imbalance / 12 * 10 ** 3  # kWh
@@ -473,8 +473,8 @@ def figure_8():
         borefield2.set_ground_parameters(ground_data2)
 
         # set borefields
-        borefield1.create_rectangular_borefield(config1[0], config1[1], 7, 7, 100)
-        borefield2.create_rectangular_borefield(config2[0], config2[1], 7, 7, 100)
+        borefield1.create_rectangular_borefield(config1[0], config1[1], 7, 7, 100, 4)
+        borefield2.create_rectangular_borefield(config2[0], config2[1], 7, 7, 100, 4)
 
         # set cooling peak according to the ratio of nb_of_boreholes
         borefield1.set_peak_cooling(peak_cooling * ratio_of_nb_of_boreholes)
