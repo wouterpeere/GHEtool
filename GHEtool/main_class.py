@@ -15,6 +15,7 @@ import pygfunction as gt
 import os.path
 import matplotlib.pyplot as plt
 import warnings
+from typing import Union
 
 from GHEtool.VariableClasses import GroundData, FluidData, PipeData
 
@@ -81,7 +82,7 @@ class Borefield:
                 'gui', 'time_L3_first_year', 'time_L3_last_year', 'peak_heating_external', 'peak_cooling_external', \
                 'monthly_load_heating_external', 'monthly_load_cooling_external', 'hourly_heating_load_external', \
                 'hourly_cooling_load_external', 'hourly_heating_load_on_the_borefield', 'hourly_cooling_load_on_the_borefield', \
-                'use_constant_Rb', 'printing', 'combo', 'jit_calculation', 'D', 'r_b', \
+                'use_constant_Rb', 'printing', 'combo', 'D', 'r_b', \
                 'L2_sizing', 'L3_sizing', 'L4_sizing', 'quadrant_sizing', 'H_init', 'use_precalculated_data'
 
     def __init__(self, simulation_period: int = 20, peak_heating: list = None,
@@ -172,9 +173,6 @@ class Borefield:
         self._custom_gfunction: tuple = ()
 
         ## params w.r.t. pygfunction
-        # true if the gfunctions should be calculated in the iteration when they
-        # are not precalculated
-        self.jit_calculation: bool = True
         self.options_pygfunction: dict = {"method": "equivalent"}
 
         # initialize variables for temperature plotting
@@ -1487,13 +1485,18 @@ class Borefield:
 
     def _calculate_temperature_profile(self, H: float = None, hourly: bool = False) -> None:
         """
-        This function calculates the temperature evolution in the using temporal superposition.
-        It is possible to calculate this for a certain depth H, otherwise self.H will be used.
+        This function calculates the evolution in the fluid temperature and borehole wall temperature.
 
-        :param H: depth of the borefield to evaluate the temperature profile
-        :param hourly: bool if True, then the temperature profile is calculated based on the hourly load
-        if there is any.
-        :return: None
+        Parameters
+        ----------
+        H : float
+            Depth at which the temperatures should be evaluated [m]. If None, than the current depth is taken.
+        hourly : bool
+            True if the temperature evolution should be calculated on an hourly basis.
+
+        Returns
+        -------
+        None
         """
 
         H_backup = self.H
@@ -1590,31 +1593,35 @@ class Borefield:
         This dictionary is directly passed through to the gFunction class of pygfunction.
         For more information, please visit the documentation of pygfunction.
 
-        :param options: dictionary with options for the gFunction class of pygfunction
-        :return: None
+        Parameters
+        ----------
+        options : dict
+            Dictionary with options for the gFunction class of pygfunction
+
+        Returns
+        -------
+        None
         """
         self.options_pygfunction = options
 
-    def set_jit_gfunction_calculation(self, jit: bool) -> None:
+    def gfunction(self, time_value: Union[list, float, np.ndarray], H: float) -> np.ndarray:
         """
-        This function sets the just-in-time calculation parameter.
-        When this is true, the gfunctions are calculated jit when sizing a for which
-        precalculated data is not available.
+        This function returns the gfunction value.
+        It can do so by either calculating the gfunctions just-in-time or by interpolating from a
+        loaded custom data file.
 
-        :param jit: True/False
-        :return: None
+        Parameters
+        ----------
+        time_value : list, float, np.ndarray
+            Time value(s) in seconds at which the gfunctions should be calculated
+        H : float
+            Depth at which the gfunctions should be calculated
+
+        Returns
+        -------
+        gvalue : np.ndarray
+            1D array with the gvalues for all the requested time_value(s)
         """
-        self.jit_calculation = jit
-
-    def gfunction(self, time_value: list, H: float) -> np.ndarray:
-        """
-        This function calculated the g-function based on interpolation of the precalculated data.
-
-        :param time_value: list of seconds at which the gfunctions should be evaluated
-        :param H: depth at which the gfunctions should be evaluated
-        :return: np.array of gfunction values
-        """
-
         # when using a variable ground temperature, sometimes no solution can be found
         if not self.use_constant_Tg and H > Borefield.THRESHOLD_DEPTH_ERROR:
             raise ValueError("Due to the use of a variable ground temperature, no solution can be found."
@@ -1698,19 +1705,33 @@ class Borefield:
         return jit_gfunction_calculation()
 
     def create_custom_dataset(self, name_datafile: str=None, options: dict=None,
-                              time_array=None, depth_array=None, save=False) -> None:
+                              time_array: Union[list, np.ndarray]=None, depth_array: Union[list, np.ndarray]=None,
+                              save: bool=False) -> None:
         """
         This function makes a datafile for a given custom borefield and sets it for the borefield object.
+        It automatically sets this datafile in the current borefield object so it can be used as a source for
+        the interpolation of gvalues.
 
-        :param name_datafile: name of the custom datafile
-        :param options: options for the gfunction calculation
-        (check pygfunction.gfunction.gFunction() for more information)
-        :param time_array: timevalues used for the calculation of the datafile
-        :param depth_array: the values for the borefield depth used to calculate the datafile
-        :param save: True if the datafile should be dumped
-        :return: None
+        Parameters
+        ----------
+        name_datafile : str
+            Name of the custom datafile
+        options : dict
+            Options for the gfunction calculation (check pygfunction.gfunction.gFunction() for more information)
+        time_array : list, np.array
+            Time values (in seconds) used for the calculation of the datafile
+        depth_array : list, np.array
+            List or arrays of depths for which the datafile should be created
+        save : bool
+            True if the datafile should be dumped
+
+        Returns
+        -------
+        None
+
+        .. deprecated:: 2.1.1
+            This function will be removed to a specific class related to custom gfunctions
         """
-
         # check if options are given
         if options is None:
             options = self.options_pygfunction
@@ -1759,8 +1780,14 @@ class Borefield:
         """
         This function sets the hourly heating load in kW.
 
-        :param heating_load: the hourly heating load as an array/list
-        :return None
+        Parameters
+        ----------
+        heating_load : np.array
+            Array with hourly heating load values [kW]
+
+        Returns
+        -------
+        None
         """
         self.hourly_heating_load = np.array(heating_load)
 
@@ -1770,10 +1797,16 @@ class Borefield:
 
     def set_hourly_cooling_load(self, cooling_load: np.array) -> None:
         """
-        This function sets the hourly heating load in kW.
+        This function sets the hourly cooling load in kW.
 
-        :param cooling_load: the hourly heating load as an array/list
-        :return None
+        Parameters
+        ----------
+        cooling_load : np.array
+            Array with hourly cooling load values [kW]
+
+        Returns
+        -------
+        None
         """
         self.hourly_cooling_load = np.array(cooling_load)
 
