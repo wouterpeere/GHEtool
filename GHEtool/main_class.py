@@ -534,7 +534,7 @@ class Borefield:
         """
         This function sets the length of the peak.
 
-        Attributes
+        Parameters
         ----------
         length : float
             Length of the peak (in seconds)
@@ -969,12 +969,20 @@ class Borefield:
     def size_L2(self, H_init: float, quadrant_sizing: int = 0) -> float:
         """
         This function sizes the  of the given configuration according to the methodology explained in
-        (Peere et al., 2021), which is a L2 method. When quadrant sizing is other than 0, it sizes the field based on
+        (Peere et al., 2021) [#PeereBS]_, which is a L2 method. When quadrant sizing is other than 0, it sizes the field based on
         the asked quadrant. It returns the borefield depth.
 
-        :param H_init: initialize depth for sizing
-        :param quadrant_sizing: if a quadrant is given the sizing is performed for this quadrant else for the relevant
-        :return: borefield depth
+        Parameters
+        ----------
+        H_init : float
+            Initial depth from where to start the iteration [m]
+        quadrant_sizing : int
+            If a quadrant is given the sizing is performed for this quadrant else for the relevant
+
+        Returns
+        -------
+        H : float
+            Required depth of the borefield [m]
         """
 
         # initiate with a given depth
@@ -1036,13 +1044,20 @@ class Borefield:
 
     def size_L3(self, H_init: float, quadrant_sizing: int = 0) -> float:
         """
-        This functions sizes the borefield based on a L3 method.
+        This function sizes the borefield based on a monthly (L3) method.
 
-        :param H_init: initial value for the depth of the borefield to start iteration
-        :param quadrant_sizing: differs from 0 if a sizing in a certain quadrant is desired
-        :return: borefield depth
+        Parameters
+        ----------
+        H_init : float
+            Initial depth from where to start the iteration [m]
+        quadrant_sizing : int
+            If a quadrant is given the sizing is performed for this quadrant else for the relevant
+
+        Returns
+        -------
+        H : float
+            Required depth of the borefield [m]
         """
-
         # initiate with a given depth
         self.H_init: float = H_init
 
@@ -1077,13 +1092,20 @@ class Borefield:
 
     def size_L4(self, H_init: float, quadrant_sizing: int = 0) -> float:
         """
-        This functions sizes the borefield based on a L4 method (hourly method).
+        This function sizes the borefield based on an hourly (L4) sizing methodology.
 
-        :param H_init: initial value for the depth of the borefield to start iteration
-        :param quadrant_sizing: differs from 0 if a sizing in a certain quadrant is desired
-        :return: borefield depth
+        Parameters
+        ----------
+        H_init : float
+            Initial depth from where to start the iteration [m]
+        quadrant_sizing : int
+            If a quadrant is given the sizing is performed for this quadrant else for the relevant
+
+        Returns
+        -------
+        H : float
+            Required depth of the borefield [m]
         """
-
         # check if hourly data is given
         if not self._check_hourly_load():
             raise ValueError("The hourly data is incorrect.")

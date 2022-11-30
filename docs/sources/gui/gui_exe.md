@@ -2,7 +2,7 @@
 
 The exe can be created using [PyInstaller](https://pyinstaller.org/en/stable/).
 
-The following line will create a windowed version of the executable:
+The following line will create a windowed version of the executable. Ideally, you have forked GHEtool into a project with its own virtual python environment.
 
 ```
 python -m PyInstaller --noconfirm --onefile --windowed --splash "./GHEtool/gui/icons/Icon.ico" --name "GHEtool" --icon "./GHEtool/gui/icons/Icon.ico" "./GHEtool/gui/start_gui.py"

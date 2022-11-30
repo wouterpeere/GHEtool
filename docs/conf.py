@@ -24,7 +24,7 @@ copyright = '2022, Wouter Peere and Tobias Blanke'
 author = 'Wouter Peere and Tobias Blanke'
 
 # The full version, including alpha/beta/rc tags
-release = '2.1.0dev'
+release = '2.1.0'
 
 
 # -- General configuration ---------------------------------------------------

@@ -6,11 +6,8 @@
 # Welcome to GHEtool's documentation!
 Dear visitor
 
-Welcome on this ReadTheDocs for the open-source borefield sizing tool GHEtool.
-Currently, this ReadTheDocs is under construction and will be changed on a regular basis.
-
-Currently, most of the available information can be found under the Graphical User Interface section.
-
+Welcome on this ReadTheDocs for the open-source borefield sizing tool GHEtool (v2.1.0).
+Currently, this ReadTheDocs is still somewhat under construction and will be changed on a regular basis.
 
 Please find below the content of this ReadTheDocs.
 

@@ -43,12 +43,6 @@ For the tests
 
 * Pytest (>=7.1.2)
 
-When working with Python 3.9 and higher, installing a newer version of pygfunction (>=2.1.0) can lead to problems due to the fact that its dependency CoolProp is not compatible with Python 3.9 and higher (see also <https://github.com/CoolProp/CoolProp/issues/1992> and <https://github.com/CoolProp/CoolProp/issues/2119>). If one wants to work with the newer version of pygfunction and with Python 3.9 or higher, one can install a development version of CoolProp using
-
-```
-pip install -i https://test.pypi.org/simple/ CoolProp==6.4.2.dev0
-```
-
 ## Quick start
 ### Installation
 
@@ -127,7 +121,7 @@ borefield.set_min_ground_temperature(0)  # minimum temperature
 borefield.create_rectangular_borefield(10, 12, 6, 6, 110, 4, 0.075)
 ```
 
-Note that the a borefield can also be set using the pygfunction package.
+Note that the borefield can also be set using the pygfunction package.
 
 ```Python
 import pygfunction as gt
