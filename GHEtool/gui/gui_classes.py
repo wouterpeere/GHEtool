@@ -1668,7 +1668,7 @@ class ResultText(Hint):
         self.var_name: str = ""
         self.prefix: str = prefix
         self.suffix: str = suffix
-        self._callable = lambda x: str(x)
+        self._callable = lambda x: f'{x}'
 
     def text_to_be_shown(self, class_name: str = "Borefield", var_name: str = "H") -> None:
         """
@@ -1715,7 +1715,25 @@ class ResultText(Hint):
         """
         self._callable = function
 
-    def set_text(self, data) -> None:
+    def set_text(self, name: str):
+        """
+        This function sets the text of the prefix and suffix
+
+        Parameters
+        ----------
+        name: str
+            String with the prefix and suffix text.\n
+            These strings are separated by ","
+
+        Returns
+        -------
+        None
+        """
+        entry_name: List[str, str] = name.split(',')
+        self.prefix = entry_name[0]
+        self.suffix = entry_name[1]
+
+    def set_text_value(self, data) -> None:
         """
         This function sets the text of the ResultText.
         This text is the combination of the prefix, the data (converted to string) and a suffix.
@@ -1729,7 +1747,10 @@ class ResultText(Hint):
         -------
         None
         """
-        super().set_text(self.prefix + str(self._callable(data)) + self.suffix)
+        try:
+            super().set_text(f'{self.prefix}{self._callable(data)}{self.suffix}')
+        except ValueError:
+            self.hide()
 
 
 class Category:
@@ -2111,6 +2132,26 @@ class ResultFigure(Category):
 
         if save_figure_button:
             self.save_fig = FunctionButton(category=self, button_text="Save figure", icon=":/icons/icons/Save_Inv.svg")
+
+    def set_text(self, name: str) -> None:
+        """
+        This function sets the text in the Figure category label and function button (separated by comma).
+
+        Parameters
+        ----------
+        name : str
+            Name of the Figure category label and function button.\n
+            These strings are separated by ","
+
+        Returns
+        -------
+        None
+        """
+        entry_name: List[str, str] = name.split(',')
+        self.label_text = entry_name[0]
+        self.label.setText(self.label_text)
+        if len(entry_name) > 1:
+            self.save_fig.set_text(entry_name[1])
 
     def fig_to_be_shown(self, class_name: str = "Borefield", function_name: str = "print_temperature_profile", **kwargs) -> None:
         """

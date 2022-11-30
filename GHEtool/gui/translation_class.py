@@ -46,7 +46,6 @@ class Translations:
         "label_next",
         "label_previous",
         "hint_depth",
-        "option_show_legend",
         "function_save_results",
         "function_save_figure",
         "X_Axis",
@@ -193,6 +192,27 @@ class Translations:
         "option_method_temp_gradient",
         "option_method_rb_calc",
         "category_earth",
+        "cat_no_result",
+        "text_no_result",
+        "numerical_results",
+        "result_text_depth",
+        "result_Rb_calculated",
+        "results_ground_temperature",
+        "results_heating_load",
+        "results_heating_load_percentage",
+        "results_heating_ext",
+        "results_heating_peak",
+        "results_cooling_load",
+        "results_cooling_load_percentage",
+        "results_cooling_ext",
+        "results_cooling_peak",
+        "max_temp",
+        "min_temp",
+        "figure_temperature_profile",
+        "legend_figure_temperature_profile",
+        "hourly_figure_temperature_profile",
+        "figure_load_duration",
+        "legend_figure_load_duration",
         "languages",
     )
 
@@ -504,15 +524,6 @@ class Translations:
             "Profondeur du trou de sonde: ",
             "Profundidad del pozo: ",
             "Profundidade do pozo: ",
-        ]
-        self.option_show_legend: List[str] = [
-            "Show legend?,yes,no",
-            "Legende zeigen?,Ja,Nein",
-            "Toon legende?,yes,no",
-            "Mostra la legenda?,yes,no",
-            "Afficher la légende?,yes,no",
-            "Mostrar leyenda?,yes,no",
-            "Mostrar lenda?,yes,no",
         ]
         self.function_save_results: List[str] = [
             "Save results",
@@ -1507,4 +1518,177 @@ class Translations:
             "Earth properties",
             "Earth properties",
             "Earth properties",
+        ]
+        self.cat_no_result: List[str] = ["No results", "Keine Ergebnisse", "No results", "No results", "No results", "No results", "No results"]
+        self.text_no_result: List[str] = [
+            "No results are yet calculated",
+            "Es wurden noch keine Ergebnisse berechnet",
+            "No results are yet calculated",
+            "No results are yet calculated",
+            "No results are yet calculated",
+            "No results are yet calculated",
+            "No results are yet calculated",
+        ]
+        self.numerical_results: List[str] = [
+            "Numerical results",
+            "Numerische Ergebnisse",
+            "Numerical results",
+            "Numerical results",
+            "Numerical results",
+            "Numerical results",
+            "Numerical results",
+        ]
+        self.result_text_depth: List[str] = ["Depth: , m", "Tiefe: , m", "Depth: , m", "Depth: , m", "Depth: , m", "Depth: , m", "Depth: , m"]
+        self.result_Rb_calculated: List[str] = [
+            "Equivalent borehole thermal resistance: , mK/W",
+            "Äquivalenter thermischer Bohrlochwiderstand: , mK/W",
+            "Equivalent borehole thermal resistance: , mK/W",
+            "Equivalent borehole thermal resistance: , mK/W",
+            "Equivalent borehole thermal resistance: , mK/W",
+            "Equivalent borehole thermal resistance: , mK/W",
+            "Equivalent borehole thermal resistance: , mK/W",
+        ]
+        self.results_ground_temperature: List[str] = [
+            "Average ground temperature: , °C",
+            "Durchschnittliche Erdreichtemperatur , °C",
+            "Average ground temperature: , °C",
+            "Average ground temperature: , °C",
+            "Average ground temperature: , °C",
+            "Average ground temperature: , °C",
+            "Average ground temperature: , °C",
+        ]
+        self.results_heating_load: List[str] = [
+            "Heating load on the borefield: , kWh",
+            "Die Heizlast für das Bohrfeld beträgt: , kWh",
+            "Heating load on the borefield: , kWh",
+            "Heating load on the borefield: , kWh",
+            "Heating load on the borefield: , kWh",
+            "Heating load on the borefield: , kWh",
+            "Heating load on the borefield: , kWh",
+        ]
+        self.results_heating_load_percentage: List[str] = [
+            "This is , % of the heating load",
+            "Das sind , % der Heizlast",
+            "This is , % of the heating load",
+            "This is , % of the heating load",
+            "This is , % of the heating load",
+            "This is , % of the heating load",
+            "This is , % of the heating load",
+        ]
+        self.results_heating_ext: List[str] = [
+            "Heating load external: , kWh",
+            "Die externe Heizlast beträgt: , kWh",
+            "Heating load external: , kWh",
+            "Heating load external: , kWh",
+            "Heating load external: , kWh",
+            "Heating load external: , kWh",
+            "Heating load external: , kWh",
+        ]
+        self.results_heating_peak: List[str] = [
+            "with a peak of: , kW",
+            "mit einer Spitzenlast von , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+        ]
+        self.results_cooling_load: List[str] = [
+            "Cooling load on the borefield: , kWh",
+            "Die Kühllast für das Bohrfeld beträgt: , kWh",
+            "Cooling load on the borefield: , kWh",
+            "Cooling load on the borefield: , kWh",
+            "Cooling load on the borefield: , kWh",
+            "Cooling load on the borefield: , kWh",
+            "Cooling load on the borefield: , kWh",
+        ]
+        self.results_cooling_load_percentage: List[str] = [
+            "This is , % of the cooling load",
+            "Das sind , % der Kühllast",
+            "This is , % of the cooling load",
+            "This is , % of the cooling load",
+            "This is , % of the cooling load",
+            "This is , % of the cooling load",
+            "This is , % of the cooling load",
+        ]
+        self.results_cooling_ext: List[str] = [
+            "Cooling load external: , kWh",
+            "Die externe Kühllast beträgt: , kWh",
+            "Cooling load external: , kWh",
+            "Cooling load external: , kWh",
+            "Cooling load external: , kWh",
+            "Cooling load external: , kWh",
+            "Cooling load external: , kWh",
+        ]
+        self.results_cooling_peak: List[str] = [
+            "with a peak of: , kW",
+            "mit einer Spitzenlast von , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+        ]
+        self.max_temp: List[str] = [
+            "The maximum average fluid temperature is , °C",
+            "Die maximale Fluidtemperatur ist , °C",
+            "The maximum average fluid temperature is , °C",
+            "The maximum average fluid temperature is , °C",
+            "The maximum average fluid temperature is , °C",
+            "The maximum average fluid temperature is , °C",
+            "The maximum average fluid temperature is , °C",
+        ]
+        self.min_temp: List[str] = [
+            "The minimal average fluid temperature is , °C",
+            "Die minimale Fluidtemperatur ist , °C",
+            "The minimal average fluid temperature is , °C",
+            "The minimal average fluid temperature is , °C",
+            "The minimal average fluid temperature is , °C",
+            "The minimal average fluid temperature is , °C",
+            "The minimal average fluid temperature is , °C",
+        ]
+        self.figure_temperature_profile: List[str] = [
+            "Temperature evolution, Save figure",
+            "Temperaturverlauf, Abbildung speichern",
+            "Temperature evolution, Save figure",
+            "Temperature evolution, Save figure",
+            "Temperature evolution, Save figure",
+            "Temperature evolution, Save figure",
+            "Temperature evolution, Save figure",
+        ]
+        self.legend_figure_temperature_profile: List[str] = [
+            "Show legend?, No , Yes ",
+            "Legende zeigen?, Nein , Ja ",
+            "Toon legende?, no , yes ",
+            "Mostra la legenda?, no , yes ",
+            "Afficher la légende?, no , yes ",
+            "Mostrar leyenda?, no , yes ",
+            "Mostrar lenda?, no , yes ",
+        ]
+        self.hourly_figure_temperature_profile: List[str] = [
+            "Hourly profile, No , Yes ",
+            "Stündliches Profil, Nein , Ja ",
+            "Hourly profile, No , Yes ",
+            "Hourly profile, No , Yes ",
+            "Hourly profile, No , Yes ",
+            "Hourly profile, No , Yes ",
+            "Hourly profile, No , Yes ",
+        ]
+        self.figure_load_duration: List[str] = [
+            "Load-duration curve, Save figure",
+            "Jahresdauerlinie, Abbildung speichern",
+            "Load-duration curve, Save figure",
+            "Load-duration curve, Save figure",
+            "Load-duration curve, Save figure",
+            "Load-duration curve, Save figure",
+            "Load-duration curve, Save figure",
+        ]
+        self.legend_figure_load_duration: List[str] = [
+            "Show legend?, No , Yes ",
+            "Legende zeigen?, Nein , Ja ",
+            "Toon legende?, no , yes ",
+            "Mostra la legenda?, no , yes ",
+            "Afficher la légende?, no , yes ",
+            "Mostrar leyenda?, no , yes ",
+            "Mostrar lenda?, no , yes ",
         ]

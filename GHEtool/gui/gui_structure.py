@@ -11,7 +11,8 @@ from PySide6.QtGui import QPen
 from PySide6.QtGui import QColor
 from numpy import cos, sin, array, int64, float64, round, sum
 
-from GHEtool.gui.gui_classes import (Aim, ButtonBox, Category, FloatBox, FileNameBox, FunctionButton, Hint, IntBox, ListBox, Option, Page, ResultFigure, ResultText, FigureOption)
+from GHEtool.gui.gui_classes import (Aim, ButtonBox, Category, FloatBox, FileNameBox, FunctionButton, Hint, IntBox, ListBox, Option, Page, ResultFigure,
+                                     ResultText, FigureOption, check_aim_options)
 from GHEtool.gui.translation_class import Translations
 from GHEtool.gui.gui_base_class import DARK, GREY, LIGHT, WHITE
 
@@ -979,7 +980,7 @@ class GuiStructure:
                 self.results_heating_load = ResultText("Heating load", category=self.numerical_results,
                                                        prefix="Heating load on the borefield: ", suffix=" kWh")
                 self.results_heating_load.text_to_be_shown("Borefield", "baseload_heating")
-                self.results_heating_load.function_to_convert_to_text(lambda x: round(sum(x), 2))
+                self.results_heating_load.function_to_convert_to_text(lambda x: round(sum(x), 0))
                 self.results_heating_load_percentage = ResultText("Percentage", category=self.numerical_results,
                                                                   prefix="This is ", suffix="% of the heating load")
                 self.results_heating_load_percentage.text_to_be_shown("Borefield", "_percentage_heating")
@@ -987,7 +988,7 @@ class GuiStructure:
                 self.results_heating_ext = ResultText("Heating ext", category=self.numerical_results,
                                                       prefix="heating load external: ", suffix=" kWh")
                 self.results_heating_ext.text_to_be_shown("Borefield", "monthly_load_heating_external")
-                self.results_heating_ext.function_to_convert_to_text(lambda x: round(sum(x), 2))
+                self.results_heating_ext.function_to_convert_to_text(lambda x: round(sum(x), 0))
                 self.results_heating_peak = ResultText("Heating ext peak", category=self.numerical_results,
                                                        prefix="with a peak of: ", suffix=" kW")
                 self.results_heating_peak.text_to_be_shown("Borefield", "peak_heating_external")
@@ -996,7 +997,7 @@ class GuiStructure:
                 self.results_cooling_load = ResultText("Cooling load", category=self.numerical_results,
                                                        prefix="Cooling load on the borefield: ", suffix=" kWh")
                 self.results_cooling_load.text_to_be_shown("Borefield", "baseload_cooling")
-                self.results_cooling_load.function_to_convert_to_text(lambda x: round(sum(x), 2))
+                self.results_cooling_load.function_to_convert_to_text(lambda x: round(sum(x), 0))
                 self.results_cooling_load_percentage = ResultText("Percentage", category=self.numerical_results,
                                                                   prefix="This is ", suffix="% of the cooling load")
                 self.results_cooling_load_percentage.text_to_be_shown("Borefield", "_percentage_cooling")
@@ -1004,7 +1005,7 @@ class GuiStructure:
                 self.results_cooling_ext = ResultText("Cooling ext", category=self.numerical_results,
                                                       prefix="cooling load external: ", suffix=" kWh")
                 self.results_cooling_ext.text_to_be_shown("Borefield", "monthly_load_cooling_external")
-                self.results_cooling_ext.function_to_convert_to_text(lambda x: round(sum(x), 2))
+                self.results_cooling_ext.function_to_convert_to_text(lambda x: round(sum(x), 0))
                 self.results_cooling_peak = ResultText("Cooling ext peak", category=self.numerical_results,
                                                        prefix="with a peak of: ", suffix=" kW")
                 self.results_cooling_peak.text_to_be_shown("Borefield", "peak_cooling_external")
@@ -1386,5 +1387,5 @@ class GuiStructure:
         Page.previous_label = translation.label_previous[index]
         self.no_file_selected = translation.NoFileSelected[index]
         for name in [j for j in translation.__slots__ if hasattr(self, j)]:
-            entry: Optional[Option, Hint, FunctionButton, Page, Category] = getattr(self, name)
+            entry: Union[Option, Hint, FunctionButton, Page, Category] = getattr(self, name)
             entry.set_text(getattr(translation, name)[index])
