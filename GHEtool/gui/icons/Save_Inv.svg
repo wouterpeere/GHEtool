@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="21.991667mm"
+   height="21.991669mm"
+   viewBox="0 0 21.991667 21.991669"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="Save_Inv.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     fit-margin-top="2"
+     fit-margin-left="2"
+     fit-margin-bottom="2"
+     fit-margin-right="2"
+     inkscape:zoom="3.0930415"
+     inkscape:cx="61.589863"
+     inkscape:cy="105.23622"
+     inkscape:window-width="1920"
+     inkscape:window-height="1027"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-78.309466,-97.128591)">
+    <rect
+       x="85.601135"
+       y="101.77442"
+       width="1.5875"
+       height="3.96875"
+       id="rect824"
+       style="stroke-width:0.264583;fill:#ffffff;fill-opacity:1" />
+    <path
+       d="m 94.0678,106.80151 h -9.525 v -6.08542 h 9.525 z m -4.7625,6.87916 c -1.455208,0 -2.645833,-1.19062 -2.645833,-2.64583 0,-1.45521 1.190625,-2.64583 2.645833,-2.64583 1.455208,0 2.645833,1.19062 2.645833,2.64583 0,1.45521 -1.190625,2.64583 -2.645833,2.64583 z m 7.9375,-14.552079 h -3.175 -9.525 -1.5875 l -2.645834,2.645829 v 14.2875 c 0,0.58209 0.47625,1.05834 1.058334,1.05834 h 15.875 c 0.582083,0 1.058333,-0.47625 1.058333,-1.05834 v -15.875 c 0,-0.582079 -0.47625,-1.058329 -1.058333,-1.058329 z"
+       id="path826"
+       style="stroke-width:0.264583;fill:#ffffff;fill-opacity:1" />
+    <rect
+       x="88.511551"
+       y="110.24109"
+       width="1.5875"
+       height="1.5875"
+       id="rect828"
+       style="stroke-width:0.264583;fill:#ffffff;fill-opacity:1" />
+  </g>
+</svg>

@@ -1,4 +1,2 @@
-from .GHEtool import Borefield
-from .VariableClasses import GroundData
-from .VariableClasses import FluidData
-from .VariableClasses import PipeData
+from GHEtool.main_class import Borefield
+from GHEtool.VariableClasses import FluidData, GroundData, PipeData

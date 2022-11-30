@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="51.999378mm"
+   height="35.570999mm"
+   viewBox="0 0 51.999378 35.570999"
+   version="1.1"
+   id="svg23687"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="Flag_Italian.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview23689"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     fit-margin-top="1"
+     fit-margin-left="1"
+     fit-margin-right="1"
+     fit-margin-bottom="1"
+     inkscape:zoom="2.1871106"
+     inkscape:cx="63.782782"
+     inkscape:cy="60.124988"
+     inkscape:window-width="1920"
+     inkscape:window-height="1027"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs23684" />
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-65.016074,-102.27538)">
+    <g
+       style="display:inline"
+       transform="matrix(0.7142766,0,0,0.7142766,-283.97946,-270.29128)"
+       id="italy"
+       inkscape:label="italy">
+      <rect
+         style="fill:#f5f7fa"
+         ry="0"
+         rx="0"
+         height="47"
+         width="70"
+         y="523"
+         x="490"
+         class="cls-11"
+         data-name="Rounded Rectangle 7 copy"
+         id="Rounded_Rectangle_7_copy-80" />
+      <rect
+         style="fill:#ed5565;stroke-width:0.986013"
+         height="47"
+         width="23.333334"
+         y="523"
+         x="536.66669"
+         class="cls-1"
+         data-name="Rectangle 1 copy 15"
+         id="Rectangle_1_copy_15-4" />
+      <rect
+         style="fill:#57a863;stroke-width:0.986013"
+         height="47"
+         width="23.333334"
+         y="523"
+         x="490"
+         class="cls-3"
+         data-name="Rectangle 1 copy 16"
+         id="Rectangle_1_copy_16-4" />
+    </g>
+  </g>
+</svg>

@@ -1,6 +1,6 @@
 """
 This document contains all the scripts for coming up with the figures of the article written by
-Verleyen L., Peere W. and Helsen L.
+Verleyen L., Peere W., Michiels E., Boydens W. and Helsen L.
 """
 import math
 
@@ -25,11 +25,12 @@ def figure_1():
     """
 
     # initiate ground data
-    ground_data = GroundData(100, 6, 2.4, 10, 0.12, 10, 10)
+    ground_data = GroundData(2.4, 10, 0.12)
 
     # initiate borefield model
     borefield = Borefield()
     borefield.set_ground_parameters(ground_data)
+    borefield.create_rectangular_borefield(10, 10, 6, 6, 100)
 
     # initiate depth array
     depth = 150
@@ -82,11 +83,12 @@ def figure_2():
     """
 
     # initiate ground data
-    ground_data = GroundData(100, 6, 2.4, 10, 0.12, 10, 10)
+    ground_data = GroundData(2.4, 10, 0.12)
 
     # initiate borefield model
     borefield = Borefield()
     borefield.set_ground_parameters(ground_data)
+    borefield.create_rectangular_borefield(10, 10, 6, 6, 100)
 
     # initiate depth array
     depths = np.array([25, 50, 100, 150, 200])
@@ -158,16 +160,19 @@ def figure_3():
         depths = []
         for H in depth_array:
             # set ground data
-            ground_data = GroundData(H, 7, 2.4, 10, 0.12, n1, n2)
+            ground_data = GroundData(2.4, 10, 0.12)
 
             # set ground data
             borefield.set_ground_parameters(ground_data)
+
+            # set borefield
+            borefield.create_rectangular_borefield(n1, n2, 7, 7, H)
 
             # calculate gfunction
             gfunction = borefield.gfunction(borefield.time, H)
 
             # calculate Ra
-            Ra = (gfunction[2] - gfunction[1]) / (2 * math.pi * borefield.k_s)
+            Ra = (gfunction[2] - gfunction[1]) / (2 * math.pi * ground_data.k_s)
 
             # add to depths
             depths.append(Ra)
@@ -222,10 +227,13 @@ def figure_4():
         depth_array = []
         for imbalance in imbalance_array:
             # initiate ground data
-            ground_data = GroundData(100, 7, 2.4, 10, 0.12, config[0], config[1])
+            ground_data = GroundData(2.4, 10, 0.12)
 
             # set ground data
             borefield.set_ground_parameters(ground_data)
+
+            # set borefield
+            borefield.create_rectangular_borefield(config[0], config[1], 7, 7, 100)
 
             # calculate loads
             extra_load = imbalance / 12 * 10 ** 3  # kWh
@@ -291,10 +299,13 @@ def figure_5():
         Ra_array = []
         for imbalance in imbalance_array:
             # initiate ground data
-            ground_data = GroundData(100, 7, 2.4, 10, 0.12, config[0], config[1])
+            ground_data = GroundData(2.4, 10, 0.12)
 
             # set ground data
             borefield.set_ground_parameters(ground_data)
+
+            # set borefield
+            borefield.create_rectangular_borefield(config[0], config[1], 7, 7, 100)
 
             # calculate loads
             extra_load = imbalance / 12 * 10 ** 3  # kWh
@@ -366,10 +377,13 @@ def figure_7():
         Ra_array = []
         for imbalance in imbalance_array:
             # initiate ground data
-            ground_data = GroundData(100, 7, 2.4, 10, 0.12, config[0], config[1])
+            ground_data = GroundData(2.4, 10, 0.12)
 
             # set ground data
             borefield.set_ground_parameters(ground_data)
+
+            # set borefield
+            borefield.create_rectangular_borefield(config[0], config[1], 7, 7, 100)
 
             # calculate loads
             extra_load = imbalance / 12 * 10 ** 3  # kWh
@@ -451,12 +465,16 @@ def figure_8():
         ratio_of_nb_of_boreholes = config1[0] * config1[1] / (config2[0] * config2[0] + config1[0] * config1[1])
 
         # initiate ground data
-        ground_data1 = GroundData(100, 7, 2.4, 10, 0.14, config1[0], config1[1])
-        ground_data2 = GroundData(100, 7, 2.4, 10, 0.14, config2[0], config2[1])
+        ground_data1 = GroundData(2.4, 10, 0.14)
+        ground_data2 = GroundData(2.4, 10, 0.14)
 
         # set ground data
         borefield1.set_ground_parameters(ground_data1)
         borefield2.set_ground_parameters(ground_data2)
+
+        # set borefields
+        borefield1.create_rectangular_borefield(config1[0], config1[1], 7, 7, 100)
+        borefield2.create_rectangular_borefield(config2[0], config2[1], 7, 7, 100)
 
         # set cooling peak according to the ratio of nb_of_boreholes
         borefield1.set_peak_cooling(peak_cooling * ratio_of_nb_of_boreholes)
@@ -502,10 +520,10 @@ def figure_8():
 
 
 if __name__ == "__main__":
-    # figure_1()
-    # figure_2()
-    # figure_3()
-    # figure_4()
+    figure_1()
+    figure_2()
+    figure_3()
+    figure_4()
     figure_5()
     figure_7()
     figure_8()

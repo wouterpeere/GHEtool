@@ -1,0 +1,7 @@
+[run]
+omit =
+/gui/*
+/Examples/*
+Validation/*
+GUI.py
+change_pickle_data.py
