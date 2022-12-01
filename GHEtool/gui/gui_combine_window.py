@@ -609,6 +609,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         except FileNotFoundError:
             self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
         except PermissionError:
+            print("PermissionError")
             return
 
     def fun_load(self) -> None:
@@ -634,7 +635,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.checking: bool = False
             # open file and get data
             with open(self.filename[0], "rb") as f:
-                li: list = pk_load(f)
+                self.filename, li, settings = pk_load(f)
             # write data to variables
             self.list_ds, li = li[0], li[1]
             # change window title to new loaded filename
@@ -682,13 +683,18 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.fun_save_auto()
         # Create list if no scenario is stored
         self.list_ds.append(DataStorage(self.gui_structure)) if len(self.list_ds) < 1 else None
+        # create list of settings with language and autosave option
+        settings: list = [self.gui_structure.option_language.get_value(),
+                          self.gui_structure.option_auto_saving.get_value()]
+
         # try to store the data in the pickle file
         try:
             # create list of all scenario names
             li = [self.list_widget_scenario.item(idx).text() for idx in range(self.list_widget_scenario.count())]
             # store data
             with open(self.filename[0], "wb") as f:
-                pk_dump([self.list_ds, li], f, pk_HP)
+                saving = self.filename, [self.list_ds, li], settings
+                pk_dump(saving, f, pk_HP)
             # deactivate changed file * from window title
             self.changedFile: bool = False
             self.change_window_title()
@@ -931,9 +937,8 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         :return: None
         """
         # hide widgets if no list of scenarios exists and display not calculated text
-
         def hide_no_result(hide: bool = True):
-            if hide:
+            if hide or self.list_widget_scenario.currentItem().text()[-1] == "*":
                 for cat in self.gui_structure.page_result.list_categories:
                     cat.hide(results=True)
                 self.gui_structure.cat_no_result.show()
