@@ -301,6 +301,11 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         if self.changedFile is False:
             self.changedFile: bool = True
             self.change_window_title()
+        # get current index of scenario
+        idx: int = self.list_widget_scenario.currentRow()
+        if self.list_ds:
+            # remove borefield object
+            self.list_ds[idx].borefield = None
         # abort here if autosave scenarios is used
         if self.gui_structure.option_auto_saving.get_value() == 1:
             return
@@ -312,14 +317,10 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # abort if there is no text
         if len(text) < 1:
             return
-        # get current index of scenario
-        idx: int = self.list_widget_scenario.currentRow()
         # create current data storage
         ds: DataStorage = DataStorage(self.gui_structure)
         # check if current data storage is equal to the previous one then delete the *
         if self.list_ds:
-            # remove borefield object
-            self.list_ds[idx].borefield = None
             if ds == self.list_ds[idx]:
                 if text[-1] != "*":
                     return

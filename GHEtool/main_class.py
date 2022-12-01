@@ -1412,7 +1412,6 @@ class Borefield:
         fig, ax
             If the borefield object is part of the GUI, it returns the figure object
         """
-
         # check if the data should be recalculated or no correct temperature profile is available
         if recalculate or not self._check_temperature_profile_available(plot_hourly):
             self._calculate_temperature_profile(hourly=plot_hourly)
