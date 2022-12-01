@@ -15,6 +15,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 - Created a new structure for the package, thereby splitting the main_py.file into more subclasses.
 - Create a class for the custom g-functions.
+- Location of backup document in the GUI
+- Results are now saved in the GUI
 
 ### Fixed
 - (issue 52) Print temperature profile after sizing with L3/L4 in quadrant 1 or 2
