@@ -34,7 +34,7 @@ from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
 
 from GHEtool.gui.gui_calculation_thread import (CalcProblem)
 from GHEtool.gui.gui_data_storage import DataStorage
-from GHEtool.gui.gui_base_class import UiGhetool
+from GHEtool.gui.gui_base_class import UiGhetool, set_graph_layout
 from GHEtool.gui.gui_structure import *  # GuiStructure, Option, FunctionButton,
 from GHEtool.gui.translation_class import Translations
 
@@ -139,6 +139,9 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.status_bar.showMessage(self.translations.GHE_tool_imported[self.gui_structure.option_language.get_value()], 5000)
         # allow checking of changes
         self.checking: bool = True
+
+        # set the correct graph layout
+        set_graph_layout()
 
     def create_action_language(self, idx: int, name: str, icon_name: str, short_cut: str):
         action = QtGui_QAction(self.central_widget)
@@ -959,12 +962,14 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
 
         # set debug message
         if ds.debug_message != "":
+            print("Ok1")
             hide_no_result(True)
             self.gui_structure.text_no_result.set_text(str(ds.debug_message))
             return
 
         # hide widgets if no results borefield exists and display not calculated text
         if borefield is None:
+            print("Oke")
             hide_no_result(True)
             return
 

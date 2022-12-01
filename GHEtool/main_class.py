@@ -278,12 +278,6 @@ class Borefield:
         # set a custom g-function
         self.load_custom_gfunction(custom_gfunction)
 
-        # create plotlayout if gui
-        if self.gui:
-            from GHEtool.gui.gui_base_class import set_graph_layout
-
-            set_graph_layout()
-
     def _set_number_of_boreholes(self) -> None:
         """
         This functions sets the number of boreholes based on the length of the borefield attribute.
