@@ -180,8 +180,8 @@ class GuiStructure:
                 self.option_method_size_depth = ButtonBox(label="Method for size borehole depth:", default_index=0,
                                                           entries=[" L2 ", " L3 ", "  L4  "],
                                                           category=self.category_calculation)
-                self.option_method_size_length = ButtonBox(label="Method for size width and length:", default_index=0,
-                                                           entries=[" L2 ", " L3 "], category=self.category_calculation)
+                # self.option_method_size_length = ButtonBox(label="Method for size width and length:", default_index=0,
+                #                                            entries=[" L2 ", " L3 "], category=self.category_calculation)
                 self.option_method_temp_gradient = ButtonBox(
                     label="Should a temperature gradient over depth be considered?:", default_index=0,
                     entries=[" no ", " yes  "], category=self.category_calculation)
@@ -277,15 +277,15 @@ class GuiStructure:
                     maximal_value=500,
                     step=1,
                 )
-                self.option_max_depth = FloatBox(
-                    category=self.category_borehole,
-                    label="Maximal borehole depth [m]: ",
-                    default_value=150,
-                    decimal_number=2,
-                    minimal_value=0,
-                    maximal_value=500,
-                    step=1,
-                )
+                # self.option_max_depth = FloatBox(
+                #     category=self.category_borehole,
+                #     label="Maximal borehole depth [m]: ",
+                #     default_value=150,
+                #     decimal_number=2,
+                #     minimal_value=0,
+                #     maximal_value=500,
+                #     step=1,
+                # )
                 self.option_spacing = FloatBox(
                     category=self.category_borehole,
                     label="Borehole spacing [m]: ",
@@ -295,48 +295,48 @@ class GuiStructure:
                     maximal_value=99,
                     step=0.1,
                 )
-                self.option_min_spacing = FloatBox(
-                    category=self.category_borehole,
-                    label="Minimal borehole spacing [m]: ",
-                    default_value=3,
-                    decimal_number=2,
-                    minimal_value=1,
-                    maximal_value=99,
-                    step=0.1,
-                )
-                self.option_max_spacing = FloatBox(
-                    category=self.category_borehole,
-                    label="Maximal borehole spacing [m]: ",
-                    default_value=9,
-                    decimal_number=2,
-                    minimal_value=1,
-                    maximal_value=99,
-                    step=0.1,
-                )
+                # self.option_min_spacing = FloatBox(
+                #     category=self.category_borehole,
+                #     label="Minimal borehole spacing [m]: ",
+                #     default_value=3,
+                #     decimal_number=2,
+                #     minimal_value=1,
+                #     maximal_value=99,
+                #     step=0.1,
+                # )
+                # self.option_max_spacing = FloatBox(
+                #     category=self.category_borehole,
+                #     label="Maximal borehole spacing [m]: ",
+                #     default_value=9,
+                #     decimal_number=2,
+                #     minimal_value=1,
+                #     maximal_value=99,
+                #     step=0.1,
+                # )
                 self.option_width = IntBox(
                     category=self.category_borehole, label="Width of rectangular field [#]: ", default_value=9, minimal_value=1, maximal_value=40
                 )
                 self.option_length = IntBox(
                     category=self.category_borehole, label="Length of rectangular field [#]: ", default_value=12, minimal_value=1, maximal_value=40
                 )
-                self.option_max_width = FloatBox(
-                    category=self.category_borehole,
-                    label="Maximal width of rectangular field [m]: ",
-                    default_value=160,
-                    decimal_number=2,
-                    minimal_value=1,
-                    maximal_value=1000,
-                    step=1,
-                )
-                self.option_max_length = FloatBox(
-                    category=self.category_borehole,
-                    label="Maximal length of rectangular field [m]: ",
-                    default_value=150,
-                    decimal_number=2,
-                    minimal_value=1,
-                    maximal_value=1000,
-                    step=1,
-                )
+                # self.option_max_width = FloatBox(
+                #     category=self.category_borehole,
+                #     label="Maximal width of rectangular field [m]: ",
+                #     default_value=160,
+                #     decimal_number=2,
+                #     minimal_value=1,
+                #     maximal_value=1000,
+                #     step=1,
+                # )
+                # self.option_max_length = FloatBox(
+                #     category=self.category_borehole,
+                #     label="Maximal length of rectangular field [m]: ",
+                #     default_value=150,
+                #     decimal_number=2,
+                #     minimal_value=1,
+                #     maximal_value=1000,
+                #     step=1,
+                # )
                 self.option_pipe_depth = FloatBox(
                     category=self.category_borehole,
                     label="Burial depth [m]: ",
