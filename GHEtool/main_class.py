@@ -1105,7 +1105,7 @@ class Borefield:
 
                 if self.H == quadrant2:
                     self.limiting_quadrant = 2
-                    # the lastest calculation was for quadrant 3, which is the smaller one
+                    # the last calculation was for quadrant 3, which is the smaller one
                     self.recalculation_needed = True
                 else:
                     self.limiting_quadrant = 3
