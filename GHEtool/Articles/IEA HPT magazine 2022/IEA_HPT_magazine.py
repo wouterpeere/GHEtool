@@ -1,6 +1,6 @@
 """
-This document contains all the scripts for coming up with the figures of the article written by
-Verleyen L., Peere W., Michiels E., Boydens W. and Helsen L.
+This document contains all the scripts for the figures of Verleyen et al. (2022).
+One needs GHEtool version 2.0.6 to run this code.   
 """
 import math
 
