@@ -1,6 +1,15 @@
 # GHEtool in literature
 Below is a general list of all the articles which use or mention GHEtool in literature. Please let us know if we missed a contribution.
 
+Note that for some of the publications, the code used in that publication, is available in this ReadTheDocs.
+In this way, we want to contribute to the transparency in the academic world by sharing computer code so it is easier to replicate and verify published results.
+
+The articles for which this is the case, are:
+
+```{toctree}
+articles/HPT_magazine.rst
+```
+
 > Verleyen, L., Peere, W., Michiels, E., Boydens, W., Helsen, L. (2022). The beauty of reason and insight: a story about 30 years old borefield equations. _IEA HPT Magazine 40_(3), 36-39, https://doi.org/10.23697/6q4n-3223
 
 > Peere, W., Boydens, W., Helsen, L. (2022). GHEtool: een open-sourcetool voor boorvelddimensionering. Presented at the 15e warmtepompsymposium: van uitdaging naar aanpak, Quadrivium, Heverlee, België.
