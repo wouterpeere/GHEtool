@@ -1,6 +1,10 @@
 # GHEtool in literature
 Below is a general list of all the articles which use or mention GHEtool in literature. Please let us know if we missed a contribution.
 
+Not that for some of the publications, a link is mentioned to the code used in this publication.
+In this way, we want to contribute to the transparency in the academic world by sharing computer code so it is easier to replicate and verify published results.
+
+
 > Verleyen, L., Peere, W., Michiels, E., Boydens, W., Helsen, L. (2022). The beauty of reason and insight: a story about 30 years old borefield equations. _IEA HPT Magazine 40_(3), 36-39, https://doi.org/10.23697/6q4n-3223
 
 The code for this article can be found in:

@@ -168,7 +168,7 @@ Tobias Blanke, Solar-Institute Jülich, FH Aachen, blanke@sij.fh-aachen.de
 ## Citation
 Please cite GHEtool using the JOSS paper.
 
-Peere, W., Blanke, T.(2022). _GHEtool: An open-source tool for borefield sizing in Python._ Journal of Open Source Software, 7(76), 4406, https://doi.org/10.21105/joss.04406
+Peere, W., Blanke, T.(2022). GHEtool: An open-source tool for borefield sizing in Python. _Journal of Open Source Software, 7_(76), 4406, https://doi.org/10.21105/joss.04406
 
 For more information on how to cite GHEtool, please visit the ReadTheDocs at [GHEtool.readthedocs.io](https://ghetool.readthedocs.io/en/stable/).
 
