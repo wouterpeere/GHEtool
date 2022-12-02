@@ -28,7 +28,9 @@ sources/legal_notice
 :maxdepth: 2
 
 sources/code/getting_started.md
+sources/code/functionalities.md
 sources/code/modules.md
+sources/code/validation.md
 ```
 
 ```{toctree}

@@ -8,7 +8,7 @@
 [![Downloads](https://static.pepy.tech/personalized-badge/ghetool?period=week&units=international_system&left_color=black&right_color=orange&left_text=Downloads%20last%20week)](https://pepy.tech/project/ghetool)
 [![Read the Docs](https://readthedocs.org/projects/ghetool/badge/?version=stable)](https://ghetool.readthedocs.io/en/stable/)
 ## What is *GHEtool*?
-<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/GHEtool/gui/Icon.png" width="110" align="left">
+<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/sources/gui/_figure/Icon.png" width="110" align="left">
 
 GHEtool is a Python package that contains all the functionalities needed to deal with borefield design. It is developed for both researchers and practitioners.
 The core of this package is the automated sizing of borefield under different conditions. The sizing of a borefield is typically slow due to the high complexity of the mathematical background. Because this tool has a lot of precalculated data (cf. infra), GHEtool can size a borefield in the order of tenths of milliseconds. This sizing typically takes the order of minutes. Therefore, this tool is suited for being implemented in workflows where iterations are required.
@@ -21,8 +21,7 @@ This can be found on [GHEtool.readthedocs.io](GHEtool.readthedocs.io).
 GHEtool also comes with a *graphical user interface (GUI)*. This GUI is prebuilt as an exe-file (only for Windows platforms currently) because this provides access to all the functionalities without coding. A setup to install the GUI at the user-defined place is also implemented and available at [https://GHEtool.sysi.be](https://www.mech.kuleuven.be/en/tme/research/thermal_systems/tools/ghetool).
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/GHEtool/gui/GHEtool.PNG" width="600">
-  Screenshot of the GUI.
+<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/sources/gui/_figure/GHEtool.PNG" width="600">
 </p>
 
 ## Requirements
@@ -147,25 +146,8 @@ borefield.print_temperature_profile(legend=True)
 A full list of functionalities is given below.
 
 ## Functionalities
-GHEtool offers functionalities of value to all different disciplines working with borefields. The features are available both in the code environment and in the GUI. These functions are listed in the table below, alongside with a link to an example document where one can find how these functionalities can be used.
-
-| Functionality | Example document |
-| --- | --- |
-| Sizing the borefield (i.e. calculating the required depth) for a given injection and extraction load for the borefield (three sizing methods are available). | [main_functionalities.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/main_functionalities.py) |
-| Calculating the temperature evolution of the ground for a given building load and borefield configuration | [main_functionalities.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/main_functionalities.py) |
-| Using dynamically calculated borehole thermal resistance (this is directly based on the code of pygfunction) | [sizing_with_Rb_calculation.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Validation/sizing_with_Rb_calculation.py) |
-| Optimising the load profile for a given heating and cooling load | [optimise_load_profile.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/optimise_load_profile.py)|
-| Importing heating and cooling loads from .csv and .xlsx files | [import_data.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/import_data.py) |
-| Using your custom borefield configuration | [custom_borefield_configuration.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/custom_borefield_configuration.py) |
-
-| Comparisons | Example document |
-| --- | --- |
-| Comparison of different sizing methods (L2, L3) for different random profiles| [sizing_method_comparison.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Validation/sizing_method_comparison.py) |
-| Comparison in calculation time and accuracy between using the precalculated gfunction data or not | [speed_comparison.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Validation/speed_comparison.py) |
-| Comparison of different sizing methods (L2, L3 and L4) for the same hourly profile | [sizing_method_comparison_L2_L3_L4.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Examples/sizing_method_comparison_L2_L3_L4.py) |
-| Comparison in calculation time and accuracy between the simplified L2 sizing methodology and the more accurate L3 method. | [sizing_method_comparison.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Validation/sizing_method_comparison.py) |
-| Comparison of Rb* calculation between GHEtool and EED. | [validation_effective_borehole_thermal_resistance.py](https://github.com/wouterpeere/GHEtool/blob/main/GHEtool/Validation/validation_effective_borehole_thermal_resistance.py) |
-
+GHEtool offers functionalities of value to all different disciplines working with borefields. The features are available both in the code environment and in the GUI.
+For more information about the functionalities of GHEtool, please visit the [ReadTheDocs](https://ghetool.readthedocs.org).
 ## License
 
 *GHEtool* is licensed under the terms of the 3-clause BSD-license.
@@ -194,14 +176,16 @@ For more information on how to cite GHEtool, please visit the ReadTheDocs at [GH
 ## References
 
 ### Development of GHEtool
-Peere, W., Blanke, T. (2022). _GHEtool: An open-source tool for borefield sizing in Python._ Journal of Open Source Software, 7(76), 4406, https://doi.org/10.21105/joss.04406
+Peere, W., Blanke, T. (2022). GHEtool: An open-source tool for borefield sizing in Python. _Journal of Open Source Software, 7_(76), 4406, https://doi.org/10.21105/joss.04406
 
-Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. (2021) _Validated combined first and last year borefield sizing methodology._ In _Proceedings of International Building Simulation Conference 2021_. Brugge (Belgium), 1-3 September 2021. https://doi.org/10.26868/25222708.2021.30180
+Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. (2021). Validated combined first and last year borefield sizing methodology. In _Proceedings of International Building Simulation Conference 2021_. Brugge (Belgium), 1-3 September 2021. https://doi.org/10.26868/25222708.2021.30180
 
-Peere, W. (2020) Methode voor economische optimalisatie van geothermische verwarmings- en koelsystemen. Master thesis, Department of Mechanical Engineering,
+Peere, W. (2020). Methode voor economische optimalisatie van geothermische verwarmings- en koelsystemen. Master thesis, Department of Mechanical Engineering,
 KU Leuven, Belgium.
 
 ### Applications/Mentions of GHEtool
+
+Verleyen, L., Peere, W., Michiels, E., Boydens, W., Helsen, L. (2022). The beauty of reason and insight: a story about 30 years old borefield equations. _IEA HPT Magazine 40_(3), 36-39, https://doi.org/10.23697/6q4n-3223
 
 Peere, W., Boydens, W., Helsen, L. (2022). GHEtool: een open-sourcetool voor boorvelddimensionering. Presented at the 15e warmtepompsymposium: van uitdaging naar aanpak, Quadrivium, Heverlee, België.
 
@@ -209,12 +193,12 @@ Peere, W., Coninx, M., De Nies, J., Hermans, L., Boydens, W., Helsen, L. (2022).
 
 Peere, W. (2022). Technologieën voor de energietransitie. Presented at the Energietransitie in meergezinswoningen en kantoorgebouwen: uitdagingen!, VUB Brussel Bruxelles - U Residence.
 
-M. Sharifi. (2022) Early-Stage Integrated Design Methods for Hybrid GEOTABS Buildings. PhD thesis, Department of Architecture and Urban Planning, Faculty of Engineering and Architecture, Ghent University.
+Sharifi., M. (2022). Early-Stage Integrated Design Methods for Hybrid GEOTABS Buildings. PhD thesis, Department of Architecture and Urban Planning, Faculty of Engineering and Architecture, Ghent University.
 
-Coninx M., De Nies J. (2022) Cost-efficient Cooling of Buildings by means of Borefields with Active and Passive Cooling. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
+Coninx, M., De Nies, J. (2022). Cost-efficient Cooling of Buildings by means of Borefields with Active and Passive Cooling. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
 
-Michiels E. (2022) Dimensionering van meerdere gekoppelde boorvelden op basis van het type vraagprofiel en de verbinding met de gebruikers. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
+Michiels, E. (2022). Dimensionering van meerdere gekoppelde boorvelden op basis van het type vraagprofiel en de verbinding met de gebruikers. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
 
-Vanpoucke B. (2022) Optimale dimensionering van boorvelden door een variabel massadebiet. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
+Vanpoucke, B. (2022). Optimale dimensionering van boorvelden door een variabel massadebiet. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
 
-Haesen R., Hermans L. (2021) Design and Assessment of Low-carbon Residential District Concepts with (Collective) Seasonal Thermal Energy Storage. Master thesis, Departement of Mechanical Engineering, KU Leuven, Belgium.
+Haesen R., Hermans L. (2021). Design and Assessment of Low-carbon Residential District Concepts with (Collective) Seasonal Thermal Energy Storage. Master thesis, Departement of Mechanical Engineering, KU Leuven, Belgium.

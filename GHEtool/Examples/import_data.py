@@ -1,5 +1,6 @@
 """
 This document is an example on how to import hourly load profiles into GHEtool.
+It uses the hourly_profile.csv data.
 """
 # import all the relevant functions
 from GHEtool import *
