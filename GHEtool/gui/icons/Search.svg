@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="21.991667mm"
+   height="21.991669mm"
+   viewBox="0 0 21.991667 21.991669"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="Search.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     fit-margin-top="2"
+     fit-margin-left="2"
+     fit-margin-bottom="2"
+     fit-margin-right="2"
+     inkscape:zoom="3.0930415"
+     inkscape:cx="61.589862"
+     inkscape:cy="27.642694"
+     inkscape:window-width="1920"
+     inkscape:window-height="1027"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-78.309466,-97.128591)">
+    <path
+       d="m 97.83392,114.39025 -2.848102,-2.8481 c -0.387341,-0.38734 -0.911392,-0.52405 -1.412657,-0.43291 l -1.002532,-1.00254 c 0.888607,-1.13923 1.412658,-2.59746 1.412658,-4.14683 0,-3.75949 -3.07595,-6.835445 -6.835444,-6.835445 -3.759494,0 -6.835444,3.075955 -6.835444,6.835445 0,3.75949 3.07595,6.83545 6.835444,6.83545 1.549367,0 2.98481,-0.52405 4.146836,-1.41266 l 1.002532,1.00253 c -0.09114,0.50126 0.04557,1.02531 0.432911,1.41265 l 2.848102,2.84811 c 0.318988,0.31898 0.729114,0.47848 1.139241,0.47848 0.410124,0 0.820251,-0.1595 1.139241,-0.47848 0.592408,-0.63798 0.592408,-1.6405 -0.02282,-2.2557 z m -10.708862,-2.98481 c -3.007596,0 -5.468356,-2.46076 -5.468356,-5.46835 0,-3.0076 2.46076,-5.46836 5.468356,-5.46836 3.007595,0 5.468355,2.46076 5.468355,5.46836 0,3.00759 -2.46076,5.46835 -5.468355,5.46835 z"
+       id="path1118"
+       style="fill:#ffffff;stroke-width:0.227848" />
+  </g>
+</svg>

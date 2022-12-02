@@ -31,6 +31,8 @@ from PySide6.QtWidgets import QMessageBox as QtWidgets_QMessageBox
 from PySide6.QtWidgets import QPushButton as QtWidgets_QPushButton
 from PySide6.QtWidgets import QSizePolicy, QSpacerItem
 from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
+from PySide6.QtCore import QSize
+from PySide6.QtGui import QIcon
 
 from GHEtool.gui.gui_calculation_thread import (CalcProblem)
 from GHEtool.gui.gui_data_storage import DataStorage
@@ -39,8 +41,8 @@ from GHEtool.gui.gui_structure import *  # GuiStructure, Option, FunctionButton,
 from GHEtool.gui.translation_class import Translations
 
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt5agg import \
-    FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
 if TYPE_CHECKING:
     from pandas import DataFrame as pd_DataFrame
@@ -1012,8 +1014,16 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             canvas = FigureCanvas(fig_obj.fig)
             # save variables
             fig_obj.layout_frame.addWidget(canvas)
+            toolbar = NavigationToolbar(canvas, QtWidgets_QWidget(self.central_widget), True)
+            for name, icon_name in [("save_figure", "Save_Inv"), ('home', 'Home'), ('zoom', 'Search'), ('back', 'Back'), ('forward', 'Forward'),
+                                    ('pan', 'Pen'), ('configure_subplots', 'Options'), ('edit_parameters', 'Parameters')]:
+                icon = QIcon()
+                icon.addFile(f":/icons/icons/{icon_name}.svg", QSize(), QIcon.Normal, QIcon.Off)
+                toolbar._actions[name].setIcon(icon)
+            fig_obj.layout_frame.addWidget(toolbar)
             fig_obj.canvas = canvas
             fig_obj.canvas.show()
+
             # draw new plot
             canvas.draw()
 
