@@ -1,14 +1,14 @@
 """
-This file gives an example on how to work with a custom _borefield within GHEtool using pygfunction.
+This file gives an example on how to work with a custom borefield within GHEtool using pygfunction.
 
-When working on a custom _borefield configuration, one needs to import this configuration into the GHEtool.
-Based on the pygfunction, one creates his custom _borefield and gives it as an argument to the class initiater Borefield of GHEtool.
+When working on a custom borefield configuration, one needs to import this configuration into the GHEtool.
+Based on the pygfunction, one creates his custom borefield and gives it as an argument to the class initiater Borefield of GHEtool.
 
 You also need a custom g-function file for interpolation. This can also be given as an argument to the class initiater as _custom_gfunction.
 This custom variable, must contain gfunctions for all time steps in Borefield.DEFAULT_TIME_ARRAY, and should be structured as follows:
 {"Time":Borefield.DEFAULT_TIME_ARRAY,"Data":[[Depth1,[Gfunc1,Gfunc2 ...]],[Depth2,[Gfunc1, Gfunc2 ...]]]}.
 
-However, one can use the function 'create_custom_dataset' when a custom _borefield is given. This will make the required dataset for the optimisation.
+However, one can use the function 'create_custom_dataset' when a custom borefield is given. This will make the required dataset for the optimisation.
  """
 
 import numpy as np
@@ -36,7 +36,7 @@ monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2
 monthly_load_heating = annual_heating_load * monthly_load_heating_percentage  # kWh
 monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage  # kWh
 
-# create the _borefield object
+# create the borefield object
 
 borefield = Borefield(simulation_period=20,
                       peak_heating=peak_heating,

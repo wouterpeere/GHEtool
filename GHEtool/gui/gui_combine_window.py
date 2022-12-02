@@ -1,7 +1,7 @@
 from functools import partial as ft_partial
 from os.path import dirname, realpath, exists
 from os.path import split as os_split
-from os import makedirs, remove
+from os import makedirs, remove, getcwd
 from pathlib import Path, PurePath
 from pickle import HIGHEST_PROTOCOL as pk_HP
 from pickle import dump as pk_dump
@@ -34,7 +34,7 @@ from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
 
 from GHEtool.gui.gui_calculation_thread import (CalcProblem)
 from GHEtool.gui.gui_data_storage import DataStorage
-from GHEtool.gui.gui_base_class import UiGhetool
+from GHEtool.gui.gui_base_class import UiGhetool, set_graph_layout
 from GHEtool.gui.gui_structure import *  # GuiStructure, Option, FunctionButton,
 from GHEtool.gui.translation_class import Translations
 
@@ -65,6 +65,8 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         :param dialog: Q widget as main window
         :param app: application widget
         """
+        # parameter to show the end of the init function
+        self.started = False
         # init windows of parent class
         super(MainWindow, self).__init__()
         super().setup_ui(dialog)
@@ -85,9 +87,11 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # allow checking of changes
         self.checking: bool = False
         # create backup path in home documents directory
-        self.backup_path: str = str(PurePath(Path.home(), 'Documents/GHEtool', BACKUP_FILENAME))
+        self.default_path: str = str(PurePath(Path.home(), 'Documents/GHEtool'))
+        self.backup_path: str = str(PurePath(getcwd(), BACKUP_FILENAME))
         # check if backup folder exits and otherwise create it
         makedirs(dirname(self.backup_path), exist_ok=True)
+        makedirs(dirname(self.default_path), exist_ok=True)
         self.translations: Translations = Translations()  # init translation class
         for idx, (name, icon, short_cut) in enumerate(zip(self.translations.languages, self.translations.icon, self.translations.short_cut)):
             self.create_action_language(idx, name, icon, short_cut)
@@ -139,6 +143,13 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.status_bar.showMessage(self.translations.GHE_tool_imported[self.gui_structure.option_language.get_value()], 5000)
         # allow checking of changes
         self.checking: bool = True
+
+        # set the correct graph layout
+        set_graph_layout()
+
+        # set started to True
+        # this is so that no changes are made when the file is opening
+        self.started: bool = True
 
     def create_action_language(self, idx: int, name: str, icon_name: str, short_cut: str):
         action = QtGui_QAction(self.central_widget)
@@ -268,6 +279,9 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         check if changes to scenario or saved file happened
         :return: None
         """
+        # return if not yet started
+        if not self.started:
+            return
         # return if checking is not allowed
         if not self.checking:
             return
@@ -287,6 +301,11 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         if self.changedFile is False:
             self.changedFile: bool = True
             self.change_window_title()
+        # get current index of scenario
+        idx: int = self.list_widget_scenario.currentRow()
+        if self.list_ds:
+            # remove borefield object
+            self.list_ds[idx].borefield = None
         # abort here if autosave scenarios is used
         if self.gui_structure.option_auto_saving.get_value() == 1:
             return
@@ -298,8 +317,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # abort if there is no text
         if len(text) < 1:
             return
-        # get current index of scenario
-        idx: int = self.list_widget_scenario.currentRow()
         # create current data storage
         ds: DataStorage = DataStorage(self.gui_structure)
         # check if current data storage is equal to the previous one then delete the *
@@ -609,6 +626,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         except FileNotFoundError:
             self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
         except PermissionError:
+            print("PermissionError")
             return
 
     def fun_load(self) -> None:
@@ -634,7 +652,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.checking: bool = False
             # open file and get data
             with open(self.filename[0], "rb") as f:
-                li: list = pk_load(f)
+                self.filename, li, settings = pk_load(f)
             # write data to variables
             self.list_ds, li = li[0], li[1]
             # change window title to new loaded filename
@@ -671,7 +689,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         if self.filename == MainWindow.filenameDefault:
             self.filename: tuple = QtWidgets_QFileDialog.getSaveFileName(
                 self.central_widget, caption=self.translations.SavePKL[self.gui_structure.option_language.get_value()], filter="GHEtool (*.GHEtool)",
-                dir=self.backup_path.replace(BACKUP_FILENAME, ''),
+                dir=self.default_path,
             )
             # break function if no file is selected
             if self.filename == MainWindow.filenameDefault:
@@ -682,13 +700,18 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.fun_save_auto()
         # Create list if no scenario is stored
         self.list_ds.append(DataStorage(self.gui_structure)) if len(self.list_ds) < 1 else None
+        # create list of settings with language and autosave option
+        settings: list = [self.gui_structure.option_language.get_value(),
+                          self.gui_structure.option_auto_saving.get_value()]
+
         # try to store the data in the pickle file
         try:
             # create list of all scenario names
             li = [self.list_widget_scenario.item(idx).text() for idx in range(self.list_widget_scenario.count())]
             # store data
             with open(self.filename[0], "wb") as f:
-                pk_dump([self.list_ds, li], f, pk_HP)
+                saving = self.filename, [self.list_ds, li], settings
+                pk_dump(saving, f, pk_HP)
             # deactivate changed file * from window title
             self.changedFile: bool = False
             self.change_window_title()
@@ -707,7 +730,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.filename: tuple = MainWindow.filenameDefault  # reset filename
         self.fun_save()  # get and save filename
         self.list_ds: list = []  # reset list of data storages
-        self.list_ds = []
         self.list_widget_scenario.clear()  # clear list widget with scenario list
 
     def change_scenario(self, idx: int) -> None:
@@ -754,7 +776,9 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         if len(self.list_ds) == idx:
             self.add_scenario()
         else:
-            self.list_ds[idx] = DataStorage(self.gui_structure)
+            # do not overwrite any results
+            if self.list_ds[idx].borefield is None:
+                self.list_ds[idx] = DataStorage(self.gui_structure)
         # create auto backup
         self.fun_save_auto()
         # remove * from scenario if not Auto save is checked and if the last char is a *
@@ -837,6 +861,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.threads[self.finished].terminate()
 
         self.list_ds[results[1]] = results[0]
+
         # count number of finished calculated scenarios
         self.finished += 1
         # update progress bar
@@ -931,9 +956,8 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         :return: None
         """
         # hide widgets if no list of scenarios exists and display not calculated text
-
         def hide_no_result(hide: bool = True):
-            if hide:
+            if hide or self.list_widget_scenario.currentItem().text()[-1] == "*":
                 for cat in self.gui_structure.page_result.list_categories:
                     cat.hide(results=True)
                 self.gui_structure.cat_no_result.show()
@@ -1009,7 +1033,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # get filename at storage place
         filename = QtWidgets_QFileDialog.getSaveFileName(
             self.central_widget, caption=self.translations.SaveFigure[self.gui_structure.option_language.get_value()],
-            dir=self.backup_path.replace(BACKUP_FILENAME, ''),
+            dir=self.default_path,
             filter="PNG (*.png);;svg (*.svg);;PDF (*.pdf)",
             selectedFilter="png (*.png);;svg (*.svg);;PDF (*.pdf)",
         )

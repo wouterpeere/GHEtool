@@ -67,7 +67,7 @@ print(borefield.results_peak_cooling)
 print("---------------------------------------------")
 
 # size the borefield for quadrant 3
-# for more information about _borefield quadrants, see (Peere et al., 2021)
+# for more information about borefield quadrants, see (Peere et al., 2021)
 depth = borefield.size(100, quadrant_sizing=3)
 print("The borehole depth is: ", str(round(depth, 2)), "m for a sizing in quadrant 3")
 # plot temperature profile for the calculated depth
