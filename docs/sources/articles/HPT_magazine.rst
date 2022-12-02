@@ -1,5 +1,5 @@
 ***********************************************************
-IEA HPT magazine (2022)
+Verleyen et al. (2022)
 ***********************************************************
 
 The code below is used in the article of Verleyen et al. (2022) [1]_.
