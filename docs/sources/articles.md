@@ -7,8 +7,6 @@ In this way, we want to contribute to the transparency in the academic world by 
 
 > Verleyen, L., Peere, W., Michiels, E., Boydens, W., Helsen, L. (2022). The beauty of reason and insight: a story about 30 years old borefield equations. _IEA HPT Magazine 40_(3), 36-39, https://doi.org/10.23697/6q4n-3223
 
-The code for this article can be found in:
-
 ```{toctree}
 articles/HPT_magazine.rst
 ```
