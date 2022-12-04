@@ -1505,6 +1505,7 @@ class Borefield:
             time_array = self.time_L3_last_year / 12 / 730. / 3600.
 
         plt.rc('figure')
+        # create new figure and axes if it not already exits otherwise clear it.
         if self.fig_temperature is None:
             fig = plt.figure()
             ax = fig.add_subplot(111)
@@ -1512,7 +1513,7 @@ class Borefield:
             fig = self.fig_temperature
             ax: plt.Axes = fig.get_axes()[0]
             ax.clear()
-
+        # set axes labels
         ax.set_xlabel(r'Time (year)')
         ax.set_ylabel(r'Temperature ($^\circ C$)')
 
@@ -1537,10 +1538,9 @@ class Borefield:
         if legend:
             ax.legend()
         ax.set_xlim(left=0, right=self.simulation_period)
-
+        # show figure if not in gui mode
         if not self.gui:
             plt.show()
-            return fig, ax
         return fig, ax
 
     def _calculate_temperature_profile(self, H: float = None, hourly: bool = False) -> None:
@@ -2275,34 +2275,35 @@ class Borefield:
         if not self._check_hourly_load():
             fig = plt.figure() if self.fig_load_duration is None else self.fig_load_duration
             return fig, fig.add_subplot(111)
-
+        # sort heating and cooling load
         heating = self.hourly_heating_load.copy()
         heating[::-1].sort()
 
         cooling = self.hourly_cooling_load.copy()
         cooling.sort()
         cooling = cooling * (-1)
-
+        # create new figure and axes if it not already exits otherwise clear it.
         if self.fig_load_duration is None:
             fig = plt.figure()
             ax = fig.add_subplot(111)
         else:
-            fig = self.fig_temperature
+            fig = self.fig_load_duration
             ax: plt.Axes = fig.get_axes()[0]
             ax.clear()
-
+        # add sorted loads to plot
         ax.step(np.arange(0, 8760, 1), heating, 'r-', label="Heating")
         ax.step(np.arange(0, 8760, 1), cooling, 'b-', label="Cooling")
+        # create 0 line
         ax.hlines(0, 0, 8759, color="black")
-
+        # add labels
         ax.set_xlabel("Time [hours]")
         ax.set_ylabel("Power [kW]")
-
+        # set x limits to 8760
         ax.set_xlim(0, 8760)
-
+        # plot legend if wanted
         if legend:
             ax.legend()
-
+        # show plt if not in gui
         if not self.gui:
             plt.show()
         return fig, ax

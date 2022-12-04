@@ -2143,15 +2143,31 @@ class ResultFigure(Category):
             self.save_fig = FunctionButton(category=self, button_text="Save figure", icon=":/icons/icons/Save_Inv.svg")
 
     def create_widget(self, page: QtW.QWidget, layout: QtW.QLayout):
+        # create widget as from category
         super().create_widget(page, layout)
-        self.layout_frame.addWidget(self.canvas)
+        # create frame with no border for the frames inside the NavigationToolbar
+        frame_local: QtW.QFrame = QtW.QFrame(self.frame)
+        frame_local.setParent(page)
+        frame_local.setStyleSheet(
+            f"QFrame{'{'}border: 0px solid {LIGHT};border-bottom-left-radius: 15px;border-bottom-right-radius: 15px;{'}'}\n"
+            f"QLabel{'{'}border: 0px solid {WHITE};{'}'}"
+        )
+        frame_local.setFrameShape(QtW.QFrame.StyledPanel)
+        frame_local.setFrameShadow(QtW.QFrame.Raised)
+        self.layout_frame.addWidget(frame_local)
+        layout_frame_local = QtW.QVBoxLayout(frame_local)
+        # set minimal height to ensure a minimal height of the plots
+        frame_local.setMinimumHeight(500)
+        # create navigation toolbar and replace icons with white ones
         toolbar: NavigationToolbar = NavigationToolbar(self.canvas, self.frame, True)
         for name, icon_name in [("save_figure", "Save_Inv"), ('home', 'Home'), ('zoom', 'Search'), ('back', 'Back'), ('forward', 'Forward'),
                                 ('pan', 'Pen'), ('configure_subplots', 'Options'), ('edit_parameters', 'Parameters')]:
             icon = QIcon()
             icon.addFile(f":/icons/icons/{icon_name}.svg", QSize(), QIcon.Normal, QIcon.Off)
             toolbar._actions[name].setIcon(icon)
-        self.layout_frame.addWidget(toolbar)
+        # add canvas and toolbar to local frame
+        layout_frame_local.addWidget(self.canvas)
+        layout_frame_local.addWidget(toolbar)
 
     def set_text(self, name: str) -> None:
         """

@@ -7,23 +7,18 @@ from pickle import HIGHEST_PROTOCOL as pk_HP
 from pickle import dump as pk_dump
 from pickle import load as pk_load
 from sys import path
-from time import sleep
-from typing import TYPE_CHECKING, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, List, Tuple, Union
 
 from PySide6.QtCore import QEvent as QtCore_QEvent, QTimer
 from PySide6.QtCore import QModelIndex as QtCore_QModelIndex
 from PySide6.QtCore import QSize as QtCore_QSize
-from PySide6.QtCore import QThread as QtCore_QThread
-from PySide6.QtCore import Signal as QtCore_pyqtSignal
 from PySide6.QtGui import QAction as QtGui_QAction
 from PySide6.QtGui import QIcon as QtGui_QIcon
 from PySide6.QtGui import QPixmap as QtGui_QPixmap
 from PySide6.QtWidgets import QApplication as QtWidgets_QApplication
 from PySide6.QtWidgets import QDialog as QtWidgets_QDialog
-from PySide6.QtWidgets import QDoubleSpinBox as QtWidgets_QDoubleSpinBox
 from PySide6.QtWidgets import QFileDialog as QtWidgets_QFileDialog
 from PySide6.QtWidgets import QInputDialog as QtWidgets_QInputDialog
-from PySide6.QtWidgets import QListWidget as QtWidgets_QListWidget
 from PySide6.QtWidgets import QListWidgetItem as QtWidgets_QListWidgetItem
 from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
 from PySide6.QtWidgets import QMenu as QtWidgets_QMenu
@@ -31,23 +26,15 @@ from PySide6.QtWidgets import QMessageBox as QtWidgets_QMessageBox
 from PySide6.QtWidgets import QPushButton as QtWidgets_QPushButton
 from PySide6.QtWidgets import QSizePolicy, QSpacerItem
 from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
-from PySide6.QtCore import QSize
-from PySide6.QtGui import QIcon
 
 from GHEtool.gui.gui_calculation_thread import (CalcProblem)
 from GHEtool.gui.gui_data_storage import DataStorage
 from GHEtool.gui.gui_base_class import UiGhetool, set_graph_layout
-from GHEtool.gui.gui_structure import *  # GuiStructure, Option, FunctionButton,
+from GHEtool.gui.gui_structure import GuiStructure, Option, FunctionButton, FigureOption
 from GHEtool.gui.translation_class import Translations
 
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
 if TYPE_CHECKING:
-    from pandas import DataFrame as pd_DataFrame
-    from pandas import ExcelFile as pd_ExcelFile
-
     from GHEtool import Borefield
 
 currentdir = dirname(realpath(__file__))
@@ -177,7 +164,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         set links of buttons and actions to function
         :return: None
         """
-        for option, name in self.gui_structure.list_of_options:
+        for option, name in [(opt, name) for opt, name in self.gui_structure.list_of_options if not isinstance(opt, FigureOption)]:
             option.change_event(self.change)
         for option, name in self.gui_structure.list_of_aims:
             option.change_event(self.change)
@@ -998,19 +985,15 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
 
             if fig_obj.is_hidden():
                 continue
-
+            # set figure to canvas figure
             setattr(borefield, fig_obj.figure_name, fig_obj.fig)
-
-            # create figure and axe if not already exists
+            # create axes and drawing
             fig_obj.fig, fig_obj.ax = getattr(borefield, fig_obj.function_name)(**fig_obj.kwargs)
             # show everything
             fig_obj.show()
             fig_obj.canvas.show()
-            # ensure that a minimal height is shown
-            fig_obj.fig.set_figheight(300, True)
             # draw new plot
             fig_obj.canvas.draw()
-
 
         # update result for every ResultText object
         for result_text_obj, result_text_name in self.gui_structure.list_of_result_texts:
