@@ -23,6 +23,34 @@ import PySide6.QtCore as QtC  # type: ignore
 import PySide6.QtGui as QtG  # type: ignore
 import PySide6.QtWidgets as QtW  # type: ignore
 
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+
+from PySide6.QtCore import QEvent as QtCore_QEvent, QTimer
+from PySide6.QtCore import QModelIndex as QtCore_QModelIndex
+from PySide6.QtCore import QSize as QtCore_QSize
+from PySide6.QtCore import QThread as QtCore_QThread
+from PySide6.QtCore import Signal as QtCore_pyqtSignal
+from PySide6.QtGui import QAction as QtGui_QAction
+from PySide6.QtGui import QIcon as QtGui_QIcon
+from PySide6.QtGui import QPixmap as QtGui_QPixmap
+from PySide6.QtWidgets import QApplication as QtWidgets_QApplication
+from PySide6.QtWidgets import QDialog as QtWidgets_QDialog
+from PySide6.QtWidgets import QDoubleSpinBox as QtWidgets_QDoubleSpinBox
+from PySide6.QtWidgets import QFileDialog as QtWidgets_QFileDialog
+from PySide6.QtWidgets import QInputDialog as QtWidgets_QInputDialog
+from PySide6.QtWidgets import QListWidget as QtWidgets_QListWidget
+from PySide6.QtWidgets import QListWidgetItem as QtWidgets_QListWidgetItem
+from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
+from PySide6.QtWidgets import QMenu as QtWidgets_QMenu
+from PySide6.QtWidgets import QMessageBox as QtWidgets_QMessageBox
+from PySide6.QtWidgets import QPushButton as QtWidgets_QPushButton
+from PySide6.QtWidgets import QSizePolicy, QSpacerItem
+from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
+from PySide6.QtCore import QSize
+from PySide6.QtGui import QIcon
+
 from GHEtool.gui.gui_base_class import DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE
 
 
@@ -2096,7 +2124,7 @@ class ResultFigure(Category):
     The ResultFigure option can be used to show figurative results in the results page.
     It is a category showing a figure and optionally a couple of FigureOptions to alter this figure.
     """
-    def __init__(self, label: str, page: Page, save_figure_button: bool = True):
+    def __init__(self, label: str, page: Page, figure_name: str, save_figure_button: bool = True):
         """
 
         Parameters
@@ -2121,9 +2149,11 @@ class ResultFigure(Category):
         .. figure:: _static/Example_ResultFigure.PNG
         """
         super().__init__(label, page)
-        self.fig = None
-        self.ax = None
-        self.canvas = None
+        self.figure_name: str = figure_name
+        plt.rc('figure')
+        self.fig: plt.Figure = plt.figure()
+        self.ax: Optional[plt.Axes] = self.fig.add_subplot(111)
+        self.canvas: FigureCanvas = FigureCanvas(self.fig)
         self.save_fig: bool = False
         self._kwargs: dict = {}
         self.function_name: str = ""
@@ -2132,6 +2162,18 @@ class ResultFigure(Category):
 
         if save_figure_button:
             self.save_fig = FunctionButton(category=self, button_text="Save figure", icon=":/icons/icons/Save_Inv.svg")
+
+    def create_widget(self, page: QtW.QWidget, layout: QtW.QLayout):
+        super().create_widget(page, layout)
+        self.layout_frame.addWidget(self.canvas)
+        toolbar = NavigationToolbar(self.canvas, self.frame, True)
+        for name, icon_name in [("save_figure", "Save_Inv"), ('home', 'Home'), ('zoom', 'Search'), ('back', 'Back'), ('forward', 'Forward'),
+                                ('pan', 'Pen'), ('configure_subplots', 'Options'), ('edit_parameters', 'Parameters')]:
+            icon = QIcon()
+            icon.addFile(f":/icons/icons/{icon_name}.svg", QSize(), QIcon.Normal, QIcon.Off)
+            toolbar._actions[name].setIcon(icon)
+
+        self.layout_frame.addWidget(toolbar)
 
     def set_text(self, name: str) -> None:
         """

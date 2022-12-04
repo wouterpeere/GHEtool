@@ -90,7 +90,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.checking: bool = False
         # create backup path in home documents directory
         self.default_path: str = str(PurePath(Path.home(), 'Documents/GHEtool'))
-        self.backup_path: str = str(PurePath(getcwd(), BACKUP_FILENAME))
+        self.backup_path: str = str(PurePath(self.default_path, BACKUP_FILENAME))
         # check if backup folder exits and otherwise create it
         makedirs(dirname(self.backup_path), exist_ok=True)
         makedirs(dirname(self.default_path), exist_ok=True)
@@ -893,6 +893,12 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.add_scenario() if not self.list_ds else self.save_scenario()
         if self.list_widget_scenario.currentItem().text()[-1] == '*':
             return
+        # create list of threads with scenarios that have not been calculated
+        self.threads = [CalcProblem(DS, idx) for idx, DS in enumerate(self.list_ds) if DS.borefield is None]
+        # set number of to calculate scenarios
+        self.NumberOfScenarios: int = len(self.threads)
+        if self.NumberOfScenarios < 1:
+            return
         # disable buttons and actions to avoid two calculation at once
         self.pushButton_start_multiple.setEnabled(False)
         self.pushButton_start_single.setEnabled(False)
@@ -903,10 +909,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.finished: int = 0
         # update progress bar
         self.update_bar(0, True)
-        # create list of threads with scenarios that have not been calculated
-        self.threads = [CalcProblem(DS, idx) for idx, DS in enumerate(self.list_ds) if DS.borefield is None]
-        # set number of to calculate scenarios
-        self.NumberOfScenarios: int = len(self.threads)
         # start calculation if at least one scenario has to be calculated
         if self.NumberOfScenarios > 0:
             self.threads[0].start()
@@ -924,6 +926,14 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.add_scenario() if not self.list_ds else self.save_scenario()
         if self.list_widget_scenario.currentItem().text()[-1] == '*':
             return
+        # get index of selected scenario
+        idx: int = self.list_widget_scenario.currentRow()
+        # get Datastorage of selected scenario
+        ds: DataStorage = self.list_ds[idx]
+        # if calculation is already done just show results
+        if ds.borefield is not None:
+            self.gui_structure.page_result.button.click()
+            return
         # return to thermal demands page if no file is selected
         # disable buttons and actions to avoid two calculation at once
         self.pushButton_start_multiple.setEnabled(False)
@@ -935,14 +945,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.finished: int = 0
         # update progress bar
         self.update_bar(0, True)
-        # get index of selected scenario
-        idx: int = self.list_widget_scenario.currentRow()
-        # get Datastorage of selected scenario
-        ds: DataStorage = self.list_ds[idx]
-        # if calculation is already done just show results
-        if ds.borefield is not None:
-            self.gui_structure.page_result.button.click()
-            return
         # create list of threads with calculation to be made
         self.threads = [CalcProblem(ds, idx)]
         # set number of to calculate scenarios
@@ -998,34 +1000,23 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                 continue
 
             plt.rc('figure')
-            if fig_obj.ax is not None:
-                fig_obj.ax.clear()
-            if fig_obj.fig is not None:
-                plt.close(fig_obj.fig)
 
-            if fig_obj.canvas is not None:
-                fig_obj.frame.layout().removeWidget(fig_obj.canvas)
-                fig_obj.canvas.setParent(None)
-                fig_obj.canvas = None
+            setattr(borefield, fig_obj.figure_name, fig_obj.fig)
 
             # create figure and axe if not already exists
             fig_obj.fig, fig_obj.ax = getattr(borefield, fig_obj.function_name)(**fig_obj.kwargs)
+            # update figure and canvas
+            #fig_obj.canvas.figure = fig_obj.fig
+            #fig_obj.fig.canvas = fig_obj.canvas
+            # show everything
             fig_obj.show()
-            canvas = FigureCanvas(fig_obj.fig)
-            # save variables
-            fig_obj.layout_frame.addWidget(canvas)
-            toolbar = NavigationToolbar(canvas, QtWidgets_QWidget(self.central_widget), True)
-            for name, icon_name in [("save_figure", "Save_Inv"), ('home', 'Home'), ('zoom', 'Search'), ('back', 'Back'), ('forward', 'Forward'),
-                                    ('pan', 'Pen'), ('configure_subplots', 'Options'), ('edit_parameters', 'Parameters')]:
-                icon = QIcon()
-                icon.addFile(f":/icons/icons/{icon_name}.svg", QSize(), QIcon.Normal, QIcon.Off)
-                toolbar._actions[name].setIcon(icon)
-            fig_obj.layout_frame.addWidget(toolbar)
-            fig_obj.canvas = canvas
             fig_obj.canvas.show()
-
+            # ensure that a minimal height is shown
+            fig_obj.fig.set_figheight(300, True)
             # draw new plot
-            canvas.draw()
+            fig_obj.canvas.draw()
+
+
 
         # update result for every ResultText object
         for result_text_obj, result_text_name in self.gui_structure.list_of_result_texts:

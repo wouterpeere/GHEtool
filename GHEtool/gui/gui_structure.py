@@ -1040,6 +1040,7 @@ class GuiStructure:
             def create_figure_temperature_profile():
                 self.figure_temperature_profile = ResultFigure(label="Temperature evolution",
                                                                page=self.page_result,
+                                                               figure_name='fig_temperature',
                                                                save_figure_button=True)
 
                 self.figure_temperature_profile.fig_to_be_shown(class_name="Borefield",
@@ -1067,6 +1068,7 @@ class GuiStructure:
             def create_figure_load_duration():
                 self.figure_load_duration = ResultFigure(label="Load-duration curve",
                                                          page=self.page_result,
+                                                         figure_name='fig_load_duration',
                                                          save_figure_button=True)
 
                 self.figure_load_duration.fig_to_be_shown(class_name="Borefield",
