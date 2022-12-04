@@ -131,3 +131,5 @@ dmypy.json
 .idea/
 README.md.orig
 GHEtool/change_pickle_data.py
+*.GHEtool
+Output/

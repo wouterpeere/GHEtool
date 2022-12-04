@@ -164,6 +164,15 @@ def hourly_borefield():
 
 
 @pytest.fixture
+def hourly_borefield_reversed():
+    borefield = Borefield()
+    borefield.set_ground_parameters(data)
+    borefield.set_borefield(borefield_gt)
+    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv", first_column_heating=False)
+    return borefield
+
+
+@pytest.fixture
 def borefield_cooling_dom():
     borefield = Borefield(simulation_period=20,
                           peak_heating=peakHeating,
@@ -178,14 +187,17 @@ def borefield_cooling_dom():
 
     return borefield
 
+
 def test_create_rectangular_field(borefield):
     for i in range(len(borefield.borefield)):
         assert borefield.borefield[i].__dict__ == borefield.create_rectangular_borefield(10, 12, 6, 6, 110, 4, 0.075)[i].__dict__
+
 
 def test_create_circular_field(borefield):
     borefield.create_circular_borefield(10, 10, 100, 1)
     for i in range(len(borefield.borefield)):
         assert borefield.borefield[i].__dict__ == gt.boreholes.circle_field(10, 10, 100, 1, 0.075)[i].__dict__
+
 
 def test_empty_values(empty_borefield):
     np.testing.assert_array_equal(empty_borefield.baseload_cooling, np.zeros(12))
@@ -233,7 +245,7 @@ def test_without_pipe(borefield):
 
 
 def test_Tg(borefield):
-    borefield.use_constant_Tg = False
+    borefield._sizing_setup.use_constant_Tg = False
     borefield._Tg()
 
 
@@ -266,6 +278,32 @@ def test_size_L4(hourly_borefield):
     assert hourly_borefield._check_hourly_load()
     hourly_borefield.sizing_setup(L4_sizing=True)
     hourly_borefield.size()
+
+
+def test_size_L4_quadrant(hourly_borefield):
+    hourly_borefield.sizing_setup(L4_sizing=True, quadrant_sizing=1)
+    hourly_borefield.size()
+
+
+def test_size_L4_quadrant_4(hourly_borefield):
+    hourly_borefield.hourly_heating_load[0] = 100000
+    hourly_borefield.sizing_setup(L4_sizing=True)
+    hourly_borefield.size()
+
+
+def test_size_L4_heating_dom(hourly_borefield_reversed):
+    hourly_borefield_reversed.sizing_setup(L4_sizing=True)
+    hourly_borefield_reversed.size()
+
+
+def test_size_L4_quadrant_3(hourly_borefield_reversed):
+    hourly_borefield_reversed.hourly_heating_load[0] = 100000
+    hourly_borefield_reversed.sizing_setup(L4_sizing=True)
+    hourly_borefield_reversed.size()
+
+
+def test_sizing_setup(borefield):
+    borefield.sizing_setup(sizing_setup=SizingSetup())
 
 
 def test_cooling_dom(borefield_cooling_dom):
@@ -305,7 +343,11 @@ def test_size_L4_without_data(borefield):
 
 def test_load_duration(monkeypatch, hourly_borefield):
     monkeypatch.setattr(plt, 'show', lambda: None)
-    hourly_borefield.plot_load_duration()
+    hourly_borefield.plot_load_duration(legend=True)
+
+
+def test_load_duration_no_hourly_data(borefield):
+    assert borefield.plot_load_duration() is None
 
 
 def test_optimise_load_profile_without_data(borefield):
@@ -333,14 +375,6 @@ def test_precalculated_data_1(borefield_custom_data):
 
 def test_precalculated_data_2(borefield_custom_data):
     borefield_custom_data.gfunction([3600*100, 3600*100, 3600*101], 100)
-
-
-def test_error_variable_Tg(borefield):
-    try:
-        borefield.ground_data.Tg = 14
-        borefield.sizing_setup(use_constant_Tg=False)
-    except ValueError:
-        assert True
 
 
 def test_choose_quadrant_1(borefield_quadrants):

@@ -50,6 +50,21 @@ class SizingSetup:
         # set the variables in this class by passing down the values given in this function
         self._set_sizing_setup(kwargs=locals())
 
+    def update_variables(self, **kwargs) -> None:
+        """
+        This function updates the variables in the current class.
+
+        Parameters
+        ----------
+        kwargs
+            Keyword arguments with all the variables that need to be changed with the corresponding new values
+
+        Returns
+        -------
+        None
+        """
+        self._set_sizing_setup(kwargs)
+
     def _set_sizing_setup(self, kwargs) -> None:
         """
         This method sets all the variables in the SizingSetup class.
@@ -173,7 +188,7 @@ class SizingSetup:
     def L4_sizing(self, L4_sizing) -> None:
         self._set_sizing(L4_sizing=L4_sizing)
 
-    def set_backup(self) -> None:
+    def make_backup(self) -> None:
         """
         This function sets the backup variable of the class.
         This is done by making a copy of the current class.
@@ -204,13 +219,3 @@ class SizingSetup:
         for var in vars(self):
             kwargs[var] = self._backup.__getattribute__(var)
         self._set_sizing_setup(kwargs)
-
-
-if __name__ == "__main__":
-    a = SizingSetup()
-    a.set_backup()
-    a.L3_sizing = True
-    print(a.L2_sizing)
-    print(a.backup.L2_sizing)
-    a.restore_backup()
-    print(a.L2_sizing)

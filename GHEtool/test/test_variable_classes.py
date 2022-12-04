@@ -73,3 +73,8 @@ def test_unequal_cross():
     assert data_ground != data_pipe
     assert data_fluid != data_pipe
     assert data_pipe != data_fluid
+
+
+def test_set_mfr():
+    data_fluid = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    data_fluid.set_mass_flow_rate(0.1)
