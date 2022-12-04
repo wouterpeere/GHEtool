@@ -1,4 +1,4 @@
-# GHEtool: An open-source tool for borefield sizing in Python
+# GHEtool: An open-source tool for borefield sizing
 
 [![PyPI version](https://badge.fury.io/py/GHEtool.svg)](https://badge.fury.io/py/GHEtool)
 [![Tests](https://github.com/wouterpeere/GHEtool/actions/workflows/test.yml/badge.svg)](https://github.com/wouterpeere/GHEtool/actions/workflows/test.yml)
