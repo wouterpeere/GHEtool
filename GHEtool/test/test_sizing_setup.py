@@ -26,3 +26,9 @@ def test_backup_functionality():
     test.restore_backup()
     assert test.L2_sizing == True
     assert test.L3_sizing == False
+
+
+def test_gfunction_calc_needed():
+    test = SizingSetup(relative_borefield_threshold=0.05)
+    assert not test.gfunction_calculation_needed(100, 98)
+    assert test.gfunction_calculation_needed(100, 94)

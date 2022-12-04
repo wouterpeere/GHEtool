@@ -12,7 +12,7 @@ class SizingSetup:
     """
     def __init__(self, use_constant_Rb: bool = None, use_constant_Tg: bool = None, quadrant_sizing: int = 0,
                  L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None,
-                 relative_borefield_threshold: float = 0.05):
+                 relative_borefield_threshold: float = 0.):
         """
 
         Parameters
@@ -31,6 +31,8 @@ class SizingSetup:
         L4_sizing : bool
             True if a sizing with the L4 method is needed
         relative_borefield_threshold : float
+            Speed improvement in sizing due to not calculate new gfunctions when the relative change in borefield depth
+            is lower then the threshold. See also the validation file to compare speed with accuracy.
 
         References
         ----------
@@ -44,7 +46,7 @@ class SizingSetup:
         self.use_constant_Tg: bool = True
         self.use_constant_Rb: bool = True
         self.quadrant_sizing: int = 0
-        self.relative_borefield_threshold: float = 0.05
+        self.relative_borefield_threshold: float = 0.
         self._backup: SizingSetup = None
 
         # set the variables in this class by passing down the values given in this function
@@ -187,6 +189,24 @@ class SizingSetup:
     @L4_sizing.setter
     def L4_sizing(self, L4_sizing) -> None:
         self._set_sizing(L4_sizing=L4_sizing)
+
+    def gfunction_calculation_needed(self, old_depth: float, new_depth: float) -> bool:
+        """
+        This function checks whether or not a new gfunction calculation is needed.
+
+        Parameters
+        ----------
+        old_depth : float
+            Old depth of the borehole [m]
+        new_depth : float
+            New depth of the borehole [m]
+
+        Returns
+        -------
+        bool
+            True if the gfunction should be recalculated and the borehole depth should be updated
+        """
+        return abs(old_depth - new_depth) / old_depth > self.relative_borefield_threshold
 
     def make_backup(self) -> None:
         """

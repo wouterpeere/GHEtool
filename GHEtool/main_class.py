@@ -792,15 +792,22 @@ class Borefield:
         H_prev = 0
         # set minimal depth to 50 m
         self.H = 50 if self.H < 1 else self.H
+
+        gfunc_uniform_T = None
+
         # Iterates as long as there is no convergence
         # (convergence if difference between depth in iterations is smaller than THRESHOLD_BOREHOLE_DEPTH)
         while abs(self.H - H_prev) >= Borefield.THRESHOLD_BOREHOLE_DEPTH:
-            # calculate the required g-function values
-            gfunct_uniform_T = self.gfunction(self.time, self.H)
+
+            if gfunc_uniform_T is None:
+                gfunc_uniform_T = self.gfunction(self.time, self.H)
+            elif self._sizing_setup.gfunction_calculation_needed(H_prev, self.H):
+                gfunc_uniform_T = self.gfunction(self.time, self.H)
+
             # calculate the thermal resistances
-            Ra = (gfunct_uniform_T[2] - gfunct_uniform_T[1]) / (2 * pi * self.ground_data.k_s)
-            Rm = (gfunct_uniform_T[1] - gfunct_uniform_T[0]) / (2 * pi * self.ground_data.k_s)
-            Rd = (gfunct_uniform_T[0]) / (2 * pi * self.ground_data.k_s)
+            Ra = (gfunc_uniform_T[2] - gfunc_uniform_T[1]) / (2 * pi * self.ground_data.k_s)
+            Rm = (gfunc_uniform_T[1] - gfunc_uniform_T[0]) / (2 * pi * self.ground_data.k_s)
+            Rd = (gfunc_uniform_T[0]) / (2 * pi * self.ground_data.k_s)
             # calculate the total borehole length
             L = (self.qa * Ra + self.qm * Rm + self.qh * Rd + self.qh * self._Rb) / abs(self.Tf - self._Tg())
             # updating the depth values
@@ -834,11 +841,17 @@ class Borefield:
         if self.H < 1:
             self.H = 50
 
+        gfunc_uniform_T = None
+
         # Iterates as long as there is no convergence
         # (convergence if difference between depth in iterations is smaller than THRESHOLD_BOREHOLE_DEPTH)
         while abs(self.H - H_prev) >= Borefield.THRESHOLD_BOREHOLE_DEPTH:
+
             # get the g-function values
-            gfunc_uniform_T = self.gfunction(time_steps, self.H)
+            if gfunc_uniform_T is None:
+                gfunc_uniform_T = self.gfunction(time_steps, self.H)
+            elif self._sizing_setup.gfunction_calculation_needed(H_prev, self.H):
+                gfunc_uniform_T = self.gfunction(time_steps, self.H)
 
             # calculate the thermal resistances
             Rpm = (gfunc_uniform_T[2] - gfunc_uniform_T[1]) / (2 * pi * self.ground_data.k_s)
@@ -854,7 +867,8 @@ class Borefield:
         return self.H
 
     def sizing_setup(self, H_init: float = 100, use_constant_Rb: bool = None, use_constant_Tg: bool = None, quadrant_sizing: int = 0,
-                     L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None, sizing_setup: SizingSetup = None) -> None:
+                     L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None,
+                     relative_borefield_threshold: float = 0., sizing_setup: SizingSetup = None) -> None:
         """
         This function sets the options for the sizing function.
 
@@ -881,6 +895,9 @@ class Borefield:
             True if a sizing with the L3 method is needed
         L4_sizing : bool
             True if a sizing with the L4 method is needed
+        relative_borefield_threshold : float
+            Speed improvement in sizing due to not calculate new gfunctions when the relative change in borefield depth
+            is lower then the threshold. See also the validation file to compare speed with accuracy.
         sizing_setup : SizingSetup
             An instance of the SizingSetup class. When this argument differs from None, all the other parameters are
             set based on this sizing_setup
@@ -906,7 +923,8 @@ class Borefield:
                                          quadrant_sizing=quadrant_sizing,
                                          L2_sizing=L2_sizing,
                                          L3_sizing=L3_sizing,
-                                         L4_sizing=L4_sizing)
+                                         L4_sizing=L4_sizing,
+                                         relative_borefield_threshold=relative_borefield_threshold)
 
     def size(self, H_init: float = 100, use_constant_Rb: bool = None, use_constant_Tg: bool = None,
              L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None, quadrant_sizing: int = None) -> float:
@@ -950,7 +968,8 @@ class Borefield:
 
         # run the sizing setup
         self._sizing_setup.update_variables(use_constant_Rb=use_constant_Rb, use_constant_Tg=use_constant_Tg,
-                          L2_sizing=L2_sizing, L3_sizing=L3_sizing, L4_sizing=L4_sizing, quadrant_sizing=quadrant_sizing)
+                                            L2_sizing=L2_sizing, L3_sizing=L3_sizing, L4_sizing=L4_sizing,
+                                            quadrant_sizing=quadrant_sizing)
 
         # sizes according to the correct algorithm
         if self._sizing_setup.L2_sizing:
