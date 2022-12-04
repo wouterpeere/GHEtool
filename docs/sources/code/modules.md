@@ -5,4 +5,5 @@
 
 Modules/GHEtool_modules.rst
 Modules/VariableClasses.rst
+Modules/SizingSetup.rst
 ```
