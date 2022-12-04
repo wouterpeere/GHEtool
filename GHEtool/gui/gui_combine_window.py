@@ -999,16 +999,10 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             if fig_obj.is_hidden():
                 continue
 
-            plt.rc('figure', 'axes', edgecolor='w')
-
             setattr(borefield, fig_obj.figure_name, fig_obj.fig)
 
             # create figure and axe if not already exists
             fig_obj.fig, fig_obj.ax = getattr(borefield, fig_obj.function_name)(**fig_obj.kwargs)
-            # update figure and canvas
-            fig_obj.ax.set_facecolor('w')
-            #fig_obj.canvas.figure = fig_obj.fig
-            #fig_obj.fig.canvas = fig_obj.canvas
             # show everything
             fig_obj.show()
             fig_obj.canvas.show()

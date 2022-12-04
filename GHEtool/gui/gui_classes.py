@@ -2145,13 +2145,12 @@ class ResultFigure(Category):
     def create_widget(self, page: QtW.QWidget, layout: QtW.QLayout):
         super().create_widget(page, layout)
         self.layout_frame.addWidget(self.canvas)
-        toolbar = NavigationToolbar(self.canvas, self.frame, True)
+        toolbar: NavigationToolbar = NavigationToolbar(self.canvas, self.frame, True)
         for name, icon_name in [("save_figure", "Save_Inv"), ('home', 'Home'), ('zoom', 'Search'), ('back', 'Back'), ('forward', 'Forward'),
                                 ('pan', 'Pen'), ('configure_subplots', 'Options'), ('edit_parameters', 'Parameters')]:
             icon = QIcon()
             icon.addFile(f":/icons/icons/{icon_name}.svg", QSize(), QIcon.Normal, QIcon.Off)
             toolbar._actions[name].setIcon(icon)
-
         self.layout_frame.addWidget(toolbar)
 
     def set_text(self, name: str) -> None:

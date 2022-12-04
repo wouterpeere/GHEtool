@@ -1507,13 +1507,12 @@ class Borefield:
         plt.rc('figure')
         if self.fig_temperature is None:
             fig = plt.figure()
+            ax = fig.add_subplot(111)
         else:
             fig = self.fig_temperature
-            fig.clear()
-            #ax: plt.Axes = fig.get_axes()[0]
-            #ax.clear()
+            ax: plt.Axes = fig.get_axes()[0]
+            ax.clear()
 
-        ax = fig.add_subplot(111)
         ax.set_xlabel(r'Time (year)')
         ax.set_ylabel(r'Temperature ($^\circ C$)')
 
@@ -2288,8 +2287,8 @@ class Borefield:
             fig = plt.figure()
             ax = fig.add_subplot(111)
         else:
-            fig = self.fig_load_duration
-            ax: plt.Axes = fig.get_axes()
+            fig = self.fig_temperature
+            ax: plt.Axes = fig.get_axes()[0]
             ax.clear()
 
         ax.step(np.arange(0, 8760, 1), heating, 'r-', label="Heating")
