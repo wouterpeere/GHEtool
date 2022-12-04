@@ -46,7 +46,7 @@ def set_graph_layout() -> None:
     plt.rcParams["xtick.color"] = white_color
     plt.rcParams["ytick.color"] = white_color
 
-    plt.rc('figure')
+    plt.rc('figure', 'axes', edgecolor=white_color)
     plt.rcParams['figure.facecolor'] = background_color
 
 

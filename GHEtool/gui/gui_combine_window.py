@@ -999,13 +999,14 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             if fig_obj.is_hidden():
                 continue
 
-            plt.rc('figure')
+            plt.rc('figure', 'axes', edgecolor='w')
 
             setattr(borefield, fig_obj.figure_name, fig_obj.fig)
 
             # create figure and axe if not already exists
             fig_obj.fig, fig_obj.ax = getattr(borefield, fig_obj.function_name)(**fig_obj.kwargs)
             # update figure and canvas
+            fig_obj.ax.set_facecolor('w')
             #fig_obj.canvas.figure = fig_obj.fig
             #fig_obj.fig.canvas = fig_obj.canvas
             # show everything
@@ -1015,7 +1016,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             fig_obj.fig.set_figheight(300, True)
             # draw new plot
             fig_obj.canvas.draw()
-
 
 
         # update result for every ResultText object
