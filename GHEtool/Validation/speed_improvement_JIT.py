@@ -10,7 +10,7 @@ import numpy as np
 import time
 from GHEtool import GroundData, Borefield
 import matplotlib.pyplot as plt
-from GHEtool.Validation.cases_loads import load_case
+from GHEtool.Validation.cases import load_case
 
 
 def test_L2_sizing():
@@ -96,5 +96,7 @@ def test_L2_sizing():
     plt.tight_layout()
     plt.show()
 
-# test the sizing with thresholds
-test_L2_sizing()
+
+if __name__ == "__main__":
+    # test the sizing with thresholds
+    test_L2_sizing()
