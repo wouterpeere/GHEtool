@@ -1409,7 +1409,7 @@ class Borefield:
         """
 
         # check if the data should be recalculated or no correct temperature profile is available
-        if recalculate or not self._check_temperature_profile_available(plot_hourly):
+        if recalculate or not self._check_temperature_profile_available(plot_hourly) or self.H != self.borefield[0].H:
             self._calculate_temperature_profile(hourly=plot_hourly)
 
         return self._plot_temperature_profile(legend=legend, plot_hourly=plot_hourly)
@@ -1437,8 +1437,8 @@ class Borefield:
             If the borefield object is part of the GUI, it returns the figure object
         """
         # check if the data should be recalculated or no correct temperature profile is available
-        # or the depth is different from the one already calculated
-        if recalculate or not self._check_temperature_profile_available(plot_hourly) or self.H != depth:
+        # or the depth is different from the depth of the borefield
+        if recalculate or not self._check_temperature_profile_available(plot_hourly) or depth != self.borefield[0].H:
             self._calculate_temperature_profile(H=depth, hourly=plot_hourly)
 
         return self._plot_temperature_profile(legend=legend, plot_hourly=plot_hourly)
