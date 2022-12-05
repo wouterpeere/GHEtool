@@ -36,7 +36,7 @@ This code is tested with Python 3.8 and requires the following libraries (the ve
 
 For the GUI
 
-* PyQt5 (>=5.10)
+* PySide6 (>=6.3.1)
 
 For the tests
 
