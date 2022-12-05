@@ -21,7 +21,7 @@ def test_L2_sizing():
     -------
     None
     """
-    guess = 200  # m
+    initial_guess = 200  # m
     relative_diff_range = np.linspace(0, 2, 20)
 
     # relevant borefield data for the calculations
@@ -31,7 +31,7 @@ def test_L2_sizing():
                       2.4 * 10 ** 6)  # ground volumetric heat capacity (J/m3K)
 
     # one can load a specific borefield quadrant
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(3)
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
 
     # create the borefield object
     borefield = Borefield(simulation_period=20,
@@ -58,8 +58,8 @@ def test_L2_sizing():
         for idx, threshold in enumerate(relative_diff_range):
             guess_time_start = time.time()
 
-            borefield.sizing_setup(H_init=guess, relative_borefield_threshold=threshold)
-            borefield.H = guess
+            borefield.sizing_setup(H_init=initial_guess, relative_borefield_threshold=threshold)
+            borefield.H = initial_guess
             borefield.size()
 
             depth_array[idx] = borefield.H
