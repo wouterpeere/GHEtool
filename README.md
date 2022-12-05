@@ -15,7 +15,7 @@ The core of this package is the automated sizing of borefield under different co
 
 #### Read The Docs
 GHEtool has an elaborate documentation were all the functionalities of the tool are explained, with examples, literature and validation.
-This can be found on [GHEtool.readthedocs.io](GHEtool.readthedocs.io).
+This can be found on [GHEtool.readthedocs.io](https://ghetool.readthedocs.io).
 
 #### Graphical user interface
 GHEtool also comes with a *graphical user interface (GUI)*. This GUI is prebuilt as an exe-file (only for Windows platforms currently) because this provides access to all the functionalities without coding. A setup to install the GUI at the user-defined place is also implemented and available at [https://GHEtool.sysi.be](https://www.mech.kuleuven.be/en/tme/research/thermal_systems/tools/ghetool).
