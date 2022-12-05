@@ -25,5 +25,7 @@ def test_speed_comparison():
 @pytest.mark.slow
 def test_speed_improvement(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
-    from GHEtool.Validation.speed_improvement_JIT import test_L2_sizing
+    from GHEtool.Validation.speed_improvement_JIT import test_L2_sizing, test_L3_sizing, test_L4_sizing
+    test_L2_sizing()
+    test_L3_sizing()
     test_L2_sizing()

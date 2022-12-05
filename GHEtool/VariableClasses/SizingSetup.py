@@ -221,7 +221,7 @@ class SizingSetup:
 
     def restore_backup(self) -> None:
         """
-        This function restores the class to a previous backup using the self.backup variable
+        This function restores the class to a previous backup using the self.backup variable.
 
         Returns
         -------
