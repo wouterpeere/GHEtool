@@ -1,13 +1,28 @@
+"""
+This file contains the code to test whether or not it is valid to set a certain threshold on the relative difference
+of the borehole depth below which the gfunctions are not recalculated.
+This is shown for a range of thresholds and for all three different sizing methodologies.
 
+- It is shown that speed improvements in sizing are possible up to 400% in L2, while keeping the error lower than 5%.
+When a threshold of 0.2 is set, the calculation time is halved and the results are as accurate as before.
+"""
 import numpy as np
 import time
 from GHEtool import GroundData, Borefield
+import matplotlib.pyplot as plt
+from GHEtool.Validation.cases_loads import load_case
 
 
 def test_L2_sizing():
+    """
+    This function test the threshold for the L2 sizing.
 
-    initial_guess_range = np.linspace(10, 250, 7)
-    relative_diff_range = [0, 0.05, 0.1, 0.15, 0.2, 0.5, 2]
+    Returns
+    -------
+    None
+    """
+    guess = 200  # m
+    relative_diff_range = np.linspace(0, 2, 20)
 
     # relevant borefield data for the calculations
     data = GroundData(3,  # conductivity of the soil (W/mK)
@@ -15,22 +30,8 @@ def test_L2_sizing():
                       0.2,  # equivalent borehole resistance (K/W)
                       2.4 * 10 ** 6)  # ground volumetric heat capacity (J/m3K)
 
-    # monthly loading values
-    peak_cooling = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak cooling in kW
-    peak_heating = np.array([160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.])  # Peak heating in kW
-
-    # annual heating and cooling load
-    annual_heating_load = 300 * 10 ** 3  # kWh
-    annual_cooling_load = 160 * 10 ** 3  # kWh
-
-    # percentage of annual load per month (15.5% for January ...)
-    monthly_load_heating_percentage = np.array(
-        [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
-    monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
-
-    # resulting load per month
-    monthly_load_heating = annual_heating_load * monthly_load_heating_percentage  # kWh
-    monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage  # kWh
+    # one can load a specific borefield quadrant
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(3)
 
     # create the borefield object
     borefield = Borefield(simulation_period=20,
@@ -45,15 +46,55 @@ def test_L2_sizing():
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)  # maximum temperature
     borefield.set_min_ground_temperature(0)  # minimum temperature
-    for threshold in relative_diff_range:
 
-        guess_time_start = time.time()
-        for guess in initial_guess_range:
+    # set the answer array
+    depth_array: np.ndarray = np.zeros(len(relative_diff_range))
+    time_array:  np.ndarray = np.zeros(len(relative_diff_range))
+
+    # iterate a couple of times to get a smoother curve for the time
+    nb_of_iterations: int = 10
+    for iterate in range(nb_of_iterations):
+
+        for idx, threshold in enumerate(relative_diff_range):
+            guess_time_start = time.time()
 
             borefield.sizing_setup(H_init=guess, relative_borefield_threshold=threshold)
             borefield.H = guess
             borefield.size()
-            print("Depth:", str(borefield.H), "m, with a guess of", str(guess), "and a threshold of", str(threshold))
-        print("Time it took", time.time() - guess_time_start)
 
+            depth_array[idx] = borefield.H
+            if iterate == 0:
+                time_array[idx] = time.time() - guess_time_start
+            else:
+                time_array[idx] = (time_array[idx] * iterate + time.time() - guess_time_start) / (iterate + 1)
+
+    # calculate relative differences
+    depth_array_rel = (depth_array - depth_array[0])/depth_array[0] * 100  # %
+    time_array_rel = (time_array[0] - time_array) / time_array * 100
+
+    # plt.figure()
+    fig, axs = plt.subplots(2, 1)
+    axs[0].plot(relative_diff_range * 100, time_array)
+    axs[0].set_xlabel("Relative difference threshold [%]")
+    axs[0].set_title("Time needed to size [ms]")
+
+    axs[1].plot(relative_diff_range * 100, time_array_rel)
+    axs[1].set_xlabel("Relative difference threshold [%]")
+    axs[1].set_title("Relative speed improvement [%]")
+
+    plt.tight_layout()
+
+    fig, axs1 = plt.subplots(2, 1)
+    axs1[0].plot(relative_diff_range * 100, depth_array)
+    axs1[0].set_xlabel("Relative difference threshold [%]")
+    axs1[0].set_title("Required depth [m]")
+
+    axs1[1].plot(relative_diff_range * 100, depth_array_rel)
+    axs1[1].set_xlabel("Relative difference threshold [%]")
+    axs1[1].set_title("Relative difference with correct result [%]")
+
+    plt.tight_layout()
+    plt.show()
+
+# test the sizing with thresholds
 test_L2_sizing()
