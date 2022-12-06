@@ -82,7 +82,7 @@ class Borefield:
                 'gui', 'time_L3_first_year', 'time_L3_last_year', 'peak_heating_external', 'peak_cooling_external', \
                 'monthly_load_heating_external', 'monthly_load_cooling_external', 'hourly_heating_load_external', \
                 'hourly_cooling_load_external', 'hourly_heating_load_on_the_borefield', 'hourly_cooling_load_on_the_borefield', \
-                'use_constant_Rb', 'printing', 'combo', 'D', 'r_b', 'recalculation_needed', 'fig_load_duration', 'fig_temperature', \
+                'use_constant_Rb', 'printing', 'combo', 'D', 'r_b', 'recalculation_needed', \
                 'L2_sizing', 'L3_sizing', 'L4_sizing', 'quadrant_sizing', 'H_init', 'use_precalculated_data'
 
     def __init__(self, simulation_period: int = 20, peak_heating: list = None,
@@ -257,9 +257,6 @@ class Borefield:
         self.printing: bool = True
         # set list for the sizing ba length and width output
         self.combo: list = []
-
-        self.fig_load_duration: Optional[plt.Figure] = None
-        self.fig_temperature: Optional[plt.Figure] = None
 
         # set load profiles
         self.set_peak_heating(peak_heating)
@@ -1506,13 +1503,8 @@ class Borefield:
 
         plt.rc('figure')
         # create new figure and axes if it not already exits otherwise clear it.
-        if self.fig_temperature is None:
-            fig = plt.figure()
-            ax = fig.add_subplot(111)
-        else:
-            fig = self.fig_temperature
-            ax: plt.Axes = fig.get_axes()[0]
-            ax.clear()
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
         # set axes labels
         ax.set_xlabel(r'Time (year)')
         ax.set_ylabel(r'Temperature ($^\circ C$)')
@@ -2283,13 +2275,8 @@ class Borefield:
         cooling.sort()
         cooling = cooling * (-1)
         # create new figure and axes if it not already exits otherwise clear it.
-        if self.fig_load_duration is None:
-            fig = plt.figure()
-            ax = fig.add_subplot(111)
-        else:
-            fig = self.fig_load_duration
-            ax: plt.Axes = fig.get_axes()[0]
-            ax.clear()
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
         # add sorted loads to plot
         ax.step(np.arange(0, 8760, 1), heating, 'r-', label="Heating")
         ax.step(np.arange(0, 8760, 1), cooling, 'b-', label="Cooling")

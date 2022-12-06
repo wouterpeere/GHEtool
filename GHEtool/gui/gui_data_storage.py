@@ -1,6 +1,7 @@
-from typing import Optional
+from __future__ import annotations
 
-import pandas as pd
+from typing import Optional
+import matplotlib.pyplot as plt
 import pygfunction as gt
 
 from GHEtool import Borefield, FluidData, GroundData, PipeData
@@ -36,7 +37,7 @@ class DataStorage:
         True if hourly data should be used
     """
 
-    def __init__(self, gui_structure: GuiStructure):
+    def __init__(self, gui_structure: GuiStructure) -> DataStorage:
         """
         This creates an instance of the DataStorage Class
 
@@ -47,7 +48,7 @@ class DataStorage:
 
         Returns
         -------
-        None
+        DataStorage
         """
         for option, name in gui_structure.list_of_options:
             # for a listbox, not the value but the text is relevant
@@ -81,6 +82,9 @@ class DataStorage:
                                             self.option_pipe_conductivity, self.option_pipe_distance, self.option_pipe_number, self.option_pipe_roughness)
 
         self.debug_message: str = ""
+
+        self.fig_temperature: Optional[plt.Figure] = None
+        self.fig_load_duration: Optional[plt.Figure] = None
 
         # params for which hourly data should be loaded
         self.hourly_data: bool = self.option_method_size_depth == 2 or (
@@ -117,6 +121,15 @@ class DataStorage:
         [aim.widget.click() for aim, name in gui_structure.list_of_aims if getattr(self, name)]
         [option.set_value(getattr(self, name)) for option, name in gui_structure.list_of_options if hasattr(self, name)]
         gui_structure.change_toggle_button()
+
+    def close_figures(self):
+        """
+        close figures in datastorage.\n
+        """
+        plt.close(self.fig_temperature)
+        plt.close(self.fig_load_duration)
+        self.fig_temperature = None
+        self.fig_load_duration = None
 
     def __eq__(self, other) -> bool:
         """
