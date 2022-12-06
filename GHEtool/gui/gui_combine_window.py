@@ -583,6 +583,9 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.list_widget_scenario.clear()
             self.list_widget_scenario.addItems(li)
             self.list_widget_scenario.setCurrentRow(0)
+            # change language to english if no change has happend
+            if self.gui_structure.option_language.get_value() == 0:
+                self.change_language()
             # check if results exits and then display them
             self.check_results()
             return

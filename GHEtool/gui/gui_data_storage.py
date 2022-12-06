@@ -131,9 +131,9 @@ class DataStorage:
         -------
         None
         """
-        for figure in self.list_of_figures:
-            plt.close(getattr(self, figure))
-            setattr(self, figure, None)
+        for fig in self.list_of_figures:
+            plt.close(getattr(self, fig))
+            setattr(self, fig, None)
 
     def __eq__(self, other) -> bool:
         """
