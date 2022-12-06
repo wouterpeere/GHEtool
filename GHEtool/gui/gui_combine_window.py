@@ -999,7 +999,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                 fig_obj.show()
                 fig_obj.canvas.show()
                 # draw new plot
-                fig_obj.canvas.draw()
+                # fig_obj.canvas.draw()
                 # set figure to canvas figure
                 setattr(ds, fig_obj.figure_name, fig)
                 continue
@@ -1008,7 +1008,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             fig_obj.show()
             fig_obj.canvas.show()
             # draw new plot
-            fig_obj.canvas.draw()
+            # fig_obj.canvas.draw()
 
         # update result for every ResultText object
         for result_text_obj, result_text_name in self.gui_structure.list_of_result_texts:
