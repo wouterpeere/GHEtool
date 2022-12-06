@@ -2112,16 +2112,15 @@ class ResultFigure(Category):
             Label text of the ResultFigure
         page : Page
             Page where the ResultFigure should be placed (the result page)
-        save_figure_button : bool
-            True if a button to save the figure should be shown
+        figure_name : str
+            The name of the figure under which it is saved in the gui_data_storage
 
         Examples
         --------
         The code below generates a ResultFigure category named 'Temperature evolution'.
 
         >>> ResultFigure(label="Temperature evolution",
-        >>>              page=self.page_result,
-        >>>              save_figure_button=True)
+        >>>              page=self.page_result)
 
         Gives (note that the FigureOption for the legend is also included):
 
