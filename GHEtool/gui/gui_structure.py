@@ -1080,7 +1080,9 @@ class GuiStructure:
                                                                 entries_values=[False, True])
 
                 # add dependencies
+                self.option_method_size_depth.add_link_2_show(self.figure_load_duration, on_index=2)
                 self.option_temperature_profile_hourly.add_link_2_show(self.figure_load_duration, on_index=1)
+                self.aim_optimize.add_link_2_show(self.figure_load_duration)
 
             # create categories
             create_category_no_result()

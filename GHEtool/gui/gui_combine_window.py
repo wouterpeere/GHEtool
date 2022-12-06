@@ -182,6 +182,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             option.change_event(ft_partial(self.change_settings_in_all_data_storages, name))
 
         self.gui_structure.option_language.change_event(self.change_language)
+        self.gui_structure.page_result.button.clicked.connect(self.display_results)
         self.actionAdd_Scenario.triggered.connect(self.add_scenario)
         self.actionUpdate_Scenario.triggered.connect(self.save_scenario)
         self.actionDelete_scenario.triggered.connect(self.delete_scenario)

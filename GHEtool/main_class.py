@@ -2261,11 +2261,12 @@ class Borefield:
 
         Returns
         ----------
-        None
+        Tuple
+            plt.Figure, plt.Axes
         """
         # check if there are hourly values
         if not self._check_hourly_load():
-            fig = plt.figure() if self.fig_load_duration is None else self.fig_load_duration
+            fig = plt.figure()
             return fig, fig.add_subplot(111)
         # sort heating and cooling load
         heating = self.hourly_heating_load.copy()
