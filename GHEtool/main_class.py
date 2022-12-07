@@ -1611,7 +1611,7 @@ class Borefield:
 
             # making a numpy array of the monthly balance (self.monthly_load) for a period of self.simulation_period years
             # [kW]
-            if self.hourly_heating_load_on_the_borefield is not np.array([]):
+            if np.any(self.hourly_heating_load_on_the_borefield):
                 hourly_load = np.tile(self.hourly_cooling_load_on_the_borefield - self.hourly_heating_load_on_the_borefield,
                                       self.simulation_period)
             else:
