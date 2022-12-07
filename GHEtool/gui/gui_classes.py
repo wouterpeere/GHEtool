@@ -2103,7 +2103,7 @@ class ResultFigure(Category):
     The ResultFigure option can be used to show figurative results in the results page.
     It is a category showing a figure and optionally a couple of FigureOptions to alter this figure.
     """
-    def __init__(self, label: str, page: Page, figure_name: str):
+    def __init__(self, label: str, page: Page):
         """
 
         Parameters
@@ -2112,8 +2112,6 @@ class ResultFigure(Category):
             Label text of the ResultFigure
         page : Page
             Page where the ResultFigure should be placed (the result page)
-        figure_name : str
-            The name of the figure under which it is saved in the gui_data_storage
 
         Examples
         --------
@@ -2146,11 +2144,11 @@ class ResultFigure(Category):
         self.x_axes_text: str = ''
         self.y_axes_text: str = ''
         self.to_show: bool = True
-        self.figure_name: str = figure_name
 
     def replace_figure(self, fig: plt.Figure) -> None:
         """
-        replace figure in canvas and reset toolbar to new figure\n
+        Replace figure in canvas and reset toolbar to new figure.
+
         Parameters
         ----------
         fig: plt.Figure
@@ -2158,7 +2156,7 @@ class ResultFigure(Category):
 
         Returns
         -------
-            None
+        None
         """
         self.fig = fig
         self.ax = fig.get_axes()[0]
@@ -2237,7 +2235,6 @@ class ResultFigure(Category):
         self.x_axes_text: str = entry_name[2]
         self.ax.set_xlabel(self.x_axes_text)
         self.ax.set_ylabel(self.y_axes_text)
-
 
     def fig_to_be_shown(self, class_name: str = "Borefield", function_name: str = "print_temperature_profile", **kwargs) -> None:
         """

@@ -990,7 +990,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             if fig_obj.is_hidden():
                 continue
 
-            fig = getattr(ds, fig_obj.figure_name)
+            fig = getattr(ds, fig_name)
             if fig is None:
                 # create axes and drawing
                 fig, ax_new = getattr(borefield, fig_obj.function_name)(**fig_obj.kwargs)
