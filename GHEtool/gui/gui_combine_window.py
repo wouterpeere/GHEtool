@@ -78,11 +78,12 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.checking: bool = False
         # create backup path in home documents directory
         self.default_path: str = str(PurePath(Path.home(), 'Documents/GHEtool'))
-        self.backup_path: str = str(PurePath(self.default_path, BACKUP_FILENAME))
+        back_path: str = str(PurePath(self.default_path, 'BACKUP'))
+        self.backup_path: str = str(PurePath(back_path, BACKUP_FILENAME))
         # check if backup folder exits and otherwise create it
         makedirs(dirname(self.backup_path), exist_ok=True)
         makedirs(dirname(self.default_path), exist_ok=True)
-        system("attrib +h " + self.backup_path)
+        system("attrib +h " + back_path)
         self.translations: Translations = Translations()  # init translation class
         for idx, (name, icon, short_cut) in enumerate(zip(self.translations.languages, self.translations.icon, self.translations.short_cut)):
             self.create_action_language(idx, name, icon, short_cut)
