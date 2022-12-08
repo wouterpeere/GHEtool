@@ -48,7 +48,7 @@ class CustomGFunction:
     """
 
     DEFAULT_DEPTH_ARRAY: np.ndarray = np.arange(0, 351, 25)  # m
-    DEFAULT_DEPTH_ARRAY[0] = 1  # m
+    DEFAULT_DEPTH_ARRAY[0] = 10  # m
     DEFAULT_TIME_ARRAY: np.ndarray = _timeValues()  # sec
 
     def __init__(self, time_array: np.ndarray = None, depth_array: np.ndarray = None, options: dict = None):
