@@ -338,11 +338,8 @@ def test_precalculated_data_2(borefield_custom_data):
 
 
 def test_error_variable_Tg(borefield):
-    try:
-        borefield.ground_data.Tg = 14
-        borefield.sizing_setup(use_constant_Tg=False)
-    except ValueError:
-        assert True
+    borefield.ground_data.Tg = 14
+    borefield.sizing_setup(use_constant_Tg=False)
 
 
 def test_choose_quadrant_1(borefield_quadrants):
@@ -417,13 +414,14 @@ def test_set_investment_cost(borefield):
 
 
 def test_investment_cost(borefield):
-    borefield._update_borefield_depth(100)
+    borefield.H = 100
     cost = 10 * 12 * 100
-    assert borefield.investment_cost == cost * borefield.cost_investment[-1]
-    borefield.set_investment_cost([0, 38])
+    assert borefield.investment_cost == cost * borefield.cost_investment[0]
+    borefield.set_investment_cost([38, 0])
     assert borefield.investment_cost == cost * 38
 
 
+@pytest.mark.slow
 def test_load_custom_gfunction(borefield):
     borefield.create_custom_dataset()
     borefield.custom_gfunction.dump_custom_dataset("./", "test")
@@ -435,4 +433,4 @@ def test_load_custom_gfunction(borefield):
 
 def test_H_smaller_50(borefield):
     borefield.H = 0.5
-    borefield.size_L2(quadrant_sizing=1)
+    borefield.size_L2(H_init=0.5, quadrant_sizing=1)

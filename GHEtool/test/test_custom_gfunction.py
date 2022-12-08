@@ -85,3 +85,9 @@ def test_unequal2():
     custom_gfunction = CustomGFunction()
     custom_gfunction2 = CustomGFunction(depth_array=[1, 5])
     assert not custom_gfunction == custom_gfunction2
+
+
+def test_unequal3():
+    custom_gfunction = CustomGFunction()
+    custom_gfunction2 = CustomGFunction(options={"test": 1})
+    assert not custom_gfunction == custom_gfunction2
