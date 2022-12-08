@@ -62,3 +62,8 @@ def test_set_options():
 
 def test_load_custom_gfunction():
     custom_gfunction = load_custom_gfunction("./test.gvalues")
+
+
+def test_check():
+    custom_gfunction = CustomGFunction()
+    custom_gfunction.calculate_gfunction(200, 100, True)
