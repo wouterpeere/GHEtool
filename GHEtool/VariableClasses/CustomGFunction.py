@@ -272,6 +272,18 @@ class CustomGFunction:
         """
         self._gvalues_array = np.array([])
 
+    def __eq__(self, other):
+        if not isinstance(other, CustomGFunction):
+            return False
+        for i in iter(self.__dict__):
+            if isinstance(getattr(self, i), np.ndarray) or isinstance(getattr(self, i), list):
+                if not np.array_equal(getattr(self, i), getattr(other, i)):
+                    return False
+                continue
+            if getattr(self, i) != getattr(other, i):
+                return False
+        return True
+
 
 def load_custom_gfunction(path: str) -> CustomGFunction:
     """

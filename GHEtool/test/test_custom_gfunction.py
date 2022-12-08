@@ -67,3 +67,21 @@ def test_load_custom_gfunction():
 def test_check():
     custom_gfunction = CustomGFunction()
     custom_gfunction.calculate_gfunction(200, 100, True)
+
+
+def test_equal():
+    custom_gfunction1 = CustomGFunction()
+    custom_gfunction2 = CustomGFunction()
+
+    assert custom_gfunction1 == custom_gfunction2
+
+
+def test_unequal():
+    custom_gfunction = CustomGFunction()
+    assert not custom_gfunction == 2
+
+
+def test_unequal2():
+    custom_gfunction = CustomGFunction()
+    custom_gfunction2 = CustomGFunction(depth_array=[1, 5])
+    assert not custom_gfunction == custom_gfunction2

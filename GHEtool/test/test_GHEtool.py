@@ -1,6 +1,7 @@
 # test if model can be imported
 import numpy as np
 import pytest
+import copy
 
 from GHEtool import *
 
@@ -31,6 +32,7 @@ monthlyLoadHeating = list(map(lambda x: x * annualHeatingLoad, monthlyLoadHeatin
 monthlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, monthlyLoadCoolingPercentage))   # kWh
 
 custom_field = gt.boreholes.L_shaped_field(N_1=4, N_2=5, B_1=5., B_2=5., H=100., D=4, r_b=0.05)
+
 
 def load_case(number):
     """This function returns the values for one of the four cases."""
@@ -401,3 +403,36 @@ def test_choose_quadrant_None(borefield_quadrants):
 
     borefield_quadrants.calculate_temperatures(200)
     assert None is borefield_quadrants.calculate_quadrant()
+
+
+def test_set_none_borefield(borefield):
+    borefield.set_borefield(None)
+
+
+def test_set_investment_cost(borefield):
+    borefield.set_investment_cost()
+    assert borefield.cost_investment == Borefield.DEFAULT_INVESTMENT
+    borefield.set_investment_cost([0, 38])
+    assert borefield.cost_investment == [0, 38]
+
+
+def test_investment_cost(borefield):
+    borefield._update_borefield_depth(100)
+    cost = 10 * 12 * 100
+    assert borefield.investment_cost == cost * borefield.cost_investment[-1]
+    borefield.set_investment_cost([0, 38])
+    assert borefield.investment_cost == cost * 38
+
+
+def test_load_custom_gfunction(borefield):
+    borefield.create_custom_dataset()
+    borefield.custom_gfunction.dump_custom_dataset("./", "test")
+    dataset = copy.copy(borefield.custom_gfunction)
+
+    borefield.load_custom_gfunction("./test.gvalues")
+    assert borefield.custom_gfunction == dataset
+
+
+def test_H_smaller_50(borefield):
+    borefield.H = 0.5
+    borefield.size_L2(quadrant_sizing=1)
