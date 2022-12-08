@@ -1,15 +1,14 @@
 from functools import partial as ft_partial
 from os.path import dirname, realpath, exists
 from os.path import split as os_split
-from os import makedirs, remove, system
+from os import makedirs, remove
 from pathlib import Path, PurePath
 from pickle import HIGHEST_PROTOCOL as pk_HP
 from pickle import dump as pk_dump
 from pickle import load as pk_load
 from sys import path
-from typing import TYPE_CHECKING, List, Tuple, Union
+from typing import TYPE_CHECKING, List, Tuple
 
-import matplotlib.pyplot as plt
 from PySide6.QtCore import QEvent as QtCore_QEvent, QTimer
 from PySide6.QtCore import QModelIndex as QtCore_QModelIndex
 from PySide6.QtCore import QSize as QtCore_QSize
@@ -42,7 +41,7 @@ currentdir = dirname(realpath(__file__))
 parentdir = dirname(currentdir)
 path.append(parentdir)
 
-BACKUP_FILENAME: str = 'backup.GHEtool'
+BACKUP_FILENAME: str = 'backup.GHEtoolBackUp'
 
 
 # main GUI class
@@ -78,12 +77,10 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.checking: bool = False
         # create backup path in home documents directory
         self.default_path: str = str(PurePath(Path.home(), 'Documents/GHEtool'))
-        back_path: str = str(PurePath(self.default_path, 'BACKUP'))
-        self.backup_path: str = str(PurePath(back_path, BACKUP_FILENAME))
+        self.backup_path: str = str(PurePath(self.default_path, BACKUP_FILENAME))
         # check if backup folder exits and otherwise create it
         makedirs(dirname(self.backup_path), exist_ok=True)
         makedirs(dirname(self.default_path), exist_ok=True)
-        system("attrib +h " + back_path)
         self.translations: Translations = Translations()  # init translation class
         for idx, (name, icon, short_cut) in enumerate(zip(self.translations.languages, self.translations.icon, self.translations.short_cut)):
             self.create_action_language(idx, name, icon, short_cut)
