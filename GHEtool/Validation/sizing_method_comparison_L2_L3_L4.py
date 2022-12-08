@@ -20,7 +20,7 @@ borefield.set_ground_parameters(data)
 borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 1, 0.075)
 
 # load the hourly profile
-borefield.load_hourly_profile("hourly_profile.csv", header=True, separator=";", first_column_heating=True)
+borefield.load_hourly_profile("..\Examples\hourly_profile.csv", header=True, separator=";", first_column_heating=True)
 
 ### size the borefield
 # according to L2

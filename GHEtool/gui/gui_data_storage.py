@@ -59,6 +59,10 @@ class DataStorage:
             setattr(self, name, aim.widget.isChecked())
 
         self.list_options_aims = [name for option, name in gui_structure.list_of_options] + [name for option, name in gui_structure.list_of_aims]
+        self.list_of_figures = [i[1] for i in gui_structure.list_of_result_figures]
+
+        for figure_name in self.list_of_figures:
+            setattr(self, figure_name, None)
 
         self.borefield: Optional[Borefield] = None
 
@@ -74,7 +78,7 @@ class DataStorage:
                                                   self.option_constant_rb, self.option_heat_capacity * 1000, self._calculate_flux())
 
         self.borefield_pygfunction = gt.boreholes.rectangle_field(self.option_width, self.option_length, self.option_spacing, self.option_spacing,
-                                                      self.option_depth, self.option_pipe_depth, self.option_pipe_borehole_radius)
+                                                                  self.option_depth, self.option_pipe_depth, self.option_pipe_borehole_radius)
 
         self.fluid_data: FluidData = FluidData(self.option_fluid_mass_flow, self.option_fluid_conductivity, self.option_fluid_density,
                                                self.option_fluid_capacity, self.option_fluid_viscosity)
@@ -82,9 +86,6 @@ class DataStorage:
                                             self.option_pipe_conductivity, self.option_pipe_distance, self.option_pipe_number, self.option_pipe_roughness)
 
         self.debug_message: str = ""
-
-        self.fig_temperature: Optional[plt.Figure] = None
-        self.fig_load_duration: Optional[plt.Figure] = None
 
         # params for which hourly data should be loaded
         self.hourly_data: bool = self.option_method_size_depth == 2 or (
@@ -122,14 +123,17 @@ class DataStorage:
         [option.set_value(getattr(self, name)) for option, name in gui_structure.list_of_options if hasattr(self, name)]
         gui_structure.change_toggle_button()
 
-    def close_figures(self):
+    def close_figures(self) -> None:
         """
-        close figures in datastorage.\n
+        This function closes the figures and sets them to None.
+        
+        Returns
+        -------
+        None
         """
-        plt.close(self.fig_temperature)
-        plt.close(self.fig_load_duration)
-        self.fig_temperature = None
-        self.fig_load_duration = None
+        for fig in self.list_of_figures:
+            plt.close(getattr(self, fig))
+            setattr(self, fig, None)
 
     def __eq__(self, other) -> bool:
         """

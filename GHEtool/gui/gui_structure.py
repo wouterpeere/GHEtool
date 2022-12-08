@@ -1039,8 +1039,7 @@ class GuiStructure:
 
             def create_figure_temperature_profile():
                 self.figure_temperature_profile = ResultFigure(label="Temperature evolution",
-                                                               page=self.page_result,
-                                                               figure_name='fig_temperature')
+                                                               page=self.page_result)
 
                 self.figure_temperature_profile.fig_to_be_shown(class_name="Borefield",
                                                                 function_name="print_temperature_profile")
@@ -1066,8 +1065,7 @@ class GuiStructure:
 
             def create_figure_load_duration():
                 self.figure_load_duration = ResultFigure(label="Load-duration curve",
-                                                         page=self.page_result,
-                                                         figure_name='fig_load_duration')
+                                                         page=self.page_result)
 
                 self.figure_load_duration.fig_to_be_shown(class_name="Borefield",
                                                           function_name="plot_load_duration")
@@ -1080,7 +1078,9 @@ class GuiStructure:
                                                                 entries_values=[False, True])
 
                 # add dependencies
+                self.option_method_size_depth.add_link_2_show(self.figure_load_duration, on_index=2)
                 self.option_temperature_profile_hourly.add_link_2_show(self.figure_load_duration, on_index=1)
+                self.aim_optimize.add_link_2_show(self.figure_load_duration)
 
             # create categories
             create_category_no_result()

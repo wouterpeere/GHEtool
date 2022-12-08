@@ -1611,7 +1611,11 @@ class Borefield:
 
             # making a numpy array of the monthly balance (self.monthly_load) for a period of self.simulation_period years
             # [kW]
-            hourly_load = np.tile(self.hourly_cooling_load - self.hourly_heating_load, self.simulation_period)
+            if np.any(self.hourly_heating_load_on_the_borefield):
+                hourly_load = np.tile(self.hourly_cooling_load_on_the_borefield - self.hourly_heating_load_on_the_borefield,
+                                      self.simulation_period)
+            else:
+                hourly_load = np.tile(self.hourly_cooling_load - self.hourly_heating_load, self.simulation_period)
 
             # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
             # g-function. This dataset is checked over and over again and is correct
@@ -2085,13 +2089,12 @@ class Borefield:
                 cool_ok = True
 
         # calculate the resulting hourly profile that can be put on the field
-        self.hourly_cooling_load_on_the_borefield = np.maximum(peak_cool_load, self.hourly_cooling_load)
-        self.hourly_heating_load_on_the_borefield = np.maximum(peak_heat_load, self.hourly_heating_load)
+        self.hourly_cooling_load_on_the_borefield = np.minimum(peak_cool_load, self.hourly_cooling_load)
+        self.hourly_heating_load_on_the_borefield = np.minimum(peak_heat_load, self.hourly_heating_load)
 
         # calculate the resulting hourly profile that cannot be put on the field
         self.hourly_cooling_load_external = np.maximum(0, self.hourly_cooling_load - peak_cool_load)
         self.hourly_heating_load_external = np.maximum(0, self.hourly_heating_load - peak_heat_load)
-
         # calculate the resulting monthly profile that cannot be put on the field
         temp = self._reduce_to_monthly_load(self.hourly_cooling_load, max(self.hourly_cooling_load))
         self.monthly_load_cooling_external = temp - self.baseload_cooling
@@ -2261,11 +2264,12 @@ class Borefield:
 
         Returns
         ----------
-        None
+        Tuple
+            plt.Figure, plt.Axes
         """
         # check if there are hourly values
         if not self._check_hourly_load():
-            fig = plt.figure() if self.fig_load_duration is None else self.fig_load_duration
+            fig = plt.figure()
             return fig, fig.add_subplot(111)
         # sort heating and cooling load
         heating = self.hourly_heating_load.copy()

@@ -183,6 +183,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             option.change_event(ft_partial(self.change_settings_in_all_data_storages, name))
 
         self.gui_structure.option_language.change_event(self.change_language)
+        self.gui_structure.page_result.button.clicked.connect(self.display_results)
         self.actionAdd_Scenario.triggered.connect(self.add_scenario)
         self.actionUpdate_Scenario.triggered.connect(self.save_scenario)
         self.actionDelete_scenario.triggered.connect(self.delete_scenario)
@@ -583,6 +584,9 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.list_widget_scenario.clear()
             self.list_widget_scenario.addItems(li)
             self.list_widget_scenario.setCurrentRow(0)
+            # change language to english if no change has happend
+            if self.gui_structure.option_language.get_value() == 0:
+                self.change_language()
             # check if results exits and then display them
             self.check_results()
             return
@@ -987,7 +991,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             if fig_obj.is_hidden():
                 continue
 
-            fig = getattr(ds, fig_obj.figure_name)
+            fig = getattr(ds, fig_name)
             if fig is None:
                 # create axes and drawing
                 fig, ax_new = getattr(borefield, fig_obj.function_name)(**fig_obj.kwargs)
@@ -998,7 +1002,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                 # draw new plot
                 fig_obj.canvas.draw()
                 # set figure to canvas figure
-                setattr(ds, fig_obj.figure_name, fig)
                 continue
             fig_obj.replace_figure(fig)
             # show everything

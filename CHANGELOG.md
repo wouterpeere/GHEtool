@@ -12,14 +12,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [2.1.1] - [expected] jan 2023
 
+### Added
+- Added NavigationToolbar to figure (issue #55)
+
 ### Changed
 - Created a new structure for the package, thereby splitting the main_py.file into more subclasses.
 - Create a class for the custom g-functions.
-- Location of backup document in the GUI
-- Results are now saved in the GUI
+- Speed improvements in JIT calculation. Up until now, the sizing of borefields required three steps: calculate the new size, update the borefield depth and calculate the gfunctions.
+However, if the new size is close to the old one, the gfunctions will not differ that much (<1%) and a lot of speed can be gained by keeping them constant.
+This effect is shown in a new validation file: [speed_improvement_JIT](/docs/sources/code/Validation/speed_improvement_JIT.rst).
 
 ### Fixed
-- (issue 52) Print temperature profile after sizing with L3/L4 in quadrant 1 or 2
+- The hourly_heating_load_on_the_borefield and hourly_cooling_load_on_the_borefield are now correctly calculated.
+- When an hourly temperature profile is plotted after an optimise_load_profile optimisation, the hourly load on the borefield (and not the entire hourly load) is shown.
 
 ## [2.1.0] - 2022-11-30
 
