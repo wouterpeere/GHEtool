@@ -1,7 +1,7 @@
 from functools import partial as ft_partial
 from os.path import dirname, realpath, exists
 from os.path import split as os_split
-from os import makedirs, remove, getcwd
+from os import makedirs, remove, system
 from pathlib import Path, PurePath
 from pickle import HIGHEST_PROTOCOL as pk_HP
 from pickle import dump as pk_dump
@@ -82,6 +82,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # check if backup folder exits and otherwise create it
         makedirs(dirname(self.backup_path), exist_ok=True)
         makedirs(dirname(self.default_path), exist_ok=True)
+        system("attrib +h " + self.backup_path)
         self.translations: Translations = Translations()  # init translation class
         for idx, (name, icon, short_cut) in enumerate(zip(self.translations.languages, self.translations.icon, self.translations.short_cut)):
             self.create_action_language(idx, name, icon, short_cut)
