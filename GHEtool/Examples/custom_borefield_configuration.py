@@ -55,7 +55,7 @@ custom_field = gt.boreholes.L_shaped_field(N_1=4, N_2=5, B_1=5., B_2=5., H=100.,
 
 # set the custom borefield (so the number of boreholes is correct)
 borefield.set_borefield(custom_field)
-borefield.create_custom_dataset("custom_field", save=True)
+borefield.create_custom_dataset()
 
 # size borefield
 depth = borefield.size(100)
