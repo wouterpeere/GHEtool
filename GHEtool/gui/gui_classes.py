@@ -1988,6 +1988,10 @@ class Category:
                 continue
             self.options_hidden.append(option)
             option.hide()
+        # when results is given as an argument, the current category is on the result page
+        # all ResultTexts should be out of the options_hidden list
+        if kwargs.get("results"):
+            self.options_hidden = [i for i in self.options_hidden if not isinstance(i, ResultText)]
 
     def show(self, **kwargs) -> None:
         """

@@ -805,7 +805,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         :return: None
         """
         # get current number of scenario but at least 0
-        number: int = max(len(self.list_ds), 0)
+        number: int = len(self.list_ds)
         # append new scenario to List of DataStorages
         self.list_ds.append(DataStorage(self.gui_structure))
         # add new scenario name and item to list widget
