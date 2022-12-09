@@ -24,7 +24,18 @@ class GFunction:
         self.time_array: np.ndarray = np.array([])
         self.previous_gfunctions: np.ndarray = np.array([])
 
+        self.threshold_depth_interpolation: float = 25  # m
+
     def calculate(self, time_value: Union[list, float, np.ndarray], borefield, alpha: float):
+
+        depth = borefield[0].H
+
+        if self._check_alpha(alpha) and self._check_borefield(borefield):
+            # see if data can be interpolated
+            gvalues: np.ndarray = self.interpolate_gfunctions(time_value, depth)
+        else:
+            gvalues: np.ndarray = np.zeros(len(time_value))
+
         time_value_np = np.array(time_value)
         if not isinstance(time_value, (float, int)) and len(time_value_np) > GFunction.DEFAULT_NUMBER_OF_TIMESTEPS:
             # due to this many requested time values, the calculation will be slow.
@@ -51,13 +62,88 @@ class GFunction:
 
         return gfunc_uniform_T
 
-    def _check_prev_calculated(self) -> bool:
+    def interpolate_gfunctions(self, time_value: Union[list, float, np.ndarray], depth: float) -> np.ndarray:
 
-        # return false when
-        if not self.store_previous_values:
-            return False,
+        gvalues: np.ndarray = np.zeros(len(time_value))
 
-        # check if there is data saved
+        # find nearest depth indices
+        idx_prev, idx_next = self._get_nearest_depth_index(depth)
+
+        # no interpolation can be made
+        if idx_prev is None or idx_next is None:
+            return gvalues
+
+    @staticmethod
+    def _nearest_value(array: np.ndarray, value: float) -> tuple(int, int):
+        """
+        This function searches the nearest value and index in an array.
+
+        Parameters
+        ----------
+        array : np.ndarray
+            Array in which the value should be searched
+        value : float
+            Value to be searched for
+
+        Returns
+        -------
+        nearest_value, nearest_index : tuple(int, int)
+        """
+        if not np.any(array):
+            return False
+        idx = (np.abs(array - value)).argmin()
+        return array[idx], idx
+
+    def _get_nearest_depth_index(self, depth: float) -> tuple(int, int):
+        """
+        This function returns the nearest depth indices w.r.t. a specific depth.
+
+        Parameters
+        ----------
+        depth : float
+            Depth for which the nearest indices in the depth_array should be searched.
+
+        Returns
+        -------
+        tuple(int, int)
+            (None, None) if no indices exist that are closer than the threshold value
+            (None, int) if the current depth is lower then the minimum in the depth array, but closer then the
+            threshold value
+            (int, None) if the current depth is higher then the maximum in the depth array, but closer then the
+            threshold value
+            (int, int) if the current depth is between two previous calculated depths which are closer together
+            then the threshold value
+        """
+        # get nearest depth index
+        val_depth, idx_depth = self._nearest_value(self.depth_array, depth)
+
+        # the exact depth is in the previous calculated data
+        # two times the same index is returned
+        if val_depth == depth:
+            return idx_depth, idx_depth
+
+        if depth > val_depth:
+            # the nearest index is the first in the array and the depth is smaller than the smallest value in the array
+            # but the difference is smaller than the threshold for interpolation
+            if idx_depth == self.depth_array.size - 1 and depth - val_depth < self.threshold_depth_interpolation:
+                return idx_depth, None
+            else:
+                idx_next = idx_depth + 1
+                if self.depth_array[idx_next] - val_depth < self.threshold_depth_interpolation:
+                    return idx_depth, idx_next
+        else:
+            # the nearest index is the last in the array and the depth is larger than the highest value in the array
+            # but the difference is smaller than the threshold for interpolation
+            if idx_depth == 0 and val_depth - depth < self.threshold_depth_interpolation:
+                return None, idx_depth
+            else:
+                idx_prev = idx_depth - 1
+                if val_depth - self.depth_array[idx_prev] < self.threshold_depth_interpolation:
+                    return idx_prev, idx_depth
+
+        # no correct interpolation indices are found
+        # None, None is returned
+        return None, None
 
     def set_options_gfunction_calculation(self, options: dict) -> None:
         """
@@ -76,7 +162,15 @@ class GFunction:
         """
         self.options = options
 
-    def remove_previous_data(self):
+    def remove_previous_data(self) -> None:
+        """
+        This function removes the previous calculated data by setting the depth_array, time_array and
+        previous_gfunctions back to empty arrays.
+
+        Returns
+        -------
+        None
+        """
         self.depth_array = np.array([])
         self.time_array = np.array([])
         self.previous_gfunctions = np.array([])
