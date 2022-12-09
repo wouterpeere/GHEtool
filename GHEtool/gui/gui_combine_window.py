@@ -1016,30 +1016,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                     text = getattr(borefield, result_text_obj.var_name)()
                 result_text_obj.set_text_value(text)
 
-    def save_figure(self, result_figure) -> None:
-        """
-        save figure to the QFileDialog asked location
-        :return: None
-        """
-        # get filename at storage place
-        filename = QtWidgets_QFileDialog.getSaveFileName(
-            self.central_widget, caption=self.translations.SaveFigure[self.gui_structure.option_language.get_value()],
-            dir=self.default_path,
-            filter="PNG (*.png);;svg (*.svg);;PDF (*.pdf)",
-            selectedFilter="png (*.png);;svg (*.svg);;PDF (*.pdf)",
-        )
-        # display message and return if no file is selected
-        if filename == MainWindow.filenameDefault:
-            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
-            return
-        # save the figure
-        import matplotlib.pyplot as plt
-        plt.rcParams['savefig.facecolor'] = 'white'
-        result_figure.ax.tick_params(axis='x', colors='black')
-        result_figure.fig.savefig(filename[0])
-        from gui_base_class import set_graph_layout
-        set_graph_layout(result_figure.ax)
-
     def save_data(self) -> None:
         """
         Save the data in a csv file
