@@ -11,6 +11,8 @@ class GFunction:
     # TODO check whether there is more time needed to calculate 3 than 100 timesteps,
     # if not, it can be useful to only calculate the default number so that it can be saved
     # for interpolation
+
+    # Er is een groot verschil (factor 10+-), maar enkel tussen L2-L3/L4. Die laatste twee zijn vrij aan elkaar gelijk
     DEFAULT_NUMBER_OF_TIMESTEPS: int = 100
 
     def __init__(self):
