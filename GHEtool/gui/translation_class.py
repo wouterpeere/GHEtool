@@ -556,7 +556,7 @@ class Translations:
         self.BaseCooling: List[str] = [
             "base cooling",
             "Grundkühlung",
-            "basisbelasting koeling",
+            "Basisbelasting koeling",
             "Base raffreddamento",
             "Base de refroidissement",
             "Base de refrigeración",
@@ -565,7 +565,7 @@ class Translations:
         self.BaseHeating: List[str] = [
             "base heating",
             "Grundheizung",
-            "basisbelasting verwarming",
+            "Basisbelasting verwarming",
             "Base riscaldamento",
             "Chauffage de base",
             "Base de calefacción",
@@ -574,7 +574,7 @@ class Translations:
         self.PeakCooling: List[str] = [
             "peak cooling",
             "Kühlspitzen",
-            "piekkoeling",
+            "Piekkoeling",
             "Picco raffreddamento",
             "Refroidissement maximal",
             "Pico de refrigeración",
@@ -583,7 +583,7 @@ class Translations:
         self.PeakHeating: List[str] = [
             "peak heating",
             "Heizspitzen",
-            "piekverwarming",
+            "Piekverwarming",
             "Picco di riscaldamento",
             "Pic de chauffage",
             "Pico de calefacción",
@@ -1186,7 +1186,7 @@ class Translations:
         self.option_toggle_buttons: List[str] = [
             "Use toggle buttons?:, no , yes ",
             "Umschalterbutton?:, Nein , Ja ",
-            "Toggle-gedrag?:, ne , ja",
+            "Toggle-gedrag?:, nee , ja",
             "Toggle buttons?:, no , yes ",
             "Toggle buttons?:, no , yes ",
             "Toggle buttons?:, no , yes ",
@@ -1495,7 +1495,7 @@ class Translations:
         self.option_method_temp_gradient: List[str] = [
             "Should a temperature gradient over depth be considered?:, no , yes ",
             "Soll ein Temperaturgradient berücksichtigt werden?:, Nein , Ja ",
-            "Moet een temperatuursgradiënt in rekening worden gebracht?:, ne , ja ",
+            "Moet een temperatuursgradiënt in rekening worden gebracht?:, nee , ja ",
             "Should a temperature gradient over depth be considered?:, no , yes ",
             "Should a temperature gradient over depth be considered?:, no , yes ",
             "Should a temperature gradient over depth be considered?:, no , yes ",
@@ -1650,7 +1650,7 @@ class Translations:
         self.figure_temperature_profile: List[str] = [
             "Temperature evolution, Temperature [°C], Time [years]",
             "Temperaturverlauf, Temperatur [°C], Zeit [Jahren]",
-            "Temperatuur evolutie, Temperatuur [°C], Time [years]",
+            "Temperatuurevolutie, Temperatuur [°C], Tijd [jaren]",
             "Temperature evolution, Temperature [°C], Time [years]",
             "Temperature evolution, Temperature [°C], Time [years]",
             "Temperature evolution, Temperature [°C], Time [years]",

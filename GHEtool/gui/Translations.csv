@@ -46,10 +46,10 @@ function_save_results;Save results;Ergebnisse speichern;Bewaar resultaten;Salva 
 function_save_figure;Save figure;Abbildung speichern;Bewaar figuren;Salva figura;Sauvegarder la figure;Guardar figura;Gardar figura
 X_Axis;Time [year];Zeit [Jahr];Tijd [jaar];Tempo [anno];Heure [année];Tiempo [año];Tempo [ano]
 Y_Axis;Temperature [°C];Temperatur [°C];Temperatuur [°C];Temperatura [°C];Température [°C];Temperatura [°C];Temperatura [°C]
-BaseCooling;base cooling;Grundkühlung;basisbelasting koeling;Base raffreddamento;Base de refroidissement;Base de refrigeración;Base de refrixeración
-BaseHeating;base heating;Grundheizung;basisbelasting verwarming;Base riscaldamento;Chauffage de base;Base de calefacción;Base de calefacción
-PeakCooling;peak cooling;Kühlspitzen;piekkoeling;Picco raffreddamento;Refroidissement maximal;Pico de refrigeración;Pico de refrixeración
-PeakHeating;peak heating;Heizspitzen;piekverwarming;Picco di riscaldamento;Pic de chauffage;Pico de calefacción;Pico de calefacción
+BaseCooling;base cooling;Grundkühlung;Basisbelasting koeling;Base raffreddamento;Base de refroidissement;Base de refrigeración;Base de refrixeración
+BaseHeating;base heating;Grundheizung;Basisbelasting verwarming;Base riscaldamento;Chauffage de base;Base de calefacción;Base de calefacción
+PeakCooling;peak cooling;Kühlspitzen;Piekkoeling;Picco raffreddamento;Refroidissement maximal;Pico de refrigeración;Pico de refrixeración
+PeakHeating;peak heating;Heizspitzen;Piekverwarming;Picco di riscaldamento;Pic de chauffage;Pico de calefacción;Pico de calefacción
 label_Import;Import;Importieren;Importeer;Importazione;Importation;Importar;Importar
 checkBox_Import;Import Demands?;Lasten importieren?;Importeer vraag?;Richieste di @importazione?;Demande d'importation?;Importar cargas?;Importar cargas?
 hint_peak_heating;Heating peak;Heizspitzen;Verwarmingspiek;Picco di riscaldamento;Pic de chauffage;Pico de calefacción;Pico de calefacción
@@ -204,8 +204,8 @@ results_cooling_ext;Cooling load external: , kWh;Die externe Kühllast beträgt:
 results_cooling_peak;with a peak of: , kW;mit einer Spitzenlast von , kW;met een piek van: , kW;with a peak of: , kW;with a peak of: , kW;with a peak of: , kW;with a peak of: , kW
 max_temp;The maximum average fluid temperature is , °C;Die maximale Fluidtemperatur ist , °C;De maximaal gemiddelde fluïdumtemperatuur is , °C;The maximum average fluid temperature is , °C;The maximum average fluid temperature is , °C;The maximum average fluid temperature is , °C;The maximum average fluid temperature is , °C
 min_temp;The minimal average fluid temperature is , °C;Die minimale Fluidtemperatur ist , °C;De minimaal gemiddelde fluïdumtemperatuur is , °C;The minimal average fluid temperature is , °C;The minimal average fluid temperature is , °C;The minimal average fluid temperature is , °C;The minimal average fluid temperature is , °C
-figure_temperature_profile;Temperature evolution, Temperature [°C], Time [years];Temperaturverlauf, Temperatur [°C], Zeit [Jahren];Temperatuur evolutie, Temperatuur [°C], Time [years];Temperature evolution, Temperature [°C], Time [years];Temperature evolution, Temperature [°C], Time [years];Temperature evolution, Temperature [°C], Time [years];Temperature evolution, Temperature [°C], Time [years]
-legend_figure_temperature_profile;Show legend?, No , Yes ;Legende zeigen?, Nein , Ja ;Toon legende?, ne , ja ;Mostra la legenda?, no , yes ;Afficher la légende?, no , yes ;Mostrar leyenda?, no , yes ;Mostrar lenda?, no , yes 
-hourly_figure_temperature_profile;Hourly profile, No , Yes ;Stündliches Profil, Nein , Ja ;Uurlijks profiel, ne , ja ;Hourly profile, no , yes ;Hourly profile, no , yes ;Hourly profile, no , yes ;Hourly profile, no , yes 
-figure_load_duration;Load-duration curve, Power [kW], Time [hours];Jahresdauerlinie, Leistung [kW], Zeit [Stunden];Belastings-duurcurve, Power [kW], Time [hours];Load-duration curve, Power [kW], Time [hours];Load-duration curve, Power [kW], Time [hours];Load-duration curve, Power [kW], Time [hours];Load-duration curve, Power [kW], Time [hours]
-legend_figure_load_duration;Show legend?, No , Yes ;Legende zeigen?, Nein , Ja ;Toon legende?, ne , ja ;Mostra la legenda?, no , yes ;Afficher la légende?, no , yes ;Mostrar leyenda?, no , yes ;Mostrar lenda?, no , yes 
+figure_temperature_profile;Temperature evolution, Temperature [°C], Time [years];Temperaturverlauf, Temperatur [°C], Zeit [Jahren];Temperatuurevolutie, Temperatuur [°C], Time [years];Temperature evolution, Temperature [°C], Time [years];Temperature evolution, Temperature [°C], Time [years];Temperature evolution, Temperature [°C], Time [years];Temperature evolution, Temperature [°C], Time [years]
+legend_figure_temperature_profile;Show legend?, No , Yes ;Legende zeigen?, Nein , Ja ;Toon legende?, nee , ja ;Mostra la legenda?, no , yes ;Afficher la légende?, no , yes ;Mostrar leyenda?, no , yes ;Mostrar lenda?, no , yes
+hourly_figure_temperature_profile;Hourly profile, No , Yes ;Stündliches Profil, Nein , Ja ;Uurlijks profiel, nee , ja ;Hourly profile, no , yes ;Hourly profile, no , yes ;Hourly profile, no , yes ;Hourly profile, no , yes
+figure_load_duration;Load-duration curve, Power [kW], Time [hours];Jahresdauerlinie, Leistung [kW], Zeit [Stunden];Belastings-duurcurve, Vermogen [kW], Tijd [hours];Load-duration curve, Power [kW], Time [hours];Load-duration curve, Power [kW], Time [hours];Load-duration curve, Power [kW], Time [hours];Load-duration curve, Power [kW], Time [hours]
+legend_figure_load_duration;Show legend?, No , Yes ;Legende zeigen?, Nein , Ja ;Toon legende?, nee , ja ;Mostra la legenda?, no , yes ;Afficher la légende?, no , yes ;Mostrar leyenda?, no , yes ;Mostrar lenda?, no , yes
