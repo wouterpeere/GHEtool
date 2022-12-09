@@ -1,6 +1,6 @@
 import pygfunction as gt
 import numpy as np
-from typing import Union
+from typing import Union, Tuple
 import copy
 
 from .CustomGFunction import _timeValues
@@ -13,7 +13,8 @@ class GFunction:
     # for interpolation
 
     # Er is een groot verschil (factor 10+-), maar enkel tussen L2-L3/L4. Die laatste twee zijn vrij aan elkaar gelijk
-    DEFAULT_NUMBER_OF_TIMESTEPS: int = 100
+    DEFAULT_TIMESTEPS: np.ndarray = _timeValues()
+    DEFAULT_NUMBER_OF_TIMESTEPS: int = DEFAULT_TIMESTEPS.size
 
     def __init__(self):
         self.store_previous_values: bool = True
@@ -24,6 +25,7 @@ class GFunction:
         self.time_array: np.ndarray = np.array([])
         self.previous_gfunctions: np.ndarray = np.array([])
 
+        self.no_extrapolation: bool = True
         self.threshold_depth_interpolation: float = 25  # m
 
     def calculate(self, time_value: Union[list, float, np.ndarray], borefield, alpha: float):
@@ -69,12 +71,27 @@ class GFunction:
         # find nearest depth indices
         idx_prev, idx_next = self._get_nearest_depth_index(depth)
 
-        # no interpolation can be made
-        if idx_prev is None or idx_next is None:
-            return gvalues
+        if self.no_extrapolation:
+            # no interpolation can be made since depth is not in between values in the depth array
+            if idx_prev is None or idx_next is None:
+                return gvalues
+
+            # check if the time values for both indices are equal
+            if not self._check_time_values_are_equal_at_indices(idx_prev, idx_next):
+                return gvalues
+
+            # check if interpolation of all time values can be done based on the available time values
+            if not self._check_time_values(self.time_array[idx_prev], time_value):
+                return gvalues
+
+            # do interpolation
+
+        # when extrapolation is permitted
+        # TODO implement extrapolation
+        return gvalues
 
     @staticmethod
-    def _nearest_value(array: np.ndarray, value: float) -> tuple(int, int):
+    def _nearest_value(array: np.ndarray, value: float) -> Tuple[int, int]:
         """
         This function searches the nearest value and index in an array.
 
@@ -94,7 +111,7 @@ class GFunction:
         idx = (np.abs(array - value)).argmin()
         return array[idx], idx
 
-    def _get_nearest_depth_index(self, depth: float) -> tuple(int, int):
+    def _get_nearest_depth_index(self, depth: float) -> Tuple[int, int]:
         """
         This function returns the nearest depth indices w.r.t. a specific depth.
 
@@ -144,6 +161,28 @@ class GFunction:
         # no correct interpolation indices are found
         # None, None is returned
         return None, None
+
+    def _check_time_values_are_equal_at_indices(self, depth_1: float, depth_2: float) -> bool:
+        """
+        This function checks whether or not the time values of the previous calculated data for both depths
+        are equal.
+
+        Parameters
+        ----------
+        depth_1 : float
+            First depth [m] for which the time values should be checked
+        depth_2 : float
+            Second depth [m] for which the time values should be checked
+
+        Returns
+        -------
+        bool
+            True if the time values are equal, False otherwise
+        """
+        return np.array_equal(self.time_array[depth_1], self.time_array[depth_2])
+
+    def _check_time_values(self, source: np.ndarray, target: np.ndarray) -> bool:
+        pass
 
     def set_options_gfunction_calculation(self, options: dict) -> None:
         """
