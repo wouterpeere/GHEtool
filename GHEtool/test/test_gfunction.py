@@ -20,13 +20,13 @@ def test_unequal_borefields():
 
     gfunc = GFunction()
     gfunc.borefield = borefield1
-    assert gfunc._check_borefield(borefield2)
+    assert not gfunc._check_borefield(borefield2)
 
 
 def test_equal_borefields2():
     borefield1 = gt.boreholes.rectangle_field(10, 10, 5, 5, 100, 4, 0.075)
     borefield2 = gt.boreholes.rectangle_field(10, 10, 5, 5, 100, 4, 0.075)
-
+    
     gfunc = GFunction()
     gfunc.borefield = borefield1
     assert gfunc._check_borefield(borefield2)
@@ -38,7 +38,7 @@ def test_unequal_borefields2():
 
     gfunc = GFunction()
     gfunc.borefield = borefield1
-    assert gfunc._check_borefield(borefield2)
+    assert not gfunc._check_borefield(borefield2)
 
 
 def test_equal_alpha():

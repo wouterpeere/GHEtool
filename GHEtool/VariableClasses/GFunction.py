@@ -8,11 +8,14 @@ from .CustomGFunction import _timeValues
 
 class GFunction:
 
-    # TODO check whether there is more time needed to calculate 3 than 100 timesteps,
-    # if not, it can be useful to only calculate the default number so that it can be saved
-    # for interpolation
+    """
+    Class that contains the functionality to calculate gfunctions and to store
+    previously calculated values that can potentially be used for interpolation to save time.
+    This is done by storing all previous calculated gvalues as long as the length of the does not change.
 
-    # Er is een groot verschil (factor 10+-), maar enkel tussen L2-L3/L4. Die laatste twee zijn vrij aan elkaar gelijk
+    # TODO update this documentation
+    """
+
     DEFAULT_TIMESTEPS: np.ndarray = _timeValues()
     DEFAULT_NUMBER_OF_TIMESTEPS: int = DEFAULT_TIMESTEPS.size
 
@@ -24,6 +27,7 @@ class GFunction:
         self.depth_array: np.ndarray = np.array([])
         self.time_array: np.ndarray = np.array([])
         self.previous_gfunctions: np.ndarray = np.array([])
+        self.nb_of_time_values: int = 0
 
         self.no_extrapolation: bool = True
         self.threshold_depth_interpolation: float = 25  # m
@@ -76,12 +80,12 @@ class GFunction:
             if idx_prev is None or idx_next is None:
                 return gvalues
 
-            # check if the time values for both indices are equal
-            if not self._check_time_values_are_equal_at_indices(idx_prev, idx_next):
-                return gvalues
+            # # check if the time values for both indices are equal
+            # if not self._check_time_values_are_equal_at_indices(idx_prev, idx_next):
+            #     return gvalues
 
             # check if interpolation of all time values can be done based on the available time values
-            if not self._check_time_values(self.time_array[idx_prev], time_value):
+            if not self._check_time_values(self.time_array, time_value):
                 return gvalues
 
             # do interpolation
@@ -213,6 +217,10 @@ class GFunction:
         self.depth_array = np.array([])
         self.time_array = np.array([])
         self.previous_gfunctions = np.array([])
+        self.nb_of_time_values = 0
+
+    def set_new_calculated_data(self, time_values: np.ndarray, depth: float, gvalues: np.ndarray) -> None:
+        pass
 
     def _check_borefield(self, borefield) -> bool:
         """
@@ -237,8 +245,8 @@ class GFunction:
             self.remove_previous_data()
             return False
 
-        keys = borefield[0].__dict__.keys()
-        keys.pop("H")
+        keys = set(borefield[0].__dict__.keys())
+        keys.remove("H")
 
         for idx, _ in enumerate(borefield):
             for key in keys:
