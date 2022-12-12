@@ -1,29 +1,24 @@
 from functools import partial as ft_partial
 from os.path import dirname, realpath, exists
 from os.path import split as os_split
-from os import makedirs, remove, getcwd
+from os import makedirs, remove
 from pathlib import Path, PurePath
 from pickle import HIGHEST_PROTOCOL as pk_HP
 from pickle import dump as pk_dump
 from pickle import load as pk_load
 from sys import path
-from time import sleep
-from typing import TYPE_CHECKING, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, List, Tuple
 
 from PySide6.QtCore import QEvent as QtCore_QEvent, QTimer
 from PySide6.QtCore import QModelIndex as QtCore_QModelIndex
 from PySide6.QtCore import QSize as QtCore_QSize
-from PySide6.QtCore import QThread as QtCore_QThread
-from PySide6.QtCore import Signal as QtCore_pyqtSignal
 from PySide6.QtGui import QAction as QtGui_QAction
 from PySide6.QtGui import QIcon as QtGui_QIcon
 from PySide6.QtGui import QPixmap as QtGui_QPixmap
 from PySide6.QtWidgets import QApplication as QtWidgets_QApplication
 from PySide6.QtWidgets import QDialog as QtWidgets_QDialog
-from PySide6.QtWidgets import QDoubleSpinBox as QtWidgets_QDoubleSpinBox
 from PySide6.QtWidgets import QFileDialog as QtWidgets_QFileDialog
 from PySide6.QtWidgets import QInputDialog as QtWidgets_QInputDialog
-from PySide6.QtWidgets import QListWidget as QtWidgets_QListWidget
 from PySide6.QtWidgets import QListWidgetItem as QtWidgets_QListWidgetItem
 from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
 from PySide6.QtWidgets import QMenu as QtWidgets_QMenu
@@ -35,24 +30,18 @@ from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
 from GHEtool.gui.gui_calculation_thread import (CalcProblem)
 from GHEtool.gui.gui_data_storage import DataStorage
 from GHEtool.gui.gui_base_class import UiGhetool, set_graph_layout
-from GHEtool.gui.gui_structure import *  # GuiStructure, Option, FunctionButton,
+from GHEtool.gui.gui_structure import GuiStructure, Option, FigureOption
 from GHEtool.gui.translation_class import Translations
 
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt5agg import \
-    FigureCanvasQTAgg as FigureCanvas
 
 if TYPE_CHECKING:
-    from pandas import DataFrame as pd_DataFrame
-    from pandas import ExcelFile as pd_ExcelFile
-
     from GHEtool import Borefield
 
 currentdir = dirname(realpath(__file__))
 parentdir = dirname(currentdir)
 path.append(parentdir)
 
-BACKUP_FILENAME: str = 'backup.GHEtool'
+BACKUP_FILENAME: str = 'backup.GHEtoolBackUp'
 
 
 # main GUI class
@@ -88,7 +77,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.checking: bool = False
         # create backup path in home documents directory
         self.default_path: str = str(PurePath(Path.home(), 'Documents/GHEtool'))
-        self.backup_path: str = str(PurePath(getcwd(), BACKUP_FILENAME))
+        self.backup_path: str = str(PurePath(self.default_path, BACKUP_FILENAME))
         # check if backup folder exits and otherwise create it
         makedirs(dirname(self.backup_path), exist_ok=True)
         makedirs(dirname(self.default_path), exist_ok=True)
@@ -147,6 +136,8 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # set the correct graph layout
         set_graph_layout()
 
+        self.display_results()
+
         # set started to True
         # this is so that no changes are made when the file is opening
         self.started: bool = True
@@ -175,25 +166,19 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         set links of buttons and actions to function
         :return: None
         """
-        for option, name in self.gui_structure.list_of_options:
+
+        setting_options = [(opt_cat, name) for category in self.gui_structure.page_settings.list_categories for opt_cat in category.list_of_options if
+                           isinstance(opt_cat, Option) for opt_glob, name in self.gui_structure.list_of_options if opt_cat == opt_glob]
+        for option, name in [(opt, name) for opt, name in self.gui_structure.list_of_options
+                             if not isinstance(opt, FigureOption) and not ((opt, name) in setting_options)]:
             option.change_event(self.change)
+        for option, name in [(opt, name) for opt, name in self.gui_structure.list_of_options if isinstance(opt, FigureOption)]:
+            option.change_event(self.update_graph)
         for option, name in self.gui_structure.list_of_aims:
             option.change_event(self.change)
 
-        # couple every ResultFigure to the save_figure button
-        for cat, cat_name in self.gui_structure.list_of_result_figures:
-            if cat.save_fig:
-                cat.save_fig.change_event(self.save_figure, cat)
-
-        for category in self.gui_structure.page_settings.list_categories:
-            for option, name in [(opt_cat, name) for opt_cat in category.list_of_options if isinstance(
-                    opt_cat, Option) for opt_glob, name in self.gui_structure.list_of_options if opt_cat == opt_glob]:
-                option.change_event(ft_partial(self.change_settings_in_all_data_storages, name))
-
-        for fig, _ in self.gui_structure.list_of_result_figures:
-            for option in fig.list_of_options:
-                if option != fig.save_fig:
-                    option.change_event(self.display_results)
+        for option, name in setting_options:
+            option.change_event(ft_partial(self.change_settings_in_all_data_storages, name))
 
         self.gui_structure.option_language.change_event(self.change_language)
         self.gui_structure.page_result.button.clicked.connect(self.display_results)
@@ -211,15 +196,14 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.list_widget_scenario.currentItemChanged.connect(self.fun_auto_save_scenario)
         self.Dia.closeEvent = self.closeEvent
 
-    def update_graph(self, option: Union[Option, FunctionButton], function_to_be_called: str):
-        if self.list_ds:
-            ds = self.list_ds[self.list_widget_scenario.currentRow()]
-            if ds.borefield is not None:
-                if isinstance(option, Option):
-                    getattr(ds.borefield, function_to_be_called)(option.get_value())
-                elif isinstance(option, FunctionButton):
-                    getattr(ds.borefield, function_to_be_called)()
-                self.display_results()
+    def update_graph(self):
+        if not self.list_ds:
+            return
+        ds = self.list_ds[self.list_widget_scenario.currentRow()]
+        if ds.borefield is None:
+            return
+        ds.close_figures()
+        self.display_results()
 
     def event_filter(self, obj: QtWidgets_QPushButton, event) -> bool:
         """
@@ -371,6 +355,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                 return
             # save old scenario
             if DataStorage(self.gui_structure) != self.list_ds[self.list_widget_scenario.row(old_row_item)]:
+                self.list_ds[self.list_widget_scenario.row(old_row_item)].close_figures()
                 self.list_ds[self.list_widget_scenario.row(old_row_item)] = DataStorage(self.gui_structure)
             # update backup fileImport
             self.fun_save_auto()
@@ -597,6 +582,9 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.list_widget_scenario.clear()
             self.list_widget_scenario.addItems(li)
             self.list_widget_scenario.setCurrentRow(0)
+            # change language to english if no change has happend
+            if self.gui_structure.option_language.get_value() == 0:
+                self.change_language()
             # check if results exits and then display them
             self.check_results()
             return
@@ -748,7 +736,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # set values of selected Datastorage
         ds.set_values(self.gui_structure)
         # refresh results if results page is selected
-        self.gui_structure.page_result.button.click() if self.stackedWidget.currentWidget() == self.gui_structure.page_result.page else None
+        self.display_results() if self.stackedWidget.currentWidget() == self.gui_structure.page_result.page else None
         # activate checking for changed
         self.checking: bool = True
 
@@ -771,13 +759,14 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         if not self.check_values():
             return False
         # get selected scenario index
-        idx = max(self.list_widget_scenario.currentRow(), 0) if idx is None or isinstance(idx, bool) else idx
+        idx: int = max(self.list_widget_scenario.currentRow(), 0) if idx is None or isinstance(idx, bool) else idx
         # if no scenario exists create a new one else save DataStorage with new inputs in list of scenarios
         if len(self.list_ds) == idx:
             self.add_scenario()
         else:
             # do not overwrite any results
             if self.list_ds[idx].borefield is None:
+                self.list_ds[idx].close_figures()
                 self.list_ds[idx] = DataStorage(self.gui_structure)
         # create auto backup
         self.fun_save_auto()
@@ -797,6 +786,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         idx = self.list_widget_scenario.currentRow()
         # check if it is not scenarios exists and not the last one is selected (The last one can not be deleted)
         if idx > 0 or (len(self.list_ds) > 1 and idx == 0):
+            self.list_ds[idx].close_figures()
             # delete scenario from list
             del self.list_ds[idx]
             # delete scenario form list widget
@@ -815,7 +805,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         :return: None
         """
         # get current number of scenario but at least 0
-        number: int = max(len(self.list_ds), 0)
+        number: int = len(self.list_ds)
         # append new scenario to List of DataStorages
         self.list_ds.append(DataStorage(self.gui_structure))
         # add new scenario name and item to list widget
@@ -874,6 +864,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.pushButton_SaveScenario.setEnabled(True)
             self.action_start_single.setEnabled(True)
             self.action_start_multiple.setEnabled(True)
+            self.display_results()
             self.gui_structure.page_result.button.click()
             return
         # start new thread
@@ -891,6 +882,12 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.add_scenario() if not self.list_ds else self.save_scenario()
         if self.list_widget_scenario.currentItem().text()[-1] == '*':
             return
+        # create list of threads with scenarios that have not been calculated
+        self.threads = [CalcProblem(DS, idx) for idx, DS in enumerate(self.list_ds) if DS.borefield is None]
+        # set number of to calculate scenarios
+        self.NumberOfScenarios: int = len(self.threads)
+        if self.NumberOfScenarios < 1:
+            return
         # disable buttons and actions to avoid two calculation at once
         self.pushButton_start_multiple.setEnabled(False)
         self.pushButton_start_single.setEnabled(False)
@@ -901,10 +898,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.finished: int = 0
         # update progress bar
         self.update_bar(0, True)
-        # create list of threads with scenarios that have not been calculated
-        self.threads = [CalcProblem(DS, idx) for idx, DS in enumerate(self.list_ds) if DS.borefield is None]
-        # set number of to calculate scenarios
-        self.NumberOfScenarios: int = len(self.threads)
         # start calculation if at least one scenario has to be calculated
         if self.NumberOfScenarios > 0:
             self.threads[0].start()
@@ -922,6 +915,15 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.add_scenario() if not self.list_ds else self.save_scenario()
         if self.list_widget_scenario.currentItem().text()[-1] == '*':
             return
+        # get index of selected scenario
+        idx: int = self.list_widget_scenario.currentRow()
+        # get Datastorage of selected scenario
+        ds: DataStorage = self.list_ds[idx]
+        # if calculation is already done just show results
+        if ds.borefield is not None:
+            self.display_results()
+            self.gui_structure.page_result.button.click()
+            return
         # return to thermal demands page if no file is selected
         # disable buttons and actions to avoid two calculation at once
         self.pushButton_start_multiple.setEnabled(False)
@@ -933,14 +935,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.finished: int = 0
         # update progress bar
         self.update_bar(0, True)
-        # get index of selected scenario
-        idx: int = self.list_widget_scenario.currentRow()
-        # get Datastorage of selected scenario
-        ds: DataStorage = self.list_ds[idx]
-        # if calculation is already done just show results
-        if ds.borefield is not None:
-            self.gui_structure.page_result.button.click()
-            return
         # create list of threads with calculation to be made
         self.threads = [CalcProblem(ds, idx)]
         # set number of to calculate scenarios
@@ -995,27 +989,24 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             if fig_obj.is_hidden():
                 continue
 
-            plt.rc('figure')
-            if fig_obj.ax is not None:
-                fig_obj.ax.clear()
-            if fig_obj.fig is not None:
-                plt.close(fig_obj.fig)
-
-            if fig_obj.canvas is not None:
-                fig_obj.frame.layout().removeWidget(fig_obj.canvas)
-                fig_obj.canvas.setParent(None)
-                fig_obj.canvas = None
-
-            # create figure and axe if not already exists
-            fig_obj.fig, fig_obj.ax = getattr(borefield, fig_obj.function_name)(**fig_obj.kwargs)
+            fig = getattr(ds, fig_name)
+            if fig is None:
+                # create axes and drawing
+                fig, ax_new = getattr(borefield, fig_obj.function_name)(**fig_obj.kwargs)
+                fig_obj.replace_figure(fig)
+                # show everything
+                fig_obj.show()
+                fig_obj.canvas.show()
+                # draw new plot
+                fig_obj.canvas.draw()
+                # set figure to canvas figure
+                continue
+            fig_obj.replace_figure(fig)
+            # show everything
             fig_obj.show()
-            canvas = FigureCanvas(fig_obj.fig)
-            # save variables
-            fig_obj.layout_frame.addWidget(canvas)
-            fig_obj.canvas = canvas
             fig_obj.canvas.show()
             # draw new plot
-            canvas.draw()
+            fig_obj.canvas.draw()
 
         # update result for every ResultText object
         for result_text_obj, result_text_name in self.gui_structure.list_of_result_texts:
@@ -1024,30 +1015,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                 if callable(text):
                     text = getattr(borefield, result_text_obj.var_name)()
                 result_text_obj.set_text_value(text)
-
-    def save_figure(self, result_figure) -> None:
-        """
-        save figure to the QFileDialog asked location
-        :return: None
-        """
-        # get filename at storage place
-        filename = QtWidgets_QFileDialog.getSaveFileName(
-            self.central_widget, caption=self.translations.SaveFigure[self.gui_structure.option_language.get_value()],
-            dir=self.default_path,
-            filter="PNG (*.png);;svg (*.svg);;PDF (*.pdf)",
-            selectedFilter="png (*.png);;svg (*.svg);;PDF (*.pdf)",
-        )
-        # display message and return if no file is selected
-        if filename == MainWindow.filenameDefault:
-            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
-            return
-        # save the figure
-        import matplotlib.pyplot as plt
-        plt.rcParams['savefig.facecolor'] = 'white'
-        result_figure.ax.tick_params(axis='x', colors='black')
-        result_figure.fig.savefig(filename[0])
-        from gui_base_class import set_graph_layout
-        set_graph_layout(result_figure.ax)
 
     def save_data(self) -> None:
         """

@@ -23,7 +23,14 @@ import PySide6.QtCore as QtC  # type: ignore
 import PySide6.QtGui as QtG  # type: ignore
 import PySide6.QtWidgets as QtW  # type: ignore
 
-from GHEtool.gui.gui_base_class import DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+
+from PySide6.QtCore import QSize
+from PySide6.QtGui import QIcon
+
+from GHEtool.gui.gui_base_class import DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE, set_graph_layout
 
 
 def _update_opponent_not_change(button: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
@@ -1981,6 +1988,10 @@ class Category:
                 continue
             self.options_hidden.append(option)
             option.hide()
+        # when results is given as an argument, the current category is on the result page
+        # all ResultTexts should be out of the options_hidden list
+        if kwargs.get("results"):
+            self.options_hidden = [i for i in self.options_hidden if not isinstance(i, ResultText)]
 
     def show(self, **kwargs) -> None:
         """
@@ -2096,7 +2107,7 @@ class ResultFigure(Category):
     The ResultFigure option can be used to show figurative results in the results page.
     It is a category showing a figure and optionally a couple of FigureOptions to alter this figure.
     """
-    def __init__(self, label: str, page: Page, save_figure_button: bool = True):
+    def __init__(self, label: str, page: Page):
         """
 
         Parameters
@@ -2105,33 +2116,107 @@ class ResultFigure(Category):
             Label text of the ResultFigure
         page : Page
             Page where the ResultFigure should be placed (the result page)
-        save_figure_button : bool
-            True if a button to save the figure should be shown
 
         Examples
         --------
         The code below generates a ResultFigure category named 'Temperature evolution'.
 
         >>> ResultFigure(label="Temperature evolution",
-        >>>              page=self.page_result,
-        >>>              save_figure_button=True)
+        >>>              page=self.page_result)
 
         Gives (note that the FigureOption for the legend is also included):
 
         .. figure:: _static/Example_ResultFigure.PNG
         """
         super().__init__(label, page)
-        self.fig = None
-        self.ax = None
-        self.canvas = None
-        self.save_fig: bool = False
+        self.frame_canvas: QtW.QFrame = QtW.QFrame(self.frame)
+        self.layout_frame_canvas: QtW.QVBoxLayout = QtW.QVBoxLayout(self.frame_canvas)
+        set_graph_layout()
+        self.fig: plt.Figure = plt.figure()
+        self.ax: Optional[plt.Axes] = self.fig.add_subplot(111)
+        self.canvas: FigureCanvas = FigureCanvas(self.fig)
+        # create navigation toolbar and replace icons with white ones
+        self.toolbar: NavigationToolbar = NavigationToolbar(self.canvas, None, True)
+        for name, icon_name in [("save_figure", "Save_Inv"), ('home', 'Home'), ('zoom', 'Search'), ('back', 'Back'), ('forward', 'Forward'),
+                                ('pan', 'Pen'), ('configure_subplots', 'Options'), ('edit_parameters', 'Parameters')]:
+            icon = QIcon()
+            icon.addFile(f":/icons/icons/{icon_name}.svg", QSize(), QIcon.Normal, QIcon.Off)
+            self.toolbar._actions[name].setIcon(icon)
         self._kwargs: dict = {}
         self.function_name: str = ""
         self.class_name: str = ""
+        self.x_axes_text: str = ''
+        self.y_axes_text: str = ''
         self.to_show: bool = True
 
-        if save_figure_button:
-            self.save_fig = FunctionButton(category=self, button_text="Save figure", icon=":/icons/icons/Save_Inv.svg")
+    def replace_figure(self, fig: plt.Figure) -> None:
+        """
+        Replace figure in canvas and reset toolbar to new figure.
+
+        Parameters
+        ----------
+        fig: plt.Figure
+            matplotlib figure
+
+        Returns
+        -------
+        None
+        """
+        self.fig = fig
+        self.ax = fig.get_axes()[0]
+        self.ax.set_xlabel(self.x_axes_text)
+        self.ax.set_ylabel(self.y_axes_text)
+        self.toolbar.home()
+        self.canvas.hide()
+        self.toolbar.hide()
+        canvas = FigureCanvas(self.fig)
+        # create navigation toolbar and replace icons with white ones
+        toolbar: NavigationToolbar = NavigationToolbar(canvas, self.frame_canvas, True)
+        for name, icon_name in [("save_figure", "Save_Inv"), ('home', 'Home'), ('zoom', 'Search'), ('back', 'Back'), ('forward', 'Forward'),
+                                ('pan', 'Pen'), ('configure_subplots', 'Options'), ('edit_parameters', 'Parameters')]:
+            icon = QIcon()
+            icon.addFile(f":/icons/icons/{icon_name}.svg", QSize(), QIcon.Normal, QIcon.Off)
+            toolbar._actions[name].setIcon(icon)
+
+        self.layout_frame_canvas.replaceWidget(self.canvas, canvas)
+        self.layout_frame_canvas.replaceWidget(self.toolbar, toolbar)
+
+        self.canvas = canvas
+        self.toolbar = toolbar
+
+    def create_widget(self, page: QtW.QWidget, layout: QtW.QLayout):
+        """
+        This function creates the frame for this Category on a given page.
+        If the current label text is "", then the frame attribute is set to the given frame.
+        It populates this category widget with all the options within this category.
+
+        Parameters
+        ----------
+        page : QtW.QWidget
+            Widget (i.e. page) in which this option should be created
+        layout : QtW.QLayout
+            The layout parent of the current frame
+
+        Returns
+        -------
+        None
+        """
+        # create widget as from category
+        super().create_widget(page, layout)
+        # create frame with no border for the frames inside the NavigationToolbar
+        self.frame_canvas.setParent(page)
+        self.frame_canvas.setStyleSheet(
+            f"QFrame{'{'}border: 0px solid {LIGHT};border-bottom-left-radius: 15px;border-bottom-right-radius: 15px;{'}'}\n"
+            f"QLabel{'{'}border: 0px solid {WHITE};{'}'}"
+        )
+        self.frame_canvas.setFrameShape(QtW.QFrame.StyledPanel)
+        self.frame_canvas.setFrameShadow(QtW.QFrame.Raised)
+        self.layout_frame.addWidget(self.frame_canvas)
+        # set minimal height to ensure a minimal height of the plots
+        self.frame_canvas.setMinimumHeight(500)
+        # add canvas and toolbar to local frame
+        self.layout_frame_canvas.addWidget(self.canvas)
+        self.layout_frame_canvas.addWidget(self.toolbar)
 
     def set_text(self, name: str) -> None:
         """
@@ -2150,8 +2235,10 @@ class ResultFigure(Category):
         entry_name: List[str, str] = name.split(',')
         self.label_text = entry_name[0]
         self.label.setText(self.label_text)
-        if len(entry_name) > 1:
-            self.save_fig.set_text(entry_name[1])
+        self.y_axes_text: str = entry_name[1]
+        self.x_axes_text: str = entry_name[2]
+        self.ax.set_xlabel(self.x_axes_text)
+        self.ax.set_ylabel(self.y_axes_text)
 
     def fig_to_be_shown(self, class_name: str = "Borefield", function_name: str = "print_temperature_profile", **kwargs) -> None:
         """
@@ -2196,7 +2283,7 @@ class ResultFigure(Category):
         """
         kwargs_temp = {}
         for i in self.list_of_options:
-            if i != self.save_fig and not i.is_hidden():
+            if not i.is_hidden():
                 key, value = i.get_value()
                 kwargs_temp[key] = value
         return {**self._kwargs, **kwargs_temp}

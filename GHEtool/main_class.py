@@ -14,7 +14,7 @@ import pygfunction as gt
 import os.path
 import matplotlib.pyplot as plt
 import warnings
-from typing import Union
+from typing import Union, Tuple, Optional
 
 from GHEtool.VariableClasses import GroundData, FluidData, PipeData
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, _timeValues
@@ -48,7 +48,7 @@ class Borefield:
                 'gui', 'time_L3_first_year', 'time_L3_last_year', 'peak_heating_external', 'peak_cooling_external', \
                 'monthly_load_heating_external', 'monthly_load_cooling_external', 'hourly_heating_load_external', \
                 'hourly_cooling_load_external', 'hourly_heating_load_on_the_borefield', 'hourly_cooling_load_on_the_borefield', \
-                'use_constant_Rb', 'printing', 'combo', 'D', 'r_b', 'recalculation_needed',\
+                'use_constant_Rb', 'printing', 'combo', 'D', 'r_b', 'recalculation_needed', \
                 'L2_sizing', 'L3_sizing', 'L4_sizing', 'quadrant_sizing', 'H_init', 'use_precalculated_data'
 
     def __init__(self, simulation_period: int = 20, peak_heating: list = None,
@@ -193,7 +193,7 @@ class Borefield:
         self.H = 0.  # borehole depth m
         self.Rb = 0.  # effective borehole thermal resistance mK/W
         self.number_of_boreholes = 0  # number of total boreholes #
-        self.ground_data: GroundData = None
+        self.ground_data: Optional[GroundData] = None
         self.D: float = 0.  # buried depth of the borehole [m]
         self.r_b: float = 0.  # borehole radius [m]
 
@@ -202,11 +202,11 @@ class Borefield:
         self.Tf_max: float = 16.  # maximum temperature of the fluid
         self.Tf_min: float = 0.  # minimum temperature of the fluid
         self.fluid_data_available: bool = False  # needs to be True in order to calculate Rb*
-        self.fluid_data: FluidData = None
+        self.fluid_data: Optional[FluidData] = None
 
         # initiate borehole parameters
         self.pipe_data_available: bool = False  # needs to be True in order to calculate Rb*
-        self.pipe_data: PipeData = None
+        self.pipe_data: Optional[PipeData] = None
 
         # initiate different sizing
         self.L2_sizing: bool = True
@@ -1359,7 +1359,7 @@ class Borefield:
 
         return False
 
-    def _plot_temperature_profile(self, legend: bool = True, plot_hourly: bool = False):
+    def _plot_temperature_profile(self, legend: bool = True, plot_hourly: bool = False) -> Tuple[plt.Figure, plt.Axes]:
         """
         This function plots the temperature profile.
         If the Borefield object exists as part of the GUI, than the figure is returned,
@@ -1385,40 +1385,38 @@ class Borefield:
             time_array = self.time_L3_last_year / 12 / 730. / 3600.
 
         plt.rc('figure')
+        # create new figure and axes if it not already exits otherwise clear it.
         fig = plt.figure()
-
-        ax1 = fig.add_subplot(111)
-        ax1.set_xlabel(r'Time (year)')
-        ax1.set_ylabel(r'Temperature ($^\circ C$)')
+        ax = fig.add_subplot(111)
+        # set axes labels
+        ax.set_xlabel(r'Time (year)')
+        ax.set_ylabel(r'Temperature ($^\circ C$)')
 
         # plot Temperatures
-        ax1.step(time_array, self.Tb, 'k-', where="pre", lw=1.5, label="Tb")
+        ax.step(time_array, self.Tb, 'k-', where="pre", lw=1.5, label="Tb")
 
         if plot_hourly:
-            ax1.step(time_array, self.results_peak_cooling, 'b-', where="pre", lw=1, label='Tf')
+            ax.step(time_array, self.results_peak_cooling, 'b-', where="pre", lw=1, label='Tf')
         else:
-            ax1.step(time_array, self.results_peak_cooling, 'b-', where="pre", lw=1.5, label='Tf peak cooling')
-            ax1.step(time_array, self.results_peak_heating, 'r-', where="pre", lw=1.5, label='Tf peak heating')
+            ax.step(time_array, self.results_peak_cooling, 'b-', where="pre", lw=1.5, label='Tf peak cooling')
+            ax.step(time_array, self.results_peak_heating, 'r-', where="pre", lw=1.5, label='Tf peak heating')
 
-            ax1.step(time_array, self.results_month_cooling, color='b', linestyle="dashed", where="pre", lw=1.5,
-                     label='Tf base cooling')
-            ax1.step(time_array, self.results_month_heating, color='r', linestyle="dashed", where="pre", lw=1.5,
-                     label='Tf base heating')
+            ax.step(time_array, self.results_month_cooling, color='b', linestyle="dashed", where="pre", lw=1.5, label='Tf base cooling')
+            ax.step(time_array, self.results_month_heating, color='r', linestyle="dashed", where="pre", lw=1.5, label='Tf base heating')
 
         # define temperature bounds
-        ax1.hlines(self.Tf_min, 0, self.simulation_period, colors='r', linestyles='dashed', label='', lw=1)
-        ax1.hlines(self.Tf_max, 0, self.simulation_period, colors='b', linestyles='dashed', label='', lw=1)
-        ax1.set_xticks(range(0, self.simulation_period + 1, 2))
+        ax.hlines(self.Tf_min, 0, self.simulation_period, colors='r', linestyles='dashed', label='', lw=1)
+        ax.hlines(self.Tf_max, 0, self.simulation_period, colors='b', linestyles='dashed', label='', lw=1)
+        ax.set_xticks(range(0, self.simulation_period + 1, 2))
 
         # Plot legend
         if legend:
-            ax1.legend()
-        ax1.set_xlim(left=0, right=self.simulation_period)
-
+            ax.legend()
+        ax.set_xlim(left=0, right=self.simulation_period)
+        # show figure if not in gui mode
         if not self.gui:
             plt.show()
-            return
-        return fig, ax1
+        return fig, ax
 
     def _calculate_temperature_profile(self, H: float = None, hourly: bool = False) -> None:
         """
@@ -1496,7 +1494,11 @@ class Borefield:
 
             # making a numpy array of the monthly balance (self.monthly_load) for a period of self.simulation_period years
             # [kW]
-            hourly_load = np.tile(self.hourly_cooling_load - self.hourly_heating_load, self.simulation_period)
+            if np.any(self.hourly_heating_load_on_the_borefield):
+                hourly_load = np.tile(self.hourly_cooling_load_on_the_borefield - self.hourly_heating_load_on_the_borefield,
+                                      self.simulation_period)
+            else:
+                hourly_load = np.tile(self.hourly_cooling_load - self.hourly_heating_load, self.simulation_period)
 
             # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
             # g-function. This dataset is checked over and over again and is correct
@@ -1892,13 +1894,12 @@ class Borefield:
                 cool_ok = True
 
         # calculate the resulting hourly profile that can be put on the field
-        self.hourly_cooling_load_on_the_borefield = np.maximum(peak_cool_load, self.hourly_cooling_load)
-        self.hourly_heating_load_on_the_borefield = np.maximum(peak_heat_load, self.hourly_heating_load)
+        self.hourly_cooling_load_on_the_borefield = np.minimum(peak_cool_load, self.hourly_cooling_load)
+        self.hourly_heating_load_on_the_borefield = np.minimum(peak_heat_load, self.hourly_heating_load)
 
         # calculate the resulting hourly profile that cannot be put on the field
         self.hourly_cooling_load_external = np.maximum(0, self.hourly_cooling_load - peak_cool_load)
         self.hourly_heating_load_external = np.maximum(0, self.hourly_heating_load - peak_heat_load)
-
         # calculate the resulting monthly profile that cannot be put on the field
         temp = self._reduce_to_monthly_load(self.hourly_cooling_load, max(self.hourly_cooling_load))
         self.monthly_load_cooling_external = temp - self.baseload_cooling
@@ -2057,7 +2058,7 @@ class Borefield:
         # show plot
         plt.show()
 
-    def plot_load_duration(self, legend: bool = False) -> None:
+    def plot_load_duration(self, legend: bool = False) -> Tuple[plt.Figure, plt.Axes]:
         """
         This function makes a load-duration curve from the hourly values.
 
@@ -2068,33 +2069,37 @@ class Borefield:
 
         Returns
         ----------
-        None
+        Tuple
+            plt.Figure, plt.Axes
         """
         # check if there are hourly values
         if not self._check_hourly_load():
-            return
-
+            fig = plt.figure()
+            return fig, fig.add_subplot(111)
+        # sort heating and cooling load
         heating = self.hourly_heating_load.copy()
         heating[::-1].sort()
 
         cooling = self.hourly_cooling_load.copy()
         cooling.sort()
         cooling = cooling * (-1)
-
+        # create new figure and axes if it not already exits otherwise clear it.
         fig = plt.figure()
         ax = fig.add_subplot(111)
+        # add sorted loads to plot
         ax.step(np.arange(0, 8760, 1), heating, 'r-', label="Heating")
         ax.step(np.arange(0, 8760, 1), cooling, 'b-', label="Cooling")
+        # create 0 line
         ax.hlines(0, 0, 8759, color="black")
-
+        # add labels
         ax.set_xlabel("Time [hours]")
         ax.set_ylabel("Power [kW]")
-
+        # set x limits to 8760
         ax.set_xlim(0, 8760)
-
+        # plot legend if wanted
         if legend:
             ax.legend()
-
+        # show plt if not in gui
         if not self.gui:
             plt.show()
         return fig, ax
