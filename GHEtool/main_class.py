@@ -659,7 +659,7 @@ class Borefield:
         This function sizes the field based on the last year of operation, i.e. quadrants 2 and 4.
 
         It uses the methodology developed by (Ahmadfard and Bernier, 2019) [#Ahmadfard2019]_.
-        The concept of borefield quadrants is developped by (Peere et al., 2020) [#PeereBS]_ [#PeereThesis]_.
+        The concept of borefield quadrants is developed by (Peere et al., 2020) [#PeereBS]_ [#PeereThesis]_.
 
         Returns
         -------
@@ -699,7 +699,7 @@ class Borefield:
         This function sizes the field based on the first year of operation, i.e. quadrants 1 and 3.
 
         It uses the methodology developed by (Monzo et al., 2016) [#Monzo]_ and adapted by (Peere et al., 2021) [#PeereBS]_.
-        The concept of borefield quadrants is developped by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]_.
+        The concept of borefield quadrants is developed by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]_.
 
         Returns
         -------
@@ -1777,7 +1777,7 @@ class Borefield:
         """
         This function calculates the monthly load based, taking a maximum peak value into account.
         This means that it sums the hourly load for each month, and if a peak occurs larger than the given peak,
-        it is limited to the the last one.
+        it is limited to the last one.
 
         Parameters
         ----------
