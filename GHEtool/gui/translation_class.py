@@ -556,7 +556,7 @@ class Translations:
         self.BaseCooling: List[str] = [
             "base cooling",
             "Grundkühlung",
-            "basisbelasting koeling",
+            "Basisbelasting koeling",
             "Base raffreddamento",
             "Base de refroidissement",
             "Base de refrigeración",
@@ -565,7 +565,7 @@ class Translations:
         self.BaseHeating: List[str] = [
             "base heating",
             "Grundheizung",
-            "basisbelasting verwarming",
+            "Basisbelasting verwarming",
             "Base riscaldamento",
             "Chauffage de base",
             "Base de calefacción",
@@ -574,7 +574,7 @@ class Translations:
         self.PeakCooling: List[str] = [
             "peak cooling",
             "Kühlspitzen",
-            "piekkoeling",
+            "Piekkoeling",
             "Picco raffreddamento",
             "Refroidissement maximal",
             "Pico de refrigeración",
@@ -583,7 +583,7 @@ class Translations:
         self.PeakHeating: List[str] = [
             "peak heating",
             "Heizspitzen",
-            "piekverwarming",
+            "Piekverwarming",
             "Picco di riscaldamento",
             "Pic de chauffage",
             "Pico de calefacción",
@@ -1185,8 +1185,8 @@ class Translations:
         ]
         self.option_toggle_buttons: List[str] = [
             "Use toggle buttons?:, no , yes ",
-            "Umschalterbutton?:, Ja , Nein ",
-            "Toggle-gedrag?:, ja , nee ",
+            "Umschalterbutton?:, Nein , Ja ",
+            "Toggle-gedrag?:, nee , ja",
             "Toggle buttons?:, no , yes ",
             "Toggle buttons?:, no , yes ",
             "Toggle buttons?:, no , yes ",
@@ -1195,7 +1195,7 @@ class Translations:
         self.option_auto_saving: List[str] = [
             "Use automatic saving?, no , yes ",
             "Automatisches speichern nutzen?, Nein, Ja ",
-            "Automatisch opslaan, nee , ja ",
+            "Automatisch opslaan, ne , ja ",
             "Automatic saving, no , yes ",
             "Automatic saving, no , yes ",
             "Automatic saving, no , yes ",
@@ -1648,45 +1648,45 @@ class Translations:
             "The minimal average fluid temperature is , °C",
         ]
         self.figure_temperature_profile: List[str] = [
-            "Temperature evolution, Save figure",
-            "Temperaturverlauf, Abbildung speichern",
-            "Temperatuur evolutie, Sla figuur op",
-            "Temperature evolution, Save figure",
-            "Temperature evolution, Save figure",
-            "Temperature evolution, Save figure",
-            "Temperature evolution, Save figure",
+            "Temperature evolution, Temperature [°C], Time [years]",
+            "Temperaturverlauf, Temperatur [°C], Zeit [Jahren]",
+            "Temperatuurevolutie, Temperatuur [°C], Tijd [jaren]",
+            "Temperature evolution, Temperature [°C], Time [years]",
+            "Temperature evolution, Temperature [°C], Time [years]",
+            "Temperature evolution, Temperature [°C], Time [years]",
+            "Temperature evolution, Temperature [°C], Time [years]",
         ]
         self.legend_figure_temperature_profile: List[str] = [
             "Show legend?, No , Yes ",
             "Legende zeigen?, Nein , Ja ",
-            "Toon legende?, no , yes ",
+            "Toon legende?, ne , ja ",
             "Mostra la legenda?, no , yes ",
             "Afficher la légende?, no , yes ",
             "Mostrar leyenda?, no , yes ",
             "Mostrar lenda?, no , yes ",
         ]
         self.hourly_figure_temperature_profile: List[str] = [
-            "Hourly profile, no , yes ",
+            "Hourly profile, No , Yes ",
             "Stündliches Profil, Nein , Ja ",
-            "Uurlijks profiel, nee , ja ",
+            "Uurlijks profiel, ne , ja ",
             "Hourly profile, no , yes ",
             "Hourly profile, no , yes ",
             "Hourly profile, no , yes ",
             "Hourly profile, no , yes ",
         ]
         self.figure_load_duration: List[str] = [
-            "Load-duration curve, Save figure",
-            "Jahresdauerlinie, Abbildung speichern",
-            "Belastings-duurcurve, Sla figuur op",
-            "Load-duration curve, Save figure",
-            "Load-duration curve, Save figure",
-            "Load-duration curve, Save figure",
-            "Load-duration curve, Save figure",
+            "Load-duration curve, Power [kW], Time [hours]",
+            "Jahresdauerlinie, Leistung [kW], Zeit [Stunden]",
+            "Belastings-duurcurve, Power [kW], Time [hours]",
+            "Load-duration curve, Power [kW], Time [hours]",
+            "Load-duration curve, Power [kW], Time [hours]",
+            "Load-duration curve, Power [kW], Time [hours]",
+            "Load-duration curve, Power [kW], Time [hours]",
         ]
         self.legend_figure_load_duration: List[str] = [
-            "Show legend?, no , yes ",
+            "Show legend?, No , Yes ",
             "Legende zeigen?, Nein , Ja ",
-            "Toon legende?, nee , ja ",
+            "Toon legende?, ne , ja ",
             "Mostra la legenda?, no , yes ",
             "Afficher la légende?, no , yes ",
             "Mostrar leyenda?, no , yes ",
