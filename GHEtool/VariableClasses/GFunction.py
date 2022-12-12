@@ -22,7 +22,7 @@ class GFunction:
     def __init__(self):
         self.store_previous_values: bool = True
         self.options: dict = {"method": "equivalent"}
-        self.alpha: float = None
+        self.alpha: float = 0.
         self.borefield: list = []
         self.depth_array: np.ndarray = np.array([])
         self.time_array: np.ndarray = np.array([])
@@ -273,6 +273,9 @@ class GFunction:
         True
             True if the alpha's are the same, False otherwise
         """
+        if alpha == 0.:
+            return False
+
         if alpha != self.alpha:
             self.alpha = alpha
             self.remove_previous_data()
