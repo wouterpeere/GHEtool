@@ -5,7 +5,7 @@ Verleyen et al. (2022)
 The code below is used in the article of Verleyen et al. (2022) [1]_.
 
 
-.. literalinclude:: ../../../GHEtool/Articles/IEA_HPT_magazine_2022/IEA_HPT_magazine.py
+.. literalinclude:: ../../../Articles/IEA_HPT_magazine_2022/IEA_HPT_magazine.py
    :language: python
    :linenos:
 
