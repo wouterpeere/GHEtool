@@ -198,7 +198,16 @@ class GFunction:
             threshold value
             (int, int) if the current depth is between two previous calculated depths which are closer together
             then the threshold value
+
+        Raises
+        ------
+        ValueError
+            When the depth is smaller or equal to zero
         """
+        # raise error when value is negative
+        if depth <= 0:
+            raise ValueError("The depth is smaller then zero!")
+
         # get nearest depth index
         val_depth, idx_depth = self._nearest_value(self.depth_array, depth)
 
@@ -212,7 +221,7 @@ class GFunction:
             # but the difference is smaller than the threshold for interpolation
             if idx_depth == self.depth_array.size - 1 and depth - val_depth < self.threshold_depth_interpolation:
                 return idx_depth, None
-            else:
+            elif idx_depth != self.depth_array.size - 1:
                 idx_next = idx_depth + 1
                 if self.depth_array[idx_next] - val_depth < self.threshold_depth_interpolation:
                     return idx_depth, idx_next
@@ -229,25 +238,6 @@ class GFunction:
         # no correct interpolation indices are found
         # None, None is returned
         return None, None
-
-    def _check_time_values_are_equal_at_indices(self, depth_1: float, depth_2: float) -> bool:
-        """
-        This function checks whether or not the time values of the previous calculated data for both depths
-        are equal.
-
-        Parameters
-        ----------
-        depth_1 : float
-            First depth [m] for which the time values should be checked
-        depth_2 : float
-            Second depth [m] for which the time values should be checked
-
-        Returns
-        -------
-        bool
-            True if the time values are equal, False otherwise
-        """
-        return np.array_equal(self.time_array[depth_1], self.time_array[depth_2])
 
     @staticmethod
     def _check_time_values(source: np.ndarray, target: np.ndarray) -> bool:
@@ -273,10 +263,13 @@ class GFunction:
             True if the time values are suitable for interpolation.
         """
 
+        if source.size == 0 or target.size == 0:
+            return False
+
         if source.size < target.size:
             return False
 
-        if source[0] <= target[0] and source[-1] > target[-1]:
+        if source[0] <= target[0] and source[-1] >= target[-1]:
             return True
 
         return False
