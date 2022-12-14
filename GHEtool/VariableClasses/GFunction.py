@@ -230,7 +230,7 @@ class GFunction:
             # but the difference is smaller than the threshold for interpolation
             if idx_depth == 0 and val_depth - depth < self.threshold_depth_interpolation:
                 return None, idx_depth
-            else:
+            elif idx_depth != 0:
                 idx_prev = idx_depth - 1
                 if val_depth - self.depth_array[idx_prev] < self.threshold_depth_interpolation:
                     return idx_prev, idx_depth

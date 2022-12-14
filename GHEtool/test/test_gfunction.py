@@ -7,6 +7,7 @@ from GHEtool.VariableClasses import GFunction
 
 depth_array = np.array([1, 5, 6])
 depth_array_empty = np.array([])
+depth_array_threshold = np.array([30, 60, 100])
 time_value_array_empty = np.array([])
 time_value_array = np.array([1, 100, 1000, 10000])
 
@@ -84,10 +85,22 @@ def test_nearest_depth_index():
     assert (0, 1) == gfunc._get_nearest_depth_index(3)
     assert (1, 1) == gfunc._get_nearest_depth_index(5)
     assert (2, None) == gfunc._get_nearest_depth_index(20)
+    assert (0, 1) == gfunc._get_nearest_depth_index(4)
+
     try:
         gfunc._get_nearest_depth_index(-100)
     except ValueError:
         assert True
+
+
+def test_nearest_depth_index_threshold():
+    gfunc = GFunction()
+    gfunc.depth_array = depth_array_threshold
+    assert (None, None) == gfunc._get_nearest_depth_index(5)
+    assert (None, None) == gfunc._get_nearest_depth_index(50)
+    assert (None, None) == gfunc._get_nearest_depth_index(95)
+    assert (None, None) == gfunc._get_nearest_depth_index(40)
+
 
 
 def test_check_time_values():
