@@ -5,6 +5,17 @@ from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction
 import pygfunction as gt
 
 
+@pytest.fixture
+def custom_gfunction():
+    custom_gfunction = CustomGFunction()
+
+    rect_field = gt.boreholes.rectangle_field(5, 5, 5, 5, 100, 4, 0.075)
+
+    custom_gfunction.create_custom_dataset(rect_field, 0.00005)
+
+    return custom_gfunction
+
+
 def test_initiate_custom_gfunction():
     custom_gfunction = CustomGFunction()
 
@@ -61,7 +72,7 @@ def test_set_options():
 
 
 def test_load_custom_gfunction():
-    custom_gfunction = load_custom_gfunction("./test.gvalues")
+    assert isinstance(load_custom_gfunction("./test.gvalues"), CustomGFunction)
 
 
 def test_check():
@@ -91,3 +102,21 @@ def test_unequal3():
     custom_gfunction = CustomGFunction()
     custom_gfunction2 = CustomGFunction(options={"test": 1})
     assert not custom_gfunction == custom_gfunction2
+
+
+def test_within_range_empty():
+    custom_gfunction = CustomGFunction()
+    assert not custom_gfunction.within_range(np.array([1]), 5)
+
+
+@pytest.mark.slow
+def test_within_range(custom_gfunction):
+    time_array = np.array([3600, 5000, 10000])
+    assert not custom_gfunction.within_range(time_array, 0.5)
+    assert not custom_gfunction.within_range(time_array, 500)
+    assert not custom_gfunction.within_range(np.array([3600, 10**8]), 50)
+    assert not custom_gfunction.within_range(np.array([10, 3600]), 50)
+    assert custom_gfunction.within_range(time_array, 50)
+
+    custom_gfunction.delete_custom_gfunction()
+    assert not custom_gfunction.within_range(time_array, 50)

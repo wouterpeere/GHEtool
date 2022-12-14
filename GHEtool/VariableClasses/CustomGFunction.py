@@ -3,7 +3,7 @@ This file contains both the CustomGFunction class and all the relevant informati
 """
 import pygfunction as gt
 import numpy as np
-from typing import Union
+from typing import Union, List
 import pickle
 import warnings
 from scipy import interpolate
@@ -193,13 +193,13 @@ class CustomGFunction:
 
         return True
 
-    def create_custom_dataset(self, borefield, alpha: float) -> None:
+    def create_custom_dataset(self, borefield: List[gt.boreholes.Borehole], alpha: float) -> None:
         """
         This function creates the custom dataset.
 
         Parameters
         ----------
-        borefield : pygfunction borefield object
+        borefield : list[pygfunction.Borehole]
             Borefield object for which the custom dataset should be created
         alpha : float
             Ground thermal diffusivity [m2/s]

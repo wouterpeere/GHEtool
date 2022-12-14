@@ -328,18 +328,6 @@ def test_optimise_load_profile_without_data(borefield):
         assert True
 
 
-def test_precalculated_out_of_bound_2(borefield_custom_data):
-    borefield_custom_data.gfunction(2, H=100)
-
-
-def test_precalculated_out_of_bound_1(borefield_custom_data):
-    borefield_custom_data.gfunction(10**10, H=100)
-
-
-def test_precalculated_out_of_bound_3(borefield_custom_data):
-    borefield_custom_data.gfunction([3600*100, 3600*101], H=500)
-
-
 def test_precalculated_data_1(borefield_custom_data):
     borefield_custom_data.gfunction([3600*100, 3600*100], 100)
 

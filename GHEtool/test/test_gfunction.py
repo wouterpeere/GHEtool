@@ -11,12 +11,6 @@ time_value_array_empty = np.array([])
 time_value_array = np.array([1, 100, 1000, 10000])
 
 
-@pytest.fixture
-def gfunc():
-    gfunc = GFunction()
-    return gfunc
-
-
 def test_equal_borefields():
     borefield1 = gt.boreholes.rectangle_field(1, 1, 5, 5, 100, 4, 0.075)
     borefield2 = gt.boreholes.rectangle_field(1, 1, 5, 5, 100, 4, 0.075)

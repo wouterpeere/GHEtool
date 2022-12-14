@@ -1,6 +1,6 @@
 import pygfunction as gt
 import numpy as np
-from typing import Union, Tuple
+from typing import Union, Tuple, List
 import copy
 from scipy import interpolate
 
@@ -32,7 +32,7 @@ class GFunction:
         self.no_extrapolation: bool = True
         self.threshold_depth_interpolation: float = 25  # m
 
-    def calculate(self, time_value: Union[list, float, np.ndarray], borefield, alpha: float):
+    def calculate(self, time_value: Union[list, float, np.ndarray], borefield: List[gt.boreholes.Borehole], alpha: float):
         """
         This function returns the gvalues either by interpolation or by calculating them.
         It does so by calling the function gvalues which does this calculation.
@@ -43,10 +43,10 @@ class GFunction:
         ----------
         time_value : list, float, np.ndarray
             Array with all the time values [s] for which gvalues should be calculated
-        borefield : pygfunction.borehole
+        borefield : list[pygfunction.borehole]
             Borefield model for which the gvalues should be calculated
         alpha : float
-            Thermal difussivity of the ground [m2/s]
+            Thermal diffusivity of the ground [m2/s]
 
         Returns
         -------
@@ -54,7 +54,7 @@ class GFunction:
             1D array with all the requested gvalues
         """
 
-        def gvalues(time_values: np.ndarray, borefield, alpha: float, depth: float) -> np.ndarray:
+        def gvalues(time_values: np.ndarray, borefield: List[gt.boreholes.Borehole], alpha: float, depth: float) -> np.ndarray:
             """
             This function returns the gvalues either by interpolation or by calculating them.
 
@@ -62,7 +62,7 @@ class GFunction:
             ----------
             time_values : np.ndarray
                 Array with all the time values [s] for which gvalues should be calculated
-            borefield : pygfunction.borehole
+            borefield : list[pygfunction.borehole]
                 Borefield model for which the gvalues should be calculated
             alpha : float
                 Thermal diffusivity of the ground [m2/s]
@@ -121,7 +121,7 @@ class GFunction:
         return gfunc_uniform_T
 
     def interpolate_gfunctions(self, time_value: Union[list, float, np.ndarray], depth: float,
-                               alpha: float, borefield) -> np.ndarray:
+                               alpha: float, borefield: List[gt.boreholes.Borehole]) -> np.ndarray:
 
         gvalues: np.ndarray = np.zeros(len(time_value))
 
@@ -319,7 +319,7 @@ class GFunction:
         self.depth_array = np.insert(self.depth_array, nearest_idx, depth)
         self.previous_gfunctions = np.insert(self.previous_gfunctions, nearest_idx, gvalues)
 
-    def _check_borefield(self, borefield) -> bool:
+    def _check_borefield(self, borefield: List[gt.boreholes.Borehole]) -> bool:
         """
         This function checks whether the new borefield object is equal to the previous one.
         It does so by comparing all the parameters (neglecting the depth).
@@ -328,7 +328,7 @@ class GFunction:
 
         Parameters
         ----------
-        borefield : pygfunction borefield object
+        borefield : list[pygfunction.Borehole]
             New borefield for which the gfunctions should be calculated
 
         Returns
