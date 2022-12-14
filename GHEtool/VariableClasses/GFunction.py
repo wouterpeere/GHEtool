@@ -2,6 +2,7 @@ import pygfunction as gt
 import numpy as np
 from typing import Union, Tuple
 import copy
+from scipy import interpolate
 
 from .CustomGFunction import _timeValues
 
@@ -27,50 +28,107 @@ class GFunction:
         self.depth_array: np.ndarray = np.array([])
         self.time_array: np.ndarray = np.array([])
         self.previous_gfunctions: np.ndarray = np.array([])
-        self.nb_of_time_values: int = 0
 
         self.no_extrapolation: bool = True
         self.threshold_depth_interpolation: float = 25  # m
 
     def calculate(self, time_value: Union[list, float, np.ndarray], borefield, alpha: float):
+        """
+        This function returns the gvalues either by interpolation or by calculating them.
+        It does so by calling the function gvalues which does this calculation.
+        This calculate function also stores the previous calculated data and makes interpolations
+        whenever the requested list of time_value are longer then DEFAULT_NUMBER_OF_TIMESTEPS.
 
+        Parameters
+        ----------
+        time_value : list, float, np.ndarray
+            Array with all the time values [s] for which gvalues should be calculated
+        borefield : pygfunction.borehole
+            Borefield model for which the gvalues should be calculated
+        alpha : float
+            Thermal difussivity of the ground [m2/s]
+
+        Returns
+        -------
+        gvalues : np.ndarray
+            1D array with all the requested gvalues
+        """
+
+        def gvalues(time_values: np.ndarray, borefield, alpha: float, depth: float) -> np.ndarray:
+            """
+            This function returns the gvalues either by interpolation or by calculating them.
+
+            Parameters
+            ----------
+            time_values : np.ndarray
+                Array with all the time values [s] for which gvalues should be calculated
+            borefield : pygfunction.borehole
+                Borefield model for which the gvalues should be calculated
+            alpha : float
+                Thermal diffusivity of the ground [m2/s]
+            depth : float
+                Depth of the borefield [m]
+
+            Returns
+            -------
+            gvalues : np.ndarray
+                1D array with all the requested gvalues
+            """
+            # do interpolation
+            gfunc_interpolated = self.interpolate_gfunctions(time_values, depth, alpha, borefield)
+
+            # if there are g-values calculated, return them
+            if np.any(gfunc_interpolated):
+                return gfunc_interpolated
+
+            # calculate the g-values for uniform borehole wall temperature
+            gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options).gFunc
+
+            # store the calculated g-values
+            self.set_new_calculated_data(time_values, depth, gfunc_calculated)
+
+            return gfunc_calculated
+
+        # get depth from borefield
         depth = borefield[0].H
 
-        if self._check_alpha(alpha) and self._check_borefield(borefield):
-            # see if data can be interpolated
-            gvalues: np.ndarray = self.interpolate_gfunctions(time_value, depth)
-        else:
-            gvalues: np.ndarray = np.zeros(len(time_value))
-
+        # make numpy array from time_values
         time_value_np = np.array(time_value)
-        if not isinstance(time_value, (float, int)) and len(time_value_np) > GFunction.DEFAULT_NUMBER_OF_TIMESTEPS:
+
+        if not isinstance(time_value, (float, int)) and time_value_np.size > GFunction.DEFAULT_NUMBER_OF_TIMESTEPS:
             # due to this many requested time values, the calculation will be slow.
             # there will be interpolation
 
             time_value_new = _timeValues(t_max=time_value[-1])
-            # Calculate the g-function for uniform borehole wall temperature
-            gfunc_uniform_T = gt.gfunction.gFunction(borefield, alpha, time_value_new,
-                                                     options=self.options).gFunc
+
+            # calculate g-function values
+            gfunc_uniform_T = gvalues(time_value_new, borefield, alpha, depth)
 
             # return interpolated values
             return np.interp(time_value, time_value_new, gfunc_uniform_T)
 
         # check if there are double values
-        if not isinstance(time_value, (float, int)) and len(time_value_np) != len(np.unique(np.asarray(time_value))):
-            gfunc_uniform_T = gt.gfunction.gFunction(borefield, alpha, np.unique(time_value_np),
-                                                     options=self.options).gFunc
+        if not isinstance(time_value, (float, int)) and time_value_np.size != np.unique(np.asarray(time_value)).size:
+
+            # calculate g-function values
+            gfunc_uniform_T = gvalues(np.unique(time_value_np), borefield, alpha, depth)
 
             return np.interp(time_value, np.unique(time_value_np), gfunc_uniform_T)
 
-        # Calculate the g-function for uniform borehole wall temperature
-        gfunc_uniform_T = gt.gfunction.gFunction(borefield, alpha, time_value_np,
-                                                 options=self.options).gFunc
+        # calculate g-function values
+        gfunc_uniform_T = gvalues(time_value_np, borefield, alpha, depth)
 
         return gfunc_uniform_T
 
-    def interpolate_gfunctions(self, time_value: Union[list, float, np.ndarray], depth: float) -> np.ndarray:
+    def interpolate_gfunctions(self, time_value: Union[list, float, np.ndarray], depth: float,
+                               alpha: float, borefield) -> np.ndarray:
 
         gvalues: np.ndarray = np.zeros(len(time_value))
+
+        # check if interpolation is possible:
+        if not (self._check_alpha(alpha) and self._check_borefield(borefield)):
+            # the alpha and/or borefield is not in line with the precalculated data
+            return gvalues
 
         # find nearest depth indices
         idx_prev, idx_next = self._get_nearest_depth_index(depth)
@@ -80,18 +138,24 @@ class GFunction:
             if idx_prev is None or idx_next is None:
                 return gvalues
 
-            # # check if the time values for both indices are equal
-            # if not self._check_time_values_are_equal_at_indices(idx_prev, idx_next):
-            #     return gvalues
-
             # check if interpolation of all time values can be done based on the available time values
             if not self._check_time_values(self.time_array, time_value):
                 return gvalues
 
             # do interpolation
 
+            if not time_value.size == 1:
+                # multiple values are requested
+                gvalues = interpolate.interpn((self.depth_array, self.time_array), self.previous_gfunctions,
+                                              np.array([[depth, t] for t in time_value]))
+            else:
+                # only one value is requested
+                gvalues = interpolate.interpn((self.depth_array, self.time_array), self.previous_gfunctions,
+                                              np.array([depth, time_value]))
+            return gvalues
+
         # when extrapolation is permitted
-        # TODO implement extrapolation
+        # not yet implemented
         return gvalues
 
     @staticmethod
@@ -185,8 +249,37 @@ class GFunction:
         """
         return np.array_equal(self.time_array[depth_1], self.time_array[depth_2])
 
-    def _check_time_values(self, source: np.ndarray, target: np.ndarray) -> bool:
-        pass
+    @staticmethod
+    def _check_time_values(source: np.ndarray, target: np.ndarray) -> bool:
+        """
+        This function checks whether or not the time values are suitable for interpolation.
+        This is done by two checks:
+
+        1. Is the target array longer then the source array? If yes, False is returned.
+
+        2. Is the smallest value of the target smaller then the smallest value in the source array
+        (and vice versa for the largest value), False is returned.
+
+        Parameters
+        ----------
+        source : np.array
+            The source of time values [s] for the interpolation
+        target : np.array
+            The targeted array of time values [s] for interpolation
+
+        Returns
+        -------
+        bool
+            True if the time values are suitable for interpolation.
+        """
+
+        if source.size < target.size:
+            return False
+
+        if source[0] <= target[0] and source[-1] > target[-1]:
+            return True
+
+        return False
 
     def set_options_gfunction_calculation(self, options: dict) -> None:
         """
@@ -217,10 +310,21 @@ class GFunction:
         self.depth_array = np.array([])
         self.time_array = np.array([])
         self.previous_gfunctions = np.array([])
-        self.nb_of_time_values = 0
 
     def set_new_calculated_data(self, time_values: np.ndarray, depth: float, gvalues: np.ndarray) -> None:
-        pass
+
+        # TODO check with time_values
+
+        nearest_idx = self._nearest_value(self.depth_array, depth)
+        if not nearest_idx:
+            nearest_idx = 0
+        else:
+            if self.depth_array[nearest_idx] < depth:
+                nearest_idx += 1
+
+        # insert data in stored data
+        self.depth_array = np.insert(self.depth_array, nearest_idx, depth)
+        self.previous_gfunctions = np.insert(self.previous_gfunctions, nearest_idx, gvalues)
 
     def _check_borefield(self, borefield) -> bool:
         """
@@ -266,7 +370,7 @@ class GFunction:
         Parameters
         ----------
         alpha : float
-            Thermal diffusivity of the ground of the borefield for which the gfunctions should be calculated.
+            Thermal diffusivity of the ground of the borefield for which the gfunctions should be calculated [m2/s].
 
         Returns
         -------
