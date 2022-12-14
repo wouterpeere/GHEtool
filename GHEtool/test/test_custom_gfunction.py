@@ -114,9 +114,10 @@ def test_within_range(custom_gfunction):
     time_array = np.array([3600, 5000, 10000])
     assert not custom_gfunction.within_range(time_array, 0.5)
     assert not custom_gfunction.within_range(time_array, 500)
-    assert not custom_gfunction.within_range(np.array([3600, 10**8]), 50)
+    assert not custom_gfunction.within_range(np.array([3500, 10**8]), 50)
     assert not custom_gfunction.within_range(np.array([10, 3600]), 50)
     assert custom_gfunction.within_range(time_array, 50)
+    assert custom_gfunction.within_range(np.array([3600, 10**5]), 50)
 
     custom_gfunction.delete_custom_gfunction()
     assert not custom_gfunction.within_range(time_array, 50)
