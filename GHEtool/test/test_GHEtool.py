@@ -433,3 +433,15 @@ def test_load_custom_gfunction(borefield):
 def test_H_smaller_50(borefield):
     borefield.H = 0.5
     borefield.size_L2(H_init=0.5, quadrant_sizing=1)
+
+
+def test_size_hourly_without_hourly_load(borefield):
+    try:
+        borefield.size_L4(H_init=100)
+    except ValueError:
+        assert True
+
+
+def test_size_hourly_quadrant(hourly_borefield):
+    hourly_borefield.H = 0.5
+    hourly_borefield.size_L4(H_init=100, quadrant_sizing=1)

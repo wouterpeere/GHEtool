@@ -102,7 +102,6 @@ def test_nearest_depth_index_threshold():
     assert (None, None) == gfunc._get_nearest_depth_index(40)
 
 
-
 def test_check_time_values():
     gfunc = GFunction()
 
