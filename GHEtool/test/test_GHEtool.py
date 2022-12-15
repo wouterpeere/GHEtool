@@ -167,6 +167,7 @@ def empty_borefield():
 
 @pytest.fixture
 def hourly_borefield():
+    from GHEtool.main_class import FOLDER
     borefield = Borefield()
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)
@@ -192,6 +193,15 @@ def borefield_cooling_dom():
 
 def test_empty_values(empty_borefield):
     np.testing.assert_array_equal(empty_borefield.baseload_cooling, np.zeros(12))
+
+
+def test_hourly_to_monthly(borefield):
+    from GHEtool.main_class import FOLDER
+    borefield.load_hourly_profile(f"{FOLDER}/Examples/hourly_profile.csv", header=True, separator=";", first_column_heating=True)
+    borefield.convert_hourly_to_monthly()
+
+    assert np.isclose(np.sum(borefield.baseload_cooling), np.sum(borefield.hourly_cooling_load))
+    assert np.isclose(np.sum(borefield.baseload_heating), np.sum(borefield.hourly_heating_load))
 
 
 def test_size(borefield):

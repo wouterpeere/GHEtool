@@ -26,6 +26,7 @@ def test_size_length_and_width(monkeypatch):
 
 
 def test_optimise_load_profile(monkeypatch):
+    from GHEtool.main_class import FOLDER
     monkeypatch.setattr(plt, 'show', lambda: None)
 
     # initiate ground data
