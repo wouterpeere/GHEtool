@@ -96,7 +96,8 @@ class DataStorage:
         This function calculates the geothermal flux.
         This is calculated based on:
 
-        2 * temperature gradient * conductivity / 100
+        temperature gradient [K/100m] * conductivity [W/mK] / 100
+        = temperature gradient [K/m] * conductivity [W/mK]
 
         Returns
         -------
