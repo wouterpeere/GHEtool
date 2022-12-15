@@ -85,7 +85,7 @@ class GFunction:
             gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options).gFunc
 
             # store the calculated g-values
-            self.set_new_calculated_data(time_values, depth, gfunc_calculated)
+            self.set_new_calculated_data(time_values, depth, gfunc_calculated, borefield, alpha)
 
             return gfunc_calculated
 
@@ -126,7 +126,7 @@ class GFunction:
         gvalues: np.ndarray = np.zeros(len(time_value))
 
         # check if interpolation is possible:
-        if not (self._check_alpha(alpha) and self._check_borefield(borefield)):
+        if not (self._check_alpha(alpha) or self._check_borefield(borefield)):
             # the alpha and/or borefield is not in line with the precalculated data
             return gvalues
 
@@ -139,19 +139,16 @@ class GFunction:
                 return gvalues
 
             # check if interpolation of all time values can be done based on the available time values
-            if not self._check_time_values(self.time_array, time_value):
+            if not self._check_time_values(time_value):
                 return gvalues
 
             # do interpolation
-
-            if not time_value.size == 1:
-                # multiple values are requested
+            if self.depth_array.size == 1:
+                gvalues = interpolate.interpn([self.time_array], self.previous_gfunctions, time_value)
+            else:
                 gvalues = interpolate.interpn((self.depth_array, self.time_array), self.previous_gfunctions,
                                               np.array([[depth, t] for t in time_value]))
-            else:
-                # only one value is requested
-                gvalues = interpolate.interpn((self.depth_array, self.time_array), self.previous_gfunctions,
-                                              np.array([depth, time_value]))
+
             return gvalues
 
         # when extrapolation is permitted
@@ -239,23 +236,20 @@ class GFunction:
         # None, None is returned
         return None, None
 
-    @staticmethod
-    def _check_time_values(source: np.ndarray, target: np.ndarray) -> bool:
+    def _check_time_values(self, time_array: np.ndarray) -> bool:
         """
         This function checks whether or not the time values are suitable for interpolation.
         This is done by two checks:
 
-        1. Is the target array longer then the source array? If yes, False is returned.
+        1. Is the time_array longer then the stored self.time_array? If yes, False is returned.
 
-        2. Is the smallest value of the target smaller then the smallest value in the source array
+        2. Is the smallest value of the time_array smaller then the smallest value in the stored self.time_array
         (and vice versa for the largest value), False is returned.
 
         Parameters
         ----------
-        source : np.array
-            The source of time values [s] for the interpolation
-        target : np.array
-            The targeted array of time values [s] for interpolation
+        time_array : np.array
+            The array of time values [s] for interpolation
 
         Returns
         -------
@@ -263,13 +257,13 @@ class GFunction:
             True if the time values are suitable for interpolation.
         """
 
-        if source.size == 0 or target.size == 0:
+        if self.time_array.size == 0 or time_array.size == 0:
             return False
 
-        if source.size < target.size:
+        if self.time_array.size < time_array.size:
             return False
 
-        if source[0] <= target[0] and source[-1] >= target[-1]:
+        if self.time_array[0] <= time_array[0] and self.time_array[-1] >= time_array[-1]:
             return True
 
         return False
@@ -304,20 +298,49 @@ class GFunction:
         self.time_array = np.array([])
         self.previous_gfunctions = np.array([])
 
-    def set_new_calculated_data(self, time_values: np.ndarray, depth: float, gvalues: np.ndarray) -> None:
+    def set_new_calculated_data(self, time_values: np.ndarray, depth: float, gvalues: np.ndarray,
+                                borefield, alpha) -> None:
 
-        # TODO check with time_values
+        def check_if_data_should_removed() -> bool:
+            """
+            This function checks whether or not the previous data should be removed.
+            It does so by comparing the stored with the new values for alpha, borefield and time_values.
 
-        nearest_idx = self._nearest_value(self.depth_array, depth)
-        if not nearest_idx:
-            nearest_idx = 0
-        else:
+            Returns
+            -------
+            bool
+                True if the previous data should be removed
+            """
+            if not self._check_alpha(alpha):
+                return True
+
+            if not self._check_borefield(borefield):
+                return True
+
+            if not self._check_time_values(time_values):
+                return True
+
+            return False
+
+        def check_if_data_should_be_saved():
+            pass
+
+        if check_if_data_should_removed():
+            self.remove_previous_data()
+
+        nearest_idx = 0
+
+        if np.any(self.previous_gfunctions):
+            nearest_val, nearest_idx = self._nearest_value(self.depth_array, depth)
             if self.depth_array[nearest_idx] < depth:
                 nearest_idx += 1
 
         # insert data in stored data
         self.depth_array = np.insert(self.depth_array, nearest_idx, depth)
         self.previous_gfunctions = np.insert(self.previous_gfunctions, nearest_idx, gvalues)
+        self.time_array = time_values
+        self.borefield = borefield
+        self.alpha = alpha
 
     def _check_borefield(self, borefield: List[gt.boreholes.Borehole]) -> bool:
         """
@@ -338,8 +361,6 @@ class GFunction:
         """
         # borefields are unequal if they have different number of boreholes
         if len(borefield) != len(self.borefield):
-            self.borefield = copy.copy(borefield)
-            self.remove_previous_data()
             return False
 
         keys = set(borefield[0].__dict__.keys())
@@ -348,8 +369,6 @@ class GFunction:
         for idx, _ in enumerate(borefield):
             for key in keys:
                 if getattr(borefield[idx], key) != getattr(self.borefield[idx], key):
-                    self.borefield = copy.copy(borefield)
-                    self.remove_previous_data()
                     return False
 
         return True
@@ -372,10 +391,7 @@ class GFunction:
         """
         if alpha == 0.:
             return False
-
         if alpha != self.alpha:
-            self.alpha = alpha
-            self.remove_previous_data()
             return False
 
         return True

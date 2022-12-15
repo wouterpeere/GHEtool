@@ -1,10 +1,5 @@
 """
 This file contains all the code for the borefield calculations.
-
-Notes
------
-In a future release, this file will be split into a Borefield class, a GeothermalSystem class and a HybridGeothermalSystem class.
-This will be done in v2.1.1.
 """
 import numpy as np
 import pickle
