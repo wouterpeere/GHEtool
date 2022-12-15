@@ -404,7 +404,7 @@ class GuiStructure:
                     step=0.1,
                 )
                 self.option_simu_period = IntBox(
-                    category=self.category_temperatures, label="Simulation period [yrs]: ", default_value=20, minimal_value=1, maximal_value=100
+                    category=self.category_temperatures, label="Simulation period [yrs]: ", default_value=40, minimal_value=1, maximal_value=100
                 )
 
             # create categories
