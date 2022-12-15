@@ -299,7 +299,28 @@ class GFunction:
         self.previous_gfunctions = np.array([])
 
     def set_new_calculated_data(self, time_values: np.ndarray, depth: float, gvalues: np.ndarray,
-                                borefield, alpha) -> None:
+                                borefield, alpha) -> bool:
+        """
+        This function stores the newly calculated gvalues if this is needed.
+
+        Parameters
+        ----------
+        time_values : np.ndarray
+            Array with all the time values [s] for which gvalues should be calculated
+        depth : float
+            Depth of the borefield [m]
+        gvalues : np.ndarray
+            Array with all the calculated gvalues for the corresponding borefield, alpha and time_values
+        borefield : list[pygfunction.borehole]
+            Borefield model for which the gvalues should be calculated
+        alpha : float
+            Thermal diffusivity of the ground [m2/s]
+
+        Returns
+        -------
+        bool
+            True if the data is saved, False otherwise
+        """
 
         def check_if_data_should_removed() -> bool:
             """
@@ -322,9 +343,31 @@ class GFunction:
 
             return False
 
-        def check_if_data_should_be_saved():
-            pass
+        def check_if_data_should_be_saved() -> bool:
+            """
+            This function implements a couple of checks to see whether or not the new data should be saved.
+            Currently the following tests are implemented:
 
+            1) check if the new time_values is longer then the saved one. If not, the data should not be saved
+            since we would lose more data then we gain.
+
+            Returns
+            -------
+            bool
+                True if the data should be saved, False otherwise
+            """
+            if time_values.size <= self.time_array:
+                # the new time array is smaller, so we would lose data if it was saved, whereby the
+                # previous data should be deleted
+                return False
+
+            return True
+
+        # check if the newly calculated data should be saved
+        if not check_if_data_should_be_saved():
+            return False
+
+        # check if the previous stored data should be removed
         if check_if_data_should_removed():
             self.remove_previous_data()
 
@@ -341,6 +384,8 @@ class GFunction:
         self.time_array = time_values
         self.borefield = borefield
         self.alpha = alpha
+
+        return True
 
     def _check_borefield(self, borefield: List[gt.boreholes.Borehole]) -> bool:
         """
