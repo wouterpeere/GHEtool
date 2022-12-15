@@ -103,7 +103,7 @@ class DataStorage:
         Geothermal flux : float
             Geothermal flux in [W/m2]
         """
-        return 2 * self.option_temp_gradient * self.option_conductivity / 100
+        return self.option_temp_gradient * self.option_conductivity / 100
 
     def set_values(self, gui_structure: GuiStructure) -> None:
         """
