@@ -1,3 +1,5 @@
+import copy
+
 import pygfunction as gt
 import numpy as np
 import pytest
@@ -66,6 +68,9 @@ def test_unequal_alpha():
 
     assert not gfunc._check_alpha(3)
 
+    gfunc.alpha = 0
+    assert not gfunc._check_alpha(3)
+
 
 def test_nearest_value_empty():
     gfunc = GFunction()
@@ -132,16 +137,63 @@ def test_set_options():
 def test_calculate_gfunctions_speed_test():
     gfunc = GFunction()
     alpha = 0.00005
-    time_values = borefield_ghe.time_L3_first_year
+    time_values = borefield_ghe.time_L3_last_year
 
-    assert not np.any(gfunc.previous_gfunctions)
     time_init_start = time.time()
     gvalues = gfunc.calculate(time_values, borefield, alpha)
     time_init_end = time.time()
-    assert np.array_equal(gvalues, gt.gfunction.gFunction(borefield, alpha, time_values).gFunc)
-    assert np.any(gfunc.previous_gfunctions)
+
     time_inter_start = time.time()
     gvalues2 = gfunc.calculate(time_values, borefield, alpha)
     time_inter_end = time.time()
     assert np.array_equal(gvalues, gvalues2)
     assert time_init_end - time_init_start > time_inter_end - time_inter_start
+
+
+def test_interpolation_1D():
+    gfunc = GFunction()
+    alpha = 0.00005
+    time_values = borefield_ghe.time_L4
+
+    gfunc.calculate(time_values, borefield, alpha)
+    gfunc_val = copy.copy(gfunc.previous_gfunctions)
+
+    assert np.array_equal(gfunc.previous_gfunctions,
+                          gt.gfunction.gFunction(borefield, alpha, gfunc.time_array).gFunc)
+    assert not np.array_equal(gfunc.calculate(borefield_ghe.time_L3_last_year, borefield, alpha),
+                              gt.gfunction.gFunction(borefield, alpha, borefield_ghe.time_L3_last_year).gFunc)
+    assert np.array_equal(gfunc_val, gfunc.previous_gfunctions)
+    assert not np.array_equal(gfunc.calculate(borefield_ghe.time_L3_last_year[20:], borefield, alpha),
+                              gt.gfunction.gFunction(borefield, alpha, borefield_ghe.time_L3_last_year[20:]).gFunc)
+    assert np.array_equal(gfunc_val, gfunc.previous_gfunctions)
+
+    gfunc.remove_previous_data()
+    gfunc.calculate(borefield_ghe.time_L3_last_year[-12:], borefield, alpha)
+    gfunc_val = copy.copy(gfunc.previous_gfunctions)
+    # check if values are correctly calculated
+    assert np.array_equal(gfunc.previous_gfunctions,
+                          gt.gfunction.gFunction(borefield, alpha, gfunc.time_array).gFunc)
+
+    # gvalues should be calculated, not interpolated
+    gfunc_cal = gfunc.calculate(borefield_ghe.time_L3_last_year[:12], borefield, alpha)
+    gfunc_pyg = gt.gfunction.gFunction(borefield, alpha, borefield_ghe.time_L3_last_year[:12]).gFunc
+    assert np.array_equal(gfunc_cal, gfunc_pyg)
+    # saved values should not have been overwritten
+    assert np.array_equal(gfunc_val, gfunc.previous_gfunctions)
+
+    # check if data will be overwritten
+    gfunc_cal = gfunc.calculate(borefield_ghe.time_L3_last_year[:13], borefield, alpha)
+    gfunc_pyg = gt.gfunction.gFunction(borefield, alpha, borefield_ghe.time_L3_last_year[:13]).gFunc
+    # check if values are correctly calculated
+    assert np.array_equal(gfunc_cal, gfunc_pyg)
+    # values should have been overwritten
+    assert not np.array_equal(gfunc_val, gfunc.previous_gfunctions)
+    gfunc_val = copy.copy(gfunc.previous_gfunctions)
+
+    # check if data will be overwritten
+    gfunc.calculate(borefield_ghe.time_L4, borefield, alpha)
+    gfunc_pyg = gt.gfunction.gFunction(borefield, alpha, gfunc.time_array).gFunc
+    # check if values are correctly calculated
+    assert np.array_equal(gfunc.previous_gfunctions, gfunc_pyg)
+    # values should have been overwritten
+    assert not np.array_equal(gfunc_val, gfunc.previous_gfunctions)

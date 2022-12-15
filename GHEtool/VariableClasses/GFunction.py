@@ -125,9 +125,16 @@ class GFunction:
 
         gvalues: np.ndarray = np.zeros(len(time_value))
 
+        if not self.store_previous_values:
+            return gvalues
+
         # check if interpolation is possible:
         if not (self._check_alpha(alpha) or self._check_borefield(borefield)):
             # the alpha and/or borefield is not in line with the precalculated data
+            return gvalues
+
+        # check if interpolation of all time values can be done based on the available time values
+        if not self._check_time_values(time_value):
             return gvalues
 
         # find nearest depth indices
@@ -136,10 +143,6 @@ class GFunction:
         if self.no_extrapolation:
             # no interpolation can be made since depth is not in between values in the depth array
             if idx_prev is None or idx_next is None:
-                return gvalues
-
-            # check if interpolation of all time values can be done based on the available time values
-            if not self._check_time_values(time_value):
                 return gvalues
 
             # do interpolation
@@ -297,6 +300,8 @@ class GFunction:
         self.depth_array = np.array([])
         self.time_array = np.array([])
         self.previous_gfunctions = np.array([])
+        self.alpha = 0
+        self.borefield = []
 
     def set_new_calculated_data(self, time_values: np.ndarray, depth: float, gvalues: np.ndarray,
                                 borefield, alpha) -> bool:
@@ -356,9 +361,13 @@ class GFunction:
             bool
                 True if the data should be saved, False otherwise
             """
-            if time_values.size <= self.time_array:
+            if time_values.size <= self.time_array.size:
                 # the new time array is smaller, so we would lose data if it was saved, whereby the
                 # previous data should be deleted
+                return False
+
+            if depth in self.depth_array and np.array_equal(time_values, self.time_array):
+                # no need to duplicate data
                 return False
 
             return True
@@ -379,8 +388,16 @@ class GFunction:
                 nearest_idx += 1
 
         # insert data in stored data
+        if self.depth_array.size == 1:
+            # self.previous_gfunctions should be converted to a 2D-array
+            if self.depth_array[0] > depth:
+                self.previous_gfunctions = np.vstack((gvalues, self.previous_gfunctions))
+            else:
+                self.previous_gfunctions = np.vstack((self.previous_gfunctions, gvalues))
+        else:
+            self.previous_gfunctions = np.insert(self.previous_gfunctions, nearest_idx, gvalues)
+
         self.depth_array = np.insert(self.depth_array, nearest_idx, depth)
-        self.previous_gfunctions = np.insert(self.previous_gfunctions, nearest_idx, gvalues)
         self.time_array = time_values
         self.borefield = borefield
         self.alpha = alpha

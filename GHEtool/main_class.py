@@ -40,7 +40,7 @@ class Borefield:
                 'peak_cooling', 'simulation_period', 'fluid_data_available', 'ground_data', 'pipe_data', 'fluid_data',\
                 'results_peak_heating', 'pipe_data_available', 'time_L4', 'options_pygfunction',\
                 'results_peak_cooling', 'results_month_cooling', 'results_month_heating', 'Tb', 'THRESHOLD_WARNING_SHALLOW_FIELD', \
-                'gui', 'time_L3_first_year', 'time_L3_last_year', 'peak_heating_external', 'peak_cooling_external', \
+                'gui', 'time_L3_last_year', 'peak_heating_external', 'peak_cooling_external', \
                 'monthly_load_heating_external', 'monthly_load_cooling_external', 'hourly_heating_load_external', \
                 'hourly_cooling_load_external', 'hourly_heating_load_on_the_borefield', 'hourly_cooling_load_on_the_borefield', \
                 'use_constant_Rb', 'printing', 'combo', 'D', 'r_b', 'recalculation_needed', \
@@ -173,7 +173,6 @@ class Borefield:
         self.time = np.array([])  # list of time values
         self.tcm: float = 0.  # time constant for first year sizing
         self.tpm: float = 0.  # time constant for first year sizing
-        self.time_L3_first_year = np.array([])  # list with time values for L3 sizing
         self.time_L3_last_year = np.array([])  # list with time values for L3 sizing
         self.time_L4 = np.array([])  # list with all the time values for the L4 sizing
 
@@ -474,7 +473,6 @@ class Borefield:
 
         # set the time array for the L3 sizing
         # This is one time for every month in the whole simulation period
-        self.time_L3_first_year = Borefield.UPM * 3600 * np.arange(1, 13)
         self.time_L3_last_year = Borefield.UPM * 3600 * np.arange(1, self.simulation_period * 12 + 1)
 
         # set the time constant for the L4 sizing
