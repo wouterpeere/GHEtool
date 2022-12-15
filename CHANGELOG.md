@@ -27,6 +27,7 @@ This effect is shown in a new validation file: [speed_improvement_JIT](/docs/sou
 - The hourly_heating_load_on_the_borefield and hourly_cooling_load_on_the_borefield are now correctly calculated.
 - When an hourly temperature profile is plotted after an optimise_load_profile optimisation, the hourly load on the borefield (and not the entire hourly load) is shown.
 - Correct conversion from hourly to monthly load (issue 62)
+- Correction temperature gradient GUI (issue 64)
 
 ## [2.1.0] - 2022-11-30
 
