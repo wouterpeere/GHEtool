@@ -4,6 +4,25 @@ from typing import List, Union
 from math import isclose
 
 
+def test_language(qtbot):
+    from GHEtool.gui.translation_csv_to_py import main
+
+    main()
+
+    from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
+
+    from GHEtool.gui.gui_combine_window import MainWindow
+
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.delete_backup()
+
+    for idx, action in enumerate(main_window.menuLanguage.actions()):
+        action.trigger()
+        assert main_window.gui_structure.option_language.get_value() == idx
+
+    main_window.menuLanguage.actions()[0].trigger()
+
+
 def test_gui_values(qtbot):
     import sys
     sys.setrecursionlimit(1500)
@@ -11,10 +30,6 @@ def test_gui_values(qtbot):
     from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
 
     from GHEtool.gui.gui_combine_window import MainWindow
-
-    from GHEtool.gui.translation_csv_to_py import main
-
-    main()
 
     # init gui window
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
