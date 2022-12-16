@@ -85,7 +85,7 @@ class Borefield:
 
     def __init__(self, simulation_period: int = 20, peak_heating: list = None,
                  peak_cooling: list = None, baseload_heating: list = None, baseload_cooling: list = None,
-                 borefield=None, custom_gfunction: str=None, gui: bool = False):
+                 borefield=None, custom_gfunction: Optional[Union[str, pathlib.Path]]=None, gui: bool = False):
         """
 
         Parameters
@@ -431,13 +431,13 @@ class Borefield:
         for bor in self._borefield:
             bor.H = H
 
-    def load_custom_gfunction(self, location: str) -> None:
+    def load_custom_gfunction(self, location: Union[str, pathlib.Path]) -> None:
         """
         This function loads the custom gfunction.
 
         Parameters
         ----------
-        location : str
+        location : str or pathlib.Path
             Path to the location of the custom gfunction file
 
         Returns
@@ -1833,9 +1833,10 @@ class Borefield:
 
         if save:
             name = f'{name_datafile}.pickle'
-            pickle.dump(data, open(f'{folder}/Data/{name}', "wb"))
+            folder.joinpath('Data').mkdir(parents=True, exist_ok=True)
+            pickle.dump(data, open(folder.joinpath('Data').joinpath(name), "wb"))
             print(f"A new dataset with name {name} has been created in {folder}/Data.")
-            return f'{folder}/Data/{name}'
+            return f'{folder.joinpath("Data").joinpath(name)}'
 
     def set_hourly_heating_load(self, heating_load: np.array) -> None:
         """
