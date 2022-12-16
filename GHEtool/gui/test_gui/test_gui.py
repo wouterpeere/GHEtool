@@ -14,8 +14,10 @@ def test_gui_values(qtbot):
 
     # init gui window
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.update_graph()
     main_window.delete_backup()
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.update_graph()
 
     main_window.gui_structure.option_filename.set_value(f'{FOLDER}/Examples/hourly_profile.csv')
 
@@ -56,7 +58,6 @@ def test_gui_values(qtbot):
         action.trigger()
         assert main_window.gui_structure.option_language.get_value() == idx
 
-
     list_columns: List[str] = ['Heating', 'Cooling']
 
     main_window.gui_structure.option_decimal_csv.set_value(0)
@@ -89,9 +90,15 @@ def test_gui_values(qtbot):
     with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
         main_window.threads[0].run()
         main_window.threads[0].any_signal.connect(main_window.thread_function)
-    print(main_window.list_ds[0].borefield.H)
-    #main_window.gui_structure.aim_size_length.widget.click()
-    #main_window.start_current_scenario_calculation()
+
+    main_window.update_graph()
+    main_window.gui_structure.aim_optimize.widget.click()
+    main_window.save_scenario()
+    main_window.start_current_scenario_calculation(True)
+    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
+        main_window.threads[0].run()
+        main_window.threads[0].any_signal.connect(main_window.thread_function)
+    #main_window.close()
 
     print('end')
 
