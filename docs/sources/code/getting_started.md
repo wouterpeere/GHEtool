@@ -12,7 +12,8 @@ This code is tested with Python 3.8 (and higher) and requires the following libr
 
 For the GUI
 
-* PyQt5 (>=5.10)
+* PySide6 (>=6.4.1)
+* configparser (>=5.3.0)
 
 For the tests
 

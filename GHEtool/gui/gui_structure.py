@@ -406,8 +406,9 @@ class GuiStructure:
                 self.option_simu_period = IntBox(
                     category=self.category_temperatures, label="Simulation period [yrs]: ", default_value=20, minimal_value=1, maximal_value=100
                 )
-                self.option_len_peak = IntBox(
-                    category=self.category_temperatures, label="Peak length [hours]: ", default_value=6, minimal_value=1, maximal_value=8760
+                self.option_len_peak = FloatBox(
+                    category=self.category_temperatures, label="Peak length [hours]: ", default_value=6, minimal_value=1, maximal_value=8760, step=1,
+                    decimal_number=2
                 )
 
             # create categories

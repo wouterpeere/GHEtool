@@ -213,6 +213,7 @@ class Translations:
         "hourly_figure_temperature_profile",
         "figure_load_duration",
         "legend_figure_load_duration",
+        "option_len_peak",
         "languages",
     )
 
@@ -1691,4 +1692,13 @@ class Translations:
             "Afficher la légende?, no , yes ",
             "Mostrar leyenda?, no , yes ",
             "Mostrar lenda?, no , yes ",
+        ]
+        self.option_len_peak: List[str] = [
+            "Peak length [hours]: ",
+            "Spitzenlastlänge [Stunden]: ",
+            "Peak length [hours]: ",
+            "Peak length [hours]: ",
+            "Peak length [hours]: ",
+            "Peak length [hours]: ",
+            "Peak length [hours]: ",
         ]

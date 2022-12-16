@@ -16,7 +16,7 @@ def run():
     # get current version
     path = pathlib.Path(FOLDER).parent
     config = ConfigParser()
-    config.read_file(open(path.parent.joinpath('setup.cfg'), 'r'))
+    config.read_file(open(path.joinpath('setup.cfg'), 'r'))
     version = config.get('metadata', 'version')
     # set version and id
     myAppID = f'GHEtool v{version}'  # arbitrary string

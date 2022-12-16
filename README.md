@@ -36,7 +36,8 @@ This code is tested with Python 3.8 and requires the following libraries (the ve
 
 For the GUI
 
-* PySide6 (>=6.3.1)
+* PySide6 (>=6.4.1)
+* configparser (>=5.3.0)
 
 For the tests
 

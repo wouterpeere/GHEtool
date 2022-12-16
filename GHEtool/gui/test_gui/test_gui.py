@@ -1,5 +1,5 @@
 from GHEtool.gui.gui_classes import FloatBox, IntBox, ListBox, ButtonBox, FileNameBox, FigureOption
-from GHEtool.main_class import FOLDER
+from GHEtool import FOLDER
 from typing import List, Union
 from math import isclose
 
@@ -51,6 +51,11 @@ def test_gui_values(qtbot):
             assert option.get_value() == 0
             option.set_value(1)
             assert option.get_value() == 1
+
+    for idx, action in enumerate(main_window.menuLanguage.actions()):
+        action.trigger()
+        assert main_window.gui_structure.option_language.get_value() == idx
+
 
     list_columns: List[str] = ['Heating', 'Cooling']
 

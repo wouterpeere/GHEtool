@@ -575,10 +575,11 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             if len(saving) < 4:
                 return
             self.filename, li, settings, version = saving
-            if not version == self.app.applicationVersion():
-                self.gui_structure.option_language.set_value(settings[0])  # set last time selected language
-                self.gui_structure.option_auto_saving.set_value(settings[1])  # set last time selected automatic saving scenario option
-                return
+            if hasattr(self.app, 'applicationVersion'):
+                if not version == self.app.applicationVersion():
+                    self.gui_structure.option_language.set_value(settings[0])  # set last time selected language
+                    self.gui_structure.option_auto_saving.set_value(settings[1])  # set last time selected automatic saving scenario option
+                    return
             # get saved data and unpack tuple
             self.list_ds, li = li[0], li[1]  # unpack tuple to get list of data-storages and scenario names
             # replace uer window id
@@ -615,7 +616,8 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         try:
             # write data to back up file
             with open(self.backup_file, "wb") as f:
-                saving = self.filename, [self.list_ds, li], settings, self.app.applicationVersion()
+                version = self.app.applicationVersion() if hasattr(self.app, "applicationVersion") else "2.0.0"
+                saving = self.filename, [self.list_ds, li], settings, version
                 pk_dump(saving, f, pk_HP)
         except FileNotFoundError:
             self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
