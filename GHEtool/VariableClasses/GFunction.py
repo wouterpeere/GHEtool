@@ -361,9 +361,9 @@ class GFunction:
             bool
                 True if the data should be saved, False otherwise
             """
-            if time_values.size <= self.time_array.size:
+            if time_values.size < self.time_array.size:
                 # the new time array is smaller, so we would lose data if it was saved, whereby the
-                # previous data should be deleted
+                # previous data should be deleted.
                 return False
 
             if depth in self.depth_array and np.array_equal(time_values, self.time_array):
@@ -395,7 +395,7 @@ class GFunction:
             else:
                 self.previous_gfunctions = np.vstack((self.previous_gfunctions, gvalues))
         else:
-            self.previous_gfunctions = np.insert(self.previous_gfunctions, nearest_idx, gvalues)
+            self.previous_gfunctions = np.insert(self.previous_gfunctions, nearest_idx, gvalues, 0)
 
         self.depth_array = np.insert(self.depth_array, nearest_idx, depth)
         self.time_array = time_values
