@@ -12,6 +12,10 @@ def test_gui_values(qtbot):
 
     from GHEtool.gui.gui_combine_window import MainWindow
 
+    from GHEtool.gui.translation_csv_to_py import main
+
+    main()
+
     # init gui window
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
     main_window.update_graph()
@@ -98,6 +102,15 @@ def test_gui_values(qtbot):
     with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
         main_window.threads[0].run()
         main_window.threads[0].any_signal.connect(main_window.thread_function)
+
+    main_window.gui_structure.option_column.set_value(0)
+    main_window.gui_structure.option_single_column.set_value(0)
+    main_window.gui_structure.button_load_csv.button.click()
+
+    main_window.gui_structure.option_column.set_value(1)
+    main_window.gui_structure.option_heating_column.set_value(0)
+    main_window.gui_structure.option_cooling_column.set_value(1)
+    main_window.gui_structure.button_load_csv.button.click()
     #main_window.close()
 
     print('end')
