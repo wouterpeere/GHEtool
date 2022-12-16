@@ -76,10 +76,10 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # allow checking of changes
         self.checking: bool = False
         # create backup path in home documents directory
-        self.default_path: str = str(PurePath(Path.home(), 'Documents/GHEtool'))
-        self.backup_path: str = str(PurePath(self.default_path, BACKUP_FILENAME))
+        self.default_path: PurePath = PurePath(Path.home(), 'Documents/GHEtool')
+        self.backup_file: PurePath = PurePath(self.default_path, BACKUP_FILENAME)
         # check if backup folder exits and otherwise create it
-        makedirs(dirname(self.backup_path), exist_ok=True)
+        makedirs(dirname(self.backup_file), exist_ok=True)
         makedirs(dirname(self.default_path), exist_ok=True)
         self.translations: Translations = Translations()  # init translation class
         for idx, (name, icon, short_cut) in enumerate(zip(self.translations.languages, self.translations.icon, self.translations.short_cut)):
@@ -558,8 +558,8 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.checking = True
 
     def delete_backup(self):
-        if exists(self.backup_path):
-            remove(self.backup_path)
+        if exists(self.backup_file):
+            remove(self.backup_file)
 
     def load_list(self) -> None:
         """
@@ -567,14 +567,20 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         :return: None
         """
         # try to open backup file if it exits
-        if exists(self.backup_path):
+        if exists(self.backup_file):
             # open backup file
-            with open(self.backup_path, "rb") as f:
+            with open(self.backup_file, "rb") as f:
                 saving: tuple = pk_load(f)
-            self.filename, li, settings = saving  # get saved data and unpack tuple
+            # check if version has been saved as well
+            if len(saving) < 4:
+                return
+            self.filename, li, settings, version = saving
+            if not version == self.app.applicationVersion():
+                self.gui_structure.option_language.set_value(settings[0])  # set last time selected language
+                self.gui_structure.option_auto_saving.set_value(settings[1])  # set last time selected automatic saving scenario option
+                return
+            # get saved data and unpack tuple
             self.list_ds, li = li[0], li[1]  # unpack tuple to get list of data-storages and scenario names
-            self.gui_structure.option_language.set_value(settings[0])  # set last time selected language
-            self.gui_structure.option_auto_saving.set_value(settings[1])  # set last time selected automatic saving scenario option
             # replace uer window id
             for DS in self.list_ds:
                 DS.ui = id(self)
@@ -608,13 +614,13 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # try to write data to back up file
         try:
             # write data to back up file
-            with open(self.backup_path, "wb") as f:
-                saving = self.filename, [self.list_ds, li], settings
+            with open(self.backup_file, "wb") as f:
+                saving = self.filename, [self.list_ds, li], settings, self.app.applicationVersion()
                 pk_dump(saving, f, pk_HP)
         except FileNotFoundError:
             self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
         except PermissionError:
-            print("PermissionError")
+            self.status_bar.showMessage("PermissionError", 5000)
             return
 
     def fun_load(self) -> None:
@@ -677,7 +683,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         if self.filename == MainWindow.filenameDefault:
             self.filename: tuple = QtWidgets_QFileDialog.getSaveFileName(
                 self.central_widget, caption=self.translations.SavePKL[self.gui_structure.option_language.get_value()], filter="GHEtool (*.GHEtool)",
-                dir=self.default_path,
+                dir=str(self.default_path),
             )
             # break function if no file is selected
             if self.filename == MainWindow.filenameDefault:

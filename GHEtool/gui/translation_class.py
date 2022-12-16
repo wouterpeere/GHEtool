@@ -1194,7 +1194,7 @@ class Translations:
         ]
         self.option_auto_saving: List[str] = [
             "Use automatic saving?, no , yes ",
-            "Automatisches speichern nutzen?, Nein, Ja ",
+            "Automatisches speichern nutzen?, Nein , Ja ",
             "Automatisch opslaan, ne , ja ",
             "Automatic saving, no , yes ",
             "Automatic saving, no , yes ",
@@ -1659,7 +1659,7 @@ class Translations:
         self.legend_figure_temperature_profile: List[str] = [
             "Show legend?, No , Yes ",
             "Legende zeigen?, Nein , Ja ",
-            "Toon legende?, ne , ja ",
+            "Toon legende?, nee , ja ",
             "Mostra la legenda?, no , yes ",
             "Afficher la légende?, no , yes ",
             "Mostrar leyenda?, no , yes ",
@@ -1668,16 +1668,16 @@ class Translations:
         self.hourly_figure_temperature_profile: List[str] = [
             "Hourly profile, No , Yes ",
             "Stündliches Profil, Nein , Ja ",
-            "Uurlijks profiel, ne , ja ",
+            "Uurlijks profiel, nee , ja ",
             "Hourly profile, no , yes ",
             "Hourly profile, no , yes ",
             "Hourly profile, no , yes ",
-            "Hourly profile, no , yes ",
+            "Hourly profile, no , yes",
         ]
         self.figure_load_duration: List[str] = [
             "Load-duration curve, Power [kW], Time [hours]",
             "Jahresdauerlinie, Leistung [kW], Zeit [Stunden]",
-            "Belastings-duurcurve, Power [kW], Time [hours]",
+            "Belastings-duurcurve, Vermogen [kW], Tijd [hours]",
             "Load-duration curve, Power [kW], Time [hours]",
             "Load-duration curve, Power [kW], Time [hours]",
             "Load-duration curve, Power [kW], Time [hours]",
@@ -1686,7 +1686,7 @@ class Translations:
         self.legend_figure_load_duration: List[str] = [
             "Show legend?, No , Yes ",
             "Legende zeigen?, Nein , Ja ",
-            "Toon legende?, ne , ja ",
+            "Toon legende?, nee , ja ",
             "Mostra la legenda?, no , yes ",
             "Afficher la légende?, no , yes ",
             "Mostrar leyenda?, no , yes ",

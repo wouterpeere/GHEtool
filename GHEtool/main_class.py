@@ -12,14 +12,12 @@ from scipy import interpolate
 from scipy.signal import convolve
 from math import pi
 import pygfunction as gt
-import os.path
+import pathlib
 import matplotlib.pyplot as plt
 import warnings
 from typing import Union, Tuple, Optional
 
 from GHEtool.VariableClasses import GroundData, FluidData, PipeData
-
-FOLDER = os.path.dirname(os.path.realpath(__file__))  # solve problem with importing GHEtool from sub-folders
 
 
 def _timeValues(dt=3600., t_max=100. * 8760 * 3600.) -> np.array:
@@ -1810,8 +1808,8 @@ class Borefield:
             depth_array = Borefield.DEFAULT_DEPTH_ARRAY
         if time_array is None:
             time_array = Borefield.DEFAULT_TIME_ARRAY
-
-        folder = '.' if self.gui else FOLDER
+        from GHEtool import FOLDER
+        folder: pathlib.Path = pathlib.Path.cwd() if self.gui else FOLDER
 
         data = dict([])
         data["Data"] = dict([])
@@ -1835,9 +1833,9 @@ class Borefield:
 
         if save:
             name = f'{name_datafile}.pickle'
-            pickle.dump(data, open(f'{folder}/Data/{name}', "wb"))
-            print(f"A new dataset with name {name} has been created in {os.path.dirname(os.path.realpath(__file__))}/Data.")
-            return f'{os.path.dirname(os.path.realpath(__file__))}/Data/ {name}'
+            pickle.dump(data, open(folder.joinpath(f'Data/{name}'), "wb"))
+            print(f"A new dataset with name {name} has been created in {folder}/Data.")
+            return f'{folder}/Data/{name}'
 
     def set_hourly_heating_load(self, heating_load: np.array) -> None:
         """
@@ -1900,7 +1898,7 @@ class Borefield:
 
         return True
 
-    def load_hourly_profile(self, file_path: str, header: bool = True, separator: str = ";",
+    def load_hourly_profile(self, file_path: Union[str, pathlib.Path], header: bool = True, separator: str = ";",
                             first_column_heating: bool = True) -> None:
         """
         This function loads in an hourly load profile [kW].
