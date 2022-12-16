@@ -371,7 +371,9 @@ class GFunction:
             This function implements a couple of checks to see whether or not the new data should be saved.
             Currently the following tests are implemented:
 
-            1) check if the new time_values is longer then the saved one. If not, the data should not be saved
+            1) check if the data should be saved
+
+            2) check if the new time_values is longer then the saved one. If not, the data should not be saved
             since we would lose more data then we gain.
 
             Returns
@@ -379,13 +381,14 @@ class GFunction:
             bool
                 True if the data should be saved, False otherwise
             """
+
+            if not self.store_previous_values:
+                # previous data should not be stored
+                return False
+
             if time_values.size < self.time_array.size:
                 # the new time array is smaller, so we would lose data if it was saved, whereby the
                 # previous data should be deleted.
-                return False
-
-            if depth in self.depth_array and np.array_equal(time_values, self.time_array):
-                # no need to duplicate data
                 return False
 
             return True
