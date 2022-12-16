@@ -9,7 +9,7 @@ import pygfunction as gt
 import os.path
 import matplotlib.pyplot as plt
 import warnings
-from typing import Union, Tuple, Optional
+from typing import Union, Tuple, Optional, List
 
 from GHEtool.VariableClasses import GroundData, FluidData, PipeData
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, _timeValues
@@ -246,13 +246,13 @@ class Borefield:
         """
         self.number_of_boreholes = len(self.borefield) if self.borefield is not None else 0
 
-    def set_borefield(self, borefield=None) -> None:
+    def set_borefield(self, borefield: List[gt.boreholes.Borehole] = None) -> None:
         """
         This function set the borefield object.
 
         Parameters
         ----------
-        borefield : pygfunction.Boreholes object
+        borefield : List[pygfunction.boreholes.Borehole]
             Borefield created with the pygfunction package
 
         Returns
@@ -333,13 +333,13 @@ class Borefield:
         return self._borefield
 
     @borefield.setter
-    def borefield(self, borefield=None) -> None:
+    def borefield(self, borefield: List[gt.boreholes.Borehole]=None) -> None:
         """
         This function sets the borefield configuration. When no input is given, the borefield variable will be deleted.
 
         Parameters
         ----------
-        borefield : pygfunction.Boreholes object
+        borefield : List[pygfunction.boreholes.Borehole]
             Borefield created with the pygfunction package
 
         Returns

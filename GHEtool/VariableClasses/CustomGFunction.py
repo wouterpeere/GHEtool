@@ -199,7 +199,7 @@ class CustomGFunction:
 
         Parameters
         ----------
-        borefield : list[pygfunction.Borehole]
+        borefield : list[pygfunction.boreholes.Borehole]
             Borefield object for which the custom dataset should be created
         alpha : float
             Ground thermal diffusivity [m2/s]

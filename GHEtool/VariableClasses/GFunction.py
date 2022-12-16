@@ -43,7 +43,7 @@ class GFunction:
         ----------
         time_value : list, float, np.ndarray
             Array with all the time values [s] for which gvalues should be calculated
-        borefield : list[pygfunction.borehole]
+        borefield : list[pygfunction.boreholes.Borehole]
             Borefield model for which the gvalues should be calculated
         alpha : float
             Thermal diffusivity of the ground [m2/s]
@@ -62,7 +62,7 @@ class GFunction:
             ----------
             time_values : np.ndarray
                 Array with all the time values [s] for which gvalues should be calculated
-            borefield : list[pygfunction.borehole]
+            borefield : list[pygfunction.boreholes.Borehole]
                 Borefield model for which the gvalues should be calculated
             alpha : float
                 Thermal diffusivity of the ground [m2/s]
@@ -122,7 +122,25 @@ class GFunction:
 
     def interpolate_gfunctions(self, time_value: Union[list, float, np.ndarray], depth: float,
                                alpha: float, borefield: List[gt.boreholes.Borehole]) -> np.ndarray:
+        """
+        This function returns the gvalues either by interpolation or by calculating them.
 
+        Parameters
+        ----------
+        time_value : list, float, np.ndarray
+            Time value(s) [s] for which gvalues should be calculated
+        depth : float
+            Depth of the borefield [m]
+        alpha : float
+            Thermal diffusivity of the ground [m2/s]
+        borefield : list[pygfunction.boreholes.Borehole]
+            Borefield model for which the gvalues should be calculated
+
+        Returns
+        -------
+        gvalues : np.ndarray
+            1D array with all the requested gvalues
+        """
         gvalues: np.ndarray = np.zeros(len(time_value))
 
         if not self.store_previous_values:
@@ -413,7 +431,7 @@ class GFunction:
 
         Parameters
         ----------
-        borefield : list[pygfunction.Borehole]
+        borefield : list[pygfunction.boreholes.Borehole]
             New borefield for which the gfunctions should be calculated
 
         Returns
