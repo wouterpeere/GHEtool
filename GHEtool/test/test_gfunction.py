@@ -16,6 +16,8 @@ time_value_array_empty = np.array([])
 time_value_array = np.array([1, 100, 1000, 10000])
 
 borefield = gt.boreholes.rectangle_field(5, 5, 5, 5, 100, 1, 0.075)
+borefield_less_deep = gt.boreholes.rectangle_field(5, 5, 5, 5, 80, 1, 0.075)
+borefield_more_deep = gt.boreholes.rectangle_field(5, 5, 5, 5, 110, 1, 0.075)
 borefield_ghe = Borefield()
 
 
@@ -197,3 +199,32 @@ def test_interpolation_1D():
     assert np.array_equal(gfunc.previous_gfunctions, gfunc_pyg)
     # values should have been overwritten
     assert not np.array_equal(gfunc_val, gfunc.previous_gfunctions)
+    gfunc_val = copy.copy(gfunc.previous_gfunctions)
+
+    # test with smaller field, should not be interpolated
+    gfunc_cal = gfunc.calculate(borefield_ghe.time_L3_last_year[:20], borefield_less_deep, alpha)
+    gfunc_pyg = gt.gfunction.gFunction(borefield_less_deep, alpha, borefield_ghe.time_L3_last_year[:20]).gFunc
+    # check if values are correctly calculated
+    assert np.array_equal(gfunc_cal, gfunc_pyg)
+    # values should not have been overwritten
+    assert np.array_equal(gfunc_val, gfunc.previous_gfunctions)
+
+    # run again to unittest that the data will not be overwritten
+    gfunc.previous_gfunctions[0] = 100
+    test = copy.copy(gfunc.previous_gfunctions)
+    gfunc.calculate(borefield_ghe.time_L4, borefield, alpha)
+    assert np.array_equal(test, gfunc.previous_gfunctions)
+
+
+def test_no_extrapolation():
+    gfunc = GFunction()
+    alpha = 0.00005
+    time_values = borefield_ghe.time_L4
+    gfunc.no_extrapolation = False
+    gfunc.calculate(time_values, borefield, alpha)
+
+    assert np.array_equal(gfunc.previous_gfunctions,
+                          gt.gfunction.gFunction(borefield, alpha, gfunc.time_array).gFunc)
+    # these should equal since there is no extrapolation
+    assert np.array_equal(gfunc.calculate(borefield_ghe.time_L3_last_year[:20], borefield, alpha),
+                          gt.gfunction.gFunction(borefield, alpha, borefield_ghe.time_L3_last_year[:20]).gFunc)
