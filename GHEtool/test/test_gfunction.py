@@ -336,3 +336,24 @@ def test_no_extrapolation():
     # these should equal since there is no extrapolation
     assert np.array_equal(gfunc.calculate(borefield_ghe.time_L3_last_year[:20], borefield, alpha),
                           gt.gfunction.gFunction(borefield, alpha, borefield_ghe.time_L3_last_year[:20]).gFunc)
+
+
+def test_floating_number():
+    gfunc = GFunction()
+    alpha = 0.00005
+    time_values = borefield_ghe.time_L4
+
+    # populate data
+    _change_borefield_depth(borefield, 100)
+    gfunc.calculate(time_values, borefield, alpha)
+
+    _change_borefield_depth(borefield, 120)
+    gfunc.calculate(time_values, borefield, alpha)
+
+    _change_borefield_depth(borefield, 80)
+    gfunc.calculate(time_values, borefield, alpha)
+
+    _change_borefield_depth(borefield, 100)
+    gfunc.calculate(7500., borefield, alpha)
+
+test_floating_number()
