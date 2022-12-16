@@ -1833,9 +1833,9 @@ class Borefield:
 
         if save:
             name = f'{name_datafile}.pickle'
-            pickle.dump(data, open(folder.joinpath(f'Data/{name}'), "wb"))
+            pickle.dump(data, open(folder.joinpath('Data').joinpath(name), "wb"))
             print(f"A new dataset with name {name} has been created in {folder}/Data.")
-            return f'{folder.joinpath(f"Data/{name}")}'
+            return f'{folder.joinpath("Data").joinpath(name)}'
 
     def set_hourly_heating_load(self, heating_load: np.array) -> None:
         """
