@@ -892,8 +892,7 @@ class Borefield:
                 g_values = self.gfunction(self.time_L4, self.H)
                 # calculation of needed differences of the g-function values. These are the weight factors in the calculation
                 # of Tb. Last element removed in order to make arrays the same length
-                g_value_previous_step = np.concatenate((np.array([0]), g_values))[:-1]
-                g_value_differences = g_values - g_value_previous_step
+                g_value_differences = np.diff(g_values, prepend=0)
 
                 # convolution to get the monthly results
                 results[:8760] = convolve(loads_short * 1000, g_value_differences[:8760])[:8760]
@@ -927,8 +926,7 @@ class Borefield:
 
                 # calculation of needed differences of the g-function values. These are the weight factors in the calculation
                 # of Tb. Last element removed in order to make arrays the same length
-                g_value_previous_step = np.concatenate((np.array([0]), g_values))[:-1]
-                g_value_differences = g_values - g_value_previous_step
+                g_value_differences = np.diff(g_values, prepend=0)
 
                 # convolution to get the monthly results
                 # convolution to get the monthly results
@@ -1220,8 +1218,7 @@ class Borefield:
 
             # calculation of needed differences of the g-function values. These are the weight factors in the calculation
             # of Tb. Last element removed in order to make arrays the same length
-            g_value_previous_step = np.concatenate((np.array([0]), g_values))[:-1]
-            g_value_differences = g_values - g_value_previous_step
+            g_value_differences = np.diff(g_values, prepend=0)
 
             # convolution to get the monthly results
             results = convolve(monthly_loads_array * 1000, g_value_differences)[:len(monthly_loads_array)]
@@ -1259,8 +1256,7 @@ class Borefield:
             g_values = self.gfunction(self.time_L4, H)
             # calculation of needed differences of the g-function values. These are the weight factors in the calculation
             # of Tb. Last element removed in order to make arrays the same length
-            g_value_previous_step = np.concatenate((np.array([0]), g_values))[:-1]
-            g_value_differences = g_values - g_value_previous_step
+            g_value_differences = np.diff(g_values, prepend=0)
 
             # convolution to get the monthly results
             results = convolve(hourly_load * 1000, g_value_differences)[:hourly_load.size]
