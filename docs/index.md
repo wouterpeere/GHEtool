@@ -31,6 +31,7 @@ sources/code/getting_started.md
 sources/code/functionalities.md
 sources/code/modules.md
 sources/code/validation.md
+sources/code/speed_improvement.md
 ```
 
 ```{toctree}
