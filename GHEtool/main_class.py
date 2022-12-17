@@ -12,7 +12,7 @@ import warnings
 from typing import Union, Tuple, Optional, List
 
 from GHEtool.VariableClasses import GroundData, FluidData, PipeData
-from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, _timeValues
+from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction
 
 FOLDER = os.path.dirname(os.path.realpath(__file__))  # solve problem with importing GHEtool from sub-folders
 
@@ -43,7 +43,7 @@ class Borefield:
                 'gui', 'time_L3_last_year', 'peak_heating_external', 'peak_cooling_external', \
                 'monthly_load_heating_external', 'monthly_load_cooling_external', 'hourly_heating_load_external', \
                 'hourly_cooling_load_external', 'hourly_heating_load_on_the_borefield', 'hourly_cooling_load_on_the_borefield', \
-                'use_constant_Rb', 'printing', 'combo', 'D', 'r_b', 'recalculation_needed', \
+                'use_constant_Rb', 'printing', 'combo', 'D', 'r_b', 'recalculation_needed', 'gfunction_calculation_object',\
                 'L2_sizing', 'L3_sizing', 'L4_sizing', 'quadrant_sizing', 'H_init', 'use_precalculated_data'
 
     def __init__(self, simulation_period: int = 20, peak_heating: list = None,
@@ -132,6 +132,7 @@ class Borefield:
         self.monthly_load = np.array([])
         self.H_init: float = 0.
         self.custom_gfunction: CustomGFunction = custom_gfunction
+        self.gfunction_calculation_object: GFunction = GFunction()
         self.recalculation_needed: bool = False
 
         ## params w.r.t. pygfunction
@@ -1556,31 +1557,7 @@ class Borefield:
             # set the correct depth of the borefield
             self._update_borefield_depth(H=H)
 
-            time_value_np = np.array(time_value)
-            if not isinstance(time_value, (float, int)) and len(time_value_np) > Borefield.DEFAULT_NUMBER_OF_TIMESTEPS:
-                # due to this many requested time values, the calculation will be slow.
-                # there will be interpolation
-
-                time_value_new = _timeValues(t_max=time_value[-1])
-                # Calculate the g-function for uniform borehole wall temperature
-                gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.ground_data.alpha, time_value_new,
-                                                         options=self.options_pygfunction).gFunc
-
-                # return interpolated values
-                return np.interp(time_value, time_value_new, gfunc_uniform_T)
-
-            # check if there are double values
-            if not isinstance(time_value, (float, int)) and len(time_value_np) != len(np.unique(np.asarray(time_value))):
-                gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.ground_data.alpha, np.unique(time_value_np),
-                                                         options=self.options_pygfunction).gFunc
-
-                return np.interp(time_value, np.unique(time_value_np), gfunc_uniform_T)
-
-            # Calculate the g-function for uniform borehole wall temperature
-            gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.ground_data.alpha, time_value_np,
-                                                     options=self.options_pygfunction).gFunc
-
-            return gfunc_uniform_T
+            return self.gfunction_calculation_object.calculate(time_value, self.borefield, self.ground_data.alpha)
 
         ## 1 bypass any possible precalculated g-functions
 

@@ -74,7 +74,7 @@ def check_cases():
     """
 
     correct_answers_L2 = (56.75, 117.23, 66.94, 91.32)
-    correct_answers_L3 = (56.81, 118.82, 66.54, 91.4)
+    correct_answers_L3 = (56.77, 118.74, 66.47, 91.34)
 
     for i in (1, 2, 3, 4):
         monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(i)
