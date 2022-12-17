@@ -354,6 +354,6 @@ def test_floating_number():
     gfunc.calculate(time_values, borefield, alpha)
 
     _change_borefield_depth(borefield, 100)
-    gfunc.calculate(7500., borefield, alpha)
-
-test_floating_number()
+    assert gfunc.calculate(7500., borefield, alpha) != gt.gfunction.gFunction(borefield, alpha, 7500.).gFunc
+    assert gfunc.calculate(gfunc.time_array[0], borefield, alpha) ==\
+           gt.gfunction.gFunction(borefield, alpha, gfunc.time_array[0]).gFunc

@@ -93,7 +93,10 @@ class GFunction:
         depth = borefield[0].H
 
         # make numpy array from time_values
-        time_value_np = np.array(time_value)
+        if isinstance(time_value, (float, int)):
+            time_value_np = np.array([time_value])
+        else:
+            time_value_np = np.array(time_value)
 
         if not isinstance(time_value, (float, int)) and time_value_np.size > GFunction.DEFAULT_NUMBER_OF_TIMESTEPS:
             # due to this many requested time values, the calculation will be slow.
