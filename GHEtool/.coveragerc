@@ -5,3 +5,7 @@ omit =
 Validation/*
 GUI.py
 change_pickle_data.py
+
+[report]
+exclude_lines =
+    if __name__ == .__main__.:
