@@ -445,3 +445,54 @@ def test_size_hourly_without_hourly_load(borefield):
 def test_size_hourly_quadrant(hourly_borefield):
     hourly_borefield.H = 0.5
     hourly_borefield.size_L4(H_init=100, quadrant_sizing=1)
+
+
+def test_create_custom_dataset_without_data(borefield):
+    borefield.ground_data = None
+    try:
+        borefield.create_custom_dataset()
+    except ValueError:
+        assert True
+    borefield.borefield = None
+    try:
+        borefield.create_custom_dataset()
+    except ValueError:
+        assert True
+
+
+def test_check_hourly_load(borefield):
+    try:
+        borefield._check_hourly_load()
+    except ValueError:
+        assert True
+
+    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv")
+    borefield.hourly_cooling_load[0] = -1
+    try:
+        borefield._check_hourly_load()
+    except ValueError:
+        assert True
+
+
+def test_load_hourly_data(borefield):
+    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv")
+    test_cooling = copy.copy(borefield.hourly_cooling_load)
+    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv", first_column_heating=False)
+    assert np.array_equal(test_cooling, borefield.hourly_heating_load)
+
+    borefield.load_hourly_profile("GHEtool/test/hourly_profile_without_header.csv", header=False)
+    assert np.array_equal(test_cooling, borefield.hourly_cooling_load)
+
+
+def test_convert_hourly_to_monthly_without_data(borefield):
+    try:
+        borefield.convert_hourly_to_monthly()
+    except IndexError:
+        assert True
+    borefield.set_fluid_parameters(fluidData)
+    borefield.set_pipe_parameters(pipeData)
+    borefield.use_constant_Rb = False
+    try:
+        borefield.optimise_load_profile()
+    except ValueError:
+        assert True

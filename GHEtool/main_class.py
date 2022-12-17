@@ -1608,7 +1608,7 @@ class Borefield:
             raise ValueError("No borefield is set for which the gfunctions should be calculated")
         try:
             self.ground_data.alpha
-        except TypeError:
+        except AttributeError:
             raise ValueError("No ground data is set for which the gfunctions should be calculated")
 
         self.custom_gfunction = CustomGFunction(time_array, depth_array, options)
@@ -1729,7 +1729,7 @@ class Borefield:
             self.hourly_cooling_load[0]
             self.hourly_heating_load[0]
         except IndexError:
-            self.load_hourly_profile()
+            raise IndexError("No hourly loads are loaded yet!")
 
         if peak_cooling_load is None:
             peak_cooling_load = max(self.hourly_cooling_load)
@@ -1816,8 +1816,7 @@ class Borefield:
         self.use_constant_Rb = True
 
         # check if hourly profile is given
-        if not self._check_hourly_load():
-            return
+        self._check_hourly_load()
 
         # set initial peak loads
         init_peak_heat_load = max(self.hourly_heating_load)

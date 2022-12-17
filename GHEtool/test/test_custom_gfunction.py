@@ -109,6 +109,7 @@ def test_within_range_empty():
     assert not custom_gfunction.within_range(np.array([1]), 5)
 
 
+@pytest.mark.slow
 def test_within_range(custom_gfunction):
     time_array = np.array([3600, 5000, 10000])
     assert not custom_gfunction.within_range(time_array, 0.5)
