@@ -1,2 +1,12 @@
 ============================= test session starts =============================
 platform win32 -- Python 3.8.10, pytest-7.1.2, pluggy-1.0.0
+PySide6 6.4.0 -- Qt runtime 6.4.0 -- Qt compiled 6.4.0
+rootdir: C:\Users\u0139027\Documents\Python\GHEtool, configfile: setup.cfg
+plugins: cov-3.0.0, qt-4.1.0, skip-slow-0.0.3
+collected 1 item
+
+GHEtool\test\speed_improvement_v211.py 
+Optimise load profile took  14.97 ms in v2.1.0 and 0.94 ms in v2.1.1. This is an improvement of 1497%.
+.
+
+============================= 1 passed in 16.96s ============================
