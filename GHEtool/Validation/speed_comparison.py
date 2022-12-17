@@ -121,7 +121,7 @@ def test_10_boreholes():
           round((depth_calculated - depth_precalculated) / depth_calculated * 100, 3), "%.\n")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
 
     test_10_boreholes()
     test_64_boreholes()
