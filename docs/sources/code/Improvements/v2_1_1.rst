@@ -12,7 +12,7 @@ The computational times as shown in the table below, are an average of 5 runs.
    * - Sizing method
      - Time v2.1.0 [ms]
      - Time v2.1.1 [ms]
-     - Relative improvement [%]
+     - Improvement [%]
    * - L2 (three pulse) sizing
      - 1.84 ms
      - 1.43 ms
@@ -33,20 +33,20 @@ The computational times as shown in the table below, are an average of 5 runs.
    * - Example
      - Time v2.1.0 [ms]
      - Time v2.1.1 [ms]
-     - Relative improvement [%]
-   * - Main functionalities (E)
+     - Improvement [%]
+   * - Main functionalities
      - 3.38 ms
      - 2.57 ms
      - 32%
-   * - Optimise load profile (E)
+   * - Optimise load profile
      - 15.07 ms
      - 0.63 ms
      - 2305%     
-   * - Sizing with Rb calculation (E)
+   * - Sizing with Rb calculation
      - 9.97 ms
      - 9.99 ms
      - 0%     
-   * - Effect borefield configuration (E)
+   * - Effect borefield configuration
      - 1.57 ms
      - 1.5 ms
      - 4%

@@ -1,7 +1,5 @@
-import pytest
 from GHEtool import *
 import numpy as np
-import matplotlib.pyplot as plt
 import pygfunction as gt
 import time
 import os, contextlib
@@ -9,8 +7,6 @@ import os, contextlib
 from GHEtool.Examples.main_functionalities import main_functionalities
 from GHEtool.Examples.sizing_with_Rb_calculation import sizing_with_Rb
 from GHEtool.Examples.effect_of_borehole_configuration import effect_borefield_configuration
-
-from GHEtool.Validation.sizing_method_comparison import sizing_method_comparison
 
 # disable the plot function by monkey patching over it
 Borefield._plot_temperature_profile = lambda *args, **kwargs: None
@@ -42,7 +38,14 @@ def run_without_messages(callable) -> None:
     callable()
 
 
-def optimise_load_profile():
+def optimise_load_profile() -> None:
+    """
+    This is a benchmark for the optimise load profile method.
+
+    Returns
+    -------
+    None
+    """
     # initiate ground data
     data = GroundData(3, 10, 0.2)
 
@@ -66,7 +69,7 @@ def optimise_load_profile():
     borefield.optimise_load_profile(depth=150, print_results=False)
 
 
-def size_L2():
+def size_L2() -> None:
     """
     This is a benchmark for the L2 sizing method.
 
@@ -134,7 +137,7 @@ def size_L2():
         borefield.size(100, L2_sizing=True)
 
 
-def size_L3():
+def size_L3() -> None:
     """
     This is a benchmark for the L3 sizing method.
 
@@ -202,7 +205,7 @@ def size_L3():
         borefield.size(100, L3_sizing=True)
 
 
-def size_L4():
+def size_L4() -> None:
     """
     This is a benchmark for the L4 sizing method.
 
