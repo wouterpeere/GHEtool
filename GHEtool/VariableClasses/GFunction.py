@@ -12,16 +12,15 @@ class GFunction:
     """
     Class that contains the functionality to calculate gfunctions and to store
     previously calculated values that can potentially be used for interpolation to save time.
-    This is done by storing all previous calculated gvalues as long as the length of the does not change.
-
-    # TODO update this documentation
+    This is done by storing previously calculated gvalues.
     """
 
     DEFAULT_TIMESTEPS: np.ndarray = _timeValues()
     DEFAULT_NUMBER_OF_TIMESTEPS: int = DEFAULT_TIMESTEPS.size
+    DEFAULT_STORE_PREVIOUS_VALUES: bool = True
 
     def __init__(self):
-        self.store_previous_values: bool = True
+        self.store_previous_values: bool = GFunction.DEFAULT_STORE_PREVIOUS_VALUES
         self.options: dict = {"method": "equivalent"}
         self.alpha: float = 0.
         self.borefield: list = []
