@@ -61,6 +61,7 @@ def sizing_method_comparison():
                           baseload_cooling=monthly_load_cooling)
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)
+    borefield.create_custom_dataset()
 
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)   # maximum temperature
