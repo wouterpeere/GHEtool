@@ -2,6 +2,7 @@
 import numpy as np
 import pytest
 import copy
+from math import isclose
 
 from GHEtool import *
 
@@ -205,7 +206,7 @@ def test_hourly_to_monthly(borefield):
 
 
 def test_size(borefield):
-    assert borefield.size(100) == 92.06688246062056
+    assert isclose(borefield.size(100), 92.06688246062056)
 
 
 def test_imbalance(borefield):
