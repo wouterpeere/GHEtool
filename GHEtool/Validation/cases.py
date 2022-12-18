@@ -74,7 +74,7 @@ def check_cases():
     """
 
     correct_answers_L2 = (56.75, 117.23, 66.94, 91.32)
-    correct_answers_L3 = (56.81, 118.82, 66.54, 91.4)
+    correct_answers_L3 = (56.77, 118.74, 66.47, 91.34)
 
     for i in (1, 2, 3, 4):
         monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(i)
@@ -146,24 +146,26 @@ def check_custom_datafile():
         assert abs(1-borefield.H/correct_answers[i - 1]) <= 0.002
 
 
-check_cases()  # check different cases
-check_custom_datafile()  # check if the custom datafile is correct
+if __name__ == "__main__":   # pragma: no cover
 
-monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(1)  # load case 1
+    check_cases()  # check different cases
+    check_custom_datafile()  # check if the custom datafile is correct
 
-borefield = Borefield(simulation_period=20,
-                      peak_heating=peak_heating,
-                      peak_cooling=peak_cooling,
-                      baseload_heating=monthly_load_heating,
-                      baseload_cooling=monthly_load_cooling)
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(1)  # load case 1
 
-borefield.set_ground_parameters(data)
-borefield.set_borefield(borefield_gt)
+    borefield = Borefield(simulation_period=20,
+                          peak_heating=peak_heating,
+                          peak_cooling=peak_cooling,
+                          baseload_heating=monthly_load_heating,
+                          baseload_cooling=monthly_load_cooling)
 
-# set temperature boundaries
-borefield.set_max_ground_temperature(16)  # maximum temperature
-borefield.set_min_ground_temperature(0)  # minimum temperature
+    borefield.set_ground_parameters(data)
+    borefield.set_borefield(borefield_gt)
 
-borefield.size(100)
-print(borefield.H)
-borefield.print_temperature_profile()
+    # set temperature boundaries
+    borefield.set_max_ground_temperature(16)  # maximum temperature
+    borefield.set_min_ground_temperature(0)  # minimum temperature
+
+    borefield.size(100)
+    print(borefield.H)
+    borefield.print_temperature_profile()

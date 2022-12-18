@@ -1,57 +1,20 @@
 """
 This file contains all the code for the borefield calculations.
-
-Notes
------
-In a future release, this file will be split into a Borefield class, a GeothermalSystem class and a HybridGeothermalSystem class.
-This will be done in v2.1.1.
 """
 import numpy as np
 import pickle
-from scipy import interpolate
 from scipy.signal import convolve
 from math import pi
 import pygfunction as gt
 import os.path
 import matplotlib.pyplot as plt
 import warnings
-from typing import Union, Tuple, Optional
+from typing import Union, Tuple, Optional, List
 
 from GHEtool.VariableClasses import GroundData, FluidData, PipeData
+from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction
 
 FOLDER = os.path.dirname(os.path.realpath(__file__))  # solve problem with importing GHEtool from sub-folders
-
-
-def _timeValues(dt=3600., t_max=100. * 8760 * 3600.) -> np.array:
-    """
-    This function calculates the default time values for the g-function.
-    This is based on the Load aggregation algorithm of Claesson and Javed [#ClaessonJaved2012]_.
-
-    Attributes
-    ----------
-    dt : float
-        time step in seconds
-    t_max : float
-        maximum time in seconds
-
-    Returns
-    -------
-    timevalues : numpy array
-        array with the time values for the simulation
-
-    References
-    ----------
-    .. [#ClaessonJaved2012] Claesson, J., & Javed, S. (2012). A
-       load-aggregation method to calculate extraction temperatures of
-       borehole heat exchangers. ASHRAE Transactions, 118 (1): 530–539.
-    """
-    dt: float = dt  # Time step (s)
-    t_max: float = t_max  # Maximum time (s)
-
-    # Load aggregation scheme
-    load_agg = gt.load_aggregation.ClaessonJaved(dt, t_max)
-
-    return load_agg.get_times_for_simulation()
 
 
 class Borefield:
@@ -63,8 +26,6 @@ class Borefield:
     # define default values
     DEFAULT_INVESTMENT: list = [35, 0]  # 35 EUR/m
     DEFAULT_LENGTH_PEAK: int = 6  # hours
-    DEFAULT_DEPTH_ARRAY: list = list(range(25, 351, 25))  # m
-    DEFAULT_TIME_ARRAY: list = _timeValues()  # sec
     DEFAULT_NUMBER_OF_TIMESTEPS: int = 100
     THRESHOLD_DEPTH_ERROR: int = 10000  # m
 
@@ -73,21 +34,21 @@ class Borefield:
 
     __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'H_init', 'Rb', 'ty', 'tm', \
                 'td', 'time', 'hourly_heating_load', 'H_max', 'use_constant_Tg', 'flux', 'volumetric_heat_capacity',\
-                'hourly_cooling_load', 'number_of_boreholes', '_borefield', '_custom_gfunction', 'cost_investment', \
+                'hourly_cooling_load', 'number_of_boreholes', '_borefield', 'custom_gfunction', 'cost_investment', \
                 'length_peak', 'th', 'Tf_max', 'Tf_min', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
                 'monthly_load_cooling', 'peak_heating', 'imbalance', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm', \
                 'peak_cooling', 'simulation_period', 'fluid_data_available', 'ground_data', 'pipe_data', 'fluid_data',\
                 'results_peak_heating', 'pipe_data_available', 'time_L4', 'options_pygfunction',\
                 'results_peak_cooling', 'results_month_cooling', 'results_month_heating', 'Tb', 'THRESHOLD_WARNING_SHALLOW_FIELD', \
-                'gui', 'time_L3_first_year', 'time_L3_last_year', 'peak_heating_external', 'peak_cooling_external', \
+                'gui', 'time_L3_last_year', 'peak_heating_external', 'peak_cooling_external', \
                 'monthly_load_heating_external', 'monthly_load_cooling_external', 'hourly_heating_load_external', \
                 'hourly_cooling_load_external', 'hourly_heating_load_on_the_borefield', 'hourly_cooling_load_on_the_borefield', \
-                'use_constant_Rb', 'printing', 'combo', 'D', 'r_b', 'recalculation_needed', \
+                'use_constant_Rb', 'printing', 'combo', 'D', 'r_b', 'recalculation_needed', 'gfunction_calculation_object',\
                 'L2_sizing', 'L3_sizing', 'L4_sizing', 'quadrant_sizing', 'H_init', 'use_precalculated_data'
 
     def __init__(self, simulation_period: int = 20, peak_heating: list = None,
                  peak_cooling: list = None, baseload_heating: list = None, baseload_cooling: list = None,
-                 borefield=None, custom_gfunction: str=None, gui: bool = False):
+                 borefield=None, custom_gfunction: CustomGFunction = None, gui: bool = False):
         """
 
         Parameters
@@ -104,8 +65,8 @@ class Borefield:
             Monthly baseload heating values [kWh]
         borefield : pygfunction borehole/borefield object
             Set the borefield for which the calculations will be carried out
-        custom_gfunction : str
-            Path to the custom_gfunction file which will be loaded.
+        custom_gfunction : CustomGFunction
+            Custom gfunction dataset
         gui : bool
             True if the Borefield object is created by the GUI. This should not be used in the code version
             of GHEtool itself.
@@ -170,7 +131,8 @@ class Borefield:
 
         self.monthly_load = np.array([])
         self.H_init: float = 0.
-        self._custom_gfunction: tuple = ()
+        self.custom_gfunction: CustomGFunction = custom_gfunction
+        self.gfunction_calculation_object: GFunction = GFunction()
         self.recalculation_needed: bool = False
 
         ## params w.r.t. pygfunction
@@ -212,7 +174,6 @@ class Borefield:
         self.time = np.array([])  # list of time values
         self.tcm: float = 0.  # time constant for first year sizing
         self.tpm: float = 0.  # time constant for first year sizing
-        self.time_L3_first_year = np.array([])  # list with time values for L3 sizing
         self.time_L3_last_year = np.array([])  # list with time values for L3 sizing
         self.time_L4 = np.array([])  # list with all the time values for the L4 sizing
 
@@ -276,9 +237,6 @@ class Borefield:
         # set a custom borefield
         self.borefield = borefield
 
-        # set a custom g-function
-        self.load_custom_gfunction(custom_gfunction)
-
     def _set_number_of_boreholes(self) -> None:
         """
         This functions sets the number of boreholes based on the length of the borefield attribute.
@@ -289,13 +247,13 @@ class Borefield:
         """
         self.number_of_boreholes = len(self.borefield) if self.borefield is not None else 0
 
-    def set_borefield(self, borefield=None) -> None:
+    def set_borefield(self, borefield: List[gt.boreholes.Borehole] = None) -> None:
         """
         This function set the borefield object.
 
         Parameters
         ----------
-        borefield : pygfunction.Boreholes object
+        borefield : List[pygfunction.boreholes.Borehole]
             Borefield created with the pygfunction package
 
         Returns
@@ -376,13 +334,13 @@ class Borefield:
         return self._borefield
 
     @borefield.setter
-    def borefield(self, borefield=None) -> None:
+    def borefield(self, borefield: List[gt.boreholes.Borehole]=None) -> None:
         """
         This function sets the borefield configuration. When no input is given, the borefield variable will be deleted.
 
         Parameters
         ----------
-        borefield : pygfunction.Boreholes object
+        borefield : List[pygfunction.boreholes.Borehole]
             Borefield created with the pygfunction package
 
         Returns
@@ -447,87 +405,7 @@ class Borefield:
         None
         """
 
-        if location is not None:
-            # load data fileImport
-            data = pickle.load(open(location, "rb"))
-            self.custom_gfunction = data
-
-    @property
-    def custom_gfunction(self):
-        """
-        This function returns the hidden _custom_gfunction variable.
-
-        Returns
-        -------
-        Hidden _custom_gfunction variable
-        """
-        return self._custom_gfunction
-
-    @custom_gfunction.setter
-    def custom_gfunction(self, custom_gfunction) -> None:
-        """
-        This function sets the custom gfunction.
-        If custom_gfunction is None, than the variable will be deleted.
-
-        Parameters
-        ----------
-        custom_gfunction
-            Custom gfunction datafile
-
-        Returns
-        -------
-        None
-        """
-        # if custom_gfunction is empty, the value has to be removed
-        if custom_gfunction is None:
-            del self.custom_gfunction
-            return
-
-        def make_interpolation_list_custom(custom_gfunction) -> tuple:
-            """
-            This function creates an interpolation list from a custom dataset and saves it under
-            the hidden _custom_gfunction variable.
-
-            Parameters
-            ----------
-            custom_gfunction
-                Custom gfunction datafile
-
-            Returns
-            -------
-            Tuple
-                Tuple with on first index a tuple with all the different depths (index 0) and time steps (index 1)
-                and on the second index a 2D-list with all the gfunction values for all the different depths.
-            """
-
-            # remove the time value
-            Time = Borefield.DEFAULT_TIME_ARRAY
-            try:
-                custom_gfunction.pop("Time")
-            except KeyError:
-                custom_gfunction = custom_gfunction
-
-            H_array = list(custom_gfunction["Data"].keys())
-            H_array.sort()
-
-            points = (H_array, Time)
-
-            values = [custom_gfunction["Data"][h] for h in H_array]
-
-            return (points, values)
-
-        self._custom_gfunction = make_interpolation_list_custom(custom_gfunction)
-
-    @custom_gfunction.deleter
-    def custom_gfunction(self) -> None:
-        """
-        This function deletes the custom_gfunction.
-
-        Returns
-        -------
-
-        """
-        self._custom_gfunction = None
+        self.custom_gfunction = load_custom_gfunction(location)
 
     def set_investment_cost(self, investment_cost: list =None) -> None:
         """
@@ -596,7 +474,6 @@ class Borefield:
 
         # set the time array for the L3 sizing
         # This is one time for every month in the whole simulation period
-        self.time_L3_first_year = Borefield.UPM * 3600 * np.arange(1, 13)
         self.time_L3_last_year = Borefield.UPM * 3600 * np.arange(1, self.simulation_period * 12 + 1)
 
         # set the time constant for the L4 sizing
@@ -621,7 +498,7 @@ class Borefield:
         self.ground_data = data
 
         # new ground data implies that a new g-function should be loaded
-        del self.custom_gfunction
+        self.custom_gfunction = None
 
     def set_fluid_parameters(self, data: FluidData) -> None:
         """
@@ -776,7 +653,7 @@ class Borefield:
         This function sizes the field based on the last year of operation, i.e. quadrants 2 and 4.
 
         It uses the methodology developed by (Ahmadfard and Bernier, 2019) [#Ahmadfard2019]_.
-        The concept of borefield quadrants is developped by (Peere et al., 2020) [#PeereBS]_ [#PeereThesis]_.
+        The concept of borefield quadrants is developed by (Peere et al., 2020) [#PeereBS]_ [#PeereThesis]_.
 
         Returns
         -------
@@ -816,7 +693,7 @@ class Borefield:
         This function sizes the field based on the first year of operation, i.e. quadrants 1 and 3.
 
         It uses the methodology developed by (Monzo et al., 2016) [#Monzo]_ and adapted by (Peere et al., 2021) [#PeereBS]_.
-        The concept of borefield quadrants is developped by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]_.
+        The concept of borefield quadrants is developed by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]_.
 
         Returns
         -------
@@ -1643,23 +1520,6 @@ class Borefield:
             self.results_month_cooling = np.array([])
             self.results_month_heating = np.array([])
 
-    def set_options_gfunction_calculation(self, options: dict) -> None:
-        """
-        This function sets the options for the gfunction calculation of pygfunction.
-        This dictionary is directly passed through to the gFunction class of pygfunction.
-        For more information, please visit the documentation of pygfunction.
-
-        Parameters
-        ----------
-        options : dict
-            Dictionary with options for the gFunction class of pygfunction
-
-        Returns
-        -------
-        None
-        """
-        self.options_pygfunction = options
-
     def gfunction(self, time_value: Union[list, float, np.ndarray], H: float = None) -> np.ndarray:
         """
         This function returns the gfunction value.
@@ -1697,31 +1557,7 @@ class Borefield:
             # set the correct depth of the borefield
             self._update_borefield_depth(H=H)
 
-            time_value_np = np.array(time_value)
-            if not isinstance(time_value, (float, int)) and len(time_value_np) > Borefield.DEFAULT_NUMBER_OF_TIMESTEPS:
-                # due to this many requested time values, the calculation will be slow.
-                # there will be interpolation
-
-                time_value_new = _timeValues(t_max=time_value[-1])
-                # Calculate the g-function for uniform borehole wall temperature
-                gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.ground_data.alpha, time_value_new,
-                                                         options=self.options_pygfunction).gFunc
-
-                # return interpolated values
-                return np.interp(time_value, time_value_new, gfunc_uniform_T)
-
-            # check if there are double values
-            if not isinstance(time_value, (float, int)) and len(time_value_np) != len(np.unique(np.asarray(time_value))):
-                gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.ground_data.alpha, np.unique(time_value_np),
-                                                         options=self.options_pygfunction).gFunc
-
-                return np.interp(time_value, np.unique(time_value_np), gfunc_uniform_T)
-
-            # Calculate the g-function for uniform borehole wall temperature
-            gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.ground_data.alpha, time_value_np,
-                                                     options=self.options_pygfunction).gFunc
-
-            return gfunc_uniform_T
+            return self.gfunction_calculation_object.calculate(time_value, self.borefield, self.ground_data.alpha)
 
         ## 1 bypass any possible precalculated g-functions
 
@@ -1732,44 +1568,16 @@ class Borefield:
         ## 2 use precalculated g-functions when available
         if not self.custom_gfunction is None:
             # there is precalculated data available
-            # interpolate
-            points, values = self.custom_gfunction
-
-            max_time_value = time_value if isinstance(time_value, (float, int)) else max(time_value)
-            min_time_value = time_value if isinstance(time_value, (float, int)) else min(time_value)
-
-            # check if H in precalculated data range
-            if H > max(points[0]) or H < min(points[0]):
-                warnings.warn("The requested depth of " + str(H) + "m is outside the bounds of " + str(min(points[0])) +
-                              " and " + str(max(points[0])) + " of the precalculated data. The gfunctions will be calculated jit.", UserWarning)
-                return jit_gfunction_calculation()
-
-            # check if max time in precalculated data range
-            if max_time_value > max(points[1]):
-                warnings.warn("The requested time of " + str(max_time_value) + "s is outside the bounds of " + str(min(points[1])) +\
-                              " and " + str(max(points[1])) + " of the precalculated data. The gfunctions will be calculated jit.", UserWarning)
-                return jit_gfunction_calculation()
-
-            # check if min time in precalculated data range
-            if min_time_value < min(points[1]):
-                warnings.warn("The requested time of " + str(min_time_value) + "s is outside the bounds of " + str(min(points[1])) +\
-                              " and " + str(max(points[1])) + " of the precalculated data. The gfunctions will be calculated jit.", UserWarning)
-                return jit_gfunction_calculation()
-
-            if not isinstance(time_value, (float, int)):
-                # multiple values are requested
-                g_value = interpolate.interpn(points, values, np.array([[H, t] for t in time_value]))
-            else:
-                # only one value is requested
-                g_value = interpolate.interpn(points, values, np.array([H, time_value]))
-            return g_value
+            # check if the requested values can be calculated using the custom_gfunction
+            if self.custom_gfunction.within_range(time_value, H):
+                return self.custom_gfunction.calculate_gfunction(time_value, H)
 
         ## 3 calculate g-function jit
         return jit_gfunction_calculation()
 
-    def create_custom_dataset(self, name_datafile: str=None, options: dict=None,
-                              time_array: Union[list, np.ndarray]=None, depth_array: Union[list, np.ndarray]=None,
-                              save: bool=False) -> None:
+    def create_custom_dataset(self, time_array: Union[list, np.ndarray] = None,
+                              depth_array: Union[list, np.ndarray] = None,
+                              options: dict = {}) -> None:
         """
         This function makes a datafile for a given custom borefield and sets it for the borefield object.
         It automatically sets this datafile in the current borefield object so it can be used as a source for
@@ -1777,67 +1585,34 @@ class Borefield:
 
         Parameters
         ----------
-        name_datafile : str
-            Name of the custom datafile
-        options : dict
-            Options for the gfunction calculation (check pygfunction.gfunction.gFunction() for more information)
         time_array : list, np.array
             Time values (in seconds) used for the calculation of the datafile
         depth_array : list, np.array
             List or arrays of depths for which the datafile should be created
-        save : bool
-            True if the datafile should be dumped
+        options : dict
+            Options for the gfunction calculation (check pygfunction.gfunction.gFunction() for more information)
 
         Returns
         -------
         None
 
-        .. deprecated:: 2.1.1
-            This function will be removed to a specific class related to custom gfunctions
+        Raises
+        ------
+        ValueError
+            When no borefield or ground data is set
         """
-        # check if options are given
-        if options is None:
-            options = self.options_pygfunction
-            # set the display option to True
-            options["disp"] = True
 
-        # chek if there is a method in options
-        if not "method" in options:
-            options["method"] = "equivalent"
+        try:
+            self.borefield[0]
+        except TypeError:
+            raise ValueError("No borefield is set for which the gfunctions should be calculated")
+        try:
+            self.ground_data.alpha
+        except AttributeError:
+            raise ValueError("No ground data is set for which the gfunctions should be calculated")
 
-        # set folder if no gui is used
-        if depth_array is None:
-            depth_array = Borefield.DEFAULT_DEPTH_ARRAY
-        if time_array is None:
-            time_array = Borefield.DEFAULT_TIME_ARRAY
-
-        folder = '.' if self.gui else FOLDER
-
-        data = dict([])
-        data["Data"] = dict([])
-        data["Time"] = time_array
-
-        for H in depth_array:
-            print("Start H: ", H)
-
-            # Calculate the g-function for uniform borehole wall temperature
-
-            # set borehole depth in borefield
-            for borehole in self.borefield:
-                borehole.H = H
-
-            gfunc_uniform_T = gt.gfunction.gFunction(self.borefield, self.ground_data.alpha,
-                                                     time_array, options=options, method=options["method"])
-
-            data["Data"][H] = gfunc_uniform_T.gFunc
-
-        self.custom_gfunction = data
-
-        if save:
-            name = f'{name_datafile}.pickle'
-            pickle.dump(data, open(f'{folder}/Data/{name}', "wb"))
-            print(f"A new dataset with name {name} has been created in {os.path.dirname(os.path.realpath(__file__))}/Data.")
-            return f'{os.path.dirname(os.path.realpath(__file__))}/Data/ {name}'
+        self.custom_gfunction = CustomGFunction(time_array, depth_array, options)
+        self.custom_gfunction.create_custom_dataset(self.borefield, self.ground_data.alpha)
 
     def set_hourly_heating_load(self, heating_load: np.array) -> None:
         """
@@ -1954,7 +1729,7 @@ class Borefield:
             self.hourly_cooling_load[0]
             self.hourly_heating_load[0]
         except IndexError:
-            self.load_hourly_profile()
+            raise IndexError("No hourly loads are loaded yet!")
 
         if peak_cooling_load is None:
             peak_cooling_load = max(self.hourly_cooling_load)
@@ -1972,7 +1747,7 @@ class Borefield:
         """
         This function calculates the monthly load based, taking a maximum peak value into account.
         This means that it sums the hourly load for each month, and if a peak occurs larger than the given peak,
-        it is limited to the the last one.
+        it is limited to the last one.
 
         Parameters
         ----------
@@ -2041,8 +1816,7 @@ class Borefield:
         self.use_constant_Rb = True
 
         # check if hourly profile is given
-        if not self._check_hourly_load():
-            return
+        self._check_hourly_load()
 
         # set initial peak loads
         init_peak_heat_load = max(self.hourly_heating_load)

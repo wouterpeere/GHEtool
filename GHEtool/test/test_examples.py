@@ -6,23 +6,27 @@ import pygfunction as gt
 
 def test_main_functionalities(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
-    import GHEtool.Examples.main_functionalities
+    from GHEtool.Examples.main_functionalities import main_functionalities
+    main_functionalities()
 
 
 def test_custom_borefield_configuration(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
-    import GHEtool.Examples.custom_borefield_configuration
+    from GHEtool.Examples.custom_borefield_configuration import custom_borefield_configuration
+    custom_borefield_configuration()
 
 
 def test_effect_borehole_configuration(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
-    import GHEtool.Examples.effect_of_borehole_configuration
+    from GHEtool.Examples.effect_of_borehole_configuration import effect_borefield_configuration
+    effect_borefield_configuration()
 
 
 @pytest.mark.slow
 def test_sizing_with_Rb(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
-    import GHEtool.Examples.sizing_with_Rb_calculation
+    from GHEtool.Examples.sizing_with_Rb_calculation import sizing_with_Rb
+    sizing_with_Rb()
 
 
 def test_optimise_load_profile(monkeypatch):
@@ -48,9 +52,3 @@ def test_optimise_load_profile(monkeypatch):
 
     # optimise the load for a 10x10 field (see data above) and a fixed depth of 150m.
     borefield.optimise_load_profile(depth=150, print_results=True)
-
-    # print resulting external peak cooling profile
-    print(borefield.peak_cooling_external)
-
-    # print resulting monthly load for an external heating source
-    print(borefield.monthly_load_heating_external)

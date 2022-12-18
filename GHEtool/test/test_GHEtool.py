@@ -1,6 +1,8 @@
 # test if model can be imported
 import numpy as np
 import pytest
+import copy
+from math import isclose
 
 from GHEtool import *
 
@@ -31,6 +33,7 @@ monthlyLoadHeating = list(map(lambda x: x * annualHeatingLoad, monthlyLoadHeatin
 monthlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, monthlyLoadCoolingPercentage))   # kWh
 
 custom_field = gt.boreholes.L_shaped_field(N_1=4, N_2=5, B_1=5., B_2=5., H=100., D=4, r_b=0.05)
+
 
 def load_case(number):
     """This function returns the values for one of the four cases."""
@@ -203,7 +206,7 @@ def test_hourly_to_monthly(borefield):
 
 
 def test_size(borefield):
-    assert borefield.size(100) == 92.06688246062056
+    assert isclose(borefield.size(100), 92.06688246062056)
 
 
 def test_imbalance(borefield):
@@ -214,7 +217,7 @@ def test_temperatureProfile(borefield):
     borefield.calculate_temperatures(depth=90)
     print(np.around(borefield.results_peak_cooling, 8))
     np.testing.assert_array_equal(np.around(borefield.results_peak_cooling, 8),
-                                  np.around(np.array([9.07267348,9.165368,9.77368204,10.72540446,12.54650156,14.38716199,15.35265141,16.13908188,13.59896695,10.32220591,9.35238892,8.86407987,8.65026263,8.7593864,9.38007687,10.34108662,12.1695408,14.01937857,14.99199093,15.78396757,13.25103038,9.98030132,9.0181641,8.53626611,8.32707069,8.44412401,9.06834933,10.03322961,11.87164216,13.72625191,14.70416257,15.50017753,12.96747466,9.69989432,8.74252847,8.26376645,8.06217274,8.18447773,8.81214533,9.78302668,11.62184074,13.47749149,14.45947417,15.25974298,12.7310644,9.46857679,8.51112362,8.03474536,7.83688396,7.96278941,8.59530962,9.56792168,11.40688625,13.26557999,14.25083516,15.05392507,12.53205853,9.27144149,8.31669644,7.84429667,7.64976448,7.77718235,8.40745637,9.37561909,11.21441348,13.07489914,14.06373664,14.87635758,12.3607387,9.1048253,8.1536713,7.68303613,7.48724905,7.61069456,8.23622643,9.20307976,11.04339594,12.90727216,13.90370166,14.72308501,12.21154942,8.9588224,8.00952468,7.53848213,7.33984107,7.45935933,8.08287264,9.05066488,10.89343492,12.76233005,13.76564725,14.58863741,12.07997195,8.82914595,7.88003778,7.40695317,7.20499575,7.32202059,7.94605538,8.91562079,10.76152572,12.63729591,13.64382604,14.46941823,11.96265935,8.71245037,7.76191378,7.28599947,7.08124143,7.19847966,7.82377231,8.79574439,10.64892359,12.52901903,13.53910217,14.3673743,11.86179484,8.6103152,7.65649666,7.17691058,6.9715808,7.09014941,7.71823487,8.69441006,10.54854429,12.42863973,13.43872287,14.26699501,11.76141555,8.5099359,7.55611737,7.07653129,6.8712015,6.98977012,7.61953157,8.60034063,10.45837756,12.34154883,13.35354898,14.181732,11.6736865,8.4185367,7.46240064,6.98354369,6.78034373,6.90249767,7.5352092,8.51601826,10.37405519,12.25722646,13.26922661,14.09740963,11.58936413,8.33421433,7.37807827,6.89922132,6.69602136,6.82160123,7.45762764,8.44114072,10.30119112,12.18513714,13.19591202,14.0213722,11.51046056,8.25520955,7.30023069,6.82368457,6.62388726,6.74981824,7.38584464,8.36935773,10.22940813,12.11335415,13.12412902,13.94958921,11.43867756,8.18342655,7.2284477,6.75329254,6.55634484,6.68466159,7.32254926,8.3071447,10.16695237,12.04922678,13.05770574,13.8819926,11.37163217,8.11781827,7.16517978,6.69155416,6.49460646,6.62292321,7.26081088,8.24540631,10.10521399,11.9874884,12.99596736,13.82025422,11.30989379,8.0561104,7.10594217,6.63443104,6.43919543,6.5687653,7.20705554,8.19070786,10.04865229,11.92908806,12.93770942,13.7628266,11.25405281,8.00252376,7.05235553,6.5808444,6.38560879,6.51517866,7.1534689,8.13712123,9.99506565,11.87550142,12.88412278,13.70923997,11.20219243,7.95345216,7.00560439,6.53588416,6.34161002,6.47075198,7.10724916,8.08861514,9.94566641,11.82674581,12.83690262,13.66444753,11.15860854,7.90986828,6.9620205,6.49230028]), 8))
+                                  np.around(np.array([9.07267348,9.165368,9.77296687,10.72360291,12.54288359,14.38203799,15.3474007,16.13299311,13.594681,10.32156769,9.35238892,8.86407987,8.65026263,8.7593864,9.37936169,10.33928507,12.16592283,14.01425456,14.98674021,15.7778788,13.24674443,9.97966311,9.0181641,8.53626611,8.32707069,8.44412401,9.06763415,10.03142806,11.86802419,13.7211279,14.69891185,15.49408876,12.96318871,9.6992561,8.74252847,8.26376645,8.06217274,8.18447773,8.81143016,9.78122514,11.61822277,13.47236748,14.45422346,15.25365421,12.72677845,9.46793857,8.51112362,8.03474536,7.83688396,7.96278941,8.59459444,9.56612014,11.40326828,13.26045599,14.24558444,15.0478363,12.52777258,9.27080327,8.31669644,7.84429667,7.64976448,7.77718235,8.4067412,9.37381755,11.21079551,13.06977514,14.05848593,14.87026882,12.35645275,9.10418709,8.1536713,7.68303613,7.48724905,7.61069456,8.23551126,9.20127822,11.03977797,12.90214816,13.89845095,14.71699625,12.20726347,8.95818419,8.00952468,7.53848213,7.33984107,7.45935933,8.08215747,9.04886334,10.88981695,12.75720605,13.76039653,14.58254864,12.075686,8.82850773,7.88003778,7.40695317,7.20499575,7.32202059,7.9453402,8.91381925,10.75790775,12.63217191,13.63857533,14.46332946,11.95837341,8.71181215,7.76191378,7.28599947,7.08124143,7.19847966,7.82305714,8.79394284,10.64530562,12.52389502,13.53385146,14.36128553,11.85750889,8.60967698,7.65649666,7.17691058,6.9715808,7.09014941,7.71751969,8.69260851,10.54492632,12.42351573,13.43347216,14.26090624,11.7571296,8.50929769,7.55611737,7.07653129,6.8712015,6.98977012,7.6188164,8.59853909,10.45475959,12.33642483,13.34829827,14.17564323,11.66940055,8.41789849,7.46240064,6.98354369,6.78034373,6.90249767,7.53449402,8.51421671,10.37043722,12.25210245,13.2639759,14.09132086,11.58507818,8.33357612,7.37807827,6.89922132,6.69602136,6.82160123,7.45691246,8.43933918,10.29757315,12.18001314,13.19066131,14.01528343,11.50617461,8.25457133,7.30023069,6.82368457,6.62388726,6.74981824,7.38512947,8.36755618,10.22579016,12.10823014,13.11887831,13.94350044,11.43439161,8.18278834,7.2284477,6.75329254,6.55634484,6.68466159,7.32183408,8.30534315,10.1633344,12.04410277,13.05245503,13.87590383,11.36734622,8.11718006,7.16517978,6.69155416,6.49460646,6.62292321,7.2600957,8.24360477,10.10159602,11.98236439,12.99071665,13.81416545,11.30560784,8.05547219,7.10594217,6.63443104,6.43919543,6.5687653,7.20634037,8.18890632,10.04503431,11.92396406,12.9324587,13.75673784,11.24976686,8.00188555,7.05235553,6.5808444,6.38560879,6.51517866,7.15275373,8.13531968,9.99144768,11.87037742,12.87887207,13.7031512,11.19790648,7.95281395,7.00560439,6.53588416,6.34161002,6.47075198,7.10653399,8.0868136,9.94204844,11.82162181,12.83165191,13.65835876,11.15432259,7.90923007,6.9620205,6.49230028]), 8))
 
 
 def test_quadrantSizing(borefield):
@@ -326,18 +329,6 @@ def test_optimise_load_profile_without_data(borefield):
         assert True
 
 
-def test_precalculated_out_of_bound_2(borefield_custom_data):
-    borefield_custom_data.gfunction(2, H=100)
-
-
-def test_precalculated_out_of_bound_1(borefield_custom_data):
-    borefield_custom_data.gfunction(10**10, H=100)
-
-
-def test_precalculated_out_of_bound_3(borefield_custom_data):
-    borefield_custom_data.gfunction([3600*100, 3600*101], H=500)
-
-
 def test_precalculated_data_1(borefield_custom_data):
     borefield_custom_data.gfunction([3600*100, 3600*100], 100)
 
@@ -347,11 +338,8 @@ def test_precalculated_data_2(borefield_custom_data):
 
 
 def test_error_variable_Tg(borefield):
-    try:
-        borefield.ground_data.Tg = 14
-        borefield.sizing_setup(use_constant_Tg=False)
-    except ValueError:
-        assert True
+    borefield.ground_data.Tg = 14
+    borefield.sizing_setup(use_constant_Tg=False)
 
 
 def test_choose_quadrant_1(borefield_quadrants):
@@ -412,3 +400,100 @@ def test_choose_quadrant_None(borefield_quadrants):
 
     borefield_quadrants.calculate_temperatures(200)
     assert None is borefield_quadrants.calculate_quadrant()
+
+
+def test_set_none_borefield(borefield):
+    borefield.set_borefield(None)
+
+
+def test_set_investment_cost(borefield):
+    borefield.set_investment_cost()
+    assert borefield.cost_investment == Borefield.DEFAULT_INVESTMENT
+    borefield.set_investment_cost([0, 38])
+    assert borefield.cost_investment == [0, 38]
+
+
+def test_investment_cost(borefield):
+    borefield.H = 100
+    cost = 10 * 12 * 100
+    assert borefield.investment_cost == cost * borefield.cost_investment[0]
+    borefield.set_investment_cost([38, 0])
+    assert borefield.investment_cost == cost * 38
+
+
+@pytest.mark.slow
+def test_load_custom_gfunction(borefield):
+    borefield.create_custom_dataset()
+    borefield.custom_gfunction.dump_custom_dataset("./", "test")
+    dataset = copy.copy(borefield.custom_gfunction)
+
+    borefield.load_custom_gfunction("./test.gvalues")
+    assert borefield.custom_gfunction == dataset
+
+
+def test_H_smaller_50(borefield):
+    borefield.H = 0.5
+    borefield.size_L2(H_init=0.5, quadrant_sizing=1)
+
+
+def test_size_hourly_without_hourly_load(borefield):
+    try:
+        borefield.size_L4(H_init=100)
+    except ValueError:
+        assert True
+
+
+def test_size_hourly_quadrant(hourly_borefield):
+    hourly_borefield.H = 0.5
+    hourly_borefield.size_L4(H_init=100, quadrant_sizing=1)
+
+
+def test_create_custom_dataset_without_data(borefield):
+    borefield.ground_data = None
+    try:
+        borefield.create_custom_dataset()
+    except ValueError:
+        assert True
+    borefield.borefield = None
+    try:
+        borefield.create_custom_dataset()
+    except ValueError:
+        assert True
+
+
+def test_check_hourly_load(borefield):
+    try:
+        borefield._check_hourly_load()
+    except ValueError:
+        assert True
+
+    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv")
+    borefield.hourly_cooling_load[0] = -1
+    try:
+        borefield._check_hourly_load()
+    except ValueError:
+        assert True
+
+
+def test_load_hourly_data(borefield):
+    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv")
+    test_cooling = copy.copy(borefield.hourly_cooling_load)
+    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv", first_column_heating=False)
+    assert np.array_equal(test_cooling, borefield.hourly_heating_load)
+
+    borefield.load_hourly_profile("GHEtool/test/hourly_profile_without_header.csv", header=False)
+    assert np.array_equal(test_cooling, borefield.hourly_cooling_load)
+
+
+def test_convert_hourly_to_monthly_without_data(borefield):
+    try:
+        borefield.convert_hourly_to_monthly()
+    except IndexError:
+        assert True
+    borefield.set_fluid_parameters(fluidData)
+    borefield.set_pipe_parameters(pipeData)
+    borefield.use_constant_Rb = False
+    try:
+        borefield.optimise_load_profile()
+    except ValueError:
+        assert True

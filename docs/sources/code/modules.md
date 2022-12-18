@@ -5,4 +5,6 @@
 
 Modules/GHEtool_modules.rst
 Modules/VariableClasses.rst
+Modules/CustomGFunction.rst
+Modules/GFunction.rst
 ```

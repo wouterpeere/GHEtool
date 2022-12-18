@@ -52,7 +52,7 @@ def test_64_boreholes():
     t1_end = time.time()
 
     # delete precalculated data
-    del borefield.custom_gfunction
+    borefield.custom_gfunction.delete_custom_gfunction()
 
     ### size without the precalculation
     t2 = time.time()
@@ -108,7 +108,7 @@ def test_10_boreholes():
     t1_end = time.time()
 
     # delete precalculated data
-    del borefield.custom_gfunction
+    borefield.custom_gfunction.delete_custom_gfunction()
 
     ### size without the precalculation
     t2 = time.time()
@@ -121,7 +121,7 @@ def test_10_boreholes():
           round((depth_calculated - depth_precalculated) / depth_calculated * 100, 3), "%.\n")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
 
     test_10_boreholes()
     test_64_boreholes()
