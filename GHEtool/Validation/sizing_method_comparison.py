@@ -16,9 +16,9 @@ def sizing_method_comparison():
     max_value_heating = 800
 
     # initiate the arrays
-    results_L2 = np.empty(number_of_iterations)
-    results_L3 = np.empty(number_of_iterations)
-    difference_results = np.empty(number_of_iterations)
+    results_L2 = np.zeros(number_of_iterations)
+    results_L3 = np.zeros(number_of_iterations)
+    difference_results = np.zeros(number_of_iterations)
 
     monthly_load_cooling_array = np.empty((number_of_iterations, 12))
     monthly_load_heating_array = np.empty((number_of_iterations, 12))
@@ -59,12 +59,8 @@ def sizing_method_comparison():
                           peak_cooling=peak_cooling,
                           baseload_heating=monthly_load_heating,
                           baseload_cooling=monthly_load_cooling)
-
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)
-
-    # create custom gfunction to speed up the calculation
-    borefield.create_custom_dataset()
 
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)   # maximum temperature
