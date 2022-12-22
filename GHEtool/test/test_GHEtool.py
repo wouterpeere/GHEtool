@@ -497,3 +497,9 @@ def test_convert_hourly_to_monthly_without_data(borefield):
         borefield.optimise_load_profile()
     except ValueError:
         assert True
+
+
+def test_calculate_hourly_temperature_profile(hourly_borefield):
+    hourly_borefield._calculate_temperature_profile(100, hourly=True)
+    hourly_borefield.hourly_heating_load_on_the_borefield = hourly_borefield.hourly_heating_load
+    hourly_borefield.hourly_cooling_load_on_the_borefield = hourly_borefield.hourly_cooling_load
