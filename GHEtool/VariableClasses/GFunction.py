@@ -27,6 +27,7 @@ class GFunction:
         self.depth_array: np.ndarray = np.array([])
         self.time_array: np.ndarray = np.array([])
         self.previous_gfunctions: np.ndarray = np.array([])
+        self.previous_depth: float = 0.
 
         self.no_extrapolation: bool = True
         self.threshold_depth_interpolation: float = 25  # m
@@ -73,6 +74,13 @@ class GFunction:
             gvalues : np.ndarray
                 1D array with all the requested gvalues
             """
+            # check if previous depth is close to current one
+            # if so, returns previous gfunction data to speed up sizing convergence
+            if np.abs(self.previous_depth - depth) < 1:
+                depth = self.previous_depth
+            else:
+                self.previous_depth = depth
+
             # do interpolation
             gfunc_interpolated = self.interpolate_gfunctions(time_values, depth, alpha, borefield)
 

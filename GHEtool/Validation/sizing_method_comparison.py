@@ -33,6 +33,16 @@ def sizing_method_comparison():
             peak_load_cooling_array[i, j] = np.random.randint(monthly_load_cooling_array[i, j], max_value_cooling)
             peak_load_heating_array[i, j] = np.random.randint(monthly_load_heating_array[i, j], max_value_heating)
 
+    import pickle
+    data = pickle.load(open("Datadump.pkl", "rb"))
+    monthly_load_heating_array = data["monthly heating"]
+    monthly_load_cooling_array = data["monthly cooling"]
+    peak_load_cooling_array = data["peak cooling"]
+    peak_load_heating_array = data["peak heating"]
+    # data_dump = {"monthly cooling": monthly_load_cooling_array, "monthly heating": monthly_load_heating_array,
+    #              "peak cooling": peak_load_cooling_array, "peak heating": peak_load_heating_array}
+    # pickle.dump(data_dump, open("Datadump.pkl", "wb"))
+
     # initiate borefield model
     data = GroundData(3, 10, 0.2)
     borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
@@ -61,7 +71,6 @@ def sizing_method_comparison():
                           baseload_cooling=monthly_load_cooling)
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)
-    # borefield.create_custom_dataset()
 
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)   # maximum temperature
@@ -99,4 +108,5 @@ def sizing_method_comparison():
 
 
 if __name__ == "__main__":   # pragma: no cover
-    sizing_method_comparison()
+    for i in range(20):
+        sizing_method_comparison()
