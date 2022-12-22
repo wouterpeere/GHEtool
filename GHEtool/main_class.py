@@ -12,7 +12,7 @@ import warnings
 from typing import Union, Tuple, Optional, List
 
 from GHEtool.VariableClasses import GroundData, FluidData, PipeData
-from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction
+from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, SizingSetup
 
 FOLDER = os.path.dirname(os.path.realpath(__file__))  # solve problem with importing GHEtool from sub-folders
 
@@ -32,7 +32,7 @@ class Borefield:
     HOURLY_LOAD_ARRAY: np.ndarray = np.arange(0, 8761, 730).astype(np.uint32)
 
     __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'H_init', 'Rb', 'ty', 'tm', \
-                'td', 'time', 'hourly_heating_load', 'H_max', 'use_constant_Tg', 'flux', 'volumetric_heat_capacity',\
+                'td', 'time', 'hourly_heating_load', 'flux', 'volumetric_heat_capacity',\
                 'hourly_cooling_load', 'number_of_boreholes', '_borefield', 'custom_gfunction', 'cost_investment', \
                 'length_peak', 'th', 'Tf_max', 'Tf_min', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
                 'monthly_load_cooling', 'peak_heating', 'imbalance', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm', \
@@ -42,8 +42,8 @@ class Borefield:
                 'gui', 'time_L3_last_year', 'peak_heating_external', 'peak_cooling_external', \
                 'monthly_load_heating_external', 'monthly_load_cooling_external', 'hourly_heating_load_external', \
                 'hourly_cooling_load_external', 'hourly_heating_load_on_the_borefield', 'hourly_cooling_load_on_the_borefield', \
-                'use_constant_Rb', 'printing', 'combo', 'D', 'r_b', 'recalculation_needed', 'gfunction_calculation_object',\
-                'L2_sizing', 'L3_sizing', 'L4_sizing', 'quadrant_sizing', 'H_init', 'use_precalculated_data'
+                'printing', 'combo', 'D', 'r_b', 'recalculation_needed', 'gfunction_calculation_object',\
+                'H_init', 'use_precalculated_data', '_sizing_setup'
 
     def __init__(self, simulation_period: int = 20, peak_heating: list = None,
                  peak_cooling: list = None, baseload_heating: list = None, baseload_cooling: list = None,
@@ -118,12 +118,7 @@ class Borefield:
         # m hereafter one needs to chance to fewer boreholes with more depth, because the calculations are no longer
         # that accurate.
         self.THRESHOLD_WARNING_SHALLOW_FIELD: int = 50
-        # parameter that determines whether or not the Rb-value should be altered in the optimisation
-        self.use_constant_Rb = True
-        # parameter that determines whether or not the Tg should be calculated with a heat flux or without
-        self.use_constant_Tg = True
 
-        self.H_max: float = 350  # max threshold for interpolation (will with first sizing)
         # setting this to False will make sure every gvalue is calculated on the spot
         # this will make everything way slower!
         self.use_precalculated_data: bool = True
@@ -592,7 +587,7 @@ class Borefield:
     def _Rb(self) -> float:
         """
         This function gives back the equivalent borehole resistance.
-        If self.use_constant_Rb is False, it calculates the equivalent borehole thermal resistance.
+        If self._sizing_setup.use_constant_Rb is False, it calculates the equivalent borehole thermal resistance.
 
         Returns
         -------
@@ -735,7 +730,7 @@ class Borefield:
         return self.H
 
     def sizing_setup(self, H_init: float = 100, use_constant_Rb: bool = None, use_constant_Tg: bool = None, quadrant_sizing: int = 0,
-                     L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None) -> None:
+                     L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None, sizing_setup: SizingSetup = None) -> None:
         """
         This function sets the options for the sizing function.
 
@@ -787,8 +782,7 @@ class Borefield:
                                          quadrant_sizing=quadrant_sizing,
                                          L2_sizing=L2_sizing,
                                          L3_sizing=L3_sizing,
-                                         L4_sizing=L4_sizing,
-                                         relative_borefield_threshold=relative_borefield_threshold)
+                                         L4_sizing=L4_sizing)
 
     def size(self, H_init: float = 100, use_constant_Rb: bool = None, use_constant_Tg: bool = None,
              L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None, quadrant_sizing: int = None) -> float:
