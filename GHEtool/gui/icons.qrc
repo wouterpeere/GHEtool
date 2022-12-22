@@ -1,5 +1,11 @@
 <RCC>
   <qresource prefix="icons">
+    <file>icons/Home.svg</file>
+    <file>icons/Search.svg</file>
+    <file>icons/Back.svg</file>
+    <file>icons/Forward.svg</file>
+    <file>icons/Pen.svg</file>
+    <file>icons/Parameters.svg</file>
     <file>icons/Optimize_Profile.svg</file>
     <file>icons/Size_Length.svg</file>
     <file>icons/Options.svg</file>

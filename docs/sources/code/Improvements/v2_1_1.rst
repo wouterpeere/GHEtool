@@ -1,0 +1,60 @@
+***************
+v2.1.1
+***************
+Due to the implementation of the GFunction class in GHEtool, a substantial speed improvement is made w.r.t. GHEtool v2.1.0 for computationally expensive tasks.
+In the tables below, one can find this speed improvement for the different sizing methods and for several of the examples documents. The results can be recreated by running the code below.
+The computational times as shown in the table below, are an average of 5 runs.
+
+
+.. list-table:: Speed benchmark sizing methods
+   :header-rows: 1
+
+   * - Sizing method
+     - Time v2.1.0 [ms]
+     - Time v2.1.1 [ms]
+     - Improvement [%]
+   * - L2 (three pulse) sizing
+     - 1.84 ms
+     - 1.43 ms
+     - 28%
+   * - L3 (monthly) sizing
+     - 12.34 ms
+     - 5.8 ms
+     - 113%     
+   * - L4 (hourly) sizing
+     - 4.21 ms
+     - 3.63 ms
+     - 16%     
+
+
+.. list-table:: Speed benchmark examples
+   :header-rows: 1
+
+   * - Example
+     - Time v2.1.0 [ms]
+     - Time v2.1.1 [ms]
+     - Improvement [%]
+   * - Main functionalities
+     - 3.38 ms
+     - 2.57 ms
+     - 32%
+   * - Optimise load profile
+     - 15.07 ms
+     - 0.63 ms
+     - 2305%     
+   * - Sizing with Rb calculation
+     - 9.97 ms
+     - 9.99 ms
+     - 0%     
+   * - Effect borefield configuration
+     - 1.57 ms
+     - 1.5 ms
+     - 4%
+
+
+
+
+.. literalinclude:: speed_improvement.py
+   :language: python
+   :linenos:
+

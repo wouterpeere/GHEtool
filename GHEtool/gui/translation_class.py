@@ -46,7 +46,6 @@ class Translations:
         "label_next",
         "label_previous",
         "hint_depth",
-        "option_show_legend",
         "function_save_results",
         "function_save_figure",
         "X_Axis",
@@ -145,36 +144,34 @@ class Translations:
         "button_rename_scenario",
         "label_Language_Head",
         "label_aim_question",
-        "comboBox_AimList",
-        "label_data_file",
+        "category_select_file",
         "label_Filename_2",
-        "label_dataColumn_2",
-        "label_HeatingLoadLine_2",
-        "label_CoolingLoadLine_2",
-        "label_combined_2",
-        "label_DataUnit_2",
-        "label_Scenario_Head",
-        "checkBox_AutoSaving",
-        "label_Scenario_Hint",
-        "label_Borehole_Resistance_Head",
-        "label_Rb_calculation_method",
-        "comboBox_Rb_methodList",
-        "label_fluid_data",
-        "label_fluid_lambda",
-        "label_fluid_mass_flow_rate",
-        "label_fluid_density",
-        "label_fluid_thermal_capacity",
-        "label_fluid_viscosity",
-        "label_pipe_data",
-        "label_NumberOfPipes",
-        "label_grout_conductivity",
-        "label_pipe_conductivity",
-        "label_pipe_outer_radius",
-        "label_pipe_inner_radius",
-        "label_borehole_radius",
-        "label_pipe_distance",
-        "label_pipe_roughness",
-        "label_borehole_burial_depth",
+        "category_th_demand",
+        "option_heating_column",
+        "option_cooling_column",
+        "option_single_column",
+        "option_unit_data",
+        "category_save_scenario",
+        "option_toggle_buttons",
+        "option_auto_saving",
+        "hint_saving",
+        "category_constant_rb",
+        "category_fluid_data",
+        "option_fluid_conductivity",
+        "option_fluid_mass_flow",
+        "option_fluid_density",
+        "option_fluid_capacity",
+        "option_fluid_viscosity",
+        "category_pipe_data",
+        "option_pipe_number",
+        "option_pipe_grout_conductivity",
+        "option_pipe_conductivity",
+        "option_pipe_outer_radius",
+        "option_pipe_inner_radius",
+        "option_pipe_borehole_radius",
+        "option_pipe_distance",
+        "option_pipe_roughness",
+        "option_pipe_depth",
         "label_ResOptimizeLoad1",
         "label_ResOptimizeLoad2",
         "label_ResOptimizeLoad3",
@@ -185,6 +182,37 @@ class Translations:
         "pushButton_start_single",
         "NotCalculated",
         "NoSolution",
+        "aim_temp_profile",
+        "aim_req_depth",
+        "aim_size_length",
+        "aim_optimize",
+        "category_calculation",
+        "option_method_size_depth",
+        "option_method_size_length",
+        "option_method_temp_gradient",
+        "option_method_rb_calc",
+        "category_earth",
+        "cat_no_result",
+        "text_no_result",
+        "numerical_results",
+        "result_text_depth",
+        "result_Rb_calculated",
+        "results_ground_temperature",
+        "results_heating_load",
+        "results_heating_load_percentage",
+        "results_heating_ext",
+        "results_heating_peak",
+        "results_cooling_load",
+        "results_cooling_load_percentage",
+        "results_cooling_ext",
+        "results_cooling_peak",
+        "max_temp",
+        "min_temp",
+        "figure_temperature_profile",
+        "legend_figure_temperature_profile",
+        "hourly_figure_temperature_profile",
+        "figure_load_duration",
+        "legend_figure_load_duration",
         "languages",
     )
 
@@ -252,7 +280,7 @@ class Translations:
         self.page_aim: List[str] = [
             "Aim,Aim of simulation",
             "Ziel,Ziel der Simulation",
-            "Aim,Aim of simulation",
+            "Doel,Doel van de simulatie",
             "Aim,Aim of simulation",
             "Aim,Aim of simulation",
             "Aim,Aim of simulation",
@@ -261,7 +289,7 @@ class Translations:
         self.page_borehole: List[str] = [
             "Borehole @and earth,Borehole and earth",
             "Bohrloch @und Erdreich,Bohrloch und Erdreich",
-            "Boorveld @ en grond,Boorveld en grond",
+            "Boorveld @en grond,Boorveld en grond",
             "Foro e @terra,Foro e terra",
             "Forage @et terre,Forage et terre",
             "Pozo @y terreno,Pozo y terreno",
@@ -297,7 +325,7 @@ class Translations:
         self.page_options: List[str] = [
             "Options,Options",
             "Optionen,Optionen",
-            "Options,Options",
+            "Opties,Opties",
             "Options,Options",
             "Options,Options",
             "Options,Options",
@@ -336,7 +364,7 @@ class Translations:
         self.option_spacing: List[str] = [
             "Borehole spacing [m]: ",
             "Bohrlochabstand [m]: ",
-            "Boorgatspatiring [m]: ",
+            "Boorgatspatiëring [m]: ",
             "Spaziatura del foro [m]: ",
             "Espacement des trous de forage [m]: ",
             "Espaciado entre pozos [m]: ",
@@ -408,7 +436,7 @@ class Translations:
         self.option_heat_capacity: List[str] = [
             "Ground volumetric heat capacity [kJ / m³ K]:",
             "Spezifische Wärmekapazität des Erdreiches [kJ / m³ K]:",
-            "Ground volumetric heat capacity [kJ / m³ K]:",
+            "Volumetrische warmtecapaciteit van de grond [kJ / m³ K]:",
             "Ground volumetric heat capacity [kJ / m³ K]:",
             "Ground volumetric heat capacity [kJ / m³ K]:",
             "Ground volumetric heat capacity [kJ / m³ K]:",
@@ -462,7 +490,7 @@ class Translations:
         self.option_temp_gradient: List[str] = [
             "Temperature gradient [K/100m]: ",
             "Temperaturgradient [K/100m]: ",
-            "Temperature gradient [K/100m]: ",
+            "Temperatuursgradiënt [K/100m]: ",
             "Temperature gradient [K/100m]: ",
             "Temperature gradient [K/100m]: ",
             "Temperature gradient [K/100m]: ",
@@ -478,13 +506,13 @@ class Translations:
             "Período de simulación [anos]: ",
         ]
         self.option_constant_rb: List[str] = [
-            "Equivalent borehole resistance [mK/W]: ",
+            "Equivalent borehole resistance (e.g. from TRT) [mK/W]: ",
             "Äquivalenter Bohrlochwiderstand [mK/W]: ",
             "Equivalente boorgatweerstand [mK/W]: ",
             "Resistenza equivalente del foro [mK/W]: ",
             "Résistance équivalente du trou de forage [mK/W]: ",
             "Resistencia del pozo equivalente [mK/W]: ",
-            "Resistencia do pozo equivalente [mK/W]: ",
+            "Resistencia do pozo equivalente [mK/W]:",
         ]
         self.label_next: List[str] = ["next", "nächstes", "volgende", "successivo", "suivant", "siguiente", "seguinte"]
         self.label_previous: List[str] = ["previous", "vorheriges", "vorige", "precedente", "précédente", "anterior", "anterior"]
@@ -496,15 +524,6 @@ class Translations:
             "Profondeur du trou de sonde: ",
             "Profundidad del pozo: ",
             "Profundidade do pozo: ",
-        ]
-        self.option_show_legend: List[str] = [
-            "Show legend?,yes,no",
-            "Legende zeigen?,Ja,Nein",
-            "Toon legende?,yes,no",
-            "Mostra la legenda?,yes,no",
-            "Afficher la légende?,yes,no",
-            "Mostrar leyenda?,yes,no",
-            "Mostrar lenda?,yes,no",
         ]
         self.function_save_results: List[str] = [
             "Save results",
@@ -537,7 +556,7 @@ class Translations:
         self.BaseCooling: List[str] = [
             "base cooling",
             "Grundkühlung",
-            "basisbelasting koeling",
+            "Basisbelasting koeling",
             "Base raffreddamento",
             "Base de refroidissement",
             "Base de refrigeración",
@@ -546,7 +565,7 @@ class Translations:
         self.BaseHeating: List[str] = [
             "base heating",
             "Grundheizung",
-            "basisbelasting verwarming",
+            "Basisbelasting verwarming",
             "Base riscaldamento",
             "Chauffage de base",
             "Base de calefacción",
@@ -555,7 +574,7 @@ class Translations:
         self.PeakCooling: List[str] = [
             "peak cooling",
             "Kühlspitzen",
-            "piekkoeling",
+            "Piekkoeling",
             "Picco raffreddamento",
             "Refroidissement maximal",
             "Pico de refrigeración",
@@ -564,7 +583,7 @@ class Translations:
         self.PeakHeating: List[str] = [
             "peak heating",
             "Heizspitzen",
-            "piekverwarming",
+            "Piekverwarming",
             "Picco di riscaldamento",
             "Pic de chauffage",
             "Pico de calefacción",
@@ -601,7 +620,7 @@ class Translations:
         self.hint_load_heating: List[str] = [
             "Heating load",
             "Heizlast",
-            "Belasting verwarming",
+            "Verwarmingslast",
             "Carico di riscaldamento",
             "Charge de chauffage",
             "Carga de calefacción",
@@ -610,7 +629,7 @@ class Translations:
         self.hint_load_cooling: List[str] = [
             "Cooling load",
             "Kühllast",
-            "Belasting koeling",
+            "Koellast",
             "Carico di raffreddamento",
             "Charge de refroidissement",
             "Carga de refrigeración",
@@ -677,7 +696,7 @@ class Translations:
         self.option_decimal_csv: List[str] = [
             "Decimal sign in CSV-file:,Point '.',Comma '++'",
             "Dezimalzeichen in CSV-Datei:,Punkt '.',Komma '++'",
-            "Decimaal teken in de CSV-file:,Punt '.',Komma '++'",
+            "Decimaalteken in de CSV-file:,Punt '.',Komma '++'",
             "Decimal sign in CSV-file:,Point '.',Comma '++'",
             "Decimal sign in CSV-file:,Point '.',Comma '++'",
             "Decimal sign in CSV-file:,Point '.',Comma '++'",
@@ -749,7 +768,7 @@ class Translations:
         self.option_column: List[str] = [
             "Thermal demand in one or two columns?:,1 column,2 columns",
             "Thermischer Bedarf einer oder zwei Spalten?:,1 Spalte,2 Spalten",
-            "Thermal demand in one or two columns?:,1 kolom,2 kolommen",
+            "Thermische vraag in één of twee kolommen?:,1 kolom,2 kolommen",
             "Thermal demand in one or two columns?:,1 colonna,2 colonne",
             "Thermal demand in one or two columns?;,1 colonne,2 colonnes",
             "Thermal demand in one or two columns?:,1 columna,2 columnas",
@@ -805,7 +824,7 @@ class Translations:
         self.ValueError: List[str] = [
             "Value error: check selected columns",
             "Wertefehler: ausgewählte Spalten prüfen",
-            "Value error: controleer geselecteerde kolommen",
+            "Waarde-error: controleer geselecteerde kolommen",
             "Errore di valore: controlla le colonne selezionate",
             "Erreur de valeur : vérifiez les colonnes sélectionnées",
             "Error de valor: compruebe las columnas seleccionadas",
@@ -814,7 +833,7 @@ class Translations:
         self.ColumnError: List[str] = [
             "Wrong column: check selected columns",
             "Falsche Spalte: ausgewählte Spalten prüfen",
-            "Wrong column: controleer geselecteerde kolommen",
+            "Foute kolom: controleer geselecteerde kolommen",
             "Colonna errata: controlla le colonne selezionate",
             "Colonne incorrecte : vérifiez les colonnes sélectionnées",
             "Columna incorrecta: compruebe las columnas seleccionadas",
@@ -1013,7 +1032,7 @@ class Translations:
         self.Y_Axis_Load_Q: List[str] = [
             "Remaining thermal energy [kWh]",
             "Übriggebliebene thermische Last [kWh]",
-            "Overblijvende energie energy [kWh]",
+            "Overblijvende thermische energie [kWh]",
             "Remaining thermal energy [kWh]",
             "Remaining thermal energy [kWh]",
             "Remaining thermal energy [kWh]",
@@ -1092,23 +1111,14 @@ class Translations:
             "What is the purpose of the simulation?",
             "What is the purpose of the simulation?",
         ]
-        self.comboBox_AimList: List[str] = [
-            "['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile']",
-            "['Bestimme Temperaturprofil', 'Bestimme notwendige Tiefe', 'Dimensioniere Bohrfeld nach Länge und Breite', 'Optimiere Lastprofil']",
-            "['Bepaal temperatuursprofiel', 'Bepaal de benodigde diepte', 'Dimensioneer boorveld bij lengte en breedte', 'Optimaliseer belastingsprofiel']",
-            "['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile']",
-            "['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile']",
-            "['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile']",
-            "['Determine temperature profile', 'Determine required depth', 'Size bore field by length and width', 'Optimize load profile']",
-        ]
-        self.label_data_file: List[str] = [
-            "Select data fileImport",
+        self.category_select_file: List[str] = [
+            "Select data file",
             "Wähle Datendatei",
             "Selecteer data fileImport",
-            "Select data fileImport",
-            "Select data fileImport",
-            "Select data fileImport",
-            "Select data fileImport",
+            "Select data file",
+            "Select data file",
+            "Select data file",
+            "Select data file",
         ]
         self.label_Filename_2: List[str] = [
             "Filename: ",
@@ -1119,16 +1129,16 @@ class Translations:
             "Nombre de archivo: ",
             "Nome de ficheiro: ",
         ]
-        self.label_dataColumn_2: List[str] = [
-            "Thermal demands: ",
-            "Thermische Lasten: ",
-            "Thermische vraag: ",
-            "Richieste termiche: ",
-            "Demande thermique: ",
-            "Cargas térmicas: ",
-            "Cargas térmicas: ",
+        self.category_th_demand: List[str] = [
+            "Thermal demands",
+            "Thermische Lasten",
+            "Thermische vraag",
+            "Richieste termiche",
+            "Demande thermique",
+            "Cargas térmicas",
+            "Cargas térmicas",
         ]
-        self.label_HeatingLoadLine_2: List[str] = [
+        self.option_heating_column: List[str] = [
             "Heating load line: ",
             "Heizlastspalte: ",
             "Belastingslijn verwarming: ",
@@ -1137,7 +1147,7 @@ class Translations:
             "Línea de carga de calefacción: ",
             "Liña de carga de calefacción: ",
         ]
-        self.label_CoolingLoadLine_2: List[str] = [
+        self.option_cooling_column: List[str] = [
             "Cooling load line: ",
             "Kühllastspalte: ",
             "Belastingslijn koeling: ",
@@ -1146,16 +1156,16 @@ class Translations:
             "Línea de carga de refrigeración: ",
             "Liña de carga de refrixeración: ",
         ]
-        self.label_combined_2: List[str] = [
+        self.option_single_column: List[str] = [
             "Load line: ",
-            "Load line: ",
+            "Lastspalte: ",
             "Belastingslijn: ",
             "Linea di carico: ",
             "Ligne de charge: ",
             "Línea de carga: ",
             "Liña de carga: ",
         ]
-        self.label_DataUnit_2: List[str] = [
+        self.option_unit_data: List[str] = [
             "Unit data: ",
             "Dateneinheit: ",
             "Eenheid data: ",
@@ -1164,25 +1174,34 @@ class Translations:
             "Datos de unidad: ",
             "Datos de unidade: ",
         ]
-        self.label_Scenario_Head: List[str] = [
-            "Scenario saving settings",
-            "Szenarioeinstellungen für das Speichern",
+        self.category_save_scenario: List[str] = [
+            "Scenario settings",
+            "Szenarioeinstellungen",
             "Instellingen opslaan scenario",
             "Scenario saving settings",
             "Scenario saving settings",
             "Scenario saving settings",
             "Scenario saving settings",
         ]
-        self.checkBox_AutoSaving: List[str] = [
-            "Automatic saving",
-            "Automatisches speichern",
-            "Automatisch opslaan",
-            "Automatic saving",
-            "Automatic saving",
-            "Automatic saving",
-            "Automatic saving",
+        self.option_toggle_buttons: List[str] = [
+            "Use toggle buttons?:, no , yes ",
+            "Umschalterbutton?:, Nein , Ja ",
+            "Toggle-gedrag?:, nee , ja",
+            "Toggle buttons?:, no , yes ",
+            "Toggle buttons?:, no , yes ",
+            "Toggle buttons?:, no , yes ",
+            "Toggle buttons?:, no , yes ",
         ]
-        self.label_Scenario_Hint: List[str] = [
+        self.option_auto_saving: List[str] = [
+            "Use automatic saving?, no , yes ",
+            "Automatisches speichern nutzen?, Nein, Ja ",
+            "Automatisch opslaan, ne , ja ",
+            "Automatic saving, no , yes ",
+            "Automatic saving, no , yes ",
+            "Automatic saving, no , yes ",
+            "Automatic saving, no , yes ",
+        ]
+        self.hint_saving: List[str] = [
             "If Auto saving is selected the scenario will automatically saved if a scenario is changed. Otherwise the scenario has to be saved with the Update scenario button in the upper left corner if the changes should not be lost.",
             "Wenn Automatisch speichern ausgewählt ist, wird das Szenario automatisch gespeichert, wenn ein Szenario geändert wird. Andernfalls muss das Szenario mit der Schaltfläche Szenario aktualisieren in der oberen linken Ecke gespeichert werden, wenn die Änderungen nicht verloren gehen sollen.",
             'Als auto-opslaan is geselecteerd, zal het scenario automatisch worden opgeslagen alshet wordt gewijzigd. Anders kan het scenario opgeslagen worden als op de "update scenario"-kopwordt gedrukt als deze niet verloren mogen gaan.',
@@ -1191,35 +1210,17 @@ class Translations:
             "If Auto saving is selected the scenario will automatically saved if a scenario is changed. Otherwise the scenario has to be saved with the Update scenario button in the upper left corner if the changes should not be lost.",
             "If Auto saving is selected the scenario will automatically saved if a scenario is changed. Otherwise the scenario has to be saved with the Update scenario button in the upper left corner if the changes should not be lost.",
         ]
-        self.label_Borehole_Resistance_Head: List[str] = [
-            "Equivalent borehole resistance",
-            "Equivalänter Bohrlochwiderstand",
+        self.category_constant_rb: List[str] = [
+            "Constant equivalent borehole resistance",
+            "Konstanter equivalänter Bohrlochwiderstand",
             "Equivalente boorgatweerstand",
             "Equivalent borehole resistance",
             "Equivalent borehole resistance",
             "Equivalent borehole resistance",
             "Equivalent borehole resistance",
         ]
-        self.label_Rb_calculation_method: List[str] = [
-            "Calculation method:",
-            "Berechnungsmethode:",
-            "Berekeningsmethode:",
-            "Calculation method:",
-            "Calculation method:",
-            "Calculation method:",
-            "Calculation method:",
-        ]
-        self.comboBox_Rb_methodList: List[str] = [
-            "['Known constant value', 'Unknown constant value', 'During calculation updating value']",
-            "['Bekannter konstanter Wert', 'Unbekannter konstanter Wert', 'Während der Berechnung aktualisierender Wert']",
-            "['Constante waarde (gegeven)', 'Constante waarde (berekend)', 'Dynamische waarde']",
-            "['Known constant value', 'Unknown constant value', 'During calculation updating value']",
-            "['Known constant value', 'Unknown constant value', 'During calculation updating value']",
-            "['Known constant value', 'Unknown constant value', 'During calculation updating value']",
-            "['Known constant value', 'Unknown constant value', 'During calculation updating value']",
-        ]
-        self.label_fluid_data: List[str] = ["Fluid data", "Fluiddaten", "Fluidumdata", "Fluid data", "Fluid data", "Fluid data", "Fluid data"]
-        self.label_fluid_lambda: List[str] = [
+        self.category_fluid_data: List[str] = ["Fluid data", "Fluiddaten", "Fluidumdata", "Fluid data", "Fluid data", "Fluid data", "Fluid data"]
+        self.option_fluid_conductivity: List[str] = [
             "Thermal conductivity [W/mK]: ",
             "Wärmeleitfähigkeit [W/mK]: ",
             "Thermische conductiviteit [W/mK]: ",
@@ -1228,7 +1229,7 @@ class Translations:
             "Thermal conductivity [W/mK]: ",
             "Thermal conductivity [W/mK]: ",
         ]
-        self.label_fluid_mass_flow_rate: List[str] = [
+        self.option_fluid_mass_flow: List[str] = [
             "Mass flow rate [kg/s]: ",
             "Massenstrom [kg/s]: ",
             "Massadebiet [kg/s]: ",
@@ -1237,7 +1238,7 @@ class Translations:
             "Mass flow rate [kg/s]: ",
             "Mass flow rate [kg/s]: ",
         ]
-        self.label_fluid_density: List[str] = [
+        self.option_fluid_density: List[str] = [
             "Density [kg/m³]:",
             "Dichte [kg/m³]:",
             "Dichtheid [kg/m³]:",
@@ -1246,16 +1247,16 @@ class Translations:
             "Density [kg/m³]:",
             "Density [kg/m³]:",
         ]
-        self.label_fluid_thermal_capacity: List[str] = [
+        self.option_fluid_capacity: List[str] = [
             "Thermal capacity [J/kg K]:",
             "Wärmekapazität [J/kg K]:",
-            "Thermalisch warmtecapaciteit [J/kg K]:",
+            "Thermisch warmtecapaciteit [J/kg K]:",
             "Thermal capacity [J/kg K]:",
             "Thermal capacity [J/kg K]:",
             "Thermal capacity [J/kg K]:",
             "Thermal capacity [J/kg K]:",
         ]
-        self.label_fluid_viscosity: List[str] = [
+        self.option_fluid_viscosity: List[str] = [
             "Dynamic viscosity [Pa s]:",
             "Dynamische Viskosität [Pa s]:",
             "Dynamische viscositeit [Pa s]:",
@@ -1264,8 +1265,8 @@ class Translations:
             "Dynamic viscosity [Pa s]:",
             "Dynamic viscosity [Pa s]:",
         ]
-        self.label_pipe_data: List[str] = ["Pipe data", "Rohrdaten", "Boorgatdata", "Pipe data", "Pipe data", "Pipe data", "Pipe data"]
-        self.label_NumberOfPipes: List[str] = [
+        self.category_pipe_data: List[str] = ["Pipe data", "Rohrdaten", "Boorgatdata", "Pipe data", "Pipe data", "Pipe data", "Pipe data"]
+        self.option_pipe_number: List[str] = [
             "Number of pipes [#]:",
             "Anzahl an Rohren [#]:",
             "Aantal U-buizen [#]:",
@@ -1274,7 +1275,7 @@ class Translations:
             "Number of pipes [#]:",
             "Number of pipes [#]:",
         ]
-        self.label_grout_conductivity: List[str] = [
+        self.option_pipe_grout_conductivity: List[str] = [
             "Grout thermal conductivity [W/mK]: ",
             "Wärmeleitfähigkeit der Füllung [W/mK]: ",
             "Thermische conductiviteit van de vulling [W/mK]: ",
@@ -1283,7 +1284,7 @@ class Translations:
             "Grout thermal conductivity [W/mK]: ",
             "Grout thermal conductivity [W/mK]: ",
         ]
-        self.label_pipe_conductivity: List[str] = [
+        self.option_pipe_conductivity: List[str] = [
             "Pipe thermal conductivity [W/mK]: ",
             "Wärmeleitfähigkeit der Rohre [W/mK]: ",
             "Thermische conductiviteit van de leiding [W/mK]: ",
@@ -1292,7 +1293,7 @@ class Translations:
             "Pipe thermal conductivity [W/mK]: ",
             "Pipe thermal conductivity [W/mK]: ",
         ]
-        self.label_pipe_outer_radius: List[str] = [
+        self.option_pipe_outer_radius: List[str] = [
             "Outer pipe radius [m]: ",
             "Äußerer Rohrradius [m]: ",
             "Straal buitenkant leiding [m]: ",
@@ -1301,7 +1302,7 @@ class Translations:
             "Outer pipe radius [m]: ",
             "Outer pipe radius [m]: ",
         ]
-        self.label_pipe_inner_radius: List[str] = [
+        self.option_pipe_inner_radius: List[str] = [
             "Inner pipe radius [m]: ",
             "Innerer Rohrradius [m]: ",
             "Straal binnenkant leiding [m]: ",
@@ -1310,7 +1311,7 @@ class Translations:
             "Inner pipe radius [m]: ",
             "Inner pipe radius [m]: ",
         ]
-        self.label_borehole_radius: List[str] = [
+        self.option_pipe_borehole_radius: List[str] = [
             "Borehole radius [m]:",
             "Bohrlochradius [m]:",
             "Boorgatstraal [m]:",
@@ -1319,7 +1320,7 @@ class Translations:
             "Borehole radius [m]:",
             "Borehole radius [m]:",
         ]
-        self.label_pipe_distance: List[str] = [
+        self.option_pipe_distance: List[str] = [
             "Distance of pipe until center [m]:",
             "Distanz zwischen Rohr und Mittelpunkt [m]:",
             "Afstand van de leiding tot het centrum van het boorgat [m]:",
@@ -1328,7 +1329,7 @@ class Translations:
             "Distance of pipe until center [m]:",
             "Distance of pipe until center [m]:",
         ]
-        self.label_pipe_roughness: List[str] = [
+        self.option_pipe_roughness: List[str] = [
             "Pipe roughness [m]:",
             "Rohrrauhigkeit [m]:",
             "Ruwheid leiding [m]:",
@@ -1337,7 +1338,7 @@ class Translations:
             "Pipe roughness [m]:",
             "Pipe roughness [m]:",
         ]
-        self.label_borehole_burial_depth: List[str] = [
+        self.option_pipe_depth: List[str] = [
             "Burial depth [m]:",
             "Vergrabungstiefe [m]:",
             "Begraven diepte [m]:",
@@ -1427,4 +1428,267 @@ class Translations:
             "No Solution found",
             "No Solution found",
             "No Solution found",
+        ]
+        self.aim_temp_profile: List[str] = [
+            "Determine temperature profile",
+            "Temperaturprofil berechnen",
+            "Bepaal temperatuursprofiel",
+            "Determine temperature profile",
+            "Determine temperature profile",
+            "Determine temperature profile",
+            "Determine temperature profile",
+        ]
+        self.aim_req_depth: List[str] = [
+            "Determine required depth",
+            "Notwendige Tiefe berechnen",
+            "Bereken benodigde diepte",
+            "Determine required depth",
+            "Determine required depth",
+            "Determine required depth",
+            "Determine required depth",
+        ]
+        self.aim_size_length: List[str] = [
+            "Size by length and width",
+            "Bestimme Länge und Breite des Bohrfeldes",
+            "Dimensioneer bij breedte en lengte",
+            "Size by length and width",
+            "Size by length and width",
+            "Size by length and width",
+            "Size by length and width",
+        ]
+        self.aim_optimize: List[str] = [
+            "Optimize load profile",
+            "Optimiere Lastprofil",
+            "Optimaliseer belanstingsprofiel",
+            "Optimize load profile",
+            "Optimize load profile",
+            "Optimize load profile",
+            "Optimize load profile",
+        ]
+        self.category_calculation: List[str] = [
+            "Calculation options",
+            "Berechnungsoptionen",
+            "Berekeningsopties",
+            "Calculation options",
+            "Calculation options",
+            "Calculation options",
+            "Calculation options",
+        ]
+        self.option_method_size_depth: List[str] = [
+            "Method for size borehole depth:,  L2  ,  L3  ,  L4  ",
+            "Methode zur Bohrlochtiefendimensionierung:,  L2  ,  L3  ,  L4  ",
+            "Methode voor boorvelddimensionering:,  L2  ,  L3  ,  L4  ",
+            "Method for size borehole depth:,  L2  ,  L3  ,  L4  ",
+            "Method for size borehole depth:,  L2  ,  L3  ,  L4  ",
+            "Method for size borehole depth:,  L2  ,  L3  ,  L4  ",
+            "Method for size borehole depth:,  L2  ,  L3  ,  L4  ",
+        ]
+        self.option_method_size_length: List[str] = [
+            "Method for size width and length:,  L2  ,  L3  ",
+            "Methode für Längen- und Breitendimensionierung:,  L2  ,  L3  ",
+            "Methode voor boorvelddimensionering:,  L2  ,  L3  ",
+            "Method for size width and length:,  L2  ,  L3  ",
+            "Method for size width and length:,  L2  ,  L3  ",
+            "Method for size width and length:,  L2  ,  L3  ",
+            "Method for size width and length:,  L2  ,  L3  ",
+        ]
+        self.option_method_temp_gradient: List[str] = [
+            "Should a temperature gradient over depth be considered?:, no , yes ",
+            "Soll ein Temperaturgradient berücksichtigt werden?:, Nein , Ja ",
+            "Moet een temperatuursgradiënt in rekening worden gebracht?:, nee , ja ",
+            "Should a temperature gradient over depth be considered?:, no , yes ",
+            "Should a temperature gradient over depth be considered?:, no , yes ",
+            "Should a temperature gradient over depth be considered?:, no , yes ",
+            "Should a temperature gradient over depth be considered?:, no , yes ",
+        ]
+        self.option_method_rb_calc: List[str] = [
+            "Borehole resistance calculation method:, constant , dynamic ",
+            "Mehtode zur Bohrlochwiderstangsberechnung:, Konstant , Dynamisch ",
+            "Berekeningsmethode boorgatweerstand:, constant , dynamisch ",
+            "Borehole resistance calculation method:, constant , dynamic ",
+            "Borehole resistance calculation method:, constant , dynamic ",
+            "Borehole resistance calculation method:, constant , dynamic ",
+            "Borehole resistance calculation method:, constant , dynamic ",
+        ]
+        self.category_earth: List[str] = [
+            "Earth properties",
+            "Erdeigenschaften",
+            "Grondeigenschappen",
+            "Earth properties",
+            "Earth properties",
+            "Earth properties",
+            "Earth properties",
+        ]
+        self.cat_no_result: List[str] = ["No results", "Keine Ergebnisse", "Geen resultaten", "No results", "No results", "No results", "No results"]
+        self.text_no_result: List[str] = [
+            "No results are yet calculated",
+            "Es wurden noch keine Ergebnisse berechnet",
+            "Er zijn nog geen resultaten berekend",
+            "No results are yet calculated",
+            "No results are yet calculated",
+            "No results are yet calculated",
+            "No results are yet calculated",
+        ]
+        self.numerical_results: List[str] = [
+            "Numerical results",
+            "Numerische Ergebnisse",
+            "Numerische resultaten",
+            "Numerical results",
+            "Numerical results",
+            "Numerical results",
+            "Numerical results",
+        ]
+        self.result_text_depth: List[str] = ["Depth: , m", "Tiefe: , m", "Diepte: , m", "Depth: , m", "Depth: , m", "Depth: , m", "Depth: , m"]
+        self.result_Rb_calculated: List[str] = [
+            "Equivalent borehole thermal resistance: , mK/W",
+            "Äquivalenter thermischer Bohrlochwiderstand: , mK/W",
+            "Equivalente boorgatweerstand: , mK/W",
+            "Equivalent borehole thermal resistance: , mK/W",
+            "Equivalent borehole thermal resistance: , mK/W",
+            "Equivalent borehole thermal resistance: , mK/W",
+            "Equivalent borehole thermal resistance: , mK/W",
+        ]
+        self.results_ground_temperature: List[str] = [
+            "Average ground temperature: , °C",
+            "Durchschnittliche Erdreichtemperatur , °C",
+            "Gemiddelde grondtemperatuur: , °C",
+            "Average ground temperature: , °C",
+            "Average ground temperature: , °C",
+            "Average ground temperature: , °C",
+            "Average ground temperature: , °C",
+        ]
+        self.results_heating_load: List[str] = [
+            "Heating load on the borefield: , kWh",
+            "Die Heizlast für das Bohrfeld beträgt: , kWh",
+            "Verwarmingsvraag op het boorveld: , kWh",
+            "Heating load on the borefield: , kWh",
+            "Heating load on the borefield: , kWh",
+            "Heating load on the borefield: , kWh",
+            "Heating load on the borefield: , kWh",
+        ]
+        self.results_heating_load_percentage: List[str] = [
+            "This is , % of the heating load",
+            "Das sind , % der Heizlast",
+            "Dit is , % van de verwarmingsvraag",
+            "This is , % of the heating load",
+            "This is , % of the heating load",
+            "This is , % of the heating load",
+            "This is , % of the heating load",
+        ]
+        self.results_heating_ext: List[str] = [
+            "Heating load external: , kWh",
+            "Die externe Heizlast beträgt: , kWh",
+            "Verwarmingsvraag extern: , kWh",
+            "Heating load external: , kWh",
+            "Heating load external: , kWh",
+            "Heating load external: , kWh",
+            "Heating load external: , kWh",
+        ]
+        self.results_heating_peak: List[str] = [
+            "with a peak of: , kW",
+            "mit einer Spitzenlast von , kW",
+            "met een piek van: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+        ]
+        self.results_cooling_load: List[str] = [
+            "Cooling load on the borefield: , kWh",
+            "Die Kühllast für das Bohrfeld beträgt: , kWh",
+            "Koelvraag op het boorveld: , kWh",
+            "Cooling load on the borefield: , kWh",
+            "Cooling load on the borefield: , kWh",
+            "Cooling load on the borefield: , kWh",
+            "Cooling load on the borefield: , kWh",
+        ]
+        self.results_cooling_load_percentage: List[str] = [
+            "This is , % of the cooling load",
+            "Das sind , % der Kühllast",
+            "Dit is , % van de koelvraag",
+            "This is , % of the cooling load",
+            "This is , % of the cooling load",
+            "This is , % of the cooling load",
+            "This is , % of the cooling load",
+        ]
+        self.results_cooling_ext: List[str] = [
+            "Cooling load external: , kWh",
+            "Die externe Kühllast beträgt: , kWh",
+            "Koelvraag extern: , kWh",
+            "Cooling load external: , kWh",
+            "Cooling load external: , kWh",
+            "Cooling load external: , kWh",
+            "Cooling load external: , kWh",
+        ]
+        self.results_cooling_peak: List[str] = [
+            "with a peak of: , kW",
+            "mit einer Spitzenlast von , kW",
+            "met een piek van: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+        ]
+        self.max_temp: List[str] = [
+            "The maximum average fluid temperature is , °C",
+            "Die maximale Fluidtemperatur ist , °C",
+            "De maximaal gemiddelde fluïdumtemperatuur is , °C",
+            "The maximum average fluid temperature is , °C",
+            "The maximum average fluid temperature is , °C",
+            "The maximum average fluid temperature is , °C",
+            "The maximum average fluid temperature is , °C",
+        ]
+        self.min_temp: List[str] = [
+            "The minimal average fluid temperature is , °C",
+            "Die minimale Fluidtemperatur ist , °C",
+            "De minimaal gemiddelde fluïdumtemperatuur is , °C",
+            "The minimal average fluid temperature is , °C",
+            "The minimal average fluid temperature is , °C",
+            "The minimal average fluid temperature is , °C",
+            "The minimal average fluid temperature is , °C",
+        ]
+        self.figure_temperature_profile: List[str] = [
+            "Temperature evolution, Temperature [°C], Time [years]",
+            "Temperaturverlauf, Temperatur [°C], Zeit [Jahren]",
+            "Temperatuurevolutie, Temperatuur [°C], Tijd [jaren]",
+            "Temperature evolution, Temperature [°C], Time [years]",
+            "Temperature evolution, Temperature [°C], Time [years]",
+            "Temperature evolution, Temperature [°C], Time [years]",
+            "Temperature evolution, Temperature [°C], Time [years]",
+        ]
+        self.legend_figure_temperature_profile: List[str] = [
+            "Show legend?, No , Yes ",
+            "Legende zeigen?, Nein , Ja ",
+            "Toon legende?, ne , ja ",
+            "Mostra la legenda?, no , yes ",
+            "Afficher la légende?, no , yes ",
+            "Mostrar leyenda?, no , yes ",
+            "Mostrar lenda?, no , yes ",
+        ]
+        self.hourly_figure_temperature_profile: List[str] = [
+            "Hourly profile, No , Yes ",
+            "Stündliches Profil, Nein , Ja ",
+            "Uurlijks profiel, ne , ja ",
+            "Hourly profile, no , yes ",
+            "Hourly profile, no , yes ",
+            "Hourly profile, no , yes ",
+            "Hourly profile, no , yes ",
+        ]
+        self.figure_load_duration: List[str] = [
+            "Load-duration curve, Power [kW], Time [hours]",
+            "Jahresdauerlinie, Leistung [kW], Zeit [Stunden]",
+            "Belastings-duurcurve, Power [kW], Time [hours]",
+            "Load-duration curve, Power [kW], Time [hours]",
+            "Load-duration curve, Power [kW], Time [hours]",
+            "Load-duration curve, Power [kW], Time [hours]",
+            "Load-duration curve, Power [kW], Time [hours]",
+        ]
+        self.legend_figure_load_duration: List[str] = [
+            "Show legend?, No , Yes ",
+            "Legende zeigen?, Nein , Ja ",
+            "Toon legende?, ne , ja ",
+            "Mostra la legenda?, no , yes ",
+            "Afficher la légende?, no , yes ",
+            "Mostrar leyenda?, no , yes ",
+            "Mostrar lenda?, no , yes ",
         ]

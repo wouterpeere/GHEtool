@@ -73,8 +73,8 @@ def check_cases():
     NOTE: these values differ slightly from the values in the mentioned paper. This is due to the fact that GHEtool uses slightly different precalculated data.
     """
 
-    correct_answers_L2 = (56.64, 116.7, 66.97, 93.10)
-    correct_answers_L3 = (56.6, 118.17, 66.56, 93.22)
+    correct_answers_L2 = (56.75, 117.23, 66.94, 91.32)
+    correct_answers_L3 = (56.77, 118.74, 66.47, 91.34)
 
     for i in (1, 2, 3, 4):
         monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(i)
@@ -95,12 +95,12 @@ def check_cases():
         borefield.size(100, L2_sizing=True)
         print(f'correct answer L2: {correct_answers_L2[i-1]}; calculated answer L2: {round(borefield.H,2)}; error: '
               f'{round(abs(1 - borefield.H / correct_answers_L2[i - 1]) * 100, 4)} %')
-        assert round(borefield.H, 2) == correct_answers_L2[i-1]
+        assert np.isclose(borefield.H, correct_answers_L2[i-1], rtol=0.001)
 
         borefield.size(100, L3_sizing=True)
         print(f'correct answer L3: {correct_answers_L3[i - 1]}; calculated answer L3: {round(borefield.H, 2)}; error: '
               f'{round(abs(1 - borefield.H / correct_answers_L3[i - 1]) * 100, 4)} %')
-        assert round(borefield.H, 2) == correct_answers_L3[i - 1]
+        assert np.isclose(borefield.H, correct_answers_L3[i-1], rtol=0.001)
 
 
 def check_custom_datafile():
@@ -111,7 +111,7 @@ def check_custom_datafile():
 
     # create custom datafile
 
-    correct_answers = (56.64, 116.7, 66.97, 93.1)
+    correct_answers = (56.75, 117.23, 66.94, 91.32)
     li = [i for i in range(0, 12)]
     borefield = Borefield(simulation_period=20,
                           peak_heating=li,
@@ -146,24 +146,26 @@ def check_custom_datafile():
         assert abs(1-borefield.H/correct_answers[i - 1]) <= 0.002
 
 
-check_cases()  # check different cases
-check_custom_datafile()  # check if the custom datafile is correct
+if __name__ == "__main__":   # pragma: no cover
 
-monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(1)  # load case 1
+    check_cases()  # check different cases
+    check_custom_datafile()  # check if the custom datafile is correct
 
-borefield = Borefield(simulation_period=20,
-                      peak_heating=peak_heating,
-                      peak_cooling=peak_cooling,
-                      baseload_heating=monthly_load_heating,
-                      baseload_cooling=monthly_load_cooling)
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(1)  # load case 1
 
-borefield.set_ground_parameters(data)
-borefield.set_borefield(borefield_gt)
+    borefield = Borefield(simulation_period=20,
+                          peak_heating=peak_heating,
+                          peak_cooling=peak_cooling,
+                          baseload_heating=monthly_load_heating,
+                          baseload_cooling=monthly_load_cooling)
 
-# set temperature boundaries
-borefield.set_max_ground_temperature(16)  # maximum temperature
-borefield.set_min_ground_temperature(0)  # minimum temperature
+    borefield.set_ground_parameters(data)
+    borefield.set_borefield(borefield_gt)
 
-borefield.size(100)
-print(borefield.H)
-borefield.print_temperature_profile()
+    # set temperature boundaries
+    borefield.set_max_ground_temperature(16)  # maximum temperature
+    borefield.set_min_ground_temperature(0)  # minimum temperature
+
+    borefield.size(100)
+    print(borefield.H)
+    borefield.print_temperature_profile()

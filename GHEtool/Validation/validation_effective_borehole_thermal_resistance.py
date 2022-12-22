@@ -1,3 +1,9 @@
+"""
+This document contains the code to compare the equivalent borehole thermal resistance calculated with GHEtool
+(based on pygfunction) with the results from Earth Energy Designer. The differences can be explained by using other
+correlations and another assumption for the Nusselt number in the laminar regime.
+"""
+
 import math
 
 import matplotlib.pyplot as plt

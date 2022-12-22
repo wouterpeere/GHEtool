@@ -1,3 +1,8 @@
+"""
+This document contains some base functionality for the GUI.
+It contains a function to reformat the graphs to a layout for the gui,
+and it contains the main class that creates the framework for the GUI (top bar etc.)
+"""
 from PySide6.QtCore import QMetaObject, QRect, QSize, Qt
 from PySide6.QtGui import QAction, QFont, QIcon
 from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QFrame,
@@ -18,7 +23,14 @@ WARNING: str = "rgb(255, 200, 87)"
 BLACK: str = "rgb(0, 0, 0)"
 
 
-def set_graph_layout():
+def set_graph_layout() -> None:
+    """
+    This function sets the graph layout to the correct format when the GUI is used.
+
+    Returns
+    -------
+    None
+    """
     from matplotlib.colors import to_rgb
     from numpy import array, float64
     import matplotlib.pyplot as plt
@@ -35,10 +47,16 @@ def set_graph_layout():
     plt.rcParams["ytick.color"] = white_color
 
     plt.rc('figure')
+    plt.rc('axes', edgecolor=white_color)
     plt.rcParams['figure.facecolor'] = background_color
 
 
 class UiGhetool:
+    """
+    This class contains the framework of the GUI, with the top bar,
+    the scenario/run/ ... buttons and the shortcuts.
+    """
+
     menuLanguage: QMenu
     status_bar: QStatusBar
     toolBar: QToolBar
@@ -107,6 +125,13 @@ class UiGhetool:
             f"QLineEdit{'{'}border: 3px solid {LIGHT};border-radius: 5px;color: {WHITE};gridline-color: {LIGHT};background-color: {LIGHT};font-weight:500;\n"
             f"selection-background-color: {LIGHT_SELECT};{'}'}\n"
             f"QLineEdit:hover{'{'}background-color: {DARK};{'}'}"
+            f"QToolTip{'{'}color: {WHITE}; background-color: {DARK}; border: 1px solid {LIGHT};border-radius: 4px;{'}'}"
+            f"QTabBar::tab{'{'}background-color: {DARK};padding-top:5px;padding-bottom:5px;padding-left:5px;padding-right:5px;color: {WHITE};{'}'}"
+            f"QTabBar::tab:selected, QTabBar::tab:hover{'{'}background-color: {LIGHT};{'}'}"
+            f"QTabBar::tab:selected{'{'}background-color: {LIGHT};{'}'}"
+            f"QTabBar::tab:!selected{'{'}background-color:  {DARK};{'}'}"
+            f"QTabWidget::pane{'{'}border: 1px solid {WHITE};{'}'}"
+            f"QTabWidget::tab-bar{'{'}left: 5px;{'}'}"
         )
         self.actionNew = QAction(ghe_tool)
         self.actionNew.setObjectName("actionNew")
