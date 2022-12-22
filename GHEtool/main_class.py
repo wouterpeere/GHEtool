@@ -31,10 +31,10 @@ class Borefield:
 
     HOURLY_LOAD_ARRAY: np.ndarray = np.arange(0, 8761, 730).astype(np.uint32)
 
-    __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'H_init', 'Rb', 'ty', 'tm', \
-                'td', 'time', 'hourly_heating_load', 'flux', 'volumetric_heat_capacity',\
+    __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'H_init', 'Rb', 'ty', 'tm', 'length_peak', \
+                'hourly_heating_load', 'flux', 'volumetric_heat_capacity', 'length_peak_cooling',\
                 'hourly_cooling_load', 'number_of_boreholes', '_borefield', 'custom_gfunction', 'cost_investment', \
-                'length_peak', 'th', 'Tf_max', 'Tf_min', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
+                'length_peak_heating', 'th', 'Tf_max', 'Tf_min', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
                 'monthly_load_cooling', 'peak_heating', 'imbalance', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm', \
                 'peak_cooling', 'simulation_period', 'fluid_data_available', 'ground_data', 'pipe_data', 'fluid_data',\
                 'results_peak_heating', 'pipe_data_available', 'time_L4', 'options_pygfunction',\
@@ -162,10 +162,10 @@ class Borefield:
         # initiate time variables
         self.ty: float = 0.  # yearly time value
         self.tm: float = 0.  # monthly time value
-        self.td: float = 0.  # daily time value
         self.th: float = 0.  # duration of peak in seconds
-        self.length_peak: float = 0.  # duration of the peak in hours
-        self.time = np.array([])  # list of time values
+        self.length_peak: float = Borefield.DEFAULT_LENGTH_PEAK
+        self.length_peak_cooling: float = Borefield.DEFAULT_LENGTH_PEAK
+        self.length_peak_heating: float = Borefield.DEFAULT_LENGTH_PEAK
         self.tcm: float = 0.  # time constant for first year sizing
         self.tpm: float = 0.  # time constant for first year sizing
         self.time_L3_last_year = np.array([])  # list with time values for L3 sizing
@@ -423,14 +423,46 @@ class Borefield:
         Parameters
         ----------
         length : float
-            Length of the peak (in seconds)
+            Length of the peak [hours]
 
         Returns
-        _______
+        -------
         None
         """
-        self.length_peak: float = length
+        self.set_length_peak_heating(length)
+        self.set_length_peak_cooling(length)
+        self.length_peak = length
         self._set_time_constants()
+
+    def set_length_peak_heating(self, length: float = DEFAULT_LENGTH_PEAK) -> None:
+        """
+        This function sets the length of the heating peak.
+
+        Parameters
+        ----------
+        length : float
+            Length of the peak [hours]
+
+        Returns
+        -------
+        None
+        """
+        self.length_peak_heating = length
+
+    def set_length_peak_cooling(self, length: float = DEFAULT_LENGTH_PEAK) -> None:
+        """
+        This function sets the length of the cooling peak.
+
+        Parameters
+        ----------
+        length : float
+            Length of the peak [hours]
+
+        Returns
+        -------
+        None
+        """
+        self.length_peak_cooling = length
 
     def set_simulation_period(self, simulation_period: int) -> None:
         """
@@ -452,6 +484,11 @@ class Borefield:
         """
         This function calculates and sets the time constants for the L2 and L3 sizing.
 
+        Parameters
+        ----------
+        length_peak : float
+            Length of the peak [hours]
+
         Returns
         -------
         None
@@ -460,8 +497,6 @@ class Borefield:
         self.th: float = self.length_peak * 3600.  # length of peak in seconds
         self.ty: float = self.simulation_period * 8760. * 3600
         self.tm: float = Borefield.UPM * 3600.
-        self.td: float = self.length_peak * 3600.
-        self.time = np.array([self.td, self.td + self.tm, self.ty + self.tm + self.td])
 
         # set the time array for the L3 sizing
         # This is one time for every month in the whole simulation period
@@ -668,11 +703,13 @@ class Borefield:
         H_prev = 0
         # set minimal depth to 50 m
         self.H = 50 if self.H < 1 else self.H
+
+        time = np.array([self.th, self.th + self.tm, self.ty + self.tm + self.th])
         # Iterates as long as there is no convergence
         # (convergence if difference between depth in iterations is smaller than THRESHOLD_BOREHOLE_DEPTH)
         while abs(self.H - H_prev) >= Borefield.THRESHOLD_BOREHOLE_DEPTH:
             # calculate the required g-function values
-            gfunct_uniform_T = self.gfunction(self.time, self.H)
+            gfunct_uniform_T = self.gfunction(time, self.H)
             # calculate the thermal resistances
             Ra = (gfunct_uniform_T[2] - gfunct_uniform_T[1]) / (2 * pi * self.ground_data.k_s)
             Rm = (gfunct_uniform_T[1] - gfunct_uniform_T[0]) / (2 * pi * self.ground_data.k_s)
@@ -1108,14 +1145,13 @@ class Borefield:
                 g_values = self.gfunction(self.time_L3_last_year, self.H)
 
                 # the g-function value of the peak with length_peak hours
-                g_value_peak = self.gfunction(self.length_peak * 3600., self.H)
+                g_value_peak_heating = self.gfunction(self.length_peak_heating * 3600., self.H)[0]
+                g_value_peak_cooling = self.gfunction(self.length_peak_cooling * 3600., self.H)[0]
 
                 # calculation of needed differences of the g-function values. These are the weight factors in
                 # the calculation of Tb.
                 g_value_differences = np.diff(g_values, prepend=0)
 
-                # convolution to get the monthly results
-                # convolution to get the monthly results
                 # convolution to get the monthly results
                 results[:12] = convolve(loads_short * 1000, g_value_differences[:12])[:12]
 
@@ -1141,9 +1177,9 @@ class Borefield:
                 # extra summation if the g-function value for the peak is included
                 results_peak_cooling = results_month_cooling +\
                                        np.tile(self.peak_cooling - self.monthly_load_cooling, 2) * 1000 *\
-                                       (g_value_peak[0] / self.ground_data.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / self.H
+                                       (g_value_peak_cooling / self.ground_data.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / self.H
                 results_peak_heating = results_month_heating - np.tile(self.peak_heating - self.monthly_load_heating, 2) * 1000 \
-                                       * (g_value_peak[0] / self.ground_data.k_s / 2 / pi + self.Rb)\
+                                       * (g_value_peak_heating / self.ground_data.k_s / 2 / pi + self.Rb)\
                                        / self.number_of_boreholes / self.H
 
                 # save temperatures under variable
@@ -1289,6 +1325,9 @@ class Borefield:
         if HC:
             # limited by extraction load
 
+            # set length peak
+            self.th = 3600. * self.length_peak_heating
+
             # temperature limit is set to the minimum temperature
             self.Tf = self.Tf_min
 
@@ -1303,6 +1342,9 @@ class Borefield:
 
         else:
             # limited by injection load
+
+            # set length peak
+            self.th = 3600. * self.length_peak_cooling
 
             # temperature limit set to maximum temperature
             self.Tf = self.Tf_max
@@ -1333,6 +1375,9 @@ class Borefield:
         if HC:
             # limited by extraction load
 
+            # set peak length
+            self.th = 3600. * self.length_peak_heating
+
             # temperature limit is set to the minimum temperature
             self.Tf = self.Tf_min
 
@@ -1350,6 +1395,9 @@ class Borefield:
             self.qm = -self.qm
         else:
             # limited by injection
+
+            # set peak length
+            self.th = 3600. * self.length_peak_cooling
 
             # temperature limit set to maximum temperature
             self.Tf = self.Tf_max
@@ -1567,7 +1615,8 @@ class Borefield:
             g_values = self.gfunction(self.time_L3_last_year, H)
 
             # the g-function value of the peak with length_peak hours
-            g_value_peak = self.gfunction(self.length_peak * 3600., H)
+            g_value_peak_cooling = self.gfunction(self.length_peak_cooling * 3600., H)[0]
+            g_value_peak_heating = self.gfunction(self.length_peak_heating * 3600., H)[0]
 
             # calculation of needed differences of the g-function values. These are the weight factors in the calculation
             # of Tb.
@@ -1589,9 +1638,9 @@ class Borefield:
 
             # extra summation if the g-function value for the peak is included
             results_peak_cooling = results_month_cooling + np.tile(self.peak_cooling - self.monthly_load_cooling, self.simulation_period) * 1000 \
-                                     * (g_value_peak[0] / self.ground_data.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / H
+                                     * (g_value_peak_cooling / self.ground_data.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / H
             results_peak_heating = results_month_heating - np.tile(self.peak_heating - self.monthly_load_heating, self.simulation_period) * 1000 \
-                                   * (g_value_peak[0] / self.ground_data.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / H
+                                   * (g_value_peak_heating / self.ground_data.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / H
 
             # save temperatures under variable
             self.results_peak_heating = results_peak_heating
