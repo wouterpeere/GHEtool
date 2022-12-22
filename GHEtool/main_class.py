@@ -480,9 +480,6 @@ class Borefield:
         if np.isinf(self.time_L4).any():
             # 16 bit is not enough, go to 32
             self.time_L4 = 3600 * np.arange(1, 8760 * self.simulation_period + 1, dtype=np.float32)
-        if np.isinf(self.time_L4).any():
-            # 32 bit is not enough, go to 64
-            self.time_L4 = 3600 * np.arange(1, 8760 * self.simulation_period + 1, dtype=np.float64)
 
     def set_ground_parameters(self, data: GroundData) -> None:
         """
@@ -1542,7 +1539,7 @@ class Borefield:
             g_value_peak = self.gfunction(self.length_peak * 3600., H)
 
             # calculation of needed differences of the g-function values. These are the weight factors in the calculation
-            # of Tb. Last element removed in order to make arrays the same length
+            # of Tb.
             g_value_differences = np.diff(g_values, prepend=0)
 
             # convolution to get the monthly results
@@ -1589,12 +1586,8 @@ class Borefield:
             g_values = self.gfunction(self.time_L4, H)
 
             # calculation of needed differences of the g-function values. These are the weight factors in the calculation
-            # of Tb. Last element removed in order to make arrays the same length
-            g_value_previous_step = np.concatenate((np.array([0]), g_values))[:-1]
-            g_value_differences = g_values - g_value_previous_step
-            g_value_differences_2 = np.diff(g_values, prepend=0)
-            assert np.array_equal(g_value_differences, g_value_differences_2)
-            assert not np.array_equal(g_value_differences, g_value_differences_2)
+            # of Tb.
+            g_value_differences = np.diff(g_values, prepend=0)
 
             # convolution to get the monthly results
             results = convolve(hourly_load * 1000, g_value_differences)[:len(hourly_load)]
