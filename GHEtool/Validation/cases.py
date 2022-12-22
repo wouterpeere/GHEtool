@@ -95,12 +95,12 @@ def check_cases():
         borefield.size(100, L2_sizing=True)
         print(f'correct answer L2: {correct_answers_L2[i-1]}; calculated answer L2: {round(borefield.H,2)}; error: '
               f'{round(abs(1 - borefield.H / correct_answers_L2[i - 1]) * 100, 4)} %')
-        assert round(borefield.H, 2) == correct_answers_L2[i-1]
+        assert np.isclose(borefield.H, correct_answers_L2[i-1], rtol=0.001)
 
         borefield.size(100, L3_sizing=True)
         print(f'correct answer L3: {correct_answers_L3[i - 1]}; calculated answer L3: {round(borefield.H, 2)}; error: '
               f'{round(abs(1 - borefield.H / correct_answers_L3[i - 1]) * 100, 4)} %')
-        assert round(borefield.H, 2) == correct_answers_L3[i - 1]
+        assert np.isclose(borefield.H, correct_answers_L3[i-1], rtol=0.001)
 
 
 def check_custom_datafile():
