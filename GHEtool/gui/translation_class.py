@@ -213,6 +213,8 @@ class Translations:
         "hourly_figure_temperature_profile",
         "figure_load_duration",
         "legend_figure_load_duration",
+        "option_len_peak_heating",
+        "option_len_peak_cooling",
         "languages",
     )
 
@@ -1186,7 +1188,7 @@ class Translations:
         self.option_toggle_buttons: List[str] = [
             "Use toggle buttons?:, no , yes ",
             "Umschalterbutton?:, Nein , Ja ",
-            "Toggle-gedrag?:, nee , ja",
+            "Toggle-gedrag?:, ne , ja",
             "Toggle buttons?:, no , yes ",
             "Toggle buttons?:, no , yes ",
             "Toggle buttons?:, no , yes ",
@@ -1495,7 +1497,7 @@ class Translations:
         self.option_method_temp_gradient: List[str] = [
             "Should a temperature gradient over depth be considered?:, no , yes ",
             "Soll ein Temperaturgradient berücksichtigt werden?:, Nein , Ja ",
-            "Moet een temperatuursgradiënt in rekening worden gebracht?:, nee , ja ",
+            "Moet een temperatuursgradiënt in rekening worden gebracht?:, ne , ja ",
             "Should a temperature gradient over depth be considered?:, no , yes ",
             "Should a temperature gradient over depth be considered?:, no , yes ",
             "Should a temperature gradient over depth be considered?:, no , yes ",
@@ -1650,7 +1652,7 @@ class Translations:
         self.figure_temperature_profile: List[str] = [
             "Temperature evolution, Temperature [°C], Time [years]",
             "Temperaturverlauf, Temperatur [°C], Zeit [Jahren]",
-            "Temperatuurevolutie, Temperatuur [°C], Tijd [jaren]",
+            "Temperatuurevolutie, Temperatuur [°C], Time [years]",
             "Temperature evolution, Temperature [°C], Time [years]",
             "Temperature evolution, Temperature [°C], Time [years]",
             "Temperature evolution, Temperature [°C], Time [years]",
@@ -1659,25 +1661,25 @@ class Translations:
         self.legend_figure_temperature_profile: List[str] = [
             "Show legend?, No , Yes ",
             "Legende zeigen?, Nein , Ja ",
-            "Toon legende?, ne , ja ",
+            "Toon legende?, nee , ja ",
             "Mostra la legenda?, no , yes ",
             "Afficher la légende?, no , yes ",
             "Mostrar leyenda?, no , yes ",
-            "Mostrar lenda?, no , yes ",
+            "Mostrar lenda?, no , yes",
         ]
         self.hourly_figure_temperature_profile: List[str] = [
             "Hourly profile, No , Yes ",
             "Stündliches Profil, Nein , Ja ",
-            "Uurlijks profiel, ne , ja ",
+            "Uurlijks profiel, nee , ja ",
             "Hourly profile, no , yes ",
             "Hourly profile, no , yes ",
             "Hourly profile, no , yes ",
-            "Hourly profile, no , yes ",
+            "Hourly profile, no , yes",
         ]
         self.figure_load_duration: List[str] = [
             "Load-duration curve, Power [kW], Time [hours]",
             "Jahresdauerlinie, Leistung [kW], Zeit [Stunden]",
-            "Belastings-duurcurve, Power [kW], Time [hours]",
+            "Belastings-duurcurve, Vermogen [kW], Tijd [hours]",
             "Load-duration curve, Power [kW], Time [hours]",
             "Load-duration curve, Power [kW], Time [hours]",
             "Load-duration curve, Power [kW], Time [hours]",
@@ -1686,9 +1688,27 @@ class Translations:
         self.legend_figure_load_duration: List[str] = [
             "Show legend?, No , Yes ",
             "Legende zeigen?, Nein , Ja ",
-            "Toon legende?, ne , ja ",
+            "Toon legende?, nee , ja ",
             "Mostra la legenda?, no , yes ",
             "Afficher la légende?, no , yes ",
             "Mostrar leyenda?, no , yes ",
-            "Mostrar lenda?, no , yes ",
+            "Mostrar lenda?, no , yes",
+        ]
+        self.option_len_peak_heating: List[str] = [
+            "Peak length heating [hours]: ",
+            "Spitzenlastlänge Heizen [Stunden]: ",
+            "Piekduur verwarming [uren]: ",
+            "Peak length heating [hours]: ",
+            "Peak length heating [hours]: ",
+            "Peak length heating [hours]: ",
+            "Peak length heating [hours]:",
+        ]
+        self.option_len_peak_cooling: List[str] = [
+            "Peak length cooling [hours]: ",
+            "Spitzenlastlänge Kühlen [Stunden]: ",
+            "Piekduur koeling [uren]: ",
+            "Peak length cooling [hours]: ",
+            "Peak length cooling [hours]: ",
+            "Peak length cooling [hours]: ",
+            "Peak length cooling [hours]:",
         ]

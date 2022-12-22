@@ -407,6 +407,28 @@ class GuiStructure:
                     category=self.category_temperatures, label="Simulation period [yrs]: ", default_value=40, minimal_value=1, maximal_value=100
                 )
 
+                self.option_len_peak_heating = FloatBox(
+                    category=self.category_temperatures, label="Peak length heating [hours]: ",
+                    default_value=6, minimal_value=1, maximal_value=8760, step=1,
+                    decimal_number=2
+                )
+                self.option_len_peak_cooling = FloatBox(
+                    category=self.category_temperatures, label="Peak length cooling [hours]: ",
+                    default_value=6, minimal_value=1, maximal_value=8760, step=1,
+                    decimal_number=2
+                )
+
+                # add dependencies
+                self.option_temperature_profile_hourly.add_link_2_show(self.option_len_peak_heating, on_index=0)
+                self.option_method_size_depth.add_link_2_show(self.option_len_peak_heating, on_index=0)
+                self.option_method_size_depth.add_link_2_show(self.option_len_peak_heating, on_index=1)
+                self.aim_optimize.add_link_2_show(self.option_len_peak_heating)
+
+                self.option_temperature_profile_hourly.add_link_2_show(self.option_len_peak_cooling, on_index=0)
+                self.option_method_size_depth.add_link_2_show(self.option_len_peak_cooling, on_index=0)
+                self.option_method_size_depth.add_link_2_show(self.option_len_peak_cooling, on_index=1)
+                self.aim_optimize.add_link_2_show(self.option_len_peak_cooling)
+
             # create categories
             create_category_earth()
             create_category_borehole()
