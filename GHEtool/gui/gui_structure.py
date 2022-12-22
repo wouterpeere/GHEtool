@@ -411,6 +411,12 @@ class GuiStructure:
                     decimal_number=2
                 )
 
+                # add dependencies
+                self.option_temperature_profile_hourly.add_link_2_show(self.option_len_peak, on_index=0)
+                self.option_method_size_depth.add_link_2_show(self.option_len_peak, on_index=0)
+                self.option_method_size_depth.add_link_2_show(self.option_len_peak, on_index=1)
+                self.aim_optimize.add_link_2_show(self.option_len_peak)
+
             # create categories
             create_category_earth()
             create_category_borehole()

@@ -137,3 +137,4 @@ GHEtool/change_pickle_data.py
 */*/*.pickle
 */*/*/*.pickle
 */*/*/*/*.pickle
+*.exe
