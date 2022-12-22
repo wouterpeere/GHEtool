@@ -19,8 +19,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Created a new structure for the package, thereby splitting the main_py.file into more subclasses.
 - Created a class for the custom g-functions (issue #57)
 - Created a class for g-function calculation that stores the previously calculated g-values to speed up the iterative algorithms (issue #57).
-The speed improvement is over a factor 10 for heavy iterative procedures (like optimise load profile). A full speed improvement report can be found under
+The speed improvement is over a factor 10 for heavy iterative procedures (like optimise load profile). A full speed improvement report can be found under:
 code version > speed improvements > v2.1.1.
+- The sizing methods themselves are now faster due to the fact that only the first and last year are calculated (issue #44). For more info, one can check:
+code version > speed improvements > v2.1.1
 
 ### Fixed
 - The hourly_heating_load_on_the_borefield and hourly_cooling_load_on_the_borefield are now correctly calculated.

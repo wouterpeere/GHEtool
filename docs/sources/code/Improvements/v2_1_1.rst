@@ -1,6 +1,59 @@
 ***************
 v2.1.1
 ***************
+In GHEtool v2.1.1 there are two major code changes that reduce the computational time significantly. One has to do with the way the sizing methodology (L3/L4) is implemented and another with the new Gfunction class.
+Both improvements are explained below.
+
++++++++++++++++++++++
+Improvement in sizing
++++++++++++++++++++++
+Previously, in v2.1.0, for the sizing methodology L3 and L4 (i.e. monthly and hourly), the temperatures where calculated every time step.
+This however (especially for long simulation periods) requires a lot of time due to the convolution step. In v2.1.1 this is changed so that only the first and last year
+are calculated, since only these years are relevant for the sizing [1]_. This means that however long the simulation period may be, only two years are calculated.
+In the table below, the time required for one sizing iteration (i.e. one g-value convolution) is shown in µs. The code to come up with these numbers is added below.
+
+.. list-table:: Speed improvement sizing methods
+   :header-rows: 1
+
+   * - Simulation period [years]
+     - Required time old method [µs]
+     - Required time new method [µs]
+   * - 5 years
+     - 15625 µs
+     - 0 µs
+   * - 15 years
+     - 15625 µs
+     - 0 µs
+   * - 25 years
+     - 31250 µs
+     - 0 µs
+   * - 35 years
+     - 46875 µs
+     - 0 µs
+   * - 45 years
+     - 62500 µs
+     - 0 µs
+   * - 55 years
+     - 78125 µs
+     - 0 µs
+   * - 65 years
+     - 78125 µs
+     - 0 µs
+   * - 75 years
+     - 78125 µs
+     - 0 µs
+   * - 85 years
+     - 109375 µs
+     - 0 µs
+   * - 95 years
+     - 125000 µs
+     - 0 µs
+
+
++++++++++++++++
+Gfunction class
++++++++++++++++
+
 Due to the implementation of the GFunction class in GHEtool, a substantial speed improvement is made w.r.t. GHEtool v2.1.0 for computationally expensive tasks.
 In the tables below, one can find this speed improvement for the different sizing methods and for several of the examples documents. The results can be recreated by running the code below.
 The computational times as shown in the table below, are an average of 5 runs.
@@ -53,8 +106,14 @@ The computational times as shown in the table below, are an average of 5 runs.
 
 
 
+.. literalinclude:: new_calc_method.py
+   :language: python
+   :linenos:
+
 
 .. literalinclude:: speed_improvement.py
    :language: python
    :linenos:
 
+.. rubric:: References
+.. [1] Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. (2021) Validated combined first and last year borefield sizing methodology. In Proceedings of International Building Simulation Conference 2021. Brugge (Belgium), 1-3 September 2021. https://doi.org/10.26868/25222708.2021.30180
