@@ -1,7 +1,7 @@
 # Getting started
 
 ## Requirements
-This code is tested with Python 3.8 (and higher) and requires the following libraries
+This code is tested with Python 3.8, 3.9 and 3.10 and requires the following libraries
 
 * Numpy (>=1.20.2)
 * Scipy (>=1.6.2)
