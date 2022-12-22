@@ -167,6 +167,15 @@ def hourly_borefield():
 
 
 @pytest.fixture
+def hourly_borefield_reversed():
+    borefield = Borefield()
+    borefield.set_ground_parameters(data)
+    borefield.set_borefield(borefield_gt)
+    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv", first_column_heating=False)
+    return borefield
+
+
+@pytest.fixture
 def borefield_cooling_dom():
     borefield = Borefield(simulation_period=20,
                           peak_heating=peakHeating,
@@ -247,7 +256,7 @@ def test_without_pipe(borefield):
 
 
 def test_Tg(borefield):
-    borefield.use_constant_Tg = False
+    borefield._sizing_setup.use_constant_Tg = False
     borefield._Tg()
 
 
@@ -280,6 +289,32 @@ def test_size_L4(hourly_borefield):
     assert hourly_borefield._check_hourly_load()
     hourly_borefield.sizing_setup(L4_sizing=True)
     hourly_borefield.size()
+
+
+def test_size_L4_quadrant(hourly_borefield):
+    hourly_borefield.sizing_setup(L4_sizing=True, quadrant_sizing=1)
+    hourly_borefield.size()
+
+
+def test_size_L4_quadrant_4(hourly_borefield):
+    hourly_borefield.hourly_heating_load[0] = 100000
+    hourly_borefield.sizing_setup(L4_sizing=True)
+    hourly_borefield.size()
+
+
+def test_size_L4_heating_dom(hourly_borefield_reversed):
+    hourly_borefield_reversed.sizing_setup(L4_sizing=True)
+    hourly_borefield_reversed.size()
+
+
+def test_size_L4_quadrant_3(hourly_borefield_reversed):
+    hourly_borefield_reversed.hourly_heating_load[0] = 100000
+    hourly_borefield_reversed.sizing_setup(L4_sizing=True)
+    hourly_borefield_reversed.size()
+
+
+def test_sizing_setup(borefield):
+    borefield.sizing_setup(sizing_setup=SizingSetup())
 
 
 def test_cooling_dom(borefield_cooling_dom):
@@ -319,7 +354,14 @@ def test_size_L4_without_data(borefield):
 
 def test_load_duration(monkeypatch, hourly_borefield):
     monkeypatch.setattr(plt, 'show', lambda: None)
-    hourly_borefield.plot_load_duration()
+    hourly_borefield.plot_load_duration(legend=True)
+
+
+def test_load_duration_no_hourly_data(borefield):
+    try:
+        borefield.plot_load_duration()
+    except ValueError:
+        assert True
 
 
 def test_optimise_load_profile_without_data(borefield):

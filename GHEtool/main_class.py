@@ -203,10 +203,7 @@ class Borefield:
         self.pipe_data: Optional[PipeData] = None
 
         # initiate different sizing
-        self.L2_sizing: bool = True
-        self.L3_sizing: bool = False
-        self.L4_sizing: bool = False
-        self.quadrant_sizing: int = 0
+        self._sizing_setup: SizingSetup = SizingSetup()
         self.H_init: float = 100.
         self.sizing_setup()
 
@@ -576,7 +573,10 @@ class Borefield:
         """
         This function calculates and sets the fluid thermal resistance R_f.
 
-        :return: None"""
+        Returns
+        -------
+        None
+        """
         self.fluid_data.h_f: float =\
             gt.pipes.convective_heat_transfer_coefficient_circular_pipe(self.fluid_data.mfr /
                                                                         self.pipe_data.number_of_pipes,
@@ -600,7 +600,7 @@ class Borefield:
             Equivalent borehole thermal resistance [mK/W]
         """
         # use a constant Rb*
-        if self.use_constant_Rb:
+        if self._sizing_setup.use_constant_Rb:
             return self.Rb
 
         # calculate Rb*
@@ -624,7 +624,7 @@ class Borefield:
         if H is None:
             H = self.H
 
-        return self.ground_data.calculate_Tg(H, use_constant_Tg=self.use_constant_Tg)
+        return self.ground_data.calculate_Tg(H, use_constant_Tg=self._sizing_setup.use_constant_Tg)
 
     def calculate_Rb(self) -> float:
         """
@@ -762,6 +762,9 @@ class Borefield:
             True if a sizing with the L3 method is needed
         L4_sizing : bool
             True if a sizing with the L4 method is needed
+        sizing_setup : SizingSetup
+            An instance of the SizingSetup class. When this argument differs from None, all the other parameters are
+            set based on this sizing_setup
 
         Returns
         -------
@@ -772,31 +775,20 @@ class Borefield:
         .. [#PeereBS] Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. (2021) Validated combined first and last year borefield sizing methodology. In Proceedings of International Building Simulation Conference 2021. Brugge (Belgium), 1-3 September 2021. https://doi.org/10.26868/25222708.2021.30180
         .. [#PeereThesis] Peere, W. (2020) Methode voor economische optimalisatie van geothermische verwarmings- en koelsystemen. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
         """
-        # check if just one sizing is given
-        if np.sum([L2_sizing if L2_sizing is not None else 0, L3_sizing if L3_sizing is not None else 0, L4_sizing if L4_sizing is not None else 0]) > 1:
-            raise ValueError("Please check if just one sizing method is chosen!")
+        self.H_init = H_init
 
-        # set variables
-        if use_constant_Rb is not None:
-            self.use_constant_Rb = use_constant_Rb
-        if use_constant_Tg is not None:
-            self.use_constant_Tg = use_constant_Tg
-        if quadrant_sizing is not None:
-            self.quadrant_sizing = quadrant_sizing
-        if self.H_init is not None:
-            self.H_init = H_init
-        if L2_sizing:
-            self.L2_sizing = L2_sizing
-            self.L3_sizing = False
-            self.L4_sizing = False
-        if L3_sizing:
-            self.L3_sizing = L3_sizing
-            self.L2_sizing = False
-            self.L4_sizing = False
-        if L4_sizing:
-            self.L4_sizing = L4_sizing
-            self.L2_sizing = False
-            self.L3_sizing = False
+        # if sizing_setup is not None, than the sizing setup is set directly
+        if sizing_setup is not None:
+            self._sizing_setup = sizing_setup
+            return
+
+        self._sizing_setup = SizingSetup(use_constant_Rb=use_constant_Rb,
+                                         use_constant_Tg=use_constant_Tg,
+                                         quadrant_sizing=quadrant_sizing,
+                                         L2_sizing=L2_sizing,
+                                         L3_sizing=L3_sizing,
+                                         L4_sizing=L4_sizing,
+                                         relative_borefield_threshold=relative_borefield_threshold)
 
     def size(self, H_init: float = 100, use_constant_Rb: bool = None, use_constant_Tg: bool = None,
              L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None, quadrant_sizing: int = None) -> float:
@@ -836,23 +828,23 @@ class Borefield:
         None
         """
         # make backup of initial parameter states
-        backup = (self.H_init, self.use_constant_Rb, self.use_constant_Tg, self.L2_sizing, self.L3_sizing, self.L4_sizing, self.quadrant_sizing)
+        self._sizing_setup.make_backup()
 
         # run the sizing setup
-        self.sizing_setup(H_init=H_init, use_constant_Rb=use_constant_Rb, use_constant_Tg=use_constant_Tg,
-                          L2_sizing=L2_sizing, L3_sizing=L3_sizing, L4_sizing=L4_sizing, quadrant_sizing=quadrant_sizing)
+        self._sizing_setup.update_variables(use_constant_Rb=use_constant_Rb, use_constant_Tg=use_constant_Tg,
+                                            L2_sizing=L2_sizing, L3_sizing=L3_sizing, L4_sizing=L4_sizing,
+                                            quadrant_sizing=quadrant_sizing)
 
         # sizes according to the correct algorithm
-        if self.L2_sizing:
-            depth = self.size_L2(self.H_init, self.quadrant_sizing)
-        if self.L3_sizing:
-            depth = self.size_L3(self.H_init, self.quadrant_sizing)
-        if self.L4_sizing:
-            depth = self.size_L4(self.H_init, self.quadrant_sizing)
+        if self._sizing_setup.L2_sizing:
+            depth = self.size_L2(self.H_init, self._sizing_setup.quadrant_sizing)
+        if self._sizing_setup.L3_sizing:
+            depth = self.size_L3(self.H_init, self._sizing_setup.quadrant_sizing)
+        if self._sizing_setup.L4_sizing:
+            depth = self.size_L4(self.H_init, self._sizing_setup.quadrant_sizing)
 
         # reset initial parameters
-        self.sizing_setup(H_init=backup[0], use_constant_Rb=backup[1], use_constant_Tg=backup[2], L2_sizing=backup[3],
-                          L3_sizing=backup[4], L4_sizing=backup[5], quadrant_sizing=backup[6])
+        self._sizing_setup.restore_backup()
 
         # check if the field is not shallow
         if depth < self.THRESHOLD_WARNING_SHALLOW_FIELD and self.printing:
@@ -1052,14 +1044,22 @@ class Borefield:
 
     def _size_based_on_temperature_profile(self, quadrant: int, hourly: bool = False) -> float:
         """
-        This function sizes based on the temperature profile.
+         This function sizes based on the temperature profile.
         It sizes for a specific quadrant and can both size with a monthly or an hourly resolution.
 
-        :param quadrant: integer for the specific quadrant to be sized for (see (Peere et al., 2021) doi: 10.26868/25222708.2021.30180)
-        :param hourly: True if an hourly resolution should be used
-        :return: depth of the borefield
-        """
+        Parameters
+        ----------
+        quadrant : int
+            Differs from 0 when a sizing in a certain quadrant is desired.
+            Quadrants are developed by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]_
+        hourly : bool
+            True if an hourly resolution should be used
 
+        Returns
+        -------
+        Depth : float
+            Required depth of the borefield [m]
+        """
         # initiate iteration
         H_prev = 0
 
@@ -1173,16 +1173,24 @@ class Borefield:
         """
         This function calculates the average monthly load in kW.
 
-        :return: None
+        Returns
+        -------
+        None
         """
         self.monthly_load = (self.baseload_cooling - self.baseload_heating) / Borefield.UPM
 
-    def set_baseload_heating(self, baseload: np.array) -> None:
+    def set_baseload_heating(self, baseload: Union[np.ndarray, list]) -> None:
         """
         This function defines the baseload in heating both in an energy as in an average power perspective.
 
-        :param baseload: baseload in kWh (np.array or list)
-        :return: None
+        Parameters
+        ----------
+        baseload : np.ndarray, list
+            Baseload heating per month [kWh]
+
+        Returns
+        -------
+        None
         """
         self.baseload_heating = np.maximum(baseload, np.zeros(12))  # kWh
         self.monthly_load_heating = self.baseload_heating / Borefield.UPM  # kW
@@ -1192,12 +1200,18 @@ class Borefield:
         # new peak heating if baseload is larger than the peak
         self.set_peak_heating(np.maximum(self.peak_heating, self.monthly_load_heating))
 
-    def set_baseload_cooling(self, baseload: np.array) -> None:
+    def set_baseload_cooling(self, baseload: Union[np.array, list]) -> None:
         """
         This function defines the baseload in cooling both in an energy as in an average power perspective.
 
-        :param baseload: baseload in kWh (np.array or list)
-        :return None
+        Parameters
+        ----------
+        baseload : np.ndarray, list
+            Baseload cooling per month [kWh]
+
+        Returns
+        -------
+        None
         """
         self.baseload_cooling = np.maximum(baseload, np.zeros(12))  # kWh
         self.monthly_load_cooling = self.baseload_cooling / Borefield.UPM # kW
@@ -1207,21 +1221,33 @@ class Borefield:
         # new peak cooling if baseload is larger than the peak
         self.set_peak_cooling(np.maximum(self.peak_cooling, self.monthly_load_cooling))
 
-    def set_peak_heating(self, peak_load: np.array) -> None:
+    def set_peak_heating(self, peak_load: Union[np.ndarray, list]) -> None:
         """
-        This function sets the peak heating to peak load.
+        This function sets the peak heating to peak load heating.
 
-        :param peak_load: peak load heating in kW (np.array or list)
-        :return: None
+        Parameters
+        ----------
+        peak_load : np.ndarray, list
+            Peak load of heating per month [kW]
+
+        Returns
+        -------
+        None
         """
         self.peak_heating = np.maximum(peak_load, self.monthly_load_heating)
 
-    def set_peak_cooling(self, peak_load: np.array) -> None:
+    def set_peak_cooling(self, peak_load: Union[np.ndarray, list]) -> None:
         """
-        This function sets the peak cooling to peak load.
+        This function sets the peak cooling to peak load cooling.
 
-        :param peak_load: peak load cooling in kW (np.array or list)
-        :return: None
+        Parameters
+        ----------
+        peak_load : np.ndarray, list
+            Peak load of cooling per month [kW]
+
+        Returns
+        -------
+        None
         """
         self.peak_cooling = np.maximum(peak_load, self.monthly_load_cooling)
 
@@ -1230,7 +1256,10 @@ class Borefield:
         """
         This function calculates the investment cost based on a cost profile linear to the total borehole length.
 
-        :return: investement cost
+        Returns
+        -------
+        float
+            Investement cost
         """
         return np.polyval(self.cost_investment, self.H * self.number_of_boreholes)
 
@@ -1239,7 +1268,9 @@ class Borefield:
         This function calculates the imbalance of the field.
         A positive imbalance means that the field is injection dominated, i.e. it heats up every year.
 
-        :return: None
+        Returns
+        -------
+        None
         """
         self.imbalance = np.sum(self.baseload_cooling) - np.sum(self.baseload_heating)
 
@@ -1349,9 +1380,15 @@ class Borefield:
         Calculate all the temperatures without plotting the figure. When depth is given, it calculates it for a given
         depth.
 
-        :param depth: depth for which the temperature profile should be calculated for.
-        :param hourly: if True, then the temperatures are calculated based on the hourly data
-        :return: None
+        Parameters
+        ----------
+        depth : float
+            Depth for which the temperature profile should be calculated for [m]
+        hourly : bool
+            True when the temperatures should be calculated based on hourly data
+        Returns
+        -------
+        None
         """
         self._calculate_temperature_profile(H=depth, hourly=hourly)
 
@@ -1606,6 +1643,23 @@ class Borefield:
             self.results_month_cooling = np.array([])
             self.results_month_heating = np.array([])
 
+    def set_options_gfunction_calculation(self, options: dict) -> None:
+        """
+        This function sets the options for the gfunction calculation of pygfunction.
+        This dictionary is directly passed through to the gFunction class of pygfunction.
+        For more information, please visit the documentation of pygfunction.
+
+        Parameters
+        ----------
+        options : dict
+            Dictionary with options for the gFunction class of pygfunction
+
+        Returns
+        -------
+        None
+        """
+        self.options_pygfunction = options
+
     def gfunction(self, time_value: Union[list, float, np.ndarray], H: float = None) -> np.ndarray:
         """
         This function returns the gfunction value.
@@ -1626,7 +1680,7 @@ class Borefield:
             1D array with the gvalues for all the requested time_value(s)
         """
         # when using a variable ground temperature, sometimes no solution can be found
-        if not self.use_constant_Tg and H > Borefield.THRESHOLD_DEPTH_ERROR:
+        if not self._sizing_setup.use_constant_Tg and H > Borefield.THRESHOLD_DEPTH_ERROR:
             raise ValueError("Due to the use of a variable ground temperature, no solution can be found."
                              "To see the temperature profile, one can plot it using the depth of ",
                              str(Borefield.THRESHOLD_DEPTH_ERROR), "m.")
@@ -1896,10 +1950,10 @@ class Borefield:
         # since the depth does not change, the Rb* value is constant
         # set to use a constant Rb* value but save the initial parameters
         Rb_backup = self.Rb
-        if not self.use_constant_Rb:
+        if not self._sizing_setup.use_constant_Rb:
             self.Rb = self.calculate_Rb()
-        use_constant_Rb_backup = self.use_constant_Rb
-        self.use_constant_Rb = True
+        use_constant_Rb_backup = self._sizing_setup.use_constant_Rb
+        self._sizing_setup.use_constant_Rb = True
 
         # check if hourly profile is given
         self._check_hourly_load()
@@ -1967,7 +2021,7 @@ class Borefield:
 
         # restore the initial parameters
         self.Rb = Rb_backup
-        self.use_constant_Rb = use_constant_Rb_backup
+        self._sizing_setup.use_constant_Rb = use_constant_Rb_backup
 
         if print_results:
             # print results

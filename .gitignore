@@ -134,3 +134,4 @@ GHEtool/change_pickle_data.py
 *.exe
 *.GHEtool
 test.gvalues
+*.orig
