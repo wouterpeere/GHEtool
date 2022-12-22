@@ -534,7 +534,7 @@ def test_convert_hourly_to_monthly_without_data(borefield):
         assert True
     borefield.set_fluid_parameters(fluidData)
     borefield.set_pipe_parameters(pipeData)
-    borefield.use_constant_Rb = False
+    borefield._sizing_setup.use_constant_Rb = False
     try:
         borefield.optimise_load_profile()
     except ValueError:
