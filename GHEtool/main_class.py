@@ -476,7 +476,13 @@ class Borefield:
         self.time_L3_last_year = Borefield.UPM * 3600 * np.arange(1, self.simulation_period * 12 + 1)
 
         # set the time constant for the L4 sizing
-        self.time_L4 = 3600 * np.arange(1, 8760 * self.simulation_period + 1)
+        self.time_L4 = 3600 * np.arange(1, 8760 * self.simulation_period + 1, dtype=np.float16)
+        if np.isinf(self.time_L4).any():
+            # 16 bit is not enough, go to 32
+            self.time_L4 = 3600 * np.arange(1, 8760 * self.simulation_period + 1, dtype=np.float32)
+        if np.isinf(self.time_L4).any():
+            # 32 bit is not enough, go to 64
+            self.time_L4 = 3600 * np.arange(1, 8760 * self.simulation_period + 1, dtype=np.float64)
 
     def set_ground_parameters(self, data: GroundData) -> None:
         """
