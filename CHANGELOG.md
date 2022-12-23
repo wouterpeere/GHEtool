@@ -31,6 +31,7 @@ code version > speed improvements > v2.1.1
 - When an hourly temperature profile is plotted after an optimise_load_profile optimisation, the hourly load on the borefield (and not the entire hourly load) is shown.
 - Correct conversion from hourly to monthly load (issue 62)
 - Problem with np.float16 when using simulation periodes >80 years due to overflow errors.
+- Implemented FIFO-class to prevent cycling in iterative sizing.
 
 ## [2.1.0] - 2022-11-30
 
