@@ -372,3 +372,5 @@ def test_fifo():
     fifo.add(30)
     assert fifo.fifo_list == [46, 30]
     assert not fifo.in_fifo_list(84)
+    fifo.clear()
+    assert fifo.fifo_list == []

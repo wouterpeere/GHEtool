@@ -59,6 +59,16 @@ class FIFO:
 
         return value in self.fifo_list and not self.fifo_list[-1] == value
 
+    def clear(self) -> None:
+        """
+        This function clears the fifo_array.
+
+        Returns
+        -------
+        None
+        """
+        self.fifo_list = []
+
 
 class GFunction:
     """
@@ -84,7 +94,7 @@ class GFunction:
         self.no_extrapolation: bool = True
         self.threshold_depth_interpolation: float = 25  # m
 
-        self.fifo_list: FIFO = FIFO()
+        self.fifo_list: FIFO = FIFO(8)
 
     def calculate(self, time_value: Union[list, float, np.ndarray], borefield: List[gt.boreholes.Borehole],
                   alpha: float):
@@ -402,6 +412,7 @@ class GFunction:
         self.previous_gfunctions = np.array([])
         self.alpha = 0
         self.borefield = []
+        self.fifo_list.clear()
 
     def set_new_calculated_data(self, time_values: np.ndarray, depth: float, gvalues: np.ndarray,
                                 borefield, alpha) -> bool:
