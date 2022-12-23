@@ -589,12 +589,7 @@ def test_incorrect_values_peak_baseload(borefield):
         assert True
 
 
-def test_temperature_profile_available():
-    borefield = Borefield()
-    borefield.set_ground_parameters(data)
-    borefield.set_borefield(borefield_gt)
-    borefield.load_hourly_profile("hourly_profile_without_header.csv", header=False)
-    hourly_borefield = borefield
+def test_temperature_profile_available(hourly_borefield):
     hourly_borefield.calculate_temperatures(100, True)
     assert not hourly_borefield.recalculation_needed
     assert hourly_borefield._check_temperature_profile_available(hourly=True)
