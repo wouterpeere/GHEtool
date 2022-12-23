@@ -545,3 +545,45 @@ def test_calculate_hourly_temperature_profile(hourly_borefield):
     hourly_borefield._calculate_temperature_profile(100, hourly=True)
     hourly_borefield.hourly_heating_load_on_the_borefield = hourly_borefield.hourly_heating_load
     hourly_borefield.hourly_cooling_load_on_the_borefield = hourly_borefield.hourly_cooling_load
+
+
+def test_incorrect_values_peak_basload(borefield):
+    try:
+        borefield.set_peak_heating(8)
+    except ValueError:
+        assert True
+
+    try:
+        borefield.set_peak_cooling(8)
+    except ValueError:
+        assert True
+
+    try:
+        borefield.set_baseload_heating(8)
+    except ValueError:
+        assert True
+
+    try:
+        borefield.set_baseload_cooling(8)
+    except ValueError:
+        assert True
+
+    try:
+        borefield.set_peak_cooling([8, 8])
+    except ValueError:
+        assert True
+
+    try:
+        borefield.set_peak_heating([8, 8])
+    except ValueError:
+        assert True
+
+    try:
+        borefield.set_baseload_cooling([8, 8])
+    except ValueError:
+        assert True
+
+    try:
+        borefield.set_baseload_heating([8, 8])
+    except ValueError:
+        assert True

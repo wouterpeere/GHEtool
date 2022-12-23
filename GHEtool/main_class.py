@@ -1221,7 +1221,16 @@ class Borefield:
         Returns
         -------
         None
+
+        Raises
+        ------
+        ValueError
+            ValueError when the baseload is no list or np.ndarray
         """
+        if (isinstance(baseload, list) or isinstance(baseload, np.ndarray)) and len(baseload) != 12:
+            raise ValueError("No correct list/array is given!")
+        if isinstance(baseload, float) or isinstance(baseload, int):
+            raise ValueError("No correct list/array is given!")
         self.baseload_heating = np.maximum(baseload, np.zeros(12))  # kWh
         self.monthly_load_heating = self.baseload_heating / Borefield.UPM  # kW
         self.calculate_monthly_load()
@@ -1242,7 +1251,16 @@ class Borefield:
         Returns
         -------
         None
+
+        Raises
+        ------
+        ValueError
+            ValueError when the baseload is no list or np.ndarray
         """
+        if (isinstance(baseload, list) or isinstance(baseload, np.ndarray)) and len(baseload) != 12:
+            raise ValueError("No correct list/array is given!")
+        if isinstance(baseload, float) or isinstance(baseload, int):
+            raise ValueError("No correct list/array is given!")
         self.baseload_cooling = np.maximum(baseload, np.zeros(12))  # kWh
         self.monthly_load_cooling = self.baseload_cooling / Borefield.UPM # kW
         self.calculate_monthly_load()
@@ -1263,7 +1281,15 @@ class Borefield:
         Returns
         -------
         None
+        Raises
+        ------
+        ValueError
+            ValueError when the peak_load is no list or np.ndarray
         """
+        if (isinstance(peak_load, list) or isinstance(peak_load, np.ndarray)) and len(peak_load) != 12:
+            raise ValueError("No correct list/array is given!")
+        if isinstance(peak_load, float) or isinstance(peak_load, int):
+            raise ValueError("No correct list/array is given!")
         self.peak_heating = np.maximum(peak_load, self.monthly_load_heating)
 
     def set_peak_cooling(self, peak_load: Union[np.ndarray, list]) -> None:
@@ -1278,7 +1304,16 @@ class Borefield:
         Returns
         -------
         None
+
+        Raises
+        ------
+        ValueError
+            ValueError when the peak_load is no list or np.ndarray
         """
+        if (isinstance(peak_load, list) or isinstance(peak_load, np.ndarray)) and len(peak_load) != 12:
+            raise ValueError("No correct list/array is given!")
+        if isinstance(peak_load, float) or isinstance(peak_load, int):
+            raise ValueError("No correct list/array is given!")
         self.peak_cooling = np.maximum(peak_load, self.monthly_load_cooling)
 
     @property
