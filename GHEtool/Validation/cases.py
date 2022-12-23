@@ -147,25 +147,5 @@ def check_custom_datafile():
 
 
 if __name__ == "__main__":   # pragma: no cover
-
     check_cases()  # check different cases
     check_custom_datafile()  # check if the custom datafile is correct
-
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(1)  # load case 1
-
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peak_heating,
-                          peak_cooling=peak_cooling,
-                          baseload_heating=monthly_load_heating,
-                          baseload_cooling=monthly_load_cooling)
-
-    borefield.set_ground_parameters(data)
-    borefield.set_borefield(borefield_gt)
-
-    # set temperature boundaries
-    borefield.set_max_ground_temperature(16)  # maximum temperature
-    borefield.set_min_ground_temperature(0)  # minimum temperature
-
-    borefield.size(100)
-    print(borefield.H)
-    borefield.print_temperature_profile()

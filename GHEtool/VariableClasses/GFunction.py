@@ -7,8 +7,70 @@ from scipy import interpolate
 from .CustomGFunction import _timeValues
 
 
-class GFunction:
+class FIFO:
+    """
+    This class is a container with n elements. If the n+1th element is added, the first is removed
+    """
 
+    def __init__(self, length: int = 2):
+        """
+
+        Parameters
+        ----------
+        length : int
+            Length of the fifo-array
+        """
+        self.length: int = length
+        self.fifo_list: list = []
+
+    def add(self, value: float) -> None:
+        """
+        This function adds the value to the fifo array.
+        If the array is full, the first element is removed.
+
+        Parameters
+        ----------
+        value : float
+            Value to be added to the array
+
+        Returns
+        -------
+        None
+        """
+        if len(self.fifo_list) >= self.length:
+            self.fifo_list.pop(0)
+
+        self.fifo_list.append(value)
+
+    def in_fifo_list(self, value: float) -> bool:
+        """
+        This function checks whether or not the value is in the fifo list, but not the last element!
+
+        Parameters
+        ----------
+        value : float
+            Value potentially in the fifo list
+
+        Returns
+        -------
+        bool
+            True if the value is in the fifo list, false otherwise
+        """
+
+        return value in self.fifo_list and not self.fifo_list[-1] == value
+
+    def clear(self) -> None:
+        """
+        This function clears the fifo_array.
+
+        Returns
+        -------
+        None
+        """
+        self.fifo_list = []
+
+
+class GFunction:
     """
     Class that contains the functionality to calculate gfunctions and to store
     previously calculated values that can potentially be used for interpolation to save time.
@@ -32,7 +94,10 @@ class GFunction:
         self.no_extrapolation: bool = True
         self.threshold_depth_interpolation: float = 25  # m
 
-    def calculate(self, time_value: Union[list, float, np.ndarray], borefield: List[gt.boreholes.Borehole], alpha: float):
+        self.fifo_list: FIFO = FIFO(8)
+
+    def calculate(self, time_value: Union[list, float, np.ndarray], borefield: List[gt.boreholes.Borehole],
+                  alpha: float):
         """
         This function returns the gvalues either by interpolation or by calculating them.
         It does so by calling the function gvalues which does this calculation.
@@ -54,7 +119,8 @@ class GFunction:
             1D array with all the requested gvalues
         """
 
-        def gvalues(time_values: np.ndarray, borefield: List[gt.boreholes.Borehole], alpha: float, depth: float) -> np.ndarray:
+        def gvalues(time_values: np.ndarray, borefield: List[gt.boreholes.Borehole], alpha: float,
+                    depth: float) -> np.ndarray:
             """
             This function returns the gvalues either by interpolation or by calculating them.
 
@@ -74,13 +140,30 @@ class GFunction:
             gvalues : np.ndarray
                 1D array with all the requested gvalues
             """
+            # check if the value is in the fifo_list
+            # if the value is in self.depth_array, there is no problem, since the interpolation will be exact anyway
+            if self.fifo_list.in_fifo_list(depth) and depth not in self.depth_array:
+                # chances are we are stuck in a loop, so calculate the gfunction and do not iterate
+
+                # calculate the g-values for uniform borehole wall temperature
+                gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options).gFunc
+
+                # store the calculated g-values
+                self.set_new_calculated_data(time_values, depth, gfunc_calculated, borefield, alpha)
+
+                self.fifo_list.add(depth)
+
+                return gfunc_calculated
+
+            # store in fifo_list to make sure we are not stuck in iterations
+            self.fifo_list.add(depth)
+
             # check if previous depth is close to current one
             # if so, returns previous gfunction data to speed up sizing convergence
             if np.abs(self.previous_depth - depth) < 1:
                 depth = self.previous_depth
             else:
                 self.previous_depth = depth
-
             # do interpolation
             gfunc_interpolated = self.interpolate_gfunctions(time_values, depth, alpha, borefield)
 
@@ -119,7 +202,6 @@ class GFunction:
 
         # check if there are double values
         if not isinstance(time_value, (float, int)) and time_value_np.size != np.unique(np.asarray(time_value)).size:
-
             # calculate g-function values
             gfunc_uniform_T = gvalues(np.unique(time_value_np), borefield, alpha, depth)
 
@@ -330,6 +412,7 @@ class GFunction:
         self.previous_gfunctions = np.array([])
         self.alpha = 0
         self.borefield = []
+        self.fifo_list.clear()
 
     def set_new_calculated_data(self, time_values: np.ndarray, depth: float, gvalues: np.ndarray,
                                 borefield, alpha) -> bool:

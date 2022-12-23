@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 import time
 
-from GHEtool.VariableClasses import GFunction
+from GHEtool.VariableClasses import GFunction, FIFO
 from GHEtool import Borefield
 
 
@@ -357,3 +357,20 @@ def test_floating_number():
     assert gfunc.calculate(7500., borefield, alpha) != gt.gfunction.gFunction(borefield, alpha, 7500.).gFunc
     assert gfunc.calculate(gfunc.time_array[0], borefield, alpha) ==\
            gt.gfunction.gFunction(borefield, alpha, gfunc.time_array[0]).gFunc
+
+
+def test_fifo():
+    fifo = FIFO()
+    assert fifo.fifo_list == []
+    fifo.add(84)
+    assert not fifo.in_fifo_list(84)
+    assert fifo.fifo_list == [84]
+    fifo.add(46)
+    assert fifo.fifo_list == [84, 46]
+    assert fifo.in_fifo_list(84)
+    assert not fifo.in_fifo_list(46)
+    fifo.add(30)
+    assert fifo.fifo_list == [46, 30]
+    assert not fifo.in_fifo_list(84)
+    fifo.clear()
+    assert fifo.fifo_list == []

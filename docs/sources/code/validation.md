@@ -13,7 +13,7 @@ Validation/sizing_method_comparison_L2_L3_L4.rst
 Validation/speed_comparison.rst
 ```
 
-Secondly, a paper (about the hybrid L2 sizing method) validates one of the main sizing methods of GHEtool. It can be found herebelow.
+Peere et al. (2021) validates the hybrid sizing method of GHEtool. The validation code can be found below.
 ```{toctree}
 :maxdepth: 1
 

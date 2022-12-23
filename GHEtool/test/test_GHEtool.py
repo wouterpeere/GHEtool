@@ -167,6 +167,15 @@ def hourly_borefield():
 
 
 @pytest.fixture
+def hourly_borefield_reversed():
+    borefield = Borefield()
+    borefield.set_ground_parameters(data)
+    borefield.set_borefield(borefield_gt)
+    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv", first_column_heating=False)
+    return borefield
+
+
+@pytest.fixture
 def borefield_cooling_dom():
     borefield = Borefield(simulation_period=20,
                           peak_heating=peakHeating,
@@ -184,7 +193,7 @@ def borefield_cooling_dom():
 
 def test_create_rectangular_field(borefield):
     for i in range(len(borefield.borefield)):
-        assert borefield.borefield[i].__dict__ == borefield.create_rectangular_borefield(10, 12, 6, 6, 110, 4, 0.075)[i].__dict__
+        assert borefield.borefield[i].__dict__ == gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)[i].__dict__
 
 
 def test_create_circular_field(borefield):
@@ -247,7 +256,7 @@ def test_without_pipe(borefield):
 
 
 def test_Tg(borefield):
-    borefield.use_constant_Tg = False
+    borefield._sizing_setup.use_constant_Tg = False
     borefield._Tg()
 
 
@@ -280,6 +289,32 @@ def test_size_L4(hourly_borefield):
     assert hourly_borefield._check_hourly_load()
     hourly_borefield.sizing_setup(L4_sizing=True)
     hourly_borefield.size()
+
+
+def test_size_L4_quadrant(hourly_borefield):
+    hourly_borefield.sizing_setup(L4_sizing=True, quadrant_sizing=1)
+    hourly_borefield.size()
+
+
+def test_size_L4_quadrant_4(hourly_borefield):
+    hourly_borefield.hourly_heating_load[0] = 100000
+    hourly_borefield.sizing_setup(L4_sizing=True)
+    hourly_borefield.size()
+
+
+def test_size_L4_heating_dom(hourly_borefield_reversed):
+    hourly_borefield_reversed.sizing_setup(L4_sizing=True)
+    hourly_borefield_reversed.size()
+
+
+def test_size_L4_quadrant_3(hourly_borefield_reversed):
+    hourly_borefield_reversed.hourly_heating_load[0] = 100000
+    hourly_borefield_reversed.sizing_setup(L4_sizing=True)
+    hourly_borefield_reversed.size()
+
+
+def test_sizing_setup(borefield):
+    borefield.sizing_setup(sizing_setup=SizingSetup())
 
 
 def test_cooling_dom(borefield_cooling_dom):
@@ -319,7 +354,14 @@ def test_size_L4_without_data(borefield):
 
 def test_load_duration(monkeypatch, hourly_borefield):
     monkeypatch.setattr(plt, 'show', lambda: None)
-    hourly_borefield.plot_load_duration()
+    hourly_borefield.plot_load_duration(legend=True)
+
+
+def test_load_duration_no_hourly_data(borefield):
+    try:
+        borefield.plot_load_duration()
+    except ValueError:
+        assert True
 
 
 def test_optimise_load_profile_without_data(borefield):
@@ -492,7 +534,7 @@ def test_convert_hourly_to_monthly_without_data(borefield):
         assert True
     borefield.set_fluid_parameters(fluidData)
     borefield.set_pipe_parameters(pipeData)
-    borefield.use_constant_Rb = False
+    borefield._sizing_setup.use_constant_Rb = False
     try:
         borefield.optimise_load_profile()
     except ValueError:
@@ -503,3 +545,68 @@ def test_calculate_hourly_temperature_profile(hourly_borefield):
     hourly_borefield._calculate_temperature_profile(100, hourly=True)
     hourly_borefield.hourly_heating_load_on_the_borefield = hourly_borefield.hourly_heating_load
     hourly_borefield.hourly_cooling_load_on_the_borefield = hourly_borefield.hourly_cooling_load
+
+
+def test_incorrect_values_peak_baseload(borefield):
+    try:
+        borefield.set_peak_heating(8)
+    except ValueError:
+        assert True
+
+    try:
+        borefield.set_peak_cooling(8)
+    except ValueError:
+        assert True
+
+    try:
+        borefield.set_baseload_heating(8)
+    except ValueError:
+        assert True
+
+    try:
+        borefield.set_baseload_cooling(8)
+    except ValueError:
+        assert True
+
+    try:
+        borefield.set_peak_cooling([8, 8])
+    except ValueError:
+        assert True
+
+    try:
+        borefield.set_peak_heating([8, 8])
+    except ValueError:
+        assert True
+
+    try:
+        borefield.set_baseload_cooling([8, 8])
+    except ValueError:
+        assert True
+
+    try:
+        borefield.set_baseload_heating([8, 8])
+    except ValueError:
+        assert True
+
+
+def test_temperature_profile_available(hourly_borefield):
+    hourly_borefield.calculate_temperatures(100, True)
+    assert not hourly_borefield.recalculation_needed
+    assert hourly_borefield._check_temperature_profile_available(hourly=True)
+    hourly_borefield.recalculation_needed = True
+    assert not hourly_borefield._check_temperature_profile_available(True)
+
+    hourly_borefield.gui = True
+    hourly_borefield._plot_temperature_profile(plot_hourly=True)
+
+
+def test_set_options_gfunction_calculation(borefield):
+    borefield.set_options_gfunction_calculation({"method": "equivalentt"})
+    assert borefield.options_pygfunction["method"] == "equivalentt"
+    borefield.set_options_gfunction_calculation({"method": "equivalent"})
+
+
+
+def test_gfunction_jit(borefield):
+    borefield.use_precalculated_data = False
+    borefield.gfunction(10000, 100)
