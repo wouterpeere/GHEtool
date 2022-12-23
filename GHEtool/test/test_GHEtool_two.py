@@ -61,6 +61,43 @@ def load_case(number):
     return monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating
 
 
+def test_different_heating_cooling_peaks():
+    # Monthly loading values
+    peakCooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]  # Peak cooling in kW
+    peakHeating = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]  # Peak heating in kW
+
+    # annual heating and cooling load
+    annualHeatingLoad = 300 * 10 ** 3  # kWh
+    annualCoolingLoad = 160 * 10 ** 3  # kWh
+
+    # percentage of annual load per month (15.5% for January ...)
+    monthlyLoadHeatingPercentage = [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144]
+    monthlyLoadCoolingPercentage = [0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025]
+
+    # resulting load per month
+    monthlyLoadHeating = list(map(lambda x: x * annualHeatingLoad, monthlyLoadHeatingPercentage))  # kWh
+    monthlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, monthlyLoadCoolingPercentage))  # kWh
+
+    borefield = Borefield(simulation_period=20,
+                          peak_heating=peakHeating,
+                          peak_cooling=peakCooling,
+                          baseload_heating=monthlyLoadHeating,
+                          baseload_cooling=monthlyLoadCooling)
+
+    borefield.set_ground_parameters(data)
+    borefield.set_borefield(copy.copy(borefield_gt))
+
+    # set temperature boundaries
+    borefield.set_max_ground_temperature(16)  # maximum temperature
+    borefield.set_min_ground_temperature(0)  # minimum temperature
+    borefield.set_length_peak_cooling(8)
+    assert borefield.length_peak_cooling == 8
+    assert borefield.length_peak_heating == 6
+    assert np.isclose(borefield.size(), 94.05270927679376)
+    assert borefield.length_peak_cooling == 8
+    assert borefield.length_peak_heating == 6
+
+
 def test_stuck_in_loop():
     monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(4)
 

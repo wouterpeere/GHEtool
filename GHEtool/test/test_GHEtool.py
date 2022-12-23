@@ -193,7 +193,7 @@ def borefield_cooling_dom():
 
 def test_create_rectangular_field(borefield):
     for i in range(len(borefield.borefield)):
-        assert borefield.borefield[i].__dict__ == borefield.create_rectangular_borefield(10, 12, 6, 6, 110, 4, 0.075)[i].__dict__
+        assert borefield.borefield[i].__dict__ == gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)[i].__dict__
 
 
 def test_create_circular_field(borefield):
@@ -547,7 +547,7 @@ def test_calculate_hourly_temperature_profile(hourly_borefield):
     hourly_borefield.hourly_cooling_load_on_the_borefield = hourly_borefield.hourly_cooling_load
 
 
-def test_incorrect_values_peak_basload(borefield):
+def test_incorrect_values_peak_baseload(borefield):
     try:
         borefield.set_peak_heating(8)
     except ValueError:
