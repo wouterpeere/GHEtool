@@ -119,7 +119,7 @@ class Borefield:
         # that accurate.
         self.THRESHOLD_WARNING_SHALLOW_FIELD: int = 50
 
-        # setting this to False will make sure every gvalue is calculated on the spot
+        # setting this to False will make sure every g-value is calculated on the spot
         # this will make everything way slower!
         self.use_precalculated_data: bool = True
 
@@ -1755,7 +1755,7 @@ class Borefield:
         Returns
         -------
         gvalue : np.ndarray
-            1D array with the gvalues for all the requested time_value(s)
+            1D array with the g-values for all the requested time_value(s)
         """
         # when using a variable ground temperature, sometimes no solution can be found
         if not self._sizing_setup.use_constant_Tg and H > Borefield.THRESHOLD_DEPTH_ERROR:
@@ -1770,7 +1770,7 @@ class Borefield:
             Returns
             -------
             gvalues : np.ndarray
-                1D array with the gvalues for the requested time intervals
+                1D array with the g-values for the requested time intervals
             """
             # set the correct depth of the borefield
             self._update_borefield_depth(H=H)
@@ -1799,7 +1799,7 @@ class Borefield:
         """
         This function makes a datafile for a given custom borefield and sets it for the borefield object.
         It automatically sets this datafile in the current borefield object so it can be used as a source for
-        the interpolation of gvalues.
+        the interpolation of g-values.
 
         Parameters
         ----------
@@ -1808,7 +1808,7 @@ class Borefield:
         depth_array : list, np.array
             List or arrays of depths for which the datafile should be created
         options : dict
-            Options for the gfunction calculation (check pygfunction.gfunction.gFunction() for more information)
+            Options for the g-function calculation (check pygfunction.gfunction.gFunction() for more information)
 
         Returns
         -------
