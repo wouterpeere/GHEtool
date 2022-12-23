@@ -11,6 +11,7 @@ class FIFO:
     """
     This class is a container with n elements. If the n+1th element is added, the first is removed
     """
+
     def __init__(self, length: int = 2):
         """
 
@@ -36,7 +37,7 @@ class FIFO:
         -------
         None
         """
-        if len(self.fifo_list) > self.length:
+        if len(self.fifo_list) >= self.length:
             self.fifo_list.pop(0)
 
         self.fifo_list.append(value)
@@ -60,7 +61,6 @@ class FIFO:
 
 
 class GFunction:
-
     """
     Class that contains the functionality to calculate gfunctions and to store
     previously calculated values that can potentially be used for interpolation to save time.
@@ -86,7 +86,8 @@ class GFunction:
 
         self.fifo_list: FIFO = FIFO()
 
-    def calculate(self, time_value: Union[list, float, np.ndarray], borefield: List[gt.boreholes.Borehole], alpha: float):
+    def calculate(self, time_value: Union[list, float, np.ndarray], borefield: List[gt.boreholes.Borehole],
+                  alpha: float):
         """
         This function returns the gvalues either by interpolation or by calculating them.
         It does so by calling the function gvalues which does this calculation.
@@ -108,7 +109,8 @@ class GFunction:
             1D array with all the requested gvalues
         """
 
-        def gvalues(time_values: np.ndarray, borefield: List[gt.boreholes.Borehole], alpha: float, depth: float) -> np.ndarray:
+        def gvalues(time_values: np.ndarray, borefield: List[gt.boreholes.Borehole], alpha: float,
+                    depth: float) -> np.ndarray:
             """
             This function returns the gvalues either by interpolation or by calculating them.
 
@@ -129,7 +131,8 @@ class GFunction:
                 1D array with all the requested gvalues
             """
             # check if the value is in the fifo_list
-            if self.fifo_list.in_fifo_list(depth):
+            # if the value is in self.depth_array, there is no problem, since the interpolation will be exact anyway
+            if self.fifo_list.in_fifo_list(depth) and depth not in self.depth_array:
                 # chances are we are stuck in a loop, so calculate the gfunction and do not iterate
 
                 # calculate the g-values for uniform borehole wall temperature
@@ -189,7 +192,6 @@ class GFunction:
 
         # check if there are double values
         if not isinstance(time_value, (float, int)) and time_value_np.size != np.unique(np.asarray(time_value)).size:
-
             # calculate g-function values
             gfunc_uniform_T = gvalues(np.unique(time_value_np), borefield, alpha, depth)
 
