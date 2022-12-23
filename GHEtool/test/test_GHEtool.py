@@ -587,3 +587,31 @@ def test_incorrect_values_peak_baseload(borefield):
         borefield.set_baseload_heating([8, 8])
     except ValueError:
         assert True
+
+
+def test_temperature_profile_available():
+    borefield = Borefield()
+    borefield.set_ground_parameters(data)
+    borefield.set_borefield(borefield_gt)
+    borefield.load_hourly_profile("hourly_profile_without_header.csv", header=False)
+    hourly_borefield = borefield
+    hourly_borefield.calculate_temperatures(100, True)
+    assert not hourly_borefield.recalculation_needed
+    assert hourly_borefield._check_temperature_profile_available(hourly=True)
+    hourly_borefield.recalculation_needed = True
+    assert not hourly_borefield._check_temperature_profile_available(True)
+
+    hourly_borefield.gui = True
+    hourly_borefield._plot_temperature_profile(plot_hourly=True)
+
+
+def test_set_options_gfunction_calculation(borefield):
+    borefield.set_options_gfunction_calculation({"method": "equivalentt"})
+    assert borefield.options_pygfunction["method"] == "equivalentt"
+    borefield.set_options_gfunction_calculation({"method": "equivalent"})
+
+
+
+def test_gfunction_jit(borefield):
+    borefield.use_precalculated_data = False
+    borefield.gfunction(10000, 100)
