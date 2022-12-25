@@ -2,9 +2,10 @@
 This document is an example on how to import hourly load profiles into GHEtool.
 It uses the hourly_profile.csv data.
 """
+import pygfunction as gt
+
 # import all the relevant functions
 from GHEtool import *
-import pygfunction as gt
 
 # initiate ground data
 data = GroundData(3, 10, 0.12, 2.4*10**6)

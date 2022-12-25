@@ -9,10 +9,10 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import pygfunction as gt
 
 from GHEtool import Borefield
-from GHEtool.VariableClasses import FluidData, PipeData, GroundData
-import pygfunction as gt
+from GHEtool.VariableClasses import FluidData, GroundData, PipeData
 
 # initiate parameters
 ground_data = GroundData(3, 10, 0.12)  # ground data with an inaccurate guess of 100m for the depth of the borefield

@@ -1,15 +1,15 @@
 def run():
+    import pathlib
+    from configparser import ConfigParser
     from ctypes import windll as ctypes_windll
     from sys import argv
     from sys import exit as sys_exit
-    from configparser import ConfigParser
-    import pathlib
 
     from PySide6.QtWidgets import QApplication as QtWidgets_QApplication
     from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
 
-    from GHEtool.gui.gui_combine_window import MainWindow
     from GHEtool import FOLDER
+    from GHEtool.gui.gui_combine_window import MainWindow
 
     # init application
     app = QtWidgets_QApplication(argv)

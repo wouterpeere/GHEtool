@@ -4,12 +4,14 @@ One needs GHEtool version 2.0.6 to run this code.
 """
 import math
 
-from GHEtool import Borefield, GroundData
 import matplotlib.pyplot as plt
 import numpy as np
 
 # code for making figures black-and-white ready
 from cycler import cycler
+
+from GHEtool import Borefield, GroundData
+
 color_c = cycler('color', ['k'])
 style_c = cycler('linestyle', ['-', '--', ':', '-.'])
 markr_c = cycler('marker', ['', '.', 'o'])

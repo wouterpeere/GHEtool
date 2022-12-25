@@ -5,11 +5,12 @@ The comparison is based on speed and relative accuracy in the result.
 It is shown that the speed difference is significant, but so is the difference in the result. With a constant Rb* value, it is important that the initial depth is rather accurate.
 """
 
-import numpy as np
 import time
 
-from GHEtool import Borefield, GroundData, FluidData, PipeData
+import numpy as np
 import pygfunction as gt
+
+from GHEtool import Borefield, FluidData, GroundData, PipeData
 
 number_of_iterations = 50
 max_value_cooling = 700

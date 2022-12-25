@@ -2,23 +2,34 @@
 This document contains all the information relevant for the GUI.
 It contains all the options, categories etc. that should appear on the GUI.
 """
+from math import cos, pi, sin, tan
 from typing import List, Optional, Tuple, Union
 
-from PySide6.QtWidgets import QStatusBar, QWidget
-from PySide6.QtWidgets import QGraphicsEllipseItem, QGraphicsScene
-from PySide6.QtWidgets import QGraphicsView as QtWidgets_QGraphicsView
-from PySide6.QtGui import QPen
-from PySide6.QtGui import QColor
-from numpy import cos, sin, array, int64, float64, round, sum
+import PySide6.QtGui as QtG
+import PySide6.QtWidgets as QtW
+from numpy import array, cos, int64, round, sin, sum
+from pandas import DataFrame as pd_DataFrame
+from pandas import read_csv as pd_read_csv
 
-from GHEtool.gui.gui_classes import (Aim, ButtonBox, Category, FloatBox, FileNameBox, FunctionButton, Hint, IntBox, ListBox, Option, Page, ResultFigure,
-                                     ResultText, FigureOption, check_aim_options)
-from GHEtool.gui.translation_class import Translations
 from GHEtool.gui.gui_base_class import DARK, GREY, LIGHT, WHITE
-
-from math import cos, pi, sin, tan
-
-from pandas import DataFrame as pd_DataFrame, read_csv as pd_read_csv
+from GHEtool.gui.gui_classes import (
+    Aim,
+    ButtonBox,
+    Category,
+    FigureOption,
+    FileNameBox,
+    FloatBox,
+    FunctionButton,
+    Hint,
+    IntBox,
+    ListBox,
+    Option,
+    Page,
+    ResultFigure,
+    ResultText,
+    check_aim_options,
+)
+from GHEtool.gui.translation_class import Translations
 
 
 def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, cooling_load_column: str, combined: str, sep: str,
@@ -137,7 +148,7 @@ class GuiStructure:
     """
     This class contains all the elements that are relevant for the GUI.
     """
-    def __init__(self, default_parent: QWidget, status_bar: QStatusBar):
+    def __init__(self, default_parent: QtW.QWidget, status_bar: QtW.QStatusBar):
         """
         All the elements that should be placed on the GUI, should be written in
         chronologial order, in this __init__ function.
@@ -1197,7 +1208,7 @@ class GuiStructure:
         """
         frame = self.category_pipe_data.graphic_left if self.category_pipe_data.graphic_left is not None else \
             self.category_pipe_data.graphic_right
-        if isinstance(frame, QtWidgets_QGraphicsView):
+        if isinstance(frame, QtW.QGraphicsView):
             # import all that is needed
             # get variables from gui
             number_of_pipes = self.option_pipe_number.get_value()
@@ -1213,22 +1224,22 @@ class GuiStructure:
             white_color = array(WHITE.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
             light_color = array(LIGHT.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
             grey_color = array(GREY.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
-            blue_color = QColor(dark_color[0], dark_color[1], dark_color[2])
-            blue_light = QColor(light_color[0], light_color[1], light_color[2])
-            white_color = QColor(white_color[0], white_color[1], white_color[2])
-            grey = QColor(grey_color[0], grey_color[1], grey_color[2])
-            brown = QColor(145, 124, 111)
+            blue_color = QtG.QColor(dark_color[0], dark_color[1], dark_color[2])
+            blue_light = QtG.QColor(light_color[0], light_color[1], light_color[2])
+            white_color = QtG.QColor(white_color[0], white_color[1], white_color[2])
+            grey = QtG.QColor(grey_color[0], grey_color[1], grey_color[2])
+            brown = QtG.QColor(145, 124, 111)
             # create graphic scene if not exits otherwise get scene and delete items
             if frame.scene() is None:
-                scene = QGraphicsScene()  # parent=self.central_widget)
+                scene = QtW.QGraphicsScene()  # parent=self.central_widget)
                 frame.setScene(scene)
                 frame.setBackgroundBrush(brown)
             else:
                 scene = frame.scene()
                 scene.clear()
             # create borehole circle in grey wih no border
-            circle = QGraphicsEllipseItem(-r_bore * scale / 2, -r_bore * scale / 2, r_bore * scale, r_bore * scale)
-            circle.setPen(QPen(grey, 0))
+            circle = QtW.QGraphicsEllipseItem(-r_bore * scale / 2, -r_bore * scale / 2, r_bore * scale, r_bore * scale)
+            circle.setPen(QtG.QPen(grey, 0))
             circle.setBrush(grey)
             scene.addItem(circle)
             # calculate pipe position and draw circle (white for outer pipe and blue for inner pipe)
@@ -1236,21 +1247,21 @@ class GuiStructure:
             for i in range(number_of_pipes):
                 pos_1 = dis * cos(2.0 * i * dt + pi) / 2
                 pos_2 = dis * sin(2.0 * i * dt + pi) / 2
-                circle = QGraphicsEllipseItem((pos_1 - r_out / 2) * scale, (pos_2 - r_out / 2) * scale, r_out * scale, r_out * scale)
+                circle = QtW.QGraphicsEllipseItem((pos_1 - r_out / 2) * scale, (pos_2 - r_out / 2) * scale, r_out * scale, r_out * scale)
                 circle.setPen(white_color)
                 circle.setBrush(white_color)
                 scene.addItem(circle)
-                circle = QGraphicsEllipseItem((pos_1 - r_in / 2) * scale, (pos_2 - r_in / 2) * scale, r_in * scale, r_in * scale)
+                circle = QtW.QGraphicsEllipseItem((pos_1 - r_in / 2) * scale, (pos_2 - r_in / 2) * scale, r_in * scale, r_in * scale)
                 circle.setPen(blue_color)
                 circle.setBrush(blue_color)
                 scene.addItem(circle)
                 pos_1 = dis * cos(2.0 * i * dt + pi + dt) / 2
                 pos_2 = dis * sin(2.0 * i * dt + pi + dt) / 2
-                circle = QGraphicsEllipseItem((pos_1 - r_out / 2) * scale, (pos_2 - r_out / 2) * scale, r_out * scale, r_out * scale)
+                circle = QtW.QGraphicsEllipseItem((pos_1 - r_out / 2) * scale, (pos_2 - r_out / 2) * scale, r_out * scale, r_out * scale)
                 circle.setPen(white_color)
                 circle.setBrush(white_color)
                 scene.addItem(circle)
-                circle = QGraphicsEllipseItem((pos_1 - r_in / 2) * scale, (pos_2 - r_in / 2) * scale, r_in * scale, r_in * scale)
+                circle = QtW.QGraphicsEllipseItem((pos_1 - r_in / 2) * scale, (pos_2 - r_in / 2) * scale, r_in * scale, r_in * scale)
                 circle.setPen(blue_light)
                 circle.setBrush(blue_light)
                 scene.addItem(circle)

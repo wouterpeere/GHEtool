@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from typing import Optional
+
 import matplotlib.pyplot as plt
 import pygfunction as gt
 
 from GHEtool import Borefield, FluidData, GroundData, PipeData
-from GHEtool.gui.gui_structure import GuiStructure
 from GHEtool.gui.gui_classes import ListBox
+from GHEtool.gui.gui_structure import GuiStructure
 
 
 class DataStorage:

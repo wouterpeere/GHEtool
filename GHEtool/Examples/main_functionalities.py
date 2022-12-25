@@ -7,9 +7,10 @@ This file contains all the main functionalities of GHEtool being:
     * printing the array of the temperature
 """
 
-# import all the relevant functions
-from GHEtool import Borefield, GroundData, FluidData, PipeData
 import numpy as np
+
+# import all the relevant functions
+from GHEtool import Borefield, FluidData, GroundData, PipeData
 
 # relevant borefield data for the calculations
 data = GroundData(3,             # conductivity of the soil (W/mK)

@@ -6,18 +6,19 @@ Notes
 In a future release, this file will be split into a Borefield class, a GeothermalSystem class and a HybridGeothermalSystem class.
 This will be done in v2.1.1.
 """
-import numpy as np
+import pathlib
 import pickle
+import warnings
+from math import pi
+from typing import Optional, Tuple, Union
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pygfunction as gt
 from scipy import interpolate
 from scipy.signal import convolve
-from math import pi
-import pygfunction as gt
-import pathlib
-import matplotlib.pyplot as plt
-import warnings
-from typing import Union, Tuple, Optional
 
-from GHEtool.VariableClasses import GroundData, FluidData, PipeData
+from GHEtool.VariableClasses import FluidData, GroundData, PipeData
 
 
 def _timeValues(dt=3600., t_max=100. * 8760 * 3600.) -> np.array:

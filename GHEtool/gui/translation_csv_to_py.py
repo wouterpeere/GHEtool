@@ -1,6 +1,8 @@
 from os import system
-from GHEtool import FOLDER
+
 from pandas import read_csv
+
+from GHEtool import FOLDER
 
 
 def main():

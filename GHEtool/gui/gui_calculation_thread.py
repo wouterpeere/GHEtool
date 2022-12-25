@@ -2,19 +2,18 @@
 This document contains all the code related to calculating the solution to the different
 aims in the GUI.
 """
-from PySide6.QtCore import QThread as QtCore_QThread
-from PySide6.QtCore import Signal as QtCore_pyqtSignal
+import PySide6.QtCore as QtC
 
 from GHEtool.gui.gui_data_storage import DataStorage
 from GHEtool.gui.gui_structure import load_data_GUI
 
 
-class CalcProblem(QtCore_QThread):
+class CalcProblem(QtC.QThread):
     """
     class to calculate the problem in an external thread
     """
 
-    any_signal = QtCore_pyqtSignal(tuple)
+    any_signal = QtC.pyqtSignal(tuple)
 
     def __init__(self, ds: DataStorage, idx: int, parent=None) -> None:
         """

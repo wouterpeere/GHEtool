@@ -4,6 +4,7 @@ This is done for two fields with different sizes. It shows that, specifically fo
 """
 
 import time
+
 import pygfunction as gt
 
 from GHEtool import Borefield, GroundData

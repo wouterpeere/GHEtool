@@ -1,36 +1,21 @@
 from functools import partial as ft_partial
-from os.path import dirname, realpath, exists
-from os.path import split as os_split
+from json import dump, load
 from os import makedirs, remove
+from os.path import dirname, exists, realpath
+from os.path import split as os_split
 from pathlib import Path, PurePath
-from json import load, dump
 from sys import path
 from typing import TYPE_CHECKING, List, Tuple
 
-from PySide6.QtCore import QEvent as QtCore_QEvent, QTimer
-from PySide6.QtCore import QModelIndex as QtCore_QModelIndex
-from PySide6.QtCore import QSize as QtCore_QSize
-from PySide6.QtGui import QAction as QtGui_QAction
-from PySide6.QtGui import QIcon as QtGui_QIcon
-from PySide6.QtGui import QPixmap as QtGui_QPixmap
-from PySide6.QtWidgets import QApplication as QtWidgets_QApplication
-from PySide6.QtWidgets import QDialog as QtWidgets_QDialog
-from PySide6.QtWidgets import QFileDialog as QtWidgets_QFileDialog
-from PySide6.QtWidgets import QInputDialog as QtWidgets_QInputDialog
-from PySide6.QtWidgets import QListWidgetItem as QtWidgets_QListWidgetItem
-from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
-from PySide6.QtWidgets import QMenu as QtWidgets_QMenu
-from PySide6.QtWidgets import QMessageBox as QtWidgets_QMessageBox
-from PySide6.QtWidgets import QPushButton as QtWidgets_QPushButton
-from PySide6.QtWidgets import QSizePolicy, QSpacerItem
-from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
+import PySide6.QtCore as QtC
+import PySide6.QtGui as QtG
+import PySide6.QtWidgets as QtW
 
-from .gui_calculation_thread import (CalcProblem)
-from .gui_data_storage import DataStorage
 from .gui_base_class import UiGhetool, set_graph_layout
-from .gui_structure import GuiStructure, Option, FigureOption
+from .gui_calculation_thread import CalcProblem
+from .gui_data_storage import DataStorage
+from .gui_structure import FigureOption, GuiStructure, Option
 from .translation_class import Translations
-
 
 if TYPE_CHECKING:
     from GHEtool import Borefield
@@ -43,10 +28,10 @@ BACKUP_FILENAME: str = 'backup.GHEtoolBackUp'
 
 
 # main GUI class
-class MainWindow(QtWidgets_QMainWindow, UiGhetool):
+class MainWindow(QtW.QMainWindow, UiGhetool):
     filenameDefault: tuple = ("", "")
 
-    def __init__(self, dialog: QtWidgets_QWidget, app: QtWidgets_QApplication) -> None:
+    def __init__(self, dialog: QtW.QWidget, app: QtW.QApplication) -> None:
         """
         initialize window
         :param dialog: Q widget as main window
@@ -63,12 +48,12 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         for page in self.gui_structure.list_of_pages:
             page.create_page(self.central_widget, self.stackedWidget, self.verticalLayout_menu)
 
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer = QtW.QSpacerItem(20, 40, QtW.QSizePolicy.Minimum, QtW.QSizePolicy.Expanding)
         self.verticalLayout_menu.addItem(self.verticalSpacer)
 
         # self.add_aims(list_button)
         # set app and dialog
-        self.app: QtWidgets_QApplication = app
+        self.app: QtW.QApplication = app
         self.Dia = dialog
         # init variables of class
         # allow checking of changes
@@ -95,10 +80,10 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.finished: int = 1  # number of finished scenarios
         self.threads: List[CalcProblem] = []  # list of calculation threads
         self.list_ds: List[DataStorage] = []  # list of data storages
-        self.sizeB = QtCore_QSize(48, 48)  # size of big logo on push button
-        self.sizeS = QtCore_QSize(24, 24)  # size of small logo on push button
-        self.sizePushB = QtCore_QSize(150, 75)  # size of big push button
-        self.sizePushS = QtCore_QSize(75, 75)  # size of small push button
+        self.sizeB = QtC.QSize(48, 48)  # size of big logo on push button
+        self.sizeS = QtC.QSize(24, 24)  # size of small logo on push button
+        self.sizePushB = QtC.QSize(150, 75)  # size of big push button
+        self.sizePushS = QtC.QSize(75, 75)  # size of small push button
         # init links from buttons to functions
         self.set_links()
         # reset progress bar
@@ -141,9 +126,9 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.started: bool = True
 
     def create_action_language(self, idx: int, name: str, icon_name: str, short_cut: str):
-        action = QtGui_QAction(self.central_widget)
-        icon = QtGui_QIcon()
-        icon.addFile(icon_name, QtCore_QSize(), QtGui_QIcon.Normal, QtGui_QIcon.Off)
+        action = QtG.QAction(self.central_widget)
+        icon = QtG.QIcon()
+        icon.addFile(icon_name, QtC.QSize(), QtG.QIcon.Normal, QtG.QIcon.Off)
         action.setIcon(icon)
         self.menuLanguage.addAction(action)
         action.setText(name)
@@ -203,7 +188,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         ds.close_figures()
         self.display_results()
 
-    def event_filter(self, obj: QtWidgets_QPushButton, event) -> bool:
+    def event_filter(self, obj: QtW.QPushButton, event) -> bool:
         """
         function to check mouse over event
         :param obj:
@@ -213,11 +198,11 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         :return:
         Boolean to check if the function worked
         """
-        if event.type() == QtCore_QEvent.Enter:
+        if event.type() == QtC.QEvent.Enter:
             # Mouse is over the label
             self.set_push(True)
             return True
-        elif event.type() == QtCore_QEvent.Leave:
+        elif event.type() == QtC.QEvent.Leave:
             # Mouse is not over the label
             self.set_push(False)
             return True
@@ -237,7 +222,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         for page in self.gui_structure.list_of_pages:
             self.set_push_button_icon_size(page.button)
 
-    def set_push_button_icon_size(self, button: QtWidgets_QPushButton, big: bool = False, name: str = "") -> None:
+    def set_push_button_icon_size(self, button: QtW.QPushButton, big: bool = False, name: str = "") -> None:
         """
         set button name and size
         :param button: QPushButton to set name and icon size for
@@ -314,7 +299,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # else add * to current item string
         self.list_widget_scenario.item(idx).setText(f"{text}*")
 
-    def fun_auto_save_scenario(self, new_row_item: QtWidgets_QListWidgetItem, old_row_item: QtWidgets_QListWidgetItem) -> None:
+    def fun_auto_save_scenario(self, new_row_item: QtW.QListWidgetItem, old_row_item: QtW.QListWidgetItem) -> None:
         """
         function to save a scenario when the item in the list Widget is changed and the checkBox to save automatic is
         checked or ask to save unsaved scenario changes
@@ -332,7 +317,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             # change item to old item by thread, because I have not found a direct way which is not lost after
             # return
             ds = DataStorage(self.gui_structure)
-            t = QTimer(self)
+            t = QtC.QTimer(self)
 
             def hello():
                 self.list_widget_scenario.blockSignals(True)
@@ -366,19 +351,19 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # check if the old scenario is unsaved then create message box
         if text[-1] == "*":
             # create message box
-            msg: QtWidgets_QMessageBox = QtWidgets_QMessageBox(self.Dia)
+            msg: QtW.QMessageBox = QtW.QMessageBox(self.Dia)
             # set Icon to question mark icon
-            msg.setIcon(QtWidgets_QMessageBox.Question)
+            msg.setIcon(QtW.QMessageBox.Question)
             # set label text to leave scenario text depending on language selected
             msg.setText(self.translations.label_LeaveScenarioText[self.gui_structure.option_language.get_value()])
             # set window text to  leave scenario text depending on language selected
             msg.setWindowTitle(self.translations.label_CancelTitle[self.gui_structure.option_language.get_value()])
             # set standard buttons to save, close and cancel
-            msg.setStandardButtons(QtWidgets_QMessageBox.Save | QtWidgets_QMessageBox.Close | QtWidgets_QMessageBox.Cancel)
+            msg.setStandardButtons(QtW.QMessageBox.Save | QtW.QMessageBox.Close | QtW.QMessageBox.Cancel)
             # get save, close and cancel button
-            button_s = msg.button(QtWidgets_QMessageBox.Save)
-            button_cl = msg.button(QtWidgets_QMessageBox.Close)
-            button_ca = msg.button(QtWidgets_QMessageBox.Cancel)
+            button_s = msg.button(QtW.QMessageBox.Save)
+            button_cl = msg.button(QtW.QMessageBox.Close)
+            button_ca = msg.button(QtW.QMessageBox.Cancel)
             # set save, close and cancel button text depending on language selected
             button_s.setText(f"{self.translations.pushButton_SaveScenario[self.gui_structure.option_language.get_value()]} ")
             button_cl.setText(f"{self.translations.label_LeaveScenario[self.gui_structure.option_language.get_value()]} ")
@@ -390,11 +375,11 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             # execute message box and save response
             reply = msg.exec_()
             # check if closing should be canceled
-            if reply == QtWidgets_QMessageBox.Cancel:
+            if reply == QtW.QMessageBox.Cancel:
                 return_2_old_item()
                 return
             # save scenario if wanted
-            if reply == QtWidgets_QMessageBox.Save:
+            if reply == QtW.QMessageBox.Save:
                 if not self.save_scenario(self.list_widget_scenario.row(old_row_item)):
                     return_2_old_item()
             # remove * symbol
@@ -403,7 +388,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.change_scenario(self.list_widget_scenario.row(new_row_item))
         return
 
-    def fun_move_scenario(self, start_item: QtCore_QModelIndex, start_index: int, start_index2: int, end_item: QtCore_QModelIndex, target_index: int) -> None:
+    def fun_move_scenario(self, start_item: QtC.QModelIndex, start_index: int, start_index2: int, end_item: QtC.QModelIndex, target_index: int) -> None:
         """
         change list of ds entry if scenario is moved (more inputs than needed, because the list widget returns that much
         :param start_item: start item of moving
@@ -417,16 +402,16 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.list_ds.insert(target_index, self.list_ds.pop(start_index))
 
     @staticmethod
-    def set_push_button_icon(button: QtWidgets_QPushButton, icon_name: str) -> None:
+    def set_push_button_icon(button: QtW.QPushButton, icon_name: str) -> None:
         """
         set QPushButton icon
         :param button: QPushButton to change to icon for
         :param icon_name: icon name as string
         :return: None
         """
-        icon = QtGui_QIcon()  # create icon class
+        icon = QtG.QIcon()  # create icon class
         # add pixmap to icon
-        icon.addPixmap(QtGui_QPixmap(f":/icons/icons/{icon_name}.svg"), QtGui_QIcon.Normal, QtGui_QIcon.Off)
+        icon.addPixmap(QtG.QPixmap(f":/icons/icons/{icon_name}.svg"), QtG.QIcon.Normal, QtG.QIcon.Off)
         button.setIcon(icon)  # set icon to button
 
     def fun_rename_scenario(self) -> None:
@@ -439,16 +424,16 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # get first item if no one is selected
         item = self.list_widget_scenario.item(0) if item is None else item
         # create dialog box to ask for a new name
-        dialog = QtWidgets_QInputDialog(self.Dia)
+        dialog = QtW.QInputDialog(self.Dia)
         dialog.setWindowTitle(self.translations.label_new_scenario[self.gui_structure.option_language.get_value()])
         dialog.setLabelText(f"{self.translations.new_name[self.gui_structure.option_language.get_value()]}{item.text()}:")
         dialog.setOkButtonText(self.translations.label_okay[self.gui_structure.option_language.get_value()])  # +++
         dialog.setCancelButtonText(self.translations.label_abort[self.gui_structure.option_language.get_value()])  # +++
-        li = dialog.findChildren(QtWidgets_QPushButton)
+        li = dialog.findChildren(QtW.QPushButton)
         self.set_push_button_icon(li[0], "Okay")
         self.set_push_button_icon(li[1], "Abort")
         # set new name if the dialog is not canceled and the text is not None
-        if dialog.exec_() == QtWidgets_QDialog.Accepted:
+        if dialog.exec_() == QtW.QDialog.Accepted:
             text = dialog.textValue()
             item.setText(text) if text != "" else None
 
@@ -490,7 +475,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             return
         self.status_bar.show()
 
-    def eventFilter(self, obj: QtWidgets_QPushButton, event) -> bool:
+    def eventFilter(self, obj: QtW.QPushButton, event) -> bool:
         """
         function to check mouse over event
         :param obj:
@@ -500,11 +485,11 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         :return:
         Boolean to check if the function worked
         """
-        if event.type() == QtCore_QEvent.Enter:
+        if event.type() == QtC.QEvent.Enter:
             # Mouse is over the label
             self.set_push(True)
             return True
-        elif event.type() == QtCore_QEvent.Leave:
+        elif event.type() == QtC.QEvent.Leave:
             # Mouse is not over the label
             self.set_push(False)
             return True
@@ -530,7 +515,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         ]
         # update all label, pushButtons, action and Menu names
         for i in [j for j in self.translations.__slots__ if hasattr(self, j)]:
-            if isinstance(getattr(self, i), QtWidgets_QMenu):
+            if isinstance(getattr(self, i), QtW.QMenu):
                 getattr(self, i).setTitle(getattr(self.translations, i)[self.gui_structure.option_language.get_value()])
                 continue
             getattr(self, i).setText(getattr(self.translations, i)[self.gui_structure.option_language.get_value()])
@@ -623,7 +608,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         :return: None
         """
         # open interface and get file name
-        self.filename = QtWidgets_QFileDialog.getOpenFileName(
+        self.filename = QtW.QFileDialog.getOpenFileName(
             self.central_widget, caption=self.translations.ChoosePKL[self.gui_structure.option_language.get_value()], filter="GHEtool (*.GHEtool)"
         )
         # load selected data
@@ -679,7 +664,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         """
         # ask for pickle file if the filename is still the default
         if self.filename == MainWindow.filenameDefault:
-            self.filename: tuple = QtWidgets_QFileDialog.getSaveFileName(
+            self.filename: tuple = QtW.QFileDialog.getSaveFileName(
                 self.central_widget, caption=self.translations.SavePKL[self.gui_structure.option_language.get_value()], filter="GHEtool (*.GHEtool)",
                 dir=str(self.default_path),
             )
@@ -1028,19 +1013,19 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             event.accept()
             return
         # create message box
-        msg: QtWidgets_QMessageBox = QtWidgets_QMessageBox(self.Dia)
+        msg: QtW.QMessageBox = QtW.QMessageBox(self.Dia)
         # set Icon to question mark icon
-        msg.setIcon(QtWidgets_QMessageBox.Question)
+        msg.setIcon(QtW.QMessageBox.Question)
         # set label text to cancel text depending on language selected
         msg.setText(self.translations.label_CancelText[self.gui_structure.option_language.get_value()])
         # set window text to cancel text depending on language selected
         msg.setWindowTitle(self.translations.label_CancelTitle[self.gui_structure.option_language.get_value()])
         # set standard buttons to save, close and cancel
-        msg.setStandardButtons(QtWidgets_QMessageBox.Save | QtWidgets_QMessageBox.Close | QtWidgets_QMessageBox.Cancel)
+        msg.setStandardButtons(QtW.QMessageBox.Save | QtW.QMessageBox.Close | QtW.QMessageBox.Cancel)
         # get save, close and cancel button
-        button_s = msg.button(QtWidgets_QMessageBox.Save)
-        button_cl = msg.button(QtWidgets_QMessageBox.Close)
-        button_ca = msg.button(QtWidgets_QMessageBox.Cancel)
+        button_s = msg.button(QtW.QMessageBox.Save)
+        button_cl = msg.button(QtW.QMessageBox.Close)
+        button_ca = msg.button(QtW.QMessageBox.Cancel)
         # set save, close and cancel button text depending on language selected
         button_s.setText(f"{self.translations.label_Save[self.gui_structure.option_language.get_value()]} ")
         button_cl.setText(f"{self.translations.label_close[self.gui_structure.option_language.get_value()]} ")
@@ -1052,12 +1037,12 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # execute message box and save response
         reply = msg.exec_()
         # check if closing should be canceled
-        if reply == QtWidgets_QMessageBox.Cancel:
+        if reply == QtW.QMessageBox.Cancel:
             # cancel closing event
             event.ignore()
             return
         # check if inputs should be saved and if successfully set closing variable to true
-        close: bool = self.fun_save() if reply == QtWidgets_QMessageBox.Save else True
+        close: bool = self.fun_save() if reply == QtW.QMessageBox.Save else True
         # stop all calculation threads
         [i.terminate() for i in self.threads]
         # close window if close variable is true else not

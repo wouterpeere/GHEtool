@@ -2,8 +2,9 @@
 This document contains the variable classes for the ground data, fluid data and pipe data.
 """
 
-import numpy as np
 from math import pi
+
+import numpy as np
 import pygfunction as gt
 
 

@@ -1,7 +1,8 @@
-from GHEtool.gui.gui_classes import FloatBox, IntBox, ListBox, ButtonBox, FileNameBox, FigureOption
-from GHEtool import FOLDER
-from typing import List, Union
 from math import isclose
+from typing import List, Union
+
+from GHEtool import FOLDER
+from GHEtool.gui.gui_classes import ButtonBox, FigureOption, FileNameBox, FloatBox, IntBox, ListBox
 
 
 def test_language(qtbot):

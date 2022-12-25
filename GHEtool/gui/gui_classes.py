@@ -16,17 +16,15 @@ from __future__ import annotations
 
 import abc
 from functools import partial as ft_partial
-from typing import Callable, List, Optional, Union, Tuple
 from os.path import exists
+from typing import Callable, List, Optional, Tuple, Union
 
+import matplotlib.pyplot as plt
 import PySide6.QtCore as QtC  # type: ignore
 import PySide6.QtGui as QtG  # type: ignore
 import PySide6.QtWidgets as QtW  # type: ignore
-
-import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-
 from PySide6.QtCore import QSize
 from PySide6.QtGui import QIcon
 

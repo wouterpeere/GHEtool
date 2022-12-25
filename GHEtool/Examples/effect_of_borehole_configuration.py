@@ -2,10 +2,11 @@
 This document is an example of how the borefield configuration can influence the total borehole length and hence the cost of the borefield.
 """
 
-# import all the relevant functions
-from GHEtool import GroundData, Borefield
 import numpy as np
 import pygfunction as gt
+
+# import all the relevant functions
+from GHEtool import Borefield, GroundData
 
 # GroundData for an initial field of 11 x 11
 data = GroundData(3, 10, 0.2)

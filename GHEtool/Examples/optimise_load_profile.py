@@ -5,9 +5,10 @@ Then, based on a load-duration curve, the heating and cooling load is altered in
 The results are returned.
 
 """
+import pygfunction as gt
+
 # import all the relevant functions
 from GHEtool import *
-import pygfunction as gt
 
 # initiate ground data
 data = GroundData(3, 10, 0.2)

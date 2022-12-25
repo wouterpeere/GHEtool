@@ -1,7 +1,8 @@
-import pytest
-from GHEtool import *
 import matplotlib.pyplot as plt
 import pygfunction as gt
+import pytest
+
+from GHEtool import *
 
 
 def test_main_functionalities(monkeypatch):

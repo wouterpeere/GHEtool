@@ -3,11 +3,12 @@ This document compares both the L2 sizing method of (Peere et al., 2021) with a 
 The comparison is based on speed and relative accuracy in the result.
 """
 
-import numpy as np
 import time
 
-from GHEtool import Borefield, GroundData
+import numpy as np
 import pygfunction as gt
+
+from GHEtool import Borefield, GroundData
 
 number_of_iterations = 50
 max_value_cooling = 700
