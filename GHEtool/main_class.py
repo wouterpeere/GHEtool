@@ -2299,23 +2299,45 @@ class Borefield:
         return fig, ax
 
     def to_dict(self) -> dict:
-        # njfdhgjksdf
+        """
+        Creates a dictionary from the main class to be again imported later.
+
+        Returns
+        -------
+            dict with the values of the main class
+        """
+        # create a dict with all float, int and string values as start dictionary
         data: dict = {key: getattr(self, key) for key in self.__slots__ if isinstance(getattr(self, key), (int, bool, float, str))}
+        # Add all arrays by converting it to lists
         for key in [key for key in self.__slots__ if isinstance(getattr(self, key), np.ndarray)]:
             data[key] = getattr(self, key).tolist()
+        # add Dataclasses if they are not None
         data['ground_data'] = {key: getattr(self.ground_data, key) for key in self.ground_data.__slots__}
         if self.fluid_data is not None:
             data['fluid_data'] = {key: getattr(self.fluid_data, key) for key in self.fluid_data.__slots__}
         if self.pipe_data is not None:
             data['pipe_data'] = {key: getattr(self.pipe_data, key) for key in self.pipe_data.__slots__}
+        # return dict
         return data
 
     def from_dict(self, data: dict):
+        """
+        Set values from input dictionary to main class
+
+        Parameters
+        ----------
+        data : dict
+            dict with main class values created by to_dict function
+        Returns
+        -------
+            None
+        """
+        # set all single values and array by converting their lists to arrays
         [setattr(self, key, np.array(value) if isinstance(value, list) else value if isinstance(value, (int, float, str, bool)) else None)
          for key, value in data.items() if hasattr(self, key)]
+        # set data classes by initializing their class and set the values
         self.ground_data = GroundData(1, 1, 1)
         [setattr(self.ground_data, key, value) for key, value in data['ground_data'].items()]
-
         if 'fluid_data' in data:
             self.fluid_data = FluidData(1, 1, 1, 1, 1)
             [setattr(self.fluid_data, key, value) for key, value in data['fluid_data'].items()]

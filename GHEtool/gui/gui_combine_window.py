@@ -567,8 +567,8 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # try to open backup file if it exits
         if exists(self.backup_file):
             # open backup file
-            with open(self.backup_file, "r") as f:
-                saving: dict = load(f)
+            with open(self.backup_file, "r") as file:
+                saving: dict = load(file)
             self.filename = saving['filename']
             # get saved data and unpack tuple
             self.list_ds = []

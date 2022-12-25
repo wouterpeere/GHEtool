@@ -141,14 +141,38 @@ class DataStorage:
             setattr(self, fig, None)
 
     def to_dict(self) -> dict:
+        """
+        Creates a dictionary from the class to be again imported later.
+
+        Returns
+        -------
+            dict
+            with the values of the class
+        """
+        # get all normal values
         data: dict = {key: value for key, value in self.__dict__.items() if isinstance(value, (int, bool, float, str))}
+        # create an entry for the borefield class
         if self.borefield is not None:
             data['borefield'] = self.borefield.to_dict()
         return data
 
     def from_dict(self, data: dict):
+        """
+        Set values from input dictionary to class
+
+        Parameters
+        ----------
+        data : dict
+            dict with main class values created by to_dict function
+        Returns
+        -------
+            None
+        """
+        # set all normal values
         [setattr(self, key, value) for key, value in data.items() if hasattr(self, key)]
+        # create data class object from set data
         self.create_data_classes()
+        # create borefield from data
         if 'borefield' in data:
             self.borefield = Borefield()
             self.borefield.from_dict(data['borefield'])
