@@ -43,7 +43,7 @@ class DataStorage:
 
         Parameters
         ----------
-        gui_structure : GuiStructure
+        gui_structure : GuiStructure or JSON dict
             GUI structure for which a data storage object should be created
 
         Returns
@@ -74,7 +74,18 @@ class DataStorage:
                                          self.option_hl_jul, self.option_hl_aug, self.option_hl_sep, self.option_hl_oct, self.option_hl_nov, self.option_hl_dec]
         self.monthlyLoadCooling: list = [self.option_cl_jan, self.option_cl_feb, self.option_cl_mar, self.option_cl_apr, self.option_cl_may, self.option_cl_jun,
                                          self.option_cl_jul, self.option_cl_aug, self.option_cl_sep, self.option_cl_oct, self.option_cl_nov, self.option_cl_dec]
-        self.ground_data: GroundData = GroundData(self.option_conductivity, self.option_ground_temp if self.option_method_temp_gradient == 0 else self.option_ground_temp_gradient,
+
+        self.create_data_classes()
+
+        self.debug_message: str = ""
+
+        # params for which hourly data should be loaded
+        self.hourly_data: bool = self.option_method_size_depth == 2 or (
+                self.option_temperature_profile_hourly == 1 and self.aim_temp_profile) or self.aim_optimize
+
+    def create_data_classes(self):
+        self.ground_data: GroundData = GroundData(self.option_conductivity,
+                                                  self.option_ground_temp if self.option_method_temp_gradient == 0 else self.option_ground_temp_gradient,
                                                   self.option_constant_rb, self.option_heat_capacity * 1000, self._calculate_flux())
 
         self.borefield_pygfunction = gt.boreholes.rectangle_field(self.option_width, self.option_length, self.option_spacing, self.option_spacing,
@@ -84,12 +95,6 @@ class DataStorage:
                                                self.option_fluid_capacity, self.option_fluid_viscosity)
         self.pipe_data: PipeData = PipeData(self.option_pipe_grout_conductivity, self.option_pipe_inner_radius, self.option_pipe_outer_radius,
                                             self.option_pipe_conductivity, self.option_pipe_distance, self.option_pipe_number, self.option_pipe_roughness)
-
-        self.debug_message: str = ""
-
-        # params for which hourly data should be loaded
-        self.hourly_data: bool = self.option_method_size_depth == 2 or (
-                self.option_temperature_profile_hourly == 1 and self.aim_temp_profile) or self.aim_optimize
 
     def _calculate_flux(self) -> float:
         """
@@ -134,6 +139,19 @@ class DataStorage:
         for fig in self.list_of_figures:
             plt.close(getattr(self, fig))
             setattr(self, fig, None)
+
+    def to_dict(self) -> dict:
+        data: dict = {key: value for key, value in self.__dict__.items() if isinstance(value, (int, bool, float, str))}
+        if self.borefield is not None:
+            data['borefield'] = self.borefield.to_dict()
+        return data
+
+    def from_dict(self, data: dict):
+        [setattr(self, key, value) for key, value in data.items() if hasattr(self, key)]
+        self.create_data_classes()
+        if 'borefield' in data:
+            self.borefield = Borefield()
+            self.borefield.from_dict(data['borefield'])
 
     def __eq__(self, other) -> bool:
         """

@@ -70,7 +70,7 @@ class Borefield:
                                               24 * 31]).cumsum()
 
     __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'H_init', 'Rb', 'ty', 'tm', \
-                'td', 'time', 'hourly_heating_load', 'H_max', 'use_constant_Tg', 'flux', 'volumetric_heat_capacity',\
+                'td', 'time', 'hourly_heating_load', 'H_max', 'use_constant_Tg',\
                 'hourly_cooling_load', 'number_of_boreholes', '_borefield', '_custom_gfunction', 'cost_investment', \
                 'length_peak', 'th', 'Tf_max', 'Tf_min', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
                 'monthly_load_cooling', 'peak_heating', 'imbalance', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm', \
@@ -2297,3 +2297,31 @@ class Borefield:
         if not self.gui:
             plt.show()
         return fig, ax
+
+    def to_dict(self) -> dict:
+        # njfdhgjksdf
+        data: dict = {key: getattr(self, key) for key in self.__slots__ if isinstance(getattr(self, key), (int, bool, float, str))}
+        for key in [key for key in self.__slots__ if isinstance(getattr(self, key), np.ndarray)]:
+            data[key] = getattr(self, key).tolist()
+        data['ground_data'] = {key: getattr(self.ground_data, key) for key in self.ground_data.__slots__}
+        if self.fluid_data is not None:
+            data['fluid_data'] = {key: getattr(self.fluid_data, key) for key in self.fluid_data.__slots__}
+        if self.pipe_data is not None:
+            data['pipe_data'] = {key: getattr(self.pipe_data, key) for key in self.pipe_data.__slots__}
+        return data
+
+    def from_dict(self, data: dict):
+        [setattr(self, key, np.array(value) if isinstance(value, list) else value if isinstance(value, (int, float, str, bool)) else None)
+         for key, value in data.items() if hasattr(self, key)]
+        self.ground_data = GroundData(1, 1, 1)
+        [setattr(self.ground_data, key, value) for key, value in data['ground_data'].items()]
+
+        if 'fluid_data' in data:
+            self.fluid_data = FluidData(1, 1, 1, 1, 1)
+            [setattr(self.fluid_data, key, value) for key, value in data['fluid_data'].items()]
+
+        if 'pipe_data' in data:
+            self.pipe_data = PipeData(1, 1, 1, 1, 1)
+            [setattr(self.pipe_data, key, value) for key, value in data['pipe_data'].items()]
+
+

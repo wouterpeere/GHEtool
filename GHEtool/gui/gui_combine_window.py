@@ -3,9 +3,7 @@ from os.path import dirname, realpath, exists
 from os.path import split as os_split
 from os import makedirs, remove
 from pathlib import Path, PurePath
-from pickle import HIGHEST_PROTOCOL as pk_HP
-from pickle import dump as pk_dump
-from pickle import load as pk_load
+from json import load, dump
 from sys import path
 from typing import TYPE_CHECKING, List, Tuple
 
@@ -27,11 +25,11 @@ from PySide6.QtWidgets import QPushButton as QtWidgets_QPushButton
 from PySide6.QtWidgets import QSizePolicy, QSpacerItem
 from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
 
-from GHEtool.gui.gui_calculation_thread import (CalcProblem)
-from GHEtool.gui.gui_data_storage import DataStorage
-from GHEtool.gui.gui_base_class import UiGhetool, set_graph_layout
-from GHEtool.gui.gui_structure import GuiStructure, Option, FigureOption
-from GHEtool.gui.translation_class import Translations
+from .gui_calculation_thread import (CalcProblem)
+from .gui_data_storage import DataStorage
+from .gui_base_class import UiGhetool, set_graph_layout
+from .gui_structure import GuiStructure, Option, FigureOption
+from .translation_class import Translations
 
 
 if TYPE_CHECKING:
@@ -569,25 +567,21 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # try to open backup file if it exits
         if exists(self.backup_file):
             # open backup file
-            with open(self.backup_file, "rb") as f:
-                saving: tuple = pk_load(f)
-            # check if version has been saved as well
-            if len(saving) < 4:
-                return
-            self.filename, li, settings, version = saving
-            if hasattr(self.app, 'applicationVersion'):
-                if not version == self.app.applicationVersion():
-                    self.gui_structure.option_language.set_value(settings[0])  # set last time selected language
-                    self.gui_structure.option_auto_saving.set_value(settings[1])  # set last time selected automatic saving scenario option
-                    return
+            with open(self.backup_file, "r") as f:
+                saving: dict = load(f)
+            self.filename = saving['filename']
             # get saved data and unpack tuple
-            self.list_ds, li = li[0], li[1]  # unpack tuple to get list of data-storages and scenario names
+            self.list_ds = []
+            for data in saving['values']:
+                ds = DataStorage(self.gui_structure)
+                ds.from_dict(data)
+                self.list_ds.append(ds)
             # replace uer window id
             for DS in self.list_ds:
                 DS.ui = id(self)
             # clear list widget and add new items and select the first one
             self.list_widget_scenario.clear()
-            self.list_widget_scenario.addItems(li)
+            self.list_widget_scenario.addItems(saving['names'])
             self.list_widget_scenario.setCurrentRow(0)
             # change language to english if no change has happend
             if self.gui_structure.option_language.get_value() == 0:
@@ -609,16 +603,14 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         if len(self.list_ds) < 1:
             self.list_ds.append(DataStorage(self.gui_structure))
         # create list of scenario names
-        li: list = [self.list_widget_scenario.item(idx).text() for idx in range(self.list_widget_scenario.count())]
-        # create list of settings with language and autosave option
-        settings: list = [self.gui_structure.option_language.get_value(), self.gui_structure.option_auto_saving.get_value()]
+        scenario_names: list = [self.list_widget_scenario.item(idx).text() for idx in range(self.list_widget_scenario.count())]
+        # create saving dict
+        saving = {'filename': self.filename, 'names': scenario_names, 'values': [ds.to_dict() for ds in self.list_ds]}
         # try to write data to back up file
         try:
             # write data to back up file
-            with open(self.backup_file, "wb") as f:
-                version = self.app.applicationVersion() if hasattr(self.app, "applicationVersion") else "2.0.0"
-                saving = self.filename, [self.list_ds, li], settings, version
-                pk_dump(saving, f, pk_HP)
+            with open(self.backup_file, "w") as file:
+                dump(saving, file, indent=6)
         except FileNotFoundError:
             self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
         except PermissionError:
@@ -647,10 +639,14 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             # deactivate checking
             self.checking: bool = False
             # open file and get data
-            with open(self.filename[0], "rb") as f:
-                self.filename, li, settings = pk_load(f)
+            with open(self.filename[0], "r") as file:
+                saving = load(file)
             # write data to variables
-            self.list_ds, li = li[0], li[1]
+            self.list_ds = []
+            for data in saving['values']:
+                ds = DataStorage(self.gui_structure)
+                ds.from_dict(data)
+                self.list_ds.append(ds)
             # change window title to new loaded filename
             self.change_window_title()
             # replace user window id
@@ -658,7 +654,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                 DS.ui = id(self)
             # init user window by reset scenario list widget and check for results
             self.list_widget_scenario.clear()
-            self.list_widget_scenario.addItems(li)
+            self.list_widget_scenario.addItems(saving['names'])
             self.list_widget_scenario.setCurrentRow(0)
             self.check_results()
             # activate checking
@@ -696,18 +692,15 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.fun_save_auto()
         # Create list if no scenario is stored
         self.list_ds.append(DataStorage(self.gui_structure)) if len(self.list_ds) < 1 else None
-        # create list of settings with language and autosave option
-        settings: list = [self.gui_structure.option_language.get_value(),
-                          self.gui_structure.option_auto_saving.get_value()]
-
         # try to store the data in the pickle file
         try:
             # create list of all scenario names
-            li = [self.list_widget_scenario.item(idx).text() for idx in range(self.list_widget_scenario.count())]
+            scenario_names = [self.list_widget_scenario.item(idx).text() for idx in range(self.list_widget_scenario.count())]
+            # create saving dict
+            saving = {'filename': self.filename, 'names': scenario_names, 'values': [ds.to_dict() for ds in self.list_ds]}
             # store data
-            with open(self.filename[0], "wb") as f:
-                saving = self.filename, [self.list_ds, li], settings
-                pk_dump(saving, f, pk_HP)
+            with open(self.filename[0], "w") as file:
+                dump(saving, file, indent=6)
             # deactivate changed file * from window title
             self.changedFile: bool = False
             self.change_window_title()
