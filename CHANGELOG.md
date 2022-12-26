@@ -126,7 +126,8 @@ This effect is shown in a new validation file: [speed_improvement_JIT](/docs/sou
 ### Fixed 
 - fixed bug in interpolation
 
-[Unreleased]: https://github.com/wouterpeere/GHEtool/compare/v2.0.5...main
+[Unreleased]: https://github.com/wouterpeere/GHEtool/compare/v2.1.0...main
+[2.1.0]: https://github.com/wouterpeere/GHEtool/compare/v2.0.5...2.1.0
 [2.0.5]: https://github.com/wouterpeere/GHEtool/compare/v2.0.4...v2.0.5
 [2.0.4]: https://github.com/wouterpeere/GHEtool/compare/v2.0.3...v2.0.4
 [2.0.3]: https://github.com/wouterpeere/GHEtool/compare/v2.0.2...v2.0.3
