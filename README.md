@@ -25,7 +25,7 @@ GHEtool also comes with a *graphical user interface (GUI)*. This GUI is prebuilt
 </p>
 
 ## Requirements
-This code is tested with Python 3.8, 3.9 and 3.10 and requires the following libraries (the versions mentioned are the ones with which the code is tested)
+This code is tested with Python 3.8, 3.9, 3.10 and 3.11 and requires the following libraries (the versions mentioned are the ones with which the code is tested)
 
 * Numpy (>=1.20.2)
 * Scipy (>=1.6.2)
@@ -36,7 +36,7 @@ This code is tested with Python 3.8, 3.9 and 3.10 and requires the following lib
 
 For the GUI
 
-* PySide6 (>=6.3.1)
+* PySide6 (>=6.4.1)
 
 For the tests
 
