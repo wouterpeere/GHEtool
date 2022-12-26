@@ -13,7 +13,7 @@ class CalcProblem(QtC.QThread):
     class to calculate the problem in an external thread
     """
 
-    any_signal = QtC.pyqtSignal(tuple)
+    any_signal = QtC.Signal(tuple)
 
     def __init__(self, ds: DataStorage, idx: int, parent=None) -> None:
         """

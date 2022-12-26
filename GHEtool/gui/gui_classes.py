@@ -18,6 +18,7 @@ import abc
 from functools import partial as ft_partial
 from os.path import exists
 from typing import Callable, List, Optional, Tuple, Union
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import PySide6.QtCore as QtC  # type: ignore
@@ -25,8 +26,7 @@ import PySide6.QtGui as QtG  # type: ignore
 import PySide6.QtWidgets as QtW  # type: ignore
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-from PySide6.QtCore import QSize
-from PySide6.QtGui import QIcon
+
 
 from GHEtool.gui.gui_base_class import DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE, set_graph_layout
 
@@ -1373,7 +1373,7 @@ class FileNameBox(Option):
         """
         # try to ask for a file otherwise show message in status bar
         try:
-            filename = QtW.QFileDialog.getOpenFileName(self.frame, caption=self.dialog_text, filter="(*.csv)")
+            filename = QtW.QFileDialog.getOpenFileName(self.frame, caption=self.dialog_text, filter="(*.csv)", dir=str(Path.home()))
             self.widget.setText(filename[0])
         # show warning if no file is selected in status bar for 5 seconds
         except FileNotFoundError:
@@ -2137,8 +2137,8 @@ class ResultFigure(Category):
         self.toolbar: NavigationToolbar = NavigationToolbar(self.canvas, None, True)
         for name, icon_name in [("save_figure", "Save_Inv"), ('home', 'Home'), ('zoom', 'Search'), ('back', 'Back'), ('forward', 'Forward'),
                                 ('pan', 'Pen'), ('configure_subplots', 'Options'), ('edit_parameters', 'Parameters')]:
-            icon = QIcon()
-            icon.addFile(f":/icons/icons/{icon_name}.svg", QSize(), QIcon.Normal, QIcon.Off)
+            icon = QtG.QIcon()
+            icon.addFile(f":/icons/icons/{icon_name}.svg", QtC.QSize(), QtG.QIcon.Normal, QtG.QIcon.Off)
             self.toolbar._actions[name].setIcon(icon)
         self._kwargs: dict = {}
         self.function_name: str = ""
@@ -2172,8 +2172,8 @@ class ResultFigure(Category):
         toolbar: NavigationToolbar = NavigationToolbar(canvas, self.frame_canvas, True)
         for name, icon_name in [("save_figure", "Save_Inv"), ('home', 'Home'), ('zoom', 'Search'), ('back', 'Back'), ('forward', 'Forward'),
                                 ('pan', 'Pen'), ('configure_subplots', 'Options'), ('edit_parameters', 'Parameters')]:
-            icon = QIcon()
-            icon.addFile(f":/icons/icons/{icon_name}.svg", QSize(), QIcon.Normal, QIcon.Off)
+            icon = QtG.QIcon()
+            icon.addFile(f":/icons/icons/{icon_name}.svg", QtC.QSize(), QtG.QIcon.Normal, QtG.QIcon.Off)
             toolbar._actions[name].setIcon(icon)
 
         self.layout_frame_canvas.replaceWidget(self.canvas, canvas)

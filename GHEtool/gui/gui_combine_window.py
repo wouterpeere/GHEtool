@@ -595,7 +595,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         try:
             # write data to back up file
             with open(self.backup_file, "w") as file:
-                dump(saving, file, indent=6)
+                dump(saving, file, indent=1)
         except FileNotFoundError:
             self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
         except PermissionError:
@@ -609,7 +609,8 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         """
         # open interface and get file name
         self.filename = QtW.QFileDialog.getOpenFileName(
-            self.central_widget, caption=self.translations.ChoosePKL[self.gui_structure.option_language.get_value()], filter="GHEtool (*.GHEtool)"
+            self.central_widget, caption=self.translations.ChoosePKL[self.gui_structure.option_language.get_value()], filter="GHEtool (*.GHEtool)",
+            dir=str(self.default_path)
         )
         # load selected data
         self.fun_load_known_filename()
@@ -685,7 +686,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             saving = {'filename': self.filename, 'names': scenario_names, 'values': [ds.to_dict() for ds in self.list_ds]}
             # store data
             with open(self.filename[0], "w") as file:
-                dump(saving, file, indent=6)
+                dump(saving, file, indent=1)
             # deactivate changed file * from window title
             self.changedFile: bool = False
             self.change_window_title()
