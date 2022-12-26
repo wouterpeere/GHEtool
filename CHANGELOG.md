@@ -32,6 +32,7 @@ code version > speed improvements > v2.1.1
 - Correct conversion from hourly to monthly load (issue 62)
 - Problem with np.float16 when using simulation periodes >80 years due to overflow errors.
 - Implemented FIFO-class to prevent cycling in iterative sizing.
+- Sometimes some gui options are not shown
 
 ## [2.1.0] - 2022-11-30
 
