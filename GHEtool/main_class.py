@@ -19,6 +19,7 @@ from scipy import interpolate
 from scipy.signal import convolve
 
 from GHEtool.VariableClasses import FluidData, GroundData, PipeData
+from GHEtool.VariableClasses.BaseClass import BaseClassVariables
 
 
 def _timeValues(dt=3600., t_max=100. * 8760 * 3600.) -> np.array:
@@ -53,7 +54,7 @@ def _timeValues(dt=3600., t_max=100. * 8760 * 3600.) -> np.array:
     return load_agg.get_times_for_simulation()
 
 
-class Borefield:
+class Borefield(BaseClassVariables):
     """Main borefield class"""
     UPM: float = 730.  # number of hours per month
     THRESHOLD_BOREHOLE_DEPTH: float = 0.05  # threshold for iteration
@@ -2307,19 +2308,20 @@ class Borefield:
         -------
             dict with the values of the main class
         """
-        # create a dict with all float, int and string values as start dictionary
-        data: dict = {key: getattr(self, key) for key in self.__slots__ if isinstance(getattr(self, key), (int, bool, float, str))}
-        # Add all arrays by converting it to lists
-        for key in [key for key in self.__slots__ if isinstance(getattr(self, key), np.ndarray)]:
-            data[key] = getattr(self, key).tolist()
-        # add Dataclasses if they are not None
-        data['ground_data'] = {key: getattr(self.ground_data, key) for key in self.ground_data.__slots__}
-        if self.fluid_data is not None:
-            data['fluid_data'] = {key: getattr(self.fluid_data, key) for key in self.fluid_data.__slots__}
-        if self.pipe_data is not None:
-            data['pipe_data'] = {key: getattr(self.pipe_data, key) for key in self.pipe_data.__slots__}
-        # return dict
-        return data
+        # # create a dict with all float, int and string values as start dictionary
+        # data: dict = {key: getattr(self, key) for key in self.__slots__ if isinstance(getattr(self, key), (int, bool, float, str))}
+        # # Add all arrays by converting it to lists
+        # for key in [key for key in self.__slots__ if isinstance(getattr(self, key), np.ndarray)]:
+        #     data[key] = getattr(self, key).tolist()
+        # # add Dataclasses if they are not None
+        # data['ground_data'] = {key: getattr(self.ground_data, key) for key in self.ground_data.__slots__}
+        # if self.fluid_data is not None:
+        #     data['fluid_data'] = {key: getattr(self.fluid_data, key) for key in self.fluid_data.__slots__}
+        # if self.pipe_data is not None:
+        #     data['pipe_data'] = {key: getattr(self.pipe_data, key) for key in self.pipe_data.__slots__}
+        # # return dict
+        # return data
+        return self.__to_dict__()
 
     def from_dict(self, data: dict):
         """
@@ -2346,5 +2348,3 @@ class Borefield:
         if 'pipe_data' in data:
             self.pipe_data = PipeData(1, 1, 1, 1, 1)
             [setattr(self.pipe_data, key, value) for key, value in data['pipe_data'].items()]
-
-

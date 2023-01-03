@@ -181,7 +181,7 @@ class DataStorage:
         # set all normal values
         [setattr(self, key, value) for key, value in data.items() if hasattr(self, key)]
         # create data class object from set data
-        self.create_data_classes()
+        self._create_data_classes()
         # create borefield from data
         if 'borefield' in data:
             self.borefield = Borefield()
