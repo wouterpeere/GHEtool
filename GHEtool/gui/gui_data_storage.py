@@ -76,7 +76,7 @@ class DataStorage:
         self.monthlyLoadCooling: list = [self.option_cl_jan, self.option_cl_feb, self.option_cl_mar, self.option_cl_apr, self.option_cl_may, self.option_cl_jun,
                                          self.option_cl_jul, self.option_cl_aug, self.option_cl_sep, self.option_cl_oct, self.option_cl_nov, self.option_cl_dec]
 
-        self.create_data_classes()
+        self._create_data_classes()
 
         self.debug_message: str = ""
 
@@ -84,7 +84,15 @@ class DataStorage:
         self.hourly_data: bool = self.option_method_size_depth == 2 or (
                 self.option_temperature_profile_hourly == 1 and self.aim_temp_profile) or self.aim_optimize
 
-    def create_data_classes(self):
+    def _create_data_classes(self) -> None:
+        """
+        This function creates the dataclasses (PipeData, FluidData and GroundData) based on entered values.
+        These can be used in the calculation thread.
+
+        Returns
+        -------
+        None
+        """
         self.ground_data: GroundData = GroundData(self.option_conductivity,
                                                   self.option_ground_temp if self.option_method_temp_gradient == 0 else self.option_ground_temp_gradient,
                                                   self.option_constant_rb, self.option_heat_capacity * 1000, self._calculate_flux())
@@ -147,8 +155,8 @@ class DataStorage:
 
         Returns
         -------
-            dict
-            with the values of the class
+        dict
+            Dictionary with the values of the class
         """
         # get all normal values
         data: dict = {key: value for key, value in self.__dict__.items() if isinstance(value, (int, bool, float, str))}
@@ -164,10 +172,11 @@ class DataStorage:
         Parameters
         ----------
         data : dict
-            dict with main class values created by to_dict function
+            Dictionary with main class values created by to_dict function
+
         Returns
         -------
-            None
+        None
         """
         # set all normal values
         [setattr(self, key, value) for key, value in data.items() if hasattr(self, key)]

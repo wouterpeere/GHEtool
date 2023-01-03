@@ -58,8 +58,6 @@ class CalcProblem(QtC.QThread):
         borefield.set_max_ground_temperature(self.DS.option_max_temp)  # maximum temperature
         borefield.set_min_ground_temperature(self.DS.option_min_temp)  # minimum temperature
 
-        borefield.set_length_peak(self.DS.option_len_peak)
-
         # set ground data
         borefield.set_ground_parameters(self.DS.ground_data)
 
