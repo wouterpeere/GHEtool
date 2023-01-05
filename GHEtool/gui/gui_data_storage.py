@@ -175,7 +175,7 @@ class DataStorage:
         -------
         None
         """
-        # set all normal values
+        # set all normal values if they exist within the DS object
         [setattr(self, key, value) for key, value in data.items() if hasattr(self, key)]
         # create data class object from set data
         self._create_data_classes()
