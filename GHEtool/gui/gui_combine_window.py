@@ -598,7 +598,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
                 setattr(ds, 'borefield', None)
             else:
                 setattr(ds, 'borefield', Borefield())
-                getattr(ds, 'borefield').from_dict(borefield)
+                getattr(ds, 'borefield').__from_dict__(borefield)
             self.list_ds.append(ds)
 
         # change window title to new loaded filename
@@ -633,7 +633,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         saving = {'filename': self.filename,
                   'names': scenario_names,
                   'values': [ds.to_dict() for ds in self.list_ds],
-                  'borefields': [getattr(ds, 'borefield').to_dict() if getattr(ds, 'borefield') is not None else None
+                  'borefields': [getattr(ds, 'borefield').__to_dict__() if getattr(ds, 'borefield') is not None else None
                                  for ds in self.list_ds]}
         try:
             # write data to back up file
@@ -660,7 +660,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def fun_load_known_filename(self) -> None:
         """
-        load stored scenarios from external pickle file
+        load stored scenarios from external json file
         :return: None
         """
         # try to open the file
@@ -706,17 +706,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         self.list_ds.append(DataStorage(self.gui_structure)) if len(self.list_ds) < 1 else None
         # try to store the data in the pickle file
         try:
-            # create list of all scenario names
-            scenario_names = [self.list_widget_scenario.item(idx).text() for idx in range(self.list_widget_scenario.count())]
-            # create saving dict
-            saving = {'filename': self.filename,
-                      'names': scenario_names,
-                      'values': [ds.to_dict() for ds in self.list_ds],
-                      'borefields': [getattr(ds, 'borefield').to_dict() if getattr(ds, 'borefield') is not None else None
-                                     for ds in self.list_ds]}
-            # store data
-            with open(self.filename[0], "w") as file:
-                dump(saving, file, indent=1)
             self._save_to_data(self.filename[0])
             # deactivate changed file * from window title
             self.changedFile: bool = False

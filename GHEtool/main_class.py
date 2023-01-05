@@ -87,7 +87,7 @@ class Borefield(BaseClassVariables):
 
     def __init__(self, simulation_period: int = 20, peak_heating: list = None,
                  peak_cooling: list = None, baseload_heating: list = None, baseload_cooling: list = None,
-                 borefield=None, custom_gfunction: Optional[Union[str, pathlib.Path]]=None, gui: bool = False):
+                 borefield=None, custom_gfunction: Optional[Union[str, pathlib.Path]] = None, gui: bool = False):
         """
 
         Parameters
@@ -227,7 +227,7 @@ class Borefield(BaseClassVariables):
         self.H = 0.  # borehole depth m
         self.Rb = 0.  # effective borehole thermal resistance mK/W
         self.number_of_boreholes = 0  # number of total boreholes #
-        self.ground_data: Optional[GroundData] = None
+        self.ground_data: GroundData = GroundData()
         self.D: float = 0.  # buried depth of the borehole [m]
         self.r_b: float = 0.  # borehole radius [m]
 
@@ -236,11 +236,11 @@ class Borefield(BaseClassVariables):
         self.Tf_max: float = 16.  # maximum temperature of the fluid
         self.Tf_min: float = 0.  # minimum temperature of the fluid
         self.fluid_data_available: bool = False  # needs to be True in order to calculate Rb*
-        self.fluid_data: Optional[FluidData] = None
+        self.fluid_data: FluidData = FluidData()
 
         # initiate borehole parameters
         self.pipe_data_available: bool = False  # needs to be True in order to calculate Rb*
-        self.pipe_data: Optional[PipeData] = None
+        self.pipe_data: PipeData = PipeData()
 
         # initiate different sizing
         self.L2_sizing: bool = True
@@ -1470,7 +1470,7 @@ class Borefield(BaseClassVariables):
                 and self.results_peak_cooling.any() and len(self.results_peak_cooling) == len(self.Tb):
             # this equals whenever an hourly calculation has been preformed
             return True
-
+        print(self.results_month_heating)
         if self.results_month_heating.any() and not hourly:
             return True
 
@@ -2299,52 +2299,3 @@ class Borefield(BaseClassVariables):
         if not self.gui:
             plt.show()
         return fig, ax
-
-    def to_dict(self) -> dict:
-        """
-        Creates a dictionary from the main class to be again imported later.
-
-        Returns
-        -------
-            dict with the values of the main class
-        """
-        # # create a dict with all float, int and string values as start dictionary
-        # data: dict = {key: getattr(self, key) for key in self.__slots__ if isinstance(getattr(self, key), (int, bool, float, str))}
-        # # Add all arrays by converting it to lists
-        # for key in [key for key in self.__slots__ if isinstance(getattr(self, key), np.ndarray)]:
-        #     data[key] = getattr(self, key).tolist()
-        # # add Dataclasses if they are not None
-        # data['ground_data'] = {key: getattr(self.ground_data, key) for key in self.ground_data.__slots__}
-        # if self.fluid_data is not None:
-        #     data['fluid_data'] = {key: getattr(self.fluid_data, key) for key in self.fluid_data.__slots__}
-        # if self.pipe_data is not None:
-        #     data['pipe_data'] = {key: getattr(self.pipe_data, key) for key in self.pipe_data.__slots__}
-        # # return dict
-        # return data
-        return self.__to_dict__()
-
-    def from_dict(self, data: dict):
-        """
-        Set values from input dictionary to main class
-
-        Parameters
-        ----------
-        data : dict
-            dict with main class values created by to_dict function
-        Returns
-        -------
-            None
-        """
-        # set all single values and array by converting their lists to arrays
-        [setattr(self, key, np.array(value) if isinstance(value, list) else value if isinstance(value, (int, float, str, bool)) else None)
-         for key, value in data.items() if hasattr(self, key)]
-        # set data classes by initializing their class and set the values
-        self.ground_data = GroundData(1, 1, 1)
-        [setattr(self.ground_data, key, value) for key, value in data['ground_data'].items()]
-        if 'fluid_data' in data:
-            self.fluid_data = FluidData(1, 1, 1, 1, 1)
-            [setattr(self.fluid_data, key, value) for key, value in data['fluid_data'].items()]
-
-        if 'pipe_data' in data:
-            self.pipe_data = PipeData(1, 1, 1, 1, 1)
-            [setattr(self.pipe_data, key, value) for key, value in data['pipe_data'].items()]

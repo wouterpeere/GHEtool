@@ -159,11 +159,7 @@ class DataStorage:
             Dictionary with the values of the class
         """
         # get all normal values
-        data: dict = {key: value for key, value in self.__dict__.items() if isinstance(value, (int, bool, float, str))}
-        # create an entry for the borefield class
-        if self.borefield is not None:
-            data['borefield'] = self.borefield.to_dict()
-        return data
+        return {key: value for key, value in self.__dict__.items() if isinstance(value, (int, bool, float, str))}
 
     def from_dict(self, data: dict):
         """
@@ -182,10 +178,6 @@ class DataStorage:
         [setattr(self, key, value) for key, value in data.items() if hasattr(self, key)]
         # create data class object from set data
         self._create_data_classes()
-        # create borefield from data
-        if 'borefield' in data:
-            self.borefield = Borefield()
-            self.borefield.from_dict(data['borefield'])
 
     def __eq__(self, other) -> bool:
         """
