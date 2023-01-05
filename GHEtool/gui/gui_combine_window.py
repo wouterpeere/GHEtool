@@ -598,7 +598,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
                 setattr(ds, 'borefield', None)
             else:
                 setattr(ds, 'borefield', Borefield())
-                getattr(ds, 'borefield').__from_dict__(borefield)
+                getattr(ds, 'borefield')._from_dict(borefield)
             self.list_ds.append(ds)
 
         # change window title to new loaded filename
@@ -633,7 +633,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         saving = {'filename': self.filename,
                   'names': scenario_names,
                   'values': [ds.to_dict() for ds in self.list_ds],
-                  'borefields': [getattr(ds, 'borefield').__to_dict__() if getattr(ds, 'borefield') is not None else None
+                  'borefields': [getattr(ds, 'borefield')._to_dict() if getattr(ds, 'borefield') is not None else None
                                  for ds in self.list_ds]}
         try:
             # write data to back up file

@@ -13,7 +13,7 @@ class BaseClass:
 
     This class should only be altered whenever a highly general method should be implemented.
     """
-    def __to_dict__(self) -> dict:
+    def _to_dict(self) -> dict:
         """
         This function converts the class variables to a dictionary so it can be saved in a JSON format.
         Currently, it can handle np.ndarray, list, set, str, int, float, tuple and classes within GHEtool.
@@ -52,12 +52,12 @@ class BaseClass:
                 dictionary[key] = getattr(self, key)
 
             # for all self-defined classes
-            if hasattr(getattr(self, key), "__to_dict__"):
-                dictionary[key] = getattr(self, key).__to_dict__()
+            if hasattr(getattr(self, key), "_to_dict"):
+                dictionary[key] = getattr(self, key)._to_dict()
 
         return dictionary
 
-    def __from_dict__(self, dictionary: dict) -> None:
+    def _from_dict(self, dictionary: dict) -> None:
         """
         This function converts the dictionary values to the class attributes.
         Currently, it can handle np.ndarray, list, set, str, int, float, tuple and classes within GHEtool.
@@ -74,8 +74,8 @@ class BaseClass:
         for key, value in dictionary.items():
 
             # for all self-defined classes
-            if hasattr(getattr(self, key), "__to_dict__"):
-                getattr(self, key).__from_dict__(value)
+            if hasattr(getattr(self, key), "_to_dict"):
+                getattr(self, key)._from_dict(value)
                 continue
 
             if isinstance(value, (int, bool, float, str, list)):

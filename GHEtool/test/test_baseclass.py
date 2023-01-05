@@ -49,7 +49,7 @@ class TestClassesWithSlots(BaseClass):
 
 def test_without_slots():
     test_class = TestClass()
-    dictionary = test_class.__to_dict__()
+    dictionary = test_class._to_dict()
     assert dictionary["test_string"] == 'test'
     assert dictionary["test_int"] == 12
     assert dictionary["test_float"] == 12.5
@@ -64,8 +64,8 @@ def test_without_slots():
 
     test_class2 = TestClass()
     test_class2.clear()
-    test_class2.__from_dict__(dictionary)
-    dictionary = test_class2.__to_dict__()
+    test_class2._from_dict(dictionary)
+    dictionary = test_class2._to_dict()
     assert dictionary["test_string"] == 'test'
     assert dictionary["test_int"] == 12
     assert dictionary["test_float"] == 12.5
@@ -81,7 +81,7 @@ def test_without_slots():
 
 def test_with_slots():
     test_class = TestClass()
-    dictionary = test_class.__to_dict__()
+    dictionary = test_class._to_dict()
     assert dictionary["test_string"] == 'test'
     assert dictionary["test_int"] == 12
     assert dictionary["test_float"] == 12.5
@@ -96,8 +96,8 @@ def test_with_slots():
 
     test_class2 = TestClass()
     test_class2.clear()
-    test_class2.__from_dict__(dictionary)
-    dictionary = test_class2.__to_dict__()
+    test_class2._from_dict(dictionary)
+    dictionary = test_class2._to_dict()
     assert dictionary["test_string"] == 'test'
     assert dictionary["test_int"] == 12
     assert dictionary["test_float"] == 12.5
