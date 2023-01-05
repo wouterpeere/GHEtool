@@ -6,6 +6,7 @@ from os.path import split as os_split
 from pathlib import Path, PurePath
 from sys import path
 from typing import TYPE_CHECKING, List, Tuple
+from GHEtool import Borefield
 
 import PySide6.QtCore as QtC
 import PySide6.QtGui as QtG
@@ -551,28 +552,10 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         """
         # try to open backup file if it exits
         if exists(self.backup_file):
-            # open backup file
-            with open(self.backup_file, "r") as file:
-                saving: dict = load(file)
-            self.filename = saving['filename']
-            # get saved data and unpack tuple
-            self.list_ds = []
-            for data in saving['values']:
-                ds = DataStorage(self.gui_structure)
-                ds.from_dict(data)
-                self.list_ds.append(ds)
-            # replace uer window id
-            for DS in self.list_ds:
-                DS.ui = id(self)
-            # clear list widget and add new items and select the first one
-            self.list_widget_scenario.clear()
-            self.list_widget_scenario.addItems(saving['names'])
-            self.list_widget_scenario.setCurrentRow(0)
-            # change language to english if no change has happend
+            self._load_from_data(self.backup_file)
+            # change language to english if no change has happened
             if self.gui_structure.option_language.get_value() == 0:
                 self.change_language()
-            # check if results exits and then display them
-            self.check_results()
             return
         # change language to english
         self.change_language()
@@ -587,20 +570,80 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # append scenario if no scenario is in list
         if len(self.list_ds) < 1:
             self.list_ds.append(DataStorage(self.gui_structure))
-        # create list of scenario names
-        scenario_names: list = [self.list_widget_scenario.item(idx).text() for idx in range(self.list_widget_scenario.count())]
+
+        self._save_to_data(self.backup_file)
+
+    def _load_from_data(self, location: str) -> None:
+        """
+        This function loads the data from a JSON formatted file.
+
+        Parameters
+        ----------
+        location : str
+            Location of the data file
+
+        Returns
+        -------
+        None
+        """
+        # open file and get data
+        with open(location, "r") as file:
+            saving = load(file)
+        # write data to variables
+        self.list_ds = []
+        for val, borefield in zip(saving['values'], saving['borefields']):
+            ds = DataStorage(self.gui_structure)
+            ds.from_dict(val)
+            if borefield is None:
+                setattr(ds, 'borefield', None)
+            else:
+                setattr(ds, 'borefield', Borefield())
+                getattr(ds, 'borefield').from_dict(borefield)
+            self.list_ds.append(ds)
+
+        # change window title to new loaded filename
+        self.change_window_title()
+        # replace user window id
+        for DS in self.list_ds:
+            DS.ui = id(self)
+
+        # init user window by reset scenario list widget and check for results
+        self.list_widget_scenario.clear()
+        self.list_widget_scenario.addItems(saving['names'])
+        self.list_widget_scenario.setCurrentRow(0)
+        self.check_results()
+
+    def _save_to_data(self, location: str) -> None:
+        """
+        This function saves the gui data to a json formatted file.
+
+        Parameters
+        ----------
+        location : str
+            Loaction of the data file.
+
+        Returns
+        -------
+        None
+        """
+        # create list of all scenario names
+        scenario_names = [self.list_widget_scenario.item(idx).text() for idx in
+                          range(self.list_widget_scenario.count())]
         # create saving dict
-        saving = {'filename': self.filename, 'names': scenario_names, 'values': [ds.to_dict() for ds in self.list_ds]}
-        # try to write data to back up file
+        saving = {'filename': self.filename,
+                  'names': scenario_names,
+                  'values': [ds.to_dict() for ds in self.list_ds],
+                  'borefields': [getattr(ds, 'borefield').to_dict() if getattr(ds, 'borefield') is not None else None
+                                 for ds in self.list_ds]}
         try:
             # write data to back up file
-            with open(self.backup_file, "w") as file:
+            with open(location, "w") as file:
                 dump(saving, file, indent=1)
         except FileNotFoundError:
-            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
+            self.status_bar.showMessage(
+                self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
         except PermissionError:
             self.status_bar.showMessage("PermissionError", 5000)
-            return
 
     def fun_load(self) -> None:
         """
@@ -624,25 +667,8 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         try:
             # deactivate checking
             self.checking: bool = False
-            # open file and get data
-            with open(self.filename[0], "r") as file:
-                saving = load(file)
-            # write data to variables
-            self.list_ds = []
-            for data in saving['values']:
-                ds = DataStorage(self.gui_structure)
-                ds.from_dict(data)
-                self.list_ds.append(ds)
-            # change window title to new loaded filename
-            self.change_window_title()
-            # replace user window id
-            for DS in self.list_ds:
-                DS.ui = id(self)
-            # init user window by reset scenario list widget and check for results
-            self.list_widget_scenario.clear()
-            self.list_widget_scenario.addItems(saving['names'])
-            self.list_widget_scenario.setCurrentRow(0)
-            self.check_results()
+            # open file and set data
+            self._load_from_data(self.filename[0])
             # activate checking
             self.checking: bool = True
         # if no file is found display error message is status bar
@@ -683,10 +709,15 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             # create list of all scenario names
             scenario_names = [self.list_widget_scenario.item(idx).text() for idx in range(self.list_widget_scenario.count())]
             # create saving dict
-            saving = {'filename': self.filename, 'names': scenario_names, 'values': [ds.to_dict() for ds in self.list_ds]}
+            saving = {'filename': self.filename,
+                      'names': scenario_names,
+                      'values': [ds.to_dict() for ds in self.list_ds],
+                      'borefields': [getattr(ds, 'borefield').to_dict() if getattr(ds, 'borefield') is not None else None
+                                     for ds in self.list_ds]}
             # store data
             with open(self.filename[0], "w") as file:
                 dump(saving, file, indent=1)
+            self._save_to_data(self.filename[0])
             # deactivate changed file * from window title
             self.changedFile: bool = False
             self.change_window_title()
