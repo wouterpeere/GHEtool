@@ -733,9 +733,9 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         :return: None
         """
         self.filename: tuple = MainWindow.filenameDefault  # reset filename
-        self.fun_save()  # get and save filename
-        self.list_ds: list = []  # reset list of data storages
-        self.list_widget_scenario.clear()  # clear list widget with scenario list
+        if self.fun_save():  # get and save filename
+            self.list_ds: list = []  # reset list of data storages
+            self.list_widget_scenario.clear()  # clear list widget with scenario list
 
     def change_scenario(self, idx: int) -> None:
         """
