@@ -30,6 +30,7 @@ monthlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, monthlyLoadCoolin
 
 custom_field = gt.boreholes.L_shaped_field(N_1=4, N_2=5, B_1=5., B_2=5., H=100., D=4, r_b=0.05)
 
+
 def load_case(number):
     """This function returns the values for one of the four cases."""
 
@@ -410,3 +411,21 @@ def test_choose_quadrant_None(borefield_quadrants):
 
     borefield_quadrants.calculate_temperatures(200)
     assert None is borefield_quadrants.calculate_quadrant()
+
+
+def test_no_ground_data():
+    borefield = Borefield(simulation_period=20,
+                          peak_heating=peakHeating,
+                          peak_cooling=peakCooling,
+                          baseload_heating=monthlyLoadHeating,
+                          baseload_cooling=monthlyLoadCooling)
+
+    borefield.set_borefield(borefield_gt)
+
+    # set temperature boundaries
+    borefield.set_max_ground_temperature(16)  # maximum temperature
+    borefield.set_min_ground_temperature(0)  # minimum temperature
+    try:
+        pass
+    except ValueError:
+        assert True

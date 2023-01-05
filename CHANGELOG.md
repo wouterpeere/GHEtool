@@ -15,7 +15,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - Added NavigationToolbar to figure (issue #55)
 - Peak length can be set in the GUI
-- Readable saving format 
+- Readable saving format for gui (JSON)
+- A super class that contains functions relevant for all GHEtool classes
 
 ### Changed
 - Created a new structure for the package, thereby splitting the main_py.file into more subclasses.

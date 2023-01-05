@@ -183,7 +183,7 @@ class PipeData(BaseClass):
         self.epsilon = epsilon              # pipe roughness m
         self.R_p: float = 0.
         self.pos = []
-        if self._check_values():
+        if self.check_values():
             self.pos = self._axis_symmetrical_pipe  # position of the pipes
 
     @property

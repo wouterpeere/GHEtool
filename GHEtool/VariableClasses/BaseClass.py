@@ -102,7 +102,7 @@ class BaseClass:
                 # normal dictionary
                 setattr(self, key, value)
 
-    def _check_values(self) -> bool:
+    def check_values(self) -> bool:
         """
         This functions checks if the class attributes differ from None.
 

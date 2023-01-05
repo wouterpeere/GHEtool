@@ -46,6 +46,17 @@ class TestClassesWithSlots(BaseClass):
         self.test_dictionary = {"a": 1, "b": 2}
         self.test_variable_class = GroundData(1, 2, 3)
 
+    def clear(self):
+        self.test_string = None
+        self.test_int = None
+        self.test_float = None
+        self.test_tuple = None
+        self.test_list = None
+        self.test_numpy = None
+        self.test_set = None
+        self.test_dictionary = None
+        self.test_variable_class = GroundData()
+
 
 def test_without_slots():
     test_class = TestClass()
@@ -64,7 +75,7 @@ def test_without_slots():
 
     test_class2 = TestClass()
     test_class2.clear()
-    assert not test_class2._check_values()
+    assert not test_class2.check_values()
     test_class2._from_dict(dictionary)
     dictionary = test_class2._to_dict()
     assert dictionary["test_string"] == 'test'
@@ -97,7 +108,7 @@ def test_with_slots():
 
     test_class2 = TestClassesWithSlots()
     test_class2.clear()
-    assert not test_class2._check_values()
+    assert not test_class2.check_values()
     test_class2._from_dict(dictionary)
     dictionary = test_class2._to_dict()
     assert dictionary["test_string"] == 'test'

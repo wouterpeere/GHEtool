@@ -76,8 +76,8 @@ class Borefield(BaseClass):
                 'hourly_cooling_load', 'number_of_boreholes', '_borefield', '_custom_gfunction', 'cost_investment', \
                 'length_peak', 'th', 'Tf_max', 'Tf_min', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
                 'monthly_load_cooling', 'peak_heating', 'imbalance', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm', \
-                'peak_cooling', 'simulation_period', 'fluid_data_available', 'ground_data', 'pipe_data', 'fluid_data',\
-                'results_peak_heating', 'pipe_data_available', 'time_L4', 'options_pygfunction',\
+                'peak_cooling', 'simulation_period', 'ground_data', 'pipe_data', 'fluid_data',\
+                'results_peak_heating', 'time_L4', 'options_pygfunction',\
                 'results_peak_cooling', 'results_month_cooling', 'results_month_heating', 'Tb', 'THRESHOLD_WARNING_SHALLOW_FIELD', \
                 'gui', 'time_L3_first_year', 'time_L3_last_year', 'peak_heating_external', 'peak_cooling_external', \
                 'monthly_load_heating_external', 'monthly_load_cooling_external', 'hourly_heating_load_external', \
@@ -235,11 +235,9 @@ class Borefield(BaseClass):
         self.Tf: float = 0.  # temperature of the fluid
         self.Tf_max: float = 16.  # maximum temperature of the fluid
         self.Tf_min: float = 0.  # minimum temperature of the fluid
-        self.fluid_data_available: bool = False  # needs to be True in order to calculate Rb*
         self.fluid_data: FluidData = FluidData()
 
         # initiate borehole parameters
-        self.pipe_data_available: bool = False  # needs to be True in order to calculate Rb*
         self.pipe_data: PipeData = PipeData()
 
         # initiate different sizing
@@ -637,9 +635,8 @@ class Borefield(BaseClass):
         None
         """
         self.fluid_data = data
-        self.fluid_data_available = True
 
-        if self.pipe_data_available:
+        if self.pipe_data.check_values():
             self.calculate_fluid_thermal_resistance()
 
     def set_pipe_parameters(self, data: PipeData) -> None:
@@ -657,9 +654,8 @@ class Borefield(BaseClass):
         """
         self.pipe_data = data
 
-        self.pipe_data_available = True
         # calculate the different resistances
-        if self.fluid_data_available:
+        if self.fluid_data.check_values():
             self.calculate_fluid_thermal_resistance()
         self.pipe_data.calculate_pipe_thermal_resistance()
 
@@ -755,9 +751,14 @@ class Borefield(BaseClass):
         -------
         Rb* : float
             Equivalent borehole thermal resistance [mK/W]
+
+        Raises
+        ------
+        ValueError
+            ValueError when no pipe or fluid data is available.
         """
         # check if all data is available
-        if not self.pipe_data_available or not self.fluid_data_available:
+        if not self.pipe_data.check_values() or not self.fluid_data.check_values():
             print("Please make sure you set al the pipe and fluid data.")
             raise ValueError
 
@@ -955,7 +956,17 @@ class Borefield(BaseClass):
         Returns
         -------
         None
+
+        Raises
+        ------
+        ValueError
+            ValueError when no ground data is provided
         """
+
+        # check ground data
+        if not self.ground_data.check_values():
+            raise ValueError("Please provide ground data.")
+
         # make backup of initial parameter states
         backup = (self.H_init, self.use_constant_Rb, self.use_constant_Tg, self.L2_sizing, self.L3_sizing, self.L4_sizing, self.quadrant_sizing)
 
