@@ -209,8 +209,8 @@ def test_hourly_to_monthly(borefield):
     borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv", header=True, separator=";", first_column_heating=True)
     borefield.convert_hourly_to_monthly()
 
-    assert np.isclose(np.sum(hourly_borefield.baseload_cooling), np.sum(hourly_borefield.hourly_cooling_load))
-    assert np.isclose(np.sum(hourly_borefield.baseload_heating), np.sum(hourly_borefield.hourly_heating_load))
+    assert np.isclose(np.sum(borefield.baseload_cooling), np.sum(borefield.hourly_cooling_load))
+    assert np.isclose(np.sum(borefield.baseload_heating), np.sum(borefield.hourly_heating_load))
 
 
 def test_size(borefield):

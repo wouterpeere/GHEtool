@@ -3,7 +3,8 @@ This document contains the information for the BaseClass.
 This class is used as a super class for different variable classes.
 """
 import numpy as np
-import pygfunction.boreholes
+
+from pygfunction.boreholes import Borehole
 
 
 class BaseClass:
@@ -17,7 +18,8 @@ class BaseClass:
     def _to_dict(self) -> dict:
         """
         This function converts the class variables to a dictionary so it can be saved in a JSON format.
-        Currently, it can handle np.ndarray, list, set, str, int, float, tuple and classes within GHEtool.
+        Currently, it can handle np.ndarray, list, set, str, int, float, tuple,
+        pygfunction.Borehole and classes within GHEtool.
 
         Returns
         -------
@@ -36,34 +38,48 @@ class BaseClass:
 
         # populate dictionary
         for key in variables:
-            if isinstance(getattr(self, key), (int, bool, float, str, list)):
+            if isinstance(getattr(self, key), (int, bool, float, str)):
                 dictionary[key] = getattr(self, key)
+                continue
 
             if isinstance(getattr(self, key), tuple):
                 dictionary[key] = {"value": list(getattr(self, key)), "type": "tuple"}
+                continue
 
             if isinstance(getattr(self, key), np.ndarray):
                 dictionary[key] = {"value": getattr(self, key).tolist(), "type": "np.ndarray"}
+                continue
 
             if isinstance(getattr(self, key), set):
                 dictionary[key] = {"value": list(getattr(self, key)), "type": "set"}
+                continue
+
+            if isinstance(getattr(self, key), list):
+                if np.any(getattr(self, key)) and isinstance(getattr(self, key)[0], Borehole):
+                    # pygfunction object
+                    dictionary[key] = {"value": [{key: value for key, value in borehole.__dict__.items()
+                                                  if key != "_is_tilted"}
+                                                 for borehole in getattr(self, key)],
+                                       "type": "pygfunction.Borehole"}
+                    continue
+                dictionary[key] = getattr(self, key)
 
             if isinstance(getattr(self, key), dict):
                 # note that this can cause problems whenever self.key contains values that or not int, bool, float or str
                 dictionary[key] = getattr(self, key)
+                continue
 
             # for all self-defined classes
             if hasattr(getattr(self, key), "_to_dict"):
                 dictionary[key] = getattr(self, key)._to_dict()
 
-            if isinstance(getattr(self, key), pygfunction.boreholes.Borehole):
-                print(getattr(self, key))
         return dictionary
 
     def _from_dict(self, dictionary: dict) -> None:
         """
         This function converts the dictionary values to the class attributes.
-        Currently, it can handle np.ndarray, list, set, str, int, float, tuple and classes within GHEtool.
+        Currently, it can handle np.ndarray, list, set, str, int, float, tuple, pygfunction.Borehole
+        and classes within GHEtool.
 
         Parameters
         ----------
@@ -101,6 +117,15 @@ class BaseClass:
                     if type == "tuple":
                         setattr(self, key, tuple(_value))
                         continue
+                    if type == "pygfunction.Borehole":
+                        borefield = [Borehole(H=borehole["H"],
+                                              D=borehole["D"],
+                                              r_b=borehole["r_b"],
+                                              x=borehole["x"],
+                                              y=borehole["y"],
+                                              tilt=borehole["tilt"],
+                                              orientation=borehole["orientation"])
+                                     for borehole in _value]
 
                 # normal dictionary
                 setattr(self, key, value)
