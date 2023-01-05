@@ -74,3 +74,12 @@ def test_unequal_cross():
     assert data_ground != data_pipe
     assert data_fluid != data_pipe
     assert data_pipe != data_fluid
+
+
+def test_empty_variable_classes():
+    ground_data = GroundData()
+    fluid_data = FluidData()
+    pipe_data = PipeData()
+    assert not ground_data._check_values()
+    assert not pipe_data._check_values()
+    assert not fluid_data._check_values()

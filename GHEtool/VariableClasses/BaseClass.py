@@ -67,7 +67,6 @@ class BaseClassVariables:
 
             # for all self-defined classes
             if hasattr(getattr(self, key), "__to_dict__"):
-                print(key, value)
                 getattr(self, key).__from_dict__(value)
                 continue
 
