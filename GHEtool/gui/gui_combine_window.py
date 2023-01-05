@@ -595,32 +595,56 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         -------
         None
         """
-        # open file and get data
-        with open(location, "r") as file:
-            saving = load(file)
-        # write data to variables
-        self.list_ds = []
-        for val, borefield in zip(saving['values'], saving['borefields']):
-            ds = DataStorage(self.gui_structure)
-            ds.from_dict(val)
-            if borefield is None:
-                setattr(ds, 'borefield', None)
-            else:
-                setattr(ds, 'borefield', Borefield())
-                getattr(ds, 'borefield')._from_dict(borefield)
-            self.list_ds.append(ds)
 
-        # change window title to new loaded filename
-        self.change_window_title()
-        # replace user window id
-        for DS in self.list_ds:
-            DS.ui = id(self)
+        def general_changes(scenarios):
+            # change window title to new loaded filename
+            self.change_window_title()
+            # replace user window id
+            for DS in self.list_ds:
+                DS.ui = id(self)
 
-        # init user window by reset scenario list widget and check for results
-        self.list_widget_scenario.clear()
-        self.list_widget_scenario.addItems(saving['names'])
-        self.list_widget_scenario.setCurrentRow(0)
-        self.check_results()
+            # init user window by reset scenario list widget and check for results
+            self.list_widget_scenario.clear()
+            self.list_widget_scenario.addItems(scenarios)
+            self.list_widget_scenario.setCurrentRow(0)
+            self.check_results()
+
+        try:
+            # open file and get data
+            with open(location, "r") as file:
+                saving = load(file)
+
+            version = saving['version']
+        except:
+            try:
+                # try to open as pickle
+                with open(location, "r") as file:
+                    saving = pk_load(file)
+
+                version = "2.1.0"
+            except:
+                raise ImportError("The datafile cannot be loaded!")
+
+        if version == "2.1.1":
+            # write data to variables
+            self.list_ds = []
+            for val, borefield in zip(saving['values'], saving['borefields']):
+                ds = DataStorage(self.gui_structure)
+                ds.from_dict(val)
+                if borefield is None:
+                    setattr(ds, 'borefield', None)
+                else:
+                    setattr(ds, 'borefield', Borefield())
+                    getattr(ds, 'borefield')._from_dict(borefield)
+                self.list_ds.append(ds)
+            general_changes(saving['names'])
+            return
+
+        if version == "2.1.0":
+            with open(self.filename[0], "rb") as f:
+                self.filename, li, settings = pk_load(f)
+            # write data to variables
+            self.list_ds, li = li[0], li[1]
 
     def _save_to_data(self, location: str) -> None:
         """
