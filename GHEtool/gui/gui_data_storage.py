@@ -110,14 +110,15 @@ class DataStorage:
         This function calculates the geothermal flux.
         This is calculated based on:
 
-        2 * temperature gradient * conductivity / 100
+        temperature gradient [K/100m] * conductivity [W/mK] / 100
+        = temperature gradient [K/m] * conductivity [W/mK]
 
         Returns
         -------
         Geothermal flux : float
             Geothermal flux in [W/m2]
         """
-        return 2 * self.option_temp_gradient * self.option_conductivity / 100
+        return self.option_temp_gradient * self.option_conductivity / 100
 
     def set_values(self, gui_structure: GuiStructure) -> None:
         """

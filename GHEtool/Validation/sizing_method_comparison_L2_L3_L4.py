@@ -5,6 +5,7 @@ The example load profile is for a profile limited in the first year of operation
 import time
 
 import pygfunction as gt
+import numpy as np
 
 # import all the relevant functions
 from GHEtool import *
@@ -13,7 +14,7 @@ from GHEtool import *
 data = GroundData(3, 10, 0.12)
 
 # initiate borefield
-borefield = Borefield()
+borefield = Borefield(100)
 
 # set ground data in borefield
 borefield.set_ground_parameters(data)
@@ -29,6 +30,7 @@ borefield.load_hourly_profile("..\Examples\hourly_profile.csv", header=True, sep
 L2_start = time.time()
 borefield.convert_hourly_to_monthly()
 depth_L2 = borefield.size(100, L2_sizing=True)
+
 L2_stop = time.time()
 
 # according to L3

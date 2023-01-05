@@ -14,21 +14,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 - Added NavigationToolbar to figure (issue #55)
-- Peak length can be set in the GUI
+- Added different peak lengths for heating and cooling seperately (issue #72)
 - Readable saving format for gui (JSON)
 - A super class that contains functions relevant for all GHEtool classes
 
 ### Changed
 - Created a new structure for the package, thereby splitting the main_py.file into more subclasses.
-- Create a class for the custom g-functions.
-- Speed improvements in JIT calculation. Up until now, the sizing of borefields required three steps: calculate the new size, update the borefield depth and calculate the gfunctions.
-However, if the new size is close to the old one, the gfunctions will not differ that much (<1%) and a lot of speed can be gained by keeping them constant.
-This effect is shown in a new validation file: [speed_improvement_JIT](/docs/sources/code/Validation/speed_improvement_JIT.rst).
+- Created a class for the custom g-functions (issue #57)
+- Created a class for g-function calculation that stores the previously calculated g-values to speed up the iterative algorithms (issue #57).
+- Created a class for sizing_setup to clean up the code.
+The speed improvement is over a factor 10 for heavy iterative procedures (like optimise load profile). A full speed improvement report can be found under:
+code version > speed improvements > v2.1.1.
+- The sizing methods themselves are now faster due to the fact that only the first and last year are calculated (issue #44). For more info, one can check:
+code version > speed improvements > v2.1.1
 
 ### Fixed
 - The hourly_heating_load_on_the_borefield and hourly_cooling_load_on_the_borefield are now correctly calculated.
 - When an hourly temperature profile is plotted after an optimise_load_profile optimisation, the hourly load on the borefield (and not the entire hourly load) is shown.
 - Correct conversion from hourly to monthly load (issue 62)
+- Problem with np.float16 when using simulation periodes >80 years due to overflow errors.
+- Implemented FIFO-class to prevent cycling in iterative sizing.
 
 ## [2.1.0] - 2022-11-30
 

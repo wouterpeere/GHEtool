@@ -1,4 +1,4 @@
-# GHEtool: An open-source tool for borefield sizing in Python
+# GHEtool: An open-source tool for borefield sizing
 
 [![PyPI version](https://badge.fury.io/py/GHEtool.svg)](https://badge.fury.io/py/GHEtool)
 [![Tests](https://github.com/wouterpeere/GHEtool/actions/workflows/test.yml/badge.svg)](https://github.com/wouterpeere/GHEtool/actions/workflows/test.yml)
@@ -25,7 +25,7 @@ GHEtool also comes with a *graphical user interface (GUI)*. This GUI is prebuilt
 </p>
 
 ## Requirements
-This code is tested with Python 3.8 and requires the following libraries (the versions mentioned are the ones with which the code is tested)
+This code is tested with Python 3.8, 3.9, 3.10 and 3.11 and requires the following libraries (the versions mentioned are the ones with which the code is tested)
 
 * Numpy (>=1.20.2)
 * Scipy (>=1.6.2)
@@ -185,6 +185,8 @@ Peere, W. (2020). Methode voor economische optimalisatie van geothermische verwa
 KU Leuven, Belgium.
 
 ### Applications/Mentions of GHEtool
+
+Cimmino, M., Cook., J. C. (2022). pygfunction 2.2 : New Features and Improvements in Accuracy and Computational Efficiency. In _Proceedings of IGSHPA Research Track 2022_. Las Vegas (USA), 6-8 December 2022. https://doi.org/10.22488/okstate.22.000015
 
 Verleyen, L., Peere, W., Michiels, E., Boydens, W., Helsen, L. (2022). The beauty of reason and insight: a story about 30 years old borefield equations. _IEA HPT Magazine 40_(3), 36-39, https://doi.org/10.23697/6q4n-3223
 

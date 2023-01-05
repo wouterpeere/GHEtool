@@ -61,6 +61,10 @@ class CalcProblem(QtC.QThread):
         # set ground data
         borefield.set_ground_parameters(self.DS.ground_data)
 
+        # set peak lengths
+        borefield.set_length_peak_cooling(self.DS.option_len_peak_cooling)
+        borefield.set_length_peak_heating(self.DS.option_len_peak_heating)
+
         ### GENERAL SETUPS
 
         # check if Rb is a constant, otherwise set the fluid/pipe parameters

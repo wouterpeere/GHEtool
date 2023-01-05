@@ -83,3 +83,8 @@ def test_empty_variable_classes():
     assert not ground_data.check_values()
     assert not pipe_data.check_values()
     assert not fluid_data.check_values()
+
+def test_set_mfr():
+    data_fluid = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    data_fluid.set_mass_flow_rate(10)
+    assert data_fluid.mfr == 10

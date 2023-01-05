@@ -3,6 +3,7 @@ This document contains the information for the BaseClass.
 This class is used as a super class for different variable classes.
 """
 import numpy as np
+import pygfunction.boreholes
 
 
 class BaseClass:
@@ -55,6 +56,8 @@ class BaseClass:
             if hasattr(getattr(self, key), "_to_dict"):
                 dictionary[key] = getattr(self, key)._to_dict()
 
+            if isinstance(getattr(self, key), pygfunction.boreholes.Borehole):
+                print(getattr(self, key))
         return dictionary
 
     def _from_dict(self, dictionary: dict) -> None:

@@ -69,7 +69,7 @@ class GroundData(BaseClass):
             return self.Tg
 
         # geothermal gradient is equal to the geothermal heat flux divided by the thermal conductivity
-        # avg ground temperature is (Tg + gradient + Tg) / 2
+        # avg ground temperature is (Tg + gradient + Tg) / 2 = Tg + gradient / 2
         return self.Tg + H * self.flux / self.k_s / 2
 
     def __eq__(self, other):
