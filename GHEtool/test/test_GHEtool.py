@@ -605,10 +605,10 @@ def test_set_options_gfunction_calculation(borefield):
     borefield.set_options_gfunction_calculation({"method": "equivalent"})
 
 
-
 def test_gfunction_jit(borefield):
     borefield.use_precalculated_data = False
     borefield.gfunction(10000, 100)
+
 
 def test_no_ground_data():
     borefield = Borefield(simulation_period=20,
@@ -623,6 +623,6 @@ def test_no_ground_data():
     borefield.set_max_ground_temperature(16)  # maximum temperature
     borefield.set_min_ground_temperature(0)  # minimum temperature
     try:
-        pass
+        borefield.size()
     except ValueError:
         assert True

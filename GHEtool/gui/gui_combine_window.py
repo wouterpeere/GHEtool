@@ -1,4 +1,5 @@
 from functools import partial as ft_partial
+from pickle import load as pk_load
 from json import dump, load
 from os import makedirs, remove
 from os.path import dirname, exists, realpath
@@ -6,11 +7,13 @@ from os.path import split as os_split
 from pathlib import Path, PurePath
 from sys import path
 from typing import TYPE_CHECKING, List, Tuple
-from GHEtool import Borefield
+from GHEtool import Borefield, FOLDER
+from configparser import ConfigParser
 
 import PySide6.QtCore as QtC
 import PySide6.QtGui as QtG
 import PySide6.QtWidgets as QtW
+import pathlib
 
 from .gui_base_class import UiGhetool, set_graph_layout
 from .gui_calculation_thread import CalcProblem
@@ -26,6 +29,12 @@ parentdir = dirname(currentdir)
 path.append(parentdir)
 
 BACKUP_FILENAME: str = 'backup.GHEtoolBackUp'
+
+# get current version
+path = pathlib.Path(FOLDER).parent
+config = ConfigParser()
+config.read_file(open(path.joinpath('setup.cfg'), 'r'))
+VERSION = config.get('metadata', 'version')
 
 
 # main GUI class
@@ -461,7 +470,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # title determine new title if a filename is not empty
         title: str = "" if filename == "" else f' - {filename.replace(".GHEtool", "")}'
         # create new title name
-        name: str = f"GHEtool {title}*" if self.changedFile else f"GHEtool {title}"
+        name: str = f"GHEtool v{VERSION} {title}*" if self.changedFile else f"GHEtool v{VERSION} {title}"
         # set new title name
         self.Dia.setWindowTitle(name)
 
@@ -620,7 +629,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         Parameters
         ----------
         location : str
-            Loaction of the data file.
+            Location of the data file.
 
         Returns
         -------
@@ -632,6 +641,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # create saving dict
         saving = {'filename': self.filename,
                   'names': scenario_names,
+                  'version': VERSION,
                   'values': [ds.to_dict() for ds in self.list_ds],
                   'borefields': [getattr(ds, 'borefield')._to_dict() if getattr(ds, 'borefield') is not None else None
                                  for ds in self.list_ds]}

@@ -62,7 +62,7 @@ def test_create_dataset():
 
 def test_dump_dataset():
     custom_gfunction = CustomGFunction()
-    custom_gfunction.dump_custom_dataset("./", "test")
+    custom_gfunction.dump_custom_dataset("", "test")
 
 
 def test_set_options():
@@ -72,7 +72,7 @@ def test_set_options():
 
 
 def test_load_custom_gfunction():
-    assert isinstance(load_custom_gfunction("./test.gvalues"), CustomGFunction)
+    assert isinstance(load_custom_gfunction("test.gvalues"), CustomGFunction)
 
 
 def test_check():

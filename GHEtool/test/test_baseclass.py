@@ -4,7 +4,7 @@ import json
 
 from GHEtool import *
 from GHEtool.VariableClasses.BaseClass import BaseClass
-from pygfunction.boreholes import Borehole, rectangle_field
+from pygfunction.boreholes import rectangle_field
 
 
 class TestClass(BaseClass):

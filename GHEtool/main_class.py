@@ -2024,7 +2024,7 @@ class Borefield(BaseClass):
         Parameters
         ----------
         depth : float
-
+            Depth of the boreholes in the borefield [m]
         print_results : bool
             True when the results of this optimisation are to be printed in the terminal
 
