@@ -84,11 +84,10 @@ def test_without_slots():
                                                  'volumetric_heat_capacity': 2400000.0,
                                                  'alpha': 4.1666666666666667e-07}
     assert dictionary["test_pygfunction"] == {'value': [{'H': 100.0, 'D': 4.0, 'r_b': 0.075, 'x': 0.0, 'y': 0.0,
-                                                        'tilt': 0.0, 'orientation': 3.141592653589793,
-                                                        '_is_tilted': False},
+                                                        'tilt': 0.0, 'orientation': 3.141592653589793},
                                                        {'H': 100.0, 'D': 4.0, 'r_b': 0.075,
-                                                        'x': 6.0, 'y': 0.0, 'tilt': 0.0, 'orientation': 0.0,
-                                                        '_is_tilted': False}], 'type': 'pygfunction.Borehole'}
+                                                        'x': 6.0, 'y': 0.0, 'tilt': 0.0, 'orientation': 0.0}],
+                                              'type': 'pygfunction.Borehole'}
 
     test_class2 = TestClass()
     test_class2.clear()
@@ -108,11 +107,10 @@ def test_without_slots():
                                                  'volumetric_heat_capacity': 2400000.0,
                                                  'alpha': 4.1666666666666667e-07}
     assert dictionary["test_pygfunction"] == {'value': [{'H': 100.0, 'D': 4.0, 'r_b': 0.075, 'x': 0.0, 'y': 0.0,
-                                                        'tilt': 0.0, 'orientation': 3.141592653589793,
-                                                        '_is_tilted': False},
+                                                        'tilt': 0.0, 'orientation': 3.141592653589793},
                                                        {'H': 100.0, 'D': 4.0, 'r_b': 0.075,
-                                                        'x': 6.0, 'y': 0.0, 'tilt': 0.0, 'orientation': 0.0,
-                                                        '_is_tilted': False}], 'type': 'pygfunction.Borehole'}
+                                                        'x': 6.0, 'y': 0.0, 'tilt': 0.0, 'orientation': 0.0}], 'type': 'pygfunction.Borehole'}
+
 
 def test_with_slots():
     test_class = TestClassesWithSlots()
@@ -130,11 +128,9 @@ def test_with_slots():
                                                  'volumetric_heat_capacity': 2400000.0,
                                                  'alpha': 4.1666666666666667e-07}
     assert dictionary["test_pygfunction"] == {'value': [{'H': 100.0, 'D': 4.0, 'r_b': 0.075, 'x': 0.0, 'y': 0.0,
-                                                        'tilt': 0.0, 'orientation': 3.141592653589793,
-                                                        '_is_tilted': False},
+                                                        'tilt': 0.0, 'orientation': 3.141592653589793},
                                                        {'H': 100.0, 'D': 4.0, 'r_b': 0.075,
-                                                        'x': 6.0, 'y': 0.0, 'tilt': 0.0, 'orientation': 0.0,
-                                                        '_is_tilted': False}], 'type': 'pygfunction.Borehole'}
+                                                        'x': 6.0, 'y': 0.0, 'tilt': 0.0, 'orientation': 0.0}], 'type': 'pygfunction.Borehole'}
 
     test_class2 = TestClassesWithSlots()
     test_class2.clear()
@@ -154,12 +150,11 @@ def test_with_slots():
                                                  'volumetric_heat_capacity': 2400000.0,
                                                  'alpha': 4.1666666666666667e-07}
     assert dictionary["test_pygfunction"] == {'value': [{'H': 100.0, 'D': 4.0, 'r_b': 0.075, 'x': 0.0, 'y': 0.0,
-                                                        'tilt': 0.0, 'orientation': 3.141592653589793,
-                                                        '_is_tilted': False},
+                                                        'tilt': 0.0, 'orientation': 3.141592653589793},
                                                        {'H': 100.0, 'D': 4.0, 'r_b': 0.075,
-                                                        'x': 6.0, 'y': 0.0, 'tilt': 0.0, 'orientation': 0.0,
-                                                        '_is_tilted': False}], 'type': 'pygfunction.Borehole'}
+                                                        'x': 6.0, 'y': 0.0, 'tilt': 0.0, 'orientation': 0.0}], 'type': 'pygfunction.Borehole'}
+
 
 def test_json_dump():
     test_class = TestClass()
-    json.dump(test_class._to_dict(),open('test.json','w'))
+    json.dump(test_class._to_dict(), open('test.json', 'w'))
