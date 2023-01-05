@@ -19,7 +19,7 @@ from scipy import interpolate
 from scipy.signal import convolve
 
 from GHEtool.VariableClasses import FluidData, GroundData, PipeData
-from GHEtool.VariableClasses.BaseClass import BaseClassVariables
+from GHEtool.VariableClasses.BaseClass import BaseClass
 
 
 def _timeValues(dt=3600., t_max=100. * 8760 * 3600.) -> np.array:
@@ -54,7 +54,7 @@ def _timeValues(dt=3600., t_max=100. * 8760 * 3600.) -> np.array:
     return load_agg.get_times_for_simulation()
 
 
-class Borefield(BaseClassVariables):
+class Borefield(BaseClass):
     """Main borefield class"""
     UPM: float = 730.  # number of hours per month
     THRESHOLD_BOREHOLE_DEPTH: float = 0.05  # threshold for iteration

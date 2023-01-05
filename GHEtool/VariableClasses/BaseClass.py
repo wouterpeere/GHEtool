@@ -1,9 +1,17 @@
+"""
+This document contains the information for the BaseClass.
+This class is used as a super class for different variable classes.
+"""
 import numpy as np
 
 
-class BaseClassVariables:
+class BaseClass:
     """
-    This class is the base class
+    This class contains basic functionality of different classes within GHEtool.
+    It contains the code to generate a dictionary from the class (in order to be able to export to JSON),
+    to load a class based on a dictionary and to check whether or not all attributes differ from None.
+
+    This class should only be altered whenever a highly general method should be implemented.
     """
     def __to_dict__(self) -> dict:
         """
@@ -56,7 +64,7 @@ class BaseClassVariables:
 
         Parameters
         ----------
-        dict
+        dictionary
             Dictionary with all the attributes of the class
 
         Returns

@@ -3,13 +3,13 @@ This document contains the variable classes for the ground data, fluid data and 
 """
 
 from math import pi
-from GHEtool.VariableClasses.BaseClass import BaseClassVariables
+from GHEtool.VariableClasses.BaseClass import BaseClass
 
 import numpy as np
 import pygfunction as gt
 
 
-class GroundData(BaseClassVariables):
+class GroundData(BaseClass):
     """
     Contains information regarding the ground data of the borefield.
     """
@@ -81,7 +81,7 @@ class GroundData(BaseClassVariables):
         return True
 
 
-class FluidData(BaseClassVariables):
+class FluidData(BaseClass):
     """
     Contains information regarding the fluid data of the borefield.
     """
@@ -140,7 +140,7 @@ class FluidData(BaseClassVariables):
         return True
 
 
-class PipeData(BaseClassVariables):
+class PipeData(BaseClass):
     """
     Contains information regarding the pipe data of the borefield.
     """

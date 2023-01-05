@@ -2,10 +2,10 @@ import pytest
 import numpy as np
 
 from GHEtool import *
-from GHEtool.VariableClasses.BaseClass import BaseClassVariables
+from GHEtool.VariableClasses.BaseClass import BaseClass
 
 
-class TestClass(BaseClassVariables):
+class TestClass(BaseClass):
 
     def __init__(self):
         self.test_string = "test"
@@ -30,7 +30,7 @@ class TestClass(BaseClassVariables):
         self.test_variable_class = GroundData()
 
 
-class TestClassesWithSlots(BaseClassVariables):
+class TestClassesWithSlots(BaseClass):
 
     __slots__ = 'test_string', 'test_int', 'test_float', 'test_tuple', 'test_list', 'test_numpy',\
                 'test_set', 'test_dictionary', 'test_variable_class'
