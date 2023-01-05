@@ -64,6 +64,7 @@ def test_without_slots():
 
     test_class2 = TestClass()
     test_class2.clear()
+    assert not test_class2._check_values()
     test_class2._from_dict(dictionary)
     dictionary = test_class2._to_dict()
     assert dictionary["test_string"] == 'test'
@@ -80,7 +81,7 @@ def test_without_slots():
 
 
 def test_with_slots():
-    test_class = TestClass()
+    test_class = TestClassesWithSlots()
     dictionary = test_class._to_dict()
     assert dictionary["test_string"] == 'test'
     assert dictionary["test_int"] == 12
@@ -94,8 +95,9 @@ def test_with_slots():
                                                  'volumetric_heat_capacity': 2400000.0,
                                                  'alpha': 4.1666666666666667e-07}
 
-    test_class2 = TestClass()
+    test_class2 = TestClassesWithSlots()
     test_class2.clear()
+    assert not test_class2._check_values()
     test_class2._from_dict(dictionary)
     dictionary = test_class2._to_dict()
     assert dictionary["test_string"] == 'test'
