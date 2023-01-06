@@ -646,13 +646,17 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             self.list_ds, li = li[0], li[1]
 
             # since the borefield object is changed, this is deleted from the dataframe
-            for ds in self.list_ds:
-                setattr(ds, 'borefield', None)
+            #for ds in self.list_ds:
+            #    setattr(ds, 'borefield', None)
 
             # convert to new ds format
             for idx, ds in enumerate(self.list_ds):
-                ds_new = DataStorage(gui_structure=self.gui_structure)
+                ds_new = DataStorage(self.gui_structure)
                 [setattr(ds_new, name, getattr(ds, name)) for name in ds.__dict__ if hasattr(ds_new, name)]
+                if ds.borefield is not None:
+                    bf = Borefield()
+                    [setattr(bf, name, getattr(ds.borefield, name)) for name in ds.borefield.__slots__ if hasattr(bf, name) and hasattr(ds.borefield, name)]
+                    setattr(ds_new, 'borefield', bf)
                 self.list_ds[idx] = ds_new
             # write scenario names
             general_changes(li)
