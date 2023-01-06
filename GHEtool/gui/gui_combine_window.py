@@ -775,6 +775,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         if self.fun_save():  # get and save filename
             self.list_ds: list = []  # reset list of data storages
             self.list_widget_scenario.clear()  # clear list widget with scenario list
+            self.display_results()  # clear the results page
 
     def change_scenario(self, idx: int) -> None:
         """
