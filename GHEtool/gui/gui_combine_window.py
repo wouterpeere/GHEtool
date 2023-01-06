@@ -1,12 +1,12 @@
 from functools import partial as ft_partial
 from pickle import load as pk_load
-from json import dump, load
+from json import dump, load, JSONDecodeError
 from os import makedirs, remove
 from os.path import dirname, exists, realpath
 from os.path import split as os_split
 from pathlib import Path, PurePath
 from sys import path
-from typing import TYPE_CHECKING, List, Tuple
+from typing import List, Tuple
 from GHEtool import Borefield, FOLDER
 from configparser import ConfigParser
 
@@ -21,8 +21,6 @@ from .gui_data_storage import DataStorage
 from .gui_structure import FigureOption, GuiStructure, Option
 from .translation_class import Translations
 
-if TYPE_CHECKING:
-    from GHEtool import Borefield
 
 currentdir = dirname(realpath(__file__))
 parentdir = dirname(currentdir)
@@ -615,14 +613,14 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
                 saving = load(file)
 
             version = saving['version']
-        except:
+        except (JSONDecodeError,  FileNotFoundError, UnicodeDecodeError):
             try:
                 # try to open as pickle
-                with open(location, "r") as file:
+                with open(location, "rb") as file:
                     saving = pk_load(file)
 
                 version = "2.1.0"
-            except:
+            except (FileNotFoundError, ImportError):
                 raise ImportError("The datafile cannot be loaded!")
 
         if version == "2.1.1":
@@ -637,29 +635,26 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
                     setattr(ds, 'borefield', Borefield())
                     getattr(ds, 'borefield')._from_dict(borefield)
                 self.list_ds.append(ds)
+            # set and change the window title
+            self.filename = saving['filename']
             general_changes(saving['names'])
             return
 
         if version == "2.1.0":
-            with open(self.filename[0], "rb") as f:
-                self.filename, li, settings = pk_load(f)
+            self.filename, li, settings = saving
             # write data to variables
-            list_ds, li = li[0], li[1]
+            self.list_ds, li = li[0], li[1]
 
             # since the borefield object is changed, this is deleted from the dataframe
-            for ds in list_ds:
+            for ds in self.list_ds:
                 setattr(ds, 'borefield', None)
 
-            # convert the old ds format to a dictionary
-            new_ds = [DataStorage.to_dict(ds) for ds in list_ds]
-
-            # load into new ds format
-            self.list_ds = []
-            for ds in new_ds:
-                ds_new = DataStorage(self.gui_structure)
-                ds_new.from_dict(ds)
-                self.list_ds.append(ds_new)
-
+            # convert to new ds format
+            for idx, ds in enumerate(self.list_ds):
+                ds_new = DataStorage(gui_structure=self.gui_structure)
+                [setattr(ds_new, name, getattr(ds, name)) for name in ds.__dict__ if hasattr(ds_new, name)]
+                self.list_ds[idx] = ds_new
+            # write scenario names
             general_changes(li)
 
     def _save_to_data(self, location: str) -> None:

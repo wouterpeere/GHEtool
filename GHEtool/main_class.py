@@ -1,16 +1,12 @@
 """
 This file contains all the code for the borefield calculations.
 """
-import pathlib
-import pickle
-import warnings
 from math import pi
-from typing import Optional, Tuple, Union, List
+from typing import Tuple, Union, List
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pygfunction as gt
-from scipy import interpolate
 from scipy.signal import convolve
 
 from GHEtool.VariableClasses import GroundData, FluidData, PipeData

@@ -27,5 +27,5 @@ def main():
     system(f'py -m black --line-length 160 {file_name}')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     main()
