@@ -644,7 +644,23 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             with open(self.filename[0], "rb") as f:
                 self.filename, li, settings = pk_load(f)
             # write data to variables
-            self.list_ds, li = li[0], li[1]
+            list_ds, li = li[0], li[1]
+
+            # since the borefield object is changed, this is deleted from the dataframe
+            for ds in list_ds:
+                setattr(ds, 'borefield', None)
+
+            # convert the old ds format to a dictionary
+            new_ds = [DataStorage.to_dict(ds) for ds in list_ds]
+
+            # load into new ds format
+            self.list_ds = []
+            for ds in new_ds:
+                ds_new = DataStorage(self.gui_structure)
+                ds_new.from_dict(ds)
+                self.list_ds.append(ds_new)
+
+            general_changes(li)
 
     def _save_to_data(self, location: str) -> None:
         """
