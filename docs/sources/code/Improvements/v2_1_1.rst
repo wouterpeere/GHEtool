@@ -8,11 +8,11 @@ Both improvements are explained below.
 Improvement in sizing
 +++++++++++++++++++++
 Previously, in v2.1.0, for the sizing methodology L3 and L4 (i.e. monthly and hourly), the temperatures where calculated every time step.
-This however (especially for long simulation periods) requires a lot of time due to the convolution step. In v2.1.1 this is changed so that only the first and last year
+This however (especially for long simulation periods) requires a lot of time due to the convolution step, especially for an hourly sizing. In v2.1.1 this is changed so that only the first and last year
 are calculated, since only these years are relevant for the sizing [1]_. This means that however long the simulation period may be, only two years are calculated.
-In the table below, the time required for one sizing iteration (i.e. one g-value convolution) is shown in µs. The code to come up with these numbers is added below.
+In the table below, the time required for one sizing iteration (i.e. one g-value convolution) for an hourly sizing is shown in µs. The code to come up with these numbers is added below.
 
-.. list-table:: Speed improvement sizing methods
+.. list-table:: Speed improvement for g-value convolution in hourly sizing
    :header-rows: 1
 
    * - Simulation period [years]
