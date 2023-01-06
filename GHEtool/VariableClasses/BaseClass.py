@@ -39,7 +39,7 @@ class BaseClass:
 
         # populate dictionary
         for key in variables:
-            if isinstance(getattr(self, key), (int, bool, float, str, list)):
+            if isinstance(getattr(self, key), (int, bool, float, str)):
                 dictionary[key] = getattr(self, key)
                 continue
 

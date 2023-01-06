@@ -645,6 +645,11 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             self.filename, li, settings = saving
             # write data to variables
             self.list_ds, li = li[0], li[1]
+
+            for idx, ds in enumerate(self.list_ds):
+                ds_new = DataStorage(gui_structure=self.gui_structure)
+                [setattr(ds_new, name, getattr(ds, name)) for name in ds.__dict__ if hasattr(ds_new, name)]
+                self.list_ds[idx] = ds_new
             # write scenario names
             general_changes(li)
             # change the window title
