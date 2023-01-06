@@ -3,6 +3,7 @@ This document contains the information for the BaseClass.
 This class is used as a super class for different variable classes.
 """
 import numpy as np
+from typing import List
 
 from pygfunction.boreholes import Borehole
 
@@ -29,16 +30,16 @@ class BaseClass:
 
         # get all variables in class
         if hasattr(self, "__slots__"):
-            variables: list = self.__slots__
+            variables: List[str] = list(self.__slots__)
         else:
-            variables: list = [attr for attr in dir(self) if not callable(getattr(self, attr)) and not attr.startswith("__")]
+            variables: List[str] = [attr for attr in dir(self) if not callable(getattr(self, attr)) and not attr.startswith("__")]
 
         # initiate dictionary
         dictionary: dict = dict([])
 
         # populate dictionary
         for key in variables:
-            if isinstance(getattr(self, key), (int, bool, float, str)):
+            if isinstance(getattr(self, key), (int, bool, float, str, list)):
                 dictionary[key] = getattr(self, key)
                 continue
 
@@ -141,10 +142,9 @@ class BaseClass:
         """
         # get all variables in class
         if hasattr(self, "__slots__"):
-            variables: list = self.__slots__
+            variables: List[str] = list(self.__slots__)
         else:
-            variables: list = [attr for attr in dir(self) if
-                               not callable(getattr(self, attr)) and not attr.startswith("__")]
+            variables: List[str] = [attr for attr in dir(self) if not callable(getattr(self, attr)) and not attr.startswith("__")]
 
         for var in variables:
             if getattr(self, var) is None:
