@@ -305,8 +305,8 @@ class Option(metaclass=abc.ABCMeta):
         -------
         None
         """
-        if self.is_hidden():
-            return
+        # if self.is_hidden():
+        #     return
         self.frame.hide()
         self.frame.setEnabled(False)
 
@@ -329,8 +329,8 @@ class Option(metaclass=abc.ABCMeta):
         -------
         None
         """
-        if not self.is_hidden():
-            return
+        # if not self.is_hidden():
+        #     return
         self.frame.show()
         self.frame.setEnabled(True)
 
