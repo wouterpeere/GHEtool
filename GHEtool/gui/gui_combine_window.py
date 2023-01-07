@@ -111,12 +111,12 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # set start page to general page
         self.gui_structure.page_aim.button.click()
 
-        current_aim = [aim for aim, _ in self.gui_structure.list_of_aims if aim.widget.isChecked()]
-        for aim, _ in self.gui_structure.list_of_aims:
-            if aim not in current_aim:
-                aim.widget.click()
-
-        current_aim[0].widget.click()
+        # current_aim = [aim for aim, _ in self.gui_structure.list_of_aims if aim.widget.isChecked()]
+        # for aim, _ in self.gui_structure.list_of_aims:
+        #     if aim not in current_aim:
+        #         aim.widget.click()
+        #
+        # current_aim[0].widget.click()
 
         [option.init_links() for option, _ in self.gui_structure.list_of_options]
 

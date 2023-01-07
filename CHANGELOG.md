@@ -27,6 +27,7 @@ The speed improvement is over a factor 10 for heavy iterative procedures (like o
 code version > speed improvements > v2.1.1.
 - The sizing methods themselves are now faster due to the fact that only the first and last year are calculated (issue #44). For more info, one can check:
 code version > speed improvements > v2.1.1
+- Faster loading time of the GUI.
 
 ### Fixed
 - The hourly_heating_load_on_the_borefield and hourly_cooling_load_on_the_borefield are now correctly calculated.
