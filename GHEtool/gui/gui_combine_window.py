@@ -921,7 +921,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             self.pushButton_SaveScenario.setEnabled(True)
             self.action_start_single.setEnabled(True)
             self.action_start_multiple.setEnabled(True)
-            self.display_results()
             self.gui_structure.page_result.button.click()
             return
         # start new thread
@@ -978,7 +977,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         ds: DataStorage = self.list_ds[idx]
         # if calculation is already done just show results
         if ds.borefield is not None:
-            self.display_results()
             self.gui_structure.page_result.button.click()
             return
         # return to thermal demands page if no file is selected
