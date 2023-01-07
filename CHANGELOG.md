@@ -36,6 +36,7 @@ code version > speed improvements > v2.1.1
 - Problem with np.float16 when using simulation periodes >80 years due to overflow errors.
 - Implemented FIFO-class to prevent cycling in iterative sizing.
 - A scenario name cannot occur twice in the scenario list.
+- Sometimes some gui options were not shown
 
 ## [2.1.0] - 2022-11-30
 

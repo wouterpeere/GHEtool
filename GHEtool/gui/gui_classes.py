@@ -309,6 +309,7 @@ class Option(metaclass=abc.ABCMeta):
         #     return
         self.frame.hide()
         self.frame.setEnabled(False)
+        [option.hide() for option, value in self.linked_options]
 
     def is_hidden(self) -> bool:
         """
@@ -333,6 +334,23 @@ class Option(metaclass=abc.ABCMeta):
         #     return
         self.frame.show()
         self.frame.setEnabled(True)
+        [option.show() for option, value in self.linked_options if self.check_linked_value(value)]
+
+    @abc.abstractmethod
+    def check_linked_value(self, value: Union[int, Tuple[Optional[int], Optional[int]], Tuple[Optional[float], Optional[float]], str, bool]) -> bool:
+        """
+        Check if the linked value is the current one then return True
+
+        Parameters
+        ----------
+        value : int, bool, str, tuple of ints or floats
+            value to be checked
+
+        Returns
+        -------
+        bool
+            True if it is the current value
+        """
 
     @abc.abstractmethod
     def change_event(self, function_to_be_called: Callable) -> None:
@@ -515,7 +533,7 @@ class FloatBox(Option):
 
         >>> option_float.add_link_2_show(option=option_linked, below=0.1, above=0.9)
         """
-
+        self.linked_options.append((option, (below, above)))
         self.widget.valueChanged.connect(ft_partial(self.show_option, option, below=below, above=above))
 
     def show_option(self, option: Union[Option, Category, FunctionButton, Hint], below: Optional[float], above: Optional[float]):
@@ -542,6 +560,27 @@ class FloatBox(Option):
         if above is not None and self.get_value() > above:
             return option.show()
         option.hide()
+
+    def check_linked_value(self, value: Tuple[Optional[float], Optional[float]]) -> bool:
+        """
+        This function checks if the linked "option" should be shown.
+
+        Parameters
+        ----------
+        value : tuple of 2 optional floats
+            first one is the below value and the second the above value
+
+        Returns
+        -------
+        bool
+            True if the linked "option" should be shown
+        """
+        below, above = value
+        if below is not None and self.get_value() < below:
+            return True
+        if above is not None and self.get_value() > above:
+            return True
+        return False
 
     def change_event(self, function_to_be_called: Callable) -> None:
         """
@@ -694,6 +733,27 @@ class IntBox(Option):
             True if the value is between the minimal and maximal value
         """
         return self.minimal_value <= self.get_value() <= self.maximal_value
+
+    def check_linked_value(self, value: Tuple[Optional[int], Optional[int]]) -> bool:
+        """
+        This function checks if the linked "option" should be shown.
+
+        Parameters
+        ----------
+        value : tuple of 2 optional ints
+            first one is the below value and the second the above value
+
+        Returns
+        -------
+        bool
+            True if the linked "option" should be shown
+        """
+        below, above = value
+        if below is not None and self.get_value() < below:
+            return True
+        if above is not None and self.get_value() > above:
+            return True
+        return False
 
     def add_link_2_show(self, option: Union[Option, Category, FunctionButton, Hint], *, below: int = None, above: int = None):
         """
@@ -961,6 +1021,22 @@ class ButtonBox(Option):
         for button, button_name in zip(self.widget, entry_name[1:]):
             button.setText(f" {button_name.replace('++', ',')} ")
 
+    def check_linked_value(self, value: int) -> bool:
+        """
+        This function checks if the linked "option" should be shown.
+
+        Parameters
+        ----------
+        value : int
+            int of index on which the option should be shown
+
+        Returns
+        -------
+        bool
+            True if the linked "option" should be shown
+        """
+        return self.get_value() == value
+
     def create_widget(self, frame: QtW.QFrame, layout_parent: QtW.QLayout, row: int = None, column: int = None) -> None:
         """
         This functions creates the ButtonBox widget in the frame.
@@ -1162,6 +1238,22 @@ class ListBox(Option):
         """
         self.linked_options.append([option, on_index])
 
+    def check_linked_value(self, value: int) -> bool:
+        """
+        This function checks if the linked "option" should be shown.
+
+        Parameters
+        ----------
+        value : int
+            int of index on which the option should be shown
+
+        Returns
+        -------
+        bool
+            True if the linked "option" should be shown
+        """
+        return self.get_value() == value
+
     def change_event(self, function_to_be_called: Callable) -> None:
         """
         This function calls the function_to_be_called whenever the index of the ListBox is changed.
@@ -1306,6 +1398,22 @@ class FileNameBox(Option):
             True if a value is given in the FileNameBox. False otherwise
         """
         return exists(self.widget.text())
+
+    def check_linked_value(self, value: str) -> bool:
+        """
+        This function checks if the linked "option" should be shown.
+
+        Parameters
+        ----------
+        value : str
+            str on which the option should be shown
+
+        Returns
+        -------
+        bool
+            True if the linked "option" should be shown
+        """
+        return self.get_value() == value
 
     def change_event(self, function_to_be_called: Callable) -> None:
         """
