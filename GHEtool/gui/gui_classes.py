@@ -106,6 +106,7 @@ class Option(metaclass=abc.ABCMeta):
         self.frame: QtW.QFrame = QtW.QFrame(self.default_parent)
         self.label = QtW.QLabel(self.frame)
         self.linked_options: List[(Option, int)] = []
+        self.linked_options_callable: List[Callable] = []
         self.limit_size: bool = True
         category.list_of_options.append(self)
         self.list_2_check_before_value: List[Tuple[Option, int], Aim] = []
@@ -305,8 +306,17 @@ class Option(metaclass=abc.ABCMeta):
         -------
         None
         """
+        if self.is_hidden():
+            return
         self.frame.hide()
         self.frame.setEnabled(False)
+        # hide all linked options
+        for linked_option in self.linked_options:
+            if isinstance(linked_option, list):
+                # for ButtonBox this is a list
+                linked_option[0].hide()
+                continue
+            linked_option.hide
 
     def is_hidden(self) -> bool:
         """
@@ -327,8 +337,15 @@ class Option(metaclass=abc.ABCMeta):
         -------
         None
         """
+        if not self.is_hidden():
+            return
         self.frame.show()
         self.frame.setEnabled(True)
+        # show all linked options when needed
+        # linked_options_callable is a list of partial functions that have the same actions as if the
+        # options would have been clicked/changed
+        for linked_option in self.linked_options_callable:
+            linked_option()
 
     @abc.abstractmethod
     def change_event(self, function_to_be_called: Callable) -> None:
@@ -513,6 +530,7 @@ class FloatBox(Option):
         """
 
         self.widget.valueChanged.connect(ft_partial(self.show_option, option, below=below, above=above))
+        self.linked_options_callable.append(ft_partial(self.show_option, option, below=below, above=above))
 
     def show_option(self, option: Union[Option, Category, FunctionButton, Hint], below: Optional[float], above: Optional[float]):
         """
@@ -716,6 +734,8 @@ class IntBox(Option):
         >>> option_int.add_link_2_show(option=option_linked, below=1, above=10)
         """
         self.widget.valueChanged.connect(ft_partial(self.show_option, option, below=below, above=above))
+        self.linked_options_callable.append(ft_partial(self.show_option, option, below=below, above=above))
+
 
     def show_option(self, option: Union[Option, Category, FunctionButton, Hint], below: Optional[int], above: Optional[int]):
         """
@@ -920,6 +940,7 @@ class ButtonBox(Option):
         """
 
         self.linked_options.append([option, on_index])
+        self.linked_options_callable.append(ft_partial(check, self.linked_options, self, self.get_value()))
 
     def change_event(self, function_to_be_called: Callable) -> None:
         """
@@ -1157,6 +1178,7 @@ class ListBox(Option):
 
         """
         self.linked_options.append([option, on_index])
+        self.linked_options_callable.append(ft_partial(check, self.linked_options, self))
 
     def change_event(self, function_to_be_called: Callable) -> None:
         """
@@ -1986,6 +2008,7 @@ class Category:
                 continue
             self.options_hidden.append(option)
             option.hide()
+
         # when results is given as an argument, the current category is on the result page
         # all ResultTexts should be out of the options_hidden list
         if kwargs.get("results"):

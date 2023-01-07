@@ -19,6 +19,7 @@ from .gui_base_class import UiGhetool, set_graph_layout
 from .gui_calculation_thread import CalcProblem
 from .gui_data_storage import DataStorage
 from .gui_structure import FigureOption, GuiStructure, Option
+from .gui_classes import check_aim_options
 from .translation_class import Translations
 
 
@@ -110,13 +111,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         self.set_push(False)
         # set start page to general page
         self.gui_structure.page_aim.button.click()
-
-        # current_aim = [aim for aim, _ in self.gui_structure.list_of_aims if aim.widget.isChecked()]
-        # for aim, _ in self.gui_structure.list_of_aims:
-        #     if aim not in current_aim:
-        #         aim.widget.click()
-        #
-        # current_aim[0].widget.click()
 
         [option.init_links() for option, _ in self.gui_structure.list_of_options]
 
@@ -443,7 +437,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # set new name if the dialog is not canceled and the text is not None
         if dialog.exec_() == QtW.QDialog.Accepted:
             text = dialog.textValue()
-            list_of_scenarios = [self.list_widget_scenario.item(x).text() for x in
+            list_of_scenarios = [self.list_widget_scenario.item(x).text().split("*")[0] for x in
                                  range(self.list_widget_scenario.count())]
             if text in list_of_scenarios:
                 text += "(2)"
@@ -871,7 +865,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         self.list_ds.append(DataStorage(self.gui_structure))
         # add new scenario name and item to list widget
         string = f"{self.translations.scenarioString[self.gui_structure.option_language.get_value()]}: {number + 1}"
-        list_of_scenarios = [self.list_widget_scenario.item(x).text() for x in range(self.list_widget_scenario.count())]
+        list_of_scenarios = [self.list_widget_scenario.item(x).text().split("*")[0] for x in range(self.list_widget_scenario.count())]
         if string in list_of_scenarios:
             string += "(2)"
         # set string in scenario widget
@@ -1013,6 +1007,9 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         display results of the current selected scenario
         :return: None
         """
+        # update so all the relevant options are shown
+        check_aim_options([aim for aim, _ in self.gui_structure.list_of_aims])
+
         # hide widgets if no list of scenarios exists and display not calculated text
         def hide_no_result(hide: bool = True):
             if hide or self.list_widget_scenario.currentItem().text()[-1] == "*":
@@ -1044,7 +1041,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         if borefield is None:
             hide_no_result(True)
             return
-
         # no errors, so proceed with showing the results
         hide_no_result(False)
         # create figure for every ResultFigure object
