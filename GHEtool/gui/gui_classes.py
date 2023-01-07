@@ -346,7 +346,7 @@ class Option(metaclass=abc.ABCMeta):
 
         Returns
         -------
-        Bool
+        bool
             True if it is the current value
         """
 
@@ -567,9 +567,10 @@ class FloatBox(Option):
         ----------
         value : tuple of 2 optional floats
             first one is the below value and the second the above value
+
         Returns
         -------
-        Bool
+        bool
             True if the linked "option" should be shown
         """
         below, above = value
@@ -739,9 +740,10 @@ class IntBox(Option):
         ----------
         value : tuple of 2 optional ints
             first one is the below value and the second the above value
+
         Returns
         -------
-        Bool
+        bool
             True if the linked "option" should be shown
         """
         below, above = value
@@ -1028,7 +1030,7 @@ class ButtonBox(Option):
 
         Returns
         -------
-        Bool
+        bool
             True if the linked "option" should be shown
         """
         return self.get_value() == value
@@ -1245,7 +1247,7 @@ class ListBox(Option):
 
         Returns
         -------
-        Bool
+        bool
             True if the linked "option" should be shown
         """
         return self.get_value() == value
@@ -1406,7 +1408,7 @@ class FileNameBox(Option):
 
         Returns
         -------
-        Bool
+        bool
             True if the linked "option" should be shown
         """
         return self.get_value() == value
