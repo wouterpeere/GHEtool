@@ -434,7 +434,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # create dialog box to ask for a new name
         dialog = QtW.QInputDialog(self.Dia)
         dialog.setWindowTitle(self.translations.label_new_scenario[self.gui_structure.option_language.get_value()])
-        dialog.setLabelText(f"{self.translations.new_name[self.gui_structure.option_language.get_value()]}{item.text()}:")
+        dialog.setLabelText(f"{self.translations.new_name[self.gui_structure.option_language.get_value()]}{item.text()}")
         dialog.setOkButtonText(self.translations.label_okay[self.gui_structure.option_language.get_value()])  # +++
         dialog.setCancelButtonText(self.translations.label_abort[self.gui_structure.option_language.get_value()])  # +++
         li = dialog.findChildren(QtW.QPushButton)
@@ -443,6 +443,10 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # set new name if the dialog is not canceled and the text is not None
         if dialog.exec_() == QtW.QDialog.Accepted:
             text = dialog.textValue()
+            list_of_scenarios = [self.list_widget_scenario.item(x).text() for x in
+                                 range(self.list_widget_scenario.count())]
+            if text in list_of_scenarios:
+                text += "(2)"
             item.setText(text) if text != "" else None
 
     def check_results(self) -> None:
@@ -866,7 +870,12 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # append new scenario to List of DataStorages
         self.list_ds.append(DataStorage(self.gui_structure))
         # add new scenario name and item to list widget
-        self.list_widget_scenario.addItem(f"{self.translations.scenarioString[self.gui_structure.option_language.get_value()]}: {number + 1}")
+        string = f"{self.translations.scenarioString[self.gui_structure.option_language.get_value()]}: {number + 1}"
+        list_of_scenarios = [self.list_widget_scenario.item(x).text() for x in range(self.list_widget_scenario.count())]
+        if string in list_of_scenarios:
+            string += "(2)"
+        # set string in scenario widget
+        self.list_widget_scenario.addItem(string)
         # select new list item
         self.list_widget_scenario.setCurrentRow(number)
         # run change function to mark unsaved inputs
