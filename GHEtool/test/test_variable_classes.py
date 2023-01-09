@@ -1,4 +1,5 @@
 import pytest
+
 from GHEtool import *
 
 
@@ -74,6 +75,14 @@ def test_unequal_cross():
     assert data_fluid != data_pipe
     assert data_pipe != data_fluid
 
+
+def test_empty_variable_classes():
+    ground_data = GroundData()
+    fluid_data = FluidData()
+    pipe_data = PipeData()
+    assert not ground_data.check_values()
+    assert not pipe_data.check_values()
+    assert not fluid_data.check_values()
 
 def test_set_mfr():
     data_fluid = FluidData(0.2, 0.568, 998, 4180, 1e-3)

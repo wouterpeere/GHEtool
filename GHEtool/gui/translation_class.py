@@ -1188,25 +1188,25 @@ class Translations:
         self.option_toggle_buttons: List[str] = [
             "Use toggle buttons?:, no , yes ",
             "Umschalterbutton?:, Nein , Ja ",
-            "Toggle-gedrag?:, ne , ja",
+            "Toggle-gedrag?:, nee , ja",
             "Toggle buttons?:, no , yes ",
             "Toggle buttons?:, no , yes ",
             "Toggle buttons?:, no , yes ",
-            "Toggle buttons?:, no , yes ",
+            "Toggle buttons?:, no , yes",
         ]
         self.option_auto_saving: List[str] = [
             "Use automatic saving?, no , yes ",
             "Automatisches speichern nutzen?, Nein, Ja ",
-            "Automatisch opslaan, ne , ja ",
+            "Automatisch opslaan, nee , ja ",
             "Automatic saving, no , yes ",
             "Automatic saving, no , yes ",
             "Automatic saving, no , yes ",
-            "Automatic saving, no , yes ",
+            "Automatic saving, no , yes",
         ]
         self.hint_saving: List[str] = [
             "If Auto saving is selected the scenario will automatically saved if a scenario is changed. Otherwise the scenario has to be saved with the Update scenario button in the upper left corner if the changes should not be lost.",
             "Wenn Automatisch speichern ausgewählt ist, wird das Szenario automatisch gespeichert, wenn ein Szenario geändert wird. Andernfalls muss das Szenario mit der Schaltfläche Szenario aktualisieren in der oberen linken Ecke gespeichert werden, wenn die Änderungen nicht verloren gehen sollen.",
-            'Als auto-opslaan is geselecteerd, zal het scenario automatisch worden opgeslagen alshet wordt gewijzigd. Anders kan het scenario opgeslagen worden als op de "update scenario"-kopwordt gedrukt als deze niet verloren mogen gaan.',
+            'Als auto-opslaan is geselecteerd, zal het scenario automatisch worden opgeslagen als het wordt gewijzigd. Anders kan het scenario opgeslagen worden als op de "update scenario"-kopwordt gedrukt als deze niet verloren mogen gaan.',
             "If Auto saving is selected the scenario will automatically saved if a scenario is changed. Otherwise the scenario has to be saved with the Update scenario button in the upper left corner if the changes should not be lost.",
             "If Auto saving is selected the scenario will automatically saved if a scenario is changed. Otherwise the scenario has to be saved with the Update scenario button in the upper left corner if the changes should not be lost.",
             "If Auto saving is selected the scenario will automatically saved if a scenario is changed. Otherwise the scenario has to be saved with the Update scenario button in the upper left corner if the changes should not be lost.",
@@ -1497,11 +1497,11 @@ class Translations:
         self.option_method_temp_gradient: List[str] = [
             "Should a temperature gradient over depth be considered?:, no , yes ",
             "Soll ein Temperaturgradient berücksichtigt werden?:, Nein , Ja ",
-            "Moet een temperatuursgradiënt in rekening worden gebracht?:, ne , ja ",
+            "Moet een temperatuursgradiënt in rekening worden gebracht?:, nee , ja ",
             "Should a temperature gradient over depth be considered?:, no , yes ",
             "Should a temperature gradient over depth be considered?:, no , yes ",
             "Should a temperature gradient over depth be considered?:, no , yes ",
-            "Should a temperature gradient over depth be considered?:, no , yes ",
+            "Should a temperature gradient over depth be considered?:, no , yes",
         ]
         self.option_method_rb_calc: List[str] = [
             "Borehole resistance calculation method:, constant , dynamic ",

@@ -1,41 +1,27 @@
 from functools import partial as ft_partial
-from os.path import dirname, realpath, exists
-from os.path import split as os_split
-from os import makedirs, remove
-from pathlib import Path, PurePath
-from pickle import HIGHEST_PROTOCOL as pk_HP
-from pickle import dump as pk_dump
 from pickle import load as pk_load
+from json import dump, load, JSONDecodeError
+from os import makedirs, remove
+from os.path import dirname, exists, realpath
+from os.path import split as os_split
+from pathlib import Path, PurePath
 from sys import path
-from typing import TYPE_CHECKING, List, Tuple
+from typing import List, Tuple
+from GHEtool import Borefield, FOLDER
+from configparser import ConfigParser
 
-from PySide6.QtCore import QEvent as QtCore_QEvent, QTimer
-from PySide6.QtCore import QModelIndex as QtCore_QModelIndex
-from PySide6.QtCore import QSize as QtCore_QSize
-from PySide6.QtGui import QAction as QtGui_QAction
-from PySide6.QtGui import QIcon as QtGui_QIcon
-from PySide6.QtGui import QPixmap as QtGui_QPixmap
-from PySide6.QtWidgets import QApplication as QtWidgets_QApplication
-from PySide6.QtWidgets import QDialog as QtWidgets_QDialog
-from PySide6.QtWidgets import QFileDialog as QtWidgets_QFileDialog
-from PySide6.QtWidgets import QInputDialog as QtWidgets_QInputDialog
-from PySide6.QtWidgets import QListWidgetItem as QtWidgets_QListWidgetItem
-from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
-from PySide6.QtWidgets import QMenu as QtWidgets_QMenu
-from PySide6.QtWidgets import QMessageBox as QtWidgets_QMessageBox
-from PySide6.QtWidgets import QPushButton as QtWidgets_QPushButton
-from PySide6.QtWidgets import QSizePolicy, QSpacerItem
-from PySide6.QtWidgets import QWidget as QtWidgets_QWidget
+import PySide6.QtCore as QtC
+import PySide6.QtGui as QtG
+import PySide6.QtWidgets as QtW
+import pathlib
 
-from GHEtool.gui.gui_calculation_thread import (CalcProblem)
-from GHEtool.gui.gui_data_storage import DataStorage
-from GHEtool.gui.gui_base_class import UiGhetool, set_graph_layout
-from GHEtool.gui.gui_structure import GuiStructure, Option, FigureOption
-from GHEtool.gui.translation_class import Translations
+from .gui_base_class import UiGhetool, set_graph_layout
+from .gui_calculation_thread import CalcProblem
+from .gui_data_storage import DataStorage
+from .gui_structure import FigureOption, GuiStructure, Option
+from .gui_classes import check_aim_options
+from .translation_class import Translations
 
-
-if TYPE_CHECKING:
-    from GHEtool import Borefield
 
 currentdir = dirname(realpath(__file__))
 parentdir = dirname(currentdir)
@@ -43,12 +29,18 @@ path.append(parentdir)
 
 BACKUP_FILENAME: str = 'backup.GHEtoolBackUp'
 
+# get current version
+path = pathlib.Path(FOLDER).parent
+config = ConfigParser()
+config.read_file(open(path.joinpath('setup.cfg'), 'r'))
+VERSION = config.get('metadata', 'version')
+
 
 # main GUI class
-class MainWindow(QtWidgets_QMainWindow, UiGhetool):
+class MainWindow(QtW.QMainWindow, UiGhetool):
     filenameDefault: tuple = ("", "")
 
-    def __init__(self, dialog: QtWidgets_QWidget, app: QtWidgets_QApplication) -> None:
+    def __init__(self, dialog: QtW.QWidget, app: QtW.QApplication) -> None:
         """
         initialize window
         :param dialog: Q widget as main window
@@ -65,21 +57,21 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         for page in self.gui_structure.list_of_pages:
             page.create_page(self.central_widget, self.stackedWidget, self.verticalLayout_menu)
 
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer = QtW.QSpacerItem(20, 40, QtW.QSizePolicy.Minimum, QtW.QSizePolicy.Expanding)
         self.verticalLayout_menu.addItem(self.verticalSpacer)
 
         # self.add_aims(list_button)
         # set app and dialog
-        self.app: QtWidgets_QApplication = app
+        self.app: QtW.QApplication = app
         self.Dia = dialog
         # init variables of class
         # allow checking of changes
         self.checking: bool = False
         # create backup path in home documents directory
-        self.default_path: str = str(PurePath(Path.home(), 'Documents/GHEtool'))
-        self.backup_path: str = str(PurePath(self.default_path, BACKUP_FILENAME))
+        self.default_path: PurePath = PurePath(Path.home(), 'Documents/GHEtool')
+        self.backup_file: PurePath = PurePath(self.default_path, BACKUP_FILENAME)
         # check if backup folder exits and otherwise create it
-        makedirs(dirname(self.backup_path), exist_ok=True)
+        makedirs(dirname(self.backup_file), exist_ok=True)
         makedirs(dirname(self.default_path), exist_ok=True)
         self.translations: Translations = Translations()  # init translation class
         for idx, (name, icon, short_cut) in enumerate(zip(self.translations.languages, self.translations.icon, self.translations.short_cut)):
@@ -97,10 +89,10 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.finished: int = 1  # number of finished scenarios
         self.threads: List[CalcProblem] = []  # list of calculation threads
         self.list_ds: List[DataStorage] = []  # list of data storages
-        self.sizeB = QtCore_QSize(48, 48)  # size of big logo on push button
-        self.sizeS = QtCore_QSize(24, 24)  # size of small logo on push button
-        self.sizePushB = QtCore_QSize(150, 75)  # size of big push button
-        self.sizePushS = QtCore_QSize(75, 75)  # size of small push button
+        self.sizeB = QtC.QSize(48, 48)  # size of big logo on push button
+        self.sizeS = QtC.QSize(24, 24)  # size of small logo on push button
+        self.sizePushB = QtC.QSize(150, 75)  # size of big push button
+        self.sizePushS = QtC.QSize(75, 75)  # size of small push button
         # init links from buttons to functions
         self.set_links()
         # reset progress bar
@@ -120,13 +112,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # set start page to general page
         self.gui_structure.page_aim.button.click()
 
-        current_aim = [aim for aim, _ in self.gui_structure.list_of_aims if aim.widget.isChecked()]
-        for aim, _ in self.gui_structure.list_of_aims:
-            if aim not in current_aim:
-                aim.widget.click()
-
-        current_aim[0].widget.click()
-
         [option.init_links() for option, _ in self.gui_structure.list_of_options]
 
         self.status_bar.showMessage(self.translations.GHE_tool_imported[self.gui_structure.option_language.get_value()], 5000)
@@ -143,9 +128,9 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.started: bool = True
 
     def create_action_language(self, idx: int, name: str, icon_name: str, short_cut: str):
-        action = QtGui_QAction(self.central_widget)
-        icon = QtGui_QIcon()
-        icon.addFile(icon_name, QtCore_QSize(), QtGui_QIcon.Normal, QtGui_QIcon.Off)
+        action = QtG.QAction(self.central_widget)
+        icon = QtG.QIcon()
+        icon.addFile(icon_name, QtC.QSize(), QtG.QIcon.Normal, QtG.QIcon.Off)
         action.setIcon(icon)
         self.menuLanguage.addAction(action)
         action.setText(name)
@@ -205,7 +190,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         ds.close_figures()
         self.display_results()
 
-    def event_filter(self, obj: QtWidgets_QPushButton, event) -> bool:
+    def event_filter(self, obj: QtW.QPushButton, event) -> bool:
         """
         function to check mouse over event
         :param obj:
@@ -215,11 +200,11 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         :return:
         Boolean to check if the function worked
         """
-        if event.type() == QtCore_QEvent.Enter:
+        if event.type() == QtC.QEvent.Enter:
             # Mouse is over the label
             self.set_push(True)
             return True
-        elif event.type() == QtCore_QEvent.Leave:
+        elif event.type() == QtC.QEvent.Leave:
             # Mouse is not over the label
             self.set_push(False)
             return True
@@ -239,7 +224,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         for page in self.gui_structure.list_of_pages:
             self.set_push_button_icon_size(page.button)
 
-    def set_push_button_icon_size(self, button: QtWidgets_QPushButton, big: bool = False, name: str = "") -> None:
+    def set_push_button_icon_size(self, button: QtW.QPushButton, big: bool = False, name: str = "") -> None:
         """
         set button name and size
         :param button: QPushButton to set name and icon size for
@@ -316,7 +301,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # else add * to current item string
         self.list_widget_scenario.item(idx).setText(f"{text}*")
 
-    def fun_auto_save_scenario(self, new_row_item: QtWidgets_QListWidgetItem, old_row_item: QtWidgets_QListWidgetItem) -> None:
+    def fun_auto_save_scenario(self, new_row_item: QtW.QListWidgetItem, old_row_item: QtW.QListWidgetItem) -> None:
         """
         function to save a scenario when the item in the list Widget is changed and the checkBox to save automatic is
         checked or ask to save unsaved scenario changes
@@ -334,7 +319,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             # change item to old item by thread, because I have not found a direct way which is not lost after
             # return
             ds = DataStorage(self.gui_structure)
-            t = QTimer(self)
+            t = QtC.QTimer(self)
 
             def hello():
                 self.list_widget_scenario.blockSignals(True)
@@ -368,19 +353,19 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # check if the old scenario is unsaved then create message box
         if text[-1] == "*":
             # create message box
-            msg: QtWidgets_QMessageBox = QtWidgets_QMessageBox(self.Dia)
+            msg: QtW.QMessageBox = QtW.QMessageBox(self.Dia)
             # set Icon to question mark icon
-            msg.setIcon(QtWidgets_QMessageBox.Question)
+            msg.setIcon(QtW.QMessageBox.Question)
             # set label text to leave scenario text depending on language selected
             msg.setText(self.translations.label_LeaveScenarioText[self.gui_structure.option_language.get_value()])
             # set window text to  leave scenario text depending on language selected
             msg.setWindowTitle(self.translations.label_CancelTitle[self.gui_structure.option_language.get_value()])
             # set standard buttons to save, close and cancel
-            msg.setStandardButtons(QtWidgets_QMessageBox.Save | QtWidgets_QMessageBox.Close | QtWidgets_QMessageBox.Cancel)
+            msg.setStandardButtons(QtW.QMessageBox.Save | QtW.QMessageBox.Close | QtW.QMessageBox.Cancel)
             # get save, close and cancel button
-            button_s = msg.button(QtWidgets_QMessageBox.Save)
-            button_cl = msg.button(QtWidgets_QMessageBox.Close)
-            button_ca = msg.button(QtWidgets_QMessageBox.Cancel)
+            button_s = msg.button(QtW.QMessageBox.Save)
+            button_cl = msg.button(QtW.QMessageBox.Close)
+            button_ca = msg.button(QtW.QMessageBox.Cancel)
             # set save, close and cancel button text depending on language selected
             button_s.setText(f"{self.translations.pushButton_SaveScenario[self.gui_structure.option_language.get_value()]} ")
             button_cl.setText(f"{self.translations.label_LeaveScenario[self.gui_structure.option_language.get_value()]} ")
@@ -392,11 +377,11 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             # execute message box and save response
             reply = msg.exec_()
             # check if closing should be canceled
-            if reply == QtWidgets_QMessageBox.Cancel:
+            if reply == QtW.QMessageBox.Cancel:
                 return_2_old_item()
                 return
             # save scenario if wanted
-            if reply == QtWidgets_QMessageBox.Save:
+            if reply == QtW.QMessageBox.Save:
                 if not self.save_scenario(self.list_widget_scenario.row(old_row_item)):
                     return_2_old_item()
             # remove * symbol
@@ -405,7 +390,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.change_scenario(self.list_widget_scenario.row(new_row_item))
         return
 
-    def fun_move_scenario(self, start_item: QtCore_QModelIndex, start_index: int, start_index2: int, end_item: QtCore_QModelIndex, target_index: int) -> None:
+    def fun_move_scenario(self, start_item: QtC.QModelIndex, start_index: int, start_index2: int, end_item: QtC.QModelIndex, target_index: int) -> None:
         """
         change list of ds entry if scenario is moved (more inputs than needed, because the list widget returns that much
         :param start_item: start item of moving
@@ -419,16 +404,16 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.list_ds.insert(target_index, self.list_ds.pop(start_index))
 
     @staticmethod
-    def set_push_button_icon(button: QtWidgets_QPushButton, icon_name: str) -> None:
+    def set_push_button_icon(button: QtW.QPushButton, icon_name: str) -> None:
         """
         set QPushButton icon
         :param button: QPushButton to change to icon for
         :param icon_name: icon name as string
         :return: None
         """
-        icon = QtGui_QIcon()  # create icon class
+        icon = QtG.QIcon()  # create icon class
         # add pixmap to icon
-        icon.addPixmap(QtGui_QPixmap(f":/icons/icons/{icon_name}.svg"), QtGui_QIcon.Normal, QtGui_QIcon.Off)
+        icon.addPixmap(QtG.QPixmap(f":/icons/icons/{icon_name}.svg"), QtG.QIcon.Normal, QtG.QIcon.Off)
         button.setIcon(icon)  # set icon to button
 
     def fun_rename_scenario(self) -> None:
@@ -441,17 +426,21 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # get first item if no one is selected
         item = self.list_widget_scenario.item(0) if item is None else item
         # create dialog box to ask for a new name
-        dialog = QtWidgets_QInputDialog(self.Dia)
+        dialog = QtW.QInputDialog(self.Dia)
         dialog.setWindowTitle(self.translations.label_new_scenario[self.gui_structure.option_language.get_value()])
-        dialog.setLabelText(f"{self.translations.new_name[self.gui_structure.option_language.get_value()]}{item.text()}:")
+        dialog.setLabelText(f"{self.translations.new_name[self.gui_structure.option_language.get_value()]}{item.text()}")
         dialog.setOkButtonText(self.translations.label_okay[self.gui_structure.option_language.get_value()])  # +++
         dialog.setCancelButtonText(self.translations.label_abort[self.gui_structure.option_language.get_value()])  # +++
-        li = dialog.findChildren(QtWidgets_QPushButton)
+        li = dialog.findChildren(QtW.QPushButton)
         self.set_push_button_icon(li[0], "Okay")
         self.set_push_button_icon(li[1], "Abort")
         # set new name if the dialog is not canceled and the text is not None
-        if dialog.exec_() == QtWidgets_QDialog.Accepted:
+        if dialog.exec_() == QtW.QDialog.Accepted:
             text = dialog.textValue()
+            list_of_scenarios = [self.list_widget_scenario.item(x).text().split("*")[0] for x in
+                                 range(self.list_widget_scenario.count())]
+            if text in list_of_scenarios:
+                text += "(2)"
             item.setText(text) if text != "" else None
 
     def check_results(self) -> None:
@@ -477,7 +466,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # title determine new title if a filename is not empty
         title: str = "" if filename == "" else f' - {filename.replace(".GHEtool", "")}'
         # create new title name
-        name: str = f"GHEtool {title}*" if self.changedFile else f"GHEtool {title}"
+        name: str = f"GHEtool v{VERSION} {title}*" if self.changedFile else f"GHEtool v{VERSION} {title}"
         # set new title name
         self.Dia.setWindowTitle(name)
 
@@ -492,7 +481,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             return
         self.status_bar.show()
 
-    def eventFilter(self, obj: QtWidgets_QPushButton, event) -> bool:
+    def eventFilter(self, obj: QtW.QPushButton, event) -> bool:
         """
         function to check mouse over event
         :param obj:
@@ -502,11 +491,11 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         :return:
         Boolean to check if the function worked
         """
-        if event.type() == QtCore_QEvent.Enter:
+        if event.type() == QtC.QEvent.Enter:
             # Mouse is over the label
             self.set_push(True)
             return True
-        elif event.type() == QtCore_QEvent.Leave:
+        elif event.type() == QtC.QEvent.Leave:
             # Mouse is not over the label
             self.set_push(False)
             return True
@@ -532,7 +521,7 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         ]
         # update all label, pushButtons, action and Menu names
         for i in [j for j in self.translations.__slots__ if hasattr(self, j)]:
-            if isinstance(getattr(self, i), QtWidgets_QMenu):
+            if isinstance(getattr(self, i), QtW.QMenu):
                 getattr(self, i).setTitle(getattr(self.translations, i)[self.gui_structure.option_language.get_value()])
                 continue
             getattr(self, i).setText(getattr(self.translations, i)[self.gui_structure.option_language.get_value()])
@@ -558,8 +547,8 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.checking = True
 
     def delete_backup(self):
-        if exists(self.backup_path):
-            remove(self.backup_path)
+        if exists(self.backup_file):
+            remove(self.backup_file)
 
     def load_list(self) -> None:
         """
@@ -567,26 +556,11 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         :return: None
         """
         # try to open backup file if it exits
-        if exists(self.backup_path):
-            # open backup file
-            with open(self.backup_path, "rb") as f:
-                saving: tuple = pk_load(f)
-            self.filename, li, settings = saving  # get saved data and unpack tuple
-            self.list_ds, li = li[0], li[1]  # unpack tuple to get list of data-storages and scenario names
-            self.gui_structure.option_language.set_value(settings[0])  # set last time selected language
-            self.gui_structure.option_auto_saving.set_value(settings[1])  # set last time selected automatic saving scenario option
-            # replace uer window id
-            for DS in self.list_ds:
-                DS.ui = id(self)
-            # clear list widget and add new items and select the first one
-            self.list_widget_scenario.clear()
-            self.list_widget_scenario.addItems(li)
-            self.list_widget_scenario.setCurrentRow(0)
-            # change language to english if no change has happend
+        if exists(self.backup_file):
+            self._load_from_data(self.backup_file)
+            # change language to english if no change has happened
             if self.gui_structure.option_language.get_value() == 0:
                 self.change_language()
-            # check if results exits and then display them
-            self.check_results()
             return
         # change language to english
         self.change_language()
@@ -601,21 +575,118 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # append scenario if no scenario is in list
         if len(self.list_ds) < 1:
             self.list_ds.append(DataStorage(self.gui_structure))
-        # create list of scenario names
-        li: list = [self.list_widget_scenario.item(idx).text() for idx in range(self.list_widget_scenario.count())]
-        # create list of settings with language and autosave option
-        settings: list = [self.gui_structure.option_language.get_value(), self.gui_structure.option_auto_saving.get_value()]
-        # try to write data to back up file
+
+        self._save_to_data(self.backup_file)
+
+    def _load_from_data(self, location: str) -> None:
+        """
+        This function loads the data from a JSON formatted file.
+
+        Parameters
+        ----------
+        location : str
+            Location of the data file
+
+        Returns
+        -------
+        None
+        """
+
+        def general_changes(scenarios):
+            # change window title to new loaded filename
+            self.change_window_title()
+            # replace user window id
+            for DS in self.list_ds:
+                DS.ui = id(self)
+
+            # init user window by reset scenario list widget and check for results
+            self.list_widget_scenario.clear()
+            self.list_widget_scenario.addItems(scenarios)
+            self.list_widget_scenario.setCurrentRow(0)
+            self.check_results()
+
+        try:
+            # open file and get data
+            with open(location, "r") as file:
+                saving = load(file)
+
+            version = saving['version']
+        except (JSONDecodeError,  FileNotFoundError, UnicodeDecodeError):
+            try:
+                # try to open as pickle
+                with open(location, "rb") as file:
+                    saving = pk_load(file)
+
+                version = "2.1.0"
+            except (FileNotFoundError, ImportError):
+                raise ImportError("The datafile cannot be loaded!")
+
+        if version == "2.1.1":
+            # write data to variables
+            self.list_ds = []
+            for val, borefield in zip(saving['values'], saving['borefields']):
+                ds = DataStorage(self.gui_structure)
+                ds.from_dict(val)
+                if borefield is None:
+                    setattr(ds, 'borefield', None)
+                else:
+                    setattr(ds, 'borefield', Borefield())
+                    getattr(ds, 'borefield')._from_dict(borefield)
+                self.list_ds.append(ds)
+            # set and change the window title
+            self.filename = saving['filename']
+            general_changes(saving['names'])
+            return
+
+        if version == "2.1.0":
+            self.filename, li, settings = saving
+            # write data to variables
+            self.list_ds, li = li[0], li[1]
+
+            # since the borefield object is changed, this is deleted from the dataframe
+            for ds in self.list_ds:
+                setattr(ds, 'borefield', None)
+
+            # convert to new ds format
+            for idx, ds in enumerate(self.list_ds):
+                ds_new = DataStorage(gui_structure=self.gui_structure)
+                [setattr(ds_new, name, getattr(ds, name)) for name in ds.__dict__ if hasattr(ds_new, name)]
+                self.list_ds[idx] = ds_new
+            # write scenario names
+            general_changes(li)
+
+    def _save_to_data(self, location: str) -> None:
+        """
+        This function saves the gui data to a json formatted file.
+
+        Parameters
+        ----------
+        location : str
+            Location of the data file.
+
+        Returns
+        -------
+        None
+        """
+        # create list of all scenario names
+        scenario_names = [self.list_widget_scenario.item(idx).text() for idx in
+                          range(self.list_widget_scenario.count())]
+        # create saving dict
+        saving = {'filename': self.filename,
+                  'names': scenario_names,
+                  'version': VERSION,
+                  'values': [ds.to_dict() for ds in self.list_ds],
+                  'borefields': [getattr(ds, 'borefield')._to_dict() if getattr(ds, 'borefield') is not None else None
+                                 for ds in self.list_ds]}
         try:
             # write data to back up file
-            with open(self.backup_path, "wb") as f:
-                saving = self.filename, [self.list_ds, li], settings
-                pk_dump(saving, f, pk_HP)
+            with open(location, "w") as file:
+                dump(saving, file, indent=1)
         except FileNotFoundError:
-            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
+            self.status_bar.showMessage(
+                self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
         except PermissionError:
-            print("PermissionError")
-            return
+            self.status_bar.showMessage("PermissionError", 5000)
 
     def fun_load(self) -> None:
         """
@@ -623,36 +694,24 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         :return: None
         """
         # open interface and get file name
-        self.filename = QtWidgets_QFileDialog.getOpenFileName(
-            self.central_widget, caption=self.translations.ChoosePKL[self.gui_structure.option_language.get_value()], filter="GHEtool (*.GHEtool)"
+        self.filename = QtW.QFileDialog.getOpenFileName(
+            self.central_widget, caption=self.translations.ChoosePKL[self.gui_structure.option_language.get_value()], filter="GHEtool (*.GHEtool)",
+            dir=str(self.default_path)
         )
         # load selected data
         self.fun_load_known_filename()
 
     def fun_load_known_filename(self) -> None:
         """
-        load stored scenarios from external pickle file
+        load stored scenarios from external json file
         :return: None
         """
         # try to open the file
         try:
             # deactivate checking
             self.checking: bool = False
-            # open file and get data
-            with open(self.filename[0], "rb") as f:
-                self.filename, li, settings = pk_load(f)
-            # write data to variables
-            self.list_ds, li = li[0], li[1]
-            # change window title to new loaded filename
-            self.change_window_title()
-            # replace user window id
-            for DS in self.list_ds:
-                DS.ui = id(self)
-            # init user window by reset scenario list widget and check for results
-            self.list_widget_scenario.clear()
-            self.list_widget_scenario.addItems(li)
-            self.list_widget_scenario.setCurrentRow(0)
-            self.check_results()
+            # open file and set data
+            self._load_from_data(self.filename[0])
             # activate checking
             self.checking: bool = True
         # if no file is found display error message is status bar
@@ -675,9 +734,9 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         """
         # ask for pickle file if the filename is still the default
         if self.filename == MainWindow.filenameDefault:
-            self.filename: tuple = QtWidgets_QFileDialog.getSaveFileName(
+            self.filename: tuple = QtW.QFileDialog.getSaveFileName(
                 self.central_widget, caption=self.translations.SavePKL[self.gui_structure.option_language.get_value()], filter="GHEtool (*.GHEtool)",
-                dir=self.default_path,
+                dir=str(self.default_path),
             )
             # break function if no file is selected
             if self.filename == MainWindow.filenameDefault:
@@ -688,18 +747,9 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         self.fun_save_auto()
         # Create list if no scenario is stored
         self.list_ds.append(DataStorage(self.gui_structure)) if len(self.list_ds) < 1 else None
-        # create list of settings with language and autosave option
-        settings: list = [self.gui_structure.option_language.get_value(),
-                          self.gui_structure.option_auto_saving.get_value()]
-
         # try to store the data in the pickle file
         try:
-            # create list of all scenario names
-            li = [self.list_widget_scenario.item(idx).text() for idx in range(self.list_widget_scenario.count())]
-            # store data
-            with open(self.filename[0], "wb") as f:
-                saving = self.filename, [self.list_ds, li], settings
-                pk_dump(saving, f, pk_HP)
+            self._save_to_data(self.filename[0])
             # deactivate changed file * from window title
             self.changedFile: bool = False
             self.change_window_title()
@@ -716,9 +766,10 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         :return: None
         """
         self.filename: tuple = MainWindow.filenameDefault  # reset filename
-        self.fun_save()  # get and save filename
-        self.list_ds: list = []  # reset list of data storages
-        self.list_widget_scenario.clear()  # clear list widget with scenario list
+        if self.fun_save():  # get and save filename
+            self.list_ds: list = []  # reset list of data storages
+            self.list_widget_scenario.clear()  # clear list widget with scenario list
+            self.display_results()  # clear the results page
 
     def change_scenario(self, idx: int) -> None:
         """
@@ -809,7 +860,12 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # append new scenario to List of DataStorages
         self.list_ds.append(DataStorage(self.gui_structure))
         # add new scenario name and item to list widget
-        self.list_widget_scenario.addItem(f"{self.translations.scenarioString[self.gui_structure.option_language.get_value()]}: {number + 1}")
+        string = f"{self.translations.scenarioString[self.gui_structure.option_language.get_value()]}: {number + 1}"
+        list_of_scenarios = [self.list_widget_scenario.item(x).text().split("*")[0] for x in range(self.list_widget_scenario.count())]
+        if string in list_of_scenarios:
+            string += "(2)"
+        # set string in scenario widget
+        self.list_widget_scenario.addItem(string)
         # select new list item
         self.list_widget_scenario.setCurrentRow(number)
         # run change function to mark unsaved inputs
@@ -864,7 +920,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             self.pushButton_SaveScenario.setEnabled(True)
             self.action_start_single.setEnabled(True)
             self.action_start_multiple.setEnabled(True)
-            self.display_results()
             self.gui_structure.page_result.button.click()
             return
         # start new thread
@@ -921,7 +976,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         ds: DataStorage = self.list_ds[idx]
         # if calculation is already done just show results
         if ds.borefield is not None:
-            self.display_results()
             self.gui_structure.page_result.button.click()
             return
         # return to thermal demands page if no file is selected
@@ -949,6 +1003,9 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         display results of the current selected scenario
         :return: None
         """
+        # update so all the relevant options are shown
+        check_aim_options([aim for aim, _ in self.gui_structure.list_of_aims])
+
         # hide widgets if no list of scenarios exists and display not calculated text
         def hide_no_result(hide: bool = True):
             if hide or self.list_widget_scenario.currentItem().text()[-1] == "*":
@@ -980,7 +1037,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         if borefield is None:
             hide_no_result(True)
             return
-
         # no errors, so proceed with showing the results
         hide_no_result(False)
         # create figure for every ResultFigure object
@@ -1016,136 +1072,6 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
                     text = getattr(borefield, result_text_obj.var_name)()
                 result_text_obj.set_text_value(text)
 
-    def save_data(self) -> None:
-        """
-        Save the data in a csv file
-        :return: None
-        """
-        # import csv writer here to save start up time
-        from csv import writer as csv_writer
-
-        # get filename at storage place
-        filename = QtWidgets_QFileDialog.getSaveFileName(
-            self.central_widget, caption=self.translations.SaveData[self.gui_structure.option_language.get_value()], filter="csv (*.csv)"
-        )
-        # display message and return if no file is selected
-        if filename == MainWindow.filenameDefault:
-            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
-            return
-        # get maximal simulation period
-        simulation_time = max([i.option_simu_period for i in self.list_ds])
-        # create first two column entries
-        to_write = [
-            ["name", "unit"],  # 0
-            ["depth", "m"],  # 1
-            ["borehole spacing", "m"],  # 2
-            ["conductivity of the soil", "W/mK"],  # 3
-            ["Ground temperature at infinity", "C"],  # 4
-            ["Equivalent borehole resistance", "mK/W"],  # 5
-            ["width of rectangular field", "#"],  # 6
-            ["length of rectangular field", "#"],  # 7
-            ["Determine length", "0/1"],
-            ["Simulation Period", "years"],
-            ["Minimal temperature", "C"],
-            ["Maximal temperature", "C"],
-        ]
-        month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-        month_yrs = [f"{mon}_{int(idx/12)+1}" for idx, mon in enumerate(month * simulation_time)]
-        to_write = to_write + [[f"Peak heating {mon}", "kW"] for mon in month]
-        to_write = to_write + [[f"Peak cooling {mon}", "kW"] for mon in month]
-        to_write = to_write + [[f"Load heating {mon}", "kWh"] for mon in month]
-        to_write = to_write + [[f"Load cooling {mon}", "kWh"] for mon in month]
-        to_write = to_write + [[f"Results peak heating {mon}", "C"] for mon in month_yrs]
-        to_write = to_write + [[f"Results peak cooling {mon}", "C"] for mon in month_yrs]
-        to_write = to_write + [[f"Results load heating {mon}", "C"] for mon in month_yrs]
-        to_write = to_write + [[f"Results load cooling {mon}", "C"] for mon in month_yrs]
-        # define ranges for results
-        ran_yr = range(12)
-        ran_simu = range(12 * simulation_time)
-        # start looping over results in list_ds and append them to to_write
-        for idx, ds in enumerate(self.list_ds):
-            ds: DataStorage = ds
-            i = 0
-            to_write[i].append(f"{self.list_widget_scenario.item(idx).text()}")
-            i += 1
-            to_write[i].append(f"{round(ds.ground_data.H, 2)}")
-            i += 1
-            to_write[i].append(f"{round(ds.ground_data.B, 2)}")
-            i += 1
-            to_write[i].append(f"{round(ds.ground_data.k_s, 2)}")
-            i += 1
-            to_write[i].append(f"{round(ds.ground_data.Tg, 2)}")
-            i += 1
-            to_write[i].append(f"{round(ds.ground_data.Rb, 4)}")
-            i += 1
-            to_write[i].append(f"{round(ds.ground_data.N_1, 0)}")
-            i += 1
-            to_write[i].append(f"{round(ds.ground_data.N_2, 0)}")
-            i += 1
-            to_write[i].append(f"{round(ds.aim_req_depth, 0)}")
-            i += 1
-            to_write[i].append(f"{round(ds.option_simu_period, 0)}")
-            i += 1
-            to_write[i].append(f"{round(ds.option_min_temp, 2)}")
-            i += 1
-            to_write[i].append(f"{round(ds.option_max_temp, 2)}")
-            for j in ran_yr:
-                i += 1
-                to_write[i].append(f"{round(ds.peakHeating[j], 2)}")
-            for j in ran_yr:
-                i += 1
-                to_write[i].append(f"{round(ds.peakCooling[j], 2)}")
-            for j in ran_yr:
-                i += 1
-                to_write[i].append(f"{round(ds.monthlyLoadHeating[j], 2)}")
-            for j in ran_yr:
-                i += 1
-                to_write[i].append(f"{round(ds.monthlyLoadCooling[j], 2)}")
-            if ds.borefield is None:
-                i += 1
-                [to_write[i + j].append(self.translations.NotCalculated[self.gui_structure.option_language.get_value()]) for j in ran_simu]
-                i += len(ran_simu)
-                [to_write[i + j].append(self.translations.NotCalculated[self.gui_structure.option_language.get_value()]) for j in ran_simu]
-                i += len(ran_simu)
-                [to_write[i + j].append(self.translations.NotCalculated[self.gui_structure.option_language.get_value()]) for j in ran_simu]
-                i += len(ran_simu)
-                [to_write[i + j].append(self.translations.NotCalculated[self.gui_structure.option_language.get_value()]) for j in ran_simu]
-                i += len(ran_simu)
-                continue
-            for j in ran_simu:
-                i += 1
-                try:
-                    to_write[i].append(f"{round(ds.borefield.results_peak_heating[j], 2)}")
-                except IndexError:
-                    to_write[i].append(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
-            for j in ran_simu:
-                i += 1
-                try:
-                    to_write[i].append(f"{round(ds.borefield.results_peak_cooling[j], 2)}")
-                except IndexError:
-                    to_write[i].append(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
-            for j in ran_simu:
-                i += 1
-                try:
-                    to_write[i].append(f"{round(ds.borefield.results_month_heating[j], 2)}")
-                except IndexError:
-                    to_write[i].append(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
-            for j in ran_simu:
-                i += 1
-                try:
-                    to_write[i].append(f"{round(ds.borefield.results_month_cooling[j], 2)}")
-                except IndexError:
-                    to_write[i].append(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
-        # try to write the data else show error message in status bar
-        try:
-            with open(filename[0], "w", newline="") as f:
-                writer = csv_writer(f, delimiter=";")
-                for row in to_write:
-                    writer.writerow(row)
-        except FileNotFoundError:
-            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
-            return
-
     def closeEvent(self, event) -> None:
         """
         new close Event to check if the input should be saved
@@ -1157,19 +1083,19 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
             event.accept()
             return
         # create message box
-        msg: QtWidgets_QMessageBox = QtWidgets_QMessageBox(self.Dia)
+        msg: QtW.QMessageBox = QtW.QMessageBox(self.Dia)
         # set Icon to question mark icon
-        msg.setIcon(QtWidgets_QMessageBox.Question)
+        msg.setIcon(QtW.QMessageBox.Question)
         # set label text to cancel text depending on language selected
         msg.setText(self.translations.label_CancelText[self.gui_structure.option_language.get_value()])
         # set window text to cancel text depending on language selected
         msg.setWindowTitle(self.translations.label_CancelTitle[self.gui_structure.option_language.get_value()])
         # set standard buttons to save, close and cancel
-        msg.setStandardButtons(QtWidgets_QMessageBox.Save | QtWidgets_QMessageBox.Close | QtWidgets_QMessageBox.Cancel)
+        msg.setStandardButtons(QtW.QMessageBox.Save | QtW.QMessageBox.Close | QtW.QMessageBox.Cancel)
         # get save, close and cancel button
-        button_s = msg.button(QtWidgets_QMessageBox.Save)
-        button_cl = msg.button(QtWidgets_QMessageBox.Close)
-        button_ca = msg.button(QtWidgets_QMessageBox.Cancel)
+        button_s = msg.button(QtW.QMessageBox.Save)
+        button_cl = msg.button(QtW.QMessageBox.Close)
+        button_ca = msg.button(QtW.QMessageBox.Cancel)
         # set save, close and cancel button text depending on language selected
         button_s.setText(f"{self.translations.label_Save[self.gui_structure.option_language.get_value()]} ")
         button_cl.setText(f"{self.translations.label_close[self.gui_structure.option_language.get_value()]} ")
@@ -1181,12 +1107,12 @@ class MainWindow(QtWidgets_QMainWindow, UiGhetool):
         # execute message box and save response
         reply = msg.exec_()
         # check if closing should be canceled
-        if reply == QtWidgets_QMessageBox.Cancel:
+        if reply == QtW.QMessageBox.Cancel:
             # cancel closing event
             event.ignore()
             return
         # check if inputs should be saved and if successfully set closing variable to true
-        close: bool = self.fun_save() if reply == QtWidgets_QMessageBox.Save else True
+        close: bool = self.fun_save() if reply == QtW.QMessageBox.Save else True
         # stop all calculation threads
         [i.terminate() for i in self.threads]
         # close window if close variable is true else not

@@ -2,19 +2,25 @@
 This document contains the variable classes for the ground data, fluid data and pipe data.
 """
 
-import numpy as np
 from math import pi
+from GHEtool.VariableClasses.BaseClass import BaseClass
+
+import numpy as np
 import pygfunction as gt
 
 
-class GroundData:
+class GroundData(BaseClass):
     """
     Contains information regarding the ground data of the borefield.
     """
 
     __slots__ = 'k_s', 'Tg', 'Rb', 'flux', 'volumetric_heat_capacity', 'alpha'
 
-    def __init__(self, k_s: float, T_g: float, R_b: float, volumetric_heat_capacity: float = 2.4 * 10**6, flux: float = 0.06):
+    def __init__(self, k_s: float = None,
+                 T_g: float = None,
+                 R_b: float = None,
+                 volumetric_heat_capacity: float = 2.4 * 10**6,
+                 flux: float = 0.06):
         """
 
         Parameters
@@ -36,7 +42,10 @@ class GroundData:
         self.Tg = T_g  # °C
         self.Rb = R_b  # mK/W
         self.volumetric_heat_capacity = volumetric_heat_capacity  # J/m3K
-        self.alpha = self.k_s / self.volumetric_heat_capacity  # m2/s
+        if self.volumetric_heat_capacity is None or self.k_s is None:
+            self.alpha = None
+        else:
+            self.alpha = self.k_s / self.volumetric_heat_capacity  # m2/s
         self.flux = flux  # W/m2
 
     def calculate_Tg(self, H: float, use_constant_Tg: bool) -> float:
@@ -72,14 +81,18 @@ class GroundData:
         return True
 
 
-class FluidData:
+class FluidData(BaseClass):
     """
     Contains information regarding the fluid data of the borefield.
     """
 
     __slots__ = 'k_f', 'rho', 'Cp', 'mu', 'mfr', 'h_f', 'R_f'
 
-    def __init__(self, mfr: float, k_f: float, rho: float, Cp: float, mu: float):
+    def __init__(self, mfr: float = None,
+                 k_f: float = None,
+                 rho: float = None,
+                 Cp: float = None,
+                 mu: float = None):
         """
 
         Parameters
@@ -127,14 +140,19 @@ class FluidData:
         return True
 
 
-class PipeData:
+class PipeData(BaseClass):
     """
     Contains information regarding the pipe data of the borefield.
     """
 
     __slots__ = 'r_in', 'r_out', 'k_p', 'D_s', 'number_of_pipes', 'epsilon', 'k_g', 'R_p', 'pos'
 
-    def __init__(self, k_g: float, r_in: float, r_out: float, k_p: float, D_s: float, number_of_pipes: int = 1,
+    def __init__(self, k_g: float = None,
+                 r_in: float = None,
+                 r_out: float = None,
+                 k_p: float = None,
+                 D_s: float = None,
+                 number_of_pipes: int = 1,
                  epsilon: float = 1e-6):
         """
 
@@ -163,8 +181,10 @@ class PipeData:
         self.D_s = D_s                      # distance of pipe until center m
         self.number_of_pipes = number_of_pipes  # number of pipes #
         self.epsilon = epsilon              # pipe roughness m
-        self.pos = self._axis_symmetrical_pipe  # position of the pipes
         self.R_p: float = 0.
+        self.pos = []
+        if self.check_values():
+            self.pos = self._axis_symmetrical_pipe  # position of the pipes
 
     @property
     def _axis_symmetrical_pipe(self) -> list:

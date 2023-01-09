@@ -15,6 +15,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - Added NavigationToolbar to figure (issue #55)
 - Added different peak lengths for heating and cooling seperately (issue #72)
+- Readable saving format for gui (JSON)
+- A super class that contains functions relevant for all GHEtool classes
 
 ### Changed
 - Created a new structure for the package, thereby splitting the main_py.file into more subclasses.
@@ -25,6 +27,7 @@ The speed improvement is over a factor 10 for heavy iterative procedures (like o
 code version > speed improvements > v2.1.1.
 - The sizing methods themselves are now faster due to the fact that only the first and last year are calculated (issue #44). For more info, one can check:
 code version > speed improvements > v2.1.1
+- Faster loading time of the GUI.
 
 ### Fixed
 - The hourly_heating_load_on_the_borefield and hourly_cooling_load_on_the_borefield are now correctly calculated.
@@ -32,7 +35,8 @@ code version > speed improvements > v2.1.1
 - Correct conversion from hourly to monthly load (issue 62)
 - Problem with np.float16 when using simulation periodes >80 years due to overflow errors.
 - Implemented FIFO-class to prevent cycling in iterative sizing.
-- Sometimes some gui options are not shown
+- A scenario name cannot occur twice in the scenario list.
+- Sometimes some gui options were not shown
 
 ## [2.1.0] - 2022-11-30
 
@@ -131,7 +135,9 @@ code version > speed improvements > v2.1.1
 ### Fixed 
 - fixed bug in interpolation
 
-[Unreleased]: https://github.com/wouterpeere/GHEtool/compare/v2.0.5...main
+[Unreleased]: https://github.com/wouterpeere/GHEtool/compare/v2.1.0...main
+[2.1.0]: https://github.com/wouterpeere/GHEtool/compare/v2.0.6...v2.1.0
+[2.0.6]: https://github.com/wouterpeere/GHEtool/compare/v2.0.5...v2.0.6
 [2.0.5]: https://github.com/wouterpeere/GHEtool/compare/v2.0.4...v2.0.5
 [2.0.4]: https://github.com/wouterpeere/GHEtool/compare/v2.0.3...v2.0.4
 [2.0.3]: https://github.com/wouterpeere/GHEtool/compare/v2.0.2...v2.0.3

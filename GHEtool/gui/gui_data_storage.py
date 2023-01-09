@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from typing import Optional
+
 import matplotlib.pyplot as plt
 import pygfunction as gt
 
 from GHEtool import Borefield, FluidData, GroundData, PipeData
-from GHEtool.gui.gui_structure import GuiStructure
 from GHEtool.gui.gui_classes import ListBox
+from GHEtool.gui.gui_structure import GuiStructure
 
 
 class DataStorage:
@@ -43,7 +44,7 @@ class DataStorage:
 
         Parameters
         ----------
-        gui_structure : GuiStructure
+        gui_structure : GuiStructure or JSON dict
             GUI structure for which a data storage object should be created
 
         Returns
@@ -74,7 +75,26 @@ class DataStorage:
                                          self.option_hl_jul, self.option_hl_aug, self.option_hl_sep, self.option_hl_oct, self.option_hl_nov, self.option_hl_dec]
         self.monthlyLoadCooling: list = [self.option_cl_jan, self.option_cl_feb, self.option_cl_mar, self.option_cl_apr, self.option_cl_may, self.option_cl_jun,
                                          self.option_cl_jul, self.option_cl_aug, self.option_cl_sep, self.option_cl_oct, self.option_cl_nov, self.option_cl_dec]
-        self.ground_data: GroundData = GroundData(self.option_conductivity, self.option_ground_temp if self.option_method_temp_gradient == 0 else self.option_ground_temp_gradient,
+
+        self._create_data_classes()
+
+        self.debug_message: str = ""
+
+        # params for which hourly data should be loaded
+        self.hourly_data: bool = self.option_method_size_depth == 2 or (
+                self.option_temperature_profile_hourly == 1 and self.aim_temp_profile) or self.aim_optimize
+
+    def _create_data_classes(self) -> None:
+        """
+        This function creates the dataclasses (PipeData, FluidData and GroundData) based on entered values.
+        These can be used in the calculation thread.
+
+        Returns
+        -------
+        None
+        """
+        self.ground_data: GroundData = GroundData(self.option_conductivity,
+                                                  self.option_ground_temp if self.option_method_temp_gradient == 0 else self.option_ground_temp_gradient,
                                                   self.option_constant_rb, self.option_heat_capacity * 1000, self._calculate_flux())
 
         self.borefield_pygfunction = gt.boreholes.rectangle_field(self.option_width, self.option_length, self.option_spacing, self.option_spacing,
@@ -84,12 +104,6 @@ class DataStorage:
                                                self.option_fluid_capacity, self.option_fluid_viscosity)
         self.pipe_data: PipeData = PipeData(self.option_pipe_grout_conductivity, self.option_pipe_inner_radius, self.option_pipe_outer_radius,
                                             self.option_pipe_conductivity, self.option_pipe_distance, self.option_pipe_number, self.option_pipe_roughness)
-
-        self.debug_message: str = ""
-
-        # params for which hourly data should be loaded
-        self.hourly_data: bool = self.option_method_size_depth == 2 or (
-                self.option_temperature_profile_hourly == 1 and self.aim_temp_profile) or self.aim_optimize
 
     def _calculate_flux(self) -> float:
         """
@@ -120,6 +134,7 @@ class DataStorage:
         None
         """
         [aim.widget.setChecked(False) for aim, _ in gui_structure.list_of_aims]
+        # run over options to hide or show the relevant ones
         [aim.widget.click() for aim, name in gui_structure.list_of_aims if getattr(self, name)]
         [option.set_value(getattr(self, name)) for option, name in gui_structure.list_of_options if hasattr(self, name)]
         gui_structure.change_toggle_button()
@@ -135,6 +150,36 @@ class DataStorage:
         for fig in self.list_of_figures:
             plt.close(getattr(self, fig))
             setattr(self, fig, None)
+
+    def to_dict(self) -> dict:
+        """
+        Creates a dictionary from the class to be again imported later.
+
+        Returns
+        -------
+        dict
+            Dictionary with the values of the class
+        """
+        # get all normal values
+        return {key: value for key, value in self.__dict__.items() if isinstance(value, (int, bool, float, str))}
+
+    def from_dict(self, data: dict):
+        """
+        Set values from input dictionary to class
+
+        Parameters
+        ----------
+        data : dict
+            Dictionary with main class values created by to_dict function
+
+        Returns
+        -------
+        None
+        """
+        # set all normal values if they exist within the DS object
+        [setattr(self, key, value) for key, value in data.items() if hasattr(self, key)]
+        # create data class object from set data
+        self._create_data_classes()
 
     def __eq__(self, other) -> bool:
         """

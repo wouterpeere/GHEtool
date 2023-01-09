@@ -5,8 +5,10 @@ This class contains all the relevant settings for the sizing options
 import copy
 import numpy as np
 
+from GHEtool.VariableClasses.BaseClass import BaseClass
 
-class SizingSetup:
+
+class SizingSetup(BaseClass):
     """
     This class contains all the settings related to the sizing options.
     """

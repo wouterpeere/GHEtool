@@ -1,5 +1,5 @@
-import pytest
 import matplotlib.pyplot as plt
+import pytest
 
 
 def test_validation_cases(monkeypatch):

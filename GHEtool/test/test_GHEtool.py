@@ -1,14 +1,12 @@
 # test if model can be imported
+import matplotlib.pyplot as plt
 import numpy as np
+import pygfunction as gt
 import pytest
 import copy
 from math import isclose
 
 from GHEtool import *
-
-import pygfunction as gt
-import matplotlib.pyplot as plt
-
 
 data = GroundData(3, 10, 0.2)
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
@@ -159,10 +157,11 @@ def empty_borefield():
 
 @pytest.fixture
 def hourly_borefield():
+    from GHEtool import FOLDER
     borefield = Borefield()
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)
-    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv")
+    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     return borefield
 
 
@@ -606,7 +605,24 @@ def test_set_options_gfunction_calculation(borefield):
     borefield.set_options_gfunction_calculation({"method": "equivalent"})
 
 
-
 def test_gfunction_jit(borefield):
     borefield.use_precalculated_data = False
     borefield.gfunction(10000, 100)
+
+
+def test_no_ground_data():
+    borefield = Borefield(simulation_period=20,
+                          peak_heating=peakHeating,
+                          peak_cooling=peakCooling,
+                          baseload_heating=monthlyLoadHeating,
+                          baseload_cooling=monthlyLoadCooling)
+
+    borefield.set_borefield(borefield_gt)
+
+    # set temperature boundaries
+    borefield.set_max_ground_temperature(16)  # maximum temperature
+    borefield.set_min_ground_temperature(0)  # minimum temperature
+    try:
+        borefield.size()
+    except ValueError:
+        assert True

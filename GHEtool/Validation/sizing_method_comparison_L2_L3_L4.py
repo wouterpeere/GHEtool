@@ -2,11 +2,13 @@
 This document is an example of the different sizing methods in GHEtool.
 The example load profile is for a profile limited in the first year of operation.
 """
-# import all the relevant functions
-from GHEtool import *
 import time
+
 import pygfunction as gt
 import numpy as np
+
+# import all the relevant functions
+from GHEtool import *
 
 # initiate ground data
 data = GroundData(3, 10, 0.12)
