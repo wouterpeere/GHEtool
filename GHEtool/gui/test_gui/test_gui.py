@@ -161,3 +161,57 @@ def test_gui_scenario_properties(qtbot):
     main_window.delete_scenario()
     assert len(main_window.list_ds) == 1
 
+
+def test_wrong_options_are_shown(qtbot):
+    import sys
+    sys.setrecursionlimit(1500)
+
+    from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
+
+    from GHEtool.gui.gui_combine_window import MainWindow
+
+    # init gui window
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.delete_backup()
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.gui_structure.aim_req_depth.widget.click()
+    main_window.gui_structure.option_method_size_depth.set_value(2)
+    main_window.gui_structure.aim_temp_profile.widget.click()
+    assert not main_window.gui_structure.option_len_peak_heating.is_hidden()
+
+    main_window.delete_backup()
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.pushButton_start_single.click()
+    main_window.add_scenario()
+    main_window.pushButton_start_single.click()
+    assert not main_window.gui_structure.max_temp.is_hidden()
+
+
+def test_backward_compatibility(qtbot):
+    import sys
+    sys.setrecursionlimit(1500)
+    import numpy as np
+
+    from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
+
+    from GHEtool.gui.gui_combine_window import MainWindow
+
+    from GHEtool import FOLDER
+    # init gui window
+    main_window_old = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window_old._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_2_1_0.GHEtool')
+
+    # init gui window
+    main_window_new = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window_new._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_2_1_1.GHEtool')
+
+    for ds_old, ds_new in zip(main_window_old.list_ds, main_window_new.list_ds):
+        for option in ds_new.list_options_aims:
+            print(getattr(ds_old, option), getattr(ds_new, option))
+            if isinstance(getattr(ds_old, option), (int, float)):
+                assert np.isclose(getattr(ds_old, option), getattr(ds_new, option))
+                continue
+            if isinstance(getattr(ds_old, option), (str, bool)):
+                assert getattr(ds_old, option) == getattr(ds_new, option)
+                continue
+
