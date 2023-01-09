@@ -207,7 +207,6 @@ def test_backward_compatibility(qtbot):
 
     for ds_old, ds_new in zip(main_window_old.list_ds, main_window_new.list_ds):
         for option in ds_new.list_options_aims:
-            print(getattr(ds_old, option), getattr(ds_new, option))
             if isinstance(getattr(ds_old, option), (int, float)):
                 assert np.isclose(getattr(ds_old, option), getattr(ds_new, option))
                 continue
