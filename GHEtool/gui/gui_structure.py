@@ -1082,8 +1082,8 @@ class GuiStructure:
 
                 # add dependencies
                 self.option_temperature_profile_hourly.add_link_2_show(self.hourly_figure_temperature_profile, on_index=1)
-                self.aim_optimize.change_event(lambda: self.option_temperature_profile_hourly.set_value(1))
-                self.option_method_size_depth.change_event(lambda: self.option_temperature_profile_hourly.set_value(1))
+                self.aim_optimize.add_link_2_show(self.hourly_figure_temperature_profile)
+                self.option_method_size_depth.add_link_2_show(self.hourly_figure_temperature_profile, on_index=2)
 
             def create_figure_load_duration():
                 self.figure_load_duration = ResultFigure(label="Load-duration curve",
