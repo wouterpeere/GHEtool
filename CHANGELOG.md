@@ -19,7 +19,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - A super class that contains functions relevant for all GHEtool classes
 
 ### Changed
-- Created a new structure for the package, thereby splitting the main_py.file into more subclasses.
 - Created a class for the custom g-functions (issue #57)
 - Created a class for g-function calculation that stores the previously calculated g-values to speed up the iterative algorithms (issue #57).
 - Created a class for sizing_setup to clean up the code.
