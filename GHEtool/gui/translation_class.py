@@ -1462,7 +1462,7 @@ class Translations:
         self.aim_optimize: List[str] = [
             "Optimize load profile",
             "Optimiere Lastprofil",
-            "Optimaliseer belanstingsprofiel",
+            "Optimaliseer belastingsprofiel",
             "Optimize load profile",
             "Optimize load profile",
             "Optimize load profile",
