@@ -27,7 +27,7 @@ author = 'Wouter Peere and Tobias Blanke'
 
 # The full version, including alpha/beta/rc tags
 # get current version
-path = pathlib.Path(__file__).parent
+path = pathlib.Path(__file__).parent.parent
 config = ConfigParser()
 config.read_file(open(path.joinpath('setup.cfg'), 'r'))
 release = config.get('metadata', 'version')
