@@ -215,6 +215,7 @@ class Translations:
         "legend_figure_load_duration",
         "option_len_peak_heating",
         "option_len_peak_cooling",
+        "option_temperature_profile_hourly",
         "languages",
     )
 
@@ -1505,12 +1506,12 @@ class Translations:
         ]
         self.option_method_rb_calc: List[str] = [
             "Borehole resistance calculation method:, constant , dynamic ",
-            "Mehtode zur Bohrlochwiderstangsberechnung:, Konstant , Dynamisch ",
+            "Methode zur Bohrlochwiderstangsberechnung:, Konstant , Dynamisch ",
             "Berekeningsmethode boorgatweerstand:, constant , dynamisch ",
             "Borehole resistance calculation method:, constant , dynamic ",
             "Borehole resistance calculation method:, constant , dynamic ",
             "Borehole resistance calculation method:, constant , dynamic ",
-            "Borehole resistance calculation method:, constant , dynamic ",
+            "Borehole resistance calculation method:, constant , dynamic",
         ]
         self.category_earth: List[str] = [
             "Earth properties",
@@ -1711,4 +1712,13 @@ class Translations:
             "Peak length cooling [hours]: ",
             "Peak length cooling [hours]: ",
             "Peak length cooling [hours]:",
+        ]
+        self.option_temperature_profile_hourly: List[str] = [
+            "Should hourly data be used for the temperature profile?, no , yes ",
+            "Should hourly data be used for the temperature profile?, no , yes ",
+            "Moet uurlijkse data gebruikt worden voor het temperatuursprofiel?, nee , ja ",
+            "Should hourly data be used for the temperature profile?, no , yes ",
+            "Should hourly data be used for the temperature profile?, no , yes ",
+            "Should hourly data be used for the temperature profile?, no , yes ",
+            "Should hourly data be used for the temperature profile?, no , yes",
         ]

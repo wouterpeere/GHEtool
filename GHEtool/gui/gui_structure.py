@@ -200,7 +200,7 @@ class GuiStructure:
                                                        entries=[" constant ", " dynamic "],
                                                        category=self.category_calculation)
                 self.option_temperature_profile_hourly = ButtonBox(
-                    label="Should hourly data be used for the temperature profile?:", default_index=0,
+                    label="Should hourly data be used for the temperature profile?", default_index=0,
                     entries=[" no ", " yes "], category=self.category_calculation)
                 # add dependencies
                 # self.aim_size_length.add_link_2_show(self.option_method_size_length)
