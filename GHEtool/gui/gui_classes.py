@@ -2605,6 +2605,14 @@ def check_aim_options(list_aim: List[Aim]) -> None:
             option.show()
 
 
+def show_options(list_options) -> None:
+    for option in list_options:
+        if option.is_hidden():
+            continue
+        if not option.linked_options:
+            continue
+        option.show()
+
 class Page:
     """
     This class contains all the functionalities of the Page option in the GUI.
