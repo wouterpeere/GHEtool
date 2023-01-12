@@ -16,7 +16,6 @@ import sys
 import pathlib
 import datetime
 from configparser import ConfigParser
-from GHEtool import FOLDER
 
 sys.path.insert(0, os.path.abspath('..'))
 
@@ -28,7 +27,7 @@ author = 'Wouter Peere and Tobias Blanke'
 
 # The full version, including alpha/beta/rc tags
 # get current version
-path = pathlib.Path(__file__).parent 
+path = pathlib.Path(__file__).parent
 config = ConfigParser()
 config.read_file(open(path.joinpath('setup.cfg'), 'r'))
 release = config.get('metadata', 'version')
