@@ -2605,13 +2605,26 @@ def check_aim_options(list_aim: List[Aim]) -> None:
             option.show()
 
 
-def show_options(list_options) -> None:
+def show_linked_options(list_options: List[Option]) -> None:
+    """
+    This function makes sure that for a given list of options, all linked options are shown if the option
+    itself is not hidden.
+
+    Parameters
+    ----------
+    list_options : List(Option)
+        A list of options which have linked options
+
+    Returns
+    -------
+    None
+    """
     for option in list_options:
         if option.is_hidden():
             continue
-        if not option.linked_options:
-            continue
+        # show already shown option to evoke linked options
         option.show()
+
 
 class Page:
     """

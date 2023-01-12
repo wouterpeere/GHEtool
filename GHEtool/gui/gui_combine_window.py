@@ -19,7 +19,7 @@ from .gui_base_class import UiGhetool, set_graph_layout
 from .gui_calculation_thread import CalcProblem
 from .gui_data_storage import DataStorage
 from .gui_structure import FigureOption, GuiStructure, Option
-from .gui_classes import check_aim_options, show_options
+from .gui_classes import check_aim_options, show_linked_options
 from .translation_class import Translations
 
 
@@ -1005,7 +1005,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         """
         # update so all the relevant options are shown
         check_aim_options([aim for aim, _ in self.gui_structure.list_of_aims])
-        show_options([option for option, _ in self.gui_structure.list_of_options])
+        show_linked_options([option for option, _ in self.gui_structure.list_of_options_with_dependent_results])
 
         # hide widgets if no list of scenarios exists and display not calculated text
         def hide_no_result(hide: bool = True):
