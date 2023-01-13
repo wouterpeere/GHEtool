@@ -38,13 +38,25 @@ VERSION = config.get('metadata', 'version')
 
 # main GUI class
 class MainWindow(QtW.QMainWindow, UiGhetool):
+    """
+    This class contains the general functionalities of the GUI (e.g. the handling of creating new scenarios,
+    saving documents etc.)
+    """
     filenameDefault: tuple = ("", "")
 
     def __init__(self, dialog: QtW.QWidget, app: QtW.QApplication) -> None:
         """
-        initialize window
-        :param dialog: Q widget as main window
-        :param app: application widget
+
+        Parameters
+        ----------
+        dialog : QtW.QWidget
+            Q widget as main window were everything is happening
+        app : QtW.QApplication
+            The widget for the application itself
+
+        Returns
+        -------
+        None
         """
         # parameter to show the end of the init function
         self.started = False
@@ -75,7 +87,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         makedirs(dirname(self.default_path), exist_ok=True)
         self.translations: Translations = Translations()  # init translation class
         for idx, (name, icon, short_cut) in enumerate(zip(self.translations.languages, self.translations.icon, self.translations.short_cut)):
-            self.create_action_language(idx, name, icon, short_cut)
+            self._create_action_language(idx, name, icon, short_cut)
         # add languages to combo box
         self.gui_structure.option_language.widget.addItems(self.translations.languages)
         self.fileImport = None  # init import file
@@ -129,7 +141,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # this is so that no changes are made when the file is opening
         self.started: bool = True
 
-    def create_action_language(self, idx: int, name: str, icon_name: str, short_cut: str):
+    def _create_action_language(self, idx: int, name: str, icon_name: str, short_cut: str):
         action = QtG.QAction(self.central_widget)
         icon = QtG.QIcon()
         icon.addFile(icon_name, QtC.QSize(), QtG.QIcon.Normal, QtG.QIcon.Off)
@@ -165,7 +177,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             option.change_event(self.change)
 
         for option, name in setting_options:
-            option.change_event(ft_partial(self.change_settings_in_all_data_storages, name))
+            option.change_event(ft_partial(self._change_settings_in_all_data_storages, name))
 
         self.gui_structure.option_language.change_event(self.change_language)
         self.gui_structure.page_result.button.clicked.connect(self.display_results)
@@ -215,6 +227,17 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def set_push(self, mouse_over: bool) -> None:
         """
+
+        Parameters
+        ----------
+        mouse_over : bool
+            True if the mouse is over a PushButton
+
+        Returns
+        -------
+        None
+        """
+        """
         function to Set PushButton Text if MouseOver
         :param mouse_over: bool true if Mouse is over PushButton
         :return: None
@@ -248,8 +271,14 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def change(self) -> None:
         """
-        check if changes to scenario or saved file happened
-        :return: None
+        This function checks if there are changes to a scenario or a file save happened.
+        If there were changes, an * is added to the current scenario.
+        This function is only active when self.started is True (this is the case when the application is running)
+        and self.checking is True (this can temporarily be disabled by some other function).
+
+        Returns
+        -------
+        None
         """
         # return if not yet started
         if not self.started:
@@ -464,8 +493,13 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def check_results(self) -> None:
         """
-        check if results exists and then display them
-        :return:
+        This function checks if there are results and if so, it will display them.
+        It checks this by checking if there exists a borefield attribute in the datastorage object
+        that differs from None.
+
+        Returns
+        -------
+        None
         """
         # hide results buttons if no results where found
         if any([(i.borefield is None) for i in self.list_ds]) or self.list_ds == []:
@@ -477,8 +511,11 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def change_window_title(self) -> None:
         """
-        change window title to filename and mark with * if unsaved changes exists
-        :return: None
+        This function changes the window title to the filename and marks it with an * if unsaved changes exist
+
+        Returns
+        -------
+        None
         """
         # get filename separated from path
         _, filename = MainWindow.filenameDefault if self.filename == MainWindow.filenameDefault else os_split(self.filename[0])
@@ -520,14 +557,31 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             return True
         return False
 
-    def change_settings_in_all_data_storages(self, name_of_option: str, *args):
+    def _change_settings_in_all_data_storages(self, name_of_option: str, *args) -> None:
+        """
+        This function makes sure that the settings are the same in all the different scenarios.
+
+        Parameters
+        ----------
+        name_of_option : str
+            Name of the option that has been changed
+        args
+            Other arguments that can be passed through
+
+        Returns
+        -------
+        None
+        """
         for ds in self.list_ds:
             setattr(ds, name_of_option, getattr(self.gui_structure, name_of_option).get_value() if len(args) < 1 else args[0])
 
     def change_language(self) -> None:
         """
-        function to change language on labels and push buttons
-        :return: None
+        This function changes the language on the different labels and buttons in the gui.
+
+        Returns
+        -------
+        None
         """
         self.checking = False
         scenario_index: int = self.list_widget_scenario.currentRow()  # get current selected scenario
@@ -566,6 +620,13 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         self.checking = True
 
     def delete_backup(self):
+        """
+        This function deletes the backup file link (not the actual backup file) if it exists.
+
+        Returns
+        -------
+        None
+        """
         if exists(self.backup_file):
             remove(self.backup_file)
 
@@ -806,9 +867,16 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def change_scenario(self, idx: int) -> None:
         """
-        update GUI if a new scenario at the comboBox is selected
-        :param idx: index of selected scenario
-        :return: None
+        Updates the gui to the correct data from the datastorage with the selected index idx.
+
+        Parameters
+        ----------
+        idx : int
+            Index of the selected scenario
+
+        Returns
+        -------
+        None
         """
         # if i no scenario is selected (idx < 0) or no scenario exists break function
         if idx < 0 or idx >= len(self.list_ds):
@@ -825,6 +893,14 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         self.checking: bool = True
 
     def check_values(self) -> bool:
+        """
+        This function checks if all the options in the gui are given correct values.
+        If not, it will print an error message on the status bar.
+
+        Returns
+        -------
+        None
+        """
         if not all(option.check_value() for option, _ in self.gui_structure.list_of_options):
             for option, _ in self.gui_structure.list_of_options:
                 if not option.check_value():
@@ -863,8 +939,11 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def delete_scenario(self) -> None:
         """
-        function to delete the selected scenario
-        :return: None
+        This function deletes the selected scenario and selects the scenario above it.
+
+        Returns
+        -------
+        None
         """
         # get current scenario index
         idx = self.list_widget_scenario.currentRow()
@@ -881,8 +960,11 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def add_scenario(self) -> None:
         """
-        function to add a scenario
-        :return: None
+        Function to add a scenario.
+
+        Returns
+        -------
+        None
         """
         # get current number of scenario but at least 0
         number: int = len(self.list_ds)
@@ -1029,8 +1111,11 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def display_results(self) -> None:
         """
-        display results of the current selected scenario
-        :return: None
+        This function displays the results (of the selected scenario) on the results page.
+
+        Returns
+        -------
+        None
         """
         def update_results():
             # update so all the relevant options are shown
@@ -1107,9 +1192,17 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def closeEvent(self, event) -> None:
         """
-        new close Event to check if the input should be saved
-        :param event: closing event
-        :return: None
+        This function is called when the gui is closed. It will prompt a window asking if potential changes
+        need to be saved.
+
+        Parameters
+        ----------
+        event
+            closing event
+
+        Returns
+        -------
+        None
         """
         # close app if nothing has been changed
         if not self.changedFile:
