@@ -112,6 +112,8 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # set start page to general page
         self.gui_structure.page_aim.button.click()
 
+        self.last_idx = 0
+
         [option.init_links() for option, _ in self.gui_structure.list_of_options]
 
         self.status_bar.showMessage(self.translations.GHE_tool_imported[self.gui_structure.option_language.get_value()], 5000)
@@ -179,6 +181,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         self.actionRename_scenario.triggered.connect(self.fun_rename_scenario)
         self.list_widget_scenario.model().rowsMoved.connect(self.fun_move_scenario)
         self.list_widget_scenario.currentItemChanged.connect(self.fun_auto_save_scenario)
+        self.list_widget_scenario.itemSelectionChanged.connect(self._always_scenario_selected)
         self.Dia.closeEvent = self.closeEvent
 
     def update_graph(self):
@@ -787,6 +790,20 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             self.list_widget_scenario.clear()  # clear list widget with scenario list
             self.display_results()  # clear the results page
 
+    def _always_scenario_selected(self) -> None:
+        """
+        This function makes sure there is always a scenario selected.
+        If no scenario is selected, the last scenario is selected.
+
+        Returns
+        -------
+        None
+        """
+        if not self.list_widget_scenario.selectedItems():
+            self.list_widget_scenario.setCurrentRow(self.last_idx)
+        else:
+            self.last_idx = self.list_widget_scenario.currentRow()
+
     def change_scenario(self, idx: int) -> None:
         """
         update GUI if a new scenario at the comboBox is selected
@@ -860,6 +877,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             self.list_widget_scenario.takeItem(idx)
             # select previous scenario then the deleted one but at least the first one
             self.list_widget_scenario.setCurrentRow(max(idx - 1, 0))
+            self.change_scenario(max(idx - 1, 0))
 
     def add_scenario(self) -> None:
         """
@@ -1029,8 +1047,8 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
                 return
             for cat in self.gui_structure.page_result.list_categories:
                 cat.show(results=True)
+                update_results()
             # make sure all the results are being shown
-            update_results()
             self.gui_structure.cat_no_result.hide()
 
         if not self.list_ds:
