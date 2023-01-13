@@ -162,6 +162,41 @@ def test_gui_scenario_properties(qtbot):
     assert len(main_window.list_ds) == 1
 
 
+def test_gui_scenario_double_naming(qtbot):
+    import sys
+    sys.setrecursionlimit(1500)
+
+    from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
+
+    from GHEtool.gui.gui_combine_window import MainWindow
+
+    # init gui window
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.delete_backup()
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+
+    # create two scenarios
+    main_window.add_scenario()
+    main_window.add_scenario()
+    assert ["Scenario: 1", "Scenario: 2"] == [main_window.list_widget_scenario.item(x).text().split("*")[0]
+                                                 for x in range(main_window.list_widget_scenario.count())]
+    main_window.list_widget_scenario.setCurrentRow(0)
+    main_window.delete_scenario()
+    # scenarios are renamed
+    assert ["Scenario: 2"] == [main_window.list_widget_scenario.item(x).text().split("*")[0]
+                              for x in range(main_window.list_widget_scenario.count())]
+
+    main_window.add_scenario()
+    main_window.add_scenario()
+    assert ["Scenario: 2", "Scenario: 2(2)", "Scenario: 3"] == [main_window.list_widget_scenario.item(x).text().split("*")[0]
+                                              for x in range(main_window.list_widget_scenario.count())]
+
+    main_window.list_widget_scenario.setCurrentRow(1)
+    main_window.fun_rename_scenario("Scenario: 3")
+    assert ["Scenario: 2", "Scenario: 3(2)", "Scenario: 3", "Scenario: 3(2)"] == [main_window.list_widget_scenario.item(x).text().split("*")[0]
+                                              for x in range(main_window.list_widget_scenario.count())]
+
+
 def test_wrong_options_are_shown(qtbot):
     import sys
     sys.setrecursionlimit(1500)

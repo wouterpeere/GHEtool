@@ -416,15 +416,36 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         icon.addPixmap(QtG.QPixmap(f":/icons/icons/{icon_name}.svg"), QtG.QIcon.Normal, QtG.QIcon.Off)
         button.setIcon(icon)  # set icon to button
 
-    def fun_rename_scenario(self) -> None:
+    def fun_rename_scenario(self, name: str="") -> None:
         """
-        function to rename current scenario with a dialog box to ask for new name
-        :return: None
+        Function to rename the current scenario with a dialog box to ask for a new name
+
+        Parameters
+        ----------
+        name : str
+            Name of the scenario (only for testing purposes
+
+        Returns
+        -------
+        None
         """
+
+        def set_name(text):
+            # sets the name of the current scenario to text
+            list_of_scenarios = [self.list_widget_scenario.item(x).text().split("*")[0] for x in
+                                 range(self.list_widget_scenario.count())]
+            if text in list_of_scenarios:
+                text += "(2)"
+            item.setText(text) if text != "" else None
+
         # get current item
         item = self.list_widget_scenario.currentItem()
         # get first item if no one is selected
         item = self.list_widget_scenario.item(0) if item is None else item
+        if name != "":
+            set_name(name)
+            return
+
         # create dialog box to ask for a new name
         dialog = QtW.QInputDialog(self.Dia)
         dialog.setWindowTitle(self.translations.label_new_scenario[self.gui_structure.option_language.get_value()])
@@ -436,12 +457,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         self.set_push_button_icon(li[1], "Abort")
         # set new name if the dialog is not canceled and the text is not None
         if dialog.exec_() == QtW.QDialog.Accepted:
-            text = dialog.textValue()
-            list_of_scenarios = [self.list_widget_scenario.item(x).text().split("*")[0] for x in
-                                 range(self.list_widget_scenario.count())]
-            if text in list_of_scenarios:
-                text += "(2)"
-            item.setText(text) if text != "" else None
+            set_name(dialog.textValue())
 
     def check_results(self) -> None:
         """
@@ -842,11 +858,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             del self.list_ds[idx]
             # delete scenario form list widget
             self.list_widget_scenario.takeItem(idx)
-            # rename remaining scenarios if the name has not be changed
-            for i in range(idx, self.list_widget_scenario.count()):
-                item = self.list_widget_scenario.item(i)
-                if item.text() == f"{self.translations.scenarioString[self.gui_structure.option_language.get_value()]}: {i + 2}":
-                    item.setText(f"{self.translations.scenarioString[self.gui_structure.option_language.get_value()]}: {i + 1}")
             # select previous scenario then the deleted one but at least the first one
             self.list_widget_scenario.setCurrentRow(max(idx - 1, 0))
 
