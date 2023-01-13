@@ -1003,9 +1003,10 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         display results of the current selected scenario
         :return: None
         """
-        # update so all the relevant options are shown
-        check_aim_options([aim for aim, _ in self.gui_structure.list_of_aims])
-        show_linked_options([option for option, _ in self.gui_structure.list_of_options_with_dependent_results])
+        def update_results():
+            # update so all the relevant options are shown
+            check_aim_options([aim for aim, _ in self.gui_structure.list_of_aims])
+            show_linked_options([option for option, _ in self.gui_structure.list_of_options_with_dependent_results])
 
         # hide widgets if no list of scenarios exists and display not calculated text
         def hide_no_result(hide: bool = True):
@@ -1017,6 +1018,8 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
                 return
             for cat in self.gui_structure.page_result.list_categories:
                 cat.show(results=True)
+            # make sure all the results are being shown
+            update_results()
             self.gui_structure.cat_no_result.hide()
 
         if not self.list_ds:
