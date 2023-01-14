@@ -3,7 +3,7 @@ This document contains the variable classes for the ground data, fluid data and 
 """
 
 from math import pi
-from GHEtool.VariableClasses import BaseClass
+from GHEtool.VariableClasses.BaseClass import BaseClass
 
 import numpy as np
 import pygfunction as gt
