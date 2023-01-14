@@ -11,7 +11,7 @@ from scipy.signal import convolve
 
 from GHEtool.VariableClasses import GroundData, FluidData, PipeData
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, SizingSetup
-from GHEtool.VariableClasses.BaseClass import BaseClass
+from GHEtool.VariableClasses import BaseClass
 
 
 class Borefield(BaseClass):
