@@ -40,7 +40,6 @@ sources/code/speed_improvements.md
 
 sources/gui/gui_functionalities.md
 sources/gui/gui_installation_guide.md
-sources/gui/gui_manual.md
 ```
 
 ```{toctree}
