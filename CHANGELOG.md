@@ -6,9 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [2.1.2] - [expected] feb 2023
 
 ### Added
-- Coaxial pipes
-- Variable temperature sizing (at least in the code version)
-- Reimplemented size by length and width
+* Coaxial pipes 
+* Variable temperature sizing (at least in the code version)
+* Reimplemented size by length and width
 
 ## [2.1.1] - [expected] jan 2023
 
@@ -135,7 +135,7 @@ code version > speed improvements > v2.1.1
 ### Fixed 
 - fixed bug in interpolation
 
-[Unreleased]: https://github.com/wouterpeere/GHEtool/compare/v2.1.0...main
+[2.1.1]: https://github.com/wouterpeere/GHEtool/compare/v2.1.0...main
 [2.1.0]: https://github.com/wouterpeere/GHEtool/compare/v2.0.6...v2.1.0
 [2.0.6]: https://github.com/wouterpeere/GHEtool/compare/v2.0.5...v2.0.6
 [2.0.5]: https://github.com/wouterpeere/GHEtool/compare/v2.0.4...v2.0.5
