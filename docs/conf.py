@@ -17,7 +17,7 @@ import pathlib
 import datetime
 from configparser import ConfigParser
 
-# sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
@@ -27,11 +27,11 @@ author = 'Wouter Peere and Tobias Blanke'
 
 # The full version, including alpha/beta/rc tags
 # get current version
-# path = pathlib.Path(__file__).parent.parent
-# config = ConfigParser()
-# config.read_file(open(path.joinpath('setup.cfg'), 'r'))
-# release = config.get('metadata', 'version')
-release = "v2.1.0"
+path = pathlib.Path(__file__).parent.parent
+config = ConfigParser()
+config.read_file(open(path.joinpath('setup.cfg'), 'r'))
+release = config.get('metadata', 'version')
+
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
