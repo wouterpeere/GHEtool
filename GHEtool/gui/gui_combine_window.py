@@ -463,7 +463,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         :return: None
         """
         self.list_ds.insert(target_index, self.list_ds.pop(start_index))
-        self.list_ds.insert(target_index, self.list_ds.pop(start_index))
 
     @staticmethod
     def set_push_button_icon(button: QtW.QPushButton, icon_name: str) -> None:
