@@ -463,6 +463,8 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         :return: None
         """
         self.list_ds.insert(target_index, self.list_ds.pop(start_index))
+        # project is changed
+        self.changedFile = True
 
     @staticmethod
     def set_push_button_icon(button: QtW.QPushButton, icon_name: str) -> None:
