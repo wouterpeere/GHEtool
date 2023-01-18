@@ -13,19 +13,24 @@
 
 import os
 import sys
+import pathlib
+import datetime
+from configparser import ConfigParser
 
 sys.path.insert(0, os.path.abspath('..'))
-import GHEtool
 
 # -- Project information -----------------------------------------------------
 
 project = 'GHEtool'
-copyright = '2022, Wouter Peere and Tobias Blanke'
+copyright = f'{datetime.datetime.now().year}, Wouter Peere and Tobias Blanke'
 author = 'Wouter Peere and Tobias Blanke'
 
 # The full version, including alpha/beta/rc tags
-release = '2.1.0'
-
+# get current version
+path = pathlib.Path(__file__).parent.parent
+config = ConfigParser()
+config.read_file(open(path.joinpath('setup.cfg'), 'r'))
+release = config.get('metadata', 'version')
 
 # -- General configuration ---------------------------------------------------
 

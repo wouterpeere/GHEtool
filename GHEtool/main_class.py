@@ -23,10 +23,9 @@ class Borefield(BaseClass):
     # define default values
     DEFAULT_INVESTMENT: list = [35, 0]  # 35 EUR/m
     DEFAULT_LENGTH_PEAK: int = 6  # hours
-    DEFAULT_NUMBER_OF_TIMESTEPS: int = 100
     THRESHOLD_DEPTH_ERROR: int = 10000  # m
 
-    HOURLY_LOAD_ARRAY: np.ndarray = np.arange(0, 8761, 730).astype(np.uint32)
+    HOURLY_LOAD_ARRAY: np.ndarray = np.arange(0, 8761, UPM).astype(np.uint32)
 
     __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'H_init', 'Rb', 'ty', 'tm', \
                 'hourly_heating_load', 'hourly_cooling_load', 'number_of_boreholes', '_borefield', 'cost_investment', \
