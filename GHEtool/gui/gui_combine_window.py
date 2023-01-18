@@ -217,6 +217,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         self.actionOpen.triggered.connect(self.fun_load)
         self.actionNew.triggered.connect(self.fun_new)
         self.actionRename_scenario.triggered.connect(self.fun_rename_scenario)
+        self.list_widget_scenario.setDragDropMode(QtW.QAbstractItemView.InternalMove)
         self.list_widget_scenario.model().rowsMoved.connect(self.fun_move_scenario)
         self.list_widget_scenario.currentItemChanged.connect(self.scenario_is_changed)
         self.list_widget_scenario.itemSelectionChanged.connect(self._always_scenario_selected)
