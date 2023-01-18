@@ -127,7 +127,6 @@ def test_gui_values(qtbot):
     main_window.gui_structure.option_heating_column.set_value(0)
     main_window.gui_structure.option_cooling_column.set_value(1)
     main_window.gui_structure.button_load_csv.button.click()
-    #main_window.close()
 
     print('end')
 

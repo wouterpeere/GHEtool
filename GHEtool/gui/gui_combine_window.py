@@ -141,7 +141,26 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # this is so that no changes are made when the file is opening
         self.started: bool = True
 
-    def _create_action_language(self, idx: int, name: str, icon_name: str, short_cut: str):
+    def _create_action_language(self, idx: int, name: str, icon_name: str, short_cut: str) -> None:
+        """
+        This function creates an action for a specific language with name name and icon icon_name
+        and couples a shortcut to this action. The action is added to the menuLanguage afterwards.
+
+        Parameters
+        ----------
+        idx : int
+            Index of the language in the language list
+        name : str
+            Name of the language
+        icon_name : str
+            Path to the icon
+        short_cut : str
+            Shortcut linked to this language
+
+        Returns
+        -------
+        None
+        """
         action = QtG.QAction(self.central_widget)
         icon = QtG.QIcon()
         icon.addFile(icon_name, QtC.QSize(), QtG.QIcon.Normal, QtG.QIcon.Off)
@@ -448,7 +467,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         icon.addPixmap(QtG.QPixmap(f":/icons/icons/{icon_name}.svg"), QtG.QIcon.Normal, QtG.QIcon.Off)
         button.setIcon(icon)  # set icon to button
 
-    def fun_rename_scenario(self, name: str="") -> None:
+    def fun_rename_scenario(self, name: str = "") -> None:
         """
         Function to rename the current scenario with a dialog box to ask for a new name
 
@@ -526,11 +545,18 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # set new title name
         self.Dia.setWindowTitle(name)
 
-    def status_hide(self, text) -> None:
+    def status_hide(self, text: str) -> None:
         """
-        show or hide statusbar if no text exists
-        :param text: text in status bar
-        :return: None
+        This function sets the text in the status bar. If the text is empty, the status bar will be closed.
+
+        Parameters
+        ----------
+        text : str
+            Text to be shown in the status bar
+
+        Returns
+        -------
+        None
         """
         if text == "":
             self.status_bar.hide()
@@ -770,8 +796,12 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def fun_load(self) -> None:
         """
-        function to load externally stored scenario
-        :return: None
+        This function sets the filename by opening a QFileDialog box.
+        Afterwards, it runs fun_load_known_filename() to open this file.
+
+        Returns
+        -------
+        None
         """
         # open interface and get file name
         self.filename = QtW.QFileDialog.getOpenFileName(
@@ -783,8 +813,13 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def fun_load_known_filename(self) -> None:
         """
-        load stored scenarios from external json file
-        :return: None
+        This function loads a previously stored project based on the self.filename attribute.
+        This attribute is set by the function fun_load().
+        When no such file exists, a message is printed in the status bar.
+
+        Returns
+        -------
+        None
         """
         # try to open the file
         try:
@@ -800,8 +835,11 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def fun_save_as(self) -> None:
         """
-        function to save under new filename
-        :return: None
+        This function sets the filename to a default value and calls the fun_save() function.
+
+        Returns
+        -------
+        None
         """
         # reset filename because then the funSave function ask for a new filename
         self.filename = MainWindow.filenameDefault
@@ -1039,8 +1077,12 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def start_multiple_scenarios_calculation(self) -> None:
         """
-        start calculation of all not calculated scenarios
-        :return: None
+        This function starts the calculation of all the scenarios that do not have a borefield attribute in their
+        DS, when check_values() is True.
+
+        Returns
+        -------
+        None
         """
         if not self.check_values():
             return
@@ -1072,8 +1114,16 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def start_current_scenario_calculation(self, no_run: bool = False) -> None:
         """
-        start calculation of selected scenario
-        :return: None
+        This function starts the calculation of the selected/current scenario, when check_values() is True.
+
+        Parameters
+        ----------
+        no_run : bool
+            Implemented to make sure that the gui_tests are working.
+
+        Returns
+        -------
+        None
         """
         if not self.check_values():
             return
