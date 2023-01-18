@@ -36,6 +36,7 @@ code version > speed improvements > v2.1.1
 - Implemented FIFO-class to prevent cycling in iterative sizing.
 - A scenario name cannot occur twice in the scenario list.
 - Sometimes some gui options were not shown
+- The drag-and-drop behaviour of the scenario list is fixed (issue #80)
 
 ## [2.1.0] - 2022-11-30
 
