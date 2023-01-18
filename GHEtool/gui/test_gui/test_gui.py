@@ -34,10 +34,10 @@ def test_gui_values(qtbot):
 
     # init gui window
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
-    main_window.update_graph()
+    main_window.remove_previous_calculated_results()
     main_window.delete_backup()
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
-    main_window.update_graph()
+    main_window.remove_previous_calculated_results()
 
     main_window.gui_structure.option_filename.set_value(f'{FOLDER}/Examples/hourly_profile.csv')
 
@@ -111,7 +111,7 @@ def test_gui_values(qtbot):
         main_window.threads[0].run()
         main_window.threads[0].any_signal.connect(main_window.thread_function)
 
-    main_window.update_graph()
+    main_window.remove_previous_calculated_results()
     main_window.gui_structure.aim_optimize.widget.click()
     main_window.save_scenario()
     main_window.start_current_scenario_calculation(True)

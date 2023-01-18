@@ -93,7 +93,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         self.fileImport = None  # init import file
         self.filename: tuple = MainWindow.filenameDefault  # filename of stored inputs
         self.list_widget_scenario.clear()  # reset list widget with stored scenarios
-        self.changedScenario: bool = False  # set change scenario variable to false
         self.changedFile: bool = False  # set change file variable to false
         self.ax: list = []  # axes of figure
         self.axBorehole = None
@@ -110,9 +109,9 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # reset progress bar
         self.update_bar(0, False)
         # set event filter for push button sizing
-        self.event_filter_install()
+        self.set_event_filter()
         # load backup data
-        self.load_list()
+        self.load_backup()
         # add progress bar and label to statusbar
         self.status_bar.addPermanentWidget(self.label_Status, 0)
         self.status_bar.addPermanentWidget(self.progressBar, 1)
@@ -120,7 +119,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # change window title to saved filename
         self.change_window_title()
         # reset push button size
-        self.set_push(False)
+        self.check_page_button_layout(False)
         # set start page to general page
         self.gui_structure.page_aim.button.click()
 
@@ -153,7 +152,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         name : str
             Name of the language
         icon_name : str
-            Path to the icon
+            Name of the icon
         short_cut : str
             Shortcut linked to this language
 
@@ -170,10 +169,14 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         action.setShortcut(short_cut)
         action.triggered.connect(ft_partial(self.gui_structure.option_language.widget.setCurrentIndex, idx))
 
-    def event_filter_install(self) -> None:
+    def set_event_filter(self) -> None:
         """
-        install event filter for push button sizing
-        :return: None
+        This function sets the event filter for the page buttons so it can be detected when there is a
+        mouse over event.
+
+        Returns
+        -------
+        None
         """
         for page in self.gui_structure.list_of_pages:
             page.button.installEventFilter(self)
@@ -181,8 +184,12 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def set_links(self) -> None:
         """
-        set links of buttons and actions to function
-        :return: None
+        This function connects all the buttons to their relevant actions.
+        All interactions between front and back-end are implemented here.
+
+        Returns
+        -------
+        None
         """
 
         setting_options = [(opt_cat, name) for category in self.gui_structure.page_settings.list_categories for opt_cat in category.list_of_options if
@@ -191,7 +198,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
                              if not isinstance(opt, FigureOption) and not ((opt, name) in setting_options)]:
             option.change_event(self.change)
         for option, name in [(opt, name) for opt, name in self.gui_structure.list_of_options if isinstance(opt, FigureOption)]:
-            option.change_event(self.update_graph)
+            option.change_event(self.remove_previous_calculated_results)
         for option, name in self.gui_structure.list_of_aims:
             option.change_event(self.change)
 
@@ -211,71 +218,65 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         self.actionNew.triggered.connect(self.fun_new)
         self.actionRename_scenario.triggered.connect(self.fun_rename_scenario)
         self.list_widget_scenario.model().rowsMoved.connect(self.fun_move_scenario)
-        self.list_widget_scenario.currentItemChanged.connect(self.fun_auto_save_scenario)
+        self.list_widget_scenario.currentItemChanged.connect(self.scenario_is_changed)
         self.list_widget_scenario.itemSelectionChanged.connect(self._always_scenario_selected)
         self.Dia.closeEvent = self.closeEvent
 
-    def update_graph(self):
+    def remove_previous_calculated_results(self):
+        """
+        This function removes previously calculated results by removing the borefield attribute
+        and closing all the figures in the DataStorage.
+
+        Returns
+        -------
+        None
+        """
         if not self.list_ds:
             return
         ds = self.list_ds[self.list_widget_scenario.currentRow()]
         if ds.borefield is None:
             return
         ds.close_figures()
-        self.display_results()
 
-    def event_filter(self, obj: QtW.QPushButton, event) -> bool:
+    def check_page_button_layout(self, mouse_over: bool) -> None:
         """
-        function to check mouse over event
-        :param obj:
-        PushButton obj
-        :param event:
-        event to check if mouse over event is entering or leaving
-        :return:
-        Boolean to check if the function worked
-        """
-        if event.type() == QtC.QEvent.Enter:
-            # Mouse is over the label
-            self.set_push(True)
-            return True
-        elif event.type() == QtC.QEvent.Leave:
-            # Mouse is not over the label
-            self.set_push(False)
-            return True
-        return False
-
-    def set_push(self, mouse_over: bool) -> None:
-        """
+        This function checks if the layout of the page button should be changed.
+        When the mouse_over is True, the page button is expanded to include text and icon.
+        When mouse_over is False, the page button is again 'closed'.
 
         Parameters
         ----------
         mouse_over : bool
-            True if the mouse is over a PushButton
+            True if the mouse is over a PushButton and it should be expanded
 
         Returns
         -------
         None
         """
-        """
-        function to Set PushButton Text if MouseOver
-        :param mouse_over: bool true if Mouse is over PushButton
-        :return: None
-        """
         # if Mouse is over PushButton change size to big otherwise to small
         if mouse_over:
             for page in self.gui_structure.list_of_pages:
-                self.set_push_button_icon_size(page.button, True, page.button_name)
+                self.change_page_button_layout(page.button, True, page.button_name)
             return
         for page in self.gui_structure.list_of_pages:
-            self.set_push_button_icon_size(page.button)
+            self.change_page_button_layout(page.button)
 
-    def set_push_button_icon_size(self, button: QtW.QPushButton, big: bool = False, name: str = "") -> None:
+    def change_page_button_layout(self, button: QtW.QPushButton, big: bool = False, name: str = "") -> None:
         """
-        set button name and size
-        :param button: QPushButton to set name and icon size for
-        :param big: big or small icon size (True = big)
-        :param name: name to set to QPushButton
-        :return: None
+        This function changes the layout of the page button, by adding/removing the text and icon.
+
+        Parameters
+        ----------
+        button : QtW.QPushButton
+            Button for which the layout has to be changed
+        big : bool
+            True if the expanded version of the button is needed, False otherwise
+        name : str
+            Name of the icon for the relevant button
+
+        Returns
+        -------
+        None
         """
         button.setText(name)  # set name to button
         # size big or small QPushButton depending on input
@@ -352,13 +353,22 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # else add * to current item string
         self.list_widget_scenario.item(idx).setText(f"{text}*")
 
-    def fun_auto_save_scenario(self, new_row_item: QtW.QListWidgetItem, old_row_item: QtW.QListWidgetItem) -> None:
+    def scenario_is_changed(self, new_row_item: QtW.QListWidgetItem, old_row_item: QtW.QListWidgetItem) -> None:
         """
-        function to save a scenario when the item in the list Widget is changed and the checkBox to save automatic is
-        checked or ask to save unsaved scenario changes
-        :param new_row_item: new selected scenario item (not used)
-        :param old_row_item: old scenario item
-        :return: None
+        This function handles the changing of scenarios.
+        If the auto-save ButtonBox is set to auto-save, the previous scenario is changed an the new item is selected.
+        If not, a messagebox is shown to ask if the 'old' scenario should be saved.
+
+        Parameters
+        ----------
+        new_row_item : QtW.QListWidgetItem
+            New selected item in the scenario listbox
+        old_row_item : QtW.QListWidgetItem
+            Old selected item in the scenario listbox
+
+        Returns
+        -------
+        None
         """
         # if no old item is selected do nothing and return
         if old_row_item is None:
@@ -457,10 +467,18 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
     @staticmethod
     def set_push_button_icon(button: QtW.QPushButton, icon_name: str) -> None:
         """
-        set QPushButton icon
-        :param button: QPushButton to change to icon for
-        :param icon_name: icon name as string
-        :return: None
+        This function sets the icon in the QPushButton.
+
+        Parameters
+        ----------
+        button : QtW.QPushButton
+            Button to which the icon should be set
+        icon_name : str
+            Icon name
+
+        Returns
+        -------
+        None
         """
         icon = QtG.QIcon()  # create icon class
         # add pixmap to icon
@@ -565,21 +583,26 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def eventFilter(self, obj: QtW.QPushButton, event) -> bool:
         """
-        function to check mouse over event
-        :param obj:
-        PushButton obj
-        :param event:
-        event to check if mouse over event is entering or leaving
-        :return:
-        Boolean to check if the function worked
+        This function checks the mouse over event. It overwrites the eventFilter object in QObject.
+
+        Parameters
+        ----------
+        obj : QtW.QPushButton
+        event : event
+            Event for which it is check if the mouse is entering or leaving
+
+        Returns
+        -------
+        bool
+            True to check if the function has worked correctly. (implemented for test cases)
         """
         if event.type() == QtC.QEvent.Enter:
             # Mouse is over the label
-            self.set_push(True)
+            self.check_page_button_layout(True)
             return True
         elif event.type() == QtC.QEvent.Leave:
             # Mouse is not over the label
-            self.set_push(False)
+            self.check_page_button_layout(False)
             return True
         return False
 
@@ -629,7 +652,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         for idx, name in enumerate(self.translations.languages):
             self.gui_structure.option_language.widget.setItemText(idx, name)
         # set small PushButtons
-        self.set_push(False)
+        self.check_page_button_layout(False)
         # replace scenario names if they are not unique
         scenarios: list = [
             f"{self.translations.scenarioString[self.gui_structure.option_language.get_value()]}: {i}"
@@ -656,10 +679,13 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         if exists(self.backup_file):
             remove(self.backup_file)
 
-    def load_list(self) -> None:
+    def load_backup(self) -> None:
         """
-        try to open the backup file and set the old values
-        :return: None
+        This function tries to open the backup file and load its values.
+
+        Returns
+        -------
+        None
         """
         # try to open backup file if it exits
         if exists(self.backup_file):
@@ -675,8 +701,11 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def fun_save_auto(self) -> None:
         """
-        function to automatically save data in backup file
-        :return: None
+        This function automatically saves data in the backup file.
+
+        Returns
+        -------
+        None
         """
         # append scenario if no scenario is in list
         if len(self.list_ds) < 1:
@@ -805,7 +834,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         """
         # open interface and get file name
         self.filename = QtW.QFileDialog.getOpenFileName(
-            self.central_widget, caption=self.translations.ChoosePKL[self.gui_structure.option_language.get_value()], filter="GHEtool (*.GHEtool)",
+            self.central_widget, caption=self.translations.ChooseGHEtool[self.gui_structure.option_language.get_value()], filter="GHEtool (*.GHEtool)",
             dir=str(self.default_path)
         )
         # load selected data
@@ -847,13 +876,18 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def fun_save(self) -> bool:
         """
-        save all scenarios externally in a pickle file
-        :return: boolean which is true if saving was successful
+        This function saves all the scenarios in a JSON formatted *.GHEtool file.
+
+
+        Returns
+        -------
+        bool
+            True if the saving was successful.
         """
         # ask for pickle file if the filename is still the default
         if self.filename == MainWindow.filenameDefault:
             self.filename: tuple = QtW.QFileDialog.getSaveFileName(
-                self.central_widget, caption=self.translations.SavePKL[self.gui_structure.option_language.get_value()], filter="GHEtool (*.GHEtool)",
+                self.central_widget, caption=self.translations.SaveGHEtool[self.gui_structure.option_language.get_value()], filter="GHEtool (*.GHEtool)",
                 dir=str(self.default_path),
             )
             # break function if no file is selected
@@ -880,8 +914,11 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def fun_new(self) -> None:
         """
-        create new data file and reset GUI
-        :return: None
+        This function creates a new GHEtool-project and resets the GUI.
+
+        Returns
+        -------
+        None
         """
         self.filename: tuple = MainWindow.filenameDefault  # reset filename
         if self.fun_save():  # get and save filename
@@ -948,12 +985,17 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def save_scenario(self, idx: int = None) -> bool:
         """
-        function to save selected scenario
-        :return: None
-        """
-        # set boolean for unsaved scenario changes to False, because we save them now
-        self.changedScenario: bool = False
+        This function saves the current scenario in the backup.
 
+        Parameters
+        ----------
+        idx : int
+            Index of the scenario. If None, the current index is taken.
+
+        Returns
+        -------
+        None
+        """
         if not self.check_values():
             return False
         # get selected scenario index
@@ -1022,10 +1064,19 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def update_bar(self, val: int, opt_start: bool = False) -> None:
         """
-        update progress bar or hide them if not needed
-        :param val: int of successfully calculated scenarios
-        :param opt_start: bool which is true if the calculation started to show progressbar and labels
-        :return: None
+        This function updates the status bar or hides them if it is no longer needed.
+        It displays the percentage of calculated scenarios.
+
+        Parameters
+        ----------
+        val : int
+            Number of successfully calculated scenarios
+        opt_start : bool
+            True if the calculation is started and the progressbar should be shown
+
+        Returns
+        -------
+        None
         """
         # show label and progress bar if calculation started otherwise hide them
         if opt_start:
@@ -1048,9 +1099,18 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
     def thread_function(self, results: Tuple[DataStorage, int]) -> None:
         """
-        turn on and off the old and new threads for the calculation
-        :param results: DataStorage of current thread and current index
-        :return: None
+        This function closes the thread of the old calculation and stores it results.
+        It increments the number of calculated scenarios, and calls to update the progress bar.
+        Afterwards, it starts the new thread for the following calculation.
+
+        Parameters
+        ----------
+        results : Tuple[DataStorage, int]
+            Tuple with the DS object of the current thread and its corresponding index
+
+        Returns
+        -------
+        None
         """
         # stop finished thread
         self.threads[self.finished].terminate()
