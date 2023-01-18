@@ -34,10 +34,10 @@ def test_gui_values(qtbot):
 
     # init gui window
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
-    main_window.update_graph()
+    main_window.remove_previous_calculated_results()
     main_window.delete_backup()
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
-    main_window.update_graph()
+    main_window.remove_previous_calculated_results()
 
     main_window.gui_structure.option_filename.set_value(f'{FOLDER}/Examples/hourly_profile.csv')
 
@@ -111,7 +111,7 @@ def test_gui_values(qtbot):
         main_window.threads[0].run()
         main_window.threads[0].any_signal.connect(main_window.thread_function)
 
-    main_window.update_graph()
+    main_window.remove_previous_calculated_results()
     main_window.gui_structure.aim_optimize.widget.click()
     main_window.save_scenario()
     main_window.start_current_scenario_calculation(True)
@@ -127,7 +127,6 @@ def test_gui_values(qtbot):
     main_window.gui_structure.option_heating_column.set_value(0)
     main_window.gui_structure.option_cooling_column.set_value(1)
     main_window.gui_structure.button_load_csv.button.click()
-    #main_window.close()
 
     print('end')
 
@@ -160,6 +159,106 @@ def test_gui_scenario_properties(qtbot):
 
     main_window.delete_scenario()
     assert len(main_window.list_ds) == 1
+
+
+def test_gui_scenario_double_naming(qtbot):
+    import sys
+    sys.setrecursionlimit(1500)
+
+    from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
+
+    from GHEtool.gui.gui_combine_window import MainWindow
+
+    # init gui window
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.delete_backup()
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+
+    # create two scenarios
+    main_window.add_scenario()
+    main_window.add_scenario()
+    assert ["Scenario: 1", "Scenario: 2"] == [main_window.list_widget_scenario.item(x).text().split("*")[0]
+                                                 for x in range(main_window.list_widget_scenario.count())]
+    main_window.list_widget_scenario.setCurrentRow(0)
+    main_window.delete_scenario()
+    # scenarios are renamed
+    assert ["Scenario: 2"] == [main_window.list_widget_scenario.item(x).text().split("*")[0]
+                              for x in range(main_window.list_widget_scenario.count())]
+
+    main_window.add_scenario()
+    main_window.add_scenario()
+    assert ["Scenario: 2", "Scenario: 2(2)", "Scenario: 3"] == [main_window.list_widget_scenario.item(x).text().split("*")[0]
+                                              for x in range(main_window.list_widget_scenario.count())]
+
+    main_window.list_widget_scenario.setCurrentRow(1)
+    main_window.fun_rename_scenario("Scenario: 3")
+    assert ["Scenario: 2", "Scenario: 3(2)", "Scenario: 3"] == [main_window.list_widget_scenario.item(x).text().split("*")[0]
+                                              for x in range(main_window.list_widget_scenario.count())]
+
+
+def test_wrong_results_shown(qtbot):
+    import sys
+    sys.setrecursionlimit(1500)
+
+    from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
+
+    from GHEtool.gui.gui_combine_window import MainWindow
+
+    # init gui window
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.delete_backup()
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.gui_structure.option_decimal_csv.set_value(0)
+    main_window.gui_structure.option_seperator_csv.set_value(0)
+
+    main_window.gui_structure.option_filename.set_value(f'{FOLDER}/Examples/hourly_profile.csv')
+    main_window.gui_structure.fun_update_combo_box_data_file(f'{FOLDER}/Examples/hourly_profile.csv')
+    main_window.gui_structure.option_column.set_value(1)
+    main_window.gui_structure.option_cooling_column.set_value(1)
+
+    main_window.gui_structure.aim_optimize.widget.click()
+    main_window.save_scenario()
+    main_window.start_current_scenario_calculation(True)
+    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
+        main_window.threads[0].run()
+        main_window.threads[0].any_signal.connect(main_window.thread_function)
+
+    assert not main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
+    assert main_window.gui_structure.result_Rb_calculated.is_hidden()
+
+    main_window.gui_structure.option_method_rb_calc.set_value(1)
+    main_window.save_scenario()
+    main_window.start_current_scenario_calculation(True)
+    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
+        main_window.threads[0].run()
+        main_window.threads[0].any_signal.connect(main_window.thread_function)
+
+    assert not main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
+    assert not main_window.gui_structure.result_Rb_calculated.is_hidden()
+
+    main_window.add_scenario()
+    main_window.save_scenario()
+    main_window.start_current_scenario_calculation(True)
+    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
+        main_window.threads[0].run()
+        main_window.threads[0].any_signal.connect(main_window.thread_function)
+
+    assert not main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
+    assert not main_window.gui_structure.result_Rb_calculated.is_hidden()
+    main_window.list_widget_scenario.setCurrentRow(0)
+    assert not main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
+    assert not main_window.gui_structure.result_Rb_calculated.is_hidden()
+    main_window.list_widget_scenario.setCurrentRow(1)
+    assert not main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
+    assert not main_window.gui_structure.result_Rb_calculated.is_hidden()
+    main_window.add_scenario()
+    main_window.gui_structure.aim_temp_profile.widget.click()
+    main_window.save_scenario()
+    main_window.start_current_scenario_calculation(True)
+    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
+        main_window.threads[0].run()
+        main_window.threads[0].any_signal.connect(main_window.thread_function)
+    assert main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
 
 
 def test_wrong_options_are_shown(qtbot):

@@ -2408,7 +2408,7 @@ class ResultFigure(Category):
         Parameters
         ----------
         results : bool
-            True if this function is called w.r.t. result page.
+            True if this function is called w.r.t. result page
 
         Returns
         -------
@@ -2603,6 +2603,27 @@ def check_aim_options(list_aim: List[Aim]) -> None:
                     opt.show()
                 continue
             option.show()
+
+
+def show_linked_options(options_list: List[Option]) -> None:
+    """
+    This function makes sure that for a given list of options, all linked options are shown if the option
+    itself is not hidden.
+
+    Parameters
+    ----------
+    options_list : List(Option)
+        A list of options which have linked options
+
+    Returns
+    -------
+    None
+    """
+    for option in options_list:
+        if option.is_hidden():
+            continue
+        # show already shown option to evoke linked options
+        option.show()
 
 
 class Page:

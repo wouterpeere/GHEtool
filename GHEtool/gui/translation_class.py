@@ -96,10 +96,10 @@ class Translations:
         "NoFileSelected",
         "ValueError",
         "ColumnError",
-        "ChoosePKL",
+        "ChooseGHEtool",
         "SaveFigure",
         "SaveData",
-        "SavePKL",
+        "SaveGHEtool",
         "label_WarningCustomBorefield",
         "label_WarningDepth",
         "checkBox_SizeBorefield",
@@ -215,6 +215,7 @@ class Translations:
         "legend_figure_load_duration",
         "option_len_peak_heating",
         "option_len_peak_cooling",
+        "option_temperature_profile_hourly",
         "languages",
     )
 
@@ -841,14 +842,14 @@ class Translations:
             "Columna incorrecta: compruebe las columnas seleccionadas",
             "Columna incorrecta: comprobe as columnas escollidas",
         ]
-        self.ChoosePKL: List[str] = [
-            "Choose pkl to load scenarios",
-            "Wählen Sie pkl zum Laden von Szenarien",
-            "Kies pkl bestand",
-            "Scegliere pkl per caricare gli scenari",
-            "Choisir pkl pour charger les scénarios",
-            "Elija pkl para cargar escenarios",
-            "Escolla pkl para cargar escenarios",
+        self.ChooseGHEtool: List[str] = [
+            "Choose *.GHEtool to load scenarios",
+            "Wählen Sie *.GHEtool zum Laden von Szenarien",
+            "Kies *.GHEtool bestand",
+            "Scegliere *.GHEtool per caricare gli scenari",
+            "Choisir *.GHEtool pour charger les scénarios",
+            "Elija *.GHEtool para cargar escenarios",
+            "Escolla *.GHEtool para cargar escenarios",
         ]
         self.SaveFigure: List[str] = [
             "Choose png location to save figure",
@@ -868,14 +869,14 @@ class Translations:
             "Elija la localización del csv para guardar resultados",
             "Escolla a localización do csv para gardar resultados",
         ]
-        self.SavePKL: List[str] = [
-            "Choose pkl location to save scenarios",
-            "Wählen Sie den pkl-Speicherort zum Speichern von Szenarien",
-            "Kies gewenste pkl locatie",
-            "Scegli il percorso pkl per salvare gli scenari",
-            "Choisissez un emplacement pkl pour enregistrer les scénarios",
-            "Elija la localización del pkl para guardar escenarios",
-            "Escolla a localización do pkl para gardar escenarios",
+        self.SaveGHEtool: List[str] = [
+            "Choose *.GHEtool location to save scenarios",
+            "Wählen Sie den *.GHEtool-Speicherort zum Speichern von Szenarien",
+            "Kies gewenste *.GHEtool locatie",
+            "Scegli il percorso *.GHEtool per salvare gli scenari",
+            "Choisissez un emplacement *.GHEtool pour enregistrer les scénarios",
+            "Elija la localización del *.GHEtool para guardar escenarios",
+            "Escolla a localización do *.GHEtool para gardar escenarios",
         ]
         self.label_WarningCustomBorefield: List[str] = [
             "With the selected values a customized bore field will be calculated. This will dramatically increase the calculation time.",
@@ -1461,7 +1462,7 @@ class Translations:
         self.aim_optimize: List[str] = [
             "Optimize load profile",
             "Optimiere Lastprofil",
-            "Optimaliseer belanstingsprofiel",
+            "Optimaliseer belastingsprofiel",
             "Optimize load profile",
             "Optimize load profile",
             "Optimize load profile",
@@ -1505,12 +1506,12 @@ class Translations:
         ]
         self.option_method_rb_calc: List[str] = [
             "Borehole resistance calculation method:, constant , dynamic ",
-            "Mehtode zur Bohrlochwiderstangsberechnung:, Konstant , Dynamisch ",
+            "Methode zur Bohrlochwiderstangsberechnung:, Konstant , Dynamisch ",
             "Berekeningsmethode boorgatweerstand:, constant , dynamisch ",
             "Borehole resistance calculation method:, constant , dynamic ",
             "Borehole resistance calculation method:, constant , dynamic ",
             "Borehole resistance calculation method:, constant , dynamic ",
-            "Borehole resistance calculation method:, constant , dynamic ",
+            "Borehole resistance calculation method:, constant , dynamic",
         ]
         self.category_earth: List[str] = [
             "Earth properties",
@@ -1711,4 +1712,13 @@ class Translations:
             "Peak length cooling [hours]: ",
             "Peak length cooling [hours]: ",
             "Peak length cooling [hours]:",
+        ]
+        self.option_temperature_profile_hourly: List[str] = [
+            "Should hourly data be used for the temperature profile?, no , yes ",
+            "Should hourly data be used for the temperature profile?, no , yes ",
+            "Moet uurlijkse data gebruikt worden voor het temperatuursprofiel?, nee , ja ",
+            "Should hourly data be used for the temperature profile?, no , yes ",
+            "Should hourly data be used for the temperature profile?, no , yes ",
+            "Should hourly data be used for the temperature profile?, no , yes ",
+            "Should hourly data be used for the temperature profile?, no , yes",
         ]

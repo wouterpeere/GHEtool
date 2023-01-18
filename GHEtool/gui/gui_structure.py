@@ -200,7 +200,7 @@ class GuiStructure:
                                                        entries=[" constant ", " dynamic "],
                                                        category=self.category_calculation)
                 self.option_temperature_profile_hourly = ButtonBox(
-                    label="Should hourly data be used for the temperature profile?:", default_index=0,
+                    label="Should hourly data be used for the temperature profile?", default_index=0,
                     entries=[" no ", " yes "], category=self.category_calculation)
                 # add dependencies
                 # self.aim_size_length.add_link_2_show(self.option_method_size_length)
@@ -1002,7 +1002,7 @@ class GuiStructure:
 
                 self.result_Rb_calculated = ResultText("Equivalent borehole thermal resistance", category=self.numerical_results,
                                                        prefix="Equivalent borehole thermal resistance: ", suffix="Wm/K")
-                self.result_Rb_calculated.text_to_be_shown("Borefield", "Rb")
+                self.result_Rb_calculated.text_to_be_shown("Borefield", "_Rb")
                 self.result_Rb_calculated.function_to_convert_to_text(lambda x: round(x, 4))
 
                 self.results_ground_temperature = ResultText("Ground temperature", category=self.numerical_results,
@@ -1164,6 +1164,9 @@ class GuiStructure:
 
         self.list_of_result_texts: List[Tuple[ResultText, str]] = [(getattr(self, name), name) for name in self.__dict__ if isinstance(getattr(self, name), ResultText)]
         self.list_of_result_figures: List[Tuple[ResultFigure, str]] = [(getattr(self, name), name) for name in self.__dict__ if isinstance(getattr(self, name), ResultFigure)]
+
+        self.list_of_options_with_dependent_results: List[Tuple[Option, str]] = [(getattr(self, name), name) for name in self.__dict__ if isinstance(getattr(self, name), Option) if
+                                                                                 getattr(self, name).linked_options]
 
     def change_toggle_button(self) -> None:
         """

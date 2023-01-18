@@ -1,4 +1,4 @@
-# GHEtool's Change Log and future developments
+# GHEtool's Changelog and future developments
 All notable changes to this project will be documented in this file including planned future developments.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
@@ -19,7 +19,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - A super class that contains functions relevant for all GHEtool classes
 
 ### Changed
-- Created a new structure for the package, thereby splitting the main_py.file into more subclasses.
 - Created a class for the custom g-functions (issue #57)
 - Created a class for g-function calculation that stores the previously calculated g-values to speed up the iterative algorithms (issue #57).
 - Created a class for sizing_setup to clean up the code.
@@ -32,11 +31,12 @@ code version > speed improvements > v2.1.1
 ### Fixed
 - The hourly_heating_load_on_the_borefield and hourly_cooling_load_on_the_borefield are now correctly calculated.
 - When an hourly temperature profile is plotted after an optimise_load_profile optimisation, the hourly load on the borefield (and not the entire hourly load) is shown.
-- Correct conversion from hourly to monthly load (issue 62)
+- Correct conversion from hourly to monthly load (issue #62)
 - Problem with np.float16 when using simulation periodes >80 years due to overflow errors.
 - Implemented FIFO-class to prevent cycling in iterative sizing.
 - A scenario name cannot occur twice in the scenario list.
 - Sometimes some gui options were not shown
+- The drag-and-drop behaviour of the scenario list is fixed (issue #80)
 
 ## [2.1.0] - 2022-11-30
 
