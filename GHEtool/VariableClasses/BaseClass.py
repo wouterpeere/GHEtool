@@ -127,7 +127,8 @@ class BaseClass:
                                               tilt=borehole["tilt"],
                                               orientation=borehole["orientation"])
                                      for borehole in _value]
-
+                        setattr(self, key, borefield)
+                        continue
                 # normal dictionary
                 setattr(self, key, value)
 
