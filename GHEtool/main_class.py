@@ -2014,7 +2014,9 @@ class Borefield(BaseClass):
     def optimise_load_profile(self, depth: float = None, print_results: bool = False) -> None:
         """
         This function optimises the load based on the given borefield and the given hourly load.
-        It does so base on a load-duration curve.
+        It does so based on a load-duration curve. The temperatures of the borefield are calculated on a monthly
+        basis, even though we have hourly data, for an hourly calculation of the temperatures
+        would take a very long time.
 
         Parameters
         ----------
