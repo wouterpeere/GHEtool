@@ -238,6 +238,8 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         if ds.borefield is None:
             return
         ds.close_figures()
+        # update figures
+        self.display_results()
 
     def check_page_button_layout(self, mouse_over: bool) -> None:
         """
