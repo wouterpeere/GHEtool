@@ -261,6 +261,50 @@ def test_wrong_results_shown(qtbot):
     assert main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
 
 
+def test_change_scenario(qtbot):
+    """
+    test if the change of a scenario works correctly.\n
+
+    Parameters
+    ----------
+    qtbot: qtbot
+        bot for the GUI
+    """
+    # import libs
+    from sys import setrecursionlimit
+    from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
+    from GHEtool.gui.gui_combine_window import MainWindow
+    from PySide6.QtCore import QModelIndex
+    # set recursion limit
+    setrecursionlimit(1500)
+    # init gui window
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.delete_backup()
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    # add three scenarios
+    main_window.add_scenario()
+    main_window.add_scenario()
+    main_window.gui_structure.aim_req_depth.widget.click()
+    main_window.save_scenario()
+    main_window.add_scenario()
+    main_window.gui_structure.option_method_size_depth.set_value(1)
+    main_window.save_scenario()
+    # save old lists of data storages and names
+    li_before = main_window.list_ds.copy()
+    li_names_before = [main_window.list_widget_scenario.item(idx).text() for idx in range(main_window.list_widget_scenario.count())]
+    # change the items
+    main_window.list_widget_scenario.model().moveRow(QModelIndex(), 2, QModelIndex(), 0)
+    # get new lists of data storages and names
+    li_after = main_window.list_ds
+    li_names_after = [main_window.list_widget_scenario.item(idx).text() for idx in range(main_window.list_widget_scenario.count())]
+    # create check lists by hand from before lists
+    li_check = [li_before[2], li_before[0], li_before[1]]
+    li_names_check = [li_names_before[2], li_names_before[0], li_names_before[1]]
+    # check if names and data storages have been changed correctly
+    assert li_after == li_check
+    assert li_names_after == li_names_check
+
+
 def test_wrong_options_are_shown(qtbot):
     import sys
     sys.setrecursionlimit(1500)
