@@ -1201,12 +1201,11 @@ class GuiStructure:
             return
         r_borehole: float = self.option_pipe_borehole_radius.get_value()  # get borehole radius
         r_outer_pipe: float = self.option_pipe_outer_radius.get_value()  # get outer pipe radius
-        r_outer_pipe_max: float = r_borehole / (1 + 1 / sin(pi / (2 * n_u)))  # calculate maximal outer pipe radius(see Circle packing)
-        distance_max: float = r_borehole - r_outer_pipe_max  # calculate maximal distance between pipe and center
+        distance_max: float = r_borehole - r_outer_pipe  # calculate maximal distance between pipe and center
         alpha: float = pi / n_u  # determine equal angle between pipes
         # determine minimal distance between pipe and center if number of pipes is bigger than one else set to half
         # borehole radius
-        distance_min: float = 2 * r_outer_pipe * (cos((pi - alpha) / 2) + sin((pi - alpha) / 2) / tan(alpha)) if n_u > 1 else r_borehole / 2
+        distance_min: float = r_outer_pipe / sin(alpha / 2) + 0.001  # add 1mm for safety
         # set minimal and maximal value for pipe distance
         self.option_pipe_distance.widget.blockSignals(True)
         self.option_pipe_distance.widget.setMinimum(distance_min)
