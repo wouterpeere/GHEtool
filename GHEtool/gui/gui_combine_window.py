@@ -1,3 +1,4 @@
+from __future__ import annotations
 from functools import partial as ft_partial
 from pickle import load as pk_load
 from json import dump, load, JSONDecodeError
@@ -44,7 +45,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
     """
     filenameDefault: tuple = ("", "")
 
-    def __init__(self, dialog: QtW.QWidget, app: QtW.QApplication) -> None:
+    def __init__(self, dialog: QtW.QWidget, app: QtW.QApplication) -> MainWindow:
         """
 
         Parameters
@@ -56,7 +57,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
         Returns
         -------
-        None
+        MainWindow
         """
         # parameter to show the end of the init function
         self.started = False

@@ -14,9 +14,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 - Added NavigationToolbar to figure (issue #55)
-- Added different peak lengths for heating and cooling seperately (issue #72)
+- Added different peak lengths for heating and cooling separately (issue #72)
 - Readable saving format for gui (JSON)
 - A super class that contains functions relevant for all GHEtool classes
+- Exe can be installed either locally for one user without admin permission or for all users using admin permission
+- Saved files (*.GHEtool) can be loaded from GHEtool by double click
 
 ### Changed
 - Created a class for the custom g-functions (issue #57)
@@ -27,6 +29,7 @@ code version > speed improvements > v2.1.1.
 - The sizing methods themselves are now faster due to the fact that only the first and last year are calculated (issue #44). For more info, one can check:
 code version > speed improvements > v2.1.1
 - Faster loading time of the GUI.
+- Smaller exe-file size by setting up a virtual environment and using a pyinstall folder instead of a single file.
 
 ### Fixed
 - The hourly_heating_load_on_the_borefield and hourly_cooling_load_on_the_borefield are now correctly calculated.
