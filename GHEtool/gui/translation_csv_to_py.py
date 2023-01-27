@@ -13,7 +13,7 @@ def main():
 
     with open(file_name, 'w', encoding='utf-8') as file:
         file.write('from typing import List\n')
-        file.write('class Translations:\n')
+        file.write('class Translations:  # pragma: no cover\n')
         list_of_options = df1["name"].to_list()
         list_of_options.append('languages')
         text = f'__slots__ = {tuple(list_of_options)}'
