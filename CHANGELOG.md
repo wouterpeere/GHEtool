@@ -37,6 +37,7 @@ code version > speed improvements > v2.1.1
 - A scenario name cannot occur twice in the scenario list.
 - Sometimes some gui options were not shown
 - The drag-and-drop behaviour of the scenario list is fixed (issue #80)
+- The renaming of a scenario was not possible (issue #86)
 
 ## [2.1.0] - 2022-11-30
 

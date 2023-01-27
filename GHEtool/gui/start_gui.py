@@ -1,4 +1,4 @@
-def run():
+def run(): # pragma: no cover
     import pathlib
     from configparser import ConfigParser
     from ctypes import windll as ctypes_windll
@@ -39,5 +39,5 @@ def run():
     sys_exit(app.exec())
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
     run()
