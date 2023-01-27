@@ -718,6 +718,17 @@ def test_change_scenario(qtbot):
     qtbot.wait(100)
     assert main_window.list_ds[1].option_conductivity == 3
     assert main_window.list_widget_scenario.currentRow() == 0
+    # check if the * is removed when it is changed to old values
+    old_value = main_window.gui_structure.option_conductivity.get_value()
+    main_window.gui_structure.option_conductivity.set_value(4)
+    assert main_window.list_widget_scenario.currentItem().text()[-1] == '*'
+    main_window.gui_structure.option_conductivity.set_value(old_value)
+    assert main_window.list_widget_scenario.currentItem().text()[-1] != '*'
+    # check if just one * is added if multiple options are changed
+    main_window.gui_structure.option_conductivity.set_value(4)
+    main_window.gui_structure.option_spacing.set_value(4)
+    assert main_window.list_widget_scenario.currentItem().text()[-1] == '*'
+    assert main_window.list_widget_scenario.currentItem().text()[-2] != '**'
     # activate auto saving option
     main_window.gui_structure.option_auto_saving.set_value(1)
     # check if the value is stored and the scenario is changed
@@ -726,6 +737,11 @@ def test_change_scenario(qtbot):
     qtbot.wait(100)
     assert main_window.list_ds[0].option_conductivity == 4
     assert main_window.list_widget_scenario.currentRow() == 1
+    # check if nothing is changed when scenarios are switched
+    main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(0))
+    main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(1))
+    assert main_window.list_ds[0].option_conductivity == 4
+    assert main_window.list_ds[1].option_conductivity == 3
 
 
 def test_backward_compatibility(qtbot):
