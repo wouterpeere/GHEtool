@@ -7,7 +7,7 @@ from os.path import dirname, exists, realpath
 from os.path import split as os_split
 from pathlib import Path, PurePath
 from sys import path
-from typing import List, Tuple
+from typing import List, Tuple, Optional, Union
 from GHEtool import Borefield, FOLDER
 from configparser import ConfigParser
 
@@ -77,6 +77,8 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # set app and dialog
         self.app: QtW.QApplication = app
         self.Dia = dialog
+        # init pop up dialog
+        self.dialog: Optional[QtW.QInputDialog] = None
         # init variables of class
         # allow checking of changes
         self.checking: bool = False
@@ -217,7 +219,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         self.actionSave_As.triggered.connect(self.fun_save_as)
         self.actionOpen.triggered.connect(self.fun_load)
         self.actionNew.triggered.connect(self.fun_new)
-        self.actionRename_scenario.triggered.connect(self.fun_rename_scenario)
+        self.actionRename_scenario.triggered.connect(lambda: self.fun_rename_scenario())
         self.list_widget_scenario.setDragDropMode(QtW.QAbstractItemView.InternalMove)
         self.list_widget_scenario.model().rowsMoved.connect(self.fun_move_scenario)
         self.list_widget_scenario.currentItemChanged.connect(self.scenario_is_changed)
@@ -286,10 +288,12 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             button.setIconSize(self.sizeS)
             button.setMaximumSize(self.sizePushB)
             button.setMinimumSize(self.sizePushB)
+            button.resize(self.sizePushB)
             return
         button.setIconSize(self.sizeB)
         button.setMaximumSize(self.sizePushS)
         button.setMinimumSize(self.sizePushS)
+        button.resize(self.sizePushS)
 
     def change(self) -> None:
         """
@@ -416,19 +420,19 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # check if the old scenario is unsaved then create message box
         if text[-1] == "*":
             # create message box
-            msg: QtW.QMessageBox = QtW.QMessageBox(self.Dia)
+            self.dialog: QtW.QMessageBox = QtW.QMessageBox(self.Dia)
             # set Icon to question mark icon
-            msg.setIcon(QtW.QMessageBox.Question)
+            self.dialog.setIcon(QtW.QMessageBox.Question)
             # set label text to leave scenario text depending on language selected
-            msg.setText(self.translations.label_LeaveScenarioText[self.gui_structure.option_language.get_value()])
+            self.dialog.setText(self.translations.label_LeaveScenarioText[self.gui_structure.option_language.get_value()])
             # set window text to  leave scenario text depending on language selected
-            msg.setWindowTitle(self.translations.label_CancelTitle[self.gui_structure.option_language.get_value()])
+            self.dialog.setWindowTitle(self.translations.label_CancelTitle[self.gui_structure.option_language.get_value()])
             # set standard buttons to save, close and cancel
-            msg.setStandardButtons(QtW.QMessageBox.Save | QtW.QMessageBox.Close | QtW.QMessageBox.Cancel)
+            self.dialog.setStandardButtons(QtW.QMessageBox.Save | QtW.QMessageBox.Close | QtW.QMessageBox.Cancel)
             # get save, close and cancel button
-            button_s = msg.button(QtW.QMessageBox.Save)
-            button_cl = msg.button(QtW.QMessageBox.Close)
-            button_ca = msg.button(QtW.QMessageBox.Cancel)
+            button_s = self.dialog.button(QtW.QMessageBox.Save)
+            button_cl = self.dialog.button(QtW.QMessageBox.Close)
+            button_ca = self.dialog.button(QtW.QMessageBox.Cancel)
             # set save, close and cancel button text depending on language selected
             button_s.setText(f"{self.translations.pushButton_SaveScenario[self.gui_structure.option_language.get_value()]} ")
             button_cl.setText(f"{self.translations.label_LeaveScenario[self.gui_structure.option_language.get_value()]} ")
@@ -438,7 +442,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             self.set_push_button_icon(button_cl, "Exit")
             self.set_push_button_icon(button_ca, "Abort")
             # execute message box and save response
-            reply = msg.exec_()
+            reply = self.dialog.exec_()
             # check if closing should be canceled
             if reply == QtW.QMessageBox.Cancel:
                 return_2_old_item()
@@ -519,17 +523,19 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             return
 
         # create dialog box to ask for a new name
-        dialog = QtW.QInputDialog(self.Dia)
-        dialog.setWindowTitle(self.translations.label_new_scenario[self.gui_structure.option_language.get_value()])
-        dialog.setLabelText(f"{self.translations.new_name[self.gui_structure.option_language.get_value()]}{item.text()}")
-        dialog.setOkButtonText(self.translations.label_okay[self.gui_structure.option_language.get_value()])  # +++
-        dialog.setCancelButtonText(self.translations.label_abort[self.gui_structure.option_language.get_value()])  # +++
-        li = dialog.findChildren(QtW.QPushButton)
+        self.dialog = QtW.QInputDialog(self.Dia)
+        self.dialog.setWindowTitle(self.translations.label_new_scenario[self.gui_structure.option_language.get_value()])
+        self.dialog.setLabelText(f"{self.translations.new_name[self.gui_structure.option_language.get_value()]}{item.text()}")
+        self.dialog.setOkButtonText(self.translations.label_okay[self.gui_structure.option_language.get_value()])  # +++
+        self.dialog.setCancelButtonText(self.translations.label_abort[self.gui_structure.option_language.get_value()])  # +++
+        li = self.dialog.findChildren(QtW.QPushButton)
         self.set_push_button_icon(li[0], "Okay")
         self.set_push_button_icon(li[1], "Abort")
         # set new name if the dialog is not canceled and the text is not None
-        if dialog.exec_() == QtW.QDialog.Accepted:
-            set_name(dialog.textValue())
+        if self.dialog.exec_() == QtW.QDialog.Accepted:
+            set_name(self.dialog.textValue())
+
+        self.dialog = None
 
     def check_results(self) -> None:
         """
@@ -712,7 +718,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         """
         # append scenario if no scenario is in list
         if len(self.list_ds) < 1:
-            self.list_ds.append(DataStorage(self.gui_structure))
+            self.add_scenario()
 
         self._save_to_data(self.backup_file)
 
@@ -754,7 +760,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
                 # try to open as pickle
                 with open(location, "rb") as file:
                     saving = pk_load(file)
-
                 version = "2.1.0"
             except (FileNotFoundError, ImportError):
                 raise ImportError("The datafile cannot be loaded!")
@@ -793,7 +798,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             # write scenario names
             general_changes(li)
 
-    def _save_to_data(self, location: str) -> None:
+    def _save_to_data(self, location: Union[str, PurePath]) -> None:
         """
         This function saves the gui data to a json formatted file.
 
@@ -1322,19 +1327,19 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             event.accept()
             return
         # create message box
-        msg: QtW.QMessageBox = QtW.QMessageBox(self.Dia)
+        self.dialog: QtW.QMessageBox = QtW.QMessageBox(self.Dia)
         # set Icon to question mark icon
-        msg.setIcon(QtW.QMessageBox.Question)
+        self.dialog.setIcon(QtW.QMessageBox.Question)
         # set label text to cancel text depending on language selected
-        msg.setText(self.translations.label_CancelText[self.gui_structure.option_language.get_value()])
+        self.dialog.setText(self.translations.label_CancelText[self.gui_structure.option_language.get_value()])
         # set window text to cancel text depending on language selected
-        msg.setWindowTitle(self.translations.label_CancelTitle[self.gui_structure.option_language.get_value()])
+        self.dialog.setWindowTitle(self.translations.label_CancelTitle[self.gui_structure.option_language.get_value()])
         # set standard buttons to save, close and cancel
-        msg.setStandardButtons(QtW.QMessageBox.Save | QtW.QMessageBox.Close | QtW.QMessageBox.Cancel)
+        self.dialog.setStandardButtons(QtW.QMessageBox.Save | QtW.QMessageBox.Close | QtW.QMessageBox.Cancel)
         # get save, close and cancel button
-        button_s = msg.button(QtW.QMessageBox.Save)
-        button_cl = msg.button(QtW.QMessageBox.Close)
-        button_ca = msg.button(QtW.QMessageBox.Cancel)
+        button_s = self.dialog.button(QtW.QMessageBox.Save)
+        button_cl = self.dialog.button(QtW.QMessageBox.Close)
+        button_ca = self.dialog.button(QtW.QMessageBox.Cancel)
         # set save, close and cancel button text depending on language selected
         button_s.setText(f"{self.translations.label_Save[self.gui_structure.option_language.get_value()]} ")
         button_cl.setText(f"{self.translations.label_close[self.gui_structure.option_language.get_value()]} ")
@@ -1344,7 +1349,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         self.set_push_button_icon(button_cl, "Exit")
         self.set_push_button_icon(button_ca, "Abort")
         # execute message box and save response
-        reply = msg.exec_()
+        reply = self.dialog.exec_()
         # check if closing should be canceled
         if reply == QtW.QMessageBox.Cancel:
             # cancel closing event
