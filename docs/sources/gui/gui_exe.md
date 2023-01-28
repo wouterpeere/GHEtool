@@ -8,7 +8,7 @@ The creation of an *.exe file consists of three steps:
 
 ## Set up a fresh virtual environment
 
-It can either be created a new virtual environment at `venv` folder using the following command in the command line:
+A new virtual environment can be created at the `venv` folder using the following command in the command line:
 
 ```
 python -m venv venv
@@ -40,8 +40,7 @@ python -m pip install PyInstaller
 The exe-folder can be created using [PyInstaller](https://pyinstaller.org/en/stable/). The following line will create a windowed version of the executable.
 
 ```
-python -m PyInstaller --noconfirm --onedir --windowed --splash "./GHEtool/gui/icons/Icon.ico" --name "GHEtool" --add-data "setup.cfg;." --icon "./GHEtool/gui/icons/Icon.ico" ".
-/GHEtool/gui/start_gui.py"
+python -m PyInstaller --noconfirm --onedir --windowed --splash "./GHEtool/gui/icons/Icon.ico" --name "GHEtool" --add-data "setup.cfg;." --icon "./GHEtool/gui/icons/Icon.ico" "./GHEtool/gui/start_gui.py"
 ```
 The following line will create a version which also displays a windows console with error messages of the executable. 
 ``` 
