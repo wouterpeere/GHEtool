@@ -1,7 +1,7 @@
 from typing import List
 
 
-class Translations:
+class Translations:  # pragma: no cover
     __slots__ = (
         "icon",
         "short_cut",
