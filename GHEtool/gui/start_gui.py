@@ -1,8 +1,7 @@
-def run():
+def run():  # pragma: no cover
     import pathlib
     from configparser import ConfigParser
     from ctypes import windll as ctypes_windll
-    from sys import argv
     from sys import exit as sys_exit
 
     from PySide6.QtWidgets import QApplication as QtWidgets_QApplication
@@ -12,7 +11,7 @@ def run():
     from GHEtool.gui.gui_combine_window import MainWindow
 
     # init application
-    app = QtWidgets_QApplication(argv)
+    app = QtWidgets_QApplication()
     # get current version
     path = pathlib.Path(FOLDER).parent
     config = ConfigParser()
@@ -39,5 +38,5 @@ def run():
     sys_exit(app.exec())
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     run()

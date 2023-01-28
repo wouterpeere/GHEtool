@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [2.1.2] - [expected] feb 2023
 
 ### Added
-- Coaxial pipes 
+- Coaxial pipes
 - Variable temperature sizing (at least in the code version)
 - Reimplemented size by length and width
 
@@ -14,12 +14,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 - Added NavigationToolbar to figure (issue #55).
-- Added different peak lengths for heating and cooling seperately (issue #72).
+- Added different peak lengths for heating and cooling separately (issue #72).
 - Readable saving format for gui (JSON).
 - A super class that contains functions relevant for all GHEtool classes.
+- Exe can be installed either locally for one user without admin permission or for all users using admin permission
+- Saved files (*.GHEtool) can be loaded from GHEtool by double click
+
 
 ### Changed
-- Created a class for the custom g-functions (issue #57)
+- Created a class for the custom g-functions (issue #57).
 - Created a class for g-function calculation that stores the previously calculated g-values to speed up the iterative algorithms (issue #57).
 - Created a class for sizing_setup to clean up the code.
 The speed improvement is over a factor 10 for heavy iterative procedures (like optimise load profile). A full speed improvement report can be found under:
@@ -28,6 +31,7 @@ code version > speed improvements > v2.1.1.
 code version > speed improvements > v2.1.1.
 - Faster loading time of the GUI.
 - Further documentation for optimise_load_profile functionality.
+- Smaller exe-file size by setting up a virtual environment and using a pyinstall folder instead of a single file.
 
 ### Fixed
 - The hourly_heating_load_on_the_borefield and hourly_cooling_load_on_the_borefield are now correctly calculated.
@@ -38,6 +42,7 @@ code version > speed improvements > v2.1.1.
 - A scenario name cannot occur twice in the scenario list.
 - Sometimes some gui options were not shown.
 - The drag-and-drop behaviour of the scenario list is fixed (issue #80).
+- The renaming of a scenario was not possible (issue #86).
 - Problems with borehole internals and pipe overlaps.
 
 ## [2.1.0] - 2022-11-30
