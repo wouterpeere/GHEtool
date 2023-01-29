@@ -1,5 +1,5 @@
 # Installation guide
-To install the latest version of the graphical user interface of GHEtool, please visit the webpage of [GHEtool](http://ghetool.sysi.be/).
+To install the latest version of the graphical user interface of GHEtool, please visit our website [https://GHEtool.eu](https://ghetool.eu).
 
 One can install the graphical user interface with and without the command line.
 - Traditionally, the tool without the command line is the cleaner version. It just shows the graphical user interface, but no other (debug) messages.

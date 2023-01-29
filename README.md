@@ -150,22 +150,18 @@ A full list of functionalities is given below.
 ## Functionalities
 GHEtool offers functionalities of value to all different disciplines working with borefields. The features are available both in the code environment and in the GUI.
 For more information about the functionalities of GHEtool, please visit the [ReadTheDocs](https://ghetool.readthedocs.org).
+
 ## License
 
 *GHEtool* is licensed under the terms of the 3-clause BSD-license.
 See [GHEtool license](LICENSE).
 
-## Contributing to *GHEtool*
+## Contact GHEtool
+- Do you want to contribute to GHEtool?
+- Do you have a great idea for a new feature?
+- Do you have a specific remark/problem?
 
-You can report bugs and propose enhancements on the
-[issue tracker](https://github.com/wouterpeere/GHEtool/issues).
-If you want to add new features and contribute to the code,
-please contact Wouter Peere (wouter.peere@kuleuven.be).
-
-## Main contributors
-Wouter Peere, KU Leuven & boydens engineering (part of Sweco), wouter.peere@kuleuven.be
-
-Tobias Blanke, Solar-Institute Jülich, FH Aachen, blanke@sij.fh-aachen.de
+Please do contact us at [wouter@ghetool.eu](mailto:wouter@ghetool.eu).
 
 ## Citation
 Please cite GHEtool using the JOSS paper.
