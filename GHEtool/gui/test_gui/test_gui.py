@@ -244,8 +244,10 @@ def test_wrong_results_shown(qtbot):
         main_window.threads[0].run()
         main_window.threads[0].any_signal.connect(main_window.thread_function)
 
+    main_window.display_results()
     assert not main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
     assert main_window.gui_structure.result_Rb_calculated.is_hidden()
+    assert not main_window.gui_structure.figure_load_duration.is_hidden()
 
     main_window.gui_structure.option_method_rb_calc.set_value(1)
     main_window.save_scenario()
@@ -254,6 +256,7 @@ def test_wrong_results_shown(qtbot):
         main_window.threads[0].run()
         main_window.threads[0].any_signal.connect(main_window.thread_function)
 
+    main_window.display_results()
     assert not main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
     assert not main_window.gui_structure.result_Rb_calculated.is_hidden()
 
@@ -264,6 +267,7 @@ def test_wrong_results_shown(qtbot):
         main_window.threads[0].run()
         main_window.threads[0].any_signal.connect(main_window.thread_function)
 
+    main_window.display_results()
     assert not main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
     assert not main_window.gui_structure.result_Rb_calculated.is_hidden()
     main_window.list_widget_scenario.setCurrentRow(0)

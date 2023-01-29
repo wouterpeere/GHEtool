@@ -1606,6 +1606,12 @@ class Hint:
         self.hint: str = name
         self.label.setText(self.hint)
 
+    def __repr__(self):
+        return f'{type(self).__name__}; Hint: {self.hint}; Warning: {self.warning}'
+
+    def __str__(self):
+        return self.__repr__
+
 
 class FunctionButton:
     """
@@ -2128,6 +2134,12 @@ class Category:
             True if the option is hidden
         """
         return self.frame.isHidden()
+
+    def __repr__(self):
+        return f'{type(self).__name__}; Label: {self.label_text}'
+
+    def __str__(self):
+        return self.__repr__
 
 
 class FigureOption(ButtonBox):
