@@ -748,6 +748,18 @@ def test_change_scenario(qtbot):
     assert main_window.list_ds[1].option_conductivity == 3
 
 
+def test_repr(qtbot):
+    # init gui window
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    assert main_window.gui_structure.figure_temperature_profile.__repr__() == "ResultFigure; Label: Temperature evolution"
+    assert main_window.gui_structure.category_language.__repr__() == "Category; Label: Language: "
+    assert main_window.gui_structure.option_toggle_buttons.__repr__() == "ButtonBox; Label: Use toggle buttons?:; Value: 1"
+    assert main_window.gui_structure.hint_peak_heating.__repr__() == "Hint; Hint: Heating peak; Warning: False"
+    assert main_window.gui_structure.option_conductivity.__repr__() == "FloatBox; Label: Conductivity of the soil [W/mK]: ; Value: 1.5"
+    assert main_window.gui_structure.option_width.__repr__() == "IntBox; Label: Width of rectangular field [#]: ; Value: 9"
+    assert main_window.gui_structure.legend_figure_temperature_profile.__repr__() == "FigureOption; Label: Show legend?; Value: ('legend', False)"
+
+
 def test_backward_compatibility(qtbot):
     """
     test if the GUI is importing old files correctly
