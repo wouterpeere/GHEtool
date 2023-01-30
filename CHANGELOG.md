@@ -10,15 +10,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Variable temperature sizing (at least in the code version)
 - Reimplemented size by length and width
 
-## [2.1.1] - [expected] jan 2023
+## [2.1.1] - 2023-01-30
 
 ### Added
 - Added NavigationToolbar to figure (issue #55).
 - Added different peak lengths for heating and cooling separately (issue #72).
 - Readable saving format for gui (JSON).
 - A super class that contains functions relevant for all GHEtool classes.
-- Exe can be installed either locally for one user without admin permission or for all users using admin permission
-- Saved files (*.GHEtool) can be loaded from GHEtool by double click
+- Exe can be installed either locally for one user without admin permission or for all users using admin permission.
+- Saved files (*.GHEtool) can be loaded from GHEtool by double click.
 
 
 ### Changed
