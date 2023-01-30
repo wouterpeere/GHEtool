@@ -12,14 +12,14 @@
 
 GHEtool is a Python package that contains all the functionalities needed to deal with borefield design. It is developed for both researchers and practitioners.
 The core of this package is the automated sizing of borefield under different conditions. By making use of combination of just-in-time calculations of thermal ground responses (using [pygfunction](https://github.com/MassimoCimmino/pygfunction)) with
-intelligent interpolation, this automated sizing can be done in the order of milliseconds.
+intelligent interpolation, this automated sizing can be done in the order of milliseconds. Please visit our website [https://GHEtool.eu](https://GHEtool.eu) for more information.
 
 #### Read The Docs
 GHEtool has an elaborate documentation were all the functionalities of the tool are explained, with examples, literature and validation.
 This can be found on [GHEtool.readthedocs.io](https://ghetool.readthedocs.io).
 
 #### Graphical user interface
-GHEtool also comes with a *graphical user interface (GUI)*. This GUI is prebuilt as an exe-file (only for Windows platforms currently) because this provides access to all the functionalities without coding. A setup to install the GUI at the user-defined place is also implemented and available at [https://GHEtool.sysi.be](https://www.mech.kuleuven.be/en/tme/research/thermal_systems/tools/ghetool).
+GHEtool also comes with a *graphical user interface (GUI)*. This GUI is prebuilt as an exe-file (only for Windows platforms currently) because this provides access to all the functionalities without coding. A setup to install the GUI at the user-defined place is also implemented and available at [https://GHEtool.eu](https://GHEtool.eu).
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/sources/gui/_figure/GHEtool.PNG" width="600">
@@ -150,22 +150,18 @@ A full list of functionalities is given below.
 ## Functionalities
 GHEtool offers functionalities of value to all different disciplines working with borefields. The features are available both in the code environment and in the GUI.
 For more information about the functionalities of GHEtool, please visit the [ReadTheDocs](https://ghetool.readthedocs.org).
+
 ## License
 
 *GHEtool* is licensed under the terms of the 3-clause BSD-license.
 See [GHEtool license](LICENSE).
 
-## Contributing to *GHEtool*
+## Contact GHEtool
+- Do you want to contribute to GHEtool?
+- Do you have a great idea for a new feature?
+- Do you have a specific remark/problem?
 
-You can report bugs and propose enhancements on the
-[issue tracker](https://github.com/wouterpeere/GHEtool/issues).
-If you want to add new features and contribute to the code,
-please contact Wouter Peere (wouter.peere@kuleuven.be).
-
-## Main contributors
-Wouter Peere, KU Leuven & boydens engineering (part of Sweco), wouter.peere@kuleuven.be
-
-Tobias Blanke, Solar-Institute Jülich, FH Aachen, blanke@sij.fh-aachen.de
+Please do contact us at [wouter@ghetool.eu](mailto:wouter@ghetool.eu).
 
 ## Citation
 Please cite GHEtool using the JOSS paper.

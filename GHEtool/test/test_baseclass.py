@@ -1,10 +1,10 @@
-import pytest
+# import pytest
 import numpy as np
+import pygfunction as gt
 import json
 
 from GHEtool import *
 from GHEtool.VariableClasses.BaseClass import BaseClass
-from pygfunction.boreholes import rectangle_field
 
 
 class TestClass(BaseClass):
@@ -20,7 +20,7 @@ class TestClass(BaseClass):
         self.test_set = set([12, 14, 16])
         self.test_dictionary = {"a": 1, "b": 2}
         self.test_variable_class = GroundData(1, 2, 3)
-        self.test_pygfunction = rectangle_field(2, 1, 6, 6, 100, 4, 0.075)
+        self.test_pygfunction = gt.boreholes.rectangle_field(2, 1, 6, 6, 100, 4, 0.075)
 
     def clear(self):
         self.test_string = None
@@ -52,7 +52,7 @@ class TestClassesWithSlots(BaseClass):
         self.test_set = set([12, 14, 16])
         self.test_dictionary = {"a": 1, "b": 2}
         self.test_variable_class = GroundData(1, 2, 3)
-        self.test_pygfunction = rectangle_field(2, 1, 6, 6, 100, 4, 0.075)
+        self.test_pygfunction = gt.boreholes.rectangle_field(2, 1, 6, 6, 100, 4, 0.075)
 
     def clear(self):
         self.test_string = None
@@ -65,7 +65,7 @@ class TestClassesWithSlots(BaseClass):
         self.test_set = None
         self.test_dictionary = None
         self.test_variable_class = GroundData()
-        self.test_pygfunction
+        self.test_pygfunction = None
 
 
 def test_without_slots():
@@ -94,6 +94,11 @@ def test_without_slots():
     assert not test_class2.check_values()
     test_class2._from_dict(dictionary)
     dictionary = test_class2._to_dict()
+    assert isinstance(test_class2.test_pygfunction[0], gt.boreholes.Borehole)
+    assert isinstance(test_class2.test_tuple, tuple)
+    assert isinstance(test_class2.test_list, list)
+    assert isinstance(test_class2.test_set, set)
+    assert isinstance(test_class2.test_numpy, np.ndarray)
     assert dictionary["test_string"] == 'test'
     assert dictionary["test_int"] == 12
     assert dictionary["test_float"] == 12.5
@@ -137,6 +142,11 @@ def test_with_slots():
     assert not test_class2.check_values()
     test_class2._from_dict(dictionary)
     dictionary = test_class2._to_dict()
+    assert isinstance(test_class2.test_pygfunction[0], gt.boreholes.Borehole)
+    assert isinstance(test_class2.test_tuple, tuple)
+    assert isinstance(test_class2.test_list, list)
+    assert isinstance(test_class2.test_set, set)
+    assert isinstance(test_class2.test_numpy, np.ndarray)
     assert dictionary["test_string"] == 'test'
     assert dictionary["test_int"] == 12
     assert dictionary["test_float"] == 12.5
@@ -158,3 +168,5 @@ def test_with_slots():
 def test_json_dump():
     test_class = TestClass()
     json.dump(test_class._to_dict(), open('test.json', 'w'))
+
+test_with_slots()

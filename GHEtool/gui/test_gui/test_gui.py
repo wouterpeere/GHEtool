@@ -244,8 +244,10 @@ def test_wrong_results_shown(qtbot):
         main_window.threads[0].run()
         main_window.threads[0].any_signal.connect(main_window.thread_function)
 
+    main_window.display_results()
     assert not main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
     assert main_window.gui_structure.result_Rb_calculated.is_hidden()
+    assert not main_window.gui_structure.figure_load_duration.is_hidden()
 
     main_window.gui_structure.option_method_rb_calc.set_value(1)
     main_window.save_scenario()
@@ -254,6 +256,7 @@ def test_wrong_results_shown(qtbot):
         main_window.threads[0].run()
         main_window.threads[0].any_signal.connect(main_window.thread_function)
 
+    main_window.display_results()
     assert not main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
     assert not main_window.gui_structure.result_Rb_calculated.is_hidden()
 
@@ -264,6 +267,7 @@ def test_wrong_results_shown(qtbot):
         main_window.threads[0].run()
         main_window.threads[0].any_signal.connect(main_window.thread_function)
 
+    main_window.display_results()
     assert not main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
     assert not main_window.gui_structure.result_Rb_calculated.is_hidden()
     main_window.list_widget_scenario.setCurrentRow(0)
@@ -742,6 +746,18 @@ def test_change_scenario(qtbot):
     main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(1))
     assert main_window.list_ds[0].option_conductivity == 4
     assert main_window.list_ds[1].option_conductivity == 3
+
+
+def test_repr(qtbot):
+    # init gui window
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    assert main_window.gui_structure.figure_temperature_profile.__repr__() == "ResultFigure; Label: Temperature evolution"
+    assert main_window.gui_structure.category_language.__repr__() == "Category; Label: Language: "
+    assert main_window.gui_structure.option_toggle_buttons.__repr__() == "ButtonBox; Label: Use toggle buttons?:; Value: 1"
+    assert main_window.gui_structure.hint_peak_heating.__repr__() == "Hint; Hint: Heating peak; Warning: False"
+    assert main_window.gui_structure.option_conductivity.__repr__() == "FloatBox; Label: Conductivity of the soil [W/mK]: ; Value: 4.0"
+    assert main_window.gui_structure.option_width.__repr__() == "IntBox; Label: Width of rectangular field [#]: ; Value: 9"
+    assert main_window.gui_structure.legend_figure_temperature_profile.__repr__() == "FigureOption; Label: Show legend?; Value: ('legend', False)"
 
 
 def test_backward_compatibility(qtbot):

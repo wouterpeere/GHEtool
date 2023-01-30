@@ -370,9 +370,6 @@ class Option(metaclass=abc.ABCMeta):
     def __repr__(self):
         return f'{type(self).__name__}; Label: {self.label_text}; Value: {self.get_value()}'
 
-    def __str__(self):
-        return self.__repr__
-
 
 def check(linked_options: List[(Union[Option, List[Option]], int)], option_input: Option, index: int):
     """
@@ -1606,6 +1603,9 @@ class Hint:
         self.hint: str = name
         self.label.setText(self.hint)
 
+    def __repr__(self):
+        return f'{type(self).__name__}; Hint: {self.hint}; Warning: {self.warning}'
+
 
 class FunctionButton:
     """
@@ -2128,6 +2128,9 @@ class Category:
             True if the option is hidden
         """
         return self.frame.isHidden()
+
+    def __repr__(self):
+        return f'{type(self).__name__}; Label: {self.label_text}'
 
 
 class FigureOption(ButtonBox):

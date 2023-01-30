@@ -1,5 +1,8 @@
-def run():  # pragma: no cover
-    import pathlib
+from sys import argv
+
+
+def run(path_list=None):  # pragma: no cover
+    from pathlib import Path
     from configparser import ConfigParser
     from ctypes import windll as ctypes_windll
     from sys import exit as sys_exit
@@ -13,7 +16,7 @@ def run():  # pragma: no cover
     # init application
     app = QtWidgets_QApplication()
     # get current version
-    path = pathlib.Path(FOLDER).parent
+    path = Path(FOLDER).parent
     config = ConfigParser()
     config.read_file(open(path.joinpath('setup.cfg'), 'r'))
     version = config.get('metadata', 'version')
@@ -25,7 +28,11 @@ def run():  # pragma: no cover
     # init window
     window = QtWidgets_QMainWindow()
     # init gui window
-    MainWindow(window, app)
+    main_window = MainWindow(window, app)
+    # load file if it is in path list
+    if path_list is not None:
+        main_window.filename = ([path for path in path_list if path.endswith('.GHEtool')][0], 0)
+        main_window.fun_load_known_filename()
 
     # show window
     try:
@@ -39,4 +46,5 @@ def run():  # pragma: no cover
 
 
 if __name__ == "__main__":  # pragma: no cover
-    run()
+    # pass system args like a file to read
+    run(argv if len(argv) > 1 else None)
