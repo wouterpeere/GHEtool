@@ -1,7 +1,7 @@
 from sys import argv
 
 
-def run(path_list=None):
+def run(path_list=None):  # pragma: no cover
     from pathlib import Path
     from configparser import ConfigParser
     from ctypes import windll as ctypes_windll
@@ -45,6 +45,6 @@ def run(path_list=None):
     sys_exit(app.exec())
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     # pass system args like a file to read
     run(argv if len(argv) > 1 else None)
