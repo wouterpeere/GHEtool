@@ -1,5 +1,5 @@
-exclude GHEtool/test/*
-include GHEtool/test/test_GHEtool.py
-include GHEtool/Examples/hourly_profile.csv
+include GHEtool/test/*
+exclude GHEtool/test/test_validation.py
+include GHEtool/Examples/*
 exclude GHEtool/gui/*
 exclude GHEtool/gui/test_gui/*
