@@ -157,7 +157,6 @@ def empty_borefield():
 
 @pytest.fixture
 def hourly_borefield():
-    from GHEtool import FOLDER
     borefield = Borefield()
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)
@@ -170,7 +169,7 @@ def hourly_borefield_reversed():
     borefield = Borefield()
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)
-    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv", first_column_heating=False)
+    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), first_column_heating=False)
     return borefield
 
 
@@ -206,7 +205,8 @@ def test_empty_values(empty_borefield):
 
 
 def test_hourly_to_monthly(borefield):
-    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv", header=True, separator=";", first_column_heating=True)
+    from GHEtool import FOLDER
+    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), header=True, separator=";", first_column_heating=True)
     borefield.convert_hourly_to_monthly()
 
     assert np.isclose(np.sum(borefield.baseload_cooling), np.sum(borefield.hourly_cooling_load))
@@ -508,7 +508,7 @@ def test_check_hourly_load(borefield):
     except ValueError:
         assert True
 
-    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv")
+    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     borefield.hourly_cooling_load[0] = -1
     try:
         borefield._check_hourly_load()
@@ -517,12 +517,12 @@ def test_check_hourly_load(borefield):
 
 
 def test_load_hourly_data(borefield):
-    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv")
+    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     test_cooling = copy.copy(borefield.hourly_cooling_load)
-    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv", first_column_heating=False)
+    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), first_column_heating=False)
     assert np.array_equal(test_cooling, borefield.hourly_heating_load)
 
-    borefield.load_hourly_profile("GHEtool/test/hourly_profile_without_header.csv", header=False)
+    borefield.load_hourly_profile(FOLDER.joinpath("test/hourly_profile_without_header.csv"), header=False)
     assert np.array_equal(test_cooling, borefield.hourly_cooling_load)
 
 

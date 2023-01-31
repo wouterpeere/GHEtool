@@ -145,7 +145,7 @@ def test_size_L4_without_heating():
     from GHEtool import FOLDER
     borefield = Borefield()
     borefield.set_ground_parameters(data)
-    borefield.set_borefield(borefield_gt)
+    borefield.set_borefield(copy.copy(borefield_gt))
     borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     borefield.hourly_heating_load = np.zeros(8760)
     borefield.imbalance = np.sum(borefield.hourly_cooling_load) - np.sum(borefield.hourly_heating_load)
@@ -157,7 +157,7 @@ def test_size_L4_without_cooling():
     from GHEtool import FOLDER
     borefield = Borefield()
     borefield.set_ground_parameters(data)
-    borefield.set_borefield(borefield_gt)
+    borefield.set_borefield(copy.copy(borefield_gt))
     borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     borefield.hourly_cooling_load = np.zeros(8760)
     borefield.imbalance = np.sum(borefield.hourly_cooling_load) - np.sum(borefield.hourly_heating_load)
