@@ -7,6 +7,10 @@ from scipy import interpolate
 from .CustomGFunction import _timeValues
 
 
+class SmallerThenZeroError(Exception):
+    """Custom exception to handle borefield sizing with a depth below 0"""
+
+
 class FIFO:
     """
     This class is a container with n elements. If the n+1th element is added, the first is removed
@@ -316,7 +320,7 @@ class GFunction:
         """
         # raise error when value is negative
         if depth <= 0:
-            raise ValueError("The depth is smaller then zero!")
+            raise SmallerThenZeroError(f"The depth {depth} is smaller then zero!")
 
         # get nearest depth index
         val_depth, idx_depth = self._nearest_value(self.depth_array, depth)

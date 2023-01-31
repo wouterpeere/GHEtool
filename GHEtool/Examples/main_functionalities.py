@@ -21,7 +21,7 @@ def main_functionalities():
                       2.4 * 10**6)   # ground volumetric heat capacity (J/m3K)
 
     # monthly loading values
-    peak_cooling = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak cooling in kW
+    peak_cooling = np.array([0]*12)#[0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak cooling in kW
     peak_heating = np.array([160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.])  # Peak heating in kW
 
     # annual heating and cooling load
@@ -30,7 +30,7 @@ def main_functionalities():
 
     # percentage of annual load per month (15.5% for January ...)
     monthly_load_heating_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
-    monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
+    monthly_load_cooling_percentage = np.array([0]*12)#[0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
 
     # resulting load per month
     monthly_load_heating = annual_heating_load * monthly_load_heating_percentage   # kWh
