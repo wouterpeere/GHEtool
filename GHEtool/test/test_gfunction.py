@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 import time
 
-from GHEtool.VariableClasses import GFunction, FIFO
+from GHEtool.VariableClasses import GFunction, FIFO, SmallerThenZeroError
 from GHEtool import Borefield
 
 
@@ -100,7 +100,7 @@ def test_nearest_depth_index():
 
     try:
         gfunc._get_nearest_depth_index(-100)
-    except ValueError:
+    except SmallerThenZeroError:
         assert True
 
 

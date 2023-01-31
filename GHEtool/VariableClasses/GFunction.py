@@ -315,7 +315,7 @@ class GFunction:
 
         Raises
         ------
-        ValueError
+        SmallerThenZeroError
             When the depth is smaller or equal to zero
         """
         # raise error when value is negative
