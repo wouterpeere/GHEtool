@@ -167,6 +167,22 @@ class RaisingTempGround(GroundData_Base):
         return self.Tg + H * self.flux / self.k_s / 2
 
 
+class TempProfileData(BaseClass):
+    """Contains the data for temperature profile calculation"""
+
+    __slots__ = 'd_t', 'phi', 'd', 'h_start'
+
+    omega = 2 * pi / (3600 * 8760)
+
+    def __init__(self, d_t: float, phi: float, h_start: float, k_s: float, heat_cap: float):
+        self.d_t = d_t
+        self.phi = phi
+        self.d = np.sqrt(2*k_s/heat_cap/self.omega)
+        self.h_start = h_start
+
+
+
+
 class GroundData(BaseClass):
     """
     Contains information regarding the ground data of the borefield.
@@ -178,7 +194,10 @@ class GroundData(BaseClass):
                  T_g: float = None,
                  R_b: float = None,
                  volumetric_heat_capacity: float = 2.4 * 10**6,
-                 flux: float = 0.06):
+                 flux: float = 0.06,
+                 phi: float = None,
+                 d_t: float = None,
+                 h_start: float = None):
         """
 
         Parameters
@@ -205,6 +224,7 @@ class GroundData(BaseClass):
         else:
             self.alpha = self.k_s / self.volumetric_heat_capacity  # m2/s
         self._flux = flux  # W/m2
+        self.temp_profile = TempProfileData(d_t, phi, h_start, self.k_s, self.volumetric_heat_capacity)
         self.determine_Tg: Callable[[float, np.ndarray], np.ndarray] = self._constant_Tg if np.isclose(flux, 0) else self._raising_Tg
 
 
@@ -226,7 +246,7 @@ class GroundData(BaseClass):
         doc="The radius property."
     )
 
-    def calculate_Tg(self, H: float, time: np.ndarray) -> float:
+    def calculate_Tg(self, H: float, time: np.ndarray) -> np.ndarray:
         """
         This function gives back the ground temperature
         When use_constant_Tg is False, the thermal heat flux is taken into account.
@@ -238,7 +258,7 @@ class GroundData(BaseClass):
 
         Returns
         -------
-        Tg : float
+        Tg : np.ndarray
             Ground temperature [deg C]
         """
         return self.determine_Tg(H, time)
@@ -252,9 +272,28 @@ class GroundData(BaseClass):
         return (self.Tg + H * self.flux / self.k_s / 2) * np.ones_like(time)
 
     def _near_field_temperature(self, H: float, time: np.ndarray) -> np.ndarray:
-        T_new = self.Tg + self.dT * np.exp(-H/self.D) * np.sin(self.sigma * time + self.phi -H/self.D)
-        self.flux = -1 * self.k_s * self.dT / self.D * np.exp(-H/self.D) * (np.sin(H/self.D - self.sigma * time - self.phi) - np.cos(H/self.D - self.sigma *
-                                                                                                                                     time - self.phi))
+        # T_new = self.Tg + self.dT * np.exp(-H/self.D) * np.sin(self.sigma * time + self.phi -H/self.D)
+        time_long = np.insert(time, 0, 0)
+        time_1 = time_long[:-1]
+        time_2 = time_long[1:]
+        T_new = self.Tg + self.temp_profile.d_t * self.temp_profile.d / 2 / (H - self.temp_profile.h_start) / (time_2 - time_1) / self.temp_profile.omega * (
+                np.exp(-H / self.temp_profile.d) * (np.cos(H / self.temp_profile.d - self.temp_profile.omega * time_2 - self.temp_profile.phi) +
+                                                    np.sin(H / self.temp_profile.d - self.temp_profile.omega * time_2 - self.temp_profile.phi))
+                - np.exp(-self.temp_profile.h_start / self.temp_profile.d) * (
+                        np.cos(self.temp_profile.h_start / self.temp_profile.d - self.temp_profile.omega * time_2 - self.temp_profile.phi) -
+                        np.sin(self.temp_profile.h_start / self.temp_profile.d - self.temp_profile.omega * time_2 - self.temp_profile.phi)) - (
+                        np.exp(-H / self.temp_profile.d) * (np.cos(H / self.temp_profile.d - self.temp_profile.omega * time_1 - self.temp_profile.phi) +
+                                                            np.sin(H / self.temp_profile.d - self.temp_profile.omega * time_1 - self.temp_profile.phi))
+                        - np.exp(-self.temp_profile.h_start / self.temp_profile.d) * (
+                                np.cos(self.temp_profile.h_start / self.temp_profile.d - self.temp_profile.omega * time_1 - self.temp_profile.phi) -
+                                np.sin(self.temp_profile.h_start / self.temp_profile.d - self.temp_profile.omega * time_1 - self.temp_profile.phi))))
+        self.flux = self.k_s * self.temp_profile.d_t * self.temp_profile.d / (H - self.temp_profile.h_start) / (time_2 - time_1) / self.temp_profile.omega * (
+                np.exp(-H / self.temp_profile.d) * np.cos(H / self.temp_profile.d - self.temp_profile.omega * time_2 - self.temp_profile.phi) -
+                np.exp(-self.temp_profile.h_start / self.temp_profile.d) * (
+                    np.cos(self.temp_profile.h_start / self.temp_profile.d - self.temp_profile.omega * time_2 - self.temp_profile.phi)) - (
+                        np.exp(-H / self.temp_profile.d) * np.cos(H / self.temp_profile.d - self.temp_profile.omega * time_1 - self.temp_profile.phi) -
+                        np.exp(-self.temp_profile.h_start / self.temp_profile.d) * (
+                            np.cos(self.temp_profile.h_start / self.temp_profile.d - self.temp_profile.omega * time_1 - self.temp_profile.phi))))
         return T_new
 
     def __eq__(self, other):
