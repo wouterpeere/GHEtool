@@ -12,6 +12,7 @@ def run(path_list=None):  # pragma: no cover
 
     from GHEtool import FOLDER
     from GHEtool.gui.gui_combine_window import MainWindow
+    from GHEtool import ghe_logger
 
     # init application
     app = QtWidgets_QApplication()
@@ -34,12 +35,16 @@ def run(path_list=None):  # pragma: no cover
         main_window.filename = ([path for path in path_list if path.endswith('.GHEtool')][0], 0)
         main_window.fun_load_known_filename()
 
+    ghe_logger.addHandler(main_window.status_bar)
+
     # show window
     try:
         import pyi_splash
         pyi_splash.close()
     except ModuleNotFoundError:
         pass
+
+    ghe_logger.info('GHEtool loaded!')
     window.showMaximized()
     # close app
     sys_exit(app.exec())

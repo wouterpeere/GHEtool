@@ -7,6 +7,8 @@ import PySide6.QtCore as QtC
 import PySide6.QtGui as QtG
 import PySide6.QtWidgets as QtW
 
+import logging
+
 import GHEtool.gui.icons_rc
 
 WHITE: str = "rgb(255, 255, 255)"
@@ -16,6 +18,19 @@ DARK: str = "rgb(0, 64, 122)"
 GREY: str = "rgb(100, 100, 100)"
 WARNING: str = "rgb(255, 200, 87)"
 BLACK: str = "rgb(0, 0, 0)"
+
+
+class StatusBar(logging.Handler):
+    level_2_color: dict[str, str] = {'DEBUG': f'{WHITE}', 'INFO': f'{WHITE}', 'ERROR': 'rgb(255,0,0)', 'CRITICAL': 'rgb(255,0,0)', 'WARNING': WARNING}
+
+    def __init__(self, parent):
+        super().__init__()
+        self.widget: QtW.QStatusBar = QtW.QStatusBar(parent)
+
+    def emit(self, record: logging.LogRecord) -> None:
+        message = self.format(record)
+        self.widget.setStyleSheet(f'color: {self.level_2_color[record.levelname]};')
+        self.widget.showMessage(message, 10_000)
 
 
 def set_graph_layout() -> None:
@@ -53,7 +68,7 @@ class UiGhetool:
     """
 
     menuLanguage: QtW.QMenu
-    status_bar: QtW.QStatusBar
+    status_bar: StatusBar
     toolBar: QtW.QToolBar
     menuScenario: QtW.QMenu
     menuSettings: QtW.QMenu
@@ -397,10 +412,10 @@ class UiGhetool:
         )
         self.toolBar.setMovable(False)
         ghe_tool.addToolBar(QtC.Qt.TopToolBarArea, self.toolBar)
-        self.status_bar = QtW.QStatusBar(ghe_tool)
-        self.status_bar.setObjectName("status_bar")
-        self.status_bar.setStyleSheet(f"QStatusBar::item{'{'}border:None;{'}'}QStatusBar{'{'}color:{BLACK};background-color: {LIGHT};{'}'}")
-        ghe_tool.setStatusBar(self.status_bar)
+        self.status_bar = StatusBar(ghe_tool)
+        self.status_bar.widget.setObjectName("status_bar")
+        self.status_bar.widget.setStyleSheet(f"QStatusBar::item{'{'}border:None;{'}'}QStatusBar{'{'}color:{BLACK};background-color: {LIGHT};{'}'}")
+        ghe_tool.setStatusBar(self.status_bar.widget)
 
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuCalculation.menuAction())

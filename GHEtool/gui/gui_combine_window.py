@@ -23,7 +23,6 @@ from .gui_structure import FigureOption, GuiStructure, Option
 from .gui_classes import check_aim_options, show_linked_options
 from .translation_class import Translations
 
-
 currentdir = dirname(realpath(__file__))
 parentdir = dirname(currentdir)
 path.append(parentdir)
@@ -66,7 +65,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         super().setup_ui(dialog)
         # pyside6-rcc icons.qrc -o icons_rc.py
 
-        self.gui_structure = GuiStructure(self.central_widget, self.status_bar)
+        self.gui_structure = GuiStructure(self.central_widget, self.status_bar.widget)
         for page in self.gui_structure.list_of_pages:
             page.create_page(self.central_widget, self.stackedWidget, self.verticalLayout_menu)
 
@@ -116,9 +115,9 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # load backup data
         self.load_backup()
         # add progress bar and label to statusbar
-        self.status_bar.addPermanentWidget(self.label_Status, 0)
-        self.status_bar.addPermanentWidget(self.progressBar, 1)
-        self.status_bar.messageChanged.connect(self.status_hide)
+        self.status_bar.widget.addPermanentWidget(self.label_Status, 0)
+        self.status_bar.widget.addPermanentWidget(self.progressBar, 1)
+        self.status_bar.widget.messageChanged.connect(self.status_hide)
         # change window title to saved filename
         self.change_window_title()
         # reset push button size
@@ -130,7 +129,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
         [option.init_links() for option, _ in self.gui_structure.list_of_options]
 
-        self.status_bar.showMessage(self.translations.GHE_tool_imported[self.gui_structure.option_language.get_value()], 5000)
+        self.status_bar.widget.showMessage(self.translations.GHE_tool_imported[self.gui_structure.option_language.get_value()], 5000)
         # allow checking of changes
         self.checking: bool = True
 
@@ -588,9 +587,9 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         None
         """
         if text == "":
-            self.status_bar.hide()
+            self.status_bar.widget.hide()
             return
-        self.status_bar.show()
+        self.status_bar.widget.show()
 
     def eventFilter(self, obj: QtW.QPushButton, event) -> bool:
         """
@@ -708,7 +707,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # change language to english
         self.change_language()
         # show message that no backup file is found
-        self.status_bar.showMessage(self.translations.NoBackupFile[self.gui_structure.option_language.get_value()])
+        self.status_bar.widget.showMessage(self.translations.NoBackupFile[self.gui_structure.option_language.get_value()])
 
     def fun_save_auto(self) -> None:
         """
@@ -870,7 +869,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             self.checking: bool = True
         # if no file is found display error message is status bar
         except FileNotFoundError:
-            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
+            self.status_bar.widget.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
 
     def fun_save_as(self) -> None:
         """
@@ -919,7 +918,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             return True
         # show file not found message in status bar if an error appears
         except FileNotFoundError:
-            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
+            self.status_bar.widget.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
             return False
 
     def fun_new(self) -> None:
@@ -989,7 +988,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         if not all(option.check_value() for option, _ in self.gui_structure.list_of_options):
             for option, _ in self.gui_structure.list_of_options:
                 if not option.check_value():
-                    self.status_bar.showMessage(f'Wrong value in option with label: {option.label_text}', 5000)
+                    self.status_bar.widget.showMessage(f'Wrong value in option with label: {option.label_text}', 5000)
                     return False
         return True
 
@@ -1092,7 +1091,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         if opt_start:
             self.label_Status.show()
             self.progressBar.show()
-            self.status_bar.show()
+            self.status_bar.widget.show()
         else:
             self.label_Status.hide()
             self.progressBar.hide()
@@ -1105,7 +1104,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             self.label_Status.hide()
             self.progressBar.hide()
             # show message that calculation is finished
-            self.status_bar.showMessage(self.translations.Calculation_Finished[self.gui_structure.option_language.get_value()], 5000)
+            self.status_bar.widget.showMessage(self.translations.Calculation_Finished[self.gui_structure.option_language.get_value()], 5000)
 
     def thread_function(self, results: Tuple[DataStorage, int]) -> None:
         """
@@ -1314,11 +1313,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         """
         This function is called when the gui is closed. It will prompt a window asking if potential changes
         need to be saved.
-
-        Parameters
-        ----------
-        event
-            closing event
 
         Returns
         -------
