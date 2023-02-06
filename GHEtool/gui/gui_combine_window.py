@@ -827,10 +827,10 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             with open(location, "w") as file:
                 dump(saving, file, indent=1)
         except FileNotFoundError:
-            self.status_bar.showMessage(
+            self.status_bar.widget.showMessage(
                 self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
         except PermissionError:
-            self.status_bar.showMessage("PermissionError", 5000)
+            self.status_bar.widget.showMessage("PermissionError", 5000)
 
     def fun_load(self) -> None:
         """
