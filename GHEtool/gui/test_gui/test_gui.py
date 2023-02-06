@@ -637,7 +637,7 @@ def test_no_load_save_file(qtbot):
         main_window._load_from_data('not_there.GHEtool')
     # check if the current error message is shown with a wrong save file/folder
     main_window._save_to_data('hello/not_there.GHEtool')
-    assert main_window.status_bar.currentMessage() == main_window.translations.NoFileSelected[main_window.gui_structure.option_language.get_value()]
+    assert main_window.status_bar.widget.currentMessage() == main_window.translations.NoFileSelected[main_window.gui_structure.option_language.get_value()]
 
 
 def test_change_scenario(qtbot):
