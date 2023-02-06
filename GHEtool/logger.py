@@ -5,7 +5,9 @@ log_format = logging.Formatter("%(asctime)s %(message)s")
 ghe_logger = logging.getLogger()
 ghe_logger.setLevel(logging.INFO)
 
-file_handler = logging.FileHandler(PurePath(Path.home(), 'Documents/GHEtool').joinpath('GHEtool.log'), mode='w')
+log_file_path = Path(PurePath(Path.home(), 'Documents/GHEtool'))
+log_file_path.mkdir(parents=True, exist_ok=True)
+file_handler = logging.FileHandler(log_file_path.joinpath('GHEtool.log'), mode='w')
 file_handler.setFormatter(log_format)
 ghe_logger.addHandler(file_handler)
 
