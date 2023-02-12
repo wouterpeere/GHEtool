@@ -10,6 +10,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Variable temperature sizing (at least in the code version)
 - Reimplemented size by length and width
 
+### Fixed
+- Wrong heating load in april in GUI (issue #94).
+
 ## [2.1.1] - 2023-01-30
 
 ### Added
