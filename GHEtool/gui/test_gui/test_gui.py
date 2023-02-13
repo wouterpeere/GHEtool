@@ -1,15 +1,18 @@
 import os
 from math import isclose
-from typing import List, Union
-
 from sys import setrecursionlimit
-from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
-from GHEtool.gui.gui_combine_window import MainWindow
+from typing import List
+
 import PySide6.QtCore as QtC
 import PySide6.QtWidgets as QtW
+from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
 
 from GHEtool import FOLDER
-from GHEtool.gui.gui_classes import ButtonBox, FigureOption, FileNameBox, FloatBox, IntBox, ListBox
+from GHEtool.gui.gui_classes.gui_structure_classes import ButtonBox, FigureOption, FloatBox, IntBox, ListBox
+from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
+
+import keyboard
+import pathlib
 
 setrecursionlimit(1500)
 
@@ -473,9 +476,6 @@ def test_save_load_new(qtbot):
     qtbot: qtbot
         bot for the GUI
     """
-    import keyboard
-    import pathlib
-    import os
     # init gui window
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
     main_window.delete_backup()
@@ -493,8 +493,8 @@ def test_save_load_new(qtbot):
     if os.path.exists(main_window.default_path.joinpath(filename_3)):
         os.remove(main_window.default_path.joinpath(filename_3))
     # trigger save action and add filename
-    QtC.QTimer.singleShot(1, lambda: keyboard.write(filename_1))
-    QtC.QTimer.singleShot(10, lambda: keyboard.press('enter'))
+    QtC.QTimer.singleShot(10, lambda: keyboard.write(filename_1))
+    QtC.QTimer.singleShot(20, lambda: keyboard.press('enter'))
     main_window.actionSave.trigger()
     # check if filename is set correctly
     assert (pathlib.Path(main_window.filename[0]), main_window.filename[1]) == (main_window.default_path.joinpath(filename_1), 'GHEtool (*.GHEtool)')
@@ -504,21 +504,21 @@ def test_save_load_new(qtbot):
     # check that they differ
     assert list_old != main_window.list_ds
     # set a different filename and test save as action
-    QtC.QTimer.singleShot(1, lambda: keyboard.write(filename_2))
-    QtC.QTimer.singleShot(10, lambda: keyboard.press('enter'))
+    QtC.QTimer.singleShot(10, lambda: keyboard.write(filename_2))
+    QtC.QTimer.singleShot(20, lambda: keyboard.press('enter'))
     main_window.actionSave_As.trigger()
     # check if filename is set correctly
     assert (pathlib.Path(main_window.filename[0]), main_window.filename[1]) == (main_window.default_path.joinpath(filename_2), 'GHEtool (*.GHEtool)')
     # trigger open function and set filename 1
-    QtC.QTimer.singleShot(1, lambda: keyboard.write(filename_1))
+    QtC.QTimer.singleShot(10, lambda: keyboard.write(filename_1))
     QtC.QTimer.singleShot(10, lambda: keyboard.press('enter'))
     main_window.actionOpen.trigger()
     # check if filename is imported correctly and the data storages as well
     assert (pathlib.Path(main_window.filename[0]), main_window.filename[1]) == (main_window.default_path.joinpath(filename_1), 'GHEtool (*.GHEtool)')
     assert list_old == main_window.list_ds
     # set a different filename and test new action
-    QtC.QTimer.singleShot(1, lambda: keyboard.write(filename_3))
-    QtC.QTimer.singleShot(10, lambda: keyboard.press('enter'))
+    QtC.QTimer.singleShot(10, lambda: keyboard.write(filename_3))
+    QtC.QTimer.singleShot(20, lambda: keyboard.press('enter'))
     main_window.actionNew.trigger()
     assert (pathlib.Path(main_window.filename[0]), main_window.filename[1]) == (main_window.default_path.joinpath(filename_3), 'GHEtool (*.GHEtool)')
     assert len(main_window.list_ds) < 1
@@ -533,7 +533,7 @@ def test_close(qtbot):
     qtbot: qtbot
         bot for the GUI
     """
-    import keyboard
+
     # init gui window
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
     main_window.delete_backup()
@@ -628,6 +628,7 @@ def test_no_load_save_file(qtbot):
         bot for the GUI
     """
     from pytest import raises
+
     # init gui window
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
     main_window.delete_backup()
@@ -770,7 +771,9 @@ def test_backward_compatibility(qtbot):
         bot for the GUI
     """
     import numpy as np
+
     from GHEtool import FOLDER
+
     # init gui window
     main_window_old = MainWindow(QtWidgets_QMainWindow(), qtbot)
     main_window_old._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_2_1_0.GHEtool')
@@ -786,4 +789,3 @@ def test_backward_compatibility(qtbot):
             if isinstance(getattr(ds_old, option), (str, bool)):
                 assert getattr(ds_old, option) == getattr(ds_new, option)
                 continue
-

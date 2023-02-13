@@ -9,7 +9,7 @@ def main():
 
     df1 = read_csv(FOLDER.joinpath('gui/Translations.csv'), sep=';', encoding='utf-8')
 
-    file_name = FOLDER.joinpath('gui/translation_class.py')
+    file_name = FOLDER.joinpath('gui/gui_classes/translation_class.py')
 
     with open(file_name, 'w', encoding='utf-8') as file:
         file.write('from typing import List\n')

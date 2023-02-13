@@ -1,28 +1,28 @@
 from __future__ import annotations
+
+import pathlib
+from configparser import ConfigParser
 from functools import partial as ft_partial
-from pickle import load as pk_load
-from json import dump, load, JSONDecodeError
+from json import JSONDecodeError, dump, load
 from os import makedirs, remove
 from os.path import dirname, exists, realpath
 from os.path import split as os_split
 from pathlib import Path, PurePath
+from pickle import load as pk_load
 from sys import path
-from typing import List, Tuple, Optional, Union
-from GHEtool import Borefield, FOLDER
-from configparser import ConfigParser
+from typing import List, Optional, Tuple, Union
 
 import PySide6.QtCore as QtC
 import PySide6.QtGui as QtG
 import PySide6.QtWidgets as QtW
-import pathlib
 
-from .gui_base_class import UiGhetool, set_graph_layout
-from .gui_calculation_thread import CalcProblem
-from .gui_data_storage import DataStorage
-from .gui_structure import FigureOption, GuiStructure, Option
-from .gui_classes import check_aim_options, show_linked_options
-from .translation_class import Translations
-
+from GHEtool import FOLDER, Borefield
+from GHEtool.gui.gui_classes.gui_base_class import UiGhetool, set_graph_layout
+from GHEtool.gui.gui_classes.gui_calculation_thread import CalcProblem
+from GHEtool.gui.gui_classes.gui_structure_classes.functions import check_aim_options, show_linked_options
+from GHEtool.gui.gui_classes.translation_class import Translations
+from GHEtool.gui.gui_data_storage import DataStorage
+from GHEtool.gui.gui_structure import FigureOption, GuiStructure, Option
 
 currentdir = dirname(realpath(__file__))
 parentdir = dirname(currentdir)
@@ -165,7 +165,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         """
         action = QtG.QAction(self.central_widget)
         icon = QtG.QIcon()
-        icon.addFile(icon_name, QtC.QSize(), QtG.QIcon.Normal, QtG.QIcon.Off)
+        icon.addFile(f'{FOLDER}/gui/icons/{icon_name}', QtC.QSize(), QtG.QIcon.Normal, QtG.QIcon.Off)
         action.setIcon(icon)
         self.menuLanguage.addAction(action)
         action.setText(name)

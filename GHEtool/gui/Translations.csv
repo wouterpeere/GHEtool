@@ -1,5 +1,5 @@
 ﻿name;English;German;Dutch;Italian;French;Spanish;Galician
-icon;:/icons/icons/Flag_English.svg;:/icons/icons/Flag_German.svg;:/icons/icons/Flag_Dutch.svg;:/icons/icons/Flag_Italian.svg;:/icons/icons/Flag_French.svg;:/icons/icons/Flag_Spain.svg;:/icons/icons/Flag_Galicia.svg
+icon;Flag_English.svg;Flag_German.svg;Flag_Dutch.svg;Flag_Italian.svg;Flag_French.svg;Flag_Spain.svg;Flag_Galicia.svg
 short_cut;Ctrl+Alt+E;Ctrl+Alt+G;Ctrl+Alt+D;Ctrl+Alt+I;Ctrl+Alt+F;Ctrl+Alt+S;Ctrl+Alt+A
 scenarioString;Scenario;Szenario;Scenario;Scenario;Scénario;Escenario;Escenario
 label_Language;Language: ;Sprache: ;Taal: ;Languange: ;Languange: ;Idioma:;Lingua: 
@@ -165,6 +165,7 @@ option_pipe_conductivity;Pipe thermal conductivity [W/mK]: ;Wärmeleitfähigkeit
 option_pipe_outer_radius;Outer pipe radius [m]: ;Äußerer Rohrradius [m]: ;Straal buitenkant leiding [m]: ;Outer pipe radius [m]: ;Outer pipe radius [m]: ;Outer pipe radius [m]: ;Outer pipe radius [m]: 
 option_pipe_inner_radius;Inner pipe radius [m]: ;Innerer Rohrradius [m]: ;Straal binnenkant leiding [m]: ;Inner pipe radius [m]: ;Inner pipe radius [m]: ;Inner pipe radius [m]: ;Inner pipe radius [m]: 
 option_pipe_borehole_radius;Borehole radius [m]:;Bohrlochradius [m]:;Boorgatstraal [m]:;Borehole radius [m]:;Borehole radius [m]:;Borehole radius [m]:;Borehole radius [m]:
+option_pipe_borehole_radius_2;Borehole radius [m]:;Bohrlochradius [m]:;Boorgatstraal [m]:;Borehole radius [m]:;Borehole radius [m]:;Borehole radius [m]:;Borehole radius [m]:
 option_pipe_distance;Distance of pipe until center [m]:;Distanz zwischen Rohr und Mittelpunkt [m]:;Afstand van de leiding tot het centrum van het boorgat [m]:;Distance of pipe until center [m]:;Distance of pipe until center [m]:;Distance of pipe until center [m]:;Distance of pipe until center [m]:
 option_pipe_roughness;Pipe roughness [m]:;Rohrrauhigkeit [m]:;Ruwheid leiding [m]:;Pipe roughness [m]:;Pipe roughness [m]:;Pipe roughness [m]:;Pipe roughness [m]:
 option_pipe_depth;Burial depth [m]:;Vergrabungstiefe [m]:;Begraven diepte [m]:;Burial depth [m]:;Burial depth [m]:;Burial depth [m]:;Burial depth [m]:

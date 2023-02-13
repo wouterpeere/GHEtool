@@ -28,6 +28,7 @@ UsePreviousAppDir=yes
 DefaultDirName={autopf}\{#MyAppName}
 ChangesAssociations=yes
 DisableProgramGroupPage=yes
+LicenseFile="{#LinkToGHEtool}\LICENSE"
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
@@ -71,6 +72,9 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "{#LinkToGHEtool}\dist\GHEtool_with_command_line\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#LinkToGHEtool}\dist\GHEtool_with_command_line\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#LinkToGHEtool}\GHEtool\gui\font\Lexend-Regular.TTF"; DestDir: "{autofonts}"; FontInstall: "Lexend"; Flags: onlyifdoesntexist uninsneveruninstall
+Source: "{#LinkToGHEtool}\GHEtool\gui\font\Lexend-Light.TTF"; DestDir: "{autofonts}"; FontInstall: "Lexend Light"; Flags: onlyifdoesntexist uninsneveruninstall
+Source: "{#LinkToGHEtool}\GHEtool\gui\font\Lexend-SemiBold.TTF"; DestDir: "{autofonts}"; FontInstall: "Lexend SemiBold"; Flags: onlyifdoesntexist uninsneveruninstall
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Registry]

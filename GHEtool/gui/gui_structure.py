@@ -2,7 +2,7 @@
 This document contains all the information relevant for the GUI.
 It contains all the options, categories etc. that should appear on the GUI.
 """
-from math import cos, pi, sin, tan
+from math import cos, pi, sin
 from typing import List, Optional, Tuple, Union
 
 import PySide6.QtGui as QtG
@@ -11,8 +11,8 @@ from numpy import array, cos, int64, round, sin, sum
 from pandas import DataFrame as pd_DataFrame
 from pandas import read_csv as pd_read_csv
 
-from GHEtool.gui.gui_base_class import DARK, GREY, LIGHT, WHITE
-from GHEtool.gui.gui_classes import (
+from GHEtool.gui.gui_classes.gui_base_class import DARK, GREY, LIGHT, WHITE
+from GHEtool.gui.gui_classes.gui_structure_classes import (
     Aim,
     ButtonBox,
     Category,
@@ -27,9 +27,8 @@ from GHEtool.gui.gui_classes import (
     Page,
     ResultFigure,
     ResultText,
-    check_aim_options,
 )
-from GHEtool.gui.translation_class import Translations
+from GHEtool.gui.gui_classes.translation_class import Translations
 
 
 def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, cooling_load_column: str, combined: str, sep: str,
@@ -170,825 +169,837 @@ class GuiStructure:
         #                                                                                                               #
         #################################################################################################################
 
-        def create_page_aim():
-            # create page
-            self.page_aim = Page(name="Aim of simulation", button_name="Aim", icon=":/icons/icons/Aim_Inv.svg")
 
-            self.aim_temp_profile = Aim(page=self.page_aim, label="Determine temperature profile", icon=":/icons/icons/Temp_Profile.svg")
-            self.aim_req_depth = Aim(page=self.page_aim, label="Determine required depth", icon=":/icons/icons/Depth_determination.svg")
-            # self.aim_size_length = Aim(page=self.page_aim, label="Size borefield by length and width", icon=":/icons/icons/Size_Length.svg")
-            self.aim_optimize = Aim(page=self.page_aim, label="Optimize load profile", icon=":/icons/icons/Optimize_Profile.svg")
+        #def create_page_aim():
+        # create page
+        self.page_aim = Page(name="Aim of simulation", button_name="Aim", icon="Aim_Inv.svg")
 
-        def create_page_options():
-            # create page
-            self.page_options = Page("Options", "Options", ":/icons/icons/Options.svg")
-            self.page_aim.set_next_page(self.page_options)
-            self.page_options.set_previous_page(self.page_aim)
+        self.aim_temp_profile = Aim(page=self.page_aim, label="Determine temperature profile", icon="Temp_Profile.svg")
+        self.aim_req_depth = Aim(page=self.page_aim, label="Determine required depth", icon="depth_determination.svg")
+        # self.aim_size_length = Aim(page=self.page_aim, label="Size borefield by length and width", icon="Size_Length.svg")
+        self.aim_optimize = Aim(page=self.page_aim, label="Optimize load profile", icon="Optimize_Profile.svg")
 
-            def create_category_calculation():
-                self.category_calculation = Category(page=self.page_options, label="Calculation options")
+        #def create_page_options():
+        # create page
+        self.page_options = Page("Options", "Options", "Options.svg")
+        self.page_aim.set_next_page(self.page_options)
+        self.page_options.set_previous_page(self.page_aim)
 
-                self.option_method_size_depth = ButtonBox(label="Method for size borehole depth:", default_index=0,
-                                                          entries=[" L2 ", " L3 ", "  L4  "],
-                                                          category=self.category_calculation)
-                # self.option_method_size_length = ButtonBox(label="Method for size width and length:", default_index=0,
-                #                                            entries=[" L2 ", " L3 "], category=self.category_calculation)
-                self.option_method_temp_gradient = ButtonBox(
-                    label="Should a temperature gradient over depth be considered?:", default_index=0,
-                    entries=[" no ", " yes  "], category=self.category_calculation)
-                self.option_method_rb_calc = ButtonBox(label="Borehole resistance calculation method:", default_index=0,
-                                                       entries=[" constant ", " dynamic "],
-                                                       category=self.category_calculation)
-                self.option_temperature_profile_hourly = ButtonBox(
-                    label="Should hourly data be used for the temperature profile?", default_index=0,
-                    entries=[" no ", " yes "], category=self.category_calculation)
-                # add dependencies
-                # self.aim_size_length.add_link_2_show(self.option_method_size_length)
-                self.aim_req_depth.add_link_2_show(self.option_method_size_depth)
-                self.aim_temp_profile.add_link_2_show(self.option_temperature_profile_hourly)
+        #def create_category_calculation():
+        self.category_calculation = Category(page=self.page_options, label="Calculation options")
 
-            # create categories
-            create_category_calculation()
+        self.option_method_size_depth = ButtonBox(label="Method for size borehole depth:", default_index=0,
+                                                  entries=[" L2 ", " L3 ", "  L4  "],
+                                                  category=self.category_calculation)
+        # self.option_method_size_length = ButtonBox(label="Method for size width and length:", default_index=0,
+        #                                            entries=[" L2 ", " L3 "], category=self.category_calculation)
+        self.option_method_temp_gradient = ButtonBox(
+            label="Should a temperature gradient over depth be considered?:", default_index=0,
+            entries=[" no ", " yes  "], category=self.category_calculation)
+        self.option_method_rb_calc = ButtonBox(label="Borehole resistance calculation method:", default_index=0,
+                                               entries=[" constant ", " dynamic "],
+                                               category=self.category_calculation)
+        self.option_temperature_profile_hourly = ButtonBox(
+            label="Should hourly data be used for the temperature profile?:", default_index=0,
+            entries=[" no ", " yes "], category=self.category_calculation)
+        # add dependencies
+        # self.aim_size_length.add_link_2_show(self.option_method_size_length)
+        self.aim_req_depth.add_link_2_show(self.option_method_size_depth)
+        self.aim_temp_profile.add_link_2_show(self.option_temperature_profile_hourly)
 
-        def create_page_borehole():
-            # create page
-            self.page_borehole = Page("Borehole and earth", "Borehole\nand earth", ":/icons/icons/Borehole.png")
-            self.page_options.set_next_page(self.page_borehole)
-            self.page_borehole.set_previous_page(self.page_options)
+        # create categories
+        #create_category_calculation()
 
-            def create_category_earth():
-                self.category_earth = Category(
-                    page=self.page_borehole,
-                    label="Earth properties",
-                )
+        # def create_page_borehole():
+        # create page
+        self.page_borehole = Page("Borehole and earth", "Borehole\nand earth", "Borehole.png")
+        self.page_options.set_next_page(self.page_borehole)
+        self.page_borehole.set_previous_page(self.page_options)
 
-                self.option_conductivity = FloatBox(
-                    category=self.category_earth,
-                    label="Conductivity of the soil [W/mK]: ",
-                    default_value=1.5,
-                    decimal_number=3,
-                    minimal_value=0.1,
-                    maximal_value=10,
-                    step=0.1,
-                )
+        # def create_category_earth():
+        self.category_earth = Category(
+            page=self.page_borehole,
+            label="Earth properties",
+        )
 
-                self.option_heat_capacity = FloatBox(
-                    category=self.category_earth,
-                    label="Ground volumetric heat capacity [kJ / m³ K]: ",
-                    default_value=2400,
-                    decimal_number=1,
-                    minimal_value=1,
-                    maximal_value=100000,
-                    step=100,
-                )
-                self.option_ground_temp = FloatBox(
-                    category=self.category_earth,
-                    label="Ground temperature at infinity [°C]: ",
-                    default_value=12,
-                    decimal_number=2,
-                    minimal_value=-273.15,
-                    maximal_value=100,
-                    step=0.1,
-                )
-                self.option_ground_temp_gradient = FloatBox(
-                    category=self.category_earth,
-                    label="Ground surface temperature [°C]: ",
-                    default_value=10,
-                    decimal_number=2,
-                    minimal_value=-273.15,
-                    maximal_value=100,
-                    step=0.1,
-                )
-                self.option_temp_gradient = FloatBox(
-                    category=self.category_earth,
-                    label="Temperature gradient [K/100m]: ",
-                    default_value=2,
-                    decimal_number=3,
-                    minimal_value=-273.15,
-                    maximal_value=100,
-                    step=0.1,
-                )
+        self.option_conductivity = FloatBox(
+            category=self.category_earth,
+            label="Conductivity of the soil [W/mK]: ",
+            default_value=1.5,
+            decimal_number=3,
+            minimal_value=0.1,
+            maximal_value=10,
+            step=0.1,
+        )
 
-                # add dependencies
-                self.option_method_temp_gradient.add_link_2_show(self.option_ground_temp_gradient, on_index=1)
-                self.option_method_temp_gradient.add_link_2_show(self.option_temp_gradient, on_index=1)
-                self.option_method_temp_gradient.add_link_2_show(self.option_ground_temp, on_index=0)
+        self.option_heat_capacity = FloatBox(
+            category=self.category_earth,
+            label="Ground volumetric heat capacity [kJ / m³ K]: ",
+            default_value=2400,
+            decimal_number=1,
+            minimal_value=1,
+            maximal_value=100_000,
+            step=100,
+        )
+        self.option_ground_temp = FloatBox(
+            category=self.category_earth,
+            label="Ground temperature at infinity [°C]: ",
+            default_value=12,
+            decimal_number=2,
+            minimal_value=-273.15,
+            maximal_value=100,
+            step=0.1,
+        )
+        self.option_ground_temp_gradient = FloatBox(
+            category=self.category_earth,
+            label="Ground surface temperature [°C]: ",
+            default_value=10,
+            decimal_number=2,
+            minimal_value=-273.15,
+            maximal_value=100,
+            step=0.1,
+        )
+        self.option_temp_gradient = FloatBox(
+            category=self.category_earth,
+            label="Temperature gradient [K/100m]: ",
+            default_value=2,
+            decimal_number=3,
+            minimal_value=-273.15,
+            maximal_value=100,
+            step=0.1,
+        )
 
-            def create_category_borehole():
-                self.category_borehole = Category(
-                    page=self.page_borehole,
-                    label="Borehole properties",
-                )
-                self.option_depth = FloatBox(
-                    category=self.category_borehole,
-                    label="Borehole depth [m]: ",
-                    default_value=100,
-                    decimal_number=2,
-                    minimal_value=0,
-                    maximal_value=500,
-                    step=1,
-                )
-                # self.option_max_depth = FloatBox(
-                #     category=self.category_borehole,
-                #     label="Maximal borehole depth [m]: ",
-                #     default_value=150,
-                #     decimal_number=2,
-                #     minimal_value=0,
-                #     maximal_value=500,
-                #     step=1,
-                # )
-                self.option_spacing = FloatBox(
-                    category=self.category_borehole,
-                    label="Borehole spacing [m]: ",
-                    default_value=6,
-                    decimal_number=2,
-                    minimal_value=1,
-                    maximal_value=99,
-                    step=0.1,
-                )
-                # self.option_min_spacing = FloatBox(
-                #     category=self.category_borehole,
-                #     label="Minimal borehole spacing [m]: ",
-                #     default_value=3,
-                #     decimal_number=2,
-                #     minimal_value=1,
-                #     maximal_value=99,
-                #     step=0.1,
-                # )
-                # self.option_max_spacing = FloatBox(
-                #     category=self.category_borehole,
-                #     label="Maximal borehole spacing [m]: ",
-                #     default_value=9,
-                #     decimal_number=2,
-                #     minimal_value=1,
-                #     maximal_value=99,
-                #     step=0.1,
-                # )
-                self.option_width = IntBox(
-                    category=self.category_borehole, label="Width of rectangular field [#]: ", default_value=9, minimal_value=1, maximal_value=40
-                )
-                self.option_length = IntBox(
-                    category=self.category_borehole, label="Length of rectangular field [#]: ", default_value=12, minimal_value=1, maximal_value=40
-                )
-                # self.option_max_width = FloatBox(
-                #     category=self.category_borehole,
-                #     label="Maximal width of rectangular field [m]: ",
-                #     default_value=160,
-                #     decimal_number=2,
-                #     minimal_value=1,
-                #     maximal_value=1000,
-                #     step=1,
-                # )
-                # self.option_max_length = FloatBox(
-                #     category=self.category_borehole,
-                #     label="Maximal length of rectangular field [m]: ",
-                #     default_value=150,
-                #     decimal_number=2,
-                #     minimal_value=1,
-                #     maximal_value=1000,
-                #     step=1,
-                # )
-                self.option_pipe_depth = FloatBox(
-                    category=self.category_borehole,
-                    label="Burial depth [m]: ",
-                    default_value=1,
-                    decimal_number=1,
-                    minimal_value=0,
-                    maximal_value=10000,
-                    step=0.1,
-                )
+        # add dependencies
+        self.option_method_temp_gradient.add_link_2_show(self.option_ground_temp_gradient, on_index=1)
+        self.option_method_temp_gradient.add_link_2_show(self.option_temp_gradient, on_index=1)
+        self.option_method_temp_gradient.add_link_2_show(self.option_ground_temp, on_index=0)
 
-                self.option_pipe_borehole_radius = FloatBox(
-                    category=self.category_borehole,
-                    label="Borehole radius [m]: ",
-                    default_value=0.075,
-                    decimal_number=4,
-                    minimal_value=0,
-                    maximal_value=10000,
-                    step=0.001,
-                )
-                self.option_pipe_borehole_radius.change_event(self.check_distance_between_pipes)
+        # def create_category_borehole():
+        self.category_borehole = Category(
+            page=self.page_borehole,
+            label="Borehole properties",
+        )
+        self.option_depth = FloatBox(
+            category=self.category_borehole,
+            label="Borehole depth [m]: ",
+            default_value=100,
+            decimal_number=2,
+            minimal_value=0,
+            maximal_value=5_000,
+            step=1,
+        )
+        # self.option_max_depth = FloatBox(
+        #     category=self.category_borehole,
+        #     label="Maximal borehole depth [m]: ",
+        #     default_value=150,
+        #     decimal_number=2,
+        #     minimal_value=0,
+        #     maximal_value=500,
+        #     step=1,
+        # )
+        self.option_spacing = FloatBox(
+            category=self.category_borehole,
+            label="Borehole spacing [m]: ",
+            default_value=6,
+            decimal_number=2,
+            minimal_value=1,
+            maximal_value=99,
+            step=0.1,
+        )
+        # self.option_min_spacing = FloatBox(
+        #     category=self.category_borehole,
+        #     label="Minimal borehole spacing [m]: ",
+        #     default_value=3,
+        #     decimal_number=2,
+        #     minimal_value=1,
+        #     maximal_value=99,
+        #     step=0.1,
+        # )
+        # self.option_max_spacing = FloatBox(
+        #     category=self.category_borehole,
+        #     label="Maximal borehole spacing [m]: ",
+        #     default_value=9,
+        #     decimal_number=2,
+        #     minimal_value=1,
+        #     maximal_value=99,
+        #     step=0.1,
+        # )
+        self.option_width = IntBox(
+            category=self.category_borehole, label="Width of rectangular field [#]: ", default_value=9, minimal_value=1, maximal_value=40
+        )
+        self.option_length = IntBox(
+            category=self.category_borehole, label="Length of rectangular field [#]: ", default_value=12, minimal_value=1, maximal_value=40
+        )
+        # self.option_max_width = FloatBox(
+        #     category=self.category_borehole,
+        #     label="Maximal width of rectangular field [m]: ",
+        #     default_value=160,
+        #     decimal_number=2,
+        #     minimal_value=1,
+        #     maximal_value=1000,
+        #     step=1,
+        # )
+        # self.option_max_length = FloatBox(
+        #     category=self.category_borehole,
+        #     label="Maximal length of rectangular field [m]: ",
+        #     default_value=150,
+        #     decimal_number=2,
+        #     minimal_value=1,
+        #     maximal_value=1000,
+        #     step=1,
+        # )
+        self.option_pipe_depth = FloatBox(
+            category=self.category_borehole,
+            label="Burial depth [m]: ",
+            default_value=1,
+            decimal_number=1,
+            minimal_value=0,
+            maximal_value=10000,
+            step=0.1,
+        )
 
-                # add dependencies
-                self.aim_temp_profile.add_link_2_show(self.option_depth)
-                self.aim_optimize.add_link_2_show(self.option_depth)
+        self.option_pipe_borehole_radius = FloatBox(
+            category=self.category_borehole,
+            label="Borehole radius [m]: ",
+            default_value=0.075,
+            decimal_number=4,
+            minimal_value=0,
+            maximal_value=10000,
+            step=0.001,
+        )
 
-                # self.aim_size_length.add_link_2_show(self.option_max_depth)
+        # add dependencies
+        self.aim_temp_profile.add_link_2_show(self.option_depth)
+        self.aim_optimize.add_link_2_show(self.option_depth)
 
-                self.aim_temp_profile.add_link_2_show(self.option_spacing)
-                self.aim_req_depth.add_link_2_show(self.option_spacing)
-                self.aim_optimize.add_link_2_show(self.option_spacing)
+        # self.aim_size_length.add_link_2_show(self.option_max_depth)
 
-                # self.aim_size_length.add_link_2_show(self.option_min_spacing)
-                # self.aim_size_length.add_link_2_show(self.option_max_spacing)
+        self.aim_temp_profile.add_link_2_show(self.option_spacing)
+        self.aim_req_depth.add_link_2_show(self.option_spacing)
+        self.aim_optimize.add_link_2_show(self.option_spacing)
 
-                self.aim_temp_profile.add_link_2_show(self.option_width)
-                self.aim_req_depth.add_link_2_show(self.option_width)
-                self.aim_optimize.add_link_2_show(self.option_width)
+        # self.aim_size_length.add_link_2_show(self.option_min_spacing)
+        # self.aim_size_length.add_link_2_show(self.option_max_spacing)
 
-                self.aim_temp_profile.add_link_2_show(self.option_length)
-                self.aim_req_depth.add_link_2_show(self.option_length)
-                self.aim_optimize.add_link_2_show(self.option_length)
+        self.aim_temp_profile.add_link_2_show(self.option_width)
+        self.aim_req_depth.add_link_2_show(self.option_width)
+        self.aim_optimize.add_link_2_show(self.option_width)
 
-                # self.aim_size_length.add_link_2_show(self.option_max_width)
-                # self.aim_size_length.add_link_2_show(self.option_max_length)
+        self.aim_temp_profile.add_link_2_show(self.option_length)
+        self.aim_req_depth.add_link_2_show(self.option_length)
+        self.aim_optimize.add_link_2_show(self.option_length)
 
-            def create_category_temperatures():
-                self.category_temperatures = Category(page=self.page_borehole, label="Temperature constraints and simulation period")
+        # self.aim_size_length.add_link_2_show(self.option_max_width)
+        # self.aim_size_length.add_link_2_show(self.option_max_length)
 
-                self.option_min_temp = FloatBox(
-                    category=self.category_temperatures,
-                    label="Minimal temperature [°C]: ",
-                    default_value=0,
-                    decimal_number=2,
-                    minimal_value=-273.15,
-                    maximal_value=100,
-                    step=0.1,
-                )
-                self.option_max_temp = FloatBox(
-                    category=self.category_temperatures,
-                    label="Maximal temperature [°C]: ",
-                    default_value=16,
-                    decimal_number=2,
-                    minimal_value=-273.15,
-                    maximal_value=100,
-                    step=0.1,
-                )
-                self.option_simu_period = IntBox(
-                    category=self.category_temperatures, label="Simulation period [yrs]: ", default_value=40,
-                    minimal_value=1, maximal_value=1000
-                )
+        # def create_category_temperatures():
+        self.category_temperatures = Category(page=self.page_borehole, label="Temperature constraints and simulation period")
 
-                self.option_len_peak_heating = FloatBox(
-                    category=self.category_temperatures, label="Peak length heating [hours]: ",
-                    default_value=6, minimal_value=1, maximal_value=8760, step=1,
-                    decimal_number=2
-                )
-                self.option_len_peak_cooling = FloatBox(
-                    category=self.category_temperatures, label="Peak length cooling [hours]: ",
-                    default_value=6, minimal_value=1, maximal_value=8760, step=1,
-                    decimal_number=2
-                )
+        self.option_min_temp = FloatBox(
+            category=self.category_temperatures,
+            label="Minimal temperature [°C]: ",
+            default_value=0,
+            decimal_number=2,
+            minimal_value=-273.15,
+            maximal_value=100,
+            step=0.1,
+        )
+        self.option_max_temp = FloatBox(
+            category=self.category_temperatures,
+            label="Maximal temperature [°C]: ",
+            default_value=16,
+            decimal_number=2,
+            minimal_value=-273.15,
+            maximal_value=100,
+            step=0.1,
+        )
+        self.option_simu_period = IntBox(
+            category=self.category_temperatures, label="Simulation period [yrs]: ", default_value=40, minimal_value=1, maximal_value=100
+        )
 
-                # add dependencies
-                self.option_temperature_profile_hourly.add_link_2_show(self.option_len_peak_heating, on_index=0)
-                self.option_method_size_depth.add_link_2_show(self.option_len_peak_heating, on_index=0)
-                self.option_method_size_depth.add_link_2_show(self.option_len_peak_heating, on_index=1)
-                self.aim_optimize.add_link_2_show(self.option_len_peak_heating)
+        self.option_len_peak_heating = FloatBox(
+            category=self.category_temperatures, label="Peak length heating [hours]: ",
+            default_value=6, minimal_value=1, maximal_value=8760, step=1,
+            decimal_number=2
+        )
+        self.option_len_peak_cooling = FloatBox(
+            category=self.category_temperatures, label="Peak length cooling [hours]: ",
+            default_value=6, minimal_value=1, maximal_value=8760, step=1,
+            decimal_number=2
+        )
 
-                self.option_temperature_profile_hourly.add_link_2_show(self.option_len_peak_cooling, on_index=0)
-                self.option_method_size_depth.add_link_2_show(self.option_len_peak_cooling, on_index=0)
-                self.option_method_size_depth.add_link_2_show(self.option_len_peak_cooling, on_index=1)
-                self.aim_optimize.add_link_2_show(self.option_len_peak_cooling)
+        # add dependencies
+        self.option_temperature_profile_hourly.add_link_2_show(self.option_len_peak_heating, on_index=0)
+        self.option_method_size_depth.add_link_2_show(self.option_len_peak_heating, on_index=0)
+        self.option_method_size_depth.add_link_2_show(self.option_len_peak_heating, on_index=1)
+        self.aim_optimize.add_link_2_show(self.option_len_peak_heating)
 
-            # create categories
-            create_category_earth()
-            create_category_borehole()
-            create_category_temperatures()
+        self.option_temperature_profile_hourly.add_link_2_show(self.option_len_peak_cooling, on_index=0)
+        self.option_method_size_depth.add_link_2_show(self.option_len_peak_cooling, on_index=0)
+        self.option_method_size_depth.add_link_2_show(self.option_len_peak_cooling, on_index=1)
+        self.aim_optimize.add_link_2_show(self.option_len_peak_cooling)
 
-        def create_page_borehole_resistance():
-            # create page
-            self.page_borehole_resistance = Page("Equivalent borehole resistance", "Borehole\nresistance", ":/icons/icons/Resistance.png")
-            self.page_borehole.set_next_page(self.page_borehole_resistance)
-            self.page_borehole_resistance.set_previous_page(self.page_borehole)
+        # create categories
+        #create_category_earth()
+        #create_category_borehole()
+        #create_category_temperatures()
 
-            def create_category_constant_rb():
-                self.category_constant_rb = Category(page=self.page_borehole_resistance, label="Constant equivalent borehole resistance")
+        #def create_page_borehole_resistance():
+        # create page
+        self.page_borehole_resistance = Page("Equivalent borehole resistance", "Borehole\nresistance", "Resistance.png")
+        self.page_borehole.set_next_page(self.page_borehole_resistance)
+        self.page_borehole_resistance.set_previous_page(self.page_borehole)
 
-                self.option_constant_rb = FloatBox(
-                    category=self.category_constant_rb,
-                    label="Equivalent borehole resistance (e.g. from TRT) [mK/W]: ",
-                    default_value=0.08,
-                    decimal_number=4,
-                    minimal_value=0,
-                    maximal_value=100,
-                    step=0.01,
-                )
+        #def create_category_constant_rb():
+        self.category_constant_rb = Category(page=self.page_borehole_resistance, label="Constant equivalent borehole resistance")
 
-                # add dependency
-                self.option_method_rb_calc.add_link_2_show(self.category_constant_rb, on_index=0)
+        self.option_constant_rb = FloatBox(
+            category=self.category_constant_rb,
+            label="Equivalent borehole resistance (e.g. from TRT) [mK/W]: ",
+            default_value=0.08,
+            decimal_number=4,
+            minimal_value=0,
+            maximal_value=100,
+            step=0.01,
+        )
 
-            def create_category_fluid_data():
-                self.category_fluid_data = Category(page=self.page_borehole_resistance, label="Fluid data")
+        # add dependency
+        self.option_method_rb_calc.add_link_2_show(self.category_constant_rb, on_index=0)
 
-                self.option_fluid_conductivity = FloatBox(
-                    category=self.category_fluid_data,
-                    label="Thermal conductivity [W/mK]: ",
-                    default_value=0.5,
-                    decimal_number=3,
-                    minimal_value=0,
-                    maximal_value=100,
-                    step=0.1,
-                )
-                self.option_fluid_density = FloatBox(
-                    category=self.category_fluid_data,
-                    label="Density [kg/m³]: ",
-                    default_value=1000,
-                    decimal_number=1,
-                    minimal_value=0,
-                    maximal_value=10000000,
-                    step=100,
-                )
-                self.option_fluid_capacity = FloatBox(
-                    category=self.category_fluid_data,
-                    label="Thermal capacity [J/kg K]: ",
-                    default_value=4182,
-                    decimal_number=1,
-                    minimal_value=0,
-                    maximal_value=10000000,
-                    step=100,
-                )
-                self.option_fluid_viscosity = FloatBox(
-                    category=self.category_fluid_data,
-                    label="Dynamic viscosity [Pa s]:",
-                    default_value=0.001,
-                    decimal_number=6,
-                    minimal_value=0,
-                    maximal_value=1,
-                    step=0.0001,
-                )
+        #def create_category_fluid_data():
+        self.category_fluid_data = Category(page=self.page_borehole_resistance, label="Fluid data")
 
-                self.option_fluid_mass_flow = FloatBox(
-                    category=self.category_fluid_data,
-                    label="Mass flow rate [kg/s]: ",
-                    default_value=0.5,
-                    decimal_number=3,
-                    minimal_value=0,
-                    maximal_value=100000,
-                    step=0.1,
-                )
+        self.option_fluid_conductivity = FloatBox(
+            category=self.category_fluid_data,
+            label="Thermal conductivity [W/mK]: ",
+            default_value=0.5,
+            decimal_number=3,
+            minimal_value=0,
+            maximal_value=100,
+            step=0.1,
+        )
+        self.option_fluid_density = FloatBox(
+            category=self.category_fluid_data,
+            label="Density [kg/m³]: ",
+            default_value=1000,
+            decimal_number=1,
+            minimal_value=0,
+            maximal_value=10000000,
+            step=100,
+        )
+        self.option_fluid_capacity = FloatBox(
+            category=self.category_fluid_data,
+            label="Thermal capacity [J/kg K]: ",
+            default_value=4182,
+            decimal_number=1,
+            minimal_value=0,
+            maximal_value=10000000,
+            step=100,
+        )
+        self.option_fluid_viscosity = FloatBox(
+            category=self.category_fluid_data,
+            label="Dynamic viscosity [Pa s]:",
+            default_value=0.001,
+            decimal_number=6,
+            minimal_value=0,
+            maximal_value=1,
+            step=0.0001,
+        )
 
-                # add dependencies
-                self.option_method_rb_calc.add_link_2_show(self.category_fluid_data, on_index=1)
+        self.option_fluid_mass_flow = FloatBox(
+            category=self.category_fluid_data,
+            label="Mass flow rate [kg/s]: ",
+            default_value=0.5,
+            decimal_number=3,
+            minimal_value=0,
+            maximal_value=100000,
+            step=0.1,
+        )
 
-            def create_category_pipe_data():
-                self.category_pipe_data = Category(page=self.page_borehole_resistance, label="Pipe data")
-                self.category_pipe_data.activate_graphic_left()
+        # add dependencies
+        self.option_method_rb_calc.add_link_2_show(self.category_fluid_data, on_index=1)
 
-                self.option_pipe_number = IntBox(
-                    category=self.category_pipe_data, label="Number of pipes [#]: ", default_value=2, minimal_value=1, maximal_value=99
-                )
-                self.option_pipe_grout_conductivity = FloatBox(
-                    category=self.category_pipe_data,
-                    label="Grout thermal conductivity [W/mK]: ",
-                    default_value=1.5,
-                    decimal_number=3,
-                    minimal_value=0,
-                    maximal_value=10000,
-                    step=0.1,
-                )
-                self.option_pipe_conductivity = FloatBox(
-                    category=self.category_pipe_data,
-                    label="Pipe thermal conductivity [W/mK]: ",
-                    default_value=0.42,
-                    decimal_number=3,
-                    minimal_value=0,
-                    maximal_value=10000,
-                    step=0.1,
-                )
-                self.option_pipe_inner_radius = FloatBox(
-                    category=self.category_pipe_data,
-                    label="Inner pipe radius [m]: ",
-                    default_value=0.02,
-                    decimal_number=4,
-                    minimal_value=0,
-                    maximal_value=10000,
-                    step=0.001,
-                )
-                self.option_pipe_outer_radius = FloatBox(
-                    category=self.category_pipe_data,
-                    label="Outer pipe radius [m]: ",
-                    default_value=0.022,
-                    decimal_number=4,
-                    minimal_value=0,
-                    maximal_value=10000,
-                    step=0.001,
-                )
-                self.option_pipe_outer_radius.change_event(self.option_pipe_inner_radius.widget.setMaximum)
-                self.option_pipe_inner_radius.change_event(self.option_pipe_outer_radius.widget.setMinimum)
+        # def create_category_pipe_data():
+        self.category_pipe_data = Category(page=self.page_borehole_resistance, label="Pipe data")
+        self.category_pipe_data.activate_graphic_left()
 
-                self.option_pipe_distance = FloatBox(
-                    category=self.category_pipe_data,
-                    label="Distance of pipe until center [m]: ",
-                    default_value=0.04,
-                    decimal_number=4,
-                    minimal_value=0,
-                    maximal_value=10000,
-                    step=0.001,
-                )
-                self.option_pipe_roughness = FloatBox(
-                    category=self.category_pipe_data,
-                    label="Pipe roughness [m]: ",
-                    default_value=0.000_001,
-                    decimal_number=7,
-                    minimal_value=0,
-                    maximal_value=10000,
-                    step=0.000001,
-                )
+        self.option_pipe_number = IntBox(
+            category=self.category_pipe_data, label="Number of pipes [#]: ", default_value=2, minimal_value=1, maximal_value=99
+        )
+        self.option_pipe_grout_conductivity = FloatBox(
+            category=self.category_pipe_data,
+            label="Grout thermal conductivity [W/mK]: ",
+            default_value=1.5,
+            decimal_number=3,
+            minimal_value=0,
+            maximal_value=10000,
+            step=0.1,
+        )
+        self.option_pipe_conductivity = FloatBox(
+            category=self.category_pipe_data,
+            label="Pipe thermal conductivity [W/mK]: ",
+            default_value=0.42,
+            decimal_number=3,
+            minimal_value=0,
+            maximal_value=10000,
+            step=0.1,
+        )
+        self.option_pipe_inner_radius = FloatBox(
+            category=self.category_pipe_data,
+            label="Inner pipe radius [m]: ",
+            default_value=0.02,
+            decimal_number=4,
+            minimal_value=0,
+            maximal_value=10000,
+            step=0.001,
+        )
+        self.option_pipe_outer_radius = FloatBox(
+            category=self.category_pipe_data,
+            label="Outer pipe radius [m]: ",
+            default_value=0.022,
+            decimal_number=4,
+            minimal_value=0,
+            maximal_value=10000,
+            step=0.001,
+        )
+        self.option_pipe_outer_radius.change_event(self.option_pipe_inner_radius.widget.setMaximum)
+        self.option_pipe_inner_radius.change_event(self.option_pipe_outer_radius.widget.setMinimum)
 
-                # add dependency
-                self.option_method_rb_calc.add_link_2_show(self.category_pipe_data, on_index=1)
+        self.option_pipe_borehole_radius_2 = FloatBox(
+            category=self.category_pipe_data,
+            label="Borehole radius [m]: ",
+            default_value=0.075,
+            decimal_number=4,
+            minimal_value=0,
+            maximal_value=10000,
+            step=0.001,
+        )
+        self.option_pipe_borehole_radius_2.change_event(self.check_distance_between_pipes)
+        self.option_pipe_borehole_radius_2.change_event(self.option_pipe_borehole_radius.set_value)
+        self.option_pipe_borehole_radius.change_event(self.option_pipe_borehole_radius_2.set_value)
 
-                # set update events
-                self.option_pipe_number.change_event(self.check_distance_between_pipes)
-                self.option_pipe_outer_radius.change_event(self.check_distance_between_pipes)
-                self.option_pipe_distance.change_event(self.check_distance_between_pipes)
+        self.option_pipe_distance = FloatBox(
+            category=self.category_pipe_data,
+            label="Distance of pipe until center [m]: ",
+            default_value=0.04,
+            decimal_number=4,
+            minimal_value=0,
+            maximal_value=10000,
+            step=0.001,
+        )
+        self.option_pipe_roughness = FloatBox(
+            category=self.category_pipe_data,
+            label="Pipe roughness [m]: ",
+            default_value=0.000_001,
+            decimal_number=7,
+            minimal_value=0,
+            maximal_value=10000,
+            step=0.000001,
+        )
 
-                self.option_pipe_number.change_event(self.update_borehole)
-                self.option_pipe_outer_radius.change_event(self.update_borehole)
-                self.option_pipe_inner_radius.change_event(self.update_borehole)
-                self.option_pipe_borehole_radius.change_event(self.update_borehole)
-                self.option_pipe_distance.change_event(self.update_borehole)
+        # add dependency
+        self.option_method_rb_calc.add_link_2_show(self.category_pipe_data, on_index=1)
 
-                self.page_borehole_resistance.add_function_called_if_button_clicked(self.update_borehole)
+        # set update events
+        self.option_pipe_number.change_event(self.check_distance_between_pipes)
+        self.option_pipe_outer_radius.change_event(self.check_distance_between_pipes)
+        self.option_pipe_distance.change_event(self.check_distance_between_pipes)
 
-            # create categories
-            create_category_constant_rb()
-            create_category_fluid_data()
-            create_category_pipe_data()
+        self.option_pipe_number.change_event(self.update_borehole)
+        self.option_pipe_outer_radius.change_event(self.update_borehole)
+        self.option_pipe_inner_radius.change_event(self.update_borehole)
+        self.option_pipe_borehole_radius.change_event(self.update_borehole)
+        self.option_pipe_distance.change_event(self.update_borehole)
 
-        def create_page_thermal_demands():
-            # create page
-            self.page_thermal = Page("Thermal demands", "Thermal\ndemands", ":/icons/icons/Thermal.svg")
-            self.page_borehole_resistance.set_next_page(self.page_thermal)
-            self.page_thermal.set_previous_page(self.page_borehole)
+        self.page_borehole_resistance.add_function_called_if_button_clicked(self.update_borehole)
 
-            def create_category_select_datafile():
-                self.category_select_file = Category(page=self.page_thermal, label="Select data file")
+        # create categories
+        #create_category_constant_rb()
+        #create_category_fluid_data()
+        #create_category_pipe_data()
 
-                self.option_seperator_csv = ButtonBox(label="Seperator in CSV-file:", default_index=0,
-                                                      entries=['Semicolon ";"', 'Comma ","'],
-                                                      category=self.category_select_file)
-                self.option_decimal_csv = ButtonBox(label="Decimal sign in CSV-file:", default_index=0,
-                                                    entries=['Point "."', 'Comma ","'],
-                                                    category=self.category_select_file)
-                self.option_filename = FileNameBox(
-                    category=self.category_select_file,
-                    label="Filename: ",
-                    default_value="",
-                    dialog_text="Choose csv file",
-                    error_text="error",
-                    status_bar=status_bar,
-                )
-                self.option_column = ButtonBox(label="Thermal demand in one or two columns: ", default_index=0,
-                                               entries=["1 column", "2 columns"], category=self.category_select_file)
-                self.option_heating_column = ListBox(category=self.category_select_file, label="Heating load line: ", default_index=0, entries=[])
-                self.option_cooling_column = ListBox(category=self.category_select_file, label="Cooling load line: ", default_index=0, entries=[])
-                self.option_single_column = ListBox(category=self.category_select_file, label="Load line: ", default_index=0, entries=[])
+        #def create_page_thermal_demands():
+        # create page
+        self.page_thermal = Page("Thermal demands", "Thermal\ndemands", "Thermal.svg")
+        self.page_borehole_resistance.set_next_page(self.page_thermal)
+        self.page_thermal.set_previous_page(self.page_borehole)
 
-                self.option_unit_data = ButtonBox(label="Unit data: ", default_index=1, entries=["W", "kW", "MW"],
-                                                  category=self.category_select_file)
+        #def create_category_select_datafile():
+        self.category_select_file = Category(page=self.page_thermal, label="Select data file")
 
-                self.button_load_csv = FunctionButton(category=self.category_select_file, button_text="Load", icon=":/icons/icons/Download.svg")
+        self.option_seperator_csv = ButtonBox(label="Seperator in CSV-file:", default_index=0,
+                                              entries=['Semicolon ";"', 'Comma ","'],
+                                              category=self.category_select_file)
+        self.option_decimal_csv = ButtonBox(label="Decimal sign in CSV-file:", default_index=0,
+                                            entries=['Point "."', 'Comma ","'],
+                                            category=self.category_select_file)
+        self.option_filename = FileNameBox(
+            category=self.category_select_file,
+            label="Filename: ",
+            default_value="",
+            dialog_text="Choose csv file",
+            error_text="error",
+            status_bar=status_bar,
+        )
+        self.option_column = ButtonBox(label="Thermal demand in one or two columns: ", default_index=0,
+                                       entries=["1 column", "2 columns"], category=self.category_select_file)
+        self.option_heating_column = ListBox(category=self.category_select_file, label="Heating load line: ", default_index=0, entries=[])
+        self.option_cooling_column = ListBox(category=self.category_select_file, label="Cooling load line: ", default_index=0, entries=[])
+        self.option_single_column = ListBox(category=self.category_select_file, label="Load line: ", default_index=0, entries=[])
 
-                # add dependencies
-                self.option_filename.add_aim_option_2_be_set_for_check(self.aim_optimize)
-                self.option_filename.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
+        self.option_unit_data = ButtonBox(label="Unit data: ", default_index=1, entries=["W", "kW", "MW"],
+                                          category=self.category_select_file)
 
-                self.option_column.add_link_2_show(self.option_heating_column, on_index=1)
-                self.option_heating_column.add_aim_option_2_be_set_for_check(self.aim_optimize)
-                self.option_heating_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
-                self.option_heating_column.add_aim_option_2_be_set_for_check((self.option_temperature_profile_hourly, 1))
+        self.button_load_csv = FunctionButton(category=self.category_select_file, button_text="Load", icon="Download.svg")
 
-                self.option_column.add_link_2_show(self.option_cooling_column, on_index=1)
-                self.option_cooling_column.add_aim_option_2_be_set_for_check(self.aim_optimize)
-                self.option_cooling_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
-                self.option_cooling_column.add_aim_option_2_be_set_for_check((self.option_temperature_profile_hourly, 1))
+        # add dependencies
+        self.option_filename.add_aim_option_2_be_set_for_check(self.aim_optimize)
+        self.option_filename.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
 
-                self.option_column.add_link_2_show(self.option_single_column, on_index=0)
-                self.option_single_column.add_aim_option_2_be_set_for_check(self.aim_optimize)
-                self.option_single_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
-                self.option_single_column.add_aim_option_2_be_set_for_check((self.option_temperature_profile_hourly, 1))
+        self.option_column.add_link_2_show(self.option_heating_column, on_index=1)
+        self.option_heating_column.add_aim_option_2_be_set_for_check(self.aim_optimize)
+        self.option_heating_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
+        self.option_heating_column.add_aim_option_2_be_set_for_check((self.option_temperature_profile_hourly, 1))
 
-                self.option_method_size_depth.add_link_2_show(self.button_load_csv, on_index=0)
-                self.option_method_size_depth.add_link_2_show(self.button_load_csv, on_index=1)
-                self.aim_temp_profile.add_link_2_show(self.button_load_csv)
-                self.option_temperature_profile_hourly.add_link_2_show(self.button_load_csv, on_index=0)
-                self.aim_req_depth.add_link_2_show(self.button_load_csv)
-                # self.aim_size_length.add_link_2_show(self.button_load_csv)
+        self.option_column.add_link_2_show(self.option_cooling_column, on_index=1)
+        self.option_cooling_column.add_aim_option_2_be_set_for_check(self.aim_optimize)
+        self.option_cooling_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
+        self.option_cooling_column.add_aim_option_2_be_set_for_check((self.option_temperature_profile_hourly, 1))
 
-                # add change events
-                self.option_seperator_csv.change_event(self.fun_update_combo_box_data_file)
-                self.option_decimal_csv.change_event(self.fun_update_combo_box_data_file)
-                self.option_filename.change_event(self.fun_update_combo_box_data_file)
+        self.option_column.add_link_2_show(self.option_single_column, on_index=0)
+        self.option_single_column.add_aim_option_2_be_set_for_check(self.aim_optimize)
+        self.option_single_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
+        self.option_single_column.add_aim_option_2_be_set_for_check((self.option_temperature_profile_hourly, 1))
 
-                self.button_load_csv.change_event(self.fun_display_data)
+        self.option_method_size_depth.add_link_2_show(self.button_load_csv, on_index=0)
+        self.option_method_size_depth.add_link_2_show(self.button_load_csv, on_index=1)
+        self.aim_temp_profile.add_link_2_show(self.button_load_csv)
+        self.option_temperature_profile_hourly.add_link_2_show(self.button_load_csv, on_index=0)
+        self.aim_req_depth.add_link_2_show(self.button_load_csv)
+        # self.aim_size_length.add_link_2_show(self.button_load_csv)
 
-            def create_category_th_demand():
-                self.category_th_demand = Category(page=self.page_thermal, label="Thermal demands")
-                self.category_th_demand.activate_grid_layout(5)
+        # add change events
+        self.option_seperator_csv.change_event(self.fun_update_combo_box_data_file)
+        self.option_decimal_csv.change_event(self.fun_update_combo_box_data_file)
+        self.option_filename.change_event(self.fun_update_combo_box_data_file)
 
-                self.hint_none_1 = Hint(category=self.category_th_demand, hint="  ")
-                self.hint_peak_heating = Hint(category=self.category_th_demand, hint="Heating peak")
-                self.hint_peak_cooling = Hint(category=self.category_th_demand, hint="Cooling peak")
-                self.hint_load_heating = Hint(category=self.category_th_demand, hint="Heating load")
-                self.hint_load_cooling = Hint(category=self.category_th_demand, hint="Cooling load")
+        self.button_load_csv.change_event(self.fun_display_data)
 
-                self.hint_none_2 = Hint(category=self.category_th_demand, hint="  ")
-                self.hint_peak_heating_unit = Hint(category=self.category_th_demand, hint="[kW]")
-                self.hint_peak_cooling_unit = Hint(category=self.category_th_demand, hint="[kW]")
-                self.hint_load_heating_unit = Hint(category=self.category_th_demand, hint="[kWh]")
-                self.hint_load_cooling_unit = Hint(category=self.category_th_demand, hint="[kWh]")
+        # def create_category_th_demand():
+        self.category_th_demand = Category(page=self.page_thermal, label="Thermal demands")
+        self.category_th_demand.activate_grid_layout(5)
 
-                self.hint_jan = Hint(category=self.category_th_demand, hint="January")
-                self.option_hp_jan = FloatBox(
-                    category=self.category_th_demand, label="", default_value=160, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_cp_jan = FloatBox(
-                    category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_hl_jan = FloatBox(
-                    category=self.category_th_demand,
-                    label="",
-                    default_value=46500,
-                    decimal_number=0,
-                    minimal_value=0,
-                    maximal_value=1_000_000_000,
-                    step=1,
-                )
-                self.option_cl_jan = FloatBox(
-                    category=self.category_th_demand,
-                    label="",
-                    default_value=4000,
-                    decimal_number=0,
-                    minimal_value=0,
-                    maximal_value=1_000_000_000,
-                    step=1,
-                )
-                self.hint_feb = Hint(category=self.category_th_demand, hint="February")
-                self.option_hp_feb = FloatBox(
-                    category=self.category_th_demand, label="", default_value=142, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_cp_feb = FloatBox(
-                    category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_hl_feb = FloatBox(
-                    category=self.category_th_demand,
-                    label="",
-                    default_value=44400,
-                    decimal_number=0,
-                    minimal_value=0,
-                    maximal_value=1_000_000_000,
-                    step=1,
-                )
-                self.option_cl_feb = FloatBox(
-                    category=self.category_th_demand,
-                    label="",
-                    default_value=8000,
-                    decimal_number=0,
-                    minimal_value=0,
-                    maximal_value=1_000_000_000,
-                    step=1,
-                )
-                self.hint_mar = Hint(category=self.category_th_demand, hint="March")
-                self.option_hp_mar = FloatBox(
-                    category=self.category_th_demand, label="", default_value=102, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_cp_mar = FloatBox(
-                    category=self.category_th_demand, label="", default_value=34, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_hl_mar = FloatBox(
-                    category=self.category_th_demand,
-                    label="",
-                    default_value=37500,
-                    decimal_number=0,
-                    minimal_value=0,
-                    maximal_value=1_000_000_000,
-                    step=1,
-                )
-                self.option_cl_mar = FloatBox(
-                    category=self.category_th_demand,
-                    label="",
-                    default_value=8000,
-                    decimal_number=0,
-                    minimal_value=0,
-                    maximal_value=1_000_000_000,
-                    step=1,
-                )
-                self.hint_apr = Hint(category=self.category_th_demand, hint="April")
-                self.option_hp_apr = FloatBox(
-                    category=self.category_th_demand, label="", default_value=55, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_cp_apr = FloatBox(
-                    category=self.category_th_demand, label="", default_value=69, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_hl_apr = FloatBox(
-                    category=self.category_th_demand,
-                    label="",
-                    default_value=29700,
-                    decimal_number=0,
-                    minimal_value=0,
-                    maximal_value=1_000_000_000,
-                    step=1,
-                )
-                self.option_cl_apr = FloatBox(
-                    category=self.category_th_demand,
-                    label="",
-                    default_value=8000,
-                    decimal_number=0,
-                    minimal_value=0,
-                    maximal_value=1_000_000_000,
-                    step=1,
-                )
-                self.hint_may = Hint(category=self.category_th_demand, hint="May")
-                self.option_hp_may = FloatBox(
-                    category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_cp_may = FloatBox(
-                    category=self.category_th_demand, label="", default_value=133, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_hl_may = FloatBox(
-                    category=self.category_th_demand,
-                    label="",
-                    default_value=19200,
-                    decimal_number=0,
-                    minimal_value=0,
-                    maximal_value=1_000_000_000,
-                    step=1,
-                )
-                self.option_cl_may = FloatBox(
-                    category=self.category_th_demand,
-                    label="",
-                    default_value=12000,
-                    decimal_number=0,
-                    minimal_value=0,
-                    maximal_value=1_000_000_000,
-                    step=1,
-                )
-                self.hint_jun = Hint(category=self.category_th_demand, hint="June")
-                self.option_hp_jun = FloatBox(
-                    category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_cp_jun = FloatBox(
-                    category=self.category_th_demand, label="", default_value=187, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_hl_jun = FloatBox(
-                    category=self.category_th_demand, label="", default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
-                )
-                self.option_cl_jun = FloatBox(
-                    category=self.category_th_demand,
-                    label="",
-                    default_value=16000,
-                    decimal_number=0,
-                    minimal_value=0,
-                    maximal_value=1_000_000_000,
-                    step=1,
-                )
-                self.hint_jul = Hint(category=self.category_th_demand, hint="July")
-                self.option_hp_jul = FloatBox(
-                    category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_cp_jul = FloatBox(
-                    category=self.category_th_demand, label="", default_value=213, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_hl_jul = FloatBox(
-                    category=self.category_th_demand, label="", default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
-                )
-                self.option_cl_jul = FloatBox(
-                    category=self.category_th_demand,
-                    label="",
-                    default_value=32000,
-                    decimal_number=0,
-                    minimal_value=0,
-                    maximal_value=1_000_000_000,
-                    step=1,
-                )
-                self.hint_aug = Hint(category=self.category_th_demand, hint="August")
-                self.option_hp_aug = FloatBox(
-                    category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_cp_aug = FloatBox(
-                    category=self.category_th_demand, label="", default_value=240, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_hl_aug = FloatBox(
-                    category=self.category_th_demand, label="", default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
-                )
-                self.option_cl_aug = FloatBox(
-                    category=self.category_th_demand,
-                    label="",
-                    default_value=32000,
-                    decimal_number=0,
-                    minimal_value=0,
-                    maximal_value=1_000_000_000,
-                    step=1,
-                )
-                self.hint_sep = Hint(category=self.category_th_demand, hint="September")
-                self.option_hp_sep = FloatBox(
-                    category=self.category_th_demand, label="", default_value=40.4, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_cp_sep = FloatBox(
-                    category=self.category_th_demand, label="", default_value=160, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_hl_sep = FloatBox(
-                    category=self.category_th_demand,
-                    label="",
-                    default_value=18300,
-                    decimal_number=0,
-                    minimal_value=0,
-                    maximal_value=1_000_000_000,
-                    step=1,
-                )
-                self.option_cl_sep = FloatBox(
-                    category=self.category_th_demand,
-                    label="",
-                    default_value=16000,
-                    decimal_number=0,
-                    minimal_value=0,
-                    maximal_value=1_000_000_000,
-                    step=1,
-                )
-                self.hint_oct = Hint(category=self.category_th_demand, hint="October")
-                self.option_hp_oct = FloatBox(
-                    category=self.category_th_demand, label="", default_value=85, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_cp_oct = FloatBox(
-                    category=self.category_th_demand, label="", default_value=37, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_hl_oct = FloatBox(
-                    category=self.category_th_demand,
-                    label="",
-                    default_value=26100,
-                    decimal_number=0,
-                    minimal_value=0,
-                    maximal_value=1_000_000_000,
-                    step=1,
-                )
-                self.option_cl_oct = FloatBox(
-                    category=self.category_th_demand,
-                    label="",
-                    default_value=12000,
-                    decimal_number=0,
-                    minimal_value=0,
-                    maximal_value=1_000_000_000,
-                    step=1,
-                )
-                self.hint_nov = Hint(category=self.category_th_demand, hint="November")
-                self.option_hp_nov = FloatBox(
-                    category=self.category_th_demand, label="", default_value=119, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_cp_nov = FloatBox(
-                    category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_hl_nov = FloatBox(
-                    category=self.category_th_demand,
-                    label="",
-                    default_value=35100,
-                    decimal_number=0,
-                    minimal_value=0,
-                    maximal_value=1_000_000_000,
-                    step=1,
-                )
-                self.option_cl_nov = FloatBox(
-                    category=self.category_th_demand,
-                    label="",
-                    default_value=8000,
-                    decimal_number=0,
-                    minimal_value=0,
-                    maximal_value=1_000_000_000,
-                    step=1,
-                )
-                self.hint_dec = Hint(category=self.category_th_demand, hint="December")
-                self.option_hp_dec = FloatBox(
-                    category=self.category_th_demand, label="", default_value=136, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_cp_dec = FloatBox(
-                    category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-                )
-                self.option_hl_dec = FloatBox(
-                    category=self.category_th_demand,
-                    label="",
-                    default_value=43200,
-                    decimal_number=0,
-                    minimal_value=0,
-                    maximal_value=1_000_000_000,
-                    step=1,
-                )
-                self.option_cl_dec = FloatBox(
-                    category=self.category_th_demand,
-                    label="",
-                    default_value=4000,
-                    decimal_number=0,
-                    minimal_value=0,
-                    maximal_value=1_000_000_000,
-                    step=1,
-                )
+        self.hint_none_1 = Hint(category=self.category_th_demand, hint="  ")
+        self.hint_peak_heating = Hint(category=self.category_th_demand, hint="Heating peak")
+        self.hint_peak_cooling = Hint(category=self.category_th_demand, hint="Cooling peak")
+        self.hint_load_heating = Hint(category=self.category_th_demand, hint="Heating load")
+        self.hint_load_cooling = Hint(category=self.category_th_demand, hint="Cooling load")
 
-                # add dependencies
-                self.option_method_size_depth.add_link_2_show(self.category_th_demand, on_index=0)
-                self.option_method_size_depth.add_link_2_show(self.category_th_demand, on_index=1)
-                self.option_temperature_profile_hourly.add_link_2_show(self.category_th_demand, on_index=0)
+        self.hint_none_2 = Hint(category=self.category_th_demand, hint="  ")
+        self.hint_peak_heating_unit = Hint(category=self.category_th_demand, hint="[kW]")
+        self.hint_peak_cooling_unit = Hint(category=self.category_th_demand, hint="[kW]")
+        self.hint_load_heating_unit = Hint(category=self.category_th_demand, hint="[kWh]")
+        self.hint_load_cooling_unit = Hint(category=self.category_th_demand, hint="[kWh]")
 
-                self.aim_temp_profile.add_link_2_show(self.category_th_demand)
-                self.aim_req_depth.add_link_2_show(self.category_th_demand)
-                # self.aim_size_length.add_link_2_show(self.category_th_demand)
+        self.hint_jan = Hint(category=self.category_th_demand, hint="January")
+        self.option_hp_jan = FloatBox(
+            category=self.category_th_demand, label="", default_value=160, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_cp_jan = FloatBox(
+            category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_hl_jan = FloatBox(
+            category=self.category_th_demand,
+            label="",
+            default_value=46500,
+            decimal_number=0,
+            minimal_value=0,
+            maximal_value=1_000_000_000,
+            step=1,
+        )
+        self.option_cl_jan = FloatBox(
+            category=self.category_th_demand,
+            label="",
+            default_value=4000,
+            decimal_number=0,
+            minimal_value=0,
+            maximal_value=1_000_000_000,
+            step=1,
+        )
+        self.hint_feb = Hint(category=self.category_th_demand, hint="February")
+        self.option_hp_feb = FloatBox(
+            category=self.category_th_demand, label="", default_value=142, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_cp_feb = FloatBox(
+            category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_hl_feb = FloatBox(
+            category=self.category_th_demand,
+            label="",
+            default_value=44400,
+            decimal_number=0,
+            minimal_value=0,
+            maximal_value=1_000_000_000,
+            step=1,
+        )
+        self.option_cl_feb = FloatBox(
+            category=self.category_th_demand,
+            label="",
+            default_value=8000,
+            decimal_number=0,
+            minimal_value=0,
+            maximal_value=1_000_000_000,
+            step=1,
+        )
+        self.hint_mar = Hint(category=self.category_th_demand, hint="March")
+        self.option_hp_mar = FloatBox(
+            category=self.category_th_demand, label="", default_value=102, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_cp_mar = FloatBox(
+            category=self.category_th_demand, label="", default_value=34, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_hl_mar = FloatBox(
+            category=self.category_th_demand,
+            label="",
+            default_value=37500,
+            decimal_number=0,
+            minimal_value=0,
+            maximal_value=1_000_000_000,
+            step=1,
+        )
+        self.option_cl_mar = FloatBox(
+            category=self.category_th_demand,
+            label="",
+            default_value=8000,
+            decimal_number=0,
+            minimal_value=0,
+            maximal_value=1_000_000_000,
+            step=1,
+        )
+        self.hint_apr = Hint(category=self.category_th_demand, hint="April")
+        self.option_hp_apr = FloatBox(
+            category=self.category_th_demand, label="", default_value=55, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_cp_apr = FloatBox(
+            category=self.category_th_demand, label="", default_value=69, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_hl_apr = FloatBox(
+            category=self.category_th_demand,
+            label="",
+            default_value=29700,
+            decimal_number=0,
+            minimal_value=0,
+            maximal_value=1_000_000_000,
+            step=1,
+        )
+        self.option_cl_apr = FloatBox(
+            category=self.category_th_demand,
+            label="",
+            default_value=8000,
+            decimal_number=0,
+            minimal_value=0,
+            maximal_value=1_000_000_000,
+            step=1,
+        )
+        self.hint_may = Hint(category=self.category_th_demand, hint="May")
+        self.option_hp_may = FloatBox(
+            category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_cp_may = FloatBox(
+            category=self.category_th_demand, label="", default_value=133, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_hl_may = FloatBox(
+            category=self.category_th_demand,
+            label="",
+            default_value=19200,
+            decimal_number=0,
+            minimal_value=0,
+            maximal_value=1_000_000_000,
+            step=1,
+        )
+        self.option_cl_may = FloatBox(
+            category=self.category_th_demand,
+            label="",
+            default_value=12000,
+            decimal_number=0,
+            minimal_value=0,
+            maximal_value=1_000_000_000,
+            step=1,
+        )
+        self.hint_jun = Hint(category=self.category_th_demand, hint="June")
+        self.option_hp_jun = FloatBox(
+            category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_cp_jun = FloatBox(
+            category=self.category_th_demand, label="", default_value=187, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_hl_jun = FloatBox(
+            category=self.category_th_demand, label="", default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
+        )
+        self.option_cl_jun = FloatBox(
+            category=self.category_th_demand,
+            label="",
+            default_value=16000,
+            decimal_number=0,
+            minimal_value=0,
+            maximal_value=1_000_000_000,
+            step=1,
+        )
+        self.hint_jul = Hint(category=self.category_th_demand, hint="July")
+        self.option_hp_jul = FloatBox(
+            category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_cp_jul = FloatBox(
+            category=self.category_th_demand, label="", default_value=213, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_hl_jul = FloatBox(
+            category=self.category_th_demand, label="", default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
+        )
+        self.option_cl_jul = FloatBox(
+            category=self.category_th_demand,
+            label="",
+            default_value=32000,
+            decimal_number=0,
+            minimal_value=0,
+            maximal_value=1_000_000_000,
+            step=1,
+        )
+        self.hint_aug = Hint(category=self.category_th_demand, hint="August")
+        self.option_hp_aug = FloatBox(
+            category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_cp_aug = FloatBox(
+            category=self.category_th_demand, label="", default_value=240, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_hl_aug = FloatBox(
+            category=self.category_th_demand, label="", default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
+        )
+        self.option_cl_aug = FloatBox(
+            category=self.category_th_demand,
+            label="",
+            default_value=32000,
+            decimal_number=0,
+            minimal_value=0,
+            maximal_value=1_000_000_000,
+            step=1,
+        )
+        self.hint_sep = Hint(category=self.category_th_demand, hint="September")
+        self.option_hp_sep = FloatBox(
+            category=self.category_th_demand, label="", default_value=40.4, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_cp_sep = FloatBox(
+            category=self.category_th_demand, label="", default_value=160, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_hl_sep = FloatBox(
+            category=self.category_th_demand,
+            label="",
+            default_value=18300,
+            decimal_number=0,
+            minimal_value=0,
+            maximal_value=1_000_000_000,
+            step=1,
+        )
+        self.option_cl_sep = FloatBox(
+            category=self.category_th_demand,
+            label="",
+            default_value=16000,
+            decimal_number=0,
+            minimal_value=0,
+            maximal_value=1_000_000_000,
+            step=1,
+        )
+        self.hint_oct = Hint(category=self.category_th_demand, hint="October")
+        self.option_hp_oct = FloatBox(
+            category=self.category_th_demand, label="", default_value=85, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_cp_oct = FloatBox(
+            category=self.category_th_demand, label="", default_value=37, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_hl_oct = FloatBox(
+            category=self.category_th_demand,
+            label="",
+            default_value=26100,
+            decimal_number=0,
+            minimal_value=0,
+            maximal_value=1_000_000_000,
+            step=1,
+        )
+        self.option_cl_oct = FloatBox(
+            category=self.category_th_demand,
+            label="",
+            default_value=12000,
+            decimal_number=0,
+            minimal_value=0,
+            maximal_value=1_000_000_000,
+            step=1,
+        )
+        self.hint_nov = Hint(category=self.category_th_demand, hint="November")
+        self.option_hp_nov = FloatBox(
+            category=self.category_th_demand, label="", default_value=119, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_cp_nov = FloatBox(
+            category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_hl_nov = FloatBox(
+            category=self.category_th_demand,
+            label="",
+            default_value=35100,
+            decimal_number=0,
+            minimal_value=0,
+            maximal_value=1_000_000_000,
+            step=1,
+        )
+        self.option_cl_nov = FloatBox(
+            category=self.category_th_demand,
+            label="",
+            default_value=8000,
+            decimal_number=0,
+            minimal_value=0,
+            maximal_value=1_000_000_000,
+            step=1,
+        )
+        self.hint_dec = Hint(category=self.category_th_demand, hint="December")
+        self.option_hp_dec = FloatBox(
+            category=self.category_th_demand, label="", default_value=136, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_cp_dec = FloatBox(
+            category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+        )
+        self.option_hl_dec = FloatBox(
+            category=self.category_th_demand,
+            label="",
+            default_value=43200,
+            decimal_number=0,
+            minimal_value=0,
+            maximal_value=1_000_000_000,
+            step=1,
+        )
+        self.option_cl_dec = FloatBox(
+            category=self.category_th_demand,
+            label="",
+            default_value=4000,
+            decimal_number=0,
+            minimal_value=0,
+            maximal_value=1_000_000_000,
+            step=1,
+        )
 
-            # create categories
-            create_category_select_datafile()
-            create_category_th_demand()
+        # add dependencies
+        self.option_method_size_depth.add_link_2_show(self.category_th_demand, on_index=0)
+        self.option_method_size_depth.add_link_2_show(self.category_th_demand, on_index=1)
+        self.option_temperature_profile_hourly.add_link_2_show(self.category_th_demand, on_index=0)
+
+        self.aim_temp_profile.add_link_2_show(self.category_th_demand)
+        self.aim_req_depth.add_link_2_show(self.category_th_demand)
+        # self.aim_size_length.add_link_2_show(self.category_th_demand)
+
+        # create categories
+        #create_category_select_datafile()
+        #create_category_th_demand()
 
         def create_page_results():
             # create page
-            self.page_result = Page("Results", "Results", ":/icons/icons/Result.svg")
+            self.page_result = Page("Results", "Results", "Result.svg")
 
             def create_category_no_result():
                 self.cat_no_result = Category(page=self.page_result, label="No results")
@@ -1124,7 +1135,7 @@ class GuiStructure:
 
         def create_page_settings():
             # create page
-            self.page_settings = Page("Settings", "Settings", ":/icons/icons/Settings.svg")
+            self.page_settings = Page("Settings", "Settings", "Settings.svg")
 
             self.category_language = Category(page=self.page_settings, label="Language")
 
@@ -1150,11 +1161,11 @@ class GuiStructure:
         #                                                                                                               #
         #################################################################################################################
 
-        create_page_aim()
-        create_page_options()
-        create_page_borehole()
-        create_page_borehole_resistance()
-        create_page_thermal_demands()
+        #create_page_aim()
+        #create_page_options()
+        #create_page_borehole()
+        #create_page_borehole_resistance()
+        #create_page_thermal_demands()
         create_page_results()
         create_page_settings()
 

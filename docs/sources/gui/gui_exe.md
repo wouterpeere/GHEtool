@@ -40,11 +40,11 @@ python -m pip install PyInstaller
 The exe-folder can be created using [PyInstaller](https://pyinstaller.org/en/stable/). The following line will create a windowed version of the executable.
 
 ```
-python -m PyInstaller --noconfirm --onedir --windowed --splash "./GHEtool/gui/icons/Icon.ico" --name "GHEtool" --add-data "setup.cfg;." --icon "./GHEtool/gui/icons/Icon.ico" "./GHEtool/gui/start_gui.py"
+python -m PyInstaller  "./GHEtool/gui/GHEtool.spec" --noconfirm
 ```
 The following line will create a version which also displays a windows console with error messages of the executable. 
 ``` 
-python -m PyInstaller --noconfirm --onedir --console --splash "./GHEtool/gui/icons/Icon.ico" --name "GHEtool_with_command_line" --add-data "setup.cfg;." --icon "./GHEtool/gui/icons/Icon.ico" "./GHEtool/gui/start_gui.py"
+python -m PyInstaller  "./GHEtool/gui/GHEtool_with_command_line.spec" --noconfirm
 ```
 
 ## Create GHEtools installable using InnoSetup
