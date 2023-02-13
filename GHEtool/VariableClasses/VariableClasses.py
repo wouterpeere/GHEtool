@@ -1,5 +1,5 @@
 """
-This document contains the variable classes for the ground data, fluid data and pipe data.
+This document contains the variable classes for the ground data, fluid data and pipe data
 """
 
 from math import pi
