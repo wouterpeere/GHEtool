@@ -2,7 +2,7 @@
 This file contains the code for the ground data with a constant temperature.
 """
 
-from GroundDataBaseClass import GroundDataBaseClass
+from GHEtool.VariableClasses.GroundData import GroundDataBaseClass
 
 
 class GroundConstantTemperature(GroundDataBaseClass):
@@ -28,4 +28,12 @@ class GroundConstantTemperature(GroundDataBaseClass):
         self.Tg = T_g
 
     def calculate_Tg(self) -> float:
+        """
+        This function gives back the ground temperature.
+
+        Returns
+        -------
+        Tg : float
+            Ground temperature [deg C]
+        """
         return self.Tg

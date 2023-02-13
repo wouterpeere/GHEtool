@@ -2,7 +2,7 @@
 This file contains the class of ground data with a flux temperature.
 """
 
-from GroundDataBaseClass import GroundDataBaseClass
+from GHEtool.VariableClasses.GroundData import GroundDataBaseClass
 
 
 class GroundFluxTemperature(GroundDataBaseClass):
@@ -32,7 +32,7 @@ class GroundFluxTemperature(GroundDataBaseClass):
 
     def calculate_Tg(self, H: float) -> float:
         """
-        This function gives back the ground temperature
+        This function gives back the ground temperature at a depth H.
 
         Parameters
         ----------
