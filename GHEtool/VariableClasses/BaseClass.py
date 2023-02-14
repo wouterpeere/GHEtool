@@ -55,6 +55,9 @@ class BaseClass:
                 dictionary[key] = {"value": list(getattr(self, key)), "type": "set"}
                 continue
 
+            if isinstance(getattr(self, key), property):
+                print(key)
+
             if isinstance(getattr(self, key), list):
                 if np.any(getattr(self, key)) and isinstance(getattr(self, key)[0], Borehole):
                     # pygfunction object

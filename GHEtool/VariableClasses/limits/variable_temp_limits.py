@@ -1,8 +1,9 @@
+from __future__ import annotations
 from typing import List, TYPE_CHECKING
 
 from GHEtool.VariableClasses.limits.limit_base_class import LimitBase
+import numpy as np
 if TYPE_CHECKING:
-    import numpy as np
     from numpy.typing import NDArray
 
 
@@ -43,11 +44,13 @@ class VariableTempLimits(LimitBase):
 
     def _update_temp_max_array(self):
         """update the temp max array from the new inputs"""
-        self._temp_max_array = np.tile(self._temp_max, self._simulation_period)
+        self._temp_max_array = np.tile([self._temp_max[int(t * len(self._temp_max) / self._time_step)] for t in range(self._time_step)],
+                                       self._simulation_period)
 
     def _update_temp_min_array(self):
         """update the temp min array from the new inputs"""
-        self._temp_min_array = np.tile(self._temp_min, self._simulation_period)
+        self._temp_min_array = np.tile([self._temp_min[int(t * len(self._temp_min) / self._time_step)] for t in range(self._time_step)],
+                                       self._simulation_period)
 
     def get_temp_max(self) -> NDArray[np.float64]:
         """gets the maximal temperature depending on the time"""
@@ -66,3 +69,7 @@ class VariableTempLimits(LimitBase):
         """set the minimal temperature depending on the time"""
         self._temp_min = temp_min
         self._update_temp_min_array()
+
+    simulation_period = property(LimitBase.get_simulation_period, set_simulation_period)
+    temp_max = property(get_temp_max, set_temp_max)
+    temp_min = property(get_temp_min, set_temp_min)

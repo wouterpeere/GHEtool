@@ -762,6 +762,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
                 # try to open as pickle
                 with open(location, "rb") as file:
                     saving = pk_load(file)
+                print('Here')
                 version = "2.1.0"
             except (FileNotFoundError, ImportError):
                 raise ImportError("The datafile cannot be loaded!")

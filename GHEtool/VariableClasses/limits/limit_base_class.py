@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 
@@ -16,6 +18,11 @@ class LimitBase(BaseClass, ABC):
         self._temp_min = temp_min
         self._temp_max = temp_max
         self._simulation_period: int = simulation_period
+
+
+    @abstractmethod
+    def set_time_step(self, time_step: int):
+        """set the time step within the year from the load data"""
 
     @abstractmethod
     def set_simulation_period(self, period: int):

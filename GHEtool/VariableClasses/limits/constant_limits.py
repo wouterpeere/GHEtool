@@ -1,8 +1,9 @@
+from __future__ import annotations
 from typing import TYPE_CHECKING
+import numpy as np
 
 from GHEtool.VariableClasses.limits.limit_base_class import LimitBase
 if TYPE_CHECKING:
-    import numpy as np
     from numpy.typing import NDArray
 
 
@@ -66,3 +67,8 @@ class ConstantLimits(LimitBase):
         """set the minimal temperature depending on the time"""
         self._temp_min = temp_min
         self._update_temp_min_array()
+
+
+    simulation_period = property(LimitBase.get_simulation_period, set_simulation_period)
+    temp_max = property(get_temp_max, set_temp_max)
+    temp_min = property(get_temp_min, set_temp_min)

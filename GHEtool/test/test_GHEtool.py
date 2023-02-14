@@ -6,7 +6,8 @@ import pytest
 import copy
 from math import isclose
 
-from GHEtool import *
+from GHEtool import GroundData, Borefield, FluidData, PipeData, SizingSetup
+from GHEtool import FOLDER
 
 data = GroundData(3, 10, 0.2)
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
@@ -157,7 +158,6 @@ def empty_borefield():
 
 @pytest.fixture
 def hourly_borefield():
-    from GHEtool import FOLDER
     borefield = Borefield()
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)
@@ -170,7 +170,7 @@ def hourly_borefield_reversed():
     borefield = Borefield()
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)
-    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv", first_column_heating=False)
+    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), first_column_heating=False)
     return borefield
 
 
@@ -206,7 +206,7 @@ def test_empty_values(empty_borefield):
 
 
 def test_hourly_to_monthly(borefield):
-    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv", header=True, separator=";", first_column_heating=True)
+    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), header=True, separator=";", first_column_heating=True)
     borefield.convert_hourly_to_monthly()
 
     assert np.isclose(np.sum(borefield.baseload_cooling), np.sum(borefield.hourly_cooling_load))
@@ -508,7 +508,7 @@ def test_check_hourly_load(borefield):
     except ValueError:
         assert True
 
-    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv")
+    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     borefield.hourly_cooling_load[0] = -1
     try:
         borefield._check_hourly_load()
@@ -517,12 +517,12 @@ def test_check_hourly_load(borefield):
 
 
 def test_load_hourly_data(borefield):
-    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv")
+    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     test_cooling = copy.copy(borefield.hourly_cooling_load)
-    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv", first_column_heating=False)
+    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), first_column_heating=False)
     assert np.array_equal(test_cooling, borefield.hourly_heating_load)
 
-    borefield.load_hourly_profile("GHEtool/test/hourly_profile_without_header.csv", header=False)
+    borefield.load_hourly_profile(FOLDER.joinpath("test/hourly_profile_without_header.csv"), header=False)
     assert np.array_equal(test_cooling, borefield.hourly_cooling_load)
 
 
@@ -626,3 +626,64 @@ def test_no_ground_data():
         borefield.size()
     except ValueError:
         assert True
+
+
+def test_variable_temp_limits(borefield):
+    borefield_gt = gt.boreholes.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)
+    borefield.set_borefield(borefield_gt)
+    depth_old = borefield.size(100, L3_sizing=True, use_constant_Tg=True, use_constant_Rb=True)
+    max_temp_old = borefield.limits.temp_max[0]
+    min_temp_old = borefield.limits.temp_min[0]
+    max_limits = [16., 16., 16., 16., 15., 14., 13., 13., 14., 15., 16., 16.]
+    min_limits = [5., 5, 4, 3, 2, 1, 0, 0, 0, 2, 4, 5]
+    borefield.set_max_ground_temperature(max_limits)
+    depth_new = borefield.size(100, L3_sizing=True, use_constant_Tg=True, use_constant_Rb=True)
+    assert np.allclose(borefield.limits.temp_max, np.tile(max_limits, borefield.limits.simulation_period))
+    assert depth_old < depth_new
+    borefield.calculate_temperatures(depth_new)
+    assert np.alltrue(borefield.results_peak_cooling <= np.tile(max_limits, borefield.limits.simulation_period) * 1.000_001)
+    borefield.set_max_ground_temperature(max_temp_old)
+    depth_new = borefield.size(100, L3_sizing=True, use_constant_Tg=True, use_constant_Rb=True)
+    assert np.isclose(depth_old, depth_new)
+    borefield.set_min_ground_temperature(min_limits)
+    depth_new = borefield.size(100, L3_sizing=True, use_constant_Tg=True, use_constant_Rb=True)
+    assert np.allclose(borefield.limits.temp_min, np.tile(min_limits, borefield.limits.simulation_period))
+    assert depth_old < depth_new
+    borefield.calculate_temperatures(depth_new)
+    assert np.alltrue(borefield.results_peak_heating >= np.tile(min_limits, borefield.limits.simulation_period) * 0.999_99)
+    borefield.set_min_ground_temperature(min_temp_old)
+    depth_new = borefield.size(100, L3_sizing=True, use_constant_Tg=True, use_constant_Rb=True)
+    assert np.isclose(depth_old, depth_new)
+    borefield.set_min_ground_temperature(min_limits)
+    borefield.set_max_ground_temperature(max_limits)
+    depth_new = borefield.size(100, L3_sizing=True, use_constant_Tg=True, use_constant_Rb=True)
+    assert depth_old < depth_new
+    borefield.calculate_temperatures(depth_new)
+    assert np.alltrue(borefield.results_peak_cooling <= np.tile(max_limits, borefield.limits.simulation_period) * 1.000_001)
+    assert np.alltrue(borefield.results_peak_heating >= np.tile(min_limits, borefield.limits.simulation_period) * 0.999_99)
+    borefield.set_min_ground_temperature(min_temp_old)
+    borefield.set_max_ground_temperature(max_temp_old)
+
+def test_size_L4_variable_temp_limits(hourly_borefield):
+    borefield_gt = gt.boreholes.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)
+    assert hourly_borefield._check_hourly_load()
+    hourly_borefield.set_borefield(borefield_gt)
+    max_temp_old = hourly_borefield.limits.temp_max[0]
+    min_temp_old = hourly_borefield.limits.temp_min[0]
+    hourly_borefield.sizing_setup(L4_sizing=True)
+    depth_old = hourly_borefield.size()
+    max_limits = [16, 16, 16, 16, 15, 14, 13, 13, 14, 15, 16, 16]
+    min_limits = [5, 5, 4, 3, 2, 1, 0, 0, 0, 2, 4, 5]
+    hourly_borefield.set_min_ground_temperature(min_limits)
+    hourly_borefield.set_max_ground_temperature(max_limits)
+    depth_new = hourly_borefield.size()
+    assert depth_old < depth_new
+    assert np.allclose(hourly_borefield.limits.temp_max, np.tile([max_limits[int(t/730)] for t in range(8760)], hourly_borefield.limits.simulation_period))
+    assert np.allclose(hourly_borefield.limits.temp_min, np.tile([min_limits[int(t/730)] for t in range(8760)], hourly_borefield.limits.simulation_period))
+    hourly_borefield.calculate_temperatures(depth_new, True)
+    assert np.alltrue(hourly_borefield.results_peak_cooling <= np.tile([max_limits[int(t/730)] for t in range(8760)],
+                                                                       hourly_borefield.limits.simulation_period) * 1.000_001)
+    assert np.alltrue(hourly_borefield.results_peak_heating >= np.tile([min_limits[int(t/730)] for t in range(8760)],
+                                                                       hourly_borefield.limits.simulation_period) * 0.999_99)
+    hourly_borefield.set_min_ground_temperature(min_temp_old)
+    hourly_borefield.set_max_ground_temperature(max_temp_old)
