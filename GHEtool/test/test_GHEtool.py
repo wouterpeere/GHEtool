@@ -628,9 +628,19 @@ def test_no_ground_data():
         assert True
 
 
-def test_variable_temp_limits(borefield):
-    borefield_gt = gt.boreholes.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)
-    borefield.set_borefield(borefield_gt)
+def test_variable_temp_limits():
+    borefield = Borefield(simulation_period=20,
+                          peak_heating=peakHeating,
+                          peak_cooling=peakCooling,
+                          baseload_heating=monthlyLoadHeating,
+                          baseload_cooling=monthlyLoadCooling)
+
+    borefield.set_ground_parameters(data)
+    # set temperature boundaries
+    borefield.set_max_ground_temperature(16)  # maximum temperature
+    borefield.set_min_ground_temperature(0)  # minimum temperature
+    borefield_rec = borefield.create_rectangular_borefield(10, 12, 6.5, 6.5, 110, 4, 0.075)
+    #borefield.set_borefield(borefield_rec)
     depth_old = borefield.size(100, L3_sizing=True, use_constant_Tg=True, use_constant_Rb=True)
     max_temp_old = borefield.limits.temp_max[0]
     min_temp_old = borefield.limits.temp_min[0]

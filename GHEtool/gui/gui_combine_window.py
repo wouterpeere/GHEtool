@@ -444,7 +444,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             self.set_push_button_icon(button_cl, "Exit")
             self.set_push_button_icon(button_ca, "Abort")
             # execute message box and save response
-            reply = self.dialog.exec_()
+            reply = self.dialog.exec()
             # check if closing should be canceled
             if reply == QtW.QMessageBox.Cancel:
                 return_2_old_item()
@@ -534,7 +534,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         self.set_push_button_icon(li[0], "Okay")
         self.set_push_button_icon(li[1], "Abort")
         # set new name if the dialog is not canceled and the text is not None
-        if self.dialog.exec_() == QtW.QDialog.Accepted:
+        if self.dialog.exec() == QtW.QDialog.Accepted:
             set_name(self.dialog.textValue())
 
         self.dialog = None
@@ -760,8 +760,13 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         except (JSONDecodeError,  FileNotFoundError, UnicodeDecodeError):
             try:
                 # try to open as pickle
+                import GHEtool
+                current_borefield = GHEtool.Borefield
+                from GHEtool.old_borefield.main_class_v2_1_0 import Borefield as OldBorefield
+                GHEtool.main_class.Borefield = OldBorefield
                 with open(location, "rb") as file:
                     saving = pk_load(file)
+                GHEtool.main_class.Borefield = current_borefield
                 print('Here')
                 version = "2.1.0"
             except (FileNotFoundError, ImportError):
@@ -1352,7 +1357,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         self.set_push_button_icon(button_cl, "Exit")
         self.set_push_button_icon(button_ca, "Abort")
         # execute message box and save response
-        reply = self.dialog.exec_()
+        reply = self.dialog.exec()
         # check if closing should be canceled
         if reply == QtW.QMessageBox.Cancel:
             # cancel closing event
