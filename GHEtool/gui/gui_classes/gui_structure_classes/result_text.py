@@ -1,20 +1,11 @@
 from __future__ import annotations
 
-import abc
-from functools import partial as ft_partial
-from os.path import exists
-from typing import Callable, List, Optional, Tuple, Union
-from pathlib import Path
+from typing import Callable, List, TYPE_CHECKING
 
-import matplotlib.pyplot as plt
-import PySide6.QtCore as QtC  # type: ignore
-import PySide6.QtGui as QtG  # type: ignore
-import PySide6.QtWidgets as QtW  # type: ignore
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-from GHEtool.gui.gui_classes.gui_structure_classes.option import Option, Category
 from GHEtool.gui.gui_classes.gui_structure_classes.hint import Hint
 
+if TYPE_CHECKING:  # pragma: no cover
+    from GHEtool.gui.gui_classes.gui_structure_classes import Category
 
 
 class ResultText(Hint):

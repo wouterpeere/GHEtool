@@ -1,10 +1,9 @@
+"""
+result figure class script
+"""
 from __future__ import annotations
 
-import abc
-from functools import partial as ft_partial
-from os.path import exists
-from typing import Callable, List, Optional, Tuple, Union
-from pathlib import Path
+from typing import List, Optional, TYPE_CHECKING
 
 import matplotlib.pyplot as plt
 import PySide6.QtCore as QtC  # type: ignore
@@ -14,12 +13,11 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
 from GHEtool import FOLDER
+from GHEtool.gui.gui_classes.gui_base_class import LIGHT, WHITE, set_graph_layout
+from GHEtool.gui.gui_classes.gui_structure_classes.category import Category
 
-from GHEtool.gui.gui_classes.gui_structure_classes.category import Category, Page
-
-from GHEtool.gui.gui_classes.gui_base_class import DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE, set_graph_layout
-
-
+if TYPE_CHECKING:  # pragma: no cover
+    from GHEtool.gui.gui_classes.gui_structure_classes.page import Page
 
 class ResultFigure(Category):
     """

@@ -1,11 +1,12 @@
 """
 This file contains both the CustomGFunction class and all the relevant information w.r.t. custom gfunctions.
 """
-import pygfunction as gt
-import numpy as np
-from typing import Union, List
 import pickle
 import warnings
+from typing import List, Union
+
+import numpy as np
+import pygfunction as gt
 from scipy import interpolate
 
 

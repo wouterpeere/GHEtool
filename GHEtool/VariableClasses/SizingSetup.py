@@ -3,6 +3,7 @@ This document contains the SizingSetup class.
 This class contains all the relevant settings for the sizing options
 """
 import copy
+
 import numpy as np
 
 from GHEtool.VariableClasses.BaseClass import BaseClass

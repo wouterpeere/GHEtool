@@ -1,29 +1,19 @@
 """
-function button class
+function button class script
 """
-
 from __future__ import annotations
 
-import abc
-from typing import Callable, List, Optional, Union, Protocol
+from typing import Callable, List, Optional, Protocol, TYPE_CHECKING, Union
+
 import PySide6.QtCore as QtC  # type: ignore
 import PySide6.QtGui as QtG  # type: ignore
 import PySide6.QtWidgets as QtW  # type: ignore
+
 from GHEtool import FOLDER
+from GHEtool.gui.gui_classes.gui_base_class import WHITE
 
-from GHEtool.gui.gui_classes.gui_base_class import  WHITE
-
-class Option(Protocol):
-    label_text: str
-    default_value: Union[bool, int, float, str]
-    widget: Optional[QtW.QWidget]
-    frame: QtW.QFrame
-    label:  QtW.QLabel
-    linked_options: List[(Option, int)]
-    limit_size: bool
-
-class Category(Protocol):
-    list_of_options: List[Option]
+if TYPE_CHECKING:  # pragma: no cover
+    from GHEtool.gui.gui_classes.gui_structure_classes import Category
 
 
 class FunctionButton:

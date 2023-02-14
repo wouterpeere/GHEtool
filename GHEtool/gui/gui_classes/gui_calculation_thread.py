@@ -2,11 +2,16 @@
 This document contains all the code related to calculating the solution to the different
 aims in the GUI.
 """
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import PySide6.QtCore as QtC
 
 from GHEtool.gui.data_2_borefield_func import data_2_borefield
-from GHEtool.gui.gui_data_storage import DataStorage
+
+if TYPE_CHECKING:  # pragma: no cover
+    from GHEtool.gui.gui_data_storage import DataStorage
 
 
 class CalcProblem(QtC.QThread):

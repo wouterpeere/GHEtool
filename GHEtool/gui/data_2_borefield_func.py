@@ -1,12 +1,19 @@
+"""
+function to create a borefield class from a datastorage
+"""
+from __future__ import annotations
+
 from functools import partial
-from typing import Callable, Tuple
+from typing import TYPE_CHECKING, Tuple
 
 import numpy as np
-from numpy.typing import NDArray
 
 from GHEtool import Borefield, FluidData, GroundData, PipeData
-from GHEtool.gui.gui_data_storage import DataStorage
 from GHEtool.gui.gui_structure import load_data_GUI
+
+if TYPE_CHECKING:  # pragma: no cover
+    from GHEtool.gui.gui_data_storage import DataStorage
+    from numpy.typing import NDArray
 
 
 def data_2_borefield(ds: DataStorage) -> Tuple[Borefield, partial[[], None]]:

@@ -1,3 +1,6 @@
+"""
+script to create the translation class from csv file
+"""
 from os import system
 
 from pandas import read_csv

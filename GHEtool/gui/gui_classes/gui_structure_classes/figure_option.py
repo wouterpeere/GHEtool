@@ -1,23 +1,14 @@
+"""
+figure option class script
+"""
 from __future__ import annotations
 
-import abc
-from functools import partial as ft_partial
-from os.path import exists
-from typing import Callable, List, Optional, Tuple, Union
-from pathlib import Path
+from typing import List, TYPE_CHECKING, Tuple
 
-import matplotlib.pyplot as plt
-import PySide6.QtCore as QtC  # type: ignore
-import PySide6.QtGui as QtG  # type: ignore
-import PySide6.QtWidgets as QtW  # type: ignore
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-from GHEtool.gui.gui_classes.gui_structure_classes.option import Option, Category
-from GHEtool.gui.gui_classes.gui_structure_classes.hint import Hint
 from GHEtool.gui.gui_classes.gui_structure_classes.button_box import ButtonBox
 
-from GHEtool.gui.gui_classes.gui_base_class import DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE, set_graph_layout
-from GHEtool.gui.gui_classes.gui_structure_classes.result_figure import ResultFigure
+if TYPE_CHECKING:  # pragma: no cover
+    from GHEtool.gui.gui_classes.gui_structure_classes.result_figure import ResultFigure
 
 
 class FigureOption(ButtonBox):

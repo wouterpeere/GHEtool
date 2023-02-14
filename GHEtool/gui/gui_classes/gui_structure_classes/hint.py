@@ -1,32 +1,17 @@
 """
-float box option class
+hint class script
 """
 from __future__ import annotations
 
-import abc
-from functools import partial as ft_partial
-from os.path import exists
-from typing import Callable, List, Optional, Tuple, Union, Protocol
-from pathlib import Path
+from typing import Optional, TYPE_CHECKING
 
-import matplotlib.pyplot as plt
-import PySide6.QtCore as QtC  # type: ignore
-import PySide6.QtGui as QtG  # type: ignore
 import PySide6.QtWidgets as QtW  # type: ignore
 
-from GHEtool.gui.gui_classes.gui_base_class import DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE, set_graph_layout
+from GHEtool.gui.gui_classes.gui_base_class import WARNING
 
-class Option(Protocol):
-    label_text: str
-    default_value: Union[bool, int, float, str]
-    widget: Optional[QtW.QWidget]
-    frame: QtW.QFrame
-    label:  QtW.QLabel
-    linked_options: List[(Option, int)]
-    limit_size: bool
+if TYPE_CHECKING:  # pragma: no cover
+    from GHEtool.gui.gui_classes.gui_structure_classes import Category
 
-class Category(Protocol):
-    list_of_options: List[Option]
 
 class Hint:
     """

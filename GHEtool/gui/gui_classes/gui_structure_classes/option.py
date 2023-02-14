@@ -1,20 +1,19 @@
 """
-option base class
+option base class script
 """
-
 from __future__ import annotations
 
 import abc
-from typing import Callable, List, Optional, Tuple, Union, Protocol
+from typing import Callable, List, Optional, TYPE_CHECKING, Tuple, Union
 
-import PySide6.QtCore as QtC  # type: ignore
-import PySide6.QtGui as QtG  # type: ignore
 import PySide6.QtWidgets as QtW  # type: ignore
+
 from GHEtool.gui.gui_classes.gui_base_class import WHITE
 from GHEtool.gui.gui_classes.gui_structure_classes.aim import Aim
 
-class Category(Protocol):
-    list_of_options: List[Option]
+if TYPE_CHECKING:  # pragma: no cover
+    from GHEtool.gui.gui_classes.gui_structure_classes import Category
+
 
 
 class Option(metaclass=abc.ABCMeta):

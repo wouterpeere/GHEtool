@@ -1,7 +1,8 @@
 # import pytest
+import json
+
 import numpy as np
 import pygfunction as gt
-import json
 
 from GHEtool import *
 from GHEtool.VariableClasses.BaseClass import BaseClass

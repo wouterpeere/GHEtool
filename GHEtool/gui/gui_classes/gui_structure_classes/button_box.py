@@ -1,22 +1,21 @@
+"""
+button box class script
+"""
 from __future__ import annotations
 
-import abc
 from functools import partial as ft_partial
-from os.path import exists
-from typing import Callable, List, Optional, Tuple, Union
-from pathlib import Path
+from typing import TYPE_CHECKING, Callable, List, Union
 
-import PySide6.QtCore as QtC  # type: ignore
-import PySide6.QtGui as QtG  # type: ignore
 import PySide6.QtWidgets as QtW  # type: ignore
 
-from GHEtool.gui.gui_classes.gui_structure_classes.function_button import FunctionButton
-from GHEtool.gui.gui_classes.gui_structure_classes.option import Option, Category
-from GHEtool.gui.gui_classes.gui_structure_classes.hint import Hint
-
 from GHEtool.gui.gui_classes.gui_base_class import DARK, GREY, LIGHT, WHITE
+from GHEtool.gui.gui_classes.gui_structure_classes.functions import _update_opponent_not_change, _update_opponent_toggle, check
+from GHEtool.gui.gui_classes.gui_structure_classes.option import Option
 
-from GHEtool.gui.gui_classes.gui_structure_classes.functions import check, _update_opponent_toggle, _update_opponent_not_change
+if TYPE_CHECKING:  # pragma: no cover
+    from GHEtool.gui.gui_classes.gui_structure_classes.category import Category
+    from GHEtool.gui.gui_classes.gui_structure_classes.function_button import FunctionButton
+    from GHEtool.gui.gui_classes.gui_structure_classes.hint import Hint
 
 
 class ButtonBox(Option):

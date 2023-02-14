@@ -1,21 +1,21 @@
 """
 filename box
 """
-import abc
-from functools import partial as ft_partial
+from __future__ import annotations
+
 from os.path import exists
-from typing import Callable, List, Optional, Tuple, Union
 from pathlib import Path
+from typing import Callable, TYPE_CHECKING
 
-import matplotlib.pyplot as plt
 import PySide6.QtCore as QtC  # type: ignore
-import PySide6.QtGui as QtG  # type: ignore
 import PySide6.QtWidgets as QtW  # type: ignore
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-from GHEtool.gui.gui_classes.gui_structure_classes.option import Option, Category
 
-from GHEtool.gui.gui_classes.gui_base_class import DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE, set_graph_layout
+from GHEtool.gui.gui_classes.gui_base_class import DARK, LIGHT, LIGHT_SELECT, WHITE
+from GHEtool.gui.gui_classes.gui_structure_classes.option import Option
+
+if TYPE_CHECKING:  # pragma: no cover
+    from GHEtool.gui.gui_classes.gui_structure_classes.category import Category
+
 
 class FileNameBox(Option):
     """

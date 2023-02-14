@@ -1,7 +1,10 @@
-import sys
-from sys import argv
+"""
+script to start the GUI
+"""
+import sys  # pragma: no cover
+from sys import argv  # pragma: no cover
 
-is_frozen = getattr(sys, 'frozen', False)
+is_frozen = getattr(sys, 'frozen', False)  # pragma: no cover
 
 
 def run(path_list=None):  # pragma: no cover

@@ -1,18 +1,17 @@
 import os
+import pathlib
 from math import isclose
 from sys import setrecursionlimit
 from typing import List
 
+import keyboard
 import PySide6.QtCore as QtC
 import PySide6.QtWidgets as QtW
 from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
 
 from GHEtool import FOLDER
-from GHEtool.gui.gui_classes.gui_structure_classes import ButtonBox, FigureOption, FloatBox, IntBox, ListBox
 from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
-
-import keyboard
-import pathlib
+from GHEtool.gui.gui_classes.gui_structure_classes import ButtonBox, FigureOption, FloatBox, IntBox, ListBox
 
 setrecursionlimit(1500)
 

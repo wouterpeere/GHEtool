@@ -1,12 +1,12 @@
 """
 script which contain basic gui structure functions
 """
-
 from __future__ import annotations
 
-from typing import List, Union, Protocol
+from typing import List, Protocol, Union
 
 import PySide6.QtWidgets as QtW  # type: ignore
+
 
 def _update_opponent_not_change(button: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
     """
