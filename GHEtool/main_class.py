@@ -253,7 +253,7 @@ class Borefield(BaseClass):
             return
         self.borefield = borefield
 
-    def create_rectangular_borefield(self, N_1: int, N_2: int, B_1: int, B_2: int, H: float, D: float = 1, r_b: float = 0.075):
+    def create_rectangular_borefield(self, N_1: int, N_2: int, B_1: float, B_2: float, H: float, D: float = 1, r_b: float = 0.075):
         """
         This function creates a rectangular borefield.
         It calls the pygfunction module in the background.
@@ -913,6 +913,7 @@ class Borefield(BaseClass):
         ValueError
             ValueError when no ground data is provided
         """
+        self.H_init = H_init
 
         # check ground data
         if not self.ground_data.check_values():

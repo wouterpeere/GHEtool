@@ -634,14 +634,15 @@ def test_variable_temp_limits():
                           peak_cooling=peakCooling,
                           baseload_heating=monthlyLoadHeating,
                           baseload_cooling=monthlyLoadCooling)
-
-    borefield.set_ground_parameters(data)
+    data2 = GroundData(3, 10, 0.2)
+    borefield.set_ground_parameters(data2)
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)  # maximum temperature
     borefield.set_min_ground_temperature(0)  # minimum temperature
-    borefield_rec = borefield.create_rectangular_borefield(10, 12, 6.5, 6.5, 110, 4, 0.075)
-    #borefield.set_borefield(borefield_rec)
+    borefield_rec2 = borefield.create_rectangular_borefield(10, 12, 6.5, 6.5, 100, 4, 0.075)
+    borefield.set_borefield(borefield_rec2)
     depth_old = borefield.size(100, L3_sizing=True, use_constant_Tg=True, use_constant_Rb=True)
+    borefield.gfunction_calculation_object.remove_previous_data()
     max_temp_old = borefield.limits.temp_max[0]
     min_temp_old = borefield.limits.temp_min[0]
     max_limits = [16., 16., 16., 16., 15., 14., 13., 13., 14., 15., 16., 16.]
@@ -674,10 +675,14 @@ def test_variable_temp_limits():
     borefield.set_min_ground_temperature(min_temp_old)
     borefield.set_max_ground_temperature(max_temp_old)
 
-def test_size_L4_variable_temp_limits(hourly_borefield):
-    borefield_gt = gt.boreholes.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)
+def test_size_L4_variable_temp_limits():
+    hourly_borefield = Borefield()
+    data2 = GroundData(3, 10, 0.2)
+    hourly_borefield.set_ground_parameters(data2)
+    hourly_borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    borefield_gt2 = gt.boreholes.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)
+    hourly_borefield.set_borefield(borefield_gt2)
     assert hourly_borefield._check_hourly_load()
-    hourly_borefield.set_borefield(borefield_gt)
     max_temp_old = hourly_borefield.limits.temp_max[0]
     min_temp_old = hourly_borefield.limits.temp_min[0]
     hourly_borefield.sizing_setup(L4_sizing=True)
