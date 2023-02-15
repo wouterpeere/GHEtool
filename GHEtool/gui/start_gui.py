@@ -1,8 +1,8 @@
 """
 script to start the GUI
 """
-import sys  # pragma: no cover
-from sys import argv  # pragma: no cover
+import sys
+from sys import argv
 
 is_frozen = getattr(sys, 'frozen', False)  # pragma: no cover
 
