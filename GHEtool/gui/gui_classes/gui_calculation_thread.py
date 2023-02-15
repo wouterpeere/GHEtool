@@ -11,7 +11,7 @@ import PySide6.QtCore as QtC
 from GHEtool.gui.data_2_borefield_func import data_2_borefield
 
 if TYPE_CHECKING:  # pragma: no cover
-    from GHEtool.gui.gui_data_storage import DataStorage
+    from GHEtool.gui.gui_classes.gui_data_storage import DataStorage
 
 
 class CalcProblem(QtC.QThread):

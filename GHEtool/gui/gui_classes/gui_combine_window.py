@@ -21,7 +21,7 @@ from GHEtool.gui.gui_classes.gui_base_class import UiGhetool, set_graph_layout
 from GHEtool.gui.gui_classes.gui_calculation_thread import CalcProblem
 from GHEtool.gui.gui_classes.gui_structure_classes.functions import check_aim_options, show_linked_options
 from GHEtool.gui.gui_classes.translation_class import Translations
-from GHEtool.gui.gui_data_storage import DataStorage
+from GHEtool.gui.gui_classes.gui_data_storage import DataStorage
 from GHEtool.gui.gui_structure import FigureOption, GuiStructure, Option
 
 currentdir = dirname(realpath(__file__))
@@ -760,10 +760,14 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         except (JSONDecodeError,  FileNotFoundError, UnicodeDecodeError):
             try:
                 # try to open as pickle
+                import GHEtool
+                from GHEtool.gui.gui_classes import gui_data_storage
+                GHEtool.gui.gui_data_storage = gui_data_storage
+                GHEtool.gui.gui_data_storage.DataStorage = gui_data_storage.DataStorage
                 with open(location, "rb") as file:
                     saving = pk_load(file)
                 version = "2.1.0"
-            except (FileNotFoundError, ImportError):
+            except (FileNotFoundError, ):
                 raise ImportError("The datafile cannot be loaded!")
 
         if version == "2.1.1":
