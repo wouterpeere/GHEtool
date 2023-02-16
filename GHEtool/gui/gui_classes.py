@@ -27,7 +27,7 @@ import PySide6.QtWidgets as QtW  # type: ignore
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
-
+from GHEtool import ghe_logger
 from GHEtool.gui.gui_base_class import DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE, set_graph_layout
 
 
@@ -89,18 +89,18 @@ class Option(metaclass=abc.ABCMeta):
 
     default_parent: Optional[QtW.QWidget] = None
 
-    def __init__(self, label: str, default_value: Union[bool, int, float, str], category: Category):
+    def __init__(self, label: List[str], default_value: Union[bool, int, float, str], category: Category):
         """
         Parameters
         ----------
-        label : str
+        label : list[str]
             The label related to the option
         default_value : bool, int, float, str
             The default value of the option
         category : Category
             The category in which the option should be placed
         """
-        self.label_text: str = label
+        self.label_text: List[str] = label
         self.default_value: Union[bool, int, float, str] = default_value
         self.widget: Optional[QtW.QWidget] = None
         self.frame: QtW.QFrame = QtW.QFrame(self.default_parent)
@@ -244,7 +244,6 @@ class Option(metaclass=abc.ABCMeta):
         -------
         None
         """
-        self.label_text = name
         self.label.setText(name)
 
     def deactivate_size_limit(self) -> None:
@@ -277,7 +276,7 @@ class Option(metaclass=abc.ABCMeta):
             The frame created for this option
         """
 
-        if self.label_text == "":
+        if not self.label_text:
             self.frame.setParent(None)
             self.frame = frame
             return frame.layout()
@@ -289,7 +288,7 @@ class Option(metaclass=abc.ABCMeta):
         layout.setSpacing(6)
         layout.setContentsMargins(0, 0, 0, 0)
         self.label.setParent(frame)
-        self.label.setText(self.label_text)
+        self.label.setText(self.label_text[0])
         layout.addWidget(self.label)
         if create_spacer:
             spacer = QtW.QSpacerItem(1, 1, QtW.QSizePolicy.Expanding, QtW.QSizePolicy.Minimum)
@@ -367,8 +366,19 @@ class Option(metaclass=abc.ABCMeta):
         None
         """
 
+    def translate(self, idx: int):
+        """
+        translate the label
+
+        Parameters
+        ----------
+        idx: int
+            index of language
+        """
+        self.set_text(self.label_text[idx])
+
     def __repr__(self):
-        return f'{type(self).__name__}; Label: {self.label_text}; Value: {self.get_value()}'
+        return f'{type(self).__name__}; Label: {self.label_text[0]}; Value: {self.get_value()}'
 
 
 def check(linked_options: List[(Union[Option, List[Option]], int)], option_input: Option, index: int):
@@ -412,13 +422,13 @@ class FloatBox(Option):
     This class contains all the functionalities of the FloatBox option in the GUI.
     The FloatBox can be used to input floating point numbers.
     """
-    def __init__(self, label: str, default_value: float, category: Category, decimal_number: int = 0,
+    def __init__(self, label: List[str], default_value: float, category: Category, decimal_number: int = 0,
                  minimal_value: float = 0.0, maximal_value: float = 100.0, step: float = 1.0):
         """
 
         Parameters
         ----------
-        label : str
+        label : list[str]
             The label of the FloatBox
         default_value : float
             The default value of the FloatBox
@@ -436,7 +446,7 @@ class FloatBox(Option):
 
         Examples
         --------
-        >>> option_float = FloatBox(label='Float label text',
+        >>> option_float = FloatBox(label=self.translations.option_float,
         >>>                         default_value=0.5,
         >>>                         category=category_example,
         >>>                         decimal_number=2,
@@ -642,12 +652,12 @@ class IntBox(Option):
     This class contains all the functionalities of the IntBox (integer box) option in the GUI.
     The IntBox can be used to input integer numbers.
     """
-    def __init__(self, label: str, default_value: int, category: Category, minimal_value: int = 0, maximal_value: int = 100, step: int = 1):
+    def __init__(self, label: List[str], default_value: int, category: Category, minimal_value: int = 0, maximal_value: int = 100, step: int = 1):
         """
 
         Parameters
         ----------
-        label : str
+        label : list[str]
             The label of the IntBox
         default_value : int
             The default value of the IntBox
@@ -663,7 +673,7 @@ class IntBox(Option):
 
         Examples
         --------
-        >>> option_float = IntBox(label='Int label text',
+        >>> option_int = IntBox(label=self.translations.option_int,
         >>>                       default_value=2,
         >>>                       category=category_example,
         >>>                       minimal_value=0,
@@ -866,12 +876,12 @@ class ButtonBox(Option):
 
     TOGGLE: bool = True
 
-    def __init__(self, label: str, default_index: int, entries: List[str], category: Category):
+    def __init__(self, label: List[str], default_index: int, entries: List[str], category: Category):
         """
 
         Parameters
         ----------
-        label : str
+        label : list[str]
             The label of the ButtonBox
         default_index : int
             The default index of the ButtonBox
@@ -882,7 +892,7 @@ class ButtonBox(Option):
 
         Examples
         --------
-        >>> option_buttons = ButtonBox(label='Button box label text',
+        >>> option_buttons = ButtonBox(label=self.translations.option_buttons,
         >>>                            default_index=0,
         >>>                            entries=['option 1', 'option 2'],
         >>>                            category=category_example)
@@ -1013,8 +1023,8 @@ class ButtonBox(Option):
         None
         """
         entry_name: List[str, str] = name.split(',')
-        self.label_text = entry_name[0]
-        self.label.setText(self.label_text)
+        label_text = entry_name[0]
+        self.label.setText(label_text)
         for button, button_name in zip(self.widget, entry_name[1:]):
             button.setText(f" {button_name.replace('++', ',')} ")
 
@@ -1100,12 +1110,12 @@ class ListBox(Option):
     This class contains all the functionalities of the ListBox option in the GUI.
     The ListBox can be used to select one option out of many (sort of like the ButtonBox)
     """
-    def __init__(self, label: str, default_index: int, entries: List[str], category: Category):
+    def __init__(self, label: List[str], default_index: int, entries: List[str], category: Category):
         """
 
         Parameters
         ----------
-        label : str
+        label : list[str]
             The label of the ListBox
         default_index : int
             The default index of the ListBox
@@ -1116,7 +1126,7 @@ class ListBox(Option):
 
         Examples
         --------
-        >>> option_list = ListBox(label='List box label text',
+        >>> option_list = ListBox(label=self.translations.option_list,
         >>>                       default_index=0,
         >>>                       entries=['Option 1', 'Option 2'],
         >>>                       category=category_example)
@@ -1205,8 +1215,8 @@ class ListBox(Option):
         None
         """
         entry_name: List[str, str] = name.split(',')
-        self.label_text = entry_name[0]
-        self.label.setText(self.label_text)
+        label_text = entry_name[0]
+        self.label.setText(label_text)
         for idx, name in enumerate(entry_name[1:]):
             self.widget.setItemText(idx, name)
 
@@ -1309,12 +1319,12 @@ class FileNameBox(Option):
     This class contains all the functionalities of the FileNameBox (filename input box) option in the GUI.
     The FileNameBox can be used to import a datafile.
     """
-    def __init__(self, label: str, default_value: str, dialog_text: str, error_text: str, status_bar: QtW.QStatusBar, category: Category):
+    def __init__(self, label: List[str], default_value: str, dialog_text: str, error_text: str, category: Category):
         """
 
         Parameters
         ----------
-        label : str
+        label : list[str]
             The label of the FileNameBox
         default_value : int
             The default value of the FileNameBox
@@ -1322,18 +1332,15 @@ class FileNameBox(Option):
             Text to be displayed in the top bar of the dialog box
         error_text : str
             Error text be be shown in the status_bar
-        status_bar : QtW.QStatusBar
-            Status bar to put in an error message related to the file import
         category : Category
             Category in which the FileNameBox should be placed
 
         Examples
         --------
-        >>> option_file = FileNameBox(label='File name box label text',
+        >>> option_file = FileNameBox(label=self.translations.option_file,
         >>>                           default_value='example_file.XX',
         >>>                           dialog_text='Choose *.XX file',
         >>>                           error_text='no file found',
-        >>>                           status_bar=status_bar,
         >>>                           category=category_example)
 
         Gives:
@@ -1345,7 +1352,6 @@ class FileNameBox(Option):
         self.widget: QtW.QLineEdit = QtW.QLineEdit(self.default_parent)
         self.dialog_text: str = dialog_text
         self.error_text: str = error_text
-        self.status_bar: QtW.QStatusBar = status_bar
 
     def get_value(self) -> str:
         """
@@ -1486,7 +1492,7 @@ class FileNameBox(Option):
             self.widget.setText(filename[0])
         # show warning if no file is selected in status bar for 5 seconds
         except FileNotFoundError:
-            self.status_bar.showMessage(self.error_text, 5000)
+            ghe_logger.error(self.error_text, 5000)
 
 
 class Hint:
@@ -1497,7 +1503,7 @@ class Hint:
 
     default_parent: Optional[QtW.QWidget] = None
 
-    def __init__(self, hint: str, category: Category, warning: bool = False):
+    def __init__(self, hint: List[str], category: Category, warning: bool = False):
         """
 
         Parameters
@@ -1511,7 +1517,7 @@ class Hint:
 
         Examples
         --------
-        >>> hint_example = Hint(hint='This is a hint to something important.',
+        >>> hint_example = Hint(hint=self.translations.hint_example,
         >>>                     category=category_example,
         >>>                     warning=True)
 
@@ -1520,7 +1526,7 @@ class Hint:
         .. figure:: _static/Example_Hint.PNG
 
         """
-        self.hint: str = hint
+        self.hint: List[str] = hint
         self.label: QtW.QLabel = QtW.QLabel(self.default_parent)
         self.warning = warning
         category.list_of_options.append(self)
@@ -1547,7 +1553,7 @@ class Hint:
         None
         """
         self.label.setParent(frame)
-        self.label.setText(self.hint)
+        self.label.setText(self.hint[0])
         if self.warning:
             self.label.setStyleSheet(f"color: {WARNING};")
         self.label.setWordWrap(True)
@@ -1600,11 +1606,21 @@ class Hint:
         -------
         None
         """
-        self.hint: str = name
-        self.label.setText(self.hint)
+        self.label.setText(name)
+
+    def translate(self, idx: int):
+        """
+        translate the label
+
+        Parameters
+        ----------
+        idx: int
+            index of language
+        """
+        self.set_text(self.hint[idx])
 
     def __repr__(self):
-        return f'{type(self).__name__}; Hint: {self.hint}; Warning: {self.warning}'
+        return f'{type(self).__name__}; Hint: {self.hint[0]}; Warning: {self.warning}'
 
 
 class FunctionButton:
@@ -1614,7 +1630,7 @@ class FunctionButton:
     """
     default_parent: Optional[QtW.QWidget] = None
 
-    def __init__(self, button_text: str, icon: str, category: Category):
+    def __init__(self, button_text: List[str], icon: str, category: Category):
         """
 
         Parameters
@@ -1628,7 +1644,7 @@ class FunctionButton:
 
         Examples
         --------
-        >>> function_example = FunctionButton(button_text='Press Here to activate function',
+        >>> function_example = FunctionButton(button_text=self.translations.function_example,
         >>>                                   icon=':/icons/icons/example_icon.svg',
         >>>                                   category=category_example)
 
@@ -1637,7 +1653,7 @@ class FunctionButton:
         .. figure:: _static/Example_Function_Button.PNG
 
         """
-        self.button_text: str = button_text
+        self.button_text: List[str] = button_text
         self.icon: str = icon
         self.frame: QtW.QFrame = QtW.QFrame(self.default_parent)
         self.button: QtW.QPushButton = QtW.QPushButton(self.default_parent)
@@ -1659,7 +1675,7 @@ class FunctionButton:
         None
         """
         self.button.setParent(frame)
-        self.button.setText(f"  {self.button_text}  ")
+        self.button.setText(f"  {self.button_text[0]}  ")
         icon = QtG.QIcon()
         # icon11.addPixmap(QtGui_QPixmap(icon), QtGui_QIcon.Normal, QtGui_QIcon.Off)
         icon.addFile(self.icon)
@@ -1727,8 +1743,18 @@ class FunctionButton:
         -------
         None
         """
-        self.button_text: str = name
-        self.button.setText(self.button_text)
+        self.button.setText(name)
+
+    def translate(self, idx: int):
+        """
+        translate the label
+
+        Parameters
+        ----------
+        idx: int
+            index of language
+        """
+        self.set_text(self.button_text[idx])
 
     def change_event(self, function_to_be_called: Callable, *args) -> None:
         """
@@ -1753,7 +1779,7 @@ class ResultText(Hint):
     This class contains all the functionalities of the ResultText option in the GUI.
     The ResultText option can be used to show text results in the results page.
     """
-    def __init__(self, result_name: str, category: Category, prefix: str = "", suffix: str = ""):
+    def __init__(self, result_name: List[str], category: Category, prefix: str = "", suffix: str = ""):
         """
 
         Parameters
@@ -1771,7 +1797,7 @@ class ResultText(Hint):
         --------
         The example below show the text result for the borefield depth.
 
-        >>> self.result_text_depth = ResultText("Depth", category=self.numerical_results, prefix="Depth: ", suffix="m")
+        >>> self.result_text_depth = ResultText(self.translations.result_text_depth, category=self.numerical_results, prefix="Depth: ", suffix="m")
         >>> self.result_text_depth.text_to_be_shown("Borefield", "H")
         >>> self.result_text_depth.function_to_convert_to_text(lambda x: round(x, 2))
 
@@ -1878,26 +1904,26 @@ class Category:
 
     default_parent: Optional[QtW.QWidget] = None
 
-    def __init__(self, label: str, page: Page):
+    def __init__(self, label: List[str], page: Page):
         """
 
         Parameters
         ----------
-        label : str
+        label : list[str]
             Label of the category
         page : Page
             Page on which the category should be placed
 
         Examples
         --------
-        >>> category_example = Category(label='Example category',
+        >>> category_example = Category(label=self.translations.category_example,
         >>>                             page=page_example)
 
         Gives:
 
         .. figure:: _static/Example_Category.PNG
         """
-        self.label_text: str = label
+        self.label_text: List[str] = label
         self.label: QtW.QLabel = QtW.QLabel(self.default_parent)
         self.list_of_options: List[Union[Option, Hint, FunctionButton]] = []
         self.frame: QtW.QFrame = QtW.QFrame(self.default_parent)
@@ -1981,7 +2007,6 @@ class Category:
         -------
         None
         """
-        self.label_text = name
         self.label.setText(name)
 
     def create_widget(self, page: QtW.QWidget, layout: QtW.QLayout):
@@ -2002,7 +2027,7 @@ class Category:
         None
         """
         self.label.setParent(page)
-        self.label.setText(self.label_text)
+        self.label.setText(self.label_text[0])
         self.label.setStyleSheet(
             f"QLabel {'{'}border: 1px solid  {LIGHT};border-top-left-radius: 15px;border-top-right-radius: 15px;background-color:  {LIGHT};padding: 5px 0px;\n"
             f"	color:  {WHITE};font-weight:500;{'}'}"
@@ -2034,7 +2059,7 @@ class Category:
                 if isinstance(option, Hint):
                     option.create_widget(self.frame, self.layout_frame, row=row, column=column)
                 else:
-                    if option.label_text == "":
+                    if not option.label_text:
                         option.deactivate_size_limit()
                     option.create_widget(self.frame, self.layout_frame, row=row, column=column)
                 if row == self.grid_layout - 1:
@@ -2129,8 +2154,19 @@ class Category:
         """
         return self.frame.isHidden()
 
+    def translate(self, idx: int):
+        """
+        translate the label
+
+        Parameters
+        ----------
+        idx: int
+            index of language
+        """
+        self.set_text(self.label_text[idx])
+
     def __repr__(self):
-        return f'{type(self).__name__}; Label: {self.label_text}'
+        return f'{type(self).__name__}; Label: {self.label_text[0]}'
 
 
 class FigureOption(ButtonBox):
@@ -2139,7 +2175,7 @@ class FigureOption(ButtonBox):
     Such an element is not placed in itself on the GUI, but is part of the ResultFigure category.
     It can be used to add an extra option to alter the figure shown.
     """
-    def __init__(self, category: ResultFigure, label: str, param: str, default: int, entries: List[str], entries_values: List):
+    def __init__(self, category: ResultFigure, label: List[str], param: str, default: int, entries: List[str], entries_values: List):
         """
 
         Parameters
@@ -2162,7 +2198,7 @@ class FigureOption(ButtonBox):
         The example below adds the legende on/off option to the temperature profile figure.
 
         >>> FigureOption(category=self.figure_temperature_profile,
-        >>>              label="Legend on",
+        >>>              label=self.translations.figure_option,
         >>>              param="legend",
         >>>              default=0,
         >>>              entries=["No", "Yes"],
@@ -2221,7 +2257,7 @@ class ResultFigure(Category):
     The ResultFigure option can be used to show figurative results in the results page.
     It is a category showing a figure and optionally a couple of FigureOptions to alter this figure.
     """
-    def __init__(self, label: str, page: Page):
+    def __init__(self, label: List[str], page: Page):
         """
 
         Parameters
@@ -2235,7 +2271,7 @@ class ResultFigure(Category):
         --------
         The code below generates a ResultFigure category named 'Temperature evolution'.
 
-        >>> ResultFigure(label="Temperature evolution",
+        >>> ResultFigure(label=self.translation.result_figure,
         >>>              page=self.page_result)
 
         Gives (note that the FigureOption for the legend is also included):
@@ -2346,9 +2382,9 @@ class ResultFigure(Category):
         -------
         None
         """
-        entry_name: List[str, str] = name.split(',')
-        self.label_text = entry_name[0]
-        self.label.setText(self.label_text)
+        entry_name: List[str] = name.split(',')
+        label_text = entry_name[0]
+        self.label.setText(label_text)
         self.y_axes_text: str = entry_name[1]
         self.x_axes_text: str = entry_name[2]
         self.ax.set_xlabel(self.x_axes_text)
@@ -2452,12 +2488,12 @@ class Aim:
 
     default_parent: Optional[QtW.QWidget] = None
 
-    def __init__(self, label: str, icon: str, page: Page):
+    def __init__(self, label: List[str], icon: str, page: Page):
         """
 
         Parameters
         ----------
-        label : str
+        label : list[str]
             Name of the Aim
         icon : str
             Path to the icon for the Aim
@@ -2466,7 +2502,7 @@ class Aim:
 
         Examples
         --------
-        >>> aim_example = Aim(label='Example aim',
+        >>> aim_example = Aim(label=self.translations.aim_example,
         >>>                   icon=":/icons/icons/example_icon.svg",
         >>>                   page=page_aim)
 
@@ -2475,7 +2511,7 @@ class Aim:
         .. figure:: _static/Example_Aim.PNG
 
         """
-        self.label: str = label
+        self.label: List[str] = label
         self.icon: str = icon
         self.widget: QtW.QPushButton = QtW.QPushButton(self.default_parent)
         self.list_options: List[Union[Option, Category, FunctionButton]] = []
@@ -2494,8 +2530,18 @@ class Aim:
         -------
         None
         """
-        self.label = name
         self.widget.setText(name)
+
+    def translate(self, idx: int):
+        """
+        translate the label
+
+        Parameters
+        ----------
+        idx: int
+            index of language
+        """
+        self.set_text(self.label[idx])
 
     def change_event(self, function_to_be_called: Callable, *args) -> None:
         """
@@ -2569,7 +2615,7 @@ class Aim:
         )
         push_button.setIconSize(QtC.QSize(30, 30))
         push_button.setCheckable(True)
-        push_button.setText(self.label)
+        push_button.setText(self.label[0])
         layout.addWidget(push_button, int(idx / 2), 0 if divmod(idx, 2)[1] == 0 else 1, 1, 1)
 
 
@@ -2639,31 +2685,28 @@ class Page:
     default_parent: Optional[QtW.QWidget] = None
     TOGGLE: bool = True
 
-    def __init__(self, name: str, button_name: str, icon: str):
+    def __init__(self, name: List[str], icon: str):
         """
 
         Parameters
         ----------
         name : str
             Name of the page (shown on top of the Page)
-        button_name : str
-            Text to be shown on the button for the Page
         icon : str
             Path to the icon that is used for the Page
 
         Examples
         --------
 
-        >>> page_example = Page(name='Example page',
-        >>>                     button_name='Name of\\nthe button',
+        >>> page_example = Page(name=self.translations.page_example,
         >>>                     icon=":/icons/icons/example_icon.svg")
 
         Gives:
 
         .. figure:: _static/Example_Page.PNG
         """
-        self.name: str = name
-        self.button_name: str = button_name
+        self.name: List[str] = name
+        self.button_name: str = ""
         self.icon: str = icon
         self.push_button_next: Optional[QtW.QPushButton] = None
         self.push_button_previous: Optional[QtW.QPushButton] = None
@@ -2707,14 +2750,25 @@ class Page:
         None
         """
         entry_name: List[str, str] = name.split(',')
-        self.name = entry_name[1]
+        name = entry_name[1]
         self.button_name = entry_name[0].replace('@', '\n')
-        self.label.setText(self.name)
+        self.label.setText(name)
         self.button.setText(self.button_name)
         if self.push_button_previous is not None:
             self.push_button_previous.setText(self.previous_label)
         if self.push_button_next is not None:
             self.push_button_next.setText(self.next_label)
+
+    def translate(self, idx: int):
+        """
+        translate the label
+
+        Parameters
+        ----------
+        idx: int
+            index of language
+        """
+        self.set_text(self.name[idx])
 
     def set_previous_page(self, previous_page: Page) -> None:
         """
@@ -2769,7 +2823,6 @@ class Page:
         self.label.setParent(central_widget)
         label: QtW.QLabel = self.label
         label.setStyleSheet('font: 63 16pt "Lexend SemiBold";')
-        label.setText(self.name)
         layout.addWidget(label)
         spacer_label = QtW.QLabel(self.page)
         spacer_label.setMinimumHeight(6)
@@ -2809,7 +2862,6 @@ class Page:
         icon23.addFile(self.icon, QtC.QSize(), QtG.QIcon.Normal, QtG.QIcon.Off)
         self.button.setIcon(icon23)
         self.button.setIconSize(QtC.QSize(24, 24))
-        self.button.setText(self.button_name)
         self.label_gap.setParent(central_widget)
         self.label_gap.setMinimumSize(QtC.QSize(0, 6))
         self.label_gap.setMaximumSize(QtC.QSize(16777215, 6))
@@ -2817,6 +2869,7 @@ class Page:
         vertical_layout_menu.addWidget(self.button)
         vertical_layout_menu.addWidget(self.label_gap)
         self.button.clicked.connect(ft_partial(stacked_widget.setCurrentWidget, self.page))  # pylint: disable=E1101
+        self.set_text(self.name[0])
         for function_2_be_called in self.functions_button_clicked:
             self.button.clicked.connect(function_2_be_called)  # pylint: disable=E1101
 

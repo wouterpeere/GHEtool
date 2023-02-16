@@ -216,6 +216,7 @@ class Translations:  # pragma: no cover
         "option_len_peak_heating",
         "option_len_peak_cooling",
         "option_temperature_profile_hourly",
+        "option_n_threads",
         "languages",
     )
 
@@ -1721,4 +1722,13 @@ class Translations:  # pragma: no cover
             "Should hourly data be used for the temperature profile?, no , yes ",
             "Should hourly data be used for the temperature profile?, no , yes ",
             "Should hourly data be used for the temperature profile?, no , yes",
+        ]
+        self.option_n_threads: List[str] = [
+            "Number of parallel threads [-]: ",
+            "Anzahl an parallelen Prozessen [-]: ",
+            "Number of parallel threads [-]: ",
+            "Number of parallel threads [-]: ",
+            "Number of parallel threads [-]: ",
+            "Number of parallel threads [-]: ",
+            "Number of parallel threads [-]: ",
         ]

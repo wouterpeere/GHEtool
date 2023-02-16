@@ -2,7 +2,6 @@ import logging
 from pathlib import Path, PurePath
 
 
-
 class CustomFormatter(logging.Formatter):
 
     grey = '\x1b[38;21m'

@@ -35,8 +35,6 @@ def run(path_list=None):  # pragma: no cover
         main_window.filename = ([path for path in path_list if path.endswith('.GHEtool')][0], 0)
         main_window.fun_load_known_filename()
 
-    ghe_logger.addHandler(main_window.status_bar)
-
     # show window
     try:
         import pyi_splash

@@ -8,7 +8,7 @@ from os.path import split as os_split
 from pathlib import Path, PurePath
 from sys import path
 from typing import List, Tuple, Optional, Union
-from GHEtool import Borefield, FOLDER
+from GHEtool import Borefield, FOLDER, ghe_logger
 from configparser import ConfigParser
 
 import PySide6.QtCore as QtC
@@ -64,8 +64,9 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         super(MainWindow, self).__init__()
         super().setup_ui(dialog)
         # pyside6-rcc icons.qrc -o icons_rc.py
-
-        self.gui_structure = GuiStructure(self.central_widget, self.status_bar.widget)
+        ghe_logger.addHandler(self.status_bar)
+        self.translations: Translations = Translations()  # init translation class
+        self.gui_structure = GuiStructure(self.central_widget, self.translations)
         for page in self.gui_structure.list_of_pages:
             page.create_page(self.central_widget, self.stackedWidget, self.verticalLayout_menu)
 
@@ -87,7 +88,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # check if backup folder exits and otherwise create it
         makedirs(dirname(self.backup_file), exist_ok=True)
         makedirs(dirname(self.default_path), exist_ok=True)
-        self.translations: Translations = Translations()  # init translation class
         for idx, (name, icon, short_cut) in enumerate(zip(self.translations.languages, self.translations.icon, self.translations.short_cut)):
             self._create_action_language(idx, name, icon, short_cut)
         # add languages to combo box
@@ -98,8 +98,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         self.changedFile: bool = False  # set change file variable to false
         self.ax: list = []  # axes of figure
         self.axBorehole = None
-        self.NumberOfScenarios: int = 1  # number of scenarios
-        self.finished: int = 1  # number of finished scenarios
+        self.n_threads: int = 1  # number of scenarios
         self.threads: List[CalcProblem] = []  # list of calculation threads
         self.list_ds: List[DataStorage] = []  # list of data storages
         self.sizeB = QtC.QSize(48, 48)  # size of big logo on push button
@@ -658,7 +657,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
                 continue
             getattr(self, i).setText(getattr(self.translations, i)[self.gui_structure.option_language.get_value()])
         # set translation of toolbox items
-        self.gui_structure.translate(self.gui_structure.option_language.get_value(), self.translations)
+        self.gui_structure.translate(self.gui_structure.option_language.get_value())
         for idx, name in enumerate(self.translations.languages):
             self.gui_structure.option_language.widget.setItemText(idx, name)
         # set small PushButtons
@@ -1096,7 +1095,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             self.label_Status.hide()
             self.progressBar.hide()
         # calculate percentage of calculated scenario
-        val = val / self.NumberOfScenarios
+        val = val / self.n_threads
         # set percentage to progress bar
         self.progressBar.setValue(round(val * 100))
         # hide labels and progressBar if all scenarios are calculated
@@ -1106,7 +1105,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             # show message that calculation is finished
             self.status_bar.widget.showMessage(self.translations.Calculation_Finished[self.gui_structure.option_language.get_value()], 5000)
 
-    def thread_function(self, results: Tuple[DataStorage, int]) -> None:
+    def thread_function(self, results: Tuple[DataStorage, int, CalcProblem]) -> None:
         """
         This function closes the thread of the old calculation and stores it results.
         It increments the number of calculated scenarios, and calls to update the progress bar.
@@ -1122,27 +1121,28 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         None
         """
         # stop finished thread
-        self.threads[self.finished].terminate()
+        results[2].terminate()
 
         self.list_ds[results[1]] = results[0]
-
-        # count number of finished calculated scenarios
-        self.finished += 1
+        open_threads = [thread for thread in self.threads if not thread.isRunning() and not thread.isFinished()]
+        import logging
+        logging.info(open_threads)
+        n_closed_threads = len(self.threads) - len(open_threads)
         # update progress bar
-        self.update_bar(self.finished, True)
+        self.update_bar(n_closed_threads, True)
         # if number of finished is the number that has to be calculated enable buttons and actions and change page to
         # results page
-        if self.finished == self.NumberOfScenarios:
-            self.pushButton_start_multiple.setEnabled(True)
-            self.pushButton_start_single.setEnabled(True)
-            self.pushButton_SaveScenario.setEnabled(True)
-            self.action_start_single.setEnabled(True)
-            self.action_start_multiple.setEnabled(True)
-            self.gui_structure.page_result.button.click()
+        if open_threads:        # start new thread
+            open_threads[0].start()
+            open_threads[0].any_signal.connect(self.thread_function)
             return
-        # start new thread
-        self.threads[self.finished].start()
-        self.threads[self.finished].any_signal.connect(self.thread_function)
+        self.pushButton_start_multiple.setEnabled(True)
+        self.pushButton_start_single.setEnabled(True)
+        self.pushButton_SaveScenario.setEnabled(True)
+        self.action_start_single.setEnabled(True)
+        self.action_start_multiple.setEnabled(True)
+        self.gui_structure.page_result.button.click()
+        return
 
     def start_multiple_scenarios_calculation(self) -> None:
         """
@@ -1162,8 +1162,8 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # create list of threads with scenarios that have not been calculated
         self.threads = [CalcProblem(DS, idx) for idx, DS in enumerate(self.list_ds) if DS.borefield is None]
         # set number of to calculate scenarios
-        self.NumberOfScenarios: int = len(self.threads)
-        if self.NumberOfScenarios < 1:
+        self.n_threads: int = len(self.threads)
+        if self.n_threads < 1:
             return
         # disable buttons and actions to avoid two calculation at once
         self.pushButton_start_multiple.setEnabled(False)
@@ -1171,15 +1171,18 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         self.pushButton_SaveScenario.setEnabled(False)
         self.action_start_single.setEnabled(False)
         self.action_start_multiple.setEnabled(False)
-        # initialize finished scenarios counting variable
-        self.finished: int = 0
         # update progress bar
         self.update_bar(0, True)
         # start calculation if at least one scenario has to be calculated
+        """
         if self.NumberOfScenarios > 0:
             self.threads[0].start()
             self.threads[0].any_signal.connect(self.thread_function)
             return
+        """
+        for thread in self.threads[:self.gui_structure.option_n_threads.get_value()]:
+            thread.start()
+            thread.any_signal.connect(self.thread_function)
 
     def start_current_scenario_calculation(self, no_run: bool = False) -> None:
         """
@@ -1215,14 +1218,12 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         self.pushButton_SaveScenario.setEnabled(False)
         self.action_start_single.setEnabled(False)
         self.action_start_multiple.setEnabled(False)
-        # initialize finished scenarios counting variable
-        self.finished: int = 0
         # update progress bar
         self.update_bar(0, True)
         # create list of threads with calculation to be made
         self.threads = [CalcProblem(ds, idx)]
         # set number of to calculate scenarios
-        self.NumberOfScenarios: int = len(self.threads)
+        self.n_threads: int = len(self.threads)
         # start calculation
         if not no_run:
             self.threads[0].start()
