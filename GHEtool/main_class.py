@@ -2,15 +2,14 @@
 This file contains all the code for the borefield calculations.
 """
 from math import pi
-from typing import Tuple, Union, List
+from typing import List, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pygfunction as gt
 from scipy.signal import convolve
 
-from GHEtool.VariableClasses import GroundData, FluidData, PipeData
-from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, SizingSetup
+from GHEtool.VariableClasses import CustomGFunction, FluidData, GFunction, GroundData, PipeData, SizingSetup, load_custom_gfunction
 from GHEtool.VariableClasses.BaseClass import BaseClass
 
 

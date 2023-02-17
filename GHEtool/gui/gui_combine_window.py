@@ -1,26 +1,28 @@
 from __future__ import annotations
+
+import pathlib
+from configparser import ConfigParser
 from functools import partial as ft_partial
-from pickle import load as pk_load
-from json import dump, load, JSONDecodeError
+from json import JSONDecodeError, dump, load
 from os import makedirs, remove
 from os.path import dirname, exists, realpath
 from os.path import split as os_split
 from pathlib import Path, PurePath
+from pickle import load as pk_load
 from sys import path
-from typing import List, Tuple, Optional, Union
-from GHEtool import Borefield, FOLDER, ghe_logger
-from configparser import ConfigParser
+from typing import List, Optional, Tuple, Union
 
 import PySide6.QtCore as QtC
 import PySide6.QtGui as QtG
 import PySide6.QtWidgets as QtW
-import pathlib
+
+from GHEtool import FOLDER, Borefield, ghe_logger
 
 from .gui_base_class import UiGhetool, set_graph_layout
 from .gui_calculation_thread import CalcProblem
+from .gui_classes import check_aim_options, show_linked_options
 from .gui_data_storage import DataStorage
 from .gui_structure import FigureOption, GuiStructure, Option
-from .gui_classes import check_aim_options, show_linked_options
 from .translation_class import Translations
 
 currentdir = dirname(realpath(__file__))
@@ -63,17 +65,16 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # init windows of parent class
         super(MainWindow, self).__init__()
         super().setup_ui(dialog)
-        # pyside6-rcc icons.qrc -o icons_rc.py
+        # add status bar logger to GHEtool logger
         ghe_logger.addHandler(self.status_bar)
-        self.translations: Translations = Translations()  # init translation class
+        # init translation class
+        self.translations: Translations = Translations()
         self.gui_structure = GuiStructure(self.central_widget, self.translations)
         for page in self.gui_structure.list_of_pages:
             page.create_page(self.central_widget, self.stackedWidget, self.verticalLayout_menu)
 
         self.verticalSpacer = QtW.QSpacerItem(20, 40, QtW.QSizePolicy.Minimum, QtW.QSizePolicy.Expanding)
         self.verticalLayout_menu.addItem(self.verticalSpacer)
-
-        # self.add_aims(list_button)
         # set app and dialog
         self.app: QtW.QApplication = app
         self.Dia = dialog

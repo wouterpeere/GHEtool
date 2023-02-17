@@ -1,15 +1,15 @@
 import os
 from math import isclose
+from sys import setrecursionlimit
 from typing import List, Union
 
-from sys import setrecursionlimit
-from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
-from GHEtool.gui.gui_combine_window import MainWindow
 import PySide6.QtCore as QtC
 import PySide6.QtWidgets as QtW
+from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
 
 from GHEtool import FOLDER
 from GHEtool.gui.gui_classes import ButtonBox, FigureOption, FileNameBox, FloatBox, IntBox, ListBox
+from GHEtool.gui.gui_combine_window import MainWindow
 
 setrecursionlimit(1500)
 
@@ -473,9 +473,11 @@ def test_save_load_new(qtbot):
     qtbot: qtbot
         bot for the GUI
     """
-    import keyboard
-    import pathlib
     import os
+    import pathlib
+
+    import keyboard
+
     # init gui window
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
     main_window.delete_backup()
@@ -534,6 +536,7 @@ def test_close(qtbot):
         bot for the GUI
     """
     import keyboard
+
     # init gui window
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
     main_window.delete_backup()
@@ -628,6 +631,7 @@ def test_no_load_save_file(qtbot):
         bot for the GUI
     """
     from pytest import raises
+
     # init gui window
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
     main_window.delete_backup()
@@ -770,7 +774,9 @@ def test_backward_compatibility(qtbot):
         bot for the GUI
     """
     import numpy as np
+
     from GHEtool import FOLDER
+
     # init gui window
     main_window_old = MainWindow(QtWidgets_QMainWindow(), qtbot)
     main_window_old._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_2_1_0.GHEtool')

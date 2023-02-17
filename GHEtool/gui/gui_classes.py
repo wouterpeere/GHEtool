@@ -17,8 +17,8 @@ from __future__ import annotations
 import abc
 from functools import partial as ft_partial
 from os.path import exists
-from typing import Callable, List, Optional, Tuple, Union
 from pathlib import Path
+from typing import Callable, List, Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
 import PySide6.QtCore as QtC  # type: ignore

@@ -3,8 +3,9 @@ This document contains all the information relevant for the GUI.
 It contains all the options, categories etc. that should appear on the GUI.
 """
 from __future__ import annotations
+
 from math import cos, pi, sin, tan
-from typing import List, Optional, TYPE_CHECKING, Tuple, Union
+from typing import TYPE_CHECKING, List, Optional, Tuple, Union
 
 import PySide6.QtGui as QtG
 import PySide6.QtWidgets as QtW
@@ -31,6 +32,7 @@ from GHEtool.gui.gui_classes import (
     ResultText,
     check_aim_options,
 )
+
 if TYPE_CHECKING:
     from GHEtool.gui.translation_class import Translations
 

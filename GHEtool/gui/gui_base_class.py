@@ -7,30 +7,9 @@ import PySide6.QtCore as QtC
 import PySide6.QtGui as QtG
 import PySide6.QtWidgets as QtW
 
-import logging
-
 import GHEtool.gui.icons_rc
-
-WHITE: str = "rgb(255, 255, 255)"
-LIGHT: str = "rgb(84, 188, 235)"
-LIGHT_SELECT: str = "rgb(42, 126, 179)"
-DARK: str = "rgb(0, 64, 122)"
-GREY: str = "rgb(100, 100, 100)"
-WARNING: str = "rgb(255, 200, 87)"
-BLACK: str = "rgb(0, 0, 0)"
-
-
-class StatusBar(logging.Handler):
-    level_2_color: dict[str, str] = {'DEBUG': f'{WHITE}', 'INFO': f'{WHITE}', 'ERROR': 'rgb(255,0,0)', 'CRITICAL': 'rgb(255,0,0)', 'WARNING': WARNING}
-
-    def __init__(self, parent):
-        super().__init__()
-        self.widget: QtW.QStatusBar = QtW.QStatusBar(parent)
-
-    def emit(self, record: logging.LogRecord) -> None:
-        message = self.format(record)
-        self.widget.setStyleSheet(f'color: {self.level_2_color[record.levelname]};')
-        self.widget.showMessage(message, 10_000)
+from GHEtool.gui.color_definition import BLACK, DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE, dark_matplotlib, white_matplotlib
+from GHEtool.logger.status_bar_logger import StatusBar
 
 
 def set_graph_layout() -> None:
@@ -42,23 +21,13 @@ def set_graph_layout() -> None:
     None
     """
     import matplotlib.pyplot as plt
-    from matplotlib.colors import to_rgb
-    from numpy import array, float64
-    background_color: str = to_rgb(
-        array(DARK.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-    white_color: str = to_rgb(
-        array(WHITE.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-    light_color: str = to_rgb(
-        array(LIGHT.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-    bright_color: str = to_rgb(
-        array(WARNING.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-    plt.rcParams["axes.labelcolor"] = white_color
-    plt.rcParams["xtick.color"] = white_color
-    plt.rcParams["ytick.color"] = white_color
+    plt.rcParams["axes.labelcolor"] = white_matplotlib
+    plt.rcParams["xtick.color"] = white_matplotlib
+    plt.rcParams["ytick.color"] = white_matplotlib
 
     plt.rc('figure')
-    plt.rc('axes', edgecolor=white_color)
-    plt.rcParams['figure.facecolor'] = background_color
+    plt.rc('axes', edgecolor=white_matplotlib)
+    plt.rcParams['figure.facecolor'] = dark_matplotlib
 
 
 class UiGhetool:

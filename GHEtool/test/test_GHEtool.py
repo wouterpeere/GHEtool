@@ -1,10 +1,11 @@
 # test if model can be imported
+import copy
+from math import isclose
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pygfunction as gt
 import pytest
-import copy
-from math import isclose
 
 from GHEtool import *
 
