@@ -1301,6 +1301,9 @@ class GuiStructure:
         # get decimal and column seperator
         sep: str = ";" if self.option_seperator_csv.get_value() == 0 else ","
         dec: str = "." if self.option_decimal_csv.get_value() == 0 else ","
+        if filename == "":
+            ghe_logger.info(self.translations.NoFileSelected[self.option_language.get_value()])
+            return
         # try to read CSV-File
         try:
             data: pd_DataFrame = pd_read_csv(filename, sep=sep, decimal=dec)
@@ -1308,7 +1311,7 @@ class GuiStructure:
             ghe_logger.error(self.translations.NoFileSelected[self.option_language.get_value()])
             return
         except PermissionError:
-            ghe_logger.error(self.no_file_selected[self.option_language.get_value()])
+            ghe_logger.error(self.translations.NoFileSelected[self.option_language.get_value()])
             return
         # get data column names to set them to comboBoxes
         columns = data.columns

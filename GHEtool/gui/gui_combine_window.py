@@ -988,7 +988,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         if not all(option.check_value() for option, _ in self.gui_structure.list_of_options):
             for option, _ in self.gui_structure.list_of_options:
                 if not option.check_value():
-                    logging.error(f'Wrong value in option with label: {option.label_text}')
+                    logging.error(f'Wrong value in option with label: {option.label_text[0]}')
                     return False
         return True
 
