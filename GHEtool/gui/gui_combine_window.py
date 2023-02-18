@@ -130,7 +130,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
         [option.init_links() for option, _ in self.gui_structure.list_of_options]
 
-        self.status_bar.widget.showMessage(self.translations.GHE_tool_imported[self.gui_structure.option_language.get_value()], 5000)
+        logging.info(self.translations.GHE_tool_imported[self.gui_structure.option_language.get_value()])
         # allow checking of changes
         self.checking: bool = True
 
@@ -708,7 +708,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # change language to english
         self.change_language()
         # show message that no backup file is found
-        self.status_bar.widget.showMessage(self.translations.NoBackupFile[self.gui_structure.option_language.get_value()])
+        logging.warning(self.translations.NoBackupFile[self.gui_structure.option_language.get_value()])
 
     def fun_save_auto(self) -> None:
         """
@@ -828,10 +828,9 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             with open(location, "w") as file:
                 dump(saving, file, indent=1)
         except FileNotFoundError:
-            self.status_bar.widget.showMessage(
-                self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
+            logging.error(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()])
         except PermissionError:
-            self.status_bar.widget.showMessage("PermissionError", 5000)
+            logging.error("PermissionError")
 
     def fun_load(self) -> None:
         """
@@ -870,7 +869,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             self.checking: bool = True
         # if no file is found display error message is status bar
         except FileNotFoundError:
-            self.status_bar.widget.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
+            logging.error(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()])
 
     def fun_save_as(self) -> None:
         """
@@ -919,7 +918,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             return True
         # show file not found message in status bar if an error appears
         except FileNotFoundError:
-            self.status_bar.widget.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
+            logging.error(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()])
             return False
 
     def fun_new(self) -> None:
@@ -989,7 +988,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         if not all(option.check_value() for option, _ in self.gui_structure.list_of_options):
             for option, _ in self.gui_structure.list_of_options:
                 if not option.check_value():
-                    self.status_bar.widget.showMessage(f'Wrong value in option with label: {option.label_text}', 5000)
+                    logging.error(f'Wrong value in option with label: {option.label_text}')
                     return False
         return True
 
@@ -1106,7 +1105,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             self.progressBar.hide()
             # show message that calculation is finished
             logging.info(self.translations.Calculation_Finished[self.gui_structure.option_language.get_value()])
-            # self.status_bar.widget.showMessage(self.translations.Calculation_Finished[self.gui_structure.option_language.get_value()], 5000)
 
     def thread_function(self, results: Tuple[DataStorage, int, CalcProblem]) -> None:
         """
