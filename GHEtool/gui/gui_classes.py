@@ -94,7 +94,7 @@ class Option(metaclass=abc.ABCMeta):
         Parameters
         ----------
         label : list[str]
-            The label related to the option
+            The label related to the option in different languages
         default_value : bool, int, float, str
             The default value of the option
         category : Category
@@ -433,7 +433,7 @@ class FloatBox(Option):
         Parameters
         ----------
         label : list[str]
-            The label of the FloatBox
+            The label of the FloatBox in different languages
         default_value : float
             The default value of the FloatBox
         category : Category
@@ -662,7 +662,7 @@ class IntBox(Option):
         Parameters
         ----------
         label : list[str]
-            The label of the IntBox
+            The label of the IntBox in different languages
         default_value : int
             The default value of the IntBox
         category : Category
@@ -886,7 +886,7 @@ class ButtonBox(Option):
         Parameters
         ----------
         label : list[str]
-            The label of the ButtonBox
+            The label of the ButtonBox in different languages
         default_index : int
             The default index of the ButtonBox
         entries : List[str]
@@ -1120,7 +1120,7 @@ class ListBox(Option):
         Parameters
         ----------
         label : list[str]
-            The label of the ListBox
+            The label of the ListBox in different languages
         default_index : int
             The default index of the ListBox
         entries : List[str]
@@ -1329,7 +1329,7 @@ class FileNameBox(Option):
         Parameters
         ----------
         label : list[str]
-            The label of the FileNameBox
+            The label of the FileNameBox in different languages
         default_value : int
             The default value of the FileNameBox
         dialog_text : str
@@ -1513,7 +1513,7 @@ class Hint:
         Parameters
         ----------
         hint : str
-            Text of the hint
+            Text of the hint in different languages
         category : Category
             Category in which the Hint should be placed
         warning : bool
@@ -1644,7 +1644,7 @@ class FunctionButton:
         Parameters
         ----------
         button_text : str
-            The label of the FunctionButton
+            The label of the FunctionButton in different languages
         icon : str
             Location of the icon for the FunctionButton
         category : Category
@@ -1797,7 +1797,7 @@ class ResultText(Hint):
         Parameters
         ----------
         result_name : str
-            Name of the result (will be overwritten by the result anyway)
+            Name of the result (will be overwritten by the result anyway) in different languages
         category : Category
             Category in which the ResultText should be placed
         prefix : str
@@ -1922,7 +1922,7 @@ class Category:
         Parameters
         ----------
         label : list[str]
-            Label of the category
+            Label of the category in different languages
         page : Page
             Page on which the category should be placed
 
@@ -2191,13 +2191,14 @@ class FigureOption(ButtonBox):
     Such an element is not placed in itself on the GUI, but is part of the ResultFigure category.
     It can be used to add an extra option to alter the figure shown.
     """
-    def __init__(self, category: ResultFigure, label: List[str], param: str, default: int, entries: List[str], entries_values: List):
+    def __init__(self, category: ResultFigure, label: List[str], param: str, default: int, entries: List[str],
+                 entries_values: List):
         """
 
         Parameters
         ----------
         category : ResultFigure
-            Category in which the FigureOption should be placed
+            Category in which the FigureOption should be placed in different languages
         label : str
             The label of the FigureOption
         param : str
@@ -2279,7 +2280,7 @@ class ResultFigure(Category):
         Parameters
         ----------
         label : str
-            Label text of the ResultFigure
+            Label text of the ResultFigure in different languages
         page : Page
             Page where the ResultFigure should be placed (the result page)
 
@@ -2510,7 +2511,7 @@ class Aim:
         Parameters
         ----------
         label : list[str]
-            Name of the Aim
+            Name of the Aim in different languages
         icon : str
             Path to the icon for the Aim
         page : Page
@@ -2711,7 +2712,7 @@ class Page:
         Parameters
         ----------
         name : str
-            Name of the page (shown on top of the Page)
+            Name of the page (shown on top of the Page) in different languages
         icon : str
             Path to the icon that is used for the Page
 
