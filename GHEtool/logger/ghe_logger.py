@@ -19,6 +19,13 @@ class CustomFormatter(logging.Formatter):
     reset = '\x1b[0m'
 
     def __init__(self, fmt: str):
+        """
+
+        Parameters
+        ----------
+        fmt : str
+            Format of the log message
+        """
         super().__init__(fmt=fmt)
         self.fmt = fmt
         self.FORMATS = {
@@ -29,7 +36,7 @@ class CustomFormatter(logging.Formatter):
             logging.CRITICAL: self.bold_red + self.fmt + self.reset
         }
 
-    def format(self, record: logging.LogRecord):
+    def format(self, record: logging.LogRecord) -> str:
         """
         Formats the record.
 
@@ -38,6 +45,10 @@ class CustomFormatter(logging.Formatter):
         record: logging.LogRecord
             record to be formatted
 
+        Returns
+        -------
+        str
+            Formatted log message
         """
         log_fmt = self.FORMATS.get(record.levelno)
         formatter = logging.Formatter(log_fmt, datefmt='%Y-%m-%d %H:%M:%S')
