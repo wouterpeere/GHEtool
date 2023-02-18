@@ -1375,7 +1375,7 @@ class FileNameBox(Option):
         Parameters
         ----------
         value : int
-            Value to which the the FileNameBox should be set.
+            Value to which the FileNameBox should be set.
 
         Returns
         -------
