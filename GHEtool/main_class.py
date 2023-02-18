@@ -1594,16 +1594,16 @@ class Borefield(BaseClass):
         ax.set_ylabel(r'Temperature ($^\circ C$)')
 
         # plot Temperatures
-        ax.step(time_array, self.Tb, 'k-', where="pre", lw=1.5, label="Tb")
+        ax.step(time_array, self.Tb, 'k-', where="post", lw=1.5, label="Tb")
 
         if plot_hourly:
-            ax.step(time_array, self.results_peak_cooling, 'b-', where="pre", lw=1, label='Tf')
+            ax.step(time_array, self.results_peak_cooling, 'b-', where="post", lw=1, label='Tf')
         else:
-            ax.step(time_array, self.results_peak_cooling, 'b-', where="pre", lw=1.5, label='Tf peak cooling')
-            ax.step(time_array, self.results_peak_heating, 'r-', where="pre", lw=1.5, label='Tf peak heating')
+            ax.step(time_array, self.results_peak_cooling, 'b-', where="post", lw=1.5, label='Tf peak cooling')
+            ax.step(time_array, self.results_peak_heating, 'r-', where="post", lw=1.5, label='Tf peak heating')
 
-            ax.step(time_array, self.results_month_cooling, color='b', linestyle="dashed", where="pre", lw=1.5, label='Tf base cooling')
-            ax.step(time_array, self.results_month_heating, color='r', linestyle="dashed", where="pre", lw=1.5, label='Tf base heating')
+            ax.step(time_array, self.results_month_cooling, color='b', linestyle="dashed", where="post", lw=1.5, label='Tf base cooling')
+            ax.step(time_array, self.results_month_heating, color='r', linestyle="dashed", where="post", lw=1.5, label='Tf base heating')
 
         # define temperature bounds
         ax.hlines(self.Tf_min, 0, self.simulation_period, colors='r', linestyles='dashed', label='', lw=1)

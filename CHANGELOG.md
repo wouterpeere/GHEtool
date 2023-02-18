@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - Logger for GHEtool (issue #96).
 
+### Changed
+- In figure plotting, the interval[x[i], x[i+1]) now has the value y[i] (instead of y[i-1]).
+
+### Fixed
+- Wrong heating load in april in GUI (issue #94).
+
 ## [2.1.1] - 2023-01-30
 
 ### Added
