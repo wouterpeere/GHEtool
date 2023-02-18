@@ -366,14 +366,18 @@ class Option(metaclass=abc.ABCMeta):
         None
         """
 
-    def translate(self, idx: int):
+    def translate(self, idx: int) -> None:
         """
-        translate the label
+        Translates the label.
 
         Parameters
         ----------
         idx: int
             index of language
+
+        Returns
+        -------
+        None
         """
         self.set_text(self.label_text[idx])
 
@@ -1608,14 +1612,18 @@ class Hint:
         """
         self.label.setText(name)
 
-    def translate(self, idx: int):
+    def translate(self, idx: int) -> None:
         """
-        translate the label
+        Translates the label.
 
         Parameters
         ----------
         idx: int
             index of language
+
+        Returns
+        -------
+        None
         """
         self.set_text(self.hint[idx])
 
@@ -1745,14 +1753,18 @@ class FunctionButton:
         """
         self.button.setText(name)
 
-    def translate(self, idx: int):
+    def translate(self, idx: int) -> None:
         """
-        translate the label
+        Translates the label.
 
         Parameters
         ----------
         idx: int
             index of language
+
+        Returns
+        -------
+        None
         """
         self.set_text(self.button_text[idx])
 
@@ -2154,14 +2166,18 @@ class Category:
         """
         return self.frame.isHidden()
 
-    def translate(self, idx: int):
+    def translate(self, idx: int) -> None:
         """
-        translate the label
+        Translates the label.
 
         Parameters
         ----------
         idx: int
             index of language
+
+        Returns
+        -------
+        None
         """
         self.set_text(self.label_text[idx])
 
@@ -2532,14 +2548,18 @@ class Aim:
         """
         self.widget.setText(name)
 
-    def translate(self, idx: int):
+    def translate(self, idx: int) -> None:
         """
-        translate the label
+        Translates the label.
 
         Parameters
         ----------
         idx: int
             index of language
+
+        Returns
+        -------
+        None
         """
         self.set_text(self.label[idx])
 
@@ -2759,14 +2779,18 @@ class Page:
         if self.push_button_next is not None:
             self.push_button_next.setText(self.next_label)
 
-    def translate(self, idx: int):
+    def translate(self, idx: int) -> None:
         """
-        translate the label
+        Translates the label.
 
         Parameters
         ----------
         idx: int
             index of language
+
+        Returns
+        -------
+        None
         """
         self.set_text(self.name[idx])
 

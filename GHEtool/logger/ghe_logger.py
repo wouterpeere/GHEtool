@@ -7,7 +7,7 @@ from pathlib import Path, PurePath
 
 class CustomFormatter(logging.Formatter):
     """
-    class to create a special console coloring of the messages
+    Class to create a special console coloring of the messages
     """
     # define colors
     grey = '\x1b[38;21m'
@@ -31,7 +31,7 @@ class CustomFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord):
         """
-        formats the record
+        Formats the record.
 
         Parameters
         ----------

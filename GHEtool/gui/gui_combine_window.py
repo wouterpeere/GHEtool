@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pathlib
+import logging
 from configparser import ConfigParser
 from functools import partial as ft_partial
 from json import JSONDecodeError, dump, load
@@ -1104,7 +1105,8 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             self.label_Status.hide()
             self.progressBar.hide()
             # show message that calculation is finished
-            self.status_bar.widget.showMessage(self.translations.Calculation_Finished[self.gui_structure.option_language.get_value()], 5000)
+            logging.info(self.translations.Calculation_Finished[self.gui_structure.option_language.get_value()])
+            # self.status_bar.widget.showMessage(self.translations.Calculation_Finished[self.gui_structure.option_language.get_value()], 5000)
 
     def thread_function(self, results: Tuple[DataStorage, int, CalcProblem]) -> None:
         """
@@ -1126,7 +1128,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
         self.list_ds[results[1]] = results[0]
         open_threads = [thread for thread in self.threads if not thread.isRunning() and not thread.isFinished()]
-        import logging
         logging.info(open_threads)
         n_closed_threads = len(self.threads) - len(open_threads)
         # update progress bar

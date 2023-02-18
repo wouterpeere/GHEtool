@@ -6,9 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [2.1.2] - [expected] feb 2023
 
 ### Added
-- Coaxial pipes
-- Variable temperature sizing (at least in the code version)
-- Reimplemented size by length and width
+- Logger for GHEtool (issue #96).
 
 ## [2.1.1] - 2023-01-30
 

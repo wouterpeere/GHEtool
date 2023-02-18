@@ -23,7 +23,7 @@ class StatusBar(Handler):
 
     def __init__(self, parent: QWidget):
         """
-        init status bar
+        Init status bar.
 
         Parameters
         ----------
@@ -35,12 +35,16 @@ class StatusBar(Handler):
 
     def emit(self, record: LogRecord) -> None:
         """
-        display record in statusbar.
+        Display record in statusbar.
 
         Parameters
         ----------
         record: logging.LogRecord
             record to be displayed
+
+        Returns
+        -------
+        None
 
         """
         message = self.format(record)
