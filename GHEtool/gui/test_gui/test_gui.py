@@ -10,6 +10,7 @@ from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
 from GHEtool import FOLDER
 from GHEtool.gui.gui_classes import ButtonBox, FigureOption, FileNameBox, FloatBox, IntBox, ListBox
 from GHEtool.gui.gui_combine_window import MainWindow
+from GHEtool.gui.translation_class import Translations
 
 setrecursionlimit(1500)
 
@@ -35,6 +36,18 @@ def test_language(qtbot):
         assert main_window.gui_structure.option_language.get_value() == idx
 
     main_window.menuLanguage.actions()[0].trigger()
+
+
+def test_translation_class():
+    """
+    Checks if all entries in the translation class have the same length
+    """
+    translations = Translations()
+    len_ref = len(translations.languages)
+    for name in translations.__slots__:
+        value = getattr(translations, name)
+        if isinstance(value, list):
+            assert len(value) == len_ref
 
 
 def test_gui_values(qtbot):
