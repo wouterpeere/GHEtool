@@ -1134,7 +1134,8 @@ class GuiStructure:
 
             self.category_save_scenario = Category(page=self.page_settings, label=self.translations.category_save_scenario)
 
-            self.option_n_threads = IntBox(label=self.translations.option_n_threads, default_value=2, category=self.category_save_scenario, minimal_value=1)
+            self.option_n_threads = IntBox(label=self.translations.option_n_threads, default_value=1, category=self.category_save_scenario, minimal_value=1,
+                                           maximal_value=1)
             self.option_toggle_buttons = ButtonBox(label=self.translations.option_toggle_buttons, default_index=1, entries=[" no ", " yes "],
                                                    category=self.category_save_scenario)
             self.option_toggle_buttons.change_event(self.change_toggle_button)
