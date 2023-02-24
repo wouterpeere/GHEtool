@@ -116,8 +116,8 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # load backup data
         self.load_backup()
         # add progress bar and label to statusbar
-        self.status_bar.widget.addPermanentWidget(self.label_Status, 0)
-        self.status_bar.widget.addPermanentWidget(self.progressBar, 1)
+        self.status_bar_progress_bar.addPermanentWidget(self.frame_progress_bar, 1)
+        #self.status_bar_progress_bar.addPermanentWidget(self.progressBar, 1)
         self.status_bar.widget.messageChanged.connect(self.status_hide)
         # change window title to saved filename
         self.change_window_title()
@@ -1090,11 +1090,11 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # show label and progress bar if calculation started otherwise hide them
         if opt_start:
             self.label_Status.show()
-            self.progressBar.show()
+            self.status_bar_progress_bar.show()
             self.status_bar.widget.show()
         else:
             self.label_Status.hide()
-            self.progressBar.hide()
+            self.status_bar_progress_bar.hide()
         # calculate percentage of calculated scenario
         val = val / self.n_threads
         # set percentage to progress bar
@@ -1102,7 +1102,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # hide labels and progressBar if all scenarios are calculated
         if val > 0.9999:
             self.label_Status.hide()
-            self.progressBar.hide()
+            self.status_bar_progress_bar.hide()
             # show message that calculation is finished
             logging.info(self.translations.Calculation_Finished[self.gui_structure.option_language.get_value()])
 
@@ -1126,7 +1126,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
         self.list_ds[results[1]] = results[0]
         open_threads = [thread for thread in self.threads if not thread.isRunning() and not thread.isFinished()]
-        logging.info(open_threads)
         n_closed_threads = len(self.threads) - len(open_threads)
         # update progress bar
         self.update_bar(n_closed_threads, True)
