@@ -1,6 +1,7 @@
 """
 This file contains all the code for the borefield calculations.
 """
+import logging
 from math import pi
 from typing import List, Tuple, Union
 
@@ -1585,13 +1586,15 @@ class Borefield(BaseClass):
         else:
             time_array = self.time_L3_last_year / 12 / 730. / 3600.
 
-        plt.rc('figure')
+        # plt.rc('figure')
         # create new figure and axes if it not already exits otherwise clear it.
         fig = plt.figure()
         ax = fig.add_subplot(111)
         # set axes labels
         ax.set_xlabel(r'Time (year)')
         ax.set_ylabel(r'Temperature ($^\circ C$)')
+        ax.yaxis.label.set_color(plt.rcParams["axes.labelcolor"])
+        ax.xaxis.label.set_color(plt.rcParams["axes.labelcolor"])
 
         # plot Temperatures
         ax.step(time_array, self.Tb, 'k-', where="post", lw=1.5, label="Tb")
