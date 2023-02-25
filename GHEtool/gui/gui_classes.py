@@ -2350,9 +2350,9 @@ class ResultFigure(Category):
         """
         val = self.scroll_area.verticalScrollBar().value()
         if event.button == "down":
-            self.scroll_area.verticalScrollBar().setValue(val+10)
+            self.scroll_area.verticalScrollBar().setValue(val+self.scroll_area.verticalScrollBar().singleStep())
             return
-        self.scroll_area.verticalScrollBar().setValue(val-10)
+        self.scroll_area.verticalScrollBar().setValue(val-self.scroll_area.verticalScrollBar().singleStep())
 
     def set_text(self, name: str) -> None:
         """
