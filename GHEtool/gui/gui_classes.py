@@ -2262,6 +2262,7 @@ class ResultFigure(Category):
         self.x_axes_text: str = ''
         self.y_axes_text: str = ''
         self.to_show: bool = True
+        self.scroll_area: Optional[QtW.QScrollArea] = None
 
     def replace_figure(self, fig: plt.Figure) -> None:
         """
@@ -2296,9 +2297,10 @@ class ResultFigure(Category):
         self.layout_frame_canvas.replaceWidget(self.toolbar, toolbar)
 
         self.canvas = canvas
+        self.canvas.mpl_connect("scroll_event", self.scrolling)
         self.toolbar = toolbar
 
-    def create_widget(self, page: QtW.QWidget, layout: QtW.QLayout):
+    def create_widget(self, page: QtW.QScrollArea, layout: QtW.QLayout):
         """
         This function creates the frame for this Category on a given page.
         If the current label text is "", then the frame attribute is set to the given frame.
@@ -2331,6 +2333,26 @@ class ResultFigure(Category):
         # add canvas and toolbar to local frame
         self.layout_frame_canvas.addWidget(self.canvas)
         self.layout_frame_canvas.addWidget(self.toolbar)
+        self.scroll_area = page
+        self.canvas.mpl_connect("scroll_event", self.scrolling)
+
+    def scrolling(self, event) -> None:
+        """
+        This function handels the scrolling behaviour.
+
+        Parameters
+        ----------
+        event : Event
+
+        Returns
+        -------
+        None
+        """
+        val = self.scroll_area.verticalScrollBar().value()
+        if event.button == "down":
+            self.scroll_area.verticalScrollBar().setValue(val+10)
+            return
+        self.scroll_area.verticalScrollBar().setValue(val-10)
 
     def set_text(self, name: str) -> None:
         """
@@ -2779,6 +2801,7 @@ class Page:
         scroll_area.setFrameShape(QtW.QFrame.NoFrame)
         scroll_area.setLineWidth(0)
         scroll_area.setWidgetResizable(True)
+        scroll_area.verticalScrollBar().setSingleStep(10)
         scroll_area_content = QtW.QWidget(self.page)
         scroll_area_content.setGeometry(QtC.QRect(0, 0, 864, 695))
         scroll_area.setWidget(scroll_area_content)
@@ -2796,7 +2819,7 @@ class Page:
         scroll_area_layout.addWidget(label_gap)
 
         for category in self.list_categories:
-            category.create_widget(scroll_area_content, scroll_area_layout)
+            category.create_widget(scroll_area, scroll_area_layout)
 
         spacer = QtW.QSpacerItem(1, 1, QtW.QSizePolicy.Minimum, QtW.QSizePolicy.Expanding)
         scroll_area_layout.addItem(spacer)
