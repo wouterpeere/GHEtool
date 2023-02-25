@@ -2336,12 +2336,23 @@ class ResultFigure(Category):
         self.scroll_area = page
         self.canvas.mpl_connect("scroll_event", self.scrolling)
 
-    def scrolling(self, event):
+    def scrolling(self, event) -> None:
+        """
+        This function handels the scrolling behaviour.
+
+        Parameters
+        ----------
+        event : Event
+
+        Returns
+        -------
+        None
+        """
         val = self.scroll_area.verticalScrollBar().value()
-        if event.button =="down":
-            self.scroll_area.verticalScrollBar().setValue(val+100)
+        if event.button == "down":
+            self.scroll_area.verticalScrollBar().setValue(val+10)
             return
-        self.scroll_area.verticalScrollBar().setValue(val-100)
+        self.scroll_area.verticalScrollBar().setValue(val-10)
 
     def set_text(self, name: str) -> None:
         """
@@ -2790,6 +2801,7 @@ class Page:
         scroll_area.setFrameShape(QtW.QFrame.NoFrame)
         scroll_area.setLineWidth(0)
         scroll_area.setWidgetResizable(True)
+        scroll_area.verticalScrollBar().setSingleStep(10)
         scroll_area_content = QtW.QWidget(self.page)
         scroll_area_content.setGeometry(QtC.QRect(0, 0, 864, 695))
         scroll_area.setWidget(scroll_area_content)
