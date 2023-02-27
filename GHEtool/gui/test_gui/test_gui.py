@@ -409,27 +409,27 @@ def test_rename_scenario(qtbot):
     # get old item name
     old_name = main_window.list_widget_scenario.item(0).text()
     # enter nothing in the text box and not change the name
-    QtC.QTimer.singleShot(0, not_change_name)
+    QtC.QTimer.singleShot(100, not_change_name)
     qtbot.mouseClick(main_window.button_rename_scenario, QtC.Qt.MouseButton.LeftButton, delay=1)
     # check if the name stays the old one
     assert main_window.list_widget_scenario.item(0).text() == old_name
     # just close the dialog window
-    QtC.QTimer.singleShot(0, close_dialog)
+    QtC.QTimer.singleShot(100, close_dialog)
     qtbot.mouseClick(main_window.button_rename_scenario, QtC.Qt.MouseButton.LeftButton, delay=1)
     # check if the name stays the old one
     assert main_window.list_widget_scenario.item(0).text() == old_name
     # abort the dialog window by button
-    QtC.QTimer.singleShot(0, reject_dialog)
+    QtC.QTimer.singleShot(100, reject_dialog)
     qtbot.mouseClick(main_window.button_rename_scenario, QtC.Qt.MouseButton.LeftButton, delay=1)
     # check if the name stays the old one
     assert main_window.list_widget_scenario.item(0).text() == old_name
     # change the name
-    QtC.QTimer.singleShot(0, change_name)
+    QtC.QTimer.singleShot(100, change_name)
     qtbot.mouseClick(main_window.button_rename_scenario, QtC.Qt.MouseButton.LeftButton, delay=1)
     # check the name has been changed correctly
     assert main_window.list_widget_scenario.item(0).text() == scenario_name
     # check if the name can be changed by double click
-    QtC.QTimer.singleShot(0, change_name_2)
+    QtC.QTimer.singleShot(100, change_name_2)
     main_window.list_widget_scenario.doubleClicked.emit(main_window.list_widget_scenario.model().index(0, 0))
     # check the name has been changed correctly
     assert main_window.list_widget_scenario.item(0).text() == scenario_name_2
@@ -492,8 +492,8 @@ def test_save_load_new(qtbot):
     if os.path.exists(main_window.default_path.joinpath(filename_3)):
         os.remove(main_window.default_path.joinpath(filename_3))
     # trigger save action and add filename
-    QtC.QTimer.singleShot(100, lambda: keyboard.write(filename_1))
-    QtC.QTimer.singleShot(200, lambda: keyboard.press('enter'))
+    QtC.QTimer.singleShot(1000, lambda: keyboard.write(filename_1))
+    QtC.QTimer.singleShot(1200, lambda: keyboard.press('enter'))
     main_window.actionSave.trigger()
     # check if filename is set correctly
     assert (pathlib.Path(main_window.filename[0]), main_window.filename[1]) == (main_window.default_path.joinpath(filename_1), 'GHEtool (*.GHEtool)')
@@ -503,21 +503,21 @@ def test_save_load_new(qtbot):
     # check that they differ
     assert list_old != main_window.list_ds
     # set a different filename and test save as action
-    QtC.QTimer.singleShot(100, lambda: keyboard.write(filename_2))
-    QtC.QTimer.singleShot(200, lambda: keyboard.press('enter'))
+    QtC.QTimer.singleShot(1000, lambda: keyboard.write(filename_2))
+    QtC.QTimer.singleShot(1200, lambda: keyboard.press('enter'))
     main_window.actionSave_As.trigger()
     # check if filename is set correctly
     assert (pathlib.Path(main_window.filename[0]), main_window.filename[1]) == (main_window.default_path.joinpath(filename_2), 'GHEtool (*.GHEtool)')
     # trigger open function and set filename 1
-    QtC.QTimer.singleShot(100, lambda: keyboard.write(filename_1))
-    QtC.QTimer.singleShot(100, lambda: keyboard.press('enter'))
+    QtC.QTimer.singleShot(1000, lambda: keyboard.write(filename_1))
+    QtC.QTimer.singleShot(1200, lambda: keyboard.press('enter'))
     main_window.actionOpen.trigger()
     # check if filename is imported correctly and the data storages as well
     assert (pathlib.Path(main_window.filename[0]), main_window.filename[1]) == (main_window.default_path.joinpath(filename_1), 'GHEtool (*.GHEtool)')
     assert list_old == main_window.list_ds
     # set a different filename and test new action
-    QtC.QTimer.singleShot(100, lambda: keyboard.write(filename_3))
-    QtC.QTimer.singleShot(200, lambda: keyboard.press('enter'))
+    QtC.QTimer.singleShot(1000, lambda: keyboard.write(filename_3))
+    QtC.QTimer.singleShot(1200, lambda: keyboard.press('enter'))
     main_window.actionNew.trigger()
     assert (pathlib.Path(main_window.filename[0]), main_window.filename[1]) == (main_window.default_path.joinpath(filename_3), 'GHEtool (*.GHEtool)')
     assert len(main_window.list_ds) < 1
@@ -573,18 +573,18 @@ def test_close(qtbot):
         if isinstance(main_window.dialog, QtW.QMessageBox):
             main_window.dialog.buttons()[0].click()
 
-    QtC.QTimer.singleShot(0, close)
+    QtC.QTimer.singleShot(100, close)
     main_window.close()
 
-    QtC.QTimer.singleShot(0, cancel)
+    QtC.QTimer.singleShot(100, cancel)
     main_window.close()
 
-    QtC.QTimer.singleShot(0, save)
-    QtC.QTimer.singleShot(10, lambda: keyboard.write(filename_1))
+    QtC.QTimer.singleShot(100, save)
+    QtC.QTimer.singleShot(120, lambda: keyboard.write(filename_1))
     QtC.QTimer.singleShot(150, lambda: keyboard.press('enter'))
     main_window.close()
 
-    QtC.QTimer.singleShot(0, exit_window)
+    QtC.QTimer.singleShot(100, exit_window)
     main_window.close()
 
 
@@ -696,19 +696,19 @@ def test_change_scenario(qtbot):
         if isinstance(main_window.dialog, QtW.QMessageBox):
             main_window.dialog.buttons()[0].click()
     # test if closing the window is not changing the value and scenario
-    QtC.QTimer.singleShot(0, close)
+    QtC.QTimer.singleShot(100, close)
     main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(1))
     assert 2.3 == main_window.gui_structure.option_conductivity.get_value()
     qtbot.wait(100)
     assert main_window.list_widget_scenario.currentRow() == 0
     # test if canceling the window is not changing the value and scenario
-    QtC.QTimer.singleShot(0, abort)
+    QtC.QTimer.singleShot(100, abort)
     main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(1))
     assert 2.3 == main_window.gui_structure.option_conductivity.get_value()
     qtbot.wait(100)
     assert main_window.list_widget_scenario.currentRow() == 0
     # test if exiting the window is rejecting the changed the value and changing the scenario
-    QtC.QTimer.singleShot(0, exit_window)
+    QtC.QTimer.singleShot(100, exit_window)
     main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(1))
     qtbot.wait(100)
     assert main_window.gui_structure.option_conductivity.get_value() == 1.1
@@ -717,7 +717,7 @@ def test_change_scenario(qtbot):
     # change a value to trigger pop up window
     main_window.gui_structure.option_conductivity.set_value(3)
     # test if saving is saving the changed the value and changing the scenario
-    QtC.QTimer.singleShot(0, save)
+    QtC.QTimer.singleShot(100, save)
     main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(0))
     qtbot.wait(100)
     assert main_window.list_ds[1].option_conductivity == 3
