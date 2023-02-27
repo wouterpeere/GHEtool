@@ -518,7 +518,6 @@ def test_temp_profile_cooling_data(qtbot, delay: int, factor: float) -> None:
     main_window.delete_backup()
 
 
-
 def test_filename_read(qtbot) -> None:
     """
     test filename reading function
@@ -569,6 +568,7 @@ def test_filename_read(qtbot) -> None:
     assert np.allclose(baseload_cooling, borefield.baseload_cooling, atol=1)
     assert np.allclose(peak_heating, borefield.peak_heating, atol=1)
     assert np.allclose(peak_cooling, borefield.peak_cooling, atol=1)
+    main_window.delete_backup()
 
 
 def test_value_error(qtbot) -> None:
@@ -582,6 +582,7 @@ def test_value_error(qtbot) -> None:
     """
     # init gui window
     main_window = MainWindow(QtW.QMainWindow(), qtbot)
+    main_window.save_scenario()
     main_window.delete_backup()
     main_window = MainWindow(QtW.QMainWindow(), qtbot)
     gs = main_window.gui_structure
@@ -592,11 +593,13 @@ def test_value_error(qtbot) -> None:
     main_window.gui_structure.option_depth.minimal_value = -500
     main_window.gui_structure.option_depth.set_value(-100)
     main_window.save_scenario()
-    borefield, func =  data_2_borefield(main_window.list_ds[-1])
+    borefield, func = data_2_borefield(main_window.list_ds[-1])
     with raises(ValueError) as err:
         func()
     main_window.start_current_scenario_calculation()
     while main_window.threads[0].isRunning():
-            QtW.QApplication.processEvents()
+        QtW.QApplication.processEvents()
 
     assert f'{main_window.list_ds[-1].debug_message}' == f'{err.value}'
+    main_window.delete_backup()
+
