@@ -535,7 +535,7 @@ def test_filename_read(qtbot) -> None:
     import pandas as pd
     file = f'{FOLDER.joinpath("Examples/hourly_profile.csv")}'
     # check if no file is passed
-    QtC.QTimer.singleShot(200, lambda: keyboard.press('Esc'))
+    QtC.QTimer.singleShot(250, lambda: keyboard.press('Esc'))
     main_window.gui_structure.option_filename.button.click()
     assert main_window.gui_structure.option_filename.status_bar.currentMessage() == main_window.gui_structure.option_filename.error_text
     # check file import and calculation
