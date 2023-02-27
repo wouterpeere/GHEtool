@@ -62,13 +62,6 @@ class CalcProblem(QtC.QThread):
             # return Datastorage as signal
             self.any_signal.emit((self.ds, self.idx))
             return
-        except RuntimeError:
-            # save bore field in Datastorage
-            self.ds.borefield = None
-            self.ds.ErrorMessage = self.ds.translation.NotCalculated
-            # return Datastorage as signal
-            self.any_signal.emit((self.ds, self.idx))
-            return
 
         # set debug message to ""
         self.ds.debug_message = ""

@@ -17,7 +17,7 @@ def custom_gfunction():
 
 
 def test_initiate_custom_gfunction():
-    custom_gfunction = CustomGFunction()
+    CustomGFunction()
 
 
 def test_initiate_with_random_values():

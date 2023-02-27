@@ -59,6 +59,7 @@ class FileNameBox(Option):
         self.dialog_text: str = dialog_text
         self.error_text: str = error_text
         self.status_bar: QtW.QStatusBar = status_bar
+        self.button: QtW.QPushButton = QtW.QPushButton(self.default_parent)
 
     def get_value(self) -> str:
         """
@@ -177,12 +178,12 @@ class FileNameBox(Option):
             f"QLineEdit:hover{'{'}background-color: {DARK};{'}'}"
         )
         layout.addWidget(self.widget)
-        button = QtW.QPushButton(self.frame)
-        button.setMinimumSize(QtC.QSize(30, 30))
-        button.setMaximumSize(QtC.QSize(30, 30))
-        button.setText("...")
-        button.clicked.connect(self.fun_choose_file)  # pylint: disable=E1101
-        layout.addWidget(button)
+        self.button.setParent(self.frame)
+        self.button.setMinimumSize(QtC.QSize(30, 30))
+        self.button.setMaximumSize(QtC.QSize(30, 30))
+        self.button.setText("...")
+        self.button.clicked.connect(self.fun_choose_file)  # pylint: disable=E1101
+        layout.addWidget(self.button)
 
     def fun_choose_file(self) -> None:
         """
@@ -194,9 +195,7 @@ class FileNameBox(Option):
         None
         """
         # try to ask for a file otherwise show message in status bar
-        try:
-            filename = QtW.QFileDialog.getOpenFileName(self.frame, caption=self.dialog_text, filter="(*.csv)", dir=str(Path.home()))
-            self.widget.setText(filename[0])
-        # show warning if no file is selected in status bar for 5 seconds
-        except FileNotFoundError:
+        filename = QtW.QFileDialog.getOpenFileName(self.frame, caption=self.dialog_text, filter="(*.csv)", dir=str(Path.home()))
+        if filename == "":
             self.status_bar.showMessage(self.error_text, 5000)
+        self.widget.setText(filename[0])

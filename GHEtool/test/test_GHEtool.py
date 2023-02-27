@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pygfunction as gt
 import pytest
+from pytest import raises
 
 from GHEtool import *
 
@@ -261,17 +262,13 @@ def test_Tg(borefield):
 
 
 def test_calculate_Rb(borefield):
-    try:
+    with raises(ValueError):
         borefield.calculate_Rb()
-    except ValueError:
-        assert True
 
 
 def test_too_much_sizing_methods(borefield):
-    try:
+    with raises(ValueError):
         borefield.sizing_setup(L2_sizing=True, L3_sizing=True)
-    except ValueError:
-        assert True
 
 
 def test_size_L3(borefield):
@@ -346,10 +343,8 @@ def test_sizing_L32(borefield_cooling_dom):
 
 
 def test_size_L4_without_data(borefield):
-    try:
+    with raises(ValueError):
         borefield.size(L4_sizing=True)
-    except ValueError:
-        assert True
 
 
 def test_load_duration(monkeypatch, hourly_borefield):
@@ -358,17 +353,13 @@ def test_load_duration(monkeypatch, hourly_borefield):
 
 
 def test_load_duration_no_hourly_data(borefield):
-    try:
+    with raises(ValueError):
         borefield.plot_load_duration()
-    except ValueError:
-        assert True
 
 
 def test_optimise_load_profile_without_data(borefield):
-    try:
+    with raises(ValueError):
         borefield.optimise_load_profile()
-    except ValueError:
-        assert True
 
 
 def test_precalculated_data_1(borefield_custom_data):
@@ -479,11 +470,8 @@ def test_H_smaller_50(borefield):
 
 
 def test_size_hourly_without_hourly_load(borefield):
-    try:
+    with raises(ValueError):
         borefield.size_L4(H_init=100)
-    except ValueError:
-        assert True
-
 
 def test_size_hourly_quadrant(hourly_borefield):
     hourly_borefield.H = 0.5
@@ -492,29 +480,21 @@ def test_size_hourly_quadrant(hourly_borefield):
 
 def test_create_custom_dataset_without_data(borefield):
     borefield.ground_data = None
-    try:
+    with raises(ValueError):
         borefield.create_custom_dataset()
-    except ValueError:
-        assert True
     borefield.borefield = None
-    try:
+    with raises(ValueError):
         borefield.create_custom_dataset()
-    except ValueError:
-        assert True
 
 
 def test_check_hourly_load(borefield):
-    try:
+    with raises(ValueError):
         borefield._check_hourly_load()
-    except ValueError:
-        assert True
 
     borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv")
     borefield.hourly_cooling_load[0] = -1
-    try:
+    with raises(ValueError):
         borefield._check_hourly_load()
-    except ValueError:
-        assert True
 
 
 def test_load_hourly_data(borefield):
@@ -528,17 +508,13 @@ def test_load_hourly_data(borefield):
 
 
 def test_convert_hourly_to_monthly_without_data(borefield):
-    try:
+    with raises(IndexError):
         borefield.convert_hourly_to_monthly()
-    except IndexError:
-        assert True
     borefield.set_fluid_parameters(fluidData)
     borefield.set_pipe_parameters(pipeData)
     borefield._sizing_setup.use_constant_Rb = False
-    try:
+    with raises(ValueError):
         borefield.optimise_load_profile()
-    except ValueError:
-        assert True
 
 
 def test_calculate_hourly_temperature_profile(hourly_borefield):
@@ -548,45 +524,29 @@ def test_calculate_hourly_temperature_profile(hourly_borefield):
 
 
 def test_incorrect_values_peak_baseload(borefield):
-    try:
+    with raises(ValueError):
         borefield.set_peak_heating(8)
-    except ValueError:
-        assert True
 
-    try:
+    with raises(ValueError):
         borefield.set_peak_cooling(8)
-    except ValueError:
-        assert True
 
-    try:
+    with raises(ValueError):
         borefield.set_baseload_heating(8)
-    except ValueError:
-        assert True
 
-    try:
+    with raises(ValueError):
         borefield.set_baseload_cooling(8)
-    except ValueError:
-        assert True
 
-    try:
+    with raises(ValueError):
         borefield.set_peak_cooling([8, 8])
-    except ValueError:
-        assert True
 
-    try:
+    with raises(ValueError):
         borefield.set_peak_heating([8, 8])
-    except ValueError:
-        assert True
 
-    try:
+    with raises(ValueError):
         borefield.set_baseload_cooling([8, 8])
-    except ValueError:
-        assert True
 
-    try:
+    with raises(ValueError):
         borefield.set_baseload_heating([8, 8])
-    except ValueError:
-        assert True
 
 
 def test_temperature_profile_available(hourly_borefield):
@@ -623,7 +583,5 @@ def test_no_ground_data():
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)  # maximum temperature
     borefield.set_min_ground_temperature(0)  # minimum temperature
-    try:
+    with raises(ValueError):
         borefield.size()
-    except ValueError:
-        assert True

@@ -161,7 +161,7 @@ class GuiStructure:
         FunctionButton.default_parent = default_parent
 
         self.status_bar = status_bar
-        self.no_file_selected = 'No file Selected'
+        self.no_file_selected = 'No file selected.'
 
         #################################################################################################################
         #                                                                                                               #
@@ -638,7 +638,7 @@ class GuiStructure:
             label="Filename: ",
             default_value="",
             dialog_text="Choose csv file",
-            error_text="error",
+            error_text=self.no_file_selected,
             status_bar=status_bar,
         )
         self.option_column = ButtonBox(label="Thermal demand in one or two columns: ", default_index=0,
@@ -1315,10 +1315,10 @@ class GuiStructure:
         try:
             data: pd_DataFrame = pd_read_csv(filename, sep=sep, decimal=dec)
         except FileNotFoundError:
-            self.status_bar.showMessage(self.no_file_selected[self.option_language.get_value()], 5000)
+            self.status_bar.showMessage(self.no_file_selected, 5000)
             return
         except PermissionError:
-            self.status_bar.showMessage(self.no_file_selected[self.option_language.get_value()], 5000)
+            self.status_bar.showMessage(self.no_file_selected, 5000)
             return
         # get data column names to set them to comboBoxes
         columns = data.columns
@@ -1407,7 +1407,7 @@ class GuiStructure:
             self.option_cp_dec.set_value(peak_cooling[11])
         # raise error and display error massage in status bar
         except FileNotFoundError:
-            self.status_bar.showMessage(self.no_file_selected[self.option_language.get_value()], 5000)
+            self.status_bar.showMessage(self.translations.no_file_selected[self.option_language.get_value()], 5000)
         except IndexError:
             self.status_bar.showMessage(self.translations.ValueError[self.option_language.get_value()], 5000)
         except KeyError:

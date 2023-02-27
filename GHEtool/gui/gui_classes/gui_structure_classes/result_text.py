@@ -124,7 +124,4 @@ class ResultText(Hint):
         -------
         None
         """
-        try:
-            super().set_text(f'{self.prefix}{self._callable(data)}{self.suffix}')
-        except ValueError:
-            self.hide()
+        super().set_text(f'{self.prefix}{self._callable(data)}{self.suffix}')
