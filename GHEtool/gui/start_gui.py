@@ -1,6 +1,7 @@
 """
 script to start the GUI
 """
+# pragma: no cover
 import sys
 from sys import argv
 
