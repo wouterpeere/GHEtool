@@ -4,6 +4,7 @@ from math import isclose
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import pygfunction as gt
 import pytest
 from pytest import raises
@@ -334,6 +335,14 @@ def test_quadrant_4(borefield):
 def test_sizing_L3(borefield):
     borefield.set_peak_heating(np.array(peakHeating)*8)
     borefield.size(L3_sizing=True)
+    max_temp = borefield.Tf_max
+    borefield.set_max_ground_temperature(12)
+    borefield.ground_data.flux = 40
+    with raises(ValueError):
+        borefield.size(L3_sizing=True, use_constant_Tg=False)
+
+    borefield.set_max_ground_temperature(max_temp)
+    borefield.ground_data.flux = 0
 
 
 def test_sizing_L32(borefield_cooling_dom):
@@ -472,6 +481,11 @@ def test_H_smaller_50(borefield):
 def test_size_hourly_without_hourly_load(borefield):
     with raises(ValueError):
         borefield.size_L4(H_init=100)
+    borefield.hourly_heating_load = None
+    borefield.hourly_cooling_load  = None
+    with raises(ValueError):
+        borefield.size_L4(H_init=100)
+
 
 def test_size_hourly_quadrant(hourly_borefield):
     hourly_borefield.H = 0.5
@@ -585,3 +599,14 @@ def test_no_ground_data():
     borefield.set_min_ground_temperature(0)  # minimum temperature
     with raises(ValueError):
         borefield.size()
+
+
+def test_hourly_temperature_profile(hourly_borefield):
+    folder = FOLDER.joinpath("Examples/hourly_profile.csv")
+    d_f = pd.read_csv(folder, sep=';', decimal='.')
+    hourly_borefield.hourly_heating_load_on_the_borefield = d_f[d_f.columns[0]].to_numpy()
+    hourly_borefield.hourly_cooling_load_on_the_borefield = d_f[d_f.columns[1]].to_numpy()
+    hourly_borefield.calculate_temperatures(100, hourly=True)
+    hourly_borefield.hourly_heating_load_on_the_borefield = np.array([])
+    hourly_borefield.hourly_cooling_load_on_the_borefield = np.array([])
+    hourly_borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
