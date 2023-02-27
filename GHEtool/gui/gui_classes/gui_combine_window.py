@@ -65,8 +65,9 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         super(MainWindow, self).__init__()
         super().setup_ui(dialog)
         # pyside6-rcc icons.qrc -o icons_rc.py
+        self.translations: Translations = Translations()  # init translation class
 
-        self.gui_structure = GuiStructure(self.central_widget, self.status_bar)
+        self.gui_structure = GuiStructure(self.central_widget, self.status_bar, self.translations)
         for page in self.gui_structure.list_of_pages:
             page.create_page(self.central_widget, self.stackedWidget, self.verticalLayout_menu)
 
@@ -88,7 +89,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # check if backup folder exits and otherwise create it
         makedirs(dirname(self.backup_file), exist_ok=True)
         makedirs(dirname(self.default_path), exist_ok=True)
-        self.translations: Translations = Translations()  # init translation class
         for idx, (name, icon, short_cut) in enumerate(zip(self.translations.languages, self.translations.icon, self.translations.short_cut)):
             self._create_action_language(idx, name, icon, short_cut)
         # add languages to combo box

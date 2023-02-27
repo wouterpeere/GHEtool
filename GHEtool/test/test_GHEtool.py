@@ -335,12 +335,16 @@ def test_quadrant_4(borefield):
 def test_sizing_L3(borefield):
     borefield.set_peak_heating(np.array(peakHeating)*8)
     borefield.size(L3_sizing=True)
-    max_temp = borefield.Tf_max
-    borefield.set_max_ground_temperature(12)
-    borefield.ground_data.flux = 40
-    with raises(ValueError):
-        borefield.size(L3_sizing=True, use_constant_Tg=False)
 
+
+def test_sizing_L3_threshold_depth_error(borefield):
+    max_temp = borefield.Tf_max
+    borefield.set_max_ground_temperature(14)
+    borefield.ground_data.flux = 0.09
+    borefield._sizing_setup.use_constant_Tg = False
+    with raises(ValueError):
+        borefield.gfunction(3600, borefield.THRESHOLD_DEPTH_ERROR + 1)
+    borefield._sizing_setup.use_constant_Tg = True
     borefield.set_max_ground_temperature(max_temp)
     borefield.ground_data.flux = 0
 
@@ -482,7 +486,7 @@ def test_size_hourly_without_hourly_load(borefield):
     with raises(ValueError):
         borefield.size_L4(H_init=100)
     borefield.hourly_heating_load = None
-    borefield.hourly_cooling_load  = None
+    borefield.hourly_cooling_load = None
     with raises(ValueError):
         borefield.size_L4(H_init=100)
 

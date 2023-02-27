@@ -5,6 +5,16 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "if typing.TYPE_CHECKING:"
+]
+omit = ["start_gui.py"]
+
 [tool.isort]
 line_length = 160
 profile = 'black'

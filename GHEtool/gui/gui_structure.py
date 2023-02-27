@@ -147,7 +147,7 @@ class GuiStructure:
     """
     This class contains all the elements that are relevant for the GUI.
     """
-    def __init__(self, default_parent: QtW.QWidget, status_bar: QtW.QStatusBar):
+    def __init__(self, default_parent: QtW.QWidget, status_bar: QtW.QStatusBar, translations: Translations):
         """
         All the elements that should be placed on the GUI, should be written in
         chronologial order, in this __init__ function.
@@ -159,7 +159,7 @@ class GuiStructure:
         Option.default_parent = default_parent
         Hint.default_parent = default_parent
         FunctionButton.default_parent = default_parent
-
+        self.translations = translations
         self.status_bar = status_bar
         self.no_file_selected = 'No file selected.'
 
