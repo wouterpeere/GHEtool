@@ -788,3 +788,38 @@ def test_backward_compatibility(qtbot):
             if isinstance(getattr(ds_old, option), (str, bool)):
                 assert getattr(ds_old, option) == getattr(ds_new, option)
                 continue
+
+
+def test_float_box(qtbot):
+    """
+    test float box functions
+
+    Parameters
+    ----------
+    qtbot: qtbot
+        bot for the GUI
+    """
+    # init gui window
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.delete_backup()
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.gui_structure.option_depth._init_links()
+    assert main_window.gui_structure.option_depth.check_linked_value((200, None))
+    assert main_window.gui_structure.option_depth.check_linked_value((None, 50))
+    assert not main_window.gui_structure.option_depth.check_linked_value((50, 200))
+    main_window.gui_structure.option_depth.show_option(main_window.gui_structure.option_width, 50, 200)
+    main_window.gui_structure.page_borehole.button.click()
+    assert main_window.gui_structure.option_width.is_hidden()
+    main_window.gui_structure.option_depth.set_value(20)
+    main_window.gui_structure.option_depth.show_option(main_window.gui_structure.option_width, 50, 200)
+    assert not main_window.gui_structure.option_width.is_hidden()
+    main_window.gui_structure.option_depth.set_value(220)
+    main_window.gui_structure.option_depth.show_option(main_window.gui_structure.option_width, 50, 200)
+    assert not main_window.gui_structure.option_width.is_hidden()
+    main_window.gui_structure.option_depth.add_link_2_show(main_window.gui_structure.option_width, 50, 200)
+    main_window.gui_structure.option_depth.set_value(110)
+    assert main_window.gui_structure.option_width.is_hidden()
+    main_window.gui_structure.option_depth.set_value(20)
+    assert not main_window.gui_structure.option_width.is_hidden()
+    main_window.gui_structure.option_depth.set_value(220)
+    assert not main_window.gui_structure.option_width.is_hidden()

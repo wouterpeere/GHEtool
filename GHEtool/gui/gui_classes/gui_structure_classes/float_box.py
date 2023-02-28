@@ -142,9 +142,9 @@ class FloatBox(Option):
         >>> option_float.add_link_2_show(option=option_linked, below=0.1, above=0.9)
         """
         self.linked_options.append((option, (below, above)))
-        self.widget.valueChanged.connect(ft_partial(self.show_option, option, below=below, above=above))
+        self.widget.valueChanged.connect(ft_partial(self.show_option, option, below, above))
 
-    def show_option(self, option: Union[Option, Category, FunctionButton, Hint], below: Optional[float], above: Optional[float]):
+    def show_option(self, option: Union[Option, Category, FunctionButton, Hint], below: Optional[float], above: Optional[float], args = None):
         """
         This function shows the option if the value of the FloatBox is between the below and above value.
         If no below or above values are given, no boundary is taken into account for respectively the lower and
