@@ -1,9 +1,9 @@
 ***************
-Users of GHEtool
+Supporters of GHEtool
 ***************
 
-GHEtool is used internationally by both academia and practitioners. Below you can find the institutions that use GHEtool.
-If you want your institution to be on this list, please do contact us, via wouter.peere@kuleuven.be.
+GHEtool is used internationally by both academia and practitioners. Below you can find the institutions that support GHEtool.
+If you want your institution to be on this list, please do contact us, via info@ghetool.eu.
 
 ------------------
 Belgium
