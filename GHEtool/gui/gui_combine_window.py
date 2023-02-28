@@ -1293,7 +1293,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
                 fig_obj.canvas.show()
                 # draw new plot
                 fig_obj.canvas.draw()
-                # set figure to canvas figure
                 continue
             fig_obj.replace_figure(fig)
             # show everything
