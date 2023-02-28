@@ -11,6 +11,7 @@ from numpy import array, cos, int64, round, sin, sum
 from pandas import DataFrame as pd_DataFrame
 from pandas import read_csv as pd_read_csv
 
+from GHEtool import FOLDER
 from GHEtool.gui.gui_classes.gui_base_class import DARK, GREY, LIGHT, WHITE
 from GHEtool.gui.gui_classes.gui_structure_classes import (
     Aim,
@@ -636,7 +637,7 @@ class GuiStructure:
         self.option_filename = FileNameBox(
             category=self.category_select_file,
             label="Filename: ",
-            default_value="",
+            default_value=f'{FOLDER.joinpath("Examples/hourly_profile.csv")}',
             dialog_text="Choose csv file",
             error_text=self.no_file_selected,
             status_bar=status_bar,

@@ -806,8 +806,11 @@ def test_backward_compatibility(qtbot):
                 assert getattr(ds_old, option) == getattr(ds_new, option)
                 continue
 
-def test_datastorage(qtbot):
 
+def test_datastorage(qtbot):
+    """
+    tests the datastorage
+    """
     # init gui window
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
     main_window.delete_backup()
@@ -973,6 +976,7 @@ def test_no_valid_value(qtbot) -> None:
     gs = main_window.gui_structure
     gs.aim_req_depth.widget.click() if not gs.aim_req_depth.widget.isChecked() else None
     gs.option_method_size_depth.set_value(2)
+    gs.option_filename.widget.setText("")
     assert not main_window.save_scenario()
     main_window.start_current_scenario_calculation()
     main_window.start_multiple_scenarios_calculation()
@@ -1003,15 +1007,16 @@ def test_value_error(qtbot) -> None:
     borefield, func = data_2_borefield(main_window.list_ds[-1])
     with raises(ValueError) as err:
         func()
-    main_window.start_current_scenario_calculation()
-    while main_window.threads[0].isRunning():
-        QtW.QApplication.processEvents()
+    main_window.start_current_scenario_calculation(True)
+    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
+        main_window.threads[0].run()
+        main_window.threads[0].any_signal.connect(main_window.thread_function)
 
     main_window.check_results()
     assert f'{main_window.list_ds[-1].debug_message}' == f'{err.value}'
     main_window.delete_backup()
 
-    
+
 def test_start_gui():
     """
     tests start gui import

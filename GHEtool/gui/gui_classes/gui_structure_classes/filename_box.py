@@ -177,6 +177,7 @@ class FileNameBox(Option):
             f"selection-background-color: {LIGHT_SELECT};{'}'}\n"
             f"QLineEdit:hover{'{'}background-color: {DARK};{'}'}"
         )
+        self.widget.setText(self.default_value)
         layout.addWidget(self.widget)
         self.button.setParent(self.frame)
         self.button.setMinimumSize(QtC.QSize(30, 30))
