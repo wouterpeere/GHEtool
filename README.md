@@ -15,7 +15,7 @@ The core of this package is the automated sizing of borefield under different co
 intelligent interpolation, this automated sizing can be done in the order of milliseconds. Please visit our website [https://GHEtool.eu](https://GHEtool.eu) for more information.
 
 #### GHEtool development
-GHEtool has been developed within a collaboration of KU Leuven (The SySi Team), boydens engineering (part of Sweco) and FH Aachen.
+GHEtool has been developed as a joint effort of KU Leuven (The SySi Team), boydens engineering (part of Sweco) and FH Aachen.
 The exhaustive list of contributors can be found [here](https://ghetool.readthedocs.io/en/latest/sources/users.html).
 
 #### Read The Docs
