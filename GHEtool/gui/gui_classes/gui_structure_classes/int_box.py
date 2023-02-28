@@ -157,9 +157,9 @@ class IntBox(Option):
 
         >>> option_int.add_link_2_show(option=option_linked, below=1, above=10)
         """
-        self.widget.valueChanged.connect(ft_partial(self.show_option, option, below=below, above=above))
+        self.widget.valueChanged.connect(ft_partial(self.show_option, option, below, above))
 
-    def show_option(self, option: Union[Option, Category, FunctionButton, Hint], below: Optional[int], above: Optional[int]):
+    def show_option(self, option: Union[Option, Category, FunctionButton, Hint], below: Optional[int], above: Optional[int], args = None):
         """
         This function shows the option if the value of the IntBox is between the below and above value.
         If no below or above values are given, no boundary is taken into account for respectively the lower and

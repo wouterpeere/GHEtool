@@ -864,6 +864,45 @@ def test_float_box(qtbot):
     assert not main_window.gui_structure.option_width.is_hidden()
 
 
+def test_int_box(qtbot):
+    """
+    test float box functions
+
+    Parameters
+    ----------
+    qtbot: qtbot
+        bot for the GUI
+    """
+    # init gui window
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.delete_backup()
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    option_width = main_window.gui_structure.option_width
+    assert np.isclose(option_width.get_value(), option_width.default_value)
+    option_width.set_value(option_width.default_value + 5)
+    assert np.isclose(option_width.default_value + 5, option_width.get_value())
+    option_width._init_links()
+    assert option_width.check_linked_value((20, None))
+    assert option_width.check_linked_value((None, 2))
+    assert not option_width.check_linked_value((5, 20))
+    option_width.show_option(main_window.gui_structure.option_depth, 5, 20)
+    main_window.gui_structure.page_borehole.button.click()
+    assert main_window.gui_structure.option_depth.is_hidden()
+    option_width.set_value(4)
+    option_width.show_option(main_window.gui_structure.option_depth, 5, 20)
+    assert not main_window.gui_structure.option_depth.is_hidden()
+    option_width.set_value(22)
+    option_width.show_option(main_window.gui_structure.option_depth, 5, 20)
+    assert not main_window.gui_structure.option_depth.is_hidden()
+    option_width.add_link_2_show(main_window.gui_structure.option_depth, below=5, above=20)
+    option_width.set_value(10)
+    assert main_window.gui_structure.option_depth.is_hidden()
+    option_width.set_value(4)
+    assert not main_window.gui_structure.option_depth.is_hidden()
+    option_width.set_value(22)
+    assert not main_window.gui_structure.option_depth.is_hidden()
+
+
 def test_filename_read(qtbot) -> None:
     """
     test filename reading function
