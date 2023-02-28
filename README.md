@@ -19,7 +19,11 @@ GHEtool has an elaborate documentation were all the functionalities of the tool 
 This can be found on [GHEtool.readthedocs.io](https://ghetool.readthedocs.io).
 
 #### Graphical user interface
-GHEtool comes with a *graphical user interface (GUI)*. This GUI is prebuilt as an exe-file (only for Windows platforms currently) because this provides access to all the functionalities without coding. A setup to install the GUI at the user-defined place is also implemented and available at [https://GHEtool.eu](https://GHEtool.eu).
+GHEtool comes with a *graphical user intekrface (GUI)*. This GUI is prebuilt as an exe-file (only for Windows platforms currently) because this provides access to all the functionalities without coding. A setup to install the GUI at the user-defined place is also implemented and available at [https://GHEtool.eu](https://GHEtool.eu).
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/sources/gui/_figure/GHEtool.PNG" width="600">
+</p>
 
 #### Supporters of GHEtool
 GHEtool is primarily supported by KU Leuven (The SySi Team), boydens engineering (part of Sweco) and FH Aachen.
