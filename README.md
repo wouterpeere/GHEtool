@@ -10,13 +10,9 @@
 ## What is *GHEtool*?
 <img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/sources/gui/_figure/Icon.png" width="110" align="left">
 
-GHEtool is a Python package that contains all the functionalities needed to deal with borefield design. It is developed for both researchers and practitioners.
+GHEtool is a Python package that contains all the functionalities needed to deal with borefield design. GHEtool has been developed as a joint effort of KU Leuven (The SySi Team), boydens engineering (part of Sweco) and FH Aachen.
 The core of this package is the automated sizing of borefield under different conditions. By making use of combination of just-in-time calculations of thermal ground responses (using [pygfunction](https://github.com/MassimoCimmino/pygfunction)) with
 intelligent interpolation, this automated sizing can be done in the order of milliseconds. Please visit our website [https://GHEtool.eu](https://GHEtool.eu) for more information.
-
-#### GHEtool development
-GHEtool has been developed as a joint effort of KU Leuven (The SySi Team), boydens engineering (part of Sweco) and FH Aachen.
-The exhaustive list of contributors can be found [here](https://ghetool.readthedocs.io/en/latest/sources/users.html).
 
 #### Read The Docs
 GHEtool has an elaborate documentation were all the functionalities of the tool are explained, with examples, literature and validation.
@@ -28,6 +24,10 @@ GHEtool comes with a *graphical user intekrface (GUI)*. This GUI is prebuilt as 
 <p align="center">
 <img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/sources/gui/_figure/GHEtool.PNG" width="600">
 </p>
+
+#### GHEtool development
+GHEtool has been developed as a joint effort of KU Leuven (The SySi Team), boydens engineering (part of Sweco) and FH Aachen.
+The exhaustive list of contributors can be found [here](https://ghetool.readthedocs.io/en/latest/sources/users.html).
 
 ## Requirements
 This code is tested with Python 3.8, 3.9, 3.10 and 3.11 and requires the following libraries (the versions mentioned are the ones with which the code is tested)
@@ -165,7 +165,7 @@ See [GHEtool license](LICENSE).
 - Do you have a great idea for a new feature?
 - Do you have a specific remark/problem?
 
-Please do contact us at [wouter@ghetool.eu](mailto:wouter@ghetool.eu).
+Please do contact us at [info@ghetool.eu](mailto:info@ghetool.eu).
 
 ## Citation
 Please cite GHEtool using the JOSS paper.
