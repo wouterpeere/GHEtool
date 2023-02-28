@@ -5,6 +5,10 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
+[pytest]
+collect_ignore = ["GHEtool/gui/start_gui.py"]
+collect_ignore_glob = ["*start_gui.py"]
+
 
 [tool.coverage.report]
 exclude_lines = [

@@ -489,7 +489,7 @@ def test_temp_profile_cooling_data(qtbot, delay: int, factor: float) -> None:
 
     g_s = main_window.gui_structure
 
-    if not g_s.aim_temp_profile.widget.isChecked():
+    if not g_s.aim_temp_profile.widget.isChecked():  # pragma: no cover
         g_s.aim_temp_profile.widget.click()
 
     borefield = create_borefield(g_s)

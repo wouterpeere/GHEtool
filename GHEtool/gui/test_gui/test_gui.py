@@ -69,7 +69,7 @@ def test_gui_values(qtbot):
         # show option and check values
         option.show()
         if isinstance(option, FloatBox) or isinstance(option, IntBox):
-            if option.linked_options:
+            if option.linked_options:  # pragma: no cover
                 option.set_value(option.maximal_value)
                 assert isclose(option.get_value(), option.maximal_value)
 
@@ -370,7 +370,7 @@ def test_rename_scenario(qtbot):
     scenario_name_2 = 'test_name_2'
     # create functions to handle pop up dialog windows to change names, close and reject the dialog
     def change_name():
-        while main_window.dialog is None:
+        while main_window.dialog is None:  # pragma: no cover
             QtW.QApplication.processEvents()
         # handle dialog now
         if isinstance(main_window.dialog, QtW.QInputDialog):
@@ -378,7 +378,7 @@ def test_rename_scenario(qtbot):
             main_window.dialog.accept()
 
     def change_name_2():
-        while main_window.dialog is None:
+        while main_window.dialog is None:  # pragma: no cover
             QtW.QApplication.processEvents()
         # handle dialog now
         if isinstance(main_window.dialog, QtW.QInputDialog):
@@ -386,7 +386,7 @@ def test_rename_scenario(qtbot):
             main_window.dialog.accept()
 
     def not_change_name():
-        while main_window.dialog is None:
+        while main_window.dialog is None:  # pragma: no cover
             QtW.QApplication.processEvents()
         # handle dialog now
         if isinstance(main_window.dialog, QtW.QInputDialog):
@@ -394,14 +394,14 @@ def test_rename_scenario(qtbot):
             main_window.dialog.accept()
 
     def close_dialog():
-        while main_window.dialog is None:
+        while main_window.dialog is None:  # pragma: no cover
             QtW.QApplication.processEvents()
         # handle dialog now
         if isinstance(main_window.dialog, QtW.QInputDialog):
             main_window.dialog.close()
 
     def reject_dialog():
-        while main_window.dialog is None:
+        while main_window.dialog is None:  # pragma: no cover
             QtW.QApplication.processEvents()
         # handle dialog now
         if isinstance(main_window.dialog, QtW.QInputDialog):
@@ -485,11 +485,11 @@ def test_save_load_new(qtbot):
     filename_2 = 'test_2.GHEtool'
     filename_3 = 'test_3.GHEtool'
     # delete files if they already exists
-    if os.path.exists(main_window.default_path.joinpath(filename_1)):
+    if os.path.exists(main_window.default_path.joinpath(filename_1)):  # pragma: no cover
         os.remove(main_window.default_path.joinpath(filename_1))
-    if os.path.exists(main_window.default_path.joinpath(filename_2)):
+    if os.path.exists(main_window.default_path.joinpath(filename_2)):  # pragma: no cover
         os.remove(main_window.default_path.joinpath(filename_2))
-    if os.path.exists(main_window.default_path.joinpath(filename_3)):
+    if os.path.exists(main_window.default_path.joinpath(filename_3)):  # pragma: no cover
         os.remove(main_window.default_path.joinpath(filename_3))
     # trigger save action and add filename
     QtC.QTimer.singleShot(1000, lambda: keyboard.write(filename_1))
@@ -546,28 +546,28 @@ def test_close(qtbot):
         os.remove(main_window.default_path.joinpath(filename_1))
 
     def close():
-        while main_window.dialog is None:
+        while main_window.dialog is None:  # pragma: no cover
             QtW.QApplication.processEvents()
         # handle dialog now
         if isinstance(main_window.dialog, QtW.QMessageBox):
             main_window.dialog.close()
 
     def cancel():
-        while main_window.dialog is None:
+        while main_window.dialog is None:  # pragma: no cover
             QtW.QApplication.processEvents()
         # handle dialog now
         if isinstance(main_window.dialog, QtW.QMessageBox):
             main_window.dialog.buttons()[2].click()
 
     def exit_window():
-        while main_window.dialog is None:
+        while main_window.dialog is None:  # pragma: no cover
             QtW.QApplication.processEvents()
         # handle dialog now
         if isinstance(main_window.dialog, QtW.QMessageBox):
             main_window.dialog.buttons()[1].click()
 
     def save():
-        while main_window.dialog is None:
+        while main_window.dialog is None:  # pragma: no cover
             QtW.QApplication.processEvents()
         # handle dialog now
         if isinstance(main_window.dialog, QtW.QMessageBox):
@@ -669,28 +669,28 @@ def test_change_scenario(qtbot):
     main_window.gui_structure.option_conductivity.set_value(2.3)
     # create functions to handle pop up window
     def close():
-        while main_window.dialog is None:
+        while main_window.dialog is None:  # pragma: no cover
             QtW.QApplication.processEvents()
         # handle dialog now
         if isinstance(main_window.dialog, QtW.QMessageBox):
             main_window.dialog.close()
 
     def abort():
-        while main_window.dialog is None:
+        while main_window.dialog is None:  # pragma: no cover
             QtW.QApplication.processEvents()
         # handle dialog now
         if isinstance(main_window.dialog, QtW.QMessageBox):
             main_window.dialog.buttons()[2].click()
 
     def exit_window():
-        while main_window.dialog is None:
+        while main_window.dialog is None:  # pragma: no cover
             QtW.QApplication.processEvents()
         # handle dialog now
         if isinstance(main_window.dialog, QtW.QMessageBox):
             main_window.dialog.buttons()[1].click()
 
     def save():
-        while main_window.dialog is None:
+        while main_window.dialog is None:  # pragma: no cover
             QtW.QApplication.processEvents()
         # handle dialog now
         if isinstance(main_window.dialog, QtW.QMessageBox):
