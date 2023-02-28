@@ -1010,3 +1010,10 @@ def test_value_error(qtbot) -> None:
     main_window.check_results()
     assert f'{main_window.list_ds[-1].debug_message}' == f'{err.value}'
     main_window.delete_backup()
+
+    
+def test_start_gui():
+    """
+    tests start gui import
+    """
+    from GHEtool.gui.start_gui import run
