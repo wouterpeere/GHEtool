@@ -196,6 +196,6 @@ class FileNameBox(Option):
         """
         # try to ask for a file otherwise show message in status bar
         filename = QtW.QFileDialog.getOpenFileName(self.frame, caption=self.dialog_text, filter="(*.csv)", dir=str(Path.home()))
-        if filename == "":
+        if filename[0] == "":
             self.status_bar.showMessage(self.error_text, 5000)
         self.widget.setText(filename[0])

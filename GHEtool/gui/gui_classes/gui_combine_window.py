@@ -914,17 +914,12 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # Create list if no scenario is stored
         self.list_ds.append(DataStorage(self.gui_structure)) if len(self.list_ds) < 1 else None
         # try to store the data in the pickle file
-        try:
-            self._save_to_data(self.filename[0])
-            # deactivate changed file * from window title
-            self.changedFile: bool = False
-            self.change_window_title()
-            # return true because everything was successful
-            return True
-        # show file not found message in status bar if an error appears
-        except FileNotFoundError:
-            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
-            return False
+        self._save_to_data(self.filename[0])
+        # deactivate changed file * from window title
+        self.changedFile: bool = False
+        self.change_window_title()
+        # return true because everything was successful
+        return True
 
     def fun_new(self) -> None:
         """
@@ -1162,8 +1157,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             return
         # add scenario if no list of scenarios exits else save current scenario
         self.add_scenario() if not self.list_ds else self.save_scenario()
-        if self.list_widget_scenario.currentItem().text()[-1] == '*':
-            return
         # create list of threads with scenarios that have not been calculated
         self.threads = [CalcProblem(DS, idx) for idx, DS in enumerate(self.list_ds) if DS.borefield is None]
         # set number of to calculate scenarios
@@ -1202,15 +1195,15 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         if not self.check_values():
             return
         # add scenario if no list of scenarios exits else save current scenario
-        self.add_scenario() if not self.list_ds else self.save_scenario()
-        if self.list_widget_scenario.currentItem().text()[-1] == '*':
-            return
+        self.add_scenario() if not self.list_ds else self.save_scenario() if self.list_widget_scenario.currentItem().text()[-1] == '*' else None
+
         # get index of selected scenario
         idx: int = self.list_widget_scenario.currentRow()
         # get Datastorage of selected scenario
         ds: DataStorage = self.list_ds[idx]
         # if calculation is already done just show results
         if ds.borefield is not None:
+            self.threads = []
             self.gui_structure.page_result.button.click()
             return
         # return to thermal demands page if no file is selected

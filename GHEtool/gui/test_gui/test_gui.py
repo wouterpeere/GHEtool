@@ -7,11 +7,15 @@ from typing import List
 import keyboard
 import PySide6.QtCore as QtC
 import PySide6.QtWidgets as QtW
+import numpy as np
 from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
+from pytest import raises
 
 from GHEtool import FOLDER
+from GHEtool.gui.data_2_borefield_func import data_2_borefield
 from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
 from GHEtool.gui.gui_classes.gui_structure_classes import ButtonBox, FigureOption, FloatBox, IntBox, ListBox
+from GHEtool.gui.test_gui.test_results import create_borefield
 
 setrecursionlimit(1500)
 
@@ -134,6 +138,13 @@ def test_gui_values(qtbot):
     with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
         main_window.threads[0].run()
         main_window.threads[0].any_signal.connect(main_window.thread_function)
+    # check if no calculation runs
+    assert main_window.list_ds[0].borefield is not None
+    main_window.start_current_scenario_calculation()
+    assert len(main_window.threads) == 0
+    assert all([ds.borefield is not None for ds in main_window.list_ds])
+    main_window.start_multiple_scenarios_calculation()
+    assert len(main_window.threads) == 0
 
     main_window.gui_structure.option_column.set_value(0)
     main_window.gui_structure.option_single_column.set_value(0)
@@ -492,9 +503,15 @@ def test_save_load_new(qtbot):
     if os.path.exists(main_window.default_path.joinpath(filename_3)):  # pragma: no cover
         os.remove(main_window.default_path.joinpath(filename_3))
     # trigger save action and add filename
+    QtC.QTimer.singleShot(100, lambda: keyboard.press('Esc'))
+    main_window.actionSave.trigger()
+    assert (pathlib.Path(main_window.filename[0]), main_window.filename[1]) == (pathlib.Path(main_window.filenameDefault[0]), main_window.filenameDefault[1])
+    # trigger save action and add filename
     QtC.QTimer.singleShot(1000, lambda: keyboard.write(filename_1))
     QtC.QTimer.singleShot(1200, lambda: keyboard.press('enter'))
     main_window.actionSave.trigger()
+    # check if filename is set correctly
+    assert (pathlib.Path(main_window.filename[0]), main_window.filename[1]) == (main_window.default_path.joinpath(filename_1), 'GHEtool (*.GHEtool)')
     # check if filename is set correctly
     assert (pathlib.Path(main_window.filename[0]), main_window.filename[1]) == (main_window.default_path.joinpath(filename_1), 'GHEtool (*.GHEtool)')
     # get old list and add a new scenario
@@ -789,6 +806,24 @@ def test_backward_compatibility(qtbot):
                 assert getattr(ds_old, option) == getattr(ds_new, option)
                 continue
 
+def test_datastorage(qtbot):
+
+    # init gui window
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.delete_backup()
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.save_scenario()
+    main_window.add_scenario()
+    assert not main_window.list_ds[0] == 2
+    assert main_window.list_ds[0] == main_window.list_ds[1]
+    val_old = main_window.list_ds[1].option_depth
+    main_window.list_ds[1].option_depth = 1
+    assert not main_window.list_ds[1] == main_window.list_ds[0]
+    main_window.list_ds[1].option_depth = val_old
+    assert main_window.list_ds[0] == main_window.list_ds[1]
+    main_window.list_ds[1].list_options_aims.append('no_real_option')
+    assert not main_window.list_ds[1] == main_window.list_ds[0]
+
 
 def test_float_box(qtbot):
     """
@@ -803,23 +838,136 @@ def test_float_box(qtbot):
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
     main_window.delete_backup()
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
-    main_window.gui_structure.option_depth._init_links()
-    assert main_window.gui_structure.option_depth.check_linked_value((200, None))
-    assert main_window.gui_structure.option_depth.check_linked_value((None, 50))
-    assert not main_window.gui_structure.option_depth.check_linked_value((50, 200))
-    main_window.gui_structure.option_depth.show_option(main_window.gui_structure.option_width, 50, 200)
+    option_depth = main_window.gui_structure.option_depth
+    assert np.isclose(option_depth.get_value(), option_depth.default_value)
+    option_depth.set_value(option_depth.default_value + 50)
+    assert np.isclose(option_depth.default_value + 50, option_depth.get_value())
+    option_depth._init_links()
+    assert option_depth.check_linked_value((200, None))
+    assert option_depth.check_linked_value((None, 50))
+    assert not option_depth.check_linked_value((50, 200))
+    option_depth.show_option(main_window.gui_structure.option_width, 50, 200)
     main_window.gui_structure.page_borehole.button.click()
     assert main_window.gui_structure.option_width.is_hidden()
-    main_window.gui_structure.option_depth.set_value(20)
-    main_window.gui_structure.option_depth.show_option(main_window.gui_structure.option_width, 50, 200)
+    option_depth.set_value(20)
+    option_depth.show_option(main_window.gui_structure.option_width, 50, 200)
     assert not main_window.gui_structure.option_width.is_hidden()
-    main_window.gui_structure.option_depth.set_value(220)
-    main_window.gui_structure.option_depth.show_option(main_window.gui_structure.option_width, 50, 200)
+    option_depth.set_value(220)
+    option_depth.show_option(main_window.gui_structure.option_width, 50, 200)
     assert not main_window.gui_structure.option_width.is_hidden()
-    main_window.gui_structure.option_depth.add_link_2_show(main_window.gui_structure.option_width, 50, 200)
-    main_window.gui_structure.option_depth.set_value(110)
+    option_depth.add_link_2_show(main_window.gui_structure.option_width, 50, 200)
+    option_depth.set_value(110)
     assert main_window.gui_structure.option_width.is_hidden()
-    main_window.gui_structure.option_depth.set_value(20)
+    option_depth.set_value(20)
     assert not main_window.gui_structure.option_width.is_hidden()
-    main_window.gui_structure.option_depth.set_value(220)
+    option_depth.set_value(220)
     assert not main_window.gui_structure.option_width.is_hidden()
+
+
+def test_filename_read(qtbot) -> None:
+    """
+    test filename reading function
+
+    Parameters
+    ----------
+    qtbot: qtbot
+        qtbot
+    """
+    # init gui window
+    main_window = MainWindow(QtW.QMainWindow(), qtbot)
+    main_window.save_scenario()
+    main_window.gui_structure.option_filename._init_links()
+    from GHEtool import FOLDER
+    import pandas as pd
+    file = f'{FOLDER.joinpath("Examples/hourly_profile.csv")}'
+    # check if no file is passed
+    QtC.QTimer.singleShot(1000, lambda: keyboard.press('Esc'))
+    main_window.gui_structure.option_filename.button.click()
+    assert main_window.gui_structure.option_filename.status_bar.currentMessage() == main_window.gui_structure.option_filename.error_text
+    # check file import and calculation
+    QtC.QTimer.singleShot(1000, lambda: keyboard.write(file))
+    QtC.QTimer.singleShot(1500, lambda: keyboard.press('enter'))
+    main_window.gui_structure.option_filename.button.click()
+    assert main_window.gui_structure.option_filename.get_value() == file.replace('\\', '/')
+    assert main_window.gui_structure.option_filename.check_linked_value(file.replace('\\', '/'))
+    main_window.gui_structure.option_column.set_value(1)
+    main_window.gui_structure.option_heating_column.set_value(0)
+    main_window.gui_structure.option_cooling_column.set_value(1)
+    main_window.gui_structure.button_load_csv.button.click()
+    main_window.save_scenario()
+    borefield, _ = data_2_borefield(main_window.list_ds[-1])
+    # check that the borefield baseload is different from main class base load
+    g_s = main_window.gui_structure
+    borefield_new = create_borefield(g_s)
+    borefield_new.load_hourly_profile(file)
+    borefield_new.calculate_monthly_load()
+    assert not np.allclose(borefield_new.baseload_cooling, borefield.baseload_cooling)
+    assert not np.allclose(borefield_new.baseload_heating, borefield.baseload_heating)
+    # manually read and calculate load
+    d_f = pd.read_csv(file, sep=';', decimal='.')
+    heat = d_f[d_f.columns[0]].to_numpy()
+    cool = d_f[d_f.columns[1]].to_numpy()
+    idx = np.array([0, 31,28,31,30,31,30,31,31,30,31,30,31]).cumsum() * 24
+    baseload_heating = [np.sum(heat[idx[i]:idx[i+1]]).astype(np.int64) for i in range(12)]
+    baseload_cooling = [np.sum(cool[idx[i]:idx[i+1]]).astype(np.int64) for i in range(12)]
+    peak_heating = [np.max(heat[idx[i]:idx[i+1]]).astype(np.int64) for i in range(12)]
+    peak_cooling = [np.max(cool[idx[i]:idx[i+1]]).astype(np.int64) for i in range(12)]
+    assert np.allclose(baseload_heating, borefield.baseload_heating, atol=1)
+    assert np.allclose(baseload_cooling, borefield.baseload_cooling, atol=1)
+    assert np.allclose(peak_heating, borefield.peak_heating, atol=1)
+    assert np.allclose(peak_cooling, borefield.peak_cooling, atol=1)
+    main_window.delete_backup()
+
+
+def test_no_valid_value(qtbot) -> None:
+    """
+    test no valid value
+
+    Parameters
+    ----------
+    qtbot: qtbot
+        qtbot
+    """
+    # init gui window
+    main_window = MainWindow(QtW.QMainWindow(), qtbot)
+    main_window.save_scenario()
+    gs = main_window.gui_structure
+    gs.aim_req_depth.widget.click() if not gs.aim_req_depth.widget.isChecked() else None
+    gs.option_method_size_depth.set_value(2)
+    assert not main_window.save_scenario()
+    main_window.start_current_scenario_calculation()
+    main_window.start_multiple_scenarios_calculation()
+
+
+def test_value_error(qtbot) -> None:
+    """
+    test value error caption
+
+    Parameters
+    ----------
+    qtbot: qtbot
+        qtbot
+    """
+    # init gui window
+    main_window = MainWindow(QtW.QMainWindow(), qtbot)
+    main_window.save_scenario()
+    main_window.delete_backup()
+    main_window = MainWindow(QtW.QMainWindow(), qtbot)
+    gs = main_window.gui_structure
+    main_window.save_scenario()
+
+    gs.aim_temp_profile.widget.click() if not gs.aim_temp_profile.widget.isChecked() else None
+    main_window.gui_structure.option_depth.widget.setMinimum(-500)
+    main_window.gui_structure.option_depth.minimal_value = -500
+    main_window.gui_structure.option_depth.set_value(-100)
+    main_window.save_scenario()
+    borefield, func = data_2_borefield(main_window.list_ds[-1])
+    with raises(ValueError) as err:
+        func()
+    main_window.start_current_scenario_calculation()
+    while main_window.threads[0].isRunning():
+        QtW.QApplication.processEvents()
+
+    main_window.check_results()
+    assert f'{main_window.list_ds[-1].debug_message}' == f'{err.value}'
+    main_window.delete_backup()
