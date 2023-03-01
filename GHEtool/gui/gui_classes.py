@@ -382,7 +382,7 @@ class Option(metaclass=abc.ABCMeta):
         self.set_text(self.label_text[idx])
 
     def __repr__(self):
-        return f'{type(self).__name__}; Label: {self.label_text[0]}; Value: {self.get_value()}'
+        return f'{type(self).__name__}; Label: {self.label_text[0] if self.label_text else None}; Value: {self.get_value()}'
 
 
 def check(linked_options: List[(Union[Option, List[Option]], int)], option_input: Option, index: int):

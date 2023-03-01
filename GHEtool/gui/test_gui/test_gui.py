@@ -113,6 +113,7 @@ def test_translation_class():
         if isinstance(value, list):
             assert len(value) == len_ref
 
+
 def test_gui_values(qtbot):
     """
     test if all gui values are set and get correctly.
@@ -151,7 +152,7 @@ def test_gui_values(qtbot):
                 assert isclose(option.get_value(), option.minimal_value)
                 continue
             val = option.get_value() + option.step
-            val = val - 2 * option.step if option.widget.maximum() > val else val
+            val = val - 2 * option.step if option.widget.maximum() < val else val
             if val < option.widget.minimum():
                 continue
             option.set_value(val)
