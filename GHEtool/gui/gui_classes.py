@@ -28,7 +28,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
 from GHEtool import ghe_logger
-from GHEtool.gui.gui_base_class import DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE, set_graph_layout
+from GHEtool.gui.gui_base_class import DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE, set_gui_graph_layout
 
 
 def _update_opponent_not_change(button: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
@@ -2298,7 +2298,6 @@ class ResultFigure(Category):
         super().__init__(label, page)
         self.frame_canvas: QtW.QFrame = QtW.QFrame(self.frame)
         self.layout_frame_canvas: QtW.QVBoxLayout = QtW.QVBoxLayout(self.frame_canvas)
-        set_graph_layout()
         self.fig: plt.Figure = plt.figure()
         self.ax: Optional[plt.Axes] = self.fig.add_subplot(111)
         self.canvas: FigureCanvas = FigureCanvas(self.fig)
@@ -2315,6 +2314,7 @@ class ResultFigure(Category):
         self.x_axes_text: str = ''
         self.y_axes_text: str = ''
         self.to_show: bool = True
+        self.scroll_area: Optional[QtW.QScrollArea] = None
 
     def replace_figure(self, fig: plt.Figure) -> None:
         """
@@ -2333,6 +2333,7 @@ class ResultFigure(Category):
         self.ax = fig.get_axes()[0]
         self.ax.set_xlabel(self.x_axes_text)
         self.ax.set_ylabel(self.y_axes_text)
+        set_gui_graph_layout(self.ax, self.fig)
         self.toolbar.home()
         self.canvas.hide()
         self.toolbar.hide()
@@ -2349,9 +2350,10 @@ class ResultFigure(Category):
         self.layout_frame_canvas.replaceWidget(self.toolbar, toolbar)
 
         self.canvas = canvas
+        self.canvas.mpl_connect("scroll_event", self.scrolling)
         self.toolbar = toolbar
 
-    def create_widget(self, page: QtW.QWidget, layout: QtW.QLayout):
+    def create_widget(self, page: QtW.QScrollArea, layout: QtW.QLayout):
         """
         This function creates the frame for this Category on a given page.
         If the current label text is "", then the frame attribute is set to the given frame.
@@ -2384,6 +2386,26 @@ class ResultFigure(Category):
         # add canvas and toolbar to local frame
         self.layout_frame_canvas.addWidget(self.canvas)
         self.layout_frame_canvas.addWidget(self.toolbar)
+        self.scroll_area = page
+        self.canvas.mpl_connect("scroll_event", self.scrolling)
+
+    def scrolling(self, event) -> None:
+        """
+        This function handels the scrolling behaviour.
+
+        Parameters
+        ----------
+        event : Event
+
+        Returns
+        -------
+        None
+        """
+        val = self.scroll_area.verticalScrollBar().value()
+        if event.button == "down":
+            self.scroll_area.verticalScrollBar().setValue(val+self.scroll_area.verticalScrollBar().singleStep())
+            return
+        self.scroll_area.verticalScrollBar().setValue(val-self.scroll_area.verticalScrollBar().singleStep())
 
     def set_text(self, name: str) -> None:
         """
@@ -2857,6 +2879,7 @@ class Page:
         scroll_area.setFrameShape(QtW.QFrame.NoFrame)
         scroll_area.setLineWidth(0)
         scroll_area.setWidgetResizable(True)
+        scroll_area.verticalScrollBar().setSingleStep(10)
         scroll_area_content = QtW.QWidget(self.page)
         scroll_area_content.setGeometry(QtC.QRect(0, 0, 864, 695))
         scroll_area.setWidget(scroll_area_content)
@@ -2874,7 +2897,7 @@ class Page:
         scroll_area_layout.addWidget(label_gap)
 
         for category in self.list_categories:
-            category.create_widget(scroll_area_content, scroll_area_layout)
+            category.create_widget(scroll_area, scroll_area_layout)
 
         spacer = QtW.QSpacerItem(1, 1, QtW.QSizePolicy.Minimum, QtW.QSizePolicy.Expanding)
         scroll_area_layout.addItem(spacer)

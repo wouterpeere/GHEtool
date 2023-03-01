@@ -19,7 +19,7 @@ import PySide6.QtWidgets as QtW
 
 from GHEtool import FOLDER, Borefield, ghe_logger
 
-from .gui_base_class import UiGhetool, set_graph_layout
+from .gui_base_class import UiGhetool
 from .gui_calculation_thread import CalcProblem
 from .gui_classes import check_aim_options, show_linked_options
 from .gui_data_storage import DataStorage
@@ -133,9 +133,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         logging.info(self.translations.GHE_tool_imported[self.gui_structure.option_language.get_value()])
         # allow checking of changes
         self.checking: bool = True
-
-        # set the correct graph layout
-        set_graph_layout()
 
         self.display_results()
 
@@ -1292,7 +1289,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
                 fig_obj.canvas.show()
                 # draw new plot
                 fig_obj.canvas.draw()
-                # set figure to canvas figure
                 continue
             fig_obj.replace_figure(fig)
             # show everything

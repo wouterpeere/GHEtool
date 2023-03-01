@@ -38,6 +38,70 @@ def test_language(qtbot):
     main_window.menuLanguage.actions()[0].trigger()
 
 
+def test_scrolling(qtbot):
+    """
+    test scrolling on results figure
+
+    Parameters
+    ----------
+    qtbot : qtbot
+        QtBot mock
+    """
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+
+    # create class which are not handled with qtbot
+
+    class Event:
+        """dummy event class"""
+        def __init__(self):
+            self.button = 'down'
+
+
+    class VerticalScrollBar:
+        """dummy vertical scroll bar class"""
+        def __init__(self):
+            self._value: int = 0
+
+        def value(self) -> int:
+            return self._value
+
+        def setValue(self, value: int):
+            self._value = value
+
+        def singleStep(self) -> int:
+            return 10
+
+    class ScrollArea:
+        """dummy scroll area class"""
+        def __init__(self):
+            self.vertical_scroll_bar = VerticalScrollBar()
+
+        def verticalScrollBar(self) -> VerticalScrollBar:
+            return self.vertical_scroll_bar
+    # overwrite scroll area with dummy class and create dummy event
+    main_window.gui_structure.figure_temperature_profile.scroll_area = ScrollArea()
+    event = Event()
+    # get before value
+    val_before = main_window.gui_structure.figure_temperature_profile.scroll_area.verticalScrollBar().value()
+    # check down scrolling
+    main_window.gui_structure.figure_temperature_profile.scrolling(event)
+    val_after = main_window.gui_structure.figure_temperature_profile.scroll_area.verticalScrollBar().value()
+    assert val_after == val_before + 10
+    # check up scrolling
+    event.button = "up"
+    main_window.gui_structure.figure_temperature_profile.scrolling(event)
+    val_after = main_window.gui_structure.figure_temperature_profile.scroll_area.verticalScrollBar().value()
+    assert val_after == val_before
+    # check down scrolling with scroll_event
+    main_window.gui_structure.figure_temperature_profile.canvas.scroll_event(0, 10, -10)
+    val_after = main_window.gui_structure.figure_temperature_profile.scroll_area.verticalScrollBar().value()
+    assert val_after == val_before + 10
+    # check up scrolling with scroll_event
+    main_window.gui_structure.figure_temperature_profile.canvas.scroll_event(0, 10, 10)
+    val_after = main_window.gui_structure.figure_temperature_profile.scroll_area.verticalScrollBar().value()
+    assert val_after == val_before
+
+
 def test_translation_class():
     """
     Checks if all entries in the translation class have the same length
@@ -48,7 +112,6 @@ def test_translation_class():
         value = getattr(translations, name)
         if isinstance(value, list):
             assert len(value) == len_ref
-
 
 def test_gui_values(qtbot):
     """

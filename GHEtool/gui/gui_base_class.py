@@ -6,28 +6,54 @@ and it contains the main class that creates the framework for the GUI (top bar e
 import PySide6.QtCore as QtC
 import PySide6.QtGui as QtG
 import PySide6.QtWidgets as QtW
+import matplotlib.pyplot as plt
+from matplotlib.colors import to_rgb
+from numpy import array, float64
 
 import GHEtool.gui.icons_rc
 from GHEtool.gui.color_definition import BLACK, DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE, dark_matplotlib, white_matplotlib
 from GHEtool.logger.status_bar_logger import StatusBar
 
+WHITE: str = "rgb(255, 255, 255)"
+LIGHT: str = "rgb(84, 188, 235)"
+LIGHT_SELECT: str = "rgb(42, 126, 179)"
+DARK: str = "rgb(0, 64, 122)"
+GREY: str = "rgb(100, 100, 100)"
+WARNING: str = "rgb(255, 200, 87)"
+BLACK: str = "rgb(0, 0, 0)"
 
-def set_graph_layout() -> None:
+background_color: str = to_rgb(
+    array(DARK.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
+white_color: str = to_rgb(
+    array(WHITE.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
+light_color: str = to_rgb(
+    array(LIGHT.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
+bright_color: str = to_rgb(
+    array(WARNING.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
+
+
+def set_gui_graph_layout(ax: plt.Axes, fig: plt.Figure) -> None:
     """
     This function sets the graph layout to the correct format when the GUI is used.
+
+    Parameters
+    ----------
+    ax: plt.Axes
+        Axes object of plot
+    fig: plt.Figure
+        Figure object of plot
 
     Returns
     -------
     None
     """
-    import matplotlib.pyplot as plt
-    plt.rcParams["axes.labelcolor"] = white_matplotlib
-    plt.rcParams["xtick.color"] = white_matplotlib
-    plt.rcParams["ytick.color"] = white_matplotlib
-
-    plt.rc('figure')
-    plt.rc('axes', edgecolor=white_matplotlib)
-    plt.rcParams['figure.facecolor'] = dark_matplotlib
+    fig.set_facecolor(background_color)
+    ax.xaxis.label.set_color(white_color)
+    ax.yaxis.label.set_color(white_color)
+    ax.tick_params(axis='x', colors=white_color)
+    ax.tick_params(axis='y', colors=white_color)
+    for spine in ax.spines.values():
+        spine.set_edgecolor(white_color)
 
 
 class UiGhetool:
