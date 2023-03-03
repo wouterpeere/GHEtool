@@ -757,7 +757,9 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
                 saving = load(file)
 
             version = saving['version']
-        except (JSONDecodeError,  FileNotFoundError, UnicodeDecodeError):
+        except FileNotFoundError:
+            raise FileNotFoundError("The datafile cannot be loaded!")
+        except (JSONDecodeError,  UnicodeDecodeError):
             try:
                 # try to open as pickle
                 import GHEtool
@@ -834,7 +836,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         except FileNotFoundError:
             self.status_bar.showMessage(
                 self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
-        except PermissionError:
+        except PermissionError:  # pragma: no cover
             self.status_bar.showMessage("PermissionError", 5000)
 
     def fun_load(self) -> None:

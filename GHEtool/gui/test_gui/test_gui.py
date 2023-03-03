@@ -59,6 +59,8 @@ def test_gui_values(qtbot):
     main_window.delete_backup()
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
     main_window.remove_previous_calculated_results()
+    main_window.add_scenario()
+    main_window.remove_previous_calculated_results()
 
     main_window.gui_structure.option_filename.set_value(f'{FOLDER}/Examples/hourly_profile.csv')
 
@@ -262,6 +264,8 @@ def test_wrong_results_shown(qtbot):
     assert not main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
     assert main_window.gui_structure.result_Rb_calculated.is_hidden()
     assert not main_window.gui_structure.figure_load_duration.is_hidden()
+    main_window.gui_structure.page_aim.button.click()
+    main_window.gui_structure.page_result.button.click()
 
     main_window.gui_structure.option_method_rb_calc.set_value(1)
     main_window.save_scenario()
@@ -539,6 +543,9 @@ def test_save_load_new(qtbot):
     main_window.actionNew.trigger()
     assert (pathlib.Path(main_window.filename[0]), main_window.filename[1]) == (main_window.default_path.joinpath(filename_3), 'GHEtool (*.GHEtool)')
     assert len(main_window.list_ds) < 1
+    main_window.filename = (filename_1, filename_1)
+    main_window.fun_load_known_filename()
+    assert main_window.status_bar.currentMessage() == main_window.translations.NoFileSelected[0]
 
 
 def test_close(qtbot):
@@ -1012,6 +1019,10 @@ def test_value_error(qtbot) -> None:
     with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
         main_window.threads[0].run()
         main_window.threads[0].any_signal.connect(main_window.thread_function)
+
+    main_window.display_results()
+    for figure in main_window.gui_structure.list_of_result_figures:
+        assert figure[0].is_hidden()
 
     main_window.check_results()
     assert f'{main_window.list_ds[-1].debug_message}' == f'{err.value}'
