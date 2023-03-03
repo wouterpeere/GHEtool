@@ -1318,7 +1318,7 @@ class GuiStructure:
         except FileNotFoundError:
             self.status_bar.showMessage(self.no_file_selected, 5000)
             return
-        except PermissionError:
+        except PermissionError:  # pragma: no cover
             self.status_bar.showMessage(self.no_file_selected, 5000)
             return
         # get data column names to set them to comboBoxes
@@ -1408,11 +1408,14 @@ class GuiStructure:
             self.option_cp_dec.set_value(peak_cooling[11])
         # raise error and display error massage in status bar
         except FileNotFoundError:
-            self.status_bar.showMessage(self.translations.no_file_selected[self.option_language.get_value()], 5000)
+            self.status_bar.showMessage(self.translations.NoFileSelected[self.option_language.get_value()], 5000)
+            return
         except IndexError:
             self.status_bar.showMessage(self.translations.ValueError[self.option_language.get_value()], 5000)
+            return
         except KeyError:
             self.status_bar.showMessage(self.translations.ColumnError[self.option_language.get_value()], 5000)
+            return
 
     def translate(self, index: int, translation: Translations) -> None:
         """

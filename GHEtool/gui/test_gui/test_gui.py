@@ -15,6 +15,7 @@ from GHEtool import FOLDER
 from GHEtool.gui.data_2_borefield_func import data_2_borefield
 from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
 from GHEtool.gui.gui_classes.gui_structure_classes import ButtonBox, FigureOption, FloatBox, IntBox, ListBox
+from GHEtool.gui.gui_structure import load_data_GUI
 from GHEtool.gui.test_gui.test_results import create_borefield
 
 setrecursionlimit(1500)
@@ -1022,3 +1023,32 @@ def test_start_gui():
     tests start gui import
     """
     from GHEtool.gui.start_gui import run
+
+
+def test_load_data_gui_errors():
+    """
+    test the load gui errors.
+    """
+    with raises(FileNotFoundError):
+        load_data_GUI("", 0, 'Heating', 'Cooling', 'Heating', ';', '.', 1)
+    with raises(FileNotFoundError):
+        load_data_GUI("no_existing_file.csv", 0, 'Heating', 'Cooling', 'Heating', ';', '.', 1)
+
+def test_file_import_errors(qtbot):
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.delete_backup()
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    g_s = main_window.gui_structure
+    g_s.option_filename.set_value("")
+    main_window.gui_structure.fun_display_data()
+    assert main_window.status_bar.currentMessage() == main_window.translations.NoFileSelected[0]
+
+    g_s.option_filename.set_value(f'{FOLDER.joinpath("Examples/hourly_profile.csv")}')
+    g_s.fun_update_combo_box_data_file(f'{FOLDER.joinpath("Examples/hourly_profile.csv")}')
+    g_s.option_single_column.widget.addItem('No Existing Column')
+    g_s.option_single_column.set_value(-1)
+    main_window.gui_structure.fun_display_data()
+    assert main_window.status_bar.currentMessage() == main_window.translations.ColumnError[0]
+    g_s.option_filename.set_value(f'{FOLDER.joinpath("Examples/hourly_profile_wrong.csv")}')
+    main_window.gui_structure.fun_display_data()
+    assert main_window.status_bar.currentMessage() == main_window.translations.ValueError[0]
