@@ -17,16 +17,19 @@ class Borehole(BaseClass):
     borehole thermal resistance and contains a fluid and pipe class object.
     """
 
-    __slots__ = '_fluid_data', '_pipe_data', 'Rb'
+    __slots__ = '_fluid_data', '_pipe_data', '_Rb'
 
     def __init__(self):
         self._fluid_data = FluidData()
         self._pipe_data = PipeData()
-        self.Rb = 0.12
+        self._Rb = 0.12
 
     @property
     def fluid_data(self) -> FluidData:
         """
+
+
+
         This function returns the fluid data object.
 
         Returns

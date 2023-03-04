@@ -27,7 +27,7 @@ class Borefield(BaseClass):
 
     HOURLY_LOAD_ARRAY: np.ndarray = np.arange(0, 8761, UPM).astype(np.uint32)
 
-    __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'H_init', 'Rb', 'ty', 'tm', 'borehole',\
+    __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'H_init', 'ty', 'tm', 'borehole',\
                 'hourly_heating_load', 'hourly_cooling_load', 'number_of_boreholes', '_borefield', 'cost_investment', \
                 'length_peak', 'th', 'Tf_max', 'Tf_min', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
                 'monthly_load_cooling', 'peak_heating', 'imbalance', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm', \
@@ -175,7 +175,6 @@ class Borefield(BaseClass):
 
         # initiate ground parameters
         self.H = 0.  # borehole depth m
-        self.Rb = 0.  # effective borehole thermal resistance mK/W
         self.number_of_boreholes = 0  # number of total boreholes #
         self.ground_data: GroundData = GroundData()
         self.D: float = 0.  # buried depth of the borehole [m]
@@ -500,6 +499,34 @@ class Borefield(BaseClass):
             # 16 bit is not enough, go to 32
             self.time_L4 = 3600 * np.arange(1, 8760 * self.simulation_period + 1, dtype=np.float32)
 
+    @property
+    def Rb(self) -> float:
+        """
+        This function returns the equivalent borehole thermal resistance.
+
+        Returns
+        -------
+        Rb : float
+            Equivalent borehole thermal resistance [mK/W]
+        """
+        return self.borehole._Rb
+
+    @Rb.setter
+    def Rb(self, Rb: float) -> None:
+        """
+        This function sets the equivalent borehole thermal resistance.
+
+        Parameters
+        ----------
+        Rb : float
+            Equivalent borehole thermal resistance [mk/W]
+
+        Returns
+        -------
+        None
+        """
+        self.set_Rb(Rb)
+
     def set_ground_parameters(self, data: GroundData) -> None:
         """
         This function sets the relevant ground parameters.
@@ -513,7 +540,6 @@ class Borefield(BaseClass):
         -------
         None
         """
-        self.Rb: float = data.Rb
 
         # Ground properties
         self.ground_data = data
@@ -564,7 +590,7 @@ class Borefield(BaseClass):
         -------
         None
         """
-        self.borehole.Rb = Rb
+        self.borehole._Rb = Rb
 
     def set_max_ground_temperature(self, temp: float) -> None:
         """

@@ -4,11 +4,10 @@ from GHEtool import *
 
 
 def test_ground_data():
-    data = GroundData(3, 10, 0.2)
+    data = GroundData(3, 10)
 
     assert data.k_s == 3
     assert data.Tg == 10
-    assert data.Rb == 0.2
 
 
 def test_fluid_data():
@@ -31,14 +30,14 @@ def test_pipe_data():
 
 
 def test_ground_data_equal():
-    data = GroundData(3, 10, 0.2)
-    data2 = GroundData(3, 10, 0.2)
+    data = GroundData(3, 10)
+    data2 = GroundData(3, 10)
     assert data == data2
 
 
 def test_ground_data_unequal():
-    data = GroundData(3, 10, 0.2)
-    data2 = GroundData(3, 11, 0.2)
+    data = GroundData(3, 10)
+    data2 = GroundData(3, 11)
     assert data != data2
 
 
@@ -69,7 +68,7 @@ def test_pipe_data_unequal():
 def test_unequal_cross():
     data_pipe = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
     data_fluid = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-    data_ground = GroundData(3, 10, 0.2)
+    data_ground = GroundData(3, 10)
 
     assert data_ground != data_pipe
     assert data_fluid != data_pipe
@@ -83,6 +82,7 @@ def test_empty_variable_classes():
     assert not ground_data.check_values()
     assert not pipe_data.check_values()
     assert not fluid_data.check_values()
+
 
 def test_set_mfr():
     data_fluid = FluidData(0.2, 0.568, 998, 4180, 1e-3)

@@ -10,7 +10,7 @@ import pygfunction as gt
 
 def effect_borefield_configuration():
     # GroundData for an initial field of 11 x 11
-    data = GroundData(3, 10, 0.2)
+    data = GroundData(3, 10)
     borefield_gt = gt.boreholes.rectangle_field(11, 11, 6, 6, 110, 1, 0.075)
 
     # Monthly loading values
@@ -39,6 +39,7 @@ def effect_borefield_configuration():
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)
+    borefield.Rb = 0.2
 
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)   # maximum temperature
