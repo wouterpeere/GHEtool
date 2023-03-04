@@ -27,7 +27,7 @@ class Borefield(BaseClass):
 
     HOURLY_LOAD_ARRAY: np.ndarray = np.arange(0, 8761, UPM).astype(np.uint32)
 
-    __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'H_init', 'Rb', 'ty', 'tm', 'borehole'\
+    __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'H_init', 'Rb', 'ty', 'tm', 'borehole',\
                 'hourly_heating_load', 'hourly_cooling_load', 'number_of_boreholes', '_borefield', 'cost_investment', \
                 'length_peak', 'th', 'Tf_max', 'Tf_min', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
                 'monthly_load_cooling', 'peak_heating', 'imbalance', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm', \
@@ -612,7 +612,19 @@ class Borefield(BaseClass):
             return self.Rb
 
         # calculate Rb*
-        return self.borehole.calculate_rb(self.H, self.D, self.ground_data.k_s)
+        return self.calculate_Rb()
+
+    def calculate_Rb(self) -> float:
+        """
+        This function calculates the equivalent borehole thermal resistance by calling the calculate_Rb
+        function of the borehole class.
+
+        Returns
+        -------
+        Rb : float
+            Equivalent borehole thermal resistance [mk/W]
+        """
+        return self.borehole.calculate_Rb(self.H, self.D, self.r_b, self.ground_data.k_s)
 
     def _Tg(self, H: float = None) -> float:
         """
@@ -1996,7 +2008,7 @@ class Borefield(BaseClass):
         # set to use a constant Rb* value but save the initial parameters
         Rb_backup = self.Rb
         if not self._sizing_setup.use_constant_Rb:
-            self.Rb = self.borehole.calculate_rb(self.H, self.D, self.ground_data.k_s)
+            self.Rb = self.calculate_Rb()
         use_constant_Rb_backup = self._sizing_setup.use_constant_Rb
         self._sizing_setup.use_constant_Rb = True
 
@@ -2204,3 +2216,56 @@ class Borefield(BaseClass):
         if not self.gui:
             plt.show()
         return fig, ax
+
+    def draw_borehole_internal(self) -> None:
+        """
+        This function draws the internal structure of a borehole.
+        This means, it draws the pipes inside the borehole.
+
+        Returns
+        -------
+        None
+        """
+
+        # calculate the pipe positions
+        pos = self.pipe_data._axis_symmetrical_pipe
+
+        # set figure
+        figure, axes = plt.subplots()
+
+        # initate circles
+        circles_outer = []
+        circles_inner = []
+
+        # color inner circles and outer circles
+        for i in range(self.borehole.pipe_data.number_of_pipes):
+            circles_outer.append(plt.Circle(pos[i], self.borehole.pipe_data.r_out, color="black"))
+            circles_inner.append(plt.Circle(pos[i], self.borehole.pipe_data.r_in, color="red"))
+            circles_outer.append(plt.Circle(pos[i + self.borehole.pipe_data.number_of_pipes], self.borehole.pipe_data.r_out, color="black"))
+            circles_inner.append(plt.Circle(pos[i + self.borehole.pipe_data.number_of_pipes], self.borehole.pipe_data.r_in, color="blue"))
+
+        # set visual settings for figure
+        axes.set_aspect('equal')
+        axes.set_xlim([-self.r_b, self.r_b])
+        axes.set_ylim([-self.r_b, self.r_b])
+        axes.get_xaxis().set_visible(False)
+        axes.get_yaxis().set_visible(False)
+        plt.tight_layout()
+
+        # define borehole circle
+        borehole_circle = plt.Circle((0, 0), self.r_b, color="white")
+
+        # add borehole circle to canvas
+        axes.add_artist(borehole_circle)
+
+        # add other circles to canvas
+        for i in circles_outer:
+            axes.add_artist(i)
+        for i in circles_inner:
+            axes.add_artist(i)
+
+        # set background color
+        axes.set_facecolor("grey")
+
+        # show plot
+        plt.show()

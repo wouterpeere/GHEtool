@@ -6,7 +6,7 @@ from GHEtool.VariableClasses.BaseClass import BaseClass
 from GHEtool.VariableClasses.VariableClasses import FluidData, PipeData
 from math import pi
 
-import matplotlib as plt
+import matplotlib.pyplot as plt
 import pygfunction as gt
 
 
@@ -16,6 +16,8 @@ class Borehole(BaseClass):
     The borehole class contains all the functionalities related to the calculation of the equivalent
     borehole thermal resistance and contains a fluid and pipe class object.
     """
+
+    __slots__ = '_fluid_data', '_pipe_data', 'Rb'
 
     def __init__(self):
         self._fluid_data = FluidData()
@@ -159,55 +161,10 @@ class Borehole(BaseClass):
                                                                         self.pipe_data.epsilon)
         self.fluid_data.R_f: float = 1. / (self.fluid_data.h_f * 2 * pi * self.pipe_data.r_in)
 
-    def draw_borehole_internal(self) -> None:
-        """
-        This function draws the internal structure of a borehole.
-        This means, it draws the pipes inside the borehole.
-
-        Returns
-        -------
-        None
-        """
-
-        # calculate the pipe positions
-        pos = self.pipe_data._axis_symmetrical_pipe
-
-        # set figure
-        figure, axes = plt.subplots()
-
-        # initate circles
-        circles_outer = []
-        circles_inner = []
-
-        # color inner circles and outer circles
-        for i in range(self.pipe_data.number_of_pipes):
-            circles_outer.append(plt.Circle(pos[i], self.pipe_data.r_out, color="black"))
-            circles_inner.append(plt.Circle(pos[i], self.pipe_data.r_in, color="red"))
-            circles_outer.append(plt.Circle(pos[i + self.pipe_data.number_of_pipes], self.pipe_data.r_out, color="black"))
-            circles_inner.append(plt.Circle(pos[i + self.pipe_data.number_of_pipes], self.pipe_data.r_in, color="blue"))
-
-        # set visual settings for figure
-        axes.set_aspect('equal')
-        axes.set_xlim([-self.r_b, self.r_b])
-        axes.set_ylim([-self.r_b, self.r_b])
-        axes.get_xaxis().set_visible(False)
-        axes.get_yaxis().set_visible(False)
-        plt.tight_layout()
-
-        # define borehole circle
-        borehole_circle = plt.Circle((0, 0), self.r_b, color="white")
-
-        # add borehole circle to canvas
-        axes.add_artist(borehole_circle)
-
-        # add other circles to canvas
-        for i in circles_outer:
-            axes.add_artist(i)
-        for i in circles_inner:
-            axes.add_artist(i)
-
-        # set background color
-        axes.set_facecolor("grey")
-
-        # show plot
-        plt.show()
+    def __eq__(self, other):
+        if not isinstance(other, Borehole):
+            return False
+        for i in self.__slots__:
+            if getattr(self, i) != getattr(other, i):
+                return False
+        return True

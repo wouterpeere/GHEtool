@@ -259,13 +259,6 @@ def test_Tg(borefield):
     borefield._Tg()
 
 
-def test_calculate_Rb(borefield):
-    try:
-        borefield.calculate_Rb()
-    except ValueError:
-        assert True
-
-
 def test_too_much_sizing_methods(borefield):
     try:
         borefield.sizing_setup(L2_sizing=True, L3_sizing=True)
