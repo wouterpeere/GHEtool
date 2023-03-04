@@ -2228,7 +2228,7 @@ class Borefield(BaseClass):
         """
 
         # calculate the pipe positions
-        pos = self.pipe_data._axis_symmetrical_pipe
+        pos = self.borehole.pipe_data._axis_symmetrical_pipe
 
         # set figure
         figure, axes = plt.subplots()
