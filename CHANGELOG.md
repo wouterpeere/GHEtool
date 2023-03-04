@@ -6,13 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [2.1.2] - [expected] feb 2023
 
 ### Added
-- Coaxial pipes
-- Variable temperature sizing (at least in the code version)
-- Reimplemented size by length and width
 
 ### Changed
 - In figure plotting, the interval[x[i], x[i+1]) now has the value y[i] (instead of y[i-1]).
 - Scroll behaviour on the result page (issue #99).
+- Changed icon of GHEtool.
 
 ### Fixed
 - Wrong heating load in april in GUI (issue #94).
