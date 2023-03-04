@@ -120,7 +120,6 @@ def check_custom_datafile():
                           baseload_cooling=li)
 
     borefield.set_ground_parameters(data)
-    borefield.Rb = 0.2
 
     customField = gt.boreholes.rectangle_field(N_1=12, N_2=10, B_1=6.5, B_2=6.5, H=110., D=4, r_b=0.075)
 
@@ -135,6 +134,7 @@ def check_custom_datafile():
 
         borefield.set_ground_parameters(data)
         borefield.set_borefield(customField)
+        borefield.Rb = 0.2
 
         # set temperature boundaries
         borefield.set_max_ground_temperature(16)  # maximum temperature
