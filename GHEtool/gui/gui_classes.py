@@ -28,7 +28,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
 
-from GHEtool.gui.gui_base_class import DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE, set_graph_layout
+from GHEtool.gui.gui_base_class import DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE, set_gui_graph_layout
 
 
 def _update_opponent_not_change(button: QtW.QPushButton, false_button_list: List[QtW.QPushButton] = None):
@@ -2245,7 +2245,6 @@ class ResultFigure(Category):
         super().__init__(label, page)
         self.frame_canvas: QtW.QFrame = QtW.QFrame(self.frame)
         self.layout_frame_canvas: QtW.QVBoxLayout = QtW.QVBoxLayout(self.frame_canvas)
-        set_graph_layout()
         self.fig: plt.Figure = plt.figure()
         self.ax: Optional[plt.Axes] = self.fig.add_subplot(111)
         self.canvas: FigureCanvas = FigureCanvas(self.fig)
@@ -2281,6 +2280,7 @@ class ResultFigure(Category):
         self.ax = fig.get_axes()[0]
         self.ax.set_xlabel(self.x_axes_text)
         self.ax.set_ylabel(self.y_axes_text)
+        set_gui_graph_layout(self.ax, self.fig)
         self.toolbar.home()
         self.canvas.hide()
         self.toolbar.hide()
@@ -2350,9 +2350,9 @@ class ResultFigure(Category):
         """
         val = self.scroll_area.verticalScrollBar().value()
         if event.button == "down":
-            self.scroll_area.verticalScrollBar().setValue(val+10)
+            self.scroll_area.verticalScrollBar().setValue(val+self.scroll_area.verticalScrollBar().singleStep())
             return
-        self.scroll_area.verticalScrollBar().setValue(val-10)
+        self.scroll_area.verticalScrollBar().setValue(val-self.scroll_area.verticalScrollBar().singleStep())
 
     def set_text(self, name: str) -> None:
         """
