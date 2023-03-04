@@ -16,7 +16,7 @@ import PySide6.QtGui as QtG
 import PySide6.QtWidgets as QtW
 import pathlib
 
-from .gui_base_class import UiGhetool, set_graph_layout
+from .gui_base_class import UiGhetool
 from .gui_calculation_thread import CalcProblem
 from .gui_data_storage import DataStorage
 from .gui_structure import FigureOption, GuiStructure, Option
@@ -133,9 +133,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         self.status_bar.showMessage(self.translations.GHE_tool_imported[self.gui_structure.option_language.get_value()], 5000)
         # allow checking of changes
         self.checking: bool = True
-
-        # set the correct graph layout
-        set_graph_layout()
 
         self.display_results()
 
@@ -766,7 +763,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             except (FileNotFoundError, ImportError):
                 raise ImportError("The datafile cannot be loaded!")
 
-        if version == "2.1.1":
+        if version == "2.1.2":
             # write data to variables
             self.list_ds = []
             for val, borefield in zip(saving['values'], saving['borefields']):
@@ -777,6 +774,20 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
                 else:
                     setattr(ds, 'borefield', Borefield())
                     getattr(ds, 'borefield')._from_dict(borefield)
+                self.list_ds.append(ds)
+            # set and change the window title
+            self.filename = saving['filename']
+            general_changes(saving['names'])
+            return
+
+        if version == "2.1.1":
+            # write data to variables
+            self.list_ds = []
+            for val, borefield in zip(saving['values'], saving['borefields']):
+                ds = DataStorage(self.gui_structure)
+                ds.from_dict(val)
+                setattr(ds, 'borefield', None)
+
                 self.list_ds.append(ds)
             # set and change the window title
             self.filename = saving['filename']
@@ -1293,7 +1304,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
                 fig_obj.canvas.show()
                 # draw new plot
                 fig_obj.canvas.draw()
-                # set figure to canvas figure
                 continue
             fig_obj.replace_figure(fig)
             # show everything

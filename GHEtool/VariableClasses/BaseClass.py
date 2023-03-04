@@ -39,6 +39,10 @@ class BaseClass:
 
         # populate dictionary
         for key in variables:
+            # for all self-defined classes
+            if hasattr(getattr(self, key), "_to_dict"):
+                dictionary[key] = getattr(self, key)._to_dict()
+
             if isinstance(getattr(self, key), (int, bool, float, str)):
                 dictionary[key] = getattr(self, key)
                 continue
@@ -69,10 +73,6 @@ class BaseClass:
                 # note that this can cause problems whenever self.key contains values that or not int, bool, float or str
                 dictionary[key] = getattr(self, key)
                 continue
-
-            # for all self-defined classes
-            if hasattr(getattr(self, key), "_to_dict"):
-                dictionary[key] = getattr(self, key)._to_dict()
 
         return dictionary
 

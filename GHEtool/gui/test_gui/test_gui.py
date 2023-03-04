@@ -37,6 +37,71 @@ def test_language(qtbot):
     main_window.menuLanguage.actions()[0].trigger()
 
 
+def test_scrolling(qtbot):
+    """
+    test scrolling on results figure
+
+    Parameters
+    ----------
+    qtbot : qtbot
+        QtBot mock
+    """
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+
+    # create class which are not handled with qtbot
+
+    class Event:
+        """dummy event class"""
+        def __init__(self):
+            self.button = 'down'
+
+
+    class VerticalScrollBar:
+        """dummy vertical scroll bar class"""
+        def __init__(self):
+            self._value: int = 0
+
+        def value(self) -> int:
+            return self._value
+
+        def setValue(self, value: int):
+            self._value = value
+
+        def singleStep(self) -> int:
+            return 10
+
+    class ScrollArea:
+        """dummy scroll area class"""
+        def __init__(self):
+            self.vertical_scroll_bar = VerticalScrollBar()
+
+        def verticalScrollBar(self) -> VerticalScrollBar:
+            return self.vertical_scroll_bar
+    # overwrite scroll area with dummy class and create dummy event
+    main_window.gui_structure.figure_temperature_profile.scroll_area = ScrollArea()
+    event = Event()
+    # get before value
+    val_before = main_window.gui_structure.figure_temperature_profile.scroll_area.verticalScrollBar().value()
+    # check down scrolling
+    main_window.gui_structure.figure_temperature_profile.scrolling(event)
+    val_after = main_window.gui_structure.figure_temperature_profile.scroll_area.verticalScrollBar().value()
+    assert val_after == val_before + 10
+    # check up scrolling
+    event.button = "up"
+    main_window.gui_structure.figure_temperature_profile.scrolling(event)
+    val_after = main_window.gui_structure.figure_temperature_profile.scroll_area.verticalScrollBar().value()
+    assert val_after == val_before
+    # check down scrolling with scroll_event
+    main_window.gui_structure.figure_temperature_profile.canvas.scroll_event(0, 10, -10)
+    val_after = main_window.gui_structure.figure_temperature_profile.scroll_area.verticalScrollBar().value()
+    assert val_after == val_before + 10
+    # check up scrolling with scroll_event
+    main_window.gui_structure.figure_temperature_profile.canvas.scroll_event(0, 10, 10)
+    val_after = main_window.gui_structure.figure_temperature_profile.scroll_area.verticalScrollBar().value()
+    assert val_after == val_before
+
+
+
 def test_gui_values(qtbot):
     """
     test if all gui values are set and get correctly.
@@ -493,9 +558,10 @@ def test_save_load_new(qtbot):
     if os.path.exists(main_window.default_path.joinpath(filename_3)):
         os.remove(main_window.default_path.joinpath(filename_3))
     # trigger save action and add filename
-    QtC.QTimer.singleShot(1, lambda: keyboard.write(filename_1))
-    QtC.QTimer.singleShot(10, lambda: keyboard.press('enter'))
+    QtC.QTimer.singleShot(1000, lambda: keyboard.write(filename_1))
+    QtC.QTimer.singleShot(10000, lambda: keyboard.press('enter'))
     main_window.actionSave.trigger()
+
     # check if filename is set correctly
     assert (pathlib.Path(main_window.filename[0]), main_window.filename[1]) == (main_window.default_path.joinpath(filename_1), 'GHEtool (*.GHEtool)')
     # get old list and add a new scenario
@@ -504,21 +570,21 @@ def test_save_load_new(qtbot):
     # check that they differ
     assert list_old != main_window.list_ds
     # set a different filename and test save as action
-    QtC.QTimer.singleShot(1, lambda: keyboard.write(filename_2))
-    QtC.QTimer.singleShot(10, lambda: keyboard.press('enter'))
+    QtC.QTimer.singleShot(1000, lambda: keyboard.write(filename_2))
+    QtC.QTimer.singleShot(10000, lambda: keyboard.press('enter'))
     main_window.actionSave_As.trigger()
     # check if filename is set correctly
     assert (pathlib.Path(main_window.filename[0]), main_window.filename[1]) == (main_window.default_path.joinpath(filename_2), 'GHEtool (*.GHEtool)')
     # trigger open function and set filename 1
-    QtC.QTimer.singleShot(1, lambda: keyboard.write(filename_1))
-    QtC.QTimer.singleShot(10, lambda: keyboard.press('enter'))
+    QtC.QTimer.singleShot(1000, lambda: keyboard.write(filename_1))
+    QtC.QTimer.singleShot(10000, lambda: keyboard.press('enter'))
     main_window.actionOpen.trigger()
     # check if filename is imported correctly and the data storages as well
     assert (pathlib.Path(main_window.filename[0]), main_window.filename[1]) == (main_window.default_path.joinpath(filename_1), 'GHEtool (*.GHEtool)')
     assert list_old == main_window.list_ds
     # set a different filename and test new action
-    QtC.QTimer.singleShot(1, lambda: keyboard.write(filename_3))
-    QtC.QTimer.singleShot(10, lambda: keyboard.press('enter'))
+    QtC.QTimer.singleShot(1000, lambda: keyboard.write(filename_3))
+    QtC.QTimer.singleShot(10000, lambda: keyboard.press('enter'))
     main_window.actionNew.trigger()
     assert (pathlib.Path(main_window.filename[0]), main_window.filename[1]) == (main_window.default_path.joinpath(filename_3), 'GHEtool (*.GHEtool)')
     assert len(main_window.list_ds) < 1
