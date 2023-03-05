@@ -9,7 +9,7 @@ import numpy as np
 import pygfunction as gt
 from scipy.signal import convolve
 
-from GHEtool.VariableClasses import GroundData, FluidData, PipeData, Borehole
+from GHEtool.VariableClasses import GroundDataBaseClass, FluidData, PipeData, Borehole
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, SizingSetup
 from GHEtool.VariableClasses.BaseClass import BaseClass
 
@@ -176,7 +176,7 @@ class Borefield(BaseClass):
         # initiate ground parameters
         self.H = 0.  # borehole depth m
         self.number_of_boreholes = 0  # number of total boreholes #
-        self.ground_data: GroundData = GroundData()
+        self.ground_data: GroundDataBaseClass = GroundDataBaseClass()
         self.D: float = 0.  # buried depth of the borehole [m]
         self.r_b: float = 0.  # borehole radius [m]
 
@@ -527,7 +527,7 @@ class Borefield(BaseClass):
         """
         self.set_Rb(Rb)
 
-    def set_ground_parameters(self, data: GroundData) -> None:
+    def set_ground_parameters(self, data: GroundDataBaseClass) -> None:
         """
         This function sets the relevant ground parameters.
 
