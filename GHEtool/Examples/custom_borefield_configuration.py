@@ -20,7 +20,7 @@ from GHEtool import *
 
 def custom_borefield_configuration():
     # set the relevant ground data for the calculations
-    data = GroundData(3, 10, 0.12)
+    data = GroundData(3, 10)
 
     # Monthly loading values
     peak_cooling = np.array([0., 0, 3.4, 6.9, 13., 18., 21., 50., 16., 3.7, 0., 0.])  # Peak cooling in kW
@@ -47,6 +47,7 @@ def custom_borefield_configuration():
                           baseload_cooling=monthly_load_cooling)
 
     borefield.set_ground_parameters(data)
+    borefield.Rb = 0.2
 
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)  # maximum temperature

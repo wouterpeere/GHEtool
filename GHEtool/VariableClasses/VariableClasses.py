@@ -14,11 +14,10 @@ class GroundData(BaseClass):
     Contains information regarding the ground data of the borefield.
     """
 
-    __slots__ = 'k_s', 'Tg', 'Rb', 'flux', 'volumetric_heat_capacity', 'alpha'
+    __slots__ = 'k_s', 'Tg', 'flux', 'volumetric_heat_capacity', 'alpha'
 
     def __init__(self, k_s: float = None,
                  T_g: float = None,
-                 R_b: float = None,
                  volumetric_heat_capacity: float = 2.4 * 10**6,
                  flux: float = 0.06):
         """
@@ -30,8 +29,6 @@ class GroundData(BaseClass):
         T_g : float
             Surface ground temperature [deg C]
             (this is equal to the ground temperature at infinity when no heat flux is given (default))
-        R_b : float
-            Equivalent borehole resistance [mK/W]
         volumetric_heat_capacity : float
             The volumetric heat capacity of the ground [J/m3K]
         flux : float
@@ -40,7 +37,6 @@ class GroundData(BaseClass):
 
         self.k_s = k_s  # W/mK
         self.Tg = T_g  # °C
-        self.Rb = R_b  # mK/W
         self.volumetric_heat_capacity = volumetric_heat_capacity  # J/m3K
         if self.volumetric_heat_capacity is None or self.k_s is None:
             self.alpha = None

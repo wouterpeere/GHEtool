@@ -95,7 +95,7 @@ class DataStorage:
         """
         self.ground_data: GroundData = GroundData(self.option_conductivity,
                                                   self.option_ground_temp if self.option_method_temp_gradient == 0 else self.option_ground_temp_gradient,
-                                                  self.option_constant_rb, self.option_heat_capacity * 1000, self._calculate_flux())
+                                                  self.option_heat_capacity * 1000, self._calculate_flux())
 
         self.borefield_pygfunction = gt.boreholes.rectangle_field(self.option_width, self.option_length, self.option_spacing, self.option_spacing,
                                                                   self.option_depth, self.option_pipe_depth, self.option_pipe_borehole_radius)

@@ -5,6 +5,7 @@
 
 Modules/GHEtool_modules.rst
 Modules/BaseClass.rst
+Modules/Borehole.rst
 Modules/VariableClasses.rst
 Modules/CustomGFunction.rst
 Modules/GFunction.rst

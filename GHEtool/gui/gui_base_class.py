@@ -6,6 +6,9 @@ and it contains the main class that creates the framework for the GUI (top bar e
 import PySide6.QtCore as QtC
 import PySide6.QtGui as QtG
 import PySide6.QtWidgets as QtW
+import matplotlib.pyplot as plt
+from matplotlib.colors import to_rgb
+from numpy import array, float64
 
 import GHEtool.gui.icons_rc
 
@@ -17,33 +20,38 @@ GREY: str = "rgb(100, 100, 100)"
 WARNING: str = "rgb(255, 200, 87)"
 BLACK: str = "rgb(0, 0, 0)"
 
+background_color: str = to_rgb(
+    array(DARK.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
+white_color: str = to_rgb(
+    array(WHITE.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
+light_color: str = to_rgb(
+    array(LIGHT.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
+bright_color: str = to_rgb(
+    array(WARNING.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
 
-def set_graph_layout() -> None:
+
+def set_gui_graph_layout(ax: plt.Axes, fig: plt.Figure) -> None:
     """
     This function sets the graph layout to the correct format when the GUI is used.
+
+    Parameters
+    ----------
+    ax: plt.Axes
+        Axes object of plot
+    fig: plt.Figure
+        Figure object of plot
 
     Returns
     -------
     None
     """
-    import matplotlib.pyplot as plt
-    from matplotlib.colors import to_rgb
-    from numpy import array, float64
-    background_color: str = to_rgb(
-        array(DARK.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-    white_color: str = to_rgb(
-        array(WHITE.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-    light_color: str = to_rgb(
-        array(LIGHT.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-    bright_color: str = to_rgb(
-        array(WARNING.replace('rgb(', '').replace(')', '').split(','), dtype=float64) / 255)
-    plt.rcParams["axes.labelcolor"] = white_color
-    plt.rcParams["xtick.color"] = white_color
-    plt.rcParams["ytick.color"] = white_color
-
-    plt.rc('figure')
-    plt.rc('axes', edgecolor=white_color)
-    plt.rcParams['figure.facecolor'] = background_color
+    fig.set_facecolor(background_color)
+    ax.xaxis.label.set_color(white_color)
+    ax.yaxis.label.set_color(white_color)
+    ax.tick_params(axis='x', colors=white_color)
+    ax.tick_params(axis='y', colors=white_color)
+    for spine in ax.spines.values():
+        spine.set_edgecolor(white_color)
 
 
 class UiGhetool:
@@ -107,7 +115,7 @@ class UiGhetool:
         font.setItalic(False)
         ghe_tool.setFont(font)
         icon = QtG.QIcon()
-        icon.addFile(":/icons/icons/icon_05.svg", QtC.QSize(), QtG.QIcon.Normal, QtG.QIcon.Off)
+        icon.addFile(":/icons/icons/icon_06.svg", QtC.QSize(), QtG.QIcon.Normal, QtG.QIcon.Off)
         ghe_tool.setWindowIcon(icon)
         ghe_tool.setStyleSheet(
             f"*{'{'}color: {WHITE};font: 11pt 'Lexend';background-color: {DARK};selection-background-color: {LIGHT};alternate-background-color: {LIGHT};{'}'}\n"
@@ -116,7 +124,7 @@ class UiGhetool:
             f"QPushButton:disabled{'{'}border: 3px solid {GREY};border-radius: 5px;color: {WHITE};gridline-color: {GREY};background-color: {GREY};{'}'}\n"
             f"QPushButton:disabled:hover{'{'}background-color: {DARK};{'}'}\n"
             f"QComboBox{'{'}border: 1px solid {WHITE};border-bottom-left-radius: 0px;border-bottom-right-radius: 0px;{'}'}\n"
-            f"QSpinBox{'{'}selection-color: {WHITE};selection-background-color: {LIGHT};border: 1px solid {WHITE};font: 11pt 'Lexend Deca Light';{'}'}\n"
+            f"QSpinBox{'{'}selection-color: {WHITE};selection-background-color: {LIGHT};border: 1px solid {WHITE};font: 11pt 'Lexend Light';{'}'}\n"
             f"QLineEdit{'{'}border: 3px solid {LIGHT};border-radius: 5px;color: {WHITE};gridline-color: {LIGHT};background-color: {LIGHT};font-weight:500;\n"
             f"selection-background-color: {LIGHT_SELECT};{'}'}\n"
             f"QLineEdit:hover{'{'}background-color: {DARK};{'}'}"

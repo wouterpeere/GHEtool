@@ -9,7 +9,7 @@ import numpy as np
 import pygfunction as gt
 from scipy.signal import convolve
 
-from GHEtool.VariableClasses import GroundData, FluidData, PipeData
+from GHEtool.VariableClasses import GroundData, FluidData, PipeData, Borehole
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, SizingSetup
 from GHEtool.VariableClasses.BaseClass import BaseClass
 
@@ -27,11 +27,11 @@ class Borefield(BaseClass):
 
     HOURLY_LOAD_ARRAY: np.ndarray = np.arange(0, 8761, UPM).astype(np.uint32)
 
-    __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'H_init', 'Rb', 'ty', 'tm', \
+    __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'H_init', 'ty', 'tm', 'borehole',\
                 'hourly_heating_load', 'hourly_cooling_load', 'number_of_boreholes', '_borefield', 'cost_investment', \
                 'length_peak', 'th', 'Tf_max', 'Tf_min', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
                 'monthly_load_cooling', 'peak_heating', 'imbalance', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm', \
-                'peak_cooling', 'simulation_period', 'ground_data', 'pipe_data', 'fluid_data',\
+                'peak_cooling', 'simulation_period', 'ground_data',\
                 'results_peak_heating', 'time_L4', 'options_pygfunction',\
                 'results_peak_cooling', 'results_month_cooling', 'results_month_heating', 'Tb', 'THRESHOLD_WARNING_SHALLOW_FIELD', \
                 'gui', 'time_L3_last_year', 'peak_heating_external', 'peak_cooling_external', \
@@ -175,7 +175,6 @@ class Borefield(BaseClass):
 
         # initiate ground parameters
         self.H = 0.  # borehole depth m
-        self.Rb = 0.  # effective borehole thermal resistance mK/W
         self.number_of_boreholes = 0  # number of total boreholes #
         self.ground_data: GroundData = GroundData()
         self.D: float = 0.  # buried depth of the borehole [m]
@@ -185,10 +184,9 @@ class Borefield(BaseClass):
         self.Tf: float = 0.  # temperature of the fluid
         self.Tf_max: float = 16.  # maximum temperature of the fluid
         self.Tf_min: float = 0.  # minimum temperature of the fluid
-        self.fluid_data: FluidData = FluidData()
 
-        # initiate borehole parameters
-        self.pipe_data: PipeData = PipeData()
+        # initiale borehole
+        self.borehole = Borehole()
 
         # initiate different sizing
         self._sizing_setup: SizingSetup = SizingSetup()
@@ -501,6 +499,34 @@ class Borefield(BaseClass):
             # 16 bit is not enough, go to 32
             self.time_L4 = 3600 * np.arange(1, 8760 * self.simulation_period + 1, dtype=np.float32)
 
+    @property
+    def Rb(self) -> float:
+        """
+        This function returns the equivalent borehole thermal resistance.
+
+        Returns
+        -------
+        Rb : float
+            Equivalent borehole thermal resistance [mK/W]
+        """
+        return self.borehole._Rb
+
+    @Rb.setter
+    def Rb(self, Rb: float) -> None:
+        """
+        This function sets the equivalent borehole thermal resistance.
+
+        Parameters
+        ----------
+        Rb : float
+            Equivalent borehole thermal resistance [mk/W]
+
+        Returns
+        -------
+        None
+        """
+        self.set_Rb(Rb)
+
     def set_ground_parameters(self, data: GroundData) -> None:
         """
         This function sets the relevant ground parameters.
@@ -514,7 +540,6 @@ class Borefield(BaseClass):
         -------
         None
         """
-        self.Rb: float = data.Rb
 
         # Ground properties
         self.ground_data = data
@@ -535,10 +560,7 @@ class Borefield(BaseClass):
         -------
         None
         """
-        self.fluid_data = data
-
-        if self.pipe_data.check_values():
-            self.calculate_fluid_thermal_resistance()
+        self.borehole.fluid_data = data
 
     def set_pipe_parameters(self, data: PipeData) -> None:
         """
@@ -553,12 +575,22 @@ class Borefield(BaseClass):
         -------
         None
         """
-        self.pipe_data = data
+        self.borehole.pipe_data = data
 
-        # calculate the different resistances
-        if self.fluid_data.check_values():
-            self.calculate_fluid_thermal_resistance()
-        self.pipe_data.calculate_pipe_thermal_resistance()
+    def set_Rb(self, Rb: float) -> None:
+        """
+        This function sets the equivalent borehole thermal resistance.
+
+        Parameters
+        ----------
+        Rb : float
+            Equivalent borehole thermal resistance (mK/W)
+
+        Returns
+        -------
+        None
+        """
+        self.borehole._Rb = Rb
 
     def set_max_ground_temperature(self, temp: float) -> None:
         """
@@ -590,25 +622,6 @@ class Borefield(BaseClass):
         """
         self.Tf_min: float = temp
 
-    def calculate_fluid_thermal_resistance(self) -> None:
-        """
-        This function calculates and sets the fluid thermal resistance R_f.
-
-        Returns
-        -------
-        None
-        """
-        self.fluid_data.h_f: float =\
-            gt.pipes.convective_heat_transfer_coefficient_circular_pipe(self.fluid_data.mfr /
-                                                                        self.pipe_data.number_of_pipes,
-                                                                        self.pipe_data.r_in,
-                                                                        self.fluid_data.mu,
-                                                                        self.fluid_data.rho,
-                                                                        self.fluid_data.k_f,
-                                                                        self.fluid_data.Cp,
-                                                                        self.pipe_data.epsilon)
-        self.fluid_data.R_f: float = 1. / (self.fluid_data.h_f * 2 * pi * self.pipe_data.r_in)
-
     @property
     def _Rb(self) -> float:
         """
@@ -626,6 +639,18 @@ class Borefield(BaseClass):
 
         # calculate Rb*
         return self.calculate_Rb()
+
+    def calculate_Rb(self) -> float:
+        """
+        This function calculates the equivalent borehole thermal resistance by calling the calculate_Rb
+        function of the borehole class.
+
+        Returns
+        -------
+        Rb : float
+            Equivalent borehole thermal resistance [mk/W]
+        """
+        return self.borehole.calculate_Rb(self.H, self.D, self.r_b, self.ground_data.k_s)
 
     def _Tg(self, H: float = None) -> float:
         """
@@ -646,34 +671,6 @@ class Borefield(BaseClass):
             H = self.H
 
         return self.ground_data.calculate_Tg(H, use_constant_Tg=self._sizing_setup.use_constant_Tg)
-
-    def calculate_Rb(self) -> float:
-        """
-        This function returns the calculated equivalent borehole thermal resistance Rb* value.
-
-        Returns
-        -------
-        Rb* : float
-            Equivalent borehole thermal resistance [mK/W]
-
-        Raises
-        ------
-        ValueError
-            ValueError when no pipe or fluid data is available.
-        """
-        # check if all data is available
-        if not self.pipe_data.check_values() or not self.fluid_data.check_values():
-            print("Please make sure you set al the pipe and fluid data.")
-            raise ValueError
-
-        # initiate temporary borefield
-        borehole = gt.boreholes.Borehole(self.H, self.D, self.r_b, 0, 0)
-        # initiate pipe
-        pipe = gt.pipes.MultipleUTube(self.pipe_data.pos, self.pipe_data.r_in, self.pipe_data.r_out,
-                                      borehole, self.ground_data.k_s, self.pipe_data.k_g,
-                                      self.pipe_data.R_p + self.fluid_data.R_f, self.pipe_data.number_of_pipes, J=2)
-
-        return pipe.effective_borehole_thermal_resistance(self.fluid_data.mfr, self.fluid_data.Cp)
 
     @property
     def _Ahmadfard(self) -> float:
@@ -1038,8 +1035,7 @@ class Borefield(BaseClass):
             Required depth of the borefield [m]
         """
         # check if hourly data is given
-        if not self._check_hourly_load():
-            raise ValueError("The hourly data is incorrect.")
+        self._check_hourly_load()
 
         # initiate with a given depth
         self.H_init: float = H_init
@@ -1595,16 +1591,16 @@ class Borefield(BaseClass):
         ax.set_ylabel(r'Temperature ($^\circ C$)')
 
         # plot Temperatures
-        ax.step(time_array, self.Tb, 'k-', where="pre", lw=1.5, label="Tb")
+        ax.step(time_array, self.Tb, 'k-', where="post", lw=1.5, label="Tb")
 
         if plot_hourly:
-            ax.step(time_array, self.results_peak_cooling, 'b-', where="pre", lw=1, label='Tf')
+            ax.step(time_array, self.results_peak_cooling, 'b-', where="post", lw=1, label='Tf')
         else:
-            ax.step(time_array, self.results_peak_cooling, 'b-', where="pre", lw=1.5, label='Tf peak cooling')
-            ax.step(time_array, self.results_peak_heating, 'r-', where="pre", lw=1.5, label='Tf peak heating')
+            ax.step(time_array, self.results_peak_cooling, 'b-', where="post", lw=1.5, label='Tf peak cooling')
+            ax.step(time_array, self.results_peak_heating, 'r-', where="post", lw=1.5, label='Tf peak heating')
 
-            ax.step(time_array, self.results_month_cooling, color='b', linestyle="dashed", where="pre", lw=1.5, label='Tf base cooling')
-            ax.step(time_array, self.results_month_heating, color='r', linestyle="dashed", where="pre", lw=1.5, label='Tf base heating')
+            ax.step(time_array, self.results_month_cooling, color='b', linestyle="dashed", where="post", lw=1.5, label='Tf base cooling')
+            ax.step(time_array, self.results_month_heating, color='r', linestyle="dashed", where="post", lw=1.5, label='Tf base heating')
 
         # define temperature bounds
         ax.hlines(self.Tf_min, 0, self.simulation_period, colors='r', linestyles='dashed', label='', lw=1)
@@ -2200,59 +2196,6 @@ class Borefield(BaseClass):
             return 3
         return 2
 
-    def draw_borehole_internal(self) -> None:
-        """
-        This function draws the internal structure of a borehole.
-        This means, it draws the pipes inside the borehole.
-
-        Returns
-        -------
-        None
-        """
-
-        # calculate the pipe positions
-        pos = self.pipe_data._axis_symmetrical_pipe
-
-        # set figure
-        figure, axes = plt.subplots()
-
-        # initate circles
-        circles_outer = []
-        circles_inner = []
-
-        # color inner circles and outer circles
-        for i in range(self.pipe_data.number_of_pipes):
-            circles_outer.append(plt.Circle(pos[i], self.pipe_data.r_out, color="black"))
-            circles_inner.append(plt.Circle(pos[i], self.pipe_data.r_in, color="red"))
-            circles_outer.append(plt.Circle(pos[i + self.pipe_data.number_of_pipes], self.pipe_data.r_out, color="black"))
-            circles_inner.append(plt.Circle(pos[i + self.pipe_data.number_of_pipes], self.pipe_data.r_in, color="blue"))
-
-        # set visual settings for figure
-        axes.set_aspect('equal')
-        axes.set_xlim([-self.r_b, self.r_b])
-        axes.set_ylim([-self.r_b, self.r_b])
-        axes.get_xaxis().set_visible(False)
-        axes.get_yaxis().set_visible(False)
-        plt.tight_layout()
-
-        # define borehole circle
-        borehole_circle = plt.Circle((0, 0), self.r_b, color="white")
-
-        # add borehole circle to canvas
-        axes.add_artist(borehole_circle)
-
-        # add other circles to canvas
-        for i in circles_outer:
-            axes.add_artist(i)
-        for i in circles_inner:
-            axes.add_artist(i)
-
-        # set background color
-        axes.set_facecolor("grey")
-
-        # show plot
-        plt.show()
-
     def plot_load_duration(self, legend: bool = False) -> Tuple[plt.Figure, plt.Axes]:
         """
         This function makes a load-duration curve from the hourly values.
@@ -2268,9 +2211,8 @@ class Borefield(BaseClass):
             plt.Figure, plt.Axes
         """
         # check if there are hourly values
-        if not self._check_hourly_load():
-            fig = plt.figure()
-            return fig, fig.add_subplot(111)
+        self._check_hourly_load()
+
         # sort heating and cooling load
         heating = self.hourly_heating_load.copy()
         heating[::-1].sort()
@@ -2298,3 +2240,56 @@ class Borefield(BaseClass):
         if not self.gui:
             plt.show()
         return fig, ax
+
+    def draw_borehole_internal(self) -> None:
+        """
+        This function draws the internal structure of a borehole.
+        This means, it draws the pipes inside the borehole.
+
+        Returns
+        -------
+        None
+        """
+
+        # calculate the pipe positions
+        pos = self.borehole.pipe_data._axis_symmetrical_pipe
+
+        # set figure
+        figure, axes = plt.subplots()
+
+        # initate circles
+        circles_outer = []
+        circles_inner = []
+
+        # color inner circles and outer circles
+        for i in range(self.borehole.pipe_data.number_of_pipes):
+            circles_outer.append(plt.Circle(pos[i], self.borehole.pipe_data.r_out, color="black"))
+            circles_inner.append(plt.Circle(pos[i], self.borehole.pipe_data.r_in, color="red"))
+            circles_outer.append(plt.Circle(pos[i + self.borehole.pipe_data.number_of_pipes], self.borehole.pipe_data.r_out, color="black"))
+            circles_inner.append(plt.Circle(pos[i + self.borehole.pipe_data.number_of_pipes], self.borehole.pipe_data.r_in, color="blue"))
+
+        # set visual settings for figure
+        axes.set_aspect('equal')
+        axes.set_xlim([-self.r_b, self.r_b])
+        axes.set_ylim([-self.r_b, self.r_b])
+        axes.get_xaxis().set_visible(False)
+        axes.get_yaxis().set_visible(False)
+        plt.tight_layout()
+
+        # define borehole circle
+        borehole_circle = plt.Circle((0, 0), self.r_b, color="white")
+
+        # add borehole circle to canvas
+        axes.add_artist(borehole_circle)
+
+        # add other circles to canvas
+        for i in circles_outer:
+            axes.add_artist(i)
+        for i in circles_inner:
+            axes.add_artist(i)
+
+        # set background color
+        axes.set_facecolor("grey")
+
+        # show plot
+        plt.show()
