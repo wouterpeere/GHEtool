@@ -91,6 +91,7 @@ class BaseClass:
         -------
         None
         """
+
         for key, value in dictionary.items():
 
             # for all self-defined classes
