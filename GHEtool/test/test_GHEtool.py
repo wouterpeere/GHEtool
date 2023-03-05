@@ -205,7 +205,7 @@ def test_borefield_cannot_size_due_to_cooling():
                           baseload_cooling=monthly_load_cooling)
 
     borefield.set_ground_parameters(copy.copy(data))
-    borefield.set_borefield(borefield_gt)
+    borefield.set_borefield(copy.deepcopy(borefield_gt))
     borefield.sizing_setup(use_constant_Tg=False)
     borefield.ground_data.Tg = 12
     borefield.set_Rb(0.2)
