@@ -7,7 +7,7 @@ from GHEtool.VariableClasses.GroundData import GroundDataBaseClass
 
 class GroundFluxTemperature(GroundDataBaseClass):
 
-    __slots__ = 'flux', 'Tg', 'k_s', 'volumetric_heat_capacity'
+    __slots__ = GroundDataBaseClass.__slots__ + ('flux', 'Tg')
 
     def __init__(self, k_s: float = None,
                  T_g: float = None,

@@ -35,7 +35,7 @@ def test_optimise_load_profile(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
 
     # initiate ground data
-    data = GroundData(3, 10)
+    data = GroundConstantTemperature(3, 10)
 
     # initiate pygfunction borefield model
     borefield_gt = gt.boreholes.rectangle_field(10, 10, 6, 6, 110, 1, 0.075)

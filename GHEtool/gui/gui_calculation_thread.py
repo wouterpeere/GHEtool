@@ -102,10 +102,9 @@ class CalcProblem(QtC.QThread):
             borefield.set_hourly_heating_load(peak_heating)
             borefield.set_hourly_cooling_load(peak_cooling)
 
-        # setup the borefield sizing
+        # set up the borefield sizing
         borefield.sizing_setup(H_init=self.DS.borefield_pygfunction[0].H,
                                use_constant_Rb=self.DS.option_method_rb_calc == 0,
-                               use_constant_Tg=self.DS.option_method_temp_gradient == 0,
                                L2_sizing=self.DS.option_method_size_depth == 0,
                                L3_sizing=self.DS.option_method_size_depth == 1,
                                L4_sizing=self.DS.option_method_size_depth == 2)

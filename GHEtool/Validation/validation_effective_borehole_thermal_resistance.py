@@ -12,10 +12,10 @@ import pandas as pd
 import pygfunction as gt
 
 from GHEtool import Borefield
-from GHEtool.VariableClasses import FluidData, GroundData, PipeData
+from GHEtool.VariableClasses import FluidData, GroundConstantTemperature, PipeData
 
 # initiate parameters
-ground_data = GroundData(3, 10)  # ground data with an inaccurate guess of 100m for the depth of the borefield
+ground_data = GroundConstantTemperature(3, 10)  # ground data with an inaccurate guess of 100m for the depth of the borefield
 borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 100, 1, 0.075)
 pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, number_of_pipes=2, epsilon=1e-6)
 

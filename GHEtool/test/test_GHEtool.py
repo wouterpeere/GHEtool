@@ -8,7 +8,8 @@ from math import isclose
 
 from GHEtool import *
 
-data = GroundData(3, 10)
+data = GroundConstantTemperature(3, 10)
+data_ground_flux = GroundFluxTemperature(3, 10)
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
 pipeData = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
 
@@ -102,8 +103,8 @@ def test_borefield():
 
 @pytest.fixture
 def borefield_quadrants():
-    data = GroundData(3.5,  # conductivity of the soil (W/mK)
-                      10)  # Ground temperature at infinity (degrees C)
+    data = GroundConstantTemperature(3.5,  # conductivity of the soil (W/mK)
+                                     10)  # Ground temperature at infinity (degrees C)
 
     borefield_gt = gt.boreholes.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)
 
@@ -204,9 +205,8 @@ def test_borefield_cannot_size_due_to_cooling():
                           baseload_heating=monthly_load_heating,
                           baseload_cooling=monthly_load_cooling)
 
-    borefield.set_ground_parameters(copy.copy(data))
+    borefield.set_ground_parameters(copy.copy(data_ground_flux))
     borefield.set_borefield(copy.deepcopy(borefield_gt))
-    borefield.sizing_setup(use_constant_Tg=False)
     borefield.ground_data.Tg = 12
     borefield.set_Rb(0.2)
 
@@ -303,8 +303,7 @@ def test_without_pipe(borefield):
 
 
 def test_Tg(borefield):
-    borefield._sizing_setup.use_constant_Tg = False
-    borefield._Tg()
+    assert borefield._Tg() == data.Tg
 
 
 def test_too_much_sizing_methods(borefield):
@@ -417,11 +416,6 @@ def test_precalculated_data_1(borefield_custom_data):
 
 def test_precalculated_data_2(borefield_custom_data):
     borefield_custom_data.gfunction([3600*100, 3600*100, 3600*101], 100)
-
-
-def test_error_variable_Tg(borefield):
-    borefield.ground_data.Tg = 14
-    borefield.sizing_setup(use_constant_Tg=False)
 
 
 def test_choose_quadrant_1(borefield_quadrants):

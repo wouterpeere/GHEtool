@@ -10,7 +10,7 @@ import time
 import numpy as np
 import pygfunction as gt
 
-from GHEtool import Borefield, FluidData, GroundData, PipeData
+from GHEtool import Borefield, FluidData, GroundConstantTemperature, PipeData
 
 
 def sizing_with_Rb():
@@ -37,7 +37,7 @@ def sizing_with_Rb():
             peak_load_heating_array[i, j] = np.random.randint(monthly_load_heating_array[i, j], max_value_heating)
 
     # initiate borefield model
-    data = GroundData(3, 10)  # ground data with an inaccurate guess of 100m for the depth of the borefield
+    data = GroundConstantTemperature(3, 10)  # ground data with an inaccurate guess of 100m for the depth of the borefield
     fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
     pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
 

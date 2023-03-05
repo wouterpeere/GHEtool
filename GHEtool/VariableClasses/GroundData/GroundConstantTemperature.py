@@ -7,7 +7,7 @@ from GHEtool.VariableClasses.GroundData import GroundDataBaseClass
 
 class GroundConstantTemperature(GroundDataBaseClass):
 
-    __slots__ = 'Tg', 'k_s', 'volumetric_heat_capacity'
+    __slots__ = GroundDataBaseClass.__slots__ + ('Tg',)
 
     def __init__(self, k_s: float = None,
                  T_g: float = None,
@@ -27,7 +27,7 @@ class GroundConstantTemperature(GroundDataBaseClass):
         super().__init__(k_s=k_s, volumetric_heat_capacity=volumetric_heat_capacity)
         self.Tg = T_g
 
-    def calculate_Tg(self, H: float) -> float:
+    def calculate_Tg(self, H: float = None) -> float:
         """
         This function gives back the ground temperature.
 

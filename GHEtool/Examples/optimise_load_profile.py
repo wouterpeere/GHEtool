@@ -11,7 +11,7 @@ import pygfunction as gt
 from GHEtool import *
 
 # initiate ground data
-data = GroundData(3, 10)
+data = GroundConstantTemperature(3, 10)
 
 # initiate borefield
 borefield = Borefield()
