@@ -826,30 +826,30 @@ def test_repr(qtbot):
     assert main_window.gui_structure.legend_figure_temperature_profile.__repr__() == "FigureOption; Label: Show legend?; Value: ('legend', False)"
 
 
-# def test_backward_compatibility(qtbot):
-#     """
-#     test if the GUI is importing old files correctly
-#
-#     Parameters
-#     ----------
-#     qtbot: qtbot
-#         bot for the GUI
-#     """
-#     import numpy as np
-#     from GHEtool import FOLDER
-#     # init gui window
-#     main_window_old = MainWindow(QtWidgets_QMainWindow(), qtbot)
-#     main_window_old._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_2_1_1.GHEtool')
-#     # init gui window
-#     main_window_new = MainWindow(QtWidgets_QMainWindow(), qtbot)
-#     main_window_new._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_2_1_2.GHEtool')
-#     # check if the imported values are the same
-#     for ds_old, ds_new in zip(main_window_old.list_ds, main_window_new.list_ds):
-#         for option in ds_new.list_options_aims:
-#             if isinstance(getattr(ds_old, option), (int, float)):
-#                 assert np.isclose(getattr(ds_old, option), getattr(ds_new, option))
-#                 continue
-#             if isinstance(getattr(ds_old, option), (str, bool)):
-#                 assert getattr(ds_old, option) == getattr(ds_new, option)
-#                 continue
+def test_backward_compatibility(qtbot):
+    """
+    test if the GUI is importing old files correctly
+
+    Parameters
+    ----------
+    qtbot: qtbot
+        bot for the GUI
+    """
+    import numpy as np
+    from GHEtool import FOLDER
+    # init gui window
+    main_window_old = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window_old._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_2_1_1.GHEtool')
+    # init gui window
+    main_window_new = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window_new._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_2_1_2.GHEtool')
+    # check if the imported values are the same
+    for ds_old, ds_new in zip(main_window_old.list_ds, main_window_new.list_ds):
+        for option in ds_new.list_options_aims:
+            if isinstance(getattr(ds_old, option), (int, float)):
+                assert np.isclose(getattr(ds_old, option), getattr(ds_new, option))
+                continue
+            if isinstance(getattr(ds_old, option), (str, bool)):
+                assert getattr(ds_old, option) == getattr(ds_new, option)
+                continue
 

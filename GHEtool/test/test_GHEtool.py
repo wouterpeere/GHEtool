@@ -196,6 +196,32 @@ def borefield_cooling_dom():
     return borefield
 
 
+def test_borefield_cannot_size_due_to_cooling():
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
+    borefield = Borefield(simulation_period=20,
+                          peak_heating=peak_heating,
+                          peak_cooling=peak_cooling,
+                          baseload_heating=monthly_load_heating,
+                          baseload_cooling=monthly_load_cooling)
+
+    borefield.set_ground_parameters(copy.copy(data))
+    borefield.set_borefield(borefield_gt)
+    borefield.sizing_setup(use_constant_Tg=False)
+    borefield.ground_data.Tg = 12
+    borefield.set_Rb(0.2)
+
+    # set temperature boundaries
+    borefield.set_max_ground_temperature(16)   # maximum temperature
+    borefield.set_min_ground_temperature(0)  # minimum temperature
+
+    try:
+        borefield.size()
+    except ValueError:
+        assert True
+        return
+    assert False
+
+
 def test_create_rectangular_field(borefield):
     for i in range(len(borefield.borefield)):
         assert borefield.borefield[i].__dict__ == gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)[i].__dict__
@@ -209,6 +235,13 @@ def test_create_circular_field(borefield):
 
 def test_empty_values(empty_borefield):
     np.testing.assert_array_equal(empty_borefield.baseload_cooling, np.zeros(12))
+
+
+def test_sizing_without_hourly_values(borefield):
+    try:
+        borefield.size_L4(100)
+    except ValueError:
+        assert True
 
 
 def test_set_Rb(borefield):
