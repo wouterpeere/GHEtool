@@ -10,14 +10,14 @@ This file contains all the main functionalities of GHEtool being:
 import numpy as np
 
 # import all the relevant functions
-from GHEtool import Borefield, FluidData, GroundData, PipeData
+from GHEtool import Borefield, FluidData, PipeData, GroundConstantTemperature
 
 
 def main_functionalities():
     # relevant borefield data for the calculations
-    data = GroundData(3,             # conductivity of the soil (W/mK)
-                      10,            # Ground temperature at infinity (degrees C)
-                      2.4 * 10**6)   # ground volumetric heat capacity (J/m3K)
+    data = GroundConstantTemperature(3,             # conductivity of the soil (W/mK)
+                                     10,            # Ground temperature at infinity (degrees C)
+                                     2.4 * 10**6)   # ground volumetric heat capacity (J/m3K)
 
     # monthly loading values
     peak_cooling = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak cooling in kW

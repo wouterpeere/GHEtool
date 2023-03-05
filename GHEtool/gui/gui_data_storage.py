@@ -5,7 +5,8 @@ from typing import Optional
 import matplotlib.pyplot as plt
 import pygfunction as gt
 
-from GHEtool import Borefield, FluidData, GroundData, PipeData
+from GHEtool import Borefield, FluidData, PipeData
+from GHEtool.VariableClasses.GroundData import *
 from GHEtool.gui.gui_classes import ListBox
 from GHEtool.gui.gui_structure import GuiStructure
 
@@ -93,9 +94,15 @@ class DataStorage:
         -------
         None
         """
-        self.ground_data: GroundData = GroundData(self.option_conductivity,
-                                                  self.option_ground_temp if self.option_method_temp_gradient == 0 else self.option_ground_temp_gradient,
-                                                  self.option_heat_capacity * 1000, self._calculate_flux())
+        if self.option_method_temp_gradient == 0:
+            self.ground_data: GroundConstantTemperature = GroundConstantTemperature(self.option_conductivity,
+                                                         self.option_ground_temp,
+                                                         self.option_heat_capacity * 1000)
+        else:
+            self.ground_data: GroundFluxTemperature = GroundFluxTemperature(self.option_conductivity,
+                                                     self.option_ground_temp_gradient,
+                                                     self.option_heat_capacity * 1000,
+                                                     self._calculate_flux())
 
         self.borefield_pygfunction = gt.boreholes.rectangle_field(self.option_width, self.option_length, self.option_spacing, self.option_spacing,
                                                                   self.option_depth, self.option_pipe_depth, self.option_pipe_borehole_radius)

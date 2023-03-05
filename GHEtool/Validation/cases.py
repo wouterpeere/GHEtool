@@ -9,11 +9,11 @@ This document contains 4 different cases referring to the paper: Peere, W., Pica
 import numpy as np
 import pygfunction as gt
 
-from GHEtool import Borefield, GroundData
+from GHEtool import Borefield, GroundConstantTemperature
 
 # relevant borefield data for the calculations
-data = GroundData(3.5,  # conductivity of the soil (W/mK)
-                  10)   # Ground temperature at infinity (degrees C)
+data = GroundConstantTemperature(3.5,  # conductivity of the soil (W/mK)
+                                 10)   # Ground temperature at infinity (degrees C)
 
 borefield_gt = gt.boreholes.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)
 

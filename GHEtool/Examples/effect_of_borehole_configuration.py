@@ -3,14 +3,14 @@ This document is an example of how the borefield configuration can influence the
 """
 
 # import all the relevant functions
-from GHEtool import GroundData, Borefield
+from GHEtool import GroundConstantTemperature, Borefield
 import numpy as np
 import pygfunction as gt
 
 
 def effect_borefield_configuration():
     # GroundData for an initial field of 11 x 11
-    data = GroundData(3, 10)
+    data = GroundConstantTemperature(3, 10)
     borefield_gt = gt.boreholes.rectangle_field(11, 11, 6, 6, 110, 1, 0.075)
 
     # Monthly loading values
@@ -52,7 +52,7 @@ def effect_borefield_configuration():
     print("------------------------")
 
     # borefield of 6x20
-    data = GroundData(3, 10)
+    data = GroundConstantTemperature(3, 10)
     borefield_gt = gt.boreholes.rectangle_field(6, 20, 6, 6, 110, 1, 0.075)
 
     # set ground parameters to borefield

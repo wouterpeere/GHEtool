@@ -9,9 +9,10 @@ import numpy as np
 import pygfunction as gt
 from scipy.signal import convolve
 
-from GHEtool.VariableClasses import GroundData, FluidData, PipeData, Borehole
+from GHEtool.VariableClasses import FluidData, PipeData, Borehole, GroundConstantTemperature
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, SizingSetup
 from GHEtool.VariableClasses.BaseClass import BaseClass
+from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
 
 
 class Borefield(BaseClass):
@@ -176,7 +177,7 @@ class Borefield(BaseClass):
         # initiate ground parameters
         self.H = 0.  # borehole depth m
         self.number_of_boreholes = 0  # number of total boreholes #
-        self.ground_data: GroundData = GroundData()
+        self.ground_data: _GroundData = GroundConstantTemperature()
         self.D: float = 0.  # buried depth of the borehole [m]
         self.r_b: float = 0.  # borehole radius [m]
 
@@ -527,7 +528,7 @@ class Borefield(BaseClass):
         """
         self.set_Rb(Rb)
 
-    def set_ground_parameters(self, data: GroundData) -> None:
+    def set_ground_parameters(self, data: _GroundData) -> None:
         """
         This function sets the relevant ground parameters.
 
@@ -654,8 +655,7 @@ class Borefield(BaseClass):
 
     def _Tg(self, H: float = None) -> float:
         """
-        This function gives back the ground temperature
-        When use_constant_Tg is False, the thermal heat flux is taken into account.
+        This function gives back the ground temperature.
 
         Parameters
         ----------
@@ -670,7 +670,7 @@ class Borefield(BaseClass):
         if H is None:
             H = self.H
 
-        return self.ground_data.calculate_Tg(H, use_constant_Tg=self._sizing_setup.use_constant_Tg)
+        return self.ground_data.calculate_Tg(H)
 
     @property
     def _Ahmadfard(self) -> float:
@@ -759,7 +759,7 @@ class Borefield(BaseClass):
             self.H = L / self.number_of_boreholes
         return self.H
 
-    def sizing_setup(self, H_init: float = 100, use_constant_Rb: bool = None, use_constant_Tg: bool = None, quadrant_sizing: int = 0,
+    def sizing_setup(self, H_init: float = 100, use_constant_Rb: bool = None, quadrant_sizing: int = 0,
                      L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None, sizing_setup: SizingSetup = None) -> None:
         """
         This function sets the options for the sizing function.
@@ -776,8 +776,6 @@ class Borefield(BaseClass):
             Initial depth of the borefield to start the iteration (m)
         use_constant_Rb : bool
             True if a constant borehole equivalent resistance (Rb*) value should be used
-        use_constant_Tg : bool
-            True if a constant Tg value should be used (the geothermal flux is neglected)
         quadrant_sizing : int
             Differs from 0 when a sizing in a certain quadrant is desired.
             Quadrants are developed by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]_
@@ -808,14 +806,13 @@ class Borefield(BaseClass):
             return
 
         self._sizing_setup = SizingSetup(use_constant_Rb=use_constant_Rb,
-                                         use_constant_Tg=use_constant_Tg,
                                          quadrant_sizing=quadrant_sizing,
                                          L2_sizing=L2_sizing,
                                          L3_sizing=L3_sizing,
                                          L4_sizing=L4_sizing)
 
-    def size(self, H_init: float = 100, use_constant_Rb: bool = None, use_constant_Tg: bool = None,
-             L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None, quadrant_sizing: int = None) -> float:
+    def size(self, H_init: float = 100, use_constant_Rb: bool = None, L2_sizing: bool = None,
+             L3_sizing: bool = None, L4_sizing: bool = None, quadrant_sizing: int = None) -> float:
         """
         This function sets the options for the sizing function.
 
@@ -835,8 +832,6 @@ class Borefield(BaseClass):
             Initial depth of the borefield to start the iteration (m)
         use_constant_Rb : bool
             True if a constant borehole equivalent resistance (Rb*) value should be used
-        use_constant_Tg : bool
-            True if a constant Tg value should be used (the geothermal flux is neglected)
         quadrant_sizing : int
             Differs from 0 when a sizing in a certain quadrant is desired.
             Quadrants are developed by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]_
@@ -865,7 +860,7 @@ class Borefield(BaseClass):
         self._sizing_setup.make_backup()
 
         # run the sizing setup
-        self._sizing_setup.update_variables(use_constant_Rb=use_constant_Rb, use_constant_Tg=use_constant_Tg,
+        self._sizing_setup.update_variables(use_constant_Rb=use_constant_Rb,
                                             L2_sizing=L2_sizing, L3_sizing=L3_sizing, L4_sizing=L4_sizing,
                                             quadrant_sizing=quadrant_sizing)
 
@@ -1760,7 +1755,7 @@ class Borefield(BaseClass):
             1D array with the g-values for all the requested time_value(s)
         """
         # when using a variable ground temperature, sometimes no solution can be found
-        if not self._sizing_setup.use_constant_Tg and H > Borefield.THRESHOLD_DEPTH_ERROR:
+        if not isinstance(self.ground_data, GroundConstantTemperature) and H > Borefield.THRESHOLD_DEPTH_ERROR:
             raise ValueError("Due to the use of a variable ground temperature, no solution can be found."
                              "To see the temperature profile, one can plot it using the depth of ",
                              str(Borefield.THRESHOLD_DEPTH_ERROR), "m.")

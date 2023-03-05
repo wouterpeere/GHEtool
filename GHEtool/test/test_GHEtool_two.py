@@ -8,7 +8,7 @@ from GHEtool import *
 
 import pygfunction as gt
 
-data = GroundData(3, 10)
+data = GroundConstantTemperature(3, 10)
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
 pipeData = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
 

@@ -8,7 +8,7 @@ import pygfunction as gt
 from GHEtool import *
 
 # initiate ground data
-data = GroundData(3, 10, 2.4*10**6)
+data = GroundConstantTemperature(3, 10, 2.4*10**6)
 borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
 
 # initiate borefield
