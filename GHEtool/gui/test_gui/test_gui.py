@@ -839,10 +839,10 @@ def test_backward_compatibility(qtbot):
     from GHEtool import FOLDER
     # init gui window
     main_window_old = MainWindow(QtWidgets_QMainWindow(), qtbot)
-    main_window_old._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_2_1_0.GHEtool')
+    main_window_old._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_2_1_1.GHEtool')
     # init gui window
     main_window_new = MainWindow(QtWidgets_QMainWindow(), qtbot)
-    main_window_new._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_2_1_1.GHEtool')
+    main_window_new._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_2_1_2.GHEtool')
     # check if the imported values are the same
     for ds_old, ds_new in zip(main_window_old.list_ds, main_window_new.list_ds):
         for option in ds_new.list_options_aims:

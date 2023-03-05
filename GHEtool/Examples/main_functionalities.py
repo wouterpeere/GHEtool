@@ -46,6 +46,8 @@ def main_functionalities():
     borefield.set_ground_parameters(data)
     borefield.create_rectangular_borefield(10, 12, 6, 6, 100, 4, 0.075)
 
+    borefield.Rb = 0.12  # equivalent borehole resistance (K/W)
+
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)   # maximum temperature
     borefield.set_min_ground_temperature(0)    # minimum temperature

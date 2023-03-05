@@ -11,20 +11,20 @@ def test_empty():
 
 
 def test_ground_data_equal():
-    data = GroundFluxTemperature(3, 10, 0.2, 0.06)
-    data2 = GroundFluxTemperature(3, 10, 0.2, 0.06)
+    data = GroundFluxTemperature(3, 10, 2.4*10**6, 0.06)
+    data2 = GroundFluxTemperature(3, 10, 2.4*10**6, 0.06)
     assert data == data2
-    data = GroundConstantTemperature(3, 10, 0.2)
-    data2 = GroundConstantTemperature(3, 10, 0.2)
+    data = GroundConstantTemperature(3, 10, 2.4*10**6)
+    data2 = GroundConstantTemperature(3, 10, 2.4*10**6)
     assert data == data2
 
 
 def test_ground_data_unequal():
-    data = GroundFluxTemperature(3, 10, 0.2)
-    data2 = GroundFluxTemperature(3, 11, 0.2)
+    data = GroundFluxTemperature(3, 10, 2.4*10**6)
+    data2 = GroundFluxTemperature(3, 11, 2.4*10**6)
     assert data != data2
-    data = GroundConstantTemperature(3, 10, 0.2)
-    data2 = GroundConstantTemperature(3, 11, 0.2)
+    data = GroundConstantTemperature(3, 10, 2.4*10**6)
+    data2 = GroundConstantTemperature(3, 11, 2.4*10**6)
     assert data != data2
 
 

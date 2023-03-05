@@ -49,7 +49,7 @@ def test_pipe_data_unequal():
 def test_unequal_cross():
     data_pipe = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
     data_fluid = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-    data_ground = GroundData(3, 10, 0.2)
+    data_ground = GroundData(3, 10)
 
     assert data_ground != data_pipe
     assert data_fluid != data_pipe
