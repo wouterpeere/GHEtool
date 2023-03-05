@@ -82,16 +82,16 @@ This runs some predefined cases to see whether all the internal dependencies wor
 To get started with GHEtool, one needs to create a Borefield object. This is done in the following steps.
 
 ```Python
-from GHEtool import Borefield, GroundData
+from GHEtool import Borefield, GroundDataConstantTemperature
 ```
 
 After importing the necessary classes, one sets all the relevant ground data and borehole equivalent resistance.
 
 ```Python
-data = GroundData(3,   # ground thermal conductivity (W/mK)
-                  10,  # initial/undisturbed ground temperature (deg C)
-                  0.2, # borehole equivalent resistance (mK/W)
-                  2.4*10**6) # volumetric heat capacity of the ground (J/m3K) 
+data =
+GroundDataConstantTemperature(3,   # ground thermal conductivity (W/mK)
+							  10,  # initial/undisturbed ground temperature (deg C)
+                              2.4*10**6) # volumetric heat capacity of the ground (J/m3K) 
 ```
 
 Furthermore, one needs to set the peak and monthly baseload for both heating and cooling.
@@ -114,7 +114,11 @@ borefield = Borefield(simulation_period=20,
                       baseload_heating=monthly_load_heating,
                       baseload_cooling=monthly_load_cooling)
 
+# set ground parameters
 borefield.set_ground_parameters(data)
+
+# set the borehole equivalent resistance
+borefield.Rb = 0.12
 
 # set temperature boundaries
 borefield.set_max_ground_temperature(16)  # maximum temperature
