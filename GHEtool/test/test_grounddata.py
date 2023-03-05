@@ -1,6 +1,6 @@
 import pytest
 
-from GHEtool.VariableClasses import GroundFluxTemperature, GroundConstantTemperature, GroundDataBaseClass
+from GHEtool.VariableClasses import GroundFluxTemperature, GroundConstantTemperature
 
 
 def test_empty():

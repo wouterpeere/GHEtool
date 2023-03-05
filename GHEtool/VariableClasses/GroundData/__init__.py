@@ -1,3 +1,2 @@
-from .GroundDataBaseClass import GroundDataBaseClass
 from .GroundFluxTemperature import GroundFluxTemperature
 from .GroundConstantTemperature import GroundConstantTemperature

@@ -2,12 +2,12 @@
 This file contains the class of ground data with a flux temperature.
 """
 
-from GHEtool.VariableClasses.GroundData import GroundDataBaseClass
+from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
 
 
-class GroundFluxTemperature(GroundDataBaseClass):
+class GroundFluxTemperature(_GroundData):
 
-    __slots__ = GroundDataBaseClass.__slots__ + ('flux', 'Tg')
+    __slots__ = _GroundData.__slots__ + ('flux', 'Tg')
 
     def __init__(self, k_s: float = None,
                  T_g: float = None,

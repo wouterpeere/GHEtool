@@ -6,7 +6,7 @@ from abc import ABC
 from GHEtool.VariableClasses.BaseClass import BaseClass
 
 
-class GroundDataBaseClass(BaseClass, ABC):
+class _GroundData(BaseClass, ABC):
     """
     Contains information regarding the ground data of the borefield.
     """

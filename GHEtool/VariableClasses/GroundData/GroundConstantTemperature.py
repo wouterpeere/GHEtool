@@ -2,12 +2,12 @@
 This file contains the code for the ground data with a constant temperature.
 """
 
-from GHEtool.VariableClasses.GroundData import GroundDataBaseClass
+from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
 
 
-class GroundConstantTemperature(GroundDataBaseClass):
+class GroundConstantTemperature(_GroundData):
 
-    __slots__ = GroundDataBaseClass.__slots__ + ('Tg',)
+    __slots__ = _GroundData.__slots__ + ('Tg',)
 
     def __init__(self, k_s: float = None,
                  T_g: float = None,
