@@ -218,8 +218,6 @@ def test_borefield_cannot_size_due_to_cooling():
         borefield.size()
     except ValueError:
         assert True
-        return
-    assert False
 
 
 def test_create_rectangular_field(borefield):
