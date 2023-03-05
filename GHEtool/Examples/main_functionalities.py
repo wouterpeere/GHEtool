@@ -17,7 +17,6 @@ def main_functionalities():
     # relevant borefield data for the calculations
     data = GroundConstantTemperature(3,             # conductivity of the soil (W/mK)
                                      10,            # Ground temperature at infinity (degrees C)
-                                     0.2,           # equivalent borehole resistance (K/W)
                                      2.4 * 10**6)   # ground volumetric heat capacity (J/m3K)
 
     # monthly loading values

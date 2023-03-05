@@ -27,9 +27,14 @@ class GroundConstantTemperature(GroundDataBaseClass):
         super().__init__(k_s=k_s, volumetric_heat_capacity=volumetric_heat_capacity)
         self.Tg = T_g
 
-    def calculate_Tg(self) -> float:
+    def calculate_Tg(self, H: float) -> float:
         """
         This function gives back the ground temperature.
+
+        Parameters
+        ----------
+        H : float
+            Depth of the borefield [m] (not used)
 
         Returns
         -------

@@ -176,7 +176,7 @@ class Borefield(BaseClass):
         # initiate ground parameters
         self.H = 0.  # borehole depth m
         self.number_of_boreholes = 0  # number of total boreholes #
-        self.ground_data: GroundDataBaseClass = GroundDataBaseClass()
+        self.ground_data: GroundDataBaseClass = None
         self.D: float = 0.  # buried depth of the borehole [m]
         self.r_b: float = 0.  # borehole radius [m]
 
@@ -670,7 +670,7 @@ class Borefield(BaseClass):
         if H is None:
             H = self.H
 
-        return self.ground_data.calculate_Tg(H, use_constant_Tg=self._sizing_setup.use_constant_Tg)
+        return self.ground_data.calculate_Tg(H)
 
     @property
     def _Ahmadfard(self) -> float:

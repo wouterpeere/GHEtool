@@ -33,9 +33,14 @@ class GroundDataBaseClass(BaseClass, ABC):
             self.alpha = self.k_s / self.volumetric_heat_capacity  # m2/s
 
     @abc.abstractmethod
-    def calculate_Tg(self) -> float:
+    def calculate_Tg(self, H: float) -> float:
         """
         This function gives back the ground temperature
+
+        Parameters
+        ----------
+        H : float
+            Depth of the borefield [m]
 
         Returns
         -------
