@@ -315,6 +315,16 @@ class UiGhetool:
         self.horizontalLayout_start_buttons.setObjectName("horizontalLayout_start_buttons")
         self.horizontalSpacer_2 = QtW.QSpacerItem(40, 20, QtW.QSizePolicy.Expanding, QtW.QSizePolicy.Minimum)
 
+        self.status_bar = StatusBar(ghe_tool)
+        self.status_bar.widget.setObjectName("status_bar")
+        self.status_bar.widget.setStyleSheet(f"QStatusBar::item{'{'}border:None;{'}'}QStatusBar{'{'}color:{BLACK};background-color: {LIGHT};{'}'}")
+        # ghe_tool.setStatusBar(self.horizontalLayout_progress_bar)
+        self.horizontalLayout_start_buttons.addWidget(self.status_bar.widget)
+        self.status_bar_progress_bar = QtW.QStatusBar(ghe_tool)
+        #self.status_bar_progress_bar.setObjectName("status_bar")
+        #self.status_bar_progress_bar.setStyleSheet(f"QStatusBar::item{'{'}border:None;{'}'}QStatusBar{'{'}color:{BLACK};background-color: {LIGHT};{'}'}")
+        ghe_tool.setStatusBar(self.status_bar_progress_bar)
+
         self.horizontalLayout_start_buttons.addItem(self.horizontalSpacer_2)
 
         self.pushButton_start_single = QtW.QPushButton(self.central_widget)
@@ -418,15 +428,6 @@ class UiGhetool:
         )
         self.toolBar.setMovable(False)
         ghe_tool.addToolBar(QtC.Qt.TopToolBarArea, self.toolBar)
-        self.status_bar = StatusBar(ghe_tool)
-        self.status_bar.widget.setObjectName("status_bar")
-        self.status_bar.widget.setStyleSheet(f"QStatusBar::item{'{'}border:None;{'}'}QStatusBar{'{'}color:{BLACK};background-color: {LIGHT};{'}'}")
-        # ghe_tool.setStatusBar(self.horizontalLayout_progress_bar)
-        self.verticalLayout_gui_structure.addWidget(self.status_bar.widget)
-        self.status_bar_progress_bar = QtW.QStatusBar(ghe_tool)
-        #self.status_bar_progress_bar.setObjectName("status_bar")
-        #self.status_bar_progress_bar.setStyleSheet(f"QStatusBar::item{'{'}border:None;{'}'}QStatusBar{'{'}color:{BLACK};background-color: {LIGHT};{'}'}")
-        ghe_tool.setStatusBar(self.status_bar_progress_bar)
 
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuCalculation.menuAction())
