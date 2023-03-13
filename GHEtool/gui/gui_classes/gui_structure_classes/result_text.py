@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable, List, TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable, List
 
 from GHEtool.gui.gui_classes.gui_structure_classes.hint import Hint
 

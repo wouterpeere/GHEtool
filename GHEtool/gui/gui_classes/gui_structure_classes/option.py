@@ -4,7 +4,7 @@ option base class script
 from __future__ import annotations
 
 import abc
-from typing import Callable, List, Optional, TYPE_CHECKING, Tuple, Union
+from typing import TYPE_CHECKING, Callable, List, Optional, Tuple, Union
 
 import PySide6.QtWidgets as QtW  # type: ignore
 

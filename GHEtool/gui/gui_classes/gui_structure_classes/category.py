@@ -3,7 +3,7 @@ category class script
 """
 from __future__ import annotations
 
-from typing import List, Optional, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, List, Optional, Union
 
 import PySide6.QtCore as QtC  # type: ignore
 import PySide6.QtWidgets as QtW  # type: ignore
@@ -14,8 +14,8 @@ from GHEtool.gui.gui_classes.gui_structure_classes.result_text import ResultText
 
 if TYPE_CHECKING:  # pragma: no cover
     from GHEtool.gui.gui_classes.gui_structure_classes.function_button import FunctionButton
-    from GHEtool.gui.gui_classes.gui_structure_classes.page import Page
     from GHEtool.gui.gui_classes.gui_structure_classes.option import Option
+    from GHEtool.gui.gui_classes.gui_structure_classes.page import Page
 
 
 class Category:

@@ -3,7 +3,7 @@ function button class script
 """
 from __future__ import annotations
 
-from typing import Callable, List, Optional, Protocol, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Callable, List, Optional, Protocol, Union
 
 import PySide6.QtCore as QtC  # type: ignore
 import PySide6.QtGui as QtG  # type: ignore

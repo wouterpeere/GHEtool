@@ -3,7 +3,7 @@ figure option class script
 """
 from __future__ import annotations
 
-from typing import List, TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING, List, Tuple
 
 from GHEtool.gui.gui_classes.gui_structure_classes.button_box import ButtonBox
 

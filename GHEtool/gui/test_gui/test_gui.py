@@ -5,9 +5,9 @@ from sys import setrecursionlimit
 from typing import List
 
 import keyboard
+import numpy as np
 import PySide6.QtCore as QtC
 import PySide6.QtWidgets as QtW
-import numpy as np
 from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
 from pytest import raises
 
@@ -42,6 +42,7 @@ def test_language(qtbot):
         assert main_window.gui_structure.option_language.get_value() == idx
 
     main_window.menuLanguage.actions()[0].trigger()
+    main_window.delete_backup()
 
 
 def test_gui_values(qtbot):
@@ -59,10 +60,8 @@ def test_gui_values(qtbot):
     main_window.delete_backup()
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
     main_window.remove_previous_calculated_results()
+    main_window.gui_structure.option_auto_saving.set_value(1)
     main_window.add_scenario()
-    main_window.remove_previous_calculated_results()
-
-    main_window.gui_structure.option_filename.set_value(f'{FOLDER}/Examples/hourly_profile.csv')
 
     for option, _ in main_window.gui_structure.list_of_options:
         # check if option is hidden and disabled
@@ -123,14 +122,14 @@ def test_gui_values(qtbot):
     main_window.gui_structure.aim_temp_profile.widget.click() if not main_window.gui_structure.aim_temp_profile.widget.isChecked() else None
     main_window.save_scenario()
     main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
+    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False):
         main_window.threads[0].run()
         main_window.threads[0].any_signal.connect(main_window.thread_function)
 
     main_window.gui_structure.aim_req_depth.widget.click()
     main_window.save_scenario()
     main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
+    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False):
         main_window.threads[0].run()
         main_window.threads[0].any_signal.connect(main_window.thread_function)
 
@@ -138,7 +137,7 @@ def test_gui_values(qtbot):
     main_window.gui_structure.aim_optimize.widget.click()
     main_window.save_scenario()
     main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
+    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False):
         main_window.threads[0].run()
         main_window.threads[0].any_signal.connect(main_window.thread_function)
     # check if no calculation runs
@@ -183,6 +182,7 @@ def test_gui_scenario_properties(qtbot):
     assert main_window.list_widget_scenario.count() == 1
     # check if adding a scenario is adding one
     for i in range(10):
+        main_window.save_scenario()
         main_window.add_scenario()
         assert len(main_window.list_ds) == 2 + i
         assert main_window.list_widget_scenario.count() == 2 + i
@@ -256,7 +256,7 @@ def test_wrong_results_shown(qtbot):
     main_window.gui_structure.aim_optimize.widget.click()
     main_window.save_scenario()
     main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
+    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False):
         main_window.threads[0].run()
         main_window.threads[0].any_signal.connect(main_window.thread_function)
 
@@ -270,7 +270,7 @@ def test_wrong_results_shown(qtbot):
     main_window.gui_structure.option_method_rb_calc.set_value(1)
     main_window.save_scenario()
     main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
+    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False):
         main_window.threads[0].run()
         main_window.threads[0].any_signal.connect(main_window.thread_function)
 
@@ -281,7 +281,7 @@ def test_wrong_results_shown(qtbot):
     main_window.add_scenario()
     main_window.save_scenario()
     main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
+    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False):
         main_window.threads[0].run()
         main_window.threads[0].any_signal.connect(main_window.thread_function)
 
@@ -298,7 +298,7 @@ def test_wrong_results_shown(qtbot):
     main_window.gui_structure.aim_temp_profile.widget.click()
     main_window.save_scenario()
     main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
+    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False):
         main_window.threads[0].run()
         main_window.threads[0].any_signal.connect(main_window.thread_function)
     assert main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
@@ -640,6 +640,25 @@ def test_auto_save(qtbot):
     # check if options has been stored correctly
     assert main_window.list_ds[1].option_conductivity == 2.1
     assert main_window.list_ds[2].option_conductivity == 1.1
+    for _ in main_window.list_ds:
+        main_window.delete_scenario()
+        qtbot.wait(100)
+    assert len(main_window.list_ds) == 1
+    assert main_window.list_widget_scenario.count() == 1
+    # check if adding a scenario is adding one
+    for i in range(10):
+        main_window.add_scenario()
+        assert len(main_window.list_ds) == 2 + i
+        assert main_window.list_widget_scenario.count() == 2 + i
+    # check if deleting a scenario is removing a scenario
+    for i in range(10):
+        main_window.delete_scenario()
+        assert len(main_window.list_ds) == 10 - i
+        assert main_window.list_widget_scenario.count() == 10 - i
+    # check if deleting the last scenario is ignored so at least one exists
+    main_window.delete_scenario()
+    assert len(main_window.list_ds) == 1
+    assert main_window.list_widget_scenario.count() == 1
 
 
 def test_no_load_save_file(qtbot):
@@ -651,15 +670,14 @@ def test_no_load_save_file(qtbot):
     qtbot: qtbot
         bot for the GUI
     """
-    from pytest import raises
 
     # init gui window
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
     main_window.delete_backup()
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
     # check if an import error has been raises with a wrong load file
-    with raises(ImportError):
-        main_window._load_from_data('not_there.GHEtool')
+    main_window._load_from_data('not_there.GHEtool')
+    assert main_window.status_bar.currentMessage() == main_window.translations.NoFileSelected[0]
     # check if the current error message is shown with a wrong save file/folder
     main_window._save_to_data('hello/not_there.GHEtool')
     assert main_window.status_bar.currentMessage() == main_window.translations.NoFileSelected[main_window.gui_structure.option_language.get_value()]
@@ -927,8 +945,9 @@ def test_filename_read(qtbot) -> None:
     main_window = MainWindow(QtW.QMainWindow(), qtbot)
     main_window.save_scenario()
     main_window.gui_structure.option_filename._init_links()
-    from GHEtool import FOLDER
     import pandas as pd
+
+    from GHEtool import FOLDER
     file = f'{FOLDER.joinpath("Examples/hourly_profile.csv")}'
     # check if no file is passed
     QtC.QTimer.singleShot(1000, lambda: keyboard.press('Esc'))
@@ -1016,7 +1035,7 @@ def test_value_error(qtbot) -> None:
     with raises(ValueError) as err:
         func()
     main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
+    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False):
         main_window.threads[0].run()
         main_window.threads[0].any_signal.connect(main_window.thread_function)
 
@@ -1033,7 +1052,6 @@ def test_start_gui():
     """
     tests start gui import
     """
-    from GHEtool.gui.start_gui import run
 
 
 def test_load_data_gui_errors():
@@ -1063,3 +1081,56 @@ def test_file_import_errors(qtbot):
     g_s.option_filename.set_value(f'{FOLDER.joinpath("Examples/hourly_profile_wrong.csv")}')
     main_window.gui_structure.fun_display_data()
     assert main_window.status_bar.currentMessage() == main_window.translations.ValueError[0]
+
+
+def test_toggle_buttons(qtbot):
+    """
+    test toggle buttons behaviour.
+
+    Parameters
+    ----------
+    qtbot: QtBot
+
+    """
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.delete_backup()
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.gui_structure.option_auto_saving.set_value(1)
+    # no toggle behaviour
+    main_window.gui_structure.option_toggle_buttons.set_value(0)
+    main_window.save_scenario()
+    main_window.gui_structure.aim_temp_profile.widget.click()
+    val_before = main_window.gui_structure.aim_temp_profile.widget.isChecked()
+    main_window.gui_structure.aim_temp_profile.widget.click()
+    val_after = main_window.gui_structure.aim_temp_profile.widget.isChecked()
+    assert val_after == val_before
+    main_window.gui_structure.aim_req_depth.widget.click()
+    assert main_window.gui_structure.aim_req_depth.widget.isChecked()
+    assert not main_window.gui_structure.aim_temp_profile.widget.isChecked()
+
+    val_before = main_window.gui_structure.option_method_rb_calc.get_value()
+    main_window.gui_structure.option_method_rb_calc.widget[val_before].click()
+    val_after = main_window.gui_structure.option_method_rb_calc.get_value()
+    assert val_before == val_after
+    main_window.gui_structure.option_method_rb_calc.widget[val_before+1].click()
+    val_after = main_window.gui_structure.option_method_rb_calc.get_value()
+    assert val_before + 1 == val_after
+    # toggle behaviour
+    main_window.gui_structure.option_toggle_buttons.set_value(1)
+    main_window.save_scenario()
+    val_before = main_window.gui_structure.aim_temp_profile.widget.isChecked()
+    main_window.gui_structure.aim_temp_profile.widget.click()
+    val_after = main_window.gui_structure.aim_temp_profile.widget.isChecked()
+    assert val_after != val_before
+    main_window.gui_structure.aim_optimize.widget.click()
+    assert main_window.gui_structure.aim_optimize.widget.isChecked()
+    assert not main_window.gui_structure.aim_temp_profile.widget.isChecked()
+
+    val_before = main_window.gui_structure.option_method_rb_calc.get_value()
+    main_window.gui_structure.option_method_rb_calc.widget[val_before].click()
+    val_after = main_window.gui_structure.option_method_rb_calc.get_value()
+    assert main_window.gui_structure.option_method_rb_calc.default_value == val_after
+    main_window.gui_structure.option_method_rb_calc.widget[val_before].click()
+    val_after = main_window.gui_structure.option_method_rb_calc.get_value()
+    assert val_before == val_after
+

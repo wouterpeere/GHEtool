@@ -4,7 +4,7 @@ float box option class
 from __future__ import annotations
 
 from functools import partial as ft_partial
-from typing import Callable, Optional, TYPE_CHECKING, Tuple, Union
+from typing import TYPE_CHECKING, Callable, Optional, Tuple, Union
 
 import PySide6.QtCore as QtC  # type: ignore
 import PySide6.QtWidgets as QtW  # type: ignore

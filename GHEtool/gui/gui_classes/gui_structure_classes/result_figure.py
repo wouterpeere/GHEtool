@@ -3,7 +3,7 @@ result figure class script
 """
 from __future__ import annotations
 
-from typing import List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Optional
 
 import matplotlib.pyplot as plt
 import PySide6.QtCore as QtC  # type: ignore

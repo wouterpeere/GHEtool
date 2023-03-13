@@ -19,9 +19,9 @@ import PySide6.QtWidgets as QtW
 from GHEtool import FOLDER, Borefield
 from GHEtool.gui.gui_classes.gui_base_class import UiGhetool, set_graph_layout
 from GHEtool.gui.gui_classes.gui_calculation_thread import CalcProblem
+from GHEtool.gui.gui_classes.gui_data_storage import DataStorage
 from GHEtool.gui.gui_classes.gui_structure_classes.functions import check_aim_options, show_linked_options
 from GHEtool.gui.gui_classes.translation_class import Translations
-from GHEtool.gui.gui_classes.gui_data_storage import DataStorage
 from GHEtool.gui.gui_structure import FigureOption, GuiStructure, Option
 
 currentdir = dirname(realpath(__file__))
@@ -198,7 +198,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         setting_options = [(opt_cat, name) for category in self.gui_structure.page_settings.list_categories for opt_cat in category.list_of_options if
                            isinstance(opt_cat, Option) for opt_glob, name in self.gui_structure.list_of_options if opt_cat == opt_glob]
         for option, name in [(opt, name) for opt, name in self.gui_structure.list_of_options
-                             if not isinstance(opt, FigureOption) and not ((opt, name) in setting_options)]:
+                             if not isinstance(opt, FigureOption) and (opt, name) not in setting_options]:
             option.change_event(self.change)
         for option, name in [(opt, name) for opt, name in self.gui_structure.list_of_options if isinstance(opt, FigureOption)]:
             option.change_event(self.remove_previous_calculated_results)
@@ -343,9 +343,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             return
         # get text string of current scenario
         text: str = self.list_widget_scenario.currentItem().text()
-        # abort if there is no text
-        if len(text) < 1:
-            return
         # create current data storage
         ds: DataStorage = DataStorage(self.gui_structure)
         # check if current data storage is equal to the previous one then delete the *
@@ -408,7 +405,8 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
                 return_2_old_item()
                 return
             # save old scenario
-            if DataStorage(self.gui_structure) != self.list_ds[self.list_widget_scenario.row(old_row_item)]:
+            if len(self.list_ds) - 1 >= self.list_widget_scenario.row(old_row_item) and DataStorage(self.gui_structure) != self.list_ds[
+                self.list_widget_scenario.row(old_row_item)]:
                 self.list_ds[self.list_widget_scenario.row(old_row_item)].close_figures()
                 self.list_ds[self.list_widget_scenario.row(old_row_item)] = DataStorage(self.gui_structure)
             # update backup fileImport
@@ -758,7 +756,9 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
             version = saving['version']
         except FileNotFoundError:
-            raise FileNotFoundError("The datafile cannot be loaded!")
+            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()])
+            return 
+            #raise ImportError("The datafile cannot be loaded!")
         except (JSONDecodeError,  UnicodeDecodeError):
             try:
                 # try to open as pickle
@@ -1126,7 +1126,10 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # stop finished thread
         self.threads[self.finished].terminate()
 
-        self.list_ds[results[1]] = results[0]
+        try:
+            self.list_ds[results[1]] = results[0]
+        except IndexError:
+            return
 
         # count number of finished calculated scenarios
         self.finished += 1

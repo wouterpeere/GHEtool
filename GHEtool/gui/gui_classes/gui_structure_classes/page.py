@@ -4,7 +4,7 @@ page class script
 from __future__ import annotations
 
 from functools import partial as ft_partial
-from typing import Callable, List, Optional, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Callable, List, Optional, Union
 
 import PySide6.QtCore as QtC  # type: ignore
 import PySide6.QtGui as QtG  # type: ignore
@@ -16,8 +16,8 @@ from GHEtool.gui.gui_classes.gui_structure_classes.aim import Aim
 from GHEtool.gui.gui_classes.gui_structure_classes.functions import _update_opponent_not_change, _update_opponent_toggle, check_aim_options
 
 if TYPE_CHECKING:  # pragma: no cover
-    from GHEtool.gui.gui_classes.gui_structure_classes.option import Option
     from GHEtool.gui.gui_classes.gui_structure_classes import Category
+    from GHEtool.gui.gui_classes.gui_structure_classes.option import Option
 
 
 class Page:

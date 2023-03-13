@@ -12,8 +12,9 @@ from GHEtool import Borefield, FluidData, GroundData, PipeData
 from GHEtool.gui.gui_structure import load_data_GUI
 
 if TYPE_CHECKING:  # pragma: no cover
-    from GHEtool.gui.gui_classes.gui_data_storage import DataStorage
     from numpy.typing import NDArray
+
+    from GHEtool.gui.gui_classes.gui_data_storage import DataStorage
 
 
 def data_2_borefield(ds: DataStorage) -> Tuple[Borefield, partial[[], None]]:

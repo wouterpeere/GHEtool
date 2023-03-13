@@ -3,13 +3,12 @@ data storage class script
 """
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 import matplotlib.pyplot as plt
 
 from GHEtool import Borefield
 from GHEtool.gui.gui_classes.gui_structure_classes import ListBox
-
 
 if TYPE_CHECKING:  # pragma: no cover
     from GHEtool.gui.gui_structure import GuiStructure

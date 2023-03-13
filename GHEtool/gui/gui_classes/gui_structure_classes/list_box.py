@@ -4,14 +4,13 @@ list box class script
 from __future__ import annotations
 
 from functools import partial as ft_partial
-from typing import Callable, List, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Callable, List, Union
 
 import PySide6.QtWidgets as QtW  # type: ignore
 
 from GHEtool.gui.gui_classes.gui_base_class import WHITE
 from GHEtool.gui.gui_classes.gui_structure_classes.functions import check
 from GHEtool.gui.gui_classes.gui_structure_classes.option import Option
-
 
 if TYPE_CHECKING:  # pragma: no cover
     from GHEtool.gui.gui_classes.gui_structure_classes import Category
