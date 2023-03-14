@@ -1317,6 +1317,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # close app if nothing has been changed
         if not self.changedFile:
             event.accept()
+            logging.info("GHEtool closed")
             return
         # create message box
         self.dialog: QtW.QMessageBox = QtW.QMessageBox(self.Dia)
@@ -1346,7 +1347,9 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         if reply == QtW.QMessageBox.Cancel:
             # cancel closing event
             event.ignore()
+            logging.info("GHEtool closing cancelled")
             return
+        logging.info("GHEtool closed")
         # check if inputs should be saved and if successfully set closing variable to true
         close: bool = self.fun_save() if reply == QtW.QMessageBox.Save else True
         # stop all calculation threads
