@@ -153,7 +153,7 @@ class Category:
         self.label.setText(self.label_text)
         self.label.setStyleSheet(
             f"QLabel {'{'}border: 1px solid  {LIGHT};border-top-left-radius: 15px;border-top-right-radius: 15px;background-color:  {LIGHT};padding: 5px 0px;\n"
-            f"	color:  {WHITE};font-weight:500;{'}'}"
+            f"	color:  {WHITE};font-weight:700;{'}'}"
         )
         self.label.setAlignment(QtC.Qt.AlignCenter | QtC.Qt.AlignVCenter)
         layout.addWidget(self.label)

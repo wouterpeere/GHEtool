@@ -11,9 +11,10 @@ import PySide6.QtGui as QtG  # type: ignore
 import PySide6.QtWidgets as QtW  # type: ignore
 
 from GHEtool import FOLDER
-from GHEtool.gui.gui_classes.gui_base_class import LIGHT, WHITE
+from GHEtool.gui.gui_classes.gui_base_class import LIGHT, WHITE, FONT
 from GHEtool.gui.gui_classes.gui_structure_classes.aim import Aim
 from GHEtool.gui.gui_classes.gui_structure_classes.functions import _update_opponent_not_change, _update_opponent_toggle, check_aim_options
+
 
 if TYPE_CHECKING:  # pragma: no cover
     from GHEtool.gui.gui_classes.gui_structure_classes import Category
@@ -159,7 +160,7 @@ class Page:
         layout.setSpacing(0)
         self.label.setParent(central_widget)
         label: QtW.QLabel = self.label
-        label.setStyleSheet('font: 63 16pt "Lexend SemiBold";')
+        label.setStyleSheet(f'font: 16pt "{FONT}";font-weight:700;')
         label.setText(self.name)
         layout.addWidget(label)
         spacer_label = QtW.QLabel(self.page)

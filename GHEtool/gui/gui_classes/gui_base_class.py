@@ -8,6 +8,7 @@ import PySide6.QtGui as QtG
 import PySide6.QtWidgets as QtW
 
 from GHEtool import FOLDER
+from platform import system
 
 WHITE: str = "rgb(255, 255, 255)"
 LIGHT: str = "rgb(84, 188, 235)"
@@ -16,6 +17,9 @@ DARK: str = "rgb(0, 64, 122)"
 GREY: str = "rgb(100, 100, 100)"
 WARNING: str = "rgb(255, 200, 87)"
 BLACK: str = "rgb(0, 0, 0)"
+
+
+FONT = 'Lexend' if system() == 'Windows' else 'Helvetica'#Arial
 
 
 def set_graph_layout() -> None:
@@ -101,7 +105,7 @@ class UiGhetool:
         ghe_tool.setSizePolicy(size_policy)
         ghe_tool.setMaximumSize(QtC.QSize(16777215, 16777215))
         font = QtG.QFont()
-        font.setFamilies(["Lexend"])
+        font.setFamilies([FONT])
         font.setPointSize(11)
         font.setBold(False)
         font.setItalic(False)
@@ -110,13 +114,14 @@ class UiGhetool:
         icon.addFile(f"{FOLDER}/gui/icons/icon_07.svg", QtC.QSize(), QtG.QIcon.Normal, QtG.QIcon.Off)
         ghe_tool.setWindowIcon(icon)
         ghe_tool.setStyleSheet(
-            f"*{'{'}color: {WHITE};font: 11pt 'Lexend';background-color: {DARK};selection-background-color: {LIGHT};alternate-background-color: {LIGHT};{'}'}\n"
-            f"QPushButton{'{'}border: 3px solid {LIGHT};border-radius: 5px;color:{WHITE};gridline-color:{LIGHT};background-color:{LIGHT};font-weight:500;{'}'}"
+            f"*{'{'}color: {WHITE};font: 11pt '{FONT}';background-color: {DARK};selection-background-color: {LIGHT};alternate-background-color: {LIGHT};{'}'}\n"
+            f"QPushButton{'{'}border: 3px solid {LIGHT};border-radius: 5px;color:{WHITE};gridline-color:{LIGHT};background-color:{LIGHT};"
+            f"font: 700 11pt '{font}';{'}'}"
             f"QPushButton:hover{'{'}background-color: {DARK};{'}'}\n"
             f"QPushButton:disabled{'{'}border: 3px solid {GREY};border-radius: 5px;color: {WHITE};gridline-color: {GREY};background-color: {GREY};{'}'}\n"
             f"QPushButton:disabled:hover{'{'}background-color: {DARK};{'}'}\n"
             f"QComboBox{'{'}border: 1px solid {WHITE};border-bottom-left-radius: 0px;border-bottom-right-radius: 0px;{'}'}\n"
-            f"QSpinBox{'{'}selection-color: {WHITE};selection-background-color: {LIGHT};border: 1px solid {WHITE};font: 11pt 'Lexend Deca Light';{'}'}\n"
+            f"QSpinBox{'{'}selection-color: {WHITE};selection-background-color: {LIGHT};border: 1px solid {WHITE};font: 11pt '{FONT}';{'}'}\n"
             f"QLineEdit{'{'}border: 3px solid {LIGHT};border-radius: 5px;color: {WHITE};gridline-color: {LIGHT};background-color: {LIGHT};font-weight:500;\n"
             f"selection-background-color: {LIGHT_SELECT};{'}'}\n"
             f"QLineEdit:hover{'{'}background-color: {DARK};{'}'}"

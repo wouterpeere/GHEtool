@@ -4,8 +4,14 @@ script to start the GUI
 # pragma: no cover
 import sys
 from sys import argv
+from platform import system
 
-is_frozen = getattr(sys, 'frozen', False)  # pragma: no cover
+# import GHEtool.gui.gui_classes.gui_base_class as gui_base
+
+# gui_base.DARK = "rgb(0, 0, 0)"
+
+os_system = system()
+is_frozen = getattr(sys, 'frozen', False) and os_system == 'Windows'  # pragma: no cover
 
 
 def run(path_list=None):  # pragma: no cover
@@ -13,7 +19,8 @@ def run(path_list=None):  # pragma: no cover
         import pyi_splash
         pyi_splash.update_text('Loading .')
     from configparser import ConfigParser
-    from ctypes import windll as ctypes_windll
+    if os_system == 'Windows':
+        from ctypes import windll as ctypes_windll
     from pathlib import Path
     from sys import exit as sys_exit
 
@@ -37,7 +44,8 @@ def run(path_list=None):  # pragma: no cover
     version = config.get('metadata', 'version')
     # set version and id
     myAppID = f'GHEtool v{version}'  # arbitrary string
-    ctypes_windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
+    if os_system == 'Windows':
+        ctypes_windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
     app.setApplicationName('GHEtool')
     app.setApplicationVersion(f'v{version}')
     # init window
