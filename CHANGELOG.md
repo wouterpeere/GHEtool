@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 - Wrong heating load in april in GUI (issue #94).
+- Results are now cleared when new loads are loaded (issue #106).
 
 ## [2.1.1] - 2023-01-30
 

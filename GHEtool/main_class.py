@@ -1239,6 +1239,7 @@ class Borefield(BaseClass):
         self.baseload_heating = np.maximum(baseload, np.zeros(12))  # kWh
         self.monthly_load_heating = self.baseload_heating / Borefield.UPM  # kW
         self.calculate_monthly_load()
+        self._delete_calculated_temperatures()
 
         # new peak heating if baseload is larger than the peak
         self.set_peak_heating(np.maximum(self.peak_heating, self.monthly_load_heating))
@@ -1268,6 +1269,7 @@ class Borefield(BaseClass):
         self.baseload_cooling = np.maximum(baseload, np.zeros(12))  # kWh
         self.monthly_load_cooling = self.baseload_cooling / Borefield.UPM  # kW
         self.calculate_monthly_load()
+        self._delete_calculated_temperatures()
 
         # new peak cooling if baseload is larger than the peak
         self.set_peak_cooling(np.maximum(self.peak_cooling, self.monthly_load_cooling))
@@ -1284,6 +1286,7 @@ class Borefield(BaseClass):
         Returns
         -------
         None
+
         Raises
         ------
         ValueError
@@ -1294,6 +1297,7 @@ class Borefield(BaseClass):
         if isinstance(peak_load, float) or isinstance(peak_load, int):
             raise ValueError("No correct list/array is given!")
         self.peak_heating = np.maximum(peak_load, self.monthly_load_heating)
+        self._delete_calculated_temperatures()
 
     def set_peak_cooling(self, peak_load: Union[np.ndarray, list]) -> None:
         """
@@ -1318,6 +1322,7 @@ class Borefield(BaseClass):
         if isinstance(peak_load, float) or isinstance(peak_load, int):
             raise ValueError("No correct list/array is given!")
         self.peak_cooling = np.maximum(peak_load, self.monthly_load_cooling)
+        self._delete_calculated_temperatures()
 
     @property
     def investment_cost(self) -> float:
@@ -1537,7 +1542,7 @@ class Borefield(BaseClass):
 
     def _check_temperature_profile_available(self, hourly: bool = True) -> bool:
         """
-        This function checks whether or not the temperature profile is already calculated.
+        This function checks whether the temperature profile is already calculated.
 
         Parameters
         ----------
@@ -1624,6 +1629,20 @@ class Borefield(BaseClass):
         if not self.gui:
             plt.show()
         return fig, ax
+
+    def _delete_calculated_temperatures(self) -> None:
+        """
+        This function deletes all the calculated temperatures.
+
+        Returns
+        -------
+        None
+        """
+        self.results_peak_heating = np.array([])
+        self.results_peak_cooling = np.array([])
+        self.results_month_heating = np.array([])
+        self.results_month_cooling = np.array([])
+        self.Tb = np.array([])
 
     def _calculate_temperature_profile(self, H: float = None, hourly: bool = False) -> None:
         """
@@ -1861,6 +1880,7 @@ class Borefield(BaseClass):
         # set monthly loads
         self.set_peak_heating(self._reduce_to_peak_load(self.hourly_heating_load, np.max(heating_load)))
         self.set_baseload_heating(self._reduce_to_monthly_load(self.hourly_heating_load, np.max(heating_load)))
+        self._delete_calculated_temperatures()
 
     def set_hourly_cooling_load(self, cooling_load: np.array) -> None:
         """
@@ -1880,6 +1900,7 @@ class Borefield(BaseClass):
         # set monthly loads
         self.set_peak_cooling(self._reduce_to_peak_load(self.hourly_cooling_load, np.max(cooling_load)))
         self.set_baseload_cooling(self._reduce_to_monthly_load(self.hourly_cooling_load, np.max(cooling_load)))
+        self._delete_calculated_temperatures()
 
     def _check_hourly_load(self) -> bool:
         """
