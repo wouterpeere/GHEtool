@@ -1342,8 +1342,11 @@ class Borefield(BaseClass):
         imbalance : float
         """
         # imbalance based on hourly load
-        if self._check_hourly_load():
+        try:
+            self._check_hourly_load()
             return np.sum(self.hourly_cooling_load) - np.sum(self.hourly_heating_load)
+        except ValueError:
+            pass
 
         return np.sum(self.baseload_cooling) - np.sum(self.baseload_heating)
 
@@ -1886,6 +1889,11 @@ class Borefield(BaseClass):
         -------
         bool
             True if the data is correct
+
+        Raises
+        ------
+        ValueError
+            When no data is given, when the data is not hourly or when there are negative values
         """
         # check whether there is data given
         if self.hourly_cooling_load is None or self.hourly_heating_load is None:
