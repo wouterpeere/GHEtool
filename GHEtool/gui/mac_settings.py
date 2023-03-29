@@ -6,16 +6,16 @@ from pathlib import Path
 # Example settings file for dmgbuild
 #
 
-# Use like this: dmgbuild -s settings.py "Test Volume" test.dmg
+# Use like this: dmgbuild -s mac_settings.py "Test Volume" test.dmg
 
 # You can actually use this file for your own application (not just TextEdit)
 # by doing e.g.
 #
-#   dmgbuild -s settings.py -D app=/path/to/My.app "My Application" MyApp.dmg
+#   dmgbuild -s mac_settings.py -D app=/path/to/My.app "My Application" MyApp.dmg
 
 # .. Useful stuff ..............................................................
 path_file = Path("__file__").parent.parent.parent
-application = defines.get("app", path_file.joinpath("dist/GHEtool"))  # noqa: F821
+application = defines.get("app", str(path_file.joinpath("dist/GHEtool.app")))  # noqa: F821
 appname = os.path.basename(application)
 
 
@@ -49,8 +49,7 @@ compression_level = 9
 size = defines.get("size", None)  # noqa: F821
 
 # Files to includePath
-all_paths = path_file.joinpath("dist/GHEtool").glob("**/*")
-files = [(f"{file}", f"{file}".replace("dist/", "")) for file in all_paths]
+files = [application]
 
 # Symlinks to create
 symlinks = {"Applications": "/Applications"}
@@ -70,11 +69,10 @@ symlinks = {"Applications": "/Applications"}
 #
 # icon = '/path/to/icon.icns'
 
-icon = os.path.join(path_file.joinpath('GHEtool/gui/icons/Icon.icns'))
+icon = icon_from_app(application)
 
 # Where to put the icons
-icon_locations = {"GHEtool": (140, 120)}
-icon_locations["Applications"] = (500, 120)
+icon_locations = {appname: (140, 120), "Applications": (500, 120)}
 
 # .. Window configuration ......................................................
 

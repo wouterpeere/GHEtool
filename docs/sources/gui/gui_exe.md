@@ -65,5 +65,5 @@ Instead of the InnoSetup step the dmgbuild package can be used by installing it 
 And afterwards running the following command:
 
 ``` 
-python -m dmgbuild -s ./GHEtool/gui/settings.py "GHEtool" GHEtool.dmg
+python -m dmgbuild -s ./GHEtool/gui/mac_settings.py "GHEtool" GHEtool.dmg
 ```
