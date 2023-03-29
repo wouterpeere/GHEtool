@@ -30,7 +30,7 @@ class Borefield(BaseClass):
     __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'H_init', 'Rb', 'ty', 'tm', \
                 'hourly_heating_load', 'hourly_cooling_load', 'number_of_boreholes', '_borefield', 'cost_investment', \
                 'length_peak', 'th', 'Tf_max', 'Tf_min', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
-                'monthly_load_cooling', 'peak_heating', 'imbalance', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm', \
+                'monthly_load_cooling', 'peak_heating', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm', \
                 'peak_cooling', 'simulation_period', 'ground_data', 'pipe_data', 'fluid_data',\
                 'results_peak_heating', 'time_L4', 'options_pygfunction',\
                 'results_peak_cooling', 'results_month_cooling', 'results_month_heating', 'Tb', 'THRESHOLD_WARNING_SHALLOW_FIELD', \
@@ -171,7 +171,6 @@ class Borefield(BaseClass):
         self.qm: float = 0.  # monthly load W
         self.qh: float = 0.  # peak load W
         self.qpm: float = 0.  # cumulative load first year sizing
-        self.imbalance: float = 0.  # imbalance kWh
 
         # initiate ground parameters
         self.H = 0.  # borehole depth m
@@ -1240,7 +1239,6 @@ class Borefield(BaseClass):
         self.baseload_heating = np.maximum(baseload, np.zeros(12))  # kWh
         self.monthly_load_heating = self.baseload_heating / Borefield.UPM  # kW
         self.calculate_monthly_load()
-        self.calculate_imbalance()
 
         # new peak heating if baseload is larger than the peak
         self.set_peak_heating(np.maximum(self.peak_heating, self.monthly_load_heating))
@@ -1270,7 +1268,6 @@ class Borefield(BaseClass):
         self.baseload_cooling = np.maximum(baseload, np.zeros(12))  # kWh
         self.monthly_load_cooling = self.baseload_cooling / Borefield.UPM  # kW
         self.calculate_monthly_load()
-        self.calculate_imbalance()
 
         # new peak cooling if baseload is larger than the peak
         self.set_peak_cooling(np.maximum(self.peak_cooling, self.monthly_load_cooling))
@@ -1334,16 +1331,21 @@ class Borefield(BaseClass):
         """
         return np.polyval(self.cost_investment, self.H * self.number_of_boreholes)
 
-    def calculate_imbalance(self) -> None:
+    @property
+    def imbalance(self) -> float:
         """
-        This function calculates the imbalance of the field.
-        A positive imbalance means that the field is injection dominated, i.e. it heats up every year.
+        This function returns the imbalance of the borefield.
+        A positive imbalance means that the field is injection dominated, ie. it heats up every year.
 
         Returns
         -------
-        None
+        imbalance : float
         """
-        self.imbalance = np.sum(self.baseload_cooling) - np.sum(self.baseload_heating)
+        # imbalance based on hourly load
+        if self._check_hourly_load():
+            return np.sum(self.hourly_cooling_load) - np.sum(self.hourly_heating_load)
+
+        return np.sum(self.baseload_cooling) - np.sum(self.baseload_heating)
 
     def _calculate_last_year_params(self, HC: bool) -> None:
         """
@@ -1893,7 +1895,7 @@ class Borefield(BaseClass):
         if len(self.hourly_heating_load) != 8760 or len(self.hourly_cooling_load) != 8760:
             raise ValueError("Incorrect length for either the heating or cooling load")
 
-        # check whether or not there are negative values in the data
+        # check whether there are negative values in the data
         if min(self.hourly_cooling_load) < 0 or min(self.hourly_heating_load) < 0:
             raise ValueError("There are negative values in either the heating or cooling load.")
 
