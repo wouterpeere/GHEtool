@@ -62,6 +62,7 @@ def run(path_list=None):  # pragma: no cover
     # show window
     if is_frozen:
         pyi_splash.close()
+
     window.showMaximized()
     # close app
     sys_exit(app.exec())

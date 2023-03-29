@@ -3,6 +3,8 @@ This document contains some base functionality for the GUI.
 It contains a function to reformat the graphs to a layout for the gui,
 and it contains the main class that creates the framework for the GUI (top bar etc.)
 """
+import os
+
 import PySide6.QtCore as QtC
 import PySide6.QtGui as QtG
 import PySide6.QtWidgets as QtW
@@ -509,3 +511,6 @@ class UiGhetool:
         self.menuLanguage.setTitle("Language")
         self.menuScenario.setTitle("Scenario")
         self.toolBar.setWindowTitle("toolBar")
+
+        if system() != "Windows":
+            self.toolBar.hide()
