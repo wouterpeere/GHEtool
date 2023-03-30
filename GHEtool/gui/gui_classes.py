@@ -15,6 +15,7 @@ There are three types of objects that can be put on the GUI.
 from __future__ import annotations
 
 import abc
+import copy
 from functools import partial as ft_partial
 from os.path import exists
 from typing import Callable, List, Optional, Tuple, Union
@@ -2276,7 +2277,7 @@ class ResultFigure(Category):
         -------
         None
         """
-        self.fig = fig
+        self.fig = copy.copy(fig)
         self.ax = fig.get_axes()[0]
         self.ax.set_xlabel(self.x_axes_text)
         self.ax.set_ylabel(self.y_axes_text)
