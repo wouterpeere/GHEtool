@@ -9,7 +9,7 @@ from GHEtool import *
 
 import pygfunction as gt
 
-data = GroundData(3, 10, 0.2)
+data = GroundConstantTemperature(3, 10)
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
 pipeData = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
 
@@ -79,6 +79,7 @@ def test_different_heating_cooling_peaks():
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(copy.copy(borefield_gt))
+    borefield.Rb = 0.2
 
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)  # maximum temperature
@@ -102,6 +103,7 @@ def test_stuck_in_loop():
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(copy.copy(borefield_gt))
+    borefield.Rb = 0.2
 
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)  # maximum temperature

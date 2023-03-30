@@ -19,7 +19,7 @@ class TestClass(BaseClass):
         self.test_numpy = np.array([15, 18, 16])
         self.test_set = set([12, 14, 16])
         self.test_dictionary = {"a": 1, "b": 2}
-        self.test_variable_class = GroundData(1, 2, 3)
+        self.test_variable_class = GroundConstantTemperature(1, 2)
         self.test_pygfunction = gt.boreholes.rectangle_field(2, 1, 6, 6, 100, 4, 0.075)
 
     def clear(self):
@@ -32,7 +32,7 @@ class TestClass(BaseClass):
         self.test_numpy = None
         self.test_set = None
         self.test_dictionary = None
-        self.test_variable_class = GroundData()
+        self.test_variable_class = GroundConstantTemperature()
         self.test_pygfunction = None
 
 
@@ -51,7 +51,7 @@ class TestClassesWithSlots(BaseClass):
         self.test_numpy = np.array([15, 18, 16])
         self.test_set = set([12, 14, 16])
         self.test_dictionary = {"a": 1, "b": 2}
-        self.test_variable_class = GroundData(1, 2, 3)
+        self.test_variable_class = GroundConstantTemperature(1, 2)
         self.test_pygfunction = gt.boreholes.rectangle_field(2, 1, 6, 6, 100, 4, 0.075)
 
     def clear(self):
@@ -64,7 +64,7 @@ class TestClassesWithSlots(BaseClass):
         self.test_numpy = None
         self.test_set = None
         self.test_dictionary = None
-        self.test_variable_class = GroundData()
+        self.test_variable_class = GroundConstantTemperature()
         self.test_pygfunction = None
 
 
@@ -80,7 +80,7 @@ def test_without_slots():
     assert dictionary["test_set"] == {'value': [16, 12, 14], 'type': 'set'}
     assert dictionary["test_numpy"] == {'value': [15, 18, 16], 'type': 'np.ndarray'}
     assert dictionary["test_dictionary"] == {"a": 1, "b": 2}
-    assert dictionary["test_variable_class"] == {'k_s': 1, 'Tg': 2, 'Rb': 3, 'flux': 0.06,
+    assert dictionary["test_variable_class"] == {'k_s': 1, 'Tg': 2,
                                                  'volumetric_heat_capacity': 2400000.0,
                                                  'alpha': 4.1666666666666667e-07}
     assert dictionary["test_pygfunction"] == {'value': [{'H': 100.0, 'D': 4.0, 'r_b': 0.075, 'x': 0.0, 'y': 0.0,
@@ -108,7 +108,7 @@ def test_without_slots():
     assert dictionary["test_set"] == {'value': [16, 12, 14], 'type': 'set'}
     assert dictionary["test_numpy"] == {'value': [15, 18, 16], 'type': 'np.ndarray'}
     assert dictionary["test_dictionary"] == {"a": 1, "b": 2}
-    assert dictionary["test_variable_class"] == {'k_s': 1, 'Tg': 2, 'Rb': 3, 'flux': 0.06,
+    assert dictionary["test_variable_class"] == {'k_s': 1, 'Tg': 2,
                                                  'volumetric_heat_capacity': 2400000.0,
                                                  'alpha': 4.1666666666666667e-07}
     assert dictionary["test_pygfunction"] == {'value': [{'H': 100.0, 'D': 4.0, 'r_b': 0.075, 'x': 0.0, 'y': 0.0,
@@ -129,7 +129,7 @@ def test_with_slots():
     assert dictionary["test_set"] == {'value': [16, 12, 14], 'type': 'set'}
     assert dictionary["test_numpy"] == {'value': [15, 18, 16], 'type': 'np.ndarray'}
     assert dictionary["test_dictionary"] == {"a": 1, "b": 2}
-    assert dictionary["test_variable_class"] == {'k_s': 1, 'Tg': 2, 'Rb': 3, 'flux': 0.06,
+    assert dictionary["test_variable_class"] == {'k_s': 1, 'Tg': 2,
                                                  'volumetric_heat_capacity': 2400000.0,
                                                  'alpha': 4.1666666666666667e-07}
     assert dictionary["test_pygfunction"] == {'value': [{'H': 100.0, 'D': 4.0, 'r_b': 0.075, 'x': 0.0, 'y': 0.0,
@@ -156,7 +156,7 @@ def test_with_slots():
     assert dictionary["test_set"] == {'value': [16, 12, 14], 'type': 'set'}
     assert dictionary["test_numpy"] == {'value': [15, 18, 16], 'type': 'np.ndarray'}
     assert dictionary["test_dictionary"] == {"a": 1, "b": 2}
-    assert dictionary["test_variable_class"] == {'k_s': 1, 'Tg': 2, 'Rb': 3, 'flux': 0.06,
+    assert dictionary["test_variable_class"] == {'k_s': 1, 'Tg': 2,
                                                  'volumetric_heat_capacity': 2400000.0,
                                                  'alpha': 4.1666666666666667e-07}
     assert dictionary["test_pygfunction"] == {'value': [{'H': 100.0, 'D': 4.0, 'r_b': 0.075, 'x': 0.0, 'y': 0.0,

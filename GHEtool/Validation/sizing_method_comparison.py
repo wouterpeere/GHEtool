@@ -8,7 +8,8 @@ import time
 import numpy as np
 import pygfunction as gt
 
-from GHEtool import Borefield, GroundData
+from GHEtool import Borefield, GroundConstantTemperature
+
 
 def sizing_method_comparison():
     number_of_iterations = 50
@@ -34,7 +35,7 @@ def sizing_method_comparison():
             peak_load_heating_array[i, j] = np.random.randint(monthly_load_heating_array[i, j], max_value_heating)
 
     # initiate borefield model
-    data = GroundData(3, 10, 0.2)
+    data = GroundConstantTemperature(3, 10)
     borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
 
     # Monthly loading values
@@ -61,6 +62,7 @@ def sizing_method_comparison():
                           baseload_cooling=monthly_load_cooling)
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)
+    borefield.Rb = 0.2
 
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)   # maximum temperature

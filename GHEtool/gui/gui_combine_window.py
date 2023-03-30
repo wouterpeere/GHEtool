@@ -755,15 +755,9 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
             version = saving['version']
         except (JSONDecodeError,  FileNotFoundError, UnicodeDecodeError):
-            try:
-                # try to open as pickle
-                with open(location, "rb") as file:
-                    saving = pk_load(file)
-                version = "2.1.0"
-            except (FileNotFoundError, ImportError):
-                raise ImportError("The datafile cannot be loaded!")
+            raise ImportError("The datafile cannot be loaded!")
 
-        if version == "2.1.1":
+        if version == "2.1.2":
             # write data to variables
             self.list_ds = []
             for val, borefield in zip(saving['values'], saving['borefields']):
@@ -776,22 +770,19 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             general_changes(saving['names'])
             return
 
-        if version == "2.1.0":
-            self.filename, li, settings = saving
+        if version == "2.1.1":
             # write data to variables
-            self.list_ds, li = li[0], li[1]
-
-            # since the borefield object is changed, this is deleted from the dataframe
-            for ds in self.list_ds:
+            self.list_ds = []
+            for val, borefield in zip(saving['values'], saving['borefields']):
+                ds = DataStorage(self.gui_structure)
+                ds.from_dict(val)
                 setattr(ds, 'borefield', None)
 
-            # convert to new ds format
-            for idx, ds in enumerate(self.list_ds):
-                ds_new = DataStorage(gui_structure=self.gui_structure)
-                [setattr(ds_new, name, getattr(ds, name)) for name in ds.__dict__ if hasattr(ds_new, name)]
-                self.list_ds[idx] = ds_new
-            # write scenario names
-            general_changes(li)
+                self.list_ds.append(ds)
+            # set and change the window title
+            self.filename = saving['filename']
+            general_changes(saving['names'])
+            return
 
     def _save_to_data(self, location: Union[str, PurePath]) -> None:
         """
