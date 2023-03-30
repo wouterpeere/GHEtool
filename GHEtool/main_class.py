@@ -1355,6 +1355,21 @@ class Borefield(BaseClass):
 
         return np.sum(self.baseload_cooling) - np.sum(self.baseload_heating)
 
+    @imbalance.setter
+    def imbalance(self, imbalance: float) -> None:
+        """
+        This is only used to insure backwards compatibility with v2.1.0
+
+        Parameters
+        ----------
+        imbalance
+
+        Returns
+        -------
+        None
+        """
+        return
+
     def _calculate_last_year_params(self, HC: bool) -> None:
         """
         This function calculates the parameters for the sizing based on the last year of operation.
