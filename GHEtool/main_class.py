@@ -37,7 +37,7 @@ class Borefield(BaseClass):
                 'gui', 'time_L3_last_year', 'peak_heating_external', 'peak_cooling_external', \
                 'monthly_load_heating_external', 'monthly_load_cooling_external', 'hourly_heating_load_external', \
                 'hourly_cooling_load_external', 'hourly_heating_load_on_the_borefield', 'hourly_cooling_load_on_the_borefield', \
-                'printing', 'combo', 'D', 'r_b', 'recalculation_needed', 'gfunction_calculation_object',\
+                'printing', 'combo', 'D', 'r_b', 'gfunction_calculation_object',\
                 'H_init', 'use_precalculated_data', '_sizing_setup'
 
     def __init__(self, simulation_period: int = 20, peak_heating: list = None,
@@ -122,7 +122,6 @@ class Borefield(BaseClass):
         self.H_init: float = 0.
         self.custom_gfunction: CustomGFunction = custom_gfunction
         self.gfunction_calculation_object: GFunction = GFunction()
-        self.recalculation_needed: bool = False
 
         ## params w.r.t. pygfunction
         self.options_pygfunction: dict = {"method": "equivalent"}
@@ -1001,10 +1000,8 @@ class Borefield(BaseClass):
                 if self.H == quadrant1:
                     self.limiting_quadrant = 1
                     # the last calculated temperature was for quadrant 4, which was the smaller one
-                    self.recalculation_needed = True
                 else:
                     self.limiting_quadrant = 4
-                    self.recalculation_needed = False
             else:
                 # injection dominated, so quadrants 2 and 3 are relevant
                 quadrant2 = self._size_based_on_temperature_profile(2)
@@ -1014,10 +1011,8 @@ class Borefield(BaseClass):
                 if self.H == quadrant2:
                     self.limiting_quadrant = 2
                     # the last calculation was for quadrant 3, which is the smaller one
-                    self.recalculation_needed = True
                 else:
                     self.limiting_quadrant = 3
-                    self.recalculation_needed = False
 
         return self.H
 
@@ -1059,10 +1054,8 @@ class Borefield(BaseClass):
                 if self.H == quadrant1:
                     self.limiting_quadrant = 1
                     # the last calculation was for quadrant 4, which is the smaller one
-                    self.recalculation_needed = True
                 else:
                     self.limiting_quadrant = 4
-                    self.recalculation_needed = False
             else:
                 # injection dominated, so quadrants 2 and 3 are relevant
                 quadrant2 = self._size_based_on_temperature_profile(2, hourly=True)
@@ -1072,10 +1065,8 @@ class Borefield(BaseClass):
                 if self.H == quadrant2:
                     self.limiting_quadrant = 2
                     # the last calculation was for quadrant 3, which is the smaller one
-                    self.recalculation_needed = True
                 else:
                     self.limiting_quadrant = 3
-                    self.recalculation_needed = False
 
         return self.H
 
@@ -1475,7 +1466,7 @@ class Borefield(BaseClass):
         """
         self._calculate_temperature_profile(H=depth, hourly=hourly)
 
-    def print_temperature_profile(self, legend: bool = True, plot_hourly: bool = False, recalculate: bool = False) -> None:
+    def print_temperature_profile(self, legend: bool = True, plot_hourly: bool = False) -> None:
         """
         This function plots the temperature profile for the calculated depth.
         It uses the available temperature profile data.
@@ -1486,23 +1477,18 @@ class Borefield(BaseClass):
             True if the legend should be printed
         plot_hourly : bool
             True if the temperature profile printed should be based on the hourly load profile.
-        recalculate : bool
-            True if the temperature profile should be calculated, regardless of this temperature profile
-            is already calculated.
 
         Returns
         -------
         fig, ax
             If the borefield object is part of the GUI, it returns the figure object
         """
-        # check if the data should be recalculated or no correct temperature profile is available
-        if recalculate or not self._check_temperature_profile_available(plot_hourly):
-            self._calculate_temperature_profile(hourly=plot_hourly)
+        # calculate temperature profile
+        self._calculate_temperature_profile(hourly=plot_hourly)
 
         return self._plot_temperature_profile(legend=legend, plot_hourly=plot_hourly)
 
-    def print_temperature_profile_fixed_depth(self, depth: float, legend: bool = True, plot_hourly: bool = False,
-                                              recalculate: bool = False):
+    def print_temperature_profile_fixed_depth(self, depth: float, legend: bool = True, plot_hourly: bool = False):
         """
         This function plots the temperature profile for a fixed depth.
         It uses the already calculated temperature profile data, if available.
@@ -1515,51 +1501,16 @@ class Borefield(BaseClass):
             True if the legend should be printed
         plot_hourly : bool
             True if the temperature profile printed should be based on the hourly load profile.
-        recalculate : bool
-            True if the temperature profile should be calculated, regardless of this temperature profile
-            is already calculated.
+
         Returns
         -------
         fig, ax
             If the borefield object is part of the GUI, it returns the figure object
         """
-        # check if the data should be recalculated or no correct temperature profile is available
-        # or the depth is different from the one already calculated
-        if recalculate or not self._check_temperature_profile_available(plot_hourly) or self.H != depth:
-            self._calculate_temperature_profile(H=depth, hourly=plot_hourly)
+        # calculate temperature profile
+        self._calculate_temperature_profile(H=depth, hourly=plot_hourly)
 
         return self._plot_temperature_profile(legend=legend, plot_hourly=plot_hourly)
-
-    def _check_temperature_profile_available(self, hourly: bool = True) -> bool:
-        """
-        This function checks whether or not the temperature profile is already calculated.
-
-        Parameters
-        ----------
-        hourly : bool
-            True if an hourly profile is wanted.
-
-        Returns
-        -------
-        bool
-            True if the needed temperatures are available
-        """
-        
-        if self.recalculation_needed:
-            self.recalculation_needed = False
-            return False
-
-        if hourly and np.array_equal(self.results_peak_heating, self.results_peak_cooling)\
-                and self.results_peak_cooling.any() and len(self.results_peak_cooling) == len(self.Tb)\
-                and self.results_peak_cooling.size == 8760 * self.simulation_period:
-            # this equals whenever an hourly calculation has been preformed
-            return True
-
-        if self.results_month_heating.any() and self.results_month_heating.size == self.simulation_period * 12\
-                and not hourly:
-            return True
-
-        return False
 
     def _plot_temperature_profile(self, legend: bool = True, plot_hourly: bool = False) -> Tuple[plt.Figure, plt.Axes]:
         """
@@ -1785,7 +1736,7 @@ class Borefield(BaseClass):
 
         ## 1 bypass any possible precalculated g-functions
 
-        # if calculate is False, than the gfunctions are calculated jit
+        # if calculate is False, then the gfunctions are calculated jit
         if not self.use_precalculated_data:
             return jit_gfunction_calculation()
 

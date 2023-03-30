@@ -588,17 +588,6 @@ def test_incorrect_values_peak_baseload(borefield):
         assert True
 
 
-def test_temperature_profile_available(hourly_borefield):
-    hourly_borefield.calculate_temperatures(100, True)
-    assert not hourly_borefield.recalculation_needed
-    assert hourly_borefield._check_temperature_profile_available(hourly=True)
-    hourly_borefield.recalculation_needed = True
-    assert not hourly_borefield._check_temperature_profile_available(True)
-
-    hourly_borefield.gui = True
-    hourly_borefield._plot_temperature_profile(plot_hourly=True)
-
-
 def test_set_options_gfunction_calculation(borefield):
     borefield.set_options_gfunction_calculation({"method": "equivalentt"})
     assert borefield.options_pygfunction["method"] == "equivalentt"
