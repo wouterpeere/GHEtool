@@ -44,7 +44,7 @@ class FIFO:
 
     def in_fifo_list(self, value: float) -> bool:
         """
-        This function checks whether or not the value is in the fifo list, but not the last element!
+        This function checks whether the value is in the fifo list, but not the last element!
 
         Parameters
         ----------
