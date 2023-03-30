@@ -769,11 +769,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             for val, borefield in zip(saving['values'], saving['borefields']):
                 ds = DataStorage(self.gui_structure)
                 ds.from_dict(val)
-                if borefield is None:
-                    setattr(ds, 'borefield', None)
-                else:
-                    setattr(ds, 'borefield', Borefield())
-                    getattr(ds, 'borefield')._from_dict(borefield)
+                setattr(ds, 'borefield', None)
                 self.list_ds.append(ds)
             # set and change the window title
             self.filename = saving['filename']
