@@ -1609,6 +1609,14 @@ class Borefield(BaseClass):
         self.results_month_heating = np.array([])
         self.results_month_cooling = np.array([])
         self.Tb = np.array([])
+        self.hourly_cooling_load_external = np.array([])
+        self.hourly_heating_load_external = np.array([])
+        self.peak_heating_external = np.array([])
+        self.peak_cooling_external = np.array([])
+        self.monthly_load_heating_external = np.array([])
+        self.monthly_load_cooling_external = np.array([])
+        self.hourly_heating_load_on_the_borefield = np.array([])
+        self.hourly_cooling_load_on_the_borefield = np.array([])
 
     def _calculate_temperature_profile(self, H: float = None, hourly: bool = False) -> None:
         """
