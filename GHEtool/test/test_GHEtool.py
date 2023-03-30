@@ -211,6 +211,8 @@ def test_hourly_to_monthly(borefield):
 
     assert np.isclose(np.sum(borefield.baseload_cooling), np.sum(borefield.hourly_cooling_load))
     assert np.isclose(np.sum(borefield.baseload_heating), np.sum(borefield.hourly_heating_load))
+    # check if hourly imbalance equals the monthly imbalance
+    assert np.isclose(borefield.imbalance, np.sum(borefield.baseload_cooling) - np.sum(borefield.baseload_heating))
 
 
 def test_size(borefield):

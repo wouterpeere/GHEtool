@@ -11,10 +11,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - In figure plotting, the interval[x[i], x[i+1]) now has the value y[i] (instead of y[i-1]).
 - Scroll behaviour on the result page (issue #99).
 - Changed icon of GHEtool.
+- Imbalance changed to property so it can handle hourly loads as well (issue #106).
 - Remove recalculation option (issue #109).
 
 ### Fixed
 - Wrong heating load in april in GUI (issue #94).
+- Results are now cleared when new loads are loaded (issue #106).
 
 ## [2.1.1] - 2023-01-30
 
