@@ -93,13 +93,13 @@ class Translations:  # pragma: no cover
         "ChooseCSV",
         "ChooseXLS",
         "ChooseXLSX",
-        "NoFileSelected",
+        "no_file_selected",
         "ValueError",
         "ColumnError",
-        "ChooseGHEtool",
+        "choose_load",
         "SaveFigure",
         "SaveData",
-        "SaveGHEtool",
+        "Save",
         "label_WarningCustomBorefield",
         "label_WarningDepth",
         "checkBox_SizeBorefield",
@@ -111,13 +111,13 @@ class Translations:  # pragma: no cover
         "label_Open",
         "label_Save_As",
         "Calculation_Finished",
-        "GHE_tool_imported",
-        "GHE_tool_imported_start",
+        "tool_imported",
+        "tool_imported_start",
         "label_new_scenario",
         "new_name",
         "label_okay",
         "label_abort",
-        "NoBackupFile",
+        "no_backup_file",
         "label_close",
         "label_cancel",
         "label_CancelTitle",
@@ -181,7 +181,7 @@ class Translations:  # pragma: no cover
         "label_ResOptimizeLoad5",
         "label_ResOptimizeLoad6",
         "pushButton_start_single",
-        "NotCalculated",
+        "not_calculated",
         "NoSolution",
         "aim_temp_profile",
         "aim_req_depth",
@@ -193,7 +193,7 @@ class Translations:  # pragma: no cover
         "option_method_temp_gradient",
         "option_method_rb_calc",
         "category_earth",
-        "cat_no_result",
+        "cat_no_results",
         "text_no_result",
         "numerical_results",
         "result_text_depth",
@@ -217,6 +217,8 @@ class Translations:  # pragma: no cover
         "option_len_peak_heating",
         "option_len_peak_cooling",
         "option_temperature_profile_hourly",
+        "option_ground_temp_gradient",
+        "option_n_threads",
         "languages",
     )
 
@@ -816,7 +818,7 @@ class Translations:  # pragma: no cover
             "Elija xls para cargar el archivo de datos",
             "Escolla xls para cargar o ficheiro de datos",
         ]
-        self.NoFileSelected: List[str] = [
+        self.no_file_selected: List[str] = [
             "No file selected.",
             "Keine Datei ausgewählt.",
             "Geen bestand geselecteerd.",
@@ -843,7 +845,7 @@ class Translations:  # pragma: no cover
             "Columna incorrecta: compruebe las columnas seleccionadas",
             "Columna incorrecta: comprobe as columnas escollidas",
         ]
-        self.ChooseGHEtool: List[str] = [
+        self.choose_load: List[str] = [
             "Choose *.GHEtool to load scenarios",
             "Wählen Sie *.GHEtool zum Laden von Szenarien",
             "Kies *.GHEtool bestand",
@@ -870,7 +872,7 @@ class Translations:  # pragma: no cover
             "Elija la localización del csv para guardar resultados",
             "Escolla a localización do csv para gardar resultados",
         ]
-        self.SaveGHEtool: List[str] = [
+        self.Save: List[str] = [
             "Choose *.GHEtool location to save scenarios",
             "Wählen Sie den *.GHEtool-Speicherort zum Speichern von Szenarien",
             "Kies gewenste *.GHEtool locatie",
@@ -946,7 +948,7 @@ class Translations:  # pragma: no cover
             "Calculation finished",
             "Calculation finished",
         ]
-        self.GHE_tool_imported: List[str] = [
+        self.tool_imported: List[str] = [
             "GHEtool imported",
             "GHEtool importiert",
             "GHEtool geïmporteerd",
@@ -955,7 +957,7 @@ class Translations:  # pragma: no cover
             "GHEtool imported",
             "GHEtool imported",
         ]
-        self.GHE_tool_imported_start: List[str] = [
+        self.tool_imported_start: List[str] = [
             "Start importing GHEtool",
             "Starte GHEtool zu importieren",
             "Start importering GHEtool",
@@ -976,7 +978,7 @@ class Translations:  # pragma: no cover
         self.new_name: List[str] = ["New name for ", "Neuer Name für ", "Nieuwe naam voor ", "New name for ", "New name for ", "New name for ", "New name for "]
         self.label_okay: List[str] = ["Okay ", "Okay ", "Oke ", "Okay ", "Okay ", "Okay ", "Okay "]
         self.label_abort: List[str] = ["Abort ", "Abbruch ", "Geannuleerd ", "Abort ", "Abort ", "Abort ", "Abort "]
-        self.NoBackupFile: List[str] = [
+        self.no_backup_file: List[str] = [
             "no backup fileImport",
             "Keine Sicherungsdatei gefunden",
             "geen backup fileImport",
@@ -1424,7 +1426,7 @@ class Translations:  # pragma: no cover
             "Calculate current scenario",
             "Calculate current scenario",
         ]
-        self.NotCalculated: List[str] = [
+        self.not_calculated: List[str] = [
             "Not calculated",
             "Noch nicht berechnet",
             "Niet berekend",
@@ -1532,7 +1534,7 @@ class Translations:  # pragma: no cover
             "Earth properties",
             "Earth properties",
         ]
-        self.cat_no_result: List[str] = ["No results", "Keine Ergebnisse", "Geen resultaten", "No results", "No results", "No results", "No results"]
+        self.cat_no_results: List[str] = ["No results", "Keine Ergebnisse", "Geen resultaten", "No results", "No results", "No results", "No results"]
         self.text_no_result: List[str] = [
             "No results are yet calculated",
             "Es wurden noch keine Ergebnisse berechnet",
@@ -1731,4 +1733,22 @@ class Translations:  # pragma: no cover
             "Should hourly data be used for the temperature profile?, no , yes ",
             "Should hourly data be used for the temperature profile?, no , yes ",
             "Should hourly data be used for the temperature profile?, no , yes",
+        ]
+        self.option_ground_temp_gradient: List[str] = [
+            "Ground temperature at infinity [°C]: ",
+            "Erdreichtemperatur in der Unendlichkeit [°C]: ",
+            "Grondtemperatuur op oneindig [°C]: ",
+            "Temperatura del terreno all'infinito [°C]: ",
+            "Température du sol à l'infini [°C]: ",
+            "Temperatura del suelo en el infinito [°C]: ",
+            "Temperatura do chan no infinito [°C]: ",
+        ]
+        self.option_n_threads: List[str] = [
+            "Number of parallel threads [-]: ",
+            "Anzahl an parallelen Prozessen [-]:",
+            "Number of parallel threads [-]: ",
+            "Number of parallel threads [-]: ",
+            "Number of parallel threads [-]: ",
+            "Number of parallel threads [-]: ",
+            "Number of parallel threads [-]: ",
         ]

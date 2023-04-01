@@ -1,14 +1,16 @@
 """
 script to start the GUI
 """
+import logging
 # pragma: no cover
 import sys
 from sys import argv
 from platform import system
 
-# import GHEtool.gui.gui_classes.gui_base_class as gui_base
-
-# gui_base.DARK = "rgb(0, 0, 0)"
+from GHEtool.gui.gui_structure import GUI
+from GHEtool.gui.gui_classes.translation_class import Translations
+from GHEtool import Borefield
+from GHEtool.gui.data_2_borefield_func import data_2_borefield
 
 os_system = system()
 is_frozen = getattr(sys, 'frozen', False) and os_system == 'Windows'  # pragma: no cover
@@ -51,7 +53,7 @@ def run(path_list=None):  # pragma: no cover
     # init window
     window = QtWidgets_QMainWindow()
     # init gui window
-    main_window = MainWindow(window, app)
+    main_window = MainWindow(window, app, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
     if is_frozen:
         pyi_splash.update_text('Loading ...')
     # load file if it is in path list
@@ -59,6 +61,8 @@ def run(path_list=None):  # pragma: no cover
         main_window.filename = ([path for path in path_list if path.endswith('.GHEtool')][0], 0)
         main_window.fun_load_known_filename()
 
+    ghe_logger = logging.getLogger()
+    ghe_logger.setLevel(logging.INFO)
     # show window
     if is_frozen:
         pyi_splash.close()

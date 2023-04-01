@@ -1,16 +1,16 @@
 """
 This file contains all the code for the borefield calculations.
 """
+from __future__ import annotations
+
 from math import pi
-from typing import List, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pygfunction as gt
-from scipy.signal import convolve
-
 from GHEtool.VariableClasses import CustomGFunction, FluidData, GFunction, GroundData, PipeData, SizingSetup, load_custom_gfunction
 from GHEtool.VariableClasses.BaseClass import BaseClass
+from scipy.signal import convolve
 
 
 class Borefield(BaseClass):
@@ -230,7 +230,7 @@ class Borefield(BaseClass):
         """
         self.number_of_boreholes = len(self.borefield) if self.borefield is not None else 0
 
-    def set_borefield(self, borefield: List[gt.boreholes.Borehole] = None) -> None:
+    def set_borefield(self, borefield: list[gt.boreholes.Borehole] = None) -> None:
         """
         This function set the borefield object.
 
@@ -317,7 +317,7 @@ class Borefield(BaseClass):
         return self._borefield
 
     @borefield.setter
-    def borefield(self, borefield: List[gt.boreholes.Borehole]=None) -> None:
+    def borefield(self, borefield: list[gt.boreholes.Borehole]=None) -> None:
         """
         This function sets the borefield configuration. When no input is given, the borefield variable will be deleted.
 
@@ -731,7 +731,7 @@ class Borefield(BaseClass):
 
         References
         ----------
-        .. [#Monzo] Monzo, P., M. Bernier, J. Acuna, and P. Mogensen. (2016). A monthly based bore field sizing methodology with applications to optimum borehole spacing. ASHRAE Transactions 122, 111–126.
+        .. [#Monzo] Monzo, P., M. Bernier, J. Acuna, and P. Mogensen. (2016). A monthly based bore field sizing methodology with applications to optimum borehole spacing. ASHRAE Transactions 122, 111-126.
         .. [#PeereBS] Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. (2021) Validated combined first and last year borefield sizing methodology. In Proceedings of International Building Simulation Conference 2021. Brugge (Belgium), 1-3 September 2021. https://doi.org/10.26868/25222708.2021.30180
         .. [#PeereThesis] Peere, W. (2020) Methode voor economische optimalisatie van geothermische verwarmings- en koelsystemen. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
         """
@@ -949,7 +949,7 @@ class Borefield(BaseClass):
                 quadrant4 = size_quadrant4()
                 self.H = max(quadrant1, quadrant4)
 
-                if self.H == quadrant1:
+                if quadrant1 == self.H:
                     self.limiting_quadrant = 1
                 else:
                     self.limiting_quadrant = 4
@@ -959,7 +959,7 @@ class Borefield(BaseClass):
                 quadrant3 = size_quadrant3()
                 self.H = max(quadrant2, quadrant3)
 
-                if self.H == quadrant2:
+                if quadrant2 == self.H:
                     self.limiting_quadrant = 2
                 else:
                     self.limiting_quadrant = 3
@@ -997,7 +997,7 @@ class Borefield(BaseClass):
                 quadrant4 = self._size_based_on_temperature_profile(4)
                 self.H = max(quadrant1, quadrant4)
 
-                if self.H == quadrant1:
+                if quadrant1 == self.H:
                     self.limiting_quadrant = 1
                     # the last calculated temperature was for quadrant 4, which was the smaller one
                     self.recalculation_needed = True
@@ -1010,7 +1010,7 @@ class Borefield(BaseClass):
                 quadrant3 = self._size_based_on_temperature_profile(3)
                 self.H = max(quadrant2, quadrant3)
 
-                if self.H == quadrant2:
+                if quadrant2 == self.H:
                     self.limiting_quadrant = 2
                     # the last calculation was for quadrant 3, which is the smaller one
                     self.recalculation_needed = True
@@ -1054,7 +1054,7 @@ class Borefield(BaseClass):
                 quadrant4 = self._size_based_on_temperature_profile(4, hourly=True)
                 self.H = max(quadrant1, quadrant4)
 
-                if self.H == quadrant1:
+                if quadrant1 == self.H:
                     self.limiting_quadrant = 1
                     # the last calculation was for quadrant 4, which is the smaller one
                     self.recalculation_needed = True
@@ -1067,7 +1067,7 @@ class Borefield(BaseClass):
                 quadrant3 = self._size_based_on_temperature_profile(3, hourly=True)
                 self.H = max(quadrant2, quadrant3)
 
-                if self.H == quadrant2:
+                if quadrant2 == self.H:
                     self.limiting_quadrant = 2
                     # the last calculation was for quadrant 3, which is the smaller one
                     self.recalculation_needed = True
@@ -1213,7 +1213,7 @@ class Borefield(BaseClass):
         """
         self.monthly_load = (self.baseload_cooling - self.baseload_heating) / Borefield.UPM
 
-    def set_baseload_heating(self, baseload: Union[np.ndarray, list]) -> None:
+    def set_baseload_heating(self, baseload: np.ndarray | list) -> None:
         """
         This function defines the baseload in heating both in an energy as in an average power perspective.
 
@@ -1231,9 +1231,9 @@ class Borefield(BaseClass):
         ValueError
             ValueError when the baseload is no list or np.ndarray
         """
-        if (isinstance(baseload, list) or isinstance(baseload, np.ndarray)) and len(baseload) != 12:
+        if (isinstance(baseload, (list, np.ndarray))) and len(baseload) != 12:
             raise ValueError("No correct list/array is given!")
-        if isinstance(baseload, float) or isinstance(baseload, int):
+        if isinstance(baseload, (float, int)):
             raise ValueError("No correct list/array is given!")
         self.baseload_heating = np.maximum(baseload, np.zeros(12))  # kWh
         self.monthly_load_heating = self.baseload_heating / Borefield.UPM  # kW
@@ -1243,7 +1243,7 @@ class Borefield(BaseClass):
         # new peak heating if baseload is larger than the peak
         self.set_peak_heating(np.maximum(self.peak_heating, self.monthly_load_heating))
 
-    def set_baseload_cooling(self, baseload: Union[np.array, list]) -> None:
+    def set_baseload_cooling(self, baseload: np.array | list) -> None:
         """
         This function defines the baseload in cooling both in an energy as in an average power perspective.
 
@@ -1261,9 +1261,9 @@ class Borefield(BaseClass):
         ValueError
             ValueError when the baseload is no list or np.ndarray
         """
-        if (isinstance(baseload, list) or isinstance(baseload, np.ndarray)) and len(baseload) != 12:
+        if (isinstance(baseload, (list, np.ndarray))) and len(baseload) != 12:
             raise ValueError("No correct list/array is given!")
-        if isinstance(baseload, float) or isinstance(baseload, int):
+        if isinstance(baseload, (float, int)):
             raise ValueError("No correct list/array is given!")
         self.baseload_cooling = np.maximum(baseload, np.zeros(12))  # kWh
         self.monthly_load_cooling = self.baseload_cooling / Borefield.UPM  # kW
@@ -1273,7 +1273,7 @@ class Borefield(BaseClass):
         # new peak cooling if baseload is larger than the peak
         self.set_peak_cooling(np.maximum(self.peak_cooling, self.monthly_load_cooling))
 
-    def set_peak_heating(self, peak_load: Union[np.ndarray, list]) -> None:
+    def set_peak_heating(self, peak_load: np.ndarray | list) -> None:
         """
         This function sets the peak heating to peak load heating.
 
@@ -1290,13 +1290,13 @@ class Borefield(BaseClass):
         ValueError
             ValueError when the peak_load is no list or np.ndarray
         """
-        if (isinstance(peak_load, list) or isinstance(peak_load, np.ndarray)) and len(peak_load) != 12:
+        if (isinstance(peak_load, (list, np.ndarray))) and len(peak_load) != 12:
             raise ValueError("No correct list/array is given!")
-        if isinstance(peak_load, float) or isinstance(peak_load, int):
+        if isinstance(peak_load, (float, int)):
             raise ValueError("No correct list/array is given!")
         self.peak_heating = np.maximum(peak_load, self.monthly_load_heating)
 
-    def set_peak_cooling(self, peak_load: Union[np.ndarray, list]) -> None:
+    def set_peak_cooling(self, peak_load: np.ndarray | list) -> None:
         """
         This function sets the peak cooling to peak load cooling.
 
@@ -1314,9 +1314,9 @@ class Borefield(BaseClass):
         ValueError
             ValueError when the peak_load is no list or np.ndarray
         """
-        if (isinstance(peak_load, list) or isinstance(peak_load, np.ndarray)) and len(peak_load) != 12:
+        if (isinstance(peak_load, (list, np.ndarray))) and len(peak_load) != 12:
             raise ValueError("No correct list/array is given!")
-        if isinstance(peak_load, float) or isinstance(peak_load, int):
+        if isinstance(peak_load, (float, int)):
             raise ValueError("No correct list/array is given!")
         self.peak_cooling = np.maximum(peak_load, self.monthly_load_cooling)
 
@@ -1523,7 +1523,7 @@ class Borefield(BaseClass):
         """
         # check if the data should be recalculated or no correct temperature profile is available
         # or the depth is different from the one already calculated
-        if recalculate or not self._check_temperature_profile_available(plot_hourly) or self.H != depth:
+        if recalculate or not self._check_temperature_profile_available(plot_hourly) or depth != self.H:
             self._calculate_temperature_profile(H=depth, hourly=plot_hourly)
 
         return self._plot_temperature_profile(legend=legend, plot_hourly=plot_hourly)
@@ -1559,7 +1559,7 @@ class Borefield(BaseClass):
 
         return False
 
-    def _plot_temperature_profile(self, legend: bool = True, plot_hourly: bool = False) -> Tuple[plt.Figure, plt.Axes]:
+    def _plot_temperature_profile(self, legend: bool = True, plot_hourly: bool = False) -> tuple[plt.Figure, plt.Axes]:
         """
         This function plots the temperature profile.
         If the Borefield object exists as part of the GUI, than the figure is returned,
@@ -1579,10 +1579,7 @@ class Borefield(BaseClass):
         """
 
         # make a time array
-        if plot_hourly:
-            time_array = self.time_L4 / 12 / 3600 / 730
-        else:
-            time_array = self.time_L3_last_year / 12 / 730. / 3600.
+        time_array = self.time_L4 / 12 / 3600 / 730 if plot_hourly else self.time_L3_last_year / 12 / 730.0 / 3600.0
 
         plt.rc('figure')
         # create new figure and axes if it not already exits otherwise clear it.
@@ -1742,7 +1739,7 @@ class Borefield(BaseClass):
         """
         self.options_pygfunction = options
 
-    def gfunction(self, time_value: Union[list, float, np.ndarray], H: float = None) -> np.ndarray:
+    def gfunction(self, time_value: list | float | np.ndarray, H: float = None) -> np.ndarray:
         """
         This function returns the gfunction value.
         It can do so by either calculating the gfunctions just-in-time or by interpolating from a
@@ -1788,7 +1785,7 @@ class Borefield(BaseClass):
             return jit_gfunction_calculation()
 
         ## 2 use precalculated g-functions when available
-        if not self.custom_gfunction is None:
+        if self.custom_gfunction is not None:
             # there is precalculated data available
             # check if the requested values can be calculated using the custom_gfunction
             if self.custom_gfunction.within_range(time_value, H):
@@ -1797,8 +1794,8 @@ class Borefield(BaseClass):
         ## 3 calculate g-function jit
         return jit_gfunction_calculation()
 
-    def create_custom_dataset(self, time_array: Union[list, np.ndarray] = None,
-                              depth_array: Union[list, np.ndarray] = None,
+    def create_custom_dataset(self, time_array: list | np.ndarray = None,
+                              depth_array: list | np.ndarray = None,
                               options: dict = {}) -> None:
         """
         This function makes a datafile for a given custom borefield and sets it for the borefield object.
@@ -2250,7 +2247,7 @@ class Borefield(BaseClass):
         # show plot
         plt.show()
 
-    def plot_load_duration(self, legend: bool = False) -> Tuple[plt.Figure, plt.Axes]:
+    def plot_load_duration(self, legend: bool = False) -> tuple[plt.Figure, plt.Axes]:
         """
         This function makes a load-duration curve from the hourly values.
 
@@ -2293,3 +2290,11 @@ class Borefield(BaseClass):
         if not self.gui:
             plt.show()
         return fig, ax
+
+    @staticmethod
+    def from_dict(dictionary: dict) -> Borefield:
+        """creates a class from dict data"""
+        borefield = Borefield()
+        BaseClass.from_dict(borefield, dictionary)
+        return borefield
+

@@ -14,7 +14,7 @@ from GHEtool.gui.gui_structure import load_data_GUI
 if TYPE_CHECKING:  # pragma: no cover
     from numpy.typing import NDArray
 
-    from GHEtool.gui.gui_classes.gui_data_storage import DataStorage
+    from ScenarioGUI.gui_classes.gui_data_storage import DataStorage
 
 
 def data_2_borefield(ds: DataStorage) -> Tuple[Borefield, partial[[], None]]:
@@ -55,7 +55,7 @@ def data_2_borefield(ds: DataStorage) -> Tuple[Borefield, partial[[], None]]:
     borefield.set_baseload_cooling(monthly_load_cooling)
 
     # set hourly loads if available
-    if ds.hourly_data:
+    if ds.option_temperature_profile_hourly == 1:
         data_unit = ds.option_unit_data
 
         peak_heating, peak_cooling = load_data_GUI(
