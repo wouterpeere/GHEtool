@@ -8,7 +8,7 @@ a = Analysis(
     ['start_gui.py'],
     pathex=[],
     binaries=[],
-    datas=[('..//..//setup.cfg', '.'), ('icons/', './GHEtool/gui/icons/'),('..//Examples//hourly_profile.csv', './GHEtool/Examples/')],
+    datas=[('..//..//setup.cfg', '.'), ('./gui_config.ini', '.'), ('icons/', './GHEtool/gui/icons/'),('..//Examples//hourly_profile.csv', './GHEtool/Examples/')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

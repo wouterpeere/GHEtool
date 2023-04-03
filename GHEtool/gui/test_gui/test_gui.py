@@ -225,6 +225,7 @@ def test_load_data_gui_errors():
     with raises(FileNotFoundError):
         load_data_GUI("no_existing_file.csv", 0, 'Heating', 'Cooling', 'Heating', ';', '.', 1)
 
+
 def test_file_import_errors(qtbot):
     main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
     main_window.delete_backup()
@@ -241,6 +242,8 @@ def test_file_import_errors(qtbot):
     main_window.gui_structure.fun_display_data()
     assert main_window.status_bar.widget.currentMessage() == main_window.translations.ColumnError[0]
     g_s.option_single_column.set_value(0)
+    g_s.option_heating_column.set_value(0)
+    g_s.option_cooling_column.set_value(1)
     g_s.option_filename.set_value(f'{FOLDER.joinpath("Examples/hourly_profile_wrong.csv")}')
     main_window.gui_structure.fun_display_data()
     assert main_window.status_bar.widget.currentMessage() == main_window.translations.ValueError[0]
