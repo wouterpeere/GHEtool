@@ -11,6 +11,29 @@ from pytest import raises
 setrecursionlimit(1500)
 
 
+def test_language(qtbot):
+    """
+    test if the language is changed correctly
+    Parameters
+    ----------
+    qtbot: qtbot
+        bot for the GUI
+    """
+    from GHEtool.gui.translation_csv_to_py import main
+
+    main()
+
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window.delete_backup()
+
+    for idx, action in enumerate(main_window.menu_language.actions()):
+        action.trigger()
+        assert main_window.gui_structure.option_language.get_value()[0] == idx
+
+    main_window.menu_language.actions()[0].trigger()
+    main_window.delete_backup()
+
+
 def test_wrong_results_shown(qtbot):
     """
     test if results are shown correctly.
@@ -209,15 +232,16 @@ def test_file_import_errors(qtbot):
     g_s = main_window.gui_structure
     g_s.option_filename.set_value("")
     main_window.gui_structure.fun_display_data()
-    assert main_window.status_bar.currentMessage() == main_window.translations.NoFileSelected[0]
+    assert main_window.status_bar.widget.currentMessage() == main_window.translations.no_file_selected[0]
 
     g_s.option_filename.set_value(f'{FOLDER.joinpath("Examples/hourly_profile.csv")}')
     g_s.fun_update_combo_box_data_file(f'{FOLDER.joinpath("Examples/hourly_profile.csv")}')
     g_s.option_single_column.widget.addItem('No Existing Column')
     g_s.option_single_column.set_value(-1)
     main_window.gui_structure.fun_display_data()
-    assert main_window.status_bar.currentMessage() == main_window.translations.ColumnError[0]
+    assert main_window.status_bar.widget.currentMessage() == main_window.translations.ColumnError[0]
+    g_s.option_single_column.set_value(0)
     g_s.option_filename.set_value(f'{FOLDER.joinpath("Examples/hourly_profile_wrong.csv")}')
     main_window.gui_structure.fun_display_data()
-    assert main_window.status_bar.currentMessage() == main_window.translations.ValueError[0]
+    assert main_window.status_bar.widget.currentMessage() == main_window.translations.ValueError[0]
 

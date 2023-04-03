@@ -1275,7 +1275,7 @@ class GUI(GuiStructure):
         columns = data.columns
         # clear comboBoxes and add column names
         # set column selection mode to 2 columns if more than one line exists
-        self.option_column.set_value(0 if len(columns) > 0 else 1)
+        self.option_column.set_value(1 if len(columns) > 0  else 0)
         options_columns = [self.option_heating_column, self.option_cooling_column, self.option_single_column]
         for list_box in options_columns:
             idx = list_box.get_value()[0]
@@ -1298,9 +1298,9 @@ class GUI(GuiStructure):
 
             loaded_data = load_data_GUI(filename=self.option_filename.get_value(),
                                         thermal_demand=self.option_column.get_value(),
-                                        heating_load_column=self.option_heating_column.widget.currentText(),
-                                        cooling_load_column=self.option_cooling_column.widget.currentText(),
-                                        combined=self.option_single_column.widget.currentText(),
+                                        heating_load_column=self.option_heating_column.get_value()[1],
+                                        cooling_load_column=self.option_cooling_column.get_value()[1],
+                                        combined=self.option_single_column.get_value()[1],
                                         sep=";" if self.option_seperator_csv.get_value() == 0 else ",",
                                         dec="." if self.option_decimal_csv.get_value() == 0 else ",",
                                         fac=0.001 if data_unit == 0 else 1 if data_unit == 1 else 1000)
@@ -1360,13 +1360,13 @@ class GUI(GuiStructure):
             self.option_cp_dec.set_value(peak_cooling[11])
         # raise error and display error massage in status bar
         except FileNotFoundError:
-            logging.error(self.translations.NoFileSelected[self.option_language.get_value()[0]], 5000)
+            logging.error(self.translations.no_file_selected[self.option_language.get_value()[0]])
             return
         except IndexError:
-            logging.error(self.translations.ValueError[self.option_language.get_value()[0]], 5000)
+            logging.error(self.translations.ValueError[self.option_language.get_value()[0]])
             return
         except KeyError:
-            logging.error(self.translations.ColumnError[self.option_language.get_value()[0]], 5000)
+            logging.error(self.translations.ColumnError[self.option_language.get_value()[0]])
             return
 
 

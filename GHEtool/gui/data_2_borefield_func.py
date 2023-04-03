@@ -4,20 +4,18 @@ function to create a borefield class from a datastorage
 from __future__ import annotations
 
 from functools import partial
-from typing import TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING
 
 import numpy as np
-
 from GHEtool import Borefield, FluidData, GroundData, PipeData
 from GHEtool.gui.gui_structure import load_data_GUI
 
 if TYPE_CHECKING:  # pragma: no cover
     from numpy.typing import NDArray
-
     from ScenarioGUI.gui_classes.gui_data_storage import DataStorage
 
 
-def data_2_borefield(ds: DataStorage) -> Tuple[Borefield, partial[[], None]]:
+def data_2_borefield(ds: DataStorage) -> tuple[Borefield, partial[[], None]]:
     # import bore field class from GHEtool and not in start up to save time
     from GHEtool import Borefield
 
@@ -55,18 +53,16 @@ def data_2_borefield(ds: DataStorage) -> Tuple[Borefield, partial[[], None]]:
     borefield.set_baseload_cooling(monthly_load_cooling)
 
     # set hourly loads if available
-    if ds.option_temperature_profile_hourly == 1:
-        data_unit = ds.option_unit_data
-
+    if ds.option_temperature_profile_hourly == 1 or ds.aim_optimize:
         peak_heating, peak_cooling = load_data_GUI(
             filename=ds.option_filename,
             thermal_demand=ds.option_column,
-            heating_load_column=ds.option_heating_column_text,
-            cooling_load_column=ds.option_cooling_column_text,
-            combined=ds.option_single_column_text,
+            heating_load_column=ds.option_heating_column[1],
+            cooling_load_column=ds.option_cooling_column[1],
+            combined=ds.option_single_column[1],
             sep=";" if ds.option_seperator_csv == 0 else ",",
             dec="." if ds.option_decimal_csv == 0 else ",",
-            fac=0.001 if data_unit == 0 else 1 if data_unit == 1 else 1000,
+            fac=0.001 if ds.option_unit_data == 0 else 1 if ds.option_unit_data == 1 else 1000,
             hourly=True)
 
         # hourly data to be loaded
@@ -154,7 +150,7 @@ def _create_ground_data(ds: DataStorage) -> GroundData:
                       ds.option_constant_rb, ds.option_heat_capacity * 1000, _calculate_flux(ds))
 
 
-def _create_monthly_loads_peaks(ds: DataStorage) -> Tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+def _create_monthly_loads_peaks(ds: DataStorage) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
     peak_heating: NDArray[np.float64] = np.array([ds.option_hp_jan, ds.option_hp_feb, ds.option_hp_mar, ds.option_hp_apr, ds.option_hp_may, ds.option_hp_jun,
                                                     ds.option_hp_jul, ds.option_hp_aug, ds.option_hp_sep, ds.option_hp_oct, ds.option_hp_nov, ds.option_hp_dec])
     peak_cooling: NDArray[np.float64] = np.array([ds.option_cp_jan, ds.option_cp_feb, ds.option_cp_mar, ds.option_cp_apr, ds.option_cp_may, ds.option_cp_jun,

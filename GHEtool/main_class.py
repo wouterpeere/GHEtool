@@ -1586,8 +1586,8 @@ class Borefield(BaseClass):
         fig = plt.figure()
         ax = fig.add_subplot(111)
         # set axes labels
-        ax.set_xlabel(r'Time (year)')
-        ax.set_ylabel(r'Temperature ($^\circ C$)')
+        ax.set_xlabel(r'Time (year)', color="white" if self.gui else "black")
+        ax.set_ylabel(r'Temperature ($^\circ C$)', color="white" if self.gui else "black")
 
         # plot Temperatures
         ax.step(time_array, self.Tb, 'k-', where="pre", lw=1.5, label="Tb")
@@ -2279,8 +2279,8 @@ class Borefield(BaseClass):
         # create 0 line
         ax.hlines(0, 0, 8759, color="black")
         # add labels
-        ax.set_xlabel("Time [hours]")
-        ax.set_ylabel("Power [kW]")
+        ax.set_xlabel("Time [hours]", color="white" if self.gui else "black")
+        ax.set_ylabel("Power [kW]", color="white" if self.gui else "black")
         # set x limits to 8760
         ax.set_xlim(0, 8760)
         # plot legend if wanted
@@ -2290,11 +2290,3 @@ class Borefield(BaseClass):
         if not self.gui:
             plt.show()
         return fig, ax
-
-    @staticmethod
-    def from_dict(dictionary: dict) -> Borefield:
-        """creates a class from dict data"""
-        borefield = Borefield()
-        BaseClass.from_dict(borefield, dictionary)
-        return borefield
-
