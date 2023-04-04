@@ -2118,21 +2118,21 @@ class Borefield(BaseClass):
 
         if print_results:
             # print results
-            print("The peak load heating is: ", int(peak_heat_load), "kW, leading to",
-                  np.round(np.sum(self.baseload_heating), 2), "kWh of heating.")
-            print("This is", np.round(np.sum(self.baseload_heating) / np.sum(self.hourly_heating_load) * 100, 2),
+            print("The peak load heating is: ", f'{peak_heat_load:.0f}', "kW, leading to",
+                  f'{np.sum(self.baseload_heating):.0f}', "kWh of heating.")
+            print("This is", f'{(np.sum(self.baseload_heating) / np.sum(self.hourly_heating_load) * 100):.0f}',
                   "% of the total heating load.")
-            print("Another", np.round(-np.sum(self.baseload_heating) + np.sum(self.hourly_heating_load), 2),
+            print("Another", f'{(-np.sum(self.baseload_heating) + np.sum(self.hourly_heating_load)):.0f}',
                   "kWh of heating should come from another source, with a peak of",
-                  int(max(self.hourly_heating_load)) - int(peak_heat_load), "kW.")
+                  f'{(max(self.hourly_heating_load) - peak_heat_load):.0f}', "kW.")
             print("------------------------------------------")
-            print("The peak load cooling is: ", int(peak_cool_load), "kW, leading to",
-                  np.round(np.sum(self.baseload_cooling), 2), "kWh of cooling.")
-            print("This is", np.round(np.sum(self.baseload_cooling) / np.sum(self.hourly_cooling_load) * 100, 2),
+            print("The peak load cooling is: ", f'{peak_cool_load:.0f}', "kW, leading to",
+                  f'{np.sum(self.baseload_cooling):.0f}', "kWh of cooling.")
+            print("This is", f'{(np.sum(self.baseload_cooling) / np.sum(self.hourly_cooling_load) * 100):.0f}',
                   "% of the total cooling load.")
-            print("Another", np.round(-np.sum(self.baseload_cooling) + np.sum(self.hourly_cooling_load), 2),
+            print("Another", f'{(-np.sum(self.baseload_cooling) + np.sum(self.hourly_cooling_load)):.0f}',
                   "kWh of cooling should come from another source, with a peak of",
-                  int(max(self.hourly_cooling_load)) - int(peak_cool_load), "kW.")
+                  f'{(max(self.hourly_cooling_load) - peak_cool_load):.0f}', "kW.")
 
             # plot results
             self.print_temperature_profile_fixed_depth(depth=depth)
