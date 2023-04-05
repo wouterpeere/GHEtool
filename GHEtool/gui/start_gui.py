@@ -7,6 +7,8 @@ import sys
 from sys import argv
 from platform import system
 
+import ScenarioGUI.global_settings
+
 from GHEtool.gui.gui_structure import GUI
 from GHEtool.gui.gui_classes.translation_class import Translations
 from GHEtool import Borefield
@@ -32,24 +34,20 @@ def run(path_list=None):  # pragma: no cover
     from PySide6.QtWidgets import QApplication as QtWidgets_QApplication
     from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
 
-    from GHEtool import FOLDER
     from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
+    import ScenarioGUI.global_settings as globs
+
+    globs.load(Path(__file__).parent.joinpath("gui_config.ini"))
 
     if is_frozen:
         pyi_splash.update_text('Loading ...')
 
     # init application
     app = QtWidgets_QApplication()
-    # get current version
-    config = ConfigParser()
-    config.read_file(open(Path(FOLDER).parent.joinpath('setup.cfg'), 'r'))
-    version = config.get('metadata', 'version')
-    # set version and id
-    myAppID = f'GHEtool v{version}'  # arbitrary string
     if os_system == 'Windows':
+        # set version and id
+        myAppID = f'GHEtool v{globs.VERSION}'  # arbitrary string
         ctypes_windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
-    app.setApplicationName('GHEtool')
-    app.setApplicationVersion(f'v{version}')
     # init window
     window = QtWidgets_QMainWindow()
     # init gui window
@@ -67,6 +65,7 @@ def run(path_list=None):  # pragma: no cover
     if is_frozen:
         pyi_splash.close()
 
+    print(ScenarioGUI.global_settings.FOLDER)
     window.showMaximized()
     # close app
     sys_exit(app.exec())
