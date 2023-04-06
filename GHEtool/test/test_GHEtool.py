@@ -1,10 +1,11 @@
 # test if model can be imported
+import copy
+from math import isclose
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pygfunction as gt
 import pytest
-import copy
-from math import isclose
 
 from GHEtool import *
 
@@ -624,6 +625,11 @@ def test_no_ground_data():
         borefield.size()
     except ValueError:
         assert True
+
+
+def test_logging(borefield):
+    borefield.activate_logger()
+    borefield.deactivate_logger()
 
 
 def test_value_error_cooling_dom_temp_gradient():

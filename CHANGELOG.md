@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [2.1.2] - [expected] feb 2023
 
 ### Added
+- Logger for GHEtool (issue #96).
+- Examples are now also in RTD.
 
 ### Changed
 - In figure plotting, the interval[x[i], x[i+1]) now has the value y[i] (instead of y[i-1]).

@@ -1,7 +1,8 @@
-import pygfunction as gt
-import numpy as np
-from typing import Union, Tuple, List
 import copy
+from typing import List, Tuple, Union
+
+import numpy as np
+import pygfunction as gt
 from scipy import interpolate
 
 from .CustomGFunction import _timeValues
