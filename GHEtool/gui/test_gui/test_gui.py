@@ -114,6 +114,29 @@ def test_translation_class():
             assert len(value) == len_ref
 
 
+def test_gui_filename_errors(qtbot):
+    """
+    test if all gui values are set and get correctly.
+
+    Parameters
+    ----------
+    qtbot: qtbot
+        bot for the GUI
+    """
+    # init gui window
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.remove_previous_calculated_results()
+    main_window.delete_backup()
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.remove_previous_calculated_results()
+
+    main_window.gui_structure.fun_update_combo_box_data_file("")
+    try:
+        main_window.gui_structure.fun_update_combo_box_data_file("C:/test.GHEtool")
+    except FileNotFoundError:
+        assert True
+
+
 def test_gui_values(qtbot):
     """
     test if all gui values are set and get correctly.

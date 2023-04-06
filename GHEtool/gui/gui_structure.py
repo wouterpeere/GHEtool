@@ -1415,8 +1415,6 @@ class GuiStructure:
         ----------
         index : int
             Index of the language
-        translation : Translations
-            Class with all the translations
 
         Returns
         -------
