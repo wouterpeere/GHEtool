@@ -301,6 +301,7 @@ class Borefield(BaseClass):
         """
         borefield = gt.boreholes.rectangle_field(N_1, N_2, B_1, B_2, H, D, r_b)
         self.set_borefield(borefield)
+
         return borefield
 
     def create_circular_borefield(self, N: int, R: float, H: float, D: float = 1, r_b: float = 0.075):
@@ -414,6 +415,7 @@ class Borefield(BaseClass):
         """
 
         self.custom_gfunction = load_custom_gfunction(location)
+        ghe_logger.info("Custom g-function has been loaded.")
 
     def set_investment_cost(self, investment_cost: list =None) -> None:
         """
@@ -500,11 +502,6 @@ class Borefield(BaseClass):
     def _set_time_constants(self) -> None:
         """
         This function calculates and sets the time constants for the L2 and L3 sizing.
-
-        Parameters
-        ----------
-        length_peak : float
-            Length of the peak [hours]
 
         Returns
         -------
@@ -687,8 +684,7 @@ class Borefield(BaseClass):
         """
         # check if all data is available
         if not self.pipe_data.check_values() or not self.fluid_data.check_values():
-            print("Please make sure you set al the pipe and fluid data.")
-            raise ValueError
+            raise ValueError("Please make sure you set al the pipe and fluid data.")
 
         # initiate temporary borefield
         borehole = gt.boreholes.Borehole(self.H, self.D, self.r_b, 0, 0)
@@ -909,12 +905,12 @@ class Borefield(BaseClass):
 
         # check if the field is not shallow
         if depth < self.THRESHOLD_WARNING_SHALLOW_FIELD and self.printing:
-            print(f"The field has a calculated depth of {round(depth, 2)} m which is lower than the proposed minimum "
-                  f"of {self.THRESHOLD_WARNING_SHALLOW_FIELD} m.")
-            print("Please change your configuration accordingly to have a not so shallow field.")
+            ghe_logger.warning(f"The field has a calculated depth of {round(depth, 2)}"
+                               f"m which is lower than the proposed minimum "
+                               f"of {self.THRESHOLD_WARNING_SHALLOW_FIELD} m."
+                               f"Please change your configuration accordingly to have a not so shallow field.")
 
-        ghe_logger.warning("The borefield has been sized.")
-
+        ghe_logger.info("The borefield has been sized.")
         return depth
 
     def size_L2(self, H_init: float, quadrant_sizing: int = 0) -> float:
@@ -1647,6 +1643,7 @@ class Borefield(BaseClass):
         self.monthly_load_cooling_external = np.array([])
         self.hourly_heating_load_on_the_borefield = np.array([])
         self.hourly_cooling_load_on_the_borefield = np.array([])
+        ghe_logger.info("Delete all stored temperatures from previous calculations.")
 
     def _calculate_temperature_profile(self, H: float = None, hourly: bool = False) -> None:
         """
@@ -1968,6 +1965,8 @@ class Borefield(BaseClass):
             self.set_hourly_heating_load(db.iloc[:, 1].tolist())
             self.set_hourly_cooling_load(db.iloc[:, 0].tolist())
 
+        ghe_logger.info("Hourly profile loaded!")
+
     def convert_hourly_to_monthly(self, peak_cooling_load: float = None, peak_heating_load: float = None) -> None:
         """
         This function converts self.hourly_cooling_load and self.hourly_heating_load to the monthly profiles used in the sizing.
@@ -2000,6 +1999,8 @@ class Borefield(BaseClass):
         self.set_peak_heating(self._reduce_to_peak_load(self.hourly_heating_load, peak_heating_load))
         self.set_baseload_cooling(self._reduce_to_monthly_load(self.hourly_cooling_load, peak_cooling_load))
         self.set_baseload_heating(self._reduce_to_monthly_load(self.hourly_heating_load, peak_heating_load))
+
+        ghe_logger.info("Hourly profile converted to monthly profile!")
 
     @staticmethod
     def _reduce_to_monthly_load(load: list, peak: float) -> list:
