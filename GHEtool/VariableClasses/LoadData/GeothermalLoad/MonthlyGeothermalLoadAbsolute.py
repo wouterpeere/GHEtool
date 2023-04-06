@@ -4,6 +4,7 @@ This file contains the code for the monthly geothermal load data where the load 
 import numpy as np
 
 from GHEtool.VariableClasses.LoadData._LoadData import _LoadData
+from GHEtool.logger.ghe_logger import ghe_logger
 
 
 class MonthlyGeothermalLoadAbsolute(_LoadData):
@@ -26,10 +27,13 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
 
     def _check_input(self, input) -> bool:
         if not isinstance(input, (np.array, list, tuple)):
+            ghe_logger.error("The load should be of type np.array, list or tuple.")
             return False
         if not len(input) == 12:
+            ghe_logger.error("The length of the load should be 12.")
             return False
         if np.min(input) < 0:
+            ghe_logger("No value in the load can be smaller than zero.")
             return False
 
     @property

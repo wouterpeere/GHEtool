@@ -666,7 +666,7 @@ def test_logging(borefield):
 
 
 def test_value_error_cooling_dom_temp_gradient():
-    data = GroundData(3, 12, 0.2)
+    data = GroundFluxTemperature(3, 10)
     borefield_pyg = gt.boreholes.rectangle_field(5, 5, 6, 6, 110, 4, 0.075)
     monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(1)
 
@@ -678,8 +678,7 @@ def test_value_error_cooling_dom_temp_gradient():
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_pyg)
-
-    borefield.sizing_setup(use_constant_Tg=False)
+    borefield.set_Rb(0.2)
 
     try:
         borefield.size()
