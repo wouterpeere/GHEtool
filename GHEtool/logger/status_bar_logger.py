@@ -9,7 +9,7 @@ from PySide6.QtWidgets import QStatusBar
 
 from GHEtool.gui.color_definition import WARNING, WHITE
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:   # pragma: no cover
     from logging import LogRecord
 
     from PySide6.QtWidgets import QWidget
