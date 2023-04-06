@@ -3,15 +3,14 @@ from __future__ import annotations
 import logging
 import pathlib
 from configparser import ConfigParser
-from json import JSONDecodeError,  load
+from json import JSONDecodeError, load
 from os.path import dirname, realpath
-
 from pickle import load as pk_load
 from sys import path
-from ScenarioGUI.gui_classes.gui_combine_window import MainWindow
-from ScenarioGUI.gui_classes.gui_data_storage import DataStorage
 
 from GHEtool import FOLDER, Borefield
+from ScenarioGUI import MainWindow
+from ScenarioGUI.gui_classes.gui_data_storage import DataStorage
 
 currentdir = dirname(realpath(__file__))
 parentdir = dirname(currentdir)
@@ -22,18 +21,19 @@ BACKUP_FILENAME: str = 'backup.GHEtoolBackUp'
 # get current version
 path = pathlib.Path(FOLDER).parent
 config = ConfigParser()
-config.read_file(open(path.joinpath('setup.cfg'), 'r'))
+config.read_file(open(path.joinpath('setup.cfg')))
 VERSION = config.get('metadata', 'version')
 
+from ScenarioGUI import load_config
 
-
+load_config(pathlib.Path(__file__).parent.parent.joinpath("gui_config.ini"))
 
 # main GUI class
 class MainWindow(MainWindow):
     """
     This class contains the general functionalities of the GUI (e.g. the handling of creating new scenarios,
     saving documents etc.)
-    """
+    """        
 
     def _load_from_data(self, location: str) -> None:
         """
@@ -64,26 +64,23 @@ class MainWindow(MainWindow):
 
         try:
             # open file and get data
-            with open(location, "r") as file:
+            with open(location) as file:
                 saving = load(file)
 
             version = saving['version']
         except FileNotFoundError:
-            logging.info(self.translations.no_file_selected[self.gui_structure.option_language.get_value()])
+            logging.info(self.translations.no_file_selected[self.gui_structure.option_language.get_value()[0]])
             return 
             #raise ImportError("The datafile cannot be loaded!")
         except (JSONDecodeError,  UnicodeDecodeError):
-            try:
-                # try to open as pickle
-                import GHEtool
-                from ScenarioGUI.gui_classes import gui_data_storage
-                GHEtool.gui.gui_data_storage = gui_data_storage
-                GHEtool.gui.gui_data_storage.DataStorage = gui_data_storage.DataStorage
-                with open(location, "rb") as file:
-                    saving = pk_load(file)
-                version = "2.1.0"
-            except (FileNotFoundError, ):
-                raise ImportError("The datafile cannot be loaded!")
+            # try to open as pickle
+            import GHEtool
+            from ScenarioGUI.gui_classes import gui_data_storage
+            GHEtool.gui.gui_data_storage = gui_data_storage
+            GHEtool.gui.gui_data_storage.DataStorage = gui_data_storage.DataStorage
+            with open(location, "rb") as file:
+                saving = pk_load(file)
+            version = "2.1.0"
 
         if version == "2.1.2":
             # write data to variables
@@ -108,7 +105,7 @@ class MainWindow(MainWindow):
             for val, borefield in zip(saving['values'], saving['borefields']):
                 ds = DataStorage(self.gui_structure)
                 ds.from_dict(val)
-                if borefield is None:
+                if borefield is None:  # pragma: no cover
                     setattr(ds, 'results', None)
                 else:
                     setattr(ds, 'results', Borefield())

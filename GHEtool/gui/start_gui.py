@@ -2,17 +2,16 @@
 script to start the GUI
 """
 import logging
+
 # pragma: no cover
 import sys
-from sys import argv
 from platform import system
+from sys import argv
 
-import ScenarioGUI.global_settings
-
-from GHEtool.gui.gui_structure import GUI
-from GHEtool.gui.gui_classes.translation_class import Translations
 from GHEtool import Borefield
 from GHEtool.gui.data_2_borefield_func import data_2_borefield
+from GHEtool.gui.gui_classes.translation_class import Translations
+from GHEtool.gui.gui_structure import GUI
 
 os_system = system()
 is_frozen = getattr(sys, 'frozen', False) and os_system == 'Windows'  # pragma: no cover
@@ -22,22 +21,17 @@ def run(path_list=None):  # pragma: no cover
     if is_frozen:
         import pyi_splash
         pyi_splash.update_text('Loading .')
-    from configparser import ConfigParser
     if os_system == 'Windows':
         from ctypes import windll as ctypes_windll
-    from pathlib import Path
     from sys import exit as sys_exit
 
     if is_frozen:
         pyi_splash.update_text('Loading ..')
 
+    from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
     from PySide6.QtWidgets import QApplication as QtWidgets_QApplication
     from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
-
-    from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
-    import ScenarioGUI.global_settings as globs
-
-    globs.load(Path(__file__).parent.joinpath("gui_config.ini"))
+    from ScenarioGUI.global_settings import VERSION
 
     if is_frozen:
         pyi_splash.update_text('Loading ...')
@@ -46,7 +40,7 @@ def run(path_list=None):  # pragma: no cover
     app = QtWidgets_QApplication()
     if os_system == 'Windows':
         # set version and id
-        myAppID = f'GHEtool v{globs.VERSION}'  # arbitrary string
+        myAppID = f'GHEtool v{VERSION}'  # arbitrary string
         ctypes_windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
     # init window
     window = QtWidgets_QMainWindow()
@@ -65,7 +59,6 @@ def run(path_list=None):  # pragma: no cover
     if is_frozen:
         pyi_splash.close()
 
-    print(ScenarioGUI.global_settings.FOLDER)
     window.showMaximized()
     # close app
     sys_exit(app.exec())
