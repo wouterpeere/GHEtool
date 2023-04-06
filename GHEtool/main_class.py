@@ -1,7 +1,6 @@
 """
 This file contains all the code for the borefield calculations.
 """
-import logging
 from math import pi
 from typing import List, Tuple, Union
 
@@ -12,6 +11,7 @@ from scipy.signal import convolve
 
 from GHEtool.VariableClasses import CustomGFunction, FluidData, GFunction, GroundData, PipeData, SizingSetup, load_custom_gfunction
 from GHEtool.VariableClasses.BaseClass import BaseClass
+from GHEtool.logger.ghe_logger import ghe_logger, console_handler, console_handler_warning
 
 
 class Borefield(BaseClass):
@@ -218,6 +218,32 @@ class Borefield(BaseClass):
 
         # set a custom borefield
         self.borefield = borefield
+
+        ghe_logger.info("Borefield object has been created.")
+
+    @staticmethod
+    def activate_logger() -> None:
+        """
+        This function activates the logging.
+
+        Returns
+        -------
+        None
+        """
+        ghe_logger.addHandler(console_handler)
+        ghe_logger.removeHandler(console_handler_warning)
+
+    @staticmethod
+    def deactivate_logger() -> None:
+        """
+        This function deactivates the logging.
+
+        Returns
+        -------
+        None
+        """
+        ghe_logger.removeHandler(console_handler)
+        ghe_logger.addHandler(console_handler_warning)
 
     def _set_number_of_boreholes(self) -> None:
         """
@@ -886,6 +912,8 @@ class Borefield(BaseClass):
             print(f"The field has a calculated depth of {round(depth, 2)} m which is lower than the proposed minimum "
                   f"of {self.THRESHOLD_WARNING_SHALLOW_FIELD} m.")
             print("Please change your configuration accordingly to have a not so shallow field.")
+
+        ghe_logger.warning("The borefield has been sized.")
 
         return depth
 

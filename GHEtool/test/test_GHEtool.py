@@ -627,6 +627,11 @@ def test_no_ground_data():
         assert True
 
 
+def test_logging(borefield):
+    borefield.activate_logger()
+    borefield.deactivate_logger()
+
+
 def test_value_error_cooling_dom_temp_gradient():
     data = GroundData(3, 12, 0.2)
     borefield_pyg = gt.boreholes.rectangle_field(5, 5, 6, 6, 110, 4, 0.075)

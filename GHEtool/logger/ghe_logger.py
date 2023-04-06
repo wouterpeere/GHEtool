@@ -67,7 +67,11 @@ log_file_path.mkdir(parents=True, exist_ok=True)
 file_handler = logging.FileHandler(log_file_path.joinpath('GHEtool.log'), mode='w')
 file_handler.setFormatter(log_format)
 ghe_logger.addHandler(file_handler)
-# add a console logger
+# add a console logger for info
 console_handler = logging.StreamHandler()
 console_handler.setFormatter(log_format)
-ghe_logger.addHandler(console_handler)
+# add a console logger for warnings (default)
+console_handler_warning = logging.StreamHandler()
+console_handler_warning.setLevel(logging.WARNING)
+console_handler_warning.setFormatter(log_format)
+ghe_logger.addHandler(console_handler_warning)
