@@ -132,10 +132,7 @@ def test_gui_filename_errors(qtbot):
     main_window.remove_previous_calculated_results()
 
     main_window.gui_structure.fun_update_combo_box_data_file("")
-    try:
-        main_window.gui_structure.fun_update_combo_box_data_file("C:/test.GHEtool")
-    except FileNotFoundError:
-        assert True
+    main_window.gui_structure.fun_update_combo_box_data_file("C:/test.GHEtool")
 
     try:
         load_data_GUI("", 1, "Heating", "Cooling", "Combined", 5, 6, 7)
