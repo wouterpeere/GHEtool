@@ -11,6 +11,7 @@ from sys import path
 from GHEtool import FOLDER, Borefield
 from ScenarioGUI import MainWindow
 from ScenarioGUI.gui_classes.gui_data_storage import DataStorage
+from ScenarioGUI import load_config
 
 currentdir = dirname(realpath(__file__))
 parentdir = dirname(currentdir)
@@ -24,16 +25,14 @@ config = ConfigParser()
 config.read_file(open(path.joinpath('setup.cfg')))
 VERSION = config.get('metadata', 'version')
 
-from ScenarioGUI import load_config
-
-load_config(pathlib.Path(__file__).parent.parent.joinpath("gui_config.ini"))
-
 # main GUI class
 class MainWindow(MainWindow):
     """
     This class contains the general functionalities of the GUI (e.g. the handling of creating new scenarios,
     saving documents etc.)
-    """        
+    """
+
+    load_config(pathlib.Path(__file__).parent.parent.joinpath("gui_config.ini"))
 
     def _load_from_data(self, location: str) -> None:
         """
