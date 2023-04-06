@@ -10,8 +10,9 @@ def run(path=None):  # pragma: no cover
     from PySide6.QtWidgets import QApplication as QtWidgets_QApplication
     from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
 
-    from GHEtool import FOLDER
+    from GHEtool import FOLDER, ghe_logger
     from GHEtool.gui.gui_combine_window import MainWindow
+    from GHEtool.logger.ghe_logger import console_handler, console_handler_warning
 
     # init application
     app = QtWidgets_QApplication()
@@ -39,6 +40,13 @@ def run(path=None):  # pragma: no cover
         pyi_splash.close()
     except ModuleNotFoundError:
         pass
+
+    # set logging to console
+    ghe_logger.addHandler(console_handler)
+    # remove warning handler
+    ghe_logger.removeHandler(console_handler_warning)
+
+    ghe_logger.info('GHEtool loaded!')
     window.showMaximized()
     # close app
     sys_exit(app.exec())

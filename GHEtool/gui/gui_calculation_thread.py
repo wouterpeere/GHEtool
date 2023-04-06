@@ -121,14 +121,14 @@ class CalcProblem(QtC.QThread):
                 # save bore field in Datastorage
                 self.DS.borefield = None
                 # return Datastorage as signal
-                self.any_signal.emit((self.DS, self.idx))
+                self.any_signal.emit((self.DS, self.idx, self))
                 return
             except RuntimeError:
                 # save bore field in Datastorage
                 self.DS.borefield = None
                 self.DS.ErrorMessage = self.translation.NotCalculated
                 # return Datastorage as signal
-                self.any_signal.emit((self.DS, self.idx))
+                self.any_signal.emit((self.DS, self.idx, self))
                 return
 
         ### Size borefield
@@ -141,14 +141,14 @@ class CalcProblem(QtC.QThread):
                 # save bore field in Datastorage
                 self.DS.borefield = None
                 # return Datastorage as signal
-                self.any_signal.emit((self.DS, self.idx))
+                self.any_signal.emit((self.DS, self.idx, self))
                 return
             except RuntimeError:
                 # save bore field in Datastorage
                 self.DS.borefield = None
                 self.DS.ErrorMessage = self.translation.NotCalculated
                 # return Datastorage as signal
-                self.any_signal.emit((self.DS, self.idx))
+                self.any_signal.emit((self.DS, self.idx, self))
                 return
 
         ### Size borefield by length and width
@@ -178,5 +178,5 @@ class CalcProblem(QtC.QThread):
         # save borefield in Datastorage
         self.DS.borefield = borefield
         # return Datastorage as signal
-        self.any_signal.emit((self.DS, self.idx))
+        self.any_signal.emit((self.DS, self.idx, self))
         return

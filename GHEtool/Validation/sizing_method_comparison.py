@@ -11,6 +11,7 @@ import pygfunction as gt
 from GHEtool import Borefield, GroundConstantTemperature
 
 
+
 def sizing_method_comparison():
     number_of_iterations = 50
     max_value_cooling = 700

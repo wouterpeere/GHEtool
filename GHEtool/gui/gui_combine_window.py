@@ -1,28 +1,30 @@
 from __future__ import annotations
+
+import pathlib
+import logging
+from configparser import ConfigParser
 from functools import partial as ft_partial
-from pickle import load as pk_load
-from json import dump, load, JSONDecodeError
+from json import JSONDecodeError, dump, load
 from os import makedirs, remove
 from os.path import dirname, exists, realpath
 from os.path import split as os_split
 from pathlib import Path, PurePath
+from pickle import load as pk_load
 from sys import path
-from typing import List, Tuple, Optional, Union
-from GHEtool import Borefield, FOLDER
-from configparser import ConfigParser
+from typing import List, Optional, Tuple, Union
 
 import PySide6.QtCore as QtC
 import PySide6.QtGui as QtG
 import PySide6.QtWidgets as QtW
-import pathlib
+
+from GHEtool import FOLDER, Borefield, ghe_logger
 
 from .gui_base_class import UiGhetool
 from .gui_calculation_thread import CalcProblem
+from .gui_classes import check_aim_options, show_linked_options
 from .gui_data_storage import DataStorage
 from .gui_structure import FigureOption, GuiStructure, Option
-from .gui_classes import check_aim_options, show_linked_options
 from .translation_class import Translations
-
 
 currentdir = dirname(realpath(__file__))
 parentdir = dirname(currentdir)
@@ -64,16 +66,16 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # init windows of parent class
         super(MainWindow, self).__init__()
         super().setup_ui(dialog)
-        # pyside6-rcc icons.qrc -o icons_rc.py
-
-        self.gui_structure = GuiStructure(self.central_widget, self.status_bar)
+        # add status bar logger to GHEtool logger
+        ghe_logger.addHandler(self.status_bar)
+        # init translation class
+        self.translations: Translations = Translations()
+        self.gui_structure = GuiStructure(self.central_widget, self.translations)
         for page in self.gui_structure.list_of_pages:
             page.create_page(self.central_widget, self.stackedWidget, self.verticalLayout_menu)
 
         self.verticalSpacer = QtW.QSpacerItem(20, 40, QtW.QSizePolicy.Minimum, QtW.QSizePolicy.Expanding)
         self.verticalLayout_menu.addItem(self.verticalSpacer)
-
-        # self.add_aims(list_button)
         # set app and dialog
         self.app: QtW.QApplication = app
         self.Dia = dialog
@@ -88,7 +90,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # check if backup folder exits and otherwise create it
         makedirs(dirname(self.backup_file), exist_ok=True)
         makedirs(dirname(self.default_path), exist_ok=True)
-        self.translations: Translations = Translations()  # init translation class
         for idx, (name, icon, short_cut) in enumerate(zip(self.translations.languages, self.translations.icon, self.translations.short_cut)):
             self._create_action_language(idx, name, icon, short_cut)
         # add languages to combo box
@@ -99,8 +100,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         self.changedFile: bool = False  # set change file variable to false
         self.ax: list = []  # axes of figure
         self.axBorehole = None
-        self.NumberOfScenarios: int = 1  # number of scenarios
-        self.finished: int = 1  # number of finished scenarios
+        self.n_threads: int = 1  # number of scenarios
         self.threads: List[CalcProblem] = []  # list of calculation threads
         self.list_ds: List[DataStorage] = []  # list of data storages
         self.sizeB = QtC.QSize(48, 48)  # size of big logo on push button
@@ -116,9 +116,9 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # load backup data
         self.load_backup()
         # add progress bar and label to statusbar
-        self.status_bar.addPermanentWidget(self.label_Status, 0)
-        self.status_bar.addPermanentWidget(self.progressBar, 1)
-        self.status_bar.messageChanged.connect(self.status_hide)
+        self.status_bar_progress_bar.addPermanentWidget(self.frame_progress_bar, 1)
+        #self.status_bar_progress_bar.addPermanentWidget(self.progressBar, 1)
+        self.status_bar.widget.messageChanged.connect(self.status_hide)
         # change window title to saved filename
         self.change_window_title()
         # reset push button size
@@ -130,7 +130,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
         [option.init_links() for option, _ in self.gui_structure.list_of_options]
 
-        self.status_bar.showMessage(self.translations.GHE_tool_imported[self.gui_structure.option_language.get_value()], 5000)
+        logging.info(self.translations.GHE_tool_imported[self.gui_structure.option_language.get_value()])
         # allow checking of changes
         self.checking: bool = True
 
@@ -585,9 +585,9 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         None
         """
         if text == "":
-            self.status_bar.hide()
+            self.status_bar.widget.hide()
             return
-        self.status_bar.show()
+        self.status_bar.widget.show()
 
     def eventFilter(self, obj: QtW.QPushButton, event) -> bool:
         """
@@ -656,7 +656,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
                 continue
             getattr(self, i).setText(getattr(self.translations, i)[self.gui_structure.option_language.get_value()])
         # set translation of toolbox items
-        self.gui_structure.translate(self.gui_structure.option_language.get_value(), self.translations)
+        self.gui_structure.translate(self.gui_structure.option_language.get_value())
         for idx, name in enumerate(self.translations.languages):
             self.gui_structure.option_language.widget.setItemText(idx, name)
         # set small PushButtons
@@ -705,7 +705,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # change language to english
         self.change_language()
         # show message that no backup file is found
-        self.status_bar.showMessage(self.translations.NoBackupFile[self.gui_structure.option_language.get_value()])
+        logging.warning(self.translations.NoBackupFile[self.gui_structure.option_language.get_value()])
 
     def fun_save_auto(self) -> None:
         """
@@ -812,10 +812,9 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             with open(location, "w") as file:
                 dump(saving, file, indent=1)
         except FileNotFoundError:
-            self.status_bar.showMessage(
-                self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
+            logging.error(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()])
         except PermissionError:
-            self.status_bar.showMessage("PermissionError", 5000)
+            logging.error("PermissionError")
 
     def fun_load(self) -> None:
         """
@@ -854,7 +853,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             self.checking: bool = True
         # if no file is found display error message is status bar
         except FileNotFoundError:
-            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
+            logging.error(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()])
 
     def fun_save_as(self) -> None:
         """
@@ -903,7 +902,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             return True
         # show file not found message in status bar if an error appears
         except FileNotFoundError:
-            self.status_bar.showMessage(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()], 5000)
+            logging.error(self.translations.NoFileSelected[self.gui_structure.option_language.get_value()])
             return False
 
     def fun_new(self) -> None:
@@ -973,7 +972,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         if not all(option.check_value() for option, _ in self.gui_structure.list_of_options):
             for option, _ in self.gui_structure.list_of_options:
                 if not option.check_value():
-                    self.status_bar.showMessage(f'Wrong value in option with label: {option.label_text}', 5000)
+                    logging.error(f'Wrong value in option with label: {option.label_text[0]}')
                     return False
         return True
 
@@ -1075,23 +1074,23 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # show label and progress bar if calculation started otherwise hide them
         if opt_start:
             self.label_Status.show()
-            self.progressBar.show()
-            self.status_bar.show()
+            self.status_bar_progress_bar.show()
+            self.status_bar.widget.show()
         else:
             self.label_Status.hide()
-            self.progressBar.hide()
+            self.status_bar_progress_bar.hide()
         # calculate percentage of calculated scenario
-        val = val / self.NumberOfScenarios
+        val = val / self.n_threads
         # set percentage to progress bar
         self.progressBar.setValue(round(val * 100))
         # hide labels and progressBar if all scenarios are calculated
         if val > 0.9999:
             self.label_Status.hide()
-            self.progressBar.hide()
+            self.status_bar_progress_bar.hide()
             # show message that calculation is finished
-            self.status_bar.showMessage(self.translations.Calculation_Finished[self.gui_structure.option_language.get_value()], 5000)
+            logging.info(self.translations.Calculation_Finished[self.gui_structure.option_language.get_value()])
 
-    def thread_function(self, results: Tuple[DataStorage, int]) -> None:
+    def thread_function(self, results: Tuple[DataStorage, int, CalcProblem]) -> None:
         """
         This function closes the thread of the old calculation and stores it results.
         It increments the number of calculated scenarios, and calls to update the progress bar.
@@ -1107,27 +1106,26 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         None
         """
         # stop finished thread
-        self.threads[self.finished].terminate()
+        results[2].terminate()
 
         self.list_ds[results[1]] = results[0]
-
-        # count number of finished calculated scenarios
-        self.finished += 1
+        open_threads = [thread for thread in self.threads if not thread.isRunning() and not thread.isFinished()]
+        n_closed_threads = len(self.threads) - len(open_threads)
         # update progress bar
-        self.update_bar(self.finished, True)
+        self.update_bar(n_closed_threads, True)
         # if number of finished is the number that has to be calculated enable buttons and actions and change page to
         # results page
-        if self.finished == self.NumberOfScenarios:
-            self.pushButton_start_multiple.setEnabled(True)
-            self.pushButton_start_single.setEnabled(True)
-            self.pushButton_SaveScenario.setEnabled(True)
-            self.action_start_single.setEnabled(True)
-            self.action_start_multiple.setEnabled(True)
-            self.gui_structure.page_result.button.click()
+        if open_threads:        # start new thread
+            open_threads[0].start()
+            open_threads[0].any_signal.connect(self.thread_function)
             return
-        # start new thread
-        self.threads[self.finished].start()
-        self.threads[self.finished].any_signal.connect(self.thread_function)
+        self.pushButton_start_multiple.setEnabled(True)
+        self.pushButton_start_single.setEnabled(True)
+        self.pushButton_SaveScenario.setEnabled(True)
+        self.action_start_single.setEnabled(True)
+        self.action_start_multiple.setEnabled(True)
+        self.gui_structure.page_result.button.click()
+        return
 
     def start_multiple_scenarios_calculation(self) -> None:
         """
@@ -1147,8 +1145,8 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # create list of threads with scenarios that have not been calculated
         self.threads = [CalcProblem(DS, idx) for idx, DS in enumerate(self.list_ds) if DS.borefield is None]
         # set number of to calculate scenarios
-        self.NumberOfScenarios: int = len(self.threads)
-        if self.NumberOfScenarios < 1:
+        self.n_threads: int = len(self.threads)
+        if self.n_threads < 1:
             return
         # disable buttons and actions to avoid two calculation at once
         self.pushButton_start_multiple.setEnabled(False)
@@ -1156,15 +1154,18 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         self.pushButton_SaveScenario.setEnabled(False)
         self.action_start_single.setEnabled(False)
         self.action_start_multiple.setEnabled(False)
-        # initialize finished scenarios counting variable
-        self.finished: int = 0
         # update progress bar
         self.update_bar(0, True)
         # start calculation if at least one scenario has to be calculated
+        """
         if self.NumberOfScenarios > 0:
             self.threads[0].start()
             self.threads[0].any_signal.connect(self.thread_function)
             return
+        """
+        for thread in self.threads[:self.gui_structure.option_n_threads.get_value()]:
+            thread.start()
+            thread.any_signal.connect(self.thread_function)
 
     def start_current_scenario_calculation(self, no_run: bool = False) -> None:
         """
@@ -1200,14 +1201,12 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         self.pushButton_SaveScenario.setEnabled(False)
         self.action_start_single.setEnabled(False)
         self.action_start_multiple.setEnabled(False)
-        # initialize finished scenarios counting variable
-        self.finished: int = 0
         # update progress bar
         self.update_bar(0, True)
         # create list of threads with calculation to be made
         self.threads = [CalcProblem(ds, idx)]
         # set number of to calculate scenarios
-        self.NumberOfScenarios: int = len(self.threads)
+        self.n_threads: int = len(self.threads)
         # start calculation
         if not no_run:
             self.threads[0].start()
@@ -1299,11 +1298,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         This function is called when the gui is closed. It will prompt a window asking if potential changes
         need to be saved.
 
-        Parameters
-        ----------
-        event
-            closing event
-
         Returns
         -------
         None
@@ -1311,6 +1305,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # close app if nothing has been changed
         if not self.changedFile:
             event.accept()
+            logging.info("GHEtool closed")
             return
         # create message box
         self.dialog: QtW.QMessageBox = QtW.QMessageBox(self.Dia)
@@ -1340,7 +1335,9 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         if reply == QtW.QMessageBox.Cancel:
             # cancel closing event
             event.ignore()
+            logging.info("GHEtool closing cancelled")
             return
+        logging.info("GHEtool closed")
         # check if inputs should be saved and if successfully set closing variable to true
         close: bool = self.fun_save() if reply == QtW.QMessageBox.Save else True
         # stop all calculation threads

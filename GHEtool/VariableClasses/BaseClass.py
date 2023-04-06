@@ -2,9 +2,9 @@
 This document contains the information for the BaseClass.
 This class is used as a super class for different variable classes.
 """
-import numpy as np
 from typing import List
 
+import numpy as np
 from pygfunction.boreholes import Borehole
 
 
@@ -107,19 +107,19 @@ class BaseClass:
                 # note that this can mean that the value is a dictionary, or it is a np.ndarray, set or tuple
                 keys = value.keys()
                 if len(keys) == 2 and "type" in keys and "value" in keys:
-                    type = value["type"]
+                    var_type = value["type"]
                     _value = value["value"]
 
-                    if type == "set":
+                    if var_type == "set":
                         setattr(self, key, set(_value))
                         continue
-                    if type == "np.ndarray":
+                    if var_type == "np.ndarray":
                         setattr(self, key, np.array(_value))
                         continue
-                    if type == "tuple":
+                    if var_type == "tuple":
                         setattr(self, key, tuple(_value))
                         continue
-                    if type == "pygfunction.Borehole":
+                    if var_type == "pygfunction.Borehole":
                         borefield = [Borehole(H=borehole["H"],
                                               D=borehole["D"],
                                               r_b=borehole["r_b"],

@@ -1,15 +1,17 @@
 import os
 from math import isclose
+from sys import setrecursionlimit
 from typing import List, Union
 
-from sys import setrecursionlimit
-from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
-from GHEtool.gui.gui_combine_window import MainWindow
 import PySide6.QtCore as QtC
 import PySide6.QtWidgets as QtW
+from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
 
 from GHEtool import FOLDER
 from GHEtool.gui.gui_classes import ButtonBox, FigureOption, FileNameBox, FloatBox, IntBox, ListBox
+from GHEtool.gui.gui_combine_window import MainWindow
+from GHEtool.gui.gui_structure import load_data_GUI
+from GHEtool.gui.translation_class import Translations
 
 setrecursionlimit(1500)
 
@@ -101,6 +103,46 @@ def test_scrolling(qtbot):
     assert val_after == val_before
 
 
+def test_translation_class():
+    """
+    Checks if all entries in the translation class have the same length
+    """
+    translations = Translations()
+    len_ref = len(translations.languages)
+    for name in translations.__slots__:
+        value = getattr(translations, name)
+        if isinstance(value, list):
+            assert len(value) == len_ref
+
+
+def test_gui_filename_errors(qtbot):
+    """
+    test if all gui values are set and get correctly.
+
+    Parameters
+    ----------
+    qtbot: qtbot
+        bot for the GUI
+    """
+    # init gui window
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.remove_previous_calculated_results()
+    main_window.delete_backup()
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.remove_previous_calculated_results()
+
+    main_window.gui_structure.fun_update_combo_box_data_file("")
+    main_window.gui_structure.fun_update_combo_box_data_file("C:/test.GHEtool")
+
+    try:
+        load_data_GUI("", 1, "Heating", "Cooling", "Combined", 5, 6, 7)
+    except FileNotFoundError:
+        assert True
+    try:
+        load_data_GUI("C:/test.GHEtool", 1, "Heating", "Cooling", "Combined", 5, 6, 7)
+    except FileNotFoundError:
+        assert True
+
 
 def test_gui_values(qtbot):
     """
@@ -140,7 +182,7 @@ def test_gui_values(qtbot):
                 assert isclose(option.get_value(), option.minimal_value)
                 continue
             val = option.get_value() + option.step
-            val = val - 2 * option.step if option.widget.maximum() > val else val
+            val = val - 2 * option.step if option.widget.maximum() < val else val
             if val < option.widget.minimum():
                 continue
             option.set_value(val)
@@ -538,9 +580,11 @@ def test_save_load_new(qtbot):
     qtbot: qtbot
         bot for the GUI
     """
-    import keyboard
-    import pathlib
     import os
+    import pathlib
+
+    import keyboard
+
     # init gui window
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
     main_window.delete_backup()
@@ -600,6 +644,7 @@ def test_close(qtbot):
         bot for the GUI
     """
     import keyboard
+
     # init gui window
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
     main_window.delete_backup()
@@ -694,6 +739,7 @@ def test_no_load_save_file(qtbot):
         bot for the GUI
     """
     from pytest import raises
+
     # init gui window
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
     main_window.delete_backup()
@@ -703,7 +749,7 @@ def test_no_load_save_file(qtbot):
         main_window._load_from_data('not_there.GHEtool')
     # check if the current error message is shown with a wrong save file/folder
     main_window._save_to_data('hello/not_there.GHEtool')
-    assert main_window.status_bar.currentMessage() == main_window.translations.NoFileSelected[main_window.gui_structure.option_language.get_value()]
+    assert main_window.status_bar.widget.currentMessage() == main_window.translations.NoFileSelected[main_window.gui_structure.option_language.get_value()]
 
 
 def test_change_scenario(qtbot):
@@ -817,13 +863,13 @@ def test_change_scenario(qtbot):
 def test_repr(qtbot):
     # init gui window
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
-    assert main_window.gui_structure.figure_temperature_profile.__repr__() == "ResultFigure; Label: Temperature evolution"
+    assert main_window.gui_structure.figure_temperature_profile.__repr__() == "ResultFigure; Label: Temperature evolution, Temperature [°C], Time [years]"
     assert main_window.gui_structure.category_language.__repr__() == "Category; Label: Language: "
-    assert main_window.gui_structure.option_toggle_buttons.__repr__() == "ButtonBox; Label: Use toggle buttons?:; Value: 1"
+    assert main_window.gui_structure.option_toggle_buttons.__repr__() == "ButtonBox; Label: Use toggle buttons?:, no , yes ; Value: 1"
     assert main_window.gui_structure.hint_peak_heating.__repr__() == "Hint; Hint: Heating peak; Warning: False"
     assert main_window.gui_structure.option_conductivity.__repr__() == "FloatBox; Label: Conductivity of the soil [W/mK]: ; Value: 4.0"
     assert main_window.gui_structure.option_width.__repr__() == "IntBox; Label: Width of rectangular field [#]: ; Value: 9"
-    assert main_window.gui_structure.legend_figure_temperature_profile.__repr__() == "FigureOption; Label: Show legend?; Value: ('legend', False)"
+    assert main_window.gui_structure.legend_figure_temperature_profile.__repr__() == "FigureOption; Label: Show legend?, No , Yes ; Value: ('legend', False)"
 
 
 def test_backward_compatibility(qtbot):
@@ -836,7 +882,9 @@ def test_backward_compatibility(qtbot):
         bot for the GUI
     """
     import numpy as np
+
     from GHEtool import FOLDER
+
     # init gui window
     main_window_old = MainWindow(QtWidgets_QMainWindow(), qtbot)
     main_window_old._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_2_1_1.GHEtool')

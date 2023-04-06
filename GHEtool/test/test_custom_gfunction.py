@@ -1,8 +1,8 @@
-import pytest
 import numpy as np
+import pygfunction as gt
+import pytest
 
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction
-import pygfunction as gt
 
 
 @pytest.fixture

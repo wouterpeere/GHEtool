@@ -1,10 +1,11 @@
 # test if model can be imported
+import copy
+from math import isclose
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pygfunction as gt
 import pytest
-import copy
-from math import isclose
 
 from GHEtool import *
 
@@ -394,6 +395,13 @@ def test_size_L4_without_data(borefield):
 def test_load_duration(monkeypatch, hourly_borefield):
     monkeypatch.setattr(plt, 'show', lambda: None)
     hourly_borefield.plot_load_duration(legend=True)
+    hourly_borefield.optimise_load_profile(150)
+    hourly_borefield.print_temperature_profile(plot_hourly=True)
+
+
+def test_plot_hourly(monkeypatch, hourly_borefield):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    hourly_borefield.print_temperature_profile(plot_hourly=True)
 
 
 def test_load_duration_no_hourly_data(borefield):
@@ -646,6 +654,33 @@ def test_no_ground_data():
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)  # maximum temperature
     borefield.set_min_ground_temperature(0)  # minimum temperature
+    try:
+        borefield.size()
+    except ValueError:
+        assert True
+
+
+def test_logging(borefield):
+    borefield.activate_logger()
+    borefield.deactivate_logger()
+
+
+def test_value_error_cooling_dom_temp_gradient():
+    data = GroundData(3, 12, 0.2)
+    borefield_pyg = gt.boreholes.rectangle_field(5, 5, 6, 6, 110, 4, 0.075)
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(1)
+
+    borefield = Borefield(simulation_period=20,
+                          peak_heating=peak_heating,
+                          peak_cooling=peak_cooling,
+                          baseload_heating=monthly_load_heating,
+                          baseload_cooling=monthly_load_cooling)
+
+    borefield.set_ground_parameters(data)
+    borefield.set_borefield(borefield_pyg)
+
+    borefield.sizing_setup(use_constant_Tg=False)
+
     try:
         borefield.size()
     except ValueError:

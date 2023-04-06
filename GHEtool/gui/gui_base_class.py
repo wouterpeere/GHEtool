@@ -11,6 +11,8 @@ from matplotlib.colors import to_rgb
 from numpy import array, float64
 
 import GHEtool.gui.icons_rc
+from GHEtool.gui.color_definition import BLACK, DARK, GREY, LIGHT, LIGHT_SELECT, WARNING, WHITE, dark_matplotlib, white_matplotlib
+from GHEtool.logger.status_bar_logger import StatusBar
 
 WHITE: str = "rgb(255, 255, 255)"
 LIGHT: str = "rgb(84, 188, 235)"
@@ -61,7 +63,7 @@ class UiGhetool:
     """
 
     menuLanguage: QtW.QMenu
-    status_bar: QtW.QStatusBar
+    status_bar: StatusBar
     toolBar: QtW.QToolBar
     menuScenario: QtW.QMenu
     menuSettings: QtW.QMenu
@@ -72,9 +74,9 @@ class UiGhetool:
     pushButton_start_single: QtW.QPushButton
     horizontalSpacer_2: QtW.QSpacerItem
     progressBar: QtW.QProgressBar
-    horizontalLayout_2: QtW.QHBoxLayout
+    horizontalLayout_start_buttons: QtW.QHBoxLayout
     label_Status: QtW.QLabel
-    horizontalLayout_7: QtW.QHBoxLayout
+    horizontalLayout_progress_bar: QtW.QHBoxLayout
     stackedWidget: QtW.QStackedWidget
     verticalLayout_21: QtW.QVBoxLayout
     verticalLayout_menu: QtW.QVBoxLayout
@@ -83,6 +85,8 @@ class UiGhetool:
     pushButton_SaveScenario: QtW.QPushButton
     verticalLayout_scenario: QtW.QVBoxLayout
     horizontalLayout_23: QtW.QHBoxLayout
+    verticalLayout_gui_structure: QtW.QVBoxLayout
+    horizontalLayout_gui_structure: QtW.QHBoxLayout
     central_widget: QtW.QWidget
     pushButton_DeleteScenario: QtW.QPushButton
     action_start_single: QtG.QAction
@@ -285,11 +289,18 @@ class UiGhetool:
 
         self.horizontalLayout_23.addLayout(self.verticalLayout_scenario)
 
+        self.verticalLayout_gui_structure = QtW.QVBoxLayout()
+        self.verticalLayout_gui_structure.setObjectName("verticalLayout_gui_structure")
+
+        self.horizontalLayout_gui_structure = QtW.QHBoxLayout()
+        self.horizontalLayout_gui_structure.setObjectName("horizontalLayout_gui_structure")
+        self.verticalLayout_gui_structure.addLayout(self.horizontalLayout_gui_structure)
+
         self.verticalLayout_menu = QtW.QVBoxLayout()
         self.verticalLayout_menu.setSpacing(0)
         self.verticalLayout_menu.setObjectName("verticalLayout_menu")
 
-        self.horizontalLayout_23.addLayout(self.verticalLayout_menu)
+        self.horizontalLayout_gui_structure.addLayout(self.verticalLayout_menu)
 
         self.verticalLayout_21 = QtW.QVBoxLayout()
         self.verticalLayout_21.setObjectName("verticalLayout_21")
@@ -300,30 +311,21 @@ class UiGhetool:
 
         self.verticalLayout_21.addWidget(self.stackedWidget)
 
-        self.horizontalLayout_7 = QtW.QHBoxLayout()
-        self.horizontalLayout_7.setObjectName("horizontalLayout_7")
-        self.label_Status = QtW.QLabel(self.central_widget)
-        self.label_Status.setObjectName("label_Status")
-        self.label_Status.setStyleSheet(f"*{'{'}background-color: {LIGHT};{'}'}")
-        self.horizontalLayout_7.addWidget(self.label_Status)
-
-        self.progressBar = QtW.QProgressBar(self.central_widget)
-        self.progressBar.setObjectName("progressBar")
-        self.progressBar.setStyleSheet(
-            f"QProgressBar{'{'}border: 1px solid {WHITE};border-radius: 10px;text-align: center;color: {WHITE};{'}'}\n"
-            f"QProgressBar::chunk{'{'}background-color: {LIGHT}; border-radius: 10px;{'}'}"
-        )
-        self.progressBar.setValue(24)
-
-        self.horizontalLayout_7.addWidget(self.progressBar)
-
-        self.verticalLayout_21.addLayout(self.horizontalLayout_7)
-
-        self.horizontalLayout_2 = QtW.QHBoxLayout()
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.horizontalLayout_start_buttons = QtW.QHBoxLayout()
+        self.horizontalLayout_start_buttons.setObjectName("horizontalLayout_start_buttons")
         self.horizontalSpacer_2 = QtW.QSpacerItem(40, 20, QtW.QSizePolicy.Expanding, QtW.QSizePolicy.Minimum)
 
-        self.horizontalLayout_2.addItem(self.horizontalSpacer_2)
+        self.status_bar = StatusBar(ghe_tool)
+        self.status_bar.widget.setObjectName("status_bar")
+        self.status_bar.widget.setStyleSheet(f"QStatusBar::item{'{'}border:None;{'}'}QStatusBar{'{'}color:{BLACK};background-color: {LIGHT};{'}'}")
+        # ghe_tool.setStatusBar(self.horizontalLayout_progress_bar)
+        self.horizontalLayout_start_buttons.addWidget(self.status_bar.widget)
+        self.status_bar_progress_bar = QtW.QStatusBar(ghe_tool)
+        #self.status_bar_progress_bar.setObjectName("status_bar")
+        #self.status_bar_progress_bar.setStyleSheet(f"QStatusBar::item{'{'}border:None;{'}'}QStatusBar{'{'}color:{BLACK};background-color: {LIGHT};{'}'}")
+        ghe_tool.setStatusBar(self.status_bar_progress_bar)
+
+        self.horizontalLayout_start_buttons.addItem(self.horizontalSpacer_2)
 
         self.pushButton_start_single = QtW.QPushButton(self.central_widget)
         self.pushButton_start_single.setObjectName("pushButton_start_single")
@@ -334,7 +336,7 @@ class UiGhetool:
         self.pushButton_start_single.setIcon(icon32)
         self.pushButton_start_single.setIconSize(QtC.QSize(24, 24))
 
-        self.horizontalLayout_2.addWidget(self.pushButton_start_single)
+        self.horizontalLayout_start_buttons.addWidget(self.pushButton_start_single)
 
         self.pushButton_start_multiple = QtW.QPushButton(self.central_widget)
         self.pushButton_start_multiple.setObjectName("pushButton_start_multiple")
@@ -345,7 +347,7 @@ class UiGhetool:
         self.pushButton_start_multiple.setIcon(icon33)
         self.pushButton_start_multiple.setIconSize(QtC.QSize(24, 24))
 
-        self.horizontalLayout_2.addWidget(self.pushButton_start_multiple)
+        self.horizontalLayout_start_buttons.addWidget(self.pushButton_start_multiple)
 
         self.pushButton_Cancel = QtW.QPushButton(self.central_widget)
         self.pushButton_Cancel.setObjectName("pushButton_Cancel")
@@ -356,11 +358,32 @@ class UiGhetool:
         self.pushButton_Cancel.setIcon(icon34)
         self.pushButton_Cancel.setIconSize(QtC.QSize(24, 24))
 
-        self.horizontalLayout_2.addWidget(self.pushButton_Cancel)
+        self.horizontalLayout_start_buttons.addWidget(self.pushButton_Cancel)
 
-        self.verticalLayout_21.addLayout(self.horizontalLayout_2)
+        self.verticalLayout_21.addLayout(self.horizontalLayout_start_buttons)
 
-        self.horizontalLayout_23.addLayout(self.verticalLayout_21)
+        self.frame_progress_bar = QtW.QFrame(self.central_widget)
+        self.horizontalLayout_progress_bar = QtW.QHBoxLayout(self.frame_progress_bar)
+        self.horizontalLayout_progress_bar.setObjectName("horizontalLayout_progress_bar")
+        self.label_Status = QtW.QLabel(self.central_widget)
+        self.label_Status.setObjectName("label_Status")
+        self.horizontalLayout_progress_bar.addWidget(self.label_Status)
+
+        self.progressBar = QtW.QProgressBar(self.central_widget)
+        self.progressBar.setObjectName("progressBar")
+        self.progressBar.setStyleSheet(
+            f"QProgressBar{'{'}border: 1px solid {WHITE};border-radius: 10px;text-align: center;color: {WHITE};{'}'}\n"
+            f"QProgressBar::chunk{'{'}background-color: {LIGHT}; border-radius: 10px;{'}'}"
+        )
+        self.progressBar.setValue(0)
+
+        self.horizontalLayout_progress_bar.addWidget(self.progressBar)
+
+        self.verticalLayout_gui_structure.addWidget(self.frame_progress_bar)
+
+        self.horizontalLayout_gui_structure.addLayout(self.verticalLayout_21)
+
+        self.horizontalLayout_23.addLayout(self.verticalLayout_gui_structure)
 
         ghe_tool.setCentralWidget(self.central_widget)
         self.menubar = QtW.QMenuBar(ghe_tool)
@@ -405,10 +428,6 @@ class UiGhetool:
         )
         self.toolBar.setMovable(False)
         ghe_tool.addToolBar(QtC.Qt.TopToolBarArea, self.toolBar)
-        self.status_bar = QtW.QStatusBar(ghe_tool)
-        self.status_bar.setObjectName("status_bar")
-        self.status_bar.setStyleSheet(f"QStatusBar::item{'{'}border:None;{'}'}QStatusBar{'{'}color:{BLACK};background-color: {LIGHT};{'}'}")
-        ghe_tool.setStatusBar(self.status_bar)
 
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuCalculation.menuAction())

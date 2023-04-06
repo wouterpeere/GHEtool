@@ -1,13 +1,13 @@
 # test if model can be imported
-import numpy as np
-import pytest
 import copy
 from math import isclose
 import matplotlib.pyplot as plt
 
-from GHEtool import *
-
+import numpy as np
 import pygfunction as gt
+import pytest
+
+from GHEtool import *
 
 data = GroundConstantTemperature(3, 10)
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
@@ -116,6 +116,31 @@ def test_stuck_in_loop():
     assert borefield.length_peak_heating == 8
     borefield.size()
     assert np.isclose(borefield.size(), 100.91784885721547)
+
+
+def test_different_results_with_other_peak_lengths():
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(4)
+
+    borefield = Borefield(simulation_period=20,
+                          peak_heating=peak_heating,
+                          peak_cooling=peak_cooling,
+                          baseload_heating=monthly_load_heating,
+                          baseload_cooling=monthly_load_cooling)
+
+    borefield.set_ground_parameters(data)
+    borefield.set_borefield(copy.copy(borefield_gt))
+
+    # set temperature boundaries
+    borefield.set_max_ground_temperature(16)  # maximum temperature
+    borefield.set_min_ground_temperature(0)  # minimum temperature
+
+    borefield.set_length_peak(2)
+    init_length_L2 = borefield.size_L2(100)
+    borefield.set_length_peak_heating(8)
+    borefield.set_length_peak_cooling(8)
+    new_length_L2 = borefield.size_L2(100)
+
+    assert new_length_L2 > init_length_L2
 
 
 def test_reset_temp_profiles_when_loaded(monkeypatch):

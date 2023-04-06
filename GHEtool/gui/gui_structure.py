@@ -2,8 +2,10 @@
 This document contains all the information relevant for the GUI.
 It contains all the options, categories etc. that should appear on the GUI.
 """
+from __future__ import annotations
+
 from math import cos, pi, sin, tan
-from typing import List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, List, Optional, Tuple, Union
 
 import PySide6.QtGui as QtG
 import PySide6.QtWidgets as QtW
@@ -11,6 +13,7 @@ from numpy import array, cos, int64, round, sin, sum
 from pandas import DataFrame as pd_DataFrame
 from pandas import read_csv as pd_read_csv
 
+from GHEtool import ghe_logger
 from GHEtool.gui.gui_base_class import DARK, GREY, LIGHT, WHITE
 from GHEtool.gui.gui_classes import (
     Aim,
@@ -29,7 +32,9 @@ from GHEtool.gui.gui_classes import (
     ResultText,
     check_aim_options,
 )
-from GHEtool.gui.translation_class import Translations
+
+if TYPE_CHECKING:  # pragma: no cover
+    from GHEtool.gui.translation_class import Translations
 
 
 def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, cooling_load_column: str, combined: str, sep: str,
@@ -148,7 +153,7 @@ class GuiStructure:
     """
     This class contains all the elements that are relevant for the GUI.
     """
-    def __init__(self, default_parent: QtW.QWidget, status_bar: QtW.QStatusBar):
+    def __init__(self, default_parent: QtW.QWidget, translations: Translations):
         """
         All the elements that should be placed on the GUI, should be written in
         chronologial order, in this __init__ function.
@@ -160,9 +165,7 @@ class GuiStructure:
         Option.default_parent = default_parent
         Hint.default_parent = default_parent
         FunctionButton.default_parent = default_parent
-
-        self.status_bar = status_bar
-        self.no_file_selected = 'No file Selected'
+        self.translations = translations
 
         #################################################################################################################
         #                                                                                                               #
@@ -172,35 +175,35 @@ class GuiStructure:
 
         def create_page_aim():
             # create page
-            self.page_aim = Page(name="Aim of simulation", button_name="Aim", icon=":/icons/icons/Aim_Inv.svg")
+            self.page_aim = Page(name=self.translations.page_aim, icon=":/icons/icons/Aim_Inv.svg")
 
-            self.aim_temp_profile = Aim(page=self.page_aim, label="Determine temperature profile", icon=":/icons/icons/Temp_Profile.svg")
-            self.aim_req_depth = Aim(page=self.page_aim, label="Determine required depth", icon=":/icons/icons/Depth_determination.svg")
+            self.aim_temp_profile = Aim(page=self.page_aim, label=self.translations.aim_temp_profile, icon=":/icons/icons/Temp_Profile.svg")
+            self.aim_req_depth = Aim(page=self.page_aim, label=self.translations.aim_req_depth, icon=":/icons/icons/Depth_determination.svg")
             # self.aim_size_length = Aim(page=self.page_aim, label="Size borefield by length and width", icon=":/icons/icons/Size_Length.svg")
-            self.aim_optimize = Aim(page=self.page_aim, label="Optimize load profile", icon=":/icons/icons/Optimize_Profile.svg")
+            self.aim_optimize = Aim(page=self.page_aim, label=self.translations.aim_req_depth, icon=":/icons/icons/Optimize_Profile.svg")
 
         def create_page_options():
             # create page
-            self.page_options = Page("Options", "Options", ":/icons/icons/Options.svg")
+            self.page_options = Page(name=self.translations.page_options, icon=":/icons/icons/Options.svg")
             self.page_aim.set_next_page(self.page_options)
             self.page_options.set_previous_page(self.page_aim)
 
             def create_category_calculation():
-                self.category_calculation = Category(page=self.page_options, label="Calculation options")
+                self.category_calculation = Category(page=self.page_options, label=self.translations.category_calculation)
 
-                self.option_method_size_depth = ButtonBox(label="Method for size borehole depth:", default_index=0,
+                self.option_method_size_depth = ButtonBox(label=self.translations.option_method_size_depth, default_index=0,
                                                           entries=[" L2 ", " L3 ", "  L4  "],
                                                           category=self.category_calculation)
                 # self.option_method_size_length = ButtonBox(label="Method for size width and length:", default_index=0,
                 #                                            entries=[" L2 ", " L3 "], category=self.category_calculation)
                 self.option_method_temp_gradient = ButtonBox(
-                    label="Should a temperature gradient over depth be considered?:", default_index=0,
+                    label=self.translations.option_method_temp_gradient, default_index=0,
                     entries=[" no ", " yes  "], category=self.category_calculation)
-                self.option_method_rb_calc = ButtonBox(label="Borehole resistance calculation method:", default_index=0,
+                self.option_method_rb_calc = ButtonBox(label=self.translations.option_method_rb_calc, default_index=0,
                                                        entries=[" constant ", " dynamic "],
                                                        category=self.category_calculation)
                 self.option_temperature_profile_hourly = ButtonBox(
-                    label="Should hourly data be used for the temperature profile?", default_index=0,
+                    label=self.translations.option_temperature_profile_hourly, default_index=0,
                     entries=[" no ", " yes "], category=self.category_calculation)
                 # add dependencies
                 # self.aim_size_length.add_link_2_show(self.option_method_size_length)
@@ -212,19 +215,19 @@ class GuiStructure:
 
         def create_page_borehole():
             # create page
-            self.page_borehole = Page("Borehole and earth", "Borehole\nand earth", ":/icons/icons/Borehole.png")
+            self.page_borehole = Page(self.translations.page_borehole, icon=":/icons/icons/Borehole.png")
             self.page_options.set_next_page(self.page_borehole)
             self.page_borehole.set_previous_page(self.page_options)
 
             def create_category_earth():
                 self.category_earth = Category(
                     page=self.page_borehole,
-                    label="Earth properties",
+                    label=self.translations.category_earth,
                 )
 
                 self.option_conductivity = FloatBox(
                     category=self.category_earth,
-                    label="Conductivity of the soil [W/mK]: ",
+                    label=self.translations.option_conductivity,
                     default_value=1.5,
                     decimal_number=3,
                     minimal_value=0.1,
@@ -234,7 +237,7 @@ class GuiStructure:
 
                 self.option_heat_capacity = FloatBox(
                     category=self.category_earth,
-                    label="Ground volumetric heat capacity [kJ / m³ K]: ",
+                    label=self.translations.option_heat_capacity,
                     default_value=2400,
                     decimal_number=1,
                     minimal_value=1,
@@ -243,7 +246,7 @@ class GuiStructure:
                 )
                 self.option_ground_temp = FloatBox(
                     category=self.category_earth,
-                    label="Ground temperature at infinity [°C]: ",
+                    label=self.translations.option_ground_temp,
                     default_value=12,
                     decimal_number=2,
                     minimal_value=-273.15,
@@ -252,7 +255,7 @@ class GuiStructure:
                 )
                 self.option_ground_temp_gradient = FloatBox(
                     category=self.category_earth,
-                    label="Ground surface temperature [°C]: ",
+                    label=self.translations.option_ground_temp,
                     default_value=10,
                     decimal_number=2,
                     minimal_value=-273.15,
@@ -261,7 +264,7 @@ class GuiStructure:
                 )
                 self.option_temp_gradient = FloatBox(
                     category=self.category_earth,
-                    label="Temperature gradient [K/100m]: ",
+                    label=self.translations.option_temp_gradient,
                     default_value=2,
                     decimal_number=3,
                     minimal_value=-273.15,
@@ -277,11 +280,11 @@ class GuiStructure:
             def create_category_borehole():
                 self.category_borehole = Category(
                     page=self.page_borehole,
-                    label="Borehole properties",
+                    label=self.translations.category_borehole,
                 )
                 self.option_depth = FloatBox(
                     category=self.category_borehole,
-                    label="Borehole depth [m]: ",
+                    label=self.translations.option_depth,
                     default_value=100,
                     decimal_number=2,
                     minimal_value=0,
@@ -299,7 +302,7 @@ class GuiStructure:
                 # )
                 self.option_spacing = FloatBox(
                     category=self.category_borehole,
-                    label="Borehole spacing [m]: ",
+                    label=self.translations.option_spacing,
                     default_value=6,
                     decimal_number=2,
                     minimal_value=1,
@@ -325,10 +328,10 @@ class GuiStructure:
                 #     step=0.1,
                 # )
                 self.option_width = IntBox(
-                    category=self.category_borehole, label="Width of rectangular field [#]: ", default_value=9, minimal_value=1, maximal_value=40
+                    category=self.category_borehole, label=self.translations.option_width, default_value=9, minimal_value=1, maximal_value=40
                 )
                 self.option_length = IntBox(
-                    category=self.category_borehole, label="Length of rectangular field [#]: ", default_value=12, minimal_value=1, maximal_value=40
+                    category=self.category_borehole, label=self.translations.option_length, default_value=12, minimal_value=1, maximal_value=40
                 )
                 # self.option_max_width = FloatBox(
                 #     category=self.category_borehole,
@@ -350,7 +353,7 @@ class GuiStructure:
                 # )
                 self.option_pipe_depth = FloatBox(
                     category=self.category_borehole,
-                    label="Burial depth [m]: ",
+                    label=self.translations.option_pipe_depth,
                     default_value=1,
                     decimal_number=1,
                     minimal_value=0,
@@ -360,7 +363,7 @@ class GuiStructure:
 
                 self.option_pipe_borehole_radius = FloatBox(
                     category=self.category_borehole,
-                    label="Borehole radius [m]: ",
+                    label=self.translations.option_pipe_borehole_radius,
                     default_value=0.075,
                     decimal_number=4,
                     minimal_value=0,
@@ -394,11 +397,11 @@ class GuiStructure:
                 # self.aim_size_length.add_link_2_show(self.option_max_length)
 
             def create_category_temperatures():
-                self.category_temperatures = Category(page=self.page_borehole, label="Temperature constraints and simulation period")
+                self.category_temperatures = Category(page=self.page_borehole, label=self.translations.category_temperatures)
 
                 self.option_min_temp = FloatBox(
                     category=self.category_temperatures,
-                    label="Minimal temperature [°C]: ",
+                    label=self.translations.option_min_temp,
                     default_value=0,
                     decimal_number=2,
                     minimal_value=-273.15,
@@ -407,7 +410,7 @@ class GuiStructure:
                 )
                 self.option_max_temp = FloatBox(
                     category=self.category_temperatures,
-                    label="Maximal temperature [°C]: ",
+                    label=self.translations.option_max_temp,
                     default_value=16,
                     decimal_number=2,
                     minimal_value=-273.15,
@@ -415,17 +418,17 @@ class GuiStructure:
                     step=0.1,
                 )
                 self.option_simu_period = IntBox(
-                    category=self.category_temperatures, label="Simulation period [yrs]: ", default_value=40,
+                    category=self.category_temperatures, label=self.translations.option_simu_period, default_value=40,
                     minimal_value=1, maximal_value=1000
                 )
 
                 self.option_len_peak_heating = FloatBox(
-                    category=self.category_temperatures, label="Peak length heating [hours]: ",
+                    category=self.category_temperatures, label=self.translations.option_len_peak_heating,
                     default_value=6, minimal_value=1, maximal_value=8760, step=1,
                     decimal_number=2
                 )
                 self.option_len_peak_cooling = FloatBox(
-                    category=self.category_temperatures, label="Peak length cooling [hours]: ",
+                    category=self.category_temperatures, label=self.translations.option_len_peak_cooling,
                     default_value=6, minimal_value=1, maximal_value=8760, step=1,
                     decimal_number=2
                 )
@@ -448,16 +451,16 @@ class GuiStructure:
 
         def create_page_borehole_resistance():
             # create page
-            self.page_borehole_resistance = Page("Equivalent borehole resistance", "Borehole\nresistance", ":/icons/icons/Resistance.png")
+            self.page_borehole_resistance = Page(name=self.translations.page_borehole_resistance, icon=":/icons/icons/Resistance.png")
             self.page_borehole.set_next_page(self.page_borehole_resistance)
             self.page_borehole_resistance.set_previous_page(self.page_borehole)
 
             def create_category_constant_rb():
-                self.category_constant_rb = Category(page=self.page_borehole_resistance, label="Constant equivalent borehole resistance")
+                self.category_constant_rb = Category(page=self.page_borehole_resistance, label=self.translations.category_constant_rb)
 
                 self.option_constant_rb = FloatBox(
                     category=self.category_constant_rb,
-                    label="Equivalent borehole resistance (e.g. from TRT) [mK/W]: ",
+                    label=self.translations.option_constant_rb,
                     default_value=0.08,
                     decimal_number=4,
                     minimal_value=0,
@@ -469,11 +472,11 @@ class GuiStructure:
                 self.option_method_rb_calc.add_link_2_show(self.category_constant_rb, on_index=0)
 
             def create_category_fluid_data():
-                self.category_fluid_data = Category(page=self.page_borehole_resistance, label="Fluid data")
+                self.category_fluid_data = Category(page=self.page_borehole_resistance, label=self.translations.category_fluid_data)
 
                 self.option_fluid_conductivity = FloatBox(
                     category=self.category_fluid_data,
-                    label="Thermal conductivity [W/mK]: ",
+                    label=self.translations.option_fluid_conductivity,
                     default_value=0.5,
                     decimal_number=3,
                     minimal_value=0,
@@ -482,7 +485,7 @@ class GuiStructure:
                 )
                 self.option_fluid_density = FloatBox(
                     category=self.category_fluid_data,
-                    label="Density [kg/m³]: ",
+                    label=self.translations.option_fluid_density,
                     default_value=1000,
                     decimal_number=1,
                     minimal_value=0,
@@ -491,7 +494,7 @@ class GuiStructure:
                 )
                 self.option_fluid_capacity = FloatBox(
                     category=self.category_fluid_data,
-                    label="Thermal capacity [J/kg K]: ",
+                    label=self.translations.option_fluid_capacity,
                     default_value=4182,
                     decimal_number=1,
                     minimal_value=0,
@@ -500,7 +503,7 @@ class GuiStructure:
                 )
                 self.option_fluid_viscosity = FloatBox(
                     category=self.category_fluid_data,
-                    label="Dynamic viscosity [Pa s]:",
+                    label=self.translations.option_fluid_viscosity,
                     default_value=0.001,
                     decimal_number=6,
                     minimal_value=0,
@@ -510,7 +513,7 @@ class GuiStructure:
 
                 self.option_fluid_mass_flow = FloatBox(
                     category=self.category_fluid_data,
-                    label="Mass flow rate [kg/s]: ",
+                    label=self.translations.option_fluid_mass_flow,
                     default_value=0.5,
                     decimal_number=3,
                     minimal_value=0,
@@ -522,15 +525,15 @@ class GuiStructure:
                 self.option_method_rb_calc.add_link_2_show(self.category_fluid_data, on_index=1)
 
             def create_category_pipe_data():
-                self.category_pipe_data = Category(page=self.page_borehole_resistance, label="Pipe data")
+                self.category_pipe_data = Category(page=self.page_borehole_resistance, label=self.translations.category_pipe_data)
                 self.category_pipe_data.activate_graphic_left()
 
                 self.option_pipe_number = IntBox(
-                    category=self.category_pipe_data, label="Number of pipes [#]: ", default_value=2, minimal_value=1, maximal_value=99
+                    category=self.category_pipe_data, label=self.translations.option_pipe_number, default_value=2, minimal_value=1, maximal_value=99
                 )
                 self.option_pipe_grout_conductivity = FloatBox(
                     category=self.category_pipe_data,
-                    label="Grout thermal conductivity [W/mK]: ",
+                    label=self.translations.option_pipe_grout_conductivity,
                     default_value=1.5,
                     decimal_number=3,
                     minimal_value=0,
@@ -539,7 +542,7 @@ class GuiStructure:
                 )
                 self.option_pipe_conductivity = FloatBox(
                     category=self.category_pipe_data,
-                    label="Pipe thermal conductivity [W/mK]: ",
+                    label=self.translations.category_pipe_data,
                     default_value=0.42,
                     decimal_number=3,
                     minimal_value=0,
@@ -548,7 +551,7 @@ class GuiStructure:
                 )
                 self.option_pipe_inner_radius = FloatBox(
                     category=self.category_pipe_data,
-                    label="Inner pipe radius [m]: ",
+                    label=self.translations.option_pipe_inner_radius,
                     default_value=0.02,
                     decimal_number=4,
                     minimal_value=0,
@@ -557,7 +560,7 @@ class GuiStructure:
                 )
                 self.option_pipe_outer_radius = FloatBox(
                     category=self.category_pipe_data,
-                    label="Outer pipe radius [m]: ",
+                    label=self.translations.option_pipe_outer_radius,
                     default_value=0.022,
                     decimal_number=4,
                     minimal_value=0,
@@ -569,7 +572,7 @@ class GuiStructure:
 
                 self.option_pipe_distance = FloatBox(
                     category=self.category_pipe_data,
-                    label="Distance of pipe until center [m]: ",
+                    label=self.translations.option_pipe_distance,
                     default_value=0.04,
                     decimal_number=4,
                     minimal_value=0,
@@ -578,7 +581,7 @@ class GuiStructure:
                 )
                 self.option_pipe_roughness = FloatBox(
                     category=self.category_pipe_data,
-                    label="Pipe roughness [m]: ",
+                    label=self.translations.option_pipe_roughness,
                     default_value=0.000_001,
                     decimal_number=7,
                     minimal_value=0,
@@ -609,37 +612,36 @@ class GuiStructure:
 
         def create_page_thermal_demands():
             # create page
-            self.page_thermal = Page("Thermal demands", "Thermal\ndemands", ":/icons/icons/Thermal.svg")
+            self.page_thermal = Page(name=self.translations.page_thermal, icon=":/icons/icons/Thermal.svg")
             self.page_borehole_resistance.set_next_page(self.page_thermal)
             self.page_thermal.set_previous_page(self.page_borehole)
 
             def create_category_select_datafile():
-                self.category_select_file = Category(page=self.page_thermal, label="Select data file")
+                self.category_select_file = Category(page=self.page_thermal, label=self.translations.category_select_file)
 
-                self.option_seperator_csv = ButtonBox(label="Seperator in CSV-file:", default_index=0,
+                self.option_seperator_csv = ButtonBox(label=self.translations.option_seperator_csv, default_index=0,
                                                       entries=['Semicolon ";"', 'Comma ","'],
                                                       category=self.category_select_file)
-                self.option_decimal_csv = ButtonBox(label="Decimal sign in CSV-file:", default_index=0,
+                self.option_decimal_csv = ButtonBox(label=self.translations.option_decimal_csv, default_index=0,
                                                     entries=['Point "."', 'Comma ","'],
                                                     category=self.category_select_file)
                 self.option_filename = FileNameBox(
                     category=self.category_select_file,
-                    label="Filename: ",
+                    label=self.translations.option_filename,
                     default_value="",
                     dialog_text="Choose csv file",
-                    error_text="error",
-                    status_bar=status_bar,
+                    error_text=self.translations.NoFileSelected[0],
                 )
-                self.option_column = ButtonBox(label="Thermal demand in one or two columns: ", default_index=0,
+                self.option_column = ButtonBox(label=self.translations.option_column, default_index=0,
                                                entries=["1 column", "2 columns"], category=self.category_select_file)
-                self.option_heating_column = ListBox(category=self.category_select_file, label="Heating load line: ", default_index=0, entries=[])
-                self.option_cooling_column = ListBox(category=self.category_select_file, label="Cooling load line: ", default_index=0, entries=[])
-                self.option_single_column = ListBox(category=self.category_select_file, label="Load line: ", default_index=0, entries=[])
+                self.option_heating_column = ListBox(category=self.category_select_file, label=self.translations.option_heating_column, default_index=0, entries=[])
+                self.option_cooling_column = ListBox(category=self.category_select_file, label=self.translations.option_cooling_column, default_index=0, entries=[])
+                self.option_single_column = ListBox(category=self.category_select_file, label=self.translations.option_single_column, default_index=0, entries=[])
 
-                self.option_unit_data = ButtonBox(label="Unit data: ", default_index=1, entries=["W", "kW", "MW"],
+                self.option_unit_data = ButtonBox(label=self.translations.option_unit_data, default_index=1, entries=["W", "kW", "MW"],
                                                   category=self.category_select_file)
 
-                self.button_load_csv = FunctionButton(category=self.category_select_file, button_text="Load", icon=":/icons/icons/Download.svg")
+                self.button_load_csv = FunctionButton(category=self.category_select_file, button_text=self.translations.button_load_csv, icon=":/icons/icons/Download.svg")
 
                 # add dependencies
                 self.option_filename.add_aim_option_2_be_set_for_check(self.aim_optimize)
@@ -675,31 +677,31 @@ class GuiStructure:
                 self.button_load_csv.change_event(self.fun_display_data)
 
             def create_category_th_demand():
-                self.category_th_demand = Category(page=self.page_thermal, label="Thermal demands")
+                self.category_th_demand = Category(page=self.page_thermal, label=self.translations.category_th_demand)
                 self.category_th_demand.activate_grid_layout(5)
 
-                self.hint_none_1 = Hint(category=self.category_th_demand, hint="  ")
-                self.hint_peak_heating = Hint(category=self.category_th_demand, hint="Heating peak")
-                self.hint_peak_cooling = Hint(category=self.category_th_demand, hint="Cooling peak")
-                self.hint_load_heating = Hint(category=self.category_th_demand, hint="Heating load")
-                self.hint_load_cooling = Hint(category=self.category_th_demand, hint="Cooling load")
+                self.hint_none_1 = Hint(category=self.category_th_demand, hint=["  "] * 10)
+                self.hint_peak_heating = Hint(category=self.category_th_demand, hint=self.translations.hint_peak_heating)
+                self.hint_peak_cooling = Hint(category=self.category_th_demand, hint=self.translations.hint_peak_cooling)
+                self.hint_load_heating = Hint(category=self.category_th_demand, hint=self.translations.hint_load_heating)
+                self.hint_load_cooling = Hint(category=self.category_th_demand, hint=self.translations.hint_load_cooling)
 
-                self.hint_none_2 = Hint(category=self.category_th_demand, hint="  ")
-                self.hint_peak_heating_unit = Hint(category=self.category_th_demand, hint="[kW]")
-                self.hint_peak_cooling_unit = Hint(category=self.category_th_demand, hint="[kW]")
-                self.hint_load_heating_unit = Hint(category=self.category_th_demand, hint="[kWh]")
-                self.hint_load_cooling_unit = Hint(category=self.category_th_demand, hint="[kWh]")
+                self.hint_none_2 = Hint(category=self.category_th_demand, hint=["  "] * 10)
+                self.hint_peak_heating_unit = Hint(category=self.category_th_demand, hint=["[kW]"] * 10)
+                self.hint_peak_cooling_unit = Hint(category=self.category_th_demand, hint=["[kW]"] * 10)
+                self.hint_load_heating_unit = Hint(category=self.category_th_demand, hint=["[kWh]"] * 10)
+                self.hint_load_cooling_unit = Hint(category=self.category_th_demand, hint=["[kWh]"] * 10)
 
-                self.hint_jan = Hint(category=self.category_th_demand, hint="January")
+                self.hint_jan = Hint(category=self.category_th_demand, hint=self.translations.hint_jan)
                 self.option_hp_jan = FloatBox(
-                    category=self.category_th_demand, label="", default_value=160, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=160, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_cp_jan = FloatBox(
-                    category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_hl_jan = FloatBox(
                     category=self.category_th_demand,
-                    label="",
+                    label=[],
                     default_value=46500,
                     decimal_number=0,
                     minimal_value=0,
@@ -708,23 +710,23 @@ class GuiStructure:
                 )
                 self.option_cl_jan = FloatBox(
                     category=self.category_th_demand,
-                    label="",
+                    label=[],
                     default_value=4000,
                     decimal_number=0,
                     minimal_value=0,
                     maximal_value=1_000_000_000,
                     step=1,
                 )
-                self.hint_feb = Hint(category=self.category_th_demand, hint="February")
+                self.hint_feb = Hint(category=self.category_th_demand, hint=self.translations.hint_feb)
                 self.option_hp_feb = FloatBox(
-                    category=self.category_th_demand, label="", default_value=142, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=142, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_cp_feb = FloatBox(
-                    category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_hl_feb = FloatBox(
                     category=self.category_th_demand,
-                    label="",
+                    label=[],
                     default_value=44400,
                     decimal_number=0,
                     minimal_value=0,
@@ -733,23 +735,23 @@ class GuiStructure:
                 )
                 self.option_cl_feb = FloatBox(
                     category=self.category_th_demand,
-                    label="",
+                    label=[],
                     default_value=8000,
                     decimal_number=0,
                     minimal_value=0,
                     maximal_value=1_000_000_000,
                     step=1,
                 )
-                self.hint_mar = Hint(category=self.category_th_demand, hint="March")
+                self.hint_mar = Hint(category=self.category_th_demand, hint=self.translations.hint_mar)
                 self.option_hp_mar = FloatBox(
-                    category=self.category_th_demand, label="", default_value=102, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=102, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_cp_mar = FloatBox(
-                    category=self.category_th_demand, label="", default_value=34, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=34, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_hl_mar = FloatBox(
                     category=self.category_th_demand,
-                    label="",
+                    label=[],
                     default_value=37500,
                     decimal_number=0,
                     minimal_value=0,
@@ -758,23 +760,23 @@ class GuiStructure:
                 )
                 self.option_cl_mar = FloatBox(
                     category=self.category_th_demand,
-                    label="",
+                    label=[],
                     default_value=8000,
                     decimal_number=0,
                     minimal_value=0,
                     maximal_value=1_000_000_000,
                     step=1,
                 )
-                self.hint_apr = Hint(category=self.category_th_demand, hint="April")
+                self.hint_apr = Hint(category=self.category_th_demand, hint=self.translations.hint_apr)
                 self.option_hp_apr = FloatBox(
-                    category=self.category_th_demand, label="", default_value=55, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=55, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_cp_apr = FloatBox(
-                    category=self.category_th_demand, label="", default_value=69, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=69, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_hl_apr = FloatBox(
                     category=self.category_th_demand,
-                    label="",
+                    label=[],
                     default_value=29700,
                     decimal_number=0,
                     minimal_value=0,
@@ -783,23 +785,23 @@ class GuiStructure:
                 )
                 self.option_cl_apr = FloatBox(
                     category=self.category_th_demand,
-                    label="",
+                    label=[],
                     default_value=8000,
                     decimal_number=0,
                     minimal_value=0,
                     maximal_value=1_000_000_000,
                     step=1,
                 )
-                self.hint_may = Hint(category=self.category_th_demand, hint="May")
+                self.hint_may = Hint(category=self.category_th_demand, hint=self.translations.hint_may)
                 self.option_hp_may = FloatBox(
-                    category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_cp_may = FloatBox(
-                    category=self.category_th_demand, label="", default_value=133, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=133, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_hl_may = FloatBox(
                     category=self.category_th_demand,
-                    label="",
+                    label=[],
                     default_value=19200,
                     decimal_number=0,
                     minimal_value=0,
@@ -808,80 +810,80 @@ class GuiStructure:
                 )
                 self.option_cl_may = FloatBox(
                     category=self.category_th_demand,
-                    label="",
+                    label=[],
                     default_value=12000,
                     decimal_number=0,
                     minimal_value=0,
                     maximal_value=1_000_000_000,
                     step=1,
                 )
-                self.hint_jun = Hint(category=self.category_th_demand, hint="June")
+                self.hint_jun = Hint(category=self.category_th_demand, hint=self.translations.hint_jun)
                 self.option_hp_jun = FloatBox(
-                    category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_cp_jun = FloatBox(
-                    category=self.category_th_demand, label="", default_value=187, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=187, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_hl_jun = FloatBox(
-                    category=self.category_th_demand, label="", default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
+                    category=self.category_th_demand, label=[], default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
                 )
                 self.option_cl_jun = FloatBox(
                     category=self.category_th_demand,
-                    label="",
+                    label=[],
                     default_value=16000,
                     decimal_number=0,
                     minimal_value=0,
                     maximal_value=1_000_000_000,
                     step=1,
                 )
-                self.hint_jul = Hint(category=self.category_th_demand, hint="July")
+                self.hint_jul = Hint(category=self.category_th_demand, hint=self.translations.hint_jul)
                 self.option_hp_jul = FloatBox(
-                    category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_cp_jul = FloatBox(
-                    category=self.category_th_demand, label="", default_value=213, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=213, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_hl_jul = FloatBox(
-                    category=self.category_th_demand, label="", default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
+                    category=self.category_th_demand, label=[], default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
                 )
                 self.option_cl_jul = FloatBox(
                     category=self.category_th_demand,
-                    label="",
+                    label=[],
                     default_value=32000,
                     decimal_number=0,
                     minimal_value=0,
                     maximal_value=1_000_000_000,
                     step=1,
                 )
-                self.hint_aug = Hint(category=self.category_th_demand, hint="August")
+                self.hint_aug = Hint(category=self.category_th_demand, hint=self.translations.hint_aug)
                 self.option_hp_aug = FloatBox(
-                    category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_cp_aug = FloatBox(
-                    category=self.category_th_demand, label="", default_value=240, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=240, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_hl_aug = FloatBox(
-                    category=self.category_th_demand, label="", default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
+                    category=self.category_th_demand, label=[], default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
                 )
                 self.option_cl_aug = FloatBox(
                     category=self.category_th_demand,
-                    label="",
+                    label=[],
                     default_value=32000,
                     decimal_number=0,
                     minimal_value=0,
                     maximal_value=1_000_000_000,
                     step=1,
                 )
-                self.hint_sep = Hint(category=self.category_th_demand, hint="September")
+                self.hint_sep = Hint(category=self.category_th_demand, hint=self.translations.hint_sep)
                 self.option_hp_sep = FloatBox(
-                    category=self.category_th_demand, label="", default_value=40.4, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=40.4, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_cp_sep = FloatBox(
-                    category=self.category_th_demand, label="", default_value=160, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=160, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_hl_sep = FloatBox(
                     category=self.category_th_demand,
-                    label="",
+                    label=[],
                     default_value=18300,
                     decimal_number=0,
                     minimal_value=0,
@@ -890,23 +892,23 @@ class GuiStructure:
                 )
                 self.option_cl_sep = FloatBox(
                     category=self.category_th_demand,
-                    label="",
+                    label=[],
                     default_value=16000,
                     decimal_number=0,
                     minimal_value=0,
                     maximal_value=1_000_000_000,
                     step=1,
                 )
-                self.hint_oct = Hint(category=self.category_th_demand, hint="October")
+                self.hint_oct = Hint(category=self.category_th_demand, hint=self.translations.hint_oct)
                 self.option_hp_oct = FloatBox(
-                    category=self.category_th_demand, label="", default_value=85, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=85, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_cp_oct = FloatBox(
-                    category=self.category_th_demand, label="", default_value=37, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=37, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_hl_oct = FloatBox(
                     category=self.category_th_demand,
-                    label="",
+                    label=[],
                     default_value=26100,
                     decimal_number=0,
                     minimal_value=0,
@@ -915,23 +917,23 @@ class GuiStructure:
                 )
                 self.option_cl_oct = FloatBox(
                     category=self.category_th_demand,
-                    label="",
+                    label=[],
                     default_value=12000,
                     decimal_number=0,
                     minimal_value=0,
                     maximal_value=1_000_000_000,
                     step=1,
                 )
-                self.hint_nov = Hint(category=self.category_th_demand, hint="November")
+                self.hint_nov = Hint(category=self.category_th_demand, hint=self.translations.hint_nov)
                 self.option_hp_nov = FloatBox(
-                    category=self.category_th_demand, label="", default_value=119, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=119, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_cp_nov = FloatBox(
-                    category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_hl_nov = FloatBox(
                     category=self.category_th_demand,
-                    label="",
+                    label=[],
                     default_value=35100,
                     decimal_number=0,
                     minimal_value=0,
@@ -940,23 +942,23 @@ class GuiStructure:
                 )
                 self.option_cl_nov = FloatBox(
                     category=self.category_th_demand,
-                    label="",
+                    label=[],
                     default_value=8000,
                     decimal_number=0,
                     minimal_value=0,
                     maximal_value=1_000_000_000,
                     step=1,
                 )
-                self.hint_dec = Hint(category=self.category_th_demand, hint="December")
+                self.hint_dec = Hint(category=self.category_th_demand, hint=self.translations.hint_dec)
                 self.option_hp_dec = FloatBox(
-                    category=self.category_th_demand, label="", default_value=136, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=136, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_cp_dec = FloatBox(
-                    category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+                    category=self.category_th_demand, label=[], default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
                 )
                 self.option_hl_dec = FloatBox(
                     category=self.category_th_demand,
-                    label="",
+                    label=[],
                     default_value=43200,
                     decimal_number=0,
                     minimal_value=0,
@@ -965,7 +967,7 @@ class GuiStructure:
                 )
                 self.option_cl_dec = FloatBox(
                     category=self.category_th_demand,
-                    label="",
+                    label=[],
                     default_value=4000,
                     decimal_number=0,
                     minimal_value=0,
@@ -988,68 +990,68 @@ class GuiStructure:
 
         def create_page_results():
             # create page
-            self.page_result = Page("Results", "Results", ":/icons/icons/Result.svg")
+            self.page_result = Page(self.translations.page_result, icon=":/icons/icons/Result.svg")
 
             def create_category_no_result():
-                self.cat_no_result = Category(page=self.page_result, label="No results")
-                self.text_no_result = Hint("No results are yet calculated", category=self.cat_no_result, warning=True)
+                self.cat_no_result = Category(page=self.page_result, label=self.translations.cat_no_result)
+                self.text_no_result = Hint(self.translations.text_no_result, category=self.cat_no_result, warning=True)
 
             def create_category_numerical_results():
-                self.numerical_results = Category(page=self.page_result, label="Numerical results")
+                self.numerical_results = Category(page=self.page_result, label=self.translations.numerical_results)
 
-                self.result_text_depth = ResultText("Depth", category=self.numerical_results, prefix="Depth: ", suffix="m")
+                self.result_text_depth = ResultText(self.translations.result_text_depth, category=self.numerical_results, prefix="Depth: ", suffix="m")
                 self.result_text_depth.text_to_be_shown("Borefield", "H")
                 self.result_text_depth.function_to_convert_to_text(lambda x: round(x, 2))
 
-                self.result_Rb_calculated = ResultText("Equivalent borehole thermal resistance", category=self.numerical_results,
+                self.result_Rb_calculated = ResultText(self.translations.result_Rb_calculated, category=self.numerical_results,
                                                        prefix="Equivalent borehole thermal resistance: ", suffix="Wm/K")
                 self.result_Rb_calculated.text_to_be_shown("Borefield", "_Rb")
                 self.result_Rb_calculated.function_to_convert_to_text(lambda x: round(x, 4))
 
-                self.results_ground_temperature = ResultText("Ground temperature", category=self.numerical_results,
+                self.results_ground_temperature = ResultText(self.translations.results_ground_temperature, category=self.numerical_results,
                                                              prefix="Average ground temperature: ", suffix=" deg C")
                 self.results_ground_temperature.text_to_be_shown("Borefield", "_Tg")
                 self.results_ground_temperature.function_to_convert_to_text(lambda x: round(x, 2))
 
-                self.results_heating_load = ResultText("Heating load", category=self.numerical_results,
+                self.results_heating_load = ResultText(self.translations.results_heating_load, category=self.numerical_results,
                                                        prefix="Heating load on the borefield: ", suffix=" kWh")
                 self.results_heating_load.text_to_be_shown("Borefield", "baseload_heating")
                 self.results_heating_load.function_to_convert_to_text(lambda x: round(sum(x), 0))
-                self.results_heating_load_percentage = ResultText("Percentage", category=self.numerical_results,
+                self.results_heating_load_percentage = ResultText(self.translations.results_heating_load_percentage, category=self.numerical_results,
                                                                   prefix="This is ", suffix="% of the heating load")
                 self.results_heating_load_percentage.text_to_be_shown("Borefield", "_percentage_heating")
                 self.results_heating_load_percentage.function_to_convert_to_text(lambda x: round(x, 2))
-                self.results_heating_ext = ResultText("Heating ext", category=self.numerical_results,
+                self.results_heating_ext = ResultText(self.translations.results_heating_ext, category=self.numerical_results,
                                                       prefix="heating load external: ", suffix=" kWh")
                 self.results_heating_ext.text_to_be_shown("Borefield", "monthly_load_heating_external")
                 self.results_heating_ext.function_to_convert_to_text(lambda x: round(sum(x), 0))
-                self.results_heating_peak = ResultText("Heating ext peak", category=self.numerical_results,
+                self.results_heating_peak = ResultText(self.translations.results_heating_peak, category=self.numerical_results,
                                                        prefix="with a peak of: ", suffix=" kW")
                 self.results_heating_peak.text_to_be_shown("Borefield", "peak_heating_external")
                 self.results_heating_peak.function_to_convert_to_text(lambda x: round(max(x), 2))
 
-                self.results_cooling_load = ResultText("Cooling load", category=self.numerical_results,
+                self.results_cooling_load = ResultText(self.translations.results_cooling_load, category=self.numerical_results,
                                                        prefix="Cooling load on the borefield: ", suffix=" kWh")
                 self.results_cooling_load.text_to_be_shown("Borefield", "baseload_cooling")
                 self.results_cooling_load.function_to_convert_to_text(lambda x: round(sum(x), 0))
-                self.results_cooling_load_percentage = ResultText("Percentage", category=self.numerical_results,
+                self.results_cooling_load_percentage = ResultText(self.translations.results_cooling_load_percentage, category=self.numerical_results,
                                                                   prefix="This is ", suffix="% of the cooling load")
                 self.results_cooling_load_percentage.text_to_be_shown("Borefield", "_percentage_cooling")
                 self.results_cooling_load_percentage.function_to_convert_to_text(lambda x: round(x, 2))
-                self.results_cooling_ext = ResultText("Cooling ext", category=self.numerical_results,
+                self.results_cooling_ext = ResultText(self.translations.results_cooling_ext, category=self.numerical_results,
                                                       prefix="cooling load external: ", suffix=" kWh")
                 self.results_cooling_ext.text_to_be_shown("Borefield", "monthly_load_cooling_external")
                 self.results_cooling_ext.function_to_convert_to_text(lambda x: round(sum(x), 0))
-                self.results_cooling_peak = ResultText("Cooling ext peak", category=self.numerical_results,
+                self.results_cooling_peak = ResultText(self.translations.results_cooling_peak, category=self.numerical_results,
                                                        prefix="with a peak of: ", suffix=" kW")
                 self.results_cooling_peak.text_to_be_shown("Borefield", "peak_cooling_external")
                 self.results_cooling_peak.function_to_convert_to_text(lambda x: round(max(x), 2))
 
-                self.max_temp = ResultText("Max temp", category=self.numerical_results,
+                self.max_temp = ResultText(self.translations.max_temp, category=self.numerical_results,
                                            prefix="The maximum average fluid temperature is ", suffix=" deg C")
                 self.max_temp.text_to_be_shown("Borefield", "results_peak_cooling")
                 self.max_temp.function_to_convert_to_text(lambda x: round(max(x), 2))
-                self.min_temp = ResultText("Max temp", category=self.numerical_results,
+                self.min_temp = ResultText(self.translations.min_temp, category=self.numerical_results,
                                            prefix="The minimum average fluid temperature is ", suffix=" deg C")
                 self.min_temp.text_to_be_shown("Borefield", "results_peak_heating")
                 self.min_temp.function_to_convert_to_text(lambda x: round(min(x), 2))
@@ -1072,21 +1074,21 @@ class GuiStructure:
                 self.aim_temp_profile.add_link_2_show(self.min_temp)
 
             def create_figure_temperature_profile():
-                self.figure_temperature_profile = ResultFigure(label="Temperature evolution",
+                self.figure_temperature_profile = ResultFigure(label=self.translations.figure_temperature_profile,
                                                                page=self.page_result)
 
                 self.figure_temperature_profile.fig_to_be_shown(class_name="Borefield",
                                                                 function_name="print_temperature_profile")
 
                 self.legend_figure_temperature_profile = FigureOption(category=self.figure_temperature_profile,
-                                                                      label="Legend on",
+                                                                      label=self.translations.legend_figure_temperature_profile,
                                                                       param="legend",
                                                                       default=0,
                                                                       entries=["No", "Yes"],
                                                                       entries_values=[False, True])
 
                 self.hourly_figure_temperature_profile = FigureOption(category=self.figure_temperature_profile,
-                                                                      label="Hourly profile",
+                                                                      label=self.translations.hourly_figure_temperature_profile,
                                                                       param="plot_hourly",
                                                                       default=0,
                                                                       entries=["No", "Yes"],
@@ -1098,14 +1100,14 @@ class GuiStructure:
                 self.option_method_size_depth.add_link_2_show(self.hourly_figure_temperature_profile, on_index=2)
 
             def create_figure_load_duration():
-                self.figure_load_duration = ResultFigure(label="Load-duration curve",
+                self.figure_load_duration = ResultFigure(label=self.translations.figure_load_duration,
                                                          page=self.page_result)
 
                 self.figure_load_duration.fig_to_be_shown(class_name="Borefield",
                                                           function_name="plot_load_duration")
 
                 self.legend_figure_load_duration = FigureOption(category=self.figure_load_duration,
-                                                                label="Legend on",
+                                                                label=self.translations.legend_figure_load_duration,
                                                                 param="legend",
                                                                 default=0,
                                                                 entries=["No", "Yes"],
@@ -1124,24 +1126,24 @@ class GuiStructure:
 
         def create_page_settings():
             # create page
-            self.page_settings = Page("Settings", "Settings", ":/icons/icons/Settings.svg")
+            self.page_settings = Page(self.translations.page_settings, ":/icons/icons/Settings.svg")
 
-            self.category_language = Category(page=self.page_settings, label="Language")
+            self.category_language = Category(page=self.page_settings, label=self.translations.category_language)
 
-            self.option_language = ListBox(category=self.category_language, label="Language: ", default_index=0, entries=[])
+            self.option_language = ListBox(category=self.category_language, label=self.translations.option_language, default_index=0, entries=[])
 
-            self.category_save_scenario = Category(page=self.page_settings, label="Scenario saving settings")
+            self.category_save_scenario = Category(page=self.page_settings, label=self.translations.category_save_scenario)
 
-            self.option_toggle_buttons = ButtonBox(label="Toggle buttons?:", default_index=1, entries=[" no ", " yes "],
+            self.option_n_threads = IntBox(label=self.translations.option_n_threads, default_value=1, category=self.category_save_scenario, minimal_value=1,
+                                           maximal_value=1)
+            self.option_toggle_buttons = ButtonBox(label=self.translations.option_toggle_buttons, default_index=1, entries=[" no ", " yes "],
                                                    category=self.category_save_scenario)
             self.option_toggle_buttons.change_event(self.change_toggle_button)
-            self.option_auto_saving = ButtonBox(label="Use automatic saving?:", default_index=0,
+            self.option_auto_saving = ButtonBox(label=self.translations.option_auto_saving, default_index=0,
                                                 entries=[" no ", " yes "], category=self.category_save_scenario)
             self.hint_saving = Hint(
                 category=self.category_save_scenario,
-                hint="If Auto saving is selected the scenario will automatically saved if a scenario"
-                " is changed. Otherwise the scenario has to be saved with the Update scenario "
-                "button in the upper left corner if the changes should not be lost. ",
+                hint=self.translations.hint_saving,
             )
 
         #################################################################################################################
@@ -1300,14 +1302,17 @@ class GuiStructure:
         # get decimal and column seperator
         sep: str = ";" if self.option_seperator_csv.get_value() == 0 else ","
         dec: str = "." if self.option_decimal_csv.get_value() == 0 else ","
+        if filename == "":
+            ghe_logger.info(self.translations.NoFileSelected[self.option_language.get_value()])
+            return
         # try to read CSV-File
         try:
             data: pd_DataFrame = pd_read_csv(filename, sep=sep, decimal=dec)
         except FileNotFoundError:
-            self.status_bar.showMessage(self.no_file_selected[self.option_language.get_value()], 5000)
+            ghe_logger.error(self.translations.NoFileSelected[self.option_language.get_value()])
             return
         except PermissionError:
-            self.status_bar.showMessage(self.no_file_selected[self.option_language.get_value()], 5000)
+            ghe_logger.error(self.translations.NoFileSelected[self.option_language.get_value()])
             return
         # get data column names to set them to comboBoxes
         columns = data.columns
@@ -1396,13 +1401,13 @@ class GuiStructure:
             self.option_cp_dec.set_value(peak_cooling[11])
         # raise error and display error massage in status bar
         except FileNotFoundError:
-            self.status_bar.showMessage(self.no_file_selected[self.option_language.get_value()], 5000)
+            ghe_logger.error(self.translations.NoFileSelected[self.option_language.get_value()])
         except IndexError:
-            self.status_bar.showMessage(self.translations.ValueError[self.option_language.get_value()], 5000)
+            ghe_logger.error(self.translations.ValueError[self.option_language.get_value()])
         except KeyError:
-            self.status_bar.showMessage(self.translations.ColumnError[self.option_language.get_value()], 5000)
+            ghe_logger.error(self.translations.ColumnError[self.option_language.get_value()])
 
-    def translate(self, index: int, translation: Translations) -> None:
+    def translate(self, index: int) -> None:
         """
         This function translates the GUI.
 
@@ -1410,16 +1415,12 @@ class GuiStructure:
         ----------
         index : int
             Index of the language
-        translation : Translations
-            Class with all the translations
 
         Returns
         -------
         None
         """
-        Page.next_label = translation.label_next[index]
-        Page.previous_label = translation.label_previous[index]
-        self.no_file_selected = translation.NoFileSelected[index]
-        for name in [j for j in translation.__slots__ if hasattr(self, j)]:
-            entry: Union[Option, Hint, FunctionButton, Page, Category] = getattr(self, name)
-            entry.set_text(getattr(translation, name)[index])
+        Page.next_label = self.translations.label_next[index]
+        Page.previous_label = self.translations.label_previous[index]
+        for name in [j for j in self.translations.__slots__ if hasattr(self, j)]:
+            getattr(self, name).translate(index)

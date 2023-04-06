@@ -1,13 +1,12 @@
 import copy
-
-import pygfunction as gt
-import numpy as np
-import pytest
 import time
 
-from GHEtool.VariableClasses import GFunction, FIFO
-from GHEtool import Borefield
+import numpy as np
+import pygfunction as gt
+import pytest
 
+from GHEtool import Borefield
+from GHEtool.VariableClasses import FIFO, GFunction
 
 depth_array = np.array([1, 5, 6])
 depth_array_empty = np.array([])
