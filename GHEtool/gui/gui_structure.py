@@ -33,7 +33,7 @@ from GHEtool.gui.gui_classes import (
     check_aim_options,
 )
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from GHEtool.gui.translation_class import Translations
 
 

@@ -10,6 +10,7 @@ from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
 from GHEtool import FOLDER
 from GHEtool.gui.gui_classes import ButtonBox, FigureOption, FileNameBox, FloatBox, IntBox, ListBox
 from GHEtool.gui.gui_combine_window import MainWindow
+from GHEtool.gui.gui_structure import load_data_GUI
 from GHEtool.gui.translation_class import Translations
 
 setrecursionlimit(1500)
@@ -133,6 +134,15 @@ def test_gui_filename_errors(qtbot):
     main_window.gui_structure.fun_update_combo_box_data_file("")
     try:
         main_window.gui_structure.fun_update_combo_box_data_file("C:/test.GHEtool")
+    except FileNotFoundError:
+        assert True
+
+    try:
+        load_data_GUI("", 1, "Heating", "Cooling", "Combined", 5, 6, 7)
+    except FileNotFoundError:
+        assert True
+    try:
+        load_data_GUI("C:/test.GHEtool", 1, "Heating", "Cooling", "Combined", 5, 6, 7)
     except FileNotFoundError:
         assert True
 
