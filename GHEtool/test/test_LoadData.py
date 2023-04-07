@@ -28,6 +28,7 @@ def test_baseload_heating():
     assert np.array_equal(load.baseload_heating, np.linspace(0, 11, 12))
     load.set_baseload_heating(np.linspace(1, 12, 12))
     assert np.array_equal(load.baseload_heating, np.linspace(1, 12, 12))
+    assert np.array_equal(load.baseload_heating / 730, load.baseload_heating_power)
     try:
         load.set_baseload_heating(np.ones(11))
     except ValueError:
@@ -41,6 +42,8 @@ def test_baseload_cooling():
     assert np.array_equal(load.baseload_cooling, np.linspace(0, 11, 12))
     load.set_baseload_cooling(np.linspace(1, 12, 12))
     assert np.array_equal(load.baseload_cooling, np.linspace(1, 12, 12))
+    assert np.array_equal(load.baseload_cooling / 730, load.baseload_cooling_power)
+
     try:
         load.set_baseload_cooling(np.ones(11))
     except ValueError:

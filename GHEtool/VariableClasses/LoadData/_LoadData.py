@@ -16,6 +16,8 @@ class _LoadData(BaseClass, ABC):
     """
     __slots__ = "hourly_resolution"
 
+    UPM: float = 730.  # number of hours per month
+
     def __init__(self, hourly_resolution: bool):
         """
 
@@ -73,9 +75,29 @@ class _LoadData(BaseClass, ABC):
         """
 
     @abc.abstractmethod
+    def baseload_heating_power(self) -> np.ndarray:
+        """
+        This function returns the baseload heating in kW avg/month.
+
+        Returns
+        -------
+        baseload heating : np.ndarray
+        """
+
+    @abc.abstractmethod
     def baseload_cooling(self) -> np.ndarray:
         """
         This function returns the baseload cooling in kWh/month.
+
+        Returns
+        -------
+        baseload cooling : np.ndarray
+        """
+
+    @abc.abstractmethod
+    def baseload_cooling_power(self) -> np.ndarray:
+        """
+        This function returns the baseload cooling in kW avg/month.
 
         Returns
         -------
