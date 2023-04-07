@@ -3,6 +3,7 @@ This file contains the base class for the load classes.
 """
 import abc
 from abc import ABC
+from typing import Union
 
 import numpy as np
 
@@ -26,7 +27,7 @@ class _LoadData(BaseClass, ABC):
         self.hourly_resolution: bool = hourly_resolution
 
     @abc.abstractmethod
-    def _check_input(self, input: np.ndarray | list | tuple) -> bool:
+    def _check_input(self, input: Union[np.ndarray, list, tuple]) -> bool:
         """
         This function checks whether the input is valid or not.
 
