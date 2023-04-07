@@ -1340,6 +1340,18 @@ class Borefield(BaseClass):
         self._delete_calculated_temperatures()
 
     @property
+    def Re(self) -> float:
+        """
+        Reynolds number.
+
+        Returns
+        -------
+        Reynolds number : float
+        """
+        u = self.fluid_data.mfr / self.pipe_data.number_of_pipes / self.fluid_data.rho / (pi * self.pipe_data.r_in ** 2)
+        return self.fluid_data.rho * u * self.pipe_data.r_in * 2 / self.fluid_data.mu
+
+    @property
     def investment_cost(self) -> float:
         """
         This function calculates the investment cost based on a cost profile linear to the total borehole length.
