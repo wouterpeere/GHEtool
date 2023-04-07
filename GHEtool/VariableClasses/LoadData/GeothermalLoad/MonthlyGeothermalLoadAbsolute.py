@@ -93,6 +93,8 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
     def baseload_cooling(self, load: Union[np.ndarray, list, tuple]) -> None:
         """
         This function sets the baseload cooling [kWh/month] after it has been checked.
+        If the baseload cooling gives a higher average power than the peak power,
+        this is taken as the peak power in that month.
 
         Parameters
         ----------
@@ -111,6 +113,8 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
         """
         if self._check_input(load):
             self._baseload_cooling = load
+            # set peak load
+            self.peak_cooling = np.maximum(self.peak_cooling, self.baseload_cooling_power)
             return
         raise ValueError
 
@@ -129,6 +133,8 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
     def set_baseload_cooling(self, load: Union[np.ndarray, list, tuple]) -> None:
         """
         This function sets the baseload cooling [kWh/month] after it has been checked.
+        If the baseload cooling gives a higher average power than the peak power,
+        this is taken as the peak power in that month.
 
         Parameters
         ----------
@@ -163,6 +169,8 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
     def baseload_heating(self, load: Union[np.ndarray, list, tuple]) -> None:
         """
         This function sets the baseload heating [kWh/month] after it has been checked.
+        If the baseload heating gives a higher average power than the peak power,
+        this is taken as the peak power in that month.
 
         Parameters
         ----------
@@ -181,6 +189,8 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
         """
         if self._check_input(load):
             self._baseload_heating = load
+            # set peak load
+            self.peak_heating = np.maximum(self.peak_heating, self.baseload_heating_power)
             return
         raise ValueError
 
@@ -199,6 +209,8 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
     def set_baseload_heating(self, load: Union[np.ndarray, list, tuple]) -> None:
         """
         This function sets the baseload heating [kWh/month] after it has been checked.
+        If the baseload heating gives a higher average power than the peak power,
+        this is taken as the peak power in that month.
 
         Parameters
         ----------
@@ -233,6 +245,7 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
     def peak_cooling(self, load) -> None:
         """
         This function sets the peak cooling load [kW/month] after it has been checked.
+        If the baseload cooling gives a higher average power, this is taken as the peak power in that month.
 
         Parameters
         ----------
@@ -250,13 +263,14 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             values
         """
         if self._check_input(load):
-            self._peak_cooling = load
+            self._peak_cooling = np.maximum(load, self.baseload_cooling_power)
             return
         raise ValueError
 
     def set_peak_cooling(self, load: Union[np.ndarray, list, tuple]) -> None:
         """
         This function sets the peak cooling load [kW/month] after it has been checked.
+        If the baseload cooling gives a higher average power, this is taken as the peak power in that month.
 
         Parameters
         ----------
@@ -291,6 +305,7 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
     def peak_heating(self, load: Union[np.ndarray, list, tuple]) -> None:
         """
         This function sets the peak heating load [kW/month] after it has been checked.
+        If the baseload heating gives a higher average power, this is taken as the peak power in that month.
 
         Parameters
         ----------
@@ -308,13 +323,14 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             values
         """
         if self._check_input(load):
-            self._peak_heating = load
+            self._peak_heating = np.maximum(load, self.baseload_heating_power)
             return
         raise ValueError
 
     def set_peak_heating(self, load: Union[np.ndarray, list, tuple]) -> None:
         """
         This function sets the peak heating load [kW/month] after it has been checked.
+        If the baseload heating gives a higher average power, this is taken as the peak power in that month.
 
         Parameters
         ----------
