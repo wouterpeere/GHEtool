@@ -1,6 +1,7 @@
 """
 This file contains all the code for the borefield calculations.
 """
+import logging
 from math import pi
 from typing import List, Tuple, Union
 
@@ -11,7 +12,7 @@ from scipy.signal import convolve
 
 from GHEtool.VariableClasses import CustomGFunction, FluidData, GFunction, GroundData, PipeData, SizingSetup, load_custom_gfunction
 from GHEtool.VariableClasses.BaseClass import BaseClass
-from GHEtool.logger.ghe_logger import ghe_logger, console_handler, console_handler_warning
+from GHEtool.logger.ghe_logger import ghe_logger
 
 
 class Borefield(BaseClass):
@@ -219,7 +220,7 @@ class Borefield(BaseClass):
         # set a custom borefield
         self.borefield = borefield
 
-        ghe_logger.info("Borefield object has been created.")
+        ghe_logger.main_info("Borefield object has been created.")
 
     @staticmethod
     def activate_logger() -> None:
@@ -230,8 +231,7 @@ class Borefield(BaseClass):
         -------
         None
         """
-        ghe_logger.addHandler(console_handler)
-        ghe_logger.removeHandler(console_handler_warning)
+        ghe_logger.setLevel("MAIN_INFO")
 
     @staticmethod
     def deactivate_logger() -> None:
@@ -242,8 +242,7 @@ class Borefield(BaseClass):
         -------
         None
         """
-        ghe_logger.removeHandler(console_handler)
-        ghe_logger.addHandler(console_handler_warning)
+        ghe_logger.setLevel(logging.INFO)
 
     def _set_number_of_boreholes(self) -> None:
         """
@@ -415,7 +414,7 @@ class Borefield(BaseClass):
         """
 
         self.custom_gfunction = load_custom_gfunction(location)
-        ghe_logger.info("Custom g-function has been loaded.")
+        ghe_logger.main_info("Custom g-function has been loaded.")
 
     def set_investment_cost(self, investment_cost: list =None) -> None:
         """
@@ -910,7 +909,7 @@ class Borefield(BaseClass):
                                f"of {self.THRESHOLD_WARNING_SHALLOW_FIELD} m."
                                f"Please change your configuration accordingly to have a not so shallow field.")
 
-        ghe_logger.info("The borefield has been sized.")
+        ghe_logger.main_info("The borefield has been sized.")
         return depth
 
     def size_L2(self, H_init: float, quadrant_sizing: int = 0) -> float:
@@ -1655,7 +1654,7 @@ class Borefield(BaseClass):
         self.monthly_load_cooling_external = np.array([])
         self.hourly_heating_load_on_the_borefield = np.array([])
         self.hourly_cooling_load_on_the_borefield = np.array([])
-        ghe_logger.info("Delete all stored temperatures from previous calculations.")
+        ghe_logger.main_info("Deleted all stored temperatures from previous calculations.")
 
     def _calculate_temperature_profile(self, H: float = None, hourly: bool = False) -> None:
         """
@@ -1977,7 +1976,7 @@ class Borefield(BaseClass):
             self.set_hourly_heating_load(db.iloc[:, 1].tolist())
             self.set_hourly_cooling_load(db.iloc[:, 0].tolist())
 
-        ghe_logger.info("Hourly profile loaded!")
+        ghe_logger.main_info("Hourly profile loaded!")
 
     def convert_hourly_to_monthly(self, peak_cooling_load: float = None, peak_heating_load: float = None) -> None:
         """
@@ -2012,7 +2011,7 @@ class Borefield(BaseClass):
         self.set_baseload_cooling(self._reduce_to_monthly_load(self.hourly_cooling_load, peak_cooling_load))
         self.set_baseload_heating(self._reduce_to_monthly_load(self.hourly_heating_load, peak_heating_load))
 
-        ghe_logger.info("Hourly profile converted to monthly profile!")
+        ghe_logger.main_info("Hourly profile converted to monthly profile!")
 
     @staticmethod
     def _reduce_to_monthly_load(load: list, peak: float) -> list:
