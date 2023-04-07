@@ -55,7 +55,7 @@ class CustomFormatter(logging.Formatter):
         return formatter.format(record)
 
 
-def addLoggingLevel(levelName, levelNum, methodName=None):
+def addLoggingLevel(levelName, levelNum, methodName=None):  # pragma: no cover
     # copied from: https://stackoverflow.com/questions/2183233/
     # how-to-add-a-custom-loglevel-to-pythons-logging-facility/35804945#35804945
     """
