@@ -54,7 +54,10 @@ class CustomFormatter(logging.Formatter):
         formatter = logging.Formatter(log_fmt, datefmt='%Y-%m-%d %H:%M:%S')
         return formatter.format(record)
 
+
 def addLoggingLevel(levelName, levelNum, methodName=None):
+    # copied from: https://stackoverflow.com/questions/2183233/
+    # how-to-add-a-custom-loglevel-to-pythons-logging-facility/35804945#35804945
     """
     Comprehensively adds a new logging level to the `logging` module and the
     currently configured logging class.
