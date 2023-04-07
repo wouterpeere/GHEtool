@@ -197,6 +197,7 @@ class Translations:  # pragma: no cover
         "numerical_results",
         "result_text_depth",
         "result_Rb_calculated",
+        "result_Reynolds",
         "results_ground_temperature",
         "results_heating_load",
         "results_heating_load_percentage",
@@ -1551,6 +1552,15 @@ class Translations:  # pragma: no cover
             "Equivalent borehole thermal resistance: , mK/W",
             "Equivalent borehole thermal resistance: , mK/W",
             "Equivalent borehole thermal resistance: , mK/W",
+        ]
+        self.result_Reynolds: List[str] = [
+            "Reynolds number: , ",
+            "Reynoldszahl  : , ",
+            "Reynoldsgetal: , ",
+            "Reynolds number: , ",
+            "Reynolds number: , ",
+            "Reynolds number: , ",
+            "Reynoldsnumber: ,",
         ]
         self.results_ground_temperature: List[str] = [
             "Average ground temperature: , °C",

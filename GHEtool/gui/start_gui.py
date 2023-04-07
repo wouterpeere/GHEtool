@@ -12,7 +12,7 @@ def run(path=None):  # pragma: no cover
 
     from GHEtool import FOLDER, ghe_logger
     from GHEtool.gui.gui_combine_window import MainWindow
-    from GHEtool.logger.ghe_logger import console_handler, console_handler_warning
+    from GHEtool.logger.ghe_logger import console_handler
 
     # init application
     app = QtWidgets_QApplication()
@@ -40,11 +40,6 @@ def run(path=None):  # pragma: no cover
         pyi_splash.close()
     except ModuleNotFoundError:
         pass
-
-    # set logging to console
-    ghe_logger.addHandler(console_handler)
-    # remove warning handler
-    ghe_logger.removeHandler(console_handler_warning)
 
     ghe_logger.info('GHEtool loaded!')
     window.showMaximized()

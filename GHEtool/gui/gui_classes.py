@@ -2330,6 +2330,7 @@ class ResultFigure(Category):
         -------
         None
         """
+        plt.close(self.fig)
         self.fig = copy.copy(fig)
         self.ax = fig.get_axes()[0]
         self.ax.set_xlabel(self.x_axes_text)

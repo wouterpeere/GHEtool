@@ -44,7 +44,7 @@ def main_functionalities():
                           baseload_cooling=monthly_load_cooling)
 
     # one can activate or deactive the logger, by default it is deactivated
-    borefield.activate_logger()
+    # borefield.activate_logger()
     # borefield.deactivate_logger()
 
     borefield.set_ground_parameters(data)
