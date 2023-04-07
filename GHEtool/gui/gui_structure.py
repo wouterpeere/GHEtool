@@ -1008,6 +1008,12 @@ class GuiStructure:
                 self.result_Rb_calculated.text_to_be_shown("Borefield", "_Rb")
                 self.result_Rb_calculated.function_to_convert_to_text(lambda x: round(x, 4))
 
+                self.result_Reynolds = ResultText(self.translations.result_Rb_calculated,
+                                                       category=self.numerical_results,
+                                                       prefix="Reynolds number: ", suffix="")
+                self.result_Reynolds.text_to_be_shown("Borefield", "Re")
+                self.result_Reynolds.function_to_convert_to_text(lambda x: round(x, 0))
+
                 self.results_ground_temperature = ResultText(self.translations.results_ground_temperature, category=self.numerical_results,
                                                              prefix="Average ground temperature: ", suffix=" deg C")
                 self.results_ground_temperature.text_to_be_shown("Borefield", "_Tg")
@@ -1059,6 +1065,7 @@ class GuiStructure:
                 # add dependency
                 self.option_method_temp_gradient.add_link_2_show(self.results_ground_temperature, on_index=1)
                 self.option_method_rb_calc.add_link_2_show(self.result_Rb_calculated, on_index=1)
+                self.option_method_rb_calc.add_link_2_show(self.result_Reynolds, on_index=1)
                 self.aim_req_depth.add_link_2_show(self.result_text_depth)
 
                 self.aim_optimize.add_link_2_show(self.results_heating_ext)
