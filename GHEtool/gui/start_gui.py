@@ -5,6 +5,7 @@ import logging
 
 # pragma: no cover
 import sys
+from pathlib import Path
 from platform import system
 from sys import argv
 
@@ -32,6 +33,8 @@ def run(path_list=None):  # pragma: no cover
     from PySide6.QtWidgets import QApplication as QtWidgets_QApplication
     from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
     from ScenarioGUI.global_settings import VERSION
+    from ScenarioGUI import load_config
+    load_config(Path(__file__).parent.joinpath("gui_config.ini"))
 
     if is_frozen:
         pyi_splash.update_text('Loading ...')

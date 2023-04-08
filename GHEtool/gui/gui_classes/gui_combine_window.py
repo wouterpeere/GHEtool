@@ -8,10 +8,9 @@ from os.path import dirname, realpath
 from pickle import load as pk_load
 from sys import path
 
-from GHEtool import FOLDER, Borefield
+from GHEtool import Borefield
 from ScenarioGUI import MainWindow
 from ScenarioGUI.gui_classes.gui_data_storage import DataStorage
-from ScenarioGUI import load_config
 
 currentdir = dirname(realpath(__file__))
 parentdir = dirname(currentdir)
@@ -19,11 +18,6 @@ path.append(parentdir)
 
 BACKUP_FILENAME: str = 'backup.GHEtoolBackUp'
 
-# get current version
-path = pathlib.Path(FOLDER).parent
-config = ConfigParser()
-config.read_file(open(path.joinpath('setup.cfg')))
-VERSION = config.get('metadata', 'version')
 
 # main GUI class
 class MainWindow(MainWindow):
@@ -32,7 +26,6 @@ class MainWindow(MainWindow):
     saving documents etc.)
     """
 
-    load_config(pathlib.Path(__file__).parent.parent.joinpath("gui_config.ini"))
 
     def _load_from_data(self, location: str) -> None:
         """

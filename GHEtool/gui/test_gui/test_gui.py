@@ -1,3 +1,4 @@
+from pathlib import Path
 from sys import setrecursionlimit
 
 import numpy as np
@@ -10,6 +11,10 @@ from GHEtool.gui.gui_structure import GUI, load_data_GUI
 from pytest import raises
 
 setrecursionlimit(1500)
+
+from ScenarioGUI import load_config
+print(Path(__file__).parent.parent.joinpath("gui_config.ini"))
+load_config(Path(__file__).parent.parent.joinpath("gui_config.ini"))
 
 
 def test_language(qtbot):

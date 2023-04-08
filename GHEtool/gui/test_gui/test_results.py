@@ -2,21 +2,22 @@
 test that the results are correctly calculated
 """
 import sys
+from pathlib import Path
 from typing import Tuple
 
-import keyboard
 import numpy as np
-import PySide6.QtCore as QtC
 import PySide6.QtWidgets as QtW
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
-from pytest import raises
 
 from GHEtool import Borefield, FluidData, GroundData, PipeData
 from GHEtool.gui.data_2_borefield_func import data_2_borefield
 from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
 from GHEtool.gui.gui_classes.translation_class import Translations
 from GHEtool.gui.gui_structure import GUI, GuiStructure
+from ScenarioGUI import load_config
+
+load_config(Path(__file__).parent.parent.joinpath("gui_config.ini"))
 
 sys.setrecursionlimit(1500)
 
