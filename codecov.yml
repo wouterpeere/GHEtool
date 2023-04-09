@@ -1,0 +1,4 @@
+# sample regex patterns
+ignore:
+  - "mac_settings.py"
+  - "start_gui.py"

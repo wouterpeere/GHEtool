@@ -3,7 +3,6 @@ script to start the GUI
 """
 import logging
 
-# pragma: no cover
 import sys
 from pathlib import Path
 from platform import system
