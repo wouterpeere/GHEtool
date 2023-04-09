@@ -1,4 +1,4 @@
 # sample regex patterns
 ignore:
-  - "mac_settings.py"
-  - "start_gui.py"
+  - "GHEtool/gui/mac_settings.py"
+  - "GHEtool/gui/start_gui.py"
