@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file including pl
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [2.1.2] - [expected] feb 2023
+## [2.1.2] - [expected] apr 2023
 
 ### Added
 - Coaxial pipes
@@ -12,6 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 - Wrong heating load in april in GUI (issue #94).
+
+### Changed
+- GUI base classes has been separated into a new package to be easier maintainable. 
 
 ## [2.1.1] - 2023-01-30
 
