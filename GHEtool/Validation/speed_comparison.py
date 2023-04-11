@@ -7,11 +7,11 @@ import time
 
 import pygfunction as gt
 
-from GHEtool import Borefield, GroundData
+from GHEtool import Borefield, GroundConstantTemperature
 
 
 def test_64_boreholes():
-    data = GroundData(3, 10, 0.2)
+    data = GroundConstantTemperature(3, 10)
     borefield_64 = gt.boreholes.rectangle_field(8, 8, 6, 6, 110, 1, 0.075)
 
     # monthly loading values
@@ -39,6 +39,7 @@ def test_64_boreholes():
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_64)
+    borefield.Rb = 0.2
 
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)  # maximum temperature
@@ -67,7 +68,7 @@ def test_64_boreholes():
 
 
 def test_10_boreholes():
-    data = GroundData(3, 10, 0.2)
+    data = GroundConstantTemperature(3, 10)
     borefield_10 = gt.boreholes.rectangle_field(2, 5, 6, 6, 110, 1, 0.075)
 
     # monthly loading values
@@ -95,6 +96,7 @@ def test_10_boreholes():
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_10)
+    borefield.Rb = 0.2
 
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)  # maximum temperature

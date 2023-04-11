@@ -11,7 +11,8 @@ from pytest import raises
 
 from GHEtool import *
 
-data = GroundData(3, 10, 0.2)
+data = GroundConstantTemperature(3, 10)
+data_ground_flux = GroundFluxTemperature(3, 10)
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
 pipeData = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
 
@@ -91,6 +92,7 @@ def test_borefield():
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)
+    borefield.set_Rb(0.2)
 
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)  # maximum temperature
@@ -104,13 +106,13 @@ def test_borefield():
 
 @pytest.fixture
 def borefield_quadrants():
-    data = GroundData(3.5,  # conductivity of the soil (W/mK)
-                      10,  # Ground temperature at infinity (degrees C)
-                      0.2)  # equivalent borehole resistance (K/W)
+    data = GroundConstantTemperature(3.5,  # conductivity of the soil (W/mK)
+                                     10)  # Ground temperature at infinity (degrees C)
 
     borefield_gt = gt.boreholes.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)
 
     borefield = Borefield()
+    borefield.set_Rb(0.2)
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)
 
@@ -127,6 +129,7 @@ def borefield():
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)
+    borefield.set_Rb(0.2)
 
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)  # maximum temperature
@@ -144,6 +147,7 @@ def borefield_custom_data():
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)
+    borefield.set_Rb(0.2)
     borefield.create_custom_dataset()
 
     # set temperature boundaries
@@ -163,6 +167,7 @@ def hourly_borefield():
     from GHEtool import FOLDER
     borefield = Borefield()
     borefield.set_ground_parameters(data)
+    borefield.set_Rb(0.2)
     borefield.set_borefield(borefield_gt)
     borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     return borefield
@@ -172,6 +177,7 @@ def hourly_borefield():
 def hourly_borefield_reversed():
     borefield = Borefield()
     borefield.set_ground_parameters(data)
+    borefield.set_Rb(0.2)
     borefield.set_borefield(borefield_gt)
     borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv", first_column_heating=False)
     return borefield
@@ -188,9 +194,33 @@ def borefield_cooling_dom():
     borefield.set_baseload_cooling(np.array(monthlyLoadCooling)*2)
 
     borefield.set_ground_parameters(data)
+    borefield.set_Rb(0.2)
     borefield.set_borefield(borefield_gt)
 
     return borefield
+
+
+def test_borefield_cannot_size_due_to_cooling():
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
+    borefield = Borefield(simulation_period=20,
+                          peak_heating=peak_heating,
+                          peak_cooling=peak_cooling,
+                          baseload_heating=monthly_load_heating,
+                          baseload_cooling=monthly_load_cooling)
+
+    borefield.set_ground_parameters(copy.copy(data_ground_flux))
+    borefield.set_borefield(copy.deepcopy(borefield_gt))
+    borefield.ground_data.Tg = 12
+    borefield.set_Rb(0.2)
+
+    # set temperature boundaries
+    borefield.set_max_ground_temperature(16)   # maximum temperature
+    borefield.set_min_ground_temperature(0)  # minimum temperature
+
+    try:
+        borefield.size()
+    except ValueError:
+        assert True
 
 
 def test_create_rectangular_field(borefield):
@@ -206,6 +236,22 @@ def test_create_circular_field(borefield):
 
 def test_empty_values(empty_borefield):
     np.testing.assert_array_equal(empty_borefield.baseload_cooling, np.zeros(12))
+
+
+def test_sizing_without_hourly_values(borefield):
+    try:
+        borefield.size_L4(100)
+    except ValueError:
+        assert True
+
+
+def test_set_Rb(borefield):
+    assert borefield.borehole._Rb == 0.2
+    borefield.set_Rb(0.15)
+    assert borefield.borehole._Rb == 0.15
+    borefield.Rb = 0.08
+    assert borefield.borehole._Rb == 0.08
+    assert borefield.Rb == 0.08
 
 
 def test_hourly_to_monthly(borefield):
@@ -260,6 +306,7 @@ def test_without_pipe(borefield):
 def test_Tg(borefield):
     borefield._sizing_setup.use_constant_Tg = False
     borefield._Tg()
+    assert borefield._Tg() == data.Tg
 
 
 def test_calculate_Rb(borefield):
@@ -381,11 +428,6 @@ def test_precalculated_data_1(borefield_custom_data):
 
 def test_precalculated_data_2(borefield_custom_data):
     borefield_custom_data.gfunction([3600*100, 3600*100, 3600*101], 100)
-
-
-def test_error_variable_Tg(borefield):
-    borefield.ground_data.Tg = 14
-    borefield.sizing_setup(use_constant_Tg=False)
 
 
 def test_choose_quadrant_1(borefield_quadrants):

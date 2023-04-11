@@ -13,7 +13,7 @@ class SizingSetup(BaseClass):
     """
     This class contains all the settings related to the sizing options.
     """
-    def __init__(self, use_constant_Rb: bool = None, use_constant_Tg: bool = None, quadrant_sizing: int = 0,
+    def __init__(self, use_constant_Rb: bool = None, quadrant_sizing: int = 0,
                  L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None):
         """
 
@@ -21,8 +21,6 @@ class SizingSetup(BaseClass):
         ----------
         use_constant_Rb : bool
             True if a constant borehole equivalent resistance (Rb*) value should be used
-        use_constant_Tg : bool
-            True if a constant Tg value should be used (the geothermal flux is neglected)
         quadrant_sizing : int
             Differs from 0 when a sizing in a certain quadrant is desired.
             Quadrants are developed by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]_
@@ -42,7 +40,6 @@ class SizingSetup(BaseClass):
         self._L2_sizing: bool = True
         self._L3_sizing: bool = False
         self._L4_sizing: bool = False
-        self.use_constant_Tg: bool = True
         self.use_constant_Rb: bool = True
         self.quadrant_sizing: int = 0
         self._backup: SizingSetup = None

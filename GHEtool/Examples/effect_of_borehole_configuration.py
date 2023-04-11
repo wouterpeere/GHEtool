@@ -2,16 +2,15 @@
 This document is an example of how the borefield configuration can influence the total borehole length and hence the cost of the borefield.
 """
 
+# import all the relevant functions
+from GHEtool import GroundConstantTemperature, Borefield
 import numpy as np
 import pygfunction as gt
-
-# import all the relevant functions
-from GHEtool import Borefield, GroundData
 
 
 def effect_borefield_configuration():
     # GroundData for an initial field of 11 x 11
-    data = GroundData(3, 10, 0.2)
+    data = GroundConstantTemperature(3, 10)
     borefield_gt = gt.boreholes.rectangle_field(11, 11, 6, 6, 110, 1, 0.075)
 
     # Monthly loading values
@@ -40,6 +39,7 @@ def effect_borefield_configuration():
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)
+    borefield.Rb = 0.2
 
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)   # maximum temperature
@@ -52,11 +52,14 @@ def effect_borefield_configuration():
     print("------------------------")
 
     # borefield of 6x20
-    data = GroundData(3, 10, 0.2)
+    data = GroundConstantTemperature(3, 10)
     borefield_gt = gt.boreholes.rectangle_field(6, 20, 6, 6, 110, 1, 0.075)
 
     # set ground parameters to borefield
     borefield.set_ground_parameters(data)
+
+    # set Rb
+    borefield.Rb = 0.2
 
     # size borefield
     depth6_20 = borefield.size(100)

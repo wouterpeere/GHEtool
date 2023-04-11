@@ -9,12 +9,11 @@ This document contains 4 different cases referring to the paper: Peere, W., Pica
 import numpy as np
 import pygfunction as gt
 
-from GHEtool import Borefield, GroundData
+from GHEtool import Borefield, GroundConstantTemperature
 
 # relevant borefield data for the calculations
-data = GroundData(3.5,  # conductivity of the soil (W/mK)
-                  10,   # Ground temperature at infinity (degrees C)
-                  0.2)  # equivalent borehole resistance (K/W)
+data = GroundConstantTemperature(3.5,  # conductivity of the soil (W/mK)
+                                 10)   # Ground temperature at infinity (degrees C)
 
 borefield_gt = gt.boreholes.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)
 
@@ -87,6 +86,7 @@ def check_cases():
 
         borefield.set_ground_parameters(data)
         borefield.set_borefield(borefield_gt)
+        borefield.Rb = 0.2
 
         # set temperature boundaries
         borefield.set_max_ground_temperature(16)  # maximum temperature
@@ -134,6 +134,7 @@ def check_custom_datafile():
 
         borefield.set_ground_parameters(data)
         borefield.set_borefield(customField)
+        borefield.Rb = 0.2
 
         # set temperature boundaries
         borefield.set_max_ground_temperature(16)  # maximum temperature
