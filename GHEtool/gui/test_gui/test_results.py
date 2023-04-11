@@ -10,7 +10,7 @@ import PySide6.QtWidgets as QtW
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
-from GHEtool import Borefield, FluidData, GroundData, PipeData
+from GHEtool import Borefield, FluidData, GroundConstantTemperature, GroundFluxTemperature, PipeData
 from GHEtool.gui.data_2_borefield_func import data_2_borefield
 from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
 from GHEtool.gui.gui_classes.translation_class import Translations
@@ -54,8 +54,10 @@ def create_borefield(g_s: GuiStructure) -> Borefield:
     borefield.set_max_ground_temperature(g_s.option_max_temp.get_value())
     borefield.set_min_ground_temperature(g_s.option_min_temp.get_value())
 
-    g_d = GroundData(g_s.option_conductivity.get_value(), g_s.option_ground_temp.get_value(),
-                    g_s.option_constant_rb.get_value(), g_s.option_heat_capacity.get_value() * 1000, 0)
+    if g_s.option_method_temp_gradient == 0:
+        g_d = GroundConstantTemperature(g_s.option_conductivity.get_value(), g_s.option_ground_temp.get_value(), g_s.option_heat_capacity.get_value() * 1000)
+    else:
+        g_d = GroundConstantTemperature(g_s.option_conductivity.get_value(), g_s.option_ground_temp_gradient.get_value(), g_s.option_heat_capacity.get_value() * 1000)
     borefield.set_ground_parameters(g_d)
 
     borefield.create_rectangular_borefield(g_s.option_width.get_value(), g_s.option_length.get_value(), g_s.option_spacing.get_value(),
@@ -120,7 +122,7 @@ def test_temp_profile_ground_data(qtbot, depth: float, k_s: float, heat_cap: flo
     gs.option_temp_gradient.set_value(0)
     gs.option_constant_rb.set_value(r_b)
 
-    gd = GroundData(k_s, ground_temp, r_b, heat_cap * 1_000, 0)
+    gd = GroundConstantTemperature(k_s, ground_temp, heat_cap * 1_000)
     borefield.set_ground_parameters(gd)
 
     main_window.save_scenario()
@@ -167,13 +169,10 @@ def test_temp_profile_temp_gradient(qtbot, gradient: float, ground_temp: float):
     borefield.ground_data.flux = k_s * gradient / 100
     borefield.ground_data.Tg = ground_temp
 
-    borefield._sizing_setup.use_constant_Tg = False
-
     ds = main_window.list_ds[-1]
     borefield_gui, func = data_2_borefield(ds)
     assert np.isclose(borefield_gui.ground_data.flux, borefield.ground_data.flux)
     assert np.isclose(borefield_gui.ground_data.Tg, borefield.ground_data.Tg)
-    assert borefield_gui._sizing_setup.use_constant_Tg == borefield._sizing_setup.use_constant_Tg
     assert func.func == borefield_gui.calculate_temperatures
     assert func.args == (depth,)
     assert func.keywords == {}
@@ -236,7 +235,7 @@ def test_temp_profile_pipe_data(qtbot, n_pipes: int, conduct_grout: float, condu
     main_window.save_scenario()
     ds = main_window.list_ds[-1]
     borefield_gui, func = data_2_borefield(ds)
-    assert borefield_gui.pipe_data == borefield.pipe_data
+    assert borefield_gui.borehole.pipe_data == borefield.borehole.pipe_data
     assert borefield_gui._sizing_setup.use_constant_Rb == borefield._sizing_setup.use_constant_Rb
     assert func.func == borefield_gui.calculate_temperatures
     assert func.args == (depth,)
@@ -289,7 +288,7 @@ def test_temp_profile_fluid_data(qtbot, conduct: float, density: float, heat_cap
     main_window.save_scenario()
     ds = main_window.list_ds[-1]
     borefield_gui, func = data_2_borefield(ds)
-    assert borefield_gui.fluid_data == borefield.fluid_data
+    assert borefield_gui.borehole.fluid_data == borefield.borehole.fluid_data
     assert borefield_gui._sizing_setup.use_constant_Rb == borefield._sizing_setup.use_constant_Rb
     assert func.func == borefield_gui.calculate_temperatures
     assert func.args == (depth,)

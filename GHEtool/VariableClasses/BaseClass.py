@@ -98,8 +98,11 @@ class BaseClass:
 
         for key, value in dictionary.items():
 
+            if not hasattr(self, key):
+                continue
+
             # for all self-defined classes
-            if hasattr(getattr(self, key), "to_dict"):
+            if hasattr(getattr(self, key), "from_dict"):
                 getattr(self, key).from_dict(value)
                 continue
 

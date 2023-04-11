@@ -69,9 +69,16 @@ class MainWindow(MainWindow):
             import GHEtool
             from ScenarioGUI.gui_classes import gui_data_storage
             GHEtool.gui.gui_data_storage = gui_data_storage
+            from GHEtool import GroundConstantTemperature
+            class BoreFieldNew:
+                """nothing"""
+            BorefielOld = Borefield
+            GHEtool.VariableClasses.VariableClasses.GroundData = GroundConstantTemperature
             GHEtool.gui.gui_data_storage.DataStorage = gui_data_storage.DataStorage
+            GHEtool.main_class.Borefield = BoreFieldNew
             with open(location, "rb") as file:
                 saving = pk_load(file)
+            GHEtool.main_class.Borefield = BorefielOld
             version = "2.1.0"
 
         if version == "2.1.2":
@@ -102,6 +109,7 @@ class MainWindow(MainWindow):
                 else:
                     setattr(ds, 'results', Borefield())
                     getattr(ds, 'results').from_dict(borefield)
+                ds.results.set_Rb(borefield["ground_data"]["Rb"])
                 self.list_ds.append(ds)
             # set and change the window title
             self.filename = saving['filename']

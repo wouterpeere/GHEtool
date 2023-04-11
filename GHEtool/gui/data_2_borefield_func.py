@@ -45,6 +45,8 @@ def data_2_borefield(ds: DataStorage) -> tuple[Borefield, partial[[], None]]:
     # set fluid and pipe data
         borefield.set_fluid_parameters(_create_fluid_data(ds))
         borefield.set_pipe_parameters(_create_pipe_data(ds))
+    else:
+        borefield.Rb = ds.option_constant_rb  # equivalent borehole resistance (K/W)
 
     # set monthly loads
     peak_heating, peak_cooling, monthly_load_heating, monthly_load_cooling = _create_monthly_loads_peaks(ds)

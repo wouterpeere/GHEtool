@@ -639,7 +639,7 @@ class Borefield(BaseClass):
             Equivalent borehole thermal resistance [mK/W]
         """
         # use a constant Rb*
-        if self._sizing_setup.use_constant_Rb:
+        if not self.borehole.fluid_data.check_values():
             return self.Rb
 
         # calculate Rb*
