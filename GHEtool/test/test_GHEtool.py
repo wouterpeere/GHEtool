@@ -9,7 +9,7 @@ import pygfunction as gt
 import pytest
 from pytest import raises
 
-from GHEtool import *
+from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, PipeData, Borefield, SizingSetup, FOLDER
 
 data = GroundConstantTemperature(3, 10)
 data_ground_flux = GroundFluxTemperature(3, 10)

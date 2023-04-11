@@ -7,7 +7,8 @@ from functools import partial
 from typing import TYPE_CHECKING
 
 import numpy as np
-from GHEtool import Borefield, FluidData, GroundData, PipeData
+from GHEtool import Borefield, FluidData, PipeData, GroundConstantTemperature, GroundFluxTemperature
+from GHEtool.VariableClasses import GroundData
 from GHEtool.gui.gui_structure import load_data_GUI
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -72,7 +73,6 @@ def data_2_borefield(ds: DataStorage) -> tuple[Borefield, partial[[], None]]:
     # set up the borefield sizing
     borefield.sizing_setup(H_init=borefield.borefield[0].H,
                            use_constant_Rb=ds.option_method_rb_calc == 0,
-                           use_constant_Tg=ds.option_method_temp_gradient == 0,
                            L2_sizing=ds.option_method_size_depth == 0,
                            L3_sizing=ds.option_method_size_depth == 1,
                            L4_sizing=ds.option_method_size_depth == 2)
@@ -146,8 +146,10 @@ def _calculate_flux(ds: DataStorage) -> float:
 
 
 def _create_ground_data(ds: DataStorage) -> GroundData:
-    return GroundData(ds.option_conductivity, ds.option_ground_temp if ds.option_method_temp_gradient == 0 else ds.option_ground_temp_gradient,
-                      ds.option_constant_rb, ds.option_heat_capacity * 1000, _calculate_flux(ds))
+    if ds.option_method_temp_gradient == 0:
+        return GroundConstantTemperature(ds.option_conductivity, ds.option_ground_temp, ds.option_heat_capacity * 1000)
+    return GroundFluxTemperature(ds.option_conductivity, ds.option_ground_temp_gradient, ds.option_heat_capacity * 1000,
+                                 _calculate_flux(ds))
 
 
 def _create_monthly_loads_peaks(ds: DataStorage) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
