@@ -4,6 +4,7 @@ This file contains all the code for the borefield calculations.
 from __future__ import annotations
 
 from math import pi
+from pathlib import Path
 from typing import Tuple
 
 import matplotlib.pyplot as plt
@@ -1890,7 +1891,7 @@ class Borefield(BaseClass):
 
         return True
 
-    def load_hourly_profile(self, file_path: str, header: bool = True, separator: str = ";",
+    def load_hourly_profile(self, file_path: str | Path, header: bool = True, separator: str = ";",
                             first_column_heating: bool = True) -> None:
         """
         This function loads in an hourly load profile [kW].
