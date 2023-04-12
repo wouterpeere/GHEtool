@@ -13,7 +13,7 @@ from GHEtool.gui.gui_classes.translation_class import Translations
 from numpy import array, cos, int64, round, sin, sum
 from pandas import DataFrame as pd_DataFrame
 from pandas import read_csv as pd_read_csv
-from ScenarioGUI.global_settings import DARK, GREY, LIGHT, WHITE
+import ScenarioGUI.global_settings as globs
 from ScenarioGUI.gui_classes.gui_structure import GuiStructure
 from ScenarioGUI.gui_classes.gui_structure_classes import (
     Aim,
@@ -210,63 +210,11 @@ class GUI(GuiStructure):
         self.page_options.set_next_page(self.page_borehole)
         self.page_borehole.set_previous_page(self.page_options)
 
-        # def create_category_earth():
-        self.category_earth = Category(
-            page=self.page_borehole,
-            label=translations.category_earth,
-        )
-
-        self.option_conductivity = FloatBox(
-            category=self.category_earth,
-            label=translations.option_conductivity,
-            default_value=1.5,
-            decimal_number=3,
-            minimal_value=0.1,
-            maximal_value=10,
-            step=0.1,
-        )
-
-        self.option_heat_capacity = FloatBox(
-            category=self.category_earth,
-            label=translations.option_heat_capacity,
-            default_value=2400,
-            decimal_number=1,
-            minimal_value=1,
-            maximal_value=100_000,
-            step=100,
-        )
-        self.option_ground_temp = FloatBox(
-            category=self.category_earth,
-            label=translations.option_ground_temp,
-            default_value=12,
-            decimal_number=2,
-            minimal_value=-273.15,
-            maximal_value=100,
-            step=0.1,
-        )
-        self.option_ground_temp_gradient = FloatBox(
-            category=self.category_earth,
-            label=translations.option_ground_temp_gradient,
-            default_value=10,
-            decimal_number=2,
-            minimal_value=-273.15,
-            maximal_value=100,
-            step=0.1,
-        )
-        self.option_temp_gradient = FloatBox(
-            category=self.category_earth,
-            label=translations.option_temp_gradient,
-            default_value=2,
-            decimal_number=3,
-            minimal_value=-273.15,
-            maximal_value=100,
-            step=0.1,
-        )
-
-        # add dependencies
-        self.option_method_temp_gradient.add_link_2_show(self.option_ground_temp_gradient, on_index=1)
-        self.option_method_temp_gradient.add_link_2_show(self.option_temp_gradient, on_index=1)
-        self.option_method_temp_gradient.add_link_2_show(self.option_ground_temp, on_index=0)
+        #self.aim_rect = Aim(page=self.page_borehole, label="aim_rect", icon="Temp_Profile.svg")
+        #self.aim_circle = Aim(page=self.page_borehole, label="aim_circle", icon="Temp_Profile.svg")
+        #self.aim_L_shape = Aim(page=self.page_borehole, label="aim_L_shape", icon="Temp_Profile.svg")
+        #self.aim_Box_shaped = Aim(page=self.page_borehole, label="aim_Box_shaped", icon="Temp_Profile.svg")
+        #self.aim_U_shaped = Aim(page=self.page_borehole, label="aim_U_shaped", icon="Temp_Profile.svg")
 
         # def create_category_borehole():
         self.category_borehole = Category(
@@ -382,6 +330,64 @@ class GUI(GuiStructure):
         self.aim_temp_profile.add_link_2_show(self.option_length)
         self.aim_req_depth.add_link_2_show(self.option_length)
         self.aim_optimize.add_link_2_show(self.option_length)
+
+        # def create_category_earth():
+        self.category_earth = Category(
+            page=self.page_borehole,
+            label=translations.category_earth,
+        )
+
+        self.option_conductivity = FloatBox(
+            category=self.category_earth,
+            label=translations.option_conductivity,
+            default_value=1.5,
+            decimal_number=3,
+            minimal_value=0.1,
+            maximal_value=10,
+            step=0.1,
+        )
+
+        self.option_heat_capacity = FloatBox(
+            category=self.category_earth,
+            label=translations.option_heat_capacity,
+            default_value=2400,
+            decimal_number=1,
+            minimal_value=1,
+            maximal_value=100_000,
+            step=100,
+        )
+        self.option_ground_temp = FloatBox(
+            category=self.category_earth,
+            label=translations.option_ground_temp,
+            default_value=12,
+            decimal_number=2,
+            minimal_value=-273.15,
+            maximal_value=100,
+            step=0.1,
+        )
+        self.option_ground_temp_gradient = FloatBox(
+            category=self.category_earth,
+            label=translations.option_ground_temp_gradient,
+            default_value=10,
+            decimal_number=2,
+            minimal_value=-273.15,
+            maximal_value=100,
+            step=0.1,
+        )
+        self.option_temp_gradient = FloatBox(
+            category=self.category_earth,
+            label=translations.option_temp_gradient,
+            default_value=2,
+            decimal_number=3,
+            minimal_value=-273.15,
+            maximal_value=100,
+            step=0.1,
+        )
+
+        # add dependencies
+        self.option_method_temp_gradient.add_link_2_show(self.option_ground_temp_gradient, on_index=1)
+        self.option_method_temp_gradient.add_link_2_show(self.option_temp_gradient, on_index=1)
+        self.option_method_temp_gradient.add_link_2_show(self.option_ground_temp, on_index=0)
 
         # self.aim_size_length.add_link_2_show(self.option_max_width)
         # self.aim_size_length.add_link_2_show(self.option_max_length)
@@ -1198,10 +1204,10 @@ class GUI(GuiStructure):
             max_l = min(frame.width(), frame.height())
             scale = max_l / r_bore / 1.25  # leave 25 % space
             # set colors
-            dark_color = array(DARK.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
-            white_color = array(WHITE.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
-            light_color = array(LIGHT.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
-            grey_color = array(GREY.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
+            dark_color = array(globs.DARK.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
+            white_color = array(globs.WHITE.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
+            light_color = array(globs.LIGHT.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
+            grey_color = array(globs.GREY.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
             blue_color = QtG.QColor(dark_color[0], dark_color[1], dark_color[2])
             blue_light = QtG.QColor(light_color[0], light_color[1], light_color[2])
             white_color = QtG.QColor(white_color[0], white_color[1], white_color[2])

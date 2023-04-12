@@ -293,8 +293,8 @@ class Translations:  # pragma: no cover
             "Aim,Aim of simulation",
         ]
         self.page_borehole: List[str] = [
-            "Borehole @and earth,Borehole and earth",
-            "Bohrloch @und Erdreich,Bohrloch und Erdreich",
+            "Borefield @and earth,Borefield and earth",
+            "Bohrlochfeld @und Erdreich,Bohrlochfeld und Erdreich",
             "Boorveld @en grond,Boorveld en grond",
             "Foro e @terra,Foro e terra",
             "Forage @et terre,Forage et terre",
@@ -350,9 +350,9 @@ class Translations:  # pragma: no cover
         self.label_File: List[str] = ["File", "Datei", "Bestand", "File", "File", "File", "File"]
         self.label_Calculation: List[str] = ["Calculation", "Berechnung", "Berekening", "Calculation", "Calculation", "Calculation", "Calculation"]
         self.category_borehole: List[str] = [
-            "Borehole and earth properties",
-            "Bohrloch und Erdreicheigenschaften",
-            "Eigenschappen van boorveld en grond",
+            "Borefield properties",
+            "Bohrlochfeldeigenschaften",
+            "Eigenschappen van boorveld",
             "Proprietà del foro e della terra",
             "Propriétés du trou de sonde et de la terre",
             "Propiedades del pozo y terreno",

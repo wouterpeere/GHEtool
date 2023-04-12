@@ -13,7 +13,7 @@ import pygfunction as gt
 
 from scipy.signal import convolve
 
-from GHEtool.VariableClasses import FluidData, PipeData, Borehole, GroundConstantTemperature
+from GHEtool.VariableClasses import FluidData, PipeData, Borehole, GroundConstantTemperature, GroundFluxTemperature
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, SizingSetup
 from GHEtool.VariableClasses.BaseClass import BaseClass
 from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
@@ -2288,3 +2288,26 @@ class Borefield(BaseClass):
 
         # show plot
         plt.show()
+
+    def from_dict(self, dictionary: dict) -> None:
+        """
+        This function converts the dictionary values to the class attributes.
+        Currently, it can handle np.ndarray, list, set, str, int, float, tuple, pygfunction.Borehole
+        and classes within GHEtool.
+
+        Parameters
+        ----------
+        dictionary
+            Dictionary with all the attributes of the class
+
+        Returns
+        -------
+        None
+        """
+        if "flux" in dictionary["ground_data"]:
+            self.ground_data = GroundFluxTemperature(dictionary["ground_data"]["k_s"], dictionary["ground_data"]["Tg"],
+                                                     dictionary["ground_data"]["volumetric_heat_capacity"], dictionary["ground_data"]["flux"])
+        else:
+            self.ground_data = GroundConstantTemperature(dictionary["ground_data"]["k_s"], dictionary["ground_data"]["Tg"],
+                                                         dictionary["ground_data"]["volumetric_heat_capacity"])
+        super().from_dict(dictionary)

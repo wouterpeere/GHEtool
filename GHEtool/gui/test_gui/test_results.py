@@ -59,6 +59,7 @@ def create_borefield(g_s: GuiStructure) -> Borefield:
     else:
         g_d = GroundConstantTemperature(g_s.option_conductivity.get_value(), g_s.option_ground_temp_gradient.get_value(), g_s.option_heat_capacity.get_value() * 1000)
     borefield.set_ground_parameters(g_d)
+    borefield.set_Rb(g_s.option_constant_rb.get_value())
 
     borefield.create_rectangular_borefield(g_s.option_width.get_value(), g_s.option_length.get_value(), g_s.option_spacing.get_value(),
                                            g_s.option_spacing.get_value(), g_s.option_depth.get_value(), g_s.option_pipe_depth.get_value(),
@@ -107,7 +108,7 @@ def test_temp_profile_ground_data(qtbot, depth: float, k_s: float, heat_cap: flo
     heat_cap = round_down(heat_cap, 1)
     depth = round_down(depth, 2)
     ground_temp = round_down(ground_temp, 2)
-    r_b = round_down(ground_temp, 4)
+    r_b = round_down(r_b, 4)
 
     gs = main_window.gui_structure
 
@@ -119,17 +120,19 @@ def test_temp_profile_ground_data(qtbot, depth: float, k_s: float, heat_cap: flo
     gs.option_heat_capacity.set_value(heat_cap)
     gs.option_ground_temp.set_value(ground_temp)
     gs.option_depth.set_value(depth)
-    gs.option_temp_gradient.set_value(0)
+    gs.option_method_temp_gradient.set_value(0)
     gs.option_constant_rb.set_value(r_b)
 
     gd = GroundConstantTemperature(k_s, ground_temp, heat_cap * 1_000)
     borefield.set_ground_parameters(gd)
+    borefield.set_Rb(r_b)
 
     main_window.save_scenario()
 
     ds = main_window.list_ds[-1]
     borefield_gui, func = data_2_borefield(ds)
     assert borefield_gui.ground_data == borefield.ground_data
+    assert borefield_gui.borehole._Rb == borefield.borehole._Rb
     assert func.func == borefield_gui.calculate_temperatures
     assert func.args == (depth, )
     assert func.keywords == {}
@@ -166,8 +169,8 @@ def test_temp_profile_temp_gradient(qtbot, gradient: float, ground_temp: float):
     gs.option_ground_temp_gradient.set_value(ground_temp)
     main_window.save_scenario()
 
-    borefield.ground_data.flux = k_s * gradient / 100
-    borefield.ground_data.Tg = ground_temp
+    gd = GroundFluxTemperature(k_s, ground_temp, borefield.ground_data.volumetric_heat_capacity, k_s * gradient / 100)
+    borefield.set_ground_parameters(gd)
 
     ds = main_window.list_ds[-1]
     borefield_gui, func = data_2_borefield(ds)

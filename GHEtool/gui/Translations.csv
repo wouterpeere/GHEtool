@@ -11,7 +11,7 @@ pushButton_DeleteScenario;Delete scenario;Szenario löschen;Verwijder scenario;C
 pushButton_start_multiple;Calculate all scenarios;Berechne alle Szenarios;Bereken alle scenarios;Calculate all scenarios;Calculate all scenarios;Calculate all scenarios;Calculate all scenarios
 pushButton_Cancel;Exit;Verlassen;Sluit;Esci;Sortie;Salir;Saír
 page_aim;Aim,Aim of simulation;Ziel,Ziel der Simulation;Doel,Doel van de simulatie;Aim,Aim of simulation;Aim,Aim of simulation;Aim,Aim of simulation;Aim,Aim of simulation
-page_borehole;Borehole @and earth,Borehole and earth;Bohrloch @und Erdreich,Bohrloch und Erdreich;Boorveld @en grond,Boorveld en grond;Foro e @terra,Foro e terra;Forage @et terre,Forage et terre;Pozo @y terreno,Pozo y terreno;Pozo @e chan,Pozo e chan
+page_borehole;Borefield @and earth,Borefield and earth;Bohrlochfeld @und Erdreich,Bohrlochfeld und Erdreich;Boorveld @en grond,Boorveld en grond;Foro e @terra,Foro e terra;Forage @et terre,Forage et terre;Pozo @y terreno,Pozo y terreno;Pozo @e chan,Pozo e chan
 page_borehole_resistance;Borehole @resistance,Equivalent borehole resistance;Bohrloch-@widerstand,Equivalänter Bohrlochwiderstand;Boorgat-@weerstand,Equivalente boorgatweerstand;Borehole@resistance,Equivalent borehole resistance;Borehole@resistance,Equivalent borehole resistance;Borehole@resistance,Equivalent borehole resistance;Borehole@resistance,Equivalent borehole resistance
 page_thermal;Thermal @demand,Thermal demands;Thermischer @Bedarf,Thermische Last;Thermische @vraag,Thermische vraag;Richieste @termiche,Richieste termiche;Demande @thermique,Demande thermique;Cargas @térmicas,Cargas térmicas;Cargas @térmicas,Cargas térmicas
 page_result;Results,Results;Ergebnisse,Ergebnisse;Resultaten,Resultaten;Risultati,Risultati;Résultats,Résultats;Resultados,Resultados;Resultados,Resultados
@@ -20,7 +20,7 @@ page_settings;Settings,Settings;Einstellungen,Einstellungen;Instellingen,Instell
 label_Status;Progress: ;Fortschritt: ;Vooruitgang: ;Progressi: ;Progrès: ;Progreso: ;Progreso: 
 label_File;File;Datei;Bestand;File;File;File;File
 label_Calculation;Calculation;Berechnung;Berekening;Calculation;Calculation;Calculation;Calculation
-category_borehole;Borehole and earth properties;Bohrloch und Erdreicheigenschaften;Eigenschappen van boorveld en grond;Proprietà del foro e della terra;Propriétés du trou de sonde et de la terre;Propiedades del pozo y terreno;Propiedades do pozo e do chan
+category_borehole;Borefield properties;Bohrlochfeldeigenschaften;Eigenschappen van boorveld;Proprietà del foro e della terra;Propriétés du trou de sonde et de la terre;Propiedades del pozo y terreno;Propiedades do pozo e do chan
 option_depth;Borehole depth [m]: ;Bohrlochtiefe [m]: ;Boorgatdiepte [m]: ;Profondità foro [m]: ;Profondeur du forage [m]: ;Profundidad del pozo [m]: ;Profundidade do pozo [m]: 
 option_spacing;Borehole spacing [m]: ;Bohrlochabstand [m]: ;Boorgatspatiëring [m]: ;Spaziatura del foro [m]: ;Espacement des trous de forage [m]: ;Espaciado entre pozos [m]: ;Espazamento entre pozos [m]: 
 option_conductivity;Conductivity of the soil [W/mK]: ;Wärmeleitfähigkeit des Erdreiches [W/mK]: ;Conductiviteit van de bodem [W/mK]: ;Conducibilità del terreno [W/mK]: ;Conductivité du sol [W/mK]: ;Conductividad del suelo [W/mK]: ;Conductividade do chan [W/mK]: 
