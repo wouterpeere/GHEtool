@@ -5,11 +5,11 @@ scenarioString;Scenario;Szenario;Scenario;Scenario;Scénario;Escenario;Escenario
 label_Language;Language: ;Sprache: ;Taal: ;Languange: ;Languange: ;Idioma:;Lingua: 
 category_language;Language: ;Sprache: ;Taal: ;Languange: ;Languange: ;Idioma:;Lingua: 
 option_language;Language:,English,German,Dutch,Italian,French,Spanish,Galician;Sprache:,English,German,Dutch,Italian,French,Spanish,Galician;Taal:,English,German,Dutch,Italian,French,Spanish,Galician;Languange:,English,German,Dutch,Italian,French,Spanish,Galician;Languange:,English,German,Dutch,Italian,French,Spanish,Galician;Idioma:,English,German,Dutch,Italian,French,Spanish,Galician;Lingua:,English,German,Dutch,Italian,French,Spanish,Galician
-pushButton_SaveScenario;Update scenario;Szenario aktualisieren;Update scenario;Aggiorna scenario;Mettre à jour le scénario;Actualizar escenario;Actualizar escenario
-pushButton_AddScenario;Add scenario;Szenario hinzufügen;Nieuw scenario;Aggiungi scenario;Ajouter un scénario;Añadir escenario;Engadir escenario
-pushButton_DeleteScenario;Delete scenario;Szenario löschen;Verwijder scenario;Cancella scenario;Supprimer un scénario;Borrar escenario;Eliminar escenario
-pushButton_start_multiple;Calculate all scenarios;Berechne alle Szenarios;Bereken alle scenarios;Calculate all scenarios;Calculate all scenarios;Calculate all scenarios;Calculate all scenarios
-pushButton_Cancel;Exit;Verlassen;Sluit;Esci;Sortie;Salir;Saír
+push_button_save_scenario;Update scenario;Szenario aktualisieren;Update scenario;Aggiorna scenario;Mettre à jour le scénario;Actualizar escenario;Actualizar escenario
+push_button_add_scenario;Add scenario;Szenario hinzufügen;Nieuw scenario;Aggiungi scenario;Ajouter un scénario;Añadir escenario;Engadir escenario
+push_button_delete_scenario;Delete scenario;Szenario löschen;Verwijder scenario;Cancella scenario;Supprimer un scénario;Borrar escenario;Eliminar escenario
+push_button_start_multiple;Calculate all scenarios;Berechne alle Szenarios;Bereken alle scenarios;Calculate all scenarios;Calculate all scenarios;Calculate all scenarios;Calculate all scenarios
+push_button_cancel;Exit;Verlassen;Sluit;Esci;Sortie;Salir;Saír
 page_aim;Aim,Aim of simulation;Ziel,Ziel der Simulation;Doel,Doel van de simulatie;Aim,Aim of simulation;Aim,Aim of simulation;Aim,Aim of simulation;Aim,Aim of simulation
 page_borehole;Borefield @and earth,Borefield and earth;Bohrlochfeld @und Erdreich,Bohrlochfeld und Erdreich;Boorveld @en grond,Boorveld en grond;Foro e @terra,Foro e terra;Forage @et terre,Forage et terre;Pozo @y terreno,Pozo y terreno;Pozo @e chan,Pozo e chan
 page_borehole_resistance;Borehole @resistance,Equivalent borehole resistance;Bohrloch-@widerstand,Equivalänter Bohrlochwiderstand;Boorgat-@weerstand,Equivalente boorgatweerstand;Borehole@resistance,Equivalent borehole resistance;Borehole@resistance,Equivalent borehole resistance;Borehole@resistance,Equivalent borehole resistance;Borehole@resistance,Equivalent borehole resistance
@@ -123,20 +123,20 @@ label_StayScenario;Stay by scenario;Beim Szenario bleiben;Blijf bij scenario;Sta
 X_Axis_Load;Month of year;Monat des Jahres;Maand van het jaar;Month of year;Month of year;Month of year;Month of year
 Y_Axis_Load_P;Remaining peak thermal power [kW];Übriggebliebene Spitzenleistung [kW];Overblijvende piek [kW];Remaining peak thermal power [kW];Remaining peak thermal power [kW];Remaining peak thermal power [kW];Remaining peak thermal power [kW]
 Y_Axis_Load_Q;Remaining thermal energy [kWh];Übriggebliebene thermische Last [kWh];Overblijvende thermische energie [kWh];Remaining thermal energy [kWh];Remaining thermal energy [kWh];Remaining thermal energy [kWh];Remaining thermal energy [kWh]
-menuLanguage;Language;Sprache;Taal;Languange;Languange;Idiom;Lingua
-menuSettings;Settings;Einstellungen;Instellingen;Settings;Settings;Settings;Settings
-menuCalculation;Calculation;Berechnung;Berekening;Calculation;Calculation;Calculation;Calculation
-menuFile;File;Datei;Bestand;File;File;File;File
-menuScenario;Scenario;Szenario;Scenario;Scenario;Scénario;Escenario;Escenario
+menu_language;Language;Sprache;Taal;Languange;Languange;Idiom;Lingua
+menu_settings;Settings;Einstellungen;Instellingen;Settings;Settings;Settings;Settings
+menu_calculation;Calculation;Berechnung;Berekening;Calculation;Calculation;Calculation;Calculation
+menu_file;File;Datei;Bestand;File;File;File;File
+menu_scenario;Scenario;Szenario;Scenario;Scenario;Scénario;Escenario;Escenario
 action_start_multiple;Calculate all scenarios;Berechne alle Szenarios;Bereken alle scenarios;Calculate all scenarios;Calculate all scenarios;Calculate all scenarios;Calculate all scenarios
-actionNew;New Project;Neues Projekt;Nieuw project;New Project;New Project;New Project;New Project
-actionSave;Save Project;Speichere Projekt;Bewaar project;Save Project;Save Project;Save Project;Save Project
-actionOpen;Open Project;Öffne Projekt;Open project;Open Project;Open Project;Open Project;Open Project
-actionUpdate_Scenario;Update scenario;Szenario aktualisieren;Update scenario;Aggiorna scenario;Mettre à jour le scénario;Actualizar escenario;Actualizar escenario
-actionAdd_Scenario;Add scenario;Szenario hinzufügen;Nieuw scenario;Aggiungi scenario;Ajouter un scénario;Añadir escenario;Engadir escenario
-actionDelete_scenario;Delete scenario;Szenario löschen;Verwijder scenario;Cancella scenario;Supprimer un scénario;Borrar escenario;Eliminar escenario
-actionSave_As;Save as;Speichere Projekt unter ...;Sla op als;Save as;Save as;Save as;Save as
-actionRename_scenario;Rename scenario;Szenario umbenennen;Hernoem scenario;Rename scenario;Rename scenario;Rename scenario;Rename scenario
+action_new;New Project;Neues Projekt;Nieuw project;New Project;New Project;New Project;New Project
+action_save;Save Project;Speichere Projekt;Bewaar project;Save Project;Save Project;Save Project;Save Project
+action_open;Open Project;Öffne Projekt;Open project;Open Project;Open Project;Open Project;Open Project
+action_update_scenario;Update scenario;Szenario aktualisieren;Update scenario;Aggiorna scenario;Mettre à jour le scénario;Actualizar escenario;Actualizar escenario
+action_add_scenario;Add scenario;Szenario hinzufügen;Nieuw scenario;Aggiungi scenario;Ajouter un scénario;Añadir escenario;Engadir escenario
+action_delete_scenario;Delete scenario;Szenario löschen;Verwijder scenario;Cancella scenario;Supprimer un scénario;Borrar escenario;Eliminar escenario
+action_save_as;Save as;Speichere Projekt unter ...;Sla op als;Save as;Save as;Save as;Save as
+button_rename_scenario;Rename scenario;Szenario umbenennen;Hernoem scenario;Rename scenario;Rename scenario;Rename scenario;Rename scenario
 button_rename_scenario;Rename scenario;Szenario umbenennen;Hernoem scenario;Rename scenario;Rename scenario;Rename scenario;Rename scenario
 label_Language_Head;Language;Sprache;Taal;Languange;Languange;Idiom;Lingua
 label_aim_question;What is the purpose of the simulation?;Was ist das Ziel der Simulation?;Wat is het doel van de berekening?;What is the purpose of the simulation?;What is the purpose of the simulation?;What is the purpose of the simulation?;What is the purpose of the simulation?

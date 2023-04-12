@@ -10,6 +10,7 @@ import numpy as np
 from GHEtool import Borefield, FluidData, PipeData, GroundConstantTemperature, GroundFluxTemperature
 from GHEtool.VariableClasses import GroundData
 from GHEtool.gui.gui_structure import load_data_GUI
+import pygfunction as gt
 
 if TYPE_CHECKING:  # pragma: no cover
     from numpy.typing import NDArray
@@ -118,8 +119,25 @@ def _set_boreholes(ds: DataStorage, borefield: Borefield) -> None:
     -------
     None
     """
-    borefield.create_rectangular_borefield(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing, ds.option_depth, ds.option_pipe_depth,
-                                           ds.option_pipe_borehole_radius)
+    if ds.aim_rect:
+        borefield.create_rectangular_borefield(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing, ds.option_depth, ds.option_pipe_depth,
+                                               ds.option_pipe_borehole_radius)
+        return
+    if ds.aim_Box_shaped:
+        boreholes = gt.boreholes.box_shaped_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing, ds.option_depth,
+                                                  ds.option_pipe_depth, ds.option_pipe_borehole_radius)
+        borefield.set_borefield(boreholes)
+        return
+    if ds.aim_L_shaped:
+        boreholes = gt.boreholes.L_shaped_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing, ds.option_depth,
+                                                  ds.option_pipe_depth, ds.option_pipe_borehole_radius)
+        borefield.set_borefield(boreholes)
+        return
+    if ds.aim_U_shaped:
+        boreholes = gt.boreholes.U_shaped_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing, ds.option_depth,
+                                                  ds.option_pipe_depth, ds.option_pipe_borehole_radius)
+        borefield.set_borefield(boreholes)
+        return
 
 
 def _create_fluid_data(ds: DataStorage) -> FluidData:

@@ -9,11 +9,11 @@ class Translations:  # pragma: no cover
         "label_Language",
         "category_language",
         "option_language",
-        "pushButton_SaveScenario",
-        "pushButton_AddScenario",
-        "pushButton_DeleteScenario",
-        "pushButton_start_multiple",
-        "pushButton_Cancel",
+        "push_button_save_scenario",
+        "push_button_add_scenario",
+        "push_button_delete_scenario",
+        "push_button_start_multiple",
+        "push_button_cancel",
         "page_aim",
         "page_borehole",
         "page_borehole_resistance",
@@ -127,20 +127,20 @@ class Translations:  # pragma: no cover
         "X_Axis_Load",
         "Y_Axis_Load_P",
         "Y_Axis_Load_Q",
-        "menuLanguage",
-        "menuSettings",
-        "menuCalculation",
-        "menuFile",
-        "menuScenario",
+        "menu_language",
+        "menu_settings",
+        "menu_calculation",
+        "menu_file",
+        "menu_scenario",
         "action_start_multiple",
-        "actionNew",
-        "actionSave",
-        "actionOpen",
-        "actionUpdate_Scenario",
-        "actionAdd_Scenario",
-        "actionDelete_scenario",
-        "actionSave_As",
-        "actionRename_scenario",
+        "action_new",
+        "action_save",
+        "action_open",
+        "action_update_scenario",
+        "action_add_scenario",
+        "action_delete_scenario",
+        "action_save_as",
+        "button_rename_scenario",
         "button_rename_scenario",
         "label_Language_Head",
         "label_aim_question",
@@ -246,7 +246,7 @@ class Translations:  # pragma: no cover
             "Idioma:,English,German,Dutch,Italian,French,Spanish,Galician",
             "Lingua:,English,German,Dutch,Italian,French,Spanish,Galician",
         ]
-        self.pushButton_SaveScenario: List[str] = [
+        self.push_button_save_scenario: List[str] = [
             "Update scenario",
             "Szenario aktualisieren",
             "Update scenario",
@@ -255,7 +255,7 @@ class Translations:  # pragma: no cover
             "Actualizar escenario",
             "Actualizar escenario",
         ]
-        self.pushButton_AddScenario: List[str] = [
+        self.push_button_add_scenario: List[str] = [
             "Add scenario",
             "Szenario hinzufügen",
             "Nieuw scenario",
@@ -264,7 +264,7 @@ class Translations:  # pragma: no cover
             "Añadir escenario",
             "Engadir escenario",
         ]
-        self.pushButton_DeleteScenario: List[str] = [
+        self.push_button_delete_scenario: List[str] = [
             "Delete scenario",
             "Szenario löschen",
             "Verwijder scenario",
@@ -273,7 +273,7 @@ class Translations:  # pragma: no cover
             "Borrar escenario",
             "Eliminar escenario",
         ]
-        self.pushButton_start_multiple: List[str] = [
+        self.push_button_start_multiple: List[str] = [
             "Calculate all scenarios",
             "Berechne alle Szenarios",
             "Bereken alle scenarios",
@@ -282,7 +282,7 @@ class Translations:  # pragma: no cover
             "Calculate all scenarios",
             "Calculate all scenarios",
         ]
-        self.pushButton_Cancel: List[str] = ["Exit", "Verlassen", "Sluit", "Esci", "Sortie", "Salir", "Saír"]
+        self.push_button_cancel: List[str] = ["Exit", "Verlassen", "Sluit", "Esci", "Sortie", "Salir", "Saír"]
         self.page_aim: List[str] = [
             "Aim,Aim of simulation",
             "Ziel,Ziel der Simulation",
@@ -1044,11 +1044,11 @@ class Translations:  # pragma: no cover
             "Remaining thermal energy [kWh]",
             "Remaining thermal energy [kWh]",
         ]
-        self.menuLanguage: List[str] = ["Language", "Sprache", "Taal", "Languange", "Languange", "Idiom", "Lingua"]
-        self.menuSettings: List[str] = ["Settings", "Einstellungen", "Instellingen", "Settings", "Settings", "Settings", "Settings"]
-        self.menuCalculation: List[str] = ["Calculation", "Berechnung", "Berekening", "Calculation", "Calculation", "Calculation", "Calculation"]
-        self.menuFile: List[str] = ["File", "Datei", "Bestand", "File", "File", "File", "File"]
-        self.menuScenario: List[str] = ["Scenario", "Szenario", "Scenario", "Scenario", "Scénario", "Escenario", "Escenario"]
+        self.menu_language: List[str] = ["Language", "Sprache", "Taal", "Languange", "Languange", "Idiom", "Lingua"]
+        self.menu_settings: List[str] = ["Settings", "Einstellungen", "Instellingen", "Settings", "Settings", "Settings", "Settings"]
+        self.menu_calculation: List[str] = ["Calculation", "Berechnung", "Berekening", "Calculation", "Calculation", "Calculation", "Calculation"]
+        self.menu_file: List[str] = ["File", "Datei", "Bestand", "File", "File", "File", "File"]
+        self.menu_scenario: List[str] = ["Scenario", "Szenario", "Scenario", "Scenario", "Scénario", "Escenario", "Escenario"]
         self.action_start_multiple: List[str] = [
             "Calculate all scenarios",
             "Berechne alle Szenarios",
@@ -1058,10 +1058,10 @@ class Translations:  # pragma: no cover
             "Calculate all scenarios",
             "Calculate all scenarios",
         ]
-        self.actionNew: List[str] = ["New Project", "Neues Projekt", "Nieuw project", "New Project", "New Project", "New Project", "New Project"]
-        self.actionSave: List[str] = ["Save Project", "Speichere Projekt", "Bewaar project", "Save Project", "Save Project", "Save Project", "Save Project"]
-        self.actionOpen: List[str] = ["Open Project", "Öffne Projekt", "Open project", "Open Project", "Open Project", "Open Project", "Open Project"]
-        self.actionUpdate_Scenario: List[str] = [
+        self.action_new: List[str] = ["New Project", "Neues Projekt", "Nieuw project", "New Project", "New Project", "New Project", "New Project"]
+        self.action_save: List[str] = ["Save Project", "Speichere Projekt", "Bewaar project", "Save Project", "Save Project", "Save Project", "Save Project"]
+        self.action_open: List[str] = ["Open Project", "Öffne Projekt", "Open project", "Open Project", "Open Project", "Open Project", "Open Project"]
+        self.action_update_scenario: List[str] = [
             "Update scenario",
             "Szenario aktualisieren",
             "Update scenario",
@@ -1070,7 +1070,7 @@ class Translations:  # pragma: no cover
             "Actualizar escenario",
             "Actualizar escenario",
         ]
-        self.actionAdd_Scenario: List[str] = [
+        self.action_add_scenario: List[str] = [
             "Add scenario",
             "Szenario hinzufügen",
             "Nieuw scenario",
@@ -1079,7 +1079,7 @@ class Translations:  # pragma: no cover
             "Añadir escenario",
             "Engadir escenario",
         ]
-        self.actionDelete_scenario: List[str] = [
+        self.action_delete_scenario: List[str] = [
             "Delete scenario",
             "Szenario löschen",
             "Verwijder scenario",
@@ -1088,8 +1088,8 @@ class Translations:  # pragma: no cover
             "Borrar escenario",
             "Eliminar escenario",
         ]
-        self.actionSave_As: List[str] = ["Save as", "Speichere Projekt unter ...", "Sla op als", "Save as", "Save as", "Save as", "Save as"]
-        self.actionRename_scenario: List[str] = [
+        self.action_save_as: List[str] = ["Save as", "Speichere Projekt unter ...", "Sla op als", "Save as", "Save as", "Save as", "Save as"]
+        self.button_rename_scenario: List[str] = [
             "Rename scenario",
             "Szenario umbenennen",
             "Hernoem scenario",

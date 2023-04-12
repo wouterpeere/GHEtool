@@ -210,11 +210,12 @@ class GUI(GuiStructure):
         self.page_options.set_next_page(self.page_borehole)
         self.page_borehole.set_previous_page(self.page_options)
 
-        #self.aim_rect = Aim(page=self.page_borehole, label="aim_rect", icon="Temp_Profile.svg")
-        #self.aim_circle = Aim(page=self.page_borehole, label="aim_circle", icon="Temp_Profile.svg")
-        #self.aim_L_shape = Aim(page=self.page_borehole, label="aim_L_shape", icon="Temp_Profile.svg")
-        #self.aim_Box_shaped = Aim(page=self.page_borehole, label="aim_Box_shaped", icon="Temp_Profile.svg")
-        #self.aim_U_shaped = Aim(page=self.page_borehole, label="aim_U_shaped", icon="Temp_Profile.svg")
+        self.aim_rect = Aim(page=self.page_borehole, label="Rectangular borefield", icon="RectField.svg")
+        self.aim_Box_shaped = Aim(page=self.page_borehole, label="Box shaped borefield", icon="BoxField.svg")
+        self.aim_L_shaped = Aim(page=self.page_borehole, label="L-shaped borefield", icon="LField.svg")
+        self.aim_U_shaped = Aim(page=self.page_borehole, label="U-shaped borefield", icon="UField.svg")
+        #self.aim_circle = Aim(page=self.page_borehole, label="Circle borefield", icon="CircleField.svg")
+        #self.aim_custom = Aim(page=self.page_borehole, label="Customized borefield", icon="FlexField.svg")
 
         # def create_category_borehole():
         self.category_borehole = Category(

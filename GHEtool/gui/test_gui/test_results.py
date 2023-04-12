@@ -16,6 +16,7 @@ from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
 from GHEtool.gui.gui_classes.translation_class import Translations
 from GHEtool.gui.gui_structure import GUI, GuiStructure
 from ScenarioGUI import load_config
+import pygfunction as gt
 
 load_config(Path(__file__).parent.parent.joinpath("gui_config.ini"))
 
@@ -54,7 +55,7 @@ def create_borefield(g_s: GuiStructure) -> Borefield:
     borefield.set_max_ground_temperature(g_s.option_max_temp.get_value())
     borefield.set_min_ground_temperature(g_s.option_min_temp.get_value())
 
-    if g_s.option_method_temp_gradient == 0:
+    if g_s.option_method_temp_gradient.get_value() == 0:
         g_d = GroundConstantTemperature(g_s.option_conductivity.get_value(), g_s.option_ground_temp.get_value(), g_s.option_heat_capacity.get_value() * 1000)
     else:
         g_d = GroundConstantTemperature(g_s.option_conductivity.get_value(), g_s.option_ground_temp_gradient.get_value(), g_s.option_heat_capacity.get_value() * 1000)
@@ -181,6 +182,56 @@ def test_temp_profile_temp_gradient(qtbot, gradient: float, ground_temp: float):
     assert func.keywords == {}
 
     main_window.delete_backup()
+
+
+def test_borefield_shapes(qtbot):
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window.save_scenario()
+    main_window.add_scenario()
+    main_window.gui_structure.aim_rect.widget.click() if not main_window.gui_structure.aim_rect.widget.isChecked() else None
+    main_window.save_scenario()
+    ds = main_window.list_ds[-1]
+    borefield_gui, func = data_2_borefield(ds)
+    boreholes = gt.boreholes.rectangle_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing, ds.option_depth,
+                                              ds.option_pipe_depth, ds.option_pipe_borehole_radius)
+    def check_borefield(borefield_1: list[gt.boreholes], borefield_2: list[gt.boreholes]):
+        for borehole_1, borehole_2 in zip(borefield_1, borefield_2):
+            assert np.isclose(borehole_1.H, borehole_2.H)
+            assert np.isclose(borehole_1.D, borehole_2.D)
+            assert np.isclose(borehole_1.r_b, borehole_2.r_b)
+            assert np.isclose(borehole_1.x, borehole_2.x)
+            assert np.isclose(borehole_1.y, borehole_2.y)
+            assert np.isclose(borehole_1.tilt, borehole_2.tilt)
+            assert np.isclose(borehole_1.orientation, borehole_2.orientation)
+
+    check_borefield(borefield_gui.borefield, boreholes)
+
+    main_window.gui_structure.aim_Box_shaped.widget.click()
+    main_window.save_scenario()
+    ds = main_window.list_ds[-1]
+    borefield_gui, func = data_2_borefield(ds)
+    boreholes = gt.boreholes.box_shaped_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing, ds.option_depth,
+                                              ds.option_pipe_depth, ds.option_pipe_borehole_radius)
+    check_borefield(borefield_gui.borefield, boreholes)
+
+    main_window.gui_structure.aim_L_shaped.widget.click()
+    main_window.save_scenario()
+    ds = main_window.list_ds[-1]
+    borefield_gui, func = data_2_borefield(ds)
+    boreholes = gt.boreholes.L_shaped_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing, ds.option_depth,
+                                              ds.option_pipe_depth, ds.option_pipe_borehole_radius)
+    check_borefield(borefield_gui.borefield, boreholes)
+
+    main_window.gui_structure.aim_U_shaped.widget.click()
+    main_window.save_scenario()
+    ds = main_window.list_ds[-1]
+    borefield_gui, func = data_2_borefield(ds)
+    boreholes = gt.boreholes.U_shaped_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing, ds.option_depth,
+                                              ds.option_pipe_depth, ds.option_pipe_borehole_radius)
+    check_borefield(borefield_gui.borefield, boreholes)
+
+    main_window.delete_backup()
+
 
 
 @given(n_pipes=st.integers(1, 2), conduct_grout=st.floats(0.1, 1), conduct_pipe=st.floats(0.1, 1), inner_pipe=st.floats(0.01, 0.03),
