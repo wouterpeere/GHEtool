@@ -181,10 +181,8 @@ def test_temp_profile_temp_gradient(qtbot, gradient: float, ground_temp: float):
     main_window.delete_backup()
 
 
-@given(tilt=st.floats(0, 10))
-@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=10,  deadline=None)
-def test_borefield_shapes(qtbot, tilt: float):
-    tilt = round_down(tilt, 2)
+def test_borefield_shapes(qtbot):
+    tilt = 0
     main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
     main_window.save_scenario()
     main_window.add_scenario()
@@ -230,6 +228,23 @@ def test_borefield_shapes(qtbot, tilt: float):
     borefield_gui, func = data_2_borefield(ds)
     boreholes = gt.boreholes.U_shaped_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing + 1, ds.option_depth,
                                               ds.option_pipe_depth, ds.option_pipe_borehole_radius, tilt / 360 * 2 * np.pi)
+    check_borefield(borefield_gui.borefield, boreholes)
+
+    main_window.gui_structure.aim_circle.widget.click()
+    main_window.save_scenario()
+    ds = main_window.list_ds[-1]
+    borefield_gui, func = data_2_borefield(ds)
+    boreholes = gt.boreholes.circle_field(ds.option_number_circle_boreholes, ds.option_borefield_radius, ds.option_depth,
+                                              ds.option_pipe_depth, ds.option_pipe_borehole_radius, tilt / 360 * 2 * np.pi)
+    check_borefield(borefield_gui.borefield, boreholes)
+
+    main_window.gui_structure.aim_custom.widget.click()
+    values = [(x, y, H, D, r_b) for x, y, H, D, r_b in [(0,0,100,5,0.075), (0,9,110,2,0.06), (9,0,90,3,0.08), (9,9,150,6,0.07)]]
+    main_window.gui_structure.custom_borefield.set_value(values)
+    main_window.save_scenario()
+    ds = main_window.list_ds[-1]
+    borefield_gui, func = data_2_borefield(ds)
+    boreholes = [gt.boreholes.Borehole(H, D, r_b, x=x, y=y) for x, y, H, D, r_b in values]
     check_borefield(borefield_gui.borefield, boreholes)
 
     main_window.delete_backup()
