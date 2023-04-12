@@ -1,13 +1,12 @@
 import copy
-
-import pygfunction as gt
-import numpy as np
-import pytest
 import time
 
-from GHEtool.VariableClasses import GFunction, FIFO
-from GHEtool import Borefield
+import numpy as np
+import pygfunction as gt
+from pytest import raises
 
+from GHEtool import Borefield
+from GHEtool.VariableClasses import FIFO, GFunction
 
 depth_array = np.array([1, 5, 6])
 depth_array_empty = np.array([])
@@ -98,10 +97,9 @@ def test_nearest_depth_index():
     assert (2, None) == gfunc._get_nearest_depth_index(20)
     assert (0, 1) == gfunc._get_nearest_depth_index(4)
 
-    try:
+    with raises(ValueError):
         gfunc._get_nearest_depth_index(-100)
-    except ValueError:
-        assert True
+
 
 
 def test_nearest_depth_index_threshold():

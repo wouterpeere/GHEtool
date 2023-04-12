@@ -1,5 +1,5 @@
-import pytest
-from GHEtool import *
+
+from GHEtool import SizingSetup
 
 
 def test_initialising_setups():
@@ -21,8 +21,8 @@ def test_backup_functionality():
     test = SizingSetup()
     test.make_backup()
     test.L3_sizing = True
-    assert test.L2_sizing == False
-    assert test._backup.L2_sizing == True
+    assert test.L2_sizing is False
+    assert test._backup.L2_sizing is True
     test.restore_backup()
-    assert test.L2_sizing == True
-    assert test.L3_sizing == False
+    assert test.L2_sizing is True
+    assert test.L3_sizing is False

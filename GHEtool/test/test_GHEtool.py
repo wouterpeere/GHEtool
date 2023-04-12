@@ -1,12 +1,15 @@
 # test if model can be imported
-import matplotlib.pyplot as plt
-import numpy as np
-import pygfunction as gt
-import pytest
 import copy
 from math import isclose
 
-from GHEtool import *
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import pygfunction as gt
+import pytest
+from pytest import raises
+
+from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, PipeData, Borefield, SizingSetup, FOLDER
 
 data = GroundConstantTemperature(3, 10)
 data_ground_flux = GroundFluxTemperature(3, 10)
@@ -176,7 +179,7 @@ def hourly_borefield_reversed():
     borefield.set_ground_parameters(data)
     borefield.set_Rb(0.2)
     borefield.set_borefield(borefield_gt)
-    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv", first_column_heating=False)
+    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), first_column_heating=False)
     return borefield
 
 
@@ -252,7 +255,7 @@ def test_set_Rb(borefield):
 
 
 def test_hourly_to_monthly(borefield):
-    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv", header=True, separator=";", first_column_heating=True)
+    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), header=True, separator=";", first_column_heating=True)
     borefield.convert_hourly_to_monthly()
 
     assert np.isclose(np.sum(borefield.baseload_cooling), np.sum(borefield.hourly_cooling_load))
@@ -301,14 +304,19 @@ def test_without_pipe(borefield):
 
 
 def test_Tg(borefield):
+    borefield._sizing_setup.use_constant_Tg = False
+    borefield._Tg()
     assert borefield._Tg() == data.Tg
 
 
+def test_calculate_Rb(borefield):
+    with raises(ValueError):
+        borefield.calculate_Rb()
+
+
 def test_too_much_sizing_methods(borefield):
-    try:
+    with raises(ValueError):
         borefield.sizing_setup(L2_sizing=True, L3_sizing=True)
-    except ValueError:
-        assert True
 
 
 def test_size_L3(borefield):
@@ -376,6 +384,18 @@ def test_sizing_L3(borefield):
     borefield.size(L3_sizing=True)
 
 
+def test_sizing_L3_threshold_depth_error(borefield):
+    max_temp = borefield.Tf_max
+    borefield.set_max_ground_temperature(14)
+    borefield.set_ground_parameters(data_ground_flux)
+    borefield._sizing_setup.use_constant_Tg = False
+    with raises(ValueError):
+        borefield.gfunction(3600, borefield.THRESHOLD_DEPTH_ERROR + 1)
+    borefield._sizing_setup.use_constant_Tg = True
+    borefield.set_max_ground_temperature(max_temp)
+    borefield.ground_data.flux = 0
+
+
 def test_sizing_L32(borefield_cooling_dom):
     borefield_cooling_dom.size(L3_sizing=True)
     borefield_cooling_dom.set_peak_heating(np.array(peakHeating) * 5)
@@ -383,10 +403,8 @@ def test_sizing_L32(borefield_cooling_dom):
 
 
 def test_size_L4_without_data(borefield):
-    try:
+    with raises(ValueError):
         borefield.size(L4_sizing=True)
-    except ValueError:
-        assert True
 
 
 def test_load_duration(monkeypatch, hourly_borefield):
@@ -395,17 +413,13 @@ def test_load_duration(monkeypatch, hourly_borefield):
 
 
 def test_load_duration_no_hourly_data(borefield):
-    try:
+    with raises(ValueError):
         borefield.plot_load_duration()
-    except ValueError:
-        assert True
 
 
 def test_optimise_load_profile_without_data(borefield):
-    try:
+    with raises(ValueError):
         borefield.optimise_load_profile()
-    except ValueError:
-        assert True
 
 
 def test_precalculated_data_1(borefield_custom_data):
@@ -511,10 +525,12 @@ def test_H_smaller_50(borefield):
 
 
 def test_size_hourly_without_hourly_load(borefield):
-    try:
+    with raises(ValueError):
         borefield.size_L4(H_init=100)
-    except ValueError:
-        assert True
+    borefield.hourly_heating_load = None
+    borefield.hourly_cooling_load = None
+    with raises(ValueError):
+        borefield.size_L4(H_init=100)
 
 
 def test_size_hourly_quadrant(hourly_borefield):
@@ -524,53 +540,41 @@ def test_size_hourly_quadrant(hourly_borefield):
 
 def test_create_custom_dataset_without_data(borefield):
     borefield.ground_data = None
-    try:
+    with raises(ValueError):
         borefield.create_custom_dataset()
-    except ValueError:
-        assert True
     borefield.borefield = None
-    try:
+    with raises(ValueError):
         borefield.create_custom_dataset()
-    except ValueError:
-        assert True
 
 
 def test_check_hourly_load(borefield):
-    try:
+    with raises(ValueError):
         borefield._check_hourly_load()
-    except ValueError:
-        assert True
 
-    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv")
+    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     borefield.hourly_cooling_load[0] = -1
-    try:
+    with raises(ValueError):
         borefield._check_hourly_load()
-    except ValueError:
-        assert True
 
 
 def test_load_hourly_data(borefield):
-    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv")
+    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     test_cooling = copy.copy(borefield.hourly_cooling_load)
-    borefield.load_hourly_profile("GHEtool/Examples/hourly_profile.csv", first_column_heating=False)
+    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), first_column_heating=False)
     assert np.array_equal(test_cooling, borefield.hourly_heating_load)
 
-    borefield.load_hourly_profile("GHEtool/test/hourly_profile_without_header.csv", header=False)
+    borefield.load_hourly_profile(FOLDER.joinpath("test/hourly_profile_without_header.csv"), header=False)
     assert np.array_equal(test_cooling, borefield.hourly_cooling_load)
 
 
 def test_convert_hourly_to_monthly_without_data(borefield):
-    try:
+    with raises(IndexError):
         borefield.convert_hourly_to_monthly()
-    except IndexError:
-        assert True
     borefield.set_fluid_parameters(fluidData)
     borefield.set_pipe_parameters(pipeData)
     borefield._sizing_setup.use_constant_Rb = False
-    try:
+    with raises(ValueError):
         borefield.optimise_load_profile()
-    except ValueError:
-        assert True
 
 
 def test_calculate_hourly_temperature_profile(hourly_borefield):
@@ -580,45 +584,29 @@ def test_calculate_hourly_temperature_profile(hourly_borefield):
 
 
 def test_incorrect_values_peak_baseload(borefield):
-    try:
+    with raises(ValueError):
         borefield.set_peak_heating(8)
-    except ValueError:
-        assert True
 
-    try:
+    with raises(ValueError):
         borefield.set_peak_cooling(8)
-    except ValueError:
-        assert True
 
-    try:
+    with raises(ValueError):
         borefield.set_baseload_heating(8)
-    except ValueError:
-        assert True
 
-    try:
+    with raises(ValueError):
         borefield.set_baseload_cooling(8)
-    except ValueError:
-        assert True
 
-    try:
+    with raises(ValueError):
         borefield.set_peak_cooling([8, 8])
-    except ValueError:
-        assert True
 
-    try:
+    with raises(ValueError):
         borefield.set_peak_heating([8, 8])
-    except ValueError:
-        assert True
 
-    try:
+    with raises(ValueError):
         borefield.set_baseload_cooling([8, 8])
-    except ValueError:
-        assert True
 
-    try:
+    with raises(ValueError):
         borefield.set_baseload_heating([8, 8])
-    except ValueError:
-        assert True
 
 
 def test_temperature_profile_available(hourly_borefield):
@@ -655,7 +643,16 @@ def test_no_ground_data():
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)  # maximum temperature
     borefield.set_min_ground_temperature(0)  # minimum temperature
-    try:
+    with raises(ValueError):
         borefield.size()
-    except ValueError:
-        assert True
+
+
+def test_hourly_temperature_profile(hourly_borefield):
+    folder = FOLDER.joinpath("Examples/hourly_profile.csv")
+    d_f = pd.read_csv(folder, sep=';', decimal='.')
+    hourly_borefield.hourly_heating_load_on_the_borefield = d_f[d_f.columns[0]].to_numpy()
+    hourly_borefield.hourly_cooling_load_on_the_borefield = d_f[d_f.columns[1]].to_numpy()
+    hourly_borefield.calculate_temperatures(100, hourly=True)
+    hourly_borefield.hourly_heating_load_on_the_borefield = np.array([])
+    hourly_borefield.hourly_cooling_load_on_the_borefield = np.array([])
+    hourly_borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))

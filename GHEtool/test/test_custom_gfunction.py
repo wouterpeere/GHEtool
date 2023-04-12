@@ -1,8 +1,8 @@
-import pytest
 import numpy as np
+import pygfunction as gt
+import pytest
 
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction
-import pygfunction as gt
 
 
 @pytest.fixture
@@ -17,7 +17,7 @@ def custom_gfunction():
 
 
 def test_initiate_custom_gfunction():
-    custom_gfunction = CustomGFunction()
+    CustomGFunction()
 
 
 def test_initiate_with_random_values():

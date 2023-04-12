@@ -2,9 +2,9 @@
 This document contains the information for the BaseClass.
 This class is used as a super class for different variable classes.
 """
-import numpy as np
 from typing import List
 
+import numpy as np
 from pygfunction.boreholes import Borehole
 
 
@@ -16,7 +16,7 @@ class BaseClass:
 
     This class should only be altered whenever a highly general method should be implemented.
     """
-    def _to_dict(self) -> dict:
+    def to_dict(self) -> dict:
         """
         This function converts the class variables to a dictionary so it can be saved in a JSON format.
         Currently, it can handle np.ndarray, list, set, str, int, float, tuple,
@@ -35,7 +35,7 @@ class BaseClass:
             variables: List[str] = [attr for attr in dir(self) if not callable(getattr(self, attr)) and not attr.startswith("__")]
 
         # initiate dictionary
-        dictionary: dict = dict([])
+        dictionary: dict = {}
 
         # populate dictionary
         for key in variables:
@@ -74,9 +74,13 @@ class BaseClass:
                 dictionary[key] = getattr(self, key)
                 continue
 
+            # for all self-defined classes
+            if hasattr(getattr(self, key), "to_dict"):
+                dictionary[key] = getattr(self, key).to_dict()
+
         return dictionary
 
-    def _from_dict(self, dictionary: dict) -> None:
+    def from_dict(self, dictionary: dict) -> None:
         """
         This function converts the dictionary values to the class attributes.
         Currently, it can handle np.ndarray, list, set, str, int, float, tuple, pygfunction.Borehole
@@ -94,9 +98,12 @@ class BaseClass:
 
         for key, value in dictionary.items():
 
+            if not hasattr(self, key):
+                continue
+
             # for all self-defined classes
-            if hasattr(getattr(self, key), "_to_dict"):
-                getattr(self, key)._from_dict(value)
+            if hasattr(getattr(self, key), "from_dict"):
+                getattr(self, key).from_dict(value)
                 continue
 
             if isinstance(value, (int, bool, float, str, list)):
@@ -148,7 +155,4 @@ class BaseClass:
         else:
             variables: List[str] = [attr for attr in dir(self) if not callable(getattr(self, attr)) and not attr.startswith("__")]
 
-        for var in variables:
-            if getattr(self, var) is None:
-                return False
-        return True
+        return all(getattr(self, var) is not None for var in variables)

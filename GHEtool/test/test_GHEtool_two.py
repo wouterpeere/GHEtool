@@ -1,12 +1,12 @@
 # test if model can be imported
-import numpy as np
-import pytest
 import copy
 from math import isclose
 
-from GHEtool import *
-
+import numpy as np
 import pygfunction as gt
+import pytest
+
+from GHEtool import *
 
 data = GroundConstantTemperature(3, 10)
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
