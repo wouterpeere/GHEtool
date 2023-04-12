@@ -371,13 +371,17 @@ def test_temp_profile_borefield_data(qtbot, width: int, length: int, spacing: fl
 
     borefield = create_borefield(gs)
 
+    main_window.gui_structure.aim_rect.widget.click() if not main_window.gui_structure.aim_rect.widget.isChecked() else None
     gs.option_width.set_value(width)
     gs.option_length.set_value(length)
     gs.option_spacing.set_value(spacing)
+    gs.option_spacing_length.set_value(spacing)
     gs.option_pipe_depth.set_value(burial_depth)
     gs.option_pipe_borehole_radius.set_value(radius)
 
-    borefield.create_rectangular_borefield(width, length, spacing, spacing, gs.option_depth.get_value(), burial_depth, radius)
+    boreholes = gt.boreholes.rectangle_field(width, length, spacing, spacing, gs.option_depth.get_value(), burial_depth, radius,
+                                             tilt=gs.option_tilted.get_value() / 360 * 2 * np.pi)
+    borefield.set_borefield(boreholes)
 
     main_window.save_scenario()
     ds = main_window.list_ds[-1]
