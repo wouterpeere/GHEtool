@@ -119,23 +119,25 @@ def _set_boreholes(ds: DataStorage, borefield: Borefield) -> None:
     -------
     None
     """
+    tilt = ds.option_tilted / 360 * 2 * np.pi
     if ds.aim_rect:
-        borefield.create_rectangular_borefield(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing, ds.option_depth, ds.option_pipe_depth,
-                                               ds.option_pipe_borehole_radius)
+        boreholes = gt.boreholes.rectangle_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing_length, ds.option_depth,
+                                                  ds.option_pipe_depth, ds.option_pipe_borehole_radius, tilt)
+        borefield.set_borefield(boreholes)
         return
     if ds.aim_Box_shaped:
-        boreholes = gt.boreholes.box_shaped_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing, ds.option_depth,
-                                                  ds.option_pipe_depth, ds.option_pipe_borehole_radius)
+        boreholes = gt.boreholes.box_shaped_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing_length, ds.option_depth,
+                                                  ds.option_pipe_depth, ds.option_pipe_borehole_radius, tilt)
         borefield.set_borefield(boreholes)
         return
     if ds.aim_L_shaped:
-        boreholes = gt.boreholes.L_shaped_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing, ds.option_depth,
-                                                  ds.option_pipe_depth, ds.option_pipe_borehole_radius)
+        boreholes = gt.boreholes.L_shaped_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing_length, ds.option_depth,
+                                                  ds.option_pipe_depth, ds.option_pipe_borehole_radius, tilt)
         borefield.set_borefield(boreholes)
         return
     if ds.aim_U_shaped:
-        boreholes = gt.boreholes.U_shaped_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing, ds.option_depth,
-                                                  ds.option_pipe_depth, ds.option_pipe_borehole_radius)
+        boreholes = gt.boreholes.U_shaped_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing_length, ds.option_depth,
+                                                  ds.option_pipe_depth, ds.option_pipe_borehole_radius, tilt)
         borefield.set_borefield(boreholes)
         return
 

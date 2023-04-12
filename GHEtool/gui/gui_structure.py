@@ -3,18 +3,21 @@ This document contains all the information relevant for the GUI.
 It contains all the options, categories etc. that should appear on the GUI.
 """
 import logging
+from functools import partial
 from math import cos, pi, sin
 from typing import List, Optional, Tuple
 
 import PySide6.QtGui as QtG
 import PySide6.QtWidgets as QtW
+import PySide6.QtCore as QtC
 from GHEtool import FOLDER
 from GHEtool.gui.gui_classes.translation_class import Translations
 from numpy import array, cos, int64, round, sin, sum
 from pandas import DataFrame as pd_DataFrame
 from pandas import read_csv as pd_read_csv
 import ScenarioGUI.global_settings as globs
-from ScenarioGUI.gui_classes.gui_structure import GuiStructure
+from ScenarioGUI import GuiStructure
+from ScenarioGUI import elements as els
 from ScenarioGUI.gui_classes.gui_structure_classes import (
     Aim,
     ButtonBox,
@@ -215,13 +218,24 @@ class GUI(GuiStructure):
         self.aim_L_shaped = Aim(page=self.page_borehole, label="L-shaped borefield", icon="LField.svg")
         self.aim_U_shaped = Aim(page=self.page_borehole, label="U-shaped borefield", icon="UField.svg")
         #self.aim_circle = Aim(page=self.page_borehole, label="Circle borefield", icon="CircleField.svg")
-        #self.aim_custom = Aim(page=self.page_borehole, label="Customized borefield", icon="FlexField.svg")
+        self.aim_custom = Aim(page=self.page_borehole, label="Customized borefield", icon="FlexField.svg")
 
         # def create_category_borehole():
         self.category_borehole = Category(
             page=self.page_borehole,
             label=translations.category_borehole,
         )
+
+        self.custom_borefield = els.FlexibleAmount(label="Custom borefield", default_length=1, entry_mame="Borehole", category=self.category_borehole,
+                                                min_length=1)
+        self.custom_borefield.add_option(els.FloatBox, name="x [m]", default_value=0, minimal_value=-1_000_000, maximal_value=1_000_000)
+        self.custom_borefield.add_option(els.FloatBox, name="y [m]", default_value=0, minimal_value=-1_000_000, maximal_value=1_000_000)
+        self.custom_borefield.add_option(els.FloatBox, name="depth [m]", default_value=100, minimal_value=0, maximal_value=1_000_000)
+        self.custom_borefield.add_option(els.FloatBox, name="buried depth [m]", default_value=2, minimal_value=0, maximal_value=1_000_000)
+        self.custom_borefield.add_option(els.FloatBox, name="Borehole radius [m]", default_value=0.075, minimal_value=0, maximal_value=1_000)
+        self.custom_borefield.add_option(els.FloatBox, name="tilt [°]", default_value=0, minimal_value=-90, maximal_value=90)
+        self.aim_custom.add_link_2_show(self.custom_borefield)
+
         self.option_depth = FloatBox(
             category=self.category_borehole,
             label=translations.option_depth,
@@ -243,6 +257,15 @@ class GUI(GuiStructure):
         self.option_spacing = FloatBox(
             category=self.category_borehole,
             label=translations.option_spacing,
+            default_value=6,
+            decimal_number=2,
+            minimal_value=1,
+            maximal_value=99,
+            step=0.1,
+        )
+        self.option_spacing_length = FloatBox(
+            category=self.category_borehole,
+            label=translations.option_spacing_length,
             default_value=6,
             decimal_number=2,
             minimal_value=1,
@@ -311,9 +334,35 @@ class GUI(GuiStructure):
             step=0.001,
         )
 
+        self.option_tilted = FloatBox(
+            category=self.category_borehole,
+            label="Tilt [°] (0° = vertical, 90° horizontal directed to exterior)",
+            default_value=0.0,
+            decimal_number=2,
+            minimal_value=-90,
+            maximal_value=90,
+            step=0.001,
+        )
+
         # add dependencies
-        self.aim_temp_profile.add_link_2_show(self.option_depth)
-        self.aim_optimize.add_link_2_show(self.option_depth)
+        #self.aim_temp_profile.add_link_2_show(self.option_depth)
+        #self.aim_optimize.add_link_2_show(self.option_depth)
+        self.aim_rect.change_event(partial(self.show_option_on_multiple_aims, [self.aim_optimize, self.aim_temp_profile], [self.aim_rect,
+                                                                                                                          self.aim_Box_shaped], self.option_depth))
+        self.aim_optimize.change_event(partial(self.show_option_on_multiple_aims, [self.aim_optimize, self.aim_temp_profile], [self.aim_rect,
+                                                                                                                          self.aim_Box_shaped], self.option_depth))
+        self.aim_temp_profile.change_event(partial(self.show_option_on_multiple_aims, [self.aim_optimize, self.aim_temp_profile], [self.aim_rect,
+                                                                                                                          self.aim_Box_shaped], self.option_depth))
+        self.aim_req_depth.change_event(partial(self.show_option_on_multiple_aims, [self.aim_optimize, self.aim_temp_profile], [self.aim_rect,
+                                                                                                                          self.aim_Box_shaped], self.option_depth))
+        self.aim_Box_shaped.change_event(partial(self.show_option_on_multiple_aims, [self.aim_optimize, self.aim_temp_profile], [self.aim_rect,
+                                                                                                                          self.aim_Box_shaped], self.option_depth))
+        self.aim_custom.change_event(partial(self.show_option_on_multiple_aims, [self.aim_optimize, self.aim_temp_profile], [self.aim_rect,
+                                                                                                                          self.aim_Box_shaped], self.option_depth))
+        self.aim_L_shaped.change_event(partial(self.show_option_on_multiple_aims, [self.aim_optimize, self.aim_temp_profile], [self.aim_rect,
+                                                                                                                          self.aim_Box_shaped], self.option_depth))
+        self.aim_U_shaped.change_event(partial(self.show_option_on_multiple_aims, [self.aim_optimize, self.aim_temp_profile], [self.aim_rect,
+                                                                                                                          self.aim_Box_shaped], self.option_depth))
 
         # self.aim_size_length.add_link_2_show(self.option_max_depth)
 
@@ -1376,4 +1425,14 @@ class GUI(GuiStructure):
             logging.error(self.translations.ColumnError[self.option_language.get_value()[0]])
             return
 
+    def show_option_on_multiple_aims(self, first_aims: list[Aim], second_aims: list[Aim], option: Option):
+        def show_hide():
+            first = any(aim.widget.isChecked() for aim in first_aims)
+            second = any(aim.widget.isChecked() for aim in second_aims)
+            if first and second:
+                option.show()
+                return
+            option.hide()
+
+        QtC.QTimer.singleShot(5, show_hide)
 

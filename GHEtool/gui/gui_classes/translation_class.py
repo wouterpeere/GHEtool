@@ -27,6 +27,7 @@ class Translations:  # pragma: no cover
         "category_borehole",
         "option_depth",
         "option_spacing",
+        "option_spacing_length",
         "option_conductivity",
         "option_ground_temp",
         "option_max_depth",
@@ -368,13 +369,22 @@ class Translations:  # pragma: no cover
             "Profundidade do pozo [m]: ",
         ]
         self.option_spacing: List[str] = [
-            "Borehole spacing [m]: ",
-            "Bohrlochabstand [m]: ",
-            "Boorgatspatiëring [m]: ",
+            "Borehole spacing width [m]: ",
+            "Bohrlochabstand Breitenrichtung [m]: ",
+            "Boorgatspatiëring Breedte [m]: ",
             "Spaziatura del foro [m]: ",
             "Espacement des trous de forage [m]: ",
             "Espaciado entre pozos [m]: ",
-            "Espazamento entre pozos [m]: ",
+            "Espazamento entre pozos [m]:",
+        ]
+        self.option_spacing_length: List[str] = [
+            "Borehole spacing length [m]: ",
+            "Bohrlochabstand Längenrichtung [m]: ",
+            "Boorgatspatiëring lengte [m]: ",
+            "Spaziatura del foro [m]: ",
+            "Espacement des trous de forage [m]: ",
+            "Espaciado entre pozos [m]: ",
+            "Espazamento entre pozos [m]:",
         ]
         self.option_conductivity: List[str] = [
             "Conductivity of the soil [W/mK]: ",
