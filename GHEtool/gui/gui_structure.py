@@ -236,6 +236,7 @@ class GUI(GuiStructure):
         self.custom_borefield.add_option(els.FloatBox, name="Borehole radius [m]", default_value=0.075, minimal_value=0, maximal_value=1_000,
                                          decimal_number=4, step=0.01)
         # self.custom_borefield.add_option(els.FloatBox, name="tilt [°]", default_value=0, minimal_value=-90, maximal_value=90)
+        self.custom_borefield.change_event(self.update_borefield)
 
         self.option_depth = FloatBox(
             category=self.category_borefield,
@@ -278,8 +279,10 @@ class GUI(GuiStructure):
         self.option_borefield_radius = els.FloatBox(category=self.category_borefield, label=translations.option_borefield_radius,
                                                     minimal_value=0, maximal_value=1_000_000, default_value=12.5, step=0.1, decimal_number=2)
 
+        self.option_borefield_radius.change_event(self.update_borefield)
         self.option_number_circle_boreholes = els.IntBox(category=self.category_borefield, label=translations.option_number_circle_boreholes,
-                                                    minimal_value=1, maximal_value=1_000_000, default_value=12, step=1)
+                                                    minimal_value=2, maximal_value=1_000_000, default_value=12, step=1)
+        self.option_number_circle_boreholes.change_event(self.update_borefield)
         # self.option_min_spacing = FloatBox(
         #     category=self.category_borehole,
         #     label="Minimal borehole spacing [m]: ",
@@ -1352,61 +1355,77 @@ class GUI(GuiStructure):
         frame = self.category_borefield.graphic_left if self.category_borefield.graphic_left is not None else self.category_borefield.graphic_right
         if not isinstance(frame, QtW.QGraphicsView):
             return
-        # import all that is needed
-        # get variables from gui
-        spacing_width = self.option_spacing.get_value()
-        spacing_length = self.option_spacing_length.get_value()
-        r_bore = min(spacing_length, spacing_length) / 4
-        width = self.option_width.get_value()
-        length = self.option_length.get_value()
-        # calculate scale from graphic view size
-        max_l = min(frame.width(), frame.height())
-        max_size = max(spacing_length * length, spacing_width * width, 1)
-        scale = max_l / max_size / 1.25  # leave 25 % space
-        # set colors
-        white_color = array(globs.WHITE.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
-        brown = QtG.QColor(145, 124, 111)
-        # create graphic scene if not exits otherwise get scene and delete items
-        if frame.scene() is None:
-            scene = QtW.QGraphicsScene()  # parent=self.central_widget)
-            frame.setScene(scene)
-            frame.setBackgroundBrush(brown)
-        else:
-            scene = frame.scene()
-            scene.clear()
-        # create borehole circle in grey wih no border
-        width = (width - 1) * spacing_width * scale / 2 + r_bore * scale / 2
-        length = (length - 1) * spacing_length * scale / 2 + r_bore * scale / 2
+        def draw_borefield():
+            # import all that is needed
+            # get variables from gui
+            spacing_width = self.option_spacing.get_value()
+            spacing_length = self.option_spacing_length.get_value()
+            r_bore = min(spacing_length, spacing_width) / 4
+            width = self.option_width.get_value()
+            length = self.option_length.get_value()
+            # calculate scale from graphic view size
+            max_l = min(frame.width(), frame.height())
+            max_size = max(spacing_length * length, spacing_width * width, 1)
+            scale = max_l / max_size / 1.25  # leave 25 % space
+            # set colors
+            white_color = array(globs.WHITE.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
+            white_color = QtG.QColor(white_color[0], white_color[1], white_color[2])
+            brown = QtG.QColor(145, 124, 111)
+            # create graphic scene if not exits otherwise get scene and delete items
+            if frame.scene() is None:
+                scene = QtW.QGraphicsScene()  # parent=self.central_widget)
+                frame.setScene(scene)
+                frame.setBackgroundBrush(brown)
+            else:
+                scene = frame.scene()
+                scene.clear()
+            # create borehole circle in grey wih no border
+            width = (width - 1) * spacing_width * scale / 2 + r_bore * scale / 2
+            length = (length - 1) * spacing_length * scale / 2 + r_bore * scale / 2
 
-        logging.info((width, length, scale))
-        if self.aim_rect.widget.isChecked():
-            coordinates = [(w * spacing_width * scale - width, l * spacing_length * scale - length) for w in range(self.option_width.get_value()) for l in range(self.option_length.get_value())]
-        elif self.aim_Box_shaped.widget.isChecked():
-            coordinates = [(w * spacing_width * scale - width, l * spacing_length * scale - length) for w in range(self.option_width.get_value()) if not(
-                    0 < w < self.option_width.get_value() - 1) for l in range(self.option_length.get_value())]
-            coordinates += [(w * spacing_width * scale - width, l * spacing_length * scale - length) for w in range(self.option_width.get_value()) for l
-                            in range(self.option_length.get_value())  if not (0 < l < self.option_length.get_value() - 1) ]
-        elif self.aim_L_shaped.widget.isChecked():
-            l = self.option_length.get_value() - 1
-            coordinates = [(w * spacing_width * scale - width, l * spacing_length * scale - length) for w in range(self.option_width.get_value())]
-            w = 0
-            coordinates += [(w * spacing_width * scale - width, l * spacing_length * scale - length) for l in range(self.option_length.get_value())]
-        elif self.aim_U_shaped.widget.isChecked():
+            if self.aim_rect.widget.isChecked():
+                coordinates = [(w * spacing_width * scale - width, l * spacing_length * scale - length) for w in range(self.option_width.get_value()) for l in range(self.option_length.get_value())]
+            elif self.aim_Box_shaped.widget.isChecked():
+                coordinates = [(w * spacing_width * scale - width, l * spacing_length * scale - length) for w in range(self.option_width.get_value()) if not(
+                        0 < w < self.option_width.get_value() - 1) for l in range(self.option_length.get_value())]
+                coordinates += [(w * spacing_width * scale - width, l * spacing_length * scale - length) for w in range(self.option_width.get_value()) for l
+                                in range(self.option_length.get_value())  if not (0 < l < self.option_length.get_value() - 1) ]
+            elif self.aim_L_shaped.widget.isChecked():
+                l = self.option_length.get_value() - 1
+                coordinates = [(w * spacing_width * scale - width, l * spacing_length * scale - length) for w in range(self.option_width.get_value())]
+                w = 0
+                coordinates += [(w * spacing_width * scale - width, l * spacing_length * scale - length) for l in range(self.option_length.get_value())]
+            elif self.aim_U_shaped.widget.isChecked():
+                l = self.option_length.get_value() - 1
+                coordinates = [(w * spacing_width * scale - width, l * spacing_length * scale - length) for w in range(self.option_width.get_value())]
+                w = 0
+                coordinates += [(w * spacing_width * scale - width, l * spacing_length * scale - length) for l in range(self.option_length.get_value())]
+                w = self.option_width.get_value() - 1
+                coordinates += [(w * spacing_width * scale - width, l * spacing_length * scale - length) for l in range(self.option_length.get_value())]
+            elif self.aim_circle.widget.isChecked():
+                r_bore = 2 * self.option_borefield_radius.get_value() * pi / self.option_number_circle_boreholes.get_value() / 4
+                scale = max_l / (2 * self.option_borefield_radius.get_value() + r_bore) / 1.25  # leave 25 % space
+                angle = 2 * pi / self.option_number_circle_boreholes.get_value()
+                radius = self.option_borefield_radius.get_value()*scale
+                coordinates = [(sin(angle * n) * radius - r_bore * scale / 2, cos(angle * n) * radius - r_bore * scale / 2) for n in range(self.option_number_circle_boreholes.get_value())]
 
-            l = self.option_length.get_value() - 1
-            coordinates = [(w * spacing_width * scale - width, l * spacing_length * scale - length) for w in range(self.option_width.get_value())]
-            w = 0
-            coordinates += [(w * spacing_width * scale - width, l * spacing_length * scale - length) for l in range(self.option_length.get_value())]
-            w = self.option_width.get_value() - 1
-            coordinates += [(w * spacing_width * scale - width, l * spacing_length * scale - length) for l in range(self.option_length.get_value())]
-        else:
-            coordinates = []
+            else:
+                coordinates = [(x,y) for x,y,_,_,_ in self.custom_borefield.get_value()]
+                min_x = min(x for x, _ in coordinates)
+                max_x = max(x for x, _ in coordinates)
+                min_y = min(y for _, y in coordinates)
+                max_y = max(y for _, y in coordinates)
+                r_bore = max(min(max_x - min_x, max_y - min_y), 1) / len(coordinates)
+                scale = max_l / (max(max_x - min_x, max_y - min_y, 5) + r_bore) / 1.25
+                coordinates = [(x * scale - r_bore / 2 * scale, y * scale - r_bore / 2 * scale) for x, y in coordinates]
 
-        for x, y in coordinates:
-            circle = QtW.QGraphicsEllipseItem(x, y, r_bore * scale, r_bore * scale)
-            circle.setPen(QtG.QPen(white_color, 0))
-            circle.setBrush(white_color)
-            scene.addItem(circle)
+            for x, y in coordinates:
+                circle = QtW.QGraphicsEllipseItem(x, y, r_bore * scale, r_bore * scale)
+                circle.setPen(QtG.QPen(white_color, 0))
+                circle.setBrush(white_color)
+                scene.addItem(circle)
+
+        QtC.QTimer.singleShot(5, draw_borefield)
 
     def fun_update_combo_box_data_file(self, filename: str) -> None:
         """
