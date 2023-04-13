@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file including pl
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [2.1.2] - [expected] feb 20233
+## [2.1.2] - [expected] feb 2023
 
 ### Added
 - Logger for GHEtool (issue #96).
