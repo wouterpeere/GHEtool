@@ -1,6 +1,7 @@
 """
 This document contains the variable classes for the ground data, fluid data and pipe data.
 """
+from __future__ import annotations
 
 from math import pi
 
@@ -37,11 +38,11 @@ class FluidData(BaseClass):
         mu : float
             Dynamic viscosity of the fluid [Pa/s]
         """
-        self.k_f = k_f  # Thermal conductivity W/mK
-        self.mfr = mfr  # Mass flow rate per borehole kg/s
-        self.rho = rho  # Density kg/m3
-        self.Cp = Cp    # Thermal capacity J/kgK
-        self.mu = mu    # Dynamic viscosity Pa/s
+        self.k_f: float | None = k_f  # Thermal conductivity W/mK
+        self.mfr: float | None = mfr  # Mass flow rate per borehole kg/s
+        self.rho: float | None = rho  # Density kg/m3
+        self.Cp: float | None = Cp    # Thermal capacity J/kgK
+        self.mu: float | None = mu    # Dynamic viscosity Pa/s
         self.h_f: float = 0.  # convective heat transfer coefficient
         self.R_f: float = 0.  # fluid thermal resistance
 

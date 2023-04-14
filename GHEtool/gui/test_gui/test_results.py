@@ -206,7 +206,7 @@ def test_borefield_shapes(qtbot):
             assert np.isclose(borehole_1.orientation, borehole_2.orientation)
 
     check_borefield(borefield_gui.borefield, boreholes)
-
+    qtbot.wait(10)
     main_window.gui_structure.aim_Box_shaped.widget.click()
     main_window.gui_structure.update_borefield()
     main_window.save_scenario()
@@ -215,7 +215,7 @@ def test_borefield_shapes(qtbot):
     boreholes = gt.boreholes.box_shaped_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing + 1, ds.option_depth,
                                               ds.option_pipe_depth, ds.option_pipe_borehole_radius, tilt / 360 * 2 * np.pi)
     check_borefield(borefield_gui.borefield, boreholes)
-
+    qtbot.wait(10)
     main_window.gui_structure.aim_L_shaped.widget.click()
     main_window.gui_structure.update_borefield()
     main_window.save_scenario()
@@ -224,7 +224,7 @@ def test_borefield_shapes(qtbot):
     boreholes = gt.boreholes.L_shaped_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing + 1, ds.option_depth,
                                               ds.option_pipe_depth, ds.option_pipe_borehole_radius, tilt / 360 * 2 * np.pi)
     check_borefield(borefield_gui.borefield, boreholes)
-
+    qtbot.wait(10)
     main_window.gui_structure.aim_U_shaped.widget.click()
     main_window.gui_structure.update_borefield()
     main_window.save_scenario()
@@ -233,7 +233,7 @@ def test_borefield_shapes(qtbot):
     boreholes = gt.boreholes.U_shaped_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing + 1, ds.option_depth,
                                               ds.option_pipe_depth, ds.option_pipe_borehole_radius, tilt / 360 * 2 * np.pi)
     check_borefield(borefield_gui.borefield, boreholes)
-
+    qtbot.wait(10)
     main_window.gui_structure.aim_circle.widget.click()
     main_window.gui_structure.update_borefield()
     main_window.save_scenario()
@@ -242,6 +242,7 @@ def test_borefield_shapes(qtbot):
     boreholes = gt.boreholes.circle_field(ds.option_number_circle_boreholes, ds.option_borefield_radius, ds.option_depth,
                                               ds.option_pipe_depth, ds.option_pipe_borehole_radius, tilt / 360 * 2 * np.pi)
     check_borefield(borefield_gui.borefield, boreholes)
+    qtbot.wait(10)
 
     main_window.gui_structure.aim_custom.widget.click()
     main_window.gui_structure.update_borefield()
@@ -252,7 +253,7 @@ def test_borefield_shapes(qtbot):
     borefield_gui, func = data_2_borefield(ds)
     boreholes = [gt.boreholes.Borehole(H, D, r_b, x=x, y=y) for x, y, H, D, r_b in values]
     check_borefield(borefield_gui.borefield, boreholes)
-
+    qtbot.wait(10)
     main_window.delete_backup()
 
 

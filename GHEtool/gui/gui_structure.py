@@ -227,6 +227,9 @@ class GUI(GuiStructure):
         )
         self.category_borefield.activate_graphic_left()
 
+        self.borefield_file = els.FileNameBox(label="Borefield file", category=self.category_borefield, default_value="", file_extension="txt")#["txt",# "csv"])
+        self.import_borefield = els.FunctionButton(button_text="import borefield", icon="Download", category=self.category_borefield)
+
         self.custom_borefield = els.FlexibleAmount(label=translations.custom_borefield, default_length=1, entry_mame="Borehole", category=self.category_borefield,
                                                    min_length=1)
         self.custom_borefield.add_option(els.FloatBox, name="x [m]", default_value=0, minimal_value=-1_000_000, maximal_value=1_000_000,  decimal_number=2)
@@ -415,6 +418,16 @@ class GUI(GuiStructure):
                                       [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
                                       [self.aim_custom],
                                       self.custom_borefield)) for aim in li_aim]
+
+        _ = [aim.change_event(partial(self.show_option_on_multiple_aims,
+                                      [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
+                                      [self.aim_custom],
+                                      self.import_borefield)) for aim in li_aim]
+
+        _ = [aim.change_event(partial(self.show_option_on_multiple_aims,
+                                      [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
+                                      [self.aim_custom],
+                                      self.borefield_file)) for aim in li_aim]
 
         [aim.change_event(self.update_borefield) for aim in li_aim]
 

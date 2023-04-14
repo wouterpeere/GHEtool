@@ -26,12 +26,12 @@ def run(path_list=None):  # pragma: no cover
     from PySide6.QtWidgets import QApplication as QtWidgets_QApplication
     from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
     from GHEtool import Borefield
-    from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
     from GHEtool.gui.data_2_borefield_func import data_2_borefield
     from GHEtool.gui.gui_classes.translation_class import Translations
     from GHEtool.gui.gui_structure import GUI
     from ScenarioGUI import load_config
     load_config(Path(__file__).parent.joinpath("gui_config.ini"))
+    from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
 
     if is_frozen:
         pyi_splash.update_text('Loading ...')

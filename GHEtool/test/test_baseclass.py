@@ -14,6 +14,7 @@ class TestClass(BaseClass):
         self.test_int = 12
         self.test_float = 12.5
         self.test_bool = True
+        self.test_none = None
         self.test_tuple = (12, 13, 14)
         self.test_list = [14, 13, 12]
         self.test_numpy = np.array([15, 18, 16])
@@ -28,6 +29,7 @@ class TestClass(BaseClass):
         self.test_float = None
         self.test_tuple = None
         self.test_bool = None
+        self.test_none = 0
         self.test_list = None
         self.test_numpy = None
         self.test_set = None
@@ -38,7 +40,7 @@ class TestClass(BaseClass):
 
 class TestClassesWithSlots(BaseClass):
 
-    __slots__ = 'test_string', 'test_int', 'test_float', 'test_tuple', 'test_list', 'test_numpy',\
+    __slots__ = 'test_string', 'test_int', 'test_float', 'test_tuple', 'test_list', 'test_numpy', "test_none", \
                 'test_set', 'test_dictionary', 'test_variable_class', 'test_pygfunction', 'test_bool'
 
     def __init__(self):
@@ -46,6 +48,7 @@ class TestClassesWithSlots(BaseClass):
         self.test_int = 12
         self.test_float = 12.5
         self.test_bool = True
+        self.test_none = None
         self.test_tuple = (12, 13, 14)
         self.test_list = [14, 13, 12]
         self.test_numpy = np.array([15, 18, 16])
@@ -60,6 +63,7 @@ class TestClassesWithSlots(BaseClass):
         self.test_float = None
         self.test_tuple = None
         self.test_bool = None
+        self.test_none = 0
         self.test_list = None
         self.test_numpy = None
         self.test_set = None
@@ -75,12 +79,14 @@ def test_without_slots():
     assert dictionary["test_int"] == 12
     assert dictionary["test_float"] == 12.5
     assert dictionary["test_bool"]
+    assert dictionary["test_none"] == "None"
     assert dictionary["test_tuple"] == {'value': [12, 13, 14], 'type': 'tuple'}
     assert dictionary["test_list"] == [14, 13, 12]
     assert dictionary["test_set"] == {'value': [16, 12, 14], 'type': 'set'}
     assert dictionary["test_numpy"] == {'value': [15, 18, 16], 'type': 'np.ndarray'}
     assert dictionary["test_dictionary"] == {"a": 1, "b": 2}
-    assert dictionary["test_variable_class"] == {'k_s': 1, 'Tg': 2,
+    assert dictionary["test_variable_class"] == {'k_s': 1, 'Tg': 2,'__module__': 'GHEtool.VariableClasses.GroundData.GroundConstantTemperature',
+                                                 '__name__': 'GroundConstantTemperature',
                                                  'volumetric_heat_capacity': 2400000.0,
                                                  'alpha': 4.1666666666666667e-07}
     assert dictionary["test_pygfunction"] == {'value': [{'H': 100.0, 'D': 4.0, 'r_b': 0.075, 'x': 0.0, 'y': 0.0,
@@ -103,12 +109,14 @@ def test_without_slots():
     assert dictionary["test_int"] == 12
     assert dictionary["test_float"] == 12.5
     assert dictionary["test_bool"]
+    assert dictionary["test_none"] == "None"
     assert dictionary["test_tuple"] == {'value': [12, 13, 14], 'type': 'tuple'}
     assert dictionary["test_list"] == [14, 13, 12]
     assert dictionary["test_set"] == {'value': [16, 12, 14], 'type': 'set'}
     assert dictionary["test_numpy"] == {'value': [15, 18, 16], 'type': 'np.ndarray'}
     assert dictionary["test_dictionary"] == {"a": 1, "b": 2}
-    assert dictionary["test_variable_class"] == {'k_s': 1, 'Tg': 2,
+    assert dictionary["test_variable_class"] == {'k_s': 1, 'Tg': 2,'__module__': 'GHEtool.VariableClasses.GroundData.GroundConstantTemperature',
+                                                 '__name__': 'GroundConstantTemperature',
                                                  'volumetric_heat_capacity': 2400000.0,
                                                  'alpha': 4.1666666666666667e-07}
     assert dictionary["test_pygfunction"] == {'value': [{'H': 100.0, 'D': 4.0, 'r_b': 0.075, 'x': 0.0, 'y': 0.0,
@@ -124,12 +132,14 @@ def test_with_slots():
     assert dictionary["test_int"] == 12
     assert dictionary["test_float"] == 12.5
     assert dictionary["test_bool"]
+    assert dictionary["test_none"] == "None"
     assert dictionary["test_tuple"] == {'value': [12, 13, 14], 'type': 'tuple'}
     assert dictionary["test_list"] == [14, 13, 12]
     assert dictionary["test_set"] == {'value': [16, 12, 14], 'type': 'set'}
     assert dictionary["test_numpy"] == {'value': [15, 18, 16], 'type': 'np.ndarray'}
     assert dictionary["test_dictionary"] == {"a": 1, "b": 2}
-    assert dictionary["test_variable_class"] == {'k_s': 1, 'Tg': 2,
+    assert dictionary["test_variable_class"] == {'k_s': 1, 'Tg': 2,'__module__': 'GHEtool.VariableClasses.GroundData.GroundConstantTemperature',
+                                                 '__name__': 'GroundConstantTemperature',
                                                  'volumetric_heat_capacity': 2400000.0,
                                                  'alpha': 4.1666666666666667e-07}
     assert dictionary["test_pygfunction"] == {'value': [{'H': 100.0, 'D': 4.0, 'r_b': 0.075, 'x': 0.0, 'y': 0.0,
@@ -151,12 +161,14 @@ def test_with_slots():
     assert dictionary["test_int"] == 12
     assert dictionary["test_float"] == 12.5
     assert dictionary["test_bool"]
+    assert dictionary["test_none"] == "None"
     assert dictionary["test_tuple"] == {'value': [12, 13, 14], 'type': 'tuple'}
     assert dictionary["test_list"] == [14, 13, 12]
     assert dictionary["test_set"] == {'value': [16, 12, 14], 'type': 'set'}
     assert dictionary["test_numpy"] == {'value': [15, 18, 16], 'type': 'np.ndarray'}
     assert dictionary["test_dictionary"] == {"a": 1, "b": 2}
-    assert dictionary["test_variable_class"] == {'k_s': 1, 'Tg': 2,
+    assert dictionary["test_variable_class"] == {'k_s': 1, 'Tg': 2,'__module__': 'GHEtool.VariableClasses.GroundData.GroundConstantTemperature',
+                                                 '__name__': 'GroundConstantTemperature',
                                                  'volumetric_heat_capacity': 2400000.0,
                                                  'alpha': 4.1666666666666667e-07}
     assert dictionary["test_pygfunction"] == {'value': [{'H': 100.0, 'D': 4.0, 'r_b': 0.075, 'x': 0.0, 'y': 0.0,
@@ -168,5 +180,3 @@ def test_with_slots():
 def test_json_dump():
     test_class = TestClass()
     json.dump(test_class.to_dict(), open('test.json', 'w'))
-
-test_with_slots()

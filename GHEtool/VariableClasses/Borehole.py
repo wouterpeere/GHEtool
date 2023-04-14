@@ -27,9 +27,6 @@ class Borehole(BaseClass):
     @property
     def fluid_data(self) -> FluidData:
         """
-
-
-
         This function returns the fluid data object.
 
         Returns
