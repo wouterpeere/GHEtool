@@ -2,9 +2,11 @@
 This document contains the information for the BaseClass.
 This class is used as a super class for different variable classes.
 """
+from __future__ import annotations
 from typing import List
 
 import numpy as np
+from numpy import ndarray
 from pygfunction.boreholes import Borehole
 from importlib import import_module
 
