@@ -600,7 +600,7 @@ def test_incorrect_values_peak_baseload(borefield):
 
 def test_set_options_gfunction_calculation(borefield):
     borefield.set_options_gfunction_calculation({"method": "equivalentt"})
-    assert borefield.options_pygfunction["method"] == "equivalentt"
+    assert borefield.gfunction_calculation_object.options["method"] == "equivalentt"
     borefield.set_options_gfunction_calculation({"method": "equivalent"})
 
 
