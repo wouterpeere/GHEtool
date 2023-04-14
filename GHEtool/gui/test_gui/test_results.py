@@ -189,6 +189,7 @@ def test_borefield_shapes(qtbot):
     main_window.gui_structure.aim_rect.widget.click() if not main_window.gui_structure.aim_rect.widget.isChecked() else None
     main_window.gui_structure.option_tilted.set_value(tilt)
     main_window.gui_structure.option_spacing_length.set_value(main_window.gui_structure.option_spacing.get_value() + 1)
+    main_window.gui_structure.update_borefield()
     main_window.save_scenario()
     ds = main_window.list_ds[-1]
     borefield_gui, func = data_2_borefield(ds)
@@ -207,6 +208,7 @@ def test_borefield_shapes(qtbot):
     check_borefield(borefield_gui.borefield, boreholes)
 
     main_window.gui_structure.aim_Box_shaped.widget.click()
+    main_window.gui_structure.update_borefield()
     main_window.save_scenario()
     ds = main_window.list_ds[-1]
     borefield_gui, func = data_2_borefield(ds)
@@ -215,6 +217,7 @@ def test_borefield_shapes(qtbot):
     check_borefield(borefield_gui.borefield, boreholes)
 
     main_window.gui_structure.aim_L_shaped.widget.click()
+    main_window.gui_structure.update_borefield()
     main_window.save_scenario()
     ds = main_window.list_ds[-1]
     borefield_gui, func = data_2_borefield(ds)
@@ -223,6 +226,7 @@ def test_borefield_shapes(qtbot):
     check_borefield(borefield_gui.borefield, boreholes)
 
     main_window.gui_structure.aim_U_shaped.widget.click()
+    main_window.gui_structure.update_borefield()
     main_window.save_scenario()
     ds = main_window.list_ds[-1]
     borefield_gui, func = data_2_borefield(ds)
@@ -231,6 +235,7 @@ def test_borefield_shapes(qtbot):
     check_borefield(borefield_gui.borefield, boreholes)
 
     main_window.gui_structure.aim_circle.widget.click()
+    main_window.gui_structure.update_borefield()
     main_window.save_scenario()
     ds = main_window.list_ds[-1]
     borefield_gui, func = data_2_borefield(ds)
@@ -239,6 +244,7 @@ def test_borefield_shapes(qtbot):
     check_borefield(borefield_gui.borefield, boreholes)
 
     main_window.gui_structure.aim_custom.widget.click()
+    main_window.gui_structure.update_borefield()
     values = [(x, y, H, D, r_b) for x, y, H, D, r_b in [(0,0,100,5,0.075), (0,9,110,2,0.06), (9,0,90,3,0.08), (9,9,150,6,0.07)]]
     main_window.gui_structure.custom_borefield.set_value(values)
     main_window.save_scenario()

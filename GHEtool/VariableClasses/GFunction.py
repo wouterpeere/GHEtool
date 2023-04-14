@@ -1,4 +1,4 @@
-import copy
+from __future__ import annotations
 from typing import List, Tuple, Union
 
 import numpy as np
@@ -86,7 +86,7 @@ class GFunction:
         self.store_previous_values: bool = GFunction.DEFAULT_STORE_PREVIOUS_VALUES
         self.options: dict = {"method": "equivalent"}
         self.alpha: float = 0.
-        self.borefield: list = []
+        self.borefield: list[gt.boreholes.Borehole] = []
         self.depth_array: np.ndarray = np.array([])
         self.time_array: np.ndarray = np.array([])
         self.previous_gfunctions: np.ndarray = np.array([])

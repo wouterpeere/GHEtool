@@ -1416,8 +1416,10 @@ class GUI(GuiStructure):
                 min_y = min(y for _, y in coordinates)
                 max_y = max(y for _, y in coordinates)
                 r_bore = max(min(max_x - min_x, max_y - min_y), 1) / len(coordinates)
+                dist_x = max_x - min_x
+                dist_y = max_y - min_y
                 scale = max_l / (max(max_x - min_x, max_y - min_y, 5) + r_bore) / 1.25
-                coordinates = [(x * scale - r_bore / 2 * scale, y * scale - r_bore / 2 * scale) for x, y in coordinates]
+                coordinates = [((x - dist_x / 2 - r_bore / 2) * scale, (y - dist_y /2 - r_bore / 2) * scale) for x, y in coordinates]
 
             for x, y in coordinates:
                 circle = QtW.QGraphicsEllipseItem(x, y, r_bore * scale, r_bore * scale)
