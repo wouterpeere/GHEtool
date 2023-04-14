@@ -109,13 +109,9 @@ def calculate_costs(borefield: Borefield, heating_building: np.ndarray, heating_
 
     Returns
     -------
-    investment cost borefield, operational cost heating, operational cost cooling, total operational cost
+    investment cost borefield, operational cost heating, operational cost cooling, total operational cost:
+        float, float, float, float
     """
-
-    # calculate hourly discount rate
-    DR_hourly = ((1+costs["DR"])**(1/8760) - 1)*8760
-    correction_factor = np.power(1/(1+DR_hourly), np.arange(costs["sim_period"] * 8760))
-
     # calculate investment cost
     investment_borefield = costs["C_borefield"] * borefield.H * borefield.number_of_boreholes
 
@@ -123,8 +119,18 @@ def calculate_costs(borefield: Borefield, heating_building: np.ndarray, heating_
     elec_heating = heating_building - heating_geothermal
     elec_cooling = cooling_geothermal - cooling_building
 
-    cost_heating = elec_heating * correction_factor * costs["C_elec"]
-    cost_cooling = elec_cooling * correction_factor * costs["C_elec"]
+    discounted_cooling_cost = []
+    discounted_heating_cost = []
+    for i in range(SIMULATION_PERIOD):
+        tempc = costs["C_elec"] * (elec_cooling[730 * 12 * i:730 * 12 * (i + 1)])
+        tempc = tempc * (1 / (1 + costs["DR"])) ** (i + 1)
+
+        temph = costs["C_elec"] * (elec_heating[730 * 12 * i:730 * 12 * (i + 1)])
+        temph = temph * (1 / (1 + costs["DR"])) ** (i + 1)
+        discounted_cooling_cost.append(tempc)
+        discounted_heating_cost.append(temph)
+    cost_cooling = np.sum(discounted_cooling_cost)
+    cost_heating = np.sum(discounted_heating_cost)
 
     return investment_borefield, cost_heating, cost_cooling, cost_heating+cost_cooling
 
@@ -144,7 +150,6 @@ cooling_ground = cooling_building.copy()
 heating_ground = heating_building.copy()
 
 while abs(depths[0] - depths[1]) > 0.1:
-    print("iter", depths)
     # set loads
     borefield.set_hourly_cooling_load(cooling_ground)
     borefield.set_hourly_heating_load(heating_ground)
@@ -159,8 +164,6 @@ while abs(depths[0] - depths[1]) > 0.1:
     # recalculate heating load
     heating_ground = update_load_COP(temp_profile, COP, heating_building)
 
-borefield.print_temperature_profile(plot_hourly=True)
-
 
 ### ACTIVE COOLING
 depths = [0.9, 0]
@@ -171,7 +174,6 @@ heating_ground = heating_building.copy()
 
 borefield.set_max_ground_temperature(25)
 while abs(depths[0] - depths[1]) > 0.1:
-    print("iter", depths)
     # set loads
     borefield.set_hourly_cooling_load(cooling_ground)
     borefield.set_hourly_heating_load(heating_ground)
@@ -190,67 +192,95 @@ while abs(depths[0] - depths[1]) > 0.1:
 
 ### RUN OPTIMISATION
 
-    # initialise parameters
-    operational_costs = []
-    operational_costs_cooling = []
-    operational_costs_heating = []
-    investment_costs = []
-    total_costs = []
-    depths = []
+# initialise parameters
+operational_costs = []
+operational_costs_cooling = []
+operational_costs_heating = []
+investment_costs = []
+total_costs = []
+depths = []
 
-    def f(depth: list[float]) -> float:
-        """
-        Optimisation function.
 
-        Parameters
-        ----------
-        depth : list
-            List with one element: the depth of the borefield in mm
+def f(depth: list[float]) -> float:
+    """
+    Optimisation function.
 
-        Returns
-        -------
-        total_cost : float
-        """
-        # convert to meters
-        depth = depth[0] / 1000
+    Parameters
+    ----------
+    depth : list
+        List with one element: the depth of the borefield in mm
 
+    Returns
+    -------
+    total_cost : float
+    """
+    # convert to meters
+    depth = depth[0] / 1000
+    borefield._update_borefield_depth(depth)
+    borefield.H = depth
+    depths.append(depth)
+
+    # initialise
+    heating_ground = heating_building.copy()
+    cooling_ground = cooling_building.copy()
+
+    heating_ground_prev = np.zeros(len(heating_ground))
+    cooling_ground_prev = np.zeros(len(cooling_ground))
+    
+    # iterate until convergence in the load
+    while np.sum(cooling_ground + heating_ground - heating_ground_prev - cooling_ground_prev) > 100:
+        # set loads
+        borefield.set_hourly_heating_load(heating_ground)
+        borefield.set_hourly_cooling_load(cooling_ground)
+
+        # get temperature profile
         borefield.calculate_temperatures(depth, hourly=True)
-        depths.append(depth)
-        investment, cost_heating, cost_cooling, operational_cost = calculate_costs(borefield,
-                                                                                 heating_building, heating_ground,
-                                                                                 cooling_building, cooling_ground,
-                                                                                 costs)
-        total_costs.append(investment + operational_cost)
-        operational_costs.append(operational_cost)
-        operational_costs_cooling.append(cost_cooling)
-        operational_costs_heating.append(cost_heating)
-        investment_costs.append(investment)
-        return investment + operational_cost
+        temp_profile = borefield.results_peak_heating
 
-    # add boundaries to figure
-    # multiply with 1000 for numerical stability
-    f([depth_active * 10 ** 3])
-    f([depth_passive * 10 ** 3])
+        # set previous loads
+        heating_ground_prev = heating_ground.copy()
+        cooling_ground_prev = cooling_ground.copy()
 
-    res = gp_minimize(f,  # the function to minimize
-                      [(depth_active * 10 ** 3, depth_passive * 10 ** 3)],  # the bounds on each dimension of x
-                      acq_func="EI",  # the acquisition function
-                      n_calls=30,  # the number of evaluations of f
-                      initial_point_generator="lhs",
-                      n_random_starts=15,  # the number of random initialization points
-                      # noise=0,       # the noise level (optional)
-                      random_state=1234)  # the random seed
+        # recalculate heating load
+        heating_ground = update_load_COP(temp_profile, COP, heating_building)
+        cooling_ground = update_load_EER(temp_profile, EER, 16, cooling_building)
 
-    # plot figures
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111)
-    ax1.plot(depths,[x/1000 for x in total_costs], marker = 'o', label = "TC")
-    ax1.plot(depths, [x/1000 for x in investment_costs], marker = 'o', label="IC")
-    ax1.plot(depths, [x/1000 for x in operational_costs], marker = 'o', label="OC")
-    ax1.plot(depths, [x/1000 for x in operational_costs_cooling], marker='o', label="OCc")
-    ax1.plot(depths, [x/1000 for x in operational_costs_heating], marker='o', label="OCh")
-    ax1.set_xlabel(r'Depth (m)', fontsize=14)
-    ax1.set_ylabel(r'Costs ($k€$)', fontsize=14)
-    ax1.legend(loc='lower left', ncol=3)
-    ax1.tick_params(labelsize=14)
-    plt.show()
+    # calculate costs
+    investment, cost_heating, cost_cooling, operational_cost = calculate_costs(borefield,
+                                                                             heating_building, heating_ground,
+                                                                             cooling_building, cooling_ground,
+                                                                             costs)
+    total_costs.append(investment + operational_cost)
+    operational_costs.append(operational_cost)
+    operational_costs_cooling.append(cost_cooling)
+    operational_costs_heating.append(cost_heating)
+    investment_costs.append(investment)
+    return investment + operational_cost
+
+# add boundaries to figure
+# multiply with 1000 for numerical stability
+f([depth_active * 10 ** 3])
+f([depth_passive * 10 ** 3])
+
+res = gp_minimize(f,  # the function to minimize
+                  [(depth_active * 10 ** 3, depth_passive * 10 ** 3)],  # the bounds on each dimension of x
+                  acq_func="EI",  # the acquisition function
+                  n_calls=30,  # the number of evaluations of f
+                  initial_point_generator="lhs",
+                  n_random_starts=15,  # the number of random initialization points
+                  # noise=0,       # the noise level (optional)
+                  random_state=1234)  # the random seed
+
+# plot figures
+fig = plt.figure()
+ax1 = fig.add_subplot(111)
+ax1.plot(depths, [x/1000 for x in total_costs], marker = 'o', label = "TC")
+ax1.plot(depths, [x/1000 for x in investment_costs], marker = 'o', label="IC")
+ax1.plot(depths, [x/1000 for x in operational_costs], marker = 'o', label="OC")
+ax1.plot(depths, [x/1000 for x in operational_costs_cooling], marker='o', label="OCc")
+ax1.plot(depths, [x/1000 for x in operational_costs_heating], marker='o', label="OCh")
+ax1.set_xlabel(r'Depth (m)', fontsize=14)
+ax1.set_ylabel(r'Costs ($k€$)', fontsize=14)
+ax1.legend(loc='lower left', ncol=3)
+ax1.tick_params(labelsize=14)
+plt.show()
