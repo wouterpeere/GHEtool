@@ -33,7 +33,7 @@ class Borefield(BaseClass):
                 'length_peak', 'th', 'Tf_max', 'Tf_min', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
                 'monthly_load_cooling', 'peak_heating', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm', \
                 'peak_cooling', 'simulation_period', 'ground_data', 'pipe_data', 'fluid_data',\
-                'results_peak_heating', 'time_L4', 'options_pygfunction',\
+                'results_peak_heating', 'time_L4',\
                 'results_peak_cooling', 'results_month_cooling', 'results_month_heating', 'Tb', 'THRESHOLD_WARNING_SHALLOW_FIELD', \
                 'gui', 'time_L3_last_year', 'peak_heating_external', 'peak_cooling_external', \
                 'monthly_load_heating_external', 'monthly_load_cooling_external', 'hourly_heating_load_external', \
@@ -123,9 +123,6 @@ class Borefield(BaseClass):
         self.H_init: float = 0.
         self.custom_gfunction: CustomGFunction = custom_gfunction
         self.gfunction_calculation_object: GFunction = GFunction()
-
-        ## params w.r.t. pygfunction
-        self.options_pygfunction: dict = {"method": "equivalent"}
 
         # initialize variables for temperature plotting
         self.results_peak_heating = np.array([])  # list with the minimum temperatures due to the peak heating
@@ -1778,7 +1775,7 @@ class Borefield(BaseClass):
         -------
         None
         """
-        self.options_pygfunction = options
+        self.gfunction_calculation_object.set_options_gfunction_calculation(options)
 
     def gfunction(self, time_value: Union[list, float, np.ndarray], H: float = None) -> np.ndarray:
         """
