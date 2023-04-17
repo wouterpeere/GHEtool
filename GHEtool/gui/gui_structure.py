@@ -990,7 +990,7 @@ class GuiStructure:
                 self.geo_load = ButtonBox(label=self.translations.geo_load, default_index=0,
                                           entries=[" goethermal ", " building "],
                                           category=self.category_demand_building_or_geo)
-                self.SCOP = self.option_conductivity = FloatBox(
+                self.SCOP = FloatBox(
                     category=self.category_demand_building_or_geo,
                     label=self.translations.SCOP,
                     default_value=4,
@@ -999,7 +999,7 @@ class GuiStructure:
                     maximal_value=50,
                     step=0.1,
                 )
-                self.SEER = self.option_conductivity = FloatBox(
+                self.SEER = FloatBox(
                     category=self.category_demand_building_or_geo,
                     label=self.translations.SEER,
                     default_value=3,
