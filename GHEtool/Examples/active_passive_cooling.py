@@ -204,7 +204,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
     depths = []
 
 
-    def f(depth: list[float]) -> float:
+    def f(depth: list) -> float:
         """
         Optimisation function.
 
