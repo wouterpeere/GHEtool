@@ -39,7 +39,7 @@ class Borefield(BaseClass):
                 'monthly_load_heating_external', 'monthly_load_cooling_external', 'hourly_heating_load_external', \
                 'hourly_cooling_load_external', 'hourly_heating_load_on_the_borefield', 'hourly_cooling_load_on_the_borefield', \
                 'printing', 'combo', 'D', 'r_b', 'gfunction_calculation_object',\
-                'H_init', 'use_precalculated_data', '_sizing_setup'
+                'H_init', 'use_precalculated_data', '_sizing_setup', 'hourly_heating_load_building', 'hourly_cooling_load_building'
 
     def __init__(self, simulation_period: int = 20, peak_heating: list = None,
                  peak_cooling: list = None, baseload_heating: list = None, baseload_cooling: list = None,
@@ -145,6 +145,8 @@ class Borefield(BaseClass):
         self.monthly_load_cooling_external = np.array([])
         self.hourly_heating_load_on_the_borefield = np.array([])
         self.hourly_cooling_load_on_the_borefield = np.array([])
+        self.hourly_heating_load_building = np.array([])
+        self.hourly_cooling_load_building = np.array([])
 
         # initiate load variables
         self.baseload_heating = LIST_OF_ZEROS  # list with baseload heating kWh
@@ -2152,6 +2154,8 @@ class Borefield(BaseClass):
         # calculate the resulting hourly profile that can be put on the field
         self.hourly_cooling_load_on_the_borefield = np.minimum(peak_cool_load_geo, hourly_cooling_load_geo)
         self.hourly_heating_load_on_the_borefield = np.minimum(peak_heat_load_geo, hourly_heating_load_geo)
+        self.hourly_heating_load_building = self.hourly_heating_load_on_the_borefield / (1 - 1/SCOP)
+        self.hourly_cooling_load_building = self.hourly_cooling_load_on_the_borefield / (1 + 1/SEER)
 
         # convert peak geothermal load to building load
         peak_cool_load: float = peak_cool_load_geo / (1 + 1/SEER)
@@ -2210,7 +2214,7 @@ class Borefield(BaseClass):
         float
             Percentage of heating load that can be done geothermally.
         """
-        return np.sum(self.baseload_heating) / np.sum(self.hourly_heating_load) * 100
+        return np.sum(self.hourly_heating_load_building) / np.sum(self.hourly_heating_load) * 100
 
     @property
     def _percentage_cooling(self) -> float:
@@ -2222,7 +2226,7 @@ class Borefield(BaseClass):
         float
             Percentage of cooling load that can be done geothermally.
         """
-        return np.sum(self.baseload_cooling) / np.sum(self.hourly_cooling_load) * 100
+        return np.sum(self.hourly_cooling_load_building) / np.sum(self.hourly_cooling_load) * 100
 
     def calculate_quadrant(self) -> int:
         """

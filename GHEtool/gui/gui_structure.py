@@ -1055,7 +1055,12 @@ class GuiStructure:
 
                 self.results_heating_load = ResultText(self.translations.results_heating_load, category=self.numerical_results,
                                                        prefix="Heating load on the borefield: ", suffix=" kWh")
-                self.results_heating_load.text_to_be_shown("Borefield", "baseload_heating")
+                self.results_heating_peak_geo = ResultText(self.translations.results_heating_peak,
+                                                       category=self.numerical_results,
+                                                       prefix="with a peak of: ", suffix=" kW")
+                self.results_heating_peak_geo.text_to_be_shown("Borefield", "hourly_heating_load_building")
+                self.results_heating_peak_geo.function_to_convert_to_text(lambda x: round(max(x), 2))
+                self.results_heating_load.text_to_be_shown("Borefield", "hourly_heating_load_building")
                 self.results_heating_load.function_to_convert_to_text(lambda x: round(sum(x), 0))
                 self.results_heating_load_percentage = ResultText(self.translations.results_heating_load_percentage, category=self.numerical_results,
                                                                   prefix="This is ", suffix="% of the heating load")
@@ -1072,7 +1077,12 @@ class GuiStructure:
 
                 self.results_cooling_load = ResultText(self.translations.results_cooling_load, category=self.numerical_results,
                                                        prefix="Cooling load on the borefield: ", suffix=" kWh")
-                self.results_cooling_load.text_to_be_shown("Borefield", "baseload_cooling")
+                self.results_cooling_peak_geo = ResultText(self.translations.results_cooling_peak,
+                                                       category=self.numerical_results,
+                                                       prefix="with a peak of: ", suffix=" kW")
+                self.results_cooling_peak_geo.text_to_be_shown("Borefield", "hourly_cooling_load_building")
+                self.results_cooling_peak_geo.function_to_convert_to_text(lambda x: round(max(x), 2))
+                self.results_cooling_load.text_to_be_shown("Borefield", "hourly_cooling_load_building")
                 self.results_cooling_load.function_to_convert_to_text(lambda x: round(sum(x), 0))
                 self.results_cooling_load_percentage = ResultText(self.translations.results_cooling_load_percentage, category=self.numerical_results,
                                                                   prefix="This is ", suffix="% of the cooling load")
@@ -1103,6 +1113,7 @@ class GuiStructure:
                 self.aim_req_depth.add_link_2_show(self.result_text_depth)
 
                 self.aim_optimize.add_link_2_show(self.results_heating_ext)
+                self.aim_optimize.add_link_2_show(self.results_heating_peak_geo)
                 self.aim_optimize.add_link_2_show(self.results_heating_load_percentage)
                 self.aim_optimize.add_link_2_show(self.results_heating_load)
                 self.aim_optimize.add_link_2_show(self.results_heating_peak)
@@ -1110,6 +1121,7 @@ class GuiStructure:
                 self.aim_optimize.add_link_2_show(self.results_cooling_load_percentage)
                 self.aim_optimize.add_link_2_show(self.results_cooling_load)
                 self.aim_optimize.add_link_2_show(self.results_cooling_peak)
+                self.aim_optimize.add_link_2_show(self.results_cooling_peak_geo)
 
                 self.aim_temp_profile.add_link_2_show(self.max_temp)
                 self.aim_temp_profile.add_link_2_show(self.min_temp)
