@@ -3,12 +3,13 @@ All notable changes to this project will be documented in this file including pl
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [2.1.2] - [expected] feb 2023
+## [2.1.2] - 2023-04-17
 
 ### Added
 - Logger for GHEtool (issue #96).
 - Examples are now also in RTD.
 - Reynolds number is shown on the result page (issue #112).
+- It is now possible to use building loads instead of ground loads (issue #115).
 
 ### Changed
 - In figure plotting, the interval[x[i], x[i+1]) now has the value y[i] (instead of y[i-1]).
@@ -20,6 +21,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - Wrong heating load in april in GUI (issue #94).
 - Results are now cleared when new loads are loaded (issue #106).
+- Options for g-function calculations are not working (issue #119).
+- Wrong naming aim optimise load profile.
 
 ## [2.1.1] - 2023-01-30
 
@@ -153,7 +156,8 @@ code version > speed improvements > v2.1.1.
 ### Fixed 
 - fixed bug in interpolation
 
-[2.1.1]: https://github.com/wouterpeere/GHEtool/compare/v2.1.0...main
+[2.1.2]: https://github.com/wouterpeere/GHEtool/compare/v2.1.1...v2.1.2
+[2.1.1]: https://github.com/wouterpeere/GHEtool/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/wouterpeere/GHEtool/compare/v2.0.6...v2.1.0
 [2.0.6]: https://github.com/wouterpeere/GHEtool/compare/v2.0.5...v2.0.6
 [2.0.5]: https://github.com/wouterpeere/GHEtool/compare/v2.0.4...v2.0.5
