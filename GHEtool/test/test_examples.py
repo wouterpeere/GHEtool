@@ -30,6 +30,13 @@ def test_sizing_with_Rb(monkeypatch):
     sizing_with_Rb()
 
 
+@pytest.mark.slow
+def test_active_passive(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    from GHEtool.Examples.active_passive_cooling import active_passive_cooling
+    active_passive_cooling(FOLDER.joinpath('Examples/active_passive_example.csv'))
+
+
 def test_optimise_load_profile(monkeypatch):
     from GHEtool import FOLDER
     monkeypatch.setattr(plt, 'show', lambda: None)
@@ -50,7 +57,7 @@ def test_optimise_load_profile(monkeypatch):
     borefield.set_borefield(borefield_gt)
 
     # load the hourly profile
-    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), header=True, separator=";", first_column_heating=True)
+    borefield.load_hourly_profile(FOLDER.joinpath('Examples/hourly_profile.csv'), header=True, separator=";", first_column_heating=True)
 
     # optimise the load for a 10x10 field (see data above) and a fixed depth of 150m.
     borefield.optimise_load_profile(depth=150, print_results=True)
