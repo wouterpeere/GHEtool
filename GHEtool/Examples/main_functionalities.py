@@ -98,5 +98,5 @@ def main_functionalities():
     borefield.print_temperature_profile(legend=True)
 
 
-if __name__== "__main__":  # pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
     main_functionalities()
