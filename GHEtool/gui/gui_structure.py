@@ -984,8 +984,42 @@ class GuiStructure:
                 self.aim_req_depth.add_link_2_show(self.category_th_demand)
                 # self.aim_size_length.add_link_2_show(self.category_th_demand)
 
+            def create_category_building_demand():
+                self.category_demand_building_or_geo =\
+                    Category(page=self.page_thermal, label=self.translations.category_demand_building_or_geo)
+                self.geo_load = ButtonBox(label=self.translations.geo_load, default_index=0,
+                                          entries=[" goethermal ", " building "],
+                                          category=self.category_demand_building_or_geo)
+                self.SCOP = self.option_conductivity = FloatBox(
+                    category=self.category_demand_building_or_geo,
+                    label=self.translations.SCOP,
+                    default_value=4,
+                    decimal_number=2,
+                    minimal_value=1,
+                    maximal_value=50,
+                    step=0.1,
+                )
+                self.SEER = self.option_conductivity = FloatBox(
+                    category=self.category_demand_building_or_geo,
+                    label=self.translations.SEER,
+                    default_value=3,
+                    decimal_number=2,
+                    minimal_value=1,
+                    maximal_value=50,
+                    step=0.1,
+                )
+
+                # add dependencies
+                self.aim_optimize.add_link_2_show(self.SCOP)
+                self.aim_optimize.add_link_2_show(self.SEER)
+                self.geo_load.add_link_2_show(self.SCOP, 1)
+                self.geo_load.add_link_2_show(self.SEER, 1)
+                self.aim_req_depth.add_link_2_show(self.geo_load)
+                self.aim_temp_profile.add_link_2_show(self.geo_load)
+
             # create categories
             create_category_select_datafile()
+            create_category_building_demand()
             create_category_th_demand()
 
         def create_page_results():

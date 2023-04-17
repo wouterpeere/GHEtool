@@ -218,6 +218,10 @@ class Translations:  # pragma: no cover
         "option_len_peak_cooling",
         "option_temperature_profile_hourly",
         "option_n_threads",
+        "category_demand_building_or_geo",
+        "geo_load",
+        "SCOP",
+        "SEER",
         "languages",
     )
 
@@ -1742,3 +1746,23 @@ class Translations:  # pragma: no cover
             "Number of parallel threads [-]: ",
             "Number of parallel threads [-]:",
         ]
+        self.category_demand_building_or_geo: List[str] = [
+            "Load type: ",
+            "Art der Belastung: ",
+            "Type belasting: ",
+            "Load type: ",
+            "Load type: ",
+            "Load type:",
+            "Load type:",
+        ]
+        self.geo_load: List[str] = [
+            "Load type, Geothermal , Building ",
+            "Art der Belastung, Grundseite , Gebäudeseite ",
+            "Type belasting, grondzijdig , gebouwzijdig ",
+            "Load type, Geothermal , Building ",
+            "Load type, Geothermal , Building ",
+            "Load type, Geothermal , Building ",
+            "Load type, Geothermal , Building ",
+        ]
+        self.SCOP: List[str] = ["SCOP [-]: ", "SCOP [-]: ", "SCOP [-]: ", "SCOP [-]: ", "SCOP [-]: ", "SCOP [-]: ", "SCOP [-]:"]
+        self.SEER: List[str] = ["SEER [-]: ", "SEER [-]: ", "SEER [-]: ", "SEER [-]: ", "SEER [-]: ", "SEER [-]: ", "SEER [-]:"]
