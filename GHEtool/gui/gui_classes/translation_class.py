@@ -15,7 +15,8 @@ class Translations:  # pragma: no cover
         "push_button_start_multiple",
         "push_button_cancel",
         "page_aim",
-        "page_borehole",
+        "page_borefield",
+        "page_earth",
         "page_borehole_resistance",
         "page_thermal",
         "page_result",
@@ -220,6 +221,9 @@ class Translations:  # pragma: no cover
         "option_temperature_profile_hourly",
         "option_ground_temp_gradient",
         "option_n_threads",
+        "option_number_circle_boreholes",
+        "option_borefield_radius",
+        "custom_borefield",
         "languages",
     )
 
@@ -293,15 +297,16 @@ class Translations:  # pragma: no cover
             "Aim,Aim of simulation",
             "Aim,Aim of simulation",
         ]
-        self.page_borehole: List[str] = [
-            "Borefield @and earth,Borefield and earth",
-            "Bohrlochfeld @und Erdreich,Bohrlochfeld und Erdreich",
-            "Boorveld @en grond,Boorveld en grond",
-            "Foro e @terra,Foro e terra",
-            "Forage @et terre,Forage et terre",
-            "Pozo @y terreno,Pozo y terreno",
-            "Pozo @e chan,Pozo e chan",
+        self.page_borefield: List[str] = [
+            "Borefield,Borefield",
+            "Bohrlochfeld,Bohrlochfeld",
+            "Boorveld,Boorveld",
+            "Foro,Foro",
+            "Forage,Forage",
+            "Pozo,Pozo",
+            "Pozo,Pozo",
         ]
+        self.page_earth: List[str] = ["Earth,Earth", "Erdreich,Erdreich", "Grond,Grond", "Terra,Terra", "Terre,Terre", "Terreno,Terreno", "Chan,Chan"]
         self.page_borehole_resistance: List[str] = [
             "Borehole @resistance,Equivalent borehole resistance",
             "Bohrloch-@widerstand,Equivalänter Bohrlochwiderstand",
@@ -1761,4 +1766,31 @@ class Translations:  # pragma: no cover
             "Number of parallel threads [-]: ",
             "Number of parallel threads [-]: ",
             "Number of parallel threads [-]: ",
+        ]
+        self.option_number_circle_boreholes: List[str] = [
+            "Number of boreholes [-]:",
+            "Anzahl der Bohrlöcher [-]:",
+            "Number of boreholes [-]:",
+            "Number of boreholes [-]:",
+            "Number of boreholes [-]:",
+            "Number of boreholes [-]:",
+            "Number of boreholes [-]:",
+        ]
+        self.option_borefield_radius: List[str] = [
+            "Distance of the boreholes from the center of the field [m]:",
+            "Abstand der Bohrlöcher vom Zentrum der Feldes [m]:",
+            "Distance of the boreholes from the center of the field [m]:",
+            "Distance of the boreholes from the center of the field [m]:",
+            "Distance of the boreholes from the center of the field [m]:",
+            "Distance of the boreholes from the center of the field [m]:",
+            "Distance of the boreholes from the center of the field [m]:",
+        ]
+        self.custom_borefield: List[str] = [
+            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
+            "Benutzerdefiniertes Bohrelochfeld,Bohrloch,x [m]:,y [m]:,Tiefe [m]:,Vergrabungstiefe [m]:,Bohrlochradius [m]",
+            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
+            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
+            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
+            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
+            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
         ]

@@ -2,10 +2,13 @@
 This document contains the information for the BaseClass.
 This class is used as a super class for different variable classes.
 """
+from __future__ import annotations
 from typing import List
 
 import numpy as np
+from numpy import ndarray
 from pygfunction.boreholes import Borehole
+from importlib import import_module
 
 
 class BaseClass:
@@ -35,45 +38,50 @@ class BaseClass:
             variables: List[str] = [attr for attr in dir(self) if not callable(getattr(self, attr)) and not attr.startswith("__")]
 
         # initiate dictionary
-        dictionary: dict = {}
+        dictionary: dict = {"__module__": f"{type(self).__module__}", "__name__":  f"{type(self).__name__}"}
 
         # populate dictionary
         for key in variables:
+            value = getattr(self, key)
 
-            if isinstance(getattr(self, key), (int, bool, float, str)):
-                dictionary[key] = getattr(self, key)
+            if value is None:
+                dictionary[key] = "None"
                 continue
 
-            if isinstance(getattr(self, key), tuple):
-                dictionary[key] = {"value": list(getattr(self, key)), "type": "tuple"}
+            if isinstance(value, (int, bool, float, str)):
+                dictionary[key] = value
                 continue
 
-            if isinstance(getattr(self, key), np.ndarray):
-                dictionary[key] = {"value": getattr(self, key).tolist(), "type": "np.ndarray"}
+            if isinstance(value, tuple):
+                dictionary[key] = {"value": list(value), "type": "tuple"}
                 continue
 
-            if isinstance(getattr(self, key), set):
-                dictionary[key] = {"value": list(getattr(self, key)), "type": "set"}
+            if isinstance(value, np.ndarray):
+                dictionary[key] = {"value": value.tolist(), "type": "np.ndarray"}
                 continue
 
-            if isinstance(getattr(self, key), list):
-                if np.any(getattr(self, key)) and isinstance(getattr(self, key)[0], Borehole):
+            if isinstance(value, set):
+                dictionary[key] = {"value": list(value), "type": "set"}
+                continue
+
+            if isinstance(value, list):
+                if np.any(value) and isinstance(value[0], Borehole):
                     # pygfunction object
                     dictionary[key] = {"value": [{key: value for key, value in borehole.__dict__.items()
                                                   if key != "_is_tilted"}
-                                                 for borehole in getattr(self, key)],
+                                                 for borehole in value],
                                        "type": "pygfunction.Borehole"}
                     continue
-                dictionary[key] = getattr(self, key)
+                dictionary[key] = value
 
-            if isinstance(getattr(self, key), dict):
+            if isinstance(value, dict):
                 # note that this can cause problems whenever self.key contains values that or not int, bool, float or str
-                dictionary[key] = getattr(self, key)
+                dictionary[key] = value
                 continue
 
             # for all self-defined classes
-            if hasattr(getattr(self, key), "to_dict"):
-                dictionary[key] = getattr(self, key).to_dict()
+            if hasattr(value, "to_dict"):
+                dictionary[key] = value.to_dict()
 
         return dictionary
 
@@ -92,15 +100,18 @@ class BaseClass:
         -------
         None
         """
+        if hasattr(self, "__slots__"):
+            variables: List[str] = list(self.__slots__)
+        else:
+            variables: List[str] = [key for key, value in dictionary.items() if not key.startswith("__")]
 
         for key, value in dictionary.items():
 
-            if not hasattr(self, key):
+            if key not in variables:
                 continue
 
-            # for all self-defined classes
-            if hasattr(getattr(self, key), "from_dict"):
-                getattr(self, key).from_dict(value)
+            if value == "None":
+                setattr(self, key, None)
                 continue
 
             if isinstance(value, (int, bool, float, str, list)):
@@ -110,6 +121,13 @@ class BaseClass:
             if isinstance(value, dict):
                 # note that this can mean that the value is a dictionary, or it is a np.ndarray, set or tuple
                 keys = value.keys()
+                # for all self-defined classes
+                if "__module__" in keys:
+                    class_dict = getattr(import_module(value["__module__"]), value["__name__"])
+                    setattr(self, key, class_dict.__new__(class_dict))
+                    getattr(self, key).from_dict(value)
+                    continue
+
                 if len(keys) == 2 and "type" in keys and "value" in keys:
                     type = value["type"]
                     _value = value["value"]

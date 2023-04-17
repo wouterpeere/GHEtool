@@ -140,6 +140,14 @@ def _set_boreholes(ds: DataStorage, borefield: Borefield) -> None:
                                                   ds.option_pipe_depth, ds.option_pipe_borehole_radius, tilt)
         borefield.set_borefield(boreholes)
         return
+    if ds.aim_circle:
+        boreholes = gt.boreholes.circle_field(ds.option_number_circle_boreholes, ds.option_borefield_radius, ds.option_depth, ds.option_pipe_depth,
+                                              ds.option_pipe_borehole_radius, tilt)
+        borefield.set_borefield(boreholes)
+        return
+    borefield_gt = [gt.boreholes.Borehole(H, D, r_b, x=x, y=y ) for x, y, H, D, r_b in ds.custom_borefield]
+    borefield.set_borefield(borefield_gt)
+    return
 
 
 def _create_fluid_data(ds: DataStorage) -> FluidData:

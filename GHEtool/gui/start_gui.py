@@ -8,11 +8,6 @@ from pathlib import Path
 from platform import system
 from sys import argv
 
-from GHEtool import Borefield
-from GHEtool.gui.data_2_borefield_func import data_2_borefield
-from GHEtool.gui.gui_classes.translation_class import Translations
-from GHEtool.gui.gui_structure import GUI
-
 os_system = system()
 is_frozen = getattr(sys, 'frozen', False) and os_system == 'Windows'  # pragma: no cover
 
@@ -28,12 +23,15 @@ def run(path_list=None):  # pragma: no cover
     if is_frozen:
         pyi_splash.update_text('Loading ..')
 
-    from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
     from PySide6.QtWidgets import QApplication as QtWidgets_QApplication
     from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
-    from ScenarioGUI.global_settings import VERSION
+    from GHEtool import Borefield
+    from GHEtool.gui.data_2_borefield_func import data_2_borefield
+    from GHEtool.gui.gui_classes.translation_class import Translations
+    from GHEtool.gui.gui_structure import GUI
     from ScenarioGUI import load_config
     load_config(Path(__file__).parent.joinpath("gui_config.ini"))
+    from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
 
     if is_frozen:
         pyi_splash.update_text('Loading ...')
@@ -41,6 +39,7 @@ def run(path_list=None):  # pragma: no cover
     # init application
     app = QtWidgets_QApplication()
     if os_system == 'Windows':
+        from ScenarioGUI.global_settings import VERSION
         # set version and id
         myAppID = f'GHEtool v{VERSION}'  # arbitrary string
         ctypes_windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)

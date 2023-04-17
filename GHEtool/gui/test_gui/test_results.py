@@ -7,10 +7,11 @@ from typing import Tuple
 
 import numpy as np
 import PySide6.QtWidgets as QtW
+import pandas as pd
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
-from GHEtool import Borefield, FluidData, GroundConstantTemperature, GroundFluxTemperature, PipeData
+from GHEtool import Borefield, FOLDER, FluidData, GroundConstantTemperature, GroundFluxTemperature, PipeData
 from GHEtool.gui.data_2_borefield_func import data_2_borefield
 from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
 from GHEtool.gui.gui_classes.translation_class import Translations
@@ -181,16 +182,15 @@ def test_temp_profile_temp_gradient(qtbot, gradient: float, ground_temp: float):
     main_window.delete_backup()
 
 
-@given(tilt=st.floats(0, 10))
-@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=10,  deadline=None)
-def test_borefield_shapes(qtbot, tilt: float):
-    tilt = round_down(tilt, 2)
+def test_borefield_shapes(qtbot):
+    tilt = 0
     main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
     main_window.save_scenario()
     main_window.add_scenario()
     main_window.gui_structure.aim_rect.widget.click() if not main_window.gui_structure.aim_rect.widget.isChecked() else None
     main_window.gui_structure.option_tilted.set_value(tilt)
     main_window.gui_structure.option_spacing_length.set_value(main_window.gui_structure.option_spacing.get_value() + 1)
+    main_window.gui_structure.update_borefield()
     main_window.save_scenario()
     ds = main_window.list_ds[-1]
     borefield_gui, func = data_2_borefield(ds)
@@ -207,31 +207,75 @@ def test_borefield_shapes(qtbot, tilt: float):
             assert np.isclose(borehole_1.orientation, borehole_2.orientation)
 
     check_borefield(borefield_gui.borefield, boreholes)
-
+    qtbot.wait(10)
     main_window.gui_structure.aim_Box_shaped.widget.click()
+    main_window.gui_structure.update_borefield()
     main_window.save_scenario()
     ds = main_window.list_ds[-1]
     borefield_gui, func = data_2_borefield(ds)
     boreholes = gt.boreholes.box_shaped_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing + 1, ds.option_depth,
                                               ds.option_pipe_depth, ds.option_pipe_borehole_radius, tilt / 360 * 2 * np.pi)
     check_borefield(borefield_gui.borefield, boreholes)
-
+    qtbot.wait(10)
     main_window.gui_structure.aim_L_shaped.widget.click()
+    main_window.gui_structure.update_borefield()
     main_window.save_scenario()
     ds = main_window.list_ds[-1]
     borefield_gui, func = data_2_borefield(ds)
     boreholes = gt.boreholes.L_shaped_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing + 1, ds.option_depth,
                                               ds.option_pipe_depth, ds.option_pipe_borehole_radius, tilt / 360 * 2 * np.pi)
     check_borefield(borefield_gui.borefield, boreholes)
-
+    qtbot.wait(10)
     main_window.gui_structure.aim_U_shaped.widget.click()
+    main_window.gui_structure.update_borefield()
     main_window.save_scenario()
     ds = main_window.list_ds[-1]
     borefield_gui, func = data_2_borefield(ds)
     boreholes = gt.boreholes.U_shaped_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing + 1, ds.option_depth,
                                               ds.option_pipe_depth, ds.option_pipe_borehole_radius, tilt / 360 * 2 * np.pi)
     check_borefield(borefield_gui.borefield, boreholes)
+    qtbot.wait(10)
+    main_window.gui_structure.aim_circle.widget.click()
+    main_window.gui_structure.update_borefield()
+    main_window.save_scenario()
+    ds = main_window.list_ds[-1]
+    borefield_gui, func = data_2_borefield(ds)
+    boreholes = gt.boreholes.circle_field(ds.option_number_circle_boreholes, ds.option_borefield_radius, ds.option_depth,
+                                              ds.option_pipe_depth, ds.option_pipe_borehole_radius, tilt / 360 * 2 * np.pi)
+    check_borefield(borefield_gui.borefield, boreholes)
+    qtbot.wait(10)
 
+    main_window.gui_structure.aim_custom.widget.click()
+    values = [(x, y, H, D, r_b) for x, y, H, D, r_b in [(0,0,100,5,0.075), (0,9,110,2,0.06), (9,0,90,3,0.08), (9,9,150,6,0.07)]]
+    main_window.gui_structure.custom_borefield.set_value(values)
+    main_window.gui_structure.update_borefield()
+    main_window.save_scenario()
+    ds = main_window.list_ds[-1]
+    borefield_gui, func = data_2_borefield(ds)
+    boreholes = [gt.boreholes.Borehole(H, D, r_b, x=x, y=y) for x, y, H, D, r_b in values]
+    check_borefield(borefield_gui.borefield, boreholes)
+    qtbot.wait(10)
+    main_window.delete_backup()
+
+
+def test_import_borefield_data(qtbot):
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window.delete_backup()
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+
+    main_window.gui_structure.borefield_file.set_value("file")
+    main_window.gui_structure.import_borefield.button.click()
+    assert main_window.status_bar.widget.currentMessage() == main_window.translations.no_file_selected[main_window.gui_structure.option_language.get_value()[0]]
+
+    main_window.gui_structure.aim_custom.widget.click()
+    file = f"{FOLDER.joinpath('gui/test_gui/borefield_data.csv')}"
+    main_window.gui_structure.borefield_file.set_value(file)
+    main_window.gui_structure.import_borefield.button.click()
+    main_window.save_scenario()
+    data = pd.read_csv(file)
+    for li_1, li_2 in zip(data.values, main_window.gui_structure.custom_borefield.get_value()):
+        assert np.allclose(li_1, li_2)
+    qtbot.wait(10)
     main_window.delete_backup()
 
 

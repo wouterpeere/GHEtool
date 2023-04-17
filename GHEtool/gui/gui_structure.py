@@ -5,11 +5,14 @@ It contains all the options, categories etc. that should appear on the GUI.
 import logging
 from functools import partial
 from math import cos, pi, sin
+from pathlib import Path
 from typing import List, Optional, Tuple
 
 import PySide6.QtGui as QtG
 import PySide6.QtWidgets as QtW
 import PySide6.QtCore as QtC
+import pandas as pd
+
 from GHEtool import FOLDER
 from GHEtool.gui.gui_classes.translation_class import Translations
 from numpy import array, cos, int64, round, sin, sum
@@ -209,35 +212,42 @@ class GUI(GuiStructure):
 
         # def create_page_borehole():
         # create page
-        self.page_borehole = Page(translations.page_borehole, "Borehole\nand earth", "Borehole.png")
-        self.page_options.set_next_page(self.page_borehole)
-        self.page_borehole.set_previous_page(self.page_options)
+        self.page_borefield = Page(translations.page_borefield, "Borehole\nand earth", "RectField")
+        self.page_options.set_next_page(self.page_borefield)
+        self.page_borefield.set_previous_page(self.page_options)
 
-        self.aim_rect = Aim(page=self.page_borehole, label="Rectangular borefield", icon="RectField.svg")
-        self.aim_Box_shaped = Aim(page=self.page_borehole, label="Box shaped borefield", icon="BoxField.svg")
-        self.aim_L_shaped = Aim(page=self.page_borehole, label="L-shaped borefield", icon="LField.svg")
-        self.aim_U_shaped = Aim(page=self.page_borehole, label="U-shaped borefield", icon="UField.svg")
-        #self.aim_circle = Aim(page=self.page_borehole, label="Circle borefield", icon="CircleField.svg")
-        self.aim_custom = Aim(page=self.page_borehole, label="Customized borefield", icon="FlexField.svg")
+        self.aim_rect = Aim(page=self.page_borefield, label="Rectangular borefield", icon="RectField.svg")
+        self.aim_Box_shaped = Aim(page=self.page_borefield, label="Box shaped borefield", icon="BoxField.svg")
+        self.aim_L_shaped = Aim(page=self.page_borefield, label="L-shaped borefield", icon="LField.svg")
+        self.aim_U_shaped = Aim(page=self.page_borefield, label="U-shaped borefield", icon="UField.svg")
+        self.aim_circle = Aim(page=self.page_borefield, label="Circle borefield", icon="CircleField.svg")
+        self.aim_custom = Aim(page=self.page_borefield, label="Customized borefield", icon="FlexField.svg")
 
         # def create_category_borehole():
-        self.category_borehole = Category(
-            page=self.page_borehole,
+        self.category_borefield = Category(
+            page=self.page_borefield,
             label=translations.category_borehole,
         )
+        self.category_borefield.activate_graphic_left()
 
-        self.custom_borefield = els.FlexibleAmount(label="Custom borefield", default_length=1, entry_mame="Borehole", category=self.category_borehole,
-                                                min_length=1)
-        self.custom_borefield.add_option(els.FloatBox, name="x [m]", default_value=0, minimal_value=-1_000_000, maximal_value=1_000_000)
-        self.custom_borefield.add_option(els.FloatBox, name="y [m]", default_value=0, minimal_value=-1_000_000, maximal_value=1_000_000)
+        file = f"{FOLDER.joinpath('gui/test_gui/borefield_data.csv')}"
+        self.borefield_file = els.FileNameBox(label="Borefield file", category=self.category_borefield, default_value=file, file_extension="csv")#["txt", "csv"])
+        self.import_borefield = els.FunctionButton(button_text="import borefield", icon="Download", category=self.category_borefield)
+        self.import_borefield.change_event(self.fun_import_borefield)
+
+        self.custom_borefield = els.FlexibleAmount(label=translations.custom_borefield, default_length=1, entry_mame="Borehole", category=self.category_borefield,
+                                                   min_length=1)
+        self.custom_borefield.add_option(els.FloatBox, name="x [m]", default_value=0, minimal_value=-1_000_000, maximal_value=1_000_000,  decimal_number=2)
+        self.custom_borefield.add_option(els.FloatBox, name="y [m]", default_value=0, minimal_value=-1_000_000, maximal_value=1_000_000,  decimal_number=2)
         self.custom_borefield.add_option(els.FloatBox, name="depth [m]", default_value=100, minimal_value=0, maximal_value=1_000_000)
-        self.custom_borefield.add_option(els.FloatBox, name="buried depth [m]", default_value=2, minimal_value=0, maximal_value=1_000_000)
-        self.custom_borefield.add_option(els.FloatBox, name="Borehole radius [m]", default_value=0.075, minimal_value=0, maximal_value=1_000)
-        self.custom_borefield.add_option(els.FloatBox, name="tilt [°]", default_value=0, minimal_value=-90, maximal_value=90)
-        self.aim_custom.add_link_2_show(self.custom_borefield)
+        self.custom_borefield.add_option(els.FloatBox, name="buried depth [m]", default_value=2, minimal_value=0, maximal_value=1_000_000,  decimal_number=2)
+        self.custom_borefield.add_option(els.FloatBox, name="Borehole radius [m]", default_value=0.075, minimal_value=0, maximal_value=1_000,
+                                         decimal_number=4, step=0.01)
+        # self.custom_borefield.add_option(els.FloatBox, name="tilt [Â°]", default_value=0, minimal_value=-90, maximal_value=90)
+        self.custom_borefield.change_event(self.update_borefield)
 
         self.option_depth = FloatBox(
-            category=self.category_borehole,
+            category=self.category_borefield,
             label=translations.option_depth,
             default_value=100,
             decimal_number=2,
@@ -255,7 +265,7 @@ class GUI(GuiStructure):
         #     step=1,
         # )
         self.option_spacing = FloatBox(
-            category=self.category_borehole,
+            category=self.category_borefield,
             label=translations.option_spacing,
             default_value=6,
             decimal_number=2,
@@ -263,8 +273,9 @@ class GUI(GuiStructure):
             maximal_value=99,
             step=0.1,
         )
+        self.option_spacing.change_event(self.update_borefield)
         self.option_spacing_length = FloatBox(
-            category=self.category_borehole,
+            category=self.category_borefield,
             label=translations.option_spacing_length,
             default_value=6,
             decimal_number=2,
@@ -272,6 +283,14 @@ class GUI(GuiStructure):
             maximal_value=99,
             step=0.1,
         )
+        self.option_spacing_length.change_event(self.update_borefield)
+        self.option_borefield_radius = els.FloatBox(category=self.category_borefield, label=translations.option_borefield_radius,
+                                                    minimal_value=0, maximal_value=1_000_000, default_value=12.5, step=0.1, decimal_number=2)
+
+        self.option_borefield_radius.change_event(self.update_borefield)
+        self.option_number_circle_boreholes = els.IntBox(category=self.category_borefield, label=translations.option_number_circle_boreholes,
+                                                    minimal_value=2, maximal_value=1_000_000, default_value=12, step=1)
+        self.option_number_circle_boreholes.change_event(self.update_borefield)
         # self.option_min_spacing = FloatBox(
         #     category=self.category_borehole,
         #     label="Minimal borehole spacing [m]: ",
@@ -291,11 +310,13 @@ class GUI(GuiStructure):
         #     step=0.1,
         # )
         self.option_width = IntBox(
-            category=self.category_borehole, label=translations.option_width, default_value=9, minimal_value=1, maximal_value=40
+            category=self.category_borefield, label=translations.option_width, default_value=9, minimal_value=1, maximal_value=40
         )
+        self.option_width.change_event(self.update_borefield)
         self.option_length = IntBox(
-            category=self.category_borehole, label=translations.option_length, default_value=12, minimal_value=1, maximal_value=40
+            category=self.category_borefield, label=translations.option_length, default_value=12, minimal_value=1, maximal_value=40
         )
+        self.option_length.change_event(self.update_borefield)
         # self.option_max_width = FloatBox(
         #     category=self.category_borehole,
         #     label="Maximal width of rectangular field [m]: ",
@@ -315,7 +336,7 @@ class GUI(GuiStructure):
         #     step=1,
         # )
         self.option_pipe_depth = FloatBox(
-            category=self.category_borehole,
+            category=self.category_borefield,
             label=translations.option_pipe_depth,
             default_value=1,
             decimal_number=1,
@@ -325,7 +346,7 @@ class GUI(GuiStructure):
         )
 
         self.option_pipe_borehole_radius = FloatBox(
-            category=self.category_borehole,
+            category=self.category_borefield,
             label=translations.option_pipe_borehole_radius,
             default_value=0.075,
             decimal_number=4,
@@ -335,55 +356,95 @@ class GUI(GuiStructure):
         )
 
         self.option_tilted = FloatBox(
-            category=self.category_borehole,
-            label="Tilt [°] (0° = vertical, 90° horizontal directed to exterior)",
+            category=self.category_borefield,
+            label="Tilt [Â°] (0Â° = vertical, 90Â° horizontal directed to exterior)",
             default_value=0.0,
             decimal_number=2,
             minimal_value=-90,
             maximal_value=90,
             step=0.001,
         )
+        self.option_tilted.hide()
 
         # add dependencies
         #self.aim_temp_profile.add_link_2_show(self.option_depth)
         #self.aim_optimize.add_link_2_show(self.option_depth)
-        self.aim_rect.change_event(partial(self.show_option_on_multiple_aims, [self.aim_optimize, self.aim_temp_profile], [self.aim_rect,
-                                                                                                                          self.aim_Box_shaped], self.option_depth))
-        self.aim_optimize.change_event(partial(self.show_option_on_multiple_aims, [self.aim_optimize, self.aim_temp_profile], [self.aim_rect,
-                                                                                                                          self.aim_Box_shaped], self.option_depth))
-        self.aim_temp_profile.change_event(partial(self.show_option_on_multiple_aims, [self.aim_optimize, self.aim_temp_profile], [self.aim_rect,
-                                                                                                                          self.aim_Box_shaped], self.option_depth))
-        self.aim_req_depth.change_event(partial(self.show_option_on_multiple_aims, [self.aim_optimize, self.aim_temp_profile], [self.aim_rect,
-                                                                                                                          self.aim_Box_shaped], self.option_depth))
-        self.aim_Box_shaped.change_event(partial(self.show_option_on_multiple_aims, [self.aim_optimize, self.aim_temp_profile], [self.aim_rect,
-                                                                                                                          self.aim_Box_shaped], self.option_depth))
-        self.aim_custom.change_event(partial(self.show_option_on_multiple_aims, [self.aim_optimize, self.aim_temp_profile], [self.aim_rect,
-                                                                                                                          self.aim_Box_shaped], self.option_depth))
-        self.aim_L_shaped.change_event(partial(self.show_option_on_multiple_aims, [self.aim_optimize, self.aim_temp_profile], [self.aim_rect,
-                                                                                                                          self.aim_Box_shaped], self.option_depth))
-        self.aim_U_shaped.change_event(partial(self.show_option_on_multiple_aims, [self.aim_optimize, self.aim_temp_profile], [self.aim_rect,
-                                                                                                                          self.aim_Box_shaped], self.option_depth))
-
+        li_aim = [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth, self.aim_rect, self.aim_Box_shaped, self.aim_L_shaped, self.aim_U_shaped,
+                  self.aim_circle, self.aim_custom]
+        _ = [aim.change_event(partial(show_option_on_multiple_aims,
+                                      [self.aim_optimize, self.aim_temp_profile],
+                                      [self.aim_rect, self.aim_Box_shaped, self.aim_L_shaped, self.aim_U_shaped, self.aim_circle],
+                                      self.option_depth)) for aim in li_aim]
         # self.aim_size_length.add_link_2_show(self.option_max_depth)
 
-        self.aim_temp_profile.add_link_2_show(self.option_spacing)
-        self.aim_req_depth.add_link_2_show(self.option_spacing)
-        self.aim_optimize.add_link_2_show(self.option_spacing)
+        _ = [aim.change_event(partial(show_option_on_multiple_aims,
+                                      [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
+                                      [self.aim_rect,self.aim_Box_shaped, self.aim_L_shaped,self.aim_U_shaped],
+                                      self.option_spacing)) for aim in li_aim]
+        _ = [aim.change_event(partial(show_option_on_multiple_aims,
+                                      [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
+                                      [self.aim_rect,self.aim_Box_shaped, self.aim_L_shaped,self.aim_U_shaped],
+                                      self.option_spacing_length)) for aim in li_aim]
 
         # self.aim_size_length.add_link_2_show(self.option_min_spacing)
         # self.aim_size_length.add_link_2_show(self.option_max_spacing)
 
-        self.aim_temp_profile.add_link_2_show(self.option_width)
-        self.aim_req_depth.add_link_2_show(self.option_width)
-        self.aim_optimize.add_link_2_show(self.option_width)
+        _ = [aim.change_event(partial(show_option_on_multiple_aims,
+                                      [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
+                                      [self.aim_rect,self.aim_Box_shaped, self.aim_L_shaped,self.aim_U_shaped],
+                                      self.option_width)) for aim in li_aim]
 
-        self.aim_temp_profile.add_link_2_show(self.option_length)
-        self.aim_req_depth.add_link_2_show(self.option_length)
-        self.aim_optimize.add_link_2_show(self.option_length)
+        _ = [aim.change_event(partial(show_option_on_multiple_aims,
+                                      [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
+                                      [self.aim_rect,self.aim_Box_shaped, self.aim_L_shaped,self.aim_U_shaped],
+                                      self.option_length)) for aim in li_aim]
+
+        _ = [aim.change_event(partial(show_option_on_multiple_aims,
+                                      [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
+                                      [self.aim_rect,self.aim_Box_shaped, self.aim_L_shaped,self.aim_U_shaped, self.aim_circle],
+                                      self.option_pipe_depth)) for aim in li_aim]
+
+        _ = [aim.change_event(partial(show_option_on_multiple_aims,
+                                      [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
+                                      [self.aim_rect, self.aim_Box_shaped, self.aim_L_shaped, self.aim_U_shaped, self.aim_circle],
+                                      self.option_pipe_borehole_radius)) for aim in li_aim]
+
+        _ = [aim.change_event(partial(show_option_on_multiple_aims,
+                                      [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
+                                      [self.aim_circle],
+                                      self.option_number_circle_boreholes)) for aim in li_aim]
+
+        _ = [aim.change_event(partial(show_option_on_multiple_aims,
+                                      [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
+                                      [self.aim_circle],
+                                      self.option_borefield_radius)) for aim in li_aim]
+
+        _ = [aim.change_event(partial(show_option_on_multiple_aims,
+                                      [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
+                                      [self.aim_custom],
+                                      self.custom_borefield)) for aim in li_aim]
+
+        _ = [aim.change_event(partial(show_option_on_multiple_aims,
+                                      [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
+                                      [self.aim_custom],
+                                      self.import_borefield)) for aim in li_aim]
+
+        _ = [aim.change_event(partial(show_option_on_multiple_aims,
+                                      [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
+                                      [self.aim_custom],
+                                      self.borefield_file)) for aim in li_aim]
+
+        [aim.change_event(self.update_borefield) for aim in li_aim]
+
+        self.page_borefield.add_function_called_if_button_clicked(self.update_borefield)
+
+        self.page_earth = Page(translations.page_earth, "earth", "Borehole.png")
+        self.page_borefield.set_next_page(self.page_earth)
+        self.page_earth.set_previous_page(self.page_borefield)
 
         # def create_category_earth():
         self.category_earth = Category(
-            page=self.page_borehole,
+            page=self.page_earth,
             label=translations.category_earth,
         )
 
@@ -443,7 +504,7 @@ class GUI(GuiStructure):
         # self.aim_size_length.add_link_2_show(self.option_max_length)
 
         # def create_category_temperatures():
-        self.category_temperatures = Category(page=self.page_borehole, label=translations.category_temperatures)
+        self.category_temperatures = Category(page=self.page_earth, label=translations.category_temperatures)
 
         self.option_min_temp = FloatBox(
             category=self.category_temperatures,
@@ -497,8 +558,8 @@ class GUI(GuiStructure):
         #def create_page_borehole_resistance():
         # create page
         self.page_borehole_resistance = Page(translations.page_borehole_resistance, "Borehole\nresistance", "Resistance.png")
-        self.page_borehole.set_next_page(self.page_borehole_resistance)
-        self.page_borehole_resistance.set_previous_page(self.page_borehole)
+        self.page_borefield.set_next_page(self.page_borehole_resistance)
+        self.page_borehole_resistance.set_previous_page(self.page_borefield)
 
         #def create_category_constant_rb():
         self.category_constant_rb = Category(page=self.page_borehole_resistance, label=translations.category_constant_rb)
@@ -672,7 +733,7 @@ class GUI(GuiStructure):
         # create page
         self.page_thermal = Page(translations.page_thermal, "Thermal\ndemands", "Thermal.svg")
         self.page_borehole_resistance.set_next_page(self.page_thermal)
-        self.page_thermal.set_previous_page(self.page_borehole)
+        self.page_thermal.set_previous_page(self.page_borefield)
 
         #def create_category_select_datafile():
         self.category_select_file = Category(page=self.page_thermal, label=translations.category_select_file)
@@ -1300,6 +1361,92 @@ class GUI(GuiStructure):
                 circle.setBrush(blue_light)
                 scene.addItem(circle)
 
+    def update_borefield(self) -> None:
+        """
+        This function plots the position of the pipe in the borehole.
+        This figure can be either left or right of the options in the category
+
+        Returns
+        -------
+        None
+        """
+        frame = self.category_borefield.graphic_left if self.category_borefield.graphic_left is not None else self.category_borefield.graphic_right
+        if not isinstance(frame, QtW.QGraphicsView):
+            return
+        def draw_borefield():
+            # import all that is needed
+            # get variables from gui
+            spacing_width = self.option_spacing.get_value()
+            spacing_length = self.option_spacing_length.get_value()
+            r_bore = min(spacing_length, spacing_width) / 4
+            width = self.option_width.get_value()
+            length = self.option_length.get_value()
+            # calculate scale from graphic view size
+            max_l = min(frame.width(), frame.height())
+            max_size = max(spacing_length * length, spacing_width * width, 1)
+            scale = max_l / max_size / 1.25  # leave 25 % space
+            # set colors
+            white_color = array(globs.WHITE.replace('rgb(', '').replace(')', '').split(','), dtype=int64)
+            white_color = QtG.QColor(white_color[0], white_color[1], white_color[2])
+            brown = QtG.QColor(145, 124, 111)
+            # create graphic scene if not exits otherwise get scene and delete items
+            if frame.scene() is None:
+                scene = QtW.QGraphicsScene()  # parent=self.central_widget)
+                frame.setScene(scene)
+                frame.setBackgroundBrush(brown)
+            else:
+                scene = frame.scene()
+                scene.clear()
+            # create borehole circle in grey wih no border
+            width = (width - 1) * spacing_width * scale / 2 + r_bore * scale / 2
+            length = (length - 1) * spacing_length * scale / 2 + r_bore * scale / 2
+
+            if self.aim_rect.widget.isChecked():
+                coordinates = [(w * spacing_width * scale - width, l * spacing_length * scale - length) for w in range(self.option_width.get_value()) for l in range(self.option_length.get_value())]
+            elif self.aim_Box_shaped.widget.isChecked():
+                coordinates = [(w * spacing_width * scale - width, l * spacing_length * scale - length) for w in range(self.option_width.get_value()) if not(
+                        0 < w < self.option_width.get_value() - 1) for l in range(self.option_length.get_value())]
+                coordinates += [(w * spacing_width * scale - width, l * spacing_length * scale - length) for w in range(self.option_width.get_value()) for l
+                                in range(self.option_length.get_value())  if not (0 < l < self.option_length.get_value() - 1) ]
+            elif self.aim_L_shaped.widget.isChecked():
+                l = self.option_length.get_value() - 1
+                coordinates = [(w * spacing_width * scale - width, l * spacing_length * scale - length) for w in range(self.option_width.get_value())]
+                w = 0
+                coordinates += [(w * spacing_width * scale - width, l * spacing_length * scale - length) for l in range(self.option_length.get_value())]
+            elif self.aim_U_shaped.widget.isChecked():
+                l = self.option_length.get_value() - 1
+                coordinates = [(w * spacing_width * scale - width, l * spacing_length * scale - length) for w in range(self.option_width.get_value())]
+                w = 0
+                coordinates += [(w * spacing_width * scale - width, l * spacing_length * scale - length) for l in range(self.option_length.get_value())]
+                w = self.option_width.get_value() - 1
+                coordinates += [(w * spacing_width * scale - width, l * spacing_length * scale - length) for l in range(self.option_length.get_value())]
+            elif self.aim_circle.widget.isChecked():
+                r_bore = 2 * self.option_borefield_radius.get_value() * pi / self.option_number_circle_boreholes.get_value() / 4
+                scale = max_l / (2 * self.option_borefield_radius.get_value() + r_bore) / 1.25  # leave 25 % space
+                angle = 2 * pi / self.option_number_circle_boreholes.get_value()
+                radius = self.option_borefield_radius.get_value()*scale
+                coordinates = [(sin(angle * n) * radius - r_bore * scale / 2, cos(angle * n) * radius - r_bore * scale / 2) for n in range(self.option_number_circle_boreholes.get_value())]
+
+            else:
+                coordinates = [(x,y) for x,y,_,_,_ in self.custom_borefield.get_value()]
+                min_x = min(x for x, _ in coordinates)
+                max_x = max(x for x, _ in coordinates)
+                min_y = min(y for _, y in coordinates)
+                max_y = max(y for _, y in coordinates)
+                r_bore = max(min(max_x - min_x, max_y - min_y), 1) / len(coordinates)
+                dist_x = max_x + min_x
+                dist_y = max_y + min_y
+                scale = max_l / (max(max_x - min_x, max_y - min_y, 5) + r_bore) / 1.25
+                coordinates = [((x - dist_x / 2 - r_bore / 2) * scale, (y - dist_y /2 - r_bore / 2) * scale) for x, y in coordinates]
+
+            for x, y in coordinates:
+                circle = QtW.QGraphicsEllipseItem(x, y, r_bore * scale, r_bore * scale)
+                circle.setPen(QtG.QPen(white_color, 0))
+                circle.setBrush(white_color)
+                scene.addItem(circle)
+
+        QtC.QTimer.singleShot(5, draw_borefield)
+
     def fun_update_combo_box_data_file(self, filename: str) -> None:
         """
         This function updates the combo box of the file selector when a new file is selected.
@@ -1339,7 +1486,6 @@ class GUI(GuiStructure):
             list_box.widget.addItems(columns)
             if len(columns) > idx:
                 list_box.set_value(idx)
-
 
     def fun_display_data(self) -> None:
         """
@@ -1425,14 +1571,22 @@ class GUI(GuiStructure):
             logging.error(self.translations.ColumnError[self.option_language.get_value()[0]])
             return
 
-    def show_option_on_multiple_aims(self, first_aims: list[Aim], second_aims: list[Aim], option: Option):
-        def show_hide():
-            first = any(aim.widget.isChecked() for aim in first_aims)
-            second = any(aim.widget.isChecked() for aim in second_aims)
-            if first and second:
-                option.show()
-                return
-            option.hide()
+    def fun_import_borefield(self):
+        filename = self.borefield_file.get_value()
+        if not Path(filename).exists() or filename == "":
+            logging.error(self.translations.no_file_selected[self.option_language.get_value()[0]])
+            return
+        data = pd.read_csv(filename)
+        self.custom_borefield.set_value(data.values)
 
-        QtC.QTimer.singleShot(5, show_hide)
 
+def show_option_on_multiple_aims(first_aims: list[Aim], second_aims: list[Aim], option: Option):
+    def show_hide():
+        first = any(aim.widget.isChecked() for aim in first_aims)
+        second = any(aim.widget.isChecked() for aim in second_aims)
+        if first and second:
+            option.show()
+            return
+        option.hide()
+
+    QtC.QTimer.singleShot(5, show_hide)
