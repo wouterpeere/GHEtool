@@ -742,6 +742,13 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             for DS in self.list_ds:
                 DS.ui = id(self)
 
+            # when there was a crash, potentially scenario's have a *
+            temp = scenarios.copy()
+            scenarios = [scenario.split("*")[0] for scenario in scenarios]
+            if temp != scenarios:
+                # there was a crash before
+                ghe_logger.warning("GHEtool is loaded after a previous crash. Please check all inputs carefully.")
+
             # init user window by reset scenario list widget and check for results
             self.list_widget_scenario.clear()
             self.list_widget_scenario.addItems(scenarios)
