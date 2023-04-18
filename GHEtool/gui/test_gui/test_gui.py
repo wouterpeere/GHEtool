@@ -246,7 +246,7 @@ def test_gui_values(qtbot):
         main_window.threads[0].any_signal.connect(main_window.thread_function)
     main_window.gui_structure.geo_load.set_value(0)
     main_window.gui_structure.option_method_size_depth.set_value(0)
-
+    main_window.save_scenario()
 
     main_window.remove_previous_calculated_results()
     main_window.gui_structure.aim_optimize.widget.click()

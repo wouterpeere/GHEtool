@@ -1931,7 +1931,7 @@ class Borefield(BaseClass):
             When no data is given, when the data is not hourly or when there are negative values
         """
         # check whether there is data given
-        if self.hourly_cooling_load is None or self.hourly_heating_load is None:
+        if self.hourly_cooling_load == np.array([]) or self.hourly_heating_load == np.array([]):
             raise ValueError("No data is given for either the heating or cooling load.")
 
         # check whether the data is hourly
