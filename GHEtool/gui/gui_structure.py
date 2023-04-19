@@ -180,7 +180,7 @@ class GuiStructure:
             self.aim_temp_profile = Aim(page=self.page_aim, label=self.translations.aim_temp_profile, icon=":/icons/icons/Temp_Profile.svg")
             self.aim_req_depth = Aim(page=self.page_aim, label=self.translations.aim_req_depth, icon=":/icons/icons/Depth_determination.svg")
             # self.aim_size_length = Aim(page=self.page_aim, label="Size borefield by length and width", icon=":/icons/icons/Size_Length.svg")
-            self.aim_optimize = Aim(page=self.page_aim, label=self.translations.aim_req_depth, icon=":/icons/icons/Optimize_Profile.svg")
+            self.aim_optimize = Aim(page=self.page_aim, label=self.translations.aim_optimize, icon=":/icons/icons/Optimize_Profile.svg")
 
         def create_page_options():
             # create page

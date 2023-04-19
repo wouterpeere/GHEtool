@@ -33,7 +33,7 @@ class Borefield(BaseClass):
                 'length_peak', 'th', 'Tf_max', 'Tf_min', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
                 'monthly_load_cooling', 'peak_heating', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm', \
                 'peak_cooling', 'simulation_period', 'ground_data', 'pipe_data', 'fluid_data',\
-                'results_peak_heating', 'time_L4', 'options_pygfunction',\
+                'results_peak_heating', 'time_L4', 'example_active_passive',\
                 'results_peak_cooling', 'results_month_cooling', 'results_month_heating', 'Tb', 'THRESHOLD_WARNING_SHALLOW_FIELD', \
                 'gui', 'time_L3_last_year', 'peak_heating_external', 'peak_cooling_external', \
                 'monthly_load_heating_external', 'monthly_load_cooling_external', 'hourly_heating_load_external', \
@@ -123,9 +123,7 @@ class Borefield(BaseClass):
         self.H_init: float = 0.
         self.custom_gfunction: CustomGFunction = custom_gfunction
         self.gfunction_calculation_object: GFunction = GFunction()
-
-        ## params w.r.t. pygfunction
-        self.options_pygfunction: dict = {"method": "equivalent"}
+        self.example_active_passive: bool = False
 
         # initialize variables for temperature plotting
         self.results_peak_heating = np.array([])  # list with the minimum temperatures due to the peak heating
@@ -1131,7 +1129,32 @@ class Borefield(BaseClass):
         # (convergence if difference between depth in iterations is smaller than THRESHOLD_BOREHOLE_DEPTH)
         while abs(self.H - H_prev) >= Borefield.THRESHOLD_BOREHOLE_DEPTH:
 
-            if hourly:
+            if self.example_active_passive:
+                self._calculate_temperature_profile(self.H, hourly=True)
+                # # calculate g-values
+                # g_values = self.gfunction(self.time_L4, self.H)
+                #
+                # # calculation of needed differences of the g-function values. These are the weight factors
+                # # in the calculation of Tb.
+                # g_value_differences = np.diff(g_values, prepend=0)
+                #
+                # loads = self.hourly_cooling_load - self.hourly_heating_load
+                #
+                # # convolution to get the monthly results
+                # results = convolve(loads, g_value_differences)[:438000]
+                #
+                # # calculation the borehole wall temperature for every month i
+                # Tb = results / (2 * pi * self.ground_data.k_s) / (self.H * self.number_of_boreholes) + self._Tg(self.H)
+                #
+                # self.Tb = Tb
+                # # now the Tf will be calculated based on
+                # # Tf = Tb + Q * R_b
+                # temperature_result = Tb + loads * 1000 * (self.Rb / self.number_of_boreholes / self.H)
+                # # reset other variables
+                # self.results_peak_heating = temperature_result
+                # self.results_peak_cooling = temperature_result
+
+            elif hourly:
                 # calculate g-values
                 g_values = self.gfunction(self.time_L4, self.H)
 
@@ -1739,6 +1762,8 @@ class Borefield(BaseClass):
                                       self.simulation_period)
             else:
                 hourly_load = np.tile(self.hourly_cooling_load - self.hourly_heating_load, self.simulation_period)
+            if self.example_active_passive:
+                hourly_load = self.hourly_cooling_load - self.hourly_heating_load
 
             # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
             # g-function. This dataset is checked over and over again and is correct
@@ -1780,7 +1805,7 @@ class Borefield(BaseClass):
         -------
         None
         """
-        self.options_pygfunction = options
+        self.gfunction_calculation_object.set_options_gfunction_calculation(options)
 
     def gfunction(self, time_value: Union[list, float, np.ndarray], H: float = None) -> np.ndarray:
         """
@@ -1935,7 +1960,8 @@ class Borefield(BaseClass):
             raise ValueError("No data is given for either the heating or cooling load.")
 
         # check whether the data is hourly
-        if len(self.hourly_heating_load) != 8760 or len(self.hourly_cooling_load) != 8760:
+        if not self.example_active_passive and (len(self.hourly_heating_load) != 8760
+                                                or len(self.hourly_cooling_load) != 8760):
             raise ValueError("Incorrect length for either the heating or cooling load")
 
         # check whether there are negative values in the data

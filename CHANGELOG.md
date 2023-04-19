@@ -3,12 +3,13 @@ All notable changes to this project will be documented in this file including pl
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [2.1.2] - 2023-04-17
+## [2.1.2] - 2023-04-19
 
 ### Added
 - Logger for GHEtool (issue #96).
 - Examples are now also in RTD.
 - Reynolds number is shown on the result page (issue #112).
+- Example for the combination of active and passive cooling (issue #114).
 - It is now possible to use building loads (with a SCOP/SEER) instead of ground loads(issue #115).
 
 ### Changed

@@ -770,6 +770,19 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             except (FileNotFoundError, ImportError):
                 raise ImportError("The datafile cannot be loaded!")
 
+        if version == "2.1.2":
+            # write data to variables
+            self.list_ds = []
+            for val, borefield in zip(saving['values'], saving['borefields']):
+                ds = DataStorage(self.gui_structure)
+                ds.from_dict(val)
+                setattr(ds, 'borefield', None)
+                self.list_ds.append(ds)
+            # set and change the window title
+            self.filename = saving['filename']
+            general_changes(saving['names'])
+            return
+
         if version == "2.1.1":
             # write data to variables
             self.list_ds = []
