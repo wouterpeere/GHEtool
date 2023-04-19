@@ -4,8 +4,8 @@ The example load profile is for a profile limited in the first year of operation
 """
 import time
 
-import pygfunction as gt
 import numpy as np
+import pygfunction as gt
 
 # import all the relevant functions
 from GHEtool import *

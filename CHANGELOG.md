@@ -6,9 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [2.1.2] - [expected] feb 2023
 
 ### Added
-- Coaxial pipes
-- Variable temperature sizing (at least in the code version)
-- Reimplemented size by length and width
+- Logger for GHEtool (issue #96).
+- Examples are now also in RTD.
+- Reynolds number is shown on the result page (issue #112).
+
+### Changed
+- In figure plotting, the interval[x[i], x[i+1]) now has the value y[i] (instead of y[i-1]).
+- Scroll behaviour on the result page (issue #99).
+- Changed icon of GHEtool.
+- Imbalance changed to property so it can handle hourly loads as well (issue #106).
+- Remove recalculation option (issue #109).
+
+### Fixed
+- Sizing doesn't crash when either no heating or cooling load is present (issue #91).
+- Wrong heating load in april in GUI (issue #94).
+- Results are now cleared when new loads are loaded (issue #106).
+- Options for g-function calculations are not working (issue #119).
 
 ### Fixed
 - Sizing (L2, L3, L4) with no heating or cooling load does not work (issue #91) 

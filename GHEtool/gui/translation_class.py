@@ -197,6 +197,7 @@ class Translations:  # pragma: no cover
         "numerical_results",
         "result_text_depth",
         "result_Rb_calculated",
+        "result_Reynolds",
         "results_ground_temperature",
         "results_heating_load",
         "results_heating_load_percentage",
@@ -216,6 +217,7 @@ class Translations:  # pragma: no cover
         "option_len_peak_heating",
         "option_len_peak_cooling",
         "option_temperature_profile_hourly",
+        "option_n_threads",
         "languages",
     )
 
@@ -1344,7 +1346,7 @@ class Translations:  # pragma: no cover
         self.option_pipe_depth: List[str] = [
             "Burial depth [m]:",
             "Vergrabungstiefe [m]:",
-            "Begraven diepte [m]:",
+            "Deklaag [m]:",
             "Burial depth [m]:",
             "Burial depth [m]:",
             "Burial depth [m]:",
@@ -1551,6 +1553,15 @@ class Translations:  # pragma: no cover
             "Equivalent borehole thermal resistance: , mK/W",
             "Equivalent borehole thermal resistance: , mK/W",
         ]
+        self.result_Reynolds: List[str] = [
+            "Reynolds number: , ",
+            "Reynoldszahl  : , ",
+            "Reynoldsgetal: , ",
+            "Reynolds number: , ",
+            "Reynolds number: , ",
+            "Reynolds number: , ",
+            "Reynoldsnumber: ,",
+        ]
         self.results_ground_temperature: List[str] = [
             "Average ground temperature: , °C",
             "Durchschnittliche Erdreichtemperatur , °C",
@@ -1721,4 +1732,13 @@ class Translations:  # pragma: no cover
             "Should hourly data be used for the temperature profile?, no , yes ",
             "Should hourly data be used for the temperature profile?, no , yes ",
             "Should hourly data be used for the temperature profile?, no , yes",
+        ]
+        self.option_n_threads: List[str] = [
+            "Number of parallel threads [-]: ",
+            "Anzahl an parallelen Prozessen [-]: ",
+            "Nummer van parallelle threads [-]: ",
+            "Number of parallel threads [-]: ",
+            "Number of parallel threads [-]: ",
+            "Number of parallel threads [-]: ",
+            "Number of parallel threads [-]:",
         ]

@@ -71,7 +71,7 @@ class DataStorage:
                                   self.option_hp_jul, self.option_hp_aug, self.option_hp_sep, self.option_hp_oct, self.option_hp_nov, self.option_hp_dec]
         self.peakCooling: list = [self.option_cp_jan, self.option_cp_feb, self.option_cp_mar, self.option_cp_apr, self.option_cp_may, self.option_cp_jun,
                                   self.option_cp_jul, self.option_cp_aug, self.option_cp_sep, self.option_cp_oct, self.option_cp_nov, self.option_cp_dec]
-        self.monthlyLoadHeating: list = [self.option_hl_jan, self.option_hl_feb, self.option_hl_mar, self.option_hp_apr, self.option_hl_may, self.option_hl_jun,
+        self.monthlyLoadHeating: list = [self.option_hl_jan, self.option_hl_feb, self.option_hl_mar, self.option_hl_apr, self.option_hl_may, self.option_hl_jun,
                                          self.option_hl_jul, self.option_hl_aug, self.option_hl_sep, self.option_hl_oct, self.option_hl_nov, self.option_hl_dec]
         self.monthlyLoadCooling: list = [self.option_cl_jan, self.option_cl_feb, self.option_cl_mar, self.option_cl_apr, self.option_cl_may, self.option_cl_jun,
                                          self.option_cl_jul, self.option_cl_aug, self.option_cl_sep, self.option_cl_oct, self.option_cl_nov, self.option_cl_dec]

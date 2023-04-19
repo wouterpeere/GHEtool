@@ -1,4 +1,4 @@
-from .VariableClasses import FluidData, GroundData, PipeData
-from .CustomGFunction import CustomGFunction, load_custom_gfunction, _timeValues
-from .GFunction import GFunction, FIFO, SmallerThenZeroError
+from .CustomGFunction import CustomGFunction, _timeValues, load_custom_gfunction
+from .GFunction import FIFO, GFunction, SmallerThenZeroError
 from .SizingSetup import SizingSetup
+from .VariableClasses import FluidData, GroundData, PipeData

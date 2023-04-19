@@ -1,9 +1,9 @@
 ***************
-Users of GHEtool
+Supported the development of GHEtool
 ***************
 
-GHEtool is used internationally by both academia and practitioners. Below you can find the institutions that use GHEtool.
-If you want your institution to be on this list, please do contact us, via wouter.peere@kuleuven.be.
+GHEtool is used internationally by both academia and practitioners. Below you can find the institutions that supported the development of GHEtool.
+If you want your institution to be on this list, please do contact us, via info@ghetool.eu.
 
 ------------------
 Belgium
@@ -17,19 +17,13 @@ Belgium
         :text-align: center
 
         .. figure:: _logo's/boydens_engineering.jpg
- 
-
-    .. grid-item-card:: KU Leuven
-        :text-align: center
-
-        .. figure:: _logo's/KULeuven.png
         
     .. grid-item-card:: Sweco Belgium
         :text-align: center
 
         .. figure:: _logo's/Sweco.png
 
-    .. grid-item-card:: Thermal Systems Simulation Research Group (The SySi's)
+    .. grid-item-card:: Thermal Systems Simulation Research Group (The SySi's) - KU Leuven
         :text-align: center
 
         .. figure:: _logo's/The_SySi.png

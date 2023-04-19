@@ -1,15 +1,17 @@
 import os
 from math import isclose
+from sys import setrecursionlimit
 from typing import List, Union
 
-from sys import setrecursionlimit
-from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
-from GHEtool.gui.gui_combine_window import MainWindow
 import PySide6.QtCore as QtC
 import PySide6.QtWidgets as QtW
+from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
 
 from GHEtool import FOLDER
 from GHEtool.gui.gui_classes import ButtonBox, FigureOption, FileNameBox, FloatBox, IntBox, ListBox
+from GHEtool.gui.gui_combine_window import MainWindow
+from GHEtool.gui.gui_structure import load_data_GUI
+from GHEtool.gui.translation_class import Translations
 
 setrecursionlimit(1500)
 
@@ -35,6 +37,111 @@ def test_language(qtbot):
         assert main_window.gui_structure.option_language.get_value() == idx
 
     main_window.menuLanguage.actions()[0].trigger()
+
+
+def test_scrolling(qtbot):
+    """
+    test scrolling on results figure
+
+    Parameters
+    ----------
+    qtbot : qtbot
+        QtBot mock
+    """
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+
+    # create class which are not handled with qtbot
+
+    class Event:
+        """dummy event class"""
+        def __init__(self):
+            self.button = 'down'
+
+
+    class VerticalScrollBar:
+        """dummy vertical scroll bar class"""
+        def __init__(self):
+            self._value: int = 0
+
+        def value(self) -> int:
+            return self._value
+
+        def setValue(self, value: int):
+            self._value = value
+
+        def singleStep(self) -> int:
+            return 10
+
+    class ScrollArea:
+        """dummy scroll area class"""
+        def __init__(self):
+            self.vertical_scroll_bar = VerticalScrollBar()
+
+        def verticalScrollBar(self) -> VerticalScrollBar:
+            return self.vertical_scroll_bar
+    # overwrite scroll area with dummy class and create dummy event
+    main_window.gui_structure.figure_temperature_profile.scroll_area = ScrollArea()
+    event = Event()
+    # get before value
+    val_before = main_window.gui_structure.figure_temperature_profile.scroll_area.verticalScrollBar().value()
+    # check down scrolling
+    main_window.gui_structure.figure_temperature_profile.scrolling(event)
+    val_after = main_window.gui_structure.figure_temperature_profile.scroll_area.verticalScrollBar().value()
+    assert val_after == val_before + 10
+    # check up scrolling
+    event.button = "up"
+    main_window.gui_structure.figure_temperature_profile.scrolling(event)
+    val_after = main_window.gui_structure.figure_temperature_profile.scroll_area.verticalScrollBar().value()
+    assert val_after == val_before
+    # check down scrolling with scroll_event
+    main_window.gui_structure.figure_temperature_profile.canvas.scroll_event(0, 10, -10)
+    val_after = main_window.gui_structure.figure_temperature_profile.scroll_area.verticalScrollBar().value()
+    assert val_after == val_before + 10
+    # check up scrolling with scroll_event
+    main_window.gui_structure.figure_temperature_profile.canvas.scroll_event(0, 10, 10)
+    val_after = main_window.gui_structure.figure_temperature_profile.scroll_area.verticalScrollBar().value()
+    assert val_after == val_before
+
+
+def test_translation_class():
+    """
+    Checks if all entries in the translation class have the same length
+    """
+    translations = Translations()
+    len_ref = len(translations.languages)
+    for name in translations.__slots__:
+        value = getattr(translations, name)
+        if isinstance(value, list):
+            assert len(value) == len_ref
+
+
+def test_gui_filename_errors(qtbot):
+    """
+    test if all gui values are set and get correctly.
+
+    Parameters
+    ----------
+    qtbot: qtbot
+        bot for the GUI
+    """
+    # init gui window
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.remove_previous_calculated_results()
+    main_window.delete_backup()
+    main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window.remove_previous_calculated_results()
+
+    main_window.gui_structure.fun_update_combo_box_data_file("")
+    main_window.gui_structure.fun_update_combo_box_data_file("C:/test.GHEtool")
+
+    try:
+        load_data_GUI("", 1, "Heating", "Cooling", "Combined", 5, 6, 7)
+    except FileNotFoundError:
+        assert True
+    try:
+        load_data_GUI("C:/test.GHEtool", 1, "Heating", "Cooling", "Combined", 5, 6, 7)
+    except FileNotFoundError:
+        assert True
 
 
 def test_gui_values(qtbot):
@@ -75,7 +182,7 @@ def test_gui_values(qtbot):
                 assert isclose(option.get_value(), option.minimal_value)
                 continue
             val = option.get_value() + option.step
-            val = val - 2 * option.step if option.widget.maximum() > val else val
+            val = val - 2 * option.step if option.widget.maximum() < val else val
             if val < option.widget.minimum():
                 continue
             option.set_value(val)
@@ -473,9 +580,11 @@ def test_save_load_new(qtbot):
     qtbot: qtbot
         bot for the GUI
     """
-    import keyboard
-    import pathlib
     import os
+    import pathlib
+
+    import keyboard
+
     # init gui window
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
     main_window.delete_backup()
@@ -493,9 +602,10 @@ def test_save_load_new(qtbot):
     if os.path.exists(main_window.default_path.joinpath(filename_3)):
         os.remove(main_window.default_path.joinpath(filename_3))
     # trigger save action and add filename
-    QtC.QTimer.singleShot(1, lambda: keyboard.write(filename_1))
-    QtC.QTimer.singleShot(10, lambda: keyboard.press('enter'))
+    QtC.QTimer.singleShot(1000, lambda: keyboard.write(filename_1))
+    QtC.QTimer.singleShot(10000, lambda: keyboard.press('enter'))
     main_window.actionSave.trigger()
+
     # check if filename is set correctly
     assert (pathlib.Path(main_window.filename[0]), main_window.filename[1]) == (main_window.default_path.joinpath(filename_1), 'GHEtool (*.GHEtool)')
     # get old list and add a new scenario
@@ -504,21 +614,21 @@ def test_save_load_new(qtbot):
     # check that they differ
     assert list_old != main_window.list_ds
     # set a different filename and test save as action
-    QtC.QTimer.singleShot(1, lambda: keyboard.write(filename_2))
-    QtC.QTimer.singleShot(10, lambda: keyboard.press('enter'))
+    QtC.QTimer.singleShot(1000, lambda: keyboard.write(filename_2))
+    QtC.QTimer.singleShot(10000, lambda: keyboard.press('enter'))
     main_window.actionSave_As.trigger()
     # check if filename is set correctly
     assert (pathlib.Path(main_window.filename[0]), main_window.filename[1]) == (main_window.default_path.joinpath(filename_2), 'GHEtool (*.GHEtool)')
     # trigger open function and set filename 1
-    QtC.QTimer.singleShot(1, lambda: keyboard.write(filename_1))
-    QtC.QTimer.singleShot(10, lambda: keyboard.press('enter'))
+    QtC.QTimer.singleShot(1000, lambda: keyboard.write(filename_1))
+    QtC.QTimer.singleShot(10000, lambda: keyboard.press('enter'))
     main_window.actionOpen.trigger()
     # check if filename is imported correctly and the data storages as well
     assert (pathlib.Path(main_window.filename[0]), main_window.filename[1]) == (main_window.default_path.joinpath(filename_1), 'GHEtool (*.GHEtool)')
     assert list_old == main_window.list_ds
     # set a different filename and test new action
-    QtC.QTimer.singleShot(1, lambda: keyboard.write(filename_3))
-    QtC.QTimer.singleShot(10, lambda: keyboard.press('enter'))
+    QtC.QTimer.singleShot(1000, lambda: keyboard.write(filename_3))
+    QtC.QTimer.singleShot(10000, lambda: keyboard.press('enter'))
     main_window.actionNew.trigger()
     assert (pathlib.Path(main_window.filename[0]), main_window.filename[1]) == (main_window.default_path.joinpath(filename_3), 'GHEtool (*.GHEtool)')
     assert len(main_window.list_ds) < 1
@@ -534,6 +644,7 @@ def test_close(qtbot):
         bot for the GUI
     """
     import keyboard
+
     # init gui window
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
     main_window.delete_backup()
@@ -628,6 +739,7 @@ def test_no_load_save_file(qtbot):
         bot for the GUI
     """
     from pytest import raises
+
     # init gui window
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
     main_window.delete_backup()
@@ -637,7 +749,7 @@ def test_no_load_save_file(qtbot):
         main_window._load_from_data('not_there.GHEtool')
     # check if the current error message is shown with a wrong save file/folder
     main_window._save_to_data('hello/not_there.GHEtool')
-    assert main_window.status_bar.currentMessage() == main_window.translations.NoFileSelected[main_window.gui_structure.option_language.get_value()]
+    assert main_window.status_bar.widget.currentMessage() == main_window.translations.NoFileSelected[main_window.gui_structure.option_language.get_value()]
 
 
 def test_change_scenario(qtbot):
@@ -751,13 +863,13 @@ def test_change_scenario(qtbot):
 def test_repr(qtbot):
     # init gui window
     main_window = MainWindow(QtWidgets_QMainWindow(), qtbot)
-    assert main_window.gui_structure.figure_temperature_profile.__repr__() == "ResultFigure; Label: Temperature evolution"
+    assert main_window.gui_structure.figure_temperature_profile.__repr__() == "ResultFigure; Label: Temperature evolution, Temperature [°C], Time [years]"
     assert main_window.gui_structure.category_language.__repr__() == "Category; Label: Language: "
-    assert main_window.gui_structure.option_toggle_buttons.__repr__() == "ButtonBox; Label: Use toggle buttons?:; Value: 1"
+    assert main_window.gui_structure.option_toggle_buttons.__repr__() == "ButtonBox; Label: Use toggle buttons?:, no , yes ; Value: 1"
     assert main_window.gui_structure.hint_peak_heating.__repr__() == "Hint; Hint: Heating peak; Warning: False"
     assert main_window.gui_structure.option_conductivity.__repr__() == "FloatBox; Label: Conductivity of the soil [W/mK]: ; Value: 4.0"
     assert main_window.gui_structure.option_width.__repr__() == "IntBox; Label: Width of rectangular field [#]: ; Value: 9"
-    assert main_window.gui_structure.legend_figure_temperature_profile.__repr__() == "FigureOption; Label: Show legend?; Value: ('legend', False)"
+    assert main_window.gui_structure.legend_figure_temperature_profile.__repr__() == "FigureOption; Label: Show legend?, No , Yes ; Value: ('legend', False)"
 
 
 def test_backward_compatibility(qtbot):
@@ -770,7 +882,9 @@ def test_backward_compatibility(qtbot):
         bot for the GUI
     """
     import numpy as np
+
     from GHEtool import FOLDER
+
     # init gui window
     main_window_old = MainWindow(QtWidgets_QMainWindow(), qtbot)
     main_window_old._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_2_1_0.GHEtool')
