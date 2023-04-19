@@ -1055,8 +1055,7 @@ class Borefield(BaseClass):
             Required depth of the borefield [m]
         """
         # check if hourly data is given
-        if not self._check_hourly_load():
-            raise ValueError("The hourly data is incorrect.")
+        self._check_hourly_load()
 
         # initiate with a given depth
         self.H_init: float = H_init
@@ -2171,6 +2170,7 @@ class Borefield(BaseClass):
                 else:
                     peak_cool_load_geo = min(init_peak_cool_load, peak_cool_load_geo + 1)
                     if peak_cool_load_geo == init_peak_cool_load:
+                        self.print_temperature_profile()
                         cool_ok = True
             else:
                 cool_ok = True
@@ -2366,9 +2366,8 @@ class Borefield(BaseClass):
             plt.Figure, plt.Axes
         """
         # check if there are hourly values
-        if not self._check_hourly_load():
-            fig = plt.figure()
-            return fig, fig.add_subplot(111)
+        self._check_hourly_load()
+
         # sort heating and cooling load
         heating = self.hourly_heating_load.copy()
         heating[::-1].sort()
