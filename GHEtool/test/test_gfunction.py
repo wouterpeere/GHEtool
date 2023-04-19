@@ -6,7 +6,7 @@ import pygfunction as gt
 import pytest
 
 from GHEtool import Borefield
-from GHEtool.VariableClasses import FIFO, GFunction, SmallerThenZeroError
+from GHEtool.VariableClasses import FIFO, GFunction
 
 depth_array = np.array([1, 5, 6])
 depth_array_empty = np.array([])
@@ -99,7 +99,7 @@ def test_nearest_depth_index():
 
     try:
         gfunc._get_nearest_depth_index(-100)
-    except SmallerThenZeroError:
+    except ValueError:
         assert True
 
 

@@ -96,7 +96,7 @@ def test_no_cooling():
     tests if the sizing of L2 and L3 also works with no cooling load
     """
     # Monthly loading values
-    peakCooling = [0] * 12  #[0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]  # Peak cooling in kW
+    peakCooling = [0] * 12
     peakHeating = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]  # Peak heating in kW
 
     # annual heating and cooling load
@@ -105,7 +105,7 @@ def test_no_cooling():
 
     # percentage of annual load per month (15.5% for January ...)
     monthlyLoadHeatingPercentage = [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144]
-    monthlyLoadCoolingPercentage = [0] * 12  #  [0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025]
+    monthlyLoadCoolingPercentage = [0] * 12
 
     # resulting load per month
     monthlyLoadHeating = list(map(lambda x: x * annualHeatingLoad, monthlyLoadHeatingPercentage))  # kWh
@@ -134,14 +134,14 @@ def test_no_heating():
     """
     # Monthly loading values
     peakCooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]  # Peak cooling in kW
-    peakHeating = [0] * 12  #[160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]  # Peak heating in kW
+    peakHeating = [0] * 12
 
     # annual heating and cooling load
     annualHeatingLoad = 300 * 10 ** 3  # kWh
     annualCoolingLoad = 160 * 10 ** 3  # kWh
 
     # percentage of annual load per month (15.5% for January ...)
-    monthlyLoadHeatingPercentage = [0] * 12  #[0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144]
+    monthlyLoadHeatingPercentage = [0] * 12
     monthlyLoadCoolingPercentage = [0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025]
 
     # resulting load per month
