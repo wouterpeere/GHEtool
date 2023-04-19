@@ -1139,28 +1139,6 @@ class Borefield(BaseClass):
 
             if self.example_active_passive:
                 self._calculate_temperature_profile(self.H, hourly=True)
-                # # calculate g-values
-                # g_values = self.gfunction(self.time_L4, self.H)
-                #
-                # # calculation of needed differences of the g-function values. These are the weight factors
-                # # in the calculation of Tb.
-                # g_value_differences = np.diff(g_values, prepend=0)
-                #
-                # loads = self.hourly_cooling_load - self.hourly_heating_load
-                #
-                # # convolution to get the monthly results
-                # results = convolve(loads, g_value_differences)[:438000]
-                #
-                # # calculation the borehole wall temperature for every month i
-                # Tb = results / (2 * pi * self.ground_data.k_s) / (self.H * self.number_of_boreholes) + self._Tg(self.H)
-                #
-                # self.Tb = Tb
-                # # now the Tf will be calculated based on
-                # # Tf = Tb + Q * R_b
-                # temperature_result = Tb + loads * 1000 * (self.Rb / self.number_of_boreholes / self.H)
-                # # reset other variables
-                # self.results_peak_heating = temperature_result
-                # self.results_peak_cooling = temperature_result
 
             elif hourly:
                 # calculate g-values
@@ -1967,7 +1945,7 @@ class Borefield(BaseClass):
             When no data is given, when the data is not hourly or when there are negative values
         """
         # check whether there is data given
-        if self.hourly_cooling_load == np.array([]) or self.hourly_heating_load == np.array([]):
+        if len(self.hourly_cooling_load) == 0 or len(self.hourly_heating_load) == 0:
             raise ValueError("No data is given for either the heating or cooling load.")
 
         # check whether the data is hourly
