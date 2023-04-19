@@ -11,6 +11,7 @@ import pygfunction as gt
 from scipy.signal import convolve
 
 from GHEtool.VariableClasses import CustomGFunction, FluidData, GFunction, GroundData, PipeData, SizingSetup, load_custom_gfunction
+
 from GHEtool.VariableClasses.BaseClass import BaseClass
 from GHEtool.logger.ghe_logger import ghe_logger
 
@@ -964,8 +965,12 @@ class Borefield(BaseClass):
             # determine which quadrants are relevant
             if self.imbalance <= 0:
                 # extraction dominated, so quadrants 1 and 4 are relevant
-                quadrant1 = size_quadrant1()
+                if np.max(self.peak_cooling) != 0:
+                    quadrant1 = size_quadrant1()
+                else:
+                    quadrant1 = 0
                 quadrant4 = size_quadrant4()
+
                 self.H = max(quadrant1, quadrant4)
 
                 if self.H == quadrant1:
@@ -975,7 +980,11 @@ class Borefield(BaseClass):
             else:
                 # injection dominated, so quadrants 2 and 3 are relevant
                 quadrant2 = size_quadrant2()
-                quadrant3 = size_quadrant3()
+                if np.max(self.peak_heating) != 0:
+                    quadrant3 = size_quadrant3()
+                else:
+                    quadrant3 = 0
+
                 self.H = max(quadrant2, quadrant3)
 
                 if self.H == quadrant2:
@@ -1066,7 +1075,7 @@ class Borefield(BaseClass):
             # determine which quadrants are relevant
             if self.imbalance <= 0:
                 # extraction dominated, so quadrants 1 and 4 are relevant
-                quadrant1 = self._size_based_on_temperature_profile(1, hourly=True)
+                quadrant1 = self._size_based_on_temperature_profile(1, hourly=True) if self.hourly_cooling_load.sum() > 0 else 0
                 quadrant4 = self._size_based_on_temperature_profile(4, hourly=True)
                 self.H = max(quadrant1, quadrant4)
 
@@ -1078,7 +1087,7 @@ class Borefield(BaseClass):
             else:
                 # injection dominated, so quadrants 2 and 3 are relevant
                 quadrant2 = self._size_based_on_temperature_profile(2, hourly=True)
-                quadrant3 = self._size_based_on_temperature_profile(3, hourly=True)
+                quadrant3 = self._size_based_on_temperature_profile(3, hourly=True) if self.hourly_heating_load.sum() > 0 else 0
                 self.H = max(quadrant2, quadrant3)
 
                 if self.H == quadrant2:
@@ -1212,6 +1221,9 @@ class Borefield(BaseClass):
                 # minimum temperature
                 # convert back to required length
                 self.H = (np.min(self.results_peak_heating) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
+
+            if self.H < 0:
+                return 0
 
         return self.H
 

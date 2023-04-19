@@ -18,9 +18,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Remove recalculation option (issue #109).
 
 ### Fixed
+- Sizing doesn't crash when either no heating or cooling load is present (issue #91).
 - Wrong heating load in april in GUI (issue #94).
 - Results are now cleared when new loads are loaded (issue #106).
 - Options for g-function calculations are not working (issue #119).
+
+### Fixed
+- Sizing (L2, L3, L4) with no heating or cooling load does not work (issue #91) 
 
 ## [2.1.1] - 2023-01-30
 
@@ -154,7 +158,8 @@ code version > speed improvements > v2.1.1.
 ### Fixed 
 - fixed bug in interpolation
 
-[2.1.1]: https://github.com/wouterpeere/GHEtool/compare/v2.1.0...main
+[2.1.2]: https://github.com/wouterpeere/GHEtool/compare/v2.1.1...main
+[2.1.1]: https://github.com/wouterpeere/GHEtool/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/wouterpeere/GHEtool/compare/v2.0.6...v2.1.0
 [2.0.6]: https://github.com/wouterpeere/GHEtool/compare/v2.0.5...v2.0.6
 [2.0.5]: https://github.com/wouterpeere/GHEtool/compare/v2.0.4...v2.0.5

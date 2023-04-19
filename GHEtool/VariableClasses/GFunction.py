@@ -317,7 +317,7 @@ class GFunction:
         """
         # raise error when value is negative
         if depth <= 0:
-            raise ValueError("The depth is smaller then zero!")
+            raise ValueError(f"The depth {depth} is smaller then zero!")
 
         # get nearest depth index
         val_depth, idx_depth = self._nearest_value(self.depth_array, depth)
