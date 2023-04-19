@@ -1068,7 +1068,7 @@ class GuiStructure:
                 self.results_heating_load_percentage.function_to_convert_to_text(lambda x: round(x, 2))
                 self.results_heating_ext = ResultText(self.translations.results_heating_ext, category=self.numerical_results,
                                                       prefix="heating load external: ", suffix=" kWh")
-                self.results_heating_ext.text_to_be_shown("Borefield", "monthly_load_heating_external")
+                self.results_heating_ext.text_to_be_shown("Borefield", "hourly_heating_load_external")
                 self.results_heating_ext.function_to_convert_to_text(lambda x: round(sum(x), 0))
                 self.results_heating_peak = ResultText(self.translations.results_heating_peak, category=self.numerical_results,
                                                        prefix="with a peak of: ", suffix=" kW")
@@ -1090,7 +1090,7 @@ class GuiStructure:
                 self.results_cooling_load_percentage.function_to_convert_to_text(lambda x: round(x, 2))
                 self.results_cooling_ext = ResultText(self.translations.results_cooling_ext, category=self.numerical_results,
                                                       prefix="cooling load external: ", suffix=" kWh")
-                self.results_cooling_ext.text_to_be_shown("Borefield", "monthly_load_cooling_external")
+                self.results_cooling_ext.text_to_be_shown("Borefield", "hourly_cooling_load_external")
                 self.results_cooling_ext.function_to_convert_to_text(lambda x: round(sum(x), 0))
                 self.results_cooling_peak = ResultText(self.translations.results_cooling_peak, category=self.numerical_results,
                                                        prefix="with a peak of: ", suffix=" kW")

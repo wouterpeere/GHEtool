@@ -2035,7 +2035,6 @@ class Borefield(BaseClass):
             list with monthly baseloads [kW]
         """
         month_load = [np.sum(np.minimum(peak, load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1]])) for i in range(12)]
-
         return month_load
 
     @staticmethod
@@ -2098,7 +2097,6 @@ class Borefield(BaseClass):
 
         # check if hourly profile is given
         self._check_hourly_load()
-
         # load hourly heating and cooling load and convert it to geothermal loads
         hourly_heating_load_geo: np.ndarray = self.hourly_heating_load.copy() * (1 - 1/SCOP)
         hourly_cooling_load_geo: np.ndarray = self.hourly_cooling_load.copy() * (1 + 1/SEER)

@@ -225,29 +225,6 @@ def test_gui_values(qtbot):
         main_window.threads[0].run()
         main_window.threads[0].any_signal.connect(main_window.thread_function)
 
-    main_window.gui_structure.aim_req_depth.widget.click()
-    main_window.save_scenario()
-    main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
-        main_window.threads[0].run()
-        main_window.threads[0].any_signal.connect(main_window.thread_function)
-    # change to building load
-    main_window.gui_structure.geo_load.set_value(1)
-    main_window.save_scenario()
-    main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
-        main_window.threads[0].run()
-        main_window.threads[0].any_signal.connect(main_window.thread_function)
-    main_window.gui_structure.option_method_size_depth.set_value(2)
-    main_window.save_scenario()
-    main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
-        main_window.threads[0].run()
-        main_window.threads[0].any_signal.connect(main_window.thread_function)
-    main_window.gui_structure.geo_load.set_value(0)
-    main_window.gui_structure.option_method_size_depth.set_value(0)
-    main_window.save_scenario()
-
     main_window.remove_previous_calculated_results()
     main_window.gui_structure.aim_optimize.widget.click()
     main_window.save_scenario()
@@ -265,7 +242,20 @@ def test_gui_values(qtbot):
     main_window.gui_structure.option_cooling_column.set_value(1)
     main_window.gui_structure.button_load_csv.button.click()
 
-    print('end')
+    # change to building load
+    main_window.gui_structure.aim_req_depth.widget.click()
+    main_window.gui_structure.geo_load.set_value(1)
+    main_window.save_scenario()
+    main_window.start_current_scenario_calculation(True)
+    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
+        main_window.threads[0].run()
+        main_window.threads[0].any_signal.connect(main_window.thread_function)
+    main_window.gui_structure.option_method_size_depth.set_value(2)
+    main_window.save_scenario()
+    main_window.start_current_scenario_calculation(True)
+    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
+        main_window.threads[0].run()
+        main_window.threads[0].any_signal.connect(main_window.thread_function)
 
 
 def test_gui_scenario_properties(qtbot):
