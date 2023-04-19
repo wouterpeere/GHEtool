@@ -1216,10 +1216,7 @@ class Borefield(BaseClass):
                 # convert back to required length
                 self.H = (np.min(self.results_peak_heating) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
 
-            if self.H < 0:
-                return 0
-
-        return self.H
+        return max(0, self.H)
 
     def calculate_monthly_load(self) -> None:
         """
