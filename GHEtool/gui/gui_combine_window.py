@@ -742,6 +742,13 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             for DS in self.list_ds:
                 DS.ui = id(self)
 
+            # when there was a crash, potentially scenario's have a *
+            temp = scenarios.copy()
+            scenarios = [scenario.split("*")[0] for scenario in scenarios]
+            if temp != scenarios:
+                # there was a crash before
+                ghe_logger.warning("GHEtool is loaded after a previous crash. Please check all inputs carefully.")
+
             # init user window by reset scenario list widget and check for results
             self.list_widget_scenario.clear()
             self.list_widget_scenario.addItems(scenarios)
@@ -762,6 +769,19 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
                 version = "2.1.0"
             except (FileNotFoundError, ImportError):
                 raise ImportError("The datafile cannot be loaded!")
+
+        if version == "2.1.2":
+            # write data to variables
+            self.list_ds = []
+            for val, borefield in zip(saving['values'], saving['borefields']):
+                ds = DataStorage(self.gui_structure)
+                ds.from_dict(val)
+                setattr(ds, 'borefield', None)
+                self.list_ds.append(ds)
+            # set and change the window title
+            self.filename = saving['filename']
+            general_changes(saving['names'])
+            return
 
         if version == "2.1.1":
             # write data to variables

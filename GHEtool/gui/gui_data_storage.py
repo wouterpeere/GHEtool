@@ -76,6 +76,13 @@ class DataStorage:
         self.monthlyLoadCooling: list = [self.option_cl_jan, self.option_cl_feb, self.option_cl_mar, self.option_cl_apr, self.option_cl_may, self.option_cl_jun,
                                          self.option_cl_jul, self.option_cl_aug, self.option_cl_sep, self.option_cl_oct, self.option_cl_nov, self.option_cl_dec]
 
+        if self.geo_load == 1:
+            # building loads, which need to be converted to geothermal loads
+            self.peakHeating = [i * (1 - 1/self.SCOP) for i in self.peakHeating]
+            self.monthlyLoadHeating = [i * (1 - 1/self.SCOP) for i in self.monthlyLoadHeating]
+            self.peakCooling = [i * (1 + 1/self.SEER) for i in self.peakCooling]
+            self.monthlyLoadCooling = [i * (1 + 1/self.SEER) for i in self.monthlyLoadCooling]
+
         self._create_data_classes()
 
         self.debug_message: str = ""

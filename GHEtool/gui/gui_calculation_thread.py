@@ -99,6 +99,11 @@ class CalcProblem(QtC.QThread):
             borefield.set_hourly_heating_load(peak_heating)
             borefield.set_hourly_cooling_load(peak_cooling)
 
+            # when this load is a building load, it needs to be converted to a geothermal load
+            if self.DS.geo_load == 1:
+                borefield.set_hourly_heating_load(peak_heating * (1 - 1/self.DS.SCOP))
+                borefield.set_hourly_cooling_load(peak_cooling * (1 + 1/self.DS.SEER))
+
         # setup the borefield sizing
         borefield.sizing_setup(H_init=self.DS.borefield_pygfunction[0].H,
                                use_constant_Rb=self.DS.option_method_rb_calc == 0,
@@ -113,7 +118,7 @@ class CalcProblem(QtC.QThread):
         if self.DS.aim_optimize:
             try:
                 # optimize load profile without printing the results
-                borefield.optimise_load_profile()
+                borefield.optimise_load_profile(SCOP=self.DS.SCOP, SEER=self.DS.SEER)
             except ValueError as err:
                 self.DS.debug_message = err
                 # save bore field in Datastorage

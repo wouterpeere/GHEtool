@@ -180,7 +180,7 @@ class GuiStructure:
             self.aim_temp_profile = Aim(page=self.page_aim, label=self.translations.aim_temp_profile, icon=":/icons/icons/Temp_Profile.svg")
             self.aim_req_depth = Aim(page=self.page_aim, label=self.translations.aim_req_depth, icon=":/icons/icons/Depth_determination.svg")
             # self.aim_size_length = Aim(page=self.page_aim, label="Size borefield by length and width", icon=":/icons/icons/Size_Length.svg")
-            self.aim_optimize = Aim(page=self.page_aim, label=self.translations.aim_req_depth, icon=":/icons/icons/Optimize_Profile.svg")
+            self.aim_optimize = Aim(page=self.page_aim, label=self.translations.aim_optimize, icon=":/icons/icons/Optimize_Profile.svg")
 
         def create_page_options():
             # create page
@@ -984,8 +984,42 @@ class GuiStructure:
                 self.aim_req_depth.add_link_2_show(self.category_th_demand)
                 # self.aim_size_length.add_link_2_show(self.category_th_demand)
 
+            def create_category_building_demand():
+                self.category_demand_building_or_geo =\
+                    Category(page=self.page_thermal, label=self.translations.category_demand_building_or_geo)
+                self.geo_load = ButtonBox(label=self.translations.geo_load, default_index=0,
+                                          entries=[" goethermal ", " building "],
+                                          category=self.category_demand_building_or_geo)
+                self.SCOP = FloatBox(
+                    category=self.category_demand_building_or_geo,
+                    label=self.translations.SCOP,
+                    default_value=4,
+                    decimal_number=2,
+                    minimal_value=1,
+                    maximal_value=50,
+                    step=0.1,
+                )
+                self.SEER = FloatBox(
+                    category=self.category_demand_building_or_geo,
+                    label=self.translations.SEER,
+                    default_value=3,
+                    decimal_number=2,
+                    minimal_value=1,
+                    maximal_value=50,
+                    step=0.1,
+                )
+
+                # add dependencies
+                self.aim_optimize.add_link_2_show(self.SCOP)
+                self.aim_optimize.add_link_2_show(self.SEER)
+                self.geo_load.add_link_2_show(self.SCOP, 1)
+                self.geo_load.add_link_2_show(self.SEER, 1)
+                self.aim_req_depth.add_link_2_show(self.geo_load)
+                self.aim_temp_profile.add_link_2_show(self.geo_load)
+
             # create categories
             create_category_select_datafile()
+            create_category_building_demand()
             create_category_th_demand()
 
         def create_page_results():
@@ -1021,7 +1055,12 @@ class GuiStructure:
 
                 self.results_heating_load = ResultText(self.translations.results_heating_load, category=self.numerical_results,
                                                        prefix="Heating load on the borefield: ", suffix=" kWh")
-                self.results_heating_load.text_to_be_shown("Borefield", "baseload_heating")
+                self.results_heating_peak_geo = ResultText(self.translations.results_heating_peak,
+                                                       category=self.numerical_results,
+                                                       prefix="with a peak of: ", suffix=" kW")
+                self.results_heating_peak_geo.text_to_be_shown("Borefield", "hourly_heating_load_building")
+                self.results_heating_peak_geo.function_to_convert_to_text(lambda x: round(max(x), 2))
+                self.results_heating_load.text_to_be_shown("Borefield", "hourly_heating_load_building")
                 self.results_heating_load.function_to_convert_to_text(lambda x: round(sum(x), 0))
                 self.results_heating_load_percentage = ResultText(self.translations.results_heating_load_percentage, category=self.numerical_results,
                                                                   prefix="This is ", suffix="% of the heating load")
@@ -1029,7 +1068,7 @@ class GuiStructure:
                 self.results_heating_load_percentage.function_to_convert_to_text(lambda x: round(x, 2))
                 self.results_heating_ext = ResultText(self.translations.results_heating_ext, category=self.numerical_results,
                                                       prefix="heating load external: ", suffix=" kWh")
-                self.results_heating_ext.text_to_be_shown("Borefield", "monthly_load_heating_external")
+                self.results_heating_ext.text_to_be_shown("Borefield", "hourly_heating_load_external")
                 self.results_heating_ext.function_to_convert_to_text(lambda x: round(sum(x), 0))
                 self.results_heating_peak = ResultText(self.translations.results_heating_peak, category=self.numerical_results,
                                                        prefix="with a peak of: ", suffix=" kW")
@@ -1038,7 +1077,12 @@ class GuiStructure:
 
                 self.results_cooling_load = ResultText(self.translations.results_cooling_load, category=self.numerical_results,
                                                        prefix="Cooling load on the borefield: ", suffix=" kWh")
-                self.results_cooling_load.text_to_be_shown("Borefield", "baseload_cooling")
+                self.results_cooling_peak_geo = ResultText(self.translations.results_cooling_peak,
+                                                       category=self.numerical_results,
+                                                       prefix="with a peak of: ", suffix=" kW")
+                self.results_cooling_peak_geo.text_to_be_shown("Borefield", "hourly_cooling_load_building")
+                self.results_cooling_peak_geo.function_to_convert_to_text(lambda x: round(max(x), 2))
+                self.results_cooling_load.text_to_be_shown("Borefield", "hourly_cooling_load_building")
                 self.results_cooling_load.function_to_convert_to_text(lambda x: round(sum(x), 0))
                 self.results_cooling_load_percentage = ResultText(self.translations.results_cooling_load_percentage, category=self.numerical_results,
                                                                   prefix="This is ", suffix="% of the cooling load")
@@ -1046,7 +1090,7 @@ class GuiStructure:
                 self.results_cooling_load_percentage.function_to_convert_to_text(lambda x: round(x, 2))
                 self.results_cooling_ext = ResultText(self.translations.results_cooling_ext, category=self.numerical_results,
                                                       prefix="cooling load external: ", suffix=" kWh")
-                self.results_cooling_ext.text_to_be_shown("Borefield", "monthly_load_cooling_external")
+                self.results_cooling_ext.text_to_be_shown("Borefield", "hourly_cooling_load_external")
                 self.results_cooling_ext.function_to_convert_to_text(lambda x: round(sum(x), 0))
                 self.results_cooling_peak = ResultText(self.translations.results_cooling_peak, category=self.numerical_results,
                                                        prefix="with a peak of: ", suffix=" kW")
@@ -1069,6 +1113,7 @@ class GuiStructure:
                 self.aim_req_depth.add_link_2_show(self.result_text_depth)
 
                 self.aim_optimize.add_link_2_show(self.results_heating_ext)
+                self.aim_optimize.add_link_2_show(self.results_heating_peak_geo)
                 self.aim_optimize.add_link_2_show(self.results_heating_load_percentage)
                 self.aim_optimize.add_link_2_show(self.results_heating_load)
                 self.aim_optimize.add_link_2_show(self.results_heating_peak)
@@ -1076,6 +1121,7 @@ class GuiStructure:
                 self.aim_optimize.add_link_2_show(self.results_cooling_load_percentage)
                 self.aim_optimize.add_link_2_show(self.results_cooling_load)
                 self.aim_optimize.add_link_2_show(self.results_cooling_peak)
+                self.aim_optimize.add_link_2_show(self.results_cooling_peak_geo)
 
                 self.aim_temp_profile.add_link_2_show(self.max_temp)
                 self.aim_temp_profile.add_link_2_show(self.min_temp)
