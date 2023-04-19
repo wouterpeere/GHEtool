@@ -224,6 +224,10 @@ class Translations:  # pragma: no cover
         "option_number_circle_boreholes",
         "option_borefield_radius",
         "custom_borefield",
+        "option_seperator_borefield",
+        "borefield_file",
+        "import_borefield",
+        "option_decimal_borefield",
         "languages",
     )
 
@@ -1793,4 +1797,32 @@ class Translations:  # pragma: no cover
             "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
             "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
             "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
+        ]
+        self.option_seperator_borefield: List[str] = [
+            "Seperator in file:,Semicolon ';',Comma '++',Tab '   '",
+            "Trenner in der Datei:,Semikolon ';',Komma '++',Tab '   '",
+            "Scheidingsteken in file:,Puntkomma ';',Komma '++',Tab '   '",
+            "Seperator in file:,Semicolon ';',Comma '++',Tab '   '",
+            "Seperator in file:,Semicolon ';',Comma '++',Tab '   '",
+            "Seperator in file:,Semicolon ';',Comma '++',Tab '   '",
+            "Seperator in file:,Semicolon ';',Comma '++',Tab '   '",
+        ]
+        self.borefield_file: List[str] = [
+            "Filename: ",
+            "Dateiname: ",
+            "Bestandsnaam: ",
+            "Nome fileImport: ",
+            "Nom de fichier: ",
+            "Nombre de archivo: ",
+            "Nome de ficheiro: ",
+        ]
+        self.import_borefield: List[str] = ["Load", "Laden", "Laad", "Caricare", "Chargement", "Cargar", "Cargar"]
+        self.option_decimal_borefield: List[str] = [
+            "Decimal sign in file:,Point '.',Comma '++'",
+            "Dezimalzeichen in der Datei:,Punkt '.',Komma '++'",
+            "Decimaalteken in de file:,Punt '.',Komma '++'",
+            "Decimal sign in file:,Point '.',Comma '++'",
+            "Decimal sign in file:,Point '.',Comma '++'",
+            "Decimal sign in file:,Point '.',Comma '++'",
+            "Decimal sign in file:,Point '.',Comma '++'",
         ]

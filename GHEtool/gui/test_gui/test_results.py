@@ -270,14 +270,26 @@ def test_import_borefield_data(qtbot):
     main_window.gui_structure.aim_custom.widget.click()
     file = f"{FOLDER.joinpath('gui/test_gui/borefield_data.csv')}"
     main_window.gui_structure.borefield_file.set_value(file)
+    main_window.gui_structure.option_seperator_borefield.set_value(1)
+    main_window.gui_structure.option_decimal_borefield.set_value(0)
     main_window.gui_structure.import_borefield.button.click()
     main_window.save_scenario()
     data = pd.read_csv(file)
     for li_1, li_2 in zip(data.values, main_window.gui_structure.custom_borefield.get_value()):
         assert np.allclose(li_1, li_2)
+
+    main_window.gui_structure.custom_borefield.set_value([(0, 0 ,10, 4, 0.05)])
+
+    file = f"{FOLDER.joinpath('gui/test_gui/borefield_data.txt')}"
+    main_window.gui_structure.borefield_file.set_value(file)
+    main_window.gui_structure.option_seperator_borefield.set_value(2)
+    main_window.gui_structure.option_decimal_borefield.set_value(1)
+    main_window.gui_structure.import_borefield.button.click()
+    for li_1, li_2 in zip(data.values, main_window.gui_structure.custom_borefield.get_value()):
+        assert np.allclose(li_1, li_2)
+
     qtbot.wait(10)
     main_window.delete_backup()
-
 
 
 @given(n_pipes=st.integers(1, 2), conduct_grout=st.floats(0.1, 1), conduct_pipe=st.floats(0.1, 1), inner_pipe=st.floats(0.01, 0.03),

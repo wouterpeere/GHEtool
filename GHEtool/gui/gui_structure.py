@@ -230,9 +230,16 @@ class GUI(GuiStructure):
         )
         self.category_borefield.activate_graphic_left()
 
+        self.option_seperator_borefield = ButtonBox(label=translations.option_seperator_borefield, default_index=0,
+                                              entries=['Semicolon ";"', 'Comma ","', 'Tab "   "'],
+                                              category=self.category_borefield)
+        self.option_decimal_borefield = ButtonBox(label=translations.option_decimal_borefield, default_index=0,
+                                            entries=['Point "."', 'Comma ","'],
+                                            category=self.category_borefield)
+
         file = f"{FOLDER.joinpath('gui/test_gui/borefield_data.csv')}"
-        self.borefield_file = els.FileNameBox(label="Borefield file", category=self.category_borefield, default_value=file, file_extension="csv")#["txt", "csv"])
-        self.import_borefield = els.FunctionButton(button_text="import borefield", icon="Download", category=self.category_borefield)
+        self.borefield_file = els.FileNameBox(label=translations.borefield_file, category=self.category_borefield, default_value=file, file_extension=["csv", "txt"])
+        self.import_borefield = els.FunctionButton(button_text=translations.import_borefield, icon="Download", category=self.category_borefield)
         self.import_borefield.change_event(self.fun_import_borefield)
 
         self.custom_borefield = els.FlexibleAmount(label=translations.custom_borefield, default_length=1, entry_mame="Borehole", category=self.category_borefield,
@@ -433,6 +440,16 @@ class GUI(GuiStructure):
                                       [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
                                       [self.aim_custom],
                                       self.borefield_file)) for aim in li_aim]
+
+        _ = [aim.change_event(partial(show_option_on_multiple_aims,
+                                      [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
+                                      [self.aim_custom],
+                                      self.option_seperator_borefield)) for aim in li_aim]
+
+        _ = [aim.change_event(partial(show_option_on_multiple_aims,
+                                      [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
+                                      [self.aim_custom],
+                                      self.option_decimal_borefield)) for aim in li_aim]
 
         [aim.change_event(self.update_borefield) for aim in li_aim]
 
@@ -751,6 +768,7 @@ class GUI(GuiStructure):
             dialog_text="Choose csv file",
             error_text="no file selected",
         )
+        self.option_filename.check_active = True
         self.option_column = ButtonBox(label=translations.option_column, default_index=0,
                                        entries=["1 column", "2 columns"], category=self.category_select_file)
         self.option_heating_column = ListBox(category=self.category_select_file, label=translations.option_heating_column, default_index=0, entries=[])
@@ -1576,8 +1594,16 @@ class GUI(GuiStructure):
         if not Path(filename).exists() or filename == "":
             logging.error(self.translations.no_file_selected[self.option_language.get_value()[0]])
             return
-        data = pd.read_csv(filename)
-        self.custom_borefield.set_value(data.values)
+        sep = "," if self.option_seperator_borefield.get_value() == 1 else ";" if self.option_seperator_borefield.get_value() == 0 else "\t"
+        dec = "." if self.option_decimal_borefield.get_value() == 0 else ','
+        if filename.endswith(".csv"):
+            data = pd.read_csv(filename, sep=sep, decimal=dec)
+            self.custom_borefield.set_value(data.values)
+            return
+        with open(filename, "r") as f:
+            data = f.readlines()
+        data = [[float(val.replace(dec, ".")) for val in line.split(sep)] for line in data[1:]]
+        self.custom_borefield.set_value(data)
 
 
 def show_option_on_multiple_aims(first_aims: list[Aim], second_aims: list[Aim], option: Option):

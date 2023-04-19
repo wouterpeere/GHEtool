@@ -81,7 +81,7 @@ class MainWindow(MainWindow):
             GHEtool.main_class.Borefield = BorefielOld
             version = "2.1.0"
 
-        if version == "2.1.2":
+        if version == "2.2.0":
             # write data to variables
             self.list_ds = []
             for val, borefield in zip(saving['values'], saving['results']):
@@ -98,7 +98,7 @@ class MainWindow(MainWindow):
             general_changes(saving['names'])
             return
 
-        if version == "2.1.1":
+        if version in ["2.1.1", "2.1.2"]:
             # write data to variables
             self.list_ds = []
             for val, borefield in zip(saving['values'], saving['borefields']):
