@@ -542,7 +542,7 @@ class GuiStructure:
                 )
                 self.option_pipe_conductivity = FloatBox(
                     category=self.category_pipe_data,
-                    label=self.translations.category_pipe_data,
+                    label=self.translations.option_pipe_conductivity,
                     default_value=0.42,
                     decimal_number=3,
                     minimal_value=0,
