@@ -222,6 +222,8 @@ class Translations:  # pragma: no cover
         "geo_load",
         "SCOP",
         "SEER",
+        "results_heating_peak_geo",
+        "results_cooling_peak_geo",
         "languages",
     )
 
@@ -1766,3 +1768,21 @@ class Translations:  # pragma: no cover
         ]
         self.SCOP: List[str] = ["SCOP [-]: ", "SCOP [-]: ", "SCOP [-]: ", "SCOP [-]: ", "SCOP [-]: ", "SCOP [-]: ", "SCOP [-]:"]
         self.SEER: List[str] = ["SEER [-]: ", "SEER [-]: ", "SEER [-]: ", "SEER [-]: ", "SEER [-]: ", "SEER [-]: ", "SEER [-]:"]
+        self.results_heating_peak_geo: List[str] = [
+            "with a peak of: , kW",
+            "mit einer Spitzenlast von , kW",
+            "met een piek van: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+        ]
+        self.results_cooling_peak_geo: List[str] = [
+            "with a peak of: , kW",
+            "mit einer Spitzenlast von , kW",
+            "met een piek van: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+        ]

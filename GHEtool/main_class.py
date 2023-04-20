@@ -2111,7 +2111,6 @@ class Borefield(BaseClass):
             self.Rb = self.calculate_Rb()
         use_constant_Rb_backup = self._sizing_setup.use_constant_Rb
         self._sizing_setup.use_constant_Rb = True
-
         # check if hourly profile is given
         self._check_hourly_load()
         # load hourly heating and cooling load and convert it to geothermal loads
