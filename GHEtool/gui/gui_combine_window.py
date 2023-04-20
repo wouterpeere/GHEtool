@@ -498,7 +498,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         Parameters
         ----------
         name : str
-            Name of the scenario (only for testing purposes
+            Name of the scenario (only for testing purposes)
 
         Returns
         -------
@@ -523,6 +523,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
 
         # create dialog box to ask for a new name
         self.dialog = QtW.QInputDialog(self.Dia)
+        self.dialog.setTextValue(item.text())
         self.dialog.setWindowTitle(self.translations.label_new_scenario[self.gui_structure.option_language.get_value()])
         self.dialog.setLabelText(f"{self.translations.new_name[self.gui_structure.option_language.get_value()]}{item.text()}")
         self.dialog.setOkButtonText(self.translations.label_okay[self.gui_structure.option_language.get_value()])  # +++

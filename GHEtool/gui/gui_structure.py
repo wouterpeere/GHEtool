@@ -255,7 +255,7 @@ class GuiStructure:
                 )
                 self.option_ground_temp_gradient = FloatBox(
                     category=self.category_earth,
-                    label=self.translations.option_ground_temp,
+                    label=self.translations.option_ground_temp_gradient,
                     default_value=10,
                     decimal_number=2,
                     minimal_value=-273.15,

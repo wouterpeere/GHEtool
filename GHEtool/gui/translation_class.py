@@ -224,6 +224,7 @@ class Translations:  # pragma: no cover
         "SEER",
         "results_heating_peak_geo",
         "results_cooling_peak_geo",
+        "option_ground_temp_gradient",
         "languages",
     )
 
@@ -1785,4 +1786,13 @@ class Translations:  # pragma: no cover
             "with a peak of: , kW",
             "with a peak of: , kW",
             "with a peak of: , kW",
+        ]
+        self.option_ground_temp_gradient: List[str] = [
+            "Surface temperature [°C]: ",
+            "Umgebungstemperatur[°C]: ",
+            "Omgevingstemperatuur [°C]: ",
+            "Surface temperature [°C]: ",
+            "Surface temperature [°C]: ",
+            "Surface temperature [°C]: ",
+            "Surface temperature [°C]:",
         ]
