@@ -1141,81 +1141,82 @@ class Borefield(BaseClass):
                 self._calculate_temperature_profile(self.H, hourly=True)
 
             elif hourly:
-                # calculate g-values
-                g_values = self.gfunction(self.time_L4, self.H)
-
-                # calculation of needed differences of the g-function values. These are the weight factors
-                # in the calculation of Tb.
-                g_value_differences = np.diff(g_values, prepend=0)
-
-                # convolution to get the monthly results
-                results[:8760] = convolve(loads_short * 1000, g_value_differences[:8760])[:8760]
-
-                g_sum_n1 = g_value_differences[:8760 * (self.simulation_period - 1)].reshape(self.simulation_period - 1,
-                                                                                             8760).sum(axis=0)
-                g_sum = g_sum_n1 + g_value_differences[8760 * (self.simulation_period - 1):]
-                g_sum_n2 = np.concatenate((np.array([0]), g_sum_n1[::-1]))[:-1]
-
-                results[8760:] = convolve(loads_short * 1000, g_sum)[:8760] + convolve(loads_short_rev * 1000,
-                                                                                       g_sum_n2)[:8760][::-1]
-
-                # calculation the borehole wall temperature for every month i
-                Tb = results / (2 * pi * self.ground_data.k_s) / (self.H * self.number_of_boreholes) + self._Tg(self.H)
-
-                self.Tb = Tb
-                # now the Tf will be calculated based on
-                # Tf = Tb + Q * R_b
-                temperature_result = Tb + loads_long * 1000 * (self.Rb / self.number_of_boreholes / self.H)
-                # reset other variables
-                self.results_peak_heating = temperature_result
-                self.results_peak_cooling = temperature_result
+                # # calculate g-values
+                # g_values = self.gfunction(self.time_L4, self.H)
+                #
+                # # calculation of needed differences of the g-function values. These are the weight factors
+                # # in the calculation of Tb.
+                # g_value_differences = np.diff(g_values, prepend=0)
+                #
+                # # convolution to get the monthly results
+                # results[:8760] = convolve(loads_short * 1000, g_value_differences[:8760])[:8760]
+                #
+                # g_sum_n1 = g_value_differences[:8760 * (self.simulation_period - 1)].reshape(self.simulation_period - 1,
+                #                                                                              8760).sum(axis=0)
+                # g_sum = g_sum_n1 + g_value_differences[8760 * (self.simulation_period - 1):]
+                # g_sum_n2 = np.concatenate((np.array([0]), g_sum_n1[::-1]))[:-1]
+                #
+                # results[8760:] = convolve(loads_short * 1000, g_sum)[:8760] + convolve(loads_short_rev * 1000,
+                #                                                                        g_sum_n2)[:8760][::-1]
+                #
+                # # calculation the borehole wall temperature for every month i
+                # Tb = results / (2 * pi * self.ground_data.k_s) / (self.H * self.number_of_boreholes) + self._Tg(self.H)
+                #
+                # self.Tb = Tb
+                # # now the Tf will be calculated based on
+                # # Tf = Tb + Q * R_b
+                # temperature_result = Tb + loads_long * 1000 * (self.Rb / self.number_of_boreholes / self.H)
+                # # reset other variables
+                # self.results_peak_heating = temperature_result
+                # self.results_peak_cooling = temperature_result
+                self._calculate_temperature_profile(self.H, hourly=True)
 
             else:
                 # calculate g-values
-                g_values = self.gfunction(self.time_L3_last_year, self.H)
-
-                # the g-function value of the peak with length_peak hours
-                g_value_peak_heating = self.gfunction(self.length_peak_heating * 3600., self.H)[0]
-                g_value_peak_cooling = self.gfunction(self.length_peak_cooling * 3600., self.H)[0]
-
-                # calculation of needed differences of the g-function values. These are the weight factors in
-                # the calculation of Tb.
-                g_value_differences = np.diff(g_values, prepend=0)
-
-                # convolution to get the monthly results
-                results[:12] = convolve(loads_short * 1000, g_value_differences[:12])[:12]
-
-                g_sum_n1 = g_value_differences[:12 * (self.simulation_period - 1)]\
-                    .reshape(self.simulation_period - 1, 12).sum(axis=0)
-                g_sum = g_sum_n1 + g_value_differences[12 * (self.simulation_period - 1):]
-                g_sum_n2 = np.concatenate((np.array([0]), g_sum_n1[::-1]))[:-1]
-
-                results[12:] = convolve(loads_short * 1000, g_sum)[:12]\
-                               + convolve(loads_short_rev * 1000, g_sum_n2)[:12][::-1]
-
-                # calculation the borehole wall temperature for every month i
-                Tb = results / (2 * pi * self.ground_data.k_s) / (self.H * self.number_of_boreholes) + self._Tg(self.H)
-
-                self.Tb = Tb
-                # now the Tf will be calculated based on
-                # Tf = Tb + Q * R_b
-                results_month_cooling = Tb + np.tile(self.monthly_load_cooling, 2) * 1000 \
-                                        * (self.Rb / self.number_of_boreholes / self.H)
-                results_month_heating = Tb - np.tile(self.monthly_load_heating, 2) * 1000 \
-                                        * (self.Rb / self.number_of_boreholes / self.H)
-
-                # extra summation if the g-function value for the peak is included
-                results_peak_cooling = results_month_cooling +\
-                                       np.tile(self.peak_cooling - self.monthly_load_cooling, 2) * 1000 *\
-                                       (g_value_peak_cooling / self.ground_data.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / self.H
-                results_peak_heating = results_month_heating - np.tile(self.peak_heating - self.monthly_load_heating, 2) * 1000 \
-                                       * (g_value_peak_heating / self.ground_data.k_s / 2 / pi + self.Rb)\
-                                       / self.number_of_boreholes / self.H
-
-                # save temperatures under variable
-                self.results_peak_heating = results_peak_heating
-                self.results_peak_cooling = results_peak_cooling
-
+                # g_values = self.gfunction(self.time_L3_last_year, self.H)
+                #
+                # # the g-function value of the peak with length_peak hours
+                # g_value_peak_heating = self.gfunction(self.length_peak_heating * 3600., self.H)[0]
+                # g_value_peak_cooling = self.gfunction(self.length_peak_cooling * 3600., self.H)[0]
+                #
+                # # calculation of needed differences of the g-function values. These are the weight factors in
+                # # the calculation of Tb.
+                # g_value_differences = np.diff(g_values, prepend=0)
+                #
+                # # convolution to get the monthly results
+                # results[:12] = convolve(loads_short * 1000, g_value_differences[:12])[:12]
+                #
+                # g_sum_n1 = g_value_differences[:12 * (self.simulation_period - 1)]\
+                #     .reshape(self.simulation_period - 1, 12).sum(axis=0)
+                # g_sum = g_sum_n1 + g_value_differences[12 * (self.simulation_period - 1):]
+                # g_sum_n2 = np.concatenate((np.array([0]), g_sum_n1[::-1]))[:-1]
+                #
+                # results[12:] = convolve(loads_short * 1000, g_sum)[:12]\
+                #                + convolve(loads_short_rev * 1000, g_sum_n2)[:12][::-1]
+                #
+                # # calculation the borehole wall temperature for every month i
+                # Tb = results / (2 * pi * self.ground_data.k_s) / (self.H * self.number_of_boreholes) + self._Tg(self.H)
+                #
+                # self.Tb = Tb
+                # # now the Tf will be calculated based on
+                # # Tf = Tb + Q * R_b
+                # results_month_cooling = Tb + np.tile(self.monthly_load_cooling, 2) * 1000 \
+                #                         * (self.Rb / self.number_of_boreholes / self.H)
+                # results_month_heating = Tb - np.tile(self.monthly_load_heating, 2) * 1000 \
+                #                         * (self.Rb / self.number_of_boreholes / self.H)
+                #
+                # # extra summation if the g-function value for the peak is included
+                # results_peak_cooling = results_month_cooling +\
+                #                        np.tile(self.peak_cooling - self.monthly_load_cooling, 2) * 1000 *\
+                #                        (g_value_peak_cooling / self.ground_data.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / self.H
+                # results_peak_heating = results_month_heating - np.tile(self.peak_heating - self.monthly_load_heating, 2) * 1000 \
+                #                        * (g_value_peak_heating / self.ground_data.k_s / 2 / pi + self.Rb)\
+                #                        / self.number_of_boreholes / self.H
+                #
+                # # save temperatures under variable
+                # self.results_peak_heating = results_peak_heating
+                # self.results_peak_cooling = results_peak_cooling
+                self._calculate_temperature_profile(self.H, hourly=False)
             H_prev = self.H
 
             if quadrant == 1 or quadrant == 2:
@@ -1225,6 +1226,7 @@ class Borefield(BaseClass):
             else:
                 # minimum temperature
                 # convert back to required length
+                print(np.min(self.results_peak_heating))
                 self.H = (np.min(self.results_peak_heating) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
 
             if self.H < 0:
@@ -2109,7 +2111,6 @@ class Borefield(BaseClass):
             self.Rb = self.calculate_Rb()
         use_constant_Rb_backup = self._sizing_setup.use_constant_Rb
         self._sizing_setup.use_constant_Rb = True
-
         # check if hourly profile is given
         self._check_hourly_load()
         # load hourly heating and cooling load and convert it to geothermal loads

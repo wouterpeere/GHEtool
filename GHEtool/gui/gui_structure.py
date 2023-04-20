@@ -255,7 +255,7 @@ class GuiStructure:
                 )
                 self.option_ground_temp_gradient = FloatBox(
                     category=self.category_earth,
-                    label=self.translations.option_ground_temp,
+                    label=self.translations.option_ground_temp_gradient,
                     default_value=10,
                     decimal_number=2,
                     minimal_value=-273.15,
@@ -542,7 +542,7 @@ class GuiStructure:
                 )
                 self.option_pipe_conductivity = FloatBox(
                     category=self.category_pipe_data,
-                    label=self.translations.category_pipe_data,
+                    label=self.translations.option_pipe_conductivity,
                     default_value=0.42,
                     decimal_number=3,
                     minimal_value=0,
@@ -1055,7 +1055,7 @@ class GuiStructure:
 
                 self.results_heating_load = ResultText(self.translations.results_heating_load, category=self.numerical_results,
                                                        prefix="Heating load on the borefield: ", suffix=" kWh")
-                self.results_heating_peak_geo = ResultText(self.translations.results_heating_peak,
+                self.results_heating_peak_geo = ResultText(self.translations.results_heating_peak_geo,
                                                        category=self.numerical_results,
                                                        prefix="with a peak of: ", suffix=" kW")
                 self.results_heating_peak_geo.text_to_be_shown("Borefield", "hourly_heating_load_building")
@@ -1077,7 +1077,7 @@ class GuiStructure:
 
                 self.results_cooling_load = ResultText(self.translations.results_cooling_load, category=self.numerical_results,
                                                        prefix="Cooling load on the borefield: ", suffix=" kWh")
-                self.results_cooling_peak_geo = ResultText(self.translations.results_cooling_peak,
+                self.results_cooling_peak_geo = ResultText(self.translations.results_cooling_peak_geo,
                                                        category=self.numerical_results,
                                                        prefix="with a peak of: ", suffix=" kW")
                 self.results_cooling_peak_geo.text_to_be_shown("Borefield", "hourly_cooling_load_building")

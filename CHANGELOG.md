@@ -26,6 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Options for g-function calculations are not working (issue #119).
 - Wrong naming aim optimise load profile.
 - GHEtool now can start after a crash without removing the backup file.
+- Some translations were not correct.
 
 
 ## [2.1.1] - 2023-01-30
