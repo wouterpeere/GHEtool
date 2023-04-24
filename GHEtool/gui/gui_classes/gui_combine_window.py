@@ -104,14 +104,14 @@ class MainWindow(MainWindow):
             for val, borefield in zip(saving['values'], saving['borefields']):
                 ds = DataStorage(self.gui_structure)
                 ds.from_dict(val)
-                borefield["ground_data"]["__module__"] = "GHEtool.VariableClasses.GroundData.GroundFluxTemperature"
-                borefield["ground_data"]["__name__"] = "GroundFluxTemperature"
                 if borefield is None:  # pragma: no cover
                     setattr(ds, 'results', None)
                 else:
+                    borefield["ground_data"]["__module__"] = "GHEtool.VariableClasses.GroundData.GroundFluxTemperature"
+                    borefield["ground_data"]["__name__"] = "GroundFluxTemperature"
                     setattr(ds, 'results', Borefield())
                     getattr(ds, 'results').from_dict(borefield)
-                ds.results.set_Rb(borefield["ground_data"]["Rb"])
+                    ds.results.set_Rb(borefield["ground_data"]["Rb"])
                 self.list_ds.append(ds)
             # set and change the window title
             self.filename = saving['filename']
