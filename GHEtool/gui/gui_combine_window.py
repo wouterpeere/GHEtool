@@ -1297,7 +1297,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
                 continue
 
             fig = getattr(ds, fig_name)
-            if fig is None:
+            if fig is None or True:
                 # create axes and drawing
                 fig, ax_new = getattr(borefield, fig_obj.function_name)(**fig_obj.kwargs)
                 fig_obj.replace_figure(fig)
