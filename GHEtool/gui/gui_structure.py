@@ -1377,7 +1377,8 @@ class GuiStructure:
         self.option_cooling_column.widget.addItems(columns)
         self.option_single_column.widget.addItems(columns)
         # set column selection mode to 2 columns if more than one line exists
-        self.option_column.set_value(0 if len(columns) > 0 else 1)
+        self.option_column.set_value(1 if len(columns) > 0 else 0)
+        self.option_cooling_column.widget.setCurrentIndex(len(columns)- 1)
 
     def fun_display_data(self) -> None:
         """
