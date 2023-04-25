@@ -18,7 +18,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Changed icon of GHEtool.
 - Imbalance changed to property so it can handle hourly loads as well (issue #106).
 - Remove recalculation option (issue #109).
-- Two columns is automatically selected when using two-column data (issue #133).
 
 ### Fixed
 - Sizing doesn't crash when either no heating or cooling load is present (issue #91).
