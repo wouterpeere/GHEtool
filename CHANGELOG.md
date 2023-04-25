@@ -27,6 +27,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Wrong naming aim optimise load profile.
 - GHEtool now can start after a crash without removing the backup file.
 - Some translations were not correct.
+- Solves issue with loading .csv file and optimise load profile (issue #130).
 
 
 ## [2.1.1] - 2023-01-30
