@@ -1308,12 +1308,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
                 fig_obj.canvas.draw()
                 setattr(ds, fig_name, fig)
                 continue
-            fig_obj.replace_figure(fig)
-            # show everything
-            fig_obj.show()
-            fig_obj.canvas.show()
-            # draw new plot
-            fig_obj.canvas.draw()
 
         # update result for every ResultText object
         for result_text_obj, result_text_name in self.gui_structure.list_of_result_texts:
