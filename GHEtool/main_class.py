@@ -1226,7 +1226,6 @@ class Borefield(BaseClass):
             else:
                 # minimum temperature
                 # convert back to required length
-                print(np.min(self.results_peak_heating))
                 self.H = (np.min(self.results_peak_heating) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
 
             if self.H < 0:
