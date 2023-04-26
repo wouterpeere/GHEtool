@@ -67,8 +67,6 @@ class DataStorage:
         self.hourly_data: bool = self.option_method_size_depth == 2 or (
                 self.option_temperature_profile_hourly == 1 and self.aim_temp_profile) or self.aim_optimize
 
-        # add params for backwards compatibility
-        self.geo_load: int = 0
     @property
     def peakHeating(self) -> list:
         temp = [self.option_hp_jan, self.option_hp_feb, self.option_hp_mar, self.option_hp_apr, self.option_hp_may,
@@ -105,7 +103,6 @@ class DataStorage:
         temp = [self.option_cl_jan, self.option_cl_feb, self.option_cl_mar, self.option_cl_apr, self.option_cl_may,
                 self.option_cl_jun, self.option_cl_jul, self.option_cl_aug, self.option_cl_sep, self.option_cl_oct,
                 self.option_cl_nov, self.option_cl_dec]
-
         if hasattr(self, 'geo_load') and self.geo_load == 1:
             # building loads, which need to be converted to geothermal loads
             return [i * (1 + 1 / self.SEER) for i in temp]

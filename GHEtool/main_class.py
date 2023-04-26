@@ -1972,7 +1972,7 @@ class Borefield(BaseClass):
         header : bool
             True if this file contains a header row
         separator : str
-            Symbol used in the file to seperate the columns
+            Symbol used in the file to separate the columns
         first_column_heating : bool
             True if the first column in the file is for the heating load
 
