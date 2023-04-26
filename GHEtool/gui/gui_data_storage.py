@@ -18,14 +18,6 @@ class DataStorage:
 
     Attributes
     ----------
-    peakHeating : List
-        List with monthly peak heating values [kW]
-    peakCooling : List
-        List with monthly peak cooling values [kW]
-    monthlyLoadHeating : List
-        List with monthly heating load values [kWh]
-    monthlyLoadCooling : List
-        List with monthly cooling load values [kWh]
     ground_data : GroundData
         Ground data object based on multiple inputs in the GUI
     fluid_data : FluidData
@@ -82,7 +74,7 @@ class DataStorage:
         temp = [self.option_hp_jan, self.option_hp_feb, self.option_hp_mar, self.option_hp_apr, self.option_hp_may,
                 self.option_hp_jun, self.option_hp_jul, self.option_hp_aug, self.option_hp_sep, self.option_hp_oct,
                 self.option_hp_nov, self.option_hp_dec]
-        if self.geo_load == 1:
+        if hasattr(self, 'geo_load') and self.geo_load == 1:
             # building loads, which need to be converted to geothermal loads
             return [i * (1 - 1/self.SCOP) for i in temp]
         return temp
@@ -92,7 +84,7 @@ class DataStorage:
         temp = [self.option_cp_jan, self.option_cp_feb, self.option_cp_mar, self.option_cp_apr, self.option_cp_may,
                 self.option_cp_jun, self.option_cp_jul, self.option_cp_aug, self.option_cp_sep, self.option_cp_oct,
                 self.option_cp_nov, self.option_cp_dec]
-        if self.geo_load == 1:
+        if hasattr(self, 'geo_load') and self.geo_load == 1:
             # building loads, which need to be converted to geothermal loads
             return [i * (1 + 1/self.SEER) for i in temp]
         return temp
@@ -103,7 +95,7 @@ class DataStorage:
                 self.option_hl_jun, self.option_hl_jul, self.option_hl_aug, self.option_hl_sep, self.option_hl_oct,
                 self.option_hl_nov, self.option_hl_dec]
 
-        if self.geo_load == 1:
+        if hasattr(self, 'geo_load') and self.geo_load == 1:
             # building loads, which need to be converted to geothermal loads
             return [i * (1 - 1 / self.SCOP) for i in temp]
         return temp
@@ -114,10 +106,26 @@ class DataStorage:
                 self.option_cl_jun, self.option_cl_jul, self.option_cl_aug, self.option_cl_sep, self.option_cl_oct,
                 self.option_cl_nov, self.option_cl_dec]
 
-        if self.geo_load == 1:
+        if hasattr(self, 'geo_load') and self.geo_load == 1:
             # building loads, which need to be converted to geothermal loads
             return [i * (1 + 1 / self.SEER) for i in temp]
         return temp
+
+    @peakHeating.setter
+    def peakHeating(self, *args) -> None:
+        pass
+
+    @peakCooling.setter
+    def peakCooling(self, *args) -> None:
+        pass
+
+    @monthlyLoadCooling.setter
+    def monthlyLoadCooling(self, *args) -> None:
+        pass
+
+    @monthlyLoadHeating.setter
+    def monthlyLoadHeating(self, *args) -> None:
+        pass
 
     def _create_data_classes(self) -> None:
         """
