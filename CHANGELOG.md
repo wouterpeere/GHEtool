@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Changed icon of GHEtool.
 - Imbalance changed to property so it can handle hourly loads as well (issue #106).
 - Remove recalculation option (issue #109).
+- When data is loaded in a two-column format, the button for 'two columns' is set (issue #133).
 
 ### Fixed
 - Sizing doesn't crash when either no heating or cooling load is present (issue #91).
@@ -27,6 +28,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Wrong naming aim optimise load profile.
 - GHEtool now can start after a crash without removing the backup file.
 - Some translations were not correct.
+- Figure in optimize load profile keeps getting bigger and bigger (issue #131).
 
 
 ## [2.1.1] - 2023-01-30
