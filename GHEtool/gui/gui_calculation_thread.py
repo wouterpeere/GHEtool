@@ -79,7 +79,6 @@ class CalcProblem(QtC.QThread):
         borefield.set_peak_cooling(self.DS.peakCooling)
         borefield.set_baseload_heating(self.DS.monthlyLoadHeating)
         borefield.set_baseload_cooling(self.DS.monthlyLoadCooling)
-
         # set hourly loads if available
         if self.DS.hourly_data:
             data_unit = self.DS.option_unit_data

@@ -67,21 +67,15 @@ class DataStorage:
 
         self.borefield: Optional[Borefield] = None
 
-        self.peakHeating: list = [self.option_hp_jan, self.option_hp_feb, self.option_hp_mar, self.option_hp_apr, self.option_hp_may, self.option_hp_jun,
-                                  self.option_hp_jul, self.option_hp_aug, self.option_hp_sep, self.option_hp_oct, self.option_hp_nov, self.option_hp_dec]
-        self.peakCooling: list = [self.option_cp_jan, self.option_cp_feb, self.option_cp_mar, self.option_cp_apr, self.option_cp_may, self.option_cp_jun,
-                                  self.option_cp_jul, self.option_cp_aug, self.option_cp_sep, self.option_cp_oct, self.option_cp_nov, self.option_cp_dec]
-        self.monthlyLoadHeating: list = [self.option_hl_jan, self.option_hl_feb, self.option_hl_mar, self.option_hl_apr, self.option_hl_may, self.option_hl_jun,
-                                         self.option_hl_jul, self.option_hl_aug, self.option_hl_sep, self.option_hl_oct, self.option_hl_nov, self.option_hl_dec]
-        self.monthlyLoadCooling: list = [self.option_cl_jan, self.option_cl_feb, self.option_cl_mar, self.option_cl_apr, self.option_cl_may, self.option_cl_jun,
-                                         self.option_cl_jul, self.option_cl_aug, self.option_cl_sep, self.option_cl_oct, self.option_cl_nov, self.option_cl_dec]
-
-        if self.geo_load == 1:
-            # building loads, which need to be converted to geothermal loads
-            self.peakHeating = [i * (1 - 1/self.SCOP) for i in self.peakHeating]
-            self.monthlyLoadHeating = [i * (1 - 1/self.SCOP) for i in self.monthlyLoadHeating]
-            self.peakCooling = [i * (1 + 1/self.SEER) for i in self.peakCooling]
-            self.monthlyLoadCooling = [i * (1 + 1/self.SEER) for i in self.monthlyLoadCooling]
+        # self.peakHeating: list = [self.option_hp_jan, self.option_hp_feb, self.option_hp_mar, self.option_hp_apr, self.option_hp_may, self.option_hp_jun,
+        #                           self.option_hp_jul, self.option_hp_aug, self.option_hp_sep, self.option_hp_oct, self.option_hp_nov, self.option_hp_dec]
+        # self.peakCooling: list = [self.option_cp_jan, self.option_cp_feb, self.option_cp_mar, self.option_cp_apr, self.option_cp_may, self.option_cp_jun,
+        #                           self.option_cp_jul, self.option_cp_aug, self.option_cp_sep, self.option_cp_oct, self.option_cp_nov, self.option_cp_dec]
+        # self.monthlyLoadHeating: list = [self.option_hl_jan, self.option_hl_feb, self.option_hl_mar, self.option_hl_apr, self.option_hl_may, self.option_hl_jun,
+        #                                  self.option_hl_jul, self.option_hl_aug, self.option_hl_sep, self.option_hl_oct, self.option_hl_nov, self.option_hl_dec]
+        # # self.monthlyLoadCooling: list = [self.option_cl_jan, self.option_cl_feb, self.option_cl_mar, self.option_cl_apr, self.option_cl_may, self.option_cl_jun,
+        #                                  self.option_cl_jul, self.option_cl_aug, self.option_cl_sep, self.option_cl_oct, self.option_cl_nov, self.option_cl_dec]
+        #
 
         self._create_data_classes()
 
@@ -90,6 +84,47 @@ class DataStorage:
         # params for which hourly data should be loaded
         self.hourly_data: bool = self.option_method_size_depth == 2 or (
                 self.option_temperature_profile_hourly == 1 and self.aim_temp_profile) or self.aim_optimize
+    @property
+    def peakHeating(self) -> list:
+        temp = [self.option_hp_jan, self.option_hp_feb, self.option_hp_mar, self.option_hp_apr, self.option_hp_may,
+                self.option_hp_jun, self.option_hp_jul, self.option_hp_aug, self.option_hp_sep, self.option_hp_oct,
+                self.option_hp_nov, self.option_hp_dec]
+        if self.geo_load == 1:
+            # building loads, which need to be converted to geothermal loads
+            return [i * (1 - 1/self.SCOP) for i in temp]
+        return temp
+
+    @property
+    def peakCooling(self) -> list:
+        temp = [self.option_cp_jan, self.option_cp_feb, self.option_cp_mar, self.option_cp_apr, self.option_cp_may,
+                self.option_cp_jun, self.option_cp_jul, self.option_cp_aug, self.option_cp_sep, self.option_cp_oct,
+                self.option_cp_nov, self.option_cp_dec]
+        if self.geo_load == 1:
+            # building loads, which need to be converted to geothermal loads
+            return [i * (1 + 1/self.SEER) for i in temp]
+        return temp
+
+    @property
+    def monthlyLoadHeating(self) -> list:
+        temp = [self.option_hl_jan, self.option_hl_feb, self.option_hl_mar, self.option_hl_apr, self.option_hl_may,
+                self.option_hl_jun, self.option_hl_jul, self.option_hl_aug, self.option_hl_sep, self.option_hl_oct,
+                self.option_hl_nov, self.option_hl_dec]
+
+        if self.geo_load == 1:
+            # building loads, which need to be converted to geothermal loads
+            return [i * (1 - 1 / self.SCOP) for i in temp]
+        return temp
+
+    @property
+    def monthlyLoadCooling(self) -> list:
+        temp = [self.option_cl_jan, self.option_cl_feb, self.option_cl_mar, self.option_cl_apr, self.option_cl_may,
+                self.option_cl_jun, self.option_cl_jul, self.option_cl_aug, self.option_cl_sep, self.option_cl_oct,
+                self.option_cl_nov, self.option_cl_dec]
+
+        if self.geo_load == 1:
+            # building loads, which need to be converted to geothermal loads
+            return [i * (1 + 1 / self.SEER) for i in temp]
+        return temp
 
     def _create_data_classes(self) -> None:
         """
