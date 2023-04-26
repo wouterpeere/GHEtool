@@ -1296,18 +1296,17 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             if fig_obj.is_hidden():
                 continue
 
-            fig = getattr(ds, fig_name)
-            if fig is None or True:
-                # create axes and drawing
-                fig, ax_new = getattr(borefield, fig_obj.function_name)(**fig_obj.kwargs)
-                fig_obj.replace_figure(fig)
-                # show everything
-                fig_obj.show()
-                fig_obj.canvas.show()
-                # draw new plot
-                fig_obj.canvas.draw()
-                setattr(ds, fig_name, fig)
-                continue
+            # fig = getattr(ds, fig_name)
+            # if fig is None:
+            # create axes and drawing
+            fig, ax_new = getattr(borefield, fig_obj.function_name)(**fig_obj.kwargs)
+            fig_obj.replace_figure(fig)
+            # show everything
+            fig_obj.show()
+            fig_obj.canvas.show()
+            # draw new plot
+            fig_obj.canvas.draw()
+            setattr(ds, fig_name, fig)
 
         # update result for every ResultText object
         for result_text_obj, result_text_name in self.gui_structure.list_of_result_texts:
