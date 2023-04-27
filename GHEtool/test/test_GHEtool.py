@@ -358,7 +358,7 @@ def test_load_duration(monkeypatch, hourly_borefield):
     monkeypatch.setattr(plt, 'show', lambda: None)
     hourly_borefield.plot_load_duration(legend=True)
     hourly_borefield.optimise_load_profile(150)
-    hourly_borefield.set_min_ground_temperature(-5)
+    hourly_borefield.set_min_ground_temperature(5)
     hourly_borefield.optimise_load_profile(150)
     hourly_borefield.print_temperature_profile(plot_hourly=True)
 
@@ -527,6 +527,11 @@ def test_check_hourly_load(borefield):
     except ValueError:
         assert True
     borefield.hourly_cooling_load = np.array([])
+    try:
+        borefield._check_hourly_load()
+    except ValueError:
+        assert True
+    borefield.hourly_cooling_load = borefield.hourly_cooling_load[:20]
     try:
         borefield._check_hourly_load()
     except ValueError:

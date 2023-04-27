@@ -56,7 +56,6 @@ def test_building_load(qtbot):
     without_SEER_avg = main_window.list_ds[0].monthlyLoadCooling
 
     # calculate with building load
-    main_window.gui_structure.aim_temp_profile.widget.click()
     main_window.gui_structure.geo_load.set_value(1)
     main_window.save_scenario()
 
@@ -66,15 +65,14 @@ def test_building_load(qtbot):
     assert main_window.list_ds[0].monthlyLoadHeating == [i * (1 - 1 / 4) for i in without_SCOP_avg]
     assert main_window.list_ds[0].monthlyLoadCooling == [i * (1 + 1 / 3) for i in without_SEER_avg]
 
-    # main_window.gui_structure.option_temperature_profile_hourly.set_value(1)
-    # main_window.save_scenario()
-    # main_window.start_current_scenario_calculation(True)
-    # with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
-    #     main_window.threads[0].run()
-    #     main_window.threads[0].any_signal.connect(main_window.thread_function)
-    #
+    main_window.gui_structure.option_temperature_profile_hourly.set_value(1)
+    main_window.save_scenario()
+    main_window.start_current_scenario_calculation(True)
+    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
+        main_window.threads[0].run()
+        main_window.threads[0].any_signal.connect(main_window.thread_function)
+
     # # check if the data is the same
-    # temp = main_window.list_ds[0].borefield.hourly_cooling_load - peak_cooling
-    # assert np.allclose(main_window.list_ds[0].borefield.hourly_cooling_load / (1 + 1/3), peak_cooling)
-    # assert np.allclose(main_window.list_ds[0].borefield.hourly_heating_load / (1 - 1/4), peak_heating)
+    assert np.allclose(main_window.list_ds[0].borefield.hourly_cooling_load / (1 + 1/3), peak_cooling)
+    assert np.allclose(main_window.list_ds[0].borefield.hourly_heating_load / (1 - 1/4), peak_heating)
 
