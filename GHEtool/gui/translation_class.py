@@ -225,6 +225,7 @@ class Translations:  # pragma: no cover
         "results_heating_peak_geo",
         "results_cooling_peak_geo",
         "option_ground_temp_gradient",
+        "warning_L2",
         "languages",
     )
 
@@ -1795,4 +1796,13 @@ class Translations:  # pragma: no cover
             "Surface temperature [°C]: ",
             "Surface temperature [°C]: ",
             "Surface temperature [°C]:",
+        ]
+        self.warning_L2: List[str] = [
+            "When using a temperature gradient, the L2 method can be inaccurate. Please use L3/L4. ",
+            "When using a temperature gradient, the L2 method can be inaccurate. Please use L3/L4.",
+            "Wanneer een temperatuursgradient gebruikt wordt, kan L2 inaccuraat zijn. Gebruik L3/L4.",
+            "When using a temperature gradient, the L2 method can be inaccurate. Please use L3/L4.",
+            "When using a temperature gradient, the L2 method can be inaccurate. Please use L3/L4.",
+            "When using a temperature gradient, the L2 method can be inaccurate. Please use L3/L4.",
+            "When using a temperature gradient, the L2 method can be inaccurate. Please use L3/L4.",
         ]
