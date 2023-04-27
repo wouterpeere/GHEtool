@@ -189,7 +189,6 @@ def test_size_L4_without_cooling():
     borefield.size()
 
 
-
 def test_stuck_in_loop():
     monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(4)
 
@@ -266,3 +265,37 @@ def test_reset_temp_profiles_when_loaded(monkeypatch):
 
     assert not np.array_equal(Tmax, borefield.results_peak_heating)
     assert not np.array_equal(Tmin, borefield.results_peak_cooling)
+
+
+def test_no_possible_solution():
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(4)
+
+    borefield = Borefield(simulation_period=20,
+                          peak_heating=peak_heating,
+                          peak_cooling=peak_cooling,
+                          baseload_heating=monthly_load_heating,
+                          baseload_cooling=monthly_load_cooling)
+
+    borefield.set_ground_parameters(data)
+    borefield.set_borefield(copy.copy(borefield_gt))
+    borefield.sizing_setup(use_constant_Tg=False)
+
+    # limited by cooling
+    borefield.set_max_ground_temperature(14)  # maximum temperature
+    borefield.set_min_ground_temperature(3)  # minimum temperature
+    borefield.size()
+
+    # limited by heating, but no problem for cooling
+    borefield.set_max_ground_temperature(15)
+    borefield.set_min_ground_temperature(2)
+    borefield.set_baseload_heating(borefield.baseload_heating * 5)
+    borefield.size()
+
+    # limited by heating, but problem for cooling --> no solution
+    borefield.set_max_ground_temperature(14)
+    borefield.set_min_ground_temperature(2)
+    borefield.set_baseload_heating(borefield.baseload_heating * 5)
+    try:
+        borefield.size(L3_sizing=True)
+    except ValueError:
+        assert True

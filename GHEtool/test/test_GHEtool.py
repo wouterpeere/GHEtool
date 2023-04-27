@@ -526,6 +526,11 @@ def test_check_hourly_load(borefield):
         borefield._check_hourly_load()
     except ValueError:
         assert True
+    borefield.hourly_cooling_load = borefield.hourly_cooling_load[:20]
+    try:
+        borefield._check_hourly_load()
+    except ValueError:
+        assert True
     borefield.hourly_cooling_load = np.array([])
     try:
         borefield._check_hourly_load()

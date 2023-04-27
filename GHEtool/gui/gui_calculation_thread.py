@@ -79,7 +79,6 @@ class CalcProblem(QtC.QThread):
         borefield.set_peak_cooling(self.DS.peakCooling)
         borefield.set_baseload_heating(self.DS.monthlyLoadHeating)
         borefield.set_baseload_cooling(self.DS.monthlyLoadCooling)
-
         # set hourly loads if available
         if self.DS.hourly_data:
             data_unit = self.DS.option_unit_data
@@ -100,7 +99,7 @@ class CalcProblem(QtC.QThread):
             borefield.set_hourly_cooling_load(peak_cooling)
 
             # when this load is a building load, it needs to be converted to a geothermal load
-            if self.DS.geo_load == 1:
+            if self.DS.geo_load == 1 and not self.DS.aim_optimize:
                 borefield.set_hourly_heating_load(peak_heating * (1 - 1/self.DS.SCOP))
                 borefield.set_hourly_cooling_load(peak_cooling * (1 + 1/self.DS.SEER))
 

@@ -913,6 +913,47 @@ class Borefield(BaseClass):
         ghe_logger.main_info("The borefield has been sized.")
         return depth
 
+    def _select_size(self, size_max_temp: float, size_min_temp: float, hourly: bool = False) -> float:
+        """
+        This function selects the correct size based on a size for the minimum and maximum temperature.
+        When no temperature gradient is taken into account, this is just the maximum value of the two.
+        When there is a temperature gradient and the sizing for the minimum temperature is higher than the sizing
+        for the max temperature, it is checked if this sizing does not cross the maximum temperature limit.
+        If it does, an error is returned.
+
+        Parameters
+        ----------
+        size_max_temp : float
+            Sizing according to the quadrants limited by the maximum temperature [m]
+        size_min_temp : float
+            Sizing according to the quadrants limited by the minimum temperature [m]
+        hourly : bool
+            True if the sizing was hourly
+
+        Returns
+        -------
+        depth : float
+            Required borehole depth [m]
+
+        Raises
+        ------
+        ValueError
+            ValueError when no solution can be found
+        """
+        # return the max of both sizes when no temperature gradient is used
+        if self._sizing_setup.use_constant_Tg:
+            return max(size_max_temp, size_min_temp)
+
+        if size_max_temp > size_min_temp:
+            # no problem, since the field is already sized by the maximum temperature
+            return size_max_temp
+
+        # check if sizing by the minimum temperature (quadrant 3/4) does not cross the temperature boundary
+        self.calculate_temperatures(size_min_temp, hourly=hourly)
+        if np.max(self.results_peak_cooling) <= self.Tf_max:
+            return size_min_temp
+        raise ValueError("No solution can be found due to the temperature gradient. Please increase the field size.")
+
     def size_L2(self, H_init: float, quadrant_sizing: int = 0) -> float:
         """
         This function sizes the  of the given configuration according to the methodology explained in
@@ -974,7 +1015,7 @@ class Borefield(BaseClass):
                     quadrant1 = 0
                 quadrant4 = size_quadrant4()
 
-                self.H = max(quadrant1, quadrant4)
+                self.H = self._select_size(quadrant1, quadrant4)
 
                 if self.H == quadrant1:
                     self.limiting_quadrant = 1
@@ -988,7 +1029,7 @@ class Borefield(BaseClass):
                 else:
                     quadrant3 = 0
 
-                self.H = max(quadrant2, quadrant3)
+                self.H = self._select_size(quadrant2, quadrant3)
 
                 if self.H == quadrant2:
                     self.limiting_quadrant = 2
@@ -1026,7 +1067,7 @@ class Borefield(BaseClass):
                 # extraction dominated, so quadrants 1 and 4 are relevant
                 quadrant1 = self._size_based_on_temperature_profile(1)
                 quadrant4 = self._size_based_on_temperature_profile(4)
-                self.H = max(quadrant1, quadrant4)
+                self.H = self._select_size(quadrant1, quadrant4)
 
                 if self.H == quadrant1:
                     self.limiting_quadrant = 1
@@ -1037,7 +1078,7 @@ class Borefield(BaseClass):
                 # injection dominated, so quadrants 2 and 3 are relevant
                 quadrant2 = self._size_based_on_temperature_profile(2)
                 quadrant3 = self._size_based_on_temperature_profile(3)
-                self.H = max(quadrant2, quadrant3)
+                self.H = self._select_size(quadrant2, quadrant3)
 
                 if self.H == quadrant2:
                     self.limiting_quadrant = 2
@@ -1079,7 +1120,7 @@ class Borefield(BaseClass):
                 # extraction dominated, so quadrants 1 and 4 are relevant
                 quadrant1 = self._size_based_on_temperature_profile(1, hourly=True) if self.hourly_cooling_load.sum() > 0 else 0
                 quadrant4 = self._size_based_on_temperature_profile(4, hourly=True)
-                self.H = max(quadrant1, quadrant4)
+                self.H = self._select_size(quadrant1, quadrant4, True)
 
                 if self.H == quadrant1:
                     self.limiting_quadrant = 1
@@ -1090,7 +1131,7 @@ class Borefield(BaseClass):
                 # injection dominated, so quadrants 2 and 3 are relevant
                 quadrant2 = self._size_based_on_temperature_profile(2, hourly=True)
                 quadrant3 = self._size_based_on_temperature_profile(3, hourly=True) if self.hourly_heating_load.sum() > 0 else 0
-                self.H = max(quadrant2, quadrant3)
+                self.H = self._select_size(quadrant2, quadrant3, True)
 
                 if self.H == quadrant2:
                     self.limiting_quadrant = 2
@@ -1226,7 +1267,6 @@ class Borefield(BaseClass):
             else:
                 # minimum temperature
                 # convert back to required length
-                print(np.min(self.results_peak_heating))
                 self.H = (np.min(self.results_peak_heating) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
 
             if self.H < 0:
@@ -1819,9 +1859,9 @@ class Borefield(BaseClass):
         """
         # when using a variable ground temperature, sometimes no solution can be found
         if not self._sizing_setup.use_constant_Tg and H > Borefield.THRESHOLD_DEPTH_ERROR:
-            raise ValueError("Due to the use of a variable ground temperature, no solution can be found."
-                             "To see the temperature profile, one can plot it using the depth of ",
-                             str(Borefield.THRESHOLD_DEPTH_ERROR), "m.")
+            raise ValueError(f'Due to the use of a variable ground temperature, no solution can be found. '
+                             f'To see the temperature profile, one can plot it using the depth of '
+                             f'{Borefield.THRESHOLD_DEPTH_ERROR} m.')
 
         def jit_gfunction_calculation() -> np.ndarray:
             """
@@ -2268,7 +2308,7 @@ class Borefield(BaseClass):
         min_temp = np.min(self.results_peak_heating)
 
         # calculate temperature difference w.r.t. the limits
-        DT_max = self.Tf_max - max_temp + 1000  # + 1000 to have no problems with negative temperatures
+        DT_max = - self.Tf_max + max_temp + 1000  # + 1000 to have no problems with negative temperatures
         DT_min = self.Tf_min - min_temp + 1000
 
         # if the temperature limit is not crossed, return None
@@ -2278,13 +2318,13 @@ class Borefield(BaseClass):
         # True if heating/extraction dominated
         if self.imbalance < 0:
             # either quadrant 1 or 4
-            if DT_min < DT_max:
+            if DT_min > DT_max:
                 # limited by minimum temperature
                 return 4
             return 1
 
         # quadrant 2 or 3
-        if DT_min < DT_max:
+        if DT_min > DT_max:
             # limited by minimum temperature
             return 3
         return 2
