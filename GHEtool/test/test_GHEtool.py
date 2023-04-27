@@ -355,7 +355,7 @@ def test_size_L4_without_data(borefield):
 
 
 def test_load_duration(monkeypatch, hourly_borefield):
-    # monkeypatch.setattr(plt, 'show', lambda: None)
+    monkeypatch.setattr(plt, 'show', lambda: None)
     hourly_borefield.plot_load_duration(legend=True)
     hourly_borefield.optimise_load_profile(150)
     hourly_borefield.set_min_ground_temperature(-5)
