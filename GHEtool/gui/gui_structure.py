@@ -194,9 +194,6 @@ class GuiStructure:
                 self.option_method_size_depth = ButtonBox(label=self.translations.option_method_size_depth, default_index=0,
                                                           entries=[" L2 ", " L3 ", "  L4  "],
                                                           category=self.category_calculation)
-                self.warning_L2 = Hint(hint=self.translations.warning_L2,
-                                       category=self.category_calculation,
-                                       warning=True)
                 # self.option_method_size_length = ButtonBox(label="Method for size width and length:", default_index=0,
                 #                                            entries=[" L2 ", " L3 "], category=self.category_calculation)
                 self.option_method_temp_gradient = ButtonBox(
@@ -212,7 +209,6 @@ class GuiStructure:
                 # self.aim_size_length.add_link_2_show(self.option_method_size_length)
                 self.aim_req_depth.add_link_2_show(self.option_method_size_depth)
                 self.aim_temp_profile.add_link_2_show(self.option_temperature_profile_hourly)
-                self.option_method_size_depth.add_link_2_show(self.warning_L2, on_index=0)
 
             # create categories
             create_category_calculation()
