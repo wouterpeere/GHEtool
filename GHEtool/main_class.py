@@ -1264,16 +1264,11 @@ class Borefield(BaseClass):
                 # maximum temperature
                 # convert back to required length
                 self.H = (np.max(self.results_peak_cooling) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
-            elif quadrant == 3 or quadrant == 4:
+            else:
                 # minimum temperature
                 # convert back to required length
                 self.H = (np.min(self.results_peak_heating) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
-            else:
-                # just size without a quadrant
-                max_temp = (np.max(self.results_peak_cooling) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
-                min_temp = (np.min(self.results_peak_heating) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
-                self.H = max(max_temp, min_temp)
-                print(self.H)
+
             if self.H < 0:
                 return 0
 
