@@ -28,8 +28,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Wrong naming aim optimise load profile.
 - GHEtool now can start after a crash without removing the backup file.
 - Some translations were not correct.
+- Solves issue with loading .csv file and optimise load profile (issue #130).
 - Figure in optimize load profile keeps getting bigger and bigger (issue #131).
 - Problem with sizing with temperature gradients (issue #136).
+- Problem solved with calculate_multiple_scenarios.
 
 
 ## [2.1.1] - 2023-01-30
