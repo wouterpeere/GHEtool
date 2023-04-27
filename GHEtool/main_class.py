@@ -1022,36 +1022,7 @@ class Borefield(BaseClass):
         # initiate with a given depth
         self.H_init: float = H_init
 
-        if quadrant_sizing != 0:
-            # size according to a specific quadrant
-            self.H = self._size_based_on_temperature_profile(quadrant_sizing)
-        else:
-            self.H = self._size_based_on_temperature_profile(0, False)
-            # # size according to the biggest quadrant
-            # # determine which quadrants are relevant
-            # if self.imbalance <= 0:
-            #     # extraction dominated, so quadrants 1 and 4 are relevant
-            #     quadrant1 = self._size_based_on_temperature_profile(1)
-            #     quadrant4 = self._size_based_on_temperature_profile(4)
-            #     self.H = max(quadrant1, quadrant4)
-            #
-            #     if self.H == quadrant1:
-            #         self.limiting_quadrant = 1
-            #         # the last calculated temperature was for quadrant 4, which was the smaller one
-            #     else:
-            #         self.limiting_quadrant = 4
-            # else:
-            #     # injection dominated, so quadrants 2 and 3 are relevant
-            #     quadrant2 = self._size_based_on_temperature_profile(2)
-            #     quadrant3 = self._size_based_on_temperature_profile(3)
-            #     self.H = max(quadrant2, quadrant3)
-            #
-            #     if self.H == quadrant2:
-            #         self.limiting_quadrant = 2
-            #         # the last calculation was for quadrant 3, which is the smaller one
-            #     else:
-            #         self.limiting_quadrant = 3
-
+        self.H = self._size_based_on_temperature_profile(quadrant_sizing)
         return self.H
 
     def size_L4(self, H_init: float, quadrant_sizing: int = 0) -> float:
@@ -1076,35 +1047,7 @@ class Borefield(BaseClass):
         # initiate with a given depth
         self.H_init: float = H_init
 
-        if quadrant_sizing != 0:
-            # size according to a specific quadrant
-            self.H = self._size_based_on_temperature_profile(quadrant_sizing, hourly=True)
-        else:
-            self.H = self._size_based_on_temperature_profile(0, True)
-            # # size according to the biggest quadrant
-            # # determine which quadrants are relevant
-            # if self.imbalance <= 0:
-            #     # extraction dominated, so quadrants 1 and 4 are relevant
-            #     quadrant1 = self._size_based_on_temperature_profile(1, hourly=True) if self.hourly_cooling_load.sum() > 0 else 0
-            #     quadrant4 = self._size_based_on_temperature_profile(4, hourly=True)
-            #     self.H = max(quadrant1, quadrant4)
-            #
-            #     if self.H == quadrant1:
-            #         self.limiting_quadrant = 1
-            #         # the last calculation was for quadrant 4, which is the smaller one
-            #     else:
-            #         self.limiting_quadrant = 4
-            # else:
-            #     # injection dominated, so quadrants 2 and 3 are relevant
-            #     quadrant2 = self._size_based_on_temperature_profile(2, hourly=True)
-            #     quadrant3 = self._size_based_on_temperature_profile(3, hourly=True) if self.hourly_heating_load.sum() > 0 else 0
-            #     self.H = max(quadrant2, quadrant3)
-            #
-            #     if self.H == quadrant2:
-            #         self.limiting_quadrant = 2
-            #         # the last calculation was for quadrant 3, which is the smaller one
-            #     else:
-            #         self.limiting_quadrant = 3
+        self.H = self._size_based_on_temperature_profile(quadrant_sizing, hourly=True)
 
         return self.H
 
