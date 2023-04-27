@@ -932,6 +932,12 @@ class Borefield(BaseClass):
             Required depth of the borefield [m]
         """
 
+        # print warning when using temperature gradients
+        if not self._sizing_setup.use_constant_Tg:
+            ghe_logger.warning("You are using the L2 sizing method for sizing a borefield using a temperature"
+                               "gradient. This can lead to wrong results, since this method assumes a constant"
+                               "ground temperature. Please use the L3 or L4 method instead.")
+
         # initiate with a given depth
         self.H_init: float = H_init
 
@@ -1020,30 +1026,31 @@ class Borefield(BaseClass):
             # size according to a specific quadrant
             self.H = self._size_based_on_temperature_profile(quadrant_sizing)
         else:
-            # size according to the biggest quadrant
-            # determine which quadrants are relevant
-            if self.imbalance <= 0:
-                # extraction dominated, so quadrants 1 and 4 are relevant
-                quadrant1 = self._size_based_on_temperature_profile(1)
-                quadrant4 = self._size_based_on_temperature_profile(4)
-                self.H = max(quadrant1, quadrant4)
-
-                if self.H == quadrant1:
-                    self.limiting_quadrant = 1
-                    # the last calculated temperature was for quadrant 4, which was the smaller one
-                else:
-                    self.limiting_quadrant = 4
-            else:
-                # injection dominated, so quadrants 2 and 3 are relevant
-                quadrant2 = self._size_based_on_temperature_profile(2)
-                quadrant3 = self._size_based_on_temperature_profile(3)
-                self.H = max(quadrant2, quadrant3)
-
-                if self.H == quadrant2:
-                    self.limiting_quadrant = 2
-                    # the last calculation was for quadrant 3, which is the smaller one
-                else:
-                    self.limiting_quadrant = 3
+            self.H = self._size_based_on_temperature_profile(0, False)
+            # # size according to the biggest quadrant
+            # # determine which quadrants are relevant
+            # if self.imbalance <= 0:
+            #     # extraction dominated, so quadrants 1 and 4 are relevant
+            #     quadrant1 = self._size_based_on_temperature_profile(1)
+            #     quadrant4 = self._size_based_on_temperature_profile(4)
+            #     self.H = max(quadrant1, quadrant4)
+            #
+            #     if self.H == quadrant1:
+            #         self.limiting_quadrant = 1
+            #         # the last calculated temperature was for quadrant 4, which was the smaller one
+            #     else:
+            #         self.limiting_quadrant = 4
+            # else:
+            #     # injection dominated, so quadrants 2 and 3 are relevant
+            #     quadrant2 = self._size_based_on_temperature_profile(2)
+            #     quadrant3 = self._size_based_on_temperature_profile(3)
+            #     self.H = max(quadrant2, quadrant3)
+            #
+            #     if self.H == quadrant2:
+            #         self.limiting_quadrant = 2
+            #         # the last calculation was for quadrant 3, which is the smaller one
+            #     else:
+            #         self.limiting_quadrant = 3
 
         return self.H
 
@@ -1073,30 +1080,31 @@ class Borefield(BaseClass):
             # size according to a specific quadrant
             self.H = self._size_based_on_temperature_profile(quadrant_sizing, hourly=True)
         else:
-            # size according to the biggest quadrant
-            # determine which quadrants are relevant
-            if self.imbalance <= 0:
-                # extraction dominated, so quadrants 1 and 4 are relevant
-                quadrant1 = self._size_based_on_temperature_profile(1, hourly=True) if self.hourly_cooling_load.sum() > 0 else 0
-                quadrant4 = self._size_based_on_temperature_profile(4, hourly=True)
-                self.H = max(quadrant1, quadrant4)
-
-                if self.H == quadrant1:
-                    self.limiting_quadrant = 1
-                    # the last calculation was for quadrant 4, which is the smaller one
-                else:
-                    self.limiting_quadrant = 4
-            else:
-                # injection dominated, so quadrants 2 and 3 are relevant
-                quadrant2 = self._size_based_on_temperature_profile(2, hourly=True)
-                quadrant3 = self._size_based_on_temperature_profile(3, hourly=True) if self.hourly_heating_load.sum() > 0 else 0
-                self.H = max(quadrant2, quadrant3)
-
-                if self.H == quadrant2:
-                    self.limiting_quadrant = 2
-                    # the last calculation was for quadrant 3, which is the smaller one
-                else:
-                    self.limiting_quadrant = 3
+            self.H = self._size_based_on_temperature_profile(0, True)
+            # # size according to the biggest quadrant
+            # # determine which quadrants are relevant
+            # if self.imbalance <= 0:
+            #     # extraction dominated, so quadrants 1 and 4 are relevant
+            #     quadrant1 = self._size_based_on_temperature_profile(1, hourly=True) if self.hourly_cooling_load.sum() > 0 else 0
+            #     quadrant4 = self._size_based_on_temperature_profile(4, hourly=True)
+            #     self.H = max(quadrant1, quadrant4)
+            #
+            #     if self.H == quadrant1:
+            #         self.limiting_quadrant = 1
+            #         # the last calculation was for quadrant 4, which is the smaller one
+            #     else:
+            #         self.limiting_quadrant = 4
+            # else:
+            #     # injection dominated, so quadrants 2 and 3 are relevant
+            #     quadrant2 = self._size_based_on_temperature_profile(2, hourly=True)
+            #     quadrant3 = self._size_based_on_temperature_profile(3, hourly=True) if self.hourly_heating_load.sum() > 0 else 0
+            #     self.H = max(quadrant2, quadrant3)
+            #
+            #     if self.H == quadrant2:
+            #         self.limiting_quadrant = 2
+            #         # the last calculation was for quadrant 3, which is the smaller one
+            #     else:
+            #         self.limiting_quadrant = 3
 
         return self.H
 
@@ -1223,11 +1231,15 @@ class Borefield(BaseClass):
                 # maximum temperature
                 # convert back to required length
                 self.H = (np.max(self.results_peak_cooling) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
-            else:
+            elif quadrant == 3 or quadrant == 4:
                 # minimum temperature
                 # convert back to required length
-                print(np.min(self.results_peak_heating))
                 self.H = (np.min(self.results_peak_heating) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
+            else:
+                # just size without a quadrant
+                max_temp = (np.max(self.results_peak_cooling) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
+                min_temp = (np.min(self.results_peak_heating) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
+                self.H = max(max_temp, min_temp)
 
             if self.H < 0:
                 return 0
@@ -2268,7 +2280,7 @@ class Borefield(BaseClass):
         min_temp = np.min(self.results_peak_heating)
 
         # calculate temperature difference w.r.t. the limits
-        DT_max = self.Tf_max - max_temp + 1000  # + 1000 to have no problems with negative temperatures
+        DT_max = - self.Tf_max + max_temp + 1000  # + 1000 to have no problems with negative temperatures
         DT_min = self.Tf_min - min_temp + 1000
 
         # if the temperature limit is not crossed, return None
@@ -2278,13 +2290,13 @@ class Borefield(BaseClass):
         # True if heating/extraction dominated
         if self.imbalance < 0:
             # either quadrant 1 or 4
-            if DT_min < DT_max:
+            if DT_min > DT_max:
                 # limited by minimum temperature
                 return 4
             return 1
 
         # quadrant 2 or 3
-        if DT_min < DT_max:
+        if DT_min > DT_max:
             # limited by minimum temperature
             return 3
         return 2
