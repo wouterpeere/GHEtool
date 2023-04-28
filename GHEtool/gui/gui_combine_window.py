@@ -1262,6 +1262,8 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
                     cat.hide(results=True)
                 self.gui_structure.cat_no_result.show()
                 self.gui_structure.text_no_result.set_text(self.translations.NotCalculated[self.gui_structure.option_language.get_value()])
+                if len(self.list_ds)!=0 and hasattr(self.list_ds[self.list_widget_scenario.currentRow()], 'ErrorMessage'):
+                    self.gui_structure.text_no_result.set_text(self.list_ds[self.list_widget_scenario.currentRow()].ErrorMessage)
                 return
             update_results()
             for cat in self.gui_structure.page_result.list_categories:
@@ -1296,8 +1298,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             if fig_obj.is_hidden():
                 continue
 
-            # fig = getattr(ds, fig_name)
-            # if fig is None:
             # create axes and drawing
             fig, ax_new = getattr(borefield, fig_obj.function_name)(**fig_obj.kwargs)
             fig_obj.replace_figure(fig)

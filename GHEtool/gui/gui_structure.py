@@ -74,10 +74,12 @@ def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, 
     ------
     FileNotFoundError
         If the filename is empty or it cannot be found
+
     """
     # raise error if no filename exists
     if filename == "":
         raise FileNotFoundError
+
     # Generate list of columns that have to be imported
     cols: list = []
     if len(heating_load_column) >= 1:
@@ -91,6 +93,11 @@ def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, 
         df2: pd_DataFrame = pd_read_csv(filename, usecols=cols, sep=sep, decimal=dec)
     except:
         raise FileNotFoundError
+
+    # not the correct decimal seperator
+    if isinstance(df2.iloc[1, 1], str):
+        ghe_logger.error("Please select the correct decimal point seperator.")
+        raise ValueError
 
     # ---------------------- Time Step Section  ----------------------
     # import pandas here to save start up time
@@ -1349,12 +1356,19 @@ class GuiStructure:
         -------
         None
         """
+
         if not isinstance(filename, str):
-            return
+            filename = self.option_filename.get_value()
 
         # get decimal and column seperator
         sep: str = ";" if self.option_seperator_csv.get_value() == 0 else ","
         dec: str = "." if self.option_decimal_csv.get_value() == 0 else ","
+
+        # raise error if seperator is decimal point
+        if dec == sep:
+            ghe_logger.warning("Please make sure the seperator and decimal point are different.")
+            return
+
         if filename == "":
             ghe_logger.info(self.translations.NoFileSelected[self.option_language.get_value()])
             return

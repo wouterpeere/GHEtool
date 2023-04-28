@@ -142,6 +142,10 @@ def test_gui_filename_errors(qtbot):
         load_data_GUI("C:/test.GHEtool", 1, "Heating", "Cooling", "Combined", 5, 6, 7)
     except FileNotFoundError:
         assert True
+    try:
+        load_data_GUI(f'{FOLDER}/Examples/hourly_profile.csv', 1, "Heating", "Cooling", "", ";", ",", 1)
+    except ValueError:
+        assert True
 
 
 def test_gui_values(qtbot):
@@ -189,7 +193,10 @@ def test_gui_values(qtbot):
             assert isclose(option.get_value(), val)
             option.set_value(option.default_value)
             continue
-        if (isinstance(option, ButtonBox) or isinstance(option, ListBox)) and not isinstance(option, FigureOption):
+        if (isinstance(option, ButtonBox) or isinstance(option, ListBox)) and not isinstance(option, FigureOption)\
+                and not option == main_window.gui_structure.option_heating_column and not \
+            option == main_window.gui_structure.option_cooling_column and not \
+            option == main_window.gui_structure.option_single_column:
             option.set_value(0)
             assert option.get_value() == 0
             option.set_value(1)
@@ -219,6 +226,18 @@ def test_gui_values(qtbot):
         assert main_window.gui_structure.option_single_column.widget.itemText(idx) == column
 
     main_window.gui_structure.aim_temp_profile.widget.click() if not main_window.gui_structure.aim_temp_profile.widget.isChecked() else None
+    # wrong decimal point
+    main_window.gui_structure.option_decimal_csv.set_value(1)
+    main_window.gui_structure.option_seperator_csv.set_value(0)
+    main_window.gui_structure.option_filename.set_value(f'{FOLDER}/Examples/hourly_profile.csv')
+    main_window.save_scenario()
+    main_window.start_current_scenario_calculation(False)
+    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
+        main_window.threads[0].run()
+        main_window.threads[0].any_signal.connect(main_window.thread_function)
+
+    # right decimal point
+    main_window.gui_structure.option_decimal_csv.set_value(0)
     main_window.save_scenario()
     main_window.start_current_scenario_calculation(False)
     with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:

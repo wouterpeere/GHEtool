@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Imbalance changed to property so it can handle hourly loads as well (issue #106).
 - Remove recalculation option (issue #109).
 - When data is loaded in a two-column format, the button for 'two columns' is set (issue #133).
+- GUI doesn't crash anymore when wrong seperator and decimal points are selected when loading a .csv.
 
 ### Fixed
 - Sizing doesn't crash when either no heating or cooling load is present (issue #91).
