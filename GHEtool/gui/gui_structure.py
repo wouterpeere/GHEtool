@@ -94,6 +94,11 @@ def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, 
     except:
         raise FileNotFoundError
 
+    # not the correct decimal seperator
+    if isinstance(df2.iloc[1, 1], str):
+        ghe_logger.error("Please select the correct decimal point seperator.")
+        raise ValueError
+
     # ---------------------- Time Step Section  ----------------------
     # import pandas here to save start up time
     from pandas import Series as pd_Series

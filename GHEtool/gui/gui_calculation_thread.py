@@ -6,6 +6,7 @@ import PySide6.QtCore as QtC
 
 from GHEtool.gui.gui_data_storage import DataStorage
 from GHEtool.gui.gui_structure import load_data_GUI
+from GHEtool.logger import ghe_logger
 
 
 class CalcProblem(QtC.QThread):
@@ -83,17 +84,22 @@ class CalcProblem(QtC.QThread):
         if self.DS.hourly_data:
             data_unit = self.DS.option_unit_data
 
-            peak_heating, peak_cooling = load_data_GUI(
-                filename=self.DS.option_filename,
-                thermal_demand=self.DS.option_column,
-                heating_load_column=self.DS.option_heating_column_text,
-                cooling_load_column=self.DS.option_cooling_column_text,
-                combined=self.DS.option_single_column_text,
-                sep=";" if self.DS.option_seperator_csv == 0 else ",",
-                dec="." if self.DS.option_decimal_csv == 0 else ",",
-                fac=0.001 if data_unit == 0 else 1 if data_unit == 1 else 1000,
-                hourly=True)
-
+            try:
+                peak_heating, peak_cooling = load_data_GUI(
+                    filename=self.DS.option_filename,
+                    thermal_demand=self.DS.option_column,
+                    heating_load_column=self.DS.option_heating_column_text,
+                    cooling_load_column=self.DS.option_cooling_column_text,
+                    combined=self.DS.option_single_column_text,
+                    sep=";" if self.DS.option_seperator_csv == 0 else ",",
+                    dec="." if self.DS.option_decimal_csv == 0 else ",",
+                    fac=0.001 if data_unit == 0 else 1 if data_unit == 1 else 1000,
+                    hourly=True)
+            except ValueError:
+                self.DS.ErrorMessage = "Please select the right decimal point seperator in the csv file!"
+                ghe_logger.error("Please select the right decimal point seperator in the csv file!")
+                self.any_signal.emit((self.DS, self.idx, self))
+                return
             # hourly data to be loaded
             borefield.set_hourly_heating_load(peak_heating)
             borefield.set_hourly_cooling_load(peak_cooling)

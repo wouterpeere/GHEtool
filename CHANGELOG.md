@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Imbalance changed to property so it can handle hourly loads as well (issue #106).
 - Remove recalculation option (issue #109).
 - When data is loaded in a two-column format, the button for 'two columns' is set (issue #133).
+- GUI doesn't crash anymore when wrong seperator and decimal points are selected when loading a .csv.
 
 ### Fixed
 - Sizing doesn't crash when either no heating or cooling load is present (issue #91).
@@ -30,6 +31,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Some translations were not correct.
 - Solves issue with loading .csv file and optimise load profile (issue #130).
 - Figure in optimize load profile keeps getting bigger and bigger (issue #131).
+- Problem with sizing with temperature gradients (issue #136).
 - Problem solved with calculate_multiple_scenarios.
 
 

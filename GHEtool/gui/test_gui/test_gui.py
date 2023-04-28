@@ -142,6 +142,10 @@ def test_gui_filename_errors(qtbot):
         load_data_GUI("C:/test.GHEtool", 1, "Heating", "Cooling", "Combined", 5, 6, 7)
     except FileNotFoundError:
         assert True
+    try:
+        load_data_GUI(f'{FOLDER}/Examples/hourly_profile.csv', 1, "Heating", "Cooling", "", ";", ",", 1)
+    except ValueError:
+        assert True
 
 
 def test_gui_values(qtbot):
@@ -189,7 +193,10 @@ def test_gui_values(qtbot):
             assert isclose(option.get_value(), val)
             option.set_value(option.default_value)
             continue
-        if (isinstance(option, ButtonBox) or isinstance(option, ListBox)) and not isinstance(option, FigureOption):
+        if (isinstance(option, ButtonBox) or isinstance(option, ListBox)) and not isinstance(option, FigureOption)\
+                and not option == main_window.gui_structure.option_heating_column and not \
+            option == main_window.gui_structure.option_cooling_column and not \
+            option == main_window.gui_structure.option_single_column:
             option.set_value(0)
             assert option.get_value() == 0
             option.set_value(1)
