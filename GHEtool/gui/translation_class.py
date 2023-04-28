@@ -225,6 +225,7 @@ class Translations:  # pragma: no cover
         "results_heating_peak_geo",
         "results_cooling_peak_geo",
         "option_ground_temp_gradient",
+        "hint_press_load",
         "languages",
     )
 
@@ -1795,4 +1796,13 @@ class Translations:  # pragma: no cover
             "Surface temperature [°C]: ",
             "Surface temperature [°C]: ",
             "Surface temperature [°C]:",
+        ]
+        self.hint_press_load: List[str] = [
+            "Press 'load' to load the hourly data.",
+            "Drücken Sie 'Laden', um die stündlichen Daten zu laden.",
+            "Druk op 'laden' om de data in te lezen.",
+            "Press 'load' to load the hourly data.",
+            "Press 'load' to load the hourly data.",
+            "Press 'load' to load the hourly data.",
+            "Press 'load' to load the hourly data.",
         ]
