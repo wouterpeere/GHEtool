@@ -648,6 +648,10 @@ class GuiStructure:
                 self.option_unit_data = ButtonBox(label=self.translations.option_unit_data, default_index=1, entries=["W", "kW", "MW"],
                                                   category=self.category_select_file)
 
+                self.hint_press_load = Hint(hint=self.translations.hint_press_load,
+                                            category=self.category_select_file,
+                                            warning=True)
+
                 self.button_load_csv = FunctionButton(category=self.category_select_file, button_text=self.translations.button_load_csv, icon=":/icons/icons/Download.svg")
 
                 # add dependencies
@@ -674,6 +678,12 @@ class GuiStructure:
                 self.aim_temp_profile.add_link_2_show(self.button_load_csv)
                 self.option_temperature_profile_hourly.add_link_2_show(self.button_load_csv, on_index=0)
                 self.aim_req_depth.add_link_2_show(self.button_load_csv)
+
+                self.option_method_size_depth.add_link_2_show(self.hint_press_load, on_index=0)
+                self.option_method_size_depth.add_link_2_show(self.hint_press_load, on_index=1)
+                self.aim_temp_profile.add_link_2_show(self.hint_press_load)
+                self.option_temperature_profile_hourly.add_link_2_show(self.hint_press_load, on_index=0)
+                self.aim_req_depth.add_link_2_show(self.hint_press_load)
                 # self.aim_size_length.add_link_2_show(self.button_load_csv)
 
                 # add change events

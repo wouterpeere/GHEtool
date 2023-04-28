@@ -221,3 +221,4 @@ SEER;SEER [-]: ;SEER [-]: ;SEER [-]: ;SEER [-]: ;SEER [-]: ;SEER [-]: ;SEER [-]:
 results_heating_peak_geo;with a peak of: , kW;mit einer Spitzenlast von , kW;met een piek van: , kW;with a peak of: , kW;with a peak of: , kW;with a peak of: , kW;with a peak of: , kW
 results_cooling_peak_geo;with a peak of: , kW;mit einer Spitzenlast von , kW;met een piek van: , kW;with a peak of: , kW;with a peak of: , kW;with a peak of: , kW;with a peak of: , kW
 option_ground_temp_gradient;Surface temperature [°C]: ;Umgebungstemperatur[°C]: ;Omgevingstemperatuur [°C]: ;Surface temperature [°C]: ;Surface temperature [°C]: ;Surface temperature [°C]: ;Surface temperature [°C]:
+hint_press_load;Press 'load' to load the hourly data.;Drücken Sie 'Laden', um die stündlichen Daten zu laden.;Druk op 'laden' om de data in te lezen.;Press 'load' to load the hourly data.;Press 'load' to load the hourly data.;Press 'load' to load the hourly data.;Press 'load' to load the hourly data.
