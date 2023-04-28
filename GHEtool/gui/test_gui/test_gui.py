@@ -226,6 +226,18 @@ def test_gui_values(qtbot):
         assert main_window.gui_structure.option_single_column.widget.itemText(idx) == column
 
     main_window.gui_structure.aim_temp_profile.widget.click() if not main_window.gui_structure.aim_temp_profile.widget.isChecked() else None
+    # wrong decimal point
+    main_window.gui_structure.option_decimal_csv.set_value(1)
+    main_window.gui_structure.option_seperator_csv.set_value(0)
+    main_window.gui_structure.option_filename.set_value(f'{FOLDER}/Examples/hourly_profile.csv')
+    main_window.save_scenario()
+    main_window.start_current_scenario_calculation(False)
+    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
+        main_window.threads[0].run()
+        main_window.threads[0].any_signal.connect(main_window.thread_function)
+
+    # right decimal point
+    main_window.gui_structure.option_decimal_csv.set_value(0)
     main_window.save_scenario()
     main_window.start_current_scenario_calculation(False)
     with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
