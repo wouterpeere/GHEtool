@@ -339,8 +339,6 @@ def test_file_import_errors(qtbot):
     assert np.isclose(data_new["Cooling Load"][11], g_s.option_cl_dec.get_value(), atol=1)
 
 
-    
-    
 def test_load_data_GUI():
     from GHEtool.gui.gui_structure import load_data_GUI
     from pandas import DataFrame, Series, date_range, read_csv, to_datetime

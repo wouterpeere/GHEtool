@@ -92,7 +92,7 @@ def create_borefield(g_s: GuiStructure) -> Borefield:
 
 
 @given(depth=st.floats(5, 1_000), k_s=st.floats(0.1, 10), heat_cap=st.floats(500, 10_000), ground_temp=st.floats(10, 50), r_b=st.floats(0.05, 0.2))
-@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=30,  deadline=None)
+@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=30)
 def test_temp_profile_ground_data(qtbot, depth: float, k_s: float, heat_cap: float, ground_temp: float, r_b: float):
     # depth: float = 100
     # k_s: float = 5
@@ -140,7 +140,7 @@ def test_temp_profile_ground_data(qtbot, depth: float, k_s: float, heat_cap: flo
 
 
 @given(gradient=st.floats(0.5, 10), ground_temp=st.floats(0, 20))
-@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=10,  deadline=None)
+@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=10)
 def test_temp_profile_temp_gradient(qtbot, gradient: float, ground_temp: float):
     # depth: float = 100
     # k_s: float = 5
@@ -294,7 +294,7 @@ def test_import_borefield_data(qtbot):
 
 @given(n_pipes=st.integers(1, 2), conduct_grout=st.floats(0.1, 1), conduct_pipe=st.floats(0.1, 1), inner_pipe=st.floats(0.01, 0.03),
        pipe_thickness=st.floats(0.001, 0.005), roughness=st.floats(0.000_000_1, 0.000_01))
-@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=5,  deadline=None)
+@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=5)
 def test_temp_profile_pipe_data(qtbot, n_pipes: int, conduct_grout: float, conduct_pipe: float, inner_pipe: float, pipe_thickness: float,
                                 roughness: float):
     # depth: float = 100
@@ -410,7 +410,7 @@ def test_temp_profile_fluid_data(qtbot, conduct: float, density: float, heat_cap
 
 
 @given(width=st.integers(1,30), length=st.integers(1,30), spacing=st.floats(1, 20), burial_depth=st.floats(0.5, 2), radius=st.floats(0.05, 0.15))
-@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=50,  deadline=None)
+@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=50)
 def test_temp_profile_borefield_data(qtbot, width: int, length: int, spacing: float, burial_depth: float, radius: float):
     # init gui window
     main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
@@ -451,7 +451,7 @@ def test_temp_profile_borefield_data(qtbot, width: int, length: int, spacing: fl
 
 
 @given(L2=st.booleans(), temps=st.tuples(st.floats(-10, 40), st.floats(4, 12), st.floats(4, 12)))
-@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=10,  deadline=None)
+@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=10)
 def test_sizing_L2_L3_min_max(qtbot, L2: bool, temps: Tuple[float, float, float]) -> None:
     min_temp = round_down(temps[0], 2)
     ground_temp = round_down(temps[0] + temps[1], 2)
@@ -495,7 +495,7 @@ def test_sizing_L2_L3_min_max(qtbot, L2: bool, temps: Tuple[float, float, float]
 
 
 @given(period=st.integers(5, 100), peak_heating=st.floats(1, 24), peak_cooling=st.floats(1, 24))
-@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=50,  deadline=None)
+@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=50)
 def test_temp_profile_period_peak_length(qtbot, period: int, peak_heating: float, peak_cooling: float) -> None:
     # init gui window
     main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
@@ -532,7 +532,7 @@ def test_temp_profile_period_peak_length(qtbot, period: int, peak_heating: float
 
 
 @given(delay=st.integers(0, 12), factor=st.floats(0, 2))
-@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=50,  deadline=None)
+@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=50)
 def test_temp_profile_heating_data(qtbot, delay: int, factor: float) -> None:
     # init gui window
     main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
@@ -577,7 +577,7 @@ def test_temp_profile_heating_data(qtbot, delay: int, factor: float) -> None:
 
 
 @given(delay=st.integers(0, 12), factor=st.floats(0, 2))
-@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=50,  deadline=None)
+@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=50)
 def test_temp_profile_cooling_data(qtbot, delay: int, factor: float) -> None:
     """
     test cooling data
