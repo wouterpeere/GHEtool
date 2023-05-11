@@ -133,6 +133,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         logging.info(self.translations.GHE_tool_imported[self.gui_structure.option_language.get_value()])
         # allow checking of changes
         self.checking: bool = True
+        self.no_scenario_changing: bool = False
 
         self.display_results()
 
@@ -400,7 +401,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             t.timeout.connect(hello)
             t.start(10)  # after 30 seconds, "hello, world" will be printed
         # check if the auto saving should be performed and then save the last selected scenario
-        if self.gui_structure.option_auto_saving.get_value() == 1:
+        if self.gui_structure.option_auto_saving.get_value() == 1 and not self.no_scenario_changing:
             if not self.check_values():
                 return_2_old_item()
                 return
@@ -735,6 +736,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         -------
         None
         """
+        self.no_scenario_changing = True
 
         def general_changes(scenarios):
             # change window title to new loaded filename
@@ -754,6 +756,7 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
             self.list_widget_scenario.clear()
             self.list_widget_scenario.addItems(scenarios)
             self.list_widget_scenario.setCurrentRow(0)
+            self.no_scenario_changing = False
             self.check_results()
 
         try:
