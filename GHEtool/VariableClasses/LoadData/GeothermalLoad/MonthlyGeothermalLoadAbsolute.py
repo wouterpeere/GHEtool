@@ -118,18 +118,6 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             return
         raise ValueError
 
-    @property
-    def baseload_cooling_power(self) -> np.ndarray:
-        """
-        This function returns the average cooling power per month [kW/month].
-
-        Returns
-        -------
-        baseload cooling : np.ndarray
-            Baseload cooling values [kW avg/month] for one year, so the length of the array is 12
-        """
-        return self.baseload_cooling / _LoadData.UPM
-
     def set_baseload_cooling(self, load: Union[np.ndarray, list, tuple]) -> None:
         """
         This function sets the baseload cooling [kWh/month] after it has been checked.
@@ -193,18 +181,6 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             self.peak_heating = np.maximum(self.peak_heating, self.baseload_heating_power)
             return
         raise ValueError
-
-    @property
-    def baseload_heating_power(self) -> np.ndarray:
-        """
-        This function returns the average heating power per month [kW/month].
-
-        Returns
-        -------
-        baseload heating : np.ndarray
-            Baseload heating values [kW avg/month] for one year, so the length of the array is 12
-        """
-        return self.baseload_heating / _LoadData.UPM
 
     def set_baseload_heating(self, load: Union[np.ndarray, list, tuple]) -> None:
         """

@@ -74,7 +74,7 @@ class _LoadData(BaseClass, ABC):
         baseload heating : np.ndarray
         """
 
-    @abc.abstractmethod
+    @property
     def baseload_heating_power(self) -> np.ndarray:
         """
         This function returns the baseload heating in kW avg/month.
@@ -83,6 +83,7 @@ class _LoadData(BaseClass, ABC):
         -------
         baseload heating : np.ndarray
         """
+        return self.baseload_heating / _LoadData.UPM
 
     @abc.abstractmethod
     def baseload_cooling(self) -> np.ndarray:
@@ -94,7 +95,7 @@ class _LoadData(BaseClass, ABC):
         baseload cooling : np.ndarray
         """
 
-    @abc.abstractmethod
+    @property
     def baseload_cooling_power(self) -> np.ndarray:
         """
         This function returns the baseload cooling in kW avg/month.
@@ -103,6 +104,7 @@ class _LoadData(BaseClass, ABC):
         -------
         baseload cooling : np.ndarray
         """
+        return self.baseload_cooling / _LoadData.UPM
 
     @property
     def imbalance(self) -> float:

@@ -75,7 +75,7 @@ def test_peak_cooling():
     load.set_peak_cooling(np.linspace(1, 12, 12))
     assert np.array_equal(load.peak_cooling, np.linspace(1, 12, 12))
     load.set_baseload_cooling(np.ones(12) * 730 * 5)
-    assert np.array_equal(load.peak_cooling, np.array([ 5.,  5.,  5.,  5.,  5.,  6.,  7.,  8.,  9., 10., 11., 12.]))
+    assert np.array_equal(load.peak_cooling, np.array([5.,  5.,  5.,  5.,  5.,  6.,  7.,  8.,  9., 10., 11., 12.]))
     try:
         load.set_peak_cooling(np.ones(11))
     except ValueError:

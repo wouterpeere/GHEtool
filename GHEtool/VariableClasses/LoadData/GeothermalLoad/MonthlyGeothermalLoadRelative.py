@@ -3,8 +3,9 @@ This file contains the code for the monthly geothermal load data where the load 
 and also a yearly total and peak.
 """
 
-from GHEtool.VariableClasses.LoadData._LoadData import _LoadData
+from GHEtool.VariableClasses.LoadData.GeothermalLoad import MonthlyGeothermalLoadAbsolute
 
 
-class MonthlyGeothermalLoadRelative(_LoadData):
+class MonthlyGeothermalLoadRelative(MonthlyGeothermalLoadAbsolute):
+    # louter herdefinieren hoe de verschillende parameters (baseload/peak load) worden bekomen
     pass
