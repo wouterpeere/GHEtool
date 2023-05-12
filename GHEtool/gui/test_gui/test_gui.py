@@ -1,3 +1,5 @@
+import os
+from functools import partial
 from pathlib import Path
 from sys import setrecursionlimit
 
@@ -339,8 +341,6 @@ def test_file_import_errors(qtbot):
     assert np.isclose(data_new["Cooling Load"][11], g_s.option_cl_dec.get_value(), atol=1)
 
 
-    
-    
 def test_load_data_GUI():
     from GHEtool.gui.gui_structure import load_data_GUI
     from pandas import DataFrame, Series, date_range, read_csv, to_datetime
@@ -374,4 +374,45 @@ def test_load_data_GUI():
     calc_data = load_data_GUI(FOLDER.joinpath("Examples/hourly_profile.csv"), 1, "Heating", "Cooling", "Heating", ";", ".", 1, True)
     assert np.allclose(data["Heating"], calc_data[0])
     assert np.allclose(data["Cooling"], calc_data[1])
+
+def test_bug_when_opening_scenarios_which_have_autosave_enabled(qtbot):
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window.delete_backup()
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window.gui_structure.option_auto_saving.set_value(1)
+    main_window.add_scenario()
+    main_window.add_scenario()
+    main_window.gui_structure.aim_req_depth.widget.click()
+
+    ds_old = main_window.list_ds[0]
+
+    def get_save_file_name(*args, **kwargs):
+        """getSaveFileName proxy"""
+        return kwargs["return_value"]
+
+    filename_1= main_window.default_path.joinpath("try_open1.GHEtool")
+    filename_2 = main_window.default_path.joinpath("try_open2.GHEtool")
+    QtW.QFileDialog.getSaveFileName = partial(get_save_file_name, return_value=(f"{filename_1}", "GHEtool (*.GHEtool)"))
+    assert not main_window.gui_structure.aim_optimize.widget.isChecked()
+    main_window.action_save_as.trigger()
+    main_window.gui_structure.aim_optimize.widget.click()
+    QtW.QFileDialog.getSaveFileName = partial(get_save_file_name, return_value=(f"{filename_2}", "GHEtool (*.GHEtool)"))
+    assert main_window.gui_structure.aim_optimize.widget.isChecked()
+    main_window.action_save_as.trigger()
+    QtW.QFileDialog.getOpenFileName = partial(get_save_file_name, return_value=(f"{filename_1}", "GHEtool (*.GHEtool)"))
+    main_window.action_open.trigger()
+    assert not main_window.gui_structure.aim_optimize.widget.isChecked()
+    main_window.list_widget_scenario.setCurrentRow(1)
+    main_window.list_widget_scenario.setCurrentRow(0)
+    ds_new = main_window.list_ds[0]
+    for option in ds_new.list_options_aims:
+        if isinstance(getattr(ds_old, option), (int, float)):
+            assert np.isclose(getattr(ds_old, option), getattr(ds_new, option))
+            continue
+        if isinstance(getattr(ds_old, option), (str, bool)):
+            assert getattr(ds_old, option) == getattr(ds_new, option)
+            continue
+    os.remove(main_window.default_path.joinpath(filename_1))
+    os.remove(main_window.default_path.joinpath(filename_2))
+    main_window.delete_backup()
 

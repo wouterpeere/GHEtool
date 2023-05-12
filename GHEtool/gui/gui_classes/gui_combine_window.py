@@ -26,7 +26,6 @@ class MainWindow(MainWindow):
     saving documents etc.)
     """
 
-
     def _load_from_data(self, location: str) -> None:
         """
         This function loads the data from a JSON formatted file.
@@ -44,13 +43,10 @@ class MainWindow(MainWindow):
         def general_changes(scenarios):
             # change window title to new loaded filename
             self.change_window_title()
-            # replace user window id
-            for DS in self.list_ds:
-                DS.ui = id(self)
-
             # init user window by reset scenario list widget and check for results
             self.list_widget_scenario.clear()
             self.list_widget_scenario.addItems(scenarios)
+            self.change_scenario(0)
             self.list_widget_scenario.setCurrentRow(0)
             self.check_results()
 
@@ -62,9 +58,9 @@ class MainWindow(MainWindow):
             version = saving['version']
         except FileNotFoundError:
             logging.info(self.translations.no_file_selected[self.gui_structure.option_language.get_value()[0]])
-            return 
-            #raise ImportError("The datafile cannot be loaded!")
-        except (JSONDecodeError,  UnicodeDecodeError):
+            return
+            # raise ImportError("The datafile cannot be loaded!")
+        except (JSONDecodeError, UnicodeDecodeError):
             # try to open as pickle
             import GHEtool
             from ScenarioGUI.gui_classes import gui_data_storage
@@ -72,6 +68,7 @@ class MainWindow(MainWindow):
             from GHEtool import GroundConstantTemperature
             class BoreFieldNew:
                 """nothing"""
+
             BorefielOld = Borefield
             GHEtool.VariableClasses.VariableClasses.GroundData = GroundConstantTemperature
             GHEtool.gui.gui_data_storage.DataStorage = gui_data_storage.DataStorage
@@ -88,10 +85,10 @@ class MainWindow(MainWindow):
                 ds = DataStorage(self.gui_structure)
                 ds.from_dict(val)
                 if borefield is None:
-                    setattr(ds, 'results', None)
+                    ds.results = None
                 else:
-                    setattr(ds, 'results', Borefield())
-                    getattr(ds, 'results').from_dict(borefield)
+                    ds.results = Borefield()
+                    ds.results.from_dict(borefield)
                 self.list_ds.append(ds)
             # set and change the window title
             self.filename = saving['filename']
