@@ -20,7 +20,8 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
     def __init__(self, baseload_heating: Union[np.ndarray, list, tuple] = np.zeros(12),
                  baseload_cooling: Union[np.ndarray, list, tuple] = np.zeros(12),
                  peak_heating: Union[np.ndarray, list, tuple] = np.zeros(12),
-                 peak_cooling: Union[np.ndarray, list, tuple] = np.zeros(12)):
+                 peak_cooling: Union[np.ndarray, list, tuple] = np.zeros(12),
+                 simulation_period: int = 20):
         """
 
         Parameters
@@ -33,9 +34,11 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             Peak heating values [kW/month]
         peak_cooling : np.ndarray, list, tuple
             Peak cooling values [kW/month]
+        simulation_period : int
+            Length of the simulation period in years
         """
 
-        super().__init__(hourly_resolution=False)
+        super().__init__(hourly_resolution=False, simulation_period=simulation_period)
 
         # initiate variables
         self._baseload_heating: np.ndarray = np.zeros(12)
