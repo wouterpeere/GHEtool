@@ -98,3 +98,12 @@ def test_times():
 
     load.simulation_period = 100
     assert not np.isinf(load.time_L4.any())
+    assert load.ty == 100 * 8760 * 3600
+
+
+def test_monthly_average_load():
+    load = MonthlyGeothermalLoadAbsolute()
+    load.baseload_cooling = np.ones(12) * 400
+    load.baseload_heating = np.ones(12) * 500
+    assert np.average(load.baseload_cooling_power) * 8760 == 400
+    assert np.average(load.baseload_heating_power) * 8760 == 500

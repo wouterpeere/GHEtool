@@ -14,9 +14,10 @@ class _LoadData(BaseClass, ABC):
     """
     This class contains information w.r.t. load data for the borefield sizing.
     """
-    __slots__ = 'hourly_resolution', 'simulation_period', '_peak_heating_duration', '_peak_cooling_duration', 'tm'
+    __slots__ = 'hourly_resolution', 'simulation_period', '_peak_heating_duration', '_peak_cooling_duration', 'tm',\
+                'all_months_equal'
 
-    UPM: float = 730.  # number of hours per month
+    AVG_UPM: float = 730.  # number of hours per month
     DEFAULT_LENGTH_PEAK: int = 6  # hours
 
     def __init__(self, hourly_resolution: bool, simulation_period: int = 20):
@@ -33,7 +34,24 @@ class _LoadData(BaseClass, ABC):
         self.simulation_period: int = simulation_period
         self._peak_cooling_duration: int = _LoadData.DEFAULT_LENGTH_PEAK
         self._peak_heating_duration: int = _LoadData.DEFAULT_LENGTH_PEAK
-        self.tm: int = _LoadData.UPM * 3600  # time in a month in seconds
+        self.tm: int = _LoadData.AVG_UPM * 3600  # time in a month in seconds
+        self.all_months_equal: bool = True  # true if it is assumed that all months are of the same length
+
+    @property
+    def UPM(self) -> np.ndarray:
+        """
+        Depending on whether or not all months are assumed to have equal length, the UPM are either constant
+        or vary during the year.
+
+        Returns
+        -------
+        Hours per month : np.ndarray
+        """
+        if self.all_months_equal:
+            # every month has equal length
+            return np.ones(12) * _LoadData.AVG_UPM
+        else:
+            return np.array([744, 672, 744, 720, 744, 720, 744, 744, 720, 744, 720, 744])
 
     @abc.abstractmethod
     def _check_input(self, input: Union[np.ndarray, list, tuple]) -> bool:
@@ -90,7 +108,7 @@ class _LoadData(BaseClass, ABC):
         -------
         baseload heating : np.ndarray
         """
-        return self.baseload_heating / _LoadData.UPM
+        return np.divide(self.baseload_heating, self.UPM)
 
     @abc.abstractmethod
     def baseload_cooling(self) -> np.ndarray:
@@ -111,7 +129,7 @@ class _LoadData(BaseClass, ABC):
         -------
         baseload cooling : np.ndarray
         """
-        return self.baseload_cooling / _LoadData.UPM
+        return np.divide(self.baseload_cooling, self.UPM)
 
     def baseload_heating_simulation_period(self, sim_period: int) -> np.ndarray:
         """
@@ -275,6 +293,7 @@ class _LoadData(BaseClass, ABC):
         None
         """
         self._peak_cooling_duration = duration * 3600
+
     @property
     def peak_duration(self) -> None:
         """
@@ -284,6 +303,7 @@ class _LoadData(BaseClass, ABC):
         -------
         None
         """
+        return
 
     @peak_duration.setter
     def peak_duration(self, duration: float) -> None:
@@ -323,8 +343,7 @@ class _LoadData(BaseClass, ABC):
         -------
         Times for the L3 sizing : np.ndarray
         """
-        hours_per_month = np.array([744, 672, 744, 720, 744, 720, 744, 744, 720, 744, 720, 744])
-        return np.cumsum(np.tile(hours_per_month, self.simulation_period) * 3600)
+        return np.cumsum(np.tile(self.UPM, self.simulation_period) * 3600)
 
     @property
     def time_L4(self) -> np.ndarray:
