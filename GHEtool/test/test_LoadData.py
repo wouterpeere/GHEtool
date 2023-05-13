@@ -3,6 +3,7 @@ import pytest
 import numpy as np
 
 from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute
+from GHEtool.test.test_GHEtool_two import load_case
 
 
 def test_checks():
@@ -138,3 +139,34 @@ def test_monthly_average_load():
 
     assert np.isclose(np.sum(np.multiply(load.baseload_cooling_power, load.UPM)), 400 * 12)
     assert np.isclose(np.sum(np.multiply(load.baseload_heating_power, load.UPM)), 500 * 12)
+
+
+def test_params_last_year():
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
+    load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
+    assert np.array_equal(load._calculate_last_year_params(False),
+                          (21600.0, 240000.0, 65753.42465753425, 9132.420091324202))
+    assert np.array_equal(load._calculate_last_year_params(True),
+                          (21600.0, 160000.0, 25753.424657534248, -9132.420091324202))
+    load.peak_heating = np.ones(12) * 160
+    load.peak_cooling = np.ones(12) * 240
+    assert np.array_equal(load._calculate_last_year_params(False),
+                          (21600.0, 240000.0, 65753.42465753425, 9132.420091324202))
+    assert np.array_equal(load._calculate_last_year_params(True),
+                          (21600.0, 160000.0, 25753.424657534248, -9132.420091324202))
+
+
+def test_params_first_year():
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
+    load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
+    assert np.array_equal(load._calculate_first_year_params(False),
+                          (21600.0, 18396000.0, 21024000.0, 240000.0, 6410.9589041095915, 65753.42465753425))
+    assert np.array_equal(load._calculate_first_year_params(True),
+                          (21600.0, 0, 2628000.0, 160000.0, 0, 25753.424657534248))
+    load.peak_heating = np.ones(12) * 160
+    load.peak_cooling = np.ones(12) * 240
+
+    assert np.array_equal(load._calculate_first_year_params(False),
+                          (21600.0, 15768000.0, 18396000.0, 240000.0, -2066.536203522503, 65753.42465753425))
+    assert np.array_equal(load._calculate_first_year_params(True),
+                          (21600.0, 0, 2628000.0, 160000.0, 0, 25753.424657534248))
