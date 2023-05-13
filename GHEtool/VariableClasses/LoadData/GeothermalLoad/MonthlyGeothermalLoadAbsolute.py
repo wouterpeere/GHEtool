@@ -179,7 +179,7 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             values
         """
         if self._check_input(load):
-            self._baseload_heating = load
+            self._baseload_heating = np.array(load)
             # set peak load
             self.peak_heating = np.maximum(self.peak_heating, self.baseload_heating_power)
             return
@@ -206,7 +206,7 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             When either the length is not 12, the input is not of the correct type, or it contains negative
             values
         """
-        self.baseload_heating = load
+        self.baseload_heating = np.array(load)
 
     @property
     def peak_cooling(self) -> np.ndarray:
@@ -266,7 +266,7 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             When either the length is not 12, the input is not of the correct type, or it contains negative
             values
         """
-        self.peak_cooling = load
+        self.peak_cooling = np.array(load)
 
     @property
     def peak_heating(self) -> np.ndarray:
@@ -326,4 +326,4 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             When either the length is not 12, the input is not of the correct type, or it contains negative
             values
         """
-        self.peak_heating = load
+        self.peak_heating = np.array(load)

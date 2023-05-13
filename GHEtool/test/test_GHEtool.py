@@ -96,10 +96,10 @@ def test_borefield():
     borefield.set_max_ground_temperature(16)  # maximum temperature
     borefield.set_min_ground_temperature(0)  # minimum temperature
 
-    assert borefield.simulation_period == 20
+    assert borefield._load.simulation_period == 20
     assert borefield.Tf_min == 0
     assert borefield.Tf_max == 16
-    np.testing.assert_array_equal(borefield.peak_heating, np.array([160., 142, 102., 55., 26.301369863013697, 0., 0., 0., 40.4, 85., 119., 136.]))
+    np.testing.assert_array_equal(borefield._load.peak_heating, np.array([160., 142, 102., 55., 26.301369863013697, 0., 0., 0., 40.4, 85., 119., 136.]))
 
 
 @pytest.fixture
@@ -267,7 +267,7 @@ def test_size(borefield):
 
 
 def test_imbalance(borefield):
-    assert borefield.imbalance == -140000.0
+    assert borefield._load.imbalance == -140000.0
 
 
 def test_temperatureProfile(borefield):
@@ -291,11 +291,6 @@ def test_load_custom_configuration(borefield):
 
     borefield.set_borefield(custom_field)
     assert borefield.borefield == custom_field
-
-
-def test_simulation_period(borefield):
-    borefield.set_simulation_period(25)
-    assert borefield.simulation_period == 25
 
 
 def test_without_pipe(borefield):

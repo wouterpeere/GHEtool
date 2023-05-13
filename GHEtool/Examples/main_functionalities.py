@@ -56,11 +56,11 @@ def main_functionalities():
     borefield.set_min_ground_temperature(0)    # minimum temperature
 
     # size borefield
-    depth = borefield.size(100)
+    depth = borefield.size(100, L3_sizing=True)
     print("The borehole depth is: ", depth, "m")
 
     # print imbalance
-    print("The borefield imbalance is: ", borefield.imbalance, "kWh/y. (A negative imbalance means the the field is heat extraction dominated so it cools down year after year.)") # print imbalance
+    print("The borefield imbalance is: ", borefield._load.imbalance, "kWh/y. (A negative imbalance means the the field is heat extraction dominated so it cools down year after year.)") # print imbalance
 
     # plot temperature profile for the calculated depth
     borefield.print_temperature_profile(legend=True)
