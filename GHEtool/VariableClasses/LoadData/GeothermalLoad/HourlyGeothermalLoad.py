@@ -8,7 +8,6 @@ import pandas as pd
 from typing import Union
 from GHEtool.VariableClasses.LoadData._LoadData import _LoadData
 from GHEtool.logger import ghe_logger
-from GHEtool.gui.gui_structure import load_data_GUI
 
 
 class HourlyGeothermalLoad(_LoadData):

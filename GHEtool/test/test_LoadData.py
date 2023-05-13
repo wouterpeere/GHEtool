@@ -80,3 +80,21 @@ def test_peak_cooling():
         load.set_peak_cooling(np.ones(11))
     except ValueError:
         assert True
+
+
+def test_times():
+    load = MonthlyGeothermalLoadAbsolute()
+    load.peak_cooling_duration = 6
+    load.peak_heating_duration = 7
+    assert load.peak_heating_duration == 7 * 3600
+    assert load.peak_cooling_duration == 6 * 3600
+    load.peak_duration = 8
+    assert load.peak_heating_duration == 8 * 3600
+    assert load.peak_cooling_duration == 8 * 3600
+
+    load.simulation_period = 20
+    assert load.time_L3[-1] == 20 * 3600 * 8760
+    assert load.time_L4[-1] == 20 * 3600 * 8760
+
+    load.simulation_period = 100
+    assert not np.isinf(load.time_L4.any())

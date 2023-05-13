@@ -447,7 +447,6 @@ class _LoadData(BaseClass, ABC):
             th = 3600. * self.length_peak_cooling
 
             # Select month with the highest peak load and take both the peak and average load from that month
-            # Select month with the highest peak load and take both the peak and average load from that month
             if np.max(self.peak_cooling) != np.average(self.peak_cooling):
                 month_index = np.where(self.peak_cooling == np.max(self.peak_cooling))[0, 0]
             else:
@@ -465,4 +464,4 @@ class _LoadData(BaseClass, ABC):
         tcm = self.time_L3[month_index]
         tpm = self.time_L3[month_index - 1] if month_index > 0 else 0
 
-        return month_index
+        return th, tpm, tcm, qh, qpm, qm
