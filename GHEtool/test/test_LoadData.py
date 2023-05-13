@@ -105,5 +105,36 @@ def test_monthly_average_load():
     load = MonthlyGeothermalLoadAbsolute()
     load.baseload_cooling = np.ones(12) * 400
     load.baseload_heating = np.ones(12) * 500
-    assert np.average(load.baseload_cooling_power) * 8760 == 400
-    assert np.average(load.baseload_heating_power) * 8760 == 500
+
+    assert np.isclose(np.average(load.baseload_cooling_power) * 8760, 400 * 12)
+    assert np.isclose(np.average(load.baseload_heating_power) * 8760, 500 * 12)
+    assert np.array_equal(load.baseload_cooling_power, load.peak_cooling)
+    assert np.array_equal(load.baseload_heating_power, load.peak_heating)
+
+    assert np.array_equal(load.baseload_cooling_power_simulation_period,
+                          np.tile(load.baseload_cooling_power, 20))
+    assert np.array_equal(load.baseload_heating_power_simulation_period,
+                          np.tile(load.baseload_heating_power, 20))
+    assert np.array_equal(load.peak_heating_simulation_period,
+                          np.tile(load.peak_heating, 20))
+    assert np.array_equal(load.peak_cooling_simulation_period,
+                          np.tile(load.peak_cooling, 20))
+    assert np.array_equal(load.baseload_cooling_simulation_period,
+                   np.tile(load.baseload_cooling, 20))
+    assert np.array_equal(load.baseload_heating_simulation_period,
+                          np.tile(load.baseload_heating, 20))
+
+    assert np.array_equal(load.monthly_average_load, load.baseload_cooling_power-load.baseload_heating_power)
+    assert np.array_equal(load.monthly_average_load_simulation_period,
+                          load.baseload_cooling_power_simulation_period-load.baseload_heating_power_simulation_period)
+
+    # test now with different month loads
+    temp_cooling = load.baseload_cooling_power
+    temp_heating = load.baseload_heating_power
+
+    load.all_months_equal = False
+    assert not np.array_equal(load.baseload_cooling_power, temp_cooling)
+    assert not np.array_equal(load.baseload_heating_power, temp_heating)
+
+    assert np.isclose(np.sum(np.multiply(load.baseload_cooling_power, load.UPM)), 400 * 12)
+    assert np.isclose(np.sum(np.multiply(load.baseload_heating_power, load.UPM)), 500 * 12)

@@ -131,21 +131,17 @@ class _LoadData(BaseClass, ABC):
         """
         return np.divide(self.baseload_cooling, self.UPM)
 
-    def baseload_heating_simulation_period(self, sim_period: int) -> np.ndarray:
+    @property
+    def baseload_heating_simulation_period(self) -> np.ndarray:
         """
         This function returns the baseload heating in kWh/month for a whole simulation period.
-
-        Parameters
-        ----------
-        sim_period : int
-            Length of the simulation period in years
 
         Returns
         -------
         baseload heating : np.ndarray
             baseload heating for the whole simulation period
         """
-        return np.tile(self.baseload_heating, sim_period)
+        return np.tile(self.baseload_heating, self.simulation_period)
 
     @property
     def baseload_cooling_simulation_period(self) -> np.ndarray:
@@ -231,7 +227,7 @@ class _LoadData(BaseClass, ABC):
         return self.baseload_cooling_power - self.baseload_heating_power
 
     @property
-    def monthy_average_load_simulation_period(self) -> np.ndarray:
+    def monthly_average_load_simulation_period(self) -> np.ndarray:
         """
         This function calculates the average monthly load in kW for the whole simulation period.
 

@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Changed icon of GHEtool.
 - Imbalance changed to property so it can handle hourly loads as well (issue #106).
 - Remove recalculation option (issue #109).
+- One can now use monthly calculations which do not assume equal month length.
 
 ### Fixed
 - Wrong heating load in april in GUI (issue #94).
