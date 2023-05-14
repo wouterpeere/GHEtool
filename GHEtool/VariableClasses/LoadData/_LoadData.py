@@ -245,7 +245,7 @@ class _LoadData(BaseClass, ABC):
         -------
         Length peak in heating [s]
         """
-        return self._peak_heating_duration
+        return self._peak_heating_duration * 3600
 
     @peak_heating_duration.setter
     def peak_heating_duration(self, duration: float) -> None:
@@ -261,7 +261,7 @@ class _LoadData(BaseClass, ABC):
         -------
         None
         """
-        self._peak_heating_duration = duration * 3600
+        self._peak_heating_duration = duration
 
     @property
     def peak_cooling_duration(self) -> float:
@@ -272,7 +272,7 @@ class _LoadData(BaseClass, ABC):
         -------
         Duration of the peak in cooling [s]
         """
-        return self._peak_cooling_duration
+        return self._peak_cooling_duration * 3600
 
     @peak_cooling_duration.setter
     def peak_cooling_duration(self, duration: float) -> None:
@@ -288,7 +288,7 @@ class _LoadData(BaseClass, ABC):
         -------
         None
         """
-        self._peak_cooling_duration = duration * 3600
+        self._peak_cooling_duration = duration
 
     @property
     def peak_duration(self) -> None:
