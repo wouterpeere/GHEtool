@@ -381,7 +381,7 @@ class _LoadData(BaseClass, ABC):
             # limited by extraction load
 
             # set length peak
-            th = 3600. * self.peak_heating_duration
+            th = self.peak_heating_duration
 
             # Select month with the highest peak load and take both the peak and average load from that month
             if np.max(self.peak_heating) != np.average(self.peak_heating):
@@ -400,7 +400,7 @@ class _LoadData(BaseClass, ABC):
             # limited by injection load
 
             # set length peak
-            th = 3600. * self.peak_cooling_duration
+            th = self.peak_cooling_duration
 
             # Select month with the highest peak load and take both the peak and average load from that month
             if np.max(self.peak_cooling) != np.average(self.peak_cooling):
@@ -436,7 +436,7 @@ class _LoadData(BaseClass, ABC):
             # limited by extraction load
 
             # set peak length
-            th = 3600. * self.peak_heating_duration
+            th = self.peak_heating_duration
 
             # Select month with the highest peak load and take both the peak and average load from that month
             if np.max(self.peak_heating) != np.average(self.peak_heating):
@@ -459,7 +459,7 @@ class _LoadData(BaseClass, ABC):
             # limited by injection
 
             # set peak length
-            th = 3600. * self.peak_cooling_duration
+            th = self.peak_cooling_duration
 
             # Select month with the highest peak load and take both the peak and average load from that month
             if np.max(self.peak_cooling) != np.average(self.peak_cooling):

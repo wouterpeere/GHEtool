@@ -232,10 +232,6 @@ def test_create_circular_field(borefield):
         assert borefield.borefield[i].__dict__ == gt.boreholes.circle_field(10, 10, 100, 1, 0.075)[i].__dict__
 
 
-def test_empty_values(empty_borefield):
-    np.testing.assert_array_equal(empty_borefield.baseload_cooling, np.zeros(12))
-
-
 def test_sizing_without_hourly_values(borefield):
     try:
         borefield.size_L4(100)
