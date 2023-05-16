@@ -230,29 +230,6 @@ class GUI(GuiStructure):
         )
         self.category_borefield.activate_graphic_left()
 
-        self.option_seperator_borefield = ButtonBox(label=translations.option_seperator_borefield, default_index=0,
-                                              entries=['Semicolon ";"', 'Comma ","', 'Tab "   "'],
-                                              category=self.category_borefield)
-        self.option_decimal_borefield = ButtonBox(label=translations.option_decimal_borefield, default_index=0,
-                                            entries=['Point "."', 'Comma ","'],
-                                            category=self.category_borefield)
-
-        file = f"{FOLDER.joinpath('gui/test_gui/borefield_data.csv')}"
-        self.borefield_file = els.FileNameBox(label=translations.borefield_file, category=self.category_borefield, default_value=file, file_extension=["csv", "txt"])
-        self.import_borefield = els.FunctionButton(button_text=translations.import_borefield, icon="Download", category=self.category_borefield)
-        self.import_borefield.change_event(self.fun_import_borefield)
-
-        self.custom_borefield = els.FlexibleAmount(label=translations.custom_borefield, default_length=1, entry_mame="Borehole", category=self.category_borefield,
-                                                   min_length=1)
-        self.custom_borefield.add_option(els.FloatBox, name="x [m]", default_value=0, minimal_value=-1_000_000, maximal_value=1_000_000,  decimal_number=2)
-        self.custom_borefield.add_option(els.FloatBox, name="y [m]", default_value=0, minimal_value=-1_000_000, maximal_value=1_000_000,  decimal_number=2)
-        self.custom_borefield.add_option(els.FloatBox, name="depth [m]", default_value=100, minimal_value=0, maximal_value=1_000_000)
-        self.custom_borefield.add_option(els.FloatBox, name="buried depth [m]", default_value=2, minimal_value=0, maximal_value=1_000_000,  decimal_number=2)
-        self.custom_borefield.add_option(els.FloatBox, name="Borehole radius [m]", default_value=0.075, minimal_value=0, maximal_value=1_000,
-                                         decimal_number=4, step=0.01)
-        # self.custom_borefield.add_option(els.FloatBox, name="tilt [Â°]", default_value=0, minimal_value=-90, maximal_value=90)
-        self.custom_borefield.change_event(self.update_borefield)
-
         self.option_depth = FloatBox(
             category=self.category_borefield,
             label=translations.option_depth,
@@ -372,6 +349,30 @@ class GUI(GuiStructure):
             step=0.001,
         )
         self.option_tilted.hide()
+
+
+        self.option_seperator_borefield = ButtonBox(label=translations.option_seperator_borefield, default_index=0,
+                                              entries=['Semicolon ";"', 'Comma ","', 'Tab "   "'],
+                                              category=self.category_borefield)
+        self.option_decimal_borefield = ButtonBox(label=translations.option_decimal_borefield, default_index=0,
+                                            entries=['Point "."', 'Comma ","'],
+                                            category=self.category_borefield)
+
+        file = f"{FOLDER.joinpath('gui/test_gui/borefield_data.csv')}"
+        self.borefield_file = els.FileNameBox(label=translations.borefield_file, category=self.category_borefield, default_value=file, file_extension=["csv", "txt"])
+        self.import_borefield = els.FunctionButton(button_text=translations.import_borefield, icon="Download", category=self.category_borefield)
+        self.import_borefield.change_event(self.fun_import_borefield)
+
+        self.custom_borefield = els.FlexibleAmount(label=translations.custom_borefield, default_length=1, entry_mame="Borehole", category=self.category_borefield,
+                                                   min_length=1)
+        self.custom_borefield.add_option(els.FloatBox, name="x [m]", default_value=0, minimal_value=-1_000_000, maximal_value=1_000_000,  decimal_number=2)
+        self.custom_borefield.add_option(els.FloatBox, name="y [m]", default_value=0, minimal_value=-1_000_000, maximal_value=1_000_000,  decimal_number=2)
+        self.custom_borefield.add_option(els.FloatBox, name="depth [m]", default_value=100, minimal_value=0, maximal_value=1_000_000)
+        self.custom_borefield.add_option(els.FloatBox, name="buried depth [m]", default_value=2, minimal_value=0, maximal_value=1_000_000,  decimal_number=2)
+        self.custom_borefield.add_option(els.FloatBox, name="Borehole radius [m]", default_value=0.075, minimal_value=0, maximal_value=1_000,
+                                         decimal_number=4, step=0.01)
+        # self.custom_borefield.add_option(els.FloatBox, name="tilt [Â°]", default_value=0, minimal_value=-90, maximal_value=90)
+        self.custom_borefield.change_event(self.update_borefield)
 
         # add dependencies
         #self.aim_temp_profile.add_link_2_show(self.option_depth)

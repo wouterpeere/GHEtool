@@ -3,6 +3,7 @@ This file contains all the code for the borefield calculations.
 """
 from __future__ import annotations
 
+import logging
 from math import pi
 from pathlib import Path
 from typing import Tuple
@@ -17,6 +18,12 @@ from GHEtool.VariableClasses import FluidData, PipeData, Borehole, GroundConstan
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, SizingSetup
 from GHEtool.VariableClasses.BaseClass import BaseClass
 from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
+
+
+class MaxTempError(ValueError):
+    """maximal temperature error"""
+    def __init__(self):
+        super().__init__("With the maximal temperature and temperature gradient no solution can be found")
 
 
 class Borefield(BaseClass):
@@ -1107,6 +1114,9 @@ class Borefield(BaseClass):
         # initialise the results array
         results = np.zeros(loads_short.size * 2)
 
+        if hasattr(self.ground_data, "max_depth"):
+            self.H = self.ground_data.max_depth(self.Tf_max)
+
         # Iterates as long as there is no convergence
         # (convergence if difference between depth in iterations is smaller than THRESHOLD_BOREHOLE_DEPTH)
         while abs(self.H - H_prev) >= Borefield.THRESHOLD_BOREHOLE_DEPTH:
@@ -1186,6 +1196,9 @@ class Borefield(BaseClass):
                 # save temperatures under variable
                 self.results_peak_heating = results_peak_heating
                 self.results_peak_cooling = results_peak_cooling
+
+            if hasattr(self.ground_data, "max_depth") and np.max(self.results_peak_cooling) > self.Tf_max:
+                raise MaxTempError
 
             H_prev = self.H
 

@@ -30,6 +30,21 @@ class GroundFluxTemperature(_GroundData):
         self.flux = flux
         self.Tg = T_g
 
+    def max_depth(self, t_max: float) -> float:
+        """
+        determine the depth for the maximal temperature
+
+        Parameters
+        ----------
+        t_max : float
+            maximal temperature
+
+        Returns
+        -------
+            depth with maximal temperature difference possible
+        """
+        return (t_max - self.Tg)/(2 * self.flux) * 2 * self.flux
+
     def calculate_Tg(self, H: float) -> float:
         """
         This function gives back the ground temperature at a depth H.
