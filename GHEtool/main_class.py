@@ -7,9 +7,10 @@ from typing import Tuple, Union, List
 import matplotlib.pyplot as plt
 import numpy as np
 import pygfunction as gt
+from numpy.typing import NDArray
 from scipy.signal import convolve
 
-from GHEtool.VariableClasses import GroundData, FluidData, PipeData
+from GHEtool.VariableClasses import GroundData, FluidData, PipeData, ConstantFluidData
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, SizingSetup
 from GHEtool.VariableClasses.BaseClass import BaseClass
 
@@ -185,7 +186,7 @@ class Borefield(BaseClass):
         self.Tf: float = 0.  # temperature of the fluid
         self.Tf_max: float = 16.  # maximum temperature of the fluid
         self.Tf_min: float = 0.  # minimum temperature of the fluid
-        self.fluid_data: FluidData = FluidData()
+        self.fluid_data: FluidData = ConstantFluidData()
 
         # initiate borehole parameters
         self.pipe_data: PipeData = PipeData()
@@ -537,9 +538,6 @@ class Borefield(BaseClass):
         """
         self.fluid_data = data
 
-        if self.pipe_data.check_values():
-            self.calculate_fluid_thermal_resistance()
-
     def set_pipe_parameters(self, data: PipeData) -> None:
         """
         This function sets the pipe parameters.
@@ -556,8 +554,6 @@ class Borefield(BaseClass):
         self.pipe_data = data
 
         # calculate the different resistances
-        if self.fluid_data.check_values():
-            self.calculate_fluid_thermal_resistance()
         self.pipe_data.calculate_pipe_thermal_resistance()
 
     def set_max_ground_temperature(self, temp: float) -> None:
@@ -590,7 +586,7 @@ class Borefield(BaseClass):
         """
         self.Tf_min: float = temp
 
-    def calculate_fluid_thermal_resistance(self) -> None:
+    def calculate_fluid_thermal_resistance(self, temps: NDArray[np.float64]) -> None:
         """
         This function calculates and sets the fluid thermal resistance R_f.
 
@@ -598,19 +594,17 @@ class Borefield(BaseClass):
         -------
         None
         """
-        self.fluid_data.h_f: float =\
-            gt.pipes.convective_heat_transfer_coefficient_circular_pipe(self.fluid_data.mfr /
-                                                                        self.pipe_data.number_of_pipes,
-                                                                        self.pipe_data.r_in,
-                                                                        self.fluid_data.mu,
-                                                                        self.fluid_data.rho,
-                                                                        self.fluid_data.k_f,
-                                                                        self.fluid_data.Cp,
-                                                                        self.pipe_data.epsilon)
-        self.fluid_data.R_f: float = 1. / (self.fluid_data.h_f * 2 * pi * self.pipe_data.r_in)
+        self.fluid_data.h_f = np.zeros_like(temps)
+        for idx, (mu, rho, k_f, c_p) in enumerate(zip(self.fluid_data.mu(temps), self.fluid_data.rho(temps),self.fluid_data.k_f(temps),self.fluid_data.c_p(
+                temps))):
+            self.fluid_data.h_f[idx] = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(self.fluid_data.mfr /
+                                                                            self.pipe_data.number_of_pipes,
+                                                                            self.pipe_data.r_in,
+                                                                            mu, rho, k_f, c_p,
+                                                                            self.pipe_data.epsilon)
+        self.fluid_data.R_f = 1. / (self.fluid_data.h_f * 2 * pi * self.pipe_data.r_in)
 
-    @property
-    def _Rb(self) -> float:
+    def _Rb(self, temps: NDArray[np.float64]) -> NDArray[np.float64]:
         """
         This function gives back the equivalent borehole resistance.
         If self._sizing_setup.use_constant_Rb is False, it calculates the equivalent borehole thermal resistance.
@@ -622,10 +616,10 @@ class Borefield(BaseClass):
         """
         # use a constant Rb*
         if self._sizing_setup.use_constant_Rb:
-            return self.Rb
+            return self.Rb * np.ones_like(temps)
 
         # calculate Rb*
-        return self.calculate_Rb()
+        return self.calculate_Rb(temps)
 
     def _Tg(self, H: float = None) -> float:
         """
@@ -647,7 +641,7 @@ class Borefield(BaseClass):
 
         return self.ground_data.calculate_Tg(H, use_constant_Tg=self._sizing_setup.use_constant_Tg)
 
-    def calculate_Rb(self) -> float:
+    def calculate_Rb(self, temps: NDArray[np.float64]) -> NDArray[np.float64]:
         """
         This function returns the calculated equivalent borehole thermal resistance Rb* value.
 
@@ -666,14 +660,19 @@ class Borefield(BaseClass):
             print("Please make sure you set al the pipe and fluid data.")
             raise ValueError
 
+        if self.pipe_data.check_values():
+            self.calculate_fluid_thermal_resistance(temps)
+
         # initiate temporary borefield
         borehole = gt.boreholes.Borehole(self.H, self.D, self.r_b, 0, 0)
         # initiate pipe
-        pipe = gt.pipes.MultipleUTube(self.pipe_data.pos, self.pipe_data.r_in, self.pipe_data.r_out,
-                                      borehole, self.ground_data.k_s, self.pipe_data.k_g,
-                                      self.pipe_data.R_p + self.fluid_data.R_f, self.pipe_data.number_of_pipes, J=2)
-
-        return pipe.effective_borehole_thermal_resistance(self.fluid_data.mfr, self.fluid_data.Cp)
+        r_b = np.zeros_like(temps)
+        for idx, (R_f, c_p) in enumerate(zip(self.fluid_data.R_f, self.fluid_data.c_p(temps))):
+            pipe = gt.pipes.MultipleUTube(self.pipe_data.pos, self.pipe_data.r_in, self.pipe_data.r_out,
+                                          borehole, self.ground_data.k_s, self.pipe_data.k_g,
+                                          self.pipe_data.R_p + R_f, self.pipe_data.number_of_pipes, J=2)
+            r_b[idx] = pipe.effective_borehole_thermal_resistance(self.fluid_data.mfr, c_p)
+        return r_b
 
     @property
     def _Ahmadfard(self) -> float:
@@ -711,7 +710,7 @@ class Borefield(BaseClass):
             Rm = (gfunct_uniform_T[1] - gfunct_uniform_T[0]) / (2 * pi * self.ground_data.k_s)
             Rd = (gfunct_uniform_T[0]) / (2 * pi * self.ground_data.k_s)
             # calculate the total borehole length
-            L = (self.qa * Ra + self.qm * Rm + self.qh * Rd + self.qh * self._Rb) / abs(self.Tf - self._Tg())
+            L = (self.qa * Ra + self.qm * Rm + self.qh * Rd + self.qh * self._Rb(self.Tf * np.ones(1))[0]) / abs(self.Tf - self._Tg())
             # updating the depth values
             H_prev = self.H
             self.H = L / self.number_of_boreholes
@@ -755,7 +754,7 @@ class Borefield(BaseClass):
             Rh = (gfunc_uniform_T[0]) / (2 * pi * self.ground_data.k_s)
 
             # calculate the total length
-            L = (self.qh * self._Rb + self.qh * Rh + self.qm * Rcm + self.qpm * Rpm) / abs(self.Tf - self._Tg())
+            L = (self.qh * self._Rb(self.Tf * np.ones(1))[0] + self.qh * Rh + self.qm * Rcm + self.qpm * Rpm) / abs(self.Tf - self._Tg())
 
             # updating the depth values
             H_prev = self.H
@@ -871,7 +870,7 @@ class Borefield(BaseClass):
         self._sizing_setup.update_variables(use_constant_Rb=use_constant_Rb, use_constant_Tg=use_constant_Tg,
                                             L2_sizing=L2_sizing, L3_sizing=L3_sizing, L4_sizing=L4_sizing,
                                             quadrant_sizing=quadrant_sizing)
-
+        self.H_init = H_init
         # sizes according to the correct algorithm
         if self._sizing_setup.L2_sizing:
             depth = self.size_L2(self.H_init, self._sizing_setup.quadrant_sizing)
@@ -1142,6 +1141,8 @@ class Borefield(BaseClass):
                 # now the Tf will be calculated based on
                 # Tf = Tb + Q * R_b
                 temperature_result = Tb + loads_long * 1000 * (self.Rb / self.number_of_boreholes / self.H)
+                self.Rb = self._Rb(temperature_result)
+                temperature_result = Tb + loads_long * 1000 * (self.Rb / self.number_of_boreholes / self.H)
                 # reset other variables
                 self.results_peak_heating = temperature_result
                 self.results_peak_cooling = temperature_result
@@ -1187,7 +1188,20 @@ class Borefield(BaseClass):
                 results_peak_heating = results_month_heating - np.tile(self.peak_heating - self.monthly_load_heating, 2) * 1000 \
                                        * (g_value_peak_heating / self.ground_data.k_s / 2 / pi + self.Rb)\
                                        / self.number_of_boreholes / self.H
+                self.Rb = self._Rb((results_peak_heating + results_peak_cooling) / 2)
+                results_month_cooling = Tb + np.tile(self.monthly_load_cooling, 2) * 1000 \
+                                        * (self.Rb / self.number_of_boreholes / self.H)
+                results_month_heating = Tb - np.tile(self.monthly_load_heating, 2) * 1000 \
+                                        * (self.Rb / self.number_of_boreholes / self.H)
 
+                # extra summation if the g-function value for the peak is included
+                results_peak_cooling = results_month_cooling +\
+                                       np.tile(self.peak_cooling - self.monthly_load_cooling, 2) * 1000 *\
+                                       (g_value_peak_cooling / self.ground_data.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / self.H
+                results_peak_heating = results_month_heating - np.tile(self.peak_heating - self.monthly_load_heating, 2) * 1000 \
+                                       * (g_value_peak_heating / self.ground_data.k_s / 2 / pi + self.Rb)\
+                                       / self.number_of_boreholes / self.H
+                print((self.Rb[:10], self._Rb((results_peak_heating + results_peak_cooling) / 2)[:10]))
                 # save temperatures under variable
                 self.results_peak_heating = results_peak_heating
                 self.results_peak_cooling = results_peak_cooling
@@ -1640,8 +1654,6 @@ class Borefield(BaseClass):
         if H is not None:
             self.H = H
         # set Rb* value
-        self.Rb = self._Rb
-
         self.H = H_backup
 
         H = self.H if H is None else H
@@ -1671,6 +1683,20 @@ class Borefield(BaseClass):
 
             self.Tb = Tb
             # now the Tf will be calculated based on
+            # Tf = Tb + Q * R_b
+            results_month_cooling = Tb + np.tile(self.monthly_load_cooling, self.simulation_period) * 1000 \
+                              * (self.Rb / self.number_of_boreholes / H)
+            results_month_heating = Tb - np.tile(self.monthly_load_heating, self.simulation_period) * 1000 \
+                              * (self.Rb / self.number_of_boreholes / H)
+
+            # extra summation if the g-function value for the peak is included
+            results_peak_cooling = results_month_cooling + np.tile(self.peak_cooling - self.monthly_load_cooling, self.simulation_period) * 1000 \
+                                     * (g_value_peak_cooling / self.ground_data.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / H
+            results_peak_heating = results_month_heating - np.tile(self.peak_heating - self.monthly_load_heating, self.simulation_period) * 1000 \
+                                   * (g_value_peak_heating / self.ground_data.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / H
+
+            self.Rb = self._Rb((results_peak_heating + results_peak_cooling)/2)
+
             # Tf = Tb + Q * R_b
             results_month_cooling = Tb + np.tile(self.monthly_load_cooling, self.simulation_period) * 1000 \
                               * (self.Rb / self.number_of_boreholes / H)
@@ -1719,6 +1745,8 @@ class Borefield(BaseClass):
             self.Tb = Tb
             # now the Tf will be calculated based on
             # Tf = Tb + Q * R_b
+            temperature_result = Tb + hourly_load * 1000 * (self.Rb / self.number_of_boreholes / H)
+            self.Rb = self._Rb(temperature_result)
             temperature_result = Tb + hourly_load * 1000 * (self.Rb / self.number_of_boreholes / H)
 
             # reset other variables
@@ -2037,7 +2065,7 @@ class Borefield(BaseClass):
         # set to use a constant Rb* value but save the initial parameters
         Rb_backup = self.Rb
         if not self._sizing_setup.use_constant_Rb:
-            self.Rb = self.calculate_Rb()
+            self.Rb = self.calculate_Rb((np.ones_like(self.monthly_load) * self.Tf_max + np.ones_like(self.monthly_load) * self.Tf_min)/2)
         use_constant_Rb_backup = self._sizing_setup.use_constant_Rb
         self._sizing_setup.use_constant_Rb = True
 

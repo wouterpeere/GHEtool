@@ -4,12 +4,12 @@ import pytest
 import copy
 from math import isclose
 
-from GHEtool import *
+from GHEtool import GroundData, PipeData, ConstantFluidData, Borefield
 
 import pygfunction as gt
 
 data = GroundData(3, 10, 0.2)
-fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+fluidData = ConstantFluidData(0.2, 0.568, 998, 4180, 1e-3)
 pipeData = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
 
 borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)

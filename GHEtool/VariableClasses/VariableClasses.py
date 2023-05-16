@@ -81,65 +81,6 @@ class GroundData(BaseClass):
         return True
 
 
-class FluidData(BaseClass):
-    """
-    Contains information regarding the fluid data of the borefield.
-    """
-
-    __slots__ = 'k_f', 'rho', 'Cp', 'mu', 'mfr', 'h_f', 'R_f'
-
-    def __init__(self, mfr: float = None,
-                 k_f: float = None,
-                 rho: float = None,
-                 Cp: float = None,
-                 mu: float = None):
-        """
-
-        Parameters
-        ----------
-        mfr : float
-            Mass flow rate per borehole [kg/s]
-        k_f : float
-            Thermal Conductivity of the fluid [W/mK]
-        rho : float
-            Density of the fluid [kg/m3]
-        Cp : float
-            Thermal capacity of the fluid [J/kgK]
-        mu : float
-            Dynamic viscosity of the fluid [Pa/s]
-        """
-        self.k_f = k_f  # Thermal conductivity W/mK
-        self.mfr = mfr  # Mass flow rate per borehole kg/s
-        self.rho = rho  # Density kg/m3
-        self.Cp = Cp    # Thermal capacity J/kgK
-        self.mu = mu    # Dynamic viscosity Pa/s
-        self.h_f: float = 0.  # convective heat transfer coefficient
-        self.R_f: float = 0.  # fluid thermal resistance
-
-    def set_mass_flow_rate(self, mfr: float) -> None:
-        """
-        This function sets the mass flow rate per borehole.
-
-        Parameters
-        ----------
-        mfr : fluid
-            Mass flow rate per borehole [kg/s]
-
-        Returns
-        -------
-        None
-        """
-        self.mfr = mfr
-
-    def __eq__(self, other):
-        if not isinstance(other, FluidData):
-            return False
-        for i in self.__slots__:
-            if getattr(self, i) != getattr(other, i):
-                return False
-        return True
-
-
 class PipeData(BaseClass):
     """
     Contains information regarding the pipe data of the borefield.
