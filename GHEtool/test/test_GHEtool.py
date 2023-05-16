@@ -10,6 +10,7 @@ import pytest
 from pytest import raises
 
 from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, PipeData, Borefield, SizingSetup, FOLDER
+from GHEtool.main_class import MaxTempError
 
 data = GroundConstantTemperature(3, 10)
 data_ground_flux = GroundFluxTemperature(3, 10)
@@ -217,10 +218,11 @@ def test_borefield_cannot_size_due_to_cooling():
     borefield.set_max_ground_temperature(16)   # maximum temperature
     borefield.set_min_ground_temperature(0)  # minimum temperature
 
-    try:
-        borefield.size()
-    except ValueError:
-        assert True
+    with raises(ValueError):
+        borefield.size(100)
+
+    with raises(MaxTempError):
+        borefield.size_L3(100)
 
 
 def test_create_rectangular_field(borefield):
@@ -288,7 +290,6 @@ def test_dynamicRb(borefield):
 
 
 def test_load_custom_configuration(borefield):
-
     borefield.set_borefield(custom_field)
     assert borefield.borefield == custom_field
 
@@ -329,12 +330,10 @@ def test_draw_internals(monkeypatch, borefield):
     borefield.set_pipe_parameters(pipeData)
     borefield.draw_borehole_internal()
 
-
 def test_size_L4(hourly_borefield):
     assert hourly_borefield._check_hourly_load()
     hourly_borefield.sizing_setup(L4_sizing=True)
     hourly_borefield.size()
-
 
 def test_size_L4_quadrant(hourly_borefield):
     hourly_borefield.sizing_setup(L4_sizing=True, quadrant_sizing=1)
@@ -346,25 +345,20 @@ def test_size_L4_quadrant_4(hourly_borefield):
     hourly_borefield.sizing_setup(L4_sizing=True)
     hourly_borefield.size()
 
-
 def test_size_L4_heating_dom(hourly_borefield_reversed):
     hourly_borefield_reversed.sizing_setup(L4_sizing=True)
     hourly_borefield_reversed.size()
-
 
 def test_size_L4_quadrant_3(hourly_borefield_reversed):
     hourly_borefield_reversed.hourly_heating_load[0] = 100000
     hourly_borefield_reversed.sizing_setup(L4_sizing=True)
     hourly_borefield_reversed.size()
 
-
 def test_sizing_setup(borefield):
     borefield.sizing_setup(sizing_setup=SizingSetup())
 
-
 def test_cooling_dom(borefield_cooling_dom):
     borefield_cooling_dom.size()
-
 
 def test_sizing_different_quadrants(borefield):
     borefield.size(quadrant_sizing=1)
