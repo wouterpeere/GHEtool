@@ -22,7 +22,7 @@ from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
 
 
 class MaxTempError(ValueError):
-    """maximal temperature error"""
+    """Maximal temperature error"""
     def __init__(self):
         super().__init__("With the maximal temperature and temperature gradient no solution can be found")
 
@@ -947,6 +947,10 @@ class Borefield(BaseClass):
                 self.H = size_quadrant4()
         else:
             # size according to the biggest quadrant
+
+            # check max size
+            self._check_temperature_at_max_depth(False)
+
             # determine which quadrants are relevant
             if self.imbalance <= 0:
                 # extraction dominated, so quadrants 1 and 4 are relevant
@@ -995,6 +999,10 @@ class Borefield(BaseClass):
             self.H = self._size_based_on_temperature_profile(quadrant_sizing)
         else:
             # size according to the biggest quadrant
+
+            # check max size
+            self._check_temperature_at_max_depth(False)
+
             # determine which quadrants are relevant
             if self.imbalance <= 0:
                 # extraction dominated, so quadrants 1 and 4 are relevant
@@ -1052,6 +1060,10 @@ class Borefield(BaseClass):
             self.H = self._size_based_on_temperature_profile(quadrant_sizing, hourly=True)
         else:
             # size according to the biggest quadrant
+
+            # check max size
+            self._check_temperature_at_max_depth(True)
+
             # determine which quadrants are relevant
             if self.imbalance <= 0:
                 # extraction dominated, so quadrants 1 and 4 are relevant
@@ -1081,6 +1093,29 @@ class Borefield(BaseClass):
                     self.recalculation_needed = False
 
         return self.H
+
+    def _check_temperature_at_max_depth(self, hourly: bool) -> bool:
+        # define loads for sizing
+        # it only calculates the first and the last year, so the sizing is less computationally expensive
+        loads_short = self.hourly_cooling_load - self.hourly_heating_load if hourly else self.monthly_load
+        loads_short_rev = loads_short[::-1]
+        loads_long = np.tile(loads_short, 2)
+
+        # initialise the results array
+        results = np.zeros(loads_short.size * 2)
+
+        # check if the maximum temperature stays within bounds, when the max_depth is applied
+        self.H = self.ground_data.max_depth(self.Tf_max)
+        if hourly:
+            calculate_1_last_year_temps_l4(self, loads_short, loads_short_rev, results, loads_long)
+        else:
+            calculate_1_last_year_temps_l3(self, loads_short, loads_short_rev, results)
+
+        # the temperature exceeds the limit even at maximum size
+        if np.max(self.results_peak_cooling - self.Tf_max) > 0:
+            raise MaxTempError
+
+        return True
 
     def _size_based_on_temperature_profile(self, quadrant: int, hourly: bool = False) -> float:
         """
@@ -1114,15 +1149,6 @@ class Borefield(BaseClass):
 
         # initialise the results array
         results = np.zeros(loads_short.size * 2)
-
-        if hasattr(self.ground_data, "max_depth"):
-            self.H = self.ground_data.max_depth(self.Tf_max)
-            if hourly:
-                calculate_1_last_year_temps_l4(self, loads_short, loads_short_rev, results, loads_long)
-            else:
-                calculate_1_last_year_temps_l3(self, loads_short, loads_short_rev, results)
-            if np.max(self.results_peak_cooling - self.Tf_max) > 0:
-                raise MaxTempError
 
         # Iterates as long as there is no convergence
         # (convergence if difference between depth in iterations is smaller than THRESHOLD_BOREHOLE_DEPTH)

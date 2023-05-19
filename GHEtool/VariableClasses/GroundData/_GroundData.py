@@ -32,6 +32,21 @@ class _GroundData(BaseClass, ABC):
         else:
             self.alpha = self.k_s / self.volumetric_heat_capacity  # m2/s
 
+    def max_depth(self, t_max: float) -> float:
+        """
+        Determine the depth for the maximal temperature. 1000m by default.
+
+        Parameters
+        ----------
+        t_max : float
+            Maximal temperature [deg C]
+
+        Returns
+        -------
+            Depth with maximal temperature difference possible [m]
+        """
+        return 1000
+
     @abc.abstractmethod
     def calculate_Tg(self, H: float) -> float:
         """

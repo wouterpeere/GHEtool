@@ -265,7 +265,7 @@ def test_hourly_to_monthly(borefield):
 
 
 def test_size(borefield):
-    assert isclose(borefield.size(100), 92.06688246062056)
+    assert isclose(borefield.size(100), 92.06685220587497)
 
 
 def test_imbalance(borefield):
