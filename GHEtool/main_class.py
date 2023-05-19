@@ -12,7 +12,7 @@ from warnings import warn
 
 from GHEtool.VariableClasses import FluidData, PipeData, Borehole, GroundConstantTemperature
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, SizingSetup
-from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute
+from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute, _LoadData
 from GHEtool.VariableClasses.BaseClass import BaseClass
 from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
 from GHEtool.logger.ghe_logger import ghe_logger, console_handler, console_handler_warning
@@ -371,6 +371,21 @@ class Borefield(BaseClass):
 
         for bor in self._borefield:
             bor.H = H
+
+    def set_loads(self, load: _LoadData) -> None:
+        """
+        This function sets the load data.
+
+        Parameters
+        ----------
+        load : _LoadData
+            The load data
+
+        Returns
+        -------
+        None
+        """
+        self._load = load
 
     def load_custom_gfunction(self, location: str) -> None:
         """
@@ -1579,7 +1594,6 @@ class Borefield(BaseClass):
             return self.gfunction_calculation_object.calculate(time_value, self.borefield, self.ground_data.alpha)
 
         ## 1 bypass any possible precalculated g-functions
-
         # if calculate is False, then the gfunctions are calculated jit
         if not self.use_precalculated_data:
             return jit_gfunction_calculation()
@@ -1737,41 +1751,6 @@ class Borefield(BaseClass):
 
         ghe_logger.info("Hourly profile loaded!")
 
-    def convert_hourly_to_monthly(self, peak_cooling_load: float = None, peak_heating_load: float = None) -> None:
-        """
-        This function converts self.hourly_cooling_load and self.hourly_heating_load to the monthly profiles used in the sizing.
-
-        Parameters
-        ----------
-        peak_cooling_load : float
-            peak power in cooling [kW]
-        peak_heating_load : float
-            peak power in heating [kW]
-
-        Returns
-        -------
-        None
-        """
-
-        try:
-            self.hourly_cooling_load[0]
-            self.hourly_heating_load[0]
-        except IndexError:
-            raise IndexError("No hourly loads are loaded yet!")
-
-        if peak_cooling_load is None:
-            peak_cooling_load = np.max(self.hourly_cooling_load)
-        if peak_heating_load is None:
-            peak_heating_load = np.max(self.hourly_heating_load)
-
-        # calculate peak and base loads
-        self.set_peak_cooling(self._reduce_to_peak_load(self.hourly_cooling_load, peak_cooling_load))
-        self.set_peak_heating(self._reduce_to_peak_load(self.hourly_heating_load, peak_heating_load))
-        self.set_baseload_cooling(self._reduce_to_monthly_load(self.hourly_cooling_load, peak_cooling_load))
-        self.set_baseload_heating(self._reduce_to_monthly_load(self.hourly_heating_load, peak_heating_load))
-
-        ghe_logger.info("Hourly profile converted to monthly profile!")
-
     @staticmethod
     def _reduce_to_monthly_load(load: list, peak: float) -> list:
         """
@@ -1848,11 +1827,13 @@ class Borefield(BaseClass):
         self._sizing_setup.use_constant_Rb = True
 
         # check if hourly profile is given
-        self._check_hourly_load()
+        if not self._load.hourly_resolution:
+            ghe_logger.warning('No hourly data is given!')
+            return
 
         # set initial peak loads
-        init_peak_heat_load = np.max(self.hourly_heating_load)
-        init_peak_cool_load = np.max(self.hourly_cooling_load)
+        init_peak_heat_load = self._load.max_peak_heating
+        init_peak_cool_load = self._load.max_peak_cooling
 
         # peak loads for iteration
         peak_heat_load = init_peak_heat_load
@@ -2021,10 +2002,11 @@ class Borefield(BaseClass):
             plt.Figure, plt.Axes
         """
         # check if there are hourly values
-        self._check_hourly_load()
+        if not self._load.hourly_resolution:
+            ghe_logger.warning('No hourly loads are available')
 
         # sort heating and cooling load
-        heating = self.hourly_heating_load.copy()
+        heating = self._load.hourly_heating_load.copy()
         heating[::-1].sort()
 
         cooling = self.hourly_cooling_load.copy()

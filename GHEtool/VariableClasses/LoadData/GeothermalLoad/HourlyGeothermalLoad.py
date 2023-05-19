@@ -344,3 +344,4 @@ class HourlyGeothermalLoad(_LoadData):
         self.hourly_cooling_load = df['cooling']
 
         ghe_logger.info("Hourly profile loaded!")
+

@@ -480,3 +480,25 @@ class _LoadData(BaseClass, ABC):
         tpm = self.time_L3[month_index - 1] if month_index > 0 else 0
 
         return th, tpm, tcm, qh, qpm, qm
+
+    @property
+    def max_peak_cooling(self) -> float:
+        """
+        This returns the max peak cooling in kW.
+
+        Returns
+        -------
+        max peak cooling : float
+        """
+        return np.max(self.peak_cooling)
+
+    @property
+    def max_peak_heating(self) -> float:
+        """
+        This returns the max peak heating in kW.
+
+        Returns
+        -------
+        max peak heating : float
+        """
+        return np.max(self.peak_heating)
