@@ -10,7 +10,7 @@ import time
 import numpy as np
 import pygfunction as gt
 
-from GHEtool import Borefield, ConstantFluidData, GroundData, PipeData
+from GHEtool import Borefield, FluidData, GroundData, PipeData
 
 
 def sizing_with_Rb():
@@ -38,7 +38,7 @@ def sizing_with_Rb():
 
     # initiate borefield model
     data = GroundData(3, 10, 0.2)  # ground data with an inaccurate guess of 100m for the depth of the borefield
-    fluid_data = ConstantFluidData(0.2, 0.568, 998, 4180, 1e-3)
+    fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
     pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
 
     borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 100, 1, 0.075)
