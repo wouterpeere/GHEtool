@@ -386,7 +386,7 @@ def test_sizing_L3_threshold_depth_error(borefield):
     with raises(ValueError):
         borefield.gfunction(3600, borefield.THRESHOLD_DEPTH_ERROR + 1)
     borefield.set_max_ground_temperature(max_temp)
-    borefield.ground_data.flux = 0
+    borefield.set_ground_parameters(data)
 
 def test_calc_temperatures_gradient_flux(borefield):
     """test that the geothermal heat flux and geothermal temperature gradient are leading to the same results"""
