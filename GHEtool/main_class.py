@@ -1156,11 +1156,11 @@ class Borefield(BaseClass):
         # (convergence if difference between depth in iterations is smaller than THRESHOLD_BOREHOLE_DEPTH)
         while abs(self.H - H_prev) >= Borefield.THRESHOLD_BOREHOLE_DEPTH:
 
-            if hourly:
-                calculate_1_last_year_temps_l4(self, loads_short, loads_short_rev, results, loads_long)
-            else:
-                calculate_1_last_year_temps_l3(self, loads_short, loads_short_rev, results)
-            # self._calculate_temperature_profile(self.H, hourly)
+            # if hourly:
+            #     calculate_1_last_year_temps_l4(self, loads_short, loads_short_rev, results, loads_long)
+            # else:
+            #     calculate_1_last_year_temps_l3(self, loads_short, loads_short_rev, results)
+            self._calculate_temperature_profile(self.H, hourly)
             H_prev = self.H
 
             if quadrant == 1 or quadrant == 2:
