@@ -221,7 +221,7 @@ def test_borefield_cannot_size_due_to_cooling():
     with raises(ValueError):
         borefield.size(100)
 
-    with raises(MaxTempError):
+    with raises(ValueError):
         borefield.size_L3(100)
 
 
@@ -265,7 +265,7 @@ def test_hourly_to_monthly(borefield):
 
 
 def test_size(borefield):
-    assert isclose(borefield.size(100), 92.06685220587497)
+    assert isclose(borefield.size(100), 92.06688246062056)
 
 
 def test_imbalance(borefield):

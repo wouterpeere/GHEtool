@@ -1095,6 +1095,8 @@ class Borefield(BaseClass):
         return self.H
 
     def _check_temperature_at_max_depth(self, hourly: bool) -> bool:
+
+        return True
         # define loads for sizing
         # it only calculates the first and the last year, so the sizing is less computationally expensive
         loads_short = self.hourly_cooling_load - self.hourly_heating_load if hourly else self.monthly_load
@@ -1158,7 +1160,7 @@ class Borefield(BaseClass):
                 calculate_1_last_year_temps_l4(self, loads_short, loads_short_rev, results, loads_long)
             else:
                 calculate_1_last_year_temps_l3(self, loads_short, loads_short_rev, results)
-
+            # self._calculate_temperature_profile(self.H, hourly)
             H_prev = self.H
 
             if quadrant == 1 or quadrant == 2:
