@@ -195,7 +195,7 @@ class GUI(GuiStructure):
         #                                            entries=[" L2 ", " L3 "], category=self.category_calculation)
         self.option_method_temp_gradient = ButtonBox(
             label=translations.option_method_temp_gradient, default_index=0,
-            entries=[" no ", " yes  "], category=self.category_calculation)
+            entries=[" none ", " heat flux ", " temperature gradient "], category=self.category_calculation)
         self.option_method_rb_calc = ButtonBox(label=translations.option_method_rb_calc, default_index=0,
                                                entries=[" constant ", " dynamic "],
                                                category=self.category_calculation)
@@ -503,19 +503,32 @@ class GUI(GuiStructure):
             maximal_value=100,
             step=0.1,
         )
+
         self.option_temp_gradient = FloatBox(
             category=self.category_earth,
             label=translations.option_temp_gradient,
-            default_value=2,
+            default_value=3,
             decimal_number=3,
             minimal_value=-273.15,
-            maximal_value=100,
+            maximal_value=500,
             step=0.1,
         )
 
+        self.option_ground_heat_flux = FloatBox(
+            category=self.category_earth,
+            label=translations.option_ground_heat_flux,
+            default_value=0.06,
+            decimal_number=4,
+            minimal_value=-200,
+            maximal_value=500,
+            step=0.01,
+        )
+
         # add dependencies
+        self.option_method_temp_gradient.add_link_2_show(self.option_temp_gradient, on_index=2)
+        self.option_method_temp_gradient.add_link_2_show(self.option_ground_heat_flux, on_index=1)
         self.option_method_temp_gradient.add_link_2_show(self.option_ground_temp_gradient, on_index=1)
-        self.option_method_temp_gradient.add_link_2_show(self.option_temp_gradient, on_index=1)
+        self.option_method_temp_gradient.add_link_2_show(self.option_ground_temp_gradient, on_index=2)
         self.option_method_temp_gradient.add_link_2_show(self.option_ground_temp, on_index=0)
 
         # self.aim_size_length.add_link_2_show(self.option_max_width)
@@ -1192,6 +1205,7 @@ class GUI(GuiStructure):
 
                 # add dependency
                 self.option_method_temp_gradient.add_link_2_show(self.results_ground_temperature, on_index=1)
+                self.option_method_temp_gradient.add_link_2_show(self.results_ground_temperature, on_index=2)
                 self.option_method_rb_calc.add_link_2_show(self.result_Rb_calculated, on_index=1)
                 self.aim_req_depth.add_link_2_show(self.result_text_depth)
 

@@ -9,7 +9,7 @@ import numpy as np
 import PySide6.QtWidgets as QtW
 import pandas as pd
 
-from GHEtool import Borefield, FOLDER, FluidData, GroundConstantTemperature, GroundFluxTemperature, PipeData
+from GHEtool import Borefield, FOLDER, FluidData, GroundConstantTemperature, GroundFluxTemperature, PipeData, GroundTemperatureGradient
 from GHEtool.gui.data_2_borefield_func import data_2_borefield
 from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
 from GHEtool.gui.gui_classes.translation_class import Translations
@@ -150,7 +150,7 @@ def test_temp_profile_temp_gradient(qtbot):
     k_s = gs.option_conductivity.get_value()
     depth = gs.option_depth.get_value()
 
-    gradient = round_down(main_window.gui_structure.option_method_temp_gradient.get_value() * 1.5, 3)
+    gradient = round_down(main_window.gui_structure.option_temp_gradient.get_value() * 1.5, 3)
     ground_temp = round_down(main_window.gui_structure.option_temp_gradient.get_value() * 1.5, 2)
 
     gs.aim_temp_profile.widget.click() if not gs.aim_temp_profile.widget.isChecked() else None
@@ -158,17 +158,37 @@ def test_temp_profile_temp_gradient(qtbot):
     borefield = create_borefield(gs)
 
     gs.option_temp_gradient.set_value(gradient)
-    gs.option_method_temp_gradient.set_value(1)
+    gs.option_method_temp_gradient.set_value(2)
     gs.option_ground_temp_gradient.set_value(ground_temp)
     main_window.save_scenario()
 
-    gd = GroundFluxTemperature(k_s, ground_temp, borefield.ground_data.volumetric_heat_capacity, k_s * gradient / 100)
+    gd = GroundTemperatureGradient(k_s, ground_temp, borefield.ground_data.volumetric_heat_capacity, gradient)
+    borefield.set_ground_parameters(gd)
+
+    ds = main_window.list_ds[-1]
+    borefield_gui, func = data_2_borefield(ds)
+    assert np.isclose(borefield_gui.ground_data.gradient, borefield.ground_data.gradient)
+    assert np.isclose(borefield_gui.ground_data.Tg, borefield.ground_data.Tg)
+    assert np.isclose(borefield_gui._Tg(150), gd.calculate_Tg(150))
+    assert func.func == borefield_gui.calculate_temperatures
+    assert func.args == (depth,)
+    assert func.keywords == {}
+
+    flux = round_down(gradient * k_s / 100, 2)
+
+    gs.option_temp_gradient.set_value(gradient)
+    gs.option_method_temp_gradient.set_value(1)
+    gs.option_ground_heat_flux.set_value(flux)
+    main_window.save_scenario()
+
+    gd = GroundFluxTemperature(k_s, ground_temp, borefield.ground_data.volumetric_heat_capacity, flux)
     borefield.set_ground_parameters(gd)
 
     ds = main_window.list_ds[-1]
     borefield_gui, func = data_2_borefield(ds)
     assert np.isclose(borefield_gui.ground_data.flux, borefield.ground_data.flux)
     assert np.isclose(borefield_gui.ground_data.Tg, borefield.ground_data.Tg)
+    assert np.isclose(borefield_gui._Tg(150), gd.calculate_Tg(150))
     assert func.func == borefield_gui.calculate_temperatures
     assert func.args == (depth,)
     assert func.keywords == {}

@@ -11,11 +11,11 @@ from typing import Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 import pygfunction as gt
-from numpy._typing import NDArray
+from numpy.typing import NDArray
 
 from scipy.signal import convolve
 
-from GHEtool.VariableClasses import FluidData, PipeData, Borehole, GroundConstantTemperature, GroundFluxTemperature
+from GHEtool.VariableClasses import FluidData, PipeData, Borehole, GroundConstantTemperature
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, SizingSetup
 from GHEtool.VariableClasses.BaseClass import BaseClass
 from GHEtool.VariableClasses.GroundData._GroundData import _GroundData

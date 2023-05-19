@@ -228,6 +228,7 @@ class Translations:  # pragma: no cover
         "borefield_file",
         "import_borefield",
         "option_decimal_borefield",
+        "option_ground_heat_flux",
         "languages",
     )
 
@@ -1527,13 +1528,13 @@ class Translations:  # pragma: no cover
             "Method for size width and length:,  L2  ,  L3  ",
         ]
         self.option_method_temp_gradient: List[str] = [
-            "Should a temperature gradient over depth be considered?:, no , yes ",
-            "Soll ein Temperaturgradient berücksichtigt werden?:, Nein , Ja ",
-            "Moet een temperatuursgradiënt in rekening worden gebracht?:, nee , ja ",
-            "Should a temperature gradient over depth be considered?:, no , yes ",
-            "Should a temperature gradient over depth be considered?:, no , yes ",
-            "Should a temperature gradient over depth be considered?:, no , yes ",
-            "Should a temperature gradient over depth be considered?:, no , yes",
+            "Which temperature gradient over depth be considered?:, none , heat flux , temperature gradient ",
+            "Welche Art Temperaturgradient soll berücksichtigt werden?:, Keiner , Wärmestrom , Temperaturgradient ",
+            "Moet een temperatuursgradiënt in rekening worden gebracht?:, nee , hittegolf , temperatuursgradiënt, ",
+            "Which temperature gradient over depth be considered?:, none , heat flux , temperature gradient ",
+            "Which temperature gradient over depth be considered?:, none , heat flux , temperature gradient ",
+            "Which temperature gradient over depth be considered?:, none , heat flux , temperature gradient ",
+            "Which temperature gradient over depth be considered?:, none , heat flux , temperature gradient ",
         ]
         self.option_method_rb_calc: List[str] = [
             "Borehole resistance calculation method:, constant , dynamic ",
@@ -1825,4 +1826,13 @@ class Translations:  # pragma: no cover
             "Decimal sign in file:,Point '.',Comma '++'",
             "Decimal sign in file:,Point '.',Comma '++'",
             "Decimal sign in file:,Point '.',Comma '++'",
+        ]
+        self.option_ground_heat_flux: List[str] = [
+            "Geothermal heat flux [W/m2]:",
+            "Geothermischer Wärmestrom [W/m²]:",
+            "Geothermal heat flux [W/m2]:",
+            "Geothermal heat flux [W/m2]:",
+            "Geothermal heat flux [W/m2]:",
+            "Geothermal heat flux [W/m2]:",
+            "Geothermal heat flux [W/m2]:",
         ]

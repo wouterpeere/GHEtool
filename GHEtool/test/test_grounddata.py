@@ -1,6 +1,6 @@
 import pytest
 
-from GHEtool.VariableClasses import GroundFluxTemperature, GroundConstantTemperature
+from GHEtool.VariableClasses import GroundFluxTemperature, GroundConstantTemperature, GroundTemperatureGradient
 
 
 def test_empty():
@@ -38,9 +38,14 @@ def test_alpha():
 def test_Tg():
     ground_flux_temperature = GroundFluxTemperature(3, 10, 2.4*10**6, 0.06)
     ground_constant_temperature = GroundConstantTemperature(3, 10)
+    ground_temperature_gradient = GroundTemperatureGradient(3, 10, 2.4*10**6, 2)
 
     assert ground_constant_temperature.calculate_Tg(100) == 10
     assert ground_flux_temperature.calculate_Tg(0) == 10
     assert ground_flux_temperature.calculate_Tg(100) == 11
     assert ground_flux_temperature.max_depth(18) == 400
     assert ground_flux_temperature.max_depth(14) == 200
+    assert ground_temperature_gradient.calculate_Tg(0) == 10
+    assert ground_temperature_gradient.calculate_Tg(100) == 11
+    assert ground_temperature_gradient.max_depth(18) == 400
+    assert ground_temperature_gradient.max_depth(14) == 200

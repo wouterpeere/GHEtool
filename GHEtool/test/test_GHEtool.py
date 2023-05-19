@@ -9,11 +9,12 @@ import pygfunction as gt
 import pytest
 from pytest import raises
 
-from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, PipeData, Borefield, SizingSetup, FOLDER
+from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, PipeData, Borefield, SizingSetup, FOLDER, GroundTemperatureGradient
 from GHEtool.main_class import MaxTempError
 
 data = GroundConstantTemperature(3, 10)
 data_ground_flux = GroundFluxTemperature(3, 10)
+data_ground_gradient = GroundTemperatureGradient(3, 10, gradient=2)
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
 pipeData = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
 
@@ -382,12 +383,23 @@ def test_sizing_L3_threshold_depth_error(borefield):
     max_temp = borefield.Tf_max
     borefield.set_max_ground_temperature(14)
     borefield.set_ground_parameters(data_ground_flux)
-    borefield._sizing_setup.use_constant_Tg = False
     with raises(ValueError):
         borefield.gfunction(3600, borefield.THRESHOLD_DEPTH_ERROR + 1)
-    borefield._sizing_setup.use_constant_Tg = True
     borefield.set_max_ground_temperature(max_temp)
     borefield.ground_data.flux = 0
+
+def test_calc_temperatures_gradient_flux(borefield):
+    """test that the geothermal heat flux and geothermal temperature gradient are leading to the same results"""
+    borefield.set_ground_parameters(data_ground_flux)
+    borefield.calculate_temperatures(150)
+    temps_heating = borefield.results_peak_heating
+    temps_cooling = borefield.results_peak_cooling
+    borefield.set_ground_parameters(data_ground_gradient)
+    borefield.calculate_temperatures(150)
+
+    assert np.allclose(temps_heating, borefield.results_peak_heating)
+    assert np.allclose(temps_cooling, borefield.results_peak_cooling)
+    borefield.set_ground_parameters(data)
 
 
 def test_sizing_L32(borefield_cooling_dom):
