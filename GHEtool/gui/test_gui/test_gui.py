@@ -137,10 +137,13 @@ def test_backward_compatibility(qtbot):
     
     # init gui window
     main_window_old = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
-    main_window_old._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_2_1_0.GHEtool')
+
+    assert not main_window_old._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_2_1_0.GHEtool')
+
+    assert main_window_old._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_2_1_1.GHEtool')
     # init gui window
     main_window_new = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
-    main_window_new._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_2_1_1.GHEtool')
+    assert main_window_new._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_2_1_2.GHEtool')
     # check if the imported values are the same
     for ds_old, ds_new in zip(main_window_old.list_ds, main_window_new.list_ds):
         for option in ds_new.list_options_aims:
