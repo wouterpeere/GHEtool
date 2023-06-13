@@ -6,7 +6,7 @@ Coninx, M., De Nies, J. (2022). Cost-efficient Cooling of Buildings by means of 
 with Active and Passive Cooling. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
 """
 
-from GHEtool import Borefield, GroundData
+from GHEtool import Borefield, GroundConstantTemperature
 
 import pandas as pd
 import numpy as np
@@ -143,7 +143,8 @@ def active_passive_cooling(location='Active_passive_example.csv'):
     borefield.set_max_ground_temperature(17)
 
     borefield.create_rectangular_borefield(12, 12, 6, 6, 100)
-    borefield.set_ground_parameters(GroundData(2.1, 11, 0.12))
+    borefield.set_ground_parameters(GroundConstantTemperature(2.1, 11))
+    borefield.Rb = 0.12
 
     ### PASSIVE COOLING
     depths = [0.9, 0]
