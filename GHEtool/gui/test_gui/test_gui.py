@@ -113,6 +113,9 @@ def test_wrong_results_shown(qtbot):
         main_window.threads[-1].any_signal.connect(main_window.thread_function)
     assert main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
 
+    # test FileNotFound
+    assert not main_window._save_to_data('C:/test.GHEtool')
+
 
 def test_backward_compatibility(qtbot):
     """
@@ -301,7 +304,6 @@ def test_file_import_errors(qtbot):
     assert np.isclose(data_new["Heating peak"][10], g_s.option_hp_nov.get_value(), atol=0.01) 
     assert np.isclose(data_new["Heating peak"][11], g_s.option_hp_dec.get_value(), atol=0.01)
 
-
     assert np.isclose(data_new["Cooling peak"][0], g_s.option_cp_jan.get_value(), atol=0.01)
     assert np.isclose(data_new["Cooling peak"][1], g_s.option_cp_feb.get_value(), atol=0.01)
     assert np.isclose(data_new["Cooling peak"][2], g_s.option_cp_mar.get_value(), atol=0.01)
@@ -314,7 +316,6 @@ def test_file_import_errors(qtbot):
     assert np.isclose(data_new["Cooling peak"][9], g_s.option_cp_oct.get_value(), atol=0.01)
     assert np.isclose(data_new["Cooling peak"][10], g_s.option_cp_nov.get_value(), atol=0.01)
     assert np.isclose(data_new["Cooling peak"][11], g_s.option_cp_dec.get_value(), atol=0.01)
-    
 
     assert np.isclose(data_new["Heating Load"][0], g_s.option_hl_jan.get_value(), atol=1) 
     assert np.isclose(data_new["Heating Load"][1], g_s.option_hl_feb.get_value(), atol=1) 
@@ -328,7 +329,6 @@ def test_file_import_errors(qtbot):
     assert np.isclose(data_new["Heating Load"][9], g_s.option_hl_oct.get_value(), atol=1) 
     assert np.isclose(data_new["Heating Load"][10], g_s.option_hl_nov.get_value(), atol=1) 
     assert np.isclose(data_new["Heating Load"][11], g_s.option_hl_dec.get_value(), atol=1)
-
 
     assert np.isclose(data_new["Cooling Load"][0], g_s.option_cl_jan.get_value(), atol=1)
     assert np.isclose(data_new["Cooling Load"][1], g_s.option_cl_feb.get_value(), atol=1)

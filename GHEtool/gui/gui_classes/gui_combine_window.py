@@ -94,7 +94,7 @@ class MainWindow(MainWindow):
             general_changes(saving['names'])
             return True
 
-    def _save_to_data(self, location: str | PurePath) -> None:
+    def _save_to_data(self, location: str | PurePath) -> bool:
         """
         This function saves the gui data to a json formatted file.
 
@@ -105,7 +105,8 @@ class MainWindow(MainWindow):
 
         Returns
         -------
-        None
+        bool
+            True if it was saved succesfully
         """
         # create list of all scenario names
         scenario_names = [self.list_widget_scenario.item(idx).text() for idx in range(self.list_widget_scenario.count())]
@@ -120,7 +121,10 @@ class MainWindow(MainWindow):
             # write data to back up file
             with open(location, "w") as file:
                 dump(saving, file, indent=1)
+            return True
         except FileNotFoundError:
             globs.LOGGER.error(self.translations.no_file_selected[self.gui_structure.option_language.get_value()[0]])
+            return False
         except PermissionError:  # pragma: no cover
             globs.LOGGER.error("PermissionError")
+            return False
