@@ -43,9 +43,9 @@ def test_building_load(qtbot):
     main_window.gui_structure.aim_optimize.widget.click()
     main_window.save_scenario()
     main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
-        main_window.threads[0].run()
-        main_window.threads[0].any_signal.connect(main_window.thread_function)
+    with qtbot.waitSignal(main_window.threads[-1].any_signal, raising=False) as blocker:
+        main_window.threads[-1].run()
+        main_window.threads[-1].any_signal.connect(main_window.thread_function)
 
     # check if the data is the same, because optimize load profile needs the building, not the ground data
     assert np.allclose(main_window.list_ds[0].results.hourly_cooling_load, peak_cooling)
@@ -71,9 +71,9 @@ def test_building_load(qtbot):
     main_window.gui_structure.option_temperature_profile_hourly.set_value(1)
     main_window.save_scenario()
     main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[0].any_signal, raising=False) as blocker:
-        main_window.threads[0].run()
-        main_window.threads[0].any_signal.connect(main_window.thread_function)
+    with qtbot.waitSignal(main_window.threads[-1].any_signal, raising=False) as blocker:
+        main_window.threads[-1].run()
+        main_window.threads[-1].any_signal.connect(main_window.thread_function)
 
     # # check if the data is the same
     test = (main_window.list_ds[0].results.hourly_cooling_load - peak_cooling)
