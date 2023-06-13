@@ -89,7 +89,8 @@ def test_without_slots():
     assert dictionary["test_variable_class"] == {'k_s': 1, 'Tg': 2,'__module__': 'GHEtool.VariableClasses.GroundData.GroundConstantTemperature',
                                                  '__name__': 'GroundConstantTemperature',
                                                  'volumetric_heat_capacity': 2400000.0,
-                                                 'alpha': 4.1666666666666667e-07}
+                                                 'alpha': 4.1666666666666667e-07,
+                                                 'variable_Tg': False}
     assert dictionary["test_pygfunction"] == {'value': [{'H': 100.0, 'D': 4.0, 'r_b': 0.075, 'x': 0.0, 'y': 0.0,
                                                         'tilt': 0.0, 'orientation': 3.141592653589793},
                                                        {'H': 100.0, 'D': 4.0, 'r_b': 0.075,
@@ -119,7 +120,8 @@ def test_without_slots():
     assert dictionary["test_variable_class"] == {'k_s': 1, 'Tg': 2,'__module__': 'GHEtool.VariableClasses.GroundData.GroundConstantTemperature',
                                                  '__name__': 'GroundConstantTemperature',
                                                  'volumetric_heat_capacity': 2400000.0,
-                                                 'alpha': 4.1666666666666667e-07}
+                                                 'alpha': 4.1666666666666667e-07,
+                                                 'variable_Tg': False}
     assert dictionary["test_pygfunction"] == {'value': [{'H': 100.0, 'D': 4.0, 'r_b': 0.075, 'x': 0.0, 'y': 0.0,
                                                         'tilt': 0.0, 'orientation': 3.141592653589793},
                                                        {'H': 100.0, 'D': 4.0, 'r_b': 0.075,
@@ -142,7 +144,8 @@ def test_with_slots():
     assert dictionary["test_variable_class"] == {'k_s': 1, 'Tg': 2,'__module__': 'GHEtool.VariableClasses.GroundData.GroundConstantTemperature',
                                                  '__name__': 'GroundConstantTemperature',
                                                  'volumetric_heat_capacity': 2400000.0,
-                                                 'alpha': 4.1666666666666667e-07}
+                                                 'alpha': 4.1666666666666667e-07,
+                                                 'variable_Tg': False}
     assert dictionary["test_pygfunction"] == {'value': [{'H': 100.0, 'D': 4.0, 'r_b': 0.075, 'x': 0.0, 'y': 0.0,
                                                         'tilt': 0.0, 'orientation': 3.141592653589793},
                                                        {'H': 100.0, 'D': 4.0, 'r_b': 0.075,
@@ -171,7 +174,8 @@ def test_with_slots():
     assert dictionary["test_variable_class"] == {'k_s': 1, 'Tg': 2,'__module__': 'GHEtool.VariableClasses.GroundData.GroundConstantTemperature',
                                                  '__name__': 'GroundConstantTemperature',
                                                  'volumetric_heat_capacity': 2400000.0,
-                                                 'alpha': 4.1666666666666667e-07}
+                                                 'alpha': 4.1666666666666667e-07,
+                                                 'variable_Tg': False}
     assert dictionary["test_pygfunction"] == {'value': [{'H': 100.0, 'D': 4.0, 'r_b': 0.075, 'x': 0.0, 'y': 0.0,
                                                         'tilt': 0.0, 'orientation': 3.141592653589793},
                                                        {'H': 100.0, 'D': 4.0, 'r_b': 0.075,
