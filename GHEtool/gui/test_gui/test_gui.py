@@ -419,3 +419,23 @@ def test_bug_when_opening_scenarios_which_have_autosave_enabled(qtbot):
     os.remove(main_window.default_path.joinpath(filename_2))
     main_window.delete_backup()
 
+
+def test_start_after_crash(qtbot):
+    """
+    tests if the gui can start after a crash when an * is present in the scenario's.
+
+    Parameters
+    ----------
+    qtbot
+
+    Returns
+    -------
+    None
+    """
+    import numpy as np
+
+    from GHEtool import FOLDER
+
+    # init gui window
+    main_window_old = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window_old._load_from_data(f'{FOLDER}/gui/test_gui/test_after_crash.GHEtool')

@@ -42,6 +42,10 @@ def main_functionalities():
                           baseload_heating=monthly_load_heating,
                           baseload_cooling=monthly_load_cooling)
 
+    # one can activate or deactive the logger, by default it is deactivated
+    # borefield.activate_logger()
+    # borefield.deactivate_logger()
+
     borefield.set_ground_parameters(data)
     borefield.create_rectangular_borefield(10, 12, 6, 6, 100, 4, 0.075)
 
@@ -95,5 +99,5 @@ def main_functionalities():
     borefield.print_temperature_profile(legend=True)
 
 
-if __name__== "__main__":  # pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
     main_functionalities()

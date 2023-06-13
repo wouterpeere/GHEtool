@@ -38,6 +38,9 @@ from ScenarioGUI.gui_classes.gui_structure_classes import (
     ResultText,
 )
 
+if TYPE_CHECKING:  # pragma: no cover
+    from GHEtool.gui.translation_class import Translations
+
 
 def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, cooling_load_column: str, combined: str, sep: str,
                   dec: str, fac: float, hourly: bool = False):
@@ -76,10 +79,12 @@ def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, 
     ------
     FileNotFoundError
         If the filename is empty or it cannot be found
+
     """
     # raise error if no filename exists
     if filename == "":
         raise FileNotFoundError
+
     # Generate list of columns that have to be imported
     cols: list = []
     if len(heating_load_column) >= 1:
@@ -93,6 +98,11 @@ def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, 
         df2: pd_DataFrame = pd_read_csv(filename, usecols=cols, sep=sep, decimal=dec)
     except:
         raise FileNotFoundError
+
+    # not the correct decimal seperator
+    if isinstance(df2.iloc[1, 1], str):
+        ghe_logger.error("Please select the correct decimal point seperator.")
+        raise ValueError
 
     # ---------------------- Time Step Section  ----------------------
     # import pandas here to save start up time
@@ -779,7 +789,11 @@ class GUI(GuiStructure):
         self.option_unit_data = ButtonBox(label=translations.option_unit_data, default_index=1, entries=["W", "kW", "MW"],
                                           category=self.category_select_file)
 
-        self.button_load_csv = FunctionButton(category=self.category_select_file, button_text=translations.button_load_csv, icon="Download.svg")
+                self.hint_press_load = Hint(hint=self.translations.hint_press_load,
+                                            category=self.category_select_file,
+                                            warning=True)
+
+                self.button_load_csv = FunctionButton(category=self.category_select_file, button_text=translations.button_load_csv, icon="Download.svg")
 
         # add dependencies
         self.option_filename.add_aim_option_2_be_set_for_check(self.aim_optimize)
@@ -800,12 +814,18 @@ class GUI(GuiStructure):
         self.option_single_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
         self.option_single_column.add_aim_option_2_be_set_for_check((self.option_temperature_profile_hourly, 1))
 
-        self.option_method_size_depth.add_link_2_show(self.button_load_csv, on_index=0)
-        self.option_method_size_depth.add_link_2_show(self.button_load_csv, on_index=1)
-        self.aim_temp_profile.add_link_2_show(self.button_load_csv)
-        self.option_temperature_profile_hourly.add_link_2_show(self.button_load_csv, on_index=0)
-        self.aim_req_depth.add_link_2_show(self.button_load_csv)
-        # self.aim_size_length.add_link_2_show(self.button_load_csv)
+                self.option_method_size_depth.add_link_2_show(self.button_load_csv, on_index=0)
+                self.option_method_size_depth.add_link_2_show(self.button_load_csv, on_index=1)
+                self.aim_temp_profile.add_link_2_show(self.button_load_csv)
+                self.option_temperature_profile_hourly.add_link_2_show(self.button_load_csv, on_index=0)
+                self.aim_req_depth.add_link_2_show(self.button_load_csv)
+
+                self.option_method_size_depth.add_link_2_show(self.hint_press_load, on_index=0)
+                self.option_method_size_depth.add_link_2_show(self.hint_press_load, on_index=1)
+                self.aim_temp_profile.add_link_2_show(self.hint_press_load)
+                self.option_temperature_profile_hourly.add_link_2_show(self.hint_press_load, on_index=0)
+                self.aim_req_depth.add_link_2_show(self.hint_press_load)
+                # self.aim_size_length.add_link_2_show(self.button_load_csv)
 
         # add change events
         self.option_seperator_csv.change_event(self.fun_update_combo_box_data_file)
@@ -1122,9 +1142,43 @@ class GUI(GuiStructure):
         self.aim_req_depth.add_link_2_show(self.category_th_demand)
         # self.aim_size_length.add_link_2_show(self.category_th_demand)
 
-        # create categories
-        #create_category_select_datafile()
-        #create_category_th_demand()
+            def create_category_building_demand():
+                self.category_demand_building_or_geo =\
+                    Category(page=self.page_thermal, label=self.translations.category_demand_building_or_geo)
+                self.geo_load = ButtonBox(label=self.translations.geo_load, default_index=0,
+                                          entries=[" goethermal ", " building "],
+                                          category=self.category_demand_building_or_geo)
+                self.SCOP = FloatBox(
+                    category=self.category_demand_building_or_geo,
+                    label=self.translations.SCOP,
+                    default_value=4,
+                    decimal_number=2,
+                    minimal_value=1,
+                    maximal_value=50,
+                    step=0.1,
+                )
+                self.SEER = FloatBox(
+                    category=self.category_demand_building_or_geo,
+                    label=self.translations.SEER,
+                    default_value=3,
+                    decimal_number=2,
+                    minimal_value=1,
+                    maximal_value=50,
+                    step=0.1,
+                )
+
+                # add dependencies
+                self.aim_optimize.add_link_2_show(self.SCOP)
+                self.aim_optimize.add_link_2_show(self.SEER)
+                self.geo_load.add_link_2_show(self.SCOP, 1)
+                self.geo_load.add_link_2_show(self.SEER, 1)
+                self.aim_req_depth.add_link_2_show(self.geo_load)
+                self.aim_temp_profile.add_link_2_show(self.geo_load)
+
+            # create categories
+            # create_category_select_datafile()
+            create_category_building_demand()
+            # create_category_th_demand()
 
         def create_page_results():
             # create page
@@ -1142,6 +1196,12 @@ class GUI(GuiStructure):
                 self.result_Rb_calculated.text_to_be_shown("Borefield", "_Rb")
                 self.result_Rb_calculated.function_to_convert_to_text(lambda x: round(x, 4))
 
+                self.result_Reynolds = ResultText(self.translations.result_Reynolds,
+                                                       category=self.numerical_results,
+                                                       prefix="Reynolds number: ", suffix="")
+                self.result_Reynolds.text_to_be_shown("Borefield", "Re")
+                self.result_Reynolds.function_to_convert_to_text(lambda x: round(x, 0))
+
                 self.results_ground_temperature = ResultText(translations.results_ground_temperature, category=self.numerical_results,
                                                              prefix="Average ground temperature: ", suffix=" deg C")
                 self.results_ground_temperature.text_to_be_shown("Borefield", "_Tg")
@@ -1149,7 +1209,12 @@ class GUI(GuiStructure):
 
                 self.results_heating_load = ResultText(translations.results_heating_load, category=self.numerical_results,
                                                        prefix="Heating load on the borefield: ", suffix=" kWh")
-                self.results_heating_load.text_to_be_shown("Borefield", "baseload_heating")
+                self.results_heating_peak_geo = ResultText(self.translations.results_heating_peak_geo,
+                                                       category=self.numerical_results,
+                                                       prefix="with a peak of: ", suffix=" kW")
+                self.results_heating_peak_geo.text_to_be_shown("Borefield", "hourly_heating_load_building")
+                self.results_heating_peak_geo.function_to_convert_to_text(lambda x: round(max(x), 2))
+                self.results_heating_load.text_to_be_shown("Borefield", "hourly_heating_load_building")
                 self.results_heating_load.function_to_convert_to_text(lambda x: round(sum(x), 0))
                 self.results_heating_load_percentage = ResultText(translations.results_heating_load_percentage, category=self.numerical_results,
                                                                   prefix="This is ", suffix="% of the heating load")
@@ -1157,7 +1222,7 @@ class GUI(GuiStructure):
                 self.results_heating_load_percentage.function_to_convert_to_text(lambda x: round(x, 2))
                 self.results_heating_ext = ResultText(translations.results_heating_ext, category=self.numerical_results,
                                                       prefix="heating load external: ", suffix=" kWh")
-                self.results_heating_ext.text_to_be_shown("Borefield", "monthly_load_heating_external")
+                self.results_heating_ext.text_to_be_shown("Borefield", "hourly_heating_load_external")
                 self.results_heating_ext.function_to_convert_to_text(lambda x: round(sum(x), 0))
                 self.results_heating_peak = ResultText(translations.results_heating_peak, category=self.numerical_results,
                                                        prefix="with a peak of: ", suffix=" kW")
@@ -1166,7 +1231,12 @@ class GUI(GuiStructure):
 
                 self.results_cooling_load = ResultText(translations.results_cooling_load, category=self.numerical_results,
                                                        prefix="Cooling load on the borefield: ", suffix=" kWh")
-                self.results_cooling_load.text_to_be_shown("Borefield", "baseload_cooling")
+                self.results_cooling_peak_geo = ResultText(self.translations.results_cooling_peak_geo,
+                                                       category=self.numerical_results,
+                                                       prefix="with a peak of: ", suffix=" kW")
+                self.results_cooling_peak_geo.text_to_be_shown("Borefield", "hourly_cooling_load_building")
+                self.results_cooling_peak_geo.function_to_convert_to_text(lambda x: round(max(x), 2))
+                self.results_cooling_load.text_to_be_shown("Borefield", "hourly_cooling_load_building")
                 self.results_cooling_load.function_to_convert_to_text(lambda x: round(sum(x), 0))
                 self.results_cooling_load_percentage = ResultText(translations.results_cooling_load_percentage, category=self.numerical_results,
                                                                   prefix="This is ", suffix="% of the cooling load")
@@ -1174,7 +1244,7 @@ class GUI(GuiStructure):
                 self.results_cooling_load_percentage.function_to_convert_to_text(lambda x: round(x, 2))
                 self.results_cooling_ext = ResultText(translations.results_cooling_ext, category=self.numerical_results,
                                                       prefix="cooling load external: ", suffix=" kWh")
-                self.results_cooling_ext.text_to_be_shown("Borefield", "monthly_load_cooling_external")
+                self.results_cooling_ext.text_to_be_shown("Borefield", "hourly_cooling_load_external")
                 self.results_cooling_ext.function_to_convert_to_text(lambda x: round(sum(x), 0))
                 self.results_cooling_peak = ResultText(translations.results_cooling_peak, category=self.numerical_results,
                                                        prefix="with a peak of: ", suffix=" kW")
@@ -1193,9 +1263,11 @@ class GUI(GuiStructure):
                 # add dependency
                 self.option_method_temp_gradient.add_link_2_show(self.results_ground_temperature, on_index=1)
                 self.option_method_rb_calc.add_link_2_show(self.result_Rb_calculated, on_index=1)
+                self.option_method_rb_calc.add_link_2_show(self.result_Reynolds, on_index=1)
                 self.aim_req_depth.add_link_2_show(self.result_text_depth)
 
                 self.aim_optimize.add_link_2_show(self.results_heating_ext)
+                self.aim_optimize.add_link_2_show(self.results_heating_peak_geo)
                 self.aim_optimize.add_link_2_show(self.results_heating_load_percentage)
                 self.aim_optimize.add_link_2_show(self.results_heating_load)
                 self.aim_optimize.add_link_2_show(self.results_heating_peak)
@@ -1203,6 +1275,7 @@ class GUI(GuiStructure):
                 self.aim_optimize.add_link_2_show(self.results_cooling_load_percentage)
                 self.aim_optimize.add_link_2_show(self.results_cooling_load)
                 self.aim_optimize.add_link_2_show(self.results_cooling_peak)
+                self.aim_optimize.add_link_2_show(self.results_cooling_peak_geo)
 
                 self.aim_temp_profile.add_link_2_show(self.max_temp)
                 self.aim_temp_profile.add_link_2_show(self.min_temp)
@@ -1476,6 +1549,15 @@ class GUI(GuiStructure):
         # get decimal and column seperator
         sep: str = ";" if self.option_seperator_csv.get_value() == 0 else ","
         dec: str = "." if self.option_decimal_csv.get_value() == 0 else ","
+
+        # raise error if seperator is decimal point
+        if dec == sep:
+            ghe_logger.warning("Please make sure the seperator and decimal point are different.")
+            return
+
+        if filename == "":
+            ghe_logger.info(self.translations.NoFileSelected[self.option_language.get_value()])
+            return
         # try to read CSV-File
         try:
             data: pd_DataFrame = pd_read_csv(filename, sep=sep, decimal=dec)
@@ -1488,15 +1570,15 @@ class GUI(GuiStructure):
         # get data column names to set them to comboBoxes
         columns = data.columns
         # clear comboBoxes and add column names
+        self.option_heating_column.widget.clear()
+        self.option_cooling_column.widget.clear()
+        self.option_single_column.widget.clear()
+        self.option_heating_column.widget.addItems(columns)
+        self.option_cooling_column.widget.addItems(columns)
+        self.option_single_column.widget.addItems(columns)
         # set column selection mode to 2 columns if more than one line exists
-        self.option_column.set_value(1 if len(columns) > 0  else 0)
-        options_columns = [self.option_heating_column, self.option_cooling_column, self.option_single_column]
-        for list_box in options_columns:
-            idx = list_box.get_value()[0]
-            list_box.widget.clear()
-            list_box.widget.addItems(columns)
-            if len(columns) > idx:
-                list_box.set_value(idx)
+        self.option_column.set_value(1 if len(columns) > 0 else 0)
+        self.option_cooling_column.widget.setCurrentIndex(len(columns) - 1)
 
     def fun_display_data(self) -> None:
         """

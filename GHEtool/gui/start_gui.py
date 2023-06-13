@@ -60,6 +60,7 @@ def run(path_list=None):  # pragma: no cover
     if is_frozen:
         pyi_splash.close()
 
+    ghe_logger.info('GHEtool loaded!')
     window.showMaximized()
     # close app
     sys_exit(app.exec())

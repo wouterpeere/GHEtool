@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import List, Tuple, Union
 
 import numpy as np
+import copy
 import pygfunction as gt
 from scipy import interpolate
 
@@ -45,7 +46,7 @@ class FIFO:
 
     def in_fifo_list(self, value: float) -> bool:
         """
-        This function checks whether or not the value is in the fifo list, but not the last element!
+        This function checks whether the value is in the fifo list, but not the last element!
 
         Parameters
         ----------
@@ -317,7 +318,7 @@ class GFunction:
         """
         # raise error when value is negative
         if depth <= 0:
-            raise ValueError("The depth is smaller then zero!")
+            raise ValueError(f"The depth {depth} is smaller then zero!")
 
         # get nearest depth index
         val_depth, idx_depth = self._nearest_value(self.depth_array, depth)

@@ -1,5 +1,6 @@
+import pytest
 
-from GHEtool import SizingSetup
+from GHEtool import *
 
 
 def test_initialising_setups():

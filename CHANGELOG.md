@@ -3,21 +3,37 @@ All notable changes to this project will be documented in this file including pl
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [2.1.2] - [expected] apr 2023
+## [2.1.2] - 2023-04-28
 
 ### Added
-- Different classes for the ground data: one for constant ground temperature and one for the ground temperature with flux (issue #45).
+- Logger for GHEtool (issue #96).
+- Examples are now also in RTD.
+- Reynolds number is shown on the result page (issue #112).
+- Example for the combination of active and passive cooling (issue #114).
+- It is now possible to use building loads (with a SCOP/SEER) instead of ground loads(issue #115).
 
 ### Changed
 - In figure plotting, the interval[x[i], x[i+1]) now has the value y[i] (instead of y[i-1]).
 - Scroll behaviour on the result page (issue #99).
 - Changed icon of GHEtool.
+- Imbalance changed to property so it can handle hourly loads as well (issue #106).
+- Remove recalculation option (issue #109).
+- When data is loaded in a two-column format, the button for 'two columns' is set (issue #133).
+- GUI doesn't crash anymore when wrong seperator and decimal points are selected when loading a .csv.
 
 ### Fixed
+- Sizing doesn't crash when either no heating or cooling load is present (issue #91).
 - Wrong heating load in april in GUI (issue #94).
+- Results are now cleared when new loads are loaded (issue #106).
+- Options for g-function calculations are not working (issue #119).
+- Wrong naming aim optimise load profile.
+- GHEtool now can start after a crash without removing the backup file.
+- Some translations were not correct.
+- Solves issue with loading .csv file and optimise load profile (issue #130).
+- Figure in optimize load profile keeps getting bigger and bigger (issue #131).
+- Problem with sizing with temperature gradients (issue #136).
+- Problem solved with calculate_multiple_scenarios.
 
-### Changed
-- GUI base classes has been separated into a new package to be easier maintainable. 
 
 ## [2.1.1] - 2023-01-30
 
@@ -151,7 +167,9 @@ code version > speed improvements > v2.1.1.
 ### Fixed 
 - fixed bug in interpolation
 
-[2.1.1]: https://github.com/wouterpeere/GHEtool/compare/v2.1.0...main
+
+[2.1.2]: https://github.com/wouterpeere/GHEtool/compare/v2.1.1...v2.1.2
+[2.1.1]: https://github.com/wouterpeere/GHEtool/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/wouterpeere/GHEtool/compare/v2.0.6...v2.1.0
 [2.0.6]: https://github.com/wouterpeere/GHEtool/compare/v2.0.5...v2.0.6
 [2.0.5]: https://github.com/wouterpeere/GHEtool/compare/v2.0.4...v2.0.5

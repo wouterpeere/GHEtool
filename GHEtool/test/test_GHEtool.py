@@ -165,7 +165,6 @@ def empty_borefield():
 
 @pytest.fixture
 def hourly_borefield():
-    from GHEtool import FOLDER
     borefield = Borefield()
     borefield.set_ground_parameters(data)
     borefield.set_Rb(0.2)
@@ -262,6 +261,8 @@ def test_hourly_to_monthly(borefield):
 
     assert np.isclose(np.sum(borefield.baseload_cooling), np.sum(borefield.hourly_cooling_load))
     assert np.isclose(np.sum(borefield.baseload_heating), np.sum(borefield.hourly_heating_load))
+    # check if hourly imbalance equals the monthly imbalance
+    assert np.isclose(borefield.imbalance, np.sum(borefield.baseload_cooling) - np.sum(borefield.baseload_heating))
 
 
 def test_size(borefield):
@@ -404,6 +405,16 @@ def test_size_L4_without_data(borefield):
 def test_load_duration(monkeypatch, hourly_borefield):
     monkeypatch.setattr(plt, 'show', lambda: None)
     hourly_borefield.plot_load_duration(legend=True)
+    hourly_borefield.optimise_load_profile(150)
+    hourly_borefield.set_min_ground_temperature(-5)
+    hourly_borefield.set_max_ground_temperature(17)
+    hourly_borefield.optimise_load_profile(150)
+    hourly_borefield.print_temperature_profile(plot_hourly=True)
+
+
+def test_plot_hourly(monkeypatch, hourly_borefield):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    hourly_borefield.print_temperature_profile(plot_hourly=True)
 
 
 def test_load_duration_no_hourly_data(borefield):
@@ -549,6 +560,8 @@ def test_check_hourly_load(borefield):
     borefield.hourly_cooling_load[0] = -1
     with raises(ValueError):
         borefield._check_hourly_load()
+    except ValueError:
+        assert True
 
 
 def test_load_hourly_data(borefield):
@@ -603,20 +616,9 @@ def test_incorrect_values_peak_baseload(borefield):
         borefield.set_baseload_heating([8, 8])
 
 
-def test_temperature_profile_available(hourly_borefield):
-    hourly_borefield.calculate_temperatures(100, True)
-    assert not hourly_borefield.recalculation_needed
-    assert hourly_borefield._check_temperature_profile_available(hourly=True)
-    hourly_borefield.recalculation_needed = True
-    assert not hourly_borefield._check_temperature_profile_available(True)
-
-    hourly_borefield.gui = True
-    hourly_borefield._plot_temperature_profile(plot_hourly=True)
-
-
 def test_set_options_gfunction_calculation(borefield):
     borefield.set_options_gfunction_calculation({"method": "equivalentt"})
-    assert borefield.options_pygfunction["method"] == "equivalentt"
+    assert borefield.gfunction_calculation_object.options["method"] == "equivalentt"
     borefield.set_options_gfunction_calculation({"method": "equivalent"})
 
 
@@ -650,3 +652,29 @@ def test_hourly_temperature_profile(hourly_borefield):
     hourly_borefield.hourly_heating_load_on_the_borefield = np.array([])
     hourly_borefield.hourly_cooling_load_on_the_borefield = np.array([])
     hourly_borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+
+def test_logging(borefield):
+    borefield.activate_logger()
+    borefield.deactivate_logger()
+
+
+def test_value_error_cooling_dom_temp_gradient():
+    data = GroundData(3, 12, 0.2)
+    borefield_pyg = gt.boreholes.rectangle_field(5, 5, 6, 6, 110, 4, 0.075)
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(1)
+
+    borefield = Borefield(simulation_period=20,
+                          peak_heating=peak_heating,
+                          peak_cooling=peak_cooling,
+                          baseload_heating=monthly_load_heating,
+                          baseload_cooling=monthly_load_cooling)
+
+    borefield.set_ground_parameters(data)
+    borefield.set_borefield(borefield_pyg)
+
+    borefield.sizing_setup(use_constant_Tg=False)
+
+    try:
+        borefield.size()
+    except ValueError:
+        assert True

@@ -9,14 +9,13 @@ class Translations:  # pragma: no cover
         "label_Language",
         "category_language",
         "option_language",
-        "push_button_save_scenario",
-        "push_button_add_scenario",
-        "push_button_delete_scenario",
-        "push_button_start_multiple",
-        "push_button_cancel",
+        "pushButton_SaveScenario",
+        "pushButton_AddScenario",
+        "pushButton_DeleteScenario",
+        "pushButton_start_multiple",
+        "pushButton_Cancel",
         "page_aim",
-        "page_borefield",
-        "page_earth",
+        "page_borehole",
         "page_borehole_resistance",
         "page_thermal",
         "page_result",
@@ -28,7 +27,6 @@ class Translations:  # pragma: no cover
         "category_borehole",
         "option_depth",
         "option_spacing",
-        "option_spacing_length",
         "option_conductivity",
         "option_ground_temp",
         "option_max_depth",
@@ -95,13 +93,13 @@ class Translations:  # pragma: no cover
         "ChooseCSV",
         "ChooseXLS",
         "ChooseXLSX",
-        "no_file_selected",
+        "NoFileSelected",
         "ValueError",
         "ColumnError",
-        "choose_load",
+        "ChooseGHEtool",
         "SaveFigure",
         "SaveData",
-        "Save",
+        "SaveGHEtool",
         "label_WarningCustomBorefield",
         "label_WarningDepth",
         "checkBox_SizeBorefield",
@@ -113,13 +111,13 @@ class Translations:  # pragma: no cover
         "label_Open",
         "label_Save_As",
         "Calculation_Finished",
-        "tool_imported",
-        "tool_imported_start",
+        "GHE_tool_imported",
+        "GHE_tool_imported_start",
         "label_new_scenario",
         "new_name",
         "label_okay",
         "label_abort",
-        "no_backup_file",
+        "NoBackupFile",
         "label_close",
         "label_cancel",
         "label_CancelTitle",
@@ -129,20 +127,20 @@ class Translations:  # pragma: no cover
         "X_Axis_Load",
         "Y_Axis_Load_P",
         "Y_Axis_Load_Q",
-        "menu_language",
-        "menu_settings",
-        "menu_calculation",
-        "menu_file",
-        "menu_scenario",
+        "menuLanguage",
+        "menuSettings",
+        "menuCalculation",
+        "menuFile",
+        "menuScenario",
         "action_start_multiple",
-        "action_new",
-        "action_save",
-        "action_open",
-        "action_update_scenario",
-        "action_add_scenario",
-        "action_delete_scenario",
-        "action_save_as",
-        "button_rename_scenario",
+        "actionNew",
+        "actionSave",
+        "actionOpen",
+        "actionUpdate_Scenario",
+        "actionAdd_Scenario",
+        "actionDelete_scenario",
+        "actionSave_As",
+        "actionRename_scenario",
         "button_rename_scenario",
         "label_Language_Head",
         "label_aim_question",
@@ -171,7 +169,6 @@ class Translations:  # pragma: no cover
         "option_pipe_outer_radius",
         "option_pipe_inner_radius",
         "option_pipe_borehole_radius",
-        "option_pipe_borehole_radius_2",
         "option_pipe_distance",
         "option_pipe_roughness",
         "option_pipe_depth",
@@ -183,7 +180,7 @@ class Translations:  # pragma: no cover
         "label_ResOptimizeLoad5",
         "label_ResOptimizeLoad6",
         "pushButton_start_single",
-        "not_calculated",
+        "NotCalculated",
         "NoSolution",
         "aim_temp_profile",
         "aim_req_depth",
@@ -195,11 +192,12 @@ class Translations:  # pragma: no cover
         "option_method_temp_gradient",
         "option_method_rb_calc",
         "category_earth",
-        "cat_no_results",
+        "cat_no_result",
         "text_no_result",
         "numerical_results",
         "result_text_depth",
         "result_Rb_calculated",
+        "result_Reynolds",
         "results_ground_temperature",
         "results_heating_load",
         "results_heating_load_percentage",
@@ -219,28 +217,28 @@ class Translations:  # pragma: no cover
         "option_len_peak_heating",
         "option_len_peak_cooling",
         "option_temperature_profile_hourly",
-        "option_ground_temp_gradient",
         "option_n_threads",
-        "option_number_circle_boreholes",
-        "option_borefield_radius",
-        "custom_borefield",
-        "option_seperator_borefield",
-        "borefield_file",
-        "import_borefield",
-        "option_decimal_borefield",
+        "category_demand_building_or_geo",
+        "geo_load",
+        "SCOP",
+        "SEER",
+        "results_heating_peak_geo",
+        "results_cooling_peak_geo",
+        "option_ground_temp_gradient",
+        "hint_press_load",
         "languages",
     )
 
     def __init__(self):
         self.languages: List[str] = ["English", "German", "Dutch", "Italian", "French", "Spanish", "Galician"]
         self.icon: List[str] = [
-            "Flag_English.svg",
-            "Flag_German.svg",
-            "Flag_Dutch.svg",
-            "Flag_Italian.svg",
-            "Flag_French.svg",
-            "Flag_Spain.svg",
-            "Flag_Galicia.svg",
+            ":/icons/icons/Flag_English.svg",
+            ":/icons/icons/Flag_German.svg",
+            ":/icons/icons/Flag_Dutch.svg",
+            ":/icons/icons/Flag_Italian.svg",
+            ":/icons/icons/Flag_French.svg",
+            ":/icons/icons/Flag_Spain.svg",
+            ":/icons/icons/Flag_Galicia.svg",
         ]
         self.short_cut: List[str] = ["Ctrl+Alt+E", "Ctrl+Alt+G", "Ctrl+Alt+D", "Ctrl+Alt+I", "Ctrl+Alt+F", "Ctrl+Alt+S", "Ctrl+Alt+A"]
         self.scenarioString: List[str] = ["Scenario", "Szenario", "Scenario", "Scenario", "Scénario", "Escenario", "Escenario"]
@@ -255,7 +253,7 @@ class Translations:  # pragma: no cover
             "Idioma:,English,German,Dutch,Italian,French,Spanish,Galician",
             "Lingua:,English,German,Dutch,Italian,French,Spanish,Galician",
         ]
-        self.push_button_save_scenario: List[str] = [
+        self.pushButton_SaveScenario: List[str] = [
             "Update scenario",
             "Szenario aktualisieren",
             "Update scenario",
@@ -264,7 +262,7 @@ class Translations:  # pragma: no cover
             "Actualizar escenario",
             "Actualizar escenario",
         ]
-        self.push_button_add_scenario: List[str] = [
+        self.pushButton_AddScenario: List[str] = [
             "Add scenario",
             "Szenario hinzufügen",
             "Nieuw scenario",
@@ -273,7 +271,7 @@ class Translations:  # pragma: no cover
             "Añadir escenario",
             "Engadir escenario",
         ]
-        self.push_button_delete_scenario: List[str] = [
+        self.pushButton_DeleteScenario: List[str] = [
             "Delete scenario",
             "Szenario löschen",
             "Verwijder scenario",
@@ -282,7 +280,7 @@ class Translations:  # pragma: no cover
             "Borrar escenario",
             "Eliminar escenario",
         ]
-        self.push_button_start_multiple: List[str] = [
+        self.pushButton_start_multiple: List[str] = [
             "Calculate all scenarios",
             "Berechne alle Szenarios",
             "Bereken alle scenarios",
@@ -291,7 +289,7 @@ class Translations:  # pragma: no cover
             "Calculate all scenarios",
             "Calculate all scenarios",
         ]
-        self.push_button_cancel: List[str] = ["Exit", "Verlassen", "Sluit", "Esci", "Sortie", "Salir", "Saír"]
+        self.pushButton_Cancel: List[str] = ["Exit", "Verlassen", "Sluit", "Esci", "Sortie", "Salir", "Saír"]
         self.page_aim: List[str] = [
             "Aim,Aim of simulation",
             "Ziel,Ziel der Simulation",
@@ -301,16 +299,15 @@ class Translations:  # pragma: no cover
             "Aim,Aim of simulation",
             "Aim,Aim of simulation",
         ]
-        self.page_borefield: List[str] = [
-            "Borefield,Borefield",
-            "Bohrlochfeld,Bohrlochfeld",
-            "Boorveld,Boorveld",
-            "Foro,Foro",
-            "Forage,Forage",
-            "Pozo,Pozo",
-            "Pozo,Pozo",
+        self.page_borehole: List[str] = [
+            "Borehole @and earth,Borehole and earth",
+            "Bohrloch @und Erdreich,Bohrloch und Erdreich",
+            "Boorveld @en grond,Boorveld en grond",
+            "Foro e @terra,Foro e terra",
+            "Forage @et terre,Forage et terre",
+            "Pozo @y terreno,Pozo y terreno",
+            "Pozo @e chan,Pozo e chan",
         ]
-        self.page_earth: List[str] = ["Earth,Earth", "Erdreich,Erdreich", "Grond,Grond", "Terra,Terra", "Terre,Terre", "Terreno,Terreno", "Chan,Chan"]
         self.page_borehole_resistance: List[str] = [
             "Borehole @resistance,Equivalent borehole resistance",
             "Bohrloch-@widerstand,Equivalänter Bohrlochwiderstand",
@@ -360,9 +357,9 @@ class Translations:  # pragma: no cover
         self.label_File: List[str] = ["File", "Datei", "Bestand", "File", "File", "File", "File"]
         self.label_Calculation: List[str] = ["Calculation", "Berechnung", "Berekening", "Calculation", "Calculation", "Calculation", "Calculation"]
         self.category_borehole: List[str] = [
-            "Borefield properties",
-            "Bohrlochfeldeigenschaften",
-            "Eigenschappen van boorveld",
+            "Borehole and earth properties",
+            "Bohrloch und Erdreicheigenschaften",
+            "Eigenschappen van boorveld en grond",
             "Proprietà del foro e della terra",
             "Propriétés du trou de sonde et de la terre",
             "Propiedades del pozo y terreno",
@@ -378,22 +375,13 @@ class Translations:  # pragma: no cover
             "Profundidade do pozo [m]: ",
         ]
         self.option_spacing: List[str] = [
-            "Borehole spacing width [m]: ",
-            "Bohrlochabstand Breitenrichtung [m]: ",
-            "Boorgatspatiëring Breedte [m]: ",
+            "Borehole spacing [m]: ",
+            "Bohrlochabstand [m]: ",
+            "Boorgatspatiëring [m]: ",
             "Spaziatura del foro [m]: ",
             "Espacement des trous de forage [m]: ",
             "Espaciado entre pozos [m]: ",
-            "Espazamento entre pozos [m]:",
-        ]
-        self.option_spacing_length: List[str] = [
-            "Borehole spacing length [m]: ",
-            "Bohrlochabstand Längenrichtung [m]: ",
-            "Boorgatspatiëring lengte [m]: ",
-            "Spaziatura del foro [m]: ",
-            "Espacement des trous de forage [m]: ",
-            "Espaciado entre pozos [m]: ",
-            "Espazamento entre pozos [m]:",
+            "Espazamento entre pozos [m]: ",
         ]
         self.option_conductivity: List[str] = [
             "Conductivity of the soil [W/mK]: ",
@@ -837,7 +825,7 @@ class Translations:  # pragma: no cover
             "Elija xls para cargar el archivo de datos",
             "Escolla xls para cargar o ficheiro de datos",
         ]
-        self.no_file_selected: List[str] = [
+        self.NoFileSelected: List[str] = [
             "No file selected.",
             "Keine Datei ausgewählt.",
             "Geen bestand geselecteerd.",
@@ -864,7 +852,7 @@ class Translations:  # pragma: no cover
             "Columna incorrecta: compruebe las columnas seleccionadas",
             "Columna incorrecta: comprobe as columnas escollidas",
         ]
-        self.choose_load: List[str] = [
+        self.ChooseGHEtool: List[str] = [
             "Choose *.GHEtool to load scenarios",
             "Wählen Sie *.GHEtool zum Laden von Szenarien",
             "Kies *.GHEtool bestand",
@@ -891,7 +879,7 @@ class Translations:  # pragma: no cover
             "Elija la localización del csv para guardar resultados",
             "Escolla a localización do csv para gardar resultados",
         ]
-        self.Save: List[str] = [
+        self.SaveGHEtool: List[str] = [
             "Choose *.GHEtool location to save scenarios",
             "Wählen Sie den *.GHEtool-Speicherort zum Speichern von Szenarien",
             "Kies gewenste *.GHEtool locatie",
@@ -967,7 +955,7 @@ class Translations:  # pragma: no cover
             "Calculation finished",
             "Calculation finished",
         ]
-        self.tool_imported: List[str] = [
+        self.GHE_tool_imported: List[str] = [
             "GHEtool imported",
             "GHEtool importiert",
             "GHEtool geïmporteerd",
@@ -976,7 +964,7 @@ class Translations:  # pragma: no cover
             "GHEtool imported",
             "GHEtool imported",
         ]
-        self.tool_imported_start: List[str] = [
+        self.GHE_tool_imported_start: List[str] = [
             "Start importing GHEtool",
             "Starte GHEtool zu importieren",
             "Start importering GHEtool",
@@ -997,7 +985,7 @@ class Translations:  # pragma: no cover
         self.new_name: List[str] = ["New name for ", "Neuer Name für ", "Nieuwe naam voor ", "New name for ", "New name for ", "New name for ", "New name for "]
         self.label_okay: List[str] = ["Okay ", "Okay ", "Oke ", "Okay ", "Okay ", "Okay ", "Okay "]
         self.label_abort: List[str] = ["Abort ", "Abbruch ", "Geannuleerd ", "Abort ", "Abort ", "Abort ", "Abort "]
-        self.no_backup_file: List[str] = [
+        self.NoBackupFile: List[str] = [
             "no backup fileImport",
             "Keine Sicherungsdatei gefunden",
             "geen backup fileImport",
@@ -1063,11 +1051,11 @@ class Translations:  # pragma: no cover
             "Remaining thermal energy [kWh]",
             "Remaining thermal energy [kWh]",
         ]
-        self.menu_language: List[str] = ["Language", "Sprache", "Taal", "Languange", "Languange", "Idiom", "Lingua"]
-        self.menu_settings: List[str] = ["Settings", "Einstellungen", "Instellingen", "Settings", "Settings", "Settings", "Settings"]
-        self.menu_calculation: List[str] = ["Calculation", "Berechnung", "Berekening", "Calculation", "Calculation", "Calculation", "Calculation"]
-        self.menu_file: List[str] = ["File", "Datei", "Bestand", "File", "File", "File", "File"]
-        self.menu_scenario: List[str] = ["Scenario", "Szenario", "Scenario", "Scenario", "Scénario", "Escenario", "Escenario"]
+        self.menuLanguage: List[str] = ["Language", "Sprache", "Taal", "Languange", "Languange", "Idiom", "Lingua"]
+        self.menuSettings: List[str] = ["Settings", "Einstellungen", "Instellingen", "Settings", "Settings", "Settings", "Settings"]
+        self.menuCalculation: List[str] = ["Calculation", "Berechnung", "Berekening", "Calculation", "Calculation", "Calculation", "Calculation"]
+        self.menuFile: List[str] = ["File", "Datei", "Bestand", "File", "File", "File", "File"]
+        self.menuScenario: List[str] = ["Scenario", "Szenario", "Scenario", "Scenario", "Scénario", "Escenario", "Escenario"]
         self.action_start_multiple: List[str] = [
             "Calculate all scenarios",
             "Berechne alle Szenarios",
@@ -1077,10 +1065,10 @@ class Translations:  # pragma: no cover
             "Calculate all scenarios",
             "Calculate all scenarios",
         ]
-        self.action_new: List[str] = ["New Project", "Neues Projekt", "Nieuw project", "New Project", "New Project", "New Project", "New Project"]
-        self.action_save: List[str] = ["Save Project", "Speichere Projekt", "Bewaar project", "Save Project", "Save Project", "Save Project", "Save Project"]
-        self.action_open: List[str] = ["Open Project", "Öffne Projekt", "Open project", "Open Project", "Open Project", "Open Project", "Open Project"]
-        self.action_update_scenario: List[str] = [
+        self.actionNew: List[str] = ["New Project", "Neues Projekt", "Nieuw project", "New Project", "New Project", "New Project", "New Project"]
+        self.actionSave: List[str] = ["Save Project", "Speichere Projekt", "Bewaar project", "Save Project", "Save Project", "Save Project", "Save Project"]
+        self.actionOpen: List[str] = ["Open Project", "Öffne Projekt", "Open project", "Open Project", "Open Project", "Open Project", "Open Project"]
+        self.actionUpdate_Scenario: List[str] = [
             "Update scenario",
             "Szenario aktualisieren",
             "Update scenario",
@@ -1089,7 +1077,7 @@ class Translations:  # pragma: no cover
             "Actualizar escenario",
             "Actualizar escenario",
         ]
-        self.action_add_scenario: List[str] = [
+        self.actionAdd_Scenario: List[str] = [
             "Add scenario",
             "Szenario hinzufügen",
             "Nieuw scenario",
@@ -1098,7 +1086,7 @@ class Translations:  # pragma: no cover
             "Añadir escenario",
             "Engadir escenario",
         ]
-        self.action_delete_scenario: List[str] = [
+        self.actionDelete_scenario: List[str] = [
             "Delete scenario",
             "Szenario löschen",
             "Verwijder scenario",
@@ -1107,8 +1095,8 @@ class Translations:  # pragma: no cover
             "Borrar escenario",
             "Eliminar escenario",
         ]
-        self.action_save_as: List[str] = ["Save as", "Speichere Projekt unter ...", "Sla op als", "Save as", "Save as", "Save as", "Save as"]
-        self.button_rename_scenario: List[str] = [
+        self.actionSave_As: List[str] = ["Save as", "Speichere Projekt unter ...", "Sla op als", "Save as", "Save as", "Save as", "Save as"]
+        self.actionRename_scenario: List[str] = [
             "Rename scenario",
             "Szenario umbenennen",
             "Hernoem scenario",
@@ -1345,15 +1333,6 @@ class Translations:  # pragma: no cover
             "Borehole radius [m]:",
             "Borehole radius [m]:",
         ]
-        self.option_pipe_borehole_radius_2: List[str] = [
-            "Borehole radius [m]:",
-            "Bohrlochradius [m]:",
-            "Boorgatstraal [m]:",
-            "Borehole radius [m]:",
-            "Borehole radius [m]:",
-            "Borehole radius [m]:",
-            "Borehole radius [m]:",
-        ]
         self.option_pipe_distance: List[str] = [
             "Distance of pipe until center [m]:",
             "Distanz zwischen Rohr und Mittelpunkt [m]:",
@@ -1375,7 +1354,7 @@ class Translations:  # pragma: no cover
         self.option_pipe_depth: List[str] = [
             "Burial depth [m]:",
             "Vergrabungstiefe [m]:",
-            "Begraven diepte [m]:",
+            "Deklaag [m]:",
             "Burial depth [m]:",
             "Burial depth [m]:",
             "Burial depth [m]:",
@@ -1445,7 +1424,7 @@ class Translations:  # pragma: no cover
             "Calculate current scenario",
             "Calculate current scenario",
         ]
-        self.not_calculated: List[str] = [
+        self.NotCalculated: List[str] = [
             "Not calculated",
             "Noch nicht berechnet",
             "Niet berekend",
@@ -1553,7 +1532,7 @@ class Translations:  # pragma: no cover
             "Earth properties",
             "Earth properties",
         ]
-        self.cat_no_results: List[str] = ["No results", "Keine Ergebnisse", "Geen resultaten", "No results", "No results", "No results", "No results"]
+        self.cat_no_result: List[str] = ["No results", "Keine Ergebnisse", "Geen resultaten", "No results", "No results", "No results", "No results"]
         self.text_no_result: List[str] = [
             "No results are yet calculated",
             "Es wurden noch keine Ergebnisse berechnet",
@@ -1581,6 +1560,15 @@ class Translations:  # pragma: no cover
             "Equivalent borehole thermal resistance: , mK/W",
             "Equivalent borehole thermal resistance: , mK/W",
             "Equivalent borehole thermal resistance: , mK/W",
+        ]
+        self.result_Reynolds: List[str] = [
+            "Reynolds number: , ",
+            "Reynoldszahl  : , ",
+            "Reynoldsgetal: , ",
+            "Reynolds number: , ",
+            "Reynolds number: , ",
+            "Reynolds number: , ",
+            "Reynoldsnumber: ,",
         ]
         self.results_ground_temperature: List[str] = [
             "Average ground temperature: , °C",
@@ -1753,76 +1741,68 @@ class Translations:  # pragma: no cover
             "Should hourly data be used for the temperature profile?, no , yes ",
             "Should hourly data be used for the temperature profile?, no , yes",
         ]
-        self.option_ground_temp_gradient: List[str] = [
-            "Ground temperature at infinity [°C]: ",
-            "Erdreichtemperatur in der Unendlichkeit [°C]: ",
-            "Grondtemperatuur op oneindig [°C]: ",
-            "Temperatura del terreno all'infinito [°C]: ",
-            "Température du sol à l'infini [°C]: ",
-            "Temperatura del suelo en el infinito [°C]: ",
-            "Temperatura do chan no infinito [°C]: ",
-        ]
         self.option_n_threads: List[str] = [
             "Number of parallel threads [-]: ",
-            "Anzahl an parallelen Prozessen [-]:",
+            "Anzahl an parallelen Prozessen [-]: ",
+            "Nummer van parallelle threads [-]: ",
             "Number of parallel threads [-]: ",
             "Number of parallel threads [-]: ",
             "Number of parallel threads [-]: ",
-            "Number of parallel threads [-]: ",
-            "Number of parallel threads [-]: ",
+            "Number of parallel threads [-]:",
         ]
-        self.option_number_circle_boreholes: List[str] = [
-            "Number of boreholes [-]:",
-            "Anzahl der Bohrlöcher [-]:",
-            "Number of boreholes [-]:",
-            "Number of boreholes [-]:",
-            "Number of boreholes [-]:",
-            "Number of boreholes [-]:",
-            "Number of boreholes [-]:",
+        self.category_demand_building_or_geo: List[str] = [
+            "Load type: ",
+            "Art der Belastung: ",
+            "Type belasting: ",
+            "Load type: ",
+            "Load type: ",
+            "Load type:",
+            "Load type:",
         ]
-        self.option_borefield_radius: List[str] = [
-            "Distance of the boreholes from the center of the field [m]:",
-            "Abstand der Bohrlöcher vom Zentrum der Feldes [m]:",
-            "Distance of the boreholes from the center of the field [m]:",
-            "Distance of the boreholes from the center of the field [m]:",
-            "Distance of the boreholes from the center of the field [m]:",
-            "Distance of the boreholes from the center of the field [m]:",
-            "Distance of the boreholes from the center of the field [m]:",
+        self.geo_load: List[str] = [
+            "Load type, Geothermal , Building ",
+            "Art der Belastung, Grundseite , Gebäudeseite ",
+            "Type belasting, grondzijdig , gebouwzijdig ",
+            "Load type, Geothermal , Building ",
+            "Load type, Geothermal , Building ",
+            "Load type, Geothermal , Building ",
+            "Load type, Geothermal , Building ",
         ]
-        self.custom_borefield: List[str] = [
-            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
-            "Benutzerdefiniertes Bohrelochfeld,Bohrloch,x [m]:,y [m]:,Tiefe [m]:,Vergrabungstiefe [m]:,Bohrlochradius [m]",
-            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
-            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
-            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
-            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
-            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
+        self.SCOP: List[str] = ["SCOP [-]: ", "SCOP [-]: ", "SCOP [-]: ", "SCOP [-]: ", "SCOP [-]: ", "SCOP [-]: ", "SCOP [-]:"]
+        self.SEER: List[str] = ["SEER [-]: ", "SEER [-]: ", "SEER [-]: ", "SEER [-]: ", "SEER [-]: ", "SEER [-]: ", "SEER [-]:"]
+        self.results_heating_peak_geo: List[str] = [
+            "with a peak of: , kW",
+            "mit einer Spitzenlast von , kW",
+            "met een piek van: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
         ]
-        self.option_seperator_borefield: List[str] = [
-            "Seperator in file:,Semicolon ';',Comma '++',Tab '   '",
-            "Trenner in der Datei:,Semikolon ';',Komma '++',Tab '   '",
-            "Scheidingsteken in file:,Puntkomma ';',Komma '++',Tab '   '",
-            "Seperator in file:,Semicolon ';',Comma '++',Tab '   '",
-            "Seperator in file:,Semicolon ';',Comma '++',Tab '   '",
-            "Seperator in file:,Semicolon ';',Comma '++',Tab '   '",
-            "Seperator in file:,Semicolon ';',Comma '++',Tab '   '",
+        self.results_cooling_peak_geo: List[str] = [
+            "with a peak of: , kW",
+            "mit einer Spitzenlast von , kW",
+            "met een piek van: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
         ]
-        self.borefield_file: List[str] = [
-            "Filename: ",
-            "Dateiname: ",
-            "Bestandsnaam: ",
-            "Nome fileImport: ",
-            "Nom de fichier: ",
-            "Nombre de archivo: ",
-            "Nome de ficheiro: ",
+        self.option_ground_temp_gradient: List[str] = [
+            "Surface temperature [°C]: ",
+            "Umgebungstemperatur[°C]: ",
+            "Omgevingstemperatuur [°C]: ",
+            "Surface temperature [°C]: ",
+            "Surface temperature [°C]: ",
+            "Surface temperature [°C]: ",
+            "Surface temperature [°C]:",
         ]
-        self.import_borefield: List[str] = ["Load", "Laden", "Laad", "Caricare", "Chargement", "Cargar", "Cargar"]
-        self.option_decimal_borefield: List[str] = [
-            "Decimal sign in file:,Point '.',Comma '++'",
-            "Dezimalzeichen in der Datei:,Punkt '.',Komma '++'",
-            "Decimaalteken in de file:,Punt '.',Komma '++'",
-            "Decimal sign in file:,Point '.',Comma '++'",
-            "Decimal sign in file:,Point '.',Comma '++'",
-            "Decimal sign in file:,Point '.',Comma '++'",
-            "Decimal sign in file:,Point '.',Comma '++'",
+        self.hint_press_load: List[str] = [
+            "Press 'load' to load the hourly data.",
+            "Drücken Sie 'Laden', um die stündlichen Daten zu laden.",
+            "Druk op 'laden' om de data in te lezen.",
+            "Press 'load' to load the hourly data.",
+            "Press 'load' to load the hourly data.",
+            "Press 'load' to load the hourly data.",
+            "Press 'load' to load the hourly data.",
         ]

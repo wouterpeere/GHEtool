@@ -3,6 +3,7 @@ import json
 
 import numpy as np
 import pygfunction as gt
+
 from GHEtool import *
 from GHEtool.VariableClasses.BaseClass import BaseClass
 
