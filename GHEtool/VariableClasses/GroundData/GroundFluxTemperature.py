@@ -29,21 +29,7 @@ class GroundFluxTemperature(_GroundData):
         super().__init__(k_s=k_s, volumetric_heat_capacity=volumetric_heat_capacity)
         self.flux = flux
         self.Tg = T_g
-
-    def max_depth(self, t_max: float) -> float:
-        """
-        determine the depth for the maximal temperature
-
-        Parameters
-        ----------
-        t_max : float
-            maximal temperature
-
-        Returns
-        -------
-            depth with maximal temperature difference possible
-        """
-        return (t_max - self.Tg)/self.flux * self.k_s
+        self.variable_Tg = True
 
     def calculate_Tg(self, H: float) -> float:
         """

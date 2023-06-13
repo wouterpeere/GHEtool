@@ -6,7 +6,7 @@ import logging
 from functools import partial
 from math import cos, pi, sin
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, TYPE_CHECKING
 
 import PySide6.QtGui as QtG
 import PySide6.QtWidgets as QtW
@@ -39,7 +39,7 @@ from ScenarioGUI.gui_classes.gui_structure_classes import (
 )
 
 if TYPE_CHECKING:  # pragma: no cover
-    from GHEtool.gui.translation_class import Translations
+    from GHEtool.gui.gui_classes.translation_class import Translations
 
 
 def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, cooling_load_column: str, combined: str, sep: str,
@@ -101,7 +101,7 @@ def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, 
 
     # not the correct decimal seperator
     if isinstance(df2.iloc[1, 1], str):
-        ghe_logger.error("Please select the correct decimal point seperator.")
+        logging.error("Please select the correct decimal point seperator.")
         raise ValueError
 
     # ---------------------- Time Step Section  ----------------------
@@ -757,431 +757,431 @@ class GUI(GuiStructure):
         #create_category_fluid_data()
         #create_category_pipe_data()
 
-        #def create_page_thermal_demands():
+        # def create_page_thermal_demands():
         # create page
         self.page_thermal = Page(translations.page_thermal, "Thermal\ndemands", "Thermal.svg")
         self.page_borehole_resistance.set_next_page(self.page_thermal)
         self.page_thermal.set_previous_page(self.page_borefield)
 
-        #def create_category_select_datafile():
-        self.category_select_file = Category(page=self.page_thermal, label=translations.category_select_file)
+        def create_category_select_datafile():
+            self.category_select_file = Category(page=self.page_thermal, label=translations.category_select_file)
 
-        self.option_seperator_csv = ButtonBox(label=translations.option_seperator_csv, default_index=0,
-                                              entries=['Semicolon ";"', 'Comma ","'],
+            self.option_seperator_csv = ButtonBox(label=translations.option_seperator_csv, default_index=0,
+                                                  entries=['Semicolon ";"', 'Comma ","'],
+                                                  category=self.category_select_file)
+            self.option_decimal_csv = ButtonBox(label=translations.option_decimal_csv, default_index=0,
+                                                entries=['Point "."', 'Comma ","'],
+                                                category=self.category_select_file)
+            self.option_filename = FileNameBox(
+                category=self.category_select_file,
+                label=translations.option_filename,
+                default_value=f'{FOLDER.joinpath("Examples/hourly_profile.csv")}',
+                dialog_text="Choose csv file",
+                error_text="no file selected",
+            )
+            self.option_filename.check_active = True
+            self.option_column = ButtonBox(label=translations.option_column, default_index=0,
+                                           entries=["1 column", "2 columns"], category=self.category_select_file)
+            self.option_heating_column = ListBox(category=self.category_select_file, label=translations.option_heating_column, default_index=0, entries=[])
+            self.option_cooling_column = ListBox(category=self.category_select_file, label=translations.option_cooling_column, default_index=0, entries=[])
+            self.option_single_column = ListBox(category=self.category_select_file, label=translations.option_single_column, default_index=0, entries=[])
+
+            self.option_unit_data = ButtonBox(label=translations.option_unit_data, default_index=1, entries=["W", "kW", "MW"],
                                               category=self.category_select_file)
-        self.option_decimal_csv = ButtonBox(label=translations.option_decimal_csv, default_index=0,
-                                            entries=['Point "."', 'Comma ","'],
-                                            category=self.category_select_file)
-        self.option_filename = FileNameBox(
-            category=self.category_select_file,
-            label=translations.option_filename,
-            default_value=f'{FOLDER.joinpath("Examples/hourly_profile.csv")}',
-            dialog_text="Choose csv file",
-            error_text="no file selected",
-        )
-        self.option_filename.check_active = True
-        self.option_column = ButtonBox(label=translations.option_column, default_index=0,
-                                       entries=["1 column", "2 columns"], category=self.category_select_file)
-        self.option_heating_column = ListBox(category=self.category_select_file, label=translations.option_heating_column, default_index=0, entries=[])
-        self.option_cooling_column = ListBox(category=self.category_select_file, label=translations.option_cooling_column, default_index=0, entries=[])
-        self.option_single_column = ListBox(category=self.category_select_file, label=translations.option_single_column, default_index=0, entries=[])
 
-        self.option_unit_data = ButtonBox(label=translations.option_unit_data, default_index=1, entries=["W", "kW", "MW"],
-                                          category=self.category_select_file)
+            self.hint_press_load = Hint(hint=self.translations.hint_press_load,
+                                        category=self.category_select_file,
+                                        warning=True)
 
-                self.hint_press_load = Hint(hint=self.translations.hint_press_load,
-                                            category=self.category_select_file,
-                                            warning=True)
+            self.button_load_csv = FunctionButton(category=self.category_select_file, button_text=translations.button_load_csv, icon="Download.svg")
 
-                self.button_load_csv = FunctionButton(category=self.category_select_file, button_text=translations.button_load_csv, icon="Download.svg")
+            # add dependencies
+            self.option_filename.add_aim_option_2_be_set_for_check(self.aim_optimize)
+            self.option_filename.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
 
-        # add dependencies
-        self.option_filename.add_aim_option_2_be_set_for_check(self.aim_optimize)
-        self.option_filename.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
+            self.option_column.add_link_2_show(self.option_heating_column, on_index=1)
+            self.option_heating_column.add_aim_option_2_be_set_for_check(self.aim_optimize)
+            self.option_heating_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
+            self.option_heating_column.add_aim_option_2_be_set_for_check((self.option_temperature_profile_hourly, 1))
 
-        self.option_column.add_link_2_show(self.option_heating_column, on_index=1)
-        self.option_heating_column.add_aim_option_2_be_set_for_check(self.aim_optimize)
-        self.option_heating_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
-        self.option_heating_column.add_aim_option_2_be_set_for_check((self.option_temperature_profile_hourly, 1))
+            self.option_column.add_link_2_show(self.option_cooling_column, on_index=1)
+            self.option_cooling_column.add_aim_option_2_be_set_for_check(self.aim_optimize)
+            self.option_cooling_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
+            self.option_cooling_column.add_aim_option_2_be_set_for_check((self.option_temperature_profile_hourly, 1))
 
-        self.option_column.add_link_2_show(self.option_cooling_column, on_index=1)
-        self.option_cooling_column.add_aim_option_2_be_set_for_check(self.aim_optimize)
-        self.option_cooling_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
-        self.option_cooling_column.add_aim_option_2_be_set_for_check((self.option_temperature_profile_hourly, 1))
+            self.option_column.add_link_2_show(self.option_single_column, on_index=0)
+            self.option_single_column.add_aim_option_2_be_set_for_check(self.aim_optimize)
+            self.option_single_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
+            self.option_single_column.add_aim_option_2_be_set_for_check((self.option_temperature_profile_hourly, 1))
 
-        self.option_column.add_link_2_show(self.option_single_column, on_index=0)
-        self.option_single_column.add_aim_option_2_be_set_for_check(self.aim_optimize)
-        self.option_single_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
-        self.option_single_column.add_aim_option_2_be_set_for_check((self.option_temperature_profile_hourly, 1))
+            self.option_method_size_depth.add_link_2_show(self.button_load_csv, on_index=0)
+            self.option_method_size_depth.add_link_2_show(self.button_load_csv, on_index=1)
+            self.aim_temp_profile.add_link_2_show(self.button_load_csv)
+            self.option_temperature_profile_hourly.add_link_2_show(self.button_load_csv, on_index=0)
+            self.aim_req_depth.add_link_2_show(self.button_load_csv)
 
-                self.option_method_size_depth.add_link_2_show(self.button_load_csv, on_index=0)
-                self.option_method_size_depth.add_link_2_show(self.button_load_csv, on_index=1)
-                self.aim_temp_profile.add_link_2_show(self.button_load_csv)
-                self.option_temperature_profile_hourly.add_link_2_show(self.button_load_csv, on_index=0)
-                self.aim_req_depth.add_link_2_show(self.button_load_csv)
+            self.option_method_size_depth.add_link_2_show(self.hint_press_load, on_index=0)
+            self.option_method_size_depth.add_link_2_show(self.hint_press_load, on_index=1)
+            self.aim_temp_profile.add_link_2_show(self.hint_press_load)
+            self.option_temperature_profile_hourly.add_link_2_show(self.hint_press_load, on_index=0)
+            self.aim_req_depth.add_link_2_show(self.hint_press_load)
+            # self.aim_size_length.add_link_2_show(self.button_load_csv)
 
-                self.option_method_size_depth.add_link_2_show(self.hint_press_load, on_index=0)
-                self.option_method_size_depth.add_link_2_show(self.hint_press_load, on_index=1)
-                self.aim_temp_profile.add_link_2_show(self.hint_press_load)
-                self.option_temperature_profile_hourly.add_link_2_show(self.hint_press_load, on_index=0)
-                self.aim_req_depth.add_link_2_show(self.hint_press_load)
-                # self.aim_size_length.add_link_2_show(self.button_load_csv)
+            # add change events
+            self.option_seperator_csv.change_event(self.fun_update_combo_box_data_file)
+            self.option_decimal_csv.change_event(self.fun_update_combo_box_data_file)
+            self.option_filename.change_event(self.fun_update_combo_box_data_file)
 
-        # add change events
-        self.option_seperator_csv.change_event(self.fun_update_combo_box_data_file)
-        self.option_decimal_csv.change_event(self.fun_update_combo_box_data_file)
-        self.option_filename.change_event(self.fun_update_combo_box_data_file)
+            self.button_load_csv.change_event(self.fun_display_data)
 
-        self.button_load_csv.change_event(self.fun_display_data)
+        def create_category_th_demand():
+            self.category_th_demand = Category(page=self.page_thermal, label=translations.category_th_demand)
+            self.category_th_demand.activate_grid_layout(5)
 
-        # def create_category_th_demand():
-        self.category_th_demand = Category(page=self.page_thermal, label=translations.category_th_demand)
-        self.category_th_demand.activate_grid_layout(5)
+            self.hint_none_1 = Hint(category=self.category_th_demand, hint="  ")
+            self.hint_peak_heating = Hint(category=self.category_th_demand, hint=translations.hint_peak_heating)
+            self.hint_peak_cooling = Hint(category=self.category_th_demand, hint=translations.hint_peak_cooling)
+            self.hint_load_heating = Hint(category=self.category_th_demand, hint=translations.hint_load_heating)
+            self.hint_load_cooling = Hint(category=self.category_th_demand, hint=translations.hint_load_cooling)
 
-        self.hint_none_1 = Hint(category=self.category_th_demand, hint="  ")
-        self.hint_peak_heating = Hint(category=self.category_th_demand, hint=translations.hint_peak_heating)
-        self.hint_peak_cooling = Hint(category=self.category_th_demand, hint=translations.hint_peak_cooling)
-        self.hint_load_heating = Hint(category=self.category_th_demand, hint=translations.hint_load_heating)
-        self.hint_load_cooling = Hint(category=self.category_th_demand, hint=translations.hint_load_cooling)
+            self.hint_none_2 = Hint(category=self.category_th_demand, hint="  ")
+            self.hint_peak_heating_unit = Hint(category=self.category_th_demand, hint="[kW]")
+            self.hint_peak_cooling_unit = Hint(category=self.category_th_demand, hint="[kW]")
+            self.hint_load_heating_unit = Hint(category=self.category_th_demand, hint="[kWh]")
+            self.hint_load_cooling_unit = Hint(category=self.category_th_demand, hint="[kWh]")
 
-        self.hint_none_2 = Hint(category=self.category_th_demand, hint="  ")
-        self.hint_peak_heating_unit = Hint(category=self.category_th_demand, hint="[kW]")
-        self.hint_peak_cooling_unit = Hint(category=self.category_th_demand, hint="[kW]")
-        self.hint_load_heating_unit = Hint(category=self.category_th_demand, hint="[kWh]")
-        self.hint_load_cooling_unit = Hint(category=self.category_th_demand, hint="[kWh]")
+            self.hint_jan = Hint(category=self.category_th_demand, hint=translations.hint_jan)
+            self.option_hp_jan = FloatBox(
+                category=self.category_th_demand, label="", default_value=160, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_cp_jan = FloatBox(
+                category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_hl_jan = FloatBox(
+                category=self.category_th_demand,
+                label="",
+                default_value=46500,
+                decimal_number=0,
+                minimal_value=0,
+                maximal_value=1_000_000_000,
+                step=1,
+            )
+            self.option_cl_jan = FloatBox(
+                category=self.category_th_demand,
+                label="",
+                default_value=4000,
+                decimal_number=0,
+                minimal_value=0,
+                maximal_value=1_000_000_000,
+                step=1,
+            )
+            self.hint_feb = Hint(category=self.category_th_demand, hint=translations.hint_feb)
+            self.option_hp_feb = FloatBox(
+                category=self.category_th_demand, label="", default_value=142, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_cp_feb = FloatBox(
+                category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_hl_feb = FloatBox(
+                category=self.category_th_demand,
+                label="",
+                default_value=44400,
+                decimal_number=0,
+                minimal_value=0,
+                maximal_value=1_000_000_000,
+                step=1,
+            )
+            self.option_cl_feb = FloatBox(
+                category=self.category_th_demand,
+                label="",
+                default_value=8000,
+                decimal_number=0,
+                minimal_value=0,
+                maximal_value=1_000_000_000,
+                step=1,
+            )
+            self.hint_mar = Hint(category=self.category_th_demand, hint=translations.hint_mar)
+            self.option_hp_mar = FloatBox(
+                category=self.category_th_demand, label="", default_value=102, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_cp_mar = FloatBox(
+                category=self.category_th_demand, label="", default_value=34, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_hl_mar = FloatBox(
+                category=self.category_th_demand,
+                label="",
+                default_value=37500,
+                decimal_number=0,
+                minimal_value=0,
+                maximal_value=1_000_000_000,
+                step=1,
+            )
+            self.option_cl_mar = FloatBox(
+                category=self.category_th_demand,
+                label="",
+                default_value=8000,
+                decimal_number=0,
+                minimal_value=0,
+                maximal_value=1_000_000_000,
+                step=1,
+            )
+            self.hint_apr = Hint(category=self.category_th_demand, hint=translations.hint_apr)
+            self.option_hp_apr = FloatBox(
+                category=self.category_th_demand, label="", default_value=55, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_cp_apr = FloatBox(
+                category=self.category_th_demand, label="", default_value=69, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_hl_apr = FloatBox(
+                category=self.category_th_demand,
+                label="",
+                default_value=29700,
+                decimal_number=0,
+                minimal_value=0,
+                maximal_value=1_000_000_000,
+                step=1,
+            )
+            self.option_cl_apr = FloatBox(
+                category=self.category_th_demand,
+                label="",
+                default_value=8000,
+                decimal_number=0,
+                minimal_value=0,
+                maximal_value=1_000_000_000,
+                step=1,
+            )
+            self.hint_may = Hint(category=self.category_th_demand, hint=translations.hint_may)
+            self.option_hp_may = FloatBox(
+                category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_cp_may = FloatBox(
+                category=self.category_th_demand, label="", default_value=133, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_hl_may = FloatBox(
+                category=self.category_th_demand,
+                label="",
+                default_value=19200,
+                decimal_number=0,
+                minimal_value=0,
+                maximal_value=1_000_000_000,
+                step=1,
+            )
+            self.option_cl_may = FloatBox(
+                category=self.category_th_demand,
+                label="",
+                default_value=12000,
+                decimal_number=0,
+                minimal_value=0,
+                maximal_value=1_000_000_000,
+                step=1,
+            )
+            self.hint_jun = Hint(category=self.category_th_demand, hint=translations.hint_jun)
+            self.option_hp_jun = FloatBox(
+                category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_cp_jun = FloatBox(
+                category=self.category_th_demand, label="", default_value=187, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_hl_jun = FloatBox(
+                category=self.category_th_demand, label="", default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
+            )
+            self.option_cl_jun = FloatBox(
+                category=self.category_th_demand,
+                label="",
+                default_value=16000,
+                decimal_number=0,
+                minimal_value=0,
+                maximal_value=1_000_000_000,
+                step=1,
+            )
+            self.hint_jul = Hint(category=self.category_th_demand, hint=translations.hint_jul)
+            self.option_hp_jul = FloatBox(
+                category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_cp_jul = FloatBox(
+                category=self.category_th_demand, label="", default_value=213, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_hl_jul = FloatBox(
+                category=self.category_th_demand, label="", default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
+            )
+            self.option_cl_jul = FloatBox(
+                category=self.category_th_demand,
+                label="",
+                default_value=32000,
+                decimal_number=0,
+                minimal_value=0,
+                maximal_value=1_000_000_000,
+                step=1,
+            )
+            self.hint_aug = Hint(category=self.category_th_demand, hint=translations.hint_aug)
+            self.option_hp_aug = FloatBox(
+                category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_cp_aug = FloatBox(
+                category=self.category_th_demand, label="", default_value=240, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_hl_aug = FloatBox(
+                category=self.category_th_demand, label="", default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
+            )
+            self.option_cl_aug = FloatBox(
+                category=self.category_th_demand,
+                label="",
+                default_value=32000,
+                decimal_number=0,
+                minimal_value=0,
+                maximal_value=1_000_000_000,
+                step=1,
+            )
+            self.hint_sep = Hint(category=self.category_th_demand, hint=translations.hint_sep)
+            self.option_hp_sep = FloatBox(
+                category=self.category_th_demand, label="", default_value=40.4, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_cp_sep = FloatBox(
+                category=self.category_th_demand, label="", default_value=160, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_hl_sep = FloatBox(
+                category=self.category_th_demand,
+                label="",
+                default_value=18300,
+                decimal_number=0,
+                minimal_value=0,
+                maximal_value=1_000_000_000,
+                step=1,
+            )
+            self.option_cl_sep = FloatBox(
+                category=self.category_th_demand,
+                label="",
+                default_value=16000,
+                decimal_number=0,
+                minimal_value=0,
+                maximal_value=1_000_000_000,
+                step=1,
+            )
+            self.hint_oct = Hint(category=self.category_th_demand, hint=translations.hint_oct)
+            self.option_hp_oct = FloatBox(
+                category=self.category_th_demand, label="", default_value=85, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_cp_oct = FloatBox(
+                category=self.category_th_demand, label="", default_value=37, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_hl_oct = FloatBox(
+                category=self.category_th_demand,
+                label="",
+                default_value=26100,
+                decimal_number=0,
+                minimal_value=0,
+                maximal_value=1_000_000_000,
+                step=1,
+            )
+            self.option_cl_oct = FloatBox(
+                category=self.category_th_demand,
+                label="",
+                default_value=12000,
+                decimal_number=0,
+                minimal_value=0,
+                maximal_value=1_000_000_000,
+                step=1,
+            )
+            self.hint_nov = Hint(category=self.category_th_demand, hint=translations.hint_nov)
+            self.option_hp_nov = FloatBox(
+                category=self.category_th_demand, label="", default_value=119, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_cp_nov = FloatBox(
+                category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_hl_nov = FloatBox(
+                category=self.category_th_demand,
+                label="",
+                default_value=35100,
+                decimal_number=0,
+                minimal_value=0,
+                maximal_value=1_000_000_000,
+                step=1,
+            )
+            self.option_cl_nov = FloatBox(
+                category=self.category_th_demand,
+                label="",
+                default_value=8000,
+                decimal_number=0,
+                minimal_value=0,
+                maximal_value=1_000_000_000,
+                step=1,
+            )
+            self.hint_dec = Hint(category=self.category_th_demand, hint=translations.hint_dec)
+            self.option_hp_dec = FloatBox(
+                category=self.category_th_demand, label="", default_value=136, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_cp_dec = FloatBox(
+                category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
+            )
+            self.option_hl_dec = FloatBox(
+                category=self.category_th_demand,
+                label="",
+                default_value=43200,
+                decimal_number=0,
+                minimal_value=0,
+                maximal_value=1_000_000_000,
+                step=1,
+            )
+            self.option_cl_dec = FloatBox(
+                category=self.category_th_demand,
+                label="",
+                default_value=4000,
+                decimal_number=0,
+                minimal_value=0,
+                maximal_value=1_000_000_000,
+                step=1,
+            )
 
-        self.hint_jan = Hint(category=self.category_th_demand, hint=translations.hint_jan)
-        self.option_hp_jan = FloatBox(
-            category=self.category_th_demand, label="", default_value=160, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_cp_jan = FloatBox(
-            category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_hl_jan = FloatBox(
-            category=self.category_th_demand,
-            label="",
-            default_value=46500,
-            decimal_number=0,
-            minimal_value=0,
-            maximal_value=1_000_000_000,
-            step=1,
-        )
-        self.option_cl_jan = FloatBox(
-            category=self.category_th_demand,
-            label="",
-            default_value=4000,
-            decimal_number=0,
-            minimal_value=0,
-            maximal_value=1_000_000_000,
-            step=1,
-        )
-        self.hint_feb = Hint(category=self.category_th_demand, hint=translations.hint_feb)
-        self.option_hp_feb = FloatBox(
-            category=self.category_th_demand, label="", default_value=142, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_cp_feb = FloatBox(
-            category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_hl_feb = FloatBox(
-            category=self.category_th_demand,
-            label="",
-            default_value=44400,
-            decimal_number=0,
-            minimal_value=0,
-            maximal_value=1_000_000_000,
-            step=1,
-        )
-        self.option_cl_feb = FloatBox(
-            category=self.category_th_demand,
-            label="",
-            default_value=8000,
-            decimal_number=0,
-            minimal_value=0,
-            maximal_value=1_000_000_000,
-            step=1,
-        )
-        self.hint_mar = Hint(category=self.category_th_demand, hint=translations.hint_mar)
-        self.option_hp_mar = FloatBox(
-            category=self.category_th_demand, label="", default_value=102, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_cp_mar = FloatBox(
-            category=self.category_th_demand, label="", default_value=34, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_hl_mar = FloatBox(
-            category=self.category_th_demand,
-            label="",
-            default_value=37500,
-            decimal_number=0,
-            minimal_value=0,
-            maximal_value=1_000_000_000,
-            step=1,
-        )
-        self.option_cl_mar = FloatBox(
-            category=self.category_th_demand,
-            label="",
-            default_value=8000,
-            decimal_number=0,
-            minimal_value=0,
-            maximal_value=1_000_000_000,
-            step=1,
-        )
-        self.hint_apr = Hint(category=self.category_th_demand, hint=translations.hint_apr)
-        self.option_hp_apr = FloatBox(
-            category=self.category_th_demand, label="", default_value=55, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_cp_apr = FloatBox(
-            category=self.category_th_demand, label="", default_value=69, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_hl_apr = FloatBox(
-            category=self.category_th_demand,
-            label="",
-            default_value=29700,
-            decimal_number=0,
-            minimal_value=0,
-            maximal_value=1_000_000_000,
-            step=1,
-        )
-        self.option_cl_apr = FloatBox(
-            category=self.category_th_demand,
-            label="",
-            default_value=8000,
-            decimal_number=0,
-            minimal_value=0,
-            maximal_value=1_000_000_000,
-            step=1,
-        )
-        self.hint_may = Hint(category=self.category_th_demand, hint=translations.hint_may)
-        self.option_hp_may = FloatBox(
-            category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_cp_may = FloatBox(
-            category=self.category_th_demand, label="", default_value=133, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_hl_may = FloatBox(
-            category=self.category_th_demand,
-            label="",
-            default_value=19200,
-            decimal_number=0,
-            minimal_value=0,
-            maximal_value=1_000_000_000,
-            step=1,
-        )
-        self.option_cl_may = FloatBox(
-            category=self.category_th_demand,
-            label="",
-            default_value=12000,
-            decimal_number=0,
-            minimal_value=0,
-            maximal_value=1_000_000_000,
-            step=1,
-        )
-        self.hint_jun = Hint(category=self.category_th_demand, hint=translations.hint_jun)
-        self.option_hp_jun = FloatBox(
-            category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_cp_jun = FloatBox(
-            category=self.category_th_demand, label="", default_value=187, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_hl_jun = FloatBox(
-            category=self.category_th_demand, label="", default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
-        )
-        self.option_cl_jun = FloatBox(
-            category=self.category_th_demand,
-            label="",
-            default_value=16000,
-            decimal_number=0,
-            minimal_value=0,
-            maximal_value=1_000_000_000,
-            step=1,
-        )
-        self.hint_jul = Hint(category=self.category_th_demand, hint=translations.hint_jul)
-        self.option_hp_jul = FloatBox(
-            category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_cp_jul = FloatBox(
-            category=self.category_th_demand, label="", default_value=213, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_hl_jul = FloatBox(
-            category=self.category_th_demand, label="", default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
-        )
-        self.option_cl_jul = FloatBox(
-            category=self.category_th_demand,
-            label="",
-            default_value=32000,
-            decimal_number=0,
-            minimal_value=0,
-            maximal_value=1_000_000_000,
-            step=1,
-        )
-        self.hint_aug = Hint(category=self.category_th_demand, hint=translations.hint_aug)
-        self.option_hp_aug = FloatBox(
-            category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_cp_aug = FloatBox(
-            category=self.category_th_demand, label="", default_value=240, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_hl_aug = FloatBox(
-            category=self.category_th_demand, label="", default_value=0, decimal_number=0, minimal_value=0, maximal_value=1_000_000_000, step=1
-        )
-        self.option_cl_aug = FloatBox(
-            category=self.category_th_demand,
-            label="",
-            default_value=32000,
-            decimal_number=0,
-            minimal_value=0,
-            maximal_value=1_000_000_000,
-            step=1,
-        )
-        self.hint_sep = Hint(category=self.category_th_demand, hint=translations.hint_sep)
-        self.option_hp_sep = FloatBox(
-            category=self.category_th_demand, label="", default_value=40.4, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_cp_sep = FloatBox(
-            category=self.category_th_demand, label="", default_value=160, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_hl_sep = FloatBox(
-            category=self.category_th_demand,
-            label="",
-            default_value=18300,
-            decimal_number=0,
-            minimal_value=0,
-            maximal_value=1_000_000_000,
-            step=1,
-        )
-        self.option_cl_sep = FloatBox(
-            category=self.category_th_demand,
-            label="",
-            default_value=16000,
-            decimal_number=0,
-            minimal_value=0,
-            maximal_value=1_000_000_000,
-            step=1,
-        )
-        self.hint_oct = Hint(category=self.category_th_demand, hint=translations.hint_oct)
-        self.option_hp_oct = FloatBox(
-            category=self.category_th_demand, label="", default_value=85, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_cp_oct = FloatBox(
-            category=self.category_th_demand, label="", default_value=37, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_hl_oct = FloatBox(
-            category=self.category_th_demand,
-            label="",
-            default_value=26100,
-            decimal_number=0,
-            minimal_value=0,
-            maximal_value=1_000_000_000,
-            step=1,
-        )
-        self.option_cl_oct = FloatBox(
-            category=self.category_th_demand,
-            label="",
-            default_value=12000,
-            decimal_number=0,
-            minimal_value=0,
-            maximal_value=1_000_000_000,
-            step=1,
-        )
-        self.hint_nov = Hint(category=self.category_th_demand, hint=translations.hint_nov)
-        self.option_hp_nov = FloatBox(
-            category=self.category_th_demand, label="", default_value=119, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_cp_nov = FloatBox(
-            category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_hl_nov = FloatBox(
-            category=self.category_th_demand,
-            label="",
-            default_value=35100,
-            decimal_number=0,
-            minimal_value=0,
-            maximal_value=1_000_000_000,
-            step=1,
-        )
-        self.option_cl_nov = FloatBox(
-            category=self.category_th_demand,
-            label="",
-            default_value=8000,
-            decimal_number=0,
-            minimal_value=0,
-            maximal_value=1_000_000_000,
-            step=1,
-        )
-        self.hint_dec = Hint(category=self.category_th_demand, hint=translations.hint_dec)
-        self.option_hp_dec = FloatBox(
-            category=self.category_th_demand, label="", default_value=136, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_cp_dec = FloatBox(
-            category=self.category_th_demand, label="", default_value=0, decimal_number=3, minimal_value=0, maximal_value=1000000, step=1
-        )
-        self.option_hl_dec = FloatBox(
-            category=self.category_th_demand,
-            label="",
-            default_value=43200,
-            decimal_number=0,
-            minimal_value=0,
-            maximal_value=1_000_000_000,
-            step=1,
-        )
-        self.option_cl_dec = FloatBox(
-            category=self.category_th_demand,
-            label="",
-            default_value=4000,
-            decimal_number=0,
-            minimal_value=0,
-            maximal_value=1_000_000_000,
-            step=1,
-        )
+            # add dependencies
+            self.option_method_size_depth.add_link_2_show(self.category_th_demand, on_index=0)
+            self.option_method_size_depth.add_link_2_show(self.category_th_demand, on_index=1)
+            self.option_temperature_profile_hourly.add_link_2_show(self.category_th_demand, on_index=0)
 
-        # add dependencies
-        self.option_method_size_depth.add_link_2_show(self.category_th_demand, on_index=0)
-        self.option_method_size_depth.add_link_2_show(self.category_th_demand, on_index=1)
-        self.option_temperature_profile_hourly.add_link_2_show(self.category_th_demand, on_index=0)
+            self.aim_temp_profile.add_link_2_show(self.category_th_demand)
+            self.aim_req_depth.add_link_2_show(self.category_th_demand)
+            # self.aim_size_length.add_link_2_show(self.category_th_demand)
 
-        self.aim_temp_profile.add_link_2_show(self.category_th_demand)
-        self.aim_req_depth.add_link_2_show(self.category_th_demand)
-        # self.aim_size_length.add_link_2_show(self.category_th_demand)
+        def create_category_building_demand():
+            self.category_demand_building_or_geo =\
+                Category(page=self.page_thermal, label=self.translations.category_demand_building_or_geo)
+            self.geo_load = ButtonBox(label=self.translations.geo_load, default_index=0,
+                                      entries=[" goethermal ", " building "],
+                                      category=self.category_demand_building_or_geo)
+            self.SCOP = FloatBox(
+                category=self.category_demand_building_or_geo,
+                label=self.translations.SCOP,
+                default_value=4,
+                decimal_number=2,
+                minimal_value=1,
+                maximal_value=50,
+                step=0.1,
+            )
+            self.SEER = FloatBox(
+                category=self.category_demand_building_or_geo,
+                label=self.translations.SEER,
+                default_value=3,
+                decimal_number=2,
+                minimal_value=1,
+                maximal_value=50,
+                step=0.1,
+            )
 
-            def create_category_building_demand():
-                self.category_demand_building_or_geo =\
-                    Category(page=self.page_thermal, label=self.translations.category_demand_building_or_geo)
-                self.geo_load = ButtonBox(label=self.translations.geo_load, default_index=0,
-                                          entries=[" goethermal ", " building "],
-                                          category=self.category_demand_building_or_geo)
-                self.SCOP = FloatBox(
-                    category=self.category_demand_building_or_geo,
-                    label=self.translations.SCOP,
-                    default_value=4,
-                    decimal_number=2,
-                    minimal_value=1,
-                    maximal_value=50,
-                    step=0.1,
-                )
-                self.SEER = FloatBox(
-                    category=self.category_demand_building_or_geo,
-                    label=self.translations.SEER,
-                    default_value=3,
-                    decimal_number=2,
-                    minimal_value=1,
-                    maximal_value=50,
-                    step=0.1,
-                )
+            # add dependencies
+            self.aim_optimize.add_link_2_show(self.SCOP)
+            self.aim_optimize.add_link_2_show(self.SEER)
+            self.geo_load.add_link_2_show(self.SCOP, 1)
+            self.geo_load.add_link_2_show(self.SEER, 1)
+            self.aim_req_depth.add_link_2_show(self.geo_load)
+            self.aim_temp_profile.add_link_2_show(self.geo_load)
 
-                # add dependencies
-                self.aim_optimize.add_link_2_show(self.SCOP)
-                self.aim_optimize.add_link_2_show(self.SEER)
-                self.geo_load.add_link_2_show(self.SCOP, 1)
-                self.geo_load.add_link_2_show(self.SEER, 1)
-                self.aim_req_depth.add_link_2_show(self.geo_load)
-                self.aim_temp_profile.add_link_2_show(self.geo_load)
-
-            # create categories
-            # create_category_select_datafile()
-            create_category_building_demand()
-            # create_category_th_demand()
+        # create categories
+        create_category_select_datafile()
+        create_category_building_demand()
+        create_category_th_demand()
 
         def create_page_results():
-            # create page
+
             self.create_results_page()
 
             def create_category_numerical_results():
@@ -1552,11 +1552,11 @@ class GUI(GuiStructure):
 
         # raise error if seperator is decimal point
         if dec == sep:
-            ghe_logger.warning("Please make sure the seperator and decimal point are different.")
+            logging.warning("Please make sure the seperator and decimal point are different.")
             return
 
         if filename == "":
-            ghe_logger.info(self.translations.NoFileSelected[self.option_language.get_value()])
+            logging.info(self.translations.no_file_selected[self.option_language.get_value()[0]])
             return
         # try to read CSV-File
         try:

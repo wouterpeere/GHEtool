@@ -10,7 +10,6 @@ import pytest
 from pytest import raises
 
 from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, PipeData, Borefield, SizingSetup, FOLDER
-from GHEtool.main_class import MaxTempError
 
 data = GroundConstantTemperature(3, 10)
 data_ground_flux = GroundFluxTemperature(3, 10)
@@ -220,7 +219,7 @@ def test_borefield_cannot_size_due_to_cooling():
     with raises(ValueError):
         borefield.size(100)
 
-    with raises(MaxTempError):
+    with raises(ValueError):
         borefield.size_L3(100)
 
 
@@ -560,8 +559,6 @@ def test_check_hourly_load(borefield):
     borefield.hourly_cooling_load[0] = -1
     with raises(ValueError):
         borefield._check_hourly_load()
-    except ValueError:
-        assert True
 
 
 def test_load_hourly_data(borefield):
@@ -659,7 +656,7 @@ def test_logging(borefield):
 
 
 def test_value_error_cooling_dom_temp_gradient():
-    data = GroundData(3, 12, 0.2)
+    data = GroundFluxTemperature(3, 12)
     borefield_pyg = gt.boreholes.rectangle_field(5, 5, 6, 6, 110, 4, 0.075)
     monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(1)
 
@@ -671,8 +668,7 @@ def test_value_error_cooling_dom_temp_gradient():
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_pyg)
-
-    borefield.sizing_setup(use_constant_Tg=False)
+    borefield.set_Rb(0.2)
 
     try:
         borefield.size()

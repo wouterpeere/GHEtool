@@ -263,6 +263,7 @@ def test_file_import_errors(qtbot):
     g_s.fun_update_combo_box_data_file(f'{FOLDER.joinpath("Examples/hourly_profile.csv")}')
     g_s.option_single_column.widget.addItem('No Existing Column')
     g_s.option_single_column.set_value(-1)
+    g_s.option_column.set_value(0)
     main_window.gui_structure.fun_display_data()
     assert main_window.status_bar.widget.currentMessage() == main_window.translations.ColumnError[0]
     g_s.option_single_column.set_value(0)
@@ -378,6 +379,7 @@ def test_load_data_GUI():
     assert np.allclose(data["Heating"], calc_data[0])
     assert np.allclose(data["Cooling"], calc_data[1])
 
+
 def test_bug_when_opening_scenarios_which_have_autosave_enabled(qtbot):
     main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
     main_window.delete_backup()
@@ -437,5 +439,35 @@ def test_start_after_crash(qtbot):
     from GHEtool import FOLDER
 
     # init gui window
-    main_window_old = MainWindow(QtWidgets_QMainWindow(), qtbot)
+    main_window_old = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
     main_window_old._load_from_data(f'{FOLDER}/gui/test_gui/test_after_crash.GHEtool')
+
+def test_gui_filename_errors(qtbot):
+    """
+    test if all gui values are set and get correctly.
+
+    Parameters
+    ----------
+    qtbot: qtbot
+        bot for the GUI
+    """
+    # init gui window
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window.remove_previous_calculated_results()
+    main_window.delete_backup()
+
+    main_window.gui_structure.fun_update_combo_box_data_file("")
+    main_window.gui_structure.fun_update_combo_box_data_file("C:/test.GHEtool")
+
+    try:
+        load_data_GUI("", 1, "Heating", "Cooling", "Combined", 5, 6, 7)
+    except FileNotFoundError:
+        assert True
+    try:
+        load_data_GUI("C:/test.GHEtool", 1, "Heating", "Cooling", "Combined", 5, 6, 7)
+    except FileNotFoundError:
+        assert True
+    try:
+        load_data_GUI(f'{FOLDER}/Examples/hourly_profile.csv', 1, "Heating", "Cooling", "", ";", ",", 1)
+    except ValueError:
+        assert True

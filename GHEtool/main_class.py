@@ -10,11 +10,12 @@ from typing import Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 import pygfunction as gt
-from numpy._typing import NDArray
+import logging
 
 from scipy.signal import convolve
 
-from GHEtool.VariableClasses import FluidData, PipeData, Borehole, GroundConstantTemperature, GroundFluxTemperature
+from GHEtool.VariableClasses import FluidData, PipeData, Borehole, GroundConstantTemperature
+from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, SizingSetup
 from GHEtool.VariableClasses.BaseClass import BaseClass
 from GHEtool.logger.ghe_logger import ghe_logger
@@ -937,7 +938,7 @@ class Borefield(BaseClass):
             ValueError when no solution can be found
         """
         # return the max of both sizes when no temperature gradient is used
-        if self._sizing_setup.use_constant_Tg:
+        if not self.ground_data.variable_Tg:
             return max(size_max_temp, size_min_temp)
 
         if size_max_temp > size_min_temp:
@@ -1399,8 +1400,9 @@ class Borefield(BaseClass):
         -------
         Reynolds number : float
         """
-        u = self.fluid_data.mfr / self.pipe_data.number_of_pipes / self.fluid_data.rho / (pi * self.pipe_data.r_in ** 2)
-        return self.fluid_data.rho * u * self.pipe_data.r_in * 2 / self.fluid_data.mu
+        u = self.borehole.fluid_data.mfr / self.borehole.pipe_data.number_of_pipes / self.borehole.fluid_data.rho /\
+            (pi * self.borehole.pipe_data.r_in ** 2)
+        return self.borehole.fluid_data.rho * u * self.borehole.pipe_data.r_in * 2 / self.borehole.fluid_data.mu
 
     @property
     def investment_cost(self) -> float:
@@ -1966,7 +1968,8 @@ class Borefield(BaseClass):
             When no data is given, when the data is not hourly or when there are negative values
         """
         # check whether there is data given
-        if len(self.hourly_cooling_load) == 0 or len(self.hourly_heating_load) == 0:
+        if self.hourly_cooling_load is None or self.hourly_heating_load is None\
+            or len(self.hourly_cooling_load) == 0 or len(self.hourly_heating_load) == 0:
             raise ValueError("No data is given for either the heating or cooling load.")
 
         # check whether the data is hourly

@@ -42,5 +42,3 @@ def test_Tg():
     assert ground_constant_temperature.calculate_Tg(100) == 10
     assert ground_flux_temperature.calculate_Tg(0) == 10
     assert ground_flux_temperature.calculate_Tg(100) == 11
-    assert ground_flux_temperature.max_depth(18) == 400
-    assert ground_flux_temperature.max_depth(14) == 200

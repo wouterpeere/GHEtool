@@ -10,6 +10,8 @@ import pytest
 from GHEtool import *
 
 data = GroundConstantTemperature(3, 10)
+data_ground_flux = GroundFluxTemperature(3, 10)
+
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
 pipeData = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
 
@@ -173,7 +175,6 @@ def test_size_L4_without_heating():
     borefield.set_borefield(copy.copy(borefield_gt))
     borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     borefield.hourly_heating_load = np.zeros(8760)
-    borefield.imbalance = np.sum(borefield.hourly_cooling_load) - np.sum(borefield.hourly_heating_load)
     borefield.sizing_setup(L4_sizing=True)
     borefield.size()
 
@@ -185,7 +186,6 @@ def test_size_L4_without_cooling():
     borefield.set_borefield(copy.copy(borefield_gt))
     borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     borefield.hourly_cooling_load = np.zeros(8760)
-    borefield.imbalance = np.sum(borefield.hourly_cooling_load) - np.sum(borefield.hourly_heating_load)
     borefield.sizing_setup(L4_sizing=True)
     borefield.size()
 
@@ -278,9 +278,8 @@ def test_no_possible_solution():
                           baseload_heating=monthly_load_heating,
                           baseload_cooling=monthly_load_cooling)
 
-    borefield.set_ground_parameters(data)
+    borefield.set_ground_parameters(data_ground_flux)
     borefield.set_borefield(copy.copy(borefield_gt))
-    borefield.sizing_setup(use_constant_Tg=False)
 
     # limited by cooling
     borefield.set_max_ground_temperature(14)  # maximum temperature

@@ -73,6 +73,11 @@ def data_2_borefield(ds: DataStorage) -> tuple[Borefield, partial[[], None]]:
         borefield.set_hourly_heating_load(peak_heating)
         borefield.set_hourly_cooling_load(peak_cooling)
 
+        # when this load is a building load, it needs to be converted to a geothermal load
+        if ds.geo_load == 1 and not ds.aim_optimize:
+            borefield.set_hourly_heating_load(peak_heating * (1 - 1 / ds.SCOP))
+            borefield.set_hourly_cooling_load(peak_cooling * (1 + 1 / ds.SEER))
+
     # set up the borefield sizing
     borefield.sizing_setup(H_init=borefield.borefield[0].H,
                            use_constant_Rb=ds.option_method_rb_calc == 0,
@@ -191,4 +196,12 @@ def _create_monthly_loads_peaks(ds: DataStorage) -> tuple[NDArray[np.float64], N
                                      ds.option_hl_jul, ds.option_hl_aug, ds.option_hl_sep, ds.option_hl_oct, ds.option_hl_nov, ds.option_hl_dec])
     monthly_load_cooling: NDArray[np.float64] = np.array([ds.option_cl_jan, ds.option_cl_feb, ds.option_cl_mar, ds.option_cl_apr, ds.option_cl_may, ds.option_cl_jun,
                                      ds.option_cl_jul, ds.option_cl_aug, ds.option_cl_sep, ds.option_cl_oct, ds.option_cl_nov, ds.option_cl_dec])
+
+    if hasattr(ds, 'geo_load') and ds.geo_load == 1:
+        # building loads, which need to be converted to geothermal loads
+        peak_heating = peak_heating * (1 - 1 / ds.SCOP)
+        monthly_load_heating = monthly_load_heating * (1 - 1 / ds.SCOP)
+        peak_cooling = peak_cooling * (1 + 1 / ds.SEER)
+        monthly_load_cooling = monthly_load_cooling * (1 + 1 / ds.SEER)
+
     return peak_heating, peak_cooling, monthly_load_heating, monthly_load_cooling

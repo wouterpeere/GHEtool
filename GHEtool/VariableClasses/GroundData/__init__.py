@@ -1,2 +1,3 @@
 from .GroundFluxTemperature import GroundFluxTemperature
 from .GroundConstantTemperature import GroundConstantTemperature
+from ._GroundData import _GroundData
