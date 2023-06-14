@@ -121,7 +121,6 @@ class MainWindow(MainWindow):
             # write data to back up file
             with open(location, "w") as file:
                 dump(saving, file, indent=1)
-            globs.LOGGER.info(location)
             return True
         except FileNotFoundError:
             globs.LOGGER.error(self.translations.no_file_selected[self.gui_structure.option_language.get_value()[0]])
