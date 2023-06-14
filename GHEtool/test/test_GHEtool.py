@@ -559,6 +559,10 @@ def test_check_hourly_load(borefield):
     borefield.hourly_cooling_load[0] = -1
     with raises(ValueError):
         borefield._check_hourly_load()
+    borefield.hourly_cooling_load[0] = 0
+    borefield.hourly_cooling_load = borefield.hourly_cooling_load[:20]
+    with raises(ValueError):
+        borefield._check_hourly_load()
 
 
 def test_load_hourly_data(borefield):

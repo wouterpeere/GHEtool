@@ -113,8 +113,9 @@ def test_wrong_results_shown(qtbot):
         main_window.threads[-1].any_signal.connect(main_window.thread_function)
     assert main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
 
-    # test FileNotFound
-    # assert not main_window._save_to_data('C:/testt.GHEtool')
+    main_window._save_to_data("hello/not_there.GHEtool")
+    assert main_window.status_bar.widget.currentMessage() == main_window.translations.no_file_selected[
+        main_window.gui_structure.option_language.get_value()[0]]
 
 
 def test_backward_compatibility(qtbot):
