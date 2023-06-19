@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [2.2.0] - summer 2023
 
+## Added
+- Extra warning message if one wants to load a GHEtool file that was created with a newer version.
+
+## Changed
+- GUI was moved to a seperate project: ScenarioGUI.
+
 ## Fixed
 - Fixed problem with L2 sizing, when the peak load was the same in all months (issue #146).
 

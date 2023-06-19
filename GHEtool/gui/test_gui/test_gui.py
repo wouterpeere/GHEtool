@@ -158,6 +158,12 @@ def test_backward_compatibility(qtbot):
                 assert getattr(ds_old, option) == getattr(ds_new, option)
                 continue
 
+    # test error message for loading a file from a newer GHEtool version.
+    main_window_new = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
+                                 data_2_results_function=data_2_borefield)
+    main_window_new._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_999_1_1.GHEtool')
+    assert main_window.status_bar.widget.currentMessage() == main_window.translations.cannot_load_new_version[0]
+
 
 def test_datastorage(qtbot):
     """
@@ -442,6 +448,7 @@ def test_start_after_crash(qtbot):
     # init gui window
     main_window_old = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
     main_window_old._load_from_data(f'{FOLDER}/gui/test_gui/test_after_crash.GHEtool')
+
 
 def test_gui_filename_errors(qtbot):
     """

@@ -237,6 +237,7 @@ class Translations:  # pragma: no cover
         "results_cooling_peak_geo",
         "option_ground_temp_gradient",
         "hint_press_load",
+        "cannot_load_new_version",
         "languages",
     )
 
@@ -1899,4 +1900,13 @@ class Translations:  # pragma: no cover
             "Press 'load' to load the hourly data.",
             "Press 'load' to load the hourly data.",
             "Press 'load' to load the hourly data.",
+        ]
+        self.cannot_load_new_version: List[str] = [
+            " You cannot load a file that is from a newer GHEtool version.",
+            "Sie können keine Datei laden, die von einer neueren GHEtool-Version stammt.",
+            "Je kunt geen bestand laden dat van een nieuwere GHEtool-versie is.",
+            "You cannot load a file that is from a newer GHEtool version.",
+            "You cannot load a file that is from a newer GHEtool version.",
+            "You cannot load a file that is from a newer GHEtool version.",
+            "You cannot load a file that is from a newer GHEtool version.",
         ]

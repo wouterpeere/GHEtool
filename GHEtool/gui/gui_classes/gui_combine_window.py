@@ -94,6 +94,9 @@ class MainWindow(MainWindow):
             general_changes(saving['names'])
             return True
 
+        # print warning if the version is not a previous one
+        logging.error(self.translations.cannot_load_new_version[self.gui_structure.option_language.get_value()[0]])
+
     def _save_to_data(self, location: str | PurePath) -> bool:
         """
         This function saves the gui data to a json formatted file.
