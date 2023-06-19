@@ -678,3 +678,53 @@ def test_value_error_cooling_dom_temp_gradient():
         borefield.size()
     except ValueError:
         assert True
+
+
+def test_get_month_index(borefield):
+    test_equal = np.array([2]*12)
+    test_unequal = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 10])
+    test_unequal_2 = np.array([2]*12)
+    test_unequal_2[3] = 30
+    test_unequal_2[4] = 30
+
+    assert borefield.get_month_index(test_equal, test_equal) == 11
+    assert borefield.get_month_index(test_unequal, test_equal) == 10
+    assert borefield.get_month_index(test_unequal, test_unequal) == 10
+    assert borefield.get_month_index(test_equal, test_unequal) == 10
+    assert borefield.get_month_index(test_equal, test_unequal_2) == 4
+
+
+def test_borefield_with_constant_peaks(borefield):
+    # test first year
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(1)
+    borefield.set_peak_cooling(peak_cooling)
+    borefield.set_peak_heating(peak_heating)
+    borefield.set_baseload_heating(monthly_load_heating)
+    borefield.set_baseload_cooling(monthly_load_cooling)
+
+    # do not save previous g-functions
+    borefield.gfunction_calculation_object.store_previous_values = False
+
+    length_L2_1 = borefield.size_L2(100)
+    # set constant peak
+    borefield.set_peak_cooling([150]*12)
+    length_L2_2 = borefield.size_L2(100)
+
+    assert np.isclose(length_L2_1, length_L2_2)
+
+    # test last year
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
+    borefield.set_peak_cooling(peak_cooling)
+    borefield.set_peak_heating(peak_heating)
+    borefield.set_baseload_heating(monthly_load_heating)
+    borefield.set_baseload_cooling(monthly_load_cooling)
+
+    # do not save previous g-functions
+    borefield.gfunction_calculation_object.store_previous_values = False
+
+    length_L2_1 = borefield.size_L2(100)
+    # set constant peak
+    borefield.set_peak_cooling([240] * 12)
+    length_L2_2 = borefield.size_L2(100)
+
+    assert np.isclose(length_L2_1, length_L2_2, atol=10**-3)

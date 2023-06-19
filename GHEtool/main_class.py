@@ -1303,6 +1303,7 @@ class Borefield(BaseClass):
             raise ValueError("No correct list/array is given!")
         if isinstance(baseload, (float, int)):
             raise ValueError("No correct list/array is given!")
+        baseload = np.array(baseload)
         self.baseload_heating = np.maximum(baseload, np.zeros(12))  # kWh
         self.monthly_load_heating = self.baseload_heating / Borefield.UPM  # kW
         self.calculate_monthly_load()
@@ -1333,6 +1334,7 @@ class Borefield(BaseClass):
             raise ValueError("No correct list/array is given!")
         if isinstance(baseload, (float, int)):
             raise ValueError("No correct list/array is given!")
+        baseload = np.array(baseload)
         self.baseload_cooling = np.maximum(baseload, np.zeros(12))  # kWh
         self.monthly_load_cooling = self.baseload_cooling / Borefield.UPM  # kW
         self.calculate_monthly_load()
@@ -1363,6 +1365,7 @@ class Borefield(BaseClass):
             raise ValueError("No correct list/array is given!")
         if isinstance(peak_load, (float, int)):
             raise ValueError("No correct list/array is given!")
+        peak_load = np.array(peak_load)
         self.peak_heating = np.maximum(peak_load, self.monthly_load_heating)
         self._delete_calculated_temperatures()
 
@@ -1388,6 +1391,7 @@ class Borefield(BaseClass):
             raise ValueError("No correct list/array is given!")
         if isinstance(peak_load, (float, int)):
             raise ValueError("No correct list/array is given!")
+        peak_load = np.array(peak_load)
         self.peak_cooling = np.maximum(peak_load, self.monthly_load_cooling)
         self._delete_calculated_temperatures()
 
@@ -1436,6 +1440,34 @@ class Borefield(BaseClass):
         return np.sum(self.baseload_cooling) - np.sum(self.baseload_heating)
 
 
+    @staticmethod
+    def get_month_index(peak_load, avg_load) -> int:
+        """
+        This function calculates and returns the month index (i.e. the index of the month
+        in which the field should be sized). It does so by taking 1) the month with the highest peak load.
+        2) if all the peak loads are the same, it takes the month with the highest average load
+        3) if all average loads are the same, it takes the last month
+
+        Parameters
+        ----------
+        peak_load : np.ndarray
+            array with the peak loads [kW]
+        avg_load : np.ndarray
+            array with the monthly average loads [kW]
+
+        Returns
+        -------
+        month_index : int
+            0 = jan, 1 = feb ...
+        """
+        # check if all peak loads are equal
+        if not np.all(peak_load == peak_load[0]):
+            return np.where(peak_load == np.max(peak_load))[0][-1]
+
+        # if the average load is not constant, the month with the highest average load is chosen
+        # if it is constant, the last month is returned
+        return np.where(avg_load == np.max(avg_load))[0][-1]
+
     def _calculate_last_year_params(self, HC: bool) -> None:
         """
         This function calculates the parameters for the sizing based on the last year of operation.
@@ -1464,7 +1496,7 @@ class Borefield(BaseClass):
             self.Tf = self.Tf_min
 
             # Select month with the highest peak load and take both the peak and average load from that month
-            month_index = np.where(self.peak_heating == np.max(self.peak_heating))[0][0]
+            month_index = self.get_month_index(self.peak_heating, self.monthly_load_heating)
             self.qm = self.monthly_load[month_index] * 1000.
             self.qh = np.max(self.peak_heating) * 1000.
 
@@ -1482,11 +1514,11 @@ class Borefield(BaseClass):
             self.Tf = self.Tf_max
 
             # Select month with the highest peak load and take both the peak and average load from that month
-            month_index = np.where(self.peak_cooling == np.max(self.peak_cooling))[0][0]
+            month_index = self.get_month_index(self.peak_cooling, self.monthly_load_cooling)
             self.qm = self.monthly_load[month_index] * 1000.
             self.qh = np.max(self.peak_cooling) * 1000.
 
-    def _calculate_first_year_params(self, HC: bool, month_index: int = None) -> int:
+    def _calculate_first_year_params(self, HC: bool) -> None:
         """
         This function calculates the parameters for the sizing based on the first year of operation.
         This is needed for the L2 sizing.
@@ -1495,13 +1527,10 @@ class Borefield(BaseClass):
         ----------
         HC : bool
             True if the borefield is limited by extraction load
-        month_index : int
-            Month index with the highest peak load (jan = 0, feb = 1 ...)
 
         Returns
         -------
-        month_index : int
-            Month with the highest peak load (jan = 0, feb = 1 ...)
+        None
         """
 
         if HC:
@@ -1514,7 +1543,7 @@ class Borefield(BaseClass):
             self.Tf = self.Tf_min
 
             # Select month with the highest peak load and take both the peak and average load from that month
-            month_index = np.where(self.peak_heating == np.max(self.peak_heating))[0][0] if month_index is None else month_index
+            month_index = self.get_month_index(self.peak_heating, self.monthly_load_heating)
             self.qh = np.max(self.peak_heating) * 1000.
 
             self.qm = self.monthly_load[month_index] * 1000.
@@ -1535,7 +1564,7 @@ class Borefield(BaseClass):
             self.Tf = self.Tf_max
 
             # Select month with the highest peak load and take both the peak and average load from that month
-            month_index = np.where(self.peak_cooling == np.max(self.peak_cooling))[0][0] if month_index is None else month_index
+            month_index = self.get_month_index(self.peak_cooling, self.monthly_load_cooling)
             self.qh = np.max(self.peak_cooling) * 1000.
 
             self.qm = self.monthly_load[month_index] * 1000.
@@ -1547,7 +1576,7 @@ class Borefield(BaseClass):
         self.tcm = (month_index + 1) * Borefield.UPM * 3600
         self.tpm = month_index * Borefield.UPM * 3600
 
-        return month_index
+        return
 
     def calculate_temperatures(self, depth: float = None, hourly: bool = False) -> None:
         """
