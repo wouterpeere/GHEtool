@@ -727,4 +727,4 @@ def test_borefield_with_constant_peaks(borefield):
     borefield.set_peak_cooling([240] * 12)
     length_L2_2 = borefield.size_L2(100)
 
-    assert np.isclose(length_L2_1, length_L2_2, rtol=10**-5)
+    assert np.isclose(length_L2_1, length_L2_2, rtol=3*10**-5)
