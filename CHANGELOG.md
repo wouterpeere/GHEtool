@@ -33,6 +33,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Figure in optimize load profile keeps getting bigger and bigger (issue #131).
 - Problem with sizing with temperature gradients (issue #136).
 - Problem solved with calculate_multiple_scenarios.
+- Fixed problem with L2 sizing, when the peak load was the same in all months (issue #146).
 
 
 ## [2.1.1] - 2023-01-30
