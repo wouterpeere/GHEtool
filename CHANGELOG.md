@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file including pl
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [2.2.0] - summer 2023
+
+## Fixed
+- Fixed problem with L2 sizing, when the peak load was the same in all months (issue #146).
+
+
 ## [2.1.2] - 2023-04-28
 
 ### Added
@@ -33,7 +39,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Figure in optimize load profile keeps getting bigger and bigger (issue #131).
 - Problem with sizing with temperature gradients (issue #136).
 - Problem solved with calculate_multiple_scenarios.
-- Fixed problem with L2 sizing, when the peak load was the same in all months (issue #146).
 
 
 ## [2.1.1] - 2023-01-30
@@ -168,7 +173,7 @@ code version > speed improvements > v2.1.1.
 ### Fixed 
 - fixed bug in interpolation
 
-
+[2.2.0]: https://github.com/wouterpeere/GHEtool/compare/v2.1.2...v2.2.0
 [2.1.2]: https://github.com/wouterpeere/GHEtool/compare/v2.1.1...v2.1.2
 [2.1.1]: https://github.com/wouterpeere/GHEtool/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/wouterpeere/GHEtool/compare/v2.0.6...v2.1.0
