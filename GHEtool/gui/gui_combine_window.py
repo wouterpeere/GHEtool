@@ -1280,12 +1280,6 @@ class MainWindow(QtW.QMainWindow, UiGhetool):
         # get borefield of selected scenario
         borefield: Borefield = ds.borefield
 
-        # set debug message
-        if ds.debug_message != "":
-            hide_no_result(True)
-            self.gui_structure.text_no_result.set_text(str(ds.debug_message))
-            return
-
         # hide widgets if no results borefield exists and display not calculated text
         if borefield is None:
             hide_no_result(True)
