@@ -61,8 +61,6 @@ class DataStorage:
 
         self._create_data_classes()
 
-        self.debug_message: str = ""
-
         # params for which hourly data should be loaded
         self.hourly_data: bool = self.option_method_size_depth == 2 or (
                 self.option_temperature_profile_hourly == 1 and self.aim_temp_profile) or self.aim_optimize
