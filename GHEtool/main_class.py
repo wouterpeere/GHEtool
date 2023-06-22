@@ -367,6 +367,7 @@ class Borefield(BaseClass):
         self.D = borefield[0].D
         self.r_b = borefield[0].r_b
         self.H = borefield[0].H
+        self.gfunction_calculation_object.remove_previous_data()
 
     @borefield.deleter
     def borefield(self):
@@ -572,6 +573,9 @@ class Borefield(BaseClass):
 
         # new ground data implies that a new g-function should be loaded
         self.custom_gfunction = None
+
+        # the stored gfunction data should be deleted
+        self.gfunction_calculation_object.remove_previous_data()
 
     def set_fluid_parameters(self, data: FluidData) -> None:
         """
@@ -836,7 +840,7 @@ class Borefield(BaseClass):
                                          L3_sizing=L3_sizing,
                                          L4_sizing=L4_sizing)
 
-    def size(self, H_init: float = 100, use_constant_Rb: bool = None, L2_sizing: bool = None,
+    def size(self, use_constant_Rb: bool = None, L2_sizing: bool = None,
              L3_sizing: bool = None, L4_sizing: bool = None, quadrant_sizing: int = None) -> float:
         """
         This function sets the options for the sizing function.
@@ -853,8 +857,6 @@ class Borefield(BaseClass):
 
         Parameters
         ----------
-        H_init : float
-            Initial depth of the borefield to start the iteration (m)
         use_constant_Rb : bool
             True if a constant borehole equivalent resistance (Rb*) value should be used
         quadrant_sizing : int

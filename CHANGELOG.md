@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Fixed
 - Fixed problem with L2 sizing, when the peak load was the same in all months (issue #146).
+- Small bug in faster g-function calculation solved. When changing the borefield, the previously calculated g-functions where not removed.
 
 
 ## [2.1.2] - 2023-04-28

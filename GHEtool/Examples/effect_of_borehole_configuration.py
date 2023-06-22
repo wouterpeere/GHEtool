@@ -46,26 +46,29 @@ def effect_borefield_configuration():
     borefield.set_min_ground_temperature(0)    # minimum temperature
 
     # size borefield
-    depth = borefield.size(100)
+    depth = borefield.size()
     print("The borehole depth is:", depth, "m for a 11x11 field")
     print("The total length is:", int(depth * 11 * 11), "m")
     print("------------------------")
+
 
     # borefield of 6x20
     data = GroundConstantTemperature(3, 10)
     borefield_gt = gt.boreholes.rectangle_field(6, 20, 6, 6, 110, 1, 0.075)
 
     # set ground parameters to borefield
+    borefield.set_borefield(borefield_gt)
     borefield.set_ground_parameters(data)
 
     # set Rb
     borefield.Rb = 0.2
 
     # size borefield
-    depth6_20 = borefield.size(100)
+    depth6_20 = borefield.size()
     print("The borehole depth is:", depth6_20, "m for a 6x20 field")
     print("The total length is:", int(depth6_20 * 6 * 20), "m")
     print("The second field is hence", -int(depth6_20 * 6 * 20) + int(depth * 11 * 11), "m shorter")
+
     borefield.print_temperature_profile()
 
 

@@ -241,7 +241,7 @@ class GFunction:
             return gvalues
 
         # check if interpolation is possible:
-        if not (self._check_alpha(alpha) or self._check_borefield(borefield)):
+        if not (self._check_alpha(alpha) and self._check_borefield(borefield)):
             # the alpha and/or borefield is not in line with the precalculated data
             return gvalues
 
