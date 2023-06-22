@@ -2332,6 +2332,12 @@ class Borefield(BaseClass):
         .. [#PeereEtAl] Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. (2021) Validated combined first and last year borefield sizing methodology. In Proceedings of International Building Simulation Conference 2021. Brugge (Belgium), 1-3 September 2021. https://doi.org/10.26868/25222708.2021.30180
         """
 
+        # calculate temperatures if they are not calculated
+        if not np.any(self.results_peak_heating):
+            ghe_logger.warning('There are not yet temperatures calculated, hence there is no limiting quadrant.'
+                               'The temperature is calculated now, based on monthly values.')
+            self.calculate_temperatures()
+
         # calculate max/min fluid temperatures
         max_temp = np.max(self.results_peak_cooling)
         min_temp = np.min(self.results_peak_heating)
