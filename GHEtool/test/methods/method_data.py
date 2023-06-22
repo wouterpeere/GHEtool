@@ -44,7 +44,7 @@ borefield = Borefield()
 borefield.set_ground_parameters(data)
 borefield.Rb = 0.12
 borefield.set_borefield(borefield_gt)
-borefield.load_hourly_profile("hourly data/hourly_profile.csv", header=True, separator=";", first_column_heating=True)
+borefield.load_hourly_profile(FOLDER.joinpath("test/methods/hourly data/hourly_profile.csv"), header=True, separator=";", first_column_heating=True)
 borefield.convert_hourly_to_monthly()
 
 list_of_test_objects.add(TestObject(borefield, L2_output=182.73, L3_output=182.656, L4_output=182.337, quadrant=1,
