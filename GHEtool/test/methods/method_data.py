@@ -36,3 +36,4 @@ borefield.sizing_setup(use_constant_Rb=False)
 
 list_of_test_objects.add(TestObject(borefield, L2_output=52.7, L3_output=52.73, quadrant=1,
                          name='Main functionalities (2)'))
+
