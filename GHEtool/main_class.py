@@ -38,7 +38,7 @@ class Borefield(BaseClass):
                 'hourly_heating_load', 'hourly_cooling_load', 'number_of_boreholes', '_borefield', 'cost_investment', \
                 'length_peak', 'th', 'Tf_max', 'Tf_min', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
                 'monthly_load_cooling', 'peak_heating', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm', \
-                'peak_cooling', 'simulation_period', 'ground_data', 'pipe_data', 'fluid_data',\
+                'peak_cooling', 'simulation_period', '_ground_data', 'pipe_data', 'fluid_data',\
                 'results_peak_heating', 'time_L4', 'example_active_passive',\
                 'results_peak_cooling', 'results_month_cooling', 'results_month_heating', 'Tb', 'THRESHOLD_WARNING_SHALLOW_FIELD', \
                 'gui', 'time_L3_last_year', 'peak_heating_external', 'peak_cooling_external', \
@@ -181,7 +181,7 @@ class Borefield(BaseClass):
         # initiate ground parameters
         self.H = 0.  # borehole depth m
         self.number_of_boreholes = 0  # number of total boreholes #
-        self.ground_data: _GroundData = GroundConstantTemperature()
+        self._ground_data: _GroundData = GroundConstantTemperature()
         self.D: float = 0.  # buried depth of the borehole [m]
         self.r_b: float = 0.  # borehole radius [m]
 
@@ -554,6 +554,41 @@ class Borefield(BaseClass):
         """
         self.set_Rb(Rb)
 
+    @property
+    def ground_data(self) -> _GroundData:
+        """"
+        This function returns the ground data.
+
+        Returns
+        -------
+        ground data : GroundData
+
+        """
+        return self._ground_data
+
+    @ground_data.setter
+    def ground_data(self, data: _GroundData) -> None:
+        """
+            This function sets the relevant ground parameters.
+
+            Parameters
+            ----------
+            data : GroundData
+                All the relevant ground data
+
+            Returns
+            -------
+            None
+            """
+        # Ground properties
+        self._ground_data = data
+
+        # new ground data implies that a new g-function should be loaded
+        self.custom_gfunction = None
+
+        # the stored gfunction data should be deleted
+        self.gfunction_calculation_object.remove_previous_data()
+
     def set_ground_parameters(self, data: _GroundData) -> None:
         """
         This function sets the relevant ground parameters.
@@ -570,12 +605,6 @@ class Borefield(BaseClass):
 
         # Ground properties
         self.ground_data = data
-
-        # new ground data implies that a new g-function should be loaded
-        self.custom_gfunction = None
-
-        # the stored gfunction data should be deleted
-        self.gfunction_calculation_object.remove_previous_data()
 
     def set_fluid_parameters(self, data: FluidData) -> None:
         """
