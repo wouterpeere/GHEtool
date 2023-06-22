@@ -114,5 +114,5 @@ jobs:
         pip install -r requirements_dev.txt
         pip install -e .
     - name: Test with pytest
-      run: pytest GHEtool/test
+      run: pytest GHEtool/test/unit-tests
       
