@@ -92,12 +92,12 @@ def check_cases():
         borefield.set_max_ground_temperature(16)  # maximum temperature
         borefield.set_min_ground_temperature(0)  # minimum temperature
 
-        borefield.size(100, L2_sizing=True)
+        borefield.size(L2_sizing=True)
         print(f'correct answer L2: {correct_answers_L2[i-1]}; calculated answer L2: {round(borefield.H,2)}; error: '
               f'{round(abs(1 - borefield.H / correct_answers_L2[i - 1]) * 100, 4)} %')
         assert np.isclose(borefield.H, correct_answers_L2[i-1], rtol=0.001)
 
-        borefield.size(100, L3_sizing=True)
+        borefield.size(L3_sizing=True)
         print(f'correct answer L3: {correct_answers_L3[i - 1]}; calculated answer L3: {round(borefield.H, 2)}; error: '
               f'{round(abs(1 - borefield.H / correct_answers_L3[i - 1]) * 100, 4)} %')
         assert np.isclose(borefield.H, correct_answers_L3[i-1], rtol=0.001)
@@ -140,7 +140,7 @@ def check_custom_datafile():
         borefield.set_max_ground_temperature(16)  # maximum temperature
         borefield.set_min_ground_temperature(0)  # minimum temperature
 
-        borefield.size(100)
+        borefield.size()
         print(f'correct answer: {correct_answers[i-1]}; calculated '
               f'answer: {round(borefield.H,2)}; error: '
               f'{round(abs(1-borefield.H/correct_answers[i - 1])*100,4)} %')

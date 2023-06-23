@@ -1193,7 +1193,7 @@ class GUI(GuiStructure):
 
                 self.result_Rb_calculated = ResultText(translations.result_Rb_calculated, category=self.numerical_results,
                                                        prefix="Equivalent borehole thermal resistance: ", suffix="Wm/K")
-                self.result_Rb_calculated.text_to_be_shown("Borefield", "_Rb")
+                self.result_Rb_calculated.text_to_be_shown("Borefield", "Rb")
                 self.result_Rb_calculated.function_to_convert_to_text(lambda x: round(x, 4))
 
                 self.result_Reynolds = ResultText(self.translations.result_Reynolds,

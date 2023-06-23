@@ -332,13 +332,11 @@ def test_temp_profile_pipe_data(qtbot):
     borefield.set_pipe_parameters(pipe_data)
     borefield.set_fluid_parameters(fluid_data)
 
-    borefield._sizing_setup.use_constant_Rb = False
 
     main_window.save_scenario()
     ds = main_window.list_ds[-1]
     borefield_gui, func = data_2_borefield(ds)
     assert borefield_gui.borehole.pipe_data == borefield.borehole.pipe_data
-    assert borefield_gui._sizing_setup.use_constant_Rb == borefield._sizing_setup.use_constant_Rb
     assert func.func == borefield_gui.calculate_temperatures
     assert func.args == (depth,)
     assert func.keywords == {}
@@ -382,13 +380,10 @@ def test_temp_profile_fluid_data(qtbot):
     borefield.set_pipe_parameters(pipe_data)
     borefield.set_fluid_parameters(fluid_data)
 
-    borefield._sizing_setup.use_constant_Rb = False
-
     main_window.save_scenario()
     ds = main_window.list_ds[-1]
     borefield_gui, func = data_2_borefield(ds)
     assert borefield_gui.borehole.fluid_data == borefield.borehole.fluid_data
-    assert borefield_gui._sizing_setup.use_constant_Rb == borefield._sizing_setup.use_constant_Rb
     assert func.func == borefield_gui.calculate_temperatures
     assert func.args == (depth,)
     assert func.keywords == {}

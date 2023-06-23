@@ -159,7 +159,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         borefield.set_hourly_heating_load(heating_ground)
 
         # size borefield
-        depth_passive = borefield.size_L4(100)
+        depth_passive = borefield.size_L4()
         depths.insert(0, depth_passive)
 
         # get temperature profile
@@ -183,7 +183,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         borefield.set_hourly_heating_load(heating_ground)
 
         # size borefield
-        depth_active = borefield.size_L4(100)
+        depth_active = borefield.size_L4()
         depths.insert(0, depth_active)
 
         # get temperature profile

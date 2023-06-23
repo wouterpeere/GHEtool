@@ -265,7 +265,7 @@ def test_hourly_to_monthly(borefield):
 
 
 def test_size(borefield):
-    assert isclose(borefield.size(100), 92.06688246062056)
+    assert isclose(borefield.size(), 92.06688246062056)
 
 
 def test_imbalance(borefield):
@@ -280,13 +280,13 @@ def test_temperatureProfile(borefield):
 
 
 def test_quadrantSizing(borefield):
-    assert round(borefield.size(100, quadrant_sizing=3), 2) == 41.3
+    assert round(borefield.size(quadrant_sizing=3), 2) == 41.3
 
 
 def test_dynamicRb(borefield):
     borefield.set_fluid_parameters(fluidData)
     borefield.set_pipe_parameters(pipeData)
-    assert round(borefield.size(100, use_constant_Rb=False), 2) == 52.7
+    assert round(borefield.size(use_constant_Rb=False), 2) == 52.7
 
 
 def test_load_custom_configuration(borefield):
@@ -302,17 +302,13 @@ def test_simulation_period(borefield):
 def test_without_pipe(borefield):
     borefield.set_pipe_parameters(pipeData)
     borefield.set_fluid_parameters(fluidData)
+    borefield.borehole.use_constant_Rb = True
 
 
 def test_Tg(borefield):
     borefield._sizing_setup.use_constant_Tg = False
     borefield._Tg()
     assert borefield._Tg() == data.Tg
-
-
-def test_calculate_Rb(borefield):
-    with raises(ValueError):
-        borefield.calculate_Rb()
 
 
 def test_too_much_sizing_methods(borefield):
@@ -442,7 +438,7 @@ def test_choose_quadrant_1(borefield_quadrants):
     borefield_quadrants.set_baseload_cooling(monthly_load_cooling)
     borefield_quadrants.set_baseload_heating(monthly_load_heating)
 
-    borefield_quadrants.size(100, L3_sizing=True)
+    borefield_quadrants.size(L3_sizing=True)
     assert 1 == borefield_quadrants.calculate_quadrant()
 
 
@@ -454,7 +450,7 @@ def test_choose_quadrant_2(borefield_quadrants):
     borefield_quadrants.set_baseload_cooling(monthly_load_cooling)
     borefield_quadrants.set_baseload_heating(monthly_load_heating)
 
-    borefield_quadrants.size(100, L3_sizing=True)
+    borefield_quadrants.size(L3_sizing=True)
     assert 2 == borefield_quadrants.calculate_quadrant()
 
 
@@ -466,7 +462,7 @@ def test_choose_quadrant_3(borefield_quadrants):
     borefield_quadrants.set_baseload_cooling(monthly_load_cooling)
     borefield_quadrants.set_baseload_heating(monthly_load_heating)
 
-    borefield_quadrants.size(100, L3_sizing=True)
+    borefield_quadrants.size(L3_sizing=True)
     assert 3 == borefield_quadrants.calculate_quadrant()
 
 
@@ -478,7 +474,7 @@ def test_choose_quadrant_4(borefield_quadrants):
     borefield_quadrants.set_baseload_cooling(monthly_load_cooling)
     borefield_quadrants.set_baseload_heating(monthly_load_heating)
 
-    borefield_quadrants.size(100, L3_sizing=True)
+    borefield_quadrants.size(L3_sizing=True)
     assert 4 == borefield_quadrants.calculate_quadrant()
 
 
@@ -525,21 +521,21 @@ def test_load_custom_gfunction(borefield):
 
 def test_H_smaller_50(borefield):
     borefield.H = 0.5
-    borefield.size_L2(H_init=0.5, quadrant_sizing=1)
+    borefield.size_L2(quadrant_sizing=1)
 
 
 def test_size_hourly_without_hourly_load(borefield):
     with raises(ValueError):
-        borefield.size_L4(H_init=100)
+        borefield.size_L4()
     borefield.hourly_heating_load = None
     borefield.hourly_cooling_load = None
     with raises(ValueError):
-        borefield.size_L4(H_init=100)
+        borefield.size_L4()
 
 
 def test_size_hourly_quadrant(hourly_borefield):
     hourly_borefield.H = 0.5
-    hourly_borefield.size_L4(H_init=100, quadrant_sizing=1)
+    hourly_borefield.size_L4(quadrant_sizing=1)
 
 
 def test_create_custom_dataset_without_data(borefield):
@@ -705,10 +701,10 @@ def test_borefield_with_constant_peaks(borefield):
     # do not save previous g-functions
     borefield.gfunction_calculation_object.store_previous_values = False
 
-    length_L2_1 = borefield.size_L2(100)
+    length_L2_1 = borefield.size_L2()
     # set constant peak
     borefield.set_peak_cooling([150]*12)
-    length_L2_2 = borefield.size_L2(100)
+    length_L2_2 = borefield.size_L2()
 
     assert np.isclose(length_L2_1, length_L2_2)
 
@@ -722,9 +718,36 @@ def test_borefield_with_constant_peaks(borefield):
     # do not save previous g-functions
     borefield.gfunction_calculation_object.store_previous_values = False
 
-    length_L2_1 = borefield.size_L2(100)
+    length_L2_1 = borefield.size_L2()
     # set constant peak
     borefield.set_peak_cooling([240] * 12)
-    length_L2_2 = borefield.size_L2(100)
+    length_L2_2 = borefield.size_L2()
 
     assert np.isclose(length_L2_1, length_L2_2, rtol=3*10**-5)
+
+
+def test_wrong_input_for_quadrant_sizing(borefield):
+    # this can happen since in this version, the H_init was removed
+    try:
+        borefield.size(100)
+    except ValueError:
+        assert True
+    try:
+        borefield.size_L2(100)
+    except ValueError:
+        assert True
+    try:
+        borefield.size_L3(100)
+    except ValueError:
+        assert True
+
+def test_wrong_input_for_quadrant_sizing_L4(hourly_borefield):
+    # this can happen since in this version, the H_init was removed
+    try:
+        hourly_borefield.size(100)
+    except ValueError:
+        assert True
+    try:
+        hourly_borefield.size_L4(100)
+    except ValueError:
+        assert True

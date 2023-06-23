@@ -143,7 +143,7 @@ borefield.set_borefield(borefield_gt)
 Once a Borefield object is created, one can make use of all the functionalities of GHEtool. One can for example size the borefield using:
 
 ```Python
-depth = borefield.size(100)
+depth = borefield.size()
 print("The borehole depth is: ", depth, "m")
 ```
 

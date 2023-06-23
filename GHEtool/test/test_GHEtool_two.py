@@ -127,8 +127,8 @@ def test_no_cooling():
     borefield.set_max_ground_temperature(16)  # maximum temperature
     borefield.set_min_ground_temperature(0)  # minimum temperature
 
-    borefield.size_L2(100)
-    borefield.size_L3(100)
+    borefield.size_L2()
+    borefield.size_L3()
 
 
 def test_no_heating():
@@ -164,8 +164,8 @@ def test_no_heating():
     borefield.set_max_ground_temperature(16)  # maximum temperature
     borefield.set_min_ground_temperature(0)  # minimum temperature
 
-    borefield.size_L2(100)
-    borefield.size_L3(100)
+    borefield.size_L2()
+    borefield.size_L3()
 
 
 def test_size_L4_without_heating():
@@ -233,10 +233,10 @@ def test_different_results_with_other_peak_lengths():
     borefield.set_min_ground_temperature(0)  # minimum temperature
 
     borefield.set_length_peak(2)
-    init_length_L2 = borefield.size_L2(100)
+    init_length_L2 = borefield.size_L2()
     borefield.set_length_peak_heating(8)
     borefield.set_length_peak_cooling(8)
-    new_length_L2 = borefield.size_L2(100)
+    new_length_L2 = borefield.size_L2()
 
     assert new_length_L2 > init_length_L2
 

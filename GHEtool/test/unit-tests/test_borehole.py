@@ -1,12 +1,9 @@
 import copy
 
-import pygfunction as gt
-import pytest
+import numpy as np
 
 from GHEtool import FluidData, PipeData
 from GHEtool.VariableClasses import Borehole
-
-import matplotlib.pyplot as plt
 
 fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
 pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
@@ -51,7 +48,36 @@ def test_calculate_Rb():
     borehole.fluid_data = fluid_data
     borehole.pipe_data = pipe_data
 
-    borehole.calculate_Rb(100, 1, 0.075, 3)
+    assert np.isclose(borehole.calculate_Rb(100, 1, 0.075, 3), 0.09483159131195469)
+
+
+def test_Rb():
+    borehole = Borehole()
+    assert borehole.get_Rb(100, 1, 0.07, 2) == 0.12
+
+    # set pipe and fluid data
+    borehole.fluid_data = fluid_data
+    borehole.pipe_data = pipe_data
+
+    assert np.isclose(borehole.calculate_Rb(100, 1, 0.075, 3), 0.09483159131195469)
+
+    # set Rb
+    borehole.Rb = 0.12
+    assert borehole.get_Rb(100, 1, 0.07, 2) == 0.12
+
+    # set pipe and fluid data
+    borehole.fluid_data = fluid_data
+    borehole.pipe_data = pipe_data
+
+    assert np.isclose(borehole.calculate_Rb(100, 1, 0.075, 3), 0.09483159131195469)
+    del borehole.pipe_data
+    assert borehole.get_Rb(100, 1, 0.07, 2) == 0.12
+    borehole.pipe_data = pipe_data
+    assert np.isclose(borehole.calculate_Rb(100, 1, 0.075, 3), 0.09483159131195469)
+    del borehole.fluid_data
+    assert borehole.get_Rb(100, 1, 0.07, 2) == 0.12
+    borehole.fluid_data = fluid_data
+    assert np.isclose(borehole.calculate_Rb(100, 1, 0.075, 3), 0.09483159131195469)
 
 
 def test_calculate_Rb_no_data():
