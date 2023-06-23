@@ -1519,22 +1519,22 @@ class Translations:  # pragma: no cover
             "Calculation options",
         ]
         self.option_method_size_depth: List[str] = [
-            "Method for size borehole depth:,  L2  ,  L3  ,  L4  ",
-            "Methode zur Bohrlochtiefendimensionierung:,  L2  ,  L3  ,  L4  ",
-            "Methode voor boorvelddimensionering:,  L2  ,  L3  ,  L4  ",
-            "Method for size borehole depth:,  L2  ,  L3  ,  L4  ",
-            "Method for size borehole depth:,  L2  ,  L3  ,  L4  ",
-            "Method for size borehole depth:,  L2  ,  L3  ,  L4  ",
-            "Method for size borehole depth:,  L2  ,  L3  ,  L4  ",
+            "Method for size borehole depth:,  Simplified  ,  Monthly  ,  Hourly  ",
+            "Methode zur Bohrlochtiefendimensionierung:,  Vereinfacht  ,  Monatlich  ,  Stündlich  ",
+            "Methode voor boorvelddimensionering:,  Vereenvoudigd  ,  Maandelijks  ,  Uurlijks  ",
+            "Method for size borehole depth:,  Simplified  ,  Monthly  ,  Hourly  ",
+            "Method for size borehole depth:,  Simplified  ,  Monthly  ,  Hourly  ",
+            "Method for size borehole depth:,  Simplified  ,  Monthly  ,  Hourly  ",
+            "Method for size borehole depth:,  Simplified  ,  Monthly  ,  Hourly",
         ]
         self.option_method_size_length: List[str] = [
-            "Method for size width and length:,  L2  ,  L3  ",
-            "Methode für Längen- und Breitendimensionierung:,  L2  ,  L3  ",
-            "Methode voor boorvelddimensionering:,  L2  ,  L3  ",
-            "Method for size width and length:,  L2  ,  L3  ",
-            "Method for size width and length:,  L2  ,  L3  ",
-            "Method for size width and length:,  L2  ,  L3  ",
-            "Method for size width and length:,  L2  ,  L3  ",
+            "Method for size width and length:,  Simplified  ,  Monthly  ",
+            "Methode für Längen- und Breitendimensionierung:,  Vereinfacht  ,  Monatlich  ",
+            "Methode voor boorvelddimensionering:,  Vereenvoudigd  ,  Maandelijks  ",
+            "Method for size width and length:,  Simplified  ,  Monthly  ",
+            "Method for size width and length:,  Simplified  ,  Monthly  ",
+            "Method for size width and length:,  Simplified  ,  Monthly  ",
+            "Method for size width and length:,  Simplified  ,  Monthly",
         ]
         self.option_method_temp_gradient: List[str] = [
             "Should a temperature gradient over depth be considered?:, no , yes ",
