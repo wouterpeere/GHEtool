@@ -400,7 +400,10 @@ def test_size_L4_without_data(borefield):
 def test_load_duration(monkeypatch, hourly_borefield):
     monkeypatch.setattr(plt, 'show', lambda: None)
     hourly_borefield.plot_load_duration(legend=True)
+    temp_Rb, temp_use_constant_Rb = hourly_borefield.borehole.Rb, hourly_borefield.borehole.use_constant_Rb
     hourly_borefield.optimise_load_profile(150)
+    assert temp_Rb == hourly_borefield.borehole.Rb
+    assert temp_use_constant_Rb, hourly_borefield.borehole.use_constant_Rb
     hourly_borefield.set_min_ground_temperature(-5)
     hourly_borefield.set_max_ground_temperature(17)
     hourly_borefield.optimise_load_profile(150)
@@ -740,6 +743,7 @@ def test_wrong_input_for_quadrant_sizing(borefield):
         borefield.size_L3(100)
     except ValueError:
         assert True
+
 
 def test_wrong_input_for_quadrant_sizing_L4(hourly_borefield):
     # this can happen since in this version, the H_init was removed
