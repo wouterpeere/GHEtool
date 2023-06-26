@@ -99,8 +99,8 @@ list_of_test_objects.add(TestObject(borefield, L2_output=186.5208, L3_output=191
 from GHEtool.Validation.cases import load_case
 data = GroundConstantTemperature(3.5, 10)
 borefield_gt = gt.boreholes.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)
-correct_answers_L2 = (56.75, 117.192, 66.94, 91.266)
-correct_answers_L3 = (56.771, 118.669, 66.471, 91.209)
+correct_answers_L2 = (56.75, 117.223, 66.94, 91.266)
+correct_answers_L3 = (56.771, 118.738, 66.471, 91.340)
 for i in (1, 2, 3, 4):
     monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(i)
     borefield = Borefield(simulation_period=20, peak_heating=peak_heating, peak_cooling=peak_cooling,

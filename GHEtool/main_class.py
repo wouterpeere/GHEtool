@@ -858,7 +858,7 @@ class Borefield(BaseClass):
         """
         self.H_init = H_init
 
-        # if sizing_setup is not None, than the sizing setup is set directly
+        # if sizing_setup is not None, then the sizing setup is set directly
         if sizing_setup is not None:
             self._sizing_setup = sizing_setup
             return
@@ -869,7 +869,7 @@ class Borefield(BaseClass):
                                          L3_sizing=L3_sizing,
                                          L4_sizing=L4_sizing)
 
-    def size(self, use_constant_Rb: bool = None, L2_sizing: bool = None,
+    def size(self, H_init: float = None, use_constant_Rb: bool = None, L2_sizing: bool = None,
              L3_sizing: bool = None, L4_sizing: bool = None, quadrant_sizing: int = None) -> float:
         """
         This function sets the options for the sizing function.
@@ -881,11 +881,11 @@ class Borefield(BaseClass):
         * The L4 sizing is the most exact one, since it uses hourly data (8760 pulses/year)
 
         Please note that the changes sizing setup changes here are not saved! Use self.setupSizing for this.
-        (e.g. if you size by putting the constantTg param to True but it was False, if you plot the results afterwards
-        the constantTg will be False again and your results will seem off!)
 
         Parameters
         ----------
+        H_init : float
+            Initial depth for the iteration. If None, the default H_init is chosen.
         use_constant_Rb : bool
             True if a constant borehole equivalent resistance (Rb*) value should be used
         quadrant_sizing : int
@@ -912,6 +912,10 @@ class Borefield(BaseClass):
         if not self.ground_data.check_values():
             raise ValueError("Please provide ground data.")
 
+        # check H_init
+        if H_init is None:
+            H_init = self.H_init
+
         # make backup of initial parameter states
         self._sizing_setup.make_backup()
 
@@ -922,11 +926,11 @@ class Borefield(BaseClass):
 
         # sizes according to the correct algorithm
         if self._sizing_setup.L2_sizing:
-            depth = self.size_L2(self.H_init, self._sizing_setup.quadrant_sizing)
+            depth = self.size_L2(H_init, self._sizing_setup.quadrant_sizing)
         if self._sizing_setup.L3_sizing:
-            depth = self.size_L3(self.H_init, self._sizing_setup.quadrant_sizing)
+            depth = self.size_L3(H_init, self._sizing_setup.quadrant_sizing)
         if self._sizing_setup.L4_sizing:
-            depth = self.size_L4(self.H_init, self._sizing_setup.quadrant_sizing)
+            depth = self.size_L4(H_init, self._sizing_setup.quadrant_sizing)
 
         # reset initial parameters
         self._sizing_setup.restore_backup()
@@ -1002,7 +1006,7 @@ class Borefield(BaseClass):
         """
 
         # initiate with a given depth
-        self.H_init: float = H_init
+        self.H: float = H_init
 
         def size_quadrant1():
             self._calculate_first_year_params(False)  # calculate parameters
@@ -1083,7 +1087,7 @@ class Borefield(BaseClass):
             Required depth of the borefield [m]
         """
         # initiate with a given depth
-        self.H_init: float = H_init
+        self.H: float = H_init
 
         if quadrant_sizing != 0:
             # size according to a specific quadrant
@@ -1136,7 +1140,7 @@ class Borefield(BaseClass):
         self._check_hourly_load()
 
         # initiate with a given depth
-        self.H_init: float = H_init
+        self.H: float = H_init
 
         if quadrant_sizing != 0:
             # size according to a specific quadrant
@@ -1790,7 +1794,10 @@ class Borefield(BaseClass):
 
             # the g-function value of the peak with length_peak hours
             g_value_peak_cooling = self.gfunction(self.length_peak_cooling * 3600., H)[0]
-            g_value_peak_heating = self.gfunction(self.length_peak_heating * 3600., H)[0]
+            if self.length_peak_cooling == self.length_peak_heating:
+                g_value_peak_heating = g_value_peak_cooling
+            else:
+                g_value_peak_heating = self.gfunction(self.length_peak_heating * 3600., H)[0]
 
             # calculation of needed differences of the g-function values. These are the weight factors in the calculation
             # of Tb.
