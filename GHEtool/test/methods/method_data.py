@@ -177,5 +177,5 @@ borefield.sizing_setup(use_constant_Rb=False)
 borefield.set_max_ground_temperature(17)
 borefield.set_min_ground_temperature(3)
 borefield.load_hourly_profile(FOLDER.joinpath("test\methods\hourly data\swimming_pool.csv"), header=True, separator=";", first_column_heating=False)
-list_of_test_objects.add(TestObject(borefield, L2_output=305.509, L3_output=310.725, L4_output=308.269, quadrant=4,
+list_of_test_objects.add(TestObject(borefield, L2_output=305.509 , L3_output=310.725, L4_output=308.269, quadrant=4,
                                     name='BS2023 Swimming pool'))

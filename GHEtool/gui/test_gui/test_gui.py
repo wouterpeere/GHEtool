@@ -59,7 +59,14 @@ def test_wrong_results_shown(qtbot):
     main_window.gui_structure.option_seperator_csv.set_value(0)
 
     main_window.gui_structure.option_filename.set_value(f'{FOLDER}/Examples/hourly_profile.csv')
+    assert main_window.gui_structure.option_cooling_column.get_value()[0] == 1
+    assert main_window.gui_structure.option_column.get_value() == 1
+    main_window.gui_structure.option_decimal_csv.set_value(1)
+    main_window.gui_structure.option_seperator_csv.set_value(1)
     main_window.gui_structure.fun_update_combo_box_data_file(f'{FOLDER}/Examples/hourly_profile.csv')
+    assert main_window.status_bar.widget.currentMessage() == 'Please make sure the seperator and decimal point are different.'
+    main_window.gui_structure.option_decimal_csv.set_value(0)
+    main_window.gui_structure.option_seperator_csv.set_value(0)
     main_window.gui_structure.option_column.set_value(1)
     main_window.gui_structure.option_cooling_column.set_value(1)
 
