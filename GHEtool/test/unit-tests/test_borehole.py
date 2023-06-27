@@ -59,5 +59,6 @@ def test_calculate_Rb_no_data():
 
     try:
         borehole.calculate_Rb(100, 1, 0.075, 3)
+        assert False  # pragma: no cover
     except ValueError:
         assert True

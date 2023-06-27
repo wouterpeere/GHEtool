@@ -73,18 +73,34 @@ def test_nb_of_boreholes():
     borefield = Borefield()
     assert borefield.number_of_boreholes == 0
     borefield = Borefield(borefield=borefield_gt)
+    borefield.set_ground_parameters(data_ground_flux)
     assert borefield.number_of_boreholes == 120
-    borefield.set_borefield(gt.boreholes.rectangle_field(5, 5, 6, 6, 100, 1, 0.075))
+    borefield.set_borefield(gt.boreholes.rectangle_field(5, 5, 6, 6, 110, 0.1, 0.07))
+    assert borefield.H == 110
+    assert borefield.r_b == 0.07
+    assert borefield.D == 0.1
     assert borefield.number_of_boreholes == 25
+    borefield.gfunction(5000, 110)
+    assert np.any(borefield.gfunction_calculation_object.depth_array)
     borefield.borefield = gt.boreholes.rectangle_field(6, 5, 6, 6, 100, 1, 0.075)
-    temp = copy.deepcopy(borefield.borefield)
+    assert not np.any(borefield.gfunction_calculation_object.depth_array)
+    assert borefield.H == 100
+    assert borefield.r_b == 0.075
+    assert borefield.D == 1
+    temp = copy.deepcopy(borefield.gfunction_calculation_object)
+    borefield.gfunction(5000, 110)
+    assert np.any(borefield.gfunction_calculation_object.depth_array)
     assert borefield.number_of_boreholes == 30
-    borefield.borehole = None
-    assert borefield.number_of_boreholes == 30
-    assert borefields_equal(borefield.borefield, temp)
+    borefield.borefield = None
+    assert not np.any(borefield.gfunction_calculation_object.depth_array)
+    assert borefield.gfunction_calculation_object
+    assert borefield.number_of_boreholes == 0
+    borefield.borefield = gt.boreholes.rectangle_field(6, 5, 6, 6, 100, 1, 0.075)
+    borefield.gfunction(5000, 110)
+    assert np.any(borefield.gfunction_calculation_object.depth_array)
     borefield.set_borefield(None)
-    assert borefield.number_of_boreholes == 30
-    assert borefields_equal(borefield.borefield, temp)
+    assert not np.any(borefield.gfunction_calculation_object.depth_array)
+    assert borefield.number_of_boreholes == 0
 
 
 def test_create_rectangular_field(borefield):
@@ -99,23 +115,88 @@ def test_create_circular_field(borefield):
     borefields_equal(borefield.borefield, gt.boreholes.circle_field(10, 10, 100, 1, 0.075))
 
 
-def test_borefield():
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peakHeating,
-                          peak_cooling=peakCooling,
-                          baseload_heating=monthlyLoadHeating,
-                          baseload_cooling=monthlyLoadCooling)
+def test_update_depth(borefield):
+    init_H = borefield.borefield[0].H
 
-    borefield.set_ground_parameters(data)
-    borefield.set_borefield(borefield_gt)
-    borefield.set_Rb(0.2)
+    borefield.H = init_H + 1
+    borefield._update_borefield_depth()
+    for bor in borefield.borefield:
+        assert bor.H == init_H + 1
 
-    # set temperature boundaries
-    borefield.set_max_ground_temperature(16)  # maximum temperature
-    borefield.set_min_ground_temperature(0)  # minimum temperature
+    borefield._update_borefield_depth(init_H + 2)
+    for bor in borefield.borefield:
+        assert bor.H == init_H + 2
 
+    borefield._update_borefield_depth(init_H + 2)
+    for bor in borefield.borefield:
+        assert bor.H == init_H + 2
+
+def test_create_custom_dataset(borefield):
+    borefield_test = Borefield()
+    try:
+        borefield_test.create_custom_dataset([100, 1000], [50, 100])
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
+    borefield.create_rectangular_borefield(10, 10, 6, 6, 100, 1, 0.075)
+    try:
+        borefield_test.create_custom_dataset([100, 1000], [50, 100])
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
+
+
+@pytest.mark.slow
+def test_load_custom_gfunction(borefield):
+    borefield.create_custom_dataset()
+    borefield.custom_gfunction.dump_custom_dataset("./", "test")
+    dataset = copy.copy(borefield.custom_gfunction)
+    borefield.borefield = None
+    assert borefield.custom_gfunction is None
+    borefield.custom_gfunction = dataset
+    borefield.set_borefield(None)
+    assert borefield.custom_gfunction is None
+    borefield.load_custom_gfunction("./test.gvalues")
+    assert borefield.custom_gfunction == dataset
+
+
+def test_set_investment_cost(borefield):
+    borefield.set_investment_cost()
+    assert borefield.cost_investment == Borefield.DEFAULT_INVESTMENT
+    borefield.set_investment_cost([0, 39])
+    assert borefield.cost_investment == [0, 39]
+
+
+def test_set_length_peak():
+    borefield = Borefield()
+    borefield.set_length_peak_heating(8)
+    borefield.set_length_peak_cooling(10)
+    assert borefield.length_peak_cooling == 10
+    assert borefield.length_peak_heating == 8
+    borefield.set_length_peak(12)
+    assert borefield.length_peak_cooling == 12
+    assert borefield.length_peak_heating == 12
+    borefield.set_length_peak_cooling()
+    borefield.set_length_peak_heating()
+    assert borefield.length_peak_heating == 6
+    assert borefield.length_peak_cooling == 6
+    borefield.set_length_peak_heating(8)
+    borefield.set_length_peak_cooling(10)
+    borefield.set_length_peak()
+    assert borefield.length_peak_heating == 6
+    assert borefield.length_peak_cooling == 6
+
+
+def test_simulation_period():
+    borefield = Borefield(simulation_period=20)
     assert borefield.simulation_period == 20
-    assert borefield.Tf_min == 0
-    assert borefield.Tf_max == 16
-    assert borefield
-    np.testing.assert_array_equal(borefield.peak_heating, np.array([160., 142, 102., 55., 26.301369863013697, 0., 0., 0., 40.4, 85., 119., 136.]))
+    assert len(borefield.time_L3_last_year) == 12 * 20
+    borefield = Borefield(simulation_period=25)
+    assert borefield.simulation_period == 25
+    assert len(borefield.time_L3_last_year) == 12 * 25
+    borefield.set_simulation_period(40)
+    assert borefield.simulation_period == 40
+    assert len(borefield.time_L3_last_year) == 12 * 40
+
+
+

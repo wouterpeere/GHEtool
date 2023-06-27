@@ -36,7 +36,7 @@ class Borefield(BaseClass):
 
     __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'H_init', 'ty', 'tm', 'borehole',\
                 'hourly_heating_load', 'hourly_cooling_load', 'number_of_boreholes', '_borefield', 'cost_investment', \
-                'length_peak', 'th', 'Tf_max', 'Tf_min', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
+                'th', 'Tf_max', 'Tf_min', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
                 'monthly_load_cooling', 'peak_heating', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm', \
                 'peak_cooling', 'simulation_period', '_ground_data', 'pipe_data', 'fluid_data',\
                 'results_peak_heating', 'time_L4', 'example_active_passive',\
@@ -44,12 +44,13 @@ class Borefield(BaseClass):
                 'gui', 'time_L3_last_year', 'peak_heating_external', 'peak_cooling_external', \
                 'monthly_load_heating_external', 'monthly_load_cooling_external', 'hourly_heating_load_external', \
                 'hourly_cooling_load_external', 'hourly_heating_load_on_the_borefield', 'hourly_cooling_load_on_the_borefield', \
-                'printing', 'combo', 'D', 'r_b', 'gfunction_calculation_object',\
+                'D', 'r_b', 'gfunction_calculation_object',\
                 'H_init', 'use_precalculated_data', '_sizing_setup', 'hourly_heating_load_building', 'hourly_cooling_load_building'
 
-    def __init__(self, simulation_period: int = 20, peak_heating: list = None,
-                 peak_cooling: list = None, baseload_heating: list = None, baseload_cooling: list = None,
-                 borefield=None, custom_gfunction: CustomGFunction = None, gui: bool = False):
+    def __init__(self, simulation_period: int = 20, peak_heating: np.ndarray | list = None,
+                 peak_cooling: np.ndarray | list = None, baseload_heating: np.ndarray | list = None,
+                 baseload_cooling: np.ndarray | list = None, borefield=None,
+                 custom_gfunction: CustomGFunction = None, gui: bool = False):
         """
 
         Parameters
@@ -108,13 +109,13 @@ class Borefield(BaseClass):
         # initiate vars
         LIST_OF_ZEROS = np.zeros(12)
         if baseload_cooling is None:
-            baseload_cooling: list = LIST_OF_ZEROS
+            baseload_cooling: np.ndarray = LIST_OF_ZEROS
         if baseload_heating is None:
-            baseload_heating: list = LIST_OF_ZEROS
+            baseload_heating: np.ndarray = LIST_OF_ZEROS
         if peak_cooling is None:
-            peak_cooling: list = LIST_OF_ZEROS
+            peak_cooling: np.ndarray = LIST_OF_ZEROS
         if peak_heating is None:
-            peak_heating: list = LIST_OF_ZEROS
+            peak_heating: np.ndarray = LIST_OF_ZEROS
 
         self.limiting_quadrant: int = 0  # parameter that tells in which quadrant the field is limited
         # m hereafter one needs to chance to fewer boreholes with more depth, because the calculations are no longer
@@ -164,7 +165,6 @@ class Borefield(BaseClass):
         self.ty: float = 0.  # yearly time value
         self.tm: float = 0.  # monthly time value
         self.th: float = 0.  # duration of peak in seconds
-        self.length_peak: float = Borefield.DEFAULT_LENGTH_PEAK
         self.length_peak_cooling: float = Borefield.DEFAULT_LENGTH_PEAK
         self.length_peak_heating: float = Borefield.DEFAULT_LENGTH_PEAK
         self.tcm: float = 0.  # time constant for first year sizing
@@ -201,11 +201,6 @@ class Borefield(BaseClass):
         # check if the GHEtool is used by the gui i
         self.gui = gui
 
-        # set boolean for printing output
-        self.printing: bool = True
-        # set list for the sizing ba length and width output
-        self.combo: list = []
-
         # set load profiles
         self.set_peak_heating(peak_heating)
         self.set_peak_cooling(peak_cooling)
@@ -213,7 +208,8 @@ class Borefield(BaseClass):
         self.set_baseload_heating(baseload_heating)
 
         # set simulation period
-        self.simulation_period: int = simulation_period
+        self.simulation_period: int = 0
+        self.set_simulation_period(simulation_period)
 
         # set investment cost
         self.cost_investment: list = Borefield.DEFAULT_INVESTMENT
@@ -260,7 +256,7 @@ class Borefield(BaseClass):
 
     def set_borefield(self, borefield: list[gt.boreholes.Borehole] = None) -> None:
         """
-        This function set the borefield object.
+        This function set the borefield object. When None is given, the borefield will be deleted.
 
         Parameters
         ----------
@@ -271,8 +267,6 @@ class Borefield(BaseClass):
         -------
         None
         """
-        if borefield is None:
-            return
         self.borefield = borefield
 
     def create_rectangular_borefield(self, N_1: int, N_2: int, B_1: int, B_2: int, H: float, D: float = 1, r_b: float = 0.075):
@@ -346,7 +340,7 @@ class Borefield(BaseClass):
         return self._borefield
 
     @borefield.setter
-    def borefield(self, borefield: list[gt.boreholes.Borehole]=None) -> None:
+    def borefield(self, borefield: list[gt.boreholes.Borehole] = None) -> None:
         """
         This function sets the borefield configuration. When no input is given, the borefield variable will be deleted.
 
@@ -381,6 +375,8 @@ class Borefield(BaseClass):
         """
         self._borefield = None
         self._set_number_of_boreholes()
+        self.gfunction_calculation_object.remove_previous_data()
+        self.custom_gfunction = None
 
     def _update_borefield_depth(self, H: float = None) -> None:
         """
@@ -454,8 +450,6 @@ class Borefield(BaseClass):
         """
         self.set_length_peak_heating(length)
         self.set_length_peak_cooling(length)
-        self.length_peak = length
-        self._set_time_constants()
 
     def set_length_peak_heating(self, length: float = DEFAULT_LENGTH_PEAK) -> None:
         """
@@ -512,7 +506,6 @@ class Borefield(BaseClass):
         None
         """
         # Number of segments per borehole
-        self.th: float = self.length_peak * 3600.  # length of peak in seconds
         self.ty: float = self.simulation_period * 8760. * 3600
         self.tm: float = Borefield.UPM * 3600.
 
@@ -569,17 +562,17 @@ class Borefield(BaseClass):
     @ground_data.setter
     def ground_data(self, data: _GroundData) -> None:
         """
-            This function sets the relevant ground parameters.
+        This function sets the relevant ground parameters.
 
-            Parameters
-            ----------
-            data : GroundData
-                All the relevant ground data
+        Parameters
+        ----------
+        data : GroundData
+            All the relevant ground data
 
-            Returns
-            -------
-            None
-            """
+        Returns
+        -------
+        None
+        """
         # Ground properties
         self._ground_data = data
 
@@ -936,7 +929,7 @@ class Borefield(BaseClass):
         self._sizing_setup.restore_backup()
 
         # check if the field is not shallow
-        if depth < self.THRESHOLD_WARNING_SHALLOW_FIELD and self.printing:
+        if depth < self.THRESHOLD_WARNING_SHALLOW_FIELD:
             ghe_logger.warning(f"The field has a calculated depth of {round(depth, 2)}"
                                f"m which is lower than the proposed minimum "
                                f"of {self.THRESHOLD_WARNING_SHALLOW_FIELD} m."
