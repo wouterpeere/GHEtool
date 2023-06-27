@@ -100,7 +100,7 @@ from GHEtool.Validation.cases import load_case
 data = GroundConstantTemperature(3.5, 10)
 borefield_gt = gt.boreholes.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)
 correct_answers_L2 = (56.75, 117.223, 66.94, 91.266)
-correct_answers_L3 = (56.771, 118.738, 66.471, 91.340)
+correct_answers_L3 = (56.771, 118.738, 66.471, 91.240)
 for i in (1, 2, 3, 4):
     monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(i)
     borefield = Borefield(simulation_period=20, peak_heating=peak_heating, peak_cooling=peak_cooling,
@@ -112,3 +112,70 @@ for i in (1, 2, 3, 4):
     borefield.set_min_ground_temperature(0)
     list_of_test_objects.add(TestObject(borefield, L2_output=correct_answers_L2[i-1],
                                         L3_output=correct_answers_L3[i-1], quadrant=i, name=f'BS2021 case {i}'))
+
+correct_answers_L2 = (56.749, 117.223, 66.941, 91.266)
+correct_answers_L3 = (56.770, 118.738, 66.471, 91.240)
+customField = gt.boreholes.rectangle_field(N_1=12, N_2=10, B_1=6.5, B_2=6.5, H=110., D=4, r_b=0.075)
+for i in (1, 2, 3, 4):
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(i)
+    borefield = Borefield(simulation_period=20, peak_heating=peak_heating, peak_cooling=peak_cooling,
+                          baseload_heating=monthly_load_heating, baseload_cooling=monthly_load_cooling)
+    borefield.set_ground_parameters(data)
+    borefield.set_borefield(customField)
+    borefield.Rb = 0.2
+
+    borefield.set_max_ground_temperature(16)  # maximum temperature
+    borefield.set_min_ground_temperature(0)  # minimum temperature
+    list_of_test_objects.add(TestObject(borefield, L2_output=correct_answers_L2[i-1],
+                                        L3_output=correct_answers_L3[i-1], quadrant=i, name=f'Custom field case {i}'))
+
+data = GroundConstantTemperature(3, 10)
+borefield = Borefield(100)
+borefield.set_ground_parameters(data)
+borefield.Rb = 0.12
+borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 1, 0.075)
+borefield.load_hourly_profile(FOLDER.joinpath("Examples\hourly_profile.csv"), header=True, separator=";", first_column_heating=True)
+list_of_test_objects.add(TestObject(borefield, L2_output=285.476, L3_output=288.541, L4_output=266.696, quadrant=i,
+                                    name=f'Sizing method comparison (Validation)'))
+
+ground_data = GroundFluxTemperature(3, 10)
+fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
+borefield = Borefield()
+borefield.create_rectangular_borefield(5, 4, 6, 6, 110, 4, 0.075)
+borefield.set_Rb(0.12)
+borefield.set_ground_parameters(ground_data)
+borefield.set_fluid_parameters(fluid_data)
+borefield.set_pipe_parameters(pipe_data)
+borefield.sizing_setup(use_constant_Rb=False)
+borefield.set_max_ground_temperature(17)
+borefield.set_min_ground_temperature(3)
+borefield.load_hourly_profile(FOLDER.joinpath("test\methods\hourly data\\auditorium.csv"), header=True, separator=";", first_column_heating=False)
+list_of_test_objects.add(TestObject(borefield, L2_output=136.780, L3_output=136.294, L4_output=101.285, quadrant=1,
+                                    name='BS2023 Auditorium'))
+
+borefield = Borefield()
+borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 4, 0.075)
+borefield.set_Rb(0.12)
+borefield.set_ground_parameters(ground_data)
+borefield.set_fluid_parameters(fluid_data)
+borefield.set_pipe_parameters(pipe_data)
+borefield.sizing_setup(use_constant_Rb=False)
+borefield.set_max_ground_temperature(17)
+borefield.set_min_ground_temperature(3)
+borefield.load_hourly_profile(FOLDER.joinpath("test\methods\hourly data\office.csv"), header=True, separator=";", first_column_heating=False)
+list_of_test_objects.add(TestObject(borefield, L2_output=111.180, L3_output=113.069, L4_output=107.081, quadrant=2,
+                                    name='BS2023 Office'))
+
+borefield = Borefield()
+borefield.create_rectangular_borefield(15, 20, 6, 6, 110, 4, 0.075)
+borefield.set_Rb(0.12)
+borefield.set_ground_parameters(ground_data)
+borefield.set_fluid_parameters(fluid_data)
+borefield.set_pipe_parameters(pipe_data)
+borefield.sizing_setup(use_constant_Rb=False)
+borefield.set_max_ground_temperature(17)
+borefield.set_min_ground_temperature(3)
+borefield.load_hourly_profile(FOLDER.joinpath("test\methods\hourly data\swimming_pool.csv"), header=True, separator=";", first_column_heating=False)
+list_of_test_objects.add(TestObject(borefield, L2_output=305.509, L3_output=310.725, L4_output=308.269, quadrant=4,
+                                    name='BS2023 Swimming pool'))
