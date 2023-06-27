@@ -76,7 +76,7 @@ class CustomGFunction:
         self.time_array = CustomGFunction.DEFAULT_TIME_ARRAY
         self.depth_array = CustomGFunction.DEFAULT_DEPTH_ARRAY
 
-        self._gvalues_array: np.ndarray = np.zeros((self.depth_array.size, self.time_array.size))
+        self.gvalues_array: np.ndarray = np.zeros((self.depth_array.size, self.time_array.size))
         self.options: dict = {"method": "equivalent", "display": True}
 
         # set values
@@ -97,7 +97,7 @@ class CustomGFunction:
         self.max_t = time_array[-1]
         self.min_t = time_array[0]
         # initialise gvalue array
-        self._gvalues_array = np.zeros((self.depth_array.size, self.time_array.size))
+        self.gvalues_array = np.zeros((self.depth_array.size, self.time_array.size))
 
     @property
     def depth_array(self) -> np.ndarray:
@@ -109,7 +109,7 @@ class CustomGFunction:
         self.max_H = self._depth_array[-1]
         self.min_H = self._depth_array[0]
         # initialise gvalue array
-        self._gvalues_array = np.zeros((self.depth_array.size, self.time_array.size))
+        self.gvalues_array = np.zeros((self.depth_array.size, self.time_array.size))
 
     def calculate_gfunction(self, time_value: Union[list, float, np.ndarray], H: float, check: bool = False) -> np.ndarray:
         """
@@ -139,10 +139,10 @@ class CustomGFunction:
 
         if not isinstance(time_value, (float, int)):
             # multiple values are requested
-            g_value = interpolate.interpn((self.depth_array, self.time_array), self._gvalues_array, np.array([[H, t] for t in time_value]))
+            g_value = interpolate.interpn((self.depth_array, self.time_array), self.gvalues_array, np.array([[H, t] for t in time_value]))
         else:
             # only one value is requested
-            g_value = interpolate.interpn((self.depth_array, self.time_array), self._gvalues_array, np.array([H, time_value]))
+            g_value = interpolate.interpn((self.depth_array, self.time_array), self.gvalues_array, np.array([H, time_value]))
         return g_value
 
     def within_range(self, time_value: Union[list, float, np.ndarray], H: float) -> bool:
@@ -164,7 +164,7 @@ class CustomGFunction:
         """
 
         # check if the custom gfunctions are calculated
-        if not np.any(self._gvalues_array):
+        if not np.any(self.gvalues_array):
             return False
 
         max_time_value = time_value if isinstance(time_value, (float, int)) else max(time_value)
@@ -227,7 +227,7 @@ class CustomGFunction:
                                                      self.time_array, options=self.options,
                                                      method=self.options["method"])
 
-            self._gvalues_array[idx] = gfunc_uniform_T.gFunc
+            self.gvalues_array[idx] = gfunc_uniform_T.gFunc
 
     def dump_custom_dataset(self, path: str, name: str) -> None:
         """
@@ -272,7 +272,7 @@ class CustomGFunction:
         -------
         None
         """
-        self._gvalues_array = np.array([])
+        self.gvalues_array = np.array([])
 
     def __eq__(self, other):
         if not isinstance(other, CustomGFunction):

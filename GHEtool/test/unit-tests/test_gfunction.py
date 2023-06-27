@@ -372,3 +372,28 @@ def test_fifo():
     assert not fifo.in_fifo_list(84)
     fifo.clear()
     assert fifo.fifo_list == []
+
+
+def test_stuck_in_loop():
+    gfunc = GFunction()
+    alpha = 0.00005
+    time_values = borefield_ghe.time_L3_last_year
+    for bor in borefield:
+        bor.H = 100
+    gfunc.calculate(time_values, borefield, alpha)
+    for bor in borefield:
+        bor.H = 120
+    gfunc.calculate(time_values, borefield, alpha)
+    for bor in borefield:
+        bor.H = 110
+    temp = gfunc.calculate(time_values, borefield, alpha)
+    for bor in borefield:
+        bor.H = 111
+    gfunc.calculate(time_values, borefield, alpha)
+    for bor in borefield:
+        bor.H = 110
+    temp = gfunc.calculate(time_values, borefield, alpha)
+    assert np.allclose(temp, gfunc.calculate(time_values, borefield, alpha))
+    for bor in borefield:
+        bor.H = 110.5
+    assert np.allclose(temp, gfunc.calculate(time_values, borefield, alpha))
