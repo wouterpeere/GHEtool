@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from functools import partial
 from typing import TYPE_CHECKING
+import logging
 
 import numpy as np
 from GHEtool import Borefield, FluidData, PipeData, GroundConstantTemperature, GroundFluxTemperature
@@ -94,6 +95,7 @@ def data_2_borefield(ds: DataStorage) -> tuple[Borefield, partial[[], None]]:
 
             ### Size borefield
     if ds.aim_req_depth:
+        logging.info("Run sizing")
         return borefield, partial(borefield.size)
 
 

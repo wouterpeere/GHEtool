@@ -143,7 +143,6 @@ fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
 pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
 borefield = Borefield()
 borefield.create_rectangular_borefield(5, 4, 6, 6, 110, 4, 0.075)
-borefield.set_Rb(0.12)
 borefield.set_ground_parameters(ground_data)
 borefield.set_fluid_parameters(fluid_data)
 borefield.set_pipe_parameters(pipe_data)
@@ -156,7 +155,6 @@ list_of_test_objects.add(TestObject(borefield, L2_output=136.780, L3_output=136.
 
 borefield = Borefield()
 borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 4, 0.075)
-borefield.set_Rb(0.12)
 borefield.set_ground_parameters(ground_data)
 borefield.set_fluid_parameters(fluid_data)
 borefield.set_pipe_parameters(pipe_data)
@@ -169,7 +167,6 @@ list_of_test_objects.add(TestObject(borefield, L2_output=111.180, L3_output=113.
 
 borefield = Borefield()
 borefield.create_rectangular_borefield(15, 20, 6, 6, 110, 4, 0.075)
-borefield.set_Rb(0.12)
 borefield.set_ground_parameters(ground_data)
 borefield.set_fluid_parameters(fluid_data)
 borefield.set_pipe_parameters(pipe_data)
@@ -179,3 +176,32 @@ borefield.set_min_ground_temperature(3)
 borefield.load_hourly_profile(FOLDER.joinpath("test\methods\hourly data\swimming_pool.csv"), header=True, separator=";", first_column_heating=False)
 list_of_test_objects.add(TestObject(borefield, L2_output=305.509 , L3_output=310.725, L4_output=308.269, quadrant=4,
                                     name='BS2023 Swimming pool'))
+
+ground_data_IKC = GroundFluxTemperature(2.3, 10.5, flux=2.85)
+fluid_data_IKC = FluidData(0.2, 0.5, 1021.7, 3919, 0.0033)
+pipe_data_IKC = PipeData(2.3, 0.016, 0.02, 0.42, 0.04)
+monthly_cooling = np.array([0, 0, 740, 1850, 3700, 7400, 7400, 7400, 5550, 2220, 740, 0]) * (1+1/4.86)
+monthly_heating = np.array([20064, 17784, 16644, 13680, 0, 0, 0, 0, 0, 12540, 15618, 17670]) * (1-1/4.49)
+peak_cooling = np.array([61]*12) * (1+1/4.86)
+peak_heating = np.array([57]*12) * (1-1/4.49)
+borefield = Borefield(peak_cooling=peak_cooling, peak_heating=peak_heating,
+                      baseload_cooling=monthly_cooling, baseload_heating=monthly_heating)
+borefield.create_rectangular_borefield(4, 5, 8, 8, 110, 0.8, 0.07)
+borefield.set_ground_parameters(ground_data_IKC)
+borefield.set_fluid_parameters(fluid_data_IKC)
+borefield.set_pipe_parameters(pipe_data_IKC)
+borefield.sizing_setup(use_constant_Rb=False)
+borefield.set_length_peak(10)
+borefield.set_max_ground_temperature(25)
+borefield.set_min_ground_temperature(0)
+list_of_test_objects.add(TestObject(borefield, error=ValueError, name='Real case 1 (Error)'))
+
+ground_data_IKC = GroundFluxTemperature(2.3, 10.5, flux=2.3*2.85/100)
+borefield.set_ground_parameters(ground_data_IKC)
+list_of_test_objects.add(TestObject(borefield, L2_output=74.46, L3_output=74.85, quadrant=4,
+                                    name='Real case 1 (Correct)'))
+
+borefield.set_ground_parameters(ground_data_IKC)
+borefield.create_rectangular_borefield(2, 10, 8, 8, 60, 0.8, 0.07)
+list_of_test_objects.add(TestObject(borefield, L2_output=71.65, L3_output=72.04, quadrant=4,
+                                    name='Real case 1 (Correct)'))

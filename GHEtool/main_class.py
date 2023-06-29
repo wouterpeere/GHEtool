@@ -900,7 +900,7 @@ class Borefield(BaseClass):
         ValueError
             ValueError when no ground data is provided
         """
-
+        logging.info("Run sizing")
         # check ground data
         if not self.ground_data.check_values():
             raise ValueError("Please provide ground data.")
