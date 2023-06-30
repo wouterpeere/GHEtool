@@ -1,15 +1,11 @@
 from __future__ import annotations
 
 import logging
-import pathlib
-from configparser import ConfigParser
 from json import JSONDecodeError, load, dump
 from os.path import dirname, realpath
 from pathlib import PurePath
-from pickle import load as pk_load
 from sys import path
 
-from GHEtool import Borefield
 from ScenarioGUI import MainWindow
 from ScenarioGUI.gui_classes.gui_data_storage import DataStorage
 import ScenarioGUI.global_settings as globs
@@ -42,7 +38,32 @@ class MainWindow(MainWindow):
         True if it is loaded, False otherwise
         """
 
-        def general_changes(scenarios):
+        def convert_v21x_to_v220(val: dict) -> None:
+            """
+            This function converts the data from a stored datafile from a version v2.1.x to v2.2.0.
+
+            Parameters
+            ----------
+            val : dict
+                Loaded values
+
+            Returns
+            -------
+            None
+            """
+            logging.info("Convert data to v.2.2.0 format.")
+            data = val.pop("option_spacing")
+            val["option_spacing_width"] = data
+            val["option_spacing_length"] = data
+            val["aim_rect"] = True
+            val["aim_Box_shaped"] = False
+            val["aim_L_shaped"] = False
+            val["aim_U_shaped"] = False
+            val["aim_circle"] = False
+            val["aim_custom"] = False
+            val["option_pipe_borehole_radius_2"] = val["option_pipe_borehole_radius"]
+
+        def general_changes(scenarios) -> None:
             # change window title to new loaded filename
             self.change_window_title()
             # init user window by reset scenario list widget and check for results
@@ -51,6 +72,7 @@ class MainWindow(MainWindow):
             self.change_scenario(0)
             self.list_widget_scenario.setCurrentRow(0)
             self.check_results()
+            print(ok)
 
         try:
             # open file and get data
@@ -85,6 +107,7 @@ class MainWindow(MainWindow):
             self.list_ds = []
             for val, borefield in zip(saving['values'], saving['borefields']):
                 ds = DataStorage(self.gui_structure)
+                convert_v21x_to_v220(val)
                 ds.from_dict(val)
                 ds.results = None
                 self.list_ds.append(ds)
