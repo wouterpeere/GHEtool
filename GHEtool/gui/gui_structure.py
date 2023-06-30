@@ -258,16 +258,16 @@ class GUI(GuiStructure):
         #     maximal_value=500,
         #     step=1,
         # )
-        self.option_spacing = FloatBox(
+        self.option_spacing_width = FloatBox(
             category=self.category_borefield,
-            label=translations.option_spacing,
+            label=translations.option_spacing_width,
             default_value=6,
             decimal_number=2,
             minimal_value=1,
             maximal_value=99,
             step=0.1,
         )
-        self.option_spacing.change_event(self.update_borefield)
+        self.option_spacing_width.change_event(self.update_borefield)
         self.option_spacing_length = FloatBox(
             category=self.category_borefield,
             label=translations.option_spacing_length,
@@ -398,7 +398,7 @@ class GUI(GuiStructure):
         _ = [aim.change_event(partial(show_option_on_multiple_aims,
                                       [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
                                       [self.aim_rect,self.aim_Box_shaped, self.aim_L_shaped,self.aim_U_shaped],
-                                      self.option_spacing)) for aim in li_aim]
+                                      self.option_spacing_width)) for aim in li_aim]
         _ = [aim.change_event(partial(show_option_on_multiple_aims,
                                       [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
                                       [self.aim_rect,self.aim_Box_shaped, self.aim_L_shaped,self.aim_U_shaped],
@@ -1460,7 +1460,7 @@ class GUI(GuiStructure):
         def draw_borefield():
             # import all that is needed
             # get variables from gui
-            spacing_width = self.option_spacing.get_value()
+            spacing_width = self.option_spacing_width.get_value()
             spacing_length = self.option_spacing_length.get_value()
             r_bore = min(spacing_length, spacing_width) / 4
             width = self.option_width.get_value()

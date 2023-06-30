@@ -58,8 +58,8 @@ def create_borefield(g_s: GuiStructure) -> Borefield:
     borefield.set_ground_parameters(g_d)
     borefield.set_Rb(g_s.option_constant_rb.get_value())
 
-    borefield.create_rectangular_borefield(g_s.option_width.get_value(), g_s.option_length.get_value(), g_s.option_spacing.get_value(),
-                                           g_s.option_spacing.get_value(), g_s.option_depth.get_value(), g_s.option_pipe_depth.get_value(),
+    borefield.create_rectangular_borefield(g_s.option_width.get_value(), g_s.option_length.get_value(), g_s.option_spacing_width.get_value(),
+                                           g_s.option_spacing_width.get_value(), g_s.option_depth.get_value(), g_s.option_pipe_depth.get_value(),
                                            g_s.option_pipe_borehole_radius.get_value())
 
     borefield.set_length_peak_heating(g_s.option_len_peak_heating.get_value())
@@ -183,12 +183,12 @@ def test_borefield_shapes(qtbot):
     main_window.add_scenario()
     main_window.gui_structure.aim_rect.widget.click() if not main_window.gui_structure.aim_rect.widget.isChecked() else None
     main_window.gui_structure.option_tilted.set_value(tilt)
-    main_window.gui_structure.option_spacing_length.set_value(main_window.gui_structure.option_spacing.get_value() + 1)
+    main_window.gui_structure.option_spacing_length.set_value(main_window.gui_structure.option_spacing_width.get_value() + 1)
     main_window.gui_structure.update_borefield()
     main_window.save_scenario()
     ds = main_window.list_ds[-1]
     borefield_gui, func = data_2_borefield(ds)
-    boreholes = gt.boreholes.rectangle_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing + 1, ds.option_depth,
+    boreholes = gt.boreholes.rectangle_field(ds.option_width, ds.option_length, ds.option_spacing_width, ds.option_spacing_width + 1, ds.option_depth,
                                               ds.option_pipe_depth, ds.option_pipe_borehole_radius, tilt / 360 * 2 * np.pi)
     def check_borefield(borefield_1: list[gt.boreholes], borefield_2: list[gt.boreholes]):
         for borehole_1, borehole_2 in zip(borefield_1, borefield_2):
@@ -207,7 +207,7 @@ def test_borefield_shapes(qtbot):
     main_window.save_scenario()
     ds = main_window.list_ds[-1]
     borefield_gui, func = data_2_borefield(ds)
-    boreholes = gt.boreholes.box_shaped_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing + 1, ds.option_depth,
+    boreholes = gt.boreholes.box_shaped_field(ds.option_width, ds.option_length, ds.option_spacing_width, ds.option_spacing_width + 1, ds.option_depth,
                                               ds.option_pipe_depth, ds.option_pipe_borehole_radius, tilt / 360 * 2 * np.pi)
     check_borefield(borefield_gui.borefield, boreholes)
     qtbot.wait(10)
@@ -216,7 +216,7 @@ def test_borefield_shapes(qtbot):
     main_window.save_scenario()
     ds = main_window.list_ds[-1]
     borefield_gui, func = data_2_borefield(ds)
-    boreholes = gt.boreholes.L_shaped_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing + 1, ds.option_depth,
+    boreholes = gt.boreholes.L_shaped_field(ds.option_width, ds.option_length, ds.option_spacing_width, ds.option_spacing_width + 1, ds.option_depth,
                                               ds.option_pipe_depth, ds.option_pipe_borehole_radius, tilt / 360 * 2 * np.pi)
     check_borefield(borefield_gui.borefield, boreholes)
     qtbot.wait(10)
@@ -225,7 +225,7 @@ def test_borefield_shapes(qtbot):
     main_window.save_scenario()
     ds = main_window.list_ds[-1]
     borefield_gui, func = data_2_borefield(ds)
-    boreholes = gt.boreholes.U_shaped_field(ds.option_width, ds.option_length, ds.option_spacing, ds.option_spacing + 1, ds.option_depth,
+    boreholes = gt.boreholes.U_shaped_field(ds.option_width, ds.option_length, ds.option_spacing_width, ds.option_spacing_width + 1, ds.option_depth,
                                               ds.option_pipe_depth, ds.option_pipe_borehole_radius, tilt / 360 * 2 * np.pi)
     check_borefield(borefield_gui.borefield, boreholes)
     qtbot.wait(10)
@@ -403,7 +403,7 @@ def test_temp_profile_borefield_data(qtbot):
     main_window.add_scenario()
     gs = main_window.gui_structure
 
-    spacing = round_down(gs.option_spacing.get_value() * 1.5, 2)
+    spacing = round_down(gs.option_spacing_width.get_value() * 1.5, 2)
     radius = round_down(gs.option_pipe_borehole_radius.get_value() * 1.5, 4)
     burial_depth = round_down(gs.option_pipe_depth.get_value() * 1.5, 1)
     width = gs.option_width.get_value() + 2
@@ -416,7 +416,7 @@ def test_temp_profile_borefield_data(qtbot):
     main_window.gui_structure.aim_rect.widget.click() if not main_window.gui_structure.aim_rect.widget.isChecked() else None
     gs.option_width.set_value(width)
     gs.option_length.set_value(length)
-    gs.option_spacing.set_value(spacing)
+    gs.option_spacing_width.set_value(spacing)
     gs.option_spacing_length.set_value(spacing)
     gs.option_pipe_depth.set_value(burial_depth)
     gs.option_pipe_borehole_radius.set_value(radius)
