@@ -200,10 +200,10 @@ list_of_test_objects.add(TestObject(borefield, error=ValueError, name='Real case
 
 ground_data_IKC = GroundFluxTemperature(2.3, 10.5, flux=2.3*2.85/100)
 borefield.set_ground_parameters(ground_data_IKC)
-list_of_test_objects.add(TestObject(borefield, L2_output=74.46, L3_output=74.85, quadrant=4,
+list_of_test_objects.add(TestObject(borefield, L2_output=74.46, L3_output=74.866, quadrant=4,
                                     name='Real case 1 (Correct)'))
 
 borefield.set_ground_parameters(ground_data_IKC)
 borefield.create_rectangular_borefield(2, 10, 8, 8, 60, 0.8, 0.07)
-list_of_test_objects.add(TestObject(borefield, L2_output=71.65, L3_output=72.04, quadrant=4,
-                                    name='Real case 1 (Correct)'))
+list_of_test_objects.add(TestObject(borefield, L2_output=71.65, L3_output=72.054, quadrant=4,
+                                    name='Real case 2 (Correct)'))

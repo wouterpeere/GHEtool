@@ -72,8 +72,6 @@ class MainWindow(MainWindow):
             self.change_scenario(0)
             self.list_widget_scenario.setCurrentRow(0)
             self.check_results()
-            print(ok)
-
         try:
             # open file and get data
             with open(location) as file:
