@@ -80,7 +80,7 @@ def data_2_borefield(ds: DataStorage) -> tuple[Borefield, partial[[], None]]:
             borefield.set_hourly_cooling_load(peak_cooling * (1 + 1 / ds.SEER))
 
     # set up the borefield sizing
-    borefield.sizing_setup(H_init=borefield.borefield[0].H,
+    borefield.sizing_setup(H_init=100,
                            use_constant_Rb=ds.option_method_rb_calc == 0,
                            L2_sizing=ds.option_method_size_depth == 0,
                            L3_sizing=ds.option_method_size_depth == 1,
@@ -95,7 +95,6 @@ def data_2_borefield(ds: DataStorage) -> tuple[Borefield, partial[[], None]]:
 
             ### Size borefield
     if ds.aim_req_depth:
-        logging.info("Run sizing")
         return borefield, partial(borefield.size)
 
 
@@ -152,7 +151,7 @@ def _set_boreholes(ds: DataStorage, borefield: Borefield) -> None:
                                               ds.option_pipe_borehole_radius, tilt)
         borefield.set_borefield(boreholes)
         return
-    borefield_gt = [gt.boreholes.Borehole(H, D, r_b, x=x, y=y ) for x, y, H, D, r_b in ds.custom_borefield]
+    borefield_gt = [gt.boreholes.Borehole(H, D, r_b, x=x, y=y) for x, y, H, D, r_b in ds.custom_borefield]
     borefield.set_borefield(borefield_gt)
     return
 

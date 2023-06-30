@@ -9,6 +9,7 @@ from GHEtool import *
 
 list_of_test_objects = TestMethodClass()
 
+
 # Case 1 from main_functionalities
 data = GroundConstantTemperature(3, 10)
 peak_cooling = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])
@@ -185,7 +186,8 @@ monthly_heating = np.array([20064, 17784, 16644, 13680, 0, 0, 0, 0, 0, 12540, 15
 peak_cooling = np.array([61]*12) * (1+1/4.86)
 peak_heating = np.array([57]*12) * (1-1/4.49)
 borefield = Borefield(peak_cooling=peak_cooling, peak_heating=peak_heating,
-                      baseload_cooling=monthly_cooling, baseload_heating=monthly_heating)
+                      baseload_cooling=monthly_cooling, baseload_heating=monthly_heating,
+                      simulation_period=25)
 borefield.create_rectangular_borefield(4, 5, 8, 8, 110, 0.8, 0.07)
 borefield.set_ground_parameters(ground_data_IKC)
 borefield.set_fluid_parameters(fluid_data_IKC)
