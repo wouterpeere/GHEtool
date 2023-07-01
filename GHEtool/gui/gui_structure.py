@@ -4,10 +4,11 @@ It contains all the options, categories etc. that should appear on the GUI.
 """
 import logging
 from functools import partial
-from math import cos, pi, sin
+from math import cos, pi, sin, asin
 from pathlib import Path
 from typing import List, Optional, Tuple, TYPE_CHECKING
 
+import numpy as np
 import PySide6.QtGui as QtG
 import PySide6.QtWidgets as QtW
 import PySide6.QtCore as QtC
@@ -1363,18 +1364,37 @@ class GUI(GuiStructure):
         n_u: int = self.option_pipe_number.get_value()  # get number of U pipes
         if n_u == 0:
             return
-        r_borehole: float = self.option_pipe_borehole_radius.get_value()  # get borehole radius
+        pipe_distance: float = self.option_pipe_distance.get_value()  # get pipe distance
+        r_borehole: float = self.option_pipe_borehole_radius_2.get_value()  # get borehole radius
         r_outer_pipe: float = self.option_pipe_outer_radius.get_value()  # get outer pipe radius
         distance_max: float = r_borehole - r_outer_pipe  # calculate maximal distance between pipe and center
         alpha: float = pi / n_u  # determine equal angle between pipes
-        # determine minimal distance between pipe and center if number of pipes is bigger than one else set to half
-        # borehole radius
+        # determine minimal distance between pipe and center
         distance_min: float = r_outer_pipe / sin(alpha / 2) + 0.001  # add 1mm for safety
         # set minimal and maximal value for pipe distance
         self.option_pipe_distance.widget.blockSignals(True)
         self.option_pipe_distance.widget.setMinimum(distance_min)
         self.option_pipe_distance.widget.setMaximum(distance_max)
         self.option_pipe_distance.widget.blockSignals(False)
+        # set minimal and maximal value for borehole radius
+        self.option_pipe_borehole_radius_2.widget.blockSignals(True)
+        self.option_pipe_borehole_radius_2.widget.setMinimum(r_outer_pipe + distance_min)  # add 1mm for safety
+        self.option_pipe_borehole_radius_2.widget.blockSignals(False)
+        self.option_pipe_borehole_radius.widget.blockSignals(True)
+        self.option_pipe_borehole_radius.widget.setMinimum(r_outer_pipe + distance_min)  # add 1mm for safety
+        self.option_pipe_borehole_radius.widget.blockSignals(False)
+        # set max value for pipe radius
+        self.option_pipe_outer_radius.widget.blockSignals(True)
+        self.option_pipe_outer_radius.widget.setMaximum(r_borehole - distance_min)
+        self.option_pipe_outer_radius.widget.blockSignals(False)
+
+        # set max number of U-tubes
+        alpha_min = 4 * asin(r_outer_pipe/pipe_distance)
+        max_nb_of_pipes = np.floor(2 * pi / alpha_min)
+        # set max number of pipes
+        self.option_pipe_number.widget.blockSignals(True)
+        self.option_pipe_number.widget.setMaximum(max_nb_of_pipes)
+        self.option_pipe_number.widget.blockSignals(False)
 
     def update_borehole(self) -> None:
         """
