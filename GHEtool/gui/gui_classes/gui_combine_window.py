@@ -84,7 +84,7 @@ class MainWindow(MainWindow):
             # raise ImportError("The datafile cannot be loaded!")
         except (JSONDecodeError, UnicodeDecodeError):
             # try to open as pickle
-            globs.LOGGER.warning('One cannot open a GHEtool v2.1.0')
+            globs.LOGGER.warning('One cannot open a GHEtool v2.1.0 file!')
             return False
 
         if version == "2.2.0":

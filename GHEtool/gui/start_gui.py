@@ -41,7 +41,7 @@ def run(path_list=None):  # pragma: no cover
     if os_system == 'Windows':
         from ScenarioGUI.global_settings import VERSION
         # set version and id
-        myAppID = f'GHEtool v{VERSION}'  # arbitrary string
+        myAppID = f'GHEtool Community v{VERSION}'  # arbitrary string
         ctypes_windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
     # init window
     window = QtWidgets_QMainWindow()
