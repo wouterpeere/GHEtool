@@ -1359,6 +1359,8 @@ class GUI(GuiStructure):
         -------
         None
         """
+        if not self.started:
+            return
         if self.option_pipe_distance.is_hidden():
             return
         n_u: int = self.option_pipe_number.get_value()  # get number of U pipes
@@ -1564,6 +1566,8 @@ class GUI(GuiStructure):
         -------
         None
         """
+        if not self.started:
+            return
         filename = (self.option_filename.get_value() if not isinstance(filename, str) else filename) if filename is not None else self.option_filename.get_value()
 
         # get decimal and column seperator
