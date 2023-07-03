@@ -303,9 +303,6 @@ def test_no_possible_solution():
 
 
 def test_problem_with_gfunction_calc_obj():
-    """
-    This document is an example of how the borefield configuration can influence the total borehole length and hence the cost of the borefield.
-    """
     # GroundData for an initial field of 11 x 11
     data = GroundConstantTemperature(3, 10)
     borefield_gt = gt.boreholes.rectangle_field(11, 11, 6, 6, 110, 1, 0.075)

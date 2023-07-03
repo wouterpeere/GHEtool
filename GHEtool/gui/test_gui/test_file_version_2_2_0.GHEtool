@@ -1,6 +1,6 @@
 {
  "filename": [
-  "C:/Users/Annelore/Documents/Wouter/GHEtool/gui/test_gui/test_file_version_2_2_0.GHEtool",
+  "C:/Users/WouterPeere/Python/GHEtool/GHEtool/gui/test_gui/test_file_version_2_2_0.GHEtool",
   "GHEtool (*.GHEtool)"
  ],
  "names": [
@@ -11,7 +11,7 @@
  "values": [
   {
    "option_font_size": 12,
-   "option_method_size_depth": 0,
+   "option_method_size_depth": 1,
    "option_method_temp_gradient": 1,
    "option_method_rb_calc": 1,
    "option_temperature_profile_hourly": 0,
@@ -27,7 +27,16 @@
    "option_tilted": 0.0,
    "option_seperator_borefield": 0,
    "option_decimal_borefield": 0,
-   "borefield_file": "C:\\Users\\Annelore\\Documents\\Wouter\\GHEtool\\gui\\test_gui\\borefield_data.csv",
+   "borefield_file": "C:\\Users\\WouterPeere\\Python\\GHEtool\\GHEtool\\gui\\test_gui\\borefield_data.csv",
+   "custom_borefield": [
+    [
+     0.0,
+     0.0,
+     100.0,
+     2.0,
+     0.075
+    ]
+   ],
    "option_conductivity": 1.2,
    "option_heat_capacity": 2800.0,
    "option_ground_temp": 12.0,
@@ -143,6 +152,42 @@
    "option_toggle_buttons": 1,
    "option_n_threads": 2,
    "option_auto_saving": 0,
+   "option_figure_background": [
+    0,
+    64,
+    122
+   ],
+   "option_plot_background": [
+    255,
+    255,
+    255
+   ],
+   "option_axes_text": [
+    255,
+    255,
+    255
+   ],
+   "option_axes": [
+    255,
+    255,
+    255
+   ],
+   "option_title": [
+    255,
+    255,
+    255
+   ],
+   "option_legend_text": [
+    0,
+    64,
+    122
+   ],
+   "option_font_size_figure": 12,
+   "option_font_text": "Lexend",
+   "option_font": [
+    90,
+    "Lexend"
+   ],
    "aim_temp_profile": true,
    "aim_req_depth": false,
    "aim_optimize": false,
@@ -172,7 +217,16 @@
    "option_tilted": 0.0,
    "option_seperator_borefield": 0,
    "option_decimal_borefield": 0,
-   "borefield_file": "C:\\Users\\Annelore\\Documents\\Wouter\\GHEtool\\gui\\test_gui\\borefield_data.csv",
+   "borefield_file": "C:\\Users\\WouterPeere\\Python\\GHEtool\\GHEtool\\gui\\test_gui\\borefield_data.csv",
+   "custom_borefield": [
+    [
+     0.0,
+     0.0,
+     100.0,
+     2.0,
+     0.075
+    ]
+   ],
    "option_conductivity": 1.2,
    "option_heat_capacity": 2800.0,
    "option_ground_temp": 12.0,
@@ -276,6 +330,42 @@
    "option_toggle_buttons": 1,
    "option_n_threads": 2,
    "option_auto_saving": 0,
+   "option_figure_background": [
+    0,
+    64,
+    122
+   ],
+   "option_plot_background": [
+    255,
+    255,
+    255
+   ],
+   "option_axes_text": [
+    255,
+    255,
+    255
+   ],
+   "option_axes": [
+    255,
+    255,
+    255
+   ],
+   "option_title": [
+    255,
+    255,
+    255
+   ],
+   "option_legend_text": [
+    0,
+    64,
+    122
+   ],
+   "option_font_size_figure": 12,
+   "option_font_text": "Lexend",
+   "option_font": [
+    90,
+    "Lexend"
+   ],
    "aim_temp_profile": false,
    "aim_req_depth": true,
    "aim_optimize": false,

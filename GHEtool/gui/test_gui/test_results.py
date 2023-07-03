@@ -259,7 +259,7 @@ def test_import_borefield_data(qtbot):
 
     main_window.gui_structure.borefield_file.set_value("file")
     main_window.gui_structure.import_borefield.button.click()
-    assert main_window.status_bar.widget.currentMessage() == main_window.translations.no_file_selected[main_window.gui_structure.option_language.get_value()[0]]
+    assert main_window.status_bar.label.text() == main_window.translations.no_file_selected[main_window.gui_structure.option_language.get_value()[0]]
 
     main_window.gui_structure.aim_custom.widget.click()
     file = f"{FOLDER.joinpath('gui/test_gui/borefield_data.csv')}"
