@@ -1,3 +1,4 @@
+# noinspection PyPackageRequirements
 import copy
 from math import isclose
 
@@ -12,6 +13,7 @@ from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData,
 from GHEtool.logger import ghe_logger
 
 data = GroundConstantTemperature(3, 10)
+ground_data_constant = data
 data_ground_flux = GroundFluxTemperature(3, 10)
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
 pipeData = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
@@ -131,6 +133,7 @@ def test_update_depth(borefield):
     for bor in borefield.borefield:
         assert bor.H == init_H + 2
 
+
 def test_create_custom_dataset(borefield):
     borefield_test = Borefield()
     try:
@@ -138,11 +141,11 @@ def test_create_custom_dataset(borefield):
         assert False  # pragma: no cover
     except ValueError:
         assert True
-    borefield.create_rectangular_borefield(10, 10, 6, 6, 100, 1, 0.075)
+    borefield_test.create_rectangular_borefield(10, 10, 6, 6, 100, 1, 0.075)
     try:
         borefield_test.create_custom_dataset([100, 1000], [50, 100])
         assert False  # pragma: no cover
-    except ValueError:
+    except AssertionError:
         assert True
 
 
@@ -199,4 +202,67 @@ def test_simulation_period():
     assert len(borefield.time_L3_last_year) == 12 * 40
 
 
+def test_set_Rb():
+    borefield = Borefield()
+    borefield.set_Rb(0.2)
+    assert borefield.Rb == 0.2
+    borefield.set_Rb(0.3)
+    assert borefield.Rb == 0.3
+    borefield.Rb = 0.4
+    assert borefield.Rb == 0.4
+    assert borefield.Rb == borefield.borehole._Rb
 
+
+def test_ground_data_custom_gfunction():
+    borefield = Borefield(borefield=borefield_gt)
+    assert borefield.ground_data == GroundConstantTemperature()
+    borefield.ground_data = ground_data_constant
+    assert borefield.custom_gfunction is None
+
+    # create custom data set
+    borefield.create_custom_dataset()
+    borefield.gfunction([5000, 10000], 150)
+    assert not borefield.custom_gfunction is None
+
+    # test for property setter
+    borefield.ground_data = ground_data_constant
+    assert borefield.ground_data == ground_data_constant
+    assert borefield._ground_data == ground_data_constant
+    assert borefield.custom_gfunction is None
+
+    # create custom data set
+    borefield.create_custom_dataset()
+    borefield.gfunction([5000, 10000], 150)
+    assert not borefield.custom_gfunction is None
+
+    # test for set function
+    borefield.set_ground_parameters(data_ground_flux)
+    assert borefield.ground_data == data_ground_flux
+    assert borefield._ground_data == data_ground_flux
+    assert borefield.custom_gfunction is None
+
+
+def test_ground_data_jit_gfunction():
+    borefield = Borefield(borefield=borefield_gt)
+    assert borefield.ground_data == GroundConstantTemperature()
+    borefield.ground_data = ground_data_constant
+
+    # calculate gfunction
+    borefield.gfunction([5000, 10000], 150)
+    assert np.any(borefield.gfunction_calculation_object.depth_array)
+
+    # test for property setter
+    borefield.ground_data = ground_data_constant
+    assert borefield.ground_data == ground_data_constant
+    assert borefield._ground_data == ground_data_constant
+    assert not np.any(borefield.gfunction_calculation_object.depth_array)
+
+    # calculate gfunction
+    borefield.gfunction([5000, 10000], 150)
+    assert np.any(borefield.gfunction_calculation_object.depth_array)
+
+    # test for set function
+    borefield.set_ground_parameters(data_ground_flux)
+    assert borefield.ground_data == data_ground_flux
+    assert borefield._ground_data == data_ground_flux
+    assert not np.any(borefield.gfunction_calculation_object.depth_array)
