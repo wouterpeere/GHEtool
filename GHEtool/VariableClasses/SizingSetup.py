@@ -77,6 +77,11 @@ class SizingSetup(BaseClass):
         Returns
         -------
         None
+
+        Raises
+        ------
+        ValueError
+            When there is a problematic value like two sizing methods or a quadrant not in (0, 4)
         """
         variables = vars(self)
         sizing_vars = set(["L2_sizing", "L3_sizing", "L4_sizing"])
@@ -94,6 +99,9 @@ class SizingSetup(BaseClass):
         for key, val in kwargs.items():
             if key in variables and key not in sizing_vars:
                 if val is not None:
+                    if key == "quadrant_sizing" and val not in (0, 1, 2, 3, 4):
+                        raise ValueError(f'The quadrant {val} does not exist!')
+                        return
                     self.__setattr__(key, val)
 
     def _check_and_set_sizing(self, L2_sizing: bool, L3_sizing: bool, L4_sizing: bool) -> None:

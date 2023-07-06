@@ -11,6 +11,7 @@ from pytest import raises
 
 from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, PipeData, Borefield, SizingSetup, FOLDER
 from GHEtool.logger import ghe_logger
+from GHEtool.Validation.cases import load_case
 
 data = GroundConstantTemperature(3, 10)
 ground_data_constant = data
@@ -266,3 +267,241 @@ def test_ground_data_jit_gfunction():
     assert borefield.ground_data == data_ground_flux
     assert borefield._ground_data == data_ground_flux
     assert not np.any(borefield.gfunction_calculation_object.depth_array)
+
+
+def test_set_fluid_params():
+    borefield = Borefield()
+    assert borefield.borehole.fluid_data == FluidData()
+    borefield.set_fluid_parameters(fluidData)
+    assert borefield.borehole.fluid_data == fluidData
+
+
+def test_set_pipe_params():
+    borefield = Borefield()
+    assert borefield.borehole.pipe_data == PipeData()
+    borefield.set_pipe_parameters(pipeData)
+    assert borefield.borehole.pipe_data == pipeData
+
+
+def test_set_Rb():
+    borefield = Borefield()
+    assert borefield.Rb == 0.12
+    borefield.set_Rb(0.13)
+    assert borefield.Rb == 0.13
+
+
+def test_set_max_temp():
+    borefield = Borefield()
+    borefield.set_max_ground_temperature(13)
+    assert borefield.Tf_max == 13
+    borefield.set_max_ground_temperature(14)
+    assert borefield.Tf_max == 14
+    try:
+        borefield.set_max_ground_temperature(borefield.Tf_min-1)
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
+
+
+def test_set_min_temp():
+    borefield = Borefield()
+    borefield.set_min_ground_temperature(3)
+    assert borefield.Tf_min == 3
+    borefield.set_min_ground_temperature(4)
+    assert borefield.Tf_min == 4
+    try:
+        borefield.set_min_ground_temperature(borefield.Tf_max+1)
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
+
+
+def test_Tg():
+    borefield = Borefield()
+    borefield.set_ground_parameters(ground_data_constant)
+    assert borefield._Tg() == borefield.ground_data.calculate_Tg(borefield.H)
+    assert borefield._Tg(20) == borefield.ground_data.calculate_Tg(20)
+    borefield.set_ground_parameters(data_ground_flux)
+    assert borefield._Tg() == borefield.ground_data.calculate_Tg(borefield.H)
+    assert borefield._Tg(20) == borefield.ground_data.calculate_Tg(20)
+
+
+@pytest.mark.parametrize("ground_data, constant_Rb, result",
+                         zip([ground_data_constant, data_ground_flux, ground_data_constant, data_ground_flux],
+                             [True, True, False, False],
+                             [30.924434615896764, 30.07937084831388, 30.973435165241145, 30.072313999914726]))
+def test_Ahmadfard(ground_data, constant_Rb, result):
+    borefield = Borefield()
+    borefield.borefield = borefield_gt
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(3)
+    borefield.set_peak_heating(peak_heating)
+    borefield.set_peak_cooling(peak_cooling)
+    borefield.set_baseload_cooling(monthly_load_cooling)
+    borefield.set_baseload_heating(monthly_load_heating)
+
+    borefield.set_ground_parameters(ground_data)
+    borefield.set_fluid_parameters(fluidData)
+    borefield.set_pipe_parameters(pipeData)
+    borefield.sizing_setup(use_constant_Rb=constant_Rb)
+    borefield._calculate_last_year_params(True)
+    assert np.isclose(result, borefield._Ahmadfard)
+    assert result == borefield.H
+
+@pytest.mark.parametrize("ground_data, constant_Rb, result",
+                         zip([ground_data_constant, data_ground_flux, ground_data_constant, data_ground_flux],
+                             [True, True, False, False],
+                             [38.53491016745154, 37.10078260823372, 38.53368909018465, 37.100782551185]))
+def test_Carcel(ground_data, constant_Rb, result):
+    borefield = Borefield()
+    borefield.borefield = borefield_gt
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(3)
+    borefield.set_peak_heating(peak_heating)
+    borefield.set_peak_cooling(peak_cooling)
+    borefield.set_baseload_cooling(monthly_load_cooling)
+    borefield.set_baseload_heating(monthly_load_heating)
+
+    borefield.set_ground_parameters(ground_data)
+    borefield.set_fluid_parameters(fluidData)
+    borefield.set_pipe_parameters(pipeData)
+    borefield.sizing_setup(use_constant_Rb=constant_Rb)
+    borefield._calculate_first_year_params(True)
+    assert np.isclose(result, borefield._Carcel)
+    assert result == borefield.H
+
+
+def test_set_sizing_setup():
+    borefield = Borefield()
+    sizing_setup_backup = copy.deepcopy(borefield._sizing_setup)
+    H_init_backup = borefield.H_init
+    borefield.sizing_setup()
+    assert borefield._sizing_setup == sizing_setup_backup
+    assert borefield.H_init == H_init_backup
+    # set sizing_setup
+    test = SizingSetup(True, 4, False, True, False)
+    test2 = SizingSetup(False, 3, False, False, True)
+    borefield.sizing_setup(120, True, 4, False, True, False)
+    assert borefield.H_init == 120
+    assert borefield._sizing_setup == test
+    borefield.sizing_setup(sizing_setup=test2)
+    assert borefield.H_init == 120
+    assert borefield._sizing_setup == test2
+
+
+def test_size():
+    borefield = Borefield()
+    try:
+        borefield.size()
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
+    borefield.borefield = borefield_gt
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(3)
+    borefield.set_peak_heating(peak_heating)
+    borefield.set_peak_cooling(peak_cooling)
+    borefield.set_baseload_cooling(monthly_load_cooling)
+    borefield.set_baseload_heating(monthly_load_heating)
+
+    borefield.set_ground_parameters(ground_data_constant)
+    sizing_setup_backup = copy.deepcopy(borefield._sizing_setup)
+    borefield.size(L3_sizing=True)
+    assert borefield._sizing_setup.L3_sizing == sizing_setup_backup.L3_sizing
+
+
+def test_select_size():
+    borefield = Borefield()
+    borefield.borefield = borefield_gt
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(3)
+    borefield.set_peak_heating(peak_heating)
+    borefield.set_peak_cooling(peak_cooling)
+    borefield.set_baseload_cooling(monthly_load_cooling)
+    borefield.set_baseload_heating(monthly_load_heating)
+
+    # with constant Tg
+    borefield.set_ground_parameters(ground_data_constant)
+    assert borefield._select_size(100, 20) == 100
+    assert borefield._select_size(10, 20) == 20
+
+    # with variable Tg
+    borefield.set_ground_parameters(data_ground_flux)
+    assert borefield._select_size(100, 20) == 100
+    assert borefield._select_size(10, 80) == 80
+    borefield.set_max_ground_temperature(14)
+    try:
+        borefield._select_size(10, 80)
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
+
+
+def test_size_L2_value_errors():
+    borefield = Borefield()
+    try:
+        borefield.size_L2(100)
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
+    borefield.set_peak_heating(peak_heating)
+    borefield.set_peak_cooling(peak_cooling)
+    borefield.set_baseload_cooling(monthly_load_cooling)
+    borefield.set_baseload_heating(monthly_load_heating)
+    borefield.set_ground_parameters(ground_data_constant)
+    try:
+        borefield.size_L2(100, 5)
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
+
+
+@pytest.mark.parametrize("quadrant, result",
+                         zip([1, 2, 3, 4], [74.55862437702756, 96.8819595625224, 27.20469151215654, 21.935797517893317]))
+def test_size_L2(quadrant, result):
+    borefield = Borefield()
+    borefield.borefield = borefield_gt
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
+    borefield.set_peak_heating(peak_heating)
+    borefield.set_peak_cooling(peak_cooling)
+    borefield.set_baseload_cooling(monthly_load_cooling)
+    borefield.set_baseload_heating(monthly_load_heating)
+    borefield.set_ground_parameters(ground_data_constant)
+
+    assert np.isclose(result, borefield.size_L2(100, quadrant_sizing=quadrant))
+    assert borefield.limiting_quadrant == quadrant
+    assert borefield.H == result
+
+
+def test_size_L3_value_errors():
+    borefield = Borefield()
+    try:
+        borefield.size_L3(100)
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
+    borefield.set_peak_heating(peak_heating)
+    borefield.set_peak_cooling(peak_cooling)
+    borefield.set_baseload_cooling(monthly_load_cooling)
+    borefield.set_baseload_heating(monthly_load_heating)
+    borefield.set_ground_parameters(ground_data_constant)
+    try:
+        borefield.size_L3(100, 5)
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
+
+@pytest.mark.parametrize("quadrant, result",
+                         zip([1, 2, 3, 4], [98.64768654650995, 98.64768654650995, 26.722846792067735, 26.722846792067735]))
+def test_size_L3(quadrant, result):
+    borefield = Borefield()
+    borefield.borefield = borefield_gt
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
+    borefield.set_peak_heating(peak_heating)
+    borefield.set_peak_cooling(peak_cooling)
+    borefield.set_baseload_cooling(monthly_load_cooling)
+    borefield.set_baseload_heating(monthly_load_heating)
+    borefield.set_ground_parameters(ground_data_constant)
+
+    assert np.isclose(result, borefield.size_L3(100, quadrant_sizing=quadrant))
+    assert borefield.limiting_quadrant == quadrant
+    assert borefield.H == result
+

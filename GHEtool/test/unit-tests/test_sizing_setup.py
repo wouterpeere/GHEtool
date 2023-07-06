@@ -59,3 +59,22 @@ def test_more_than_one_option():
         assert False     # pragma: no cover
     except ValueError:
         assert True
+    try:
+        test._check_and_set_sizing(False, True, True)
+        assert False     # pragma: no cover
+    except ValueError:
+        assert True
+    try:
+        test._check_and_set_sizing(True, False, True)
+        assert False     # pragma: no cover
+    except ValueError:
+        assert True
+
+
+def test_error_quadrant():
+    try:
+        SizingSetup(quadrant_sizing=5)
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
+    SizingSetup(quadrant_sizing=0)

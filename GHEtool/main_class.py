@@ -656,7 +656,14 @@ class Borefield(BaseClass):
         Returns
         -------
         None
+
+        Raises
+        ------
+        ValueError
+            When the maximal temperature is lower than the minimal temperature
         """
+        if temp <= self.Tf_min:
+            raise ValueError(f'The maximum temperature {temp} is lower than the minimum temperature {self.Tf_min}')
         self.Tf_max: float = temp
 
     def set_min_ground_temperature(self, temp: float) -> None:
@@ -671,7 +678,14 @@ class Borefield(BaseClass):
         Returns
         -------
         None
+
+        Raises
+        ------
+        ValueError
+            When the maximal temperature is lower than the minimal temperature
         """
+        if temp >= self.Tf_max:
+            raise ValueError(f'The minimum temperature {temp} is lower than the maximum temperature {self.Tf_max}')
         self.Tf_min: float = temp
 
     @property
@@ -753,7 +767,7 @@ class Borefield(BaseClass):
         # (convergence if difference between depth in iterations is smaller than THRESHOLD_BOREHOLE_DEPTH)
         while abs(self.H - H_prev) >= Borefield.THRESHOLD_BOREHOLE_DEPTH:
             # calculate the required g-function values
-            gfunct_uniform_T = self.gfunction(time, self.H)
+            gfunct_uniform_T = self.gfunction(time, max(1, self.H))
             # calculate the thermal resistances
             Ra = (gfunct_uniform_T[2] - gfunct_uniform_T[1]) / (2 * pi * self.ground_data.k_s)
             Rm = (gfunct_uniform_T[1] - gfunct_uniform_T[0]) / (2 * pi * self.ground_data.k_s)
@@ -810,7 +824,7 @@ class Borefield(BaseClass):
             self.H = L / self.number_of_boreholes
         return self.H
 
-    def sizing_setup(self, H_init: float = 100, use_constant_Rb: bool = None, quadrant_sizing: int = 0,
+    def sizing_setup(self, H_init: float = None, use_constant_Rb: bool = None, quadrant_sizing: int = 0,
                      L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None, sizing_setup: SizingSetup = None) -> None:
         """
         This function sets the options for the sizing function.
@@ -849,7 +863,8 @@ class Borefield(BaseClass):
         .. [#PeereBS] Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. (2021) Validated combined first and last year borefield sizing methodology. In Proceedings of International Building Simulation Conference 2021. Brugge (Belgium), 1-3 September 2021. https://doi.org/10.26868/25222708.2021.30180
         .. [#PeereThesis] Peere, W. (2020) Methode voor economische optimalisatie van geothermische verwarmings- en koelsystemen. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
         """
-        self.H_init = H_init
+        if H_init is not None:
+            self.H_init = H_init
 
         # if sizing_setup is not None, then the sizing setup is set directly
         if sizing_setup is not None:
@@ -995,7 +1010,18 @@ class Borefield(BaseClass):
         -------
         H : float
             Required depth of the borefield [m]
+
+        Raises
+        ------
+        ValueError
+            ValueError when no ground data is provided or quadrant is not in range.
         """
+        # check ground data
+        if not self.ground_data.check_values():
+            raise ValueError("Please provide ground data.")
+        # check quadrants
+        if not quadrant_sizing in range(0, 5):
+            raise ValueError(f'Quadrant {quadrant_sizing} does not exist.')
 
         # initiate with a given depth
         self.H: float = H_init
@@ -1028,6 +1054,7 @@ class Borefield(BaseClass):
                 self.H = size_quadrant3()
             else:
                 self.H = size_quadrant4()
+            self.limiting_quadrant = quadrant_sizing
         else:
             # size according to the biggest quadrant
             # determine which quadrants are relevant
@@ -1077,7 +1104,19 @@ class Borefield(BaseClass):
         -------
         H : float
             Required depth of the borefield [m]
+
+        Raises
+        ------
+         ValueError
+            ValueError when no ground data is provided or quadrant is not in range.
         """
+        # check ground data
+        if not self.ground_data.check_values():
+            raise ValueError("Please provide ground data.")
+        # check quadrants
+        if not quadrant_sizing in range(0, 5):
+            raise ValueError(f'Quadrant {quadrant_sizing} does not exist.')
+
         # initiate with a given depth
         self.H: float = H_init
 
@@ -1127,7 +1166,19 @@ class Borefield(BaseClass):
         -------
         H : float
             Required depth of the borefield [m]
+
+        Raises
+        ------
+         ValueError
+            ValueError when no ground data is provided or quadrant is not in range.
         """
+        # check ground data
+        if not self.ground_data.check_values():
+            raise ValueError("Please provide ground data.")
+        # check quadrants
+        if not quadrant_sizing in range(0, 5):
+            raise ValueError(f'Quadrant {quadrant_sizing} does not exist.')
+
         # check if hourly data is given
         self._check_hourly_load()
 
