@@ -157,6 +157,7 @@ def test_create_custom_dataset():
 @pytest.mark.slow
 def test_load_custom_gfunction():
     borefield = Borefield()
+    borefield.set_ground_parameters(ground_data_constant)
     borefield.borefield = copy.deepcopy(borefield_gt)
     borefield.create_custom_dataset()
     borefield.custom_gfunction.dump_custom_dataset("./", "test")

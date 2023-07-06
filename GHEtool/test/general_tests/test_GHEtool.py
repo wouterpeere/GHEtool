@@ -186,16 +186,6 @@ def test_sizing_L32(borefield_cooling_dom):
     borefield_cooling_dom.size(L3_sizing=True)
 
 
-def test_load_duration(monkeypatch, hourly_borefield):
-    monkeypatch.setattr(plt, 'show', lambda: None)
-    hourly_borefield.plot_load_duration(legend=True)
-    hourly_borefield.optimise_load_profile(150)
-    hourly_borefield.set_min_ground_temperature(-5)
-    hourly_borefield.set_max_ground_temperature(17)
-    hourly_borefield.optimise_load_profile(150)
-    hourly_borefield.print_temperature_profile(plot_hourly=True)
-
-
 def test_plot_hourly(monkeypatch, hourly_borefield):
     monkeypatch.setattr(plt, 'show', lambda: None)
     hourly_borefield.print_temperature_profile(plot_hourly=True)

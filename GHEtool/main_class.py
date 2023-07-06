@@ -2298,7 +2298,6 @@ class Borefield(BaseClass):
                 else:
                     peak_cool_load_geo = min(init_peak_cool_load, peak_cool_load_geo + 1)
                     if peak_cool_load_geo == init_peak_cool_load:
-                        self.print_temperature_profile()
                         cool_ok = True
             else:
                 cool_ok = True
