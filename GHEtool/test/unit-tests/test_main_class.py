@@ -38,6 +38,11 @@ monthlyLoadHeating = list(map(lambda x: x * annualHeatingLoad, monthlyLoadHeatin
 monthlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, monthlyLoadCoolingPercentage))   # kWh
 
 
+def borefields_equal(borefield_one, borefield_two) -> bool:
+    for i in range(len(borefield_one)):
+        if borefield_one[i].__dict__ != borefield_two[i].__dict__:
+            return False
+    return True
 def test_logging():
     borefield = Borefield()
     assert ghe_logger.level == 20
