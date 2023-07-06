@@ -104,7 +104,6 @@ class SizingSetup(BaseClass):
                 if val is not None:
                     if key == "quadrant_sizing" and val not in (0, 1, 2, 3, 4):
                         raise ValueError(f'The quadrant {val} does not exist!')
-                        return
                     self.__setattr__(key, val)
 
     def _check_and_set_sizing(self, L2_sizing: bool, L3_sizing: bool, L4_sizing: bool) -> None:

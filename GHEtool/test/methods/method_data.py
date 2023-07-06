@@ -6,6 +6,7 @@ import pygfunction as gt
 
 from GHEtool.test.methods.TestMethodClass import TestObject, TestMethodClass
 from GHEtool import *
+from GHEtool.Validation.cases import load_case
 
 list_of_test_objects = TestMethodClass()
 
@@ -97,7 +98,6 @@ borefield.set_borefield(borefield_gt)
 list_of_test_objects.add(TestObject(borefield, L2_output=186.5208, L3_output=191.206, quadrant=2,
                          name='Effect of borehole configuration (2)'))
 
-from GHEtool.Validation.cases import load_case
 data = GroundConstantTemperature(3.5, 10)
 borefield_gt = gt.boreholes.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)
 correct_answers_L2 = (56.75, 117.223, 66.94, 91.266)
@@ -207,3 +207,69 @@ borefield.set_ground_parameters(ground_data_IKC)
 borefield.create_rectangular_borefield(2, 10, 8, 8, 60, 0.8, 0.07)
 list_of_test_objects.add(TestObject(borefield, L2_output=71.65, L3_output=72.054, quadrant=4,
                                     name='Real case 2 (Correct)'))
+
+peakCooling = [0] * 12
+peakHeating = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]  # Peak heating in kW
+annualHeatingLoad = 300 * 10 ** 3  # kWh
+monthlyLoadHeatingPercentage = [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144]
+monthlyLoadHeating = list(map(lambda x: x * annualHeatingLoad, monthlyLoadHeatingPercentage))  # kWh
+monthlyLoadCooling = [0]*12  # kWh
+borefield = Borefield(simulation_period=20, peak_heating=peakHeating,peak_cooling=peakCooling,
+                      baseload_heating=monthlyLoadHeating,baseload_cooling=monthlyLoadCooling)
+borefield.set_ground_parameters(data)
+borefield.create_rectangular_borefield(10, 12, 6, 6, 110, 4, 0.075)
+borefield.set_max_ground_temperature(16)
+borefield.set_min_ground_temperature(0)
+list_of_test_objects.add(TestObject(borefield, L2_output=81.205, L3_output=81.969, quadrant=4,
+                                    name='No cooling L2/L3'))
+
+peakCooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]  # Peak cooling in kW
+peakHeating = [0] * 12
+annualCoolingLoad = 160 * 10 ** 3  # kWh
+monthlyLoadCoolingPercentage = [0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025]
+monthlyLoadHeating = [0]*12  # kWh
+monthlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, monthlyLoadCoolingPercentage))  # kWh
+borefield = Borefield(simulation_period=20, peak_heating=peakHeating, peak_cooling=peakCooling,
+                      baseload_heating=monthlyLoadHeating, baseload_cooling=monthlyLoadCooling)
+borefield.set_ground_parameters(data)
+borefield.create_rectangular_borefield(10, 12, 6, 6, 110, 4, 0.075)
+borefield.set_max_ground_temperature(16)  # maximum temperature
+borefield.set_min_ground_temperature(0)  # minimum temperature
+list_of_test_objects.add(TestObject(borefield, L2_output=120.913, L3_output=123.346, quadrant=2,
+                                    name='No heating L2/L3'))
+borefield = Borefield()
+borefield.set_ground_parameters(data)
+borefield.create_rectangular_borefield(10, 12, 6, 6, 110, 4, 0.075)
+borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+borefield.hourly_cooling_load = np.zeros(8760)
+list_of_test_objects.add(TestObject(borefield, L4_output=244.04826670835274, quadrant=4, name='No cooling L4'))
+
+borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+borefield.hourly_heating_load = np.zeros(8760)
+list_of_test_objects.add(TestObject(borefield, L4_output=305.55338863384287, quadrant=2, name='No heating L4'))
+
+monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
+borefield = Borefield(simulation_period=20, peak_heating=peak_heating, peak_cooling=peak_cooling,
+                      baseload_heating=monthly_load_heating, baseload_cooling=monthly_load_cooling)
+borefield.set_ground_parameters(GroundFluxTemperature(3, 12))
+borefield.create_rectangular_borefield(10, 12, 6, 6, 110, 4, 0.075)
+borefield.set_Rb(0.2)
+list_of_test_objects.add(TestObject(borefield, error=ValueError, quadrant=2, name='Cannot size'))
+
+data = GroundConstantTemperature(3, 10)
+borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
+borefield = Borefield()
+borefield.set_ground_parameters(data)
+borefield.set_Rb(0.2)
+borefield.set_borefield(borefield_gt)
+borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+borefield.hourly_heating_load[0] = 100000
+list_of_test_objects.add(TestObject(borefield, L4_output=18760.64149089075, quadrant=4, name='Hourly profile, quadrant 4'))
+
+borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), first_column_heating=False)
+list_of_test_objects.add(TestObject(borefield, L4_output=368.50138222702657, quadrant=2, name='Hourly profile reversed'))
+
+borefield.hourly_heating_load[0] = 100000
+list_of_test_objects.add(TestObject(borefield, L4_output=18602.210559679363, quadrant=3, name='Hourly profile, quadrant 3'))
+
+

@@ -86,3 +86,4 @@ def test_equal_unequal():
     setup3 = SizingSetup(True, 2, True, False, False)
     assert setup1 == setup2
     assert not setup2 == setup3
+    assert not setup2 == Borefield()

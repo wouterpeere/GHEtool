@@ -106,19 +106,23 @@ def test_nb_of_boreholes():
     assert borefield.number_of_boreholes == 0
 
 
-def test_create_rectangular_field(borefield):
+def test_create_rectangular_field():
+    borefield = Borefield()
     borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 4, 0.075)
     assert borefield.number_of_boreholes == 100
     borefields_equal(borefield.borefield, gt.boreholes.rectangle_field(10, 10, 6, 6, 110, 4, 0.075))
 
 
-def test_create_circular_field(borefield):
+def test_create_circular_field():
+    borefield = Borefield()
     borefield.create_circular_borefield(10, 10, 100, 1)
     assert borefield.number_of_boreholes == 10
     borefields_equal(borefield.borefield, gt.boreholes.circle_field(10, 10, 100, 1, 0.075))
 
 
-def test_update_depth(borefield):
+def test_update_depth():
+    borefield = Borefield()
+    borefield.borefield = copy.deepcopy(borefield_gt)
     init_H = borefield.borefield[0].H
 
     borefield.H = init_H + 1
@@ -135,7 +139,7 @@ def test_update_depth(borefield):
         assert bor.H == init_H + 2
 
 
-def test_create_custom_dataset(borefield):
+def test_create_custom_dataset():
     borefield_test = Borefield()
     try:
         borefield_test.create_custom_dataset([100, 1000], [50, 100])
@@ -151,7 +155,9 @@ def test_create_custom_dataset(borefield):
 
 
 @pytest.mark.slow
-def test_load_custom_gfunction(borefield):
+def test_load_custom_gfunction():
+    borefield = Borefield()
+    borefield.borefield = copy.deepcopy(borefield_gt)
     borefield.create_custom_dataset()
     borefield.custom_gfunction.dump_custom_dataset("./", "test")
     dataset = copy.copy(borefield.custom_gfunction)
@@ -164,7 +170,8 @@ def test_load_custom_gfunction(borefield):
     assert borefield.custom_gfunction == dataset
 
 
-def test_set_investment_cost(borefield):
+def test_set_investment_cost():
+    borefield = Borefield()
     borefield.set_investment_cost()
     assert borefield.cost_investment == Borefield.DEFAULT_INVESTMENT
     borefield.set_investment_cost([0, 39])
@@ -902,3 +909,25 @@ def test_load_duration(monkeypatch):
     borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     borefield.plot_load_duration(legend=True)
     borefield.optimise_load_profile(150)
+
+
+def test_calculate_quadrants_without_data():
+    borefield = Borefield()
+    borefield.borefield = copy.deepcopy(borefield_gt)
+    borefield.set_max_ground_temperature(18)
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
+    borefield.set_peak_heating(peak_heating)
+    borefield.set_peak_cooling(peak_cooling)
+    borefield.set_baseload_cooling(monthly_load_cooling)
+    borefield.set_baseload_heating(monthly_load_heating)
+    borefield.set_ground_parameters(ground_data_constant)
+    borefield.calculate_quadrant()
+
+
+def test_optimise_load_profile_without_data():
+    borefield = Borefield()
+    try:
+        borefield.optimise_load_profile()
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True

@@ -154,30 +154,6 @@ def borefield_cooling_dom():
     return borefield
 
 
-def test_borefield_cannot_size_due_to_cooling():
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peak_heating,
-                          peak_cooling=peak_cooling,
-                          baseload_heating=monthly_load_heating,
-                          baseload_cooling=monthly_load_cooling)
-
-    borefield.set_ground_parameters(copy.copy(data_ground_flux))
-    borefield.set_borefield(copy.deepcopy(borefield_gt))
-    borefield.ground_data.Tg = 12
-    borefield.set_Rb(0.2)
-
-    # set temperature boundaries
-    borefield.set_max_ground_temperature(16)   # maximum temperature
-    borefield.set_min_ground_temperature(0)  # minimum temperature
-
-    with raises(ValueError):
-        borefield.size(100)
-
-    with raises(ValueError):
-        borefield.size_L3(100)
-
-
 def test_hourly_to_monthly(borefield):
     borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), header=True, separator=";", first_column_heating=True)
     borefield.convert_hourly_to_monthly()
@@ -204,10 +180,20 @@ def test_sizing_L3_threshold_depth_error(borefield):
     borefield.ground_data.flux = 0
 
 
+def test_sizing_L32(borefield_cooling_dom):
+    borefield_cooling_dom.size(L3_sizing=True)
+    borefield_cooling_dom.set_peak_heating(np.array(peakHeating) * 5)
+    borefield_cooling_dom.size(L3_sizing=True)
 
 
-
-
+def test_load_duration(monkeypatch, hourly_borefield):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    hourly_borefield.plot_load_duration(legend=True)
+    hourly_borefield.optimise_load_profile(150)
+    hourly_borefield.set_min_ground_temperature(-5)
+    hourly_borefield.set_max_ground_temperature(17)
+    hourly_borefield.optimise_load_profile(150)
+    hourly_borefield.print_temperature_profile(plot_hourly=True)
 
 
 def test_plot_hourly(monkeypatch, hourly_borefield):
@@ -220,65 +206,12 @@ def test_load_duration_no_hourly_data(borefield):
         borefield.plot_load_duration()
 
 
-def test_optimise_load_profile_without_data(borefield):
-    with raises(ValueError):
-        borefield.optimise_load_profile()
-
-
 def test_precalculated_data_1(borefield_custom_data):
     borefield_custom_data.gfunction([3600*100, 3600*100], 100)
 
 
 def test_precalculated_data_2(borefield_custom_data):
     borefield_custom_data.gfunction([3600*100, 3600*100, 3600*101], 100)
-
-
-def test_choose_quadrant_1(borefield_quadrants):
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(1)
-
-    borefield_quadrants.set_peak_heating(peak_heating)
-    borefield_quadrants.set_peak_cooling(peak_cooling)
-    borefield_quadrants.set_baseload_cooling(monthly_load_cooling)
-    borefield_quadrants.set_baseload_heating(monthly_load_heating)
-
-    borefield_quadrants.size(100, L3_sizing=True)
-    assert 1 == borefield_quadrants.calculate_quadrant()
-
-
-def test_choose_quadrant_2(borefield_quadrants):
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
-
-    borefield_quadrants.set_peak_heating(peak_heating)
-    borefield_quadrants.set_peak_cooling(peak_cooling)
-    borefield_quadrants.set_baseload_cooling(monthly_load_cooling)
-    borefield_quadrants.set_baseload_heating(monthly_load_heating)
-
-    borefield_quadrants.size(100, L3_sizing=True)
-    assert 2 == borefield_quadrants.calculate_quadrant()
-
-
-def test_choose_quadrant_3(borefield_quadrants):
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(3)
-
-    borefield_quadrants.set_peak_heating(peak_heating)
-    borefield_quadrants.set_peak_cooling(peak_cooling)
-    borefield_quadrants.set_baseload_cooling(monthly_load_cooling)
-    borefield_quadrants.set_baseload_heating(monthly_load_heating)
-
-    borefield_quadrants.size(100, L3_sizing=True)
-    assert 3 == borefield_quadrants.calculate_quadrant()
-
-
-def test_choose_quadrant_4(borefield_quadrants):
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(4)
-
-    borefield_quadrants.set_peak_heating(peak_heating)
-    borefield_quadrants.set_peak_cooling(peak_cooling)
-    borefield_quadrants.set_baseload_cooling(monthly_load_cooling)
-    borefield_quadrants.set_baseload_heating(monthly_load_heating)
-
-    borefield_quadrants.size(100, L3_sizing=True)
-    assert 4 == borefield_quadrants.calculate_quadrant()
 
 
 def test_choose_quadrant_None(borefield_quadrants):
@@ -292,6 +225,43 @@ def test_choose_quadrant_None(borefield_quadrants):
     borefield_quadrants.calculate_temperatures(200)
     assert None is borefield_quadrants.calculate_quadrant()
 
+
+@pytest.mark.slow
+def test_load_custom_gfunction(borefield):
+    borefield.create_custom_dataset()
+    borefield.custom_gfunction.dump_custom_dataset("./", "test")
+    dataset = copy.copy(borefield.custom_gfunction)
+
+    borefield.load_custom_gfunction("./test.gvalues")
+    assert borefield.custom_gfunction == dataset
+
+
+def test_H_smaller_50(borefield):
+    borefield.H = 0.5
+    borefield.size_L2(H_init=0.5, quadrant_sizing=1)
+
+
+def test_size_hourly_without_hourly_load(borefield):
+    with raises(ValueError):
+        borefield.size_L4(H_init=100)
+    borefield.hourly_heating_load = None
+    borefield.hourly_cooling_load = None
+    with raises(ValueError):
+        borefield.size_L4(H_init=100)
+
+
+def test_size_hourly_quadrant(hourly_borefield):
+    hourly_borefield.H = 0.5
+    hourly_borefield.size_L4(H_init=100, quadrant_sizing=1)
+
+
+def test_create_custom_dataset_without_data(borefield):
+    borefield.ground_data = None
+    with raises(ValueError):
+        borefield.create_custom_dataset()
+    borefield.borefield = None
+    with raises(ValueError):
+        borefield.create_custom_dataset()
 
 
 def test_check_hourly_load(borefield):
