@@ -65,7 +65,7 @@ def test_wrong_results_shown(qtbot):
     main_window.gui_structure.option_decimal_csv.set_value(1)
     main_window.gui_structure.option_seperator_csv.set_value(1)
     main_window.gui_structure.fun_update_combo_box_data_file(f'{FOLDER}/Examples/hourly_profile.csv')
-    assert main_window.status_bar.widget.currentMessage() == 'Please make sure the seperator and decimal point are different.'
+    assert main_window.status_bar.label.text() == 'Please make sure the seperator and decimal point are different.'
     main_window.gui_structure.option_decimal_csv.set_value(0)
     main_window.gui_structure.option_seperator_csv.set_value(0)
     main_window.gui_structure.option_column.set_value(1)
@@ -122,7 +122,7 @@ def test_wrong_results_shown(qtbot):
     assert main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
 
     main_window._save_to_data("hello/not_there.GHEtool")
-    assert main_window.status_bar.widget.currentMessage() == main_window.translations.no_file_selected[
+    assert main_window.status_bar.label.text() == main_window.translations.no_file_selected[
         main_window.gui_structure.option_language.get_value()[0]]
 
 
@@ -145,8 +145,8 @@ def test_backward_compatibility(qtbot):
     main_window.load_backup()
     assert main_window.list_ds[0].results is None
     main_window._load_from_data("no_file")
-    assert main_window.status_bar.widget.currentMessage() == main_window.translations.no_file_selected[0]
-    
+    assert main_window.status_bar.label.text() == main_window.translations.no_file_selected[0]
+
     # init gui window
     main_window_old = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations,
                                  result_creating_class=Borefield,
@@ -180,7 +180,7 @@ def test_backward_compatibility(qtbot):
     main_window_new = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
                                  data_2_results_function=data_2_borefield)
     main_window_new._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_999_1_1.GHEtool')
-    assert main_window.status_bar.widget.currentMessage() == main_window.translations.cannot_load_new_version[0]
+    assert main_window.status_bar.label.text() == main_window.translations.cannot_load_new_version[0]
 
 
 def test_datastorage(qtbot):
@@ -282,7 +282,7 @@ def test_file_import_errors(qtbot):
     g_s = main_window.gui_structure
     g_s.option_filename.set_value("")
     main_window.gui_structure.fun_display_data()
-    assert main_window.status_bar.widget.currentMessage() == main_window.translations.no_file_selected[0]
+    assert main_window.status_bar.label.text() == main_window.translations.no_file_selected[0]
 
     g_s.option_filename.set_value(f'{FOLDER.joinpath("Examples/hourly_profile.csv")}')
     g_s.fun_update_combo_box_data_file(f'{FOLDER.joinpath("Examples/hourly_profile.csv")}')
@@ -290,13 +290,13 @@ def test_file_import_errors(qtbot):
     g_s.option_single_column.set_value(-1)
     g_s.option_column.set_value(0)
     main_window.gui_structure.fun_display_data()
-    assert main_window.status_bar.widget.currentMessage() == main_window.translations.ColumnError[0]
+    assert main_window.status_bar.label.text() == main_window.translations.ColumnError[0]
     g_s.option_single_column.set_value(0)
     g_s.option_heating_column.set_value(0)
     g_s.option_cooling_column.set_value(1)
     g_s.option_filename.set_value(f'{FOLDER.joinpath("Examples/hourly_profile_wrong.csv")}')
     main_window.gui_structure.fun_display_data()
-    assert main_window.status_bar.widget.currentMessage() == main_window.translations.ValueError[0]
+    assert main_window.status_bar.label.text() == main_window.translations.ValueError[0]
     
     g_s.option_filename.set_value(f'{FOLDER.joinpath("Examples/hourly_profile.csv")}')
     g_s.fun_update_combo_box_data_file(f'{FOLDER.joinpath("Examples/hourly_profile.csv")}')

@@ -65,15 +65,13 @@ class MainWindow(MainWindow):
             val["aim_custom"] = False
             val["option_pipe_borehole_radius_2"] = val["option_pipe_borehole_radius"]
 
-        def general_changes(scenarios) -> None:
+        def general_changes() -> None:
             # change window title to new loaded filename
             self.change_window_title()
-            # init user window by reset scenario list widget and check for results
-            self.list_widget_scenario.clear()
-            self.list_widget_scenario.addItems(scenarios)
-            self.change_scenario(0)
             self.list_widget_scenario.setCurrentRow(0)
+            self.list_widget_scenario.item(0).data(MainWindow.role).set_values(self.gui_structure)
             self.check_results()
+
         try:
             # open file and get data
             with open(location) as file:
@@ -89,32 +87,36 @@ class MainWindow(MainWindow):
             globs.LOGGER.warning('One cannot open a GHEtool v2.1.0 file!')
             return False
 
+        self.list_widget_scenario.clear()
+
         if version == "2.2.0":
             # write data to variables
-            self.list_ds = []
-            for val in saving['values']:
+            for val, name in zip(saving['values'], saving['names']):
                 ds = DataStorage(self.gui_structure)
                 ds.from_dict(val)
                 ds.results = None
-                self.list_ds.append(ds)
+                item = QtW.QListWidgetItem(name)
+                item.setData(MainWindow.role, ds)
+                self.list_widget_scenario.addItem(item)
             # set and change the window title
             self.filename = saving['filename']
-            general_changes(saving['names'])
+            general_changes()
             return True
 
         if version in ["2.1.1", "2.1.2"]:
             # write data to variables
-            self.list_ds = []
-            for val, borefield in zip(saving['values'], saving['borefields']):
+            for val, borefield, name in zip(saving['values'], saving['borefields'], saving['names']):
                 ds = DataStorage(self.gui_structure)
                 convert_v21x_to_v220(val)
                 ds.from_dict(val)
                 ds.results = None
-                self.list_ds.append(ds)
+                item = QtW.QListWidgetItem(name)
+                item.setData(MainWindow.role, ds)
+                self.list_widget_scenario.addItem(item)
 
             # set and change the window title
             self.filename = saving['filename']
-            general_changes(saving['names'])
+            general_changes()
             return True
 
         # print warning if the version is not a previous one
