@@ -22,6 +22,11 @@ jobs:
           pip install -e .
       - name: Test with pytest
         run: pytest GHEtool/test/methods/test_methods.py --cov=./ --cov-report=xml
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage.xml
+          token: 8e6f48b5-8534-4f9a-894b-0a2d226dab26 # not required for public repos
 
   test_examples:
     runs-on: windows-latest
@@ -39,6 +44,11 @@ jobs:
           pip install -e .
       - name: Test with pytest
         run: pytest GHEtool/test/test_examples.py --cov=./ --cov-report=xml
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage.xml
+          token: 8e6f48b5-8534-4f9a-894b-0a2d226dab26 # not required for public repos
    
   test_validation:
     runs-on: windows-latest
@@ -56,6 +66,11 @@ jobs:
           pip install -e .
       - name: Test with pytest
         run: pytest GHEtool/test/test_validation.py --cov=./ --cov-report=xml
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage.xml
+          token: 8e6f48b5-8534-4f9a-894b-0a2d226dab26 # not required for public repos
 
   unit-tests:
     runs-on: ${{ matrix.os }}

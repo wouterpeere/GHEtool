@@ -341,7 +341,7 @@ def test_problem_with_gfunction_calc_obj():
     borefield.set_min_ground_temperature(0)  # minimum temperature
 
     # size borefield
-    assert np.isclose(borefield.size(), 190.223)
+    assert np.isclose(borefield.size(), 190.2116676694166)
 
     # borefield of 6x20
     data = GroundConstantTemperature(3, 10)
@@ -356,3 +356,4 @@ def test_problem_with_gfunction_calc_obj():
 
     # size borefield
     assert np.isclose(borefield.size(), 186.5208)
+

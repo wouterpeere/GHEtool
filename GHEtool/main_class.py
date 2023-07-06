@@ -1124,26 +1124,19 @@ class Borefield(BaseClass):
             # size according to a specific quadrant
             self.H = self._size_based_on_temperature_profile(quadrant_sizing)
         else:
-            # size according to the biggest quadrant
-            # determine which quadrants are relevant
-            if self.imbalance <= 0:
-                # extraction dominated, so quadrants 1 and 4 are relevant
-                quadrant1 = self._size_based_on_temperature_profile(1)
-                quadrant4 = self._size_based_on_temperature_profile(4)
-                self.H = self._select_size(quadrant1, quadrant4)
+            # extraction dominated, so quadrants 1 and 4 are relevant
+            max_temp = self._size_based_on_temperature_profile(10)
+            min_temp = self._size_based_on_temperature_profile(20)
+            self.H = self._select_size(max_temp, min_temp)
 
-                if quadrant1 == self.H:
+            if self.imbalance <= 0:
+                if max_temp == self.H:
                     self.limiting_quadrant = 1
                     # the last calculated temperature was for quadrant 4, which was the smaller one
                 else:
                     self.limiting_quadrant = 4
             else:
-                # injection dominated, so quadrants 2 and 3 are relevant
-                quadrant2 = self._size_based_on_temperature_profile(2)
-                quadrant3 = self._size_based_on_temperature_profile(3)
-                self.H = self._select_size(quadrant2, quadrant3)
-
-                if quadrant2 == self.H:
+                if max_temp == self.H:
                     self.limiting_quadrant = 2
                     # the last calculation was for quadrant 3, which is the smaller one
                 else:
@@ -1189,26 +1182,18 @@ class Borefield(BaseClass):
             # size according to a specific quadrant
             self.H = self._size_based_on_temperature_profile(quadrant_sizing, hourly=True)
         else:
-            # size according to the biggest quadrant
-            # determine which quadrants are relevant
+            max_temp = self._size_based_on_temperature_profile(10, hourly=True) if self.hourly_cooling_load.sum() > 0 else 0
+            min_temp = self._size_based_on_temperature_profile(20, hourly=True)
+            self.H = self._select_size(max_temp, min_temp, True)
             if self.imbalance <= 0:
                 # extraction dominated, so quadrants 1 and 4 are relevant
-                quadrant1 = self._size_based_on_temperature_profile(1, hourly=True) if self.hourly_cooling_load.sum() > 0 else 0
-                quadrant4 = self._size_based_on_temperature_profile(4, hourly=True)
-                self.H = self._select_size(quadrant1, quadrant4, True)
-
-                if quadrant1 == self.H:
+                if max_temp == self.H:
                     self.limiting_quadrant = 1
                     # the last calculation was for quadrant 4, which is the smaller one
                 else:
                     self.limiting_quadrant = 4
             else:
-                # injection dominated, so quadrants 2 and 3 are relevant
-                quadrant2 = self._size_based_on_temperature_profile(2, hourly=True)
-                quadrant3 = self._size_based_on_temperature_profile(3, hourly=True) if self.hourly_heating_load.sum() > 0 else 0
-                self.H = self._select_size(quadrant2, quadrant3, True)
-
-                if quadrant2 == self.H:
+                if max_temp == self.H:
                     self.limiting_quadrant = 2
                     # the last calculation was for quadrant 3, which is the smaller one
                 else:
@@ -1335,17 +1320,35 @@ class Borefield(BaseClass):
                 self._calculate_temperature_profile(self.H, hourly=False)
             H_prev = self.H
 
-            if quadrant == 1 or quadrant == 2:
+            if quadrant == 1:
+                # maximum temperature
+                # convert back to required length
+                self.H = (np.max(self.results_peak_cooling[:12]) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
+            elif quadrant == 2:
+                # maximum temperature
+                # convert back to required length
+                self.H = (np.max(self.results_peak_cooling[-12:]) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
+            elif quadrant == 3:
+                # minimum temperature
+                # convert back to required length
+                self.H = (np.min(self.results_peak_heating[:12]) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
+            elif quadrant == 4:
+                # minimum temperature
+                # convert back to required length
+                self.H = (np.min(self.results_peak_heating[-12:]) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
+            elif quadrant == 10:
+                # over all years
                 # maximum temperature
                 # convert back to required length
                 self.H = (np.max(self.results_peak_cooling) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
-            else:
+            elif quadrant == 20:
+                # over all years
                 # minimum temperature
                 # convert back to required length
                 self.H = (np.min(self.results_peak_heating) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
 
-            if self.H < 0:
-                return 0
+            if self.H <= 0:
+                return 0.1
 
         return self.H
 
@@ -1948,6 +1951,8 @@ class Borefield(BaseClass):
         gvalue : np.ndarray
             1D array with the g-values for all the requested time_value(s)
         """
+        if H is None:
+            H = self.H
         # when using a variable ground temperature, sometimes no solution can be found
         if not isinstance(self.ground_data, GroundConstantTemperature) and H > Borefield.THRESHOLD_DEPTH_ERROR:
             raise ValueError("Due to the use of a variable ground temperature, no solution can be found."
