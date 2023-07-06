@@ -78,3 +78,11 @@ def test_error_quadrant():
     except ValueError:
         assert True
     SizingSetup(quadrant_sizing=0)
+
+
+def test_equal_unequal():
+    setup1 = SizingSetup(True, 2, False, True, True)
+    setup2 = SizingSetup(True, 2, False, True, True)
+    setup3 = SizingSetup(True, 2, True, False, True)
+    assert setup1 == setup2
+    assert not setup2 == setup3

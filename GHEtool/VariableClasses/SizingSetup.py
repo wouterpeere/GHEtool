@@ -13,6 +13,9 @@ class SizingSetup(BaseClass):
     """
     This class contains all the settings related to the sizing options.
     """
+
+    __slots__ = '_L2_sizing', '_L3_sizing', '_L4_sizing', 'use_constant_Rb', 'quadrant_sizing', '_backup'
+
     def __init__(self, use_constant_Rb: bool = None, quadrant_sizing: int = 0,
                  L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None):
         """
@@ -83,7 +86,7 @@ class SizingSetup(BaseClass):
         ValueError
             When there is a problematic value like two sizing methods or a quadrant not in (0, 4)
         """
-        variables = vars(self)
+        variables = self.__slots__
         sizing_vars = set(["L2_sizing", "L3_sizing", "L4_sizing"])
 
         # set value for sizing method
@@ -221,6 +224,16 @@ class SizingSetup(BaseClass):
             raise ValueError("No backup has been made.")
 
         kwargs = {}
-        for var in vars(self):
+        for var in self.__slots__:
             kwargs[var] = self._backup.__getattribute__(var)
         self._set_sizing_setup(kwargs)
+
+    def __eq__(self, other):
+        if not isinstance(other, SizingSetup):
+            return False
+        for i in self.__slots__:
+            if i == '_backup':
+                continue
+            if getattr(self, i) != getattr(other, i):
+                return False
+        return True
