@@ -69,7 +69,7 @@ def test_equivalent_loading():
 
 def test_calculate_Rb():
     borehole = Borehole()
-    borehole.pipe_data = pipe_data
+    borehole.pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
     borehole.fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
 
     assert np.isclose(0.09483159131195469, borehole.calculate_Rb(100, 1, 0.075, 3))
