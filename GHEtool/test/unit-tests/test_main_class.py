@@ -38,31 +38,6 @@ monthlyLoadHeating = list(map(lambda x: x * annualHeatingLoad, monthlyLoadHeatin
 monthlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, monthlyLoadCoolingPercentage))   # kWh
 
 
-def borefields_equal(borefield_one, borefield_two) -> bool:
-    for i in range(len(borefield_one)):
-        if borefield_one[i].__dict__ != borefield_two[i].__dict__:
-            return False
-    return True
-
-
-@pytest.fixture
-def borefield():
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peakHeating,
-                          peak_cooling=peakCooling,
-                          baseload_heating=monthlyLoadHeating,
-                          baseload_cooling=monthlyLoadCooling)
-
-    borefield.set_ground_parameters(data)
-    borefield.set_borefield(copy.deepcopy(borefield_gt))
-    borefield.set_Rb(0.2)
-
-    # set temperature boundaries
-    borefield.set_max_ground_temperature(16)  # maximum temperature
-    borefield.set_min_ground_temperature(0)  # minimum temperature
-    return borefield
-
-
 def test_logging():
     borefield = Borefield()
     assert ghe_logger.level == 20

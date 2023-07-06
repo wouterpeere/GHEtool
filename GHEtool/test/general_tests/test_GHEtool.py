@@ -112,28 +112,12 @@ def borefield_custom_data():
 
 
 @pytest.fixture
-def empty_borefield():
-    borefield = Borefield()
-    return borefield
-
-
-@pytest.fixture
 def hourly_borefield():
     borefield = Borefield()
     borefield.set_ground_parameters(data)
     borefield.set_Rb(0.2)
     borefield.set_borefield(borefield_gt)
     borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
-    return borefield
-
-
-@pytest.fixture
-def hourly_borefield_reversed():
-    borefield = Borefield()
-    borefield.set_ground_parameters(data)
-    borefield.set_Rb(0.2)
-    borefield.set_borefield(borefield_gt)
-    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), first_column_heating=False)
     return borefield
 
 
@@ -157,6 +141,7 @@ def borefield_cooling_dom():
 def test_hourly_to_monthly(borefield):
     borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), header=True, separator=";", first_column_heating=True)
     borefield.convert_hourly_to_monthly()
+    borefield.size()
 
     assert np.isclose(np.sum(borefield.baseload_cooling), np.sum(borefield.hourly_cooling_load))
     assert np.isclose(np.sum(borefield.baseload_heating), np.sum(borefield.hourly_heating_load))

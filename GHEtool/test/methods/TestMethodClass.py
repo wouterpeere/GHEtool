@@ -57,7 +57,7 @@ class TestMethodClass():
             if i.name != '':
                 list_of_names.append(i.name)
                 continue
-            list_of_names.append(f'case {_}')
+            list_of_names.append(f'case {_}')  # pragma: no cover
         return list_of_names
 
     @property
@@ -71,7 +71,7 @@ class TestMethodClass():
             if i.name != '':
                 list_of_names.append(i.name)
                 continue
-            list_of_names.append(f'case {_}')
+            list_of_names.append(f'case {_}')  # pragma: no cover
         return list_of_names
 
     @property
@@ -85,7 +85,7 @@ class TestMethodClass():
             if i.name != '':
                 list_of_names.append(i.name)
                 continue
-            list_of_names.append(f'case {_}')
+            list_of_names.append(f'case {_}')  # pragma: no cover
         return list_of_names
 
     @property
@@ -97,7 +97,7 @@ class TestMethodClass():
             if i.name != '':
                 list_of_names.append(i.name)
                 continue
-            list_of_names.append(f'case {_}')
+            list_of_names.append(f'case {_}')  # pragma: no cover
         return list_of_names
 
     @property
