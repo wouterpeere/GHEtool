@@ -1183,7 +1183,7 @@ class Borefield(BaseClass):
             self.H = self._size_based_on_temperature_profile(quadrant_sizing, hourly=True)
         else:
             max_temp = self._size_based_on_temperature_profile(10, hourly=True) if self.hourly_cooling_load.sum() > 0 else 0
-            min_temp = self._size_based_on_temperature_profile(20, hourly=True)
+            min_temp = self._size_based_on_temperature_profile(20, hourly=True) if self.hourly_heating_load.sum() > 0 else 0
             self.H = self._select_size(max_temp, min_temp, True)
             if self.imbalance <= 0:
                 # extraction dominated, so quadrants 1 and 4 are relevant
@@ -1323,19 +1323,19 @@ class Borefield(BaseClass):
             if quadrant == 1:
                 # maximum temperature
                 # convert back to required length
-                self.H = (np.max(self.results_peak_cooling[:12]) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
+                self.H = (np.max(self.results_peak_cooling[:8760 if hourly else 12]) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
             elif quadrant == 2:
                 # maximum temperature
                 # convert back to required length
-                self.H = (np.max(self.results_peak_cooling[-12:]) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
+                self.H = (np.max(self.results_peak_cooling[-8760 if hourly else -12:]) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
             elif quadrant == 3:
                 # minimum temperature
                 # convert back to required length
-                self.H = (np.min(self.results_peak_heating[:12]) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
+                self.H = (np.min(self.results_peak_heating[:8760 if hourly else 12]) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
             elif quadrant == 4:
                 # minimum temperature
                 # convert back to required length
-                self.H = (np.min(self.results_peak_heating[-12:]) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
+                self.H = (np.min(self.results_peak_heating[-8760 if hourly else -12:]) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
             elif quadrant == 10:
                 # over all years
                 # maximum temperature
@@ -1347,8 +1347,8 @@ class Borefield(BaseClass):
                 # convert back to required length
                 self.H = (np.min(self.results_peak_heating) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
 
-            if self.H <= 0:
-                return 0.1
+            if self.H < 0:
+                return 0
 
         return self.H
 

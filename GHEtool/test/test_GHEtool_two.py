@@ -355,5 +355,5 @@ def test_problem_with_gfunction_calc_obj():
     borefield.Rb = 0.2
 
     # size borefield
-    assert np.isclose(borefield.size(), 186.5208)
+    assert np.isclose(borefield.size(), 186.50968468475781)
 

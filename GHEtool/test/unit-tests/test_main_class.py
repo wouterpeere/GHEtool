@@ -455,7 +455,7 @@ def test_size_L2_value_errors():
 
 
 @pytest.mark.parametrize("quadrant, result",
-                         zip([1, 2, 3, 4], [74.55862437702756, 96.8819595625224, 27.20469151215654, 21.935797517893317]))
+                         zip([1, 2, 3, 4], [74.55862437702756, 96.85342542746277, 27.2041541800546, 21.789526435986094]))
 def test_size_L2(quadrant, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
@@ -895,6 +895,7 @@ def test_draw_internals(monkeypatch):
 
 
 def test_load_duration(monkeypatch):
+    borefield = Borefield()
     monkeypatch.setattr(plt, 'show', lambda: None)
     borefield.set_ground_parameters(ground_data_constant)
     borefield.borefield = copy.deepcopy(borefield_gt)
