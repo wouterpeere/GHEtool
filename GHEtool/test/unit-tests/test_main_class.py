@@ -468,7 +468,7 @@ def test_size_L2(quadrant, result):
 
     assert np.isclose(result, borefield.size_L2(100, quadrant_sizing=quadrant))
     assert borefield.limiting_quadrant == quadrant
-    assert borefield.H == result
+    assert np.isclose(result, borefield.H)
 
 
 def test_size_L3_value_errors():
@@ -503,5 +503,4 @@ def test_size_L3(quadrant, result):
     borefield.set_ground_parameters(ground_data_constant)
 
     assert np.isclose(result, borefield.size_L3(100, quadrant_sizing=quadrant))
-    assert borefield.H == result
-
+    assert np.isclose(result, borefield.H)

@@ -81,8 +81,8 @@ def test_error_quadrant():
 
 
 def test_equal_unequal():
-    setup1 = SizingSetup(True, 2, False, True, True)
-    setup2 = SizingSetup(True, 2, False, True, True)
-    setup3 = SizingSetup(True, 2, True, False, True)
+    setup1 = SizingSetup(True, 2, False, True, False)
+    setup2 = SizingSetup(True, 2, False, True, False)
+    setup3 = SizingSetup(True, 2, True, False, False)
     assert setup1 == setup2
     assert not setup2 == setup3
