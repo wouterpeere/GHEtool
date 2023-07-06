@@ -281,7 +281,7 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, 150, 10**6, 10**6,
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, 100, 10**6, 10**6, 70.054, 87.899,
                                                    210.800, 247.186, 325.236, 429.231, name='Optimise load profile 2'))
 
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, 50, 10**6, 10**6, 44.791, 63.8,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, 50, 10**6, 10**6, 44.791, 63.799,
                                                    118.9, 117.804, 417.138, 558.612, name='Optimise load profile 2'))
 
 borefield = Borefield()
