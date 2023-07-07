@@ -56,9 +56,9 @@ def test_optimise(input, result):
     model.optimise_load_profile(depth, SCOP, SEER)
     percentage_heating, percentage_cooling, peak_heating_geo, peak_cooling_geo, peak_heating_ext, peak_cooling_ext = \
         result
-    print(model._percentage_heating, model._percentage_cooling)
-    print(np.max(model.peak_heating), np.max(model.peak_cooling))
-    print(np.max(model.peak_heating_external), np.max(model.peak_cooling_external))
+    # print(model._percentage_heating, model._percentage_cooling)
+    # print(np.max(model.peak_heating), np.max(model.peak_cooling))
+    # print(np.max(model.peak_heating_external), np.max(model.peak_cooling_external))
     assert np.isclose(model._percentage_heating, percentage_heating)
     assert np.isclose(model._percentage_cooling, percentage_cooling)
     assert np.isclose(np.max(model.peak_heating), peak_heating_geo)

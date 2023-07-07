@@ -43,6 +43,8 @@ def borefields_equal(borefield_one, borefield_two) -> bool:
         if borefield_one[i].__dict__ != borefield_two[i].__dict__:
             return False
     return True
+
+
 def test_logging():
     borefield = Borefield()
     assert ghe_logger.level == 20
@@ -134,7 +136,6 @@ def test_create_custom_dataset():
         assert True
 
 
-@pytest.mark.slow
 def test_load_custom_gfunction():
     borefield = Borefield()
     borefield.set_ground_parameters(ground_data_constant)

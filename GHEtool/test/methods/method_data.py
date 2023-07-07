@@ -255,6 +255,8 @@ borefield.set_ground_parameters(GroundFluxTemperature(3, 12))
 borefield.create_rectangular_borefield(10, 12, 6, 6, 110, 4, 0.075)
 borefield.set_Rb(0.2)
 list_of_test_objects.add(SizingObject(borefield, error=ValueError, quadrant=2, name='Cannot size'))
+list_of_test_objects.add(SizingObject(borefield, error_L4=ValueError, quadrant=2, name='Cannot size L4'))
+
 
 data = GroundConstantTemperature(3, 10)
 borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
