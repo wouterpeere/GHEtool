@@ -673,6 +673,13 @@ class GUI(GuiStructure):
         # add dependencies
         self.option_method_rb_calc.add_link_2_show(self.category_fluid_data, on_index=1)
 
+        # for Rb* calculation
+        self.option_fluid_conductivity.change_event(self.update_borehole_thermal_resistance)
+        self.option_fluid_density.change_event(self.update_borehole_thermal_resistance)
+        self.option_fluid_capacity.change_event(self.update_borehole_thermal_resistance)
+        self.option_fluid_viscosity.change_event(self.update_borehole_thermal_resistance)
+        self.option_fluid_mass_flow.change_event(self.update_borehole_thermal_resistance)
+
         # def create_category_pipe_data():
         self.category_pipe_data = Category(page=self.page_borehole_resistance, label=translations.category_pipe_data)
         self.category_pipe_data.activate_graphic_left()
@@ -781,7 +788,6 @@ class GUI(GuiStructure):
         self.option_pipe_borehole_radius_2.change_event(self.update_borehole_thermal_resistance)
         self.option_pipe_distance.change_event(self.update_borehole_thermal_resistance)
         self.option_pipe_roughness.change_event(self.update_borehole_thermal_resistance)
-        self.option_fluid_mass_flow.change_event(self.update_borehole_thermal_resistance)
 
 
         # create categories
