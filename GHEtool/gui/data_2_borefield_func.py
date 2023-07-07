@@ -80,8 +80,7 @@ def data_2_borefield(ds: DataStorage) -> tuple[Borefield, partial[[], None]]:
             borefield.set_hourly_cooling_load(peak_cooling * (1 + 1 / ds.SEER))
 
     # set up the borefield sizing
-    borefield.sizing_setup(H_init=100,
-                           use_constant_Rb=ds.option_method_rb_calc == 0,
+    borefield.sizing_setup(use_constant_Rb=ds.option_method_rb_calc == 0,
                            L2_sizing=ds.option_method_size_depth == 0,
                            L3_sizing=ds.option_method_size_depth == 1,
                            L4_sizing=ds.option_method_size_depth == 2)

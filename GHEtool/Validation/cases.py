@@ -134,7 +134,7 @@ def check_custom_datafile():
 
         borefield.size(100, L3_sizing=True)
         print(f'correct answer: {correct_answers[i-1]}; calculated '
-              f'answer: {round(borefield.H,3)}; error: '
+              f'answer: {round(borefield.H,2)}; error: '
               f'{round(abs(1-borefield.H/correct_answers[i - 1])*100,4)} %')
         # assert abs(1-borefield.H/correct_answers[i - 1]) <= 0.002
 

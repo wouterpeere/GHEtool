@@ -45,6 +45,14 @@ def borefields_equal(borefield_one, borefield_two) -> bool:
     return True
 
 
+def test_set_investment_cost():
+    borefield = Borefield()
+    borefield.set_investment_cost()
+    assert borefield.cost_investment == Borefield.DEFAULT_INVESTMENT
+    borefield.set_investment_cost([0, 39])
+    assert borefield.cost_investment == [0, 39]
+
+
 def test_logging():
     borefield = Borefield()
     assert ghe_logger.level == 20
@@ -150,14 +158,6 @@ def test_load_custom_gfunction():
     assert borefield.custom_gfunction is None
     borefield.load_custom_gfunction("./test.gvalues")
     assert borefield.custom_gfunction == dataset
-
-
-def test_set_investment_cost():
-    borefield = Borefield()
-    borefield.set_investment_cost()
-    assert borefield.cost_investment == Borefield.DEFAULT_INVESTMENT
-    borefield.set_investment_cost([0, 39])
-    assert borefield.cost_investment == [0, 39]
 
 
 def test_set_length_peak():
@@ -318,7 +318,7 @@ def test_Tg():
 @pytest.mark.parametrize("ground_data, constant_Rb, result",
                          zip([ground_data_constant, data_ground_flux, ground_data_constant, data_ground_flux],
                              [True, True, False, False],
-                             [30.924434615896764, 30.245606119498383, 30.924434615896764, 30.245606119498383]))
+                             [39.994203323480214, 38.733665022510635, 30.924434615896764, 30.245606119498383]))
 def test_Ahmadfard(ground_data, constant_Rb, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
@@ -339,7 +339,7 @@ def test_Ahmadfard(ground_data, constant_Rb, result):
 @pytest.mark.parametrize("ground_data, constant_Rb, result",
                          zip([ground_data_constant, data_ground_flux, ground_data_constant, data_ground_flux],
                              [True, True, False, False],
-                             [38.53491016745154, 37.10078260823372, 38.53491016745154, 37.100782551185]))
+                             [48.76844845370183, 46.593433439950985, 38.53491016745154, 37.100782551185]))
 def test_Carcel(ground_data, constant_Rb, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
@@ -366,8 +366,8 @@ def test_set_sizing_setup():
     assert borefield._sizing_setup == sizing_setup_backup
     assert borefield.H_init == H_init_backup
     # set sizing_setup
-    test = SizingSetup(True, 4, False, True, False)
-    test2 = SizingSetup(False, 3, False, False, True)
+    test = SizingSetup(4, False, True, False)
+    test2 = SizingSetup(3, False, False, True)
     borefield.sizing_setup(120, True, 4, False, True, False)
     assert borefield.H_init == 120
     assert borefield._sizing_setup == test
@@ -548,9 +548,12 @@ def test_size_L4():
     # quadrant 4
     borefield.borefield = copy.deepcopy(borefield_gt)
     borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
-    assert np.isclose(174.23648328808213, borefield.size_L4(100, quadrant_sizing=4))
+    # to increase coverage
+    borefield.sizing_setup(L4_sizing=True)
+    assert np.isclose(174.23648328808213, borefield.size(100, quadrant_sizing=4))
     assert np.isclose(174.23648328808213, borefield.H)
     assert borefield.calculate_quadrant() == 4
+
 
 
 def test_set_investment_cost():

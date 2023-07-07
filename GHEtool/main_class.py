@@ -34,7 +34,7 @@ class Borefield(BaseClass):
 
     HOURLY_LOAD_ARRAY: np.ndarray = np.arange(0, 8761, UPM).astype(np.uint32)
 
-    __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'H_init', 'ty', 'tm', 'borehole',\
+    __slots__ = 'baseload_heating', 'baseload_cooling', 'H', 'ty', 'tm', 'borehole',\
                 'hourly_heating_load', 'hourly_cooling_load', 'number_of_boreholes', '_borefield', 'cost_investment', \
                 'th', 'Tf_max', 'Tf_min', 'limiting_quadrant', 'monthly_load', 'monthly_load_heating', \
                 'monthly_load_cooling', 'peak_heating', 'qa', 'Tf', 'qm', 'qh', 'qpm', 'tcm', 'tpm', \
@@ -127,7 +127,6 @@ class Borefield(BaseClass):
         self.use_precalculated_data: bool = True
 
         self.monthly_load = np.array([])
-        self.H_init: float = 0.
         self.custom_gfunction: CustomGFunction = custom_gfunction
         self.gfunction_calculation_object: GFunction = GFunction()
         self.example_active_passive: bool = False
@@ -529,12 +528,12 @@ class Borefield(BaseClass):
         Rb : float
             Equivalent borehole thermal resistance [mK/W]
         """
-        return self.borehole._Rb
+        return self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s)
 
     @Rb.setter
     def Rb(self, Rb: float) -> None:
         """
-        This function sets the equivalent borehole thermal resistance.
+        This function sets the constant equivalent borehole thermal resistance.
 
         Parameters
         ----------
@@ -631,7 +630,7 @@ class Borefield(BaseClass):
 
     def set_Rb(self, Rb: float) -> None:
         """
-        This function sets the equivalent borehole thermal resistance.
+        This function sets the constant equivalent borehole thermal resistance.
 
         Parameters
         ----------
@@ -642,7 +641,7 @@ class Borefield(BaseClass):
         -------
         None
         """
-        self.borehole._Rb = Rb
+        self.borehole.Rb = Rb
 
     def set_max_ground_temperature(self, temp: float) -> None:
         """
@@ -687,36 +686,6 @@ class Borefield(BaseClass):
         if temp >= self.Tf_max:
             raise ValueError(f'The minimum temperature {temp} is lower than the maximum temperature {self.Tf_max}')
         self.Tf_min: float = temp
-
-    @property
-    def _Rb(self) -> float:
-        """
-        This function gives back the equivalent borehole resistance.
-        If self._sizing_setup.use_constant_Rb is False, it calculates the equivalent borehole thermal resistance.
-
-        Returns
-        -------
-        Rb : float
-            Equivalent borehole thermal resistance [mK/W]
-        """
-        # use a constant Rb*
-        if not self.borehole.fluid_data.check_values():
-            return self.Rb
-
-        # calculate Rb*
-        return self.calculate_Rb()
-
-    def calculate_Rb(self) -> float:
-        """
-        This function calculates the equivalent borehole thermal resistance by calling the calculate_Rb
-        function of the borehole class.
-
-        Returns
-        -------
-        Rb : float
-            Equivalent borehole thermal resistance [mk/W]
-        """
-        return self.borehole.calculate_Rb(self.H, self.D, self.r_b, self.ground_data.k_s)
 
     def _Tg(self, H: float = None) -> float:
         """
@@ -773,7 +742,7 @@ class Borefield(BaseClass):
             Rm = (gfunct_uniform_T[1] - gfunct_uniform_T[0]) / (2 * pi * self.ground_data.k_s)
             Rd = (gfunct_uniform_T[0]) / (2 * pi * self.ground_data.k_s)
             # calculate the total borehole length
-            L = (self.qa * Ra + self.qm * Rm + self.qh * Rd + self.qh * self._Rb) / abs(self.Tf - self._Tg())
+            L = (self.qa * Ra + self.qm * Rm + self.qh * Rd + self.qh * self.Rb) / abs(self.Tf - self._Tg())
             # updating the depth values
             H_prev = self.H
             self.H = L / self.number_of_boreholes
@@ -817,7 +786,7 @@ class Borefield(BaseClass):
             Rh = (gfunc_uniform_T[0]) / (2 * pi * self.ground_data.k_s)
 
             # calculate the total length
-            L = (self.qh * self._Rb + self.qh * Rh + self.qm * Rcm + self.qpm * Rpm) / abs(self.Tf - self._Tg())
+            L = (self.qh * self.Rb + self.qh * Rh + self.qm * Rcm + self.qpm * Rpm) / abs(self.Tf - self._Tg())
 
             # updating the depth values
             H_prev = self.H
@@ -871,11 +840,12 @@ class Borefield(BaseClass):
             self._sizing_setup = sizing_setup
             return
 
-        self._sizing_setup = SizingSetup(use_constant_Rb=use_constant_Rb,
-                                         quadrant_sizing=quadrant_sizing,
+        self._sizing_setup = SizingSetup(quadrant_sizing=quadrant_sizing,
                                          L2_sizing=L2_sizing,
                                          L3_sizing=L3_sizing,
                                          L4_sizing=L4_sizing)
+        if not use_constant_Rb is None:
+            self.borehole.use_constant_Rb = use_constant_Rb
 
     def size(self, H_init: float = None, use_constant_Rb: bool = None, L2_sizing: bool = None,
              L3_sizing: bool = None, L4_sizing: bool = None, quadrant_sizing: int = None) -> float:
@@ -915,6 +885,9 @@ class Borefield(BaseClass):
         ValueError
             ValueError when no ground data is provided
         """
+        if not isinstance(use_constant_Rb, bool) and not use_constant_Rb is None:
+            raise ValueError('Please check your inputs for the use_constant_Rb argument!')
+
         # check ground data
         if not self.ground_data.check_values():
             raise ValueError("Please provide ground data.")
@@ -925,11 +898,13 @@ class Borefield(BaseClass):
 
         # make backup of initial parameter states
         self._sizing_setup.make_backup()
+        use_constant_Rb_backup = self.borehole.use_constant_Rb
 
         # run the sizing setup
-        self._sizing_setup.update_variables(use_constant_Rb=use_constant_Rb,
-                                            L2_sizing=L2_sizing, L3_sizing=L3_sizing, L4_sizing=L4_sizing,
+        self._sizing_setup.update_variables(L2_sizing=L2_sizing, L3_sizing=L3_sizing, L4_sizing=L4_sizing,
                                             quadrant_sizing=quadrant_sizing)
+        if not use_constant_Rb is None:
+            self.borehole.use_constant_Rb = use_constant_Rb
 
         # sizes according to the correct algorithm
         if self._sizing_setup.L2_sizing:
@@ -941,6 +916,7 @@ class Borefield(BaseClass):
 
         # reset initial parameters
         self._sizing_setup.restore_backup()
+        self.borehole.use_constant_Rb = use_constant_Rb_backup
 
         # check if the field is not shallow
         if depth < self.THRESHOLD_WARNING_SHALLOW_FIELD:
@@ -993,7 +969,7 @@ class Borefield(BaseClass):
             return size_min_temp
         raise ValueError("No solution can be found due to the temperature gradient. Please increase the field size.")
 
-    def size_L2(self, H_init: float, quadrant_sizing: int = 0) -> float:
+    def size_L2(self, H_init: float = None, quadrant_sizing: int = 0) -> float:
         """
         This function sizes the  of the given configuration according to the methodology explained in
         (Peere et al., 2021) [#PeereBS]_, which is a L2 method. When quadrant sizing is other than 0, it sizes the field based on
@@ -1024,7 +1000,7 @@ class Borefield(BaseClass):
             raise ValueError(f'Quadrant {quadrant_sizing} does not exist.')
 
         # initiate with a given depth
-        self.H: float = H_init
+        self.H: float = H_init if H_init is not None else self.H_init
 
         def size_quadrant1():
             self._calculate_first_year_params(False)  # calculate parameters
@@ -1089,7 +1065,7 @@ class Borefield(BaseClass):
 
         return self.H
 
-    def size_L3(self, H_init: float, quadrant_sizing: int = 0) -> float:
+    def size_L3(self, H_init: float = None, quadrant_sizing: int = 0) -> float:
         """
         This function sizes the borefield based on a monthly (L3) method.
 
@@ -1118,7 +1094,7 @@ class Borefield(BaseClass):
             raise ValueError(f'Quadrant {quadrant_sizing} does not exist.')
 
         # initiate with a given depth
-        self.H: float = H_init
+        self.H: float = H_init if H_init is not None else self.H_init
 
         if quadrant_sizing != 0:
             # size according to a specific quadrant
@@ -1144,7 +1120,7 @@ class Borefield(BaseClass):
 
         return self.H
 
-    def size_L4(self, H_init: float, quadrant_sizing: int = 0) -> float:
+    def size_L4(self, H_init: float = None, quadrant_sizing: int = 0) -> float:
         """
         This function sizes the borefield based on an hourly (L4) sizing methodology.
 
@@ -1176,7 +1152,7 @@ class Borefield(BaseClass):
         self._check_hourly_load()
 
         # initiate with a given depth
-        self.H: float = H_init
+        self.H: float = H_init if H_init is not None else self.H_init
 
         if quadrant_sizing != 0:
             # size according to a specific quadrant
@@ -1819,15 +1795,9 @@ class Borefield(BaseClass):
         None
         """
 
-        H_backup = self.H
-        if H is not None:
-            self.H = H
         # set Rb* value
-        self.Rb = self._Rb
-
-        self.H = H_backup
-
-        H = self.H if H is None else H
+        Rb = self.borehole.get_Rb(H if H is not None else self.H, self.D, self.r_b, self.ground_data.k_s)
+        H = H if H is not None else self.H
 
         if not hourly:
             # making a numpy array of the monthly balance (self.monthly_load) for a period of self.simulation_period years
@@ -1859,15 +1829,15 @@ class Borefield(BaseClass):
             # now the Tf will be calculated based on
             # Tf = Tb + Q * R_b
             results_month_cooling = Tb + np.tile(self.monthly_load_cooling, self.simulation_period) * 1000 \
-                              * (self.Rb / self.number_of_boreholes / H)
+                              * (Rb / self.number_of_boreholes / H)
             results_month_heating = Tb - np.tile(self.monthly_load_heating, self.simulation_period) * 1000 \
-                              * (self.Rb / self.number_of_boreholes / H)
+                              * (Rb / self.number_of_boreholes / H)
 
             # extra summation if the g-function value for the peak is included
             results_peak_cooling = results_month_cooling + np.tile(self.peak_cooling - self.monthly_load_cooling, self.simulation_period) * 1000 \
-                                     * (g_value_peak_cooling / self.ground_data.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / H
+                                     * (g_value_peak_cooling / self.ground_data.k_s / 2 / pi + Rb) / self.number_of_boreholes / H
             results_peak_heating = results_month_heating - np.tile(self.peak_heating - self.monthly_load_heating, self.simulation_period) * 1000 \
-                                   * (g_value_peak_heating / self.ground_data.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / H
+                                   * (g_value_peak_heating / self.ground_data.k_s / 2 / pi + Rb) / self.number_of_boreholes / H
 
             # save temperatures under variable
             self.results_peak_heating = results_peak_heating
@@ -1907,7 +1877,7 @@ class Borefield(BaseClass):
             self.Tb = Tb
             # now the Tf will be calculated based on
             # Tf = Tb + Q * R_b
-            temperature_result = Tb + hourly_load * 1000 * (self.Rb / self.number_of_boreholes / H)
+            temperature_result = Tb + hourly_load * 1000 * (Rb / self.number_of_boreholes / H)
 
             # reset other variables
             self.results_peak_heating = temperature_result
@@ -1970,7 +1940,6 @@ class Borefield(BaseClass):
             """
             # set the correct depth of the borefield
             self._update_borefield_depth(H=H)
-
             return self.gfunction_calculation_object.calculate(time_value, self.borefield, self.ground_data.alpha)
 
         ## 1 bypass any possible precalculated g-functions
@@ -2243,11 +2212,10 @@ class Borefield(BaseClass):
 
         # since the depth does not change, the Rb* value is constant
         # set to use a constant Rb* value but save the initial parameters
-        Rb_backup = self.Rb
-        if not self._sizing_setup.use_constant_Rb:
-            self.Rb = self.calculate_Rb()
-        use_constant_Rb_backup = self._sizing_setup.use_constant_Rb
-        self._sizing_setup.use_constant_Rb = True
+        Rb_backup = self.borehole.Rb
+        use_constant_Rb_backup = self.borehole.use_constant_Rb
+        self.Rb = self.borehole.get_Rb(depth, self.D, self.r_b, self.ground_data.k_s)
+
         # check if hourly profile is given
         self._check_hourly_load()
         # load hourly heating and cooling load and convert it to geothermal loads
@@ -2332,7 +2300,7 @@ class Borefield(BaseClass):
 
         # restore the initial parameters
         self.Rb = Rb_backup
-        self._sizing_setup.use_constant_Rb = use_constant_Rb_backup
+        self.borehole.use_constant_Rb = use_constant_Rb_backup
 
         if print_results:
             # print results

@@ -17,12 +17,43 @@ class Borehole(BaseClass):
     borehole thermal resistance and contains a fluid and pipe class object.
     """
 
-    __slots__ = '_fluid_data', '_pipe_data', '_Rb'
+    __slots__ = '_fluid_data', '_pipe_data', '_Rb', 'use_constant_Rb'
 
     def __init__(self):
         self._fluid_data = FluidData()
         self._pipe_data = PipeData()
-        self._Rb = 0.12
+        self._Rb: float = 0.12
+        self.use_constant_Rb: bool = True
+
+    @property
+    def Rb(self) -> float:
+        """
+        This returns the constant, equivalent borehole thermal resistance [mK/W].
+
+        Returns
+        -------
+        Rb* : float
+            Equivalent borehole thermal resistance [mK/W]
+        """
+        return self._Rb
+
+    @Rb.setter
+    def Rb(self, Rb: float) -> None:
+        """
+        This function sets the constant equivalent borehole thermal resistance [mK/W].
+        Futhermore it sets the use_constant_Rb to True.
+
+        Parameters
+        ----------
+        Rb : float
+            Equivalent borehole thermal resistance [mK/W]
+
+        Returns
+        -------
+        None
+        """
+        self._Rb = Rb
+        self.use_constant_Rb = True
 
     @property
     def fluid_data(self) -> FluidData:
@@ -39,10 +70,13 @@ class Borehole(BaseClass):
     def fluid_data(self, fluid_data: FluidData) -> None:
         """
         This function sets the fluid data.
+        Futhermore it sets the use_constant_Rb to False (if the pipe data is available) so the next time the Rb*
+        is calculated dynamically. If this is not wanted, set the use_constant_Rb attribute back to True.
 
         Parameters
         ----------
         fluid_data : FluidData
+            Fluid data
 
         Returns
         -------
@@ -51,17 +85,19 @@ class Borehole(BaseClass):
         self._fluid_data = fluid_data
         if self.pipe_data.check_values():
             self.calculate_fluid_thermal_resistance()
+            self.use_constant_Rb = False
 
     @fluid_data.deleter
     def fluid_data(self) -> None:
         """
-        This function resets the fluid data object.
+        This function resets the fluid data object and sets the use_constant_Rb to True.
 
         Returns
         -------
         None
         """
         self._fluid_data = FluidData()
+        self.use_constant_Rb = True
 
     @property
     def pipe_data(self) -> PipeData:
@@ -78,10 +114,13 @@ class Borehole(BaseClass):
     def pipe_data(self, pipe_data: PipeData) -> None:
         """
         This function sets the pipe data.
+        Futhermore it sets the use_constant_Rb to False (if the pipe data is available) so the next time the Rb*
+        is calculated dynamically. If this is not wanted, set the use_constant_Rb attribute back to True.
 
         Parameters
         ----------
         pipe_data : PipeData
+            Pipe data
 
         Returns
         -------
@@ -91,17 +130,19 @@ class Borehole(BaseClass):
         self.pipe_data.calculate_pipe_thermal_resistance()
         if self.fluid_data.check_values():
             self.calculate_fluid_thermal_resistance()
+            self.use_constant_Rb = False
 
     @pipe_data.deleter
     def pipe_data(self) -> None:
         """
-        This function resets the fluid data object.
+        This function resets the pipe data object and sets the use_constant_Rb to True.
 
         Returns
         -------
         None
         """
         self._pipe_data = PipeData()
+        self.use_constant_Rb = True
 
     def calculate_Rb(self, H: float, D: float, r_b: float, k_s: float) -> float:
         """
@@ -160,6 +201,32 @@ class Borehole(BaseClass):
                                                                         self.fluid_data.Cp,
                                                                         self.pipe_data.epsilon)
         self.fluid_data.R_f: float = 1. / (self.fluid_data.h_f * 2 * pi * self.pipe_data.r_in)
+
+    def get_Rb(self, H: float, D: float, r_b: float, k_s: float) -> float:
+        """
+        This function returns the equivalent borehole thermal resistance.
+        If use_constant_Rb is True, self._Rb is returned, otherwise the resistance is calculated.
+
+        Parameters
+        ----------
+        H : float
+            Borehole depth [m]
+        D : float
+            Borehole burial depth [m]
+        r_b : float
+            Borehole radius [m]
+        k_s : float
+            Ground thermal conductivity [mk/W]
+
+        Returns
+        -------
+        Rb* : float
+            Equivalent borehole thermal resistance [mK/W]
+        """
+        if self.use_constant_Rb:
+            return self.Rb
+
+        return self.calculate_Rb(H, D, r_b, k_s)
 
     def __eq__(self, other):
         if not isinstance(other, Borehole):

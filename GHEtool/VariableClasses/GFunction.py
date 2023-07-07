@@ -174,7 +174,7 @@ class GFunction:
                 return gfunc_interpolated
 
             # calculate the g-values for uniform borehole wall temperature
-            gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options).gFunc
+            gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options, method=self.options['method']).gFunc
 
             # store the calculated g-values
             self.set_new_calculated_data(time_values, depth, gfunc_calculated, borefield, alpha)

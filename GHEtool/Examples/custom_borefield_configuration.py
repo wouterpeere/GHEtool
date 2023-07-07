@@ -61,7 +61,7 @@ def custom_borefield_configuration():
     borefield.create_custom_dataset()
 
     # size borefield
-    depth = borefield.size(100)
+    depth = borefield.size()
     print("The borehole depth is: ", depth, "m")
 
     # print imbalance

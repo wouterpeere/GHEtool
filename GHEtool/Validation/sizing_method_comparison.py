@@ -77,7 +77,7 @@ def sizing_method_comparison():
         borefield.set_baseload_heating(monthly_load_heating_array[i])
         borefield.set_peak_cooling(peak_load_cooling_array[i])
         borefield.set_peak_heating(peak_load_heating_array[i])
-        results_L2[i] = borefield.size(100, L2_sizing=True)
+        results_L2[i] = borefield.size(L2_sizing=True)
     end_L2 = time.time()
 
     # size according to L3 method
@@ -87,7 +87,7 @@ def sizing_method_comparison():
         borefield.set_baseload_heating(monthly_load_heating_array[i])
         borefield.set_peak_cooling(peak_load_cooling_array[i])
         borefield.set_peak_heating(peak_load_heating_array[i])
-        results_L3[i] = borefield.size(100, L3_sizing=True)
+        results_L3[i] = borefield.size(L3_sizing=True)
     end_L3 = time.time()
 
     print("Time for sizing according to L2:", end_L2 - start_L2, "s (or ", round((end_L2 - start_L2) / number_of_iterations * 1000, 3), "ms/sizing)")

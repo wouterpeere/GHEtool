@@ -14,16 +14,14 @@ class SizingSetup(BaseClass):
     This class contains all the settings related to the sizing options.
     """
 
-    __slots__ = '_L2_sizing', '_L3_sizing', '_L4_sizing', 'use_constant_Rb', 'quadrant_sizing', '_backup'
+    __slots__ = '_L2_sizing', '_L3_sizing', '_L4_sizing', 'quadrant_sizing', '_backup'
 
-    def __init__(self, use_constant_Rb: bool = None, quadrant_sizing: int = 0,
+    def __init__(self, quadrant_sizing: int = 0,
                  L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None):
         """
 
         Parameters
         ----------
-        use_constant_Rb : bool
-            True if a constant borehole equivalent resistance (Rb*) value should be used
         quadrant_sizing : int
             Differs from 0 when a sizing in a certain quadrant is desired.
             Quadrants are developed by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]_
@@ -43,7 +41,6 @@ class SizingSetup(BaseClass):
         self._L2_sizing: bool = True
         self._L3_sizing: bool = False
         self._L4_sizing: bool = False
-        self.use_constant_Rb: bool = True
         self.quadrant_sizing: int = 0
         self._backup: SizingSetup = None
 

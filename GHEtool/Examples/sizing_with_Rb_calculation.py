@@ -83,7 +83,7 @@ def sizing_with_Rb():
     borefield.sizing_setup(use_constant_Rb=True)
 
     # calculate the Rb* value
-    borefield.Rb = borefield.calculate_Rb()
+    borefield.Rb = borefield.borehole.calculate_Rb(100, 1, 0.075, data.k_s)
 
     start_Rb_constant = time.time()
     for i in range(number_of_iterations):
@@ -91,7 +91,7 @@ def sizing_with_Rb():
         borefield.set_baseload_heating(monthly_load_heating_array[i])
         borefield.set_peak_cooling(peak_load_cooling_array[i])
         borefield.set_peak_heating(peak_load_heating_array[i])
-        results_Rb_static[i] = borefield.size(100)
+        results_Rb_static[i] = borefield.size()
     end_Rb_constant = time.time()
 
     # size with a dynamic Rb* value
@@ -103,7 +103,7 @@ def sizing_with_Rb():
         borefield.set_baseload_heating(monthly_load_heating_array[i])
         borefield.set_peak_cooling(peak_load_cooling_array[i])
         borefield.set_peak_heating(peak_load_heating_array[i])
-        results_Rb_dynamic[i] = borefield.size(100)
+        results_Rb_dynamic[i] = borefield.size()
     end_Rb_dynamic = time.time()
     print(results_Rb_dynamic[1])
 
@@ -128,7 +128,7 @@ def sizing_with_Rb():
     borefield.sizing_setup(use_constant_Rb=True)
 
     # calculate the Rb* value
-    borefield.Rb = borefield.calculate_Rb()
+    borefield.Rb = borefield.borehole.calculate_Rb(100, 1, 0.075, data.k_s)
 
     start_Rb_constant = time.time()
     for i in range(number_of_iterations):
@@ -136,7 +136,7 @@ def sizing_with_Rb():
         borefield.set_baseload_heating(monthly_load_heating_array[i])
         borefield.set_peak_cooling(peak_load_cooling_array[i])
         borefield.set_peak_heating(peak_load_heating_array[i])
-        results_Rb_static[i] = borefield.size(100)
+        results_Rb_static[i] = borefield.size()
     end_Rb_constant = time.time()
 
     # size with a dynamic Rb* value
@@ -148,7 +148,7 @@ def sizing_with_Rb():
         borefield.set_baseload_heating(monthly_load_heating_array[i])
         borefield.set_peak_cooling(peak_load_cooling_array[i])
         borefield.set_peak_heating(peak_load_heating_array[i])
-        results_Rb_dynamic[i] = borefield.size(100)
+        results_Rb_dynamic[i] = borefield.size()
     end_Rb_dynamic = time.time()
 
     print("These are the results when an accurate constant Rb* value is used.")
