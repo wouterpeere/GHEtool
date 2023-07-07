@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Added
 - Extra warning message if one wants to load a GHEtool file that was created with a newer version.
+- New class of GroundData: GroundTemperatureGradient added (issue #145).
 
 ## Changed
 - GUI was moved to a seperate project: ScenarioGUI.

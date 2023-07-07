@@ -82,9 +82,9 @@
     ""
    ],
    "option_unit_data": 1,
-   "geo_load": 1,
-   "SCOP": 4.5,
-   "SEER": 20.0,
+   "geo_load": 0,
+   "SCOP": 4.0,
+   "SEER": 3.0,
    "option_hp_jan": 161.0,
    "option_cp_jan": 0.0,
    "option_hl_jan": 46510.0,
@@ -151,7 +151,7 @@
     "English"
    ],
    "option_toggle_buttons": 1,
-   "option_n_threads": 1,
+   "option_n_threads": 2,
    "option_auto_saving": 0,
    "option_figure_background": [
     0,
@@ -264,9 +264,9 @@
    "option_single_column_text": "",
    "option_single_column": -1,
    "option_unit_data": 1,
-   "geo_load": 1,
-   "SCOP": 4.5,
-   "SEER": 20.0,
+   "geo_load": 0,
+   "SCOP": 4.0,
+   "SEER": 3.0,
    "option_hp_jan": 161.0,
    "option_cp_jan": 0.0,
    "option_hl_jan": 46510.0,
@@ -330,7 +330,7 @@
    "option_language_text": "English",
    "option_language": 0,
    "option_toggle_buttons": 1,
-   "option_n_threads": 1,
+   "option_n_threads": 2,
    "option_auto_saving": 0,
    "option_figure_background": [
     0,

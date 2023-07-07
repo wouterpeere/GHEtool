@@ -10,6 +10,7 @@ from GHEtool.gui.data_2_borefield_func import data_2_borefield
 from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
 from GHEtool.gui.gui_classes.translation_class import Translations
 from GHEtool.gui.gui_structure import GUI, load_data_GUI
+from ScenarioGUI.gui_classes.gui_structure_classes import ListBox
 from pytest import raises
 
 setrecursionlimit(1500)
@@ -174,7 +175,6 @@ def test_backward_compatibility(qtbot):
             if isinstance(getattr(ds_old, option), (str, bool)):
                 assert getattr(ds_old, option) == getattr(ds_new, option)
                 continue
-
 
     # test error message for loading a file from a newer GHEtool version.
     main_window_new = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
@@ -436,7 +436,7 @@ def test_bug_when_opening_scenarios_which_have_autosave_enabled(qtbot):
     main_window.list_widget_scenario.setCurrentRow(0)
     ds_new = main_window.list_ds[0]
     for option in ds_new.list_options_aims:
-        if isinstance(option, Listbox):
+        if isinstance(option, ListBox):
             pass
         if isinstance(getattr(ds_old, option), (int, float)):
             assert np.isclose(getattr(ds_old, option), getattr(ds_new, option))

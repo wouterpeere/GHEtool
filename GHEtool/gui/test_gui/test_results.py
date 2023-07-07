@@ -106,6 +106,7 @@ def test_temp_profile_ground_data(qtbot):
     r_b = round_down(main_window.gui_structure.option_constant_rb.get_value() * 1.5, 4)
 
     gs = main_window.gui_structure
+    gs.option_temperature_profile_hourly.set_value(0)
 
     gs.aim_temp_profile.widget.click() if not gs.aim_temp_profile.widget.isChecked() else None
 
@@ -146,6 +147,7 @@ def test_temp_profile_temp_gradient(qtbot):
     main_window.add_scenario()
 
     gs = main_window.gui_structure
+    gs.option_temperature_profile_hourly.set_value(0)
 
     k_s = gs.option_conductivity.get_value()
     depth = gs.option_depth.get_value()
