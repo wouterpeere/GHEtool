@@ -358,6 +358,34 @@ class _LoadData(BaseClass, ABC):
             time_L4 = 3600 * np.arange(1, 8760 * self.simulation_period + 1, dtype=np.float32)
         return time_L4
 
+    @staticmethod
+    def get_month_index(peak_load, avg_load) -> int:
+        """
+        This function calculates and returns the month index (i.e. the index of the month
+        in which the field should be sized). It does so by taking 1) the month with the highest peak load.
+        2) if all the peak loads are the same, it takes the month with the highest average load
+        3) if all average loads are the same, it takes the last month
+
+        Parameters
+        ----------
+        peak_load : np.ndarray
+            array with the peak loads [kW]
+        avg_load : np.ndarray
+            array with the monthly average loads [kW]
+
+        Returns
+        -------
+        month_index : int
+            0 = jan, 1 = feb ...
+        """
+        # check if all peak loads are equal
+        if not np.all(peak_load == peak_load[0]):
+            return np.where(peak_load == np.max(peak_load))[0][-1]
+
+        # if the average load is not constant, the month with the highest average load is chosen
+        # if it is constant, the last month is returned
+        return np.where(avg_load == np.max(avg_load))[0][-1]
+
     def _calculate_last_year_params(self, HC: bool) -> tuple:
         """
         This function calculates the parameters for the sizing based on the last year of operation.
@@ -384,13 +412,9 @@ class _LoadData(BaseClass, ABC):
             th = self.peak_heating_duration
 
             # Select month with the highest peak load and take both the peak and average load from that month
-            if np.max(self.peak_heating) != np.average(self.peak_heating):
-                month_index = np.where(self.peak_heating == np.max(self.peak_heating))[0][0]
-            else:
-                # if the peak is constant in all months, then the maximum of the baseload month is chosen
-                month_index = np.where(self.baseload_heating_power == np.max(self.baseload_heating_power))[0][0]
+            month_index = self.get_month_index(self.peak_heating, self.baseload_heating_power)
             qm = self.monthly_average_load[month_index] * 1000.
-            qh = np.max(self.peak_heating) * 1000.
+            qh = self.max_peak_heating * 1000.
 
             # correct signs
             qm = -qm
@@ -403,13 +427,9 @@ class _LoadData(BaseClass, ABC):
             th = self.peak_cooling_duration
 
             # Select month with the highest peak load and take both the peak and average load from that month
-            if np.max(self.peak_cooling) != np.average(self.peak_cooling):
-                month_index = np.where(self.peak_cooling == np.max(self.peak_cooling))[0][0]
-            else:
-                # if the peak is constant in all months, then the maximum of the baseload month is chosen
-                month_index = np.where(self.baseload_cooling_power == np.max(self.baseload_cooling_power))[0][0]
+            month_index = self.get_month_index(self.peak_cooling, self.baseload_cooling_power)
             qm = self.monthly_average_load[month_index] * 1000.
-            qh = np.max(self.peak_cooling) * 1000.
+            qh = self.max_peak_cooling * 1000.
 
         return th, qh, qm, qa
 
@@ -439,13 +459,8 @@ class _LoadData(BaseClass, ABC):
             th = self.peak_heating_duration
 
             # Select month with the highest peak load and take both the peak and average load from that month
-            if np.max(self.peak_heating) != np.average(self.peak_heating):
-                month_index = np.where(self.peak_heating == np.max(self.peak_heating))[0][0]
-            else:
-                # if the peak is constant in all months, then the maximum of the baseload month is chosen
-                month_index = np.where(self.baseload_heating_power == np.max(self.baseload_heating_power))[0][0]
-
-            qh = np.max(self.peak_heating) * 1000.
+            month_index = self.get_month_index(self.peak_heating, self.baseload_heating_power)
+            qh = self.max_peak_heating * 1000.
 
             qm = self.monthly_average_load[month_index] * 1000.
 
@@ -462,13 +477,8 @@ class _LoadData(BaseClass, ABC):
             th = self.peak_cooling_duration
 
             # Select month with the highest peak load and take both the peak and average load from that month
-            if np.max(self.peak_cooling) != np.average(self.peak_cooling):
-                month_index = np.where(self.peak_cooling == np.max(self.peak_cooling))[0][0]
-            else:
-                # if the peak is constant in all months, then the maximum of the baseload month is chosen
-                month_index = np.where(self.baseload_cooling_power == np.max(self.baseload_cooling_power))[0][0]
-
-            qh = np.max(self.peak_cooling) * 1000.
+            month_index = self.get_month_index(self.peak_cooling, self.baseload_cooling_power)
+            qh = self.max_peak_cooling * 1000.
 
             qm = self.monthly_average_load[month_index] * 1000.
             if month_index < 1:

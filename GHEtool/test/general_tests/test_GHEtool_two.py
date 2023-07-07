@@ -87,11 +87,11 @@ def test_different_heating_cooling_peaks():
     borefield.set_max_ground_temperature(16)  # maximum temperature
     borefield.set_min_ground_temperature(0)  # minimum temperature
     borefield.set_length_peak_cooling(8)
-    assert borefield.length_peak_cooling == 8
-    assert borefield.length_peak_heating == 6
+    assert borefield.load.peak_cooling_duration == 8 * 3600
+    assert borefield.load.peak_heating_duration == 6 * 3600
     assert np.isclose(borefield.size(), 94.05270927679376)
-    assert borefield.length_peak_cooling == 8
-    assert borefield.length_peak_heating == 6
+    assert borefield.load.peak_cooling_duration == 8 * 3600
+    assert borefield.load.peak_heating_duration == 6 * 3600
 
 
 def test_stuck_in_loop():
@@ -114,8 +114,8 @@ def test_stuck_in_loop():
     borefield.size()
     borefield.set_length_peak_cooling(8)
     borefield.set_length_peak_heating(8)
-    assert borefield.length_peak_cooling == 8
-    assert borefield.length_peak_heating == 8
+    assert borefield.load.peak_cooling_duration == 8
+    assert borefield.load.peak_heating_duration == 8
     borefield.size()
     assert np.isclose(borefield.size(), 100.91784885721547)
     borefield.set_length_peak_heating(7)
@@ -195,13 +195,13 @@ def test_no_possible_solution():
     # limited by heating, but no problem for cooling
     borefield.set_max_ground_temperature(15)
     borefield.set_min_ground_temperature(2)
-    borefield.set_baseload_heating(borefield.baseload_heating * 5)
+    borefield.set_baseload_heating(borefield.load.baseload_heating * 5)
     borefield.size()
 
     # limited by heating, but problem for cooling --> no solution
     borefield.set_max_ground_temperature(14)
     borefield.set_min_ground_temperature(2)
-    borefield.set_baseload_heating(borefield.baseload_heating * 5)
+    borefield.set_baseload_heating(borefield.load.baseload_heating * 5)
     try:
         borefield.size(L3_sizing=True)
     except ValueError:

@@ -3,7 +3,7 @@ import pytest
 import numpy as np
 
 from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute
-from GHEtool.test.test_GHEtool_two import load_case
+from GHEtool.Validation.cases import load_case
 
 
 def test_checks():
@@ -170,3 +170,19 @@ def test_params_first_year():
                           (21600.0, 15768000.0, 18396000.0, 240000.0, -2066.536203522503, 65753.42465753425))
     assert np.array_equal(load._calculate_first_year_params(True),
                           (21600.0, 0, 2628000.0, 160000.0, 0, 25753.424657534248))
+
+
+def test_get_month_index():
+    load = MonthlyGeothermalLoadAbsolute()
+    test_equal = np.array([2]*12)
+    test_unequal = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 10])
+    test_unequal_2 = np.array([2]*12)
+    test_unequal_2[3] = 30
+    test_unequal_2[4] = 30
+
+    assert load.get_month_index(test_equal, test_equal) == 11
+    assert load.get_month_index(test_unequal, test_equal) == 10
+    assert load.get_month_index(test_unequal, test_unequal) == 10
+    assert load.get_month_index(test_equal, test_unequal) == 10
+    assert load.get_month_index(test_equal, test_unequal_2) == 4
+

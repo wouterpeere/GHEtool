@@ -56,7 +56,7 @@ def test_borefield():
     assert borefield.simulation_period == 20
     assert borefield.Tf_min == 0
     assert borefield.Tf_max == 16
-    np.testing.assert_array_equal(borefield.peak_heating, np.array([160., 142, 102., 55., 26.301369863013697, 0., 0., 0., 40.4, 85., 119., 136.]))
+    np.testing.assert_array_equal(borefield.load.peak_heating, np.array([160., 142, 102., 55., 26.301369863013697, 0., 0., 0., 40.4, 85., 119., 136.]))
 
 
 @pytest.fixture
@@ -143,14 +143,14 @@ def test_hourly_to_monthly(borefield):
     borefield.convert_hourly_to_monthly()
     borefield.size()
 
-    assert np.isclose(np.sum(borefield.baseload_cooling), np.sum(borefield.hourly_cooling_load))
-    assert np.isclose(np.sum(borefield.baseload_heating), np.sum(borefield.hourly_heating_load))
+    assert np.isclose(np.sum(borefield.load.baseload_cooling), np.sum(borefield.hourly_cooling_load))
+    assert np.isclose(np.sum(borefield.load.baseload_heating), np.sum(borefield.hourly_heating_load))
     # check if hourly imbalance equals the monthly imbalance
-    assert np.isclose(borefield.imbalance, np.sum(borefield.baseload_cooling) - np.sum(borefield.baseload_heating))
+    assert np.isclose(borefield.load.imbalance, np.sum(borefield.load.baseload_cooling) - np.sum(borefield.load.baseload_heating))
 
 
 def test_imbalance(borefield):
-    assert borefield.imbalance == -140000.0
+    assert borefield.load.imbalance == -140000.0
 
 
 def test_sizing_L3_threshold_depth_error(borefield):

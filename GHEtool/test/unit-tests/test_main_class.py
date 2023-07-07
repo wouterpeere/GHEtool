@@ -561,21 +561,6 @@ def test_reynolds_number():
     assert np.isclose(4244.131815783876, borefield.Re)
 
 
-def test_get_month_index():
-    borefield = Borefield()
-    test_equal = np.array([2]*12)
-    test_unequal = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 10])
-    test_unequal_2 = np.array([2]*12)
-    test_unequal_2[3] = 30
-    test_unequal_2[4] = 30
-
-    assert borefield.get_month_index(test_equal, test_equal) == 11
-    assert borefield.get_month_index(test_unequal, test_equal) == 10
-    assert borefield.get_month_index(test_unequal, test_unequal) == 10
-    assert borefield.get_month_index(test_equal, test_unequal) == 10
-    assert borefield.get_month_index(test_equal, test_unequal_2) == 4
-
-
 def test_last_year_params():
     borefield = Borefield()
     monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
