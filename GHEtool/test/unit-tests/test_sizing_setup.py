@@ -47,9 +47,9 @@ def test_properties():
 
 def test_update_variables():
     test = SizingSetup()
-    assert test.use_constant_Rb
-    test.update_variables(use_constant_Rb=False)
-    assert not test.use_constant_Rb
+    assert test.quadrant_sizing == 0
+    test.update_variables(quadrant_sizing=1)
+    assert test.quadrant_sizing == 1
 
 
 def test_more_than_one_option():
@@ -81,9 +81,9 @@ def test_error_quadrant():
 
 
 def test_equal_unequal():
-    setup1 = SizingSetup(True, 2, False, True, False)
-    setup2 = SizingSetup(True, 2, False, True, False)
-    setup3 = SizingSetup(True, 2, True, False, False)
+    setup1 = SizingSetup(2, False, True, False)
+    setup2 = SizingSetup(2, False, True, False)
+    setup3 = SizingSetup(2, True, False, False)
     assert setup1 == setup2
     assert not setup2 == setup3
     assert not setup2 == Borefield()
