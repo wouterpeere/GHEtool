@@ -259,7 +259,7 @@ def test_load_hourly_data(borefield):
     borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), first_column_heating=False)
     assert np.array_equal(test_cooling, borefield.hourly_heating_load)
 
-    borefield.load_hourly_profile(FOLDER.joinpath("test/unit-tests/hourly_profile_without_header.csv"), header=False)
+    borefield.load_hourly_profile(FOLDER.joinpath("test/methods/hourly data/hourly_profile_without_header.csv"), header=False)
     assert np.array_equal(test_cooling, borefield.hourly_cooling_load)
 
 
@@ -392,3 +392,29 @@ def test_borefield_with_constant_peaks(borefield):
     length_L2_2 = borefield.size_L2(100)
 
     assert np.isclose(length_L2_1, length_L2_2, rtol=3*10**-5)
+
+
+def test_sizing_with_use_constant_Rb():
+    borefield = Borefield()
+    borefield.set_ground_parameters(data)
+    borefield.set_fluid_parameters(fluidData)
+    borefield.set_pipe_parameters(pipeData)
+    borefield.borefield = copy.deepcopy(borefield_gt)
+    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    assert not borefield.borehole.use_constant_Rb
+    borefield.sizing_setup(L4_sizing=True)
+    assert np.isclose(205.49615778557904, borefield.size())
+    assert np.isclose(182.17320067531486, borefield.size(use_constant_Rb=True))
+
+
+def test_size_with_different_peak_lengths(borefield):
+    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(4)
+
+    borefield.set_peak_heating(peak_heating)
+    borefield.set_peak_cooling(peak_cooling)
+    borefield.set_baseload_cooling(monthly_load_cooling)
+    borefield.set_baseload_heating(monthly_load_heating)
+
+    borefield.set_length_peak_cooling(8)
+    borefield.set_length_peak_heating(6)
+    assert np.isclose(99.33058400216777, borefield.size(L3_sizing=True))

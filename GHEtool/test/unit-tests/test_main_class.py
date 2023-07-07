@@ -1,13 +1,10 @@
 # noinspection PyPackageRequirements
 import copy
-from math import isclose
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 import pygfunction as gt
 import pytest
-from pytest import raises
 
 from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, PipeData, Borefield, SizingSetup, FOLDER
 from GHEtool.logger import ghe_logger
@@ -41,7 +38,7 @@ monthlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, monthlyLoadCoolin
 def borefields_equal(borefield_one, borefield_two) -> bool:
     for i in range(len(borefield_one)):
         if borefield_one[i].__dict__ != borefield_two[i].__dict__:
-            return False
+            return False   # pragma: no cover
     return True
 
 
@@ -80,7 +77,6 @@ def test_nb_of_boreholes():
     assert borefield.H == 100
     assert borefield.r_b == 0.075
     assert borefield.D == 1
-    temp = copy.deepcopy(borefield.gfunction_calculation_object)
     borefield.gfunction(5000, 110)
     assert np.any(borefield.gfunction_calculation_object.depth_array)
     assert borefield.number_of_boreholes == 30
@@ -270,13 +266,6 @@ def test_set_pipe_params():
     assert borefield.borehole.pipe_data == PipeData()
     borefield.set_pipe_parameters(pipeData)
     assert borefield.borehole.pipe_data == pipeData
-
-
-def test_set_Rb():
-    borefield = Borefield()
-    assert borefield.Rb == 0.12
-    borefield.set_Rb(0.13)
-    assert borefield.Rb == 0.13
 
 
 def test_set_max_temp():
@@ -553,15 +542,6 @@ def test_size_L4():
     assert np.isclose(174.23648328808213, borefield.size(100, quadrant_sizing=4))
     assert np.isclose(174.23648328808213, borefield.H)
     assert borefield.calculate_quadrant() == 4
-
-
-
-def test_set_investment_cost():
-    borefield = Borefield()
-    borefield.set_investment_cost()
-    assert borefield.cost_investment == Borefield.DEFAULT_INVESTMENT
-    borefield.set_investment_cost([0, 38])
-    assert borefield.cost_investment == [0, 38]
 
 
 def test_investment_cost():

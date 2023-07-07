@@ -878,16 +878,13 @@ class Borefield(BaseClass):
 
         Returns
         -------
-        None
+        borehole depth : float
 
         Raises
         ------
         ValueError
             ValueError when no ground data is provided
         """
-        if not isinstance(use_constant_Rb, bool) and not use_constant_Rb is None:
-            raise ValueError('Please check your inputs for the use_constant_Rb argument!')
-
         # check ground data
         if not self.ground_data.check_values():
             raise ValueError("Please provide ground data.")
