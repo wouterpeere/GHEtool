@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 import logging
 
 import numpy as np
-from GHEtool import Borefield, FluidData, PipeData, GroundConstantTemperature, GroundFluxTemperature
+from GHEtool import Borefield, FluidData, PipeData, GroundConstantTemperature, GroundFluxTemperature, GroundTemperatureGradient
 from GHEtool.VariableClasses import GroundData
 from GHEtool.gui.gui_structure import load_data_GUI
 import pygfunction as gt
@@ -183,8 +183,9 @@ def _calculate_flux(ds: DataStorage) -> float:
 def _create_ground_data(ds: DataStorage) -> GroundData:
     if ds.option_method_temp_gradient == 0:
         return GroundConstantTemperature(ds.option_conductivity, ds.option_ground_temp, ds.option_heat_capacity * 1000)
-    return GroundFluxTemperature(ds.option_conductivity, ds.option_ground_temp_gradient, ds.option_heat_capacity * 1000,
-                                 _calculate_flux(ds))
+    if ds.option_method_temp_gradient == 1:
+        return GroundFluxTemperature(ds.option_conductivity, ds.option_ground_temp_gradient, ds.option_heat_capacity * 1000, ds.option_ground_heat_flux)
+    return GroundTemperatureGradient(ds.option_conductivity, ds.option_ground_temp_gradient, ds.option_heat_capacity * 1000, ds.option_temp_gradient)
 
 
 def _create_monthly_loads_peaks(ds: DataStorage) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:

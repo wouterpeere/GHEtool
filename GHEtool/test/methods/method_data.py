@@ -310,6 +310,3 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, 150, 10**6, 10**6,
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, 100, 10**6, 10**6, 87.899, 70.054,
                                                    247.186, 210.800, 429.23, 325.236,
                                                    name='Optimise load profile 3, reversed'))
-
-if __name__ == "__main__":
-    print(list_of_test_objects.L4_sizing_input, list_of_test_objects.L4_sizing_output, list_of_test_objects.names_L4)

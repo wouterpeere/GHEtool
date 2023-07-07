@@ -6,11 +6,11 @@ from __future__ import annotations
 from math import pi
 from pathlib import Path
 from typing import Tuple
+import logging
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pygfunction as gt
-import logging
 
 from scipy.signal import convolve
 

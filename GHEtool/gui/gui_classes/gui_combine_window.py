@@ -64,6 +64,8 @@ class MainWindow(MainWindow):
             val["aim_circle"] = False
             val["aim_custom"] = False
             val["option_pipe_borehole_radius_2"] = val["option_pipe_borehole_radius"]
+            if val["option_method_temp_gradient"] == 1:
+                val["option_method_temp_gradient"] = 2
 
         def general_changes() -> None:
             # change window title to new loaded filename
