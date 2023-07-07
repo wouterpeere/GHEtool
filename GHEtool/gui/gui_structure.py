@@ -789,6 +789,9 @@ class GUI(GuiStructure):
         self.option_pipe_distance.change_event(self.update_borehole_thermal_resistance)
         self.option_pipe_roughness.change_event(self.update_borehole_thermal_resistance)
 
+        self.option_conductivity.change_event(self.update_borehole_thermal_resistance)
+        self.option_depth.change_event(self.update_borehole_thermal_resistance)
+
 
         # create categories
         #create_category_constant_rb()
@@ -1387,6 +1390,12 @@ class GUI(GuiStructure):
 
         # general settings
         self.create_lists()
+        # TODO this should be implemented in ScenarioGUI v3.0
+        self.list_of_result_texts = []
+        for cat in self.page_result.list_categories:
+            for option in cat.list_of_options:
+                if isinstance(option, ResultText):
+                    self.list_of_result_texts.append((option, ''))
 
     def check_distance_between_pipes(self) -> None:
         """
@@ -1438,7 +1447,6 @@ class GUI(GuiStructure):
         self.option_pipe_number.widget.blockSignals(True)
         self.option_pipe_number.widget.setMaximum(min(max_nb_of_pipes, self.option_pipe_number.maximal_value))
         self.option_pipe_number.widget.blockSignals(False)
-        self.update_borehole_thermal_resistance()
 
     def update_borehole(self) -> None:
         """

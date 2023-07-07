@@ -50,6 +50,7 @@ jobs:
           files: ./coverage.xml
           token: 8e6f48b5-8534-4f9a-894b-0a2d226dab26 # not required for public repos
 
+      - uses: actions/checkout@v2
   test_examples:
     runs-on: windows-latest
     steps:
