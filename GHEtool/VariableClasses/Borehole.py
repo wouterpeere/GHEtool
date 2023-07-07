@@ -19,9 +19,18 @@ class Borehole(BaseClass):
 
     __slots__ = '_fluid_data', '_pipe_data', '_Rb', 'use_constant_Rb'
 
-    def __init__(self):
-        self._fluid_data = FluidData()
-        self._pipe_data = PipeData()
+    def __init__(self, fluid_data: FluidData = None, pipe_data: PipeData = None):
+        """
+
+        Parameters
+        ----------
+        fluid_data : FluidData
+            Fluid data
+        pipe_data : PipeData
+            Pipe data
+        """
+        self._fluid_data = FluidData() if fluid_data is None else fluid_data
+        self._pipe_data = PipeData() if pipe_data is None else pipe_data
         self._Rb: float = 0.12
         self.use_constant_Rb: bool = True
 
