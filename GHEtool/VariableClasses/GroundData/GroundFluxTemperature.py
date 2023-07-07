@@ -29,6 +29,7 @@ class GroundFluxTemperature(_GroundData):
         super().__init__(k_s=k_s, volumetric_heat_capacity=volumetric_heat_capacity)
         self.flux = flux
         self.Tg = T_g
+        self.variable_Tg = True
 
     def calculate_Tg(self, H: float) -> float:
         """

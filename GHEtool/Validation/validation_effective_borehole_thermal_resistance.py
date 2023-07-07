@@ -40,9 +40,10 @@ mfr_range = np.arange(0.05, 0.55, 0.05)
 for mfr in mfr_range:
     fluid_data = FluidData(mfr, 0.568, 998, 4180, 1e-3)
     borefield.set_fluid_parameters(fluid_data)
-    Rb.append(borefield.calculate_Rb())
-    R_p.append(borefield.R_p)
-    R_fp.append(borefield.R_f)
+    Rb.append(borefield.Rb)
+    R_p.append(borefield.borehole.pipe_data.R_p)
+    R_fp.append(borefield.borehole.fluid_data.R_f)
+
 
 # make figure
 plt.figure()

@@ -1,7 +1,8 @@
-import copy
+from __future__ import annotations
 from typing import List, Tuple, Union
 
 import numpy as np
+import copy
 import pygfunction as gt
 from scipy import interpolate
 
@@ -86,7 +87,7 @@ class GFunction:
         self.store_previous_values: bool = GFunction.DEFAULT_STORE_PREVIOUS_VALUES
         self.options: dict = {"method": "equivalent"}
         self.alpha: float = 0.
-        self.borefield: list = []
+        self.borefield: list[gt.boreholes.Borehole] = []
         self.depth_array: np.ndarray = np.array([])
         self.time_array: np.ndarray = np.array([])
         self.previous_gfunctions: np.ndarray = np.array([])
@@ -173,7 +174,7 @@ class GFunction:
                 return gfunc_interpolated
 
             # calculate the g-values for uniform borehole wall temperature
-            gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options).gFunc
+            gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options, method=self.options['method']).gFunc
 
             # store the calculated g-values
             self.set_new_calculated_data(time_values, depth, gfunc_calculated, borefield, alpha)
@@ -240,7 +241,7 @@ class GFunction:
             return gvalues
 
         # check if interpolation is possible:
-        if not (self._check_alpha(alpha) or self._check_borefield(borefield)):
+        if not (self._check_alpha(alpha) and self._check_borefield(borefield)):
             # the alpha and/or borefield is not in line with the precalculated data
             return gvalues
 
@@ -317,7 +318,7 @@ class GFunction:
         """
         # raise error when value is negative
         if depth <= 0:
-            raise ValueError("The depth is smaller then zero!")
+            raise ValueError(f"The depth {depth} is smaller then zero!")
 
         # get nearest depth index
         val_depth, idx_depth = self._nearest_value(self.depth_array, depth)

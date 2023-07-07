@@ -2,10 +2,13 @@
 This document contains the information for the BaseClass.
 This class is used as a super class for different variable classes.
 """
+from __future__ import annotations
 from typing import List
 
 import numpy as np
+from numpy import ndarray
 from pygfunction.boreholes import Borehole
+from importlib import import_module
 
 
 class BaseClass:
@@ -16,7 +19,7 @@ class BaseClass:
 
     This class should only be altered whenever a highly general method should be implemented.
     """
-    def _to_dict(self) -> dict:
+    def to_dict(self) -> dict:
         """
         This function converts the class variables to a dictionary so it can be saved in a JSON format.
         Currently, it can handle np.ndarray, list, set, str, int, float, tuple,
@@ -35,48 +38,54 @@ class BaseClass:
             variables: List[str] = [attr for attr in dir(self) if not callable(getattr(self, attr)) and not attr.startswith("__")]
 
         # initiate dictionary
-        dictionary: dict = dict([])
+        dictionary: dict = {"__module__": f"{type(self).__module__}", "__name__":  f"{type(self).__name__}"}
 
         # populate dictionary
         for key in variables:
-            # for all self-defined classes
-            if hasattr(getattr(self, key), "_to_dict"):
-                dictionary[key] = getattr(self, key)._to_dict()
+            value = getattr(self, key)
 
-            if isinstance(getattr(self, key), (int, bool, float, str)):
-                dictionary[key] = getattr(self, key)
+            if value is None:
+                dictionary[key] = "None"
                 continue
 
-            if isinstance(getattr(self, key), tuple):
-                dictionary[key] = {"value": list(getattr(self, key)), "type": "tuple"}
+            if isinstance(value, (int, bool, float, str)):
+                dictionary[key] = value
                 continue
 
-            if isinstance(getattr(self, key), np.ndarray):
-                dictionary[key] = {"value": getattr(self, key).tolist(), "type": "np.ndarray"}
+            if isinstance(value, tuple):
+                dictionary[key] = {"value": list(value), "type": "tuple"}
                 continue
 
-            if isinstance(getattr(self, key), set):
-                dictionary[key] = {"value": list(getattr(self, key)), "type": "set"}
+            if isinstance(value, np.ndarray):
+                dictionary[key] = {"value": value.tolist(), "type": "np.ndarray"}
                 continue
 
-            if isinstance(getattr(self, key), list):
-                if np.any(getattr(self, key)) and isinstance(getattr(self, key)[0], Borehole):
+            if isinstance(value, set):
+                dictionary[key] = {"value": list(value), "type": "set"}
+                continue
+
+            if isinstance(value, list):
+                if np.any(value) and isinstance(value[0], Borehole):
                     # pygfunction object
                     dictionary[key] = {"value": [{key: value for key, value in borehole.__dict__.items()
                                                   if key != "_is_tilted"}
-                                                 for borehole in getattr(self, key)],
+                                                 for borehole in value],
                                        "type": "pygfunction.Borehole"}
                     continue
-                dictionary[key] = getattr(self, key)
+                dictionary[key] = value
 
-            if isinstance(getattr(self, key), dict):
+            if isinstance(value, dict):
                 # note that this can cause problems whenever self.key contains values that or not int, bool, float or str
-                dictionary[key] = getattr(self, key)
+                dictionary[key] = value
                 continue
+
+            # for all self-defined classes
+            if hasattr(value, "to_dict"):
+                dictionary[key] = value.to_dict()
 
         return dictionary
 
-    def _from_dict(self, dictionary: dict) -> None:
+    def from_dict(self, dictionary: dict) -> None:
         """
         This function converts the dictionary values to the class attributes.
         Currently, it can handle np.ndarray, list, set, str, int, float, tuple, pygfunction.Borehole
@@ -91,12 +100,18 @@ class BaseClass:
         -------
         None
         """
+        if hasattr(self, "__slots__"):
+            variables: List[str] = list(self.__slots__)
+        else:
+            variables: List[str] = [key for key, value in dictionary.items() if not key.startswith("__")]
 
         for key, value in dictionary.items():
 
-            # for all self-defined classes
-            if hasattr(getattr(self, key), "_to_dict"):
-                getattr(self, key)._from_dict(value)
+            if key not in variables:
+                continue
+
+            if value == "None":
+                setattr(self, key, None)
                 continue
 
             if isinstance(value, (int, bool, float, str, list)):
@@ -106,6 +121,13 @@ class BaseClass:
             if isinstance(value, dict):
                 # note that this can mean that the value is a dictionary, or it is a np.ndarray, set or tuple
                 keys = value.keys()
+                # for all self-defined classes
+                if "__module__" in keys:
+                    class_dict = getattr(import_module(value["__module__"]), value["__name__"])
+                    setattr(self, key, class_dict.__new__(class_dict))
+                    getattr(self, key).from_dict(value)
+                    continue
+
                 if len(keys) == 2 and "type" in keys and "value" in keys:
                     var_type = value["type"]
                     _value = value["value"]
@@ -148,7 +170,4 @@ class BaseClass:
         else:
             variables: List[str] = [attr for attr in dir(self) if not callable(getattr(self, attr)) and not attr.startswith("__")]
 
-        for var in variables:
-            if getattr(self, var) is None:
-                return False
-        return True
+        return all(getattr(self, var) is not None for var in variables)
