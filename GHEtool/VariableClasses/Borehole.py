@@ -29,10 +29,14 @@ class Borehole(BaseClass):
         pipe_data : PipeData
             Pipe data
         """
-        self._fluid_data = FluidData() if fluid_data is None else fluid_data
-        self._pipe_data = PipeData() if pipe_data is None else pipe_data
+        self._fluid_data = FluidData()
+        self._pipe_data = PipeData()
         self._Rb: float = 0.12
         self.use_constant_Rb: bool = True
+        if not fluid_data is None:
+            self.fluid_data = fluid_data
+        if not pipe_data is None:
+            self.pipe_data = pipe_data
 
     @property
     def Rb(self) -> float:

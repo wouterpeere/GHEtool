@@ -239,6 +239,7 @@ class Translations:  # pragma: no cover
         "option_ground_temp_gradient",
         "hint_press_load",
         "cannot_load_new_version",
+        "pipe_thermal_resistance",
         "languages",
     )
 
@@ -1220,22 +1221,22 @@ class Translations:  # pragma: no cover
             "Scenario saving settings",
         ]
         self.option_toggle_buttons: List[str] = [
-            "Use toggle buttons?:, no , yes ",
+            "Use toggle buttons?:, No , Yes ",
             "Umschalterbutton?:, Nein , Ja ",
-            "Toggle-gedrag?:, nee , ja",
-            "Toggle buttons?:, no , yes ",
-            "Toggle buttons?:, no , yes ",
-            "Toggle buttons?:, no , yes ",
-            "Toggle buttons?:, no , yes",
+            "Toggle-gedrag?:, Nee , Ja",
+            "Toggle buttons?:, No , Yes ",
+            "Toggle buttons?:, No , Yes ",
+            "Toggle buttons?:, No , Yes ",
+            "Toggle buttons?:, No , Yes",
         ]
         self.option_auto_saving: List[str] = [
-            "Use automatic saving?, no , yes ",
+            "Use automatic saving?, No , Yes ",
             "Automatisches speichern nutzen?, Nein, Ja ",
-            "Automatisch opslaan, nee , ja ",
-            "Automatic saving, no , yes ",
-            "Automatic saving, no , yes ",
-            "Automatic saving, no , yes ",
-            "Automatic saving, no , yes",
+            "Automatisch opslaan, Nee , Ja ",
+            "Automatic saving, No , Yes ",
+            "Automatic saving, No , Yes ",
+            "Automatic saving, No , Yes ",
+            "Automatic saving, No , Yes",
         ]
         self.hint_saving: List[str] = [
             "If Auto saving is selected the scenario will automatically saved if a scenario is changed. Otherwise the scenario has to be saved with the Update scenario button in the upper left corner if the changes should not be lost.",
@@ -1547,13 +1548,13 @@ class Translations:  # pragma: no cover
             "Consider temperature variation in the ground?:, None , Heat flux , Temperature gradient",
         ]
         self.option_method_rb_calc: List[str] = [
-            "Borehole resistance calculation method:, constant , dynamic ",
+            "Borehole resistance calculation method:, Constant , Dynamic ",
             "Methode zur Bohrlochwiderstangsberechnung:, Konstant , Dynamisch ",
-            "Berekeningsmethode boorgatweerstand:, constant , dynamisch ",
-            "Borehole resistance calculation method:, constant , dynamic ",
-            "Borehole resistance calculation method:, constant , dynamic ",
-            "Borehole resistance calculation method:, constant , dynamic ",
-            "Borehole resistance calculation method:, constant , dynamic",
+            "Berekeningsmethode boorgatweerstand:, Constant , Dynamisch ",
+            "Borehole resistance calculation method:, Constant , Dynamic ",
+            "Borehole resistance calculation method:, Constant , Dynamic ",
+            "Borehole resistance calculation method:, Constant , Dynamic ",
+            "Borehole resistance calculation method:, Constant , Dynamic",
         ]
         self.category_earth: List[str] = [
             "Earth properties",
@@ -1713,20 +1714,20 @@ class Translations:  # pragma: no cover
         self.legend_figure_temperature_profile: List[str] = [
             "Show legend?, No , Yes ",
             "Legende zeigen?, Nein , Ja ",
-            "Toon legende?, nee , ja ",
-            "Mostra la legenda?, no , yes ",
-            "Afficher la légende?, no , yes ",
-            "Mostrar leyenda?, no , yes ",
-            "Mostrar lenda?, no , yes",
+            "Toon legende?, Nee , Ja ",
+            "Mostra la legenda?, No , Yes ",
+            "Afficher la légende?, No , Yes ",
+            "Mostrar leyenda?, No , Yes ",
+            "Mostrar lenda?, No , Yes",
         ]
         self.hourly_figure_temperature_profile: List[str] = [
             "Hourly profile, No , Yes ",
             "Stündliches Profil, Nein , Ja ",
-            "Uurlijks profiel, nee , ja ",
-            "Hourly profile, no , yes ",
-            "Hourly profile, no , yes ",
-            "Hourly profile, no , yes ",
-            "Hourly profile, no , yes",
+            "Uurlijks profiel, Nee , Ja ",
+            "Hourly profile, No , Yes ",
+            "Hourly profile, No , Yes ",
+            "Hourly profile, No , Yes ",
+            "Hourly profile, No , Yes",
         ]
         self.figure_load_duration: List[str] = [
             "Load-duration curve, Power [kW], Time [hours]",
@@ -1740,11 +1741,11 @@ class Translations:  # pragma: no cover
         self.legend_figure_load_duration: List[str] = [
             "Show legend?, No , Yes ",
             "Legende zeigen?, Nein , Ja ",
-            "Toon legende?, nee , ja ",
-            "Mostra la legenda?, no , yes ",
-            "Afficher la légende?, no , yes ",
-            "Mostrar leyenda?, no , yes ",
-            "Mostrar lenda?, no , yes",
+            "Toon legende?, Nee , Ja ",
+            "Mostra la legenda?, No , Yes ",
+            "Afficher la légende?, No , Yes ",
+            "Mostrar leyenda?, No , Yes ",
+            "Mostrar lenda?, No , Yes",
         ]
         self.option_len_peak_heating: List[str] = [
             "Peak length heating [hours]: ",
@@ -1765,13 +1766,13 @@ class Translations:  # pragma: no cover
             "Peak length cooling [hours]:",
         ]
         self.option_temperature_profile_hourly: List[str] = [
-            "Should hourly data be used for the temperature profile?, no , yes ",
-            "Should hourly data be used for the temperature profile?, no , yes ",
-            "Moet uurlijkse data gebruikt worden voor het temperatuursprofiel?, nee , ja ",
-            "Should hourly data be used for the temperature profile?, no , yes ",
-            "Should hourly data be used for the temperature profile?, no , yes ",
-            "Should hourly data be used for the temperature profile?, no , yes ",
-            "Should hourly data be used for the temperature profile?, no , yes",
+            "Should hourly data be used for the temperature profile?, No , Yes ",
+            "Should hourly data be used for the temperature profile?, No , Yes ",
+            "Moet uurlijkse data gebruikt worden voor het temperatuursprofiel?, Nee , Ja ",
+            "Should hourly data be used for the temperature profile?, No , Yes ",
+            "Should hourly data be used for the temperature profile?, No , Yes ",
+            "Should hourly data be used for the temperature profile?, No , Yes ",
+            "Should hourly data be used for the temperature profile?, No , Yes",
         ]
         self.option_ground_temp_gradient: List[str] = [
             "Ground temperature at infinity [°C]: ",
@@ -1856,13 +1857,13 @@ class Translations:  # pragma: no cover
             "Decimal sign in file:,Point '.',Comma '++'",
         ]
         self.category_demand_building_or_geo: List[str] = [
-            "Load type: ",
-            "Art der Belastung: ",
-            "Type belasting: ",
-            "Load type: ",
-            "Load type: ",
-            "Load type:",
-            "Load type:",
+            "Load type ",
+            "Art der Belastung ",
+            "Type belasting ",
+            "Load type ",
+            "Load type ",
+            "Load type",
+            "Load type",
         ]
         self.geo_load: List[str] = [
             "Load type, Geothermal , Building ",
@@ -1919,4 +1920,13 @@ class Translations:  # pragma: no cover
             "You cannot load a file that is from a newer GHEtool version.",
             "You cannot load a file that is from a newer GHEtool version.",
             "You cannot load a file that is from a newer GHEtool version.",
+        ]
+        self.pipe_thermal_resistance: List[str] = [
+            "The equivalent borehole thermal resistance (at , mK/W",
+            "Äquivalenter thermischer Bohrlochwiderstand (auf , mK/W",
+            "De equivalente boorgatweerstand (op , mK/W",
+            "The equivalent borehole thermal resistance (at , mK/W",
+            "The equivalent borehole thermal resistance (at , mK/W",
+            "The equivalent borehole thermal resistance (at , mK/W",
+            "The equivalent borehole thermal resistance (at , mK/W",
         ]

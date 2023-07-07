@@ -696,7 +696,7 @@ class GUI(GuiStructure):
             decimal_number=3,
             minimal_value=0,
             maximal_value=10000,
-            step=0.1,
+            step=0.01,
         )
         self.option_pipe_inner_radius = FloatBox(
             category=self.category_pipe_data,
@@ -750,6 +750,10 @@ class GUI(GuiStructure):
             maximal_value=10000,
             step=0.000001,
         )
+        self.pipe_thermal_resistance = ResultText(translations.pipe_thermal_resistance,
+                                                   category=self.category_pipe_data,
+                                                   prefix="The equivalent borehole thermal resistance (at 150m) is: ", suffix="mK/W")
+        self.pipe_thermal_resistance.warning = True
 
         # add dependency
         self.option_method_rb_calc.add_link_2_show(self.category_pipe_data, on_index=1)
@@ -766,6 +770,19 @@ class GUI(GuiStructure):
         self.option_pipe_distance.change_event(self.update_borehole)
 
         self.page_borehole_resistance.add_function_called_if_button_clicked(self.update_borehole)
+        self.page_borehole_resistance.add_function_called_if_button_clicked(self.update_borehole_thermal_resistance)
+
+        # calculate Rb* updates
+        self.option_pipe_number.change_event(self.update_borehole_thermal_resistance)
+        self.option_pipe_grout_conductivity.change_event(self.update_borehole_thermal_resistance)
+        self.option_pipe_inner_radius.change_event(self.update_borehole_thermal_resistance)
+        self.option_pipe_outer_radius.change_event(self.update_borehole_thermal_resistance)
+        self.option_pipe_conductivity.change_event(self.update_borehole_thermal_resistance)
+        self.option_pipe_borehole_radius_2.change_event(self.update_borehole_thermal_resistance)
+        self.option_pipe_distance.change_event(self.update_borehole_thermal_resistance)
+        self.option_pipe_roughness.change_event(self.update_borehole_thermal_resistance)
+        self.option_fluid_mass_flow.change_event(self.update_borehole_thermal_resistance)
+
 
         # create categories
         #create_category_constant_rb()
@@ -1731,15 +1748,17 @@ class GUI(GuiStructure):
         -------
         None
         """
+        # try:
         fluid_data = FluidData(self.option_fluid_mass_flow.get_value(), self.option_fluid_conductivity.get_value(),
                                self.option_fluid_density.get_value(), self.option_fluid_capacity.get_value(), self.option_fluid_viscosity.get_value())
         pipe_data = PipeData(self.option_pipe_grout_conductivity.get_value(), self.option_pipe_inner_radius.get_value(), self.option_pipe_outer_radius.get_value(),
                              self.option_pipe_conductivity.get_value(), self.option_pipe_distance.get_value(), self.option_pipe_number.get_value(), self.option_pipe_roughness.get_value())
 
         borehole = Borehole(fluid_data, pipe_data)
-        logging.info(f'The borehole thermal resistance is'
-                     f'{borehole.get_Rb(150, self.option_pipe_depth.get_value(), self.option_pipe_borehole_radius.get_value(), self.option_conductivity.get_value())}')
-
+        resistance = borehole.get_Rb(self.option_depth.get_value(), self.option_pipe_depth.get_value(), self.option_pipe_borehole_radius.get_value(), self.option_conductivity.get_value())
+        self.pipe_thermal_resistance.set_text_value(f'{self.option_depth.get_value()}m): {round(resistance, 4)}')
+        # except:
+        #     pass
 
 def show_option_on_multiple_aims(first_aims: list[Aim], second_aims: list[Aim], option: Option):
     def show_hide():

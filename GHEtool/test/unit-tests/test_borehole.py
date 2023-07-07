@@ -124,3 +124,8 @@ def test_Rb_values():
 
     assert np.allclose(Rb_list, [0.2696064888020322, 0.16229265041543758, 0.11073836048982678, 0.09483159131195469, 0.08742765267449451, 0.08315828854931047, 0.08046372254501538, 0.07864703705590415, 0.07735912210040842, 0.07640933344353783])
 
+
+def test_assign_by_initiation():
+    borehole = Borehole(fluid_data, pipe_data)
+    assert np.isclose(borehole.calculate_Rb(100, 1, 0.075, 3), 0.09483159131195469)
+    assert not borehole.use_constant_Rb
