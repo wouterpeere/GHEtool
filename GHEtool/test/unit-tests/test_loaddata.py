@@ -185,4 +185,3 @@ def test_get_month_index():
     assert load.get_month_index(test_unequal, test_unequal) == 10
     assert load.get_month_index(test_equal, test_unequal) == 10
     assert load.get_month_index(test_equal, test_unequal_2) == 4
-

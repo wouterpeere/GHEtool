@@ -293,6 +293,17 @@ class HourlyGeothermalLoad(_LoadData):
         return np.tile(self.hourly_cooling_load)
 
     @property
+    def hourly_load_simulation_period(self) -> np.ndarray:
+        """
+        This function calculates the resulting hourly load in kW for the whole simulation period.
+
+        Returns
+        -------
+        resulting hourly load : np.ndarray
+        """
+        return np.tile(self.hourly_cooling_load - self.hourly_heating_load, self.simulation_period)
+
+    @property
     def hourly_heating_load_simulation_period(self) -> np.ndarray:
         """
         This function returns the hourly heating in kWh/h for a whole simulation period.
@@ -334,14 +345,14 @@ class HourlyGeothermalLoad(_LoadData):
         # import data
         if first_column_heating:
             df = pd.read_csv(file_path, sep=separator, header=header, decimal=decimal_seperator,
-                             usecols=['heating', 'cooling'])
+                             names=['heating', 'cooling'])
         else:
             df = pd.read_csv(file_path, sep=separator, header=header, decimal=decimal_seperator,
-                             usecols=['cooling', 'heating'])
+                             names=['cooling', 'heating'])
 
         # set data
-        self.hourly_heating_load = df['heating']
-        self.hourly_cooling_load = df['cooling']
+        self.hourly_heating_load = np.array(df['heating'])
+        self.hourly_cooling_load = np.array(df['cooling'])
 
         ghe_logger.info("Hourly profile loaded!")
 

@@ -16,7 +16,8 @@ from warnings import warn
 
 from GHEtool.VariableClasses import FluidData, PipeData, Borehole, GroundConstantTemperature
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, SizingSetup
-from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute, _LoadData
+from GHEtool.VariableClasses.LoadData import *
+from GHEtool.VariableClasses.LoadData import _LoadData
 from GHEtool.VariableClasses.BaseClass import BaseClass
 from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
 from GHEtool.logger.ghe_logger import ghe_logger
@@ -36,7 +37,7 @@ class Borefield(BaseClass):
     HOURLY_LOAD_ARRAY: np.ndarray = np.arange(0, 8761, UPM).astype(np.uint32)
 
     __slots__ = 'H', 'H_init', 'borehole',\
-                'hourly_heating_load', 'hourly_cooling_load', 'number_of_boreholes', '_borefield', 'cost_investment', \
+                'number_of_boreholes', '_borefield', 'cost_investment', \
                 'Tf_max', 'Tf_min', 'limiting_quadrant', \
                 'Tf', 'example_active_passive',\
                 '_ground_data', '_load',\
@@ -142,8 +143,6 @@ class Borefield(BaseClass):
         self.Tb = np.array([])  # list of borehole wall temperatures
 
         # initiate variables for optimal sizing
-        self.hourly_heating_load = np.array([])
-        self.hourly_cooling_load = np.array([])
         self.hourly_cooling_load_external = np.array([])
         self.hourly_heating_load_external = np.array([])
         self.peak_heating_external = np.array([])
@@ -486,7 +485,7 @@ class Borefield(BaseClass):
         self.load = load
 
     @property
-    def load(self) -> _LoadData:
+    def load(self) -> _LoadData | HourlyGeothermalLoad | MonthlyGeothermalLoadAbsolute:
         """
         This returns the LoadData object.
         
@@ -1179,7 +1178,8 @@ class Borefield(BaseClass):
             raise ValueError(f'Quadrant {quadrant_sizing} does not exist.')
 
         # check if hourly data is given
-        self._check_hourly_load()
+        if not self.load.hourly_resolution:
+            raise ValueError("There is no hourly resolution available!")
 
         # initiate with a given depth
         self.H: float = H_init if H_init is not None else self.H_init
@@ -1188,8 +1188,8 @@ class Borefield(BaseClass):
             # size according to a specific quadrant
             self.H = self._size_based_on_temperature_profile(quadrant_sizing, hourly=True)
         else:
-            max_temp = self._size_based_on_temperature_profile(10, hourly=True) if self.hourly_cooling_load.sum() > 0 else 0
-            min_temp = self._size_based_on_temperature_profile(20, hourly=True) if self.hourly_heating_load.sum() > 0 else 0
+            max_temp = self._size_based_on_temperature_profile(10, hourly=True) if np.any(self.load.hourly_cooling_load) else 0
+            min_temp = self._size_based_on_temperature_profile(20, hourly=True) if np.any(self.load.hourly_heating_load) else 0
             self.H = self._select_size(max_temp, min_temp, True)
             if self.load.imbalance <= 0:
                 # extraction dominated, so quadrants 1 and 4 are relevant
@@ -1233,12 +1233,12 @@ class Borefield(BaseClass):
 
         # define loads for sizing
         # it only calculates the first and the last year, so the sizing is less computationally expensive
-        loads_short = self.hourly_cooling_load - self.hourly_heating_load if hourly else self.load.monthly_average_load
-        loads_short_rev = loads_short[::-1]
-        loads_long = np.tile(loads_short, 2)
-
-        # initialise the results array
-        results = np.zeros(loads_short.size * 2)
+        # loads_short = self.load.hourly_cooling_load - self.load.hourly_heating_load if hourly else self.load.monthly_average_load
+        # loads_short_rev = loads_short[::-1]
+        # loads_long = np.tile(loads_short, 2)
+        #
+        # # initialise the results array
+        # results = np.zeros(loads_short.size * 2)
 
         # Iterates as long as there is no convergence
         # (convergence if difference between depth in iterations is smaller than THRESHOLD_BOREHOLE_DEPTH)
@@ -1671,7 +1671,8 @@ class Borefield(BaseClass):
         if hourly:
 
             # check for hourly data if this is requested
-            self._check_hourly_load()
+            if not self.load.hourly_resolution:
+                raise ValueError("There is no hourly resolution available!")
 
             # making a numpy array of the monthly balance (self.monthly_load) for a period of self.simulation_period years
             # [kW]
@@ -1679,7 +1680,7 @@ class Borefield(BaseClass):
                 hourly_load = np.tile(self.hourly_cooling_load_on_the_borefield - self.hourly_heating_load_on_the_borefield,
                                       self.simulation_period)
             else:
-                hourly_load = np.tile(self.hourly_cooling_load - self.hourly_heating_load, self.simulation_period)
+                hourly_load = self.load.hourly_load_simulation_period
             if self.example_active_passive:
                 hourly_load = self.hourly_cooling_load - self.hourly_heating_load
 
@@ -1833,11 +1834,8 @@ class Borefield(BaseClass):
         -------
         None
         """
-        self.hourly_heating_load = np.array(heating_load)
-
-        # set monthly loads
-        self.set_peak_heating(self._reduce_to_peak_load(self.hourly_heating_load, np.max(heating_load)))
-        self.set_baseload_heating(self._reduce_to_monthly_load(self.hourly_heating_load, np.max(heating_load)))
+        warn("This function will be depreciated in v2.2.1", DeprecationWarning, stacklevel=2)
+        self._load.hourly_heating_load = heating_load
         self._delete_calculated_temperatures()
 
     def convert_hourly_to_monthly(self, peak_cooling_load: float = None, peak_heating_load: float = None) -> None:
@@ -1857,21 +1855,21 @@ class Borefield(BaseClass):
         """
 
         try:
-            self.hourly_cooling_load[0]
-            self.hourly_heating_load[0]
+            self.load.hourly_cooling_load[0]
+            self.load.hourly_heating_load[0]
         except IndexError:
             raise IndexError("No hourly loads are loaded yet!")
 
         if peak_cooling_load is None:
-            peak_cooling_load = np.max(self.hourly_cooling_load)
+            peak_cooling_load = np.max(self.load.hourly_cooling_load)
         if peak_heating_load is None:
-            peak_heating_load = np.max(self.hourly_heating_load)
+            peak_heating_load = np.max(self.load.hourly_heating_load)
 
         # calculate peak and base loads
-        self.set_peak_cooling(self._reduce_to_peak_load(self.hourly_cooling_load, peak_cooling_load))
-        self.set_peak_heating(self._reduce_to_peak_load(self.hourly_heating_load, peak_heating_load))
-        self.set_baseload_cooling(self._reduce_to_monthly_load(self.hourly_cooling_load, peak_cooling_load))
-        self.set_baseload_heating(self._reduce_to_monthly_load(self.hourly_heating_load, peak_heating_load))
+        self.set_peak_cooling(self._reduce_to_peak_load(self.load.hourly_cooling_load, peak_cooling_load))
+        self.set_peak_heating(self._reduce_to_peak_load(self.load.hourly_heating_load, peak_heating_load))
+        self.set_baseload_cooling(self._reduce_to_monthly_load(self.load.hourly_cooling_load, peak_cooling_load))
+        self.set_baseload_heating(self._reduce_to_monthly_load(self.load.hourly_heating_load, peak_heating_load))
 
         ghe_logger.main_info("Hourly profile converted to monthly profile!")
 
@@ -1888,45 +1886,12 @@ class Borefield(BaseClass):
         -------
         None
         """
-        self.hourly_cooling_load = np.array(cooling_load)
-
-        # set monthly loads
-        self.set_peak_cooling(self._reduce_to_peak_load(self.hourly_cooling_load, np.max(cooling_load)))
-        self.set_baseload_cooling(self._reduce_to_monthly_load(self.hourly_cooling_load, np.max(cooling_load)))
+        warn("This function will be depreciated in v2.2.1", DeprecationWarning, stacklevel=2)
+        self._load.hourly_heating_load = cooling_load
         self._delete_calculated_temperatures()
 
-    def _check_hourly_load(self) -> bool:
-        """
-        This function checks if there is correct hourly data available.
-
-        Returns
-        -------
-        bool
-            True if the data is correct
-
-        Raises
-        ------
-        ValueError
-            When no data is given, when the data is not hourly or when there are negative values
-        """
-        # check whether there is data given
-        if self.hourly_cooling_load is None or self.hourly_heating_load is None\
-            or len(self.hourly_cooling_load) == 0 or len(self.hourly_heating_load) == 0:
-            raise ValueError("No data is given for either the heating or cooling load.")
-
-        # check whether the data is hourly
-        if not self.example_active_passive and (len(self.hourly_heating_load) != 8760
-                                                or len(self.hourly_cooling_load) != 8760):
-            raise ValueError("Incorrect length for either the heating or cooling load")
-
-        # check whether there are negative values in the data
-        if min(self.hourly_cooling_load) < 0 or min(self.hourly_heating_load) < 0:
-            raise ValueError("There are negative values in either the heating or cooling load.")
-
-        return True
-
     def load_hourly_profile(self, file_path: str | Path, header: bool = True, separator: str = ";",
-                            first_column_heating: bool = True) -> None:
+                            decimal_seperator: str = ".", first_column_heating: bool = True) -> None:
         """
         This function loads in an hourly load profile [kW].
 
@@ -1937,7 +1902,9 @@ class Borefield(BaseClass):
         header : bool
             True if this file contains a header row
         separator : str
-            Symbol used in the file to seperate the columns
+            Symbol used in the file to separate the columns
+        decimal_seperator : str
+            Symbol used for the decimal number separation
         first_column_heating : bool
             True if the first column in the file is for the heating load
 
@@ -1945,22 +1912,11 @@ class Borefield(BaseClass):
         -------
         None
         """
-        if header:
-            header: int = 0
-        else:
-            header = None
-        from pandas import read_csv
-        db = read_csv(file_path, sep=separator, header=header)
 
-        if first_column_heating:
-            self.set_hourly_heating_load(db.iloc[:, 0].tolist())
-            self.set_hourly_cooling_load(db.iloc[:, 1].tolist())
-        else:
-            self.set_hourly_heating_load(db.iloc[:, 1].tolist())
-            self.set_hourly_cooling_load(db.iloc[:, 0].tolist())
+        self.load = HourlyGeothermalLoad()
 
-        ghe_logger.main_info("Hourly profile loaded!")
-
+        self.load.load_hourly_profile(file_path=file_path, header=header, separator=separator,
+                                      decimal_seperator=decimal_seperator, first_column_heating=first_column_heating)
     @staticmethod
     def _reduce_to_monthly_load(load: list, peak: float) -> list:
         """
@@ -2029,6 +1985,11 @@ class Borefield(BaseClass):
         Returns
         -------
         None
+
+        Raises
+        ------
+        ValueError
+            ValueError if no hourly load is given
         """
 
         if depth is None:
@@ -2041,7 +2002,9 @@ class Borefield(BaseClass):
         self.Rb = self.borehole.get_Rb(depth, self.D, self.r_b, self.ground_data.k_s)
 
         # check if hourly profile is given
-        self._check_hourly_load()
+        if not self.load.hourly_resolution:
+            raise ValueError("There is no hourly resolution available!")
+
         # load hourly heating and cooling load and convert it to geothermal loads
         hourly_heating_load_geo: np.ndarray = self.hourly_heating_load.copy() * (1 - 1/SCOP)
         hourly_cooling_load_geo: np.ndarray = self.hourly_cooling_load.copy() * (1 + 1/SEER)
@@ -2238,7 +2201,8 @@ class Borefield(BaseClass):
             plt.Figure, plt.Axes
         """
         # check if there are hourly values
-        self._check_hourly_load()
+        if not self.load.hourly_resolution:
+            raise ValueError("There is no hourly resolution available!")
 
         # sort heating and cooling load
         heating = self.load.hourly_heating_load.copy()
