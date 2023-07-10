@@ -52,8 +52,8 @@ def test_L4(model: Borefield, result):
                          ids=list_of_test_objects.names_optimise_load_profile)
 def test_optimise(input, result):
     model: Borefield = input[0]
-    depth, SCOP, SEER = input[1:]
-    model.optimise_load_profile(depth, SCOP, SEER)
+    load, depth, SCOP, SEER = input[1:]
+    model.optimise_load_profile(load, depth, SCOP, SEER)
     percentage_heating, percentage_cooling, peak_heating_geo, peak_cooling_geo, peak_heating_ext, peak_cooling_ext = \
         result
     # print(model._percentage_heating, model._percentage_cooling)
@@ -61,7 +61,7 @@ def test_optimise(input, result):
     # print(np.max(model.peak_heating_external), np.max(model.peak_cooling_external))
     assert np.isclose(model._percentage_heating, percentage_heating)
     assert np.isclose(model._percentage_cooling, percentage_cooling)
-    assert np.isclose(np.max(model.peak_heating), peak_heating_geo)
-    assert np.isclose(np.max(model.peak_cooling), peak_cooling_geo)
-    assert np.isclose(np.max(model.peak_heating_external), peak_heating_ext)
-    assert np.isclose(np.max(model.peak_cooling_external), peak_cooling_ext)
+    assert np.isclose(model.load.max_peak_heating, peak_heating_geo)
+    assert np.isclose(model.load.max_peak_cooling, peak_cooling_geo)
+    assert np.isclose(model._external_load.max_peak_heating, peak_heating_ext)
+    assert np.isclose(model._external_load.max_peak_cooling, peak_cooling_ext)

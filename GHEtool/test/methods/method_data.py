@@ -277,30 +277,29 @@ borefield.set_Rb(0.2)
 borefield.set_borefield(borefield_gt)
 hourly_load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
 borefield.load = hourly_load
-borefield._load.hourly_heating_load[0] = 100000
+borefield._borefield_load.hourly_heating_load[0] = 100000
 list_of_test_objects.add(SizingObject(borefield, L4_output=18760.64149089075, quadrant=4, name='Hourly profile, quadrant 4'))
 
 hourly_load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_cooling=0, col_heating=1)
 borefield.load = hourly_load
 list_of_test_objects.add(SizingObject(borefield, L4_output=368.50138222702657, quadrant=2, name='Hourly profile reversed'))
 
-borefield._load.hourly_heating_load[0] = 100000
+borefield._borefield_load.hourly_heating_load[0] = 100000
 list_of_test_objects.add(SizingObject(borefield, L4_output=18602.210559679363, quadrant=3, name='Hourly profile, quadrant 3'))
 
 hourly_load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
-borefield.load = hourly_load
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, 150, 10**6, 10**6, 87.506, 97.012,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 10**6, 10**6, 87.506, 97.012,
                                                    305.842, 384.204, 230.193, 292.212, name='Optimise load profile 1'))
 
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, 100, 10**6, 10**6, 70.054, 87.899,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 10**6, 10**6, 70.054, 87.899,
                                                    210.800, 247.186, 325.236, 429.231, name='Optimise load profile 2'))
 
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, 50, 10**6, 10**6, 44.791, 63.799,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 10**6, 10**6, 44.791, 63.799,
                                                    118.898, 117.804, 417.138, 558.612, name='Optimise load profile 3'))
 
 borefield.set_min_ground_temperature(-5)
 borefield.set_max_ground_temperature(25)
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, 150, 10**6, 10**6, 100, 100,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 10**6, 10**6, 100, 100,
                                                    536.036, 676.417, 0, 0, name='Optimise load profile 100%'))
 
 borefield = Borefield()
@@ -310,16 +309,15 @@ borefield.set_borefield(borefield_gt)
 borefield.set_max_ground_temperature(16)
 borefield.set_min_ground_temperature(0)
 hourly_load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_heating=1, col_cooling=0)
-borefield.load = hourly_load
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, 150, 10**6, 10**6, 99.976, 66.492,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 10**6, 10**6, 99.976, 66.492,
                                                    643.137, 195.331, 33.278, 340.705,
                                                    name='Optimise load profile 1, reversed'))
 borefield.set_max_ground_temperature(20)
 borefield.set_min_ground_temperature(4)
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, 150, 10**6, 10**6, 97.012, 87.506,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 10**6, 10**6, 97.012, 87.506,
                                                    384.204, 305.842, 292.211, 230.195,
                                                    name='Optimise load profile 2, reversed'))
 
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, 100, 10**6, 10**6, 87.899, 70.054,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 10**6, 10**6, 87.899, 70.054,
                                                    247.186, 210.800, 429.23, 325.236,
                                                    name='Optimise load profile 3, reversed'))

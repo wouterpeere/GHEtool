@@ -59,7 +59,7 @@ def main_functionalities():
     print("The borehole depth is: ", depth, "m")
 
     # print imbalance
-    print("The borefield imbalance is: ", borefield._load.imbalance, "kWh/y. (A negative imbalance means the the field is heat extraction dominated so it cools down year after year.)") # print imbalance
+    print("The borefield imbalance is: ", borefield._borefield_load.imbalance, "kWh/y. (A negative imbalance means the the field is heat extraction dominated so it cools down year after year.)") # print imbalance
 
     # plot temperature profile for the calculated depth
     borefield.print_temperature_profile(legend=True)
