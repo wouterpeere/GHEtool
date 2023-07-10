@@ -137,18 +137,6 @@ def borefield_cooling_dom():
     return borefield
 
 
-def test_hourly_to_monthly(borefield):
-    load = HourlyGeothermalLoad()
-    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), header=True, separator=';')
-    borefield.convert_hourly_to_monthly()
-    borefield.size()
-
-    assert np.isclose(np.sum(borefield.load.baseload_cooling), np.sum(borefield.hourly_cooling_load))
-    assert np.isclose(np.sum(borefield.load.baseload_heating), np.sum(borefield.hourly_heating_load))
-    # check if hourly imbalance equals the monthly imbalance
-    assert np.isclose(borefield.load.imbalance, np.sum(borefield.load.baseload_cooling) - np.sum(borefield.load.baseload_heating))
-
-
 def test_imbalance(borefield):
     assert borefield.load.imbalance == -140000.0
 
@@ -234,45 +222,6 @@ def test_create_custom_dataset_without_data(borefield):
         borefield.create_custom_dataset()
 
 
-def test_check_hourly_load(borefield):
-    with raises(ValueError):
-        borefield._check_hourly_load()
-
-    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
-    borefield.hourly_cooling_load[0] = -1
-    with raises(ValueError):
-        borefield._check_hourly_load()
-    borefield.hourly_cooling_load[0] = 0
-    borefield.hourly_cooling_load = borefield.hourly_cooling_load[:20]
-    with raises(ValueError):
-        borefield._check_hourly_load()
-
-
-def test_load_hourly_data(borefield):
-    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
-    test_cooling = copy.copy(borefield.hourly_cooling_load)
-    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_heating=1, col_cooling=0)
-    assert np.array_equal(test_cooling, borefield.hourly_heating_load)
-
-    borefield.load_hourly_profile(FOLDER.joinpath("test/methods/hourly data/hourly_profile_without_header.csv"), header=False)
-    assert np.array_equal(test_cooling, borefield.hourly_cooling_load)
-
-
-def test_convert_hourly_to_monthly_without_data(borefield):
-    with raises(IndexError):
-        borefield.convert_hourly_to_monthly()
-    borefield.set_fluid_parameters(fluidData)
-    borefield.set_pipe_parameters(pipeData)
-    borefield._sizing_setup.use_constant_Rb = False
-    with raises(ValueError):
-        borefield.optimise_load_profile()
-
-
-def test_calculate_hourly_temperature_profile(hourly_borefield):
-    hourly_borefield._calculate_temperature_profile(100, hourly=True)
-    hourly_borefield.hourly_heating_load_on_the_borefield = hourly_borefield.hourly_heating_load
-    hourly_borefield.hourly_cooling_load_on_the_borefield = hourly_borefield.hourly_cooling_load
-
 
 def test_incorrect_values_peak_baseload(borefield):
     with raises(ValueError):
@@ -318,17 +267,6 @@ def test_no_ground_data():
     borefield.set_min_ground_temperature(0)  # minimum temperature
     with raises(ValueError):
         borefield.size()
-
-
-def test_hourly_temperature_profile(hourly_borefield):
-    folder = FOLDER.joinpath("Examples/hourly_profile.csv")
-    d_f = pd.read_csv(folder, sep=';', decimal='.')
-    hourly_borefield.hourly_heating_load_on_the_borefield = d_f[d_f.columns[0]].to_numpy()
-    hourly_borefield.hourly_cooling_load_on_the_borefield = d_f[d_f.columns[1]].to_numpy()
-    hourly_borefield.calculate_temperatures(100, hourly=True)
-    hourly_borefield.hourly_heating_load_on_the_borefield = np.array([])
-    hourly_borefield.hourly_cooling_load_on_the_borefield = np.array([])
-    hourly_borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
 
 
 def test_value_error_cooling_dom_temp_gradient():
@@ -380,7 +318,9 @@ def test_sizing_with_use_constant_Rb():
     borefield.set_fluid_parameters(fluidData)
     borefield.set_pipe_parameters(pipeData)
     borefield.borefield = copy.deepcopy(borefield_gt)
-    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load = HourlyGeothermalLoad()
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    borefield.load = load
     assert not borefield.borehole.use_constant_Rb
     borefield.sizing_setup(L4_sizing=True)
     assert np.isclose(205.49615778557904, borefield.size())

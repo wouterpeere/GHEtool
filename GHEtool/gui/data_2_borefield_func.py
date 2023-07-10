@@ -9,7 +9,7 @@ import logging
 
 import numpy as np
 from GHEtool import Borefield, FluidData, PipeData, GroundConstantTemperature, GroundFluxTemperature, GroundTemperatureGradient
-from GHEtool.VariableClasses import GroundData
+from GHEtool.VariableClasses import GroundData, MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
 from GHEtool.gui.gui_structure import load_data_GUI
 import pygfunction as gt
 
@@ -34,10 +34,6 @@ def data_2_borefield(ds: DataStorage) -> tuple[Borefield, partial[[], None]]:
     # set ground data
     borefield.set_ground_parameters(_create_ground_data(ds))
 
-    # set peak lengths
-    borefield.set_length_peak_cooling(ds.option_len_peak_cooling)
-    borefield.set_length_peak_heating(ds.option_len_peak_heating)
-
     ### GENERAL SETUPS
 
     # check if Rb is a constant, otherwise set the fluid/pipe parameters
@@ -51,10 +47,12 @@ def data_2_borefield(ds: DataStorage) -> tuple[Borefield, partial[[], None]]:
 
     # set monthly loads
     peak_heating, peak_cooling, monthly_load_heating, monthly_load_cooling = _create_monthly_loads_peaks(ds)
-    borefield.set_peak_heating(peak_heating)
-    borefield.set_peak_cooling(peak_cooling)
-    borefield.set_baseload_heating(monthly_load_heating)
-    borefield.set_baseload_cooling(monthly_load_cooling)
+    load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
+
+    # set peak lengths
+    load.peak_cooling_duration = ds.option_len_peak_cooling
+    load.peak_heating_duration = ds.option_len_peak_heating
+    borefield.load = load
 
     # set hourly loads if available
     if ds.option_temperature_profile_hourly == 1 or ds.aim_optimize:
@@ -70,13 +68,17 @@ def data_2_borefield(ds: DataStorage) -> tuple[Borefield, partial[[], None]]:
             hourly=True)
 
         # hourly data to be loaded
-        borefield.set_hourly_heating_load(peak_heating)
-        borefield.set_hourly_cooling_load(peak_cooling)
+        hourly_data = HourlyGeothermalLoad()
+        hourly_data.hourly_cooling_load = peak_cooling
+        hourly_data.hourly_heating_load = peak_heating
+        borefield.load = hourly_data
 
         # when this load is a building load, it needs to be converted to a geothermal load
         if ds.geo_load == 1 and not ds.aim_optimize:
-            borefield.set_hourly_heating_load(peak_heating * (1 - 1 / ds.SCOP))
-            borefield.set_hourly_cooling_load(peak_cooling * (1 + 1 / ds.SEER))
+            hourly_data = HourlyGeothermalLoad()
+            hourly_data.hourly_cooling_load = peak_cooling * (1 + 1 / ds.SEER)
+            hourly_data.hourly_heating_load = peak_heating * (1 - 1 / ds.SCOP)
+            borefield.load = hourly_data
 
     # set up the borefield sizing
     borefield.sizing_setup(use_constant_Rb=ds.option_method_rb_calc == 0,
@@ -92,7 +94,7 @@ def data_2_borefield(ds: DataStorage) -> tuple[Borefield, partial[[], None]]:
     # if load should be optimized do this
     if ds.aim_optimize:
         # optimize load profile without printing the results
-        return borefield, partial(borefield.optimise_load_profile)
+        return borefield, partial(borefield.optimise_load_profile, borefield.load, borefield.H, ds.SCOP, ds.SEER)
 
             ### Size borefield
     if ds.aim_req_depth:

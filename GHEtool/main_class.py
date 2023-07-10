@@ -1818,41 +1818,6 @@ class Borefield(BaseClass):
         self._borefield_load.hourly_heating_load = heating_load
         self._delete_calculated_temperatures()
 
-    def convert_hourly_to_monthly(self, peak_cooling_load: float = None, peak_heating_load: float = None) -> None:
-        """
-        This function converts self.hourly_cooling_load and self.hourly_heating_load to the monthly profiles used in the sizing.
-
-        Parameters
-        ----------
-        peak_cooling_load : float
-            peak power in cooling [kW]
-        peak_heating_load : float
-            peak power in heating [kW]
-
-        Returns
-        -------
-        None
-        """
-
-        try:
-            self.load.hourly_cooling_load[0]
-            self.load.hourly_heating_load[0]
-        except IndexError:
-            raise IndexError("No hourly loads are loaded yet!")
-
-        if peak_cooling_load is None:
-            peak_cooling_load = np.max(self.load.hourly_cooling_load)
-        if peak_heating_load is None:
-            peak_heating_load = np.max(self.load.hourly_heating_load)
-
-        # calculate peak and base loads
-        self.set_peak_cooling(self._reduce_to_peak_load(self.load.hourly_cooling_load, peak_cooling_load))
-        self.set_peak_heating(self._reduce_to_peak_load(self.load.hourly_heating_load, peak_heating_load))
-        self.set_baseload_cooling(self._reduce_to_monthly_load(self.load.hourly_cooling_load, peak_cooling_load))
-        self.set_baseload_heating(self._reduce_to_monthly_load(self.load.hourly_heating_load, peak_heating_load))
-
-        ghe_logger.main_info("Hourly profile converted to monthly profile!")
-
     def set_hourly_cooling_load(self, cooling_load: np.array) -> None:
         """
         This function sets the hourly cooling load in kW.
@@ -1870,50 +1835,18 @@ class Borefield(BaseClass):
         self._borefield_load.hourly_heating_load = cooling_load
         self._delete_calculated_temperatures()
 
-    @staticmethod
-    def _reduce_to_monthly_load(load: list, peak: float) -> list:
+    @property
+    def Re(self) -> float:
         """
-        This function calculates the monthly load based, taking a maximum peak value into account.
-        This means that it sums the hourly load for each month, and if a peak occurs larger than the given peak,
-        it is limited to the last one.
-
-        Parameters
-        ----------
-        load : list or numpy.array
-            hourly load values [kW]
-        peak : float
-            maximum peak power [kW]
+        Reynolds number.
 
         Returns
         -------
-        monthly baseloads : list
-            list with monthly baseloads [kW]
+        Reynolds number : float
         """
-        month_load = [np.sum(np.minimum(peak, load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1]])) for i in range(12)]
-
-        return month_load
-
-    @staticmethod
-    def _reduce_to_peak_load(load: list, peak: float) -> list:
-        """
-        This function calculates the monthly peak load, taking a maximum peak value into account.
-        This means that for each month, it takes the minimum of either the peak in that month or the given peak.
-
-        Parameters
-        ----------
-        load : list or numpy.array
-            hourly loads [kW]
-        peak : float
-            maximum peak power [kW]
-
-        Returns
-        -------
-        peak loads : list
-            list with monthly peak loads [kW]
-        """
-
-        peak_load = [np.max(np.minimum(peak, load[Borefield.HOURLY_LOAD_ARRAY[i]:Borefield.HOURLY_LOAD_ARRAY[i + 1]])) for i in range(12)]
-        return peak_load
+        u = self.borehole.fluid_data.mfr / self.borehole.pipe_data.number_of_pipes / self.borehole.fluid_data.rho /\
+            (pi * self.borehole.pipe_data.r_in ** 2)
+        return self.borehole.fluid_data.rho * u * self.borehole.pipe_data.r_in * 2 / self.borehole.fluid_data.mu
 
     def optimise_load_profile(self, building_load: HourlyGeothermalLoad, depth: float = None, SCOP: float = 10**6,
                               SEER: float = 10**6, print_results: bool = False) -> None:

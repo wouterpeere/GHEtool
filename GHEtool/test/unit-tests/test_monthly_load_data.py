@@ -165,7 +165,7 @@ def test_params_first_year():
     load.peak_cooling = np.ones(12) * 240
 
     assert np.array_equal(load._calculate_first_year_params(False),
-                          (21600.0, 15768000.0, 18396000.0, 240000.0, -2066.536203522503, 65753.42465753425))
+                          (21600, 18396000.0, 21024000.0, 240000.0, 6410.9589041095915, 65753.42465753425))
     assert np.array_equal(load._calculate_first_year_params(True),
                           (21600.0, 0, 2628000.0, 160000.0, 0, 25753.424657534248))
 

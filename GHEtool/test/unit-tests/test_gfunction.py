@@ -136,7 +136,7 @@ def test_set_options():
 def test_calculate_gfunctions_speed_test():
     gfunc = GFunction()
     alpha = 0.00005
-    time_values = borefield_ghe.time_L3_last_year
+    time_values = borefield_ghe.load.time_L3
 
     time_init_start = time.time()
     gvalues = gfunc.calculate(time_values, borefield, alpha)
@@ -152,38 +152,38 @@ def test_calculate_gfunctions_speed_test():
 def test_interpolation_1D():
     gfunc = GFunction()
     alpha = 0.00005
-    time_values = borefield_ghe.time_L4
+    time_values = borefield_ghe.load.time_L4
 
     gfunc.calculate(time_values, borefield, alpha)
     gfunc_val = copy.copy(gfunc.previous_gfunctions)
 
     assert np.array_equal(gfunc.previous_gfunctions,
                           gt.gfunction.gFunction(borefield, alpha, gfunc.time_array).gFunc)
-    assert not np.array_equal(gfunc.calculate(borefield_ghe.time_L3_last_year, borefield, alpha),
-                              gt.gfunction.gFunction(borefield, alpha, borefield_ghe.time_L3_last_year).gFunc)
+    assert not np.array_equal(gfunc.calculate(borefield_ghe.load.time_L3, borefield, alpha),
+                              gt.gfunction.gFunction(borefield, alpha, borefield_ghe.load.time_L3).gFunc)
     assert np.array_equal(gfunc_val, gfunc.previous_gfunctions)
-    assert not np.array_equal(gfunc.calculate(borefield_ghe.time_L3_last_year[20:], borefield, alpha),
-                              gt.gfunction.gFunction(borefield, alpha, borefield_ghe.time_L3_last_year[20:]).gFunc)
+    assert not np.array_equal(gfunc.calculate(borefield_ghe.load.time_L3[20:], borefield, alpha),
+                              gt.gfunction.gFunction(borefield, alpha, borefield_ghe.load.time_L3[20:]).gFunc)
     assert np.array_equal(gfunc_val, gfunc.previous_gfunctions)
 
     gfunc.remove_previous_data()
-    gfunc.calculate(borefield_ghe.time_L3_last_year[-12:], borefield, alpha)
+    gfunc.calculate(borefield_ghe.load.time_L3[-12:], borefield, alpha)
     gfunc_val = copy.copy(gfunc.previous_gfunctions)
     # check if values are correctly calculated
     assert np.array_equal(gfunc.previous_gfunctions,
                           gt.gfunction.gFunction(borefield, alpha, gfunc.time_array).gFunc)
 
     # gvalues should be calculated, not interpolated
-    gfunc_cal = gfunc.calculate(borefield_ghe.time_L3_last_year[:12], borefield, alpha)
-    gfunc_pyg = gt.gfunction.gFunction(borefield, alpha, borefield_ghe.time_L3_last_year[:12]).gFunc
+    gfunc_cal = gfunc.calculate(borefield_ghe.load.time_L3[:12], borefield, alpha)
+    gfunc_pyg = gt.gfunction.gFunction(borefield, alpha, borefield_ghe.load.time_L3[:12]).gFunc
     assert np.array_equal(gfunc_cal, gfunc_pyg)
     # saved values should not have been overwritten
     assert not np.array_equal(gfunc_val, gfunc.previous_gfunctions)
     assert np.array_equal(gfunc_cal, gfunc.previous_gfunctions)
 
     # check if data will be overwritten
-    gfunc_cal = gfunc.calculate(borefield_ghe.time_L3_last_year[:13], borefield, alpha)
-    gfunc_pyg = gt.gfunction.gFunction(borefield, alpha, borefield_ghe.time_L3_last_year[:13]).gFunc
+    gfunc_cal = gfunc.calculate(borefield_ghe.load.time_L3[:13], borefield, alpha)
+    gfunc_pyg = gt.gfunction.gFunction(borefield, alpha, borefield_ghe.load.time_L3[:13]).gFunc
     # check if values are correctly calculated
     assert np.array_equal(gfunc_cal, gfunc_pyg)
     # values should have been overwritten
@@ -191,7 +191,7 @@ def test_interpolation_1D():
     gfunc_val = copy.copy(gfunc.previous_gfunctions)
 
     # check if data will be overwritten
-    gfunc.calculate(borefield_ghe.time_L4, borefield, alpha)
+    gfunc.calculate(borefield_ghe.load.time_L4, borefield, alpha)
     gfunc_pyg = gt.gfunction.gFunction(borefield, alpha, gfunc.time_array).gFunc
     # check if values are correctly calculated
     assert np.array_equal(gfunc.previous_gfunctions, gfunc_pyg)
@@ -200,8 +200,8 @@ def test_interpolation_1D():
     gfunc_val = copy.copy(gfunc.previous_gfunctions)
 
     # test with smaller field, should not be interpolated
-    gfunc_cal = gfunc.calculate(borefield_ghe.time_L3_last_year[:20], borefield_less_deep, alpha)
-    gfunc_pyg = gt.gfunction.gFunction(borefield_less_deep, alpha, borefield_ghe.time_L3_last_year[:20]).gFunc
+    gfunc_cal = gfunc.calculate(borefield_ghe.load.time_L3[:20], borefield_less_deep, alpha)
+    gfunc_pyg = gt.gfunction.gFunction(borefield_less_deep, alpha, borefield_ghe.load.time_L3[:20]).gFunc
     # check if values are correctly calculated
     assert np.array_equal(gfunc_cal, gfunc_pyg)
     # values should not have been overwritten
@@ -210,7 +210,7 @@ def test_interpolation_1D():
     # run again to unittest that the data will not be overwritten
     gfunc.previous_gfunctions[0] = 100
     test = copy.copy(gfunc.previous_gfunctions)
-    gfunc.calculate(borefield_ghe.time_L4, borefield, alpha)
+    gfunc.calculate(borefield_ghe.load.time_L4, borefield, alpha)
     assert np.array_equal(test, gfunc.previous_gfunctions)
 
 
@@ -222,7 +222,7 @@ def _change_borefield_depth(borefield, depth):
 def test_store_2D_data():
     gfunc = GFunction()
     alpha = 0.00005
-    time_values = borefield_ghe.time_L4
+    time_values = borefield_ghe.load.time_L4
 
     gfunc.calculate(time_values, borefield, alpha)
     gfunc_val = copy.copy(gfunc.previous_gfunctions)
@@ -276,7 +276,7 @@ def test_store_2D_data():
 def test_interpolate_2D():
     gfunc = GFunction()
     alpha = 0.00005
-    time_values = borefield_ghe.time_L4
+    time_values = borefield_ghe.load.time_L4
 
     # populate data
     _change_borefield_depth(borefield, 100)
@@ -297,14 +297,14 @@ def test_interpolate_2D():
     assert not np.array_equal(gfunc_calc, gfunc_pyg)
 
     _change_borefield_depth(borefield, 100)
-    gfunc_calc = gfunc.calculate(borefield_ghe.time_L3_last_year[:20], borefield, alpha)
-    gfunc_pyg = gt.gfunction.gFunction(borefield, alpha, borefield_ghe.time_L3_last_year[:20]).gFunc
+    gfunc_calc = gfunc.calculate(borefield_ghe.load.time_L3[:20], borefield, alpha)
+    gfunc_pyg = gt.gfunction.gFunction(borefield, alpha, borefield_ghe.load.time_L3[:20]).gFunc
 
     assert np.array_equal(gfunc.depth_array, np.array([80, 100, 120]))
     assert gfunc_pyg.size == gfunc_calc.size
     assert not np.array_equal(gfunc_calc, gfunc_pyg)
 
-    time_double = borefield_ghe.time_L3_last_year[:20]
+    time_double = borefield_ghe.load.time_L3[:20]
     time_double = np.insert(time_double, -1, time_double[-1])
 
     gfunc_calc = gfunc.calculate(time_double, borefield, alpha)
@@ -317,29 +317,29 @@ def test_interpolate_2D():
 
     # calculate anyhow
     gfunc.store_previous_values = False
-    gfunc_calc = gfunc.calculate(borefield_ghe.time_L3_last_year[:20], borefield, alpha)
-    gfunc_val = gt.gfunction.gFunction(borefield, alpha, borefield_ghe.time_L3_last_year[:20]).gFunc
+    gfunc_calc = gfunc.calculate(borefield_ghe.load.time_L3[:20], borefield, alpha)
+    gfunc_val = gt.gfunction.gFunction(borefield, alpha, borefield_ghe.load.time_L3[:20]).gFunc
     assert np.array_equal(gfunc_calc, gfunc_val)
 
 
 def test_no_extrapolation():
     gfunc = GFunction()
     alpha = 0.00005
-    time_values = borefield_ghe.time_L4
+    time_values = borefield_ghe.load.time_L4
     gfunc.no_extrapolation = False
     gfunc.calculate(time_values, borefield, alpha)
 
     assert np.array_equal(gfunc.previous_gfunctions,
                           gt.gfunction.gFunction(borefield, alpha, gfunc.time_array).gFunc)
     # these should equal since there is no extrapolation
-    assert np.array_equal(gfunc.calculate(borefield_ghe.time_L3_last_year[:20], borefield, alpha),
-                          gt.gfunction.gFunction(borefield, alpha, borefield_ghe.time_L3_last_year[:20]).gFunc)
+    assert np.array_equal(gfunc.calculate(borefield_ghe.load.time_L3[:20], borefield, alpha),
+                          gt.gfunction.gFunction(borefield, alpha, borefield_ghe.load.time_L3[:20]).gFunc)
 
 
 def test_floating_number():
     gfunc = GFunction()
     alpha = 0.00005
-    time_values = borefield_ghe.time_L4
+    time_values = borefield_ghe.load.time_L4
 
     # populate data
     _change_borefield_depth(borefield, 100)
@@ -377,7 +377,7 @@ def test_fifo():
 def test_stuck_in_loop():
     gfunc = GFunction()
     alpha = 0.00005
-    time_values = borefield_ghe.time_L3_last_year
+    time_values = borefield_ghe.load.time_L3
     for bor in borefield:
         bor.H = 100
     gfunc.calculate(time_values, borefield, alpha)

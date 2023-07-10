@@ -48,8 +48,8 @@ def test_building_load(qtbot):
         main_window.threads[-1].any_signal.connect(main_window.thread_function)
 
     # check if the data is the same, because optimize load profile needs the building, not the ground data
-    assert np.allclose(main_window.list_ds[0].results.hourly_cooling_load, peak_cooling)
-    assert np.allclose(main_window.list_ds[0].results.hourly_heating_load, peak_heating)
+    assert np.allclose(main_window.list_ds[0].results._building_load.hourly_cooling_load, peak_cooling)
+    assert np.allclose(main_window.list_ds[0].results._building_load.hourly_heating_load, peak_heating)
 
     # calculate with geothermal load
     main_window.gui_structure.aim_temp_profile.widget.click()
@@ -76,6 +76,6 @@ def test_building_load(qtbot):
         main_window.threads[-1].any_signal.connect(main_window.thread_function)
 
     # # check if the data is the same
-    test = (main_window.list_ds[0].results.hourly_cooling_load - peak_cooling)
-    assert np.allclose(main_window.list_ds[0].results.hourly_cooling_load / (1 + 1/3), peak_cooling)
-    assert np.allclose(main_window.list_ds[0].results.hourly_heating_load / (1 - 1/4), peak_heating)
+    test = (main_window.list_ds[0].results.load.hourly_cooling_load - peak_cooling)
+    assert np.allclose(main_window.list_ds[0].results.load.hourly_cooling_load / (1 + 1/3), peak_cooling)
+    assert np.allclose(main_window.list_ds[0].results.load.hourly_heating_load / (1 - 1/4), peak_heating)
