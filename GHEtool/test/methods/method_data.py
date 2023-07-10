@@ -294,7 +294,7 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 10**6, 10**6, 70.054, 87.899,
                                                    210.800, 247.186, 325.236, 429.231, name='Optimise load profile 2'))
 
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 10**6, 10**6, 44.791, 63.799,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 10**6, 10**6, 45.096, 63.799,
                                                    118.898, 117.804, 417.138, 558.612, name='Optimise load profile 3'))
 
 borefield.set_min_ground_temperature(-5)

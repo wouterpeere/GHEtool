@@ -550,27 +550,24 @@ def test_last_year_params():
     assert np.isclose(21600.0, th)
 
 
-def test_fist_year_params():
-    borefield = Borefield()
-    borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
-    borefield._calculate_first_year_params(False)
-    assert np.isclose(0, borefield.qa)
-    assert np.isclose(65753.42465753425, borefield.qm)
-    assert np.isclose(6410.95890410959, borefield.qpm)
-    assert np.isclose(21024000.0, borefield.tcm)
-    assert np.isclose(18396000.0, borefield.tpm)
-    assert np.isclose(240000.0, borefield.qh)
-    assert borefield.Tf == borefield.Tf_max
+def test_first_year_params():
+    load = MonthlyGeothermalLoadAbsolute(*load_case(2))
+    th, tpm, tcm, qh, qpm, qcm = load._calculate_first_year_params(False)
+    assert np.isclose(0, qa)
+    assert np.isclose(65753.42465753425, qm)
+    assert np.isclose(6410.95890410959, qpm)
+    assert np.isclose(21024000.0, tcm)
+    assert np.isclose(18396000.0, tpm)
+    assert np.isclose(240000.0, qh)
     assert np.isclose(21600.0, borefield.th)
-    borefield._calculate_first_year_params(True)
-    assert np.isclose(0, borefield.qa)
-    assert np.isclose(25753.424657534248, borefield.qm)
-    assert np.isclose(0, borefield.qpm)
-    assert np.isclose(2628000.0, borefield.tcm)
-    assert np.isclose(0, borefield.tpm)
-    assert np.isclose(160000.0, borefield.qh)
-    assert borefield.Tf == borefield.Tf_min
-    assert np.isclose(21600.0, borefield.th)
+    th, tpm, tcm, qh, qpm, qcm = load._calculate_first_year_params(True)
+    assert np.isclose(0, qa)
+    assert np.isclose(25753.424657534248, qm)
+    assert np.isclose(0, qpm)
+    assert np.isclose(2628000.0, tcm)
+    assert np.isclose(0, tpm)
+    assert np.isclose(160000.0, qh)
+    assert np.isclose(21600.0, th)
 
 
 def test_calculate_temperatures():
@@ -818,6 +815,7 @@ def test_load_duration(monkeypatch):
     borefield.borefield = copy.deepcopy(borefield_gt)
     load = HourlyGeothermalLoad()
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    borefield.load = load
     borefield.plot_load_duration(legend=True)
     borefield.optimise_load_profile(load, 150)
 
