@@ -136,7 +136,7 @@ def borefield_cooling_dom():
 
 
 def test_hourly_to_monthly(borefield):
-    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), header=True, separator=";", first_column_heating=True)
+    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), header=True, separator=";")
     borefield.convert_hourly_to_monthly()
     borefield.size()
 
@@ -248,7 +248,7 @@ def test_check_hourly_load(borefield):
 def test_load_hourly_data(borefield):
     borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     test_cooling = copy.copy(borefield.hourly_cooling_load)
-    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), first_column_heating=False)
+    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_heating=1, col_cooling=0)
     assert np.array_equal(test_cooling, borefield.hourly_heating_load)
 
     borefield.load_hourly_profile(FOLDER.joinpath("test/methods/hourly data/hourly_profile_without_header.csv"), header=False)

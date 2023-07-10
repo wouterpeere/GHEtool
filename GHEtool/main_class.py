@@ -1892,7 +1892,7 @@ class Borefield(BaseClass):
         self._delete_calculated_temperatures()
 
     def load_hourly_profile(self, file_path: str | Path, header: bool = True, separator: str = ";",
-                            decimal_seperator: str = ".", first_column_heating: bool = True) -> None:
+                            decimal_seperator: str = ".", col_heating: int = 0, col_cooling: int = 1) -> None:
         """
         This function loads in an hourly load profile [kW].
 
@@ -1906,8 +1906,10 @@ class Borefield(BaseClass):
             Symbol used in the file to separate the columns
         decimal_seperator : str
             Symbol used for the decimal number separation
-        first_column_heating : bool
-            True if the first column in the file is for the heating load
+        col_heating : int
+            Column for heating
+        col_cooling : int
+            Column for cooling
 
         Returns
         -------
@@ -1917,7 +1919,8 @@ class Borefield(BaseClass):
         self.load = HourlyGeothermalLoad()
 
         self.load.load_hourly_profile(file_path=file_path, header=header, separator=separator,
-                                      decimal_seperator=decimal_seperator, first_column_heating=first_column_heating)
+                                      decimal_seperator=decimal_seperator,
+                                      col_heating=col_heating, col_cooling=col_cooling)
     @staticmethod
     def _reduce_to_monthly_load(load: list, peak: float) -> list:
         """

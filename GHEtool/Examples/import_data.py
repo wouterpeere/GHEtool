@@ -24,7 +24,7 @@ borefield.Rb = 0.12
 borefield.set_borefield(borefield_gt)
 
 # load the hourly profile
-borefield.load_hourly_profile("hourly_profile.csv", header=True, separator=";", first_column_heating=True)
+borefield.load_hourly_profile("hourly_profile.csv", header=True, separator=";")
 borefield.convert_hourly_to_monthly()
 
 # size the borefield and plot the resulting temperature evolution

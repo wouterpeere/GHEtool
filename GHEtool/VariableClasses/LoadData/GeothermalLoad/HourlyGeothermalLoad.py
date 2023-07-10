@@ -316,7 +316,7 @@ class HourlyGeothermalLoad(_LoadData):
         return np.tile(self.hourly_heating_load, self.simulation_period)
 
     def load_hourly_profile(self, file_path: str, header: bool = True, separator: str = ";",
-                            decimal_seperator: str = ".", first_column_heating: bool = True) -> None:
+                            decimal_seperator: str = ".", col_heating: int = 0, col_cooling: int = 1) -> None:
         """
         This function loads in an hourly load profile [kW].
 
@@ -330,8 +330,10 @@ class HourlyGeothermalLoad(_LoadData):
             Symbol used in the file to separate the columns
         decimal_seperator : str
             Symbol used for the decimal number separation
-        first_column_heating : bool
-            True if the first column in the file is for the heating load
+        col_heating : int
+            Column for heating
+        col_cooling : int
+            Column for cooling
 
         Returns
         -------
@@ -342,17 +344,16 @@ class HourlyGeothermalLoad(_LoadData):
         else:
             header = None
 
+        if col_heating == col_cooling:
+            ghe_logger.info('Only one column with data selected. Load will be splitted into heating and cooling load.')
+            # TODO
+
         # import data
-        if first_column_heating:
-            df = pd.read_csv(file_path, sep=separator, header=header, decimal=decimal_seperator,
-                             names=['heating', 'cooling'])
-        else:
-            df = pd.read_csv(file_path, sep=separator, header=header, decimal=decimal_seperator,
-                             names=['cooling', 'heating'])
+        df = pd.read_csv(file_path, sep=separator, header=header, decimal=decimal_seperator)
 
         # set data
-        self.hourly_heating_load = np.array(df['heating'])
-        self.hourly_cooling_load = np.array(df['cooling'])
+        self.hourly_heating_load = np.array(df.iloc[:, col_heating])
+        self.hourly_cooling_load = np.array(df.iloc[:, col_cooling])
 
         ghe_logger.info("Hourly profile loaded!")
 
