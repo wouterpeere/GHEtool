@@ -15,7 +15,7 @@ class _LoadData(BaseClass, ABC):
     This class contains information w.r.t. load data for the borefield sizing.
     """
     __slots__ = 'hourly_resolution', 'simulation_period', '_peak_heating_duration', '_peak_cooling_duration', 'tm',\
-                'all_months_equal'
+                '_all_months_equal'
 
     AVG_UPM: float = 730.  # number of hours per month
     DEFAULT_LENGTH_PEAK: int = 6  # hours
@@ -36,7 +36,37 @@ class _LoadData(BaseClass, ABC):
         self._peak_cooling_duration: int = _LoadData.DEFAULT_LENGTH_PEAK
         self._peak_heating_duration: int = _LoadData.DEFAULT_LENGTH_PEAK
         self.tm: int = _LoadData.AVG_UPM * 3600  # time in a month in seconds
-        self.all_months_equal: bool = True  # true if it is assumed that all months are of the same length
+        self._all_months_equal: bool = True  # true if it is assumed that all months are of the same length
+
+    @property
+    def all_months_equal(self) -> bool:
+        """
+        Returns the attribute all months are equal
+
+        Returns
+        -------
+        bool
+            True if the months are assumed to be of equal length (i.e. 730 hours/month).
+            False if the correct number of hours is used.
+        """
+        return self._all_months_equal
+
+    @all_months_equal.setter
+    def all_months_equal(self, bool: bool) -> None:
+        """
+        Sets the all_months_equal attribute.
+
+        Parameters
+        ----------
+        bool : bool
+            True if the months are assumed to be of equal length (i.e. 730 hours/month).
+            False if the correct number of hours is used.
+
+        Returns
+        -------
+        None
+        """
+        self._all_months_equal = bool
 
     @property
     def UPM(self) -> np.ndarray:

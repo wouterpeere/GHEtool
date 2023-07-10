@@ -204,8 +204,7 @@ class HourlyGeothermalLoad(_LoadData):
         """
         return np.sum(self.hourly_cooling_load - self.hourly_heating_load)
 
-    @staticmethod
-    def resample_to_monthly(hourly_load: np.ndarray, peak: bool = False) -> np.ndarray:
+    def resample_to_monthly(self, hourly_load: np.ndarray, peak: bool = False) -> np.ndarray:
         """
         This function resamples an hourly_load to either monthly peaks (kW/month) or baseloads (kWh/month).
 
@@ -224,13 +223,20 @@ class HourlyGeothermalLoad(_LoadData):
         # create dataframe
         df = pd.DataFrame(hourly_load, index=HourlyGeothermalLoad.HOURS_SERIES, columns=['load'])
 
+        if self.all_months_equal:
+            if peak:
+                return np.max(np.array_split(hourly_load, 12), axis=1)
+            else:
+                return np.sum(np.array_split(hourly_load, 12), axis=1)
+
         # resample
         if peak:
             df = df.resample('M').agg({'load': 'max'})
         else:
             df = df.resample('M').agg({'load': 'sum'})
-
         return df['load']
+
+
 
     @property
     def baseload_cooling(self) -> np.ndarray:
@@ -331,9 +337,9 @@ class HourlyGeothermalLoad(_LoadData):
         decimal_seperator : str
             Symbol used for the decimal number separation
         col_heating : int
-            Column for heating
+            Column index for heating
         col_cooling : int
-            Column for cooling
+            Column index for cooling
 
         Returns
         -------
