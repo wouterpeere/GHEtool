@@ -167,6 +167,7 @@ borefield.set_pipe_parameters(pipe_data)
 borefield.sizing_setup(use_constant_Rb=False)
 borefield.set_max_ground_temperature(17)
 borefield.set_min_ground_temperature(3)
+hourly_load.simulation_period = 20
 hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly data\office.csv"), header=True, separator=";",
                                 col_cooling=0, col_heating=1)
 borefield.load = hourly_load

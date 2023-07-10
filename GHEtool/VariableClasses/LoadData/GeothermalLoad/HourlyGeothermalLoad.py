@@ -236,8 +236,6 @@ class HourlyGeothermalLoad(_LoadData):
             df = df.resample('M').agg({'load': 'sum'})
         return df['load']
 
-
-
     @property
     def baseload_cooling(self) -> np.ndarray:
         """
@@ -362,4 +360,3 @@ class HourlyGeothermalLoad(_LoadData):
         self.hourly_cooling_load = np.array(df.iloc[:, col_cooling])
 
         ghe_logger.info("Hourly profile loaded!")
-
