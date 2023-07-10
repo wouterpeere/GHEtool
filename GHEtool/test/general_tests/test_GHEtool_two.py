@@ -73,8 +73,7 @@ def test_different_heating_cooling_peaks():
     monthlyLoadHeating = list(map(lambda x: x * annualHeatingLoad, monthlyLoadHeatingPercentage))  # kWh
     monthlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, monthlyLoadCoolingPercentage))  # kWh
 
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peakHeating,
+    borefield = Borefield(peak_heating=peakHeating,
                           peak_cooling=peakCooling,
                           baseload_heating=monthlyLoadHeating,
                           baseload_cooling=monthlyLoadCooling)
@@ -97,8 +96,7 @@ def test_different_heating_cooling_peaks():
 def test_stuck_in_loop():
     monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(4)
 
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peak_heating,
+    borefield = Borefield(peak_heating=peak_heating,
                           peak_cooling=peak_cooling,
                           baseload_heating=monthly_load_heating,
                           baseload_cooling=monthly_load_cooling)
@@ -125,8 +123,7 @@ def test_stuck_in_loop():
 def test_different_results_with_other_peak_lengths():
     monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(4)
 
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peak_heating,
+    borefield = Borefield(peak_heating=peak_heating,
                           peak_cooling=peak_cooling,
                           baseload_heating=monthly_load_heating,
                           baseload_cooling=monthly_load_cooling)
@@ -150,8 +147,7 @@ def test_different_results_with_other_peak_lengths():
 def test_reset_temp_profiles_when_loaded(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     monthlyLoadCooling, monthlyLoadHeating, peakCooling, peakHeating = load_case(1)
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peakHeating,
+    borefield = Borefield(peak_heating=peakHeating,
                           peak_cooling=peakCooling,
                           baseload_heating=monthlyLoadHeating,
                           baseload_cooling=monthlyLoadCooling)
@@ -178,8 +174,7 @@ def test_reset_temp_profiles_when_loaded(monkeypatch):
 def test_no_possible_solution():
     monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(4)
 
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peak_heating,
+    borefield = Borefield(peak_heating=peak_heating,
                           peak_cooling=peak_cooling,
                           baseload_heating=monthly_load_heating,
                           baseload_cooling=monthly_load_cooling)
@@ -232,8 +227,7 @@ def test_problem_with_gfunction_calc_obj():
 
     # create the borefield object
 
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peak_heating,
+    borefield = Borefield(peak_heating=peak_heating,
                           peak_cooling=peak_cooling,
                           baseload_heating=monthly_load_heating,
                           baseload_cooling=monthly_load_cooling)

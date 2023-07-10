@@ -24,7 +24,6 @@ def data_2_borefield(ds: DataStorage) -> tuple[Borefield, partial[[], None]]:
 
     # create the bore field object
     borefield = Borefield(
-        simulation_period=ds.option_simu_period,
         gui=True,
     )
     _set_boreholes(ds, borefield)
@@ -84,6 +83,9 @@ def data_2_borefield(ds: DataStorage) -> tuple[Borefield, partial[[], None]]:
                            L2_sizing=ds.option_method_size_depth == 0,
                            L3_sizing=ds.option_method_size_depth == 1,
                            L4_sizing=ds.option_method_size_depth == 2)
+
+    # set borefield simulation period
+    borefield.simulation_period = ds.option_simu_period
 
     ### FUNCTIONALITIES (i.e. aims)
 

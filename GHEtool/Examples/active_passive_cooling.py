@@ -138,7 +138,8 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         return investment_borefield, cost_heating, cost_cooling, cost_heating+cost_cooling
 
 
-    borefield = Borefield(SIMULATION_PERIOD)
+    borefield = Borefield()
+    borefield.simulation_period = SIMULATION_PERIOD
     borefield.example_active_passive = True
     borefield.set_max_ground_temperature(17)
 

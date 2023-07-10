@@ -49,16 +49,18 @@ class Borefield(BaseClass):
                 'printing', 'combo', 'D', 'r_b', 'gfunction_calculation_object',\
                 'H_init', 'use_precalculated_data', '_sizing_setup', 'hourly_heating_load_building', 'hourly_cooling_load_building'
 
-    def __init__(self, simulation_period: int = 20, peak_heating: np.ndarray | list = None,
-                 peak_cooling: np.ndarray | list = None, baseload_heating: np.ndarray | list = None,
-                 baseload_cooling: np.ndarray | list = None, borefield=None,
-                 custom_gfunction: CustomGFunction = None, gui: bool = False, load: _LoadData = None):
+    def __init__(self, peak_heating: np.ndarray | list = None,
+                 peak_cooling: np.ndarray | list = None,
+                 baseload_heating: np.ndarray | list = None,
+                 baseload_cooling: np.ndarray | list = None,
+                 borefield=None,
+                 custom_gfunction: CustomGFunction = None,
+                 gui: bool = False,
+                 load: _LoadData = None):
         """
 
         Parameters
         ----------
-        simulation_period : int
-            Simulation period in years
         peak_heating : list, numpy array
             Monthly peak heating values [kW]
         peak_cooling : list, numpy array
@@ -100,8 +102,7 @@ class Borefield(BaseClass):
 
         create the borefield object
 
-        >>> borefield = Borefield(simulation_period=20,
-        >>>                      peak_heating=peak_heating,
+        >>> borefield = Borefield(peak_heating=peak_heating,
         >>>                      peak_cooling=peak_cooling,
         >>>                      baseload_heating=monthly_load_heating,
         >>>                      baseload_cooling=monthly_load_cooling)
@@ -183,7 +184,7 @@ class Borefield(BaseClass):
             self.load = load
         else:
             self.load = MonthlyGeothermalLoadAbsolute(baseload_heating, baseload_cooling,
-                                                      peak_heating, peak_cooling, simulation_period)
+                                                      peak_heating, peak_cooling)
 
         # set investment cost
         self.cost_investment: list = Borefield.DEFAULT_INVESTMENT
@@ -513,13 +514,13 @@ class Borefield(BaseClass):
         self._delete_calculated_temperatures()
     
     @property
-    def simulation_period(self) -> float:
+    def simulation_period(self) -> int:
         """
         This returns the simulation period from the LoadData object.
         
         Returns
         -------
-        Simulation period [years] : float
+        Simulation period [years] : int
         """
         return self.load.simulation_period
 
@@ -1571,7 +1572,7 @@ class Borefield(BaseClass):
         # define temperature bounds
         ax.hlines(self.Tf_min, 0, self.simulation_period, colors='r', linestyles='dashed', label='', lw=1)
         ax.hlines(self.Tf_max, 0, self.simulation_period, colors='b', linestyles='dashed', label='', lw=1)
-        ax.set_xticks(range(0, self.simulation_period + 1, 2))
+        ax.set_xticks(range(0, self.simulation_period+1, 2))
 
         # Plot legend
         if legend:

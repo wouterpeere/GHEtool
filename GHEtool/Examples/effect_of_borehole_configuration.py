@@ -31,11 +31,10 @@ def effect_borefield_configuration():
 
     # create the borefield object
 
-    borefield = Borefield(simulation_period=20,
-                      peak_heating=peak_heating,
-                      peak_cooling=peak_cooling,
-                      baseload_heating=monthly_load_heating,
-                      baseload_cooling=monthly_load_cooling)
+    borefield = Borefield(peak_heating=peak_heating,
+                          peak_cooling=peak_cooling,
+                          baseload_heating=monthly_load_heating,
+                          baseload_cooling=monthly_load_cooling)
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)

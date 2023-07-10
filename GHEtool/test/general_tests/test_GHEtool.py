@@ -39,8 +39,7 @@ custom_field = gt.boreholes.L_shaped_field(N_1=4, N_2=5, B_1=5., B_2=5., H=100.,
 
 
 def test_borefield():
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peakHeating,
+    borefield = Borefield(peak_heating=peakHeating,
                           peak_cooling=peakCooling,
                           baseload_heating=monthlyLoadHeating,
                           baseload_cooling=monthlyLoadCooling)
@@ -76,8 +75,7 @@ def borefield_quadrants():
 
 @pytest.fixture
 def borefield():
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peakHeating,
+    borefield = Borefield(peak_heating=peakHeating,
                           peak_cooling=peakCooling,
                           baseload_heating=monthlyLoadHeating,
                           baseload_cooling=monthlyLoadCooling)
@@ -94,8 +92,7 @@ def borefield():
 
 @pytest.fixture
 def borefield_custom_data():
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peakHeating,
+    borefield = Borefield(peak_heating=peakHeating,
                           peak_cooling=peakCooling,
                           baseload_heating=monthlyLoadHeating,
                           baseload_cooling=monthlyLoadCooling)
@@ -123,8 +120,7 @@ def hourly_borefield():
 
 @pytest.fixture
 def borefield_cooling_dom():
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peakHeating,
+    borefield = Borefield(peak_heating=peakHeating,
                           peak_cooling=peakCooling,
                           baseload_heating=monthlyLoadHeating,
                           baseload_cooling=monthlyLoadCooling)
@@ -311,8 +307,7 @@ def test_gfunction_jit(borefield):
 
 
 def test_no_ground_data():
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peakHeating,
+    borefield = Borefield(peak_heating=peakHeating,
                           peak_cooling=peakCooling,
                           baseload_heating=monthlyLoadHeating,
                           baseload_cooling=monthlyLoadCooling)
@@ -342,8 +337,7 @@ def test_value_error_cooling_dom_temp_gradient():
     borefield_pyg = gt.boreholes.rectangle_field(5, 5, 6, 6, 110, 4, 0.075)
     monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(1)
 
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peak_heating,
+    borefield = Borefield(peak_heating=peak_heating,
                           peak_cooling=peak_cooling,
                           baseload_heating=monthly_load_heating,
                           baseload_cooling=monthly_load_cooling)

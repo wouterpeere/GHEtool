@@ -108,8 +108,7 @@ Next, one creates the borefield object in GHEtool and sets the temperature const
 
 ```Python
 # create the borefield object
-borefield = Borefield(simulation_period=20,
-                      peak_heating=peak_heating,
+borefield = Borefield(peak_heating=peak_heating,
                       peak_cooling=peak_cooling,
                       baseload_heating=monthly_load_heating,
                       baseload_cooling=monthly_load_cooling)

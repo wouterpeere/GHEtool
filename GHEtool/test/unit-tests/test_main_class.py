@@ -177,10 +177,10 @@ def test_set_length_peak():
 
 
 def test_simulation_period():
-    borefield = Borefield(simulation_period=20)
+    borefield = Borefield()
     assert borefield.simulation_period == 20
     assert len(borefield.time_L3_last_year) == 12 * 20
-    borefield = Borefield(simulation_period=25)
+    borefield.simulation_period = 25
     assert borefield.simulation_period == 25
     assert len(borefield.time_L3_last_year) == 12 * 25
     borefield.set_simulation_period(40)

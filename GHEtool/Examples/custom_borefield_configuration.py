@@ -40,8 +40,7 @@ def custom_borefield_configuration():
 
     # create the borefield object
 
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peak_heating,
+    borefield = Borefield(peak_heating=peak_heating,
                           peak_cooling=peak_cooling,
                           baseload_heating=monthly_load_heating,
                           baseload_cooling=monthly_load_cooling)
@@ -65,7 +64,7 @@ def custom_borefield_configuration():
     print("The borehole depth is: ", depth, "m")
 
     # print imbalance
-    print("The borefield imbalance is: ", borefield.imbalance, "kWh/y. (A negative imbalance means the the field is heat extraction dominated so it cools down year after year.)") # print imbalance
+    print("The borefield imbalance is: ", borefield.load.imbalance, "kWh/y. (A negative imbalance means the the field is heat extraction dominated so it cools down year after year.)") # print imbalance
 
     # plot temperature profile for the calculated depth
     borefield.print_temperature_profile(legend=True)

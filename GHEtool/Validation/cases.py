@@ -78,8 +78,7 @@ def check_cases():
     for i in (1, 2, 3, 4):
         monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(i)
 
-        borefield = Borefield(simulation_period=20,
-                              peak_heating=peak_heating,
+        borefield = Borefield(peak_heating=peak_heating,
                               peak_cooling=peak_cooling,
                               baseload_heating=monthly_load_heating,
                               baseload_cooling=monthly_load_cooling)
@@ -118,8 +117,7 @@ def check_custom_datafile():
     for i in (1, 2, 3, 4):
         monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(i)
 
-        borefield = Borefield(simulation_period=20,
-                              peak_heating=peak_heating,
+        borefield = Borefield(peak_heating=peak_heating,
                               peak_cooling=peak_cooling,
                               baseload_heating=monthly_load_heating,
                               baseload_cooling=monthly_load_cooling)

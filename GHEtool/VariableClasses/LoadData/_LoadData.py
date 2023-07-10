@@ -19,8 +19,9 @@ class _LoadData(BaseClass, ABC):
 
     AVG_UPM: float = 730.  # number of hours per month
     DEFAULT_LENGTH_PEAK: int = 6  # hours
+    DEFAULT_SIMULATION_PERIOD: int = 20  # years
 
-    def __init__(self, hourly_resolution: bool, simulation_period: int = 20):
+    def __init__(self, hourly_resolution: bool, simulation_period: int = DEFAULT_SIMULATION_PERIOD):
         """
 
         Parameters
