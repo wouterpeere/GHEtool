@@ -11,7 +11,7 @@ from pytest import raises
 
 from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, PipeData, Borefield, SizingSetup, FOLDER
 from GHEtool.Validation.cases import load_case
-from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute
+from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
 
 data = GroundConstantTemperature(3, 10)
 data_ground_flux = GroundFluxTemperature(3, 10)
@@ -115,7 +115,9 @@ def hourly_borefield():
     borefield.set_ground_parameters(data)
     borefield.set_Rb(0.2)
     borefield.set_borefield(borefield_gt)
-    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load = HourlyGeothermalLoad()
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), header=True, separator=";")
+    borefield.load = load
     return borefield
 
 
@@ -136,7 +138,8 @@ def borefield_cooling_dom():
 
 
 def test_hourly_to_monthly(borefield):
-    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), header=True, separator=";")
+    load = HourlyGeothermalLoad()
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), header=True, separator=';')
     borefield.convert_hourly_to_monthly()
     borefield.size()
 

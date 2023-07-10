@@ -9,7 +9,7 @@ import pytest
 from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, PipeData, Borefield, SizingSetup, FOLDER
 from GHEtool.logger import ghe_logger
 from GHEtool.Validation.cases import load_case
-from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute
+from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
 
 data = GroundConstantTemperature(3, 10)
 ground_data_constant = data
@@ -482,29 +482,36 @@ def test_size_L4_value_errors():
 def test_size_L4():
     borefield = Borefield()
     borefield.set_ground_parameters(ground_data_constant)
-
+    load = HourlyGeothermalLoad()
     # quadrant 1
     borefield.borefield = copy.deepcopy(borefield_gt)
-    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    borefield.load = load
     assert np.isclose(182.17317343989652, borefield.size_L4(100, quadrant_sizing=1))
     assert np.isclose(182.17317343989652, borefield.H)
     assert borefield.calculate_quadrant() == 1
     # quadrant 2
     borefield.borefield = copy.deepcopy(borefield_gt)
-    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_cooling=0, col_heating=1)
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_cooling=0, col_heating=1)
+    borefield.load = load
+
     assert np.isclose(305.2876065045127, borefield.size_L4(100, quadrant_sizing=2))
     assert np.isclose(305.2876065045127, borefield.H)
     assert borefield.calculate_quadrant() == 2
     # quadrant 3
     borefield.borefield = copy.deepcopy(borefield_gt)
-    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_cooling=0, col_heating=1)
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_cooling=0, col_heating=1)
+    borefield.load = load
+
     borefield.set_max_ground_temperature(25)
     assert np.isclose(109.4742962707615, borefield.size_L4(100, quadrant_sizing=3))
     assert np.isclose(109.4742962707615, borefield.H)
     assert borefield.calculate_quadrant() == 3
     # quadrant 4
     borefield.borefield = copy.deepcopy(borefield_gt)
-    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    borefield.load = load
+
     # to increase coverage
     borefield.sizing_setup(L4_sizing=True)
     assert np.isclose(174.23648328808213, borefield.size(100, quadrant_sizing=4))
@@ -811,7 +818,9 @@ def test_load_duration(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     borefield.set_ground_parameters(ground_data_constant)
     borefield.borefield = copy.deepcopy(borefield_gt)
-    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load = HourlyGeothermalLoad()
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    borefield.load = load
     borefield.plot_load_duration(legend=True)
     borefield.optimise_load_profile(150)
 

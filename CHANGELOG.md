@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - GUI was moved to a seperate project: ScenarioGUI.
 - H_init was removed from the sizing functions since it was not used.
 - Rb is now solely handled by the borehole object.
+- load_hourly_profile is moved to the separate load classes (issue #45).
 
 ## Fixed
 - Fixed problem with L2 sizing, when the peak load was the same in all months (issue #146).
