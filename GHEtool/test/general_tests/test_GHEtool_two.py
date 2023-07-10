@@ -112,8 +112,8 @@ def test_stuck_in_loop():
     borefield.size()
     borefield.set_length_peak_cooling(8)
     borefield.set_length_peak_heating(8)
-    assert borefield.load.peak_cooling_duration == 8
-    assert borefield.load.peak_heating_duration == 8
+    assert borefield.load.peak_cooling_duration == 8 * 3600
+    assert borefield.load.peak_heating_duration == 8 * 3600
     borefield.size()
     assert np.isclose(borefield.size(), 100.91784885721547)
     borefield.set_length_peak_heating(7)

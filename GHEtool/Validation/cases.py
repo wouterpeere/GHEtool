@@ -9,7 +9,7 @@ This document contains 4 different cases referring to the paper: Peere, W., Pica
 import numpy as np
 import pygfunction as gt
 
-from GHEtool import Borefield, GroundConstantTemperature
+from GHEtool import Borefield, GroundConstantTemperature, MonthlyGeothermalLoadAbsolute
 
 # relevant borefield data for the calculations
 data = GroundConstantTemperature(3.5,  # conductivity of the soil (W/mK)
@@ -61,7 +61,7 @@ def load_case(number):
         peak_cooling = np.array([0., 0., 22., 44., 83., 117., 134., 150., 100., 23., 0., 0.])
         peak_heating = np.array([300., 268., 191., 103., 75., 0., 0., 38., 76., 160., 224., 255.])
 
-    return monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating
+    return monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling
 
 
 def check_cases():
@@ -76,12 +76,7 @@ def check_cases():
     correct_answers_L3 = (56.77, 118.74, 66.47, 91.24)
 
     for i in (1, 2, 3, 4):
-        monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(i)
-
-        borefield = Borefield(peak_heating=peak_heating,
-                              peak_cooling=peak_cooling,
-                              baseload_heating=monthly_load_heating,
-                              baseload_cooling=monthly_load_cooling)
+        borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(i)))
 
         borefield.set_ground_parameters(data)
         borefield.set_borefield(borefield_gt)
@@ -115,12 +110,7 @@ def check_custom_datafile():
     custom_field = gt.boreholes.rectangle_field(N_1=12, N_2=10, B_1=6.5, B_2=6.5, H=110., D=4, r_b=0.075)
 
     for i in (1, 2, 3, 4):
-        monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(i)
-
-        borefield = Borefield(peak_heating=peak_heating,
-                              peak_cooling=peak_cooling,
-                              baseload_heating=monthly_load_heating,
-                              baseload_cooling=monthly_load_cooling)
+        borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(i)))
 
         borefield.set_ground_parameters(data)
         borefield.set_borefield(custom_field)

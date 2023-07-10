@@ -1179,7 +1179,7 @@ class Borefield(BaseClass):
             raise ValueError(f'Quadrant {quadrant_sizing} does not exist.')
 
         # check if hourly data is given
-        if not self.load.hourly_resolution:
+        if not self.load.hourly_resolution and not self.example_active_passive:
             raise ValueError("There is no hourly resolution available!")
 
         # initiate with a given depth
@@ -2007,8 +2007,8 @@ class Borefield(BaseClass):
             raise ValueError("There is no hourly resolution available!")
 
         # load hourly heating and cooling load and convert it to geothermal loads
-        hourly_heating_load_geo: np.ndarray = self.hourly_heating_load.copy() * (1 - 1/SCOP)
-        hourly_cooling_load_geo: np.ndarray = self.hourly_cooling_load.copy() * (1 + 1/SEER)
+        hourly_heating_load_geo: np.ndarray = self.load.hourly_heating_load.copy() * (1 - 1/SCOP)
+        hourly_cooling_load_geo: np.ndarray = self.load.hourly_cooling_load.copy() * (1 + 1/SEER)
 
         # set hourly_heat_load and hourly_cooling_load
         self.hourly_heating_load = hourly_heating_load_geo

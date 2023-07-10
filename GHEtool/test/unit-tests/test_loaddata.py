@@ -142,8 +142,7 @@ def test_monthly_average_load():
 
 
 def test_params_last_year():
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
-    load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
+    load = MonthlyGeothermalLoadAbsolute(*load_case(2))
     assert np.array_equal(load._calculate_last_year_params(False),
                           (21600.0, 240000.0, 65753.42465753425, 9132.420091324202))
     assert np.array_equal(load._calculate_last_year_params(True),
@@ -157,8 +156,7 @@ def test_params_last_year():
 
 
 def test_params_first_year():
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
-    load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
+    load = MonthlyGeothermalLoadAbsolute(*load_case(2))
     assert np.array_equal(load._calculate_first_year_params(False),
                           (21600.0, 18396000.0, 21024000.0, 240000.0, 6410.9589041095915, 65753.42465753425))
     assert np.array_equal(load._calculate_first_year_params(True),

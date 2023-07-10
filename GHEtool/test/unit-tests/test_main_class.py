@@ -9,6 +9,7 @@ import pytest
 from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, PipeData, Borefield, SizingSetup, FOLDER
 from GHEtool.logger import ghe_logger
 from GHEtool.Validation.cases import load_case
+from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute
 
 data = GroundConstantTemperature(3, 10)
 ground_data_constant = data
@@ -160,32 +161,32 @@ def test_set_length_peak():
     borefield = Borefield()
     borefield.set_length_peak_heating(8)
     borefield.set_length_peak_cooling(10)
-    assert borefield.length_peak_cooling == 10
-    assert borefield.length_peak_heating == 8
+    assert borefield.load.length_peak_cooling == 10
+    assert borefield.load.length_peak_heating == 8
     borefield.set_length_peak(12)
-    assert borefield.length_peak_cooling == 12
-    assert borefield.length_peak_heating == 12
+    assert borefield.load.length_peak_cooling == 12
+    assert borefield.load.length_peak_heating == 12
     borefield.set_length_peak_cooling()
     borefield.set_length_peak_heating()
-    assert borefield.length_peak_heating == 6
-    assert borefield.length_peak_cooling == 6
+    assert borefield.load.length_peak_heating == 6
+    assert borefield.load.length_peak_cooling == 6
     borefield.set_length_peak_heating(8)
     borefield.set_length_peak_cooling(10)
     borefield.set_length_peak()
-    assert borefield.length_peak_heating == 6
-    assert borefield.length_peak_cooling == 6
+    assert borefield.load.length_peak_heating == 6
+    assert borefield.load.length_peak_cooling == 6
 
 
 def test_simulation_period():
     borefield = Borefield()
     assert borefield.simulation_period == 20
-    assert len(borefield.time_L3_last_year) == 12 * 20
+    assert len(borefield.load.time_L3_last_year) == 12 * 20
     borefield.simulation_period = 25
     assert borefield.simulation_period == 25
-    assert len(borefield.time_L3_last_year) == 12 * 25
+    assert len(borefield.load.time_L3_last_year) == 12 * 25
     borefield.set_simulation_period(40)
     assert borefield.simulation_period == 40
-    assert len(borefield.time_L3_last_year) == 12 * 40
+    assert len(borefield.load.time_L3_last_year) == 12 * 40
 
 
 def test_set_Rb():
@@ -311,12 +312,7 @@ def test_Tg():
 def test_Ahmadfard(ground_data, constant_Rb, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(3)
-    borefield.set_peak_heating(peak_heating)
-    borefield.set_peak_cooling(peak_cooling)
-    borefield.set_baseload_cooling(monthly_load_cooling)
-    borefield.set_baseload_heating(monthly_load_heating)
-
+    borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(3))
     borefield.set_ground_parameters(ground_data)
     borefield.set_fluid_parameters(fluidData)
     borefield.set_pipe_parameters(pipeData)
@@ -332,11 +328,7 @@ def test_Ahmadfard(ground_data, constant_Rb, result):
 def test_Carcel(ground_data, constant_Rb, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(3)
-    borefield.set_peak_heating(peak_heating)
-    borefield.set_peak_cooling(peak_cooling)
-    borefield.set_baseload_cooling(monthly_load_cooling)
-    borefield.set_baseload_heating(monthly_load_heating)
+    borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(3))
 
     borefield.set_ground_parameters(ground_data)
     borefield.set_fluid_parameters(fluidData)
@@ -374,11 +366,7 @@ def test_size():
     except ValueError:
         assert True
     borefield.borefield = copy.deepcopy(borefield_gt)
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(3)
-    borefield.set_peak_heating(peak_heating)
-    borefield.set_peak_cooling(peak_cooling)
-    borefield.set_baseload_cooling(monthly_load_cooling)
-    borefield.set_baseload_heating(monthly_load_heating)
+    borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(3))
 
     borefield.set_ground_parameters(ground_data_constant)
     sizing_setup_backup = copy.deepcopy(borefield._sizing_setup)
@@ -389,11 +377,7 @@ def test_size():
 def test_select_size():
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(3)
-    borefield.set_peak_heating(peak_heating)
-    borefield.set_peak_cooling(peak_cooling)
-    borefield.set_baseload_cooling(monthly_load_cooling)
-    borefield.set_baseload_heating(monthly_load_heating)
+    borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(3))
 
     # with constant Tg
     borefield.set_ground_parameters(ground_data_constant)
@@ -437,11 +421,7 @@ def test_size_L2_value_errors():
 def test_size_L2(quadrant, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
-    borefield.set_peak_heating(peak_heating)
-    borefield.set_peak_cooling(peak_cooling)
-    borefield.set_baseload_cooling(monthly_load_cooling)
-    borefield.set_baseload_heating(monthly_load_heating)
+    borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
     borefield.set_ground_parameters(ground_data_constant)
     borefield.size_L2(100, quadrant_sizing=quadrant)
 
@@ -457,11 +437,7 @@ def test_size_L3_value_errors():
         assert False  # pragma: no cover
     except ValueError:
         assert True
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
-    borefield.set_peak_heating(peak_heating)
-    borefield.set_peak_cooling(peak_cooling)
-    borefield.set_baseload_cooling(monthly_load_cooling)
-    borefield.set_baseload_heating(monthly_load_heating)
+    borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
     borefield.set_ground_parameters(ground_data_constant)
     try:
         borefield.size_L3(100, 5)
@@ -475,11 +451,7 @@ def test_size_L3(quadrant, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
     borefield.set_max_ground_temperature(18)
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
-    borefield.set_peak_heating(peak_heating)
-    borefield.set_peak_cooling(peak_cooling)
-    borefield.set_baseload_cooling(monthly_load_cooling)
-    borefield.set_baseload_heating(monthly_load_heating)
+    borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
     borefield.set_ground_parameters(ground_data_constant)
 
     assert np.isclose(result, borefield.size_L3(100, quadrant_sizing=quadrant))
@@ -493,11 +465,7 @@ def test_size_L4_value_errors():
         assert False  # pragma: no cover
     except ValueError:
         assert True
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
-    borefield.set_peak_heating(peak_heating)
-    borefield.set_peak_cooling(peak_cooling)
-    borefield.set_baseload_cooling(monthly_load_cooling)
-    borefield.set_baseload_heating(monthly_load_heating)
+    borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
     borefield.set_ground_parameters(ground_data_constant)
     try:
         borefield.size_L4(100, 5)
@@ -562,12 +530,7 @@ def test_reynolds_number():
 
 
 def test_last_year_params():
-    borefield = Borefield()
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
-    borefield.set_peak_heating(peak_heating)
-    borefield.set_peak_cooling(peak_cooling)
-    borefield.set_baseload_cooling(monthly_load_cooling)
-    borefield.set_baseload_heating(monthly_load_heating)
+    borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(2)))
     borefield._calculate_last_year_params(False)
     assert np.isclose(9132.420091324202, borefield.qa)
     assert np.isclose(65753.42465753425, borefield.qm)
@@ -584,11 +547,7 @@ def test_last_year_params():
 
 def test_fist_year_params():
     borefield = Borefield()
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
-    borefield.set_peak_heating(peak_heating)
-    borefield.set_peak_cooling(peak_cooling)
-    borefield.set_baseload_cooling(monthly_load_cooling)
-    borefield.set_baseload_heating(monthly_load_heating)
+    borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
     borefield._calculate_first_year_params(False)
     assert np.isclose(0, borefield.qa)
     assert np.isclose(65753.42465753425, borefield.qm)
@@ -613,11 +572,7 @@ def test_calculate_temperatures():
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
     borefield.set_ground_parameters(ground_data_constant)
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
-    borefield.set_peak_heating(peak_heating)
-    borefield.set_peak_cooling(peak_cooling)
-    borefield.set_baseload_cooling(monthly_load_cooling)
-    borefield.set_baseload_heating(monthly_load_heating)
+    borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
 
     borefield.calculate_temperatures(120)
     np.testing.assert_array_almost_equal(borefield.results_peak_heating,
@@ -865,11 +820,7 @@ def test_calculate_quadrants_without_data():
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
     borefield.set_max_ground_temperature(18)
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
-    borefield.set_peak_heating(peak_heating)
-    borefield.set_peak_cooling(peak_cooling)
-    borefield.set_baseload_cooling(monthly_load_cooling)
-    borefield.set_baseload_heating(monthly_load_heating)
+    borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
     borefield.set_ground_parameters(ground_data_constant)
     borefield.calculate_quadrant()
 
