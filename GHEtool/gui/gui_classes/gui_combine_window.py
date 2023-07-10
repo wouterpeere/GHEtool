@@ -101,7 +101,7 @@ class MainWindow(MainWindow):
                 item.setData(MainWindow.role, ds)
                 self.list_widget_scenario.addItem(item)
             # set and change the window title
-            self.filename = saving['filename']
+            self.filename = tuple(saving['filename'])
             general_changes()
             return True
 
@@ -117,7 +117,7 @@ class MainWindow(MainWindow):
                 self.list_widget_scenario.addItem(item)
 
             # set and change the window title
-            self.filename = saving['filename']
+            self.filename = tuple(saving['filename'])
             general_changes()
             return True
 
