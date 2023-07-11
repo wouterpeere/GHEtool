@@ -51,6 +51,8 @@ def test_building_load(qtbot):
     assert np.allclose(main_window.list_ds[0].results._building_load.hourly_cooling_load, peak_cooling)
     assert np.allclose(main_window.list_ds[0].results._building_load.hourly_heating_load, peak_heating)
 
+    # check if the resultTexts are correct
+
     # calculate with geothermal load
     main_window.gui_structure.aim_temp_profile.widget.click()
     main_window.save_scenario()

@@ -1865,10 +1865,6 @@ class Borefield(BaseClass):
         use_constant_Rb_backup = self.borehole.use_constant_Rb
         self.Rb = self.borehole.get_Rb(depth, self.D, self.r_b, self.ground_data.k_s)
 
-        # check if hourly profile is given
-        if not building_load.hourly_resolution:
-            raise ValueError("There is no hourly resolution available!")
-
         # load hourly heating and cooling load and convert it to geothermal loads
         primary_geothermal_load = HourlyGeothermalLoad()
         primary_geothermal_load.set_hourly_cooling(building_load.hourly_cooling_load.copy() * (1 + 1/SEER))

@@ -1616,8 +1616,6 @@ class GUI(GuiStructure):
         -------
         None
         """
-        if not self.started:
-            return
         filename = (self.option_filename.get_value() if not isinstance(filename, str) else filename) if filename is not None else self.option_filename.get_value()
 
         # get decimal and column seperator
@@ -1629,7 +1627,7 @@ class GUI(GuiStructure):
             logging.warning("Please make sure the seperator and decimal point are different.")
             return
 
-        if filename == "":
+        if filename == "" and self.started:
             logging.info(self.translations.no_file_selected[self.option_language.get_value()[0]])
             return
         # try to read CSV-File
