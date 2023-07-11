@@ -147,7 +147,7 @@ def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, 
     df2 = df2.fillna(0)
 
     if hourly:
-        return df2["peak Heating"], df2["peak Cooling"]
+        return np.array(df2["peak Heating"]), np.array(df2["peak Cooling"])
 
     # resample to a monthly resolution as sum and maximal load
     df3: pd_DataFrame = df2.resample("M").agg(
@@ -160,7 +160,7 @@ def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, 
     heating_load = df3["Heating Load"]
     cooling_load = df3["Cooling Load"]
 
-    return peak_heating, peak_cooling, heating_load, cooling_load
+    return np.array(peak_heating), np.array(peak_cooling), np.array(heating_load), np.array(cooling_load)
 
 
 class GUI(GuiStructure):
@@ -1253,44 +1253,44 @@ class GUI(GuiStructure):
                 self.results_heating_peak_geo = ResultText(self.translations.results_heating_peak_geo,
                                                        category=self.numerical_results,
                                                        prefix="with a peak of: ", suffix=" kW")
-                self.results_heating_peak_geo.text_to_be_shown("Borefield", "hourly_heating_load_building")
-                self.results_heating_peak_geo.function_to_convert_to_text(lambda x: round(max(x), 2))
-                self.results_heating_load.text_to_be_shown("Borefield", "hourly_heating_load_building")
-                self.results_heating_load.function_to_convert_to_text(lambda x: round(sum(x), 0))
+                self.results_heating_peak_geo.text_to_be_shown("Borefield", "_secundary_borefield_load")
+                self.results_heating_peak_geo.function_to_convert_to_text(lambda x: round(getattr(x, "max_peak_heating"), 2))
+                self.results_heating_load.text_to_be_shown("Borefield", "_secundary_borefield_load")
+                self.results_heating_load.function_to_convert_to_text(lambda x: round(np.sum(getattr(x, "hourly_heating_load")), 0))
                 self.results_heating_load_percentage = ResultText(translations.results_heating_load_percentage, category=self.numerical_results,
                                                                   prefix="This is ", suffix="% of the heating load")
                 self.results_heating_load_percentage.text_to_be_shown("Borefield", "_percentage_heating")
                 self.results_heating_load_percentage.function_to_convert_to_text(lambda x: round(x, 2))
                 self.results_heating_ext = ResultText(translations.results_heating_ext, category=self.numerical_results,
                                                       prefix="heating load external: ", suffix=" kWh")
-                self.results_heating_ext.text_to_be_shown("Borefield", "hourly_heating_load_external")
-                self.results_heating_ext.function_to_convert_to_text(lambda x: round(sum(x), 0))
+                self.results_heating_ext.text_to_be_shown("Borefield", "_external_load")
+                self.results_heating_ext.function_to_convert_to_text(lambda x: round(np.sum(getattr(x, "hourly_heating_load"), 0)))
                 self.results_heating_peak = ResultText(translations.results_heating_peak, category=self.numerical_results,
                                                        prefix="with a peak of: ", suffix=" kW")
-                self.results_heating_peak.text_to_be_shown("Borefield", "peak_heating_external")
-                self.results_heating_peak.function_to_convert_to_text(lambda x: round(max(x), 2))
+                self.results_heating_peak.text_to_be_shown("Borefield", "_external_load")
+                self.results_heating_peak.function_to_convert_to_text(lambda x: round(getattr(x, 'max_peak_heating'), 2))
 
                 self.results_cooling_load = ResultText(translations.results_cooling_load, category=self.numerical_results,
                                                        prefix="Cooling load on the borefield: ", suffix=" kWh")
                 self.results_cooling_peak_geo = ResultText(self.translations.results_cooling_peak_geo,
                                                        category=self.numerical_results,
                                                        prefix="with a peak of: ", suffix=" kW")
-                self.results_cooling_peak_geo.text_to_be_shown("Borefield", "hourly_cooling_load_building")
-                self.results_cooling_peak_geo.function_to_convert_to_text(lambda x: round(max(x), 2))
-                self.results_cooling_load.text_to_be_shown("Borefield", "hourly_cooling_load_building")
-                self.results_cooling_load.function_to_convert_to_text(lambda x: round(sum(x), 0))
+                self.results_cooling_peak_geo.text_to_be_shown("Borefield", "_secundary_borefield_load")
+                self.results_cooling_peak_geo.function_to_convert_to_text(lambda x: round(getattr(x, 'max_peak_cooling'), 2))
+                self.results_cooling_load.text_to_be_shown("Borefield", "_secundary_borefield_load")
+                self.results_cooling_load.function_to_convert_to_text(lambda x: round(np.sum(getattr(x, 'hourly_cooling_load')), 0))
                 self.results_cooling_load_percentage = ResultText(translations.results_cooling_load_percentage, category=self.numerical_results,
                                                                   prefix="This is ", suffix="% of the cooling load")
                 self.results_cooling_load_percentage.text_to_be_shown("Borefield", "_percentage_cooling")
                 self.results_cooling_load_percentage.function_to_convert_to_text(lambda x: round(x, 2))
                 self.results_cooling_ext = ResultText(translations.results_cooling_ext, category=self.numerical_results,
                                                       prefix="cooling load external: ", suffix=" kWh")
-                self.results_cooling_ext.text_to_be_shown("Borefield", "hourly_cooling_load_external")
-                self.results_cooling_ext.function_to_convert_to_text(lambda x: round(sum(x), 0))
+                self.results_cooling_ext.text_to_be_shown("Borefield", "_external_load")
+                self.results_cooling_ext.function_to_convert_to_text(lambda x: round(np.sum(getattr(x, 'hourly_cooling_load')), 0))
                 self.results_cooling_peak = ResultText(translations.results_cooling_peak, category=self.numerical_results,
                                                        prefix="with a peak of: ", suffix=" kW")
-                self.results_cooling_peak.text_to_be_shown("Borefield", "peak_cooling_external")
-                self.results_cooling_peak.function_to_convert_to_text(lambda x: round(max(x), 2))
+                self.results_cooling_peak.text_to_be_shown("Borefield", "_external_load")
+                self.results_cooling_peak.function_to_convert_to_text(lambda x: round(getattr(x, 'max_peak_cooling'), 2))
 
                 self.max_temp = ResultText(translations.max_temp, category=self.numerical_results,
                                            prefix="The maximum average fluid temperature is ", suffix=" deg C")
@@ -1616,8 +1616,6 @@ class GUI(GuiStructure):
         -------
         None
         """
-        if not self.started:
-            return
         filename = (self.option_filename.get_value() if not isinstance(filename, str) else filename) if filename is not None else self.option_filename.get_value()
 
         # get decimal and column seperator
@@ -1629,7 +1627,7 @@ class GUI(GuiStructure):
             logging.warning("Please make sure the seperator and decimal point are different.")
             return
 
-        if filename == "":
+        if filename == "" and self.started:
             logging.info(self.translations.no_file_selected[self.option_language.get_value()[0]])
             return
         # try to read CSV-File

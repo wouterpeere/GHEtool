@@ -6,7 +6,7 @@ Coninx, M., De Nies, J. (2022). Cost-efficient Cooling of Buildings by means of 
 with Active and Passive Cooling. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
 """
 
-from GHEtool import Borefield, GroundConstantTemperature
+from GHEtool import Borefield, GroundConstantTemperature, HourlyGeothermalLoadMultiYear
 
 import pandas as pd
 import numpy as np
@@ -137,9 +137,8 @@ def active_passive_cooling(location='Active_passive_example.csv'):
 
         return investment_borefield, cost_heating, cost_cooling, cost_heating+cost_cooling
 
-
-    borefield = Borefield(SIMULATION_PERIOD)
-    borefield.example_active_passive = True
+    borefield = Borefield()
+    borefield.simulation_period = SIMULATION_PERIOD
     borefield.set_max_ground_temperature(17)
 
     borefield.create_rectangular_borefield(12, 12, 6, 6, 100)
@@ -155,8 +154,10 @@ def active_passive_cooling(location='Active_passive_example.csv'):
 
     while abs(depths[0] - depths[1]) > 0.1:
         # set loads
-        borefield.set_hourly_cooling_load(cooling_ground)
-        borefield.set_hourly_heating_load(heating_ground)
+        load = HourlyGeothermalLoadMultiYear()
+        load.hourly_heating_load = heating_ground
+        load.hourly_cooling_load = cooling_ground
+        borefield.load = load
 
         # size borefield
         depth_passive = borefield.size_L4()
@@ -179,8 +180,10 @@ def active_passive_cooling(location='Active_passive_example.csv'):
     borefield.set_max_ground_temperature(25)
     while abs(depths[0] - depths[1]) > 0.1:
         # set loads
-        borefield.set_hourly_cooling_load(cooling_ground)
-        borefield.set_hourly_heating_load(heating_ground)
+        load = HourlyGeothermalLoadMultiYear()
+        load.hourly_heating_load = heating_ground
+        load.hourly_cooling_load = cooling_ground
+        borefield.load = load
 
         # size borefield
         depth_active = borefield.size_L4()
@@ -234,8 +237,10 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         # iterate until convergence in the load
         while np.sum(cooling_ground + heating_ground - heating_ground_prev - cooling_ground_prev) > 100:
             # set loads
-            borefield.set_hourly_heating_load(heating_ground)
-            borefield.set_hourly_cooling_load(cooling_ground)
+            load = HourlyGeothermalLoadMultiYear()
+            load.hourly_heating_load = heating_ground
+            load.hourly_cooling_load = cooling_ground
+            borefield.load = load
 
             # get temperature profile
             borefield.calculate_temperatures(depth, hourly=True)

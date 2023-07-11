@@ -10,7 +10,7 @@ import time
 import numpy as np
 import pygfunction as gt
 
-from GHEtool import Borefield, FluidData, GroundConstantTemperature, PipeData
+from GHEtool import Borefield, FluidData, GroundConstantTemperature, PipeData, MonthlyGeothermalLoadAbsolute
 
 
 def sizing_with_Rb():
@@ -59,12 +59,11 @@ def sizing_with_Rb():
     monthly_load_heating = annual_heating_load * monthly_load_heating_percentage   # kWh
     monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage   # kWh
 
+    # set the load
+    load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
+
     # create the borefield object
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peak_heating,
-                          peak_cooling=peak_cooling,
-                          baseload_heating=monthly_load_heating,
-                          baseload_cooling=monthly_load_cooling)
+    borefield = Borefield(load=load)
 
     borefield.set_ground_parameters(data)
     borefield.set_fluid_parameters(fluid_data)
@@ -87,10 +86,10 @@ def sizing_with_Rb():
 
     start_Rb_constant = time.time()
     for i in range(number_of_iterations):
-        borefield.set_baseload_cooling(monthly_load_cooling_array[i])
-        borefield.set_baseload_heating(monthly_load_heating_array[i])
-        borefield.set_peak_cooling(peak_load_cooling_array[i])
-        borefield.set_peak_heating(peak_load_heating_array[i])
+        # set the load
+        load = MonthlyGeothermalLoadAbsolute(monthly_load_heating_array[i], monthly_load_cooling_array[i],
+                                              peak_load_heating_array[i], peak_load_cooling_array[i])
+        borefield.load = load
         results_Rb_static[i] = borefield.size()
     end_Rb_constant = time.time()
 
@@ -99,10 +98,10 @@ def sizing_with_Rb():
 
     start_Rb_dynamic = time.time()
     for i in range(number_of_iterations):
-        borefield.set_baseload_cooling(monthly_load_cooling_array[i])
-        borefield.set_baseload_heating(monthly_load_heating_array[i])
-        borefield.set_peak_cooling(peak_load_cooling_array[i])
-        borefield.set_peak_heating(peak_load_heating_array[i])
+        # set the load
+        load = MonthlyGeothermalLoadAbsolute(monthly_load_heating_array[i], monthly_load_cooling_array[i],
+                                              peak_load_heating_array[i], peak_load_cooling_array[i])
+        borefield.load = load
         results_Rb_dynamic[i] = borefield.size()
     end_Rb_dynamic = time.time()
     print(results_Rb_dynamic[1])
@@ -132,10 +131,10 @@ def sizing_with_Rb():
 
     start_Rb_constant = time.time()
     for i in range(number_of_iterations):
-        borefield.set_baseload_cooling(monthly_load_cooling_array[i])
-        borefield.set_baseload_heating(monthly_load_heating_array[i])
-        borefield.set_peak_cooling(peak_load_cooling_array[i])
-        borefield.set_peak_heating(peak_load_heating_array[i])
+        # set the load
+        load = MonthlyGeothermalLoadAbsolute(monthly_load_heating_array[i], monthly_load_cooling_array[i],
+                                             peak_load_heating_array[i], peak_load_cooling_array[i])
+        borefield.load = load
         results_Rb_static[i] = borefield.size()
     end_Rb_constant = time.time()
 
@@ -144,10 +143,10 @@ def sizing_with_Rb():
 
     start_Rb_dynamic = time.time()
     for i in range(number_of_iterations):
-        borefield.set_baseload_cooling(monthly_load_cooling_array[i])
-        borefield.set_baseload_heating(monthly_load_heating_array[i])
-        borefield.set_peak_cooling(peak_load_cooling_array[i])
-        borefield.set_peak_heating(peak_load_heating_array[i])
+        # set the load
+        load = MonthlyGeothermalLoadAbsolute(monthly_load_heating_array[i], monthly_load_cooling_array[i],
+                                             peak_load_heating_array[i], peak_load_cooling_array[i])
+        borefield.load = load
         results_Rb_dynamic[i] = borefield.size()
     end_Rb_dynamic = time.time()
 

@@ -22,10 +22,11 @@ class SizingObject:
 
 class OptimiseLoadProfileObject:
 
-    def __init__(self, borefield: Borefield, depth: float, SCOP: float, SEER: float, percentage_heating: float,
+    def __init__(self, borefield: Borefield, load, depth: float, SCOP: float, SEER: float, percentage_heating: float,
                  percentage_cooling: float, peak_heating_geo: float, peak_cooling_geo: float, peak_heating_ext: float,
                  peak_cooling_ext: float, name: str = ""):
         self.borefield = copy.deepcopy(borefield)
+        self.load = copy.deepcopy(load)
         self.depth = depth
         self.SCOP = SCOP
         self.SEER = SEER
@@ -166,7 +167,7 @@ class TestMethodClass():
         for _, i in enumerate(self.list_of_test_objects):
             if isinstance(i, SizingObject):
                 continue
-            temp.append((copy.deepcopy(i.borefield),i.depth, i.SCOP, i.SEER))
+            temp.append((copy.deepcopy(i.borefield), copy.deepcopy(i.load), i.depth, i.SCOP, i.SEER))
         return temp
 
     @property

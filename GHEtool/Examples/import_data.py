@@ -24,8 +24,9 @@ borefield.Rb = 0.12
 borefield.set_borefield(borefield_gt)
 
 # load the hourly profile
-borefield.load_hourly_profile("hourly_profile.csv", header=True, separator=";", first_column_heating=True)
-borefield.convert_hourly_to_monthly()
+load = HourlyGeothermalLoad()
+load.load_hourly_profile("hourly_profile.csv", header=True, separator=";")
+borefield.load = load
 
 # size the borefield and plot the resulting temperature evolution
 depth = borefield.size(100, L2_sizing=True)

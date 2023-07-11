@@ -11,6 +11,7 @@ from pytest import raises
 
 from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, PipeData, Borefield, SizingSetup, FOLDER
 from GHEtool.Validation.cases import load_case
+from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
 
 data = GroundConstantTemperature(3, 10)
 data_ground_flux = GroundFluxTemperature(3, 10)
@@ -39,8 +40,7 @@ custom_field = gt.boreholes.L_shaped_field(N_1=4, N_2=5, B_1=5., B_2=5., H=100.,
 
 
 def test_borefield():
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peakHeating,
+    borefield = Borefield(peak_heating=peakHeating,
                           peak_cooling=peakCooling,
                           baseload_heating=monthlyLoadHeating,
                           baseload_cooling=monthlyLoadCooling)
@@ -56,7 +56,7 @@ def test_borefield():
     assert borefield.simulation_period == 20
     assert borefield.Tf_min == 0
     assert borefield.Tf_max == 16
-    np.testing.assert_array_equal(borefield.peak_heating, np.array([160., 142, 102., 55., 26.301369863013697, 0., 0., 0., 40.4, 85., 119., 136.]))
+    np.testing.assert_array_equal(borefield.load.peak_heating, np.array([160., 142, 102., 55., 26.301369863013697, 0., 0., 0., 40.4, 85., 119., 136.]))
 
 
 @pytest.fixture
@@ -76,8 +76,7 @@ def borefield_quadrants():
 
 @pytest.fixture
 def borefield():
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peakHeating,
+    borefield = Borefield(peak_heating=peakHeating,
                           peak_cooling=peakCooling,
                           baseload_heating=monthlyLoadHeating,
                           baseload_cooling=monthlyLoadCooling)
@@ -94,8 +93,7 @@ def borefield():
 
 @pytest.fixture
 def borefield_custom_data():
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peakHeating,
+    borefield = Borefield(peak_heating=peakHeating,
                           peak_cooling=peakCooling,
                           baseload_heating=monthlyLoadHeating,
                           baseload_cooling=monthlyLoadCooling)
@@ -117,14 +115,15 @@ def hourly_borefield():
     borefield.set_ground_parameters(data)
     borefield.set_Rb(0.2)
     borefield.set_borefield(borefield_gt)
-    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load = HourlyGeothermalLoad()
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), header=True, separator=";")
+    borefield.load = load
     return borefield
 
 
 @pytest.fixture
 def borefield_cooling_dom():
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peakHeating,
+    borefield = Borefield(peak_heating=peakHeating,
                           peak_cooling=peakCooling,
                           baseload_heating=monthlyLoadHeating,
                           baseload_cooling=monthlyLoadCooling)
@@ -138,19 +137,8 @@ def borefield_cooling_dom():
     return borefield
 
 
-def test_hourly_to_monthly(borefield):
-    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), header=True, separator=";", first_column_heating=True)
-    borefield.convert_hourly_to_monthly()
-    borefield.size()
-
-    assert np.isclose(np.sum(borefield.baseload_cooling), np.sum(borefield.hourly_cooling_load))
-    assert np.isclose(np.sum(borefield.baseload_heating), np.sum(borefield.hourly_heating_load))
-    # check if hourly imbalance equals the monthly imbalance
-    assert np.isclose(borefield.imbalance, np.sum(borefield.baseload_cooling) - np.sum(borefield.baseload_heating))
-
-
 def test_imbalance(borefield):
-    assert borefield.imbalance == -140000.0
+    assert borefield.load.imbalance == -140000.0
 
 
 def test_sizing_L3_threshold_depth_error(borefield):
@@ -190,12 +178,7 @@ def test_precalculated_data_2(borefield_custom_data):
 
 
 def test_choose_quadrant_None(borefield_quadrants):
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(4)
-
-    borefield_quadrants.set_peak_heating(peak_heating)
-    borefield_quadrants.set_peak_cooling(peak_cooling)
-    borefield_quadrants.set_baseload_cooling(monthly_load_cooling)
-    borefield_quadrants.set_baseload_heating(monthly_load_heating)
+    borefield_quadrants.load = MonthlyGeothermalLoadAbsolute(*load_case(4))
 
     borefield_quadrants.calculate_temperatures(200)
     assert None is borefield_quadrants.calculate_quadrant()
@@ -239,45 +222,6 @@ def test_create_custom_dataset_without_data(borefield):
         borefield.create_custom_dataset()
 
 
-def test_check_hourly_load(borefield):
-    with raises(ValueError):
-        borefield._check_hourly_load()
-
-    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
-    borefield.hourly_cooling_load[0] = -1
-    with raises(ValueError):
-        borefield._check_hourly_load()
-    borefield.hourly_cooling_load[0] = 0
-    borefield.hourly_cooling_load = borefield.hourly_cooling_load[:20]
-    with raises(ValueError):
-        borefield._check_hourly_load()
-
-
-def test_load_hourly_data(borefield):
-    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
-    test_cooling = copy.copy(borefield.hourly_cooling_load)
-    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), first_column_heating=False)
-    assert np.array_equal(test_cooling, borefield.hourly_heating_load)
-
-    borefield.load_hourly_profile(FOLDER.joinpath("test/methods/hourly data/hourly_profile_without_header.csv"), header=False)
-    assert np.array_equal(test_cooling, borefield.hourly_cooling_load)
-
-
-def test_convert_hourly_to_monthly_without_data(borefield):
-    with raises(IndexError):
-        borefield.convert_hourly_to_monthly()
-    borefield.set_fluid_parameters(fluidData)
-    borefield.set_pipe_parameters(pipeData)
-    borefield._sizing_setup.use_constant_Rb = False
-    with raises(ValueError):
-        borefield.optimise_load_profile()
-
-
-def test_calculate_hourly_temperature_profile(hourly_borefield):
-    hourly_borefield._calculate_temperature_profile(100, hourly=True)
-    hourly_borefield.hourly_heating_load_on_the_borefield = hourly_borefield.hourly_heating_load
-    hourly_borefield.hourly_cooling_load_on_the_borefield = hourly_borefield.hourly_cooling_load
-
 
 def test_incorrect_values_peak_baseload(borefield):
     with raises(ValueError):
@@ -311,8 +255,7 @@ def test_gfunction_jit(borefield):
 
 
 def test_no_ground_data():
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peakHeating,
+    borefield = Borefield(peak_heating=peakHeating,
                           peak_cooling=peakCooling,
                           baseload_heating=monthlyLoadHeating,
                           baseload_cooling=monthlyLoadCooling)
@@ -326,27 +269,11 @@ def test_no_ground_data():
         borefield.size()
 
 
-def test_hourly_temperature_profile(hourly_borefield):
-    folder = FOLDER.joinpath("Examples/hourly_profile.csv")
-    d_f = pd.read_csv(folder, sep=';', decimal='.')
-    hourly_borefield.hourly_heating_load_on_the_borefield = d_f[d_f.columns[0]].to_numpy()
-    hourly_borefield.hourly_cooling_load_on_the_borefield = d_f[d_f.columns[1]].to_numpy()
-    hourly_borefield.calculate_temperatures(100, hourly=True)
-    hourly_borefield.hourly_heating_load_on_the_borefield = np.array([])
-    hourly_borefield.hourly_cooling_load_on_the_borefield = np.array([])
-    hourly_borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
-
-
 def test_value_error_cooling_dom_temp_gradient():
     data = GroundFluxTemperature(3, 12)
     borefield_pyg = gt.boreholes.rectangle_field(5, 5, 6, 6, 110, 4, 0.075)
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(1)
 
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peak_heating,
-                          peak_cooling=peak_cooling,
-                          baseload_heating=monthly_load_heating,
-                          baseload_cooling=monthly_load_cooling)
+    borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(1)))
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_pyg)
@@ -360,12 +287,7 @@ def test_value_error_cooling_dom_temp_gradient():
 
 def test_borefield_with_constant_peaks(borefield):
     # test first year
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(1)
-    borefield.set_peak_cooling(peak_cooling)
-    borefield.set_peak_heating(peak_heating)
-    borefield.set_baseload_heating(monthly_load_heating)
-    borefield.set_baseload_cooling(monthly_load_cooling)
-
+    borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(1))
     # do not save previous g-functions
     borefield.gfunction_calculation_object.store_previous_values = False
 
@@ -377,11 +299,7 @@ def test_borefield_with_constant_peaks(borefield):
     assert np.isclose(length_L2_1, length_L2_2)
 
     # test last year
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
-    borefield.set_peak_cooling(peak_cooling)
-    borefield.set_peak_heating(peak_heating)
-    borefield.set_baseload_heating(monthly_load_heating)
-    borefield.set_baseload_cooling(monthly_load_cooling)
+    borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
 
     # do not save previous g-functions
     borefield.gfunction_calculation_object.store_previous_values = False
@@ -400,7 +318,9 @@ def test_sizing_with_use_constant_Rb():
     borefield.set_fluid_parameters(fluidData)
     borefield.set_pipe_parameters(pipeData)
     borefield.borefield = copy.deepcopy(borefield_gt)
-    borefield.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load = HourlyGeothermalLoad()
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    borefield.load = load
     assert not borefield.borehole.use_constant_Rb
     borefield.sizing_setup(L4_sizing=True)
     assert np.isclose(205.49615778557904, borefield.size())
@@ -408,12 +328,7 @@ def test_sizing_with_use_constant_Rb():
 
 
 def test_size_with_different_peak_lengths(borefield):
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(4)
-
-    borefield.set_peak_heating(peak_heating)
-    borefield.set_peak_cooling(peak_cooling)
-    borefield.set_baseload_cooling(monthly_load_cooling)
-    borefield.set_baseload_heating(monthly_load_heating)
+    borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(4))
 
     borefield.set_length_peak_cooling(8)
     borefield.set_length_peak_heating(6)

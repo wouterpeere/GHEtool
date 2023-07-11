@@ -9,7 +9,7 @@ import numpy as np
 import PySide6.QtWidgets as QtW
 import pandas as pd
 
-from GHEtool import Borefield, FOLDER, FluidData, GroundConstantTemperature, GroundFluxTemperature, PipeData, GroundTemperatureGradient
+from GHEtool import Borefield, FOLDER, FluidData, GroundConstantTemperature, GroundFluxTemperature, PipeData, GroundTemperatureGradient, MonthlyGeothermalLoadAbsolute
 from GHEtool.gui.data_2_borefield_func import data_2_borefield
 from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
 from GHEtool.gui.gui_classes.translation_class import Translations
@@ -49,7 +49,7 @@ def create_borefield(g_s: GuiStructure) -> Borefield:
     -------
         borefield with data from g_s
     """
-    borefield = Borefield(g_s.option_simu_period.get_value())
+    borefield = Borefield()
 
     borefield.set_max_ground_temperature(g_s.option_max_temp.get_value())
     borefield.set_min_ground_temperature(g_s.option_min_temp.get_value())
@@ -61,9 +61,6 @@ def create_borefield(g_s: GuiStructure) -> Borefield:
     borefield.create_rectangular_borefield(g_s.option_width.get_value(), g_s.option_length.get_value(), g_s.option_spacing_width.get_value(),
                                            g_s.option_spacing_width.get_value(), g_s.option_depth.get_value(), g_s.option_pipe_depth.get_value(),
                                            g_s.option_pipe_borehole_radius.get_value())
-
-    borefield.set_length_peak_heating(g_s.option_len_peak_heating.get_value())
-    borefield.set_length_peak_cooling(g_s.option_len_peak_cooling.get_value())
 
     hl = [g_s.option_hl_jan.get_value(), g_s.option_hl_feb.get_value(), g_s.option_hl_mar.get_value(), g_s.option_hl_apr.get_value(),
           g_s.option_hl_may.get_value(), g_s.option_hl_jun.get_value(), g_s.option_hl_jul.get_value(), g_s.option_hl_aug.get_value(),
@@ -81,10 +78,13 @@ def create_borefield(g_s: GuiStructure) -> Borefield:
           g_s.option_cp_may.get_value(), g_s.option_cp_jun.get_value(), g_s.option_cp_jul.get_value(), g_s.option_cp_aug.get_value(),
           g_s.option_cp_sep.get_value(), g_s.option_cp_oct.get_value(), g_s.option_cp_nov.get_value(), g_s.option_cp_dec.get_value()]
 
-    borefield.set_baseload_heating(hl)
-    borefield.set_baseload_cooling(cl)
-    borefield.set_peak_heating(hp)
-    borefield.set_peak_cooling(cp)
+    load = MonthlyGeothermalLoadAbsolute(hl, cl, hp, cp)
+
+    load.peak_heating_duration = g_s.option_len_peak_heating.get_value()
+    load.peak_cooling_duration = g_s.option_len_peak_cooling.get_value()
+
+    borefield.load = load
+    borefield.simulation_period = g_s.option_simu_period.get_value()
 
     return borefield
 
@@ -510,9 +510,9 @@ def test_temp_profile_period_peak_length(qtbot) -> None:
     gs.aim_temp_profile.widget.click() if not gs.aim_temp_profile.widget.isChecked() else None
 
     borefield = create_borefield(gs)
-    borefield.set_simulation_period(period)
-    borefield.set_length_peak_heating(peak_heating)
-    borefield.set_length_peak_cooling(peak_cooling)
+    borefield.load.simulation_period = period
+    borefield.load.peak_heating_duration = peak_heating
+    borefield.load.peak_cooling_duration = peak_cooling
 
     gs.option_len_peak_heating.set_value(peak_heating)
     gs.option_len_peak_cooling.set_value(peak_cooling)
@@ -521,14 +521,13 @@ def test_temp_profile_period_peak_length(qtbot) -> None:
     main_window.save_scenario()
     ds = main_window.list_ds[-1]
     borefield_gui, func = data_2_borefield(ds)
-    assert borefield_gui.length_peak_heating == borefield.length_peak_heating
-    assert borefield_gui.length_peak_cooling == borefield.length_peak_cooling
+    assert borefield_gui.load.peak_cooling_duration == borefield.load.peak_cooling_duration
+    assert borefield_gui.load.peak_heating_duration == borefield.load.peak_heating_duration
     assert func.func == borefield_gui.calculate_temperatures
     assert func.args == (gs.option_depth.get_value(), )
     assert func.keywords == {}
 
     main_window.delete_backup()
-
 
 
 def test_temp_profile_heating_data(qtbot) -> None:
@@ -565,10 +564,10 @@ def test_temp_profile_heating_data(qtbot) -> None:
         main_window.save_scenario()
         ds = main_window.list_ds[-1]
         borefield_gui, func = data_2_borefield(ds)
-        assert np.allclose(borefield_gui.baseload_heating, borefield.baseload_heating)
-        assert np.allclose(borefield_gui.baseload_cooling, borefield.baseload_cooling)
-        assert np.allclose(borefield_gui.peak_heating, borefield.peak_heating)
-        assert np.allclose(borefield_gui.peak_cooling, borefield.peak_cooling)
+        assert np.allclose(borefield_gui.load.baseload_heating, borefield.load.baseload_heating)
+        assert np.allclose(borefield_gui.load.baseload_cooling, borefield.load.baseload_cooling)
+        assert np.allclose(borefield_gui.load.peak_heating, borefield.load.peak_heating)
+        assert np.allclose(borefield_gui.load.peak_cooling, borefield.load.peak_cooling)
         assert func.func == borefield_gui.calculate_temperatures
         assert func.args == (gs.option_depth.get_value(),)
         assert func.keywords == {}
@@ -625,10 +624,10 @@ def test_temp_profile_cooling_data(qtbot) -> None:
         main_window.save_scenario()
         d_s = main_window.list_ds[-1]
         borefield_gui, func = data_2_borefield(d_s)
-        assert np.allclose(borefield_gui.baseload_heating, borefield.baseload_heating)
-        assert np.allclose(borefield_gui.baseload_cooling, borefield.baseload_cooling)
-        assert np.allclose(borefield_gui.peak_heating, borefield.peak_heating)
-        assert np.allclose(borefield_gui.peak_cooling, borefield.peak_cooling)
+        assert np.allclose(borefield_gui.load.baseload_heating, borefield.load.baseload_heating)
+        assert np.allclose(borefield_gui.load.baseload_cooling, borefield.load.baseload_cooling)
+        assert np.allclose(borefield_gui.load.peak_heating, borefield.load.peak_heating)
+        assert np.allclose(borefield_gui.load.peak_cooling, borefield.load.peak_cooling)
         assert func.func == borefield_gui.calculate_temperatures
         assert func.args == (g_s.option_depth.get_value(),)
         assert func.keywords == {}
