@@ -183,3 +183,8 @@ def test_get_month_index():
     assert load.get_month_index(test_unequal, test_unequal) == 10
     assert load.get_month_index(test_equal, test_unequal) == 10
     assert load.get_month_index(test_equal, test_unequal_2) == 4
+
+
+def test_dummy_peak_duration():
+    test = MonthlyGeothermalLoadAbsolute()
+    assert None is test.peak_duration

@@ -834,3 +834,35 @@ def test_optimise_load_profile_without_data():
         assert False  # pragma: no cover
     except ValueError:
         assert True
+
+
+def test_load_load():
+    borefield1 = Borefield()
+    borefield2 = Borefield()
+
+    load = MonthlyGeothermalLoadAbsolute(*load_case(1))
+    borefield2.load = load
+    borefield1.set_load(load)
+    assert borefield1.load is borefield2.load
+
+
+def test_calculate_temperature_profile():
+    borefield = Borefield()
+    load = MonthlyGeothermalLoadAbsolute(*load_case(1))
+    borefield.load = load
+
+    try:
+        borefield.calculate_temperatures(hourly=True)
+        assert False   # pragma: no cover
+    except ValueError:
+        assert True
+
+
+def test_optimise_load_profile_without_hourly_data():
+    borefield = Borefield()
+    borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(1))
+    try:
+        borefield.optimise_load_profile(borefield.load)
+        assert False   # pragma: no cover
+    except ValueError:
+        assert True

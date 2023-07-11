@@ -7,7 +7,7 @@ import time
 
 import pygfunction as gt
 
-from GHEtool import Borefield, GroundConstantTemperature
+from GHEtool import Borefield, GroundConstantTemperature, MonthlyGeothermalLoadAbsolute
 
 
 def test_64_boreholes():
@@ -30,11 +30,11 @@ def test_64_boreholes():
     monthly_load_heating = list(map(lambda x: x * annual_heating_load, monthly_load_heating_percentage))  # kWh
     monthly_load_cooling = list(map(lambda x: x * annual_cooling_load, monthly_load_cooling_percentage))  # kWh
 
+    # set the load
+    load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
+
     # create the borefield object
-    borefield = Borefield(peak_heating=peak_heating,
-                          peak_cooling=peak_cooling,
-                          baseload_heating=monthly_load_heating,
-                          baseload_cooling=monthly_load_cooling)
+    borefield = Borefield(load=load)
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_64)
@@ -86,11 +86,11 @@ def test_10_boreholes():
     monthly_load_heating = list(map(lambda x: x * annual_heating_load, monthly_heating_load_percentage))  # kWh
     monthly_load_cooling = list(map(lambda x: x * annual_cooling_load, monthly_load_cooling_percentage))  # kWh
 
+    # set the load
+    load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
+
     # create the borefield object
-    borefield = Borefield(peak_heating=peak_heating,
-                          peak_cooling=peak_cooling,
-                          baseload_heating=monthly_load_heating,
-                          baseload_cooling=monthly_load_cooling)
+    borefield = Borefield(load=load)
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_10)

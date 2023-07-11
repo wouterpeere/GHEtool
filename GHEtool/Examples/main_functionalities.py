@@ -10,7 +10,7 @@ This file contains all the main functionalities of GHEtool being:
 import numpy as np
 
 # import all the relevant functions
-from GHEtool import Borefield, FluidData, PipeData, GroundConstantTemperature
+from GHEtool import Borefield, FluidData, PipeData, GroundConstantTemperature, MonthlyGeothermalLoadAbsolute
 
 
 def main_functionalities():
@@ -35,11 +35,11 @@ def main_functionalities():
     monthly_load_heating = annual_heating_load * monthly_load_heating_percentage   # kWh
     monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage   # kWh
 
+    # set the load
+    load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
+
     # create the borefield object
-    borefield = Borefield(peak_heating=peak_heating,
-                          peak_cooling=peak_cooling,
-                          baseload_heating=monthly_load_heating,
-                          baseload_cooling=monthly_load_cooling)
+    borefield = Borefield(load=load)
 
     # one can activate or deactive the logger, by default it is deactivated
     # borefield.activate_logger()

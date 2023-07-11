@@ -1801,40 +1801,6 @@ class Borefield(BaseClass):
         self.custom_gfunction = CustomGFunction(time_array, depth_array, options)
         self.custom_gfunction.create_custom_dataset(self.borefield, self.ground_data.alpha)
 
-    def set_hourly_heating_load(self, heating_load: np.array) -> None:
-        """
-        This function sets the hourly heating load in kW.
-
-        Parameters
-        ----------
-        heating_load : np.array
-            Array with hourly heating load values [kW]
-
-        Returns
-        -------
-        None
-        """
-        warn("This function will be depreciated in v2.2.1", DeprecationWarning, stacklevel=2)
-        self._borefield_load.hourly_heating_load = heating_load
-        self._delete_calculated_temperatures()
-
-    def set_hourly_cooling_load(self, cooling_load: np.array) -> None:
-        """
-        This function sets the hourly cooling load in kW.
-
-        Parameters
-        ----------
-        cooling_load : np.array
-            Array with hourly cooling load values [kW]
-
-        Returns
-        -------
-        None
-        """
-        warn("This function will be depreciated in v2.2.1", DeprecationWarning, stacklevel=2)
-        self._borefield_load.hourly_heating_load = cooling_load
-        self._delete_calculated_temperatures()
-
     @property
     def Re(self) -> float:
         """
