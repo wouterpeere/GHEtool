@@ -39,7 +39,7 @@ class Borefield(BaseClass):
     __slots__ = 'H', 'H_init', 'borehole',\
                 'number_of_boreholes', '_borefield', 'cost_investment', \
                 'Tf_max', 'Tf_min', 'limiting_quadrant', \
-                'Tf', 'example_active_passive',\
+                'Tf', \
                 '_ground_data', '_borefield_load',\
                 'results_peak_heating', 'options_pygfunction',\
                 'results_peak_cooling', 'results_month_cooling', 'results_month_heating', 'Tb', 'THRESHOLD_WARNING_SHALLOW_FIELD', \
@@ -127,7 +127,6 @@ class Borefield(BaseClass):
         # this will make everything way slower!
         self.use_precalculated_data: bool = True
 
-        self.example_active_passive: bool = False
         self.custom_gfunction: CustomGFunction = custom_gfunction
         self.gfunction_calculation_object: GFunction = GFunction()
 
@@ -1170,7 +1169,7 @@ class Borefield(BaseClass):
             raise ValueError(f'Quadrant {quadrant_sizing} does not exist.')
 
         # check if hourly data is given
-        if not self.load.hourly_resolution and not self.example_active_passive:
+        if not self.load.hourly_resolution:
             raise ValueError("There is no hourly resolution available!")
 
         # initiate with a given depth
@@ -1236,10 +1235,7 @@ class Borefield(BaseClass):
         # (convergence if difference between depth in iterations is smaller than THRESHOLD_BOREHOLE_DEPTH)
         while abs(self.H - H_prev) >= Borefield.THRESHOLD_BOREHOLE_DEPTH:
 
-            if self.example_active_passive:
-                self._calculate_temperature_profile(self.H, hourly=True)
-
-            elif hourly:
+            if hourly:
                 # # calculate g-values
                 # g_values = self.gfunction(self.load.time_L4, self.H)
                 #
@@ -1661,8 +1657,6 @@ class Borefield(BaseClass):
                 raise ValueError("There is no hourly resolution available!")
 
             hourly_load = self.load.hourly_load_simulation_period
-            if self.example_active_passive:
-                hourly_load = self.hourly_cooling_load - self.hourly_heating_load
 
             # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
             # g-function. This dataset is checked over and over again and is correct

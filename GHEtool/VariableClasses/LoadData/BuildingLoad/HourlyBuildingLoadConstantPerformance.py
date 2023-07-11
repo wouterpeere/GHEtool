@@ -10,13 +10,13 @@ from GHEtool.VariableClasses.LoadData._LoadData import _LoadData
 from GHEtool.logger import ghe_logger
 
 
-class HourlyGeothermalLoad(_LoadData):
+class HourlyBuildingLoadConstantPerformance(_LoadData):
     """
-    This class contains all the information for geothermal load data with a monthly resolution and absolute input.
-    This means that the inputs are both in kWh/month and kW/month.
-    """
+        This class contains all the information for geothermal load data with a monthly resolution and absolute input.
+        This means that the inputs are both in kWh/month and kW/month.
+        """
 
-    __slots__ = tuple(_LoadData.__slots__) + ('_heating_load', '_cooling_load')
+    __slots__ = tuple(_LoadData.__slots__) + ('_heating_load', '_cooling_load', 'SEER', 'SCOP')
 
     # define parameters for conversion to monthly loads
     START = pd.to_datetime("2019-01-01 00:00:00")
@@ -25,7 +25,7 @@ class HourlyGeothermalLoad(_LoadData):
 
     def __init__(self, heating_load: Union[np.ndarray, list, tuple] = np.zeros(8760),
                  cooling_load: Union[np.ndarray, list, tuple] = np.zeros(8760),
-                 simulation_period: int = 20):
+                 simulation_period: int = 20, SCOP: float = 4, SEER: float = 3):
         """
 
         Parameters
@@ -36,6 +36,10 @@ class HourlyGeothermalLoad(_LoadData):
             Cooling load [kWh/h]
         simulation_period : int
             Length of the simulation period in years
+        SCOP : float
+            Seasonal performance index of heating
+        SEER : float
+            Seasonal performance index of cooling
         """
 
         super().__init__(hourly_resolution=True, simulation_period=simulation_period)
@@ -43,6 +47,8 @@ class HourlyGeothermalLoad(_LoadData):
         # initiate variables
         self._hourly_heating_load: np.ndarray = np.zeros(8760)
         self._hourly_cooling_load: np.ndarray = np.zeros(8760)
+        self.SCOP = SCOP
+        self.SEER = SEER
 
         # set variables
         self.hourly_heating_load = heating_load
@@ -129,7 +135,7 @@ class HourlyGeothermalLoad(_LoadData):
         Raises
         ------
         ValueError
-            When either the length is not 8760, the input is not of the correct type, or it contains negative
+            When either the length is not 12, the input is not of the correct type, or it contains negative
             values
         """
         self.hourly_heating_load = load
@@ -187,7 +193,7 @@ class HourlyGeothermalLoad(_LoadData):
         Raises
         ------
         ValueError
-            When either the length is not 8760, the input is not of the correct type, or it contains negative
+            When either the length is not 12, the input is not of the correct type, or it contains negative
             values
         """
         self.hourly_cooling_load = load
@@ -204,7 +210,8 @@ class HourlyGeothermalLoad(_LoadData):
         """
         return np.sum(self.hourly_cooling_load - self.hourly_heating_load)
 
-    def resample_to_monthly(self, hourly_load: np.ndarray, peak: bool = False) -> np.ndarray:
+    @staticmethod
+    def resample_to_monthly(hourly_load: np.ndarray, peak: bool = False) -> np.ndarray:
         """
         This function resamples an hourly_load to either monthly peaks (kW/month) or baseloads (kWh/month).
 
@@ -221,19 +228,14 @@ class HourlyGeothermalLoad(_LoadData):
             Either peak loads or baseloads
         """
         # create dataframe
-        df = pd.DataFrame(hourly_load, index=HourlyGeothermalLoad.HOURS_SERIES, columns=['load'])
-
-        if self.all_months_equal:
-            if peak:
-                return np.max(np.array_split(hourly_load, 12), axis=1)
-            else:
-                return np.sum(np.array_split(hourly_load, 12), axis=1)
+        df = pd.DataFrame(hourly_load, index=HourlyBuildingLoadConstantPerformance.HOURS_SERIES, columns=['load'])
 
         # resample
         if peak:
             df = df.resample('M').agg({'load': 'max'})
         else:
             df = df.resample('M').agg({'load': 'sum'})
+
         return df['load']
 
     @property
@@ -294,18 +296,7 @@ class HourlyGeothermalLoad(_LoadData):
         hourly cooling : np.ndarray
             hourly cooling for the whole simulation period
         """
-        return np.tile(self.hourly_cooling_load, self.simulation_period)
-
-    @property
-    def hourly_load_simulation_period(self) -> np.ndarray:
-        """
-        This function calculates the resulting hourly load in kW for the whole simulation period.
-
-        Returns
-        -------
-        resulting hourly load : np.ndarray
-        """
-        return np.tile(self.hourly_cooling_load - self.hourly_heating_load, self.simulation_period)
+        return np.tile(self.hourly_cooling_load)
 
     @property
     def hourly_heating_load_simulation_period(self) -> np.ndarray:
@@ -320,7 +311,7 @@ class HourlyGeothermalLoad(_LoadData):
         return np.tile(self.hourly_heating_load, self.simulation_period)
 
     def load_hourly_profile(self, file_path: str, header: bool = True, separator: str = ";",
-                            decimal_seperator: str = ".", col_heating: int = 0, col_cooling: int = 1) -> None:
+                            decimal_seperator: str = ".", first_column_heating: bool = True) -> None:
         """
         This function loads in an hourly load profile [kW].
 
@@ -334,10 +325,8 @@ class HourlyGeothermalLoad(_LoadData):
             Symbol used in the file to separate the columns
         decimal_seperator : str
             Symbol used for the decimal number separation
-        col_heating : int
-            Column index for heating
-        col_cooling : int
-            Column index for cooling
+        first_column_heating : bool
+            True if the first column in the file is for the heating load
 
         Returns
         -------
@@ -348,15 +337,17 @@ class HourlyGeothermalLoad(_LoadData):
         else:
             header = None
 
-        if col_heating == col_cooling:
-            ghe_logger.info('Only one column with data selected. Load will be splitted into heating and cooling load.')
-            # TODO
-
         # import data
-        df = pd.read_csv(file_path, sep=separator, header=header, decimal=decimal_seperator)
+        if first_column_heating:
+            df = pd.read_csv(file_path, sep=separator, header=header, decimal=decimal_seperator,
+                             usecols=['heating', 'cooling'])
+        else:
+            df = pd.read_csv(file_path, sep=separator, header=header, decimal=decimal_seperator,
+                             usecols=['cooling', 'heating'])
 
         # set data
-        self.hourly_heating_load = np.array(df.iloc[:, col_heating])
-        self.hourly_cooling_load = np.array(df.iloc[:, col_cooling])
+        self.hourly_heating_load = df['heating']
+        self.hourly_cooling_load = df['cooling']
 
         ghe_logger.info("Hourly profile loaded!")
+

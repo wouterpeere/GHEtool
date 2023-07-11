@@ -30,11 +30,12 @@ def test_sizing_with_Rb(monkeypatch):
     sizing_with_Rb()
 
 
-# @pytest.mark.slow
-# def test_active_passive(monkeypatch):
-#     monkeypatch.setattr(plt, 'show', lambda: None)
-#     from GHEtool.Examples.active_passive_cooling import active_passive_cooling
-#     active_passive_cooling(FOLDER.joinpath('Examples/active_passive_example.csv'))
+@pytest.mark.slow
+def test_active_passive(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    from GHEtool.Examples.active_passive_cooling import active_passive_cooling
+    active_passive_cooling(FOLDER.joinpath('Examples/active_passive_example.csv'))
+
 
 def test_optimise_load_profile(monkeypatch):
     from GHEtool import FOLDER
