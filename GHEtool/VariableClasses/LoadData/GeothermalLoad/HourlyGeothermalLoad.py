@@ -204,37 +204,29 @@ class HourlyGeothermalLoad(_LoadData):
         """
         return np.sum(self.hourly_cooling_load - self.hourly_heating_load)
 
-    def resample_to_monthly(self, hourly_load: np.ndarray, peak: bool = False) -> np.ndarray:
+    def resample_to_monthly(self, hourly_load: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """
-        This function resamples an hourly_load to either monthly peaks (kW/month) or baseloads (kWh/month).
+        This function resamples an hourly_load to monthly peaks (kW/month) and baseloads (kWh/month).
 
         Parameters
         ----------
         hourly_load : np.ndarray
             Hourly loads in kWh/h
-        peak : bool
-            True if the resampling is to peak loads, otherwise it is in baseloads
 
         Returns
         -------
-        monthly loads : np.ndarray
-            Either peak loads or baseloads
+        peak loads [kW], monthly average loads [kWh/month] : np.ndarray, np.ndarray
         """
         # create dataframe
         df = pd.DataFrame(hourly_load, index=HourlyGeothermalLoad.HOURS_SERIES, columns=['load'])
 
         if self.all_months_equal:
-            if peak:
-                return np.max(np.array_split(hourly_load, 12), axis=1)
-            else:
-                return np.sum(np.array_split(hourly_load, 12), axis=1)
+            return np.max(np.array_split(hourly_load, 12), axis=1), np.sum(np.array_split(hourly_load, 12), axis=1)
 
         # resample
-        if peak:
-            df = df.resample('M').agg({'load': 'max'})
-        else:
-            df = df.resample('M').agg({'load': 'sum'})
-        return df['load']
+        return np.array(df.resample('M').agg({'load': 'max'})['load']),\
+            np.array(df.resample('M').agg({'load': 'sum'})['load'])
+
 
     @property
     def baseload_cooling(self) -> np.ndarray:
@@ -246,7 +238,7 @@ class HourlyGeothermalLoad(_LoadData):
         baseload cooling : np.ndarray
             Baseload cooling values [kWh/month] for one year, so the length of the array is 12
         """
-        return self.resample_to_monthly(self.hourly_cooling_load, peak=False)
+        return self.resample_to_monthly(self.hourly_cooling_load)[1]
 
     @property
     def baseload_heating(self) -> np.ndarray:
@@ -258,7 +250,7 @@ class HourlyGeothermalLoad(_LoadData):
         baseload heating : np.ndarray
             Baseload heating values [kWh/month] for one year, so the length of the array is 12
         """
-        return self.resample_to_monthly(self.hourly_heating_load, peak=False)
+        return self.resample_to_monthly(self.hourly_heating_load)[1]
 
     @property
     def peak_cooling(self) -> np.ndarray:
@@ -270,7 +262,7 @@ class HourlyGeothermalLoad(_LoadData):
         peak cooling : np.ndarray
             Peak cooling values for one year, so the length of the array is 12
         """
-        return self.resample_to_monthly(self.hourly_cooling_load, peak=True)
+        return self.resample_to_monthly(self.hourly_cooling_load)[0]
 
     @property
     def peak_heating(self) -> np.ndarray:
@@ -282,7 +274,7 @@ class HourlyGeothermalLoad(_LoadData):
         peak heating : np.ndarray
             Peak heating values for one year, so the length of the array is 12
         """
-        return self.resample_to_monthly(self.hourly_heating_load, peak=True)
+        return self.resample_to_monthly(self.hourly_heating_load)[0]
 
     @property
     def hourly_cooling_simulation_period(self) -> np.ndarray:
