@@ -3,7 +3,6 @@ This file contains the code for the hourly geothermal load data for a multi-year
 """
 
 import numpy as np
-import pandas as pd
 
 from typing import Union
 from GHEtool.logger import ghe_logger
@@ -104,26 +103,6 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
             return
         raise ValueError
 
-    def set_hourly_heating(self, load: Union[np.ndarray, list, tuple]) -> None:
-        """
-        This function sets the hourly heating load [kWh/h] after it has been checked.
-
-        Parameters
-        ----------
-        load : np.ndarray, list or tuple
-            Hourly heating [kWh/h]
-
-        Returns
-        -------
-        None
-
-        Raises
-        ------
-        ValueError
-            When either the length is not a multiple of 8760, the input is not of the correct type,
-            or it contains negative values
-        """
-        self.hourly_heating_load = load
 
     @property
     def hourly_cooling_load(self) -> np.ndarray:
@@ -163,27 +142,6 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
             return
         raise ValueError
 
-    def set_hourly_cooling(self, load: Union[np.ndarray, list, tuple]) -> None:
-        """
-        This function sets the hourly cooling load [kWh/h] after it has been checked.
-
-        Parameters
-        ----------
-        load : np.ndarray, list or tuple
-            Hourly cooling [kWh/h]
-
-        Returns
-        -------
-        None
-
-        Raises
-        ------
-        ValueError
-            When either the length is not a multiple of 8760, the input is not of the correct type,
-            or it contains negative values
-        """
-        self.hourly_cooling_load = load
-
 
     @property
     def hourly_cooling_simulation_period(self) -> np.ndarray:
@@ -206,7 +164,7 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
         -------
         resulting hourly load : np.ndarray
         """
-        return self._hourly_cooling_load - self._hourly_heating_load
+        return self.hourly_cooling_simulation_period - self.hourly_heating_load_simulation_period
 
     @property
     def hourly_heating_load_simulation_period(self) -> np.ndarray:

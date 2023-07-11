@@ -3,7 +3,7 @@ import pytest
 import numpy as np
 
 from GHEtool import FOLDER
-from GHEtool.VariableClasses import HourlyGeothermalLoad
+from GHEtool.VariableClasses import HourlyGeothermalLoad, HourlyGeothermalLoadMultiYear
 
 
 def test_load_hourly_data():
@@ -89,3 +89,66 @@ def test_load_simulation_period():
                           np.tile(np.linspace(50, 8759, 8760), load.simulation_period))
     assert np.array_equal(load.hourly_load_simulation_period,
                           np.tile(-np.linspace(0, 8759, 8760)+np.linspace(50, 8759, 8760), load.simulation_period))
+
+
+def test_set_hourly_values():
+    load = HourlyGeothermalLoad()
+    try:
+        load.set_hourly_heating(np.ones(10))
+        assert False   # pragma: no cover
+    except ValueError:
+        assert True
+    try:
+        load.set_hourly_cooling(np.ones(10))
+        assert False   # pragma: no cover
+    except ValueError:
+        assert True
+
+### continue for multi year
+def test_checks_multiyear():
+    load = HourlyGeothermalLoadMultiYear()
+    assert not load._check_input(2)
+    assert not load._check_input(np.ones(8759))
+    assert not load._check_input(-1*np.ones(8760))
+    assert load._check_input([1]*8760)
+    assert load._check_input(np.ones(8760))
+    assert load._check_input(np.ones(8760 * 3))
+    assert not load._check_input(np.ones(9000))
+
+
+def test_set_hourly_load_multi_year():
+    load = HourlyGeothermalLoadMultiYear()
+    load.hourly_heating_load = np.linspace(0, 8759*2+1, 8760*2)
+    assert len(load._hourly_heating_load) == 8760*2
+    assert len(load.hourly_heating_load) == 8760
+    assert load.simulation_period == 2
+    assert np.array_equal(load.hourly_heating_load, np.linspace(0 + 8760/2, 8759 + 8760/2, 8760))
+    assert np.array_equal(load.hourly_heating_load_simulation_period, load._hourly_heating_load)
+    load.hourly_cooling_load = np.linspace(0, 8759 * 2 + 1, 8760 * 2)
+    assert len(load._hourly_cooling_load) == 8760 * 2
+    assert len(load.hourly_cooling_load) == 8760
+    assert load.simulation_period == 2
+    assert np.array_equal(load.hourly_cooling_load, np.linspace(0 + 8760 / 2, 8759 + 8760 / 2, 8760))
+    assert np.array_equal(load.hourly_cooling_simulation_period, load._hourly_cooling_load)
+    load._hourly_cooling_load = load._hourly_cooling_load - 20
+    assert np.array_equal(load.hourly_load_simulation_period, load._hourly_cooling_load-load._hourly_heating_load)
+
+
+def test_imbalance_multi_year():
+    load = HourlyGeothermalLoad(np.ones(8760)*10, np.ones(8760))
+    assert load.imbalance == -78840
+    load = HourlyGeothermalLoad(np.ones(8760), np.ones(8760)*10)
+    assert load.imbalance == 78840
+
+def test_set_hourly_values_multi_year():
+    load = HourlyGeothermalLoad()
+    try:
+        load.set_hourly_heating(np.ones(10))
+        assert False   # pragma: no cover
+    except ValueError:
+        assert True
+    try:
+        load.set_hourly_cooling(np.ones(10))
+        assert False   # pragma: no cover
+    except ValueError:
+        assert True
