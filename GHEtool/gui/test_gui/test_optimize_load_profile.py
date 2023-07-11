@@ -52,6 +52,19 @@ def test_building_load(qtbot):
     assert np.allclose(main_window.list_ds[0].results._building_load.hourly_heating_load, peak_heating)
 
     # check if the resultTexts are correct
+    gs = main_window.gui_structure
+    main_window.display_results()
+
+    assert gs.results_heating_load.label.text() == "Heating load on the borefield: 566750.0 kWh"
+    assert gs.results_heating_peak_geo.label.text() == "with a peak of: 310.29 kW"
+    assert gs.results_heating_load_percentage.label.text() == "This is 88.14 % of the heating load"
+    assert gs.results_heating_ext.label.text() == "Heating load external: 76267.0 kWh"
+    assert gs.results_heating_peak.label.text() == "with a peak of: 225.75 kW"
+    assert gs.results_cooling_load.label.text() == "Cooling load on the borefield: 173773.0 kWh"
+    assert gs.results_cooling_peak_geo.label.text() == "with a peak of: 121.57 kW"
+    assert gs.results_cooling_load_percentage.label.text() == "This is 64.9 % of the cooling load"
+    assert gs.results_cooling_ext.label.text() == "Cooling load external: 93971.0 kWh"
+    assert gs.results_cooling_peak.label.text() == "with a peak of: 554.85 kW"
 
     # calculate with geothermal load
     main_window.gui_structure.aim_temp_profile.widget.click()

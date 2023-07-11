@@ -867,6 +867,7 @@ def test_optimise_load_profile_without_hourly_data():
     except ValueError:
         assert True
     borefield.load = HourlyGeothermalLoad()
+    borefield.set_ground_parameters(ground_data_constant)
     borefield.load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     borefield.create_rectangular_borefield(10, 10, 6, 6, 150)
     borefield.optimise_load_profile(borefield.load)
