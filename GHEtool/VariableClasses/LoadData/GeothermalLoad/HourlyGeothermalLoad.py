@@ -5,7 +5,7 @@ This file contains the code for the hourly geothermal load data.
 import numpy as np
 import pandas as pd
 
-from typing import Union
+from typing import Union, Tuple
 from GHEtool.VariableClasses.LoadData._LoadData import _LoadData
 from GHEtool.logger import ghe_logger
 
@@ -204,7 +204,7 @@ class HourlyGeothermalLoad(_LoadData):
         """
         return np.sum(self.hourly_cooling_load - self.hourly_heating_load)
 
-    def resample_to_monthly(self, hourly_load: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    def resample_to_monthly(self, hourly_load: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """
         This function resamples an hourly_load to monthly peaks (kW/month) and baseloads (kWh/month).
 
