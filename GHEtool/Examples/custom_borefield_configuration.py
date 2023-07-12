@@ -20,7 +20,7 @@ from GHEtool import *
 
 def custom_borefield_configuration():
     # set the relevant ground data for the calculations
-    data = GroundData(3, 10, 0.12)
+    data = GroundConstantTemperature(3, 10)
 
     # Monthly loading values
     peak_cooling = np.array([0., 0, 3.4, 6.9, 13., 18., 21., 50., 16., 3.7, 0., 0.])  # Peak cooling in kW
@@ -38,15 +38,14 @@ def custom_borefield_configuration():
     monthly_load_heating = annual_heating_load * monthly_load_heating_percentage  # kWh
     monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage  # kWh
 
-    # create the borefield object
+    # set the load
+    load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
 
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peak_heating,
-                          peak_cooling=peak_cooling,
-                          baseload_heating=monthly_load_heating,
-                          baseload_cooling=monthly_load_cooling)
+    # create the borefield object
+    borefield = Borefield(load=load)
 
     borefield.set_ground_parameters(data)
+    borefield.Rb = 0.2
 
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)  # maximum temperature
@@ -60,11 +59,11 @@ def custom_borefield_configuration():
     borefield.create_custom_dataset()
 
     # size borefield
-    depth = borefield.size(100)
+    depth = borefield.size()
     print("The borehole depth is: ", depth, "m")
 
     # print imbalance
-    print("The borefield imbalance is: ", borefield.imbalance, "kWh/y. (A negative imbalance means the the field is heat extraction dominated so it cools down year after year.)") # print imbalance
+    print("The borefield imbalance is: ", borefield.load.imbalance, "kWh/y. (A negative imbalance means the the field is heat extraction dominated so it cools down year after year.)") # print imbalance
 
     # plot temperature profile for the calculated depth
     borefield.print_temperature_profile(legend=True)

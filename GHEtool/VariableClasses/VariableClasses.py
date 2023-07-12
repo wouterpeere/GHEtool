@@ -1,84 +1,14 @@
 """
 This document contains the variable classes for the ground data, fluid data and pipe data.
 """
+from __future__ import annotations
 
 from math import pi
-from GHEtool.VariableClasses.BaseClass import BaseClass
 
 import numpy as np
 import pygfunction as gt
 
-
-class GroundData(BaseClass):
-    """
-    Contains information regarding the ground data of the borefield.
-    """
-
-    __slots__ = 'k_s', 'Tg', 'Rb', 'flux', 'volumetric_heat_capacity', 'alpha'
-
-    def __init__(self, k_s: float = None,
-                 T_g: float = None,
-                 R_b: float = None,
-                 volumetric_heat_capacity: float = 2.4 * 10**6,
-                 flux: float = 0.06):
-        """
-
-        Parameters
-        ----------
-        k_s : float
-            Ground thermal conductivity [W/mK]
-        T_g : float
-            Surface ground temperature [deg C]
-            (this is equal to the ground temperature at infinity when no heat flux is given (default))
-        R_b : float
-            Equivalent borehole resistance [mK/W]
-        volumetric_heat_capacity : float
-            The volumetric heat capacity of the ground [J/m3K]
-        flux : float
-            The geothermal heat flux [W/m2]
-        """
-
-        self.k_s = k_s  # W/mK
-        self.Tg = T_g  # °C
-        self.Rb = R_b  # mK/W
-        self.volumetric_heat_capacity = volumetric_heat_capacity  # J/m3K
-        if self.volumetric_heat_capacity is None or self.k_s is None:
-            self.alpha = None
-        else:
-            self.alpha = self.k_s / self.volumetric_heat_capacity  # m2/s
-        self.flux = flux  # W/m2
-
-    def calculate_Tg(self, H: float, use_constant_Tg: bool) -> float:
-        """
-        This function gives back the ground temperature
-        When use_constant_Tg is False, the thermal heat flux is taken into account.
-
-        Parameters
-        ----------
-        H : float
-            Depth at which the temperature should be calculated [m]
-        use_constant_Tg : bool
-            True if a constant ground temperature should be used
-
-        Returns
-        -------
-        Tg : float
-            Ground temperature [deg C]
-        """
-        if use_constant_Tg:
-            return self.Tg
-
-        # geothermal gradient is equal to the geothermal heat flux divided by the thermal conductivity
-        # avg ground temperature is (Tg + gradient + Tg) / 2 = Tg + gradient / 2
-        return self.Tg + H * self.flux / self.k_s / 2
-
-    def __eq__(self, other):
-        if not isinstance(other, GroundData):
-            return False
-        for i in self.__slots__:
-            if getattr(self, i) != getattr(other, i):
-                return False
-        return True
+from GHEtool.VariableClasses.BaseClass import BaseClass
 
 
 class FluidData(BaseClass):
@@ -108,11 +38,11 @@ class FluidData(BaseClass):
         mu : float
             Dynamic viscosity of the fluid [Pa/s]
         """
-        self.k_f = k_f  # Thermal conductivity W/mK
-        self.mfr = mfr  # Mass flow rate per borehole kg/s
-        self.rho = rho  # Density kg/m3
-        self.Cp = Cp    # Thermal capacity J/kgK
-        self.mu = mu    # Dynamic viscosity Pa/s
+        self.k_f: float | None = k_f  # Thermal conductivity W/mK
+        self.mfr: float | None = mfr  # Mass flow rate per borehole kg/s
+        self.rho: float | None = rho  # Density kg/m3
+        self.Cp: float | None = Cp    # Thermal capacity J/kgK
+        self.mu: float | None = mu    # Dynamic viscosity Pa/s
         self.h_f: float = 0.  # convective heat transfer coefficient
         self.R_f: float = 0.  # fluid thermal resistance
 

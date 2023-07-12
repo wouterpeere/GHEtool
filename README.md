@@ -10,7 +10,7 @@
 ## What is *GHEtool*?
 <img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/sources/gui/_figure/Icon.png" width="110" align="left">
 
-GHEtool is a Python package that contains all the functionalities needed to deal with borefield design. It is developed for both researchers and practitioners.
+GHEtool is a Python package that contains all the functionalities needed to deal with borefield design. GHEtool has been developed as a joint effort of KU Leuven (The SySi Team), boydens engineering (part of Sweco) and FH Aachen.
 The core of this package is the automated sizing of borefield under different conditions. By making use of combination of just-in-time calculations of thermal ground responses (using [pygfunction](https://github.com/MassimoCimmino/pygfunction)) with
 intelligent interpolation, this automated sizing can be done in the order of milliseconds. Please visit our website [https://GHEtool.eu](https://GHEtool.eu) for more information.
 
@@ -19,11 +19,15 @@ GHEtool has an elaborate documentation were all the functionalities of the tool 
 This can be found on [GHEtool.readthedocs.io](https://ghetool.readthedocs.io).
 
 #### Graphical user interface
-GHEtool also comes with a *graphical user interface (GUI)*. This GUI is prebuilt as an exe-file (only for Windows platforms currently) because this provides access to all the functionalities without coding. A setup to install the GUI at the user-defined place is also implemented and available at [https://GHEtool.eu](https://GHEtool.eu).
+GHEtool comes with a *graphical user interface (GUI)*. This GUI is built using [ScenarioGUI](https://github.com/tblanke/ScenarioGUI).
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/sources/gui/_figure/GHEtool.PNG" width="600">
 </p>
+
+#### GHEtool development
+GHEtool has been developed as a joint effort of KU Leuven (The SySi Team), boydens engineering (part of Sweco) and FH Aachen.
+The exhaustive list of contributors can be found [here](https://ghetool.readthedocs.io/en/latest/sources/users.html).
 
 ## Requirements
 This code is tested with Python 3.8, 3.9, 3.10 and 3.11 and requires the following libraries (the versions mentioned are the ones with which the code is tested)
@@ -78,16 +82,16 @@ This runs some predefined cases to see whether all the internal dependencies wor
 To get started with GHEtool, one needs to create a Borefield object. This is done in the following steps.
 
 ```Python
-from GHEtool import Borefield, GroundData
+from GHEtool import Borefield, GroundDataConstantTemperature, MonthlyGeothermalLoadAbsolute
 ```
 
 After importing the necessary classes, one sets all the relevant ground data and borehole equivalent resistance.
 
 ```Python
-data = GroundData(3,   # ground thermal conductivity (W/mK)
-                  10,  # initial/undisturbed ground temperature (deg C)
-                  0.2, # borehole equivalent resistance (mK/W)
-                  2.4*10**6) # volumetric heat capacity of the ground (J/m3K) 
+data =
+GroundDataConstantTemperature(3,   # ground thermal conductivity (W/mK)
+							  10,  # initial/undisturbed ground temperature (deg C)
+                              2.4*10**6) # volumetric heat capacity of the ground (J/m3K) 
 ```
 
 Furthermore, one needs to set the peak and monthly baseload for both heating and cooling.
@@ -98,19 +102,27 @@ peak_heating = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]  # 
 
 monthly_load_heating = [46500.0, 44400.0, 37500.0, 29700.0, 19200.0, 0.0, 0.0, 0.0, 18300.0, 26100.0, 35100.0, 43200.0]        # in kWh
 monthly_load_cooling = [4000.0, 8000.0, 8000.0, 8000.0, 12000.0, 16000.0, 32000.0, 32000.0, 16000.0, 12000.0, 8000.0, 4000.0]  # in kWh
+
+# set load object
+load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
+
 ```
 
 Next, one creates the borefield object in GHEtool and sets the temperature constraints and the ground data.
 
 ```Python
 # create the borefield object
-borefield = Borefield(simulation_period=20,
-                      peak_heating=peak_heating,
+borefield = Borefield(load=load
+					  peak_heating=peak_heating,
                       peak_cooling=peak_cooling,
                       baseload_heating=monthly_load_heating,
                       baseload_cooling=monthly_load_cooling)
 
+# set ground parameters
 borefield.set_ground_parameters(data)
+
+# set the borehole equivalent resistance
+borefield.Rb = 0.12
 
 # set temperature boundaries
 borefield.set_max_ground_temperature(16)  # maximum temperature
@@ -135,7 +147,7 @@ borefield.set_borefield(borefield_gt)
 Once a Borefield object is created, one can make use of all the functionalities of GHEtool. One can for example size the borefield using:
 
 ```Python
-depth = borefield.size(100)
+depth = borefield.size()
 print("The borehole depth is: ", depth, "m")
 ```
 
@@ -161,7 +173,7 @@ See [GHEtool license](LICENSE).
 - Do you have a great idea for a new feature?
 - Do you have a specific remark/problem?
 
-Please do contact us at [wouter@ghetool.eu](mailto:wouter@ghetool.eu).
+Please do contact us at [info@ghetool.eu](mailto:info@ghetool.eu).
 
 ## Citation
 Please cite GHEtool using the JOSS paper.
@@ -174,6 +186,8 @@ For more information on how to cite GHEtool, please visit the ReadTheDocs at [GH
 ## References
 
 ### Development of GHEtool
+Coninx, M., De Nies, J. (2022). Cost-efficient Cooling of Buildings by means of Borefields with Active and Passive Cooling. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
+
 Peere, W., Blanke, T. (2022). GHEtool: An open-source tool for borefield sizing in Python. _Journal of Open Source Software, 7_(76), 4406, https://doi.org/10.21105/joss.04406
 
 Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. (2021). Validated combined first and last year borefield sizing methodology. In _Proceedings of International Building Simulation Conference 2021_. Brugge (Belgium), 1-3 September 2021. https://doi.org/10.26868/25222708.2021.30180
@@ -182,6 +196,7 @@ Peere, W. (2020). Methode voor economische optimalisatie van geothermische verwa
 KU Leuven, Belgium.
 
 ### Applications/Mentions of GHEtool
+Hermans, L., Haesen, R., Uytterhoeven, A., Peere, W., Boydens, W., Helsen, L. (2023). Pre-design of collective residential solar districts with seasonal thermal energy storage: Importance of level of detail. _Applied thermal engineering_ 226, Art.No. 120203, 10.1016/j.applthermaleng.2023.120203
 
 Cimmino, M., Cook., J. C. (2022). pygfunction 2.2 : New Features and Improvements in Accuracy and Computational Efficiency. In _Proceedings of IGSHPA Research Track 2022_. Las Vegas (USA), 6-8 December 2022. https://doi.org/10.22488/okstate.22.000015
 

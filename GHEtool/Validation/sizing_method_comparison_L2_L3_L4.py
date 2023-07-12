@@ -4,14 +4,14 @@ The example load profile is for a profile limited in the first year of operation
 """
 import time
 
-import pygfunction as gt
 import numpy as np
+import pygfunction as gt
 
 # import all the relevant functions
 from GHEtool import *
 
 # initiate ground data
-data = GroundData(3, 10, 0.12)
+data = GroundConstantTemperature(3, 10)
 
 # initiate borefield
 borefield = Borefield(100)
@@ -19,11 +19,16 @@ borefield = Borefield(100)
 # set ground data in borefield
 borefield.set_ground_parameters(data)
 
+# set Rb
+borefield.Rb = 0.12
+
 # set the borefield
 borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 1, 0.075)
 
 # load the hourly profile
-borefield.load_hourly_profile("..\Examples\hourly_profile.csv", header=True, separator=";", first_column_heating=True)
+load = HourlyGeothermalLoad()
+load.load_hourly_profile("..\Examples\hourly_profile.csv", header=True, separator=";")
+borefield.load = load
 
 ### size the borefield
 # according to L2

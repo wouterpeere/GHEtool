@@ -132,5 +132,8 @@ dmypy.json
 README.md.orig
 GHEtool/change_pickle_data.py
 *.exe
-GHEtool/test/test.gvalues
+GHEtool/test/unit-tests/test.gvalues
 *.orig
+
+# test json
+*.json

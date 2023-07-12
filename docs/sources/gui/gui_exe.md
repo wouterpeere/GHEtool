@@ -40,11 +40,11 @@ python -m pip install PyInstaller
 The exe-folder can be created using [PyInstaller](https://pyinstaller.org/en/stable/). The following line will create a windowed version of the executable.
 
 ```
-python -m PyInstaller --noconfirm --onedir --windowed --splash "./GHEtool/gui/icons/Icon.ico" --name "GHEtool" --add-data "setup.cfg;." --icon "./GHEtool/gui/icons/Icon.ico" "./GHEtool/gui/start_gui.py"
+python -m PyInstaller  "./GHEtool/gui/GHEtool.spec" --noconfirm
 ```
 The following line will create a version which also displays a windows console with error messages of the executable. 
 ``` 
-python -m PyInstaller --noconfirm --onedir --console --splash "./GHEtool/gui/icons/Icon.ico" --name "GHEtool_with_command_line" --add-data "setup.cfg;." --icon "./GHEtool/gui/icons/Icon.ico" "./GHEtool/gui/start_gui.py"
+python -m PyInstaller  "./GHEtool/gui/GHEtool_with_command_line.spec" --noconfirm
 ```
 
 ## Create GHEtools installable using InnoSetup
@@ -52,3 +52,18 @@ python -m PyInstaller --noconfirm --onedir --console --splash "./GHEtool/gui/ico
 The setup *.exe can be created using the *.iss files in the GHEtool/gui folder. Therefore, the LinkToGHEtool (line 4) has to be changed to the current one. 
 Afterwards [InnoSetup](http://www.innosetup.org/) can use the *.iss file to create the setup *.exe file. 
 The "Inno_setup_console.iss" file is creating a setup for a GHEtool implementation with a windows console and "Inno_setup_windowed.iss" a normal version. 
+
+## Create the DMG for MAC
+
+Follow the steps as before but run the following pyinstaller command instead. The InnoSetup step is skipped as well.
+
+``` 
+python -m PyInstaller  "./GHEtool/gui/GHEtool_mac.spec" --noconfirm
+```
+
+Instead of the InnoSetup step the dmgbuild package can be used by installing it using pip ("pip install dmgbuild")
+And afterwards running the following command:
+
+``` 
+python -m dmgbuild -s ./GHEtool/gui/mac_settings.py "GHEtool" GHEtool.dmg
+```

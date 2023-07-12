@@ -1,7 +1,6 @@
 import numpy as np
 import pygfunction as gt
-from GHEtool import GroundData, Borefield
-from GHEtool.main_class import FOLDER
+from GHEtool import GroundConstantTemperature, Borefield, HourlyGeothermalLoad, FOLDER
 from scipy.signal import convolve
 from math import pi
 from time import process_time_ns
@@ -28,7 +27,7 @@ def test_new_calc_method(simulation_period: int):
     h = 110
 
     # initiate ground data
-    data = GroundData(3, 10, 0.12)
+    data = GroundConstantTemperature(3, 10)
 
     # initiate pygfunction borefield model
     borefield_gt = gt.boreholes.rectangle_field(10, 10, 6, 6, 110, 1, 0.075)
@@ -36,16 +35,21 @@ def test_new_calc_method(simulation_period: int):
     # initiate borefield
     borefield = Borefield(100)
 
+    # set borehole thermal equivalent resistance
+    borefield.Rb = 0.12
+
     # set ground data in borefield
     borefield.set_ground_parameters(data)
 
     # set pygfunction borefield model
     borefield.set_borefield(borefield_gt)
 
-    borefield.set_simulation_period(simulation_period)
 
     # load the hourly profile
-    borefield.load_hourly_profile(f"hourly_profile.csv", header=True, separator=";", first_column_heating=True)
+    load = HourlyGeothermalLoad(simulation_period=simulation_period)
+    load.load_hourly_profile(f'hourly_profile.csv', header=True, separator=";")
+
+    borefield.load = load
 
     # borefield.g-function is a function that uses the precalculated data to interpolate the correct values of the
     # g-function. This dataset is checked over and over again and is correct
