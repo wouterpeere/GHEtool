@@ -16,7 +16,7 @@ class MultipleUTube(_PipeData):
     Contains information regarding the Multiple U-Tube class.
     """
 
-    __slots__ = _PipeData.__slots__ + ('r_in', 'r_out', 'D_s', 'number_of_pipes', 'pos')
+    __slots__ = _PipeData.__slots__ + ('r_in', 'r_out', 'D_s', 'number_of_pipes', 'pos', 'R_p', 'R_f')
 
     def __init__(self, k_g: float = None,
                  r_in: float = None,
@@ -52,6 +52,8 @@ class MultipleUTube(_PipeData):
         self.D_s = D_s                      # distance of pipe until center m
         self.number_of_pipes = number_of_pipes  # number of pipes #
         self.pos = []
+        self.R_p = 0                        # pipe thermal resistance mK/W
+        self.R_f = 0                        # film (i.e. fluid) thermal resistance mK/W
         if self.check_values():
             self.pos = self._axis_symmetrical_pipe  # position of the pipes
 
@@ -72,39 +74,28 @@ class MultipleUTube(_PipeData):
             pos[i + self.number_of_pipes] = (self.D_s * np.cos(2.0 * i * dt + pi + dt), self.D_s * np.sin(2.0 * i * dt + pi + dt))
         return pos
 
-    def calculate_pipe_thermal_resistance(self) -> None:
+    def calculate_resistances(self, fluid_data: FluidData) -> None:
         """
-        This function calculates and sets the pipe thermal resistance R_p.
-
-        Returns
-        -------
-        R_p : float
-            The pipe thermal resistance [mK/W]
-        """
-        self.R_p: float = gt.pipes.conduction_thermal_resistance_circular_pipe(self.r_in, self.r_out, self.k_p)
-
-    def calculate_convective_heat_transfer_coefficient(self, fluid_data: FluidData) -> float:
-        """
-        This function calculates the convective heat transfer coefficient h_f [W/m^2K].
+        This function calculates the conductive and convective resistances, which are constant.
 
         Parameters
         ----------
         fluid_data : FluidData
-            FluidData object
+            Fluid data
 
         Returns
         -------
-        h_f : float
-            Convective heat transfer coefficient [W/m^2K]
+        None
         """
-
-        return gt.pipes.convective_heat_transfer_coefficient_circular_pipe(fluid_data.mfr/self.number_of_pipes,
-                                                                           self.r_in,
-                                                                           fluid_data.mu,
-                                                                           fluid_data.rho,
-                                                                           fluid_data.k_f,
-                                                                           fluid_data.Cp,
-                                                                           self.epsilon)
+        # Pipe thermal resistance [m.K/W]
+        self.R_p = gt.pipes.conduction_thermal_resistance_circular_pipe(
+            self.r_in, self.r_out, self.k_p)
+        # Convection heat transfer coefficient [W/m2.K]
+        h_f = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(fluid_data.mfr/self.number_of_pipes,
+                                                                          self.r_in, fluid_data.mu, fluid_data.rho,
+                                                                          fluid_data.k_f, fluid_data.Cp, self.epsilon)
+        # Film thermal resistance [m.K/W]
+        self.R_f = 1.0 / (h_f * 2 * np.pi * self.r_in)
 
     def pipe_model(self, fluid_data: FluidData, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
         """
@@ -124,7 +115,7 @@ class MultipleUTube(_PipeData):
         BasePipe
         """
         return gt.pipes.MultipleUTube(self.pos, self.r_in, self.r_out, borehole, k_s, self.k_g,
-                                      self.R_p + fluid_data.R_f, self.number_of_pipes, J=2)
+                                      self.R_p + self.R_f, self.number_of_pipes, J=2)
 
     def draw_borehole_internal(self, r_b: float) -> None:
         """
@@ -141,45 +132,15 @@ class MultipleUTube(_PipeData):
         None
         """
 
-        # calculate the pipe positions
-        pos = self._axis_symmetrical_pipe
+        # borehole
+        borehole = gt.boreholes.Borehole(100, 1, r_b, 0, 0)
+        if self.R_p == 0:
+            self.R_p = 0.1
+            self.R_f = 0.1
+            pipe = self.pipe_model(FluidData(), 2, borehole)
+            self.R_p, self.R_f = 0, 0
+        else:
+            pipe = self.pipe_model(FluidData(), 2, borehole)
 
-        # set figure
-        figure, axes = plt.subplots()
-
-        # initate circles
-        circles_outer = []
-        circles_inner = []
-
-        # color inner circles and outer circles
-        for i in range(self.number_of_pipes):
-            circles_outer.append(plt.Circle(pos[i], self.r_out, color="black"))
-            circles_inner.append(plt.Circle(pos[i], self.r_in, color="red"))
-            circles_outer.append(plt.Circle(pos[i + self.number_of_pipes], self.r_out, color="black"))
-            circles_inner.append(plt.Circle(pos[i + self.number_of_pipes], self.r_in, color="blue"))
-
-        # set visual settings for figure
-        axes.set_aspect('equal')
-        axes.set_xlim([-r_b, r_b])
-        axes.set_ylim([-r_b, r_b])
-        axes.get_xaxis().set_visible(False)
-        axes.get_yaxis().set_visible(False)
-        plt.tight_layout()
-
-        # define borehole circle
-        borehole_circle = plt.Circle((0, 0), r_b, color="white")
-
-        # add borehole circle to canvas
-        axes.add_artist(borehole_circle)
-
-        # add other circles to canvas
-        for i in circles_outer:
-            axes.add_artist(i)
-        for i in circles_inner:
-            axes.add_artist(i)
-
-        # set background color
-        axes.set_facecolor("grey")
-
-        # show plot
+        pipe.visualize_pipes()
         plt.show()

@@ -6,6 +6,7 @@ from GHEtool.VariableClasses.PipeData import *
 from GHEtool.VariableClasses import FluidData
 import matplotlib.pyplot as plt
 import numpy as np
+import pygfunction as gt
 
 
 ### Test U-pipes
@@ -24,33 +25,43 @@ def test_axissym():
     np.testing.assert_array_almost_equal(double._axis_symmetrical_pipe, MultipleUTube(1, 0.16, 0.02, 2, 0.02, 2)._axis_symmetrical_pipe)
 
 
-def test_pipe_thermal_resistance():
-    single = SingleUPipe(1, 0.016, 0.02, 2, 0.02)
-    double = DoubleUPipe(1, 0.016, 0.02, 2, 0.02)
-    U = MultipleUTube(1, 0.016, 0.02, 2, 0.02)
-    single.calculate_pipe_thermal_resistance()
-    double.calculate_pipe_thermal_resistance()
-    U.calculate_pipe_thermal_resistance()
-    assert np.isclose(single.R_p, double.R_p)
-    assert np.isclose(single.R_p, U.R_p)
-    assert np.isclose(single.R_p, 0.017757199605368243)
-
-
-def test_calculate_convective_heat_transfer_coefficient():
+def test_calculate_thermal_resistance():
     fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
     single = SingleUPipe(1, 0.016, 0.02, 2, 0.02)
     double = DoubleUPipe(1, 0.016, 0.02, 2, 0.02)
     Us = MultipleUTube(1, 0.016, 0.02, 2, 0.02, 1)
     Ud = MultipleUTube(1, 0.016, 0.02, 2, 0.02, 2)
-    assert np.isclose(single.calculate_convective_heat_transfer_coefficient(fluid_data), 1143.6170532222986)
-    assert np.isclose(Us.calculate_convective_heat_transfer_coefficient(fluid_data), 1143.6170532222986)
-    assert np.isclose(double.calculate_convective_heat_transfer_coefficient(fluid_data), 553.7476734615789)
-    assert np.isclose(Ud.calculate_convective_heat_transfer_coefficient(fluid_data), 553.7476734615789)
+
+    single.calculate_resistances(fluid_data)
+    double.calculate_resistances(fluid_data)
+    Us.calculate_resistances(fluid_data)
+    Ud.calculate_resistances(fluid_data)
+    assert np.isclose(single.R_p, 0.017757199605368243)
+    assert np.isclose(single.R_f, 0.008698002460890118)
+    assert np.isclose(double.R_p, 0.017757199605368243)
+    assert np.isclose(double.R_f, 0.017963387333190542)
+    assert np.allclose((single.R_f, single.R_p), (Us.R_f, Us.R_p))
+    assert np.allclose((double.R_f, double.R_p), (Ud.R_f, Ud.R_p))
+
+    single = SingleUPipe(1, 0.016, 0.02, 2, 0.04)
+    double = DoubleUPipe(1, 0.016, 0.02, 2, 0.04)
+    single.calculate_resistances(fluid_data)
+    double.calculate_resistances(fluid_data)
+    borehole = gt.boreholes.Borehole(100, 1, 0.07, 0, 0)
+    pipe = single.pipe_model(fluid_data, 2, borehole)
+    assert np.isclose(pipe.effective_borehole_thermal_resistance(0.1, 4180), 0.13637413925456277)
+    pipe = double.pipe_model(fluid_data, 2, borehole)
+    assert np.isclose(pipe.effective_borehole_thermal_resistance(0.2, 4180), 0.09065168435087693)
 
 
 def test_draw_internals(monkeypatch):
     pipe = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05)
     monkeypatch.setattr(plt, 'show', lambda: None)
+    pipe.draw_borehole_internal(0.075)
+    assert pipe.R_f == 0
+    assert pipe.R_p == 0
+    fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    pipe.calculate_resistances(fluid_data)
     pipe.draw_borehole_internal(0.075)
 
 

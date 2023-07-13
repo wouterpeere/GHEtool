@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Borehole thermal resistance is now visible at the borehole thermal resistance page (issue #51).
 - New class of GroundData: GroundTemperatureGradient added (issue #145).
 - Load classes (issue #45).
-- Pipe classes (single, double, coaxial, Multiple U Tube) (issue #45).
+- Pipe classes (single, double, coaxial, Multiple U Tube) (issue #40 and #45).
 
 ## Changed
 - GUI was moved to a seperate project: ScenarioGUI.
@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - load_hourly_profile is moved to the separate load classes (issue #45).
 - Removed 'set_hourly_cooling_load', 'set_hourly_heating_load' from main_class and move it to separate load class (issue #45).
 - Moved draw_borehole_internals to PipeClass (issue #45).
+- Borehole equivalent resistances is now calculated in one step, centralised in the pipe class (issue #45).
 
 ## Fixed
 - Fixed problem with L2 sizing, when the peak load was the same in all months (issue #146).

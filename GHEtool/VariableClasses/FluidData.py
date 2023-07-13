@@ -16,7 +16,7 @@ class FluidData(BaseClass):
     Contains information regarding the fluid data of the borefield.
     """
 
-    __slots__ = 'k_f', 'rho', 'Cp', 'mu', 'mfr', 'h_f', 'R_f'
+    __slots__ = 'k_f', 'rho', 'Cp', 'mu', 'mfr'
 
     def __init__(self, mfr: float = None,
                  k_f: float = None,
@@ -43,8 +43,6 @@ class FluidData(BaseClass):
         self.rho: float | None = rho  # Density kg/m3
         self.Cp: float | None = Cp    # Thermal capacity J/kgK
         self.mu: float | None = mu    # Dynamic viscosity Pa/s
-        self.h_f: float = 0.  # convective heat transfer coefficient
-        self.R_f: float = 0.  # fluid thermal resistance
 
     def set_mass_flow_rate(self, mfr: float) -> None:
         """

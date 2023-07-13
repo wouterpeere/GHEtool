@@ -20,22 +20,19 @@ def test_fluid_data_without_pipe():
     assert borehole.fluid_data == FluidData()
 
 
+def test_fluid_data_with_pipe_first_added():
+    borehole = Borehole()
+    borehole.pipe_data = pipe_data
+    assert borehole.pipe_data.R_f == 0
+    borehole.fluid_data = fluid_data
+    assert np.isclose(0.01663038005086118, borehole.pipe_data.R_f)
+
+
 def test_fluid_data_with_pipe_later_added():
     borehole = Borehole()
-    borehole.fluid_data = fluid_data
-    assert borehole.fluid_data.R_f == 0
-    assert borehole.fluid_data.h_f == 0
-    borehole.pipe_data = pipe_data
-    assert np.isclose(0.01663038005086118, borehole.fluid_data.R_f)
-    assert np.isclose(638.0088432741649, borehole.fluid_data.h_f)
-
-
-def test_fluid_data_with_pipe_first():
-    borehole = Borehole()
     borehole.pipe_data = pipe_data
     borehole.fluid_data = fluid_data
-    assert np.isclose(0.01663038005086118, borehole.fluid_data.R_f)
-    assert np.isclose(638.0088432741649, borehole.fluid_data.h_f)
+    assert np.isclose(0.01663038005086118, borehole.pipe_data.R_f)
 
 
 def test_pipe_data():

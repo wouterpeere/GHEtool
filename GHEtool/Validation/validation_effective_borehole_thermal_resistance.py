@@ -42,7 +42,7 @@ for mfr in mfr_range:
     borefield.set_fluid_parameters(fluid_data)
     Rb.append(borefield.Rb)
     R_p.append(borefield.borehole.pipe_data.R_p)
-    R_fp.append(borefield.borehole.fluid_data.R_f)
+    R_fp.append(borefield.borehole.pipe_data.R_f)
 
 
 # make figure

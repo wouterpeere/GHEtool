@@ -13,7 +13,7 @@ class _PipeData(BaseClass, ABC):
     Contains information regarding the pipe data of the borefield.
     """
 
-    __slots__ = 'k_g', 'k_p', 'epsilon' , 'R_p'
+    __slots__ = 'k_g', 'k_p', 'epsilon'
 
     def __init__(self, k_g: float = None,
                  k_p: float = None,
@@ -33,34 +33,20 @@ class _PipeData(BaseClass, ABC):
         self.k_g = k_g                      # grout thermal conductivity W/mK
         self.k_p = k_p                      # pipe thermal conductivity W/mK
         self.epsilon = epsilon              # pipe roughness m
-        self.R_p: float = 0.                # pipe thermal resistance mK/W
 
     @abc.abstractmethod
-    def calculate_pipe_thermal_resistance(self) -> None:
+    def calculate_resistances(self, fluid_data: FluidData) -> None:
         """
-        This function calculates and sets the pipe thermal resistance R_p.
-
-        Returns
-        -------
-        R_p : float
-            The pipe thermal resistance [mK/W]
-        """
-        pass
-
-    @abc.abstractmethod
-    def calculate_convective_heat_transfer_coefficient(self, fluid_data: FluidData) -> float:
-        """
-        This function calculates the convective heat transfer coefficient h_f [W/m^2K].
+        This function calculates the conductive and convective resistances, which are constant.
 
         Parameters
         ----------
         fluid_data : FluidData
-            FluidData object
+            Fluid data
 
         Returns
         -------
-        h_f : float
-            Convective heat transfer coefficient [W/m^2K]
+        None
         """
 
     @abc.abstractmethod

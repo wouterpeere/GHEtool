@@ -18,7 +18,7 @@ class Borehole(BaseClass):
     borehole thermal resistance and contains a fluid and pipe class object.
     """
 
-    __slots__ = '_fluid_data', '_pipe_data', '_Rb', 'use_constant_Rb'
+    __slots__ = '_fluid_data', '_pipe_data', '_Rb', 'use_constant_Rb', 'borehole_internal_model'
 
     def __init__(self, fluid_data: FluidData = None, pipe_data: _PipeData = None):
         """
@@ -34,6 +34,7 @@ class Borehole(BaseClass):
         self._pipe_data = MultipleUTube()
         self._Rb: float = 0.12
         self.use_constant_Rb: bool = True
+        self.borehole_internal_model: gt.pipes._BasePipe = None
         if not fluid_data is None:
             self.fluid_data = fluid_data
         if not pipe_data is None:
@@ -98,7 +99,7 @@ class Borehole(BaseClass):
         """
         self._fluid_data = fluid_data
         if self.pipe_data.check_values():
-            self.calculate_fluid_thermal_resistance()
+            self.pipe_data.calculate_resistances(self.fluid_data)
             self.use_constant_Rb = False
 
     @fluid_data.deleter
@@ -141,9 +142,8 @@ class Borehole(BaseClass):
         None
         """
         self._pipe_data = pipe_data
-        self.pipe_data.calculate_pipe_thermal_resistance()
         if self.fluid_data.check_values():
-            self.calculate_fluid_thermal_resistance()
+            self.pipe_data.calculate_resistances(self.fluid_data)
             self.use_constant_Rb = False
 
     @pipe_data.deleter
@@ -194,17 +194,6 @@ class Borehole(BaseClass):
         pipe = self.pipe_data.pipe_model(self.fluid_data, k_s, borehole)
 
         return pipe.effective_borehole_thermal_resistance(self.fluid_data.mfr, self.fluid_data.Cp)
-
-    def calculate_fluid_thermal_resistance(self) -> None:
-        """
-        This function calculates and sets the fluid thermal resistance R_f.
-
-        Returns
-        -------
-        None
-        """
-        self.fluid_data.h_f: float = self.pipe_data.calculate_convective_heat_transfer_coefficient(self.fluid_data)
-        self.fluid_data.R_f: float = 1. / (self.fluid_data.h_f * 2 * pi * self.pipe_data.r_in)
 
     def get_Rb(self, H: float, D: float, r_b: float, k_s: float) -> float:
         """
