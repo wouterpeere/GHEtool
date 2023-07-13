@@ -1,5 +1,5 @@
 """
-This file contains the base class for the N-U-Pipe borehole classes.
+This file contains the base class for the Multiple U-Tube borehole classes.
 """
 
 import numpy as np
@@ -11,9 +11,9 @@ from GHEtool.VariableClasses.PipeData._PipeData import _PipeData
 from GHEtool.VariableClasses.FluidData import FluidData
 
 
-class NUPipe(_PipeData):
+class MultipleUTube(_PipeData):
     """
-    Contains information regarding the N-UPipe class.
+    Contains information regarding the Multiple U-Tube class.
     """
 
     __slots__ = _PipeData.__slots__ + ('r_in', 'r_out', 'D_s', 'number_of_pipes', 'pos')

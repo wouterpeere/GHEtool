@@ -9,7 +9,7 @@ import numpy as np
 import PySide6.QtWidgets as QtW
 import pandas as pd
 
-from GHEtool import Borefield, FOLDER, FluidData, GroundConstantTemperature, GroundFluxTemperature, GroundTemperatureGradient, MonthlyGeothermalLoadAbsolute, NUPipe
+from GHEtool import Borefield, FOLDER, FluidData, GroundConstantTemperature, GroundFluxTemperature, GroundTemperatureGradient, MonthlyGeothermalLoadAbsolute, MultipleUTube
 from GHEtool.gui.data_2_borefield_func import data_2_borefield
 from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
 from GHEtool.gui.gui_classes.translation_class import Translations
@@ -332,7 +332,7 @@ def test_temp_profile_pipe_data(qtbot):
     outer_pipe = round_down(inner_pipe + 0.02 * 1.5, 4)
     roughness = round_down(gs.option_pipe_roughness.get_value() * 1.5, 7)
 
-    pipe_data = NUPipe(conduct_grout, inner_pipe, outer_pipe, conduct_pipe, dis, main_window.gui_structure.option_pipe_number.get_value() + 2, roughness)
+    pipe_data = MultipleUTube(conduct_grout, inner_pipe, outer_pipe, conduct_pipe, dis, main_window.gui_structure.option_pipe_number.get_value() + 2, roughness)
     fluid_data = FluidData(gs.option_fluid_mass_flow.get_value(), gs.option_fluid_conductivity.get_value(), gs.option_fluid_density.get_value(),
                            gs.option_fluid_capacity.get_value(), gs.option_fluid_viscosity.get_value())
 
@@ -384,8 +384,8 @@ def test_temp_profile_fluid_data(qtbot):
     viscosity = round_down(gs.option_fluid_viscosity.get_value() * 1.5, 6)
     flow_rate = round_down(gs.option_fluid_mass_flow.get_value() * 1.5, 3)
 
-    pipe_data = NUPipe(gs.option_pipe_grout_conductivity.get_value(), gs.option_pipe_inner_radius.get_value(), gs.option_pipe_outer_radius.get_value(),
-                                        gs.option_pipe_conductivity.get_value(), gs.option_pipe_distance.get_value(), gs.option_pipe_number.get_value(), gs.option_pipe_roughness.get_value())
+    pipe_data = MultipleUTube(gs.option_pipe_grout_conductivity.get_value(), gs.option_pipe_inner_radius.get_value(), gs.option_pipe_outer_radius.get_value(),
+                              gs.option_pipe_conductivity.get_value(), gs.option_pipe_distance.get_value(), gs.option_pipe_number.get_value(), gs.option_pipe_roughness.get_value())
     fluid_data = FluidData(flow_rate, conduct, density, heat_cap, viscosity)
 
     gs.aim_temp_profile.widget.click() if not gs.aim_temp_profile.widget.isChecked() else None

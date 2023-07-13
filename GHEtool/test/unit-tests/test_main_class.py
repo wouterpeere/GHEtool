@@ -6,7 +6,7 @@ import numpy as np
 import pygfunction as gt
 import pytest
 
-from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, DoubleUPipe, Borefield, SizingSetup, FOLDER, NUPipe
+from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, DoubleUPipe, Borefield, SizingSetup, FOLDER, MultipleUTube
 from GHEtool.logger import ghe_logger
 from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
@@ -264,7 +264,7 @@ def test_set_fluid_params():
 
 def test_set_pipe_params():
     borefield = Borefield()
-    assert borefield.borehole.pipe_data == NUPipe()
+    assert borefield.borehole.pipe_data == MultipleUTube()
     borefield.set_pipe_parameters(pipeData)
     assert borefield.borehole.pipe_data == pipeData
 

@@ -2,10 +2,10 @@
 This document contains the class for the single U-pipe borehole.
 """
 
-from GHEtool.VariableClasses.PipeData.NUPipe import NUPipe
+from GHEtool.VariableClasses.PipeData.MultipleUTube import MultipleUTube
 
 
-class SingleUPipe(NUPipe):
+class SingleUPipe(MultipleUTube):
     """
     Class for the single U-pipe borehole.
     """

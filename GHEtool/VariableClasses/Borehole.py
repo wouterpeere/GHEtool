@@ -4,7 +4,7 @@ This document contains all the information of the borehole class.
 
 from GHEtool.VariableClasses.BaseClass import BaseClass
 from GHEtool.VariableClasses.FluidData import FluidData
-from GHEtool.VariableClasses.PipeData import _PipeData, NUPipe
+from GHEtool.VariableClasses.PipeData import _PipeData, MultipleUTube
 from math import pi
 
 import matplotlib.pyplot as plt
@@ -31,7 +31,7 @@ class Borehole(BaseClass):
             Pipe data
         """
         self._fluid_data = FluidData()
-        self._pipe_data = NUPipe()
+        self._pipe_data = MultipleUTube()
         self._Rb: float = 0.12
         self.use_constant_Rb: bool = True
         if not fluid_data is None:
@@ -155,7 +155,7 @@ class Borehole(BaseClass):
         -------
         None
         """
-        self._pipe_data = NUPipe()
+        self._pipe_data = MultipleUTube()
         self.use_constant_Rb = True
 
     def calculate_Rb(self, H: float, D: float, r_b: float, k_s: float) -> float:

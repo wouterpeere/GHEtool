@@ -2,10 +2,10 @@
 This document contains the class for the double U-Pipe borehole.
 """
 
-from GHEtool.VariableClasses.PipeData.NUPipe import NUPipe
+from GHEtool.VariableClasses.PipeData.MultipleUTube import MultipleUTube
 
 
-class DoubleUPipe(NUPipe):
+class DoubleUPipe(MultipleUTube):
     """
     Class for the double U-Pipe borehole.
     """

@@ -15,7 +15,7 @@ import PySide6.QtCore as QtC
 import pandas as pd
 
 from GHEtool import FOLDER
-from GHEtool.VariableClasses import FluidData, NUPipe, Borehole
+from GHEtool.VariableClasses import FluidData, MultipleUTube, Borehole
 from GHEtool.gui.gui_classes.translation_class import Translations
 from numpy import array, cos, int64, round, sin, sum
 from pandas import DataFrame as pd_DataFrame
@@ -1763,8 +1763,8 @@ class GUI(GuiStructure):
         try:
             fluid_data = FluidData(self.option_fluid_mass_flow.get_value(), self.option_fluid_conductivity.get_value(),
                                    self.option_fluid_density.get_value(), self.option_fluid_capacity.get_value(), self.option_fluid_viscosity.get_value())
-            pipe_data = NUPipe(self.option_pipe_grout_conductivity.get_value(), self.option_pipe_inner_radius.get_value(), self.option_pipe_outer_radius.get_value(),
-                                 self.option_pipe_conductivity.get_value(), self.option_pipe_distance.get_value(), self.option_pipe_number.get_value(), self.option_pipe_roughness.get_value())
+            pipe_data = MultipleUTube(self.option_pipe_grout_conductivity.get_value(), self.option_pipe_inner_radius.get_value(), self.option_pipe_outer_radius.get_value(),
+                                      self.option_pipe_conductivity.get_value(), self.option_pipe_distance.get_value(), self.option_pipe_number.get_value(), self.option_pipe_roughness.get_value())
 
             borehole = Borehole(fluid_data, pipe_data)
             resistance = borehole.get_Rb(self.option_depth.get_value(), self.option_pipe_depth.get_value(), self.option_pipe_borehole_radius.get_value(), self.option_conductivity.get_value())
