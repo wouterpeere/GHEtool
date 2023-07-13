@@ -13,7 +13,7 @@ data = GroundConstantTemperature(3, 10)
 data_ground_flux = GroundFluxTemperature(3, 10)
 
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-pipeData = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
+pipeData = DoubleUPipe(1, 0.015, 0.02, 0.4, 0.05)
 
 borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
 
@@ -53,7 +53,7 @@ def load_case(number):
         peak_cooling = np.array([0., 0., 22., 44., 83., 117., 134., 150., 100., 23., 0., 0.])
         peak_heating = np.array([300., 268., 191., 103., 75., 0., 0., 38., 76., 160., 224., 255.])
 
-    return monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating
+    return monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling
 
 
 def test_different_heating_cooling_peaks():
@@ -73,10 +73,8 @@ def test_different_heating_cooling_peaks():
     monthlyLoadHeating = list(map(lambda x: x * annualHeatingLoad, monthlyLoadHeatingPercentage))  # kWh
     monthlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, monthlyLoadCoolingPercentage))  # kWh
 
-    borefield = Borefield(peak_heating=peakHeating,
-                          peak_cooling=peakCooling,
-                          baseload_heating=monthlyLoadHeating,
-                          baseload_cooling=monthlyLoadCooling)
+    load = MonthlyGeothermalLoadAbsolute(monthlyLoadHeating, monthlyLoadCooling, peakHeating, peakCooling)
+    borefield = Borefield(load=load)
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(copy.copy(borefield_gt))
@@ -94,12 +92,7 @@ def test_different_heating_cooling_peaks():
 
 
 def test_stuck_in_loop():
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(4)
-
-    borefield = Borefield(peak_heating=peak_heating,
-                          peak_cooling=peak_cooling,
-                          baseload_heating=monthly_load_heating,
-                          baseload_cooling=monthly_load_cooling)
+    borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(4)))
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(copy.copy(borefield_gt))
@@ -121,12 +114,7 @@ def test_stuck_in_loop():
 
 
 def test_different_results_with_other_peak_lengths():
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(4)
-
-    borefield = Borefield(peak_heating=peak_heating,
-                          peak_cooling=peak_cooling,
-                          baseload_heating=monthly_load_heating,
-                          baseload_cooling=monthly_load_cooling)
+    borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(4)))
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(copy.copy(borefield_gt))
@@ -146,11 +134,7 @@ def test_different_results_with_other_peak_lengths():
 
 def test_reset_temp_profiles_when_loaded(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
-    monthlyLoadCooling, monthlyLoadHeating, peakCooling, peakHeating = load_case(1)
-    borefield = Borefield(peak_heating=peakHeating,
-                          peak_cooling=peakCooling,
-                          baseload_heating=monthlyLoadHeating,
-                          baseload_cooling=monthlyLoadCooling)
+    borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(1)))
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(copy.copy(borefield_gt))
@@ -172,12 +156,7 @@ def test_reset_temp_profiles_when_loaded(monkeypatch):
 
 
 def test_no_possible_solution():
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(4)
-
-    borefield = Borefield(peak_heating=peak_heating,
-                          peak_cooling=peak_cooling,
-                          baseload_heating=monthly_load_heating,
-                          baseload_cooling=monthly_load_cooling)
+    borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(4)))
 
     borefield.set_ground_parameters(data_ground_flux)
     borefield.set_borefield(copy.copy(borefield_gt))
@@ -226,11 +205,8 @@ def test_problem_with_gfunction_calc_obj():
     monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage  # kWh
 
     # create the borefield object
-
-    borefield = Borefield(peak_heating=peak_heating,
-                          peak_cooling=peak_cooling,
-                          baseload_heating=monthly_load_heating,
-                          baseload_cooling=monthly_load_cooling)
+    load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
+    borefield = Borefield(load=load)
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)

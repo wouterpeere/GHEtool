@@ -33,7 +33,7 @@ list_of_test_objects.add(SizingObject(borefield, L2_output=92.07, L3_output=91.9
                                       name='Main functionalities (1)'))
 
 fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, number_of_pipes=2)
+pipe_data = DoubleUPipe(1, 0.015, 0.02, 0.4, 0.05)
 borefield.set_fluid_parameters(fluid_data)
 borefield.set_pipe_parameters(pipe_data)
 borefield.sizing_setup(use_constant_Rb=False)
@@ -144,7 +144,7 @@ list_of_test_objects.add(SizingObject(borefield, L2_output=285.476, L3_output=28
 
 ground_data = GroundFluxTemperature(3, 10)
 fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
+pipe_data = DoubleUPipe(1, 0.015, 0.02, 0.4, 0.05)
 borefield = Borefield()
 borefield.create_rectangular_borefield(5, 4, 6, 6, 110, 4, 0.075)
 borefield.set_ground_parameters(ground_data)
@@ -190,7 +190,7 @@ list_of_test_objects.add(SizingObject(borefield, L2_output=305.509, L3_output=31
 
 ground_data_IKC = GroundFluxTemperature(2.3, 10.5, flux=2.85)
 fluid_data_IKC = FluidData(0.2, 0.5, 1021.7, 3919, 0.0033)
-pipe_data_IKC = PipeData(2.3, 0.016, 0.02, 0.42, 0.04)
+pipe_data_IKC = SingleUPipe(2.3, 0.016, 0.02, 0.42, 0.04)
 monthly_cooling = np.array([0, 0, 740, 1850, 3700, 7400, 7400, 7400, 5550, 2220, 740, 0]) * (1+1/4.86)
 monthly_heating = np.array([20064, 17784, 16644, 13680, 0, 0, 0, 0, 0, 12540, 15618, 17670]) * (1-1/4.49)
 peak_cooling = np.array([61]*12) * (1+1/4.86)

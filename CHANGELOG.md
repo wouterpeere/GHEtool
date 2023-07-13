@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Rb is now solely handled by the borehole object.
 - load_hourly_profile is moved to the separate load classes (issue #45).
 - Removed 'set_hourly_cooling_load', 'set_hourly_heating_load' from main_class and move it to separate load class (issue #45).
+- Moved draw_borehole_internals to PipeClass (issue #45).
 
 ## Fixed
 - Fixed problem with L2 sizing, when the peak load was the same in all months (issue #146).

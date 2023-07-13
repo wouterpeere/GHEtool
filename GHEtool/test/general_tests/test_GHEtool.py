@@ -9,14 +9,15 @@ import pygfunction as gt
 import pytest
 from pytest import raises
 
-from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, PipeData, Borefield, SizingSetup, FOLDER
+from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, Borefield, SizingSetup, FOLDER, DoubleUPipe
+from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute
 from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
 
 data = GroundConstantTemperature(3, 10)
 data_ground_flux = GroundFluxTemperature(3, 10)
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-pipeData = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
+pipeData = DoubleUPipe(1, 0.015, 0.02, 0.4, 0.05)
 
 borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
 
@@ -40,10 +41,8 @@ custom_field = gt.boreholes.L_shaped_field(N_1=4, N_2=5, B_1=5., B_2=5., H=100.,
 
 
 def test_borefield():
-    borefield = Borefield(peak_heating=peakHeating,
-                          peak_cooling=peakCooling,
-                          baseload_heating=monthlyLoadHeating,
-                          baseload_cooling=monthlyLoadCooling)
+    load = MonthlyGeothermalLoadAbsolute(monthlyLoadHeating, monthlyLoadCooling, peakHeating, peakCooling)
+    borefield = Borefield(load=load)
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)
@@ -76,10 +75,8 @@ def borefield_quadrants():
 
 @pytest.fixture
 def borefield():
-    borefield = Borefield(peak_heating=peakHeating,
-                          peak_cooling=peakCooling,
-                          baseload_heating=monthlyLoadHeating,
-                          baseload_cooling=monthlyLoadCooling)
+    load = MonthlyGeothermalLoadAbsolute(monthlyLoadHeating, monthlyLoadCooling, peakHeating, peakCooling)
+    borefield = Borefield(load=load)
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)
@@ -93,10 +90,8 @@ def borefield():
 
 @pytest.fixture
 def borefield_custom_data():
-    borefield = Borefield(peak_heating=peakHeating,
-                          peak_cooling=peakCooling,
-                          baseload_heating=monthlyLoadHeating,
-                          baseload_cooling=monthlyLoadCooling)
+    load = MonthlyGeothermalLoadAbsolute(monthlyLoadHeating, monthlyLoadCooling, peakHeating, peakCooling)
+    borefield = Borefield(load=load)
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)

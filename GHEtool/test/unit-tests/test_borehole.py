@@ -4,11 +4,11 @@ import pygfunction as gt
 import numpy as np
 import pytest
 
-from GHEtool import FluidData, PipeData
+from GHEtool import FluidData, DoubleUPipe, SingleUPipe, NUPipe
 from GHEtool.VariableClasses import Borehole
 
 fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
+pipe_data = DoubleUPipe(1, 0.015, 0.02, 0.4, 0.05)
 
 
 def test_fluid_data_without_pipe():
@@ -40,13 +40,13 @@ def test_fluid_data_with_pipe_first():
 
 def test_pipe_data():
     borehole = Borehole()
-    assert borehole.pipe_data == PipeData()
+    assert borehole.pipe_data == NUPipe()
     assert borehole.pipe_data.R_p == 0
     borehole.pipe_data = pipe_data
     assert borehole.pipe_data == pipe_data
     assert np.isclose(0.11446505967405429, borehole.pipe_data.R_p)
     del borehole.pipe_data
-    assert borehole.pipe_data == PipeData()
+    assert borehole.pipe_data == NUPipe()
 
 
 def test_equivalent_loading():
@@ -67,7 +67,7 @@ def test_equivalent_loading():
 
 def test_calculate_Rb():
     borehole = Borehole()
-    borehole.pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
+    borehole.pipe_data = NUPipe(1, 0.015, 0.02, 0.4, 0.05, 2)
     borehole.fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
 
     assert np.isclose(borehole.calculate_Rb(100, 1, 0.075, 3), 0.09483159131195469)
@@ -114,7 +114,7 @@ def test_calculate_Rb_no_data():
 def test_Rb_values():
     borehole = Borehole()
     mfr_range = np.arange(0.05, 0.55, 0.05)
-    pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, number_of_pipes=2, epsilon=1e-6)
+    pipe_data = NUPipe(1, 0.015, 0.02, 0.4, 0.05, number_of_pipes=2, epsilon=1e-6)
     borehole.pipe_data = pipe_data
     Rb_list = []
     for mfr in mfr_range:

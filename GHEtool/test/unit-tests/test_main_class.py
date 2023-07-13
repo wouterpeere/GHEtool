@@ -6,7 +6,7 @@ import numpy as np
 import pygfunction as gt
 import pytest
 
-from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, PipeData, Borefield, SizingSetup, FOLDER
+from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, DoubleUPipe, Borefield, SizingSetup, FOLDER, NUPipe
 from GHEtool.logger import ghe_logger
 from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
@@ -15,7 +15,7 @@ data = GroundConstantTemperature(3, 10)
 ground_data_constant = data
 data_ground_flux = GroundFluxTemperature(3, 10)
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-pipeData = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
+pipeData = DoubleUPipe(1, 0.015, 0.02, 0.4, 0.05)
 
 borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
 
@@ -264,7 +264,7 @@ def test_set_fluid_params():
 
 def test_set_pipe_params():
     borefield = Borefield()
-    assert borefield.borehole.pipe_data == PipeData()
+    assert borefield.borehole.pipe_data == NUPipe()
     borefield.set_pipe_parameters(pipeData)
     assert borefield.borehole.pipe_data == pipeData
 
@@ -797,13 +797,6 @@ def test_gfunction():
     np.testing.assert_array_almost_equal(borefield.gfunction([6000, 60000, 600000]), np.array([0.622017, 1.703272, 2.840246]))
     borefield.use_precalculated_data = False
     np.testing.assert_array_almost_equal(borefield.gfunction([6000, 60000, 600000]), np.array([0.63751082, 1.70657847, 2.84227252]))
-
-
-def test_draw_internals(monkeypatch):
-    borefield = Borefield()
-    monkeypatch.setattr(plt, 'show', lambda: None)
-    borefield.set_pipe_parameters(pipeData)
-    borefield.draw_borehole_internal()
 
 
 def test_load_duration(monkeypatch):

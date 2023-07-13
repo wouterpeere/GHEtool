@@ -14,10 +14,11 @@ import pygfunction as gt
 from scipy.signal import convolve
 from warnings import warn
 
-from GHEtool.VariableClasses import FluidData, PipeData, Borehole, GroundConstantTemperature
+from GHEtool.VariableClasses import FluidData, Borehole, GroundConstantTemperature
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, SizingSetup
 from GHEtool.VariableClasses.LoadData import *
 from GHEtool.VariableClasses.LoadData import _LoadData
+from GHEtool.VariableClasses.PipeData import _PipeData
 from GHEtool.VariableClasses.BaseClass import BaseClass
 from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
 from GHEtool.logger.ghe_logger import ghe_logger
@@ -625,7 +626,7 @@ class Borefield(BaseClass):
         """
         self.borehole.fluid_data = data
 
-    def set_pipe_parameters(self, data: PipeData) -> None:
+    def set_pipe_parameters(self, data: _PipeData) -> None:
         """
         This function sets the pipe parameters.
 
@@ -2075,56 +2076,3 @@ class Borefield(BaseClass):
         if not self.gui:
             plt.show()
         return fig, ax
-
-    def draw_borehole_internal(self) -> None:
-        """
-        This function draws the internal structure of a borehole.
-        This means, it draws the pipes inside the borehole.
-
-        Returns
-        -------
-        None
-        """
-
-        # calculate the pipe positions
-        pos = self.borehole.pipe_data._axis_symmetrical_pipe
-
-        # set figure
-        figure, axes = plt.subplots()
-
-        # initate circles
-        circles_outer = []
-        circles_inner = []
-
-        # color inner circles and outer circles
-        for i in range(self.borehole.pipe_data.number_of_pipes):
-            circles_outer.append(plt.Circle(pos[i], self.borehole.pipe_data.r_out, color="black"))
-            circles_inner.append(plt.Circle(pos[i], self.borehole.pipe_data.r_in, color="red"))
-            circles_outer.append(plt.Circle(pos[i + self.borehole.pipe_data.number_of_pipes], self.borehole.pipe_data.r_out, color="black"))
-            circles_inner.append(plt.Circle(pos[i + self.borehole.pipe_data.number_of_pipes], self.borehole.pipe_data.r_in, color="blue"))
-
-        # set visual settings for figure
-        axes.set_aspect('equal')
-        axes.set_xlim([-self.r_b, self.r_b])
-        axes.set_ylim([-self.r_b, self.r_b])
-        axes.get_xaxis().set_visible(False)
-        axes.get_yaxis().set_visible(False)
-        plt.tight_layout()
-
-        # define borehole circle
-        borehole_circle = plt.Circle((0, 0), self.r_b, color="white")
-
-        # add borehole circle to canvas
-        axes.add_artist(borehole_circle)
-
-        # add other circles to canvas
-        for i in circles_outer:
-            axes.add_artist(i)
-        for i in circles_inner:
-            axes.add_artist(i)
-
-        # set background color
-        axes.set_facecolor("grey")
-
-        # show plot
-        plt.show()
