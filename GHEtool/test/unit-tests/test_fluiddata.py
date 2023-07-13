@@ -28,6 +28,7 @@ def test_unequal_cross():
     data_fluid = FluidData(0.2, 0.568, 998, 4180, 1e-3)
     data_ground = GroundConstantTemperature(3, 10)
     assert data_ground != data_fluid
+    assert data_fluid != data_ground
 
 
 def test_empty_variable_classes():

@@ -93,10 +93,10 @@ class CoaxialPipe(_PipeData):
         -------
         BasePipe
         """
-        return gt.pipes.Coaxial(pos=[0, 0],
+        return gt.pipes.Coaxial(pos=(0., 0.),
                                 r_in=np.array([self.r_out_in, self.r_in_in]) if self.is_inner_inlet else
                                 np.array([self.r_in_in, self.r_out_in]),
-                                r_out=np.array([self.r_out_out,self.r_in_out]) if self.is_inner_inlet else
+                                r_out=np.array([self.r_out_out, self.r_in_out]) if self.is_inner_inlet else
                                 np.array([self.r_in_out, self.r_out_out]),
                                 borehole=borehole, k_s=k_s, k_g=self.k_g, R_ff=self.R_ff, R_fp=self.R_fp, J=2)
 
