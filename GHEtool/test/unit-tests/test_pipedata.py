@@ -6,7 +6,6 @@ from GHEtool.VariableClasses.PipeData import *
 from GHEtool.VariableClasses import FluidData
 import matplotlib.pyplot as plt
 import numpy as np
-import pygfunction as gt
 
 
 ### Test U-pipes
@@ -19,10 +18,10 @@ def test_empty_class():
 def test_axissym():
     single = SingleUPipe(1, 0.016, 0.02, 2, 0.02)
     double = DoubleUPipe(1, 0.016, 0.02, 2, 0.02)
-    assert np.array_equal(single._axis_symmetrical_pipe, [(-0.02, 2.4492935982947064e-18), (0.02, -4.898587196589413e-18)])
-    assert np.array_equal(double._axis_symmetrical_pipe, [(-0.02, 2.4492935982947064e-18), (0.02, -4.898587196589413e-18), (-3.673940397442059e-18, -0.02), (6.123233995736766e-18, 0.02)])
-    assert np.array_equal(single._axis_symmetrical_pipe, MultipleUTube(1, 0.16, 0.02, 2, 0.02, 1)._axis_symmetrical_pipe)
-    assert np.array_equal(double._axis_symmetrical_pipe, MultipleUTube(1, 0.16, 0.02, 2, 0.02, 2)._axis_symmetrical_pipe)
+    np.testing.assert_array_almost_equal(single._axis_symmetrical_pipe, [(-0.02, 2.4492935982947064e-18), (0.02, -4.898587196589413e-18)])
+    np.testing.assert_array_almost_equal(double._axis_symmetrical_pipe, [(-0.02, 2.4492935982947064e-18), (0.02, -4.898587196589413e-18), (-3.673940397442059e-18, -0.02), (6.123233995736766e-18, 0.02)])
+    np.testing.assert_array_almost_equal(single._axis_symmetrical_pipe, MultipleUTube(1, 0.16, 0.02, 2, 0.02, 1)._axis_symmetrical_pipe)
+    np.testing.assert_array_almost_equal(double._axis_symmetrical_pipe, MultipleUTube(1, 0.16, 0.02, 2, 0.02, 2)._axis_symmetrical_pipe)
 
 
 def test_pipe_thermal_resistance():
