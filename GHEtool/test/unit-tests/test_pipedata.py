@@ -141,7 +141,6 @@ def test_calculate_borehole_equivalent_resistance_coaxial():
     fluid = gt.media.Fluid('MPG', 20.)
     fluid = FluidData(0.5, fluid.k, fluid.rho, fluid.cp, fluid.mu)
     pipe.calculate_resistances(fluid)
-    pipe.calculate_resistances(fluid)
     model = pipe.pipe_model(fluid, 2, borehole)
     assert np.isclose(model.effective_borehole_thermal_resistance(0.5, 4180), 0.17312532151975354)
 
