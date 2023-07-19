@@ -8,7 +8,7 @@ The ground data classes you can use have either:
 #. A constant ground geothermal heat flux
 #. A constant ground temperature gradient
 
-All of these three classes are based on the abstract class _GroundData.
+All of these three classes are children of the abstract class _GroundData.
 
 
 .. automodule:: GHEtool.VariableClasses.GroundData._GroundData

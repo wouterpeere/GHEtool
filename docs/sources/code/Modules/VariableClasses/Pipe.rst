@@ -2,7 +2,17 @@
 Pipe data
 ***************
 
-.. automodule:: GHEtool.VariableClasses.PipeData._GroundData
+GHEtool supports both U-type and coaxial type heat exchangers.
+You can use:
+
+#. Multiple U-tubes
+#. Single U-tubes (special case of multiple U-tubes)
+#. Double U-tubes (special case of multiple U-tubes)
+#. Coaxial pipe
+
+All of the classes above are children from the abstract _PipeData class.
+
+.. automodule:: GHEtool.VariableClasses.PipeData._PipeData
     :members:
     :show-inheritance:
     :private-members:
