@@ -1,13 +1,13 @@
 """
-This document contains the class for the double U-Pipe borehole.
+This document contains the class for the single U-Tube borehole.
 """
 
 from GHEtool.VariableClasses.PipeData.MultipleUTube import MultipleUTube
 
 
-class DoubleUPipe(MultipleUTube):
+class SingleUTube(MultipleUTube):
     """
-    Class for the double U-Pipe borehole.
+    Class for the single U-Tube borehole.
     """
     def __init__(self, k_g: float = None,
                  r_in: float = None,
@@ -32,4 +32,4 @@ class DoubleUPipe(MultipleUTube):
         epsilon : float
             Pipe roughness [m]
         """
-        super().__init__(k_g, r_in, r_out, k_p, D_s, 2, epsilon)
+        super().__init__(k_g, r_in, r_out, k_p, D_s, 1, epsilon)

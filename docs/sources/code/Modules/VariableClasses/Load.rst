@@ -1,5 +1,5 @@
 ***************
-Ground data
+Load data
 ***************
 
 .. automodule:: GHEtool.VariableClasses.GroundData._GroundData

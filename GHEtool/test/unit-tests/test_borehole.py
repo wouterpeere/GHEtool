@@ -4,11 +4,11 @@ import pygfunction as gt
 import numpy as np
 import pytest
 
-from GHEtool import FluidData, DoubleUPipe, SingleUPipe, MultipleUTube
+from GHEtool import FluidData, DoubleUTube, SingleUTube, MultipleUTube
 from GHEtool.VariableClasses import Borehole
 
 fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-pipe_data = DoubleUPipe(1, 0.015, 0.02, 0.4, 0.05)
+pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 
 
 def test_fluid_data_without_pipe():

@@ -1,5 +1,5 @@
 from ._PipeData import _PipeData
-from .SingleUPipe import SingleUPipe
-from .DoubleUPipe import DoubleUPipe
+from .SingleUTube import SingleUTube
+from .DoubleUTube import DoubleUTube
 from .MultipleUTube import MultipleUTube
 from .CoaxialPipe import CoaxialPipe

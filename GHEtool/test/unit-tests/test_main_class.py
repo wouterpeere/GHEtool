@@ -6,7 +6,7 @@ import numpy as np
 import pygfunction as gt
 import pytest
 
-from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, DoubleUPipe, Borefield, SizingSetup, FOLDER, MultipleUTube
+from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, DoubleUTube, Borefield, SizingSetup, FOLDER, MultipleUTube
 from GHEtool.logger import ghe_logger
 from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
@@ -15,7 +15,7 @@ data = GroundConstantTemperature(3, 10)
 ground_data_constant = data
 data_ground_flux = GroundFluxTemperature(3, 10)
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-pipeData = DoubleUPipe(1, 0.015, 0.02, 0.4, 0.05)
+pipeData = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 
 borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
 

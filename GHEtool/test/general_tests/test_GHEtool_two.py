@@ -13,7 +13,7 @@ data = GroundConstantTemperature(3, 10)
 data_ground_flux = GroundFluxTemperature(3, 10)
 
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-pipeData = DoubleUPipe(1, 0.015, 0.02, 0.4, 0.05)
+pipeData = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 
 borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
 
