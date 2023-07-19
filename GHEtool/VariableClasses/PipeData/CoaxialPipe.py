@@ -52,7 +52,18 @@ class CoaxialPipe(_PipeData):
         self.R_fp: float = 0.
 
     def calculate_resistances(self, fluid_data: FluidData) -> None:
+        """
+        This function calculates the conductive and convective resistances, which are constant.
 
+        Parameters
+        ----------
+        fluid_data : FluidData
+            Fluid data
+
+        Returns
+        -------
+        None
+        """
         # Pipe thermal resistances [m.K/W]
         # Inner pipe
         R_p_in = gt.pipes.conduction_thermal_resistance_circular_pipe(
