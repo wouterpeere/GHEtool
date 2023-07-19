@@ -1938,7 +1938,7 @@ class Translations:  # pragma: no cover
         ]
         self.option_is_inner_inlet: List[str] = [
             "Inlet via inner tube?, Yes , No ",
-            "Inlet via inner tube?, Yes , No ",
+            "Einlass am inneren Rohr?, Ja , Nein ",
             "Inlaat via binnenste leiding?, Ja, Nee",
             "Inlet via inner tube?, Yes , No ",
             "Inlet via inner tube?, Yes , No ",
@@ -1947,7 +1947,7 @@ class Translations:  # pragma: no cover
         ]
         self.option_U_pipe_or_coaxial_pipe: List[str] = [
             "Borehole interals:, U-tube , Coaxial pipe ",
-            "Borehole interal:, U-tube , Coaxial pipe ",
+            "Sondentyp:, U-Sonde , Koaxialsonde ",
             "Type leiding:, U-buis , Coaxiaal",
             "Borehole interal:, U-tube , Coaxial pipe ",
             "Borehole interal:, U-tube , Coaxial pipe ",
@@ -1956,7 +1956,7 @@ class Translations:  # pragma: no cover
         ]
         self.option_pipe_coaxial_inner_inner: List[str] = [
             "Inner pipe inner radius [m]: ",
-            "Inner pipe inner radius [m]: ",
+            "Innerer Radius des inneren Rohres [m]:",
             "Binnenste leiding binnenstraal [m]:",
             "Inner pipe inner radius [m]: ",
             "Inner pipe inner radius [m]: ",
@@ -1965,7 +1965,7 @@ class Translations:  # pragma: no cover
         ]
         self.option_pipe_coaxial_outer_inner: List[str] = [
             "Outer pipe inner radius [m]:",
-            "Outer pipe inner radius [m]:",
+            "Äußerer Radius des inneren Rohres [m]:",
             "Buitenste leiding binnenstraal [m]:",
             "Outer pipe inner radius [m]:",
             "Outer pipe inner radius [m]:",
@@ -1974,7 +1974,7 @@ class Translations:  # pragma: no cover
         ]
         self.option_pipe_coaxial_inner_outer: List[str] = [
             "Inner pipe outer radius [m]:",
-            "Inner pipe outer radius [m]:",
+            "Innerer Radius des äußeren Rohres [m]:",
             "Binnenste leiding buitenstraal [m]:",
             "Inner pipe outer radius [m]:",
             "Inner pipe outer radius [m]:",
@@ -1983,7 +1983,7 @@ class Translations:  # pragma: no cover
         ]
         self.option_pipe_coaxial_outer_outer: List[str] = [
             "Outer pipe outer radius [m]:",
-            "Outer pipe outer radius [m]:",
+            "Äußerer Radius des äußeren Rohres [m]:",
             "Buitenste leiding buitenstraal [m]:",
             "Outer pipe outer radius [m]:",
             "Outer pipe outer radius [m]:",
