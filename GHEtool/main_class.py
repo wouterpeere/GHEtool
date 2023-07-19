@@ -1805,9 +1805,7 @@ class Borefield(BaseClass):
         -------
         Reynolds number : float
         """
-        u = self.borehole.fluid_data.mfr / self.borehole.pipe_data.number_of_pipes / self.borehole.fluid_data.rho /\
-            (pi * self.borehole.pipe_data.r_in ** 2)
-        return self.borehole.fluid_data.rho * u * self.borehole.pipe_data.r_in * 2 / self.borehole.fluid_data.mu
+        return self.borehole.Re
 
     def optimise_load_profile(self, building_load: HourlyGeothermalLoad, depth: float = None, SCOP: float = 10**6,
                               SEER: float = 10**6, print_results: bool = False) -> None:

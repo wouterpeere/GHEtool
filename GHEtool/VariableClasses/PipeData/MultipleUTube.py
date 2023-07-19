@@ -117,6 +117,23 @@ class MultipleUTube(_PipeData):
         return gt.pipes.MultipleUTube(self.pos, self.r_in, self.r_out, borehole, k_s, self.k_g,
                                       self.R_p + self.R_f, self.number_of_pipes, J=2)
 
+    def Re(self, fluid_data: FluidData) -> float:
+        """
+        Reynolds number.
+
+        Parameters
+        ----------
+        fluid_data: FluidData
+            fluid data
+
+        Returns
+        -------
+        Reynolds number : float
+        """
+        u = fluid_data.mfr / self.number_of_pipes / fluid_data.rho / \
+            (pi * self.r_in ** 2)
+        return fluid_data.rho * u * self.r_in * 2 / fluid_data.mu
+
     def draw_borehole_internal(self, r_b: float) -> None:
         """
         This function draws the internal structure of a borehole.

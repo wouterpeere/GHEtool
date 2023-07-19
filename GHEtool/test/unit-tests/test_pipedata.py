@@ -164,3 +164,10 @@ def test_pipe_data_unequal_cross():
     assert data != data2
     assert data2 != data
 
+
+def test_reynolds_number():
+    fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2)
+    assert np.isclose(data.Re(fluid_data=fluid_data), 4244.131815783876)
+    data = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
+    assert np.isclose(data.Re(fluid_data=fluid_data), 1727.5977540504243)

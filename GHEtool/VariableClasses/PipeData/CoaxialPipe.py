@@ -111,6 +111,33 @@ class CoaxialPipe(_PipeData):
                                 np.array([self.r_in_out, self.r_out_out]),
                                 borehole=borehole, k_s=k_s, k_g=self.k_g, R_ff=self.R_ff, R_fp=self.R_fp, J=2)
 
+    def Re(self, fluid_data: FluidData) -> float:
+        """
+        Reynolds number.
+        Note: This code is based on pygfunction, 'convective_heat_transfer_coefficient_concentric_annulus' in the
+        Pipes class.
+
+        Parameters
+        ----------
+        fluid_data: FluidData
+            fluid data
+
+        Returns
+        -------
+        Reynolds number : float
+        """
+        # Hydraulic diameter and radius for concentric tube annulus region
+        D_h = 2 * (self.r_out_in - self.r_in_out)
+        r_h = D_h / 2
+        # Cross-sectional area of the annulus region
+        A_c = pi * ((self.r_out_in ** 2) - (self.r_in_out ** 2))
+        # Volume flow rate
+        V_dot = fluid_data.mfr / fluid_data.rho
+        # Average velocity
+        V = V_dot / A_c
+        # Reynolds number
+        return fluid_data.rho * V * D_h / fluid_data.mu
+
     def draw_borehole_internal(self, r_b: float) -> None:
         """
         This function draws the internal structure of a borehole.

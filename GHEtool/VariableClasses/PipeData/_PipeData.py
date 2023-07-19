@@ -69,6 +69,21 @@ class _PipeData(BaseClass, ABC):
         """
 
     @abc.abstractmethod
+    def Re(self, fluid_data: FluidData) -> float:
+        """
+        Reynolds number.
+
+        Parameters
+        ----------
+        fluid_data: FluidData
+            fluid data
+
+        Returns
+        -------
+        Reynolds number : float
+        """
+
+    @abc.abstractmethod
     def draw_borehole_internal(self, r_b: float) -> None:
         """
         This function draws the internal structure of a borehole.

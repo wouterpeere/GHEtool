@@ -71,6 +71,17 @@ class Borehole(BaseClass):
         self.use_constant_Rb = True
 
     @property
+    def Re(self) -> float:
+        """
+        Reynolds number.
+
+        Returns
+        -------
+        Reynolds number : float
+        """
+        return self.pipe_data.Re(self.fluid_data)
+
+    @property
     def fluid_data(self) -> FluidData:
         """
         This function returns the fluid data object.

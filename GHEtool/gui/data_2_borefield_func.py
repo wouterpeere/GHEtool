@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 import logging
 
 import numpy as np
-from GHEtool import Borefield, FluidData, MultipleUTube, GroundConstantTemperature, GroundFluxTemperature, GroundTemperatureGradient
+from GHEtool import Borefield, FluidData, MultipleUTube, GroundConstantTemperature, GroundFluxTemperature, GroundTemperatureGradient, CoaxialPipe
 from GHEtool.VariableClasses import GroundData, MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
 from GHEtool.gui.gui_structure import load_data_GUI
 import pygfunction as gt
@@ -163,9 +163,18 @@ def _create_fluid_data(ds: DataStorage) -> FluidData:
     return FluidData(ds.option_fluid_mass_flow, ds.option_fluid_conductivity, ds.option_fluid_density, ds.option_fluid_capacity, ds.option_fluid_viscosity)
 
 
-def _create_pipe_data(ds: DataStorage) -> MultipleUTube:
-    return MultipleUTube(ds.option_pipe_grout_conductivity, ds.option_pipe_inner_radius, ds.option_pipe_outer_radius, ds.option_pipe_conductivity,
-                         ds.option_pipe_distance, ds.option_pipe_number, ds.option_pipe_roughness)
+def _create_pipe_data(ds: DataStorage) -> MultipleUTube | CoaxialPipe:
+    if ds.option_U_pipe_or_coaxial_pipe == 0:
+        return MultipleUTube(ds.option_pipe_grout_conductivity, ds.option_pipe_inner_radius, ds.option_pipe_outer_radius, ds.option_pipe_conductivity,
+                             ds.option_pipe_distance, ds.option_pipe_number, ds.option_pipe_roughness)
+    return CoaxialPipe(ds.option_pipe_coaxial_inner_inner,
+                       ds.option_pipe_coaxial_inner_outer,
+                       ds.option_pipe_coaxial_outer_inner,
+                       ds.option_pipe_coaxial_outer_outer,
+                       ds.option_pipe_conductivity,
+                       ds.option_pipe_grout_conductivity,
+                       ds.option_pipe_roughness,
+                       ds.option_is_inner_inlet)
 
 
 def _calculate_flux(ds: DataStorage) -> float:
