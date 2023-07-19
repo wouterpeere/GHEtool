@@ -144,6 +144,21 @@ def test_calculate_borehole_equivalent_resistance_coaxial():
     model = pipe.pipe_model(fluid, 2, borehole)
     assert np.isclose(model.effective_borehole_thermal_resistance(0.5, 4180), 0.17312532151975354)
 
+    # pygfunction itself
+    is_inner_inlet = True
+    for i in range(1, 12, 2):
+        pipe_ghe = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=False)
+        fluid = gt.media.Fluid('MPG', 20.)
+        fluid = FluidData(0.5, fluid.k, fluid.rho, fluid.cp, fluid.mu)
+        pipe_ghe.calculate_resistances(fluid)
+        pipe = gt.pipes.Coaxial(pos=(0., 0.),
+                         r_in=np.array([r_out_in, r_in_in]) if is_inner_inlet else
+                         np.array([r_in_in, r_out_in]),
+                         r_out=np.array([r_out_out, r_in_out]) if is_inner_inlet else
+                         np.array([r_in_out, r_out_out]),
+                         borehole=borehole, k_s=i, k_g=k_g, R_ff=pipe_ghe.R_ff, R_fp=pipe_ghe.R_fp, J=2)
+        print(pipe._Rd)
+
 
 def test_pipe_data_equal_coaxial():
     data = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
