@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Peere"
+  given-names: "Wouter"
+  orcid: "https://orcid.org/0000-0002-9981-9926"
+title: "GHEtool"
+version: 2.2.0
+date-released: 2023-09-15
+url: "https://github.com/wouterpeere/GHEtool"
+preferred-citation:
+  type: article
+  authors:
+  - family-names: "Peere"
+    given-names: "Wouter"
+    orcid: "https://orcid.org/0000-0002-2311-5981"
+  - family-names: "Blanke"
+    given-names: "Tobias"
+    orcid: "https://orcid.org/0000-0003-1529-5529"
+  doi: "10.21105/joss.04406"
+  journal: "ournal of Open Source Software"
+  start: 4406
+  title: "GHEtool: An open-source tool for borefield sizing in Python"
+  issue: 76
+  volume: 7
+  year: 2022
+
+  @article{Peere2022, doi = {10.21105/joss.04406}, url = {https://doi.org/10.21105/joss.04406}, year = {2022}, publisher = {The Open Journal}, volume = {7}, number = {76}, pages = {4406}, author = {Wouter Peere and Tobias Blanke}, title = {GHEtool: An open-source tool for borefield sizing in Python}, journal = {Journal of Open Source Software} }

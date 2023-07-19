@@ -73,7 +73,7 @@ class _PipeData(BaseClass, ABC):
         Parameters
         ----------
         fluid_data: FluidData
-            fluid data
+            Fluid data
 
         Returns
         -------
