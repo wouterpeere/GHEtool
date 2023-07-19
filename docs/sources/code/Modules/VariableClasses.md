@@ -6,8 +6,8 @@ Please find below the different classes and their modules.
 ```{toctree}
 :maxdepth: 2
 
-Modules/VariableClasses/Ground.rst
-Modules/VariableClasses/Fluid.rst
-Modules/VariableClasses/Load.rst
-Modules/VariableClasses/Pipe.rst
+VariableClasses/Ground.rst
+VariableClasses/Fluid.rst
+VariableClasses/Load.rst
+VariableClasses/Pipe.rst
 ```
