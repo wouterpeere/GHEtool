@@ -1,6 +1,3 @@
-"""
-This file contains the base class for the pipe classes.
-"""
 import abc
 import pygfunction as gt
 from abc import ABC

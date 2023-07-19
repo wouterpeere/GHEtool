@@ -1,7 +1,3 @@
-"""
-This file contains the code for the hourly geothermal load data.
-"""
-
 import numpy as np
 import pandas as pd
 

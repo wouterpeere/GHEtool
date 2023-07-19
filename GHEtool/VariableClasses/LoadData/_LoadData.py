@@ -1,6 +1,3 @@
-"""
-This file contains the base class for the load classes.
-"""
 import abc
 from abc import ABC
 from typing import Union

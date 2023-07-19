@@ -1,7 +1,3 @@
-"""
-This file contains the base class for the coaxial borehole class.
-"""
-
 import numpy as np
 import pygfunction as gt
 import matplotlib.pyplot as plt

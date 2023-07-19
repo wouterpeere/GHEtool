@@ -1,7 +1,3 @@
-"""
-This document contains the class for the single U-Tube borehole.
-"""
-
 from GHEtool.VariableClasses.PipeData.MultipleUTube import MultipleUTube
 
 
