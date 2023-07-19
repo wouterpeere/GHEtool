@@ -838,11 +838,17 @@ class GUI(GuiStructure):
         self.option_pipe_coaxial_outer_outer.change_event(self.check_correct_pipe_data)
         self.option_U_pipe_or_coaxial_pipe.change_event(self.check_correct_pipe_data)
 
+        self.option_U_pipe_or_coaxial_pipe.change_event(self.update_borehole)
         self.option_pipe_number.change_event(self.update_borehole)
         self.option_pipe_outer_radius.change_event(self.update_borehole)
         self.option_pipe_inner_radius.change_event(self.update_borehole)
         self.option_pipe_borehole_radius.change_event(self.update_borehole)
         self.option_pipe_distance.change_event(self.update_borehole)
+        self.option_pipe_coaxial_inner_inner.change_event(self.update_borehole)
+        self.option_pipe_coaxial_inner_outer.change_event(self.update_borehole)
+        self.option_pipe_coaxial_outer_inner.change_event(self.update_borehole)
+        self.option_pipe_coaxial_outer_outer.change_event(self.update_borehole)
+        self.option_is_inner_inlet.change_event(self.update_borehole)
 
         self.page_borehole_resistance.add_function_called_if_button_clicked(self.update_borehole)
         self.page_borehole_resistance.add_function_called_if_button_clicked(self.update_borehole_thermal_resistance)
@@ -1546,7 +1552,7 @@ class GUI(GuiStructure):
 
     def update_borehole(self) -> None:
         """
-        This function plots the position of the pipe in the borehole.
+        This function plots the position of the U-pipe or coaxial pipe in the borehole.
         This figure can be either left or right of the options in the category
 
         Returns
@@ -1556,13 +1562,8 @@ class GUI(GuiStructure):
         frame = self.category_pipe_data.graphic_left if self.category_pipe_data.graphic_left is not None else \
             self.category_pipe_data.graphic_right
         if isinstance(frame, QtW.QGraphicsView):
-            # import all that is needed
-            # get variables from gui
-            number_of_pipes = self.option_pipe_number.get_value()
-            r_out = self.option_pipe_outer_radius.get_value() * 10
-            r_in = self.option_pipe_inner_radius.get_value() * 10
+            # draw general frame
             r_bore = max(self.option_pipe_borehole_radius.get_value() * 10, 0.001)
-            dis = self.option_pipe_distance.get_value() * 10
             # calculate scale from graphic view size
             max_l = min(frame.width(), frame.height())
             scale = max_l / r_bore / 1.25  # leave 25 % space
@@ -1589,29 +1590,65 @@ class GUI(GuiStructure):
             circle.setPen(QtG.QPen(grey, 0))
             circle.setBrush(grey)
             scene.addItem(circle)
-            # calculate pipe position and draw circle (white for outer pipe and blue for inner pipe)
-            dt: float = pi / float(number_of_pipes)
-            for i in range(number_of_pipes):
-                pos_1 = dis * cos(2.0 * i * dt + pi) / 2
-                pos_2 = dis * sin(2.0 * i * dt + pi) / 2
-                circle = QtW.QGraphicsEllipseItem((pos_1 - r_out / 2) * scale, (pos_2 - r_out / 2) * scale, r_out * scale, r_out * scale)
+
+            def Upipe():
+                # calculate pipe position and draw circle (white for outer pipe and blue for inner pipe)
+                # get variables from gui
+                number_of_pipes = self.option_pipe_number.get_value()
+                r_out = self.option_pipe_outer_radius.get_value() * 10
+                r_in = self.option_pipe_inner_radius.get_value() * 10
+                dis = self.option_pipe_distance.get_value() * 10
+                dt: float = pi / float(number_of_pipes)
+                for i in range(number_of_pipes):
+                    pos_1 = dis * cos(2.0 * i * dt + pi) / 2
+                    pos_2 = dis * sin(2.0 * i * dt + pi) / 2
+                    circle = QtW.QGraphicsEllipseItem((pos_1 - r_out / 2) * scale, (pos_2 - r_out / 2) * scale, r_out * scale, r_out * scale)
+                    circle.setPen(white_color)
+                    circle.setBrush(white_color)
+                    scene.addItem(circle)
+                    circle = QtW.QGraphicsEllipseItem((pos_1 - r_in / 2) * scale, (pos_2 - r_in / 2) * scale, r_in * scale, r_in * scale)
+                    circle.setPen(blue_color)
+                    circle.setBrush(blue_color)
+                    scene.addItem(circle)
+                    pos_1 = dis * cos(2.0 * i * dt + pi + dt) / 2
+                    pos_2 = dis * sin(2.0 * i * dt + pi + dt) / 2
+                    circle = QtW.QGraphicsEllipseItem((pos_1 - r_out / 2) * scale, (pos_2 - r_out / 2) * scale, r_out * scale, r_out * scale)
+                    circle.setPen(white_color)
+                    circle.setBrush(white_color)
+                    scene.addItem(circle)
+                    circle = QtW.QGraphicsEllipseItem((pos_1 - r_in / 2) * scale, (pos_2 - r_in / 2) * scale, r_in * scale, r_in * scale)
+                    circle.setPen(blue_light)
+                    circle.setBrush(blue_light)
+                    scene.addItem(circle)
+
+            def coaxial():
+                # get values from GUI
+                r_in_in = self.option_pipe_coaxial_inner_inner.get_value() * 10
+                r_in_out = self.option_pipe_coaxial_inner_outer.get_value() * 10
+                r_out_in = self.option_pipe_coaxial_outer_inner.get_value() * 10
+                r_out_out = self.option_pipe_coaxial_outer_outer.get_value() * 10
+                inlet_is_inner = self.option_is_inner_inlet.get_value() == 0
+                circle = QtW.QGraphicsEllipseItem(-r_out_out * scale / 2, -r_out_out * scale / 2, r_out_out * scale, r_out_out * scale)
                 circle.setPen(white_color)
                 circle.setBrush(white_color)
                 scene.addItem(circle)
-                circle = QtW.QGraphicsEllipseItem((pos_1 - r_in / 2) * scale, (pos_2 - r_in / 2) * scale, r_in * scale, r_in * scale)
-                circle.setPen(blue_color)
-                circle.setBrush(blue_color)
+                circle = QtW.QGraphicsEllipseItem(-r_out_in * scale / 2, -r_out_in * scale / 2, r_out_in * scale, r_out_in * scale)
+                circle.setPen(blue_color if inlet_is_inner else blue_light)
+                circle.setBrush(blue_color if inlet_is_inner else blue_light)
                 scene.addItem(circle)
-                pos_1 = dis * cos(2.0 * i * dt + pi + dt) / 2
-                pos_2 = dis * sin(2.0 * i * dt + pi + dt) / 2
-                circle = QtW.QGraphicsEllipseItem((pos_1 - r_out / 2) * scale, (pos_2 - r_out / 2) * scale, r_out * scale, r_out * scale)
+                circle = QtW.QGraphicsEllipseItem(-r_in_out * scale / 2, -r_in_out * scale / 2, r_in_out * scale, r_in_out * scale)
                 circle.setPen(white_color)
                 circle.setBrush(white_color)
                 scene.addItem(circle)
-                circle = QtW.QGraphicsEllipseItem((pos_1 - r_in / 2) * scale, (pos_2 - r_in / 2) * scale, r_in * scale, r_in * scale)
-                circle.setPen(blue_light)
-                circle.setBrush(blue_light)
+                circle = QtW.QGraphicsEllipseItem(-r_in_in * scale / 2, -r_in_in * scale / 2, r_in_in * scale, r_in_in * scale)
+                circle.setPen(blue_color if not inlet_is_inner else blue_light)
+                circle.setBrush(blue_color if not inlet_is_inner else blue_light)
                 scene.addItem(circle)
+
+            if self.option_U_pipe_or_coaxial_pipe.get_value() == 0:
+                Upipe()
+                return
+            coaxial()
 
     def update_borefield(self) -> None:
         """
