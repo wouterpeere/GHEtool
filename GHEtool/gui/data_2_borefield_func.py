@@ -1,5 +1,5 @@
 """
-function to create a borefield class from a datastorage
+Functions to create a borefield class from a datastorage
 """
 from __future__ import annotations
 
@@ -19,6 +19,20 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 def data_2_borefield(ds: DataStorage) -> tuple[Borefield, partial[[], None]]:
+    """
+    This function converts the data from the GUI, stored in a data storage to a borefield object with a function
+    that can be handled by the ScenarioGUI processing unit.
+
+    Parameters
+    ----------
+    ds : DataStorage
+        Data storage object that contains all the values inputted in a certain scenario within the GUI.
+
+    Returns
+    -------
+    tuple
+        Borefield object (filled with the data from the gui), partial function for a specific functionality of aim of the GUI.
+    """
     # import bore field class from GHEtool and not in start up to save time
     from GHEtool import Borefield
 
@@ -121,8 +135,14 @@ def data_2_borefield(ds: DataStorage) -> tuple[Borefield, partial[[], None]]:
 
 def _set_boreholes(ds: DataStorage, borefield: Borefield) -> None:
     """
-    This function creates the dataclasses (PipeData, FluidData and GroundData) based on entered values.
-    These can be used in the calculation thread.
+    This function creates the borefield based on the data in the DataStorage and sets attributes it to the borefield object.
+
+    Parameters
+    ----------
+    ds : DataStorage
+        Data storage object that contains all the values inputted in a certain scenario within the GUI.
+    borefield : Borefield
+        Borfield object to which a borefield should be set.
 
     Returns
     -------
@@ -160,10 +180,34 @@ def _set_boreholes(ds: DataStorage, borefield: Borefield) -> None:
 
 
 def _create_fluid_data(ds: DataStorage) -> FluidData:
+    """
+    This function creates a FluidData object based on the data entered in the GUI.
+
+    Parameters
+    ----------
+    ds : DataStorage
+        Data storage object that contains all the values inputted in a certain scenario within the GUI.
+
+    Returns
+    -------
+    FluidData
+    """
     return FluidData(ds.option_fluid_mass_flow, ds.option_fluid_conductivity, ds.option_fluid_density, ds.option_fluid_capacity, ds.option_fluid_viscosity)
 
 
 def _create_pipe_data(ds: DataStorage) -> MultipleUTube | CoaxialPipe:
+    """
+    This function creates a PipeData (either a MultipleUTube or a CoaxialPipe) object based on the data entered in the GUI.
+
+    Parameters
+    ----------
+    ds : DataStorage
+        Data storage object that contains all the values inputted in a certain scenario within the GUI.
+
+    Returns
+    -------
+    MultipleUTube or CoaxialPipe
+    """
     if ds.option_U_pipe_or_coaxial_pipe == 0:
         return MultipleUTube(ds.option_pipe_grout_conductivity, ds.option_pipe_inner_radius, ds.option_pipe_outer_radius, ds.option_pipe_conductivity,
                              ds.option_pipe_distance, ds.option_pipe_number, ds.option_pipe_roughness)
@@ -194,6 +238,18 @@ def _calculate_flux(ds: DataStorage) -> float:
 
 
 def _create_ground_data(ds: DataStorage) -> GroundData:
+    """
+    This function creates a GroundData object based on the data entered in the GUI.
+
+    Parameters
+    ----------
+    ds : DataStorage
+        Data storage object that contains all the values inputted in a certain scenario within the GUI.
+
+    Returns
+    -------
+    GroundData
+    """
     if ds.option_method_temp_gradient == 0:
         return GroundConstantTemperature(ds.option_conductivity, ds.option_ground_temp, ds.option_heat_capacity * 1000)
     if ds.option_method_temp_gradient == 1:
@@ -202,6 +258,19 @@ def _create_ground_data(ds: DataStorage) -> GroundData:
 
 
 def _create_monthly_loads_peaks(ds: DataStorage) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+    """
+    This function creates a the monthly loads based on the data entered in the GUI.
+
+    Parameters
+    ----------
+    ds : DataStorage
+        Data storage object that contains all the values inputted in a certain scenario within the GUI.
+
+    Returns
+    -------
+    peak heating [kW/month], peak cooling [kW/month], baseload heating [kWh/month], baseload cooling [kWh/month] : np.ndarray, np.ndarray, np.ndarray, np.ndarray
+        Monthly peak heating/cooling loads as well as monthly baseloads for heating and cooling for 1 year
+    """
     peak_heating: NDArray[np.float64] = np.array([ds.option_hp_jan, ds.option_hp_feb, ds.option_hp_mar, ds.option_hp_apr, ds.option_hp_may, ds.option_hp_jun,
                                                     ds.option_hp_jul, ds.option_hp_aug, ds.option_hp_sep, ds.option_hp_oct, ds.option_hp_nov, ds.option_hp_dec])
     peak_cooling: NDArray[np.float64] = np.array([ds.option_cp_jan, ds.option_cp_feb, ds.option_cp_mar, ds.option_cp_apr, ds.option_cp_may, ds.option_cp_jun,

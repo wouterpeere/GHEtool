@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Removed 'set_hourly_cooling_load', 'set_hourly_heating_load' from main_class and move it to separate load class (issue #45).
 - Moved draw_borehole_internals to PipeClass (issue #45).
 - Borehole equivalent resistances is now calculated in one step, centralised in the pipe class (issue #45).
+- Go to 100% code coverage with 300 tests.
 
 ## Fixed
 - Fixed problem with L2 sizing, when the peak load was the same in all months (issue #146).
