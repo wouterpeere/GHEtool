@@ -3,6 +3,7 @@ import abc
 import numpy as np
 
 from GHEtool.VariableClasses.BaseClass import BaseClass
+from typing import Union
 
 
 class _TemperatureLimits(BaseClass, abc.ABC):
@@ -40,7 +41,7 @@ class _TemperatureLimits(BaseClass, abc.ABC):
         """
 
     @abc.abstractmethod
-    def set_max_temperature(self, max_temperature: int | list | np.ndarray) -> None:
+    def set_max_temperature(self, max_temperature: Union[int, list, np.ndarray]) -> None:
         """
         Sets the maximum temperature limit of the borefield.
 
@@ -55,7 +56,7 @@ class _TemperatureLimits(BaseClass, abc.ABC):
         """
 
     @abc.abstractmethod
-    def set_min_temperature(self, min_temperature: int | list | np.ndarray) -> None:
+    def set_min_temperature(self, min_temperature: Union[int, list, np.ndarray]) -> None:
         """
         Sets the minimum temperature limit of the borefield.
 
