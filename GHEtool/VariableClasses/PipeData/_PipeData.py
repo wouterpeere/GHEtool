@@ -1,6 +1,3 @@
-"""
-This file contains the base class for the pipe classes.
-"""
 import abc
 import pygfunction as gt
 from abc import ABC
@@ -76,7 +73,7 @@ class _PipeData(BaseClass, ABC):
         Parameters
         ----------
         fluid_data: FluidData
-            fluid data
+            Fluid data
 
         Returns
         -------

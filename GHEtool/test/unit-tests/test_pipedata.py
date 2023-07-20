@@ -11,14 +11,14 @@ import pygfunction as gt
 
 ### Test U-pipes
 def test_empty_class():
-    assert not SingleUPipe().check_values()
-    assert not DoubleUPipe().check_values()
+    assert not SingleUTube().check_values()
+    assert not DoubleUTube().check_values()
     assert not MultipleUTube().check_values()
 
 
 def test_axissym():
-    single = SingleUPipe(1, 0.016, 0.02, 2, 0.02)
-    double = DoubleUPipe(1, 0.016, 0.02, 2, 0.02)
+    single = SingleUTube(1, 0.016, 0.02, 2, 0.02)
+    double = DoubleUTube(1, 0.016, 0.02, 2, 0.02)
     np.testing.assert_array_almost_equal(single._axis_symmetrical_pipe, [(-0.02, 2.4492935982947064e-18), (0.02, -4.898587196589413e-18)])
     np.testing.assert_array_almost_equal(double._axis_symmetrical_pipe, [(-0.02, 2.4492935982947064e-18), (0.02, -4.898587196589413e-18), (-3.673940397442059e-18, -0.02), (6.123233995736766e-18, 0.02)])
     np.testing.assert_array_almost_equal(single._axis_symmetrical_pipe, MultipleUTube(1, 0.16, 0.02, 2, 0.02, 1)._axis_symmetrical_pipe)
@@ -27,8 +27,8 @@ def test_axissym():
 
 def test_calculate_thermal_resistance():
     fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-    single = SingleUPipe(1, 0.016, 0.02, 2, 0.02)
-    double = DoubleUPipe(1, 0.016, 0.02, 2, 0.02)
+    single = SingleUTube(1, 0.016, 0.02, 2, 0.02)
+    double = DoubleUTube(1, 0.016, 0.02, 2, 0.02)
     Us = MultipleUTube(1, 0.016, 0.02, 2, 0.02, 1)
     Ud = MultipleUTube(1, 0.016, 0.02, 2, 0.02, 2)
 
@@ -46,8 +46,8 @@ def test_calculate_thermal_resistance():
 
 def test_equivalent_borehole_resistance_U_tubes():
     fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-    single = SingleUPipe(1, 0.016, 0.02, 2, 0.04)
-    double = DoubleUPipe(1, 0.016, 0.02, 2, 0.04)
+    single = SingleUTube(1, 0.016, 0.02, 2, 0.04)
+    double = DoubleUTube(1, 0.016, 0.02, 2, 0.04)
     single.calculate_resistances(fluid_data)
     double.calculate_resistances(fluid_data)
     borehole = gt.boreholes.Borehole(100, 1, 0.07, 0, 0)
@@ -141,9 +141,23 @@ def test_calculate_borehole_equivalent_resistance_coaxial():
     fluid = gt.media.Fluid('MPG', 20.)
     fluid = FluidData(0.5, fluid.k, fluid.rho, fluid.cp, fluid.mu)
     pipe.calculate_resistances(fluid)
-    pipe.calculate_resistances(fluid)
     model = pipe.pipe_model(fluid, 2, borehole)
     assert np.isclose(model.effective_borehole_thermal_resistance(0.5, 4180), 0.17312532151975354)
+
+    # pygfunction itself
+    is_inner_inlet = True
+    for i in range(1, 12, 2):
+        pipe_ghe = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=False)
+        fluid = gt.media.Fluid('MPG', 20.)
+        fluid = FluidData(0.5, fluid.k, fluid.rho, fluid.cp, fluid.mu)
+        pipe_ghe.calculate_resistances(fluid)
+        pipe = gt.pipes.Coaxial(pos=(0., 0.),
+                         r_in=np.array([r_out_in, r_in_in]) if is_inner_inlet else
+                         np.array([r_in_in, r_out_in]),
+                         r_out=np.array([r_out_out, r_in_out]) if is_inner_inlet else
+                         np.array([r_in_out, r_out_out]),
+                         borehole=borehole, k_s=i, k_g=k_g, R_ff=pipe_ghe.R_ff, R_fp=pipe_ghe.R_fp, J=2)
+        print(pipe._Rd)
 
 
 def test_pipe_data_equal_coaxial():

@@ -1,7 +1,3 @@
-"""
-This file contains the base class for the Multiple U-Tube borehole classes.
-"""
-
 import numpy as np
 import pygfunction as gt
 import matplotlib.pyplot as plt

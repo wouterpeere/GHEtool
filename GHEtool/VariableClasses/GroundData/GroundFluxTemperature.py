@@ -1,7 +1,3 @@
-"""
-This file contains the class of ground data with a flux temperature.
-"""
-
 from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
 
 

@@ -1,7 +1,3 @@
-"""
-This file contains the code for the hourly geothermal load data for a multi-year input.
-"""
-
 import numpy as np
 
 from typing import Union

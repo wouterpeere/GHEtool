@@ -1,6 +1,3 @@
-"""
-This file contains the code for the monthly geothermal load data where the load is given in kWh and kW per month.
-"""
 import numpy as np
 
 from typing import Union
