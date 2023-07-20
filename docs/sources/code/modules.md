@@ -1,7 +1,7 @@
 # Modules
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 3
 
 Modules/GHEtool_modules.rst
 Modules/BaseClass.rst
