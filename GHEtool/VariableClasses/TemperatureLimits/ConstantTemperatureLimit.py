@@ -47,6 +47,7 @@ class ConstantTemperatureLimit(_TemperatureLimits):
         if not self.check_input(max_temperature):
             raise ValueError('Max temperature is not a number!')
         self._max_temperature = max_temperature
+        self.check_max_not_below_min()
 
     def set_min_temperature(self, min_temperature: float) -> None:
         """
@@ -70,6 +71,7 @@ class ConstantTemperatureLimit(_TemperatureLimits):
         if not self.check_input(min_temperature):
             raise ValueError('Min temperature is not a number!')
         self._min_temperature = min_temperature
+        self.check_max_not_below_min()
 
     def get_min_temperature_monthly(self, simulation_period: int) -> np.ndarray:
         """

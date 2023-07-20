@@ -19,8 +19,8 @@ class _TemperatureLimits(BaseClass, abc.ABC):
             True if the limit class uses constant limits
         """
         self.constant_limits = constant_limits
-        self._max_temperature = None
-        self._min_temperature = None
+        self._max_temperature = 16
+        self._min_temperature = 0
         # TODO check that L2 does not work with non-constant temperature limits
 
     @abc.abstractmethod
@@ -133,4 +133,22 @@ class _TemperatureLimits(BaseClass, abc.ABC):
         Hourly maximum temperature limit : np.ndarray
         """
 
-# TODO monthly can go to hourly, not vice versa!
+    def check_max_not_below_min(self) -> None:
+        """
+        Tests if the maximum temperature limit is always higher than the min_limit.
+        If not, an error is raised.
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            If the max temperature limit is not always strictly above the min temperature limit
+        """
+        max_lim = np.array(self._max_temperature)
+        min_lim = np.array(self._min_temperature)
+        if np.all(max_lim > min_lim):
+            return
+        raise ValueError('The maximum temperature limit is not strictly above the minimum temperature limit!')
