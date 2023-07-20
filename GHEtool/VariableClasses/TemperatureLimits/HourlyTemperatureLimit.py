@@ -6,19 +6,19 @@ from typing import Union
 
 class HourlyTemperatureLimit(_TemperatureLimits):
 
-    def __init__(self, max_temp: Union[list, np.ndarray], min_temp: Union[list, np.ndarray]):
+    def __init__(self, min_temp: Union[list, np.ndarray], max_temp: Union[list, np.ndarray]):
         """
 
         Parameters
         ----------
-        max_temp : list | np.ndarray
-            Array with monthly maximum temperature limit values
         min_temp : list | np.ndarray
             Array with monthly minimum temperature limit values
+        max_temp : list | np.ndarray
+            Array with monthly maximum temperature limit values
         """
         super().__init__(constant_limits=False)
-        self.set_max_temperature(max_temp)
         self.set_min_temperature(min_temp)
+        self.set_max_temperature(max_temp)
 
     def check_input(self, temperature_limit: Union[list, np.ndarray]) -> bool:
         """
