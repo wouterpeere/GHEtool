@@ -1,5 +1,5 @@
 # GHEtool's Changelog and future developments
-All notable changes to this project will be documented in this file including planned future developments.
+All notable changes to this project will be documented in this file. For future developments, please visit our [project board](https://github.com/users/wouterpeere/projects/2) on GitHub.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
@@ -13,7 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Pipe classes (single, double, coaxial, Multiple U Tube) (issue #40 and #45).
 
 ## Changed
-- GUI was moved to a seperate project: ScenarioGUI.
+- GUI was moved to a separate project: [ScenarioGUI](https://github.com/tblanke/ScenarioGUI).
 - H_init was removed from the sizing functions since it was not used.
 - Rb is now solely handled by the borehole object.
 - load_hourly_profile is moved to the separate load classes (issue #45).
@@ -25,7 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fixed problem with L2 sizing, when the peak load was the same in all months (issue #146).
 - Small bug in faster g-function calculation solved. When changing the borefield, the previously calculated g-functions where not removed.
 - When using interpolation for the g-functions, the results could vary a little bit based on the previous sizings. By reinstating the H_init parameter, this is solved.
-- Borehole internals do no longer overlap.
+- Borehole internals can no longer overlap in the GUI.
 
 
 ## [2.1.2] - 2023-04-28
