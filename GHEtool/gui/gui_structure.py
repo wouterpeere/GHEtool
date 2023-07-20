@@ -1501,6 +1501,7 @@ class GUI(GuiStructure):
             alpha: float = pi / n_u  # determine equal angle between pipes
             # determine minimal distance between pipe and center
             distance_min: float = r_outer_pipe / sin(alpha / 2) + 0.001  # add 1mm for safety
+
             # set minimal and maximal value for pipe distance
             self.option_pipe_distance.widget.blockSignals(True)
             self.option_pipe_distance.widget.setMinimum(max(distance_min, self.option_pipe_distance.minimal_value))
@@ -1522,7 +1523,7 @@ class GUI(GuiStructure):
             self.option_pipe_outer_radius.widget.blockSignals(False)
 
             # set max number of U-tubes
-            alpha_min = 4 * asin(r_outer_pipe/pipe_distance)
+            alpha_min = 4 * asin(r_outer_pipe / pipe_distance)
             max_nb_of_pipes = np.floor(2 * pi / alpha_min)
             # set max number of pipes
             self.option_pipe_number.widget.blockSignals(True)

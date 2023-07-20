@@ -329,7 +329,7 @@ def test_temp_profile_pipe_data(qtbot):
     conduct_pipe = round_down(gs.option_pipe_conductivity.get_value() * 1.5, 3)
     inner_pipe = round_down(gs.option_pipe_inner_radius.get_value() * 1.5, 4)
     dis = round_down(0.5 - (inner_pipe + 0.02 * 1.5) - 0.02, 4)
-    outer_pipe = round_down(inner_pipe + 0.02 * 1.5, 4)
+    outer_pipe = round_down(inner_pipe + 0.02 * 1.5 - 0.02, 4)
     roughness = round_down(gs.option_pipe_roughness.get_value() * 1.5, 7)
 
     pipe_data = MultipleUTube(conduct_grout, inner_pipe, outer_pipe, conduct_pipe, dis, main_window.gui_structure.option_pipe_number.get_value() + 2, roughness)
@@ -341,6 +341,7 @@ def test_temp_profile_pipe_data(qtbot):
     borefield = create_borefield(gs)
 
     gs.option_pipe_grout_conductivity.set_value(conduct_grout)
+    gs.option_pipe_distance.set_value(dis)
     gs.option_pipe_number.set_value(main_window.gui_structure.option_pipe_number.get_value() + 2)
     gs.option_pipe_outer_radius.set_value(outer_pipe)
     gs.option_pipe_inner_radius.set_value(inner_pipe)
@@ -353,7 +354,6 @@ def test_temp_profile_pipe_data(qtbot):
 
     borefield.set_pipe_parameters(pipe_data)
     borefield.set_fluid_parameters(fluid_data)
-
 
     main_window.save_scenario()
     ds = main_window.list_ds[-1]
