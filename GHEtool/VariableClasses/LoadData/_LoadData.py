@@ -1,5 +1,4 @@
 import abc
-from abc import ABC
 from typing import Union
 
 import numpy as np
@@ -7,7 +6,7 @@ import numpy as np
 from GHEtool.VariableClasses.BaseClass import BaseClass
 
 
-class _LoadData(BaseClass, ABC):
+class _LoadData(BaseClass, abc.ABC):
     """
     This class contains information w.r.t. load data for the borefield sizing.
     """

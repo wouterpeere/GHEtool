@@ -1,11 +1,10 @@
 import abc
 import pygfunction as gt
-from abc import ABC
 from GHEtool.VariableClasses.BaseClass import BaseClass
 from GHEtool.VariableClasses.FluidData import FluidData
 
 
-class _PipeData(BaseClass, ABC):
+class _PipeData(BaseClass, abc.ABC):
     """
     Contains information regarding the pipe data of the borefield.
     """
