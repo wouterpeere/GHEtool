@@ -6,7 +6,7 @@ import numpy as np
 class ConstantTemperatureLimit(_TemperatureLimits):
 
     def __init__(self, min_temp: float = 0, max_temp: float = 16):
-        super().__init__(constant_limits=True)
+        super().__init__()
         self.set_max_temperature(max_temp)
         self.set_min_temperature(min_temp)
 

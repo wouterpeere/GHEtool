@@ -16,7 +16,7 @@ class MonthlyTemperatureLimit(_TemperatureLimits):
         max_temp : list | np.ndarray
             Array with monthly maximum temperature limit values
         """
-        super().__init__(constant_limits=False)
+        super().__init__()
         self.set_min_temperature(min_temp)
         self.set_max_temperature(max_temp)
 

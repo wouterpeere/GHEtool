@@ -2,7 +2,7 @@ from GHEtool.VariableClasses.TemperatureLimits._TemperatureLimits import _Temper
 
 import numpy as np
 from typing import Union
-
+from functools import partial
 
 class HourlyTemperatureLimit(_TemperatureLimits):
 
@@ -16,9 +16,10 @@ class HourlyTemperatureLimit(_TemperatureLimits):
         max_temp : list | np.ndarray
             Array with monthly maximum temperature limit values
         """
-        super().__init__(constant_limits=False)
+        super().__init__()
         self.set_min_temperature(min_temp)
         self.set_max_temperature(max_temp)
+        self.test = partial(lambda x: print(x))
 
     def check_input(self, temperature_limit: Union[list, np.ndarray]) -> bool:
         """

@@ -11,15 +11,7 @@ class _TemperatureLimits(BaseClass, abc.ABC):
     Contains information regarding the temperature limits of the borefield.
     """
 
-    def __init__(self, constant_limits: bool):
-        """
-
-        Parameters
-        ----------
-        constant_limits : bool
-            True if the limit class uses constant limits
-        """
-        self.constant_limits = constant_limits
+    def __init__(self):
         self._max_temperature = 16
         self._min_temperature = 0
         # TODO check that L2 does not work with non-constant temperature limits

@@ -5,7 +5,6 @@ from GHEtool.VariableClasses import ConstantTemperatureLimit, MonthlyTemperature
 # tests for constant temperature limit
 def test_constant_init():
     constant = ConstantTemperatureLimit(2, 5)
-    assert constant.constant_limits
     assert constant._max_temperature == 5
     assert constant._min_temperature == 2
 
@@ -61,7 +60,6 @@ def test_constant_hourly_limits():
 # test monthly limits
 def test_monthly_init():
     monthly = MonthlyTemperatureLimit(np.linspace(-12, -1, 12), np.linspace(0, 11, 12))
-    assert not monthly.constant_limits
     assert np.allclose(monthly._max_temperature, np.linspace(0, 11, 12))
     assert np.allclose(monthly._min_temperature, np.linspace(-12, -1, 12))
 
@@ -138,7 +136,6 @@ def test_monthly_hourly_limits():
 # test hourly limits
 def test_hourly_limits():
     hourly = HourlyTemperatureLimit(np.linspace(-12, -1, 8760), np.linspace(0, 11, 8760))
-    assert not hourly.constant_limits
     assert np.allclose(hourly._max_temperature, np.linspace(0, 11, 8760))
     assert np.allclose(hourly._min_temperature, np.linspace(-12, -1, 8760))
 
@@ -215,6 +212,7 @@ def test_hourly_monthly_limits():
 
 def test_hourly_hourly_limits():
     hourly = HourlyTemperatureLimit(np.linspace(-12, -1, 8760), np.linspace(0, 11, 8760))
+    # hourly.test(20)
     UPM = np.array([744, 672, 744, 720, 744, 720, 744, 744, 720, 744, 720, 744])
     assert np.allclose(hourly.get_max_temperature_hourly(2, UPM), np.tile(hourly._max_temperature, 2))
     assert np.allclose(hourly.get_min_temperature_hourly(2, UPM), np.tile(hourly._min_temperature, 2))
