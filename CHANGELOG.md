@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - New class of GroundData: GroundTemperatureGradient added (issue #145).
 - Load classes (issue #45).
 - Pipe classes (single, double, coaxial, Multiple U Tube) (issue #40 and #45).
+- Flexible temperature limits (issue #41 and #45).
 
 ## Changed
 - GUI was moved to a separate project: [ScenarioGUI](https://github.com/tblanke/ScenarioGUI).
