@@ -1352,30 +1352,30 @@ class Borefield(BaseClass):
             if quadrant == 1:
                 # maximum temperature
                 # convert back to required length
-                self.H = np.max((self.results_peak_cooling[:8760 if hourly else 12] - self._Tg()) / ((self.Tf_max_hourly[:8760] if hourly else self.Tf_max_monthly[:12]) - self._Tg())) * H_prev
+                self.H = np.max((self.results_peak_cooling[:8760 if hourly else 12] - self._Tg()) / abs((self.Tf_max_hourly[:8760] if hourly else self.Tf_max_monthly[:12]) - self._Tg())) * H_prev
             elif quadrant == 2:
                 # maximum temperature
                 # convert back to required length
-                self.H = np.max((self.results_peak_cooling[-8760 if hourly else -12:] - self._Tg()) / ((self.Tf_max_hourly[:8760] if hourly else self.Tf_max_monthly[:12]) - self._Tg())) * H_prev
+                self.H = np.max((self.results_peak_cooling[-8760 if hourly else -12:] - self._Tg()) / abs((self.Tf_max_hourly[:8760] if hourly else self.Tf_max_monthly[:12]) - self._Tg())) * H_prev
             elif quadrant == 3:
                 # minimum temperature
                 # convert back to required length
-                self.H = np.max((self.results_peak_heating[:8760 if hourly else 12] - self._Tg()) / ((self.Tf_min_hourly[:8760] if hourly else self.Tf_min_monthly[:12]) - self._Tg())) * H_prev
+                self.H = np.max((self.results_peak_heating[:8760 if hourly else 12] - self._Tg()) / abs((self.Tf_min_hourly[:8760] if hourly else self.Tf_min_monthly[:12]) - self._Tg())) * H_prev
             elif quadrant == 4:
                 # minimum temperature
                 # convert back to required length
-                self.H = np.max((self.results_peak_heating[-8760 if hourly else -12:] - self._Tg()) / ((self.Tf_min_hourly[:8760] if hourly else self.Tf_min_monthly[:12]) - self._Tg())) * H_prev
+                self.H = np.max((self.results_peak_heating[-8760 if hourly else -12:] - self._Tg()) / abs((self.Tf_min_hourly[:8760] if hourly else self.Tf_min_monthly[:12]) - self._Tg())) * H_prev
             elif quadrant == 10:
                 # over all years
                 # maximum temperature
                 # convert back to required length
-                self.H = np.max((self.results_peak_cooling - self._Tg()) / ((self.Tf_max_hourly if hourly else self.Tf_max_monthly) - self._Tg())) * H_prev
+                self.H = np.max((self.results_peak_cooling - self._Tg()) / abs((self.Tf_max_hourly if hourly else self.Tf_max_monthly) - self._Tg())) * H_prev
             elif quadrant == 20:
                 # over all years
                 # minimum temperature
                 # convert back to required length
-                self.H = np.max((self.results_peak_heating - self._Tg()) / ((self.Tf_min_hourly if hourly else self.Tf_min_monthly) - self._Tg())) * H_prev
-
+                self.H = np.max((self.results_peak_heating - self._Tg()) / abs((self.Tf_min_hourly if hourly else self.Tf_min_monthly) - self._Tg())) * H_prev
+            # self.H = min(self.H, 600)
             if self.H < 0:
                 return 0
 
