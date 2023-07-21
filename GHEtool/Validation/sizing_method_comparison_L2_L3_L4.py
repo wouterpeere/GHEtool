@@ -26,7 +26,9 @@ borefield.Rb = 0.12
 borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 1, 0.075)
 
 # load the hourly profile
-borefield.load_hourly_profile("..\Examples\hourly_profile.csv", header=True, separator=";", first_column_heating=True)
+load = HourlyGeothermalLoad()
+load.load_hourly_profile("..\Examples\hourly_profile.csv", header=True, separator=";")
+borefield.load = load
 
 ### size the borefield
 # according to L2

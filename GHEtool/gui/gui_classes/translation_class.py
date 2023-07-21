@@ -27,7 +27,7 @@ class Translations:  # pragma: no cover
         "label_Calculation",
         "category_borehole",
         "option_depth",
-        "option_spacing",
+        "option_spacing_width",
         "option_spacing_length",
         "option_conductivity",
         "option_ground_temp",
@@ -200,6 +200,7 @@ class Translations:  # pragma: no cover
         "numerical_results",
         "result_text_depth",
         "result_Rb_calculated",
+        "result_Reynolds",
         "results_ground_temperature",
         "results_heating_load",
         "results_heating_load_percentage",
@@ -220,6 +221,7 @@ class Translations:  # pragma: no cover
         "option_len_peak_cooling",
         "option_temperature_profile_hourly",
         "option_ground_temp_gradient",
+        "option_ground_heat_flux",
         "option_n_threads",
         "option_number_circle_boreholes",
         "option_borefield_radius",
@@ -228,6 +230,22 @@ class Translations:  # pragma: no cover
         "borefield_file",
         "import_borefield",
         "option_decimal_borefield",
+        "category_demand_building_or_geo",
+        "geo_load",
+        "SCOP",
+        "SEER",
+        "results_heating_peak_geo",
+        "results_cooling_peak_geo",
+        "option_ground_temp_gradient",
+        "hint_press_load",
+        "cannot_load_new_version",
+        "pipe_thermal_resistance",
+        "option_is_inner_inlet",
+        "option_U_pipe_or_coaxial_pipe",
+        "option_pipe_coaxial_inner_inner",
+        "option_pipe_coaxial_outer_inner",
+        "option_pipe_coaxial_inner_outer",
+        "option_pipe_coaxial_outer_outer",
         "languages",
     )
 
@@ -377,7 +395,7 @@ class Translations:  # pragma: no cover
             "Profundidad del pozo [m]: ",
             "Profundidade do pozo [m]: ",
         ]
-        self.option_spacing: List[str] = [
+        self.option_spacing_width: List[str] = [
             "Borehole spacing width [m]: ",
             "Bohrlochabstand Breitenrichtung [m]: ",
             "Boorgatspatiëring Breedte [m]: ",
@@ -1209,22 +1227,22 @@ class Translations:  # pragma: no cover
             "Scenario saving settings",
         ]
         self.option_toggle_buttons: List[str] = [
-            "Use toggle buttons?:, no , yes ",
+            "Use toggle buttons?:, No , Yes ",
             "Umschalterbutton?:, Nein , Ja ",
-            "Toggle-gedrag?:, nee , ja",
-            "Toggle buttons?:, no , yes ",
-            "Toggle buttons?:, no , yes ",
-            "Toggle buttons?:, no , yes ",
-            "Toggle buttons?:, no , yes",
+            "Toggle-gedrag?:, Nee , Ja",
+            "Toggle buttons?:, No , Yes ",
+            "Toggle buttons?:, No , Yes ",
+            "Toggle buttons?:, No , Yes ",
+            "Toggle buttons?:, No , Yes",
         ]
         self.option_auto_saving: List[str] = [
-            "Use automatic saving?, no , yes ",
+            "Use automatic saving?, No , Yes ",
             "Automatisches speichern nutzen?, Nein, Ja ",
-            "Automatisch opslaan, nee , ja ",
-            "Automatic saving, no , yes ",
-            "Automatic saving, no , yes ",
-            "Automatic saving, no , yes ",
-            "Automatic saving, no , yes",
+            "Automatisch opslaan, Nee , Ja ",
+            "Automatic saving, No , Yes ",
+            "Automatic saving, No , Yes ",
+            "Automatic saving, No , Yes ",
+            "Automatic saving, No , Yes",
         ]
         self.hint_saving: List[str] = [
             "If Auto saving is selected the scenario will automatically saved if a scenario is changed. Otherwise the scenario has to be saved with the Update scenario button in the upper left corner if the changes should not be lost.",
@@ -1375,7 +1393,7 @@ class Translations:  # pragma: no cover
         self.option_pipe_depth: List[str] = [
             "Burial depth [m]:",
             "Vergrabungstiefe [m]:",
-            "Begraven diepte [m]:",
+            "Deklaag [m]:",
             "Burial depth [m]:",
             "Burial depth [m]:",
             "Burial depth [m]:",
@@ -1509,40 +1527,40 @@ class Translations:  # pragma: no cover
             "Calculation options",
         ]
         self.option_method_size_depth: List[str] = [
-            "Method for size borehole depth:,  L2  ,  L3  ,  L4  ",
-            "Methode zur Bohrlochtiefendimensionierung:,  L2  ,  L3  ,  L4  ",
-            "Methode voor boorvelddimensionering:,  L2  ,  L3  ,  L4  ",
-            "Method for size borehole depth:,  L2  ,  L3  ,  L4  ",
-            "Method for size borehole depth:,  L2  ,  L3  ,  L4  ",
-            "Method for size borehole depth:,  L2  ,  L3  ,  L4  ",
-            "Method for size borehole depth:,  L2  ,  L3  ,  L4  ",
+            "Method for size borehole depth:,  Simplified  ,  Monthly  ,  Hourly  ",
+            "Methode zur Bohrlochtiefendimensionierung:,  Vereinfacht  ,  Monatlich  ,  Stündlich  ",
+            "Methode voor boorvelddimensionering:,  Vereenvoudigd  ,  Maandelijks  ,  Uurlijks  ",
+            "Method for size borehole depth:,  Simplified  ,  Monthly  ,  Hourly  ",
+            "Method for size borehole depth:,  Simplified  ,  Monthly  ,  Hourly  ",
+            "Method for size borehole depth:,  Simplified  ,  Monthly  ,  Hourly  ",
+            "Method for size borehole depth:,  Simplified  ,  Monthly  ,  Hourly",
         ]
         self.option_method_size_length: List[str] = [
-            "Method for size width and length:,  L2  ,  L3  ",
-            "Methode für Längen- und Breitendimensionierung:,  L2  ,  L3  ",
-            "Methode voor boorvelddimensionering:,  L2  ,  L3  ",
-            "Method for size width and length:,  L2  ,  L3  ",
-            "Method for size width and length:,  L2  ,  L3  ",
-            "Method for size width and length:,  L2  ,  L3  ",
-            "Method for size width and length:,  L2  ,  L3  ",
+            "Method for size width and length:,  Simplified  ,  Monthly  ",
+            "Methode für Längen- und Breitendimensionierung:,  Vereinfacht  ,  Monatlich  ",
+            "Methode voor boorvelddimensionering:,  Vereenvoudigd  ,  Maandelijks  ",
+            "Method for size width and length:,  Simplified  ,  Monthly  ",
+            "Method for size width and length:,  Simplified  ,  Monthly  ",
+            "Method for size width and length:,  Simplified  ,  Monthly  ",
+            "Method for size width and length:,  Simplified  ,  Monthly",
         ]
         self.option_method_temp_gradient: List[str] = [
-            "Should a temperature gradient over depth be considered?:, no , yes ",
-            "Soll ein Temperaturgradient berücksichtigt werden?:, Nein , Ja ",
-            "Moet een temperatuursgradiënt in rekening worden gebracht?:, nee , ja ",
-            "Should a temperature gradient over depth be considered?:, no , yes ",
-            "Should a temperature gradient over depth be considered?:, no , yes ",
-            "Should a temperature gradient over depth be considered?:, no , yes ",
-            "Should a temperature gradient over depth be considered?:, no , yes",
+            "Consider temperature variation in the ground?:, None , Heat flux , Temperature gradient ",
+            "Welche Art Temperaturgradient soll berücksichtigt werden?:, Keiner , Wärmestrom , Temperaturgradient ",
+            "Moet een variabele grondtemperatuur in rekening worden gebracht?:, Nee , Flux , Gradiënt, ",
+            "Consider temperature variation in the ground?:, None , Heat flux , Temperature gradient ",
+            "Consider temperature variation in the ground?:, None , Heat flux , Temperature gradient ",
+            "Consider temperature variation in the ground?:, None , Heat flux , Temperature gradient ",
+            "Consider temperature variation in the ground?:, None , Heat flux , Temperature gradient",
         ]
         self.option_method_rb_calc: List[str] = [
-            "Borehole resistance calculation method:, constant , dynamic ",
+            "Borehole resistance calculation method:, Constant , Dynamic ",
             "Methode zur Bohrlochwiderstangsberechnung:, Konstant , Dynamisch ",
-            "Berekeningsmethode boorgatweerstand:, constant , dynamisch ",
-            "Borehole resistance calculation method:, constant , dynamic ",
-            "Borehole resistance calculation method:, constant , dynamic ",
-            "Borehole resistance calculation method:, constant , dynamic ",
-            "Borehole resistance calculation method:, constant , dynamic",
+            "Berekeningsmethode boorgatweerstand:, Constant , Dynamisch ",
+            "Borehole resistance calculation method:, Constant , Dynamic ",
+            "Borehole resistance calculation method:, Constant , Dynamic ",
+            "Borehole resistance calculation method:, Constant , Dynamic ",
+            "Borehole resistance calculation method:, Constant , Dynamic",
         ]
         self.category_earth: List[str] = [
             "Earth properties",
@@ -1581,6 +1599,15 @@ class Translations:  # pragma: no cover
             "Equivalent borehole thermal resistance: , mK/W",
             "Equivalent borehole thermal resistance: , mK/W",
             "Equivalent borehole thermal resistance: , mK/W",
+        ]
+        self.result_Reynolds: List[str] = [
+            "Reynolds number: , ",
+            "Reynoldszahl  : , ",
+            "Reynoldsgetal: , ",
+            "Reynolds number: , ",
+            "Reynolds number: , ",
+            "Reynolds number: , ",
+            "Reynoldsnumber: ,",
         ]
         self.results_ground_temperature: List[str] = [
             "Average ground temperature: , °C",
@@ -1684,7 +1711,7 @@ class Translations:  # pragma: no cover
         self.figure_temperature_profile: List[str] = [
             "Temperature evolution, Temperature [°C], Time [years]",
             "Temperaturverlauf, Temperatur [°C], Zeit [Jahren]",
-            "Temperatuurevolutie, Temperatuur [°C], Time [years]",
+            "Temperatuurevolutie, Temperatuur [°C], Tijd [jaar]",
             "Temperature evolution, Temperature [°C], Time [years]",
             "Temperature evolution, Temperature [°C], Time [years]",
             "Temperature evolution, Temperature [°C], Time [years]",
@@ -1693,25 +1720,25 @@ class Translations:  # pragma: no cover
         self.legend_figure_temperature_profile: List[str] = [
             "Show legend?, No , Yes ",
             "Legende zeigen?, Nein , Ja ",
-            "Toon legende?, nee , ja ",
-            "Mostra la legenda?, no , yes ",
-            "Afficher la légende?, no , yes ",
-            "Mostrar leyenda?, no , yes ",
-            "Mostrar lenda?, no , yes",
+            "Toon legende?, Nee , Ja ",
+            "Mostra la legenda?, No , Yes ",
+            "Afficher la légende?, No , Yes ",
+            "Mostrar leyenda?, No , Yes ",
+            "Mostrar lenda?, No , Yes",
         ]
         self.hourly_figure_temperature_profile: List[str] = [
             "Hourly profile, No , Yes ",
             "Stündliches Profil, Nein , Ja ",
-            "Uurlijks profiel, nee , ja ",
-            "Hourly profile, no , yes ",
-            "Hourly profile, no , yes ",
-            "Hourly profile, no , yes ",
-            "Hourly profile, no , yes",
+            "Uurlijks profiel, Nee , Ja ",
+            "Hourly profile, No , Yes ",
+            "Hourly profile, No , Yes ",
+            "Hourly profile, No , Yes ",
+            "Hourly profile, No , Yes",
         ]
         self.figure_load_duration: List[str] = [
             "Load-duration curve, Power [kW], Time [hours]",
             "Jahresdauerlinie, Leistung [kW], Zeit [Stunden]",
-            "Belastings-duurcurve, Vermogen [kW], Tijd [hours]",
+            "Belastings-duurcurve, Vermogen [kW], Tijd [jaar]",
             "Load-duration curve, Power [kW], Time [hours]",
             "Load-duration curve, Power [kW], Time [hours]",
             "Load-duration curve, Power [kW], Time [hours]",
@@ -1720,11 +1747,11 @@ class Translations:  # pragma: no cover
         self.legend_figure_load_duration: List[str] = [
             "Show legend?, No , Yes ",
             "Legende zeigen?, Nein , Ja ",
-            "Toon legende?, nee , ja ",
-            "Mostra la legenda?, no , yes ",
-            "Afficher la légende?, no , yes ",
-            "Mostrar leyenda?, no , yes ",
-            "Mostrar lenda?, no , yes",
+            "Toon legende?, Nee , Ja ",
+            "Mostra la legenda?, No , Yes ",
+            "Afficher la légende?, No , Yes ",
+            "Mostrar leyenda?, No , Yes ",
+            "Mostrar lenda?, No , Yes",
         ]
         self.option_len_peak_heating: List[str] = [
             "Peak length heating [hours]: ",
@@ -1745,13 +1772,13 @@ class Translations:  # pragma: no cover
             "Peak length cooling [hours]:",
         ]
         self.option_temperature_profile_hourly: List[str] = [
-            "Should hourly data be used for the temperature profile?, no , yes ",
-            "Should hourly data be used for the temperature profile?, no , yes ",
-            "Moet uurlijkse data gebruikt worden voor het temperatuursprofiel?, nee , ja ",
-            "Should hourly data be used for the temperature profile?, no , yes ",
-            "Should hourly data be used for the temperature profile?, no , yes ",
-            "Should hourly data be used for the temperature profile?, no , yes ",
-            "Should hourly data be used for the temperature profile?, no , yes",
+            "Should hourly data be used for the temperature profile?, No , Yes ",
+            "Should hourly data be used for the temperature profile?, No , Yes ",
+            "Moet uurlijkse data gebruikt worden voor het temperatuursprofiel?, Nee , Ja ",
+            "Should hourly data be used for the temperature profile?, No , Yes ",
+            "Should hourly data be used for the temperature profile?, No , Yes ",
+            "Should hourly data be used for the temperature profile?, No , Yes ",
+            "Should hourly data be used for the temperature profile?, No , Yes",
         ]
         self.option_ground_temp_gradient: List[str] = [
             "Ground temperature at infinity [°C]: ",
@@ -1760,7 +1787,16 @@ class Translations:  # pragma: no cover
             "Temperatura del terreno all'infinito [°C]: ",
             "Température du sol à l'infini [°C]: ",
             "Temperatura del suelo en el infinito [°C]: ",
-            "Temperatura do chan no infinito [°C]: ",
+            "Temperatura do chan no infinito [°C]:",
+        ]
+        self.option_ground_heat_flux: List[str] = [
+            "Geothermal heat flux [W/m2]:",
+            "Geothermischer Wärmestrom [W/m²]:",
+            "Geothermische warmteflux [W/m2]:",
+            "Geothermal heat flux [W/m2]:",
+            "Geothermal heat flux [W/m2]:",
+            "Geothermal heat flux [W/m2]:",
+            "Geothermal heat flux [W/m2]:",
         ]
         self.option_n_threads: List[str] = [
             "Number of parallel threads [-]: ",
@@ -1825,4 +1861,132 @@ class Translations:  # pragma: no cover
             "Decimal sign in file:,Point '.',Comma '++'",
             "Decimal sign in file:,Point '.',Comma '++'",
             "Decimal sign in file:,Point '.',Comma '++'",
+        ]
+        self.category_demand_building_or_geo: List[str] = [
+            "Load type ",
+            "Art der Belastung ",
+            "Type belasting ",
+            "Load type ",
+            "Load type ",
+            "Load type",
+            "Load type",
+        ]
+        self.geo_load: List[str] = [
+            "Load type, Geothermal , Building ",
+            "Art der Belastung, Grundseite , Gebäudeseite ",
+            "Type belasting, grondzijdig , gebouwzijdig ",
+            "Load type, Geothermal , Building ",
+            "Load type, Geothermal , Building ",
+            "Load type, Geothermal , Building ",
+            "Load type, Geothermal , Building ",
+        ]
+        self.SCOP: List[str] = ["SCOP [-]: ", "SCOP [-]: ", "SCOP [-]: ", "SCOP [-]: ", "SCOP [-]: ", "SCOP [-]: ", "SCOP [-]:"]
+        self.SEER: List[str] = ["SEER [-]: ", "SEER [-]: ", "SEER [-]: ", "SEER [-]: ", "SEER [-]: ", "SEER [-]: ", "SEER [-]:"]
+        self.results_heating_peak_geo: List[str] = [
+            "with a peak of: , kW",
+            "mit einer Spitzenlast von , kW",
+            "met een piek van: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+        ]
+        self.results_cooling_peak_geo: List[str] = [
+            "with a peak of: , kW",
+            "mit einer Spitzenlast von , kW",
+            "met een piek van: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+            "with a peak of: , kW",
+        ]
+        self.option_ground_temp_gradient: List[str] = [
+            "Surface temperature [°C]: ",
+            "Umgebungstemperatur[°C]: ",
+            "Omgevingstemperatuur [°C]: ",
+            "Surface temperature [°C]: ",
+            "Surface temperature [°C]: ",
+            "Surface temperature [°C]: ",
+            "Surface temperature [°C]:",
+        ]
+        self.hint_press_load: List[str] = [
+            "Press 'load' to load the hourly data.",
+            "Drücken Sie 'Laden', um die stündlichen Daten zu laden.",
+            "Druk op 'laden' om de data in te lezen.",
+            "Press 'load' to load the hourly data.",
+            "Press 'load' to load the hourly data.",
+            "Press 'load' to load the hourly data.",
+            "Press 'load' to load the hourly data.",
+        ]
+        self.cannot_load_new_version: List[str] = [
+            " You cannot load a file that is from a newer GHEtool version.",
+            "Sie können keine Datei laden, die von einer neueren GHEtool-Version stammt.",
+            "Je kunt geen bestand laden dat van een nieuwere GHEtool-versie is.",
+            "You cannot load a file that is from a newer GHEtool version.",
+            "You cannot load a file that is from a newer GHEtool version.",
+            "You cannot load a file that is from a newer GHEtool version.",
+            "You cannot load a file that is from a newer GHEtool version.",
+        ]
+        self.pipe_thermal_resistance: List[str] = [
+            "The equivalent borehole thermal resistance (at , mK/W",
+            "Äquivalenter thermischer Bohrlochwiderstand (auf , mK/W",
+            "De equivalente boorgatweerstand (op , mK/W",
+            "The equivalent borehole thermal resistance (at , mK/W",
+            "The equivalent borehole thermal resistance (at , mK/W",
+            "The equivalent borehole thermal resistance (at , mK/W",
+            "The equivalent borehole thermal resistance (at , mK/W",
+        ]
+        self.option_is_inner_inlet: List[str] = [
+            "Inlet via inner tube?, Yes , No ",
+            "Einlass am inneren Rohr?, Ja , Nein ",
+            "Inlaat via binnenste leiding?, Ja, Nee",
+            "Inlet via inner tube?, Yes , No ",
+            "Inlet via inner tube?, Yes , No ",
+            "Inlet via inner tube?, Yes , No ",
+            "Inlet via inner tube?, Yes , No ",
+        ]
+        self.option_U_pipe_or_coaxial_pipe: List[str] = [
+            "Borehole interals:, U-tube , Coaxial pipe ",
+            "Sondentyp:, U-Sonde , Koaxialsonde ",
+            "Type leiding:, U-buis , Coaxiaal",
+            "Borehole interal:, U-tube , Coaxial pipe ",
+            "Borehole interal:, U-tube , Coaxial pipe ",
+            "Borehole interal:, U-tube , Coaxial pipe ",
+            "Borehole interal:, U-tube , Coaxial pipe",
+        ]
+        self.option_pipe_coaxial_inner_inner: List[str] = [
+            "Inner pipe inner radius [m]: ",
+            "Innerer Radius des inneren Rohres [m]:",
+            "Binnenste leiding binnenstraal [m]:",
+            "Inner pipe inner radius [m]: ",
+            "Inner pipe inner radius [m]: ",
+            "Inner pipe inner radius [m]: ",
+            "Inner pipe inner radius [m]:",
+        ]
+        self.option_pipe_coaxial_outer_inner: List[str] = [
+            "Outer pipe inner radius [m]:",
+            "Äußerer Radius des inneren Rohres [m]:",
+            "Buitenste leiding binnenstraal [m]:",
+            "Outer pipe inner radius [m]:",
+            "Outer pipe inner radius [m]:",
+            "Outer pipe inner radius [m]:",
+            "Outer pipe inner radius [m]:",
+        ]
+        self.option_pipe_coaxial_inner_outer: List[str] = [
+            "Inner pipe outer radius [m]:",
+            "Innerer Radius des äußeren Rohres [m]:",
+            "Binnenste leiding buitenstraal [m]:",
+            "Inner pipe outer radius [m]:",
+            "Inner pipe outer radius [m]:",
+            "Inner pipe outer radius [m]:",
+            "Inner pipe outer radius [m]:",
+        ]
+        self.option_pipe_coaxial_outer_outer: List[str] = [
+            "Outer pipe outer radius [m]:",
+            "Äußerer Radius des äußeren Rohres [m]:",
+            "Buitenste leiding buitenstraal [m]:",
+            "Outer pipe outer radius [m]:",
+            "Outer pipe outer radius [m]:",
+            "Outer pipe outer radius [m]:",
+            "Outer pipe outer radius [m]:",
         ]

@@ -6,7 +6,7 @@
 # Welcome to GHEtool's documentation!
 Dear visitor
 
-Welcome on this ReadTheDocs for the open-source borefield sizing tool GHEtool (v2.1.1).
+Welcome on this ReadTheDocs for the open-source borefield sizing tool GHEtool.
 
 Here one can find (extensive) documentation of GHEtool. Please find below the content of this ReadTheDocs.
 
@@ -20,7 +20,6 @@ If you have any questions, remarks or ideas for future functionalities, please c
 self
 sources/cite
 sources/articles
-sources/users.rst
 sources/changelog
 sources/legal_notice
 ```
@@ -32,6 +31,7 @@ sources/legal_notice
 sources/code/getting_started.md
 sources/code/functionalities.md
 sources/code/modules.md
+sources/code/examples.md
 sources/code/validation.md
 sources/code/speed_improvements.md
 ```

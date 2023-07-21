@@ -1,23 +1,68 @@
 # GHEtool's Changelog and future developments
-All notable changes to this project will be documented in this file including planned future developments.
+All notable changes to this project will be documented in this file. For future developments, please visit our [project board](https://github.com/users/wouterpeere/projects/2) on GitHub.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [2.1.2] - [expected] apr 2023
+## [2.2.0] - summer 2023
+
+## Added
+- Extra warning message if one wants to load a GHEtool file that was created with a newer version.
+- Borehole thermal resistance is now visible at the borehole thermal resistance page (issue #51).
+- New class of GroundData: GroundTemperatureGradient added (issue #145).
+- Load classes (issue #45).
+- Pipe classes (single, double, coaxial, Multiple U Tube) (issue #40 and #45).
+- Flexible temperature limits (issue #41 and #45).
+
+## Changed
+- GUI was moved to a separate project: [ScenarioGUI](https://github.com/tblanke/ScenarioGUI).
+- H_init was removed from the sizing functions since it was not used.
+- Rb is now solely handled by the borehole object.
+- load_hourly_profile is moved to the separate load classes (issue #45).
+- Removed 'set_hourly_cooling_load', 'set_hourly_heating_load' from main_class and move it to separate load class (issue #45).
+- Moved draw_borehole_internals to PipeClass (issue #45).
+- Borehole equivalent resistances is now calculated in one step, centralised in the pipe class (issue #45).
+- Go to 100% code coverage with 300 tests.
+
+## Fixed
+- Fixed problem with L2 sizing, when the peak load was the same in all months (issue #146).
+- Small bug in faster g-function calculation solved. When changing the borefield, the previously calculated g-functions where not removed.
+- When using interpolation for the g-functions, the results could vary a little bit based on the previous sizings. By reinstating the H_init parameter, this is solved.
+- Borehole internals can no longer overlap in the GUI.
+
+
+## [2.1.2] - 2023-04-28
 
 ### Added
-- Different classes for the ground data: one for constant ground temperature and one for the ground temperature with flux (issue #45).
+- Logger for GHEtool (issue #96).
+- Examples are now also in RTD.
+- Reynolds number is shown on the result page (issue #112).
+- Example for the combination of active and passive cooling (issue #114).
+- It is now possible to use building loads (with a SCOP/SEER) instead of ground loads(issue #115).
 
 ### Changed
 - In figure plotting, the interval[x[i], x[i+1]) now has the value y[i] (instead of y[i-1]).
 - Scroll behaviour on the result page (issue #99).
 - Changed icon of GHEtool.
+- Imbalance changed to property so it can handle hourly loads as well (issue #106).
+- Remove recalculation option (issue #109).
+- When data is loaded in a two-column format, the button for 'two columns' is set (issue #133).
+- GUI doesn't crash anymore when wrong seperator and decimal points are selected when loading a .csv.
+- One can now use monthly calculations which do not assume equal month length.
+
 
 ### Fixed
+- Sizing doesn't crash when either no heating or cooling load is present (issue #91).
 - Wrong heating load in april in GUI (issue #94).
+- Results are now cleared when new loads are loaded (issue #106).
+- Options for g-function calculations are not working (issue #119).
+- Wrong naming aim optimise load profile.
+- GHEtool now can start after a crash without removing the backup file.
+- Some translations were not correct.
+- Solves issue with loading .csv file and optimise load profile (issue #130).
+- Figure in optimize load profile keeps getting bigger and bigger (issue #131).
+- Problem with sizing with temperature gradients (issue #136).
+- Problem solved with calculate_multiple_scenarios.
 
-### Changed
-- GUI base classes has been separated into a new package to be easier maintainable. 
 
 ## [2.1.1] - 2023-01-30
 
@@ -151,7 +196,9 @@ code version > speed improvements > v2.1.1.
 ### Fixed 
 - fixed bug in interpolation
 
-[2.1.1]: https://github.com/wouterpeere/GHEtool/compare/v2.1.0...main
+[2.2.0]: https://github.com/wouterpeere/GHEtool/compare/v2.1.2...v2.2.0
+[2.1.2]: https://github.com/wouterpeere/GHEtool/compare/v2.1.1...v2.1.2
+[2.1.1]: https://github.com/wouterpeere/GHEtool/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/wouterpeere/GHEtool/compare/v2.0.6...v2.1.0
 [2.0.6]: https://github.com/wouterpeere/GHEtool/compare/v2.0.5...v2.0.6
 [2.0.5]: https://github.com/wouterpeere/GHEtool/compare/v2.0.4...v2.0.5

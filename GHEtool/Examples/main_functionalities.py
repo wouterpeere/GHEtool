@@ -10,7 +10,7 @@ This file contains all the main functionalities of GHEtool being:
 import numpy as np
 
 # import all the relevant functions
-from GHEtool import Borefield, FluidData, PipeData, GroundConstantTemperature
+from GHEtool import Borefield, FluidData, DoubleUTube, GroundConstantTemperature, MonthlyGeothermalLoadAbsolute
 
 
 def main_functionalities():
@@ -35,12 +35,15 @@ def main_functionalities():
     monthly_load_heating = annual_heating_load * monthly_load_heating_percentage   # kWh
     monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage   # kWh
 
+    # set the load
+    load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
+
     # create the borefield object
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peak_heating,
-                          peak_cooling=peak_cooling,
-                          baseload_heating=monthly_load_heating,
-                          baseload_cooling=monthly_load_cooling)
+    borefield = Borefield(load=load)
+
+    # one can activate or deactive the logger, by default it is deactivated
+    # borefield.activate_logger()
+    # borefield.deactivate_logger()
 
     borefield.set_ground_parameters(data)
     borefield.create_rectangular_borefield(10, 12, 6, 6, 100, 4, 0.075)
@@ -52,11 +55,11 @@ def main_functionalities():
     borefield.set_min_ground_temperature(0)    # minimum temperature
 
     # size borefield
-    depth = borefield.size(100)
+    depth = borefield.size()
     print("The borehole depth is: ", depth, "m")
 
     # print imbalance
-    print("The borefield imbalance is: ", borefield.imbalance, "kWh/y. (A negative imbalance means the the field is heat extraction dominated so it cools down year after year.)") # print imbalance
+    print("The borefield imbalance is: ", borefield._borefield_load.imbalance, "kWh/y. (A negative imbalance means the the field is heat extraction dominated so it cools down year after year.)") # print imbalance
 
     # plot temperature profile for the calculated depth
     borefield.print_temperature_profile(legend=True)
@@ -72,7 +75,7 @@ def main_functionalities():
 
     # size the borefield for quadrant 3
     # for more information about borefield quadrants, see (Peere et al., 2021)
-    depth = borefield.size(100, quadrant_sizing=3)
+    depth = borefield.size(quadrant_sizing=3)
     print("The borehole depth is: ", str(round(depth, 2)), "m for a sizing in quadrant 3")
     # plot temperature profile for the calculated depth
     borefield.print_temperature_profile(legend=True)
@@ -82,7 +85,7 @@ def main_functionalities():
 
     # this requires pipe and fluid data
     fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-    pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, number_of_pipes=2)
+    pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
     borefield.set_fluid_parameters(fluid_data)
     borefield.set_pipe_parameters(pipe_data)
 
@@ -90,10 +93,10 @@ def main_functionalities():
     # when it is given as an argument to the size function, it will size correctly, but the plot will be with
     # constant Rb* since it has not been changed in the setup function
     borefield.sizing_setup(use_constant_Rb=False)
-    depth = borefield.size(100)
+    depth = borefield.size()
     print("The borehole depth is: ", str(round(depth, 2)), "m for a sizing with dynamic Rb*.")
     borefield.print_temperature_profile(legend=True)
 
 
-if __name__== "__main__":  # pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
     main_functionalities()

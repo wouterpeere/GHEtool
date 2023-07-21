@@ -10,7 +10,7 @@ import time
 import numpy as np
 import pygfunction as gt
 
-from GHEtool import Borefield, FluidData, GroundConstantTemperature, PipeData
+from GHEtool import Borefield, FluidData, GroundConstantTemperature, DoubleUTube, MonthlyGeothermalLoadAbsolute
 
 
 def sizing_with_Rb():
@@ -39,7 +39,7 @@ def sizing_with_Rb():
     # initiate borefield model
     data = GroundConstantTemperature(3, 10)  # ground data with an inaccurate guess of 100m for the depth of the borefield
     fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-    pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, 2)
+    pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 
     borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 100, 1, 0.075)
 
@@ -59,12 +59,11 @@ def sizing_with_Rb():
     monthly_load_heating = annual_heating_load * monthly_load_heating_percentage   # kWh
     monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage   # kWh
 
+    # set the load
+    load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
+
     # create the borefield object
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peak_heating,
-                          peak_cooling=peak_cooling,
-                          baseload_heating=monthly_load_heating,
-                          baseload_cooling=monthly_load_cooling)
+    borefield = Borefield(load=load)
 
     borefield.set_ground_parameters(data)
     borefield.set_fluid_parameters(fluid_data)
@@ -83,15 +82,15 @@ def sizing_with_Rb():
     borefield.sizing_setup(use_constant_Rb=True)
 
     # calculate the Rb* value
-    borefield.Rb = borefield.calculate_Rb()
+    borefield.Rb = borefield.borehole.calculate_Rb(100, 1, 0.075, data.k_s)
 
     start_Rb_constant = time.time()
     for i in range(number_of_iterations):
-        borefield.set_baseload_cooling(monthly_load_cooling_array[i])
-        borefield.set_baseload_heating(monthly_load_heating_array[i])
-        borefield.set_peak_cooling(peak_load_cooling_array[i])
-        borefield.set_peak_heating(peak_load_heating_array[i])
-        results_Rb_static[i] = borefield.size(100)
+        # set the load
+        load = MonthlyGeothermalLoadAbsolute(monthly_load_heating_array[i], monthly_load_cooling_array[i],
+                                              peak_load_heating_array[i], peak_load_cooling_array[i])
+        borefield.load = load
+        results_Rb_static[i] = borefield.size()
     end_Rb_constant = time.time()
 
     # size with a dynamic Rb* value
@@ -99,11 +98,11 @@ def sizing_with_Rb():
 
     start_Rb_dynamic = time.time()
     for i in range(number_of_iterations):
-        borefield.set_baseload_cooling(monthly_load_cooling_array[i])
-        borefield.set_baseload_heating(monthly_load_heating_array[i])
-        borefield.set_peak_cooling(peak_load_cooling_array[i])
-        borefield.set_peak_heating(peak_load_heating_array[i])
-        results_Rb_dynamic[i] = borefield.size(100)
+        # set the load
+        load = MonthlyGeothermalLoadAbsolute(monthly_load_heating_array[i], monthly_load_cooling_array[i],
+                                              peak_load_heating_array[i], peak_load_cooling_array[i])
+        borefield.load = load
+        results_Rb_dynamic[i] = borefield.size()
     end_Rb_dynamic = time.time()
     print(results_Rb_dynamic[1])
 
@@ -128,15 +127,15 @@ def sizing_with_Rb():
     borefield.sizing_setup(use_constant_Rb=True)
 
     # calculate the Rb* value
-    borefield.Rb = borefield.calculate_Rb()
+    borefield.Rb = borefield.borehole.calculate_Rb(100, 1, 0.075, data.k_s)
 
     start_Rb_constant = time.time()
     for i in range(number_of_iterations):
-        borefield.set_baseload_cooling(monthly_load_cooling_array[i])
-        borefield.set_baseload_heating(monthly_load_heating_array[i])
-        borefield.set_peak_cooling(peak_load_cooling_array[i])
-        borefield.set_peak_heating(peak_load_heating_array[i])
-        results_Rb_static[i] = borefield.size(100)
+        # set the load
+        load = MonthlyGeothermalLoadAbsolute(monthly_load_heating_array[i], monthly_load_cooling_array[i],
+                                             peak_load_heating_array[i], peak_load_cooling_array[i])
+        borefield.load = load
+        results_Rb_static[i] = borefield.size()
     end_Rb_constant = time.time()
 
     # size with a dynamic Rb* value
@@ -144,11 +143,11 @@ def sizing_with_Rb():
 
     start_Rb_dynamic = time.time()
     for i in range(number_of_iterations):
-        borefield.set_baseload_cooling(monthly_load_cooling_array[i])
-        borefield.set_baseload_heating(monthly_load_heating_array[i])
-        borefield.set_peak_cooling(peak_load_cooling_array[i])
-        borefield.set_peak_heating(peak_load_heating_array[i])
-        results_Rb_dynamic[i] = borefield.size(100)
+        # set the load
+        load = MonthlyGeothermalLoadAbsolute(monthly_load_heating_array[i], monthly_load_cooling_array[i],
+                                             peak_load_heating_array[i], peak_load_cooling_array[i])
+        borefield.load = load
+        results_Rb_dynamic[i] = borefield.size()
     end_Rb_dynamic = time.time()
 
     print("These are the results when an accurate constant Rb* value is used.")

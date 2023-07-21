@@ -12,12 +12,12 @@ import pandas as pd
 import pygfunction as gt
 
 from GHEtool import Borefield
-from GHEtool.VariableClasses import FluidData, GroundConstantTemperature, PipeData
+from GHEtool.VariableClasses import FluidData, GroundConstantTemperature, DoubleUTube
 
 # initiate parameters
 ground_data = GroundConstantTemperature(3, 10)  # ground data with an inaccurate guess of 100m for the depth of the borefield
 borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 100, 1, 0.075)
-pipe_data = PipeData(1, 0.015, 0.02, 0.4, 0.05, number_of_pipes=2, epsilon=1e-6)
+pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05, epsilon=1e-6)
 
 # initiate borefield model
 borefield = Borefield()
@@ -40,9 +40,10 @@ mfr_range = np.arange(0.05, 0.55, 0.05)
 for mfr in mfr_range:
     fluid_data = FluidData(mfr, 0.568, 998, 4180, 1e-3)
     borefield.set_fluid_parameters(fluid_data)
-    Rb.append(borefield.calculate_Rb())
-    R_p.append(borefield.R_p)
-    R_fp.append(borefield.R_f)
+    Rb.append(borefield.Rb)
+    R_p.append(borefield.borehole.pipe_data.R_p)
+    R_fp.append(borefield.borehole.pipe_data.R_f)
+
 
 # make figure
 plt.figure()

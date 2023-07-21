@@ -1,7 +1,3 @@
-"""
-This file contains the class of ground data with a flux temperature.
-"""
-
 from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
 
 
@@ -29,21 +25,7 @@ class GroundFluxTemperature(_GroundData):
         super().__init__(k_s=k_s, volumetric_heat_capacity=volumetric_heat_capacity)
         self.flux = flux
         self.Tg = T_g
-
-    def max_depth(self, t_max: float) -> float:
-        """
-        Determine the depth for the maximal temperature
-
-        Parameters
-        ----------
-        t_max : float
-            Maximal temperature [deg C]
-
-        Returns
-        -------
-            Depth with maximal temperature difference possible [m]
-        """
-        return (t_max - self.Tg)/self.flux * self.k_s
+        self.variable_Tg = True
 
     def calculate_Tg(self, H: float) -> float:
         """

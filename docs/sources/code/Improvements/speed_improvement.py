@@ -7,6 +7,7 @@ import os, contextlib
 from GHEtool.Examples.main_functionalities import main_functionalities
 from GHEtool.Examples.sizing_with_Rb_calculation import sizing_with_Rb
 from GHEtool.Examples.effect_of_borehole_configuration import effect_borefield_configuration
+from GHEtool import HourlyGeothermalLoad
 
 # disable the plot function by monkey patching over it
 Borefield._plot_temperature_profile = lambda *args, **kwargs: None
@@ -62,8 +63,9 @@ def optimise_load_profile() -> None:
     borefield.set_borefield(borefield_gt)
 
     # load the hourly profile
-    borefield.load_hourly_profile("hourly_profile.csv", header=True, separator=";",
-                                  first_column_heating=True)
+    load = HourlyGeothermalLoad()
+    load.load_hourly_profile("hourly_profile.csv", header=True, separator=";")
+    borefield.load = load
 
     # optimise the load for a 10x10 field (see data above) and a fixed depth of 150m.
     borefield.optimise_load_profile(depth=150, print_results=False)
@@ -229,8 +231,9 @@ def size_L4() -> None:
     borefield.set_borefield(borefield_gt)
 
     # load the hourly profile
-    borefield.load_hourly_profile("hourly_profile.csv", header=True, separator=";",
-                                  first_column_heating=True)
+    load = HourlyGeothermalLoad()
+    load.load_hourly_profile("hourly_profile.csv", header=True, separator=";")
+    borefield.load = load
 
     borefield.size(L4_sizing=True)
 
