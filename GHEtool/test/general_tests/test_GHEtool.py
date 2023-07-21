@@ -135,7 +135,7 @@ def test_imbalance(borefield):
 
 
 def test_sizing_L3_threshold_depth_error(borefield):
-    max_temp = borefield.Tf_max_monthly[0]
+    max_temp = float(borefield.Tf_max_monthly[0])
     borefield.set_max_ground_temperature(14)
     borefield.set_ground_parameters(data_ground_flux)
     borefield._sizing_setup.use_constant_Tg = False
