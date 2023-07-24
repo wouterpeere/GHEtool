@@ -1120,6 +1120,7 @@ class Borefield(BaseClass):
         if quadrant_sizing != 0:
             # size according to a specific quadrant
             self.H, _ = self._size_based_on_temperature_profile(quadrant_sizing)
+            return self.H
         else:
             # extraction dominated, so quadrants 1 and 4 are relevant
             max_temp, sized = self._size_based_on_temperature_profile(10)
@@ -1179,6 +1180,7 @@ class Borefield(BaseClass):
         if quadrant_sizing != 0:
             # size according to a specific quadrant
             self.H, _ = self._size_based_on_temperature_profile(quadrant_sizing, hourly=True)
+            return self.H
         else:
             max_temp, sized = self._size_based_on_temperature_profile(10, hourly=True) if np.any(self.load.hourly_cooling_load) else (0, False)
             if sized:

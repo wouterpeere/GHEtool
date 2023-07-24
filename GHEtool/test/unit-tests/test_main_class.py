@@ -308,7 +308,7 @@ def test_Tg():
 @pytest.mark.parametrize("ground_data, constant_Rb, result",
                          zip([ground_data_constant, data_ground_flux, ground_data_constant, data_ground_flux],
                              [True, True, False, False],
-                             [39.994203323480214, 38.733665022510635, 30.924434615896764, 30.245606119498383]))
+                             [39.994203323480214, 38.70946566704161, 30.924434615896764, 30.245606119498383]))
 def test_Ahmadfard(ground_data, constant_Rb, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
@@ -324,7 +324,7 @@ def test_Ahmadfard(ground_data, constant_Rb, result):
 @pytest.mark.parametrize("ground_data, constant_Rb, result",
                          zip([ground_data_constant, data_ground_flux, ground_data_constant, data_ground_flux],
                              [True, True, False, False],
-                             [48.76844845370183, 46.593433439950985, 38.53491016745154, 37.100782551185]))
+                             [48.76844845370183, 46.593433439950985, 38.70946566704161, 37.100782551185]))
 def test_Carcel(ground_data, constant_Rb, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
@@ -417,7 +417,7 @@ def test_size_L2_value_errors():
 
 
 @pytest.mark.parametrize("quadrant, result",
-                         zip([1, 2, 3, 4], [74.55862437702756, 96.85342542746277, 27.2041541800546, 21.789526435986094]))
+                         zip([1, 2, 3, 4], [74.55862437702756, 96.85342542746277, 27.2041541800546, 21.903857780936665]))
 def test_size_L2(quadrant, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
@@ -446,7 +446,7 @@ def test_size_L3_value_errors():
         assert True
 
 @pytest.mark.parametrize("quadrant, result",
-                         zip([1, 2, 3, 4], [56.37136629360852, 71.42698877336204, 26.722846792067735, 21.379839204879715]))
+                         zip([1, 2, 3, 4], [56.37136629360852, 71.42698877336204, 26.722846792067735, 21.333161686968708]))
 def test_size_L3(quadrant, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
