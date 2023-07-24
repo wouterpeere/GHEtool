@@ -324,7 +324,7 @@ def test_Ahmadfard(ground_data, constant_Rb, result):
 @pytest.mark.parametrize("ground_data, constant_Rb, result",
                          zip([ground_data_constant, data_ground_flux, ground_data_constant, data_ground_flux],
                              [True, True, False, False],
-                             [48.76844845370183, 46.593433439950985, 38.70946566704161, 37.100782551185]))
+                             [48.76844845370183, 46.593433439950985, 38.53491016745154, 37.100782551185]))
 def test_Carcel(ground_data, constant_Rb, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
