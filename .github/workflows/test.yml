@@ -27,8 +27,8 @@ jobs:
         with:
           files: ./coverage.xml
           token: 8e6f48b5-8534-4f9a-894b-0a2d226dab26 # not required for public repos
-
-  test_GUI:
+  
+  test_general:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -43,13 +43,14 @@ jobs:
           pip install -r requirements_dev.txt
           pip install -e .
       - name: Test with pytest
-        run: pytest GHEtool/gui/test_gui --cov=./ --cov-report=xml
+        run: pytest GHEtool/test/general_tests --cov=./ --cov-report=xml
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
           files: ./coverage.xml
           token: 8e6f48b5-8534-4f9a-894b-0a2d226dab26 # not required for public repos
-          
+
+      - uses: actions/checkout@v2
   test_examples:
     runs-on: windows-latest
     steps:

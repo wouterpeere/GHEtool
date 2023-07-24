@@ -13,16 +13,15 @@ class SizingSetup(BaseClass):
     """
     This class contains all the settings related to the sizing options.
     """
-    def __init__(self, use_constant_Rb: bool = None, use_constant_Tg: bool = None, quadrant_sizing: int = 0,
+
+    __slots__ = '_L2_sizing', '_L3_sizing', '_L4_sizing', 'quadrant_sizing', '_backup'
+
+    def __init__(self, quadrant_sizing: int = 0,
                  L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None):
         """
 
         Parameters
         ----------
-        use_constant_Rb : bool
-            True if a constant borehole equivalent resistance (Rb*) value should be used
-        use_constant_Tg : bool
-            True if a constant Tg value should be used (the geothermal flux is neglected)
         quadrant_sizing : int
             Differs from 0 when a sizing in a certain quadrant is desired.
             Quadrants are developed by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]_
@@ -42,8 +41,6 @@ class SizingSetup(BaseClass):
         self._L2_sizing: bool = True
         self._L3_sizing: bool = False
         self._L4_sizing: bool = False
-        self.use_constant_Tg: bool = True
-        self.use_constant_Rb: bool = True
         self.quadrant_sizing: int = 0
         self._backup: SizingSetup = None
 
@@ -80,8 +77,13 @@ class SizingSetup(BaseClass):
         Returns
         -------
         None
+
+        Raises
+        ------
+        ValueError
+            When there is a problematic value like two sizing methods or a quadrant not in (0, 4)
         """
-        variables = vars(self)
+        variables = self.__slots__
         sizing_vars = set(["L2_sizing", "L3_sizing", "L4_sizing"])
 
         # set value for sizing method
@@ -97,6 +99,8 @@ class SizingSetup(BaseClass):
         for key, val in kwargs.items():
             if key in variables and key not in sizing_vars:
                 if val is not None:
+                    if key == "quadrant_sizing" and val not in (0, 1, 2, 3, 4):
+                        raise ValueError(f'The quadrant {val} does not exist!')
                     self.__setattr__(key, val)
 
     def _check_and_set_sizing(self, L2_sizing: bool, L3_sizing: bool, L4_sizing: bool) -> None:
@@ -216,6 +220,16 @@ class SizingSetup(BaseClass):
             raise ValueError("No backup has been made.")
 
         kwargs = {}
-        for var in vars(self):
+        for var in self.__slots__:
             kwargs[var] = self._backup.__getattribute__(var)
         self._set_sizing_setup(kwargs)
+
+    def __eq__(self, other):
+        if not isinstance(other, SizingSetup):
+            return False
+        for i in self.__slots__:
+            if i == '_backup':
+                continue
+            if getattr(self, i) != getattr(other, i):
+                return False
+        return True

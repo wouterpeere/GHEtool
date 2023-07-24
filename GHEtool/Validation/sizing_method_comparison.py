@@ -8,7 +8,7 @@ import time
 import numpy as np
 import pygfunction as gt
 
-from GHEtool import Borefield, GroundData
+from GHEtool import Borefield, GroundConstantTemperature, MonthlyGeothermalLoadAbsolute
 
 
 def sizing_method_comparison():
@@ -35,7 +35,7 @@ def sizing_method_comparison():
             peak_load_heating_array[i, j] = np.random.randint(monthly_load_heating_array[i, j], max_value_heating)
 
     # initiate borefield model
-    data = GroundData(3, 10, 0.2)
+    data = GroundConstantTemperature(3, 10)
     borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
 
     # Monthly loading values
@@ -54,14 +54,14 @@ def sizing_method_comparison():
     monthly_load_heating = annual_heating_load * monthly_load_heating_percentage   # kWh
     monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage   # kWh
 
+    # set the load
+    load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
+
     # create the borefield object
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peak_heating,
-                          peak_cooling=peak_cooling,
-                          baseload_heating=monthly_load_heating,
-                          baseload_cooling=monthly_load_cooling)
+    borefield = Borefield(load=load)
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_gt)
+    borefield.Rb = 0.2
 
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)   # maximum temperature
@@ -70,21 +70,21 @@ def sizing_method_comparison():
     # size according to L2 method
     start_L2 = time.time()
     for i in range(number_of_iterations):
-        borefield.set_baseload_cooling(monthly_load_cooling_array[i])
-        borefield.set_baseload_heating(monthly_load_heating_array[i])
-        borefield.set_peak_cooling(peak_load_cooling_array[i])
-        borefield.set_peak_heating(peak_load_heating_array[i])
-        results_L2[i] = borefield.size(100, L2_sizing=True)
+        # set the load
+        load = MonthlyGeothermalLoadAbsolute(monthly_load_heating_array[i], monthly_load_cooling_array[i],
+                                             peak_load_heating_array[i], peak_load_cooling_array[i])
+        borefield.load = load
+        results_L2[i] = borefield.size(L2_sizing=True)
     end_L2 = time.time()
 
     # size according to L3 method
     start_L3 = time.time()
     for i in range(number_of_iterations):
-        borefield.set_baseload_cooling(monthly_load_cooling_array[i])
-        borefield.set_baseload_heating(monthly_load_heating_array[i])
-        borefield.set_peak_cooling(peak_load_cooling_array[i])
-        borefield.set_peak_heating(peak_load_heating_array[i])
-        results_L3[i] = borefield.size(100, L3_sizing=True)
+        # set the load
+        load = MonthlyGeothermalLoadAbsolute(monthly_load_heating_array[i], monthly_load_cooling_array[i],
+                                             peak_load_heating_array[i], peak_load_cooling_array[i])
+        borefield.load = load
+        results_L3[i] = borefield.size(L3_sizing=True)
     end_L3 = time.time()
 
     print("Time for sizing according to L2:", end_L2 - start_L2, "s (or ", round((end_L2 - start_L2) / number_of_iterations * 1000, 3), "ms/sizing)")

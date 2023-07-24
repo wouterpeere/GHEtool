@@ -1,7 +1,8 @@
-import copy
+from __future__ import annotations
 from typing import List, Tuple, Union
 
 import numpy as np
+import copy
 import pygfunction as gt
 from scipy import interpolate
 
@@ -86,14 +87,14 @@ class GFunction:
         self.store_previous_values: bool = GFunction.DEFAULT_STORE_PREVIOUS_VALUES
         self.options: dict = {"method": "equivalent"}
         self.alpha: float = 0.
-        self.borefield: list = []
+        self.borefield: list[gt.boreholes.Borehole] = []
         self.depth_array: np.ndarray = np.array([])
         self.time_array: np.ndarray = np.array([])
         self.previous_gfunctions: np.ndarray = np.array([])
         self.previous_depth: float = 0.
 
         self.no_extrapolation: bool = True
-        self.threshold_depth_interpolation: float = 25  # m
+        self.threshold_depth_interpolation: float = .25  # %
 
         self.fifo_list: FIFO = FIFO(8)
 
@@ -173,7 +174,7 @@ class GFunction:
                 return gfunc_interpolated
 
             # calculate the g-values for uniform borehole wall temperature
-            gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options).gFunc
+            gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options, method=self.options['method']).gFunc
 
             # store the calculated g-values
             self.set_new_calculated_data(time_values, depth, gfunc_calculated, borefield, alpha)
@@ -240,7 +241,7 @@ class GFunction:
             return gvalues
 
         # check if interpolation is possible:
-        if not (self._check_alpha(alpha) or self._check_borefield(borefield)):
+        if not (self._check_alpha(alpha) and self._check_borefield(borefield)):
             # the alpha and/or borefield is not in line with the precalculated data
             return gvalues
 
@@ -330,20 +331,20 @@ class GFunction:
         if depth > val_depth:
             # the nearest index is the first in the array and the depth is smaller than the smallest value in the array
             # but the difference is smaller than the threshold for interpolation
-            if idx_depth == self.depth_array.size - 1 and depth - val_depth < self.threshold_depth_interpolation:
+            if idx_depth == self.depth_array.size - 1 and depth - val_depth < self.threshold_depth_interpolation * depth:
                 return idx_depth, None
             elif idx_depth != self.depth_array.size - 1:
                 idx_next = idx_depth + 1
-                if self.depth_array[idx_next] - val_depth < self.threshold_depth_interpolation:
+                if self.depth_array[idx_next] - val_depth < self.threshold_depth_interpolation * depth:
                     return idx_depth, idx_next
         else:
             # the nearest index is the last in the array and the depth is larger than the highest value in the array
             # but the difference is smaller than the threshold for interpolation
-            if idx_depth == 0 and val_depth - depth < self.threshold_depth_interpolation:
+            if idx_depth == 0 and val_depth - depth < self.threshold_depth_interpolation * depth:
                 return None, idx_depth
             elif idx_depth != 0:
                 idx_prev = idx_depth - 1
-                if val_depth - self.depth_array[idx_prev] < self.threshold_depth_interpolation:
+                if val_depth - self.depth_array[idx_prev] < self.threshold_depth_interpolation * depth:
                     return idx_prev, idx_depth
 
         # no correct interpolation indices are found

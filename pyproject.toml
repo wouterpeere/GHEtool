@@ -5,6 +5,20 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
+[pytest]
+collect_ignore = ["GHEtool/gui/start_gui.py"]
+collect_ignore_glob = ["*start_gui.py"]
+
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "if typing.TYPE_CHECKING:"
+]
+omit = ["./GHEtool.gui.start_gui.py", "./GHEtool.gui.mac_settings.py"]
+
 [tool.isort]
 line_length = 160
 profile = 'black'

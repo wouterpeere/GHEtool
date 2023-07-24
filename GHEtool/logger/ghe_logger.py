@@ -123,4 +123,3 @@ ghe_logger.addHandler(file_handler)
 console_handler = logging.StreamHandler()
 console_handler.setFormatter(log_format)
 ghe_logger.addHandler(console_handler)
-
