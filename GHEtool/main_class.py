@@ -1119,27 +1119,27 @@ class Borefield(BaseClass):
 
         if quadrant_sizing != 0:
             # size according to a specific quadrant
-            self.H = self._size_based_on_temperature_profile(quadrant_sizing)
+            self.H, _ = self._size_based_on_temperature_profile(quadrant_sizing)
         else:
             # extraction dominated, so quadrants 1 and 4 are relevant
-            max_temp = self._size_based_on_temperature_profile(10)
-            min_temp = self._size_based_on_temperature_profile(20)
-            self.H = self._select_size(max_temp, min_temp)
-
-            if self.load.imbalance <= 0:
-                if max_temp == self.H:
+            max_temp, sized = self._size_based_on_temperature_profile(10)
+            if sized:
+                # already correct size
+                self.H = max_temp
+                if self.load.imbalance <= 0:
                     self.limiting_quadrant = 1
-                    # the last calculated temperature was for quadrant 4, which was the smaller one
                 else:
-                    self.limiting_quadrant = 4
-            else:
-                if max_temp == self.H:
                     self.limiting_quadrant = 2
-                    # the last calculation was for quadrant 3, which is the smaller one
+                return max_temp
+            min_temp, sized = self._size_based_on_temperature_profile(20)
+            if sized:
+                self.H = min_temp
+                if self.load.imbalance <= 0:
+                    self.limiting_quadrant = 4
                 else:
                     self.limiting_quadrant = 3
-
-        return self.H
+                return min_temp
+            raise ValueError('No solution can be found due to the temperature gradient. Please increase the field size.')
 
     def size_L4(self, H_init: float = None, quadrant_sizing: int = 0) -> float:
         """
@@ -1178,28 +1178,28 @@ class Borefield(BaseClass):
 
         if quadrant_sizing != 0:
             # size according to a specific quadrant
-            self.H = self._size_based_on_temperature_profile(quadrant_sizing, hourly=True)
+            self.H, _ = self._size_based_on_temperature_profile(quadrant_sizing, hourly=True)
         else:
-            max_temp = self._size_based_on_temperature_profile(10, hourly=True) if np.any(self.load.hourly_cooling_load) else 0
-            min_temp = self._size_based_on_temperature_profile(20, hourly=True) if np.any(self.load.hourly_heating_load) else 0
-            self.H = self._select_size(max_temp, min_temp, True)
-            if self.load.imbalance <= 0:
-                # extraction dominated, so quadrants 1 and 4 are relevant
-                if max_temp == self.H:
+            max_temp, sized = self._size_based_on_temperature_profile(10, hourly=True) if np.any(self.load.hourly_cooling_load) else (0, False)
+            if sized:
+                # already correct size
+                self.H = max_temp
+                if self.load.imbalance <= 0:
                     self.limiting_quadrant = 1
-                    # the last calculation was for quadrant 4, which is the smaller one
                 else:
-                    self.limiting_quadrant = 4
-            else:
-                if max_temp == self.H:
                     self.limiting_quadrant = 2
-                    # the last calculation was for quadrant 3, which is the smaller one
+                return max_temp
+            min_temp, sized = self._size_based_on_temperature_profile(20, hourly=True) if np.any(self.load.hourly_heating_load) else (0, False)
+            if sized:
+                if self.load.imbalance <= 0:
+                    self.limiting_quadrant = 4
                 else:
                     self.limiting_quadrant = 3
+                self.H = min_temp
+                return min_temp
+            raise ValueError('No solution can be found due to the temperature gradient. Please increase the field size.')
 
-        return self.H
-
-    def _size_based_on_temperature_profile(self, quadrant: int, hourly: bool = False) -> float:
+    def _size_based_on_temperature_profile(self, quadrant: int, hourly: bool = False) -> (float, bool):
         """
          This function sizes based on the temperature profile.
         It sizes for a specific quadrant and can both size with a monthly or an hourly resolution.
@@ -1216,6 +1216,8 @@ class Borefield(BaseClass):
         -------
         Depth : float
             Required depth of the borefield [m]
+        Sized : bool
+            True if the required depth also satisfies the other temperature constraint [m]
         """
         # initiate iteration
         H_prev = 0
@@ -1343,9 +1345,10 @@ class Borefield(BaseClass):
                 self.H = (np.min(self.results_peak_heating) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
 
             if self.H < 0:
-                return 0
+                return 0, False
 
-        return self.H
+        return self.H, np.max(self.results_peak_cooling) <= self.Tf_max + 0.05\
+                       and np.min(self.results_peak_heating) >= self.Tf_min - 0.05
 
     def set_baseload_heating(self, baseload: np.ndarray | list) -> None:
         """

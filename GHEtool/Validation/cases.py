@@ -124,7 +124,6 @@ def check_custom_datafile():
         print(f'correct answer: {correct_answers[i-1]}; calculated '
               f'answer: {round(borefield.H,2)}; error: '
               f'{round(abs(1-borefield.H/correct_answers[i - 1])*100,4)} %')
-        # assert abs(1-borefield.H/correct_answers[i - 1]) <= 0.002
 
 
 if __name__ == "__main__":   # pragma: no cover
