@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Moved draw_borehole_internals to PipeClass (issue #45).
 - Borehole equivalent resistances is now calculated in one step, centralised in the pipe class (issue #45).
 - Go to 100% code coverage with 300 tests.
+- Threshold interpolation for g-functions set to a relative threshold of 25% relative to the demanded depth (issue #144).
 
 ## Fixed
 - Fixed problem with L2 sizing, when the peak load was the same in all months (issue #146).

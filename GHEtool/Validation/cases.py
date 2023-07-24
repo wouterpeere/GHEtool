@@ -128,5 +128,5 @@ def check_custom_datafile():
 
 
 if __name__ == "__main__":   # pragma: no cover
-    # check_cases()  # check different cases
+    check_cases()  # check different cases
     check_custom_datafile()  # check if the custom datafile is correct

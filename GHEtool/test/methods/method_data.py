@@ -229,7 +229,7 @@ borefield.set_ground_parameters(data)
 borefield.create_rectangular_borefield(10, 12, 6, 6, 110, 4, 0.075)
 borefield.set_max_ground_temperature(16)
 borefield.set_min_ground_temperature(0)
-list_of_test_objects.add(SizingObject(borefield, L2_output=81.205, L3_output=81.969, quadrant=4,
+list_of_test_objects.add(SizingObject(borefield, L2_output=81.205, L3_output=82.077, quadrant=4,
                                       name='No cooling L2/L3'))
 
 peakCooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]  # Peak cooling in kW
