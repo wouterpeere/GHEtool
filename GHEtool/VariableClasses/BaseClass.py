@@ -171,3 +171,9 @@ class BaseClass:
             variables: List[str] = [attr for attr in dir(self) if not callable(getattr(self, attr)) and not attr.startswith("__")]
 
         return all(getattr(self, var) is not None for var in variables)
+
+
+class UnsolvableDueToTemperatureGradient(ValueError):
+
+    def __init__(self):
+        super().__init__('No solution can be found due to the temperature gradient. Please increase the field size.')

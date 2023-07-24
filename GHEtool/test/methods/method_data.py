@@ -7,6 +7,7 @@ import pygfunction as gt
 from GHEtool.test.methods.TestMethodClass import *
 from GHEtool import *
 from GHEtool.Validation.cases import load_case
+from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient
 
 list_of_test_objects = TestMethodClass()
 

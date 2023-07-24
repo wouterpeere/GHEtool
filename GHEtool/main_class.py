@@ -19,7 +19,7 @@ from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFun
 from GHEtool.VariableClasses.LoadData import *
 from GHEtool.VariableClasses.LoadData import _LoadData
 from GHEtool.VariableClasses.PipeData import _PipeData
-from GHEtool.VariableClasses.BaseClass import BaseClass
+from GHEtool.VariableClasses.BaseClass import BaseClass, UnsolvableDueToTemperatureGradient
 from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
 from GHEtool.logger.ghe_logger import ghe_logger
 
@@ -971,8 +971,8 @@ class Borefield(BaseClass):
 
         Raises
         ------
-        ValueError
-            ValueError when no solution can be found
+        UnsolvableDueToTemperatureGradient
+            Error when no solution can be found
         """
         # return the max of both sizes when no temperature gradient is used
         if not self.ground_data.variable_Tg:
@@ -986,7 +986,7 @@ class Borefield(BaseClass):
         self.calculate_temperatures(size_min_temp, hourly=hourly)
         if np.max(self.results_peak_cooling) <= self.Tf_max:
             return size_min_temp
-        raise ValueError("No solution can be found due to the temperature gradient. Please increase the field size.")
+        raise UnsolvableDueToTemperatureGradient
 
     def size_L2(self, H_init: float = None, quadrant_sizing: int = 0) -> float:
         """
@@ -1106,6 +1106,8 @@ class Borefield(BaseClass):
         ------
          ValueError
             ValueError when no ground data is provided or quadrant is not in range.
+        UnsolvableDueToTemperatureGradient
+            Error when the field cannot be sized.
         """
         # check ground data
         if not self.ground_data.check_values():
@@ -1140,7 +1142,7 @@ class Borefield(BaseClass):
                 else:
                     self.limiting_quadrant = 3
                 return min_temp
-            raise ValueError('No solution can be found due to the temperature gradient. Please increase the field size.')
+            raise UnsolvableDueToTemperatureGradient
 
     def size_L4(self, H_init: float = None, quadrant_sizing: int = 0) -> float:
         """
@@ -1160,8 +1162,10 @@ class Borefield(BaseClass):
 
         Raises
         ------
-         ValueError
-            ValueError when no ground data is provided or quadrant is not in range.
+        ValueError
+           ValueError when no ground data is provided or quadrant is not in range.
+        UnsolvableDueToTemperatureGradient
+           When the field cannot be sized due to the temperature gradient.
         """
         # check ground data
         if not self.ground_data.check_values():
@@ -1199,7 +1203,7 @@ class Borefield(BaseClass):
                     self.limiting_quadrant = 3
                 self.H = min_temp
                 return min_temp
-            raise ValueError('No solution can be found due to the temperature gradient. Please increase the field size.')
+            raise UnsolvableDueToTemperatureGradient
 
     def _size_based_on_temperature_profile(self, quadrant: int, hourly: bool = False) -> (float, bool):
         """
@@ -1729,9 +1733,7 @@ class Borefield(BaseClass):
             H = self.H
         # when using a variable ground temperature, sometimes no solution can be found
         if not isinstance(self.ground_data, GroundConstantTemperature) and H > Borefield.THRESHOLD_DEPTH_ERROR:
-            raise ValueError("Due to the use of a variable ground temperature, no solution can be found."
-                             "To see the temperature profile, one can plot it using the depth of ",
-                             str(Borefield.THRESHOLD_DEPTH_ERROR), "m.")
+            raise UnsolvableDueToTemperatureGradient
 
         def jit_gfunction_calculation() -> np.ndarray:
             """
