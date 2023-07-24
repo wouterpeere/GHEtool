@@ -8,6 +8,7 @@ import pygfunction as gt
 import pytest
 
 from GHEtool import *
+from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient
 
 data = GroundConstantTemperature(3, 10)
 data_ground_flux = GroundFluxTemperature(3, 10)
@@ -178,7 +179,8 @@ def test_no_possible_solution():
     borefield.set_baseload_heating(borefield.load.baseload_heating * 5)
     try:
         borefield.size(L3_sizing=True)
-    except ValueError:
+        assert False  # pragma: no cover
+    except UnsolvableDueToTemperatureGradient:
         assert True
 
 
