@@ -240,7 +240,6 @@ class Translations:  # pragma: no cover
         "hint_press_load",
         "cannot_load_new_version",
         "pipe_thermal_resistance",
-        "option_is_inner_inlet",
         "option_U_pipe_or_coaxial_pipe",
         "option_pipe_coaxial_inner_inner",
         "option_pipe_coaxial_outer_inner",
@@ -1873,7 +1872,7 @@ class Translations:  # pragma: no cover
         ]
         self.geo_load: List[str] = [
             "Load type, Geothermal , Building ",
-            "Art der Belastung, Grundseite , Gebäudeseite ",
+            "Art der Belastung, Geothermieseite , Gebäudeseite ",
             "Type belasting, grondzijdig , gebouwzijdig ",
             "Load type, Geothermal , Building ",
             "Load type, Geothermal , Building ",
@@ -1935,15 +1934,6 @@ class Translations:  # pragma: no cover
             "The equivalent borehole thermal resistance (at , mK/W",
             "The equivalent borehole thermal resistance (at , mK/W",
             "The equivalent borehole thermal resistance (at , mK/W",
-        ]
-        self.option_is_inner_inlet: List[str] = [
-            "Inlet via inner tube?, Yes , No ",
-            "Einlass am inneren Rohr?, Ja , Nein ",
-            "Inlaat via binnenste leiding?, Ja, Nee",
-            "Inlet via inner tube?, Yes , No ",
-            "Inlet via inner tube?, Yes , No ",
-            "Inlet via inner tube?, Yes , No ",
-            "Inlet via inner tube?, Yes , No ",
         ]
         self.option_U_pipe_or_coaxial_pipe: List[str] = [
             "Borehole interals:, U-tube , Coaxial pipe ",

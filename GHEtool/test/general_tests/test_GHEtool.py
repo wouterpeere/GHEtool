@@ -53,6 +53,8 @@ def test_borefield():
     borefield.set_min_ground_temperature(0)  # minimum temperature
 
     assert borefield.simulation_period == 20
+    assert borefield.Tf_min == 0
+    assert borefield.Tf_max == 16
     np.testing.assert_array_equal(borefield.load.peak_heating, np.array([160., 142, 102., 55., 26.301369863013697, 0., 0., 0., 40.4, 85., 119., 136.]))
 
 
@@ -135,7 +137,7 @@ def test_imbalance(borefield):
 
 
 def test_sizing_L3_threshold_depth_error(borefield):
-    max_temp = float(borefield.Tf_max_monthly[0])
+    max_temp = borefield.Tf_max
     borefield.set_max_ground_temperature(14)
     borefield.set_ground_parameters(data_ground_flux)
     borefield._sizing_setup.use_constant_Tg = False

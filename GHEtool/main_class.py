@@ -4,6 +4,7 @@ This file contains all the code for the borefield calculations.
 from __future__ import annotations
 
 from math import pi
+from pathlib import Path
 from typing import Tuple
 import logging
 
@@ -12,7 +13,6 @@ import numpy as np
 import pygfunction as gt
 from scipy.signal import convolve
 from warnings import warn
-from functools import partial
 
 from GHEtool.VariableClasses import FluidData, Borehole, GroundConstantTemperature
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, SizingSetup
@@ -22,8 +22,6 @@ from GHEtool.VariableClasses.PipeData import _PipeData
 from GHEtool.VariableClasses.BaseClass import BaseClass
 from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
 from GHEtool.logger.ghe_logger import ghe_logger
-from GHEtool.VariableClasses.TemperatureLimits import *
-from GHEtool.VariableClasses.TemperatureLimits import _TemperatureLimits
 
 
 class Borefield(BaseClass):
@@ -41,8 +39,8 @@ class Borefield(BaseClass):
 
     __slots__ = 'H', 'H_init', 'borehole',\
                 'number_of_boreholes', '_borefield', 'cost_investment', \
-                'limiting_quadrant',\
-                'Tf', '_temperature_limit',\
+                'Tf_max', 'Tf_min', 'limiting_quadrant', \
+                'Tf', \
                 '_ground_data', '_borefield_load',\
                 'results_peak_heating', 'options_pygfunction',\
                 'results_peak_cooling', 'results_month_cooling', 'results_month_heating', 'Tb', 'THRESHOLD_WARNING_SHALLOW_FIELD', \
@@ -152,7 +150,8 @@ class Borefield(BaseClass):
 
         # initiate fluid parameters
         self.Tf: float = 0.  # temperature of the fluid
-        self._temperature_limit: _TemperatureLimits = ConstantTemperatureLimit(0, 16)
+        self.Tf_max: float = 16.  # maximum temperature of the fluid
+        self.Tf_min: float = 0.  # minimum temperature of the fluid
 
         # initiale borehole
         self.borehole = Borehole()
@@ -185,22 +184,6 @@ class Borefield(BaseClass):
         self.borefield = borefield
 
         ghe_logger.main_info("Borefield object has been created.")
-
-    @property
-    def Tf_min_monthly(self) -> np.ndarray:
-        return self.temperature_limit.get_min_temperature_monthly(self.load.simulation_period)
-
-    @property
-    def Tf_min_hourly(self) -> np.ndarray:
-        return self.temperature_limit.get_min_temperature_hourly(self.load.simulation_period)
-
-    @property
-    def Tf_max_monthly(self) -> np.ndarray:
-        return self.temperature_limit.get_max_temperature_monthly(self.load.simulation_period)
-
-    @property
-    def Tf_max_hourly(self) -> np.ndarray:
-        return self.temperature_limit.get_max_temperature_hourly(self.load.simulation_period)
 
     @staticmethod
     def activate_logger() -> None:
@@ -673,33 +656,6 @@ class Borefield(BaseClass):
         """
         self.borehole.Rb = Rb
 
-    @property
-    def temperature_limit(self) -> ConstantTemperatureLimit:
-        """
-        This returns the temperature limit object.
-
-        Returns
-        -------
-        TemperatureLimit object
-        """
-        return self._temperature_limit
-
-    @temperature_limit.setter
-    def temperature_limit(self, limit: _TemperatureLimits) -> None:
-        """
-        This sets the temperature limit.
-
-        Parameters
-        ----------
-        limit : TemperatureLimit
-            Temperature limit
-
-        Returns
-        -------
-        None
-        """
-        self._temperature_limit = limit
-
     def set_max_ground_temperature(self, temp: float) -> None:
         """
         This functions sets the maximal ground temperature to temp.
@@ -712,8 +668,15 @@ class Borefield(BaseClass):
         Returns
         -------
         None
+
+        Raises
+        ------
+        ValueError
+            When the maximal temperature is lower than the minimal temperature
         """
-        self._temperature_limit.set_max_temperature(temp)
+        if temp <= self.Tf_min:
+            raise ValueError(f'The maximum temperature {temp} is lower than the minimum temperature {self.Tf_min}')
+        self.Tf_max: float = temp
 
     def set_min_ground_temperature(self, temp: float) -> None:
         """
@@ -727,8 +690,15 @@ class Borefield(BaseClass):
         Returns
         -------
         None
+
+        Raises
+        ------
+        ValueError
+            When the maximal temperature is lower than the minimal temperature
         """
-        self._temperature_limit.set_min_temperature(temp)
+        if temp >= self.Tf_max:
+            raise ValueError(f'The minimum temperature {temp} is lower than the maximum temperature {self.Tf_max}')
+        self.Tf_min: float = temp
 
     def _Tg(self, H: float = None) -> float:
         """
@@ -1014,7 +984,7 @@ class Borefield(BaseClass):
 
         # check if sizing by the minimum temperature (quadrant 3/4) does not cross the temperature boundary
         self.calculate_temperatures(size_min_temp, hourly=hourly)
-        if np.all(np.less_equal(self.results_peak_cooling, self.Tf_max_hourly if hourly else self.Tf_max_monthly)):
+        if np.max(self.results_peak_cooling) <= self.Tf_max:
             return size_min_temp
         raise ValueError("No solution can be found due to the temperature gradient. Please increase the field size.")
 
@@ -1040,12 +1010,7 @@ class Borefield(BaseClass):
         ------
         ValueError
             ValueError when no ground data is provided or quadrant is not in range.
-        RuntimeError
-            RuntimeError when non-constant temperature bounds are used.
         """
-        # check temperature bounds
-        if not isinstance(self.temperature_limit, ConstantTemperatureLimit):
-            raise RuntimeError('Cannot size with L2 method since the temperature limits are not constant.')
         # check ground data
         if not self.ground_data.check_values():
             raise ValueError("Please provide ground data.")
@@ -1058,22 +1023,22 @@ class Borefield(BaseClass):
 
         def size_quadrant1():
             th, _, tcm, qh, qpm, qm = self.load._calculate_first_year_params(False)  # calculate parameters
-            self.Tf = self.temperature_limit._max_temperature
+            self.Tf = self.Tf_max
             return self._Carcel(th, tcm, qh, qpm, qm)  # size
 
         def size_quadrant2():
             th, qh, qm, qa = self.load._calculate_last_year_params(False)  # calculate parameters
-            self.Tf = self.temperature_limit._max_temperature
+            self.Tf = self.Tf_max
             return self._Ahmadfard(th, qh, qm, qa)  # size
 
         def size_quadrant3():
             th, _, tcm, qh, qpm, qm = self.load._calculate_first_year_params(True)  # calculate parameters
-            self.Tf = self.temperature_limit._min_temperature
+            self.Tf = self.Tf_min
             return self._Carcel(th, tcm, qh, qpm, qm)  # size
 
         def size_quadrant4():
             th, qh, qm, qa = self.load._calculate_last_year_params(True)  # calculate parameters
-            self.Tf = self.temperature_limit._min_temperature
+            self.Tf = self.Tf_min
             return self._Ahmadfard(th, qh, qm, qa)  # size
 
         if quadrant_sizing != 0:
@@ -1156,6 +1121,7 @@ class Borefield(BaseClass):
             # size according to a specific quadrant
             self.H = self._size_based_on_temperature_profile(quadrant_sizing)
         else:
+            # extraction dominated, so quadrants 1 and 4 are relevant
             max_temp = self._size_based_on_temperature_profile(10)
             min_temp = self._size_based_on_temperature_profile(20)
             self.H = self._select_size(max_temp, min_temp)
@@ -1348,34 +1314,34 @@ class Borefield(BaseClass):
                 # self.results_peak_cooling = results_peak_cooling
                 self._calculate_temperature_profile(self.H, hourly=False)
             H_prev = self.H
-            sim_per = self.load.simulation_period
+
             if quadrant == 1:
                 # maximum temperature
                 # convert back to required length
-                self.H = np.max((self.results_peak_cooling[:8760 if hourly else 12] - self._Tg()) / abs((self.Tf_max_hourly[:8760] if hourly else self.Tf_max_monthly[:12]) - self._Tg())) * H_prev
+                self.H = (np.max(self.results_peak_cooling[:8760 if hourly else 12]) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
             elif quadrant == 2:
                 # maximum temperature
                 # convert back to required length
-                self.H = np.max((self.results_peak_cooling[-8760 if hourly else -12:] - self._Tg()) / abs((self.Tf_max_hourly[:8760] if hourly else self.Tf_max_monthly[:12]) - self._Tg())) * H_prev
+                self.H = (np.max(self.results_peak_cooling[-8760 if hourly else -12:]) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
             elif quadrant == 3:
                 # minimum temperature
                 # convert back to required length
-                self.H = np.max((self.results_peak_heating[:8760 if hourly else 12] - self._Tg()) / abs((self.Tf_min_hourly[:8760] if hourly else self.Tf_min_monthly[:12]) - self._Tg())) * H_prev
+                self.H = (np.min(self.results_peak_heating[:8760 if hourly else 12]) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
             elif quadrant == 4:
                 # minimum temperature
                 # convert back to required length
-                self.H = np.max((self.results_peak_heating[-8760 if hourly else -12:] - self._Tg()) / abs((self.Tf_min_hourly[:8760] if hourly else self.Tf_min_monthly[:12]) - self._Tg())) * H_prev
+                self.H = (np.min(self.results_peak_heating[-8760 if hourly else -12:]) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
             elif quadrant == 10:
                 # over all years
                 # maximum temperature
                 # convert back to required length
-                self.H = np.max((self.results_peak_cooling - self._Tg()) / abs((self.Tf_max_hourly if hourly else self.Tf_max_monthly) - self._Tg())) * H_prev
+                self.H = (np.max(self.results_peak_cooling) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
             elif quadrant == 20:
                 # over all years
                 # minimum temperature
                 # convert back to required length
-                self.H = np.max((self.results_peak_heating - self._Tg()) / abs((self.Tf_min_hourly if hourly else self.Tf_min_monthly) - self._Tg())) * H_prev
-            # self.H = min(self.H, 600)
+                self.H = (np.min(self.results_peak_heating) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
+
             if self.H < 0:
                 return 0
 
@@ -1592,8 +1558,8 @@ class Borefield(BaseClass):
             ax.step(time_array, self.results_month_heating, color='r', linestyle="dashed", where="post", lw=1.5, label='Tf base heating')
 
         # define temperature bounds
-        ax.step(time_array, self.Tf_max_hourly if plot_hourly else self.Tf_max_monthly, color='b', linestyle='dashed', label='', lw=1)
-        ax.step(time_array, self.Tf_min_hourly if plot_hourly else self.Tf_min_monthly, color='r', linestyle='dashed', label='', lw=1)
+        ax.hlines(self.Tf_min, 0, self.simulation_period, colors='r', linestyles='dashed', label='', lw=1)
+        ax.hlines(self.Tf_max, 0, self.simulation_period, colors='b', linestyles='dashed', label='', lw=1)
         ax.set_xticks(range(0, self.simulation_period+1, 2))
 
         # Plot legend
@@ -1920,11 +1886,11 @@ class Borefield(BaseClass):
             self.calculate_temperatures(depth=depth)
 
             # deviation from minimum temperature
-            if abs(np.min(self.results_peak_heating - self.Tf_min_monthly)) > 0.05:
+            if abs(min(self.results_peak_heating) - self.Tf_min) > 0.05:
 
                 # check if it goes below the threshold
-                if np.min(self.results_peak_heating - self.Tf_min_monthly) < 0:
-                    peak_heat_load_geo -= 1 * np.max(10 * (self.Tf_min_monthly - self.results_peak_heating), initial=1)
+                if min(self.results_peak_heating) < self.Tf_min:
+                    peak_heat_load_geo -= 1 * max(1, 10 * (self.Tf_min - min(self.results_peak_heating)))
                 else:
                     peak_heat_load_geo = min(init_peak_heating, peak_heat_load_geo + 1)
                     if peak_heat_load_geo == init_peak_heating:
@@ -1933,11 +1899,11 @@ class Borefield(BaseClass):
                 heat_ok = True
 
             # deviation from maximum temperature
-            if abs(np.max(self.results_peak_cooling - self.Tf_max_monthly)) > 0.05:
+            if abs(np.max(self.results_peak_cooling) - self.Tf_max) > 0.05:
 
                 # check if it goes above the threshold
-                if np.max(self.results_peak_cooling - self.Tf_max_monthly) > 0:
-                    peak_cool_load_geo -= 1 * np.max(10 * (-self.Tf_max_monthly + self.results_peak_cooling), initial=1)
+                if np.max(self.results_peak_cooling) > self.Tf_max:
+                    peak_cool_load_geo -= 1 * max(1, 10 * (-self.Tf_max + np.max(self.results_peak_cooling)))
                 else:
                     peak_cool_load_geo = min(init_peak_cooling, peak_cool_load_geo + 1)
                     if peak_cool_load_geo == init_peak_cooling:
@@ -2037,27 +2003,28 @@ class Borefield(BaseClass):
                                'The temperature is calculated now, based on monthly values.')
             self.calculate_temperatures()
 
-        hourly = self.results_peak_cooling.size == 8760 * self.load.simulation_period
+        # calculate max/min fluid temperatures
+        max_temp = np.max(self.results_peak_cooling)
+        min_temp = np.min(self.results_peak_heating)
 
         # calculate temperature difference w.r.t. the limits
-        DT_max = (-self.Tf_max_hourly if hourly else -self.Tf_max_monthly) + self.results_peak_cooling + 1000  # + 1000 to have no problems with negative temperatures
-        DT_min = (self.Tf_min_hourly if hourly else self.Tf_min_monthly) - self.results_peak_heating + 1000
+        DT_max = - self.Tf_max + max_temp + 1000  # + 1000 to have no problems with negative temperatures
+        DT_min = self.Tf_min - min_temp + 1000
 
         # if the temperature limit is not crossed, return None
-        if np.min((self.Tf_max_hourly if hourly else self.Tf_max_monthly) - self.results_peak_cooling) > 0.1 \
-                and np.max((self.Tf_min_hourly if hourly else self.Tf_min_monthly) - self.results_peak_heating) < -0.1:
+        if self.Tf_max - 0.1 > max_temp and self.Tf_min + 0.1 < min_temp:
             return
 
         # True if heating/extraction dominated
         if self.load.imbalance < 0:
             # either quadrant 1 or 4
-            if np.max(DT_min) > np.max(DT_max):
+            if DT_min > DT_max:
                 # limited by minimum temperature
                 return 4
             return 1
 
         # quadrant 2 or 3
-        if np.max(DT_min) > np.max(DT_max):
+        if DT_min > DT_max:
             # limited by minimum temperature
             return 3
         return 2

@@ -806,12 +806,6 @@ class GUI(GuiStructure):
             maximal_value=10000,
             step=0.000001,
         )
-        self.option_is_inner_inlet = ButtonBox(
-            category=self.category_pipe_data,
-            label=translations.option_is_inner_inlet,
-            default_index=0,
-            entries=[' yes ', ' no ']
-        )
         self.pipe_thermal_resistance = ResultText(translations.pipe_thermal_resistance,
                                                    category=self.category_pipe_data,
                                                    prefix="The equivalent borehole thermal resistance (at 150m) is: ", suffix="mK/W")
@@ -823,7 +817,6 @@ class GUI(GuiStructure):
         self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_coaxial_inner_outer, on_index=1)
         self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_coaxial_outer_inner, on_index=1)
         self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_coaxial_outer_outer, on_index=1)
-        self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_is_inner_inlet, on_index=1)
         self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_inner_radius, on_index=0)
         self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_outer_radius, on_index=0)
         self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_number, on_index=0)
@@ -848,7 +841,6 @@ class GUI(GuiStructure):
         self.option_pipe_coaxial_inner_outer.change_event(self.update_borehole)
         self.option_pipe_coaxial_outer_inner.change_event(self.update_borehole)
         self.option_pipe_coaxial_outer_outer.change_event(self.update_borehole)
-        self.option_is_inner_inlet.change_event(self.update_borehole)
 
         self.page_borehole_resistance.add_function_called_if_button_clicked(self.update_borehole)
         self.page_borehole_resistance.add_function_called_if_button_clicked(self.update_borehole_thermal_resistance)
@@ -867,7 +859,6 @@ class GUI(GuiStructure):
         self.option_pipe_coaxial_inner_outer.change_event(self.update_borehole_thermal_resistance)
         self.option_pipe_coaxial_outer_inner.change_event(self.update_borehole_thermal_resistance)
         self.option_pipe_coaxial_outer_outer.change_event(self.update_borehole_thermal_resistance)
-        self.option_is_inner_inlet.change_event(self.update_borehole_thermal_resistance)
 
         self.option_conductivity.change_event(self.update_borehole_thermal_resistance)
         self.option_depth.change_event(self.update_borehole_thermal_resistance)
@@ -1628,22 +1619,21 @@ class GUI(GuiStructure):
                 r_in_out = self.option_pipe_coaxial_inner_outer.get_value() * 10
                 r_out_in = self.option_pipe_coaxial_outer_inner.get_value() * 10
                 r_out_out = self.option_pipe_coaxial_outer_outer.get_value() * 10
-                inlet_is_inner = self.option_is_inner_inlet.get_value() == 0
                 circle = QtW.QGraphicsEllipseItem(-r_out_out * scale / 2, -r_out_out * scale / 2, r_out_out * scale, r_out_out * scale)
                 circle.setPen(white_color)
                 circle.setBrush(white_color)
                 scene.addItem(circle)
                 circle = QtW.QGraphicsEllipseItem(-r_out_in * scale / 2, -r_out_in * scale / 2, r_out_in * scale, r_out_in * scale)
-                circle.setPen(blue_color if inlet_is_inner else blue_light)
-                circle.setBrush(blue_color if inlet_is_inner else blue_light)
+                circle.setPen(blue_color)
+                circle.setBrush(blue_color)
                 scene.addItem(circle)
                 circle = QtW.QGraphicsEllipseItem(-r_in_out * scale / 2, -r_in_out * scale / 2, r_in_out * scale, r_in_out * scale)
                 circle.setPen(white_color)
                 circle.setBrush(white_color)
                 scene.addItem(circle)
                 circle = QtW.QGraphicsEllipseItem(-r_in_in * scale / 2, -r_in_in * scale / 2, r_in_in * scale, r_in_in * scale)
-                circle.setPen(blue_color if not inlet_is_inner else blue_light)
-                circle.setBrush(blue_color if not inlet_is_inner else blue_light)
+                circle.setPen(blue_light)
+                circle.setBrush(blue_light)
                 scene.addItem(circle)
 
             if self.option_U_pipe_or_coaxial_pipe.get_value() == 0:
@@ -1908,7 +1898,7 @@ class GUI(GuiStructure):
                                         self.option_pipe_conductivity.get_value(),
                                         self.option_pipe_grout_conductivity.get_value(),
                                         self.option_pipe_roughness.get_value(),
-                                        self.option_is_inner_inlet.get_value())
+                                        True)  # constant since this does not change anything
             borehole = Borehole(fluid_data, pipe_data)
             resistance = borehole.get_Rb(self.option_depth.get_value(), self.option_pipe_depth.get_value(), self.option_pipe_borehole_radius.get_value(), self.option_conductivity.get_value())
             self.pipe_thermal_resistance.set_text_value(f'{self.option_depth.get_value()}m): {round(resistance, 4)}')

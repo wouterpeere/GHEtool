@@ -272,17 +272,27 @@ def test_set_pipe_params():
 def test_set_max_temp():
     borefield = Borefield()
     borefield.set_max_ground_temperature(13)
-    assert borefield.Tf_max_monthly[0] == 13
+    assert borefield.Tf_max == 13
     borefield.set_max_ground_temperature(14)
-    assert borefield.Tf_max_monthly[0] == 14
+    assert borefield.Tf_max == 14
+    try:
+        borefield.set_max_ground_temperature(borefield.Tf_min-1)
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
 
 
 def test_set_min_temp():
     borefield = Borefield()
     borefield.set_min_ground_temperature(3)
-    assert borefield.Tf_min_monthly[0] == 3
+    assert borefield.Tf_min == 3
     borefield.set_min_ground_temperature(4)
-    assert borefield.Tf_min_monthly[0] == 4
+    assert borefield.Tf_min == 4
+    try:
+        borefield.set_min_ground_temperature(borefield.Tf_max+1)
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
 
 
 def test_Tg():
@@ -854,13 +864,3 @@ def test_optimise_load_profile_without_hourly_data():
     borefield.load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     borefield.create_rectangular_borefield(10, 10, 6, 6, 150)
     borefield.optimise_load_profile(borefield.load)
-
-
-def test_limit_properties():
-    borefield = Borefield()
-    borefield.load = HourlyGeothermalLoad()
-    sim_per = borefield.load.simulation_period
-    assert np.allclose(borefield.temperature_limit.get_min_temperature_monthly(sim_per), borefield.Tf_min_monthly)
-    assert np.allclose(borefield.temperature_limit.get_min_temperature_hourly(sim_per), borefield.Tf_min_hourly)
-    assert np.allclose(borefield.temperature_limit.get_max_temperature_monthly(sim_per), borefield.Tf_max_monthly)
-    assert np.allclose(borefield.temperature_limit.get_max_temperature_hourly(sim_per), borefield.Tf_max_hourly)
