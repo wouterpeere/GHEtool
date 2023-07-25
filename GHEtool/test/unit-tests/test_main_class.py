@@ -10,6 +10,7 @@ from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData,
 from GHEtool.logger import ghe_logger
 from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
+from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient
 
 data = GroundConstantTemperature(3, 10)
 ground_data_constant = data
@@ -392,7 +393,7 @@ def test_select_size():
     try:
         borefield._select_size(10, 80)
         assert False  # pragma: no cover
-    except ValueError:
+    except UnsolvableDueToTemperatureGradient:
         assert True
 
 
@@ -788,7 +789,7 @@ def test_gfunction():
     try:
         borefield.gfunction(56491)
         assert False  # pragma: no cover
-    except ValueError:
+    except UnsolvableDueToTemperatureGradient:
         assert True
     borefield.H = 102.3
 

@@ -10,7 +10,7 @@ import pytest
 from pytest import raises
 
 from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, Borefield, SizingSetup, FOLDER, DoubleUTube
-from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute
+from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient
 from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
 
@@ -141,7 +141,7 @@ def test_sizing_L3_threshold_depth_error(borefield):
     borefield.set_max_ground_temperature(14)
     borefield.set_ground_parameters(data_ground_flux)
     borefield._sizing_setup.use_constant_Tg = False
-    with raises(ValueError):
+    with raises(UnsolvableDueToTemperatureGradient):
         borefield.gfunction(3600, borefield.THRESHOLD_DEPTH_ERROR + 1)
     borefield._sizing_setup.use_constant_Tg = True
     borefield.set_max_ground_temperature(max_temp)
@@ -276,7 +276,8 @@ def test_value_error_cooling_dom_temp_gradient():
 
     try:
         borefield.size()
-    except ValueError:
+        assert False  # pragma: no cover
+    except UnsolvableDueToTemperatureGradient:
         assert True
 
 

@@ -7,6 +7,7 @@ import pygfunction as gt
 from GHEtool.test.methods.TestMethodClass import *
 from GHEtool import *
 from GHEtool.Validation.cases import load_case
+from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient
 
 list_of_test_objects = TestMethodClass()
 
@@ -205,7 +206,7 @@ borefield.sizing_setup(use_constant_Rb=False)
 borefield.set_length_peak(10)
 borefield.set_max_ground_temperature(25)
 borefield.set_min_ground_temperature(0)
-list_of_test_objects.add(SizingObject(borefield, error=ValueError, name='Real case 1 (Error)'))
+list_of_test_objects.add(SizingObject(borefield, error=UnsolvableDueToTemperatureGradient, name='Real case 1 (Error)'))
 
 ground_data_IKC = GroundFluxTemperature(2.3, 10.5, flux=2.3*2.85/100)
 borefield.set_ground_parameters(ground_data_IKC)
@@ -263,7 +264,7 @@ borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(2)))
 borefield.set_ground_parameters(GroundFluxTemperature(3, 12))
 borefield.create_rectangular_borefield(10, 12, 6, 6, 110, 4, 0.075)
 borefield.set_Rb(0.2)
-list_of_test_objects.add(SizingObject(borefield, error=ValueError, quadrant=2, name='Cannot size'))
+list_of_test_objects.add(SizingObject(borefield, error=UnsolvableDueToTemperatureGradient, quadrant=2, name='Cannot size'))
 list_of_test_objects.add(SizingObject(borefield, error_L4=ValueError, quadrant=2, name='Cannot size L4'))
 
 
