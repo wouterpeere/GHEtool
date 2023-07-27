@@ -92,19 +92,19 @@ borefield.Rb = 0.2
 borefield.set_max_ground_temperature(16)   # maximum temperature
 borefield.set_min_ground_temperature(0)    # minimum temperature
 
-list_of_test_objects.add(SizingObject(borefield, L2_output=190.223, L3_output=195.949, quadrant=2,
+list_of_test_objects.add(SizingObject(borefield, L2_output=190.223, L3_output=195.962, quadrant=2,
                                       name='Effect of borehole configuration (1)'))
 
 borefield_gt = gt.boreholes.rectangle_field(6, 20, 6, 6, 110, 1, 0.075)
 borefield.set_borefield(borefield_gt)
 
-list_of_test_objects.add(SizingObject(borefield, L2_output=186.5208, L3_output=191.206, quadrant=2,
+list_of_test_objects.add(SizingObject(borefield, L2_output=186.5208, L3_output=191.232, quadrant=2,
                                       name='Effect of borehole configuration (2)'))
 
 data = GroundConstantTemperature(3.5, 10)
 borefield_gt = gt.boreholes.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)
 correct_answers_L2 = (56.75, 117.223, 66.94, 91.266)
-correct_answers_L3 = (56.771, 118.738, 66.471, 91.240)
+correct_answers_L3 = (56.771, 118.738, 66.471, 91.274)
 for i in (1, 2, 3, 4):
     load = MonthlyGeothermalLoadAbsolute(*load_case(i))
     borefield = Borefield(load=load)
@@ -117,7 +117,7 @@ for i in (1, 2, 3, 4):
                                           L3_output=correct_answers_L3[i-1], quadrant=i, name=f'BS2021 case {i}'))
 
 correct_answers_L2 = (56.749, 117.223, 66.941, 91.266)
-correct_answers_L3 = (56.770, 118.738, 66.471, 91.240)
+correct_answers_L3 = (56.770, 118.738, 66.471, 91.274)
 customField = gt.boreholes.rectangle_field(N_1=12, N_2=10, B_1=6.5, B_2=6.5, H=110., D=4, r_b=0.075)
 for i in (1, 2, 3, 4):
     load = MonthlyGeothermalLoadAbsolute(*load_case(i))
@@ -172,7 +172,7 @@ hourly_load.simulation_period = 20
 hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly data\office.csv"), header=True, separator=";",
                                 col_cooling=0, col_heating=1)
 borefield.load = hourly_load
-list_of_test_objects.add(SizingObject(borefield, L2_output=111.180, L3_output=113.069, L4_output=107.081, quadrant=2,
+list_of_test_objects.add(SizingObject(borefield, L2_output=111.180, L3_output=113.069, L4_output=107.09674613249454, quadrant=2,
                                       name='BS2023 Office'))
 
 borefield = Borefield()
@@ -210,7 +210,7 @@ list_of_test_objects.add(SizingObject(borefield, error=UnsolvableDueToTemperatur
 
 ground_data_IKC = GroundFluxTemperature(2.3, 10.5, flux=2.3*2.85/100)
 borefield.set_ground_parameters(ground_data_IKC)
-list_of_test_objects.add(SizingObject(borefield, L2_output=74.46, L3_output=74.866, quadrant=4,
+list_of_test_objects.add(SizingObject(borefield, L2_output=74.46, L3_output=74.854, quadrant=4,
                                       name='Real case 1 (Correct)'))
 
 borefield.set_ground_parameters(ground_data_IKC)
@@ -245,7 +245,7 @@ borefield.set_ground_parameters(data)
 borefield.create_rectangular_borefield(10, 12, 6, 6, 110, 4, 0.075)
 borefield.set_max_ground_temperature(16)  # maximum temperature
 borefield.set_min_ground_temperature(0)  # minimum temperature
-list_of_test_objects.add(SizingObject(borefield, L2_output=120.913, L3_output=123.346, quadrant=2,
+list_of_test_objects.add(SizingObject(borefield, L2_output=120.913, L3_output=123.269, quadrant=2,
                                       name='No heating L2/L3'))
 borefield = Borefield()
 borefield.set_ground_parameters(data)
@@ -258,7 +258,7 @@ list_of_test_objects.add(SizingObject(borefield, L4_output=244.04826670835274, q
 hourly_load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
 borefield.load = hourly_load
 borefield.load.hourly_heating_load = np.zeros(8760)
-list_of_test_objects.add(SizingObject(borefield, L4_output=305.55338863384287, quadrant=2, name='No heating L4'))
+list_of_test_objects.add(SizingObject(borefield, L4_output=305.5387171364822, quadrant=2, name='No heating L4'))
 
 borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(2)))
 borefield.set_ground_parameters(GroundFluxTemperature(3, 12))
@@ -283,7 +283,7 @@ list_of_test_objects.add(SizingObject(borefield, L4_output=18760.64149089075, qu
 
 hourly_load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_cooling=0, col_heating=1)
 borefield.load = hourly_load
-list_of_test_objects.add(SizingObject(borefield, L4_output=368.50138222702657, quadrant=2, name='Hourly profile reversed'))
+list_of_test_objects.add(SizingObject(borefield, L4_output=368.47977648446584, quadrant=2, name='Hourly profile reversed'))
 
 borefield._borefield_load.hourly_heating_load[0] = 100000
 list_of_test_objects.add(SizingObject(borefield, L4_output=18602.210559679363, quadrant=3, name='Hourly profile, quadrant 3'))

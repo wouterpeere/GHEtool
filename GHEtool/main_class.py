@@ -1125,7 +1125,7 @@ class Borefield(BaseClass):
             return self.H
         else:
             # extraction dominated, so quadrants 1 and 4 are relevant
-            max_temp, sized = self._size_based_on_temperature_profile(10, min_depth=0)
+            max_temp, sized = self._size_based_on_temperature_profile(10, min_depth=20)
             if sized:
                 # already correct size
                 self.H = max_temp
@@ -1186,7 +1186,7 @@ class Borefield(BaseClass):
             self.H, _ = self._size_based_on_temperature_profile(quadrant_sizing, hourly=True)
             return self.H
         else:
-            max_temp, sized = self._size_based_on_temperature_profile(10, hourly=True) if np.any(self.load.hourly_cooling_load) else (0, False)
+            max_temp, sized = self._size_based_on_temperature_profile(10, hourly=True, min_depth=20) if np.any(self.load.hourly_cooling_load) else (0, False)
             if sized:
                 # already correct size
                 self.H = max_temp
@@ -1208,12 +1208,9 @@ class Borefield(BaseClass):
     def calculate_next_depth(self, min_depth, H) -> float:
         # diff between the max temperature in peak cooling and the avg undisturbed ground temperature at depth H
         delta_temp = np.max(self.results_peak_cooling - self.ground_data.calculate_Tg(H))
-        max_depth = self.ground_data.max_depth(self.Tf_max)
-        depth = self.ground_data.max_depth(self.Tf_max - delta_temp)
-        delta_H = self.ground_data.delta_H(delta_temp)
-        if depth < min_depth:
-            raise UnsolvableDueToTemperatureGradient
-
+        delta_wrt_max = self.Tf_max - self.ground_data.calculate_Tg(H)
+        rel_diff = delta_wrt_max/delta_temp
+        depth = H/rel_diff
         return depth
 
     def _size_based_on_temperature_profile(self, quadrant: int, hourly: bool = False, min_depth: float = None) -> (float, bool):
@@ -1253,6 +1250,7 @@ class Borefield(BaseClass):
 
         if not min_depth is None:
             self.H = self.ground_data.max_depth(self.Tf_max)
+            self.H = min_depth
 
 
         # Iterates as long as there is no convergence
