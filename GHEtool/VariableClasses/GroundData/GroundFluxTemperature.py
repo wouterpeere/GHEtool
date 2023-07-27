@@ -44,3 +44,9 @@ class GroundFluxTemperature(_GroundData):
         # geothermal gradient is equal to the geothermal heat flux divided by the thermal conductivity
         # avg ground temperature is (Tg + gradient + Tg) / 2 = Tg + gradient / 2
         return self.Tg + H * self.flux / self.k_s / 2
+
+    def max_depth(self, max_temp) -> float:
+        return (max_temp - self.Tg) * 2 * self.k_s / self.flux
+
+    def delta_H(self, temp) -> float:
+        return temp * 2 * self.k_s / self.flux

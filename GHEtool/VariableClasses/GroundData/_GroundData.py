@@ -46,6 +46,15 @@ class _GroundData(BaseClass, ABC):
             Ground temperature [deg C]
         """
 
+    @abc.abstractmethod
+    def max_depth(self, max_temp) -> float:
+        """
+
+        Returns
+        -------
+
+        """
+
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
             return False

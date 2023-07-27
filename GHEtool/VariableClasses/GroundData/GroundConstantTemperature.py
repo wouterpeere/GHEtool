@@ -38,3 +38,7 @@ class GroundConstantTemperature(_GroundData):
             Ground temperature [deg C]
         """
         return self.Tg
+
+
+    def max_depth(self, max_temp) -> float:
+        return self.Tg

@@ -14,7 +14,7 @@ import pygfunction as gt
 from scipy.signal import convolve
 from warnings import warn
 
-from GHEtool.VariableClasses import FluidData, Borehole, GroundConstantTemperature
+from GHEtool.VariableClasses import FluidData, Borehole, GroundConstantTemperature, GroundFluxTemperature
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, SizingSetup
 from GHEtool.VariableClasses.LoadData import *
 from GHEtool.VariableClasses.LoadData import _LoadData
@@ -1125,7 +1125,7 @@ class Borefield(BaseClass):
             return self.H
         else:
             # extraction dominated, so quadrants 1 and 4 are relevant
-            max_temp, sized = self._size_based_on_temperature_profile(10)
+            max_temp, sized = self._size_based_on_temperature_profile(10, min_depth=0)
             if sized:
                 # already correct size
                 self.H = max_temp
@@ -1205,7 +1205,18 @@ class Borefield(BaseClass):
                 return min_temp
             raise UnsolvableDueToTemperatureGradient
 
-    def _size_based_on_temperature_profile(self, quadrant: int, hourly: bool = False) -> (float, bool):
+    def calculate_next_depth(self, min_depth, H) -> float:
+        # diff between the max temperature in peak cooling and the avg undisturbed ground temperature at depth H
+        delta_temp = np.max(self.results_peak_cooling - self.ground_data.calculate_Tg(H))
+        max_depth = self.ground_data.max_depth(self.Tf_max)
+        depth = self.ground_data.max_depth(self.Tf_max - delta_temp)
+        delta_H = self.ground_data.delta_H(delta_temp)
+        if depth < min_depth:
+            raise UnsolvableDueToTemperatureGradient
+
+        return depth
+
+    def _size_based_on_temperature_profile(self, quadrant: int, hourly: bool = False, min_depth: float = None) -> (float, bool):
         """
          This function sizes based on the temperature profile.
         It sizes for a specific quadrant and can both size with a monthly or an hourly resolution.
@@ -1239,6 +1250,10 @@ class Borefield(BaseClass):
         #
         # # initialise the results array
         # results = np.zeros(loads_short.size * 2)
+
+        if not min_depth is None:
+            self.H = self.ground_data.max_depth(self.Tf_max)
+
 
         # Iterates as long as there is no convergence
         # (convergence if difference between depth in iterations is smaller than THRESHOLD_BOREHOLE_DEPTH)
@@ -1276,12 +1291,15 @@ class Borefield(BaseClass):
                 self._calculate_temperature_profile(self.H, hourly=True)
 
             else:
-                # calculate g-values
-                # g_values = self.gfunction(self.time_L3_last_year, self.H)
+                # # calculate g-values
+                # g_values = self.gfunction(self.load.time_L3, self.H)
                 #
                 # # the g-function value of the peak with length_peak hours
-                # g_value_peak_heating = self.gfunction(self.length_peak_heating * 3600., self.H)[0]
-                # g_value_peak_cooling = self.gfunction(self.length_peak_cooling * 3600., self.H)[0]
+                # g_value_peak_cooling = self.gfunction(self.load.peak_cooling_duration, self.H)[0]
+                # if self.load.peak_cooling_duration == self.load.peak_heating_duration:
+                #     g_value_peak_heating = g_value_peak_cooling
+                # else:
+                #     g_value_peak_heating = self.gfunction(self.load.peak_heating_duration, self.H)[0]
                 #
                 # # calculation of needed differences of the g-function values. These are the weight factors in
                 # # the calculation of Tb.
@@ -1290,9 +1308,9 @@ class Borefield(BaseClass):
                 # # convolution to get the monthly results
                 # results[:12] = convolve(loads_short * 1000, g_value_differences[:12])[:12]
                 #
-                # g_sum_n1 = g_value_differences[:12 * (self.simulation_period - 1)]\
-                #     .reshape(self.simulation_period - 1, 12).sum(axis=0)
-                # g_sum = g_sum_n1 + g_value_differences[12 * (self.simulation_period - 1):]
+                # g_sum_n1 = g_value_differences[:12 * (self.load.simulation_period - 1)]\
+                #     .reshape(self.load.simulation_period - 1, 12).sum(axis=0)
+                # g_sum = g_sum_n1 + g_value_differences[12 * (self.load.simulation_period - 1):]
                 # g_sum_n2 = np.concatenate((np.array([0]), g_sum_n1[::-1]))[:-1]
                 #
                 # results[12:] = convolve(loads_short * 1000, g_sum)[:12]\
@@ -1304,16 +1322,16 @@ class Borefield(BaseClass):
                 # self.Tb = Tb
                 # # now the Tf will be calculated based on
                 # # Tf = Tb + Q * R_b
-                # results_month_cooling = Tb + np.tile(self.monthly_load_cooling, 2) * 1000 \
+                # results_month_cooling = Tb + np.tile(self.load.baseload_cooling_power, 2) * 1000 \
                 #                         * (self.Rb / self.number_of_boreholes / self.H)
-                # results_month_heating = Tb - np.tile(self.monthly_load_heating, 2) * 1000 \
+                # results_month_heating = Tb - np.tile(self.load.baseload_heating_power, 2) * 1000 \
                 #                         * (self.Rb / self.number_of_boreholes / self.H)
                 #
                 # # extra summation if the g-function value for the peak is included
                 # results_peak_cooling = results_month_cooling +\
-                #                        np.tile(self.peak_cooling - self.monthly_load_cooling, 2) * 1000 *\
+                #                        np.tile(self.load.peak_cooling - self.load.baseload_cooling_power, 2) * 1000 *\
                 #                        (g_value_peak_cooling / self.ground_data.k_s / 2 / pi + self.Rb) / self.number_of_boreholes / self.H
-                # results_peak_heating = results_month_heating - np.tile(self.peak_heating - self.monthly_load_heating, 2) * 1000 \
+                # results_peak_heating = results_month_heating - np.tile(self.load.peak_heating - self.load.baseload_heating_power, 2) * 1000 \
                 #                        * (g_value_peak_heating / self.ground_data.k_s / 2 / pi + self.Rb)\
                 #                        / self.number_of_boreholes / self.H
                 #
@@ -1322,34 +1340,36 @@ class Borefield(BaseClass):
                 # self.results_peak_cooling = results_peak_cooling
                 self._calculate_temperature_profile(self.H, hourly=False)
             H_prev = self.H
-
-            if quadrant == 1:
-                # maximum temperature
-                # convert back to required length
-                self.H = (np.max(self.results_peak_cooling[:8760 if hourly else 12]) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
-            elif quadrant == 2:
-                # maximum temperature
-                # convert back to required length
-                self.H = (np.max(self.results_peak_cooling[-8760 if hourly else -12:]) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
-            elif quadrant == 3:
-                # minimum temperature
-                # convert back to required length
-                self.H = (np.min(self.results_peak_heating[:8760 if hourly else 12]) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
-            elif quadrant == 4:
-                # minimum temperature
-                # convert back to required length
-                self.H = (np.min(self.results_peak_heating[-8760 if hourly else -12:]) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
-            elif quadrant == 10:
-                # over all years
-                # maximum temperature
-                # convert back to required length
-                self.H = (np.max(self.results_peak_cooling) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
-            elif quadrant == 20:
-                # over all years
-                # minimum temperature
-                # convert back to required length
-                self.H = (np.min(self.results_peak_heating) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
-
+            if min_depth is None or not isinstance(self.ground_data, GroundFluxTemperature):
+                if quadrant == 1:
+                    # maximum temperature
+                    # convert back to required length
+                    self.H = (np.max(self.results_peak_cooling[:8760 if hourly else 12]) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
+                elif quadrant == 2:
+                    # maximum temperature
+                    # convert back to required length
+                    self.H = (np.max(self.results_peak_cooling[-8760 if hourly else -12:]) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
+                elif quadrant == 3:
+                    # minimum temperature
+                    # convert back to required length
+                    self.H = (np.min(self.results_peak_heating[:8760 if hourly else 12]) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
+                elif quadrant == 4:
+                    # minimum temperature
+                    # convert back to required length
+                    self.H = (np.min(self.results_peak_heating[-8760 if hourly else -12:]) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
+                elif quadrant == 10:
+                    # over all years
+                    # maximum temperature
+                    # convert back to required length
+                    self.H = (np.max(self.results_peak_cooling) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
+                elif quadrant == 20:
+                    # over all years
+                    # minimum temperature
+                    # convert back to required length
+                    self.H = (np.min(self.results_peak_heating) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
+            elif isinstance(self.ground_data, GroundFluxTemperature):
+                # for when the temperature gradient is active and it is cooling
+                self.H = self.calculate_next_depth(min_depth, H_prev)
             if self.H < 0:
                 return 0, False
 
