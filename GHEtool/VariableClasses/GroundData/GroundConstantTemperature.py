@@ -1,7 +1,3 @@
-"""
-This file contains the code for the ground data with a constant temperature.
-"""
-
 from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
 
 

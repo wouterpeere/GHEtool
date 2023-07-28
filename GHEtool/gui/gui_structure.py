@@ -15,7 +15,7 @@ import PySide6.QtCore as QtC
 import pandas as pd
 
 from GHEtool import FOLDER
-from GHEtool.VariableClasses import FluidData, PipeData, Borehole
+from GHEtool.VariableClasses import FluidData, MultipleUTube, Borehole, CoaxialPipe
 from GHEtool.gui.gui_classes.translation_class import Translations
 from numpy import array, cos, int64, round, sin, sum
 from pandas import DataFrame as pd_DataFrame
@@ -684,6 +684,12 @@ class GUI(GuiStructure):
         self.category_pipe_data = Category(page=self.page_borehole_resistance, label=translations.category_pipe_data)
         self.category_pipe_data.activate_graphic_left()
 
+        self.option_U_pipe_or_coaxial_pipe = ButtonBox(
+            category=self.category_pipe_data,
+            label=translations.option_U_pipe_or_coaxial_pipe,
+            default_index=0,
+            entries=['U-pipe', 'Coaxial pipe']
+        )
         self.option_pipe_number = IntBox(
             category=self.category_pipe_data, label=translations.option_pipe_number, default_value=2, minimal_value=1, maximal_value=99
         )
@@ -723,9 +729,52 @@ class GUI(GuiStructure):
             maximal_value=10000,
             step=0.001,
         )
+
         self.option_pipe_outer_radius.change_event(self.option_pipe_inner_radius.widget.setMaximum)
         self.option_pipe_inner_radius.change_event(self.option_pipe_outer_radius.widget.setMinimum)
 
+        self.option_pipe_coaxial_inner_inner = FloatBox(
+            category=self.category_pipe_data,
+            label=translations.option_pipe_coaxial_inner_inner,
+            default_value=0.0221,
+            decimal_number=4,
+            minimal_value=0,
+            maximal_value=10000,
+            step=0.001,
+        )
+        self.option_pipe_coaxial_inner_outer = FloatBox(
+            category=self.category_pipe_data,
+            label=translations.option_pipe_coaxial_inner_outer,
+            default_value=0.025,
+            decimal_number=4,
+            minimal_value=0,
+            maximal_value=10000,
+            step=0.001,
+        )
+        self.option_pipe_coaxial_inner_outer.change_event(self.option_pipe_coaxial_inner_inner.widget.setMaximum)
+        self.option_pipe_coaxial_inner_inner.change_event(self.option_pipe_coaxial_inner_outer.widget.setMinimum)
+        self.option_pipe_coaxial_outer_inner = FloatBox(
+            category=self.category_pipe_data,
+            label=translations.option_pipe_coaxial_outer_inner,
+            default_value=0.0487,
+            decimal_number=4,
+            minimal_value=0,
+            maximal_value=10000,
+            step=0.001,
+        )
+        self.option_pipe_coaxial_outer_outer = FloatBox(
+            category=self.category_pipe_data,
+            label=translations.option_pipe_coaxial_outer_outer,
+            default_value=0.055,
+            decimal_number=4,
+            minimal_value=0,
+            maximal_value=10000,
+            step=0.001,
+        )
+        self.option_pipe_coaxial_inner_outer.change_event(self.option_pipe_coaxial_outer_inner.widget.setMinimum)
+        self.option_pipe_coaxial_outer_inner.change_event(self.option_pipe_coaxial_inner_outer.widget.setMaximum)
+        self.option_pipe_coaxial_outer_outer.change_event(self.option_pipe_coaxial_outer_inner.widget.setMaximum)
+        self.option_pipe_coaxial_outer_inner.change_event(self.option_pipe_coaxial_outer_outer.widget.setMinimum)
         self.option_pipe_borehole_radius_2 = FloatBox(
             category=self.category_pipe_data,
             label=translations.option_pipe_borehole_radius_2,
@@ -735,7 +784,7 @@ class GUI(GuiStructure):
             maximal_value=10000,
             step=0.001,
         )
-        self.option_pipe_borehole_radius_2.change_event(self.check_distance_between_pipes)
+        self.option_pipe_borehole_radius_2.change_event(self.check_correct_pipe_data)
         self.option_pipe_borehole_radius_2.change_event(self.option_pipe_borehole_radius.set_value)
         self.option_pipe_borehole_radius.change_event(self.option_pipe_borehole_radius_2.set_value)
 
@@ -764,22 +813,40 @@ class GUI(GuiStructure):
 
         # add dependency
         self.option_method_rb_calc.add_link_2_show(self.category_pipe_data, on_index=1)
+        self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_coaxial_inner_inner, on_index=1)
+        self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_coaxial_inner_outer, on_index=1)
+        self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_coaxial_outer_inner, on_index=1)
+        self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_coaxial_outer_outer, on_index=1)
+        self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_inner_radius, on_index=0)
+        self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_outer_radius, on_index=0)
+        self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_number, on_index=0)
+        self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_distance, on_index=0)
+
 
         # set update events
-        self.option_pipe_number.change_event(self.check_distance_between_pipes)
-        self.option_pipe_outer_radius.change_event(self.check_distance_between_pipes)
-        self.option_pipe_distance.change_event(self.check_distance_between_pipes)
+        self.option_pipe_number.change_event(self.check_correct_pipe_data)
+        self.option_pipe_outer_radius.change_event(self.check_correct_pipe_data)
+        self.option_pipe_distance.change_event(self.check_correct_pipe_data)
 
+        self.option_pipe_coaxial_outer_outer.change_event(self.check_correct_pipe_data)
+        self.option_U_pipe_or_coaxial_pipe.change_event(self.check_correct_pipe_data)
+
+        self.option_U_pipe_or_coaxial_pipe.change_event(self.update_borehole)
         self.option_pipe_number.change_event(self.update_borehole)
         self.option_pipe_outer_radius.change_event(self.update_borehole)
         self.option_pipe_inner_radius.change_event(self.update_borehole)
         self.option_pipe_borehole_radius.change_event(self.update_borehole)
         self.option_pipe_distance.change_event(self.update_borehole)
+        self.option_pipe_coaxial_inner_inner.change_event(self.update_borehole)
+        self.option_pipe_coaxial_inner_outer.change_event(self.update_borehole)
+        self.option_pipe_coaxial_outer_inner.change_event(self.update_borehole)
+        self.option_pipe_coaxial_outer_outer.change_event(self.update_borehole)
 
         self.page_borehole_resistance.add_function_called_if_button_clicked(self.update_borehole)
         self.page_borehole_resistance.add_function_called_if_button_clicked(self.update_borehole_thermal_resistance)
 
         # calculate Rb* updates
+        self.option_U_pipe_or_coaxial_pipe.change_event(self.update_borehole_thermal_resistance)
         self.option_pipe_number.change_event(self.update_borehole_thermal_resistance)
         self.option_pipe_grout_conductivity.change_event(self.update_borehole_thermal_resistance)
         self.option_pipe_inner_radius.change_event(self.update_borehole_thermal_resistance)
@@ -788,10 +855,13 @@ class GUI(GuiStructure):
         self.option_pipe_borehole_radius_2.change_event(self.update_borehole_thermal_resistance)
         self.option_pipe_distance.change_event(self.update_borehole_thermal_resistance)
         self.option_pipe_roughness.change_event(self.update_borehole_thermal_resistance)
+        self.option_pipe_coaxial_inner_inner.change_event(self.update_borehole_thermal_resistance)
+        self.option_pipe_coaxial_inner_outer.change_event(self.update_borehole_thermal_resistance)
+        self.option_pipe_coaxial_outer_inner.change_event(self.update_borehole_thermal_resistance)
+        self.option_pipe_coaxial_outer_outer.change_event(self.update_borehole_thermal_resistance)
 
         self.option_conductivity.change_event(self.update_borehole_thermal_resistance)
         self.option_depth.change_event(self.update_borehole_thermal_resistance)
-
 
         # create categories
         #create_category_constant_rb()
@@ -1397,10 +1467,10 @@ class GUI(GuiStructure):
                 if isinstance(option, ResultText):
                     self.list_of_result_texts.append((option, ''))
 
-    def check_distance_between_pipes(self) -> None:
+    def check_correct_pipe_data(self) -> None:
         """
-        This function calculates and sets the minimal and maximal distance between the U pipes
-        and the center of the borehole.
+        This function calculates and sets the minimal and maximal distances for the U-pipe configuration
+        as well as the coaxial one.
 
         Returns
         -------
@@ -1408,49 +1478,74 @@ class GUI(GuiStructure):
         """
         if not self.started:
             return
-        if self.option_pipe_distance.is_hidden():
+        if self.category_pipe_data.is_hidden():
             return
-        n_u: int = self.option_pipe_number.get_value()  # get number of U pipes
-        if n_u == 0:
-            return
-        pipe_distance: float = self.option_pipe_distance.get_value()  # get pipe distance
-        r_borehole: float = self.option_pipe_borehole_radius_2.get_value()  # get borehole radius
-        r_outer_pipe: float = self.option_pipe_outer_radius.get_value()  # get outer pipe radius
-        distance_max: float = r_borehole - r_outer_pipe  # calculate maximal distance between pipe and center
-        alpha: float = pi / n_u  # determine equal angle between pipes
-        # determine minimal distance between pipe and center
-        distance_min: float = r_outer_pipe / sin(alpha / 2) + 0.001  # add 1mm for safety
-        # set minimal and maximal value for pipe distance
-        self.option_pipe_distance.widget.blockSignals(True)
-        self.option_pipe_distance.widget.setMinimum(max(distance_min, self.option_pipe_distance.minimal_value))
-        self.option_pipe_distance.widget.setMaximum(min(distance_max, self.option_pipe_distance.maximal_value))
-        self.option_pipe_distance.widget.blockSignals(False)
-        # set minimal and maximal value for borehole radius
-        self.option_pipe_borehole_radius_2.widget.blockSignals(True)
-        self.option_pipe_borehole_radius_2.widget.setMinimum(max(r_outer_pipe + distance_min,
-                                                                 self.option_pipe_borehole_radius_2.minimal_value))
-        self.option_pipe_borehole_radius_2.widget.blockSignals(False)
-        self.option_pipe_borehole_radius.widget.blockSignals(True)
-        self.option_pipe_borehole_radius.widget.setMinimum(max(r_outer_pipe + distance_min,
-                                                                 self.option_pipe_borehole_radius.minimal_value))
-        self.option_pipe_borehole_radius.widget.blockSignals(False)
-        # set max value for pipe radius
-        self.option_pipe_outer_radius.widget.blockSignals(True)
-        self.option_pipe_outer_radius.widget.setMaximum(min(r_borehole-distance_min,
-                                                        self.option_pipe_outer_radius.maximal_value))
-        self.option_pipe_outer_radius.widget.blockSignals(False)
 
-        # set max number of U-tubes
-        alpha_min = 4 * asin(r_outer_pipe/pipe_distance)
-        max_nb_of_pipes = np.floor(2 * pi / alpha_min)
-        # set max number of pipes
-        self.option_pipe_number.widget.blockSignals(True)
-        self.option_pipe_number.widget.setMaximum(min(max_nb_of_pipes, self.option_pipe_number.maximal_value))
-        self.option_pipe_number.widget.blockSignals(False)
+        def Upipe():
+            n_u: int = self.option_pipe_number.get_value()  # get number of U pipes
+            if n_u == 0:
+                # can cause problems in loading
+                return  # pragma: no cover
+            pipe_distance: float = self.option_pipe_distance.get_value()  # get pipe distance
+            r_borehole: float = self.option_pipe_borehole_radius_2.get_value()  # get borehole radius
+            r_outer_pipe: float = self.option_pipe_outer_radius.get_value()  # get outer pipe radius
+            distance_max: float = r_borehole - r_outer_pipe  # calculate maximal distance between pipe and center
+            alpha: float = pi / n_u  # determine equal angle between pipes
+            # determine minimal distance between pipe and center
+            distance_min: float = r_outer_pipe / sin(alpha / 2) + 0.001  # add 1mm for safety
+
+            # set minimal and maximal value for pipe distance
+            self.option_pipe_distance.widget.blockSignals(True)
+            self.option_pipe_distance.widget.setMinimum(max(distance_min, self.option_pipe_distance.minimal_value))
+            self.option_pipe_distance.widget.setMaximum(min(distance_max, self.option_pipe_distance.maximal_value))
+            self.option_pipe_distance.widget.blockSignals(False)
+            # set minimal value for borehole radius
+            self.option_pipe_borehole_radius_2.widget.blockSignals(True)
+            self.option_pipe_borehole_radius_2.widget.setMinimum(max(r_outer_pipe + distance_min,
+                                                                     self.option_pipe_borehole_radius_2.minimal_value))
+            self.option_pipe_borehole_radius_2.widget.blockSignals(False)
+            self.option_pipe_borehole_radius.widget.blockSignals(True)
+            self.option_pipe_borehole_radius.widget.setMinimum(max(r_outer_pipe + distance_min,
+                                                                     self.option_pipe_borehole_radius.minimal_value))
+            self.option_pipe_borehole_radius.widget.blockSignals(False)
+            # set max value for pipe radius
+            self.option_pipe_outer_radius.widget.blockSignals(True)
+            self.option_pipe_outer_radius.widget.setMaximum(min(r_borehole-distance_min,
+                                                            self.option_pipe_outer_radius.maximal_value))
+            self.option_pipe_outer_radius.widget.blockSignals(False)
+
+            # set max number of U-tubes
+            alpha_min = 4 * asin(r_outer_pipe / pipe_distance)
+            max_nb_of_pipes = np.floor(2 * pi / alpha_min)
+            # set max number of pipes
+            self.option_pipe_number.widget.blockSignals(True)
+            self.option_pipe_number.widget.setMaximum(min(max_nb_of_pipes, self.option_pipe_number.maximal_value))
+            self.option_pipe_number.widget.blockSignals(False)
+
+        def coaxial():
+            r_borehole: float = self.option_pipe_borehole_radius_2.get_value()  # get borehole radius
+            r_outer_pipe: float = self.option_pipe_coaxial_outer_outer.get_value()  # get outer pipe radius
+            # set max value for outer pipe outer radius
+            self.option_pipe_outer_radius.widget.blockSignals(True)
+            self.option_pipe_outer_radius.widget.setMaximum(r_borehole)
+            self.option_pipe_outer_radius.widget.blockSignals(False)
+            # set min value for borehole radius
+            self.option_pipe_borehole_radius_2.widget.blockSignals(True)
+            self.option_pipe_borehole_radius_2.widget.setMinimum(max(r_outer_pipe,
+                                                                     self.option_pipe_borehole_radius_2.minimal_value))
+            self.option_pipe_borehole_radius_2.widget.blockSignals(False)
+            self.option_pipe_borehole_radius.widget.blockSignals(True)
+            self.option_pipe_borehole_radius.widget.setMinimum(max(r_outer_pipe,
+                                                                   self.option_pipe_borehole_radius.minimal_value))
+            self.option_pipe_borehole_radius.widget.blockSignals(False)
+        if self.option_U_pipe_or_coaxial_pipe.get_value() == 0:
+            Upipe()
+            return
+        coaxial()
 
     def update_borehole(self) -> None:
         """
-        This function plots the position of the pipe in the borehole.
+        This function plots the position of the U-pipe or coaxial pipe in the borehole.
         This figure can be either left or right of the options in the category
 
         Returns
@@ -1460,13 +1555,8 @@ class GUI(GuiStructure):
         frame = self.category_pipe_data.graphic_left if self.category_pipe_data.graphic_left is not None else \
             self.category_pipe_data.graphic_right
         if isinstance(frame, QtW.QGraphicsView):
-            # import all that is needed
-            # get variables from gui
-            number_of_pipes = self.option_pipe_number.get_value()
-            r_out = self.option_pipe_outer_radius.get_value() * 10
-            r_in = self.option_pipe_inner_radius.get_value() * 10
+            # draw general frame
             r_bore = max(self.option_pipe_borehole_radius.get_value() * 10, 0.001)
-            dis = self.option_pipe_distance.get_value() * 10
             # calculate scale from graphic view size
             max_l = min(frame.width(), frame.height())
             scale = max_l / r_bore / 1.25  # leave 25 % space
@@ -1493,29 +1583,64 @@ class GUI(GuiStructure):
             circle.setPen(QtG.QPen(grey, 0))
             circle.setBrush(grey)
             scene.addItem(circle)
-            # calculate pipe position and draw circle (white for outer pipe and blue for inner pipe)
-            dt: float = pi / float(number_of_pipes)
-            for i in range(number_of_pipes):
-                pos_1 = dis * cos(2.0 * i * dt + pi) / 2
-                pos_2 = dis * sin(2.0 * i * dt + pi) / 2
-                circle = QtW.QGraphicsEllipseItem((pos_1 - r_out / 2) * scale, (pos_2 - r_out / 2) * scale, r_out * scale, r_out * scale)
+
+            def Upipe():
+                # calculate pipe position and draw circle (white for outer pipe and blue for inner pipe)
+                # get variables from gui
+                number_of_pipes = self.option_pipe_number.get_value()
+                r_out = self.option_pipe_outer_radius.get_value() * 10
+                r_in = self.option_pipe_inner_radius.get_value() * 10
+                dis = self.option_pipe_distance.get_value() * 10
+                dt: float = pi / float(number_of_pipes)
+                for i in range(number_of_pipes):
+                    pos_1 = dis * cos(2.0 * i * dt + pi) / 2
+                    pos_2 = dis * sin(2.0 * i * dt + pi) / 2
+                    circle = QtW.QGraphicsEllipseItem((pos_1 - r_out / 2) * scale, (pos_2 - r_out / 2) * scale, r_out * scale, r_out * scale)
+                    circle.setPen(white_color)
+                    circle.setBrush(white_color)
+                    scene.addItem(circle)
+                    circle = QtW.QGraphicsEllipseItem((pos_1 - r_in / 2) * scale, (pos_2 - r_in / 2) * scale, r_in * scale, r_in * scale)
+                    circle.setPen(blue_color)
+                    circle.setBrush(blue_color)
+                    scene.addItem(circle)
+                    pos_1 = dis * cos(2.0 * i * dt + pi + dt) / 2
+                    pos_2 = dis * sin(2.0 * i * dt + pi + dt) / 2
+                    circle = QtW.QGraphicsEllipseItem((pos_1 - r_out / 2) * scale, (pos_2 - r_out / 2) * scale, r_out * scale, r_out * scale)
+                    circle.setPen(white_color)
+                    circle.setBrush(white_color)
+                    scene.addItem(circle)
+                    circle = QtW.QGraphicsEllipseItem((pos_1 - r_in / 2) * scale, (pos_2 - r_in / 2) * scale, r_in * scale, r_in * scale)
+                    circle.setPen(blue_light)
+                    circle.setBrush(blue_light)
+                    scene.addItem(circle)
+
+            def coaxial():
+                # get values from GUI
+                r_in_in = self.option_pipe_coaxial_inner_inner.get_value() * 10
+                r_in_out = self.option_pipe_coaxial_inner_outer.get_value() * 10
+                r_out_in = self.option_pipe_coaxial_outer_inner.get_value() * 10
+                r_out_out = self.option_pipe_coaxial_outer_outer.get_value() * 10
+                circle = QtW.QGraphicsEllipseItem(-r_out_out * scale / 2, -r_out_out * scale / 2, r_out_out * scale, r_out_out * scale)
                 circle.setPen(white_color)
                 circle.setBrush(white_color)
                 scene.addItem(circle)
-                circle = QtW.QGraphicsEllipseItem((pos_1 - r_in / 2) * scale, (pos_2 - r_in / 2) * scale, r_in * scale, r_in * scale)
+                circle = QtW.QGraphicsEllipseItem(-r_out_in * scale / 2, -r_out_in * scale / 2, r_out_in * scale, r_out_in * scale)
                 circle.setPen(blue_color)
                 circle.setBrush(blue_color)
                 scene.addItem(circle)
-                pos_1 = dis * cos(2.0 * i * dt + pi + dt) / 2
-                pos_2 = dis * sin(2.0 * i * dt + pi + dt) / 2
-                circle = QtW.QGraphicsEllipseItem((pos_1 - r_out / 2) * scale, (pos_2 - r_out / 2) * scale, r_out * scale, r_out * scale)
+                circle = QtW.QGraphicsEllipseItem(-r_in_out * scale / 2, -r_in_out * scale / 2, r_in_out * scale, r_in_out * scale)
                 circle.setPen(white_color)
                 circle.setBrush(white_color)
                 scene.addItem(circle)
-                circle = QtW.QGraphicsEllipseItem((pos_1 - r_in / 2) * scale, (pos_2 - r_in / 2) * scale, r_in * scale, r_in * scale)
+                circle = QtW.QGraphicsEllipseItem(-r_in_in * scale / 2, -r_in_in * scale / 2, r_in_in * scale, r_in_in * scale)
                 circle.setPen(blue_light)
                 circle.setBrush(blue_light)
                 scene.addItem(circle)
+
+            if self.option_U_pipe_or_coaxial_pipe.get_value() == 0:
+                Upipe()
+                return
+            coaxial()
 
     def update_borefield(self) -> None:
         """
@@ -1763,9 +1888,18 @@ class GUI(GuiStructure):
         try:
             fluid_data = FluidData(self.option_fluid_mass_flow.get_value(), self.option_fluid_conductivity.get_value(),
                                    self.option_fluid_density.get_value(), self.option_fluid_capacity.get_value(), self.option_fluid_viscosity.get_value())
-            pipe_data = PipeData(self.option_pipe_grout_conductivity.get_value(), self.option_pipe_inner_radius.get_value(), self.option_pipe_outer_radius.get_value(),
-                                 self.option_pipe_conductivity.get_value(), self.option_pipe_distance.get_value(), self.option_pipe_number.get_value(), self.option_pipe_roughness.get_value())
-
+            if self.option_U_pipe_or_coaxial_pipe.get_value() == 0:
+                pipe_data = MultipleUTube(self.option_pipe_grout_conductivity.get_value(), self.option_pipe_inner_radius.get_value(), self.option_pipe_outer_radius.get_value(),
+                                          self.option_pipe_conductivity.get_value(), self.option_pipe_distance.get_value(), self.option_pipe_number.get_value(), self.option_pipe_roughness.get_value())
+            else:
+                pipe_data = CoaxialPipe(self.option_pipe_coaxial_inner_inner.get_value(),
+                                        self.option_pipe_coaxial_inner_outer.get_value(),
+                                        self.option_pipe_coaxial_outer_inner.get_value(),
+                                        self.option_pipe_coaxial_outer_outer.get_value(),
+                                        self.option_pipe_conductivity.get_value(),
+                                        self.option_pipe_grout_conductivity.get_value(),
+                                        self.option_pipe_roughness.get_value(),
+                                        True)  # constant since this does not change anything
             borehole = Borehole(fluid_data, pipe_data)
             resistance = borehole.get_Rb(self.option_depth.get_value(), self.option_pipe_depth.get_value(), self.option_pipe_borehole_radius.get_value(), self.option_conductivity.get_value())
             self.pipe_thermal_resistance.set_text_value(f'{self.option_depth.get_value()}m): {round(resistance, 4)}')

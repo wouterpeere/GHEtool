@@ -1,6 +1,3 @@
-"""
-This file contains the base class for the ground classes.
-"""
 import abc
 from abc import ABC
 from GHEtool.VariableClasses.BaseClass import BaseClass

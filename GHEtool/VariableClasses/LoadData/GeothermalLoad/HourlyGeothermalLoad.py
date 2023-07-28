@@ -1,7 +1,3 @@
-"""
-This file contains the code for the hourly geothermal load data.
-"""
-
 import numpy as np
 import pandas as pd
 
@@ -277,7 +273,7 @@ class HourlyGeothermalLoad(_LoadData):
         return self.resample_to_monthly(self.hourly_heating_load)[0]
 
     @property
-    def hourly_cooling_simulation_period(self) -> np.ndarray:
+    def hourly_cooling_load_simulation_period(self) -> np.ndarray:
         """
         This function returns the hourly cooling in kWh/h for a whole simulation period.
 
@@ -297,7 +293,7 @@ class HourlyGeothermalLoad(_LoadData):
         -------
         resulting hourly load : np.ndarray
         """
-        return np.tile(self.hourly_cooling_load - self.hourly_heating_load, self.simulation_period)
+        return self.hourly_cooling_load_simulation_period - self.hourly_heating_load_simulation_period
 
     @property
     def hourly_heating_load_simulation_period(self) -> np.ndarray:
@@ -340,9 +336,9 @@ class HourlyGeothermalLoad(_LoadData):
         else:
             header = None
 
-        if col_heating == col_cooling:
-            ghe_logger.info('Only one column with data selected. Load will be splitted into heating and cooling load.')
-            # TODO
+        # TODO implement single column
+        # if col_heating == col_cooling:
+        #     ghe_logger.info('Only one column with data selected. Load will be splitted into heating and cooling load.')
 
         # import data
         df = pd.read_csv(file_path, sep=separator, header=header, decimal=decimal_seperator)

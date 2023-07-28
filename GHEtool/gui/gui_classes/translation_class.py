@@ -240,6 +240,11 @@ class Translations:  # pragma: no cover
         "hint_press_load",
         "cannot_load_new_version",
         "pipe_thermal_resistance",
+        "option_U_pipe_or_coaxial_pipe",
+        "option_pipe_coaxial_inner_inner",
+        "option_pipe_coaxial_outer_inner",
+        "option_pipe_coaxial_inner_outer",
+        "option_pipe_coaxial_outer_outer",
         "languages",
     )
 
@@ -1867,7 +1872,7 @@ class Translations:  # pragma: no cover
         ]
         self.geo_load: List[str] = [
             "Load type, Geothermal , Building ",
-            "Art der Belastung, Grundseite , Gebäudeseite ",
+            "Art der Belastung, Geothermieseite , Gebäudeseite ",
             "Type belasting, grondzijdig , gebouwzijdig ",
             "Load type, Geothermal , Building ",
             "Load type, Geothermal , Building ",
@@ -1929,4 +1934,49 @@ class Translations:  # pragma: no cover
             "The equivalent borehole thermal resistance (at , mK/W",
             "The equivalent borehole thermal resistance (at , mK/W",
             "The equivalent borehole thermal resistance (at , mK/W",
+        ]
+        self.option_U_pipe_or_coaxial_pipe: List[str] = [
+            "Borehole interals:, U-tube , Coaxial pipe ",
+            "Sondentyp:, U-Sonde , Koaxialsonde ",
+            "Type leiding:, U-buis , Coaxiaal",
+            "Borehole interal:, U-tube , Coaxial pipe ",
+            "Borehole interal:, U-tube , Coaxial pipe ",
+            "Borehole interal:, U-tube , Coaxial pipe ",
+            "Borehole interal:, U-tube , Coaxial pipe",
+        ]
+        self.option_pipe_coaxial_inner_inner: List[str] = [
+            "Inner pipe inner radius [m]: ",
+            "Innerer Radius des inneren Rohres [m]:",
+            "Binnenste leiding binnenstraal [m]:",
+            "Inner pipe inner radius [m]: ",
+            "Inner pipe inner radius [m]: ",
+            "Inner pipe inner radius [m]: ",
+            "Inner pipe inner radius [m]:",
+        ]
+        self.option_pipe_coaxial_outer_inner: List[str] = [
+            "Outer pipe inner radius [m]:",
+            "Äußerer Radius des inneren Rohres [m]:",
+            "Buitenste leiding binnenstraal [m]:",
+            "Outer pipe inner radius [m]:",
+            "Outer pipe inner radius [m]:",
+            "Outer pipe inner radius [m]:",
+            "Outer pipe inner radius [m]:",
+        ]
+        self.option_pipe_coaxial_inner_outer: List[str] = [
+            "Inner pipe outer radius [m]:",
+            "Innerer Radius des äußeren Rohres [m]:",
+            "Binnenste leiding buitenstraal [m]:",
+            "Inner pipe outer radius [m]:",
+            "Inner pipe outer radius [m]:",
+            "Inner pipe outer radius [m]:",
+            "Inner pipe outer radius [m]:",
+        ]
+        self.option_pipe_coaxial_outer_outer: List[str] = [
+            "Outer pipe outer radius [m]:",
+            "Äußerer Radius des äußeren Rohres [m]:",
+            "Buitenste leiding buitenstraal [m]:",
+            "Outer pipe outer radius [m]:",
+            "Outer pipe outer radius [m]:",
+            "Outer pipe outer radius [m]:",
+            "Outer pipe outer radius [m]:",
         ]

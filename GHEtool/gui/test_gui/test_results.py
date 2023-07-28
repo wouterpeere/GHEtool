@@ -9,7 +9,7 @@ import numpy as np
 import PySide6.QtWidgets as QtW
 import pandas as pd
 
-from GHEtool import Borefield, FOLDER, FluidData, GroundConstantTemperature, GroundFluxTemperature, PipeData, GroundTemperatureGradient, MonthlyGeothermalLoadAbsolute
+from GHEtool import Borefield, FOLDER, FluidData, GroundConstantTemperature, GroundFluxTemperature, GroundTemperatureGradient, MonthlyGeothermalLoadAbsolute, MultipleUTube
 from GHEtool.gui.data_2_borefield_func import data_2_borefield
 from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
 from GHEtool.gui.gui_classes.translation_class import Translations
@@ -329,10 +329,10 @@ def test_temp_profile_pipe_data(qtbot):
     conduct_pipe = round_down(gs.option_pipe_conductivity.get_value() * 1.5, 3)
     inner_pipe = round_down(gs.option_pipe_inner_radius.get_value() * 1.5, 4)
     dis = round_down(0.5 - (inner_pipe + 0.02 * 1.5) - 0.02, 4)
-    outer_pipe = round_down(inner_pipe + 0.02 * 1.5, 4)
+    outer_pipe = round_down(inner_pipe + 0.02 * 1.5 - 0.02, 4)
     roughness = round_down(gs.option_pipe_roughness.get_value() * 1.5, 7)
 
-    pipe_data = PipeData(conduct_grout, inner_pipe, outer_pipe, conduct_pipe, dis, main_window.gui_structure.option_pipe_number.get_value() + 2, roughness)
+    pipe_data = MultipleUTube(conduct_grout, inner_pipe, outer_pipe, conduct_pipe, dis, main_window.gui_structure.option_pipe_number.get_value() + 2, roughness)
     fluid_data = FluidData(gs.option_fluid_mass_flow.get_value(), gs.option_fluid_conductivity.get_value(), gs.option_fluid_density.get_value(),
                            gs.option_fluid_capacity.get_value(), gs.option_fluid_viscosity.get_value())
 
@@ -341,6 +341,7 @@ def test_temp_profile_pipe_data(qtbot):
     borefield = create_borefield(gs)
 
     gs.option_pipe_grout_conductivity.set_value(conduct_grout)
+    gs.option_pipe_distance.set_value(dis)
     gs.option_pipe_number.set_value(main_window.gui_structure.option_pipe_number.get_value() + 2)
     gs.option_pipe_outer_radius.set_value(outer_pipe)
     gs.option_pipe_inner_radius.set_value(inner_pipe)
@@ -349,11 +350,10 @@ def test_temp_profile_pipe_data(qtbot):
     gs.option_method_rb_calc.set_value(1)
 
     while not np.isclose(gs.option_pipe_distance.get_value(), dis):
-        gs.option_pipe_distance.set_value(dis)
+        gs.option_pipe_distance.set_value(dis)  # pragma: no cover
 
     borefield.set_pipe_parameters(pipe_data)
     borefield.set_fluid_parameters(fluid_data)
-
 
     main_window.save_scenario()
     ds = main_window.list_ds[-1]
@@ -384,8 +384,8 @@ def test_temp_profile_fluid_data(qtbot):
     viscosity = round_down(gs.option_fluid_viscosity.get_value() * 1.5, 6)
     flow_rate = round_down(gs.option_fluid_mass_flow.get_value() * 1.5, 3)
 
-    pipe_data = PipeData(gs.option_pipe_grout_conductivity.get_value(), gs.option_pipe_inner_radius.get_value(), gs.option_pipe_outer_radius.get_value(),
-                                        gs.option_pipe_conductivity.get_value(), gs.option_pipe_distance.get_value(), gs.option_pipe_number.get_value(), gs.option_pipe_roughness.get_value())
+    pipe_data = MultipleUTube(gs.option_pipe_grout_conductivity.get_value(), gs.option_pipe_inner_radius.get_value(), gs.option_pipe_outer_radius.get_value(),
+                              gs.option_pipe_conductivity.get_value(), gs.option_pipe_distance.get_value(), gs.option_pipe_number.get_value(), gs.option_pipe_roughness.get_value())
     fluid_data = FluidData(flow_rate, conduct, density, heat_cap, viscosity)
 
     gs.aim_temp_profile.widget.click() if not gs.aim_temp_profile.widget.isChecked() else None
@@ -633,3 +633,38 @@ def test_temp_profile_cooling_data(qtbot) -> None:
         assert func.keywords == {}
 
     main_window.delete_backup()
+
+
+def test_coaxial_and_gradient(qtbot):
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
+                             data_2_results_function=data_2_borefield)
+    main_window.delete_backup()
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
+                             data_2_results_function=data_2_borefield)
+
+    gs = main_window.gui_structure
+
+    gs.option_method_rb_calc.set_value(1)
+    gs.option_U_pipe_or_coaxial_pipe.set_value(1)
+    gs.option_method_temp_gradient.set_value(2)
+    main_window.save_scenario()
+    main_window.start_current_scenario_calculation(True)
+    with qtbot.waitSignal(main_window.threads[-1].any_signal, raising=False) as blocker:
+        main_window.threads[-1].run()
+        main_window.threads[-1].any_signal.connect(main_window.thread_function)
+
+    main_window.display_results()
+
+    assert gs.result_Rb_calculated.label.text() == 'Equivalent borehole thermal resistance: 0.0984 mK/W'
+    assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 16.55 °C'
+
+    gs.option_method_temp_gradient.set_value(1)
+    main_window.save_scenario()
+    main_window.start_current_scenario_calculation(True)
+    with qtbot.waitSignal(main_window.threads[-1].any_signal, raising=False) as blocker:
+        main_window.threads[-1].run()
+        main_window.threads[-1].any_signal.connect(main_window.thread_function)
+
+    main_window.display_results()
+    assert gs.result_Rb_calculated.label.text() == 'Equivalent borehole thermal resistance: 0.0984 mK/W'
+    assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 17.05 °C'

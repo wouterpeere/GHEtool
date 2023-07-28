@@ -1,7 +1,3 @@
-"""
-This file contains the code for the hourly geothermal load data for a multi-year input.
-"""
-
 import numpy as np
 
 from typing import Union
@@ -144,7 +140,7 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
 
 
     @property
-    def hourly_cooling_simulation_period(self) -> np.ndarray:
+    def hourly_cooling_load_simulation_period(self) -> np.ndarray:
         """
         This function returns the hourly cooling in kWh/h for a whole simulation period.
 
@@ -154,17 +150,6 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
             hourly cooling for the whole simulation period
         """
         return self._hourly_cooling_load
-
-    @property
-    def hourly_load_simulation_period(self) -> np.ndarray:
-        """
-        This function calculates the resulting hourly load in kW for the whole simulation period.
-
-        Returns
-        -------
-        resulting hourly load : np.ndarray
-        """
-        return self.hourly_cooling_simulation_period - self.hourly_heating_load_simulation_period
 
     @property
     def hourly_heating_load_simulation_period(self) -> np.ndarray:
