@@ -9,7 +9,7 @@ import pygfunction as gt
 import pytest
 from pytest import raises
 
-from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, PipeData, Borefield, SizingSetup, FOLDER
+from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, PipeData, Borefield, CalculationSetup, FOLDER
 from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
 

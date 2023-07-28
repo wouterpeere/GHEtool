@@ -15,7 +15,7 @@ from scipy.signal import convolve
 from warnings import warn
 
 from GHEtool.VariableClasses import FluidData, PipeData, Borehole, GroundConstantTemperature
-from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, SizingSetup
+from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, CalculationSetup
 from GHEtool.VariableClasses.LoadData import *
 from GHEtool.VariableClasses.LoadData import _LoadData
 from GHEtool.VariableClasses.BaseClass import BaseClass
@@ -36,15 +36,15 @@ class Borefield(BaseClass):
 
     HOURLY_LOAD_ARRAY: np.ndarray = np.arange(0, 8761, UPM).astype(np.uint32)
 
-    __slots__ = 'H', 'H_init', 'borehole',\
+    __slots__ = 'H', 'borehole',\
                 'number_of_boreholes', '_borefield', 'cost_investment', \
                 'Tf_max', 'Tf_min', 'limiting_quadrant', \
-                'Tf', \
+                'Tf',\
                 '_ground_data', '_borefield_load',\
                 'results_peak_heating', 'options_pygfunction',\
                 'results_peak_cooling', 'results_month_cooling', 'results_month_heating', 'Tb', 'THRESHOLD_WARNING_SHALLOW_FIELD', \
                 'gui', 'D', 'r_b', 'gfunction_calculation_object',\
-                'H_init', 'use_precalculated_data', '_sizing_setup', \
+                '_sizing_setup', \
                 '_secundary_borefield_load', '_building_load', '_external_load'
 
     def __init__(self, peak_heating: np.ndarray | list = None,
@@ -123,10 +123,6 @@ class Borefield(BaseClass):
         # that accurate.
         self.THRESHOLD_WARNING_SHALLOW_FIELD: int = 50
 
-        # setting this to False will make sure every g-value is calculated on the spot
-        # this will make everything way slower!
-        self.use_precalculated_data: bool = True
-
         self.custom_gfunction: CustomGFunction = custom_gfunction
         self.gfunction_calculation_object: GFunction = GFunction()
 
@@ -156,8 +152,7 @@ class Borefield(BaseClass):
         self.borehole = Borehole()
 
         # initiate different sizing
-        self._sizing_setup: SizingSetup = SizingSetup()
-        self.H_init: float = 100.
+        self._sizing_setup: CalculationSetup = CalculationSetup()
         self.sizing_setup()
 
         # check if the GHEtool is used by the gui i
@@ -814,8 +809,7 @@ class Borefield(BaseClass):
             self.H = L / self.number_of_boreholes
         return self.H
 
-    def sizing_setup(self, H_init: float = None, use_constant_Rb: bool = None, quadrant_sizing: int = 0,
-                     L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None, sizing_setup: SizingSetup = None) -> None:
+    def sizing_setup(self, sizing_setup: CalculationSetup = None, use_constant_Rb: bool = None, **kwargs) -> None:
         """
         This function sets the options for the sizing function.
 
@@ -827,22 +821,14 @@ class Borefield(BaseClass):
 
         Parameters
         ----------
-        H_init : float
-            Initial depth of the borefield to start the iteration (m)
+        sizing_setup : CalculationSetup
+            An instance of the CalculationSetup class. When this argument differs from None, all the other parameters are
+            set based on this calculation_setup
         use_constant_Rb : bool
             True if a constant borehole equivalent resistance (Rb*) value should be used
-        quadrant_sizing : int
-            Differs from 0 when a sizing in a certain quadrant is desired.
-            Quadrants are developed by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]_
-        L2_sizing : bool
-            True if a sizing with the L2 method is needed
-        L3_sizing : bool
-            True if a sizing with the L3 method is needed
-        L4_sizing : bool
-            True if a sizing with the L4 method is needed
-        sizing_setup : SizingSetup
-            An instance of the SizingSetup class. When this argument differs from None, all the other parameters are
-            set based on this sizing_setup
+        kwargs
+            Dictionary with all the other options that can be set within GHEtool. For a complete list,
+            see the documentation in the CalculationSetup class.
 
         Returns
         -------
@@ -853,23 +839,20 @@ class Borefield(BaseClass):
         .. [#PeereBS] Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. (2021) Validated combined first and last year borefield sizing methodology. In Proceedings of International Building Simulation Conference 2021. Brugge (Belgium), 1-3 September 2021. https://doi.org/10.26868/25222708.2021.30180
         .. [#PeereThesis] Peere, W. (2020) Methode voor economische optimalisatie van geothermische verwarmings- en koelsystemen. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
         """
-        if H_init is not None:
-            self.H_init = H_init
 
         # if sizing_setup is not None, then the sizing setup is set directly
         if sizing_setup is not None:
             self._sizing_setup = sizing_setup
             return
 
-        self._sizing_setup = SizingSetup(quadrant_sizing=quadrant_sizing,
-                                         L2_sizing=L2_sizing,
-                                         L3_sizing=L3_sizing,
-                                         L4_sizing=L4_sizing)
+        self._sizing_setup = CalculationSetup()
+        self._sizing_setup.update_variables(**kwargs)
+
         if not use_constant_Rb is None:
             self.borehole.use_constant_Rb = use_constant_Rb
 
     def size(self, H_init: float = None, use_constant_Rb: bool = None, L2_sizing: bool = None,
-             L3_sizing: bool = None, L4_sizing: bool = None, quadrant_sizing: int = None) -> float:
+             L3_sizing: bool = None, L4_sizing: bool = None, quadrant_sizing: int = None, **kwargs) -> float:
         """
         This function sets the options for the sizing function.
 
@@ -887,15 +870,18 @@ class Borefield(BaseClass):
             Initial depth for the iteration. If None, the default H_init is chosen.
         use_constant_Rb : bool
             True if a constant borehole equivalent resistance (Rb*) value should be used
-        quadrant_sizing : int
-            Differs from 0 when a sizing in a certain quadrant is desired.
-            Quadrants are developed by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]_
         L2_sizing : bool
             True if a sizing with the L2 method is needed
         L3_sizing : bool
             True if a sizing with the L3 method is needed
         L4_sizing : bool
             True if a sizing with the L4 method is needed
+        quadrant_sizing : int
+            Differs from 0 when a sizing in a certain quadrant is desired.
+            Quadrants are developed by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]_
+        kwargs : dict
+            Dictionary with all the other options that can be set within GHEtool. For a complete list,
+            see the documentation in the CalculationSetup class.
 
         Returns
         -------
@@ -910,17 +896,15 @@ class Borefield(BaseClass):
         if not self.ground_data.check_values():
             raise ValueError("Please provide ground data.")
 
-        # check H_init
-        if H_init is None:
-            H_init = self.H_init
-
         # make backup of initial parameter states
         self._sizing_setup.make_backup()
         use_constant_Rb_backup = self.borehole.use_constant_Rb
 
         # run the sizing setup
-        self._sizing_setup.update_variables(L2_sizing=L2_sizing, L3_sizing=L3_sizing, L4_sizing=L4_sizing,
+        self._sizing_setup.update_variables(H_init=H_init, L2_sizing=L2_sizing, L3_sizing=L3_sizing, L4_sizing=L4_sizing,
                                             quadrant_sizing=quadrant_sizing)
+        self._sizing_setup.update_variables(**kwargs)
+
         if not use_constant_Rb is None:
             self.borehole.use_constant_Rb = use_constant_Rb
 
@@ -1018,7 +1002,7 @@ class Borefield(BaseClass):
             raise ValueError(f'Quadrant {quadrant_sizing} does not exist.')
 
         # initiate with a given depth
-        self.H: float = H_init if H_init is not None else self.H_init
+        self.H: float = H_init if H_init is not None else self._sizing_setup.H_init
 
         def size_quadrant1():
             th, _, tcm, qh, qpm, qm = self.load._calculate_first_year_params(False)  # calculate parameters
@@ -1114,7 +1098,7 @@ class Borefield(BaseClass):
             raise ValueError(f'Quadrant {quadrant_sizing} does not exist.')
 
         # initiate with a given depth
-        self.H: float = H_init if H_init is not None else self.H_init
+        self.H: float = H_init if H_init is not None else self._sizing_setup.H_init
 
         if quadrant_sizing != 0:
             # size according to a specific quadrant
@@ -1173,7 +1157,7 @@ class Borefield(BaseClass):
             raise ValueError("There is no hourly resolution available!")
 
         # initiate with a given depth
-        self.H: float = H_init if H_init is not None else self.H_init
+        self.H: float = H_init if H_init is not None else self._sizing_setup.H_init
 
         if quadrant_sizing != 0:
             # size according to a specific quadrant
@@ -1743,7 +1727,7 @@ class Borefield(BaseClass):
         ## 1 bypass any possible precalculated g-functions
 
         # if calculate is False, then the gfunctions are calculated jit
-        if not self.use_precalculated_data:
+        if not self._sizing_setup.use_precalculate_dataset:
             return jit_gfunction_calculation()
 
         ## 2 use precalculated g-functions when available
