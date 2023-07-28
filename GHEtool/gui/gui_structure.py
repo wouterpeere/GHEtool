@@ -1484,7 +1484,8 @@ class GUI(GuiStructure):
         def Upipe():
             n_u: int = self.option_pipe_number.get_value()  # get number of U pipes
             if n_u == 0:
-                return
+                # can cause problems in loading
+                return  # pragma: no cover
             pipe_distance: float = self.option_pipe_distance.get_value()  # get pipe distance
             r_borehole: float = self.option_pipe_borehole_radius_2.get_value()  # get borehole radius
             r_outer_pipe: float = self.option_pipe_outer_radius.get_value()  # get outer pipe radius
