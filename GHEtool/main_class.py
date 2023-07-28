@@ -100,10 +100,12 @@ class Borefield(BaseClass):
 
         create the borefield object
 
-        >>> borefield = Borefield(peak_heating=peak_heating,
-        >>>                      peak_cooling=peak_cooling,
-        >>>                      baseload_heating=monthly_load_heating,
-        >>>                      baseload_cooling=monthly_load_cooling)
+        >>> borefield = Borefield()
+
+        set the load
+
+        >>> load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
+        >>> borefield.load = load
 
         """
 

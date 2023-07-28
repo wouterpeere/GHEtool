@@ -90,7 +90,7 @@ After importing the necessary classes, one sets all the relevant ground data and
 ```Python
 data =
 GroundDataConstantTemperature(3,   # ground thermal conductivity (W/mK)
-							  10,  # initial/undisturbed ground temperature (deg C)
+                              10,  # initial/undisturbed ground temperature (deg C)
                               2.4*10**6) # volumetric heat capacity of the ground (J/m3K) 
 ```
 
@@ -112,11 +112,7 @@ Next, one creates the borefield object in GHEtool and sets the temperature const
 
 ```Python
 # create the borefield object
-borefield = Borefield(load=load
-					  peak_heating=peak_heating,
-                      peak_cooling=peak_cooling,
-                      baseload_heating=monthly_load_heating,
-                      baseload_cooling=monthly_load_cooling)
+borefield = Borefield(load=load)
 
 # set ground parameters
 borefield.set_ground_parameters(data)
