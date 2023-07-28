@@ -21,7 +21,7 @@ class CalculationSetup(BaseClass):
     def __init__(self, quadrant_sizing: int = 0,
                  L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None,
                  atol: float = 0.05, rtol: float = 0.005, max_nb_of_iterations: int = 30,
-                 interpolate_gfunctions: bool = True, H_init: float = 100.,
+                 interpolate_gfunctions: bool = None, H_init: float = 100.,
                  use_precalculate_dataset: bool = True):
         """
 

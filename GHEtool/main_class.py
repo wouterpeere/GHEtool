@@ -1722,10 +1722,10 @@ class Borefield(BaseClass):
             """
             # set the correct depth of the borefield
             self._update_borefield_depth(H=H)
-            return self.gfunction_calculation_object.calculate(time_value, self.borefield, self.ground_data.alpha)
+            return self.gfunction_calculation_object.calculate(time_value, self.borefield, self.ground_data.alpha,
+                                                               interpolate=self._sizing_setup.interpolate_gfunctions)
 
         ## 1 bypass any possible precalculated g-functions
-
         # if calculate is False, then the gfunctions are calculated jit
         if not self._sizing_setup.use_precalculate_dataset:
             return jit_gfunction_calculation()
