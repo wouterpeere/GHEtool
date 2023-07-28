@@ -11,6 +11,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - New class of GroundData: GroundTemperatureGradient added (issue #145).
 - Load classes (issue #45).
 - Pipe classes (single, double, coaxial, Multiple U Tube) (issue #40 and #45).
+- Interpolation option in calculate function in Gfunction class (issue #159).
+- Absolute and relative tolerances for the sizing methods even as a maximum number of iterations is added, so there is more transparency and flexibility
+in the trade-off between accuracy and speed (issue #159).
 
 ## Changed
 - GUI was moved to a separate project: [ScenarioGUI](https://github.com/tblanke/ScenarioGUI).
@@ -21,6 +24,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Moved draw_borehole_internals to PipeClass (issue #45).
 - Borehole equivalent resistances is now calculated in one step, centralised in the pipe class (issue #45).
 - Go to 100% code coverage with 300 tests.
+- Rename SizingSetup class to CalculationSetup class (issue #159).
+- Move H_init to CalculationSetup class (issue #159).
+- Move use_precalcated_data to CalculationSetup class and rename to: 'use_precalculate_dataset' (issue #159).
 
 ## Fixed
 - Fixed problem with L2 sizing, when the peak load was the same in all months (issue #146).
