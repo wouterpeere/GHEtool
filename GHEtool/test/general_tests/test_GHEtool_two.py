@@ -101,6 +101,7 @@ def test_stuck_in_loop():
     # set temperature boundaries
     borefield.set_max_ground_temperature(16)  # maximum temperature
     borefield.set_min_ground_temperature(0)  # minimum temperature
+    borefield.sizing_setup(max_nb_of_iterations=50)
 
     borefield.size()
     borefield.set_length_peak_cooling(8)
