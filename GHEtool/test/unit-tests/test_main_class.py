@@ -790,7 +790,7 @@ def test_gfunction():
     np.testing.assert_array_almost_equal(borefield.gfunction([6000, 60000, 600000]), np.array([0.63751082, 1.70657847, 2.84227252]))
     borefield.create_custom_dataset()
     np.testing.assert_array_almost_equal(borefield.gfunction([6000, 60000, 600000]), np.array([0.622017, 1.703272, 2.840246]))
-    borefield.use_precalculated_data = False
+    borefield.sizing_setup(use_precalculated_dataset=False)
     np.testing.assert_array_almost_equal(borefield.gfunction([6000, 60000, 600000]), np.array([0.63751082, 1.70657847, 2.84227252]))
 
 

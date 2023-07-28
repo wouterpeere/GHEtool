@@ -16,13 +16,13 @@ class CalculationSetup(BaseClass):
 
     __slots__ = '_L2_sizing', '_L3_sizing', '_L4_sizing', 'quadrant_sizing', '_backup', \
                 'atol', 'rtol', 'max_nb_of_iterations', 'interpolate_gfunctions', 'H_init',\
-                'use_precalculate_dataset'
+                'use_precalculated_dataset'
 
     def __init__(self, quadrant_sizing: int = 0,
                  L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None,
                  atol: float = 0.05, rtol: float = 0.005, max_nb_of_iterations: int = 30,
                  interpolate_gfunctions: bool = None, H_init: float = 100.,
-                 use_precalculate_dataset: bool = True):
+                 use_precalculated_dataset: bool = True):
         """
 
         Parameters
@@ -50,7 +50,7 @@ class CalculationSetup(BaseClass):
             a slightly different result.
         H_init : float
             The initial depth for the different methods.
-        use_precalculate_dataset : bool
+        use_precalculated_dataset : bool
             True if a precalculated dataset of g-function should be used.
 
         References
@@ -69,7 +69,7 @@ class CalculationSetup(BaseClass):
         self.max_nb_of_iterations: int = max_nb_of_iterations
         self.interpolate_gfunctions: bool = interpolate_gfunctions
         self.H_init: float = H_init
-        self.use_precalculate_dataset: bool = use_precalculate_dataset
+        self.use_precalculated_dataset: bool = use_precalculated_dataset
 
         self._backup: CalculationSetup = None
 

@@ -1727,7 +1727,7 @@ class Borefield(BaseClass):
 
         ## 1 bypass any possible precalculated g-functions
         # if calculate is False, then the gfunctions are calculated jit
-        if not self._sizing_setup.use_precalculate_dataset:
+        if not self._sizing_setup.use_precalculated_dataset:
             return jit_gfunction_calculation()
 
         ## 2 use precalculated g-functions when available
