@@ -9,7 +9,7 @@ import pygfunction as gt
 import pytest
 from pytest import raises
 
-from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, PipeData, Borefield, SizingSetup, FOLDER
+from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, PipeData, Borefield, CalculationSetup, FOLDER
 from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
 
@@ -281,6 +281,14 @@ def test_value_error_cooling_dom_temp_gradient():
 
     try:
         borefield.size()
+        assert False  # pragma: no cover
+    except RuntimeError:
+        assert True
+
+    borefield.sizing_setup(max_nb_of_iterations=200)
+    try:
+        borefield.size()
+        assert False  # pragma: no cover
     except ValueError:
         assert True
 

@@ -9,6 +9,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Extra warning message if one wants to load a GHEtool file that was created with a newer version.
 - Borehole thermal resistance is now visible at the borehole thermal resistance page (issue #51).
 - New class of GroundData: GroundTemperatureGradient added (issue #145).
+- Interpolation option in calculate function in Gfunction class (issue #159).
+- Absolute and relative tolerances for the sizing methods even as a maximum number of iterations is added, so there is more transparency and flexibility
+in the trade-off between accuracy and speed (issue #159).
 
 ## Changed
 - GUI was moved to a seperate project: ScenarioGUI.
@@ -16,6 +19,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Rb is now solely handled by the borehole object.
 - load_hourly_profile is moved to the separate load classes (issue #45).
 - Removed 'set_hourly_cooling_load', 'set_hourly_heating_load' from main_class and move it to separate load class (issue #45).
+- Rename SizingSetup class to CalculationSetup class (issue #159).
+- Move H_init to CalculationSetup class (issue #159).
+- Move use_precalcated_data to CalculationSetup class and rename to: 'use_precalculate_dataset' (issue #159).
 
 ## Fixed
 - Fixed problem with L2 sizing, when the peak load was the same in all months (issue #146).
