@@ -12,8 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Load classes (issue #45).
 - Pipe classes (single, double, coaxial, Multiple U Tube) (issue #40 and #45).
 - Interpolation option in calculate function in Gfunction class (issue #159).
-- Absolute and relative tolerances for the sizing methods even as a maximum number of iterations is added, so there is more transparency and flexibility
-in the trade-off between accuracy and speed (issue #159).
+- Absolute and relative tolerances for the sizing methods even as a maximum number of iterations is added, so there is more transparency and flexibility in the trade-off between accuracy and speed (issue #159).
 
 ## Changed
 - GUI was moved to a separate project: [ScenarioGUI](https://github.com/tblanke/ScenarioGUI).
