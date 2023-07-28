@@ -742,7 +742,7 @@ class Borefield(BaseClass):
             RuntimeError if the max number of iterations is crossed
         """
         if iter + 1 > self._sizing_setup.max_nb_of_iterations:
-            raise RuntimeError(f'The maximum number of iterations {self._sizing_setup.max_nb_of_iterations} is crossed.'
+            raise RuntimeError(f'The maximum number of iterations {self._sizing_setup.max_nb_of_iterations} is crossed. '
                                f'There is no size convergence.')
         if old_depth == 0:
             return False

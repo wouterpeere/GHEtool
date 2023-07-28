@@ -218,23 +218,7 @@ def _create_pipe_data(ds: DataStorage) -> MultipleUTube | CoaxialPipe:
                        ds.option_pipe_conductivity,
                        ds.option_pipe_grout_conductivity,
                        ds.option_pipe_roughness,
-                       ds.option_is_inner_inlet)
-
-
-def _calculate_flux(ds: DataStorage) -> float:
-    """
-    This function calculates the geothermal flux.
-    This is calculated based on:
-
-    temperature gradient [K/100m] * conductivity [W/mK] / 100
-    = temperature gradient [K/m] * conductivity [W/mK]
-
-    Returns
-    -------
-    Geothermal flux : float
-        Geothermal flux in [W/m2]
-    """
-    return ds.option_temp_gradient * ds.option_conductivity / 100
+                       True)
 
 
 def _create_ground_data(ds: DataStorage) -> GroundData:

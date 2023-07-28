@@ -1478,7 +1478,7 @@ class GUI(GuiStructure):
         """
         if not self.started:
             return
-        if self.option_pipe_distance.is_hidden():
+        if self.category_pipe_data.is_hidden():
             return
 
         def Upipe():
