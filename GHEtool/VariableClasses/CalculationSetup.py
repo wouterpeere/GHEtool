@@ -20,7 +20,7 @@ class CalculationSetup(BaseClass):
 
     def __init__(self, quadrant_sizing: int = 0,
                  L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None,
-                 atol: float = 0.05, rtol: float = 0.005, max_nb_of_iterations: int = 30,
+                 atol: float = 0.05, rtol: float = 0.005, max_nb_of_iterations: int = 40,
                  interpolate_gfunctions: bool = None, H_init: float = 100.,
                  use_precalculated_dataset: bool = True):
         """
@@ -38,10 +38,10 @@ class CalculationSetup(BaseClass):
             True if a sizing with the L4 method is needed
         atol : float
             Absolute tolerance between two consecutive depths in the sizing method,
-            below which the iteration is stopped.
+            below which the iteration is stopped. False means that this tolerance is ignored.
         rtol : float
             Relative tolerance between two consecutive depths in the sizing method,
-             below which the iteration is stopped.
+             below which the iteration is stopped. False means that this tolerance is ignored.
         max_nb_of_iterations : int
             Max number of iterations after which the iteration is stopped.
         interpolate_gfunctions : bool

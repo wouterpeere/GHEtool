@@ -93,6 +93,6 @@ def test_assign_incorrect_variable():
     setup = CalculationSetup()
     try:
         setup.update_variables(test='test')
-        assert False  # pragma no cover
+        assert False  # pragma: no cover
     except ValueError:
         assert True

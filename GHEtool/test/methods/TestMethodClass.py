@@ -9,13 +9,14 @@ import copy
 class SizingObject:
 
     def __init__(self, borefield, L2_output=None, L3_output=None, L4_output=None,
-                 quadrant: int = None, error=None, error_L4=None, name: str = ""):
+                 quadrant: int = None, error_L2=None, error_L3=None, error_L4=None, name: str = ""):
         self.borefield: Borefield = copy.deepcopy(borefield)
         self.L2_output = L2_output
         self.L3_output = L3_output
         self.L4_output = L4_output
         self.quadrant = quadrant
-        self.error = error
+        self.error_L2 = error_L2
+        self.error_L3 = error_L3
         self.error_L4 = error_L4
         self.name = name
 
@@ -53,7 +54,7 @@ class TestMethodClass():
         for _, i in enumerate(self.list_of_test_objects):
             if not isinstance(i, SizingObject):
                 continue
-            if i.L2_output is None and i.error is None:
+            if i.L2_output is None and i.error_L2 is None:
                 continue
             if i.name != '':
                 list_of_names.append(i.name)
@@ -67,7 +68,7 @@ class TestMethodClass():
         for _, i in enumerate(self.list_of_test_objects):
             if not isinstance(i, SizingObject):
                 continue
-            if i.L3_output is None and i.error is None:
+            if i.L3_output is None and i.error_L3 is None:
                 continue
             if i.name != '':
                 list_of_names.append(i.name)
@@ -107,7 +108,7 @@ class TestMethodClass():
         for _, i in enumerate(self.list_of_test_objects):
             if not isinstance(i, SizingObject):
                 continue
-            if i.L2_output is not None or i.error is not None:
+            if i.L2_output is not None or i.error_L2 is not None:
                 temp.append(copy.deepcopy(i.borefield))
         return temp
 
@@ -117,8 +118,8 @@ class TestMethodClass():
         for _, i in enumerate(self.list_of_test_objects):
             if not isinstance(i, SizingObject):
                 continue
-            if i.L2_output is not None or i.error is not None:
-                temp.append((i.L2_output if i.L2_output is not None else i.error, i.quadrant))
+            if i.L2_output is not None or i.error_L2 is not None:
+                temp.append((i.L2_output if i.L2_output is not None else i.error_L2, i.quadrant))
         return temp
 
     @property
@@ -127,7 +128,7 @@ class TestMethodClass():
         for _, i in enumerate(self.list_of_test_objects):
             if not isinstance(i, SizingObject):
                 continue
-            if i.L3_output is not None or i.error is not None:
+            if i.L3_output is not None or i.error_L3 is not None:
                 temp.append(copy.deepcopy(i.borefield))
         return temp
 
@@ -137,8 +138,8 @@ class TestMethodClass():
         for _, i in enumerate(self.list_of_test_objects):
             if not isinstance(i, SizingObject):
                 continue
-            if i.L3_output is not None or i.error is not None:
-                temp.append((i.L3_output if i.L3_output is not None else i.error, i.quadrant))
+            if i.L3_output is not None or i.error_L3 is not None:
+                temp.append((i.L3_output if i.L3_output is not None else i.error_L3, i.quadrant))
         return temp
 
     @property

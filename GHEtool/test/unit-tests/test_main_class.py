@@ -889,3 +889,18 @@ def test_effect_H_init(H, result):
     load = MonthlyGeothermalLoadAbsolute(*load_case(1))
     borefield.load = load
     assert np.isclose(borefield.size(H_init=H), result)
+
+
+def test_depth_convergence():
+    borefield = Borefield()
+    borefield.sizing_setup(atol=1, rtol=0.01, max_nb_of_iterations=10)
+    try:
+        borefield._check_convergence(10, 12, 10)
+        assert False  # pragma: no cover
+    except RuntimeError:
+        assert True
+
+    assert borefield._check_convergence(10, 10, 1)
+    assert not borefield._check_convergence(10, 10.5, 1)
+    assert borefield._check_convergence(10, 10.001, 1)
+    assert not borefield._check_convergence(10000, 10002, 1)
