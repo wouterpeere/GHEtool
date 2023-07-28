@@ -42,3 +42,22 @@ class GroundConstantTemperature(_GroundData):
 
     def max_depth(self, max_temp) -> float:
         return self.Tg
+
+    def new_depth(self, limiting_temperature: float, perv_depth: float, calculated_old_temperature: float) -> float:
+        """
+        determines the new borehole depth based on old one
+
+        Parameters
+        ----------
+        limiting_temperature: float
+             temperature limit
+        perv_depth: float
+            previous depth
+        calculated_old_temperature: float
+            calculated temperature
+
+        Returns
+        -------
+            new depth
+        """
+        return (calculated_old_temperature - self.Tg) / (limiting_temperature - self.Tg) * perv_depth

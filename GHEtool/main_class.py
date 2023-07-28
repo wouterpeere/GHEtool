@@ -4,7 +4,6 @@ This file contains all the code for the borefield calculations.
 from __future__ import annotations
 
 from math import pi
-from pathlib import Path
 from typing import Tuple
 import logging
 
@@ -1207,11 +1206,16 @@ class Borefield(BaseClass):
 
     def calculate_next_depth(self, min_depth, H) -> float:
         # diff between the max temperature in peak cooling and the avg undisturbed ground temperature at depth H
+        t_max_l = (np.max(self.results_peak_cooling) - self.ground_data.calculate_Tg(H)) * H
+        root1, root2 = solve_quadratic(a=-self.ground_data.flux / self.ground_data.k_s / 2,b=(self.Tf_max - self.ground_data.calculate_Tg(0)), c=-1*t_max_l)
+        print(root1, root2, np.max(self.results_peak_cooling),  H)
         delta_temp = np.max(self.results_peak_cooling - self.ground_data.calculate_Tg(H))
         delta_wrt_max = self.Tf_max - self.ground_data.calculate_Tg(H)
         rel_diff = delta_wrt_max/delta_temp
         depth = H/rel_diff
-        return depth
+        print(depth)
+
+        return min(root1, root2)# depth
 
     def _size_based_on_temperature_profile(self, quadrant: int, hourly: bool = False, min_depth: float = None) -> (float, bool):
         """
@@ -1248,8 +1252,11 @@ class Borefield(BaseClass):
         # # initialise the results array
         # results = np.zeros(loads_short.size * 2)
 
-        if not min_depth is None:
+        if min_depth is not None:
             self.H = self.ground_data.max_depth(self.Tf_max)
+            self._calculate_temperature_profile(self.H, hourly=hourly)
+            if np.max(self.results_peak_cooling - self.Tf_max ) > 0:
+                raise UnsolvableDueToTemperatureGradient
             self.H = min_depth
 
 
@@ -1338,36 +1345,33 @@ class Borefield(BaseClass):
                 # self.results_peak_cooling = results_peak_cooling
                 self._calculate_temperature_profile(self.H, hourly=False)
             H_prev = self.H
-            if min_depth is None or not isinstance(self.ground_data, GroundFluxTemperature):
-                if quadrant == 1:
-                    # maximum temperature
-                    # convert back to required length
-                    self.H = (np.max(self.results_peak_cooling[:8760 if hourly else 12]) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
-                elif quadrant == 2:
-                    # maximum temperature
-                    # convert back to required length
-                    self.H = (np.max(self.results_peak_cooling[-8760 if hourly else -12:]) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
-                elif quadrant == 3:
-                    # minimum temperature
-                    # convert back to required length
-                    self.H = (np.min(self.results_peak_heating[:8760 if hourly else 12]) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
-                elif quadrant == 4:
-                    # minimum temperature
-                    # convert back to required length
-                    self.H = (np.min(self.results_peak_heating[-8760 if hourly else -12:]) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
-                elif quadrant == 10:
-                    # over all years
-                    # maximum temperature
-                    # convert back to required length
-                    self.H = (np.max(self.results_peak_cooling) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
-                elif quadrant == 20:
-                    # over all years
-                    # minimum temperature
-                    # convert back to required length
-                    self.H = (np.min(self.results_peak_heating) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
-            elif isinstance(self.ground_data, GroundFluxTemperature):
-                # for when the temperature gradient is active and it is cooling
-                self.H = self.calculate_next_depth(min_depth, H_prev)
+            if quadrant == 1:
+                # maximum temperature
+                # convert back to required length
+                self.H = self.ground_data.new_depth(self.Tf_max, H_prev, np.max(self.results_peak_cooling[:8760 if hourly else 12]))
+                # print(self.H)
+            elif quadrant == 2:
+                # maximum temperature
+                # convert back to required length
+                self.H = self.ground_data.new_depth(self.Tf_max, H_prev, np.max(self.results_peak_cooling[-8760 if hourly else -12:]))
+            elif quadrant == 3:
+                # minimum temperature
+                # convert back to required length
+                self.H = self.ground_data.new_depth(self.Tf_min, H_prev, np.min(self.results_peak_heating[:8760 if hourly else 12]))
+            elif quadrant == 4:
+                # minimum temperature
+                # convert back to required length
+                self.H = self.ground_data.new_depth(self.Tf_min, H_prev, np.min(self.results_peak_heating[-8760 if hourly else -12:]))
+            elif quadrant == 10:
+                # over all years
+                # maximum temperature
+                # convert back to required length
+                self.H = self.ground_data.new_depth(self.Tf_max, H_prev, np.max(self.results_peak_cooling))
+            elif quadrant == 20:
+                # over all years
+                # minimum temperature
+                # convert back to required length
+                self.H = self.ground_data.new_depth(self.Tf_min, H_prev, np.min(self.results_peak_heating))
             if self.H < 0:
                 return 0, False
 
