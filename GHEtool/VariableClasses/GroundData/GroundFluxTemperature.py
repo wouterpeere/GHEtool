@@ -1,5 +1,4 @@
 from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
-from GHEtool.utils.solve_quadratic_equation import solve_quadratic
 
 
 class GroundFluxTemperature(_GroundData):
@@ -47,28 +46,7 @@ class GroundFluxTemperature(_GroundData):
         return self.Tg + H * self.flux / self.k_s / 2
 
     def max_depth(self, max_temp) -> float:
-        return (max_temp - self.Tg) * self.k_s / self.flux
+        return (max_temp - self.Tg) * 2 * self.k_s / self.flux
 
     def delta_H(self, temp) -> float:
         return temp * 2 * self.k_s / self.flux
-
-    def new_depth(self, limiting_temperature: float, perv_depth: float, calculated_old_temperature: float) -> float:
-        """
-        determines the new borehole depth based on old one
-
-        Parameters
-        ----------
-        limiting_temperature: float
-             temperature limit
-        perv_depth: float
-            previous depth
-        calculated_old_temperature: float
-            calculated temperature
-
-        Returns
-        -------
-            new depth
-        """
-        t_max_l = (calculated_old_temperature - self.calculate_Tg(perv_depth)) * perv_depth
-        root1, root2 = solve_quadratic(a=-self.flux / self.k_s / 2,b=(limiting_temperature - self.calculate_Tg(0)), c=-1*t_max_l)
-        return min(root1, root2)

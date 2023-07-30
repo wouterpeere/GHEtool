@@ -1,5 +1,4 @@
 from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
-from GHEtool.utils.solve_quadratic_equation import solve_quadratic
 
 
 class GroundTemperatureGradient(_GroundData):
@@ -45,27 +44,3 @@ class GroundTemperatureGradient(_GroundData):
         # avg ground temperature is (Tg + gradient + Tg) / 2 = Tg + gradient / 2
         # divide by 100 since the gradient is in K/100m
         return self.Tg + H * self.gradient / 2 / 100
-
-    def max_depth(self, max_temp) -> float:
-        return (max_temp - self.Tg) * 100 / self.gradient
-
-    def new_depth(self, limiting_temperature: float, perv_depth: float, calculated_old_temperature: float) -> float:
-        """
-        determines the new borehole depth based on old one
-
-        Parameters
-        ----------
-        limiting_temperature: float
-             temperature limit
-        perv_depth: float
-            previous depth
-        calculated_old_temperature: float
-            calculated temperature
-
-        Returns
-        -------
-            new depth
-        """
-        t_max_l = (calculated_old_temperature - self.calculate_Tg(perv_depth)) * perv_depth
-        root1, root2 = solve_quadratic(a=-self.gradient / 2 / 100,b=(limiting_temperature - self.calculate_Tg(0)), c=-1*t_max_l)
-        return min(root1, root2)

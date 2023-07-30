@@ -55,25 +55,6 @@ class _GroundData(BaseClass, ABC):
 
         """
 
-    @abc.abstractmethod
-    def new_depth(self, limiting_temperature: float, perv_depth: float, calculated_old_temperature: float) -> float:
-        """
-        determines the new borehole depth based on old one
-
-        Parameters
-        ----------
-        limiting_temperature: float
-             temperature limit
-        perv_depth: float
-            previous depth
-        calculated_old_temperature: float
-            calculated temperature
-
-        Returns
-        -------
-            new depth
-        """
-
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
             return False
