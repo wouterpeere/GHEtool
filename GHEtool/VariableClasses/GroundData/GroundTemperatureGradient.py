@@ -44,3 +44,8 @@ class GroundTemperatureGradient(_GroundData):
         # avg ground temperature is (Tg + gradient + Tg) / 2 = Tg + gradient / 2
         # divide by 100 since the gradient is in K/100m
         return self.Tg + H * self.gradient / 2 / 100
+
+
+    def max_depth(self, max_temp) -> float:
+        # TODO implement
+        pass

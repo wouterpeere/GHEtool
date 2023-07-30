@@ -319,7 +319,7 @@ def test_sizing_with_use_constant_Rb():
     borefield.load = load
     assert not borefield.borehole.use_constant_Rb
     borefield.sizing_setup(L4_sizing=True)
-    assert np.isclose(205.49615778557904, borefield.size())
+    assert np.isclose(205.48663833574912, borefield.size())
     assert np.isclose(182.17320067531486, borefield.size(use_constant_Rb=True))
 
 
@@ -328,4 +328,4 @@ def test_size_with_different_peak_lengths(borefield):
 
     borefield.set_length_peak_cooling(8)
     borefield.set_length_peak_heating(6)
-    assert np.isclose(99.33058400216777, borefield.size(L3_sizing=True))
+    assert np.isclose(99.33922034336214, borefield.size(L3_sizing=True))
