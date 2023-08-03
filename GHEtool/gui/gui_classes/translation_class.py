@@ -245,6 +245,11 @@ class Translations:  # pragma: no cover
         "option_pipe_coaxial_outer_inner",
         "option_pipe_coaxial_inner_outer",
         "option_pipe_coaxial_outer_outer",
+        "option_advanced_options",
+        "category_advanced_options",
+        "option_atol",
+        "option_rtol",
+        "option_max_nb_of_iter",
         "languages",
     )
 
@@ -1979,4 +1984,49 @@ class Translations:  # pragma: no cover
             "Outer pipe outer radius [m]:",
             "Outer pipe outer radius [m]:",
             "Outer pipe outer radius [m]:",
+        ]
+        self.option_advanced_options: List[str] = [
+            "Enable advanced options?, No , Yes ",
+            "Aktiviere erweiterte Optionen?, Nein , Ja ",
+            "Activeer geavanceerde opties?, Nee, Ja ",
+            "Enable advanced options?, No , Yes ",
+            "Enable advanced options?, No , Yes ",
+            "Enable advanced options?, No , Yes ",
+            "Enable advanced options?, No , Yes ",
+        ]
+        self.category_advanced_options: List[str] = [
+            "Advanced options",
+            "Erweiterte Optionen",
+            "Geavanceerde opties",
+            "Advanced options",
+            "Advanced options",
+            "Advanced options",
+            "Advanced options",
+        ]
+        self.option_atol: List[str] = [
+            "Absolute tolerance for iteration convergence [m]:",
+            "Absolute Toleranz für Iterationskonvergenz [m]:",
+            "Absolute tolerance for iteration convergence [m]:",
+            "Absolute tolerance for iteration convergence [m]:",
+            "Absolute tolerance for iteration convergence [m]:",
+            "Absolute tolerance for iteration convergence [m]:",
+            "Absolute tolerance for iteration convergence [m]:",
+        ]
+        self.option_rtol: List[str] = [
+            "Relative tolerance for iteration convergence [%]:",
+            "Relative Toleranz für Iterationskonvergenz [%]:",
+            "Relative tolerance for iteration convergence [%]:",
+            "Relative tolerance for iteration convergence [%]:",
+            "Relative tolerance for iteration convergence [%]:",
+            "Relative tolerance for iteration convergence [%]:",
+            "Relative tolerance for iteration convergence [%]:",
+        ]
+        self.option_max_nb_of_iter: List[str] = [
+            "Maximum number of iterations to check for convergence [#]:",
+            "Maximale Anzahl der Iterationen, um auf Konvergenz zu prüfen [#]:",
+            "Maximum number of iterations to check for convergence [#]:",
+            "Maximum number of iterations to check for convergence [#]:",
+            "Maximum number of iterations to check for convergence [#]:",
+            "Maximum number of iterations to check for convergence [#]:",
+            "Maximum number of iterations to check for convergence [#]:",
         ]

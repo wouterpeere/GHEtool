@@ -219,6 +219,22 @@ class GUI(GuiStructure):
         self.aim_req_depth.add_link_2_show(self.option_method_size_depth)
         self.aim_temp_profile.add_link_2_show(self.option_temperature_profile_hourly)
 
+        self.category_advanced_options = Category(page=self.page_options, label=translations.category_advanced_options)
+        self.option_atol = FloatBox(translations.option_atol, 0.05, self.category_advanced_options,
+                                    decimal_number=2,
+                                    minimal_value=0.01,
+                                    maximal_value=100,
+                                    step=0.05)
+        self.option_rtol = FloatBox(translations.option_rtol, 0.5, self.category_advanced_options,
+                                    decimal_number=1,
+                                    minimal_value=0.1,
+                                    maximal_value=100,
+                                    step=1)
+        self.option_max_nb_of_iter = IntBox(translations.option_max_nb_of_iter, 40, self.category_advanced_options,
+                                            minimal_value=1,
+                                            maximal_value=100,
+                                            step=1)
+
         # create categories
         #create_category_calculation()
 
@@ -1457,6 +1473,11 @@ class GUI(GuiStructure):
         #create_page_thermal_demands()
         create_page_results()
         self.create_settings_page()
+
+        # add advanced options
+        self.option_advanced_options = ButtonBox(translations.option_advanced_options, 0,
+                                                 [' No ', ' Yes '], self.category_save_scenario)
+        self.option_advanced_options.add_link_2_show(self.category_advanced_options, on_index=1)
 
         # general settings
         self.create_lists()
