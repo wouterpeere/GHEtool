@@ -175,36 +175,33 @@ class GUI(GuiStructure):
         # set default parent for the class variables to avoid widgets creation not in the main window
         super().__init__(default_parent, translations)
 
-        #################################################################################################################
-        #                                                                                                               #
-        # GUI STRUCTURE                                                                                                 #
-        #                                                                                                               #
-        #################################################################################################################
+        self._page_aim(translations)
+        self._page_options(translations)
+        self._page_borefield(translations)
+        self._page_earth(translations)
+        self._page_borehole_resistance(translations)
+        self._page_thermal_demand(translations)
+        self._page_results(translations)
+        self._page_settings(translations)
+        self._create_lists()
 
+    def _page_aim(self, translations):
+            # create page
+            self.page_aim = Page(name=translations.page_aim, button_name="Aim", icon="Aim_Inv.svg")
 
-        #def create_page_aim():
-        # create page
-        self.page_aim = Page(name=translations.page_aim, button_name="Aim", icon="Aim_Inv.svg")
+            self.aim_temp_profile = Aim(page=self.page_aim, label=translations.aim_temp_profile, icon="Temp_Profile.svg")
+            self.aim_req_depth = Aim(page=self.page_aim, label=translations.aim_req_depth, icon="depth_determination.svg")
+            self.aim_optimize = Aim(page=self.page_aim, label=translations.aim_optimize, icon="Optimize_Profile.svg")
 
-        self.aim_temp_profile = Aim(page=self.page_aim, label=translations.aim_temp_profile, icon="Temp_Profile.svg")
-        self.aim_req_depth = Aim(page=self.page_aim, label=translations.aim_req_depth, icon="depth_determination.svg")
-        # self.aim_size_length = Aim(page=self.page_aim, label="Size borefield by length and width", icon="Size_Length.svg")
-        self.aim_optimize = Aim(page=self.page_aim, label=translations.aim_optimize, icon="Optimize_Profile.svg")
-
-        #def create_page_options():
+    def _page_options(self, translations):
         # create page
         self.page_options = Page(translations.page_options, "Options", "Options.svg")
-        self.page_aim.set_next_page(self.page_options)
-        self.page_options.set_previous_page(self.page_aim)
 
-        #def create_category_calculation():
         self.category_calculation = Category(page=self.page_options, label=translations.category_calculation)
 
         self.option_method_size_depth = ButtonBox(label=translations.option_method_size_depth, default_index=0,
                                                   entries=[" L2 ", " L3 ", "  L4  "],
                                                   category=self.category_calculation)
-        # self.option_method_size_length = ButtonBox(label="Method for size width and length:", default_index=0,
-        #                                            entries=[" L2 ", " L3 "], category=self.category_calculation)
         self.option_method_temp_gradient = ButtonBox(
             label=translations.option_method_temp_gradient, default_index=0,
             entries=[" none ", " heat flux ", " temperature gradient "], category=self.category_calculation)
@@ -215,7 +212,6 @@ class GUI(GuiStructure):
             label=translations.option_temperature_profile_hourly, default_index=0,
             entries=[" no ", " yes "], category=self.category_calculation)
         # add dependencies
-        # self.aim_size_length.add_link_2_show(self.option_method_size_length)
         self.aim_req_depth.add_link_2_show(self.option_method_size_depth)
         self.aim_temp_profile.add_link_2_show(self.option_temperature_profile_hourly)
 
@@ -235,14 +231,9 @@ class GUI(GuiStructure):
                                             maximal_value=100,
                                             step=1)
 
-        # create categories
-        #create_category_calculation()
-
-        # def create_page_borehole():
+    def _page_borefield(self, translations):
         # create page
         self.page_borefield = Page(translations.page_borefield, "Borehole\nand earth", "RectField")
-        self.page_options.set_next_page(self.page_borefield)
-        self.page_borefield.set_previous_page(self.page_options)
 
         self.aim_rect = Aim(page=self.page_borefield, label="Rectangular borefield", icon="RectField.svg")
         self.aim_Box_shaped = Aim(page=self.page_borefield, label="Box shaped borefield", icon="BoxField.svg")
@@ -251,7 +242,6 @@ class GUI(GuiStructure):
         self.aim_circle = Aim(page=self.page_borefield, label="Circle borefield", icon="CircleField.svg")
         self.aim_custom = Aim(page=self.page_borefield, label="Customized borefield", icon="FlexField.svg")
 
-        # def create_category_borehole():
         self.category_borefield = Category(
             page=self.page_borefield,
             label=translations.category_borehole,
@@ -267,15 +257,6 @@ class GUI(GuiStructure):
             maximal_value=5_000,
             step=1,
         )
-        # self.option_max_depth = FloatBox(
-        #     category=self.category_borehole,
-        #     label="Maximal borehole depth [m]: ",
-        #     default_value=150,
-        #     decimal_number=2,
-        #     minimal_value=0,
-        #     maximal_value=500,
-        #     step=1,
-        # )
         self.option_spacing_width = FloatBox(
             category=self.category_borefield,
             label=translations.option_spacing_width,
@@ -303,24 +284,6 @@ class GUI(GuiStructure):
         self.option_number_circle_boreholes = els.IntBox(category=self.category_borefield, label=translations.option_number_circle_boreholes,
                                                     minimal_value=2, maximal_value=1_000_000, default_value=12, step=1)
         self.option_number_circle_boreholes.change_event(self.update_borefield)
-        # self.option_min_spacing = FloatBox(
-        #     category=self.category_borehole,
-        #     label="Minimal borehole spacing [m]: ",
-        #     default_value=3,
-        #     decimal_number=2,
-        #     minimal_value=1,
-        #     maximal_value=99,
-        #     step=0.1,
-        # )
-        # self.option_max_spacing = FloatBox(
-        #     category=self.category_borehole,
-        #     label="Maximal borehole spacing [m]: ",
-        #     default_value=9,
-        #     decimal_number=2,
-        #     minimal_value=1,
-        #     maximal_value=99,
-        #     step=0.1,
-        # )
         self.option_width = IntBox(
             category=self.category_borefield, label=translations.option_width, default_value=9, minimal_value=1, maximal_value=40
         )
@@ -329,24 +292,7 @@ class GUI(GuiStructure):
             category=self.category_borefield, label=translations.option_length, default_value=12, minimal_value=1, maximal_value=40
         )
         self.option_length.change_event(self.update_borefield)
-        # self.option_max_width = FloatBox(
-        #     category=self.category_borehole,
-        #     label="Maximal width of rectangular field [m]: ",
-        #     default_value=160,
-        #     decimal_number=2,
-        #     minimal_value=1,
-        #     maximal_value=1000,
-        #     step=1,
-        # )
-        # self.option_max_length = FloatBox(
-        #     category=self.category_borehole,
-        #     label="Maximal length of rectangular field [m]: ",
-        #     default_value=150,
-        #     decimal_number=2,
-        #     minimal_value=1,
-        #     maximal_value=1000,
-        #     step=1,
-        # )
+
         self.option_pipe_depth = FloatBox(
             category=self.category_borefield,
             label=translations.option_pipe_depth,
@@ -378,7 +324,6 @@ class GUI(GuiStructure):
         )
         self.option_tilted.hide()
 
-
         self.option_seperator_borefield = ButtonBox(label=translations.option_seperator_borefield, default_index=0,
                                               entries=['Semicolon ";"', 'Comma ","', 'Tab "   "'],
                                               category=self.category_borefield)
@@ -399,19 +344,16 @@ class GUI(GuiStructure):
         self.custom_borefield.add_option(els.FloatBox, name="buried depth [m]", default_value=2, minimal_value=0, maximal_value=1_000_000,  decimal_number=2)
         self.custom_borefield.add_option(els.FloatBox, name="Borehole radius [m]", default_value=0.075, minimal_value=0, maximal_value=1_000,
                                          decimal_number=4, step=0.01)
-        # self.custom_borefield.add_option(els.FloatBox, name="tilt [Â°]", default_value=0, minimal_value=-90, maximal_value=90)
+
         self.custom_borefield.change_event(self.update_borefield)
 
         # add dependencies
-        #self.aim_temp_profile.add_link_2_show(self.option_depth)
-        #self.aim_optimize.add_link_2_show(self.option_depth)
         li_aim = [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth, self.aim_rect, self.aim_Box_shaped, self.aim_L_shaped, self.aim_U_shaped,
                   self.aim_circle, self.aim_custom]
         _ = [aim.change_event(partial(show_option_on_multiple_aims,
                                       [self.aim_optimize, self.aim_temp_profile],
                                       [self.aim_rect, self.aim_Box_shaped, self.aim_L_shaped, self.aim_U_shaped, self.aim_circle],
                                       self.option_depth)) for aim in li_aim]
-        # self.aim_size_length.add_link_2_show(self.option_max_depth)
 
         _ = [aim.change_event(partial(show_option_on_multiple_aims,
                                       [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
@@ -421,9 +363,6 @@ class GUI(GuiStructure):
                                       [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
                                       [self.aim_rect,self.aim_Box_shaped, self.aim_L_shaped,self.aim_U_shaped],
                                       self.option_spacing_length)) for aim in li_aim]
-
-        # self.aim_size_length.add_link_2_show(self.option_min_spacing)
-        # self.aim_size_length.add_link_2_show(self.option_max_spacing)
 
         _ = [aim.change_event(partial(show_option_on_multiple_aims,
                                       [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
@@ -484,11 +423,9 @@ class GUI(GuiStructure):
 
         self.page_borefield.add_function_called_if_button_clicked(self.update_borefield)
 
+    def _page_earth(self, translations):
         self.page_earth = Page(translations.page_earth, "earth", "Borehole.png")
-        self.page_borefield.set_next_page(self.page_earth)
-        self.page_earth.set_previous_page(self.page_borefield)
 
-        # def create_category_earth():
         self.category_earth = Category(
             page=self.page_earth,
             label=translations.category_earth,
@@ -559,10 +496,6 @@ class GUI(GuiStructure):
         self.option_method_temp_gradient.add_link_2_show(self.option_ground_temp_gradient, on_index=2)
         self.option_method_temp_gradient.add_link_2_show(self.option_ground_temp, on_index=0)
 
-        # self.aim_size_length.add_link_2_show(self.option_max_width)
-        # self.aim_size_length.add_link_2_show(self.option_max_length)
-
-        # def create_category_temperatures():
         self.category_temperatures = Category(page=self.page_earth, label=translations.category_temperatures)
 
         self.option_min_temp = FloatBox(
@@ -609,18 +542,10 @@ class GUI(GuiStructure):
         self.option_method_size_depth.add_link_2_show(self.option_len_peak_cooling, on_index=1)
         self.aim_optimize.add_link_2_show(self.option_len_peak_cooling)
 
-        # create categories
-        #create_category_earth()
-        #create_category_borehole()
-        #create_category_temperatures()
-
-        #def create_page_borehole_resistance():
+    def _page_borehole_resistance(self, translations):
         # create page
         self.page_borehole_resistance = Page(translations.page_borehole_resistance, "Borehole\nresistance", "Resistance.png")
-        self.page_borefield.set_next_page(self.page_borehole_resistance)
-        self.page_borehole_resistance.set_previous_page(self.page_borefield)
 
-        #def create_category_constant_rb():
         self.category_constant_rb = Category(page=self.page_borehole_resistance, label=translations.category_constant_rb)
 
         self.option_constant_rb = FloatBox(
@@ -636,7 +561,6 @@ class GUI(GuiStructure):
         # add dependency
         self.option_method_rb_calc.add_link_2_show(self.category_constant_rb, on_index=0)
 
-        #def create_category_fluid_data():
         self.category_fluid_data = Category(page=self.page_borehole_resistance, label=translations.category_fluid_data)
 
         self.option_fluid_conductivity = FloatBox(
@@ -838,7 +762,6 @@ class GUI(GuiStructure):
         self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_number, on_index=0)
         self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_distance, on_index=0)
 
-
         # set update events
         self.option_pipe_number.change_event(self.check_correct_pipe_data)
         self.option_pipe_outer_radius.change_event(self.check_correct_pipe_data)
@@ -879,16 +802,9 @@ class GUI(GuiStructure):
         self.option_conductivity.change_event(self.update_borehole_thermal_resistance)
         self.option_depth.change_event(self.update_borehole_thermal_resistance)
 
-        # create categories
-        #create_category_constant_rb()
-        #create_category_fluid_data()
-        #create_category_pipe_data()
-
-        # def create_page_thermal_demands():
+    def _page_thermal_demand(self, translations):
         # create page
         self.page_thermal = Page(translations.page_thermal, "Thermal\ndemands", "Thermal.svg")
-        self.page_borehole_resistance.set_next_page(self.page_thermal)
-        self.page_thermal.set_previous_page(self.page_borefield)
 
         def create_category_select_datafile():
             self.category_select_file = Category(page=self.page_thermal, label=translations.category_select_file)
@@ -916,7 +832,7 @@ class GUI(GuiStructure):
             self.option_unit_data = ButtonBox(label=translations.option_unit_data, default_index=1, entries=["W", "kW", "MW"],
                                               category=self.category_select_file)
 
-            self.hint_press_load = Hint(hint=self.translations.hint_press_load,
+            self.hint_press_load = Hint(hint=translations.hint_press_load,
                                         category=self.category_select_file,
                                         warning=True)
 
@@ -1271,13 +1187,13 @@ class GUI(GuiStructure):
 
         def create_category_building_demand():
             self.category_demand_building_or_geo =\
-                Category(page=self.page_thermal, label=self.translations.category_demand_building_or_geo)
-            self.geo_load = ButtonBox(label=self.translations.geo_load, default_index=0,
+                Category(page=self.page_thermal, label=translations.category_demand_building_or_geo)
+            self.geo_load = ButtonBox(label=translations.geo_load, default_index=0,
                                       entries=[" goethermal ", " building "],
                                       category=self.category_demand_building_or_geo)
             self.SCOP = FloatBox(
                 category=self.category_demand_building_or_geo,
-                label=self.translations.SCOP,
+                label=translations.SCOP,
                 default_value=4,
                 decimal_number=2,
                 minimal_value=1,
@@ -1286,7 +1202,7 @@ class GUI(GuiStructure):
             )
             self.SEER = FloatBox(
                 category=self.category_demand_building_or_geo,
-                label=self.translations.SEER,
+                label=translations.SEER,
                 default_value=3,
                 decimal_number=2,
                 minimal_value=1,
@@ -1307,171 +1223,167 @@ class GUI(GuiStructure):
         create_category_building_demand()
         create_category_th_demand()
 
-        def create_page_results():
+    def _page_results(self, translations):
+        self.create_results_page()
 
-            self.create_results_page()
+        def create_category_numerical_results():
+            self.numerical_results = Category(page=self.page_result, label=translations.numerical_results)
 
-            def create_category_numerical_results():
-                self.numerical_results = Category(page=self.page_result, label=translations.numerical_results)
+            self.result_text_depth = ResultText(translations.result_text_depth, category=self.numerical_results,
+                                                prefix="Depth: ", suffix="m")
+            self.result_text_depth.text_to_be_shown("Borefield", "H")
+            self.result_text_depth.function_to_convert_to_text(lambda x: round(x, 2))
 
-                self.result_text_depth = ResultText(translations.result_text_depth, category=self.numerical_results, prefix="Depth: ", suffix="m")
-                self.result_text_depth.text_to_be_shown("Borefield", "H")
-                self.result_text_depth.function_to_convert_to_text(lambda x: round(x, 2))
+            self.result_Rb_calculated = ResultText(translations.result_Rb_calculated, category=self.numerical_results,
+                                                   prefix="Equivalent borehole thermal resistance: ", suffix="Wm/K")
+            self.result_Rb_calculated.text_to_be_shown("Borefield", "Rb")
+            self.result_Rb_calculated.function_to_convert_to_text(lambda x: round(x, 4))
 
-                self.result_Rb_calculated = ResultText(translations.result_Rb_calculated, category=self.numerical_results,
-                                                       prefix="Equivalent borehole thermal resistance: ", suffix="Wm/K")
-                self.result_Rb_calculated.text_to_be_shown("Borefield", "Rb")
-                self.result_Rb_calculated.function_to_convert_to_text(lambda x: round(x, 4))
+            self.result_Reynolds = ResultText(translations.result_Reynolds,
+                                              category=self.numerical_results,
+                                              prefix="Reynolds number: ", suffix="")
+            self.result_Reynolds.text_to_be_shown("Borefield", "Re")
+            self.result_Reynolds.function_to_convert_to_text(lambda x: round(x, 0))
 
-                self.result_Reynolds = ResultText(self.translations.result_Reynolds,
-                                                       category=self.numerical_results,
-                                                       prefix="Reynolds number: ", suffix="")
-                self.result_Reynolds.text_to_be_shown("Borefield", "Re")
-                self.result_Reynolds.function_to_convert_to_text(lambda x: round(x, 0))
+            self.results_ground_temperature = ResultText(translations.results_ground_temperature,
+                                                         category=self.numerical_results,
+                                                         prefix="Average ground temperature: ", suffix=" deg C")
+            self.results_ground_temperature.text_to_be_shown("Borefield", "_Tg")
+            self.results_ground_temperature.function_to_convert_to_text(lambda x: round(x, 2))
 
-                self.results_ground_temperature = ResultText(translations.results_ground_temperature, category=self.numerical_results,
-                                                             prefix="Average ground temperature: ", suffix=" deg C")
-                self.results_ground_temperature.text_to_be_shown("Borefield", "_Tg")
-                self.results_ground_temperature.function_to_convert_to_text(lambda x: round(x, 2))
-
-                self.results_heating_load = ResultText(translations.results_heating_load, category=self.numerical_results,
-                                                       prefix="Heating load on the borefield: ", suffix=" kWh")
-                self.results_heating_peak_geo = ResultText(self.translations.results_heating_peak_geo,
-                                                       category=self.numerical_results,
-                                                       prefix="with a peak of: ", suffix=" kW")
-                self.results_heating_peak_geo.text_to_be_shown("Borefield", "_secundary_borefield_load")
-                self.results_heating_peak_geo.function_to_convert_to_text(lambda x: round(getattr(x, "max_peak_heating"), 2))
-                self.results_heating_load.text_to_be_shown("Borefield", "_secundary_borefield_load")
-                self.results_heating_load.function_to_convert_to_text(lambda x: round(np.sum(getattr(x, "hourly_heating_load")), 0))
-                self.results_heating_load_percentage = ResultText(translations.results_heating_load_percentage, category=self.numerical_results,
-                                                                  prefix="This is ", suffix="% of the heating load")
-                self.results_heating_load_percentage.text_to_be_shown("Borefield", "_percentage_heating")
-                self.results_heating_load_percentage.function_to_convert_to_text(lambda x: round(x, 2))
-                self.results_heating_ext = ResultText(translations.results_heating_ext, category=self.numerical_results,
-                                                      prefix="heating load external: ", suffix=" kWh")
-                self.results_heating_ext.text_to_be_shown("Borefield", "_external_load")
-                self.results_heating_ext.function_to_convert_to_text(lambda x: round(np.sum(getattr(x, "hourly_heating_load"), 0)))
-                self.results_heating_peak = ResultText(translations.results_heating_peak, category=self.numerical_results,
-                                                       prefix="with a peak of: ", suffix=" kW")
-                self.results_heating_peak.text_to_be_shown("Borefield", "_external_load")
-                self.results_heating_peak.function_to_convert_to_text(lambda x: round(getattr(x, 'max_peak_heating'), 2))
-
-                self.results_cooling_load = ResultText(translations.results_cooling_load, category=self.numerical_results,
-                                                       prefix="Cooling load on the borefield: ", suffix=" kWh")
-                self.results_cooling_peak_geo = ResultText(self.translations.results_cooling_peak_geo,
+            self.results_heating_load = ResultText(translations.results_heating_load, category=self.numerical_results,
+                                                   prefix="Heating load on the borefield: ", suffix=" kWh")
+            self.results_heating_peak_geo = ResultText(translations.results_heating_peak_geo,
                                                        category=self.numerical_results,
                                                        prefix="with a peak of: ", suffix=" kW")
-                self.results_cooling_peak_geo.text_to_be_shown("Borefield", "_secundary_borefield_load")
-                self.results_cooling_peak_geo.function_to_convert_to_text(lambda x: round(getattr(x, 'max_peak_cooling'), 2))
-                self.results_cooling_load.text_to_be_shown("Borefield", "_secundary_borefield_load")
-                self.results_cooling_load.function_to_convert_to_text(lambda x: round(np.sum(getattr(x, 'hourly_cooling_load')), 0))
-                self.results_cooling_load_percentage = ResultText(translations.results_cooling_load_percentage, category=self.numerical_results,
-                                                                  prefix="This is ", suffix="% of the cooling load")
-                self.results_cooling_load_percentage.text_to_be_shown("Borefield", "_percentage_cooling")
-                self.results_cooling_load_percentage.function_to_convert_to_text(lambda x: round(x, 2))
-                self.results_cooling_ext = ResultText(translations.results_cooling_ext, category=self.numerical_results,
-                                                      prefix="cooling load external: ", suffix=" kWh")
-                self.results_cooling_ext.text_to_be_shown("Borefield", "_external_load")
-                self.results_cooling_ext.function_to_convert_to_text(lambda x: round(np.sum(getattr(x, 'hourly_cooling_load')), 0))
-                self.results_cooling_peak = ResultText(translations.results_cooling_peak, category=self.numerical_results,
+            self.results_heating_peak_geo.text_to_be_shown("Borefield", "_secundary_borefield_load")
+            self.results_heating_peak_geo.function_to_convert_to_text(
+                lambda x: round(getattr(x, "max_peak_heating"), 2))
+            self.results_heating_load.text_to_be_shown("Borefield", "_secundary_borefield_load")
+            self.results_heating_load.function_to_convert_to_text(
+                lambda x: round(np.sum(getattr(x, "hourly_heating_load")), 0))
+            self.results_heating_load_percentage = ResultText(translations.results_heating_load_percentage,
+                                                              category=self.numerical_results,
+                                                              prefix="This is ", suffix="% of the heating load")
+            self.results_heating_load_percentage.text_to_be_shown("Borefield", "_percentage_heating")
+            self.results_heating_load_percentage.function_to_convert_to_text(lambda x: round(x, 2))
+            self.results_heating_ext = ResultText(translations.results_heating_ext, category=self.numerical_results,
+                                                  prefix="heating load external: ", suffix=" kWh")
+            self.results_heating_ext.text_to_be_shown("Borefield", "_external_load")
+            self.results_heating_ext.function_to_convert_to_text(
+                lambda x: round(np.sum(getattr(x, "hourly_heating_load"), 0)))
+            self.results_heating_peak = ResultText(translations.results_heating_peak, category=self.numerical_results,
+                                                   prefix="with a peak of: ", suffix=" kW")
+            self.results_heating_peak.text_to_be_shown("Borefield", "_external_load")
+            self.results_heating_peak.function_to_convert_to_text(lambda x: round(getattr(x, 'max_peak_heating'), 2))
+
+            self.results_cooling_load = ResultText(translations.results_cooling_load, category=self.numerical_results,
+                                                   prefix="Cooling load on the borefield: ", suffix=" kWh")
+            self.results_cooling_peak_geo = ResultText(translations.results_cooling_peak_geo,
+                                                       category=self.numerical_results,
                                                        prefix="with a peak of: ", suffix=" kW")
-                self.results_cooling_peak.text_to_be_shown("Borefield", "_external_load")
-                self.results_cooling_peak.function_to_convert_to_text(lambda x: round(getattr(x, 'max_peak_cooling'), 2))
+            self.results_cooling_peak_geo.text_to_be_shown("Borefield", "_secundary_borefield_load")
+            self.results_cooling_peak_geo.function_to_convert_to_text(
+                lambda x: round(getattr(x, 'max_peak_cooling'), 2))
+            self.results_cooling_load.text_to_be_shown("Borefield", "_secundary_borefield_load")
+            self.results_cooling_load.function_to_convert_to_text(
+                lambda x: round(np.sum(getattr(x, 'hourly_cooling_load')), 0))
+            self.results_cooling_load_percentage = ResultText(translations.results_cooling_load_percentage,
+                                                              category=self.numerical_results,
+                                                              prefix="This is ", suffix="% of the cooling load")
+            self.results_cooling_load_percentage.text_to_be_shown("Borefield", "_percentage_cooling")
+            self.results_cooling_load_percentage.function_to_convert_to_text(lambda x: round(x, 2))
+            self.results_cooling_ext = ResultText(translations.results_cooling_ext, category=self.numerical_results,
+                                                  prefix="cooling load external: ", suffix=" kWh")
+            self.results_cooling_ext.text_to_be_shown("Borefield", "_external_load")
+            self.results_cooling_ext.function_to_convert_to_text(
+                lambda x: round(np.sum(getattr(x, 'hourly_cooling_load')), 0))
+            self.results_cooling_peak = ResultText(translations.results_cooling_peak, category=self.numerical_results,
+                                                   prefix="with a peak of: ", suffix=" kW")
+            self.results_cooling_peak.text_to_be_shown("Borefield", "_external_load")
+            self.results_cooling_peak.function_to_convert_to_text(lambda x: round(getattr(x, 'max_peak_cooling'), 2))
 
-                self.max_temp = ResultText(translations.max_temp, category=self.numerical_results,
-                                           prefix="The maximum average fluid temperature is ", suffix=" deg C")
-                self.max_temp.text_to_be_shown("Borefield", "results_peak_cooling")
-                self.max_temp.function_to_convert_to_text(lambda x: round(max(x), 2))
-                self.min_temp = ResultText(translations.min_temp, category=self.numerical_results,
-                                           prefix="The minimum average fluid temperature is ", suffix=" deg C")
-                self.min_temp.text_to_be_shown("Borefield", "results_peak_heating")
-                self.min_temp.function_to_convert_to_text(lambda x: round(min(x), 2))
+            self.max_temp = ResultText(translations.max_temp, category=self.numerical_results,
+                                       prefix="The maximum average fluid temperature is ", suffix=" deg C")
+            self.max_temp.text_to_be_shown("Borefield", "results_peak_cooling")
+            self.max_temp.function_to_convert_to_text(lambda x: round(max(x), 2))
+            self.min_temp = ResultText(translations.min_temp, category=self.numerical_results,
+                                       prefix="The minimum average fluid temperature is ", suffix=" deg C")
+            self.min_temp.text_to_be_shown("Borefield", "results_peak_heating")
+            self.min_temp.function_to_convert_to_text(lambda x: round(min(x), 2))
 
-                # add dependency
-                self.option_method_temp_gradient.add_link_2_show(self.results_ground_temperature, on_index=1)
-                self.option_method_temp_gradient.add_link_2_show(self.results_ground_temperature, on_index=2)
-                self.option_method_rb_calc.add_link_2_show(self.result_Rb_calculated, on_index=1)
-                self.option_method_rb_calc.add_link_2_show(self.result_Reynolds, on_index=1)
-                self.aim_req_depth.add_link_2_show(self.result_text_depth)
+            # add dependency
+            self.option_method_temp_gradient.add_link_2_show(self.results_ground_temperature, on_index=1)
+            self.option_method_temp_gradient.add_link_2_show(self.results_ground_temperature, on_index=2)
+            self.option_method_rb_calc.add_link_2_show(self.result_Rb_calculated, on_index=1)
+            self.option_method_rb_calc.add_link_2_show(self.result_Reynolds, on_index=1)
+            self.aim_req_depth.add_link_2_show(self.result_text_depth)
 
-                self.aim_optimize.add_link_2_show(self.results_heating_ext)
-                self.aim_optimize.add_link_2_show(self.results_heating_peak_geo)
-                self.aim_optimize.add_link_2_show(self.results_heating_load_percentage)
-                self.aim_optimize.add_link_2_show(self.results_heating_load)
-                self.aim_optimize.add_link_2_show(self.results_heating_peak)
-                self.aim_optimize.add_link_2_show(self.results_cooling_ext)
-                self.aim_optimize.add_link_2_show(self.results_cooling_load_percentage)
-                self.aim_optimize.add_link_2_show(self.results_cooling_load)
-                self.aim_optimize.add_link_2_show(self.results_cooling_peak)
-                self.aim_optimize.add_link_2_show(self.results_cooling_peak_geo)
+            self.aim_optimize.add_link_2_show(self.results_heating_ext)
+            self.aim_optimize.add_link_2_show(self.results_heating_peak_geo)
+            self.aim_optimize.add_link_2_show(self.results_heating_load_percentage)
+            self.aim_optimize.add_link_2_show(self.results_heating_load)
+            self.aim_optimize.add_link_2_show(self.results_heating_peak)
+            self.aim_optimize.add_link_2_show(self.results_cooling_ext)
+            self.aim_optimize.add_link_2_show(self.results_cooling_load_percentage)
+            self.aim_optimize.add_link_2_show(self.results_cooling_load)
+            self.aim_optimize.add_link_2_show(self.results_cooling_peak)
+            self.aim_optimize.add_link_2_show(self.results_cooling_peak_geo)
 
-                self.aim_temp_profile.add_link_2_show(self.max_temp)
-                self.aim_temp_profile.add_link_2_show(self.min_temp)
+            self.aim_temp_profile.add_link_2_show(self.max_temp)
+            self.aim_temp_profile.add_link_2_show(self.min_temp)
 
-            def create_figure_temperature_profile():
-                self.figure_temperature_profile = ResultFigure(label=translations.figure_temperature_profile,
-                                                               page=self.page_result)
+        def create_figure_temperature_profile():
+            self.figure_temperature_profile = ResultFigure(label=translations.figure_temperature_profile,
+                                                           page=self.page_result)
 
-                self.figure_temperature_profile.fig_to_be_shown(class_name="Borefield",
-                                                                function_name="print_temperature_profile")
+            self.figure_temperature_profile.fig_to_be_shown(class_name="Borefield",
+                                                            function_name="print_temperature_profile")
 
-                self.legend_figure_temperature_profile = FigureOption(category=self.figure_temperature_profile,
-                                                                      label=translations.legend_figure_temperature_profile,
-                                                                      param="legend",
-                                                                      default=0,
-                                                                      entries=["No", "Yes"],
-                                                                      entries_values=[False, True])
+            self.legend_figure_temperature_profile = FigureOption(category=self.figure_temperature_profile,
+                                                                  label=translations.legend_figure_temperature_profile,
+                                                                  param="legend",
+                                                                  default=0,
+                                                                  entries=["No", "Yes"],
+                                                                  entries_values=[False, True])
 
-                self.hourly_figure_temperature_profile = FigureOption(category=self.figure_temperature_profile,
-                                                                      label=translations.hourly_figure_temperature_profile,
-                                                                      param="plot_hourly",
-                                                                      default=0,
-                                                                      entries=["No", "Yes"],
-                                                                      entries_values=[False, True])
+            self.hourly_figure_temperature_profile = FigureOption(category=self.figure_temperature_profile,
+                                                                  label=translations.hourly_figure_temperature_profile,
+                                                                  param="plot_hourly",
+                                                                  default=0,
+                                                                  entries=["No", "Yes"],
+                                                                  entries_values=[False, True])
 
-                # add dependencies
-                self.option_temperature_profile_hourly.add_link_2_show(self.hourly_figure_temperature_profile, on_index=1)
-                self.aim_optimize.add_link_2_show(self.hourly_figure_temperature_profile)
-                self.option_method_size_depth.add_link_2_show(self.hourly_figure_temperature_profile, on_index=2)
+            # add dependencies
+            self.option_temperature_profile_hourly.add_link_2_show(self.hourly_figure_temperature_profile, on_index=1)
+            self.aim_optimize.add_link_2_show(self.hourly_figure_temperature_profile)
+            self.option_method_size_depth.add_link_2_show(self.hourly_figure_temperature_profile, on_index=2)
 
-            def create_figure_load_duration():
-                self.figure_load_duration = ResultFigure(label=translations.figure_load_duration,
-                                                         page=self.page_result)
+        def create_figure_load_duration():
+            self.figure_load_duration = ResultFigure(label=translations.figure_load_duration,
+                                                     page=self.page_result)
 
-                self.figure_load_duration.fig_to_be_shown(class_name="Borefield",
-                                                          function_name="plot_load_duration")
+            self.figure_load_duration.fig_to_be_shown(class_name="Borefield",
+                                                      function_name="plot_load_duration")
 
-                self.legend_figure_load_duration = FigureOption(category=self.figure_load_duration,
-                                                                label=translations.legend_figure_load_duration,
-                                                                param="legend",
-                                                                default=0,
-                                                                entries=["No", "Yes"],
-                                                                entries_values=[False, True])
+            self.legend_figure_load_duration = FigureOption(category=self.figure_load_duration,
+                                                            label=translations.legend_figure_load_duration,
+                                                            param="legend",
+                                                            default=0,
+                                                            entries=["No", "Yes"],
+                                                            entries_values=[False, True])
 
-                # add dependencies
-                self.option_method_size_depth.add_link_2_show(self.figure_load_duration, on_index=2)
-                self.option_temperature_profile_hourly.add_link_2_show(self.figure_load_duration, on_index=1)
-                self.aim_optimize.add_link_2_show(self.figure_load_duration)
+            # add dependencies
+            self.option_method_size_depth.add_link_2_show(self.figure_load_duration, on_index=2)
+            self.option_temperature_profile_hourly.add_link_2_show(self.figure_load_duration, on_index=1)
+            self.aim_optimize.add_link_2_show(self.figure_load_duration)
 
-            # create categories
-            create_category_numerical_results()
-            create_figure_temperature_profile()
-            create_figure_load_duration()
+        # create categories
+        create_category_numerical_results()
+        create_figure_temperature_profile()
+        create_figure_load_duration()
 
-
-
-        #################################################################################################################
-        #                                                                                                               #
-        # CREATE PAGES                                                                                                  #
-        #                                                                                                               #
-        #################################################################################################################
-
-        #create_page_aim()
-        #create_page_options()
-        #create_page_borehole()
-        #create_page_borehole_resistance()
-        #create_page_thermal_demands()
-        create_page_results()
+    def _page_settings(self, translations):
         self.create_settings_page()
 
         # add advanced options
@@ -1479,6 +1391,7 @@ class GUI(GuiStructure):
                                                  [' No ', ' Yes '], self.category_save_scenario)
         self.option_advanced_options.add_link_2_show(self.category_advanced_options, on_index=1)
 
+    def _create_lists(self):
         # general settings
         self.create_lists()
         # TODO this should be implemented in ScenarioGUI v3.0
