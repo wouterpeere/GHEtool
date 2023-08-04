@@ -175,6 +175,23 @@ class GUI(GuiStructure):
         # set default parent for the class variables to avoid widgets creation not in the main window
         super().__init__(default_parent, translations)
 
+        self.create_pages_in_order(translations)
+        self._create_lists()
+
+
+    def create_pages_in_order(self, translations) -> None:
+        """
+        This function creates all the pages in order.
+
+        Parameters
+        ----------
+        translations : Translation
+            Translations for all the labels/texts
+
+        Returns
+        -------
+        None
+        """
         self._page_aim(translations)
         self._page_options(translations)
         self._page_borefield(translations)
@@ -183,15 +200,14 @@ class GUI(GuiStructure):
         self._page_thermal_demand(translations)
         self._page_results(translations)
         self._page_settings(translations)
-        self._create_lists()
 
     def _page_aim(self, translations):
-            # create page
-            self.page_aim = Page(name=translations.page_aim, button_name="Aim", icon="Aim_Inv.svg")
+        # create page
+        self.page_aim = Page(name=translations.page_aim, button_name="Aim", icon="Aim_Inv.svg")
 
-            self.aim_temp_profile = Aim(page=self.page_aim, label=translations.aim_temp_profile, icon="Temp_Profile.svg")
-            self.aim_req_depth = Aim(page=self.page_aim, label=translations.aim_req_depth, icon="depth_determination.svg")
-            self.aim_optimize = Aim(page=self.page_aim, label=translations.aim_optimize, icon="Optimize_Profile.svg")
+        self.aim_temp_profile = Aim(page=self.page_aim, label=translations.aim_temp_profile, icon="Temp_Profile.svg")
+        self.aim_req_depth = Aim(page=self.page_aim, label=translations.aim_req_depth, icon="depth_determination.svg")
+        self.aim_optimize = Aim(page=self.page_aim, label=translations.aim_optimize, icon="Optimize_Profile.svg")
 
     def _page_options(self, translations):
         # create page
