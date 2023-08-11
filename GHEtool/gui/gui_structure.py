@@ -167,6 +167,7 @@ class GUI(GuiStructure):
     """
     This class contains all the elements that are relevant for the GUI.
     """
+
     def __init__(self, default_parent: QtW.QWidget, translations: Translations):
         """
         All the elements that should be placed on the GUI, should be written in
@@ -177,7 +178,6 @@ class GUI(GuiStructure):
 
         self.create_pages_in_order(translations)
         self._create_lists()
-
 
     def create_pages_in_order(self, translations) -> None:
         """
@@ -298,7 +298,7 @@ class GUI(GuiStructure):
 
         self.option_borefield_radius.change_event(self.update_borefield)
         self.option_number_circle_boreholes = els.IntBox(category=self.category_borefield, label=translations.option_number_circle_boreholes,
-                                                    minimal_value=2, maximal_value=1_000_000, default_value=12, step=1)
+                                                         minimal_value=2, maximal_value=1_000_000, default_value=12, step=1)
         self.option_number_circle_boreholes.change_event(self.update_borefield)
         self.option_width = IntBox(
             category=self.category_borefield, label=translations.option_width, default_value=9, minimal_value=1, maximal_value=40
@@ -341,23 +341,25 @@ class GUI(GuiStructure):
         self.option_tilted.hide()
 
         self.option_seperator_borefield = ButtonBox(label=translations.option_seperator_borefield, default_index=0,
-                                              entries=['Semicolon ";"', 'Comma ","', 'Tab "   "'],
-                                              category=self.category_borefield)
+                                                    entries=['Semicolon ";"', 'Comma ","', 'Tab "   "'],
+                                                    category=self.category_borefield)
         self.option_decimal_borefield = ButtonBox(label=translations.option_decimal_borefield, default_index=0,
-                                            entries=['Point "."', 'Comma ","'],
-                                            category=self.category_borefield)
+                                                  entries=['Point "."', 'Comma ","'],
+                                                  category=self.category_borefield)
 
         file = f"{FOLDER.joinpath('gui/test_gui/borefield_data.csv')}"
-        self.borefield_file = els.FileNameBox(label=translations.borefield_file, category=self.category_borefield, default_value=file, file_extension=["csv", "txt"])
+        self.borefield_file = els.FileNameBox(label=translations.borefield_file, category=self.category_borefield, default_value=file,
+                                              file_extension=["csv", "txt"])
         self.import_borefield = els.FunctionButton(button_text=translations.import_borefield, icon="Download", category=self.category_borefield)
         self.import_borefield.change_event(self.fun_import_borefield)
 
-        self.custom_borefield = els.FlexibleAmount(label=translations.custom_borefield, default_length=1, entry_mame="Borehole", category=self.category_borefield,
+        self.custom_borefield = els.FlexibleAmount(label=translations.custom_borefield, default_length=1, entry_mame="Borehole",
+                                                   category=self.category_borefield,
                                                    min_length=1)
-        self.custom_borefield.add_option(els.FloatBox, name="x [m]", default_value=0, minimal_value=-1_000_000, maximal_value=1_000_000,  decimal_number=2)
-        self.custom_borefield.add_option(els.FloatBox, name="y [m]", default_value=0, minimal_value=-1_000_000, maximal_value=1_000_000,  decimal_number=2)
+        self.custom_borefield.add_option(els.FloatBox, name="x [m]", default_value=0, minimal_value=-1_000_000, maximal_value=1_000_000, decimal_number=2)
+        self.custom_borefield.add_option(els.FloatBox, name="y [m]", default_value=0, minimal_value=-1_000_000, maximal_value=1_000_000, decimal_number=2)
         self.custom_borefield.add_option(els.FloatBox, name="depth [m]", default_value=100, minimal_value=0, maximal_value=1_000_000)
-        self.custom_borefield.add_option(els.FloatBox, name="buried depth [m]", default_value=2, minimal_value=0, maximal_value=1_000_000,  decimal_number=2)
+        self.custom_borefield.add_option(els.FloatBox, name="buried depth [m]", default_value=2, minimal_value=0, maximal_value=1_000_000, decimal_number=2)
         self.custom_borefield.add_option(els.FloatBox, name="Borehole radius [m]", default_value=0.075, minimal_value=0, maximal_value=1_000,
                                          decimal_number=4, step=0.01)
 
@@ -373,26 +375,26 @@ class GUI(GuiStructure):
 
         _ = [aim.change_event(partial(show_option_on_multiple_aims,
                                       [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
-                                      [self.aim_rect,self.aim_Box_shaped, self.aim_L_shaped,self.aim_U_shaped],
+                                      [self.aim_rect, self.aim_Box_shaped, self.aim_L_shaped, self.aim_U_shaped],
                                       self.option_spacing_width)) for aim in li_aim]
         _ = [aim.change_event(partial(show_option_on_multiple_aims,
                                       [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
-                                      [self.aim_rect,self.aim_Box_shaped, self.aim_L_shaped,self.aim_U_shaped],
+                                      [self.aim_rect, self.aim_Box_shaped, self.aim_L_shaped, self.aim_U_shaped],
                                       self.option_spacing_length)) for aim in li_aim]
 
         _ = [aim.change_event(partial(show_option_on_multiple_aims,
                                       [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
-                                      [self.aim_rect,self.aim_Box_shaped, self.aim_L_shaped,self.aim_U_shaped],
+                                      [self.aim_rect, self.aim_Box_shaped, self.aim_L_shaped, self.aim_U_shaped],
                                       self.option_width)) for aim in li_aim]
 
         _ = [aim.change_event(partial(show_option_on_multiple_aims,
                                       [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
-                                      [self.aim_rect,self.aim_Box_shaped, self.aim_L_shaped,self.aim_U_shaped],
+                                      [self.aim_rect, self.aim_Box_shaped, self.aim_L_shaped, self.aim_U_shaped],
                                       self.option_length)) for aim in li_aim]
 
         _ = [aim.change_event(partial(show_option_on_multiple_aims,
                                       [self.aim_optimize, self.aim_temp_profile, self.aim_req_depth],
-                                      [self.aim_rect,self.aim_Box_shaped, self.aim_L_shaped,self.aim_U_shaped, self.aim_circle],
+                                      [self.aim_rect, self.aim_Box_shaped, self.aim_L_shaped, self.aim_U_shaped, self.aim_circle],
                                       self.option_pipe_depth)) for aim in li_aim]
 
         _ = [aim.change_event(partial(show_option_on_multiple_aims,
@@ -686,8 +688,8 @@ class GUI(GuiStructure):
             step=0.001,
         )
 
-        self.option_pipe_outer_radius.change_event(self.option_pipe_inner_radius.widget.setMaximum)
-        self.option_pipe_inner_radius.change_event(self.option_pipe_outer_radius.widget.setMinimum)
+        self.option_pipe_outer_radius.change_event(lambda: self.option_pipe_inner_radius.widget.setMaximum(self.option_pipe_outer_radius.get_value()))
+        self.option_pipe_inner_radius.change_event(lambda: self.option_pipe_outer_radius.widget.setMinimum(self.option_pipe_inner_radius.get_value()))
 
         self.option_pipe_coaxial_inner_inner = FloatBox(
             category=self.category_pipe_data,
@@ -707,8 +709,10 @@ class GUI(GuiStructure):
             maximal_value=10000,
             step=0.001,
         )
-        self.option_pipe_coaxial_inner_outer.change_event(self.option_pipe_coaxial_inner_inner.widget.setMaximum)
-        self.option_pipe_coaxial_inner_inner.change_event(self.option_pipe_coaxial_inner_outer.widget.setMinimum)
+        self.option_pipe_coaxial_inner_outer.change_event(lambda: self.option_pipe_coaxial_inner_inner.widget.setMaximum(
+            self.option_pipe_coaxial_inner_outer.get_value()))
+        self.option_pipe_coaxial_inner_inner.change_event(lambda: self.option_pipe_coaxial_inner_outer.widget.setMinimum(
+            self.option_pipe_coaxial_inner_inner.get_value()))
         self.option_pipe_coaxial_outer_inner = FloatBox(
             category=self.category_pipe_data,
             label=translations.option_pipe_coaxial_outer_inner,
@@ -727,10 +731,14 @@ class GUI(GuiStructure):
             maximal_value=10000,
             step=0.001,
         )
-        self.option_pipe_coaxial_inner_outer.change_event(self.option_pipe_coaxial_outer_inner.widget.setMinimum)
-        self.option_pipe_coaxial_outer_inner.change_event(self.option_pipe_coaxial_inner_outer.widget.setMaximum)
-        self.option_pipe_coaxial_outer_outer.change_event(self.option_pipe_coaxial_outer_inner.widget.setMaximum)
-        self.option_pipe_coaxial_outer_inner.change_event(self.option_pipe_coaxial_outer_outer.widget.setMinimum)
+        self.option_pipe_coaxial_inner_outer.change_event(lambda: self.option_pipe_coaxial_outer_inner.widget.setMinimum(
+            self.option_pipe_coaxial_inner_outer.get_value()))
+        self.option_pipe_coaxial_outer_inner.change_event(
+            lambda: self.option_pipe_coaxial_inner_outer.widget.setMaximum(self.option_pipe_coaxial_outer_inner.get_value()))
+        self.option_pipe_coaxial_outer_outer.change_event(
+            lambda: self.option_pipe_coaxial_outer_inner.widget.setMaximum(self.option_pipe_coaxial_outer_outer.get_value()))
+        self.option_pipe_coaxial_outer_inner.change_event(
+            lambda: self.option_pipe_coaxial_outer_outer.widget.setMinimum(self.option_pipe_coaxial_outer_inner.get_value()))
         self.option_pipe_borehole_radius_2 = FloatBox(
             category=self.category_pipe_data,
             label=translations.option_pipe_borehole_radius_2,
@@ -741,8 +749,8 @@ class GUI(GuiStructure):
             step=0.001,
         )
         self.option_pipe_borehole_radius_2.change_event(self.check_correct_pipe_data)
-        self.option_pipe_borehole_radius_2.change_event(self.option_pipe_borehole_radius.set_value)
-        self.option_pipe_borehole_radius.change_event(self.option_pipe_borehole_radius_2.set_value)
+        self.option_pipe_borehole_radius_2.change_event(lambda: self.option_pipe_borehole_radius.set_value(self.option_pipe_borehole_radius_2.get_value()))
+        self.option_pipe_borehole_radius.change_event(lambda: self.option_pipe_borehole_radius_2.set_value(self.option_pipe_borehole_radius.get_value()))
 
         self.option_pipe_distance = FloatBox(
             category=self.category_pipe_data,
@@ -763,8 +771,8 @@ class GUI(GuiStructure):
             step=0.000001,
         )
         self.pipe_thermal_resistance = ResultText(translations.pipe_thermal_resistance,
-                                                   category=self.category_pipe_data,
-                                                   prefix="The equivalent borehole thermal resistance (at 150m) is: ", suffix="mK/W")
+                                                  category=self.category_pipe_data,
+                                                  prefix="The equivalent borehole thermal resistance (at 150m) is: ", suffix="mK/W")
         self.pipe_thermal_resistance.warning = True
 
         # add dependency
@@ -887,9 +895,9 @@ class GUI(GuiStructure):
             # self.aim_size_length.add_link_2_show(self.button_load_csv)
 
             # add change events
-            self.option_seperator_csv.change_event(self.fun_update_combo_box_data_file)
-            self.option_decimal_csv.change_event(self.fun_update_combo_box_data_file)
-            self.option_filename.change_event(self.fun_update_combo_box_data_file)
+            self.option_seperator_csv.change_event(lambda: self.fun_update_combo_box_data_file(self.option_filename.get_value()))
+            self.option_decimal_csv.change_event(lambda: self.fun_update_combo_box_data_file(self.option_filename.get_value()))
+            self.option_filename.change_event(lambda: self.fun_update_combo_box_data_file(self.option_filename.get_value()))
 
             self.button_load_csv.change_event(self.fun_display_data)
 
@@ -1202,7 +1210,7 @@ class GUI(GuiStructure):
             # self.aim_size_length.add_link_2_show(self.category_th_demand)
 
         def create_category_building_demand():
-            self.category_demand_building_or_geo =\
+            self.category_demand_building_or_geo = \
                 Category(page=self.page_thermal, label=translations.category_demand_building_or_geo)
             self.geo_load = ButtonBox(label=translations.geo_load, default_index=0,
                                       entries=[" goethermal ", " building "],
@@ -1456,12 +1464,12 @@ class GUI(GuiStructure):
             self.option_pipe_borehole_radius_2.widget.blockSignals(False)
             self.option_pipe_borehole_radius.widget.blockSignals(True)
             self.option_pipe_borehole_radius.widget.setMinimum(max(r_outer_pipe + distance_min,
-                                                                     self.option_pipe_borehole_radius.minimal_value))
+                                                                   self.option_pipe_borehole_radius.minimal_value))
             self.option_pipe_borehole_radius.widget.blockSignals(False)
             # set max value for pipe radius
             self.option_pipe_outer_radius.widget.blockSignals(True)
-            self.option_pipe_outer_radius.widget.setMaximum(min(r_borehole-distance_min,
-                                                            self.option_pipe_outer_radius.maximal_value))
+            self.option_pipe_outer_radius.widget.setMaximum(min(r_borehole - distance_min,
+                                                                self.option_pipe_outer_radius.maximal_value))
             self.option_pipe_outer_radius.widget.blockSignals(False)
 
             # set max number of U-tubes
@@ -1488,6 +1496,7 @@ class GUI(GuiStructure):
             self.option_pipe_borehole_radius.widget.setMinimum(max(r_outer_pipe,
                                                                    self.option_pipe_borehole_radius.minimal_value))
             self.option_pipe_borehole_radius.widget.blockSignals(False)
+
         if self.option_U_pipe_or_coaxial_pipe.get_value() == 0:
             Upipe()
             return
@@ -1604,6 +1613,7 @@ class GUI(GuiStructure):
         frame = self.category_borefield.graphic_left if self.category_borefield.graphic_left is not None else self.category_borefield.graphic_right
         if not isinstance(frame, QtW.QGraphicsView):
             return
+
         def draw_borefield():
             # import all that is needed
             # get variables from gui
@@ -1633,12 +1643,13 @@ class GUI(GuiStructure):
             length = (length - 1) * spacing_length * scale / 2 + r_bore * scale / 2
 
             if self.aim_rect.widget.isChecked():
-                coordinates = [(w * spacing_width * scale - width, l * spacing_length * scale - length) for w in range(self.option_width.get_value()) for l in range(self.option_length.get_value())]
+                coordinates = [(w * spacing_width * scale - width, l * spacing_length * scale - length) for w in range(self.option_width.get_value()) for l in
+                               range(self.option_length.get_value())]
             elif self.aim_Box_shaped.widget.isChecked():
-                coordinates = [(w * spacing_width * scale - width, l * spacing_length * scale - length) for w in range(self.option_width.get_value()) if not(
+                coordinates = [(w * spacing_width * scale - width, l * spacing_length * scale - length) for w in range(self.option_width.get_value()) if not (
                         0 < w < self.option_width.get_value() - 1) for l in range(self.option_length.get_value())]
                 coordinates += [(w * spacing_width * scale - width, l * spacing_length * scale - length) for w in range(self.option_width.get_value()) for l
-                                in range(self.option_length.get_value())  if not (0 < l < self.option_length.get_value() - 1) ]
+                                in range(self.option_length.get_value()) if not (0 < l < self.option_length.get_value() - 1)]
             elif self.aim_L_shaped.widget.isChecked():
                 l = self.option_length.get_value() - 1
                 coordinates = [(w * spacing_width * scale - width, l * spacing_length * scale - length) for w in range(self.option_width.get_value())]
@@ -1655,11 +1666,12 @@ class GUI(GuiStructure):
                 r_bore = 2 * self.option_borefield_radius.get_value() * pi / self.option_number_circle_boreholes.get_value() / 4
                 scale = max_l / (2 * self.option_borefield_radius.get_value() + r_bore) / 1.25  # leave 25 % space
                 angle = 2 * pi / self.option_number_circle_boreholes.get_value()
-                radius = self.option_borefield_radius.get_value()*scale
-                coordinates = [(sin(angle * n) * radius - r_bore * scale / 2, cos(angle * n) * radius - r_bore * scale / 2) for n in range(self.option_number_circle_boreholes.get_value())]
+                radius = self.option_borefield_radius.get_value() * scale
+                coordinates = [(sin(angle * n) * radius - r_bore * scale / 2, cos(angle * n) * radius - r_bore * scale / 2) for n in
+                               range(self.option_number_circle_boreholes.get_value())]
 
             else:
-                coordinates = [(x,y) for x,y,_,_,_ in self.custom_borefield.get_value()]
+                coordinates = [(x, y) for x, y, _, _, _ in self.custom_borefield.get_value()]
                 min_x = min(x for x, _ in coordinates)
                 max_x = max(x for x, _ in coordinates)
                 min_y = min(y for _, y in coordinates)
@@ -1668,7 +1680,7 @@ class GUI(GuiStructure):
                 dist_x = max_x + min_x
                 dist_y = max_y + min_y
                 scale = max_l / (max(max_x - min_x, max_y - min_y, 5) + r_bore) / 1.25
-                coordinates = [((x - dist_x / 2 - r_bore / 2) * scale, (y - dist_y /2 - r_bore / 2) * scale) for x, y in coordinates]
+                coordinates = [((x - dist_x / 2 - r_bore / 2) * scale, (y - dist_y / 2 - r_bore / 2) * scale) for x, y in coordinates]
 
             for x, y in coordinates:
                 circle = QtW.QGraphicsEllipseItem(x, y, r_bore * scale, r_bore * scale)
@@ -1691,7 +1703,8 @@ class GUI(GuiStructure):
         -------
         None
         """
-        filename = (self.option_filename.get_value() if not isinstance(filename, str) else filename) if filename is not None else self.option_filename.get_value()
+        filename = (
+            self.option_filename.get_value() if not isinstance(filename, str) else filename) if filename is not None else self.option_filename.get_value()
 
         # get decimal and column seperator
         sep: str = ";" if self.option_seperator_csv.get_value() == 0 else ","
@@ -1839,8 +1852,10 @@ class GUI(GuiStructure):
             fluid_data = FluidData(self.option_fluid_mass_flow.get_value(), self.option_fluid_conductivity.get_value(),
                                    self.option_fluid_density.get_value(), self.option_fluid_capacity.get_value(), self.option_fluid_viscosity.get_value())
             if self.option_U_pipe_or_coaxial_pipe.get_value() == 0:
-                pipe_data = MultipleUTube(self.option_pipe_grout_conductivity.get_value(), self.option_pipe_inner_radius.get_value(), self.option_pipe_outer_radius.get_value(),
-                                          self.option_pipe_conductivity.get_value(), self.option_pipe_distance.get_value(), self.option_pipe_number.get_value(), self.option_pipe_roughness.get_value())
+                pipe_data = MultipleUTube(self.option_pipe_grout_conductivity.get_value(), self.option_pipe_inner_radius.get_value(),
+                                          self.option_pipe_outer_radius.get_value(),
+                                          self.option_pipe_conductivity.get_value(), self.option_pipe_distance.get_value(), self.option_pipe_number.get_value(),
+                                          self.option_pipe_roughness.get_value())
             else:
                 pipe_data = CoaxialPipe(self.option_pipe_coaxial_inner_inner.get_value(),
                                         self.option_pipe_coaxial_inner_outer.get_value(),
@@ -1851,10 +1866,12 @@ class GUI(GuiStructure):
                                         self.option_pipe_roughness.get_value(),
                                         True)  # constant since this does not change anything
             borehole = Borehole(fluid_data, pipe_data)
-            resistance = borehole.get_Rb(self.option_depth.get_value(), self.option_pipe_depth.get_value(), self.option_pipe_borehole_radius.get_value(), self.option_conductivity.get_value())
+            resistance = borehole.get_Rb(self.option_depth.get_value(), self.option_pipe_depth.get_value(), self.option_pipe_borehole_radius.get_value(),
+                                         self.option_conductivity.get_value())
             self.pipe_thermal_resistance.set_text_value(f'{self.option_depth.get_value()}m): {round(resistance, 4)}')
         except:
             pass
+
 
 def show_option_on_multiple_aims(first_aims: list[Aim], second_aims: list[Aim], option: Option):
     def show_hide():
