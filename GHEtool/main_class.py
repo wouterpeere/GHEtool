@@ -14,7 +14,7 @@ import pygfunction as gt
 from scipy.signal import convolve
 from warnings import warn
 
-from GHEtool.VariableClasses import FluidData, Borehole, GroundConstantTemperature
+from GHEtool.VariableClasses import FluidData, Borehole, GroundConstantTemperature, Results
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, CalculationSetup
 from GHEtool.VariableClasses.LoadData import *
 from GHEtool.VariableClasses.LoadData import _LoadData
@@ -42,8 +42,8 @@ class Borefield(BaseClass):
         'Tf_max', 'Tf_min', 'limiting_quadrant', \
         'Tf', \
         '_ground_data', '_borefield_load', \
-        'results_peak_heating', 'options_pygfunction', \
-        'results_peak_cooling', 'results_month_cooling', 'results_month_heating', 'Tb', 'THRESHOLD_WARNING_SHALLOW_FIELD', \
+        'options_pygfunction', \
+        'Tb', 'THRESHOLD_WARNING_SHALLOW_FIELD', \
         'gui', 'D', 'r_b', 'gfunction_calculation_object', \
         '_sizing_setup', \
         '_secundary_borefield_load', '_building_load', '_external_load'
@@ -133,10 +133,7 @@ class Borefield(BaseClass):
         self.options_pygfunction: dict = {"method": "equivalent"}
 
         # initialize variables for temperature plotting
-        self.results_peak_heating = np.array([])  # list with the minimum temperatures due to the peak heating
-        self.results_peak_cooling = np.array([])  # list with the maximum temperatures due to peak cooling
-        self.results_month_heating = np.array([])
-        self.results_month_cooling = np.array([])
+        self.results = Results()
         self.Tb = np.array([])  # list of borehole wall temperatures
 
         # initiate ground parameters
@@ -1012,7 +1009,7 @@ class Borefield(BaseClass):
 
         # check if sizing by the minimum temperature (quadrant 3/4) does not cross the temperature boundary
         self.calculate_temperatures(size_min_temp, hourly=hourly)
-        if np.max(self.results_peak_cooling) <= self.Tf_max:
+        if np.max(self.results.peak_cooling) <= self.Tf_max:
             return size_min_temp
         raise ValueError("No solution can be found due to the temperature gradient. Please increase the field size.")
 
@@ -1294,8 +1291,8 @@ class Borefield(BaseClass):
                 # # Tf = Tb + Q * R_b
                 # temperature_result = Tb + loads_long * 1000 * (self.Rb / self.number_of_boreholes / self.H)
                 # # reset other variables
-                # self.results_peak_heating = temperature_result
-                # self.results_peak_cooling = temperature_result
+                # self.results.peak_heating = temperature_result
+                # self.results.peak_cooling = temperature_result
                 self._calculate_temperature_profile(self.H, hourly=True)
 
             else:
@@ -1341,41 +1338,41 @@ class Borefield(BaseClass):
                 #                        / self.number_of_boreholes / self.H
                 #
                 # # save temperatures under variable
-                # self.results_peak_heating = results_peak_heating
-                # self.results_peak_cooling = results_peak_cooling
+                # self.results.peak_heating = results_peak_heating
+                # self.results.peak_cooling = results_peak_cooling
                 self._calculate_temperature_profile(self.H, hourly=False)
             H_prev = self.H
 
             if quadrant == 1:
                 # maximum temperature
                 # convert back to required length
-                self.H = (np.max(self.results_peak_cooling[:8760 if hourly else 12]) - self._Tg()) / (
+                self.H = (np.max(self.results.peak_cooling[:8760 if hourly else 12]) - self._Tg()) / (
                         self.Tf_max - self._Tg()) * H_prev
             elif quadrant == 2:
                 # maximum temperature
                 # convert back to required length
-                self.H = (np.max(self.results_peak_cooling[-8760 if hourly else -12:]) - self._Tg()) / (
+                self.H = (np.max(self.results.peak_cooling[-8760 if hourly else -12:]) - self._Tg()) / (
                         self.Tf_max - self._Tg()) * H_prev
             elif quadrant == 3:
                 # minimum temperature
                 # convert back to required length
-                self.H = (np.min(self.results_peak_heating[:8760 if hourly else 12]) - self._Tg()) / (
+                self.H = (np.min(self.results.peak_heating[:8760 if hourly else 12]) - self._Tg()) / (
                         self.Tf_min - self._Tg()) * H_prev
             elif quadrant == 4:
                 # minimum temperature
                 # convert back to required length
-                self.H = (np.min(self.results_peak_heating[-8760 if hourly else -12:]) - self._Tg()) / (
+                self.H = (np.min(self.results.peak_heating[-8760 if hourly else -12:]) - self._Tg()) / (
                         self.Tf_min - self._Tg()) * H_prev
             elif quadrant == 10:
                 # over all years
                 # maximum temperature
                 # convert back to required length
-                self.H = (np.max(self.results_peak_cooling) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
+                self.H = (np.max(self.results.peak_cooling) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
             elif quadrant == 20:
                 # over all years
                 # minimum temperature
                 # convert back to required length
-                self.H = (np.min(self.results_peak_heating) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
+                self.H = (np.min(self.results.peak_heating) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
 
             if self.H < 0:
                 return 0
@@ -1586,14 +1583,14 @@ class Borefield(BaseClass):
         ax.step(time_array, self.Tb, 'k-', where="post", lw=1.5, label="Tb")
 
         if plot_hourly:
-            ax.step(time_array, self.results_peak_cooling, 'b-', where="post", lw=1, label='Tf')
+            ax.step(time_array, self.results.peak_cooling, 'b-', where="post", lw=1, label='Tf')
         else:
-            ax.step(time_array, self.results_peak_cooling, 'b-', where="post", lw=1.5, label='Tf peak cooling')
-            ax.step(time_array, self.results_peak_heating, 'r-', where="post", lw=1.5, label='Tf peak heating')
+            ax.step(time_array, self.results.peak_cooling, 'b-', where="post", lw=1.5, label='Tf peak cooling')
+            ax.step(time_array, self.results.peak_heating, 'r-', where="post", lw=1.5, label='Tf peak heating')
 
-            ax.step(time_array, self.results_month_cooling, color='b', linestyle="dashed", where="post", lw=1.5,
+            ax.step(time_array, self.results.monthly_cooling, color='b', linestyle="dashed", where="post", lw=1.5,
                     label='Tf base cooling')
-            ax.step(time_array, self.results_month_heating, color='r', linestyle="dashed", where="post", lw=1.5,
+            ax.step(time_array, self.results.monthly_heating, color='r', linestyle="dashed", where="post", lw=1.5,
                     label='Tf base heating')
 
         # define temperature bounds
@@ -1618,14 +1615,11 @@ class Borefield(BaseClass):
         -------
         None
         """
-        self.results_peak_heating = np.array([])
-        self.results_peak_cooling = np.array([])
-        self.results_month_heating = np.array([])
-        self.results_month_cooling = np.array([])
+        self.results = Results()
         self.Tb = np.array([])
         self._building_load = HourlyGeothermalLoad()
         self._secundary_borefield_load = HourlyGeothermalLoad()
-        ghe_logger.info("Delete all stored temperatures from previous calculations.")
+        ghe_logger.info("Deleted all stored temperatures from previous calculations.")
 
     def _calculate_temperature_profile(self, H: float = None, hourly: bool = False) -> None:
         """
@@ -1689,13 +1683,12 @@ class Borefield(BaseClass):
                                            g_value_peak_heating / self.ground_data.k_s / 2 / pi + Rb) / self.number_of_boreholes / H
 
             # save temperatures under variable
-            self.results_peak_heating = results_peak_heating
-            self.results_peak_cooling = results_peak_cooling
-            self.results_month_cooling = results_month_cooling
-            self.results_month_heating = results_month_heating
+            self.results = Results(peak_heating=results_peak_heating,
+                                   peak_cooling=results_peak_cooling,
+                                   monthly_heating=results_month_heating,
+                                   monthly_cooling=results_month_cooling)
 
         if hourly:
-
             # check for hourly data if this is requested
             if not self.load.hourly_resolution:
                 raise ValueError("There is no hourly resolution available!")
@@ -1722,10 +1715,8 @@ class Borefield(BaseClass):
             temperature_result = Tb + hourly_load * 1000 * (Rb / self.number_of_boreholes / H)
 
             # reset other variables
-            self.results_peak_heating = temperature_result
-            self.results_peak_cooling = temperature_result
-            self.results_month_cooling = np.array([])
-            self.results_month_heating = np.array([])
+            self.results = Results(peak_heating=temperature_result,
+                                   peak_cooling=temperature_result)
 
     def set_options_gfunction_calculation(self, options: dict) -> None:
         """
@@ -1929,11 +1920,11 @@ class Borefield(BaseClass):
             self.calculate_temperatures(depth=depth)
 
             # deviation from minimum temperature
-            if abs(min(self.results_peak_heating) - self.Tf_min) > 0.05:
+            if abs(min(self.results.peak_heating) - self.Tf_min) > 0.05:
 
                 # check if it goes below the threshold
-                if min(self.results_peak_heating) < self.Tf_min:
-                    peak_heat_load_geo -= 1 * max(1, 10 * (self.Tf_min - min(self.results_peak_heating)))
+                if min(self.results.peak_heating) < self.Tf_min:
+                    peak_heat_load_geo -= 1 * max(1, 10 * (self.Tf_min - min(self.results.peak_heating)))
                 else:
                     peak_heat_load_geo = min(init_peak_heating, peak_heat_load_geo + 1)
                     if peak_heat_load_geo == init_peak_heating:
@@ -1942,11 +1933,11 @@ class Borefield(BaseClass):
                 heat_ok = True
 
             # deviation from maximum temperature
-            if abs(np.max(self.results_peak_cooling) - self.Tf_max) > 0.05:
+            if abs(np.max(self.results.peak_cooling) - self.Tf_max) > 0.05:
 
                 # check if it goes above the threshold
-                if np.max(self.results_peak_cooling) > self.Tf_max:
-                    peak_cool_load_geo -= 1 * max(1, 10 * (-self.Tf_max + np.max(self.results_peak_cooling)))
+                if np.max(self.results.peak_cooling) > self.Tf_max:
+                    peak_cool_load_geo -= 1 * max(1, 10 * (-self.Tf_max + np.max(self.results.peak_cooling)))
                 else:
                     peak_cool_load_geo = min(init_peak_cooling, peak_cool_load_geo + 1)
                     if peak_cool_load_geo == init_peak_cooling:
@@ -2043,14 +2034,14 @@ class Borefield(BaseClass):
         """
 
         # calculate temperatures if they are not calculated
-        if not np.any(self.results_peak_heating):
+        if not np.any(self.results.peak_heating):
             ghe_logger.warning('There are not yet temperatures calculated, hence there is no limiting quadrant.'
                                'The temperature is calculated now, based on monthly values.')
             self.calculate_temperatures()
 
         # calculate max/min fluid temperatures
-        max_temp = np.max(self.results_peak_cooling)
-        min_temp = np.min(self.results_peak_heating)
+        max_temp = np.max(self.results.peak_cooling)
+        min_temp = np.min(self.results.peak_heating)
 
         # calculate temperature difference w.r.t. the limits
         DT_max = - self.Tf_max + max_temp + 1000  # + 1000 to have no problems with negative temperatures
