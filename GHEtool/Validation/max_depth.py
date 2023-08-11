@@ -27,7 +27,6 @@ hourly_load = HourlyGeothermalLoad()
 hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly data\\auditorium.csv"), header=True, separator=";",
                               col_cooling=0, col_heating=1)
 borefield.load = hourly_load
-borefield.size_L3()
 
 Tg_array = []
 max_Tf_array = []
@@ -44,6 +43,18 @@ def f(x, a, b):
 
 # fit to 1/x curve
 diff = np.array(max_Tf_array) - np.array(Tg_array)
+
+prev_gfunctions = borefield.gfunction_calculation_object.previous_gfunctions
+g_value_differences = []
+for idx, prev in enumerate(prev_gfunctions):
+    g_values = borefield.gfunction(borefield.load.time_L3, depth_array[idx])
+    g_value_differences.append(np.diff(g_values, prepend=0))
+
+plt.figure()
+for idx, diff in enumerate(g_value_differences):
+    plt.plot(diff, label=depth_array[idx])
+plt.legend()
+plt.show()
 
 popt, pcov = curve_fit(f, depth_array, diff)
 print(popt, pcov)
