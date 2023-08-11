@@ -7,7 +7,8 @@
    id="svg8"
    inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
    sodipodi:docname="icon_squared_07.svg"
-   inkscape:export-filename="E:\scieboFH\PL2\GHEtool-main\GHEtool\picsSVG\icon_05.png"
+   inkscape:export-filename="C:\Users\Tobi\Documents\GitHub\GHEtool_test\GHEtool\gui\icons\icon_squared.png"
+
    inkscape:export-xdpi="130"
    inkscape:export-ydpi="130"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -100,9 +101,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.1767767"
-     inkscape:cx="-675.99406"
-     inkscape:cy="506.28844"
+     inkscape:zoom="0.7071068"
+     inkscape:cx="382.54476"
+     inkscape:cy="376.8879"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -143,25 +144,14 @@
      id="layer1"
      transform="translate(-62.674702,-103.64712)">
     <g
-       id="g1031"
-       style="fill:#917c6f"
-       transform="matrix(0.99999992,0,0,1.1764706,1.8792114e-6,-53.584795)">
-      <ellipse
-         style="fill:#00407a;fill-opacity:1;stroke:none;stroke-width:9.21955;stroke-linejoin:round"
-         id="path866"
-         cx="162.67471"
-         cy="218.64713"
-         rx="100.00001"
-         ry="85" />
-    </g>
-    <g
        id="g1031-4"
        style="fill:#917c6f"
        transform="matrix(0.99999992,0,0,1.1764706,1.8792114e-6,-53.584795)">
       <path
          id="path866-0"
          style="fill:#00407a;stroke-width:9.21955;stroke-linejoin:round"
-         d="m 262.67472,218.64713 a 100.00001,85 0 0 1 -100.00001,85 100.00001,85 0 0 1 -100.000004,-85 100.00001,85 0 0 1 100.000004,-85 100.00001,85 0 0 1 100.00001,85 z" />
+         d="m 262.67472,133.64713 0,169.99999 H 62.674706 l -10e-7,-169.99999 z"
+         sodipodi:nodetypes="ccccc" />
     </g>
     <path
        style="fill:none;stroke:#ffffff;stroke-width:10;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
@@ -175,27 +165,13 @@
        sodipodi:nodetypes="cczcc" />
     <path
        style="color:#000000;fill:#ffffff;-inkscape-stroke:none"
-       d="m 94.64882,130.34992 c -0.381369,0.3558 -0.588585,0.54972 -0.880235,0.82688 -0.550962,0.52359 -1.093642,1.05393 -1.630843,1.58635 -1.083112,1.07347 -2.116285,2.18545 -3.178512,3.31157 -1.267036,1.34324 -2.509305,2.74891 -3.703153,4.27661 l 127.464623,2.3e-4 v -10 z"
+       d="m 62.674702,130.34992 v 10.00141 l 199.999998,2.3e-4 v -10 z"
        id="path7218"
-       sodipodi:nodetypes="cssscccc" />
-    <ellipse
-       style="fill:#00407a;fill-opacity:1;stroke:none;stroke-width:7.08872;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
-       id="path7377"
-       cx="212.7198"
-       cy="135.35124"
-       rx="2.5"
-       ry="5.0250001" />
+       sodipodi:nodetypes="ccccc" />
     <path
        style="color:#000000;fill:#ffffff;-inkscape-stroke:none"
-       d="m 124.52734,113.64648 v 10 l 98.14634,-1.3e-4 c -0.51323,-0.38235 -1.00753,-0.74626 -1.51362,-1.11312 -0.74488,-0.53996 -1.50342,-1.06752 -2.2696,-1.58912 -4.09451,-2.78744 -8.31545,-5.31738 -12.62762,-7.2974 z"
+       d="m 62.674702,113.64648 v 10 l 199.999998,-1.3e-4 v -9.99964 z"
        id="path6544"
-       sodipodi:nodetypes="cccsscc" />
-    <ellipse
-       style="fill:#00407a;fill-opacity:1;stroke:none;stroke-width:7.08872;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
-       id="path7377-3"
-       cx="124.52752"
-       cy="118.64712"
-       rx="2.5"
-       ry="5.0250001" />
+       sodipodi:nodetypes="ccccc" />
   </g>
 </svg>

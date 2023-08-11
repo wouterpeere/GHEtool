@@ -28,6 +28,7 @@ UsePreviousAppDir=yes
 DefaultDirName={autopf}\{#MyAppName}
 ChangesAssociations=yes
 DisableProgramGroupPage=yes
+LicenseFile="{#LinkToGHEtool}\LICENSE"
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog

@@ -1,47 +1,66 @@
+"""
+script to start the GUI
+"""
+import logging
+
+import sys
+from pathlib import Path
+from platform import system
 from sys import argv
+from ScenarioGUI import load_config
+load_config(Path(__file__).parent.joinpath("gui_config.ini"))
+
+os_system = system()
+is_frozen = getattr(sys, 'frozen', False) and os_system == 'Windows'  # pragma: no cover
 
 
-def run(path=None):  # pragma: no cover
-    from pathlib import Path
-    from configparser import ConfigParser
-    from ctypes import windll as ctypes_windll
+def run(path_list=None):  # pragma: no cover
+    if is_frozen:
+        import pyi_splash
+        pyi_splash.update_text('Loading .')
+    if os_system == 'Windows':
+        from ctypes import windll as ctypes_windll
     from sys import exit as sys_exit
+
+    if is_frozen:
+        pyi_splash.update_text('Loading ..')
 
     from PySide6.QtWidgets import QApplication as QtWidgets_QApplication
     from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
+    from GHEtool import Borefield
+    from GHEtool.gui.data_2_borefield_func import data_2_borefield
+    from GHEtool.gui.gui_classes.translation_class import Translations
+    from GHEtool.gui.gui_structure import GUI
+    from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
+    import ScenarioGUI.global_settings as globs
 
-    from GHEtool import FOLDER, ghe_logger
-    from GHEtool.gui.gui_combine_window import MainWindow
-    from GHEtool.logger.ghe_logger import console_handler
+    if is_frozen:
+        pyi_splash.update_text('Loading ...')
 
     # init application
     app = QtWidgets_QApplication()
-    # get current version
-    config = ConfigParser()
-    config.read_file(open(Path(FOLDER).parent.joinpath('setup.cfg'), 'r'))
-    version = config.get('metadata', 'version')
-    # set version and id
-    myAppID = f'GHEtool v{version}'  # arbitrary string
-    ctypes_windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
-    app.setApplicationName('GHEtool')
-    app.setApplicationVersion(f'v{version}')
+    if os_system == 'Windows':
+        # set version and id
+        myAppID = f'{globs.GUI_NAME} v{globs.VERSION}'  # arbitrary string
+        ctypes_windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
     # init window
     window = QtWidgets_QMainWindow()
     # init gui window
-    main_window = MainWindow(window, app)
+    main_window = MainWindow(window, app, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    if is_frozen:
+        pyi_splash.update_text('Loading ...')
     # load file if it is in path list
-    if path is not None:
-        main_window.filename = (path, 0)
+    if path_list is not None:
+        main_window.filename = ([path for path in path_list if path.endswith(f'.{globs.FILE_EXTENSION}')][0], 0)
         main_window.fun_load_known_filename()
 
+    ghe_logger = logging.getLogger()
+    ghe_logger.setLevel(logging.INFO)
     # show window
-    try:
-        import pyi_splash
+    if is_frozen:
         pyi_splash.close()
-    except ModuleNotFoundError:
-        pass
 
-    ghe_logger.info('GHEtool loaded!')
+    ghe_logger.info(f'{globs.GUI_NAME} loaded!')
     window.showMaximized()
     # close app
     sys_exit(app.exec())
@@ -49,4 +68,4 @@ def run(path=None):  # pragma: no cover
 
 if __name__ == "__main__":  # pragma: no cover
     # pass system args like a file to read
-    run([path for path in argv if path.endswith('.GHEtool')][0] if len(argv) > 1 else None)
+    run(argv if len(argv) > 1 else None)

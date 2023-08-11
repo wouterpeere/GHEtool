@@ -20,7 +20,6 @@ If you have any questions, remarks or ideas for future functionalities, please c
 self
 sources/cite
 sources/articles
-sources/users.rst
 sources/changelog
 sources/legal_notice
 ```
