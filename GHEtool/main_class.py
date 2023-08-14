@@ -43,7 +43,7 @@ class Borefield(BaseClass):
         'Tf', \
         '_ground_data', '_borefield_load', \
         'options_pygfunction', \
-        'Tb', 'THRESHOLD_WARNING_SHALLOW_FIELD', \
+        'THRESHOLD_WARNING_SHALLOW_FIELD', \
         'gui', 'D', 'r_b', 'gfunction_calculation_object', \
         '_sizing_setup', \
         '_secundary_borefield_load', '_building_load', '_external_load'
@@ -134,7 +134,6 @@ class Borefield(BaseClass):
 
         # initialize variables for temperature plotting
         self.results = Results()
-        self.Tb = np.array([])  # list of borehole wall temperatures
 
         # initiate ground parameters
         self.H = 0.  # borehole depth m
@@ -1580,7 +1579,7 @@ class Borefield(BaseClass):
         ax.xaxis.label.set_color(plt.rcParams["axes.labelcolor"])
 
         # plot Temperatures
-        ax.step(time_array, self.Tb, 'k-', where="post", lw=1.5, label="Tb")
+        ax.step(time_array, self.results.Tb, 'k-', where="post", lw=1.5, label="Tb")
 
         if plot_hourly:
             ax.step(time_array, self.results.peak_cooling, 'b-', where="post", lw=1, label='Tf')
@@ -1616,7 +1615,6 @@ class Borefield(BaseClass):
         None
         """
         self.results = Results()
-        self.Tb = np.array([])
         self._building_load = HourlyGeothermalLoad()
         self._secundary_borefield_load = HourlyGeothermalLoad()
         ghe_logger.info("Deleted all stored temperatures from previous calculations.")
@@ -1664,7 +1662,6 @@ class Borefield(BaseClass):
             # calculation the borehole wall temperature for every month i
             Tb = results / (2 * pi * self.ground_data.k_s) / (H * self.number_of_boreholes) + self._Tg(H)
 
-            self.Tb = Tb
             # now the Tf will be calculated based on
             # Tf = Tb + Q * R_b
             results_month_cooling = Tb + self.load.baseload_cooling_power_simulation_period * 1000 \
@@ -1683,7 +1680,8 @@ class Borefield(BaseClass):
                                            g_value_peak_heating / self.ground_data.k_s / 2 / pi + Rb) / self.number_of_boreholes / H
 
             # save temperatures under variable
-            self.results = Results(peak_heating=results_peak_heating,
+            self.results = Results(borehole_wall_temp=Tb,
+                                   peak_heating=results_peak_heating,
                                    peak_cooling=results_peak_cooling,
                                    monthly_heating=results_month_heating,
                                    monthly_cooling=results_month_cooling)
@@ -1709,13 +1707,13 @@ class Borefield(BaseClass):
             # calculation the borehole wall temperature for every month i
             Tb = results / (2 * pi * self.ground_data.k_s) / (H * self.number_of_boreholes) + self._Tg(H)
 
-            self.Tb = Tb
             # now the Tf will be calculated based on
             # Tf = Tb + Q * R_b
             temperature_result = Tb + hourly_load * 1000 * (Rb / self.number_of_boreholes / H)
 
             # reset other variables
-            self.results = Results(peak_heating=temperature_result,
+            self.results = Results(borehole_wall_temp=Tb,
+                                   peak_heating=temperature_result,
                                    peak_cooling=temperature_result)
 
     def set_options_gfunction_calculation(self, options: dict) -> None:
