@@ -121,7 +121,6 @@ class Borefield(BaseClass):
         if peak_heating is None:
             peak_heating: np.ndarray = LIST_OF_ZEROS
 
-
         self.limiting_quadrant: int = 0  # parameter that tells in which quadrant the field is limited
         # m hereafter one needs to chance to fewer boreholes with more depth, because the calculations are no longer
         # that accurate.
@@ -159,15 +158,15 @@ class Borefield(BaseClass):
         self._sizing_setup: CalculationSetup = CalculationSetup()
         self.sizing_setup()
 
-        # check if the GHEtool is used by the gui
+        # check if the GHEtool is used by the gui i
         self.gui = gui
 
         # load on the geothermal borefield, used in calculations
         self._borefield_load = MonthlyGeothermalLoadAbsolute()
-        # geothermal load, but converted to a secondary demand in optimise_load_profile
-        # self._secundary_borefield_load: HourlyGeothermalLoad = HourlyGeothermalLoad()
-        # secondary load of the building, used in optimise_load_profile
-        # self._building_load: HourlyGeothermalLoad = HourlyGeothermalLoad()
+        # geothermal load, but converted to a secundary demand in optimise_load_profile
+        self._secundary_borefield_load: HourlyGeothermalLoad = HourlyGeothermalLoad()
+        # secundary load of the building, used in optimise_load_profile
+        self._building_load: HourlyGeothermalLoad = HourlyGeothermalLoad()
 
         if load is not None:
             self.load = load
@@ -179,7 +178,7 @@ class Borefield(BaseClass):
         self.cost_investment: list = Borefield.DEFAULT_INVESTMENT
 
         # set a custom borefield
-        # self.borefield = borefield
+        self.borefield = borefield
 
         ghe_logger.main_info("Borefield object has been created.")
 
