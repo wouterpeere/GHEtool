@@ -133,7 +133,7 @@ def data_2_borefield(ds: DataStorage) -> tuple[Borefield, partial[[], None]]:
 
         ### Plot temperature profile
     if ds.aim_temp_profile:
-        return borefield, lambda *args: print('done') #partial(borefield.calculate_temperatures, borefield.H)
+        return borefield, partial(borefield.calculate_temperatures, borefield.H)
 
 
 def _set_boreholes(ds: DataStorage, borefield: Borefield) -> None:
