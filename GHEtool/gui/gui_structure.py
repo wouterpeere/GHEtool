@@ -102,7 +102,7 @@ def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, 
         raise FileNotFoundError
 
     # not the correct decimal seperator
-    if isinstance(df2.iloc[1, 1], str):
+    if isinstance(df2.iloc[0, 0], str):
         logging.error("Please select the correct decimal point seperator.")
         raise ValueError
 
@@ -842,7 +842,7 @@ class GUI(GuiStructure):
             self.option_filename = FileNameBox(
                 category=self.category_select_file,
                 label=translations.option_filename,
-                default_value=f'{FOLDER.joinpath("Examples/hourly_profile.csv")}',
+                default_value='',
                 dialog_text="Choose csv file",
                 error_text="no file selected",
             )
