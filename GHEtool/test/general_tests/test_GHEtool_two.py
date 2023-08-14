@@ -141,8 +141,8 @@ def test_reset_temp_profiles_when_loaded(monkeypatch):
     borefield.set_borefield(copy.copy(borefield_gt))
 
     borefield.calculate_temperatures()
-    Tmax = borefield.results_peak_heating.copy()
-    Tmin = borefield.results_peak_cooling.copy()
+    Tmax = borefield.results.peak_cooling.copy()
+    Tmin = borefield.results.peak_heating.copy()
 
     monthlyLoadCooling, monthlyLoadHeating, peakCooling, peakHeating = load_case(2)
     borefield.set_baseload_cooling(monthlyLoadCooling)
@@ -152,8 +152,8 @@ def test_reset_temp_profiles_when_loaded(monkeypatch):
 
     borefield.print_temperature_profile()
 
-    assert not np.array_equal(Tmax, borefield.results_peak_heating)
-    assert not np.array_equal(Tmin, borefield.results_peak_cooling)
+    assert not np.array_equal(Tmax, borefield.results.peak_heating)
+    assert not np.array_equal(Tmin, borefield.results.peak_cooling)
 
 
 def test_no_possible_solution():
