@@ -171,9 +171,9 @@ class Borefield(BaseClass):
 
         if load is not None:
             self.load = load
-        #else:
-        #    self.load = MonthlyGeothermalLoadAbsolute(baseload_heating, baseload_cooling,
-        #                                              peak_heating, peak_cooling)
+        else:
+            self.load = MonthlyGeothermalLoadAbsolute(baseload_heating, baseload_cooling,
+                                                      peak_heating, peak_cooling)
 
         # set investment cost
         self.cost_investment: list = Borefield.DEFAULT_INVESTMENT
