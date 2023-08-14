@@ -892,7 +892,6 @@ class GUI(GuiStructure):
             self.aim_temp_profile.add_link_2_show(self.hint_press_load)
             self.option_temperature_profile_hourly.add_link_2_show(self.hint_press_load, on_index=0)
             self.aim_req_depth.add_link_2_show(self.hint_press_load)
-            # self.aim_size_length.add_link_2_show(self.button_load_csv)
 
             # add change events
             self.option_seperator_csv.change_event(lambda: self.fun_update_combo_box_data_file(self.option_filename.get_value()))
@@ -1207,7 +1206,6 @@ class GUI(GuiStructure):
 
             self.aim_temp_profile.add_link_2_show(self.category_th_demand)
             self.aim_req_depth.add_link_2_show(self.category_th_demand)
-            # self.aim_size_length.add_link_2_show(self.category_th_demand)
 
         def create_category_building_demand():
             self.category_demand_building_or_geo = \
@@ -1342,18 +1340,25 @@ class GUI(GuiStructure):
             self.option_method_rb_calc.add_link_2_show(self.result_Rb_calculated, on_index=1)
             self.option_method_rb_calc.add_link_2_show(self.result_Reynolds, on_index=1)
             self.aim_req_depth.add_link_2_show(self.result_text_depth)
-
-            self.aim_optimize.add_link_2_show(self.results_heating_ext)
-            self.aim_optimize.add_link_2_show(self.results_heating_peak_geo)
-            self.aim_optimize.add_link_2_show(self.results_heating_load_percentage)
-            self.aim_optimize.add_link_2_show(self.results_heating_load)
-            self.aim_optimize.add_link_2_show(self.results_heating_peak)
-            self.aim_optimize.add_link_2_show(self.results_cooling_ext)
-            self.aim_optimize.add_link_2_show(self.results_cooling_load_percentage)
-            self.aim_optimize.add_link_2_show(self.results_cooling_load)
-            self.aim_optimize.add_link_2_show(self.results_cooling_peak)
-            self.aim_optimize.add_link_2_show(self.results_cooling_peak_geo)
-
+            list_options_optimize_load_profile = [self.results_heating_ext, self.results_heating_peak_geo,
+                                                  self.results_heating_load_percentage, self.results_heating_load,
+                                                  self.results_heating_peak, self.results_cooling_ext,
+                                                  self.results_cooling_load_percentage, self.results_cooling_load,
+                                                  self.results_cooling_peak, self.results_cooling_peak_geo]
+            self.show_option_under_multiple_conditions(list_options_optimize_load_profile,
+                                                       [self.aim_optimize],
+                                                       custom_logic=self.aim_optimize.widget.isChecked,
+                                                       check_on_visibility_change=True)
+            # self.aim_optimize.add_link_2_show(self.results_heating_ext)
+            # self.aim_optimize.add_link_2_show(self.results_heating_peak_geo)
+            # self.aim_optimize.add_link_2_show(self.results_heating_load_percentage)
+            # self.aim_optimize.add_link_2_show(self.results_heating_load)
+            # self.aim_optimize.add_link_2_show(self.results_heating_peak)
+            # self.aim_optimize.add_link_2_show(self.results_cooling_ext)
+            # self.aim_optimize.add_link_2_show(self.results_cooling_load_percentage)
+            # self.aim_optimize.add_link_2_show(self.results_cooling_load)
+            # self.aim_optimize.add_link_2_show(self.results_cooling_peak)
+            # self.aim_optimize.add_link_2_show(self.results_cooling_peak_geo)
             self.aim_temp_profile.add_link_2_show(self.max_temp)
             self.aim_temp_profile.add_link_2_show(self.min_temp)
 
