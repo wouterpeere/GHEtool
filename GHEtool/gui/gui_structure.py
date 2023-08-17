@@ -178,6 +178,7 @@ class GUI(GuiStructure):
 
         self.create_pages_in_order(translations)
         self._create_lists()
+        self.set_dependencies()
 
     def create_pages_in_order(self, translations) -> None:
         """
@@ -227,9 +228,6 @@ class GUI(GuiStructure):
         self.option_temperature_profile_hourly = ButtonBox(
             label=translations.option_temperature_profile_hourly, default_index=0,
             entries=[" no ", " yes "], category=self.category_calculation)
-        # add dependencies
-        self.aim_req_depth.add_link_2_show(self.option_method_size_depth)
-        self.aim_temp_profile.add_link_2_show(self.option_temperature_profile_hourly)
 
         self.category_advanced_options = Category(page=self.page_options, label=translations.category_advanced_options)
         self.option_atol = FloatBox(translations.option_atol, 0.05, self.category_advanced_options,
@@ -506,13 +504,6 @@ class GUI(GuiStructure):
             maximal_value=500,
             step=0.01,
         )
-
-        # add dependencies
-        self.option_method_temp_gradient.add_link_2_show(self.option_temp_gradient, on_index=2)
-        self.option_method_temp_gradient.add_link_2_show(self.option_ground_heat_flux, on_index=1)
-        self.option_method_temp_gradient.add_link_2_show(self.option_ground_temp_gradient, on_index=1)
-        self.option_method_temp_gradient.add_link_2_show(self.option_ground_temp_gradient, on_index=2)
-        self.option_method_temp_gradient.add_link_2_show(self.option_ground_temp, on_index=0)
 
         self.category_temperatures = Category(page=self.page_earth, label=translations.category_temperatures)
 
@@ -1346,19 +1337,10 @@ class GUI(GuiStructure):
                                                   self.results_cooling_load_percentage, self.results_cooling_load,
                                                   self.results_cooling_peak, self.results_cooling_peak_geo]
             self.show_option_under_multiple_conditions(list_options_optimize_load_profile,
-                                                       [self.aim_optimize],
-                                                       custom_logic=self.aim_optimize.widget.isChecked,
+                                                       self.aim_optimize,
+                                                       custom_logic=self.aim_optimize.is_checked,
                                                        check_on_visibility_change=True)
-            # self.aim_optimize.add_link_2_show(self.results_heating_ext)
-            # self.aim_optimize.add_link_2_show(self.results_heating_peak_geo)
-            # self.aim_optimize.add_link_2_show(self.results_heating_load_percentage)
-            # self.aim_optimize.add_link_2_show(self.results_heating_load)
-            # self.aim_optimize.add_link_2_show(self.results_heating_peak)
-            # self.aim_optimize.add_link_2_show(self.results_cooling_ext)
-            # self.aim_optimize.add_link_2_show(self.results_cooling_load_percentage)
-            # self.aim_optimize.add_link_2_show(self.results_cooling_load)
-            # self.aim_optimize.add_link_2_show(self.results_cooling_peak)
-            # self.aim_optimize.add_link_2_show(self.results_cooling_peak_geo)
+
             self.aim_temp_profile.add_link_2_show(self.max_temp)
             self.aim_temp_profile.add_link_2_show(self.min_temp)
 
@@ -1419,6 +1401,28 @@ class GUI(GuiStructure):
         self.option_advanced_options = ButtonBox(translations.option_advanced_options, 0,
                                                  [' No ', ' Yes '], self.category_save_scenario)
         self.option_advanced_options.add_link_2_show(self.category_advanced_options, on_index=1)
+
+    def set_dependencies(self) -> None:
+        self.show_option_under_multiple_conditions(self.option_method_size_depth,
+                                                   self.aim_req_depth,
+                                                   custom_logic=self.aim_req_depth.is_checked)
+        self.show_option_under_multiple_conditions(self.option_temperature_profile_hourly,
+                                                   self.aim_temp_profile,
+                                                   custom_logic=self.aim_temp_profile.is_checked)
+
+        self.show_option_under_multiple_conditions(self.option_ground_temp,
+                                                   self.option_method_temp_gradient,
+                                                   custom_logic=partial(
+                                                       self.option_method_temp_gradient.check_linked_value, 0))
+        self.show_option_under_multiple_conditions([self.option_ground_temp_gradient, self.option_ground_heat_flux],
+                                                   self.option_method_temp_gradient,
+                                                   custom_logic=partial(
+                                                       self.option_method_temp_gradient.check_linked_value, 1))
+        self.show_option_under_multiple_conditions([self.option_ground_temp_gradient, self.option_temp_gradient],
+                                                   self.option_method_temp_gradient,
+                                                   custom_logic=partial(
+                                                       self.option_method_temp_gradient.check_linked_value, 2))
+
 
     def _create_lists(self):
         # general settings
