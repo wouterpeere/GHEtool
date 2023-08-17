@@ -1338,7 +1338,7 @@ class GUI(GuiStructure):
                                                   self.results_cooling_peak, self.results_cooling_peak_geo]
             self.show_option_under_multiple_conditions(list_options_optimize_load_profile,
                                                        self.aim_optimize,
-                                                       custom_logic=self.aim_optimize.is_checked,
+                                                       custom_logic=self.aim_optimize.widget.isChecked,
                                                        check_on_visibility_change=True)
 
             self.aim_temp_profile.add_link_2_show(self.max_temp)
@@ -1405,23 +1405,19 @@ class GUI(GuiStructure):
     def set_dependencies(self) -> None:
         self.show_option_under_multiple_conditions(self.option_method_size_depth,
                                                    self.aim_req_depth,
-                                                   custom_logic=self.aim_req_depth.is_checked)
+                                                   custom_logic=self.aim_req_depth.widget.isChecked)
         self.show_option_under_multiple_conditions(self.option_temperature_profile_hourly,
                                                    self.aim_temp_profile,
-                                                   custom_logic=self.aim_temp_profile.is_checked)
+                                                   custom_logic=self.aim_temp_profile.widget.isChecked)
 
         self.show_option_under_multiple_conditions(self.option_ground_temp,
                                                    self.option_method_temp_gradient,
                                                    custom_logic=partial(
                                                        self.option_method_temp_gradient.check_linked_value, 0))
-        self.show_option_under_multiple_conditions([self.option_ground_temp_gradient, self.option_ground_heat_flux],
-                                                   self.option_method_temp_gradient,
-                                                   custom_logic=partial(
-                                                       self.option_method_temp_gradient.check_linked_value, 1))
         self.show_option_under_multiple_conditions([self.option_ground_temp_gradient, self.option_temp_gradient],
-                                                   self.option_method_temp_gradient,
-                                                   custom_logic=partial(
-                                                       self.option_method_temp_gradient.check_linked_value, 2))
+                                                   self.option_method_temp_gradient, functions_check_for_or=[partial(
+                                                       self.option_method_temp_gradient.check_linked_value, 2), partial(
+                                                       self.option_method_temp_gradient.check_linked_value, 1)])
 
 
     def _create_lists(self):
