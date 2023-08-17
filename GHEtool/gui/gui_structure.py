@@ -540,17 +540,6 @@ class GUI(GuiStructure):
             decimal_number=2
         )
 
-        # add dependencies
-        self.option_temperature_profile_hourly.add_link_2_show(self.option_len_peak_heating, on_index=0)
-        self.option_method_size_depth.add_link_2_show(self.option_len_peak_heating, on_index=0)
-        self.option_method_size_depth.add_link_2_show(self.option_len_peak_heating, on_index=1)
-        self.aim_optimize.add_link_2_show(self.option_len_peak_heating)
-
-        self.option_temperature_profile_hourly.add_link_2_show(self.option_len_peak_cooling, on_index=0)
-        self.option_method_size_depth.add_link_2_show(self.option_len_peak_cooling, on_index=0)
-        self.option_method_size_depth.add_link_2_show(self.option_len_peak_cooling, on_index=1)
-        self.aim_optimize.add_link_2_show(self.option_len_peak_cooling)
-
     def _page_borehole_resistance(self, translations):
         # create page
         self.page_borehole_resistance = Page(translations.page_borehole_resistance, "Borehole\nresistance", "Resistance.png")
@@ -1414,21 +1403,44 @@ class GUI(GuiStructure):
                                                    self.option_method_temp_gradient,
                                                    custom_logic=partial(
                                                        self.option_method_temp_gradient.check_linked_value, 0))
-        self.show_option_under_multiple_conditions([self.option_ground_temp_gradient, self.option_temp_gradient],
-                                                   self.option_method_temp_gradient, functions_check_for_or=[partial(
-                                                       self.option_method_temp_gradient.check_linked_value, 2), partial(
-                                                       self.option_method_temp_gradient.check_linked_value, 1)])
+        self.show_option_under_multiple_conditions(self.option_ground_temp_gradient,
+                                                   self.option_method_temp_gradient,
+                                                   functions_check_for_or=[
+                                                       partial(self.option_method_temp_gradient.check_linked_value, 1),
+                                                       partial(self.option_method_temp_gradient.check_linked_value, 2)])
+        self.show_option_under_multiple_conditions(self.option_ground_heat_flux,
+                                                   self.option_method_temp_gradient,
+                                                   custom_logic=partial(
+                                                       self.option_method_temp_gradient.check_linked_value, 1))
+        self.show_option_under_multiple_conditions(self.option_temp_gradient,
+                                                   self.option_method_temp_gradient,
+                                                   custom_logic=partial(
+                                                       self.option_method_temp_gradient.check_linked_value, 2))
+        self.option_method_size_depth.value_if_hidden = False
+        self.option_temperature_profile_hourly.value_if_hidden = False
+        self.show_option_under_multiple_conditions(self.option_len_peak_heating,
+                                                   [self.aim_optimize, self.option_temperature_profile_hourly,
+                                                    self.option_method_size_depth],
+                                                   functions_check_for_or=[
+                                                       partial(self.option_temperature_profile_hourly.check_linked_value, 0),
+                                                       partial(self.option_method_size_depth.create_function_2_check_linked_value, 0),
+                                                       partial(self.option_method_size_depth.check_linked_value, 1),
+                                                       self.aim_optimize.is_checked
+                                                   ], check_on_visibility_change=True)
+        # add dependencies
+        # self.option_temperature_profile_hourly.add_link_2_show(self.option_len_peak_heating, on_index=0)
+        # self.option_method_size_depth.add_link_2_show(self.option_len_peak_heating, on_index=0)
+        # self.option_method_size_depth.add_link_2_show(self.option_len_peak_heating, on_index=1)
+        # self.aim_optimize.add_link_2_show(self.option_len_peak_heating)
 
+        self.option_temperature_profile_hourly.add_link_2_show(self.option_len_peak_cooling, on_index=0)
+        self.option_method_size_depth.add_link_2_show(self.option_len_peak_cooling, on_index=0)
+        self.option_method_size_depth.add_link_2_show(self.option_len_peak_cooling, on_index=1)
+        self.aim_optimize.add_link_2_show(self.option_len_peak_cooling)
 
     def _create_lists(self):
         # general settings
         self.create_lists()
-        # TODO this should be implemented in ScenarioGUI v3.0
-        self.list_of_result_texts = []
-        for cat in self.page_result.list_categories:
-            for option in cat.list_of_options:
-                if isinstance(option, ResultText):
-                    self.list_of_result_texts.append((option, ''))
 
     def check_correct_pipe_data(self) -> None:
         """
