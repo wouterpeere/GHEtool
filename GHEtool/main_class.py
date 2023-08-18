@@ -1149,7 +1149,12 @@ class Borefield(BaseClass):
             return self.H
         else:
             # extraction dominated, so quadrants 1 and 4 are relevant
-            max_temp, sized = self._size_based_on_temperature_profile(10, deep_sizing=False)
+            try:
+                max_temp, sized = self._size_based_on_temperature_profile(10, deep_sizing=False)
+            except MaximumNumberOfIterations:
+                # no convergence with normal method, but perhaps with deep_sizing enabled
+                if self._sizing_setup.deep_sizing and self.ground_data.variable_Tg:
+                    max_temp, sized = self._size_based_on_temperature_profile(10, deep_sizing=True)
             if sized:
                 # already correct size
                 self.H = max_temp
@@ -1210,7 +1215,12 @@ class Borefield(BaseClass):
             self.H, _ = self._size_based_on_temperature_profile(quadrant_sizing, hourly=True)
             return self.H
         else:
-            max_temp, sized = self._size_based_on_temperature_profile(10, hourly=True, deep_sizing=False) if np.any(self.load.hourly_cooling_load) else (0, False)
+            try:
+                max_temp, sized = self._size_based_on_temperature_profile(10, hourly=True, deep_sizing=False) if np.any(self.load.hourly_cooling_load) else (0, False)
+            except MaximumNumberOfIterations:
+                # no convergence with normal method, but perhaps with deep_sizing enabled
+                if self._sizing_setup.deep_sizing and self.ground_data.variable_Tg:
+                    max_temp, sized = self._size_based_on_temperature_profile(10, hourly=True, deep_sizing=True) if np.any(self.load.hourly_cooling_load) else (0, False)
             if sized:
                 # already correct size
                 self.H = max_temp
@@ -1229,14 +1239,38 @@ class Borefield(BaseClass):
                 return min_temp
             raise UnsolvableDueToTemperatureGradient
 
-    def calculate_next_depth(self, min_depth, H) -> float:
-        assert False
-        # diff between the max temperature in peak cooling and the avg undisturbed ground temperature at depth H
-        delta_temp = np.max(self.results.peak_cooling - self.ground_data.calculate_Tg(H))
-        delta_wrt_max = self.Tf_max - self.ground_data.calculate_Tg(H)
+    def calculate_next_depth_deep_sizing(self, current_depth: float) -> float:
+        """
+        This method is a slower but more robust way of calculating the next depth in the sizing iteration when the
+        borefield is sized for the maximum fluid temperature when there is a non-constant ground temperature.
+        The method is based (as can be seen in its corresponding validation document) on the assumption that the
+        difference between the maximum temperature in peak cooling and the average undisturbed ground temperature
+        is irreversily proportional to the depth. In this way, given this difference in temperature and the current
+        depth, a new depth can be calculated.
+
+        Parameters
+        ----------
+        current_depth : float
+            The current depth of the borefield [m]
+
+        Returns
+        -------
+        float
+            New depth of the borefield [m]
+        """
+        # diff between the max temperature in peak cooling and the avg undisturbed ground temperature at current_depth
+        delta_temp = np.max(self.results.peak_cooling - self.ground_data.calculate_Tg(current_depth))
+
+        # calculate the maximum temperature difference between the temperature limit and the ground temperature
+        # at current_depth
+        delta_wrt_max = self.Tf_max - self.ground_data.calculate_Tg(current_depth)
+
+        # delta_t1/H1 ~ delta_t2/H2
+        # H2 = delta_t2/delta_t1*current_depth
         rel_diff = delta_wrt_max/delta_temp
-        depth = H/rel_diff
-        return depth
+        new_depth = current_depth/rel_diff
+
+        return new_depth
 
     def _size_based_on_temperature_profile(self, quadrant: int, hourly: bool = False, deep_sizing: bool = False) -> (float, bool):
         """
@@ -1275,6 +1309,9 @@ class Borefield(BaseClass):
         # # initialise the results array
         # results = np.zeros(loads_short.size * 2)
 
+        if deep_sizing:
+            # set borefield to minimal depth
+            self.H = 20
 
         # Iterates as long as there is no convergence
         # (convergence if difference between depth in iterations is smaller than THRESHOLD_BOREHOLE_DEPTH)
@@ -1391,7 +1428,7 @@ class Borefield(BaseClass):
                     self.H = (np.min(self.results.peak_heating) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
             elif self.ground_data.variable_Tg:
                 # for when the temperature gradient is active and it is cooling
-                self.H = self.calculate_next_depth(20, H_prev)
+                self.H = self.calculate_next_depth_deep_sizing(H_prev)
             if self.H < 0:
                 return 0, False
 
