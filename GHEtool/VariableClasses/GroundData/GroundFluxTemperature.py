@@ -3,7 +3,7 @@ from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
 
 class GroundFluxTemperature(_GroundData):
 
-    __slots__ = _GroundData.__slots__ + ('flux', 'Tg')
+    __slots__ = _GroundData.__slots__ + ('flux',)
 
     def __init__(self, k_s: float = None,
                  T_g: float = None,
@@ -45,8 +45,17 @@ class GroundFluxTemperature(_GroundData):
         # avg ground temperature is (Tg + gradient + Tg) / 2 = Tg + gradient / 2
         return self.Tg + H * self.flux / self.k_s / 2
 
-    def max_depth(self, max_temp) -> float:
-        return (max_temp - self.Tg) * 2 * self.k_s / self.flux
+    def calculate_delta_H(self, temperature_diff: float) -> float:
+        """
+        This function calculates the difference in depth for a given difference in temperature.
 
-    def delta_H(self, temp) -> float:
-        return temp * 2 * self.k_s / self.flux
+        Parameters
+        ----------
+        temperature_diff : float
+            Difference in temperature [deg C]
+
+        Returns
+        -------
+        Difference in depth [m] : float
+        """
+        return temperature_diff * 2 * self.k_s / self.flux

@@ -3,7 +3,7 @@ from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
 
 class GroundTemperatureGradient(_GroundData):
 
-    __slots__ = _GroundData.__slots__ + ('gradient', 'Tg')
+    __slots__ = _GroundData.__slots__ + ('gradient',)
 
     def __init__(self, k_s: float = None,
                  T_g: float = None,
@@ -45,7 +45,17 @@ class GroundTemperatureGradient(_GroundData):
         # divide by 100 since the gradient is in K/100m
         return self.Tg + H * self.gradient / 2 / 100
 
+    def calculate_delta_H(self, temperature_diff: float) -> float:
+        """
+        This function calculates the difference in depth for a given difference in temperature.
 
-    def max_depth(self, max_temp) -> float:
-        # TODO implement
-        pass
+        Parameters
+        ----------
+        temperature_diff : float
+            Difference in temperature [deg C]
+
+        Returns
+        -------
+        Difference in depth [m] : float
+        """
+        return temperature_diff * 2 * 100 / self.gradient
