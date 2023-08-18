@@ -27,7 +27,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Removed 'set_hourly_cooling_load', 'set_hourly_heating_load' from main_class and move it to separate load class (issue #45).
 - Moved draw_borehole_internals to PipeClass (issue #45).
 - Borehole equivalent resistances is now calculated in one step, centralised in the pipe class (issue #45).
-- Go to 100% code coverage with 300 tests.
+- Go to 100% code coverage with 350 tests.
 - Threshold interpolation for g-functions set to a relative threshold of 25% relative to the demanded depth (issue #144).
 - Implemented a custom error for crossing the maximum number of iterations: 'MaximumNumberOfIterations' (issue #144).
 - _size_based_on_temperature_profile now returns two arguments: the required depth and a boolean flag to check if the field is sized (issue #144).

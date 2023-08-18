@@ -10,7 +10,7 @@ import pytest
 from pytest import raises
 
 from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, Borefield, CalculationSetup, FOLDER, DoubleUTube
-from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient
+from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient, MaximumNumberOfIterations
 from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
 
@@ -140,10 +140,10 @@ def test_sizing_L3_threshold_depth_error(borefield):
     max_temp = borefield.Tf_max
     borefield.set_max_ground_temperature(14)
     borefield.set_ground_parameters(data_ground_flux)
-    borefield._sizing_setup.use_constant_Tg = False
+    borefield._calculation_setup.use_constant_Tg = False
     with raises(UnsolvableDueToTemperatureGradient):
         borefield.gfunction(3600, borefield.THRESHOLD_DEPTH_ERROR + 1)
-    borefield._sizing_setup.use_constant_Tg = True
+    borefield._calculation_setup.use_constant_Tg = True
     borefield.set_max_ground_temperature(max_temp)
     borefield.ground_data.flux = 0
 
@@ -277,10 +277,10 @@ def test_value_error_cooling_dom_temp_gradient():
     try:
         borefield.size()
         assert False  # pragma: no cover
-    except RuntimeError:
+    except MaximumNumberOfIterations:
         assert True
 
-    borefield.sizing_setup(max_nb_of_iterations=500)
+    borefield.calculation_setup(max_nb_of_iterations=500)
     try:
         borefield.size()
         assert False  # pragma: no cover
@@ -325,7 +325,7 @@ def test_sizing_with_use_constant_Rb():
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     borefield.load = load
     assert not borefield.borehole.use_constant_Rb
-    borefield.sizing_setup(L4_sizing=True)
+    borefield.calculation_setup(L4_sizing=True)
     assert np.isclose(205.49615778557904, borefield.size())
     assert np.isclose(182.17320067531486, borefield.size(use_constant_Rb=True))
 

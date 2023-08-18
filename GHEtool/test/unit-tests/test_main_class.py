@@ -317,7 +317,7 @@ def test_Ahmadfard(ground_data, constant_Rb, result):
     borefield.set_ground_parameters(ground_data)
     borefield.set_fluid_parameters(fluidData)
     borefield.set_pipe_parameters(pipeData)
-    borefield.sizing_setup(use_constant_Rb=constant_Rb)
+    borefield.calculation_setup(use_constant_Rb=constant_Rb)
     th, qh, qm, qa = load._calculate_last_year_params(True)
     assert np.isclose(result, borefield._Ahmadfard(th, qh, qm, qa))
     assert np.isclose(result, borefield.H)
@@ -334,7 +334,7 @@ def test_Carcel(ground_data, constant_Rb, result):
     borefield.set_ground_parameters(ground_data)
     borefield.set_fluid_parameters(fluidData)
     borefield.set_pipe_parameters(pipeData)
-    borefield.sizing_setup(use_constant_Rb=constant_Rb)
+    borefield.calculation_setup(use_constant_Rb=constant_Rb)
     th, _, tcm, qh, qpm, qm = load._calculate_first_year_params(True)
     assert np.isclose(result, borefield._Carcel(th, tcm, qh, qpm, qm))
     assert np.isclose(result, borefield.H)
@@ -342,16 +342,22 @@ def test_Carcel(ground_data, constant_Rb, result):
 
 def test_set_sizing_setup():
     borefield = Borefield()
-    sizing_setup_backup = copy.deepcopy(borefield._sizing_setup)
-    borefield.sizing_setup()
-    assert borefield._sizing_setup == sizing_setup_backup
-    # set sizing_setup
+    sizing_setup_backup = copy.deepcopy(borefield._calculation_setup)
+    borefield.calculation_setup()
+    assert borefield._calculation_setup == sizing_setup_backup
+    # set calculation_setup
     test = CalculationSetup(4, False, True, False)
     test2 = CalculationSetup(3, False, False, True)
-    borefield.sizing_setup(use_constant_Rb=True, quadrant_sizing=4, L2_sizing=False, L3_sizing=True, L4_sizing=False)
-    assert borefield._sizing_setup == test
-    borefield.sizing_setup(sizing_setup=test2)
-    assert borefield._sizing_setup == test2
+    borefield.calculation_setup(use_constant_Rb=True, quadrant_sizing=4, L2_sizing=False, L3_sizing=True, L4_sizing=False)
+    assert borefield._calculation_setup == test
+    borefield.calculation_setup(calculation_setup=test2)
+    assert borefield._calculation_setup == test2
+
+    borefield.calculation_setup(rtol=10)
+    assert borefield._calculation_setup.rtol == 10
+    borefield.calculation_setup(atol=10)
+    assert borefield._calculation_setup.atol == 10
+    assert borefield._calculation_setup.rtol == 10
 
 
 def test_size():
@@ -365,9 +371,9 @@ def test_size():
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(3))
 
     borefield.set_ground_parameters(ground_data_constant)
-    sizing_setup_backup = copy.deepcopy(borefield._sizing_setup)
+    sizing_setup_backup = copy.deepcopy(borefield._calculation_setup)
     borefield.size(L3_sizing=True)
-    assert borefield._sizing_setup == sizing_setup_backup
+    assert borefield._calculation_setup == sizing_setup_backup
 
 
 def test_select_size():
@@ -509,7 +515,7 @@ def test_size_L4():
     borefield.load = load
 
     # to increase coverage
-    borefield.sizing_setup(L4_sizing=True)
+    borefield.calculation_setup(L4_sizing=True)
     assert np.isclose(174.23648328808213, borefield.size(100, quadrant_sizing=4))
     assert np.isclose(174.23648328808213, borefield.H)
     assert borefield.calculate_quadrant() == 4
@@ -791,7 +797,7 @@ def test_gfunction():
     np.testing.assert_array_almost_equal(borefield.gfunction([6000, 60000, 600000]), np.array([0.63751082, 1.70657847, 2.84227252]))
     borefield.create_custom_dataset()
     np.testing.assert_array_almost_equal(borefield.gfunction([6000, 60000, 600000]), np.array([0.622017, 1.703272, 2.840246]))
-    borefield.sizing_setup(use_precalculated_dataset=False)
+    borefield.calculation_setup(use_precalculated_dataset=False)
     np.testing.assert_array_almost_equal(borefield.gfunction([6000, 60000, 600000]), np.array([0.63751082, 1.70657847, 2.84227252]))
 
 
@@ -875,7 +881,7 @@ def test_effect_H_init(H, result):
     borefield.create_rectangular_borefield(10, 5, 7, 7, 100, 0.75)
     load = MonthlyGeothermalLoadAbsolute(*load_case(1))
     borefield.load = load
-    borefield.sizing_setup(H_init=H)
+    borefield.calculation_setup(H_init=H)
     assert np.isclose(borefield.size(), result)
     borefield = Borefield()
     borefield.ground_data = GroundConstantTemperature(3, 11)
@@ -887,7 +893,7 @@ def test_effect_H_init(H, result):
 
 def test_depth_convergence():
     borefield = Borefield()
-    borefield.sizing_setup(atol=1, rtol=0.01, max_nb_of_iterations=10)
+    borefield.calculation_setup(atol=1, rtol=0.01, max_nb_of_iterations=10)
     try:
         borefield._check_convergence(10, 12, 10)
         assert False  # pragma: no cover

@@ -486,8 +486,8 @@ def test_sizing_L2_L3_min_max(qtbot) -> None:
         assert borefield_gui.ground_data.Tg == borefield.ground_data.Tg
         assert borefield_gui.Tf_max == borefield.Tf_max
         assert borefield_gui.Tf_min == borefield.Tf_min
-        assert borefield_gui._sizing_setup.L2_sizing == L2
-        assert borefield_gui._sizing_setup.L3_sizing != L2
+        assert borefield_gui._calculation_setup.L2_sizing == L2
+        assert borefield_gui._calculation_setup.L3_sizing != L2
         assert func.func == borefield_gui.size
         assert func.args == ()
         assert func.keywords == {}

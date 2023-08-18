@@ -22,7 +22,7 @@ def validate():
     borefield.set_ground_parameters(ground_data)
     borefield.set_fluid_parameters(fluid_data)
     borefield.set_pipe_parameters(pipe_data)
-    borefield.sizing_setup(use_constant_Rb=False)
+    borefield.calculation_setup(use_constant_Rb=False)
     borefield.set_max_ground_temperature(17)
     borefield.set_min_ground_temperature(3)
     hourly_load = HourlyGeothermalLoad()

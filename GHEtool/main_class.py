@@ -45,7 +45,7 @@ class Borefield(BaseClass):
         'options_pygfunction', \
         'THRESHOLD_WARNING_SHALLOW_FIELD', \
         'gui', 'D', 'r_b', 'gfunction_calculation_object', \
-        '_sizing_setup', \
+        '_calculation_setup', \
         '_secundary_borefield_load', '_building_load', '_external_load'
 
     def __init__(self, peak_heating: np.ndarray | list = None,
@@ -151,8 +151,8 @@ class Borefield(BaseClass):
         self.borehole = Borehole()
 
         # initiate different sizing
-        self._sizing_setup: CalculationSetup = CalculationSetup()
-        self.sizing_setup()
+        self._calculation_setup: CalculationSetup = CalculationSetup()
+        self.calculation_setup()
 
         # check if the GHEtool is used by the gui i
         self.gui = gui
@@ -737,14 +737,14 @@ class Borefield(BaseClass):
         MaximumNumberOfIterations
             MaximumNumberOfIterations if the max number of iterations is crossed
         """
-        if iter + 1 > self._sizing_setup.max_nb_of_iterations:
-            raise MaximumNumberOfIterations(self._sizing_setup.max_nb_of_iterations)
+        if iter + 1 > self._calculation_setup.max_nb_of_iterations:
+            raise MaximumNumberOfIterations(self._calculation_setup.max_nb_of_iterations)
 
         if old_depth == 0:
             return False
-        test_a_tol = abs(new_depth - old_depth) <= self._sizing_setup.atol if self._sizing_setup.atol != False else True
+        test_a_tol = abs(new_depth - old_depth) <= self._calculation_setup.atol if self._calculation_setup.atol != False else True
         test_rtol = abs(
-            new_depth - old_depth) / old_depth <= self._sizing_setup.rtol if self._sizing_setup.rtol != False else True
+            new_depth - old_depth) / old_depth <= self._calculation_setup.rtol if self._calculation_setup.rtol != False else True
 
         return test_a_tol and test_rtol
 
@@ -849,7 +849,7 @@ class Borefield(BaseClass):
             i += 1
         return self.H
 
-    def sizing_setup(self, sizing_setup: CalculationSetup = None, use_constant_Rb: bool = None, **kwargs) -> None:
+    def calculation_setup(self, calculation_setup: CalculationSetup = None, use_constant_Rb: bool = None, **kwargs) -> None:
         """
         This function sets the options for the sizing function.
 
@@ -861,7 +861,7 @@ class Borefield(BaseClass):
 
         Parameters
         ----------
-        sizing_setup : CalculationSetup
+        calculation_setup : CalculationSetup
             An instance of the CalculationSetup class. When this argument differs from None, all the other parameters are
             set based on this calculation_setup
         use_constant_Rb : bool
@@ -880,13 +880,12 @@ class Borefield(BaseClass):
         .. [#PeereThesis] Peere, W. (2020) Methode voor economische optimalisatie van geothermische verwarmings- en koelsystemen. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
         """
 
-        # if sizing_setup is not None, then the sizing setup is set directly
-        if sizing_setup is not None:
-            self._sizing_setup = sizing_setup
+        # if calculation_setup is not None, then the sizing setup is set directly
+        if calculation_setup is not None:
+            self._calculation_setup = calculation_setup
             return
 
-        self._sizing_setup = CalculationSetup()
-        self._sizing_setup.update_variables(**kwargs)
+        self._calculation_setup.update_variables(**kwargs)
 
         if not use_constant_Rb is None:
             self.borehole.use_constant_Rb = use_constant_Rb
@@ -937,28 +936,28 @@ class Borefield(BaseClass):
             raise ValueError("Please provide ground data.")
 
         # make backup of initial parameter states
-        self._sizing_setup.make_backup()
+        self._calculation_setup.make_backup()
         use_constant_Rb_backup = self.borehole.use_constant_Rb
 
         # run the sizing setup
-        self._sizing_setup.update_variables(H_init=H_init, L2_sizing=L2_sizing, L3_sizing=L3_sizing,
-                                            L4_sizing=L4_sizing,
-                                            quadrant_sizing=quadrant_sizing)
-        self._sizing_setup.update_variables(**kwargs)
+        self._calculation_setup.update_variables(H_init=H_init, L2_sizing=L2_sizing, L3_sizing=L3_sizing,
+                                                 L4_sizing=L4_sizing,
+                                                 quadrant_sizing=quadrant_sizing)
+        self._calculation_setup.update_variables(**kwargs)
 
         if not use_constant_Rb is None:
             self.borehole.use_constant_Rb = use_constant_Rb
 
         # sizes according to the correct algorithm
-        if self._sizing_setup.L2_sizing:
-            depth = self.size_L2(H_init, self._sizing_setup.quadrant_sizing)
-        if self._sizing_setup.L3_sizing:
-            depth = self.size_L3(H_init, self._sizing_setup.quadrant_sizing)
-        if self._sizing_setup.L4_sizing:
-            depth = self.size_L4(H_init, self._sizing_setup.quadrant_sizing)
+        if self._calculation_setup.L2_sizing:
+            depth = self.size_L2(H_init, self._calculation_setup.quadrant_sizing)
+        if self._calculation_setup.L3_sizing:
+            depth = self.size_L3(H_init, self._calculation_setup.quadrant_sizing)
+        if self._calculation_setup.L4_sizing:
+            depth = self.size_L4(H_init, self._calculation_setup.quadrant_sizing)
 
         # reset initial parameters
-        self._sizing_setup.restore_backup()
+        self._calculation_setup.restore_backup()
         self.borehole.use_constant_Rb = use_constant_Rb_backup
 
         # check if the field is not shallow
@@ -1043,7 +1042,7 @@ class Borefield(BaseClass):
             raise ValueError(f'Quadrant {quadrant_sizing} does not exist.')
 
         # initiate with a given depth
-        self.H: float = H_init if H_init is not None else self._sizing_setup.H_init
+        self.H: float = H_init if H_init is not None else self._calculation_setup.H_init
 
         def size_quadrant1():
             th, _, tcm, qh, qpm, qm = self.load._calculate_first_year_params(False)  # calculate parameters
@@ -1141,20 +1140,21 @@ class Borefield(BaseClass):
             raise ValueError(f'Quadrant {quadrant_sizing} does not exist.')
 
         # initiate with a given depth
-        self.H: float = H_init if H_init is not None else self._sizing_setup.H_init
+        self.H: float = H_init if H_init is not None else self._calculation_setup.H_init
 
         if quadrant_sizing != 0:
             # size according to a specific quadrant
             self.H, _ = self._size_based_on_temperature_profile(quadrant_sizing)
             return self.H
         else:
-            # extraction dominated, so quadrants 1 and 4 are relevant
             try:
                 max_temp, sized = self._size_based_on_temperature_profile(10, deep_sizing=False)
-            except MaximumNumberOfIterations:
+            except MaximumNumberOfIterations as e:
                 # no convergence with normal method, but perhaps with deep_sizing enabled
-                if self._sizing_setup.deep_sizing and self.ground_data.variable_Tg:
+                if self._calculation_setup.deep_sizing and self.ground_data.variable_Tg:
                     max_temp, sized = self._size_based_on_temperature_profile(10, deep_sizing=True)
+                else:
+                    raise e
             if sized:
                 # already correct size
                 self.H = max_temp
@@ -1208,7 +1208,7 @@ class Borefield(BaseClass):
             raise ValueError("There is no hourly resolution available!")
 
         # initiate with a given depth
-        self.H: float = H_init if H_init is not None else self._sizing_setup.H_init
+        self.H: float = H_init if H_init is not None else self._calculation_setup.H_init
 
         if quadrant_sizing != 0:
             # size according to a specific quadrant
@@ -1217,10 +1217,12 @@ class Borefield(BaseClass):
         else:
             try:
                 max_temp, sized = self._size_based_on_temperature_profile(10, hourly=True, deep_sizing=False) if np.any(self.load.hourly_cooling_load) else (0, False)
-            except MaximumNumberOfIterations:
+            except MaximumNumberOfIterations as e:
                 # no convergence with normal method, but perhaps with deep_sizing enabled
-                if self._sizing_setup.deep_sizing and self.ground_data.variable_Tg:
+                if self._calculation_setup.deep_sizing and self.ground_data.variable_Tg:
                     max_temp, sized = self._size_based_on_temperature_profile(10, hourly=True, deep_sizing=True) if np.any(self.load.hourly_cooling_load) else (0, False)
+                else:
+                    raise e
             if sized:
                 # already correct size
                 self.H = max_temp
@@ -1431,6 +1433,8 @@ class Borefield(BaseClass):
                 self.H = self.calculate_next_depth_deep_sizing(H_prev)
             if self.H < 0:
                 return 0, False
+
+            i += 1
 
         return self.H, (np.max(self.results.peak_cooling) <= self.Tf_max + 0.05 or
                         (quadrant == 10 or quadrant == 1 or quadrant == 2))\
@@ -1828,11 +1832,11 @@ class Borefield(BaseClass):
             # set the correct depth of the borefield
             self._update_borefield_depth(H=H)
             return self.gfunction_calculation_object.calculate(time_value, self.borefield, self.ground_data.alpha,
-                                                               interpolate=self._sizing_setup.interpolate_gfunctions)
+                                                               interpolate=self._calculation_setup.interpolate_gfunctions)
 
         ## 1 bypass any possible precalculated g-functions
         # if calculate is False, then the gfunctions are calculated jit
-        if not self._sizing_setup.use_precalculated_dataset:
+        if not self._calculation_setup.use_precalculated_dataset:
             return jit_gfunction_calculation()
 
         ## 2 use precalculated g-functions when available
