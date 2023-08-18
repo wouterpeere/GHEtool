@@ -9,8 +9,8 @@ import pygfunction as gt
 import pytest
 from pytest import raises
 
-from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, Borefield, SizingSetup, FOLDER, DoubleUTube
-from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute
+from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, Borefield, CalculationSetup, FOLDER, DoubleUTube
+from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient, MaximumNumberOfIterations
 from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
 
@@ -53,6 +53,8 @@ def test_borefield():
     borefield.set_min_ground_temperature(0)  # minimum temperature
 
     assert borefield.simulation_period == 20
+    assert borefield.Tf_min == 0
+    assert borefield.Tf_max == 16
     np.testing.assert_array_equal(borefield.load.peak_heating, np.array([160., 142, 102., 55., 26.301369863013697, 0., 0., 0., 40.4, 85., 119., 136.]))
 
 
@@ -135,13 +137,13 @@ def test_imbalance(borefield):
 
 
 def test_sizing_L3_threshold_depth_error(borefield):
-    max_temp = float(borefield.Tf_max_monthly[0])
+    max_temp = borefield.Tf_max
     borefield.set_max_ground_temperature(14)
     borefield.set_ground_parameters(data_ground_flux)
-    borefield._sizing_setup.use_constant_Tg = False
-    with raises(ValueError):
+    borefield._calculation_setup.use_constant_Tg = False
+    with raises(UnsolvableDueToTemperatureGradient):
         borefield.gfunction(3600, borefield.THRESHOLD_DEPTH_ERROR + 1)
-    borefield._sizing_setup.use_constant_Tg = True
+    borefield._calculation_setup.use_constant_Tg = True
     borefield.set_max_ground_temperature(max_temp)
     borefield.ground_data.flux = 0
 
@@ -274,7 +276,15 @@ def test_value_error_cooling_dom_temp_gradient():
 
     try:
         borefield.size()
-    except ValueError:
+        assert False  # pragma: no cover
+    except MaximumNumberOfIterations:
+        assert True
+
+    borefield.calculation_setup(max_nb_of_iterations=500)
+    try:
+        borefield.size()
+        assert False  # pragma: no cover
+    except UnsolvableDueToTemperatureGradient:
         assert True
 
 
@@ -315,7 +325,7 @@ def test_sizing_with_use_constant_Rb():
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     borefield.load = load
     assert not borefield.borehole.use_constant_Rb
-    borefield.sizing_setup(L4_sizing=True)
+    borefield.calculation_setup(L4_sizing=True)
     assert np.isclose(205.49615778557904, borefield.size())
     assert np.isclose(182.17320067531486, borefield.size(use_constant_Rb=True))
 
@@ -325,4 +335,4 @@ def test_size_with_different_peak_lengths(borefield):
 
     borefield.set_length_peak_cooling(8)
     borefield.set_length_peak_heating(6)
-    assert np.isclose(99.33058400216777, borefield.size(L3_sizing=True))
+    assert np.isclose(99.33058400216774, borefield.size(L3_sizing=True))

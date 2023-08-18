@@ -74,7 +74,7 @@ def custom_borefield_configuration():
     # print gives the array of monthly temperatures for peak cooling without showing the plot
     borefield.calculate_temperatures(depth=90)
     print("Result array for cooling peaks")
-    print(borefield.results_peak_cooling)
+    print(borefield.results.peak_cooling)
 
 
 if __name__ == "__main__":  # pragma: no cover

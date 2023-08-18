@@ -240,12 +240,16 @@ class Translations:  # pragma: no cover
         "hint_press_load",
         "cannot_load_new_version",
         "pipe_thermal_resistance",
-        "option_is_inner_inlet",
         "option_U_pipe_or_coaxial_pipe",
         "option_pipe_coaxial_inner_inner",
         "option_pipe_coaxial_outer_inner",
         "option_pipe_coaxial_inner_outer",
         "option_pipe_coaxial_outer_outer",
+        "option_advanced_options",
+        "category_advanced_options",
+        "option_atol",
+        "option_rtol",
+        "option_max_nb_of_iter",
         "languages",
     )
 
@@ -1873,7 +1877,7 @@ class Translations:  # pragma: no cover
         ]
         self.geo_load: List[str] = [
             "Load type, Geothermal , Building ",
-            "Art der Belastung, Grundseite , Gebäudeseite ",
+            "Art der Belastung, Geothermieseite , Gebäudeseite ",
             "Type belasting, grondzijdig , gebouwzijdig ",
             "Load type, Geothermal , Building ",
             "Load type, Geothermal , Building ",
@@ -1936,15 +1940,6 @@ class Translations:  # pragma: no cover
             "The equivalent borehole thermal resistance (at , mK/W",
             "The equivalent borehole thermal resistance (at , mK/W",
         ]
-        self.option_is_inner_inlet: List[str] = [
-            "Inlet via inner tube?, Yes , No ",
-            "Einlass am inneren Rohr?, Ja , Nein ",
-            "Inlaat via binnenste leiding?, Ja, Nee",
-            "Inlet via inner tube?, Yes , No ",
-            "Inlet via inner tube?, Yes , No ",
-            "Inlet via inner tube?, Yes , No ",
-            "Inlet via inner tube?, Yes , No ",
-        ]
         self.option_U_pipe_or_coaxial_pipe: List[str] = [
             "Borehole interals:, U-tube , Coaxial pipe ",
             "Sondentyp:, U-Sonde , Koaxialsonde ",
@@ -1989,4 +1984,49 @@ class Translations:  # pragma: no cover
             "Outer pipe outer radius [m]:",
             "Outer pipe outer radius [m]:",
             "Outer pipe outer radius [m]:",
+        ]
+        self.option_advanced_options: List[str] = [
+            "Enable advanced options?, No , Yes ",
+            "Aktiviere erweiterte Optionen?, Nein , Ja ",
+            "Activeer geavanceerde opties?, Nee, Ja ",
+            "Enable advanced options?, No , Yes ",
+            "Enable advanced options?, No , Yes ",
+            "Enable advanced options?, No , Yes ",
+            "Enable advanced options?, No , Yes ",
+        ]
+        self.category_advanced_options: List[str] = [
+            "Advanced options",
+            "Erweiterte Optionen",
+            "Geavanceerde opties",
+            "Advanced options",
+            "Advanced options",
+            "Advanced options",
+            "Advanced options",
+        ]
+        self.option_atol: List[str] = [
+            "Absolute tolerance for iteration convergence [m]:",
+            "Absolute Toleranz für Iterationskonvergenz [m]:",
+            "Absolute tolerance for iteration convergence [m]:",
+            "Absolute tolerance for iteration convergence [m]:",
+            "Absolute tolerance for iteration convergence [m]:",
+            "Absolute tolerance for iteration convergence [m]:",
+            "Absolute tolerance for iteration convergence [m]:",
+        ]
+        self.option_rtol: List[str] = [
+            "Relative tolerance for iteration convergence [%]:",
+            "Relative Toleranz für Iterationskonvergenz [%]:",
+            "Relative tolerance for iteration convergence [%]:",
+            "Relative tolerance for iteration convergence [%]:",
+            "Relative tolerance for iteration convergence [%]:",
+            "Relative tolerance for iteration convergence [%]:",
+            "Relative tolerance for iteration convergence [%]:",
+        ]
+        self.option_max_nb_of_iter: List[str] = [
+            "Maximum number of iterations to check for convergence [#]:",
+            "Maximale Anzahl der Iterationen, um auf Konvergenz zu prüfen [#]:",
+            "Maximum number of iterations to check for convergence [#]:",
+            "Maximum number of iterations to check for convergence [#]:",
+            "Maximum number of iterations to check for convergence [#]:",
+            "Maximum number of iterations to check for convergence [#]:",
+            "Maximum number of iterations to check for convergence [#]:",
         ]
