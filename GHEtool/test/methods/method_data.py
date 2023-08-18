@@ -7,7 +7,7 @@ import pygfunction as gt
 from GHEtool.test.methods.TestMethodClass import *
 from GHEtool import *
 from GHEtool.Validation.cases import load_case
-from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient
+from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient, MaximumNumberOfIterations
 
 list_of_test_objects = TestMethodClass()
 
@@ -167,7 +167,7 @@ borefield.load = hourly_load
 list_of_test_objects.add(SizingObject(borefield, L2_output=136.780, L3_output=136.294, L4_output=101.285, quadrant=1,
                                       name='BS2023 Auditorium'))
 borefield.sizing_setup(max_nb_of_iterations=20)
-list_of_test_objects.add(SizingObject(borefield, error_L2=RuntimeError, error_L3=RuntimeError, error_L4=RuntimeError, quadrant=1,
+list_of_test_objects.add(SizingObject(borefield, error_L2=MaximumNumberOfIterations, error_L3=MaximumNumberOfIterations, error_L4=MaximumNumberOfIterations, quadrant=1,
                                       name='BS2023 Auditorium (max nb of iter)'))
 borefield.sizing_setup(atol=False, max_nb_of_iterations=40)
 list_of_test_objects.add(SizingObject(borefield, L2_output=136.0488, L3_output=135.591, L4_output=101.061, quadrant=1,
@@ -188,7 +188,7 @@ borefield.load = hourly_load
 list_of_test_objects.add(SizingObject(borefield, L2_output=111.180, L3_output=113.069, L4_output=107.08131844420905, quadrant=2,
                                       name='BS2023 Office'))
 borefield.sizing_setup(max_nb_of_iterations=20)
-list_of_test_objects.add(SizingObject(borefield, error_L2=RuntimeError, error_L3=RuntimeError, error_L4=RuntimeError, quadrant=2,
+list_of_test_objects.add(SizingObject(borefield, error_L2=MaximumNumberOfIterations, error_L3=MaximumNumberOfIterations, error_L4=MaximumNumberOfIterations, quadrant=2,
                                       name='BS2023 Office (max nb of iter)'))
 borefield.sizing_setup(atol=False, max_nb_of_iterations=40)
 list_of_test_objects.add(SizingObject(borefield, L2_output=110.845, L3_output=112.914, L4_output=106.920, quadrant=2,

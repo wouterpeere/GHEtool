@@ -50,6 +50,7 @@ class GroundConstantTemperature(_GroundData):
 
         Returns
         -------
-        Difference in depth [m] : float
+        float
+            Difference in depth [m]
         """
         return 0

@@ -56,6 +56,7 @@ class GroundTemperatureGradient(_GroundData):
 
         Returns
         -------
-        Difference in depth [m] : float
+        float
+            Difference in depth [m]
         """
         return temperature_diff * 2 * 100 / self.gradient

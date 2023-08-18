@@ -181,3 +181,11 @@ class UnsolvableDueToTemperatureGradient(Exception):
     """
     def __init__(self):
         super().__init__('No solution can be found due to the temperature gradient. Please increase the field size.')
+
+
+class MaximumNumberOfIterations(RuntimeError):
+    """
+    This Error occurs when the maximum number of interation is reacted.
+    """
+    def __init__(self, iter: int):
+        super().__init__(f'The maximum number of iterations {iter} is crossed. There is no size convergence.')

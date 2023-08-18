@@ -56,6 +56,7 @@ class GroundFluxTemperature(_GroundData):
 
         Returns
         -------
-        Difference in depth [m] : float
+        float
+            Difference in depth [m]
         """
         return temperature_diff * 2 * self.k_s / self.flux

@@ -19,7 +19,7 @@ from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFun
 from GHEtool.VariableClasses.LoadData import *
 from GHEtool.VariableClasses.LoadData import _LoadData
 from GHEtool.VariableClasses.PipeData import _PipeData
-from GHEtool.VariableClasses.BaseClass import BaseClass, UnsolvableDueToTemperatureGradient
+from GHEtool.VariableClasses.BaseClass import BaseClass, UnsolvableDueToTemperatureGradient, MaximumNumberOfIterations
 from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
 from GHEtool.logger.ghe_logger import ghe_logger
 
@@ -716,7 +716,7 @@ class Borefield(BaseClass):
     def _check_convergence(self, new_depth: float, old_depth: float, iter: int) -> bool:
         """
         This function checks, with the absolute and relative tolerance, if the depth is converged.
-        This is the case if both criteria are met. Raises runtime error if the max number of iterations is crossed.
+        This is the case if both criteria are met. Raises MaximumNumberOfIterations error if the max number of iterations is crossed.
 
         Parameters
         ----------
@@ -734,12 +734,12 @@ class Borefield(BaseClass):
 
         Raises
         ------
-        RuntimeError
-            RuntimeError if the max number of iterations is crossed
+        MaximumNumberOfIterations
+            MaximumNumberOfIterations if the max number of iterations is crossed
         """
         if iter + 1 > self._sizing_setup.max_nb_of_iterations:
-            raise RuntimeError(f'The maximum number of iterations {self._sizing_setup.max_nb_of_iterations} is crossed. '
-                               f'There is no size convergence.')
+            raise MaximumNumberOfIterations(self._sizing_setup.max_nb_of_iterations)
+
         if old_depth == 0:
             return False
         test_a_tol = abs(new_depth - old_depth) <= self._sizing_setup.atol if self._sizing_setup.atol != False else True
@@ -1496,7 +1496,7 @@ class Borefield(BaseClass):
         Returns
         -------
         float
-            Investement cost
+            Investment cost
         """
         return np.polyval(self.cost_investment, self.H * self.number_of_boreholes)
 
@@ -1511,6 +1511,7 @@ class Borefield(BaseClass):
             Depth for which the temperature profile should be calculated for [m]
         hourly : bool
             True when the temperatures should be calculated based on hourly data
+
         Returns
         -------
         None
@@ -1853,7 +1854,8 @@ class Borefield(BaseClass):
 
         Returns
         -------
-        Reynolds number : float
+        float
+            Reynolds number
         """
         return self.borehole.Re
 
