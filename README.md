@@ -129,6 +129,8 @@ atol and rtol is chosen when sizing. The options are:
 * _use_precalculated_dataset_: This option makes sure the custom g-function dataset (if available) is not used.
 * _interpolate_gfunctions_: Calculating the gvalues gives a large overhead cost, although they are not that sensitive to a change in borehole depth. If this parameter is True 
 it is allowed that gfunctions are interpolated. (To change the threshold for this interpolation, go to the Gfunction class.)
+* _deep_sizing_: An alternative sizing method for cases with high cooling (peaks) and a variable ground temperature.
+This method is potentially slower, but proves to be more robust.
 
 ### Simple example
 
