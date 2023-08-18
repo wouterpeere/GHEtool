@@ -898,3 +898,40 @@ def test_depth_convergence():
     assert not borefield._check_convergence(10, 10.5, 1)
     assert borefield._check_convergence(10, 10.001, 1)
     assert not borefield._check_convergence(10000, 10002, 1)
+
+
+def test_calculate_next_depth_deep_sizing():
+    borefield = Borefield()
+    borefield.ground_data = GroundFluxTemperature(3, 10)
+    borefield.create_rectangular_borefield(10, 5, 7, 7, 100, 0.75)
+    load = MonthlyGeothermalLoadAbsolute(*load_case(1))
+    borefield.load = load
+
+    borefield.calculate_temperatures(75)
+    assert np.isclose(borefield.calculate_next_depth_deep_sizing(75), 117.98660599828808)
+    borefield.calculate_temperatures(117.98660599828808)
+    assert np.isclose(borefield.calculate_next_depth_deep_sizing(117.98660599828808), 128.16618036528823)
+    borefield.calculate_temperatures(128.16618036528823)
+    assert np.isclose(borefield.calculate_next_depth_deep_sizing(128.16618036528823), 130.8812255630479)
+
+
+@pytest.mark.parametrize("case, result",
+                         zip((1, 2, 3, 4),
+                             [131.90418292004594, 0, 139.46239300837794, 131.90418292004594]))
+def test_deep_sizing(case, result):
+    borefield = Borefield()
+    borefield.ground_data = GroundFluxTemperature(3, 10)
+    borefield.create_rectangular_borefield(10, 5, 7, 7, 100, 0.75)
+    load = MonthlyGeothermalLoadAbsolute(*load_case(case))
+    borefield.load = load
+
+    assert np.allclose(result, borefield._size_based_on_temperature_profile(10, deep_sizing=True)[0])
+
+    borefield = Borefield()
+    borefield.ground_data = GroundFluxTemperature(3, 10)
+    borefield.create_rectangular_borefield(10, 5, 7, 7, 100, 0.75)
+    load = MonthlyGeothermalLoadAbsolute(*load_case(case))
+    borefield.load = load
+
+    # methods should more or less lead to the same results, 1% diff taken as a reference
+    assert np.allclose(result, borefield._size_based_on_temperature_profile(10, deep_sizing=False)[0], rtol=0.01)

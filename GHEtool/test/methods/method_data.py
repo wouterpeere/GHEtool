@@ -190,6 +190,9 @@ list_of_test_objects.add(SizingObject(borefield, L2_output=111.180, L3_output=11
 borefield.sizing_setup(max_nb_of_iterations=20)
 list_of_test_objects.add(SizingObject(borefield, error_L2=MaximumNumberOfIterations, error_L3=MaximumNumberOfIterations, error_L4=MaximumNumberOfIterations, quadrant=2,
                                       name='BS2023 Office (max nb of iter)'))
+borefield.sizing_setup(deep_sizing=True)
+list_of_test_objects.add(SizingObject(borefield, error_L2=MaximumNumberOfIterations, L3_output=113.074, L4_output=107.08131844420905, quadrant=2,
+                                      name='BS2023 Office (max nb of iter, deep sizing)'))
 borefield.sizing_setup(atol=False, max_nb_of_iterations=40)
 list_of_test_objects.add(SizingObject(borefield, L2_output=110.845, L3_output=112.914, L4_output=106.920, quadrant=2,
                                       name='BS2023 Office (no atol)'))
