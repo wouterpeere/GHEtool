@@ -40,5 +40,5 @@ def test_effective_borehole_thermal_resistance(monkeypatch):
 @pytest.mark.slow
 def test_validate_deep_sizing(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
-    from GHEtool.Validation.validation_effective_borehole_thermal_resistance import validate
+    from GHEtool.Validation.validate_deep_sizing import validate
     validate()
