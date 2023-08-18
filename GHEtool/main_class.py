@@ -1149,7 +1149,7 @@ class Borefield(BaseClass):
             return self.H
         else:
             # extraction dominated, so quadrants 1 and 4 are relevant
-            max_temp, sized = self._size_based_on_temperature_profile(10, min_depth=20)
+            max_temp, sized = self._size_based_on_temperature_profile(10, deep_sizing=False)
             if sized:
                 # already correct size
                 self.H = max_temp
@@ -1210,7 +1210,7 @@ class Borefield(BaseClass):
             self.H, _ = self._size_based_on_temperature_profile(quadrant_sizing, hourly=True)
             return self.H
         else:
-            max_temp, sized = self._size_based_on_temperature_profile(10, hourly=True, min_depth=20) if np.any(self.load.hourly_cooling_load) else (0, False)
+            max_temp, sized = self._size_based_on_temperature_profile(10, hourly=True, deep_sizing=False) if np.any(self.load.hourly_cooling_load) else (0, False)
             if sized:
                 # already correct size
                 self.H = max_temp
@@ -1230,6 +1230,7 @@ class Borefield(BaseClass):
             raise UnsolvableDueToTemperatureGradient
 
     def calculate_next_depth(self, min_depth, H) -> float:
+        assert False
         # diff between the max temperature in peak cooling and the avg undisturbed ground temperature at depth H
         delta_temp = np.max(self.results.peak_cooling - self.ground_data.calculate_Tg(H))
         delta_wrt_max = self.Tf_max - self.ground_data.calculate_Tg(H)
@@ -1237,7 +1238,7 @@ class Borefield(BaseClass):
         depth = H/rel_diff
         return depth
 
-    def _size_based_on_temperature_profile(self, quadrant: int, hourly: bool = False, min_depth: float = None) -> (float, bool):
+    def _size_based_on_temperature_profile(self, quadrant: int, hourly: bool = False, deep_sizing: bool = False) -> (float, bool):
         """
          This function sizes based on the temperature profile.
         It sizes for a specific quadrant and can both size with a monthly or an hourly resolution.
@@ -1249,6 +1250,8 @@ class Borefield(BaseClass):
             Quadrants are developed by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]_
         hourly : bool
             True if an hourly resolution should be used
+        deep_sizing : bool
+            True if the slower method should be used for the sizing, which is robuster.
 
         Returns
         -------
@@ -1271,10 +1274,6 @@ class Borefield(BaseClass):
         #
         # # initialise the results array
         # results = np.zeros(loads_short.size * 2)
-
-        if not min_depth is None:
-            self.H = self.ground_data.max_depth(self.Tf_max)
-            self.H = min_depth
 
 
         # Iterates as long as there is no convergence
@@ -1363,7 +1362,7 @@ class Borefield(BaseClass):
                 # self.results.peak_cooling = results_peak_cooling
                 self._calculate_temperature_profile(self.H, hourly=False)
             H_prev = self.H
-            if min_depth is None or not self.ground_data.variable_Tg:
+            if not deep_sizing:
                 if quadrant == 1:
                     # maximum temperature
                     # convert back to required length
@@ -1392,12 +1391,14 @@ class Borefield(BaseClass):
                     self.H = (np.min(self.results.peak_heating) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
             elif self.ground_data.variable_Tg:
                 # for when the temperature gradient is active and it is cooling
-                self.H = self.calculate_next_depth(min_depth, H_prev)
+                self.H = self.calculate_next_depth(20, H_prev)
             if self.H < 0:
                 return 0, False
 
-        return self.H, np.max(self.results.peak_cooling) <= self.Tf_max + 0.05 \
-                       and np.min(self.results.peak_heating) >= self.Tf_min - 0.05
+        return self.H, (np.max(self.results.peak_cooling) <= self.Tf_max + 0.05 or
+                        (quadrant == 10 or quadrant == 1 or quadrant == 2))\
+                       and (np.min(self.results.peak_heating) >= self.Tf_min - 0.05 or
+                            (quadrant == 20 or quadrant == 3 or quadrant == 4))
 
     def set_baseload_heating(self, baseload: np.ndarray | list) -> None:
         """
