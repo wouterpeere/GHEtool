@@ -99,11 +99,11 @@ class GFunction:
         self.fifo_list: FIFO = FIFO(8)
 
     def calculate(self, time_value: Union[list, float, np.ndarray], borefield: List[gt.boreholes.Borehole],
-                  alpha: float):
+                  alpha: float, interpolate: bool = None):
         """
         This function returns the gvalues either by interpolation or by calculating them.
         It does so by calling the function gvalues which does this calculation.
-        This calculate function also stores the previous calculated data and makes interpolations
+        This calculation function also stores the previous calculated data and makes interpolations
         whenever the requested list of time_value are longer then DEFAULT_NUMBER_OF_TIMESTEPS.
 
         Parameters
@@ -114,6 +114,8 @@ class GFunction:
             Borefield model for which the gvalues should be calculated
         alpha : float
             Thermal diffusivity of the ground [m2/s]
+        interpolate : bool
+            True if results should be interpolated when possible, False otherwise. If None, the default is chosen.
 
         Returns
         -------
@@ -122,7 +124,7 @@ class GFunction:
         """
 
         def gvalues(time_values: np.ndarray, borefield: List[gt.boreholes.Borehole], alpha: float,
-                    depth: float) -> np.ndarray:
+                    depth: float, interpolate: bool = None) -> np.ndarray:
             """
             This function returns the gvalues either by interpolation or by calculating them.
 
@@ -136,6 +138,8 @@ class GFunction:
                 Thermal diffusivity of the ground [m2/s]
             depth : float
                 Depth of the borefield [m]
+            interpolate : bool
+                True if results should be interpolated when possible, False otherwise. If None, the default is chosen.
 
             Returns
             -------
@@ -167,7 +171,9 @@ class GFunction:
             else:
                 self.previous_depth = depth
             # do interpolation
-            gfunc_interpolated = self.interpolate_gfunctions(time_values, depth, alpha, borefield)
+            interpolate = interpolate if interpolate is not None else self.store_previous_values
+            gfunc_interpolated = self.interpolate_gfunctions(time_values, depth, alpha, borefield)\
+                if interpolate else np.array([])
 
             # if there are g-values calculated, return them
             if np.any(gfunc_interpolated):
@@ -197,7 +203,7 @@ class GFunction:
             time_value_new = _timeValues(t_max=time_value[-1])
 
             # calculate g-function values
-            gfunc_uniform_T = gvalues(time_value_new, borefield, alpha, depth)
+            gfunc_uniform_T = gvalues(time_value_new, borefield, alpha, depth, interpolate)
 
             # return interpolated values
             return np.interp(time_value, time_value_new, gfunc_uniform_T)
@@ -205,19 +211,20 @@ class GFunction:
         # check if there are double values
         if not isinstance(time_value, (float, int)) and time_value_np.size != np.unique(np.asarray(time_value)).size:
             # calculate g-function values
-            gfunc_uniform_T = gvalues(np.unique(time_value_np), borefield, alpha, depth)
+            gfunc_uniform_T = gvalues(np.unique(time_value_np), borefield, alpha, depth, interpolate)
 
             return np.interp(time_value, np.unique(time_value_np), gfunc_uniform_T)
 
         # calculate g-function values
-        gfunc_uniform_T = gvalues(time_value_np, borefield, alpha, depth)
+        gfunc_uniform_T = gvalues(time_value_np, borefield, alpha, depth, interpolate)
 
         return gfunc_uniform_T
 
     def interpolate_gfunctions(self, time_value: Union[list, float, np.ndarray], depth: float,
                                alpha: float, borefield: List[gt.boreholes.Borehole]) -> np.ndarray:
         """
-        This function returns the gvalues either by interpolation or by calculating them.
+        This function returns the gvalues by interpolation them. If interpolation is not possible, an emtpy
+        array is returned.
 
         Parameters
         ----------
@@ -236,9 +243,6 @@ class GFunction:
             1D array with all the requested gvalues
         """
         gvalues: np.ndarray = np.zeros(len(time_value))
-
-        if not self.store_previous_values:
-            return gvalues
 
         # check if interpolation is possible:
         if not (self._check_alpha(alpha) and self._check_borefield(borefield)):
@@ -463,8 +467,8 @@ class GFunction:
 
         def check_if_data_should_be_saved() -> bool:
             """
-            This function implements a couple of checks to see whether or not the new data should be saved.
-            Currently the following tests are implemented:
+            This function implements a couple of checks to see whether the new data should be saved.
+            Currently, the following tests are implemented:
 
             1) check if the data should be saved
 

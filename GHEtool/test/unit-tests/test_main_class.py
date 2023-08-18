@@ -6,7 +6,7 @@ import numpy as np
 import pygfunction as gt
 import pytest
 
-from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, DoubleUTube, Borefield, SizingSetup, FOLDER, MultipleUTube
+from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, DoubleUTube, Borefield, CalculationSetup, FOLDER, MultipleUTube
 from GHEtool.logger import ghe_logger
 from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
@@ -343,19 +343,14 @@ def test_Carcel(ground_data, constant_Rb, result):
 def test_set_sizing_setup():
     borefield = Borefield()
     sizing_setup_backup = copy.deepcopy(borefield._sizing_setup)
-    H_init_backup = borefield.H_init
     borefield.sizing_setup()
     assert borefield._sizing_setup == sizing_setup_backup
-    assert borefield.H_init == H_init_backup
     # set sizing_setup
-    test = SizingSetup(4, False, True, False)
-    test2 = SizingSetup(3, False, False, True)
-    borefield.sizing_setup(120, True, 4, False, True, False)
-    assert borefield.H_init == 120
-    assert borefield._sizing_setup == test
+    test = CalculationSetup(4, False, True, False)
+    test2 = CalculationSetup(3, False, False, True)
+    borefield.sizing_setup(use_constant_Rb=True, quadrant_sizing=4, L2_sizing=False, L3_sizing=True, L4_sizing=False)
     assert borefield._sizing_setup == test
     borefield.sizing_setup(sizing_setup=test2)
-    assert borefield.H_init == 120
     assert borefield._sizing_setup == test2
 
 
@@ -576,7 +571,7 @@ def test_calculate_temperatures():
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
 
     borefield.calculate_temperatures(120)
-    np.testing.assert_array_almost_equal(borefield.results_peak_heating,
+    np.testing.assert_array_almost_equal(borefield.results.peak_heating,
                                          np.array([ 7.76418446,  8.06457527,  8.59144992,  9.22406634,  9.9176661 ,
        10.35493277, 10.85933332, 10.99023511, 10.04321457,  9.33984947,
         8.73958309,  8.33426967,  7.95321315,  8.25111367,  8.77481226,
@@ -625,7 +620,7 @@ def test_calculate_temperatures():
        10.55323455,  9.93631861,  9.51283391,  9.1158352 ,  9.39905299,
         9.90536243, 10.51952398, 11.19933578, 11.62696168, 12.12650419,
        12.25159304, 11.29457142, 10.57776036,  9.96084442,  9.53735972]))
-    np.testing.assert_array_almost_equal(borefield.results_peak_cooling,
+    np.testing.assert_array_almost_equal(borefield.results.peak_cooling,
                                          np.array([ 9.7265228 ,  9.87217467, 10.134688  , 10.63927884, 11.62475183,
        12.59873554, 13.28921831, 13.76520367, 12.39881805, 10.70464274,
        10.2834413 , 10.00058989,  9.91555149, 10.05871306, 10.31805035,
@@ -674,7 +669,7 @@ def test_calculate_temperatures():
        11.91802782, 11.48017683, 11.17915413, 11.07817353, 11.20665239,
        11.44860052, 11.93473647, 12.90642151, 13.87076446, 14.55638918,
        15.0265616 , 13.6501749 , 11.94255363, 11.50470264, 11.20367994]))
-    np.testing.assert_array_almost_equal(borefield.results_month_cooling,
+    np.testing.assert_array_almost_equal(borefield.results.monthly_cooling,
                                          np.array([ 9.7265228 ,  9.87217467,  9.91023486,  9.96749514, 10.24004053,
        10.62890537, 11.40727853, 11.53818031, 10.77407145, 10.54689525,
        10.2834413 , 10.00058989,  9.91555149, 10.05871306, 10.09359721,
@@ -723,7 +718,7 @@ def test_calculate_temperatures():
        11.76028033, 11.48017683, 11.17915413, 11.07817353, 11.20665239,
        11.22414738, 11.26295278, 11.52171021, 11.90093428, 12.67444939,
        12.79953825, 12.0254283 , 11.78480614, 11.50470264, 11.20367994]))
-    np.testing.assert_array_almost_equal(borefield.results_month_heating,
+    np.testing.assert_array_almost_equal(borefield.results.monthly_heating,
                                          np.array([ 9.37492462,  9.46486873,  9.54493806,  9.64968692,  9.9176661 ,
        10.35493277, 10.85933332, 10.99023511, 10.38868332, 10.18251169,
         9.93275637,  9.66908304,  9.56395331,  9.65140713,  9.72830041,
@@ -796,7 +791,7 @@ def test_gfunction():
     np.testing.assert_array_almost_equal(borefield.gfunction([6000, 60000, 600000]), np.array([0.63751082, 1.70657847, 2.84227252]))
     borefield.create_custom_dataset()
     np.testing.assert_array_almost_equal(borefield.gfunction([6000, 60000, 600000]), np.array([0.622017, 1.703272, 2.840246]))
-    borefield.use_precalculated_data = False
+    borefield.sizing_setup(use_precalculated_dataset=False)
     np.testing.assert_array_almost_equal(borefield.gfunction([6000, 60000, 600000]), np.array([0.63751082, 1.70657847, 2.84227252]))
 
 
@@ -865,3 +860,41 @@ def test_optimise_load_profile_without_hourly_data():
     borefield.load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     borefield.create_rectangular_borefield(10, 10, 6, 6, 150)
     borefield.optimise_load_profile(borefield.load)
+
+@pytest.mark.parametrize("H, result",
+                         zip(range(110, 130, 1), [122.99210426454648, 122.99135446500962, 122.99135409065917,
+                                                  122.99135403971272, 122.99135403719148, 122.9913540367823,
+                                                  122.99135403674013, 122.99135403673134, 122.99221686744185,
+                                                  122.99217229220649, 122.99135553171544, 122.99220727438545,
+                                                  122.99477143007601, 122.9921794642058, 122.99220615327106,
+                                                  122.99221262582992, 122.99221900364599, 122.9922252887964,
+                                                  122.99223148329897, 122.99223758911434]))
+def test_effect_H_init(H, result):
+    borefield = Borefield()
+    borefield.ground_data = GroundConstantTemperature(3, 11)
+    borefield.create_rectangular_borefield(10, 5, 7, 7, 100, 0.75)
+    load = MonthlyGeothermalLoadAbsolute(*load_case(1))
+    borefield.load = load
+    borefield.sizing_setup(H_init=H)
+    assert np.isclose(borefield.size(), result)
+    borefield = Borefield()
+    borefield.ground_data = GroundConstantTemperature(3, 11)
+    borefield.create_rectangular_borefield(10, 5, 7, 7, 100, 0.75)
+    load = MonthlyGeothermalLoadAbsolute(*load_case(1))
+    borefield.load = load
+    assert np.isclose(borefield.size(H_init=H), result)
+
+
+def test_depth_convergence():
+    borefield = Borefield()
+    borefield.sizing_setup(atol=1, rtol=0.01, max_nb_of_iterations=10)
+    try:
+        borefield._check_convergence(10, 12, 10)
+        assert False  # pragma: no cover
+    except RuntimeError:
+        assert True
+
+    assert borefield._check_convergence(10, 10, 1)
+    assert not borefield._check_convergence(10, 10.5, 1)
+    assert borefield._check_convergence(10, 10.001, 1)
+    assert not borefield._check_convergence(10000, 10002, 1)

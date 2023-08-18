@@ -12,7 +12,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Load classes (issue #45).
 - Pipe classes (single, double, coaxial, Multiple U Tube) (issue #40 and #45).
 - Flexible temperature limits (issue #41 and #45).
+- Added another methodology for sizing with a variable ground temperature (issue #144).
 - Custom error when the field cannot be sized due to a ground temperature gradient (issue #156).
+- Interpolation option in calculate function in Gfunction class (issue #159).
+- Absolute and relative tolerances for the sizing methods even as a maximum number of iterations is added, so there is more transparency and flexibility in the trade-off between accuracy and speed (issue #159).
+- Added advanced options to GHEtool GUI (issue #165).
+- Added a result class so all calculated temperatures are now in a separate Result class object within the borefield object (issue #167).
 
 ## Changed
 - GUI was moved to a separate project: [ScenarioGUI](https://github.com/tblanke/ScenarioGUI).
@@ -27,6 +32,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - _size_based_on_temperature_profile now returns two arguments: the required depth and a boolean flag to check if the field is sized (issue #144).
 - Speed up of L3/L4 sizing by halving calculation time due to intermediate checks if the field is sized (issue #144).
 - Changed ValueError when the field cannot be sized due to a temperature gradient to the custom UnsolvableDueToTemperatureGradient Exception (issue #156).
+- Rename SizingSetup class to CalculationSetup class (issue #159).
+- Move H_init to CalculationSetup class (issue #159).
+- Move use_precalcated_data to CalculationSetup class and rename to: 'use_precalculate_dataset' (issue #159).
+
 
 ## Fixed
 - Fixed problem with L2 sizing, when the peak load was the same in all months (issue #146).

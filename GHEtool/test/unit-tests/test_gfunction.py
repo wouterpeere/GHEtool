@@ -318,8 +318,35 @@ def test_interpolate_2D():
     # calculate anyhow
     gfunc.store_previous_values = False
     gfunc_calc = gfunc.calculate(borefield_ghe.load.time_L3[:20], borefield, alpha)
-    gfunc_val = gt.gfunction.gFunction(borefield, alpha, borefield_ghe.load.time_L3[:20]).gFunc
-    assert np.array_equal(gfunc_calc, gfunc_val)
+    assert np.allclose(gfunc_calc, [14.89758799, 19.00729376, 21.25068071, 22.6936062,  23.70823959, 24.4633899,
+                                    25.04810995, 25.51433124, 25.89459298, 26.21041712, 26.47665307, 26.70390003,
+                                    26.89993724, 27.07060881, 27.22039279, 27.35277941, 27.47052956, 27.57585579,
+                                    27.67055182, 27.75608682])
+    gfunc.store_previous_values = True
+    gfunc_calc = gfunc.calculate(borefield_ghe.load.time_L3[:20], borefield, alpha)
+    assert np.allclose(gfunc_calc, [15.21723783, 19.21174728, 21.39698711, 22.78389769, 23.78126837, 24.51443669,
+                                    25.09618046, 25.5292184,  25.90238329, 26.22140026, 26.48339286, 26.70550955,
+                                    26.90228268, 27.07574976, 27.20792103, 27.33922595, 27.46457098, 27.56161827,
+                                    27.65866557, 27.74718794])
+
+    # now with argument
+    gfunc_calc = gfunc.calculate(borefield_ghe.load.time_L3[:20], borefield, alpha, interpolate=False)
+    assert np.allclose(gfunc_calc, [14.89758799, 19.00729376, 21.25068071, 22.6936062, 23.70823959, 24.4633899,
+                                    25.04810995, 25.51433124, 25.89459298, 26.21041712, 26.47665307, 26.70390003,
+                                    26.89993724, 27.07060881, 27.22039279, 27.35277941, 27.47052956, 27.57585579,
+                                    27.67055182, 27.75608682])
+
+    gfunc_calc = gfunc.calculate(borefield_ghe.load.time_L3[:20], borefield, alpha, interpolate=True)
+    assert np.allclose(gfunc_calc, [15.21723783, 19.21174728, 21.39698711, 22.78389769, 23.78126837, 24.51443669,
+                                    25.09618046, 25.5292184, 25.90238329, 26.22140026, 26.48339286, 26.70550955,
+                                    26.90228268, 27.07574976, 27.20792103, 27.33922595, 27.46457098, 27.56161827,
+                                    27.65866557, 27.74718794])
+    # default is still interpolate is True
+    gfunc_calc = gfunc.calculate(borefield_ghe.load.time_L3[:20], borefield, alpha)
+    assert np.allclose(gfunc_calc, [15.21723783, 19.21174728, 21.39698711, 22.78389769, 23.78126837, 24.51443669,
+                                    25.09618046, 25.5292184, 25.90238329, 26.22140026, 26.48339286, 26.70550955,
+                                    26.90228268, 27.07574976, 27.20792103, 27.33922595, 27.46457098, 27.56161827,
+                                    27.65866557, 27.74718794])
 
 
 def test_no_extrapolation():

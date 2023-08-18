@@ -437,7 +437,7 @@ def test_bug_when_opening_scenarios_which_have_autosave_enabled(qtbot):
     ds_new = main_window.list_ds[0]
     for option in ds_new.list_options_aims:
         if isinstance(option, ListBox):
-            pass
+            pass  # pragma: no cover
         if isinstance(getattr(ds_old, option), (int, float)):
             assert np.isclose(getattr(ds_old, option), getattr(ds_new, option))
             continue

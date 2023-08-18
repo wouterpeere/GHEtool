@@ -9,7 +9,7 @@ import pygfunction as gt
 import pytest
 from pytest import raises
 
-from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, Borefield, SizingSetup, FOLDER, DoubleUTube
+from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, Borefield, CalculationSetup, FOLDER, DoubleUTube
 from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient
 from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
@@ -274,6 +274,13 @@ def test_value_error_cooling_dom_temp_gradient():
     borefield.set_borefield(borefield_pyg)
     borefield.set_Rb(0.2)
 
+    try:
+        borefield.size()
+        assert False  # pragma: no cover
+    except RuntimeError:
+        assert True
+
+    borefield.sizing_setup(max_nb_of_iterations=200)
     try:
         borefield.size()
         assert False  # pragma: no cover

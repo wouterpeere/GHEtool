@@ -350,7 +350,7 @@ def test_temp_profile_pipe_data(qtbot):
     gs.option_method_rb_calc.set_value(1)
 
     while not np.isclose(gs.option_pipe_distance.get_value(), dis):
-        gs.option_pipe_distance.set_value(dis)
+        gs.option_pipe_distance.set_value(dis)  # pragma: no cover
 
     borefield.set_pipe_parameters(pipe_data)
     borefield.set_fluid_parameters(fluid_data)
@@ -633,3 +633,38 @@ def test_temp_profile_cooling_data(qtbot) -> None:
         assert func.keywords == {}
 
     main_window.delete_backup()
+
+
+def test_coaxial_and_gradient(qtbot):
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
+                             data_2_results_function=data_2_borefield)
+    main_window.delete_backup()
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
+                             data_2_results_function=data_2_borefield)
+
+    gs = main_window.gui_structure
+
+    gs.option_method_rb_calc.set_value(1)
+    gs.option_U_pipe_or_coaxial_pipe.set_value(1)
+    gs.option_method_temp_gradient.set_value(2)
+    main_window.save_scenario()
+    main_window.start_current_scenario_calculation(True)
+    with qtbot.waitSignal(main_window.threads[-1].any_signal, raising=False) as blocker:
+        main_window.threads[-1].run()
+        main_window.threads[-1].any_signal.connect(main_window.thread_function)
+
+    main_window.display_results()
+
+    assert gs.result_Rb_calculated.label.text() == 'Equivalent borehole thermal resistance: 0.0984 mK/W'
+    assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 16.55 °C'
+
+    gs.option_method_temp_gradient.set_value(1)
+    main_window.save_scenario()
+    main_window.start_current_scenario_calculation(True)
+    with qtbot.waitSignal(main_window.threads[-1].any_signal, raising=False) as blocker:
+        main_window.threads[-1].run()
+        main_window.threads[-1].any_signal.connect(main_window.thread_function)
+
+    main_window.display_results()
+    assert gs.result_Rb_calculated.label.text() == 'Equivalent borehole thermal resistance: 0.0984 mK/W'
+    assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 17.05 °C'

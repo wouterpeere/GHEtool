@@ -98,7 +98,10 @@ def data_2_borefield(ds: DataStorage) -> tuple[Borefield, partial[[], None]]:
     borefield.sizing_setup(use_constant_Rb=ds.option_method_rb_calc == 0,
                            L2_sizing=ds.option_method_size_depth == 0,
                            L3_sizing=ds.option_method_size_depth == 1,
-                           L4_sizing=ds.option_method_size_depth == 2)
+                           L4_sizing=ds.option_method_size_depth == 2,
+                           atol=ds.option_atol,
+                           rtol=ds.option_rtol,
+                           max_nb_of_iterations=ds.option_max_nb_of_iter)
 
     # set borefield simulation period
     borefield.simulation_period = ds.option_simu_period
@@ -218,23 +221,7 @@ def _create_pipe_data(ds: DataStorage) -> MultipleUTube | CoaxialPipe:
                        ds.option_pipe_conductivity,
                        ds.option_pipe_grout_conductivity,
                        ds.option_pipe_roughness,
-                       ds.option_is_inner_inlet)
-
-
-def _calculate_flux(ds: DataStorage) -> float:
-    """
-    This function calculates the geothermal flux.
-    This is calculated based on:
-
-    temperature gradient [K/100m] * conductivity [W/mK] / 100
-    = temperature gradient [K/m] * conductivity [W/mK]
-
-    Returns
-    -------
-    Geothermal flux : float
-        Geothermal flux in [W/m2]
-    """
-    return ds.option_temp_gradient * ds.option_conductivity / 100
+                       True)
 
 
 def _create_ground_data(ds: DataStorage) -> GroundData:

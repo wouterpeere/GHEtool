@@ -118,6 +118,17 @@ In a future version of GHEtool, also secundary building loads will be included. 
 
 Please note that it is possible to add your own load types by inheriting the attributes from the abstract _LoadData class.
 
+### Options for sizing methods
+Like always with iterative methods, there is a trade-off between speed and accuracy. Within GHEtool (using the CalculationSetup class) one can alter different parameters
+to customize the behaviour they want. Note that these options are additive, meaning that, for example, the strongest criteria from the
+atol and rtol is chosen when sizing. The options are:
+
+* _atol_: For the sizing methods, an absolute tolerance in meters between two consecutive iterations can be set.
+* _rtol_: For the sizing methods, a relative tolerance in meters between two consecutive iterations can be set.
+* _max_nb_of_iterations_: For the sizing methods, a maximum number of iterations can be set. If the size is not converged, a RuntimeError is thrown.
+* _use_precalculated_dataset_: This option makes sure the custom g-function dataset (if available) is not used.
+* _interpolate_gfunctions_: Calculating the gvalues gives a large overhead cost, although they are not that sensitive to a change in borehole depth. If this parameter is True 
+it is allowed that gfunctions are interpolated. (To change the threshold for this interpolation, go to the Gfunction class.)
 
 ### Simple example
 
@@ -134,7 +145,7 @@ After importing the necessary classes, the relevant ground data parameters are s
 ```Python
 data =
 GroundDataConstantTemperature(3,   # ground thermal conductivity (W/mK)
-							  10,  # initial/undisturbed ground temperature (deg C)
+                              10,  # initial/undisturbed ground temperature (deg C)
                               2.4*10**6) # volumetric heat capacity of the ground (J/m3K) 
 ```
 
@@ -158,11 +169,7 @@ we set the borehole equivalent thermal resistance.
 
 ```Python
 # create the borefield object
-borefield = Borefield(load=load
-					  peak_heating=peak_heating,
-                      peak_cooling=peak_cooling,
-                      baseload_heating=monthly_load_heating,
-                      baseload_cooling=monthly_load_cooling)
+borefield = Borefield(load=load)
 
 # set ground parameters
 borefield.set_ground_parameters(data)

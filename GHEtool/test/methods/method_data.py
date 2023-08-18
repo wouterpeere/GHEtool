@@ -41,6 +41,9 @@ borefield.sizing_setup(use_constant_Rb=False)
 
 list_of_test_objects.add(SizingObject(borefield, L2_output=52.7, L3_output=52.73, quadrant=1,
                                       name='Main functionalities (2)'))
+borefield.sizing_setup(atol=False)
+list_of_test_objects.add(SizingObject(borefield, L2_output=52.716, L3_output=52.741, quadrant=1,
+                                      name='Main functionalities (2), no atol'))
 
 borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
 borefield = Borefield()
@@ -159,6 +162,12 @@ hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly data\\audit
 borefield.load = hourly_load
 list_of_test_objects.add(SizingObject(borefield, L2_output=136.780, L3_output=136.294, L4_output=101.285, quadrant=1,
                                       name='BS2023 Auditorium'))
+borefield.sizing_setup(max_nb_of_iterations=20)
+list_of_test_objects.add(SizingObject(borefield, error_L2=RuntimeError, error_L3=RuntimeError, error_L4=RuntimeError, quadrant=1,
+                                      name='BS2023 Auditorium (max nb of iter)'))
+borefield.sizing_setup(atol=False, max_nb_of_iterations=40)
+list_of_test_objects.add(SizingObject(borefield, L2_output=136.0488, L3_output=135.591, L4_output=101.061, quadrant=1,
+                                      name='BS2023 Auditorium (no atol)'))
 
 borefield = Borefield()
 borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 4, 0.075)
@@ -174,6 +183,12 @@ hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly data\office
 borefield.load = hourly_load
 list_of_test_objects.add(SizingObject(borefield, L2_output=111.180, L3_output=113.069, L4_output=107.09674613249454, quadrant=2,
                                       name='BS2023 Office'))
+borefield.sizing_setup(max_nb_of_iterations=20)
+list_of_test_objects.add(SizingObject(borefield, error_L2=RuntimeError, error_L3=RuntimeError, error_L4=RuntimeError, quadrant=2,
+                                      name='BS2023 Office (max nb of iter)'))
+borefield.sizing_setup(atol=False, max_nb_of_iterations=40)
+list_of_test_objects.add(SizingObject(borefield, L2_output=110.845, L3_output=112.914, L4_output=106.920, quadrant=2,
+                                      name='BS2023 Office (no atol)'))
 
 borefield = Borefield()
 borefield.create_rectangular_borefield(15, 20, 6, 6, 110, 4, 0.075)
@@ -188,6 +203,9 @@ hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly data\swimmi
 borefield.load = hourly_load
 list_of_test_objects.add(SizingObject(borefield, L2_output=305.509, L3_output=310.725, L4_output=308.269, quadrant=4,
                                       name='BS2023 Swimming pool'))
+borefield.sizing_setup(atol=False, max_nb_of_iterations=40)
+list_of_test_objects.add(SizingObject(borefield, L2_output=305.552, L3_output=310.746, L4_output=308.295, quadrant=4,
+                                      name='BS2023 Swimming pool (no atol)'))
 
 ground_data_IKC = GroundFluxTemperature(2.3, 10.5, flux=2.85)
 fluid_data_IKC = FluidData(0.2, 0.5, 1021.7, 3919, 0.0033)
@@ -206,13 +224,19 @@ borefield.sizing_setup(use_constant_Rb=False)
 borefield.set_length_peak(10)
 borefield.set_max_ground_temperature(25)
 borefield.set_min_ground_temperature(0)
-list_of_test_objects.add(SizingObject(borefield, error=UnsolvableDueToTemperatureGradient, name='Real case 1 (Error)'))
+list_of_test_objects.add(SizingObject(borefield, error_L2=UnsolvableDueToTemperatureGradient, error_L3=UnsolvableDueToTemperatureGradient, name='Real case 1 (Error)'))
+borefield.sizing_setup(max_nb_of_iterations=20)
+list_of_test_objects.add(SizingObject(borefield, error_L2=RuntimeError, error_L3=ValueError, name='Real case 1 (Error, max nb of iter)'))
 
 ground_data_IKC = GroundFluxTemperature(2.3, 10.5, flux=2.3*2.85/100)
 borefield.set_ground_parameters(ground_data_IKC)
-list_of_test_objects.add(SizingObject(borefield, L2_output=74.46, L3_output=74.854, quadrant=4,
+borefield.sizing_setup(max_nb_of_iterations=40)
+list_of_test_objects.add(SizingObject(borefield, L2_output=74.46, L3_output=74.866, quadrant=4,
                                       name='Real case 1 (Correct)'))
-
+borefield.sizing_setup(atol=False)
+list_of_test_objects.add(SizingObject(borefield, L2_output=74.46, L3_output=74.888, quadrant=4,
+                                      name='Real case 1 (Correct) (no atol)'))
+borefield.sizing_setup(atol=0.05)
 borefield.set_ground_parameters(ground_data_IKC)
 borefield.create_rectangular_borefield(2, 10, 8, 8, 60, 0.8, 0.07)
 list_of_test_objects.add(SizingObject(borefield, L2_output=71.65, L3_output=72.054, quadrant=4,
@@ -264,7 +288,7 @@ borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(2)))
 borefield.set_ground_parameters(GroundFluxTemperature(3, 12))
 borefield.create_rectangular_borefield(10, 12, 6, 6, 110, 4, 0.075)
 borefield.set_Rb(0.2)
-list_of_test_objects.add(SizingObject(borefield, error=UnsolvableDueToTemperatureGradient, quadrant=2, name='Cannot size'))
+list_of_test_objects.add(SizingObject(borefield, error_L2=UnsolvableDueToTemperatureGradient, error_L3=UnsolvableDueToTemperatureGradient, quadrant=2, name='Cannot size'))
 list_of_test_objects.add(SizingObject(borefield, error_L4=ValueError, quadrant=2, name='Cannot size L4'))
 
 
