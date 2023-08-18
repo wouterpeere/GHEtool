@@ -4,6 +4,7 @@ import numpy as np
 from typing import Union
 from functools import partial
 
+
 class HourlyTemperatureLimit(_TemperatureLimits):
 
     def __init__(self, min_temp: Union[list, np.ndarray], max_temp: Union[list, np.ndarray]):

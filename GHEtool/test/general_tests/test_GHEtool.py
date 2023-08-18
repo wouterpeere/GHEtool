@@ -280,13 +280,12 @@ def test_value_error_cooling_dom_temp_gradient():
     except RuntimeError:
         assert True
 
-    # TODO reimplement with deep_sizing
-    # borefield.sizing_setup(max_nb_of_iterations=200)
-    # try:
-    #     borefield.size()
-    #     assert False  # pragma: no cover
-    # except UnsolvableDueToTemperatureGradient:
-    #     assert True
+    borefield.sizing_setup(max_nb_of_iterations=500)
+    try:
+        borefield.size()
+        assert False  # pragma: no cover
+    except UnsolvableDueToTemperatureGradient:
+        assert True
 
 
 def test_borefield_with_constant_peaks(borefield):

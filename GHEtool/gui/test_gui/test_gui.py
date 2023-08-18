@@ -17,7 +17,6 @@ setrecursionlimit(1500)
 
 from ScenarioGUI import load_config
 from ScenarioGUI.gui_classes.gui_structure_classes import *
-print(Path(__file__).parent.parent.joinpath("gui_config.ini"))
 load_config(Path(__file__).parent.parent.joinpath("gui_config.ini"))
 
 
