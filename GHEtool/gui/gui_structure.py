@@ -40,6 +40,9 @@ from ScenarioGUI.gui_classes.gui_structure_classes import (
     ResultText,
 )
 
+# change default value to False
+Option.value_if_hidden = False
+
 if TYPE_CHECKING:  # pragma: no cover
     from GHEtool.gui.gui_classes.translation_class import Translations
 
@@ -1327,7 +1330,7 @@ class GUI(GuiStructure):
                                                   self.results_cooling_peak, self.results_cooling_peak_geo]
             self.show_option_under_multiple_conditions(list_options_optimize_load_profile,
                                                        self.aim_optimize,
-                                                       custom_logic=self.aim_optimize.widget.isChecked,
+                                                       custom_logic=self.aim_optimize.is_checked,
                                                        check_on_visibility_change=True)
 
             self.aim_temp_profile.add_link_2_show(self.max_temp)
@@ -1394,10 +1397,10 @@ class GUI(GuiStructure):
     def set_dependencies(self) -> None:
         self.show_option_under_multiple_conditions(self.option_method_size_depth,
                                                    self.aim_req_depth,
-                                                   custom_logic=self.aim_req_depth.widget.isChecked)
+                                                   custom_logic=self.aim_req_depth.is_checked)
         self.show_option_under_multiple_conditions(self.option_temperature_profile_hourly,
                                                    self.aim_temp_profile,
-                                                   custom_logic=self.aim_temp_profile.widget.isChecked)
+                                                   custom_logic=self.aim_temp_profile.is_checked)
 
         self.show_option_under_multiple_conditions(self.option_ground_temp,
                                                    self.option_method_temp_gradient,
@@ -1416,27 +1419,16 @@ class GUI(GuiStructure):
                                                    self.option_method_temp_gradient,
                                                    custom_logic=partial(
                                                        self.option_method_temp_gradient.check_linked_value, 2))
-        self.option_method_size_depth.value_if_hidden = False
-        self.option_temperature_profile_hourly.value_if_hidden = False
-        self.show_option_under_multiple_conditions(self.option_len_peak_heating,
+
+        self.show_option_under_multiple_conditions([self.option_len_peak_heating, self.option_len_peak_cooling],
                                                    [self.aim_optimize, self.option_temperature_profile_hourly,
                                                     self.option_method_size_depth],
                                                    functions_check_for_or=[
                                                        partial(self.option_temperature_profile_hourly.check_linked_value, 0),
-                                                       partial(self.option_method_size_depth.create_function_2_check_linked_value, 0),
+                                                       partial(self.option_method_size_depth.check_linked_value, 0),
                                                        partial(self.option_method_size_depth.check_linked_value, 1),
                                                        self.aim_optimize.is_checked
                                                    ], check_on_visibility_change=True)
-        # add dependencies
-        # self.option_temperature_profile_hourly.add_link_2_show(self.option_len_peak_heating, on_index=0)
-        # self.option_method_size_depth.add_link_2_show(self.option_len_peak_heating, on_index=0)
-        # self.option_method_size_depth.add_link_2_show(self.option_len_peak_heating, on_index=1)
-        # self.aim_optimize.add_link_2_show(self.option_len_peak_heating)
-
-        self.option_temperature_profile_hourly.add_link_2_show(self.option_len_peak_cooling, on_index=0)
-        self.option_method_size_depth.add_link_2_show(self.option_len_peak_cooling, on_index=0)
-        self.option_method_size_depth.add_link_2_show(self.option_len_peak_cooling, on_index=1)
-        self.aim_optimize.add_link_2_show(self.option_len_peak_cooling)
 
     def _create_lists(self):
         # general settings
