@@ -1178,14 +1178,6 @@ class GUI(GuiStructure):
                 step=0.1,
             )
 
-            # add dependencies
-            self.aim_optimize.add_link_2_show(self.SCOP)
-            self.aim_optimize.add_link_2_show(self.SEER)
-            self.geo_load.add_link_2_show(self.SCOP, 1)
-            self.geo_load.add_link_2_show(self.SEER, 1)
-            self.aim_req_depth.add_link_2_show(self.geo_load)
-            self.aim_temp_profile.add_link_2_show(self.geo_load)
-
         # create categories
         create_category_select_datafile()
         create_category_building_demand()
@@ -1433,6 +1425,27 @@ class GUI(GuiStructure):
                                                        partial(self.option_temperature_profile_hourly.check_linked_value, 0),
                                                    ],
                                                    check_on_visibility_change=True)
+
+        self.show_option_under_multiple_conditions([self.SCOP, self.SEER],
+                                                   self.geo_load,
+                                                   custom_logic=partial(self.geo_load.check_linked_value, 1))
+
+        self.aim_optimize.change_event(self.disable_button_box(self.geo_load, 0, partial(self.aim_optimize.is_checked)))
+
+        # self.float_b.change_event(
+        #     self.disable_button_box(
+        #         self.button_box_short,
+        #         1,
+        #         partial(self.float_b.check_linked_value, (50, None)),
+        #     )
+        # )
+
+        # self.aim_optimize.add_link_2_show(self.SCOP)
+        # self.aim_optimize.add_link_2_show(self.SEER)
+        # self.geo_load.add_link_2_show(self.SCOP, 1)
+        # self.geo_load.add_link_2_show(self.SEER, 1)
+        # self.aim_req_depth.add_link_2_show(self.geo_load)
+        # self.aim_temp_profile.add_link_2_show(self.geo_load)
 
     def _create_lists(self):
         # general settings
