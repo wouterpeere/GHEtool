@@ -120,3 +120,97 @@ def test_visibility_peak_length(qtbot):
     visible()
     main_window.change_scenario(1)
     invisible()
+
+
+def test_visibility_rb(qtbot):
+
+    main_window, gs = setup(qtbot)
+
+    assert not gs.category_constant_rb.is_hidden()
+    assert gs.category_fluid_data.is_hidden()
+    assert gs.category_pipe_data.is_hidden()
+    main_window.save_scenario()
+
+    main_window.add_scenario()
+    gs.option_method_rb_calc.set_value(1)
+    assert gs.category_constant_rb.is_hidden()
+    assert not gs.category_fluid_data.is_hidden()
+    assert not gs.category_pipe_data.is_hidden()
+    main_window.save_scenario()
+
+    main_window.change_scenario(0)
+    assert not gs.category_constant_rb.is_hidden()
+    assert gs.category_fluid_data.is_hidden()
+    assert gs.category_pipe_data.is_hidden()
+
+
+def test_visibility_rb_autosave(qtbot):
+    main_window, gs = setup(qtbot)
+
+    gs.option_auto_saving.set_value(1)
+
+    assert not gs.category_constant_rb.is_hidden()
+    assert gs.category_fluid_data.is_hidden()
+    assert gs.category_pipe_data.is_hidden()
+
+    main_window.add_scenario()
+    gs.option_method_rb_calc.set_value(1)
+    assert gs.category_constant_rb.is_hidden()
+    assert not gs.category_fluid_data.is_hidden()
+    assert not gs.category_pipe_data.is_hidden()
+
+    main_window.change_scenario(0)
+    assert not gs.category_constant_rb.is_hidden()
+    assert gs.category_fluid_data.is_hidden()
+    assert gs.category_pipe_data.is_hidden()
+
+
+def test_visibility_pipe_options(qtbot):
+
+    main_window, gs = setup(qtbot)
+    gs.option_auto_saving.set_value(1)
+
+    gs.option_method_rb_calc.set_value(1)
+    assert gs.option_pipe_coaxial_inner_inner.is_hidden()
+    assert gs.option_pipe_coaxial_inner_outer.is_hidden()
+    assert gs.option_pipe_coaxial_outer_inner.is_hidden()
+    assert gs.option_pipe_coaxial_outer_outer.is_hidden()
+    assert not gs.option_pipe_inner_radius.is_hidden()
+    assert not gs.option_pipe_outer_radius.is_hidden()
+    assert not gs.option_pipe_number.is_hidden()
+    assert not gs.option_pipe_distance.is_hidden()
+
+    gs.option_U_pipe_or_coaxial_pipe.set_value(1)
+    assert not gs.option_pipe_coaxial_inner_inner.is_hidden()
+    assert not gs.option_pipe_coaxial_inner_outer.is_hidden()
+    assert not gs.option_pipe_coaxial_outer_inner.is_hidden()
+    assert not gs.option_pipe_coaxial_outer_outer.is_hidden()
+    assert gs.option_pipe_inner_radius.is_hidden()
+    assert gs.option_pipe_outer_radius.is_hidden()
+    assert gs.option_pipe_number.is_hidden()
+    assert gs.option_pipe_distance.is_hidden()
+
+    main_window.add_scenario()
+    gs.option_U_pipe_or_coaxial_pipe.set_value(0)
+    assert gs.option_pipe_coaxial_inner_inner.is_hidden()
+    assert gs.option_pipe_coaxial_inner_outer.is_hidden()
+    assert gs.option_pipe_coaxial_outer_inner.is_hidden()
+    assert gs.option_pipe_coaxial_outer_outer.is_hidden()
+    assert not gs.option_pipe_inner_radius.is_hidden()
+    assert not gs.option_pipe_outer_radius.is_hidden()
+    assert not gs.option_pipe_number.is_hidden()
+    assert not gs.option_pipe_distance.is_hidden()
+
+    main_window.add_scenario()
+    gs.option_method_rb_calc.set_value(0)
+    assert gs.category_pipe_data.is_hidden()
+
+    main_window.change_scenario(0)
+    assert not gs.option_pipe_coaxial_inner_inner.is_hidden()
+    assert not gs.option_pipe_coaxial_inner_outer.is_hidden()
+    assert not gs.option_pipe_coaxial_outer_inner.is_hidden()
+    assert not gs.option_pipe_coaxial_outer_outer.is_hidden()
+    assert gs.option_pipe_inner_radius.is_hidden()
+    assert gs.option_pipe_outer_radius.is_hidden()
+    assert gs.option_pipe_number.is_hidden()
+    assert gs.option_pipe_distance.is_hidden()

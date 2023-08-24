@@ -560,8 +560,6 @@ class GUI(GuiStructure):
         )
 
         # add dependency
-        self.option_method_rb_calc.add_link_2_show(self.category_constant_rb, on_index=0)
-
         self.category_fluid_data = Category(page=self.page_borehole_resistance, label=translations.category_fluid_data)
 
         self.option_fluid_conductivity = FloatBox(
@@ -610,9 +608,6 @@ class GUI(GuiStructure):
             maximal_value=100000,
             step=0.1,
         )
-
-        # add dependencies
-        self.option_method_rb_calc.add_link_2_show(self.category_fluid_data, on_index=1)
 
         # for Rb* calculation
         self.option_fluid_conductivity.change_event(self.update_borehole_thermal_resistance)
@@ -757,17 +752,6 @@ class GUI(GuiStructure):
                                                   category=self.category_pipe_data,
                                                   prefix="The equivalent borehole thermal resistance (at 150m) is: ", suffix="mK/W")
         self.pipe_thermal_resistance.warning = True
-
-        # add dependency
-        self.option_method_rb_calc.add_link_2_show(self.category_pipe_data, on_index=1)
-        self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_coaxial_inner_inner, on_index=1)
-        self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_coaxial_inner_outer, on_index=1)
-        self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_coaxial_outer_inner, on_index=1)
-        self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_coaxial_outer_outer, on_index=1)
-        self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_inner_radius, on_index=0)
-        self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_outer_radius, on_index=0)
-        self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_number, on_index=0)
-        self.option_U_pipe_or_coaxial_pipe.add_link_2_show(self.option_pipe_distance, on_index=0)
 
         # set update events
         self.option_pipe_number.change_event(self.check_correct_pipe_data)
@@ -1429,6 +1413,30 @@ class GUI(GuiStructure):
                                                        partial(self.option_method_size_depth.check_linked_value, 1),
                                                        self.aim_optimize.is_checked
                                                    ], check_on_visibility_change=True)
+
+        self.show_option_under_multiple_conditions(self.category_constant_rb,
+                                                   self.option_method_rb_calc,
+                                                   custom_logic=partial(self.option_method_rb_calc.check_linked_value, 0))
+        self.show_option_under_multiple_conditions([self.category_fluid_data, self.category_pipe_data],
+                                                   self.option_method_rb_calc,
+                                                   custom_logic=partial(self.option_method_rb_calc.check_linked_value, 1))
+
+        self.show_option_under_multiple_conditions([self.option_pipe_coaxial_inner_inner,
+                                                    self.option_pipe_coaxial_inner_outer,
+                                                    self.option_pipe_coaxial_outer_inner,
+                                                    self.option_pipe_coaxial_outer_outer],
+                                                   self.option_U_pipe_or_coaxial_pipe,
+                                                   custom_logic=partial(self.option_U_pipe_or_coaxial_pipe.check_linked_value, 1),
+                                                   check_on_visibility_change=True)
+
+        self.show_option_under_multiple_conditions([self.option_pipe_inner_radius,
+                                                    self.option_pipe_outer_radius,
+                                                    self.option_pipe_number,
+                                                    self.option_pipe_distance],
+                                                   self.option_U_pipe_or_coaxial_pipe,
+                                                   custom_logic=partial(
+                                                       self.option_U_pipe_or_coaxial_pipe.check_linked_value, 0),
+                                                   check_on_visibility_change=True)
 
     def _create_lists(self):
         # general settings
