@@ -214,3 +214,43 @@ def test_visibility_pipe_options(qtbot):
     assert gs.option_pipe_outer_radius.is_hidden()
     assert gs.option_pipe_number.is_hidden()
     assert gs.option_pipe_distance.is_hidden()
+
+
+def test_visibility_load(qtbot):
+
+    main_window, gs = setup(qtbot)
+    gs.option_auto_saving.set_value(1)
+
+    def visible():
+        assert not gs.button_load_csv.is_hidden()
+        assert not gs.hint_press_load.is_hidden()
+        assert not gs.category_th_demand.is_hidden()
+
+    def invisible():
+        assert gs.button_load_csv.is_hidden()
+        assert gs.hint_press_load.is_hidden()
+        assert gs.category_th_demand.is_hidden()
+
+    assert gs.option_heating_column.is_hidden()
+    assert gs.option_cooling_column.is_hidden()
+    assert not gs.option_single_column.is_hidden()
+    gs.option_column.set_value(1)
+    assert not gs.option_heating_column.is_hidden()
+    assert not gs.option_cooling_column.is_hidden()
+    assert gs.option_single_column.is_hidden()
+
+    visible()
+    gs.option_temperature_profile_hourly.set_value(1)
+    invisible()
+    gs.option_temperature_profile_hourly.set_value(0)
+    visible()
+    gs.aim_req_depth.widget.click()
+    visible()
+    gs.option_method_size_depth.set_value(2)
+    invisible()
+    gs.aim_temp_profile.widget.click()
+    visible()
+    gs.aim_optimize.widget.click()
+    invisible()
+    gs.aim_req_depth.widget.click()
+    invisible()

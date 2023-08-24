@@ -109,6 +109,8 @@ def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, 
         logging.error("Please select the correct decimal point seperator.")
         raise ValueError
 
+    # heating and cooling column are equal
+
     # ---------------------- Time Step Section  ----------------------
     # import pandas here to save start up time
     from pandas import Series as pd_Series
@@ -833,32 +835,17 @@ class GUI(GuiStructure):
             self.option_filename.add_aim_option_2_be_set_for_check(self.aim_optimize)
             self.option_filename.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
 
-            self.option_column.add_link_2_show(self.option_heating_column, on_index=1)
             self.option_heating_column.add_aim_option_2_be_set_for_check(self.aim_optimize)
             self.option_heating_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
             self.option_heating_column.add_aim_option_2_be_set_for_check((self.option_temperature_profile_hourly, 1))
 
-            self.option_column.add_link_2_show(self.option_cooling_column, on_index=1)
             self.option_cooling_column.add_aim_option_2_be_set_for_check(self.aim_optimize)
             self.option_cooling_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
             self.option_cooling_column.add_aim_option_2_be_set_for_check((self.option_temperature_profile_hourly, 1))
 
-            self.option_column.add_link_2_show(self.option_single_column, on_index=0)
             self.option_single_column.add_aim_option_2_be_set_for_check(self.aim_optimize)
             self.option_single_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
             self.option_single_column.add_aim_option_2_be_set_for_check((self.option_temperature_profile_hourly, 1))
-
-            self.option_method_size_depth.add_link_2_show(self.button_load_csv, on_index=0)
-            self.option_method_size_depth.add_link_2_show(self.button_load_csv, on_index=1)
-            self.aim_temp_profile.add_link_2_show(self.button_load_csv)
-            self.option_temperature_profile_hourly.add_link_2_show(self.button_load_csv, on_index=0)
-            self.aim_req_depth.add_link_2_show(self.button_load_csv)
-
-            self.option_method_size_depth.add_link_2_show(self.hint_press_load, on_index=0)
-            self.option_method_size_depth.add_link_2_show(self.hint_press_load, on_index=1)
-            self.aim_temp_profile.add_link_2_show(self.hint_press_load)
-            self.option_temperature_profile_hourly.add_link_2_show(self.hint_press_load, on_index=0)
-            self.aim_req_depth.add_link_2_show(self.hint_press_load)
 
             # add change events
             self.option_seperator_csv.change_event(lambda: self.fun_update_combo_box_data_file(self.option_filename.get_value()))
@@ -1166,14 +1153,6 @@ class GUI(GuiStructure):
                 step=1,
             )
 
-            # add dependencies
-            self.option_method_size_depth.add_link_2_show(self.category_th_demand, on_index=0)
-            self.option_method_size_depth.add_link_2_show(self.category_th_demand, on_index=1)
-            self.option_temperature_profile_hourly.add_link_2_show(self.category_th_demand, on_index=0)
-
-            self.aim_temp_profile.add_link_2_show(self.category_th_demand)
-            self.aim_req_depth.add_link_2_show(self.category_th_demand)
-
         def create_category_building_demand():
             self.category_demand_building_or_geo = \
                 Category(page=self.page_thermal, label=translations.category_demand_building_or_geo)
@@ -1436,6 +1415,23 @@ class GUI(GuiStructure):
                                                    self.option_U_pipe_or_coaxial_pipe,
                                                    custom_logic=partial(
                                                        self.option_U_pipe_or_coaxial_pipe.check_linked_value, 0),
+                                                   check_on_visibility_change=True)
+
+        self.show_option_under_multiple_conditions([self.option_heating_column, self.option_cooling_column],
+                                                   self.option_column,
+                                                   custom_logic=partial(self.option_column.check_linked_value, 1))
+        self.show_option_under_multiple_conditions(self.option_single_column,
+                                                   self.option_column,
+                                                   custom_logic=partial(self.option_column.check_linked_value, 0))
+
+        self.show_option_under_multiple_conditions([self.button_load_csv, self.hint_press_load, self.category_th_demand],
+                                                   [self.option_method_size_depth,
+                                                    self.option_temperature_profile_hourly],
+                                                   functions_check_for_or=[
+                                                       partial(self.option_method_size_depth.check_linked_value, 0),
+                                                       partial(self.option_method_size_depth.check_linked_value, 1),
+                                                       partial(self.option_temperature_profile_hourly.check_linked_value, 0),
+                                                   ],
                                                    check_on_visibility_change=True)
 
     def _create_lists(self):
