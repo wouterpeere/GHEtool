@@ -1272,25 +1272,6 @@ class GUI(GuiStructure):
             self.min_temp.text_to_be_shown("Borefield", "results_peak_heating")
             self.min_temp.function_to_convert_to_text(lambda x: round(min(x), 2))
 
-            # add dependency
-            self.option_method_temp_gradient.add_link_2_show(self.results_ground_temperature, on_index=1)
-            self.option_method_temp_gradient.add_link_2_show(self.results_ground_temperature, on_index=2)
-            self.option_method_rb_calc.add_link_2_show(self.result_Rb_calculated, on_index=1)
-            self.option_method_rb_calc.add_link_2_show(self.result_Reynolds, on_index=1)
-            self.aim_req_depth.add_link_2_show(self.result_text_depth)
-            list_options_optimize_load_profile = [self.results_heating_ext, self.results_heating_peak_geo,
-                                                  self.results_heating_load_percentage, self.results_heating_load,
-                                                  self.results_heating_peak, self.results_cooling_ext,
-                                                  self.results_cooling_load_percentage, self.results_cooling_load,
-                                                  self.results_cooling_peak, self.results_cooling_peak_geo]
-            self.show_option_under_multiple_conditions(list_options_optimize_load_profile,
-                                                       self.aim_optimize,
-                                                       custom_logic=self.aim_optimize.is_checked,
-                                                       check_on_visibility_change=True)
-
-            self.aim_temp_profile.add_link_2_show(self.max_temp)
-            self.aim_temp_profile.add_link_2_show(self.min_temp)
-
         def create_figure_temperature_profile():
             self.figure_temperature_profile = ResultFigure(label=translations.figure_temperature_profile,
                                                            page=self.page_result)
@@ -1312,11 +1293,6 @@ class GUI(GuiStructure):
                                                                   entries=["No", "Yes"],
                                                                   entries_values=[False, True])
 
-            # add dependencies
-            self.option_temperature_profile_hourly.add_link_2_show(self.hourly_figure_temperature_profile, on_index=1)
-            self.aim_optimize.add_link_2_show(self.hourly_figure_temperature_profile)
-            self.option_method_size_depth.add_link_2_show(self.hourly_figure_temperature_profile, on_index=2)
-
         def create_figure_load_duration():
             self.figure_load_duration = ResultFigure(label=translations.figure_load_duration,
                                                      page=self.page_result)
@@ -1330,11 +1306,6 @@ class GUI(GuiStructure):
                                                             default=0,
                                                             entries=["No", "Yes"],
                                                             entries_values=[False, True])
-
-            # add dependencies
-            self.option_method_size_depth.add_link_2_show(self.figure_load_duration, on_index=2)
-            self.option_temperature_profile_hourly.add_link_2_show(self.figure_load_duration, on_index=1)
-            self.aim_optimize.add_link_2_show(self.figure_load_duration)
 
         # create categories
         create_category_numerical_results()
@@ -1432,20 +1403,51 @@ class GUI(GuiStructure):
 
         self.aim_optimize.change_event(self.disable_button_box(self.geo_load, 0, partial(self.aim_optimize.is_checked)))
 
-        # self.float_b.change_event(
-        #     self.disable_button_box(
-        #         self.button_box_short,
-        #         1,
-        #         partial(self.float_b.check_linked_value, (50, None)),
-        #     )
-        # )
+        # result page
 
-        # self.aim_optimize.add_link_2_show(self.SCOP)
-        # self.aim_optimize.add_link_2_show(self.SEER)
-        # self.geo_load.add_link_2_show(self.SCOP, 1)
-        # self.geo_load.add_link_2_show(self.SEER, 1)
-        # self.aim_req_depth.add_link_2_show(self.geo_load)
-        # self.aim_temp_profile.add_link_2_show(self.geo_load)
+        list_options_optimize_load_profile = [self.results_heating_ext, self.results_heating_peak_geo,
+                                              self.results_heating_load_percentage, self.results_heating_load,
+                                              self.results_heating_peak, self.results_cooling_ext,
+                                              self.results_cooling_load_percentage, self.results_cooling_load,
+                                              self.results_cooling_peak, self.results_cooling_peak_geo]
+        self.show_option_under_multiple_conditions(list_options_optimize_load_profile,
+                                                   self.aim_optimize,
+                                                   custom_logic=self.aim_optimize.is_checked,
+                                                   check_on_visibility_change=True)
+
+        self.show_option_under_multiple_conditions(self.results_ground_temperature,
+                                                   self.option_method_temp_gradient,
+                                                   functions_check_for_or=[
+                                                       partial(self.option_method_temp_gradient.check_linked_value, 1),
+                                                       partial(self.option_method_temp_gradient.check_linked_value, 2)
+                                                   ],
+                                                   check_on_visibility_change=True)
+
+        self.show_option_under_multiple_conditions([self.result_Rb_calculated, self.result_Reynolds],
+                                                   self.option_method_rb_calc,
+                                                   custom_logic=partial(self.option_method_rb_calc.check_linked_value, 1),
+                                                   check_on_visibility_change=True)
+
+        self.show_option_under_multiple_conditions(self.result_text_depth,
+                                                   self.aim_req_depth,
+                                                   custom_logic=partial(self.aim_req_depth.is_checked),
+                                                   check_on_visibility_change=True)
+
+        self.show_option_under_multiple_conditions([self.max_temp, self.min_temp],
+                                                   self.aim_temp_profile,
+                                                   custom_logic=partial(self.aim_temp_profile.is_checked),
+                                                   check_on_visibility_change=True)
+
+        self.show_option_under_multiple_conditions([self.hourly_figure_temperature_profile,
+                                                    self.figure_load_duration],
+                                                   [self.option_temperature_profile_hourly,
+                                                    self.aim_optimize,
+                                                    self.option_method_size_depth],
+                                                   functions_check_for_or=[
+                                                       partial(self.option_temperature_profile_hourly.check_linked_value, 1),
+                                                       partial(self.aim_optimize.is_checked),
+                                                       partial(self.option_method_size_depth.check_linked_value, 2)
+                                                   ])
 
     def _create_lists(self):
         # general settings

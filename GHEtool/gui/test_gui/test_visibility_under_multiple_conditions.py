@@ -254,3 +254,38 @@ def test_visibility_load(qtbot):
     invisible()
     gs.aim_req_depth.widget.click()
     invisible()
+
+
+def test_visibility_SCOP(qtbot):
+
+    main_window, gs = setup(qtbot)
+
+    def visible():
+        assert not gs.SCOP.is_hidden()
+        assert not gs.SEER.is_hidden()
+
+    def invisible():
+        assert gs.SCOP.is_hidden()
+        assert gs.SEER.is_hidden()
+
+    invisible()
+    gs.geo_load.set_value(1)
+    visible()
+    main_window.save_scenario()
+
+    main_window.add_scenario()
+    visible()
+    gs.geo_load.set_value(0)
+    invisible()
+
+    gs.aim_optimize.widget.click()
+    visible()
+
+    main_window.save_scenario()
+    main_window.change_scenario(0)
+    visible()
+
+
+def test_visibility_on_result_page(qtbot):
+
+    main_window, gs = setup(qtbot)
