@@ -281,7 +281,6 @@ def test_borefield_shapes(qtbot):
     boreholes = [gt.boreholes.Borehole(H, D, r_b, x=x, y=y) for x, y, H, D, r_b in values]
     check_borefield(borefield_gui.borefield, boreholes)
     qtbot.wait(10)
-    main_window.delete_backup()
 
 
 def test_import_borefield_data(qtbot):
