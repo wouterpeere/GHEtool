@@ -17,7 +17,6 @@ setrecursionlimit(1500)
 
 from ScenarioGUI import load_config
 from ScenarioGUI.gui_classes.gui_structure_classes import *
-print(Path(__file__).parent.parent.joinpath("gui_config.ini"))
 load_config(Path(__file__).parent.parent.joinpath("gui_config.ini"))
 
 
@@ -54,7 +53,8 @@ def test_wrong_results_shown(qtbot):
         bot for the GUI
     """
     # init gui window
-    MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window.delete_backup()
     main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
     main_window.show()
     main_window.gui_structure.option_decimal_csv.set_value(0)
@@ -74,10 +74,10 @@ def test_wrong_results_shown(qtbot):
 
     main_window.gui_structure.aim_optimize.widget.click()
     main_window.save_scenario()
-    main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[-1].any_signal, raising=False):
-        main_window.threads[-1].run()
-        main_window.threads[-1].any_signal.connect(main_window.thread_function)
+    main_window.start_current_scenario_calculation()
+    thread = main_window.threads[-1]
+    thread.run()
+    assert thread.calculated
 
     main_window.display_results()
     assert not main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
@@ -88,10 +88,10 @@ def test_wrong_results_shown(qtbot):
 
     main_window.gui_structure.option_method_rb_calc.set_value(1)
     main_window.save_scenario()
-    main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[-1].any_signal, raising=False):
-        main_window.threads[-1].run()
-        main_window.threads[-1].any_signal.connect(main_window.thread_function)
+    main_window.start_current_scenario_calculation()
+    thread = main_window.threads[-1]
+    thread.run()
+    assert thread.calculated
 
     main_window.display_results()
     assert not main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
@@ -99,27 +99,29 @@ def test_wrong_results_shown(qtbot):
 
     main_window.add_scenario()
     main_window.save_scenario()
-    main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[-1].any_signal, raising=False):
-        main_window.threads[-1].run()
-        main_window.threads[-1].any_signal.connect(main_window.thread_function)
+    main_window.start_current_scenario_calculation()
+    thread = main_window.threads[-1]
+    thread.run()
+    assert thread.calculated
 
     main_window.display_results()
     assert not main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
     assert not main_window.gui_structure.result_Rb_calculated.is_hidden()
-    main_window.list_widget_scenario.setCurrentRow(0)
+    main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(0))
     assert not main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
     assert not main_window.gui_structure.result_Rb_calculated.is_hidden()
-    main_window.list_widget_scenario.setCurrentRow(1)
+    main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(1))
     assert not main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
     assert not main_window.gui_structure.result_Rb_calculated.is_hidden()
     main_window.add_scenario()
     main_window.gui_structure.aim_temp_profile.widget.click()
     main_window.save_scenario()
-    main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[-1].any_signal, raising=False):
-        main_window.threads[-1].run()
-        main_window.threads[-1].any_signal.connect(main_window.thread_function)
+    main_window.start_current_scenario_calculation()
+    thread = main_window.threads[-1]
+    thread.run()
+    assert thread.calculated
+    print(main_window.gui_structure.option_temperature_profile_hourly.get_value(), main_window.gui_structure.aim_optimize.is_checked(), main_window.gui_structure.option_method_size_depth.get_value())
+    main_window.display_results()
     assert main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
 
     main_window._save_to_data("hello/not_there.GHEtool")
@@ -250,10 +252,10 @@ def test_value_error(qtbot) -> None:
     borefield, func = data_2_borefield(main_window.list_ds[-1])
     with raises(ValueError) as err:
         func()
-    main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[-1].any_signal, raising=False):
-        main_window.threads[-1].run()
-        main_window.threads[-1].any_signal.connect(main_window.thread_function)
+    main_window.start_current_scenario_calculation()
+    thread = main_window.threads[-1]
+    thread.run()
+    assert thread.calculated
 
     main_window.display_results()
     for figure in main_window.gui_structure.list_of_result_figures:
@@ -432,8 +434,8 @@ def test_bug_when_opening_scenarios_which_have_autosave_enabled(qtbot):
     QtW.QFileDialog.getOpenFileName = partial(get_save_file_name, return_value=(f"{filename_1}", "GHEtool (*.GHEtool)"))
     main_window.action_open.trigger()
     assert not main_window.gui_structure.aim_optimize.widget.isChecked()
-    main_window.list_widget_scenario.setCurrentRow(1)
-    main_window.list_widget_scenario.setCurrentRow(0)
+    main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(1))
+    main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(0))
     ds_new = main_window.list_ds[0]
     for option in ds_new.list_options_aims:
         if isinstance(option, ListBox):

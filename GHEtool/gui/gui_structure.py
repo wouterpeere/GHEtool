@@ -1447,7 +1447,8 @@ class GUI(GuiStructure):
                                                        partial(self.option_temperature_profile_hourly.check_linked_value, 1),
                                                        partial(self.aim_optimize.is_checked),
                                                        partial(self.option_method_size_depth.check_linked_value, 2)
-                                                   ])
+                                                   ],
+                                                   check_on_visibility_change=True)
 
     def _create_lists(self):
         # general settings

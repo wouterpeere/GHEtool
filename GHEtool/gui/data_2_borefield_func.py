@@ -246,7 +246,7 @@ def _create_ground_data(ds: DataStorage) -> GroundData:
 
 def _create_monthly_loads_peaks(ds: DataStorage) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
     """
-    This function creates a the monthly loads based on the data entered in the GUI.
+    This function creates the monthly loads based on the data entered in the GUI.
 
     Parameters
     ----------

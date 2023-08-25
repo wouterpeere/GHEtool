@@ -37,20 +37,20 @@ def test_advanced_options(qtbot):
     assert not gs.category_advanced_options.is_hidden()
     gs.aim_req_depth.widget.click()
 
-    main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[-1].any_signal, raising=False) as blocker:
-        main_window.threads[-1].run()
-        main_window.threads[-1].any_signal.connect(main_window.thread_function)
+    main_window.start_current_scenario_calculation()
+    thread = main_window.threads[-1]
+    thread.run()
+    assert thread.calculated
 
     main_window.display_results()
     assert gs.result_text_depth.label.text() == 'Depth: 115.13 m'
 
     gs.option_atol.set_value(25)
     gs.option_rtol.set_value(20)
-    main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[-1].any_signal, raising=False) as blocker:
-        main_window.threads[-1].run()
-        main_window.threads[-1].any_signal.connect(main_window.thread_function)
+    main_window.start_current_scenario_calculation()
+    thread = main_window.threads[-1]
+    thread.run()
+    assert thread.calculated
 
     main_window.display_results()
     assert gs.result_text_depth.label.text() == 'Depth: 115.15 m'

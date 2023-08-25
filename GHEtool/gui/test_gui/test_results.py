@@ -648,10 +648,10 @@ def test_coaxial_and_gradient(qtbot):
     gs.option_U_pipe_or_coaxial_pipe.set_value(1)
     gs.option_method_temp_gradient.set_value(2)
     main_window.save_scenario()
-    main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[-1].any_signal, raising=False) as blocker:
-        main_window.threads[-1].run()
-        main_window.threads[-1].any_signal.connect(main_window.thread_function)
+    main_window.start_current_scenario_calculation()
+    thread = main_window.threads[-1]
+    thread.run()
+    assert thread.calculated
 
     main_window.display_results()
 
@@ -660,10 +660,10 @@ def test_coaxial_and_gradient(qtbot):
 
     gs.option_method_temp_gradient.set_value(1)
     main_window.save_scenario()
-    main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[-1].any_signal, raising=False) as blocker:
-        main_window.threads[-1].run()
-        main_window.threads[-1].any_signal.connect(main_window.thread_function)
+    main_window.start_current_scenario_calculation()
+    thread = main_window.threads[-1]
+    thread.run()
+    assert thread.calculated
 
     main_window.display_results()
     assert gs.result_Rb_calculated.label.text() == 'Equivalent borehole thermal resistance: 0.0984 mK/W'

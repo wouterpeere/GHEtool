@@ -287,5 +287,187 @@ def test_visibility_SCOP(qtbot):
 
 
 def test_visibility_on_result_page(qtbot):
+    """
+    This function tests options on the result page for their visibility.
+    This is done by creating multiple scenario's, calculating all of them and then checking the visibility.
 
+    These scenario's are:
+    1) default
+    2) default + flux
+    3) default + gradient
+    4) default + pipe
+    5) default + hourly
+    6) default + size depth
+    7) default + size depth (hourly)
+    8) optimize
+
+    """
     main_window, gs = setup(qtbot)
+    main_window.delete_backup()
+    main_window, gs = setup(qtbot)
+
+    # gs.option_auto_saving.set_value(1)
+    gs.option_filename.set_value(f'{FOLDER}/Examples/hourly_profile.csv')
+
+    # main_window.add_scenario()
+    # scenario 2
+    main_window.save_scenario()
+    main_window.add_scenario()
+    gs.option_method_temp_gradient.set_value(1)
+    # scenario 3
+    main_window.save_scenario()
+    main_window.add_scenario()
+    gs.option_method_temp_gradient.set_value(2)
+    # scenario 4
+    main_window.save_scenario()
+    main_window.add_scenario()
+    gs.option_method_temp_gradient.set_value(0)
+    gs.option_method_rb_calc.set_value(1)
+    # scenario 5
+    main_window.save_scenario()
+    main_window.add_scenario()
+    gs.option_method_rb_calc.set_value(0)
+    gs.option_temperature_profile_hourly.set_value(1)
+    # scenario 6
+    main_window.save_scenario()
+    main_window.add_scenario()
+    gs.aim_req_depth.widget.click()
+    # scenario 7
+    main_window.save_scenario()
+    main_window.add_scenario()
+    gs.option_method_size_depth.set_value(2)
+    # scenario 8
+    main_window.save_scenario()
+    main_window.add_scenario()
+    gs.option_method_size_depth.set_value(0)
+    gs.aim_optimize.widget.click()
+
+    main_window.start_multiple_scenarios_calculation()
+    # thread = main_window.threads[-1]
+    _ = [thread.run() for thread in main_window.threads]
+    # assert thread.calculated
+
+    list_options_optimize_load_profile = [gs.results_heating_ext, gs.results_heating_peak_geo,
+                                          gs.results_heating_load_percentage, gs.results_heating_load,
+                                          gs.results_heating_peak, gs.results_cooling_ext,
+                                          gs.results_cooling_load_percentage, gs.results_cooling_load,
+                                          gs.results_cooling_peak, gs.results_cooling_peak_geo]
+
+    # go over all the scenario's and check correct visibility
+    # scenario 1
+    main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(0))
+    main_window.display_results()
+    assert np.all([option.is_hidden() for option in list_options_optimize_load_profile])
+    assert gs.result_Rb_calculated.is_hidden()
+    assert gs.result_Reynolds.is_hidden()
+    assert gs.result_text_depth.is_hidden()
+    assert gs.results_ground_temperature.is_hidden()
+    assert gs.hourly_figure_temperature_profile.is_hidden()
+    assert gs.figure_load_duration.is_hidden()
+    assert not gs.max_temp.is_hidden()
+    assert not gs.min_temp.is_hidden()
+    assert gs.max_temp.label.text() == "The maximum average fluid temperature is 16.64 °C"
+    assert gs.min_temp.label.text() == "The minimal average fluid temperature is 3.15 °C"
+
+    # scenario 2
+    main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(1))
+    main_window.display_results()
+    assert np.all([option.is_hidden() for option in list_options_optimize_load_profile])
+    assert gs.result_Rb_calculated.is_hidden()
+    assert gs.result_Reynolds.is_hidden()
+    assert gs.result_text_depth.is_hidden()
+    assert gs.hourly_figure_temperature_profile.is_hidden()
+    assert gs.figure_load_duration.is_hidden()
+    assert not gs.max_temp.is_hidden()
+    assert not gs.min_temp.is_hidden()
+    assert gs.max_temp.label.text() == "The maximum average fluid temperature is 16.64 °C"
+    assert gs.min_temp.label.text() == "The minimal average fluid temperature is 3.15 °C"
+    assert not gs.results_ground_temperature.is_hidden()
+    assert gs.results_ground_temperature.label.text() == "Average ground temperature: 12.0 °C"
+
+    # scenario 3
+    main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(2))
+    main_window.display_results()
+    assert np.all([option.is_hidden() for option in list_options_optimize_load_profile])
+    assert gs.result_Rb_calculated.is_hidden()
+    assert gs.result_Reynolds.is_hidden()
+    assert gs.result_text_depth.is_hidden()
+    assert gs.hourly_figure_temperature_profile.is_hidden()
+    assert gs.figure_load_duration.is_hidden()
+    assert not gs.max_temp.is_hidden()
+    assert not gs.min_temp.is_hidden()
+    assert gs.max_temp.label.text() == "The maximum average fluid temperature is 16.14 °C"
+    assert gs.min_temp.label.text() == "The minimal average fluid temperature is 2.65 °C"
+    assert not gs.results_ground_temperature.is_hidden()
+    assert gs.results_ground_temperature.label.text() == "Average ground temperature: 11.5 °C"
+
+    # scenario 4
+    main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(3))
+    main_window.display_results()
+    assert np.all([option.is_hidden() for option in list_options_optimize_load_profile])
+    assert gs.result_text_depth.is_hidden()
+    assert gs.hourly_figure_temperature_profile.is_hidden()
+    assert gs.figure_load_duration.is_hidden()
+    assert not gs.max_temp.is_hidden()
+    assert not gs.min_temp.is_hidden()
+    assert gs.max_temp.label.text() == "The maximum average fluid temperature is 16.15 °C"
+    assert gs.min_temp.label.text() == "The minimal average fluid temperature is 3.47 °C"
+    assert gs.results_ground_temperature.is_hidden()
+    assert gs.result_Rb_calculated.label.text() == "Equivalent borehole thermal resistance: 0.0579 mK/W"
+    assert gs.result_Reynolds.label.text() == "Reynolds number: 7958.0 "
+
+    # scenario 5
+    main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(4))
+    main_window.display_results()
+    assert np.all([option.is_hidden() for option in list_options_optimize_load_profile])
+    assert gs.result_Rb_calculated.is_hidden()
+    assert gs.result_Reynolds.is_hidden()
+    assert gs.result_text_depth.is_hidden()
+    assert not gs.hourly_figure_temperature_profile.is_hidden()
+    assert not gs.figure_load_duration.is_hidden()
+    assert not gs.max_temp.is_hidden()
+    assert not gs.min_temp.is_hidden()
+    assert gs.max_temp.label.text() == "The maximum average fluid temperature is 24.82 °C"
+    assert gs.min_temp.label.text() == "The minimal average fluid temperature is -14.93 °C"
+    assert gs.results_ground_temperature.is_hidden()
+
+    # scenario 6
+    main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(5))
+    main_window.display_results()
+    assert np.all([option.is_hidden() for option in list_options_optimize_load_profile])
+    assert gs.result_Rb_calculated.is_hidden()
+    assert gs.result_Reynolds.is_hidden()
+    assert not gs.result_text_depth.is_hidden()
+    assert gs.result_text_depth.label.text() == "Depth: 317.61 m"
+    assert gs.hourly_figure_temperature_profile.is_hidden()
+    assert gs.figure_load_duration.is_hidden()
+    assert gs.max_temp.is_hidden()
+    assert gs.min_temp.is_hidden()
+    assert gs.results_ground_temperature.is_hidden()
+
+    # scenario 7
+    main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(6))
+    main_window.display_results()
+    assert np.all([option.is_hidden() for option in list_options_optimize_load_profile])
+    assert gs.result_Rb_calculated.is_hidden()
+    assert gs.result_Reynolds.is_hidden()
+    assert not gs.result_text_depth.is_hidden()
+    assert gs.result_text_depth.label.text() == "Depth: 323.5 m"
+    assert not gs.hourly_figure_temperature_profile.is_hidden()
+    assert not gs.figure_load_duration.is_hidden()
+    assert gs.max_temp.is_hidden()
+    assert gs.min_temp.is_hidden()
+    assert gs.results_ground_temperature.is_hidden()
+
+    # scenario 8
+    main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(7))
+    main_window.display_results()
+    assert np.all([not option.is_hidden() for option in list_options_optimize_load_profile])
+    assert gs.result_Rb_calculated.is_hidden()
+    assert gs.result_Reynolds.is_hidden()
+    assert gs.result_text_depth.is_hidden()
+    assert not gs.hourly_figure_temperature_profile.is_hidden()
+    assert not gs.figure_load_duration.is_hidden()
+    assert gs.max_temp.is_hidden()
+    assert gs.min_temp.is_hidden()
+    assert gs.results_ground_temperature.is_hidden()
