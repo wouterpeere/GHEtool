@@ -31,7 +31,7 @@ def test_pipe_right_options_shown(qtbot):
     main_window.save_scenario()
 
     gs = main_window.gui_structure
-    assert gs.pipe_thermal_resistance.is_hidden()
+    assert gs.category_pipe_data.is_hidden()
     gs.option_method_rb_calc.set_value(1)
     gs.page_borehole_resistance.button.click()
     assert not gs.option_U_pipe_or_coaxial_pipe.is_hidden()
@@ -72,10 +72,10 @@ def test_Rb_calculated_when_value_changed_U_pipe(qtbot):
     main_window.save_scenario()
 
     gs = main_window.gui_structure
-    assert gs.pipe_thermal_resistance.is_hidden()
+    assert gs.category_pipe_data.is_hidden()
     gs.option_method_rb_calc.set_value(1)
     gs.page_borehole_resistance.button.click()
-    assert not gs.pipe_thermal_resistance.is_hidden()
+    assert not gs.category_pipe_data.is_hidden()
 
     assert gs.pipe_thermal_resistance.label.text() == 'The equivalent borehole thermal resistance (at 100.0m): 0.0579 mK/W'
     gs.option_conductivity.set_value(2.5)
@@ -119,7 +119,7 @@ def test_Rb_calculated_when_value_changed_coaxial(qtbot):
     main_window.save_scenario()
 
     gs = main_window.gui_structure
-    assert gs.pipe_thermal_resistance.is_hidden()
+    assert gs.category_pipe_data.is_hidden()
 
     gs.option_method_rb_calc.set_value(1)
     gs.page_borehole_resistance.button.click()
