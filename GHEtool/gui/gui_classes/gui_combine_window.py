@@ -57,6 +57,10 @@ class MainWindow(MainWindow):
             data = val.pop("option_spacing")
             val["option_spacing_width"] = data
             val["option_spacing_length"] = data
+            val["option_heating_column"] = (val["option_heating_column"], "")
+            val["option_single_column"] = (val["option_single_column"], "")
+            val["option_cooling_column"] = (val["option_cooling_column"], "")
+            val["option_language"] = (val["option_language"], "")
             val["aim_rect"] = True
             val["aim_Box_shaped"] = False
             val["aim_L_shaped"] = False

@@ -68,14 +68,15 @@ def test_building_load(qtbot):
 
     # calculate with geothermal load
     main_window.gui_structure.aim_temp_profile.widget.click()
+    main_window.gui_structure.geo_load.set_value(0)
     main_window.save_scenario()
-    without_SCOP, without_SEER, without_SCOP_avg, without_SEER_avg = _create_monthly_loads_peaks(main_window.list_ds[0])
+    without_SCOP, without_SEER, without_SCOP_avg, without_SEER_avg = _create_monthly_loads_peaks(main_window.list_ds[-1])
 
     # calculate with building load
     main_window.gui_structure.geo_load.set_value(1)
     main_window.save_scenario()
 
-    with_SCOP, with_SEER, with_SCOP_avg, with_SEER_avg = _create_monthly_loads_peaks(main_window.list_ds[0])
+    with_SCOP, with_SEER, with_SCOP_avg, with_SEER_avg = _create_monthly_loads_peaks(main_window.list_ds[-1])
 
     # check loads
     assert np.array_equal(with_SCOP, (1 - 1/4) * without_SCOP)
@@ -91,6 +92,5 @@ def test_building_load(qtbot):
     assert thread.calculated
 
     # # check if the data is the same
-    test = (main_window.list_ds[0].results.load.hourly_cooling_load - peak_cooling)
     assert np.allclose(main_window.list_ds[0].results.load.hourly_cooling_load / (1 + 1/3), peak_cooling)
     assert np.allclose(main_window.list_ds[0].results.load.hourly_heating_load / (1 - 1/4), peak_heating)
