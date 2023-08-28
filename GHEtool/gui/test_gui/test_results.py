@@ -12,7 +12,7 @@ from GHEtool import Borefield, FOLDER, FluidData, GroundConstantTemperature, Gro
 from GHEtool.gui.data_2_borefield_func import data_2_borefield
 from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
 from GHEtool.gui.gui_classes.translation_class import Translations
-from GHEtool.gui.gui_structure import GUI
+from GHEtool.gui.gui_structure import GUI, GuiStructure
 from ScenarioGUI import load_config
 import pygfunction as gt
 
