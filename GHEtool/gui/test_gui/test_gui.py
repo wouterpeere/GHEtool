@@ -317,7 +317,7 @@ def test_file_import_errors(qtbot):
     g_s.option_filename.set_value(f'{FOLDER.joinpath("Examples/hourly_profile_wrong.csv")}')
     main_window.gui_structure.fun_display_data()
     assert main_window.status_bar.label.text() == main_window.translations.ValueError[0]
-    
+
     g_s.option_filename.set_value(f'{FOLDER.joinpath("Examples/hourly_profile.csv")}')
     g_s.fun_update_combo_box_data_file(f'{FOLDER.joinpath("Examples/hourly_profile.csv")}')
     g_s.option_column.set_value(1)
@@ -326,10 +326,10 @@ def test_file_import_errors(qtbot):
     g_s.option_cooling_column.set_value(1)
     data = read_csv(FOLDER.joinpath("Examples/hourly_profile.csv"), sep=";", decimal=".")
     data_new = DataFrame()
-    start = to_datetime("2019-01-01 00:00:00") 
-    end = to_datetime("2019-12-31 23:59:00") 
-    # add date column 
-    data_new["Date"] = Series(date_range(start, end, freq="1H")) 
+    start = to_datetime("2019-01-01 00:00:00")
+    end = to_datetime("2019-12-31 23:59:00")
+    # add date column
+    data_new["Date"] = Series(date_range(start, end, freq="1H"))
     data_new = data_new.set_index("Date")
     data_new["Heating Load"] = data["Heating"].to_numpy()
     data_new["Cooling Load"] = data["Cooling"].to_numpy()
@@ -337,17 +337,17 @@ def test_file_import_errors(qtbot):
     data_new["Cooling peak"] = data["Cooling"].to_numpy()
     data_new = data_new.resample("M").agg({"Heating Load": "sum", "Cooling Load": "sum", "Heating peak": "max", "Cooling peak": "max"})
     main_window.gui_structure.fun_display_data()
-    assert np.isclose(data_new["Heating peak"][0], g_s.option_hp_jan.get_value(), atol=0.01) 
-    assert np.isclose(data_new["Heating peak"][1], g_s.option_hp_feb.get_value(), atol=0.01) 
-    assert np.isclose(data_new["Heating peak"][2], g_s.option_hp_mar.get_value(), atol=0.01) 
-    assert np.isclose(data_new["Heating peak"][3], g_s.option_hp_apr.get_value(), atol=0.01) 
-    assert np.isclose(data_new["Heating peak"][4], g_s.option_hp_may.get_value(), atol=0.01) 
-    assert np.isclose(data_new["Heating peak"][5], g_s.option_hp_jun.get_value(), atol=0.01) 
-    assert np.isclose(data_new["Heating peak"][6], g_s.option_hp_jul.get_value(), atol=0.01) 
-    assert np.isclose(data_new["Heating peak"][7], g_s.option_hp_aug.get_value(), atol=0.01) 
-    assert np.isclose(data_new["Heating peak"][8], g_s.option_hp_sep.get_value(), atol=0.01) 
-    assert np.isclose(data_new["Heating peak"][9], g_s.option_hp_oct.get_value(), atol=0.01) 
-    assert np.isclose(data_new["Heating peak"][10], g_s.option_hp_nov.get_value(), atol=0.01) 
+    assert np.isclose(data_new["Heating peak"][0], g_s.option_hp_jan.get_value(), atol=0.01)
+    assert np.isclose(data_new["Heating peak"][1], g_s.option_hp_feb.get_value(), atol=0.01)
+    assert np.isclose(data_new["Heating peak"][2], g_s.option_hp_mar.get_value(), atol=0.01)
+    assert np.isclose(data_new["Heating peak"][3], g_s.option_hp_apr.get_value(), atol=0.01)
+    assert np.isclose(data_new["Heating peak"][4], g_s.option_hp_may.get_value(), atol=0.01)
+    assert np.isclose(data_new["Heating peak"][5], g_s.option_hp_jun.get_value(), atol=0.01)
+    assert np.isclose(data_new["Heating peak"][6], g_s.option_hp_jul.get_value(), atol=0.01)
+    assert np.isclose(data_new["Heating peak"][7], g_s.option_hp_aug.get_value(), atol=0.01)
+    assert np.isclose(data_new["Heating peak"][8], g_s.option_hp_sep.get_value(), atol=0.01)
+    assert np.isclose(data_new["Heating peak"][9], g_s.option_hp_oct.get_value(), atol=0.01)
+    assert np.isclose(data_new["Heating peak"][10], g_s.option_hp_nov.get_value(), atol=0.01)
     assert np.isclose(data_new["Heating peak"][11], g_s.option_hp_dec.get_value(), atol=0.01)
 
     assert np.isclose(data_new["Cooling peak"][0], g_s.option_cp_jan.get_value(), atol=0.01)
@@ -363,17 +363,17 @@ def test_file_import_errors(qtbot):
     assert np.isclose(data_new["Cooling peak"][10], g_s.option_cp_nov.get_value(), atol=0.01)
     assert np.isclose(data_new["Cooling peak"][11], g_s.option_cp_dec.get_value(), atol=0.01)
 
-    assert np.isclose(data_new["Heating Load"][0], g_s.option_hl_jan.get_value(), atol=1) 
-    assert np.isclose(data_new["Heating Load"][1], g_s.option_hl_feb.get_value(), atol=1) 
-    assert np.isclose(data_new["Heating Load"][2], g_s.option_hl_mar.get_value(), atol=1) 
-    assert np.isclose(data_new["Heating Load"][3], g_s.option_hl_apr.get_value(), atol=1) 
-    assert np.isclose(data_new["Heating Load"][4], g_s.option_hl_may.get_value(), atol=1) 
-    assert np.isclose(data_new["Heating Load"][5], g_s.option_hl_jun.get_value(), atol=1) 
-    assert np.isclose(data_new["Heating Load"][6], g_s.option_hl_jul.get_value(), atol=1) 
-    assert np.isclose(data_new["Heating Load"][7], g_s.option_hl_aug.get_value(), atol=1) 
-    assert np.isclose(data_new["Heating Load"][8], g_s.option_hl_sep.get_value(), atol=1) 
-    assert np.isclose(data_new["Heating Load"][9], g_s.option_hl_oct.get_value(), atol=1) 
-    assert np.isclose(data_new["Heating Load"][10], g_s.option_hl_nov.get_value(), atol=1) 
+    assert np.isclose(data_new["Heating Load"][0], g_s.option_hl_jan.get_value(), atol=1)
+    assert np.isclose(data_new["Heating Load"][1], g_s.option_hl_feb.get_value(), atol=1)
+    assert np.isclose(data_new["Heating Load"][2], g_s.option_hl_mar.get_value(), atol=1)
+    assert np.isclose(data_new["Heating Load"][3], g_s.option_hl_apr.get_value(), atol=1)
+    assert np.isclose(data_new["Heating Load"][4], g_s.option_hl_may.get_value(), atol=1)
+    assert np.isclose(data_new["Heating Load"][5], g_s.option_hl_jun.get_value(), atol=1)
+    assert np.isclose(data_new["Heating Load"][6], g_s.option_hl_jul.get_value(), atol=1)
+    assert np.isclose(data_new["Heating Load"][7], g_s.option_hl_aug.get_value(), atol=1)
+    assert np.isclose(data_new["Heating Load"][8], g_s.option_hl_sep.get_value(), atol=1)
+    assert np.isclose(data_new["Heating Load"][9], g_s.option_hl_oct.get_value(), atol=1)
+    assert np.isclose(data_new["Heating Load"][10], g_s.option_hl_nov.get_value(), atol=1)
     assert np.isclose(data_new["Heating Load"][11], g_s.option_hl_dec.get_value(), atol=1)
 
     assert np.isclose(data_new["Cooling Load"][0], g_s.option_cl_jan.get_value(), atol=1)
@@ -396,10 +396,10 @@ def test_load_data_GUI():
     calc_data = load_data_GUI(FOLDER.joinpath("Examples/hourly_profile.csv"), 0, "Heating", "Cooling", "Heating", ";", ".", 1, False)
     data = read_csv(FOLDER.joinpath("Examples/hourly_profile.csv"), sep=";", decimal=".")
     data_new = DataFrame()
-    start = to_datetime("2019-01-01 00:00:00") 
-    end = to_datetime("2019-12-31 23:59:00") 
-    # add date column 
-    data_new["Date"] = Series(date_range(start, end, freq="1H")) 
+    start = to_datetime("2019-01-01 00:00:00")
+    end = to_datetime("2019-12-31 23:59:00")
+    # add date column
+    data_new["Date"] = Series(date_range(start, end, freq="1H"))
     data_new = data_new.set_index("Date")
     data_new["Heating Load"] = data["Heating"].to_numpy()
     data_new["Cooling Load"] = np.zeros(8760)
@@ -436,22 +436,15 @@ def test_bug_when_opening_scenarios_which_have_autosave_enabled(qtbot):
 
     ds_old = main_window.list_ds[0]
 
-    def get_save_file_name(*args, **kwargs):
-        """getSaveFileName proxy"""
-        return kwargs["return_value"]
-
     filename_1= main_window.default_path.joinpath("try_open1.GHEtool")
     filename_2 = main_window.default_path.joinpath("try_open2.GHEtool")
-    QtW.QFileDialog.getSaveFileName = partial(get_save_file_name, return_value=(f"{filename_1}", "GHEtool (*.GHEtool)"))
-    assert not main_window.gui_structure.aim_optimize.widget.isChecked()
-    main_window.action_save_as.trigger()
+    assert main_window._save_to_data(filename_1)
     main_window.gui_structure.aim_optimize.widget.click()
-    QtW.QFileDialog.getSaveFileName = partial(get_save_file_name, return_value=(f"{filename_2}", "GHEtool (*.GHEtool)"))
-    assert main_window.gui_structure.aim_optimize.widget.isChecked()
-    main_window.action_save_as.trigger()
-    QtW.QFileDialog.getOpenFileName = partial(get_save_file_name, return_value=(f"{filename_1}", "GHEtool (*.GHEtool)"))
-    main_window.action_open.trigger()
-    assert not main_window.gui_structure.aim_optimize.widget.isChecked()
+    assert main_window.gui_structure.aim_optimize.is_checked()
+    assert main_window._save_to_data(filename_2)
+    assert main_window._load_from_data(filename_1)
+    assert not main_window.list_ds[-1].aim_optimize
+    assert not main_window.gui_structure.aim_optimize.is_checked()
     main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(1))
     main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(0))
     ds_new = main_window.list_ds[0]
@@ -464,8 +457,8 @@ def test_bug_when_opening_scenarios_which_have_autosave_enabled(qtbot):
         if isinstance(getattr(ds_old, option), (str, bool)):
             assert getattr(ds_old, option) == getattr(ds_new, option)
             continue
-    os.remove(main_window.default_path.joinpath(filename_1))
-    os.remove(main_window.default_path.joinpath(filename_2))
+    os.remove(filename_1)
+    os.remove(filename_2)
     main_window.delete_backup()
 
 
