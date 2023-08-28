@@ -3,21 +3,17 @@ Test to see if the advanced options work as expected
 """
 import sys
 from pathlib import Path
-from typing import Tuple
 
-import numpy as np
 import PySide6.QtWidgets as QtW
-import pandas as pd
 
-from GHEtool import Borefield, FOLDER, FluidData, GroundConstantTemperature, GroundFluxTemperature, PipeData, GroundTemperatureGradient
+from GHEtool import Borefield
 from GHEtool.gui.data_2_borefield_func import data_2_borefield
 from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
 from GHEtool.gui.gui_classes.translation_class import Translations
-from GHEtool.gui.gui_structure import GUI, GuiStructure
+from GHEtool.gui.gui_structure import GUI
 from ScenarioGUI import load_config
-import pygfunction as gt
 
-load_config(Path(__file__).parent.parent.joinpath("gui_config.ini"))
+load_config(Path(__file__).parent.joinpath("gui_config.ini"))
 
 sys.setrecursionlimit(1500)
 

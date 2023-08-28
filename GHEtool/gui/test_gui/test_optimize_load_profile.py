@@ -1,7 +1,7 @@
+from pathlib import Path
 from sys import setrecursionlimit
 
 import numpy as np
-from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
 
 import PySide6.QtWidgets as QtW
 from GHEtool import FOLDER, Borefield
@@ -9,7 +9,9 @@ from GHEtool.gui.data_2_borefield_func import data_2_borefield, _create_monthly_
 from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
 from GHEtool.gui.gui_classes.translation_class import Translations
 from GHEtool.gui.gui_structure import GUI, load_data_GUI
+from ScenarioGUI import load_config
 
+load_config(Path(__file__).parent.joinpath("gui_config.ini"))
 
 setrecursionlimit(1500)
 

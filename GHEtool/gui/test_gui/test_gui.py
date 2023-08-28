@@ -16,8 +16,7 @@ from pytest import raises
 setrecursionlimit(1500)
 
 from ScenarioGUI import load_config
-from ScenarioGUI.gui_classes.gui_structure_classes import *
-load_config(Path(__file__).parent.parent.joinpath("gui_config.ini"))
+load_config(Path(__file__).parent.joinpath("gui_config.ini"))
 
 
 def test_language(qtbot):
