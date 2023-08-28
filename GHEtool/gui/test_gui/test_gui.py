@@ -16,6 +16,7 @@ from pytest import raises
 setrecursionlimit(1500)
 
 from ScenarioGUI import load_config
+
 load_config(Path(__file__).parent.joinpath("gui_config.ini"))
 
 
@@ -113,6 +114,7 @@ def test_wrong_results_shown(qtbot):
     assert not main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
     assert not main_window.gui_structure.result_Rb_calculated.is_hidden()
 
+
 def test_wrong_results_shown_2(qtbot):
     """
     test if results are shown correctly.
@@ -127,9 +129,9 @@ def test_wrong_results_shown_2(qtbot):
     main_window.delete_backup()
     main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
     main_window.add_scenario()
-    assert main_window.gui_structure.option_temperature_profile_hourly.get_value() <1
+    assert main_window.gui_structure.option_temperature_profile_hourly.get_value() < 1
     assert main_window.gui_structure.option_method_size_depth.get_value() < 1
-    if not main_window.gui_structure.aim_temp_profile.is_checked():
+    if not main_window.gui_structure.aim_temp_profile.is_checked():  # pragma: no cover
         main_window.gui_structure.aim_temp_profile.widget.click()
     main_window.save_scenario()
     ds = main_window.list_ds[-1]
@@ -187,7 +189,7 @@ def test_backward_compatibility(qtbot):
     for ds_old, ds_new in zip(main_window_old.list_ds, main_window_new.list_ds):
         ds_new.borefield_file = ds_old.borefield_file
         for option in ds_new.list_options_aims:
-            if isinstance(getattr(ds_old, option), int) and isinstance(getattr(ds_new, option), list):
+            if isinstance(getattr(ds_old, option), int) and isinstance(getattr(ds_new, option), list):  # pragma: no cover
                 # listboxes are saved differently from v2.2.0 onwards
                 assert getattr(ds_old, option) == getattr(ds_new, option)[0]
                 continue
@@ -280,7 +282,7 @@ def test_value_error(qtbot) -> None:
         assert figure[0].is_hidden()
 
     main_window.check_results()
-    #assert f'{main_window.list_ds[-1].debug_message}' == f'{err.value}'
+    # assert f'{main_window.list_ds[-1].debug_message}' == f'{err.value}'
     main_window.delete_backup()
 
 
@@ -436,7 +438,7 @@ def test_bug_when_opening_scenarios_which_have_autosave_enabled(qtbot):
 
     ds_old = main_window.list_ds[0]
 
-    filename_1= main_window.default_path.joinpath("try_open1.GHEtool")
+    filename_1 = main_window.default_path.joinpath("try_open1.GHEtool")
     filename_2 = main_window.default_path.joinpath("try_open2.GHEtool")
     assert main_window._save_to_data(filename_1)
     main_window.gui_structure.aim_optimize.widget.click()
