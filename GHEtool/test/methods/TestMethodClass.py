@@ -41,7 +41,7 @@ class OptimiseLoadProfileObject:
         self.peak_cooling_ext = peak_cooling_ext
         self.name = name
 
-    def test(self):
+    def test(self):  # pragma: no cover
         self.borefield.optimise_load_profile(self.load, self.depth, self.SCOP, self.SEER)
         assert np.isclose(self.borefield._percentage_heating, self.percentage_heating)
         assert np.isclose(self.borefield._percentage_cooling, self.percentage_cooling)
