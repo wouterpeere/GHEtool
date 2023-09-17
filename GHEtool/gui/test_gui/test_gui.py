@@ -282,7 +282,7 @@ def test_value_error(qtbot) -> None:
         assert figure[0].is_hidden()
 
     main_window.check_results()
-    # assert f'{main_window.list_ds[-1].debug_message}' == f'{err.value}'
+    assert f'{main_window.list_ds[-1].debug_message}' == f'{err.value}'
     main_window.delete_backup()
 
 
