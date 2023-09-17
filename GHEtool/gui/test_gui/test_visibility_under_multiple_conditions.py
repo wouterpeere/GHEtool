@@ -265,6 +265,8 @@ def test_visibility_SCOP(qtbot):
         assert gs.SCOP.is_hidden()
         assert gs.SEER.is_hidden()
 
+    gs.option_include_dhw.set_value(1)
+
     invisible()
     gs.geo_load.set_value(1)
     visible()
@@ -281,6 +283,27 @@ def test_visibility_SCOP(qtbot):
     main_window.save_scenario()
     main_window.change_scenario(0)
     visible()
+
+
+def test_visibility_dhw(qtbot):
+
+    main_window, gs = setup(qtbot)
+
+    assert not gs.option_include_dhw.is_hidden()
+    assert gs.DHW.is_hidden()
+    assert gs.SCOP_DHW.is_hidden()
+
+    gs.option_include_dhw.set_value(1)
+    assert not gs.DHW.is_hidden()
+    assert gs.SCOP_DHW.is_hidden()
+
+    gs.geo_load.set_value(1)
+    assert not gs.DHW.is_hidden()
+    assert not gs.SCOP_DHW.is_hidden()
+
+    gs.aim_optimize.widget.click()
+    assert gs.DHW.is_hidden()
+    assert gs.SCOP_DHW.is_hidden()
 
 
 def test_visibility_on_result_page(qtbot):

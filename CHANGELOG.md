@@ -28,6 +28,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Rename SizingSetup class to CalculationSetup class (issue #159).
 - Move H_init to CalculationSetup class (issue #159).
 - Move use_precalcated_data to CalculationSetup class and rename to: 'use_precalculate_dataset' (issue #159).
+- Changed 'minimal average fluid temperature' to 'minimum average fluid temperature' in GUI (issue #172).
 
 ## Fixed
 - Fixed problem with L2 sizing, when the peak load was the same in all months (issue #146).
