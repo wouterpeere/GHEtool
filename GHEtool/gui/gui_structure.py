@@ -1163,12 +1163,24 @@ class GUI(GuiStructure):
             self.category_demand_building_or_geo = \
                 Category(page=self.page_thermal, label=translations.category_demand_building_or_geo)
             self.geo_load = ButtonBox(label=translations.geo_load, default_index=0,
-                                      entries=[" goethermal ", " building "],
+                                      entries=[" geothermal ", " building "],
+                                      category=self.category_demand_building_or_geo)
+            self.option_include_dhw = ButtonBox(label=translations.option_include_dhw, default_index=0,
+                                      entries=[" No ", " Yes "],
                                       category=self.category_demand_building_or_geo)
             self.SCOP = FloatBox(
                 category=self.category_demand_building_or_geo,
                 label=translations.SCOP,
                 default_value=4,
+                decimal_number=2,
+                minimal_value=1,
+                maximal_value=50,
+                step=0.1,
+            )
+            self.SCOP_DHW = FloatBox(
+                category=self.category_demand_building_or_geo,
+                label=translations.SCOP_DHW,
+                default_value=3,
                 decimal_number=2,
                 minimal_value=1,
                 maximal_value=50,
@@ -1182,6 +1194,15 @@ class GUI(GuiStructure):
                 minimal_value=1,
                 maximal_value=50,
                 step=0.1,
+            )
+            self.DHW = FloatBox(
+                category=self.category_demand_building_or_geo,
+                label=translations.DHW,
+                default_value=0,
+                decimal_number=0,
+                minimal_value=0,
+                maximal_value=500_000_000,
+                step=1,
             )
 
         # create categories
@@ -1271,12 +1292,12 @@ class GUI(GuiStructure):
 
             self.max_temp = ResultText(translations.max_temp, category=self.numerical_results,
                                        prefix="The maximum average fluid temperature is ", suffix=" deg C")
-            self.max_temp.text_to_be_shown("Borefield", "results_peak_cooling")
-            self.max_temp.function_to_convert_to_text(lambda x: round(max(x), 2))
+            self.max_temp.text_to_be_shown("Borefield", "results")
+            self.max_temp.function_to_convert_to_text(lambda x: round(max(x.peak_cooling), 2))
             self.min_temp = ResultText(translations.min_temp, category=self.numerical_results,
                                        prefix="The minimum average fluid temperature is ", suffix=" deg C")
-            self.min_temp.text_to_be_shown("Borefield", "results_peak_heating")
-            self.min_temp.function_to_convert_to_text(lambda x: round(min(x), 2))
+            self.min_temp.text_to_be_shown("Borefield", "results")
+            self.min_temp.function_to_convert_to_text(lambda x: round(min(x.peak_heating), 2))
 
         def create_figure_temperature_profile():
             self.figure_temperature_profile = ResultFigure(label=translations.figure_temperature_profile,
@@ -1406,6 +1427,22 @@ class GUI(GuiStructure):
         self.show_option_under_multiple_conditions([self.SCOP, self.SEER],
                                                    self.geo_load,
                                                    custom_logic=partial(self.geo_load.check_linked_value, 1))
+
+        self.show_option_under_multiple_conditions(self.option_include_dhw,
+                                                   self.aim_optimize,
+                                                   custom_logic=lambda: not self.aim_optimize.is_checked())
+        self.show_option_under_multiple_conditions(self.DHW,
+                                                   self.option_include_dhw,
+                                                   custom_logic=partial(self.option_include_dhw.check_linked_value, 1),
+                                                   check_on_visibility_change=True)
+
+        self.show_option_under_multiple_conditions(self.SCOP_DHW,
+                                                   [self.geo_load, self.option_include_dhw],
+                                                   functions_check_for_and=[
+                                                       partial(self.geo_load.check_linked_value, 1),
+                                                       partial(self.option_include_dhw.check_linked_value, 1)
+                                                   ],
+                                                   check_on_visibility_change=True)
 
         self.aim_optimize.change_event(self.disable_button_box(self.geo_load, 0, partial(self.aim_optimize.is_checked)))
 

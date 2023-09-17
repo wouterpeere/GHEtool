@@ -188,3 +188,28 @@ def test_get_month_index():
 def test_dummy_peak_duration():
     test = MonthlyGeothermalLoadAbsolute()
     assert None is test.peak_duration
+
+
+def test_dhw():
+    load = MonthlyGeothermalLoadAbsolute()
+    assert load.dhw == 0.
+    load.add_dhw(1000)
+    assert load.dhw == 1000.
+    load.dhw = 200
+    assert load.dhw == 200.
+    try:
+        load.add_dhw('test')
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
+    try:
+        load.add_dhw(-10)
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
+
+    load.dhw = 8760*10
+    assert np.array_equal(np.full(12, 8760*10/12), load.baseload_heating)
+    assert load.imbalance == -8760*10
+    load.all_months_equal = False
+    assert np.array_equal(np.array([7440., 6720., 7440., 7200., 7440., 7200., 7440., 7440., 7200., 7440., 7200., 7440.]), load.baseload_heating)
