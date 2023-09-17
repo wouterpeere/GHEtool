@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Interpolation option in calculate function in Gfunction class (issue #159).
 - Absolute and relative tolerances for the sizing methods even as a maximum number of iterations is added, so there is more transparency and flexibility in the trade-off between accuracy and speed (issue #159).
 - Added advanced options to GHEtool GUI (issue #165).
+- Added domestic hot water (DHW) to GHEtool (issue #172).
 
 ## Changed
 - GUI was moved to a separate project: [ScenarioGUI](https://github.com/tblanke/ScenarioGUI).

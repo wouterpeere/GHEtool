@@ -116,6 +116,8 @@ In a future version of GHEtool, also secundary building loads will be included. 
 * _HourlyGeothermalLoad_: You can set (or load) the hourly heating and cooling load of a standard year which will be used for all years within the simulation period.
 * _HourlyGeothermalLoadMultiYear_: You can set (or load) the hourly heating and cooling load for multiple years (i.e. for the whole simulation period). This way, you can use secundary loads already with GHEtool as shown in [this example](https://ghetool.readthedocs.io/en/stable/sources/code/Examples/active_passive_cooling.html).
 
+All load classes also have the option to add a yearly domestic hot water usage.
+
 Please note that it is possible to add your own load types by inheriting the attributes from the abstract _LoadData class.
 
 ### Options for sizing methods
