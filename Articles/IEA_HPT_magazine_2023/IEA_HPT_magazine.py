@@ -243,7 +243,7 @@ scattered = [[(np.random.normal(i, 0.04), val) for i, val in enumerate(building)
 
 # Import libraries
 
-fig = plt.figure(figsize=(10, 7))
+fig = plt.figure()
 
 # Creating plot
 plt.boxplot(size_per_field, positions=range(3))
@@ -255,7 +255,7 @@ for i in range(3):
     # Add some random "jitter" to the x-axis
     x = np.concatenate((x, np.random.normal(i, 0.04, size=len(size_per_field[i]))))
 
-plt.plot(x, y, 'r.', alpha=0.2, label='Individual GHEtool calculations')
+plt.plot(x, y, 'r.', alpha=0.2, label='Individual sizings')
 
 # add sizing based on rule of thumb
 plt.arrow(0.4, auditorium_load.max_peak_cooling/ROT, -0.2, 0, length_includes_head=True, head_width=500, head_length=0.04, color="#377eb8", label='Rule of thumb cooling')  # cooling
@@ -295,7 +295,7 @@ for i in range(3):
     # Add some random "jitter" to the x-axis
     x = np.concatenate((x, np.random.normal(i, 0.04, size=len(specific_extraction[i]))))
 
-plt.plot(x, y, 'r.', alpha=0.2, label='Individual GHEtool calculations')
+plt.plot(x, y, 'r.', alpha=0.2, label='Individual sizings')
 # labels
 plt.ylabel('Specific heat extraction [W/m]')
 plt.xticks([r for r in range(3)], ['Auditorium', 'Office', 'Residential'])
