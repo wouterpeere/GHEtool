@@ -16,13 +16,14 @@ class CalculationSetup(BaseClass):
 
     __slots__ = '_L2_sizing', '_L3_sizing', '_L4_sizing', 'quadrant_sizing', '_backup', \
                 'atol', 'rtol', 'max_nb_of_iterations', 'interpolate_gfunctions', 'H_init',\
-                'use_precalculated_dataset', 'deep_sizing'
+                'use_precalculated_dataset', 'deep_sizing', 'force_deep_sizing'
 
     def __init__(self, quadrant_sizing: int = 0,
                  L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None,
                  atol: float = 0.05, rtol: float = 0.005, max_nb_of_iterations: int = 40,
                  interpolate_gfunctions: bool = None, H_init: float = 100.,
-                 use_precalculated_dataset: bool = True, deep_sizing: bool = False):
+                 use_precalculated_dataset: bool = True, deep_sizing: bool = False,
+                 force_deep_sizing: bool = False):
         """
 
         Parameters
@@ -58,6 +59,8 @@ class CalculationSetup(BaseClass):
             anyways. By using another approach for sizing with a variable ground temperature, a solution can be found,
             however this method is slower. If deep_sizing is True, whenever an unsolvable error is returned, the
             sizing is done again with this other methodology.
+        force_deep_sizing : bool
+            True when deep_sizing should be done always
 
         References
         ----------
@@ -77,6 +80,7 @@ class CalculationSetup(BaseClass):
         self.H_init: float = H_init
         self.use_precalculated_dataset: bool = use_precalculated_dataset
         self.deep_sizing: bool = deep_sizing
+        self.force_deep_sizing: bool = force_deep_sizing
 
         self._backup: CalculationSetup = None
 

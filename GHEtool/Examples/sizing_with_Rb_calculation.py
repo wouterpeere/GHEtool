@@ -75,8 +75,8 @@ def sizing_with_Rb():
     borefield.create_custom_dataset()
 
     # set temperature boundaries
-    borefield.set_max_ground_temperature(16)   # maximum temperature
-    borefield.set_min_ground_temperature(0)    # minimum temperature
+    borefield.set_max_avg_fluid_temperature(16)   # maximum temperature
+    borefield.set_min_avg_fluid_temperature(0)    # minimum temperature
 
     # size with constant Rb* value
     borefield.calculation_setup(use_constant_Rb=True)

@@ -3,6 +3,7 @@ This file contains all the code for the borefield calculations.
 """
 from __future__ import annotations
 
+import warnings
 from math import pi
 from pathlib import Path
 from typing import Tuple
@@ -474,7 +475,7 @@ class Borefield(BaseClass):
     def load(self) -> _LoadData | HourlyGeothermalLoad | MonthlyGeothermalLoadAbsolute:
         """
         This returns the LoadData object.
-        
+
         Returns
         -------
         Load data: LoadData
@@ -485,7 +486,7 @@ class Borefield(BaseClass):
     def load(self, load: _LoadData) -> None:
         """
         This function sets the _load attribute.
-        
+
         Parameters
         ----------
         load : _LoadData
@@ -502,7 +503,7 @@ class Borefield(BaseClass):
     def simulation_period(self) -> int:
         """
         This returns the simulation period from the LoadData object.
-        
+
         Returns
         -------
         Simulation period [years] : int
@@ -650,14 +651,14 @@ class Borefield(BaseClass):
         """
         self.borehole.Rb = Rb
 
-    def set_max_ground_temperature(self, temp: float) -> None:
+    def set_max_avg_fluid_temperature(self, temp: float) -> None:
         """
-        This functions sets the maximal ground temperature to temp.
+        This functions sets the maximal average fluid temperature to temp.
 
         Parameters
         ----------
         temp : float
-            Maximal ground temperature [deg C]
+            Maximal average fluid temperature [deg C]
 
         Returns
         -------
@@ -666,20 +667,24 @@ class Borefield(BaseClass):
         Raises
         ------
         ValueError
-            When the maximal temperature is lower than the minimal temperature
+            When the maximal average fluid temperature is lower than the minimal average fluid temperature
         """
         if temp <= self.Tf_min:
-            raise ValueError(f'The maximum temperature {temp} is lower than the minimum temperature {self.Tf_min}')
+            raise ValueError(f'The maximum average fluid temperature {temp} is lower than the minimum average fluid temperature {self.Tf_min}')
         self.Tf_max: float = temp
 
-    def set_min_ground_temperature(self, temp: float) -> None:
+    def set_max_ground_temperature(self, temp: float) -> None:  # pragma: no cover
+        DeprecationWarning('This function will be depreciated in v2.2.1. Please use the correct set_max_avg_fluid_temperature() function')
+        self.set_max_avg_fluid_temperature(temp)
+
+    def set_min_avg_fluid_temperature(self, temp: float) -> None:
         """
-        This functions sets the minimal ground temperature to temp.
+        This functions sets the minimal average fluid temperature to temp.
 
         Parameters
         ----------
         temp : float
-            Minimal ground temperature [deg C]
+            Minimal average fluid temperature [deg C]
 
         Returns
         -------
@@ -688,11 +693,15 @@ class Borefield(BaseClass):
         Raises
         ------
         ValueError
-            When the maximal temperature is lower than the minimal temperature
+            When the maximal average temperature is lower than the minimal average temperature
         """
         if temp >= self.Tf_max:
-            raise ValueError(f'The minimum temperature {temp} is lower than the maximum temperature {self.Tf_max}')
+            raise ValueError(f'The minimum average fluid temperature {temp} is lower than the maximum average fluid temperature {self.Tf_max}')
         self.Tf_min: float = temp
+
+    def set_min_ground_temperature(self, temp: float) -> None:  # pragma: no cover
+        DeprecationWarning('This function will be depreciated in v2.2.1. Please use the correct set_min_avg_fluid_temperature() function')
+        self.set_min_avg_fluid_temperature(temp)
 
     def _Tg(self, H: float = None) -> float:
         """
@@ -1148,7 +1157,7 @@ class Borefield(BaseClass):
             return self.H
         else:
             try:
-                max_temp, sized = self._size_based_on_temperature_profile(10, deep_sizing=False)
+                max_temp, sized = self._size_based_on_temperature_profile(10, deep_sizing=self._calculation_setup.force_deep_sizing)
             except MaximumNumberOfIterations as e:
                 # no convergence with normal method, but perhaps with deep_sizing enabled
                 if self._calculation_setup.deep_sizing and self.ground_data.variable_Tg:
@@ -1216,7 +1225,7 @@ class Borefield(BaseClass):
             return self.H
         else:
             try:
-                max_temp, sized = self._size_based_on_temperature_profile(10, hourly=True, deep_sizing=False) if np.any(self.load.hourly_cooling_load) else (0, False)
+                max_temp, sized = self._size_based_on_temperature_profile(10, hourly=True, deep_sizing=self._calculation_setup.force_deep_sizing) if np.any(self.load.hourly_cooling_load) else (0, False)
             except MaximumNumberOfIterations as e:
                 # no convergence with normal method, but perhaps with deep_sizing enabled
                 if self._calculation_setup.deep_sizing and self.ground_data.variable_Tg:
@@ -1276,7 +1285,7 @@ class Borefield(BaseClass):
 
     def _size_based_on_temperature_profile(self, quadrant: int, hourly: bool = False, deep_sizing: bool = False) -> (float, bool):
         """
-         This function sizes based on the temperature profile.
+        This function sizes based on the temperature profile.
         It sizes for a specific quadrant and can both size with a monthly or an hourly resolution.
 
         Parameters

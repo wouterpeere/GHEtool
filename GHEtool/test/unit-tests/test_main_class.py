@@ -272,12 +272,12 @@ def test_set_pipe_params():
 
 def test_set_max_temp():
     borefield = Borefield()
-    borefield.set_max_ground_temperature(13)
+    borefield.set_max_avg_fluid_temperature(13)
     assert borefield.Tf_max == 13
-    borefield.set_max_ground_temperature(14)
+    borefield.set_max_avg_fluid_temperature(14)
     assert borefield.Tf_max == 14
     try:
-        borefield.set_max_ground_temperature(borefield.Tf_min-1)
+        borefield.set_max_avg_fluid_temperature(borefield.Tf_min - 1)
         assert False  # pragma: no cover
     except ValueError:
         assert True
@@ -285,12 +285,12 @@ def test_set_max_temp():
 
 def test_set_min_temp():
     borefield = Borefield()
-    borefield.set_min_ground_temperature(3)
+    borefield.set_min_avg_fluid_temperature(3)
     assert borefield.Tf_min == 3
-    borefield.set_min_ground_temperature(4)
+    borefield.set_min_avg_fluid_temperature(4)
     assert borefield.Tf_min == 4
     try:
-        borefield.set_min_ground_temperature(borefield.Tf_max+1)
+        borefield.set_min_avg_fluid_temperature(borefield.Tf_max + 1)
         assert False  # pragma: no cover
     except ValueError:
         assert True
@@ -390,7 +390,7 @@ def test_select_size():
     borefield.set_ground_parameters(data_ground_flux)
     assert borefield._select_size(100, 20) == 100
     assert borefield._select_size(10, 80) == 80
-    borefield.set_max_ground_temperature(14)
+    borefield.set_max_avg_fluid_temperature(14)
     try:
         borefield._select_size(10, 80)
         assert False  # pragma: no cover
@@ -452,7 +452,7 @@ def test_size_L3_value_errors():
 def test_size_L3(quadrant, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
-    borefield.set_max_ground_temperature(18)
+    borefield.set_max_avg_fluid_temperature(18)
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
     borefield.set_ground_parameters(ground_data_constant)
 
@@ -505,7 +505,7 @@ def test_size_L4():
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_cooling=0, col_heating=1)
     borefield.load = load
 
-    borefield.set_max_ground_temperature(25)
+    borefield.set_max_avg_fluid_temperature(25)
     assert np.isclose(109.4742962707615, borefield.size_L4(100, quadrant_sizing=3))
     assert np.isclose(109.4742962707615, borefield.H)
     assert borefield.calculate_quadrant() == 3
@@ -816,7 +816,7 @@ def test_load_duration(monkeypatch):
 def test_calculate_quadrants_without_data():
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
-    borefield.set_max_ground_temperature(18)
+    borefield.set_max_avg_fluid_temperature(18)
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
     borefield.set_ground_parameters(ground_data_constant)
     borefield.calculate_quadrant()

@@ -36,6 +36,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Rename SizingSetup class to CalculationSetup class (issue #159).
 - Move H_init to CalculationSetup class (issue #159).
 - Move use_precalcated_data to CalculationSetup class and rename to: 'use_precalculate_dataset' (issue #159).
+- Changed 'set_max_ground_temperature' and 'set_min_ground_temperature' to correct names: 'set_max_avg_fluid_temperature' and 'set_min_avg_fluid_temperature'
 
 
 ## Fixed

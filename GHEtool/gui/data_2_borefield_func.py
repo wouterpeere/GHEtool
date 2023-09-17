@@ -42,8 +42,8 @@ def data_2_borefield(ds: DataStorage) -> tuple[Borefield, partial[[], None]]:
     )
     _set_boreholes(ds, borefield)
     # set temperature boundaries
-    borefield.set_max_ground_temperature(ds.option_max_temp)  # maximum temperature
-    borefield.set_min_ground_temperature(ds.option_min_temp)  # minimum temperature
+    borefield.set_max_avg_fluid_temperature(ds.option_max_temp)  # maximum temperature
+    borefield.set_min_avg_fluid_temperature(ds.option_min_temp)  # minimum temperature
 
     # set ground data
     borefield.set_ground_parameters(_create_ground_data(ds))
