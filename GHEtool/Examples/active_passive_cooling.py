@@ -139,7 +139,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
 
     borefield = Borefield()
     borefield.simulation_period = SIMULATION_PERIOD
-    borefield.set_max_ground_temperature(17)
+    borefield.set_max_avg_fluid_temperature(17)
 
     borefield.create_rectangular_borefield(12, 12, 6, 6, 100)
     borefield.set_ground_parameters(GroundConstantTemperature(2.1, 11))
@@ -164,7 +164,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         depths.insert(0, depth_passive)
 
         # get temperature profile
-        temp_profile = borefield.results_peak_heating
+        temp_profile = borefield.results.peak_heating
 
         # recalculate heating load
         heating_ground = update_load_COP(temp_profile, COP, heating_building)
@@ -177,7 +177,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
     cooling_ground = cooling_building.copy()
     heating_ground = heating_building.copy()
 
-    borefield.set_max_ground_temperature(25)
+    borefield.set_max_avg_fluid_temperature(25)
     while abs(depths[0] - depths[1]) > 0.1:
         # set loads
         load = HourlyGeothermalLoadMultiYear()
@@ -190,7 +190,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         depths.insert(0, depth_active)
 
         # get temperature profile
-        temp_profile = borefield.results_peak_heating
+        temp_profile = borefield.results.peak_heating
 
         # recalculate heating load
         heating_ground = update_load_COP(temp_profile, COP, heating_building)
@@ -244,7 +244,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
 
             # get temperature profile
             borefield.calculate_temperatures(depth, hourly=True)
-            temp_profile = borefield.results_peak_heating
+            temp_profile = borefield.results.peak_heating
 
             # set previous loads
             heating_ground_prev = heating_ground.copy()

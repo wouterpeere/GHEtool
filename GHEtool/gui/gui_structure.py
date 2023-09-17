@@ -1292,12 +1292,12 @@ class GUI(GuiStructure):
 
             self.max_temp = ResultText(translations.max_temp, category=self.numerical_results,
                                        prefix="The maximum average fluid temperature is ", suffix=" deg C")
-            self.max_temp.text_to_be_shown("Borefield", "results_peak_cooling")
-            self.max_temp.function_to_convert_to_text(lambda x: round(max(x), 2))
+            self.max_temp.text_to_be_shown("Borefield", "results")
+            self.max_temp.function_to_convert_to_text(lambda x: round(max(x.peak_cooling), 2))
             self.min_temp = ResultText(translations.min_temp, category=self.numerical_results,
                                        prefix="The minimum average fluid temperature is ", suffix=" deg C")
-            self.min_temp.text_to_be_shown("Borefield", "results_peak_heating")
-            self.min_temp.function_to_convert_to_text(lambda x: round(min(x), 2))
+            self.min_temp.text_to_be_shown("Borefield", "results")
+            self.min_temp.function_to_convert_to_text(lambda x: round(min(x.peak_heating), 2))
 
         def create_figure_temperature_profile():
             self.figure_temperature_profile = ResultFigure(label=translations.figure_temperature_profile,

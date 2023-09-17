@@ -51,8 +51,8 @@ def create_borefield(g_s: GuiStructure) -> Borefield:
     """
     borefield = Borefield()
 
-    borefield.set_max_ground_temperature(g_s.option_max_temp.get_value())
-    borefield.set_min_ground_temperature(g_s.option_min_temp.get_value())
+    borefield.set_max_avg_fluid_temperature(g_s.option_max_temp.get_value())
+    borefield.set_min_avg_fluid_temperature(g_s.option_min_temp.get_value())
 
     g_d = GroundConstantTemperature(g_s.option_conductivity.get_value(), g_s.option_ground_temp.get_value(), g_s.option_heat_capacity.get_value() * 1000)
     borefield.set_ground_parameters(g_d)
@@ -480,8 +480,8 @@ def test_sizing_L2_L3_min_max(qtbot) -> None:
         borefield = create_borefield(gs)
 
         borefield.ground_data.Tg = ground_temp
-        borefield.set_max_ground_temperature(max_temp)
-        borefield.set_min_ground_temperature(min_temp)
+        borefield.set_max_avg_fluid_temperature(max_temp)
+        borefield.set_min_avg_fluid_temperature(min_temp)
 
         gs.option_max_temp.set_value(max_temp)
         gs.option_min_temp.set_value(min_temp)
@@ -495,8 +495,8 @@ def test_sizing_L2_L3_min_max(qtbot) -> None:
         assert borefield_gui.ground_data.Tg == borefield.ground_data.Tg
         assert borefield_gui.Tf_max == borefield.Tf_max
         assert borefield_gui.Tf_min == borefield.Tf_min
-        assert borefield_gui._sizing_setup.L2_sizing == L2
-        assert borefield_gui._sizing_setup.L3_sizing != L2
+        assert borefield_gui._calculation_setup.L2_sizing == L2
+        assert borefield_gui._calculation_setup.L3_sizing != L2
         assert func.func == borefield_gui.size
         assert func.args == ()
         assert func.keywords == {}

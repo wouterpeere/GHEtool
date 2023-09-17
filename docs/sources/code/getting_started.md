@@ -132,10 +132,10 @@ we set the borehole equivalent thermal resistance.
 ```Python
 # create the borefield object
 borefield = Borefield(load=load
-					  peak_heating=peak_heating,
-                      peak_cooling=peak_cooling,
-                      baseload_heating=monthly_load_heating,
-                      baseload_cooling=monthly_load_cooling)
+peak_heating = peak_heating,
+peak_cooling = peak_cooling,
+baseload_heating = monthly_load_heating,
+baseload_cooling = monthly_load_cooling)
 
 # set ground parameters
 borefield.set_ground_parameters(data)
@@ -144,8 +144,8 @@ borefield.set_ground_parameters(data)
 borefield.Rb = 0.12
 
 # set temperature boundaries
-borefield.set_max_ground_temperature(16)  # maximum temperature
-borefield.set_min_ground_temperature(0)  # minimum temperature
+borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
+borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
 ```
 
 Next we create a rectangular borefield.
