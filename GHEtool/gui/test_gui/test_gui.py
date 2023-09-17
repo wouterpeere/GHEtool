@@ -507,7 +507,7 @@ def test_gui_filename_errors(qtbot):
     except FileNotFoundError:
         assert True
     try:
-        load_data_GUI("C:/test.GHEtool", 1, "Heating", "Cooling", "Combined", 5, 6, 7)
+        load_data_GUI("C:/test.GHEtool", 1, "Heating", "Cooling", "Combined", ";", ",", 7)
     except FileNotFoundError:
         assert True
     try:

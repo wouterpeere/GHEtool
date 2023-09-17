@@ -387,7 +387,7 @@ def test_visibility_on_result_page(qtbot):
     assert not gs.max_temp.is_hidden()
     assert not gs.min_temp.is_hidden()
     assert gs.max_temp.label.text() == "The maximum average fluid temperature is 16.64 °C"
-    assert gs.min_temp.label.text() == "The minimal average fluid temperature is 3.15 °C"
+    assert gs.min_temp.label.text() == "The minimum average fluid temperature is 3.15 °C"
 
     # scenario 2
     main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(1))
@@ -401,7 +401,7 @@ def test_visibility_on_result_page(qtbot):
     assert not gs.max_temp.is_hidden()
     assert not gs.min_temp.is_hidden()
     assert gs.max_temp.label.text() == "The maximum average fluid temperature is 16.64 °C"
-    assert gs.min_temp.label.text() == "The minimal average fluid temperature is 3.15 °C"
+    assert gs.min_temp.label.text() == "The minimum average fluid temperature is 3.15 °C"
     assert not gs.results_ground_temperature.is_hidden()
     assert gs.results_ground_temperature.label.text() == "Average ground temperature: 12.0 °C"
 
@@ -417,7 +417,7 @@ def test_visibility_on_result_page(qtbot):
     assert not gs.max_temp.is_hidden()
     assert not gs.min_temp.is_hidden()
     assert gs.max_temp.label.text() == "The maximum average fluid temperature is 16.14 °C"
-    assert gs.min_temp.label.text() == "The minimal average fluid temperature is 2.65 °C"
+    assert gs.min_temp.label.text() == "The minimum average fluid temperature is 2.65 °C"
     assert not gs.results_ground_temperature.is_hidden()
     assert gs.results_ground_temperature.label.text() == "Average ground temperature: 11.5 °C"
 
@@ -431,7 +431,7 @@ def test_visibility_on_result_page(qtbot):
     assert not gs.max_temp.is_hidden()
     assert not gs.min_temp.is_hidden()
     assert gs.max_temp.label.text() == "The maximum average fluid temperature is 16.15 °C"
-    assert gs.min_temp.label.text() == "The minimal average fluid temperature is 3.47 °C"
+    assert gs.min_temp.label.text() == "The minimum average fluid temperature is 3.47 °C"
     assert gs.results_ground_temperature.is_hidden()
     assert gs.result_Rb_calculated.label.text() == "Equivalent borehole thermal resistance: 0.0579 mK/W"
     assert gs.result_Reynolds.label.text() == "Reynolds number: 7958.0 "
@@ -448,7 +448,7 @@ def test_visibility_on_result_page(qtbot):
     assert not gs.max_temp.is_hidden()
     assert not gs.min_temp.is_hidden()
     assert gs.max_temp.label.text() == "The maximum average fluid temperature is 24.82 °C"
-    assert gs.min_temp.label.text() == "The minimal average fluid temperature is -14.93 °C"
+    assert gs.min_temp.label.text() == "The minimum average fluid temperature is -14.93 °C"
     assert gs.results_ground_temperature.is_hidden()
 
     # scenario 6
