@@ -90,6 +90,10 @@ def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, 
     if filename == "":
         raise FileNotFoundError
 
+    if heating_load_column == cooling_load_column:
+        logging.error('Please select different values for the heating and cooling column.')
+        raise ValueError('Please select different values for the heating and cooling column.')
+
     # Generate list of columns that have to be imported
     cols: list = []
     if len(heating_load_column) >= 1:
@@ -101,13 +105,15 @@ def load_data_GUI(filename: str, thermal_demand: int, heating_load_column: str, 
     date: str = "Date"
     try:
         df2: pd_DataFrame = pd_read_csv(filename, usecols=cols, sep=sep, decimal=dec)
-    except:
-        raise FileNotFoundError
+    except FileNotFoundError:
+        raise FileNotFoundError('The file for the hourly load cannot be found.')
+    except ValueError:
+        raise ValueError('Please select the correct seperator for the hourly load.')
 
     # not the correct decimal seperator
     if isinstance(df2.iloc[0, 0], str):
         logging.error("Please select the correct decimal point seperator.")
-        raise ValueError
+        raise ValueError("Please select the correct decimal point seperator.")
 
     # heating and cooling column are equal
 
