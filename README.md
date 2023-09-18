@@ -249,6 +249,8 @@ For more information on how to cite GHEtool, please visit the ReadTheDocs at [GH
 ## References
 
 ### Development of GHEtool
+Peere, W., Hermans, L., Boydens, W., and Helsen, L. (2023). Evaluation of the oversizing and computational speed of different open-source borefield sizing methods. In _Proceedings of International Building Simulation Conference 2023_. Shanghai (Belgium), 4-6 September 2023.
+
 Coninx, M., De Nies, J. (2022). Cost-efficient Cooling of Buildings by means of Borefields with Active and Passive Cooling. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
 
 Peere, W., Blanke, T. (2022). GHEtool: An open-source tool for borefield sizing in Python. _Journal of Open Source Software, 7_(76), 4406, https://doi.org/10.21105/joss.04406
