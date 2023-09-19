@@ -13,18 +13,16 @@ import copy
 import itertools
 
 
-## set parameters
+# set parameters
 glycol_single_lam = FluidData(0.2, 0.5, 1021.7, 3919, 0.0033)
 glycol_double_lam = FluidData(0.225, 0.5, 1021.7, 3919, 0.0033)
 glycol_single_tur = FluidData(0.36, 0.5, 1021.7, 3919, 0.0033)
 glycol_double_tur = FluidData(0.45, 0.5, 1021.7, 3919, 0.0033)
-fluids = [glycol_single_lam, glycol_double_lam, glycol_single_tur, glycol_double_tur]
 
 singe_u_pipe_good = SingleUTube(2, 0.016, 0.02, 0.4, 0.04)
 double_u_pipe_good = DoubleUTube(2, 0.013, 0.016, 0.4, 0.045)
 singe_u_pipe_bad = SingleUTube(1.5, 0.016, 0.02, 0.4, 0.04)
 double_u_pipe_bad = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.045)
-pipes = [singe_u_pipe_good, double_u_pipe_good, singe_u_pipe_bad, double_u_pipe_bad]
 
 fluid_pipes_single = list(zip([glycol_single_lam, glycol_single_tur], [singe_u_pipe_bad, singe_u_pipe_good]))
 fluid_pipes_double = list(zip([glycol_double_lam, glycol_double_tur], [double_u_pipe_bad, double_u_pipe_good]))
@@ -59,14 +57,21 @@ office_field = gt.boreholes.rectangle_field(20, 10, 6, 6, 150, 0.75, 0.07)
 residential_field = gt.boreholes.rectangle_field(5, 8, 6, 6, 150, 0.75, 0.07)
 
 ROT = 0.030  # rule of thumb kW/m
-YLIM = (-100, 150)  # limits of the relative plots
 
 
-def figure_1_2():
-    # laminar
+def figure_1_2() -> None:
+    """
+    This function creates Figure 1 and 2 from the article.
 
+    Returns
+    -------
+    None
+    """
+
+    # initialise arrays
     cool, heat, ref = np.empty(3), np.empty(3), np.empty(3)
 
+    # iterate over the different buildings and size the borefield
     for idx, (field, load) in enumerate(zip([auditorium_field, office_field, residential_field],
                                             [auditorium_load, office_load, residential_load])):
 
@@ -78,10 +83,11 @@ def figure_1_2():
         borefield.set_pipe_parameters(double_u_pipe_good)
         ref[idx] = (borefield.size(L4_sizing=True) * borefield.number_of_boreholes)
 
+        # calculate the size according to the rule of thumb
         cool[idx] = (load.max_peak_cooling / ROT)
         heat[idx] = (load.max_peak_heating / ROT)
 
-    # create figure
+    # Figure 1 for the total required borehole length
     barWidth = 0.25
 
     plt.figure()
@@ -99,7 +105,8 @@ def figure_1_2():
     plt.title('Total borehole length for different buildings')
     plt.legend()
 
-    # Figure 2 for relative over and undersizing
+    # Figure 2 for relative over- and undersizing
+    # calculate over- and undersizing
     rel_cool = (cool - ref) / ref * 100  # %
     rel_heat = (heat - ref) / ref * 100  # %
 
@@ -113,16 +120,26 @@ def figure_1_2():
 
     plt.xticks([r + barWidth for r in range(3)], ['Auditorium', 'Office', 'Residential'])
     plt.ylabel('Relative over- and undersizing w.r.t. GHEtool [%]')
-    plt.title('Relative difference in rule of thumb sizing for different buildings')
-    plt.ylim(YLIM)
+    plt.title('Influence of the building load/type\non the required borehole length')
+    plt.ylim((-100, 150))
     plt.legend()
     plt.grid(axis='y')
     plt.show()
 
 
-def figure_3():
+def figure_3() -> None:
+    """
+    This function creates the third figure from the article.
+
+    Returns
+    -------
+    None
+    """
+
+    # initialise loads
     cool, heat, ref = np.empty(4), np.empty(4), np.empty(4)
 
+    # iterate over all flow type-pipe combinations
     field, load = auditorium_field, auditorium_load
     for idx, (fluid, pipe) in enumerate(zip([glycol_double_lam, glycol_double_tur, glycol_single_lam, glycol_single_tur],
                            [double_u_pipe_good, double_u_pipe_good, singe_u_pipe_good, singe_u_pipe_good])):
@@ -134,16 +151,16 @@ def figure_3():
         borefield.set_pipe_parameters(pipe)
         ref[idx] = (borefield.size(L4_sizing=True) * borefield.number_of_boreholes)
 
+        # size according to the rule of thumb
         cool[idx] = (load.max_peak_cooling / ROT)
         heat[idx] = (load.max_peak_heating / ROT)
 
-    # create figure
+    # Figure 3
     barWidth = 0.25
 
-    # Figure 2 for relative over and undersizing
+    # calculate relative over- and undersizing
     rel_cool = (cool - ref) / ref * 100  # %
     rel_heat = (heat - ref) / ref * 100  # %
-    # print(rel_cool, rel_heat)
 
     plt.figure()
 
@@ -157,15 +174,24 @@ def figure_3():
                                                   'Single U-pipe\nLaminar flow', 'Single U-pipe\nTurbulent flow'])
     plt.ylabel('Relative over- and undersizing w.r.t. GHEtool[%]')
     plt.title('Influence of borehole design parameters\non the required borehole length for the auditorium')
-    # plt.ylim(YLIM)
     plt.legend()
     plt.grid(axis='y')
     plt.show()
 
 
-def figure_4():
+def figure_4() -> None:
+    """
+    This function creates Figure 4 from the article.
+
+    Returns
+    -------
+    None
+    """
+
+    # initialise arrays
     cool, heat, ref = np.empty(4), np.empty(4), np.empty(4)
 
+    # iterate over the temperature limits
     field, load = auditorium_field, auditorium_load
     for idx, (max, min) in enumerate(temp_limits):
         borefield = Borefield(borefield=field, load=load)
@@ -176,16 +202,16 @@ def figure_4():
         borefield.set_pipe_parameters(double_u_pipe_good)
         ref[idx] = (borefield.size(L4_sizing=True) * borefield.number_of_boreholes)
 
+        # size according to the rule of thumb
         cool[idx] = (load.max_peak_cooling / ROT)
         heat[idx] = (load.max_peak_heating / ROT)
 
-    # create figure
+    # Figure 4
     barWidth = 0.25
 
-    # Figure 2 for relative over and undersizing
+    # calculate relative over- and undersizing
     rel_cool = (cool - ref) / ref * 100  # %
     rel_heat = (heat - ref) / ref * 100  # %
-    # print(rel_cool, rel_heat)
 
     plt.figure()
 
@@ -205,101 +231,100 @@ def figure_4():
     plt.show()
 
 
-# figure_4()
-def calc():
-    sizes = []
-    size_per_field = []
-    for idx, (field, load) in enumerate(zip([auditorium_field, office_field, residential_field],
-                                                [auditorium_load, office_load, residential_load])):
-        sizes = []
-        for ground in grounds:
-            for fluid, pipe in fluid_pipes:
-                for temp_limit in temp_limits:
-                    for sim_period in (20, 40):
-                        try:
-                            borefield = Borefield(load=load)
-                            borefield.borefield = copy.copy(field)
-                            borefield.set_ground_parameters(ground)
-                            borefield.simulation_period = sim_period
-                            borefield.set_pipe_parameters(pipe)
-                            borefield.set_fluid_parameters(fluid)
-                            borefield.set_min_ground_temperature(temp_limit[1])
-                            borefield.set_max_ground_temperature(temp_limit[0])
-                            print(borefield.size())
-                            sizes.append(borefield.H * borefield.number_of_boreholes)
-                        except RuntimeError:
-                            print('Error')
-        size_per_field.append(sizes)
+def figure_5_6() -> None:
+    def calc() -> list:
+        size_per_field = []
+        for idx, (field, load) in enumerate(zip([auditorium_field, office_field, residential_field],
+                                                    [auditorium_load, office_load, residential_load])):
+            sizes = []
+            for ground in grounds:
+                for fluid, pipe in fluid_pipes:
+                    for temp_limit in temp_limits:
+                        for sim_period in (20, 40):
+                            try:
+                                borefield = Borefield(load=load)
+                                borefield.borefield = copy.copy(field)
+                                borefield.set_ground_parameters(ground)
+                                borefield.simulation_period = sim_period
+                                borefield.set_pipe_parameters(pipe)
+                                borefield.set_fluid_parameters(fluid)
+                                borefield.set_min_ground_temperature(temp_limit[1])
+                                borefield.set_max_ground_temperature(temp_limit[0])
+                                print(borefield.size())
+                                sizes.append(borefield.H * borefield.number_of_boreholes)
+                            except RuntimeError:
+                                print('Error')
+            size_per_field.append(sizes)
+        return size_per_field
 
-    import pickle
-    pickle.dump(size_per_field, open('office_results.pkl', 'wb'))
+    # calculate the sizings for each building
+    size_per_field = calc()
 
-# calc()
-import pickle
+    # Figure 5
+    fig = plt.figure()
 
-size_per_field = pickle.load(open('office_results.pkl', 'rb'))
+    # Creating plot
+    plt.boxplot(size_per_field, positions=range(3))
 
-scattered = [[(np.random.normal(i, 0.04), val) for i, val in enumerate(building)] for building in size_per_field]
+    # Create scatter
+    x, y = np.empty(0), np.empty(0)
+    for i in range(3):
+        y = np.concatenate((y, np.array(size_per_field[i])))
+        # Add some random "jitter" to the x-axis
+        x = np.concatenate((x, np.random.normal(i, 0.04, size=len(size_per_field[i]))))
 
-# Import libraries
+    plt.plot(x, y, 'r.', alpha=0.2, label='Individual sizings')
 
-fig = plt.figure()
+    # add sizing based on rule of thumb
+    plt.arrow(0.4, auditorium_load.max_peak_cooling/ROT, -0.2, 0, length_includes_head=True, head_width=500, head_length=0.04, color="#377eb8", label='Rule of thumb cooling')  # cooling
+    plt.arrow(0.4, auditorium_load.max_peak_heating/ROT, -0.2, 0, length_includes_head=True, head_width=500, head_length=0.04, color="#ff7f00", label='Rule of thumb heating')
+    plt.arrow(1.4, office_load.max_peak_cooling/ROT, -0.2, 0, length_includes_head=True, head_width=500, head_length=0.04, color="#377eb8")  # cooling
+    plt.arrow(1.4, office_load.max_peak_heating/ROT, -0.2, 0, length_includes_head=True, head_width=500, head_length=0.04, color="#ff7f00")
+    plt.arrow(2.4, residential_load.max_peak_cooling/ROT, -0.2, 0, length_includes_head=True, head_width=500, head_length=0.04, color="#377eb8")  # cooling
+    plt.arrow(2.4, residential_load.max_peak_heating/ROT, -0.2, 0, length_includes_head=True, head_width=500, head_length=0.04, color="#ff7f00")
 
-# Creating plot
-plt.boxplot(size_per_field, positions=range(3))
+    # labels
+    plt.ylabel('Total required borehole length [m]')
+    plt.xticks([r for r in range(3)], ['Auditorium', 'Office', 'Residential'])
+    plt.legend()
+    plt.title('Variation in total required borehole length')
+    plt.show()
 
-# Create scatter
-x, y = np.empty(0), np.empty(0)
-for i in range(3):
-    y = np.concatenate((y, np.array(size_per_field[i])))
-    # Add some random "jitter" to the x-axis
-    x = np.concatenate((x, np.random.normal(i, 0.04, size=len(size_per_field[i]))))
+    # Figure 6
+    specific_extraction = [0, 0, 0]
 
-plt.plot(x, y, 'r.', alpha=0.2, label='Individual sizings')
+    # list of all the peak values for different buildings in both heating and cooling
+    peak = [(auditorium_load.max_peak_heating, auditorium_load.max_peak_cooling),
+            (office_load.max_peak_heating, office_load.max_peak_cooling),
+            (residential_load.max_peak_heating, residential_load.max_peak_cooling)]
 
-# add sizing based on rule of thumb
-plt.arrow(0.4, auditorium_load.max_peak_cooling/ROT, -0.2, 0, length_includes_head=True, head_width=500, head_length=0.04, color="#377eb8", label='Rule of thumb cooling')  # cooling
-plt.arrow(0.4, auditorium_load.max_peak_heating/ROT, -0.2, 0, length_includes_head=True, head_width=500, head_length=0.04, color="#ff7f00", label='Rule of thumb heating')
-plt.arrow(1.4, office_load.max_peak_cooling/ROT, -0.2, 0, length_includes_head=True, head_width=500, head_length=0.04, color="#377eb8")  # cooling
-plt.arrow(1.4, office_load.max_peak_heating/ROT, -0.2, 0, length_includes_head=True, head_width=500, head_length=0.04, color="#ff7f00")
-plt.arrow(2.4, residential_load.max_peak_cooling/ROT, -0.2, 0, length_includes_head=True, head_width=500, head_length=0.04, color="#377eb8")  # cooling
-plt.arrow(2.4, residential_load.max_peak_heating/ROT, -0.2, 0, length_includes_head=True, head_width=500, head_length=0.04, color="#ff7f00")
+    # calculate specific heat extraction for both heating and cooling
+    for i, val in enumerate(size_per_field):
+        specific_extraction[i] = val / peak[i][0] + val / peak[i][1]
 
-# Plot references
+    plt.figure()
+    # Creating plot
+    plt.boxplot(specific_extraction, positions=range(3))
 
-# labels
-plt.ylabel('Total required borehole length [m]')
-plt.xticks([r for r in range(3)], ['Auditorium', 'Office', 'Residential'])
-plt.legend()
-plt.title('Variation in total required borehole length')
-# show plot
-plt.show()
+    # Create scatter
+    x, y = np.empty(0), np.empty(0)
+    for i in range(3):
+        y = np.concatenate((y, np.array(specific_extraction[i])))
+        # Add some random "jitter" to the x-axis
+        x = np.concatenate((x, np.random.normal(i, 0.04, size=len(specific_extraction[i]))))
 
-# Figure 6
+    plt.plot(x, y, 'r.', alpha=0.2, label='Individual sizings')
 
-specific_extraction = [0, 0, 0]
-peak = [(auditorium_load.max_peak_heating, auditorium_load.max_peak_cooling),
-        (office_load.max_peak_heating, office_load.max_peak_cooling),
-        (residential_load.max_peak_heating, residential_load.max_peak_cooling)]
-for i, val in enumerate(size_per_field):
-    specific_extraction[i] = val / peak[i][0] + val / peak[i][1]
+    # figure layout
+    plt.ylabel('Specific heat extraction [W/m]')
+    plt.xticks([r for r in range(3)], ['Auditorium', 'Office', 'Residential'])
+    plt.legend()
+    plt.title('Variation in rule of thumb parameter')
+    plt.show()
 
-plt.figure()
-# Creating plot
-plt.boxplot(specific_extraction, positions=range(3))
 
-# Create scatter
-x, y = np.empty(0), np.empty(0)
-for i in range(3):
-    y = np.concatenate((y, np.array(specific_extraction[i])))
-    # Add some random "jitter" to the x-axis
-    x = np.concatenate((x, np.random.normal(i, 0.04, size=len(specific_extraction[i]))))
-
-plt.plot(x, y, 'r.', alpha=0.2, label='Individual sizings')
-# labels
-plt.ylabel('Specific heat extraction [W/m]')
-plt.xticks([r for r in range(3)], ['Auditorium', 'Office', 'Residential'])
-plt.legend()
-plt.title('Variation in rule of thumb parameter')
-# show plot
-plt.show()
+if __name__ == '__main__':
+    figure_1_2()
+    figure_3()
+    figure_4()
+    figure_5_6()
