@@ -520,22 +520,22 @@ class Translations:  # pragma: no cover
             "Restriccións de temperatura e período de simulación",
         ]
         self.option_min_temp: List[str] = [
-            "Minimal temperature [°C]: ",
-            "Minimaltemperatur [°C]: ",
-            "Minimale temperatuur [°C]: ",
-            "Temperatura minima [°C]: ",
-            "Température minimale [°C]: ",
-            "Temperatura mínima [°C]: ",
-            "Temperatura mínima[°C]: ",
+            "Minimal average fluid temperature [°C]: ",
+            "Minimale durchschnittliche Fluidtemperatur [°C]:",
+            "Minimale gemiddelde fluïdumtemperatuur [°C]: ",
+            "Minimal average fluid temperature [°C]: ",
+            "Minimal average fluid temperature [°C]: ",
+            "Minimal average fluid temperature [°C]: ",
+            "Minimal average fluid temperature [°C]: ",
         ]
         self.option_max_temp: List[str] = [
-            "Maximal temperature [°C]: ",
-            "Maximaltemperatur [°C]: ",
-            "Maximale temperatuur [°C]: ",
-            "Temperatura massima [°C]: ",
-            "Température maximale [°C]: ",
-            "Temperatura máxima [°C]: ",
-            "Temperatura máxima [°C]: ",
+            "Maximal average fluid temperature [°C]: ",
+            "Maximale durchschnittliche Fluidtemperatur [°C]:",
+            "Maximale gemiddelde fluïdumtemperatuur [°C]: ",
+            "Maximal average fluid temperature [°C]: ",
+            "Maximal average fluid temperature [°C]: ",
+            "Maximal average fluid temperature [°C]: ",
+            "Maximal average fluid temperature [°C]: ",
         ]
         self.option_temp_gradient: List[str] = [
             "Temperature gradient [K/100m]: ",
