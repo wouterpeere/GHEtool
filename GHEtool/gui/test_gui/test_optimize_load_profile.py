@@ -1,7 +1,7 @@
+from pathlib import Path
 from sys import setrecursionlimit
 
 import numpy as np
-from PySide6.QtWidgets import QMainWindow as QtWidgets_QMainWindow
 
 import PySide6.QtWidgets as QtW
 from GHEtool import FOLDER, Borefield
@@ -9,7 +9,9 @@ from GHEtool.gui.data_2_borefield_func import data_2_borefield, _create_monthly_
 from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
 from GHEtool.gui.gui_classes.translation_class import Translations
 from GHEtool.gui.gui_structure import GUI, load_data_GUI
+from ScenarioGUI import load_config
 
+load_config(Path(__file__).parent.joinpath("gui_config.ini"))
 
 setrecursionlimit(1500)
 
@@ -42,10 +44,10 @@ def test_building_load(qtbot):
     # set optimize load profile
     main_window.gui_structure.aim_optimize.widget.click()
     main_window.save_scenario()
-    main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[-1].any_signal, raising=False) as blocker:
-        main_window.threads[-1].run()
-        main_window.threads[-1].any_signal.connect(main_window.thread_function)
+    main_window.start_current_scenario_calculation()
+    thread = main_window.threads[-1]
+    thread.run()
+    assert thread.calculated
 
     # check if the data is the same, because optimize load profile needs the building, not the ground data
     assert np.allclose(main_window.list_ds[0].results._building_load.hourly_cooling_load, peak_cooling)
@@ -68,14 +70,15 @@ def test_building_load(qtbot):
 
     # calculate with geothermal load
     main_window.gui_structure.aim_temp_profile.widget.click()
+    main_window.gui_structure.geo_load.set_value(0)
     main_window.save_scenario()
-    without_SCOP, without_SEER, without_SCOP_avg, without_SEER_avg = _create_monthly_loads_peaks(main_window.list_ds[0])
+    without_SCOP, without_SEER, without_SCOP_avg, without_SEER_avg = _create_monthly_loads_peaks(main_window.list_ds[-1])
 
     # calculate with building load
     main_window.gui_structure.geo_load.set_value(1)
     main_window.save_scenario()
 
-    with_SCOP, with_SEER, with_SCOP_avg, with_SEER_avg = _create_monthly_loads_peaks(main_window.list_ds[0])
+    with_SCOP, with_SEER, with_SCOP_avg, with_SEER_avg = _create_monthly_loads_peaks(main_window.list_ds[-1])
 
     # check loads
     assert np.array_equal(with_SCOP, (1 - 1/4) * without_SCOP)
@@ -85,12 +88,11 @@ def test_building_load(qtbot):
 
     main_window.gui_structure.option_temperature_profile_hourly.set_value(1)
     main_window.save_scenario()
-    main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[-1].any_signal, raising=False) as blocker:
-        main_window.threads[-1].run()
-        main_window.threads[-1].any_signal.connect(main_window.thread_function)
+    main_window.start_current_scenario_calculation()
+    thread = main_window.threads[-1]
+    thread.run()
+    assert thread.calculated
 
     # # check if the data is the same
-    test = (main_window.list_ds[0].results.load.hourly_cooling_load - peak_cooling)
     assert np.allclose(main_window.list_ds[0].results.load.hourly_cooling_load / (1 + 1/3), peak_cooling)
     assert np.allclose(main_window.list_ds[0].results.load.hourly_heating_load / (1 - 1/4), peak_heating)

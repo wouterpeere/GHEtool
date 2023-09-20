@@ -322,14 +322,18 @@ borefield.set_Rb(0.2)
 borefield.set_borefield(borefield_gt)
 hourly_load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
 borefield.load = hourly_load
-borefield._borefield_load.hourly_heating_load[0] = 100000
+temp = hourly_load.hourly_heating_load
+temp[0] = 100_000
+borefield._borefield_load.hourly_heating_load = temp
 list_of_test_objects.add(SizingObject(borefield, L4_output=18760.64149089075, quadrant=4, name='Hourly profile, quadrant 4'))
 
 hourly_load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_cooling=0, col_heating=1)
 borefield.load = hourly_load
 list_of_test_objects.add(SizingObject(borefield, L4_output=368.50138222702657, quadrant=2, name='Hourly profile reversed'))
 
-borefield._borefield_load.hourly_heating_load[0] = 100000
+temp = hourly_load.hourly_heating_load
+temp[0] = 100_000
+borefield._borefield_load.hourly_heating_load = temp
 list_of_test_objects.add(SizingObject(borefield, L4_output=18602.210559679363, quadrant=3, name='Hourly profile, quadrant 3'))
 
 hourly_load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))

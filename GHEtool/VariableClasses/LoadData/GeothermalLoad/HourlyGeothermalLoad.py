@@ -21,7 +21,8 @@ class HourlyGeothermalLoad(_LoadData):
 
     def __init__(self, heating_load: Union[np.ndarray, list, tuple] = np.zeros(8760),
                  cooling_load: Union[np.ndarray, list, tuple] = np.zeros(8760),
-                 simulation_period: int = 20):
+                 simulation_period: int = 20,
+                 dhw: float = 0.):
         """
 
         Parameters
@@ -32,6 +33,8 @@ class HourlyGeothermalLoad(_LoadData):
             Cooling load [kWh/h]
         simulation_period : int
             Length of the simulation period in years
+        dhw : float
+            Yearly consumption of domestic hot water [kWh/year]
         """
 
         super().__init__(hourly_resolution=True, simulation_period=simulation_period)
@@ -43,6 +46,7 @@ class HourlyGeothermalLoad(_LoadData):
         # set variables
         self.hourly_heating_load = heating_load
         self.hourly_cooling_load = cooling_load
+        self.dhw = dhw
 
     def _check_input(self, input: Union[np.ndarray, list, tuple]) -> bool:
         """
@@ -75,14 +79,14 @@ class HourlyGeothermalLoad(_LoadData):
     @property
     def hourly_heating_load(self) -> np.ndarray:
         """
-        This function returns the hourly heating load in kWh/h.
+        This function returns the hourly heating load in kWh/h including DHW.
 
         Returns
         -------
         hourly heating : np.ndarray
-            Hourly heating values [kWh/h] for one year, so the length of the array is 8760
+            Hourly heating values (incl. DHW) [kWh/h] for one year, so the length of the array is 8760
         """
-        return self._hourly_heating_load
+        return self._hourly_heating_load + self.dhw / 8760
 
     @hourly_heating_load.setter
     def hourly_heating_load(self, load: Union[np.ndarray, list, tuple]) -> None:

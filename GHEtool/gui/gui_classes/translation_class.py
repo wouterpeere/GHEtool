@@ -250,6 +250,9 @@ class Translations:  # pragma: no cover
         "option_atol",
         "option_rtol",
         "option_max_nb_of_iter",
+        "SCOP_DHW",
+        "option_include_dhw",
+        "DHW",
         "languages",
     )
 
@@ -517,22 +520,22 @@ class Translations:  # pragma: no cover
             "Restriccións de temperatura e período de simulación",
         ]
         self.option_min_temp: List[str] = [
-            "Minimal temperature [°C]: ",
-            "Minimaltemperatur [°C]: ",
-            "Minimale temperatuur [°C]: ",
-            "Temperatura minima [°C]: ",
-            "Température minimale [°C]: ",
-            "Temperatura mínima [°C]: ",
-            "Temperatura mínima[°C]: ",
+            "Minimal average fluid temperature [°C]: ",
+            "Minimale durchschnittliche Fluidtemperatur [°C]:",
+            "Minimale gemiddelde fluïdumtemperatuur [°C]: ",
+            "Minimal average fluid temperature [°C]: ",
+            "Minimal average fluid temperature [°C]: ",
+            "Minimal average fluid temperature [°C]: ",
+            "Minimal average fluid temperature [°C]: ",
         ]
         self.option_max_temp: List[str] = [
-            "Maximal temperature [°C]: ",
-            "Maximaltemperatur [°C]: ",
-            "Maximale temperatuur [°C]: ",
-            "Temperatura massima [°C]: ",
-            "Température maximale [°C]: ",
-            "Temperatura máxima [°C]: ",
-            "Temperatura máxima [°C]: ",
+            "Maximal average fluid temperature [°C]: ",
+            "Maximale durchschnittliche Fluidtemperatur [°C]:",
+            "Maximale gemiddelde fluïdumtemperatuur [°C]: ",
+            "Maximal average fluid temperature [°C]: ",
+            "Maximal average fluid temperature [°C]: ",
+            "Maximal average fluid temperature [°C]: ",
+            "Maximal average fluid temperature [°C]: ",
         ]
         self.option_temp_gradient: List[str] = [
             "Temperature gradient [K/100m]: ",
@@ -1704,13 +1707,13 @@ class Translations:  # pragma: no cover
             "The maximum average fluid temperature is , °C",
         ]
         self.min_temp: List[str] = [
-            "The minimal average fluid temperature is , °C",
+            "The minimum average fluid temperature is , °C",
             "Die minimale Fluidtemperatur ist , °C",
             "De minimaal gemiddelde fluïdumtemperatuur is , °C",
-            "The minimal average fluid temperature is , °C",
-            "The minimal average fluid temperature is , °C",
-            "The minimal average fluid temperature is , °C",
-            "The minimal average fluid temperature is , °C",
+            "The minimum average fluid temperature is , °C",
+            "The minimum average fluid temperature is , °C",
+            "The minimum average fluid temperature is , °C",
+            "The minimum average fluid temperature is , °C",
         ]
         self.figure_temperature_profile: List[str] = [
             "Temperature evolution, Temperature [°C], Time [years]",
@@ -2029,4 +2032,23 @@ class Translations:  # pragma: no cover
             "Maximum number of iterations to check for convergence [#]:",
             "Maximum number of iterations to check for convergence [#]:",
             "Maximum number of iterations to check for convergence [#]:",
+        ]
+        self.SCOP_DHW: List[str] = ["SCOP DHW [-]", "SCOP Warmwasser [-]", "SCOP SWW [-]", "SCOP DHW [-]", "SCOP DHW [-]", "SCOP DHW [-]", "SCOP DHW [-]"]
+        self.option_include_dhw: List[str] = [
+            "Include Domestic Hot Water?, No , Yes ",
+            "Warmwasser hinzufügen?, Nein , Ja ",
+            "Sanitair warm water toevoegen?, No , Yes ",
+            "Include Domestic Hot Water?, No , Yes ",
+            "Include Domestic Hot Water?, No , Yes ",
+            "Include Domestic Hot Water?, No , Yes ",
+            "Include Domestic Hot Water?, No , Yes ",
+        ]
+        self.DHW: List[str] = [
+            "Yearly DHW consumption [kWh/year]:",
+            "Jährlicher Verbrauch von Warmwasser [kWh/Jahr]:",
+            "Jaarlijkse SWW vraag [kWh/jaar]",
+            "Yearly DHW consumption [kWh/year]:",
+            "Yearly DHW consumption [kWh/year]:",
+            "Yearly DHW consumption [kWh/year]:",
+            "Yearly DHW consumption [kWh/year]:",
         ]

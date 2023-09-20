@@ -3,7 +3,6 @@ test that the results are correctly calculated
 """
 import sys
 from pathlib import Path
-from typing import Tuple
 
 import numpy as np
 import PySide6.QtWidgets as QtW
@@ -17,9 +16,10 @@ from GHEtool.gui.gui_structure import GUI, GuiStructure
 from ScenarioGUI import load_config
 import pygfunction as gt
 
-load_config(Path(__file__).parent.parent.joinpath("gui_config.ini"))
+load_config(Path(__file__).parent.joinpath("gui_config.ini"))
 
 sys.setrecursionlimit(1500)
+
 
 def round_down(value: float, decimal: int) -> float:
     """
@@ -96,6 +96,10 @@ def test_temp_profile_ground_data(qtbot):
     # ground_temp: float = 12.
     # init gui window
     main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window.delete_backup()
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
+                             data_2_results_function=data_2_borefield)
+
     main_window.save_scenario()
     main_window.add_scenario()
 
@@ -133,8 +137,6 @@ def test_temp_profile_ground_data(qtbot):
     assert func.args == (depth, )
     assert func.keywords == {}
 
-    main_window.delete_backup()
-
 
 def test_temp_profile_temp_gradient(qtbot):
     # depth: float = 100
@@ -143,6 +145,10 @@ def test_temp_profile_temp_gradient(qtbot):
     # ground_temp: float = 12.
     # init gui window
     main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window.delete_backup()
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
+                             data_2_results_function=data_2_borefield)
+
     main_window.save_scenario()
     main_window.add_scenario()
 
@@ -195,12 +201,15 @@ def test_temp_profile_temp_gradient(qtbot):
     assert func.args == (depth,)
     assert func.keywords == {}
 
-    main_window.delete_backup()
 
 
 def test_borefield_shapes(qtbot):
     tilt = 0
     main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window.delete_backup()
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
+                             data_2_results_function=data_2_borefield)
+
     main_window.save_scenario()
     main_window.add_scenario()
     main_window.gui_structure.aim_rect.widget.click() if not main_window.gui_structure.aim_rect.widget.isChecked() else None
@@ -271,7 +280,6 @@ def test_borefield_shapes(qtbot):
     boreholes = [gt.boreholes.Borehole(H, D, r_b, x=x, y=y) for x, y, H, D, r_b in values]
     check_borefield(borefield_gui.borefield, boreholes)
     qtbot.wait(10)
-    main_window.delete_backup()
 
 
 def test_import_borefield_data(qtbot):
@@ -305,7 +313,6 @@ def test_import_borefield_data(qtbot):
         assert np.allclose(li_1, li_2)
 
     qtbot.wait(10)
-    main_window.delete_backup()
 
 
 def test_temp_profile_pipe_data(qtbot):
@@ -410,12 +417,12 @@ def test_temp_profile_fluid_data(qtbot):
     assert func.args == (depth,)
     assert func.keywords == {}
 
-    main_window.delete_backup()
-
-
 def test_temp_profile_borefield_data(qtbot):
     # init gui window
     main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window.delete_backup()
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+
     main_window.save_scenario()
     main_window.add_scenario()
     gs = main_window.gui_structure
@@ -450,12 +457,14 @@ def test_temp_profile_borefield_data(qtbot):
     assert func.args == (gs.option_depth.get_value(),)
     assert func.keywords == {}
 
-    main_window.delete_backup()
-
 
 def test_sizing_L2_L3_min_max(qtbot) -> None:
     # init gui window
     main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window.delete_backup()
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
+                             data_2_results_function=data_2_borefield)
+
     gs = main_window.gui_structure
 
     for L2 in [0,1]:
@@ -492,12 +501,14 @@ def test_sizing_L2_L3_min_max(qtbot) -> None:
         assert func.args == ()
         assert func.keywords == {}
 
-    main_window.delete_backup()
-
 
 def test_temp_profile_period_peak_length(qtbot) -> None:
     # init gui window
     main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window.delete_backup()
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
+                             data_2_results_function=data_2_borefield)
+
     main_window.save_scenario()
     main_window.add_scenario()
 
@@ -527,12 +538,14 @@ def test_temp_profile_period_peak_length(qtbot) -> None:
     assert func.args == (gs.option_depth.get_value(), )
     assert func.keywords == {}
 
-    main_window.delete_backup()
-
 
 def test_temp_profile_heating_data(qtbot) -> None:
     # init gui window
     main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window.delete_backup()
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
+                             data_2_results_function=data_2_borefield)
+
     factor = 1.12
     for delay in range(1, 10):
         main_window.save_scenario()
@@ -572,8 +585,6 @@ def test_temp_profile_heating_data(qtbot) -> None:
         assert func.args == (gs.option_depth.get_value(),)
         assert func.keywords == {}
 
-    main_window.delete_backup()
-
 
 def test_temp_profile_cooling_data(qtbot) -> None:
     """
@@ -591,6 +602,9 @@ def test_temp_profile_cooling_data(qtbot) -> None:
     """
     # init gui window
     main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window.delete_backup()
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
+                             data_2_results_function=data_2_borefield)
 
     cool_peak = [0, 0, 34, 69, 133, 187, 213, 240, 160, 37, 0, 0]
 
@@ -632,8 +646,6 @@ def test_temp_profile_cooling_data(qtbot) -> None:
         assert func.args == (g_s.option_depth.get_value(),)
         assert func.keywords == {}
 
-    main_window.delete_backup()
-
 
 def test_coaxial_and_gradient(qtbot):
     main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
@@ -648,10 +660,10 @@ def test_coaxial_and_gradient(qtbot):
     gs.option_U_pipe_or_coaxial_pipe.set_value(1)
     gs.option_method_temp_gradient.set_value(2)
     main_window.save_scenario()
-    main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[-1].any_signal, raising=False) as blocker:
-        main_window.threads[-1].run()
-        main_window.threads[-1].any_signal.connect(main_window.thread_function)
+    main_window.start_current_scenario_calculation()
+    thread = main_window.threads[-1]
+    thread.run()
+    assert thread.calculated
 
     main_window.display_results()
 
@@ -660,10 +672,10 @@ def test_coaxial_and_gradient(qtbot):
 
     gs.option_method_temp_gradient.set_value(1)
     main_window.save_scenario()
-    main_window.start_current_scenario_calculation(True)
-    with qtbot.waitSignal(main_window.threads[-1].any_signal, raising=False) as blocker:
-        main_window.threads[-1].run()
-        main_window.threads[-1].any_signal.connect(main_window.thread_function)
+    main_window.start_current_scenario_calculation()
+    thread = main_window.threads[-1]
+    thread.run()
+    assert thread.calculated
 
     main_window.display_results()
     assert gs.result_Rb_calculated.label.text() == 'Equivalent borehole thermal resistance: 0.0984 mK/W'

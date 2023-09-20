@@ -3,21 +3,17 @@ Test to see if the Rb* is calculated on the go
 """
 import sys
 from pathlib import Path
-from typing import Tuple
 
-import numpy as np
 import PySide6.QtWidgets as QtW
-import pandas as pd
 
-from GHEtool import Borefield, FOLDER, FluidData, GroundConstantTemperature, GroundFluxTemperature, PipeData, GroundTemperatureGradient
+from GHEtool import Borefield
 from GHEtool.gui.data_2_borefield_func import data_2_borefield
 from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
 from GHEtool.gui.gui_classes.translation_class import Translations
-from GHEtool.gui.gui_structure import GUI, GuiStructure
+from GHEtool.gui.gui_structure import GUI
 from ScenarioGUI import load_config
-import pygfunction as gt
 
-load_config(Path(__file__).parent.parent.joinpath("gui_config.ini"))
+load_config(Path(__file__).parent.joinpath("gui_config.ini"))
 
 sys.setrecursionlimit(1500)
 
@@ -31,7 +27,7 @@ def test_pipe_right_options_shown(qtbot):
     main_window.save_scenario()
 
     gs = main_window.gui_structure
-    assert gs.pipe_thermal_resistance.is_hidden()
+    assert gs.category_pipe_data.is_hidden()
     gs.option_method_rb_calc.set_value(1)
     gs.page_borehole_resistance.button.click()
     assert not gs.option_U_pipe_or_coaxial_pipe.is_hidden()
@@ -72,10 +68,10 @@ def test_Rb_calculated_when_value_changed_U_pipe(qtbot):
     main_window.save_scenario()
 
     gs = main_window.gui_structure
-    assert gs.pipe_thermal_resistance.is_hidden()
+    assert gs.category_pipe_data.is_hidden()
     gs.option_method_rb_calc.set_value(1)
     gs.page_borehole_resistance.button.click()
-    assert not gs.pipe_thermal_resistance.is_hidden()
+    assert not gs.category_pipe_data.is_hidden()
 
     assert gs.pipe_thermal_resistance.label.text() == 'The equivalent borehole thermal resistance (at 100.0m): 0.0579 mK/W'
     gs.option_conductivity.set_value(2.5)
@@ -119,7 +115,7 @@ def test_Rb_calculated_when_value_changed_coaxial(qtbot):
     main_window.save_scenario()
 
     gs = main_window.gui_structure
-    assert gs.pipe_thermal_resistance.is_hidden()
+    assert gs.category_pipe_data.is_hidden()
 
     gs.option_method_rb_calc.set_value(1)
     gs.page_borehole_resistance.button.click()

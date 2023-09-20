@@ -18,7 +18,8 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
                  baseload_cooling: Union[np.ndarray, list, tuple] = np.zeros(12),
                  peak_heating: Union[np.ndarray, list, tuple] = np.zeros(12),
                  peak_cooling: Union[np.ndarray, list, tuple] = np.zeros(12),
-                 simulation_period: int = 20):
+                 simulation_period: int = 20,
+                 dhw: float = 0.):
         """
 
         Parameters
@@ -33,6 +34,8 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             Peak cooling values [kW/month]
         simulation_period : int
             Length of the simulation period in years
+        dhw : float
+            Yearly consumption of domestic hot water [kWh/year]
         """
 
         super().__init__(hourly_resolution=False, simulation_period=simulation_period)
@@ -48,6 +51,7 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
         self.baseload_cooling = baseload_cooling
         self.peak_heating = peak_heating
         self.peak_cooling = peak_cooling
+        self.dhw = dhw
 
     def _check_input(self, input: Union[np.ndarray, list, tuple]) -> bool:
         """
@@ -144,14 +148,14 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
     @property
     def baseload_heating(self) -> np.ndarray:
         """
-        This function returns the baseload heating in kWh/month.
+        This function returns the baseload heating in kWh/month (incl. DHW).
 
         Returns
         -------
         baseload heating : np.ndarray
-            Baseload heating values [kWh/month] for one year, so the length of the array is 12
+            Baseload heating values (incl. DHW) [kWh/month] for one year, so the length of the array is 12
         """
-        return self._baseload_heating
+        return self._baseload_heating + self.dhw / 8760 * self.UPM
 
     @baseload_heating.setter
     def baseload_heating(self, load: Union[np.ndarray, list, tuple]) -> None:

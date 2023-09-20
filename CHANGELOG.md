@@ -11,13 +11,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - New class of GroundData: GroundTemperatureGradient added (issue #145).
 - Load classes (issue #45).
 - Pipe classes (single, double, coaxial, Multiple U Tube) (issue #40 and #45).
-- Flexible temperature limits (issue #41 and #45).
 - Added another methodology for sizing with a variable ground temperature (issue #144).
 - Custom error when the field cannot be sized due to a ground temperature gradient (issue #156).
 - Interpolation option in calculate function in Gfunction class (issue #159).
 - Absolute and relative tolerances for the sizing methods even as a maximum number of iterations is added, so there is more transparency and flexibility in the trade-off between accuracy and speed (issue #159).
 - Added advanced options to GHEtool GUI (issue #165).
 - Added a result class so all calculated temperatures are now in a separate Result class object within the borefield object (issue #167).
+- Added domestic hot water (DHW) to GHEtool (issue #172).
 
 ## Changed
 - GUI was moved to a separate project: [ScenarioGUI](https://github.com/tblanke/ScenarioGUI).
@@ -37,7 +37,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Move H_init to CalculationSetup class (issue #159).
 - Move use_precalcated_data to CalculationSetup class and rename to: 'use_precalculate_dataset' (issue #159).
 - Changed 'set_max_ground_temperature' and 'set_min_ground_temperature' to correct names: 'set_max_avg_fluid_temperature' and 'set_min_avg_fluid_temperature'
-
+- Changed 'minimal average fluid temperature' to 'minimum average fluid temperature' in GUI (issue #172).
 
 ## Fixed
 - Fixed problem with L2 sizing, when the peak load was the same in all months (issue #146).

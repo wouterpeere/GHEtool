@@ -94,6 +94,11 @@ def data_2_borefield(ds: DataStorage) -> tuple[Borefield, partial[[], None]]:
             hourly_data.hourly_heating_load = peak_heating * (1 - 1 / ds.SCOP)
             borefield.load = hourly_data
 
+    # add dhw when needed
+    if ds.option_include_dhw == 1 and not ds.aim_optimize:
+        SCOP = ds.SCOP_DHW if ds.geo_load == 1 else 99999999999
+        borefield.load.dhw = ds.DHW * (1 - 1 / SCOP)
+
     # set up the borefield sizing
     borefield.calculation_setup(use_constant_Rb=ds.option_method_rb_calc == 0,
                                 L2_sizing=ds.option_method_size_depth == 0,
@@ -246,7 +251,7 @@ def _create_ground_data(ds: DataStorage) -> GroundData:
 
 def _create_monthly_loads_peaks(ds: DataStorage) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
     """
-    This function creates a the monthly loads based on the data entered in the GUI.
+    This function creates the monthly loads based on the data entered in the GUI.
 
     Parameters
     ----------
