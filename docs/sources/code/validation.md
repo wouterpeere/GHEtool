@@ -20,10 +20,17 @@ Peere et al. (2021) validates the hybrid sizing method of GHEtool. The validatio
 Validation/cases.rst
 ```
 
-The equivalent borehole thermal resistance is validated with the commercial software of Earth Energy Designer and can be found here.
+The equivalent borehole thermal resistance is validated with the commercial software of Earth Energy Designer (EED) and can be found here.
 
 ```{toctree}
 :maxdepth: 1
 
 Validation/validation_effective_borehole_thermal_resistance.rst
+```
+
+The deep sizing methodology, using a 1/depth assumption for the convergence of the borefield sizing when there is a temperature gradient can be found here.
+```{toctree}
+:maxdepth: 1
+
+Validation/deep_sizing.rst
 ```

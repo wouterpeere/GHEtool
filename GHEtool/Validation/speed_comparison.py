@@ -7,11 +7,11 @@ import time
 
 import pygfunction as gt
 
-from GHEtool import Borefield, GroundData
+from GHEtool import Borefield, GroundConstantTemperature, MonthlyGeothermalLoadAbsolute
 
 
 def test_64_boreholes():
-    data = GroundData(3, 10, 0.2)
+    data = GroundConstantTemperature(3, 10)
     borefield_64 = gt.boreholes.rectangle_field(8, 8, 6, 6, 110, 1, 0.075)
 
     # monthly loading values
@@ -30,26 +30,26 @@ def test_64_boreholes():
     monthly_load_heating = list(map(lambda x: x * annual_heating_load, monthly_load_heating_percentage))  # kWh
     monthly_load_cooling = list(map(lambda x: x * annual_cooling_load, monthly_load_cooling_percentage))  # kWh
 
+    # set the load
+    load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
+
     # create the borefield object
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peak_heating,
-                          peak_cooling=peak_cooling,
-                          baseload_heating=monthly_load_heating,
-                          baseload_cooling=monthly_load_cooling)
+    borefield = Borefield(load=load)
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_64)
+    borefield.Rb = 0.2
 
     # set temperature boundaries
-    borefield.set_max_ground_temperature(16)  # maximum temperature
-    borefield.set_min_ground_temperature(0)  # minimum temperature
+    borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
+    borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
 
     # precalculate
     borefield.create_custom_dataset()
 
     # size borefield
     t1 = time.time()
-    depth_precalculated = borefield.size(100)
+    depth_precalculated = borefield.size()
     t1_end = time.time()
 
     # delete precalculated data
@@ -57,7 +57,7 @@ def test_64_boreholes():
 
     ### size without the precalculation
     t2 = time.time()
-    depth_calculated = borefield.size(100)
+    depth_calculated = borefield.size()
     t2_end = time.time()
 
     print("With precalculated data, the sizing took", round(t1_end - t1, 3), "s for 64 boreholes.")
@@ -67,7 +67,7 @@ def test_64_boreholes():
 
 
 def test_10_boreholes():
-    data = GroundData(3, 10, 0.2)
+    data = GroundConstantTemperature(3, 10)
     borefield_10 = gt.boreholes.rectangle_field(2, 5, 6, 6, 110, 1, 0.075)
 
     # monthly loading values
@@ -86,26 +86,26 @@ def test_10_boreholes():
     monthly_load_heating = list(map(lambda x: x * annual_heating_load, monthly_heating_load_percentage))  # kWh
     monthly_load_cooling = list(map(lambda x: x * annual_cooling_load, monthly_load_cooling_percentage))  # kWh
 
+    # set the load
+    load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
+
     # create the borefield object
-    borefield = Borefield(simulation_period=20,
-                          peak_heating=peak_heating,
-                          peak_cooling=peak_cooling,
-                          baseload_heating=monthly_load_heating,
-                          baseload_cooling=monthly_load_cooling)
+    borefield = Borefield(load=load)
 
     borefield.set_ground_parameters(data)
     borefield.set_borefield(borefield_10)
+    borefield.Rb = 0.2
 
     # set temperature boundaries
-    borefield.set_max_ground_temperature(16)  # maximum temperature
-    borefield.set_min_ground_temperature(0)  # minimum temperature
+    borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
+    borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
 
     # precalculate
     borefield.create_custom_dataset()
 
     # size borefield
     t1 = time.time()
-    depth_precalculated = borefield.size(100)
+    depth_precalculated = borefield.size()
     t1_end = time.time()
 
     # delete precalculated data
@@ -113,13 +113,13 @@ def test_10_boreholes():
 
     ### size without the precalculation
     t2 = time.time()
-    depth_calculated = borefield.size(100)
+    depth_calculated = borefield.size()
     t2_end = time.time()
 
     print("With precalculated data, the sizing took", round(t1_end - t1, 3), "s for 10 boreholes.")
     print("Without the precalculated data, the sizing took", round(t2_end - t2, 3), "s for 10 boreholes.")
     print("The difference in accuracy between the two results is",
-          round((depth_calculated - depth_precalculated) / depth_calculated * 100, 3), "%.\n")
+          round((depth_calculated-depth_precalculated) / depth_calculated * 100, 3), "%.\n")
 
 
 if __name__ == "__main__":  # pragma: no cover

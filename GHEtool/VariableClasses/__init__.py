@@ -1,4 +1,9 @@
-from .CustomGFunction import CustomGFunction, _timeValues, load_custom_gfunction
-from .GFunction import FIFO, GFunction
-from .SizingSetup import SizingSetup
-from .VariableClasses import FluidData, GroundData, PipeData
+from .FluidData import FluidData
+from .GroundData import *
+from .LoadData import *
+from .PipeData import *
+from .CustomGFunction import CustomGFunction, load_custom_gfunction, _timeValues
+from .GFunction import GFunction, FIFO
+from .CalculationSetup import CalculationSetup
+from .Borehole import Borehole
+from .Result import Results

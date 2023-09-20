@@ -1,7 +1,8 @@
-import copy
+from __future__ import annotations
 from typing import List, Tuple, Union
 
 import numpy as np
+import copy
 import pygfunction as gt
 from scipy import interpolate
 
@@ -86,23 +87,23 @@ class GFunction:
         self.store_previous_values: bool = GFunction.DEFAULT_STORE_PREVIOUS_VALUES
         self.options: dict = {"method": "equivalent"}
         self.alpha: float = 0.
-        self.borefield: list = []
+        self.borefield: list[gt.boreholes.Borehole] = []
         self.depth_array: np.ndarray = np.array([])
         self.time_array: np.ndarray = np.array([])
         self.previous_gfunctions: np.ndarray = np.array([])
         self.previous_depth: float = 0.
 
         self.no_extrapolation: bool = True
-        self.threshold_depth_interpolation: float = 25  # m
+        self.threshold_depth_interpolation: float = .25  # %
 
         self.fifo_list: FIFO = FIFO(8)
 
     def calculate(self, time_value: Union[list, float, np.ndarray], borefield: List[gt.boreholes.Borehole],
-                  alpha: float):
+                  alpha: float, interpolate: bool = None):
         """
         This function returns the gvalues either by interpolation or by calculating them.
         It does so by calling the function gvalues which does this calculation.
-        This calculate function also stores the previous calculated data and makes interpolations
+        This calculation function also stores the previous calculated data and makes interpolations
         whenever the requested list of time_value are longer then DEFAULT_NUMBER_OF_TIMESTEPS.
 
         Parameters
@@ -113,6 +114,8 @@ class GFunction:
             Borefield model for which the gvalues should be calculated
         alpha : float
             Thermal diffusivity of the ground [m2/s]
+        interpolate : bool
+            True if results should be interpolated when possible, False otherwise. If None, the default is chosen.
 
         Returns
         -------
@@ -121,7 +124,7 @@ class GFunction:
         """
 
         def gvalues(time_values: np.ndarray, borefield: List[gt.boreholes.Borehole], alpha: float,
-                    depth: float) -> np.ndarray:
+                    depth: float, interpolate: bool = None) -> np.ndarray:
             """
             This function returns the gvalues either by interpolation or by calculating them.
 
@@ -135,6 +138,8 @@ class GFunction:
                 Thermal diffusivity of the ground [m2/s]
             depth : float
                 Depth of the borefield [m]
+            interpolate : bool
+                True if results should be interpolated when possible, False otherwise. If None, the default is chosen.
 
             Returns
             -------
@@ -166,14 +171,16 @@ class GFunction:
             else:
                 self.previous_depth = depth
             # do interpolation
-            gfunc_interpolated = self.interpolate_gfunctions(time_values, depth, alpha, borefield)
+            interpolate = interpolate if interpolate is not None else self.store_previous_values
+            gfunc_interpolated = self.interpolate_gfunctions(time_values, depth, alpha, borefield)\
+                if interpolate else np.array([])
 
             # if there are g-values calculated, return them
             if np.any(gfunc_interpolated):
                 return gfunc_interpolated
 
             # calculate the g-values for uniform borehole wall temperature
-            gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options).gFunc
+            gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options, method=self.options['method']).gFunc
 
             # store the calculated g-values
             self.set_new_calculated_data(time_values, depth, gfunc_calculated, borefield, alpha)
@@ -196,7 +203,7 @@ class GFunction:
             time_value_new = _timeValues(t_max=time_value[-1])
 
             # calculate g-function values
-            gfunc_uniform_T = gvalues(time_value_new, borefield, alpha, depth)
+            gfunc_uniform_T = gvalues(time_value_new, borefield, alpha, depth, interpolate)
 
             # return interpolated values
             return np.interp(time_value, time_value_new, gfunc_uniform_T)
@@ -204,19 +211,20 @@ class GFunction:
         # check if there are double values
         if not isinstance(time_value, (float, int)) and time_value_np.size != np.unique(np.asarray(time_value)).size:
             # calculate g-function values
-            gfunc_uniform_T = gvalues(np.unique(time_value_np), borefield, alpha, depth)
+            gfunc_uniform_T = gvalues(np.unique(time_value_np), borefield, alpha, depth, interpolate)
 
             return np.interp(time_value, np.unique(time_value_np), gfunc_uniform_T)
 
         # calculate g-function values
-        gfunc_uniform_T = gvalues(time_value_np, borefield, alpha, depth)
+        gfunc_uniform_T = gvalues(time_value_np, borefield, alpha, depth, interpolate)
 
         return gfunc_uniform_T
 
     def interpolate_gfunctions(self, time_value: Union[list, float, np.ndarray], depth: float,
                                alpha: float, borefield: List[gt.boreholes.Borehole]) -> np.ndarray:
         """
-        This function returns the gvalues either by interpolation or by calculating them.
+        This function returns the gvalues by interpolation them. If interpolation is not possible, an emtpy
+        array is returned.
 
         Parameters
         ----------
@@ -236,11 +244,8 @@ class GFunction:
         """
         gvalues: np.ndarray = np.zeros(len(time_value))
 
-        if not self.store_previous_values:
-            return gvalues
-
         # check if interpolation is possible:
-        if not (self._check_alpha(alpha) or self._check_borefield(borefield)):
+        if not (self._check_alpha(alpha) and self._check_borefield(borefield)):
             # the alpha and/or borefield is not in line with the precalculated data
             return gvalues
 
@@ -330,20 +335,20 @@ class GFunction:
         if depth > val_depth:
             # the nearest index is the first in the array and the depth is smaller than the smallest value in the array
             # but the difference is smaller than the threshold for interpolation
-            if idx_depth == self.depth_array.size - 1 and depth - val_depth < self.threshold_depth_interpolation:
+            if idx_depth == self.depth_array.size - 1 and depth - val_depth < self.threshold_depth_interpolation * depth:
                 return idx_depth, None
             elif idx_depth != self.depth_array.size - 1:
                 idx_next = idx_depth + 1
-                if self.depth_array[idx_next] - val_depth < self.threshold_depth_interpolation:
+                if self.depth_array[idx_next] - val_depth < self.threshold_depth_interpolation * depth:
                     return idx_depth, idx_next
         else:
             # the nearest index is the last in the array and the depth is larger than the highest value in the array
             # but the difference is smaller than the threshold for interpolation
-            if idx_depth == 0 and val_depth - depth < self.threshold_depth_interpolation:
+            if idx_depth == 0 and val_depth - depth < self.threshold_depth_interpolation * depth:
                 return None, idx_depth
             elif idx_depth != 0:
                 idx_prev = idx_depth - 1
-                if val_depth - self.depth_array[idx_prev] < self.threshold_depth_interpolation:
+                if val_depth - self.depth_array[idx_prev] < self.threshold_depth_interpolation * depth:
                     return idx_prev, idx_depth
 
         # no correct interpolation indices are found
@@ -462,8 +467,8 @@ class GFunction:
 
         def check_if_data_should_be_saved() -> bool:
             """
-            This function implements a couple of checks to see whether or not the new data should be saved.
-            Currently the following tests are implemented:
+            This function implements a couple of checks to see whether the new data should be saved.
+            Currently, the following tests are implemented:
 
             1) check if the data should be saved
 

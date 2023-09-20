@@ -5,34 +5,45 @@ Then, based on a load-duration curve, the heating and cooling load is altered in
 The results are returned.
 
 """
-import pygfunction as gt
+import numpy as np
 
 # import all the relevant functions
 from GHEtool import *
 
-# initiate ground data
-data = GroundData(3, 10, 0.2)
 
-# initiate borefield
-borefield = Borefield()
+def optimise():
 
-# set ground data in borefield
-borefield.set_ground_parameters(data)
+    # initiate ground data
+    data = GroundConstantTemperature(3, 10)
 
-# set borefield
-borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 1, 0.075)
+    # initiate borefield
+    borefield = Borefield()
 
-# load the hourly profile
-borefield.load_hourly_profile("Hourly_Profile.csv", header=True, separator=";", first_column_heating=True)
+    # set ground data in borefield
+    borefield.set_ground_parameters(data)
 
-# optimise the load for a 10x10 field (see data above) and a fixed depth of 150m.
-borefield.optimise_load_profile(depth=150, print_results=True)
+    # set Rb
+    borefield.Rb = 0.12
 
-# calculate temperatures
-borefield.calculate_temperatures(hourly=True)
+    # set borefield
+    borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 1, 0.075)
 
-# print resulting external peak cooling profile
-print(borefield.peak_cooling_external)
+    # load the hourly profile
+    load = HourlyGeothermalLoad()
+    load.load_hourly_profile("hourly_profile.csv", header=True, separator=";")
 
-# print resulting monthly load for an external heating source
-print(borefield.monthly_load_heating_external)
+    # optimise the load for a 10x10 field (see data above) and a fixed depth of 150m.
+    borefield.optimise_load_profile(building_load=load, depth=150, print_results=True)
+
+    # calculate temperatures
+    borefield.calculate_temperatures(hourly=True)
+
+    # print resulting external peak cooling profile
+    print(borefield._external_load.max_peak_cooling)
+
+    # print resulting monthly load for an external heating source
+    print(np.sum(borefield._external_load.hourly_heating_load))
+
+
+if __name__ == "__main__":  # pragma: no cover
+    optimise()
