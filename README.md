@@ -133,6 +133,7 @@ atol and rtol is chosen when sizing. The options are:
 it is allowed that gfunctions are interpolated. (To change the threshold for this interpolation, go to the Gfunction class.)
 * _deep_sizing_: An alternative sizing method for cases with high cooling (peaks) and a variable ground temperature.
 This method is potentially slower, but proves to be more robust.
+* _force_deep_sizing_: When the alternative method from above should always be used.
 
 ### Simple example
 
