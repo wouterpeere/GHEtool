@@ -1347,6 +1347,10 @@ class GUI(GuiStructure):
                                                  [' No ', ' Yes '], self.category_save_scenario)
         self.option_advanced_options.add_link_2_show(self.category_advanced_options, on_index=1)
 
+        # dissable options for figure change
+        self.category_default_figure_settings.hide()
+        self.category_default_figure_settings.show = lambda *kwargs: None
+
     def set_dependencies(self) -> None:
         self.show_option_under_multiple_conditions(self.option_method_size_depth,
                                                    self.aim_req_depth,
