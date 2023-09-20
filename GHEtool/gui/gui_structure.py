@@ -21,6 +21,7 @@ from numpy import array, cos, int64, round, sin, sum
 from pandas import DataFrame as pd_DataFrame
 from pandas import read_csv as pd_read_csv
 import ScenarioGUI.global_settings as globs
+import pygfunction as gt
 from ScenarioGUI import GuiStructure
 from ScenarioGUI import elements as els
 from ScenarioGUI.gui_classes.gui_structure_classes import (
@@ -570,6 +571,35 @@ class GUI(GuiStructure):
         # add dependency
         self.category_fluid_data = Category(page=self.page_borehole_resistance, label=translations.category_fluid_data)
 
+        self.option_fluid_selector = ButtonBox(
+            category=self.category_fluid_data,
+            label=translations.option_fluid_selector,
+            default_index=0,
+            entries=['Custom', 'Glycol mixture'])
+
+        self.option_glycol_selector = ButtonBox(
+            category=self.category_fluid_data,
+            label=translations.option_glycol_selector,
+            default_index=0,
+            entries=['Ethylene glycol', 'Propylene glycol']
+        )
+        self.option_glycol_percentage = FloatBox(
+            category=self.category_fluid_data,
+            label=translations.option_glycol_percentage,
+            decimal_number=0,
+            default_value=20,
+            maximal_value=100,
+            minimal_value=0
+        )
+        self.option_fluid_ref_temp = FloatBox(
+            category=self.category_fluid_data,
+            label=translations.option_fluid_ref_temp,
+            decimal_number=1,
+            default_value=10,
+            maximal_value=100,
+            minimal_value=0
+        )
+
         self.option_fluid_conductivity = FloatBox(
             category=self.category_fluid_data,
             label=translations.option_fluid_conductivity,
@@ -623,6 +653,10 @@ class GUI(GuiStructure):
         self.option_fluid_capacity.change_event(self.update_borehole_thermal_resistance)
         self.option_fluid_viscosity.change_event(self.update_borehole_thermal_resistance)
         self.option_fluid_mass_flow.change_event(self.update_borehole_thermal_resistance)
+        self.option_fluid_selector.change_event(self.update_borehole_thermal_resistance)
+        self.option_glycol_selector.change_event(self.update_borehole_thermal_resistance)
+        self.option_glycol_percentage.change_event(self.update_borehole_thermal_resistance)
+        self.option_fluid_ref_temp.change_event(self.update_borehole_thermal_resistance)
 
         # def create_category_pipe_data():
         self.category_pipe_data = Category(page=self.page_borehole_resistance, label=translations.category_pipe_data)
@@ -1394,6 +1428,15 @@ class GUI(GuiStructure):
                                                    self.option_method_rb_calc,
                                                    custom_logic=partial(self.option_method_rb_calc.check_linked_value, 1))
 
+        self.show_option_under_multiple_conditions([self.option_fluid_capacity, self.option_fluid_conductivity,
+                                                    self.option_fluid_density, self.option_fluid_viscosity],
+                                                   [self.option_fluid_selector, self.option_method_rb_calc],
+                                                   custom_logic=partial(self.option_fluid_selector.check_linked_value, 0))
+        self.show_option_under_multiple_conditions([self.option_glycol_selector, self.option_glycol_percentage,
+                                                    self.option_fluid_ref_temp],
+                                                   [self.option_fluid_selector, self.option_method_rb_calc],
+                                                   custom_logic=partial(self.option_fluid_selector.check_linked_value, 1))
+
         self.show_option_under_multiple_conditions([self.option_pipe_coaxial_inner_inner,
                                                     self.option_pipe_coaxial_inner_outer,
                                                     self.option_pipe_coaxial_outer_inner,
@@ -1927,6 +1970,16 @@ class GUI(GuiStructure):
         try:
             fluid_data = FluidData(self.option_fluid_mass_flow.get_value(), self.option_fluid_conductivity.get_value(),
                                    self.option_fluid_density.get_value(), self.option_fluid_capacity.get_value(), self.option_fluid_viscosity.get_value())
+            if self.option_fluid_selector.get_value() == 1:
+                # use pygfunction to get fluid properties
+                if self.option_glycol_selector.get_value() == 0:
+                    fluid_data.import_fluid_from_pygfunction(gt.media.Fluid('MEG',
+                                                                            self.option_glycol_percentage.get_value(),
+                                                                            self.option_fluid_ref_temp.get_value()))
+                else:
+                    fluid_data.import_fluid_from_pygfunction(gt.media.Fluid('MPG',
+                                                                            self.option_glycol_percentage.get_value(),
+                                                                            self.option_fluid_ref_temp.get_value()))
             if self.option_U_pipe_or_coaxial_pipe.get_value() == 0:
                 pipe_data = MultipleUTube(self.option_pipe_grout_conductivity.get_value(), self.option_pipe_inner_radius.get_value(),
                                           self.option_pipe_outer_radius.get_value(),

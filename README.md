@@ -133,6 +133,7 @@ atol and rtol is chosen when sizing. The options are:
 it is allowed that gfunctions are interpolated. (To change the threshold for this interpolation, go to the Gfunction class.)
 * _deep_sizing_: An alternative sizing method for cases with high cooling (peaks) and a variable ground temperature.
 This method is potentially slower, but proves to be more robust.
+* _force_deep_sizing_: When the alternative method from above should always be used.
 
 ### Simple example
 
@@ -147,10 +148,9 @@ from GHEtool import Borefield, GroundDataConstantTemperature, MonthlyGeothermalL
 After importing the necessary classes, the relevant ground data parameters are set.
 
 ```Python
-data =
-GroundDataConstantTemperature(3,   # ground thermal conductivity (W/mK)
-                              10,  # initial/undisturbed ground temperature (deg C)
-                              2.4*10**6) # volumetric heat capacity of the ground (J/m3K) 
+data = GroundDataConstantTemperature(3,   # ground thermal conductivity (W/mK)
+                                     10,  # initial/undisturbed ground temperature (deg C)
+                                     2.4*10**6) # volumetric heat capacity of the ground (J/m3K) 
 ```
 
 Furthermore, for our loads, we need to set the peak loads as well as the monthly base loads for heating and cooling.

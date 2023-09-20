@@ -18,6 +18,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added advanced options to GHEtool GUI (issue #165).
 - Added a result class so all calculated temperatures are now in a separate Result class object within the borefield object (issue #167).
 - Added domestic hot water (DHW) to GHEtool (issue #172).
+- Glycol-water mixtures can now be selected from within the GUI (issue #174).
+- Pygfunction media object can be imported into the FluidData object in GHEtool (issue #174).
 
 ## Changed
 - GUI was moved to a separate project: [ScenarioGUI](https://github.com/tblanke/ScenarioGUI).
