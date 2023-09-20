@@ -680,3 +680,47 @@ def test_coaxial_and_gradient(qtbot):
     main_window.display_results()
     assert gs.result_Rb_calculated.label.text() == 'Equivalent borehole thermal resistance: 0.0984 mK/W'
     assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 17.05 °C'
+
+
+def test_fluid_selector(qtbot):
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
+                             data_2_results_function=data_2_borefield)
+    main_window.delete_backup()
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
+                             data_2_results_function=data_2_borefield)
+
+    gs = main_window.gui_structure
+
+    gs.option_method_rb_calc.set_value(1)
+    main_window.save_scenario()
+    main_window.start_current_scenario_calculation()
+    thread = main_window.threads[-1]
+    thread.run()
+    assert thread.calculated
+
+    main_window.display_results()
+
+    assert gs.result_Rb_calculated.label.text() == 'Equivalent borehole thermal resistance: 0.0579 mK/W'
+    assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 16.15 °C'
+
+    gs.option_fluid_selector.set_value(1)
+    main_window.save_scenario()
+    main_window.start_current_scenario_calculation()
+    thread = main_window.threads[-1]
+    thread.run()
+    assert thread.calculated
+
+    main_window.display_results()
+    assert gs.result_Rb_calculated.label.text() == 'Equivalent borehole thermal resistance: 0.0621 mK/W'
+    assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 16.25 °C'
+
+    gs.option_glycol_selector.set_value(1)
+    main_window.save_scenario()
+    main_window.start_current_scenario_calculation()
+    thread = main_window.threads[-1]
+    thread.run()
+    assert thread.calculated
+
+    main_window.display_results()
+    assert gs.result_Rb_calculated.label.text() == 'Equivalent borehole thermal resistance: 0.0681 mK/W'
+    assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 16.38 °C'

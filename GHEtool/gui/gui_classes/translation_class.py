@@ -253,6 +253,10 @@ class Translations:  # pragma: no cover
         "SCOP_DHW",
         "option_include_dhw",
         "DHW",
+        "option_fluid_selector",
+        "option_glycol_selector",
+        "option_glycol_percentage",
+        "option_fluid_ref_temp",
         "languages",
     )
 
@@ -2033,7 +2037,7 @@ class Translations:  # pragma: no cover
             "Maximum number of iterations to check for convergence [#]:",
             "Maximum number of iterations to check for convergence [#]:",
         ]
-        self.SCOP_DHW: List[str] = ["SCOP DHW [-]", "SCOP Warmwasser [-]", "SCOP SWW [-]", "SCOP DHW [-]", "SCOP DHW [-]", "SCOP DHW [-]", "SCOP DHW [-]"]
+        self.SCOP_DHW: List[str] = ["SCOP DHW [-]:", "SCOP Warmwasser [-]", "SCOP SWW [-]", "SCOP DHW [-]", "SCOP DHW [-]", "SCOP DHW [-]", "SCOP DHW [-]"]
         self.option_include_dhw: List[str] = [
             "Include Domestic Hot Water?, No , Yes ",
             "Warmwasser hinzufügen?, Nein , Ja ",
@@ -2051,4 +2055,40 @@ class Translations:  # pragma: no cover
             "Yearly DHW consumption [kWh/year]:",
             "Yearly DHW consumption [kWh/year]:",
             "Yearly DHW consumption [kWh/year]:",
+        ]
+        self.option_fluid_selector: List[str] = [
+            "Fluid properties:, Custom , Water-glycol  ",
+            "Fluid-Eigenschaften: Benutzerdefiniert, Wasser-Glykol",
+            "Vloeistofeigenschappen:, Manueel , Water-glycol  ",
+            "Fluid properties:, Custom , Water-glycol  ",
+            "Fluid properties:, Custom , Water-glycol  ",
+            "Fluid properties:, Custom , Water-glycol  ",
+            "Fluid properties:, Custom , Water-glycol  ",
+        ]
+        self.option_glycol_selector: List[str] = [
+            "Type of glycol:, Ethylene glycol , Propylene glycol ",
+            "Glykoltyp: Ethylenglykol, Propylenglykol",
+            "Type glycol:, Ethyleenglycol , Propyleenglycol",
+            "Type of glycol:, Ethylene glycol , Propylene glycol ",
+            "Type of glycol:, Ethylene glycol , Propylene glycol ",
+            "Type of glycol:, Ethylene glycol , Propylene glycol ",
+            "Type of glycol:, Ethylene glycol , Propylene glycol ",
+        ]
+        self.option_glycol_percentage: List[str] = [
+            "Percentage of glycol [%]:",
+            "Glykolanteil [%]:",
+            "Percentage glycol [%]:",
+            "Percentage of glycol [%]:",
+            "Percentage of glycol [%]:",
+            "Percentage of glycol [%]:",
+            "Percentage of glycol [%]:",
+        ]
+        self.option_fluid_ref_temp: List[str] = [
+            "Reference fluid temperature [°C]:",
+            "Referenz-Fluidtemperatur [°C]:",
+            "Referentietemperatuur fluidum [°C]:",
+            "Reference fluid temperature [°C]:",
+            "Reference fluid temperature [°C]:",
+            "Reference fluid temperature [°C]:",
+            "Reference fluid temperature [°C]:",
         ]

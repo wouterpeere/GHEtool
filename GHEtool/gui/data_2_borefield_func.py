@@ -200,7 +200,16 @@ def _create_fluid_data(ds: DataStorage) -> FluidData:
     -------
     FluidData
     """
-    return FluidData(ds.option_fluid_mass_flow, ds.option_fluid_conductivity, ds.option_fluid_density, ds.option_fluid_capacity, ds.option_fluid_viscosity)
+    fluid_data = FluidData(ds.option_fluid_mass_flow, ds.option_fluid_conductivity, ds.option_fluid_density, ds.option_fluid_capacity, ds.option_fluid_viscosity)
+    if ds.option_fluid_selector == 1:
+        # use pygfunction to get fluid properties
+        if ds.option_glycol_selector == 0:
+            fluid_data.import_fluid_from_pygfunction(gt.media.Fluid('MEG',
+                                                                    ds.option_glycol_percentage, ds.option_fluid_ref_temp))
+        else:
+            fluid_data.import_fluid_from_pygfunction(gt.media.Fluid('MPG',
+                                                                    ds.option_glycol_percentage, ds.option_fluid_ref_temp))
+    return fluid_data
 
 
 def _create_pipe_data(ds: DataStorage) -> MultipleUTube | CoaxialPipe:

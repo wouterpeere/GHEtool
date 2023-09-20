@@ -188,3 +188,56 @@ def test_Rb_calculated_when_value_changed_coaxial(qtbot):
     gs.option_pipe_borehole_radius_2.set_value(0.075)
 
     assert gs.pipe_thermal_resistance.label.text() == 'The equivalent borehole thermal resistance (at 100.0m): 0.1737 mK/W'
+
+
+def test_correct_fluid_options_shown(qtbot):
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
+                             data_2_results_function=data_2_borefield)
+    main_window.delete_backup()
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
+                             data_2_results_function=data_2_borefield)
+    main_window.save_scenario()
+
+    gs = main_window.gui_structure
+
+    assert gs.category_fluid_data.is_hidden()
+    gs.option_method_rb_calc.set_value(1)
+    assert not gs.category_fluid_data.is_hidden()
+    assert not gs.option_fluid_capacity.is_hidden()
+    assert not gs.option_fluid_conductivity.is_hidden()
+    assert not gs.option_fluid_density.is_hidden()
+    assert not gs.option_fluid_viscosity.is_hidden()
+    assert not gs.option_fluid_selector.is_hidden()
+    assert not gs.option_fluid_mass_flow.is_hidden()
+    assert gs.option_glycol_selector.is_hidden()
+    assert gs.option_glycol_percentage.is_hidden()
+    assert gs.option_fluid_ref_temp.is_hidden()
+
+    gs.option_fluid_selector.set_value(1)
+    assert not gs.category_fluid_data.is_hidden()
+    assert gs.option_fluid_capacity.is_hidden()
+    assert gs.option_fluid_conductivity.is_hidden()
+    assert gs.option_fluid_density.is_hidden()
+    assert gs.option_fluid_viscosity.is_hidden()
+    assert not gs.option_fluid_selector.is_hidden()
+    assert not gs.option_fluid_mass_flow.is_hidden()
+    assert not gs.option_glycol_selector.is_hidden()
+    assert not gs.option_glycol_percentage.is_hidden()
+    assert not gs.option_fluid_ref_temp.is_hidden()
+
+    gs.option_fluid_selector.set_value(0)
+    gs.page_borehole_resistance.button.click()
+    assert not gs.pipe_thermal_resistance.is_hidden()
+    assert gs.pipe_thermal_resistance.label.text() == 'The equivalent borehole thermal resistance (at 100.0m): 0.0579 mK/W'
+    gs.option_fluid_selector.set_value(1)
+    assert gs.pipe_thermal_resistance.label.text() == 'The equivalent borehole thermal resistance (at 100.0m): 0.0621 mK/W'
+    gs.option_glycol_percentage.set_value(10)
+    assert gs.pipe_thermal_resistance.label.text() == 'The equivalent borehole thermal resistance (at 100.0m): 0.0595 mK/W'
+    gs.option_fluid_ref_temp.set_value(15)
+    assert gs.pipe_thermal_resistance.label.text() == 'The equivalent borehole thermal resistance (at 100.0m): 0.0591 mK/W'
+    gs.option_glycol_selector.set_value(1)
+    assert gs.pipe_thermal_resistance.label.text() == 'The equivalent borehole thermal resistance (at 100.0m): 0.0593 mK/W'
+    gs.option_glycol_percentage.set_value(20)
+    assert gs.pipe_thermal_resistance.label.text() == 'The equivalent borehole thermal resistance (at 100.0m): 0.0627 mK/W'
+    gs.option_fluid_ref_temp.set_value(10)
+    assert gs.pipe_thermal_resistance.label.text() == 'The equivalent borehole thermal resistance (at 100.0m): 0.0681 mK/W'
