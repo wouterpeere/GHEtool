@@ -148,10 +148,9 @@ from GHEtool import Borefield, GroundDataConstantTemperature, MonthlyGeothermalL
 After importing the necessary classes, the relevant ground data parameters are set.
 
 ```Python
-data =
-GroundDataConstantTemperature(3,   # ground thermal conductivity (W/mK)
-                              10,  # initial/undisturbed ground temperature (deg C)
-                              2.4*10**6) # volumetric heat capacity of the ground (J/m3K) 
+data = GroundDataConstantTemperature(3,   # ground thermal conductivity (W/mK)
+                                     10,  # initial/undisturbed ground temperature (deg C)
+                                     2.4*10**6) # volumetric heat capacity of the ground (J/m3K) 
 ```
 
 Furthermore, for our loads, we need to set the peak loads as well as the monthly base loads for heating and cooling.
