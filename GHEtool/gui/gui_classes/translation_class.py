@@ -257,6 +257,9 @@ class Translations:  # pragma: no cover
         "option_glycol_selector",
         "option_glycol_percentage",
         "option_fluid_ref_temp",
+        "option_use_ground_database",
+        "option_ground_database",
+        "hint_ground_database",
         "languages",
     )
 
@@ -820,13 +823,13 @@ class Translations:  # pragma: no cover
             "Liña de data: ",
         ]
         self.option_column: List[str] = [
-            "Thermal demand in one or two columns?:,1 column,2 columns",
-            "Thermischer Bedarf einer oder zwei Spalten?:,1 Spalte,2 Spalten",
-            "Thermische vraag in één of twee kolommen?:,1 kolom,2 kolommen",
-            "Thermal demand in one or two columns?:,1 colonna,2 colonne",
+            "Thermal demand in one or two columns?,1 column,2 columns",
+            "Thermischer Bedarf einer oder zwei Spalten?,1 Spalte,2 Spalten",
+            "Thermische vraag in één of twee kolommen?,1 kolom,2 kolommen",
+            "Thermal demand in one or two columns?,1 colonna,2 colonne",
             "Thermal demand in one or two columns?;,1 colonne,2 colonnes",
-            "Thermal demand in one or two columns?:,1 columna,2 columnas",
-            "Thermal demand in one or two columns?:,1 columna,2 columnas",
+            "Thermal demand in one or two columns?,1 columna,2 columnas",
+            "Thermal demand in one or two columns?,1 columna,2 columnas",
         ]
         self.pushButton_calculate: List[str] = ["Calculate", "Berechne", "Bereken", "Calcola", "Calculer", "Calcular", "Calcular"]
         self.ErrorMassage: List[str] = ["Error!", "Fehler!", "Error!", "Errore!", "Erreur!", "Error!", "Erro!"]
@@ -1238,13 +1241,13 @@ class Translations:  # pragma: no cover
             "Scenario saving settings",
         ]
         self.option_toggle_buttons: List[str] = [
-            "Use toggle buttons?:, No , Yes ",
-            "Umschalterbutton?:, Nein , Ja ",
-            "Toggle-gedrag?:, Nee , Ja",
-            "Toggle buttons?:, No , Yes ",
-            "Toggle buttons?:, No , Yes ",
-            "Toggle buttons?:, No , Yes ",
-            "Toggle buttons?:, No , Yes",
+            "Use toggle buttons?, No , Yes ",
+            "Umschalterbutton?, Nein , Ja ",
+            "Toggle-gedrag?, Nee , Ja",
+            "Toggle buttons?, No , Yes ",
+            "Toggle buttons?, No , Yes ",
+            "Toggle buttons?, No , Yes ",
+            "Toggle buttons?, No , Yes",
         ]
         self.option_auto_saving: List[str] = [
             "Use automatic saving?, No , Yes ",
@@ -1556,13 +1559,13 @@ class Translations:  # pragma: no cover
             "Method for size width and length:,  Simplified  ,  Monthly",
         ]
         self.option_method_temp_gradient: List[str] = [
-            "Consider temperature variation in the ground?:, None , Heat flux , Temperature gradient ",
-            "Welche Art Temperaturgradient soll berücksichtigt werden?:, Keiner , Wärmestrom , Temperaturgradient ",
-            "Moet een variabele grondtemperatuur in rekening worden gebracht?:, Nee , Flux , Gradiënt, ",
-            "Consider temperature variation in the ground?:, None , Heat flux , Temperature gradient ",
-            "Consider temperature variation in the ground?:, None , Heat flux , Temperature gradient ",
-            "Consider temperature variation in the ground?:, None , Heat flux , Temperature gradient ",
-            "Consider temperature variation in the ground?:, None , Heat flux , Temperature gradient",
+            "Consider temperature variation in the ground?, None , Heat flux , Temperature gradient ",
+            "Welche Art Temperaturgradient soll berücksichtigt werden?, Keiner , Wärmestrom , Temperaturgradient ",
+            "Moet een variabele grondtemperatuur in rekening worden gebracht?, Nee , Flux , Gradiënt, ",
+            "Consider temperature variation in the ground?, None , Heat flux , Temperature gradient ",
+            "Consider temperature variation in the ground?, None , Heat flux , Temperature gradient ",
+            "Consider temperature variation in the ground?, None , Heat flux , Temperature gradient ",
+            "Consider temperature variation in the ground?, None , Heat flux , Temperature gradient",
         ]
         self.option_method_rb_calc: List[str] = [
             "Borehole resistance calculation method:, Constant , Dynamic ",
@@ -2091,4 +2094,31 @@ class Translations:  # pragma: no cover
             "Reference fluid temperature [°C]:",
             "Reference fluid temperature [°C]:",
             "Reference fluid temperature [°C]:",
+        ]
+        self.option_use_ground_database: List[str] = [
+            "Use the reference database?, No , Yes ",
+            "Datenbankreferenz verwenden?, Nein , Ja ",
+            "Gebruik de temperatuurdatabank? Nee , Ja ,",
+            "Use the reference database?, No , Yes ",
+            "Use the reference database?, No , Yes ",
+            "Use the reference database?, No , Yes ",
+            "Use the reference database?, No , Yes ",
+        ]
+        self.option_ground_database: List[str] = [
+            "Select from the database: ",
+            "Aus der Datenbank auswählen:",
+            "Selecteer van de databank:",
+            "Select from the database: ",
+            "Select from the database: ",
+            "Select from the database: ",
+            "Select from the database: ",
+        ]
+        self.hint_ground_database: List[str] = [
+            "The ground temperature at the selected location is: , °C",
+            "Die Bodentemperatur an der ausgewählten Stelle beträgt: , °C",
+            "De grondtemperatuur op de geselecteerde locatie is: , °C",
+            "The ground temperature at the selected location is: , °C",
+            "The ground temperature at the selected location is: , °C",
+            "The ground temperature at the selected location is: , °C",
+            "The ground temperature at the selected location is: , °C",
         ]

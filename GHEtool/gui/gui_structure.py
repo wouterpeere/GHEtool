@@ -15,7 +15,7 @@ import PySide6.QtCore as QtC
 import pandas as pd
 
 from GHEtool import FOLDER
-from GHEtool.VariableClasses import FluidData, MultipleUTube, Borehole, CoaxialPipe
+from GHEtool.VariableClasses import FluidData, MultipleUTube, Borehole, CoaxialPipe, LIST_OF_COUNTRY_NAMES, LIST_OF_COUNTRIES
 from GHEtool.gui.gui_classes.translation_class import Translations
 from numpy import array, cos, int64, round, sin, sum
 from pandas import DataFrame as pd_DataFrame
@@ -478,6 +478,20 @@ class GUI(GuiStructure):
             maximal_value=100_000,
             step=100,
         )
+        self.option_use_ground_database = ButtonBox(
+            category=self.category_earth,
+            label=translations.option_use_ground_database,
+            default_index=0,
+            entries=[' No ', ' Yes '])
+        self.option_ground_database = ListBox(category=self.category_earth,
+                                              label=translations.option_ground_database,
+                                              default_index=0,
+                                              entries=LIST_OF_COUNTRY_NAMES)
+        self.option_ground_database.change_event(self._update_selected_ground_temperature_from_database)
+
+        self.hint_ground_database = ResultText(translations.hint_ground_database,
+                                                  category=self.category_earth,
+                                                  prefix="The ground temperature at the selected reference is: ", suffix="°C")
         self.option_ground_temp = FloatBox(
             category=self.category_earth,
             label=translations.option_ground_temp,
@@ -1397,11 +1411,21 @@ class GUI(GuiStructure):
                                                    self.option_method_temp_gradient,
                                                    custom_logic=partial(
                                                        self.option_method_temp_gradient.check_linked_value, 0))
-        self.show_option_under_multiple_conditions(self.option_ground_temp_gradient,
+        self.show_option_under_multiple_conditions(self.option_use_ground_database,
                                                    self.option_method_temp_gradient,
                                                    functions_check_for_or=[
                                                        partial(self.option_method_temp_gradient.check_linked_value, 1),
                                                        partial(self.option_method_temp_gradient.check_linked_value, 2)])
+        self.show_option_under_multiple_conditions(self.option_ground_temp_gradient,
+                                                   self.option_use_ground_database,
+                                                   custom_logic=partial(
+                                                       self.option_use_ground_database.check_linked_value, 0),
+                                                   check_on_visibility_change=True)
+        self.show_option_under_multiple_conditions([self.hint_ground_database, self.option_ground_database],
+                                                   self.option_use_ground_database,
+                                                   custom_logic=partial(
+                                                       self.option_use_ground_database.check_linked_value, 1),
+                                                   check_on_visibility_change=True)
         self.show_option_under_multiple_conditions(self.option_ground_heat_flux,
                                                    self.option_method_temp_gradient,
                                                    custom_logic=partial(
@@ -2001,6 +2025,18 @@ class GUI(GuiStructure):
         except:
             pass
 
+    def _update_selected_ground_temperature_from_database(self) -> None:
+        """
+        This function updates the hint for the ground database.
+
+        Returns
+        -------
+        None
+        """
+        try:
+            self.hint_ground_database.set_text_value(LIST_OF_COUNTRIES[self.option_ground_database.get_value()[0]])
+        except:
+            pass
 
 def show_option_on_multiple_aims(first_aims: list[Aim], second_aims: list[Aim], option: Option):
     def show_hide():
