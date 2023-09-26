@@ -682,6 +682,61 @@ def test_coaxial_and_gradient(qtbot):
     assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 17.05 °C'
 
 
+def test_ground_selector(qtbot):
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
+                             data_2_results_function=data_2_borefield)
+    main_window.delete_backup()
+    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
+                             data_2_results_function=data_2_borefield)
+
+    gs = main_window.gui_structure
+
+    gs.option_method_temp_gradient.set_value(2)
+    main_window.save_scenario()
+    main_window.start_current_scenario_calculation()
+    thread = main_window.threads[-1]
+    thread.run()
+    assert thread.calculated
+
+    main_window.display_results()
+
+    assert gs.results_ground_temperature.label.text() == 'Average ground temperature: 11.5 °C'
+    assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 16.14 °C'
+
+    gs.option_use_ground_database.set_value(1)
+    main_window.save_scenario()
+    main_window.start_current_scenario_calculation()
+    thread = main_window.threads[-1]
+    thread.run()
+    assert thread.calculated
+
+    main_window.display_results()
+    assert gs.results_ground_temperature.label.text() == 'Average ground temperature: 15.7 °C'
+    assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 20.34 °C'
+
+    gs.option_ground_database.set_value(1)
+    main_window.save_scenario()
+    main_window.start_current_scenario_calculation()
+    thread = main_window.threads[-1]
+    thread.run()
+    assert thread.calculated
+
+    main_window.display_results()
+    assert gs.results_ground_temperature.label.text() == 'Average ground temperature: 10.5 °C'
+    assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 15.14 °C'
+
+    gs.option_method_temp_gradient.set_value(1)
+    main_window.save_scenario()
+    main_window.start_current_scenario_calculation()
+    thread = main_window.threads[-1]
+    thread.run()
+    assert thread.calculated
+
+    main_window.display_results()
+    assert gs.results_ground_temperature.label.text() == 'Average ground temperature: 11.0 °C'
+    assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 15.64 °C'
+
+
 def test_fluid_selector(qtbot):
     main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
                              data_2_results_function=data_2_borefield)
