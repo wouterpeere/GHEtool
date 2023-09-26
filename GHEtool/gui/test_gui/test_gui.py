@@ -294,6 +294,10 @@ def test_load_data_gui_errors():
         load_data_GUI("", 0, 'Heating', 'Cooling', 'Heating', ';', '.', 1)
     with raises(FileNotFoundError):
         load_data_GUI("no_existing_file.csv", 0, 'Heating', 'Cooling', 'Heating', ';', '.', 1)
+    with raises(ValueError):
+        load_data_GUI("no_existing_file.csv", 0, 'Heating', 'Heating', 'Heating', ';', '.', 1)
+    with raises(ValueError):
+        load_data_GUI(FOLDER.joinpath("Examples/hourly_profile.csv"), 0, "Heating", "Cooling", "Heating", ",", ".", 1, False)
 
 
 def test_file_import_errors(qtbot):
