@@ -1226,7 +1226,7 @@ class GUI(GuiStructure):
                 default_value=3,
                 decimal_number=2,
                 minimal_value=1,
-                maximal_value=50,
+                maximal_value=1000,
                 step=0.1,
             )
             self.DHW = FloatBox(
