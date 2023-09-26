@@ -2035,8 +2035,9 @@ class GUI(GuiStructure):
         """
         try:
             self.hint_ground_database.set_text_value(LIST_OF_COUNTRIES[self.option_ground_database.get_value()[0]])
-        except:
+        except:   # pragma: no cover
             pass
+
 
 def show_option_on_multiple_aims(first_aims: list[Aim], second_aims: list[Aim], option: Option):
     def show_hide():
