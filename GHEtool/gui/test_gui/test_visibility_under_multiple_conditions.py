@@ -57,6 +57,10 @@ def test_visibility_non_constant_temperature(qtbot):
     assert gs.option_ground_temp_gradient.is_hidden()
     assert gs.option_ground_heat_flux.is_hidden()
     assert gs.option_temp_gradient.is_hidden()
+    assert gs.option_use_ground_database.is_hidden()
+    assert gs.option_ground_database.is_hidden()
+    assert gs.hint_ground_database.is_hidden()
+
     main_window.save_scenario()
 
     main_window.add_scenario()
@@ -65,6 +69,8 @@ def test_visibility_non_constant_temperature(qtbot):
     assert not gs.option_ground_temp_gradient.is_hidden()
     assert not gs.option_ground_heat_flux.is_hidden()
     assert gs.option_temp_gradient.is_hidden()
+    assert not gs.option_use_ground_database.is_hidden()
+
     main_window.save_scenario()
 
     main_window.add_scenario()
@@ -73,13 +79,30 @@ def test_visibility_non_constant_temperature(qtbot):
     assert not gs.option_ground_temp_gradient.is_hidden()
     assert gs.option_ground_heat_flux.is_hidden()
     assert not gs.option_temp_gradient.is_hidden()
+    assert not gs.option_use_ground_database.is_hidden()
     main_window.save_scenario()
+
+    main_window.add_scenario()
+    gs.option_use_ground_database.set_value(1)
+    assert gs.option_ground_temp.is_hidden()
+    assert gs.option_ground_temp_gradient.is_hidden()
+    assert gs.option_ground_heat_flux.is_hidden()
+    assert not gs.option_temp_gradient.is_hidden()
+    assert not gs.option_use_ground_database.is_hidden()
+    assert not gs.option_ground_database.is_hidden()
+    assert not gs.hint_ground_database.is_hidden()
+    assert gs.hint_ground_database.label.text() == "The ground temperature at the selected location is: 14.2 °C"
+    gs.option_ground_database.set_value(1)
+    assert gs.hint_ground_database.label.text() == "The ground temperature at the selected location is: 9.0 °C"
 
     main_window.change_scenario(0)
     assert not gs.option_ground_temp.is_hidden()
     assert gs.option_ground_temp_gradient.is_hidden()
     assert gs.option_ground_heat_flux.is_hidden()
     assert gs.option_temp_gradient.is_hidden()
+    assert gs.option_use_ground_database.is_hidden()
+    assert gs.option_ground_database.is_hidden()
+    assert gs.hint_ground_database.is_hidden()
 
 
 def test_visibility_peak_length(qtbot):

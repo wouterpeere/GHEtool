@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added domestic hot water (DHW) to GHEtool (issue #172).
 - Glycol-water mixtures can now be selected from within the GUI (issue #174).
 - Pygfunction media object can be imported into the FluidData object in GHEtool (issue #174).
+- Temperature database (Europe) based on data from (Xing, 2014) (issue #178).
 
 ## Changed
 - GUI was moved to a separate project: [ScenarioGUI](https://github.com/tblanke/ScenarioGUI).
@@ -40,6 +41,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Move use_precalcated_data to CalculationSetup class and rename to: 'use_precalculate_dataset' (issue #159).
 - Changed 'set_max_ground_temperature' and 'set_min_ground_temperature' to correct names: 'set_max_avg_fluid_temperature' and 'set_min_avg_fluid_temperature'
 - Changed 'minimal average fluid temperature' to 'minimum average fluid temperature' in GUI (issue #172).
+- Max value of SEER is now 1000 (issue #178).
 
 ## Fixed
 - Fixed problem with L2 sizing, when the peak load was the same in all months (issue #146).

@@ -9,7 +9,7 @@ import logging
 
 import numpy as np
 from GHEtool import Borefield, FluidData, MultipleUTube, GroundConstantTemperature, GroundFluxTemperature, GroundTemperatureGradient, CoaxialPipe
-from GHEtool.VariableClasses import GroundData, MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
+from GHEtool.VariableClasses import GroundData, MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad, LIST_OF_COUNTRIES
 from GHEtool.gui.gui_structure import load_data_GUI
 import pygfunction as gt
 
@@ -253,9 +253,13 @@ def _create_ground_data(ds: DataStorage) -> GroundData:
     """
     if ds.option_method_temp_gradient == 0:
         return GroundConstantTemperature(ds.option_conductivity, ds.option_ground_temp, ds.option_heat_capacity * 1000)
+    if ds.option_use_ground_database == 0:
+        ground_temp = ds.option_ground_temp_gradient
+    else:
+        ground_temp = LIST_OF_COUNTRIES[ds.option_ground_database[0]]
     if ds.option_method_temp_gradient == 1:
-        return GroundFluxTemperature(ds.option_conductivity, ds.option_ground_temp_gradient, ds.option_heat_capacity * 1000, ds.option_ground_heat_flux)
-    return GroundTemperatureGradient(ds.option_conductivity, ds.option_ground_temp_gradient, ds.option_heat_capacity * 1000, ds.option_temp_gradient)
+        return GroundFluxTemperature(ds.option_conductivity, ground_temp, ds.option_heat_capacity * 1000, ds.option_ground_heat_flux)
+    return GroundTemperatureGradient(ds.option_conductivity, ground_temp, ds.option_heat_capacity * 1000, ds.option_temp_gradient)
 
 
 def _create_monthly_loads_peaks(ds: DataStorage) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
