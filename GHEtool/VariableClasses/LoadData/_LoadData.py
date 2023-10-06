@@ -161,6 +161,30 @@ class _LoadData(BaseClass, ABC):
         return np.divide(self.baseload_cooling, self.UPM)
 
     @property
+    def yearly_heating_load(self) -> float:
+        """
+        This function returns the yearly heating load in kWh/year.
+
+        Returns
+        -------
+        float
+            Yearly heating load kWh/year
+        """
+        return np.sum(self.baseload_heating)
+
+    @property
+    def yearly_cooling_load(self) -> float:
+        """
+        This function returns the yearly cooling load in kWh/year.
+
+        Returns
+        -------
+        float
+            Yearly cooling load kWh/year
+        """
+        return np.sum(self.baseload_cooling)
+
+    @property
     def baseload_heating_simulation_period(self) -> np.ndarray:
         """
         This function returns the baseload heating in kWh/month for a whole simulation period.
@@ -242,7 +266,7 @@ class _LoadData(BaseClass, ABC):
         -------
         imbalance : float
         """
-        return np.sum(self.baseload_cooling - self.baseload_heating)
+        return self.yearly_cooling_load - self.yearly_heating_load
 
     @property
     def monthly_average_load(self) -> np.ndarray:
@@ -265,6 +289,7 @@ class _LoadData(BaseClass, ABC):
         monthly average load : np.ndarray
         """
         return np.tile(self.monthly_average_load, self.simulation_period)
+
     @property
     def peak_heating_duration(self) -> float:
         """
