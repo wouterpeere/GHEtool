@@ -2029,6 +2029,11 @@ class GUI(GuiStructure):
         except:
             pass
 
+    def translate(self, index: int, translation: Translations) -> None:
+        # so that the labels are updated.
+        super().translate(index, translation)
+        self._update_selected_ground_temperature_from_database()
+
     def _update_selected_ground_temperature_from_database(self) -> None:
         """
         This function updates the hint for the ground database.
