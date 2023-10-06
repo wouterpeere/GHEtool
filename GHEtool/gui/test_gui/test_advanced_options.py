@@ -27,6 +27,7 @@ def test_advanced_options(qtbot):
     main_window.save_scenario()
 
     gs = main_window.gui_structure
+    gs.option_source_ground_temperature.set_value(0)
     gs.option_method_rb_calc.set_value(0)
 
     assert gs.category_advanced_options.is_hidden()
