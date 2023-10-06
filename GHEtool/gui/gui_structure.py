@@ -234,7 +234,7 @@ class GUI(GuiStructure):
         self.option_method_temp_gradient = ButtonBox(
             label=translations.option_method_temp_gradient, default_index=0,
             entries=[" none ", " heat flux ", " temperature gradient "], category=self.category_calculation)
-        self.option_method_rb_calc = ButtonBox(label=translations.option_method_rb_calc, default_index=0,
+        self.option_method_rb_calc = ButtonBox(label=translations.option_method_rb_calc, default_index=1,
                                                entries=[" constant ", " dynamic "],
                                                category=self.category_calculation)
         self.option_temperature_profile_hourly = ButtonBox(

@@ -690,6 +690,7 @@ def test_ground_selector(qtbot):
                              data_2_results_function=data_2_borefield)
 
     gs = main_window.gui_structure
+    gs.option_method_rb_calc.set_value(0)
 
     gs.option_method_temp_gradient.set_value(2)
     main_window.save_scenario()

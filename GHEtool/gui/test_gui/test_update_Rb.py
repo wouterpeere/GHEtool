@@ -27,6 +27,7 @@ def test_pipe_right_options_shown(qtbot):
     main_window.save_scenario()
 
     gs = main_window.gui_structure
+    gs.option_method_rb_calc.set_value(0)
     assert gs.category_pipe_data.is_hidden()
     gs.option_method_rb_calc.set_value(1)
     gs.page_borehole_resistance.button.click()
@@ -68,6 +69,7 @@ def test_Rb_calculated_when_value_changed_U_pipe(qtbot):
     main_window.save_scenario()
 
     gs = main_window.gui_structure
+    gs.option_method_rb_calc.set_value(0)
     assert gs.category_pipe_data.is_hidden()
     gs.option_method_rb_calc.set_value(1)
     gs.page_borehole_resistance.button.click()
@@ -115,6 +117,7 @@ def test_Rb_calculated_when_value_changed_coaxial(qtbot):
     main_window.save_scenario()
 
     gs = main_window.gui_structure
+    gs.option_method_rb_calc.set_value(0)
     assert gs.category_pipe_data.is_hidden()
 
     gs.option_method_rb_calc.set_value(1)
@@ -199,6 +202,7 @@ def test_correct_fluid_options_shown(qtbot):
     main_window.save_scenario()
 
     gs = main_window.gui_structure
+    gs.option_method_rb_calc.set_value(0)
 
     assert gs.category_fluid_data.is_hidden()
     gs.option_method_rb_calc.set_value(1)
