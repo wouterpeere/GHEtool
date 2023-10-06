@@ -24,6 +24,7 @@ def test_building_load(qtbot):
     main_window.gui_structure.option_method_rb_calc.set_value(0)
     main_window.gui_structure.option_decimal_csv.set_value(0)
     main_window.gui_structure.option_seperator_csv.set_value(0)
+    main_window.gui_structure.option_source_ground_temperature.set_value(0)
 
     main_window.gui_structure.option_filename.set_value(f'{FOLDER}/Examples/hourly_profile.csv')
     main_window.gui_structure.fun_update_combo_box_data_file(f'{FOLDER}/Examples/hourly_profile.csv')

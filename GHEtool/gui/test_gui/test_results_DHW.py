@@ -15,6 +15,7 @@ def test_results_DHW(qtbot):
                              data_2_results_function=data_2_borefield)
 
     gs = main_window.gui_structure
+    gs.option_source_ground_temperature.set_value(0)
     gs.option_method_rb_calc.set_value(0)
 
     gs.aim_optimize.widget.click()
