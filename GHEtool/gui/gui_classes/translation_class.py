@@ -192,7 +192,6 @@ class Translations:  # pragma: no cover
         "category_calculation",
         "option_method_size_depth",
         "option_method_size_length",
-        "option_method_temp_gradient",
         "option_method_rb_calc",
         "category_earth",
         "cat_no_results",
@@ -257,9 +256,12 @@ class Translations:  # pragma: no cover
         "option_glycol_selector",
         "option_glycol_percentage",
         "option_fluid_ref_temp",
-        "option_use_ground_database",
         "option_ground_database",
         "hint_ground_database",
+        "hint_borehole_depth",
+        "hint_ground_flux_database",
+        "option_source_ground_temperature",
+        "option_flux_gradient",
         "languages",
     )
 
@@ -1558,15 +1560,6 @@ class Translations:  # pragma: no cover
             "Method for size width and length:,  Simplified  ,  Monthly  ",
             "Method for size width and length:,  Simplified  ,  Monthly",
         ]
-        self.option_method_temp_gradient: List[str] = [
-            "Consider temperature variation in the ground?, None , Heat flux , Temperature gradient ",
-            "Welche Art Temperaturgradient soll berücksichtigt werden?, Keiner , Wärmestrom , Temperaturgradient ",
-            "Moet een variabele grondtemperatuur in rekening worden gebracht?, Nee , Flux , Gradiënt, ",
-            "Consider temperature variation in the ground?, None , Heat flux , Temperature gradient ",
-            "Consider temperature variation in the ground?, None , Heat flux , Temperature gradient ",
-            "Consider temperature variation in the ground?, None , Heat flux , Temperature gradient ",
-            "Consider temperature variation in the ground?, None , Heat flux , Temperature gradient",
-        ]
         self.option_method_rb_calc: List[str] = [
             "Borehole resistance calculation method:, Constant , Dynamic ",
             "Methode zur Bohrlochwiderstangsberechnung:, Konstant , Dynamisch ",
@@ -2095,15 +2088,6 @@ class Translations:  # pragma: no cover
             "Reference fluid temperature [°C]:",
             "Reference fluid temperature [°C]:",
         ]
-        self.option_use_ground_database: List[str] = [
-            "Use the reference database?, No , Yes ",
-            "Datenbankreferenz verwenden?, Nein , Ja ",
-            "Gebruik de temperatuurdatabank? Nee , Ja ,",
-            "Use the reference database?, No , Yes ",
-            "Use the reference database?, No , Yes ",
-            "Use the reference database?, No , Yes ",
-            "Use the reference database?, No , Yes ",
-        ]
         self.option_ground_database: List[str] = [
             "Select from the database: ",
             "Aus der Datenbank auswählen:",
@@ -2121,4 +2105,40 @@ class Translations:  # pragma: no cover
             "The ground temperature at the selected location is: , °C",
             "The ground temperature at the selected location is: , °C",
             "The ground temperature at the selected location is: , °C",
+        ]
+        self.hint_borehole_depth: List[str] = [
+            "The borehole depth is relative w.r.t. the buried depth, not the surface level.",
+            "Die Bohrlochtiefe ist relativ zur eingegrabenen Tiefe, nicht zur Geländeoberfläche.",
+            "De boorgatdiepte is relatief ten opzichte van de deklaag, niet het maaiveld.",
+            "The borehole depth is relative w.r.t. the buried depth, not the surface level.",
+            "The borehole depth is relative w.r.t. the buried depth, not the surface level.",
+            "The borehole depth is relative w.r.t. the buried depth, not the surface level.",
+            "The borehole depth is relative w.r.t. the buried depth, not the surface level.",
+        ]
+        self.hint_ground_flux_database: List[str] = [
+            "The geothermal heat flux at the selected location is: , W/m²",
+            "Die geothermische Wärmeflussdichte an der ausgewählten Stelle beträgt: , W/m²",
+            "De geothermische warmteflux op de gekozen locatie is: , W/m²",
+            "The geothermal heat flux at the selected location is: , W/m²",
+            "The geothermal heat flux at the selected location is: , W/m²",
+            "The geothermal heat flux at the selected location is: , W/m²",
+            "The geothermal heat flux at the selected location is: , W/m²",
+        ]
+        self.option_source_ground_temperature: List[str] = [
+            "Source of the ground temperature data:, Measured , Database , Custom",
+            "Quelle der Bodentemperaturdaten:, Gemessen , Datenbank , Benutzerdefiniert",
+            "Bron voor de grondtemperatuur:, Gemeten , Databank , Custom",
+            "Source of the ground temperature data:, Measured , Database , Custom",
+            "Source of the ground temperature data:, Measured , Database , Custom",
+            "Source of the ground temperature data:, Measured , Database , Custom",
+            "Source of the ground temperature data:, Measured , Database , Custom",
+        ]
+        self.option_flux_gradient: List[str] = [
+            "How to take into account temperature variation?, Flux , Gradient",
+            "Wie berücksichtigt man Temperaturschwankungen?, Fluss , Gradient ",
+            "Hoe temperatuurvariatie meenemen?, Flux , Gradiënt ",
+            "How to take into account temperature variation?, Flux , Gradient",
+            "How to take into account temperature variation?, Flux , Gradient",
+            "How to take into account temperature variation?, Flux , Gradient",
+            "How to take into account temperature variation?, Flux , Gradient",
         ]
