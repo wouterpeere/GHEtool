@@ -1380,7 +1380,7 @@ class GUI(GuiStructure):
                                                      page=self.page_result)
 
             self.figure_load_duration.fig_to_be_shown(class_name="Borefield",
-                                                      function_name="plot_load_duration")
+                                                      function_name="_plot_load_duration")
 
             self.legend_figure_load_duration = FigureOption(category=self.figure_load_duration,
                                                             label=translations.legend_figure_load_duration,

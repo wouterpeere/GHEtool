@@ -813,6 +813,21 @@ def test_load_duration(monkeypatch):
     borefield.optimise_load_profile(load, 150)
 
 
+def test_optimise_load_profile(monkeypatch):
+    borefield = Borefield()
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    borefield.set_ground_parameters(ground_data_constant)
+    borefield.borefield = copy.deepcopy(borefield_gt)
+    load = HourlyGeothermalLoad()
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load.simulation_period = 40
+    borefield.optimise_load_profile(load, 150)
+    assert borefield.load.simulation_period == 40
+    assert borefield._building_load.simulation_period == 40
+    assert borefield._secundary_borefield_load.simulation_period == 40
+    assert borefield._external_load.simulation_period == 40
+
+
 def test_calculate_quadrants_without_data():
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
@@ -866,6 +881,7 @@ def test_optimise_load_profile_without_hourly_data():
     borefield.load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     borefield.create_rectangular_borefield(10, 10, 6, 6, 150)
     borefield.optimise_load_profile(borefield.load)
+
 
 @pytest.mark.parametrize("H, result",
                          zip(range(110, 130, 1), [122.99210426454648, 122.99135446500962, 122.99135409065917,
