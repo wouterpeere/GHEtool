@@ -1995,7 +1995,7 @@ class Borefield(BaseClass):
                 if min(self.results.peak_heating) < self.Tf_min:
                     peak_heat_load_geo -= 1 * max(1, 10 * (self.Tf_min - min(self.results.peak_heating)))
                 else:
-                    peak_heat_load_geo = min(init_peak_heating, peak_heat_load_geo + 1)
+                    peak_heat_load_geo = min(init_peak_heating, peak_heat_load_geo * 1.01)
                     if peak_heat_load_geo == init_peak_heating:
                         heat_ok = True
             else:
@@ -2008,7 +2008,7 @@ class Borefield(BaseClass):
                 if np.max(self.results.peak_cooling) > self.Tf_max:
                     peak_cool_load_geo -= 1 * max(1, 10 * (-self.Tf_max + np.max(self.results.peak_cooling)))
                 else:
-                    peak_cool_load_geo = min(init_peak_cooling, peak_cool_load_geo + 1)
+                    peak_cool_load_geo = min(init_peak_cooling, peak_cool_load_geo * 1.01)
                     if peak_cool_load_geo == init_peak_cooling:
                         cool_ok = True
             else:
