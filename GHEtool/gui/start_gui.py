@@ -43,6 +43,7 @@ def run(path_list=None):  # pragma: no cover
         # set version and id
         myAppID = f'{globs.GUI_NAME} v{globs.VERSION}'  # arbitrary string
         ctypes_windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
+
     # init window
     window = QtWidgets_QMainWindow()
     # init gui window
