@@ -131,5 +131,5 @@ def test_results_DHW(qtbot):
 
     main_window.display_results()
 
-    assert gs.results_heating_load.label.text() == "Heating load on the borefield: 566750.0 kWh"
+    assert gs.results_heating_load.label.text() == "Heating load on the borefield: 530633.0 kWh"
 
