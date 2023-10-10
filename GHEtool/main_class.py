@@ -3,6 +3,7 @@ This file contains all the code for the borefield calculations.
 """
 from __future__ import annotations
 
+import copy
 import warnings
 from math import pi
 from pathlib import Path
@@ -1966,7 +1967,7 @@ class Borefield(BaseClass):
         primary_geothermal_load.set_hourly_heating(building_load.hourly_heating_load.copy() * (1 - 1 / SCOP))
 
         # set geothermal load
-        self.load = primary_geothermal_load
+        self.load = copy.deepcopy(primary_geothermal_load)
 
         # set initial peak loads
         init_peak_heating: float = self.load.max_peak_heating
@@ -1981,8 +1982,8 @@ class Borefield(BaseClass):
 
         while not cool_ok or not heat_ok:
             # limit the primary geothermal heating and cooling load to peak_heat_load_geo and peak_cool_load_geo
-            self.load.set_hourly_cooling(np.minimum(peak_cool_load_geo, primary_geothermal_load.hourly_cooling_load))
-            self.load.set_hourly_heating(np.minimum(peak_heat_load_geo, primary_geothermal_load.hourly_heating_load))
+            self.load.set_hourly_cooling(np.minimum(np.maximum(0, peak_cool_load_geo), primary_geothermal_load.hourly_cooling_load))
+            self.load.set_hourly_heating(np.minimum(np.maximum(0, peak_heat_load_geo), primary_geothermal_load.hourly_heating_load))
 
             # calculate temperature profile, just for the results
             self.calculate_temperatures(depth=depth)

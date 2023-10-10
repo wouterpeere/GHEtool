@@ -370,3 +370,29 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 10**6, 10**6, 87.899, 70.054,
                                                    247.186, 210.800, 429.23, 325.236,
                                                    name='Optimise load profile 3, reversed'))
+
+list_of_test_objects.add(SizingObject(borefield, L4_output=18760.64149089075, quadrant=4, name='Hourly profile, quadrant 4'))
+
+hourly_load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_cooling=0, col_heating=1)
+borefield.load = hourly_load
+list_of_test_objects.add(SizingObject(borefield, L4_output=368.50138222702657, quadrant=2, name='Hourly profile reversed'))
+
+temp = hourly_load.hourly_heating_load
+temp[0] = 100_000
+borefield._borefield_load.hourly_heating_load = temp
+list_of_test_objects.add(SizingObject(borefield, L4_output=18602.210559679363, quadrant=3, name='Hourly profile, quadrant 3'))
+
+hourly_load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 10**6, 10**6, 87.506, 97.012,
+                                                   305.842, 384.204, 230.193, 292.212, name='Optimise load profile 1'))
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 10**6, 10**6, 70.054, 87.899,
+                                                   210.800, 247.186, 325.236, 429.231, name='Optimise load profile 2'))
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 10**6, 10**6, 45.096, 63.799,
+                                                   118.898, 117.804, 417.138, 558.612, name='Optimise load profile 3'))
+
+borefield.set_min_avg_fluid_temperature(-5)
+borefield.set_max_avg_fluid_temperature(25)
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 10**6, 10**6, 100, 100,
+                                                   536.036, 676.417, 0, 0, name='Optimise load profile 100%'))

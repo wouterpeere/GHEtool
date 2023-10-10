@@ -828,6 +828,21 @@ def test_optimise_load_profile(monkeypatch):
     assert borefield._external_load.simulation_period == 40
 
 
+def test_optimise_borefield_small(monkeypatch):
+    borefield = Borefield()
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    borefield.set_ground_parameters(ground_data_constant)
+    borefield.create_rectangular_borefield(5, 1, 6, 6, 100)
+    load = HourlyGeothermalLoad()
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load.simulation_period = 40
+    borefield.optimise_load_profile(load, 150, print_results=True)
+    assert borefield.load.simulation_period == 40
+    assert borefield._building_load.simulation_period == 40
+    assert borefield._secundary_borefield_load.simulation_period == 40
+    assert borefield._external_load.simulation_period == 40
+
+
 def test_calculate_quadrants_without_data():
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
