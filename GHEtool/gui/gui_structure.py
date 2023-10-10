@@ -1584,7 +1584,7 @@ class GUI(GuiStructure):
         if not self.started:
             return
         if self.category_pipe_data.is_hidden():
-            return
+            return  # pragma: no cover
 
         def Upipe():
             n_u: int = self.option_pipe_number.get_value()  # get number of U pipes

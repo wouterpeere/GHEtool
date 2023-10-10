@@ -2174,7 +2174,7 @@ class Borefield(BaseClass):
         ax.set_xlim(0, 8760)
         # plot legend if wanted
         if legend:
-            ax.legend()
+            ax.legend()  #
         # show plt if not in gui
         if not self.gui:
             plt.show()
@@ -2216,8 +2216,8 @@ class Borefield(BaseClass):
         ax.set_xlim(0, 8760)
         # plot legend if wanted
         if legend:
-            ax.legend()
+            ax.legend()  # pragma: no cover
         # show plt if not in gui
         if not self.gui:
-            plt.show()
+            plt.show()  # pragma: no cover
         return fig, ax
