@@ -3,6 +3,7 @@ This file contains all the code for the borefield calculations.
 """
 from __future__ import annotations
 
+import copy
 import warnings
 from math import pi
 from pathlib import Path
@@ -1643,7 +1644,7 @@ class Borefield(BaseClass):
         # create new figure and axes if it not already exits otherwise clear it.
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        # set axes labels
+        # set axes labelsv
         ax.set_xlabel(r'Time (year)')
         ax.set_ylabel(r'Temperature ($^\circ C$)')
         ax.yaxis.label.set_color(plt.rcParams["axes.labelcolor"])
@@ -1944,7 +1945,7 @@ class Borefield(BaseClass):
         ## Explain variables
         # load --> primary, geothermal load
         # _building_load --> secundary, building load
-        # _secundary_geothermal_load --> secundary, geothermal load
+        # _secundary_borefield_load --> secundary, geothermal load
 
         # check if hourly load is given
         if not building_load.hourly_resolution:
@@ -1961,12 +1962,12 @@ class Borefield(BaseClass):
         self.Rb = self.borehole.get_Rb(depth, self.D, self.r_b, self.ground_data.k_s)
 
         # load hourly heating and cooling load and convert it to geothermal loads
-        primary_geothermal_load = HourlyGeothermalLoad()
+        primary_geothermal_load = HourlyGeothermalLoad(simulation_period=building_load.simulation_period)
         primary_geothermal_load.set_hourly_cooling(building_load.hourly_cooling_load.copy() * (1 + 1 / SEER))
         primary_geothermal_load.set_hourly_heating(building_load.hourly_heating_load.copy() * (1 - 1 / SCOP))
 
         # set geothermal load
-        self.load = primary_geothermal_load
+        self.load = copy.deepcopy(primary_geothermal_load)
 
         # set initial peak loads
         init_peak_heating: float = self.load.max_peak_heating
@@ -1981,8 +1982,8 @@ class Borefield(BaseClass):
 
         while not cool_ok or not heat_ok:
             # limit the primary geothermal heating and cooling load to peak_heat_load_geo and peak_cool_load_geo
-            self.load.set_hourly_cooling(np.minimum(peak_cool_load_geo, primary_geothermal_load.hourly_cooling_load))
-            self.load.set_hourly_heating(np.minimum(peak_heat_load_geo, primary_geothermal_load.hourly_heating_load))
+            self.load.set_hourly_cooling(np.minimum(np.maximum(0, peak_cool_load_geo), primary_geothermal_load.hourly_cooling_load))
+            self.load.set_hourly_heating(np.minimum(np.maximum(0, peak_heat_load_geo), primary_geothermal_load.hourly_heating_load))
 
             # calculate temperature profile, just for the results
             self.calculate_temperatures(depth=depth)
@@ -2014,7 +2015,7 @@ class Borefield(BaseClass):
                 cool_ok = True
 
         # calculate the resulting secundary hourly profile that can be put on the borefield
-        self._secundary_borefield_load = HourlyGeothermalLoad()
+        self._secundary_borefield_load = HourlyGeothermalLoad(simulation_period=building_load.simulation_period)
         self._secundary_borefield_load.set_hourly_cooling(self.load.hourly_cooling_load / (1 + 1 / SEER))
         self._secundary_borefield_load.set_hourly_heating(self.load.hourly_heating_load / (1 - 1 / SCOP))
 
@@ -2022,7 +2023,7 @@ class Borefield(BaseClass):
         self._building_load = building_load
 
         # calculate external load
-        self._external_load = HourlyGeothermalLoad()
+        self._external_load = HourlyGeothermalLoad(simulation_period=building_load.simulation_period)
         self._external_load.set_hourly_heating(np.maximum(0, building_load.hourly_heating_load -
                                                           self._secundary_borefield_load.hourly_heating_load))
         self._external_load.set_hourly_cooling(np.maximum(0, building_load.hourly_cooling_load -
@@ -2173,8 +2174,50 @@ class Borefield(BaseClass):
         ax.set_xlim(0, 8760)
         # plot legend if wanted
         if legend:
-            ax.legend()
+            ax.legend()  #
         # show plt if not in gui
         if not self.gui:
             plt.show()
+        return fig, ax
+
+    def _plot_load_duration(self, legend: bool = False) -> Tuple[plt.Figure, plt.Axes]:
+        """
+        This function makes a load-duration curve from the hourly values.
+
+        Parameters
+        ----------
+        legend : bool
+            True if the figure should have a legend
+
+        Returns
+        ----------
+        Tuple
+            plt.Figure, plt.Axes
+        """
+        # sort heating and cooling load
+        heating = self._secundary_borefield_load.hourly_heating_load.copy()
+        heating[::-1].sort()
+
+        cooling = self._secundary_borefield_load.hourly_cooling_load.copy()
+        cooling.sort()
+        cooling = cooling * (-1)
+        # create new figure and axes if it not already exits otherwise clear it.
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        # add sorted loads to plot
+        ax.step(np.arange(0, 8760, 1), heating, 'r-', label="Heating")
+        ax.step(np.arange(0, 8760, 1), cooling, 'b-', label="Cooling")
+        # create 0 line
+        ax.hlines(0, 0, 8759, color="black")
+        # add labels
+        ax.set_xlabel("Time [hours]")
+        ax.set_ylabel("Power [kW]")
+        # set x limits to 8760
+        ax.set_xlim(0, 8760)
+        # plot legend if wanted
+        if legend:
+            ax.legend()  # pragma: no cover
+        # show plt if not in gui
+        if not self.gui:
+            plt.show()  # pragma: no cover
         return fig, ax

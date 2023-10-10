@@ -15,7 +15,7 @@ import PySide6.QtCore as QtC
 import pandas as pd
 
 from GHEtool import FOLDER
-from GHEtool.VariableClasses import FluidData, MultipleUTube, Borehole, CoaxialPipe, LIST_OF_COUNTRY_NAMES, LIST_OF_COUNTRIES
+from GHEtool.VariableClasses import FluidData, MultipleUTube, Borehole, CoaxialPipe, LIST_OF_COUNTRY_NAMES, DATASET
 from GHEtool.gui.gui_classes.translation_class import Translations
 from numpy import array, cos, int64, round, sin, sum
 from pandas import DataFrame as pd_DataFrame
@@ -231,10 +231,7 @@ class GUI(GuiStructure):
         self.option_method_size_depth = ButtonBox(label=translations.option_method_size_depth, default_index=0,
                                                   entries=[" L2 ", " L3 ", "  L4  "],
                                                   category=self.category_calculation)
-        self.option_method_temp_gradient = ButtonBox(
-            label=translations.option_method_temp_gradient, default_index=0,
-            entries=[" none ", " heat flux ", " temperature gradient "], category=self.category_calculation)
-        self.option_method_rb_calc = ButtonBox(label=translations.option_method_rb_calc, default_index=0,
+        self.option_method_rb_calc = ButtonBox(label=translations.option_method_rb_calc, default_index=1,
                                                entries=[" constant ", " dynamic "],
                                                category=self.category_calculation)
         self.option_temperature_profile_hourly = ButtonBox(
@@ -478,11 +475,16 @@ class GUI(GuiStructure):
             maximal_value=100_000,
             step=100,
         )
-        self.option_use_ground_database = ButtonBox(
-            category=self.category_earth,
-            label=translations.option_use_ground_database,
-            default_index=0,
-            entries=[' No ', ' Yes '])
+
+        self.option_source_ground_temperature = ButtonBox(category=self.category_earth,
+                                                          label=translations.option_source_ground_temperature,
+                                                          default_index=1,
+                                                          entries=['Measured', 'Database', 'Custom'])
+        self.option_flux_gradient = ButtonBox(category=self.category_earth,
+                                              label=translations.option_flux_gradient,
+                                              default_index=0,
+                                              entries=['Flux', 'Gradient'])
+
         self.option_ground_database = ListBox(category=self.category_earth,
                                               label=translations.option_ground_database,
                                               default_index=0,
@@ -491,7 +493,11 @@ class GUI(GuiStructure):
 
         self.hint_ground_database = ResultText(translations.hint_ground_database,
                                                   category=self.category_earth,
-                                                  prefix="The ground temperature at the selected reference is: ", suffix="°C")
+                                                  prefix="The ground temperature at the selected location is: ", suffix="°C")
+        self.hint_ground_flux_database = ResultText(translations.hint_ground_flux_database,
+                                                    category=self.category_earth,
+                                                    prefix="The geothermal heat flux at the selected location is: ", suffix="W/m²")
+        # constant ground temperature
         self.option_ground_temp = FloatBox(
             category=self.category_earth,
             label=translations.option_ground_temp,
@@ -501,6 +507,7 @@ class GUI(GuiStructure):
             maximal_value=100,
             step=0.1,
         )
+        # ground temperature when there is a flux or gradient
         self.option_ground_temp_gradient = FloatBox(
             category=self.category_earth,
             label=translations.option_ground_temp_gradient,
@@ -510,7 +517,7 @@ class GUI(GuiStructure):
             maximal_value=100,
             step=0.1,
         )
-
+        # geothermal gradient
         self.option_temp_gradient = FloatBox(
             category=self.category_earth,
             label=translations.option_temp_gradient,
@@ -520,7 +527,7 @@ class GUI(GuiStructure):
             maximal_value=500,
             step=0.1,
         )
-
+        # geothermal flux
         self.option_ground_heat_flux = FloatBox(
             category=self.category_earth,
             label=translations.option_ground_heat_flux,
@@ -1373,7 +1380,7 @@ class GUI(GuiStructure):
                                                      page=self.page_result)
 
             self.figure_load_duration.fig_to_be_shown(class_name="Borefield",
-                                                      function_name="plot_load_duration")
+                                                      function_name="_plot_load_duration")
 
             self.legend_figure_load_duration = FigureOption(category=self.figure_load_duration,
                                                             label=translations.legend_figure_load_duration,
@@ -1408,32 +1415,29 @@ class GUI(GuiStructure):
                                                    custom_logic=self.aim_temp_profile.is_checked)
 
         self.show_option_under_multiple_conditions(self.option_ground_temp,
-                                                   self.option_method_temp_gradient,
+                                                   self.option_source_ground_temperature,
                                                    custom_logic=partial(
-                                                       self.option_method_temp_gradient.check_linked_value, 0))
-        self.show_option_under_multiple_conditions(self.option_use_ground_database,
-                                                   self.option_method_temp_gradient,
-                                                   functions_check_for_or=[
-                                                       partial(self.option_method_temp_gradient.check_linked_value, 1),
-                                                       partial(self.option_method_temp_gradient.check_linked_value, 2)])
-        self.show_option_under_multiple_conditions(self.option_ground_temp_gradient,
-                                                   self.option_use_ground_database,
+                                                       self.option_source_ground_temperature.check_linked_value, 0))
+        self.show_option_under_multiple_conditions([self.hint_ground_database,
+                                                    self.hint_ground_flux_database,
+                                                    self.option_ground_database],
+                                                   self.option_source_ground_temperature,
                                                    custom_logic=partial(
-                                                       self.option_use_ground_database.check_linked_value, 0),
-                                                   check_on_visibility_change=True)
-        self.show_option_under_multiple_conditions([self.hint_ground_database, self.option_ground_database],
-                                                   self.option_use_ground_database,
+                                                       self.option_source_ground_temperature.check_linked_value, 1))
+        self.show_option_under_multiple_conditions([self.option_flux_gradient, self.option_ground_temp_gradient],
+                                                   self.option_source_ground_temperature,
                                                    custom_logic=partial(
-                                                       self.option_use_ground_database.check_linked_value, 1),
-                                                   check_on_visibility_change=True)
+                                                       self.option_source_ground_temperature.check_linked_value, 2))
         self.show_option_under_multiple_conditions(self.option_ground_heat_flux,
-                                                   self.option_method_temp_gradient,
+                                                   self.option_flux_gradient,
                                                    custom_logic=partial(
-                                                       self.option_method_temp_gradient.check_linked_value, 1))
+                                                       self.option_flux_gradient.check_linked_value, 0),
+                                                   check_on_visibility_change=True)
         self.show_option_under_multiple_conditions(self.option_temp_gradient,
-                                                   self.option_method_temp_gradient,
+                                                   self.option_flux_gradient,
                                                    custom_logic=partial(
-                                                       self.option_method_temp_gradient.check_linked_value, 2))
+                                                       self.option_flux_gradient.check_linked_value, 1),
+                                                   check_on_visibility_change=True)
 
         self.show_option_under_multiple_conditions([self.option_len_peak_heating, self.option_len_peak_cooling],
                                                    [self.aim_optimize, self.option_temperature_profile_hourly,
@@ -1530,10 +1534,10 @@ class GUI(GuiStructure):
                                                    check_on_visibility_change=True)
 
         self.show_option_under_multiple_conditions(self.results_ground_temperature,
-                                                   self.option_method_temp_gradient,
+                                                   self.option_source_ground_temperature,
                                                    functions_check_for_or=[
-                                                       partial(self.option_method_temp_gradient.check_linked_value, 1),
-                                                       partial(self.option_method_temp_gradient.check_linked_value, 2)
+                                                       partial(self.option_source_ground_temperature.check_linked_value, 1),
+                                                       partial(self.option_source_ground_temperature.check_linked_value, 2)
                                                    ],
                                                    check_on_visibility_change=True)
 
@@ -1580,7 +1584,7 @@ class GUI(GuiStructure):
         if not self.started:
             return
         if self.category_pipe_data.is_hidden():
-            return
+            return  # pragma: no cover
 
         def Upipe():
             n_u: int = self.option_pipe_number.get_value()  # get number of U pipes
@@ -2025,6 +2029,11 @@ class GUI(GuiStructure):
         except:
             pass
 
+    def translate(self, index: int, translation: Translations) -> None:
+        # so that the labels are updated.
+        super().translate(index, translation)
+        self._update_selected_ground_temperature_from_database()
+
     def _update_selected_ground_temperature_from_database(self) -> None:
         """
         This function updates the hint for the ground database.
@@ -2034,10 +2043,11 @@ class GUI(GuiStructure):
         None
         """
         try:
-            self.hint_ground_database.set_text_value(LIST_OF_COUNTRIES[self.option_ground_database.get_value()[0]])
+            temperature, flux = DATASET[self.option_ground_database.get_value()[1]]
+            self.hint_ground_database.set_text_value(temperature)
+            self.hint_ground_flux_database.set_text_value(flux)
         except:   # pragma: no cover
             pass
-
 
 def show_option_on_multiple_aims(first_aims: list[Aim], second_aims: list[Aim], option: Option):
     def show_hide():

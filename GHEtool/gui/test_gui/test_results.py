@@ -120,7 +120,7 @@ def test_temp_profile_ground_data(qtbot):
     gs.option_heat_capacity.set_value(heat_cap)
     gs.option_ground_temp.set_value(ground_temp)
     gs.option_depth.set_value(depth)
-    gs.option_method_temp_gradient.set_value(0)
+    gs.option_source_ground_temperature.set_value(0)
     gs.option_constant_rb.set_value(r_b)
 
     gd = GroundConstantTemperature(k_s, ground_temp, heat_cap * 1_000)
@@ -166,7 +166,8 @@ def test_temp_profile_temp_gradient(qtbot):
     borefield = create_borefield(gs)
 
     gs.option_temp_gradient.set_value(gradient)
-    gs.option_method_temp_gradient.set_value(2)
+    gs.option_source_ground_temperature.set_value(2)
+    gs.option_flux_gradient.set_value(1)
     gs.option_ground_temp_gradient.set_value(ground_temp)
     main_window.save_scenario()
 
@@ -185,7 +186,7 @@ def test_temp_profile_temp_gradient(qtbot):
     flux = round_down(gradient * k_s / 100, 2)
 
     gs.option_temp_gradient.set_value(gradient)
-    gs.option_method_temp_gradient.set_value(1)
+    gs.option_flux_gradient.set_value(0)
     gs.option_ground_heat_flux.set_value(flux)
     main_window.save_scenario()
 
@@ -200,7 +201,6 @@ def test_temp_profile_temp_gradient(qtbot):
     assert func.func == borefield_gui.calculate_temperatures
     assert func.args == (depth,)
     assert func.keywords == {}
-
 
 
 def test_borefield_shapes(qtbot):
@@ -466,8 +466,9 @@ def test_sizing_L2_L3_min_max(qtbot) -> None:
                              data_2_results_function=data_2_borefield)
 
     gs = main_window.gui_structure
+    gs.option_source_ground_temperature.set_value(0)
 
-    for L2 in [0,1]:
+    for L2 in [0, 1]:
         min_temp = round_down(gs.option_min_temp.get_value() - 2, 2)
         ground_temp = round_down(gs.option_ground_temp.get_value() * 1.12, 2)
         max_temp = round_down(gs.option_max_temp.get_value() + 2, 2)
@@ -655,10 +656,11 @@ def test_coaxial_and_gradient(qtbot):
                              data_2_results_function=data_2_borefield)
 
     gs = main_window.gui_structure
+    gs.option_source_ground_temperature.set_value(2)
 
     gs.option_method_rb_calc.set_value(1)
     gs.option_U_pipe_or_coaxial_pipe.set_value(1)
-    gs.option_method_temp_gradient.set_value(2)
+    gs.option_flux_gradient.set_value(1)
     main_window.save_scenario()
     main_window.start_current_scenario_calculation()
     thread = main_window.threads[-1]
@@ -670,7 +672,7 @@ def test_coaxial_and_gradient(qtbot):
     assert gs.result_Rb_calculated.label.text() == 'Equivalent borehole thermal resistance: 0.0984 mK/W'
     assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 16.55 °C'
 
-    gs.option_method_temp_gradient.set_value(1)
+    gs.option_flux_gradient.set_value(0)
     main_window.save_scenario()
     main_window.start_current_scenario_calculation()
     thread = main_window.threads[-1]
@@ -690,8 +692,10 @@ def test_ground_selector(qtbot):
                              data_2_results_function=data_2_borefield)
 
     gs = main_window.gui_structure
+    gs.option_method_rb_calc.set_value(0)
 
-    gs.option_method_temp_gradient.set_value(2)
+    gs.option_source_ground_temperature.set_value(2)
+    gs.option_flux_gradient.set_value(1)
     main_window.save_scenario()
     main_window.start_current_scenario_calculation()
     thread = main_window.threads[-1]
@@ -703,7 +707,7 @@ def test_ground_selector(qtbot):
     assert gs.results_ground_temperature.label.text() == 'Average ground temperature: 11.5 °C'
     assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 16.14 °C'
 
-    gs.option_use_ground_database.set_value(1)
+    gs.option_source_ground_temperature.set_value(1)
     main_window.save_scenario()
     main_window.start_current_scenario_calculation()
     thread = main_window.threads[-1]
@@ -711,8 +715,8 @@ def test_ground_selector(qtbot):
     assert thread.calculated
 
     main_window.display_results()
-    assert gs.results_ground_temperature.label.text() == 'Average ground temperature: 15.7 °C'
-    assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 20.34 °C'
+    assert gs.results_ground_temperature.label.text() == 'Average ground temperature: 12.17 °C'
+    assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 16.81 °C'
 
     gs.option_ground_database.set_value(1)
     main_window.save_scenario()
@@ -722,19 +726,8 @@ def test_ground_selector(qtbot):
     assert thread.calculated
 
     main_window.display_results()
-    assert gs.results_ground_temperature.label.text() == 'Average ground temperature: 10.5 °C'
-    assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 15.14 °C'
-
-    gs.option_method_temp_gradient.set_value(1)
-    main_window.save_scenario()
-    main_window.start_current_scenario_calculation()
-    thread = main_window.threads[-1]
-    thread.run()
-    assert thread.calculated
-
-    main_window.display_results()
-    assert gs.results_ground_temperature.label.text() == 'Average ground temperature: 11.0 °C'
-    assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 15.64 °C'
+    assert gs.results_ground_temperature.label.text() == 'Average ground temperature: 13.07 °C'
+    assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 17.71 °C'
 
 
 def test_fluid_selector(qtbot):
@@ -745,6 +738,7 @@ def test_fluid_selector(qtbot):
                              data_2_results_function=data_2_borefield)
 
     gs = main_window.gui_structure
+    gs.option_source_ground_temperature.set_value(0)
 
     gs.option_method_rb_calc.set_value(1)
     main_window.save_scenario()

@@ -27,6 +27,8 @@ def setup(qtbot):
     main_window.save_scenario()
 
     gs = main_window.gui_structure
+    gs.option_method_rb_calc.set_value(0)
+    gs.option_source_ground_temperature.set_value(0)
     return main_window, gs
 
 
@@ -53,56 +55,79 @@ def test_visibility_hourly_profile(qtbot):
 def test_visibility_non_constant_temperature(qtbot):
 
     main_window, gs = setup(qtbot)
-    assert not gs.option_ground_temp.is_hidden()
-    assert gs.option_ground_temp_gradient.is_hidden()
-    assert gs.option_ground_heat_flux.is_hidden()
-    assert gs.option_temp_gradient.is_hidden()
-    assert gs.option_use_ground_database.is_hidden()
-    assert gs.option_ground_database.is_hidden()
-    assert gs.hint_ground_database.is_hidden()
 
+    def check(value: int):
+        assert not gs.option_source_ground_temperature.is_hidden()
+        if value == 0:
+            assert not gs.option_ground_temp.is_hidden()
+            assert gs.option_ground_temp_gradient.is_hidden()
+            assert gs.option_ground_heat_flux.is_hidden()
+            assert gs.option_temp_gradient.is_hidden()
+            assert gs.option_ground_database.is_hidden()
+            assert gs.hint_ground_database.is_hidden()
+            assert gs.hint_ground_flux_database.is_hidden()
+            return
+        if value == 1:
+            assert gs.option_ground_temp.is_hidden()
+            assert gs.option_ground_temp_gradient.is_hidden()
+            assert gs.option_ground_heat_flux.is_hidden()
+            assert gs.option_temp_gradient.is_hidden()
+            assert not gs.option_ground_database.is_hidden()
+            assert not gs.hint_ground_database.is_hidden()
+            assert not gs.hint_ground_flux_database.is_hidden()
+            return
+        if value == 2:
+            assert gs.option_ground_temp.is_hidden()
+            assert not gs.option_ground_temp_gradient.is_hidden()
+            assert not gs.option_ground_heat_flux.is_hidden()
+            assert gs.option_temp_gradient.is_hidden()
+            assert gs.option_ground_database.is_hidden()
+            assert gs.hint_ground_database.is_hidden()
+            assert gs.hint_ground_flux_database.is_hidden()
+            return
+
+        assert gs.option_ground_temp.is_hidden()
+        assert not gs.option_ground_temp_gradient.is_hidden()
+        assert gs.option_ground_heat_flux.is_hidden()
+        assert not gs.option_temp_gradient.is_hidden()
+        assert gs.option_ground_database.is_hidden()
+        assert gs.hint_ground_database.is_hidden()
+        assert gs.hint_ground_flux_database.is_hidden()
+        return
+
+    check(0)
     main_window.save_scenario()
 
     main_window.add_scenario()
-    gs.option_method_temp_gradient.set_value(1)
-    assert gs.option_ground_temp.is_hidden()
-    assert not gs.option_ground_temp_gradient.is_hidden()
-    assert not gs.option_ground_heat_flux.is_hidden()
-    assert gs.option_temp_gradient.is_hidden()
-    assert not gs.option_use_ground_database.is_hidden()
-
+    gs.option_source_ground_temperature.set_value(1)
+    check(1)
     main_window.save_scenario()
 
     main_window.add_scenario()
-    gs.option_method_temp_gradient.set_value(2)
-    assert gs.option_ground_temp.is_hidden()
-    assert not gs.option_ground_temp_gradient.is_hidden()
-    assert gs.option_ground_heat_flux.is_hidden()
-    assert not gs.option_temp_gradient.is_hidden()
-    assert not gs.option_use_ground_database.is_hidden()
+    gs.option_source_ground_temperature.set_value(2)
+    check(2)
     main_window.save_scenario()
 
     main_window.add_scenario()
-    gs.option_use_ground_database.set_value(1)
-    assert gs.option_ground_temp.is_hidden()
-    assert gs.option_ground_temp_gradient.is_hidden()
-    assert gs.option_ground_heat_flux.is_hidden()
-    assert not gs.option_temp_gradient.is_hidden()
-    assert not gs.option_use_ground_database.is_hidden()
-    assert not gs.option_ground_database.is_hidden()
-    assert not gs.hint_ground_database.is_hidden()
-    assert gs.hint_ground_database.label.text() == "The ground temperature at the selected location is: 14.2 °C"
-    gs.option_ground_database.set_value(1)
-    assert gs.hint_ground_database.label.text() == "The ground temperature at the selected location is: 9.0 °C"
+    gs.option_flux_gradient.set_value(1)
+    check(3)
+
+    main_window.save_scenario()
 
     main_window.change_scenario(0)
-    assert not gs.option_ground_temp.is_hidden()
-    assert gs.option_ground_temp_gradient.is_hidden()
-    assert gs.option_ground_heat_flux.is_hidden()
-    assert gs.option_temp_gradient.is_hidden()
-    assert gs.option_use_ground_database.is_hidden()
-    assert gs.option_ground_database.is_hidden()
-    assert gs.hint_ground_database.is_hidden()
+    check(0)
+
+    main_window.change_scenario(1)
+    assert gs.hint_ground_database.label.text() == "The ground temperature at the selected location is: 9.5 °C"
+    assert gs.hint_ground_flux_database.label.text() == "The geothermal heat flux at the selected location is: 0.08 W/m²"
+    gs.option_ground_database.set_value(1)
+    assert gs.hint_ground_database.label.text() == "The ground temperature at the selected location is: 10.4 °C"
+    assert gs.hint_ground_flux_database.label.text() == "The geothermal heat flux at the selected location is: 0.08 W/m²"
+    check(1)
+    main_window.change_scenario(2)
+    check(2)
+    main_window.change_scenario(3)
+    check(3)
 
 
 def test_visibility_peak_length(qtbot):
@@ -167,7 +192,9 @@ def test_visibility_rb(qtbot):
 def test_visibility_rb_autosave(qtbot):
     main_window, gs = setup(qtbot)
 
+    main_window.save_scenario()  # needed in ScenarioGUI v0.3.0.2 due to a bug (issue 144)
     gs.option_auto_saving.set_value(1)
+    gs.option_method_rb_calc.set_value(0)
 
     assert not gs.category_constant_rb.is_hidden()
     assert gs.category_fluid_data.is_hidden()
@@ -334,7 +361,7 @@ def test_visibility_on_result_page(qtbot):
     This function tests options on the result page for their visibility.
     This is done by creating multiple scenario's, calculating all of them and then checking the visibility.
 
-    These scenario's are:
+    These scenarios are:
     1) default
     2) default + flux
     3) default + gradient
@@ -348,6 +375,7 @@ def test_visibility_on_result_page(qtbot):
     main_window, gs = setup(qtbot)
     main_window.delete_backup()
     main_window, gs = setup(qtbot)
+    gs.option_source_ground_temperature
 
     # gs.option_auto_saving.set_value(1)
     gs.option_filename.set_value(f'{FOLDER}/Examples/hourly_profile.csv')
@@ -356,15 +384,15 @@ def test_visibility_on_result_page(qtbot):
     # scenario 2
     main_window.save_scenario()
     main_window.add_scenario()
-    gs.option_method_temp_gradient.set_value(1)
+    gs.option_source_ground_temperature.set_value(2)
     # scenario 3
     main_window.save_scenario()
     main_window.add_scenario()
-    gs.option_method_temp_gradient.set_value(2)
+    gs.option_flux_gradient.set_value(1)
     # scenario 4
     main_window.save_scenario()
     main_window.add_scenario()
-    gs.option_method_temp_gradient.set_value(0)
+    gs.option_source_ground_temperature.set_value(0)
     gs.option_method_rb_calc.set_value(1)
     # scenario 5
     main_window.save_scenario()

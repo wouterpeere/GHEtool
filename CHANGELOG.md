@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file. For future 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [2.2.0] - summer 2023
+## [2.2.0] - 2023-10-10
 
 ## Added
 - Extra warning message if one wants to load a GHEtool file that was created with a newer version.
@@ -20,7 +20,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added domestic hot water (DHW) to GHEtool (issue #172).
 - Glycol-water mixtures can now be selected from within the GUI (issue #174).
 - Pygfunction media object can be imported into the FluidData object in GHEtool (issue #174).
-- Temperature database (Europe) based on data from (Xing, 2014) (issue #178).
+- Temperature and flux database (Europe) implemented (issue #178).
+- Yearly heating/cooling load in LoadClass (issue #180).
 
 ## Changed
 - GUI was moved to a separate project: [ScenarioGUI](https://github.com/tblanke/ScenarioGUI).
@@ -48,6 +49,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Small bug in faster g-function calculation solved. When changing the borefield, the previously calculated g-functions where not removed.
 - When using interpolation for the g-functions, the results could vary a little bit based on the previous sizings. By reinstating the H_init parameter, this is solved.
 - Borehole internals can no longer overlap in the GUI.
+- Optimise load profile crashes with small borefields (issue #180).
 
 
 ## [2.1.2] - 2023-04-28

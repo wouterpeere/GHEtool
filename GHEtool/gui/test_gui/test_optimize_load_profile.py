@@ -21,8 +21,10 @@ def test_building_load(qtbot):
     main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
     main_window.delete_backup()
     main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window.gui_structure.option_method_rb_calc.set_value(0)
     main_window.gui_structure.option_decimal_csv.set_value(0)
     main_window.gui_structure.option_seperator_csv.set_value(0)
+    main_window.gui_structure.option_source_ground_temperature.set_value(0)
 
     main_window.gui_structure.option_filename.set_value(f'{FOLDER}/Examples/hourly_profile.csv')
     main_window.gui_structure.fun_update_combo_box_data_file(f'{FOLDER}/Examples/hourly_profile.csv')
@@ -52,21 +54,22 @@ def test_building_load(qtbot):
     # check if the data is the same, because optimize load profile needs the building, not the ground data
     assert np.allclose(main_window.list_ds[0].results._building_load.hourly_cooling_load, peak_cooling)
     assert np.allclose(main_window.list_ds[0].results._building_load.hourly_heating_load, peak_heating)
+    assert main_window.list_ds[0].results._building_load.simulation_period == 40
 
     # check if the resultTexts are correct
     gs = main_window.gui_structure
     main_window.display_results()
 
-    assert gs.results_heating_load.label.text() == "Heating load on the borefield: 566750.0 kWh"
-    assert gs.results_heating_peak_geo.label.text() == "with a peak of: 310.29 kW"
-    assert gs.results_heating_load_percentage.label.text() == "This is 88.14 % of the heating load"
-    assert gs.results_heating_ext.label.text() == "Heating load external: 76267.0 kWh"
-    assert gs.results_heating_peak.label.text() == "with a peak of: 225.75 kW"
-    assert gs.results_cooling_load.label.text() == "Cooling load on the borefield: 173773.0 kWh"
-    assert gs.results_cooling_peak_geo.label.text() == "with a peak of: 121.57 kW"
-    assert gs.results_cooling_load_percentage.label.text() == "This is 64.9 % of the cooling load"
-    assert gs.results_cooling_ext.label.text() == "Cooling load external: 93971.0 kWh"
-    assert gs.results_cooling_peak.label.text() == "with a peak of: 554.85 kW"
+    assert gs.results_heating_load.label.text() == "Heating load on the borefield: 530633.0 kWh"
+    assert gs.results_heating_peak_geo.label.text() == "with a peak of: 274.35 kW"
+    assert gs.results_heating_load_percentage.label.text() == "This is 82.52 % of the heating load"
+    assert gs.results_heating_ext.label.text() == "Heating load external: 112385.0 kWh"
+    assert gs.results_heating_peak.label.text() == "with a peak of: 261.69 kW"
+    assert gs.results_cooling_load.label.text() == "Cooling load on the borefield: 172688.0 kWh"
+    assert gs.results_cooling_peak_geo.label.text() == "with a peak of: 120.17 kW"
+    assert gs.results_cooling_load_percentage.label.text() == "This is 64.5 % of the cooling load"
+    assert gs.results_cooling_ext.label.text() == "Cooling load external: 95056.0 kWh"
+    assert gs.results_cooling_peak.label.text() == "with a peak of: 556.25 kW"
 
     # calculate with geothermal load
     main_window.gui_structure.aim_temp_profile.widget.click()

@@ -213,3 +213,9 @@ def test_dhw():
     assert load.imbalance == -8760*10
     load.all_months_equal = False
     assert np.array_equal(np.array([7440., 6720., 7440., 7200., 7440., 7200., 7440., 7440., 7200., 7440., 7200., 7440.]), load.baseload_heating)
+
+
+def test_yearly_heating_cooling():
+    load = MonthlyGeothermalLoadAbsolute(*load_case(2))
+    assert load.yearly_heating_load == 160000
+    assert load.yearly_cooling_load == 240000
