@@ -1743,13 +1743,13 @@ class Translations:  # pragma: no cover
             "Hourly profile, No , Yes",
         ]
         self.figure_load_duration: List[str] = [
-            "Load-duration curve, Power [kW], Time [hours]",
+            "Load-duration curve (geothermal), Power [kW], Time [hours]",
             "Jahresdauerlinie, Leistung [kW], Zeit [Stunden]",
-            "Belastings-duurcurve, Vermogen [kW], Tijd [jaar]",
-            "Load-duration curve, Power [kW], Time [hours]",
-            "Load-duration curve, Power [kW], Time [hours]",
-            "Load-duration curve, Power [kW], Time [hours]",
-            "Load-duration curve, Power [kW], Time [hours]",
+            "Belastings-duurcurve (geothermisch), Vermogen [kW], Tijd [jaar]",
+            "Load-duration curve (geothermal), Power [kW], Time [hours]",
+            "Load-duration curve (geothermal), Power [kW], Time [hours]",
+            "Load-duration curve (geothermal), Power [kW], Time [hours]",
+            "Load-duration curve (geothermal), Power [kW], Time [hours]",
         ]
         self.legend_figure_load_duration: List[str] = [
             "Show legend?, No , Yes ",
