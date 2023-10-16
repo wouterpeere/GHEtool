@@ -76,9 +76,9 @@ jobs:
   test_examples:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python 3.11
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: '3.11'
       - name: Install dependencies
@@ -90,7 +90,7 @@ jobs:
       - name: Test with pytest
         run: pytest GHEtool/test/test_examples.py --cov=./ --cov-report=xml
       - name: Upload Coverage to Codecov
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           files: ./coverage.xml
           token: 8e6f48b5-8534-4f9a-894b-0a2d226dab26 # not required for public repos
@@ -98,9 +98,9 @@ jobs:
   test_validation:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python 3.11
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: '3.11'
       - name: Install dependencies
@@ -112,7 +112,7 @@ jobs:
       - name: Test with pytest
         run: pytest GHEtool/test/test_validation.py --cov=./ --cov-report=xml
       - name: Upload Coverage to Codecov
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           files: ./coverage.xml
           token: 8e6f48b5-8534-4f9a-894b-0a2d226dab26 # not required for public repos
@@ -125,9 +125,9 @@ jobs:
         python-version: ['3.8', '3.9', '3.10', '3.11']
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
@@ -140,7 +140,7 @@ jobs:
     - name: Test with pytest
       run: pytest GHEtool/test/unit-tests --cov=./ --cov-report=xml
     - name: Upload Coverage to Codecov
-      uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v3
       with:
         files: ./coverage.xml
         token: 8e6f48b5-8534-4f9a-894b-0a2d226dab26 # not required for public repos
