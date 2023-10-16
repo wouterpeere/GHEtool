@@ -331,7 +331,7 @@ def test_visibility_SCOP(qtbot):
 
     gs.aim_optimize.widget.click()
     visible()
-
+    gs.aim_temp_profile.widget.click()
     main_window.save_scenario()
     main_window.change_scenario(0)
     visible()
@@ -377,7 +377,7 @@ def test_visibility_on_result_page(qtbot):
     main_window, gs = setup(qtbot)
     main_window.delete_backup()
     main_window, gs = setup(qtbot)
-    gs.option_source_ground_temperature
+    # gs.option_source_ground_temperature
 
     # gs.option_auto_saving.set_value(1)
     gs.option_filename.set_value(f'{FOLDER}/Examples/hourly_profile.csv')
