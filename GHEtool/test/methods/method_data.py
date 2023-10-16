@@ -377,7 +377,7 @@ borefield.set_min_avg_fluid_temperature(3)
 borefield.set_max_avg_fluid_temperature(16)
 borefield.set_length_peak(6)
 load = HourlyGeothermalLoad()
-load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/problem_data.csv"), col_heating=0, col_cooling=1, header=True, decimal_seperator=',')
+load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\problem_data.csv"), col_heating=0, col_cooling=1, header=True, decimal_seperator=',')
 load.simulation_period = 40
 borefield.load = load
 
