@@ -91,7 +91,14 @@ class MainWindow(MainWindow):
             logging.info(self.translations.no_file_selected[self.gui_structure.option_language.get_value()[0]])
             return False
             # raise ImportError("The datafile cannot be loaded!")
-        except (JSONDecodeError, UnicodeDecodeError):
+        except (JSONDecodeError, UnicodeDecodeError) as e:
+            if 'Expecting' in str(e):
+                globs.LOGGER.warning('The back-up file has been corrupted! And will hence be overwritten.')
+                # change language to english
+                self.change_language()
+                # add a first scenario
+                self.add_scenario()
+                return False
             # try to open as pickle
             globs.LOGGER.warning('One cannot open a GHEtool v2.1.0 file!')
             return False
