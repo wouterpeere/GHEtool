@@ -18,6 +18,7 @@ load_config(Path(__file__).parent.joinpath("gui_config.ini"))
 
 sys.setrecursionlimit(1500)
 
+
 def setup(qtbot):
     main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
                              data_2_results_function=data_2_borefield)
@@ -124,6 +125,7 @@ def test_visibility_non_constant_temperature(qtbot):
     assert gs.hint_ground_database.label.text() == "The ground temperature at the selected location is: 10.4 °C"
     assert gs.hint_ground_flux_database.label.text() == "The geothermal heat flux at the selected location is: 0.08 W/m²"
     check(1)
+    main_window.save_scenario()
     main_window.change_scenario(2)
     check(2)
     main_window.change_scenario(3)
