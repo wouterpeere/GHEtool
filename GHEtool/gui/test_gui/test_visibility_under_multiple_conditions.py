@@ -377,12 +377,9 @@ def test_visibility_on_result_page(qtbot):
     main_window, gs = setup(qtbot)
     main_window.delete_backup()
     main_window, gs = setup(qtbot)
-    # gs.option_source_ground_temperature
 
-    # gs.option_auto_saving.set_value(1)
     gs.option_filename.set_value(f'{FOLDER}/Examples/hourly_profile.csv')
 
-    # main_window.add_scenario()
     # scenario 2
     main_window.save_scenario()
     main_window.add_scenario()
