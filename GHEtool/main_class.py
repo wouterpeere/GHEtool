@@ -1982,8 +1982,8 @@ class Borefield(BaseClass):
 
         while not cool_ok or not heat_ok:
             # limit the primary geothermal heating and cooling load to peak_heat_load_geo and peak_cool_load_geo
-            self.load.set_hourly_cooling(np.minimum(np.maximum(0, peak_cool_load_geo), primary_geothermal_load.hourly_cooling_load))
-            self.load.set_hourly_heating(np.minimum(np.maximum(0, peak_heat_load_geo), primary_geothermal_load.hourly_heating_load))
+            self.load.set_hourly_cooling(np.minimum(peak_cool_load_geo, primary_geothermal_load.hourly_cooling_load))
+            self.load.set_hourly_heating(np.minimum(peak_heat_load_geo, primary_geothermal_load.hourly_heating_load))
 
             # calculate temperature profile, just for the results
             self.calculate_temperatures(depth=depth)
@@ -1993,7 +1993,8 @@ class Borefield(BaseClass):
 
                 # check if it goes below the threshold
                 if min(self.results.peak_heating) < self.Tf_min:
-                    peak_heat_load_geo -= 1 * max(1, 10 * (self.Tf_min - min(self.results.peak_heating)))
+                    peak_heat_load_geo = max(0.1,
+                                             peak_heat_load_geo - 1 * max(1, 10 * (self.Tf_min - min(self.results.peak_heating))))
                 else:
                     peak_heat_load_geo = min(init_peak_heating, peak_heat_load_geo * 1.01)
                     if peak_heat_load_geo == init_peak_heating:
@@ -2006,7 +2007,8 @@ class Borefield(BaseClass):
 
                 # check if it goes above the threshold
                 if np.max(self.results.peak_cooling) > self.Tf_max:
-                    peak_cool_load_geo -= 1 * max(1, 10 * (-self.Tf_max + np.max(self.results.peak_cooling)))
+                    peak_cool_load_geo = max(0.1,
+                                             peak_cool_load_geo - 1 * max(1, 10 * (-self.Tf_max + np.max(self.results.peak_cooling))))
                 else:
                     peak_cool_load_geo = min(init_peak_cooling, peak_cool_load_geo * 1.01)
                     if peak_cool_load_geo == init_peak_cooling:
