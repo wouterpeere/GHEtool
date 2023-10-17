@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file. For future 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [2.2.0] - 2023-10-10
+## [2.2.0] - 2023-10-17
 
 ## Added
 - Extra warning message if one wants to load a GHEtool file that was created with a newer version.
