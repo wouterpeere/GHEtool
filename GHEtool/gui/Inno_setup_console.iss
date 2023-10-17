@@ -6,7 +6,7 @@
 #define MyAppVersion "2.2.0"
 #define MyAppPublisher "Enead BV"
 #define MyAppURL "https://github.com/wouterpeere/GHEtool"
-#define MyAppExeName "GHEtool_with_command_line.exe"
+#define MyAppExeName "GHEtool Community.exe"
 #define MyAppAssocName MyAppName + "-file"
 #define MyAppAssocExt ".GHEtool"
 #define MyAppAssocKey StringChange(MyAppAssocName, " ", "") + MyAppAssocExt
