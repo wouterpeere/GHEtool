@@ -14,7 +14,7 @@ def test_load_hourly_data():
     assert np.array_equal(load.hourly_cooling_load, load1.hourly_heating_load)
     assert np.array_equal(load.hourly_heating_load, load1.hourly_cooling_load)
     load2 = HourlyGeothermalLoad()
-    load2.load_hourly_profile(FOLDER.joinpath("test/methods/hourly data/hourly_profile_without_header.csv"), header=False)
+    load2.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile_without_header.csv"), header=False)
     assert np.array_equal(load.hourly_cooling_load, load2.hourly_cooling_load)
     assert np.array_equal(load.hourly_heating_load, load2.hourly_heating_load)
 

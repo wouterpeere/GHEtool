@@ -5,25 +5,20 @@ import sys
 from pathlib import Path
 
 import numpy as np
-import PySide6.QtWidgets as QtW
 
-from GHEtool import Borefield, FOLDER
-from GHEtool.gui.data_2_borefield_func import data_2_borefield
-from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
-from GHEtool.gui.gui_classes.translation_class import Translations
-from GHEtool.gui.gui_structure import GUI
+from GHEtool import FOLDER
 from ScenarioGUI import load_config
+
+from GHEtool.gui.test_gui.starting_closing_tests import start_tests, close_tests
 
 load_config(Path(__file__).parent.joinpath("gui_config.ini"))
 
 sys.setrecursionlimit(1500)
 
+
 def setup(qtbot):
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
+    # init gui window
+    main_window = start_tests(qtbot)
     main_window.save_scenario()
 
     gs = main_window.gui_structure
@@ -50,6 +45,7 @@ def test_visibility_hourly_profile(qtbot):
     main_window.change_scenario(0)
     assert not gs.option_temperature_profile_hourly.is_hidden()
     assert gs.option_method_size_depth.is_hidden()
+    close_tests(main_window, qtbot)
 
 
 def test_visibility_non_constant_temperature(qtbot):
@@ -124,10 +120,12 @@ def test_visibility_non_constant_temperature(qtbot):
     assert gs.hint_ground_database.label.text() == "The ground temperature at the selected location is: 10.4 °C"
     assert gs.hint_ground_flux_database.label.text() == "The geothermal heat flux at the selected location is: 0.08 W/m²"
     check(1)
+    main_window.save_scenario()
     main_window.change_scenario(2)
     check(2)
     main_window.change_scenario(3)
     check(3)
+    close_tests(main_window, qtbot)
 
 
 def test_visibility_peak_length(qtbot):
@@ -165,6 +163,7 @@ def test_visibility_peak_length(qtbot):
     visible()
     main_window.change_scenario(1)
     invisible()
+    close_tests(main_window, qtbot)
 
 
 def test_visibility_rb(qtbot):
@@ -187,6 +186,7 @@ def test_visibility_rb(qtbot):
     assert not gs.category_constant_rb.is_hidden()
     assert gs.category_fluid_data.is_hidden()
     assert gs.category_pipe_data.is_hidden()
+    close_tests(main_window, qtbot)
 
 
 def test_visibility_rb_autosave(qtbot):
@@ -210,6 +210,7 @@ def test_visibility_rb_autosave(qtbot):
     assert not gs.category_constant_rb.is_hidden()
     assert gs.category_fluid_data.is_hidden()
     assert gs.category_pipe_data.is_hidden()
+    close_tests(main_window, qtbot)
 
 
 def test_visibility_pipe_options(qtbot):
@@ -261,6 +262,7 @@ def test_visibility_pipe_options(qtbot):
     assert gs.option_pipe_outer_radius.is_hidden()
     assert gs.option_pipe_number.is_hidden()
     assert gs.option_pipe_distance.is_hidden()
+    close_tests(main_window, qtbot)
 
 
 def test_visibility_load(qtbot):
@@ -301,6 +303,7 @@ def test_visibility_load(qtbot):
     invisible()
     gs.aim_req_depth.widget.click()
     invisible()
+    close_tests(main_window, qtbot)
 
 
 def test_visibility_SCOP(qtbot):
@@ -329,10 +332,11 @@ def test_visibility_SCOP(qtbot):
 
     gs.aim_optimize.widget.click()
     visible()
-
+    gs.aim_temp_profile.widget.click()
     main_window.save_scenario()
     main_window.change_scenario(0)
     visible()
+    close_tests(main_window, qtbot)
 
 
 def test_visibility_dhw(qtbot):
@@ -354,6 +358,7 @@ def test_visibility_dhw(qtbot):
     gs.aim_optimize.widget.click()
     assert gs.DHW.is_hidden()
     assert gs.SCOP_DHW.is_hidden()
+    close_tests(main_window, qtbot)
 
 
 def test_visibility_on_result_page(qtbot):
@@ -373,14 +378,9 @@ def test_visibility_on_result_page(qtbot):
 
     """
     main_window, gs = setup(qtbot)
-    main_window.delete_backup()
-    main_window, gs = setup(qtbot)
-    gs.option_source_ground_temperature
 
-    # gs.option_auto_saving.set_value(1)
     gs.option_filename.set_value(f'{FOLDER}/Examples/hourly_profile.csv')
 
-    # main_window.add_scenario()
     # scenario 2
     main_window.save_scenario()
     main_window.add_scenario()
@@ -542,3 +542,4 @@ def test_visibility_on_result_page(qtbot):
     assert gs.max_temp.is_hidden()
     assert gs.min_temp.is_hidden()
     assert gs.results_ground_temperature.is_hidden()
+    close_tests(main_window, qtbot)

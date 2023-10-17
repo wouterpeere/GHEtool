@@ -26,7 +26,7 @@ def validate():
     borefield.set_max_avg_fluid_temperature(17)
     borefield.set_min_avg_fluid_temperature(3)
     hourly_load = HourlyGeothermalLoad()
-    hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly data\\auditorium.csv"), header=True, separator=";",
+    hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True, separator=";",
                                   col_cooling=0, col_heating=1)
     borefield.load = hourly_load
 

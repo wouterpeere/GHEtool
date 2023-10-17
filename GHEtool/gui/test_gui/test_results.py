@@ -5,16 +5,15 @@ import sys
 from pathlib import Path
 
 import numpy as np
-import PySide6.QtWidgets as QtW
 import pandas as pd
 
 from GHEtool import Borefield, FOLDER, FluidData, GroundConstantTemperature, GroundFluxTemperature, GroundTemperatureGradient, MonthlyGeothermalLoadAbsolute, MultipleUTube
 from GHEtool.gui.data_2_borefield_func import data_2_borefield
-from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
-from GHEtool.gui.gui_classes.translation_class import Translations
-from GHEtool.gui.gui_structure import GUI, GuiStructure
+from GHEtool.gui.gui_structure import GuiStructure
 from ScenarioGUI import load_config
 import pygfunction as gt
+
+from GHEtool.gui.test_gui.starting_closing_tests import close_tests, start_tests
 
 load_config(Path(__file__).parent.joinpath("gui_config.ini"))
 
@@ -95,13 +94,9 @@ def test_temp_profile_ground_data(qtbot):
     # heat_cap: float = 2000
     # ground_temp: float = 12.
     # init gui window
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
+    main_window = start_tests(qtbot)
 
     main_window.save_scenario()
-    main_window.add_scenario()
 
     k_s = round_down(main_window.gui_structure.option_conductivity.get_value() * 1.5, 3)
     heat_cap = round_down(main_window.gui_structure.option_heat_capacity.get_value() * 1.5, 1)
@@ -136,6 +131,7 @@ def test_temp_profile_ground_data(qtbot):
     assert func.func == borefield_gui.calculate_temperatures
     assert func.args == (depth, )
     assert func.keywords == {}
+    close_tests(main_window, qtbot)
 
 
 def test_temp_profile_temp_gradient(qtbot):
@@ -144,10 +140,7 @@ def test_temp_profile_temp_gradient(qtbot):
     # heat_cap: float = 2000
     # ground_temp: float = 12.
     # init gui window
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
+    main_window = start_tests(qtbot)
 
     main_window.save_scenario()
     main_window.add_scenario()
@@ -201,14 +194,13 @@ def test_temp_profile_temp_gradient(qtbot):
     assert func.func == borefield_gui.calculate_temperatures
     assert func.args == (depth,)
     assert func.keywords == {}
+    close_tests(main_window, qtbot)
 
 
 def test_borefield_shapes(qtbot):
     tilt = 0
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
+    # init gui window
+    main_window = start_tests(qtbot)
 
     main_window.save_scenario()
     main_window.add_scenario()
@@ -280,12 +272,12 @@ def test_borefield_shapes(qtbot):
     boreholes = [gt.boreholes.Borehole(H, D, r_b, x=x, y=y) for x, y, H, D, r_b in values]
     check_borefield(borefield_gui.borefield, boreholes)
     qtbot.wait(10)
+    close_tests(main_window, qtbot)
 
 
 def test_import_borefield_data(qtbot):
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    # init gui window
+    main_window = start_tests(qtbot)
 
     main_window.gui_structure.borefield_file.set_value("file")
     main_window.gui_structure.import_borefield.button.click()
@@ -313,6 +305,7 @@ def test_import_borefield_data(qtbot):
         assert np.allclose(li_1, li_2)
 
     qtbot.wait(10)
+    close_tests(main_window, qtbot)
 
 
 def test_temp_profile_pipe_data(qtbot):
@@ -321,9 +314,7 @@ def test_temp_profile_pipe_data(qtbot):
     # heat_cap: float = 2000
     # ground_temp: float = 12.
     # init gui window
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window = start_tests(qtbot)
     main_window.save_scenario()
     main_window.add_scenario()
 
@@ -369,6 +360,7 @@ def test_temp_profile_pipe_data(qtbot):
     assert func.func == borefield_gui.calculate_temperatures
     assert func.args == (depth,)
     assert func.keywords == {}
+    close_tests(main_window, qtbot)
 
 
 def test_temp_profile_fluid_data(qtbot):
@@ -377,7 +369,7 @@ def test_temp_profile_fluid_data(qtbot):
     # heat_cap: float = 2000
     # ground_temp: float = 12.
     # init gui window
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window = start_tests(qtbot)
     main_window.save_scenario()
     main_window.add_scenario()
 
@@ -416,12 +408,11 @@ def test_temp_profile_fluid_data(qtbot):
     assert func.func == borefield_gui.calculate_temperatures
     assert func.args == (depth,)
     assert func.keywords == {}
+    close_tests(main_window, qtbot)
 
 def test_temp_profile_borefield_data(qtbot):
     # init gui window
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window = start_tests(qtbot)
 
     main_window.save_scenario()
     main_window.add_scenario()
@@ -456,14 +447,12 @@ def test_temp_profile_borefield_data(qtbot):
     assert func.func == borefield_gui.calculate_temperatures
     assert func.args == (gs.option_depth.get_value(),)
     assert func.keywords == {}
+    close_tests(main_window, qtbot)
 
 
 def test_sizing_L2_L3_min_max(qtbot) -> None:
     # init gui window
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
+    main_window = start_tests(qtbot)
 
     gs = main_window.gui_structure
     gs.option_source_ground_temperature.set_value(0)
@@ -501,14 +490,12 @@ def test_sizing_L2_L3_min_max(qtbot) -> None:
         assert func.func == borefield_gui.size
         assert func.args == ()
         assert func.keywords == {}
+    close_tests(main_window, qtbot)
 
 
 def test_temp_profile_period_peak_length(qtbot) -> None:
     # init gui window
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
+    main_window = start_tests(qtbot)
 
     main_window.save_scenario()
     main_window.add_scenario()
@@ -538,14 +525,12 @@ def test_temp_profile_period_peak_length(qtbot) -> None:
     assert func.func == borefield_gui.calculate_temperatures
     assert func.args == (gs.option_depth.get_value(), )
     assert func.keywords == {}
+    close_tests(main_window, qtbot)
 
 
 def test_temp_profile_heating_data(qtbot) -> None:
     # init gui window
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
+    main_window = start_tests(qtbot)
 
     factor = 1.12
     for delay in range(1, 10):
@@ -585,6 +570,7 @@ def test_temp_profile_heating_data(qtbot) -> None:
         assert func.func == borefield_gui.calculate_temperatures
         assert func.args == (gs.option_depth.get_value(),)
         assert func.keywords == {}
+    close_tests(main_window, qtbot)
 
 
 def test_temp_profile_cooling_data(qtbot) -> None:
@@ -602,10 +588,7 @@ def test_temp_profile_cooling_data(qtbot) -> None:
 
     """
     # init gui window
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
+    main_window = start_tests(qtbot)
 
     cool_peak = [0, 0, 34, 69, 133, 187, 213, 240, 160, 37, 0, 0]
 
@@ -646,14 +629,12 @@ def test_temp_profile_cooling_data(qtbot) -> None:
         assert func.func == borefield_gui.calculate_temperatures
         assert func.args == (g_s.option_depth.get_value(),)
         assert func.keywords == {}
+    close_tests(main_window, qtbot)
 
 
 def test_coaxial_and_gradient(qtbot):
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
+    # init gui window
+    main_window = start_tests(qtbot)
 
     gs = main_window.gui_structure
     gs.option_source_ground_temperature.set_value(2)
@@ -682,14 +663,12 @@ def test_coaxial_and_gradient(qtbot):
     main_window.display_results()
     assert gs.result_Rb_calculated.label.text() == 'Equivalent borehole thermal resistance: 0.0984 mK/W'
     assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 17.05 °C'
+    close_tests(main_window, qtbot)
 
 
 def test_ground_selector(qtbot):
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
+    # init gui window
+    main_window = start_tests(qtbot)
 
     gs = main_window.gui_structure
     gs.option_method_rb_calc.set_value(0)
@@ -728,14 +707,12 @@ def test_ground_selector(qtbot):
     main_window.display_results()
     assert gs.results_ground_temperature.label.text() == 'Average ground temperature: 13.07 °C'
     assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 17.71 °C'
+    close_tests(main_window, qtbot)
 
 
 def test_fluid_selector(qtbot):
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
+    # init gui window
+    main_window = start_tests(qtbot)
 
     gs = main_window.gui_structure
     gs.option_source_ground_temperature.set_value(0)
@@ -773,3 +750,4 @@ def test_fluid_selector(qtbot):
     main_window.display_results()
     assert gs.result_Rb_calculated.label.text() == 'Equivalent borehole thermal resistance: 0.0681 mK/W'
     assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 16.38 °C'
+    close_tests(main_window, qtbot)

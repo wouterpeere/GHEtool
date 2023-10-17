@@ -1,17 +1,15 @@
 import os
-from functools import partial
 from pathlib import Path
 from sys import setrecursionlimit
 
 import numpy as np
-import PySide6.QtWidgets as QtW
-from GHEtool import FOLDER, Borefield
+from GHEtool import FOLDER
 from GHEtool.gui.data_2_borefield_func import data_2_borefield
-from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
-from GHEtool.gui.gui_classes.translation_class import Translations
-from GHEtool.gui.gui_structure import GUI, load_data_GUI
+from GHEtool.gui.gui_structure import load_data_GUI
 from ScenarioGUI.gui_classes.gui_structure_classes import ListBox
 from pytest import raises
+
+from GHEtool.gui.test_gui.starting_closing_tests import close_tests, start_tests
 
 setrecursionlimit(1500)
 
@@ -32,15 +30,15 @@ def test_language(qtbot):
 
     main()
 
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
+    # init gui window
+    main_window = start_tests(qtbot)
 
     for idx, action in enumerate(main_window.menu_language.actions()):
         action.trigger()
         assert main_window.gui_structure.option_language.get_value()[0] == idx
 
     main_window.menu_language.actions()[0].trigger()
-    main_window.delete_backup()
+    close_tests(main_window, qtbot)
 
 
 def test_wrong_results_shown(qtbot):
@@ -53,9 +51,7 @@ def test_wrong_results_shown(qtbot):
         bot for the GUI
     """
     # init gui window
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window = start_tests(qtbot)
     main_window.show()
     main_window.gui_structure.option_method_rb_calc.set_value(0)
     main_window.gui_structure.option_decimal_csv.set_value(0)
@@ -114,6 +110,7 @@ def test_wrong_results_shown(qtbot):
     main_window.list_widget_scenario.setCurrentItem(main_window.list_widget_scenario.item(1))
     assert not main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
     assert not main_window.gui_structure.result_Rb_calculated.is_hidden()
+    close_tests(main_window, qtbot)
 
 
 def test_wrong_results_shown_2(qtbot):
@@ -126,9 +123,7 @@ def test_wrong_results_shown_2(qtbot):
         bot for the GUI
     """
     # init gui window
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window = start_tests(qtbot)
     main_window.add_scenario()
     assert main_window.gui_structure.option_temperature_profile_hourly.get_value() < 1
     assert main_window.gui_structure.option_method_size_depth.get_value() < 1
@@ -147,8 +142,8 @@ def test_wrong_results_shown_2(qtbot):
     assert main_window.gui_structure.hourly_figure_temperature_profile.is_hidden()
 
     main_window._save_to_data("hello/not_there.GHEtool")
-    assert main_window.status_bar.label.text() == main_window.translations.no_file_selected[
-        main_window.gui_structure.option_language.get_value()[0]]
+    assert main_window.status_bar.label.text() == main_window.translations.no_file_selected[main_window.gui_structure.option_language.get_value()[0]]
+    close_tests(main_window, qtbot)
 
 
 def test_backward_compatibility(qtbot):
@@ -163,28 +158,24 @@ def test_backward_compatibility(qtbot):
     import numpy as np
     from GHEtool import FOLDER
     # check results None works
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    # init gui window
+    main_window = start_tests(qtbot)
     main_window.save_scenario()
     main_window.load_backup()
     assert main_window.list_ds[0].results is None
     main_window._load_from_data("no_file")
     assert main_window.status_bar.label.text() == main_window.translations.no_file_selected[0]
+    close_tests(main_window, qtbot)
 
     # init gui window
-    main_window_old = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations,
-                                 result_creating_class=Borefield,
-                                 data_2_results_function=data_2_borefield)
+    main_window_old = start_tests(qtbot)
 
     # test cannot load old data
     assert not main_window_old._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_2_1_0.GHEtool')
 
     assert main_window_old._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_2_1_1.GHEtool')
     # init gui window
-    main_window_new = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations,
-                                 result_creating_class=Borefield,
-                                 data_2_results_function=data_2_borefield)
+    main_window_new = start_tests(qtbot)
     assert main_window_new._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_2_2_0.GHEtool')
     # check if the imported values are the same
     for ds_old, ds_new in zip(main_window_old.list_ds, main_window_new.list_ds):
@@ -201,11 +192,13 @@ def test_backward_compatibility(qtbot):
                 assert getattr(ds_old, option) == getattr(ds_new, option)
                 continue
 
-    # test error message for loading a file from a newer GHEtool version.
-    main_window_new = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                                 data_2_results_function=data_2_borefield)
+    # init gui window
+    close_tests(main_window_new, qtbot)
+    close_tests(main_window_old, qtbot)
+    main_window_new = start_tests(qtbot)
     main_window_new._load_from_data(f'{FOLDER}/gui/test_gui/test_file_version_999_1_1.GHEtool')
-    assert main_window.status_bar.label.text() == main_window.translations.cannot_load_new_version[0]
+    assert main_window_new.status_bar.label.text() == main_window_new.translations.cannot_load_new_version[0]
+    close_tests(main_window_new, qtbot)
 
 
 def test_datastorage(qtbot):
@@ -213,9 +206,7 @@ def test_datastorage(qtbot):
     tests the datastorage
     """
     # init gui window
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window = start_tests(qtbot)
     main_window.save_scenario()
     main_window.add_scenario()
     assert main_window.list_ds[0] != 2
@@ -227,6 +218,7 @@ def test_datastorage(qtbot):
     assert main_window.list_ds[0] == main_window.list_ds[1]
     main_window.list_ds[1].list_options_aims.append('no_real_option')
     assert main_window.list_ds[1] != main_window.list_ds[0]
+    close_tests(main_window, qtbot)
 
 
 def test_no_valid_value(qtbot) -> None:
@@ -239,7 +231,7 @@ def test_no_valid_value(qtbot) -> None:
         qtbot
     """
     # init gui window
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window = start_tests(qtbot)
     main_window.save_scenario()
     gs = main_window.gui_structure
     gs.aim_req_depth.widget.click() if not gs.aim_req_depth.widget.isChecked() else None
@@ -248,6 +240,7 @@ def test_no_valid_value(qtbot) -> None:
     assert not main_window.save_scenario()
     main_window.start_current_scenario_calculation()
     main_window.start_multiple_scenarios_calculation()
+    close_tests(main_window, qtbot)
 
 
 def test_value_error(qtbot) -> None:
@@ -260,9 +253,7 @@ def test_value_error(qtbot) -> None:
         qtbot
     """
     # init gui window
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window = start_tests(qtbot)
     gs = main_window.gui_structure
 
     gs.aim_temp_profile.widget.click() if not gs.aim_temp_profile.widget.isChecked() else None
@@ -283,9 +274,8 @@ def test_value_error(qtbot) -> None:
         assert figure[0].is_hidden()
 
     main_window.check_results()
-    assert f'{main_window.list_ds[-1].debug_message}' == f'{err.value}'
-    main_window.delete_backup()
-
+    assert f'{main_window.list_ds[-1].debug_message}' == f'{err.value}' 
+    close_tests(main_window, qtbot)
 
 def test_load_data_gui_errors():
     """
@@ -303,9 +293,8 @@ def test_load_data_gui_errors():
 
 def test_file_import_errors(qtbot):
     from pandas import DataFrame, Series, date_range, read_csv, to_datetime
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    # init gui window
+    main_window = start_tests(qtbot)
     g_s = main_window.gui_structure
     g_s.option_filename.set_value("")
     main_window.gui_structure.fun_display_data()
@@ -395,6 +384,8 @@ def test_file_import_errors(qtbot):
     assert np.isclose(data_new["Cooling Load"][9], g_s.option_cl_oct.get_value(), atol=1)
     assert np.isclose(data_new["Cooling Load"][10], g_s.option_cl_nov.get_value(), atol=1)
     assert np.isclose(data_new["Cooling Load"][11], g_s.option_cl_dec.get_value(), atol=1)
+    
+    close_tests(main_window, qtbot)
 
 
 def test_load_data_GUI():
@@ -432,10 +423,10 @@ def test_load_data_GUI():
     assert np.allclose(data["Cooling"], calc_data[1])
 
 
+
 def test_bug_when_opening_scenarios_which_have_autosave_enabled(qtbot):
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    # init gui window
+    main_window = start_tests(qtbot)
     main_window.gui_structure.option_auto_saving.set_value(1)
     main_window.add_scenario()
     main_window.add_scenario()
@@ -445,10 +436,10 @@ def test_bug_when_opening_scenarios_which_have_autosave_enabled(qtbot):
 
     filename_1 = main_window.default_path.joinpath("try_open1.GHEtool")
     filename_2 = main_window.default_path.joinpath("try_open2.GHEtool")
-    assert main_window._save_to_data(filename_1)
+    main_window._save_to_data(filename_1)
     main_window.gui_structure.aim_optimize.widget.click()
     assert main_window.gui_structure.aim_optimize.is_checked()
-    assert main_window._save_to_data(filename_2)
+    main_window._save_to_data(filename_2)
     assert main_window._load_from_data(filename_1)
     assert not main_window.list_ds[-1].aim_optimize
     assert not main_window.gui_structure.aim_optimize.is_checked()
@@ -466,7 +457,7 @@ def test_bug_when_opening_scenarios_which_have_autosave_enabled(qtbot):
             continue
     os.remove(filename_1)
     os.remove(filename_2)
-    main_window.delete_backup()
+    close_tests(main_window, qtbot)
 
 
 def test_start_after_crash(qtbot):
@@ -481,13 +472,12 @@ def test_start_after_crash(qtbot):
     -------
     None
     """
-    import numpy as np
-
     from GHEtool import FOLDER
 
     # init gui window
-    main_window_old = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window_old = start_tests(qtbot)
     main_window_old._load_from_data(f'{FOLDER}/gui/test_gui/test_after_crash.GHEtool')
+    close_tests(main_window_old, qtbot)
 
 
 def test_gui_filename_errors(qtbot):
@@ -500,9 +490,7 @@ def test_gui_filename_errors(qtbot):
         bot for the GUI
     """
     # init gui window
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
-    main_window.remove_previous_calculated_results()
-    main_window.delete_backup()
+    main_window = start_tests(qtbot)
 
     main_window.gui_structure.fun_update_combo_box_data_file("")
     main_window.gui_structure.fun_update_combo_box_data_file("C:/test.GHEtool")
@@ -519,3 +507,5 @@ def test_gui_filename_errors(qtbot):
         load_data_GUI(f'{FOLDER}/Examples/hourly_profile.csv', 1, "Heating", "Cooling", "", ";", ",", 1)
     except ValueError:
         assert True
+        
+    close_tests(main_window, qtbot)

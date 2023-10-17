@@ -1,18 +1,10 @@
-import PySide6.QtWidgets as QtW
-
-from GHEtool import Borefield, FOLDER
-from GHEtool.gui.data_2_borefield_func import data_2_borefield
-from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
-from GHEtool.gui.gui_classes.translation_class import Translations
-from GHEtool.gui.gui_structure import GUI
+from GHEtool import FOLDER
+from GHEtool.gui.test_gui.starting_closing_tests import close_tests, start_tests
 
 
 def test_results_DHW(qtbot):
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
+    # init gui window
+    main_window = start_tests(qtbot)
 
     gs = main_window.gui_structure
     gs.option_source_ground_temperature.set_value(0)
@@ -132,4 +124,6 @@ def test_results_DHW(qtbot):
     main_window.display_results()
 
     assert gs.results_heating_load.label.text() == "Heating load on the borefield: 530633.0 kWh"
+
+    close_tests(main_window, qtbot)
 
