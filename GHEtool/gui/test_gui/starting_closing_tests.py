@@ -41,4 +41,5 @@ def close_tests(main_window: MainWindow, qtbot) -> None:
     if main_window.saving_threads:  # pragma: no cover
         _ = [thread.terminate() for thread in main_window.saving_threads if not thread.isRunning()]
         if any([not thread.calculated for thread in main_window.saving_threads]):
+            qtbot.wait(1000)
             _ = [thread.func() for thread in main_window.saving_threads]
