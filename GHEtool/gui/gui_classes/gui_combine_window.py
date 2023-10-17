@@ -93,7 +93,7 @@ class MainWindow(MainWindow):
             return False
             # raise ImportError("The datafile cannot be loaded!")
         except (JSONDecodeError, UnicodeDecodeError) as e:
-            if 'Expecting' in str(e):
+            if 'Expecting' in str(e):  # pragma: no cover
                 globs.LOGGER.warning('The back-up file has been corrupted! And will hence be overwritten.')
                 # change language to english
                 self.change_language()
