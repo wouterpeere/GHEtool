@@ -3,13 +3,12 @@ from sys import setrecursionlimit
 
 import numpy as np
 
-import PySide6.QtWidgets as QtW
-from GHEtool import FOLDER, Borefield
-from GHEtool.gui.data_2_borefield_func import data_2_borefield, _create_monthly_loads_peaks
-from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
-from GHEtool.gui.gui_classes.translation_class import Translations
-from GHEtool.gui.gui_structure import GUI, load_data_GUI
+from GHEtool import FOLDER
+from GHEtool.gui.data_2_borefield_func import _create_monthly_loads_peaks
+from GHEtool.gui.gui_structure import load_data_GUI
 from ScenarioGUI import load_config
+
+from GHEtool.gui.test_gui.starting_closing_tests import close_tests, start_tests
 
 load_config(Path(__file__).parent.joinpath("gui_config.ini"))
 
@@ -18,9 +17,7 @@ setrecursionlimit(1500)
 
 def test_building_load(qtbot):
     # init gui window
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield, data_2_results_function=data_2_borefield)
+    main_window = start_tests(qtbot)
     main_window.gui_structure.option_method_rb_calc.set_value(0)
     main_window.gui_structure.option_decimal_csv.set_value(0)
     main_window.gui_structure.option_seperator_csv.set_value(0)
@@ -99,3 +96,4 @@ def test_building_load(qtbot):
     # # check if the data is the same
     assert np.allclose(main_window.list_ds[0].results.load.hourly_cooling_load / (1 + 1/3), peak_cooling)
     assert np.allclose(main_window.list_ds[0].results.load.hourly_heating_load / (1 - 1/4), peak_heating)
+    close_tests(main_window, qtbot)

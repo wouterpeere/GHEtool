@@ -4,14 +4,9 @@ Test to see if the Rb* is calculated on the go
 import sys
 from pathlib import Path
 
-import PySide6.QtWidgets as QtW
-
-from GHEtool import Borefield
-from GHEtool.gui.data_2_borefield_func import data_2_borefield
-from GHEtool.gui.gui_classes.gui_combine_window import MainWindow
-from GHEtool.gui.gui_classes.translation_class import Translations
-from GHEtool.gui.gui_structure import GUI
 from ScenarioGUI import load_config
+
+from GHEtool.gui.test_gui.starting_closing_tests import close_tests, start_tests
 
 load_config(Path(__file__).parent.joinpath("gui_config.ini"))
 
@@ -19,11 +14,8 @@ sys.setrecursionlimit(1500)
 
 
 def test_pipe_right_options_shown(qtbot):
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
+    # init gui window
+    main_window = start_tests(qtbot)
     main_window.save_scenario()
 
     gs = main_window.gui_structure
@@ -58,14 +50,12 @@ def test_pipe_right_options_shown(qtbot):
     assert not gs.option_pipe_coaxial_inner_outer.is_hidden()
     assert not gs.option_pipe_coaxial_outer_inner.is_hidden()
     assert not gs.option_pipe_coaxial_outer_outer.is_hidden()
+    close_tests(main_window, qtbot)
 
 
 def test_Rb_calculated_when_value_changed_U_pipe(qtbot):
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
+    # init gui window
+    main_window = start_tests(qtbot)
     main_window.save_scenario()
 
     gs = main_window.gui_structure
@@ -106,14 +96,12 @@ def test_Rb_calculated_when_value_changed_U_pipe(qtbot):
     assert gs.pipe_thermal_resistance.label.text() == 'The equivalent borehole thermal resistance (at 160.0m): 0.077 mK/W'
     gs.option_pipe_roughness.set_value(0.00002)
     assert gs.pipe_thermal_resistance.label.text() == 'The equivalent borehole thermal resistance (at 160.0m): 0.0769 mK/W'
+    close_tests(main_window, qtbot)
 
 
 def test_Rb_calculated_when_value_changed_coaxial(qtbot):
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
+    # init gui window
+    main_window = start_tests(qtbot)
     main_window.save_scenario()
 
     gs = main_window.gui_structure
@@ -164,11 +152,9 @@ def test_Rb_calculated_when_value_changed_coaxial(qtbot):
     r_in_out = 0.025  # Inside pipe outer radius [m]
     r_out_in = 0.0487  # Outer pipe inside radius [m]
     r_out_out = 0.055  # Outer pipe outside radius [m]
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
+    # init gui window
+    close_tests(main_window, qtbot)
+    main_window = start_tests(qtbot)
     main_window.save_scenario()
 
     gs = main_window.gui_structure
@@ -191,14 +177,12 @@ def test_Rb_calculated_when_value_changed_coaxial(qtbot):
     gs.option_pipe_borehole_radius_2.set_value(0.075)
 
     assert gs.pipe_thermal_resistance.label.text() == 'The equivalent borehole thermal resistance (at 100.0m): 0.1737 mK/W'
+    close_tests(main_window, qtbot)
 
 
 def test_correct_fluid_options_shown(qtbot):
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
-    main_window.delete_backup()
-    main_window = MainWindow(QtW.QMainWindow(), qtbot, GUI, Translations, result_creating_class=Borefield,
-                             data_2_results_function=data_2_borefield)
+    # init gui window
+    main_window = start_tests(qtbot)
     main_window.save_scenario()
 
     gs = main_window.gui_structure
@@ -245,3 +229,4 @@ def test_correct_fluid_options_shown(qtbot):
     assert gs.pipe_thermal_resistance.label.text() == 'The equivalent borehole thermal resistance (at 100.0m): 0.0627 mK/W'
     gs.option_fluid_ref_temp.set_value(10)
     assert gs.pipe_thermal_resistance.label.text() == 'The equivalent borehole thermal resistance (at 100.0m): 0.0681 mK/W'
+    close_tests(main_window, qtbot)
