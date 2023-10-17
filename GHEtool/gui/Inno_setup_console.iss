@@ -3,7 +3,7 @@
 
 #define LinkToGHEtool "C:\Users\WouterPeere\Python\GHEtool"
 #define MyAppName "GHEtool"
-#define MyAppVersion "2.1.2"
+#define MyAppVersion "2.2.0"
 #define MyAppPublisher "Enead BV"
 #define MyAppURL "https://github.com/wouterpeere/GHEtool"
 #define MyAppExeName "GHEtool_with_command_line.exe"
@@ -28,7 +28,7 @@ UsePreviousAppDir=yes
 DefaultDirName={autopf}\{#MyAppName}
 ChangesAssociations=yes
 DisableProgramGroupPage=yes
-LicenseFile="{#LinkToGHEtool}\LICENSE"
+LicenseFile="{#LinkToGHEtool}\LICENSE.txt"
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog

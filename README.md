@@ -20,7 +20,7 @@ This can be found on [GHEtool.readthedocs.io](https://ghetool.readthedocs.io).
 
 #### Graphical user interface
 GHEtool comes with a *graphical user interface (GUI)*. This GUI is built using [ScenarioGUI](https://github.com/tblanke/ScenarioGUI).
-One can download the open-source GUI [here](https://ghetool.eu/wp-content/uploads/setups/GHEtool%20Community_setup.exe).
+One can download the open-source GUI [here](https://ghetool.eu/wp-content/uploads/setups/GHEtool%20Community_setup_v2_2_0.exe).
 <p align="center">
 <img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/sources/gui/_figure/GHEtool.PNG" width="600">
 </p>
