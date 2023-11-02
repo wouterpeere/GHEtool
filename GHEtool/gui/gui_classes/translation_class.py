@@ -503,8 +503,8 @@ class Translations:  # pragma: no cover
         ]
         self.option_width: List[str] = [
             "Number of boreholes in the width direction [-]:",
-            "Breite des rechteckigen Feldes [-]: ",
             "Anzahl der Bohrungen in der Breite [-]:",
+            "Aantal boringen in de breedte [#]:",
             "Number of boreholes in the width direction [-]:",
             "Number of boreholes in the width direction [-]:",
             "Number of boreholes in the width direction [-]:",
@@ -512,8 +512,8 @@ class Translations:  # pragma: no cover
         ]
         self.option_length: List[str] = [
             "Number of boreholes in the length direction [-]:",
-            "Länge des rechteckigen Feldes [-]: ",
             "Anzahl der Bohrungen in der Länge [-]:",
+            "Aantal boringen in de lengte [#]:",
             "Number of boreholes in the length direction [-]:",
             "Number of boreholes in the length direction [-]:",
             "Number of boreholes in the length direction [-]:",
@@ -1835,7 +1835,7 @@ class Translations:  # pragma: no cover
         self.custom_borefield: List[str] = [
             "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
             "Benutzerdefiniertes Bohrelochfeld,Bohrloch,x [m]:,y [m]:,Tiefe [m]:,Vergrabungstiefe [m]:,Bohrlochradius [m]",
-            "Manueel boorveld,Boorgat,x [m]:,y [m]:,Dieote [m]:,Begraven Diepte [m]:,Boorgatstraal [m]",
+            "Manueel boorveld,Boorgat,x [m]:,y [m]:,Diepte [m]:,Begraven Diepte [m]:,Boorgatstraal [m]",
             "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
             "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
             "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
@@ -2009,7 +2009,7 @@ class Translations:  # pragma: no cover
         self.option_atol: List[str] = [
             "Absolute tolerance for iteration convergence [m]:",
             "Absolute Toleranz für Iterationskonvergenz [m]:",
-            "Absolute tolerance for iteration convergence [m]:",
+            "Absolute tolerantie voor convergentie van de iteratie [m]:",
             "Absolute tolerance for iteration convergence [m]:",
             "Absolute tolerance for iteration convergence [m]:",
             "Absolute tolerance for iteration convergence [m]:",
@@ -2018,7 +2018,7 @@ class Translations:  # pragma: no cover
         self.option_rtol: List[str] = [
             "Relative tolerance for iteration convergence [%]:",
             "Relative Toleranz für Iterationskonvergenz [%]:",
-            "Relative tolerance for iteration convergence [%]:",
+            "Relative tolerantie voor de convergentie van de iteratie [%]:",
             "Relative tolerance for iteration convergence [%]:",
             "Relative tolerance for iteration convergence [%]:",
             "Relative tolerance for iteration convergence [%]:",
@@ -2027,7 +2027,7 @@ class Translations:  # pragma: no cover
         self.option_max_nb_of_iter: List[str] = [
             "Maximum number of iterations to check for convergence [-]:",
             "Maximale Anzahl der Iterationen, um auf Konvergenz zu prüfen [-]:",
-            "Maximum number of iterations to check for convergence [-]:",
+            "Maximum aantal iteraties [-]:",
             "Maximum number of iterations to check for convergence [-]:",
             "Maximum number of iterations to check for convergence [-]:",
             "Maximum number of iterations to check for convergence [-]:",
@@ -2037,7 +2037,7 @@ class Translations:  # pragma: no cover
         self.option_include_dhw: List[str] = [
             "Include Domestic Hot Water?, No , Yes ",
             "Warmwasser hinzufügen?, Nein , Ja ",
-            "Sanitair warm water toevoegen?, No , Yes ",
+            "Sanitair warm water toevoegen?, Nee , Ja ",
             "Include Domestic Hot Water?, No , Yes ",
             "Include Domestic Hot Water?, No , Yes ",
             "Include Domestic Hot Water?, No , Yes ",
@@ -2127,7 +2127,7 @@ class Translations:  # pragma: no cover
         self.option_source_ground_temperature: List[str] = [
             "Source of the ground temperature data:, Measured , Database , Custom",
             "Quelle der Bodentemperaturdaten:, Gemessen , Datenbank , Benutzerdefiniert",
-            "Bron voor de grondtemperatuur:, Gemeten , Databank , Custom",
+            "Bron voor de grondtemperatuur:, Gemeten , Databank , Manueel",
             "Source of the ground temperature data:, Measured , Database , Custom",
             "Source of the ground temperature data:, Measured , Database , Custom",
             "Source of the ground temperature data:, Measured , Database , Custom",
