@@ -182,7 +182,7 @@ class Translations:  # pragma: no cover
         "label_CancelText",
         "label_ResOptimizeLoad5",
         "label_ResOptimizeLoad6",
-        "pushButton_start_single",
+        "push_button_start_single",
         "not_calculated",
         "NoSolution",
         "aim_temp_profile",
@@ -502,22 +502,22 @@ class Translations:  # pragma: no cover
             "Ground volumetric heat capacity [kJ / m³ K]:",
         ]
         self.option_width: List[str] = [
-            "Width of rectangular field [#]: ",
-            "Breite des rechteckigen Feldes [#]: ",
-            "Breedte van het rechthoekige veld [#]: ",
-            "Larghezza del campo rettangolare [#]: ",
-            "Largeur du champ rectangulaire [#]: ",
-            "Ancho del campo rectangular [#]: ",
-            "Ancho do campo rectangular [#]: ",
+            "Number of boreholes in the width direction [-]:",
+            "Breite des rechteckigen Feldes [-]: ",
+            "Anzahl der Bohrungen in der Breite [-]:",
+            "Number of boreholes in the width direction [-]:",
+            "Number of boreholes in the width direction [-]:",
+            "Number of boreholes in the width direction [-]:",
+            "Number of boreholes in the width direction [-]:",
         ]
         self.option_length: List[str] = [
-            "Length of rectangular field [#]: ",
-            "Länge des rechteckigen Feldes [#]: ",
-            "Lengte van het rechthoekige veld [#]: ",
-            "Lunghezza del campo rettangolare [#]: ",
-            "Longueur du champ rectangulaire [#]: ",
-            "Longitud del campo rectangular [#]: ",
-            "Lonxitude do campo rectangular [#]: ",
+            "Number of boreholes in the length direction [-]:",
+            "Länge des rechteckigen Feldes [-]: ",
+            "Anzahl der Bohrungen in der Länge [-]:",
+            "Number of boreholes in the length direction [-]:",
+            "Number of boreholes in the length direction [-]:",
+            "Number of boreholes in the length direction [-]:",
+            "Number of boreholes in the length direction [-]:",
         ]
         self.category_temperatures: List[str] = [
             "Temperature constraints and simulation period",
@@ -1326,13 +1326,13 @@ class Translations:  # pragma: no cover
         ]
         self.category_pipe_data: List[str] = ["Pipe data", "Rohrdaten", "Boorgatdata", "Pipe data", "Pipe data", "Pipe data", "Pipe data"]
         self.option_pipe_number: List[str] = [
-            "Number of pipes [#]:",
-            "Anzahl an Rohren [#]:",
-            "Aantal U-buizen [#]:",
-            "Number of pipes [#]:",
-            "Number of pipes [#]:",
-            "Number of pipes [#]:",
-            "Number of pipes [#]:",
+            "Number of pipes [-]:",
+            "Anzahl an Rohren [-]:",
+            "Aantal U-buizen [-]:",
+            "Number of pipes [-]:",
+            "Number of pipes [-]:",
+            "Number of pipes [-]:",
+            "Number of pipes [-]:",
         ]
         self.option_pipe_grout_conductivity: List[str] = [
             "Grout thermal conductivity [W/mK]: ",
@@ -1470,7 +1470,7 @@ class Translations:  # pragma: no cover
             "The remaining heating / cooling load is: ",
             "The remaining heating / cooling load is: ",
         ]
-        self.pushButton_start_single: List[str] = [
+        self.push_button_start_single: List[str] = [
             "Calculate current scenario",
             "Berechne ausgewähltes Szenario",
             "Bereken huidig scenario",
@@ -1808,7 +1808,7 @@ class Translations:  # pragma: no cover
         self.option_n_threads: List[str] = [
             "Number of parallel threads [-]: ",
             "Anzahl an parallelen Prozessen [-]:",
-            "Number of parallel threads [-]: ",
+            "Aantal parallelle threads [-]:",
             "Number of parallel threads [-]: ",
             "Number of parallel threads [-]: ",
             "Number of parallel threads [-]: ",
@@ -1817,7 +1817,7 @@ class Translations:  # pragma: no cover
         self.option_number_circle_boreholes: List[str] = [
             "Number of boreholes [-]:",
             "Anzahl der Bohrlöcher [-]:",
-            "Number of boreholes [-]:",
+            "Aantal boringen [-]:",
             "Number of boreholes [-]:",
             "Number of boreholes [-]:",
             "Number of boreholes [-]:",
@@ -1826,7 +1826,7 @@ class Translations:  # pragma: no cover
         self.option_borefield_radius: List[str] = [
             "Distance of the boreholes from the center of the field [m]:",
             "Abstand der Bohrlöcher vom Zentrum der Feldes [m]:",
-            "Distance of the boreholes from the center of the field [m]:",
+            "Afstand van de boringen tot het centrum van de cirkel [m]:",
             "Distance of the boreholes from the center of the field [m]:",
             "Distance of the boreholes from the center of the field [m]:",
             "Distance of the boreholes from the center of the field [m]:",
@@ -1835,7 +1835,7 @@ class Translations:  # pragma: no cover
         self.custom_borefield: List[str] = [
             "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
             "Benutzerdefiniertes Bohrelochfeld,Bohrloch,x [m]:,y [m]:,Tiefe [m]:,Vergrabungstiefe [m]:,Bohrlochradius [m]",
-            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
+            "Manueel boorveld,Boorgat,x [m]:,y [m]:,Dieote [m]:,Begraven Diepte [m]:,Boorgatstraal [m]",
             "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
             "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
             "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
@@ -2025,13 +2025,13 @@ class Translations:  # pragma: no cover
             "Relative tolerance for iteration convergence [%]:",
         ]
         self.option_max_nb_of_iter: List[str] = [
-            "Maximum number of iterations to check for convergence [#]:",
-            "Maximale Anzahl der Iterationen, um auf Konvergenz zu prüfen [#]:",
-            "Maximum number of iterations to check for convergence [#]:",
-            "Maximum number of iterations to check for convergence [#]:",
-            "Maximum number of iterations to check for convergence [#]:",
-            "Maximum number of iterations to check for convergence [#]:",
-            "Maximum number of iterations to check for convergence [#]:",
+            "Maximum number of iterations to check for convergence [-]:",
+            "Maximale Anzahl der Iterationen, um auf Konvergenz zu prüfen [-]:",
+            "Maximum number of iterations to check for convergence [-]:",
+            "Maximum number of iterations to check for convergence [-]:",
+            "Maximum number of iterations to check for convergence [-]:",
+            "Maximum number of iterations to check for convergence [-]:",
+            "Maximum number of iterations to check for convergence [-]:",
         ]
         self.SCOP_DHW: List[str] = ["SCOP DHW [-]:", "SCOP Warmwasser [-]", "SCOP SWW [-]", "SCOP DHW [-]", "SCOP DHW [-]", "SCOP DHW [-]", "SCOP DHW [-]"]
         self.option_include_dhw: List[str] = [
