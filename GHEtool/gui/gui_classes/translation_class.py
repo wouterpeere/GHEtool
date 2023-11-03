@@ -262,6 +262,9 @@ class Translations:  # pragma: no cover
         "hint_ground_flux_database",
         "option_source_ground_temperature",
         "option_flux_gradient",
+        "label_Continue",
+        "label_ContinueText",
+        "label_ContinueTitle",
         "languages",
     )
 
@@ -1407,13 +1410,13 @@ class Translations:  # pragma: no cover
             "Pipe roughness [m]:",
         ]
         self.option_pipe_depth: List[str] = [
-            "Burial depth [m]:",
+            "Buried depth [m]:",
             "Vergrabungstiefe [m]:",
             "Deklaag [m]:",
-            "Burial depth [m]:",
-            "Burial depth [m]:",
-            "Burial depth [m]:",
-            "Burial depth [m]:",
+            "Buried depth [m]:",
+            "Buried depth [m]:",
+            "Buried depth [m]:",
+            "Buried depth [m]:",
         ]
         self.label_ResOptimizeLoad1: List[str] = [
             "The peak heating / cooling load is: ",
@@ -2142,3 +2145,14 @@ class Translations:  # pragma: no cover
             "How to take into account temperature variation?, Flux , Gradient",
             "How to take into account temperature variation?, Flux , Gradient",
         ]
+        self.label_Continue: List[str] = ["Continue", "Fortsetzen", "Ga verder", "Continue", "Continue", "Continue", "Continue"]
+        self.label_ContinueText: List[str] = [
+            "Would you like to save the project before you continue?",
+            "Möchten Sie das Projekt speichern bevor sie fortfahren?",
+            "Wilt u het project opslaan voor u verdergaat?",
+            "Would you like to save the project before you continue?",
+            "Would you like to save the project before you continue?",
+            "Would you like to save the project before you continue?",
+            "Would you like to save the project before you continue?",
+        ]
+        self.label_ContinueTitle: List[str] = ["Warning", "Warnung", "Waarschuwing", "Warning", "Warning", "Warning", "Warning"]
