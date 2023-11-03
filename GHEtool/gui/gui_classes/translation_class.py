@@ -737,13 +737,13 @@ class Translations:  # pragma: no cover
             "Tipo de ficheiro: ",
         ]
         self.option_seperator_csv: List[str] = [
-            "Seperator in CSV-file:,Semicolon ';',Comma '++'",
+            "Separator in CSV-file:,Semicolon ';',Comma '++'",
             "Trenner in der CSV-Datei:,Semikolon ';',Komma '++'",
             "Scheidingsteken in CSV-file:,Puntkomma ';',Komma '++'",
-            "Seperator in CSV-file:,Semicolon ';',Comma '++'",
-            "Seperator in CSV-file:,Semicolon ';',Comma '++'",
-            "Seperator in CSV-file:,Semicolon ';',Comma '++'",
-            "Seperator in CSV-file:,Semicolon ';',Comma '++'",
+            "Separator in CSV-file:,Semicolon ';',Comma '++'",
+            "Separator in CSV-file:,Semicolon ';',Comma '++'",
+            "Separator in CSV-file:,Semicolon ';',Comma '++'",
+            "Separator in CSV-file:,Semicolon ';',Comma '++'",
         ]
         self.option_filename: List[str] = [
             "Filename: ",
@@ -1836,22 +1836,22 @@ class Translations:  # pragma: no cover
             "Distance of the boreholes from the center of the field [m]:",
         ]
         self.custom_borefield: List[str] = [
-            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
+            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried depth [m]:,Borehole radius [m]",
             "Benutzerdefiniertes Bohrelochfeld,Bohrloch,x [m]:,y [m]:,Tiefe [m]:,Vergrabungstiefe [m]:,Bohrlochradius [m]",
-            "Manueel boorveld,Boorgat,x [m]:,y [m]:,Diepte [m]:,Begraven Diepte [m]:,Boorgatstraal [m]",
-            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
-            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
-            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
-            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried Depth [m]:,Borehole radius [m]",
+            "Manueel boorveld,Boorgat,x [m]:,y [m]:,Diepte [m]:,Deklaag [m]:,Boorgatstraal [m]",
+            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried depth [m]:,Borehole radius [m]",
+            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried depth [m]:,Borehole radius [m]",
+            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried depth [m]:,Borehole radius [m]",
+            "Custom borefield,Borehole,x [m]:,y [m]:,Depth [m]:,Buried depth [m]:,Borehole radius [m]",
         ]
         self.option_seperator_borefield: List[str] = [
-            "Seperator in file:,Semicolon ';',Comma '++',Tab '   '",
+            "Separator in file:,Semicolon ';',Comma '++',Tab '   '",
             "Trenner in der Datei:,Semikolon ';',Komma '++',Tab '   '",
             "Scheidingsteken in file:,Puntkomma ';',Komma '++',Tab '   '",
-            "Seperator in file:,Semicolon ';',Comma '++',Tab '   '",
-            "Seperator in file:,Semicolon ';',Comma '++',Tab '   '",
-            "Seperator in file:,Semicolon ';',Comma '++',Tab '   '",
-            "Seperator in file:,Semicolon ';',Comma '++',Tab '   '",
+            "Separator in file:,Semicolon ';',Comma '++',Tab '   '",
+            "Separator in file:,Semicolon ';',Comma '++',Tab '   '",
+            "Separator in file:,Semicolon ';',Comma '++',Tab '   '",
+            "Separator in file:,Semicolon ';',Comma '++',Tab '   '",
         ]
         self.borefield_file: List[str] = [
             "Filename: ",
