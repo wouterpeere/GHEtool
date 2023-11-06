@@ -11,7 +11,7 @@ from scipy import interpolate
 from GHEtool.logger.ghe_logger import ghe_logger
 
 
-def _timeValues(dt=3600., t_max=100. * 8760 * 3600.) -> np.array:
+def _time_values(dt=3600., t_max=100. * 8760 * 3600.) -> np.array:
     """
     This function calculates the default time values for the g-function.
     This is based on the Load aggregation algorithm of Claesson and Javed [#ClaessonJaved2012]_.
@@ -34,13 +34,8 @@ def _timeValues(dt=3600., t_max=100. * 8760 * 3600.) -> np.array:
        load-aggregation method to calculate extraction temperatures of
        borehole heat exchangers. ASHRAE Transactions, 118 (1): 530–539.
     """
-    dt: float = dt  # Time step (s)
-    t_max: float = t_max  # Maximum time (s)
-
     # Load aggregation scheme
-    load_agg = gt.load_aggregation.ClaessonJaved(dt, t_max)
-
-    return load_agg.get_times_for_simulation()
+    return gt.load_aggregation.ClaessonJaved(dt, t_max).get_times_for_simulation()
 
 
 class CustomGFunction:
@@ -51,7 +46,7 @@ class CustomGFunction:
 
     DEFAULT_DEPTH_ARRAY: np.ndarray = np.arange(0, 351, 25)  # m
     DEFAULT_DEPTH_ARRAY[0] = 10  # m
-    DEFAULT_TIME_ARRAY: np.ndarray = _timeValues()  # sec
+    DEFAULT_TIME_ARRAY: np.ndarray = _time_values()  # sec
 
     def __init__(self, time_array: np.ndarray = None, depth_array: np.ndarray = None, options: dict = None):
         """

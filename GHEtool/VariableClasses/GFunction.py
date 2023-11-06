@@ -6,7 +6,7 @@ import copy
 import pygfunction as gt
 from scipy import interpolate
 
-from .CustomGFunction import _timeValues
+from .CustomGFunction import _time_values
 
 
 class FIFO:
@@ -79,7 +79,7 @@ class GFunction:
     This is done by storing previously calculated gvalues.
     """
 
-    DEFAULT_TIMESTEPS: np.ndarray = _timeValues()
+    DEFAULT_TIMESTEPS: np.ndarray = _time_values()
     DEFAULT_NUMBER_OF_TIMESTEPS: int = DEFAULT_TIMESTEPS.size
     DEFAULT_STORE_PREVIOUS_VALUES: bool = True
 
@@ -200,7 +200,7 @@ class GFunction:
             # due to this many requested time values, the calculation will be slow.
             # there will be interpolation
 
-            time_value_new = _timeValues(t_max=time_value[-1])
+            time_value_new = _time_values(t_max=time_value[-1])
 
             # calculate g-function values
             gfunc_uniform_T = gvalues(time_value_new, borefield, alpha, depth, interpolate)

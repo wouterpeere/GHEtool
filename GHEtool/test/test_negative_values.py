@@ -3,6 +3,11 @@ import numpy as np
 from GHEtool import GroundConstantTemperature, MonthlyGeothermalLoadAbsolute, Borefield
 
 
+import pygfunction as gt
+
+from GHEtool.VariableClasses import _time_values
+
+
 def test_negative_g_func_values():
     # relevant borefield data for the calculations
     data = GroundConstantTemperature(1,             # conductivity of the soil (W/mK)
@@ -41,4 +46,11 @@ def test_negative_g_func_values():
     borefield.set_min_avg_fluid_temperature(0)    # minimum temperature
 
     g_func = borefield.gfunction(load.time_L3, 150)
+
+    g_func2 = gt.gfunction.gFunction(borefield.borefield, data.alpha, _time_values(t_max=load.time_L3[-1]),
+                                     options=borefield.gfunction_calculation_object.options,
+                                     method=borefield.gfunction_calculation_object.options['method']).gFunc
+
+    assert np.allclose(g_func, np.interp(load.time_L3, _time_values(t_max=load.time_L3[-1]), g_func2))
+    assert np.all(g_func2 > 0)
     assert np.all(g_func > 0)
