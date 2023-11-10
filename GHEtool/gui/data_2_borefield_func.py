@@ -6,6 +6,7 @@ from __future__ import annotations
 from functools import partial
 from typing import TYPE_CHECKING
 import logging
+import warnings
 
 import numpy as np
 from GHEtool import Borefield, FluidData, MultipleUTube, GroundConstantTemperature, GroundFluxTemperature, GroundTemperatureGradient, CoaxialPipe
@@ -205,6 +206,10 @@ def _create_fluid_data(ds: DataStorage) -> FluidData:
     """
     fluid_data = FluidData(ds.option_fluid_mass_flow, ds.option_fluid_conductivity, ds.option_fluid_density, ds.option_fluid_capacity, ds.option_fluid_viscosity)
     if ds.option_fluid_selector == 1:
+
+        # set warnings as error
+        warnings.filterwarnings("error")
+
         # use pygfunction to get fluid properties
         if ds.option_glycol_selector == 0:
             fluid_data.import_fluid_from_pygfunction(gt.media.Fluid('MEG',
@@ -212,6 +217,7 @@ def _create_fluid_data(ds: DataStorage) -> FluidData:
         else:
             fluid_data.import_fluid_from_pygfunction(gt.media.Fluid('MPG',
                                                                     ds.option_glycol_percentage, ds.option_fluid_ref_temp))
+    warnings.resetwarnings()
     return fluid_data
 
 
