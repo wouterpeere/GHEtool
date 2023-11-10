@@ -2,7 +2,7 @@ import pytest
 
 import numpy as np
 
-from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute
+from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
 from GHEtool.Validation.cases import load_case
 
 
@@ -225,6 +225,7 @@ def test_eq():
     load_1 = MonthlyGeothermalLoadAbsolute(*load_case(2))
     load_2 = MonthlyGeothermalLoadAbsolute(*load_case(2))
 
+
     assert load_1 == load_2
     load_2.simulation_period = 55
     assert load_1 != load_2
@@ -260,3 +261,6 @@ def test_eq():
     assert load_1 != load_2
     load_2.peak_cooling = [i + 1 for i in load_2.peak_cooling]
     assert load_1 == load_2
+
+    load_2 = HourlyGeothermalLoad()
+    assert load_1 != load_2
