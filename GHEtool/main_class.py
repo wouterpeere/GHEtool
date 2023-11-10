@@ -2200,10 +2200,10 @@ class Borefield(BaseClass):
         load = self._secundary_borefield_load if self._secundary_borefield_load != HourlyGeothermalLoad() else self.load
 
         # sort heating and cooling load
-        heating = self.load.hourly_heating_load.copy()
+        heating = load.hourly_heating_load.copy()
         heating[::-1].sort()
 
-        cooling = self.load.hourly_cooling_load.copy()
+        cooling = load.hourly_cooling_load.copy()
         cooling.sort()
         cooling = cooling * (-1)
         # create new figure and axes if it not already exits otherwise clear it.
