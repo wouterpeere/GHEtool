@@ -532,22 +532,22 @@ class Translations:  # pragma: no cover
             "Restriccións de temperatura e período de simulación",
         ]
         self.option_min_temp: List[str] = [
-            "Minimal average fluid temperature [°C]: ",
+            "Minimum average fluid temperature [°C]: ",
             "Minimale durchschnittliche Fluidtemperatur [°C]:",
             "Minimale gemiddelde fluïdumtemperatuur [°C]: ",
-            "Minimal average fluid temperature [°C]: ",
-            "Minimal average fluid temperature [°C]: ",
-            "Minimal average fluid temperature [°C]: ",
-            "Minimal average fluid temperature [°C]: ",
+            "Minimum average fluid temperature [°C]: ",
+            "Minimum average fluid temperature [°C]: ",
+            "Minimum average fluid temperature [°C]: ",
+            "Minimum average fluid temperature [°C]: ",
         ]
         self.option_max_temp: List[str] = [
-            "Maximal average fluid temperature [°C]: ",
+            "Maximum average fluid temperature [°C]: ",
             "Maximale durchschnittliche Fluidtemperatur [°C]:",
             "Maximale gemiddelde fluïdumtemperatuur [°C]: ",
-            "Maximal average fluid temperature [°C]: ",
-            "Maximal average fluid temperature [°C]: ",
-            "Maximal average fluid temperature [°C]: ",
-            "Maximal average fluid temperature [°C]: ",
+            "Maximum average fluid temperature [°C]: ",
+            "Maximum average fluid temperature [°C]: ",
+            "Maximum average fluid temperature [°C]: ",
+            "Maximum average fluid temperature [°C]: ",
         ]
         self.option_temp_gradient: List[str] = [
             "Temperature gradient [K/100m]: ",
@@ -559,7 +559,7 @@ class Translations:  # pragma: no cover
             "Temperature gradient [K/100m]: ",
         ]
         self.option_simu_period: List[str] = [
-            "Simulation period [yrs]: ",
+            "Simulation period [years]: ",
             "Simulationszeit [Jahre]: ",
             "Simulatieperiode [jaar]: ",
             "Periodo di simulazione [anni]: ",
@@ -1703,7 +1703,7 @@ class Translations:  # pragma: no cover
         self.max_temp: List[str] = [
             "The maximum average fluid temperature is , °C",
             "Die maximale Fluidtemperatur ist , °C",
-            "De maximaal gemiddelde fluïdumtemperatuur is , °C",
+            "De maximum gemiddelde fluïdumtemperatuur is , °C",
             "The maximum average fluid temperature is , °C",
             "The maximum average fluid temperature is , °C",
             "The maximum average fluid temperature is , °C",
@@ -1712,7 +1712,7 @@ class Translations:  # pragma: no cover
         self.min_temp: List[str] = [
             "The minimum average fluid temperature is , °C",
             "Die minimale Fluidtemperatur ist , °C",
-            "De minimaal gemiddelde fluïdumtemperatuur is , °C",
+            "De minimum gemiddelde fluïdumtemperatuur is , °C",
             "The minimum average fluid temperature is , °C",
             "The minimum average fluid temperature is , °C",
             "The minimum average fluid temperature is , °C",
@@ -1764,22 +1764,22 @@ class Translations:  # pragma: no cover
             "Mostrar lenda?, No , Yes",
         ]
         self.option_len_peak_heating: List[str] = [
-            "Peak length heating [hours]: ",
+            "Peak duration heating [hours]: ",
             "Spitzenlastlänge Heizen [Stunden]: ",
             "Piekduur verwarming [uren]: ",
-            "Peak length heating [hours]: ",
-            "Peak length heating [hours]: ",
-            "Peak length heating [hours]: ",
-            "Peak length heating [hours]:",
+            "Peak duration heating [hours]: ",
+            "Peak duration heating [hours]: ",
+            "Peak duration heating [hours]: ",
+            "Peak duration heating [hours]:",
         ]
         self.option_len_peak_cooling: List[str] = [
-            "Peak length cooling [hours]: ",
+            "Peak duration cooling [hours]: ",
             "Spitzenlastlänge Kühlen [Stunden]: ",
             "Piekduur koeling [uren]: ",
-            "Peak length cooling [hours]: ",
-            "Peak length cooling [hours]: ",
-            "Peak length cooling [hours]: ",
-            "Peak length cooling [hours]:",
+            "Peak duration cooling [hours]: ",
+            "Peak duration cooling [hours]: ",
+            "Peak duration cooling [hours]: ",
+            "Peak duration cooling [hours]:",
         ]
         self.option_temperature_profile_hourly: List[str] = [
             "Should hourly data be used for the temperature profile?, No , Yes ",
