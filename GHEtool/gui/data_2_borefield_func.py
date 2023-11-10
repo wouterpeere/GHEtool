@@ -93,11 +93,14 @@ def data_2_borefield(ds: DataStorage) -> tuple[Borefield, partial[[], None]]:
             hourly_data.hourly_cooling_load = peak_cooling * (1 + 1 / ds.SEER)
             hourly_data.hourly_heating_load = peak_heating * (1 - 1 / ds.SCOP)
             borefield.load = hourly_data
+            borefield._secundary_borefield_load.hourly_heating_load = peak_heating
+            borefield._secundary_borefield_load.hourly_cooling_load = peak_cooling
 
     # add dhw when needed
     if ds.option_include_dhw == 1 and not ds.aim_optimize:
         SCOP = ds.SCOP_DHW if ds.geo_load == 1 else 99999999999
         borefield.load.dhw = ds.DHW * (1 - 1 / SCOP)
+        borefield._secundary_borefield_load.dhw = ds.DHW
 
     # set up the borefield sizing
     borefield.calculation_setup(use_constant_Rb=ds.option_method_rb_calc == 0,
