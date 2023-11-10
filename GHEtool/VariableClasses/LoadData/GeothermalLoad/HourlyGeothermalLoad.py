@@ -353,7 +353,7 @@ class HourlyGeothermalLoad(_LoadData):
 
         ghe_logger.info("Hourly profile loaded!")
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if not isinstance(other, HourlyGeothermalLoad):
             return False
         if not np.array_equal(self.hourly_cooling_load, other.hourly_cooling_load):
