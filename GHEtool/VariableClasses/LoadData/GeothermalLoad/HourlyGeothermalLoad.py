@@ -352,3 +352,14 @@ class HourlyGeothermalLoad(_LoadData):
         self.hourly_cooling_load = np.array(df.iloc[:, col_cooling])
 
         ghe_logger.info("Hourly profile loaded!")
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, HourlyGeothermalLoad):
+            return False
+        if not np.array_equal(self.hourly_cooling_load, other.hourly_cooling_load):
+            return False
+        if not np.array_equal(self.hourly_heating_load, other.hourly_heating_load):
+            return False
+        if not self.simulation_period == other.simulation_period:
+            return False
+        return True
