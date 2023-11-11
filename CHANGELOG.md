@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## Added
 - Equal functions for HourlyGeothermalLoad and MonthlyGeothermalLoadAbsolute (issue #189).
 
+## changed
+- Negative reference temperatures for the fluid are now possible (issue #192).
+
 ## fixed
 - Bug in load-duration curve when not working with optimize load profile (issue # 189).
 

@@ -618,7 +618,7 @@ class GUI(GuiStructure):
             decimal_number=1,
             default_value=10,
             maximal_value=100,
-            minimal_value=0
+            minimal_value=-50
         )
 
         self.option_fluid_conductivity = FloatBox(
