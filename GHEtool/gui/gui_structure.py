@@ -904,11 +904,6 @@ class GUI(GuiStructure):
             self.option_cooling_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
             self.option_cooling_column.add_aim_option_2_be_set_for_check((self.option_temperature_profile_hourly, 1))
 
-            def _test(text):
-                print(text)
-
-            self.option_cooling_column.change_event(lambda: _test(self.option_cooling_column.get_value()))
-
             self.option_single_column.add_aim_option_2_be_set_for_check(self.aim_optimize)
             self.option_single_column.add_aim_option_2_be_set_for_check((self.option_method_size_depth, 2))
             self.option_single_column.add_aim_option_2_be_set_for_check((self.option_temperature_profile_hourly, 1))
