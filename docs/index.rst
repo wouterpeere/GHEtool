@@ -11,10 +11,10 @@ Welcome on this ReadTheDocs for the open-source borefield sizing tool GHEtool.
 
 Here one can find (extensive) documentation of GHEtool. Please find below the content of this ReadTheDocs.
 
-The user manual for GHEtool Pro, together with instructions for installation, you can find [here](https://manual.ghetool.eu).
+The user manual for GHEtool Pro, together with instructions for installation, you can find `here <https://manual.ghetool.eu>`_.
 
-If you want to download GHEtool, please visit our website at [https://GHEtool.eu](https://GHEtool.eu).
-If you have any questions, remarks or ideas for future functionalities, please contact us at [wouter@ghetool.eu](mailto:wouter@ghetool.eu).
+If you want to download GHEtool, please visit our website at `https://GHEtool.eu <https://GHEtool.eu>`_.
+If you have any questions, remarks or ideas for future functionalities, please contact us at `wouter@ghetool.eu <mailto:wouter@ghetool.eu>`_.
 
 .. toctree::
     :caption: GHEtool
@@ -41,7 +41,7 @@ If you have any questions, remarks or ideas for future functionalities, please c
 .. toctree::
     :caption: Graphical user interface (GUI)
     :maxdepth: 2
-    sources/gui/gui_installation.guide.md
+    sources/gui/gui_installation_guide.md
 
 .. toctree::
     :caption: Contribute to GHEtool (GUI)
