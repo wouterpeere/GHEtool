@@ -46,9 +46,9 @@ def test_correct_columns_hourly_data(qtbot):
                              data_2_results_function=data_2_borefield)
 
     gs = main_window.gui_structure
-    assert gs.option_cooling_column == (0, 'Heating')
-    assert gs.option_heating_column == (1, 'Cooling')
+    assert gs.option_cooling_column.get_value() == (0, 'Heating')
+    assert gs.option_heating_column.get_value() == (1, 'Cooling')
 
     main_window.change_scenario(1)
-    assert gs.option_cooling_column == (0, 'Heating')
-    assert gs.option_heating_column == (1, 'Cooling')
+    assert gs.option_cooling_column.get_value() == (0, 'Heating')
+    assert gs.option_heating_column.get_value() == (1, 'Cooling')
