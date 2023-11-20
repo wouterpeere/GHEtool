@@ -133,7 +133,7 @@ class MainWindow(MainWindow):
                 self.list_widget_scenario.addItem(item)
 
             # set and change the window title
-            self.filename = tuple(saving['filename'])
+            self.filename = tuple(saving['filename']) if 'GHEtoolBackUp' in str(location) else (str(location), 'GHEtool (*.GHEtool)')
             general_changes() if not append else None
             return True
 
