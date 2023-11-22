@@ -1,7 +1,6 @@
 import numpy as np
 
-from GHEtool import GroundConstantTemperature, MonthlyGeothermalLoadAbsolute, Borefield
-
+from GHEtool import GroundConstantTemperature, HourlyGeothermalLoad, Borefield
 
 import pygfunction as gt
 
@@ -10,28 +9,11 @@ from GHEtool.VariableClasses import _time_values
 
 def test_negative_g_func_values():
     # relevant borefield data for the calculations
-    data = GroundConstantTemperature(1,             # conductivity of the soil (W/mK)
-                                     12,            # Ground temperature at infinity (degrees C)
-                                     5 * 10**6)   # ground volumetric heat capacity (J/m3K)
-
-    # monthly loading values
-    peak_cooling = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak cooling in kW
-    peak_heating = np.array([160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.])  # Peak heating in kW
-
-    # annual heating and cooling load
-    annual_heating_load = 300 * 10 ** 3  # kWh
-    annual_cooling_load = 160 * 10 ** 3  # kWh
-
-    # percentage of annual load per month (15.5% for January ...)
-    monthly_load_heating_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
-    monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
-
-    # resulting load per month
-    monthly_load_heating = annual_heating_load * monthly_load_heating_percentage   # kWh
-    monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage   # kWh
-
+    data = GroundConstantTemperature(1,  # conductivity of the soil (W/mK)
+                                     12,  # Ground temperature at infinity (degrees C)
+                                     5 * 10 ** 6)  # ground volumetric heat capacity (J/m3K)
     # set the load
-    load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
+    load = HourlyGeothermalLoad(np.zeros(8760), np.zeros(8760), 100)
 
     # create the borefield object
     borefield = Borefield(load=load)
@@ -42,17 +24,46 @@ def test_negative_g_func_values():
     borefield.Rb = 0.12  # equivalent borehole resistance (K/W)
 
     # set temperature boundaries
-    borefield.set_max_avg_fluid_temperature(16)   # maximum temperature
-    borefield.set_min_avg_fluid_temperature(0)    # minimum temperature
+    borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
+    borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
 
+    g_func0 = borefield.gfunction(load.time_L4, 150)
+
+    borefield.gfunction_calculation_object.remove_previous_data()
     borefield.gfunction_calculation_object.set_options_gfunction_calculation({'linear_threshold': 16000})
 
-    g_func = borefield.gfunction(load.time_L3, 150)
+    g_func1 = borefield.gfunction(load.time_L4, 150)
 
-    g_func2 = gt.gfunction.gFunction(borefield.borefield, data.alpha, _time_values(t_max=load.time_L3[-1]),
+    time_vals = _time_values(t_max=load.time_L4[-1])
+
+    g_func2 = gt.gfunction.gFunction(borefield.borefield, data.alpha, time_vals,
                                      options=borefield.gfunction_calculation_object.options,
                                      method=borefield.gfunction_calculation_object.options['method']).gFunc
 
-    assert np.allclose(g_func, np.interp(load.time_L3, _time_values(t_max=load.time_L3[-1]), g_func2))
+    borefield.gfunction_calculation_object.options['linear_threshold'] = time_vals[10]
+
+    g_func3 = gt.gfunction.gFunction(borefield.borefield, data.alpha, time_vals,
+                                     options=borefield.gfunction_calculation_object.options,
+                                     method=borefield.gfunction_calculation_object.options['method']).gFunc
+
+    del borefield.gfunction_calculation_object.options['linear_threshold']
+
+    g_func3[:10] = gt.gfunction.gFunction(borefield.borefield, data.alpha, time_vals[:10],
+                                     options=borefield.gfunction_calculation_object.options,
+                                     method=borefield.gfunction_calculation_object.options['method']).gFunc
+
+
+    """import matplotlib.pyplot as plt
+    plt.Figure()
+    plt.plot(g_func0, label="g_func0")
+    plt.plot(g_func1, label="g_func1")
+    plt.plot(np.interp(load.time_L4, time_vals, g_func2), label="g_func2")
+    plt.legend()
+    plt.show()
+    """
+
+    assert np.allclose(g_func1, np.interp(load.time_L4, time_vals, g_func2))
+    assert np.allclose(g_func0, np.interp(load.time_L4, time_vals, g_func3), rtol = 0.001)
+    assert np.all(g_func0 > 0)
+    assert np.all(g_func1 > 0)
     assert np.all(g_func2 > 0)
-    assert np.all(g_func > 0)

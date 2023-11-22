@@ -1,9 +1,15 @@
+from __future__ import annotations
+
 import numpy as np
 import pandas as pd
 
-from typing import Union, Tuple
+from typing import Union, Tuple, TYPE_CHECKING
+
 from GHEtool.VariableClasses.LoadData._LoadData import _LoadData
 from GHEtool.logger import ghe_logger
+
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike, NDArray
 
 
 class HourlyGeothermalLoad(_LoadData):
@@ -19,8 +25,8 @@ class HourlyGeothermalLoad(_LoadData):
     END = pd.to_datetime("2019-12-31 23:59:00")
     HOURS_SERIES = pd.Series(pd.date_range(START, END, freq="1H"))
 
-    def __init__(self, heating_load: Union[np.ndarray, list, tuple] = np.zeros(8760),
-                 cooling_load: Union[np.ndarray, list, tuple] = np.zeros(8760),
+    def __init__(self, heating_load: ArrayLike | None = None,
+                 cooling_load: ArrayLike | None = None,
                  simulation_period: int = 20,
                  dhw: float = 0.):
         """
@@ -40,12 +46,12 @@ class HourlyGeothermalLoad(_LoadData):
         super().__init__(hourly_resolution=True, simulation_period=simulation_period)
 
         # initiate variables
-        self._hourly_heating_load: np.ndarray = np.zeros(8760)
-        self._hourly_cooling_load: np.ndarray = np.zeros(8760)
+        self._hourly_heating_load: NDArray[np.float64] = np.zeros(8760)
+        self._hourly_cooling_load: NDArray[np.float64] = np.zeros(8760)
 
         # set variables
-        self.hourly_heating_load = heating_load
-        self.hourly_cooling_load = cooling_load
+        self.hourly_heating_load: NDArray[np.float64] = np.zeros(8760) if heating_load is None else np.array(heating_load)
+        self.hourly_cooling_load: NDArray[np.float64] = np.zeros(8760) if cooling_load is None else np.array(cooling_load)
         self.dhw = dhw
 
     def _check_input(self, input: Union[np.ndarray, list, tuple]) -> bool:
