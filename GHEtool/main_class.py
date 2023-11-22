@@ -1943,8 +1943,6 @@ class Borefield(BaseClass):
         ------
         ValueError
             ValueError if no hourly load is given or the threshold is negative
-        MaximumNumberOfIterations
-            MaximumNumberOfIterations when the method does not converge
         """
 
         ## Explain variables
@@ -1989,9 +1987,6 @@ class Borefield(BaseClass):
         # set iteration criteria
         cool_ok, heat_ok = False, False
 
-        # set iteration counter
-        count: int = 0
-
         while not cool_ok or not heat_ok:
             # limit the primary geothermal heating and cooling load to peak_heat_load_geo and peak_cool_load_geo
             self.load.set_hourly_cooling(np.minimum(peak_cool_load_geo, primary_geothermal_load.hourly_cooling_load))
@@ -2027,10 +2022,6 @@ class Borefield(BaseClass):
                         cool_ok = True
             else:
                 cool_ok = True
-
-            count += 1
-            if count == self._calculation_setup.max_nb_of_iterations:
-                raise MaximumNumberOfIterations(self._calculation_setup.max_nb_of_iterations)
 
         # calculate the resulting secundary hourly profile that can be put on the borefield
         self._secundary_borefield_load = HourlyGeothermalLoad(simulation_period=building_load.simulation_period)
