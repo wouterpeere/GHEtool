@@ -53,17 +53,17 @@ def test_negative_g_func_values():
                                      method=borefield.gfunction_calculation_object.options['method']).gFunc
 
 
-    """import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt
     plt.Figure()
     plt.plot(g_func0, label="g_func0")
     plt.plot(g_func1, label="g_func1")
     plt.plot(np.interp(load.time_L4, time_vals, g_func2), label="g_func2")
     plt.legend()
     plt.show()
-    """
+
 
     assert np.allclose(g_func1, np.interp(load.time_L4, time_vals, g_func2))
-    assert np.allclose(g_func0, np.interp(load.time_L4, time_vals, g_func3), rtol = 0.001)
+    assert np.allclose(g_func0, np.interp(load.time_L4, time_vals, g_func3), rtol=0.001)
     assert np.all(g_func0 > 0)
     assert np.all(g_func1 > 0)
     assert np.all(g_func2 > 0)

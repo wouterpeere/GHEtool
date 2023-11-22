@@ -153,16 +153,7 @@ class GFunction:
 
                 # calculate the g-values for uniform borehole wall temperature
                 gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options).gFunc
-                if np.any(gfunc_calculated < 0):
-                    threshold = 24 * 3600.
-                    self.options["linear_threshold"] = threshold
-                    gfunc_calculated1 = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options, method=self.options['method']).gFunc
-                    self.options["linear_threshold"] = borefield[0].r_b**2 / self.alpha
-                    gfunc_calculated2 = gt.gfunction.gFunction(borefield, alpha, time_values[time_values < threshold], options=self.options,
-                                                               method=self.options[
-                                                                   'method']).gFunc
-                    gfunc_calculated1[time_values < threshold] = gfunc_calculated2
-
+                
                 # store the calculated g-values
                 self.set_new_calculated_data(time_values, depth, gfunc_calculated, borefield, alpha)
 
@@ -191,13 +182,16 @@ class GFunction:
             # calculate the g-values for uniform borehole wall temperature
             gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options, method=self.options['method']).gFunc
             if np.any(gfunc_calculated < 0):
+                # there are negative gfunction values
+
                 threshold = time_values[np.min(np.arange(gfunc_calculated.size)[gfunc_calculated < 0]) - 1]
                 self.options["linear_threshold"] = threshold
-                gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options, method=self.options['method']).gFunc
+                gfunc_calculated_corrected = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options, method=self.options['method']).gFunc
                 del self.options["linear_threshold"]
-                gfunc_calculated2 = gt.gfunction.gFunction(borefield, alpha, time_values[time_values < threshold], options=self.options, method=self.options[
-                    'method']).gFunc
-                gfunc_calculated[time_values < threshold] = gfunc_calculated2
+
+                # replace all values after the threshold with the new, corrected, values
+                gfunc_calculated_corrected[time_values < threshold] = gfunc_calculated[time_values < threshold]
+                gfunc_calculated = gfunc_calculated_corrected
 
             # store the calculated g-values
             self.set_new_calculated_data(time_values, depth, gfunc_calculated, borefield, alpha)
