@@ -129,8 +129,13 @@ def test_check_time_values():
 
 def test_set_options():
     gfunc = GFunction()
-    gfunc.set_options_gfunction_calculation({"Method": "similarities"})
-    assert gfunc.options["Method"] == "similarities"
+    test = {"method": "similarities", "linear_threshold": 24*3600}
+    gfunc.set_options_gfunction_calculation(test)
+    assert gfunc.options == test
+    gfunc.set_options_gfunction_calculation({"method": "similarities"})
+    assert gfunc.options == test
+    gfunc.set_options_gfunction_calculation({"method": "similarities"}, add=False)
+    assert gfunc.options == {"method": "similarities"}
 
 
 def test_calculate_gfunctions_speed_test():

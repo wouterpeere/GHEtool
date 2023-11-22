@@ -85,7 +85,7 @@ class GFunction:
 
     def __init__(self):
         self.store_previous_values: bool = GFunction.DEFAULT_STORE_PREVIOUS_VALUES
-        self.options: dict = {"method": "equivalent"}
+        self.options: dict = {'method': 'equivalent', 'linear_threshold': 24*3600}
         self.alpha: float = 0.
         self.borefield: list[gt.boreholes.Borehole] = []
         self.depth_array: np.ndarray = np.array([])
@@ -387,7 +387,7 @@ class GFunction:
 
         return False
 
-    def set_options_gfunction_calculation(self, options: dict) -> None:
+    def set_options_gfunction_calculation(self, options: dict, add: bool = True) -> None:
         """
         This function sets the options for the gfunction calculation of pygfunction.
         This dictionary is directly passed through to the gFunction class of pygfunction.
@@ -397,11 +397,18 @@ class GFunction:
         ----------
         options : dict
             Dictionary with options for the gFunction class of pygfunction
+        add : bool
+            True if the options should be added, False is the options should be replaced.
 
         Returns
         -------
         None
         """
+        if add:
+            self.options = self.options | options
+            return
+
+        # replace options
         self.options = options
 
     def remove_previous_data(self) -> None:
