@@ -45,6 +45,8 @@ def test_negative_g_func_values():
     borefield.set_max_avg_fluid_temperature(16)   # maximum temperature
     borefield.set_min_avg_fluid_temperature(0)    # minimum temperature
 
+    borefield.gfunction_calculation_object.set_options_gfunction_calculation({'linear_threshold': 16000})
+
     g_func = borefield.gfunction(load.time_L3, 150)
 
     g_func2 = gt.gfunction.gFunction(borefield.borefield, data.alpha, _time_values(t_max=load.time_L3[-1]),

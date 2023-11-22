@@ -85,7 +85,7 @@ class GFunction:
 
     def __init__(self):
         self.store_previous_values: bool = GFunction.DEFAULT_STORE_PREVIOUS_VALUES
-        self.options: dict = {'method': 'equivalent', 'linear_threshold': 24*3600}
+        self.options: dict = {'method': 'equivalent'}
         self.alpha: float = 0.
         self.borefield: list[gt.boreholes.Borehole] = []
         self.depth_array: np.ndarray = np.array([])
