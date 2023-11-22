@@ -405,7 +405,7 @@ class GFunction:
         None
         """
         if add:
-            self.options = self.options | options
+            self.options.update(options)
             return
 
         # replace options
