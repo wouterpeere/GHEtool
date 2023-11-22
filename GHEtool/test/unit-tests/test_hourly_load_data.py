@@ -3,7 +3,7 @@ import pytest
 import numpy as np
 
 from GHEtool import FOLDER
-from GHEtool.VariableClasses import HourlyGeothermalLoad, HourlyGeothermalLoadMultiYear
+from GHEtool.VariableClasses import HourlyGeothermalLoad, HourlyGeothermalLoadMultiYear, MonthlyGeothermalLoadAbsolute
 
 
 def test_load_hourly_data():
@@ -181,3 +181,29 @@ def test_dhw():
     assert np.array_equal(np.full(8760, 10), load.hourly_heating_load)
     assert np.array_equal(np.full(12, 8760*10/12), load.baseload_heating)
     assert load.imbalance == -8760*10
+
+
+def test_eq():
+    profile_1 = HourlyGeothermalLoad()
+    profile_2 = MonthlyGeothermalLoadAbsolute()
+    assert not profile_1 == profile_2
+    assert profile_1 == profile_1
+
+    profile_2 = HourlyGeothermalLoad()
+    assert profile_1 == profile_2
+
+    profile_1.simulation_period = 55
+    assert profile_1 != profile_2
+
+    profile_1.hourly_cooling_load = np.linspace(0, 10000, 8760)
+    profile_2.simulation_period = 55
+    assert profile_1 != profile_2
+
+    profile_2.hourly_cooling_load = np.linspace(0, 10000, 8760)
+    assert profile_1 == profile_2
+
+    profile_1.hourly_heating_load = np.linspace(0, 8759, 8760)
+    assert profile_1 != profile_2
+
+    profile_2.hourly_heating_load = np.linspace(0, 8759, 8760)
+    assert profile_1 == profile_2

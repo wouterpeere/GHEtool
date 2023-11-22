@@ -423,7 +423,6 @@ def test_load_data_GUI():
     assert np.allclose(data["Cooling"], calc_data[1])
 
 
-
 def test_bug_when_opening_scenarios_which_have_autosave_enabled(qtbot):
     # init gui window
     main_window = start_tests(qtbot)

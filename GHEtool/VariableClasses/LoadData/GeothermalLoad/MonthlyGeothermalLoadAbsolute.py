@@ -328,3 +328,18 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             values
         """
         self.peak_heating = np.array(load)
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, MonthlyGeothermalLoadAbsolute):
+            return False
+        if not np.array_equal(self.baseload_heating, other.baseload_heating):
+            return False
+        if not np.array_equal(self.baseload_cooling, other.baseload_cooling):
+            return False
+        if not np.array_equal(self.peak_heating, other.peak_heating):
+            return False
+        if not np.array_equal(self.peak_cooling, other.peak_cooling):
+            return False
+        if not self.simulation_period == other.simulation_period:
+            return False
+        return True

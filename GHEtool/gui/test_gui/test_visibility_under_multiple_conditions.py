@@ -417,6 +417,7 @@ def test_visibility_on_result_page(qtbot):
     # thread = main_window.threads[-1]
     _ = [thread.run() for thread in main_window.threads]
     # assert thread.calculated
+    qtbot.wait(10000)
 
     list_options_optimize_load_profile = [gs.results_heating_ext, gs.results_heating_peak_geo,
                                           gs.results_heating_load_percentage, gs.results_heating_load,

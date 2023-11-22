@@ -4,6 +4,9 @@ using a combination of active and passive cooling.
 This example is based on the work of Coninx and De Nies, 2021.
 Coninx, M., De Nies, J. (2022). Cost-efficient Cooling of Buildings by means of Borefields
 with Active and Passive Cooling. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
+It is also published as: Coninx, M., De Nies, J., Hermans, L., Peere, W., Boydens, W., Helsen, L. (2024).
+Cost-efficient cooling of buildings by means of geothermal borefields with active and passive cooling.
+Applied Energy, 355, Art. No. 122261, https://doi.org/10.1016/j.apenergy.2023.122261.
 """
 
 from GHEtool import Borefield, GroundConstantTemperature, HourlyGeothermalLoadMultiYear

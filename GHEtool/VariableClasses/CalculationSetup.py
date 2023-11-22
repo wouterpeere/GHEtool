@@ -11,7 +11,7 @@ from GHEtool.VariableClasses.BaseClass import BaseClass
 
 class CalculationSetup(BaseClass):
     """
-    This class contains all the settings related to the sizing options.
+    This class contains all the settings related to the GHEtool methods.
     """
 
     __slots__ = '_L2_sizing', '_L3_sizing', '_L4_sizing', 'quadrant_sizing', '_backup', \

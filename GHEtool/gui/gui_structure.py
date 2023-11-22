@@ -618,7 +618,7 @@ class GUI(GuiStructure):
             decimal_number=1,
             default_value=10,
             maximal_value=100,
-            minimal_value=0
+            minimal_value=-50
         )
 
         self.option_fluid_conductivity = FloatBox(
@@ -1850,6 +1850,8 @@ class GUI(GuiStructure):
         -------
         None
         """
+        if not self.started and self.option_cooling_column.get_value()[0] != -1:
+            return
         filename = (
             self.option_filename.get_value() if not isinstance(filename, str) else filename) if filename is not None else self.option_filename.get_value()
 

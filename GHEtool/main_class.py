@@ -1911,7 +1911,7 @@ class Borefield(BaseClass):
         return self.borehole.Re
 
     def optimise_load_profile(self, building_load: HourlyGeothermalLoad, depth: float = None, SCOP: float = 10 ** 6,
-                              SEER: float = 10 ** 6, print_results: bool = False) -> None:
+                              SEER: float = 10 ** 6, print_results: bool = False, temperature_threshold: float = 0.05) -> None:
         """
         This function optimises the load based on the given borefield and the given hourly load.
         (When the load is not geothermal, the SCOP and SEER are used to convert it to a geothermal load.)
@@ -1931,6 +1931,9 @@ class Borefield(BaseClass):
             SEER of the geothermal system (needed to convert hourly building load to geothermal load)
         print_results : bool
             True when the results of this optimisation are to be printed in the terminal
+        temperature_threshold : float
+            The maximum allowed temperature difference between the maximum and minimum fluid temperatures and their
+            respective limits. The lower this threshold, the longer the convergence will take.
 
         Returns
         -------
@@ -1939,7 +1942,7 @@ class Borefield(BaseClass):
         Raises
         ------
         ValueError
-            ValueError if no hourly load is given
+            ValueError if no hourly load is given or the threshold is negative
         """
 
         ## Explain variables
@@ -1950,6 +1953,10 @@ class Borefield(BaseClass):
         # check if hourly load is given
         if not building_load.hourly_resolution:
             raise ValueError("No hourly load was given!")
+
+        # check if threshold is positive
+        if temperature_threshold < 0:
+            raise ValueError(f'The temperature threshold is {temperature_threshold}, but it cannot be below 0!')
 
         # set depth
         if depth is None:
@@ -1989,7 +1996,7 @@ class Borefield(BaseClass):
             self.calculate_temperatures(depth=depth)
 
             # deviation from minimum temperature
-            if abs(min(self.results.peak_heating) - self.Tf_min) > 0.05:
+            if abs(min(self.results.peak_heating) - self.Tf_min) > temperature_threshold:
 
                 # check if it goes below the threshold
                 if min(self.results.peak_heating) < self.Tf_min:
@@ -2003,7 +2010,7 @@ class Borefield(BaseClass):
                 heat_ok = True
 
             # deviation from maximum temperature
-            if abs(np.max(self.results.peak_cooling) - self.Tf_max) > 0.05:
+            if abs(np.max(self.results.peak_cooling) - self.Tf_max) > temperature_threshold:
 
                 # check if it goes above the threshold
                 if np.max(self.results.peak_cooling) > self.Tf_max:
@@ -2196,11 +2203,14 @@ class Borefield(BaseClass):
         Tuple
             plt.Figure, plt.Axes
         """
+
+        load = self._secundary_borefield_load if self._secundary_borefield_load != HourlyGeothermalLoad() else self.load
+
         # sort heating and cooling load
-        heating = self._secundary_borefield_load.hourly_heating_load.copy()
+        heating = load.hourly_heating_load.copy()
         heating[::-1].sort()
 
-        cooling = self._secundary_borefield_load.hourly_cooling_load.copy()
+        cooling = load.hourly_cooling_load.copy()
         cooling.sort()
         cooling = cooling * (-1)
         # create new figure and axes if it not already exits otherwise clear it.

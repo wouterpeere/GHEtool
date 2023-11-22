@@ -843,6 +843,20 @@ def test_optimise_borefield_small(monkeypatch):
     assert borefield._external_load.simulation_period == 40
 
 
+def test_optimise_borefield_wrong_threshold(monkeypatch):
+    borefield = Borefield()
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    borefield.set_ground_parameters(ground_data_constant)
+    borefield.create_rectangular_borefield(5, 1, 6, 6, 100)
+    load = HourlyGeothermalLoad()
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load.simulation_period = 40
+    try:
+        borefield.optimise_load_profile(load, 150, print_results=True, temperature_threshold=-0.5)
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
+
 def test_calculate_quadrants_without_data():
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
