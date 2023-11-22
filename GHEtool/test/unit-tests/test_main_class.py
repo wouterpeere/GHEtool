@@ -853,7 +853,7 @@ def test_optimise_borefield_wrong_threshold(monkeypatch):
     load.simulation_period = 40
     try:
         borefield.optimise_load_profile(load, 150, print_results=True, temperature_threshold=-0.5)
-        assert False
+        assert False  # pragma: no cover
     except ValueError:
         assert True
 
