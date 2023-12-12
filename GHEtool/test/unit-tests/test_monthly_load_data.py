@@ -195,6 +195,7 @@ def test_dhw():
     assert load.dhw == 0.
     load.add_dhw(1000)
     assert load.dhw == 1000.
+    assert np.isclose(load.dhw_power, 1000./8760)
     load.dhw = 200
     assert load.dhw == 200.
     try:
@@ -209,6 +210,8 @@ def test_dhw():
         assert True
 
     load.dhw = 8760*10
+    assert np.array_equal(np.full(12, 10), load.peak_heating)
+    assert load.max_peak_heating == 10
     assert np.array_equal(np.full(12, 8760*10/12), load.baseload_heating)
     assert load.imbalance == -8760*10
     load.all_months_equal = False

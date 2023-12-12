@@ -55,7 +55,7 @@ def test_results_DHW(qtbot):
     main_window.display_results()
 
     assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 16.59 °C'
-    assert gs.min_temp.label.text() == 'The minimum average fluid temperature is 2.81 °C'
+    assert gs.min_temp.label.text() == 'The minimum average fluid temperature is 2.8 °C'
 
     gs.geo_load.set_value(1)
     gs.option_include_dhw.set_value(0)
@@ -82,7 +82,7 @@ def test_results_DHW(qtbot):
     main_window.display_results()
 
     assert gs.max_temp.label.text() == 'The maximum average fluid temperature is 18.5 °C'
-    assert gs.min_temp.label.text() == 'The minimum average fluid temperature is 8.56 °C'
+    assert gs.min_temp.label.text() == 'The minimum average fluid temperature is 8.55 °C'
 
     gs.option_temperature_profile_hourly.set_value(1)
 

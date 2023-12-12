@@ -417,7 +417,7 @@ class Translations:  # pragma: no cover
         self.option_spacing_width: List[str] = [
             "Borehole spacing width [m]: ",
             "Bohrlochabstand Breitenrichtung [m]: ",
-            "Boorgatspatiëring Breedte [m]: ",
+            "Boorgatspatiëring breedte [m]: ",
             "Spaziatura del foro [m]: ",
             "Espacement des trous de forage [m]: ",
             "Espaciado entre pozos [m]: ",
