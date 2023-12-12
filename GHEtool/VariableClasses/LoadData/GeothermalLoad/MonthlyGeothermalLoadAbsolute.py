@@ -116,9 +116,7 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             values
         """
         if self._check_input(load):
-            self._baseload_cooling = load
-            # set peak load
-            self.peak_cooling = np.maximum(self.peak_cooling, self.baseload_cooling_power)
+            self._baseload_cooling = np.array(load)
             return
         raise ValueError
 
@@ -181,8 +179,6 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
         """
         if self._check_input(load):
             self._baseload_heating = np.array(load)
-            # set peak load
-            self.peak_heating = np.maximum(self.peak_heating, self.baseload_heating_power)
             return
         raise ValueError
 
@@ -219,7 +215,7 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
         peak cooling : np.ndarray
             Peak cooling values for one year, so the length of the array is 12
         """
-        return self._peak_cooling
+        return np.maximum(self._peak_cooling, self.baseload_cooling_power)
 
     @peak_cooling.setter
     def peak_cooling(self, load) -> None:
@@ -243,7 +239,7 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             values
         """
         if self._check_input(load):
-            self._peak_cooling = np.maximum(load, self.baseload_cooling_power)
+            self._peak_cooling = np.array(load)
             return
         raise ValueError
 
@@ -279,7 +275,7 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
         peak heating : np.ndarray
             Peak heating values for one year, so the length of the array is 12
         """
-        return self._peak_heating
+        return np.maximum(np.array(self._peak_heating) + self.dhw_power, self.baseload_heating_power)
 
     @peak_heating.setter
     def peak_heating(self, load: Union[np.ndarray, list, tuple]) -> None:
@@ -303,7 +299,7 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             values
         """
         if self._check_input(load):
-            self._peak_heating = np.maximum(load, self.baseload_heating_power)
+            self._peak_heating = np.array(load)
             return
         raise ValueError
 

@@ -615,3 +615,14 @@ class _LoadData(BaseClass, ABC):
         if not dhw >= 0:
             raise ValueError(f'Please fill in a positive value for the domestic hot water instead of {dhw}.')
         self._dhw_yearly = dhw
+
+    @property
+    def dhw_power(self) -> float:
+        """
+        This function returns the power related to the dhw production.
+
+        Returns
+        -------
+        dhw power : float
+        """
+        return self._dhw_yearly / 8760
