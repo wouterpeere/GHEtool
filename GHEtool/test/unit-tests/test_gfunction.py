@@ -129,8 +129,13 @@ def test_check_time_values():
 
 def test_set_options():
     gfunc = GFunction()
-    gfunc.set_options_gfunction_calculation({"Method": "similarities"})
-    assert gfunc.options["Method"] == "similarities"
+    test = {"method": "similarities", "linear_threshold": 24*3600}
+    gfunc.set_options_gfunction_calculation(test)
+    assert gfunc.options == test
+    gfunc.set_options_gfunction_calculation({"method": "similarities"})
+    assert gfunc.options == test
+    gfunc.set_options_gfunction_calculation({"method": "similarities"}, add=False)
+    assert gfunc.options == {"method": "similarities"}
 
 
 def test_calculate_gfunctions_speed_test():
@@ -424,3 +429,18 @@ def test_stuck_in_loop():
     for bor in borefield:
         bor.H = 110.5
     assert np.allclose(temp, gfunc.calculate(time_values, borefield, alpha))
+
+
+def test_negative_values():
+    gfunc = GFunction()
+    gfunc.use_cyl_correction_when_negative = False
+    field = gt.boreholes.rectangle_field(10, 7, 2, 2, 150, 2, 0.2)
+    time = gt.load_aggregation.ClaessonJaved(3600, 3600 * 8760 * 20).get_times_for_simulation()
+    g_func = gfunc.calculate(time, field, 1 / 5000 / 1000, interpolate=False)
+    assert not np.all(g_func > 0)
+    assert np.isclose(np.min(g_func), -519964.66315776133)
+
+    gfunc.use_cyl_correction_when_negative = True
+    g_func = gfunc.calculate(time, field, 1 / 5000 / 1000, interpolate=False)
+    assert np.all(g_func > 0)
+    assert np.isclose(np.min(g_func), 0.14299471464245733)

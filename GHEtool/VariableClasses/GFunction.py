@@ -1,12 +1,18 @@
 from __future__ import annotations
+
+import warnings
 from typing import List, Tuple, Union
 
 import numpy as np
-import copy
 import pygfunction as gt
 from scipy import interpolate
 
-from .CustomGFunction import _timeValues
+from .CustomGFunction import _time_values
+
+from GHEtool.VariableClasses.cylindrical_correction import update_pygfunction
+
+# add cylindrical correction to pygfunction
+update_pygfunction()
 
 
 class FIFO:
@@ -79,19 +85,20 @@ class GFunction:
     This is done by storing previously calculated gvalues.
     """
 
-    DEFAULT_TIMESTEPS: np.ndarray = _timeValues()
+    DEFAULT_TIMESTEPS: np.ndarray = _time_values()
     DEFAULT_NUMBER_OF_TIMESTEPS: int = DEFAULT_TIMESTEPS.size
     DEFAULT_STORE_PREVIOUS_VALUES: bool = True
 
     def __init__(self):
         self.store_previous_values: bool = GFunction.DEFAULT_STORE_PREVIOUS_VALUES
-        self.options: dict = {"method": "equivalent"}
+        self.options: dict = {'method': 'equivalent'}
         self.alpha: float = 0.
         self.borefield: list[gt.boreholes.Borehole] = []
         self.depth_array: np.ndarray = np.array([])
         self.time_array: np.ndarray = np.array([])
         self.previous_gfunctions: np.ndarray = np.array([])
         self.previous_depth: float = 0.
+        self.use_cyl_correction_when_negative: bool = True
 
         self.no_extrapolation: bool = True
         self.threshold_depth_interpolation: float = .25  # %
@@ -153,7 +160,7 @@ class GFunction:
 
                 # calculate the g-values for uniform borehole wall temperature
                 gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options).gFunc
-
+                
                 # store the calculated g-values
                 self.set_new_calculated_data(time_values, depth, gfunc_calculated, borefield, alpha)
 
@@ -172,7 +179,7 @@ class GFunction:
                 self.previous_depth = depth
             # do interpolation
             interpolate = interpolate if interpolate is not None else self.store_previous_values
-            gfunc_interpolated = self.interpolate_gfunctions(time_values, depth, alpha, borefield)\
+            gfunc_interpolated = self.interpolate_gfunctions(time_values, depth, alpha, borefield) \
                 if interpolate else np.array([])
 
             # if there are g-values calculated, return them
@@ -181,6 +188,20 @@ class GFunction:
 
             # calculate the g-values for uniform borehole wall temperature
             gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options, method=self.options['method']).gFunc
+            if np.any(gfunc_calculated < 0):
+                warnings.warn('There are negative g-values. This can be caused by a large borehole radius.')
+                if self.use_cyl_correction_when_negative:
+                    # there are negative gfunction values
+                    warnings.warn('Cylindrical correction is used to correct this large borehole. '
+                                  'You can change this behaviour by setting the use_cyl_correction_when_negative variable '
+                                  'of the Gfunction class to False.')
+
+                    backup = self.options.get('Cylindrical_correction')
+
+                    self.options["cylindrical_correction"] = True
+                    gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options, method=self.options['method']).gFunc
+                    self.options["cylindrical_correction"] = backup
+
 
             # store the calculated g-values
             self.set_new_calculated_data(time_values, depth, gfunc_calculated, borefield, alpha)
@@ -200,7 +221,7 @@ class GFunction:
             # due to this many requested time values, the calculation will be slow.
             # there will be interpolation
 
-            time_value_new = _timeValues(t_max=time_value[-1])
+            time_value_new = _time_values(t_max=time_value[-1])
 
             # calculate g-function values
             gfunc_uniform_T = gvalues(time_value_new, borefield, alpha, depth, interpolate)
@@ -387,7 +408,7 @@ class GFunction:
 
         return False
 
-    def set_options_gfunction_calculation(self, options: dict) -> None:
+    def set_options_gfunction_calculation(self, options: dict, add: bool = True) -> None:
         """
         This function sets the options for the gfunction calculation of pygfunction.
         This dictionary is directly passed through to the gFunction class of pygfunction.
@@ -397,11 +418,18 @@ class GFunction:
         ----------
         options : dict
             Dictionary with options for the gFunction class of pygfunction
+        add : bool
+            True if the options should be added, False is the options should be replaced.
 
         Returns
         -------
         None
         """
+        if add:
+            self.options.update(options)
+            return
+
+        # replace options
         self.options = options
 
     def remove_previous_data(self) -> None:
