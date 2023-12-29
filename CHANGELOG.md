@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Bug in hourly data (issue #196).
 - Bug in saving after a file has been moved (issue #198).
 - Problem with negative g-function values (issue #187).
+- Bug in DHW and peak heating power(issue #202).
 
 
 ## [2.2.0] - 2023-10-17

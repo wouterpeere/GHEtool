@@ -178,6 +178,9 @@ def test_dhw():
         assert True
 
     load.dhw = 8760*10
+    assert np.array_equal(np.full(12, 10), load.peak_heating)
+    assert np.array_equal(np.full(8760, 10), load.hourly_heating_load)
+    assert load.max_peak_heating == 10
     assert np.array_equal(np.full(8760, 10), load.hourly_heating_load)
     assert np.array_equal(np.full(12, 8760*10/12), load.baseload_heating)
     assert load.imbalance == -8760*10
