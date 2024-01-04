@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 
 from typing import Union
@@ -183,7 +185,12 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
                                                  self._hourly_cooling_load + other._hourly_cooling_load)
 
         if isinstance(other, HourlyGeothermalLoad):
-            pass
+            warnings.warn('You combine a hourly load with a multi-year load. The result will be a multi-year load with'
+                          ' the same simulation period as before.')
+            return HourlyGeothermalLoadMultiYear(self._hourly_heating_load + np.tile(other.hourly_heating_load,
+                                                                                     self.simulation_period),
+                                                 self._hourly_cooling_load + np.tile(other.hourly_cooling_load,
+                                                                                     self.simulation_period))
 
         try:
             return other.__add__(self)

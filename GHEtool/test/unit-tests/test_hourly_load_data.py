@@ -319,3 +319,20 @@ def test_add_multiyear():
     assert np.allclose(result._hourly_cooling_load, load_1._hourly_cooling_load + load_2._hourly_cooling_load)
     assert np.allclose(result.hourly_heating_load, load_1.hourly_heating_load + load_2.hourly_heating_load)
     assert np.allclose(result.hourly_cooling_load, load_1.hourly_cooling_load + load_2.hourly_cooling_load)
+
+    load_2 = HourlyGeothermalLoad(np.arange(0, 8760, 1),
+                                  np.arange(0, 8760, 1) + 1,
+                                  dhw=20000)
+
+    with pytest.warns():
+        result = load_1 + load_2
+
+    assert np.allclose(result._hourly_heating_load, load_1._hourly_heating_load + np.tile(load_2.hourly_heating_load, load_1.simulation_period))
+    assert np.allclose(result._hourly_cooling_load, load_1._hourly_cooling_load + np.tile(load_2.hourly_cooling_load, load_1.simulation_period))
+    assert np.allclose(result.hourly_heating_load, load_1.hourly_heating_load + load_2.hourly_heating_load)
+    assert np.allclose(result.hourly_cooling_load, load_1.hourly_cooling_load + load_2.hourly_cooling_load)
+
+    assert np.allclose(result._hourly_heating_load,
+                   load_1._hourly_heating_load + np.tile(load_2._hourly_heating_load + load_2.dhw_power, load_1.simulation_period))
+    assert np.allclose(result._hourly_cooling_load,
+                   load_1._hourly_cooling_load + np.tile(load_2._hourly_cooling_load, load_1.simulation_period))
