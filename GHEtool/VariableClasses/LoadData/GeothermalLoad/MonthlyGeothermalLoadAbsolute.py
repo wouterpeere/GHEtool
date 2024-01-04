@@ -4,7 +4,7 @@ import numpy as np
 
 from typing import Union
 from GHEtool.VariableClasses.LoadData._LoadData import _LoadData
-from GHEtool.VariableClasses.LoadData.GeothermalLoad import HourlyGeothermalLoad
+from GHEtool.VariableClasses.LoadData.GeothermalLoad import HourlyGeothermalLoad, HourlyGeothermalLoadMultiYear
 from GHEtool.logger.ghe_logger import ghe_logger
 
 
@@ -369,13 +369,17 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
 
             return result
 
+        # multiyear hourly
+        if isinstance(other, HourlyGeothermalLoadMultiYear):
+            raise TypeError('You cannot add an HourlyMultiYear input with a monthly based input.')
+
+        # hourly load
         if isinstance(other, HourlyGeothermalLoad):
+            warnings.warn('You add an hourly to a monthly load, the result will hence be a monthly load.')
             if self.simulation_period != other.simulation_period:
                 warnings.warn(f'The simulation period for both load classes are different. '
                               f'The maximum simulation period of '
                               f'{max(self.simulation_period, other.simulation_period)} years will be taken.')
-            if isinstance(other, HourlyGeothermalLoad):
-                warnings.warn('You add an hourly to a monthly load, the result will hence be a monthly load.')
 
             peak_heating, baseload_heating = other.resample_to_monthly(other._hourly_heating_load)
             peak_cooling, baseload_cooling = other.resample_to_monthly(other._hourly_cooling_load)
@@ -392,4 +396,3 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             return result
 
         raise TypeError('Cannot perform addition. Please check if you use correct classes.')
-
