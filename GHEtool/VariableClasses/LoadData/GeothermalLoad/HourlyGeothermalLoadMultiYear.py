@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 
 from typing import Union
@@ -162,3 +164,35 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
             hourly heating for the whole simulation period
         """
         return self._hourly_heating_load
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, HourlyGeothermalLoad):
+            return False
+        if not np.array_equal(self._hourly_cooling_load, other._hourly_cooling_load):
+            return False
+        if not np.array_equal(self._hourly_heating_load, other._hourly_heating_load):
+            return False
+        if not self.simulation_period == other.simulation_period:
+            return False
+        return True
+
+    def __add__(self, other):
+        if isinstance(other, HourlyGeothermalLoadMultiYear):
+            if self.simulation_period != other.simulation_period:
+                raise ValueError('Cannot combine HourlyGeothermalLoadMultiYear classes with different simulation periods.')
+
+            return HourlyGeothermalLoadMultiYear(self._hourly_heating_load + other._hourly_heating_load,
+                                                 self._hourly_cooling_load + other._hourly_cooling_load)
+
+        if isinstance(other, HourlyGeothermalLoad):
+            warnings.warn('You combine a hourly load with a multi-year load. The result will be a multi-year load with'
+                          ' the same simulation period as before.')
+            return HourlyGeothermalLoadMultiYear(self._hourly_heating_load + np.tile(other.hourly_heating_load,
+                                                                                     self.simulation_period),
+                                                 self._hourly_cooling_load + np.tile(other.hourly_cooling_load,
+                                                                                     self.simulation_period))
+
+        try:
+            return other.__add__(self)
+        except TypeError:  # pragma: no cover
+            raise TypeError('Cannot perform addition. Please check if you use correct classes.')  # pragma: no cover

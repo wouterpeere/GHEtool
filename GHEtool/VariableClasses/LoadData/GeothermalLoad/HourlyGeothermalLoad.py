@@ -3,6 +3,8 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+import warnings
+
 from typing import Union, Tuple, TYPE_CHECKING
 
 from GHEtool.VariableClasses.LoadData._LoadData import _LoadData
@@ -369,3 +371,19 @@ class HourlyGeothermalLoad(_LoadData):
         if not self.simulation_period == other.simulation_period:
             return False
         return True
+
+    def __add__(self, other):
+        if isinstance(other, HourlyGeothermalLoad):
+            if self.simulation_period != other.simulation_period:
+                warnings.warn(f'The simulation period for both load classes are different. '
+                              f'The maximum simulation period of '
+                              f'{max(self.simulation_period, other.simulation_period)} years will be taken.')
+            return HourlyGeothermalLoad(self._hourly_heating_load + other._hourly_heating_load,
+                                        self._hourly_cooling_load + other._hourly_cooling_load,
+                                        max(self.simulation_period, other.simulation_period),
+                                        self.dhw + other.dhw)
+
+        try:
+            return other.__add__(self)
+        except TypeError:  # pragma: no cover
+            raise TypeError('Cannot perform addition. Please check if you use correct classes.')  # pragma: no cover

@@ -267,3 +267,71 @@ def test_eq():
 
     load_2 = HourlyGeothermalLoad()
     assert load_1 != load_2
+
+
+def test_add():
+    load_1 = MonthlyGeothermalLoadAbsolute(*load_case(2))
+    load_2 = MonthlyGeothermalLoadAbsolute(*load_case(1))
+    load_1.dhw = 10000
+    load_2.dhw = 50000
+    load_1.simulation_period = 20
+    load_2.simulation_period = 30
+
+    try:
+        load_1 + 55
+        assert False  # pragma: no cover
+    except TypeError:
+        assert True
+
+    with pytest.warns():
+        result = load_1 + load_2
+
+    assert result.simulation_period == 30
+    assert result.dhw == 60000
+    assert np.allclose(result.baseload_heating, load_1.baseload_heating + load_2.baseload_heating)
+    assert np.allclose(result.baseload_cooling, load_1.baseload_cooling + load_2.baseload_cooling)
+    assert np.allclose(result._peak_heating, load_1._peak_heating + load_2._peak_heating)
+    assert np.allclose(result._peak_cooling, load_1._peak_cooling + load_2._peak_cooling)
+
+    load_2.simulation_period = 20
+    load_2.peak_heating_duration = 18
+
+    with pytest.warns():
+        result = load_1 + load_2
+        assert result.peak_heating_duration == 18*3600
+    load_1.peak_heating_duration = 18
+    try:
+        with pytest.warns():
+            result = load_1 + load_2
+        assert False  # pragma: no cover
+    except:
+        assert True
+
+    load_1.peak_cooling_duration = 18
+    with pytest.warns():
+        result = load_1 + load_2
+        assert result.peak_cooling_duration == 18*3600
+    load_2.peak_cooling_duration = 18
+    try:
+        with pytest.warns():
+            result = load_1 + load_2
+        assert False  # pragma: no cover
+    except:
+        assert True
+
+    # add hourly load
+    load_hourly = HourlyGeothermalLoad(np.full(8760, 10), np.full(8760, 20), 30, 10000)
+
+    with pytest.warns():
+        result = load_1 + load_hourly  # simulation period not equal
+
+    assert result.simulation_period == 30
+    assert result.dhw == 20000
+    assert np.allclose(result._baseload_heating, load_1._baseload_heating + load_hourly.resample_to_monthly(load_hourly._hourly_heating_load)[1])
+    assert np.allclose(result._baseload_cooling, load_1._baseload_cooling + load_hourly.resample_to_monthly(load_hourly._hourly_cooling_load)[1])
+    assert np.allclose(result._peak_heating, load_1._peak_heating + load_hourly.resample_to_monthly(load_hourly._hourly_heating_load)[0])
+    assert np.allclose(result._peak_cooling, load_1._peak_cooling + load_hourly.resample_to_monthly(load_hourly._hourly_cooling_load)[0])
+
+    load_hourly.simulation_period = 20
+    with pytest.warns():
+        result = load_1 + load_hourly
