@@ -1,7 +1,10 @@
+import warnings
+
 import numpy as np
 
 from typing import Union
 from GHEtool.VariableClasses.LoadData._LoadData import _LoadData
+from GHEtool.VariableClasses.LoadData.GeothermalLoad import HourlyGeothermalLoad
 from GHEtool.logger.ghe_logger import ghe_logger
 
 
@@ -339,3 +342,33 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
         if not self.simulation_period == other.simulation_period:
             return False
         return True
+
+    def __add__(self, other):
+        if isinstance(other, (MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad)):
+            if self.simulation_period != other.simulation_period:
+                warnings.warn(f'The simulation period for both load classes are different. '
+                              f'The maximum simulation period of '
+                              f'{max(self.simulation_period, other.simulation_period)} years will be taken.')
+            if self.peak_cooling_duration != other.peak_cooling_duration:
+                warnings.warn(f'The peak cooling duration for both load classes are different. '
+                              f'The maximum peak cooling duration of '
+                              f'{max(self.peak_cooling_duration, other.peak_cooling_duration)} hours will be taken.')
+            if self.peak_heating_duration != other.peak_heating_duration:
+                warnings.warn(f'The peak heating duration for both load classes are different. '
+                              f'The maximum peak heating duration of '
+                              f'{max(self.peak_heating_duration, other.peak_heating_duration)} hours will be taken.')
+            if isinstance(other, HourlyGeothermalLoad):
+                warnings.warn('You add an hourly to a monthly load, the result will hence be a monthly load.')
+            result = MonthlyGeothermalLoadAbsolute(self._baseload_heating + other._baseload_heating,
+                                                   self._baseload_cooling + other._baseload_cooling,
+                                                   self._peak_heating + other._peak_heating,
+                                                   self._peak_cooling + other._peak_cooling,
+                                                   max(self.simulation_period, other.simulation_period),
+                                                   self.dhw + other.dhw)
+            result.peak_cooling_duration = max(self._peak_cooling_duration, other._peak_cooling_duration)
+            result.peak_heating_duration = max(self._peak_heating_duration, other._peak_heating_duration)
+
+            return result
+
+        raise TypeError('Cannot perform addition. Please check if you use correct classes.')
+

@@ -210,3 +210,29 @@ def test_eq():
 
     profile_2.hourly_heating_load = np.linspace(0, 8759, 8760)
     assert profile_1 == profile_2
+
+
+def test_eq_multiyear():
+    profile_1 = HourlyGeothermalLoadMultiYear()
+    profile_2 = MonthlyGeothermalLoadAbsolute()
+    assert not profile_1 == profile_2
+    assert profile_1 == profile_1
+
+    profile_2 = HourlyGeothermalLoadMultiYear()
+    assert profile_1 == profile_2
+
+    profile_1.simulation_period = 55
+    assert profile_1 != profile_2
+
+    profile_1.hourly_cooling_load = np.linspace(0, 10000, 8760*55)
+    profile_2.simulation_period = 55
+    assert profile_1 != profile_2
+
+    profile_2.hourly_cooling_load = np.linspace(0, 10000, 8760*55)
+    assert profile_1 == profile_2
+
+    profile_1.hourly_heating_load = np.linspace(0, 8759, 8760*55)
+    assert profile_1 != profile_2
+
+    profile_2.hourly_heating_load = np.linspace(0, 8759, 8760*55)
+    assert profile_1 == profile_2
