@@ -162,3 +162,14 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
             hourly heating for the whole simulation period
         """
         return self._hourly_heating_load
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, HourlyGeothermalLoad):
+            return False
+        if not np.array_equal(self._hourly_cooling_load, other._hourly_cooling_load):
+            return False
+        if not np.array_equal(self._hourly_heating_load, other._hourly_heating_load):
+            return False
+        if not self.simulation_period == other.simulation_period:
+            return False
+        return True
