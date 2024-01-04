@@ -4,7 +4,8 @@ import numpy as np
 
 from typing import Union
 from GHEtool.VariableClasses.LoadData._LoadData import _LoadData
-from GHEtool.VariableClasses.LoadData.GeothermalLoad import HourlyGeothermalLoad, HourlyGeothermalLoadMultiYear
+from GHEtool.VariableClasses.LoadData.GeothermalLoad import HourlyGeothermalLoad
+from GHEtool.VariableClasses.LoadData.GeothermalLoad.HourlyGeothermalLoadMultiYear import HourlyGeothermalLoadMultiYear
 from GHEtool.logger.ghe_logger import ghe_logger
 
 
