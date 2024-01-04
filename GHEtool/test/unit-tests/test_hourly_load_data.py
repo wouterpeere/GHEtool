@@ -290,3 +290,32 @@ def test_add():
     assert np.allclose(result._baseload_cooling, load_1._baseload_cooling + load_hourly.resample_to_monthly(load_hourly._hourly_cooling_load)[1])
     assert np.allclose(result._peak_heating, load_1._peak_heating + load_hourly.resample_to_monthly(load_hourly._hourly_heating_load)[0])
     assert np.allclose(result._peak_cooling, load_1._peak_cooling + load_hourly.resample_to_monthly(load_hourly._hourly_cooling_load)[0])
+
+
+def test_add_multiyear():
+    load_1 = HourlyGeothermalLoadMultiYear(heating_load=np.arange(0, 8760, 1),
+                                           cooling_load=np.full(8760, 2))
+    load_2 = HourlyGeothermalLoadMultiYear(cooling_load=np.arange(0, 8760*2, 1) + 1,
+                                           heating_load=np.full(8760*2, 3))
+
+    try:
+        load_1 + 55
+        assert False  # pragma: no cover
+    except TypeError:
+        assert True
+
+    try:
+        load_1 + load_2
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
+
+    load_1 = HourlyGeothermalLoadMultiYear(heating_load=np.arange(0, 8760 * 2, 1),
+                                           cooling_load=np.full(8760 * 2, 2))
+
+    result = load_1 + load_2
+
+    assert np.allclose(result._hourly_heating_load, load_1._hourly_heating_load + load_2._hourly_heating_load)
+    assert np.allclose(result._hourly_cooling_load, load_1._hourly_cooling_load + load_2._hourly_cooling_load)
+    assert np.allclose(result.hourly_heating_load, load_1.hourly_heating_load + load_2.hourly_heating_load)
+    assert np.allclose(result.hourly_cooling_load, load_1.hourly_cooling_load + load_2.hourly_cooling_load)

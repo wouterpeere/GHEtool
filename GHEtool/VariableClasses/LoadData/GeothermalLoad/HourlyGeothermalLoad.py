@@ -382,7 +382,8 @@ class HourlyGeothermalLoad(_LoadData):
                                         self._hourly_cooling_load + other._hourly_cooling_load,
                                         max(self.simulation_period, other.simulation_period),
                                         self.dhw + other.dhw)
+
         try:
             return other.__add__(self)
-        except TypeError:
-            raise TypeError('Cannot perform addition. Please check if you use correct classes.')
+        except TypeError:  # pragma: no cover
+            raise TypeError('Cannot perform addition. Please check if you use correct classes.')  # pragma: no cover
