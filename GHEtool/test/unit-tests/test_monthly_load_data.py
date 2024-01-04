@@ -318,3 +318,20 @@ def test_add():
         assert False  # pragma: no cover
     except:
         assert True
+
+    # add hourly load
+    load_hourly = HourlyGeothermalLoad(np.full(8760, 10), np.full(8760, 20), 30, 10000)
+
+    with pytest.warns():
+        result = load_1 + load_hourly  # simulation period not equal
+
+    assert result.simulation_period == 30
+    assert result.dhw == 20000
+    assert np.allclose(result._baseload_heating, load_1._baseload_heating + load_hourly.resample_to_monthly(load_hourly._hourly_heating_load)[1])
+    assert np.allclose(result._baseload_cooling, load_1._baseload_cooling + load_hourly.resample_to_monthly(load_hourly._hourly_cooling_load)[1])
+    assert np.allclose(result._peak_heating, load_1._peak_heating + load_hourly.resample_to_monthly(load_hourly._hourly_heating_load)[0])
+    assert np.allclose(result._peak_cooling, load_1._peak_cooling + load_hourly.resample_to_monthly(load_hourly._hourly_cooling_load)[0])
+
+    load_hourly.simulation_period = 20
+    with pytest.warns():
+        result = load_1 + load_hourly
