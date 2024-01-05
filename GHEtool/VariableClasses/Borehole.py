@@ -5,7 +5,7 @@ This document contains all the information of the borehole class.
 from GHEtool.VariableClasses.BaseClass import BaseClass
 from GHEtool.VariableClasses.FluidData import FluidData
 from GHEtool.VariableClasses.PipeData import _PipeData, MultipleUTube
-from math import pi
+from typing import Union
 
 import matplotlib.pyplot as plt
 import pygfunction as gt
@@ -169,7 +169,7 @@ class Borehole(BaseClass):
         self._pipe_data = MultipleUTube()
         self.use_constant_Rb = True
 
-    def calculate_Rb(self, H: float, D: float, r_b: float, k_s: float) -> float:
+    def calculate_Rb(self, H: float, D: float, r_b: float, k_s: Union[float, callable]) -> float:
         """
         This function calculates the equivalent borehole thermal resistance.
 
@@ -181,8 +181,8 @@ class Borehole(BaseClass):
             Borehole burial depth [m]
         r_b : float
             Borehole radius [m]
-        k_s : float
-            Ground thermal conductivity [mk/W]
+        k_s : float or callable
+            (Function to calculate the) ground thermal conductivity [mk/W]
 
         Returns
         -------
@@ -202,11 +202,11 @@ class Borehole(BaseClass):
         # initiate temporary borefield
         borehole = gt.boreholes.Borehole(H, D, r_b, 0, 0)
         # initiate pipe
-        pipe = self.pipe_data.pipe_model(self.fluid_data, k_s, borehole)
+        pipe = self.pipe_data.pipe_model(self.fluid_data, k_s if isinstance(k_s, (float, int)) else k_s(H), borehole)
 
         return pipe.effective_borehole_thermal_resistance(self.fluid_data.mfr, self.fluid_data.Cp)
 
-    def get_Rb(self, H: float, D: float, r_b: float, k_s: float) -> float:
+    def get_Rb(self, H: float, D: float, r_b: float, k_s: Union[callable, float]) -> float:
         """
         This function returns the equivalent borehole thermal resistance.
         If use_constant_Rb is True, self._Rb is returned, otherwise the resistance is calculated.
@@ -219,8 +219,8 @@ class Borehole(BaseClass):
             Borehole burial depth [m]
         r_b : float
             Borehole radius [m]
-        k_s : float
-            Ground thermal conductivity [mk/W]
+        k_s : float or callable
+            (Function to calculate) ground thermal conductivity in function of depth [mk/W]
 
         Returns
         -------
@@ -230,7 +230,7 @@ class Borehole(BaseClass):
         if self.use_constant_Rb:
             return self.Rb
 
-        return self.calculate_Rb(H, D, r_b, k_s)
+        return self.calculate_Rb(H, D, r_b, k_s if isinstance(k_s, (int, float)) else k_s(H))
 
     def __eq__(self, other):
         if not isinstance(other, Borehole):
