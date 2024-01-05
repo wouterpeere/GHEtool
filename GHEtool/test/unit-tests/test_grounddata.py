@@ -30,9 +30,9 @@ def test_ground_data_unequal():
 
 def test_alpha():
     data = GroundFluxTemperature(3)
-    assert data.alpha == 3 / data.volumetric_heat_capacity
+    assert data.alpha(H=100) == 3 / data.volumetric_heat_capacity
     data = GroundFluxTemperature()
-    assert data.alpha is None
+    assert data.alpha() is None
 
 
 def test_Tg():

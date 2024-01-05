@@ -1841,7 +1841,7 @@ class Borefield(BaseClass):
             """
             # set the correct depth of the borefield
             self._update_borefield_depth(H=H)
-            return self.gfunction_calculation_object.calculate(time_value, self.borefield, self.ground_data.alpha,
+            return self.gfunction_calculation_object.calculate(time_value, self.borefield, self.ground_data.alpha(H),
                                                                interpolate=self._calculation_setup.interpolate_gfunctions)
 
         ## 1 bypass any possible precalculated g-functions
@@ -1891,7 +1891,7 @@ class Borefield(BaseClass):
         except TypeError:
             raise ValueError("No borefield is set for which the gfunctions should be calculated")
         try:
-            self.ground_data.alpha
+            self.ground_data.alpha(H=100)
         except AttributeError:
             raise ValueError("No ground data is set for which the gfunctions should be calculated")
 

@@ -8,7 +8,7 @@ class _GroundData(BaseClass, ABC):
     Contains information regarding the ground data of the borefield.
     """
 
-    __slots__ = 'k_s', 'volumetric_heat_capacity', 'alpha', 'variable_Tg', 'Tg'
+    __slots__ = 'k_s', 'volumetric_heat_capacity', 'variable_Tg', 'Tg'
 
     def __init__(self, k_s: float = None,
                  volumetric_heat_capacity: float = 2.4 * 10**6):
@@ -26,11 +26,27 @@ class _GroundData(BaseClass, ABC):
         self.volumetric_heat_capacity = volumetric_heat_capacity  # J/m3K
         self.variable_Tg: bool = False
         self.Tg: float = 10
-        if self.volumetric_heat_capacity is None or self.k_s is None:
-            self.alpha = None
-        else:
-            self.alpha = self.k_s / self.volumetric_heat_capacity  # m2/s
 
+    def alpha(self, H: float = 100) -> float:
+        """
+        Returns the ground thermal diffusivity in m²/s for a given depth.
+        If no volumetric heat capacity or conductivity is given, None is returned.
+
+        Parameters
+        ----------
+        H : float
+            Depth in meters.
+
+        Returns
+        -------
+        float
+            Ground thermal diffusivity in m²/s for a given depth.
+        """
+
+        if self.volumetric_heat_capacity is None or self.k_s is None:
+            return None
+        else:
+            return self.k_s / self.volumetric_heat_capacity  # m2/s
     @abc.abstractmethod
     def calculate_Tg(self, H: float) -> float:
         """
