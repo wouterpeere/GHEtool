@@ -4,7 +4,7 @@ import warnings
 import numpy as np
 from abc import ABC
 from GHEtool.VariableClasses.BaseClass import BaseClass
-from typing import Union
+from typing import Union, List
 
 
 class GroundLayer(BaseClass):
@@ -84,7 +84,7 @@ class _GroundData(BaseClass, ABC):
             The volumetric heat capacity of the ground [J/m3K]
         """
 
-        self.layers: list[GroundLayer] = []
+        self.layers: List[GroundLayer] = []
         self.layer_depths: list = []
         self.variable_Tg: bool = False
         self.Tg: float = 10
@@ -93,7 +93,7 @@ class _GroundData(BaseClass, ABC):
         if k_s is not None:
             self.add_layer_on_bottom(GroundLayer(k_s, volumetric_heat_capacity, thickness=None))
 
-    def add_layer_on_top(self, layer: Union[GroundLayer, list[GroundLayer]]) -> None:
+    def add_layer_on_top(self, layer: Union[GroundLayer, List[GroundLayer]]) -> None:
         """
         This function adds a ground layer on the top of the array. This hence becomes the highest
         ground layer.
@@ -128,7 +128,7 @@ class _GroundData(BaseClass, ABC):
                 continue
             self.layer_depths.append(self.layer_depths[idx] + layer.thickness)
 
-    def add_layer_on_bottom(self, layer: Union[GroundLayer, list[GroundLayer]]) -> None:
+    def add_layer_on_bottom(self, layer: Union[GroundLayer, List[GroundLayer]]) -> None:
         """
         This function adds a ground layer on the bottom of the array. This hence becomes the deepest
         ground layer.

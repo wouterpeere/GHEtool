@@ -164,7 +164,7 @@ def test_temp_profile_temp_gradient(qtbot):
     gs.option_ground_temp_gradient.set_value(ground_temp)
     main_window.save_scenario()
 
-    gd = GroundTemperatureGradient(k_s, ground_temp, borefield.ground_data.volumetric_heat_capacity, gradient)
+    gd = GroundTemperatureGradient(k_s, ground_temp, borefield.ground_data.volumetric_heat_capacity(), gradient)
     borefield.set_ground_parameters(gd)
 
     ds = main_window.list_ds[-1]
