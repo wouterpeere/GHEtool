@@ -26,7 +26,7 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           files: ./coverage.xml
-          token: 8e6f48b5-8534-4f9a-894b-0a2d226dab26 # not required for public repos
+          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
   
   test_general:
     runs-on: windows-latest
@@ -48,7 +48,7 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           files: ./coverage.xml
-          token: 8e6f48b5-8534-4f9a-894b-0a2d226dab26 # not required for public repos
+          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
 
 
   test_gui:
@@ -71,7 +71,7 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           files: ./coverage.xml
-          token: 8e6f48b5-8534-4f9a-894b-0a2d226dab26 # not required for public repos
+          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
 
   test_examples:
     runs-on: windows-latest
@@ -93,7 +93,7 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           files: ./coverage.xml
-          token: 8e6f48b5-8534-4f9a-894b-0a2d226dab26 # not required for public repos
+          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
    
   test_validation:
     runs-on: windows-latest
@@ -115,7 +115,7 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           files: ./coverage.xml
-          token: 8e6f48b5-8534-4f9a-894b-0a2d226dab26 # not required for public repos
+          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
 
   unit-tests:
     runs-on: ${{ matrix.os }}
@@ -143,5 +143,4 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         files: ./coverage.xml
-        token: 8e6f48b5-8534-4f9a-894b-0a2d226dab26 # not required for public repos
-      
+        token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
