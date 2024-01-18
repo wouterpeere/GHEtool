@@ -24,7 +24,7 @@ There are two graphical user interfaces available which are built using GHEtool:
 #### GHEtool Pro
 GHEtool Pro is the official and supported version of GHEtool which supports drilling companies, engineering firms, architects, government organizations in their geothermal design process.
 With GHEtool Pro they can minimize the environmental and societal impact while maximizing the cost-effective utilization of geothermal projects.
-Visit our website at [https://ghetool.eu](htts://ghetool.eu) to learn more about the synergy between this open-source package and GHEtool Pro.
+Visit our website at [https://ghetool.eu](https://ghetool.eu) to learn more about the synergy between this open-source package and GHEtool Pro.
 
 #### GHEtool Community
 Besides GHEtool Pro, an open-source alternative for the graphical user interface is available in the form of *GHEtool Community*.
