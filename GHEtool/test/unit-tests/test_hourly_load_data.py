@@ -368,3 +368,46 @@ def test_add_multiyear():
         assert False  # pragma: no cover
     except TypeError:
         assert True
+
+
+def test_start_month_general():
+    load = HourlyGeothermalLoad()
+    assert load.start_month == 1
+    try:
+        load.start_month = 1.5
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
+    try:
+        load.start_month = 0
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
+    try:
+        load.start_month = 13
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
+    load.start_month = 12
+    assert load.start_month == 12
+    assert load._start_hour == 11 * 730
+    load.start_month = 1
+    assert load.start_month == 1
+    assert load._start_hour == 0
+    load.start_month = 3
+    assert load.start_month == 3
+    assert load._start_hour == 730 * 2
+
+    load.all_months_equal = False
+    assert load._start_hour == 1416
+
+
+def test_different_start_month():
+    load = HourlyGeothermalLoad(np.arange(1, 8761, 1), np.arange(1, 8761, 1))
+    load.start_month = 3
+    assert load.start_month == 3
+    assert load.hourly_cooling_load[0] == 731 * 2 - 1
+    assert load.hourly_heating_load[0] == 731 * 2 - 1
+    load.all_months_equal = False
+    assert load.hourly_cooling_load[0] == 1417
+    assert load.hourly_heating_load[0] == 1417

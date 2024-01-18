@@ -15,6 +15,30 @@ def test_checks():
     assert load._check_input(np.ones(12))
 
 
+def test_start_month_general():
+    load = MonthlyGeothermalLoadAbsolute()
+    assert load.start_month == 1
+    try:
+        load.start_month = 1.5
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
+    try:
+        load.start_month = 0
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
+    try:
+        load.start_month = 13
+        assert False  # pragma: no cover
+    except ValueError:
+        assert True
+    load.start_month = 12
+    assert load.start_month == 12
+    load.start_month = 1
+    assert load.start_month == 1
+
+
 def test_imbalance():
     load = MonthlyGeothermalLoadAbsolute(np.ones(12)*10, np.ones(12), np.ones(12), np.ones(12))
     assert load.imbalance == -108
@@ -33,6 +57,7 @@ def test_baseload_heating():
     assert np.array_equal(load.baseload_heating_power, load.peak_heating)
     try:
         load.set_baseload_heating(np.ones(11))
+        assert False  # pragma: no cover
     except ValueError:
         assert True
 
@@ -49,6 +74,7 @@ def test_baseload_cooling():
 
     try:
         load.set_baseload_cooling(np.ones(11))
+        assert False  # pragma: no cover
     except ValueError:
         assert True
 
@@ -64,6 +90,7 @@ def test_peak_heating():
     assert np.array_equal(load.peak_heating, np.array([5., 5., 5., 5., 5., 6., 7., 8., 9., 10., 11., 12.]))
     try:
         load.set_peak_heating(np.ones(11))
+        assert False  # pragma: no cover
     except ValueError:
         assert True
 
@@ -79,6 +106,7 @@ def test_peak_cooling():
     assert np.array_equal(load.peak_cooling, np.array([5.,  5.,  5.,  5.,  5.,  6.,  7.,  8.,  9., 10., 11., 12.]))
     try:
         load.set_peak_cooling(np.ones(11))
+        assert False  # pragma: no cover
     except ValueError:
         assert True
 
@@ -335,3 +363,16 @@ def test_add():
     load_hourly.simulation_period = 20
     with pytest.warns():
         result = load_1 + load_hourly
+
+
+def test_different_start_month():
+    load = MonthlyGeothermalLoadAbsolute(baseload_heating=np.arange(1, 13, 1),
+                                         baseload_cooling=np.arange(1, 13, 1),
+                                         peak_cooling=np.arange(1, 13, 1),
+                                         peak_heating=np.arange(1, 13, 1))
+    load.start_month = 2
+    result = np.array([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1])
+    assert np.array_equal(load.baseload_heating, result)
+    assert np.array_equal(load.baseload_cooling, result)
+    assert np.array_equal(load.peak_heating, result)
+    assert np.array_equal(load.peak_cooling, result)
