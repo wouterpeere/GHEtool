@@ -38,10 +38,6 @@ This code is tested with Python 3.8, 3.9, 3.10 and 3.11 and requires the followi
 * Openpyxl (>=3.0.7)
 * Pandas (>=1.2.4)
 
-For the GUI
-
-* ScenarioGUI (>=0.3.0)
-
 For the tests
 
 * Pytest (>=7.1.2)
