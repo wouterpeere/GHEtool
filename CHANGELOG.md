@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [2.2.1] - 2024-01-18
 
 ## Added
+- Possibility to start in another month (issue #140).
 - Equal functions for HourlyGeothermalLoad and MonthlyGeothermalLoadAbsolute (issue #189).
 - Cylindrical borehole correction (issue #187).
 - __add__ functionality for the load classes (issue #202).
