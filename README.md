@@ -27,8 +27,8 @@ With GHEtool Pro they can minimize the environmental and societal impact while m
 Visit our website at [https://ghetool.eu](htts://ghetool.eu) to learn more about the synergy between this open-source package and GHEtool Pro.
 
 #### GHEtool Community
-Next to GHEtool Pro, an open-source alternative for the graphical user interface is available in the form of *GHEtool Community*.
-This version is built and maintained by the community, but has no official support like GHEtool Pro. You can read all about this 
+Besides GHEtool Pro, an open-source alternative for the graphical user interface is available in the form of *GHEtool Community*.
+This version is built and maintained by the community, and **has no official support like GHEtool Pro**. You can read all about this 
 *GHEtool Community* on their [GitHub repo](https://github.com/wouterpeere/ghetool-gui).
 
 <p align="center">
@@ -39,7 +39,7 @@ This version is built and maintained by the community, but has no official suppo
 GHEtool is in constant development with new methods, enhancements and features added to every new version. Please visit our [project board](https://github.com/users/wouterpeere/projects/2) to check our progress.
 
 ## Requirements
-This code is tested with Python 3.8, 3.9, 3.10 and 3.11 and requires the following libraries (the versions mentioned are the ones with which the code is tested)
+This code is tested with Python 3.8, 3.9, 3.10, 3.11 and 3.12 and requires the following libraries (the versions mentioned are the ones with which the code is tested)
 
 * Numpy (>=1.20.2)
 * Scipy (>=1.6.2)
@@ -84,7 +84,7 @@ This runs some predefined cases to see whether all the internal dependencies wor
 ## Get started with GHEtool
 
 ### Building blocks of GHEtool
-GHEtool is a flexible package that can be extend with methods from [pygfunction](https://pygfunction.readthedocs.io/en/stable/) (and [ScenarioGUI](https://github.com/tblanke/ScenarioGUI) for the GUI part).
+GHEtool is a flexible package that can be extend with methods from [pygfunction](https://pygfunction.readthedocs.io/en/stable/).
 To work efficiently with GHEtool, it is important to understand the main structure of the package.
 
 #### Borefield
