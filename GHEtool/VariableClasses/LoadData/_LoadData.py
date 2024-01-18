@@ -35,6 +35,44 @@ class _LoadData(BaseClass, ABC):
         self.tm: int = _LoadData.AVG_UPM * 3600  # time in a month in seconds
         self._all_months_equal: bool = True  # true if it is assumed that all months are of the same length
         self._dhw_yearly: float = 0.
+        self._start_month: float = 0
+
+    @property
+    def start_month(self) -> int:
+        """
+        This function returns the start month.
+
+        Returns
+        -------
+        float
+            Start month
+        """
+        return self._start_month
+
+    @start_month.setter
+    def start_month(self, month: int) -> None:
+        """
+        This function sets the start month.
+
+        Parameters
+        ----------
+        month : int
+            Start month (jan: 1, feb: 2 ...)
+
+        Returns
+        -------
+        None
+
+        Raises
+        ----------
+        ValueError
+            When the start month is smaller than 1, larger than 12 or non-integer
+        """
+
+        if not isinstance(month, int) or month < 1 or month > 12:
+            raise ValueError(f'The value for month is: {month} which is not an integer in [1,12].')
+
+        self._start_month = month
 
     @property
     def all_months_equal(self) -> bool:
@@ -626,3 +664,22 @@ class _LoadData(BaseClass, ABC):
         dhw power : float
         """
         return self._dhw_yearly / 8760
+
+    @abc.abstractmethod
+    def correct_for_start_month(self, array: np.ndarray, start_month) -> np.ndarray:
+        """
+        This function corrects the load for the correct start month.
+        If the simulation starts in september, the start month is 9 and hence the array should start
+        at index 9.
+
+        Parameters
+        ----------
+        array : np.ndarray
+            Load array
+        start_month : int
+            Start month
+
+        Returns
+        -------
+        load : np.ndarray
+        """
