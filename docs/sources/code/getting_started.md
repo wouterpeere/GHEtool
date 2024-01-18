@@ -3,16 +3,20 @@
 ## Requirements
 This code is tested with Python 3.8, 3.9, 3.10, 3.11 and 3.12 and requires the following libraries (the versions mentioned are the ones with which the code is tested)
 
-* matplotlib>=3.5.2
-* numpy>=1.23.1
-* pandas>=1.4.3
-* pygfunction>=2.2.1
-* scipy>=1.8.1
-* scikit-optimize>=0.9.0
+* matplotlib >= 3.5.2
+* numpy >= 1.23.1
+* pandas >= 1.4.3
+* pygfunction >= 2.2.1
+* scipy >= 1.8.1
+* scikit-optimize >= 0.9.0
 
 For the tests
 
-* Pytest (>=7.1.2)
+* Pytest >= 7.1.2
+
+For the active/passive example
+
+* scikit-optimize >= 0.9.0
 
 ## Installation
 

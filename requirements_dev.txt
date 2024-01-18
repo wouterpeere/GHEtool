@@ -1,3 +1,4 @@
 pytest>=7.1.2
 pytest-cov>=3.0.0
 hypothesis>=6.65.2
+scikit-optimize>=0.9.0
