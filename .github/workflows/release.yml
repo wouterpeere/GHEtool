@@ -116,7 +116,7 @@ jobs:
         files: ./coverage.xml
         token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
 
-  dependency:
+  release:
     needs: [test_methods, test_general, test_examples, test_validation, unit-tests]
     runs-on: windows-latest
     steps:
