@@ -11,10 +11,27 @@ Welcome on this ReadTheDocs for the open-source borefield sizing tool GHEtool.
 
 Here one can find (extensive) documentation of GHEtool codebase. Please find below the content of this ReadTheDocs.
 
+Graphical user interface
+========================
+There are two graphical user interfaces available which are built using GHEtool: GHEtool Pro and GHEtool Community
+
+GHEtool Pro
+-----------
+GHEtool Pro is the official and supported version of GHEtool which supports drilling companies, engineering firms, architects, government organizations in their geothermal design process.
+With GHEtool Pro they can minimize the environmental and societal impact while maximizing the cost-effective utilization of geothermal projects.
+Visit our website at `https://ghetool.eu <https://ghetool.eu>`_ to learn more about the synergy between this open-source package and GHEtool Pro.
+
 The user manual for GHEtool Pro, together with instructions for installation, you can find `here <https://manual.ghetool.eu>`_.
 
-If you want to download GHEtool, please visit our website at `https://GHEtool.eu <https://GHEtool.eu>`_.
-If you have any questions, remarks or ideas for future functionalities, please contact us via GitHub.
+.. image:: GHEtoolPro.png
+  :alt: Image of GHEtool Pro
+
+
+GHEtool Community
+-----------------
+Besides GHEtool Pro, an open-source alternative for the graphical user interface is available in the form of *GHEtool Community*.
+This version is built and maintained by the community, and **has no official support like GHEtool Pro**. You can read all about this
+*GHEtool Community* on their `GitHub Repo <https://github.com/wouterpeere/ghetool-gui>`_.
 
 .. toctree::
     :caption: GHEtool
