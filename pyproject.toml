@@ -12,7 +12,3 @@ exclude_lines = [
   "if TYPE_CHECKING:",
   "if typing.TYPE_CHECKING:"
 ]
-
-[tool.isort]
-line_length = 160
-profile = 'black
