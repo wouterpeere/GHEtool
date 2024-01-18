@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Move code related to the GUI to a separate repo (issue #210).
 
 ## fixed
+- Problem with multiyear hourly data and L3 sizing (issue #153).
 - Problem with negative g-function values (issue #187).
 - Bug in load-duration curve when not working with optimize load profile (issue #189).
 - Bug in hourly data (issue #196).
