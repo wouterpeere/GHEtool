@@ -1,18 +1,14 @@
 # Installation
 
 ## Requirements
-This code is tested with Python 3.8, 3.9, 3.10 and 3.11 and requires the following libraries:
+This code is tested with Python 3.8, 3.9, 3.10, 3.11 and 3.12 and requires the following libraries (the versions mentioned are the ones with which the code is tested)
 
-* Numpy (>=1.20.2)
-* Scipy (>=1.6.2)
-* Matplotlib (>=3.4.1)
-* Pygfunction (>=2.2.0)
-* Openpyxl (>=3.0.7)
-* Pandas (>=1.2.4)
-
-For the GUI
-
-* ScenarioGUI (>=0.3.0)
+* matplotlib>=3.5.2
+* numpy>=1.23.1
+* pandas>=1.4.3
+* pygfunction>=2.2.1
+* scipy>=1.8.1
+* scikit-optimize>=0.9.0
 
 For the tests
 

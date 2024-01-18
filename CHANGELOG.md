@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file. For future 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [2.2.1] - 2024
+## [2.2.1] - 2024-01-18
 
 ## Added
 - Equal functions for HourlyGeothermalLoad and MonthlyGeothermalLoadAbsolute (issue #189).
@@ -12,8 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## changed
 - Negative reference temperatures for the fluid are now possible (issue #192).
+- Move code related to the GUI to a separate repo (issue #210).
 
 ## fixed
+- Problem with multiyear hourly data and L3 sizing (issue #153).
 - Problem with negative g-function values (issue #187).
 - Bug in load-duration curve when not working with optimize load profile (issue #189).
 - Bug in hourly data (issue #196).

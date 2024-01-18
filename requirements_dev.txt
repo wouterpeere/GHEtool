@@ -1,6 +1,5 @@
 pytest>=7.1.2
 pytest-cov>=3.0.0
-pytest-qt>=4.1.0
 hypothesis>=6.65.2
 black>=22.8.0
 keyboard>=0.13.5
