@@ -46,7 +46,7 @@ class Borefield(BaseClass):
         '_ground_data', '_borefield_load', \
         'options_pygfunction', \
         'THRESHOLD_WARNING_SHALLOW_FIELD', \
-        'gui', 'D', 'r_b', 'gfunction_calculation_object', \
+        'D', 'r_b', 'gfunction_calculation_object', \
         '_calculation_setup', \
         '_secundary_borefield_load', '_building_load', '_external_load'
 
@@ -56,7 +56,6 @@ class Borefield(BaseClass):
                  baseload_cooling: np.ndarray | list = None,
                  borefield=None,
                  custom_gfunction: CustomGFunction = None,
-                 gui: bool = False,
                  load: _LoadData = None):
         """
 
@@ -74,9 +73,6 @@ class Borefield(BaseClass):
             Set the borefield for which the calculations will be carried out
         custom_gfunction : CustomGFunction
             Custom gfunction dataset
-        gui : bool
-            True if the Borefield object is created by the GUI. This should not be used in the code version
-            of GHEtool itself.
 
         Examples
         --------
@@ -155,9 +151,6 @@ class Borefield(BaseClass):
         # initiate different sizing
         self._calculation_setup: CalculationSetup = CalculationSetup()
         self.calculation_setup()
-
-        # check if the GHEtool is used by the gui i
-        self.gui = gui
 
         # load on the geothermal borefield, used in calculations
         self._borefield_load = MonthlyGeothermalLoadAbsolute()
@@ -1584,7 +1577,7 @@ class Borefield(BaseClass):
         Returns
         -------
         fig, ax
-            If the borefield object is part of the GUI, it returns the figure object
+            Figure object
         """
         # calculate temperature profile
         self._calculate_temperature_profile(hourly=plot_hourly)
@@ -1608,7 +1601,7 @@ class Borefield(BaseClass):
         Returns
         -------
         fig, ax
-            If the borefield object is part of the GUI, it returns the figure object
+            Figure object
         """
         # calculate temperature profile
         self._calculate_temperature_profile(H=depth, hourly=plot_hourly)
@@ -1618,8 +1611,6 @@ class Borefield(BaseClass):
     def _plot_temperature_profile(self, legend: bool = True, plot_hourly: bool = False) -> Tuple[plt.Figure, plt.Axes]:
         """
         This function plots the temperature profile.
-        If the Borefield object exists as part of the GUI, than the figure is returned,
-        otherwise it is shown.
 
         Parameters
         ----------
@@ -1631,7 +1622,7 @@ class Borefield(BaseClass):
         Returns
         -------
         fig, ax
-            If the borefield object is part of the GUI, it returns the figure object
+            Figure object
         """
 
         # make a time array
@@ -1673,9 +1664,7 @@ class Borefield(BaseClass):
         if legend:
             ax.legend()
         ax.set_xlim(left=0, right=self.simulation_period)
-        # show figure if not in gui mode
-        if not self.gui:
-            plt.show()
+        plt.show()
         return fig, ax
 
     def _delete_calculated_temperatures(self) -> None:
@@ -2184,52 +2173,5 @@ class Borefield(BaseClass):
         # plot legend if wanted
         if legend:
             ax.legend()  #
-        # show plt if not in gui
-        if not self.gui:
-            plt.show()
-        return fig, ax
-
-    def _plot_load_duration(self, legend: bool = False) -> Tuple[plt.Figure, plt.Axes]:
-        """
-        This function makes a load-duration curve from the hourly values.
-
-        Parameters
-        ----------
-        legend : bool
-            True if the figure should have a legend
-
-        Returns
-        ----------
-        Tuple
-            plt.Figure, plt.Axes
-        """
-
-        load = self._secundary_borefield_load if self._secundary_borefield_load != HourlyGeothermalLoad() else self.load
-
-        # sort heating and cooling load
-        heating = load.hourly_heating_load.copy()
-        heating[::-1].sort()
-
-        cooling = load.hourly_cooling_load.copy()
-        cooling.sort()
-        cooling = cooling * (-1)
-        # create new figure and axes if it not already exits otherwise clear it.
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        # add sorted loads to plot
-        ax.step(np.arange(0, 8760, 1), heating, 'r-', label="Heating")
-        ax.step(np.arange(0, 8760, 1), cooling, 'b-', label="Cooling")
-        # create 0 line
-        ax.hlines(0, 0, 8759, color="black")
-        # add labels
-        ax.set_xlabel("Time [hours]")
-        ax.set_ylabel("Power [kW]")
-        # set x limits to 8760
-        ax.set_xlim(0, 8760)
-        # plot legend if wanted
-        if legend:
-            ax.legend()  # pragma: no cover
-        # show plt if not in gui
-        if not self.gui:
-            plt.show()  # pragma: no cover
+        plt.show()
         return fig, ax
