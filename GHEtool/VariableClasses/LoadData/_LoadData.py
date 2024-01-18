@@ -35,7 +35,7 @@ class _LoadData(BaseClass, ABC):
         self.tm: int = _LoadData.AVG_UPM * 3600  # time in a month in seconds
         self._all_months_equal: bool = True  # true if it is assumed that all months are of the same length
         self._dhw_yearly: float = 0.
-        self._start_month: float = 0
+        self._start_month: float = 1
 
     @property
     def start_month(self) -> int:
@@ -666,7 +666,7 @@ class _LoadData(BaseClass, ABC):
         return self._dhw_yearly / 8760
 
     @abc.abstractmethod
-    def correct_for_start_month(self, array: np.ndarray, start_month) -> np.ndarray:
+    def correct_for_start_month(self, array: np.ndarray) -> np.ndarray:
         """
         This function corrects the load for the correct start month.
         If the simulation starts in september, the start month is 9 and hence the array should start
@@ -676,8 +676,6 @@ class _LoadData(BaseClass, ABC):
         ----------
         array : np.ndarray
             Load array
-        start_month : int
-            Start month
 
         Returns
         -------

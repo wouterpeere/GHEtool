@@ -363,3 +363,16 @@ def test_add():
     load_hourly.simulation_period = 20
     with pytest.warns():
         result = load_1 + load_hourly
+
+
+def test_different_start_month():
+    load = MonthlyGeothermalLoadAbsolute(baseload_heating=np.arange(1, 13, 1),
+                                         baseload_cooling=np.arange(1, 13, 1),
+                                         peak_cooling=np.arange(1, 13, 1),
+                                         peak_heating=np.arange(1, 13, 1))
+    load.start_month = 2
+    result = np.array([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1])
+    assert np.array_equal(load.baseload_heating, result)
+    assert np.array_equal(load.baseload_cooling, result)
+    assert np.array_equal(load.peak_heating, result)
+    assert np.array_equal(load.peak_cooling, result)
