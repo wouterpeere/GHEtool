@@ -25,7 +25,9 @@ The user manual for GHEtool Pro, together with instructions for installation, yo
 
 .. image:: GHEtoolPro.png
   :alt: Image of GHEtool Pro
-  :width: 500
+  :width: 450
+  :align: center
+
 
 GHEtool Community
 -----------------
