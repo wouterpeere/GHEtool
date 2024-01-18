@@ -27,8 +27,6 @@ The user manual for GHEtool Pro, together with instructions for installation, yo
   :alt: Image of GHEtool Pro
   :width: 500
 
-
-
 GHEtool Community
 -----------------
 Besides GHEtool Pro, an open-source alternative for the graphical user interface is available in the form of *GHEtool Community*.
@@ -47,7 +45,7 @@ This version is built and maintained by the community, and **has no official sup
 
 
 .. toctree::
-    :caption: Code version
+    :caption: Code
     :maxdepth: 2
 
     sources/code/getting_started.md
