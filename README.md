@@ -26,14 +26,14 @@ GHEtool Pro is the official and supported version of GHEtool which supports dril
 With GHEtool Pro they can minimize the environmental and societal impact while maximizing the cost-effective utilization of geothermal projects.
 Visit our website at [https://ghetool.eu](https://ghetool.eu) to learn more about the synergy between this open-source package and GHEtool Pro.
 
+<p align="center">
+<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/GHEtoolPro.PNG" width="600">
+</p>
+
 #### GHEtool Community
 Besides GHEtool Pro, an open-source alternative for the graphical user interface is available in the form of *GHEtool Community*.
 This version is built and maintained by the community, and **has no official support like GHEtool Pro**. You can read all about this 
 *GHEtool Community* on their [GitHub repo](https://github.com/wouterpeere/ghetool-gui).
-
-<p align="center">
-<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/sources/gui/_figure/GHEtool.PNG" width="600">
-</p>
 
 ### Development
 GHEtool is in constant development with new methods, enhancements and features added to every new version. Please visit our [project board](https://github.com/users/wouterpeere/projects/2) to check our progress.
