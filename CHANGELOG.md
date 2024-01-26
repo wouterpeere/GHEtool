@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file. For future 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [2.2.1] - 2024-01-18
+## [2.2.1] - 2024-01-26
 
 ## Added
 - GHEtool is available on conda-forge (issue #107).
@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## changed
 - Negative reference temperatures for the fluid are now possible (issue #192).
 - Move code related to the GUI to a separate repo (issue #210).
+- Autorelease to PyPi and testPyPi (issue #212).
 
 ## fixed
 - Problem with multiyear hourly data and L3 sizing (issue #153).
@@ -23,7 +24,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Bug in hourly data (issue #196).
 - Bug in saving after a file has been moved (issue #198).
 - Bug in DHW and peak heating power(issue #202).
-
 
 ## [2.2.0] - 2023-10-17
 

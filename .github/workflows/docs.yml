@@ -1,4 +1,4 @@
-name: Docs
+name: Create docs
 on: [push, release]
 
 jobs:
