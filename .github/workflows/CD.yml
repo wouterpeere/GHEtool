@@ -1,16 +1,11 @@
 name: CD to pypi
 
 on:
-  push:
-    branches:
-      - master
-
-permissions:
-  contents: write
+  release:
+    types: [ published, unpublished ]
 
 jobs:
   build:
-    if: "contains(github.event.head_commit.message, 'auto-update version')"
     name: Build distribution 📦
     runs-on: ubuntu-latest
 
@@ -36,7 +31,7 @@ jobs:
 
   publish-to-testpypi:
     needs: build
-    if: "contains(github.event.head_commit.message, 'rc') || contains(github.event.head_commit.message, 'dev')"
+    if: "contains(github.event.release.name, 'rc') || contains(github.event.release.name, 'dev')"
     name: Publish 📦 to TestPyPI
     runs-on: ubuntu-latest
 
@@ -59,7 +54,7 @@ jobs:
 
   publish-to-pypi:
     needs: build
-    if: "!contains(github.event.head_commit.message, 'rc') && !contains(github.event.head_commit.message, 'dev')"
+    if: "!contains(github.event.release.name, 'rc') && !contains(github.event.release.name, 'dev')"
     name: Publish 📦 to PyPI
     runs-on: ubuntu-latest
 
