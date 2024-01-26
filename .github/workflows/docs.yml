@@ -1,5 +1,5 @@
 name: Create docs
-on: [push, release]
+on: push
 
 jobs:
   notebooks:
