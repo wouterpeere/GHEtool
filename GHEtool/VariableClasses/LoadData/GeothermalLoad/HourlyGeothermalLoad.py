@@ -94,7 +94,7 @@ class HourlyGeothermalLoad(_LoadData):
         hourly heating : np.ndarray
             Hourly heating values (incl. DHW) [kWh/h] for one year, so the length of the array is 8760
         """
-        return self._hourly_heating_load + self.dhw / 8760
+        return self.correct_for_start_month(self._hourly_heating_load + self.dhw / 8760)
 
     @hourly_heating_load.setter
     def hourly_heating_load(self, load: Union[np.ndarray, list, tuple]) -> None:
@@ -152,7 +152,7 @@ class HourlyGeothermalLoad(_LoadData):
         hourly cooling : np.ndarray
             Hourly cooling values [kWh/h] for one year, so the length of the array is 8760
         """
-        return self._hourly_cooling_load
+        return self.correct_for_start_month(self._hourly_cooling_load)
 
     @hourly_cooling_load.setter
     def hourly_cooling_load(self, load: Union[np.ndarray, list, tuple]) -> None:
@@ -387,3 +387,34 @@ class HourlyGeothermalLoad(_LoadData):
             return other.__add__(self)
         except TypeError:  # pragma: no cover
             raise TypeError('Cannot perform addition. Please check if you use correct classes.')  # pragma: no cover
+
+    @property
+    def _start_hour(self) -> int:
+        """
+        This function returns the hour at which the year starts based on the start month.
+
+        Returns
+        -------
+        int
+            Start hour of the year
+        """
+        return int(np.sum([self.UPM[i] for i in range(self.start_month - 1)]))
+
+    def correct_for_start_month(self, array: np.ndarray) -> np.ndarray:
+        """
+        This function corrects the load for the correct start month.
+        If the simulation starts in september, the start month is 9 and hence the array should start
+        at index 9.
+
+        Parameters
+        ----------
+        array : np.ndarray
+            Load array
+
+        Returns
+        -------
+        load : np.ndarray
+        """
+        if self.start_month == 1:
+            return array
+        return np.concatenate((array[self._start_hour:], array[:self._start_hour]))

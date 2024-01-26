@@ -65,3 +65,9 @@ def test_optimise_load_profile(monkeypatch):
 
     # optimise the load for a 10x10 field (see data above) and a fixed depth of 150m.
     borefield.optimise_load_profile(load, depth=150, print_results=True)
+
+
+def test_start_in_different_month(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    from GHEtool.Examples.start_in_different_month import start_in_different_month
+    start_in_different_month()

@@ -8,7 +8,7 @@
 [![Downloads](https://static.pepy.tech/personalized-badge/ghetool?period=week&units=international_system&left_color=black&right_color=orange&left_text=Downloads%20last%20week)](https://pepy.tech/project/ghetool)
 [![Read the Docs](https://readthedocs.org/projects/ghetool/badge/?version=latest)](https://ghetool.readthedocs.io/en/latest/)
 ## What is *GHEtool*?
-<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/sources/gui/_figure/Icon.png" width="110" align="left">
+<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/Icon.png" width="110" align="left">
 
 GHEtool is a Python package that contains all the functionalities needed to deal with borefield design. GHEtool has been developed as a joint effort of KU Leuven (The SySi Team), boydens engineering (part of Sweco) and FH Aachen.
 The core of this package is the automated sizing of borefield under different conditions. By making use of combination of just-in-time calculations of thermal ground responses (using [pygfunction](https://github.com/MassimoCimmino/pygfunction)) with
@@ -26,14 +26,14 @@ GHEtool Pro is the official and supported version of GHEtool which supports dril
 With GHEtool Pro they can minimize the environmental and societal impact while maximizing the cost-effective utilization of geothermal projects.
 Visit our website at [https://ghetool.eu](https://ghetool.eu) to learn more about the synergy between this open-source package and GHEtool Pro.
 
+<p align="center">
+<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/GHEtoolPro.png" width="600">
+</p>
+
 #### GHEtool Community
 Besides GHEtool Pro, an open-source alternative for the graphical user interface is available in the form of *GHEtool Community*.
 This version is built and maintained by the community, and **has no official support like GHEtool Pro**. You can read all about this 
 *GHEtool Community* on their [GitHub repo](https://github.com/wouterpeere/ghetool-gui).
-
-<p align="center">
-<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/sources/gui/_figure/GHEtool.PNG" width="600">
-</p>
 
 ### Development
 GHEtool is in constant development with new methods, enhancements and features added to every new version. Please visit our [project board](https://github.com/users/wouterpeere/projects/2) to check our progress.
@@ -71,6 +71,11 @@ or one can install a newer development version using
 ```
 pip install --extra-index-url https://test.pypi.org/simple/ GHEtool
 ```
+
+GHEtool is also available as a conda package. Therefore, you can install GHEtool with the command:
+````
+conda install GHEtool
+````
 
 Developers can clone this repository.
 
