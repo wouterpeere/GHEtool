@@ -95,7 +95,8 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
         baseload cooling : np.ndarray
             Baseload cooling values [kWh/month] for one year, so the length of the array is 12
         """
-        return self._baseload_cooling
+        return  self.correct_for_start_month(
+            self._baseload_cooling)
 
     @baseload_cooling.setter
     def baseload_cooling(self, load: Union[np.ndarray, list, tuple]) -> None:
@@ -157,7 +158,8 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
         baseload heating : np.ndarray
             Baseload heating values (incl. DHW) [kWh/month] for one year, so the length of the array is 12
         """
-        return self._baseload_heating + self.dhw / 8760 * self.UPM
+        return self.correct_for_start_month(
+            self._baseload_heating + self.dhw / 8760 * self.UPM)
 
     @baseload_heating.setter
     def baseload_heating(self, load: Union[np.ndarray, list, tuple]) -> None:
@@ -219,7 +221,8 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
         peak cooling : np.ndarray
             Peak cooling values for one year, so the length of the array is 12
         """
-        return np.maximum(self._peak_cooling, self.baseload_cooling_power)
+        return self.correct_for_start_month(
+            np.maximum(self._peak_cooling, self.baseload_cooling_power))
 
     @peak_cooling.setter
     def peak_cooling(self, load) -> None:
@@ -279,7 +282,8 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
         peak heating : np.ndarray
             Peak heating values for one year, so the length of the array is 12
         """
-        return np.maximum(np.array(self._peak_heating) + self.dhw_power, self.baseload_heating_power)
+        return self.correct_for_start_month(
+            np.maximum(np.array(self._peak_heating) + self.dhw_power, self.baseload_heating_power))
 
     @peak_heating.setter
     def peak_heating(self, load: Union[np.ndarray, list, tuple]) -> None:
@@ -397,3 +401,22 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             return result
 
         raise TypeError('Cannot perform addition. Please check if you use correct classes.')
+
+    def correct_for_start_month(self, array: np.ndarray) -> np.ndarray:
+        """
+        This function corrects the load for the correct start month.
+        If the simulation starts in september, the start month is 9 and hence the array should start
+        at index 9.
+
+        Parameters
+        ----------
+        array : np.ndarray
+            Load array
+
+        Returns
+        -------
+        load : np.ndarray
+        """
+        if self.start_month == 1:
+            return array
+        return np.concatenate((array[self.start_month-1:], array[:self.start_month-1]))
