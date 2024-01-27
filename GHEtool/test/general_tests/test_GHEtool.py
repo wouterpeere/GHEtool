@@ -123,7 +123,7 @@ def borefield_cooling_dom():
                           baseload_heating=monthlyLoadHeating,
                           baseload_cooling=monthlyLoadCooling)
 
-    borefield.set_baseload_cooling(np.array(monthlyLoadCooling)*2)
+    borefield.load.baseload_cooling = np.array(monthlyLoadCooling)*2
 
     borefield.set_ground_parameters(data)
     borefield.set_Rb(0.2)
@@ -217,33 +217,6 @@ def test_create_custom_dataset_without_data(borefield):
         borefield.create_custom_dataset()
 
 
-
-def test_incorrect_values_peak_baseload(borefield):
-    with raises(ValueError):
-        borefield.set_peak_heating(8)
-
-    with raises(ValueError):
-        borefield.set_peak_cooling(8)
-
-    with raises(ValueError):
-        borefield.set_baseload_heating(8)
-
-    with raises(ValueError):
-        borefield.set_baseload_cooling(8)
-
-    with raises(ValueError):
-        borefield.set_peak_cooling([8, 8])
-
-    with raises(ValueError):
-        borefield.set_peak_heating([8, 8])
-
-    with raises(ValueError):
-        borefield.set_baseload_cooling([8, 8])
-
-    with raises(ValueError):
-        borefield.set_baseload_heating([8, 8])
-
-
 def test_gfunction_jit(borefield):
     borefield.use_precalculated_data = False
     borefield.gfunction(10000, 100)
@@ -309,7 +282,7 @@ def test_borefield_with_constant_peaks(borefield):
 
     length_L2_1 = borefield.size_L2(100)
     # set constant peak
-    borefield.set_peak_cooling([240] * 12)
+    borefield.load.peak_cooling = [240] * 12
     length_L2_2 = borefield.size_L2(100)
 
     assert np.isclose(length_L2_1, length_L2_2, rtol=3*10**-5)
@@ -333,6 +306,6 @@ def test_sizing_with_use_constant_Rb():
 def test_size_with_different_peak_lengths(borefield):
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(4))
 
-    borefield.set_length_peak_cooling(8)
-    borefield.set_length_peak_heating(6)
+    borefield.load.peak_cooling_duration = 8
+    borefield.load.peak_heating_duration = 6
     assert np.isclose(99.33058400216774, borefield.size(L3_sizing=True))
