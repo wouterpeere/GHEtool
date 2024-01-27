@@ -150,7 +150,7 @@ def test_sizing_L3_threshold_depth_error(borefield):
 
 def test_sizing_L32(borefield_cooling_dom):
     borefield_cooling_dom.size(L3_sizing=True)
-    borefield_cooling_dom.set_peak_heating(np.array(peakHeating) * 5)
+    borefield_cooling_dom.load.peak_heating = np.array(peakHeating) * 5
     borefield_cooling_dom.size(L3_sizing=True)
 
 
@@ -269,7 +269,7 @@ def test_borefield_with_constant_peaks(borefield):
 
     length_L2_1 = borefield.size_L2(100)
     # set constant peak
-    borefield.set_peak_cooling([150]*12)
+    borefield.load.peak_cooling = [150]*12
     length_L2_2 = borefield.size_L2(100)
 
     assert np.isclose(length_L2_1, length_L2_2)
