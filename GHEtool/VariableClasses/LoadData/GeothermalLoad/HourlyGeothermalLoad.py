@@ -25,7 +25,7 @@ class HourlyGeothermalLoad(_LoadData):
     # define parameters for conversion to monthly loads
     START = pd.to_datetime("2019-01-01 00:00:00")
     END = pd.to_datetime("2019-12-31 23:59:00")
-    HOURS_SERIES = pd.Series(pd.date_range(START, END, freq="1H"))
+    HOURS_SERIES = pd.Series(pd.date_range(START, END, freq="1h"))
 
     def __init__(self, heating_load: ArrayLike | None = None,
                  cooling_load: ArrayLike | None = None,
