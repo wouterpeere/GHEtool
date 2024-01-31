@@ -181,22 +181,13 @@ def test_load_custom_gfunction():
 
 def test_set_length_peak():
     borefield = Borefield()
-    borefield.set_length_peak_heating(8)
-    borefield.set_length_peak_cooling(10)
+    borefield.load.peak_heating_duration = 8
+    borefield.load.peak_cooling_duration = 10
     assert borefield.load.peak_cooling_duration == 10 * 3600
     assert borefield.load.peak_heating_duration == 8 * 3600
     borefield.set_length_peak(12)
     assert borefield.load.peak_cooling_duration == 12 * 3600
     assert borefield.load.peak_heating_duration == 12 * 3600
-    borefield.set_length_peak_cooling()
-    borefield.set_length_peak_heating()
-    assert borefield.load.peak_heating_duration == 6 * 3600
-    assert borefield.load.peak_cooling_duration == 6 * 3600
-    borefield.set_length_peak_heating(8)
-    borefield.set_length_peak_cooling(10)
-    borefield.set_length_peak()
-    assert borefield.load.peak_heating_duration == 6 * 3600
-    assert borefield.load.peak_cooling_duration == 6 * 3600
 
 
 def test_simulation_period():
@@ -206,7 +197,7 @@ def test_simulation_period():
     borefield.simulation_period = 25
     assert borefield.simulation_period == 25
     assert len(borefield.load.time_L3) == 12 * 25
-    borefield.set_simulation_period(40)
+    borefield.load.simulation_period = 40
     assert borefield.simulation_period == 40
     assert len(borefield.load.time_L3) == 12 * 40
 
@@ -435,11 +426,8 @@ def test_size_L2_value_errors():
         assert False  # pragma: no cover
     except ValueError:
         assert True
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
-    borefield.set_peak_heating(peak_heating)
-    borefield.set_peak_cooling(peak_cooling)
-    borefield.set_baseload_cooling(monthly_load_cooling)
-    borefield.set_baseload_heating(monthly_load_heating)
+    load = MonthlyGeothermalLoadAbsolute(*load_case(2))
+    borefield.load = load
     borefield.set_ground_parameters(ground_data_constant)
     try:
         borefield.size_L2(100, 5)

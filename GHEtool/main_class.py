@@ -496,54 +496,6 @@ class Borefield(BaseClass):
         """
         self._borefield_load.peak_duration = length
 
-    def set_length_peak_heating(self, length: float = DEFAULT_LENGTH_PEAK) -> None:
-        """
-        This function sets the length of the heating peak.
-
-        Parameters
-        ----------
-        length : float
-            Length of the peak [hours]
-
-        Returns
-        -------
-        None
-        """
-        warn("This function will be depreciated in v2.2.1", DeprecationWarning, stacklevel=2)
-        self._borefield_load.peak_heating_duration = length
-
-    def set_length_peak_cooling(self, length: float = DEFAULT_LENGTH_PEAK) -> None:
-        """
-        This function sets the length of the cooling peak.
-
-        Parameters
-        ----------
-        length : float
-            Length of the peak [hours]
-
-        Returns
-        -------
-        None
-        """
-        warn("This function will be depreciated in v2.2.1", DeprecationWarning, stacklevel=2)
-        self._borefield_load.peak_cooling_duration = length
-
-    def set_simulation_period(self, simulation_period: int) -> None:
-        """
-        This function sets the simulation period and updates the time constants.
-
-        Parameters
-        ----------
-        simulation_period : int
-            Simulation period [years]
-
-        Returns
-        -------
-        None
-        """
-        warn("This function will be depreciated in v2.2.1", DeprecationWarning, stacklevel=2)
-        self._borefield_load.simulation_period = simulation_period
-
     def set_load(self, load: _LoadData) -> None:
         """
         This function sets the _load attribute.
@@ -761,10 +713,6 @@ class Borefield(BaseClass):
             raise ValueError(f'The maximum average fluid temperature {temp} is lower than the minimum average fluid temperature {self.Tf_min}')
         self.Tf_max: float = temp
 
-    def set_max_ground_temperature(self, temp: float) -> None:  # pragma: no cover
-        DeprecationWarning('This function will be depreciated in v2.2.1. Please use the correct set_max_avg_fluid_temperature() function')
-        self.set_max_avg_fluid_temperature(temp)
-
     def set_min_avg_fluid_temperature(self, temp: float) -> None:
         """
         This functions sets the minimal average fluid temperature to temp.
@@ -786,10 +734,6 @@ class Borefield(BaseClass):
         if temp >= self.Tf_max:
             raise ValueError(f'The minimum average fluid temperature {temp} is lower than the maximum average fluid temperature {self.Tf_max}')
         self.Tf_min: float = temp
-
-    def set_min_ground_temperature(self, temp: float) -> None:  # pragma: no cover
-        DeprecationWarning('This function will be depreciated in v2.2.1. Please use the correct set_min_avg_fluid_temperature() function')
-        self.set_min_avg_fluid_temperature(temp)
 
     def _Tg(self, H: float = None) -> float:
         """
@@ -1537,95 +1481,6 @@ class Borefield(BaseClass):
                         (quadrant == 10 or quadrant == 1 or quadrant == 2))\
                        and (np.min(self.results.peak_heating) >= self.Tf_min - 0.05 or
                             (quadrant == 20 or quadrant == 3 or quadrant == 4))
-
-    def set_baseload_heating(self, baseload: np.ndarray | list) -> None:
-        """
-        This function defines the baseload in heating both in an energy as in an average power perspective.
-
-        Parameters
-        ----------
-        baseload : np.ndarray, list
-            Baseload heating per month [kWh]
-
-        Returns
-        -------
-        None
-
-        Raises
-        ------
-        ValueError
-            ValueError when the baseload is no list or np.ndarray
-        """
-        warn("This function will be depreciated in v2.2.1", DeprecationWarning, stacklevel=2)
-        self._borefield_load.baseload_heating = baseload
-        self._delete_calculated_temperatures()
-
-    def set_baseload_cooling(self, baseload: np.array | list) -> None:
-        """
-        This function defines the baseload in cooling both in an energy as in an average power perspective.
-
-        Parameters
-        ----------
-        baseload : np.ndarray, list
-            Baseload cooling per month [kWh]
-
-        Returns
-        -------
-        None
-
-        Raises
-        ------
-        ValueError
-            ValueError when the baseload is no list or np.ndarray
-        """
-        warn("This function will be depreciated in v2.2.1", DeprecationWarning, stacklevel=2)
-        self._borefield_load.baseload_cooling = baseload
-        self._delete_calculated_temperatures()
-
-    def set_peak_heating(self, peak_load: np.ndarray | list) -> None:
-        """
-        This function sets the peak heating to peak load heating.
-
-        Parameters
-        ----------
-        peak_load : np.ndarray, list
-            Peak load of heating per month [kW]
-
-        Returns
-        -------
-        None
-
-        Raises
-        ------
-        ValueError
-            ValueError when the peak_load is no list or np.ndarray
-        """
-        warn("This function will be depreciated in v2.2.1", DeprecationWarning, stacklevel=2)
-        self._borefield_load.peak_heating = peak_load
-        self._delete_calculated_temperatures()
-
-    def set_peak_cooling(self, peak_load: np.ndarray | list) -> None:
-        """
-        This function sets the peak cooling to peak load cooling.
-
-        Parameters
-        ----------
-        peak_load : np.ndarray, list
-            Peak load of cooling per month [kW]
-
-        Returns
-        -------
-        None
-
-        Raises
-        ------
-        ValueError
-            ValueError when the peak_load is no list or np.ndarray
-        """
-        warn("This function will be depreciated in v2.2.1", DeprecationWarning, stacklevel=2)
-        self._borefield_load.peak_cooling = peak_load
-        self._delete_calculated_temperatures()
-
     @property
     def investment_cost(self) -> float:
         """
