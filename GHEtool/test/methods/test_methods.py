@@ -63,5 +63,5 @@ def test_optimise(input, result):
     assert np.isclose(model._percentage_cooling, percentage_cooling)
     assert np.isclose(model.load.max_peak_heating, peak_heating_geo)
     assert np.isclose(model.load.max_peak_cooling, peak_cooling_geo)
-    assert np.isclose(model._external_load.max_peak_heating, peak_heating_ext)
-    assert np.isclose(model._external_load.max_peak_cooling, peak_cooling_ext)
+    assert np.isclose(model._external_load.max_peak_extraction, peak_heating_ext)
+    assert np.isclose(model._external_load.max_peak_injection, peak_cooling_ext)

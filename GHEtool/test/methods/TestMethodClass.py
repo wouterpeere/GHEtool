@@ -47,8 +47,8 @@ class OptimiseLoadProfileObject:
         assert np.isclose(self.borefield._percentage_cooling, self.percentage_cooling)
         assert np.isclose(self.borefield.load.max_peak_heating, self.peak_heating_geo)
         assert np.isclose(self.borefield.load.max_peak_cooling, self.peak_cooling_geo)
-        assert np.isclose(self.borefield._external_load.max_peak_heating, self.peak_heating_ext)
-        assert np.isclose(self.borefield._external_load.max_peak_cooling, self.peak_cooling_ext)
+        assert np.isclose(self.borefield._external_load.max_peak_extraction, self.peak_heating_ext)
+        assert np.isclose(self.borefield._external_load.max_peak_injection, self.peak_cooling_ext)
 
 
 class TestMethodClass():

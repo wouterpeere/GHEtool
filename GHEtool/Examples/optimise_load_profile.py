@@ -39,7 +39,7 @@ def optimise():
     borefield.calculate_temperatures(hourly=True)
 
     # print resulting external peak cooling profile
-    print(borefield._external_load.max_peak_cooling)
+    print(borefield._external_load.max_peak_injection)
 
     # print resulting monthly load for an external heating source
     print(np.sum(borefield._external_load.hourly_heating_load))

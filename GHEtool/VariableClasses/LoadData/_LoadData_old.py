@@ -7,17 +7,18 @@ import numpy as np
 from GHEtool.VariableClasses.BaseClass import BaseClass
 
 
-class _LoadData(BaseClass, ABC):
+class _LoadData_old(BaseClass, ABC):
     """
     This class contains information w.r.t. load data for the borefield sizing.
     """
+    __slots__ = 'hourly_resolution', 'simulation_period', '_peak_heating_duration', '_peak_cooling_duration', 'tm',\
+                '_all_months_equal', '_dhw_yearly'
 
     AVG_UPM: float = 730.  # number of hours per month
     DEFAULT_LENGTH_PEAK: int = 6  # hours
     DEFAULT_SIMULATION_PERIOD: int = 20  # years
 
-    def __init__(self, hourly_resolution: bool, simulation_period: int = DEFAULT_SIMULATION_PERIOD,
-                 start_month: int = 1):
+    def __init__(self, hourly_resolution: bool, simulation_period: int = DEFAULT_SIMULATION_PERIOD):
         """
 
         Parameters
@@ -26,17 +27,15 @@ class _LoadData(BaseClass, ABC):
             True if the load class uses an hourly resolution
         simulation_period : int
             Length of the simulation period in years
-        start_month : int
-            Start month of the simulation (jan: 1, feb: 2 ...)
         """
         self.hourly_resolution: bool = hourly_resolution
         self.simulation_period: int = simulation_period
-        self._peak_injection_duration: int = _LoadData.DEFAULT_LENGTH_PEAK
-        self._peak_extraction_duration: int = _LoadData.DEFAULT_LENGTH_PEAK
+        self._peak_cooling_duration: int = _LoadData.DEFAULT_LENGTH_PEAK
+        self._peak_heating_duration: int = _LoadData.DEFAULT_LENGTH_PEAK
         self.tm: int = _LoadData.AVG_UPM * 3600  # time in a month in seconds
         self._all_months_equal: bool = True  # true if it is assumed that all months are of the same length
-        self._start_month: int = 1
-        self.start_month = start_month
+        self._dhw_yearly: float = 0.
+        self._start_month: float = 1
 
     @property
     def start_month(self) -> int:
@@ -45,7 +44,7 @@ class _LoadData(BaseClass, ABC):
 
         Returns
         -------
-        int
+        float
             Start month
         """
         return self._start_month
@@ -74,23 +73,6 @@ class _LoadData(BaseClass, ABC):
             raise ValueError(f'The value for month is: {month} which is not an integer in [1,12].')
 
         self._start_month = month
-
-    @abc.abstractmethod
-    def correct_for_start_month(self, array: np.ndarray) -> np.ndarray:
-        """
-        This function corrects the load for the correct start month.
-        If the simulation starts in september, the start month is 9 and hence the array should start
-        at index 9.
-
-        Parameters
-        ----------
-        array : np.ndarray
-            Load array
-
-        Returns
-        -------
-        load : np.ndarray
-        """
 
     @property
     def all_months_equal(self) -> bool:
@@ -155,19 +137,19 @@ class _LoadData(BaseClass, ABC):
         """
 
     @abc.abstractmethod
-    def peak_extraction(self) -> np.ndarray:
+    def peak_heating(self) -> np.ndarray:
         """
-        This function returns the peak extraction in kW/month.
+        This function returns the peak heating load in kW/month.
 
         Returns
         -------
-        peak extraction : np.ndarray
+        peak heating : np.ndarray
         """
 
     @abc.abstractmethod
-    def peak_injection(self) -> np.ndarray:
+    def peak_cooling(self) -> np.ndarray:
         """
-        This function returns the peak injection in kW/month.
+        This function returns the peak cooling load in kW/month.
 
         Returns
         -------
@@ -175,187 +157,142 @@ class _LoadData(BaseClass, ABC):
         """
 
     @abc.abstractmethod
-    def baseload_extraction(self) -> np.ndarray:
+    def baseload_heating(self) -> np.ndarray:
         """
-        This function returns the baseload extraction in kWh/month.
+        This function returns the baseload heating in kWh/month.
 
         Returns
         -------
-        baseload extraction : np.ndarray
+        baseload heating : np.ndarray
         """
+
+    @property
+    def baseload_heating_power(self) -> np.ndarray:
+        """
+        This function returns the baseload heating in kW avg/month.
+
+        Returns
+        -------
+        baseload heating : np.ndarray
+        """
+        return np.divide(self.baseload_heating, self.UPM)
 
     @abc.abstractmethod
-    def baseload_injection(self) -> np.ndarray:
+    def baseload_cooling(self) -> np.ndarray:
         """
-        This function returns the baseload injection in kWh/month.
+        This function returns the baseload cooling in kWh/month.
 
         Returns
         -------
-        baseload injection : np.ndarray
+        baseload cooling : np.ndarray
         """
 
     @property
-    def _peak_extraction(self) -> np.ndarray:
+    def baseload_cooling_power(self) -> np.ndarray:
         """
-        This function returns the peak extraction, corrected for the start month in kW/month.
+        This function returns the baseload cooling in kW avg/month.
 
         Returns
         -------
-        peak extraction : np.ndarray
+        baseload cooling : np.ndarray
         """
-        return self.correct_for_start_month(self.peak_extraction)
+        return np.divide(self.baseload_cooling, self.UPM)
 
     @property
-    def _peak_injection(self) -> np.ndarray:
+    def yearly_heating_load(self) -> float:
         """
-        This function returns the peak injection, corrected for the start month in kW/month.
+        This function returns the yearly heating load in kWh/year.
+
+        Returns
+        -------
+        float
+            Yearly heating load kWh/year
+        """
+        return np.sum(self.baseload_heating)
+
+    @property
+    def yearly_cooling_load(self) -> float:
+        """
+        This function returns the yearly cooling load in kWh/year.
+
+        Returns
+        -------
+        float
+            Yearly cooling load kWh/year
+        """
+        return np.sum(self.baseload_cooling)
+
+    @property
+    def baseload_heating_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the baseload heating in kWh/month for a whole simulation period.
+
+        Returns
+        -------
+        baseload heating : np.ndarray
+            baseload heating for the whole simulation period
+        """
+        return np.tile(self.baseload_heating, self.simulation_period)
+
+    @property
+    def baseload_cooling_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the baseload cooling in kWh/month for a whole simulation period.
+
+        Returns
+        -------
+        baseload cooling : np.ndarray
+            baseload cooling for the whole simulation period
+        """
+        return np.tile(self.baseload_cooling, self.simulation_period)
+
+    @property
+    def peak_heating_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the peak heating in kW/month for a whole simulation period.
+
+        Returns
+        -------
+        peak heating : np.ndarray
+            peak heating for the whole simulation period
+        """
+        return np.tile(self.peak_heating, self.simulation_period)
+
+    @property
+    def peak_cooling_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the peak cooling in kW/month for a whole simulation period.
 
         Returns
         -------
         peak cooling : np.ndarray
+            peak cooling for the whole simulation period
         """
-        return self.correct_for_start_month(self.peak_injection)
+        return np.tile(self.peak_cooling, self.simulation_period)
 
     @property
-    def _baseload_extraction(self) -> np.ndarray:
+    def baseload_heating_power_simulation_period(self) -> np.ndarray:
         """
-        This function returns the baseload extraction, corrected for the start month in kWh/month.
+        This function returns the avergae heating power in kW avg/month for a whole simulation period.
 
         Returns
         -------
-        baseload extraction : np.ndarray
+        average heating power : np.ndarray
+            average heating power for the whole simulation period
         """
-        return self.correct_for_start_month(self.baseload_extraction)
+        return np.tile(self.baseload_heating_power, self.simulation_period)
 
     @property
-    def _baseload_injection(self) -> np.ndarray:
+    def baseload_cooling_power_simulation_period(self) -> np.ndarray:
         """
-        This function returns the baseload injection, corrected for the start month in kWh/month.
+        This function returns the average cooling power in kW avg/month for a whole simulation period.
 
         Returns
         -------
-        baseload injection : np.ndarray
+        average cooling power : np.ndarray
+            average cooling for the whole simulation period
         """
-
-        return self.correct_for_start_month(self.baseload_injection)
-
-    @property
-    def baseload_extraction_power(self) -> np.ndarray:
-        """
-        This function returns the baseload extraction in kW avg/month.
-
-        Returns
-        -------
-        baseload extraction : np.ndarray
-        """
-        return np.divide(self._baseload_extraction, self.UPM)
-
-    @property
-    def baseload_injection_power(self) -> np.ndarray:
-        """
-        This function returns the baseload injection in kW avg/month.
-
-        Returns
-        -------
-        baseload injection : np.ndarray
-        """
-        return np.divide(self._baseload_injection, self.UPM)
-
-    @property
-    def yearly_extraction_load(self) -> float:
-        """
-        This function returns the yearly extraction load in kWh/year.
-
-        Returns
-        -------
-        float
-            Yearly extraction load kWh/year
-        """
-        return np.sum(self.baseload_extraction)
-
-    @property
-    def yearly_injection_load(self) -> float:
-        """
-        This function returns the yearly injection load in kWh/year.
-
-        Returns
-        -------
-        float
-            Yearly injection load kWh/year
-        """
-        return np.sum(self.baseload_injection)
-
-    @property
-    def baseload_extraction_simulation_period(self) -> np.ndarray:
-        """
-        This function returns the baseload extraction in kWh/month for a whole simulation period.
-
-        Returns
-        -------
-        baseload extraction : np.ndarray
-            baseload extraction for the whole simulation period
-        """
-        return np.tile(self._baseload_extraction, self.simulation_period)
-
-    @property
-    def baseload_injection_simulation_period(self) -> np.ndarray:
-        """
-        This function returns the baseload injection in kWh/month for a whole simulation period.
-
-        Returns
-        -------
-        baseload injection : np.ndarray
-            baseload injection for the whole simulation period
-        """
-        return np.tile(self._baseload_injection, self.simulation_period)
-
-    @property
-    def peak_extraction_simulation_period(self) -> np.ndarray:
-        """
-        This function returns the peak extraction in kW/month for a whole simulation period.
-
-        Returns
-        -------
-        peak extraction : np.ndarray
-            peak extraction for the whole simulation period
-        """
-        return np.tile(self._peak_extraction, self.simulation_period)
-
-    @property
-    def peak_injection_simulation_period(self) -> np.ndarray:
-        """
-        This function returns the peak injection in kW/month for a whole simulation period.
-
-        Returns
-        -------
-        peak injection : np.ndarray
-            peak injection for the whole simulation period
-        """
-        return np.tile(self._peak_injection, self.simulation_period)
-
-    @property
-    def baseload_extraction_power_simulation_period(self) -> np.ndarray:
-        """
-        This function returns the average extraction power in kW avg/month for a whole simulation period.
-
-        Returns
-        -------
-        average extraction power : np.ndarray
-            average extraction power for the whole simulation period
-        """
-        return np.tile(self.baseload_extraction_power, self.simulation_period)
-
-    @property
-    def baseload_injection_power_simulation_period(self) -> np.ndarray:
-        """
-        This function returns the average injection power in kW avg/month for a whole simulation period.
-
-        Returns
-        -------
-        average injection power : np.ndarray
-            average injection for the whole simulation period
-        """
-        return np.tile(self.baseload_injection_power, self.simulation_period)
+        return np.tile(self.baseload_cooling_power, self.simulation_period)
 
     @property
     def imbalance(self) -> float:
@@ -367,7 +304,7 @@ class _LoadData(BaseClass, ABC):
         -------
         imbalance : float
         """
-        return self.yearly_injection_load - self.yearly_extraction_load
+        return self.yearly_cooling_load - self.yearly_heating_load
 
     @property
     def monthly_average_load(self) -> np.ndarray:
@@ -378,7 +315,7 @@ class _LoadData(BaseClass, ABC):
         -------
         monthly average load : np.ndarray
         """
-        return self.baseload_injection_power - self.baseload_extraction_power
+        return self.baseload_cooling_power - self.baseload_heating_power
 
     @property
     def monthly_average_load_simulation_period(self) -> np.ndarray:
@@ -392,20 +329,20 @@ class _LoadData(BaseClass, ABC):
         return np.tile(self.monthly_average_load, self.simulation_period)
 
     @property
-    def peak_extraction_duration(self) -> float:
+    def peak_heating_duration(self) -> float:
         """
-        Length of the peak in extraction.
+        Length of the peak in heating.
 
         Returns
         -------
-        Length peak in extraction [s]
+        Length peak in heating [s]
         """
-        return self._peak_extraction_duration * 3600
+        return self._peak_heating_duration * 3600
 
-    @peak_extraction_duration.setter
-    def peak_extraction_duration(self, duration: float) -> None:
+    @peak_heating_duration.setter
+    def peak_heating_duration(self, duration: float) -> None:
         """
-        This function sets the duration of the peak in extraction.
+        This function sets the duration of the peak in heating.
 
         Parameters
         ----------
@@ -416,21 +353,21 @@ class _LoadData(BaseClass, ABC):
         -------
         None
         """
-        self._peak_extraction_duration = duration
+        self._peak_heating_duration = duration
 
     @property
-    def peak_injection_duration(self) -> float:
+    def peak_cooling_duration(self) -> float:
         """
-        Duration of the peak in injection.
+        Duration of the peak in cooling.
 
         Returns
         -------
-        Duration of the peak in injection [s]
+        Duration of the peak in cooling [s]
         """
-        return self._peak_injection_duration * 3600
+        return self._peak_cooling_duration * 3600
 
-    @peak_injection_duration.setter
-    def peak_injection_duration(self, duration: float) -> None:
+    @peak_cooling_duration.setter
+    def peak_cooling_duration(self, duration: float) -> None:
         """
         This function sets the duration of the peak in cooling.
 
@@ -443,12 +380,12 @@ class _LoadData(BaseClass, ABC):
         -------
         None
         """
-        self._peak_injection_duration = duration
+        self._peak_cooling_duration = duration
 
     @property
     def peak_duration(self) -> None:
         """
-        Dummy object to set the length peak for both extraction and injection.
+        Dummy object to set the length peak for both heating and cooling.
 
         Returns
         -------
@@ -459,7 +396,7 @@ class _LoadData(BaseClass, ABC):
     @peak_duration.setter
     def peak_duration(self, duration: float) -> None:
         """
-        This sets the duration of both the extraction and injection peak.
+        This sets the duration of both the heating and cooling peak.
 
         Parameters
         ----------
@@ -470,8 +407,8 @@ class _LoadData(BaseClass, ABC):
         -------
         None
         """
-        self.peak_extraction_duration = duration
-        self.peak_injection_duration = duration
+        self.peak_heating_duration = duration
+        self.peak_cooling_duration = duration
 
     @property
     def ty(self) -> float:
@@ -564,12 +501,12 @@ class _LoadData(BaseClass, ABC):
             # limited by extraction load
 
             # set length peak
-            th = self.peak_extraction_duration
+            th = self.peak_heating_duration
 
             # Select month with the highest peak load and take both the peak and average load from that month
-            month_index = self.get_month_index(self._peak_extraction, self.baseload_extraction_power)
+            month_index = self.get_month_index(self.peak_heating, self.baseload_heating_power)
             qm = self.monthly_average_load[month_index] * 1000.
-            qh = self.max_peak_extraction * 1000.
+            qh = self.max_peak_heating * 1000.
 
             # correct signs
             qm = -qm
@@ -579,12 +516,12 @@ class _LoadData(BaseClass, ABC):
             # limited by injection load
 
             # set length peak
-            th = self.peak_injection_duration
+            th = self.peak_cooling_duration
 
             # Select month with the highest peak load and take both the peak and average load from that month
-            month_index = self.get_month_index(self._peak_injection, self.baseload_injection_power)
+            month_index = self.get_month_index(self.peak_cooling, self.baseload_cooling_power)
             qm = self.monthly_average_load[month_index] * 1000.
-            qh = self.max_peak_injection * 1000.
+            qh = self.max_peak_cooling * 1000.
 
         return th, qh, qm, qa
 
@@ -611,11 +548,11 @@ class _LoadData(BaseClass, ABC):
             # limited by extraction load
 
             # set peak length
-            th = self.peak_extraction_duration
+            th = self.peak_heating_duration
 
             # Select month with the highest peak load and take both the peak and average load from that month
-            month_index = self.get_month_index(self._peak_extraction, self.baseload_extraction_power)
-            qh = self.max_peak_extraction * 1000.
+            month_index = self.get_month_index(self.peak_heating, self.baseload_heating_power)
+            qh = self.max_peak_heating * 1000.
 
             qm = self.monthly_average_load[month_index] * 1000.
 
@@ -629,11 +566,11 @@ class _LoadData(BaseClass, ABC):
             # limited by injection
 
             # set peak length
-            th = self.peak_injection_duration
+            th = self.peak_cooling_duration
 
             # Select month with the highest peak load and take both the peak and average load from that month
-            month_index = self.get_month_index(self._peak_injection, self.baseload_injection_power)
-            qh = self.max_peak_injection * 1000.
+            month_index = self.get_month_index(self.peak_cooling, self.baseload_cooling_power)
+            qh = self.max_peak_cooling * 1000.
 
             qm = self.monthly_average_load[month_index] * 1000.
             if month_index < 1:
@@ -647,24 +584,100 @@ class _LoadData(BaseClass, ABC):
         return th, tpm, tcm, qh, qpm, qm
 
     @property
-    def max_peak_injection(self) -> float:
+    def max_peak_cooling(self) -> float:
         """
-        This returns the max peak injection in kW.
+        This returns the max peak cooling in kW.
 
         Returns
         -------
         max peak cooling : float
         """
-        return np.max(self.peak_injection)
+        return np.max(self.peak_cooling)
 
     @property
-    def max_peak_extraction(self) -> float:
+    def max_peak_heating(self) -> float:
         """
-        This returns the max peak extraction in kW.
+        This returns the max peak heating in kW.
 
         Returns
         -------
         max peak heating : float
         """
-        return np.max(self.peak_extraction)
+        return np.max(self.peak_heating)
 
+    def add_dhw(self, dhw: float) -> None:
+        """
+        This function adds the domestic hot water (dhw).
+        An error is raies is the dhw is not positive.
+
+        Parameters
+        ----------
+        dhw : float
+            Yearly consumption of domestic hot water [kWh/year]
+
+        Returns
+        -------
+        None
+        """
+        self.dhw = dhw
+
+    @property
+    def dhw(self) -> float:
+        """
+        This function returns the yearly domestic hot water consumption.
+
+        Returns
+        -------
+        dhw : float
+            Yearly domestic hot water consumption [kWh/year]
+        """
+        return self._dhw_yearly
+
+    @dhw.setter
+    def dhw(self, dhw: float) -> None:
+        """
+        This function adds the domestic hot water (dhw).
+        An error is raies is the dhw is not positive.
+
+        Parameters
+        ----------
+        dhw : float
+            Yearly consumption of domestic hot water [kWh/year]
+
+        Returns
+        -------
+        None
+        """
+        if not isinstance(dhw, (float, int)):
+            raise ValueError('Please fill in a number for the domestic hot water.')
+        if not dhw >= 0:
+            raise ValueError(f'Please fill in a positive value for the domestic hot water instead of {dhw}.')
+        self._dhw_yearly = dhw
+
+    @property
+    def dhw_power(self) -> float:
+        """
+        This function returns the power related to the dhw production.
+
+        Returns
+        -------
+        dhw power : float
+        """
+        return self._dhw_yearly / 8760
+
+    @abc.abstractmethod
+    def correct_for_start_month(self, array: np.ndarray) -> np.ndarray:
+        """
+        This function corrects the load for the correct start month.
+        If the simulation starts in september, the start month is 9 and hence the array should start
+        at index 9.
+
+        Parameters
+        ----------
+        array : np.ndarray
+            Load array
+
+        Returns
+        -------
+        load : np.ndarray
+        """

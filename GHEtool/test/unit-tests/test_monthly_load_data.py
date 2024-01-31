@@ -316,8 +316,8 @@ def test_add():
 
     assert result.simulation_period == 30
     assert result.dhw == 60000
-    assert np.allclose(result.baseload_heating, load_1.baseload_heating + load_2.baseload_heating)
-    assert np.allclose(result.baseload_cooling, load_1.baseload_cooling + load_2.baseload_cooling)
+    assert np.allclose(result.baseload_extraction, load_1.baseload_heating + load_2.baseload_heating)
+    assert np.allclose(result.baseload_injection, load_1.baseload_cooling + load_2.baseload_cooling)
     assert np.allclose(result._peak_heating, load_1._peak_heating + load_2._peak_heating)
     assert np.allclose(result._peak_cooling, load_1._peak_cooling + load_2._peak_cooling)
 
@@ -326,7 +326,7 @@ def test_add():
 
     with pytest.warns():
         result = load_1 + load_2
-        assert result.peak_heating_duration == 18*3600
+        assert result.peak_extraction_duration == 18 * 3600
     load_1.peak_heating_duration = 18
     try:
         with pytest.warns():
@@ -338,7 +338,7 @@ def test_add():
     load_1.peak_cooling_duration = 18
     with pytest.warns():
         result = load_1 + load_2
-        assert result.peak_cooling_duration == 18*3600
+        assert result.peak_injection_duration == 18 * 3600
     load_2.peak_cooling_duration = 18
     try:
         with pytest.warns():

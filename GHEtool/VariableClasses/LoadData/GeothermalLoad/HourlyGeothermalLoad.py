@@ -7,7 +7,7 @@ import warnings
 
 from typing import Union, Tuple, TYPE_CHECKING
 
-from GHEtool.VariableClasses.LoadData._LoadData import _LoadData
+from GHEtool.VariableClasses.LoadData._LoadData_old import _LoadData
 from GHEtool.logger import ghe_logger
 
 if TYPE_CHECKING:

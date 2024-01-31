@@ -84,8 +84,8 @@ def figure_1_2() -> None:
         ref[idx] = (borefield.size(L4_sizing=True) * borefield.number_of_boreholes)
 
         # calculate the size according to the rule of thumb
-        cool[idx] = (load.max_peak_cooling / ROT)
-        heat[idx] = (load.max_peak_heating / ROT)
+        cool[idx] = (load.max_peak_injection / ROT)
+        heat[idx] = (load.max_peak_extraction / ROT)
 
     # Figure 1 for the total required borehole length
     barWidth = 0.25

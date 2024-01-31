@@ -70,7 +70,7 @@ def main_functionalities():
     # print gives the array of monthly temperatures for peak cooling without showing the plot
     borefield.calculate_temperatures(depth=90)
     print("Result array for cooling peaks")
-    print(borefield.results.peak_cooling)
+    print(borefield.results.peak_injection)
     print("---------------------------------------------")
 
     # size the borefield for quadrant 3

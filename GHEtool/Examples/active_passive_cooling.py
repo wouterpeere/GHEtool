@@ -167,7 +167,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         depths.insert(0, depth_passive)
 
         # get temperature profile
-        temp_profile = borefield.results.peak_heating
+        temp_profile = borefield.results.peak_extraction
 
         # recalculate heating load
         heating_ground = update_load_COP(temp_profile, COP, heating_building)
@@ -193,7 +193,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         depths.insert(0, depth_active)
 
         # get temperature profile
-        temp_profile = borefield.results.peak_heating
+        temp_profile = borefield.results.peak_extraction
 
         # recalculate heating load
         heating_ground = update_load_COP(temp_profile, COP, heating_building)
@@ -247,7 +247,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
 
             # get temperature profile
             borefield.calculate_temperatures(depth, hourly=True)
-            temp_profile = borefield.results.peak_heating
+            temp_profile = borefield.results.peak_extraction
 
             # set previous loads
             heating_ground_prev = heating_ground.copy()
