@@ -3,7 +3,19 @@ All notable changes to this project will be documented in this file. For future 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [2.2.1] - 2024-01-26
+## [2.2.2] - unpublished
+
+## Added
+- Function to create box, U and L-shaped borefields (issue #224).
+
+## changed
+/
+
+## fixed
+- Small typo's in functions (issue #224).
+
+
+## [2.2.1] - 2024-01-27
 
 ## Added
 - GHEtool is available on conda-forge (issue #107).
@@ -240,6 +252,8 @@ code version > speed improvements > v2.1.1.
 ### Fixed 
 - fixed bug in interpolation
 
+
+[2.2.1]: https://github.com/wouterpeere/GHEtool/compare/v2.2.0...v2.2.1
 [2.2.0]: https://github.com/wouterpeere/GHEtool/compare/v2.1.2...v2.2.0
 [2.1.2]: https://github.com/wouterpeere/GHEtool/compare/v2.1.1...v2.1.2
 [2.1.1]: https://github.com/wouterpeere/GHEtool/compare/v2.1.0...v2.1.1
