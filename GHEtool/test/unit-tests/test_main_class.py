@@ -21,26 +21,26 @@ pipeData = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
 
 # Monthly loading values
-peakCooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]              # Peak cooling in kW
-peakHeating = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]             # Peak heating in kW
+peakCooling = [0.0, 0, 34.0, 69.0, 133.0, 187.0, 213.0, 240.0, 160.0, 37.0, 0.0, 0.0]  # Peak cooling in kW
+peakHeating = [160.0, 142, 102.0, 55.0, 0.0, 0.0, 0.0, 0.0, 40.4, 85.0, 119.0, 136.0]  # Peak heating in kW
 
 # annual heating and cooling load
-annualHeatingLoad = 300*10**3  # kWh
-annualCoolingLoad = 160*10**3  # kWh
+annualHeatingLoad = 300 * 10**3  # kWh
+annualCoolingLoad = 160 * 10**3  # kWh
 
 # percentage of annual load per month (15.5% for January ...)
-monthlyLoadHeatingPercentage = [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144]
-monthlyLoadCoolingPercentage = [0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025]
+monthlyLoadHeatingPercentage = [0.155, 0.148, 0.125, 0.099, 0.064, 0.0, 0.0, 0.0, 0.061, 0.087, 0.117, 0.144]
+monthlyLoadCoolingPercentage = [0.025, 0.05, 0.05, 0.05, 0.075, 0.1, 0.2, 0.2, 0.1, 0.075, 0.05, 0.025]
 
 # resulting load per month
-monthlyLoadHeating = list(map(lambda x: x * annualHeatingLoad, monthlyLoadHeatingPercentage))   # kWh
-monthlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, monthlyLoadCoolingPercentage))   # kWh
+monthlyLoadHeating = list(map(lambda x: x * annualHeatingLoad, monthlyLoadHeatingPercentage))  # kWh
+monthlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, monthlyLoadCoolingPercentage))  # kWh
 
 
 def borefields_equal(borefield_one, borefield_two) -> bool:
     for i in range(len(borefield_one)):
         if borefield_one[i].__dict__ != borefield_two[i].__dict__:
-            return False   # pragma: no cover
+            return False  # pragma: no cover
     return True
 
 
@@ -106,6 +106,27 @@ def test_create_circular_field():
     borefield.create_circular_borefield(10, 10, 100, 1)
     assert borefield.number_of_boreholes == 10
     borefields_equal(borefield.borefield, gt.boreholes.circle_field(10, 10, 100, 1, 0.075))
+
+
+def test_create_U_shaped_field():
+    borefield = Borefield()
+    borefield.create_U_shaped_borefield(10, 9, 6, 6, 110, 4, 0.075)
+    assert borefield.number_of_boreholes == 9*2+(10-2)
+    borefields_equal(borefield.borefield, gt.boreholes.U_shaped_field(10, 10, 6, 6, 110, 4, 0.075))
+
+
+def test_create_L_shaped_field():
+    borefield = Borefield()
+    borefield.create_L_shaped_borefield(10, 9, 6, 6, 110, 4, 0.075)
+    assert borefield.number_of_boreholes == 10+ 8
+    borefields_equal(borefield.borefield, gt.boreholes.L_shaped_field(10, 10, 6, 6, 110, 4, 0.075))
+
+
+def test_create_box_shaped_field():
+    borefield = Borefield()
+    borefield.create_box_shaped_borefield(10, 8, 6, 6, 110, 4, 0.075)
+    assert borefield.number_of_boreholes == 10*2 + (8-2)*2
+    borefields_equal(borefield.borefield, gt.boreholes.box_shaped_field(10, 10, 6, 6, 110, 4, 0.075))
 
 
 def test_update_depth():
@@ -297,10 +318,14 @@ def test_Tg():
     assert borefield._Tg(20) == borefield.ground_data.calculate_Tg(20)
 
 
-@pytest.mark.parametrize("ground_data, constant_Rb, result",
-                         zip([ground_data_constant, data_ground_flux, ground_data_constant, data_ground_flux],
-                             [True, True, False, False],
-                             [39.994203323480214, 38.70946566704161, 30.924434615896764, 30.245606119498383]))
+@pytest.mark.parametrize(
+    "ground_data, constant_Rb, result",
+    zip(
+        [ground_data_constant, data_ground_flux, ground_data_constant, data_ground_flux],
+        [True, True, False, False],
+        [39.994203323480214, 38.70946566704161, 30.924434615896764, 30.245606119498383],
+    ),
+)
 def test_Ahmadfard(ground_data, constant_Rb, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
@@ -313,10 +338,15 @@ def test_Ahmadfard(ground_data, constant_Rb, result):
     assert np.isclose(result, borefield._Ahmadfard(th, qh, qm, qa))
     assert np.isclose(result, borefield.H)
 
-@pytest.mark.parametrize("ground_data, constant_Rb, result",
-                         zip([ground_data_constant, data_ground_flux, ground_data_constant, data_ground_flux],
-                             [True, True, False, False],
-                             [48.76844845370183, 46.593433439950985, 38.53491016745154, 37.100782551185]))
+
+@pytest.mark.parametrize(
+    "ground_data, constant_Rb, result",
+    zip(
+        [ground_data_constant, data_ground_flux, ground_data_constant, data_ground_flux],
+        [True, True, False, False],
+        [48.76844845370183, 46.593433439950985, 38.53491016745154, 37.100782551185],
+    ),
+)
 def test_Carcel(ground_data, constant_Rb, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
@@ -406,8 +436,7 @@ def test_size_L2_value_errors():
         assert True
 
 
-@pytest.mark.parametrize("quadrant, result",
-                         zip([1, 2, 3, 4], [74.55862437702756, 96.85342542746277, 27.2041541800546, 21.903857780936665]))
+@pytest.mark.parametrize("quadrant, result", zip([1, 2, 3, 4], [74.55862437702756, 96.85342542746277, 27.2041541800546, 21.903857780936665]))
 def test_size_L2(quadrant, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
@@ -435,8 +464,8 @@ def test_size_L3_value_errors():
     except ValueError:
         assert True
 
-@pytest.mark.parametrize("quadrant, result",
-                         zip([1, 2, 3, 4], [56.37136629360852, 71.42698877336204, 26.722846792067735, 21.333161686968708]))
+
+@pytest.mark.parametrize("quadrant, result", zip([1, 2, 3, 4], [56.37136629360852, 71.42698877336204, 26.722846792067735, 21.333161686968708]))
 def test_size_L3(quadrant, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
@@ -791,7 +820,7 @@ def test_gfunction():
 
 def test_load_duration(monkeypatch):
     borefield = Borefield()
-    monkeypatch.setattr(plt, 'show', lambda: None)
+    monkeypatch.setattr(plt, "show", lambda: None)
     borefield.set_ground_parameters(ground_data_constant)
     borefield.borefield = copy.deepcopy(borefield_gt)
     load = HourlyGeothermalLoad()
@@ -803,7 +832,7 @@ def test_load_duration(monkeypatch):
 
 def test_optimise_load_profile(monkeypatch):
     borefield = Borefield()
-    monkeypatch.setattr(plt, 'show', lambda: None)
+    monkeypatch.setattr(plt, "show", lambda: None)
     borefield.set_ground_parameters(ground_data_constant)
     borefield.borefield = copy.deepcopy(borefield_gt)
     load = HourlyGeothermalLoad()
@@ -818,7 +847,7 @@ def test_optimise_load_profile(monkeypatch):
 
 def test_optimise_borefield_small(monkeypatch):
     borefield = Borefield()
-    monkeypatch.setattr(plt, 'show', lambda: None)
+    monkeypatch.setattr(plt, "show", lambda: None)
     borefield.set_ground_parameters(ground_data_constant)
     borefield.create_rectangular_borefield(5, 1, 6, 6, 100)
     load = HourlyGeothermalLoad()
@@ -833,7 +862,7 @@ def test_optimise_borefield_small(monkeypatch):
 
 def test_optimise_borefield_wrong_threshold(monkeypatch):
     borefield = Borefield()
-    monkeypatch.setattr(plt, 'show', lambda: None)
+    monkeypatch.setattr(plt, "show", lambda: None)
     borefield.set_ground_parameters(ground_data_constant)
     borefield.create_rectangular_borefield(5, 1, 6, 6, 100)
     load = HourlyGeothermalLoad()
@@ -844,6 +873,7 @@ def test_optimise_borefield_wrong_threshold(monkeypatch):
         assert False  # pragma: no cover
     except ValueError:
         assert True
+
 
 def test_calculate_quadrants_without_data():
     borefield = Borefield()
@@ -880,7 +910,7 @@ def test_calculate_temperature_profile():
 
     try:
         borefield.calculate_temperatures(hourly=True)
-        assert False   # pragma: no cover
+        assert False  # pragma: no cover
     except ValueError:
         assert True
 
@@ -890,7 +920,7 @@ def test_optimise_load_profile_without_hourly_data():
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(1))
     try:
         borefield.optimise_load_profile(borefield.load)
-        assert False   # pragma: no cover
+        assert False  # pragma: no cover
     except ValueError:
         assert True
     borefield.load = HourlyGeothermalLoad()
@@ -900,14 +930,21 @@ def test_optimise_load_profile_without_hourly_data():
     borefield.optimise_load_profile(borefield.load)
 
 
-@pytest.mark.parametrize("H, result",
-                         zip(range(110, 130, 1), [122.99210426454648, 122.99135446500962, 122.99135409065917,
-                                                  122.99135403971272, 122.99135403719148, 122.9913540367823,
-                                                  122.99135403674013, 122.99135403673134, 122.99221686744185,
-                                                  122.99217229220649, 122.99135553171544, 122.99220727438545,
-                                                  122.99477143007601, 122.9921794642058, 122.99220615327106,
-                                                  122.99221262582992, 122.99221900364599, 122.9922252887964,
-                                                  122.99223148329897, 122.99223758911434]))
+@pytest.mark.parametrize(
+    "H, result",
+    zip(
+        range(110, 130, 1),
+        [
+            122.99210426454648, 122.99135446500962, 122.99135409065917, 122.99135403971272,
+            122.99135403719148, 122.9913540367823,  122.99135403674013, 122.99135403673134,
+            122.99221686744185, 122.99217229220649, 122.99135553171544, 122.99220727438545,
+            122.99477143007601, 122.9921794642058,  122.99220615327106, 122.99221262582992,
+            122.99221900364599, 122.9922252887964,  122.99223148329897, 122.99223758911434,
+        ],
+    ),
+)
+
+
 def test_effect_H_init(H, result):
     borefield = Borefield()
     borefield.ground_data = GroundConstantTemperature(3, 11)
@@ -954,9 +991,7 @@ def test_calculate_next_depth_deep_sizing():
     assert np.isclose(borefield.calculate_next_depth_deep_sizing(128.16618036528823), 130.8812255630479)
 
 
-@pytest.mark.parametrize("case, result",
-                         zip((1, 2, 3, 4),
-                             [131.90418292004594, 0, 139.46239300837794, 131.90418292004594]))
+@pytest.mark.parametrize("case, result", zip((1, 2, 3, 4), [131.90418292004594, 0, 139.46239300837794, 131.90418292004594]))
 def test_deep_sizing(case, result):
     borefield = Borefield()
     borefield.ground_data = GroundFluxTemperature(3, 10)
