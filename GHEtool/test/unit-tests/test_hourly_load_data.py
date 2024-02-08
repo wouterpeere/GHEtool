@@ -98,16 +98,11 @@ def test_load_simulation_period():
 
 def test_set_hourly_values():
     load = HourlyGeothermalLoad()
-    try:
+    with pytest.raises(ValueError):
         load.set_hourly_heating(np.ones(10))
-        assert False   # pragma: no cover
-    except ValueError:
-        assert True
-    try:
+    with pytest.raises(ValueError):
         load.set_hourly_cooling(np.ones(10))
-        assert False   # pragma: no cover
-    except ValueError:
-        assert True
+
 
 ### continue for multi year
 def test_checks_multiyear():
