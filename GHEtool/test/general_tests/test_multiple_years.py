@@ -19,23 +19,21 @@ def test_multiple_years_L4():
     borefield.set_max_avg_fluid_temperature(17)
     load = pd.read_csv(FOLDER.joinpath("test/methods/hourly_data/multiple_years.csv"), sep=",")
     # load["heating"][8760*25:] = 0
-    hourly_load = HourlyGeothermalLoadMultiYear(load["heating"].clip(0)*load_factor, load["cooling"].clip(0)*load_factor)
+    hourly_load = HourlyGeothermalLoadMultiYear(load["heating"].clip(0)*load_factor, load["cooling"].clip(0) * load_factor)
     borefield.load = hourly_load
-    assert np.allclose(borefield.load.hourly_heating_load_simulation_period, load["heating"].clip(0)*load_factor)
+    assert np.allclose(borefield.load.hourly_heating_load_simulation_period, load["heating"].clip(0) * load_factor)
     assert np.allclose(borefield.load.hourly_cooling_load_simulation_period, load["cooling"].clip(0) * load_factor)
-    assert np.allclose(borefield.load.hourly_load_simulation_period, load["cooling"].clip(0) * load_factor - load["heating"].clip(0)*load_factor)
+    assert np.allclose(borefield.load.hourly_load_simulation_period, load["cooling"].clip(0) * load_factor - load["heating"].clip(0) * load_factor)
     h = borefield.size_L4(150)
     assert np.isclose(h, 114.912, rtol=0.001)
     load["heating"][8760*25:] = 0
-    hourly_load = HourlyGeothermalLoadMultiYear(load["heating"].clip(0)*load_factor, load["cooling"].clip(0)*load_factor)
+    hourly_load = HourlyGeothermalLoadMultiYear(load["heating"].clip(0)*load_factor, load["cooling"].clip(0) * load_factor)
     borefield.load = hourly_load
-    assert np.allclose(borefield.load.hourly_heating_load_simulation_period, load["heating"].clip(0)*load_factor)
+    assert np.allclose(borefield.load.hourly_heating_load_simulation_period, load["heating"].clip(0) * load_factor)
     assert np.allclose(borefield.load.hourly_cooling_load_simulation_period, load["cooling"].clip(0) * load_factor)
-    assert np.allclose(borefield.load.hourly_load_simulation_period, load["cooling"].clip(0) * load_factor - load["heating"].clip(0)*load_factor)
+    assert np.allclose(borefield.load.hourly_load_simulation_period, load["cooling"].clip(0) * load_factor - load["heating"].clip(0) * load_factor)
     h = borefield.size_L4(150)
     assert np.isclose(h, 101.836, rtol=0.001)
-    #borefield.print_temperature_profile_fixed_depth(h, plot_hourly=True)
-    #logging.info(h)
 
 
 def test_multiple_years_L3():
@@ -49,8 +47,7 @@ def test_multiple_years_L3():
     borefield.set_min_avg_fluid_temperature(0)
     borefield.set_max_avg_fluid_temperature(17)
     load = pd.read_csv(FOLDER.joinpath("test/methods/hourly_data/multiple_years.csv"), sep=",")
-    # load["heating"][8760*25:] = 0
-    hourly_load = HourlyGeothermalLoadMultiYear(load["heating"].clip(0)*load_factor, load["cooling"].clip(0)*load_factor)
+    hourly_load = HourlyGeothermalLoadMultiYear(load["heating"].clip(0)*load_factor, load["cooling"].clip(0) * load_factor)
     borefield.load = hourly_load
     monthly_heating_load = np.array([np.mean((load["heating"].clip(0)*load_factor)[i-730:i]) for i in range(730, len(load["heating"])+1, 730)])
     monthly_cooling_load = np.array([np.mean((load["cooling"].clip(0)*load_factor)[i-730:i]) for i in range(730, len(load["cooling"])+1, 730)])
@@ -60,13 +57,13 @@ def test_multiple_years_L3():
     assert np.allclose(borefield.load.baseload_cooling_power_simulation_period, monthly_cooling_load)
     assert np.allclose(borefield.load.baseload_heating_simulation_period, monthly_heating_load * 730)
     assert np.allclose(borefield.load.baseload_cooling_simulation_period, monthly_cooling_load * 730)
-    assert np.allclose(borefield.load.peak_heating, peak_heating)
-    assert np.allclose(borefield.load.peak_cooling, peak_cooling)
+    assert np.allclose(borefield.load.peak_heating_simulation_period, peak_heating)
+    assert np.allclose(borefield.load.peak_cooling_simulation_period, peak_cooling)
     assert np.allclose(borefield.load.monthly_average_load_simulation_period, monthly_cooling_load - monthly_heating_load)
     h = borefield.size_L3(150)
     assert np.isclose(h, 110.233, rtol=0.001)
     load["heating"][8760*25:] = 0
-    hourly_load = HourlyGeothermalLoadMultiYear(load["heating"].clip(0)*load_factor, load["cooling"].clip(0)*load_factor)
+    hourly_load = HourlyGeothermalLoadMultiYear(load["heating"].clip(0)*load_factor, load["cooling"].clip(0) * load_factor)
     borefield.load = hourly_load
     monthly_heating_load = np.array([np.mean((load["heating"].clip(0)*load_factor)[i-730:i]) for i in range(730, len(load["heating"])+1, 730)])
     monthly_cooling_load = np.array([np.mean((load["cooling"].clip(0)*load_factor)[i-730:i]) for i in range(730, len(load["cooling"])+1, 730)])
@@ -74,14 +71,11 @@ def test_multiple_years_L3():
     peak_cooling = [np.max((load["cooling"].clip(0)*load_factor)[i-730:i]) for i in range(730, len(load["cooling"])+1, 730)]
     assert np.allclose(borefield.load.baseload_heating_power_simulation_period, monthly_heating_load)
     assert np.allclose(borefield.load.baseload_cooling_power_simulation_period, monthly_cooling_load)
-    assert np.allclose(borefield.load.peak_heating, peak_heating)
-    assert np.allclose(borefield.load.peak_cooling, peak_cooling)
+    assert np.allclose(borefield.load.peak_heating_simulation_period, peak_heating)
+    assert np.allclose(borefield.load.peak_cooling_simulation_period, peak_cooling)
     assert np.allclose(borefield.load.monthly_average_load_simulation_period, monthly_cooling_load - monthly_heating_load)
     h = borefield.size_L3(150)
     assert np.isclose(h, 100.418, rtol=0.001)
-    # borefield.print_temperature_profile_fixed_depth(h, plot_hourly=False)
-    #logging.info(borefield.load.peak_heating_duration)
-    #logging.info(borefield.load.peak_cooling_duration)
 
 
 def test_multiple_years_L3_monthly_data():
@@ -95,25 +89,23 @@ def test_multiple_years_L3_monthly_data():
     borefield.set_min_avg_fluid_temperature(0)
     borefield.set_max_avg_fluid_temperature(17)
     load = pd.read_csv(FOLDER.joinpath("test/methods/hourly_data/multiple_years.csv"), sep=",")
-    # load["heating"][8760*25:] = 0
     monthly_heating_load = np.array([np.mean((load["heating"].clip(0)*load_factor)[i-730:i]) for i in range(730, len(load["heating"])+1, 730)])
     monthly_cooling_load = np.array([np.mean((load["cooling"].clip(0)*load_factor)[i-730:i]) for i in range(730, len(load["cooling"])+1, 730)])
     peak_heating = [np.max((load["heating"].clip(0)*load_factor)[i-730:i]) for i in range(730, len(load["heating"])+1, 730)]
     peak_cooling = [np.max((load["cooling"].clip(0)*load_factor)[i-730:i]) for i in range(730, len(load["cooling"])+1, 730)]
-    hourly_load = MonthlyGeothermalLoadMultiYear(monthly_heating_load * 730, monthly_cooling_load * 730 ,peak_heating, peak_cooling)
-    borefield.load = hourly_load
+    monthly_load = MonthlyGeothermalLoadMultiYear(monthly_heating_load * 730, monthly_cooling_load * 730, peak_heating, peak_cooling)
+    borefield.load = monthly_load
     assert np.allclose(borefield.load.baseload_heating_power_simulation_period, monthly_heating_load)
     assert np.allclose(borefield.load.baseload_cooling_power_simulation_period, monthly_cooling_load)
     assert np.allclose(borefield.load.baseload_heating_simulation_period, monthly_heating_load * 730)
     assert np.allclose(borefield.load.baseload_cooling_simulation_period, monthly_cooling_load * 730)
-    assert np.allclose(borefield.load.peak_heating, peak_heating)
-    assert np.allclose(borefield.load.peak_cooling, peak_cooling)
+    assert np.allclose(borefield.load.peak_heating_simulation_period, peak_heating)
+    assert np.allclose(borefield.load.peak_cooling_simulation_period, peak_cooling)
     assert np.allclose(borefield.load.monthly_average_load_simulation_period, monthly_cooling_load - monthly_heating_load)
     assert borefield.load.simulation_period == 50
     logging.info(borefield.load.peak_heating_duration)
     logging.info(borefield.load.peak_cooling_duration)
     h = borefield.size_L3(150)
-    # borefield.print_temperature_profile_fixed_depth(h, plot_hourly=False)
     assert np.isclose(h, 110.233, rtol=0.001)
     load["heating"][8760*25:] = 0
     monthly_heating_load = np.array([np.mean((load["heating"].clip(0)*load_factor)[i-730:i]) for i in range(730, len(load["heating"])+1, 730)])
@@ -124,10 +116,8 @@ def test_multiple_years_L3_monthly_data():
     borefield.load = hourly_load
     assert np.allclose(borefield.load.baseload_heating_power_simulation_period, monthly_heating_load)
     assert np.allclose(borefield.load.baseload_cooling_power_simulation_period, monthly_cooling_load)
-    assert np.allclose(borefield.load.peak_heating, peak_heating)
-    assert np.allclose(borefield.load.peak_cooling, peak_cooling)
+    assert np.allclose(borefield.load.peak_heating_simulation_period, peak_heating)
+    assert np.allclose(borefield.load.peak_cooling_simulation_period, peak_cooling)
     assert np.allclose(borefield.load.monthly_average_load_simulation_period, monthly_cooling_load - monthly_heating_load)
     h = borefield.size_L3(150)
     assert np.isclose(h, 100.418, rtol=0.001)
-    # borefield.print_temperature_profile_fixed_depth(h, plot_hourly=False)
-    #logging.info(h)

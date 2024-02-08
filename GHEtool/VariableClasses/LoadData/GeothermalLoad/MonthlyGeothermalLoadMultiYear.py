@@ -129,7 +129,7 @@ class MonthlyGeothermalLoadMultiYear(MonthlyGeothermalLoadAbsolute):
         average heating power : np.ndarray
             average heating power for the whole simulation period
         """
-        return np.divide(self.baseload_heating_simulation_period, self.UPM)
+        return np.divide(self.baseload_heating_simulation_period, np.tile(self.UPM, self.simulation_period))
 
     @property
     def baseload_cooling_power_simulation_period(self) -> np.ndarray:
@@ -141,7 +141,7 @@ class MonthlyGeothermalLoadMultiYear(MonthlyGeothermalLoadAbsolute):
         average cooling power : np.ndarray
             average cooling for the whole simulation period
         """
-        return np.divide(self.baseload_cooling_simulation_period, self.UPM)
+        return np.divide(self.baseload_cooling_simulation_period, np.tile(self.UPM, self.simulation_period))
 
     @property
     def monthly_average_load_simulation_period(self) -> np.ndarray:

@@ -154,7 +154,7 @@ def test_create_custom_dataset():
     with pytest.raises(ValueError):
         borefield_test.create_custom_dataset([100, 1000], [50, 100])
     borefield_test.create_rectangular_borefield(10, 10, 6, 6, 100, 1, 0.075)
-    with pytest.raises(ValueError):
+    with pytest.raises(AssertionError):
         borefield_test.create_custom_dataset([100, 1000], [50, 100])
 
 

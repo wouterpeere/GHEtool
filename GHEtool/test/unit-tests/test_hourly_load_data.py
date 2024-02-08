@@ -104,6 +104,40 @@ def test_set_hourly_values():
         load.set_hourly_cooling(np.ones(10))
 
 
+def test_start_month_general():
+    load = HourlyGeothermalLoad()
+    assert load.start_month == 1
+    with pytest.raises(ValueError):
+        load.start_month = 1.5
+    with pytest.raises(ValueError):
+        load.start_month = 0
+    with pytest.raises(ValueError):
+        load.start_month = 13
+    load.start_month = 12
+    assert load.start_month == 12
+    assert load._start_hour == 11 * 730
+    load.start_month = 1
+    assert load.start_month == 1
+    assert load._start_hour == 0
+    load.start_month = 3
+    assert load.start_month == 3
+    assert load._start_hour == 730 * 2
+
+    load.all_months_equal = False
+    assert load._start_hour == 1416
+
+
+def test_different_start_month():
+    load = HourlyGeothermalLoad(np.arange(1, 8761, 1), np.arange(1, 8761, 1))
+    load.start_month = 3
+    assert load.start_month == 3
+    assert load.hourly_cooling_load[0] == 731 * 2 - 1
+    assert load.hourly_heating_load[0] == 731 * 2 - 1
+    load.all_months_equal = False
+    assert load.hourly_cooling_load[0] == 1417
+    assert load.hourly_heating_load[0] == 1417
+
+
 ### continue for multi year
 def test_checks_multiyear():
     load = HourlyGeothermalLoadMultiYear()
@@ -143,16 +177,11 @@ def test_imbalance_multi_year():
 
 def test_set_hourly_values_multi_year():
     load = HourlyGeothermalLoadMultiYear()
-    try:
+    with pytest.raises(ValueError):
         load.set_hourly_heating(np.ones(10))
-        assert False   # pragma: no cover
-    except ValueError:
-        assert True
-    try:
+    with pytest.raises(ValueError):
         load.set_hourly_cooling(np.ones(10))
-        assert False   # pragma: no cover
-    except ValueError:
-        assert True
+
 
 def test_dhw():
     load = HourlyGeothermalLoad()
@@ -161,16 +190,10 @@ def test_dhw():
     assert load.dhw == 1000.
     load.dhw = 200
     assert load.dhw == 200.
-    try:
+    with pytest.raises(ValueError):
         load.add_dhw('test')
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
-    try:
+    with pytest.raises(ValueError):
         load.add_dhw(-10)
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
 
     load.dhw = 8760*10
     assert np.array_equal(np.full(12, 10), load.peak_heating)
@@ -243,11 +266,8 @@ def test_add():
                                   simulation_period=30,
                                   dhw=10000)
 
-    try:
+    with pytest.raises(ValueError):
         load_1 + 55
-        assert False  # pragma: no cover
-    except TypeError:
-        assert True
 
     with pytest.warns():
         result = load_1 + load_2
@@ -258,13 +278,8 @@ def test_add():
     assert np.allclose(result.hourly_heating_load, load_1.hourly_heating_load + load_2.hourly_heating_load)
 
     load_2.simulation_period = 20
-    try:
-        with pytest.warns():
-            result = load_1 + load_2
-        assert False  # pragma: no cover
-    except:
-        assert True
-
+    with pytest.warns():
+        result = load_1 + load_2
     assert result.simulation_period == 20
     assert result.dhw == 30000
     assert np.allclose(result.hourly_cooling_load, load_1.hourly_cooling_load + load_2.hourly_cooling_load)
@@ -315,17 +330,11 @@ def test_add_multiyear():
     load_2 = HourlyGeothermalLoadMultiYear(cooling_load=np.arange(0, 8760*2, 1) + 1,
                                            heating_load=np.full(8760*2, 3))
 
-    try:
+    with pytest.raises(ValueError):
         load_1 + 55
-        assert False  # pragma: no cover
-    except TypeError:
-        assert True
 
-    try:
+    with pytest.raises(ValueError):
         load_1 + load_2
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
 
     load_1 = HourlyGeothermalLoadMultiYear(heating_load=np.arange(0, 8760 * 2, 1),
                                            cooling_load=np.full(8760 * 2, 2))
@@ -357,51 +366,5 @@ def test_add_multiyear():
     # monthly load
     load_2 = MonthlyGeothermalLoadAbsolute(*load_case(1))
 
-    try:
+    with pytest.raises(ValueError):
         load_1 + load_2
-        assert False  # pragma: no cover
-    except TypeError:
-        assert True
-
-
-def test_start_month_general():
-    load = HourlyGeothermalLoad()
-    assert load.start_month == 1
-    try:
-        load.start_month = 1.5
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
-    try:
-        load.start_month = 0
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
-    try:
-        load.start_month = 13
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
-    load.start_month = 12
-    assert load.start_month == 12
-    assert load._start_hour == 11 * 730
-    load.start_month = 1
-    assert load.start_month == 1
-    assert load._start_hour == 0
-    load.start_month = 3
-    assert load.start_month == 3
-    assert load._start_hour == 730 * 2
-
-    load.all_months_equal = False
-    assert load._start_hour == 1416
-
-
-def test_different_start_month():
-    load = HourlyGeothermalLoad(np.arange(1, 8761, 1), np.arange(1, 8761, 1))
-    load.start_month = 3
-    assert load.start_month == 3
-    assert load.hourly_cooling_load[0] == 731 * 2 - 1
-    assert load.hourly_heating_load[0] == 731 * 2 - 1
-    load.all_months_equal = False
-    assert load.hourly_cooling_load[0] == 1417
-    assert load.hourly_heating_load[0] == 1417
