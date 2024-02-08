@@ -393,3 +393,5 @@ def test_checks_multiyear_monthly():
         load.baseload_heating = np.ones(13)
     with raises(ValueError):
         load.baseload_cooling = np.ones(13)
+
+

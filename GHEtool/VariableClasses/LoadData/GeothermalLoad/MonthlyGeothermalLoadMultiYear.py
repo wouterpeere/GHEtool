@@ -23,7 +23,6 @@ class MonthlyGeothermalLoadMultiYear(MonthlyGeothermalLoadAbsolute):
         baseload_cooling: ArrayLike | None = None,
         peak_heating: ArrayLike | None = None,
         peak_cooling: ArrayLike | None = None,
-        dhw: float = 0.0,
     ):
         """
 
@@ -37,21 +36,15 @@ class MonthlyGeothermalLoadMultiYear(MonthlyGeothermalLoadAbsolute):
             Peak heating values [kW/month]
         peak_cooling : np.ndarray, list, tuple
             Peak cooling values [kW/month]
-        simulation_period : int
-            Length of the simulation period in years
-        dhw : float
-            Yearly consumption of domestic hot water [kWh/year]
         """
 
+        super().__init__()
+
         # set variables
-        baseload_heating = np.zeros(12) if baseload_heating is None and baseload_cooling is None else baseload_heating
-        baseload_heating = np.zeros_like(baseload_cooling) if baseload_heating is None else baseload_heating
-        baseload_cooling = np.zeros_like(baseload_heating) if baseload_cooling is None else baseload_cooling
-        peak_heating = np.zeros(12) if peak_heating is None and peak_cooling is None else peak_heating
-        peak_heating = np.zeros_like(peak_cooling) if peak_heating is None else peak_heating
-        peak_cooling = np.zeros_like(peak_heating) if peak_cooling is None else peak_cooling
-        dhw = dhw
-        super().__init__(baseload_heating, baseload_cooling, peak_heating, peak_cooling, dhw=dhw)
+        self.baseload_heating = np.zeros(12) if baseload_heating is None else baseload_heating
+        self.baseload_cooling = np.zeros(12) if baseload_cooling is None else baseload_cooling
+        self.peak_heating = np.zeros(12) if peak_heating is None else peak_heating
+        self.peak_cooling = np.zeros(12) if peak_cooling is None else peak_cooling
 
     def _check_input(self, load_array: ArrayLike) -> bool:
         """
@@ -82,28 +75,6 @@ class MonthlyGeothermalLoadMultiYear(MonthlyGeothermalLoadAbsolute):
         return True
 
     @property
-    def baseload_heating_power(self) -> np.ndarray:
-        """
-        This function returns the baseload heating in kW avg/month.
-
-        Returns
-        -------
-        baseload heating : np.ndarray
-        """
-        return self.baseload_heating / 730
-
-    @property
-    def baseload_cooling_power(self) -> np.ndarray:
-        """
-        This function returns the baseload heating in kW avg/month.
-
-        Returns
-        -------
-        baseload heating : np.ndarray
-        """
-        return self.baseload_cooling / 730
-
-    @property
     def baseload_heating_simulation_period(self) -> np.ndarray:
         """
         This function returns the baseload heating in kWh/month for a whole simulation period.
@@ -113,7 +84,7 @@ class MonthlyGeothermalLoadMultiYear(MonthlyGeothermalLoadAbsolute):
         baseload heating : np.ndarray
             baseload heating for the whole simulation period
         """
-        return self.baseload_heating
+        return self._baseload_heating
 
     @property
     def baseload_cooling_simulation_period(self) -> np.ndarray:
@@ -125,7 +96,7 @@ class MonthlyGeothermalLoadMultiYear(MonthlyGeothermalLoadAbsolute):
         baseload cooling : np.ndarray
             baseload cooling for the whole simulation period
         """
-        return self.baseload_cooling
+        return self._baseload_cooling
 
     @property
     def peak_heating_simulation_period(self) -> np.ndarray:
@@ -137,7 +108,7 @@ class MonthlyGeothermalLoadMultiYear(MonthlyGeothermalLoadAbsolute):
         peak heating : np.ndarray
             peak heating for the whole simulation period
         """
-        return self.peak_heating
+        return self._peak_heating
 
     @property
     def peak_cooling_simulation_period(self) -> np.ndarray:
@@ -149,19 +120,19 @@ class MonthlyGeothermalLoadMultiYear(MonthlyGeothermalLoadAbsolute):
         peak cooling : np.ndarray
             peak cooling for the whole simulation period
         """
-        return self.peak_cooling
+        return self._peak_cooling
 
     @property
     def baseload_heating_power_simulation_period(self) -> np.ndarray:
         """
-        This function returns the avergae heating power in kW avg/month for a whole simulation period.
+        This function returns the average heating power in kW avg/month for a whole simulation period.
 
         Returns
         -------
         average heating power : np.ndarray
             average heating power for the whole simulation period
         """
-        return self.baseload_heating_power
+        return np.divide(self.baseload_heating_simulation_period, self.UPM)
 
     @property
     def baseload_cooling_power_simulation_period(self) -> np.ndarray:
@@ -173,7 +144,7 @@ class MonthlyGeothermalLoadMultiYear(MonthlyGeothermalLoadAbsolute):
         average cooling power : np.ndarray
             average cooling for the whole simulation period
         """
-        return self.baseload_cooling_power
+        return np.divide(self.baseload_cooling_simulation_period, self.UPM)
 
     @property
     def monthly_average_load_simulation_period(self) -> np.ndarray:
@@ -184,7 +155,7 @@ class MonthlyGeothermalLoadMultiYear(MonthlyGeothermalLoadAbsolute):
         -------
         monthly average load : np.ndarray
         """
-        return self.monthly_average_load
+        return self.baseload_cooling_power_simulation_period - self.baseload_heating_power_simulation_period
 
     @property
     def baseload_cooling(self) -> np.ndarray:
@@ -196,7 +167,7 @@ class MonthlyGeothermalLoadMultiYear(MonthlyGeothermalLoadAbsolute):
         baseload cooling : np.ndarray
             Baseload cooling values [kWh/month] for one year, so the length of the array is 12
         """
-        return self.correct_for_start_month(self._baseload_cooling)
+        return np.mean(self.baseload_cooling_simulation_period.reshape((self.simulation_period, 12)), axis=0)
 
     @baseload_cooling.setter
     def baseload_cooling(self, load: ArrayLike) -> None:
@@ -217,7 +188,7 @@ class MonthlyGeothermalLoadMultiYear(MonthlyGeothermalLoadAbsolute):
         Raises
         ------
         ValueError
-            When either the length is not 12, the input is not of the correct type, or it contains negative
+            When either the length is not a multiple of 12 , the input is not of the correct type, or it contains negative
             values
         """
         if self._check_input(load):
@@ -236,7 +207,7 @@ class MonthlyGeothermalLoadMultiYear(MonthlyGeothermalLoadAbsolute):
         baseload heating : np.ndarray
             Baseload heating values (incl. DHW) [kWh/month] for one year, so the length of the array is 12
         """
-        return self.correct_for_start_month(self._baseload_heating + self.dhw * 730 / 8760)
+        return np.mean(self.baseload_heating_simulation_period.reshape((self.simulation_period, 12)), axis=0)
 
     @baseload_heating.setter
     def baseload_heating(self, load: ArrayLike) -> None:
@@ -257,11 +228,91 @@ class MonthlyGeothermalLoadMultiYear(MonthlyGeothermalLoadAbsolute):
         Raises
         ------
         ValueError
-            When either the length is not 12, the input is not of the correct type, or it contains negative
-            values
+            When either the length is not a multiple of 12, the input is not of the correct type, or it contains
+            negative values
         """
         if self._check_input(load):
             self._baseload_heating = np.array(load)
+            self.simulation_period = int(len(load) / 12)
+            return
+        raise ValueError
+
+    @property
+    def peak_cooling(self) -> np.ndarray:
+        """
+        This function returns the peak cooling load in kW/month.
+
+        Returns
+        -------
+        peak cooling : np.ndarray
+            Peak cooling values for one year, so the length of the array is 12
+        """
+        return np.mean(np.maximum(self.peak_cooling_simulation_period, self.baseload_cooling_power_simulation_period).
+                       reshape((self.simulation_period, 12)), axis=0)
+
+    @peak_cooling.setter
+    def peak_cooling(self, load) -> None:
+        """
+        This function sets the peak cooling load [kW/month] after it has been checked.
+        If the baseload cooling gives a higher average power, this is taken as the peak power in that month.
+
+        Parameters
+        ----------
+        load : np.ndarray, list or tuple
+            Peak cooling load [kW/month]
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            When either the length is not a multiple of 12, the input is not of the correct type, or it contains
+            negative values
+        """
+        if self._check_input(load):
+            self._peak_cooling = np.array(load)
+            self.simulation_period = int(len(load) / 12)
+            return
+        raise ValueError
+
+    @property
+    def peak_heating(self) -> np.ndarray:
+        """
+        This function returns the peak heating load in kW/month.
+
+        Returns
+        -------
+        peak heating : np.ndarray
+            Peak heating values for one year, so the length of the array is 12
+        """
+        return np.mean(np.maximum(self.peak_heating_simulation_period, self.baseload_heating_power_simulation_period).
+                       reshape((self.simulation_period, 12)), axis=0)
+
+    @peak_heating.setter
+    def peak_heating(self, load: ArrayLike) -> None:
+        """
+        This function sets the peak heating load [kW/month] after it has been checked.
+        If the baseload heating gives a higher average power, this is taken as the peak power in that month.
+
+        Parameters
+        ----------
+        load : np.ndarray, list or tuple
+            Peak heating load [kW/month]
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            When either the length is not a multiple of 12, the input is not of the correct type, or it contains
+            negative values
+        """
+        if self._check_input(load):
+            self._peak_heating = np.array(load)
             self.simulation_period = int(len(load) / 12)
             return
         raise ValueError

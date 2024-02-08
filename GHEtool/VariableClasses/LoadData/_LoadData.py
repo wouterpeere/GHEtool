@@ -273,7 +273,7 @@ class _LoadData(BaseClass, ABC):
     @property
     def baseload_heating_power_simulation_period(self) -> np.ndarray:
         """
-        This function returns the avergae heating power in kW avg/month for a whole simulation period.
+        This function returns the average heating power in kW avg/month for a whole simulation period.
 
         Returns
         -------
