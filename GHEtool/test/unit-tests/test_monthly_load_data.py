@@ -2,8 +2,10 @@ import pytest
 
 import numpy as np
 
-from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
+from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad, MonthlyGeothermalLoadMultiYear
 from GHEtool.Validation.cases import load_case
+
+from _pytest.python_api import raises
 
 
 def test_checks():
@@ -376,3 +378,18 @@ def test_different_start_month():
     assert np.array_equal(load.baseload_cooling, result)
     assert np.array_equal(load.peak_heating, result)
     assert np.array_equal(load.peak_cooling, result)
+
+
+def test_checks_multiyear_monthly():
+    load = MonthlyGeothermalLoadMultiYear()
+    assert not load._check_input(2)
+    assert not load._check_input(np.ones(11))
+    assert not load._check_input(-1*np.ones(12*2))
+    assert load._check_input([1]*12*2)
+    assert load._check_input(np.ones(12))
+    assert load._check_input(np.ones(12 * 3))
+    assert not load._check_input(np.ones(30))
+    with raises(ValueError):
+        load.baseload_heating = np.ones(13)
+    with raises(ValueError):
+        load.baseload_cooling = np.ones(13)

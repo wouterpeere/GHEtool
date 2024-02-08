@@ -5,13 +5,13 @@ import pandas as pd
 
 import warnings
 
-from typing import Union, Tuple, TYPE_CHECKING
+from typing import Tuple, TYPE_CHECKING
 
 from GHEtool.VariableClasses.LoadData._LoadData import _LoadData
 from GHEtool.logger import ghe_logger
 
 if TYPE_CHECKING:
-    from numpy.typing import ArrayLike, NDArray
+    from numpy.typing import ArrayLike
 
 
 class HourlyGeothermalLoad(_LoadData):
@@ -27,7 +27,10 @@ class HourlyGeothermalLoad(_LoadData):
     END = pd.to_datetime("2019-12-31 23:59:00")
     HOURS_SERIES = pd.Series(pd.date_range(START, END, freq="1h"))
 
-    def __init__(self, heating_load: ArrayLike | None = None, cooling_load: ArrayLike | None = None, simulation_period: int = 20, dhw: float = 0.0):
+    def __init__(self, heating_load: ArrayLike | None = None,
+                 cooling_load: ArrayLike | None = None,
+                 simulation_period: int = 20,
+                 dhw: float = 0.):
         """
 
         Parameters
@@ -45,15 +48,15 @@ class HourlyGeothermalLoad(_LoadData):
         super().__init__(hourly_resolution=True, simulation_period=simulation_period)
 
         # initiate variables
-        self._hourly_heating_load: NDArray[np.float64] = np.zeros(8760)
-        self._hourly_cooling_load: NDArray[np.float64] = np.zeros(8760)
+        self._hourly_heating_load: np.ndarray = np.zeros(8760)
+        self._hourly_cooling_load: np.ndarray = np.zeros(8760)
 
         # set variables
-        self.hourly_heating_load: NDArray[np.float64] = np.zeros(8760) if heating_load is None else np.array(heating_load)
-        self.hourly_cooling_load: NDArray[np.float64] = np.zeros(8760) if cooling_load is None else np.array(cooling_load)
+        self.hourly_heating_load: np.ndarray = np.zeros(8760) if heating_load is None else np.array(heating_load)
+        self.hourly_cooling_load: np.ndarray = np.zeros(8760) if cooling_load is None else np.array(cooling_load)
         self.dhw = dhw
 
-    def _check_input(self, input: Union[np.ndarray, list, tuple]) -> bool:
+    def _check_input(self, load_array: ArrayLike) -> bool:
         """
         This function checks whether the input is valid or not.
         The input is correct if and only if:
@@ -63,20 +66,20 @@ class HourlyGeothermalLoad(_LoadData):
 
         Parameters
         ----------
-        input : np.ndarray, list or tuple
+        load_array : np.ndarray, list or tuple
 
         Returns
         -------
         bool
             True if the inputs are valid
         """
-        if not isinstance(input, (np.ndarray, list, tuple)):
+        if not isinstance(load_array, (np.ndarray, list, tuple)):
             ghe_logger.error("The load should be of type np.ndarray, list or tuple.")
             return False
-        if not len(input) == 8760:
+        if not len(load_array) == 8760:
             ghe_logger.error("The length of the load should be 8760.")
             return False
-        if np.min(input) < 0:
+        if np.min(load_array) < 0:
             ghe_logger.error("No value in the load can be smaller than zero.")
             return False
         return True
@@ -94,7 +97,7 @@ class HourlyGeothermalLoad(_LoadData):
         return self.correct_for_start_month(self._hourly_heating_load + self.dhw / 8760)
 
     @hourly_heating_load.setter
-    def hourly_heating_load(self, load: Union[np.ndarray, list, tuple]) -> None:
+    def hourly_heating_load(self, load: ArrayLike) -> None:
         """
         This function sets the hourly heating load [kWh/h] after it has been checked.
 
@@ -118,7 +121,7 @@ class HourlyGeothermalLoad(_LoadData):
             return
         raise ValueError
 
-    def set_hourly_heating(self, load: Union[np.ndarray, list, tuple]) -> None:
+    def set_hourly_heating(self, load: ArrayLike) -> None:
         """
         This function sets the hourly heating load [kWh/h] after it has been checked.
 
@@ -152,7 +155,7 @@ class HourlyGeothermalLoad(_LoadData):
         return self.correct_for_start_month(self._hourly_cooling_load)
 
     @hourly_cooling_load.setter
-    def hourly_cooling_load(self, load: Union[np.ndarray, list, tuple]) -> None:
+    def hourly_cooling_load(self, load: ArrayLike) -> None:
         """
         This function sets the hourly cooling load [kWh/h] after it has been checked.
 
@@ -176,7 +179,7 @@ class HourlyGeothermalLoad(_LoadData):
             return
         raise ValueError
 
-    def set_hourly_cooling(self, load: Union[np.ndarray, list, tuple]) -> None:
+    def set_hourly_cooling(self, load: ArrayLike) -> None:
         """
         This function sets the hourly cooling load [kWh/h] after it has been checked.
 

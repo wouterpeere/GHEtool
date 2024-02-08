@@ -4,12 +4,12 @@ import warnings
 
 import numpy as np
 
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 from GHEtool.logger import ghe_logger
 from GHEtool.VariableClasses.LoadData.GeothermalLoad.HourlyGeothermalLoad import HourlyGeothermalLoad
 
 if TYPE_CHECKING:
-    from numpy.typing import ArrayLike, NDArray
+    from numpy.typing import ArrayLike
 
 
 class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
@@ -34,7 +34,6 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
         # initiate variables
         self._hourly_heating_load: np.ndarray = np.zeros(8760)
         self._hourly_cooling_load: np.ndarray = np.zeros(8760)
-        self.range_month: range = range(0)
 
         # set variables
         heating_load = np.zeros(8760) if heating_load is None and cooling_load is None else heating_load
@@ -104,7 +103,6 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
         if self._check_input(load):
             self._hourly_heating_load = load
             self.simulation_period = int(len(load) / 8760)
-            self.range_month = range(730, len(load) + 1, 730)
             return
         raise ValueError
 
@@ -143,7 +141,6 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
         if self._check_input(load):
             self._hourly_cooling_load = load
             self.simulation_period = int(len(load) / 8760)
-            self.range_month = range(730, len(load) + 1, 730)
             return
         raise ValueError
 
@@ -170,163 +167,6 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
             hourly heating for the whole simulation period
         """
         return self._hourly_heating_load
-
-    @property
-    def baseload_cooling(self) -> np.ndarray:
-        """
-        This function returns the baseload cooling in kWh/month.
-
-        Returns
-        -------
-        baseload cooling : np.ndarray
-            Baseload cooling values [kWh/month] for one year, so the length of the array is 12
-        """
-        return self.resample_to_monthly(self._hourly_cooling_load)[1]
-
-    @property
-    def baseload_heating(self) -> np.ndarray:
-        """
-        This function returns the baseload heating in kWh/month.
-
-        Returns
-        -------
-        baseload heating : np.ndarray
-            Baseload heating values [kWh/month] for one year, so the length of the array is 12
-        """
-        return self.resample_to_monthly(self._hourly_heating_load)[1]
-
-    @property
-    def peak_cooling(self) -> np.ndarray:
-        """
-        This function returns the peak cooling load in kW/month.
-
-        Returns
-        -------
-        peak cooling : np.ndarray
-            Peak cooling values for one year, so the length of the array is 12
-        """
-        return self.resample_to_monthly(self._hourly_cooling_load)[0]
-
-    @property
-    def peak_heating(self) -> np.ndarray:
-        """
-        This function returns the peak cooling load in kW/month.
-
-        Returns
-        -------
-        peak cooling : np.ndarray
-            Peak cooling values for one year, so the length of the array is 12
-        """
-        return self.resample_to_monthly(self._hourly_heating_load)[0]
-
-    @property
-    def baseload_heating_power(self) -> np.ndarray:
-        """
-        This function returns the baseload heating in kW avg/month.
-
-        Returns
-        -------
-        baseload heating : np.ndarray
-        """
-        return self.baseload_heating / 730
-
-    @property
-    def baseload_cooling_power(self) -> np.ndarray:
-        """
-        This function returns the baseload heating in kW avg/month.
-
-        Returns
-        -------
-        baseload heating : np.ndarray
-        """
-        return self.baseload_cooling / 730
-
-    @property
-    def baseload_heating_simulation_period(self) -> np.ndarray:
-        """
-        This function returns the baseload heating in kWh/month for a whole simulation period.
-
-        Returns
-        -------
-        baseload heating : np.ndarray
-            baseload heating for the whole simulation period
-        """
-        return self.baseload_heating
-
-    @property
-    def baseload_cooling_simulation_period(self) -> np.ndarray:
-        """
-        This function returns the baseload cooling in kWh/month for a whole simulation period.
-
-        Returns
-        -------
-        baseload cooling : np.ndarray
-            baseload cooling for the whole simulation period
-        """
-        return self.baseload_cooling
-
-    @property
-    def peak_heating_simulation_period(self) -> np.ndarray:
-        """
-        This function returns the peak heating in kW/month for a whole simulation period.
-
-        Returns
-        -------
-        peak heating : np.ndarray
-            peak heating for the whole simulation period
-        """
-        return self.peak_heating
-
-    @property
-    def peak_cooling_simulation_period(self) -> np.ndarray:
-        """
-        This function returns the peak cooling in kW/month for a whole simulation period.
-
-        Returns
-        -------
-        peak cooling : np.ndarray
-            peak cooling for the whole simulation period
-        """
-        return self.peak_cooling
-
-    @property
-    def baseload_heating_power_simulation_period(self) -> np.ndarray:
-        """
-        This function returns the avergae heating power in kW avg/month for a whole simulation period.
-
-        Returns
-        -------
-        average heating power : np.ndarray
-            average heating power for the whole simulation period
-        """
-        return self.baseload_heating_power
-
-    @property
-    def baseload_cooling_power_simulation_period(self) -> np.ndarray:
-        """
-        This function returns the average cooling power in kW avg/month for a whole simulation period.
-
-        Returns
-        -------
-        average cooling power : np.ndarray
-            average cooling for the whole simulation period
-        """
-        return self.baseload_cooling_power
-
-    @property
-    def monthly_average_load_simulation_period(self) -> np.ndarray:
-        """
-        This function calculates the average monthly load in kW for the whole simulation period.
-
-        Returns
-        -------
-        monthly average load : np.ndarray
-        """
-        return self.monthly_average_load
-
-    def resample_to_monthly(self, hourly_load: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-        res = np.array([hourly_load[i - 730 : i] for i in self.range_month])
-        return np.max(res, axis=1), np.sum(res, axis=1)
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, HourlyGeothermalLoad):
