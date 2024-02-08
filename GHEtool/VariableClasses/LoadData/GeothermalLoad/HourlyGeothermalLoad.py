@@ -20,17 +20,14 @@ class HourlyGeothermalLoad(_LoadData):
     This means that the inputs are both in kWh/month and kW/month.
     """
 
-    __slots__ = tuple(_LoadData.__slots__) + ('_heating_load', '_cooling_load')
+    __slots__ = tuple(_LoadData.__slots__) + ("_heating_load", "_cooling_load")
 
     # define parameters for conversion to monthly loads
     START = pd.to_datetime("2019-01-01 00:00:00")
     END = pd.to_datetime("2019-12-31 23:59:00")
     HOURS_SERIES = pd.Series(pd.date_range(START, END, freq="1h"))
 
-    def __init__(self, heating_load: ArrayLike | None = None,
-                 cooling_load: ArrayLike | None = None,
-                 simulation_period: int = 20,
-                 dhw: float = 0.):
+    def __init__(self, heating_load: ArrayLike | None = None, cooling_load: ArrayLike | None = None, simulation_period: int = 20, dhw: float = 0.0):
         """
 
         Parameters
@@ -77,7 +74,7 @@ class HourlyGeothermalLoad(_LoadData):
             ghe_logger.error("The load should be of type np.ndarray, list or tuple.")
             return False
         if not len(input) == 8760:
-            ghe_logger.error("The length of the load should be 12.")
+            ghe_logger.error("The length of the load should be 8760.")
             return False
         if np.min(input) < 0:
             ghe_logger.error("No value in the load can be smaller than zero.")
@@ -225,16 +222,14 @@ class HourlyGeothermalLoad(_LoadData):
         -------
         peak loads [kW], monthly average loads [kWh/month] : np.ndarray, np.ndarray
         """
-        # create dataframe
-        df = pd.DataFrame(hourly_load, index=HourlyGeothermalLoad.HOURS_SERIES, columns=['load'])
-
         if self.all_months_equal:
             return np.max(np.array_split(hourly_load, 12), axis=1), np.sum(np.array_split(hourly_load, 12), axis=1)
 
-        # resample
-        return np.array(df.resample('M').agg({'load': 'max'})['load']),\
-            np.array(df.resample('M').agg({'load': 'sum'})['load'])
+        # create dataframe
+        df = pd.DataFrame(hourly_load, index=HourlyGeothermalLoad.HOURS_SERIES, columns=["load"])
 
+        # resample
+        return np.array(df.resample("M").agg({"load": "max"})["load"]), np.array(df.resample("M").agg({"load": "sum"})["load"])
 
     @property
     def baseload_cooling(self) -> np.ndarray:
@@ -319,8 +314,9 @@ class HourlyGeothermalLoad(_LoadData):
         """
         return np.tile(self.hourly_heating_load, self.simulation_period)
 
-    def load_hourly_profile(self, file_path: str, header: bool = True, separator: str = ";",
-                            decimal_seperator: str = ".", col_heating: int = 0, col_cooling: int = 1) -> None:
+    def load_hourly_profile(
+        self, file_path: str, header: bool = True, separator: str = ";", decimal_seperator: str = ".", col_heating: int = 0, col_cooling: int = 1
+    ) -> None:
         """
         This function loads in an hourly load profile [kW].
 
@@ -375,18 +371,22 @@ class HourlyGeothermalLoad(_LoadData):
     def __add__(self, other):
         if isinstance(other, HourlyGeothermalLoad):
             if self.simulation_period != other.simulation_period:
-                warnings.warn(f'The simulation period for both load classes are different. '
-                              f'The maximum simulation period of '
-                              f'{max(self.simulation_period, other.simulation_period)} years will be taken.')
-            return HourlyGeothermalLoad(self._hourly_heating_load + other._hourly_heating_load,
-                                        self._hourly_cooling_load + other._hourly_cooling_load,
-                                        max(self.simulation_period, other.simulation_period),
-                                        self.dhw + other.dhw)
+                warnings.warn(
+                    f"The simulation period for both load classes are different. "
+                    f"The maximum simulation period of "
+                    f"{max(self.simulation_period, other.simulation_period)} years will be taken."
+                )
+            return HourlyGeothermalLoad(
+                self._hourly_heating_load + other._hourly_heating_load,
+                self._hourly_cooling_load + other._hourly_cooling_load,
+                max(self.simulation_period, other.simulation_period),
+                self.dhw + other.dhw,
+            )
 
         try:
             return other.__add__(self)
         except TypeError:  # pragma: no cover
-            raise TypeError('Cannot perform addition. Please check if you use correct classes.')  # pragma: no cover
+            raise TypeError("Cannot perform addition. Please check if you use correct classes.")  # pragma: no cover
 
     @property
     def _start_hour(self) -> int:
@@ -417,4 +417,4 @@ class HourlyGeothermalLoad(_LoadData):
         """
         if self.start_month == 1:
             return array
-        return np.concatenate((array[self._start_hour:], array[:self._start_hour]))
+        return np.concatenate((array[self._start_hour :], array[: self._start_hour]))

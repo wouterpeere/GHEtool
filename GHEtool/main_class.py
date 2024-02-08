@@ -28,7 +28,8 @@ from GHEtool.logger.ghe_logger import ghe_logger
 
 class Borefield(BaseClass):
     """Main borefield class"""
-    UPM: float = 730.  # number of hours per month
+
+    UPM: float = 730.0  # number of hours per month
     THRESHOLD_BOREHOLE_DEPTH: float = 0.05  # threshold for iteration
     MAX_SIMULATION_PERIOD: int = 100  # maximal value for simulation
 
@@ -39,24 +40,39 @@ class Borefield(BaseClass):
 
     HOURLY_LOAD_ARRAY: np.ndarray = np.arange(0, 8761, UPM).astype(np.uint32)
 
-    __slots__ = 'H', 'borehole', \
-        'number_of_boreholes', '_borefield', 'cost_investment', \
-        'Tf_max', 'Tf_min', 'limiting_quadrant', \
-        'Tf', \
-        '_ground_data', '_borefield_load', \
-        'options_pygfunction', \
-        'THRESHOLD_WARNING_SHALLOW_FIELD', \
-        'D', 'r_b', 'gfunction_calculation_object', \
-        '_calculation_setup', \
-        '_secundary_borefield_load', '_building_load', '_external_load'
+    __slots__ = (
+        "H",
+        "borehole",
+        "number_of_boreholes",
+        "_borefield",
+        "cost_investment",
+        "Tf_max",
+        "Tf_min",
+        "limiting_quadrant",
+        "Tf",
+        "_ground_data",
+        "_borefield_load",
+        "options_pygfunction",
+        "THRESHOLD_WARNING_SHALLOW_FIELD",
+        "D",
+        "r_b",
+        "gfunction_calculation_object",
+        "_calculation_setup",
+        "_secundary_borefield_load",
+        "_building_load",
+        "_external_load",
+    )
 
-    def __init__(self, peak_heating: np.ndarray | list = None,
-                 peak_cooling: np.ndarray | list = None,
-                 baseload_heating: np.ndarray | list = None,
-                 baseload_cooling: np.ndarray | list = None,
-                 borefield=None,
-                 custom_gfunction: CustomGFunction = None,
-                 load: _LoadData = None):
+    def __init__(
+        self,
+        peak_heating: np.ndarray | list = None,
+        peak_cooling: np.ndarray | list = None,
+        baseload_heating: np.ndarray | list = None,
+        baseload_cooling: np.ndarray | list = None,
+        borefield=None,
+        custom_gfunction: CustomGFunction = None,
+        load: _LoadData = None,
+    ):
         """
 
         Parameters
@@ -134,16 +150,16 @@ class Borefield(BaseClass):
         self.results = Results()
 
         # initiate ground parameters
-        self.H = 0.  # borehole depth m
+        self.H = 0.0  # borehole depth m
         self.number_of_boreholes = 0  # number of total boreholes #
         self._ground_data: _GroundData = GroundConstantTemperature()
-        self.D: float = 0.  # buried depth of the borehole [m]
-        self.r_b: float = 0.  # borehole radius [m]
+        self.D: float = 0.0  # buried depth of the borehole [m]
+        self.r_b: float = 0.0  # borehole radius [m]
 
         # initiate fluid parameters
-        self.Tf: float = 0.  # temperature of the fluid
-        self.Tf_max: float = 16.  # maximum temperature of the fluid
-        self.Tf_min: float = 0.  # minimum temperature of the fluid
+        self.Tf: float = 0.0  # temperature of the fluid
+        self.Tf_max: float = 16.0  # maximum temperature of the fluid
+        self.Tf_min: float = 0.0  # minimum temperature of the fluid
 
         # initiale borehole
         self.borehole = Borehole()
@@ -162,8 +178,7 @@ class Borefield(BaseClass):
         if load is not None:
             self.load = load
         else:
-            self.load = MonthlyGeothermalLoadAbsolute(baseload_heating, baseload_cooling,
-                                                      peak_heating, peak_cooling)
+            self.load = MonthlyGeothermalLoadAbsolute(baseload_heating, baseload_cooling, peak_heating, peak_cooling)
 
         # set investment cost
         self.cost_investment: list = Borefield.DEFAULT_INVESTMENT
@@ -220,8 +235,7 @@ class Borefield(BaseClass):
         """
         self.borefield = borefield
 
-    def create_rectangular_borefield(self, N_1: int, N_2: int, B_1: float, B_2: float, H: float, D: float = 1,
-                                     r_b: float = 0.075):
+    def create_rectangular_borefield(self, N_1: int, N_2: int, B_1: float, B_2: float, H: float, D: float = 1, r_b: float = 0.075):
         """
         This function creates a rectangular borefield.
         It calls the pygfunction module in the background.
@@ -372,7 +386,6 @@ class Borefield(BaseClass):
         borefield = gt.boreholes.box_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
         self.set_borefield(borefield)
         return borefield
-
 
     @property
     def borefield(self):
@@ -596,7 +609,7 @@ class Borefield(BaseClass):
 
     @property
     def ground_data(self) -> _GroundData:
-        """"
+        """ "
         This function returns the ground data.
 
         Returns
@@ -710,7 +723,7 @@ class Borefield(BaseClass):
             When the maximal average fluid temperature is lower than the minimal average fluid temperature
         """
         if temp <= self.Tf_min:
-            raise ValueError(f'The maximum average fluid temperature {temp} is lower than the minimum average fluid temperature {self.Tf_min}')
+            raise ValueError(f"The maximum average fluid temperature {temp} is lower than the minimum average fluid temperature {self.Tf_min}")
         self.Tf_max: float = temp
 
     def set_min_avg_fluid_temperature(self, temp: float) -> None:
@@ -732,7 +745,7 @@ class Borefield(BaseClass):
             When the maximal average temperature is lower than the minimal average temperature
         """
         if temp >= self.Tf_max:
-            raise ValueError(f'The minimum average fluid temperature {temp} is lower than the maximum average fluid temperature {self.Tf_max}')
+            raise ValueError(f"The minimum average fluid temperature {temp} is lower than the maximum average fluid temperature {self.Tf_max}")
         self.Tf_min: float = temp
 
     def _Tg(self, H: float = None) -> float:
@@ -784,8 +797,7 @@ class Borefield(BaseClass):
         if old_depth == 0:
             return False
         test_a_tol = abs(new_depth - old_depth) <= self._calculation_setup.atol if self._calculation_setup.atol != False else True
-        test_rtol = abs(
-            new_depth - old_depth) / old_depth <= self._calculation_setup.rtol if self._calculation_setup.rtol != False else True
+        test_rtol = abs(new_depth - old_depth) / old_depth <= self._calculation_setup.rtol if self._calculation_setup.rtol != False else True
 
         return test_a_tol and test_rtol
 
@@ -931,8 +943,16 @@ class Borefield(BaseClass):
         if not use_constant_Rb is None:
             self.borehole.use_constant_Rb = use_constant_Rb
 
-    def size(self, H_init: float = None, use_constant_Rb: bool = None, L2_sizing: bool = None,
-             L3_sizing: bool = None, L4_sizing: bool = None, quadrant_sizing: int = None, **kwargs) -> float:
+    def size(
+        self,
+        H_init: float = None,
+        use_constant_Rb: bool = None,
+        L2_sizing: bool = None,
+        L3_sizing: bool = None,
+        L4_sizing: bool = None,
+        quadrant_sizing: int = None,
+        **kwargs,
+    ) -> float:
         """
         This function sets the options for the sizing function.
 
@@ -981,9 +1001,7 @@ class Borefield(BaseClass):
         use_constant_Rb_backup = self.borehole.use_constant_Rb
 
         # run the sizing setup
-        self._calculation_setup.update_variables(H_init=H_init, L2_sizing=L2_sizing, L3_sizing=L3_sizing,
-                                                 L4_sizing=L4_sizing,
-                                                 quadrant_sizing=quadrant_sizing)
+        self._calculation_setup.update_variables(H_init=H_init, L2_sizing=L2_sizing, L3_sizing=L3_sizing, L4_sizing=L4_sizing, quadrant_sizing=quadrant_sizing)
         self._calculation_setup.update_variables(**kwargs)
 
         if not use_constant_Rb is None:
@@ -1003,10 +1021,12 @@ class Borefield(BaseClass):
 
         # check if the field is not shallow
         if depth < self.THRESHOLD_WARNING_SHALLOW_FIELD:
-            ghe_logger.warning(f"The field has a calculated depth of {round(depth, 2)}"
-                               f"m which is lower than the proposed minimum "
-                               f"of {self.THRESHOLD_WARNING_SHALLOW_FIELD} m. "
-                               f"Please change your configuration accordingly to have a not so shallow field.")
+            ghe_logger.warning(
+                f"The field has a calculated depth of {round(depth, 2)}"
+                f"m which is lower than the proposed minimum "
+                f"of {self.THRESHOLD_WARNING_SHALLOW_FIELD} m. "
+                f"Please change your configuration accordingly to have a not so shallow field."
+            )
 
         ghe_logger.info("The borefield has been sized.")
         return depth
@@ -1080,7 +1100,7 @@ class Borefield(BaseClass):
             raise ValueError("Please provide ground data.")
         # check quadrants
         if not quadrant_sizing in range(0, 5):
-            raise ValueError(f'Quadrant {quadrant_sizing} does not exist.')
+            raise ValueError(f"Quadrant {quadrant_sizing} does not exist.")
 
         # initiate with a given depth
         self.H: float = H_init if H_init is not None else self._calculation_setup.H_init
@@ -1178,7 +1198,7 @@ class Borefield(BaseClass):
             raise ValueError("Please provide ground data.")
         # check quadrants
         if not quadrant_sizing in range(0, 5):
-            raise ValueError(f'Quadrant {quadrant_sizing} does not exist.')
+            raise ValueError(f"Quadrant {quadrant_sizing} does not exist.")
 
         # initiate with a given depth
         self.H: float = H_init if H_init is not None else self._calculation_setup.H_init
@@ -1242,7 +1262,7 @@ class Borefield(BaseClass):
             raise ValueError("Please provide ground data.")
         # check quadrants
         if not quadrant_sizing in range(0, 5):
-            raise ValueError(f'Quadrant {quadrant_sizing} does not exist.')
+            raise ValueError(f"Quadrant {quadrant_sizing} does not exist.")
 
         # check if hourly data is given
         if not self.load.hourly_resolution:
@@ -1257,11 +1277,17 @@ class Borefield(BaseClass):
             return self.H
         else:
             try:
-                max_temp, sized = self._size_based_on_temperature_profile(10, hourly=True, deep_sizing=self._calculation_setup.force_deep_sizing) if np.any(self.load.hourly_cooling_load) else (0, False)
+                max_temp, sized = (
+                    self._size_based_on_temperature_profile(10, hourly=True, deep_sizing=self._calculation_setup.force_deep_sizing)
+                    if np.any(self.load.hourly_cooling_load)
+                    else (0, False)
+                )
             except MaximumNumberOfIterations as e:
                 # no convergence with normal method, but perhaps with deep_sizing enabled
                 if self._calculation_setup.deep_sizing and self.ground_data.variable_Tg:
-                    max_temp, sized = self._size_based_on_temperature_profile(10, hourly=True, deep_sizing=True) if np.any(self.load.hourly_cooling_load) else (0, False)
+                    max_temp, sized = (
+                        self._size_based_on_temperature_profile(10, hourly=True, deep_sizing=True) if np.any(self.load.hourly_cooling_load) else (0, False)
+                    )
                 else:
                     raise e
             if sized:
@@ -1310,8 +1336,8 @@ class Borefield(BaseClass):
 
         # delta_t1/H1 ~ delta_t2/H2
         # H2 = delta_t2/delta_t1*current_depth
-        rel_diff = delta_wrt_max/delta_temp
-        new_depth = current_depth/rel_diff
+        rel_diff = delta_wrt_max / delta_temp
+        new_depth = current_depth / rel_diff
 
         return new_depth
 
@@ -1360,7 +1386,6 @@ class Borefield(BaseClass):
         # (convergence if difference between depth in iterations is smaller than THRESHOLD_BOREHOLE_DEPTH)
         i = 0
         while not self._check_convergence(self.H, H_prev, i):
-
             if hourly:
                 # # calculate g-values
                 # g_values = self.gfunction(self.load.time_L4, self.H)
@@ -1446,19 +1471,19 @@ class Borefield(BaseClass):
                 if quadrant == 1:
                     # maximum temperature
                     # convert back to required length
-                    self.H = (np.max(self.results.peak_cooling[:8760 if hourly else 12]) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
+                    self.H = (np.max(self.results.peak_cooling[: 8760 if hourly else 12]) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
                 elif quadrant == 2:
                     # maximum temperature
                     # convert back to required length
-                    self.H = (np.max(self.results.peak_cooling[-8760 if hourly else -12:]) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
+                    self.H = (np.max(self.results.peak_cooling[-8760 if hourly else -12 :]) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
                 elif quadrant == 3:
                     # minimum temperature
                     # convert back to required length
-                    self.H = (np.min(self.results.peak_heating[:8760 if hourly else 12]) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
+                    self.H = (np.min(self.results.peak_heating[: 8760 if hourly else 12]) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
                 elif quadrant == 4:
                     # minimum temperature
                     # convert back to required length
-                    self.H = (np.min(self.results.peak_heating[-8760 if hourly else -12:]) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
+                    self.H = (np.min(self.results.peak_heating[-8760 if hourly else -12 :]) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
                 elif quadrant == 10:
                     # over all years
                     # maximum temperature
@@ -1477,10 +1502,10 @@ class Borefield(BaseClass):
 
             i += 1
 
-        return self.H, (np.max(self.results.peak_cooling) <= self.Tf_max + 0.05 or
-                        (quadrant == 10 or quadrant == 1 or quadrant == 2))\
-                       and (np.min(self.results.peak_heating) >= self.Tf_min - 0.05 or
-                            (quadrant == 20 or quadrant == 3 or quadrant == 4))
+        return self.H, (np.max(self.results.peak_cooling) <= self.Tf_max + 0.05 or (quadrant == 10 or quadrant == 1 or quadrant == 2)) and (
+            np.min(self.results.peak_heating) >= self.Tf_min - 0.05 or (quadrant == 20 or quadrant == 3 or quadrant == 4)
+        )
+
     @property
     def investment_cost(self) -> float:
         """
@@ -1578,35 +1603,33 @@ class Borefield(BaseClass):
         if plot_hourly:
             time_array = self.load.time_L4 / 12 / 3600 / 730
         else:
-            time_array = self.load.time_L3 / 12 / 730. / 3600.
+            time_array = self.load.time_L3 / 12 / 730.0 / 3600.0
 
         # plt.rc('figure')
         # create new figure and axes if it not already exits otherwise clear it.
         fig = plt.figure()
         ax = fig.add_subplot(111)
         # set axes labelsv
-        ax.set_xlabel(r'Time (year)')
-        ax.set_ylabel(r'Temperature ($^\circ C$)')
+        ax.set_xlabel(r"Time (year)")
+        ax.set_ylabel(r"Temperature ($^\circ C$)")
         ax.yaxis.label.set_color(plt.rcParams["axes.labelcolor"])
         ax.xaxis.label.set_color(plt.rcParams["axes.labelcolor"])
 
         # plot Temperatures
-        ax.step(time_array, self.results.Tb, 'k-', where="post", lw=1.5, label="Tb")
+        ax.step(time_array, self.results.Tb, "k-", where="post", lw=1.5, label="Tb")
 
         if plot_hourly:
-            ax.step(time_array, self.results.peak_cooling, 'b-', where="post", lw=1, label='Tf')
+            ax.step(time_array, self.results.peak_cooling, "b-", where="post", lw=1, label="Tf")
         else:
-            ax.step(time_array, self.results.peak_cooling, 'b-', where="post", lw=1.5, label='Tf peak cooling')
-            ax.step(time_array, self.results.peak_heating, 'r-', where="post", lw=1.5, label='Tf peak heating')
+            ax.step(time_array, self.results.peak_cooling, "b-", where="post", lw=1.5, label="Tf peak cooling")
+            ax.step(time_array, self.results.peak_heating, "r-", where="post", lw=1.5, label="Tf peak heating")
 
-            ax.step(time_array, self.results.monthly_cooling, color='b', linestyle="dashed", where="post", lw=1.5,
-                    label='Tf base cooling')
-            ax.step(time_array, self.results.monthly_heating, color='r', linestyle="dashed", where="post", lw=1.5,
-                    label='Tf base heating')
+            ax.step(time_array, self.results.monthly_cooling, color="b", linestyle="dashed", where="post", lw=1.5, label="Tf base cooling")
+            ax.step(time_array, self.results.monthly_heating, color="r", linestyle="dashed", where="post", lw=1.5, label="Tf base heating")
 
         # define temperature bounds
-        ax.hlines(self.Tf_min, 0, self.simulation_period, colors='r', linestyles='dashed', label='', lw=1)
-        ax.hlines(self.Tf_max, 0, self.simulation_period, colors='b', linestyles='dashed', label='', lw=1)
+        ax.hlines(self.Tf_min, 0, self.simulation_period, colors="r", linestyles="dashed", label="", lw=1)
+        ax.hlines(self.Tf_max, 0, self.simulation_period, colors="b", linestyles="dashed", label="", lw=1)
         ax.set_xticks(range(0, self.simulation_period + 1, 2))
 
         # Plot legend
@@ -1666,35 +1689,42 @@ class Borefield(BaseClass):
             g_value_differences = np.diff(g_values, prepend=0)
 
             # convolution to get the monthly results
-            results = convolve(self.load.monthly_average_load_simulation_period * 1000,
-                               g_value_differences)[:12 * self.simulation_period]
+            results = convolve(self.load.monthly_average_load_simulation_period * 1000, g_value_differences)[: 12 * self.simulation_period]
 
             # calculation the borehole wall temperature for every month i
             Tb = results / (2 * pi * self.ground_data.k_s) / (H * self.number_of_boreholes) + self._Tg(H)
 
             # now the Tf will be calculated based on
             # Tf = Tb + Q * R_b
-            results_month_cooling = Tb + self.load.baseload_cooling_power_simulation_period * 1000 \
-                                    * (Rb / self.number_of_boreholes / H)
-            results_month_heating = Tb - self.load.baseload_heating_power_simulation_period * 1000 \
-                                    * (Rb / self.number_of_boreholes / H)
+            results_month_cooling = Tb + self.load.baseload_cooling_power_simulation_period * 1000 * (Rb / self.number_of_boreholes / H)
+            results_month_heating = Tb - self.load.baseload_heating_power_simulation_period * 1000 * (Rb / self.number_of_boreholes / H)
 
             # extra summation if the g-function value for the peak is included
-            results_peak_cooling = results_month_cooling + (
-                    self.load.peak_cooling_simulation_period - self.load.baseload_cooling_power_simulation_period) * 1000 \
-                                   * (
-                                           g_value_peak_cooling / self.ground_data.k_s / 2 / pi + Rb) / self.number_of_boreholes / H
-            results_peak_heating = results_month_heating - (
-                    self.load.peak_heating_simulation_period - self.load.baseload_heating_power_simulation_period) * 1000 \
-                                   * (
-                                           g_value_peak_heating / self.ground_data.k_s / 2 / pi + Rb) / self.number_of_boreholes / H
+            results_peak_cooling = (
+                results_month_cooling
+                + (self.load.peak_cooling_simulation_period - self.load.baseload_cooling_power_simulation_period)
+                * 1000
+                * (g_value_peak_cooling / self.ground_data.k_s / 2 / pi + Rb)
+                / self.number_of_boreholes
+                / H
+            )
+            results_peak_heating = (
+                results_month_heating
+                - (self.load.peak_heating_simulation_period - self.load.baseload_heating_power_simulation_period)
+                * 1000
+                * (g_value_peak_heating / self.ground_data.k_s / 2 / pi + Rb)
+                / self.number_of_boreholes
+                / H
+            )
 
             # save temperatures under variable
-            self.results = Results(borehole_wall_temp=Tb,
-                                   peak_heating=results_peak_heating,
-                                   peak_cooling=results_peak_cooling,
-                                   monthly_heating=results_month_heating,
-                                   monthly_cooling=results_month_cooling)
+            self.results = Results(
+                borehole_wall_temp=Tb,
+                peak_heating=results_peak_heating,
+                peak_cooling=results_peak_cooling,
+                monthly_heating=results_month_heating,
+                monthly_cooling=results_month_cooling,
+            )
 
         if hourly:
             # check for hourly data if this is requested
@@ -1712,7 +1742,7 @@ class Borefield(BaseClass):
             g_value_differences = np.diff(g_values, prepend=0)
 
             # convolution to get the monthly results
-            results = convolve(hourly_load * 1000, g_value_differences)[:len(hourly_load)]
+            results = convolve(hourly_load * 1000, g_value_differences)[: len(hourly_load)]
 
             # calculation the borehole wall temperature for every month i
             Tb = results / (2 * pi * self.ground_data.k_s) / (H * self.number_of_boreholes) + self._Tg(H)
@@ -1722,9 +1752,7 @@ class Borefield(BaseClass):
             temperature_result = Tb + hourly_load * 1000 * (Rb / self.number_of_boreholes / H)
 
             # reset other variables
-            self.results = Results(borehole_wall_temp=Tb,
-                                   peak_heating=temperature_result,
-                                   peak_cooling=temperature_result)
+            self.results = Results(borehole_wall_temp=Tb, peak_heating=temperature_result, peak_cooling=temperature_result)
 
     def set_options_gfunction_calculation(self, options: dict) -> None:
         """
@@ -1779,8 +1807,9 @@ class Borefield(BaseClass):
             """
             # set the correct depth of the borefield
             self._update_borefield_depth(H=H)
-            return self.gfunction_calculation_object.calculate(time_value, self.borefield, self.ground_data.alpha,
-                                                               interpolate=self._calculation_setup.interpolate_gfunctions)
+            return self.gfunction_calculation_object.calculate(
+                time_value, self.borefield, self.ground_data.alpha, interpolate=self._calculation_setup.interpolate_gfunctions
+            )
 
         ## 1 bypass any possible precalculated g-functions
         # if calculate is False, then the gfunctions are calculated jit
@@ -1797,9 +1826,7 @@ class Borefield(BaseClass):
         ## 3 calculate g-function jit
         return jit_gfunction_calculation()
 
-    def create_custom_dataset(self, time_array: list | np.ndarray = None,
-                              depth_array: list | np.ndarray = None,
-                              options: dict = {}) -> None:
+    def create_custom_dataset(self, time_array: list | np.ndarray = None, depth_array: list | np.ndarray = None, options: dict = {}) -> None:
         """
         This function makes a datafile for a given custom borefield and sets it for the borefield object.
         It automatically sets this datafile in the current borefield object so it can be used as a source for
@@ -1848,8 +1875,15 @@ class Borefield(BaseClass):
         """
         return self.borehole.Re
 
-    def optimise_load_profile(self, building_load: HourlyGeothermalLoad, depth: float = None, SCOP: float = 10 ** 6,
-                              SEER: float = 10 ** 6, print_results: bool = False, temperature_threshold: float = 0.05) -> None:
+    def optimise_load_profile(
+        self,
+        building_load: HourlyGeothermalLoad,
+        depth: float = None,
+        SCOP: float = 10**6,
+        SEER: float = 10**6,
+        print_results: bool = False,
+        temperature_threshold: float = 0.05,
+    ) -> None:
         """
         This function optimises the load based on the given borefield and the given hourly load.
         (When the load is not geothermal, the SCOP and SEER are used to convert it to a geothermal load.)
@@ -1894,7 +1928,7 @@ class Borefield(BaseClass):
 
         # check if threshold is positive
         if temperature_threshold < 0:
-            raise ValueError(f'The temperature threshold is {temperature_threshold}, but it cannot be below 0!')
+            raise ValueError(f"The temperature threshold is {temperature_threshold}, but it cannot be below 0!")
 
         # set depth
         if depth is None:
@@ -1935,11 +1969,9 @@ class Borefield(BaseClass):
 
             # deviation from minimum temperature
             if abs(min(self.results.peak_heating) - self.Tf_min) > temperature_threshold:
-
                 # check if it goes below the threshold
                 if min(self.results.peak_heating) < self.Tf_min:
-                    peak_heat_load_geo = max(0.1,
-                                             peak_heat_load_geo - 1 * max(1, 10 * (self.Tf_min - min(self.results.peak_heating))))
+                    peak_heat_load_geo = max(0.1, peak_heat_load_geo - 1 * max(1, 10 * (self.Tf_min - min(self.results.peak_heating))))
                 else:
                     peak_heat_load_geo = min(init_peak_heating, peak_heat_load_geo * 1.01)
                     if peak_heat_load_geo == init_peak_heating:
@@ -1949,11 +1981,9 @@ class Borefield(BaseClass):
 
             # deviation from maximum temperature
             if abs(np.max(self.results.peak_cooling) - self.Tf_max) > temperature_threshold:
-
                 # check if it goes above the threshold
                 if np.max(self.results.peak_cooling) > self.Tf_max:
-                    peak_cool_load_geo = max(0.1,
-                                             peak_cool_load_geo - 1 * max(1, 10 * (-self.Tf_max + np.max(self.results.peak_cooling))))
+                    peak_cool_load_geo = max(0.1, peak_cool_load_geo - 1 * max(1, 10 * (-self.Tf_max + np.max(self.results.peak_cooling))))
                 else:
                     peak_cool_load_geo = min(init_peak_cooling, peak_cool_load_geo * 1.01)
                     if peak_cool_load_geo == init_peak_cooling:
@@ -1971,10 +2001,8 @@ class Borefield(BaseClass):
 
         # calculate external load
         self._external_load = HourlyGeothermalLoad(simulation_period=building_load.simulation_period)
-        self._external_load.set_hourly_heating(np.maximum(0, building_load.hourly_heating_load -
-                                                          self._secundary_borefield_load.hourly_heating_load))
-        self._external_load.set_hourly_cooling(np.maximum(0, building_load.hourly_cooling_load -
-                                                          self._secundary_borefield_load.hourly_cooling_load))
+        self._external_load.set_hourly_heating(np.maximum(0, building_load.hourly_heating_load - self._secundary_borefield_load.hourly_heating_load))
+        self._external_load.set_hourly_cooling(np.maximum(0, building_load.hourly_cooling_load - self._secundary_borefield_load.hourly_cooling_load))
 
         # restore the initial parameters
         self.Rb = Rb_backup
@@ -1982,23 +2010,37 @@ class Borefield(BaseClass):
 
         if print_results:
             # print results
-            print("The peak load heating is: ", f'{self._secundary_borefield_load.max_peak_heating:.0f}',
-                  "kW, leading to",
-                  f'{np.sum(self._secundary_borefield_load.hourly_heating_load):.0f}', "kWh of heating.")
-            print("This is", f'{self._percentage_heating:.0f}',
-                  "% of the total heating load.")
-            print("Another", f'{np.sum(self._external_load.hourly_heating_load):.0f}',
-                  "kWh of heating should come from another source, with a peak of",
-                  f'{self._external_load.max_peak_heating:.0f}', "kW.")
+            print(
+                "The peak load heating is: ",
+                f"{self._secundary_borefield_load.max_peak_heating:.0f}",
+                "kW, leading to",
+                f"{np.sum(self._secundary_borefield_load.hourly_heating_load):.0f}",
+                "kWh of heating.",
+            )
+            print("This is", f"{self._percentage_heating:.0f}", "% of the total heating load.")
+            print(
+                "Another",
+                f"{np.sum(self._external_load.hourly_heating_load):.0f}",
+                "kWh of heating should come from another source, with a peak of",
+                f"{self._external_load.max_peak_heating:.0f}",
+                "kW.",
+            )
             print("------------------------------------------")
-            print("The peak load cooling is: ", f'{self._secundary_borefield_load.max_peak_cooling:.0f}',
-                  "kW, leading to",
-                  f'{np.sum(self._secundary_borefield_load.hourly_cooling_load):.0f}', "kWh of cooling.")
-            print("This is", f'{self._percentage_cooling:.0f}',
-                  "% of the total cooling load.")
-            print("Another", f'{np.sum(self._external_load.hourly_cooling_load):.0f}',
-                  "kWh of cooling should come from another source, with a peak of",
-                  f'{self._external_load.max_peak_cooling:.0f}', "kW.")
+            print(
+                "The peak load cooling is: ",
+                f"{self._secundary_borefield_load.max_peak_cooling:.0f}",
+                "kW, leading to",
+                f"{np.sum(self._secundary_borefield_load.hourly_cooling_load):.0f}",
+                "kWh of cooling.",
+            )
+            print("This is", f"{self._percentage_cooling:.0f}", "% of the total cooling load.")
+            print(
+                "Another",
+                f"{np.sum(self._external_load.hourly_cooling_load):.0f}",
+                "kWh of cooling should come from another source, with a peak of",
+                f"{self._external_load.max_peak_cooling:.0f}",
+                "kW.",
+            )
 
             # plot results
             self.print_temperature_profile_fixed_depth(depth=depth)
@@ -2013,8 +2055,7 @@ class Borefield(BaseClass):
         float
             Percentage of heating load that can be done geothermally.
         """
-        return np.sum(self._secundary_borefield_load.hourly_heating_load) / \
-            np.sum(self._building_load.hourly_heating_load) * 100
+        return np.sum(self._secundary_borefield_load.hourly_heating_load) / np.sum(self._building_load.hourly_heating_load) * 100
 
     @property
     def _percentage_cooling(self) -> float:
@@ -2026,8 +2067,7 @@ class Borefield(BaseClass):
         float
             Percentage of cooling load that can be done geothermally.
         """
-        return np.sum(self._secundary_borefield_load.hourly_cooling_load) / \
-            np.sum(self._building_load.hourly_cooling_load) * 100
+        return np.sum(self._secundary_borefield_load.hourly_cooling_load) / np.sum(self._building_load.hourly_cooling_load) * 100
 
     def calculate_quadrant(self) -> int:
         """
@@ -2051,8 +2091,9 @@ class Borefield(BaseClass):
 
         # calculate temperatures if they are not calculated
         if not np.any(self.results.peak_heating):
-            ghe_logger.warning('There are not yet temperatures calculated, hence there is no limiting quadrant.'
-                               'The temperature is calculated now, based on monthly values.')
+            ghe_logger.warning(
+                "There are not yet temperatures calculated, hence there is no limiting quadrant." "The temperature is calculated now, based on monthly values."
+            )
             self.calculate_temperatures()
 
         # calculate max/min fluid temperatures
@@ -2060,7 +2101,7 @@ class Borefield(BaseClass):
         min_temp = np.min(self.results.peak_heating)
 
         # calculate temperature difference w.r.t. the limits
-        DT_max = - self.Tf_max + max_temp + 1000  # + 1000 to have no problems with negative temperatures
+        DT_max = -self.Tf_max + max_temp + 1000  # + 1000 to have no problems with negative temperatures
         DT_min = self.Tf_min - min_temp + 1000
 
         # if the temperature limit is not crossed, return None
@@ -2110,8 +2151,8 @@ class Borefield(BaseClass):
         fig = plt.figure()
         ax = fig.add_subplot(111)
         # add sorted loads to plot
-        ax.step(np.arange(0, 8760, 1), heating, 'r-', label="Heating")
-        ax.step(np.arange(0, 8760, 1), cooling, 'b-', label="Cooling")
+        ax.step(np.arange(0, 8760, 1), heating, "r-", label="Heating")
+        ax.step(np.arange(0, 8760, 1), cooling, "b-", label="Cooling")
         # create 0 line
         ax.hlines(0, 0, 8759, color="black")
         # add labels
