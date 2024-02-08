@@ -266,7 +266,7 @@ def test_add():
                                   simulation_period=30,
                                   dhw=10000)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         load_1 + 55
 
     with pytest.warns():
@@ -330,7 +330,7 @@ def test_add_multiyear():
     load_2 = HourlyGeothermalLoadMultiYear(cooling_load=np.arange(0, 8760*2, 1) + 1,
                                            heating_load=np.full(8760*2, 3))
 
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         load_1 + 55
 
     with pytest.raises(ValueError):
@@ -366,5 +366,5 @@ def test_add_multiyear():
     # monthly load
     load_2 = MonthlyGeothermalLoadAbsolute(*load_case(1))
 
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         load_1 + load_2

@@ -298,16 +298,24 @@ def test_add():
         result = load_1 + load_2
         assert result.peak_heating_duration == 18*3600
     load_1.peak_heating_duration = 18
-    with pytest.warns():
-        result = load_1 + load_2
+    try:
+        with pytest.warns():
+            result = load_1 + load_2
+        assert False  # pragma: no cover
+    except:
+        assert True
 
     load_1.peak_cooling_duration = 18
     with pytest.warns():
         result = load_1 + load_2
         assert result.peak_cooling_duration == 18*3600
     load_2.peak_cooling_duration = 18
-    with pytest.warns():
-        result = load_1 + load_2
+    try:
+        with pytest.warns():
+            result = load_1 + load_2
+        assert False  # pragma: no cover
+    except:
+        assert True
 
     # add hourly load
     load_hourly = HourlyGeothermalLoad(np.full(8760, 10), np.full(8760, 20), 30, 10000)
