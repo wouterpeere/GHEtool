@@ -2,13 +2,10 @@ from __future__ import annotations
 
 import numpy as np
 
-from typing import TYPE_CHECKING
-
 from GHEtool.VariableClasses.LoadData.GeothermalLoad.MonthlyGeothermalLoadAbsolute import MonthlyGeothermalLoadAbsolute
 from GHEtool.logger.ghe_logger import ghe_logger
 
-if TYPE_CHECKING:
-    from numpy.typing import ArrayLike
+from numpy.typing import ArrayLike
 
 
 class MonthlyGeothermalLoadMultiYear(MonthlyGeothermalLoadAbsolute):

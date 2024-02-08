@@ -2,7 +2,6 @@ import warnings
 
 import numpy as np
 
-from typing import TYPE_CHECKING
 from GHEtool.VariableClasses.LoadData._LoadData import _LoadData
 from GHEtool.VariableClasses.LoadData.GeothermalLoad import HourlyGeothermalLoad
 from GHEtool.VariableClasses.LoadData.GeothermalLoad.HourlyGeothermalLoadMultiYear import HourlyGeothermalLoadMultiYear

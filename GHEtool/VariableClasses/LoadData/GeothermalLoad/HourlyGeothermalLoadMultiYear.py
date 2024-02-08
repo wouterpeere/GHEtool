@@ -4,12 +4,10 @@ import warnings
 
 import numpy as np
 
-from typing import TYPE_CHECKING
 from GHEtool.logger import ghe_logger
 from GHEtool.VariableClasses.LoadData.GeothermalLoad.HourlyGeothermalLoad import HourlyGeothermalLoad
 
-if TYPE_CHECKING:
-    from numpy.typing import ArrayLike
+from numpy.typing import ArrayLike
 
 
 class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
