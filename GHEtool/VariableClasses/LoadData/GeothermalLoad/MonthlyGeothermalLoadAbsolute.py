@@ -20,10 +20,10 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
 
     def __init__(
         self,
-        baseload_heating: ArrayLike | None = None,
-        baseload_cooling: ArrayLike | None = None,
-        peak_heating: ArrayLike | None = None,
-        peak_cooling: ArrayLike | None = None,
+        baseload_heating: ArrayLike = None,
+        baseload_cooling: ArrayLike = None,
+        peak_heating: ArrayLike = None,
+        peak_cooling: ArrayLike = None,
         simulation_period: int = 20,
         dhw: float = 0.0,
     ):

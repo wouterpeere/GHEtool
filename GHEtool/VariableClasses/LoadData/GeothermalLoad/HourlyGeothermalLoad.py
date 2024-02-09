@@ -27,8 +27,8 @@ class HourlyGeothermalLoad(_LoadData):
     END = pd.to_datetime("2019-12-31 23:59:00")
     HOURS_SERIES = pd.Series(pd.date_range(START, END, freq="1h"))
 
-    def __init__(self, heating_load: ArrayLike | None = None,
-                 cooling_load: ArrayLike | None = None,
+    def __init__(self, heating_load: ArrayLike = None,
+                 cooling_load: ArrayLike = None,
                  simulation_period: int = 20,
                  dhw: float = 0.):
         """

@@ -18,7 +18,7 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
     This means that the inputs are both in kWh/month and kW/month.
     """
 
-    def __init__(self, heating_load: ArrayLike | None = None, cooling_load: ArrayLike | None = None):
+    def __init__(self, heating_load: ArrayLike = None, cooling_load: ArrayLike = None):
         """
 
         Parameters
