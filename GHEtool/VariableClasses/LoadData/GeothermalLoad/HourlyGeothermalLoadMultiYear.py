@@ -3,7 +3,9 @@ from __future__ import annotations
 import warnings
 
 import numpy as np
+import pandas as pd
 
+from typing import Tuple
 from GHEtool.logger import ghe_logger
 from GHEtool.VariableClasses.LoadData.GeothermalLoad.HourlyGeothermalLoad import HourlyGeothermalLoad
 
@@ -197,3 +199,109 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
             return other.__add__(self)
         except TypeError:  # pragma: no cover
             raise TypeError("Cannot perform addition. Please check if you use correct classes.")  # pragma: no cover
+
+    @property
+    def baseload_heating_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the baseload heating in kWh/month for a whole simulation period.
+
+        Returns
+        -------
+        baseload heating : np.ndarray
+            baseload heating for the whole simulation period
+        """
+        return self.resample_to_monthly(self._hourly_heating_load)[1]
+
+    @property
+    def baseload_cooling_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the baseload cooling in kWh/month for a whole simulation period.
+
+        Returns
+        -------
+        baseload cooling : np.ndarray
+            baseload cooling for the whole simulation period
+        """
+        return self.resample_to_monthly(self._hourly_cooling_load)[1]
+
+    @property
+    def peak_heating_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the peak heating in kW/month for a whole simulation period.
+
+        Returns
+        -------
+        peak heating : np.ndarray
+            peak heating for the whole simulation period
+        """
+        return self.resample_to_monthly(self._hourly_heating_load)[0]
+
+    @property
+    def peak_cooling_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the peak cooling in kW/month for a whole simulation period.
+
+        Returns
+        -------
+        peak cooling : np.ndarray
+            peak cooling for the whole simulation period
+        """
+        return self.resample_to_monthly(self._hourly_cooling_load)[0]
+
+    @property
+    def baseload_heating_power_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the average heating power in kW avg/month for a whole simulation period.
+
+        Returns
+        -------
+        average heating power : np.ndarray
+            average heating power for the whole simulation period
+        """
+        return np.divide(self.baseload_heating_simulation_period, np.tile(self.UPM, self.simulation_period))
+
+    @property
+    def baseload_cooling_power_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the average cooling power in kW avg/month for a whole simulation period.
+
+        Returns
+        -------
+        average cooling power : np.ndarray
+            average cooling for the whole simulation period
+        """
+        return np.divide(self.baseload_cooling_simulation_period, np.tile(self.UPM, self.simulation_period))
+
+    def hours_series(self) -> pd.Series:
+        hours_per_year = 8760  # Assuming non-leap years
+        leap_year_hours = 24  # Leap year has 24 additional hours
+        total_hours = self.simulation_period * hours_per_year + (self.simulation_period // 4) * leap_year_hours
+
+        start_date = pd.Timestamp(year=1, month=1, day=1, hour=0)
+        end_date = start_date + pd.Timedelta(hours=total_hours - 1)
+        index = pd.date_range(start=start_date, end=end_date, freq='H')
+        series = pd.Series(index=index)
+        return series
+
+    def resample_to_monthly(self, hourly_load: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        This function resamples an hourly_load to monthly peaks (kW/month) and baseloads (kWh/month).
+
+        Parameters
+        ----------
+        hourly_load : np.ndarray
+            Hourly loads in kWh/h
+
+        Returns
+        -------
+        peak loads [kW], monthly average loads [kWh/month] : np.ndarray, np.ndarray
+        """
+        if self.all_months_equal:
+            return np.max(np.array_split(hourly_load, 12*self.simulation_period), axis=1),\
+                np.sum(np.array_split(hourly_load, 12*self.simulation_period), axis=1)
+
+        # create dataframe
+        df = pd.DataFrame(hourly_load, index=self.hours_series, columns=["load"])
+
+        # resample
+        return np.array(df.resample("M").agg({"load": "max"})["load"]), np.array(df.resample("M").agg({"load": "sum"})["load"])

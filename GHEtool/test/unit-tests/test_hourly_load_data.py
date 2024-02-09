@@ -278,8 +278,12 @@ def test_add():
     assert np.allclose(result.hourly_heating_load, load_1.hourly_heating_load + load_2.hourly_heating_load)
 
     load_2.simulation_period = 20
-    with pytest.warns():
-        result = load_1 + load_2
+    try:
+        with pytest.warns():
+            result = load_1 + load_2
+        assert False  # pragma: no cover
+    except:
+        assert True
     assert result.simulation_period == 20
     assert result.dhw == 30000
     assert np.allclose(result.hourly_cooling_load, load_1.hourly_cooling_load + load_2.hourly_cooling_load)

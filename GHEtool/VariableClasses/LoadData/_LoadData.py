@@ -326,7 +326,7 @@ class _LoadData(BaseClass, ABC):
         -------
         monthly average load : np.ndarray
         """
-        return np.tile(self.monthly_average_load, self.simulation_period)
+        return self.baseload_cooling_power_simulation_period - self.baseload_heating_power_simulation_period
 
     @property
     def peak_heating_duration(self) -> float:
