@@ -8,7 +8,6 @@ This code is tested with Python 3.8, 3.9, 3.10, 3.11 and 3.12 and requires the f
 * pandas >= 1.4.3
 * pygfunction >= 2.2.1
 * scipy >= 1.8.1
-* scikit-optimize >= 0.9.0
 
 For the tests
 
@@ -91,6 +90,7 @@ In a future version of GHEtool, also secundary building loads will be included. 
 * _MonthlyGeothermalLoadAbsolute_: You can set one the monthly baseload and peak load for heating and cooling for one standard year which will be used for all years within the simulation period.
 * _HourlyGeothermalLoad_: You can set (or load) the hourly heating and cooling load of a standard year which will be used for all years within the simulation period.
 * _HourlyGeothermalLoadMultiYear_: You can set (or load) the hourly heating and cooling load for multiple years (i.e. for the whole simulation period). This way, you can use secundary loads already with GHEtool as shown in [this example](https://ghetool.readthedocs.io/en/stable/sources/code/Examples/active_passive_cooling.html).
+* _MonthlyGeothermalLoadMultiYear_: You can set the monthly heating and cooling load for multiple years (i.e. for the whole simulation period).
 
 All load classes also have the option to add a yearly domestic hot water usage.
 
