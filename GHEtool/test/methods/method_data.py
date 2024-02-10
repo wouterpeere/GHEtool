@@ -241,7 +241,7 @@ borefield.set_ground_parameters(ground_data_IKC)
 borefield.set_fluid_parameters(fluid_data_IKC)
 borefield.set_pipe_parameters(pipe_data_IKC)
 borefield.calculation_setup(use_constant_Rb=False)
-borefield.set_length_peak(10)
+borefield.load.peak_duration = 10
 borefield.set_max_avg_fluid_temperature(25)
 borefield.set_min_avg_fluid_temperature(0)
 list_of_test_objects.add(SizingObject(borefield, error_L2=UnsolvableDueToTemperatureGradient, error_L3=UnsolvableDueToTemperatureGradient, name='Real case 1 (Error)'))
@@ -375,7 +375,7 @@ borefield = Borefield()
 borefield.create_rectangular_borefield(3, 6, 6, 6, 146, 4)
 borefield.set_min_avg_fluid_temperature(3)
 borefield.set_max_avg_fluid_temperature(16)
-borefield.set_length_peak(6)
+borefield.load.peak_duration = 6
 load = HourlyGeothermalLoad()
 load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\problem_data.csv"), col_heating=0, col_cooling=1, header=True, decimal_seperator=',')
 load.simulation_period = 40
