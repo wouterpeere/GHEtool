@@ -7,6 +7,7 @@ import pytest
 from GHEtool import FluidData, DoubleUTube, SingleUTube, MultipleUTube
 from GHEtool.VariableClasses import Borehole
 
+
 fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
 pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 
@@ -101,12 +102,9 @@ def test_Rb():
 
 def test_calculate_Rb_no_data():
     borehole = Borehole()
-
-    try:
+    with pytest.raises(ValueError):
         borehole.calculate_Rb(100, 1, 0.075, 3)
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
+
 
 def test_Rb_values():
     borehole = Borehole()

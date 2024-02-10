@@ -29,7 +29,6 @@ def compare():
 
     # load the hourly profile
     load = HourlyGeothermalLoad()
-    print(FOLDER)
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), header=True, separator=";")
     borefield.load = load
     borefield.simulation_period = 100

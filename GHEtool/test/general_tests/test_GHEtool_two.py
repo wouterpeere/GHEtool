@@ -10,6 +10,7 @@ import pytest
 from GHEtool import *
 from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient
 
+
 data = GroundConstantTemperature(3, 10)
 data_ground_flux = GroundFluxTemperature(3, 10)
 
@@ -125,7 +126,7 @@ def test_different_results_with_other_peak_lengths():
     borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
     borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
 
-    borefield.set_length_peak(2)
+    borefield.load.peak_duration = 2
     init_length_L2 = borefield.size_L2()
     borefield.load.peak_duration = 8
     new_length_L2 = borefield.size_L2()
@@ -174,11 +175,8 @@ def test_no_possible_solution():
     borefield.set_max_avg_fluid_temperature(14)
     borefield.set_min_avg_fluid_temperature(2)
     borefield.load.baseload_heating = borefield.load.baseload_heating * 5
-    try:
+    with pytest.raises(UnsolvableDueToTemperatureGradient):
         borefield.size(L3_sizing=True)
-        assert False  # pragma: no cover
-    except UnsolvableDueToTemperatureGradient:
-        assert True
 
 
 def test_problem_with_gfunction_calc_obj():

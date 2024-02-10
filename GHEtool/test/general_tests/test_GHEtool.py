@@ -247,18 +247,12 @@ def test_value_error_cooling_dom_temp_gradient():
     borefield.set_borefield(borefield_pyg)
     borefield.set_Rb(0.2)
 
-    try:
+    with raises(MaximumNumberOfIterations):
         borefield.size()
-        assert False  # pragma: no cover
-    except MaximumNumberOfIterations:
-        assert True
 
     borefield.calculation_setup(max_nb_of_iterations=500)
-    try:
+    with raises(UnsolvableDueToTemperatureGradient):
         borefield.size()
-        assert False  # pragma: no cover
-    except UnsolvableDueToTemperatureGradient:
-        assert True
 
 
 def test_borefield_with_constant_peaks(borefield):

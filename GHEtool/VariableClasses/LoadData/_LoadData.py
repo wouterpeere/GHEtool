@@ -116,9 +116,9 @@ class _LoadData(BaseClass, ABC):
         """
         if self.all_months_equal:
             # every month has equal length
-            return np.ones(12) * _LoadData.AVG_UPM
+            return np.full(12, _LoadData.AVG_UPM, dtype=np.int64)
         else:
-            return np.array([744, 672, 744, 720, 744, 720, 744, 744, 720, 744, 720, 744])
+            return np.array([744, 672, 744, 720, 744, 720, 744, 744, 720, 744, 720, 744], dtype=np.int64)
 
     @abc.abstractmethod
     def _check_input(self, input: Union[np.ndarray, list, tuple]) -> bool:
@@ -273,7 +273,7 @@ class _LoadData(BaseClass, ABC):
     @property
     def baseload_heating_power_simulation_period(self) -> np.ndarray:
         """
-        This function returns the avergae heating power in kW avg/month for a whole simulation period.
+        This function returns the average heating power in kW avg/month for a whole simulation period.
 
         Returns
         -------
@@ -326,7 +326,7 @@ class _LoadData(BaseClass, ABC):
         -------
         monthly average load : np.ndarray
         """
-        return np.tile(self.monthly_average_load, self.simulation_period)
+        return self.baseload_cooling_power_simulation_period - self.baseload_heating_power_simulation_period
 
     @property
     def peak_heating_duration(self) -> float:

@@ -2,7 +2,7 @@ import pytest
 
 import numpy as np
 
-from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
+from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad, MonthlyGeothermalLoadMultiYear
 from GHEtool.Validation.cases import load_case
 
 
@@ -18,21 +18,12 @@ def test_checks():
 def test_start_month_general():
     load = MonthlyGeothermalLoadAbsolute()
     assert load.start_month == 1
-    try:
+    with pytest.raises(ValueError):
         load.start_month = 1.5
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
-    try:
+    with pytest.raises(ValueError):
         load.start_month = 0
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
-    try:
+    with pytest.raises(ValueError):
         load.start_month = 13
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
     load.start_month = 12
     assert load.start_month == 12
     load.start_month = 1
@@ -55,11 +46,8 @@ def test_baseload_heating():
     assert np.array_equal(load.baseload_heating, np.linspace(1, 12, 12))
     assert np.array_equal(load.baseload_heating / 730, load.baseload_heating_power)
     assert np.array_equal(load.baseload_heating_power, load.peak_heating)
-    try:
+    with pytest.raises(ValueError):
         load.set_baseload_heating(np.ones(11))
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
 
 
 def test_baseload_cooling():
@@ -72,11 +60,8 @@ def test_baseload_cooling():
     assert np.array_equal(load.baseload_cooling / 730, load.baseload_cooling_power)
     assert np.array_equal(load.baseload_cooling_power, load.peak_cooling)
 
-    try:
+    with pytest.raises(ValueError):
         load.set_baseload_cooling(np.ones(11))
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
 
 
 def test_peak_heating():
@@ -88,11 +73,8 @@ def test_peak_heating():
     assert np.array_equal(load.peak_heating, np.linspace(1, 12, 12))
     load.set_baseload_heating(np.ones(12) * 730 * 5)
     assert np.array_equal(load.peak_heating, np.array([5., 5., 5., 5., 5., 6., 7., 8., 9., 10., 11., 12.]))
-    try:
+    with pytest.raises(ValueError):
         load.set_peak_heating(np.ones(11))
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
 
 
 def test_peak_cooling():
@@ -104,11 +86,8 @@ def test_peak_cooling():
     assert np.array_equal(load.peak_cooling, np.linspace(1, 12, 12))
     load.set_baseload_cooling(np.ones(12) * 730 * 5)
     assert np.array_equal(load.peak_cooling, np.array([5.,  5.,  5.,  5.,  5.,  6.,  7.,  8.,  9., 10., 11., 12.]))
-    try:
+    with pytest.raises(ValueError):
         load.set_peak_cooling(np.ones(11))
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
 
 
 def test_times():
@@ -226,16 +205,10 @@ def test_dhw():
     assert np.isclose(load.dhw_power, 1000./8760)
     load.dhw = 200
     assert load.dhw == 200.
-    try:
+    with pytest.raises(ValueError):
         load.add_dhw('test')
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
-    try:
+    with pytest.raises(ValueError):
         load.add_dhw(-10)
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
 
     load.dhw = 8760*10
     assert np.array_equal(np.full(12, 10), load.peak_heating)
@@ -305,11 +278,8 @@ def test_add():
     load_1.simulation_period = 20
     load_2.simulation_period = 30
 
-    try:
+    with pytest.raises(TypeError):
         load_1 + 55
-        assert False  # pragma: no cover
-    except TypeError:
-        assert True
 
     with pytest.warns():
         result = load_1 + load_2
@@ -376,3 +346,20 @@ def test_different_start_month():
     assert np.array_equal(load.baseload_cooling, result)
     assert np.array_equal(load.peak_heating, result)
     assert np.array_equal(load.peak_cooling, result)
+
+
+### continue for multi year
+def test_checks_multiyear_monthly():
+    load = MonthlyGeothermalLoadMultiYear()
+    assert not load._check_input(2)
+    assert not load._check_input(np.ones(11))
+    assert not load._check_input(-1*np.ones(12*2))
+    assert load._check_input([1]*12*2)
+    assert load._check_input(np.ones(12))
+    assert load._check_input(np.ones(12 * 3))
+    assert not load._check_input(np.ones(30))
+    with pytest.raises(ValueError):
+        load.baseload_heating = np.ones(13)
+    with pytest.raises(ValueError):
+        load.baseload_cooling = np.ones(13)
+
