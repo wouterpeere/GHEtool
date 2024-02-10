@@ -174,17 +174,6 @@ def test_load_custom_gfunction():
     assert borefield.custom_gfunction == dataset
 
 
-def test_set_length_peak():
-    borefield = Borefield()
-    borefield.load.peak_heating_duration = 8
-    borefield.load.peak_cooling_duration = 10
-    assert borefield.load.peak_cooling_duration == 10 * 3600
-    assert borefield.load.peak_heating_duration == 8 * 3600
-    borefield.set_length_peak(12)
-    assert borefield.load.peak_cooling_duration == 12 * 3600
-    assert borefield.load.peak_heating_duration == 12 * 3600
-
-
 def test_simulation_period():
     borefield = Borefield()
     assert borefield.simulation_period == 20

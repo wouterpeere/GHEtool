@@ -32,7 +32,6 @@ class Borefield(BaseClass):
 
     UPM: float = 730.0  # number of hours per month
     THRESHOLD_BOREHOLE_DEPTH: float = 0.05  # threshold for iteration
-    MAX_SIMULATION_PERIOD: int = 100  # maximal value for simulation
 
     # define default values
     DEFAULT_INVESTMENT: list = [35, 0]  # 35 EUR/m
@@ -466,21 +465,6 @@ class Borefield(BaseClass):
         if investment_cost is None:
             investment_cost = Borefield.DEFAULT_INVESTMENT
         self.cost_investment: list = investment_cost
-
-    def set_length_peak(self, length: float = DEFAULT_LENGTH_PEAK) -> None:
-        """
-        This function sets the length of the peak.
-
-        Parameters
-        ----------
-        length : float
-            Length of the peak [hours]
-
-        Returns
-        -------
-        None
-        """
-        self._borefield_load.peak_duration = length
 
     def set_load(self, load: _LoadData) -> None:
         """

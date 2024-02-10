@@ -126,7 +126,7 @@ def test_different_results_with_other_peak_lengths():
     borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
     borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
 
-    borefield.set_length_peak(2)
+    borefield.load.peak_duration = 2
     init_length_L2 = borefield.size_L2()
     borefield.load.peak_duration = 8
     new_length_L2 = borefield.size_L2()
