@@ -197,9 +197,19 @@ def test_monthly_based_on_hourly_multi_year():
     assert np.allclose(load.baseload_heating_power_simulation_period, heating_bl/730)
     assert np.allclose(load.baseload_cooling_power_simulation_period, heating_bl * 2/730)
     assert np.allclose(load.monthly_average_load_simulation_period, heating_bl/730)
-    # TODO test for monthly multiyear
-    # TODO test for hour_series
-    # TODO test for reduce_to_monthly
+
+
+def test_resample_to_monthly_multiyear():
+    load = HourlyGeothermalLoadMultiYear()
+    load.simulation_period = 2
+    peak, baseload = load.resample_to_monthly(np.tile(np.linspace(0, 729, 730), 24))
+    assert np.array_equal(peak, np.full(24, 729))
+    assert np.array_equal(baseload, np.full(24, 266085))
+    load.all_months_equal = False
+    peak, baseload = load.resample_to_monthly(np.tile(np.linspace(0, 729, 730), 24))
+    assert np.array_equal(peak, np.tile(np.array([729., 685., 729., 729., 729., 729., 729., 729., 729., 729., 729., 729.]), 2))
+    assert np.array_equal(baseload, np.tile(np.array([266176., 234864., 275780., 259140., 275836., 259100.,
+                                              275892., 276088., 258920., 276144., 258880., 276200.]), 2))
 
 
 def test_dhw():
