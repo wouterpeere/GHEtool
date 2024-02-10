@@ -116,9 +116,9 @@ class _LoadData(BaseClass, ABC):
         """
         if self.all_months_equal:
             # every month has equal length
-            return np.ones(12) * _LoadData.AVG_UPM
+            return np.full(12, _LoadData.AVG_UPM, dtype=np.int32)
         else:
-            return np.array([744, 672, 744, 720, 744, 720, 744, 744, 720, 744, 720, 744])
+            return np.array([744, 672, 744, 720, 744, 720, 744, 744, 720, 744, 720, 744], dtype=np.int32)
 
     @abc.abstractmethod
     def _check_input(self, input: Union[np.ndarray, list, tuple]) -> bool:

@@ -1,6 +1,7 @@
 import pytest
 
 import numpy as np
+import pandas as pd
 
 from GHEtool import FOLDER
 from GHEtool.VariableClasses import HourlyGeothermalLoad, HourlyGeothermalLoadMultiYear, MonthlyGeothermalLoadAbsolute
@@ -181,6 +182,24 @@ def test_set_hourly_values_multi_year():
         load.set_hourly_heating(np.ones(10))
     with pytest.raises(ValueError):
         load.set_hourly_cooling(np.ones(10))
+
+
+def test_monthly_based_on_hourly_multi_year():
+    load = HourlyGeothermalLoadMultiYear(heating_load=np.arange(0, 8760*2, 1),
+                                         cooling_load=np.arange(0, 8760*2, 1)*2)
+    heating = np.array([729, 1459, 2189, 2919, 3649, 4379, 5109, 5839, 6569, 7299, 8029, 8759, 9489,
+                        10219, 10949, 11679, 12409, 13139, 13869, 14599, 15329, 16059, 16789, 17519])
+    heating_bl = np.array([np.sum(np.arange(0, 8760*2, 1)[i-730:i]) for i in range(730, 8760*2+1, 730)])
+    assert np.allclose(load.peak_heating_simulation_period, heating)
+    assert np.allclose(load.peak_cooling_simulation_period, heating*2)
+    assert np.allclose(load.baseload_heating_simulation_period, heating_bl)
+    assert np.allclose(load.baseload_cooling_simulation_period, heating_bl * 2)
+    assert np.allclose(load.baseload_heating_power_simulation_period, heating_bl/730)
+    assert np.allclose(load.baseload_cooling_power_simulation_period, heating_bl * 2/730)
+    assert np.allclose(load.monthly_average_load_simulation_period, heating_bl/730)
+    # TODO test for monthly multiyear
+    # TODO test for hour_series
+    # TODO test for reduce_to_monthly
 
 
 def test_dhw():

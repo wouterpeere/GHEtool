@@ -103,8 +103,6 @@ def test_multiple_years_L3_monthly_data():
     assert np.allclose(borefield.load.peak_cooling_simulation_period, peak_cooling)
     assert np.allclose(borefield.load.monthly_average_load_simulation_period, monthly_cooling_load - monthly_heating_load)
     assert borefield.load.simulation_period == 50
-    logging.info(borefield.load.peak_heating_duration)
-    logging.info(borefield.load.peak_cooling_duration)
     h = borefield.size_L3(150)
     assert np.isclose(h, 110.233, rtol=0.001)
     load["heating"][8760*25:] = 0

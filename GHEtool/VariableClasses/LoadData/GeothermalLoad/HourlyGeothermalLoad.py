@@ -22,11 +22,6 @@ class HourlyGeothermalLoad(_LoadData):
 
     __slots__ = tuple(_LoadData.__slots__) + ("_heating_load", "_cooling_load")
 
-    # define parameters for conversion to monthly loads
-    START = pd.to_datetime("2019-01-01 00:00:00")
-    END = pd.to_datetime("2019-12-31 23:59:00")
-    HOURS_SERIES = pd.Series(pd.date_range(START, END, freq="1h"))
-
     def __init__(self, heating_load: ArrayLike = None,
                  cooling_load: ArrayLike = None,
                  simulation_period: int = 20,
@@ -225,14 +220,12 @@ class HourlyGeothermalLoad(_LoadData):
         -------
         peak loads [kW], monthly average loads [kWh/month] : np.ndarray, np.ndarray
         """
+        data = np.array_split(hourly_load, np.cumsum(self.UPM)[:-1])
+
         if self.all_months_equal:
-            return np.max(np.array_split(hourly_load, 12), axis=1), np.sum(np.array_split(hourly_load, 12), axis=1)
+            return np.max(data, axis=1), np.sum(data, axis=1)
 
-        # create dataframe
-        df = pd.DataFrame(hourly_load, index=HourlyGeothermalLoad.HOURS_SERIES, columns=["load"])
-
-        # resample
-        return np.array(df.resample("M").agg({"load": "max"})["load"]), np.array(df.resample("M").agg({"load": "sum"})["load"])
+        return np.array([np.max(i) for i in data]), np.array([np.sum(i) for i in data])
 
     @property
     def baseload_cooling(self) -> np.ndarray:

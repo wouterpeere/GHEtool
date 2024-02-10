@@ -68,6 +68,27 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
             return False
         return True
 
+    def resample_to_monthly(self, hourly_load: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        This function resamples an hourly_load to monthly peaks (kW/month) and baseloads (kWh/month).
+
+        Parameters
+        ----------
+        hourly_load : np.ndarray
+            Hourly loads in kWh/h
+
+        Returns
+        -------
+        peak loads [kW], monthly average loads [kWh/month] : np.ndarray, np.ndarray
+        """
+
+        data = np.array_split(hourly_load, np.cumsum(np.tile(self.UPM, self.simulation_period))[:-1])
+
+        if self.all_months_equal:
+            return np.max(data, axis=1), np.sum(data, axis=1)
+
+        return np.array([np.max(i) for i in data]), np.array([np.sum(i) for i in data])
+
     @property
     def hourly_heating_load(self) -> np.ndarray:
         """
@@ -271,37 +292,3 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
             average cooling for the whole simulation period
         """
         return np.divide(self.baseload_cooling_simulation_period, np.tile(self.UPM, self.simulation_period))
-
-    def hours_series(self) -> pd.Series:
-        hours_per_year = 8760  # Assuming non-leap years
-        leap_year_hours = 24  # Leap year has 24 additional hours
-        total_hours = self.simulation_period * hours_per_year + (self.simulation_period // 4) * leap_year_hours
-
-        start_date = pd.Timestamp(year=1, month=1, day=1, hour=0)
-        end_date = start_date + pd.Timedelta(hours=total_hours - 1)
-        index = pd.date_range(start=start_date, end=end_date, freq='H')
-        series = pd.Series(index=index)
-        return series
-
-    def resample_to_monthly(self, hourly_load: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-        """
-        This function resamples an hourly_load to monthly peaks (kW/month) and baseloads (kWh/month).
-
-        Parameters
-        ----------
-        hourly_load : np.ndarray
-            Hourly loads in kWh/h
-
-        Returns
-        -------
-        peak loads [kW], monthly average loads [kWh/month] : np.ndarray, np.ndarray
-        """
-        if self.all_months_equal:
-            return np.max(np.array_split(hourly_load, 12*self.simulation_period), axis=1),\
-                np.sum(np.array_split(hourly_load, 12*self.simulation_period), axis=1)
-
-        # create dataframe
-        df = pd.DataFrame(hourly_load, index=self.hours_series, columns=["load"])
-
-        # resample
-        return np.array(df.resample("M").agg({"load": "max"})["load"]), np.array(df.resample("M").agg({"load": "sum"})["load"])
