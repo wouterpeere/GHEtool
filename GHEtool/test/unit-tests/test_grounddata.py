@@ -3,6 +3,7 @@ import pytest
 import numpy as np
 
 from GHEtool.VariableClasses import GroundFluxTemperature, GroundConstantTemperature, GroundTemperatureGradient, GroundLayer
+from GHEtool.VariableClasses import FluidData
 
 
 def test_ground_layer_class():
@@ -50,6 +51,8 @@ def test_ground_data_unequal():
     data = GroundConstantTemperature(3, 10, 2.4*10**6)
     data2 = GroundConstantTemperature(3, 11, 2.4*10**6)
     assert data != data2
+    fluid = FluidData(0.3, 3, 9710, 4165, 0.0001)
+    assert fluid != data
 
 
 def test_alpha():
