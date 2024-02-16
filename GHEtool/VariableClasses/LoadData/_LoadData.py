@@ -35,6 +35,44 @@ class _LoadData(BaseClass, ABC):
         self.tm: int = _LoadData.AVG_UPM * 3600  # time in a month in seconds
         self._all_months_equal: bool = True  # true if it is assumed that all months are of the same length
         self._dhw_yearly: float = 0.
+        self._start_month: float = 1
+
+    @property
+    def start_month(self) -> int:
+        """
+        This function returns the start month.
+
+        Returns
+        -------
+        float
+            Start month
+        """
+        return self._start_month
+
+    @start_month.setter
+    def start_month(self, month: int) -> None:
+        """
+        This function sets the start month.
+
+        Parameters
+        ----------
+        month : int
+            Start month (jan: 1, feb: 2 ...)
+
+        Returns
+        -------
+        None
+
+        Raises
+        ----------
+        ValueError
+            When the start month is smaller than 1, larger than 12 or non-integer
+        """
+
+        if not isinstance(month, int) or month < 1 or month > 12:
+            raise ValueError(f'The value for month is: {month} which is not an integer in [1,12].')
+
+        self._start_month = month
 
     @property
     def all_months_equal(self) -> bool:
@@ -78,9 +116,9 @@ class _LoadData(BaseClass, ABC):
         """
         if self.all_months_equal:
             # every month has equal length
-            return np.ones(12) * _LoadData.AVG_UPM
+            return np.full(12, _LoadData.AVG_UPM, dtype=np.int64)
         else:
-            return np.array([744, 672, 744, 720, 744, 720, 744, 744, 720, 744, 720, 744])
+            return np.array([744, 672, 744, 720, 744, 720, 744, 744, 720, 744, 720, 744], dtype=np.int64)
 
     @abc.abstractmethod
     def _check_input(self, input: Union[np.ndarray, list, tuple]) -> bool:
@@ -235,7 +273,7 @@ class _LoadData(BaseClass, ABC):
     @property
     def baseload_heating_power_simulation_period(self) -> np.ndarray:
         """
-        This function returns the avergae heating power in kW avg/month for a whole simulation period.
+        This function returns the average heating power in kW avg/month for a whole simulation period.
 
         Returns
         -------
@@ -288,7 +326,7 @@ class _LoadData(BaseClass, ABC):
         -------
         monthly average load : np.ndarray
         """
-        return np.tile(self.monthly_average_load, self.simulation_period)
+        return self.baseload_cooling_power_simulation_period - self.baseload_heating_power_simulation_period
 
     @property
     def peak_heating_duration(self) -> float:
@@ -554,7 +592,7 @@ class _LoadData(BaseClass, ABC):
         -------
         max peak cooling : float
         """
-        return np.max(self.peak_cooling)
+        return np.max(self.peak_cooling_simulation_period)
 
     @property
     def max_peak_heating(self) -> float:
@@ -565,7 +603,7 @@ class _LoadData(BaseClass, ABC):
         -------
         max peak heating : float
         """
-        return np.max(self.peak_heating)
+        return np.max(self.peak_heating_simulation_period)
 
     def add_dhw(self, dhw: float) -> None:
         """
@@ -626,3 +664,20 @@ class _LoadData(BaseClass, ABC):
         dhw power : float
         """
         return self._dhw_yearly / 8760
+
+    @abc.abstractmethod
+    def correct_for_start_month(self, array: np.ndarray) -> np.ndarray:
+        """
+        This function corrects the load for the correct start month.
+        If the simulation starts in september, the start month is 9 and hence the array should start
+        at index 9.
+
+        Parameters
+        ----------
+        array : np.ndarray
+            Load array
+
+        Returns
+        -------
+        load : np.ndarray
+        """

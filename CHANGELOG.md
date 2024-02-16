@@ -3,23 +3,43 @@ All notable changes to this project will be documented in this file. For future 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [2.2.1] - 2024
+## [2.2.2] - unpublished
 
 ## Added
+- Function to create box, U and L-shaped borefields (issue #224).
+- Multiple year validation for L3 and L4 sizing (issue #227).
+- Added MonthlyGeothermalLoadMultiYear (issue #227).
+- Added optimise_load_profile_energy (issue #229).
+
+## changed
+ - Removed set_peak_length from Borefield class (issue #227).
+ - Definition of the optimise_load_profile_class (issue #229).
+
+## fixed
+- Small typo's in functions (issue #224).
+
+
+## [2.2.1] - 2024-01-27
+
+## Added
+- GHEtool is available on conda-forge (issue #107).
+- Possibility to start in another month (issue #140).
 - Equal functions for HourlyGeothermalLoad and MonthlyGeothermalLoadAbsolute (issue #189).
 - Cylindrical borehole correction (issue #187).
 - __add__ functionality for the load classes (issue #202).
 
 ## changed
 - Negative reference temperatures for the fluid are now possible (issue #192).
+- Move code related to the GUI to a separate repo (issue #210).
+- Autorelease to PyPi and testPyPi (issue #212).
 
 ## fixed
+- Problem with multiyear hourly data and L3 sizing (issue #153).
 - Problem with negative g-function values (issue #187).
 - Bug in load-duration curve when not working with optimize load profile (issue #189).
 - Bug in hourly data (issue #196).
 - Bug in saving after a file has been moved (issue #198).
 - Bug in DHW and peak heating power(issue #202).
-
 
 ## [2.2.0] - 2023-10-17
 
@@ -236,6 +256,8 @@ code version > speed improvements > v2.1.1.
 ### Fixed 
 - fixed bug in interpolation
 
+
+[2.2.1]: https://github.com/wouterpeere/GHEtool/compare/v2.2.0...v2.2.1
 [2.2.0]: https://github.com/wouterpeere/GHEtool/compare/v2.1.2...v2.2.0
 [2.1.2]: https://github.com/wouterpeere/GHEtool/compare/v2.1.1...v2.1.2
 [2.1.1]: https://github.com/wouterpeere/GHEtool/compare/v2.1.0...v2.1.1

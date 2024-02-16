@@ -8,43 +8,54 @@
 [![Downloads](https://static.pepy.tech/personalized-badge/ghetool?period=week&units=international_system&left_color=black&right_color=orange&left_text=Downloads%20last%20week)](https://pepy.tech/project/ghetool)
 [![Read the Docs](https://readthedocs.org/projects/ghetool/badge/?version=latest)](https://ghetool.readthedocs.io/en/latest/)
 ## What is *GHEtool*?
-<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/sources/gui/_figure/Icon.png" width="110" align="left">
+<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/Icon.png" width="110" align="left">
 
 GHEtool is a Python package that contains all the functionalities needed to deal with borefield design. GHEtool has been developed as a joint effort of KU Leuven (The SySi Team), boydens engineering (part of Sweco) and FH Aachen.
 The core of this package is the automated sizing of borefield under different conditions. By making use of combination of just-in-time calculations of thermal ground responses (using [pygfunction](https://github.com/MassimoCimmino/pygfunction)) with
 intelligent interpolation, this automated sizing can be done in the order of milliseconds. Please visit our website [https://GHEtool.eu](https://GHEtool.eu) for more information.
 
-#### Read The Docs
+### Read The Docs
 GHEtool has an elaborate documentation were all the functionalities of the tool are explained, with examples, literature and validation.
 This can be found on [https://docs.ghetool.eu](https://docs.ghetool.eu).
 
-#### Graphical user interface
-GHEtool comes with a *graphical user interface (GUI)*. This GUI is built using [ScenarioGUI](https://github.com/tblanke/ScenarioGUI).
-One can download the open-source GUI [here](https://ghetool.eu/wp-content/uploads/setups/GHEtool%20Community_setup_v2_2_0.exe).
+## Graphical user interface
+There are two graphical user interfaces available which are built using GHEtool: GHEtool Pro and GHEtool Community
+
+#### GHEtool Pro
+GHEtool Pro is the official and supported version of GHEtool which supports drilling companies, engineering firms, architects, government organizations in their geothermal design process.
+With GHEtool Pro they can minimize the environmental and societal impact while maximizing the cost-effective utilization of geothermal projects.
+Visit our website at [https://ghetool.eu](https://ghetool.eu) to learn more about the synergy between this open-source package and GHEtool Pro.
+
 <p align="center">
-<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/sources/gui/_figure/GHEtool.PNG" width="600">
+<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/GHEtoolPro.png" width="600">
 </p>
+
+#### GHEtool Community
+Besides GHEtool Pro, an open-source alternative for the graphical user interface is available in the form of *GHEtool Community*.
+This version is built and maintained by the community, and **has no official support like GHEtool Pro**. You can read all about this 
+*GHEtool Community* on their [GitHub repo](https://github.com/wouterpeere/ghetool-gui).
 
 ### Development
 GHEtool is in constant development with new methods, enhancements and features added to every new version. Please visit our [project board](https://github.com/users/wouterpeere/projects/2) to check our progress.
 
 ## Requirements
-This code is tested with Python 3.8, 3.9, 3.10 and 3.11 and requires the following libraries (the versions mentioned are the ones with which the code is tested)
+This code is tested with Python 3.8, 3.9, 3.10, 3.11 and 3.12 and requires the following libraries (the versions mentioned are the ones with which the code is tested)
 
-* Numpy (>=1.20.2)
-* Scipy (>=1.6.2)
-* Matplotlib (>=3.4.1)
-* Pygfunction (>=2.2.2)
-* Openpyxl (>=3.0.7)
-* Pandas (>=1.2.4)
-
-For the GUI
-
-* ScenarioGUI (>=0.3.0)
+* matplotlib >= 3.5.2
+* numpy >= 1.23.1
+* pandas >= 1.4.3
+* pygfunction >= 2.2.1
+* scipy >= 1.8.1
+* scikit-optimize >= 0.9.0
 
 For the tests
 
-* Pytest (>=7.1.2)
+* Pytest >= 7.1.2
+
+For the active/passive example
+
+* scikit-optimize >= 0.9.0
+
 
 ## Quick start
 ### Installation
@@ -60,6 +71,11 @@ or one can install a newer development version using
 ```
 pip install --extra-index-url https://test.pypi.org/simple/ GHEtool
 ```
+
+GHEtool is also available as a conda package. Therefore, you can install GHEtool with the command:
+````
+conda install GHEtool
+````
 
 Developers can clone this repository.
 
@@ -78,7 +94,7 @@ This runs some predefined cases to see whether all the internal dependencies wor
 ## Get started with GHEtool
 
 ### Building blocks of GHEtool
-GHEtool is a flexible package that can be extend with methods from [pygfunction](https://pygfunction.readthedocs.io/en/stable/) (and [ScenarioGUI](https://github.com/tblanke/ScenarioGUI) for the GUI part).
+GHEtool is a flexible package that can be extend with methods from [pygfunction](https://pygfunction.readthedocs.io/en/stable/).
 To work efficiently with GHEtool, it is important to understand the main structure of the package.
 
 #### Borefield
@@ -115,6 +131,8 @@ In a future version of GHEtool, also secundary building loads will be included. 
 * _MonthlyGeothermalLoadAbsolute_: You can set one the monthly baseload and peak load for heating and cooling for one standard year which will be used for all years within the simulation period.
 * _HourlyGeothermalLoad_: You can set (or load) the hourly heating and cooling load of a standard year which will be used for all years within the simulation period.
 * _HourlyGeothermalLoadMultiYear_: You can set (or load) the hourly heating and cooling load for multiple years (i.e. for the whole simulation period). This way, you can use secundary loads already with GHEtool as shown in [this example](https://ghetool.readthedocs.io/en/stable/sources/code/Examples/active_passive_cooling.html).
+* _MonthlyGeothermalLoadMultiYear_: You can set the monthly heating and cooling load for multiple years (i.e. for the whole simulation period).
+
 
 All load classes also have the option to add a yearly domestic hot water usage.
 
@@ -226,11 +244,6 @@ For more information about the functionalities of GHEtool, please visit the docu
 
 *GHEtool* is licensed under the terms of the 3-clause BSD-license.
 See [GHEtool license](LICENSE).
-
-## GHEtool Pro
-To further increase the feasibility of geothermal solutions, we have launched our professional version of GHEtool which supports drilling companies, engineering firms, architects, government organizations with automated reporting and online courses …
-With our insightful software they can minimize the environmental and societal impact while maximizing the cost-effective utilization of geothermal projects.
-Visit our website at [https://ghetool.eu](htts://ghetool.eu) to learn more about the synergy between the open-source and commercial version of GHEtool.
 
 ## Contact GHEtool
 - Do you want to support GHEtool financially or by contributing to our software?

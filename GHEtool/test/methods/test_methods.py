@@ -9,11 +9,8 @@ from GHEtool.test.methods.method_data import list_of_test_objects
                          ids=list_of_test_objects.names_L2)
 def test_L2(model: Borefield, result):
     if not isinstance(result[0], (int, float, str)):
-        try:
+        with pytest.raises(result[0]):
             model.size_L2(100)
-            assert False   # pragma: no cover
-        except result[0]:
-            assert True
     else:
         assert np.isclose(model.size_L2(100), result[0], atol=1e-2)
         assert model.limiting_quadrant == result[1]
@@ -24,11 +21,8 @@ def test_L2(model: Borefield, result):
                          ids=list_of_test_objects.names_L3)
 def test_L3(model: Borefield, result):
     if not isinstance(result[0], (int, float, str)):
-        try:
+        with pytest.raises(result[0]):
             model.size_L3(100)
-            assert False   # pragma: no cover
-        except result[0]:
-            assert True
     else:
         assert np.isclose(model.size_L3(100), result[0], atol=1e-2)
         assert model.calculate_quadrant() == result[1]
@@ -39,11 +33,8 @@ def test_L3(model: Borefield, result):
                          ids=list_of_test_objects.names_L4)
 def test_L4(model: Borefield, result):
     if not isinstance(result[0], (int, float, str)):
-        try:
+        with pytest.raises(result[0]):
             model.size_L4(100)
-            assert False   # pragma: no cover
-        except result[0]:
-            assert True
     else:
         assert np.isclose(model.size_L4(100), result[0], atol=1e-2)
         assert model.calculate_quadrant() == result[1]
@@ -55,8 +46,11 @@ def test_L4(model: Borefield, result):
                          ids=list_of_test_objects.names_optimise_load_profile)
 def test_optimise(input, result):
     model: Borefield = input[0]
-    load, depth, SCOP, SEER = input[1:]
-    model.optimise_load_profile(load, depth, SCOP, SEER)
+    load, depth, SCOP, SEER, power = input[1:]
+    if power:
+        model.optimise_load_profile_power(load, depth, SCOP, SEER)
+    else:
+        model.optimise_load_profile_energy(load, depth, SCOP, SEER)
     percentage_heating, percentage_cooling, peak_heating_geo, peak_cooling_geo, peak_heating_ext, peak_cooling_ext = \
         result
     assert np.isclose(model._percentage_heating, percentage_heating)

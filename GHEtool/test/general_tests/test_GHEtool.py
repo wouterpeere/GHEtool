@@ -123,7 +123,7 @@ def borefield_cooling_dom():
                           baseload_heating=monthlyLoadHeating,
                           baseload_cooling=monthlyLoadCooling)
 
-    borefield.set_baseload_cooling(np.array(monthlyLoadCooling)*2)
+    borefield.load.baseload_cooling = np.array(monthlyLoadCooling)*2
 
     borefield.set_ground_parameters(data)
     borefield.set_Rb(0.2)
@@ -150,7 +150,7 @@ def test_sizing_L3_threshold_depth_error(borefield):
 
 def test_sizing_L32(borefield_cooling_dom):
     borefield_cooling_dom.size(L3_sizing=True)
-    borefield_cooling_dom.set_peak_heating(np.array(peakHeating) * 5)
+    borefield_cooling_dom.load.peak_heating = np.array(peakHeating) * 5
     borefield_cooling_dom.size(L3_sizing=True)
 
 
@@ -217,33 +217,6 @@ def test_create_custom_dataset_without_data(borefield):
         borefield.create_custom_dataset()
 
 
-
-def test_incorrect_values_peak_baseload(borefield):
-    with raises(ValueError):
-        borefield.set_peak_heating(8)
-
-    with raises(ValueError):
-        borefield.set_peak_cooling(8)
-
-    with raises(ValueError):
-        borefield.set_baseload_heating(8)
-
-    with raises(ValueError):
-        borefield.set_baseload_cooling(8)
-
-    with raises(ValueError):
-        borefield.set_peak_cooling([8, 8])
-
-    with raises(ValueError):
-        borefield.set_peak_heating([8, 8])
-
-    with raises(ValueError):
-        borefield.set_baseload_cooling([8, 8])
-
-    with raises(ValueError):
-        borefield.set_baseload_heating([8, 8])
-
-
 def test_gfunction_jit(borefield):
     borefield.use_precalculated_data = False
     borefield.gfunction(10000, 100)
@@ -274,18 +247,12 @@ def test_value_error_cooling_dom_temp_gradient():
     borefield.set_borefield(borefield_pyg)
     borefield.set_Rb(0.2)
 
-    try:
+    with raises(MaximumNumberOfIterations):
         borefield.size()
-        assert False  # pragma: no cover
-    except MaximumNumberOfIterations:
-        assert True
 
     borefield.calculation_setup(max_nb_of_iterations=500)
-    try:
+    with raises(UnsolvableDueToTemperatureGradient):
         borefield.size()
-        assert False  # pragma: no cover
-    except UnsolvableDueToTemperatureGradient:
-        assert True
 
 
 def test_borefield_with_constant_peaks(borefield):
@@ -296,7 +263,7 @@ def test_borefield_with_constant_peaks(borefield):
 
     length_L2_1 = borefield.size_L2(100)
     # set constant peak
-    borefield.set_peak_cooling([150]*12)
+    borefield.load.peak_cooling = [150]*12
     length_L2_2 = borefield.size_L2(100)
 
     assert np.isclose(length_L2_1, length_L2_2)
@@ -309,7 +276,7 @@ def test_borefield_with_constant_peaks(borefield):
 
     length_L2_1 = borefield.size_L2(100)
     # set constant peak
-    borefield.set_peak_cooling([240] * 12)
+    borefield.load.peak_cooling = [240] * 12
     length_L2_2 = borefield.size_L2(100)
 
     assert np.isclose(length_L2_1, length_L2_2, rtol=3*10**-5)
@@ -333,6 +300,6 @@ def test_sizing_with_use_constant_Rb():
 def test_size_with_different_peak_lengths(borefield):
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(4))
 
-    borefield.set_length_peak_cooling(8)
-    borefield.set_length_peak_heating(6)
+    borefield.load.peak_cooling_duration = 8
+    borefield.load.peak_heating_duration = 6
     assert np.isclose(99.33058400216774, borefield.size(L3_sizing=True))

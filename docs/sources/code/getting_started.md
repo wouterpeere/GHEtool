@@ -1,22 +1,21 @@
 # Installation
 
 ## Requirements
-This code is tested with Python 3.8, 3.9, 3.10 and 3.11 and requires the following libraries:
+This code is tested with Python 3.8, 3.9, 3.10, 3.11 and 3.12 and requires the following libraries (the versions mentioned are the ones with which the code is tested)
 
-* Numpy (>=1.20.2)
-* Scipy (>=1.6.2)
-* Matplotlib (>=3.4.1)
-* Pygfunction (>=2.2.0)
-* Openpyxl (>=3.0.7)
-* Pandas (>=1.2.4)
-
-For the GUI
-
-* ScenarioGUI (>=0.3.0)
+* matplotlib >= 3.5.2
+* numpy >= 1.23.1
+* pandas >= 1.4.3
+* pygfunction >= 2.2.1
+* scipy >= 1.8.1
 
 For the tests
 
-* Pytest (>=7.1.2)
+* Pytest >= 7.1.2
+
+For the active/passive example
+
+* scikit-optimize >= 0.9.0
 
 ## Installation
 
@@ -31,6 +30,11 @@ or one can install a newer development version using
 ```
 pip install --extra-index-url https://test.pypi.org/simple/ GHEtool
 ```
+
+GHEtool is also available as a conda package. Therefore, you can install GHEtool with the command:
+````
+conda install GHEtool
+````
 
 Developers can clone this repository.
 
@@ -86,6 +90,7 @@ In a future version of GHEtool, also secundary building loads will be included. 
 * _MonthlyGeothermalLoadAbsolute_: You can set one the monthly baseload and peak load for heating and cooling for one standard year which will be used for all years within the simulation period.
 * _HourlyGeothermalLoad_: You can set (or load) the hourly heating and cooling load of a standard year which will be used for all years within the simulation period.
 * _HourlyGeothermalLoadMultiYear_: You can set (or load) the hourly heating and cooling load for multiple years (i.e. for the whole simulation period). This way, you can use secundary loads already with GHEtool as shown in [this example](https://ghetool.readthedocs.io/en/stable/sources/code/Examples/active_passive_cooling.html).
+* _MonthlyGeothermalLoadMultiYear_: You can set the monthly heating and cooling load for multiple years (i.e. for the whole simulation period).
 
 All load classes also have the option to add a yearly domestic hot water usage.
 

@@ -12,6 +12,7 @@ from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
 from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient
 
+
 data = GroundConstantTemperature(3, 10)
 ground_data_constant = data
 data_ground_flux = GroundFluxTemperature(3, 10)
@@ -21,26 +22,26 @@ pipeData = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
 
 # Monthly loading values
-peakCooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]              # Peak cooling in kW
-peakHeating = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]             # Peak heating in kW
+peakCooling = [0.0, 0, 34.0, 69.0, 133.0, 187.0, 213.0, 240.0, 160.0, 37.0, 0.0, 0.0]  # Peak cooling in kW
+peakHeating = [160.0, 142, 102.0, 55.0, 0.0, 0.0, 0.0, 0.0, 40.4, 85.0, 119.0, 136.0]  # Peak heating in kW
 
 # annual heating and cooling load
-annualHeatingLoad = 300*10**3  # kWh
-annualCoolingLoad = 160*10**3  # kWh
+annualHeatingLoad = 300 * 10**3  # kWh
+annualCoolingLoad = 160 * 10**3  # kWh
 
 # percentage of annual load per month (15.5% for January ...)
-monthlyLoadHeatingPercentage = [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144]
-monthlyLoadCoolingPercentage = [0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025]
+monthlyLoadHeatingPercentage = [0.155, 0.148, 0.125, 0.099, 0.064, 0.0, 0.0, 0.0, 0.061, 0.087, 0.117, 0.144]
+monthlyLoadCoolingPercentage = [0.025, 0.05, 0.05, 0.05, 0.075, 0.1, 0.2, 0.2, 0.1, 0.075, 0.05, 0.025]
 
 # resulting load per month
-monthlyLoadHeating = list(map(lambda x: x * annualHeatingLoad, monthlyLoadHeatingPercentage))   # kWh
-monthlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, monthlyLoadCoolingPercentage))   # kWh
+monthlyLoadHeating = list(map(lambda x: x * annualHeatingLoad, monthlyLoadHeatingPercentage))  # kWh
+monthlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, monthlyLoadCoolingPercentage))  # kWh
 
 
 def borefields_equal(borefield_one, borefield_two) -> bool:
     for i in range(len(borefield_one)):
         if borefield_one[i].__dict__ != borefield_two[i].__dict__:
-            return False   # pragma: no cover
+            return False  # pragma: no cover
     return True
 
 
@@ -108,6 +109,27 @@ def test_create_circular_field():
     borefields_equal(borefield.borefield, gt.boreholes.circle_field(10, 10, 100, 1, 0.075))
 
 
+def test_create_U_shaped_field():
+    borefield = Borefield()
+    borefield.create_U_shaped_borefield(10, 9, 6, 6, 110, 4, 0.075)
+    assert borefield.number_of_boreholes == 9*2+(10-2)
+    borefields_equal(borefield.borefield, gt.boreholes.U_shaped_field(10, 10, 6, 6, 110, 4, 0.075))
+
+
+def test_create_L_shaped_field():
+    borefield = Borefield()
+    borefield.create_L_shaped_borefield(10, 9, 6, 6, 110, 4, 0.075)
+    assert borefield.number_of_boreholes == 10+ 8
+    borefields_equal(borefield.borefield, gt.boreholes.L_shaped_field(10, 10, 6, 6, 110, 4, 0.075))
+
+
+def test_create_box_shaped_field():
+    borefield = Borefield()
+    borefield.create_box_shaped_borefield(10, 8, 6, 6, 110, 4, 0.075)
+    assert borefield.number_of_boreholes == 10*2 + (8-2)*2
+    borefields_equal(borefield.borefield, gt.boreholes.box_shaped_field(10, 10, 6, 6, 110, 4, 0.075))
+
+
 def test_update_depth():
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
@@ -129,17 +151,11 @@ def test_update_depth():
 
 def test_create_custom_dataset():
     borefield_test = Borefield()
-    try:
+    with pytest.raises(ValueError):
         borefield_test.create_custom_dataset([100, 1000], [50, 100])
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
     borefield_test.create_rectangular_borefield(10, 10, 6, 6, 100, 1, 0.075)
-    try:
+    with pytest.raises(AssertionError):
         borefield_test.create_custom_dataset([100, 1000], [50, 100])
-        assert False  # pragma: no cover
-    except AssertionError:
-        assert True
 
 
 def test_load_custom_gfunction():
@@ -158,26 +174,6 @@ def test_load_custom_gfunction():
     assert borefield.custom_gfunction == dataset
 
 
-def test_set_length_peak():
-    borefield = Borefield()
-    borefield.set_length_peak_heating(8)
-    borefield.set_length_peak_cooling(10)
-    assert borefield.load.peak_cooling_duration == 10 * 3600
-    assert borefield.load.peak_heating_duration == 8 * 3600
-    borefield.set_length_peak(12)
-    assert borefield.load.peak_cooling_duration == 12 * 3600
-    assert borefield.load.peak_heating_duration == 12 * 3600
-    borefield.set_length_peak_cooling()
-    borefield.set_length_peak_heating()
-    assert borefield.load.peak_heating_duration == 6 * 3600
-    assert borefield.load.peak_cooling_duration == 6 * 3600
-    borefield.set_length_peak_heating(8)
-    borefield.set_length_peak_cooling(10)
-    borefield.set_length_peak()
-    assert borefield.load.peak_heating_duration == 6 * 3600
-    assert borefield.load.peak_cooling_duration == 6 * 3600
-
-
 def test_simulation_period():
     borefield = Borefield()
     assert borefield.simulation_period == 20
@@ -185,7 +181,7 @@ def test_simulation_period():
     borefield.simulation_period = 25
     assert borefield.simulation_period == 25
     assert len(borefield.load.time_L3) == 12 * 25
-    borefield.set_simulation_period(40)
+    borefield.load.simulation_period = 40
     assert borefield.simulation_period == 40
     assert len(borefield.load.time_L3) == 12 * 40
 
@@ -276,11 +272,8 @@ def test_set_max_temp():
     assert borefield.Tf_max == 13
     borefield.set_max_avg_fluid_temperature(14)
     assert borefield.Tf_max == 14
-    try:
+    with pytest.raises(ValueError):
         borefield.set_max_avg_fluid_temperature(borefield.Tf_min - 1)
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
 
 
 def test_set_min_temp():
@@ -289,11 +282,8 @@ def test_set_min_temp():
     assert borefield.Tf_min == 3
     borefield.set_min_avg_fluid_temperature(4)
     assert borefield.Tf_min == 4
-    try:
+    with pytest.raises(ValueError):
         borefield.set_min_avg_fluid_temperature(borefield.Tf_max + 1)
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
 
 
 def test_Tg():
@@ -306,10 +296,14 @@ def test_Tg():
     assert borefield._Tg(20) == borefield.ground_data.calculate_Tg(20)
 
 
-@pytest.mark.parametrize("ground_data, constant_Rb, result",
-                         zip([ground_data_constant, data_ground_flux, ground_data_constant, data_ground_flux],
-                             [True, True, False, False],
-                             [39.994203323480214, 38.70946566704161, 30.924434615896764, 30.245606119498383]))
+@pytest.mark.parametrize(
+    "ground_data, constant_Rb, result",
+    zip(
+        [ground_data_constant, data_ground_flux, ground_data_constant, data_ground_flux],
+        [True, True, False, False],
+        [39.994203323480214, 38.70946566704161, 30.924434615896764, 30.245606119498383],
+    ),
+)
 def test_Ahmadfard(ground_data, constant_Rb, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
@@ -322,10 +316,15 @@ def test_Ahmadfard(ground_data, constant_Rb, result):
     assert np.isclose(result, borefield._Ahmadfard(th, qh, qm, qa))
     assert np.isclose(result, borefield.H)
 
-@pytest.mark.parametrize("ground_data, constant_Rb, result",
-                         zip([ground_data_constant, data_ground_flux, ground_data_constant, data_ground_flux],
-                             [True, True, False, False],
-                             [48.76844845370183, 46.593433439950985, 38.53491016745154, 37.100782551185]))
+
+@pytest.mark.parametrize(
+    "ground_data, constant_Rb, result",
+    zip(
+        [ground_data_constant, data_ground_flux, ground_data_constant, data_ground_flux],
+        [True, True, False, False],
+        [48.76844845370183, 46.593433439950985, 38.53491016745154, 37.100782551185],
+    ),
+)
 def test_Carcel(ground_data, constant_Rb, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
@@ -362,11 +361,8 @@ def test_set_sizing_setup():
 
 def test_size():
     borefield = Borefield()
-    try:
+    with pytest.raises(ValueError):
         borefield.size()
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
     borefield.borefield = copy.deepcopy(borefield_gt)
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(3))
 
@@ -391,35 +387,22 @@ def test_select_size():
     assert borefield._select_size(100, 20) == 100
     assert borefield._select_size(10, 80) == 80
     borefield.set_max_avg_fluid_temperature(14)
-    try:
+    with pytest.raises(UnsolvableDueToTemperatureGradient):
         borefield._select_size(10, 80)
-        assert False  # pragma: no cover
-    except UnsolvableDueToTemperatureGradient:
-        assert True
 
 
 def test_size_L2_value_errors():
     borefield = Borefield()
-    try:
+    with pytest.raises(ValueError):
         borefield.size_L2(100)
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
-    monthly_load_cooling, monthly_load_heating, peak_cooling, peak_heating = load_case(2)
-    borefield.set_peak_heating(peak_heating)
-    borefield.set_peak_cooling(peak_cooling)
-    borefield.set_baseload_cooling(monthly_load_cooling)
-    borefield.set_baseload_heating(monthly_load_heating)
+    load = MonthlyGeothermalLoadAbsolute(*load_case(2))
+    borefield.load = load
     borefield.set_ground_parameters(ground_data_constant)
-    try:
+    with pytest.raises(ValueError):
         borefield.size_L2(100, 5)
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
 
 
-@pytest.mark.parametrize("quadrant, result",
-                         zip([1, 2, 3, 4], [74.55862437702756, 96.85342542746277, 27.2041541800546, 21.903857780936665]))
+@pytest.mark.parametrize("quadrant, result", zip([1, 2, 3, 4], [74.55862437702756, 96.85342542746277, 27.2041541800546, 21.903857780936665]))
 def test_size_L2(quadrant, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
@@ -434,21 +417,15 @@ def test_size_L2(quadrant, result):
 
 def test_size_L3_value_errors():
     borefield = Borefield()
-    try:
+    with pytest.raises(ValueError):
         borefield.size_L3(100)
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
     borefield.set_ground_parameters(ground_data_constant)
-    try:
+    with pytest.raises(ValueError):
         borefield.size_L3(100, 5)
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
 
-@pytest.mark.parametrize("quadrant, result",
-                         zip([1, 2, 3, 4], [56.37136629360852, 71.42698877336204, 26.722846792067735, 21.333161686968708]))
+
+@pytest.mark.parametrize("quadrant, result", zip([1, 2, 3, 4], [56.37136629360852, 71.42698877336204, 26.722846792067735, 21.333161686968708]))
 def test_size_L3(quadrant, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
@@ -462,23 +439,14 @@ def test_size_L3(quadrant, result):
 
 def test_size_L4_value_errors():
     borefield = Borefield()
-    try:
+    with pytest.raises(ValueError):
         borefield.size_L4(100)
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
     borefield.set_ground_parameters(ground_data_constant)
-    try:
+    with pytest.raises(ValueError):
         borefield.size_L4(100, 5)
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
-    try:
+    with pytest.raises(ValueError):
         borefield.size_L4(100)
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
 
 
 def test_size_L4():
@@ -787,11 +755,8 @@ def test_gfunction():
     borefield.set_ground_parameters(data_ground_flux)
     borefield.create_rectangular_borefield(10, 10, 6, 6, 100, 1, 0.075)
     borefield.H = 100_000
-    try:
+    with pytest.raises(UnsolvableDueToTemperatureGradient):
         borefield.gfunction(56491)
-        assert False  # pragma: no cover
-    except UnsolvableDueToTemperatureGradient:
-        assert True
     borefield.H = 102.3
 
     np.testing.assert_array_almost_equal(borefield.gfunction([6000, 60000, 600000]), np.array([0.63751082, 1.70657847, 2.84227252]))
@@ -803,59 +768,100 @@ def test_gfunction():
 
 def test_load_duration(monkeypatch):
     borefield = Borefield()
-    monkeypatch.setattr(plt, 'show', lambda: None)
+    monkeypatch.setattr(plt, "show", lambda: None)
     borefield.set_ground_parameters(ground_data_constant)
     borefield.borefield = copy.deepcopy(borefield_gt)
     load = HourlyGeothermalLoad()
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     borefield.load = load
     borefield.plot_load_duration(legend=True)
-    borefield.optimise_load_profile(load, 150)
+    borefield.optimise_load_profile_power(load, 150)
+    borefield.optimise_load_profile_energy(load, 150)
 
 
-def test_optimise_load_profile(monkeypatch):
+def test_optimise_load_profile_power(monkeypatch):
     borefield = Borefield()
-    monkeypatch.setattr(plt, 'show', lambda: None)
+    monkeypatch.setattr(plt, "show", lambda: None)
     borefield.set_ground_parameters(ground_data_constant)
     borefield.borefield = copy.deepcopy(borefield_gt)
     load = HourlyGeothermalLoad()
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     load.simulation_period = 40
-    borefield.optimise_load_profile(load, 150)
+    borefield.optimise_load_profile_power(load, 150)
     assert borefield.load.simulation_period == 40
     assert borefield._building_load.simulation_period == 40
     assert borefield._secundary_borefield_load.simulation_period == 40
     assert borefield._external_load.simulation_period == 40
 
 
-def test_optimise_borefield_small(monkeypatch):
+def test_optimise_load_profile_energy(monkeypatch):
     borefield = Borefield()
-    monkeypatch.setattr(plt, 'show', lambda: None)
+    monkeypatch.setattr(plt, "show", lambda: None)
     borefield.set_ground_parameters(ground_data_constant)
-    borefield.create_rectangular_borefield(5, 1, 6, 6, 100)
+    borefield.borefield = copy.deepcopy(borefield_gt)
     load = HourlyGeothermalLoad()
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     load.simulation_period = 40
-    borefield.optimise_load_profile(load, 150, print_results=True)
+    borefield.optimise_load_profile_energy(load, 150)
     assert borefield.load.simulation_period == 40
     assert borefield._building_load.simulation_period == 40
     assert borefield._secundary_borefield_load.simulation_period == 40
     assert borefield._external_load.simulation_period == 40
 
 
-def test_optimise_borefield_wrong_threshold(monkeypatch):
+def test_optimise_borefield_small_power(monkeypatch):
     borefield = Borefield()
-    monkeypatch.setattr(plt, 'show', lambda: None)
+    monkeypatch.setattr(plt, "show", lambda: None)
     borefield.set_ground_parameters(ground_data_constant)
     borefield.create_rectangular_borefield(5, 1, 6, 6, 100)
     load = HourlyGeothermalLoad()
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     load.simulation_period = 40
-    try:
-        borefield.optimise_load_profile(load, 150, print_results=True, temperature_threshold=-0.5)
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
+    borefield.optimise_load_profile_power(load, 150)
+    assert borefield.load.simulation_period == 40
+    assert borefield._building_load.simulation_period == 40
+    assert borefield._secundary_borefield_load.simulation_period == 40
+    assert borefield._external_load.simulation_period == 40
+
+
+def test_optimise_borefield_small_energy(monkeypatch):
+    borefield = Borefield()
+    monkeypatch.setattr(plt, "show", lambda: None)
+    borefield.set_ground_parameters(ground_data_constant)
+    borefield.create_rectangular_borefield(5, 1, 6, 6, 100)
+    load = HourlyGeothermalLoad()
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load.simulation_period = 40
+    borefield.optimise_load_profile_energy(load, 150)
+    assert borefield.load.simulation_period == 40
+    assert borefield._building_load.simulation_period == 40
+    assert borefield._secundary_borefield_load.simulation_period == 40
+    assert borefield._external_load.simulation_period == 40
+
+
+def test_optimise_borefield_wrong_threshold_power(monkeypatch):
+    borefield = Borefield()
+    monkeypatch.setattr(plt, "show", lambda: None)
+    borefield.set_ground_parameters(ground_data_constant)
+    borefield.create_rectangular_borefield(5, 1, 6, 6, 100)
+    load = HourlyGeothermalLoad()
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load.simulation_period = 40
+    with pytest.raises(ValueError):
+        borefield.optimise_load_profile_power(load, 150, temperature_threshold=-0.5)
+
+
+def test_optimise_borefield_wrong_threshold_energy(monkeypatch):
+    borefield = Borefield()
+    monkeypatch.setattr(plt, "show", lambda: None)
+    borefield.set_ground_parameters(ground_data_constant)
+    borefield.create_rectangular_borefield(5, 1, 6, 6, 100)
+    load = HourlyGeothermalLoad()
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load.simulation_period = 40
+    with pytest.raises(ValueError):
+        borefield.optimise_load_profile_energy(load, 150, temperature_threshold=-0.5)
+
 
 def test_calculate_quadrants_without_data():
     borefield = Borefield()
@@ -866,13 +872,16 @@ def test_calculate_quadrants_without_data():
     borefield.calculate_quadrant()
 
 
-def test_optimise_load_profile_without_data():
+def test_optimise_load_profile_power_without_data():
     borefield = Borefield()
-    try:
-        borefield.optimise_load_profile(MonthlyGeothermalLoadAbsolute())
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
+    with pytest.raises(ValueError):
+        borefield.optimise_load_profile_power(MonthlyGeothermalLoadAbsolute())
+
+
+def test_optimise_load_profile_energy_without_data():
+    borefield = Borefield()
+    with pytest.raises(ValueError):
+        borefield.optimise_load_profile_energy(MonthlyGeothermalLoadAbsolute())
 
 
 def test_load_load():
@@ -890,37 +899,49 @@ def test_calculate_temperature_profile():
     borefield.set_ground_parameters(ground_data_constant)
     load = MonthlyGeothermalLoadAbsolute(*load_case(1))
     borefield.load = load
-
-    try:
+    with pytest.raises(ValueError):
         borefield.calculate_temperatures(hourly=True)
-        assert False   # pragma: no cover
-    except ValueError:
-        assert True
 
 
-def test_optimise_load_profile_without_hourly_data():
+def test_optimise_load_profile_power_without_hourly_data():
     borefield = Borefield()
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(1))
-    try:
-        borefield.optimise_load_profile(borefield.load)
-        assert False   # pragma: no cover
-    except ValueError:
-        assert True
+    with pytest.raises(ValueError):
+        borefield.optimise_load_profile_power(borefield.load)
     borefield.load = HourlyGeothermalLoad()
     borefield.set_ground_parameters(ground_data_constant)
     borefield.load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     borefield.create_rectangular_borefield(10, 10, 6, 6, 150)
-    borefield.optimise_load_profile(borefield.load)
+    borefield.optimise_load_profile_power(borefield.load)
 
 
-@pytest.mark.parametrize("H, result",
-                         zip(range(110, 130, 1), [122.99210426454648, 122.99135446500962, 122.99135409065917,
-                                                  122.99135403971272, 122.99135403719148, 122.9913540367823,
-                                                  122.99135403674013, 122.99135403673134, 122.99221686744185,
-                                                  122.99217229220649, 122.99135553171544, 122.99220727438545,
-                                                  122.99477143007601, 122.9921794642058, 122.99220615327106,
-                                                  122.99221262582992, 122.99221900364599, 122.9922252887964,
-                                                  122.99223148329897, 122.99223758911434]))
+def test_optimise_load_profile_energy_without_hourly_data():
+    borefield = Borefield()
+    borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(1))
+    with pytest.raises(ValueError):
+        borefield.optimise_load_profile_energy(borefield.load)
+    borefield.load = HourlyGeothermalLoad()
+    borefield.set_ground_parameters(ground_data_constant)
+    borefield.load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    borefield.create_rectangular_borefield(10, 10, 6, 6, 150)
+    borefield.optimise_load_profile_energy(borefield.load)
+
+
+@pytest.mark.parametrize(
+    "H, result",
+    zip(
+        range(110, 130, 1),
+        [
+            122.99210426454648, 122.99135446500962, 122.99135409065917, 122.99135403971272,
+            122.99135403719148, 122.9913540367823,  122.99135403674013, 122.99135403673134,
+            122.99221686744185, 122.99217229220649, 122.99135553171544, 122.99220727438545,
+            122.99477143007601, 122.9921794642058,  122.99220615327106, 122.99221262582992,
+            122.99221900364599, 122.9922252887964,  122.99223148329897, 122.99223758911434,
+        ],
+    ),
+)
+
+
 def test_effect_H_init(H, result):
     borefield = Borefield()
     borefield.ground_data = GroundConstantTemperature(3, 11)
@@ -940,11 +961,8 @@ def test_effect_H_init(H, result):
 def test_depth_convergence():
     borefield = Borefield()
     borefield.calculation_setup(atol=1, rtol=0.01, max_nb_of_iterations=10)
-    try:
+    with pytest.raises(RuntimeError):
         borefield._check_convergence(10, 12, 10)
-        assert False  # pragma: no cover
-    except RuntimeError:
-        assert True
 
     assert borefield._check_convergence(10, 10, 1)
     assert not borefield._check_convergence(10, 10.5, 1)
@@ -967,9 +985,7 @@ def test_calculate_next_depth_deep_sizing():
     assert np.isclose(borefield.calculate_next_depth_deep_sizing(128.16618036528823), 130.8812255630479)
 
 
-@pytest.mark.parametrize("case, result",
-                         zip((1, 2, 3, 4),
-                             [131.90418292004594, 0, 139.46239300837794, 131.90418292004594]))
+@pytest.mark.parametrize("case, result", zip((1, 2, 3, 4), [131.90418292004594, 0, 139.46239300837794, 131.90418292004594]))
 def test_deep_sizing(case, result):
     borefield = Borefield()
     borefield.ground_data = GroundFluxTemperature(3, 10)
