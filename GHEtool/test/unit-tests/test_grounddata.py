@@ -14,6 +14,7 @@ def test_ground_layer_class():
     assert layer_1 == layer_2
     layer_1 = GroundConstantTemperature(10, 10)
     assert layer_1 != layer_2
+    assert layer_2 != layer_1
     assert 10 == layer_2.non_negative(10)
     assert None is layer_2.non_negative(None)
     try:
