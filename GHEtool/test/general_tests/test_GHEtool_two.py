@@ -267,3 +267,28 @@ def test_size_with_multiple_ground_layers():
     borefield.ground_data = flux_new
     assert np.isclose(98.05035285309258, borefield.size(L2_sizing=True), rtol=1e-3)
     assert np.isclose(98.7940117048903, borefield.size(L3_sizing=True), rtol=1e-3)
+
+
+def test_if_gfunction_history_is_cleared_with_groundlayers():
+    borefield = Borefield()
+    borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 1, 0.075)
+    borefield.ground_data = GroundFluxTemperature(1.7, 10)
+    borefield.gfunction(3600*20, 100)
+    borefield.gfunction(3600*20, 150)
+    assert np.array_equal([100, 150], borefield.gfunction_calculation_object.depth_array)
+
+    # now with multiple layers
+    layer_1 = GroundLayer(k_s=1.7, thickness=4.9)
+    layer_2 = GroundLayer(k_s=2.3, thickness=1.9)
+    layer_3 = GroundLayer(k_s=2.1, thickness=3)
+    layer_4 = GroundLayer(k_s=1.5, thickness=69.7)
+    layer_5 = GroundLayer(k_s=2.1, thickness=16.1)
+    layer_6 = GroundLayer(k_s=1.7, thickness=None)
+
+    flux = GroundFluxTemperature(T_g=10)
+    flux.add_layer_on_bottom([layer_1, layer_2, layer_3, layer_4, layer_5, layer_6])
+    borefield.ground_data = flux
+    borefield.gfunction(3600 * 20, 100)
+    borefield.gfunction(3600 * 20, 150)
+    # 100 is removed
+    assert np.array_equal([150.], borefield.gfunction_calculation_object.depth_array)
