@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [2.2.2] - unpublished
 
 ## Added
+- Added multiple ground layers (issue #97).
 - Function to create box, U and L-shaped borefields (issue #224).
 - Multiple year validation for L3 and L4 sizing (issue #227).
 - Added MonthlyGeothermalLoadMultiYear (issue #227).
