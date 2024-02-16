@@ -176,7 +176,7 @@ class BaseClass:
         if all(temp):
             return True
         else:
-            print(f'There is a problem with the {[var for idx, var in enumerate(variables) if not temp[idx]]} variables.')
+            # print(f'There is a problem with the {[var for idx, var in enumerate(variables) if not temp[idx]]} variables.')
             return False
 
 

@@ -71,3 +71,8 @@ def test_start_in_different_month(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     from GHEtool.Examples.start_in_different_month import start_in_different_month
     start_in_different_month()
+
+
+def test_multiple_ground_layers():
+    from GHEtool.Examples.multiple_ground_layers import multiple_ground_layers
+    multiple_ground_layers()

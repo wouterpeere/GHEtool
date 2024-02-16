@@ -11,4 +11,5 @@ Examples/main_functionalities.rst
 Examples/optimise_load_profile.rst
 Examples/sizing_with_Rb_calculation.rst
 Examples/start_in_different_month.rst
+Examples/multiple_ground_layers.rst
 ```
