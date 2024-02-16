@@ -1766,7 +1766,7 @@ class Borefield(BaseClass):
 
         warnings.warn(DeprecationWarning('Optimise_load_profile is replaced by optimise_load_profile_power'
                                          'or optimise_load_profile_energy. This method will be depreciated in '
-                                         'v2.2.3.'))
+                                         'v2.3.1.'))
 
         self.optimise_load_profile_power(building_load=building_load,
                                          depth=depth,
@@ -1775,7 +1775,7 @@ class Borefield(BaseClass):
                                          temperature_threshold=temperature_threshold)
 
         if print_results:
-            warnings.warn(DeprecationWarning('print_results will be depreciated from v2.2.3 onwards for code clarity. '
+            warnings.warn(DeprecationWarning('print_results will be depreciated from v2.3.1 onwards for code clarity. '
                                              'The user can replicate the same behaviour manually.'))
             # print results
             print(
