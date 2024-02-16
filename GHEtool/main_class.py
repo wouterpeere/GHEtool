@@ -902,9 +902,7 @@ class Borefield(BaseClass):
         if not use_constant_Rb is None:
             self.borehole.use_constant_Rb = use_constant_Rb
 
-    def size(
-        self,
-        H_init: float = None,
+    def size(self,H_init: float = None,
         use_constant_Rb: bool = None,
         L2_sizing: bool = None,
         L3_sizing: bool = None,

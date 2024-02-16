@@ -229,3 +229,41 @@ def test_problem_with_gfunction_calc_obj():
 
     # size borefield
     assert np.isclose(borefield.size(), 186.50968468475781)
+
+
+def test_size_with_multiple_ground_layers():
+    borefield = Borefield()
+    borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 1, 0.075)
+    borefield.ground_data = GroundFluxTemperature(1.7, 10)
+    borefield.set_Rb(0.12)
+
+    # set temperature boundaries
+    borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
+    borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
+    borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(4))
+
+    borefield.load.peak_cooling_duration = 8
+    borefield.load.peak_heating_duration = 6
+    assert np.isclose(97.16160816008234, borefield.size(L2_sizing=True))
+    assert np.isclose(97.89883260681054, borefield.size(L3_sizing=True))
+
+    # now with multiple layers
+    layer_1 = GroundLayer(k_s=1.7, thickness=4.9)
+    layer_2 = GroundLayer(k_s=2.3, thickness=1.9)
+    layer_3 = GroundLayer(k_s=2.1, thickness=3)
+    layer_4 = GroundLayer(k_s=1.5, thickness=69.7)
+    layer_5 = GroundLayer(k_s=2.1, thickness=16.1)
+    layer_6 = GroundLayer(k_s=1.7, thickness=None)
+
+    flux = GroundFluxTemperature(T_g=10)
+    flux.add_layer_on_bottom([layer_1, layer_2, layer_3, layer_4, layer_5, layer_6])
+    borefield.ground_data = flux
+    assert np.isclose(98.05035285309258, borefield.size(L2_sizing=True))
+    assert np.isclose(98.7940117048903, borefield.size(L3_sizing=True))
+
+    ks_saved = flux.k_s(borefield.H)
+
+    flux_new = GroundFluxTemperature(ks_saved, 10)
+    borefield.ground_data = flux_new
+    assert np.isclose(98.05035285309258, borefield.size(L2_sizing=True), rtol=1e-3)
+    assert np.isclose(98.7940117048903, borefield.size(L3_sizing=True), rtol=1e-3)
