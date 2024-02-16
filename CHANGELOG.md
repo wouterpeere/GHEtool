@@ -9,9 +9,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Function to create box, U and L-shaped borefields (issue #224).
 - Multiple year validation for L3 and L4 sizing (issue #227).
 - Added MonthlyGeothermalLoadMultiYear (issue #227).
+- Added optimise_load_profile_energy (issue #229).
 
 ## changed
-/
+ - Removed set_peak_length from Borefield class (issue #227).
+ - Definition of the optimise_load_profile_class (issue #229).
 
 ## fixed
 - Small typo's in functions (issue #224).

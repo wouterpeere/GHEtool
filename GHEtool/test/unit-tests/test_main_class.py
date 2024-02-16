@@ -775,10 +775,11 @@ def test_load_duration(monkeypatch):
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     borefield.load = load
     borefield.plot_load_duration(legend=True)
-    borefield.optimise_load_profile(load, 150)
+    borefield.optimise_load_profile_power(load, 150)
+    borefield.optimise_load_profile_energy(load, 150)
 
 
-def test_optimise_load_profile(monkeypatch):
+def test_optimise_load_profile_power(monkeypatch):
     borefield = Borefield()
     monkeypatch.setattr(plt, "show", lambda: None)
     borefield.set_ground_parameters(ground_data_constant)
@@ -786,14 +787,29 @@ def test_optimise_load_profile(monkeypatch):
     load = HourlyGeothermalLoad()
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     load.simulation_period = 40
-    borefield.optimise_load_profile(load, 150)
+    borefield.optimise_load_profile_power(load, 150)
     assert borefield.load.simulation_period == 40
     assert borefield._building_load.simulation_period == 40
     assert borefield._secundary_borefield_load.simulation_period == 40
     assert borefield._external_load.simulation_period == 40
 
 
-def test_optimise_borefield_small(monkeypatch):
+def test_optimise_load_profile_energy(monkeypatch):
+    borefield = Borefield()
+    monkeypatch.setattr(plt, "show", lambda: None)
+    borefield.set_ground_parameters(ground_data_constant)
+    borefield.borefield = copy.deepcopy(borefield_gt)
+    load = HourlyGeothermalLoad()
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load.simulation_period = 40
+    borefield.optimise_load_profile_energy(load, 150)
+    assert borefield.load.simulation_period == 40
+    assert borefield._building_load.simulation_period == 40
+    assert borefield._secundary_borefield_load.simulation_period == 40
+    assert borefield._external_load.simulation_period == 40
+
+
+def test_optimise_borefield_small_power(monkeypatch):
     borefield = Borefield()
     monkeypatch.setattr(plt, "show", lambda: None)
     borefield.set_ground_parameters(ground_data_constant)
@@ -801,14 +817,29 @@ def test_optimise_borefield_small(monkeypatch):
     load = HourlyGeothermalLoad()
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     load.simulation_period = 40
-    borefield.optimise_load_profile(load, 150, print_results=True)
+    borefield.optimise_load_profile_power(load, 150, print_results=True)
     assert borefield.load.simulation_period == 40
     assert borefield._building_load.simulation_period == 40
     assert borefield._secundary_borefield_load.simulation_period == 40
     assert borefield._external_load.simulation_period == 40
 
 
-def test_optimise_borefield_wrong_threshold(monkeypatch):
+def test_optimise_borefield_small_energy(monkeypatch):
+    borefield = Borefield()
+    monkeypatch.setattr(plt, "show", lambda: None)
+    borefield.set_ground_parameters(ground_data_constant)
+    borefield.create_rectangular_borefield(5, 1, 6, 6, 100)
+    load = HourlyGeothermalLoad()
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load.simulation_period = 40
+    borefield.optimise_load_profile_energy(load, 150, print_results=True)
+    assert borefield.load.simulation_period == 40
+    assert borefield._building_load.simulation_period == 40
+    assert borefield._secundary_borefield_load.simulation_period == 40
+    assert borefield._external_load.simulation_period == 40
+
+
+def test_optimise_borefield_wrong_threshold_power(monkeypatch):
     borefield = Borefield()
     monkeypatch.setattr(plt, "show", lambda: None)
     borefield.set_ground_parameters(ground_data_constant)
@@ -817,7 +848,19 @@ def test_optimise_borefield_wrong_threshold(monkeypatch):
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     load.simulation_period = 40
     with pytest.raises(ValueError):
-        borefield.optimise_load_profile(load, 150, print_results=True, temperature_threshold=-0.5)
+        borefield.optimise_load_profile_power(load, 150, temperature_threshold=-0.5)
+
+
+def test_optimise_borefield_wrong_threshold_energy(monkeypatch):
+    borefield = Borefield()
+    monkeypatch.setattr(plt, "show", lambda: None)
+    borefield.set_ground_parameters(ground_data_constant)
+    borefield.create_rectangular_borefield(5, 1, 6, 6, 100)
+    load = HourlyGeothermalLoad()
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load.simulation_period = 40
+    with pytest.raises(ValueError):
+        borefield.optimise_load_profile_energy(load, 150, temperature_threshold=-0.5)
 
 
 def test_calculate_quadrants_without_data():
@@ -829,10 +872,16 @@ def test_calculate_quadrants_without_data():
     borefield.calculate_quadrant()
 
 
-def test_optimise_load_profile_without_data():
+def test_optimise_load_profile_power_without_data():
     borefield = Borefield()
     with pytest.raises(ValueError):
-        borefield.optimise_load_profile(MonthlyGeothermalLoadAbsolute())
+        borefield.optimise_load_profile_power(MonthlyGeothermalLoadAbsolute())
+
+
+def test_optimise_load_profile_energy_without_data():
+    borefield = Borefield()
+    with pytest.raises(ValueError):
+        borefield.optimise_load_profile_energy(MonthlyGeothermalLoadAbsolute())
 
 
 def test_load_load():
@@ -853,16 +902,28 @@ def test_calculate_temperature_profile():
         borefield.calculate_temperatures(hourly=True)
 
 
-def test_optimise_load_profile_without_hourly_data():
+def test_optimise_load_profile_power_without_hourly_data():
     borefield = Borefield()
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(1))
     with pytest.raises(ValueError):
-        borefield.optimise_load_profile(borefield.load)
+        borefield.optimise_load_profile_power(borefield.load)
     borefield.load = HourlyGeothermalLoad()
     borefield.set_ground_parameters(ground_data_constant)
     borefield.load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     borefield.create_rectangular_borefield(10, 10, 6, 6, 150)
-    borefield.optimise_load_profile(borefield.load)
+    borefield.optimise_load_profile_power(borefield.load)
+
+
+def test_optimise_load_profile_energy_without_hourly_data():
+    borefield = Borefield()
+    borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(1))
+    with pytest.raises(ValueError):
+        borefield.optimise_load_profile_energy(borefield.load)
+    borefield.load = HourlyGeothermalLoad()
+    borefield.set_ground_parameters(ground_data_constant)
+    borefield.load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    borefield.create_rectangular_borefield(10, 10, 6, 6, 150)
+    borefield.optimise_load_profile_energy(borefield.load)
 
 
 @pytest.mark.parametrize(

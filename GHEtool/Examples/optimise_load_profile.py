@@ -33,11 +33,10 @@ def optimise():
     load.load_hourly_profile("hourly_profile.csv", header=True, separator=";")
 
     # optimise the load for a 10x10 field (see data above) and a fixed depth of 150m.
-    borefield.optimise_load_profile(building_load=load, depth=150, print_results=True)
+    borefield.optimise_load_profile_power(building_load=load, depth=150)
 
     # calculate temperatures
     borefield.calculate_temperatures(hourly=True)
-
     # print resulting external peak cooling profile
     print(borefield._external_load.max_peak_cooling)
 

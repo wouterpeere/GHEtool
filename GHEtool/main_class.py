@@ -1756,13 +1756,69 @@ class Borefield(BaseClass):
         """
         return self.borehole.Re
 
-    def optimise_load_profile(
+    def optimise_load_profile(self,
+        building_load: HourlyGeothermalLoad,
+        depth: float = None,
+        SCOP: float = 10**6,
+        SEER: float = 10**6,
+        temperature_threshold: float = 0.05,
+        print_results: bool = False):
+
+        warnings.warn(DeprecationWarning('Optimise_load_profile is replaced by optimise_load_profile_power'
+                                         'or optimise_load_profile_energy. This method will be depreciated in '
+                                         'v2.2.3.'))
+
+        self.optimise_load_profile_power(building_load=building_load,
+                                         depth=depth,
+                                         SCOP=SCOP,
+                                         SEER=SEER,
+                                         temperature_threshold=temperature_threshold)
+
+        if print_results:
+            warnings.warn(DeprecationWarning('print_results will be depreciated from v2.2.3 onwards for code clarity. '
+                                             'The user can replicate the same behaviour manually.'))
+            # print results
+            print(
+                "The peak load heating is: ",
+                f"{self._secundary_borefield_load.max_peak_heating:.0f}",
+                "kW, leading to",
+                f"{np.sum(self._secundary_borefield_load.hourly_heating_load):.0f}",
+                "kWh of heating.",
+            )
+            print("This is", f"{self._percentage_heating:.0f}", "% of the total heating load.")
+            print(
+                "Another",
+                f"{np.sum(self._external_load.hourly_heating_load):.0f}",
+                "kWh of heating should come from another source, with a peak of",
+                f"{self._external_load.max_peak_heating:.0f}",
+                "kW.",
+            )
+            print("------------------------------------------")
+            print(
+                "The peak load cooling is: ",
+                f"{self._secundary_borefield_load.max_peak_cooling:.0f}",
+                "kW, leading to",
+                f"{np.sum(self._secundary_borefield_load.hourly_cooling_load):.0f}",
+                "kWh of cooling.",
+            )
+            print("This is", f"{self._percentage_cooling:.0f}", "% of the total cooling load.")
+            print(
+                "Another",
+                f"{np.sum(self._external_load.hourly_cooling_load):.0f}",
+                "kWh of cooling should come from another source, with a peak of",
+                f"{self._external_load.max_peak_cooling:.0f}",
+                "kW.",
+            )
+
+            # plot results
+            self.print_temperature_profile_fixed_depth(depth=depth)
+
+    def optimise_load_profile_power(
         self,
         building_load: HourlyGeothermalLoad,
         depth: float = None,
         SCOP: float = 10**6,
         SEER: float = 10**6,
-        print_results: bool = False,
         temperature_threshold: float = 0.05,
     ) -> None:
         """
@@ -1782,8 +1838,6 @@ class Borefield(BaseClass):
             SCOP of the geothermal system (needed to convert hourly building load to geothermal load)
         SEER : float
             SEER of the geothermal system (needed to convert hourly building load to geothermal load)
-        print_results : bool
-            True when the results of this optimisation are to be printed in the terminal
         temperature_threshold : float
             The maximum allowed temperature difference between the maximum and minimum fluid temperatures and their
             respective limits. The lower this threshold, the longer the convergence will take.
@@ -1889,42 +1943,189 @@ class Borefield(BaseClass):
         self.Rb = Rb_backup
         self.borehole.use_constant_Rb = use_constant_Rb_backup
 
-        if print_results:
-            # print results
-            print(
-                "The peak load heating is: ",
-                f"{self._secundary_borefield_load.max_peak_heating:.0f}",
-                "kW, leading to",
-                f"{np.sum(self._secundary_borefield_load.hourly_heating_load):.0f}",
-                "kWh of heating.",
-            )
-            print("This is", f"{self._percentage_heating:.0f}", "% of the total heating load.")
-            print(
-                "Another",
-                f"{np.sum(self._external_load.hourly_heating_load):.0f}",
-                "kWh of heating should come from another source, with a peak of",
-                f"{self._external_load.max_peak_heating:.0f}",
-                "kW.",
-            )
-            print("------------------------------------------")
-            print(
-                "The peak load cooling is: ",
-                f"{self._secundary_borefield_load.max_peak_cooling:.0f}",
-                "kW, leading to",
-                f"{np.sum(self._secundary_borefield_load.hourly_cooling_load):.0f}",
-                "kWh of cooling.",
-            )
-            print("This is", f"{self._percentage_cooling:.0f}", "% of the total cooling load.")
-            print(
-                "Another",
-                f"{np.sum(self._external_load.hourly_cooling_load):.0f}",
-                "kWh of cooling should come from another source, with a peak of",
-                f"{self._external_load.max_peak_cooling:.0f}",
-                "kW.",
-            )
+    def optimise_load_profile_energy(
+        self,
+        building_load: HourlyGeothermalLoad,
+        depth: float = None,
+        SCOP: float = 10**6,
+        SEER: float = 10**6,
+        temperature_threshold: float = 0.05,
+    ) -> None:
+        """
+        This function optimises the load based on the given borefield and the given hourly load.
+        (When the load is not geothermal, the SCOP and SEER are used to convert it to a geothermal load.)
+        It does so based on a load-duration curve. The temperatures of the borefield are calculated on a monthly
+        basis, even though we have hourly data, for an hourly calculation of the temperatures
+        would take a very long time.
 
-            # plot results
-            self.print_temperature_profile_fixed_depth(depth=depth)
+        Parameters
+        ----------
+        building_load : _LoadData
+            Load data used for the optimisation
+        depth : float
+            Depth of the boreholes in the borefield [m]
+        SCOP : float
+            SCOP of the geothermal system (needed to convert hourly building load to geothermal load)
+        SEER : float
+            SEER of the geothermal system (needed to convert hourly building load to geothermal load)
+        temperature_threshold : float
+            The maximum allowed temperature difference between the maximum and minimum fluid temperatures and their
+            respective limits. The lower this threshold, the longer the convergence will take.
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            ValueError if no hourly load is given or the threshold is negative
+        """
+
+        ## Explain variables
+        # load --> primary, geothermal load
+        # _building_load --> secundary, building load
+        # _secundary_borefield_load --> secundary, geothermal load
+
+        # check if hourly load is given
+        if not building_load.hourly_resolution:
+            raise ValueError("No hourly load was given!")
+
+        # check if threshold is positive
+        if temperature_threshold < 0:
+            raise ValueError(f"The temperature threshold is {temperature_threshold}, but it cannot be below 0!")
+
+        # set depth
+        if depth is None:
+            depth = self.H
+
+        # since the depth does not change, the Rb* value is constant
+        # set to use a constant Rb* value but save the initial parameters
+        Rb_backup = self.borehole.Rb
+        use_constant_Rb_backup = self.borehole.use_constant_Rb
+        self.Rb = self.borehole.get_Rb(depth, self.D, self.r_b, self.ground_data.k_s)
+
+        # load hourly heating and cooling load and convert it to geothermal loads
+        primary_geothermal_load = HourlyGeothermalLoad(simulation_period=building_load.simulation_period)
+        primary_geothermal_load.set_hourly_cooling(building_load.hourly_cooling_load.copy() * (1 + 1 / SEER))
+        primary_geothermal_load.set_hourly_heating(building_load.hourly_heating_load.copy() * (1 - 1 / SCOP))
+
+        # set relation qh-qm
+        nb_points = 100
+
+        power_heating_range = np.linspace(0.001, primary_geothermal_load.max_peak_heating, nb_points)
+        power_cooling_range = np.linspace(0.001, primary_geothermal_load.max_peak_cooling, nb_points)
+
+        # relationship between the peak load and the corresponding monthly load
+        heating_peak_bl = np.zeros((nb_points, 12))
+        cooling_peak_bl = np.zeros((nb_points, 12))
+
+        for idx in range(nb_points):
+            heating_peak_bl[idx] = primary_geothermal_load.resample_to_monthly(np.minimum(power_heating_range[idx], primary_geothermal_load.hourly_heating_load))[1]
+            cooling_peak_bl[idx] = primary_geothermal_load.resample_to_monthly(np.minimum(power_cooling_range[idx], primary_geothermal_load.hourly_cooling_load))[1]
+
+        # create monthly multi-load
+        primary_monthly_load = \
+            MonthlyGeothermalLoadMultiYear(baseload_heating=primary_geothermal_load.baseload_heating_simulation_period,
+                                           baseload_cooling=primary_geothermal_load.baseload_cooling_simulation_period,
+                                           peak_heating=primary_geothermal_load.peak_heating_simulation_period,
+                                           peak_cooling=primary_geothermal_load.peak_cooling_simulation_period)
+
+        self.load = primary_monthly_load
+
+        # store initial monthly peak loads
+        peak_heating = primary_geothermal_load.peak_heating
+        peak_cooling = primary_geothermal_load.peak_cooling
+
+        for i in range(12 * self.load.simulation_period):
+            # set iteration criteria
+            cool_ok, heat_ok = False, False
+
+            while not cool_ok or not heat_ok:
+                # calculate temperature profile, just for the results
+                self.calculate_temperatures(depth)
+
+                # deviation from minimum temperature
+                if abs(self.results.peak_heating[i] - self.Tf_min) > temperature_threshold:
+                    # check if it goes below the threshold
+                    curr_heating_peak = self.load.peak_heating_simulation_period[i]
+                    if self.results.peak_heating[i] < self.Tf_min:
+                        curr_heating_peak = max(0.1, curr_heating_peak - 1 * max(1, 10 * (self.Tf_min - self.results.peak_heating[i])))
+                    else:
+                        curr_heating_peak = min(peak_heating[i % 12], curr_heating_peak * 1.01)
+                        if curr_heating_peak == peak_heating[i % 12]:
+                            heat_ok = True
+                    self.load._peak_heating[i], self.load._baseload_heating[i] =\
+                        curr_heating_peak, np.interp(curr_heating_peak, power_heating_range, heating_peak_bl[:, i % 12])
+                else:
+                    heat_ok = True
+
+                # deviation from maximum temperature
+                if abs(self.results.peak_cooling[i] - self.Tf_max) > temperature_threshold:
+                    # check if it goes above the threshold
+                    curr_cooling_peak = self.load.peak_cooling_simulation_period[i]
+                    if self.results.peak_cooling[i] > self.Tf_max:
+                        curr_cooling_peak = max(0.1, curr_cooling_peak - 1 * max(1, 10 * (
+                                    -self.Tf_max + np.max(self.results.peak_cooling))))
+                    else:
+                        curr_cooling_peak = min(peak_cooling[i % 12], curr_cooling_peak * 1.01)
+                        if curr_cooling_peak == peak_cooling[i % 12]:
+                            cool_ok = True
+                    self.load._peak_cooling[i], self.load._baseload_cooling[i] = \
+                        curr_cooling_peak, np.interp(curr_cooling_peak, power_cooling_range, cooling_peak_bl[:, i % 12])
+                else:
+                    cool_ok = True
+
+        def f(hourly_load, monthly_peak) -> np.ndarray:
+            """
+            This function creates a new hourly load where the values are limited by the monthly peaks.
+
+            Parameters
+            ----------
+            hourly_load : np.ndarray
+                An array with hourly values
+            monthly_peak : np.ndarray
+                An array with monthly values
+
+            Returns
+            -------
+            np.ndarray
+                New array with hourly values where each value is the minimum of the monthly and hourly array
+            """
+            new_load = np.zeros_like(hourly_load)
+            UPM = np.cumsum(np.tile(building_load.UPM, building_load.simulation_period))
+            month_idx = 0
+            for idx, val in enumerate(hourly_load):
+                if idx == UPM[month_idx] and not month_idx == len(UPM) - 1:
+                    month_idx += 1
+                new_load[idx] = min(val, monthly_peak[month_idx])
+            return new_load
+
+        # calculate hourly load
+        temp = HourlyGeothermalLoadMultiYear()
+        temp.hourly_heating_load = f(primary_geothermal_load.hourly_heating_load_simulation_period, self.load.peak_heating_simulation_period)
+        temp.hourly_cooling_load = f(primary_geothermal_load.hourly_cooling_load_simulation_period, self.load.peak_cooling_simulation_period)
+
+        # set correct hourly load
+        self.load = temp
+
+        # calculate the corresponding geothermal load
+        self._secundary_borefield_load = HourlyGeothermalLoadMultiYear()
+        self._secundary_borefield_load.hourly_cooling_load = self.load.hourly_cooling_load_simulation_period / (1 + 1 / SEER)
+        self._secundary_borefield_load.hourly_heating_load = self.load.hourly_heating_load_simulation_period / (1 - 1 / SCOP)
+
+        # set building load
+        self._building_load = building_load
+
+        # calculate external load
+        self._external_load = HourlyGeothermalLoadMultiYear()
+        self._external_load.hourly_heating_load = np.maximum(0, building_load.hourly_heating_load_simulation_period - self._secundary_borefield_load.hourly_heating_load_simulation_period)
+        self._external_load.hourly_cooling_load = np.maximum(0, building_load.hourly_cooling_load_simulation_period - self._secundary_borefield_load.hourly_cooling_load_simulation_period)
+
+        # restore the initial parameters
+        self.Rb = Rb_backup
+        self.borehole.use_constant_Rb = use_constant_Rb_backup
+
 
     @property
     def _percentage_heating(self) -> float:
@@ -1936,7 +2137,8 @@ class Borefield(BaseClass):
         float
             Percentage of heating load that can be done geothermally.
         """
-        return np.sum(self._secundary_borefield_load.hourly_heating_load) / np.sum(self._building_load.hourly_heating_load) * 100
+        return np.sum(self._secundary_borefield_load.hourly_heating_load_simulation_period) /\
+            np.sum(self._building_load.hourly_heating_load_simulation_period) * 100
 
     @property
     def _percentage_cooling(self) -> float:
@@ -1948,7 +2150,7 @@ class Borefield(BaseClass):
         float
             Percentage of cooling load that can be done geothermally.
         """
-        return np.sum(self._secundary_borefield_load.hourly_cooling_load) / np.sum(self._building_load.hourly_cooling_load) * 100
+        return np.sum(self._secundary_borefield_load.hourly_cooling_load_simulation_period) /np.sum(self._building_load.hourly_cooling_load_simulation_period) * 100
 
     def calculate_quadrant(self) -> int:
         """

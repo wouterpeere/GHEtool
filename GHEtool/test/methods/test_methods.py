@@ -47,7 +47,7 @@ def test_L4(model: Borefield, result):
 def test_optimise(input, result):
     model: Borefield = input[0]
     load, depth, SCOP, SEER = input[1:]
-    model.optimise_load_profile(load, depth, SCOP, SEER)
+    model.optimise_load_profile_power(load, depth, SCOP, SEER)
     percentage_heating, percentage_cooling, peak_heating_geo, peak_cooling_geo, peak_heating_ext, peak_cooling_ext = \
         result
     assert np.isclose(model._percentage_heating, percentage_heating)
