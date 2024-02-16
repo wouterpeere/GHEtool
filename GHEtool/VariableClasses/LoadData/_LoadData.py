@@ -592,7 +592,7 @@ class _LoadData(BaseClass, ABC):
         -------
         max peak cooling : float
         """
-        return np.max(self.peak_cooling)
+        return np.max(self.peak_cooling_simulation_period)
 
     @property
     def max_peak_heating(self) -> float:
@@ -603,7 +603,7 @@ class _LoadData(BaseClass, ABC):
         -------
         max peak heating : float
         """
-        return np.max(self.peak_heating)
+        return np.max(self.peak_heating_simulation_period)
 
     def add_dhw(self, dhw: float) -> None:
         """
