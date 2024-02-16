@@ -817,7 +817,7 @@ def test_optimise_borefield_small_power(monkeypatch):
     load = HourlyGeothermalLoad()
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     load.simulation_period = 40
-    borefield.optimise_load_profile_power(load, 150, print_results=True)
+    borefield.optimise_load_profile_power(load, 150)
     assert borefield.load.simulation_period == 40
     assert borefield._building_load.simulation_period == 40
     assert borefield._secundary_borefield_load.simulation_period == 40
@@ -832,7 +832,7 @@ def test_optimise_borefield_small_energy(monkeypatch):
     load = HourlyGeothermalLoad()
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     load.simulation_period = 40
-    borefield.optimise_load_profile_energy(load, 150, print_results=True)
+    borefield.optimise_load_profile_energy(load, 150)
     assert borefield.load.simulation_period == 40
     assert borefield._building_load.simulation_period == 40
     assert borefield._secundary_borefield_load.simulation_period == 40
