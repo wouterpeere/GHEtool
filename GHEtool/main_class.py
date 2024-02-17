@@ -801,9 +801,10 @@ class Borefield(BaseClass):
             # calculate the required g-function values
             gfunct_uniform_T = self.gfunction(time, max(1, self.H))
             # calculate the thermal resistances
-            Ra = (gfunct_uniform_T[2] - gfunct_uniform_T[1]) / (2 * pi * self.ground_data.k_s)
-            Rm = (gfunct_uniform_T[1] - gfunct_uniform_T[0]) / (2 * pi * self.ground_data.k_s)
-            Rd = (gfunct_uniform_T[0]) / (2 * pi * self.ground_data.k_s)
+            k_s = self.ground_data.k_s(self.H)
+            Ra = (gfunct_uniform_T[2] - gfunct_uniform_T[1]) / (2 * pi * k_s)
+            Rm = (gfunct_uniform_T[1] - gfunct_uniform_T[0]) / (2 * pi * k_s)
+            Rd = (gfunct_uniform_T[0]) / (2 * pi * k_s)
             # calculate the total borehole length
             L = (qa * Ra + qm * Rm + qh * Rd + qh * self.Rb) / abs(self.Tf - self._Tg())
             # updating the depth values
@@ -846,9 +847,10 @@ class Borefield(BaseClass):
             gfunc_uniform_T = self.gfunction(time_steps, max(1, self.H))
 
             # calculate the thermal resistances
-            Rpm = (gfunc_uniform_T[2] - gfunc_uniform_T[1]) / (2 * pi * self.ground_data.k_s)
-            Rcm = (gfunc_uniform_T[1] - gfunc_uniform_T[0]) / (2 * pi * self.ground_data.k_s)
-            Rh = (gfunc_uniform_T[0]) / (2 * pi * self.ground_data.k_s)
+            k_s = self.ground_data.k_s(self.H)
+            Rpm = (gfunc_uniform_T[2] - gfunc_uniform_T[1]) / (2 * pi * k_s)
+            Rcm = (gfunc_uniform_T[1] - gfunc_uniform_T[0]) / (2 * pi * k_s)
+            Rh = (gfunc_uniform_T[0]) / (2 * pi * k_s)
 
             # calculate the total length
             L = (qh * self.Rb + qh * Rh + qm * Rcm + qpm * Rpm) / abs(self.Tf - self._Tg())
@@ -900,9 +902,7 @@ class Borefield(BaseClass):
         if not use_constant_Rb is None:
             self.borehole.use_constant_Rb = use_constant_Rb
 
-    def size(
-        self,
-        H_init: float = None,
+    def size(self,H_init: float = None,
         use_constant_Rb: bool = None,
         L2_sizing: bool = None,
         L3_sizing: bool = None,
@@ -1550,7 +1550,7 @@ class Borefield(BaseClass):
         """
 
         # set Rb* value
-        Rb = self.borehole.get_Rb(H if H is not None else self.H, self.D, self.r_b, self.ground_data.k_s)
+        Rb = self.borehole.get_Rb(H if H is not None else self.H, self.D, self.r_b, self.ground_data.k_s(self.H))
         H = H if H is not None else self.H
 
         if not hourly:
@@ -1573,7 +1573,8 @@ class Borefield(BaseClass):
             results = convolve(self.load.monthly_average_load_simulation_period * 1000, g_value_differences)[: 12 * self.simulation_period]
 
             # calculation the borehole wall temperature for every month i
-            Tb = results / (2 * pi * self.ground_data.k_s) / (H * self.number_of_boreholes) + self._Tg(H)
+            k_s = self.ground_data.k_s(H)
+            Tb = results / (2 * pi * k_s) / (H * self.number_of_boreholes) + self._Tg(H)
 
             # now the Tf will be calculated based on
             # Tf = Tb + Q * R_b
@@ -1585,7 +1586,7 @@ class Borefield(BaseClass):
                 results_month_cooling
                 + (self.load.peak_cooling_simulation_period - self.load.baseload_cooling_power_simulation_period)
                 * 1000
-                * (g_value_peak_cooling / self.ground_data.k_s / 2 / pi + Rb)
+                * (g_value_peak_cooling / k_s / 2 / pi + Rb)
                 / self.number_of_boreholes
                 / H
             )
@@ -1593,7 +1594,7 @@ class Borefield(BaseClass):
                 results_month_heating
                 - (self.load.peak_heating_simulation_period - self.load.baseload_heating_power_simulation_period)
                 * 1000
-                * (g_value_peak_heating / self.ground_data.k_s / 2 / pi + Rb)
+                * (g_value_peak_heating / k_s / 2 / pi + Rb)
                 / self.number_of_boreholes
                 / H
             )
@@ -1626,7 +1627,7 @@ class Borefield(BaseClass):
             results = convolve(hourly_load * 1000, g_value_differences)[: len(hourly_load)]
 
             # calculation the borehole wall temperature for every month i
-            Tb = results / (2 * pi * self.ground_data.k_s) / (H * self.number_of_boreholes) + self._Tg(H)
+            Tb = results / (2 * pi * self.ground_data.k_s(H)) / (H * self.number_of_boreholes) + self._Tg(H)
 
             # now the Tf will be calculated based on
             # Tf = Tb + Q * R_b
@@ -1689,7 +1690,7 @@ class Borefield(BaseClass):
             # set the correct depth of the borefield
             self._update_borefield_depth(H=H)
             return self.gfunction_calculation_object.calculate(
-                time_value, self.borefield, self.ground_data.alpha, interpolate=self._calculation_setup.interpolate_gfunctions
+                time_value, self.borefield, self.ground_data.alpha(H), interpolate=self._calculation_setup.interpolate_gfunctions
             )
 
         ## 1 bypass any possible precalculated g-functions
@@ -1737,7 +1738,7 @@ class Borefield(BaseClass):
         except TypeError:
             raise ValueError("No borefield is set for which the gfunctions should be calculated")
         try:
-            self.ground_data.alpha
+            self.ground_data.alpha(H=100)
         except AttributeError:
             raise ValueError("No ground data is set for which the gfunctions should be calculated")
 
@@ -1873,7 +1874,7 @@ class Borefield(BaseClass):
         # set to use a constant Rb* value but save the initial parameters
         Rb_backup = self.borehole.Rb
         use_constant_Rb_backup = self.borehole.use_constant_Rb
-        self.Rb = self.borehole.get_Rb(depth, self.D, self.r_b, self.ground_data.k_s)
+        self.Rb = self.borehole.get_Rb(depth, self.D, self.r_b, self.ground_data.k_s(depth))
 
         # load hourly heating and cooling load and convert it to geothermal loads
         primary_geothermal_load = HourlyGeothermalLoad(simulation_period=building_load.simulation_period)

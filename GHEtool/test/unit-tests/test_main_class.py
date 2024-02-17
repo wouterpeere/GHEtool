@@ -896,6 +896,7 @@ def test_load_load():
 
 def test_calculate_temperature_profile():
     borefield = Borefield()
+    borefield.set_ground_parameters(ground_data_constant)
     load = MonthlyGeothermalLoadAbsolute(*load_case(1))
     borefield.load = load
     with pytest.raises(ValueError):

@@ -190,7 +190,7 @@ class CustomGFunction:
 
         return True
 
-    def create_custom_dataset(self, borefield: List[gt.boreholes.Borehole], alpha: float) -> None:
+    def create_custom_dataset(self, borefield: List[gt.boreholes.Borehole], alpha: Union[float, callable]) -> None:
         """
         This function creates the custom dataset.
 
@@ -198,8 +198,8 @@ class CustomGFunction:
         ----------
         borefield : list[pygfunction.boreholes.Borehole]
             Borefield object for which the custom dataset should be created
-        alpha : float
-            Ground thermal diffusivity [m2/s]
+        alpha : float or callable
+            Ground thermal diffusivity [m2/s] or function to calculate it at a certain depth
 
         Returns
         -------
@@ -218,7 +218,7 @@ class CustomGFunction:
             for borehole in borefield:
                 borehole.H = H
 
-            gfunc_uniform_T = gt.gfunction.gFunction(borefield, alpha,
+            gfunc_uniform_T = gt.gfunction.gFunction(borefield, alpha if isinstance(alpha, float) else alpha(H),
                                                      self.time_array, options=self.options,
                                                      method=self.options["method"])
 

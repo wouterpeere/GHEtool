@@ -3,6 +3,8 @@ This document contains the information for the BaseClass.
 This class is used as a super class for different variable classes.
 """
 from __future__ import annotations
+
+import warnings
 from typing import List
 
 import numpy as np
@@ -170,7 +172,12 @@ class BaseClass:
         else:
             variables: List[str] = [attr for attr in dir(self) if not callable(getattr(self, attr)) and not attr.startswith("__")]
 
-        return all(getattr(self, var) is not None for var in variables)
+        temp = [getattr(self, var) is not None for var in variables]
+        if all(temp):
+            return True
+        else:
+            # print(f'There is a problem with the {[var for idx, var in enumerate(variables) if not temp[idx]]} variables.')
+            return False
 
 
 class UnsolvableDueToTemperatureGradient(Exception):

@@ -43,9 +43,9 @@ class GroundFluxTemperature(_GroundData):
         """
         # geothermal gradient is equal to the geothermal heat flux divided by the thermal conductivity
         # avg ground temperature is (Tg + gradient + Tg) / 2 = Tg + gradient / 2
-        return self.Tg + H * self.flux / self.k_s / 2
+        return self.Tg + H * self.flux / self.k_s(H) / 2
 
-    def calculate_delta_H(self, temperature_diff: float) -> float:
+    def calculate_delta_H(self, temperature_diff: float, H: float = 100) -> float:
         """
         This function calculates the difference in depth for a given difference in temperature.
 
@@ -53,10 +53,12 @@ class GroundFluxTemperature(_GroundData):
         ----------
         temperature_diff : float
             Difference in temperature [deg C]
+        H : float
+            Depth at which the average ground thermal conductivity should be taken [m]
 
         Returns
         -------
         float
             Difference in depth [m]
         """
-        return temperature_diff * 2 * self.k_s / self.flux
+        return temperature_diff * 2 * self.k_s(H) / self.flux
