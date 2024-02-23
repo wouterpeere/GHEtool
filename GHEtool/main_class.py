@@ -421,10 +421,6 @@ class Borefield(BaseClass):
         -------
         None
         """
-        if self.H == H:
-            # the borefield is already at the correct depth
-            return
-
         for bor in self._borefield:
             bor.H = H
 
