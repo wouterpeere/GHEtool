@@ -219,8 +219,6 @@ class Borefield(BaseClass):
         -------
         None
         """
-        if H <= 0:
-            raise ValueError('The depth cannot be zero or lower.')
         self._H = H
         self._update_borefield_depth(H)
 
