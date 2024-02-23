@@ -408,7 +408,7 @@ class Borefield(BaseClass):
         self.gfunction_calculation_object.remove_previous_data()
         self.custom_gfunction = None
 
-    def _update_borefield_depth(self, H: float = None) -> None:
+    def _update_borefield_depth(self, H: float) -> None:
         """
         This function updates the borehole depth.
 
@@ -421,9 +421,7 @@ class Borefield(BaseClass):
         -------
         None
         """
-        H = H if H is not None else self.H
-
-        if self._borefield[0].H == H:
+        if self.H == H:
             # the borefield is already at the correct depth
             return
 
@@ -1671,10 +1669,11 @@ class Borefield(BaseClass):
         gvalue : np.ndarray
             1D array with the g-values for all the requested time_value(s)
         """
+        H_var = H
         if H is None:
-            H = self.H
+            H_var = self.H
         # when using a variable ground temperature, sometimes no solution can be found
-        if not isinstance(self.ground_data, GroundConstantTemperature) and H > Borefield.THRESHOLD_DEPTH_ERROR:
+        if not isinstance(self.ground_data, GroundConstantTemperature) and H_var > Borefield.THRESHOLD_DEPTH_ERROR:
             raise UnsolvableDueToTemperatureGradient
 
         def jit_gfunction_calculation() -> np.ndarray:
@@ -1687,9 +1686,11 @@ class Borefield(BaseClass):
                 1D array with the g-values for the requested time intervals
             """
             # set the correct depth of the borefield
-            self._update_borefield_depth(H=H)
+            if not H is None:
+                # only update if H is provided, otherwise the depths of the borefield itself will be used
+                self._update_borefield_depth(H=H)
             return self.gfunction_calculation_object.calculate(
-                time_value, self.borefield, self.ground_data.alpha(H), interpolate=self._calculation_setup.interpolate_gfunctions
+                time_value, self.borefield, self.ground_data.alpha(H_var), interpolate=self._calculation_setup.interpolate_gfunctions
             )
 
         ## 1 bypass any possible precalculated g-functions
@@ -1701,8 +1702,8 @@ class Borefield(BaseClass):
         if self.custom_gfunction is not None:
             # there is precalculated data available
             # check if the requested values can be calculated using the custom_gfunction
-            if self.custom_gfunction.within_range(time_value, H):
-                return self.custom_gfunction.calculate_gfunction(time_value, H)
+            if self.custom_gfunction.within_range(time_value, H_var):
+                return self.custom_gfunction.calculate_gfunction(time_value, H_var)
 
         ## 3 calculate g-function jit
         return jit_gfunction_calculation()
