@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## changed
  - Removed set_peak_length from Borefield class (issue #227).
  - Definition of the optimise_load_profile_class (issue #229).
+ - Changed number_of_boreholes to an attribute (issue #233).
 
 ## fixed
 - Small typo's in functions (issue #224).

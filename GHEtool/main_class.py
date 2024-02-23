@@ -123,7 +123,6 @@ class Borefield(BaseClass):
 
         # initiate ground parameters
         self.H = 0.0  # borehole depth m
-        self.number_of_boreholes = 0  # number of total boreholes #
         self._ground_data: _GroundData = GroundConstantTemperature()
         self.D: float = 0.0  # buried depth of the borehole [m]
         self.r_b: float = 0.0  # borehole radius [m]
@@ -182,15 +181,17 @@ class Borefield(BaseClass):
         """
         ghe_logger.setLevel(logging.INFO)
 
-    def _set_number_of_boreholes(self) -> None:
+    @property
+    def number_of_boreholes(self) -> int:
         """
-        This functions sets the number of boreholes based on the length of the borefield attribute.
+        This returns the number of boreholes in the borefield attribute.
 
         Returns
         -------
-        None
+        int
+            Number of boreholes
         """
-        self.number_of_boreholes = len(self.borefield) if self.borefield is not None else 0
+        return len(self.borefield) if self.borefield is not None else 0
 
     def set_borefield(self, borefield: list[gt.boreholes.Borehole] = None) -> None:
         """
@@ -388,7 +389,6 @@ class Borefield(BaseClass):
             del self.borefield
             return
         self._borefield = borefield
-        self._set_number_of_boreholes()
         self.D = borefield[0].D
         self.r_b = borefield[0].r_b
         self.H = borefield[0].H
@@ -405,7 +405,6 @@ class Borefield(BaseClass):
         None
         """
         self._borefield = None
-        self._set_number_of_boreholes()
         self.gfunction_calculation_object.remove_previous_data()
         self.custom_gfunction = None
 
