@@ -118,6 +118,7 @@ def test_gfunction_with_irregular_borehole_depth():
     ])
     borehole_reg = borefield.gfunction([3600, 3600 * 20, 3600 * 800])
 
+    # the gfunctions for those two classes should not be equal
     assert not np.array_equal(borehole_irr, borehole_reg)
 
 
@@ -162,9 +163,9 @@ def test_update_depth():
     init_H = borefield.borefield[0].H
 
     borefield.H = init_H + 1
-    borefield._update_borefield_depth()
+    borefield._update_borefield_depth(20)
     for bor in borefield.borefield:
-        assert bor.H == init_H + 1
+        assert bor.H == 20
 
     borefield._update_borefield_depth(init_H + 2)
     for bor in borefield.borefield:

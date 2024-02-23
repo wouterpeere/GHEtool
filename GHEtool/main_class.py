@@ -122,7 +122,7 @@ class Borefield(BaseClass):
         self.results = Results()
 
         # initiate ground parameters
-        self.H = 0.0  # borehole depth m
+        self._H = 0.0  # borehole depth m
         self._ground_data: _GroundData = GroundConstantTemperature()
         self.D: float = 0.0  # buried depth of the borehole [m]
         self.r_b: float = 0.0  # borehole radius [m]
@@ -192,6 +192,37 @@ class Borefield(BaseClass):
             Number of boreholes
         """
         return len(self.borefield) if self.borefield is not None else 0
+
+    @property
+    def H(self) -> float:
+        """
+        This function returns the borehole depth.
+
+        Returns
+        -------
+        float
+            Borehole depth [meters]
+        """
+        return self._H
+
+    @H.setter
+    def H(self, H: float) -> None:
+        """
+        This function sets the borehole depth.
+
+        Parameters
+        ----------
+        H : float
+            Borehole depth [meters]
+
+        Returns
+        -------
+        None
+        """
+        if H <= 0:
+            raise ValueError('The depth cannot be zero or lower.')
+        self._H = H
+        self._update_borefield_depth(H)
 
     def set_borefield(self, borefield: list[gt.boreholes.Borehole] = None) -> None:
         """
@@ -391,7 +422,7 @@ class Borefield(BaseClass):
         self._borefield = borefield
         self.D = np.average([bor.D for bor in borefield])
         self.r_b = np.average([bor.r_b for bor in borefield])
-        self.H = np.average([bor.H for bor in borefield])
+        self._H = np.average([bor.H for bor in borefield])
         self.gfunction_calculation_object.remove_previous_data()
 
     @borefield.deleter
