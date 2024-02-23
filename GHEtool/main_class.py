@@ -389,9 +389,9 @@ class Borefield(BaseClass):
             del self.borefield
             return
         self._borefield = borefield
-        self.D = borefield[0].D
-        self.r_b = borefield[0].r_b
-        self.H = borefield[0].H
+        self.D = np.average([bor.D for bor in borefield])
+        self.r_b = np.average([bor.r_b for bor in borefield])
+        self.H = np.average([bor.H for bor in borefield])
         self.gfunction_calculation_object.remove_previous_data()
 
     @borefield.deleter

@@ -16,9 +16,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
  - Removed set_peak_length from Borefield class (issue #227).
  - Definition of the optimise_load_profile_class (issue #229).
  - Changed number_of_boreholes to an attribute (issue #233).
+ - Definition of H when loading a borefield is now the average borehole depth (issue #233).
 
 ## fixed
 - Small typo's in functions (issue #224).
+- Bug when using borefield with different borehole lengths (issue #233).
 
 
 ## [2.2.1] - 2024-01-27
