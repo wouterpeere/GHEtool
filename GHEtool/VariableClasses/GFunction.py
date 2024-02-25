@@ -90,7 +90,8 @@ class GFunction:
     DEFAULT_STORE_PREVIOUS_VALUES: bool = True
 
     def __init__(self):
-        self.store_previous_values: bool = GFunction.DEFAULT_STORE_PREVIOUS_VALUES
+        self._store_previous_values: bool = GFunction.DEFAULT_STORE_PREVIOUS_VALUES
+        self._store_previous_values_backup: bool= GFunction.DEFAULT_STORE_PREVIOUS_VALUES
         self.options: dict = {'method': 'equivalent'}
         self.alpha: float = 0.
         self.borefield: list[gt.boreholes.Borehole] = []
@@ -104,6 +105,36 @@ class GFunction:
         self.threshold_depth_interpolation: float = .25  # %
 
         self.fifo_list: FIFO = FIFO(8)
+
+
+    @property
+    def store_previous_values(self) -> bool:
+        """
+        This returns the truth value of the store_previous_values attribute.
+
+        Returns
+        -------
+        bool
+            True if the previously calculated gfunction values should be saved.
+        """
+        return self._store_previous_values
+
+    @store_previous_values.setter
+    def store_previous_values(self, store: bool) -> None:
+        """
+        This function sets the store previous values attribute and also its backup.
+
+        Parameters
+        ----------
+        store : bool
+            True if the previous calculated g-function values should be stored.
+
+        Returns
+        -------
+        None
+        """
+        self._store_previous_values = store
+        self._store_previous_values_backup = store
 
     def calculate(self, time_value: Union[list, float, np.ndarray], borefield: List[gt.boreholes.Borehole],
                   alpha: float, interpolate: bool = None):
