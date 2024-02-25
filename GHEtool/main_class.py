@@ -422,6 +422,12 @@ class Borefield(BaseClass):
         self.r_b = np.average([bor.r_b for bor in borefield])
         self._H = np.average([bor.H for bor in borefield])
         self.gfunction_calculation_object.remove_previous_data()
+        unequal_depth = np.any([bor.H != borefield[0].H for bor in borefield])
+        if unequal_depth:
+            self.gfunction_calculation_object._store_previous_values = not unequal_depth
+        else:
+            self.gfunction_calculation_object.store_previous_values = \
+                self.gfunction_calculation_object._store_previous_values_backup
 
     @borefield.deleter
     def borefield(self):
@@ -452,6 +458,10 @@ class Borefield(BaseClass):
         """
         for bor in self._borefield:
             bor.H = H
+
+        # the boreholes are equal in length
+        self.gfunction_calculation_object.store_previous_values = \
+            self.gfunction_calculation_object._store_previous_values_backup
 
     def load_custom_gfunction(self, location: str) -> None:
         """

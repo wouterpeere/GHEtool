@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
  - Definition of the optimise_load_profile_class (issue #229).
  - Changed number_of_boreholes to an attribute (issue #233).
  - Definition of H when loading a borefield is now the average borehole depth (issue #233).
+ - Changed store_previous_values in GFunction class to be a property (issue #233).
 
 ## fixed
 - Small typo's in functions (issue #224).

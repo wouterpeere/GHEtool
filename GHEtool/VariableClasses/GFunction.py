@@ -233,7 +233,6 @@ class GFunction:
                     gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options, method=self.options['method']).gFunc
                     self.options["cylindrical_correction"] = backup
 
-
             # store the calculated g-values
             self.set_new_calculated_data(time_values, depth, gfunc_calculated, borefield, alpha)
 
