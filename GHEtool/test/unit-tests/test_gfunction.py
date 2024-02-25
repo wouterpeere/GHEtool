@@ -56,6 +56,20 @@ def test_unequal_borefields2():
     assert not gfunc._check_borefield(borefield2)
 
 
+def test_store_previous_values():
+    gfunc = GFunction()
+    assert gfunc.store_previous_values
+    assert gfunc._store_previous_values_backup
+
+    gfunc.store_previous_values = False
+    assert not gfunc.store_previous_values
+    assert not gfunc._store_previous_values_backup
+
+    gfunc._store_previous_values = True
+    assert gfunc.store_previous_values
+    assert not gfunc._store_previous_values_backup
+
+
 def test_equal_alpha():
     gfunc = GFunction()
     gfunc.alpha = 2

@@ -69,17 +69,17 @@ def test_nb_of_boreholes():
     borefield.set_ground_parameters(data_ground_flux)
     assert borefield.number_of_boreholes == 120
     borefield.set_borefield(gt.boreholes.rectangle_field(5, 5, 6, 6, 110, 0.1, 0.07))
-    assert borefield.H == 110
-    assert borefield.r_b == 0.07
-    assert borefield.D == 0.1
+    assert np.isclose(borefield.H, 110)
+    assert np.isclose(borefield.r_b, 0.07)
+    assert np.isclose(borefield.D, 0.1)
     assert borefield.number_of_boreholes == 25
     borefield.gfunction(5000, 110)
     assert np.any(borefield.gfunction_calculation_object.depth_array)
     borefield.borefield = gt.boreholes.rectangle_field(6, 5, 6, 6, 100, 1, 0.075)
     assert not np.any(borefield.gfunction_calculation_object.depth_array)
-    assert borefield.H == 100
-    assert borefield.r_b == 0.075
-    assert borefield.D == 1
+    assert np.isclose(borefield.H, 100)
+    assert np.isclose(borefield.r_b, 0.075)
+    assert np.isclose(borefield.D, 1)
     borefield.gfunction(5000, 110)
     assert np.any(borefield.gfunction_calculation_object.depth_array)
     assert borefield.number_of_boreholes == 30
@@ -93,6 +93,33 @@ def test_nb_of_boreholes():
     borefield.set_borefield(None)
     assert not np.any(borefield.gfunction_calculation_object.depth_array)
     assert borefield.number_of_boreholes == 0
+
+
+def test_set_borefield():
+    borefield = Borefield()
+    borefield.set_borefield([
+        gt.boreholes.Borehole(100, 4, 0.075, 0, 0),
+        gt.boreholes.Borehole(150, 4, 0.075, 10, 0)
+    ])
+    assert borefield.H == 125
+
+
+def test_gfunction_with_irregular_borehole_depth():
+    borefield = Borefield()
+    borefield.ground_data = ground_data_constant
+    borefield.set_borefield([
+        gt.boreholes.Borehole(150, 4, 0.075, 0, 0),
+        gt.boreholes.Borehole(100, 4, 0.075, 10, 0)
+    ])
+    borehole_irr = borefield.gfunction([3600, 3600 * 20, 3600 * 800])
+    borefield.set_borefield([
+        gt.boreholes.Borehole(125, 4, 0.075, 0, 0),
+        gt.boreholes.Borehole(125, 4, 0.075, 10, 0)
+    ])
+    borehole_reg = borefield.gfunction([3600, 3600 * 20, 3600 * 800])
+
+    # the gfunctions for those two classes should not be equal
+    assert not np.array_equal(borehole_irr, borehole_reg)
 
 
 def test_create_rectangular_field():
@@ -119,7 +146,7 @@ def test_create_U_shaped_field():
 def test_create_L_shaped_field():
     borefield = Borefield()
     borefield.create_L_shaped_borefield(10, 9, 6, 6, 110, 4, 0.075)
-    assert borefield.number_of_boreholes == 10+ 8
+    assert borefield.number_of_boreholes == 10 + 8
     borefields_equal(borefield.borefield, gt.boreholes.L_shaped_field(10, 10, 6, 6, 110, 4, 0.075))
 
 
@@ -136,9 +163,9 @@ def test_update_depth():
     init_H = borefield.borefield[0].H
 
     borefield.H = init_H + 1
-    borefield._update_borefield_depth()
+    borefield._update_borefield_depth(20)
     for bor in borefield.borefield:
-        assert bor.H == init_H + 1
+        assert bor.H == 20
 
     borefield._update_borefield_depth(init_H + 2)
     for bor in borefield.borefield:
@@ -570,28 +597,28 @@ def test_calculate_temperatures():
        10.15255075,  9.54096457,  9.12037341,  8.72303207,  9.00480061,
         9.51054181, 10.12547914, 10.80869029, 11.24107298, 11.74562143,
        11.87654742, 10.92504277, 10.21207583,  9.59666225,  9.17178911,
-        8.77253798,  9.0537501 ,  9.55988622, 10.17614817, 10.85968208,
+        8.77253798,  9.0537501,  9.55988622, 10.17614817, 10.85968208,
        11.29206477, 11.79661323, 11.92753922, 10.97603456, 10.26306763,
-        9.64765405,  9.2227809 ,  8.82352977,  9.1047419 ,  9.61146373,
-       10.22920734, 10.91368494, 11.34666291, 11.85119791, 11.9809148 ,
-       11.02648776, 10.30917151,  9.69046041,  9.2646135 ,  8.86532916,
+        9.64765405,  9.2227809,  8.82352977,  9.1047419,  9.61146373,
+       10.22920734, 10.91368494, 11.34666291, 11.85119791, 11.9809148,
+       11.02648776, 10.30917151,  9.69046041,  9.2646135,  8.86532916,
         9.14747171,  9.65520666, 10.27295028, 10.95742787, 11.39040584,
        11.89494084, 12.02465773, 11.07023069, 10.35291444,  9.73420334,
         9.30835643,  8.90907209,  9.19243444,  9.70106276, 10.31940964,
        11.00419406, 11.43669622, 11.93961809, 12.06604757, 11.10816011,
-       10.38957388,  9.7704954 ,  9.3450551 ,  8.9469248 ,  9.23041   ,
-        9.73903832, 10.3573852 , 11.04216962, 11.47467178, 11.97759365,
+       10.38957388,  9.7704954,  9.3450551,  8.9469248,  9.23041,
+        9.73903832, 10.3573852, 11.04216962, 11.47467178, 11.97759365,
        12.10402313, 11.14613567, 10.42754944,  9.80847096,  9.38353452,
         8.98631798,  9.27039079,  9.77937765, 10.39763925, 11.08153248,
        11.51198131, 12.01208298, 12.13659709, 11.17814528, 10.45960879,
         9.84120172,  9.41680976,  9.01959321,  9.30366603,  9.81265289,
        10.43091449, 11.11480772, 11.54525655, 12.04535822, 12.16987233,
-       11.21142051, 10.49289526,  9.87539571,  9.451568  ,  9.05473695,
+       11.21142051, 10.49289526,  9.87539571,  9.451568,  9.05473695,
         9.33898907,  9.84758987, 10.46467316, 11.14623848, 11.57437959,
        12.07379672, 12.19811941, 11.23999967, 10.52229065,  9.90479109,
         9.48096338,  9.08413234,  9.36838445,  9.87698525, 10.49406855,
-       11.17563386, 11.60377497, 12.1031921 , 12.2275148 , 11.27004561,
-       10.55323455,  9.93631861,  9.51283391,  9.1158352 ,  9.39905299,
+       11.17563386, 11.60377497, 12.1031921, 12.2275148, 11.27004561,
+       10.55323455,  9.93631861,  9.51283391,  9.1158352,  9.39905299,
         9.90536243, 10.51952398, 11.19933578, 11.62696168, 12.12650419,
        12.25159304, 11.29457142, 10.57776036,  9.96084442,  9.53735972]))
     np.testing.assert_array_almost_equal(borefield.results.peak_cooling,
@@ -764,6 +791,38 @@ def test_gfunction():
     np.testing.assert_array_almost_equal(borefield.gfunction([6000, 60000, 600000]), np.array([0.622017, 1.703272, 2.840246]))
     borefield.calculation_setup(use_precalculated_dataset=False)
     np.testing.assert_array_almost_equal(borefield.gfunction([6000, 60000, 600000]), np.array([0.63751082, 1.70657847, 2.84227252]))
+
+
+def test_gfunction_with_irregular_depth():
+    borefield = Borefield()
+    borefield.set_ground_parameters(data_ground_flux)
+    temp = [
+        gt.boreholes.Borehole(100, 4, 0.075, 0, 0),
+        gt.boreholes.Borehole(150, 4, 0.075, 10, 0),
+        gt.boreholes.Borehole(50, 4, 0.075, 100, 0)
+    ]
+    borefield.borefield = temp
+    assert borefield.H == 100
+    g_values = borefield.gfunction([6000, 60000, 600000])
+    borefield._update_borefield_depth(100)
+    assert not np.array_equal(borefield.gfunction([6000, 60000, 600000]), g_values)
+
+    borefield = Borefield()
+    borefield.set_ground_parameters(data_ground_flux)
+    temp = [
+        gt.boreholes.Borehole(100, 4, 0.075, 0, 0),
+        gt.boreholes.Borehole(150, 4, 0.075, 10, 0),
+        gt.boreholes.Borehole(50, 4, 0.075, 100, 0)
+    ]
+    borefield.borefield = temp
+    assert borefield.H == 100
+    temp = [
+        gt.boreholes.Borehole(100, 4, 0.075, 0, 0),
+        gt.boreholes.Borehole(100, 4, 0.075, 10, 0),
+        gt.boreholes.Borehole(100, 4, 0.075, 100, 0)
+    ]
+    borefield.borefield = temp
+    assert not np.array_equal(borefield.gfunction([6000, 60000, 600000]), g_values)
 
 
 def test_load_duration(monkeypatch):

@@ -122,8 +122,7 @@ class Borefield(BaseClass):
         self.results = Results()
 
         # initiate ground parameters
-        self.H = 0.0  # borehole depth m
-        self.number_of_boreholes = 0  # number of total boreholes #
+        self._H = 0.0  # borehole depth m
         self._ground_data: _GroundData = GroundConstantTemperature()
         self.D: float = 0.0  # buried depth of the borehole [m]
         self.r_b: float = 0.0  # borehole radius [m]
@@ -182,15 +181,46 @@ class Borefield(BaseClass):
         """
         ghe_logger.setLevel(logging.INFO)
 
-    def _set_number_of_boreholes(self) -> None:
+    @property
+    def number_of_boreholes(self) -> int:
         """
-        This functions sets the number of boreholes based on the length of the borefield attribute.
+        This returns the number of boreholes in the borefield attribute.
+
+        Returns
+        -------
+        int
+            Number of boreholes
+        """
+        return len(self.borefield) if self.borefield is not None else 0
+
+    @property
+    def H(self) -> float:
+        """
+        This function returns the borehole depth.
+
+        Returns
+        -------
+        float
+            Borehole depth [meters]
+        """
+        return self._H
+
+    @H.setter
+    def H(self, H: float) -> None:
+        """
+        This function sets the borehole depth.
+
+        Parameters
+        ----------
+        H : float
+            Borehole depth [meters]
 
         Returns
         -------
         None
         """
-        self.number_of_boreholes = len(self.borefield) if self.borefield is not None else 0
+        self._H = H
+        self._update_borefield_depth(H)
 
     def set_borefield(self, borefield: list[gt.boreholes.Borehole] = None) -> None:
         """
@@ -388,11 +418,16 @@ class Borefield(BaseClass):
             del self.borefield
             return
         self._borefield = borefield
-        self._set_number_of_boreholes()
-        self.D = borefield[0].D
-        self.r_b = borefield[0].r_b
-        self.H = borefield[0].H
+        self.D = np.average([bor.D for bor in borefield])
+        self.r_b = np.average([bor.r_b for bor in borefield])
+        self._H = np.average([bor.H for bor in borefield])
         self.gfunction_calculation_object.remove_previous_data()
+        unequal_depth = np.any([bor.H != borefield[0].H for bor in borefield])
+        if unequal_depth:
+            self.gfunction_calculation_object._store_previous_values = not unequal_depth
+        else:
+            self.gfunction_calculation_object.store_previous_values = \
+                self.gfunction_calculation_object._store_previous_values_backup
 
     @borefield.deleter
     def borefield(self):
@@ -405,11 +440,10 @@ class Borefield(BaseClass):
         None
         """
         self._borefield = None
-        self._set_number_of_boreholes()
         self.gfunction_calculation_object.remove_previous_data()
         self.custom_gfunction = None
 
-    def _update_borefield_depth(self, H: float = None) -> None:
+    def _update_borefield_depth(self, H: float) -> None:
         """
         This function updates the borehole depth.
 
@@ -422,14 +456,12 @@ class Borefield(BaseClass):
         -------
         None
         """
-        H = H if H is not None else self.H
-
-        if self._borefield[0].H == H:
-            # the borefield is already at the correct depth
-            return
-
         for bor in self._borefield:
             bor.H = H
+
+        # the boreholes are equal in length
+        self.gfunction_calculation_object.store_previous_values = \
+            self.gfunction_calculation_object._store_previous_values_backup
 
     def load_custom_gfunction(self, location: str) -> None:
         """
@@ -1672,10 +1704,11 @@ class Borefield(BaseClass):
         gvalue : np.ndarray
             1D array with the g-values for all the requested time_value(s)
         """
+        H_var = H
         if H is None:
-            H = self.H
+            H_var = self.H
         # when using a variable ground temperature, sometimes no solution can be found
-        if not isinstance(self.ground_data, GroundConstantTemperature) and H > Borefield.THRESHOLD_DEPTH_ERROR:
+        if not isinstance(self.ground_data, GroundConstantTemperature) and H_var > Borefield.THRESHOLD_DEPTH_ERROR:
             raise UnsolvableDueToTemperatureGradient
 
         def jit_gfunction_calculation() -> np.ndarray:
@@ -1688,9 +1721,11 @@ class Borefield(BaseClass):
                 1D array with the g-values for the requested time intervals
             """
             # set the correct depth of the borefield
-            self._update_borefield_depth(H=H)
+            if not H is None:
+                # only update if H is provided, otherwise the depths of the borefield itself will be used
+                self._update_borefield_depth(H=H)
             return self.gfunction_calculation_object.calculate(
-                time_value, self.borefield, self.ground_data.alpha(H), interpolate=self._calculation_setup.interpolate_gfunctions
+                time_value, self.borefield, self.ground_data.alpha(H_var), interpolate=self._calculation_setup.interpolate_gfunctions
             )
 
         ## 1 bypass any possible precalculated g-functions
@@ -1702,8 +1737,8 @@ class Borefield(BaseClass):
         if self.custom_gfunction is not None:
             # there is precalculated data available
             # check if the requested values can be calculated using the custom_gfunction
-            if self.custom_gfunction.within_range(time_value, H):
-                return self.custom_gfunction.calculate_gfunction(time_value, H)
+            if self.custom_gfunction.within_range(time_value, H_var):
+                return self.custom_gfunction.calculate_gfunction(time_value, H_var)
 
         ## 3 calculate g-function jit
         return jit_gfunction_calculation()

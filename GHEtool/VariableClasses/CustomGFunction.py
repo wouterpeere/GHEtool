@@ -1,6 +1,7 @@
 """
 This file contains both the CustomGFunction class and all the relevant information w.r.t. custom gfunctions.
 """
+import copy
 import pickle
 import warnings
 from typing import List, Union
@@ -213,7 +214,7 @@ class CustomGFunction:
             ghe_logger.info(f'Start H: {H}')
 
             # Calculate the g-function for uniform borehole wall temperature
-
+            borefield = copy.deepcopy(borefield)
             # set borehole depth in borefield
             for borehole in borefield:
                 borehole.H = H
