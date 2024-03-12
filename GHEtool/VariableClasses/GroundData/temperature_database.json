@@ -1,0 +1,974 @@
+{
+    "AUT-Bregenz": {
+        "flux": 0.08,
+        "temperature": 9.5
+    },
+    "AUT-Eisenstadt": {
+        "flux": 0.08,
+        "temperature": 10.4
+    },
+    "AUT-Graz": {
+        "flux": 0.1,
+        "temperature": 9.5
+    },
+    "AUT-Innsbruck": {
+        "flux": 0.06,
+        "temperature": 9.4
+    },
+    "AUT-Linz": {
+        "flux": 0.08,
+        "temperature": 9.5
+    },
+    "AUT-Klagenfurt": {
+        "flux": 0.08,
+        "temperature": 8.1
+    },
+    "AUT-Obergurgl": {
+        "flux": 0.06,
+        "temperature": 2.8
+    },
+    "AUT-Salzburg": {
+        "flux": 0.07,
+        "temperature": 9.0
+    },
+    "AUT-St.Poelten": {
+        "flux": 0.07,
+        "temperature": 9.4
+    },
+    "AUT-Wien": {
+        "flux": 0.06,
+        "temperature": 11.6
+    },
+    "BEL-Antwerpen": {
+        "flux": 0.07,
+        "temperature": 9.6
+    },
+    "BEL-Brussels": {
+        "flux": 0.08,
+        "temperature": 9.7
+    },
+    "BEL-Gent": {
+        "flux": 0.08,
+        "temperature": 9.5
+    },
+    "BEL-Spa": {
+        "flux": 0.06,
+        "temperature": 7.4
+    },
+    "BEL-St.Hubert": {
+        "flux": 0.06,
+        "temperature": 6.8
+    },
+    "BGR-Sofia": {
+        "flux": 0.08,
+        "temperature": 10.4
+    },
+    "BGR-Varna": {
+        "flux": 0.06,
+        "temperature": 12.1
+    },
+    "HRV-Zagreb": {
+        "flux": 0.09,
+        "temperature": 11.3
+    },
+    "HRV-Split": {
+        "flux": 0.04,
+        "temperature": 15.9
+    },
+    "CZE-Brno": {
+        "flux": 0.05,
+        "temperature": 8.7
+    },
+    "CZE-Prague": {
+        "flux": 0.07,
+        "temperature": 7.8
+    },
+    "CZE-Ostrava": {
+        "flux": 0.07,
+        "temperature": 8.2
+    },
+    "DNK-Aalborg": {
+        "flux": 0.07,
+        "temperature": 7.5
+    },
+    "DNK-Copenhagen": {
+        "flux": 0.06,
+        "temperature": 8.6
+    },
+    "DNK-Roenne/Bornh.": {
+        "flux": 0.08,
+        "temperature": 8.3
+    },
+    "DNK-Thorshavn/Faer.": {
+        "flux": 0.07,
+        "temperature": 6.5
+    },
+    "EST-Tallin": {
+        "flux": 0.04,
+        "temperature": 5.2
+    },
+    "EST-Tartu": {
+        "flux": 0.03,
+        "temperature": 4.8
+    },
+    "FIN-Jyvaeskylae": {
+        "flux": 0.04,
+        "temperature": 2.6
+    },
+    "FIN-Helsinki": {
+        "flux": 0.05,
+        "temperature": 5.6
+    },
+    "FIN-Lappeenranta": {
+        "flux": 0.03,
+        "temperature": 3.6
+    },
+    "FIN-Oulu": {
+        "flux": 0.04,
+        "temperature": 2.0
+    },
+    "FIN-Sodankylae": {
+        "flux": 0.03,
+        "temperature": -1.0
+    },
+    "FIN-Turku": {
+        "flux": 0.04,
+        "temperature": 4.8
+    },
+    "FRA-Ajaccio(Corse)": {
+        "flux": 0.08,
+        "temperature": 14.8
+    },
+    "FRA-Bordeaux": {
+        "flux": 0.09,
+        "temperature": 12.4
+    },
+    "FRA-Brest": {
+        "flux": 0.09,
+        "temperature": 10.9
+    },
+    "FRA-Lille": {
+        "flux": 0.07,
+        "temperature": 9.9
+    },
+    "FRA-Marseille": {
+        "flux": 0.05,
+        "temperature": 14.8
+    },
+    "FRA-Montpellier": {
+        "flux": 0.09,
+        "temperature": 13.9
+    },
+    "FRA-Lyon": {
+        "flux": 0.09,
+        "temperature": 11.9
+    },
+    "FRA-Nantes": {
+        "flux": 0.08,
+        "temperature": 11.2
+    },
+    "FRA-Nice": {
+        "flux": 0.05,
+        "temperature": 15.0
+    },
+    "FRA-Paris": {
+        "flux": 0.07,
+        "temperature": 12.1
+    },
+    "FRA-Strasbourg": {
+        "flux": 0.1,
+        "temperature": 10.0
+    },
+    "FRA-Toulouse": {
+        "flux": 0.08,
+        "temperature": 12.6
+    },
+    "FRA-Tours": {
+        "flux": 0.07,
+        "temperature": 11.2
+    },
+    "DEU-Aachen": {
+        "flux": 0.07,
+        "temperature": 9.7
+    },
+    "DEU-Ansbach": {
+        "flux": 0.09,
+        "temperature": 8.3
+    },
+    "DEU-Augsburg": {
+        "flux": 0.08,
+        "temperature": 8.3
+    },
+    "DEU-Bamberg": {
+        "flux": 0.08,
+        "temperature": 8.5
+    },
+    "DEU-Berlin": {
+        "flux": 0.07,
+        "temperature": 9.0
+    },
+    "DEU-Bochum": {
+        "flux": 0.08,
+        "temperature": 10.0
+    },
+    "DEU-Braunlage(Harz)": {
+        "flux": 0.07,
+        "temperature": 5.9
+    },
+    "DEU-Bremen": {
+        "flux": 0.06,
+        "temperature": 8.8
+    },
+    "DEU-Chemnitz": {
+        "flux": 0.05,
+        "temperature": 7.9
+    },
+    "DEU-Cottbus": {
+        "flux": 0.06,
+        "temperature": 8.9
+    },
+    "DEU-Darmstadt": {
+        "flux": 0.08,
+        "temperature": 10.0
+    },
+    "DEU-Donauesching": {
+        "flux": 0.09,
+        "temperature": 7.0
+    },
+    "DEU-Dortmund": {
+        "flux": 0.08,
+        "temperature": 9.6
+    },
+    "DEU-Dresden": {
+        "flux": 0.06,
+        "temperature": 8.9
+    },
+    "DEU-Duesseldorf": {
+        "flux": 0.08,
+        "temperature": 10.3
+    },
+    "DEU-Emden": {
+        "flux": 0.06,
+        "temperature": 9.0
+    },
+    "DEU-Erfurt": {
+        "flux": 0.06,
+        "temperature": 7.9
+    },
+    "DEU-Essen": {
+        "flux": 0.07,
+        "temperature": 9.6
+    },
+    "DEU-Feldberg(Schw.)": {
+        "flux": 0.07,
+        "temperature": 3.3
+    },
+    "DEU-Feldberg(Ts.)": {
+        "flux": 0.07,
+        "temperature": 5.6
+    },
+    "DEU-Fichtelb.(Erz.)": {
+        "flux": 0.07,
+        "temperature": 2.9
+    },
+    "DEU-Flensburg": {
+        "flux": 0.07,
+        "temperature": 8.2
+    },
+    "DEU-Frankfurt/Ma": {
+        "flux": 0.07,
+        "temperature": 9.7
+    },
+    "DEU-Frankfurt/Od": {
+        "flux": 0.07,
+        "temperature": 8.7
+    },
+    "DEU-Freiberg": {
+        "flux": 0.06,
+        "temperature": 7.7
+    },
+    "DEU-Freiburg Brsg.": {
+        "flux": 0.09,
+        "temperature": 10.4
+    },
+    "DEU-Fulda": {
+        "flux": 0.07,
+        "temperature": 8.0
+    },
+    "DEU-Garmisch-P.": {
+        "flux": 0.08,
+        "temperature": 6.5
+    },
+    "DEU-Giessen": {
+        "flux": 0.07,
+        "temperature": 9.0
+    },
+    "DEU-Goerlitz": {
+        "flux": 0.06,
+        "temperature": 8.2
+    },
+    "DEU-Guetersloh": {
+        "flux": 0.07,
+        "temperature": 9.2
+    },
+    "DEU-Halle/Saale": {
+        "flux": 0.07,
+        "temperature": 9.7
+    },
+    "DEU-Hamburg": {
+        "flux": 0.06,
+        "temperature": 8.9
+    },
+    "DEU-Hannover": {
+        "flux": 0.06,
+        "temperature": 8.9
+    },
+    "DEU-Heide/Holst.": {
+        "flux": 0.05,
+        "temperature": 8.3
+    },
+    "DEU-Hof": {
+        "flux": 0.06,
+        "temperature": 6.9
+    },
+    "DEU-Jena": {
+        "flux": 0.06,
+        "temperature": 9.3
+    },
+    "DEU-Kaiserslautern": {
+        "flux": 0.08,
+        "temperature": 9.4
+    },
+    "DEU-Karlsruhe": {
+        "flux": 0.12,
+        "temperature": 10.3
+    },
+    "DEU-Kassel": {
+        "flux": 0.07,
+        "temperature": 8.5
+    },
+    "DEU-Kiel": {
+        "flux": 0.06,
+        "temperature": 8.4
+    },
+    "DEU-Koeln": {
+        "flux": 0.08,
+        "temperature": 10.4
+    },
+    "DEU-Konstanz": {
+        "flux": 0.09,
+        "temperature": 9.0
+    },
+    "DEU-Leipzig": {
+        "flux": 0.06,
+        "temperature": 8.8
+    },
+    "DEU-Magdeburg": {
+        "flux": 0.06,
+        "temperature": 8.7
+    },
+    "DEU-Mannheim": {
+        "flux": 0.11,
+        "temperature": 10.2
+    },
+    "DEU-Muenchen": {
+        "flux": 0.08,
+        "temperature": 8.0
+    },
+    "DEU-Muenster": {
+        "flux": 0.06,
+        "temperature": 9.2
+    },
+    "DEU-Neubrandenburg": {
+        "flux": 0.08,
+        "temperature": 7.9
+    },
+    "DEU-Norderney": {
+        "flux": 0.06,
+        "temperature": 9.0
+    },
+    "DEU-Nuernberg": {
+        "flux": 0.08,
+        "temperature": 8.7
+    },
+    "DEU-Oberstdorf": {
+        "flux": 0.08,
+        "temperature": 6.1
+    },
+    "DEU-Osnabrueck": {
+        "flux": 0.07,
+        "temperature": 9.1
+    },
+    "DEU-Potsdam": {
+        "flux": 0.07,
+        "temperature": 8.7
+    },
+    "DEU-Regensburg": {
+        "flux": 0.08,
+        "temperature": 8.2
+    },
+    "DEU-Rendsburg": {
+        "flux": 0.06,
+        "temperature": 8.2
+    },
+    "DEU-Rosenheim": {
+        "flux": 0.07,
+        "temperature": 8.3
+    },
+    "DEU-Rostock": {
+        "flux": 0.08,
+        "temperature": 8.4
+    },
+    "DEU-Saarbruecken": {
+        "flux": 0.08,
+        "temperature": 9.0
+    },
+    "DEU-Schweinfurt": {
+        "flux": 0.08,
+        "temperature": 8.8
+    },
+    "DEU-Schwerin": {
+        "flux": 0.07,
+        "temperature": 8.4
+    },
+    "DEU-Stuttgart": {
+        "flux": 0.08,
+        "temperature": 9.1
+    },
+    "DEU-Trier": {
+        "flux": 0.07,
+        "temperature": 9.9
+    },
+    "DEU-Ulm": {
+        "flux": 0.08,
+        "temperature": 7.9
+    },
+    "DEU-Wuerzburg": {
+        "flux": 0.08,
+        "temperature": 9.2
+    },
+    "DEU-Zugspitze": {
+        "flux": 0.07,
+        "temperature": -4.8
+    },
+    "GRC-Athens": {
+        "flux": 0.11,
+        "temperature": 17.7
+    },
+    "GRC-Iraklion": {
+        "flux": 0.07,
+        "temperature": 18.7
+    },
+    "GRC-Kalamata": {
+        "flux": 0.08,
+        "temperature": 17.8
+    },
+    "GRC-Kerkyra": {
+        "flux": 0.08,
+        "temperature": 17.5
+    },
+    "GRC-Larissa": {
+        "flux": 0.11,
+        "temperature": 15.7
+    },
+    "GRC-Rhodos": {
+        "flux": 0.2,
+        "temperature": 19.0
+    },
+    "GRC-Thessaloniki": {
+        "flux": 0.08,
+        "temperature": 16.2
+    },
+    "HUN-Budapest": {
+        "flux": 0.07,
+        "temperature": 10.4
+    },
+    "HUN-Debrecen": {
+        "flux": 0.1,
+        "temperature": 9.9
+    },
+    "HUN-Gyoer": {
+        "flux": 0.07,
+        "temperature": 10.4
+    },
+    "HUN-Miskolc": {
+        "flux": 0.1,
+        "temperature": 9.2
+    },
+    "HUN-Pecs": {
+        "flux": 0.08,
+        "temperature": 10.4
+    },
+    "HUN-Szeged": {
+        "flux": 0.1,
+        "temperature": 10.4
+    },
+    "ISL-Reykjavik": {
+        "flux": 0.15,
+        "temperature": 4.3
+    },
+    "IRL-Cork": {
+        "flux": 0.06,
+        "temperature": 9.4
+    },
+    "IRL-Dublin": {
+        "flux": 0.07,
+        "temperature": 9.5
+    },
+    "IRL-Shannon": {
+        "flux": 0.05,
+        "temperature": 10.1
+    },
+    "ITA-Bari": {
+        "flux": 0.08,
+        "temperature": 15.7
+    },
+    "ITA-Bologna": {
+        "flux": 0.06,
+        "temperature": 13.4
+    },
+    "ITA-Bolzano": {
+        "flux": 0.06,
+        "temperature": 11.6
+    },
+    "ITA-Cagliari(Sar": {
+        "flux": 0.08,
+        "temperature": 16.4
+    },
+    "ITA-Catania": {
+        "flux": 0.04,
+        "temperature": 17.9
+    },
+    "ITA-Cortina d Am": {
+        "flux": 0.06,
+        "temperature": 6.6
+    },
+    "ITA-Firenze": {
+        "flux": 0.1,
+        "temperature": 14.8
+    },
+    "ITA-Genova": {
+        "flux": 0.09,
+        "temperature": 15.4
+    },
+    "ITA-Milano": {
+        "flux": 0.06,
+        "temperature": 11.4
+    },
+    "ITA-Messina": {
+        "flux": 0.04,
+        "temperature": 18.2
+    },
+    "ITA-Napoli": {
+        "flux": 0.05,
+        "temperature": 15.5
+    },
+    "ITA-Palermo": {
+        "flux": 0.06,
+        "temperature": 18.5
+    },
+    "ITA-Roma": {
+        "flux": 0.1,
+        "temperature": 15.5
+    },
+    "ITA-Torino": {
+        "flux": 0.05,
+        "temperature": 12.6
+    },
+    "ITA-Trieste": {
+        "flux": 0.05,
+        "temperature": 14.2
+    },
+    "ITA-Venezia": {
+        "flux": 0.04,
+        "temperature": 12.7
+    },
+    "ITA-Volterra(Tus": {
+        "flux": 0.2,
+        "temperature": 14.0
+    },
+    "LVA-Liepaja": {
+        "flux": 0.03,
+        "temperature": 6.7
+    },
+    "LVA-Riga": {
+        "flux": 0.05,
+        "temperature": 6.1
+    },
+    "LIE-Vaduz": {
+        "flux": 0.07,
+        "temperature": 9.2
+    },
+    "LTU-Kaunas": {
+        "flux": 0.03,
+        "temperature": 6.5
+    },
+    "LTU-Klaipeda": {
+        "flux": 0.07,
+        "temperature": 7.0
+    },
+    "LTU-Vilnius": {
+        "flux": 0.04,
+        "temperature": 6.0
+    },
+    "LUX-Luxembourg": {
+        "flux": 0.07,
+        "temperature": 8.3
+    },
+    "MKD-Bitola": {
+        "flux": 0.07,
+        "temperature": 11.0
+    },
+    "MKD-Skopje": {
+        "flux": 0.08,
+        "temperature": 11.3
+    },
+    "NLD-Amsterdam": {
+        "flux": 0.07,
+        "temperature": 9.8
+    },
+    "NLD-Eindhoven": {
+        "flux": 0.06,
+        "temperature": 9.9
+    },
+    "NLD-Groningen": {
+        "flux": 0.08,
+        "temperature": 9.2
+    },
+    "NLD-Maastricht": {
+        "flux": 0.06,
+        "temperature": 9.5
+    },
+    "NLD-Rotterdam": {
+        "flux": 0.07,
+        "temperature": 10.0
+    },
+    "NLD-Utrecht": {
+        "flux": 0.09,
+        "temperature": 9.8
+    },
+    "NOR-Bergen": {
+        "flux": 0.05,
+        "temperature": 7.7
+    },
+    "NOR-Bodoe": {
+        "flux": 0.05,
+        "temperature": 4.5
+    },
+    "NOR-Oslo": {
+        "flux": 0.05,
+        "temperature": 5.7
+    },
+    "NOR-Stavanger": {
+        "flux": 0.05,
+        "temperature": 7.3
+    },
+    "NOR-Tromsoe": {
+        "flux": 0.04,
+        "temperature": 2.5
+    },
+    "NOR-Trondheim": {
+        "flux": 0.05,
+        "temperature": 4.7
+    },
+    "NOR-Vardoe": {
+        "flux": 0.06,
+        "temperature": 1.3
+    },
+    "POL-Bialystok": {
+        "flux": 0.04,
+        "temperature": 6.7
+    },
+    "POL-Krakow": {
+        "flux": 0.06,
+        "temperature": 8.6
+    },
+    "POL-Poznan": {
+        "flux": 0.07,
+        "temperature": 8.2
+    },
+    "POL-Szczecin": {
+        "flux": 0.07,
+        "temperature": 8.4
+    },
+    "POL-Warsaw": {
+        "flux": 0.07,
+        "temperature": 7.8
+    },
+    "POL-Wroclaw": {
+        "flux": 0.06,
+        "temperature": 8.3
+    },
+    "PRT-Faro": {
+        "flux": 0.08,
+        "temperature": 17.2
+    },
+    "PRT-Lisboa": {
+        "flux": 0.07,
+        "temperature": 16.8
+    },
+    "PRT-Porto": {
+        "flux": 0.07,
+        "temperature": 14.5
+    },
+    "ROU-Galati": {
+        "flux": 0.05,
+        "temperature": 10.5
+    },
+    "ROU-Bucharest": {
+        "flux": 0.04,
+        "temperature": 10.6
+    },
+    "ROU-Cluj": {
+        "flux": 0.05,
+        "temperature": 8.2
+    },
+    "ROU-Constanta": {
+        "flux": 0.04,
+        "temperature": 11.5
+    },
+    "ROU-Craiova": {
+        "flux": 0.05,
+        "temperature": 10.6
+    },
+    "ROU-Iasi": {
+        "flux": 0.05,
+        "temperature": 9.4
+    },
+    "ROU-Oradea": {
+        "flux": 0.09,
+        "temperature": 10.2
+    },
+    "ROU-Sibiu": {
+        "flux": 0.07,
+        "temperature": 8.5
+    },
+    "ROU-Timisoara": {
+        "flux": 0.07,
+        "temperature": 10.6
+    },
+    "SRB-Belgrade": {
+        "flux": 0.11,
+        "temperature": 11.8
+    },
+    "SVK-Bratislava": {
+        "flux": 0.06,
+        "temperature": 9.9
+    },
+    "SVK-Kosice": {
+        "flux": 0.08,
+        "temperature": 9.0
+    },
+    "SVK-Poprad": {
+        "flux": 0.06,
+        "temperature": 5.8
+    },
+    "SVN-Ljubljana": {
+        "flux": 0.07,
+        "temperature": 9.6
+    },
+    "ESP-Alicante": {
+        "flux": 0.07,
+        "temperature": 17.9
+    },
+    "ESP-Almeria": {
+        "flux": 0.07,
+        "temperature": 18.5
+    },
+    "ESP-Barcelona": {
+        "flux": 0.07,
+        "temperature": 15.3
+    },
+    "ESP-Bilbao": {
+        "flux": 0.07,
+        "temperature": 14.0
+    },
+    "ESP-Cordoba": {
+        "flux": 0.09,
+        "temperature": 17.5
+    },
+    "ESP-La Coruna": {
+        "flux": 0.1,
+        "temperature": 14.1
+    },
+    "ESP-Madrid": {
+        "flux": 0.08,
+        "temperature": 13.9
+    },
+    "ESP-Malaga": {
+        "flux": 0.05,
+        "temperature": 18.0
+    },
+    "ESP-Mallorca": {
+        "flux": 0.06,
+        "temperature": 15.8
+    },
+    "ESP-Murcia": {
+        "flux": 0.07,
+        "temperature": 18.0
+    },
+    "ESP-Santander": {
+        "flux": 0.06,
+        "temperature": 14.2
+    },
+    "ESP-Valladolid": {
+        "flux": 0.09,
+        "temperature": 12.0
+    },
+    "ESP-Zaragoza": {
+        "flux": 0.07,
+        "temperature": 14.6
+    },
+    "SWE-Falun": {
+        "flux": 0.05,
+        "temperature": 5.5
+    },
+    "SWE-G teborg": {
+        "flux": 0.04,
+        "temperature": 7.1
+    },
+    "SWE-J nk ping": {
+        "flux": 0.04,
+        "temperature": 5.3
+    },
+    "SWE-Kiruna": {
+        "flux": 0.04,
+        "temperature": 2.0
+    },
+    "SWE-Lule": {
+        "flux": 0.04,
+        "temperature": 3.6
+    },
+    "SWE-Malm": {
+        "flux": 0.06,
+        "temperature": 8.0
+    },
+    "SWE-stersund": {
+        "flux": 0.06,
+        "temperature": 3.5
+    },
+    "SWE-Stockholm": {
+        "flux": 0.05,
+        "temperature": 6.6
+    },
+    "SWE-Sundsvall": {
+        "flux": 0.05,
+        "temperature": 5.0
+    },
+    "SWE-Ume": {
+        "flux": 0.05,
+        "temperature": 4.5
+    },
+    "SWE-Visby(Gotlan": {
+        "flux": 0.05,
+        "temperature": 6.8
+    },
+    "CHE-Aigle": {
+        "flux": 0.07,
+        "temperature": 9.1
+    },
+    "CHE-Basel": {
+        "flux": 0.09,
+        "temperature": 9.6
+    },
+    "CHE-Bellinzona": {
+        "flux": 0.07,
+        "temperature": 10.6
+    },
+    "CHE-Bern": {
+        "flux": 0.06,
+        "temperature": 8.2
+    },
+    "CHE-Chur": {
+        "flux": 0.06,
+        "temperature": 8.7
+    },
+    "CHE-Delemont": {
+        "flux": 0.07,
+        "temperature": 8.7
+    },
+    "CHE-Geneve": {
+        "flux": 0.07,
+        "temperature": 9.6
+    },
+    "CHE-Jungfraujoch": {
+        "flux": 0.06,
+        "temperature": -7.9
+    },
+    "CHE-LaChauxdeFon": {
+        "flux": 0.08,
+        "temperature": 5.8
+    },
+    "CHE-Lugano": {
+        "flux": 0.07,
+        "temperature": 11.6
+    },
+    "CHE-Luzern": {
+        "flux": 0.07,
+        "temperature": 8.8
+    },
+    "CHE-Schaffhausen": {
+        "flux": 0.09,
+        "temperature": 8.5
+    },
+    "CHE-St.Gallen": {
+        "flux": 0.07,
+        "temperature": 7.4
+    },
+    "CHE-St.Moritz": {
+        "flux": 0.06,
+        "temperature": 1.2
+    },
+    "CHE-Zermatt": {
+        "flux": 0.06,
+        "temperature": 3.5
+    },
+    "CHE-Zuerich": {
+        "flux": 0.08,
+        "temperature": 8.5
+    },
+    "TUR-Adana": {
+        "flux": 0.06,
+        "temperature": 18.0
+    },
+    "TUR-Ankara": {
+        "flux": 0.07,
+        "temperature": 11.7
+    },
+    "TUR-Istanbul": {
+        "flux": 0.08,
+        "temperature": 14.1
+    },
+    "TUR-Izmir": {
+        "flux": 0.1,
+        "temperature": 17.7
+    },
+    "GRB-Aberdeen": {
+        "flux": 0.04,
+        "temperature": 7.9
+    },
+    "GRB-Belfast": {
+        "flux": 0.05,
+        "temperature": 9.0
+    },
+    "GRB-Edinburgh": {
+        "flux": 0.05,
+        "temperature": 8.4
+    },
+    "GRB-London": {
+        "flux": 0.05,
+        "temperature": 9.5
+    },
+    "GRB-Manchester": {
+        "flux": 0.05,
+        "temperature": 9.4
+    },
+    "GRB-Newcastle-Ty": {
+        "flux": 0.08,
+        "temperature": 8.8
+    },
+    "GRB-Plymouth": {
+        "flux": 0.1,
+        "temperature": 11.0
+    }
+}
