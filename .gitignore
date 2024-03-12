@@ -136,4 +136,4 @@ GHEtool/test/unit-tests/test.gvalues
 *.orig
 
 # test json
-*.json
+test.json
