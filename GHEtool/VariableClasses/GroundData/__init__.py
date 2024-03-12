@@ -2,4 +2,3 @@ from .GroundFluxTemperature import GroundFluxTemperature
 from .GroundConstantTemperature import GroundConstantTemperature
 from .GroundTemperatureGradient import GroundTemperatureGradient
 from ._GroundData import _GroundData, GroundLayer
-from .Temperature_database import *
