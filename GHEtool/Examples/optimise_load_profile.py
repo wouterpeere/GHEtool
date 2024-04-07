@@ -60,6 +60,5 @@ def optimise():
     borefield.print_temperature_profile(plot_hourly=True)
 
 
-
 if __name__ == "__main__":  # pragma: no cover
     optimise()
