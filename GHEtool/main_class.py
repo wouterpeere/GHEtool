@@ -1856,6 +1856,7 @@ class Borefield(BaseClass):
         SCOP: float = 10**6,
         SEER: float = 10**6,
         temperature_threshold: float = 0.05,
+        use_hourly_resolution: bool = True
     ) -> None:
         """
         This function optimises the load based on the given borefield and the given hourly load.
@@ -1877,6 +1878,9 @@ class Borefield(BaseClass):
         temperature_threshold : float
             The maximum allowed temperature difference between the maximum and minimum fluid temperatures and their
             respective limits. The lower this threshold, the longer the convergence will take.
+        use_hourly_resolution : bool
+            If use_hourly_resolution is used, the hourly data will be used for this optimisation. This can take some
+            more time than using the monthly resolution, but it will give more accurate results.
 
         Returns
         -------
@@ -1936,7 +1940,7 @@ class Borefield(BaseClass):
             self.load.set_hourly_heating(np.minimum(peak_heat_load_geo, primary_geothermal_load.hourly_heating_load))
 
             # calculate temperature profile, just for the results
-            self.calculate_temperatures(depth=depth)
+            self.calculate_temperatures(depth=depth, hourly=use_hourly_resolution)
 
             # deviation from minimum temperature
             if abs(min(self.results.peak_heating) - self.Tf_min) > temperature_threshold:
