@@ -9,6 +9,7 @@ The articles for which this is the case, are:
 ```{toctree}
 articles/HPT_magazine.rst
 ```
+> Meertens, L. (2024). Invloed van dynamische korte-termijneffecten op de dimensionering van geothermische boorvelden. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
 
 > Coninx, M., De Nies, J., Hermans, L., Peere, W., Boydens, W., Helsen, L. (2024). Cost-efficient cooling of buildings by means of geothermal borefields with active and passive cooling. _Applied Energy_, 355, Art. No. 122261, https://doi.org/10.1016/j.apenergy.2023.122261.
 
