@@ -9,14 +9,14 @@ from GHEtool.VariableClasses.FluidData import FluidData
 
 class CoaxialPipe(_PipeData):
     """
-    Contains information regarding the Multiple U-Tube class.
+    Contains information regarding the Coaxial pipe class.
     """
 
-    __slots__ = 'r_in_in', 'r_in_out', 'r_out_in', 'r_out_out', 'k_g', 'is_inner_inlet', 'R_ff', 'R_fp'
+    __slots__ = 'r_in_in', 'r_in_out', 'r_out_in', 'r_out_out', 'k_g', 'is_inner_inlet', 'R_ff', 'R_fp', 'k_p_out'
 
     def __init__(self, r_in_in: float = None, r_in_out: float = None,
                  r_out_in: float = None, r_out_out: float = None, k_p: float = None, k_g: float = None,
-                 epsilon: float = 1e-6, is_inner_inlet: bool = True):
+                 epsilon: float = 1e-6, is_inner_inlet: bool = True, k_p_out: float = None):
         """
 
         Parameters
@@ -30,13 +30,17 @@ class CoaxialPipe(_PipeData):
         r_out_out : float
             Outer radius of the outer annulus [m]
         k_p : float
-            Pipe thermal conductivity  [W/mK]
+            Pipe thermal conductivity of the inner and outer pipe [W/mK]. If k_p_out is set, k_p is only used for
+            the conductivity of the inner pipe.
         k_g : float
             Thermal conductivity of the grout [W/mK]
         epsilon : float
             Pipe roughness of the tube [m]
         is_inner_inlet : bool
             True if the inlet of the fluid is through the inner annulus
+        k_p_out : float
+            Pipe conductivity of the outer pipe [W/mK]. If None, it is assumed that the outer pipe has the same
+            conductivity as the inner pipe (k_p).
         """
         super().__init__(epsilon=epsilon, k_g=k_g, k_p=k_p)
         self.r_in_in: float = r_in_in
@@ -46,6 +50,7 @@ class CoaxialPipe(_PipeData):
         self.is_inner_inlet: bool = is_inner_inlet
         self.R_ff: float = 0.
         self.R_fp: float = 0.
+        self.k_p_out = k_p if k_p_out is None else k_p_out
 
     def calculate_resistances(self, fluid_data: FluidData) -> None:
         """
@@ -66,7 +71,8 @@ class CoaxialPipe(_PipeData):
             self.r_in_in, self.r_in_out, self.k_p)
         # Outer pipe
         R_p_out = gt.pipes.conduction_thermal_resistance_circular_pipe(
-            self.r_out_in, self.r_out_out, self.k_p)
+            self.r_out_in, self.r_out_out, self.k_p_out)
+
         # Fluid-to-fluid thermal resistance [m.K/W]
         # Inner pipe
         h_f_in = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(

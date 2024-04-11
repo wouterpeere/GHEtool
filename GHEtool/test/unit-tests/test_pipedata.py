@@ -129,6 +129,15 @@ def test_calculate_resistance_coaxial():
     assert np.isclose(pipe.R_ff, 0.16491519753761458)
 
 
+def test_calculate_resistance_coaxial_different_outer_conductivity():
+    pipe = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True, k_p_out=0.2)
+    fluid = gt.media.Fluid('MPG', 20.)
+    fluid = FluidData(0.5, fluid.k, fluid.rho, fluid.cp, fluid.mu)
+    pipe.calculate_resistances(fluid)
+    assert np.isclose(pipe.R_fp, 0.1664396892206207)
+    assert np.isclose(pipe.R_ff, 0.16491519753761458)
+
+
 def test_calculate_borehole_equivalent_resistance_coaxial():
     pipe = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
     fluid = gt.media.Fluid('MPG', 20.)
@@ -157,6 +166,16 @@ def test_calculate_borehole_equivalent_resistance_coaxial():
                          r_out=np.array([r_out_out, r_in_out]) if is_inner_inlet else
                          np.array([r_in_out, r_out_out]),
                          borehole=borehole, k_s=i, k_g=k_g, R_ff=pipe_ghe.R_ff, R_fp=pipe_ghe.R_fp, J=2)
+
+
+def test_calculate_borehole_equivalent_resistance_coaxial_different_outer_conductivity():
+    pipe = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True, k_p_out=0.2)
+    fluid = gt.media.Fluid('MPG', 20.)
+    fluid = FluidData(0.5, fluid.k, fluid.rho, fluid.cp, fluid.mu)
+    borehole = gt.boreholes.Borehole(100, 1, 0.075, 0, 0)
+    pipe.calculate_resistances(fluid)
+    model = pipe.pipe_model(fluid, 2, borehole)
+    assert np.isclose(model.effective_borehole_thermal_resistance(0.5, 4180), 0.22128574562981232)
 
 
 def test_pipe_data_equal_coaxial():
