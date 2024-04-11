@@ -11,7 +11,7 @@
 ## What is *GHEtool*?
 <img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/Icon.png" width="110" align="left">
 
-GHEtool is a Python package that contains all the functionalities needed to deal with borefield design. GHEtool has been developed as a joint effort of KU Leuven (The SySi Team), boydens engineering (part of Sweco) and FH Aachen.
+GHEtool is a Python package that contains all the functionalities needed to deal with borefield design. GHEtool has been developed as a joint effort of KU Leuven (The SySi Team), boydens engineering (part of Sweco) and FH Aachen and is currently being maintained by Enead BV.
 The core of this package is the automated sizing of borefield under different conditions. By making use of combination of just-in-time calculations of thermal ground responses (using [pygfunction](https://github.com/MassimoCimmino/pygfunction)) with
 intelligent interpolation, this automated sizing can be done in the order of milliseconds. Please visit our website [https://GHEtool.eu](https://GHEtool.eu) for more information.
 
@@ -47,7 +47,6 @@ This code is tested with Python 3.8, 3.9, 3.10, 3.11 and 3.12 and requires the f
 * pandas >= 1.4.3
 * pygfunction >= 2.2.1
 * scipy >= 1.8.1
-* scikit-optimize >= 0.9.0
 
 For the tests
 
@@ -245,8 +244,8 @@ For more information about the functionalities of GHEtool, please visit the docu
 
 ## License
 
-*GHEtool* is licensed under the terms of the 3-clause BSD-license.
-See [GHEtool license](LICENSE).
+*GHEtool* is licensed under the terms of the 3-clause BSD-license (see [GHEtool license](LICENSE)).
+For professional licenses, contact us at [info@ghetool.eu](mailto:info@ghetool.eu).
 
 ## Contact GHEtool
 - Do you want to support GHEtool financially or by contributing to our software?
@@ -279,6 +278,8 @@ Peere, W. (2020). Methode voor economische optimalisatie van geothermische verwa
 KU Leuven, Belgium.
 
 ### Applications/Mentions of GHEtool
+Meertens, L. (2024). Invloed van dynamische korte-termijneffecten op de dimensionering van geothermische boorvelden. Master thesis, Department of Mechanical Engineering, KU Lueven, Belgium.
+
 Weynjes, J. (2023). Methode voor het dimensioneren van een geothermisch systeem met regeneratie binnen verschillende ESCO-structuren. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
 
 Hermans, L., Haesen, R., Uytterhoeven, A., Peere, W., Boydens, W., Helsen, L. (2023). Pre-design of collective residential solar districts with seasonal thermal energy storage: Importance of level of detail. _Applied thermal engineering_ 226, Art.No. 120203, 10.1016/j.applthermaleng.2023.120203
