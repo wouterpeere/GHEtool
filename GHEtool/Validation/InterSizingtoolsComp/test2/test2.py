@@ -114,15 +114,9 @@ if __name__ == "__main__":
     depth_L4s = borefield.size(100, L4_sizing=True)
     L4s_stop = time.time()
 
-    borefield.print_temperature_profile(plot_hourly=True)
-
-    print("sizing with dynamic Rb")
-    print("The sizing according to L2 took", round((L2_stop - L2_start) * 1000, 4), "ms and was", depth_L2, "m.")
-    print("The sizing according to L3 took", round((L3_stop - L3_start) * 1000, 4), "ms and was", depth_L3, "m.")
-    print("The sizing according to L4 took", round((L4_stop - L4_start) * 1000, 4), "ms and was", depth_L4, "m.")
-    print("Sizing with static Rb of", Rb_static)
-    print("The sizing according to L2 took", round((L2s_stop - L2s_start) * 1000, 4), "ms and was", depth_L2s, "m.")
-    print("The sizing according to L3 took", round((L3s_stop - L3s_start) * 1000, 4), "ms and was", depth_L3s, "m.")
-    print("The sizing according to L4 took", round((L4s_stop - L4s_start) * 1000, 4), "ms and was", depth_L4s, "m.")
-
-
+    print("The sizing according to L2 has a depth of", depth_L2, "m (using dynamic Rb*) and", depth_L2s,
+          "m (using constant Rb*)")
+    print("The sizing according to L2 has a depth of", depth_L3, "m (using dynamic Rb*) and", depth_L3s,
+          "m (using constant Rb*)")
+    print("The sizing according to L2 has a depth of", depth_L4, "m (using dynamic Rb*) and", depth_L4s,
+          "m (using constant Rb*)")
