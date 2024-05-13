@@ -1,5 +1,5 @@
 """
-This work of (Ahmadfard and Bernier, 2019) provides a set of test cases that can be used to compare
+The work of (Ahmadfard and Bernier, 2019) provides a set of test cases that can be used to compare
 software tools with the ultimate goal of improving the reliability of design methods for sizing
 vertical ground heat exchangers. This document delivers the results on the test file using the GHEtool
 L2-, L3- and L4-sizing methods.
