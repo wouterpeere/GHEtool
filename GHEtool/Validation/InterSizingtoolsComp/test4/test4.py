@@ -64,19 +64,16 @@ if __name__ == "__main__":
 
     # Sizing with dynamic Rb
     # according to L2
-    print('Rb dynamic L2')
     L2_start = time.time()
     depth_L2 = borefield.size(100, L2_sizing=True)
     L2_stop = time.time()
 
     # according to L3
-    print('Rb dynamic L3')
     L3_start = time.time()
     depth_L3 = borefield.size(100, L3_sizing=True)
     L3_stop = time.time()
 
     # according to L4
-    print('Rb dynamic L4')
     L4_start = time.time()
     depth_L4 = borefield.size(100, L4_sizing=True)
     L4_stop = time.time()
@@ -102,8 +99,6 @@ if __name__ == "__main__":
     load = HourlyGeothermalLoad(simulation_period=20)
     load.load_hourly_profile("test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
-
-    # Sizing with constant Rb
 
     L2s_start = time.time()
     depth_L2s = borefield.size(100, L2_sizing=True)

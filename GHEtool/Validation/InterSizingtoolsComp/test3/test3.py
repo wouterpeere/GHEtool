@@ -24,8 +24,7 @@ if __name__ == "__main__":
     fluid_data = FluidData(mfr=33.1/49, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
     pipe_data = MultipleUTube(r_in=0.013, r_out=0.0167, D_s=0.0471/2, k_g=1.73, k_p=0.4)
 
-
-
+    # start test with dynamic Rb*
     # initiate borefield
     borefield = Borefield()
 
@@ -59,12 +58,7 @@ if __name__ == "__main__":
 
     if load.hourly_cooling_load.max() > Qmax:
         Qmax = load.hourly_cooling_load.max()
-
-    print('Qmax in kW', Qmax)
-
     Dt = Qmax*1000/(fluid_data.Cp * fluid_data.mfr)/49
-
-    print('Dt', Dt)
 
     # set temperature bounds
     borefield.set_max_avg_fluid_temperature(35 + Dt/2)
@@ -73,24 +67,21 @@ if __name__ == "__main__":
 
     # Sizing with dynamic Rb
     # according to L2
-    print('Rb dynamic L2')
     L2_start = time.time()
     depth_L2 = borefield.size(100, L2_sizing=True)
     L2_stop = time.time()
 
     # according to L3
-    print('Rb dynamic L3')
     L3_start = time.time()
     depth_L3 = borefield.size(100, L3_sizing=True)
     L3_stop = time.time()
 
     # according to L4
-    print('Rb dynamic L4')
     L4_start = time.time()
     depth_L4 = borefield.size(100, L4_sizing=True)
     L4_stop = time.time()
 
-
+    # start test with constant Rb*
     # initiate borefield
     borefield = Borefield()
 

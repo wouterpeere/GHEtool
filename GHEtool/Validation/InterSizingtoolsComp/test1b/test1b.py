@@ -24,6 +24,7 @@ if __name__ == "__main__":
     fluid_data = FluidData(mfr=0.5585, rho=1052, Cp=3795, mu=0.0052, k_f=0.48)
     pipe_data = MultipleUTube(r_in=0.0137, r_out=0.0167, D_s=0.075/2, k_g=1.4, k_p=0.43, number_of_pipes=1)
 
+    # start test with dynamic Rb*
     # initiate borefield
     borefield = Borefield()
     # set ground data in borefield
@@ -46,8 +47,6 @@ if __name__ == "__main__":
 
     borefield.set_options_gfunction_calculation(options)
 
-
-
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=10)
     load.load_hourly_profile("test1b.csv", header=True, separator=";", decimal_seperator=",",col_heating=1, col_cooling=0)
@@ -57,12 +56,7 @@ if __name__ == "__main__":
 
     if load.hourly_cooling_load.max() > Qmax:
         Qmax = load.hourly_cooling_load.max()
-
-    print('Qmax in kW', Qmax)
-
     Dt = Qmax*1000/(fluid_data.Cp * fluid_data.mfr)
-
-    print('Dt', Dt)
 
     # set temperature bounds
     borefield.set_max_avg_fluid_temperature(35 + Dt/2)
@@ -70,24 +64,21 @@ if __name__ == "__main__":
 
     # Sizing with dynamic Rb
     # according to L2
-    print('Rb dynamic L2')
     L2_start = time.time()
     depth_L2 = borefield.size(100, L2_sizing=True)
     L2_stop = time.time()
 
     # according to L3
-    print('Rb dynamic L3')
     L3_start = time.time()
     depth_L3 = borefield.size(100, L3_sizing=True)
     L3_stop = time.time()
 
     # according to L4
-    print('Rb dynamic L4')
     L4_start = time.time()
     depth_L4 = borefield.size(100, L4_sizing=True)
     L4_stop = time.time()
 
-
+    # start test with constant Rb*
     # initiate borefield
     borefield = Borefield()
 
@@ -108,8 +99,6 @@ if __name__ == "__main__":
     load = HourlyGeothermalLoad(simulation_period=10)
     load.load_hourly_profile("test1b.csv", header=True, separator=";", decimal_seperator=",",col_heating=1, col_cooling=0)
     borefield.load = load
-
-    #Sizing with constant Rb
 
     L2s_start = time.time()
     depth_L2s = borefield.size(100, L2_sizing=True)
