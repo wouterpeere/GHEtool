@@ -67,8 +67,8 @@ if __name__ == "__main__":
     print('Dt', Dt)
 
     # set temperature bounds
-    borefield.set_max_ground_temperature(35 + Dt/2)
-    borefield.set_min_ground_temperature(0 - Dt/2)
+    borefield.set_max_avg_fluid_temperature(35 + Dt/2)
+    borefield.set_min_avg_fluid_temperature(0 - Dt/2)
 
 
     # Sizing with dynamic Rb
@@ -104,8 +104,8 @@ if __name__ == "__main__":
     borefield.set_options_gfunction_calculation(options)
 
     # set temperature bounds
-    borefield.set_max_ground_temperature(35 + Dt / 2)
-    borefield.set_min_ground_temperature(0 - Dt / 2)
+    borefield.set_max_avg_fluid_temperature(35 + Dt/2)
+    borefield.set_min_avg_fluid_temperature(0 - Dt/2)
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=1)
