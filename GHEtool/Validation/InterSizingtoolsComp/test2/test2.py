@@ -37,12 +37,7 @@ if __name__ == "__main__":
                    'segment_ratios': None,
                    'disp': False,
                    'profiles': True,
-                   'method': 'equivalent',
-                   'cyl_correction': False,
-                   'use_short_term_g_function': False,
-                   'use_short_term_trc': False,
-                   'to_combine': False
-
+                   'method': 'equivalent'
                    }
 
     borefield.set_options_gfunction_calculation(options)
