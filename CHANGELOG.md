@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
  - Changed store_previous_values in GFunction class to be a property (issue #233).
  - Changed temperature database to a json-file (issue #235).
  - Changed optimise_load_profile_power to be able to work with hourly data directly (issue #237).
+ - Renamed main_class.py to borefield.py for consistent naming convention (issue #244).
 
 ## fixed
 - Small typo's in functions (issue #224).
