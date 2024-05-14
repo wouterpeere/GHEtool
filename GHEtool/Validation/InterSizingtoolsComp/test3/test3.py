@@ -22,7 +22,7 @@ if __name__ == "__main__":
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=2.25, T_g=10, volumetric_heat_capacity=2592000, flux=0)
     fluid_data = FluidData(mfr=33.1/49, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
-    pipe_data = MultipleUTube(r_in=0.013, r_out=0.0167, D_s=0.0471/2, k_g=1.73, k_p=0.4)
+    pipe_data = MultipleUTube(r_in=0.013, r_out=0.0167, D_s=0.075/2, k_g=1.73, k_p=0.4, number_of_pipes=1)
 
     # start test with dynamic Rb*
     # initiate borefield
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     borefield.set_ground_parameters(ground_data)
     borefield.set_fluid_parameters(fluid_data)
     borefield.set_pipe_parameters(pipe_data)
-    borefield.create_rectangular_borefield(7, 7, 3, 3, 110, 2.5, 0.075)
+    borefield.create_rectangular_borefield(7, 7, 5, 5, 110, 2.5, 0.075)
     Rb_static = 0.1
     borefield.set_Rb(Rb_static)
     borefield.set_options_gfunction_calculation(options)
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     borefield.set_min_avg_fluid_temperature(0 - Dt/2)
 
     # load the hourly profile
-    load = HourlyGeothermalLoad(simulation_period=1)
+    load = HourlyGeothermalLoad(simulation_period=10)
     load.load_hourly_profile("test3.csv", header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
 
