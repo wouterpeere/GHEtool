@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added MonthlyGeothermalLoadMultiYear (issue #227).
 - Added optimise_load_profile_energy (issue #229).
 - Added k_p_out to Coaxial Pipe class (issue #239).
+- Validations and inter-tool comparisons (issue #243).
 
 ## changed
  - Removed set_peak_length from Borefield class (issue #227).

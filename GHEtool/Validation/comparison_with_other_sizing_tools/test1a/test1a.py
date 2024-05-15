@@ -112,7 +112,7 @@ if __name__ == "__main__":
 
     print("The sizing according to L2 has a depth of", depth_L2, "m (using dynamic Rb*) and", depth_L2s,
           "m (using constant Rb*)")
-    print("The sizing according to L2 has a depth of", depth_L3, "m (using dynamic Rb*) and", depth_L3s,
+    print("The sizing according to L3 has a depth of", depth_L3, "m (using dynamic Rb*) and", depth_L3s,
           "m (using constant Rb*)")
-    print("The sizing according to L2 has a depth of", depth_L4, "m (using dynamic Rb*) and", depth_L4s,
+    print("The sizing according to L4 has a depth of", depth_L4, "m (using dynamic Rb*) and", depth_L4s,
           "m (using constant Rb*)")
