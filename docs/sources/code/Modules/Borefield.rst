@@ -2,6 +2,6 @@
 Borefield
 ***************
 
-.. automodule:: GHEtool.borefield
+.. automodule:: GHEtool.Borefield
     :members:
     :show-inheritance:

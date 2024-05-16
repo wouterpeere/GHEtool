@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file. For future 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [2.2.2] - unpublished
+## [2.2.2] - 2024-05-16
 
 ## Added
 - Added multiple ground layers (issue #97).
@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
  - Changed temperature database to a json-file (issue #235).
  - Changed optimise_load_profile_power to be able to work with hourly data directly (issue #237).
  - Renamed main_class.py to borefield.py for consistent naming convention (issue #244).
+ - Removed parameter 'Tf' from borefield.py since it is no longer needed (issue #249).
 
 ## fixed
 - Small typo's in functions (issue #224).
