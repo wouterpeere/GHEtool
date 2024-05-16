@@ -128,7 +128,6 @@ class Borefield(BaseClass):
         self.r_b: float = 0.0  # borehole radius [m]
 
         # initiate fluid parameters
-        self.Tf: float = 0.0  # temperature of the fluid
         self.Tf_max: float = 16.0  # maximum temperature of the fluid
         self.Tf_min: float = 0.0  # minimum temperature of the fluid
 
@@ -790,7 +789,7 @@ class Borefield(BaseClass):
 
         return test_a_tol and test_rtol
 
-    def _Ahmadfard(self, th: float, qh: float, qm: float, qa: float) -> float:
+    def _Ahmadfard(self, th: float, qh: float, qm: float, qa: float, Tf: float) -> float:
         """
         This function sizes the field based on the last year of operation, i.e. quadrants 2 and 4.
 
@@ -807,6 +806,8 @@ class Borefield(BaseClass):
             Monthly average load [W]
         qa : float
             Yearly imbalance load [W]
+        Tf : float
+            Temperature limit of the fluid [°C]
 
         Returns
         -------
@@ -838,7 +839,7 @@ class Borefield(BaseClass):
             Rm = (gfunct_uniform_T[1] - gfunct_uniform_T[0]) / (2 * pi * k_s)
             Rd = (gfunct_uniform_T[0]) / (2 * pi * k_s)
             # calculate the total borehole length
-            L = (qa * Ra + qm * Rm + qh * Rd + qh * self.Rb) / abs(self.Tf - self._Tg())
+            L = (qa * Ra + qm * Rm + qh * Rd + qh * self.Rb) / abs(Tf - self._Tg())
             # updating the depth values
             H_prev = self.H
             self.H = L / self.number_of_boreholes
@@ -846,12 +847,27 @@ class Borefield(BaseClass):
 
         return self.H
 
-    def _Carcel(self, th: float, tcm: float, qh: float, qpm: float, qm: float) -> float:
+    def _Carcel(self, th: float, tcm: float, qh: float, qpm: float, qm: float, Tf: float) -> float:
         """
         This function sizes the field based on the first year of operation, i.e. quadrants 1 and 3.
 
         It uses the methodology developed by (Monzo et al., 2016) [#Monzo]_ and adapted by (Peere et al., 2021) [#PeereBS]_.
         The concept of borefield quadrants is developed by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]_.
+
+                Parameters
+        ----------
+        th : float
+            Peak duration [s]
+        tcm : float
+            Duration of the current month [s]
+        qp : float
+            Peak load [W]
+        qpm : float
+            Average load of the past months [W]
+        qm : float
+            Monthly average load [W]
+        Tf :float
+            Temperature limit of the fluid [°C]
 
         Returns
         -------
@@ -885,7 +901,7 @@ class Borefield(BaseClass):
             Rh = (gfunc_uniform_T[0]) / (2 * pi * k_s)
 
             # calculate the total length
-            L = (qh * self.Rb + qh * Rh + qm * Rcm + qpm * Rpm) / abs(self.Tf - self._Tg())
+            L = (qh * self.Rb + qh * Rh + qm * Rcm + qpm * Rpm) / abs(Tf - self._Tg())
 
             # updating the depth values
             H_prev = self.H
@@ -1096,23 +1112,19 @@ class Borefield(BaseClass):
 
         def size_quadrant1():
             th, _, tcm, qh, qpm, qm = self.load._calculate_first_year_params(False)  # calculate parameters
-            self.Tf = self.Tf_max
-            return self._Carcel(th, tcm, qh, qpm, qm)  # size
+            return self._Carcel(th, tcm, qh, qpm, qm, self.Tf_max)  # size
 
         def size_quadrant2():
             th, qh, qm, qa = self.load._calculate_last_year_params(False)  # calculate parameters
-            self.Tf = self.Tf_max
-            return self._Ahmadfard(th, qh, qm, qa)  # size
+            return self._Ahmadfard(th, qh, qm, qa, self.Tf_max)  # size
 
         def size_quadrant3():
             th, _, tcm, qh, qpm, qm = self.load._calculate_first_year_params(True)  # calculate parameters
-            self.Tf = self.Tf_min
-            return self._Carcel(th, tcm, qh, qpm, qm)  # size
+            return self._Carcel(th, tcm, qh, qpm, qm, self.Tf_min)  # size
 
         def size_quadrant4():
             th, qh, qm, qa = self.load._calculate_last_year_params(True)  # calculate parameters
-            self.Tf = self.Tf_min
-            return self._Ahmadfard(th, qh, qm, qa)  # size
+            return self._Ahmadfard(th, qh, qm, qa, self.Tf_min)  # size
 
         if quadrant_sizing != 0:
             # size according to a specific quadrant
