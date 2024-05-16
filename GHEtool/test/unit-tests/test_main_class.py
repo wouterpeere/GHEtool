@@ -340,7 +340,7 @@ def test_Ahmadfard(ground_data, constant_Rb, result):
     borefield.set_pipe_parameters(pipeData)
     borefield.calculation_setup(use_constant_Rb=constant_Rb)
     th, qh, qm, qa = load._calculate_last_year_params(True)
-    assert np.isclose(result, borefield._Ahmadfard(th, qh, qm, qa))
+    assert np.isclose(result, borefield._Ahmadfard(th, qh, qm, qa, 0))
     assert np.isclose(result, borefield.H)
 
 
@@ -362,7 +362,7 @@ def test_Carcel(ground_data, constant_Rb, result):
     borefield.set_pipe_parameters(pipeData)
     borefield.calculation_setup(use_constant_Rb=constant_Rb)
     th, _, tcm, qh, qpm, qm = load._calculate_first_year_params(True)
-    assert np.isclose(result, borefield._Carcel(th, tcm, qh, qpm, qm))
+    assert np.isclose(result, borefield._Carcel(th, tcm, qh, qpm, qm, 0))
     assert np.isclose(result, borefield.H)
 
 
