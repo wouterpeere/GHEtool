@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file. For future 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [2.3.0] - unpublished
+
+## Added
+- Extra validation based on the work of Ahmadfard & Bernier (issue #243).
+
 ## [2.2.2] - 2024-05-16
 
 ## Added
@@ -267,7 +272,7 @@ code version > speed improvements > v2.1.1.
 ### Fixed 
 - fixed bug in interpolation
 
-
+[2.2.2]: https://github.com/wouterpeere/GHEtool/compare/v2.2.1...v2.2.2
 [2.2.1]: https://github.com/wouterpeere/GHEtool/compare/v2.2.0...v2.2.1
 [2.2.0]: https://github.com/wouterpeere/GHEtool/compare/v2.1.2...v2.2.0
 [2.1.2]: https://github.com/wouterpeere/GHEtool/compare/v2.1.1...v2.1.2
