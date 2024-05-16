@@ -11,10 +11,8 @@ References:
     - Ahmadfard, M., and M. Bernier. 2019. A review of vertical ground heat exchanger sizing tools including an inter-model
 comparison [in eng]. Renewable sustainable energy reviews (OXFORD) 110:247–265.
 """
-import numpy as np
-
-# import all the relevant functions
 from GHEtool import *
+import numpy as np
 import time
 
 
@@ -103,7 +101,6 @@ def test_1a_6h():
     print(f"The sizing according to L3 has a depth of {depth_L3:.2f}m (using dynamic Rb* of {Rb_L3:.3f}) and {depth_L3s:.2f}m (using constant Rb*)")
     print(f"The sizing according to L4 has a depth of {depth_L4:.2f}m (using dynamic Rb* of {Rb_L4:.3f}) and {depth_L4s:.2f}m (using constant Rb*)")
 
-    print(depth_L3, depth_L4, depth_L2s, depth_L3s, depth_L4s, Rb_L2, Rb_L3, Rb_L4)
     assert np.equal(depth_L2, 59.366333293365)
     assert np.equal(depth_L3, 59.542511807290666)
     assert np.equal(depth_L4, 56.2659729399716)
@@ -202,7 +199,6 @@ def test_1a_1h():
     print(f"The sizing according to L3 has a depth of {depth_L3:.2f}m (using dynamic Rb* of {Rb_L3:.3f}) and {depth_L3s:.2f}m (using constant Rb*)")
     print(f"The sizing according to L4 has a depth of {depth_L4:.2f}m (using dynamic Rb* of {Rb_L4:.3f}) and {depth_L4s:.2f}m (using constant Rb*)")
 
-    print(depth_L3, depth_L4, depth_L2s, depth_L3s, depth_L4s, Rb_L2, Rb_L3, Rb_L4)
     assert np.equal(depth_L2, 46.44356767605206)
     assert np.equal(depth_L3, 46.73933500137179)
     assert np.equal(depth_L4, 56.2659729399716)

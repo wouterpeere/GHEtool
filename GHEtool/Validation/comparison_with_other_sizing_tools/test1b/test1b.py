@@ -11,8 +11,8 @@ References:
     - Ahmadfard, M., and M. Bernier. 2019. A review of vertical ground heat exchanger sizing tools including an inter-model
 comparison [in eng]. Renewable sustainable energy reviews (OXFORD) 110:247–265.
 """
-# import all the relevant functions
 from GHEtool import *
+import numpy as np
 import time
 
 
@@ -48,16 +48,19 @@ def test_1b():
     # according to L2
     L2_start = time.time()
     depth_L2 = borefield.size(100, L2_sizing=True)
+    Rb_L2 = borefield.Rb
     L2_stop = time.time()
 
     # according to L3
     L3_start = time.time()
     depth_L3 = borefield.size(100, L3_sizing=True)
+    Rb_L3 = borefield.Rb
     L3_stop = time.time()
 
     # according to L4
     L4_start = time.time()
     depth_L4 = borefield.size(100, L4_sizing=True)
+    Rb_L4 = borefield.Rb
     L4_stop = time.time()
 
     # start test with constant Rb*
@@ -96,12 +99,22 @@ def test_1b():
     depth_L4s = borefield.size(100, L4_sizing=True)
     L4s_stop = time.time()
 
-    print("The sizing according to L2 has a depth of", depth_L2, "m (using dynamic Rb*) and", depth_L2s,
-          "m (using constant Rb*)")
-    print("The sizing according to L3 has a depth of", depth_L3, "m (using dynamic Rb*) and", depth_L3s,
-          "m (using constant Rb*)")
-    print("The sizing according to L4 has a depth of", depth_L4, "m (using dynamic Rb*) and", depth_L4s,
-          "m (using constant Rb*)")
+    print(
+        f"The sizing according to L2 has a depth of {depth_L2:.2f}m (using dynamic Rb* of {Rb_L2:.3f}) and {depth_L2s:.2f}m (using constant Rb*)")
+    print(
+        f"The sizing according to L3 has a depth of {depth_L3:.2f}m (using dynamic Rb* of {Rb_L3:.3f}) and {depth_L3s:.2f}m (using constant Rb*)")
+    print(
+        f"The sizing according to L4 has a depth of {depth_L4:.2f}m (using dynamic Rb* of {Rb_L4:.3f}) and {depth_L4s:.2f}m (using constant Rb*)")
+
+    assert np.equal(depth_L2, 75.67161488446233)
+    assert np.equal(depth_L3, 75.62427445122744)
+    assert np.equal(depth_L4, 71.49549300696316)
+    assert np.equal(depth_L2s, 76.71715998100636)
+    assert np.equal(depth_L3s, 76.66992885379705)
+    assert np.equal(depth_L4s, 72.52247308266297)
+    assert np.equal(Rb_L2, 0.12648875915036317)
+    assert np.equal(Rb_L3, 0.12648767833749805)
+    assert np.equal(Rb_L4, 0.12639600391560102)
 
 
 if __name__ == "__main__":
