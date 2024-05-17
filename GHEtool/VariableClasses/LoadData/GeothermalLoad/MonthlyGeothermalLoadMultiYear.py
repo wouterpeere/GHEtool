@@ -17,7 +17,7 @@ class MonthlyGeothermalLoadMultiYear(MonthlyGeothermalLoadAbsolute):
     def __init__(
         self,
         baseload_heating: ArrayLike = None,
-        baseload_cooling: ArrayLike  = None,
+        baseload_cooling: ArrayLike = None,
         peak_heating: ArrayLike = None,
         peak_cooling: ArrayLike = None,
     ):
