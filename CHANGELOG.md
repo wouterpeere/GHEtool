@@ -3,7 +3,12 @@ All notable changes to this project will be documented in this file. For future 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [2.2.2] - unpublished
+## [2.3.0] - unpublished
+
+## Added
+- Extra validation based on the work of Ahmadfard & Bernier (issue #243).
+
+## [2.2.2] - 2024-05-16
 
 ## Added
 - Added multiple ground layers (issue #97).
@@ -16,11 +21,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## changed
  - Removed set_peak_length from Borefield class (issue #227).
  - Definition of the optimise_load_profile_class (issue #229).
- - Changed number_of_boreholes to an attribute (issue #233).
+ - Changed number_of_boreholes to a property (issue #233).
  - Definition of H when loading a borefield is now the average borehole depth (issue #233).
  - Changed store_previous_values in GFunction class to be a property (issue #233).
  - Changed temperature database to a json-file (issue #235).
  - Changed optimise_load_profile_power to be able to work with hourly data directly (issue #237).
+ - Renamed main_class.py to borefield.py for consistent naming convention (issue #244).
+ - Removed parameter 'Tf' from borefield.py since it is no longer needed (issue #249).
 
 ## fixed
 - Small typo's in functions (issue #224).
@@ -264,7 +271,7 @@ code version > speed improvements > v2.1.1.
 ### Fixed 
 - fixed bug in interpolation
 
-
+[2.2.2]: https://github.com/wouterpeere/GHEtool/compare/v2.2.1...v2.2.2
 [2.2.1]: https://github.com/wouterpeere/GHEtool/compare/v2.2.0...v2.2.1
 [2.2.0]: https://github.com/wouterpeere/GHEtool/compare/v2.1.2...v2.2.0
 [2.1.2]: https://github.com/wouterpeere/GHEtool/compare/v2.1.1...v2.1.2

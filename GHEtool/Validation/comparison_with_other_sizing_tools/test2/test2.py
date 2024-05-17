@@ -11,14 +11,16 @@ References:
     - Ahmadfard, M., and M. Bernier. 2019. A review of vertical ground heat exchanger sizing tools including an inter-model
 comparison [in eng]. Renewable sustainable energy reviews (OXFORD) 110:247–265.
 """
-# import all the relevant functions
 from GHEtool import *
-from statistics import mean
+import numpy as np
 import time
 
-if __name__ == "__main__":
 
+<<<<<<< HEAD:GHEtool/Validation/InterSizingtoolsComp/test2/test2.py
 
+=======
+def test_2_6h():
+>>>>>>> origin/issue243-add-validation-based-on-ahmadfard-bernier:GHEtool/Validation/comparison_with_other_sizing_tools/test2/test2.py
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=2.25, T_g=12.41, volumetric_heat_capacity=2877000, flux=0)
     fluid_data = FluidData(mfr=0.2416667, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
@@ -34,44 +36,33 @@ if __name__ == "__main__":
     borefield.set_pipe_parameters(pipe_data)
     borefield.create_rectangular_borefield(12, 10, 6, 6, 110, 3, 0.054)
 
-    options = {'nSegments': 12,
-                   'segment_ratios': None,
-                   'disp': False,
-                   'profiles': True,
-                   'method': 'equivalent'
-                   }
-
-    borefield.set_options_gfunction_calculation(options)
-
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=10)
     load.load_hourly_profile("test2.csv", header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
 
-    Qmax = load.hourly_heating_load.max()
-
-    if load.hourly_cooling_load.max() > Qmax:
-        Qmax = load.hourly_cooling_load.max()
-    Dt = Qmax*1000/(fluid_data.Cp * fluid_data.mfr)/120
+    delta_t = max(load.max_peak_cooling, load.max_peak_cooling) * 1000 / (fluid_data.Cp * fluid_data.mfr) / 120
 
     # set temperature bounds
-    borefield.set_max_avg_fluid_temperature(35 + Dt/2)
-    borefield.set_min_avg_fluid_temperature(4.4 - Dt/2)
-
+    borefield.set_max_avg_fluid_temperature(35 + delta_t/2)
+    borefield.set_min_avg_fluid_temperature(4.4 - delta_t/2)
 
     # according to L2
     L2_start = time.time()
     depth_L2 = borefield.size(100, L2_sizing=True)
+    Rb_L2 = borefield.Rb
     L2_stop = time.time()
 
     # according to L3
     L3_start = time.time()
     depth_L3 = borefield.size(100, L3_sizing=True)
+    Rb_L3 = borefield.Rb
     L3_stop = time.time()
 
     # according to L4
     L4_start = time.time()
     depth_L4 = borefield.size(100, L4_sizing=True)
+    Rb_L4 = borefield.Rb
     L4_stop = time.time()
 
     # start test with constant Rb*
@@ -85,11 +76,10 @@ if __name__ == "__main__":
     borefield.create_rectangular_borefield(12, 10, 6, 6, 110, 3, 0.054)
     Rb_static = 0.113
     borefield.set_Rb(Rb_static)
-    borefield.set_options_gfunction_calculation(options)
 
     # set temperature bounds
-    borefield.set_max_avg_fluid_temperature(35 + Dt/2)
-    borefield.set_min_avg_fluid_temperature(4.4 - Dt/2)
+    borefield.set_max_avg_fluid_temperature(35 + delta_t/2)
+    borefield.set_min_avg_fluid_temperature(4.4 - delta_t/2)
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=10)
@@ -97,6 +87,7 @@ if __name__ == "__main__":
     #load.peak_cooling_duration = 1
     borefield.load = load
 
+    # Sizing with constant Rb
     L2s_start = time.time()
     depth_L2s = borefield.size(100, L2_sizing=True)
     L2s_stop = time.time()
@@ -111,9 +102,23 @@ if __name__ == "__main__":
     depth_L4s = borefield.size(100, L4_sizing=True)
     L4s_stop = time.time()
 
-    print("The sizing according to L2 has a depth of", depth_L2, "m (using dynamic Rb*) and", depth_L2s,
-          "m (using constant Rb*)")
-    print("The sizing according to L2 has a depth of", depth_L3, "m (using dynamic Rb*) and", depth_L3s,
-          "m (using constant Rb*)")
-    print("The sizing according to L2 has a depth of", depth_L4, "m (using dynamic Rb*) and", depth_L4s,
-          "m (using constant Rb*)")
+    print(
+        f"The sizing according to L2 has a depth of {depth_L2:.2f}m (using dynamic Rb* of {Rb_L2:.3f}) and {depth_L2s:.2f}m (using constant Rb*)")
+    print(
+        f"The sizing according to L3 has a depth of {depth_L3:.2f}m (using dynamic Rb* of {Rb_L3:.3f}) and {depth_L3s:.2f}m (using constant Rb*)")
+    print(
+        f"The sizing according to L4 has a depth of {depth_L4:.2f}m (using dynamic Rb* of {Rb_L4:.3f}) and {depth_L4s:.2f}m (using constant Rb*)")
+
+    assert np.equal(depth_L2, 76.84063723898528)
+    assert np.equal(depth_L3, 79.11228401910488)
+    assert np.equal(depth_L4, 84.77559168467357)
+    assert np.equal(depth_L2s, 77.43318625702659)
+    assert np.equal(depth_L3s, 79.59733272530252)
+    assert np.equal(depth_L4s, 84.97661469091508)
+    assert np.equal(Rb_L2, 0.11113022659380956)
+    assert np.equal(Rb_L3, 0.11146734480480838)
+    assert np.equal(Rb_L4, 0.11234852494964061)
+
+
+if __name__ == "__main__":
+    test_2_6h()

@@ -42,3 +42,18 @@ def test_validate_deep_sizing(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     from GHEtool.Validation.validate_deep_sizing import validate
     validate()
+
+
+def test_validation_ahmadfard():
+    from GHEtool.Validation.comparison_with_other_sizing_tools.test1a.test1a import test_1a_1h, test_1a_6h
+    from GHEtool.Validation.comparison_with_other_sizing_tools.test1b.test1b import test_1b
+    from GHEtool.Validation.comparison_with_other_sizing_tools.test2.test2 import test_2_6h
+    from GHEtool.Validation.comparison_with_other_sizing_tools.test3.test3 import test_3_6h
+    from GHEtool.Validation.comparison_with_other_sizing_tools.test4.test4 import test_4
+
+    test_1a_1h()
+    test_1a_6h()
+    test_1b()
+    test_2_6h()
+    test_3_6h()
+    test_4()
