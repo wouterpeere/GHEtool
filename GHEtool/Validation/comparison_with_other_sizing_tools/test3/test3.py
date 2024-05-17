@@ -98,6 +98,7 @@ def test_3_6h():
     depth_L4s = borefield.size(100, L4_sizing=True)
     L4s_stop = time.time()
 
+
     print(
         f"The sizing according to L2 has a depth of {depth_L2:.2f}m (using dynamic Rb* of {Rb_L2:.3f}) and {depth_L2s:.2f}m (using constant Rb*)")
     print(
