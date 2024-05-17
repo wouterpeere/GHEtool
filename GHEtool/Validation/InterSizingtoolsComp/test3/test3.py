@@ -18,7 +18,6 @@ import time
 
 if __name__ == "__main__":
 
-
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=2.25, T_g=10, volumetric_heat_capacity=2592000, flux=0)
     fluid_data = FluidData(mfr=33.1/49, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
