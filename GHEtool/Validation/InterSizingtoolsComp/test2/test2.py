@@ -18,6 +18,7 @@ import time
 
 if __name__ == "__main__":
 
+
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=2.25, T_g=12.41, volumetric_heat_capacity=2877000, flux=0)
     fluid_data = FluidData(mfr=0.2416667, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
@@ -93,6 +94,7 @@ if __name__ == "__main__":
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=10)
     load.load_hourly_profile("test2.csv", header=True, separator=",", col_heating=1, col_cooling=0)
+    #load.peak_cooling_duration = 1
     borefield.load = load
 
     L2s_start = time.time()
