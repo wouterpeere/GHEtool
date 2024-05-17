@@ -17,12 +17,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added MonthlyGeothermalLoadMultiYear (issue #227).
 - Added optimise_load_profile_energy (issue #229).
 - Added k_p_out to Coaxial Pipe class (issue #239).
-- Validations and inter-tool comparisons (issue #243).
 
 ## changed
  - Removed set_peak_length from Borefield class (issue #227).
  - Definition of the optimise_load_profile_class (issue #229).
- - Changed number_of_boreholes to an attribute (issue #233).
+ - Changed number_of_boreholes to a property (issue #233).
  - Definition of H when loading a borefield is now the average borehole depth (issue #233).
  - Changed store_previous_values in GFunction class to be a property (issue #233).
  - Changed temperature database to a json-file (issue #235).

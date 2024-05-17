@@ -32,7 +32,7 @@ class GroundLayer(BaseClass):
         self.volumetric_heat_capacity: float = self.non_negative(volumetric_heat_capacity)
         self.thickness: float = self.non_negative(thickness)
 
-    def non_negative(self, value) -> float:
+    def non_negative(self, value: float) -> float:
         """
         This function returns the value if the value > 0.
         Otherwise, an error is raised.
