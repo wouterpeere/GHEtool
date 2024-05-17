@@ -4,7 +4,7 @@ software tools with the ultimate goal of improving the reliability of design met
 vertical ground heat exchangers. This document delivers the results on the test file using the GHEtool
 L2-, L3- and L4-sizing methods.
 
-Test 4 – High annual ground load imbalance
+Sensitivity analysis on Test 4
 
 References:
 -----------
@@ -16,6 +16,14 @@ from statistics import mean
 import time
 
 if __name__ == "__main__":
+
+    #Results from Test 4
+    assert np.equal(depth_L2, 124.02695636769329)
+    assert np.equal(depth_L3, 124.67134582762849)
+    assert np.equal(depth_L4, 122.461471483961)
+    assert np.equal(depth_L2s, 121.50772080500283)
+    assert np.equal(depth_L3s, 122.15337731354852)
+    assert np.equal(depth_L4s, 119.99581098989934)
 
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=1.9, T_g=15, volumetric_heat_capacity=2052000, flux=0)
@@ -32,26 +40,20 @@ if __name__ == "__main__":
     borefield.set_pipe_parameters(pipe_data)
     borefield.create_rectangular_borefield(5, 5, 8, 8, 110, 4, 0.075)
 
-    options = {'nSegments': 12,
-                   'segment_ratios': None,
-                   'disp': False,
-                   'profiles': True,
-                   'method': 'equivalent'
-                   }
-
-    borefield.set_options_gfunction_calculation(options)
-
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
     load.load_hourly_profile("test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
 
     # convert inlet fluid temperature to heap pump constraints to constraints on average fluid temperature
-    delta_t = max(load.max_peak_cooling, load.max_peak_cooling) * 1000 / (fluid_data.Cp * fluid_data.mfr) / 25
+    Qmax = load.hourly_heating_load.max()
+    if load.hourly_cooling_load.max() > Qmax:
+        Qmax = load.hourly_cooling_load.max()
+    Dt = Qmax * 1000 / (fluid_data.Cp * fluid_data.mfr) / 25
 
     # set temperature bounds
-    borefield.set_max_avg_fluid_temperature(38 + delta_t/2)
-    borefield.set_min_avg_fluid_temperature(0 - delta_t/2)
+    borefield.set_max_avg_fluid_temperature(38 + Dt/2)
+    borefield.set_min_avg_fluid_temperature(0 - Dt/2)
 
     # Sizing with dynamic Rb
     # according to L2
@@ -83,8 +85,8 @@ if __name__ == "__main__":
     borefield.set_options_gfunction_calculation(options)
 
     # set temperature bounds
-    borefield.set_max_avg_fluid_temperature(38 + delta_t/2)
-    borefield.set_min_avg_fluid_temperature(0 - delta_t/2)
+    borefield.set_max_avg_fluid_temperature(38 + Dt/2)
+    borefield.set_min_avg_fluid_temperature(0 - Dt/2)
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
