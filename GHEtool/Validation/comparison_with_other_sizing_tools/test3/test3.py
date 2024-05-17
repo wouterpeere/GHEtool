@@ -119,3 +119,8 @@ def test_3_6h():
 
 if __name__ == "__main__":
     test_3_6h()
+<<<<<<< HEAD:GHEtool/Validation/InterSizingtoolsComp/test3/test3.py
+
+
+=======
+>>>>>>> origin/issue243-add-validation-based-on-ahmadfard-bernier:GHEtool/Validation/comparison_with_other_sizing_tools/test3/test3.py
