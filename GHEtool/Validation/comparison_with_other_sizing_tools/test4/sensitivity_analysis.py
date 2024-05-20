@@ -11,6 +11,9 @@ References:
     - Ahmadfard, M., and M. Bernier. 2019. A review of vertical ground heat exchanger sizing tools including an inter-model
 comparison [in eng]. Renewable sustainable energy reviews (OXFORD) 110:247–265.
 """
+import sys
+sys.path.append("C:\Workdir\Develop\ghetool")
+
 from GHEtool import *
 import numpy as np
 import time
@@ -41,31 +44,34 @@ def test_4_sensitivity():
     Rb_static = 0.2
     borefield.set_Rb(Rb_static)
 
+    # load the hourly profile
+    load = HourlyGeothermalLoad(simulation_period=20)
+    load.load_hourly_profile("C:\Workdir\Develop\ghetool\GHEtool\Validation\comparison_with_other_sizing_tools\\test4\\test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
+    borefield.load = load
+
+    # convert inlet fluid temperature to heap pump constraints to constraints on average fluid temperature
+    delta_t = max(load.max_peak_cooling, load.max_peak_cooling) * 1000 / (fluid_data.Cp * fluid_data.mfr) / 25
+
     # set temperature bounds
     borefield.set_max_avg_fluid_temperature(38 + delta_t/2)
     borefield.set_min_avg_fluid_temperature(0 - delta_t/2)
 
-    # load the hourly profile
-    load = HourlyGeothermalLoad(simulation_period=20)
-    load.load_hourly_profile("test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
-    borefield.load = load
-
     # Sizing with constant Rb
     L2s_start = time.time()
     depth_L2s_TC_1 = borefield.size(100, L2_sizing=True)
-    Var_depth_L2s_TC_1 = (depth_L2s - depth_L2s_TC_1)/depth_L2s_TC_1*100
+    Var_depth_L2s_TC_1 = (depth_L2s_TC_1-depth_L2s)/depth_L2s*100
     L2s_stop = time.time()
 
     # according to L3
     L3s_start = time.time()
     depth_L3s_TC_1 = borefield.size(100, L3_sizing=True)
-    Var_depth_L3s_TC_1 = (depth_L3s - depth_L3s_TC_1)/depth_L3s_TC_1*100
+    Var_depth_L3s_TC_1 = (depth_L3s_TC_1-depth_L3s)/depth_L3s*100
     L3s_stop = time.time()
 
     # according to L4
     L4s_start = time.time()
     depth_L4s_TC_1 = borefield.size(100, L4_sizing=True)
-    Var_depth_L4s_TC_1 = (depth_L4s - depth_L4s_TC_1)/depth_L4s_TC_1*100
+    Var_depth_L4s_TC_1 = (depth_L4s_TC_1-depth_L4s)/depth_L4s*100
     L4s_stop = time.time()
 
     ## Thermal Conductivity 1 --TC_2    
@@ -92,25 +98,25 @@ def test_4_sensitivity():
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
-    load.load_hourly_profile("test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
+    load.load_hourly_profile("C:\Workdir\Develop\ghetool\GHEtool\Validation\comparison_with_other_sizing_tools\\test4\\test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
 
     # Sizing with constant Rb
     L2s_start = time.time()
     depth_L2s_TC_2 = borefield.size(100, L2_sizing=True)
-    Var_depth_L2s_TC_2 = (depth_L2s - depth_L2s_TC_2)/depth_L2s_TC_2*100
+    Var_depth_L2s_TC_2 = (depth_L2s_TC_2-depth_L2s)/depth_L2s*100
     L2s_stop = time.time()
 
     # according to L3
     L3s_start = time.time()
     depth_L3s_TC_2 = borefield.size(100, L3_sizing=True)
-    Var_depth_L3s_TC_2 = (depth_L3s - depth_L3s_TC_2)/depth_L3s_TC_2*100
+    Var_depth_L3s_TC_2 = (depth_L3s_TC_2-depth_L3s)/depth_L3s*100
     L3s_stop = time.time()
 
     # according to L4
     L4s_start = time.time()
     depth_L4s_TC_2 = borefield.size(100, L4_sizing=True)
-    Var_depth_L4s_TC_2 = (depth_L4s - depth_L4s_TC_2)/depth_L4s_TC_2*100
+    Var_depth_L4s_TC_2 = (depth_L4s_TC_2-depth_L4s)/depth_L4s*100
     L4s_stop = time.time()
 
     ## Spacing 1 --S_1
@@ -137,25 +143,25 @@ def test_4_sensitivity():
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
-    load.load_hourly_profile("test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
+    load.load_hourly_profile("C:\Workdir\Develop\ghetool\GHEtool\Validation\comparison_with_other_sizing_tools\\test4\\test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
 
     # Sizing with constant Rb
     L2s_start = time.time()
     depth_L2s_S_1 = borefield.size(100, L2_sizing=True)
-    Var_depth_L2s_S_1 = (depth_L2s - depth_L2s_S_1)/depth_L2s_S_1*100
+    Var_depth_L2s_S_1 = (depth_L2s_S_1-depth_L2s)/depth_L2s*100
     L2s_stop = time.time()
 
     # according to L3
     L3s_start = time.time()
     depth_L3s_S_1 = borefield.size(100, L3_sizing=True)
-    Var_depth_L3s_S_1 = (depth_L3s - depth_L3s_S_1)/depth_L3s_S_1*100
+    Var_depth_L3s_S_1 = (depth_L3s_S_1-depth_L3s)/depth_L3s*100
     L3s_stop = time.time()
 
     # according to L4
     L4s_start = time.time()
     depth_L4s_S_1 = borefield.size(100, L4_sizing=True)
-    Var_depth_L4s_S_1 = (depth_L4s - depth_L4s_S_1)/depth_L4s_S_1*100
+    Var_depth_L4s_S_1 = (depth_L4s_S_1-depth_L4s)/depth_L4s*100
     L4s_stop = time.time()
 
     ## Spacing 2 --S_2
@@ -182,25 +188,25 @@ def test_4_sensitivity():
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
-    load.load_hourly_profile("test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
+    load.load_hourly_profile("C:\Workdir\Develop\ghetool\GHEtool\Validation\comparison_with_other_sizing_tools\\test4\\test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
 
     # Sizing with constant Rb
     L2s_start = time.time()
     depth_L2s_S_2 = borefield.size(100, L2_sizing=True)
-    Var_depth_L2s_S_2 = (depth_L2s - depth_L2s_S_2)/depth_L2s_S_2*100
+    Var_depth_L2s_S_2 = (depth_L2s_S_2-depth_L2s)/depth_L2s*100
     L2s_stop = time.time()
 
     # according to L3
     L3s_start = time.time()
     depth_L3s_S_2 = borefield.size(100, L3_sizing=True)
-    Var_depth_L3s_S_2 = (depth_L3s - depth_L3s_S_2)/depth_L3s_S_2*100
+    Var_depth_L3s_S_2 = (depth_L3s_S_2-depth_L3s)/depth_L3s*100
     L3s_stop = time.time()
 
     # according to L4
     L4s_start = time.time()
     depth_L4s_S_2 = borefield.size(100, L4_sizing=True)
-    Var_depth_L4s_S_2 = (depth_L4s - depth_L4s_S_2)/depth_L4s_S_2*100
+    Var_depth_L4s_S_2 = (depth_L4s_S_2-depth_L4s)/depth_L4s*100
     L4s_stop = time.time()
 
     ## Ground temperature 1 --GT_1
@@ -227,25 +233,25 @@ def test_4_sensitivity():
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
-    load.load_hourly_profile("test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
+    load.load_hourly_profile("C:\Workdir\Develop\ghetool\GHEtool\Validation\comparison_with_other_sizing_tools\\test4\\test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
 
     # Sizing with constant Rb
     L2s_start = time.time()
     depth_L2s_GT_1 = borefield.size(100, L2_sizing=True)
-    Var_depth_L2s_GT_1 = (depth_L2s - depth_L2s_GT_1)/depth_L2s_GT_1*100
+    Var_depth_L2s_GT_1 = (depth_L2s_GT_1-depth_L2s)/depth_L2s*100
     L2s_stop = time.time()
 
     # according to L3
     L3s_start = time.time()
     depth_L3s_GT_1 = borefield.size(100, L3_sizing=True)
-    Var_depth_L3s_GT_1 = (depth_L3s - depth_L3s_GT_1)/depth_L3s_GT_1*100
+    Var_depth_L3s_GT_1 = (depth_L3s_GT_1-depth_L3s)/depth_L3s*100
     L3s_stop = time.time()
 
     # according to L4
     L4s_start = time.time()
     depth_L4s_GT_1 = borefield.size(100, L4_sizing=True)
-    Var_depth_L4s_GT_1 = (depth_L4s - depth_L4s_GT_1)/depth_L4s_GT_1*100
+    Var_depth_L4s_GT_1 = (depth_L4s_GT_1-depth_L4s)/depth_L4s*100
     L4s_stop = time.time()
 
     ## Ground temperature 2 --GT_2
@@ -272,25 +278,25 @@ def test_4_sensitivity():
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
-    load.load_hourly_profile("test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
+    load.load_hourly_profile("C:\Workdir\Develop\ghetool\GHEtool\Validation\comparison_with_other_sizing_tools\\test4\\test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
 
     # Sizing with constant Rb
     L2s_start = time.time()
     depth_L2s_GT_2 = borefield.size(100, L2_sizing=True)
-    Var_depth_L2s_GT_2 = (depth_L2s - depth_L2s_GT_2)/depth_L2s_GT_2*100
+    Var_depth_L2s_GT_2 = (depth_L2s_GT_2-depth_L2s)/depth_L2s*100
     L2s_stop = time.time()
 
     # according to L3
     L3s_start = time.time()
     depth_L3s_GT_2 = borefield.size(100, L3_sizing=True)
-    Var_depth_L3s_GT_2 = (depth_L3s - depth_L3s_GT_2)/depth_L3s_GT_2*100
+    Var_depth_L3s_GT_2 = (depth_L3s_GT_2-depth_L3s)/depth_L3s*100
     L3s_stop = time.time()
 
     # according to L4
     L4s_start = time.time()
     depth_L4s_GT_2 = borefield.size(100, L4_sizing=True)
-    Var_depth_L4s_GT_2 = (depth_L4s - depth_L4s_GT_2)/depth_L4s_GT_2*100
+    Var_depth_L4s_GT_2 = (depth_L4s_GT_2-depth_L4s)/depth_L4s*100
     L4s_stop = time.time()
 
     ## Boreholes numbers 1 --BN_1
@@ -317,25 +323,25 @@ def test_4_sensitivity():
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
-    load.load_hourly_profile("test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
+    load.load_hourly_profile("C:\Workdir\Develop\ghetool\GHEtool\Validation\comparison_with_other_sizing_tools\\test4\\test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
 
     # Sizing with constant Rb
     L2s_start = time.time()
     depth_L2s_BN_1 = borefield.size(100, L2_sizing=True)
-    Var_depth_L2s_BN_1 = (depth_L2s - depth_L2s_BN_1)/depth_L2s_BN_1*100
+    Var_depth_L2s_BN_1 = (depth_L2s_BN_1-depth_L2s)/depth_L2s*100
     L2s_stop = time.time()
 
     # according to L3
     L3s_start = time.time()
     depth_L3s_BN_1 = borefield.size(100, L3_sizing=True)
-    Var_depth_L3s_BN_1 = (depth_L3s - depth_L3s_BN_1)/depth_L3s_BN_1*100
+    Var_depth_L3s_BN_1 = (depth_L3s_BN_1-depth_L3s)/depth_L3s*100
     L3s_stop = time.time()
 
     # according to L4
     L4s_start = time.time()
     depth_L4s_BN_1 = borefield.size(100, L4_sizing=True)
-    Var_depth_L4s_BN_1 = (depth_L4s - depth_L4s_BN_1)/depth_L4s_BN_1*100
+    Var_depth_L4s_BN_1 = (depth_L4s_BN_1-depth_L4s)/depth_L4s*100
     L4s_stop = time.time()
 
     ## Boreholes numbers 2 --BN_2
@@ -362,25 +368,25 @@ def test_4_sensitivity():
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
-    load.load_hourly_profile("test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
+    load.load_hourly_profile("C:\Workdir\Develop\ghetool\GHEtool\Validation\comparison_with_other_sizing_tools\\test4\\test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
 
     # Sizing with constant Rb
     L2s_start = time.time()
     depth_L2s_BN_2 = borefield.size(100, L2_sizing=True)
-    Var_depth_L2s_BN_2 = (depth_L2s - depth_L2s_BN_2)/depth_L2s_BN_2*100
+    Var_depth_L2s_BN_2 = (depth_L2s_BN_2-depth_L2s)/depth_L2s*100
     L2s_stop = time.time()
 
     # according to L3
     L3s_start = time.time()
     depth_L3s_BN_2 = borefield.size(100, L3_sizing=True)
-    Var_depth_L3s_BN_2 = (depth_L3s - depth_L3s_BN_2)/depth_L3s_BN_2*100
+    Var_depth_L3s_BN_2 = (depth_L3s_BN_2-depth_L3s)/depth_L3s*100
     L3s_stop = time.time()
 
     # according to L4
     L4s_start = time.time()
     depth_L4s_BN_2 = borefield.size(100, L4_sizing=True)
-    Var_depth_L4s_BN_2 = (depth_L4s - depth_L4s_BN_2)/depth_L4s_BN_2*100
+    Var_depth_L4s_BN_2 = (depth_L4s_BN_2-depth_L4s)/depth_L4s*100
     L4s_stop = time.time()
 
 
