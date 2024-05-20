@@ -302,7 +302,7 @@ def test_4_sensitivity():
     ## Boreholes numbers 1 --BN_1
     # 3x3 bores
     # initiate ground, fluid and pipe data
-    ground_data = GroundFluxTemperature(k_s=1.9, T_g=20, volumetric_heat_capacity=2052000, flux=0)
+    ground_data = GroundFluxTemperature(k_s=1.9, T_g=15, volumetric_heat_capacity=2052000, flux=0)
     fluid_data = FluidData(mfr=0.074*139.731/25, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
     pipe_data = MultipleUTube(r_in=0.013, r_out=0.0167, D_s=0.083/2, k_g=0.69, k_p=0.4)
 
@@ -347,7 +347,7 @@ def test_4_sensitivity():
     ## Boreholes numbers 2 --BN_2
     # 7x7 bores
     # initiate ground, fluid and pipe data
-    ground_data = GroundFluxTemperature(k_s=1.9, T_g=20, volumetric_heat_capacity=2052000, flux=0)
+    ground_data = GroundFluxTemperature(k_s=1.9, T_g=15, volumetric_heat_capacity=2052000, flux=0)
     fluid_data = FluidData(mfr=0.074*139.731/25, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
     pipe_data = MultipleUTube(r_in=0.013, r_out=0.0167, D_s=0.083/2, k_g=0.69, k_p=0.4)
 
