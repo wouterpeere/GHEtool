@@ -68,7 +68,7 @@ def test_3_6h():
 
     spacing = [3, 5, 7]
     simulationperiod = [1, 10]
-    results = []
+    results = np.array([])
 
     for s in simulationperiod:
         for B in spacing:
@@ -81,7 +81,7 @@ def test_3_6h():
             borefield.set_ground_parameters(ground_data)
             borefield.set_fluid_parameters(fluid_data)
             borefield.set_pipe_parameters(pipe_data)
-            borefield.create_rectangular_borefield(7, 7, 5, 5, 110, 2.5, 0.075)
+            borefield.create_rectangular_borefield(7, 7, B, B, 110, 2.5, 0.075)
             Rb_static = 0.1
             borefield.set_Rb(Rb_static)
 
@@ -90,23 +90,26 @@ def test_3_6h():
             borefield.set_min_avg_fluid_temperature(0 - delta_t/2)
 
             # load the hourly profile
-            load = HourlyGeothermalLoad(simulation_period=10)
+            load = HourlyGeothermalLoad(simulation_period=s)
             load.load_hourly_profile("test3.csv", header=True, separator=",", col_heating=1, col_cooling=0)
             borefield.load = load
 
             # Sizing with constant Rb
             L2s_start = time.time()
             depth_L2s = borefield.size(100, L2_sizing=True)
+            results = np.append(results, depth_L2s)
             L2s_stop = time.time()
 
             # according to L3
             L3s_start = time.time()
             depth_L3s = borefield.size(100, L3_sizing=True)
+            results = np.append(results, depth_L3s)
             L3s_stop = time.time()
 
             # according to L4
             L4s_start = time.time()
             depth_L4s = borefield.size(100, L4_sizing=True)
+            results = np.append(results, depth_L4s)
             L4s_stop = time.time()
 
     #peak load duration of 6 hours
@@ -121,11 +124,11 @@ def test_3_6h():
     #effects of spacing and design period
     print("Effects of spacing and desing period:")
     print(
-        f"The sizing according to L2 using constant Rb* has a depth of {results[0]:.2f}m (B=3m), {results[3]:.2f} (B=5m), {results[6]:.2f} (B=7m) for a simulation period of 1 year and {results[9]:.2f}m (B=3m), {results[12]:.2f} (B=5m), {results[15]:.2f}(B=7m) for a simulation period of 10 years ")
+        f"The sizing according to L2 using constant Rb* has a depth of {results[0]:.2f}m (B=3m), {results[3]:.2f}m (B=5m), {results[6]:.2f}m (B=7m) for a simulation period of 1 year and {results[9]:.2f}m (B=3m), {results[12]:.2f}m (B=5m), {results[15]:.2f}m (B=7m) for a simulation period of 10 years ")
     print(
-        f"The sizing according to L2 using constant Rb* has a depth of {results[1]:.2f}m (B=3m), {results[4]:.2f} (B=5m), {results[7]:.2f} (B=7m) for a simulation period of 1 year and {results[10]:.2f}m (B=3m), {results[13]:.2f} (B=5m), {results[16]:.2f}(B=7m) for a simulation period of 10 years ")
+        f"The sizing according to L2 using constant Rb* has a depth of {results[1]:.2f}m (B=3m), {results[4]:.2f}m (B=5m), {results[7]:.2f}m (B=7m) for a simulation period of 1 year and {results[10]:.2f}m (B=3m), {results[13]:.2f}m (B=5m), {results[16]:.2f}m (B=7m) for a simulation period of 10 years ")
     print(
-        f"The sizing according to L2 using constant Rb* has a depth of {results[2]:.2f}m (B=3m), {results[5]:.2f} (B=5m), {results[8]:.2f} (B=7m) for a simulation period of 1 year and {results[11]:.2f}m (B=3m), {results[14]:.2f} (B=5m), {results[17]:.2f}(B=7m) for a simulation period of 10 years ")
+        f"The sizing according to L2 using constant Rb* has a depth of {results[2]:.2f}m (B=3m), {results[5]:.2f}m (B=5m), {results[8]:.2f}m (B=7m) for a simulation period of 1 year and {results[11]:.2f}m (B=3m), {results[14]:.2f}m (B=5m), {results[17]:.2f}m (B=7m) for a simulation period of 10 years ")
 
     assert np.equal(depth_L2, 117.36039732946608)
     assert np.equal(depth_L3, 117.1785111449418)
