@@ -11,9 +11,6 @@ References:
     - Ahmadfard, M., and M. Bernier. 2019. A review of vertical ground heat exchanger sizing tools including an inter-model
 comparison [in eng]. Renewable sustainable energy reviews (OXFORD) 110:247–265.
 """
-import sys
-sys.path.append("C:\Workdir\Develop\ghetool")
-
 from GHEtool import *
 import numpy as np
 import time
@@ -46,7 +43,7 @@ def test_4_sensitivity():
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
-    load.load_hourly_profile("C:\Workdir\Develop\ghetool\GHEtool\Validation\comparison_with_other_sizing_tools\\test4\\test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
+    load.load_hourly_profile("test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
 
     # convert inlet fluid temperature to heap pump constraints to constraints on average fluid temperature
@@ -98,7 +95,7 @@ def test_4_sensitivity():
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
-    load.load_hourly_profile("C:\Workdir\Develop\ghetool\GHEtool\Validation\comparison_with_other_sizing_tools\\test4\\test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
+    load.load_hourly_profile("test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
 
     # Sizing with constant Rb
@@ -143,7 +140,7 @@ def test_4_sensitivity():
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
-    load.load_hourly_profile("C:\Workdir\Develop\ghetool\GHEtool\Validation\comparison_with_other_sizing_tools\\test4\\test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
+    load.load_hourly_profile("test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
 
     # Sizing with constant Rb
@@ -188,7 +185,7 @@ def test_4_sensitivity():
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
-    load.load_hourly_profile("C:\Workdir\Develop\ghetool\GHEtool\Validation\comparison_with_other_sizing_tools\\test4\\test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
+    load.load_hourly_profile("test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
 
     # Sizing with constant Rb
@@ -233,7 +230,7 @@ def test_4_sensitivity():
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
-    load.load_hourly_profile("C:\Workdir\Develop\ghetool\GHEtool\Validation\comparison_with_other_sizing_tools\\test4\\test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
+    load.load_hourly_profile("test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
 
     # Sizing with constant Rb
@@ -278,7 +275,7 @@ def test_4_sensitivity():
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
-    load.load_hourly_profile("C:\Workdir\Develop\ghetool\GHEtool\Validation\comparison_with_other_sizing_tools\\test4\\test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
+    load.load_hourly_profile("test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
 
     # Sizing with constant Rb
@@ -323,7 +320,7 @@ def test_4_sensitivity():
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
-    load.load_hourly_profile("C:\Workdir\Develop\ghetool\GHEtool\Validation\comparison_with_other_sizing_tools\\test4\\test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
+    load.load_hourly_profile("test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
 
     # Sizing with constant Rb
@@ -368,7 +365,7 @@ def test_4_sensitivity():
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
-    load.load_hourly_profile("C:\Workdir\Develop\ghetool\GHEtool\Validation\comparison_with_other_sizing_tools\\test4\\test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
+    load.load_hourly_profile("test4.csv", header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
 
     # Sizing with constant Rb
