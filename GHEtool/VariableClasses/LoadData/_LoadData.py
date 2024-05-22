@@ -36,6 +36,8 @@ class _LoadData(BaseClass, ABC):
         self._all_months_equal: bool = True  # true if it is assumed that all months are of the same length
         self._dhw_yearly: float = 0.
         self._start_month: float = 1
+        self.exclude_DHW_from_peak: bool = False  # by default, the DHW increase the peak load. Set to false,
+                                                  # if you only want the heating load to determine the peak in extraction
 
     @property
     def start_month(self) -> int:
@@ -663,6 +665,8 @@ class _LoadData(BaseClass, ABC):
         -------
         dhw power : float
         """
+        if self.exclude_DHW_from_peak:
+            return 0
         return self._dhw_yearly / 8760
 
     @abc.abstractmethod

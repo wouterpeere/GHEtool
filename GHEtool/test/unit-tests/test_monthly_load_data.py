@@ -225,6 +225,20 @@ def test_dhw():
     assert np.array_equal(np.array([7440., 6720., 7440., 7200., 7440., 7200., 7440., 7440., 7200., 7440., 7200., 7440.]), load.baseload_heating)
 
 
+def test_dhw_exclude():
+    load = MonthlyGeothermalLoadAbsolute()
+    load.dhw = 8760*10
+    assert np.array_equal(np.full(12, 10), load.peak_heating)
+    load.exclude_DHW_from_peak = True
+    assert load.dhw_power == 0
+    assert np.array_equal(np.full(12, 10), load.peak_heating)  # since baseload
+
+    load.peak_heating = [20]*12
+    assert np.array_equal(np.full(12, 20), load.peak_heating)
+    load.exclude_DHW_from_peak = False
+    assert np.array_equal(np.full(12, 30), load.peak_heating)
+
+
 def test_yearly_heating_cooling():
     load = MonthlyGeothermalLoadAbsolute(*load_case(2))
     assert load.yearly_heating_load == 160000
