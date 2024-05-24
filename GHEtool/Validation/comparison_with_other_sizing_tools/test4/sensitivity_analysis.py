@@ -77,8 +77,6 @@ def test_4_sensitivity():
     # -153.7044 kW
     # change the peak value this new peak magnitude
 
-    ## Thermal Conductivity 1 --TC_1
-    # 1.5 W/m-K
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=1.9, T_g=15, volumetric_heat_capacity=2052000, flux=0)
     fluid_data = FluidData(mfr=0.074*139.731/25, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
