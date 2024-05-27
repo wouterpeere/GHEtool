@@ -8,13 +8,14 @@ It is also published as: Coninx, M., De Nies, J., Hermans, L., Peere, W., Boyden
 Cost-efficient cooling of buildings by means of geothermal borefields with active and passive cooling.
 Applied Energy, 355, Art. No. 122261, https://doi.org/10.1016/j.apenergy.2023.122261.
 """
+import copy
 
 from GHEtool import Borefield, GroundConstantTemperature, HourlyGeothermalLoadMultiYear
 
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from skopt import gp_minimize
+import optuna
 
 
 def active_passive_cooling(location='Active_passive_example.csv'):
@@ -27,7 +28,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
 
     # variable COP and EER data
     COP = [0.122, 4.365]  # ax+b
-    EER = [-3.916, 17,901]  # ax+b
+    EER = [-3.916, 17.901]  # ax+b
     threshold_active_cooling = 16
 
     # set simulation period
@@ -197,7 +198,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
 
         # recalculate heating load
         heating_ground = update_load_COP(temp_profile, COP, heating_building)
-        cooling_ground = update_load_EER(temp_profile, EER, 16, cooling_building)
+        cooling_ground = update_load_EER(temp_profile, EER, threshold_active_cooling, cooling_building)
 
 
     ### RUN OPTIMISATION
@@ -211,21 +212,19 @@ def active_passive_cooling(location='Active_passive_example.csv'):
     depths = []
 
 
-    def f(depth: list) -> float:
+    def f(depth: float) -> float:
         """
         Optimisation function.
 
         Parameters
         ----------
-        depth : list
-            List with one element: the depth of the borefield in mm
+        depth : float
+            Depth of the borefield in meters
 
         Returns
         -------
         total_cost : float
         """
-        # convert to meters
-        depth = depth[0] / 1000
         borefield._update_borefield_depth(depth)
         borefield.H = depth
         depths.append(depth)
@@ -270,27 +269,30 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         return investment + operational_cost
 
     # add boundaries to figure
-    # multiply with 1000 for numerical stability
-    f([depth_active * 10 ** 3])
-    f([depth_passive * 10 ** 3])
+    MIN_BOUNDARY = depth_active
+    MAX_BOUNDARY = depth_passive
 
-    res = gp_minimize(f,  # the function to minimize
-                      [(depth_active * 10 ** 3, depth_passive * 10 ** 3)],  # the bounds on each dimension of x
-                      acq_func="EI",  # the acquisition function
-                      n_calls=30,  # the number of evaluations of f
-                      initial_point_generator="lhs",
-                      n_random_starts=15,  # the number of random initialization points
-                      # noise=0,       # the noise level (optional)
-                      random_state=1234)  # the random seed
+    def objective(trial: optuna.Trial):
+        depth = trial.suggest_float('depth', MIN_BOUNDARY, MAX_BOUNDARY)
+        return f(depth)
+
+    study = optuna.create_study()
+    study.optimize(objective, n_trials=100)
+
+    depths_sorted = copy.deepcopy(depths)
+    depths_sorted.sort()
+    depths_old_new = {}
+    for idx, depth in enumerate(depths_sorted):
+        depths_old_new[idx] = depths.index(depth)
 
     # plot figures
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
-    ax1.plot(depths, [x/1000 for x in total_costs], marker = 'o', label = "TC")
-    ax1.plot(depths, [x/1000 for x in investment_costs], marker = 'o', label="IC")
-    ax1.plot(depths, [x/1000 for x in operational_costs], marker = 'o', label="OC")
-    ax1.plot(depths, [x/1000 for x in operational_costs_cooling], marker='o', label="OCc")
-    ax1.plot(depths, [x/1000 for x in operational_costs_heating], marker='o', label="OCh")
+    ax1.plot(depths_sorted, [total_costs[depths_old_new[idx]]/1000 for idx, _ in enumerate(depths_sorted)], marker='o', label="TC")
+    ax1.plot(depths_sorted, [investment_costs[depths_old_new[idx]]/1000 for idx, _ in enumerate(depths_sorted)], marker='o', label="IC")
+    ax1.plot(depths_sorted, [operational_costs[depths_old_new[idx]]/1000 for idx, _ in enumerate(depths_sorted)], marker='o', label="OC")
+    ax1.plot(depths_sorted, [operational_costs_cooling[depths_old_new[idx]]/1000 for idx, _ in enumerate(depths_sorted)], marker='o', label="OCc")
+    ax1.plot(depths_sorted, [operational_costs_heating[depths_old_new[idx]]/1000 for idx, _ in enumerate(depths_sorted)], marker='o', label="OCh")
     ax1.set_xlabel(r'Depth (m)', fontsize=14)
     ax1.set_ylabel(r'Costs ($k€$)', fontsize=14)
     ax1.legend(loc='lower left', ncol=3)

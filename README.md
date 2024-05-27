@@ -54,7 +54,7 @@ For the tests
 
 For the active/passive example
 
-* scikit-optimize >= 0.9.0
+* optuna >= 3.6.1
 
 
 ## Quick start
