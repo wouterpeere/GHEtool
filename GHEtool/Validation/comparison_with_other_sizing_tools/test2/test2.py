@@ -16,11 +16,7 @@ import numpy as np
 import time
 
 
-<<<<<<< HEAD:GHEtool/Validation/InterSizingtoolsComp/test2/test2.py
-
-=======
 def test_2_6h():
->>>>>>> origin/issue243-add-validation-based-on-ahmadfard-bernier:GHEtool/Validation/comparison_with_other_sizing_tools/test2/test2.py
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=2.25, T_g=12.41, volumetric_heat_capacity=2877000, flux=0)
     fluid_data = FluidData(mfr=0.2416667, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)

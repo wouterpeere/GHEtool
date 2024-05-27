@@ -486,11 +486,11 @@ def test_4_sensitivity():
 
 
     print(
-        f"The sizing according to L2 has a variation of lenght of {Var_depth_L2s_PM_1:.2f}% and {Var_depth_L2s_PM_2:.2f}% (Peak Magn. -125.7581 and -153.7044 kW), {Var_depth_L2s_TC_1:.2f}% and {Var_depth_L2s_TC_2:.2f}% (Therm. cond. 1.5 and 2.3 W/m-K), {Var_depth_L2s_S_1:.2f}% en {Var_depth_L2s_S_2:.2f}% (6 and 10 m spacing), {Var_depth_L2s_GT_1:.2f}% en {Var_depth_L2s_GT_2:.2f}% (Ground Temp. 10 and 20 C), {Var_depth_L2s_BN_1:.2f}% en {Var_depth_L2s_BN_2:.2f}% (3x3 and 7x7 bores). ")
+        f"The sizing according to L2 has a variation of length of {Var_depth_L2s_PM_1:.2f}% and {Var_depth_L2s_PM_2:.2f}% (Peak Magn. -125.7581 and -153.7044 kW), {Var_depth_L2s_TC_1:.2f}% and {Var_depth_L2s_TC_2:.2f}% (Therm. cond. 1.5 and 2.3 W/m-K), {Var_depth_L2s_S_1:.2f}% en {Var_depth_L2s_S_2:.2f}% (6 and 10 m spacing), {Var_depth_L2s_GT_1:.2f}% en {Var_depth_L2s_GT_2:.2f}% (Ground Temp. 10 and 20 C), {Var_depth_L2s_BN_1:.2f}% en {Var_depth_L2s_BN_2:.2f}% (3x3 and 7x7 bores). ")
     print(
-        f"The sizing according to L3 has a variation of lenght of {Var_depth_L3s_PM_1:.2f}% and {Var_depth_L3s_PM_2:.2f}% (Peak Magn. -125.7581 and -153.7044 kW), {Var_depth_L3s_TC_1:.2f}% and {Var_depth_L3s_TC_2:.2f}% (Therm. cond. 1.5 and 2.3 W/m-K), {Var_depth_L3s_S_1:.2f}% en {Var_depth_L3s_S_2:.2f}% (6 and 10 m spacing), {Var_depth_L3s_GT_1:.2f}% en {Var_depth_L3s_GT_2:.2f}% (Ground Temp. 10 and 20 C), {Var_depth_L3s_BN_1:.2f}% en {Var_depth_L3s_BN_2:.2f}% (3x3 and 7x7 bores). ")
+        f"The sizing according to L3 has a variation of length of {Var_depth_L3s_PM_1:.2f}% and {Var_depth_L3s_PM_2:.2f}% (Peak Magn. -125.7581 and -153.7044 kW), {Var_depth_L3s_TC_1:.2f}% and {Var_depth_L3s_TC_2:.2f}% (Therm. cond. 1.5 and 2.3 W/m-K), {Var_depth_L3s_S_1:.2f}% en {Var_depth_L3s_S_2:.2f}% (6 and 10 m spacing), {Var_depth_L3s_GT_1:.2f}% en {Var_depth_L3s_GT_2:.2f}% (Ground Temp. 10 and 20 C), {Var_depth_L3s_BN_1:.2f}% en {Var_depth_L3s_BN_2:.2f}% (3x3 and 7x7 bores). ")
     print(
-        f"The sizing according to L4 has a variation of lenght of ---- and ---- (Peak Magn. -125.7581 and -153.7044 kW), {Var_depth_L4s_TC_1:.2f}% and {Var_depth_L4s_TC_2:.2f}% (Therm. cond. 1.5 and 2.3 W/m-K), {Var_depth_L4s_S_1:.2f}% en {Var_depth_L4s_S_2:.2f}% (6 and 10 m spacing), {Var_depth_L4s_GT_1:.2f}% en {Var_depth_L4s_GT_2:.2f}% (Ground Temp. 10 and 20 C), {Var_depth_L4s_BN_1:.2f}% en {Var_depth_L4s_BN_2:.2f}% (3x3 and 7x7 bores). ")
+        f"The sizing according to L4 has a variation of length of ---- and ---- (Peak Magn. -125.7581 and -153.7044 kW), {Var_depth_L4s_TC_1:.2f}% and {Var_depth_L4s_TC_2:.2f}% (Therm. cond. 1.5 and 2.3 W/m-K), {Var_depth_L4s_S_1:.2f}% en {Var_depth_L4s_S_2:.2f}% (6 and 10 m spacing), {Var_depth_L4s_GT_1:.2f}% en {Var_depth_L4s_GT_2:.2f}% (Ground Temp. 10 and 20 C), {Var_depth_L4s_BN_1:.2f}% en {Var_depth_L4s_BN_2:.2f}% (3x3 and 7x7 bores). ")
 
 
 
