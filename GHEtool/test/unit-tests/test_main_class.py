@@ -837,7 +837,6 @@ def test_load_duration(monkeypatch):
     borefield.optimise_load_profile_power(load, 150)
     borefield.optimise_load_profile_energy(load, 150)
 
-
 def test_optimise_load_profile_power(monkeypatch):
     borefield = Borefield()
     monkeypatch.setattr(plt, "show", lambda: None)
@@ -851,6 +850,7 @@ def test_optimise_load_profile_power(monkeypatch):
     assert borefield._building_load.simulation_period == 40
     assert borefield._secundary_borefield_load.simulation_period == 40
     assert borefield._external_load.simulation_period == 40
+    assert len(borefield.results.peak_heating) == 350400
 
 
 def test_optimise_load_profile_energy(monkeypatch):
@@ -866,6 +866,7 @@ def test_optimise_load_profile_energy(monkeypatch):
     assert borefield._building_load.simulation_period == 40
     assert borefield._secundary_borefield_load.simulation_period == 40
     assert borefield._external_load.simulation_period == 40
+    assert len(borefield.results.peak_heating) == 480
 
 
 def test_optimise_borefield_small_power(monkeypatch):

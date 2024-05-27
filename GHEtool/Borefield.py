@@ -2118,7 +2118,7 @@ class Borefield(BaseClass):
                     curr_cooling_peak = self.load.peak_cooling_simulation_period[i]
                     if self.results.peak_cooling[i] > self.Tf_max:
                         curr_cooling_peak = max(0.1, curr_cooling_peak - 1 * max(1, 10 * (
-                                    -self.Tf_max + np.max(self.results.peak_cooling))))
+                                    -self.Tf_max + self.results.peak_cooling[i])))
                     else:
                         curr_cooling_peak = min(peak_cooling[i % 12], curr_cooling_peak * 1.01)
                         if curr_cooling_peak == peak_cooling[i % 12]:
@@ -2159,7 +2159,7 @@ class Borefield(BaseClass):
         temp.hourly_cooling_load = f(primary_geothermal_load.hourly_cooling_load_simulation_period, self.load.peak_cooling_simulation_period)
 
         # set correct hourly load
-        self.load = temp
+        self._borefield_load = temp
 
         # calculate the corresponding geothermal load
         self._secundary_borefield_load = HourlyGeothermalLoadMultiYear()

@@ -11,6 +11,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## Changed
 - Change skopt to Optuna in active_passive_cooling (issue #258).
 
+## Fixed
+- Problems with optimise_load_profile_energy (issue #255).
+
+
 ## [2.2.2] - 2024-05-16
 
 ## Added
@@ -21,7 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added optimise_load_profile_energy (issue #229).
 - Added k_p_out to Coaxial Pipe class (issue #239).
 
-## changed
+## Changed
  - Removed set_peak_length from Borefield class (issue #227).
  - Definition of the optimise_load_profile_class (issue #229).
  - Changed number_of_boreholes to an attribute (issue #233).
@@ -32,7 +36,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
  - Renamed main_class.py to borefield.py for consistent naming convention (issue #244).
  - Removed parameter 'Tf' from borefield.py since it is no longer needed (issue #249).
 
-## fixed
+## Fixed
 - Small typo's in functions (issue #224).
 - Bug when using borefield with different borehole lengths (issue #233).
 
@@ -46,12 +50,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Cylindrical borehole correction (issue #187).
 - __add__ functionality for the load classes (issue #202).
 
-## changed
+## Changed
 - Negative reference temperatures for the fluid are now possible (issue #192).
 - Move code related to the GUI to a separate repo (issue #210).
 - Autorelease to PyPi and testPyPi (issue #212).
 
-## fixed
+## Fixed
 - Problem with multiyear hourly data and L3 sizing (issue #153).
 - Problem with negative g-function values (issue #187).
 - Bug in load-duration curve when not working with optimize load profile (issue #189).
@@ -274,7 +278,7 @@ code version > speed improvements > v2.1.1.
 ### Fixed 
 - fixed bug in interpolation
 
-[2.2.2]: https://github.com/wouterpeere/GHEtool/compare/v2.2.0...v2.2.2
+[2.2.2]: https://github.com/wouterpeere/GHEtool/compare/v2.2.1...v2.2.2
 [2.2.1]: https://github.com/wouterpeere/GHEtool/compare/v2.2.0...v2.2.1
 [2.2.0]: https://github.com/wouterpeere/GHEtool/compare/v2.1.2...v2.2.0
 [2.1.2]: https://github.com/wouterpeere/GHEtool/compare/v2.1.1...v2.1.2
