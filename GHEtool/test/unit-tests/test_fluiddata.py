@@ -2,6 +2,7 @@ import pytest
 
 from GHEtool import *
 
+import numpy as np
 import pygfunction as gt
 
 
@@ -12,6 +13,7 @@ def test_fluid_data():
     assert data.rho == 998
     assert data.Cp == 4180
     assert data.mu == 1e-3
+    assert data.vfr == 0
 
 
 def test_fluid_data_equal():
@@ -42,6 +44,27 @@ def test_set_mfr():
     data_fluid = FluidData(0.2, 0.568, 998, 4180, 1e-3)
     data_fluid.set_mass_flow_rate(10)
     assert data_fluid.mfr == 10
+
+
+def test_set_vfr():
+    with pytest.raises(ValueError):
+        FluidData(0.2, 0.568, 998, 4180, 1e-3, 0.2)
+    data_fluid = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    assert data_fluid.vfr == 0
+    data_fluid.vfr = 0.2
+    assert data_fluid._mfr == 0
+    assert data_fluid.vfr == 0.2
+    assert np.isclose(data_fluid.mfr, 0.2*998/1000)
+
+    data_fluid.mfr = 0.2
+    assert data_fluid._mfr == 0.2
+    assert data_fluid.vfr == 0
+    assert data_fluid.mfr == 0.2
+
+    data_fluid = FluidData(None, 0.568, 998, 4180, 1e-3, 0.2)
+    assert data_fluid._mfr == 0
+    assert data_fluid.vfr == 0.2
+    assert np.isclose(data_fluid.mfr, 0.2 * 998 / 1000)
 
 
 def test_import_fluid_from_pygfunction():
