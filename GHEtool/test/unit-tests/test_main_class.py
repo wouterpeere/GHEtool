@@ -833,9 +833,9 @@ def test_load_duration(monkeypatch):
     load = HourlyGeothermalLoad()
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     borefield.load = load
-    borefield.plot_load_duration(legend=True)
     borefield.optimise_load_profile_power(load, 150)
     borefield.optimise_load_profile_energy(load, 150)
+
 
 def test_optimise_load_profile_power(monkeypatch):
     borefield = Borefield()

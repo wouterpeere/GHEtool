@@ -1,5 +1,6 @@
 import pytest
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
@@ -35,6 +36,12 @@ def test_imbalance():
     assert load.imbalance == -78840
     load = HourlyGeothermalLoad(np.ones(8760), np.ones(8760)*10)
     assert load.imbalance == 78840
+
+
+def test_load_duration(monkeypatch):
+    monkeypatch.setattr(plt, "show", lambda: None)
+    load = HourlyGeothermalLoad(np.ones(8760)*10, np.ones(8760))
+    load.plot_load_duration(legend=True)
 
 
 def test_resample_to_monthly():
