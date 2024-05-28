@@ -44,7 +44,7 @@ class FluidData(BaseClass):
         self.Cp: float | None = Cp    # Thermal capacity J/kgK
         self.mu: float | None = mu    # Dynamic viscosity Pa/s
         self._vfr: float | None = vfr  # Volume flow rate l/s
-        
+
         if self._mfr is not None and self._vfr is not None:
             raise ValueError('You cannot set both the mass flow rate and volume flow rate')
         else:
@@ -81,7 +81,7 @@ class FluidData(BaseClass):
         None
         """
         self._vfr = vfr
-        self.mfr = 0
+        self._mfr = 0
 
     @property
     def mfr(self) -> float:
@@ -94,7 +94,7 @@ class FluidData(BaseClass):
         float
             mass flow rate [kg/s]
         """
-        if self._mfr is not None:
+        if self._mfr != 0:
             return self._mfr
         return self.vfr / 1000 * self.rho
 
@@ -114,7 +114,7 @@ class FluidData(BaseClass):
         None
         """
         self._mfr = mfr
-        self.vfr = 0
+        self._vfr = 0
 
     def set_mass_flow_rate(self, mfr: float) -> None:
         """

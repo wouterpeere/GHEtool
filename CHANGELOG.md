@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Added
 - Added the option to exclude DHW from the peak heating load (issue #252).
+- Added vfr to Fluid Class (issue #262).
 
 ## Changed
 - Change skopt to Optuna in active_passive_cooling (issue #258).
