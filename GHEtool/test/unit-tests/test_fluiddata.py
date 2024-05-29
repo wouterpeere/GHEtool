@@ -13,7 +13,7 @@ def test_fluid_data():
     assert data.rho == 998
     assert data.Cp == 4180
     assert data.mu == 1e-3
-    assert data.vfr == 0
+    assert data.vfr is None
 
 
 def test_fluid_data_equal():
@@ -50,19 +50,19 @@ def test_set_vfr():
     with pytest.raises(ValueError):
         FluidData(0.2, 0.568, 998, 4180, 1e-3, 0.2)
     data_fluid = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-    assert data_fluid.vfr == 0
+    assert data_fluid.vfr is None
     data_fluid.vfr = 0.2
-    assert data_fluid._mfr == 0
+    assert data_fluid._mfr is None
     assert data_fluid.vfr == 0.2
     assert np.isclose(data_fluid.mfr, 0.2*998/1000)
 
     data_fluid.mfr = 0.2
     assert data_fluid._mfr == 0.2
-    assert data_fluid.vfr == 0
+    assert data_fluid.vfr is None
     assert data_fluid.mfr == 0.2
 
     data_fluid = FluidData(None, 0.568, 998, 4180, 1e-3, 0.2)
-    assert data_fluid._mfr == 0
+    assert data_fluid._mfr is None
     assert data_fluid.vfr == 0.2
     assert np.isclose(data_fluid.mfr, 0.2 * 998 / 1000)
 

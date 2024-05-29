@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## Changed
 - Change skopt to Optuna in active_passive_cooling (issue #258).
 - Moved plot_load_duration to HourlyLoad class (issue #260).
+- Clean up Baseclass (issue #260).
 
 ## Fixed
 - Problems with optimise_load_profile_energy (issue #255).

@@ -14,6 +14,7 @@ class FluidData(BaseClass):
     """
 
     __slots__ = 'k_f', 'rho', 'Cp', 'mu', '_mfr', '_vfr'
+    __allow_none__ = ['_vfr', '_mfr']
 
     def __init__(self, mfr: float = None,
                  k_f: float = None,
@@ -47,11 +48,7 @@ class FluidData(BaseClass):
 
         if self._mfr is not None and self._vfr is not None:
             raise ValueError('You cannot set both the mass flow rate and volume flow rate')
-        else:
-            if self._mfr is None:
-                self._mfr = 0
-            else:
-                self._vfr = 0
+
 
     @property
     def vfr(self) -> float:
@@ -81,7 +78,7 @@ class FluidData(BaseClass):
         None
         """
         self._vfr = vfr
-        self._mfr = 0
+        self._mfr = None
 
     @property
     def mfr(self) -> float:
@@ -94,7 +91,7 @@ class FluidData(BaseClass):
         float
             mass flow rate [kg/s]
         """
-        if self._mfr != 0:
+        if self._mfr is not None:
             return self._mfr
         return self.vfr / 1000 * self.rho
 
@@ -114,7 +111,7 @@ class FluidData(BaseClass):
         None
         """
         self._mfr = mfr
-        self._vfr = 0
+        self._vfr = None
 
     def set_mass_flow_rate(self, mfr: float) -> None:
         """
