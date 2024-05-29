@@ -108,6 +108,19 @@ def test_input_validation():
 
 
 def test_yearly_loads():
+    baseload_heating = np.array([1000] * 12)  # 1000 kWh/month for each month
+    baseload_cooling = np.array([500] * 12)  # 500 kWh/month for each month
+    peak_heating = np.array([50] * 12)  # 50 kW/month for each month
+    peak_cooling = np.array([30] * 12)  # 30 kW/month for each month
+
+    # Initialize the MonthlyGeothermalLoadMultiYear object with test data
+    load_data = MonthlyGeothermalLoadMultiYear(
+        baseload_heating=baseload_heating,
+        baseload_cooling=baseload_cooling,
+        peak_heating=peak_heating,
+        peak_cooling=peak_cooling
+    )
+
     assert np.array_equal(load_data.yearly_cooling_load_simulation_period, [6000])
     assert np.array_equal(load_data.yearly_heating_load_simulation_period, [12000])
     assert np.array_equal(load_data.yearly_cooling_peak_simulation_period, [30])
