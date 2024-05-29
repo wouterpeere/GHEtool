@@ -105,3 +105,10 @@ def test_input_validation():
     # Test input validation for incorrect length
     with pytest.raises(ValueError):
         load_data.peak_heating = np.array([40] * 15)
+
+
+def test_yearly_loads():
+    assert np.array_equal(load_data.yearly_cooling_load_simulation_period, [6000])
+    assert np.array_equal(load_data.yearly_heating_load_simulation_period, [12000])
+    assert np.array_equal(load_data.yearly_cooling_peak_simulation_period, [30])
+    assert np.array_equal(load_data.yearly_heating_peak_simulation_period, [50])

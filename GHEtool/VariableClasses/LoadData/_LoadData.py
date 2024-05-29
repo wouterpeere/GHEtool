@@ -227,7 +227,7 @@ class _LoadData(BaseClass, ABC):
     @property
     def baseload_heating_simulation_period(self) -> np.ndarray:
         """
-        This function returns the baseload heating in kWh/month for a whole simulation period.
+        This function returns the baseload heating in kWh/month for the whole simulation period.
 
         Returns
         -------
@@ -251,7 +251,7 @@ class _LoadData(BaseClass, ABC):
     @property
     def peak_heating_simulation_period(self) -> np.ndarray:
         """
-        This function returns the peak heating in kW/month for a whole simulation period.
+        This function returns the peak heating in kW/month for the whole simulation period.
 
         Returns
         -------
@@ -263,7 +263,7 @@ class _LoadData(BaseClass, ABC):
     @property
     def peak_cooling_simulation_period(self) -> np.ndarray:
         """
-        This function returns the peak cooling in kW/month for a whole simulation period.
+        This function returns the peak cooling in kW/month for the whole simulation period.
 
         Returns
         -------
@@ -275,7 +275,7 @@ class _LoadData(BaseClass, ABC):
     @property
     def baseload_heating_power_simulation_period(self) -> np.ndarray:
         """
-        This function returns the average heating power in kW avg/month for a whole simulation period.
+        This function returns the average heating power in kW avg/month for the whole simulation period.
 
         Returns
         -------
@@ -287,7 +287,7 @@ class _LoadData(BaseClass, ABC):
     @property
     def baseload_cooling_power_simulation_period(self) -> np.ndarray:
         """
-        This function returns the average cooling power in kW avg/month for a whole simulation period.
+        This function returns the average cooling power in kW avg/month for the whole simulation period.
 
         Returns
         -------
@@ -295,6 +295,55 @@ class _LoadData(BaseClass, ABC):
             average cooling for the whole simulation period
         """
         return np.tile(self.baseload_cooling_power, self.simulation_period)
+
+    @property
+    def yearly_heating_load_simulation_period(self) -> np.array:
+        """
+        This function returns the yearly heating demand in kWh/year for the whole simulation period.
+
+        Returns
+        -------
+        yearly heating : np.ndarray
+            yearly heating for the whole simulation period
+        """
+        return np.sum(np.reshape(self.baseload_heating_simulation_period, (self.simulation_period, 12)), axis=1)
+
+    @property
+    def yearly_cooling_load_simulation_period(self) -> np.array:
+        """
+        This function returns the yearly cooling demand in kWh/year for the whole simulation period.
+
+        Returns
+        -------
+        yearly heating : np.ndarray
+            yearly cooling for the whole simulation period
+        """
+        return np.sum(np.reshape(self.baseload_cooling_simulation_period, (self.simulation_period, 12)), axis=1)
+
+    @property
+    def yearly_heating_peak_simulation_period(self) -> np.array:
+        """
+        This function returns the yearly heating peak in kW/year for the whole simulation period.
+
+        Returns
+        -------
+        yearly heating : np.ndarray
+            yearly heating for the whole simulation period
+        """
+        return np.max(np.reshape(self.peak_heating_simulation_period, (self.simulation_period, 12)), axis=1)
+
+    @property
+    def yearly_cooling_peak_simulation_period(self) -> np.array:
+        """
+        This function returns the yearly cooling peak in kW/year for the whole simulation period.
+
+        Returns
+        -------
+        yearly heating : np.ndarray
+            yearly cooling for the whole simulation period
+        """
+        return np.max(np.reshape(self.peak_cooling_simulation_period, (self.simulation_period, 12)), axis=1)
+
 
     @property
     def imbalance(self) -> float:
