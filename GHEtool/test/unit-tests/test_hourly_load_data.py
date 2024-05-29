@@ -62,8 +62,8 @@ def test_yearly_loads():
                                 simulation_period=10)
     assert np.array_equal(load.yearly_cooling_load_simulation_period, [76728840]*10)
     assert np.array_equal(load.yearly_heating_load_simulation_period, [38364420]*10)
-    assert np.array_equal(load.yearly_cooling_peak_simulation_period, [17518])
-    assert np.array_equal(load.yearly_heating_peak_simulation_period, [8759])
+    assert np.array_equal(load.yearly_cooling_peak_simulation_period, [17518]*10)
+    assert np.array_equal(load.yearly_heating_peak_simulation_period, [8759]*10)
 
 
 def test_baseload_heating():
