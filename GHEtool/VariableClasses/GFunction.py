@@ -9,11 +9,14 @@ from scipy import interpolate
 
 from .CustomGFunction import _time_values
 
+from GHEtool.VariableClasses.Short_term_effects import update_pygfunction_short_term_effects
 from GHEtool.VariableClasses.cylindrical_correction import update_pygfunction
 
-# add cylindrical correction to pygfunction
-update_pygfunction()
-
+# add short-term effects to pygfunction 
+print('update_pygfunction_short_term_effects STARTING')
+update_pygfunction_short_term_effects()
+print('update_pygfunction_short_term_effects FINISHED')
+#update_pygfunction()
 
 class FIFO:
     """
@@ -87,7 +90,7 @@ class GFunction:
 
     DEFAULT_TIMESTEPS: np.ndarray = _time_values()
     DEFAULT_NUMBER_OF_TIMESTEPS: int = DEFAULT_TIMESTEPS.size
-    DEFAULT_STORE_PREVIOUS_VALUES: bool = True
+    DEFAULT_STORE_PREVIOUS_VALUES: bool = False
 
     def __init__(self):
         self._store_previous_values: bool = GFunction.DEFAULT_STORE_PREVIOUS_VALUES
@@ -184,6 +187,7 @@ class GFunction:
             gvalues : np.ndarray
                 1D array with all the requested gvalues
             """
+
             # check if the value is in the fifo_list
             # if the value is in self.depth_array, there is no problem, since the interpolation will be exact anyway
             if self.fifo_list.in_fifo_list(depth) and depth not in self.depth_array:
@@ -218,7 +222,8 @@ class GFunction:
                 return gfunc_interpolated
 
             # calculate the g-values for uniform borehole wall temperature
-            gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options, method=self.options['method']).gFunc
+            gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options, method=self.options['method']).gFunc      
+            gfunc_calculated = np.array(gfunc_calculated)
             if np.any(gfunc_calculated < 0):
                 warnings.warn('There are negative g-values. This can be caused by a large borehole radius.')
                 if self.use_cyl_correction_when_negative:
