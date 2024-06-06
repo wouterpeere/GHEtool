@@ -11,18 +11,19 @@ References:
     - Ahmadfard, M., and M. Bernier. 2019. A review of vertical ground heat exchanger sizing tools including an inter-model
 comparison [in eng]. Renewable sustainable energy reviews (OXFORD) 110:247–265.
 """
-from GHEtool import *
-import numpy as np
-import time
 import os
+import time
+
+import numpy as np
+
+from GHEtool import *
 
 
 def test_3_6h():
-
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=2.25, T_g=10, volumetric_heat_capacity=2592000, flux=0)
-    fluid_data = FluidData(mfr=33.1/49, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
-    pipe_data = MultipleUTube(r_in=0.013, r_out=0.0167, D_s=0.075/2, k_g=1.73, k_p=0.4, number_of_pipes=1)
+    fluid_data = FluidData(mfr=33.1 / 49, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
+    pipe_data = MultipleUTube(r_in=0.013, r_out=0.0167, D_s=0.075 / 2, k_g=1.73, k_p=0.4, number_of_pipes=1)
 
     # start test with dynamic Rb*
     # initiate borefield
@@ -36,14 +37,15 @@ def test_3_6h():
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=10)
-    load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test3.csv'), header=True, separator=",", col_heating=1, col_cooling=0)
+    load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test3.csv'), header=True, separator=",",
+                             col_heating=1, col_cooling=0)
     borefield.load = load
 
     delta_t = max(load.max_peak_cooling, load.max_peak_cooling) * 1000 / (fluid_data.Cp * fluid_data.mfr) / 49
 
     # set temperature bounds
-    borefield.set_max_avg_fluid_temperature(35 + delta_t/2)
-    borefield.set_min_avg_fluid_temperature(0 - delta_t/2)
+    borefield.set_max_avg_fluid_temperature(35 + delta_t / 2)
+    borefield.set_min_avg_fluid_temperature(0 - delta_t / 2)
 
     # Sizing with dynamic Rb
     # according to L2
@@ -70,7 +72,6 @@ def test_3_6h():
 
     for s in simulation_period:
         for B in spacing:
-
             # start test with constant Rb*
             # initiate borefield
             borefield = Borefield()
@@ -84,8 +85,8 @@ def test_3_6h():
             borefield.set_Rb(Rb_static)
 
             # set temperature bounds
-            borefield.set_max_avg_fluid_temperature(35 + delta_t/2)
-            borefield.set_min_avg_fluid_temperature(0 - delta_t/2)
+            borefield.set_max_avg_fluid_temperature(35 + delta_t / 2)
+            borefield.set_min_avg_fluid_temperature(0 - delta_t / 2)
 
             # load the hourly profile
             borefield.load = load

@@ -11,10 +11,12 @@ References:
     - Ahmadfard, M., and M. Bernier. 2019. A review of vertical ground heat exchanger sizing tools including an inter-model
 comparison [in eng]. Renewable sustainable energy reviews (OXFORD) 110:247–265.
 """
-from GHEtool import *
-import numpy as np
-import time
 import os
+import time
+
+import numpy as np
+
+from GHEtool import *
 
 
 def test_1b():
@@ -35,7 +37,8 @@ def test_1b():
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=10)
-    load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test1b.csv'), header=True, separator=";", decimal_seperator=",", col_heating=1,
+    load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test1b.csv'), header=True, separator=";",
+                             decimal_seperator=",", col_heating=1,
                              col_cooling=0)
     borefield.load = load
 

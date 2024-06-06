@@ -11,10 +11,12 @@ References:
     - Ahmadfard, M., and M. Bernier. 2019. A review of vertical ground heat exchanger sizing tools including an inter-model
 comparison [in eng]. Renewable sustainable energy reviews (OXFORD) 110:247–265.
 """
-from GHEtool import *
-import numpy as np
-import time
 import os
+import time
+
+import numpy as np
+
+from GHEtool import *
 
 
 def test_4_sensitivity():

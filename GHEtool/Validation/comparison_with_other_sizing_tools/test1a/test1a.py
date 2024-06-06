@@ -11,10 +11,12 @@ References:
     - Ahmadfard, M., and M. Bernier. 2019. A review of vertical ground heat exchanger sizing tools including an inter-model
 comparison [in eng]. Renewable sustainable energy reviews (OXFORD) 110:247–265.
 """
-from GHEtool import *
-import numpy as np
-import time
 import os
+import time
+
+import numpy as np
+
+from GHEtool import *
 
 
 def test_1a_6h():
@@ -35,7 +37,8 @@ def test_1a_6h():
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=10)
-    load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test1a.csv'), header=True, separator=",", col_heating=1, col_cooling=0)
+    load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test1a.csv'), header=True, separator=",",
+                             col_heating=1, col_cooling=0)
     borefield.load = load
 
     delta_t = max(load.max_peak_cooling, load.max_peak_cooling) * 1000 / (fluid_data.Cp * fluid_data.mfr)
@@ -96,9 +99,12 @@ def test_1a_6h():
     depth_L4s = borefield.size(100, L4_sizing=True)
     L4s_stop = time.time()
 
-    print(f"The sizing according to L2 has a depth of {depth_L2:.2f}m (using dynamic Rb* of {Rb_L2:.3f}) and {depth_L2s:.2f}m (using constant Rb*)")
-    print(f"The sizing according to L3 has a depth of {depth_L3:.2f}m (using dynamic Rb* of {Rb_L3:.3f}) and {depth_L3s:.2f}m (using constant Rb*)")
-    print(f"The sizing according to L4 has a depth of {depth_L4:.2f}m (using dynamic Rb* of {Rb_L4:.3f}) and {depth_L4s:.2f}m (using constant Rb*)")
+    print(
+        f"The sizing according to L2 has a depth of {depth_L2:.2f}m (using dynamic Rb* of {Rb_L2:.3f}) and {depth_L2s:.2f}m (using constant Rb*)")
+    print(
+        f"The sizing according to L3 has a depth of {depth_L3:.2f}m (using dynamic Rb* of {Rb_L3:.3f}) and {depth_L3s:.2f}m (using constant Rb*)")
+    print(
+        f"The sizing according to L4 has a depth of {depth_L4:.2f}m (using dynamic Rb* of {Rb_L4:.3f}) and {depth_L4s:.2f}m (using constant Rb*)")
 
     assert np.equal(depth_L2, 59.366333293365)
     assert np.equal(depth_L3, 59.542511807290666)
@@ -129,7 +135,8 @@ def test_1a_1h():
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=10)
-    load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test1a.csv'), header=True, separator=",", col_heating=1, col_cooling=0)
+    load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test1a.csv'), header=True, separator=",",
+                             col_heating=1, col_cooling=0)
     borefield.load = load
     borefield.load.peak_duration = 1
 
@@ -192,9 +199,12 @@ def test_1a_1h():
     depth_L4s = borefield.size(100, L4_sizing=True)
     L4s_stop = time.time()
 
-    print(f"The sizing according to L2 has a depth of {depth_L2:.2f}m (using dynamic Rb* of {Rb_L2:.3f}) and {depth_L2s:.2f}m (using constant Rb*)")
-    print(f"The sizing according to L3 has a depth of {depth_L3:.2f}m (using dynamic Rb* of {Rb_L3:.3f}) and {depth_L3s:.2f}m (using constant Rb*)")
-    print(f"The sizing according to L4 has a depth of {depth_L4:.2f}m (using dynamic Rb* of {Rb_L4:.3f}) and {depth_L4s:.2f}m (using constant Rb*)")
+    print(
+        f"The sizing according to L2 has a depth of {depth_L2:.2f}m (using dynamic Rb* of {Rb_L2:.3f}) and {depth_L2s:.2f}m (using constant Rb*)")
+    print(
+        f"The sizing according to L3 has a depth of {depth_L3:.2f}m (using dynamic Rb* of {Rb_L3:.3f}) and {depth_L3s:.2f}m (using constant Rb*)")
+    print(
+        f"The sizing according to L4 has a depth of {depth_L4:.2f}m (using dynamic Rb* of {Rb_L4:.3f}) and {depth_L4s:.2f}m (using constant Rb*)")
 
     assert np.equal(depth_L2, 46.44356767605206)
     assert np.equal(depth_L3, 46.73933500137179)
