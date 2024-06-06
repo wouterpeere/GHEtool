@@ -2,6 +2,7 @@ import warnings
 from enum import auto, IntEnum
 from math import exp, log, pi, sqrt
 
+from collections import namedtuple
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
@@ -35,47 +36,42 @@ class DynamicsBH(object):
         bar()
         """
 
-    def __init__(self, time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, borefield):
+    def __init__(self, time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, short_term_effects_parameters):
 
         print('initialize Numerical model')
-
-
-        self.resist_bh_effective = None
-        self.Rb_cst = None
-        self.x = None
-        self.u_tube = None
-        self.fluid_factor = None
-        self.rho_cp_grout = None
-        self.rho_cp_pipe = None
-        far_field_radius = None
-        self.num_soil_cells = None
-        
-
-        from GHEtool.VariableClasses import GroundFluxTemperature, FluidData, PipeData, GroundData
-        
-        print('gFunc in RM', gFunc, len(gFunc))
 
         self.boreholes = boreholes
         self.ground_ghe = ground_data
         self.fluid_ghe = fluid_data
         self.pipes_ghe = pipe_data
-        self.borefield = borefield
         self.pipes_gt = gt.pipes
-
-        # borefield not ok
+        self.short_term_effects_parameters = short_term_effects_parameters
 
         # make function based on number of boreholes (1 or more) and half of the distance between boreholes
-        distance_between_boreholes = 20  #aanpassen!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        far_field_radius = distance_between_boreholes/2
-        self.num_soil_cells = int(far_field_radius/10*500)
+        number_of_boreholes = len(self.boreholes)
 
+        if number_of_boreholes == 0:
+            print('Error: no borefield has been initiated')
+        elif number_of_boreholes < 4:
+            far_field_radius = 10
+        else: #only works for rectangular field, adjust for more general approaches
+            distance_between_boreholes = np.sqrt((self.boreholes[1].x - self.boreholes[0].x)**2 + (self.boreholes[1].y - self.boreholes[0].y)**2)
+            far_field_radius = distance_between_boreholes/2
+
+        self.num_soil_cells = int(far_field_radius/10*500)
         self.init_temp = self.ground_ghe.Tg
 
-        self.fluid_factor = 2 # 2 by default, make function to calculate this
-        self.x = 1 # parameter to modify final time 
-        self.u_tube = 1 # 1 for single U tube, 2 for dubble U tube (not possible yet) 
-        self.rho_cp_grout = 3800000.0  # Sandbox
-        self.rho_cp_pipe = 1800000.0  # not aan te passen voor sandbox
+        # Create a namedtuple type
+        ShortTermEffectsParameters = namedtuple('ShortTermEffectsParameters', short_term_effects_parameters.keys())
+        # Create an instance of the namedtuple
+        short_term_parameters = ShortTermEffectsParameters(**short_term_effects_parameters)
+        self.short_term_parameters = short_term_parameters
+
+        self.fluid_factor = self.short_term_parameters.fluid_factor # 2 by default, make function to calculate this
+        self.x = self.short_term_parameters.x # parameter to modify final time 
+        self.u_tube = self.short_term_parameters.u_tube # 1 for single U tube, 2 for dubble U tube (not possible yet) 
+        self.rho_cp_grout = self.short_term_parameters.rho_cp_grout  # Sandbox
+        self.rho_cp_pipe = self.short_term_parameters.rho_cp_pipe  # not aan te passen voor sandbox
 
         self.Rb_cst = 1 # 0 for false, 1 for true (rewrite such that get_Rb takes right Rb)
         self.resist_bh_effective = 0.165 # get this value with get_Rb
