@@ -2117,7 +2117,7 @@ class Borefield(BaseClass):
                     curr_cooling_peak = self.load.peak_cooling_simulation_period[i]
                     if self.results.peak_cooling[i] > self.Tf_max:
                         curr_cooling_peak = max(0.1, curr_cooling_peak - 1 * max(1, 10 * (
-                                    -self.Tf_max + np.max(self.results.peak_cooling))))
+                                    -self.Tf_max + self.results.peak_cooling[i])))
                     else:
                         curr_cooling_peak = min(peak_cooling[i % 12], curr_cooling_peak * 1.01)
                         if curr_cooling_peak == peak_cooling[i % 12]:
@@ -2158,7 +2158,7 @@ class Borefield(BaseClass):
         temp.hourly_cooling_load = f(primary_geothermal_load.hourly_cooling_load_simulation_period, self.load.peak_cooling_simulation_period)
 
         # set correct hourly load
-        self.load = temp
+        self._borefield_load = temp
 
         # calculate the corresponding geothermal load
         self._secundary_borefield_load = HourlyGeothermalLoadMultiYear()
@@ -2255,47 +2255,3 @@ class Borefield(BaseClass):
             # limited by minimum temperature
             return 3
         return 2
-
-    def plot_load_duration(self, legend: bool = False) -> Tuple[plt.Figure, plt.Axes]:
-        """
-        This function makes a load-duration curve from the hourly values.
-
-        Parameters
-        ----------
-        legend : bool
-            True if the figure should have a legend
-
-        Returns
-        ----------
-        Tuple
-            plt.Figure, plt.Axes
-        """
-        # check if there are hourly values
-        if not self.load.hourly_resolution:
-            raise ValueError("There is no hourly resolution available!")
-
-        # sort heating and cooling load
-        heating = self.load.hourly_heating_load.copy()
-        heating[::-1].sort()
-
-        cooling = self.load.hourly_cooling_load.copy()
-        cooling.sort()
-        cooling = cooling * (-1)
-        # create new figure and axes if it not already exits otherwise clear it.
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        # add sorted loads to plot
-        ax.step(np.arange(0, 8760, 1), heating, "r-", label="Heating")
-        ax.step(np.arange(0, 8760, 1), cooling, "b-", label="Cooling")
-        # create 0 line
-        ax.hlines(0, 0, 8759, color="black")
-        # add labels
-        ax.set_xlabel("Time [hours]")
-        ax.set_ylabel("Power [kW]")
-        # set x limits to 8760
-        ax.set_xlim(0, 8760)
-        # plot legend if wanted
-        if legend:
-            ax.legend()  #
-        plt.show()
-        return fig, ax

@@ -31,7 +31,6 @@ def optimise():
     # load the hourly profile
     load = HourlyGeothermalLoad()
     load.load_hourly_profile("hourly_profile.csv", header=True, separator=";")
-
     # optimise the load for a 10x10 field (see data above) and a fixed depth of 150m.
     # first for an optimisation based on the power
     borefield.optimise_load_profile_power(building_load=load, depth=150)

@@ -368,6 +368,15 @@ def test_different_start_month():
     assert np.array_equal(load.peak_cooling, result)
 
 
+def test_yearly_loads():
+    load = MonthlyGeothermalLoadAbsolute(*load_case(2))
+    load.simulation_period = 10
+    assert np.array_equal(load.yearly_cooling_load_simulation_period, [240000]*10)
+    assert np.array_equal(load.yearly_heating_load_simulation_period, [160000]*10)
+    assert np.array_equal(load.yearly_cooling_peak_simulation_period, [240]*10)
+    assert np.array_equal(load.yearly_heating_peak_simulation_period, [160]*10)
+
+
 ### continue for multi year
 def test_checks_multiyear_monthly():
     load = MonthlyGeothermalLoadMultiYear()

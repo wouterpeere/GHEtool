@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
@@ -414,3 +415,43 @@ class HourlyGeothermalLoad(_LoadData):
         if self.start_month == 1:
             return array
         return np.concatenate((array[self._start_hour :], array[: self._start_hour]))
+
+    def plot_load_duration(self, legend: bool = False) -> Tuple[plt.Figure, plt.Axes]:
+        """
+        This function makes a load-duration curve from the hourly values.
+
+        Parameters
+        ----------
+        legend : bool
+            True if the figure should have a legend
+
+        Returns
+        ----------
+        Tuple
+            plt.Figure, plt.Axes
+        """
+        # sort heating and cooling load
+        heating = self.hourly_heating_load.copy()
+        heating[::-1].sort()
+
+        cooling = self.hourly_cooling_load.copy()
+        cooling[::-1].sort()
+        cooling = cooling * (-1)
+        # create new figure and axes if it not already exits otherwise clear it.
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        # add sorted loads to plot
+        ax.step(np.arange(0, 8760, 1), heating, "r-", label="Heating")
+        ax.step(np.arange(0, 8760, 1), cooling, "b-", label="Cooling")
+        # create 0 line
+        ax.hlines(0, 0, 8759, color="black")
+        # add labels
+        ax.set_xlabel("Time [hours]")
+        ax.set_ylabel("Power [kW]")
+        # set x limits to 8760
+        ax.set_xlim(0, 8760)
+        # plot legend if wanted
+        if legend:
+            ax.legend()  #
+        plt.show()
+        return fig, ax

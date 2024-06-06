@@ -159,11 +159,6 @@ def test_plot_hourly(monkeypatch, hourly_borefield):
     hourly_borefield.print_temperature_profile(plot_hourly=True)
 
 
-def test_load_duration_no_hourly_data(borefield):
-    with raises(ValueError):
-        borefield.plot_load_duration()
-
-
 def test_precalculated_data_1(borefield_custom_data):
     borefield_custom_data.gfunction([3600*100, 3600*100], 100)
 

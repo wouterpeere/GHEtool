@@ -8,9 +8,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## Added
 - Extra validation based on the work of Ahmadfard & Bernier (issue #243).
 - Added the option to exclude DHW from the peak heating load (issue #252).
+- Added vfr to Fluid Class (issue #262).
+- Added yearly_heating_load_simulation_period, yearly_cooling_load_simulation_period, yearly_heating_peak_simulation_period and yearly_cooling_peak_simulation_period to the Load class (issue #265).
 
 ## Changed
 - Change skopt to Optuna in active_passive_cooling (issue #258).
+- Moved plot_load_duration to HourlyLoad class (issue #260).
+- Clean up Baseclass (issue #260).
+
+## Fixed
+- Problems with optimise_load_profile_energy (issue #255).
+- Fix plot_load_duration (issue #260).
+
 
 ## [2.2.2] - 2024-05-16
 
@@ -22,7 +31,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added optimise_load_profile_energy (issue #229).
 - Added k_p_out to Coaxial Pipe class (issue #239).
 
-## changed
+## Changed
  - Removed set_peak_length from Borefield class (issue #227).
  - Definition of the optimise_load_profile_class (issue #229).
  - Changed number_of_boreholes to a property (issue #233).
@@ -33,7 +42,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
  - Renamed main_class.py to borefield.py for consistent naming convention (issue #244).
  - Removed parameter 'Tf' from borefield.py since it is no longer needed (issue #249).
 
-## fixed
+## Fixed
 - Small typo's in functions (issue #224).
 - Bug when using borefield with different borehole lengths (issue #233).
 
@@ -47,12 +56,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Cylindrical borehole correction (issue #187).
 - __add__ functionality for the load classes (issue #202).
 
-## changed
+## Changed
 - Negative reference temperatures for the fluid are now possible (issue #192).
 - Move code related to the GUI to a separate repo (issue #210).
 - Autorelease to PyPi and testPyPi (issue #212).
 
-## fixed
+## Fixed
 - Problem with multiyear hourly data and L3 sizing (issue #153).
 - Problem with negative g-function values (issue #187).
 - Bug in load-duration curve when not working with optimize load profile (issue #189).
