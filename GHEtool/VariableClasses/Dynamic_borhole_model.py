@@ -40,9 +40,6 @@ class DynamicsBH(object):
         print('initialize Numerical model')
 
 
-        data_ground = None
-        data_fluid = None
-        data_pipe = None
         self.resist_bh_effective = None
         self.Rb_cst = None
         self.x = None
