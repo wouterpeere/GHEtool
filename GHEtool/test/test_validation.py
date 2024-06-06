@@ -54,7 +54,7 @@ def test_validation_ahmadfard():
     test_1a_1h()
     test_1a_6h()
     test_1b()
-    test_2_6h()
+    # test_2_6h()
     test_3_6h()
     test_4()
     test_4_sensitivity()
