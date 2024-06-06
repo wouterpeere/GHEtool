@@ -36,7 +36,7 @@ class DynamicsBH(object):
         bar()
         """
 
-    def __init__(self, time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, short_term_effects_parameters):
+    def __init__(self, time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, borefield, short_term_effects_parameters):
 
         print('initialize Numerical model')
 
@@ -46,15 +46,18 @@ class DynamicsBH(object):
         self.pipes_ghe = pipe_data
         self.pipes_gt = gt.pipes
         self.short_term_effects_parameters = short_term_effects_parameters
+        self.borefield = borefield
+
 
         # make function based on number of boreholes (1 or more) and half of the distance between boreholes
         number_of_boreholes = len(self.boreholes)
 
+        # only works for rectangular field, adjust for more general approaches
         if number_of_boreholes == 0:
             print('Error: no borefield has been initiated')
         elif number_of_boreholes < 4:
             far_field_radius = 10
-        else: #only works for rectangular field, adjust for more general approaches
+        else: 
             distance_between_boreholes = np.sqrt((self.boreholes[1].x - self.boreholes[0].x)**2 + (self.boreholes[1].y - self.boreholes[0].y)**2)
             far_field_radius = distance_between_boreholes/2
 
@@ -72,12 +75,10 @@ class DynamicsBH(object):
         self.u_tube = self.short_term_parameters.u_tube # 1 for single U tube, 2 for dubble U tube (not possible yet) 
         self.rho_cp_grout = self.short_term_parameters.rho_cp_grout  # Sandbox
         self.rho_cp_pipe = self.short_term_parameters.rho_cp_pipe  # not aan te passen voor sandbox
-
-        self.Rb_cst = 1 # 0 for false, 1 for true (rewrite such that get_Rb takes right Rb)
-        self.resist_bh_effective = 0.165 # get this value with get_Rb
+        self.Rb = self.short_term_parameters.Rb
+        # Starting Rb, needs to be updated every iteration
+        self.resist_bh_effective = self.borefield.Rb
            
-        print('data is loaded')
-
         # "The one dimensional model has a fluid core, an equivalent convective
         # resistance layer, a tube layer, a grout layer and is surrounded by the
         # ground."
@@ -336,8 +337,8 @@ class DynamicsBH(object):
         R_f = 1 / (self.h_f * 2 * pi * self.pipes_ghe.r_in)
         R_p = self.pipes_gt.conduction_thermal_resistance_circular_pipe(self.pipes_ghe.r_in, self.pipes_ghe.r_out,
                                                                         self.pipes_ghe.k_p)
-
-        # wanneer Rb niet gekend is, maar dan moet je dit model niet gebruiken eigenlijk
+        """
+        # Rb moet geupdate worden
         if self.Rb_cst == 0:
 
             if self.u_tube == 2:
@@ -357,6 +358,9 @@ class DynamicsBH(object):
         else:
             #self.resist_bh_effective = self.ground_ghe.Rb
             lone = 22
+        """
+
+        self.resist_bh_effective = self.borefield.Rb 
 
         print('Rb* in NM',self.resist_bh_effective)
 

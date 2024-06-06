@@ -58,7 +58,7 @@ def evaluate_g_function(self, time):
 
         if self.solver.short_term_effects:
             self.gFunc = _ShortTermEffects(self, self.time, self.gFunc, self.boreholes, self.alpha, self.solver.ground_data,
-                                           self.solver.fluid_data, self.solver.pipe_data, self.solver.short_term_effects_parameters)
+                                           self.solver.fluid_data, self.solver.pipe_data, self.solver.borefield, self.solver.short_term_effects_parameters)
             toc = perf_counter()
         else:
             toc = perf_counter()
@@ -137,7 +137,7 @@ def __init__(self, boreholes, network, time, boundary_condition,
     self.nSources = self.initialize(**other_options)
     return
 
-def _ShortTermEffects(self, time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, short_term_parameters):
+def _ShortTermEffects(self, time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, borefield, short_term_parameters):
     
     print('gFunc pygfunction', gFunc)
 
@@ -147,7 +147,7 @@ def _ShortTermEffects(self, time, gFunc, boreholes, alpha, ground_data, fluid_da
 
     print('Dynamic_borehole_model imported')
 
-    dynamic_numerical = DynamicsBH(time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, short_term_parameters)
+    dynamic_numerical = DynamicsBH(time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, borefield, short_term_parameters)
 
     dynamic_numerical.calc_sts_g_functions()
 
