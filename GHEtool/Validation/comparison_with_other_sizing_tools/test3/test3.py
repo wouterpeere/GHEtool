@@ -11,12 +11,10 @@ References:
     - Ahmadfard, M., and M. Bernier. 2019. A review of vertical ground heat exchanger sizing tools including an inter-model
 comparison [in eng]. Renewable sustainable energy reviews (OXFORD) 110:247–265.
 """
-import sys
-sys.path.append("C:\Workdir\Develop\ghetool")
-
 from GHEtool import *
 import numpy as np
 import time
+import os
 
 
 def test_3_6h():
@@ -38,7 +36,7 @@ def test_3_6h():
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=10)
-    load.load_hourly_profile("test3.csv", header=True, separator=",", col_heating=1, col_cooling=0)
+    load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test3.csv'), header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
 
     delta_t = max(load.max_peak_cooling, load.max_peak_cooling) * 1000 / (fluid_data.Cp * fluid_data.mfr) / 49
@@ -67,10 +65,10 @@ def test_3_6h():
     L4_stop = time.time()
 
     spacing = [3, 5, 7]
-    simulationperiod = [1, 10]
+    simulation_period = [1, 10]
     results = np.array([])
 
-    for s in simulationperiod:
+    for s in simulation_period:
         for B in spacing:
 
             # start test with constant Rb*
@@ -90,8 +88,6 @@ def test_3_6h():
             borefield.set_min_avg_fluid_temperature(0 - delta_t/2)
 
             # load the hourly profile
-            load = HourlyGeothermalLoad(simulation_period=s)
-            load.load_hourly_profile("test3.csv", header=True, separator=",", col_heating=1, col_cooling=0)
             borefield.load = load
 
             # Sizing with constant Rb
@@ -112,7 +108,7 @@ def test_3_6h():
             results = np.append(results, depth_L4s)
             L4s_stop = time.time()
 
-    #peak load duration of 6 hours
+    # peak load duration of 6 hours
     print("Results for peak load duration of 6 hours:")
     print(
         f"The sizing according to L2 has a depth of {depth_L2:.2f}m (using dynamic Rb* of {Rb_L2:.3f}) and {results[12]:.2f}m (using constant Rb*)")
@@ -121,7 +117,7 @@ def test_3_6h():
     print(
         f"The sizing according to L4 has a depth of {depth_L4:.2f}m (using dynamic Rb* of {Rb_L4:.3f}) and {results[14]:.2f}m (using constant Rb*)")
 
-    #effects of spacing and design period
+    # effects of spacing and design period
     print("Effects of spacing and desing period:")
     print(
         f"The sizing according to L2 using constant Rb* has a depth of {results[0]:.2f}m (B=3m), {results[3]:.2f}m (B=5m), {results[6]:.2f}m (B=7m) for a simulation period of 1 year and {results[9]:.2f}m (B=3m), {results[12]:.2f}m (B=5m), {results[15]:.2f}m (B=7m) for a simulation period of 10 years ")

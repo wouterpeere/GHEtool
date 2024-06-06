@@ -14,6 +14,7 @@ comparison [in eng]. Renewable sustainable energy reviews (OXFORD) 110:247–265
 from GHEtool import *
 import numpy as np
 import time
+import os
 
 
 def test_2_6h():
@@ -34,7 +35,7 @@ def test_2_6h():
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=10)
-    load.load_hourly_profile("test2.csv", header=True, separator=",", col_heating=1, col_cooling=0)
+    load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test2.csv'), header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
 
     delta_t = max(load.max_peak_cooling, load.max_peak_cooling) * 1000 / (fluid_data.Cp * fluid_data.mfr) / 120
@@ -78,9 +79,6 @@ def test_2_6h():
     borefield.set_min_avg_fluid_temperature(4.4 - delta_t/2)
 
     # load the hourly profile
-    load = HourlyGeothermalLoad(simulation_period=10)
-    load.load_hourly_profile("test2.csv", header=True, separator=",", col_heating=1, col_cooling=0)
-    #load.peak_cooling_duration = 1
     borefield.load = load
 
     # Sizing with constant Rb

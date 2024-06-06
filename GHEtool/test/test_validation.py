@@ -50,10 +50,11 @@ def test_validation_ahmadfard():
     from GHEtool.Validation.comparison_with_other_sizing_tools.test2.test2 import test_2_6h
     from GHEtool.Validation.comparison_with_other_sizing_tools.test3.test3 import test_3_6h
     from GHEtool.Validation.comparison_with_other_sizing_tools.test4.test4 import test_4
-
+    from GHEtool.Validation.comparison_with_other_sizing_tools.test4.sensitivity_analysis import test_4_sensitivity
     test_1a_1h()
     test_1a_6h()
     test_1b()
     test_2_6h()
     test_3_6h()
     test_4()
+    test_4_sensitivity()
