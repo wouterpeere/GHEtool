@@ -508,5 +508,5 @@ def test_4_sensitivity():
         f"The sizing according to L4 has a variation of length of ---- and ---- (Peak Magn. -125.7581 and -153.7044 kW), {Var_depth_L4s_TC_1:.2f}% and {Var_depth_L4s_TC_2:.2f}% (Therm. cond. 1.5 and 2.3 W/m-K), {Var_depth_L4s_S_1:.2f}% en {Var_depth_L4s_S_2:.2f}% (6 and 10 m spacing), {Var_depth_L4s_GT_1:.2f}% en {Var_depth_L4s_GT_2:.2f}% (Ground Temp. 10 and 20 C), {Var_depth_L4s_BN_1:.2f}% en {Var_depth_L4s_BN_2:.2f}% (3x3 and 7x7 bores). ")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     test_4_sensitivity()

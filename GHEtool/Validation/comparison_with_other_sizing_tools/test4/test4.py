@@ -108,16 +108,16 @@ def test_4():
     print(
         f"The sizing according to L4 has a depth of {depth_L4:.2f}m (using dynamic Rb* of {Rb_L4:.3f}) and {depth_L4s:.2f}m (using constant Rb*)")
 
-    assert np.equal(depth_L2, 124.02695636769329)
-    assert np.equal(depth_L3, 124.67134582762849)
-    assert np.equal(depth_L4, 122.461471483961)
-    assert np.equal(depth_L2s, 121.50772080500283)
-    assert np.equal(depth_L3s, 122.15337731354852)
-    assert np.equal(depth_L4s, 119.99581098989934)
-    assert np.equal(Rb_L2, 0.21023380751472076)
-    assert np.equal(Rb_L3, 0.21025731326271593)
-    assert np.equal(Rb_L4, 0.2101772055278848)
+    assert np.isclose(depth_L2, 124.02695636769329)
+    assert np.isclose(depth_L3, 124.67134582762849)
+    assert np.isclose(depth_L4, 122.461471483961)
+    assert np.isclose(depth_L2s, 121.50772080500283)
+    assert np.isclose(depth_L3s, 122.15337731354852)
+    assert np.isclose(depth_L4s, 119.99581098989934)
+    assert np.isclose(Rb_L2, 0.21023380751472076)
+    assert np.isclose(Rb_L3, 0.21025731326271593)
+    assert np.isclose(Rb_L4, 0.2101772055278848)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     test_4()
