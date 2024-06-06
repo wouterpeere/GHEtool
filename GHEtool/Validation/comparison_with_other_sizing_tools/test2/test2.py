@@ -106,7 +106,7 @@ def test_2_6h():
     print(
         f"The sizing according to L4 has a depth of {depth_L4:.2f}m (using dynamic Rb* of {Rb_L4:.3f}) and {depth_L4s:.2f}m (using constant Rb*)")
 
-    assert np.equal(depth_L2, 76.84063723898528)
+    assert np.equal(depth_L2, 76.8406)
     assert np.equal(depth_L3, 79.11228401910488)
     assert np.equal(depth_L4, 84.77559168467357)
     assert np.equal(depth_L2s, 77.43318625702659)
