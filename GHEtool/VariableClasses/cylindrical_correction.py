@@ -461,57 +461,6 @@ def __init__(self, boreholes, network, time, boundary_condition,
     self.nSources = self.initialize(**other_options)
     return
 
-def evaluate_g_function(self, time):
-        """
-        Evaluate the g-function.
-
-        Parameters
-        ----------
-        time : float or array
-            Values of time (in seconds) for which the g-function is evaluated.
-
-        Returns
-        -------
-        gFunction : float or array
-            Values of the g-function
-
-        """
-        time = np.maximum(np.atleast_1d(time), 0.)
-        assert len(time) == 1 or np.all(time[:-1] <= time[1:]), \
-            "Time values must be provided in increasing order."
-        # Save time values
-        self.time = time
-        if self.solver.disp:
-            print(60*'-')
-            print(f"Calculating g-function for boundary condition : "
-                  f"'{self.boundary_condition}'".center(60))
-            print(60*'-')
-        # Initialize chrono
-        tic = perf_counter()
-
-        # Evaluate g-function
-        self.gFunc = self.solver.solve(time, self.alpha)
-
-        print('in new evaluat g function')
-
-        print('self.short_term_effects', self.alpha)
-
-        if self.cylindrical_correction:
-            print(self.cylindrical_correction)
-            self.gFunc = _ShortTermEffects(self, self.time, self.gFunc, self.boreholes, self.alpha, self.ground_data,
-                                           self.fluid_data, self.pipe_data, self.borefield)
-            toc = perf_counter()
-        else:
-            toc = perf_counter()
-
-        if self.solver.disp:
-            print(f'Total time for g-function evaluation: '
-                  f'{toc - tic:.3f} sec')
-            print(60*'-')
-        return self.gFunc
-
-
-
 def update_pygfunction() -> None:
     """
     This function updates pygfunction by adding the cylindrical correction methods to it.
@@ -522,7 +471,6 @@ def update_pygfunction() -> None:
     """
     gt.heat_transfer.cylindrical_heat_source = cylindrical_heat_source
     gt.heat_transfer.infinite_line_source = infinite_line_source
-    gt.gfunction.gFunction.evaluate_g_function = evaluate_g_function
     gt.gfunction._Equivalent.thermal_response_factors = thermal_response_factors
     gt.gfunction._BaseSolver.solve = solve
     gt.gfunction._BaseSolver.__init__ = __init__

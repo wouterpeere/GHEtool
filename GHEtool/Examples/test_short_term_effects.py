@@ -17,10 +17,10 @@ def test_short_term_effects():
 
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=1.8, T_g=17.5, volumetric_heat_capacity=2073600, flux=0)
-    fluid_data = FluidData(mfr=0.1, rho=1052, Cp=3795, mu=0.0052, k_f=0.48)
-    pipe_data = MultipleUTube(r_in=0.0137, r_out=0.0167, D_s=0.075/2, k_g=1.4, k_p=0.43)
+    fluid_data = FluidData(mfr=0.440, rho=1052, Cp=3795, mu=0.0052, k_f=0.48)
+    pipe_data = MultipleUTube(r_in=0.0137, r_out=0.0167, D_s=0.075 / 2, k_g=1.4, k_p=0.43, number_of_pipes=1)
     # Addidional input data needed for short-term model
-    fluid_factor = 2 # 2 by default, make function to calculate this
+    fluid_factor = 1 # 2 by default, make function to calculate this
     x = 1 # 1 by default, parameter to modify final time 
     u_tube = 1 # 1 for single U tube, 2 for dubble U tube (not yet possible) 
     rho_cp_grout = 3800000.0  # 3800000.0 by default
@@ -34,7 +34,7 @@ def test_short_term_effects():
     borefield.set_fluid_parameters(fluid_data)
     borefield.set_pipe_parameters(pipe_data)
     borefield.create_rectangular_borefield(1, 1, 6, 6, 110, 4, 0.075)
-    borefield.set_Rb(0.13)
+    #borefield.set_Rb(0.13)
     Rb = borefield.Rb
 
     # Sample dictionary with example values
@@ -53,6 +53,7 @@ def test_short_term_effects():
                    'method': 'equivalent',
                    'cylindrical_correction': False,
                    'short_term_effects': True,
+                   'short_term_effects_fbw': False,
                    'ground_data': ground_data,
                    'fluid_data': fluid_data,
                    'pipe_data': pipe_data,
@@ -60,17 +61,18 @@ def test_short_term_effects():
                    'short_term_effects_parameters': short_term_effects_parameters,
                      }
 
-
     borefield.set_options_gfunction_calculation(options)
-
-    # set temperature bounds
-    borefield.set_max_avg_fluid_temperature(35)
-    borefield.set_min_avg_fluid_temperature(0)
     
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=10)
     load.load_hourly_profile("C:\\Workdir\\Develop\\ghetool\\GHEtool\\Examples\\test1a.csv", header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
+
+    delta_t = max(load.max_peak_cooling, load.max_peak_cooling) * 1000 / (fluid_data.Cp * fluid_data.mfr)
+
+    # set temperature bounds
+    borefield.set_max_avg_fluid_temperature(35 + delta_t / 2)
+    borefield.set_min_avg_fluid_temperature(0 - delta_t / 2)
 
     # according to L4
     L4_start = time.time()

@@ -10,8 +10,6 @@ from scipy.linalg.lapack import dgtsv
 
 import pygfunction as gt
 
-print('test import done')
-
 class CellProps(IntEnum):
     R_IN = 0
     R_CENTER = auto()
@@ -30,15 +28,7 @@ class DynamicsBH(object):
     Energy Storage-EcoStock. Pomona, NJ, May 31-June 2.
     """
 
-    """
-    def foo(self):
-        from GHEtool import PipeData
-        bar()
-        """
-
     def __init__(self, time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, borefield, short_term_effects_parameters):
-
-        print('initialize Numerical model')
 
         self.boreholes = boreholes
         self.ground_ghe = ground_data
@@ -47,7 +37,6 @@ class DynamicsBH(object):
         self.pipes_gt = gt.pipes
         self.short_term_effects_parameters = short_term_effects_parameters
         self.borefield = borefield
-
 
         # make function based on number of boreholes (1 or more) and half of the distance between boreholes
         number_of_boreholes = len(self.boreholes)
@@ -78,7 +67,7 @@ class DynamicsBH(object):
         self.Rb = self.short_term_parameters.Rb
         # Starting Rb, needs to be updated every iteration
         self.resist_bh_effective = self.borefield.Rb
-           
+               
         # "The one dimensional model has a fluid core, an equivalent convective
         # resistance layer, a tube layer, a grout layer and is surrounded by the
         # ground."
@@ -124,9 +113,6 @@ class DynamicsBH(object):
         self.thickness_conv = (self.r_in_tube - self.r_in_convection) / self.num_conv_cells
         self.thickness_fluid = (self.r_in_convection - self.r_fluid) / self.num_fluid_cells
 
-
-        print('all parameters are set')
-
         # other
         self.g = np.array([], dtype=np.double)
         self.Tf = np.array([], dtype=np.double)
@@ -139,15 +125,9 @@ class DynamicsBH(object):
         self.t_s = self.boreholes[0].H ** 2 / (9 * self.ground_ghe.alpha())
         # default is at least 49 hours, or up to -8.6 log time
         self.calc_time_in_sec = max([self.t_s * exp(-8.6), 49.0 * 3600.0])
-
-        print('ts charact time', self.t_s)
-        print('ts * exp ', self.t_s * exp(-8.6))
-
-        self.t_b = 5 * (self.boreholes[0].r_b) ** 2 / self.ground_ghe.alpha()
-        print('t_b time vanaf wanneer stationaire benadering mag', self.t_b)
+        self.t_b = 5 * (self.boreholes[0].r_b) ** 2 / self.ground_ghe.alpha()  
         self.final_time = self.x * self.t_b
-        #self.final_time = 3601
-        print('final time', self.final_time)
+  
         self.g_sts = None
 
     def partial_init(self):
@@ -315,8 +295,6 @@ class DynamicsBH(object):
         cell_summation += num_soil_cells
 
     def calc_sts_g_functions(self, final_time=None) -> tuple:
-        print('in calc sts g functions')
-
         self.partial_init()
         self.m_flow_borehole = self.fluid_ghe.mfr
         final_time = self.final_time
@@ -326,7 +304,6 @@ class DynamicsBH(object):
         self.H = self.boreholes[0].H
         self.r_b = self.r_borehole
         self.D = self.boreholes[0].D
-        borehole = self.bh.Borehole(self.H, self.D, self.r_b, 0, 0)
         self.h_f = self.pipes_gt.convective_heat_transfer_coefficient_circular_pipe(self.m_flow_borehole,
                                                                                     self.pipes_ghe.r_in,
                                                                                     self.fluid_ghe.mu,
@@ -337,40 +314,13 @@ class DynamicsBH(object):
         R_f = 1 / (self.h_f * 2 * pi * self.pipes_ghe.r_in)
         R_p = self.pipes_gt.conduction_thermal_resistance_circular_pipe(self.pipes_ghe.r_in, self.pipes_ghe.r_out,
                                                                         self.pipes_ghe.k_p)
-        """
-        # Rb moet geupdate worden
-        if self.Rb_cst == 0:
-
-            if self.u_tube == 2:
-                pipe = self.tubes_ghe.MultipleUTube(self.pipes_ghe.pos, self.pipes_ghe.r_in, self.pipes_ghe.r_out,
-                                         borehole, self.ground_ghe.k_s(), self.pipes_ghe.k_g,
-                                         R_p + R_f, 2)
-
-                self.resist_bh_effective = pipe.effective_borehole_thermal_resistance(self.m_flow_borehole, self.fluid_ghe.Cp)
-
-            elif self.u_tube == 1:
-                pipe = self.tubes_ghe.SingleUTube(self.pipes_ghe.pos, self.pipes_ghe.r_in, self.pipes_ghe.r_out,
-                                         borehole, self.ground_ghe.k_s(), self.pipes_ghe.k_g,
-                                         R_p + R_f, 2)
-
-                self.resist_bh_effective = pipe.effective_borehole_thermal_resistance(self.m_flow_borehole, self.fluid_ghe.Cp)
-
-        else:
-            #self.resist_bh_effective = self.ground_ghe.Rb
-            lone = 22
-        """
-
+    
         self.resist_bh_effective = self.borefield.Rb 
 
-        print('Rb* in NM',self.resist_bh_effective)
-
+        # check the resistances
         resist_f_eq = R_f / 2
         resist_p_eq = R_p / 2
         resist_tg_eq = self.resist_bh_effective - resist_f_eq
-
-        print('resist_f_eq', resist_f_eq)
-        print('resist_p_eq', resist_p_eq)
-        print('resist_tg_eq', resist_tg_eq)
 
         # Pass radial cell by reference and fill here so that it can be
         # destroyed when this method returns
@@ -379,12 +329,9 @@ class DynamicsBH(object):
 
         self.t_b = 5 * (self.boreholes[0].r_b) ** 2 / self.ground_ghe.alpha()
 
-        final_time = self.final_time
-        print('final time t_b in s', final_time)
-
+        final_time = self.final_time  
         self.t_s = self.boreholes[0].H ** 2 / (9 * self.ground_ghe.alpha())
-        print('final time lntts', log(final_time / self.t_s))
-
+   
         g = []
         g_bhw = []
         g_comb = []
@@ -469,25 +416,18 @@ class DynamicsBH(object):
             # Tri-diagonal matrix solver
             # High level interface to LAPACK routine
             # https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.lapack.dgtsv.html#scipy.linalg.lapack.dgtsv
-            dgtsv(_dl, _d, _du, _b, overwrite_b=1)  # TODO: Do we really need lapack just to do a TDMA solution?
+            dgtsv(_dl, _d, _du, _b, overwrite_b=1) 
 
             radial_cell[CellProps.TEMP, :] = _b
 
             # compute standard g-functions
             g.append(self.c_0 * ((radial_cell[CellProps.TEMP, 0] - init_temp) / heat_flux - self.resist_bh_effective))
-
             g_comb.append(self.c_0 * ((radial_cell[CellProps.TEMP, 0] - radial_cell[CellProps.TEMP, self.bh_wall_idx]) / heat_flux - self.resist_bh_effective))
-
             g_plot.append(self.c_0 * ((radial_cell[CellProps.TEMP, 0] - init_temp) / heat_flux))
 
-
+            threshold_steady_state = 1- (self.resist_bh_effective - (radial_cell[CellProps.TEMP, 0]-radial_cell[CellProps.TEMP, self.bh_wall_idx]))
             qb.append(1- (self.resist_bh_effective - (radial_cell[CellProps.TEMP, 0]-radial_cell[CellProps.TEMP, self.bh_wall_idx])))
-
-            print(qb)
-
-            print('f1', radial_cell[CellProps.TEMP, 0], 'f2', radial_cell[CellProps.TEMP, 1], 'f3', radial_cell[CellProps.TEMP, 2], 'c1', radial_cell[CellProps.TEMP, 3], 'time', time)
-            #print('idx -1 ', radial_cell[CellProps.TEMP, self.bh_wall_idx - 1], 'idx bhw', radial_cell[CellProps.TEMP,self.bh_wall_idx], 'idx bhw + 1', radial_cell[CellProps.TEMP, self.bh_wall_idx + 1], 'time', time)
-
+        
             T0 = radial_cell[CellProps.TEMP, 0]
             TBH = radial_cell[CellProps.TEMP, self.bh_wall_idx]
             d= T0-TBH
@@ -496,82 +436,29 @@ class DynamicsBH(object):
             Tb.append(TBH)
             diff.append(d)
 
-            # compute g-functions at bh wall
-            bh_wall_temp = radial_cell[CellProps.TEMP, self.bh_wall_idx]
 
-            #g_bhw.append(self.c_0 * ((bh_wall_temp - init_temp) / heat_flux))
 
             lntts.append(time)
-
             plottime.append(time)
 
-            """
-            if d >= resist_bh_effective:
-                print('Tf - Tb heeft Rb* bereikt')
+            if threshold_steady_state > 1 or time >= final_time - time_step:
                 break
+            
             """
             if time >= final_time - time_step:
-                print('in time if')
-                print(final_time)
                 break
-
-
-        # plot de short term and long term g function
-        plt.rc('font', size=9)
-        plt.rc('xtick', labelsize=9)
-        plt.rc('ytick', labelsize=9)
-        plt.rc('lines', lw=1.5, markersize=5.0)
-        plt.rc('savefig', dpi=500)
-        fig = plt.figure()
-
-        ax = fig.add_subplot(111)
-        ax.set_xlabel(r'$tijd$ [s] ', fontsize=18)
-        #ax.set_ylabel(r'$|T_f - T_b|$', fontsize=18)
-
-        plt.tight_layout()
-
-        dummy = []
-        for i in range(0,len(plottime)):
-            dummy.append(0.09)
-
-        #ax.plot(plottime, Tf)
-        #ax.plot(plottime, Tb)
-        ax.plot(plottime, diff)
-        ax.plot(plottime, dummy)
-
-        """
-        #ax.legend([f'$T_f$', f'$T_b$'], fontsize=10)
-        ax.legend([ f'$|T_f - T_b|$', f'$R_b^*$'], fontsize=20)
-
-        # plot de short term and long term g function
-        plt.rc('font', size=9)
-        plt.rc('xtick', labelsize=9)
-        plt.rc('ytick', labelsize=9)
-        plt.rc('lines', lw=1.5, markersize=5.0)
-        plt.rc('savefig', dpi=500)
-        fig = plt.figure()
-
-        ax = fig.add_subplot(111)
-        ax.set_xlabel(r'$tijd$ [s] ', fontsize=18)
-        ax.set_ylabel(r'g-functie', fontsize=18)
-        plt.tight_layout()
-        ax.plot(lntts, g_plot)
-        """
+            """
 
         # quickly chop down the total values to a more manageable set
         num_intervals = int(self.x * 30)
         g_tmp = interp1d(lntts, g)
-
-
         uniform_lntts_vals = np.linspace(lntts[0], lntts[-1], num_intervals)
         uniform_g_vals = g_tmp(uniform_lntts_vals)
 
-        #g_bhw_tmp = interp1d(lntts, g_bhw)
         g_comb_tmp = interp1d(lntts,g_comb)
         qb_tmp =interp1d(lntts,qb)
         g_plot_tmp = interp1d(lntts, g_plot)
 
-        #uniform_g_bhw_vals = g_bhw_tmp(uniform_lntts_vals)
         uniform_g_comb_vals = g_comb_tmp(uniform_lntts_vals)
         uniform_qb_vals = qb_tmp(uniform_lntts_vals)
         uniform_g_plot_vals = g_plot_tmp(uniform_lntts_vals)
@@ -579,17 +466,9 @@ class DynamicsBH(object):
         # set the final arrays and interpolator objects
         self.lntts = np.array(uniform_lntts_vals)
         self.g = np.array(uniform_g_vals)
-        #self.g_bhw = np.array(uniform_g_bhw_vals)
         self.g_comb = np.array(uniform_g_comb_vals)
         self.qb = np.array(uniform_qb_vals)
         self.g_sts = interp1d(self.lntts, self.g)
         self.g_plot = np.array(uniform_g_plot_vals)
-
-        print('lntts', self.lntts)
-        print('g', self.g)
-        print('g_bhw', self.g_bhw)
-        print('g_sts', self.g_sts)
-        print('g_comb',self.g_comb)
-        print('qb', self.qb)
 
         return self.lntts, self.g, self.g_sts, self.g_comb, self.g_plot, self.qb
