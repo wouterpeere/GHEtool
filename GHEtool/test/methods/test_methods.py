@@ -48,14 +48,21 @@ def test_optimise(input, result):
     model: Borefield = input[0]
     load, depth, SCOP, SEER, power, hourly = input[1:]
     if power:
-        model.optimise_load_profile_power(load, depth, SCOP, SEER, use_hourly_resolution=hourly)
+        secundary_borefield_load, external_load = model.optimise_load_profile_power(load, depth, SCOP, SEER,
+                                                                                    use_hourly_resolution=hourly)
     else:
-        model.optimise_load_profile_energy(load, depth, SCOP, SEER)
+        secundary_borefield_load, external_load = model.optimise_load_profile_energy(load, depth, SCOP, SEER)
     percentage_heating, percentage_cooling, peak_heating_geo, peak_cooling_geo, peak_heating_ext, peak_cooling_ext = \
         result
-    assert np.isclose(model._percentage_heating, percentage_heating)
-    assert np.isclose(model._percentage_cooling, percentage_cooling)
+
+    _percentage_heating = np.sum(secundary_borefield_load.hourly_heating_load_simulation_period) / \
+                          np.sum(load.hourly_heating_load_simulation_period) * 100
+    _percentage_cooling = np.sum(secundary_borefield_load.hourly_cooling_load_simulation_period) / \
+                          np.sum(load.hourly_cooling_load_simulation_period) * 100
+
+    assert np.isclose(_percentage_heating, percentage_heating)
+    assert np.isclose(_percentage_cooling, percentage_cooling)
     assert np.isclose(model.load.max_peak_heating, peak_heating_geo)
     assert np.isclose(model.load.max_peak_cooling, peak_cooling_geo)
-    assert np.isclose(model._external_load.max_peak_heating, peak_heating_ext)
-    assert np.isclose(model._external_load.max_peak_cooling, peak_cooling_ext)
+    assert np.isclose(external_load.max_peak_heating, peak_heating_ext)
+    assert np.isclose(external_load.max_peak_cooling, peak_cooling_ext)

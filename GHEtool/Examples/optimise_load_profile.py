@@ -12,7 +12,6 @@ from GHEtool import *
 
 
 def optimise():
-
     # initiate ground data
     data = GroundConstantTemperature(3, 10)
 
@@ -31,6 +30,7 @@ def optimise():
     # load the hourly profile
     load = HourlyGeothermalLoad()
     load.load_hourly_profile("hourly_profile.csv", header=True, separator=";")
+
     # optimise the load for a 10x10 field (see data above) and a fixed depth of 150m.
     # first for an optimisation based on the power
     borefield.optimise_load_profile_power(building_load=load, depth=150)
@@ -38,8 +38,10 @@ def optimise():
     print(f'Max heating power (primary): {borefield.load.max_peak_heating:,.0f}kW')
     print(f'Max cooling power (primary): {borefield.load.max_peak_cooling:,.0f}kW')
 
-    print(f'Total energy extracted from the borefield over simulation period: {np.sum(borefield.load.baseload_heating_simulation_period):,.0f}MWh')
-    print(f'Total energy injected in the borefield over simulation period): {np.sum(borefield.load.baseload_cooling_simulation_period):,.0f}MWh')
+    print(
+        f'Total energy extracted from the borefield over simulation period: {np.sum(borefield.load.baseload_heating_simulation_period):,.0f}MWh')
+    print(
+        f'Total energy injected in the borefield over simulation period): {np.sum(borefield.load.baseload_cooling_simulation_period):,.0f}MWh')
     print('-----------------------------------------------------------------')
     borefield.calculate_temperatures(hourly=True)
     borefield.print_temperature_profile(plot_hourly=True)
