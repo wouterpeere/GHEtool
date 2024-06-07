@@ -9,6 +9,7 @@ The articles for which this is the case, are:
 ```{toctree}
 articles/HPT_magazine.rst
 ```
+> Meertens, L., Peere, W., and Helsen, L. (2024). Influence of short-term dynamic effects on geothermal borefield size. In _Proceedings of International Ground Source Heat Pump Association Conference 2024_. Montréal (Canada), 28-30 Mai 2024. https://doi.org/10.22488/okstate.24.000004 
 
 > Peere, W. (2024). Are Rules of Thumb Misleading? The Complexity of Borefield Sizing and the Importance of Design Software. _IEA HPT Magazine 42_(1), https://doi.org/10.23697/7nec-0g78.
 
