@@ -9,6 +9,10 @@ The articles for which this is the case, are:
 ```{toctree}
 articles/HPT_magazine.rst
 ```
+> Meertens, L., Peere, W., Helsen, L. (2024). Influence of short-term dynamic effects on geothermal borefield size. In Proceedings of International Ground Source Heat Pump Association. Montréal (Canada), 28-30 May 2024.
+
+> Dion G., Pasquier, P., Perraudin, D. (2024). Sizing equation based on the outlet fluid temperature of closed-loop ground heat exchangers. In Proceedings of International Ground Source Heat Pump Association. Montréal (Canada), 28-30 May 2024.
+
 > Meertens, L. (2024). Invloed van dynamische korte-termijneffecten op de dimensionering van geothermische boorvelden. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
 
 > Coninx, M., De Nies, J., Hermans, L., Peere, W., Boydens, W., Helsen, L. (2024). Cost-efficient cooling of buildings by means of geothermal borefields with active and passive cooling. _Applied Energy_, 355, Art. No. 122261, https://doi.org/10.1016/j.apenergy.2023.122261.
