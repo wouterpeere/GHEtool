@@ -2137,7 +2137,6 @@ class Borefield(BaseClass):
 
         return secundary_borefield_load, external_load
 
-    @property
     def calculate_quadrant(self) -> int:
         """
         This function returns the borefield quadrant (as defined by Peere et al., 2021 [#PeereEtAl]_)
