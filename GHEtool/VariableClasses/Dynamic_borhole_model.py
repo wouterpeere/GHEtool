@@ -441,13 +441,14 @@ class DynamicsBH(object):
             lntts.append(time)
             plottime.append(time)
 
+            """
             if threshold_steady_state > 1 or time >= final_time - time_step:
                 break
-            
             """
+            
             if time >= final_time - time_step:
                 break
-            """
+            
 
         # quickly chop down the total values to a more manageable set
         num_intervals = int(self.x * 30)

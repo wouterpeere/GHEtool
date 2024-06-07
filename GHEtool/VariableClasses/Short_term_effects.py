@@ -54,15 +54,27 @@ def evaluate_g_function(self, time):
 
         self.gFunc = self.solver.solve(time, self.alpha)
 
+        self.gFunc_CHS = gt.heat_transfer.cylindrical_heat_source(self.time, self.alpha, self.boreholes[0].r_b,self.boreholes[0].r_b)
+        self.gFunc_CHS = 2*np.pi*self.gFunc_CHS
+
+        self.gFunc_ILS = gt.heat_transfer.infinite_line_source(self.time, self.alpha, self.boreholes[0].r_b)
+        self.gFunc_ILS = -0.5*self.gFunc_ILS
+
+        print('FLS+CC', self.gFunc)
+        print('CHS', self.gFunc_CHS)
+        print('ILS', self.gFunc_ILS)
+
         if self.solver.short_term_effects:
             self.gFunc = _ShortTermEffects(self, self.time, self.gFunc, self.boreholes, self.alpha, self.solver.ground_data,
                                            self.solver.fluid_data, self.solver.pipe_data, self.solver.borefield, self.solver.short_term_effects_parameters)
             toc = perf_counter()
+            print('STE', self.gFunc)
 
         elif self.solver.short_term_effects_fbw:
             self.gFunc = _ShortTermEffectsfbw(self, self.time, self.gFunc, self.boreholes, self.alpha, self.solver.ground_data,
                                            self.solver.fluid_data, self.solver.pipe_data, self.solver.borefield, self.solver.short_term_effects_parameters)
             toc = perf_counter()
+            print('STE_fbw', self.gFunc)
         else:
             toc = perf_counter()
 
