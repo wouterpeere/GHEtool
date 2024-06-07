@@ -342,6 +342,9 @@ class DynamicsBH(object):
         Tb = [self.init_temp]
         diff = [0]
         qb=[]
+        gFunc_CHS = []
+        g_comb_comp = []
+        g_comp =[]
 
         _dl = np.zeros(self.num_cells - 1)
         _d = np.zeros(self.num_cells)
@@ -427,6 +430,12 @@ class DynamicsBH(object):
 
             threshold_steady_state = 1- (self.resist_bh_effective - (radial_cell[CellProps.TEMP, 0]-radial_cell[CellProps.TEMP, self.bh_wall_idx]))
             qb.append(1- (self.resist_bh_effective - (radial_cell[CellProps.TEMP, 0]-radial_cell[CellProps.TEMP, self.bh_wall_idx])))
+
+            gFunc_CHS.append(2*np.pi*gt.heat_transfer.cylindrical_heat_source(time, self.ground_ghe.alpha(), self.boreholes[0].r_b,self.boreholes[0].r_b))
+            g_comp.append(self.c_0 * ((radial_cell[CellProps.TEMP, 0] - init_temp) / heat_flux - self.resist_bh_effective))
+
+            print('CHS', gFunc_CHS, len(gFunc_CHS))
+            print('g ', g_comp, len(g_comp))
         
             T0 = radial_cell[CellProps.TEMP, 0]
             TBH = radial_cell[CellProps.TEMP, self.bh_wall_idx]
@@ -435,8 +444,6 @@ class DynamicsBH(object):
             Tf.append(T0)
             Tb.append(TBH)
             diff.append(d)
-
-
 
             lntts.append(time)
             plottime.append(time)
@@ -448,8 +455,7 @@ class DynamicsBH(object):
             
             if time >= final_time - time_step:
                 break
-            
-
+       
         # quickly chop down the total values to a more manageable set
         num_intervals = int(self.x * 30)
         g_tmp = interp1d(lntts, g)
