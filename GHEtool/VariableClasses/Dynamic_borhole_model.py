@@ -456,6 +456,8 @@ class DynamicsBH(object):
 
           
             if stop_crit < 0 or time >= (final_time - time_step):
+                number_interval = time/self.t_s*exp(-8.6) * 30
+                print('time', time, 'ts', self.t_s*exp(-8.6), 'number of intervals', number_interval)
                 if stop_crit < 0:
                     ghe_logger.info(f"Perfect convergence with long-term g-function after {time/3600} hours")
                     
@@ -463,30 +465,22 @@ class DynamicsBH(object):
                     ghe_logger.info(f"No perfect convergence between long-term and short term g-functions, switch made after {time/3600} hours")
                 break
             
-
-
-            """
-            if time >= final_time - time_step:
-                break
-            """
-
+        """
+        #Plotting short-term and long-term g-function on 1 graph
         fig = plt.figure()
         ax1 = fig.add_subplot(111)
 
         plt.tight_layout()
 
-        ax1.plot(self.time, self.gFunc, c='b', marker="s", label='lt')
-        ax1.plot(lntts,g, c='r', marker="o", label='g')
-        #ax1.plot(lntts,threshold_steady_state, c='g', marker="o", label='g test')
-        ax1.plot(lntts,g_comb, c='c', marker="o", label='g comb')
-        ax1.plot(lntts,gFunc_CHS, c='y', marker="o", label='g chs')
-
-
+        ax1.plot(self.time, self.gFunc, c='b', marker="s", label='g_lt')
+        ax1.plot(lntts,g, c='r', label='g_st')
         plt.legend(loc='upper left')
-         
+        """
 
         # quickly chop down the total values to a more manageable set
-        num_intervals = int(self.x * 30)
+
+
+        num_intervals = int(1000)
         g_tmp = interp1d(lntts, g)
         uniform_lntts_vals = np.linspace(lntts[0], lntts[-1], num_intervals)
         uniform_g_vals = g_tmp(uniform_lntts_vals)
