@@ -9,6 +9,7 @@ from scipy.interpolate import interp1d
 from scipy.linalg.lapack import dgtsv
 
 import pygfunction as gt
+from GHEtool.logger.ghe_logger import ghe_logger
 
 class CellProps(IntEnum):
     R_IN = 0
@@ -37,6 +38,10 @@ class DynamicsBH(object):
         self.pipes_gt = gt.pipes
         self.short_term_effects_parameters = short_term_effects_parameters
         self.borefield = borefield
+        self.gFunc = gFunc
+        self.time = time
+
+        self.g_lt = interp1d(self.time, self.gFunc)
 
         # make function based on number of boreholes (1 or more) and half of the distance between boreholes
         number_of_boreholes = len(self.boreholes)
@@ -127,6 +132,7 @@ class DynamicsBH(object):
         self.calc_time_in_sec = max([self.t_s * exp(-8.6), 49.0 * 3600.0])
         self.t_b = 5 * (self.boreholes[0].r_b) ** 2 / self.ground_ghe.alpha()  
         self.final_time = self.x * self.t_b
+        print("final time in second", self.final_time, "final time in hours", self.final_time/3600)
   
         self.g_sts = None
 
@@ -345,6 +351,8 @@ class DynamicsBH(object):
         gFunc_CHS = []
         g_comb_comp = []
         g_comp =[]
+        g_test = []
+        threshold_steady_state = []
 
         _dl = np.zeros(self.num_cells - 1)
         _d = np.zeros(self.num_cells)
@@ -427,15 +435,13 @@ class DynamicsBH(object):
             g.append(self.c_0 * ((radial_cell[CellProps.TEMP, 0] - init_temp) / heat_flux - self.resist_bh_effective))
             g_comb.append(self.c_0 * ((radial_cell[CellProps.TEMP, 0] - radial_cell[CellProps.TEMP, self.bh_wall_idx]) / heat_flux - self.resist_bh_effective))
             g_plot.append(self.c_0 * ((radial_cell[CellProps.TEMP, 0] - init_temp) / heat_flux))
-
-            threshold_steady_state = 1- (self.resist_bh_effective - (radial_cell[CellProps.TEMP, 0]-radial_cell[CellProps.TEMP, self.bh_wall_idx]))
             qb.append(1- (self.resist_bh_effective - (radial_cell[CellProps.TEMP, 0]-radial_cell[CellProps.TEMP, self.bh_wall_idx])))
-
             gFunc_CHS.append(2*np.pi*gt.heat_transfer.cylindrical_heat_source(time, self.ground_ghe.alpha(), self.boreholes[0].r_b,self.boreholes[0].r_b))
-            g_comp.append(self.c_0 * ((radial_cell[CellProps.TEMP, 0] - init_temp) / heat_flux - self.resist_bh_effective))
 
-            print('CHS', gFunc_CHS, len(gFunc_CHS))
-            print('g ', g_comp, len(g_comp))
+            if time > 3600:
+                stop_crit = self.g_lt(time) - self.c_0 * ((radial_cell[CellProps.TEMP, 0] - init_temp) / heat_flux - self.resist_bh_effective)
+            else:
+                stop_crit = 1
         
             T0 = radial_cell[CellProps.TEMP, 0]
             TBH = radial_cell[CellProps.TEMP, self.bh_wall_idx]
@@ -448,14 +454,37 @@ class DynamicsBH(object):
             lntts.append(time)
             plottime.append(time)
 
-            """
-            if threshold_steady_state > 1 or time >= final_time - time_step:
+          
+            if stop_crit < 0 or time >= (final_time - time_step):
+                if stop_crit < 0:
+                    ghe_logger.info(f"Perfect convergence with long-term g-function after {time/3600} hours")
+                    
+                else:
+                    ghe_logger.info(f"No perfect convergence between long-term and short term g-functions, switch made after {time/3600} hours")
                 break
-            """
             
+
+
+            """
             if time >= final_time - time_step:
                 break
-       
+            """
+
+        fig = plt.figure()
+        ax1 = fig.add_subplot(111)
+
+        plt.tight_layout()
+
+        ax1.plot(self.time, self.gFunc, c='b', marker="s", label='lt')
+        ax1.plot(lntts,g, c='r', marker="o", label='g')
+        #ax1.plot(lntts,threshold_steady_state, c='g', marker="o", label='g test')
+        ax1.plot(lntts,g_comb, c='c', marker="o", label='g comb')
+        ax1.plot(lntts,gFunc_CHS, c='y', marker="o", label='g chs')
+
+
+        plt.legend(loc='upper left')
+         
+
         # quickly chop down the total values to a more manageable set
         num_intervals = int(self.x * 30)
         g_tmp = interp1d(lntts, g)
