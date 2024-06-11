@@ -54,7 +54,6 @@ def test_short_term_effects():
                    'method': 'equivalent',
                    'cylindrical_correction': False,
                    'short_term_effects': True,
-                   'short_term_effects_fbw': False,
                    'ground_data': ground_data,
                    'fluid_data': fluid_data,
                    'pipe_data': pipe_data,
@@ -79,8 +78,6 @@ def test_short_term_effects():
     L4_start = time.time()
     depth_L4 = borefield.size(100, L4_sizing=True)
     L4_stop = time.time()
-
-    
 
     print("The sizing according to L4 took", round((L4_stop - L4_start) * 1000, 4), "ms and was", depth_L4, "m.")
 
