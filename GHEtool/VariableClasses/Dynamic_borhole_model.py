@@ -56,7 +56,7 @@ class DynamicsBH(object):
             far_field_radius = distance_between_boreholes/2
 
         self.num_soil_cells = int(far_field_radius/10*500)
-        self.init_temp = self.ground_ghe.T_g
+        self.init_temp = self.ground_ghe.Tg
 
         # Create a namedtuple type
         ShortTermEffectsParameters = namedtuple('ShortTermEffectsParameters', short_term_effects_parameters.keys())
