@@ -17,6 +17,11 @@ test 1a
    * - 5 years
      - 15625 µs
      - 0 µs
+
+.. csv-table:: Table Title
+   :file: ../../../../GHEtool/Validation/comparison_with_other_sizing_tools/test1a/table1a.csv table1a
+   :widths: 8,7,7,7,7,7,7,7,7,7,7,7,7,7
+   :header-rows: 1
 +++++++++++++++++++++
 test 1b
 +++++++++++++++++++++
