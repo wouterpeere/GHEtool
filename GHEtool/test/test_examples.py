@@ -76,3 +76,7 @@ def test_start_in_different_month(monkeypatch):
 def test_multiple_ground_layers():
     from GHEtool.Examples.multiple_ground_layers import multiple_ground_layers
     multiple_ground_layers()
+
+def test_short_term_effects():
+    from GHEtool.Examples.short_term_effects import short_term_effects
+    short_term_effects()

@@ -14,7 +14,7 @@ import pygfunction as gt
 import time
 
 
-def test_short_term_effects():
+def short_term_effects():
 
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=1.8, T_g=17.5, volumetric_heat_capacity=2073600, flux=0)
@@ -84,4 +84,4 @@ def test_short_term_effects():
     plt.show()
 
 if __name__ == "__main__":
-    test_short_term_effects()
+    short_term_effects()
