@@ -65,7 +65,7 @@ def short_term_effects():
     
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=10)
-    load.load_hourly_profile("C:\\Workdir\\Develop\\ghetool\\GHEtool\\Examples\\ShortTermEffects\\test1a.csv", header=True, separator=",", col_heating=1, col_cooling=0)
+    load.load_hourly_profile("C:\\Workdir\\Develop\\ghetool\\GHEtool\\Examples\\test1a.csv", header=True, separator=",", col_heating=1, col_cooling=0)
     borefield.load = load
 
     delta_t = max(load.max_peak_cooling, load.max_peak_cooling) * 1000 / (fluid_data.Cp * fluid_data.mfr)
