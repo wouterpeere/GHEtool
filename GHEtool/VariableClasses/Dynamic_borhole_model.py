@@ -56,7 +56,7 @@ class DynamicsBH(object):
             far_field_radius = distance_between_boreholes/2
 
         self.num_soil_cells = int(far_field_radius/10*500)
-        self.init_temp = self.ground_ghe.Tg
+        self.init_temp = self.ground_ghe.T_g
 
         # Create a namedtuple type
         ShortTermEffectsParameters = namedtuple('ShortTermEffectsParameters', short_term_effects_parameters.keys())
@@ -339,8 +339,6 @@ class DynamicsBH(object):
         self.t_s = self.boreholes[0].H ** 2 / (9 * self.ground_ghe.alpha())
    
         g = []
-        g_bhw = []
-        g_comb = []
         g_plot = []
         lntts = []
         plottime = [2e-12]
@@ -349,10 +347,6 @@ class DynamicsBH(object):
         diff = [0]
         qb=[]
         gFunc_CHS = []
-        g_comb_comp = []
-        g_comp =[]
-        g_test = []
-        threshold_steady_state = []
 
         _dl = np.zeros(self.num_cells - 1)
         _d = np.zeros(self.num_cells)
@@ -433,7 +427,7 @@ class DynamicsBH(object):
 
             # compute standard g-functions
             g.append(self.c_0 * ((radial_cell[CellProps.TEMP, 0] - init_temp) / heat_flux - self.resist_bh_effective))
-            g_comb.append(self.c_0 * ((radial_cell[CellProps.TEMP, 0] - radial_cell[CellProps.TEMP, self.bh_wall_idx]) / heat_flux - self.resist_bh_effective))
+            #g_plot can be adapted to plot certain relation outside of this function, this variable is returned
             g_plot.append(self.c_0 * ((radial_cell[CellProps.TEMP, 0] - init_temp) / heat_flux))
             qb.append(1- (self.resist_bh_effective - (radial_cell[CellProps.TEMP, 0]-radial_cell[CellProps.TEMP, self.bh_wall_idx])))
             gFunc_CHS.append(2*np.pi*gt.heat_transfer.cylindrical_heat_source(time, self.ground_ghe.alpha(), self.boreholes[0].r_b,self.boreholes[0].r_b))
@@ -485,20 +479,19 @@ class DynamicsBH(object):
         uniform_lntts_vals = np.linspace(lntts[0], lntts[-1], num_intervals)
         uniform_g_vals = g_tmp(uniform_lntts_vals)
 
-        g_comb_tmp = interp1d(lntts,g_comb)
+
         qb_tmp =interp1d(lntts,qb)
         g_plot_tmp = interp1d(lntts, g_plot)
 
-        uniform_g_comb_vals = g_comb_tmp(uniform_lntts_vals)
+
         uniform_qb_vals = qb_tmp(uniform_lntts_vals)
         uniform_g_plot_vals = g_plot_tmp(uniform_lntts_vals)
 
         # set the final arrays and interpolator objects
         self.lntts = np.array(uniform_lntts_vals)
         self.g = np.array(uniform_g_vals)
-        self.g_comb = np.array(uniform_g_comb_vals)
         self.qb = np.array(uniform_qb_vals)
         self.g_sts = interp1d(self.lntts, self.g)
         self.g_plot = np.array(uniform_g_plot_vals)
 
-        return self.lntts, self.g, self.g_sts, self.g_comb, self.g_plot, self.qb
+        return self.lntts, self.g, self.g_sts, self.g_plot, self.qb
