@@ -16,13 +16,13 @@ Test 1
 The first test case employs a synthetically generated balanced load profile, either as a ground load or a building load. 
 This test assumes a single borehole handles the load without borehole-to-borehole thermal interference. An analysis of 
 the first two sets in Test 1a shows that the various sizing tools provide results that are in relatively good agreement. 
-For the first set, the borehole lengths range from 54.8 to 62.1 m. The GHEtool L2-, L3-, and L4-methods yielded lengths 
-of 59.4 m (1.2% deviation), 59.6 m (1.6% deviation), and 56.3 m (-4.0% deviation), respectively. The GHEtool L4-method's 
-slightly lower result is likely due to its use of hourly values instead of a 6-hour peak duration, which aligns with other 
-L4 tools. The borehole thermal resistance evaluated with GHEtool was 0.128 mK/W for all methods, consistent with other 
-values for this parameter. 
+For the first set, the equivalent borehole resistance Rb is calculated by tool, resulting in borehole lengths ranging from 
+54.8 to 62.1 m. The GHEtool L2-, L3-, and L4-methods yielded lengths of 59.4 m (1.2% deviation), 59.6 m (1.6% deviation), 
+and 56.3 m (-4.0% deviation), respectively. The GHEtool L4-method's slightly lower result is likely due to its use of hourly
+values instead of a 6-hour peak duration, which aligns with other L4 tools. The borehole thermal resistance evaluated with
+GHEtool was 0.128 mK/W for all methods, consistent with other values for this parameter. 
 
-.. list-table:: Calculated borefield lengths for Test 1a with  a peak load duration of 6 hours and Rb calculated by tool
+.. list-table:: Calculated borefield lengths for Test 1a with  a peak load duration of 6 hours and $R_{b}$ calculated by tool
    :header-rows: 1
 
    * - Sizing method 
@@ -57,9 +57,9 @@ values for this parameter.
 When the same Rb value (0.13 mK/W) was used for all tools in the second set of Test 1a, the 
 borehole lengths ranged from 56.5 to 63.7 m, with a mean of 59.8 m. The GHEtool L2- and L3-methods produced lengths of 
 59.8 m (-0.3% deviation) and 60.0 m (0.0% deviation), respectively, while the L4-method gave a slightly shorter length 
-of 56.7 m (-5.4% deviation), consistent with other L4 methods. The differences in Rb evaluation across tools in Test 1a 
-were typical for all test cases, indicating no significant flaws among the tools. Therefore, the remainder of this 
-validation will discuss the performance for identical values for Rb. 
+of 56.7 m (-5.4% deviation), consistent with other L4-methods. The differences in Rb evaluation across all tools in Test 1a 
+were limited for all test cases, indicating no significant flaws among the tools. Therefore, the remainder of this 
+validation will discuss the performance for identical values for Rb only. 
 
 .. list-table:: Calculated borefield lengths for Test 1a with  a peak load duration of 6 hours and imposed Rb=0.13 m.K/W
    :header-rows: 1
@@ -92,11 +92,12 @@ validation will discuss the performance for identical values for Rb.
      - 63.7 
      - 
      - 
-   
 
-+++++++++++++++++++++
-Test 1b
-+++++++++++++++++++++
+The same reasoning applies to the results obtained for Test 1b. The GHEtool L2- and L3-methods both resulted in lengths of 76.7 m, 
+consistent with the mean value of all tools, which is 76.1 m. The L4-method again provides a slightly lower value of 72.5 m, which 
+is in line with other L4-methods. 
+
+
 .. list-table:: Calculated borefield lengths for Test 1b with  a peak load duration of 6 hours and imposed Rb=0.13 m.K/W
    :header-rows: 1
 
@@ -293,7 +294,7 @@ temperature (Tg), and the number of boreholes.
    
 
 
-.. list-table:: Relative variation in lenght (expressed in %) for sensitivity analysis on Test 4
+.. list-table:: Relative variation in length (expressed in %) for sensitivity analysis on Test 4
    :header-rows: 1
 
    * - Sizing method 
@@ -386,3 +387,4 @@ temperature (Tg), and the number of boreholes.
 
 .. [1] Ahmadfard and Bernier (2019) developed a comprehensive set of test cases designed to compare software tools, ultimately aiming to enhance the reliability of design methods for sizing vertical ground heat exchangers. They reviewed existing tests and proposed four new test cases that cover a wide range of conditions, from single boreholes to extensive bore fields with varying annual ground thermal imbalances. They then conducted an inter-model comparison of twelve sizing tools, including several commercially available software programs and different forms of the ASHRAE sizing equation. The L2-, L3-, and L4-sizing methods of GHEtool were validated using this openly accessible document. 
 .. [2] Meertens, L., Peere, W., and Helsen, L. (2024). Influence of short-term dynamic effects on geothermal borefield size. In _Proceedings of International Ground Source Heat Pump Association Conference 2024. Montreal (Canada), 28-30 May 2024. https://doi.org/10.22488/okstate.24.000004
+.. [3] Shonder JA, Baxter VD, Hughes PJ, Thornton JW. A comparison of vertical ground heat exchanger design software for commercial applications. ASHRAE Transactions 2000;106:831–42. 
