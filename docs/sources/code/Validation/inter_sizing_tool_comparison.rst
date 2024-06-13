@@ -22,7 +22,7 @@ slightly lower result is likely due to its use of hourly values instead of a 6-h
 L4 tools. The borehole thermal resistance evaluated with GHEtool was 0.128 mK/W for all methods, consistent with other 
 values for this parameter. 
 
-.. list-table:: Calculated borefield lengths for test 1a with  a peak load duration of 6 hours and Rb calculated by tool
+.. list-table:: Calculated borefield lengths for Test 1a with  a peak load duration of 6 hours and Rb calculated by tool
    :header-rows: 1
 
    * - Sizing method 
@@ -61,7 +61,7 @@ of 56.7 m (-5.4% deviation), consistent with other L4 methods. The differences i
 were typical for all test cases, indicating no significant flaws among the tools. Therefore, the remainder of this 
 validation will discuss the performance for identical values for Rb. 
 
-.. list-table:: Calculated borefield lengths for test 1a with  a peak load duration of 6 hours and imposed Rb=0.13 m.K/W
+.. list-table:: Calculated borefield lengths for Test 1a with  a peak load duration of 6 hours and imposed Rb=0.13 m.K/W
    :header-rows: 1
 
    * - Sizing method 
@@ -97,7 +97,7 @@ validation will discuss the performance for identical values for Rb.
 +++++++++++++++++++++
 Test 1b
 +++++++++++++++++++++
-.. list-table:: Calculated borefield lengths for test 1b with  a peak load duration of 6 hours and imposed Rb=0.13 m.K/W
+.. list-table:: Calculated borefield lengths for Test 1b with  a peak load duration of 6 hours and imposed Rb=0.13 m.K/W
    :header-rows: 1
 
    * - Sizing method 
@@ -131,7 +131,7 @@ Test 1b
 +++++++++++++++++++++
 Test 2 
 +++++++++++++++++++++
-.. list-table:: Calculated borefield lengths for test 2 with  a peak load duration of 6 hours and imposed Rb=0.113 m.K/W
+.. list-table:: Calculated borefield lengths for Test 2 with  a peak load duration of 6 hours and imposed Rb=0.113 m.K/W
    :header-rows: 1
 
    * - Sizing method 
@@ -165,7 +165,7 @@ Test 2
 +++++++++++++++++++++
 Test 3
 +++++++++++++++++++++
-.. list-table:: Calculated borefield lengths for test 3 with  a peak load duration of 6 hours and imposed Rb=0.1 m.K/W
+.. list-table:: Calculated borefield lengths for Test 3 with  a peak load duration of 6 hours and imposed Rb=0.1 m.K/W
    :header-rows: 1
 
    * - Sizing method 
@@ -197,7 +197,7 @@ Test 3
      - 
      - 
 
-.. list-table:: Calculated borefield lengths for test 3 for different spacing (B [m]) and design period (p [years])
+.. list-table:: Calculated borefield lengths for Test 3 for different spacing (B [m]) and design period (p [years])
    :header-rows: 1
 
    * - Sizing method 
@@ -252,7 +252,7 @@ Test 3
 +++++++++++++++++++++
 Test 4
 +++++++++++++++++++++
-.. list-table:: Calculated borefield lengths for test 4 with  a peak load duration of 6 hours and imposed Rb=0.2 m.K/W
+.. list-table:: Calculated borefield lengths for Test 4 with  a peak load duration of 6 hours and imposed Rb=0.2 m.K/W
 
    * - Sizing method 
      - Borehole length [m]
@@ -284,9 +284,16 @@ Test 4
      - 
 
 +++++++++++++++++++++++++++++
-Sensitivity analysis test 4
+Sensitivity analysis Test 4
 +++++++++++++++++++++++++++++
-.. list-table:: Results for the sensitivity analysis on Test 4 regarding the relative variation in length [%] for different values of peak magnitude (PM), thermal conductivity (ks), spacing (B), ground temperature (Tg), and the number of boreholes.
+
+The table bellow shows the results of the sensitivity analysis on Test 4 regarding the relative variation 
+in length for different values of peak magnitude (PM), thermal conductivity (ks), spacing (B), ground 
+temperature (Tg), and the number of boreholes.
+   
+
+
+.. list-table:: Relative variation in lenght (expressed in %) for sensitivity analysis on Test 4
    :header-rows: 1
 
    * - Sizing method 
