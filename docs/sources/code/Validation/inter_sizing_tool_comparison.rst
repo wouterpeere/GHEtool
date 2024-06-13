@@ -179,6 +179,22 @@ due to the very specific imposed monthly peak loads which differ from the more r
 +++++++++++++++++++++
 Test 3
 +++++++++++++++++++++
+
+Monzó et al. (2000) proposed a methodology that accounts for monthly loads while still using the three-pulse approach of 
+L2 methods. Test 3 employs the hourly, cooling-dominated ground load profile used to test their methodology. This test is 
+significant because the fluid temperature limitations (and thus the required borehole length) occur in the first year of 
+operation. Therefore, sizing tools that do not consider these first-year limitations, but only size based on end-of-period 
+limitations, will yield inaccurate results, as discussed in this section. 
+
+When the same Rb value (0.113 mK/W) was used for all tools, the borehole lengths ranged from 85.9 to 115.0 m, with an 
+average of 101.0 m. This high variability underscores the importance of using a sizing tool that also considers the 
+first year of operation when limitations can occur unexpectedly. The GHEtool L2-method resulted in a borehole length of 
+107.5 m (6.4% deviation), while both the L3- and L4-methods produced lengths of 107.4 m (6.2% deviation). These three
+methods yielded nearly identical results, indicating their reliability. All three methods resulted in higher borehole 
+lengths compared to the mean of the other sizing tools in this validation. The explanation is straightforward: sizing 
+tools that do not account for first-year limitations will undersize the bore field, leading to operational problems 
+during the initial years.
+
 .. list-table:: Calculated borefield lengths for Test 3 with  a peak load duration of 6 hours and imposed Rb=0.1 m.K/W
    :header-rows: 1
 
@@ -210,6 +226,10 @@ Test 3
      - 115.0
      - 
      - 
+
+The effects of spacing and design period were also considered in Test 3. The results indicate stable outcomes for the three 
+different GHEtool methods regarding design period variations, as GHEtool accounts for first-year limitations, thus eliminating 
+this uncertainty. It can be observed that the L3-method is particularly more sensitive to variations in spacing. 
 
 .. list-table:: Calculated borefield lengths for Test 3 for different spacing (B [m]) and design period (p [years])
    :header-rows: 1
@@ -400,4 +420,5 @@ temperature (Tg), and the number of boreholes.
 
 .. [1] Ahmadfard and Bernier (2019) developed a comprehensive set of test cases designed to compare software tools, ultimately aiming to enhance the reliability of design methods for sizing vertical ground heat exchangers. They reviewed existing tests and proposed four new test cases that cover a wide range of conditions, from single boreholes to extensive bore fields with varying annual ground thermal imbalances. They then conducted an inter-model comparison of twelve sizing tools, including several commercially available software programs and different forms of the ASHRAE sizing equation. The L2-, L3-, and L4-sizing methods of GHEtool were validated using this openly accessible document. 
 .. [2] Meertens, L., Peere, W., and Helsen, L. (2024). Influence of short-term dynamic effects on geothermal borefield size. In _Proceedings of International Ground Source Heat Pump Association Conference 2024. Montreal (Canada), 28-30 May 2024. https://doi.org/10.22488/okstate.24.000004
-.. [3] Shonder JA, Baxter VD, Hughes PJ, Thornton JW. A comparison of vertical ground heat exchanger design software for commercial applications. ASHRAE Transactions 2000;106:831–42. 
+.. [3] Monzó P, Bernier M, Acuña J, Mogensen PA. (2016). Monthly based bore field sizing methodology with applications to optimum borehole spacing. ASHRAE Transact 2016;122(1):111–26.
+.. [4] Shonder JA, Baxter VD, Hughes PJ, Thornton JW. (2000). A comparison of vertical ground heat exchanger design software for commercial applications. ASHRAE Transactions 2000;106:831–42. 
