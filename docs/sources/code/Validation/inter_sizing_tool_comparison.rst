@@ -176,6 +176,7 @@ average of 83.7 meters. The GHEtool L2- and L3-methods produced lengths of 77.5 
 (-9.1% deviation), respectively, while the L4-method yielded a higher length of 85.0 meters (-2.9% deviation). For this 
 specific imposed load profile, it is clear that the L4-method should be preferred over the L2- and L3-methods in GHEtool, 
 due to the very specific imposed monthly peak loads which differ from the more realistic 6-hour peak load in GHEtool.
+
 +++++++++++++++++++++
 Test 3
 +++++++++++++++++++++
