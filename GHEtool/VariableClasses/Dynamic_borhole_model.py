@@ -85,7 +85,7 @@ class DynamicsBH(object):
         self.factor_time = 50 # parameter to modify final time 
         self.rho_cp_grout = self.short_term_parameters.rho_cp_grout  # Sandbox
         self.rho_cp_pipe = self.short_term_parameters.rho_cp_pipe  # not aan te passen voor sandbox
-        self.Rb = self.short_term_parameters.Rb
+        
         # Starting Rb, needs to be updated every iteration
         self.resist_bh_effective = self.borefield.Rb
                

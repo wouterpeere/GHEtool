@@ -34,13 +34,13 @@ def short_term_effects():
     borefield.set_pipe_parameters(pipe_data)
     borefield.create_rectangular_borefield(1, 1, 6, 6, 110, 4, 0.075)
     #borefield.set_Rb(0.13)
-    Rb = borefield.Rb
+
 
     # Sample dictionary with example values
     short_term_effects_parameters = {
     'rho_cp_grout': rho_cp_grout,
     'rho_cp_pipe': rho_cp_pipe,
-    'Rb': Rb}
+    }
 
     options = {'nSegments': 12,
                    'segment_ratios': None,
