@@ -208,44 +208,82 @@ Test 3
      - p=10 y, B=5 m
      - p=10 y, B=7 m
    * - L2
+     - 113.4
      - 107.5
-     - 6.4
-     - 0.1
-     -
-     -
-     -
+     - 107.1
+     - 113.4
+     - 107.5
+     - 107.1
    * - L3
+     - 118.4
+     - 107.5
+     - 107.1
+     - 118.1
      - 107.4
-     - 6.2
-     - 0.1
+     - 106.9
    * - L4
+     - 114.4
+     - 107.4 
      - 107.4
-     - 6.2
-     - 0.1
+     - 114.1
+     - 107.4
+     - 108.3
    * - mean
+     - 117.8
+     - 110.7
+     - 110.5
+     - 101.2
      - 101.1
-     -
-     - 
+     - 104.6
    * - min
+     - 105.0
+     - 104.6
+     - 106.3
+     - 77.0
      - 85.9
-     -
-     - 
+     - 93.2
    * - max
+     - 130.6
      - 115.0
-     - 
-     - 
+     - 115.0
+     - 130.6
+     - 115.0
+     - 115.0
 +++++++++++++++++++++
 Test 4
 +++++++++++++++++++++
-.. list-table:: Calculated borefield lengths for test 4
+.. list-table:: Calculated borefield lengths for test 4 with  a peak load duration of 6 hours and imposed Rb = 0.2 m.K/W
    :header-rows: 1
 
-   * - Simulation period [years]
-     - Required time old method [µs]
-     - Required time new method [µs]
-   * - 5 years
-     - 15625 µs
-     - 0 µs
+   * - Sizing method [years]
+     - Borehole length [m]
+     - Difference from mean [%]
+     - Imposed Rb = 0.2 m.K/W [m.K/W]
+   * - L2
+     - 121.5
+     - 1.9
+     - 0.2
+   * - L3
+     - 122.2
+     - 2.5
+     - 0.2
+   * - L4
+     - 120.0
+     - 0.6
+     - 0.2
+   * - mean
+     - 119.2
+     -
+     - 
+   * - min
+     - 93.0
+     -
+     - 
+   * - max
+     - 128.9
+     - 
+     - 
+
 +++++++++++++++++++++++++++++
 Sensitivity analysis test 4
 +++++++++++++++++++++++++++++
