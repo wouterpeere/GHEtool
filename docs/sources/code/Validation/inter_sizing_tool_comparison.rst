@@ -302,6 +302,7 @@ Sensitivity analysis test 4
      - 3x3 bores 
      - 7x7 bores 
    * - L2
+     - 121.5
      - -5.9	
      - 5.2 	
      - 11.3	
@@ -313,6 +314,7 @@ Sensitivity analysis test 4
      - 149.0	
      - -49.4
    * - L3
+     - 122.2
      - -4.9	
      - 5.1	
      - 11.4	
@@ -324,6 +326,7 @@ Sensitivity analysis test 4
      - 148.0	
      - -49.2
    * - L4
+     - 120.0
      - ----	
      - ----	
      - 11.5	
@@ -335,6 +338,7 @@ Sensitivity analysis test 4
      - 147.9	
      - -49.3
    * - mean
+     - 118.8
      - -4.7	
      - 5.0	
      - 14.3	
