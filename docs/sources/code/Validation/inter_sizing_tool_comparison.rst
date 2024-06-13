@@ -1,13 +1,15 @@
 ***********************************************************
 Inter sizing tool comparison
 ***********************************************************
-Ahmadfard and Bernier (2019) developed a comprehensive set of test cases designed to compare software tools, 
+Ahmadfard and Bernier (2019) [1]_ developed a comprehensive set of test cases designed to compare software tools,
 ultimately aiming to enhance the reliability of design methods for sizing vertical ground heat exchangers. 
 They reviewed existing tests and proposed four test cases that cover a wide range of conditions, 
 from single boreholes to extensive borefields with varying annual ground thermal imbalances. 
 They then conducted an inter-model comparison of twelve sizing tools, including several commercially available 
 software programs (such as EED, GLHEpro, and DTS) and different forms of the ASHRAE sizing equation. The L2-, L3-, and L4-sizing methods of 
-GHEtool were validated using this openly accessible document. 
+GHEtool were validated using this openly accessible document.
+
+The results below can also be found in the :download:`excel document <Comparing_sizingtools_spreadsheet.xlsx>`.
 
 +++++++++++++++++++++
 Test 1
@@ -133,7 +135,7 @@ is in line with other L4-methods.
 Test 2 
 +++++++++++++++++++++
 
-Shonder et al. (2000) utilized data from an elementary school in Lincoln, Nebraska, for an inter-model comparison nearly two 
+Shonder et al. (2000) [4]_ utilized data from an elementary school in Lincoln, Nebraska, for an inter-model comparison nearly two
 decades ago. With advancements in sizing tools, this case was revisited for current validation. The test case involves a 
 borefield of 12×10 boreholes, each 73 m deep and spaced 6 m apart. The test uses a specific load profile 
 with monthly peak building loads of varying durations, ranging from 1 to 11 hours. 
@@ -180,7 +182,7 @@ due to the very specific imposed monthly peak loads which differ from the more g
 Test 3
 +++++++++++++++++++++
 
-Monzó et al. (2000) proposed a methodology that accounts for monthly loads while still using the three-pulse approach of 
+Monzó et al. (2000) [3]_ proposed a methodology that accounts for monthly loads while still using the three-pulse approach of
 L2 methods. Test 3 employs the hourly, cooling-dominated ground load profile which they used to test their methodology.
 This test is important because it represents scenarios where the fluid temperature limitation occurs in the first year of operation
 Therefore, sizing tools that do not consider these first-year limitations, but only size based on end-of-period 
@@ -409,34 +411,9 @@ and the total number of boreholes.
 The GHEtool results indicate that its sensitivity to the listed parameters is comparable to that of other sizing tools, 
 demonstrating the robustness of GHEtool.
 
-.. literalinclude:: ../../../../GHEtool/Validation/comparison_with_other_sizing_tools/test1a/test1a.py
-   :language: python
-   :linenos:
-
-.. literalinclude:: ../../../../GHEtool/Validation/comparison_with_other_sizing_tools/test1b/test1b.py
-   :language: python
-   :linenos:
-
-.. literalinclude:: ../../../../GHEtool/Validation/comparison_with_other_sizing_tools/test2/test2.py
-   :language: python
-   :linenos:
-
-.. literalinclude:: ../../../../GHEtool/Validation/comparison_with_other_sizing_tools/test3/test3.py
-   :language: python
-   :linenos:
-
-.. literalinclude:: ../../../../GHEtool/Validation/comparison_with_other_sizing_tools/test4/test4.py
-   :language: python
-   :linenos:
-
-.. literalinclude:: ../../../../GHEtool/Validation/comparison_with_other_sizing_tools/test4/sensitivity_analysis.py
-   :language: python
-   :linenos:
-
-
 .. rubric:: References
 
-.. [1] Ahmadfard and Bernier (2019) developed a comprehensive set of test cases designed to compare software tools, ultimately aiming to enhance the reliability of design methods for sizing vertical ground heat exchangers. They reviewed existing tests and proposed four new test cases that cover a wide range of conditions, from single boreholes to extensive bore fields with varying annual ground thermal imbalances. They then conducted an inter-model comparison of twelve sizing tools, including several commercially available software programs and different forms of the ASHRAE sizing equation. The L2-, L3-, and L4-sizing methods of GHEtool were validated using this openly accessible document. 
+.. [1] Ahmadfard M. and Bernier M., A review of vertical ground heat exchanger sizing tools including an inter-model comparison, Renewable and Sustainable Energy Reviews, Volume 110, 2019, Pages 247-265, ISSN 1364-0321, https://doi.org/10.1016/j.rser.2019.04.045
 .. [2] Meertens, L., Peere, W., and Helsen, L. (2024). Influence of short-term dynamic effects on geothermal borefield size. In _Proceedings of International Ground Source Heat Pump Association Conference 2024. Montreal (Canada), 28-30 May 2024. https://doi.org/10.22488/okstate.24.000004
 .. [3] Monzó P, Bernier M, Acuña J, Mogensen PA. (2016). Monthly based bore field sizing methodology with applications to optimum borehole spacing. ASHRAE Transact 2016;122(1):111–26.
 .. [4] Shonder JA, Baxter VD, Hughes PJ, Thornton JW. (2000). A comparison of vertical ground heat exchanger design software for commercial applications. ASHRAE Transactions 2000;106:831–42. 
