@@ -961,8 +961,7 @@ class Borefield(BaseClass):
              L3_sizing: bool = None,
              L4_sizing: bool = None,
              quadrant_sizing: int = None,
-             **kwargs,
-             ) -> float:
+             **kwargs) -> float:
         """
         This function sets the options for the sizing function.
 

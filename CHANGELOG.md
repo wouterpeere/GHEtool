@@ -5,10 +5,11 @@ our [project board](https://github.com/users/wouterpeere/projects/2) on GitHub.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [2.3.0] - unreleased
+## [2.3.0] - unpublished
 
 ## Added
 
+- Extra validation based on the work of Ahmadfard & Bernier (issue #243).
 - Added the option to exclude DHW from the peak heating load (issue #252).
 - Added vfr to Fluid Class (issue #262).
 - Added yearly_heating_load_simulation_period, yearly_cooling_load_simulation_period,
