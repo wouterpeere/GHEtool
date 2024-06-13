@@ -14,9 +14,6 @@ from GHEtool.VariableClasses.cylindrical_correction import update_pygfunction
 
 # add cylindrical correction to pygfunction
 update_pygfunction()
-# add short-term effects to pygfunction
-update_pygfunction_short_term_effects()
-
 
 class FIFO:
     """
@@ -105,9 +102,9 @@ class GFunction:
         self.use_cyl_correction_when_negative: bool = True
         self.no_extrapolation: bool = True
         self.threshold_depth_interpolation: float = .25  # %
-
         self.fifo_list: FIFO = FIFO(8)
 
+     
 
     @property
     def store_previous_values(self) -> bool:
@@ -186,6 +183,10 @@ class GFunction:
             gvalues : np.ndarray
                 1D array with all the requested gvalues
             """
+            include_short_term_effects = self.options.get('short_term_effects')
+            if include_short_term_effects:
+                # add short-term effects to pygfunction
+                update_pygfunction_short_term_effects()
 
             # check if the value is in the fifo_list
             # if the value is in self.depth_array, there is no problem, since the interpolation will be exact anyway
