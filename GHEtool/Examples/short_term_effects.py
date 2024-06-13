@@ -22,8 +22,6 @@ def short_term_effects():
     fluid_data = FluidData(mfr=0.440, rho=1052, Cp=3795, mu=0.0052, k_f=0.48)
     pipe_data = MultipleUTube(r_in=0.0137, r_out=0.0167, D_s=0.075 / 2, k_g=1.4, k_p=0.43, number_of_pipes=1)
     # Addidional input data needed for short-term model
-    x = 50 # 1 by default, parameter to modify final time 
-    u_tube = 1 # 1 for single U tube, 2 for dubble U tube (not yet possible) 
     rho_cp_grout = 3800000.0  # 3800000.0 by default
     rho_cp_pipe = 1800000.0  # 1800000.0 by default
 
@@ -40,8 +38,6 @@ def short_term_effects():
 
     # Sample dictionary with example values
     short_term_effects_parameters = {
-    'x': x,
-    'u_tube': u_tube,
     'rho_cp_grout': rho_cp_grout,
     'rho_cp_pipe': rho_cp_pipe,
     'Rb': Rb}

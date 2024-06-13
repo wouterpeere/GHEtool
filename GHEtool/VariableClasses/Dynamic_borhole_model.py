@@ -46,7 +46,25 @@ class DynamicsBH(object):
         # make function based on number of boreholes (1 or more) and half of the distance between boreholes
         number_of_boreholes = len(self.boreholes)
 
-        # only works for rectangular field, adjust for more general approaches
+        # Fluid factor takes into account the fluid inside of the system but outside of the boreholes
+        # To do: calculate fluid factor based on borehole configuration
+        if number_of_boreholes == 1:
+            self.fluid_factor = 1
+        else:
+            self.fluid_factor = 2
+
+        # number of pipes
+        # 1 for single U tube, 2 for dubble U tube (not possible yet) 
+        self.u_tube = self.pipes_ghe.number_of_pipes
+
+        #To do: extend numerical model to be able to handle double u-tubes
+        if self.u_tube == 2:
+            ghe_logger.warning(f"Double u-tube is considered, while model only handles single u-tube, results will be incorrect")
+
+        
+
+        # Calculate the far field radius, which influences the number of ground cells
+        # To do: only works for rectangular field, adjust for more general approaches
         if number_of_boreholes == 0:
             print('Error: no borefield has been initiated')
         elif number_of_boreholes < 4:
@@ -64,9 +82,7 @@ class DynamicsBH(object):
         short_term_parameters = ShortTermEffectsParameters(**short_term_effects_parameters)
         self.short_term_parameters = short_term_parameters
 
-        self.fluid_factor = self.short_term_parameters.fluid_factor # 2 by default, make function to calculate this
-        self.x = self.short_term_parameters.x # parameter to modify final time 
-        self.u_tube = self.short_term_parameters.u_tube # 1 for single U tube, 2 for dubble U tube (not possible yet) 
+        self.factor_time = 50 # parameter to modify final time 
         self.rho_cp_grout = self.short_term_parameters.rho_cp_grout  # Sandbox
         self.rho_cp_pipe = self.short_term_parameters.rho_cp_pipe  # not aan te passen voor sandbox
         self.Rb = self.short_term_parameters.Rb
@@ -131,7 +147,7 @@ class DynamicsBH(object):
         # default is at least 49 hours, or up to -8.6 log time
         self.calc_time_in_sec = max([self.t_s * exp(-8.6), 49.0 * 3600.0])
         self.t_b = 5 * (self.boreholes[0].r_b) ** 2 / self.ground_ghe.alpha()  
-        self.final_time = self.x * self.t_b
+        self.final_time = self.factor_time * self.t_b
         print("final time in second", self.final_time, "final time in hours", self.final_time/3600)
   
         self.g_sts = None
