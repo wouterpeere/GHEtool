@@ -187,15 +187,6 @@ significant because the fluid temperature limitations (and thus the required bor
 operation. Therefore, sizing tools that do not consider these first-year limitations, but only size based on end-of-period 
 limitations, will yield inaccurate results, as discussed in this section. 
 
-When the same Rb value (0.113 m.K/W) was used for all tools, the borehole lengths ranged from 85.9 to 115.0 m, with an 
-average of 101.0 m. This high variability underscores the importance of using a sizing tool that also considers the 
-first year of operation when limitations can occur unexpectedly. The GHEtool L2-method resulted in a borehole length of 
-107.5 m (6.4% deviation), while both the L3- and L4-methods produced lengths of 107.4 m (6.2% deviation). These three
-methods yielded nearly identical results, indicating their reliability. All three methods resulted in higher borehole 
-lengths compared to the mean of the other sizing tools in this validation. The explanation is straightforward: sizing 
-tools that do not account for first-year limitations will undersize the bore field, leading to operational problems 
-during the initial years.
-
 .. list-table:: Calculated borefield lengths for Test 3 with  a peak load duration of 6 hours and imposed Rb=0.1 m.K/W
    :header-rows: 1
 
@@ -228,9 +219,15 @@ during the initial years.
      - 
      - 
 
-The effects of spacing and design period were also considered in Test 3. The results indicate stable outcomes for the three 
-different GHEtool methods regarding design period variations, as GHEtool accounts for first-year limitations, thus eliminating 
-this uncertainty. It can be observed that the L3-method is particularly more sensitive to variations in spacing. 
+When the same Rb value (0.113 m.K/W) was used for all tools, the borehole lengths ranged from 85.9 to 115.0 m, with an 
+average of 101.0 m. This high variability underscores the importance of using a sizing tool that also considers the 
+first year of operation when limitations can occur unexpectedly. The GHEtool L2-method resulted in a borehole length of 
+107.5 m (6.4% deviation), while both the L3- and L4-methods produced lengths of 107.4 m (6.2% deviation). These three
+methods yielded nearly identical results, indicating their reliability. All three methods resulted in higher borehole 
+lengths compared to the mean of the other sizing tools in this validation. The explanation is straightforward: sizing 
+tools that do not account for first-year limitations will undersize the bore field, leading to operational problems 
+during the initial years.
+
 
 .. list-table:: Calculated borefield lengths for Test 3 for different spacing (B [m]) and design period (p [years])
    :header-rows: 1
@@ -284,6 +281,10 @@ this uncertainty. It can be observed that the L3-method is particularly more sen
      - 130.6
      - 115.0
      - 115.0
+
+The effects of spacing and design period were also considered in Test 3. The results indicate stable outcomes for the three 
+different GHEtool methods regarding design period variations, as GHEtool accounts for first-year limitations, thus eliminating 
+this uncertainty. It can be observed that the L3-method is particularly more sensitive to variations in spacing. 
 
 +++++++++++++++++++++
 Test 4
