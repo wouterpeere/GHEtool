@@ -336,10 +336,10 @@ These results indicate that all three GHEtool methods effectively account for lo
 Sensitivity analysis Test 4
 +++++++++++++++++++++++++++++
 
-The table bellow shows the results of the sensitivity analysis on Test 4 regarding the relative variation 
-in length for different values of peak magnitude (qh), thermal conductivity (ks), spacing (B), ground 
-temperature (Tg), and the number of boreholes.
-   
+
+The final results present a sensitivity analysis on Test 4, examining the relative variation in borehole length in response to 
+changes in five parameters: peak load magnitude (qh), thermal conductivity (kg), borehole spacing (B), ground temperature (Tg), 
+and the total number of boreholes.
 
 
 .. list-table:: Relative variation in length (expressed in %) for sensitivity analysis on Test 4
@@ -405,6 +405,10 @@ temperature (Tg), and the number of boreholes.
      - 27.2	
      - 150.4	
      - -48.8
+
+
+The GHEtool results indicate that its sensitivity to the listed parameters is comparable to that of other sizing tools, 
+demonstrating the robustness of GHEtool.
 
 .. literalinclude:: ../../../../GHEtool/Validation/comparison_with_other_sizing_tools/test1a/test1a.py
    :language: python
