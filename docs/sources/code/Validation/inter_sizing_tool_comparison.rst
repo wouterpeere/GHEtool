@@ -20,7 +20,7 @@ For the first set, the equivalent borehole resistance Rb is calculated by tool, 
 54.8 to 62.1 m. The GHEtool L2-, L3-, and L4-methods yielded lengths of 59.4 m (1.2% deviation), 59.6 m (1.6% deviation), 
 and 56.3 m (-4.0% deviation), respectively. The GHEtool L4-method's slightly lower result is likely due to its use of hourly
 values instead of a 6-hour peak duration, which aligns with other L4 tools. The borehole thermal resistance evaluated with
-GHEtool was 0.128 mK/W for all methods, consistent with other values for this parameter. 
+GHEtool was 0.128 m.K/W for all methods, consistent with other values for this parameter. 
 
 .. list-table:: Calculated borefield lengths for Test 1a with  a peak load duration of 6 hours and $R_{b}$ calculated by tool
    :header-rows: 1
@@ -54,7 +54,7 @@ GHEtool was 0.128 mK/W for all methods, consistent with other values for this pa
      - 
      - 0.128
 
-When the same Rb value (0.13 mK/W) was used for all tools in the second set of Test 1a, the 
+When the same Rb value (0.13 m.K/W) was used for all tools in the second set of Test 1a, the 
 borehole lengths ranged from 56.5 to 63.7 m, with a mean of 59.8 m. The GHEtool L2- and L3-methods produced lengths of 
 59.8 m (-0.3% deviation) and 60.0 m (0.0% deviation), respectively, while the L4-method gave a slightly shorter length 
 of 56.7 m (-5.4% deviation), consistent with other L4-methods. The differences in Rb evaluation across all tools in Test 1a 
@@ -135,7 +135,7 @@ Test 2
 
 Shonder et al. (2000) utilized data from an elementary school in Lincoln, Nebraska, for an inter-model comparison nearly two 
 decades ago. With advancements in sizing tools, this case was revisited for current validation. The test case involves a 
-borehole field with 12 × 10 boreholes, each 73 meters deep and spaced 6 meters apart. The test uses a specific load profile 
+borehole field with 12 × 10 boreholes, each 73 m deep and spaced 6 m apart. The test uses a specific load profile 
 with monthly peak building loads of varying durations, ranging from 1 to 11 hours. The results presented are based on a 6-hour 
 peak load duration for the L2- and L3-methods in GHEtool.
 
@@ -171,9 +171,9 @@ peak load duration for the L2- and L3-methods in GHEtool.
      - 
      - 
 
-When the same Rb value (0.13 mK/W) was used for all tools, the borehole lengths ranged from 77.5 to 102.0 meters, with an 
-average of 83.7 meters. The GHEtool L2- and L3-methods produced lengths of 77.5 meters (-11.6% deviation) and 79.6 meters 
-(-9.1% deviation), respectively, while the L4-method yielded a higher length of 85.0 meters (-2.9% deviation). For this 
+When the same Rb value (0.13 m.K/W) was used for all tools, the borehole lengths ranged from 77.5 to 102.0 m, with an 
+average of 83.7 m. The GHEtool L2- and L3-methods produced lengths of 77.5 m (-11.6% deviation) and 79.6 m
+(-9.1% deviation), respectively, while the L4-method yielded a higher length of 85.0 m (-2.9% deviation). For this 
 specific imposed load profile, it is clear that the L4-method should be preferred over the L2- and L3-methods in GHEtool, 
 due to the very specific imposed monthly peak loads which differ from the more realistic 6-hour peak load in GHEtool.
 
@@ -187,7 +187,7 @@ significant because the fluid temperature limitations (and thus the required bor
 operation. Therefore, sizing tools that do not consider these first-year limitations, but only size based on end-of-period 
 limitations, will yield inaccurate results, as discussed in this section. 
 
-When the same Rb value (0.113 mK/W) was used for all tools, the borehole lengths ranged from 85.9 to 115.0 m, with an 
+When the same Rb value (0.113 m.K/W) was used for all tools, the borehole lengths ranged from 85.9 to 115.0 m, with an 
 average of 101.0 m. This high variability underscores the importance of using a sizing tool that also considers the 
 first year of operation when limitations can occur unexpectedly. The GHEtool L2-method resulted in a borehole length of 
 107.5 m (6.4% deviation), while both the L3- and L4-methods produced lengths of 107.4 m (6.2% deviation). These three
@@ -284,9 +284,16 @@ this uncertainty. It can be observed that the L3-method is particularly more sen
      - 130.6
      - 115.0
      - 115.0
+
 +++++++++++++++++++++
 Test 4
 +++++++++++++++++++++
+
+Test 4 features a relatively high annual ground load imbalance with peak load conditions occurring during cooling operations. 
+This profile serves as an effective test for evaluating the long-term borehole thermal interference effects of various tools. 
+The bore field length is calculated for a design period of 20 years for 25 boreholes, each with a borehole thermal resistance 
+of 0.2 m.K/W. 
+
 .. list-table:: Calculated borefield lengths for Test 4 with  a peak load duration of 6 hours and imposed Rb=0.2 m.K/W
 
    * - Sizing method 
@@ -318,12 +325,18 @@ Test 4
      - 
      - 
 
+When the same Rb value (0.2 m.K/W) was used for all tools, the borehole lengths ranged from 93.0 to 128.0 meters, with an 
+average of 119.2 meters. The GHEtool L2- and L3-methods produced lengths of 121.5 meters (1.9% deviation) and 122.2 meters 
+(2.5% deviation), respectively, while the L4-method yielded a slightly shorter length of 120.0 meters (0.6% deviation). 
+These results indicate that all three GHEtool methods effectively account for long-term borehole thermal interference effects. 
+
+
 +++++++++++++++++++++++++++++
 Sensitivity analysis Test 4
 +++++++++++++++++++++++++++++
 
 The table bellow shows the results of the sensitivity analysis on Test 4 regarding the relative variation 
-in length for different values of peak magnitude (PM), thermal conductivity (ks), spacing (B), ground 
+in length for different values of peak magnitude (qh), thermal conductivity (ks), spacing (B), ground 
 temperature (Tg), and the number of boreholes.
    
 
@@ -333,8 +346,8 @@ temperature (Tg), and the number of boreholes.
 
    * - Sizing method 
      - L from Test 4 [m]
-     - PM=-125758.1 W
-     - PM=-153704.4 W
+     - qh=-125758.1 W
+     - qh=-153704.4 W
      - ks=1.5 W/m-K
      - ks=2.3 W/m-K
      - B=6 m
