@@ -132,6 +132,13 @@ is in line with other L4-methods.
 +++++++++++++++++++++
 Test 2 
 +++++++++++++++++++++
+
+Shonder et al. (2000) utilized data from an elementary school in Lincoln, Nebraska, for an inter-model comparison nearly two 
+decades ago. With advancements in sizing tools, this case was revisited for current validation. The test case involves a 
+borehole field with 12 × 10 boreholes, each 73 meters deep and spaced 6 meters apart. The test uses a specific load profile 
+with monthly peak building loads of varying durations, ranging from 1 to 11 hours. The results presented are based on a 6-hour 
+peak load duration for the L2- and L3-methods in GHEtool.
+
 .. list-table:: Calculated borefield lengths for Test 2 with  a peak load duration of 6 hours and imposed Rb=0.113 m.K/W
    :header-rows: 1
 
@@ -163,6 +170,12 @@ Test 2
      - 102.0
      - 
      - 
+
+When the same Rb value (0.13 mK/W) was used for all tools, the borehole lengths ranged from 77.5 to 102.0 meters, with an 
+average of 83.7 meters. The GHEtool L2- and L3-methods produced lengths of 77.5 meters (-11.6% deviation) and 79.6 meters 
+(-9.1% deviation), respectively, while the L4-method yielded a higher length of 85.0 meters (-2.9% deviation). For this 
+specific imposed load profile, it is clear that the L4-method should be preferred over the L2- and L3-methods in GHEtool, 
+due to the very specific imposed monthly peak loads which differ from the more realistic 6-hour peak load in GHEtool.
 +++++++++++++++++++++
 Test 3
 +++++++++++++++++++++
