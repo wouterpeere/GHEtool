@@ -8,6 +8,7 @@ import pygfunction as gt
 import numpy as np
 
 from math import pi
+import matplotlib.pyplot as plt
 
 from pygfunction.boreholes import Borehole, _EquivalentBorehole, find_duplicates
 from pygfunction.heat_transfer import finite_line_source, finite_line_source_vectorized, \
@@ -51,19 +52,29 @@ def evaluate_g_function(self, time):
 
         # Evaluate g-function
         # When cylindrical correction is True, this correction on the g-function is done in the next line
-
         self.gFunc = self.solver.solve(time, self.alpha)
 
+        """
+        # Plotting FLS versus CC g-functions
         self.gFunc_CHS = gt.heat_transfer.cylindrical_heat_source(self.time, self.alpha, self.boreholes[0].r_b,self.boreholes[0].r_b)
         self.gFunc_CHS = 2*np.pi*self.gFunc_CHS
 
         self.gFunc_ILS = gt.heat_transfer.infinite_line_source(self.time, self.alpha, self.boreholes[0].r_b)
-        self.gFunc_ILS = -0.5*self.gFunc_ILS
+        self.gFunc_ILS = 0.5*self.gFunc_ILS
 
-        print('FLS+CC', self.gFunc)
-        print('CHS', self.gFunc_CHS)
-        print('ILS', self.gFunc_ILS)
+        gFunc_FLS = self.gFunc - self.gFunc_CHS + self.gFunc_ILS
 
+        #Plotting short-term and long-term g-function on 1 graph
+        fig = plt.figure()
+        ax1 = fig.add_subplot(111)
+
+        plt.tight_layout()
+
+        ax1.plot(self.time, self.gFunc, c='b', marker="s", label='g_cc')
+        ax1.plot(self.time, gFunc_FLS, c='r',marker="s", label='g_fls')
+        plt.legend(loc='upper left')
+        """
+       
         if self.solver.short_term_effects:
             self.gFunc = _ShortTermEffects(self, self.time, self.gFunc, self.boreholes, self.alpha, self.solver.ground_data,
                                            self.solver.fluid_data, self.solver.pipe_data, self.solver.borefield, self.solver.short_term_effects_parameters)
