@@ -225,6 +225,20 @@ def test_dhw():
     assert np.array_equal(np.array([7440., 6720., 7440., 7200., 7440., 7200., 7440., 7440., 7200., 7440., 7200., 7440.]), load.baseload_heating)
 
 
+def test_dhw_exclude():
+    load = MonthlyGeothermalLoadAbsolute()
+    load.dhw = 8760*10
+    assert np.array_equal(np.full(12, 10), load.peak_heating)
+    load.exclude_DHW_from_peak = True
+    assert load.dhw_power == 0
+    assert np.array_equal(np.full(12, 10), load.peak_heating)  # since baseload
+
+    load.peak_heating = [20]*12
+    assert np.array_equal(np.full(12, 20), load.peak_heating)
+    load.exclude_DHW_from_peak = False
+    assert np.array_equal(np.full(12, 30), load.peak_heating)
+
+
 def test_yearly_heating_cooling():
     load = MonthlyGeothermalLoadAbsolute(*load_case(2))
     assert load.yearly_heating_load == 160000
@@ -352,6 +366,15 @@ def test_different_start_month():
     assert np.array_equal(load.baseload_cooling, result)
     assert np.array_equal(load.peak_heating, result)
     assert np.array_equal(load.peak_cooling, result)
+
+
+def test_yearly_loads():
+    load = MonthlyGeothermalLoadAbsolute(*load_case(2))
+    load.simulation_period = 10
+    assert np.array_equal(load.yearly_cooling_load_simulation_period, [240000]*10)
+    assert np.array_equal(load.yearly_heating_load_simulation_period, [160000]*10)
+    assert np.array_equal(load.yearly_cooling_peak_simulation_period, [240]*10)
+    assert np.array_equal(load.yearly_heating_peak_simulation_period, [160]*10)
 
 
 ### continue for multi year

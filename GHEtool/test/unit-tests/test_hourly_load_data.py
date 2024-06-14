@@ -1,5 +1,6 @@
 import pytest
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
@@ -37,6 +38,12 @@ def test_imbalance():
     assert load.imbalance == 78840
 
 
+def test_load_duration(monkeypatch):
+    monkeypatch.setattr(plt, "show", lambda: None)
+    load = HourlyGeothermalLoad(np.ones(8760)*10, np.ones(8760))
+    load.plot_load_duration(legend=True)
+
+
 def test_resample_to_monthly():
     load = HourlyGeothermalLoad()
     peak, baseload = load.resample_to_monthly(np.tile(np.linspace(0, 729, 730), 12))
@@ -47,6 +54,16 @@ def test_resample_to_monthly():
     assert np.array_equal(peak, np.array([729., 685., 729., 729., 729., 729., 729., 729., 729., 729., 729., 729.]))
     assert np.array_equal(baseload, np.array([266176., 234864., 275780., 259140., 275836., 259100.,
                                               275892., 276088., 258920., 276144., 258880., 276200.]))
+
+
+def test_yearly_loads():
+    load = HourlyGeothermalLoad(heating_load=np.linspace(0, 8759, 8760),
+                                cooling_load=np.linspace(0, 8759, 8760)*2,
+                                simulation_period=10)
+    assert np.array_equal(load.yearly_cooling_load_simulation_period, [76728840]*10)
+    assert np.array_equal(load.yearly_heating_load_simulation_period, [38364420]*10)
+    assert np.array_equal(load.yearly_cooling_peak_simulation_period, [17518]*10)
+    assert np.array_equal(load.yearly_heating_peak_simulation_period, [8759]*10)
 
 
 def test_baseload_heating():
@@ -401,3 +418,12 @@ def test_add_multiyear():
 
     with pytest.raises(TypeError):
         load_1 + load_2
+
+
+def test_yearly_loads_multiyear():
+    load = HourlyGeothermalLoadMultiYear(heating_load=np.linspace(0, 8759*2+1, 8760*2),
+                                         cooling_load=np.linspace(0, 8759*2+1, 8760*2)*2)
+    assert np.array_equal(load.yearly_cooling_load_simulation_period, [76728840, 115102020*2])
+    assert np.array_equal(load.yearly_heating_load_simulation_period, [38364420, 115102020])
+    assert np.array_equal(load.yearly_cooling_peak_simulation_period, [17518, 35038])
+    assert np.array_equal(load.yearly_heating_peak_simulation_period, [8759, 17519])
