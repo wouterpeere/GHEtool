@@ -3,7 +3,7 @@
 ```{toctree}
 :maxdepth: 2
 
-Modules/GHEtool_modules.rst
+Modules/Borefield.rst
 Modules/BaseClass.rst
 Modules/Borehole.rst
 ```

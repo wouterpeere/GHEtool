@@ -1,6 +1,7 @@
 # GHEtool: An open-source tool for borefield sizing
 
 [![PyPI version](https://badge.fury.io/py/GHEtool.svg)](https://badge.fury.io/py/GHEtool)
+[![Conda version](https://anaconda.org/conda-forge/ghetool/badges/version.svg)](https://anaconda.org/conda-forge/ghetool)
 [![Tests](https://github.com/wouterpeere/GHEtool/actions/workflows/test.yml/badge.svg)](https://github.com/wouterpeere/GHEtool/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/wouterpeere/GHEtool/branch/main/graph/badge.svg?token=I9WWHW60OD)](https://codecov.io/gh/wouterpeere/GHEtool)
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.04406/status.svg)](https://doi.org/10.21105/joss.04406)
@@ -10,7 +11,7 @@
 ## What is *GHEtool*?
 <img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/Icon.png" width="110" align="left">
 
-GHEtool is a Python package that contains all the functionalities needed to deal with borefield design. GHEtool has been developed as a joint effort of KU Leuven (The SySi Team), boydens engineering (part of Sweco) and FH Aachen.
+GHEtool is a Python package that contains all the functionalities needed to deal with borefield design. GHEtool has been developed as a joint effort of KU Leuven (The SySi Team), boydens engineering (part of Sweco) and FH Aachen and is currently being maintained by Enead BV.
 The core of this package is the automated sizing of borefield under different conditions. By making use of combination of just-in-time calculations of thermal ground responses (using [pygfunction](https://github.com/MassimoCimmino/pygfunction)) with
 intelligent interpolation, this automated sizing can be done in the order of milliseconds. Please visit our website [https://GHEtool.eu](https://GHEtool.eu) for more information.
 
@@ -46,7 +47,6 @@ This code is tested with Python 3.8, 3.9, 3.10, 3.11 and 3.12 and requires the f
 * pandas >= 1.4.3
 * pygfunction >= 2.2.1
 * scipy >= 1.8.1
-* scikit-optimize >= 0.9.0
 
 For the tests
 
@@ -54,7 +54,7 @@ For the tests
 
 For the active/passive example
 
-* scikit-optimize >= 0.9.0
+* optuna >= 3.6.1
 
 
 ## Quick start
@@ -108,6 +108,8 @@ Within GHEtool, there are multiple ways of setting the ground data. Currently, y
 * _GroundFluxTemperature_: if you want to model your ground with a varying ground temperature due to a constant geothermal heat flux.
 * _GroundTemperatureGradient_: if you want to model your ground with a varying ground temperature due to a geothermal gradient.
 
+* You can also use multiple ground layers to define your ground model. Please take a look at [our example](https://docs.ghetool.eu/en/latest/sources/code/Examples/start_in_different_month.html).
+
 Please note that it is possible to add your own ground types by inheriting the attributes from the abstract _GroundData class.
 
 #### Pipe data
@@ -131,6 +133,8 @@ In a future version of GHEtool, also secundary building loads will be included. 
 * _MonthlyGeothermalLoadAbsolute_: You can set one the monthly baseload and peak load for heating and cooling for one standard year which will be used for all years within the simulation period.
 * _HourlyGeothermalLoad_: You can set (or load) the hourly heating and cooling load of a standard year which will be used for all years within the simulation period.
 * _HourlyGeothermalLoadMultiYear_: You can set (or load) the hourly heating and cooling load for multiple years (i.e. for the whole simulation period). This way, you can use secundary loads already with GHEtool as shown in [this example](https://ghetool.readthedocs.io/en/stable/sources/code/Examples/active_passive_cooling.html).
+* _MonthlyGeothermalLoadMultiYear_: You can set the monthly heating and cooling load for multiple years (i.e. for the whole simulation period).
+
 
 All load classes also have the option to add a yearly domestic hot water usage.
 
@@ -240,8 +244,8 @@ For more information about the functionalities of GHEtool, please visit the docu
 
 ## License
 
-*GHEtool* is licensed under the terms of the 3-clause BSD-license.
-See [GHEtool license](LICENSE).
+*GHEtool* is licensed under the terms of the 3-clause BSD-license (see [GHEtool license](LICENSE)).
+For professional licenses, contact us at [info@ghetool.eu](mailto:info@ghetool.eu).
 
 ## Contact GHEtool
 - Do you want to support GHEtool financially or by contributing to our software?
@@ -260,6 +264,8 @@ For more information on how to cite GHEtool, please visit the ReadTheDocs at [ht
 ## References
 
 ### Development of GHEtool
+Meertens, L., Peere, W., Helsen, L. (2024). Influence of short-term dynamic effects on geothermal borefield size. In _Proceedings of International Ground Source Heat Pump Association_. Montréal (Canada), 28-30 May 2024.
+
 Coninx, M., De Nies, J., Hermans, L., Peere, W., Boydens, W., Helsen, L. (2024). Cost-efficient cooling of buildings by means of geothermal borefields with active and passive cooling. _Applied Energy_, 355, Art. No. 122261, https://doi.org/10.1016/j.apenergy.2023.122261.
 
 Peere, W., Hermans, L., Boydens, W., and Helsen, L. (2023). Evaluation of the oversizing and computational speed of different open-source borefield sizing methods. In _Proceedings of International Building Simulation Conference 2023_. Shanghai (Belgium), 4-6 September 2023.
@@ -274,13 +280,19 @@ Peere, W. (2020). Methode voor economische optimalisatie van geothermische verwa
 KU Leuven, Belgium.
 
 ### Applications/Mentions of GHEtool
+Dion G., Pasquier, P., Perraudin, D. (2024). Sizing equation based on the outlet fluid temperature of closed-loop ground heat exchangers. In _Proceedings of International Ground Source Heat Pump Association_. Montréal (Canada), 28-30 May 2024.
+
+Peere, W. (2024). Are Rules of Thumb Misleading? The Complexity of Borefield Sizing and the Importance of Design Software. _IEA HPT Magazine 42_(1), https://doi.org/10.23697/7nec-0g78.
+
+Meertens, L. (2024). Invloed van dynamische korte-termijneffecten op de dimensionering van geothermische boorvelden. Master thesis, Department of Mechanical Engineering, KU Lueven, Belgium.
+
 Weynjes, J. (2023). Methode voor het dimensioneren van een geothermisch systeem met regeneratie binnen verschillende ESCO-structuren. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
 
 Hermans, L., Haesen, R., Uytterhoeven, A., Peere, W., Boydens, W., Helsen, L. (2023). Pre-design of collective residential solar districts with seasonal thermal energy storage: Importance of level of detail. _Applied thermal engineering_ 226, Art.No. 120203, 10.1016/j.applthermaleng.2023.120203
 
-Cimmino, M., Cook., J. C. (2022). pygfunction 2.2 : New Features and Improvements in Accuracy and Computational Efficiency. In _Proceedings of IGSHPA Research Track 2022_. Las Vegas (USA), 6-8 December 2022. https://doi.org/10.22488/okstate.22.000015
+Cimmino, M., Cook., J. C. (2022). pygfunction 2.2 : New Features and Improvements in Accuracy and Computational Efficiency. In _Proceedings of IGSHPA Research Track 2022_. Las Vegas (USA), 6-8 December 2022. https://doi.org/10.22488/okstate.22.000015.
 
-Verleyen, L., Peere, W., Michiels, E., Boydens, W., Helsen, L. (2022). The beauty of reason and insight: a story about 30 years old borefield equations. _IEA HPT Magazine 40_(3), 36-39, https://doi.org/10.23697/6q4n-3223
+Verleyen, L., Peere, W., Michiels, E., Boydens, W., Helsen, L. (2022). The beauty of reason and insight: a story about 30 years old borefield equations. _IEA HPT Magazine 40_(3), 36-39, https://doi.org/10.23697/6q4n-3223.
 
 Peere, W., Boydens, W., Helsen, L. (2022). GHEtool: een open-sourcetool voor boorvelddimensionering. Presented at the 15e warmtepompsymposium: van uitdaging naar aanpak, Quadrivium, Heverlee, België.
 

@@ -4,6 +4,7 @@ as was documented here: https://github.com/MassimoCimmino/pygfunction/issues/269
 Note that this is a temporary solution, until issue #44 of pygfunction is solved.
 """
 
+
 import pygfunction as gt
 import numpy as np
 

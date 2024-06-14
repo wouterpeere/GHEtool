@@ -8,7 +8,6 @@ This code is tested with Python 3.8, 3.9, 3.10, 3.11 and 3.12 and requires the f
 * pandas >= 1.4.3
 * pygfunction >= 2.2.1
 * scipy >= 1.8.1
-* scikit-optimize >= 0.9.0
 
 For the tests
 
@@ -16,7 +15,7 @@ For the tests
 
 For the active/passive example
 
-* scikit-optimize >= 0.9.0
+* optuna >= 3.6.1
 
 ## Installation
 
@@ -68,6 +67,8 @@ Within GHEtool, there are multiple ways of setting the ground data. Currently, y
 * _GroundFluxTemperature_: if you want to model your ground with a varying ground temperature due to a constant geothermal heat flux.
 * _GroundTemperatureGradient_: if you want to model your ground with a varying ground temperature due to a geothermal gradient.
 
+* You can also use multiple ground layers to define your ground model. Please take a look at [our example](https://docs.ghetool.eu/en/latest/sources/code/Examples/start_in_different_month.html).
+
 Please note that it is possible to add your own ground types by inheriting the attributes from the abstract _GroundData class.
 
 ### Pipe data
@@ -91,6 +92,7 @@ In a future version of GHEtool, also secundary building loads will be included. 
 * _MonthlyGeothermalLoadAbsolute_: You can set one the monthly baseload and peak load for heating and cooling for one standard year which will be used for all years within the simulation period.
 * _HourlyGeothermalLoad_: You can set (or load) the hourly heating and cooling load of a standard year which will be used for all years within the simulation period.
 * _HourlyGeothermalLoadMultiYear_: You can set (or load) the hourly heating and cooling load for multiple years (i.e. for the whole simulation period). This way, you can use secundary loads already with GHEtool as shown in [this example](https://ghetool.readthedocs.io/en/stable/sources/code/Examples/active_passive_cooling.html).
+* _MonthlyGeothermalLoadMultiYear_: You can set the monthly heating and cooling load for multiple years (i.e. for the whole simulation period).
 
 All load classes also have the option to add a yearly domestic hot water usage.
 

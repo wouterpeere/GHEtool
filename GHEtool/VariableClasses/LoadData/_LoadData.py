@@ -36,6 +36,8 @@ class _LoadData(BaseClass, ABC):
         self._all_months_equal: bool = True  # true if it is assumed that all months are of the same length
         self._dhw_yearly: float = 0.
         self._start_month: float = 1
+        self.exclude_DHW_from_peak: bool = False  # by default, the DHW increase the peak load. Set to false,
+                                                  # if you only want the heating load to determine the peak in extraction
 
     @property
     def start_month(self) -> int:
@@ -116,9 +118,9 @@ class _LoadData(BaseClass, ABC):
         """
         if self.all_months_equal:
             # every month has equal length
-            return np.ones(12) * _LoadData.AVG_UPM
+            return np.full(12, _LoadData.AVG_UPM, dtype=np.int64)
         else:
-            return np.array([744, 672, 744, 720, 744, 720, 744, 744, 720, 744, 720, 744])
+            return np.array([744, 672, 744, 720, 744, 720, 744, 744, 720, 744, 720, 744], dtype=np.int64)
 
     @abc.abstractmethod
     def _check_input(self, input: Union[np.ndarray, list, tuple]) -> bool:
@@ -225,7 +227,7 @@ class _LoadData(BaseClass, ABC):
     @property
     def baseload_heating_simulation_period(self) -> np.ndarray:
         """
-        This function returns the baseload heating in kWh/month for a whole simulation period.
+        This function returns the baseload heating in kWh/month for the whole simulation period.
 
         Returns
         -------
@@ -249,7 +251,7 @@ class _LoadData(BaseClass, ABC):
     @property
     def peak_heating_simulation_period(self) -> np.ndarray:
         """
-        This function returns the peak heating in kW/month for a whole simulation period.
+        This function returns the peak heating in kW/month for the whole simulation period.
 
         Returns
         -------
@@ -261,7 +263,7 @@ class _LoadData(BaseClass, ABC):
     @property
     def peak_cooling_simulation_period(self) -> np.ndarray:
         """
-        This function returns the peak cooling in kW/month for a whole simulation period.
+        This function returns the peak cooling in kW/month for the whole simulation period.
 
         Returns
         -------
@@ -273,7 +275,7 @@ class _LoadData(BaseClass, ABC):
     @property
     def baseload_heating_power_simulation_period(self) -> np.ndarray:
         """
-        This function returns the avergae heating power in kW avg/month for a whole simulation period.
+        This function returns the average heating power in kW avg/month for the whole simulation period.
 
         Returns
         -------
@@ -285,7 +287,7 @@ class _LoadData(BaseClass, ABC):
     @property
     def baseload_cooling_power_simulation_period(self) -> np.ndarray:
         """
-        This function returns the average cooling power in kW avg/month for a whole simulation period.
+        This function returns the average cooling power in kW avg/month for the whole simulation period.
 
         Returns
         -------
@@ -293,6 +295,55 @@ class _LoadData(BaseClass, ABC):
             average cooling for the whole simulation period
         """
         return np.tile(self.baseload_cooling_power, self.simulation_period)
+
+    @property
+    def yearly_heating_load_simulation_period(self) -> np.array:
+        """
+        This function returns the yearly heating demand in kWh/year for the whole simulation period.
+
+        Returns
+        -------
+        yearly heating : np.ndarray
+            yearly heating for the whole simulation period
+        """
+        return np.sum(np.reshape(self.baseload_heating_simulation_period, (self.simulation_period, 12)), axis=1)
+
+    @property
+    def yearly_cooling_load_simulation_period(self) -> np.array:
+        """
+        This function returns the yearly cooling demand in kWh/year for the whole simulation period.
+
+        Returns
+        -------
+        yearly heating : np.ndarray
+            yearly cooling for the whole simulation period
+        """
+        return np.sum(np.reshape(self.baseload_cooling_simulation_period, (self.simulation_period, 12)), axis=1)
+
+    @property
+    def yearly_heating_peak_simulation_period(self) -> np.array:
+        """
+        This function returns the yearly heating peak in kW/year for the whole simulation period.
+
+        Returns
+        -------
+        yearly heating : np.ndarray
+            yearly heating for the whole simulation period
+        """
+        return np.max(np.reshape(self.peak_heating_simulation_period, (self.simulation_period, 12)), axis=1)
+
+    @property
+    def yearly_cooling_peak_simulation_period(self) -> np.array:
+        """
+        This function returns the yearly cooling peak in kW/year for the whole simulation period.
+
+        Returns
+        -------
+        yearly heating : np.ndarray
+            yearly cooling for the whole simulation period
+        """
+        return np.max(np.reshape(self.peak_cooling_simulation_period, (self.simulation_period, 12)), axis=1)
+
 
     @property
     def imbalance(self) -> float:
@@ -326,7 +377,7 @@ class _LoadData(BaseClass, ABC):
         -------
         monthly average load : np.ndarray
         """
-        return np.tile(self.monthly_average_load, self.simulation_period)
+        return self.baseload_cooling_power_simulation_period - self.baseload_heating_power_simulation_period
 
     @property
     def peak_heating_duration(self) -> float:
@@ -592,7 +643,7 @@ class _LoadData(BaseClass, ABC):
         -------
         max peak cooling : float
         """
-        return np.max(self.peak_cooling)
+        return np.max(self.peak_cooling_simulation_period)
 
     @property
     def max_peak_heating(self) -> float:
@@ -603,7 +654,7 @@ class _LoadData(BaseClass, ABC):
         -------
         max peak heating : float
         """
-        return np.max(self.peak_heating)
+        return np.max(self.peak_heating_simulation_period)
 
     def add_dhw(self, dhw: float) -> None:
         """
@@ -663,6 +714,8 @@ class _LoadData(BaseClass, ABC):
         -------
         dhw power : float
         """
+        if self.exclude_DHW_from_peak:
+            return 0
         return self._dhw_yearly / 8760
 
     @abc.abstractmethod

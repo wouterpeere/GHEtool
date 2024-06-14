@@ -1,10 +1,15 @@
+from __future__ import annotations
+
 import warnings
 
 import numpy as np
+import pandas as pd
 
-from typing import Union
+from typing import Tuple
 from GHEtool.logger import ghe_logger
 from GHEtool.VariableClasses.LoadData.GeothermalLoad.HourlyGeothermalLoad import HourlyGeothermalLoad
+
+from numpy.typing import ArrayLike
 
 
 class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
@@ -13,8 +18,7 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
     This means that the inputs are both in kWh/month and kW/month.
     """
 
-    def __init__(self, heating_load: Union[np.ndarray, list, tuple] = np.zeros(8760),
-                 cooling_load: Union[np.ndarray, list, tuple] = np.zeros(8760)):
+    def __init__(self, heating_load: ArrayLike = None, cooling_load: ArrayLike = None):
         """
 
         Parameters
@@ -32,10 +36,11 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
         self._hourly_cooling_load: np.ndarray = np.zeros(8760)
 
         # set variables
-        self.hourly_heating_load = heating_load
-        self.hourly_cooling_load = cooling_load
+        heating_load = np.zeros(8760) if heating_load is None and cooling_load is None else heating_load
+        self.hourly_heating_load = np.zeros_like(cooling_load) if heating_load is None else np.array(heating_load)
+        self.hourly_cooling_load = np.zeros_like(heating_load) if cooling_load is None else np.array(cooling_load)
 
-    def _check_input(self, input: Union[np.ndarray, list, tuple]) -> bool:
+    def _check_input(self, load_array: ArrayLike) -> bool:
         """
         This function checks whether the input is valid or not.
         The input is correct if and only if:
@@ -45,23 +50,44 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
 
         Parameters
         ----------
-        input : np.ndarray, list or tuple
+        load_array : np.ndarray, list or tuple
 
         Returns
         -------
         bool
             True if the inputs are valid
         """
-        if not isinstance(input, (np.ndarray, list, tuple)):
+        if not isinstance(load_array, (np.ndarray, list, tuple)):
             ghe_logger.error("The load should be of type np.ndarray, list or tuple.")
             return False
-        if not len(input) % 8760 == 0:
+        if not len(load_array) % 8760 == 0:
             ghe_logger.error("The input data is not a multiple of 8760 hours")
             return False
-        if np.min(input) < 0:
+        if np.min(load_array) < 0:
             ghe_logger.error("No value in the load can be smaller than zero.")
             return False
         return True
+
+    def resample_to_monthly(self, hourly_load: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        This function resamples an hourly_load to monthly peaks (kW/month) and baseloads (kWh/month).
+
+        Parameters
+        ----------
+        hourly_load : np.ndarray
+            Hourly loads in kWh/h
+
+        Returns
+        -------
+        peak loads [kW], monthly average loads [kWh/month] : np.ndarray, np.ndarray
+        """
+
+        data = np.array_split(hourly_load, np.cumsum(np.tile(self.UPM, self.simulation_period))[:-1])
+
+        if self.all_months_equal:
+            return np.max(data, axis=1), np.sum(data, axis=1)
+
+        return np.array([np.max(i) for i in data]), np.array([np.sum(i) for i in data])
 
     @property
     def hourly_heating_load(self) -> np.ndarray:
@@ -76,7 +102,7 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
         return np.mean(self._hourly_heating_load.reshape((self.simulation_period, 8760)), axis=0)
 
     @hourly_heating_load.setter
-    def hourly_heating_load(self, load: Union[np.ndarray, list, tuple]) -> None:
+    def hourly_heating_load(self, load: ArrayLike) -> None:
         """
         This function sets the hourly heating load [kWh/h] after it has been checked.
 
@@ -101,7 +127,6 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
             return
         raise ValueError
 
-
     @property
     def hourly_cooling_load(self) -> np.ndarray:
         """
@@ -115,7 +140,7 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
         return np.mean(self._hourly_cooling_load.reshape((self.simulation_period, 8760)), axis=0)
 
     @hourly_cooling_load.setter
-    def hourly_cooling_load(self, load: Union[np.ndarray, list, tuple]) -> None:
+    def hourly_cooling_load(self, load: ArrayLike) -> None:
         """
         This function sets the hourly cooling load [kWh/h] after it has been checked.
 
@@ -139,7 +164,6 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
             self.simulation_period = int(len(load) / 8760)
             return
         raise ValueError
-
 
     @property
     def hourly_cooling_load_simulation_period(self) -> np.ndarray:
@@ -179,20 +203,92 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
     def __add__(self, other):
         if isinstance(other, HourlyGeothermalLoadMultiYear):
             if self.simulation_period != other.simulation_period:
-                raise ValueError('Cannot combine HourlyGeothermalLoadMultiYear classes with different simulation periods.')
+                raise ValueError("Cannot combine HourlyGeothermalLoadMultiYear classes with different simulation periods.")
 
-            return HourlyGeothermalLoadMultiYear(self._hourly_heating_load + other._hourly_heating_load,
-                                                 self._hourly_cooling_load + other._hourly_cooling_load)
+            return HourlyGeothermalLoadMultiYear(self._hourly_heating_load + other._hourly_heating_load, self._hourly_cooling_load + other._hourly_cooling_load)
 
         if isinstance(other, HourlyGeothermalLoad):
-            warnings.warn('You combine a hourly load with a multi-year load. The result will be a multi-year load with'
-                          ' the same simulation period as before.')
-            return HourlyGeothermalLoadMultiYear(self._hourly_heating_load + np.tile(other.hourly_heating_load,
-                                                                                     self.simulation_period),
-                                                 self._hourly_cooling_load + np.tile(other.hourly_cooling_load,
-                                                                                     self.simulation_period))
+            warnings.warn(
+                "You combine a hourly load with a multi-year load. The result will be a multi-year load with" " the same simulation period as before."
+            )
+            return HourlyGeothermalLoadMultiYear(
+                self._hourly_heating_load + np.tile(other.hourly_heating_load, self.simulation_period),
+                self._hourly_cooling_load + np.tile(other.hourly_cooling_load, self.simulation_period),
+            )
 
         try:
             return other.__add__(self)
         except TypeError:  # pragma: no cover
-            raise TypeError('Cannot perform addition. Please check if you use correct classes.')  # pragma: no cover
+            raise TypeError("Cannot perform addition. Please check if you use correct classes.")  # pragma: no cover
+
+    @property
+    def baseload_heating_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the baseload heating in kWh/month for a whole simulation period.
+
+        Returns
+        -------
+        baseload heating : np.ndarray
+            baseload heating for the whole simulation period
+        """
+        return self.resample_to_monthly(self._hourly_heating_load)[1]
+
+    @property
+    def baseload_cooling_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the baseload cooling in kWh/month for a whole simulation period.
+
+        Returns
+        -------
+        baseload cooling : np.ndarray
+            baseload cooling for the whole simulation period
+        """
+        return self.resample_to_monthly(self._hourly_cooling_load)[1]
+
+    @property
+    def peak_heating_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the peak heating in kW/month for a whole simulation period.
+
+        Returns
+        -------
+        peak heating : np.ndarray
+            peak heating for the whole simulation period
+        """
+        return self.resample_to_monthly(self._hourly_heating_load)[0]
+
+    @property
+    def peak_cooling_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the peak cooling in kW/month for a whole simulation period.
+
+        Returns
+        -------
+        peak cooling : np.ndarray
+            peak cooling for the whole simulation period
+        """
+        return self.resample_to_monthly(self._hourly_cooling_load)[0]
+
+    @property
+    def baseload_heating_power_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the average heating power in kW avg/month for a whole simulation period.
+
+        Returns
+        -------
+        average heating power : np.ndarray
+            average heating power for the whole simulation period
+        """
+        return np.divide(self.baseload_heating_simulation_period, np.tile(self.UPM, self.simulation_period))
+
+    @property
+    def baseload_cooling_power_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the average cooling power in kW avg/month for a whole simulation period.
+
+        Returns
+        -------
+        average cooling power : np.ndarray
+            average cooling for the whole simulation period
+        """
+        return np.divide(self.baseload_cooling_simulation_period, np.tile(self.UPM, self.simulation_period))

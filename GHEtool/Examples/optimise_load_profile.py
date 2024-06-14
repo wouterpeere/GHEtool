@@ -12,7 +12,6 @@ from GHEtool import *
 
 
 def optimise():
-
     # initiate ground data
     data = GroundConstantTemperature(3, 10)
 
@@ -26,23 +25,40 @@ def optimise():
     borefield.Rb = 0.12
 
     # set borefield
-    borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 1, 0.075)
+    borefield.create_rectangular_borefield(10, 10, 6, 6, 150, 1, 0.075)
 
     # load the hourly profile
     load = HourlyGeothermalLoad()
     load.load_hourly_profile("hourly_profile.csv", header=True, separator=";")
 
     # optimise the load for a 10x10 field (see data above) and a fixed depth of 150m.
-    borefield.optimise_load_profile(building_load=load, depth=150, print_results=True)
+    # first for an optimisation based on the power
+    borefield.optimise_load_profile_power(building_load=load, depth=150)
 
-    # calculate temperatures
+    print(f'Max heating power (primary): {borefield.load.max_peak_heating:,.0f}kW')
+    print(f'Max cooling power (primary): {borefield.load.max_peak_cooling:,.0f}kW')
+
+    print(
+        f'Total energy extracted from the borefield over simulation period: {np.sum(borefield.load.baseload_heating_simulation_period):,.0f}MWh')
+    print(
+        f'Total energy injected in the borefield over simulation period): {np.sum(borefield.load.baseload_cooling_simulation_period):,.0f}MWh')
+    print('-----------------------------------------------------------------')
     borefield.calculate_temperatures(hourly=True)
+    borefield.print_temperature_profile(plot_hourly=True)
 
-    # print resulting external peak cooling profile
-    print(borefield._external_load.max_peak_cooling)
+    # first for an optimisation based on the energy
+    borefield.optimise_load_profile_energy(building_load=load, depth=150)
 
-    # print resulting monthly load for an external heating source
-    print(np.sum(borefield._external_load.hourly_heating_load))
+    print(f'Max heating power (primary): {borefield.load.max_peak_heating:,.0f}kW')
+    print(f'Max cooling power (primary): {borefield.load.max_peak_cooling:,.0f}kW')
+
+    print(
+        f'Total energy extracted from the borefield over simulation period: {np.sum(borefield.load.baseload_heating_simulation_period):,.0f}MWh')
+    print(
+        f'Total energy injected in the borefield over simulation period): {np.sum(borefield.load.baseload_cooling_simulation_period):,.0f}MWh')
+
+    borefield.calculate_temperatures(hourly=True)
+    borefield.print_temperature_profile(plot_hourly=True)
 
 
 if __name__ == "__main__":  # pragma: no cover

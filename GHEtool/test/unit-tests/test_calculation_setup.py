@@ -21,10 +21,8 @@ def test_initialising_setups():
 
 def test_no_backup():
     test = CalculationSetup()
-    try:
+    with pytest.raises(ValueError):
         test.restore_backup()
-    except ValueError:
-        assert True
 
 
 def test_backup_functionality():
@@ -54,29 +52,17 @@ def test_update_variables():
 
 def test_more_than_one_option():
     test = CalculationSetup()
-    try:
+    with pytest.raises(ValueError):
         test._check_and_set_sizing(True, True, False)
-        assert False     # pragma: no cover
-    except ValueError:
-        assert True
-    try:
+    with pytest.raises(ValueError):
         test._check_and_set_sizing(False, True, True)
-        assert False     # pragma: no cover
-    except ValueError:
-        assert True
-    try:
+    with pytest.raises(ValueError):
         test._check_and_set_sizing(True, False, True)
-        assert False     # pragma: no cover
-    except ValueError:
-        assert True
 
 
 def test_error_quadrant():
-    try:
+    with pytest.raises(ValueError):
         CalculationSetup(quadrant_sizing=5)
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
     CalculationSetup(quadrant_sizing=0)
 
 
@@ -91,8 +77,5 @@ def test_equal_unequal():
 
 def test_assign_incorrect_variable():
     setup = CalculationSetup()
-    try:
+    with pytest.raises(ValueError):
         setup.update_variables(test='test')
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True

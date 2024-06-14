@@ -1,7 +1,7 @@
 name: Tests Commit
 
 on:
-  - push
+  push:
 
 jobs:
 

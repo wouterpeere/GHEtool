@@ -139,7 +139,7 @@ borefield = Borefield()
 borefield.set_ground_parameters(data)
 borefield.Rb = 0.12
 borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 1, 0.075)
-hourly_load.load_hourly_profile(FOLDER.joinpath("Examples\hourly_profile.csv"), header=True, separator=";",
+hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), header=True, separator=";",
                               col_heating=0, col_cooling=1)
 borefield.load = hourly_load
 borefield.simulation_period = 100
@@ -241,7 +241,7 @@ borefield.set_ground_parameters(ground_data_IKC)
 borefield.set_fluid_parameters(fluid_data_IKC)
 borefield.set_pipe_parameters(pipe_data_IKC)
 borefield.calculation_setup(use_constant_Rb=False)
-borefield.set_length_peak(10)
+borefield.load.peak_duration = 10
 borefield.set_max_avg_fluid_temperature(25)
 borefield.set_min_avg_fluid_temperature(0)
 list_of_test_objects.add(SizingObject(borefield, error_L2=UnsolvableDueToTemperatureGradient, error_L3=UnsolvableDueToTemperatureGradient, name='Real case 1 (Error)'))
@@ -294,12 +294,12 @@ list_of_test_objects.add(SizingObject(borefield, L2_output=120.913, L3_output=12
 borefield = Borefield()
 borefield.set_ground_parameters(data)
 borefield.create_rectangular_borefield(10, 12, 6, 6, 110, 4, 0.075)
-hourly_load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"))
 borefield.load = hourly_load
 borefield.load.hourly_cooling_load = np.zeros(8760)
 list_of_test_objects.add(SizingObject(borefield, L4_output=244.04826670835274, quadrant=4, name='No cooling L4'))
 
-hourly_load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"))
 borefield.load = hourly_load
 borefield.load.hourly_heating_load = np.zeros(8760)
 list_of_test_objects.add(SizingObject(borefield, L4_output=305.55338863384287, quadrant=2, name='No heating L4'))
@@ -320,14 +320,14 @@ borefield.set_min_avg_fluid_temperature(0)
 borefield.set_ground_parameters(data)
 borefield.set_Rb(0.2)
 borefield.set_borefield(borefield_gt)
-hourly_load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"))
 borefield.load = hourly_load
 temp = hourly_load.hourly_heating_load
 temp[0] = 100_000
 borefield._borefield_load.hourly_heating_load = temp
 list_of_test_objects.add(SizingObject(borefield, L4_output=18760.64149089075, quadrant=4, name='Hourly profile, quadrant 4'))
 
-hourly_load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_cooling=0, col_heating=1)
+hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_cooling=0, col_heating=1)
 borefield.load = hourly_load
 list_of_test_objects.add(SizingObject(borefield, L4_output=368.50138222702657, quadrant=2, name='Hourly profile reversed'))
 
@@ -336,20 +336,45 @@ temp[0] = 100_000
 borefield._borefield_load.hourly_heating_load = temp
 list_of_test_objects.add(SizingObject(borefield, L4_output=18602.210559679363, quadrant=3, name='Hourly profile, quadrant 3'))
 
-hourly_load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"))
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 10**6, 10**6, 87.506, 97.012,
-                                                   305.842, 384.204, 230.193, 292.212, name='Optimise load profile 1'))
+                                                   305.842, 384.204, 230.193, 292.212, name='Optimise load profile 1 (power)', power=True, hourly=False))
 
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 10**6, 10**6, 70.054, 87.899,
-                                                   210.800, 247.186, 325.236, 429.231, name='Optimise load profile 2'))
+                                                   210.800, 247.186, 325.236, 429.231, name='Optimise load profile 2 (power)', power=True, hourly=False))
 
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 10**6, 10**6, 45.096, 63.799,
-                                                   118.898, 117.804, 417.138, 558.612, name='Optimise load profile 3'))
+                                                   118.898, 117.804, 417.138, 558.612, name='Optimise load profile 3 (power)', power=True, hourly=False))
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 10**6, 10**6, 87.506, 96.404,
+                                                   305.842, 368.463, 230.193, 307.954, name='Optimise load profile 1 (power, hourly)', power=True, hourly=True))
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 10**6, 10**6, 69.662, 87.022,
+                                                   209.053, 239.590, 326.983, 436.827, name='Optimise load profile 2 (power, hourly)', power=True, hourly=True))
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 10**6, 10**6, 44.635, 63.467,
+                                                   117.388, 116.699, 418.648, 559.718, name='Optimise load profile 3 (power, hourly)', power=True, hourly=True))
+
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 10**6, 10**6, 93.2297, 99.577,
+                                                   536.035, 663.782, 233.4426, 287.344, name='Optimise load profile 1 (energy)', power=False))
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 10**6, 10**6, 77.543, 96.331,
+                                                   385.653, 417.8915, 316.2857, 419.908, name='Optimise load profile 2 (energy)', power=False))
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 10**6, 10**6, 50.771, 75.461,
+                                                   181.332, 209.819, 402.0338, 553.2355, name='Optimise load profile 3 (energy)', power=False))
 
 borefield.set_min_avg_fluid_temperature(-5)
 borefield.set_max_avg_fluid_temperature(25)
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 10**6, 10**6, 100, 100,
-                                                   536.036, 676.417, 0, 0, name='Optimise load profile 100%'))
+                                                   536.036, 676.417, 0, 0, name='Optimise load profile 100% (power)', power=True, hourly=False))
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 10**6, 10**6, 100, 100,
+                                                   536.036, 676.417, 0, 0, name='Optimise load profile 100% (power, hourly)', power=True, hourly=True))
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 10**6, 10**6, 100, 100,
+                                                   536.036, 676.417, 0, 0, name='Optimise load profile 100% (energy)', power=False))
 
 borefield = Borefield()
 borefield.set_ground_parameters(data)
@@ -357,25 +382,48 @@ borefield.set_Rb(0.2)
 borefield.set_borefield(borefield_gt)
 borefield.set_max_avg_fluid_temperature(16)
 borefield.set_min_avg_fluid_temperature(0)
-hourly_load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_heating=1, col_cooling=0)
+hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_heating=1, col_cooling=0)
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 10**6, 10**6, 99.976, 66.492,
                                                    643.137, 195.331, 33.278, 340.705,
-                                                   name='Optimise load profile 1, reversed'))
+                                                   name='Optimise load profile 1, reversed (power)', power=True, hourly=False))
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 10**6, 10**6, 99.971, 66.424,
+                                                   639.283, 195.053, 37.132, 340.983,
+                                                   name='Optimise load profile 1, reversed (power, hourly)', power=True, hourly=True))
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 10**6, 10**6, 99.999, 72.205,
+                                                   676.415, 345.9849, 22.46646, 342.1411,
+                                                   name='Optimise load profile 1, reversed (energy)', power=False))
 borefield.set_max_avg_fluid_temperature(20)
 borefield.set_min_avg_fluid_temperature(4)
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 10**6, 10**6, 97.012, 87.506,
                                                    384.204, 305.842, 292.211, 230.195,
-                                                   name='Optimise load profile 2, reversed'))
+                                                   name='Optimise load profile 2, reversed (power)', power=True, hourly=False))
 
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 10**6, 10**6, 87.899, 70.054,
                                                    247.186, 210.800, 429.23, 325.236,
-                                                   name='Optimise load profile 3, reversed'))
+                                                   name='Optimise load profile 3, reversed (power)', power=True, hourly=False))
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 10**6, 10**6, 96.404, 87.506,
+                                                   368.463, 305.842, 307.953, 230.195,
+                                                   name='Optimise load profile 2, reversed (power, hourly)', power=True, hourly=True))
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 10**6, 10**6, 87.022, 69.662,
+                                                   239.590, 209.053, 436.826, 326.984,
+                                                   name='Optimise load profile 3, reversed (power, hourly)', power=True, hourly=True))
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 10**6, 10**6, 99.577, 93.230,
+                                                   663.782, 536.037, 287.343, 233.4438,
+                                                   name='Optimise load profile 2, reversed (energy)', power=False))
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 10**6, 10**6, 96.331, 77.543,
+                                                   417.8919, 385.6529, 419.9076, 316.2865,
+                                                   name='Optimise load profile 3, reversed (energy)', power=False))
 
 borefield = Borefield()
 borefield.create_rectangular_borefield(3, 6, 6, 6, 146, 4)
 borefield.set_min_avg_fluid_temperature(3)
 borefield.set_max_avg_fluid_temperature(16)
-borefield.set_length_peak(6)
+borefield.load.peak_duration = 6
 load = HourlyGeothermalLoad()
 load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\problem_data.csv"), col_heating=0, col_cooling=1, header=True, decimal_seperator=',')
 load.simulation_period = 40
@@ -386,4 +434,10 @@ borefield.set_fluid_parameters(FluidData(0.1, 0.475, 1033, 3930, 0.001))
 borefield.set_pipe_parameters(SingleUTube(1.5, 0.016, 0.02, 0.42, 0.04))
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 4, 25, 81.6397, 88.1277,
                                                    22.2967, 39.52027, 55.28596, 58.400,
-                                                   name='Optimise load profile (stuck in loop)'))
+                                                   name='Optimise load profile (stuck in loop) (power)', power=True, hourly=False))
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 4, 25, 80.1414, 84.639,
+                                                   21.5547, 35.77766, 56.2753, 61.9987,
+                                                   name='Optimise load profile (stuck in loop) (power, hourly)', power=True, hourly=True))
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 4, 25, 89.242, 98.362,
+                                                   56.147, 74.421, 55.020, 56.866,
+                                                   name='Optimise load profile (stuck in loop) (energy)', power=False))

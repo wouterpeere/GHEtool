@@ -1,17 +1,18 @@
 from __future__ import annotations
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
 import warnings
 
-from typing import Union, Tuple, TYPE_CHECKING
+from typing import Tuple, TYPE_CHECKING
 
 from GHEtool.VariableClasses.LoadData._LoadData import _LoadData
 from GHEtool.logger import ghe_logger
 
 if TYPE_CHECKING:
-    from numpy.typing import ArrayLike, NDArray
+    from numpy.typing import ArrayLike
 
 
 class HourlyGeothermalLoad(_LoadData):
@@ -20,15 +21,10 @@ class HourlyGeothermalLoad(_LoadData):
     This means that the inputs are both in kWh/month and kW/month.
     """
 
-    __slots__ = tuple(_LoadData.__slots__) + ('_heating_load', '_cooling_load')
+    __slots__ = tuple(_LoadData.__slots__) + ("_heating_load", "_cooling_load")
 
-    # define parameters for conversion to monthly loads
-    START = pd.to_datetime("2019-01-01 00:00:00")
-    END = pd.to_datetime("2019-12-31 23:59:00")
-    HOURS_SERIES = pd.Series(pd.date_range(START, END, freq="1H"))
-
-    def __init__(self, heating_load: ArrayLike | None = None,
-                 cooling_load: ArrayLike | None = None,
+    def __init__(self, heating_load: ArrayLike = None,
+                 cooling_load: ArrayLike = None,
                  simulation_period: int = 20,
                  dhw: float = 0.):
         """
@@ -48,15 +44,15 @@ class HourlyGeothermalLoad(_LoadData):
         super().__init__(hourly_resolution=True, simulation_period=simulation_period)
 
         # initiate variables
-        self._hourly_heating_load: NDArray[np.float64] = np.zeros(8760)
-        self._hourly_cooling_load: NDArray[np.float64] = np.zeros(8760)
+        self._hourly_heating_load: np.ndarray = np.zeros(8760)
+        self._hourly_cooling_load: np.ndarray = np.zeros(8760)
 
         # set variables
-        self.hourly_heating_load: NDArray[np.float64] = np.zeros(8760) if heating_load is None else np.array(heating_load)
-        self.hourly_cooling_load: NDArray[np.float64] = np.zeros(8760) if cooling_load is None else np.array(cooling_load)
+        self.hourly_heating_load: np.ndarray = np.zeros(8760) if heating_load is None else np.array(heating_load)
+        self.hourly_cooling_load: np.ndarray = np.zeros(8760) if cooling_load is None else np.array(cooling_load)
         self.dhw = dhw
 
-    def _check_input(self, input: Union[np.ndarray, list, tuple]) -> bool:
+    def _check_input(self, load_array: ArrayLike) -> bool:
         """
         This function checks whether the input is valid or not.
         The input is correct if and only if:
@@ -66,20 +62,20 @@ class HourlyGeothermalLoad(_LoadData):
 
         Parameters
         ----------
-        input : np.ndarray, list or tuple
+        load_array : np.ndarray, list or tuple
 
         Returns
         -------
         bool
             True if the inputs are valid
         """
-        if not isinstance(input, (np.ndarray, list, tuple)):
+        if not isinstance(load_array, (np.ndarray, list, tuple)):
             ghe_logger.error("The load should be of type np.ndarray, list or tuple.")
             return False
-        if not len(input) == 8760:
-            ghe_logger.error("The length of the load should be 12.")
+        if not len(load_array) == 8760:
+            ghe_logger.error("The length of the load should be 8760.")
             return False
-        if np.min(input) < 0:
+        if np.min(load_array) < 0:
             ghe_logger.error("No value in the load can be smaller than zero.")
             return False
         return True
@@ -97,7 +93,7 @@ class HourlyGeothermalLoad(_LoadData):
         return self.correct_for_start_month(self._hourly_heating_load + self.dhw / 8760)
 
     @hourly_heating_load.setter
-    def hourly_heating_load(self, load: Union[np.ndarray, list, tuple]) -> None:
+    def hourly_heating_load(self, load: ArrayLike) -> None:
         """
         This function sets the hourly heating load [kWh/h] after it has been checked.
 
@@ -121,7 +117,7 @@ class HourlyGeothermalLoad(_LoadData):
             return
         raise ValueError
 
-    def set_hourly_heating(self, load: Union[np.ndarray, list, tuple]) -> None:
+    def set_hourly_heating(self, load: ArrayLike) -> None:
         """
         This function sets the hourly heating load [kWh/h] after it has been checked.
 
@@ -155,7 +151,7 @@ class HourlyGeothermalLoad(_LoadData):
         return self.correct_for_start_month(self._hourly_cooling_load)
 
     @hourly_cooling_load.setter
-    def hourly_cooling_load(self, load: Union[np.ndarray, list, tuple]) -> None:
+    def hourly_cooling_load(self, load: ArrayLike) -> None:
         """
         This function sets the hourly cooling load [kWh/h] after it has been checked.
 
@@ -179,7 +175,7 @@ class HourlyGeothermalLoad(_LoadData):
             return
         raise ValueError
 
-    def set_hourly_cooling(self, load: Union[np.ndarray, list, tuple]) -> None:
+    def set_hourly_cooling(self, load: ArrayLike) -> None:
         """
         This function sets the hourly cooling load [kWh/h] after it has been checked.
 
@@ -225,16 +221,12 @@ class HourlyGeothermalLoad(_LoadData):
         -------
         peak loads [kW], monthly average loads [kWh/month] : np.ndarray, np.ndarray
         """
-        # create dataframe
-        df = pd.DataFrame(hourly_load, index=HourlyGeothermalLoad.HOURS_SERIES, columns=['load'])
+        data = np.array_split(hourly_load, np.cumsum(self.UPM)[:-1])
 
         if self.all_months_equal:
-            return np.max(np.array_split(hourly_load, 12), axis=1), np.sum(np.array_split(hourly_load, 12), axis=1)
+            return np.max(data, axis=1), np.sum(data, axis=1)
 
-        # resample
-        return np.array(df.resample('M').agg({'load': 'max'})['load']),\
-            np.array(df.resample('M').agg({'load': 'sum'})['load'])
-
+        return np.array([np.max(i) for i in data]), np.array([np.sum(i) for i in data])
 
     @property
     def baseload_cooling(self) -> np.ndarray:
@@ -319,8 +311,9 @@ class HourlyGeothermalLoad(_LoadData):
         """
         return np.tile(self.hourly_heating_load, self.simulation_period)
 
-    def load_hourly_profile(self, file_path: str, header: bool = True, separator: str = ";",
-                            decimal_seperator: str = ".", col_heating: int = 0, col_cooling: int = 1) -> None:
+    def load_hourly_profile(
+        self, file_path: str, header: bool = True, separator: str = ";", decimal_seperator: str = ".", col_heating: int = 0, col_cooling: int = 1
+    ) -> None:
         """
         This function loads in an hourly load profile [kW].
 
@@ -375,18 +368,22 @@ class HourlyGeothermalLoad(_LoadData):
     def __add__(self, other):
         if isinstance(other, HourlyGeothermalLoad):
             if self.simulation_period != other.simulation_period:
-                warnings.warn(f'The simulation period for both load classes are different. '
-                              f'The maximum simulation period of '
-                              f'{max(self.simulation_period, other.simulation_period)} years will be taken.')
-            return HourlyGeothermalLoad(self._hourly_heating_load + other._hourly_heating_load,
-                                        self._hourly_cooling_load + other._hourly_cooling_load,
-                                        max(self.simulation_period, other.simulation_period),
-                                        self.dhw + other.dhw)
+                warnings.warn(
+                    f"The simulation period for both load classes are different. "
+                    f"The maximum simulation period of "
+                    f"{max(self.simulation_period, other.simulation_period)} years will be taken."
+                )
+            return HourlyGeothermalLoad(
+                self._hourly_heating_load + other._hourly_heating_load,
+                self._hourly_cooling_load + other._hourly_cooling_load,
+                max(self.simulation_period, other.simulation_period),
+                self.dhw + other.dhw,
+            )
 
         try:
             return other.__add__(self)
         except TypeError:  # pragma: no cover
-            raise TypeError('Cannot perform addition. Please check if you use correct classes.')  # pragma: no cover
+            raise TypeError("Cannot perform addition. Please check if you use correct classes.")  # pragma: no cover
 
     @property
     def _start_hour(self) -> int:
@@ -417,4 +414,44 @@ class HourlyGeothermalLoad(_LoadData):
         """
         if self.start_month == 1:
             return array
-        return np.concatenate((array[self._start_hour:], array[:self._start_hour]))
+        return np.concatenate((array[self._start_hour :], array[: self._start_hour]))
+
+    def plot_load_duration(self, legend: bool = False) -> Tuple[plt.Figure, plt.Axes]:
+        """
+        This function makes a load-duration curve from the hourly values.
+
+        Parameters
+        ----------
+        legend : bool
+            True if the figure should have a legend
+
+        Returns
+        ----------
+        Tuple
+            plt.Figure, plt.Axes
+        """
+        # sort heating and cooling load
+        heating = self.hourly_heating_load.copy()
+        heating[::-1].sort()
+
+        cooling = self.hourly_cooling_load.copy()
+        cooling[::-1].sort()
+        cooling = cooling * (-1)
+        # create new figure and axes if it not already exits otherwise clear it.
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        # add sorted loads to plot
+        ax.step(np.arange(0, 8760, 1), heating, "r-", label="Heating")
+        ax.step(np.arange(0, 8760, 1), cooling, "b-", label="Cooling")
+        # create 0 line
+        ax.hlines(0, 0, 8759, color="black")
+        # add labels
+        ax.set_xlabel("Time [hours]")
+        ax.set_ylabel("Power [kW]")
+        # set x limits to 8760
+        ax.set_xlim(0, 8760)
+        # plot legend if wanted
+        if legend:
+            ax.legend()  #
+        plt.show()
+        return fig, ax
