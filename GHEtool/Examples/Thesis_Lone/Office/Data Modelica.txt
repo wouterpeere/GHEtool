@@ -1,0 +1,37 @@
+#### Data for Modelica
+
+### Office
+## Datafile
+office_one_column.csv
+
+## Ground data
+Ground thermal conductivity [W/mK] = 3
+Ground surface temperature [deg C] = 10
+Volumetric heat capacity of the ground [J/m3K] = 2.4*10**6
+Geothermal heat flux [W/m2] = 0.06
+
+## Fluid data
+Mass flow rate per borehole [kg/s] = 0.2
+Thermal conductivity [W/mK] = 0.568
+Density [kg/m³] = 998
+Thermal capacity [J/kgK] = 4180
+Dynamic viscosity [Pa/s] = 1e-3
+
+## Borehole/pipe data
+Inner pipe radius [m] = 0.015
+Outer pipe radius [m] = 0.02
+Borehole radius [m] = 0.075
+Grout thermal conductivity [W/mK] = 1
+Pipe thermal conductivity [W/mK] = 0.4
+number of pipes [#] = 2 (double U-tube)
+Distance pipe center to borehole center [m] = 0.05
+Burrial depth [m] = 4
+Pipe roughness [m] = 1e-6
+
+## Borefield data
+width [#] = 10
+length [#] = 10
+spacing [m] = 6
+depth [m] = 	L2: 110.796
+		L3: 112.903
+		L4: 107.018
