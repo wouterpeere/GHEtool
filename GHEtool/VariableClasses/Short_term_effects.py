@@ -94,7 +94,7 @@ def evaluate_g_function(self, time):
 def __init__(self, boreholes, network, time, boundary_condition,
              nSegments=8, segment_ratios=gt.utilities.segment_ratios,
              approximate_FLS=False, mQuad=11, nFLS=10,
-             linear_threshold=None, cylindrical_correction=True, short_term_effects=True,
+             linear_threshold=None, cylindrical_correction=False, short_term_effects=False,
              ground_data=None, fluid_data=None, pipe_data=None, borefield=None, 
              short_term_effects_parameters=None,
              disp=False, profiles=False, kind='linear', dtype=np.double,
@@ -242,7 +242,7 @@ def update_pygfunction_short_term_effects() -> None:
     Returns
     -------
     None
-    """       
+    """      
     gt.gfunction._ShortTermEffects = _ShortTermEffects
     gt.gfunction.gFunction.evaluate_g_function = evaluate_g_function
     gt.gfunction._BaseSolver.__init__ = __init__
