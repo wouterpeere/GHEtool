@@ -39,7 +39,7 @@ def validate():
         print(f'The current depth is {depth} m.')
         borefield.calculate_temperatures(depth)
         Tg_list.append(borefield.ground_data.calculate_Tg(depth))
-        max_Tf_list.append(np.max(borefield.results.peak_injection))
+        max_Tf_list.append(np.max(borefield.results.peak_cooling))
 
     def f(x, a, b):
         return a/x + b

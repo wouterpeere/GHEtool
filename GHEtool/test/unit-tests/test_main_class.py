@@ -577,7 +577,7 @@ def test_calculate_temperatures():
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
 
     borefield.calculate_temperatures(120)
-    np.testing.assert_array_almost_equal(borefield.results.peak_extraction,
+    np.testing.assert_array_almost_equal(borefield.results.peak_heating,
                                          np.array([ 7.76418446,  8.06457527,  8.59144992,  9.22406634,  9.9176661 ,
        10.35493277, 10.85933332, 10.99023511, 10.04321457,  9.33984947,
         8.73958309,  8.33426967,  7.95321315,  8.25111367,  8.77481226,
@@ -626,7 +626,7 @@ def test_calculate_temperatures():
        10.55323455,  9.93631861,  9.51283391,  9.1158352 ,  9.39905299,
         9.90536243, 10.51952398, 11.19933578, 11.62696168, 12.12650419,
        12.25159304, 11.29457142, 10.57776036,  9.96084442,  9.53735972]))
-    np.testing.assert_array_almost_equal(borefield.results.peak_injection,
+    np.testing.assert_array_almost_equal(borefield.results.peak_cooling,
                                          np.array([ 9.7265228 ,  9.87217467, 10.134688  , 10.63927884, 11.62475183,
        12.59873554, 13.28921831, 13.76520367, 12.39881805, 10.70464274,
        10.2834413 , 10.00058989,  9.91555149, 10.05871306, 10.31805035,
