@@ -16,6 +16,7 @@ from GHEtool.VariableClasses.cylindrical_correction import update_pygfunction
 update_pygfunction()
 # add short-term effects to pygfunction
 update_pygfunction_short_term_effects()
+short_term_options_set = True
 
 class FIFO:
     """
@@ -222,8 +223,12 @@ class GFunction:
             gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options, method=self.options['method']).gFunc      
             gfunc_calculated = np.array(gfunc_calculated)
 
-            
-            if np.any(gfunc_calculated < 0) and self.options["short_term_effects"] == False:
+            if short_term_options_set == True:
+                short_term_effects = self.options.get('short_term_effects')
+            else:
+                short_term_effects = False
+
+            if np.any(gfunc_calculated < 0) and short_term_effects == False:
                 warnings.warn('There are negative g-values. This can be caused by a large borehole radius.')
                 if self.use_cyl_correction_when_negative:
                     # there are negative gfunction values
