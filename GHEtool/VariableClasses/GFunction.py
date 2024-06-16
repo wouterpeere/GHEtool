@@ -188,7 +188,6 @@ class GFunction:
                 # add short-term effects to pygfunction
                 update_pygfunction_short_term_effects()
             
-            
             # check if the value is in the fifo_list
             # if the value is in self.depth_array, there is no problem, since the interpolation will be exact anyway
             if self.fifo_list.in_fifo_list(depth) and depth not in self.depth_array:
@@ -227,7 +226,7 @@ class GFunction:
             gfunc_calculated = np.array(gfunc_calculated)
 
             
-            if np.any(gfunc_calculated < 0) and self.options["short_term_effects"] == False:
+            if np.any(gfunc_calculated < 0) and not self.options["short_term_effects"] == True:
                 warnings.warn('There are negative g-values. This can be caused by a large borehole radius.')
                 if self.use_cyl_correction_when_negative:
                     # there are negative gfunction values
