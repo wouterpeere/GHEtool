@@ -87,7 +87,7 @@ class GFunction:
 
     DEFAULT_TIMESTEPS: np.ndarray = _time_values()
     DEFAULT_NUMBER_OF_TIMESTEPS: int = DEFAULT_TIMESTEPS.size
-    DEFAULT_STORE_PREVIOUS_VALUES: bool = False
+    DEFAULT_STORE_PREVIOUS_VALUES: bool = True
 
     def __init__(self):
         self._store_previous_values: bool = GFunction.DEFAULT_STORE_PREVIOUS_VALUES
