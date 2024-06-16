@@ -16,6 +16,10 @@ import time
 
 import numpy as np
 
+import sys
+sys.path.append("C:\Workdir\Develop\ghetool")
+
+
 from GHEtool import *
 
 

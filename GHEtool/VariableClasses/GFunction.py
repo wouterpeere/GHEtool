@@ -187,7 +187,7 @@ class GFunction:
             if include_short_term_effects:
                 # add short-term effects to pygfunction
                 update_pygfunction_short_term_effects()
-
+            
             # check if the value is in the fifo_list
             # if the value is in self.depth_array, there is no problem, since the interpolation will be exact anyway
             if self.fifo_list.in_fifo_list(depth) and depth not in self.depth_array:
@@ -233,7 +233,6 @@ class GFunction:
                     warnings.warn('Cylindrical correction is used to correct this large borehole. '
                                   'You can change this behaviour by setting the use_cyl_correction_when_negative variable '
                                   'of the Gfunction class to False.')
-
                     backup = self.options.get('Cylindrical_correction')
                     self.options["cylindrical_correction"] = True
                     gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options, method=self.options['method']).gFunc
