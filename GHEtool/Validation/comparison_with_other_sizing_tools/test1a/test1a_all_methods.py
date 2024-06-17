@@ -25,10 +25,7 @@ def test_1a_6h():
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=1.8, T_g=17.5, volumetric_heat_capacity=2073600, flux=0)
     fluid_data = FluidData(mfr=0.440, rho=1052, Cp=3795, mu=0.0052, k_f=0.48)
-    pipe_data = MultipleUTube(r_in=0.0137, r_out=0.0167, D_s=0.075 / 2, k_g=1.4, k_p=0.43, number_of_pipes=1)
-    # Addidional input data needed for short-term model
-    rho_cp_grout = 3800000.0  
-    rho_cp_pipe = 1540000.0    
+    pipe_data = MultipleUTube(r_in=0.0137, r_out=0.0167, D_s=0.075 / 2, k_g=1.4, k_p=0.43, number_of_pipes=1) 
 
     # start test with dynamic Rb*
     # initiate borefield
@@ -221,12 +218,15 @@ def test_1a_6h():
     assert np.isclose(depth_L2, 59.366333293365)
     assert np.isclose(depth_L3, 59.542511807290666)
     assert np.isclose(depth_L4, 56.2659729399716)
+    assert np.isclose(depth_L4_ste, 52.34712690022354)
     assert np.isclose(depth_L2s, 59.83238790604271)
     assert np.isclose(depth_L3s, 60.00736579796592)
     assert np.isclose(depth_L4s, 56.73136082379056)
+    assert np.isclose(depth_L4s_ste, 52.72442116662979)
     assert np.isclose(Rb_L2, 0.12801945735995454)
     assert np.isclose(Rb_L3, 0.1280244880933401)
     assert np.isclose(Rb_L4, 0.12793335445966403)
+    assert np.isclose(Rb_L4_ste, 0.12783109689745237)
 
 
 def test_1a_1h():
@@ -426,12 +426,15 @@ def test_1a_1h():
     assert np.isclose(depth_L2, 46.44356767605206)
     assert np.isclose(depth_L3, 46.73933500137179)
     assert np.isclose(depth_L4, 56.2659729399716)
+    assert np.isclose(depth_L4_ste, 52.34712690022354)
     assert np.isclose(depth_L2s, 46.986986159967906)
     assert np.isclose(depth_L3s, 47.28116830541002)
     assert np.isclose(depth_L4s, 56.73136082379056)
+    assert np.isclose(depth_L4s_ste, 52.72442116662979)
     assert np.isclose(Rb_L2, 0.12769092836836982)
     assert np.isclose(Rb_L3, 0.12769755355584275)
     assert np.isclose(Rb_L4, 0.12793335445966403)
+    assert np.isclose(Rb_L4_ste, 0.12783109689745237)
 
 
 if __name__ == "__main__":  # pragma: no cover
