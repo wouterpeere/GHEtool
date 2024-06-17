@@ -16,6 +16,9 @@ import time
 
 import numpy as np
 
+import sys
+sys.path.append("C:\Workdir\Develop\ghetool")
+
 from GHEtool import *
 
 
@@ -89,6 +92,10 @@ def test_3_6h():
             borefield.set_min_avg_fluid_temperature(0 - delta_t / 2)
 
             # load the hourly profile
+            # load the hourly profile
+            load = HourlyGeothermalLoad(simulation_period=s)
+            load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test3.csv'), header=True, separator=",",
+                             col_heating=1, col_cooling=0)
             borefield.load = load
 
             # Sizing with constant Rb
@@ -112,11 +119,11 @@ def test_3_6h():
     # peak load duration of 6 hours
     print("Results for peak load duration of 6 hours:")
     print(
-        f"The sizing according to L2 has a depth of {depth_L2:.2f}m (using dynamic Rb* of {Rb_L2:.3f}) and {results[12]:.2f}m (using constant Rb*)")
+        f"The sizing according to L2 has a depth of {depth_L2:.2f}m (using dynamic Rb* of {Rb_L2:.3f}) and {results[15]:.2f}m (using constant Rb*)")
     print(
-        f"The sizing according to L3 has a depth of {depth_L3:.2f}m (using dynamic Rb* of {Rb_L3:.3f}) and {results[13]:.2f}m (using constant Rb*)")
+        f"The sizing according to L3 has a depth of {depth_L3:.2f}m (using dynamic Rb* of {Rb_L3:.3f}) and {results[16]:.2f}m (using constant Rb*)")
     print(
-        f"The sizing according to L4 has a depth of {depth_L4:.2f}m (using dynamic Rb* of {Rb_L4:.3f}) and {results[14]:.2f}m (using constant Rb*)")
+        f"The sizing according to L4 has a depth of {depth_L4:.2f}m (using dynamic Rb* of {Rb_L4:.3f}) and {results[17]:.2f}m (using constant Rb*)")
 
     # effects of spacing and design period
     print("Effects of spacing and desing period:")
@@ -130,9 +137,9 @@ def test_3_6h():
     assert np.isclose(depth_L2, 117.36039732946608)
     assert np.isclose(depth_L3, 117.1785111449418)
     assert np.isclose(depth_L4, 117.14859810762285)
-    assert np.isclose(results[12], 107.52272928881716)
-    assert np.isclose(results[13], 107.34311737737467)
-    assert np.isclose(results[14], 107.36958044500126)
+    assert np.isclose(results[15], 107.0986066985957)
+    assert np.isclose(results[16], 106.9230387825644)
+    assert np.isclose(results[17], 108.34623262089772)
     assert np.isclose(Rb_L2, 0.12265691458202486)
     assert np.isclose(Rb_L3, 0.12265286595141986)
     assert np.isclose(Rb_L4, 0.12265220070895928)
