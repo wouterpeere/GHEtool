@@ -214,9 +214,9 @@ def test_1a_6h():
     print(
         f"The sizing according to L4 has a depth of {depth_L4_ste:.2f}m (using dynamic Rb* of {Rb_L4_ste:.3f}) and {depth_L4s_ste:.2f}m (using constant Rb*)")
     print(
-        f"Time needed for L4-sizing is {L4_stop-L4_start}s (using dynamic Rb*) or {L4s_stop-L4s_start}s (using constant Rb*)")
+        f"Time needed for L4-sizing is {L4_stop-L4_start:.2f}s (using dynamic Rb*) or {L4s_stop-L4s_start:.2f}s (using constant Rb*)")
     print(
-        f"Time needed for L4-sizing including short-term effect is {L4_ste_stop-L4_ste_start}s (using dynamic Rb*) or {L4s_ste_stop-L4s_ste_start}s (using constant Rb*)")
+        f"Time needed for L4-sizing including short-term effect is {L4_ste_stop-L4_ste_start:.2f}s (using dynamic Rb*) or {L4s_ste_stop-L4s_ste_start:.2f}s (using constant Rb*)")
     
     assert np.isclose(depth_L2, 59.366333293365)
     assert np.isclose(depth_L3, 59.542511807290666)
@@ -419,9 +419,9 @@ def test_1a_1h():
     print(
         f"The sizing according to L4 has a depth of {depth_L4_ste:.2f}m (using dynamic Rb* of {Rb_L4_ste:.3f}) and {depth_L4s_ste:.2f}m (using constant Rb*)")
     print(
-        f"Time needed for L4-sizing is {L4_stop-L4_start}s (using dynamic Rb*) or {L4s_stop-L4s_start}s (using constant Rb*)")
+        f"Time needed for L4-sizing is {L4_stop-L4_start:.2f}s (using dynamic Rb*) or {L4s_stop-L4s_start:.2f}s (using constant Rb*)")
     print(
-        f"Time needed for L4-sizing including short-term effect is {L4_ste_stop-L4_ste_start}s (using dynamic Rb*) or {L4s_ste_stop-L4s_ste_start}s (using constant Rb*)")
+        f"Time needed for L4-sizing including short-term effect is {L4_ste_stop-L4_ste_start:.2f}s (using dynamic Rb*) or {L4s_ste_stop-L4s_ste_start:.2f}s (using constant Rb*)")
     
     assert np.isclose(depth_L2, 46.44356767605206)
     assert np.isclose(depth_L3, 46.73933500137179)
