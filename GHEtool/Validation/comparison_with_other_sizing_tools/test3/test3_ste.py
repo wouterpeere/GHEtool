@@ -223,7 +223,7 @@ def test_3_6h_ste():
     print(
         f"The sizing according to L4 has a depth of {depth_L4:.2f}m (using dynamic Rb* of {Rb_L4:.3f}) and {results[17]:.2f}m (using constant Rb*)")
     print(
-        f"The sizing according to L4 (inclusing short-term effects) has a depth of {depth_L4_ste}m (using dynamic Rb* of {Rb_L4_ste}) and {results_ste[5]}m (using constant Rb*)")
+        f"The sizing according to L4 (inclusing short-term effects) has a depth of {depth_L4_ste:.2f}m (using dynamic Rb* of {Rb_L4_ste:.3f}) and {results_ste[5]:.2f}m (using constant Rb*)")
 
     # effects of spacing and design period
     print("Effects of spacing and desing period:")
