@@ -21,7 +21,7 @@ sys.path.append("C:\Workdir\Develop\ghetool")
 
 from GHEtool import *
 
-def test_1a_6h():
+def test_1a_6h_ste():
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=1.8, T_g=17.5, volumetric_heat_capacity=2073600, flux=0)
     fluid_data = FluidData(mfr=0.440, rho=1052, Cp=3795, mu=0.0052, k_f=0.48)
@@ -229,7 +229,7 @@ def test_1a_6h():
     assert np.isclose(Rb_L4_ste, 0.12783109689745237)
 
 
-def test_1a_1h():
+def test_1a_1h_ste():
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=1.8, T_g=17.5, volumetric_heat_capacity=2073600, flux=0)
     fluid_data = FluidData(mfr=0.440, rho=1052, Cp=3795, mu=0.0052, k_f=0.48)
@@ -438,5 +438,5 @@ def test_1a_1h():
 
 
 if __name__ == "__main__":  # pragma: no cover
-    test_1a_6h()
-    test_1a_1h()
+    test_1a_6h_ste()
+    test_1a_1h_ste()

@@ -22,7 +22,7 @@ sys.path.append("C:\Workdir\Develop\ghetool")
 from GHEtool import *
 
 
-def test_1b():
+def test_1b_ste():
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=1.8, T_g=17.5, volumetric_heat_capacity=2073600, flux=0)
     fluid_data = FluidData(mfr=0.5585, rho=1052, Cp=3795, mu=0.0052, k_f=0.48)
@@ -236,4 +236,4 @@ def test_1b():
 
 
 if __name__ == "__main__":  # pragma: no cover
-    test_1b()
+    test_1b_ste()
