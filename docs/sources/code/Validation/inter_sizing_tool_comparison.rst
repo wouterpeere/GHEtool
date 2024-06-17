@@ -196,15 +196,15 @@ limitations, will yield inaccurate results.
      - Difference from mean [%]
      - Imposed Rb* = 0.1 [m.K/W]
    * - L2
-     - 107.5
+     - 107.1
      - 6.4
      - 0.1
    * - L3
-     - 107.4
+     - 106.9
      - 6.2
      - 0.1
    * - L4
-     - 107.4
+     - 108.3
      - 6.2
      - 0.1
    * - mean
@@ -223,11 +223,10 @@ limitations, will yield inaccurate results.
 When the same Rb value (0.113 m.K/W) was used for all tools, the borehole depths ranged from 85.9 to 115.0 m, with an 
 average of 101.0 m. This high variability in required borehole depth underscores the importance of using a sizing tool 
 that also considers the first year of operation. Sizing with the GHEtool L2-method resulted in a borehole depth of 
-107.5 m (6.4% deviation), while both the L3- and L4-methods produced depths of 107.4 m (6.2% deviation). These three
-methods yielded nearly identical results, indicating their reliability. All three methods resulted in higher borehole 
-depths compared to the mean, where all twelve other sizing tools are included. The explanation is straightforward: sizing 
-tools that do not account for first-year limitations will in this case undersize the borefield, leading to operational problems 
-during the initial years.
+107.1 m (6.0% deviation), while the L3- and L4-methods produced depths of respectively 106.9 m (5.8% deviation) and 108.3 m (7.2% deviation). 
+All three methods resulted in higher borehole depths compared to the mean, where all twelve other sizing tools are included. 
+The explanation is straightforward: sizing tools that do not account for first-year limitations will in this case undersize the borefield, 
+leading to operational problems during the initial years.
 
 
 .. list-table:: Calculated borehole depths for Test 3 for different spacing (B [m]) and design period (p [years]).
