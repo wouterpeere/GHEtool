@@ -148,8 +148,6 @@ class DynamicsBH(object):
         self.calc_time_in_sec = max([self.t_s * exp(-8.6), 49.0 * 3600.0])
         self.t_b = 5 * (self.boreholes[0].r_b) ** 2 / self.ground_ghe.alpha()  
         self.final_time = self.factor_time * self.t_b
-        print("final time in second", self.final_time, "final time in hours", self.final_time/3600)
-  
         self.g_sts = None
 
     def partial_init(self):
@@ -466,8 +464,6 @@ class DynamicsBH(object):
 
           
             if stop_crit < 0 or time >= (final_time - time_step):
-                number_interval = time/self.t_s*exp(-8.6) * 30
-                print('time', time, 'ts', self.t_s*exp(-8.6), 'number of intervals', number_interval)
                 if stop_crit < 0:
                     ghe_logger.info(f"Perfect convergence with long-term g-function after {time/3600} hours")
                     

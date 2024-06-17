@@ -16,8 +16,10 @@ import time
 
 import numpy as np
 
-from GHEtool import *
+import sys
+sys.path.append("C:\Workdir\Develop\ghetool")
 
+from GHEtool import *
 
 def test_1a_6h():
     # initiate ground, fluid and pipe data
