@@ -127,9 +127,9 @@ def test_3_6h():
     print(
         f"The sizing according to L2 using constant Rb* has a depth of {results[0]:.2f}m (B=3m), {results[3]:.2f}m (B=5m), {results[6]:.2f}m (B=7m) for a simulation period of 1 year and {results[9]:.2f}m (B=3m), {results[12]:.2f}m (B=5m), {results[15]:.2f}m (B=7m) for a simulation period of 10 years ")
     print(
-        f"The sizing according to L2 using constant Rb* has a depth of {results[1]:.2f}m (B=3m), {results[4]:.2f}m (B=5m), {results[7]:.2f}m (B=7m) for a simulation period of 1 year and {results[10]:.2f}m (B=3m), {results[13]:.2f}m (B=5m), {results[16]:.2f}m (B=7m) for a simulation period of 10 years ")
+        f"The sizing according to L3 using constant Rb* has a depth of {results[1]:.2f}m (B=3m), {results[4]:.2f}m (B=5m), {results[7]:.2f}m (B=7m) for a simulation period of 1 year and {results[10]:.2f}m (B=3m), {results[13]:.2f}m (B=5m), {results[16]:.2f}m (B=7m) for a simulation period of 10 years ")
     print(
-        f"The sizing according to L2 using constant Rb* has a depth of {results[2]:.2f}m (B=3m), {results[5]:.2f}m (B=5m), {results[8]:.2f}m (B=7m) for a simulation period of 1 year and {results[11]:.2f}m (B=3m), {results[14]:.2f}m (B=5m), {results[17]:.2f}m (B=7m) for a simulation period of 10 years ")
+        f"The sizing according to L4 using constant Rb* has a depth of {results[2]:.2f}m (B=3m), {results[5]:.2f}m (B=5m), {results[8]:.2f}m (B=7m) for a simulation period of 1 year and {results[11]:.2f}m (B=3m), {results[14]:.2f}m (B=5m), {results[17]:.2f}m (B=7m) for a simulation period of 10 years ")
 
     assert np.isclose(depth_L2, 117.36039732946608)
     assert np.isclose(depth_L3, 117.1785111449418)
