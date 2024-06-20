@@ -471,7 +471,7 @@ class DynamicsBH(object):
                     ghe_logger.info(f"No perfect convergence between long-term and short term g-functions, switch made after {time/3600} hours")
                 break
             
-        """
+        
         #Plotting short-term and long-term g-function on 1 graph
         fig = plt.figure()
         ax1 = fig.add_subplot(111)
@@ -481,7 +481,7 @@ class DynamicsBH(object):
         ax1.plot(self.time, self.gFunc, c='b', marker="s", label='g_lt')
         ax1.plot(lntts,g, c='r', label='g_st')
         plt.legend(loc='upper left')
-        """
+        
 
         # quickly chop down the total values to a more manageable set
 
