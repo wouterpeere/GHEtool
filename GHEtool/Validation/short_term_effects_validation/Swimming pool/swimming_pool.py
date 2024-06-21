@@ -19,6 +19,8 @@ import pandas as pd
 
 import matplotlib.pyplot as plt
 
+import pygfunction as gt
+
 import sys
 sys.path.append("C:\Workdir\Develop\ghetool")
 
@@ -68,6 +70,18 @@ def Swimming_pool():
     # set geothermal load
     borefield.load = primary_geothermal_load
 
+    
+    options = {'nSegments': 12,
+                'segment_ratios': None,
+                   'disp': False,
+                   'profiles': True,
+                   'method': 'equivalent'
+                     }
+
+    borefield.set_options_gfunction_calculation(options)
+
+    
+
     # according to L4
     L4_start = time.time()
     depth_L4 = borefield.size(100, L4_sizing=True)
@@ -91,6 +105,7 @@ def Swimming_pool():
 
     # load the hourly profile
     borefield.load = primary_geothermal_load
+    
     # Addidional input data needed for short-term model
     rho_cp_grout = 3800000.0  
     rho_cp_pipe = 2150000.0  
@@ -116,6 +131,7 @@ def Swimming_pool():
                      }
 
     borefield.set_options_gfunction_calculation(options)
+    
 
     # according to L4 including short-term effects
     L4_ste_start = time.time()

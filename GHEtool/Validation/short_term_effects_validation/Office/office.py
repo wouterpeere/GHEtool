@@ -68,6 +68,16 @@ def Office():
     # set geothermal load
     borefield.load = primary_geothermal_load
 
+    options = {'nSegments': 12,
+                'segment_ratios': None,
+                   'disp': False,
+                   'profiles': True,
+                   'method': 'equivalent'
+                     }
+
+    borefield.set_options_gfunction_calculation(options)
+
+
     # according to L4
     L4_start = time.time()
     depth_L4 = borefield.size(100, L4_sizing=True)

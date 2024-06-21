@@ -68,6 +68,15 @@ def Auditorium():
     # set geothermal load
     borefield.load = primary_geothermal_load
 
+    options = {'nSegments': 12,
+                'segment_ratios': None,
+                   'disp': False,
+                   'profiles': True,
+                   'method': 'equivalent'
+                     }
+
+    borefield.set_options_gfunction_calculation(options)
+
     # according to L4
     L4_start = time.time()
     depth_L4 = borefield.size(100, L4_sizing=True)
@@ -78,6 +87,8 @@ def Auditorium():
 
     # initiate borefield
     borefield = Borefield()
+
+    print('start my L4 model')
 
     # set ground data in borefield
     borefield.set_ground_parameters(ground_data)
@@ -106,8 +117,8 @@ def Auditorium():
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
-                   'cylindrical_correction': True,
-                   'short_term_effects': True,
+                   'cylindrical_correction': False,
+                   'short_term_effects': False,
                    'ground_data': ground_data,
                    'fluid_data': fluid_data,
                    'pipe_data': pipe_data,
