@@ -52,7 +52,7 @@ def Office():
     borefield.set_min_avg_fluid_temperature(3)
 
     # load the hourly profile
-    load = HourlyGeothermalLoad(simulation_period=10)
+    load = HourlyGeothermalLoad(simulation_period=20)
     load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'office.csv'), header=True, separator=";",
                              decimal_seperator=".", col_heating=1,
                              col_cooling=0)
@@ -106,8 +106,8 @@ def Office():
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
-                   'cylindrical_correction': True,
-                   'short_term_effects': True,
+                   'cylindrical_correction': False,
+                   'short_term_effects': False,
                    'ground_data': ground_data,
                    'fluid_data': fluid_data,
                    'pipe_data': pipe_data,
@@ -124,8 +124,6 @@ def Office():
     L4_ste_stop = time.time()
     Tf_L4_ste = borefield.results.peak_cooling
     Tb_L4_ste = borefield.results.Tb
-
-    plt.show()
 
 
     print(
@@ -181,6 +179,7 @@ def Office():
 
     """
 
+    plt.show()
 
 if __name__ == "__main__":  # pragma: no cover
     Office()

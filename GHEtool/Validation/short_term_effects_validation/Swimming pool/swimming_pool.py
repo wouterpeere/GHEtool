@@ -52,7 +52,7 @@ def Swimming_pool():
     borefield.set_min_avg_fluid_temperature(3)
 
     # load the hourly profile
-    load = HourlyGeothermalLoad(simulation_period=10)
+    load = HourlyGeothermalLoad(simulation_period=20)
     load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'swimming_pool.csv'), header=True, separator=";",
                              decimal_seperator=".", col_heating=1,
                              col_cooling=0)
@@ -106,8 +106,8 @@ def Swimming_pool():
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
-                   'cylindrical_correction': True,
-                   'short_term_effects': True,
+                   'cylindrical_correction': False,
+                   'short_term_effects': False,
                    'ground_data': ground_data,
                    'fluid_data': fluid_data,
                    'pipe_data': pipe_data,

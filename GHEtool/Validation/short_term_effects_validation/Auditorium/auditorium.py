@@ -52,7 +52,7 @@ def Auditorium():
     borefield.set_min_avg_fluid_temperature(3)
 
     # load the hourly profile
-    load = HourlyGeothermalLoad(simulation_period=10)
+    load = HourlyGeothermalLoad(simulation_period=20)
     load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'auditorium.csv'), header=True, separator=";",
                              decimal_seperator=".", col_heating=1,
                              col_cooling=0)
@@ -178,7 +178,7 @@ def Auditorium():
     plt.show()
 
     """
-
+    plt.show()
 
 if __name__ == "__main__":  # pragma: no cover
     Auditorium()

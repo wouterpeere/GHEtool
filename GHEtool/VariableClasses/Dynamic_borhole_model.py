@@ -31,6 +31,8 @@ class DynamicsBH(object):
 
     def __init__(self, time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, borefield, short_term_effects_parameters):
 
+        print('in dynamic model')
+
         self.boreholes = boreholes
         self.ground_ghe = ground_data
         self.fluid_ghe = fluid_data
