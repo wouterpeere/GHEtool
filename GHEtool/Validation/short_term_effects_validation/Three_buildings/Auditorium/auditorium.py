@@ -117,7 +117,7 @@ def Auditorium():
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
-                   'cylindrical_correction': False,
+                   'cylindrical_correction': True,
                    'short_term_effects': False,
                    'ground_data': ground_data,
                    'fluid_data': fluid_data,

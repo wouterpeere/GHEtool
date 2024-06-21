@@ -117,7 +117,7 @@ def Office():
                    'profiles': True,
                    'method': 'equivalent',
                    'cylindrical_correction': False,
-                   'short_term_effects': False,
+                   'short_term_effects': True,
                    'ground_data': ground_data,
                    'fluid_data': fluid_data,
                    'pipe_data': pipe_data,

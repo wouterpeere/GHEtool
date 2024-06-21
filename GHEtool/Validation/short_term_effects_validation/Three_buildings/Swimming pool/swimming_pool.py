@@ -80,8 +80,6 @@ def Swimming_pool():
 
     borefield.set_options_gfunction_calculation(options)
 
-    
-
     # according to L4
     L4_start = time.time()
     depth_L4 = borefield.size(100, L4_sizing=True)
@@ -122,7 +120,7 @@ def Swimming_pool():
                    'profiles': True,
                    'method': 'equivalent',
                    'cylindrical_correction': False,
-                   'short_term_effects': False,
+                   'short_term_effects': True,
                    'ground_data': ground_data,
                    'fluid_data': fluid_data,
                    'pipe_data': pipe_data,
