@@ -36,6 +36,7 @@ def Auditorium():
     ground_data = GroundFluxTemperature(k_s=3, T_g=10, volumetric_heat_capacity= 2.4 * 10**6, flux=0.06)
     fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
     pipe_data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 1)
+    plot_load = True
 
     # initiate borefield
     borefield = Borefield()
@@ -67,6 +68,21 @@ def Auditorium():
     primary_geothermal_load.set_hourly_heating(load.hourly_heating_load.copy() * (1 - 1 / SCOP))
     # set geothermal load
     borefield.load = primary_geothermal_load
+
+    if plot_load:
+        #Plotting Load
+        heating = load.hourly_heating_load.copy() * (1 + 1 / SCOP)
+        cooling = load.hourly_cooling_load.copy() * (1 + 1 / SEER)
+        t = [i for i in range(8760)]
+        fig = plt.subplots(figsize =(12, 8)) 
+        plt.plot(t, heating, color ='r', lw=2, label ='Heating')
+        plt.plot(t, cooling, color ='b', lw=2, label ='Cooling')
+        plt.xlabel('Time [h]', fontsize = 18)
+        plt.ylabel('Load [kW]', fontsize = 18)
+        plt.legend(fontsize = 16)
+        plt.title('Profile 1: Yearly geothermal load profile auditorium building', fontsize = 22)
+        plt.show() 
+
 
     options = {'nSegments': 12,
                 'segment_ratios': None,
