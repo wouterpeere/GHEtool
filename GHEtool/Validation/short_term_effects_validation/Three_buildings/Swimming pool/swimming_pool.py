@@ -77,7 +77,7 @@ def Swimming_pool():
         cooling = load.hourly_cooling_load.copy() * (1 + 1 / SEER)
         t = [i for i in range(8760)]
         fig = plt.subplots(figsize =(12, 8)) 
-        plt.plot(t, heating, color ='r', lw=2, label ='Heating')
+        plt.plot(t, heating, color ='orange', lw=2, label ='Heating')
         plt.plot(t, cooling, color ='b', lw=2, label ='Cooling')
         plt.xlabel('Time [h]', fontsize = 18)
         plt.ylabel('Load [kW]', fontsize = 18)

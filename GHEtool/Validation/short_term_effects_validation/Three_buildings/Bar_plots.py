@@ -20,10 +20,10 @@ br2 = [x + barWidth for x in br1]
 br3 = [x + barWidth for x in br2] 
 
 # Make the plot
-plt.bar(br1, stst, color ='r', width = barWidth, 
-        edgecolor ='grey', label ='Steady-state model') 
-plt.bar(br2, dynamic, color ='b', width = barWidth, 
-        edgecolor ='grey', label ='Dynamic model') 
+plt.bar(br1, stst, color ='b', width = barWidth, 
+         label ='Steady-state model') 
+plt.bar(br2, dynamic, color ='orange', width = barWidth, 
+         label ='Dynamic model') 
 
 # Adding Xticks 
 
