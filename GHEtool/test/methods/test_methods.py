@@ -46,12 +46,16 @@ def test_L4(model: Borefield, result):
                          ids=list_of_test_objects.names_optimise_load_profile)
 def test_optimise(input, result):
     model: Borefield = input[0]
-    load, depth, SCOP, SEER, power, hourly = input[1:]
+    load, depth, SCOP, SEER, power, hourly, max_peak_heating, max_peak_cooling = input[1:]
     if power:
         secundary_borefield_load, external_load = model.optimise_load_profile_power(load, depth, SCOP, SEER,
-                                                                                    use_hourly_resolution=hourly)
+                                                                                    use_hourly_resolution=hourly,
+                                                                                    max_peak_heating=max_peak_heating,
+                                                                                    max_peak_cooling=max_peak_cooling)
     else:
-        secundary_borefield_load, external_load = model.optimise_load_profile_energy(load, depth, SCOP, SEER)
+        secundary_borefield_load, external_load = model.optimise_load_profile_energy(load, depth, SCOP, SEER,
+                                                                                     max_peak_heating=max_peak_heating,
+                                                                                     max_peak_cooling=max_peak_cooling)
     percentage_heating, percentage_cooling, peak_heating_geo, peak_cooling_geo, peak_heating_ext, peak_cooling_ext = \
         result
 
