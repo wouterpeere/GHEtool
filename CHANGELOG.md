@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added vfr to Fluid Class (issue #262).
 - Added yearly_heating_load_simulation_period, yearly_cooling_load_simulation_period,
   yearly_heating_peak_simulation_period and yearly_cooling_peak_simulation_period to the Load class (issue #265).
+- Added max peak heating/cooling to optimise_load_profile functions (issue #276).
 
 ## Changed
 
