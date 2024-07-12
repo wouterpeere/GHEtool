@@ -140,6 +140,35 @@ class CoaxialPipe(_PipeData):
         # Reynolds number
         return fluid_data.rho * V * D_h / fluid_data.mu
 
+    def pressure_drop(self, fluid_data: FluidData, borehole_depth: float) -> float:
+        """
+        Calculates the pressure drop across the entire borehole.
+        It assumed that the U-tubes are all connected in parallel.
+
+        Parameters
+        ----------
+        fluid_data: FluidData
+            Fluid data
+        borehole_depth : float
+            Borehole depth [m]
+
+        Returns
+        -------
+        Pressure drop : float
+            Pressure drop [kPa]
+        """
+
+        r_h = (self.r_out_in - self.r_in_in)
+        # Cross-sectional area of the annulus region
+        A_c = pi * ((self.r_out_in ** 2) - (self.r_in_in ** 2))
+        # Average velocity
+        V = (fluid_data.vfr / 1000) / A_c
+
+        # Darcy-Wiesbach friction factor
+        fd = gt.pipes.fluid_friction_factor_circular_pipe(
+            fluid_data.mfr, r_h, fluid_data.mu, fluid_data.rho, self.epsilon)
+        return (fd * (borehole_depth * 2) / (2 * r_h) * fluid_data.rho * V ** 2 / 2) / 1000
+
     def draw_borehole_internal(self, r_b: float) -> None:
         """
         This function draws the internal structure of a borehole.

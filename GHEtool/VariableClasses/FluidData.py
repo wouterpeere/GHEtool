@@ -42,13 +42,12 @@ class FluidData(BaseClass):
         self.k_f: float | None = k_f  # Thermal conductivity W/mK
         self._mfr: float | None = mfr  # Mass flow rate per borehole kg/s
         self.rho: float | None = rho  # Density kg/m3
-        self.Cp: float | None = Cp    # Thermal capacity J/kgK
-        self.mu: float | None = mu    # Dynamic viscosity Pa/s
+        self.Cp: float | None = Cp  # Thermal capacity J/kgK
+        self.mu: float | None = mu  # Dynamic viscosity Pa/s
         self._vfr: float | None = vfr  # Volume flow rate l/s
 
         if self._mfr is not None and self._vfr is not None:
             raise ValueError('You cannot set both the mass flow rate and volume flow rate')
-
 
     @property
     def vfr(self) -> float:
