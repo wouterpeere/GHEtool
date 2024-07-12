@@ -19,10 +19,15 @@ def test_empty_class():
 def test_axissym():
     single = SingleUTube(1, 0.016, 0.02, 2, 0.02)
     double = DoubleUTube(1, 0.016, 0.02, 2, 0.02)
-    np.testing.assert_array_almost_equal(single._axis_symmetrical_pipe, [(-0.02, 2.4492935982947064e-18), (0.02, -4.898587196589413e-18)])
-    np.testing.assert_array_almost_equal(double._axis_symmetrical_pipe, [(-0.02, 2.4492935982947064e-18), (0.02, -4.898587196589413e-18), (-3.673940397442059e-18, -0.02), (6.123233995736766e-18, 0.02)])
-    np.testing.assert_array_almost_equal(single._axis_symmetrical_pipe, MultipleUTube(1, 0.16, 0.02, 2, 0.02, 1)._axis_symmetrical_pipe)
-    np.testing.assert_array_almost_equal(double._axis_symmetrical_pipe, MultipleUTube(1, 0.16, 0.02, 2, 0.02, 2)._axis_symmetrical_pipe)
+    np.testing.assert_array_almost_equal(single._axis_symmetrical_pipe,
+                                         [(-0.02, 2.4492935982947064e-18), (0.02, -4.898587196589413e-18)])
+    np.testing.assert_array_almost_equal(double._axis_symmetrical_pipe,
+                                         [(-0.02, 2.4492935982947064e-18), (0.02, -4.898587196589413e-18),
+                                          (-3.673940397442059e-18, -0.02), (6.123233995736766e-18, 0.02)])
+    np.testing.assert_array_almost_equal(single._axis_symmetrical_pipe,
+                                         MultipleUTube(1, 0.16, 0.02, 2, 0.02, 1)._axis_symmetrical_pipe)
+    np.testing.assert_array_almost_equal(double._axis_symmetrical_pipe,
+                                         MultipleUTube(1, 0.16, 0.02, 2, 0.02, 2)._axis_symmetrical_pipe)
 
 
 def test_calculate_thermal_resistance():
@@ -91,12 +96,12 @@ def test_pipe_data_unequal():
 
 
 ### Test Coaxial pipes
-k_g = 1.0           # Grout thermal conductivity [W/m.K]
-k_p = 0.4           # Pipe thermal conductivity [W/m.K]
-r_in_in = 0.0221    # Inside pipe inner radius [m]
-r_in_out = 0.025    # Inside pipe outer radius [m]
-r_out_in = 0.0487   # Outer pipe inside radius [m]
-r_out_out = 0.055   # Outer pipe outside radius [m]
+k_g = 1.0  # Grout thermal conductivity [W/m.K]
+k_p = 0.4  # Pipe thermal conductivity [W/m.K]
+r_in_in = 0.0221  # Inside pipe inner radius [m]
+r_in_out = 0.025  # Inside pipe outer radius [m]
+r_out_in = 0.0487  # Outer pipe inside radius [m]
+r_out_out = 0.055  # Outer pipe outside radius [m]
 
 
 def test_empty_coaxial():
@@ -161,11 +166,11 @@ def test_calculate_borehole_equivalent_resistance_coaxial():
         fluid = FluidData(0.5, fluid.k, fluid.rho, fluid.cp, fluid.mu)
         pipe_ghe.calculate_resistances(fluid)
         pipe = gt.pipes.Coaxial(pos=(0., 0.),
-                         r_in=np.array([r_out_in, r_in_in]) if is_inner_inlet else
-                         np.array([r_in_in, r_out_in]),
-                         r_out=np.array([r_out_out, r_in_out]) if is_inner_inlet else
-                         np.array([r_in_out, r_out_out]),
-                         borehole=borehole, k_s=i, k_g=k_g, R_ff=pipe_ghe.R_ff, R_fp=pipe_ghe.R_fp, J=2)
+                                r_in=np.array([r_out_in, r_in_in]) if is_inner_inlet else
+                                np.array([r_in_in, r_out_in]),
+                                r_out=np.array([r_out_out, r_in_out]) if is_inner_inlet else
+                                np.array([r_in_out, r_out_out]),
+                                borehole=borehole, k_s=i, k_g=k_g, R_ff=pipe_ghe.R_ff, R_fp=pipe_ghe.R_fp, J=2)
 
 
 def test_calculate_borehole_equivalent_resistance_coaxial_different_outer_conductivity():
@@ -199,7 +204,17 @@ def test_pipe_data_unequal_cross():
 
 def test_reynolds_number():
     fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-    data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2)
-    assert np.isclose(data.Re(fluid_data=fluid_data), 4244.131815783876)
-    data = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
-    assert np.isclose(data.Re(fluid_data=fluid_data), 1727.5977540504243)
+    double = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2)
+    assert np.isclose(double.Re(fluid_data=fluid_data), 4244.131815783876)
+    coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
+    assert np.isclose(coaxial.Re(fluid_data=fluid_data), 1727.5977540504243)
+
+
+def test_pressure_drop():
+    fluid_data = FluidData(0.3, 0.568, 998, 4180, 1e-3)
+    single = MultipleUTube(1, 0.02, 0.02, 0.4, 0.05, 1)
+    double = MultipleUTube(1, 0.013, 0.016, 0.4, 0.05, 2)
+    assert np.isclose(single.pressure_drop(fluid_data, 100), 4.4688388696204555)
+    assert np.isclose(double.pressure_drop(fluid_data, 100), 10.339838859988387)
+    coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
+    assert np.isclose(coaxial.pressure_drop(fluid_data, 100), 0.16366613552554135)
