@@ -13,7 +13,8 @@ def test_fluid_data():
     assert data.rho == 998
     assert data.Cp == 4180
     assert data.mu == 1e-3
-    assert data.vfr is None
+    assert data._vfr is None
+    assert np.isclose(data.vfr, 0.20040080160320642)
 
 
 def test_fluid_data_equal():
