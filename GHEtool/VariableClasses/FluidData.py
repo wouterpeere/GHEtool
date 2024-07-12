@@ -60,7 +60,9 @@ class FluidData(BaseClass):
         float
             volume flow rate [l/s]
         """
-        return self._vfr
+        if self._vfr is not None:
+            return self._vfr
+        return self.mfr / self.rho * 1000
 
     @vfr.setter
     def vfr(self, vfr: float) -> None:

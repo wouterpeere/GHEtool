@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added yearly_heating_load_simulation_period, yearly_cooling_load_simulation_period,
   yearly_heating_peak_simulation_period and yearly_cooling_peak_simulation_period to the Load class (issue #265).
 - Added max peak heating/cooling to optimise_load_profile functions (issue #276).
+- Added pressure drop across a U-tube (issue #278).
 
 ## Changed
 
@@ -24,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Removed depreciated 'optimise_load_profile', '_percentage_heating', '_percentage_cooling' from Borefield.py (issue
   #268).
 - Removed '_external_load', '_secundary_borefield_load', '_building_load' from Borefield.py (issue #268).
+- Vfr in FluidData now returns also a value if vfr = None based on the mfr.
 
 ## Fixed
 
