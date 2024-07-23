@@ -6,9 +6,9 @@ This code is tested with Python 3.8, 3.9, 3.10, 3.11 and 3.12 and requires the f
 mentioned are the ones with which the code is tested)
 
 * matplotlib >= 3.5.2
-* numpy >= 1.23.1, <2.0.0
+* numpy >= 1.23.1
 * pandas >= 1.4.3
-* pygfunction >= 2.2.1
+* pygfunction >= 2.2.3
 * scipy >= 1.8.1
 
 For the tests

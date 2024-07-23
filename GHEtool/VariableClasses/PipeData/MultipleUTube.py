@@ -43,13 +43,13 @@ class MultipleUTube(_PipeData):
 
         super().__init__(k_g, k_p, epsilon)
 
-        self.r_in = r_in                    # inner pipe radius m
-        self.r_out = r_out                  # outer pipe radius m
-        self.D_s = D_s                      # distance of pipe until center m
+        self.r_in = r_in  # inner pipe radius m
+        self.r_out = r_out  # outer pipe radius m
+        self.D_s = D_s  # distance of pipe until center m
         self.number_of_pipes = number_of_pipes  # number of pipes #
         self.pos = []
-        self.R_p = 0                        # pipe thermal resistance mK/W
-        self.R_f = 0                        # film (i.e. fluid) thermal resistance mK/W
+        self.R_p = 0  # pipe thermal resistance mK/W
+        self.R_f = 0  # film (i.e. fluid) thermal resistance mK/W
         if self.check_values():
             self.pos = self._axis_symmetrical_pipe  # position of the pipes
 
@@ -67,7 +67,8 @@ class MultipleUTube(_PipeData):
         pos: list = [(0., 0.)] * 2 * self.number_of_pipes
         for i in range(self.number_of_pipes):
             pos[i] = (self.D_s * np.cos(2.0 * i * dt + pi), self.D_s * np.sin(2.0 * i * dt + pi))
-            pos[i + self.number_of_pipes] = (self.D_s * np.cos(2.0 * i * dt + pi + dt), self.D_s * np.sin(2.0 * i * dt + pi + dt))
+            pos[i + self.number_of_pipes] = (
+                self.D_s * np.cos(2.0 * i * dt + pi + dt), self.D_s * np.sin(2.0 * i * dt + pi + dt))
         return pos
 
     def calculate_resistances(self, fluid_data: FluidData) -> None:
@@ -87,7 +88,7 @@ class MultipleUTube(_PipeData):
         self.R_p = gt.pipes.conduction_thermal_resistance_circular_pipe(
             self.r_in, self.r_out, self.k_p)
         # Convection heat transfer coefficient [W/m2.K]
-        h_f = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(fluid_data.mfr/self.number_of_pipes,
+        h_f = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(fluid_data.mfr / self.number_of_pipes,
                                                                           self.r_in, fluid_data.mu, fluid_data.rho,
                                                                           fluid_data.k_f, fluid_data.Cp, self.epsilon)
         # Film thermal resistance [m.K/W]
@@ -129,6 +130,36 @@ class MultipleUTube(_PipeData):
         u = fluid_data.mfr / self.number_of_pipes / fluid_data.rho / \
             (pi * self.r_in ** 2)
         return fluid_data.rho * u * self.r_in * 2 / fluid_data.mu
+
+    def pressure_drop(self, fluid_data: FluidData, borehole_depth: float) -> float:
+        """
+        Calculates the pressure drop across the entire borehole.
+        It assumed that the U-tubes are all connected in parallel.
+
+        Parameters
+        ----------
+        fluid_data: FluidData
+            Fluid data
+        borehole_depth : float
+            Borehole depth [m]
+
+        Returns
+        -------
+        Pressure drop : float
+            Pressure drop [kPa]
+        """
+
+        # Darcy fluid factor
+        fd = gt.pipes.fluid_friction_factor_circular_pipe(
+            fluid_data.mfr / self.number_of_pipes,
+            self.r_in,
+            fluid_data.mu,
+            fluid_data.rho,
+            self.epsilon)
+        A = pi * self.r_in ** 2
+        V = (fluid_data.vfr / 1000) / A / self.number_of_pipes
+
+        return (fd * (borehole_depth * 2) / (2 * self.r_in) * fluid_data.rho * V ** 2 / 2) / 1000
 
     def draw_borehole_internal(self, r_b: float) -> None:
         """

@@ -1824,7 +1824,9 @@ class Borefield(BaseClass):
             SCOP: float = 10 ** 6,
             SEER: float = 10 ** 6,
             temperature_threshold: float = 0.05,
-            use_hourly_resolution: bool = True
+            use_hourly_resolution: bool = True,
+            max_peak_heating: float = None,
+            max_peak_cooling: float = None
     ) -> tuple[HourlyGeothermalLoad, HourlyGeothermalLoad]:
         """
         This function optimises the load based on the given borefield and the given hourly load.
@@ -1849,12 +1851,15 @@ class Borefield(BaseClass):
         use_hourly_resolution : bool
             If use_hourly_resolution is used, the hourly data will be used for this optimisation. This can take some
             more time than using the monthly resolution, but it will give more accurate results.
+        max_peak_heating : float
+            The maximum peak power for geothermal heating [kW]
+        max_peak_cooling : float
+            The maximum peak power for geothermal cooling [kW]
 
         Returns
         -------
         tuple [HourlyGeothermalLoad, HourlyGeothermalLoad]
             borefield load (secundary), external load (secundary)
-
 
         Raises
         ------
@@ -1891,13 +1896,18 @@ class Borefield(BaseClass):
         init_peak_heating: float = self.load.max_peak_heating
         init_peak_cooling: float = self.load.max_peak_cooling
 
+        # correct for max peak powers
+        if max_peak_heating is not None:
+            init_peak_heating = min(init_peak_heating, max_peak_heating * (1 - 1 / SCOP))
+        if max_peak_cooling is not None:
+            init_peak_cooling = min(init_peak_cooling, max_peak_cooling * (1 + 1 / SEER))
+
         # peak loads for iteration
         peak_heat_load_geo: float = init_peak_heating
         peak_cool_load_geo: float = init_peak_cooling
 
         # set iteration criteria
         cool_ok, heat_ok = False, False
-
         while not cool_ok or not heat_ok:
             # limit the primary geothermal heating and cooling load to peak_heat_load_geo and peak_cool_load_geo
             self.load.set_hourly_cooling(np.minimum(peak_cool_load_geo, primary_geothermal_load.hourly_cooling_load))
@@ -1931,7 +1941,7 @@ class Borefield(BaseClass):
                         cool_ok = True
             else:
                 cool_ok = True
-
+        print(peak_heat_load_geo)
         # calculate the resulting secundary hourly profile that can be put on the borefield
         secundary_borefield_load = HourlyGeothermalLoad(simulation_period=building_load.simulation_period)
         secundary_borefield_load.set_hourly_cooling(self.load.hourly_cooling_load / (1 + 1 / SEER))
@@ -1957,6 +1967,8 @@ class Borefield(BaseClass):
             SCOP: float = 10 ** 6,
             SEER: float = 10 ** 6,
             temperature_threshold: float = 0.05,
+            max_peak_heating: float = None,
+            max_peak_cooling: float = None
     ) -> tuple[HourlyGeothermalLoadMultiYear, HourlyGeothermalLoadMultiYear]:
         """
         This function optimises the load based on the given borefield and the given hourly load.
@@ -1978,6 +1990,10 @@ class Borefield(BaseClass):
         temperature_threshold : float
             The maximum allowed temperature difference between the maximum and minimum fluid temperatures and their
             respective limits. The lower this threshold, the longer the convergence will take.
+        max_peak_heating : float
+            The maximum peak power for geothermal heating [kW]
+        max_peak_cooling : float
+            The maximum peak power for geothermal cooling [kW]
 
         Returns
         -------
@@ -2007,10 +2023,20 @@ class Borefield(BaseClass):
         use_constant_Rb_backup = self.borehole.use_constant_Rb
         self.Rb = self.borehole.get_Rb(depth, self.D, self.r_b, self.ground_data.k_s)
 
+        # set max peak values
+        init_peak_heating = building_load.hourly_heating_load.copy() * (1 - 1 / SCOP)
+        init_peak_cooling = building_load.hourly_cooling_load.copy() * (1 + 1 / SEER)
+
+        # correct for max peak powers
+        if max_peak_heating is not None:
+            init_peak_heating = np.clip(init_peak_heating, None, max_peak_heating * (1 - 1 / SCOP))
+        if max_peak_cooling is not None:
+            init_peak_cooling = np.clip(init_peak_cooling, None, max_peak_cooling * (1 + 1 / SEER))
+
         # load hourly heating and cooling load and convert it to geothermal loads
         primary_geothermal_load = HourlyGeothermalLoad(simulation_period=building_load.simulation_period)
-        primary_geothermal_load.set_hourly_cooling(building_load.hourly_cooling_load.copy() * (1 + 1 / SEER))
-        primary_geothermal_load.set_hourly_heating(building_load.hourly_heating_load.copy() * (1 - 1 / SCOP))
+        primary_geothermal_load.set_hourly_heating(init_peak_heating)
+        primary_geothermal_load.set_hourly_cooling(init_peak_cooling)
 
         # set relation qh-qm
         nb_points = 100
