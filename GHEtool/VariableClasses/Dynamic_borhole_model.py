@@ -53,7 +53,7 @@ class DynamicsBH(object):
         if number_of_boreholes == 1:
             self.fluid_factor = 1
         else:
-            self.fluid_factor = 2
+            self.fluid_factor = 3
 
         # number of pipes
         # 1 for single U tube, 2 for dubble U tube (not possible yet) 
@@ -139,7 +139,7 @@ class DynamicsBH(object):
             self.thickness_conv = (self.r_in_tube - self.r_in_convection) / self.num_conv_cells
             self.thickness_fluid = (self.r_in_convection - self.r_fluid) / self.num_fluid_cells
             # Fixing error of thickness pipe cells, divide by number of pipe cells
-            self.thickness_pipe = self.thickness_pipe / self.num_pipe_cells
+            #self.thickness_pipe = self.thickness_pipe / self.num_pipe_cells
             ghe_logger.info(f"Single U-tube cells defined for numerical model")
 
         else:
@@ -348,6 +348,7 @@ class DynamicsBH(object):
         self.pipe_roughness = 1e-06
         self.bh = gt.boreholes
         self.H = self.boreholes[0].H
+        print(f"Borehole lenght of current iteration is {self.H}m")
         self.r_b = self.r_borehole
         self.D = self.boreholes[0].D
         self.h_f = self.pipes_gt.convective_heat_transfer_coefficient_circular_pipe(self.m_flow_borehole,
