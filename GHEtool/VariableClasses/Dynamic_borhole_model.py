@@ -138,6 +138,8 @@ class DynamicsBH(object):
             # pipe thickness is equivalent to original tube thickness
             self.thickness_conv = (self.r_in_tube - self.r_in_convection) / self.num_conv_cells
             self.thickness_fluid = (self.r_in_convection - self.r_fluid) / self.num_fluid_cells
+            # Fixing error of thickness pipe cells, divide by number of pipe cells
+            self.thickness_pipe = self.thickness_pipe / self.num_pipe_cells
             ghe_logger.info(f"Single U-tube cells defined for numerical model")
 
         else:
@@ -155,6 +157,7 @@ class DynamicsBH(object):
             # pipe thickness is equivalent to original tube thickness
             self.thickness_conv = (self.r_in_tube - self.r_in_convection) / self.num_conv_cells
             self.thickness_fluid = (self.r_in_convection - self.r_fluid) / self.num_fluid_cells
+            self.thickness_pipe = (self.u_tube*self.thickness_pipe) / self.num_pipe_cells
             ghe_logger.info(f"Double U-tube cells defined for numerical model")
 
         # other
