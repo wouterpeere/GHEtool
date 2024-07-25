@@ -364,8 +364,8 @@ class DynamicsBH(object):
         self.resist_bh_effective = self.borefield.Rb 
 
         # check the resistances
-        resist_f_eq = R_f / 2
-        resist_p_eq = R_p / 2
+        resist_f_eq = R_f / 2 * self.u_tube
+        resist_p_eq = R_p  / 2 * self.u_tube
         resist_tg_eq = self.resist_bh_effective - resist_f_eq
 
         # Pass radial cell by reference and fill here so that it can be

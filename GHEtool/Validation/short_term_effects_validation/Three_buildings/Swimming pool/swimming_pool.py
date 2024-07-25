@@ -37,7 +37,7 @@ def Swimming_pool():
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=3, T_g=10, volumetric_heat_capacity= 2.4 * 10**6, flux=0.06)
     fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-    pipe_data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 1)
+    pipe_data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2)
     plot_load = True
 
     # initiate borefield
