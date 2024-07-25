@@ -59,12 +59,6 @@ class DynamicsBH(object):
         # 1 for single U tube, 2 for dubble U tube (not possible yet) 
         self.u_tube = self.pipes_ghe.number_of_pipes
 
-        #To do: extend numerical model to be able to handle double u-tubes
-        if self.u_tube == 2:
-            ghe_logger.warning(f"Double u-tube is considered, while model only handles single u-tube, results will be incorrect")
-
-        
-
         # Calculate the far field radius, which influences the number of ground cells
         # To do: only works for rectangular field, adjust for more general approaches
         if number_of_boreholes == 0:
@@ -94,12 +88,21 @@ class DynamicsBH(object):
         # "The one dimensional model has a fluid core, an equivalent convective
         # resistance layer, a tube layer, a grout layer and is surrounded by the
         # ground."
-
+        if self.u_tube == 1:
         # cell numbers
-        self.num_fluid_cells = 3
-        self.num_conv_cells = 1
-        self.num_pipe_cells = 4
-        self.num_grout_cells = 27
+            self.num_fluid_cells = 3
+            self.num_conv_cells = 1
+            self.num_pipe_cells = 4
+            self.num_grout_cells = 27
+
+        elif self.u_tube == 2:
+            self.num_fluid_cells = 12
+            self.num_conv_cells = 4
+            self.num_pipe_cells = 16
+            self.num_grout_cells = 20
+        else:
+            ghe_logger.warning(f"Choose for single or double U-tube")
+
 
         self.num_cells = self.num_fluid_cells + self.num_conv_cells + self.num_pipe_cells
         self.num_cells += self.num_grout_cells + self.num_soil_cells
