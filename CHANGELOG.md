@@ -28,6 +28,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Removed '_external_load', '_secundary_borefield_load', '_building_load' from Borefield.py (issue #268).
 - Vfr in FluidData now returns also a value if vfr = None based on the mfr.
 - Splitted Results class into ResultsHourly and ResultsMonthly (issue #281).
+- Moved implementation of 'optimise_load_profile_power' and 'optimise_load_profile_energy' into a separate document (
+  issue #283).
+- Drop support Python 3.8.
 
 ## Fixed
 
