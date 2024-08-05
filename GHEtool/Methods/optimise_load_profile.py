@@ -1,6 +1,7 @@
 import copy
 import numpy as np
 
+from typing import Tuple
 from GHEtool.VariableClasses import HourlyGeothermalLoad, HourlyGeothermalLoadMultiYear, MonthlyGeothermalLoadMultiYear
 
 
@@ -14,7 +15,7 @@ def optimise_load_profile_power(
         use_hourly_resolution: bool = True,
         max_peak_heating: float = None,
         max_peak_cooling: float = None
-) -> tuple[HourlyGeothermalLoad, HourlyGeothermalLoad]:
+) -> tuple[HourlyGeothermalLoad, HourlyGeothermalLoad, HourlyGeothermalLoad]:
     """
     This function optimises the load based on the given borefield and the given hourly load.
     (When the load is not geothermal, the SCOP and SEER are used to convert it to a geothermal load.)
@@ -155,7 +156,7 @@ def optimise_load_profile_energy(
         temperature_threshold: float = 0.05,
         max_peak_heating: float = None,
         max_peak_cooling: float = None
-) -> tuple[HourlyGeothermalLoadMultiYear, HourlyGeothermalLoadMultiYear]:
+) -> tuple[HourlyGeothermalLoadMultiYear, HourlyGeothermalLoadMultiYear, HourlyGeothermalLoadMultiYear]:
     """
     This function optimises the load based on the given borefield and the given hourly load.
     (When the load is not geothermal, the SCOP and SEER are used to convert it to a geothermal load.)
