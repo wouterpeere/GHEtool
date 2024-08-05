@@ -3,6 +3,9 @@ from abc import ABC
 
 
 class _COP(ABC):
+    """
+    Baseclass of the heating efficiency.
+    """
 
     @abc.abstractmethod
     def get_COP(self) -> float:
@@ -28,6 +31,9 @@ class _COP(ABC):
 
 
 class _EER(ABC):
+    """
+    Baseclass of the cooling efficiency.
+    """
 
     @abc.abstractmethod
     def get_EER(self) -> float:
