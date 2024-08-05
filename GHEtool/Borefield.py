@@ -1868,6 +1868,7 @@ class Borefield(BaseClass):
             self, building_load, depth, SCOP, SEER, temperature_threshold, use_hourly_resolution,
             max_peak_heating, max_peak_cooling
         )
+        self.load = primary_borefield_load
         return secundary_borefield_load, external_load
 
     def optimise_load_profile_energy(

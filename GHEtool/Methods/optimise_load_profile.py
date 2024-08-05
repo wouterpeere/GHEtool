@@ -322,17 +322,17 @@ def optimise_load_profile_energy(
         return new_load
 
     # calculate hourly load
-    temp = HourlyGeothermalLoadMultiYear()
-    temp.hourly_heating_load = f(primary_geothermal_load.hourly_heating_load_simulation_period,
-                                 borefield.load.peak_heating_simulation_period)
-    temp.hourly_cooling_load = f(primary_geothermal_load.hourly_cooling_load_simulation_period,
-                                 borefield.load.peak_cooling_simulation_period)
+    primary_borefield_load = HourlyGeothermalLoadMultiYear()
+    primary_borefield_load.hourly_heating_load = f(primary_geothermal_load.hourly_heating_load_simulation_period,
+                                                   borefield.load.peak_heating_simulation_period)
+    primary_borefield_load.hourly_cooling_load = f(primary_geothermal_load.hourly_cooling_load_simulation_period,
+                                                   borefield.load.peak_cooling_simulation_period)
 
     # calculate the corresponding geothermal load
     secundary_borefield_load = HourlyGeothermalLoadMultiYear()
-    secundary_borefield_load.hourly_cooling_load = borefield.load.hourly_cooling_load_simulation_period / (
+    secundary_borefield_load.hourly_cooling_load = primary_borefield_load.hourly_cooling_load_simulation_period / (
             1 + 1 / SEER)
-    secundary_borefield_load.hourly_heating_load = borefield.load.hourly_heating_load_simulation_period / (
+    secundary_borefield_load.hourly_heating_load = primary_borefield_load.hourly_heating_load_simulation_period / (
             1 - 1 / SCOP)
 
     # calculate external load
@@ -342,4 +342,4 @@ def optimise_load_profile_energy(
     external_load.hourly_cooling_load = np.maximum(0, building_load.hourly_cooling_load_simulation_period -
                                                    secundary_borefield_load.hourly_cooling_load_simulation_period)
 
-    return temp, secundary_borefield_load, external_load
+    return primary_borefield_load, secundary_borefield_load, external_load
