@@ -1,0 +1,2 @@
+class EER:
+    pass

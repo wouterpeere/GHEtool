@@ -1,0 +1,2 @@
+class SCOP:
+    pass

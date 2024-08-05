@@ -1,0 +1,2 @@
+class SEER:
+    pass

@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   yearly_heating_peak_simulation_period and yearly_cooling_peak_simulation_period to the Load class (issue #265).
 - Added max peak heating/cooling to optimise_load_profile functions (issue #276).
 - Added pressure drop across a U-tube (issue #278).
+- Efficiency classes for COP, EER, SCOP, SEER (issue #285).
 
 ## Changed
 
