@@ -1,10 +1,12 @@
 """
 This file implements a Result class for temperature profiles.
 """
+import abc
 import numpy as np
+from abc import ABC
 
 
-class _Results:
+class _Results(ABC):
 
     def __init__(self, borehole_wall_temp: np.ndarray = np.array([])):
         """
@@ -19,6 +21,14 @@ class _Results:
     @property
     def Tb(self) -> np.ndarray:
         return self._Tb
+
+    @abc.abstractmethod
+    def peak_heating(self) -> np.ndarray:
+        return np.ndarray([])
+
+    @abc.abstractmethod
+    def peak_cooling(self) -> np.ndarray:
+        return np.ndarray([])
 
 
 class ResultsMonthly(_Results):
@@ -94,5 +104,14 @@ class ResultsHourly(_Results):
         super().__init__(borehole_wall_temp)
         self.hourly = True
 
+    @property
     def Tf(self) -> np.ndarray:
         return self._Tf
+
+    @property
+    def peak_heating(self) -> np.ndarray:
+        return self.Tf
+
+    @property
+    def peak_cooling(self) -> np.ndarray:
+        return self.Tf
