@@ -6,4 +6,4 @@ from .CustomGFunction import CustomGFunction, load_custom_gfunction, _time_value
 from .GFunction import GFunction, FIFO
 from .CalculationSetup import CalculationSetup
 from .Borehole import Borehole
-from .Result import Results
+from .Result import ResultsMonthly, ResultsHourly, _Results

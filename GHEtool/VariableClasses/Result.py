@@ -4,10 +4,28 @@ This file implements a Result class for temperature profiles.
 import numpy as np
 
 
-class Results:
+class _Results:
+
+    def __init__(self, borehole_wall_temp: np.ndarray = np.array([])):
+        """
+        Parameters
+        ----------
+        borehole_wall_temp : np.ndarray
+            Borehole wall temperature [deg C]
+        """
+        self._Tb = borehole_wall_temp
+        self.hourly = None
+
+    @property
+    def Tb(self) -> np.ndarray:
+        return self._Tb
+
+
+class ResultsMonthly(_Results):
     """
-    Class which contains the temperatures of the fluid and borehole wall.
+    Class which contains the temperatures of the fluid and borehole wall with a monthly resolution.
     """
+
     def __init__(self,
                  borehole_wall_temp: np.ndarray = np.array([]),
                  peak_heating: np.ndarray = np.array([]),
@@ -33,7 +51,9 @@ class Results:
         self._peak_cooling = peak_cooling
         self._monthly_heating = monthly_heating
         self._monthly_cooling = monthly_cooling
-        self._Tb = borehole_wall_temp
+
+        super().__init__(borehole_wall_temp)
+        self.hourly = False
 
     @property
     def peak_heating(self) -> np.ndarray:
@@ -51,6 +71,28 @@ class Results:
     def monthly_cooling(self) -> np.ndarray:
         return self._monthly_cooling
 
-    @property
-    def Tb(self) -> np.ndarray:
-        return self._Tb
+
+class ResultsHourly(_Results):
+    """
+    Class which contains the temperatures of the fluid and borehole wall with an hourly resolution.
+    """
+
+    def __init__(self,
+                 borehole_wall_temp: np.ndarray = np.array([]),
+                 temperature_fluid: np.ndarray = np.array([])):
+        """
+
+        Parameters
+        ----------
+        borehole_wall_temp : np.ndarray
+            Borehole wall temperature [deg C]
+        temperature_fluid : np.ndarray
+            Average fluid temperature [deg C]
+        """
+        self._Tf = temperature_fluid
+
+        super().__init__(borehole_wall_temp)
+        self.hourly = True
+
+    def Tf(self) -> np.ndarray:
+        return self._Tf
