@@ -24,11 +24,21 @@ class _Results(ABC):
 
     @abc.abstractmethod
     def peak_heating(self) -> np.ndarray:
-        return np.ndarray([])
+        """
+
+        Returns
+        -------
+
+        """
 
     @abc.abstractmethod
     def peak_cooling(self) -> np.ndarray:
-        return np.ndarray([])
+        """
+
+        Returns
+        -------
+
+        """
 
 
 class ResultsMonthly(_Results):
