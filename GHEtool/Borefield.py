@@ -17,7 +17,7 @@ import pygfunction as gt
 from numpy.typing import ArrayLike
 from scipy.signal import convolve
 
-from GHEtool.VariableClasses import FluidData, Borehole, GroundConstantTemperature, Results
+from GHEtool.VariableClasses import FluidData, Borehole, GroundConstantTemperature, ResultsMonthly, ResultsHourly
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, CalculationSetup
 from GHEtool.VariableClasses.LoadData import *
 from GHEtool.VariableClasses.LoadData import _LoadData
@@ -119,7 +119,7 @@ class Borefield(BaseClass):
         self.options_pygfunction: dict = {"method": "equivalent"}
 
         # initialize variables for temperature plotting
-        self.results = Results()
+        self.results: ResultsMonthly | ResultsHourly = ResultsMonthly()
 
         # initiate ground parameters
         self._H = 0.0  # borehole depth m
@@ -1551,7 +1551,7 @@ class Borefield(BaseClass):
         ax.step(time_array, self.results.Tb, "k-", where="post", lw=1.5, label="Tb")
 
         if plot_hourly:
-            ax.step(time_array, self.results.peak_cooling, "b-", where="post", lw=1, label="Tf")
+            ax.step(time_array, self.results.Tf, "b-", where="post", lw=1, label="Tf")
         else:
             ax.step(time_array, self.results.peak_cooling, "b-", where="post", lw=1.5, label="Tf peak cooling")
             ax.step(time_array, self.results.peak_heating, "r-", where="post", lw=1.5, label="Tf peak heating")
@@ -1581,7 +1581,7 @@ class Borefield(BaseClass):
         -------
         None
         """
-        self.results = Results()
+        self.results = ResultsMonthly()
         ghe_logger.info("Deleted all stored temperatures from previous calculations.")
 
     def _calculate_temperature_profile(self, H: float = None, hourly: bool = False) -> None:
@@ -1654,7 +1654,7 @@ class Borefield(BaseClass):
             )
 
             # save temperatures under variable
-            self.results = Results(
+            self.results = ResultsMonthly(
                 borehole_wall_temp=Tb,
                 peak_heating=results_peak_heating,
                 peak_cooling=results_peak_cooling,
@@ -1688,8 +1688,7 @@ class Borefield(BaseClass):
             temperature_result = Tb + hourly_load * 1000 * (Rb / self.number_of_boreholes / H)
 
             # reset other variables
-            self.results = Results(borehole_wall_temp=Tb, peak_heating=temperature_result,
-                                   peak_cooling=temperature_result)
+            self.results = ResultsHourly(borehole_wall_temp=Tb, temperature_fluid=temperature_result)
 
     def set_options_gfunction_calculation(self, options: dict) -> None:
         """
