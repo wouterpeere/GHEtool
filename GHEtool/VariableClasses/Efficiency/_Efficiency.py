@@ -37,7 +37,7 @@ class _EER(ABC):
     """
 
     @abc.abstractmethod
-    def get_EER(self) -> float:
+    def get_EER(self, primary_temperature, secondary_temperature, part_load) -> float:
         """
         This function returns the EER.
 
@@ -48,7 +48,7 @@ class _EER(ABC):
         """
 
     @abc.abstractmethod
-    def get_SEER(self) -> float:
+    def get_SEER(self, power, primary_temperature, secondary_temperature, part_load) -> float:
         """
         This function returns the SEER.
 
