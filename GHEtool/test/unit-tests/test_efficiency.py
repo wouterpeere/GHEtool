@@ -116,3 +116,14 @@ def test_COP_full():
                           np.array([3.375, 5.625]))
     assert np.array_equal(cop_full.get_COP(np.array([2, 2.5, 5]), np.array([3.5, 3.5, 3.5]), np.array([6.5, 8, 8])),
                           np.array([3.375, 5.625, 5.625]))
+
+
+def test_COP_get_SCOP():
+    cop_full = COP(np.array([[[1, 2], [2, 4]], [[2, 4], [4, 8]]]), np.array([1.5, 2.5]), np.array([2.5, 4.5]),
+                   np.array([0, 1]))
+
+    with pytest.raises(ValueError):
+        cop_full.get_SCOP([10, 5], 10, [2, 3, 4])
+
+    assert np.isclose(cop_full.get_SCOP([10, 10], 10, [1.5, 2.5], [2.5, 2.5]), 16 / 6)
+    assert np.isclose(cop_full.get_SCOP([10, 5], 10, [1.5, 2.5], [2.5, 2.5]), 45 / 20)

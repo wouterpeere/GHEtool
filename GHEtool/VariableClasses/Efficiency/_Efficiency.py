@@ -20,7 +20,7 @@ class _COP(ABC):
         """
 
     @abc.abstractmethod
-    def get_SCOP(self) -> float:
+    def get_SCOP(self, power, primary_temperature, secondary_temperature, part_load) -> float:
         """
         This function returns the SCOP.
 

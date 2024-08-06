@@ -1,5 +1,7 @@
 import numpy as np
+
 from scipy import interpolate
+from typing import Union
 
 from GHEtool.VariableClasses.Efficiency._Efficiency import _COP
 
@@ -68,21 +70,10 @@ class COP(_COP):
         if np.shape(self._points) != np.shape(self._data):
             raise ValueError('Please make sure the dimensions of the dataset are correct!')
 
-    def get_SCOP(self, *args, **kwargs):
-        """
-        This function returns the SCOP.
-
-        Returns
-        -------
-        SCOP
-            float
-        """
-        return self.SCOP
-
     def get_COP(self,
-                primary_temperature: float | np.ndarray,
-                secondary_temperature: float | np.ndarray = None,
-                part_load: float | np.ndarray = None) -> np.ndarray:
+                primary_temperature: Union[float, np.ndarray],
+                secondary_temperature: Union[float, np.ndarray] = None,
+                part_load: Union[float, np.ndarray] = None) -> np.ndarray:
         """
         This function calculates the COP. This function uses a linear interpolation and sets the out-of-bound values
         to the nearest value in the dataset. This function does hence not extrapolate.
@@ -99,7 +90,7 @@ class COP(_COP):
         Raises
         ------
         ValueError
-            When secondary_temperature is in the dataset but it is not provided. Same for part_load.
+            When secondary_temperature is in the dataset, and it is not provided. Same for part_load.
 
         Returns
         -------
@@ -152,3 +143,46 @@ class COP(_COP):
                                       fill_value=None)
         interp[np.isnan(interp)] = nearest[np.isnan(interp)]
         return interp
+
+    def get_SCOP(self,
+                 power: np.ndarray,
+                 nom_power: float,
+                 primary_temperature: np.ndarray,
+                 secondary_temperature: np.ndarray = None
+                 ) -> float:
+        """
+        This function calculates and returns the SCOP.
+
+        Parameters
+        ----------
+        power : np.ndarray
+            Array with the hourly secondary power of the heat pump [kW]
+        nom_power : float
+            Nominal power of the heat pump [kW]
+        primary_temperature : np.ndarray
+            Values for the average primary temperature of the heat pump for the COP calculation.
+        secondary_temperature : np.ndarray
+            Values for the average secondary temperature of the heat pump for the COP calculation.
+
+        Raises
+        ------
+        ValueError
+            When the length of all the arrays are not equal
+
+        Returns
+        -------
+        SCOP
+            float
+        """
+
+        if len(primary_temperature) != len(power) and (
+                secondary_temperature is None or len(secondary_temperature) == len(power)):
+            raise ValueError('The hourly arrays should have equal length!')
+
+        part_load = np.array(power) / nom_power
+        cop_array = self.get_COP(primary_temperature, secondary_temperature, part_load)
+
+        # SCOP = sum(Q)/sum(W)
+        w_array = np.array(power) / cop_array
+
+        return np.sum(power) / np.sum(w_array)
