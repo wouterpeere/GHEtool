@@ -1,7 +1,4 @@
-from GHEtool.VariableClasses.Efficiency._Efficiency import _COP
-
-
-class SCOP(_COP):
+class SCOP:
     """
     Class for constant SCOP efficiency
     """

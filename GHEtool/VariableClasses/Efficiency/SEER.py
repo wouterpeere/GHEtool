@@ -1,7 +1,4 @@
-from GHEtool.VariableClasses.Efficiency._Efficiency import _EER
-
-
-class SEER(_EER):
+class SEER:
     """
     Class for constant SEER efficiency
     """
