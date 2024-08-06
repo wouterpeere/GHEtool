@@ -27,3 +27,7 @@ All of the load classes are based children of the abstract _LoadData class.
 .. automodule:: GHEtool.VariableClasses.GeothermalLoad.HourlyGeothermalLoadMultiYear
     :members:
     :show-inheritance:
+
+.. automodule:: GHEtool.VariableClasses.GeothermalLoad.MonthlyGeothermalLoadMultiYear
+    :members:
+    :show-inheritance:

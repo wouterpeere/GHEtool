@@ -2,5 +2,5 @@ matplotlib>=3.5.2
 numpy>=1.23.1
 pyarrow>=15.0.0
 pandas>=2.2.0
-pygfunction>=2.2.1
+pygfunction>=2.2.3
 scipy>=1.8.1

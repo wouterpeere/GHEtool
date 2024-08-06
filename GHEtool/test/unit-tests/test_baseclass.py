@@ -1,6 +1,3 @@
-# import pytest
-import json
-
 import numpy as np
 import pygfunction as gt
 
@@ -40,9 +37,8 @@ class TestClass(BaseClass):
 
 
 class TestClassesWithSlots(BaseClass):
-
     __slots__ = 'test_string', 'test_int', 'test_float', 'test_tuple', 'test_list', 'test_numpy', "test_none", \
-                'test_set', 'test_dictionary', 'test_variable_class', 'test_pygfunction', 'test_bool'
+        'test_set', 'test_dictionary', 'test_variable_class', 'test_pygfunction', 'test_bool'
 
     def __init__(self):
         self.test_string = "test"

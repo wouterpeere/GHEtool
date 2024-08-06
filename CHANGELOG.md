@@ -14,6 +14,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added vfr to Fluid Class (issue #262).
 - Added yearly_heating_load_simulation_period, yearly_cooling_load_simulation_period,
   yearly_heating_peak_simulation_period and yearly_cooling_peak_simulation_period to the Load class (issue #265).
+- Added max peak heating/cooling to optimise_load_profile functions (issue #276).
+- Added pressure drop across a U-tube (issue #278).
+- Efficiency classes for COP, EER, SCOP, SEER (issue #285).
 
 ## Changed
 
@@ -23,11 +26,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Removed depreciated 'optimise_load_profile', '_percentage_heating', '_percentage_cooling' from Borefield.py (issue
   #268).
 - Removed '_external_load', '_secundary_borefield_load', '_building_load' from Borefield.py (issue #268).
+- Vfr in FluidData now returns also a value if vfr = None based on the mfr.
+- Splitted Results class into ResultsHourly and ResultsMonthly (issue #281).
+- Moved implementation of 'optimise_load_profile_power' and 'optimise_load_profile_energy' into a separate document (
+  issue #283).
+- Drop support Python 3.8.
 
 ## Fixed
 
 - Problems with optimise_load_profile_energy (issue #255).
 - Fix plot_load_duration (issue #260).
+- Problem in CI/CD and testing for python <3.12 (issue #274).
+- Fix compatibility with numpy 2.0 (issue #274).
 
 ## [2.2.2] - 2024-05-16
 

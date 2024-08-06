@@ -27,9 +27,9 @@ class _PipeData(BaseClass, ABC):
             Pipe roughness [m]
         """
 
-        self.k_g = k_g                      # grout thermal conductivity W/mK
-        self.k_p = k_p                      # pipe thermal conductivity W/mK
-        self.epsilon = epsilon              # pipe roughness m
+        self.k_g = k_g  # grout thermal conductivity W/mK
+        self.k_p = k_p  # pipe thermal conductivity W/mK
+        self.epsilon = epsilon  # pipe roughness m
 
     @abc.abstractmethod
     def calculate_resistances(self, fluid_data: FluidData) -> None:
@@ -78,6 +78,25 @@ class _PipeData(BaseClass, ABC):
         Returns
         -------
         Reynolds number : float
+        """
+
+    @abc.abstractmethod
+    def pressure_drop(self, fluid_data: FluidData, borehole_depth: float) -> float:
+        """
+        Calculates the pressure drop across the entire borehole.
+        It assumed that the U-tubes are all connected in parallel.
+
+        Parameters
+        ----------
+        fluid_data: FluidData
+            Fluid data
+        borehole_depth : float
+            Borehole depth [m]
+
+        Returns
+        -------
+        Pressure drop : float
+            Pressure drop [kPa]
         """
 
     @abc.abstractmethod
