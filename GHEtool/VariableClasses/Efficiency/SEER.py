@@ -53,7 +53,7 @@ class SEER(_EER):
             raise ValueError(f'A value of {SEER} for the SEER is invalid.')
         self._SEER = SEER
 
-    def get_SEER(self, *args, **kwargs):
+    def get_SEER(self, *args, **kwargs) -> float:
         """
         This function returns the SEER.
 
@@ -64,7 +64,7 @@ class SEER(_EER):
         """
         return self.SEER
 
-    def get_EER(self, *args, **kwargs):
+    def get_EER(self, *args, **kwargs) -> float:
         """
         This function returns the EER.
 

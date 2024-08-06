@@ -52,7 +52,7 @@ class SCOP(_COP):
             raise ValueError(f'A value of {SCOP} for the SCOP is invalid.')
         self._SCOP = SCOP
 
-    def get_SCOP(self, *args, **kwargs):
+    def get_SCOP(self, *args, **kwargs) -> float:
         """
         This function returns the SCOP.
 
@@ -63,7 +63,7 @@ class SCOP(_COP):
         """
         return self.SCOP
 
-    def get_COP(self, *args, **kwargs):
+    def get_COP(self, *args, **kwargs) -> float:
         """
         This function returns the COP.
 

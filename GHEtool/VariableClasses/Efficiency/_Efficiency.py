@@ -1,4 +1,5 @@
 import abc
+
 from abc import ABC
 
 
@@ -8,7 +9,7 @@ class _COP(ABC):
     """
 
     @abc.abstractmethod
-    def get_COP(self) -> float:
+    def get_COP(self, primary_temperature, secondary_temperature, part_load) -> float:
         """
         This function returns the COP.
 
