@@ -108,6 +108,9 @@ def test_times():
     assert not np.isinf(load.time_L4.any())
     assert load.ty == 100 * 8760 * 3600
 
+    with pytest.raises(ValueError):
+        load.simulation_period = 0
+
 
 def test_monthly_average_load():
     load = MonthlyGeothermalLoadAbsolute()
