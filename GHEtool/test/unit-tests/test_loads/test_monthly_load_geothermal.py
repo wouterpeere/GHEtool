@@ -308,15 +308,17 @@ def test_add():
 
     assert result.simulation_period == 30
     assert np.allclose(result._baseload_extraction,
-                       load_1._baseload_extraction + load_hourly.resample_to_monthly(load_hourly._hourly_heating_load)[
+                       load_1._baseload_extraction +
+                       load_hourly.resample_to_monthly(load_hourly._hourly_extraction_load)[
                            1])
     assert np.allclose(result._baseload_injection,
-                       load_1._baseload_injection + load_hourly.resample_to_monthly(load_hourly._hourly_cooling_load)[
+                       load_1._baseload_injection + load_hourly.resample_to_monthly(load_hourly._hourly_injection_load)[
                            1])
     assert np.allclose(result._peak_extraction,
-                       load_1._peak_extraction + load_hourly.resample_to_monthly(load_hourly._hourly_heating_load)[0])
+                       load_1._peak_extraction + load_hourly.resample_to_monthly(load_hourly._hourly_extraction_load)[
+                           0])
     assert np.allclose(result._peak_injection,
-                       load_1._peak_injection + load_hourly.resample_to_monthly(load_hourly._hourly_cooling_load)[0])
+                       load_1._peak_injection + load_hourly.resample_to_monthly(load_hourly._hourly_injection_load)[0])
 
     load_hourly.simulation_period = 20
     with pytest.warns():

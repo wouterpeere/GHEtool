@@ -13,6 +13,16 @@ class _HourlyData(_MonthlyData, ABC):
         _MonthlyData.__init__(self)
         self.hourly_resolution = True
 
+        # initiate variables
+        self._hourly_heating_load: np.ndarray = np.zeros(8760)
+        self._hourly_cooling_load: np.ndarray = np.zeros(8760)
+
+        # delete unnecessary variables
+        del self._peak_injection
+        del self._peak_extraction
+        del self._baseload_injection
+        del self._baseload_extraction
+
     @abc.abstractmethod
     def hourly_injection_load_simulation_period(self) -> np.ndarray:
         """

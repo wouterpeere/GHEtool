@@ -118,9 +118,9 @@ def test_load_simulation_period():
 def test_set_hourly_values():
     load = HourlyGeothermalLoad()
     with pytest.raises(ValueError):
-        load.set_hourly_heating(np.ones(10))
+        load.set_hourly_extraction_load(np.ones(10))
     with pytest.raises(ValueError):
-        load.set_hourly_cooling(np.ones(10))
+        load.set_hourly_injection_load(np.ones(10))
 
 
 def test_start_month_general():
@@ -190,12 +190,10 @@ def test_eq():
 def test_add():
     load_1 = HourlyGeothermalLoad(extraction_load=np.arange(0, 8760, 1),
                                   injection_load=np.full(8760, 2),
-                                  simulation_period=20,
-                                  dhw=20000)
+                                  simulation_period=20)
     load_2 = HourlyGeothermalLoad(injection_load=np.arange(0, 8760, 1) + 1,
                                   extraction_load=np.full(8760, 3),
-                                  simulation_period=30,
-                                  dhw=10000)
+                                  simulation_period=30)
 
     with pytest.raises(TypeError):
         load_1 + 55
@@ -244,8 +242,7 @@ def test_add():
     load_1 = HourlyGeothermalLoadMultiYear(extraction_load=np.arange(0, 8760 * 2, 1),
                                            injection_load=np.full(8760 * 2, 2))
     load_2 = HourlyGeothermalLoad(np.arange(0, 8760, 1),
-                                  np.arange(0, 8760, 1) + 1,
-                                  dhw=20000)
+                                  np.arange(0, 8760, 1) + 1)
 
     with pytest.warns():
         result = load_1 + load_2
@@ -259,7 +256,7 @@ def test_add():
     assert np.allclose(result.hourly_injection_load, load_1.hourly_injection_load + load_2.hourly_injection_load)
 
     assert np.allclose(result._hourly_extraction_load,
-                       load_1._hourly_extraction_load + np.tile(load_2._hourly_extraction_load + load_2.dhw_power,
+                       load_1._hourly_extraction_load + np.tile(load_2._hourly_extraction_load,
                                                                 load_1.simulation_period))
     assert np.allclose(result._hourly_injection_load,
                        load_1._hourly_injection_load + np.tile(load_2._hourly_injection_load, load_1.simulation_period))

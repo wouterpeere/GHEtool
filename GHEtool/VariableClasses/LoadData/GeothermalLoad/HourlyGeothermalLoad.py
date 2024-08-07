@@ -116,14 +116,14 @@ class HourlyGeothermalLoad(_SingleYear, _HourlyData):
             return
         raise ValueError
 
-    def set_hourly_heating(self, load: ArrayLike) -> None:
+    def set_hourly_extraction_load(self, load: ArrayLike) -> None:
         """
-        This function sets the hourly heating load [kWh/h] after it has been checked.
+        This function sets the hourly extraction load [kWh/h] after it has been checked.
 
         Parameters
         ----------
         load : np.ndarray, list or tuple
-            Hourly heating [kWh/h]
+            Hourly extraction [kWh/h]
 
         Returns
         -------
@@ -174,14 +174,14 @@ class HourlyGeothermalLoad(_SingleYear, _HourlyData):
             return
         raise ValueError
 
-    def set_hourly_cooling(self, load: ArrayLike) -> None:
+    def set_hourly_injection_load(self, load: ArrayLike) -> None:
         """
-        This function sets the hourly cooling load [kWh/h] after it has been checked.
+        This function sets the hourly injection load [kWh/h] after it has been checked.
 
         Parameters
         ----------
         load : np.ndarray, list or tuple
-            Hourly cooling [kWh/h]
+            Hourly injection [kWh/h]
 
         Returns
         -------
