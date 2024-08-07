@@ -190,8 +190,6 @@ class HourlyGeothermalLoadMultiYear(_HourlyData):
             return False
         if not np.array_equal(self._hourly_extraction_load, other._hourly_extraction_load):
             return False
-        if not self.simulation_period == other.simulation_period:
-            return False
         return True
 
     def __add__(self, other):
