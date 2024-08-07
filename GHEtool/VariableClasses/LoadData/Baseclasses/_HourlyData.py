@@ -164,9 +164,20 @@ class _HourlyData(_MonthlyData, ABC):
         peak loads [kW], monthly average loads [kWh/month] : np.ndarray, np.ndarray
         """
 
-        data = np.array_split(hourly_load, np.cumsum(np.tile(self.UPM, self.simulation_period))[:-1])
+        data = np.array_split(hourly_load, np.cumsum(np.tile(self.UPM, int(len(hourly_load) / 8760)))[:-1])
 
         if self.all_months_equal:
             return np.max(data, axis=1), np.sum(data, axis=1)
 
         return np.array([np.max(i) for i in data]), np.array([np.sum(i) for i in data])
+
+    @property
+    def simulation_period(self) -> int:
+        """
+        This property returns the simulation period.
+
+        Returns
+        -------
+        simulation period : int
+        """
+        return int(len(self.hourly_injection_load_simulation_period) / 8760)

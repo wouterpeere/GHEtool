@@ -203,9 +203,11 @@ class HourlyGeothermalLoadMultiYear(HourlyGeothermalLoad):
     def __add__(self, other):
         if isinstance(other, HourlyGeothermalLoadMultiYear):
             if self.simulation_period != other.simulation_period:
-                raise ValueError("Cannot combine HourlyGeothermalLoadMultiYear classes with different simulation periods.")
+                raise ValueError(
+                    "Cannot combine HourlyGeothermalLoadMultiYear classes with different simulation periods.")
 
-            return HourlyGeothermalLoadMultiYear(self._hourly_heating_load + other._hourly_heating_load, self._hourly_cooling_load + other._hourly_cooling_load)
+            return HourlyGeothermalLoadMultiYear(self._hourly_heating_load + other._hourly_heating_load,
+                                                 self._hourly_cooling_load + other._hourly_cooling_load)
 
         if isinstance(other, HourlyGeothermalLoad):
             warnings.warn(

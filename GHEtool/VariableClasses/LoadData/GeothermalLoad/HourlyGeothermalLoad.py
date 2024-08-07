@@ -8,7 +8,6 @@ import warnings
 
 from typing import Tuple, TYPE_CHECKING
 
-from GHEtool.VariableClasses.LoadData._LoadData import _LoadData
 from GHEtool.VariableClasses.LoadData.Baseclasses import _SingleYear, _HourlyData
 from GHEtool.logger import ghe_logger
 
@@ -287,7 +286,6 @@ class HourlyGeothermalLoad(_SingleYear, _HourlyData):
                 self._hourly_extraction_load + other._hourly_extraction_load,
                 self._hourly_injection_load + other._hourly_injection_load,
                 max(self.simulation_period, other.simulation_period),
-                self.dhw + other.dhw,
             )
 
         try:

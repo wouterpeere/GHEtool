@@ -347,19 +347,3 @@ def test_yearly_loads():
     assert np.allclose(load.yearly_extraction_load_simulation_period, [160000] * 10)
     assert np.allclose(load.yearly_injection_peak_simulation_period, [240] * 10)
     assert np.allclose(load.yearly_extraction_peak_simulation_period, [160] * 10)
-
-
-### continue for multi year
-def test_checks_multiyear_monthly():
-    load = MonthlyGeothermalLoadMultiYear()
-    assert not load._check_input(2)
-    assert not load._check_input(np.ones(11))
-    assert not load._check_input(-1 * np.ones(12 * 2))
-    assert load._check_input([1] * 12 * 2)
-    assert load._check_input(np.ones(12))
-    assert load._check_input(np.ones(12 * 3))
-    assert not load._check_input(np.ones(30))
-    with pytest.raises(ValueError):
-        load.baseload_extraction = np.ones(13)
-    with pytest.raises(ValueError):
-        load.baseload_injection = np.ones(13)

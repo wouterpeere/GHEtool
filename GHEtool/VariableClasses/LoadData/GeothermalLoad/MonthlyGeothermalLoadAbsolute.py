@@ -46,11 +46,6 @@ class MonthlyGeothermalLoadAbsolute(_SingleYear, _MonthlyData):
         _MonthlyData.__init__(self)
         _SingleYear.__init__(self, simulation_period)
 
-        # initiate variables
-        self._baseload_extraction: np.ndarray = np.zeros(12)
-        self._baseload_injection: np.ndarray = np.zeros(12)
-        self._peak_extraction: np.ndarray = np.zeros(12)
-        self._peak_injection: np.ndarray = np.zeros(12)
         self.exclude_DHW_from_peak: bool = False  # by default, the DHW increase the peak load. Set to false,
         # if you only want the heating load to determine the peak in extraction
 
@@ -444,8 +439,8 @@ class MonthlyGeothermalLoadAbsolute(_SingleYear, _MonthlyData):
                     f"{max(self.simulation_period, other.simulation_period)} years will be taken."
                 )
 
-            peak_extraction, baseload_extraction = other.resample_to_monthly(other._hourly_heating_load)
-            peak_injection, baseload_injection = other.resample_to_monthly(other._hourly_cooling_load)
+            peak_extraction, baseload_extraction = other.resample_to_monthly(other._hourly_extraction_load)
+            peak_injection, baseload_injection = other.resample_to_monthly(other._hourly_injection_load)
 
             result = MonthlyGeothermalLoadAbsolute(
                 self._baseload_extraction + baseload_extraction,

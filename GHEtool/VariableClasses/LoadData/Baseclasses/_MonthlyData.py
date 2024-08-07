@@ -18,6 +18,12 @@ class _MonthlyData(ABC):
         self._peak_extraction_duration: int = _MonthlyData.DEFAULT_LENGTH_PEAK
         self.hourly_resolution = False
 
+        # initiate variables
+        self._baseload_extraction: np.ndarray = np.zeros(12)
+        self._baseload_injection: np.ndarray = np.zeros(12)
+        self._peak_extraction: np.ndarray = np.zeros(12)
+        self._peak_injection: np.ndarray = np.zeros(12)
+
     @abc.abstractmethod
     def monthly_baseload_injection_simulation_period(self) -> np.ndarray:
         """
@@ -71,7 +77,7 @@ class _MonthlyData(ABC):
         -------
         simulation period : int
         """
-        return int(len(self.monthly_baseload_extraction) / 12)
+        return int(len(self.monthly_baseload_extraction_simulation_period) / 12)
 
     @property
     def all_months_equal(self) -> bool:

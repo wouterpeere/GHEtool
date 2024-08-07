@@ -152,9 +152,13 @@ def test_different_start_month():
     assert load.start_month == 3
     assert load.hourly_injection_load[0] == 731 * 2 - 1
     assert load.hourly_extraction_load[0] == 731 * 2 - 1
+    assert load.hourly_injection_load_simulation_period[0] == 731 * 2 - 1
+    assert load.hourly_extraction_load_simulation_period[0] == 731 * 2 - 1
     load.all_months_equal = False
     assert load.hourly_injection_load[0] == 1417
     assert load.hourly_extraction_load[0] == 1417
+    assert load.hourly_injection_load_simulation_period[0] == 1417
+    assert load.hourly_extraction_load_simulation_period[0] == 1417
 
 
 def test_eq():
@@ -200,7 +204,6 @@ def test_add():
         result = load_1 + load_2
 
     assert result.simulation_period == 30
-    assert result.dhw == 30000
     assert np.allclose(result.hourly_injection_load, load_1.hourly_injection_load + load_2.hourly_injection_load)
     assert np.allclose(result.hourly_extraction_load, load_1.hourly_extraction_load + load_2.hourly_extraction_load)
 
@@ -212,26 +215,24 @@ def test_add():
     except:
         assert True
     assert result.simulation_period == 20
-    assert result.dhw == 30000
     assert np.allclose(result.hourly_injection_load, load_1.hourly_injection_load + load_2.hourly_injection_load)
     assert np.allclose(result.hourly_extraction_load, load_1.hourly_extraction_load + load_2.hourly_extraction_load)
 
     # add with monthly load
     load_1 = MonthlyGeothermalLoadAbsolute(*load_case(2))
-    load_1.dhw = 20000
     load_hourly = HourlyGeothermalLoad(np.full(8760, 10), np.full(8760, 20), 30, 10000)
 
     with pytest.warns():
         result = load_1 + load_hourly  # simulation period not equal
 
     assert result.simulation_period == 30
-    assert result.dhw == 30000
     assert np.allclose(result._baseload_extraction,
                        load_1._baseload_extraction +
                        load_hourly.resample_to_monthly(load_hourly._hourly_extraction_load)[
                            1])
     assert np.allclose(result._baseload_injection,
-                       load_1._baseload_injection + load_hourly.resample_to_monthly(load_hourly._hourly_injection_load)[
+                       load_1._baseload_injection +
+                       load_hourly.resample_to_monthly(load_hourly._hourly_injection_load)[
                            1])
     assert np.allclose(result._peak_extraction,
                        load_1._peak_extraction + load_hourly.resample_to_monthly(load_hourly._hourly_extraction_load)[
