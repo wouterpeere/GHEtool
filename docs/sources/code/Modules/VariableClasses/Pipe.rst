@@ -9,6 +9,7 @@ You can use:
 #. Single U-tubes (special case of multiple U-tubes)
 #. Double U-tubes (special case of multiple U-tubes)
 #. Coaxial pipe
+#. Separatus pipe (https://separatus.ch/en)
 
 All of the classes above are children from the abstract _PipeData class.
 
@@ -30,5 +31,9 @@ All of the classes above are children from the abstract _PipeData class.
     :show-inheritance:
 
 .. automodule:: GHEtool.VariableClasses.PipeData.CoaxialPipe
+    :members:
+    :show-inheritance:
+
+.. automodule:: GHEtool.VariableClasses.PipeData.Separatus
     :members:
     :show-inheritance:
