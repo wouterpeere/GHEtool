@@ -190,4 +190,4 @@ class _HourlyData(_MonthlyData, ABC):
         -------
         simulation period : int
         """
-        return int(len(self.hourly_injection_load_simulation_period) / 8760)
+        return int(len(self.hourly_extraction_load_simulation_period) / 8760)

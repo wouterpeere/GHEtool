@@ -1077,7 +1077,7 @@ class Borefield(BaseClass):
 
         # check if sizing by the minimum temperature (quadrant 3/4) does not cross the temperature boundary
         self.calculate_temperatures(size_min_temp, hourly=hourly)
-        if np.max(self.results.peak_cooling) <= self.Tf_max:
+        if np.max(self.results.peak_injection) <= self.Tf_max:
             return size_min_temp
         raise UnsolvableDueToTemperatureGradient
 
@@ -1146,7 +1146,7 @@ class Borefield(BaseClass):
             # determine which quadrants are relevant
             if self.load.imbalance <= 0:
                 # extraction dominated, so quadrants 1 and 4 are relevant
-                if self.load.max_peak_cooling != 0:
+                if self.load.max_peak_injection != 0:
                     quadrant1 = size_quadrant1()
                 else:
                     quadrant1 = 0
@@ -1161,7 +1161,7 @@ class Borefield(BaseClass):
             else:
                 # injection dominated, so quadrants 2 and 3 are relevant
                 quadrant2 = size_quadrant2()
-                if self.load.max_peak_heating != 0:
+                if self.load.max_peak_extraction != 0:
                     quadrant3 = size_quadrant3()
                 else:
                     quadrant3 = 0
@@ -1286,7 +1286,7 @@ class Borefield(BaseClass):
                 max_temp, sized = (
                     self._size_based_on_temperature_profile(10, hourly=True,
                                                             deep_sizing=self._calculation_setup.force_deep_sizing)
-                    if np.any(self.load.hourly_cooling_load)
+                    if np.any(self.load.hourly_injection_load)
                     else (0, False)
                 )
             except MaximumNumberOfIterations as e:
@@ -1294,7 +1294,7 @@ class Borefield(BaseClass):
                 if self._calculation_setup.deep_sizing and self.ground_data.variable_Tg:
                     max_temp, sized = (
                         self._size_based_on_temperature_profile(10, hourly=True, deep_sizing=True) if np.any(
-                            self.load.hourly_cooling_load) else (0, False)
+                            self.load.hourly_injection_load) else (0, False)
                     )
                 else:
                     raise e
@@ -1307,7 +1307,7 @@ class Borefield(BaseClass):
                     self.limiting_quadrant = 2
                 return max_temp
             min_temp, sized = self._size_based_on_temperature_profile(20, hourly=True) if np.any(
-                self.load.hourly_heating_load) else (0, False)
+                self.load.hourly_extraction_load) else (0, False)
             if sized:
                 if self.load.imbalance <= 0:
                     self.limiting_quadrant = 4
@@ -1337,7 +1337,7 @@ class Borefield(BaseClass):
             New depth of the borefield [m]
         """
         # diff between the max temperature in peak cooling and the avg undisturbed ground temperature at current_depth
-        delta_temp = np.max(self.results.peak_cooling - self.ground_data.calculate_Tg(current_depth))
+        delta_temp = np.max(self.results.peak_injection - self.ground_data.calculate_Tg(current_depth))
 
         # calculate the maximum temperature difference between the temperature limit and the ground temperature
         # at current_depth
@@ -1396,33 +1396,33 @@ class Borefield(BaseClass):
                 if quadrant == 1:
                     # maximum temperature
                     # convert back to required length
-                    self.H = (np.max(self.results.peak_cooling[: 8760 if hourly else 12]) - self._Tg()) / (
+                    self.H = (np.max(self.results.peak_injection[: 8760 if hourly else 12]) - self._Tg()) / (
                             self.Tf_max - self._Tg()) * H_prev
                 elif quadrant == 2:
                     # maximum temperature
                     # convert back to required length
-                    self.H = (np.max(self.results.peak_cooling[-8760 if hourly else -12:]) - self._Tg()) / (
+                    self.H = (np.max(self.results.peak_injection[-8760 if hourly else -12:]) - self._Tg()) / (
                             self.Tf_max - self._Tg()) * H_prev
                 elif quadrant == 3:
                     # minimum temperature
                     # convert back to required length
-                    self.H = (np.min(self.results.peak_heating[: 8760 if hourly else 12]) - self._Tg()) / (
+                    self.H = (np.min(self.results.peak_extraction[: 8760 if hourly else 12]) - self._Tg()) / (
                             self.Tf_min - self._Tg()) * H_prev
                 elif quadrant == 4:
                     # minimum temperature
                     # convert back to required length
-                    self.H = (np.min(self.results.peak_heating[-8760 if hourly else -12:]) - self._Tg()) / (
+                    self.H = (np.min(self.results.peak_extraction[-8760 if hourly else -12:]) - self._Tg()) / (
                             self.Tf_min - self._Tg()) * H_prev
                 elif quadrant == 10:
                     # over all years
                     # maximum temperature
                     # convert back to required length
-                    self.H = (np.max(self.results.peak_cooling) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
+                    self.H = (np.max(self.results.peak_injection) - self._Tg()) / (self.Tf_max - self._Tg()) * H_prev
                 elif quadrant == 20:
                     # over all years
                     # minimum temperature
                     # convert back to required length
-                    self.H = (np.min(self.results.peak_heating) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
+                    self.H = (np.min(self.results.peak_extraction) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
             elif self.ground_data.variable_Tg:
                 # for when the temperature gradient is active and it is cooling
                 self.H = self.calculate_next_depth_deep_sizing(H_prev)
@@ -1431,9 +1431,9 @@ class Borefield(BaseClass):
 
             i += 1
 
-        return self.H, (np.max(self.results.peak_cooling) <= self.Tf_max + 0.05 or (
+        return self.H, (np.max(self.results.peak_injection) <= self.Tf_max + 0.05 or (
                 quadrant == 10 or quadrant == 1 or quadrant == 2)) and (
-                               np.min(self.results.peak_heating) >= self.Tf_min - 0.05 or (
+                               np.min(self.results.peak_extraction) >= self.Tf_min - 0.05 or (
                                quadrant == 20 or quadrant == 3 or quadrant == 4)
                        )
 
@@ -1552,12 +1552,12 @@ class Borefield(BaseClass):
         if plot_hourly:
             ax.step(time_array, self.results.Tf, "b-", where="post", lw=1, label="Tf")
         else:
-            ax.step(time_array, self.results.peak_cooling, "b-", where="post", lw=1.5, label="Tf peak cooling")
-            ax.step(time_array, self.results.peak_heating, "r-", where="post", lw=1.5, label="Tf peak heating")
+            ax.step(time_array, self.results.peak_injection, "b-", where="post", lw=1.5, label="Tf peak cooling")
+            ax.step(time_array, self.results.peak_extraction, "r-", where="post", lw=1.5, label="Tf peak heating")
 
-            ax.step(time_array, self.results.monthly_cooling, color="b", linestyle="dashed", where="post", lw=1.5,
+            ax.step(time_array, self.results.monthly_injection, color="b", linestyle="dashed", where="post", lw=1.5,
                     label="Tf base cooling")
-            ax.step(time_array, self.results.monthly_heating, color="r", linestyle="dashed", where="post", lw=1.5,
+            ax.step(time_array, self.results.monthly_extraction, color="r", linestyle="dashed", where="post", lw=1.5,
                     label="Tf base heating")
 
         # define temperature bounds
@@ -1609,18 +1609,18 @@ class Borefield(BaseClass):
             g_values = self.gfunction(self.load.time_L3, H)
 
             # the g-function value of the peak with length_peak hours
-            g_value_peak_cooling = self.gfunction(self.load.peak_cooling_duration, H)[0]
-            if self.load.peak_cooling_duration == self.load.peak_heating_duration:
-                g_value_peak_heating = g_value_peak_cooling
+            g_value_peak_injection = self.gfunction(self.load.peak_injection_duration, H)[0]
+            if self.load.peak_injection_duration == self.load.peak_extraction_duration:
+                g_value_peak_extraction = g_value_peak_injection
             else:
-                g_value_peak_heating = self.gfunction(self.load.peak_heating_duration, H)[0]
+                g_value_peak_extraction = self.gfunction(self.load.peak_extraction_duration, H)[0]
 
             # calculation of needed differences of the g-function values. These are the weight factors in the calculation
             # of Tb.
             g_value_differences = np.diff(g_values, prepend=0)
 
             # convolution to get the monthly results
-            results = convolve(self.load.monthly_average_load_simulation_period * 1000, g_value_differences)[
+            results = convolve(self.load.monthly_average_power_simulation_period * 1000, g_value_differences)[
                       : 12 * self.simulation_period]
 
             # calculation the borehole wall temperature for every month i
@@ -1629,25 +1629,27 @@ class Borefield(BaseClass):
 
             # now the Tf will be calculated based on
             # Tf = Tb + Q * R_b
-            results_month_cooling = Tb + self.load.baseload_cooling_power_simulation_period * 1000 * (
+            results_month_injection = Tb + self.load.monthly_baseload_injection_power_simulation_period * 1000 * (
                     Rb / self.number_of_boreholes / H)
-            results_month_heating = Tb - self.load.baseload_heating_power_simulation_period * 1000 * (
+            results_month_extraction = Tb - self.load.monthly_baseload_extraction_power_simulation_period * 1000 * (
                     Rb / self.number_of_boreholes / H)
 
             # extra summation if the g-function value for the peak is included
-            results_peak_cooling = (
-                    results_month_cooling
-                    + (self.load.peak_cooling_simulation_period - self.load.baseload_cooling_power_simulation_period)
+            results_peak_injection = (
+                    results_month_injection
+                    + (
+                            self.load.monthly_peak_injection_simulation_period - self.load.monthly_baseload_injection_power_simulation_period)
                     * 1000
-                    * (g_value_peak_cooling / k_s / 2 / pi + Rb)
+                    * (g_value_peak_injection / k_s / 2 / pi + Rb)
                     / self.number_of_boreholes
                     / H
             )
-            results_peak_heating = (
-                    results_month_heating
-                    - (self.load.peak_heating_simulation_period - self.load.baseload_heating_power_simulation_period)
+            results_peak_extraction = (
+                    results_month_extraction
+                    - (
+                            self.load.monthly_peak_extraction_simulation_period - self.load.monthly_baseload_extraction_power_simulation_period)
                     * 1000
-                    * (g_value_peak_heating / k_s / 2 / pi + Rb)
+                    * (g_value_peak_extraction / k_s / 2 / pi + Rb)
                     / self.number_of_boreholes
                     / H
             )
@@ -1655,10 +1657,10 @@ class Borefield(BaseClass):
             # save temperatures under variable
             self.results = ResultsMonthly(
                 borehole_wall_temp=Tb,
-                peak_heating=results_peak_heating,
-                peak_cooling=results_peak_cooling,
-                monthly_heating=results_month_heating,
-                monthly_cooling=results_month_cooling,
+                peak_extraction=results_peak_extraction,
+                peak_injection=results_peak_injection,
+                monthly_extraction=results_month_extraction,
+                monthly_injection=results_month_injection,
             )
 
         if hourly:
@@ -1823,8 +1825,8 @@ class Borefield(BaseClass):
             SEER: float = 10 ** 6,
             temperature_threshold: float = 0.05,
             use_hourly_resolution: bool = True,
-            max_peak_heating: float = None,
-            max_peak_cooling: float = None
+            max_peak_extraction: float = None,
+            max_peak_injection: float = None
     ) -> tuple[HourlyGeothermalLoad, HourlyGeothermalLoad]:
         """
         This function optimises the load based on the given borefield and the given hourly load.
@@ -1849,9 +1851,9 @@ class Borefield(BaseClass):
         use_hourly_resolution : bool
             If use_hourly_resolution is used, the hourly data will be used for this optimisation. This can take some
             more time than using the monthly resolution, but it will give more accurate results.
-        max_peak_heating : float
+        max_peak_extraction : float
             The maximum peak power for geothermal heating [kW]
-        max_peak_cooling : float
+        max_peak_injection : float
             The maximum peak power for geothermal cooling [kW]
 
         Returns
@@ -1864,12 +1866,12 @@ class Borefield(BaseClass):
         ValueError
             ValueError if no hourly load is given or the threshold is negative
         """
-        primary_borefield_load, secundary_borefield_load, external_load = optimise_load_profile_power(
+        primary_borefield_load, secondary_borefield_load, external_load = optimise_load_profile_power(
             self, building_load, depth, SCOP, SEER, temperature_threshold, use_hourly_resolution,
-            max_peak_heating, max_peak_cooling
+            max_peak_extraction, max_peak_injection
         )
         self.load = primary_borefield_load
-        return secundary_borefield_load, external_load
+        return secondary_borefield_load, external_load
 
     def optimise_load_profile_energy(
             self,
@@ -1878,8 +1880,8 @@ class Borefield(BaseClass):
             SCOP: float = 10 ** 6,
             SEER: float = 10 ** 6,
             temperature_threshold: float = 0.05,
-            max_peak_heating: float = None,
-            max_peak_cooling: float = None
+            max_peak_extraction: float = None,
+            max_peak_injection: float = None
     ) -> tuple[HourlyGeothermalLoadMultiYear, HourlyGeothermalLoadMultiYear]:
         """
         This function optimises the load based on the given borefield and the given hourly load.
@@ -1901,9 +1903,9 @@ class Borefield(BaseClass):
         temperature_threshold : float
             The maximum allowed temperature difference between the maximum and minimum fluid temperatures and their
             respective limits. The lower this threshold, the longer the convergence will take.
-        max_peak_heating : float
+        max_peak_extraction : float
             The maximum peak power for geothermal heating [kW]
-        max_peak_cooling : float
+        max_peak_injection : float
             The maximum peak power for geothermal cooling [kW]
 
         Returns
@@ -1916,12 +1918,12 @@ class Borefield(BaseClass):
         ValueError
             ValueError if no hourly load is given or the threshold is negative
         """
-        primary_borefield_load, secundary_borefield_load, external_load = optimise_load_profile_energy(
+        primary_borefield_load, secondary_borefield_load, external_load = optimise_load_profile_energy(
             self, building_load, depth, SCOP, SEER, temperature_threshold,
-            max_peak_heating, max_peak_cooling
+            max_peak_extraction, max_peak_injection
         )
         self.load = primary_borefield_load
-        return secundary_borefield_load, external_load
+        return secondary_borefield_load, external_load
 
     def calculate_quadrant(self) -> int:
         """
@@ -1944,15 +1946,15 @@ class Borefield(BaseClass):
         """
 
         # calculate temperatures if they are not calculated
-        if not np.any(self.results.peak_heating):
+        if not np.any(self.results.peak_extraction):
             ghe_logger.warning(
                 "There are not yet temperatures calculated, hence there is no limiting quadrant." "The temperature is calculated now, based on monthly values."
             )
             self.calculate_temperatures()
 
         # calculate max/min fluid temperatures
-        max_temp = np.max(self.results.peak_cooling)
-        min_temp = np.min(self.results.peak_heating)
+        max_temp = np.max(self.results.peak_injection)
+        min_temp = np.min(self.results.peak_extraction)
 
         # calculate temperature difference w.r.t. the limits
         DT_max = -self.Tf_max + max_temp + 1000  # + 1000 to have no problems with negative temperatures

@@ -309,8 +309,8 @@ def test_add():
     assert result.dhw == 60000
     assert np.allclose(result.baseload_heating, load_1.baseload_heating + load_2.baseload_heating)
     assert np.allclose(result.baseload_cooling, load_1.baseload_cooling + load_2.baseload_cooling)
-    assert np.allclose(result._peak_heating, load_1._peak_heating + load_2._peak_heating)
-    assert np.allclose(result._peak_cooling, load_1._peak_cooling + load_2._peak_cooling)
+    assert np.allclose(result._peak_extraction, load_1._peak_heating + load_2._peak_heating)
+    assert np.allclose(result._peak_injection, load_1._peak_cooling + load_2._peak_cooling)
 
     load_2.simulation_period = 20
     load_2.peak_heating_duration = 18
@@ -350,9 +350,9 @@ def test_add():
                        load_1._baseload_heating + load_hourly.resample_to_monthly(load_hourly._hourly_heating_load)[1])
     assert np.allclose(result._baseload_cooling,
                        load_1._baseload_cooling + load_hourly.resample_to_monthly(load_hourly._hourly_cooling_load)[1])
-    assert np.allclose(result._peak_heating,
+    assert np.allclose(result._peak_extraction,
                        load_1._peak_heating + load_hourly.resample_to_monthly(load_hourly._hourly_heating_load)[0])
-    assert np.allclose(result._peak_cooling,
+    assert np.allclose(result._peak_injection,
                        load_1._peak_cooling + load_hourly.resample_to_monthly(load_hourly._hourly_cooling_load)[0])
 
     load_hourly.simulation_period = 20

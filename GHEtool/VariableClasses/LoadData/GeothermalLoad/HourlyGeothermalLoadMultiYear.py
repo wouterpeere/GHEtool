@@ -139,8 +139,48 @@ class HourlyGeothermalLoadMultiYear(_HourlyData):
         """
         return self._hourly_extraction_load
 
+    def set_hourly_injection_load(self, load: ArrayLike) -> None:
+        """
+        This function sets the hourly injection load [kWh/h] after it has been checked.
+
+        Parameters
+        ----------
+        load : np.ndarray, list or tuple
+            Hourly injection [kWh/h]
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            When either the length is not a multiple of 8760, the input is not of the correct type, or it contains negative values
+        """
+        self.hourly_injection_load = load
+
+    def set_hourly_extraction_load(self, load: ArrayLike) -> None:
+        """
+        This function sets the hourly extraction load [kWh/h] after it has been checked.
+
+        Parameters
+        ----------
+        load : np.ndarray, list or tuple
+            Hourly extraction [kWh/h]
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            When either the length is not a multiple of 8760, the input is not of the correct type, or it contains negative values
+        """
+        self.hourly_extraction_load = load
+
     def __eq__(self, other) -> bool:
-        if not isinstance(other, HourlyGeothermalLoad):
+        if not isinstance(other, HourlyGeothermalLoadMultiYear):
             return False
         if not np.array_equal(self._hourly_injection_load, other._hourly_injection_load):
             return False

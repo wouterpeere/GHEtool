@@ -336,7 +336,7 @@ hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly
 borefield.load = hourly_load
 temp = hourly_load.hourly_heating_load
 temp[0] = 100_000
-borefield._borefield_load.hourly_heating_load = temp
+borefield._borefield_load.hourly_extraction_load = temp
 list_of_test_objects.add(
     SizingObject(borefield, L4_output=18760.64149089075, quadrant=4, name='Hourly profile, quadrant 4'))
 
@@ -348,7 +348,7 @@ list_of_test_objects.add(
 
 temp = hourly_load.hourly_heating_load
 temp[0] = 100_000
-borefield._borefield_load.hourly_heating_load = temp
+borefield._borefield_load.hourly_extraction_load = temp
 list_of_test_objects.add(
     SizingObject(borefield, L4_output=18602.210559679363, quadrant=3, name='Hourly profile, quadrant 3'))
 

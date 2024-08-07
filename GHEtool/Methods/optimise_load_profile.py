@@ -13,8 +13,8 @@ def optimise_load_profile_power(
         SEER: float = 10 ** 6,
         temperature_threshold: float = 0.05,
         use_hourly_resolution: bool = True,
-        max_peak_heating: float = None,
-        max_peak_cooling: float = None
+        max_peak_extraction: float = None,
+        max_peak_injection: float = None
 ) -> tuple[HourlyGeothermalLoad, HourlyGeothermalLoad, HourlyGeothermalLoad]:
     """
     This function optimises the load based on the given borefield and the given hourly load.
@@ -41,9 +41,9 @@ def optimise_load_profile_power(
     use_hourly_resolution : bool
         If use_hourly_resolution is used, the hourly data will be used for this optimisation. This can take some
         more time than using the monthly resolution, but it will give more accurate results.
-    max_peak_heating : float
+    max_peak_extraction : float
         The maximum peak power for geothermal heating [kW]
-    max_peak_cooling : float
+    max_peak_injection : float
         The maximum peak power for geothermal cooling [kW]
 
     Returns
@@ -76,21 +76,21 @@ def optimise_load_profile_power(
 
     # load hourly heating and cooling load and convert it to geothermal loads
     primary_geothermal_load = HourlyGeothermalLoad(simulation_period=building_load.simulation_period)
-    primary_geothermal_load.set_hourly_cooling(building_load.hourly_cooling_load.copy() * (1 + 1 / SEER))
-    primary_geothermal_load.set_hourly_heating(building_load.hourly_heating_load.copy() * (1 - 1 / SCOP))
+    primary_geothermal_load.set_hourly_injection_load(building_load.hourly_injection_load.copy() * (1 + 1 / SEER))
+    primary_geothermal_load.set_hourly_extraction_load(building_load.hourly_extraction_load.copy() * (1 - 1 / SCOP))
 
     # set geothermal load
     borefield.load = copy.deepcopy(primary_geothermal_load)
 
     # set initial peak loads
-    init_peak_heating: float = borefield.load.max_peak_heating
-    init_peak_cooling: float = borefield.load.max_peak_cooling
+    init_peak_heating: float = borefield.load.max_peak_extraction
+    init_peak_cooling: float = borefield.load.max_peak_injection
 
     # correct for max peak powers
-    if max_peak_heating is not None:
-        init_peak_heating = min(init_peak_heating, max_peak_heating * (1 - 1 / SCOP))
-    if max_peak_cooling is not None:
-        init_peak_cooling = min(init_peak_cooling, max_peak_cooling * (1 + 1 / SEER))
+    if max_peak_extraction is not None:
+        init_peak_heating = min(init_peak_heating, max_peak_extraction * (1 - 1 / SCOP))
+    if max_peak_injection is not None:
+        init_peak_cooling = min(init_peak_cooling, max_peak_injection * (1 + 1 / SEER))
 
     # peak loads for iteration
     peak_heat_load_geo: float = init_peak_heating
@@ -100,18 +100,20 @@ def optimise_load_profile_power(
     cool_ok, heat_ok = False, False
     while not cool_ok or not heat_ok:
         # limit the primary geothermal heating and cooling load to peak_heat_load_geo and peak_cool_load_geo
-        borefield.load.set_hourly_cooling(np.minimum(peak_cool_load_geo, primary_geothermal_load.hourly_cooling_load))
-        borefield.load.set_hourly_heating(np.minimum(peak_heat_load_geo, primary_geothermal_load.hourly_heating_load))
+        borefield.load.set_hourly_injection_load(
+            np.minimum(peak_cool_load_geo, primary_geothermal_load.hourly_injection_load))
+        borefield.load.set_hourly_extraction_load(
+            np.minimum(peak_heat_load_geo, primary_geothermal_load.hourly_extraction_load))
 
         # calculate temperature profile, just for the results
         borefield.calculate_temperatures(depth=depth, hourly=use_hourly_resolution)
 
         # deviation from minimum temperature
-        if abs(min(borefield.results.peak_heating) - borefield.Tf_min) > temperature_threshold:
+        if abs(min(borefield.results.peak_extraction) - borefield.Tf_min) > temperature_threshold:
             # check if it goes below the threshold
-            if min(borefield.results.peak_heating) < borefield.Tf_min:
+            if min(borefield.results.peak_extraction) < borefield.Tf_min:
                 peak_heat_load_geo = max(0.1, peak_heat_load_geo - 1 * max(1, 10 * (
-                        borefield.Tf_min - min(borefield.results.peak_heating))))
+                        borefield.Tf_min - min(borefield.results.peak_extraction))))
             else:
                 peak_heat_load_geo = min(init_peak_heating, peak_heat_load_geo * 1.01)
                 if peak_heat_load_geo == init_peak_heating:
@@ -120,11 +122,11 @@ def optimise_load_profile_power(
             heat_ok = True
 
         # deviation from maximum temperature
-        if abs(np.max(borefield.results.peak_cooling) - borefield.Tf_max) > temperature_threshold:
+        if abs(np.max(borefield.results.peak_injection) - borefield.Tf_max) > temperature_threshold:
             # check if it goes above the threshold
-            if np.max(borefield.results.peak_cooling) > borefield.Tf_max:
+            if np.max(borefield.results.peak_injection) > borefield.Tf_max:
                 peak_cool_load_geo = max(0.1, peak_cool_load_geo - 1 * max(1, 10 * (
-                        -borefield.Tf_max + np.max(borefield.results.peak_cooling))))
+                        -borefield.Tf_max + np.max(borefield.results.peak_injection))))
             else:
                 peak_cool_load_geo = min(init_peak_cooling, peak_cool_load_geo * 1.01)
                 if peak_cool_load_geo == init_peak_cooling:
@@ -134,15 +136,15 @@ def optimise_load_profile_power(
 
     # calculate the resulting secundary hourly profile that can be put on the borefield
     secundary_borefield_load = HourlyGeothermalLoad(simulation_period=building_load.simulation_period)
-    secundary_borefield_load.set_hourly_cooling(borefield.load.hourly_cooling_load / (1 + 1 / SEER))
-    secundary_borefield_load.set_hourly_heating(borefield.load.hourly_heating_load / (1 - 1 / SCOP))
+    secundary_borefield_load.set_hourly_injection_load(borefield.load.hourly_injection_load / (1 + 1 / SEER))
+    secundary_borefield_load.set_hourly_extraction_load(borefield.load.hourly_extraction_load / (1 - 1 / SCOP))
 
     # calculate external load
     external_load = HourlyGeothermalLoad(simulation_period=building_load.simulation_period)
-    external_load.set_hourly_heating(
-        np.maximum(0, building_load.hourly_heating_load - secundary_borefield_load.hourly_heating_load))
-    external_load.set_hourly_cooling(
-        np.maximum(0, building_load.hourly_cooling_load - secundary_borefield_load.hourly_cooling_load))
+    external_load.set_hourly_extraction_load(
+        np.maximum(0, building_load.hourly_extraction_load - secundary_borefield_load.hourly_extraction_load))
+    external_load.set_hourly_injection_load(
+        np.maximum(0, building_load.hourly_injection_load - secundary_borefield_load.hourly_injection_load))
 
     return borefield.load, secundary_borefield_load, external_load
 
@@ -154,8 +156,8 @@ def optimise_load_profile_energy(
         SCOP: float = 10 ** 6,
         SEER: float = 10 ** 6,
         temperature_threshold: float = 0.05,
-        max_peak_heating: float = None,
-        max_peak_cooling: float = None
+        max_peak_extraction: float = None,
+        max_peak_injection: float = None
 ) -> tuple[HourlyGeothermalLoadMultiYear, HourlyGeothermalLoadMultiYear, HourlyGeothermalLoadMultiYear]:
     """
     This function optimises the load based on the given borefield and the given hourly load.
@@ -179,9 +181,9 @@ def optimise_load_profile_energy(
     temperature_threshold : float
         The maximum allowed temperature difference between the maximum and minimum fluid temperatures and their
         respective limits. The lower this threshold, the longer the convergence will take.
-    max_peak_heating : float
+    max_peak_extraction : float
         The maximum peak power for geothermal heating [kW]
-    max_peak_cooling : float
+    max_peak_injection : float
         The maximum peak power for geothermal cooling [kW]
 
     Returns
@@ -214,25 +216,25 @@ def optimise_load_profile_energy(
     borefield.Rb = borefield.borehole.get_Rb(depth, borefield.D, borefield.r_b, borefield.ground_data.k_s)
 
     # set max peak values
-    init_peak_heating = building_load.hourly_heating_load.copy() * (1 - 1 / SCOP)
-    init_peak_cooling = building_load.hourly_cooling_load.copy() * (1 + 1 / SEER)
+    init_peak_heating = building_load.hourly_extraction_load.copy() * (1 - 1 / SCOP)
+    init_peak_cooling = building_load.hourly_injection_load.copy() * (1 + 1 / SEER)
 
     # correct for max peak powers
-    if max_peak_heating is not None:
-        init_peak_heating = np.clip(init_peak_heating, None, max_peak_heating * (1 - 1 / SCOP))
-    if max_peak_cooling is not None:
-        init_peak_cooling = np.clip(init_peak_cooling, None, max_peak_cooling * (1 + 1 / SEER))
+    if max_peak_extraction is not None:
+        init_peak_heating = np.clip(init_peak_heating, None, max_peak_extraction * (1 - 1 / SCOP))
+    if max_peak_injection is not None:
+        init_peak_cooling = np.clip(init_peak_cooling, None, max_peak_injection * (1 + 1 / SEER))
 
     # load hourly heating and cooling load and convert it to geothermal loads
     primary_geothermal_load = HourlyGeothermalLoad(simulation_period=building_load.simulation_period)
-    primary_geothermal_load.set_hourly_heating(init_peak_heating)
-    primary_geothermal_load.set_hourly_cooling(init_peak_cooling)
+    primary_geothermal_load.set_hourly_extraction_load(init_peak_heating)
+    primary_geothermal_load.set_hourly_injection_load(init_peak_cooling)
 
     # set relation qh-qm
     nb_points = 100
 
-    power_heating_range = np.linspace(0.001, primary_geothermal_load.max_peak_heating, nb_points)
-    power_cooling_range = np.linspace(0.001, primary_geothermal_load.max_peak_cooling, nb_points)
+    power_heating_range = np.linspace(0.001, primary_geothermal_load.max_peak_extraction, nb_points)
+    power_cooling_range = np.linspace(0.001, primary_geothermal_load.max_peak_injection, nb_points)
 
     # relationship between the peak load and the corresponding monthly load
     heating_peak_bl = np.zeros((nb_points, 12))
@@ -240,22 +242,23 @@ def optimise_load_profile_energy(
 
     for idx in range(nb_points):
         heating_peak_bl[idx] = primary_geothermal_load.resample_to_monthly(
-            np.minimum(power_heating_range[idx], primary_geothermal_load.hourly_heating_load))[1]
+            np.minimum(power_heating_range[idx], primary_geothermal_load.hourly_extraction_load))[1]
         cooling_peak_bl[idx] = primary_geothermal_load.resample_to_monthly(
-            np.minimum(power_cooling_range[idx], primary_geothermal_load.hourly_cooling_load))[1]
+            np.minimum(power_cooling_range[idx], primary_geothermal_load.hourly_injection_load))[1]
 
     # create monthly multi-load
     primary_monthly_load = \
-        MonthlyGeothermalLoadMultiYear(baseload_heating=primary_geothermal_load.baseload_heating_simulation_period,
-                                       baseload_cooling=primary_geothermal_load.baseload_cooling_simulation_period,
-                                       peak_heating=primary_geothermal_load.peak_heating_simulation_period,
-                                       peak_cooling=primary_geothermal_load.peak_cooling_simulation_period)
+        MonthlyGeothermalLoadMultiYear(
+            baseload_extraction=primary_geothermal_load.monthly_baseload_extraction_simulation_period,
+            baseload_injection=primary_geothermal_load.monthly_baseload_injection_simulation_period,
+            peak_extraction=primary_geothermal_load.monthly_peak_extraction_simulation_period,
+            peak_injection=primary_geothermal_load.monthly_peak_injection_simulation_period)
 
     borefield.load = primary_monthly_load
 
     # store initial monthly peak loads
-    peak_heating = primary_geothermal_load.peak_heating
-    peak_cooling = primary_geothermal_load.peak_cooling
+    peak_heating = primary_geothermal_load.monthly_peak_extraction
+    peak_cooling = primary_geothermal_load.monthly_peak_injection
 
     for i in range(12 * borefield.load.simulation_period):
         # set iteration criteria
@@ -266,33 +269,33 @@ def optimise_load_profile_energy(
             borefield.calculate_temperatures(depth)
 
             # deviation from minimum temperature
-            if abs(borefield.results.peak_heating[i] - borefield.Tf_min) > temperature_threshold:
+            if abs(borefield.results.peak_extraction[i] - borefield.Tf_min) > temperature_threshold:
                 # check if it goes below the threshold
-                curr_heating_peak = borefield.load.peak_heating_simulation_period[i]
-                if borefield.results.peak_heating[i] < borefield.Tf_min:
+                curr_heating_peak = borefield.load.monthly_baseload_extraction_simulation_period[i]
+                if borefield.results.peak_extraction[i] < borefield.Tf_min:
                     curr_heating_peak = max(0.1, curr_heating_peak - 1 * max(1, 10 * (
-                            borefield.Tf_min - borefield.results.peak_heating[i])))
+                            borefield.Tf_min - borefield.results.peak_extraction[i])))
                 else:
                     curr_heating_peak = min(peak_heating[i % 12], curr_heating_peak * 1.01)
                     if curr_heating_peak == peak_heating[i % 12]:
                         heat_ok = True
-                borefield.load._peak_heating[i], borefield.load._baseload_heating[i] = \
+                borefield.load._peak_extraction[i], borefield.load._baseload_extraction[i] = \
                     curr_heating_peak, np.interp(curr_heating_peak, power_heating_range, heating_peak_bl[:, i % 12])
             else:
                 heat_ok = True
 
             # deviation from maximum temperature
-            if abs(borefield.results.peak_cooling[i] - borefield.Tf_max) > temperature_threshold:
+            if abs(borefield.results.peak_injection[i] - borefield.Tf_max) > temperature_threshold:
                 # check if it goes above the threshold
-                curr_cooling_peak = borefield.load.peak_cooling_simulation_period[i]
-                if borefield.results.peak_cooling[i] > borefield.Tf_max:
+                curr_cooling_peak = borefield.load.monthly_peak_injection_simulation_period[i]
+                if borefield.results.peak_injection[i] > borefield.Tf_max:
                     curr_cooling_peak = max(0.1, curr_cooling_peak - 1 * max(1, 10 * (
-                            -borefield.Tf_max + borefield.results.peak_cooling[i])))
+                            -borefield.Tf_max + borefield.results.peak_injection[i])))
                 else:
                     curr_cooling_peak = min(peak_cooling[i % 12], curr_cooling_peak * 1.01)
                     if curr_cooling_peak == peak_cooling[i % 12]:
                         cool_ok = True
-                borefield.load._peak_cooling[i], borefield.load._baseload_cooling[i] = \
+                borefield.load._peak_injection[i], borefield.load._baseload_injection[i] = \
                     curr_cooling_peak, np.interp(curr_cooling_peak, power_cooling_range, cooling_peak_bl[:, i % 12])
             else:
                 cool_ok = True
@@ -324,23 +327,23 @@ def optimise_load_profile_energy(
 
     # calculate hourly load
     primary_borefield_load = HourlyGeothermalLoadMultiYear()
-    primary_borefield_load.hourly_heating_load = f(primary_geothermal_load.hourly_heating_load_simulation_period,
-                                                   borefield.load.peak_heating_simulation_period)
-    primary_borefield_load.hourly_cooling_load = f(primary_geothermal_load.hourly_cooling_load_simulation_period,
-                                                   borefield.load.peak_cooling_simulation_period)
+    primary_borefield_load.hourly_extraction_load = f(primary_geothermal_load.hourly_extraction_load_simulation_period,
+                                                      borefield.load.monthly_peak_extraction_simulation_period)
+    primary_borefield_load.hourly_injection_load = f(primary_geothermal_load.hourly_injection_load_simulation_period,
+                                                     borefield.load.monthly_peak_injection_simulation_period)
 
     # calculate the corresponding geothermal load
     secundary_borefield_load = HourlyGeothermalLoadMultiYear()
-    secundary_borefield_load.hourly_cooling_load = primary_borefield_load.hourly_cooling_load_simulation_period / (
+    secundary_borefield_load.hourly_injection_load = primary_borefield_load.hourly_injection_load_simulation_period / (
             1 + 1 / SEER)
-    secundary_borefield_load.hourly_heating_load = primary_borefield_load.hourly_heating_load_simulation_period / (
+    secundary_borefield_load.hourly_extraction_load = primary_borefield_load.hourly_extraction_load_simulation_period / (
             1 - 1 / SCOP)
 
     # calculate external load
     external_load = HourlyGeothermalLoadMultiYear()
-    external_load.hourly_heating_load = np.maximum(0, building_load.hourly_heating_load_simulation_period -
-                                                   secundary_borefield_load.hourly_heating_load_simulation_period)
-    external_load.hourly_cooling_load = np.maximum(0, building_load.hourly_cooling_load_simulation_period -
-                                                   secundary_borefield_load.hourly_cooling_load_simulation_period)
+    external_load.hourly_extraction_load = np.maximum(0, building_load.hourly_extraction_load_simulation_period -
+                                                      secundary_borefield_load.hourly_extraction_load_simulation_period)
+    external_load.hourly_injection_load = np.maximum(0, building_load.hourly_injection_load_simulation_period -
+                                                     secundary_borefield_load.hourly_injection_load_simulation_period)
 
     return primary_borefield_load, secundary_borefield_load, external_load

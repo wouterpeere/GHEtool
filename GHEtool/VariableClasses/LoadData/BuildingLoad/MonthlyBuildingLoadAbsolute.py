@@ -17,7 +17,7 @@ class MonthlyBuildingLoadAbsolute(_LoadData):
     """
 
     __slots__ = tuple(_LoadData.__slots__) + (
-        "_baseload_heating", "_baseload_cooling", "_peak_heating", "_peak_cooling")
+        "_baseload_heating", "_baseload_cooling", "_peak_extraction", "_peak_injection")
 
     def __init__(
             self,
@@ -343,9 +343,9 @@ class MonthlyBuildingLoadAbsolute(_LoadData):
             return False
         if not np.array_equal(self.baseload_cooling, other.baseload_cooling):
             return False
-        if not np.array_equal(self.peak_heating, other.peak_heating):
+        if not np.array_equal(self.peak_heating, other.peak_extraction):
             return False
-        if not np.array_equal(self.peak_cooling, other.peak_cooling):
+        if not np.array_equal(self.peak_cooling, other.peak_injection):
             return False
         if not self.simulation_period == other.simulation_period:
             return False
@@ -375,8 +375,8 @@ class MonthlyBuildingLoadAbsolute(_LoadData):
             result = MonthlyGeothermalLoadAbsolute(
                 self._baseload_heating + other._baseload_heating,
                 self._baseload_cooling + other._baseload_cooling,
-                self._peak_heating + other._peak_heating,
-                self._peak_cooling + other._peak_cooling,
+                self._peak_heating + other._peak_extraction,
+                self._peak_cooling + other._peak_injection,
                 max(self.simulation_period, other.simulation_period),
                 self.dhw + other.dhw,
             )
