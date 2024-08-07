@@ -37,68 +37,68 @@ def test_imbalance():
     assert load.imbalance == 108
 
 
-def test_baseload_heating():
+def test_baseload_extraction():
     load = MonthlyGeothermalLoadAbsolute()
-    assert np.array_equal(load.baseload_heating, np.zeros(12))
-    load.baseload_heating = np.linspace(0, 11, 12)
-    assert np.array_equal(load.baseload_heating, np.linspace(0, 11, 12))
-    load.set_baseload_heating(np.linspace(1, 12, 12))
-    assert np.array_equal(load.baseload_heating, np.linspace(1, 12, 12))
-    assert np.array_equal(load.baseload_heating / 730, load.baseload_heating_power)
-    assert np.array_equal(load.baseload_heating_power, load.peak_heating)
+    assert np.allclose(load.baseload_extraction, np.zeros(12))
+    load.baseload_extraction = np.linspace(0, 11, 12)
+    assert np.allclose(load.baseload_extraction, np.linspace(0, 11, 12))
+    load.set_baseload_extraction(np.linspace(1, 12, 12))
+    assert np.allclose(load.baseload_extraction, np.linspace(1, 12, 12))
+    assert np.allclose(load.baseload_extraction / 730, load.monthly_baseload_extraction_power)
+    assert np.allclose(load.monthly_baseload_extraction_power, load.peak_extraction)
     with pytest.raises(ValueError):
-        load.set_baseload_heating(np.ones(11))
+        load.set_baseload_extraction(np.ones(11))
 
 
-def test_baseload_cooling():
+def test_baseload_injection():
     load = MonthlyGeothermalLoadAbsolute()
-    assert np.array_equal(load.baseload_cooling, np.zeros(12))
-    load.baseload_cooling = np.linspace(0, 11, 12)
-    assert np.array_equal(load.baseload_cooling, np.linspace(0, 11, 12))
-    load.set_baseload_cooling(np.linspace(1, 12, 12))
-    assert np.array_equal(load.baseload_cooling, np.linspace(1, 12, 12))
-    assert np.array_equal(load.baseload_cooling / 730, load.baseload_cooling_power)
-    assert np.array_equal(load.baseload_cooling_power, load.peak_cooling)
+    assert np.allclose(load.baseload_injection, np.zeros(12))
+    load.baseload_injection = np.linspace(0, 11, 12)
+    assert np.allclose(load.baseload_injection, np.linspace(0, 11, 12))
+    load.set_baseload_injection(np.linspace(1, 12, 12))
+    assert np.allclose(load.baseload_injection, np.linspace(1, 12, 12))
+    assert np.allclose(load.baseload_injection / 730, load.monthly_baseload_injection_power)
+    assert np.allclose(load.monthly_baseload_injection_power, load.peak_injection)
 
     with pytest.raises(ValueError):
-        load.set_baseload_cooling(np.ones(11))
+        load.set_baseload_injection(np.ones(11))
 
 
-def test_peak_heating():
+def test_peak_extraction():
     load = MonthlyGeothermalLoadAbsolute()
-    assert np.array_equal(load.peak_heating, np.zeros(12))
-    load.peak_heating = np.linspace(0, 11, 12)
-    assert np.array_equal(load.peak_heating, np.linspace(0, 11, 12))
-    load.set_peak_heating(np.linspace(1, 12, 12))
-    assert np.array_equal(load.peak_heating, np.linspace(1, 12, 12))
-    load.set_baseload_heating(np.ones(12) * 730 * 5)
-    assert np.array_equal(load.peak_heating, np.array([5., 5., 5., 5., 5., 6., 7., 8., 9., 10., 11., 12.]))
+    assert np.allclose(load.peak_extraction, np.zeros(12))
+    load.peak_extraction = np.linspace(0, 11, 12)
+    assert np.allclose(load.peak_extraction, np.linspace(0, 11, 12))
+    load.set_peak_extraction(np.linspace(1, 12, 12))
+    assert np.allclose(load.peak_extraction, np.linspace(1, 12, 12))
+    load.set_baseload_extraction(np.ones(12) * 730 * 5)
+    assert np.allclose(load.peak_extraction, np.array([5., 5., 5., 5., 5., 6., 7., 8., 9., 10., 11., 12.]))
     with pytest.raises(ValueError):
-        load.set_peak_heating(np.ones(11))
+        load.set_peak_extraction(np.ones(11))
 
 
-def test_peak_cooling():
+def test_peak_injection():
     load = MonthlyGeothermalLoadAbsolute()
-    assert np.array_equal(load.peak_cooling, np.zeros(12))
-    load.peak_cooling = np.linspace(0, 11, 12)
-    assert np.array_equal(load.peak_cooling, np.linspace(0, 11, 12))
-    load.set_peak_cooling(np.linspace(1, 12, 12))
-    assert np.array_equal(load.peak_cooling, np.linspace(1, 12, 12))
-    load.set_baseload_cooling(np.ones(12) * 730 * 5)
-    assert np.array_equal(load.peak_cooling, np.array([5., 5., 5., 5., 5., 6., 7., 8., 9., 10., 11., 12.]))
+    assert np.allclose(load.peak_injection, np.zeros(12))
+    load.peak_injection = np.linspace(0, 11, 12)
+    assert np.allclose(load.peak_injection, np.linspace(0, 11, 12))
+    load.set_peak_injection(np.linspace(1, 12, 12))
+    assert np.allclose(load.peak_injection, np.linspace(1, 12, 12))
+    load.set_baseload_injection(np.ones(12) * 730 * 5)
+    assert np.allclose(load.peak_injection, np.array([5., 5., 5., 5., 5., 6., 7., 8., 9., 10., 11., 12.]))
     with pytest.raises(ValueError):
-        load.set_peak_cooling(np.ones(11))
+        load.set_peak_injection(np.ones(11))
 
 
 def test_times():
     load = MonthlyGeothermalLoadAbsolute()
-    load.peak_cooling_duration = 6
-    load.peak_heating_duration = 7
-    assert load.peak_heating_duration == 7 * 3600
-    assert load.peak_cooling_duration == 6 * 3600
+    load.peak_injection_duration = 6
+    load.peak_extraction_duration = 7
+    assert load.peak_extraction_duration == 7 * 3600
+    assert load.peak_injection_duration == 6 * 3600
     load.peak_duration = 8
-    assert load.peak_heating_duration == 8 * 3600
-    assert load.peak_cooling_duration == 8 * 3600
+    assert load.peak_extraction_duration == 8 * 3600
+    assert load.peak_injection_duration == 8 * 3600
 
     load.simulation_period = 20
     assert load.time_L3[-1] == 20 * 3600 * 8760
@@ -111,41 +111,42 @@ def test_times():
 
 def test_monthly_average_load():
     load = MonthlyGeothermalLoadAbsolute()
-    load.baseload_cooling = np.ones(12) * 400
-    load.baseload_heating = np.ones(12) * 500
+    load.baseload_injection = np.ones(12) * 400
+    load.baseload_extraction = np.ones(12) * 500
 
-    assert np.isclose(np.average(load.baseload_cooling_power) * 8760, 400 * 12)
-    assert np.isclose(np.average(load.baseload_heating_power) * 8760, 500 * 12)
-    assert np.array_equal(load.baseload_cooling_power, load.peak_cooling)
-    assert np.array_equal(load.baseload_heating_power, load.peak_heating)
+    assert np.isclose(np.average(load.monthly_baseload_injection_power) * 8760, 400 * 12)
+    assert np.isclose(np.average(load.monthly_baseload_extraction_power) * 8760, 500 * 12)
+    assert np.allclose(load.monthly_baseload_injection_power, load.peak_injection)
+    assert np.allclose(load.monthly_baseload_extraction_power, load.peak_extraction)
 
-    assert np.array_equal(load.baseload_cooling_power_simulation_period,
-                          np.tile(load.baseload_cooling_power, 20))
-    assert np.array_equal(load.baseload_heating_power_simulation_period,
-                          np.tile(load.baseload_heating_power, 20))
-    assert np.array_equal(load.peak_heating_simulation_period,
-                          np.tile(load.peak_heating, 20))
-    assert np.array_equal(load.peak_cooling_simulation_period,
-                          np.tile(load.peak_cooling, 20))
-    assert np.array_equal(load.baseload_cooling_simulation_period,
-                          np.tile(load.baseload_cooling, 20))
-    assert np.array_equal(load.baseload_heating_simulation_period,
-                          np.tile(load.baseload_heating, 20))
+    assert np.allclose(load.monthly_baseload_injection_simulation_period,
+                       np.tile(load.monthly_baseload_injection, 20))
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       np.tile(load.monthly_baseload_extraction, 20))
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       np.tile(load.peak_extraction, 20))
+    assert np.allclose(load.monthly_peak_injection_simulation_period,
+                       np.tile(load.peak_injection, 20))
+    assert np.allclose(load.monthly_baseload_injection_simulation_period,
+                       np.tile(load.baseload_injection, 20))
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       np.tile(load.baseload_extraction, 20))
 
-    assert np.array_equal(load.monthly_average_load, load.baseload_cooling_power - load.baseload_heating_power)
-    assert np.array_equal(load.monthly_average_load_simulation_period,
-                          load.baseload_cooling_power_simulation_period - load.baseload_heating_power_simulation_period)
+    assert np.allclose(load.monthly_average_power,
+                       load.monthly_baseload_injection_power - load.monthly_baseload_extraction_power)
+    assert np.allclose(load.monthly_average_power_simulation_period,
+                       load.monthly_baseload_injection_power_simulation_period - load.monthly_baseload_extraction_power_simulation_period)
 
     # test now with different month loads
-    temp_cooling = load.baseload_cooling_power
-    temp_heating = load.baseload_heating_power
+    temp_cooling = load.monthly_baseload_injection
+    temp_heating = load.monthly_baseload_extraction
 
     load.all_months_equal = False
-    assert not np.array_equal(load.baseload_cooling_power, temp_cooling)
-    assert not np.array_equal(load.baseload_heating_power, temp_heating)
+    assert not np.allclose(load.monthly_baseload_injection_power, temp_cooling)
+    assert not np.allclose(load.monthly_baseload_extraction_power, temp_heating)
 
-    assert np.isclose(np.sum(np.multiply(load.baseload_cooling_power, load.UPM)), 400 * 12)
-    assert np.isclose(np.sum(np.multiply(load.baseload_heating_power, load.UPM)), 500 * 12)
+    assert np.isclose(np.sum(np.multiply(load.monthly_baseload_injection_power, load.UPM)), 400 * 12)
+    assert np.isclose(np.sum(np.multiply(load.monthly_baseload_extraction_power, load.UPM)), 500 * 12)
 
 
 def test_params_last_year():
@@ -154,8 +155,8 @@ def test_params_last_year():
                        (21600.0, 240000.0, 65753.42465753425, 9132.420091324202))
     assert np.allclose(load._calculate_last_year_params(True),
                        (21600.0, 160000.0, 25753.424657534248, -9132.420091324202))
-    load.peak_heating = np.ones(12) * 160
-    load.peak_cooling = np.ones(12) * 240
+    load.peak_extraction = np.ones(12) * 160
+    load.peak_injection = np.ones(12) * 240
     assert np.allclose(load._calculate_last_year_params(False),
                        (21600.0, 240000.0, 65753.42465753425, 9132.420091324202))
     assert np.allclose(load._calculate_last_year_params(True),
@@ -168,14 +169,14 @@ def test_params_first_year():
                        (21600.0, 18396000.0, 21024000.0, 240000.0, 6410.9589041095915, 65753.42465753425))
     assert np.allclose(load._calculate_first_year_params(True),
                        (21600.0, 0, 2628000.0, 160000.0, 0, 25753.424657534248))
-    temp = load.peak_cooling
+    temp = load.peak_injection
     temp[0] = 250
-    load.peak_cooling = temp
+    load.peak_injection = temp
     assert np.allclose(load._calculate_first_year_params(False),
                        (21600, 0, 2628000, 250000.0, 0, -25753.424657534248))
 
-    load.peak_heating = np.ones(12) * 160
-    load.peak_cooling = np.ones(12) * 240
+    load.peak_extraction = np.ones(12) * 160
+    load.peak_injection = np.ones(12) * 240
 
     assert np.allclose(load._calculate_first_year_params(False),
                        (21600, 18396000.0, 21024000.0, 240000.0, 6410.9589041095915, 65753.42465753425))
@@ -205,8 +206,8 @@ def test_dummy_peak_duration():
 
 def test_yearly_heating_cooling():
     load = MonthlyGeothermalLoadAbsolute(*load_case(2))
-    assert load.yearly_heating_load == 160000
-    assert load.yearly_cooling_load == 240000
+    assert load.yearly_average_extraction_load == 160000
+    assert load.yearly_average_injection_load == 240000
 
 
 def test_eq():
@@ -219,34 +220,34 @@ def test_eq():
 
     load_1.simulation_period = 55
     assert load_1 == load_2
-    load_1.baseload_cooling = [i + 1 for i in load_1.baseload_cooling]
+    load_1.baseload_injection = [i + 1 for i in load_1.baseload_injection]
 
     assert load_1 != load_2
-    load_2.baseload_cooling = [i + 1 for i in load_2.baseload_cooling]
+    load_2.baseload_injection = [i + 1 for i in load_2.baseload_injection]
     assert load_1 == load_2
 
     load_1.simulation_period = 55
     assert load_1 == load_2
-    load_1.baseload_heating = [i + 1 for i in load_1.baseload_heating]
+    load_1.baseload_extraction = [i + 1 for i in load_1.baseload_extraction]
 
     assert load_1 != load_2
-    load_2.baseload_heating = [i + 1 for i in load_2.baseload_heating]
+    load_2.baseload_extraction = [i + 1 for i in load_2.baseload_extraction]
     assert load_1 == load_2
 
     load_1.simulation_period = 55
     assert load_1 == load_2
-    load_1.peak_heating = [i + 1 for i in load_1.peak_heating]
+    load_1.peak_extraction = [i + 1 for i in load_1.peak_extraction]
 
     assert load_1 != load_2
-    load_2.peak_heating = [i + 1 for i in load_2.peak_heating]
+    load_2.peak_extraction = [i + 1 for i in load_2.peak_extraction]
     assert load_1 == load_2
 
     load_1.simulation_period = 55
     assert load_1 == load_2
-    load_1.peak_cooling = [i + 1 for i in load_1.peak_cooling]
+    load_1.peak_injection = [i + 1 for i in load_1.peak_injection]
 
     assert load_1 != load_2
-    load_2.peak_cooling = [i + 1 for i in load_2.peak_cooling]
+    load_2.peak_injection = [i + 1 for i in load_2.peak_injection]
     assert load_1 == load_2
 
     load_2 = HourlyGeothermalLoad()
@@ -268,19 +269,18 @@ def test_add():
         result = load_1 + load_2
 
     assert result.simulation_period == 30
-    assert result.dhw == 60000
-    assert np.allclose(result.baseload_heating, load_1.baseload_heating + load_2.baseload_heating)
-    assert np.allclose(result.baseload_cooling, load_1.baseload_cooling + load_2.baseload_cooling)
+    assert np.allclose(result.baseload_extraction, load_1.baseload_extraction + load_2.baseload_extraction)
+    assert np.allclose(result.baseload_injection, load_1.baseload_injection + load_2.baseload_injection)
     assert np.allclose(result._peak_extraction, load_1._peak_extraction + load_2._peak_extraction)
     assert np.allclose(result._peak_injection, load_1._peak_injection + load_2._peak_injection)
 
     load_2.simulation_period = 20
-    load_2.peak_heating_duration = 18
+    load_2.peak_extraction_duration = 18
 
     with pytest.warns():
         result = load_1 + load_2
-        assert result.peak_heating_duration == 18 * 3600
-    load_1.peak_heating_duration = 18
+        assert result.peak_extraction_duration == 18 * 3600
+    load_1.peak_extraction_duration = 18
     try:
         with pytest.warns():
             result = load_1 + load_2
@@ -288,11 +288,11 @@ def test_add():
     except:
         assert True
 
-    load_1.peak_cooling_duration = 18
+    load_1.peak_injection_duration = 18
     with pytest.warns():
         result = load_1 + load_2
-        assert result.peak_cooling_duration == 18 * 3600
-    load_2.peak_cooling_duration = 18
+        assert result.peak_injection_duration == 18 * 3600
+    load_2.peak_injection_duration = 18
     try:
         with pytest.warns():
             result = load_1 + load_2
@@ -307,7 +307,6 @@ def test_add():
         result = load_1 + load_hourly  # simulation period not equal
 
     assert result.simulation_period == 30
-    assert result.dhw == 20000
     assert np.allclose(result._baseload_extraction,
                        load_1._baseload_extraction + load_hourly.resample_to_monthly(load_hourly._hourly_heating_load)[
                            1])
@@ -325,25 +324,25 @@ def test_add():
 
 
 def test_different_start_month():
-    load = MonthlyGeothermalLoadAbsolute(baseload_heating=np.arange(1, 13, 1),
-                                         baseload_cooling=np.arange(1, 13, 1),
-                                         peak_cooling=np.arange(1, 13, 1),
-                                         peak_heating=np.arange(1, 13, 1))
+    load = MonthlyGeothermalLoadAbsolute(baseload_extraction=np.arange(1, 13, 1),
+                                         baseload_injection=np.arange(1, 13, 1),
+                                         peak_injection=np.arange(1, 13, 1),
+                                         peak_extraction=np.arange(1, 13, 1))
     load.start_month = 2
     result = np.array([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1])
-    assert np.array_equal(load.baseload_heating, result)
-    assert np.array_equal(load.baseload_cooling, result)
-    assert np.array_equal(load.peak_heating, result)
-    assert np.array_equal(load.peak_cooling, result)
+    assert np.allclose(load.baseload_extraction, result)
+    assert np.allclose(load.baseload_injection, result)
+    assert np.allclose(load.peak_extraction, result)
+    assert np.allclose(load.peak_injection, result)
 
 
 def test_yearly_loads():
     load = MonthlyGeothermalLoadAbsolute(*load_case(2))
     load.simulation_period = 10
-    assert np.array_equal(load.yearly_cooling_load_simulation_period, [240000] * 10)
-    assert np.array_equal(load.yearly_heating_load_simulation_period, [160000] * 10)
-    assert np.array_equal(load.yearly_cooling_peak_simulation_period, [240] * 10)
-    assert np.array_equal(load.yearly_heating_peak_simulation_period, [160] * 10)
+    assert np.allclose(load.yearly_injection_load_simulation_period, [240000] * 10)
+    assert np.allclose(load.yearly_extraction_load_simulation_period, [160000] * 10)
+    assert np.allclose(load.yearly_injection_peak_simulation_period, [240] * 10)
+    assert np.allclose(load.yearly_extraction_peak_simulation_period, [160] * 10)
 
 
 ### continue for multi year
@@ -357,6 +356,6 @@ def test_checks_multiyear_monthly():
     assert load._check_input(np.ones(12 * 3))
     assert not load._check_input(np.ones(30))
     with pytest.raises(ValueError):
-        load.baseload_heating = np.ones(13)
+        load.baseload_extraction = np.ones(13)
     with pytest.raises(ValueError):
-        load.baseload_cooling = np.ones(13)
+        load.baseload_injection = np.ones(13)

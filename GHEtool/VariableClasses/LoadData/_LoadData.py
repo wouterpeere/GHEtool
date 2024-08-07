@@ -30,8 +30,6 @@ class _LoadData(BaseClass, ABC):
         """
         self.hourly_resolution: bool = hourly_resolution
         self.simulation_period: int = simulation_period
-        self._peak_cooling_duration: int = _LoadData.DEFAULT_LENGTH_PEAK
-        self._peak_heating_duration: int = _LoadData.DEFAULT_LENGTH_PEAK
         self.tm: int = _LoadData.AVG_UPM * 3600  # time in a month in seconds
         self._all_months_equal: bool = True  # true if it is assumed that all months are of the same length
         self._start_month: float = 1
@@ -374,60 +372,6 @@ class _LoadData(BaseClass, ABC):
         monthly average load : np.ndarray
         """
         return self.baseload_cooling_power_simulation_period - self.baseload_heating_power_simulation_period
-
-    @property
-    def peak_heating_duration(self) -> float:
-        """
-        Length of the peak in heating.
-
-        Returns
-        -------
-        Length peak in heating [s]
-        """
-        return self._peak_heating_duration * 3600
-
-    @peak_heating_duration.setter
-    def peak_heating_duration(self, duration: float) -> None:
-        """
-        This function sets the duration of the peak in heating.
-
-        Parameters
-        ----------
-        duration : float
-            Duration of the peak in hours
-
-        Returns
-        -------
-        None
-        """
-        self._peak_heating_duration = duration
-
-    @property
-    def peak_cooling_duration(self) -> float:
-        """
-        Duration of the peak in cooling.
-
-        Returns
-        -------
-        Duration of the peak in cooling [s]
-        """
-        return self._peak_cooling_duration * 3600
-
-    @peak_cooling_duration.setter
-    def peak_cooling_duration(self, duration: float) -> None:
-        """
-        This function sets the duration of the peak in cooling.
-
-        Parameters
-        ----------
-        duration : float
-            Duration of the peak in hours
-
-        Returns
-        -------
-        None
-        """
-        self._peak_cooling_duration = duration
 
     @property
     def peak_duration(self) -> None:

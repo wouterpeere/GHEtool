@@ -20,48 +20,58 @@ class _MonthlyData(ABC):
     @abc.abstractmethod
     def monthly_baseload_injection_simulation_period(self) -> np.ndarray:
         """
+        This function returns the monthly injection baseload in kWh/month for the whole simulation period.
 
         Returns
         -------
-
+        baseload injection : np.ndarray
+            baseload injection for the whole simulation period
         """
 
     @abc.abstractmethod
     def monthly_baseload_extraction_simulation_period(self) -> np.ndarray:
         """
+        This function returns the monthly extraction baseload in kWh/month for the whole simulation period.
 
         Returns
         -------
-
+        baseload extraction : np.ndarray
+            baseload extraction for the whole simulation period
         """
 
     @abc.abstractmethod
     def monthly_peak_injection_simulation_period(self) -> np.ndarray:
         """
+        This function returns the monthly injection peak in kW/month for the whole simulation period.
 
         Returns
         -------
-
+        peak injection : np.ndarray
+            peak injection for the whole simulation period
         """
 
     @abc.abstractmethod
     def monthly_peak_extraction_simulation_period(self) -> np.ndarray:
         """
+        This function returns the monthly extraction peak in kW/month for the whole simulation period.
 
         Returns
         -------
-
+        peak extraction : np.ndarray
+            peak extraction for the whole simulation period
         """
 
     @property
     def simulation_period(self) -> int:
         """
+        This property returns the simulation period.
 
         Returns
         -------
-
+        simulation period
+            int
         """
-        return int(len(self.monthly_baseload_extraction_average_year) / 12)
+        return int(len(self.monthly_baseload_extraction) / 12)
 
     @property
     def all_months_equal(self) -> bool:
@@ -110,7 +120,7 @@ class _MonthlyData(ABC):
             return np.array([744, 672, 744, 720, 744, 720, 744, 744, 720, 744, 720, 744], dtype=np.int64)
 
     @property
-    def monthly_baseload_injection_average_year(self) -> np.ndarray:
+    def monthly_baseload_injection(self) -> np.ndarray:
         """
 
         Returns
@@ -121,7 +131,7 @@ class _MonthlyData(ABC):
                        axis=0)
 
     @property
-    def monthly_baseload_extraction_average_year(self) -> np.ndarray:
+    def monthly_baseload_extraction(self) -> np.ndarray:
         """
 
         Returns
@@ -132,7 +142,7 @@ class _MonthlyData(ABC):
                        axis=0)
 
     @property
-    def monthly_peak_injection_average_year(self) -> np.ndarray:
+    def monthly_peak_injection(self) -> np.ndarray:
         """
 
         Returns
@@ -143,7 +153,7 @@ class _MonthlyData(ABC):
                        axis=0)
 
     @property
-    def monthly_peak_extraction_average_year(self) -> np.ndarray:
+    def monthly_peak_extraction(self) -> np.ndarray:
         """
 
         Returns
@@ -154,24 +164,24 @@ class _MonthlyData(ABC):
                        axis=0)
 
     @property
-    def monthly_baseload_injection_power_average_year(self) -> np.ndarray:
+    def monthly_baseload_injection_power(self) -> np.ndarray:
         """
 
         Returns
         -------
 
         """
-        return np.divide(self.monthly_baseload_injection_average_year, self.UPM)
+        return np.divide(self.monthly_baseload_injection, self.UPM)
 
     @property
-    def monthly_baseload_extraction_power_average_year(self) -> np.ndarray:
+    def monthly_baseload_extraction_power(self) -> np.ndarray:
         """
 
         Returns
         -------
 
         """
-        return np.divide(self.monthly_baseload_extraction_average_year, self.UPM)
+        return np.divide(self.monthly_baseload_extraction, self.UPM)
 
     @property
     def monthly_baseload_injection_power_simulation_period(self) -> np.ndarray:
@@ -203,7 +213,7 @@ class _MonthlyData(ABC):
         float
             Yearly injection load kWh/year
         """
-        return np.sum(self.monthly_baseload_injection_average_year)
+        return np.sum(self.monthly_baseload_injection)
 
     @property
     def yearly_average_extraction_load(self) -> float:
@@ -215,7 +225,7 @@ class _MonthlyData(ABC):
         float
             Yearly extraction load kWh/year
         """
-        return np.sum(self.monthly_baseload_extraction_average_year)
+        return np.sum(self.monthly_baseload_extraction)
 
     @property
     def yearly_extraction_load_simulation_period(self) -> np.array:
@@ -290,8 +300,7 @@ class _MonthlyData(ABC):
         -------
         monthly average load : np.ndarray
         """
-        return np.mean(self.monthly_average_power_simulation_period.reshape((self.simulation_period, 12)),
-                       axis=0)
+        return np.mean(self.monthly_average_power_simulation_period.reshape((self.simulation_period, 12)), axis=0)
 
     @property
     def monthly_average_power_simulation_period(self) -> np.ndarray:
@@ -503,8 +512,8 @@ class _MonthlyData(ABC):
             th = self.peak_extraction_duration
 
             # Select month with the highest peak load and take both the peak and average load from that month
-            month_index = self.get_month_index(self.monthly_peak_extraction_average_year,
-                                               self.monthly_baseload_extraction_average_year)
+            month_index = self.get_month_index(self.monthly_peak_extraction,
+                                               self.monthly_baseload_extraction)
             qm = self.monthly_average_power[month_index] * 1000.
             qh = self.max_peak_extraction * 1000.
 
@@ -519,8 +528,8 @@ class _MonthlyData(ABC):
             th = self.peak_injection_duration
 
             # Select month with the highest peak load and take both the peak and average load from that month
-            month_index = self.get_month_index(self.monthly_peak_injection_average_year,
-                                               self.monthly_baseload_injection_power_average_year)
+            month_index = self.get_month_index(self.monthly_peak_injection,
+                                               self.monthly_baseload_injection_power)
             qm = self.monthly_average_power[month_index] * 1000.
             qh = self.max_peak_injection * 1000.
 
@@ -552,8 +561,8 @@ class _MonthlyData(ABC):
             th = self.peak_extraction_duration
 
             # Select month with the highest peak load and take both the peak and average load from that month
-            month_index = self.get_month_index(self.monthly_peak_extraction_average_year,
-                                               self.monthly_baseload_extraction_power_average_year)
+            month_index = self.get_month_index(self.monthly_peak_extraction,
+                                               self.monthly_baseload_extraction_power)
             qh = self.max_peak_extraction * 1000.
 
             qm = self.monthly_average_power[month_index] * 1000.
@@ -571,8 +580,8 @@ class _MonthlyData(ABC):
             th = self.peak_injection_duration
 
             # Select month with the highest peak load and take both the peak and average load from that month
-            month_index = self.get_month_index(self.monthly_peak_injection_average_year,
-                                               self.monthly_baseload_injection_power_average_year)
+            month_index = self.get_month_index(self.monthly_peak_injection,
+                                               self.monthly_baseload_injection_power)
             qh = self.max_peak_injection * 1000.
 
             qm = self.monthly_average_power[month_index] * 1000.
