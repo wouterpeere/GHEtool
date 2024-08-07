@@ -2,15 +2,15 @@ import abc
 
 import numpy as np
 
-from ._MonthlyData import _MonthlyData
+from ._LoadData import _LoadData
 from abc import ABC
 from typing import Tuple
 
 
-class _HourlyData(_MonthlyData, ABC):
+class _HourlyData(_LoadData, ABC):
 
     def __init__(self):
-        _MonthlyData.__init__(self)
+        _LoadData.__init__(self)
         self.hourly_resolution = True
 
         # initiate variables

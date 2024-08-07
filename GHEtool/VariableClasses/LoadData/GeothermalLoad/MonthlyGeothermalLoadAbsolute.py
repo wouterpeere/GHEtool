@@ -2,7 +2,7 @@ import warnings
 
 import numpy as np
 
-from GHEtool.VariableClasses.LoadData.Baseclasses import _SingleYear, _MonthlyData
+from GHEtool.VariableClasses.LoadData.Baseclasses import _SingleYear, _LoadData
 from GHEtool.VariableClasses.LoadData.GeothermalLoad import HourlyGeothermalLoad
 from GHEtool.VariableClasses.LoadData.GeothermalLoad.HourlyGeothermalLoadMultiYear import HourlyGeothermalLoadMultiYear
 from GHEtool.logger.ghe_logger import ghe_logger
@@ -10,7 +10,7 @@ from GHEtool.logger.ghe_logger import ghe_logger
 from numpy.typing import ArrayLike
 
 
-class MonthlyGeothermalLoadAbsolute(_SingleYear, _MonthlyData):
+class MonthlyGeothermalLoadAbsolute(_SingleYear, _LoadData):
     """
     This class contains all the information for geothermal load data with a monthly resolution and absolute input.
     This means that the inputs are both in kWh/month and kW/month.
@@ -43,7 +43,7 @@ class MonthlyGeothermalLoadAbsolute(_SingleYear, _MonthlyData):
             Yearly consumption of domestic hot water [kWh/year]
         """
 
-        _MonthlyData.__init__(self)
+        _LoadData.__init__(self)
         _SingleYear.__init__(self, simulation_period)
 
         self.exclude_DHW_from_peak: bool = False  # by default, the DHW increase the peak load. Set to false,

@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import numpy as np
 
-from GHEtool.VariableClasses.LoadData.Baseclasses import _MonthlyData
+from GHEtool.VariableClasses.LoadData.Baseclasses import _LoadData
 from GHEtool.VariableClasses.LoadData.GeothermalLoad.MonthlyGeothermalLoadAbsolute import MonthlyGeothermalLoadAbsolute
 from GHEtool.logger.ghe_logger import ghe_logger
 
 from numpy.typing import ArrayLike
 
 
-class MonthlyGeothermalLoadMultiYear(_MonthlyData):
+class MonthlyGeothermalLoadMultiYear(_LoadData):
     """
     This class contains all the information for geothermal load data with a monthly resolution and absolute input.
     This means that the inputs are both in kWh/month and kW/month.

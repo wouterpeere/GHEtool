@@ -7,15 +7,15 @@ from GHEtool.logger.ghe_logger import ghe_logger
 from numpy.typing import ArrayLike
 
 
-class _MonthlyData(ABC):
+class _LoadData(ABC):
     AVG_UPM: int = 730  # number of hours per month
     DEFAULT_LENGTH_PEAK: int = 6  # hours
 
     def __init__(self):
-        self.tm: int = _MonthlyData.AVG_UPM * 3600  # time in a month in seconds
+        self.tm: int = _LoadData.AVG_UPM * 3600  # time in a month in seconds
         self._all_months_equal: bool = True  # true if it is assumed that all months are of the same length
-        self._peak_injection_duration: int = _MonthlyData.DEFAULT_LENGTH_PEAK
-        self._peak_extraction_duration: int = _MonthlyData.DEFAULT_LENGTH_PEAK
+        self._peak_injection_duration: int = _LoadData.DEFAULT_LENGTH_PEAK
+        self._peak_extraction_duration: int = _LoadData.DEFAULT_LENGTH_PEAK
         self.hourly_resolution = False
 
         # initiate variables
@@ -121,7 +121,7 @@ class _MonthlyData(ABC):
         """
         if self.all_months_equal:
             # every month has equal length
-            return np.full(12, _MonthlyData.AVG_UPM, dtype=np.int64)
+            return np.full(12, _LoadData.AVG_UPM, dtype=np.int64)
         else:
             return np.array([744, 672, 744, 720, 744, 720, 744, 744, 720, 744, 720, 744], dtype=np.int64)
 
