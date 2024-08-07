@@ -11,8 +11,8 @@ class _LoadData(BaseClass, ABC):
     """
     This class contains information w.r.t. load data for the borefield sizing.
     """
-    __slots__ = 'hourly_resolution', 'simulation_period', '_peak_heating_duration', '_peak_cooling_duration', 'tm',\
-                '_all_months_equal', '_dhw_yearly'
+    __slots__ = 'hourly_resolution', 'simulation_period', '_peak_heating_duration', '_peak_cooling_duration', 'tm', \
+        '_all_months_equal', '_dhw_yearly'
 
     AVG_UPM: float = 730.  # number of hours per month
     DEFAULT_LENGTH_PEAK: int = 6  # hours
@@ -34,10 +34,7 @@ class _LoadData(BaseClass, ABC):
         self._peak_heating_duration: int = _LoadData.DEFAULT_LENGTH_PEAK
         self.tm: int = _LoadData.AVG_UPM * 3600  # time in a month in seconds
         self._all_months_equal: bool = True  # true if it is assumed that all months are of the same length
-        self._dhw_yearly: float = 0.
         self._start_month: float = 1
-        self.exclude_DHW_from_peak: bool = False  # by default, the DHW increase the peak load. Set to false,
-                                                  # if you only want the heating load to determine the peak in extraction
 
     @property
     def start_month(self) -> int:
@@ -343,7 +340,6 @@ class _LoadData(BaseClass, ABC):
             yearly cooling for the whole simulation period
         """
         return np.max(np.reshape(self.peak_cooling_simulation_period, (self.simulation_period, 12)), axis=1)
-
 
     @property
     def imbalance(self) -> float:
@@ -655,68 +651,6 @@ class _LoadData(BaseClass, ABC):
         max peak heating : float
         """
         return np.max(self.peak_heating_simulation_period)
-
-    def add_dhw(self, dhw: float) -> None:
-        """
-        This function adds the domestic hot water (dhw).
-        An error is raies is the dhw is not positive.
-
-        Parameters
-        ----------
-        dhw : float
-            Yearly consumption of domestic hot water [kWh/year]
-
-        Returns
-        -------
-        None
-        """
-        self.dhw = dhw
-
-    @property
-    def dhw(self) -> float:
-        """
-        This function returns the yearly domestic hot water consumption.
-
-        Returns
-        -------
-        dhw : float
-            Yearly domestic hot water consumption [kWh/year]
-        """
-        return self._dhw_yearly
-
-    @dhw.setter
-    def dhw(self, dhw: float) -> None:
-        """
-        This function adds the domestic hot water (dhw).
-        An error is raies is the dhw is not positive.
-
-        Parameters
-        ----------
-        dhw : float
-            Yearly consumption of domestic hot water [kWh/year]
-
-        Returns
-        -------
-        None
-        """
-        if not isinstance(dhw, (float, int)):
-            raise ValueError('Please fill in a number for the domestic hot water.')
-        if not dhw >= 0:
-            raise ValueError(f'Please fill in a positive value for the domestic hot water instead of {dhw}.')
-        self._dhw_yearly = dhw
-
-    @property
-    def dhw_power(self) -> float:
-        """
-        This function returns the power related to the dhw production.
-
-        Returns
-        -------
-        dhw power : float
-        """
-        if self.exclude_DHW_from_peak:
-            return 0
-        return self._dhw_yearly / 8760
 
     @abc.abstractmethod
     def correct_for_start_month(self, array: np.ndarray) -> np.ndarray:

@@ -17,7 +17,8 @@ def test_load_hourly_data():
     assert np.array_equal(load.hourly_cooling_load, load1.hourly_heating_load)
     assert np.array_equal(load.hourly_heating_load, load1.hourly_cooling_load)
     load2 = HourlyGeothermalLoad()
-    load2.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile_without_header.csv"), header=False)
+    load2.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile_without_header.csv"),
+                              header=False)
     assert np.array_equal(load.hourly_cooling_load, load2.hourly_cooling_load)
     assert np.array_equal(load.hourly_heating_load, load2.hourly_heating_load)
 
@@ -26,29 +27,29 @@ def test_checks():
     load = HourlyGeothermalLoad()
     assert not load._check_input(2)
     assert not load._check_input(np.ones(8759))
-    assert not load._check_input(-1*np.ones(8760))
-    assert load._check_input([1]*8760)
+    assert not load._check_input(-1 * np.ones(8760))
+    assert load._check_input([1] * 8760)
     assert load._check_input(np.ones(8760))
 
 
 def test_imbalance():
-    load = HourlyGeothermalLoad(np.ones(8760)*10, np.ones(8760))
+    load = HourlyGeothermalLoad(np.ones(8760) * 10, np.ones(8760))
     assert load.imbalance == -78840
-    load = HourlyGeothermalLoad(np.ones(8760), np.ones(8760)*10)
+    load = HourlyGeothermalLoad(np.ones(8760), np.ones(8760) * 10)
     assert load.imbalance == 78840
 
 
 def test_load_duration(monkeypatch):
     monkeypatch.setattr(plt, "show", lambda: None)
-    load = HourlyGeothermalLoad(np.ones(8760)*10, np.ones(8760))
+    load = HourlyGeothermalLoad(np.ones(8760) * 10, np.ones(8760))
     load.plot_load_duration(legend=True)
 
 
 def test_resample_to_monthly():
     load = HourlyGeothermalLoad()
     peak, baseload = load.resample_to_monthly(np.tile(np.linspace(0, 729, 730), 12))
-    assert np.array_equal(peak, np.ones(12)*729)
-    assert np.array_equal(baseload, np.ones(12)*266085)
+    assert np.array_equal(peak, np.ones(12) * 729)
+    assert np.array_equal(baseload, np.ones(12) * 266085)
     load.all_months_equal = False
     peak, baseload = load.resample_to_monthly(np.tile(np.linspace(0, 729, 730), 12))
     assert np.array_equal(peak, np.array([729., 685., 729., 729., 729., 729., 729., 729., 729., 729., 729., 729.]))
@@ -58,19 +59,19 @@ def test_resample_to_monthly():
 
 def test_yearly_loads():
     load = HourlyGeothermalLoad(heating_load=np.linspace(0, 8759, 8760),
-                                cooling_load=np.linspace(0, 8759, 8760)*2,
+                                cooling_load=np.linspace(0, 8759, 8760) * 2,
                                 simulation_period=10)
-    assert np.array_equal(load.yearly_cooling_load_simulation_period, [76728840]*10)
-    assert np.array_equal(load.yearly_heating_load_simulation_period, [38364420]*10)
-    assert np.array_equal(load.yearly_cooling_peak_simulation_period, [17518]*10)
-    assert np.array_equal(load.yearly_heating_peak_simulation_period, [8759]*10)
+    assert np.array_equal(load.yearly_cooling_load_simulation_period, [76728840] * 10)
+    assert np.array_equal(load.yearly_heating_load_simulation_period, [38364420] * 10)
+    assert np.array_equal(load.yearly_cooling_peak_simulation_period, [17518] * 10)
+    assert np.array_equal(load.yearly_heating_peak_simulation_period, [8759] * 10)
 
 
 def test_baseload_heating():
     load = HourlyGeothermalLoad()
     assert np.array_equal(load.baseload_heating, np.zeros(12))
     load.hourly_heating_load = np.repeat(np.linspace(0, 11, 12), 730)
-    assert np.array_equal(load.baseload_heating, np.linspace(0, 11, 12)*730)
+    assert np.array_equal(load.baseload_heating, np.linspace(0, 11, 12) * 730)
     assert np.array_equal(load.baseload_heating / 730, load.baseload_heating_power)
     assert np.array_equal(load.baseload_heating_power, load.peak_heating)
 
@@ -111,7 +112,7 @@ def test_load_simulation_period():
     assert np.array_equal(load.hourly_cooling_load_simulation_period,
                           np.tile(np.linspace(50, 8759, 8760), load.simulation_period))
     assert np.array_equal(load.hourly_load_simulation_period,
-                          np.tile(-np.linspace(0, 8759, 8760)+np.linspace(50, 8759, 8760), load.simulation_period))
+                          np.tile(-np.linspace(0, 8759, 8760) + np.linspace(50, 8759, 8760), load.simulation_period))
 
 
 def test_set_hourly_values():
@@ -161,8 +162,8 @@ def test_checks_multiyear():
     load = HourlyGeothermalLoadMultiYear()
     assert not load._check_input(2)
     assert not load._check_input(np.ones(8759))
-    assert not load._check_input(-1*np.ones(8760))
-    assert load._check_input([1]*8760)
+    assert not load._check_input(-1 * np.ones(8760))
+    assert load._check_input([1] * 8760)
     assert load._check_input(np.ones(8760))
     assert load._check_input(np.ones(8760 * 3))
     assert not load._check_input(np.ones(9000))
@@ -170,11 +171,11 @@ def test_checks_multiyear():
 
 def test_set_hourly_load_multi_year():
     load = HourlyGeothermalLoadMultiYear()
-    load.hourly_heating_load = np.linspace(0, 8759*2+1, 8760*2)
-    assert len(load._hourly_heating_load) == 8760*2
+    load.hourly_heating_load = np.linspace(0, 8759 * 2 + 1, 8760 * 2)
+    assert len(load._hourly_heating_load) == 8760 * 2
     assert len(load.hourly_heating_load) == 8760
     assert load.simulation_period == 2
-    assert np.array_equal(load.hourly_heating_load, np.linspace(0 + 8760/2, 8759 + 8760/2, 8760))
+    assert np.array_equal(load.hourly_heating_load, np.linspace(0 + 8760 / 2, 8759 + 8760 / 2, 8760))
     assert np.array_equal(load.hourly_heating_load_simulation_period, load._hourly_heating_load)
     load.hourly_cooling_load = np.linspace(0, 8759 * 2 + 1, 8760 * 2)
     assert len(load._hourly_cooling_load) == 8760 * 2
@@ -183,13 +184,13 @@ def test_set_hourly_load_multi_year():
     assert np.array_equal(load.hourly_cooling_load, np.linspace(0 + 8760 / 2, 8759 + 8760 / 2, 8760))
     assert np.array_equal(load.hourly_cooling_load_simulation_period, load._hourly_cooling_load)
     load._hourly_cooling_load = load._hourly_cooling_load - 20
-    assert np.array_equal(load.hourly_load_simulation_period, load._hourly_cooling_load-load._hourly_heating_load)
+    assert np.array_equal(load.hourly_load_simulation_period, load._hourly_cooling_load - load._hourly_heating_load)
 
 
 def test_imbalance_multi_year():
-    load = HourlyGeothermalLoad(np.ones(8760)*10, np.ones(8760))
+    load = HourlyGeothermalLoad(np.ones(8760) * 10, np.ones(8760))
     assert load.imbalance == -78840
-    load = HourlyGeothermalLoad(np.ones(8760), np.ones(8760)*10)
+    load = HourlyGeothermalLoad(np.ones(8760), np.ones(8760) * 10)
     assert load.imbalance == 78840
 
 
@@ -202,18 +203,18 @@ def test_set_hourly_values_multi_year():
 
 
 def test_monthly_based_on_hourly_multi_year():
-    load = HourlyGeothermalLoadMultiYear(heating_load=np.arange(0, 8760*2, 1),
-                                         cooling_load=np.arange(0, 8760*2, 1)*2)
+    load = HourlyGeothermalLoadMultiYear(heating_load=np.arange(0, 8760 * 2, 1),
+                                         cooling_load=np.arange(0, 8760 * 2, 1) * 2)
     heating = np.array([729, 1459, 2189, 2919, 3649, 4379, 5109, 5839, 6569, 7299, 8029, 8759, 9489,
                         10219, 10949, 11679, 12409, 13139, 13869, 14599, 15329, 16059, 16789, 17519])
-    heating_bl = np.array([np.sum(np.arange(0, 8760*2, 1)[i-730:i]) for i in range(730, 8760*2+1, 730)])
+    heating_bl = np.array([np.sum(np.arange(0, 8760 * 2, 1)[i - 730:i]) for i in range(730, 8760 * 2 + 1, 730)])
     assert np.allclose(load.peak_heating_simulation_period, heating)
-    assert np.allclose(load.peak_cooling_simulation_period, heating*2)
+    assert np.allclose(load.peak_cooling_simulation_period, heating * 2)
     assert np.allclose(load.baseload_heating_simulation_period, heating_bl)
     assert np.allclose(load.baseload_cooling_simulation_period, heating_bl * 2)
-    assert np.allclose(load.baseload_heating_power_simulation_period, heating_bl/730)
-    assert np.allclose(load.baseload_cooling_power_simulation_period, heating_bl * 2/730)
-    assert np.allclose(load.monthly_average_load_simulation_period, heating_bl/730)
+    assert np.allclose(load.baseload_heating_power_simulation_period, heating_bl / 730)
+    assert np.allclose(load.baseload_cooling_power_simulation_period, heating_bl * 2 / 730)
+    assert np.allclose(load.monthly_average_load_simulation_period, heating_bl / 730)
 
 
 def test_resample_to_monthly_multiyear():
@@ -224,9 +225,11 @@ def test_resample_to_monthly_multiyear():
     assert np.array_equal(baseload, np.full(24, 266085))
     load.all_months_equal = False
     peak, baseload = load.resample_to_monthly(np.tile(np.linspace(0, 729, 730), 24))
-    assert np.array_equal(peak, np.tile(np.array([729., 685., 729., 729., 729., 729., 729., 729., 729., 729., 729., 729.]), 2))
+    assert np.array_equal(peak,
+                          np.tile(np.array([729., 685., 729., 729., 729., 729., 729., 729., 729., 729., 729., 729.]),
+                                  2))
     assert np.array_equal(baseload, np.tile(np.array([266176., 234864., 275780., 259140., 275836., 259100.,
-                                              275892., 276088., 258920., 276144., 258880., 276200.]), 2))
+                                                      275892., 276088., 258920., 276144., 258880., 276200.]), 2))
 
 
 def test_dhw():
@@ -241,13 +244,13 @@ def test_dhw():
     with pytest.raises(ValueError):
         load.add_dhw(-10)
 
-    load.dhw = 8760*10
+    load.dhw = 8760 * 10
     assert np.array_equal(np.full(12, 10), load.peak_heating)
     assert np.array_equal(np.full(8760, 10), load.hourly_heating_load)
     assert load.max_peak_heating == 10
     assert np.array_equal(np.full(8760, 10), load.hourly_heating_load)
-    assert np.array_equal(np.full(12, 8760*10/12), load.baseload_heating)
-    assert load.imbalance == -8760*10
+    assert np.array_equal(np.full(12, 8760 * 10 / 12), load.baseload_heating)
+    assert load.imbalance == -8760 * 10
 
 
 def test_eq():
@@ -288,17 +291,17 @@ def test_eq_multiyear():
     profile_1.simulation_period = 55
     assert profile_1 != profile_2
 
-    profile_1.hourly_cooling_load = np.linspace(0, 10000, 8760*55)
+    profile_1.hourly_cooling_load = np.linspace(0, 10000, 8760 * 55)
     profile_2.simulation_period = 55
     assert profile_1 != profile_2
 
-    profile_2.hourly_cooling_load = np.linspace(0, 10000, 8760*55)
+    profile_2.hourly_cooling_load = np.linspace(0, 10000, 8760 * 55)
     assert profile_1 == profile_2
 
-    profile_1.hourly_heating_load = np.linspace(0, 8759, 8760*55)
+    profile_1.hourly_heating_load = np.linspace(0, 8759, 8760 * 55)
     assert profile_1 != profile_2
 
-    profile_2.hourly_heating_load = np.linspace(0, 8759, 8760*55)
+    profile_2.hourly_heating_load = np.linspace(0, 8759, 8760 * 55)
     assert profile_1 == profile_2
 
 
@@ -345,10 +348,16 @@ def test_add():
 
     assert result.simulation_period == 30
     assert result.dhw == 30000
-    assert np.allclose(result._baseload_heating, load_1._baseload_heating + load_hourly.resample_to_monthly(load_hourly._hourly_heating_load)[1])
-    assert np.allclose(result._baseload_cooling, load_1._baseload_cooling + load_hourly.resample_to_monthly(load_hourly._hourly_cooling_load)[1])
-    assert np.allclose(result._peak_heating, load_1._peak_heating + load_hourly.resample_to_monthly(load_hourly._hourly_heating_load)[0])
-    assert np.allclose(result._peak_cooling, load_1._peak_cooling + load_hourly.resample_to_monthly(load_hourly._hourly_cooling_load)[0])
+    assert np.allclose(result._baseload_extraction,
+                       load_1._baseload_extraction + load_hourly.resample_to_monthly(load_hourly._hourly_heating_load)[
+                           1])
+    assert np.allclose(result._baseload_injection,
+                       load_1._baseload_injection + load_hourly.resample_to_monthly(load_hourly._hourly_cooling_load)[
+                           1])
+    assert np.allclose(result._peak_extraction,
+                       load_1._peak_extraction + load_hourly.resample_to_monthly(load_hourly._hourly_heating_load)[0])
+    assert np.allclose(result._peak_injection,
+                       load_1._peak_injection + load_hourly.resample_to_monthly(load_hourly._hourly_cooling_load)[0])
 
     # test multiyear
     load_1 = HourlyGeothermalLoadMultiYear(heating_load=np.arange(0, 8760 * 2, 1),
@@ -377,8 +386,8 @@ def test_add():
 def test_add_multiyear():
     load_1 = HourlyGeothermalLoadMultiYear(heating_load=np.arange(0, 8760, 1),
                                            cooling_load=np.full(8760, 2))
-    load_2 = HourlyGeothermalLoadMultiYear(cooling_load=np.arange(0, 8760*2, 1) + 1,
-                                           heating_load=np.full(8760*2, 3))
+    load_2 = HourlyGeothermalLoadMultiYear(cooling_load=np.arange(0, 8760 * 2, 1) + 1,
+                                           heating_load=np.full(8760 * 2, 3))
 
     with pytest.raises(TypeError):
         load_1 + 55
@@ -403,15 +412,18 @@ def test_add_multiyear():
     with pytest.warns():
         result = load_1 + load_2
 
-    assert np.allclose(result._hourly_heating_load, load_1._hourly_heating_load + np.tile(load_2.hourly_heating_load, load_1.simulation_period))
-    assert np.allclose(result._hourly_cooling_load, load_1._hourly_cooling_load + np.tile(load_2.hourly_cooling_load, load_1.simulation_period))
+    assert np.allclose(result._hourly_heating_load,
+                       load_1._hourly_heating_load + np.tile(load_2.hourly_heating_load, load_1.simulation_period))
+    assert np.allclose(result._hourly_cooling_load,
+                       load_1._hourly_cooling_load + np.tile(load_2.hourly_cooling_load, load_1.simulation_period))
     assert np.allclose(result.hourly_heating_load, load_1.hourly_heating_load + load_2.hourly_heating_load)
     assert np.allclose(result.hourly_cooling_load, load_1.hourly_cooling_load + load_2.hourly_cooling_load)
 
     assert np.allclose(result._hourly_heating_load,
-                   load_1._hourly_heating_load + np.tile(load_2._hourly_heating_load + load_2.dhw_power, load_1.simulation_period))
+                       load_1._hourly_heating_load + np.tile(load_2._hourly_heating_load + load_2.dhw_power,
+                                                             load_1.simulation_period))
     assert np.allclose(result._hourly_cooling_load,
-                   load_1._hourly_cooling_load + np.tile(load_2._hourly_cooling_load, load_1.simulation_period))
+                       load_1._hourly_cooling_load + np.tile(load_2._hourly_cooling_load, load_1.simulation_period))
 
     # monthly load
     load_2 = MonthlyGeothermalLoadAbsolute(*load_case(1))
@@ -421,9 +433,9 @@ def test_add_multiyear():
 
 
 def test_yearly_loads_multiyear():
-    load = HourlyGeothermalLoadMultiYear(heating_load=np.linspace(0, 8759*2+1, 8760*2),
-                                         cooling_load=np.linspace(0, 8759*2+1, 8760*2)*2)
-    assert np.array_equal(load.yearly_cooling_load_simulation_period, [76728840, 115102020*2])
+    load = HourlyGeothermalLoadMultiYear(heating_load=np.linspace(0, 8759 * 2 + 1, 8760 * 2),
+                                         cooling_load=np.linspace(0, 8759 * 2 + 1, 8760 * 2) * 2)
+    assert np.array_equal(load.yearly_cooling_load_simulation_period, [76728840, 115102020 * 2])
     assert np.array_equal(load.yearly_heating_load_simulation_period, [38364420, 115102020])
     assert np.array_equal(load.yearly_cooling_peak_simulation_period, [17518, 35038])
     assert np.array_equal(load.yearly_heating_peak_simulation_period, [8759, 17519])

@@ -12,6 +12,9 @@ class _SingleYear(ABC):
         self._simulation_period = None
         self._start_month = None
 
+        self.simulation_period = simulation_period
+        self.start_month = start_month
+
     @property
     def start_month(self) -> int:
         """

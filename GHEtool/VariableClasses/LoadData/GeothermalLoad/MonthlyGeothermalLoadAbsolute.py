@@ -3,6 +3,7 @@ import warnings
 import numpy as np
 
 from GHEtool.VariableClasses.LoadData._LoadData import _LoadData
+from GHEtool.VariableClasses.LoadData.Baseclasses import _SingleYear, _MonthlyData
 from GHEtool.VariableClasses.LoadData.GeothermalLoad import HourlyGeothermalLoad
 from GHEtool.VariableClasses.LoadData.GeothermalLoad.HourlyGeothermalLoadMultiYear import HourlyGeothermalLoadMultiYear
 from GHEtool.logger.ghe_logger import ghe_logger
@@ -10,22 +11,20 @@ from GHEtool.logger.ghe_logger import ghe_logger
 from numpy.typing import ArrayLike
 
 
-class MonthlyGeothermalLoadAbsolute(_LoadData):
+class MonthlyGeothermalLoadAbsolute(_SingleYear, _MonthlyData, _LoadData):
     """
     This class contains all the information for geothermal load data with a monthly resolution and absolute input.
     This means that the inputs are both in kWh/month and kW/month.
     """
 
-    __slots__ = tuple(_LoadData.__slots__) + ("_baseload_heating", "_baseload_cooling", "_peak_heating", "_peak_cooling")
-
     def __init__(
-        self,
-        baseload_heating: ArrayLike = None,
-        baseload_cooling: ArrayLike = None,
-        peak_heating: ArrayLike = None,
-        peak_cooling: ArrayLike = None,
-        simulation_period: int = 20,
-        dhw: float = 0.0,
+            self,
+            baseload_heating: ArrayLike = None,
+            baseload_cooling: ArrayLike = None,
+            peak_heating: ArrayLike = None,
+            peak_cooling: ArrayLike = None,
+            simulation_period: int = 20,
+            dhw: float = 0.0,
     ):
         """
 
@@ -45,13 +44,18 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             Yearly consumption of domestic hot water [kWh/year]
         """
 
-        super().__init__(hourly_resolution=False, simulation_period=simulation_period)
+        _LoadData.__init__(self, hourly_resolution=False, simulation_period=simulation_period)
+        _MonthlyData.__init__(self)
+        _SingleYear.__init__(self, simulation_period)
 
         # initiate variables
-        self._baseload_heating: np.ndarray = np.zeros(12)
-        self._baseload_cooling: np.ndarray = np.zeros(12)
-        self._peak_heating: np.ndarray = np.zeros(12)
-        self._peak_cooling: np.ndarray = np.zeros(12)
+        self._baseload_extraction: np.ndarray = np.zeros(12)
+        self._baseload_injection: np.ndarray = np.zeros(12)
+        self._peak_extraction: np.ndarray = np.zeros(12)
+        self._peak_injection: np.ndarray = np.zeros(12)
+        self._dhw_yearly: float = 0.
+        self.exclude_DHW_from_peak: bool = False  # by default, the DHW increase the peak load. Set to false,
+        # if you only want the heating load to determine the peak in extraction
 
         # set variables
         self.baseload_heating = np.zeros(12) if baseload_heating is None else baseload_heating
@@ -98,7 +102,7 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
         baseload cooling : np.ndarray
             Baseload cooling values [kWh/month] for one year, so the length of the array is 12
         """
-        return self.correct_for_start_month(self._baseload_cooling)
+        return self.correct_for_start_month(self._baseload_injection)
 
     @baseload_cooling.setter
     def baseload_cooling(self, load: ArrayLike) -> None:
@@ -123,7 +127,7 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             values
         """
         if self._check_input(load):
-            self._baseload_cooling = np.array(load)
+            self._baseload_injection = np.array(load)
             return
         raise ValueError
 
@@ -160,7 +164,7 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
         baseload heating : np.ndarray
             Baseload heating values (incl. DHW) [kWh/month] for one year, so the length of the array is 12
         """
-        return self.correct_for_start_month(self._baseload_heating + self.dhw / 8760 * self.UPM)
+        return self.correct_for_start_month(self._baseload_extraction + self.dhw / 8760 * self.UPM)
 
     @baseload_heating.setter
     def baseload_heating(self, load: ArrayLike) -> None:
@@ -185,7 +189,7 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             values
         """
         if self._check_input(load):
-            self._baseload_heating = np.array(load)
+            self._baseload_extraction = np.array(load)
             return
         raise ValueError
 
@@ -222,7 +226,7 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
         peak cooling : np.ndarray
             Peak cooling values for one year, so the length of the array is 12
         """
-        return self.correct_for_start_month(np.maximum(self._peak_cooling, self.baseload_cooling_power))
+        return self.correct_for_start_month(np.maximum(self._peak_injection, self.baseload_cooling_power))
 
     @peak_cooling.setter
     def peak_cooling(self, load) -> None:
@@ -246,7 +250,7 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             values
         """
         if self._check_input(load):
-            self._peak_cooling = np.array(load)
+            self._peak_injection = np.array(load)
             return
         raise ValueError
 
@@ -282,7 +286,8 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
         peak heating : np.ndarray
             Peak heating values for one year, so the length of the array is 12
         """
-        return self.correct_for_start_month(np.maximum(np.array(self._peak_heating) + self.dhw_power, self.baseload_heating_power))
+        return self.correct_for_start_month(
+            np.maximum(np.array(self._peak_extraction) + self.dhw_power, self.baseload_heating_power))
 
     @peak_heating.setter
     def peak_heating(self, load: ArrayLike) -> None:
@@ -306,7 +311,7 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             values
         """
         if self._check_input(load):
-            self._peak_heating = np.array(load)
+            self._peak_extraction = np.array(load)
             return
         raise ValueError
 
@@ -331,6 +336,76 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             values
         """
         self.peak_heating = np.array(load)
+
+    @property
+    def monthly_baseload_injection_simulation_period(self) -> np.ndarray:
+        """
+
+        Returns
+        -------
+
+        """
+        return np.tile(self._baseload_injection, self.simulation_period)
+
+    @property
+    def monthly_baseload_extraction_simulation_period(self) -> np.ndarray:
+        """
+
+        Returns
+        -------
+
+        """
+        return np.tile(self._baseload_extraction, self.simulation_period)
+
+    @property
+    def monthly_peak_injection_simulation_period(self) -> np.ndarray:
+        """
+
+        Returns
+        -------
+
+        """
+        return np.tile(self._peak_injection, self.simulation_period)
+
+    @property
+    def monthly_peak_extraction_simulation_period(self) -> np.ndarray:
+        """
+
+        Returns
+        -------
+
+        """
+        return np.tile(self._peak_extraction, self.simulation_period)
+
+    @property
+    def peak_duration(self) -> None:
+        """
+        Dummy object to set the length peak for both heating and cooling.
+
+        Returns
+        -------
+        None
+        """
+        return
+
+    @peak_duration.setter
+    def peak_duration(self, duration: float) -> None:
+        """
+        This sets the duration of both the extraction and injection peak.
+
+        Parameters
+        ----------
+        duration : float
+            Duration in hours
+
+        Returns
+        -------
+        None
+        """
+        self.peak_extraction_duration = duration
+        self.peak_injection_duration = duration
+        self.peak_heating_duration = duration
+        self.peak_cooling_duration = duration
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, MonthlyGeothermalLoadAbsolute):
@@ -369,10 +444,10 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
                 )
 
             result = MonthlyGeothermalLoadAbsolute(
-                self._baseload_heating + other._baseload_heating,
-                self._baseload_cooling + other._baseload_cooling,
-                self._peak_heating + other._peak_heating,
-                self._peak_cooling + other._peak_cooling,
+                self._baseload_extraction + other._baseload_extraction,
+                self._baseload_injection + other._baseload_injection,
+                self._peak_extraction + other._peak_extraction,
+                self._peak_injection + other._peak_injection,
                 max(self.simulation_period, other.simulation_period),
                 self.dhw + other.dhw,
             )
@@ -399,10 +474,10 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             peak_cooling, baseload_cooling = other.resample_to_monthly(other._hourly_cooling_load)
 
             result = MonthlyGeothermalLoadAbsolute(
-                self._baseload_heating + baseload_heating,
-                self._baseload_cooling + baseload_cooling,
-                self._peak_heating + peak_heating,
-                self._peak_cooling + peak_cooling,
+                self._baseload_extraction + baseload_heating,
+                self._baseload_injection + baseload_cooling,
+                self._peak_extraction + peak_heating,
+                self._peak_injection + peak_cooling,
                 max(self.simulation_period, other.simulation_period),
                 self.dhw + other.dhw,
             )
@@ -430,4 +505,74 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
         """
         if self.start_month == 1:
             return array
-        return np.concatenate((array[self.start_month - 1 :], array[: self.start_month - 1]))
+        return np.concatenate((array[self.start_month - 1:], array[: self.start_month - 1]))
+
+    def add_dhw(self, dhw: float) -> None:
+        """
+        This function adds the domestic hot water (dhw).
+        An error is raised is the dhw is not positive.
+
+        Parameters
+        ----------
+        dhw : float
+            Yearly consumption of domestic hot water [kWh/year]
+
+        Returns
+        -------
+        None
+        """
+        warnings.warn('In the next version of GHEtool, DHW will be removed from this class. '
+                      'Please use the MonthlyBuildingLoadAbsolute class.', DeprecationWarning)
+        self.dhw = dhw
+
+    @property
+    def dhw(self) -> float:
+        """
+        This function returns the yearly domestic hot water consumption.
+
+        Returns
+        -------
+        dhw : float
+            Yearly domestic hot water consumption [kWh/year]
+        """
+        warnings.warn('In the next version of GHEtool, DHW will be removed from this class. '
+                      'Please use the MonthlyBuildingLoadAbsolute class.', DeprecationWarning)
+        return self._dhw_yearly
+
+    @dhw.setter
+    def dhw(self, dhw: float) -> None:
+        """
+        This function adds the domestic hot water (dhw).
+        An error is raises is the dhw is not positive.
+
+        Parameters
+        ----------
+        dhw : float
+            Yearly consumption of domestic hot water [kWh/year]
+
+        Returns
+        -------
+        None
+        """
+        warnings.warn('In the next version of GHEtool, DHW will be removed from this class. '
+                      'Please use the MonthlyBuildingLoadAbsolute class.', DeprecationWarning)
+        if not isinstance(dhw, (float, int)):
+            raise ValueError('Please fill in a number for the domestic hot water.')
+        if not dhw >= 0:
+            raise ValueError(f'Please fill in a positive value for the domestic hot water instead of {dhw}.')
+        self._dhw_yearly = dhw
+
+    @property
+    def dhw_power(self) -> float:
+        """
+        This function returns the power related to the dhw production.
+
+        Returns
+        -------
+        dhw power : float
+        """
+        warnings.warn('In the next version of GHEtool, DHW will be removed from this class. '
+                      'Please use the MonthlyBuildingLoadAbsolute class.', DeprecationWarning)
+        if self.exclude_DHW_from_peak:
+            return 0
+        return self._dhw_yearly / 8760
