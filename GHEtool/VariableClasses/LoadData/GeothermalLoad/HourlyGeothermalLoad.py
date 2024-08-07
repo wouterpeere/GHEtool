@@ -221,7 +221,7 @@ class HourlyGeothermalLoad(_SingleYear, _HourlyData):
 
     def load_hourly_profile(
             self, file_path: str, header: bool = True, separator: str = ";", decimal_seperator: str = ".",
-            col_heating: int = 0, col_cooling: int = 1
+            col_extraction: int = 0, col_injection: int = 1
     ) -> None:
         """
         This function loads in an hourly load profile [kW].
@@ -236,10 +236,10 @@ class HourlyGeothermalLoad(_SingleYear, _HourlyData):
             Symbol used in the file to separate the columns
         decimal_seperator : str
             Symbol used for the decimal number separation
-        col_heating : int
-            Column index for heating
-        col_cooling : int
-            Column index for cooling
+        col_extraction : int
+            Column index for extraction data
+        col_injection : int
+            Column index for injection data
 
         Returns
         -------
@@ -251,15 +251,15 @@ class HourlyGeothermalLoad(_SingleYear, _HourlyData):
             header = None
 
         # TODO implement single column
-        # if col_heating == col_cooling:
+        # if col_extraction == col_injection:
         #     ghe_logger.info('Only one column with data selected. Load will be splitted into heating and cooling load.')
 
         # import data
         df = pd.read_csv(file_path, sep=separator, header=header, decimal=decimal_seperator)
 
         # set data
-        self.hourly_extraction_load = np.array(df.iloc[:, col_heating])
-        self.hourly_injection_load = np.array(df.iloc[:, col_cooling])
+        self.hourly_extraction_load = np.array(df.iloc[:, col_extraction])
+        self.hourly_injection_load = np.array(df.iloc[:, col_injection])
 
         ghe_logger.info("Hourly profile loaded!")
 

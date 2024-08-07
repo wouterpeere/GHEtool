@@ -23,26 +23,26 @@ pipeData = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
 
 # Monthly loading values
-peakCooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]  # Peak cooling in kW
-peakHeating = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]  # Peak heating in kW
+peak_injection = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]  # Peak cooling in kW
+peak_extraction = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]  # Peak heating in kW
 
 # annual heating and cooling load
 annualHeatingLoad = 300 * 10 ** 3  # kWh
 annualCoolingLoad = 160 * 10 ** 3  # kWh
 
 # percentage of annual load per month (15.5% for January ...)
-monthlyLoadHeatingPercentage = [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144]
-monthlyLoadCoolingPercentage = [0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025]
+baseload_extractionPercentage = [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144]
+baseload_injectionPercentage = [0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025]
 
 # resulting load per month
-monthlyLoadHeating = list(map(lambda x: x * annualHeatingLoad, monthlyLoadHeatingPercentage))  # kWh
-monthlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, monthlyLoadCoolingPercentage))  # kWh
+baseload_extraction = list(map(lambda x: x * annualHeatingLoad, baseload_extractionPercentage))  # kWh
+baseload_injection = list(map(lambda x: x * annualCoolingLoad, baseload_injectionPercentage))  # kWh
 
 custom_field = gt.boreholes.L_shaped_field(N_1=4, N_2=5, B_1=5., B_2=5., H=100., D=4, r_b=0.05)
 
 
 def test_borefield():
-    load = MonthlyGeothermalLoadAbsolute(monthlyLoadHeating, monthlyLoadCooling, peakHeating, peakCooling)
+    load = MonthlyGeothermalLoadAbsolute(baseload_extraction, baseload_injection, peak_extraction, peak_injection)
     borefield = Borefield(load=load)
 
     borefield.set_ground_parameters(data)
@@ -77,7 +77,7 @@ def borefield_quadrants():
 
 @pytest.fixture
 def borefield():
-    load = MonthlyGeothermalLoadAbsolute(monthlyLoadHeating, monthlyLoadCooling, peakHeating, peakCooling)
+    load = MonthlyGeothermalLoadAbsolute(baseload_extraction, baseload_injection, peak_extraction, peak_injection)
     borefield = Borefield(load=load)
 
     borefield.set_ground_parameters(data)
@@ -92,7 +92,7 @@ def borefield():
 
 @pytest.fixture
 def borefield_custom_data():
-    load = MonthlyGeothermalLoadAbsolute(monthlyLoadHeating, monthlyLoadCooling, peakHeating, peakCooling)
+    load = MonthlyGeothermalLoadAbsolute(baseload_extraction, baseload_injection, peak_extraction, peak_injection)
     borefield = Borefield(load=load)
 
     borefield.set_ground_parameters(data)
@@ -120,12 +120,12 @@ def hourly_borefield():
 
 @pytest.fixture
 def borefield_cooling_dom():
-    borefield = Borefield(peak_heating=peakHeating,
-                          peak_cooling=peakCooling,
-                          baseload_heating=monthlyLoadHeating,
-                          baseload_cooling=monthlyLoadCooling)
+    borefield = Borefield(peak_extraction=peak_extraction,
+                          peak_injection=peak_injection,
+                          baseload_extraction=baseload_extraction,
+                          baseload_injection=baseload_injection)
 
-    borefield.load.baseload_cooling = np.array(monthlyLoadCooling) * 2
+    borefield.load.baseload_injection = np.array(baseload_injection) * 2
 
     borefield.set_ground_parameters(data)
     borefield.set_Rb(0.2)
@@ -152,7 +152,7 @@ def test_sizing_L3_threshold_depth_error(borefield):
 
 def test_sizing_L32(borefield_cooling_dom):
     borefield_cooling_dom.size(L3_sizing=True)
-    borefield_cooling_dom.load.peak_heating = np.array(peakHeating) * 5
+    borefield_cooling_dom.load.peak_extraction = np.array(peak_extraction) * 5
     borefield_cooling_dom.size(L3_sizing=True)
 
 
@@ -220,10 +220,10 @@ def test_gfunction_jit(borefield):
 
 
 def test_no_ground_data():
-    borefield = Borefield(peak_heating=peakHeating,
-                          peak_cooling=peakCooling,
-                          baseload_heating=monthlyLoadHeating,
-                          baseload_cooling=monthlyLoadCooling)
+    borefield = Borefield(peak_extraction=peak_extraction,
+                          peak_injection=peak_injection,
+                          baseload_extraction=baseload_extraction,
+                          baseload_injection=baseload_injection)
 
     borefield.set_borefield(borefield_gt)
 
@@ -260,7 +260,7 @@ def test_borefield_with_constant_peaks(borefield):
 
     length_L2_1 = borefield.size_L2(100)
     # set constant peak
-    borefield.load.peak_cooling = [150] * 12
+    borefield.load.peak_injection = [150] * 12
     length_L2_2 = borefield.size_L2(100)
 
     assert np.isclose(length_L2_1, length_L2_2)
@@ -273,7 +273,7 @@ def test_borefield_with_constant_peaks(borefield):
 
     length_L2_1 = borefield.size_L2(100)
     # set constant peak
-    borefield.load.peak_cooling = [240] * 12
+    borefield.load.peak_injection = [240] * 12
     length_L2_2 = borefield.size_L2(100)
 
     assert np.isclose(length_L2_1, length_L2_2, rtol=3 * 10 ** -5)

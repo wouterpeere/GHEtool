@@ -25,36 +25,37 @@ class SizingObject:
 
 class OptimiseLoadProfileObject:
 
-    def __init__(self, borefield: Borefield, load, depth: float, SCOP: float, SEER: float, percentage_heating: float,
-                 percentage_cooling: float, peak_heating_geo: float, peak_cooling_geo: float, peak_heating_ext: float,
-                 peak_cooling_ext: float, name: str = "", power: bool = True, hourly: bool = True,
-                 max_peak_heating: float = None,
-                 max_peak_cooling: float = None):
+    def __init__(self, borefield: Borefield, load, depth: float, SCOP: float, SEER: float, percentage_extraction: float,
+                 percentage_injection: float, peak_extraction_geo: float, peak_injection_geo: float,
+                 peak_extraction_ext: float,
+                 peak_injection_ext: float, name: str = "", power: bool = True, hourly: bool = True,
+                 max_peak_extraction: float = None,
+                 max_peak_injection: float = None):
         self.borefield = copy.deepcopy(borefield)
         self.load = copy.deepcopy(load)
         self.depth = depth
         self.SCOP = SCOP
         self.SEER = SEER
-        self.percentage_heating = percentage_heating
-        self.percentage_cooling = percentage_cooling
-        self.peak_heating_geo = peak_heating_geo
-        self.peak_cooling_geo = peak_cooling_geo
-        self.peak_heating_ext = peak_heating_ext
-        self.peak_cooling_ext = peak_cooling_ext
+        self.percentage_extraction = percentage_extraction
+        self.percentage_injection = percentage_injection
+        self.peak_extraction_geo = peak_extraction_geo
+        self.peak_injection_geo = peak_injection_geo
+        self.peak_extraction_ext = peak_extraction_ext
+        self.peak_injection_ext = peak_injection_ext
         self.name = name
         self.power = power
         self.hourly = hourly
-        self.max_peak_heating = max_peak_heating
-        self.max_peak_cooling = max_peak_cooling
+        self.max_peak_extraction = max_peak_extraction
+        self.max_peak_injection = max_peak_injection
 
     def test(self):  # pragma: no cover
         self.borefield.optimise_load_profile(self.load, self.depth, self.SCOP, self.SEER)
-        assert np.isclose(self.borefield._percentage_heating, self.percentage_heating)
-        assert np.isclose(self.borefield._percentage_cooling, self.percentage_cooling)
-        assert np.isclose(self.borefield.load.max_peak_heating, self.peak_heating_geo)
-        assert np.isclose(self.borefield.load.max_peak_cooling, self.peak_cooling_geo)
-        assert np.isclose(self.borefield._external_load.max_peak_heating, self.peak_heating_ext)
-        assert np.isclose(self.borefield._external_load.max_peak_cooling, self.peak_cooling_ext)
+        assert np.isclose(self.borefield._percentage_extraction, self.percentage_extraction)
+        assert np.isclose(self.borefield._percentage_injection, self.percentage_injection)
+        assert np.isclose(self.borefield.load.max_peak_extraction, self.peak_extraction_geo)
+        assert np.isclose(self.borefield.load.max_peak_injection, self.peak_injection_geo)
+        assert np.isclose(self.borefield._external_load.max_peak_extraction, self.peak_extraction_ext)
+        assert np.isclose(self.borefield._external_load.max_peak_injection, self.peak_injection_ext)
 
 
 class TestMethodClass():
@@ -186,7 +187,7 @@ class TestMethodClass():
             if isinstance(i, SizingObject):
                 continue
             temp.append((copy.deepcopy(i.borefield), copy.deepcopy(i.load), i.depth, i.SCOP, i.SEER, i.power, i.hourly,
-                         i.max_peak_heating, i.max_peak_cooling))
+                         i.max_peak_extraction, i.max_peak_injection))
         return temp
 
     @property
@@ -195,6 +196,6 @@ class TestMethodClass():
         for _, i in enumerate(self.list_of_test_objects):
             if isinstance(i, SizingObject):
                 continue
-            temp.append((i.percentage_heating, i.percentage_cooling, i.peak_heating_geo, i.peak_cooling_geo,
-                         i.peak_heating_ext, i.peak_cooling_ext))
+            temp.append((i.percentage_extraction, i.percentage_injection, i.peak_extraction_geo, i.peak_injection_geo,
+                         i.peak_extraction_ext, i.peak_injection_ext))
         return temp

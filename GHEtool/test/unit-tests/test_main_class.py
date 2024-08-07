@@ -493,7 +493,7 @@ def test_size_L4():
     assert borefield.calculate_quadrant() == 1
     # quadrant 2
     borefield.borefield = copy.deepcopy(borefield_gt)
-    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_cooling=0, col_heating=1)
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_injection=0, col_extraction=1)
     borefield.load = load
 
     assert np.isclose(305.2876065045127, borefield.size_L4(100, quadrant_sizing=2))
@@ -501,7 +501,7 @@ def test_size_L4():
     assert borefield.calculate_quadrant() == 2
     # quadrant 3
     borefield.borefield = copy.deepcopy(borefield_gt)
-    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_cooling=0, col_heating=1)
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_injection=0, col_extraction=1)
     borefield.load = load
 
     borefield.set_max_avg_fluid_temperature(25)

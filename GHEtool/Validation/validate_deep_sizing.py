@@ -28,7 +28,7 @@ def validate():
     hourly_load = HourlyGeothermalLoad()
     hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,
                                     separator=";",
-                                    col_cooling=0, col_heating=1)
+                                    col_injection=0, col_extraction=1)
     borefield.load = hourly_load
 
     # initiate lists

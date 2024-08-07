@@ -13,16 +13,16 @@ list_of_test_objects = TestMethodClass()
 
 # Case 1 from main_functionalities
 data = GroundConstantTemperature(3, 10)
-peak_cooling = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])
-peak_heating = np.array([160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.])
-annual_heating_load = 300 * 10 ** 3
-annual_cooling_load = 160 * 10 ** 3
-monthly_load_heating_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
-monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
-monthly_load_heating = annual_heating_load * monthly_load_heating_percentage
-monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage
-borefield = Borefield(peak_heating=peak_heating, peak_cooling=peak_cooling,
-                      baseload_heating=monthly_load_heating, baseload_cooling=monthly_load_cooling)
+peak_injection = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])
+peak_extraction = np.array([160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.])
+annual_extraction_load = 300 * 10 ** 3
+annual_injection_load = 160 * 10 ** 3
+monthly_load_extraction_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
+monthly_load_injection_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
+monthly_load_extraction = annual_extraction_load * monthly_load_extraction_percentage
+monthly_load_injection = annual_injection_load * monthly_load_injection_percentage
+borefield = Borefield(peak_extraction=peak_extraction, peak_injection=peak_injection,
+                      baseload_extraction=monthly_load_extraction, baseload_injection=monthly_load_injection)
 borefield.Rb = 0.2
 borefield.set_ground_parameters(data)
 borefield.create_rectangular_borefield(10, 12, 6, 6, 100, 4, 0.075)
@@ -51,22 +51,22 @@ borefield.Rb = 0.12
 borefield.set_borefield(borefield_gt)
 hourly_load = HourlyGeothermalLoad()
 hourly_load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile.csv"), header=True,
-                                separator=";", col_heating=0, col_cooling=1)
+                                separator=";", col_extraction=0, col_injection=1)
 borefield.load = hourly_load
 
 list_of_test_objects.add(SizingObject(borefield, L2_output=182.73, L3_output=182.656, L4_output=182.337, quadrant=1,
                                       name='Hourly profile (1)'))
 
-peak_cooling = np.array([0., 0, 3.4, 6.9, 13., 18., 21., 50., 16., 3.7, 0., 0.])  # Peak cooling in kW
-peak_heating = np.array([60., 42., 10., 5., 0., 0., 0., 0., 4.4, 8.5, 19., 36.])  # Peak heating in kW
-annual_heating_load = 30 * 10 ** 3  # kWh
-annual_cooling_load = 16 * 10 ** 3  # kWh
-monthly_load_heating_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
-monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
-monthly_load_heating = annual_heating_load * monthly_load_heating_percentage  # kWh
-monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage  # kWh
-borefield = Borefield(peak_heating=peak_heating, peak_cooling=peak_cooling,
-                      baseload_heating=monthly_load_heating, baseload_cooling=monthly_load_cooling)
+peak_injection = np.array([0., 0, 3.4, 6.9, 13., 18., 21., 50., 16., 3.7, 0., 0.])  # Peak injection in kW
+peak_extraction = np.array([60., 42., 10., 5., 0., 0., 0., 0., 4.4, 8.5, 19., 36.])  # Peak extraction in kW
+annual_extraction_load = 30 * 10 ** 3  # kWh
+annual_injection_load = 16 * 10 ** 3  # kWh
+monthly_load_extraction_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
+monthly_load_injection_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
+monthly_load_extraction = annual_extraction_load * monthly_load_extraction_percentage  # kWh
+monthly_load_injection = annual_injection_load * monthly_load_injection_percentage  # kWh
+borefield = Borefield(peak_extraction=peak_extraction, peak_injection=peak_injection,
+                      baseload_extraction=monthly_load_extraction, baseload_injection=monthly_load_injection)
 borefield.set_ground_parameters(data)
 borefield.Rb = 0.2
 borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
@@ -78,16 +78,16 @@ list_of_test_objects.add(SizingObject(borefield, L2_output=305.176, L3_output=30
                                       name='Custom config (1)'))
 
 borefield_gt = gt.boreholes.rectangle_field(11, 11, 6, 6, 110, 1, 0.075)
-peak_cooling = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak cooling in kW
-peak_heating = np.array([160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.])  # Peak heating in kW
-annual_heating_load = 150 * 10 ** 3  # kWh
-annual_cooling_load = 400 * 10 ** 3  # kWh
-monthly_load_heating_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
-monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
-monthly_load_heating = annual_heating_load * monthly_load_heating_percentage  # kWh
-monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage  # kWh
-borefield = Borefield(peak_heating=peak_heating, peak_cooling=peak_cooling,
-                      baseload_heating=monthly_load_heating, baseload_cooling=monthly_load_cooling)
+peak_injection = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak injection in kW
+peak_extraction = np.array([160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.])  # Peak extraction in kW
+annual_extraction_load = 150 * 10 ** 3  # kWh
+annual_injection_load = 400 * 10 ** 3  # kWh
+monthly_load_extraction_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
+monthly_load_injection_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
+monthly_load_extraction = annual_extraction_load * monthly_load_extraction_percentage  # kWh
+monthly_load_injection = annual_injection_load * monthly_load_injection_percentage  # kWh
+borefield = Borefield(peak_extraction=peak_extraction, peak_injection=peak_injection,
+                      baseload_extraction=monthly_load_extraction, baseload_injection=monthly_load_injection)
 borefield.set_ground_parameters(data)
 borefield.set_borefield(borefield_gt)
 borefield.Rb = 0.2
@@ -141,7 +141,7 @@ borefield.Rb = 0.12
 borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 1, 0.075)
 hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), header=True,
                                 separator=";",
-                                col_heating=0, col_cooling=1)
+                                col_extraction=0, col_injection=1)
 borefield.load = hourly_load
 borefield.simulation_period = 100
 list_of_test_objects.add(SizingObject(borefield, L2_output=285.476, L3_output=288.541, L4_output=266.696, quadrant=4,
@@ -159,7 +159,7 @@ borefield.calculation_setup(use_constant_Rb=False)
 borefield.set_max_avg_fluid_temperature(17)
 borefield.set_min_avg_fluid_temperature(3)
 hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True, separator=";",
-                                col_cooling=0, col_heating=1)
+                                col_injection=0, col_extraction=1)
 borefield.load = hourly_load
 list_of_test_objects.add(SizingObject(borefield, L2_output=136.780, L3_output=136.294, L4_output=101.285, quadrant=1,
                                       name='BS2023 Auditorium'))
@@ -184,7 +184,7 @@ borefield.set_max_avg_fluid_temperature(17)
 borefield.set_min_avg_fluid_temperature(3)
 hourly_load.simulation_period = 20
 hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\office.csv"), header=True, separator=";",
-                                col_cooling=0, col_heating=1)
+                                col_injection=0, col_extraction=1)
 borefield.load = hourly_load
 list_of_test_objects.add(
     SizingObject(borefield, L2_output=111.180, L3_output=113.069, L4_output=107.08131844420905, quadrant=2,
@@ -222,7 +222,7 @@ borefield.set_max_avg_fluid_temperature(17)
 borefield.set_min_avg_fluid_temperature(3)
 hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\swimming_pool.csv"), header=True,
                                 separator=";",
-                                col_cooling=0, col_heating=1)
+                                col_injection=0, col_extraction=1)
 borefield.load = hourly_load
 list_of_test_objects.add(SizingObject(borefield, L2_output=305.509, L3_output=310.725, L4_output=308.269, quadrant=4,
                                       name='BS2023 Swimming pool'))
@@ -238,11 +238,11 @@ borefield.calculation_setup(force_deep_sizing=False)
 ground_data_IKC = GroundFluxTemperature(2.3, 10.5, flux=2.85)
 fluid_data_IKC = FluidData(0.2, 0.5, 1021.7, 3919, 0.0033)
 pipe_data_IKC = SingleUTube(2.3, 0.016, 0.02, 0.42, 0.04)
-monthly_cooling = np.array([0, 0, 740, 1850, 3700, 7400, 7400, 7400, 5550, 2220, 740, 0]) * (1 + 1 / 4.86)
-monthly_heating = np.array([20064, 17784, 16644, 13680, 0, 0, 0, 0, 0, 12540, 15618, 17670]) * (1 - 1 / 4.49)
-peak_cooling = np.array([61] * 12) * (1 + 1 / 4.86)
-peak_heating = np.array([57] * 12) * (1 - 1 / 4.49)
-load = MonthlyGeothermalLoadAbsolute(monthly_heating, monthly_cooling, peak_heating, peak_cooling, 25)
+monthly_injection = np.array([0, 0, 740, 1850, 3700, 7400, 7400, 7400, 5550, 2220, 740, 0]) * (1 + 1 / 4.86)
+monthly_extraction = np.array([20064, 17784, 16644, 13680, 0, 0, 0, 0, 0, 12540, 15618, 17670]) * (1 - 1 / 4.49)
+peak_injection = np.array([61] * 12) * (1 + 1 / 4.86)
+peak_extraction = np.array([57] * 12) * (1 - 1 / 4.49)
+load = MonthlyGeothermalLoadAbsolute(monthly_extraction, monthly_injection, peak_extraction, peak_injection, 25)
 borefield = Borefield(load=load)
 borefield.create_rectangular_borefield(4, 5, 8, 8, 110, 0.8, 0.07)
 borefield.set_ground_parameters(ground_data_IKC)
@@ -274,46 +274,46 @@ list_of_test_objects.add(SizingObject(borefield, L2_output=71.65, L3_output=72.0
                                       name='Real case 2 (Correct)'))
 
 peakCooling = [0] * 12
-peakHeating = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]  # Peak heating in kW
+peakHeating = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]  # Peak extraction in kW
 annualHeatingLoad = 300 * 10 ** 3  # kWh
 monthlyLoadHeatingPercentage = [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144]
 monthlyLoadHeating = list(map(lambda x: x * annualHeatingLoad, monthlyLoadHeatingPercentage))  # kWh
 monthlyLoadCooling = [0] * 12  # kWh
-borefield = Borefield(peak_heating=peakHeating, peak_cooling=peakCooling,
-                      baseload_heating=monthlyLoadHeating, baseload_cooling=monthlyLoadCooling)
+borefield = Borefield(peak_extraction=peakHeating, peak_injection=peakCooling,
+                      baseload_extraction=monthlyLoadHeating, baseload_injection=monthlyLoadCooling)
 borefield.set_ground_parameters(data)
 borefield.create_rectangular_borefield(10, 12, 6, 6, 110, 4, 0.075)
 borefield.set_max_avg_fluid_temperature(16)
 borefield.set_min_avg_fluid_temperature(0)
 list_of_test_objects.add(SizingObject(borefield, L2_output=81.205, L3_output=82.077, quadrant=4,
-                                      name='No cooling L2/L3'))
+                                      name='No injection L2/L3'))
 
-peakCooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]  # Peak cooling in kW
+peakCooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]  # Peak injection in kW
 peakHeating = [0] * 12
 annualCoolingLoad = 160 * 10 ** 3  # kWh
 monthlyLoadCoolingPercentage = [0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025]
 monthlyLoadHeating = [0] * 12  # kWh
 monthlyLoadCooling = list(map(lambda x: x * annualCoolingLoad, monthlyLoadCoolingPercentage))  # kWh
-borefield = Borefield(peak_heating=peakHeating, peak_cooling=peakCooling,
-                      baseload_heating=monthlyLoadHeating, baseload_cooling=monthlyLoadCooling)
+borefield = Borefield(peak_extraction=peakHeating, peak_injection=peakCooling,
+                      baseload_extraction=monthlyLoadHeating, baseload_injection=monthlyLoadCooling)
 borefield.set_ground_parameters(data)
 borefield.create_rectangular_borefield(10, 12, 6, 6, 110, 4, 0.075)
 borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
 borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
 list_of_test_objects.add(SizingObject(borefield, L2_output=120.913, L3_output=123.346, quadrant=2,
-                                      name='No heating L2/L3'))
+                                      name='No extraction L2/L3'))
 borefield = Borefield()
 borefield.set_ground_parameters(data)
 borefield.create_rectangular_borefield(10, 12, 6, 6, 110, 4, 0.075)
 hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"))
 borefield.load = hourly_load
-borefield.load.hourly_cooling_load = np.zeros(8760)
-list_of_test_objects.add(SizingObject(borefield, L4_output=244.04826670835274, quadrant=4, name='No cooling L4'))
+borefield.load.hourly_injection_load = np.zeros(8760)
+list_of_test_objects.add(SizingObject(borefield, L4_output=244.04826670835274, quadrant=4, name='No injection L4'))
 
 hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"))
 borefield.load = hourly_load
-borefield.load.hourly_heating_load = np.zeros(8760)
-list_of_test_objects.add(SizingObject(borefield, L4_output=305.55338863384287, quadrant=2, name='No heating L4'))
+borefield.load.hourly_extraction_load = np.zeros(8760)
+list_of_test_objects.add(SizingObject(borefield, L4_output=305.55338863384287, quadrant=2, name='No extraction L4'))
 
 borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(2)))
 borefield.set_ground_parameters(GroundFluxTemperature(3, 12))
@@ -334,19 +334,19 @@ borefield.set_Rb(0.2)
 borefield.set_borefield(borefield_gt)
 hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"))
 borefield.load = hourly_load
-temp = hourly_load.hourly_heating_load
+temp = hourly_load.hourly_extraction_load
 temp[0] = 100_000
 borefield._borefield_load.hourly_extraction_load = temp
 list_of_test_objects.add(
     SizingObject(borefield, L4_output=18760.64149089075, quadrant=4, name='Hourly profile, quadrant 4'))
 
-hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_cooling=0,
-                                col_heating=1)
+hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_injection=0,
+                                col_extraction=1)
 borefield.load = hourly_load
 list_of_test_objects.add(
     SizingObject(borefield, L4_output=368.50138222702657, quadrant=2, name='Hourly profile reversed'))
 
-temp = hourly_load.hourly_heating_load
+temp = hourly_load.hourly_extraction_load
 temp[0] = 100_000
 borefield._borefield_load.hourly_extraction_load = temp
 list_of_test_objects.add(
@@ -396,12 +396,12 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 
                                                    200, 200, 336.036, 476.416,
                                                    name='Optimise load profile 1 (power, limit)', power=True,
                                                    hourly=False,
-                                                   max_peak_heating=200, max_peak_cooling=200))
+                                                   max_peak_extraction=200, max_peak_injection=200))
 
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 10 ** 6, 10 ** 6, 67.621, 81.579,
                                                    200, 200, 336.036, 476.416,
                                                    name='Optimise load profile 1 (energy, limit)', power=False,
-                                                   max_peak_heating=200, max_peak_cooling=200))
+                                                   max_peak_extraction=200, max_peak_injection=200))
 
 borefield.set_min_avg_fluid_temperature(-5)
 borefield.set_max_avg_fluid_temperature(25)
@@ -413,7 +413,8 @@ list_of_test_objects.add(
     OptimiseLoadProfileObject(borefield, hourly_load, 150, 10 ** 6, 10 ** 6, 81.451, 95.049,
                               536.036 / 2, 676.417 / 2, 536.036 / 2, 676.417 / 2,
                               name='Optimise load profile 50% (power)',
-                              power=True, hourly=False, max_peak_heating=536.036 / 2, max_peak_cooling=676.417 / 2))
+                              power=True, hourly=False, max_peak_extraction=536.036 / 2,
+                              max_peak_injection=676.417 / 2))
 
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 10 ** 6, 10 ** 6, 100, 100,
                                                    536.036, 676.417, 0, 0,
@@ -427,8 +428,8 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 10 ** 6, 10 ** 6, 81.451, 95.049,
                                                    536.036 / 2, 676.417 / 2, 536.036 / 2, 676.417 / 2,
                                                    name='Optimise load profile 50% (energy)',
-                                                   power=False, max_peak_heating=536.036 / 2,
-                                                   max_peak_cooling=676.417 / 2))
+                                                   power=False, max_peak_extraction=536.036 / 2,
+                                                   max_peak_injection=676.417 / 2))
 
 borefield = Borefield()
 borefield.set_ground_parameters(data)
@@ -436,8 +437,8 @@ borefield.set_Rb(0.2)
 borefield.set_borefield(borefield_gt)
 borefield.set_max_avg_fluid_temperature(16)
 borefield.set_min_avg_fluid_temperature(0)
-hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_heating=1,
-                                col_cooling=0)
+hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_extraction=1,
+                                col_injection=0)
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 10 ** 6, 10 ** 6, 99.976, 66.492,
                                                    643.137, 195.331, 33.278, 340.705,
                                                    name='Optimise load profile 1, reversed (power)', power=True,
@@ -486,7 +487,8 @@ borefield.set_min_avg_fluid_temperature(3)
 borefield.set_max_avg_fluid_temperature(16)
 borefield.load.peak_duration = 6
 load = HourlyGeothermalLoad()
-load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\problem_data.csv"), col_heating=0, col_cooling=1,
+load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\problem_data.csv"), col_extraction=0,
+                         col_injection=1,
                          header=True, decimal_seperator=',')
 load.simulation_period = 40
 borefield.load = load

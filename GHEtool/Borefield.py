@@ -4,6 +4,7 @@ This file contains all the code for the borefield calculations.
 from __future__ import annotations
 
 import copy
+import warnings
 from math import pi
 from typing import Tuple
 import logging
@@ -41,26 +42,27 @@ class Borefield(BaseClass):
 
     def __init__(
             self,
-            peak_heating: ArrayLike = None,
-            peak_cooling: ArrayLike = None,
-            baseload_heating: ArrayLike = None,
-            baseload_cooling: ArrayLike = None,
+            peak_extraction: ArrayLike = None,
+            peak_injection: ArrayLike = None,
+            baseload_extraction: ArrayLike = None,
+            baseload_injection: ArrayLike = None,
             borefield: list[gt.boreholes.Borehole] = None,
             custom_gfunction: CustomGFunction = None,
             load: _LoadData = None,
+            **kwargs
     ):
         """
 
         Parameters
         ----------
-        peak_heating : list, numpy array
-            Monthly peak heating values [kW]
-        peak_cooling : list, numpy array
-            Monthly peak cooling values [kW]
-        baseload_heating : list, numpy array
-            Monthly baseload heating values [kWh]
-        baseload_cooling : list, numpy array
-            Monthly baseload heating values [kWh]
+        peak_extraction : list, numpy array
+            Monthly peak extraction values [kW]
+        peak_injection : list, numpy array
+            Monthly peak injection values [kW]
+        baseload_extraction : list, numpy array
+            Monthly baseload extraction values [kWh]
+        baseload_injection : list, numpy array
+            Monthly baseload extraction values [kWh]
         borefield : pygfunction borehole/borefield object
             Set the borefield for which the calculations will be carried out
         custom_gfunction : CustomGFunction
@@ -71,23 +73,23 @@ class Borefield(BaseClass):
 
         monthly peak values [kW]
 
-        >>> peak_cooling = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])
-        >>> peak_heating = np.array([160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.])
+        >>> peak_injection = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])
+        >>> peak_extraction = np.array([160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.])
 
-        annual heating and cooling load [kWh]
+        annual extraction and injection load [kWh]
 
-        >>> annual_heating_load = 300 * 10 ** 3
-        >>> annual_cooling_load = 160 * 10 ** 3
+        >>> annual_extraction_load = 300 * 10 ** 3
+        >>> annual_injection_load = 160 * 10 ** 3
 
         percentage of annual load per month (15.5% for January ...)
 
-        >>> monthly_load_heating_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
-        >>> monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
+        >>> monthly_load_extraction_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
+        >>> monthly_load_injection_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
 
         resulting load per month [kWh]
 
-        >>> monthly_load_heating = annual_heating_load * monthly_load_heating_percentage
-        >>> monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage
+        >>> monthly_load_extraction = annual_extraction_load * monthly_load_extraction_percentage
+        >>> monthly_load_injection = annual_injection_load * monthly_load_injection_percentage
 
         create the borefield object
 
@@ -95,16 +97,15 @@ class Borefield(BaseClass):
 
         set the load
 
-        >>> load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
+        >>> load = MonthlyGeothermalLoadAbsolute(monthly_load_extraction, monthly_load_injection, peak_extraction, peak_injection)
         >>> borefield.load = load
 
         """
 
-        # initiate vars
-        baseload_cooling: np.ndarray = np.zeros(12) if baseload_cooling is None else baseload_cooling
-        baseload_heating: np.ndarray = np.zeros(12) if baseload_heating is None else baseload_heating
-        peak_cooling: np.ndarray = np.zeros(12) if peak_cooling is None else peak_cooling
-        peak_heating: np.ndarray = np.zeros(12) if peak_heating is None else peak_heating
+        if len(kwargs) > 0:
+            raise DeprecationWarning(
+                'Since version 2.3.0, it is no longer possible to set a heating and cooling load (see issue 220).'
+                'Please use the load classes.')
 
         self.limiting_quadrant: int = 0  # parameter that tells in which quadrant the field is limited
         # m hereafter one needs to chance to fewer boreholes with more depth, because the calculations are no longer
@@ -143,7 +144,8 @@ class Borefield(BaseClass):
         if load is not None:
             self.load = load
         else:
-            self.load = MonthlyGeothermalLoadAbsolute(baseload_heating, baseload_cooling, peak_heating, peak_cooling)
+            self.load = MonthlyGeothermalLoadAbsolute(baseload_extraction, baseload_injection, peak_extraction,
+                                                      peak_injection)
 
         # set investment cost
         self.cost_investment: list = Borefield.DEFAULT_INVESTMENT
@@ -1322,7 +1324,7 @@ class Borefield(BaseClass):
         This method is a slower but more robust way of calculating the next depth in the sizing iteration when the
         borefield is sized for the maximum fluid temperature when there is a non-constant ground temperature.
         The method is based (as can be seen in its corresponding validation document) on the assumption that the
-        difference between the maximum temperature in peak cooling and the average undisturbed ground temperature
+        difference between the maximum temperature in peak injection and the average undisturbed ground temperature
         is irreversily proportional to the depth. In this way, given this difference in temperature and the current
         depth, a new depth can be calculated.
 
@@ -1336,7 +1338,7 @@ class Borefield(BaseClass):
         float
             New depth of the borefield [m]
         """
-        # diff between the max temperature in peak cooling and the avg undisturbed ground temperature at current_depth
+        # diff between the max temperature in peak injection and the avg undisturbed ground temperature at current_depth
         delta_temp = np.max(self.results.peak_injection - self.ground_data.calculate_Tg(current_depth))
 
         # calculate the maximum temperature difference between the temperature limit and the ground temperature
@@ -1424,7 +1426,7 @@ class Borefield(BaseClass):
                     # convert back to required length
                     self.H = (np.min(self.results.peak_extraction) - self._Tg()) / (self.Tf_min - self._Tg()) * H_prev
             elif self.ground_data.variable_Tg:
-                # for when the temperature gradient is active and it is cooling
+                # for when the temperature gradient is active and it is injection
                 self.H = self.calculate_next_depth_deep_sizing(H_prev)
             if self.H < 0:
                 return 0, False
@@ -1552,13 +1554,13 @@ class Borefield(BaseClass):
         if plot_hourly:
             ax.step(time_array, self.results.Tf, "b-", where="post", lw=1, label="Tf")
         else:
-            ax.step(time_array, self.results.peak_injection, "b-", where="post", lw=1.5, label="Tf peak cooling")
-            ax.step(time_array, self.results.peak_extraction, "r-", where="post", lw=1.5, label="Tf peak heating")
+            ax.step(time_array, self.results.peak_injection, "b-", where="post", lw=1.5, label="Tf peak injection")
+            ax.step(time_array, self.results.peak_extraction, "r-", where="post", lw=1.5, label="Tf peak extraction")
 
             ax.step(time_array, self.results.monthly_injection, color="b", linestyle="dashed", where="post", lw=1.5,
-                    label="Tf base cooling")
+                    label="Tf base injection")
             ax.step(time_array, self.results.monthly_extraction, color="r", linestyle="dashed", where="post", lw=1.5,
-                    label="Tf base heating")
+                    label="Tf base extraction")
 
         # define temperature bounds
         ax.hlines(self.Tf_min, 0, self.simulation_period, colors="r", linestyles="dashed", label="", lw=1)
@@ -1852,9 +1854,9 @@ class Borefield(BaseClass):
             If use_hourly_resolution is used, the hourly data will be used for this optimisation. This can take some
             more time than using the monthly resolution, but it will give more accurate results.
         max_peak_extraction : float
-            The maximum peak power for geothermal heating [kW]
+            The maximum peak power for geothermal extraction [kW]
         max_peak_injection : float
-            The maximum peak power for geothermal cooling [kW]
+            The maximum peak power for geothermal injection [kW]
 
         Returns
         -------
@@ -1904,9 +1906,9 @@ class Borefield(BaseClass):
             The maximum allowed temperature difference between the maximum and minimum fluid temperatures and their
             respective limits. The lower this threshold, the longer the convergence will take.
         max_peak_extraction : float
-            The maximum peak power for geothermal heating [kW]
+            The maximum peak power for geothermal extraction [kW]
         max_peak_injection : float
-            The maximum peak power for geothermal cooling [kW]
+            The maximum peak power for geothermal injection [kW]
 
         Returns
         -------
@@ -1964,7 +1966,7 @@ class Borefield(BaseClass):
         if self.Tf_max - 0.1 > max_temp and self.Tf_min + 0.1 < min_temp:
             return
 
-        # True if heating/extraction dominated
+        # True if extraction dominated
         if self.load.imbalance < 0:
             # either quadrant 1 or 4
             if DT_min > DT_max:

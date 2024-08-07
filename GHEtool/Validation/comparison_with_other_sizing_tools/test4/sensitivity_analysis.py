@@ -157,7 +157,7 @@ def test_4_sensitivity():
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
     load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test4.csv'), header=True, separator=",",
-                             col_heating=1, col_cooling=0)
+                             col_extraction=1, col_injection=0)
     borefield.load = load
 
     # Sizing with constant Rb
@@ -203,7 +203,7 @@ def test_4_sensitivity():
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
     load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test4.csv'), header=True, separator=",",
-                             col_heating=1, col_cooling=0)
+                             col_extraction=1, col_injection=0)
     borefield.load = load
 
     # Sizing with constant Rb
@@ -249,7 +249,7 @@ def test_4_sensitivity():
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
     load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test4.csv'), header=True, separator=",",
-                             col_heating=1, col_cooling=0)
+                             col_extraction=1, col_injection=0)
     borefield.load = load
 
     # Sizing with constant Rb
@@ -295,7 +295,7 @@ def test_4_sensitivity():
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
     load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test4.csv'), header=True, separator=",",
-                             col_heating=1, col_cooling=0)
+                             col_extraction=1, col_injection=0)
     borefield.load = load
 
     # Sizing with constant Rb
@@ -341,7 +341,7 @@ def test_4_sensitivity():
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
     load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test4.csv'), header=True, separator=",",
-                             col_heating=1, col_cooling=0)
+                             col_extraction=1, col_injection=0)
     borefield.load = load
 
     # Sizing with constant Rb
@@ -387,7 +387,7 @@ def test_4_sensitivity():
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
     load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test4.csv'), header=True, separator=",",
-                             col_heating=1, col_cooling=0)
+                             col_extraction=1, col_injection=0)
     borefield.load = load
 
     # Sizing with constant Rb
@@ -433,7 +433,7 @@ def test_4_sensitivity():
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
     load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test4.csv'), header=True, separator=",",
-                             col_heating=1, col_cooling=0)
+                             col_extraction=1, col_injection=0)
     borefield.load = load
 
     # Sizing with constant Rb
@@ -479,7 +479,7 @@ def test_4_sensitivity():
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
     load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test4.csv'), header=True, separator=",",
-                             col_heating=1, col_cooling=0)
+                             col_extraction=1, col_injection=0)
     borefield.load = load
 
     # Sizing with constant Rb

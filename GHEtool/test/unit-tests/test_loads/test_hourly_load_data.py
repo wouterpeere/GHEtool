@@ -13,7 +13,7 @@ def test_load_hourly_data():
     load = HourlyGeothermalLoad()
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     load1 = HourlyGeothermalLoad()
-    load1.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_heating=1, col_cooling=0)
+    load1.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_extraction=1, col_injection=0)
     assert np.array_equal(load.hourly_injection_load, load1.hourly_extraction_load)
     assert np.array_equal(load.hourly_extraction_load, load1.hourly_injection_load)
     load2 = HourlyGeothermalLoad()
