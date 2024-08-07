@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added max peak heating/cooling to optimise_load_profile functions (issue #276).
 - Added pressure drop across a U-tube (issue #278).
 - Efficiency classes for COP, EER, SCOP, SEER (issue #285).
+- Added the Separatus probe.
 
 ## Changed
 

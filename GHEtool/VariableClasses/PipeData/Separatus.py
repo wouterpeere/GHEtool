@@ -7,7 +7,7 @@ from GHEtool.VariableClasses.FluidData import FluidData
 class Separatus(SingleUTube):
     """
     This class contains the model for the Separatus probe. Separatus is a new player in the geothermal space and
-    uses a unique splitpipe-technology. This technology inserts a membrane in the middel of a pipe with DN50, so that
+    uses a unique 'splitpipe'-technology. This technology inserts a membrane in the middel of a pipe with DN50, so that
     the inlet and outlet flows are separated.
 
     The model in this class has been obtained in close collaboration between Separatus AG (Swiss) and Enead BV (Belgium)
