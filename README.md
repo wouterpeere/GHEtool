@@ -168,17 +168,21 @@ You can set the fluid data by using the FluidData class. In the future, more flu
 
 One last element which you will need in your calculations, is the load data. Currently, you can only set the primary (
 i.e. geothermal) load of the borefield.
-In a future version of GHEtool, also secundary building loads will be included. For now, you can use the following
+In a future version of GHEtool, also secondary building loads will be included. For now, you can use the following
 inputs:
 
-* _MonthlyGeothermalLoadAbsolute_: You can set one the monthly baseload and peak load for heating and cooling for one
+* _MonthlyGeothermalLoadAbsolute_: You can set one the monthly baseload and peak load for extraction and injection for
+  one
   standard year which will be used for all years within the simulation period.
-* _HourlyGeothermalLoad_: You can set (or load) the hourly heating and cooling load of a standard year which will be
+* _HourlyGeothermalLoad_: You can set (or load) the hourly extraction and injection load of a standard year which will
+  be
   used for all years within the simulation period.
-* _HourlyGeothermalLoadMultiYear_: You can set (or load) the hourly heating and cooling load for multiple years (i.e.
-  for the whole simulation period). This way, you can use secundary loads already with GHEtool as shown
+* _HourlyGeothermalLoadMultiYear_: You can set (or load) the hourly extraction and injection load for multiple years (
+  i.e.
+  for the whole simulation period). This way, you can use secondary loads already with GHEtool as shown
   in [this example](https://ghetool.readthedocs.io/en/stable/sources/code/Examples/active_passive_cooling.html).
-* _MonthlyGeothermalLoadMultiYear_: You can set the monthly heating and cooling load for multiple years (i.e. for the
+* _MonthlyGeothermalLoadMultiYear_: You can set the monthly extraction and injection load for multiple years (i.e. for
+  the
   whole simulation period).
 
 All load classes also have the option to add a yearly domestic hot water usage.
@@ -203,7 +207,7 @@ atol and rtol is chosen when sizing. The options are:
   a change in borehole depth. If this parameter is True
   it is allowed that gfunctions are interpolated. (To change the threshold for this interpolation, go to the Gfunction
   class.)
-* _deep_sizing_: An alternative sizing method for cases with high cooling (peaks) and a variable ground temperature.
+* _deep_sizing_: An alternative sizing method for cases with high injection (peaks) and a variable ground temperature.
   This method is potentially slower, but proves to be more robust.
 * _force_deep_sizing_: When the alternative method from above should always be used.
 
@@ -227,19 +231,20 @@ data = GroundDataConstantTemperature(3,  # ground thermal conductivity (W/mK)
                                      2.4 * 10 ** 6)  # volumetric heat capacity of the ground (J/m3K) 
 ```
 
-Furthermore, for our loads, we need to set the peak loads as well as the monthly base loads for heating and cooling.
+Furthermore, for our loads, we need to set the peak loads as well as the monthly base loads for extraction and
+injection.
 
 ```Python
-peak_cooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]  # Peak cooling in kW
-peak_heating = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]  # Peak heating in kW
+peak_injection = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]  # Peak injection in kW
+peak_extraction = [160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.]  # Peak extract in kW
 
-monthly_load_heating = [46500.0, 44400.0, 37500.0, 29700.0, 19200.0, 0.0, 0.0, 0.0, 18300.0, 26100.0, 35100.0,
-                        43200.0]  # in kWh
-monthly_load_cooling = [4000.0, 8000.0, 8000.0, 8000.0, 12000.0, 16000.0, 32000.0, 32000.0, 16000.0, 12000.0, 8000.0,
-                        4000.0]  # in kWh
+monthly_load_extraction = [46500.0, 44400.0, 37500.0, 29700.0, 19200.0, 0.0, 0.0, 0.0, 18300.0, 26100.0, 35100.0,
+                           43200.0]  # in kWh
+monthly_load_injection = [4000.0, 8000.0, 8000.0, 8000.0, 12000.0, 16000.0, 32000.0, 32000.0, 16000.0, 12000.0, 8000.0,
+                          4000.0]  # in kWh
 
 # set load object
-load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
+load = MonthlyGeothermalLoadAbsolute(monthly_load_extraction, monthly_load_injection, peak_extraction, peak_injection)
 
 ```
 

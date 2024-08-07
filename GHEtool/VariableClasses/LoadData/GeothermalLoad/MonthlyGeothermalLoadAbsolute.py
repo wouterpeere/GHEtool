@@ -2,7 +2,7 @@ import warnings
 
 import numpy as np
 
-from GHEtool.VariableClasses.LoadData._LoadData import _LoadData
+from GHEtool.VariableClasses.LoadData.Baseclasses import _SingleYear, _LoadData
 from GHEtool.VariableClasses.LoadData.GeothermalLoad import HourlyGeothermalLoad
 from GHEtool.VariableClasses.LoadData.GeothermalLoad.HourlyGeothermalLoadMultiYear import HourlyGeothermalLoadMultiYear
 from GHEtool.logger.ghe_logger import ghe_logger
@@ -10,55 +10,55 @@ from GHEtool.logger.ghe_logger import ghe_logger
 from numpy.typing import ArrayLike
 
 
-class MonthlyGeothermalLoadAbsolute(_LoadData):
+class MonthlyGeothermalLoadAbsolute(_SingleYear, _LoadData):
     """
     This class contains all the information for geothermal load data with a monthly resolution and absolute input.
     This means that the inputs are both in kWh/month and kW/month.
     """
 
-    __slots__ = tuple(_LoadData.__slots__) + ("_baseload_heating", "_baseload_cooling", "_peak_heating", "_peak_cooling")
-
     def __init__(
-        self,
-        baseload_heating: ArrayLike = None,
-        baseload_cooling: ArrayLike = None,
-        peak_heating: ArrayLike = None,
-        peak_cooling: ArrayLike = None,
-        simulation_period: int = 20,
-        dhw: float = 0.0,
+            self,
+            baseload_extraction: ArrayLike = None,
+            baseload_injection: ArrayLike = None,
+            peak_extraction: ArrayLike = None,
+            peak_injection: ArrayLike = None,
+            simulation_period: int = 20,
+            *args,
+            **kwargs
     ):
         """
 
         Parameters
         ----------
-        baseload_heating : np.ndarray, list, tuple
+        baseload_extraction : np.ndarray, list, tuple
             Baseload heating values [kWh/month]
-        baseload_cooling : np.ndarray, list, tuple
+        baseload_injection : np.ndarray, list, tuple
             Baseload cooling values [kWh/month]
-        peak_heating : np.ndarray, list, tuple
+        peak_extraction : np.ndarray, list, tuple
             Peak heating values [kW/month]
-        peak_cooling : np.ndarray, list, tuple
+        peak_injection : np.ndarray, list, tuple
             Peak cooling values [kW/month]
         simulation_period : int
             Length of the simulation period in years
         dhw : float
             Yearly consumption of domestic hot water [kWh/year]
         """
+        # check legacy
+        if len(args) > 0 or len(kwargs) > 0:
+            raise DeprecationWarning(
+                'The definition of the HourlyGeothermalLoad class has been changed to injection/extraction terminology instead of cooling/heating terminology. '
+                'Support for DHW is also dropped. You can use the HourlyBuildingLoad class with the same definitions instead.')
+        _LoadData.__init__(self)
+        _SingleYear.__init__(self, simulation_period)
 
-        super().__init__(hourly_resolution=False, simulation_period=simulation_period)
-
-        # initiate variables
-        self._baseload_heating: np.ndarray = np.zeros(12)
-        self._baseload_cooling: np.ndarray = np.zeros(12)
-        self._peak_heating: np.ndarray = np.zeros(12)
-        self._peak_cooling: np.ndarray = np.zeros(12)
+        self.exclude_DHW_from_peak: bool = False  # by default, the DHW increase the peak load. Set to false,
+        # if you only want the heating load to determine the peak in extraction
 
         # set variables
-        self.baseload_heating = np.zeros(12) if baseload_heating is None else baseload_heating
-        self.baseload_cooling = np.zeros(12) if baseload_cooling is None else baseload_cooling
-        self.peak_heating = np.zeros(12) if peak_heating is None else peak_heating
-        self.peak_cooling = np.zeros(12) if peak_cooling is None else peak_cooling
-        self.dhw = dhw
+        self.baseload_extraction = np.zeros(12) if baseload_extraction is None else baseload_extraction
+        self.baseload_injection = np.zeros(12) if baseload_injection is None else baseload_injection
+        self.peak_extraction = np.zeros(12) if peak_extraction is None else peak_extraction
+        self.peak_injection = np.zeros(12) if peak_injection is None else peak_injection
 
     def _check_input(self, load_array: ArrayLike) -> bool:
         """
@@ -89,7 +89,7 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
         return True
 
     @property
-    def baseload_cooling(self) -> np.ndarray:
+    def baseload_injection(self) -> np.ndarray:
         """
         This function returns the baseload cooling in kWh/month.
 
@@ -98,10 +98,10 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
         baseload cooling : np.ndarray
             Baseload cooling values [kWh/month] for one year, so the length of the array is 12
         """
-        return self.correct_for_start_month(self._baseload_cooling)
+        return self.correct_for_start_month(self._baseload_injection)
 
-    @baseload_cooling.setter
-    def baseload_cooling(self, load: ArrayLike) -> None:
+    @baseload_injection.setter
+    def baseload_injection(self, load: ArrayLike) -> None:
         """
         This function sets the baseload cooling [kWh/month] after it has been checked.
         If the baseload cooling gives a higher average power than the peak power,
@@ -123,11 +123,11 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             values
         """
         if self._check_input(load):
-            self._baseload_cooling = np.array(load)
+            self._baseload_injection = np.array(load)
             return
         raise ValueError
 
-    def set_baseload_cooling(self, load: ArrayLike) -> None:
+    def set_baseload_injection(self, load: ArrayLike) -> None:
         """
         This function sets the baseload cooling [kWh/month] after it has been checked.
         If the baseload cooling gives a higher average power than the peak power,
@@ -148,10 +148,10 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             When either the length is not 12, the input is not of the correct type, or it contains negative
             values
         """
-        self.baseload_cooling = load
+        self.baseload_injection = load
 
     @property
-    def baseload_heating(self) -> np.ndarray:
+    def baseload_extraction(self) -> np.ndarray:
         """
         This function returns the baseload heating in kWh/month (incl. DHW).
 
@@ -160,10 +160,10 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
         baseload heating : np.ndarray
             Baseload heating values (incl. DHW) [kWh/month] for one year, so the length of the array is 12
         """
-        return self.correct_for_start_month(self._baseload_heating + self.dhw / 8760 * self.UPM)
+        return self.correct_for_start_month(self._baseload_extraction)
 
-    @baseload_heating.setter
-    def baseload_heating(self, load: ArrayLike) -> None:
+    @baseload_extraction.setter
+    def baseload_extraction(self, load: ArrayLike) -> None:
         """
         This function sets the baseload heating [kWh/month] after it has been checked.
         If the baseload heating gives a higher average power than the peak power,
@@ -185,11 +185,11 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             values
         """
         if self._check_input(load):
-            self._baseload_heating = np.array(load)
+            self._baseload_extraction = np.array(load)
             return
         raise ValueError
 
-    def set_baseload_heating(self, load: ArrayLike) -> None:
+    def set_baseload_extraction(self, load: ArrayLike) -> None:
         """
         This function sets the baseload heating [kWh/month] after it has been checked.
         If the baseload heating gives a higher average power than the peak power,
@@ -210,10 +210,10 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             When either the length is not 12, the input is not of the correct type, or it contains negative
             values
         """
-        self.baseload_heating = np.array(load)
+        self.baseload_extraction = np.array(load)
 
     @property
-    def peak_cooling(self) -> np.ndarray:
+    def peak_injection(self) -> np.ndarray:
         """
         This function returns the peak cooling load in kW/month.
 
@@ -222,10 +222,11 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
         peak cooling : np.ndarray
             Peak cooling values for one year, so the length of the array is 12
         """
-        return self.correct_for_start_month(np.maximum(self._peak_cooling, self.baseload_cooling_power))
+        return self.correct_for_start_month(
+            np.maximum(self._peak_injection, self.monthly_baseload_injection_power))
 
-    @peak_cooling.setter
-    def peak_cooling(self, load) -> None:
+    @peak_injection.setter
+    def peak_injection(self, load) -> None:
         """
         This function sets the peak cooling load [kW/month] after it has been checked.
         If the baseload cooling gives a higher average power, this is taken as the peak power in that month.
@@ -246,11 +247,11 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             values
         """
         if self._check_input(load):
-            self._peak_cooling = np.array(load)
+            self._peak_injection = np.array(load)
             return
         raise ValueError
 
-    def set_peak_cooling(self, load: ArrayLike) -> None:
+    def set_peak_injection(self, load: ArrayLike) -> None:
         """
         This function sets the peak cooling load [kW/month] after it has been checked.
         If the baseload cooling gives a higher average power, this is taken as the peak power in that month.
@@ -270,10 +271,10 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             When either the length is not 12, the input is not of the correct type, or it contains negative
             values
         """
-        self.peak_cooling = np.array(load)
+        self.peak_injection = np.array(load)
 
     @property
-    def peak_heating(self) -> np.ndarray:
+    def peak_extraction(self) -> np.ndarray:
         """
         This function returns the peak heating load in kW/month.
 
@@ -282,10 +283,11 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
         peak heating : np.ndarray
             Peak heating values for one year, so the length of the array is 12
         """
-        return self.correct_for_start_month(np.maximum(np.array(self._peak_heating) + self.dhw_power, self.baseload_heating_power))
+        return self.correct_for_start_month(
+            np.maximum(np.array(self._peak_extraction), self.monthly_baseload_extraction_power))
 
-    @peak_heating.setter
-    def peak_heating(self, load: ArrayLike) -> None:
+    @peak_extraction.setter
+    def peak_extraction(self, load: ArrayLike) -> None:
         """
         This function sets the peak heating load [kW/month] after it has been checked.
         If the baseload heating gives a higher average power, this is taken as the peak power in that month.
@@ -306,11 +308,11 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             values
         """
         if self._check_input(load):
-            self._peak_heating = np.array(load)
+            self._peak_extraction = np.array(load)
             return
         raise ValueError
 
-    def set_peak_heating(self, load: ArrayLike) -> None:
+    def set_peak_extraction(self, load: ArrayLike) -> None:
         """
         This function sets the peak heating load [kW/month] after it has been checked.
         If the baseload heating gives a higher average power, this is taken as the peak power in that month.
@@ -330,18 +332,66 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
             When either the length is not 12, the input is not of the correct type, or it contains negative
             values
         """
-        self.peak_heating = np.array(load)
+        self.peak_extraction = np.array(load)
+
+    @property
+    def monthly_baseload_injection_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the monthly injection baseload in kWh/month for the whole simulation period.
+
+        Returns
+        -------
+        baseload injection : np.ndarray
+            baseload injection for the whole simulation period
+        """
+        return np.tile(self.baseload_injection, self.simulation_period)
+
+    @property
+    def monthly_baseload_extraction_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the monthly extraction baseload in kWh/month for the whole simulation period.
+
+        Returns
+        -------
+        baseload extraction : np.ndarray
+            baseload extraction for the whole simulation period
+        """
+        return np.tile(self.baseload_extraction, self.simulation_period)
+
+    @property
+    def monthly_peak_injection_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the monthly injection peak in kW/month for the whole simulation period.
+
+        Returns
+        -------
+        peak injection : np.ndarray
+            peak injection for the whole simulation period
+        """
+        return np.tile(self.peak_injection, self.simulation_period)
+
+    @property
+    def monthly_peak_extraction_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the monthly extraction peak in kW/month for the whole simulation period.
+
+        Returns
+        -------
+        peak extraction : np.ndarray
+            peak extraction for the whole simulation period
+        """
+        return np.tile(self.peak_extraction, self.simulation_period)
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, MonthlyGeothermalLoadAbsolute):
             return False
-        if not np.array_equal(self.baseload_heating, other.baseload_heating):
+        if not np.array_equal(self.baseload_extraction, other.baseload_extraction):
             return False
-        if not np.array_equal(self.baseload_cooling, other.baseload_cooling):
+        if not np.array_equal(self.baseload_injection, other.baseload_injection):
             return False
-        if not np.array_equal(self.peak_heating, other.peak_heating):
+        if not np.array_equal(self.peak_extraction, other.peak_extraction):
             return False
-        if not np.array_equal(self.peak_cooling, other.peak_cooling):
+        if not np.array_equal(self.peak_injection, other.peak_injection):
             return False
         if not self.simulation_period == other.simulation_period:
             return False
@@ -355,29 +405,28 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
                     f"The maximum simulation period of "
                     f"{max(self.simulation_period, other.simulation_period)} years will be taken."
                 )
-            if self.peak_cooling_duration != other.peak_cooling_duration:
+            if self.peak_injection_duration != other.peak_injection_duration:
                 warnings.warn(
                     f"The peak cooling duration for both load classes are different. "
                     f"The maximum peak cooling duration of "
-                    f"{max(self.peak_cooling_duration, other.peak_cooling_duration)} hours will be taken."
+                    f"{max(self.peak_injection_duration, other.peak_injection_duration)} hours will be taken."
                 )
-            if self.peak_heating_duration != other.peak_heating_duration:
+            if self.peak_extraction_duration != other.peak_extraction_duration:
                 warnings.warn(
                     f"The peak heating duration for both load classes are different. "
                     f"The maximum peak heating duration of "
-                    f"{max(self.peak_heating_duration, other.peak_heating_duration)} hours will be taken."
+                    f"{max(self.peak_extraction_duration, other.peak_extraction_duration)} hours will be taken."
                 )
 
             result = MonthlyGeothermalLoadAbsolute(
-                self._baseload_heating + other._baseload_heating,
-                self._baseload_cooling + other._baseload_cooling,
-                self._peak_heating + other._peak_heating,
-                self._peak_cooling + other._peak_cooling,
-                max(self.simulation_period, other.simulation_period),
-                self.dhw + other.dhw,
+                self._baseload_extraction + other._baseload_extraction,
+                self._baseload_injection + other._baseload_injection,
+                self._peak_extraction + other._peak_extraction,
+                self._peak_injection + other._peak_injection,
+                max(self.simulation_period, other.simulation_period)
             )
-            result.peak_cooling_duration = max(self._peak_cooling_duration, other._peak_cooling_duration)
-            result.peak_heating_duration = max(self._peak_heating_duration, other._peak_heating_duration)
+            result.peak_injection_duration = max(self._peak_injection_duration, other._peak_injection_duration)
+            result.peak_extraction_duration = max(self._peak_extraction_duration, other._peak_extraction_duration)
 
             return result
 
@@ -395,19 +444,18 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
                     f"{max(self.simulation_period, other.simulation_period)} years will be taken."
                 )
 
-            peak_heating, baseload_heating = other.resample_to_monthly(other._hourly_heating_load)
-            peak_cooling, baseload_cooling = other.resample_to_monthly(other._hourly_cooling_load)
+            peak_extraction, baseload_extraction = other.resample_to_monthly(other._hourly_extraction_load)
+            peak_injection, baseload_injection = other.resample_to_monthly(other._hourly_injection_load)
 
             result = MonthlyGeothermalLoadAbsolute(
-                self._baseload_heating + baseload_heating,
-                self._baseload_cooling + baseload_cooling,
-                self._peak_heating + peak_heating,
-                self._peak_cooling + peak_cooling,
-                max(self.simulation_period, other.simulation_period),
-                self.dhw + other.dhw,
+                self._baseload_extraction + baseload_extraction,
+                self._baseload_injection + baseload_injection,
+                self._peak_extraction + peak_extraction,
+                self._peak_injection + peak_injection,
+                max(self.simulation_period, other.simulation_period)
             )
-            result.peak_cooling_duration = self._peak_cooling_duration
-            result.peak_heating_duration = self._peak_heating_duration
+            result.peak_injection_duration = self._peak_injection_duration
+            result.peak_extraction_duration = self._peak_extraction_duration
 
             return result
 
@@ -430,4 +478,4 @@ class MonthlyGeothermalLoadAbsolute(_LoadData):
         """
         if self.start_month == 1:
             return array
-        return np.concatenate((array[self.start_month - 1 :], array[: self.start_month - 1]))
+        return np.concatenate((array[self.start_month - 1:], array[: self.start_month - 1]))
