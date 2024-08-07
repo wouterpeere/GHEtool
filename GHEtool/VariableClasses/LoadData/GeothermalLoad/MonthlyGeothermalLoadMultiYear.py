@@ -21,6 +21,8 @@ class MonthlyGeothermalLoadMultiYear(_LoadData):
             baseload_injection: ArrayLike = None,
             peak_extraction: ArrayLike = None,
             peak_injection: ArrayLike = None,
+            *args,
+            **kwargs
     ):
         """
 
@@ -35,6 +37,11 @@ class MonthlyGeothermalLoadMultiYear(_LoadData):
         peak_injection : np.ndarray, list, tuple
             Peak cooling values [kW/month]
         """
+        # check legacy
+        if len(args) > 0 or len(kwargs) > 0:
+            raise DeprecationWarning(
+                'The definition of the HourlyGeothermalLoad class has been changed to injection/extraction terminology instead of cooling/heating terminology. '
+                'Support for DHW is also dropped. You can use the HourlyBuildingLoad class with the same definitions instead.')
 
         super().__init__()
 

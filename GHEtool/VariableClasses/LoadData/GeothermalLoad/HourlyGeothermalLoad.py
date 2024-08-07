@@ -24,7 +24,8 @@ class HourlyGeothermalLoad(_SingleYear, _HourlyData):
     def __init__(self, extraction_load: ArrayLike = None,
                  injection_load: ArrayLike = None,
                  simulation_period: int = 20,
-                 dhw: float = 0.):
+                 *args,
+                 **kwargs):
         """
 
         Parameters
@@ -38,6 +39,11 @@ class HourlyGeothermalLoad(_SingleYear, _HourlyData):
         dhw : float
             Yearly consumption of domestic hot water [kWh/year]
         """
+        # check legacy
+        if len(args) > 0 or len(kwargs) > 0:
+            raise DeprecationWarning(
+                'The definition of the HourlyGeothermalLoad class has been changed to injection/extraction terminology instead of cooling/heating terminology. '
+                'Support for DHW is also dropped. You can use the HourlyBuildingLoad class with the same definitions instead.')
 
         _HourlyData.__init__(self)
         _SingleYear.__init__(self, simulation_period)

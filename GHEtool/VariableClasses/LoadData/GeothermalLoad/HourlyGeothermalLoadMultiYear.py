@@ -17,7 +17,7 @@ class HourlyGeothermalLoadMultiYear(_HourlyData):
     This means that the inputs are both in kWh/month and kW/month.
     """
 
-    def __init__(self, extraction_load: ArrayLike = None, injection_load: ArrayLike = None):
+    def __init__(self, extraction_load: ArrayLike = None, injection_load: ArrayLike = None, *args, **kwargs):
         """
 
         Parameters
@@ -27,9 +27,13 @@ class HourlyGeothermalLoadMultiYear(_HourlyData):
         injection_load : np.ndarray, list, tuple
             Injection load [kWh/h]
         """
+        # check legacy
+        if len(args) > 0 or len(kwargs) > 0:
+            raise DeprecationWarning(
+                'The definition of the HourlyGeothermalLoad class has been changed to injection/extraction terminology instead of cooling/heating terminology. '
+                'Support for DHW is also dropped. You can use the HourlyBuildingLoad class with the same definitions instead.')
 
         super().__init__()
-
         # set variables
         extraction_load = np.zeros(8760) if extraction_load is None and injection_load is None else extraction_load
         self.hourly_extraction_load = np.zeros_like(injection_load) if extraction_load is None else np.array(

@@ -140,3 +140,8 @@ def test_yearly_loads():
     assert np.array_equal(load_data.yearly_extraction_load_simulation_period, [12000])
     assert np.array_equal(load_data.yearly_injection_peak_simulation_period, [30])
     assert np.array_equal(load_data.yearly_extraction_peak_simulation_period, [50])
+
+
+def test_depreciation_warning():
+    with pytest.raises(DeprecationWarning):
+        MonthlyGeothermalLoadMultiYear(baseload_heating=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])

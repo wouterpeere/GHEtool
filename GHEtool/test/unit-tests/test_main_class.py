@@ -1063,3 +1063,8 @@ def test_deep_sizing(case, result):
 
     # methods should more or less lead to the same results, 1% diff taken as a reference
     assert np.allclose(result, borefield._size_based_on_temperature_profile(10, deep_sizing=False)[0], rtol=0.01)
+
+
+def test_depreciation_warning():
+    with pytest.raises(DeprecationWarning):
+        Borefield(baseload_heating=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])

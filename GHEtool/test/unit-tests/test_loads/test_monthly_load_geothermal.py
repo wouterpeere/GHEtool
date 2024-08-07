@@ -304,7 +304,7 @@ def test_add():
         assert True
 
     # add hourly load
-    load_hourly = HourlyGeothermalLoad(np.full(8760, 10), np.full(8760, 20), 30, 10000)
+    load_hourly = HourlyGeothermalLoad(np.full(8760, 10), np.full(8760, 20), 30)
 
     with pytest.warns():
         result = load_1 + load_hourly  # simulation period not equal
@@ -352,3 +352,8 @@ def test_yearly_loads():
     assert np.allclose(load.yearly_extraction_load_simulation_period, [160000] * 10)
     assert np.allclose(load.yearly_injection_peak_simulation_period, [240] * 10)
     assert np.allclose(load.yearly_extraction_peak_simulation_period, [160] * 10)
+
+
+def test_depreciation_warning():
+    with pytest.raises(DeprecationWarning):
+        MonthlyGeothermalLoadAbsolute(baseload_heating=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])

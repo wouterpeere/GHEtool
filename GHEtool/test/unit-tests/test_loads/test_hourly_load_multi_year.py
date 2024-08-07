@@ -90,6 +90,14 @@ def test_eq_multiyear():
     assert profile_1 == profile_2
 
     profile_1.hourly_injection_load = np.linspace(0, 10000, 8760 * 55)
+    profile_2.hourly_injection_load = np.linspace(0, 10000, 8760 * 54)
+    assert profile_1 != profile_2
+    assert profile_2 != profile_1
+
+    profile_2.hourly_injection_load = np.linspace(0, 10001, 8760 * 55)
+    assert profile_1 != profile_2
+    assert profile_2 != profile_1
+
     profile_2.hourly_injection_load = np.linspace(0, 10000, 8760 * 55)
     assert profile_1 == profile_2
 
@@ -123,8 +131,7 @@ def test_add_multiyear():
     assert np.allclose(result.hourly_injection_load, load_1.hourly_injection_load + load_2.hourly_injection_load)
 
     load_2 = HourlyGeothermalLoad(np.arange(0, 8760, 1),
-                                  np.arange(0, 8760, 1) + 1,
-                                  dhw=20000)
+                                  np.arange(0, 8760, 1) + 1)
 
     with pytest.warns():
         result = load_1 + load_2
@@ -157,3 +164,8 @@ def test_yearly_loads_multiyear():
     assert np.array_equal(load.yearly_extraction_load_simulation_period, [38364420, 115102020])
     assert np.array_equal(load.yearly_injection_peak_simulation_period, [17518, 35038])
     assert np.array_equal(load.yearly_extraction_peak_simulation_period, [8759, 17519])
+
+
+def test_depreciation_warning():
+    with pytest.raises(DeprecationWarning):
+        HourlyGeothermalLoadMultiYear(hourly_heating=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
