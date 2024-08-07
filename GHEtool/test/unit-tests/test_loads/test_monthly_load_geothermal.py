@@ -334,6 +334,10 @@ def test_different_start_month():
     assert np.allclose(load.baseload_injection, result)
     assert np.allclose(load.peak_extraction, result)
     assert np.allclose(load.peak_injection, result)
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period, np.tile(result, 20))
+    assert np.allclose(load.monthly_baseload_injection_simulation_period, np.tile(result, 20))
+    assert np.allclose(load.monthly_peak_extraction_simulation_period, np.tile(result, 20))
+    assert np.allclose(load.monthly_peak_injection_simulation_period, np.tile(result, 20))
 
 
 def test_yearly_loads():

@@ -16,6 +16,7 @@ class _MonthlyData(ABC):
         self._all_months_equal: bool = True  # true if it is assumed that all months are of the same length
         self._peak_injection_duration: int = _MonthlyData.DEFAULT_LENGTH_PEAK
         self._peak_extraction_duration: int = _MonthlyData.DEFAULT_LENGTH_PEAK
+        self.hourly_resolution = False
 
     @abc.abstractmethod
     def monthly_baseload_injection_simulation_period(self) -> np.ndarray:
@@ -25,7 +26,7 @@ class _MonthlyData(ABC):
         Returns
         -------
         baseload injection : np.ndarray
-            baseload injection for the whole simulation period
+            Baseload injection for the whole simulation period
         """
 
     @abc.abstractmethod
@@ -36,7 +37,7 @@ class _MonthlyData(ABC):
         Returns
         -------
         baseload extraction : np.ndarray
-            baseload extraction for the whole simulation period
+            Baseload extraction for the whole simulation period
         """
 
     @abc.abstractmethod
@@ -47,7 +48,7 @@ class _MonthlyData(ABC):
         Returns
         -------
         peak injection : np.ndarray
-            peak injection for the whole simulation period
+            Peak injection for the whole simulation period
         """
 
     @abc.abstractmethod
@@ -58,7 +59,7 @@ class _MonthlyData(ABC):
         Returns
         -------
         peak extraction : np.ndarray
-            peak extraction for the whole simulation period
+            Peak extraction for the whole simulation period
         """
 
     @property
@@ -68,8 +69,7 @@ class _MonthlyData(ABC):
 
         Returns
         -------
-        simulation period
-            int
+        simulation period : int
         """
         return int(len(self.monthly_baseload_extraction) / 12)
 

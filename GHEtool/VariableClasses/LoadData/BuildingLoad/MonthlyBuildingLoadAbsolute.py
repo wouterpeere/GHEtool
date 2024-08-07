@@ -17,7 +17,7 @@ class MonthlyBuildingLoadAbsolute(_LoadData):
     """
 
     __slots__ = tuple(_LoadData.__slots__) + (
-    "_baseload_heating", "_baseload_cooling", "_peak_heating", "_peak_cooling")
+        "_baseload_heating", "_baseload_cooling", "_peak_heating", "_peak_cooling")
 
     def __init__(
             self,
@@ -53,7 +53,9 @@ class MonthlyBuildingLoadAbsolute(_LoadData):
         self._baseload_cooling: np.ndarray = np.zeros(12)
         self._peak_heating: np.ndarray = np.zeros(12)
         self._peak_cooling: np.ndarray = np.zeros(12)
-
+        self._dhw_yearly: float = 0.
+        self.exclude_DHW_from_peak: bool = False  # by default, the DHW increase the peak load. Set to false,
+        # if you only want the heating load to determine the peak in extra
         # set variables
         self.baseload_heating = np.zeros(12) if baseload_heating is None else baseload_heating
         self.baseload_cooling = np.zeros(12) if baseload_cooling is None else baseload_cooling
@@ -433,3 +435,65 @@ class MonthlyBuildingLoadAbsolute(_LoadData):
         if self.start_month == 1:
             return array
         return np.concatenate((array[self.start_month - 1:], array[: self.start_month - 1]))
+
+    def add_dhw(self, dhw: float) -> None:
+        """
+        This function adds the domestic hot water (dhw).
+        An error is raies is the dhw is not positive.
+
+        Parameters
+        ----------
+        dhw : float
+            Yearly consumption of domestic hot water [kWh/year]
+
+        Returns
+        -------
+        None
+        """
+        self.dhw = dhw
+
+    @property
+    def dhw(self) -> float:
+        """
+        This function returns the yearly domestic hot water consumption.
+
+        Returns
+        -------
+        dhw : float
+            Yearly domestic hot water consumption [kWh/year]
+        """
+        return self._dhw_yearly
+
+    @dhw.setter
+    def dhw(self, dhw: float) -> None:
+        """
+        This function adds the domestic hot water (dhw).
+        An error is raies is the dhw is not positive.
+
+        Parameters
+        ----------
+        dhw : float
+            Yearly consumption of domestic hot water [kWh/year]
+
+        Returns
+        -------
+        None
+        """
+        if not isinstance(dhw, (float, int)):
+            raise ValueError('Please fill in a number for the domestic hot water.')
+        if not dhw >= 0:
+            raise ValueError(f'Please fill in a positive value for the domestic hot water instead of {dhw}.')
+        self._dhw_yearly = dhw
+
+    @property
+    def dhw_power(self) -> float:
+        """
+        This function returns the power related to the dhw production.
+
+        Returns
+        -------
+        dhw power : float
+        """
+        if self.exclude_DHW_from_peak:
+            return 0
+        return self._dhw_yearly

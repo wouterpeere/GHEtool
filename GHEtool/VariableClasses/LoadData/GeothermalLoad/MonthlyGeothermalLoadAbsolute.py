@@ -344,7 +344,7 @@ class MonthlyGeothermalLoadAbsolute(_SingleYear, _MonthlyData):
         baseload injection : np.ndarray
             baseload injection for the whole simulation period
         """
-        return np.tile(self._baseload_injection, self.simulation_period)
+        return np.tile(self.baseload_injection, self.simulation_period)
 
     @property
     def monthly_baseload_extraction_simulation_period(self) -> np.ndarray:
@@ -356,7 +356,7 @@ class MonthlyGeothermalLoadAbsolute(_SingleYear, _MonthlyData):
         baseload extraction : np.ndarray
             baseload extraction for the whole simulation period
         """
-        return np.tile(self._baseload_extraction, self.simulation_period)
+        return np.tile(self.baseload_extraction, self.simulation_period)
 
     @property
     def monthly_peak_injection_simulation_period(self) -> np.ndarray:
