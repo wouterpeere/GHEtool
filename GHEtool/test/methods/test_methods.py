@@ -52,14 +52,14 @@ def test_optimise(input, result):
         primary_borefield_load, secondary_borefield_load, external_load = optimise_load_profile_power(model, load,
                                                                                                       depth, SCOP, SEER,
                                                                                                       use_hourly_resolution=hourly,
-                                                                                                      max_peak_extraction=max_peak_extraction,
-                                                                                                      max_peak_injection=max_peak_injection)
+                                                                                                      max_peak_heating=max_peak_extraction,
+                                                                                                      max_peak_cooling=max_peak_injection)
     else:
         primary_borefield_load, secondary_borefield_load, external_load = optimise_load_profile_energy(model, load,
                                                                                                        depth, SCOP,
                                                                                                        SEER,
-                                                                                                       max_peak_extraction=max_peak_extraction,
-                                                                                                       max_peak_injection=max_peak_injection)
+                                                                                                       max_peak_heating=max_peak_extraction,
+                                                                                                       max_peak_cooling=max_peak_injection)
     percentage_extraction, percentage_injection, peak_extraction_geo, peak_injection_geo, peak_extraction_ext, peak_injection_ext = \
         result
 

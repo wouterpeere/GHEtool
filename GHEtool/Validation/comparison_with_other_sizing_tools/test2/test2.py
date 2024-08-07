@@ -41,7 +41,7 @@ def test_2_6h():
                              col_extraction=1, col_injection=0)
     borefield.load = load
 
-    delta_t = max(load.max_peak_cooling, load.max_peak_cooling) * 1000 / (fluid_data.Cp * fluid_data.mfr) / 120
+    delta_t = max(load.max_peak_extraction, load.max_peak_injection) * 1000 / (fluid_data.Cp * fluid_data.mfr) / 120
 
     # set temperature bounds
     borefield.set_max_avg_fluid_temperature(35 + delta_t / 2)
