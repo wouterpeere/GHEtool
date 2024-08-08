@@ -8,6 +8,10 @@ from numpy.typing import ArrayLike
 
 
 class _LoadData(ABC):
+    """
+    This class contains all the general functionalities for the load classes.
+    """
+
     AVG_UPM: int = 730  # number of hours per month
     DEFAULT_LENGTH_PEAK: int = 6  # hours
 
@@ -299,21 +303,22 @@ class _LoadData(ABC):
             self.monthly_baseload_injection_simulation_period - self.monthly_baseload_extraction_simulation_period) / self.simulation_period
 
     @property
-    def monthly_average_power(self) -> np.ndarray:
+    def monthly_average_injection_power(self) -> np.ndarray:
         """
-        This function calculates the average monthly load in kW.
+        This function calculates the average monthly injection power in kW.
         A negative load means it is extraction dominated.
 
         Returns
         -------
         monthly average load : np.ndarray
         """
-        return np.mean(self.monthly_average_power_simulation_period.reshape((self.simulation_period, 12)), axis=0)
+        return np.mean(self.monthly_average_injection_power_simulation_period.reshape((self.simulation_period, 12)),
+                       axis=0)
 
     @property
-    def monthly_average_power_simulation_period(self) -> np.ndarray:
+    def monthly_average_injection_power_simulation_period(self) -> np.ndarray:
         """
-        This function calculates the average monthly power in kW for the whole simulation period.
+        This function calculates the average monthly injection power in kW for the whole simulation period.
         A negative load means it is extraction dominated.
 
         Returns
@@ -379,7 +384,7 @@ class _LoadData(ABC):
     @property
     def peak_duration(self) -> None:
         """
-        Dummy object to set the length peak for both heating and cooling.
+        Dummy object to set the length peak for both extraction and injection.
 
         Returns
         -------
@@ -522,7 +527,7 @@ class _LoadData(ABC):
             # Select month with the highest peak load and take both the peak and average load from that month
             month_index = self.get_month_index(self.monthly_peak_extraction,
                                                self.monthly_baseload_extraction)
-            qm = self.monthly_average_power[month_index] * 1000.
+            qm = self.monthly_average_injection_power[month_index] * 1000.
             qh = self.max_peak_extraction * 1000.
 
             # correct signs
@@ -538,7 +543,7 @@ class _LoadData(ABC):
             # Select month with the highest peak load and take both the peak and average load from that month
             month_index = self.get_month_index(self.monthly_peak_injection,
                                                self.monthly_baseload_injection_power)
-            qm = self.monthly_average_power[month_index] * 1000.
+            qm = self.monthly_average_injection_power[month_index] * 1000.
             qh = self.max_peak_injection * 1000.
 
         return th, qh, qm, qa
@@ -573,12 +578,12 @@ class _LoadData(ABC):
                                                self.monthly_baseload_extraction_power)
             qh = self.max_peak_extraction * 1000.
 
-            qm = self.monthly_average_power[month_index] * 1000.
+            qm = self.monthly_average_injection_power[month_index] * 1000.
 
             if month_index < 1:
                 qpm = 0
             else:
-                qpm = np.sum(self.monthly_average_power[:month_index]) * 1000 / (month_index + 1)
+                qpm = np.sum(self.monthly_average_injection_power[:month_index]) * 1000 / (month_index + 1)
 
             qm = -qm
         else:
@@ -592,11 +597,11 @@ class _LoadData(ABC):
                                                self.monthly_baseload_injection_power)
             qh = self.max_peak_injection * 1000.
 
-            qm = self.monthly_average_power[month_index] * 1000.
+            qm = self.monthly_average_injection_power[month_index] * 1000.
             if month_index < 1:
                 qpm = 0
             else:
-                qpm = np.sum(self.monthly_average_power[:month_index]) * 1000 / (month_index + 1)
+                qpm = np.sum(self.monthly_average_injection_power[:month_index]) * 1000 / (month_index + 1)
 
         tcm = self.time_L3[month_index]
         tpm = self.time_L3[month_index - 1] if month_index > 0 else 0

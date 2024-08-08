@@ -69,7 +69,7 @@ def test_multiple_years_L3():
     assert np.allclose(borefield.load.monthly_baseload_injection_simulation_period, monthly_cooling_load * 730)
     assert np.allclose(borefield.load.monthly_peak_extraction_simulation_period, peak_extraction)
     assert np.allclose(borefield.load.monthly_peak_injection_simulation_period, peak_injection)
-    assert np.allclose(borefield.load.monthly_average_power_simulation_period,
+    assert np.allclose(borefield.load.monthly_average_injection_power_simulation_period,
                        monthly_cooling_load - monthly_heating_load)
     h = borefield.size_L3(150)
     assert np.isclose(h, 110.233, rtol=0.001)
@@ -89,7 +89,7 @@ def test_multiple_years_L3():
     assert np.allclose(borefield.load.monthly_baseload_injection_power_simulation_period, monthly_cooling_load)
     assert np.allclose(borefield.load.monthly_peak_extraction_simulation_period, peak_extraction)
     assert np.allclose(borefield.load.monthly_peak_injection_simulation_period, peak_injection)
-    assert np.allclose(borefield.load.monthly_average_power_simulation_period,
+    assert np.allclose(borefield.load.monthly_average_injection_power_simulation_period,
                        monthly_cooling_load - monthly_heating_load)
     h = borefield.size_L3(150)
     assert np.isclose(h, 100.418, rtol=0.001)
@@ -123,7 +123,7 @@ def test_multiple_years_L3_monthly_data():
     assert np.allclose(borefield.load.monthly_baseload_injection_simulation_period, monthly_cooling_load * 730)
     assert np.allclose(borefield.load.monthly_peak_extraction_simulation_period, peak_extraction)
     assert np.allclose(borefield.load.monthly_peak_injection_simulation_period, peak_injection)
-    assert np.allclose(borefield.load.monthly_average_power_simulation_period,
+    assert np.allclose(borefield.load.monthly_average_injection_power_simulation_period,
                        monthly_cooling_load - monthly_heating_load)
     assert borefield.load.simulation_period == 50
     h = borefield.size_L3(150)
@@ -144,7 +144,7 @@ def test_multiple_years_L3_monthly_data():
     assert np.allclose(borefield.load.monthly_baseload_injection_power_simulation_period, monthly_cooling_load)
     assert np.allclose(borefield.load.monthly_peak_extraction_simulation_period, peak_extraction)
     assert np.allclose(borefield.load.monthly_peak_injection_simulation_period, peak_injection)
-    assert np.allclose(borefield.load.monthly_average_power_simulation_period,
+    assert np.allclose(borefield.load.monthly_average_injection_power_simulation_period,
                        monthly_cooling_load - monthly_heating_load)
     h = borefield.size_L3(150)
     assert np.isclose(h, 100.418, rtol=0.001)

@@ -135,9 +135,9 @@ def test_monthly_average_load():
     assert np.allclose(load.monthly_baseload_extraction_simulation_period,
                        np.tile(load.baseload_extraction, 20))
 
-    assert np.allclose(load.monthly_average_power,
+    assert np.allclose(load.monthly_average_injection_power,
                        load.monthly_baseload_injection_power - load.monthly_baseload_extraction_power)
-    assert np.allclose(load.monthly_average_power_simulation_period,
+    assert np.allclose(load.monthly_average_injection_power_simulation_period,
                        load.monthly_baseload_injection_power_simulation_period - load.monthly_baseload_extraction_power_simulation_period)
 
     # test now with different month loads

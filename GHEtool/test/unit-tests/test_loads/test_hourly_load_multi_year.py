@@ -63,7 +63,7 @@ def test_monthly_based_on_hourly_multi_year():
     assert np.allclose(load.monthly_baseload_injection_simulation_period, heating_bl * 2)
     assert np.allclose(load.monthly_baseload_extraction_power_simulation_period, heating_bl / 730)
     assert np.allclose(load.monthly_baseload_injection_power_simulation_period, heating_bl * 2 / 730)
-    assert np.allclose(load.monthly_average_power_simulation_period, heating_bl / 730)
+    assert np.allclose(load.monthly_average_injection_power_simulation_period, heating_bl / 730)
 
 
 def test_resample_to_monthly_multiyear():

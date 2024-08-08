@@ -35,6 +35,8 @@ class _Efficiency:
         ------
         ValueError
             When the shape of the data does not equal the provided ranges.
+        ValueError
+            When there is a datapoint smaller or equal to zero.
 
         """
         self._data = data
@@ -43,6 +45,10 @@ class _Efficiency:
         self.__range_primary_ = range_avg_primary_temperature
         self.__range_secondary_ = range_avg_secondary_temperature
         self.__range_part_load_ = range_part_load
+
+        # check if all data points are higher than 0
+        if not np.all(self._data > 0):
+            raise ValueError('The efficiencies should all be above zero!')
 
         # set points
         self._points = [range_avg_primary_temperature]

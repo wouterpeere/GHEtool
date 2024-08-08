@@ -3,8 +3,6 @@ from __future__ import annotations
 import numpy as np
 
 from GHEtool.VariableClasses.LoadData.Baseclasses import _LoadData
-from GHEtool.VariableClasses.LoadData.GeothermalLoad.MonthlyGeothermalLoadAbsolute import MonthlyGeothermalLoadAbsolute
-from GHEtool.logger.ghe_logger import ghe_logger
 
 from numpy.typing import ArrayLike
 

@@ -29,6 +29,8 @@ def test_COP_basic():
         COP(np.array([3, 4, 6]), np.array([5, 15]))
     with pytest.raises(ValueError):
         COP(np.array([3, 4, 6]), np.array([5, 10, 15]), np.array([5, 6]))
+    with pytest.raises(ValueError):  # no efficiencies equal or smaller than 0
+        COP(np.array([0, 4, 6]), np.array([5, 10, 15]))
 
     cop_basic = COP(np.array([3, 4, 6]), np.array([5, 10, 15]))
     assert not cop_basic._range_secondary
@@ -134,6 +136,8 @@ def test_EER_basic():
         EER(np.array([3, 4, 6]), np.array([5, 15]))
     with pytest.raises(ValueError):
         EER(np.array([3, 4, 6]), np.array([5, 10, 15]), np.array([5, 6]))
+    with pytest.raises(ValueError):  # no efficiencies equal or smaller than 0
+        EER(np.array([0, 4, 6]), np.array([5, 10, 15]))
 
     eer_basic = EER(np.array([3, 4, 6]), np.array([5, 10, 15]))
     assert not eer_basic._range_secondary
