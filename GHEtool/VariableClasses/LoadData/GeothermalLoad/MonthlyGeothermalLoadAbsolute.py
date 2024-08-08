@@ -60,34 +60,6 @@ class MonthlyGeothermalLoadAbsolute(_SingleYear, _LoadData):
         self.peak_extraction = np.zeros(12) if peak_extraction is None else peak_extraction
         self.peak_injection = np.zeros(12) if peak_injection is None else peak_injection
 
-    def _check_input(self, load_array: ArrayLike) -> bool:
-        """
-        This function checks whether the input is valid or not.
-        The input is correct if and only if:
-        1) the input is a np.ndarray, list or tuple
-        2) the length of the input is 12
-        3) the input does not contain any negative values.
-
-        Parameters
-        ----------
-        load_array : np.ndarray, list or tuple
-
-        Returns
-        -------
-        bool
-            True if the inputs are valid
-        """
-        if not isinstance(load_array, (np.ndarray, list, tuple)):
-            ghe_logger.error("The load should be of type np.ndarray, list or tuple.")
-            return False
-        if not len(load_array) == 12:
-            ghe_logger.error("The length of the load should be 12.")
-            return False
-        if np.min(load_array) < 0:
-            ghe_logger.error("No value in the load can be smaller than zero.")
-            return False
-        return True
-
     @property
     def baseload_injection(self) -> np.ndarray:
         """

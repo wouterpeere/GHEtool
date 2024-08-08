@@ -17,6 +17,8 @@ class _LoadData(ABC):
         self._peak_injection_duration: int = _LoadData.DEFAULT_LENGTH_PEAK
         self._peak_extraction_duration: int = _LoadData.DEFAULT_LENGTH_PEAK
         self.hourly_resolution = False
+        self._multiyear = False
+        self._hourly = False
 
         # initiate variables
         self._baseload_extraction: np.ndarray = np.zeros(12)
@@ -601,10 +603,13 @@ class _LoadData(ABC):
 
         return th, tpm, tcm, qh, qpm, qm
 
-    @abc.abstractmethod
     def _check_input(self, load_array: ArrayLike) -> bool:
         """
         This function checks whether the input is valid or not.
+        The input is correct if and only if:
+        1) the input is a np.ndarray, list or tuple
+        2) the length of the input is (a multiple of) 12 or 8760, depending on if it is an hourly load or not
+        3) the input does not contain any negative values.
 
         Parameters
         ----------
@@ -615,3 +620,28 @@ class _LoadData(ABC):
         bool
             True if the inputs are valid
         """
+        if not isinstance(load_array, (np.ndarray, list, tuple)):
+            ghe_logger.error("The load should be of type np.ndarray, list or tuple.")
+            return False
+        if self._multiyear:
+            if self._hourly:
+                if not len(load_array) % 8760 == 0:
+                    ghe_logger.error("The length of the load should be a multiple of 8760.")
+                    return False
+            else:
+                if not len(load_array) % 12 == 0:
+                    ghe_logger.error("The length of the load should be a multiple of 12.")
+                    return False
+        else:
+            if self._hourly:
+                if not len(load_array) == 8760:
+                    ghe_logger.error("The length of the load should be 8760.")
+                    return False
+            else:
+                if not len(load_array) == 12:
+                    ghe_logger.error("The length of the load should be 12.")
+                    return False
+        if np.min(load_array) < 0:
+            ghe_logger.error("No value in the load can be smaller than zero.")
+            return False
+        return True
