@@ -650,3 +650,9 @@ class _LoadData(ABC):
             ghe_logger.error("No value in the load can be smaller than zero.")
             return False
         return True
+
+    def set_results(self, results) -> None:
+        pass
+
+    def reset_results(self, min_temperature: float, max_temperature: float) -> None:
+        pass
