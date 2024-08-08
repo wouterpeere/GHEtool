@@ -13,6 +13,7 @@ class SCOP:
         """
         self._SCOP = None
         self.SCOP = SCOP
+        self._range_part_load = False
 
     @property
     def SCOP(self) -> float:

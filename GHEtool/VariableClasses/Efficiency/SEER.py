@@ -14,6 +14,7 @@ class SEER:
 
         self._SEER = None
         self.SEER = SEER
+        self._range_part_load = False
 
     @property
     def SEER(self) -> float:

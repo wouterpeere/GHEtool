@@ -200,7 +200,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         -------
         EER or SEER
         """
-        return self._cop
+        return self._eer
 
     @eer.setter
     def eer(self, efficiency_cooling: Union[int, float, EER, SEER]) -> None:
@@ -231,7 +231,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         -------
         COP or SCOP
         """
-        return self._cop
+        return self._cop_dhw
 
     @cop_dhw.setter
     def cop_dhw(self, efficiency_dhw: Union[int, float, COP, SCOP]) -> None:
@@ -249,9 +249,9 @@ class _LoadDataBuilding(_LoadData, ABC):
         None
         """
         if isinstance(efficiency_dhw, (int, float)):
-            self._cop = SCOP(efficiency_dhw)
+            self._cop_dhw = SCOP(efficiency_dhw)
             return
-        self._cop = efficiency_dhw
+        self._cop_dhw = efficiency_dhw
 
     def set_results(self, results: Union[ResultsMonthly, ResultsHourly]) -> None:
         """

@@ -62,9 +62,7 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
         self._baseload_cooling: np.ndarray = np.zeros(12)
         self._peak_heating: np.ndarray = np.zeros(12)
         self._peak_cooling: np.ndarray = np.zeros(12)
-        self._dhw_yearly: float = 0.
-        self.exclude_DHW_from_peak: bool = False  # by default, the DHW increase the peak load. Set to false,
-        # if you only want the heating load to determine the peak in extra
+
         # set variables
         self.baseload_heating = np.zeros(12) if baseload_heating is None else baseload_heating
         self.baseload_cooling = np.zeros(12) if baseload_cooling is None else baseload_cooling
@@ -318,6 +316,7 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
         """
         self.peak_heating = np.array(load)
 
+    @property
     def monthly_baseload_heating_simulation_period(self) -> np.ndarray:
         """
         This function returns the monthly heating baseload in kWh/month for the whole simulation period.
@@ -329,6 +328,7 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
         """
         return np.tile(self.baseload_heating, self.simulation_period)
 
+    @property
     def monthly_baseload_cooling_simulation_period(self) -> np.ndarray:
         """
         This function returns the monthly cooling baseload in kWh/month for the whole simulation period.
@@ -340,6 +340,7 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
         """
         return np.tile(self.baseload_cooling, self.simulation_period)
 
+    @property
     def monthly_peak_heating_simulation_period(self) -> np.ndarray:
         """
         This function returns the monthly heating peak in kW/month for the whole simulation period.
@@ -351,6 +352,7 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
         """
         return np.tile(self.peak_heating, self.simulation_period)
 
+    @property
     def monthly_peak_cooling_simulation_period(self) -> np.ndarray:
         """
         This function returns the monthly cooling peak in kW/month for the whole simulation period.
@@ -442,3 +444,22 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
             return result
 
         raise TypeError("Cannot perform addition. Please check if you use correct classes.")
+
+    def correct_for_start_month(self, array: np.ndarray) -> np.ndarray:
+        """
+        This function corrects the load for the correct start month.
+        If the simulation starts in september, the start month is 9 and hence the array should start
+        at index 9.
+
+        Parameters
+        ----------
+        array : np.ndarray
+            Load array
+
+        Returns
+        -------
+        load : np.ndarray
+        """
+        if self.start_month == 1:
+            return array
+        return np.concatenate((array[self.start_month - 1:], array[: self.start_month - 1]))
