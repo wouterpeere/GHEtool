@@ -20,13 +20,13 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
 
     def __init__(
             self,
-            baseload_heating: ArrayLike,
-            baseload_cooling: ArrayLike,
-            peak_heating: ArrayLike,
-            peak_cooling: ArrayLike,
-            simulation_period: int,
-            efficiency_heating: Union[int, float, COP, SCOP],
-            efficiency_cooling: Union[int, float, EER, SEER],
+            baseload_heating: ArrayLike = None,
+            baseload_cooling: ArrayLike = None,
+            peak_heating: ArrayLike = None,
+            peak_cooling: ArrayLike = None,
+            simulation_period: int = 20,
+            efficiency_heating: Union[int, float, COP, SCOP] = 5,
+            efficiency_cooling: Union[int, float, EER, SEER] = 20,
             dhw: float = 0.0,
             efficiency_dhw: Union[int, float, COP, SCOP] = None
     ):

@@ -236,3 +236,45 @@ def test_EER_get_SEER():
 
     assert np.isclose(eer_full.get_SEER([10, 10], 10, [1.5, 2.5], [2.5, 2.5]), 16 / 6)
     assert np.isclose(eer_full.get_SEER([10, 5], 10, [1.5, 2.5], [2.5, 2.5]), 45 / 20)
+
+
+def test_eq():
+    scop1 = SCOP(5)
+    scop2 = SCOP(6)
+    scop3 = SCOP(6)
+    seer1 = SEER(5)
+    seer2 = SEER(6)
+    seer3 = SEER(6)
+
+    assert scop1 != scop2
+    assert seer1 != seer2
+    assert scop1 != seer1
+    assert seer1 != scop1
+    assert scop2 == scop3
+    assert seer2 == seer3
+
+    cop_basic1 = COP(np.array([1, 10]), np.array([1, 10]))
+    eer_basic1 = EER(np.array([1, 10]), np.array([1, 10]))
+    cop_pl1 = COP(np.array([[1, 10], [2, 20]]), np.array([1, 10]), range_part_load=np.array([0.5, 1]))
+    eer_pl1 = EER(np.array([[1, 10], [2, 20]]), np.array([1, 10]), range_part_load=np.array([0.5, 1]))
+    cop_basic2 = COP(np.array([2, 10]), np.array([1, 10]))
+    eer_basic2 = EER(np.array([2, 10]), np.array([1, 10]))
+    cop_pl2 = COP(np.array([[2, 10], [2, 20]]), np.array([1, 10]), range_part_load=np.array([0.5, 1]))
+    eer_pl2 = EER(np.array([[2, 10], [2, 20]]), np.array([1, 10]), range_part_load=np.array([0.5, 1]))
+    cop_basic3 = COP(np.array([1, 10]), np.array([1, 10]))
+    eer_basic3 = EER(np.array([1, 10]), np.array([1, 10]))
+    cop_pl3 = COP(np.array([[1, 10], [2, 20]]), np.array([1, 10]), range_part_load=np.array([0.5, 1]))
+    eer_pl3 = EER(np.array([[1, 10], [2, 20]]), np.array([1, 10]), range_part_load=np.array([0.5, 1]))
+
+    assert cop_basic1 != cop_basic2
+    assert eer_basic1 != eer_basic2
+    assert cop_basic1 != eer_basic1
+    assert eer_basic1 != cop_basic1
+    assert cop_basic1 == cop_basic3
+    assert eer_basic1 == eer_basic3
+    assert cop_pl1 != cop_pl2
+    assert eer_pl1 != eer_pl2
+    assert cop_pl1 != eer_pl1
+    assert eer_pl1 != cop_pl1
+    assert cop_pl1 == cop_pl3
+    assert eer_pl1 == eer_pl3

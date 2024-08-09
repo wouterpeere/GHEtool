@@ -4,7 +4,27 @@ from scipy import interpolate
 from typing import Union
 
 
-class _Efficiency:
+class _EfficiencyBase:
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, self.__class__):
+            return False
+
+        for key in self.__dict__:
+            value1 = self.__dict__[key]
+            value2 = other.__dict__[key]
+
+            if isinstance(value1, np.ndarray) and isinstance(value2, np.ndarray):
+                if not np.array_equal(value1, value2):
+                    return False
+            else:
+                if not np.array_equal(value1, value2):
+                    return False
+
+        return True
+
+
+class _Efficiency(_EfficiencyBase):
     """
     Baseclass for all the efficiencies
     """

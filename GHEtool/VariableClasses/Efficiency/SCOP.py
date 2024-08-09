@@ -1,4 +1,7 @@
-class SCOP:
+from ._Efficiency import _EfficiencyBase
+
+
+class SCOP(_EfficiencyBase):
     """
     Class for constant SCOP efficiency
     """

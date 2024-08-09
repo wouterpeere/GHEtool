@@ -272,7 +272,8 @@ class _LoadDataBuilding(_LoadData, ABC):
         None
         """
         # check if the length is correct
-        if len(results.Tb) != self.simulation_period * (8760 if self._hourly else 12):
+        if len(results.Tb) != self.simulation_period * (8760 if self._hourly else 12) or (
+                self._hourly != isinstance(results, ResultsHourly)):
             raise ValueError(
                 'The results have a length of {len(results.Tb)} whereas, with a simulation period of {self.simulation_period} years '
                 'a length of {self.simulation_period * (8760 if self._hourly else 12)} was expected.')

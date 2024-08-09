@@ -1,4 +1,7 @@
-class SEER:
+from ._Efficiency import _EfficiencyBase
+
+
+class SEER(_EfficiencyBase):
     """
     Class for constant SEER efficiency
     """
