@@ -1273,7 +1273,7 @@ class Borefield(BaseClass):
             raise ValueError(f"Quadrant {quadrant_sizing} does not exist.")
 
         # check if hourly data is given
-        if not self.load.hourly_resolution:
+        if not self.load._hourly:
             raise ValueError("There is no hourly resolution available!")
 
         # initiate with a given depth
@@ -1667,7 +1667,7 @@ class Borefield(BaseClass):
 
         if hourly:
             # check for hourly data if this is requested
-            if not self.load.hourly_resolution:
+            if not self.load._hourly:
                 raise ValueError("There is no hourly resolution available!")
 
             hourly_load = self.load.hourly_net_resulting_power
@@ -1861,7 +1861,7 @@ class Borefield(BaseClass):
         Returns
         -------
         tuple [HourlyGeothermalLoad, HourlyGeothermalLoad]
-            borefield load (secundary), external load (secundary)
+            borefield load (secondary), external load (secondary)
 
         Raises
         ------
@@ -1913,7 +1913,7 @@ class Borefield(BaseClass):
         Returns
         -------
         tuple [HourlyGeothermalLoadMultiYear, HourlyGeothermalLoadMultiYear]
-            borefield load (secundary), external load (secundary)
+            borefield load (secondary), external load (secondary)
 
         Raises
         ------

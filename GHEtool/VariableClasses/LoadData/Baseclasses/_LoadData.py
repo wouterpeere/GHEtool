@@ -133,10 +133,11 @@ class _LoadData(ABC):
     @property
     def monthly_baseload_injection(self) -> np.ndarray:
         """
+        This function returns the monthly baseload injection in kWh/month.
 
         Returns
         -------
-
+        monthly baseload injection : np.ndarray
         """
         return np.mean(self.monthly_baseload_injection_simulation_period.reshape((self.simulation_period, 12)),
                        axis=0)
@@ -144,10 +145,11 @@ class _LoadData(ABC):
     @property
     def monthly_baseload_extraction(self) -> np.ndarray:
         """
+        This function returns the monthly baseload extraction in kWh/month.
 
         Returns
         -------
-
+        monthly baseload extraction : np.ndarray
         """
         return np.mean(self.monthly_baseload_extraction_simulation_period.reshape((self.simulation_period, 12)),
                        axis=0)
@@ -155,10 +157,11 @@ class _LoadData(ABC):
     @property
     def monthly_peak_injection(self) -> np.ndarray:
         """
+        This function returns the monthly peak injection in kW/month.
 
         Returns
         -------
-
+        monthly peak injection : np.ndarray
         """
         return np.mean(self.monthly_peak_injection_simulation_period.reshape((self.simulation_period, 12)),
                        axis=0)
@@ -166,10 +169,11 @@ class _LoadData(ABC):
     @property
     def monthly_peak_extraction(self) -> np.ndarray:
         """
+        This function returns the monthly peak extraction in kW/month.
 
         Returns
         -------
-
+        monthly peak extraction : np.ndarray
         """
         return np.mean(self.monthly_peak_extraction_simulation_period.reshape((self.simulation_period, 12)),
                        axis=0)
@@ -177,20 +181,22 @@ class _LoadData(ABC):
     @property
     def monthly_baseload_injection_power(self) -> np.ndarray:
         """
+        This function returns the monthly injection power due to the baseload injection in kW/month.
 
         Returns
         -------
-
+        monthly baseload injection power : np.ndarray
         """
         return np.divide(self.monthly_baseload_injection, self.UPM)
 
     @property
     def monthly_baseload_extraction_power(self) -> np.ndarray:
         """
+        This function returns the monthly extraction power due to the baseload extraction in kW/month.
 
         Returns
         -------
-
+        monthly baseload extraction power : np.ndarray
         """
         return np.divide(self.monthly_baseload_extraction, self.UPM)
 

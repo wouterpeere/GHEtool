@@ -49,7 +49,7 @@ def optimise_load_profile_power(
     Returns
     -------
     tuple [HourlyGeothermalLoad, HourlyGeothermalLoad, HourlyGeothermalLoad]
-        borefield load (primary), borefield load (secundary), external load (secundary)
+        borefield load (primary), borefield load (secondary), external load (secondary)
 
     Raises
     ------
@@ -60,7 +60,7 @@ def optimise_load_profile_power(
     borefield = copy.deepcopy(borefield)
 
     # check if hourly load is given
-    if not building_load.hourly_resolution:
+    if not building_load._hourly:
         raise ValueError("No hourly load was given!")
 
     # check if threshold is positive
@@ -134,19 +134,19 @@ def optimise_load_profile_power(
         else:
             cool_ok = True
 
-    # calculate the resulting secundary hourly profile that can be put on the borefield
-    secundary_borefield_load = HourlyGeothermalLoad(simulation_period=building_load.simulation_period)
-    secundary_borefield_load.set_hourly_injection_load(borefield.load.hourly_injection_load / (1 + 1 / SEER))
-    secundary_borefield_load.set_hourly_extraction_load(borefield.load.hourly_extraction_load / (1 - 1 / SCOP))
+    # calculate the resulting secondary hourly profile that can be put on the borefield
+    secondary_borefield_load = HourlyGeothermalLoad(simulation_period=building_load.simulation_period)
+    secondary_borefield_load.set_hourly_injection_load(borefield.load.hourly_injection_load / (1 + 1 / SEER))
+    secondary_borefield_load.set_hourly_extraction_load(borefield.load.hourly_extraction_load / (1 - 1 / SCOP))
 
     # calculate external load
     external_load = HourlyGeothermalLoad(simulation_period=building_load.simulation_period)
     external_load.set_hourly_extraction_load(
-        np.maximum(0, building_load.hourly_extraction_load - secundary_borefield_load.hourly_extraction_load))
+        np.maximum(0, building_load.hourly_extraction_load - secondary_borefield_load.hourly_extraction_load))
     external_load.set_hourly_injection_load(
-        np.maximum(0, building_load.hourly_injection_load - secundary_borefield_load.hourly_injection_load))
+        np.maximum(0, building_load.hourly_injection_load - secondary_borefield_load.hourly_injection_load))
 
-    return borefield.load, secundary_borefield_load, external_load
+    return borefield.load, secondary_borefield_load, external_load
 
 
 def optimise_load_profile_energy(
@@ -189,7 +189,7 @@ def optimise_load_profile_energy(
     Returns
     -------
     tuple [HourlyGeothermalLoad, HourlyGeothermalLoad, HourlyGeothermalLoad]
-        borefield load (primary), borefield load (secundary), external load (secundary)
+        borefield load (primary), borefield load (secondary), external load (secondary)
 
     Raises
     ------
@@ -200,7 +200,7 @@ def optimise_load_profile_energy(
     borefield = copy.deepcopy(borefield)
 
     # check if hourly load is given
-    if not building_load.hourly_resolution:
+    if not building_load._hourly:
         raise ValueError("No hourly load was given!")
 
     # check if threshold is positive
@@ -335,17 +335,17 @@ def optimise_load_profile_energy(
                                                      borefield.load.monthly_peak_injection_simulation_period)
 
     # calculate the corresponding geothermal load
-    secundary_borefield_load = HourlyGeothermalLoadMultiYear()
-    secundary_borefield_load.hourly_injection_load = primary_borefield_load.hourly_injection_load_simulation_period / (
+    secondary_borefield_load = HourlyGeothermalLoadMultiYear()
+    secondary_borefield_load.hourly_injection_load = primary_borefield_load.hourly_injection_load_simulation_period / (
             1 + 1 / SEER)
-    secundary_borefield_load.hourly_extraction_load = primary_borefield_load.hourly_extraction_load_simulation_period / (
+    secondary_borefield_load.hourly_extraction_load = primary_borefield_load.hourly_extraction_load_simulation_period / (
             1 - 1 / SCOP)
 
     # calculate external load
     external_load = HourlyGeothermalLoadMultiYear()
     external_load.hourly_extraction_load = np.maximum(0, building_load.hourly_extraction_load_simulation_period -
-                                                      secundary_borefield_load.hourly_extraction_load_simulation_period)
+                                                      secondary_borefield_load.hourly_extraction_load_simulation_period)
     external_load.hourly_injection_load = np.maximum(0, building_load.hourly_injection_load_simulation_period -
-                                                     secundary_borefield_load.hourly_injection_load_simulation_period)
+                                                     secondary_borefield_load.hourly_injection_load_simulation_period)
 
-    return primary_borefield_load, secundary_borefield_load, external_load
+    return primary_borefield_load, secondary_borefield_load, external_load

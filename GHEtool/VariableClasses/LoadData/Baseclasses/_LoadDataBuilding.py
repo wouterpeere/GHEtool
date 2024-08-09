@@ -103,10 +103,11 @@ class _LoadDataBuilding(_LoadData, ABC):
     @property
     def monthly_baseload_cooling(self) -> np.ndarray:
         """
+        This function returns the monthly baseload cooling in kWh/month.
 
         Returns
         -------
-
+        monthly baseload cooling : np.ndarray
         """
         return np.mean(self.monthly_baseload_cooling_simulation_period.reshape((self.simulation_period, 12)),
                        axis=0)
@@ -114,10 +115,11 @@ class _LoadDataBuilding(_LoadData, ABC):
     @property
     def monthly_baseload_heating(self) -> np.ndarray:
         """
+        This function returns the monthly baseload heating in kWh/month.
 
         Returns
         -------
-
+        monthly baseload heating : np.ndarray
         """
         return np.mean(self.monthly_baseload_heating_simulation_period.reshape((self.simulation_period, 12)),
                        axis=0)
@@ -125,10 +127,11 @@ class _LoadDataBuilding(_LoadData, ABC):
     @property
     def monthly_peak_cooling(self) -> np.ndarray:
         """
+        This function returns the monthly peak cooling in kW/month.
 
         Returns
         -------
-
+        monthly peak cooling : np.ndarray
         """
         return np.mean(self.monthly_peak_cooling_simulation_period.reshape((self.simulation_period, 12)),
                        axis=0)
@@ -136,10 +139,11 @@ class _LoadDataBuilding(_LoadData, ABC):
     @property
     def monthly_peak_heating(self) -> np.ndarray:
         """
+        This function returns the monthly peak heating in kW/month.
 
         Returns
         -------
-
+        monthly peak heating : np.ndarray
         """
         return np.mean(self.monthly_peak_heating_simulation_period.reshape((self.simulation_period, 12)),
                        axis=0)
@@ -147,20 +151,22 @@ class _LoadDataBuilding(_LoadData, ABC):
     @property
     def monthly_baseload_cooling_power(self) -> np.ndarray:
         """
+        This function returns the monthly cooling power due to the baseload cooling in kW/month.
 
         Returns
         -------
-
+        monthly baseload cooling power : np.ndarray
         """
         return np.divide(self.monthly_baseload_cooling, self.UPM)
 
     @property
     def monthly_baseload_heating_power(self) -> np.ndarray:
         """
+        This function returns the monthly heating power due to the baseload heating in kW/month.
 
         Returns
         -------
-
+        monthly baseload heating power : np.ndarray
         """
         return np.divide(self.monthly_baseload_heating, self.UPM)
 
