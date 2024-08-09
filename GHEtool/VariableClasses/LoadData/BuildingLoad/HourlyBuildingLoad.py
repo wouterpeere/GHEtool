@@ -10,7 +10,6 @@ from typing import Tuple, TYPE_CHECKING, Union
 
 from GHEtool.VariableClasses.Efficiency import *
 from GHEtool.VariableClasses.LoadData.Baseclasses import _SingleYear, _HourlyDataBuilding
-from GHEtool.logger import ghe_logger
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike

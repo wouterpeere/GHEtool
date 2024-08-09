@@ -726,8 +726,8 @@ class _LoadDataBuilding(_LoadData, ABC):
             Baseload domestic hot water for the whole simulation period
         """
         if isinstance(self._dhw, (int, float)):
-            temp = self._dhw / (8760 if self._hourly else 12)
-            return np.full(self.simulation_period * (8760 if self._hourly else 12), temp)
+            temp = self._dhw * self.UPM / 8760  # divide DHW across the months relative to the UPM
+            return np.tile(temp, self.simulation_period)
         if self._multiyear:
             return self._dhw
         return np.tile(self._dhw, self.simulation_period)
