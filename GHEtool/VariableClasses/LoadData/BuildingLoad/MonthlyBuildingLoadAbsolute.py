@@ -6,7 +6,6 @@ from GHEtool.VariableClasses.Efficiency import *
 from GHEtool.VariableClasses.LoadData.Baseclasses import _SingleYear, _LoadDataBuilding
 from GHEtool.VariableClasses.LoadData.GeothermalLoad import HourlyGeothermalLoad
 from GHEtool.VariableClasses.LoadData.GeothermalLoad.HourlyGeothermalLoadMultiYear import HourlyGeothermalLoadMultiYear
-from GHEtool.logger.ghe_logger import ghe_logger
 
 from numpy.typing import ArrayLike
 from typing import Union
@@ -27,8 +26,8 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
             simulation_period: int = 20,
             efficiency_heating: Union[int, float, COP, SCOP] = 5,
             efficiency_cooling: Union[int, float, EER, SEER] = 20,
-            dhw: Union[float, np.ndarray] = None,
-            efficiency_dhw: Union[int, float, COP, SCOP] = None
+            dhw: Union[float, np.ndarray] = 0.,
+            efficiency_dhw: Union[int, float, COP, SCOP] = 4
     ):
         """
 

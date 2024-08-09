@@ -18,7 +18,7 @@ class _LoadDataBuilding(_LoadData, ABC):
     def __init__(self,
                  efficiency_heating: Union[int, float, COP, SCOP],
                  efficiency_cooling: Union[int, float, EER, SEER],
-                 dhw: Union[float, np.ndarray] = None,
+                 dhw: Union[float, np.ndarray] = 0.,
                  efficiency_dhw: Union[int, float, COP, SCOP] = 4):
         """
 
@@ -54,6 +54,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         self.cop = efficiency_heating
         self.eer = efficiency_cooling
         self.cop_dhw = efficiency_dhw
+        self.dhw = dhw
 
     @abc.abstractmethod
     def monthly_baseload_heating_simulation_period(self) -> np.ndarray:
@@ -487,7 +488,7 @@ class _LoadDataBuilding(_LoadData, ABC):
             self.monthly_baseload_heating_simulation_period,
             self.cop.get_COP(self.get_cop(True), part_load=part_load))
 
-        if self.dhw == 0.:
+        if isinstance(self.dhw, (int, float)) and self.dhw == 0.:
             return extraction_due_to_heating
 
         part_load_dhw = self.monthly_baseload_dhw_power_simulation_period / np.max(
@@ -533,7 +534,7 @@ class _LoadDataBuilding(_LoadData, ABC):
             self.monthly_peak_heating_simulation_period,
             self.cop.get_COP(self.get_cop(True), part_load=part_load))
 
-        if self.exclude_DHW_from_peak or self.dhw == 0.:
+        if self.exclude_DHW_from_peak or (isinstance(self.dhw, (int, float)) and self.dhw == 0.):
             return extraction_due_to_heating
 
         part_load_dhw = self.monthly_baseload_dhw_power_simulation_period / np.max(
@@ -689,6 +690,8 @@ class _LoadDataBuilding(_LoadData, ABC):
         if isinstance(dhw, (float, int)):
             if not dhw >= 0:
                 raise ValueError(f'Please fill in a positive value for the domestic hot water instead of {dhw}.')
+            self._dhw = dhw
+            return
         if not self._check_input(dhw):
             raise ValueError('Wrong value for the DHW array. Please make sure the length matches that of the heating '
                              'and cooling array.')
@@ -707,7 +710,9 @@ class _LoadDataBuilding(_LoadData, ABC):
         if isinstance(self._dhw, (int, float)):
             temp = self._dhw / (8760 if self._hourly else 12)
             return np.full(self.simulation_period * (8760 if self._hourly else 12), temp)
-        return self._dhw
+        if self._multiyear:
+            return self._dhw
+        return np.tile(self._dhw, self.simulation_period)
 
     @property
     def monthly_baseload_dhw_power_simulation_period(self) -> np.ndarray:
@@ -733,7 +738,7 @@ class _LoadDataBuilding(_LoadData, ABC):
             Baseload domestic hot water for one year
         """
 
-        return np.max(self.monthly_baseload_dhw_simulation_period.reshape((self.simulation_period, 12)), axis=0)
+        return np.mean(self.monthly_baseload_dhw_simulation_period.reshape((self.simulation_period, 12)), axis=0)
 
     @property
     def monthly_peak_dhw(self) -> np.ndarray:
@@ -745,7 +750,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         peak domestic hot water : np.ndarray
             Peak domestic hot water for one year
         """
-        return np.max(self.monthly_peak_dhw_simulation_period.reshape((self.simulation_period, 12)), axis=0)
+        return np.mean(self.monthly_baseload_dhw_power_simulation_period.reshape((self.simulation_period, 12)), axis=0)
 
     @property
     def yearly_average_dhw_load(self) -> float:
