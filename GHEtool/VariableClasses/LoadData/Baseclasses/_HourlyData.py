@@ -11,7 +11,7 @@ class _HourlyData(_LoadData, ABC):
 
     def __init__(self):
         _LoadData.__init__(self)
-        self.hourly_resolution = True
+        self._hourly = True
 
         # initiate variables
         self._hourly_heating_load: np.ndarray = np.zeros(8760)
@@ -26,19 +26,23 @@ class _HourlyData(_LoadData, ABC):
     @abc.abstractmethod
     def hourly_injection_load_simulation_period(self) -> np.ndarray:
         """
+        This function returns the hourly injection load in kWh/h for the whole simulation period.
 
         Returns
         -------
-
+        hourly injection : np.ndarray
+            Hourly injection values [kWh/h] for the whole simulation period
         """
 
     @abc.abstractmethod
     def hourly_extraction_load_simulation_period(self) -> np.ndarray:
         """
+        This function returns the hourly extraction load in kWh/h for the whole simulation period.
 
         Returns
         -------
-
+        hourly extraction : np.ndarray
+            Hourly extraction values [kWh/h] for the whole simulation period
         """
 
     @property
@@ -66,10 +70,10 @@ class _HourlyData(_LoadData, ABC):
         return np.mean(self.hourly_extraction_load_simulation_period.reshape((self.simulation_period, 8760)), axis=0)
 
     @property
-    def hourly_load_simulation_period(self) -> np.ndarray:
+    def hourly_net_resulting_power(self) -> np.ndarray:
         """
-        This function calculates the resulting hourly load in kW for the whole simulation period.
-        A negative values means the borefield is extraction dominated.
+        This function calculates the net resulting hourly load in kW for the whole simulation period.
+        A negative value means the borefield is extraction dominated.
 
         Returns
         -------
@@ -190,4 +194,4 @@ class _HourlyData(_LoadData, ABC):
         -------
         simulation period : int
         """
-        return int(len(self.hourly_extraction_load_simulation_period) / 8760)
+        return int(len(self.hourly_injection_load_simulation_period) / 8760)

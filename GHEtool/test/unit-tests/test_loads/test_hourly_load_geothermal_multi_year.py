@@ -20,19 +20,19 @@ def test_checks_multiyear():
 def test_set_hourly_load_multi_year():
     load = HourlyGeothermalLoadMultiYear()
     load.hourly_extraction_load = np.linspace(0, 8759 * 2 + 1, 8760 * 2)
+    load.hourly_injection_load = np.linspace(0, 8759 * 2 + 1, 8760 * 2)
     assert len(load._hourly_extraction_load) == 8760 * 2
     assert len(load.hourly_extraction_load) == 8760
     assert load.simulation_period == 2
     assert np.array_equal(load.hourly_extraction_load, np.linspace(0 + 8760 / 2, 8759 + 8760 / 2, 8760))
     assert np.array_equal(load.hourly_extraction_load_simulation_period, load._hourly_extraction_load)
-    load.hourly_injection_load = np.linspace(0, 8759 * 2 + 1, 8760 * 2)
     assert len(load._hourly_injection_load) == 8760 * 2
     assert len(load.hourly_injection_load) == 8760
     assert load.simulation_period == 2
     assert np.array_equal(load.hourly_injection_load, np.linspace(0 + 8760 / 2, 8759 + 8760 / 2, 8760))
     assert np.array_equal(load.hourly_injection_load_simulation_period, load._hourly_injection_load)
     load._hourly_injection_load = load._hourly_injection_load - 20
-    assert np.array_equal(load.hourly_load_simulation_period,
+    assert np.array_equal(load.hourly_net_resulting_power,
                           load._hourly_injection_load - load._hourly_extraction_load)
 
 

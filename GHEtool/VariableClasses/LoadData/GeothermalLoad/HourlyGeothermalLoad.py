@@ -17,8 +17,7 @@ if TYPE_CHECKING:
 
 class HourlyGeothermalLoad(_SingleYear, _HourlyData):
     """
-    This class contains all the information for geothermal load data with a monthly resolution and absolute input.
-    This means that the inputs are both in kWh/month and kW/month.
+    This class contains all the information for building load data with an hourly resolution.
     """
 
     def __init__(self, extraction_load: ArrayLike = None,
@@ -239,8 +238,6 @@ class HourlyGeothermalLoad(_SingleYear, _HourlyData):
         # set data
         self.hourly_extraction_load = np.array(df.iloc[:, col_extraction])
         self.hourly_injection_load = np.array(df.iloc[:, col_injection])
-
-        ghe_logger.info("Hourly profile loaded!")
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, HourlyGeothermalLoad):

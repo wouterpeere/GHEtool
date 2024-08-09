@@ -20,7 +20,6 @@ class _LoadData(ABC):
         self._all_months_equal: bool = True  # true if it is assumed that all months are of the same length
         self._peak_injection_duration: int = _LoadData.DEFAULT_LENGTH_PEAK
         self._peak_extraction_duration: int = _LoadData.DEFAULT_LENGTH_PEAK
-        self.hourly_resolution = False
         self._multiyear = False
         self._hourly = False
 

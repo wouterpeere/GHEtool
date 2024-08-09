@@ -25,7 +25,7 @@ def test_multiple_years_L4():
     borefield.load = hourly_load
     assert np.allclose(borefield.load.hourly_extraction_load_simulation_period, load["heating"].clip(0) * load_factor)
     assert np.allclose(borefield.load.hourly_injection_load_simulation_period, load["cooling"].clip(0) * load_factor)
-    assert np.allclose(borefield.load.hourly_load_simulation_period,
+    assert np.allclose(borefield.load.hourly_net_resulting_power,
                        load["cooling"].clip(0) * load_factor - load["heating"].clip(0) * load_factor)
     h = borefield.size_L4(150)
     assert np.isclose(h, 114.912, rtol=0.001)
@@ -35,7 +35,7 @@ def test_multiple_years_L4():
     borefield.load = hourly_load
     assert np.allclose(borefield.load.hourly_extraction_load_simulation_period, load["heating"].clip(0) * load_factor)
     assert np.allclose(borefield.load.hourly_injection_load_simulation_period, load["cooling"].clip(0) * load_factor)
-    assert np.allclose(borefield.load.hourly_load_simulation_period,
+    assert np.allclose(borefield.load.hourly_net_resulting_power,
                        load["cooling"].clip(0) * load_factor - load["heating"].clip(0) * load_factor)
     h = borefield.size_L4(150)
     assert np.isclose(h, 101.836, rtol=0.001)

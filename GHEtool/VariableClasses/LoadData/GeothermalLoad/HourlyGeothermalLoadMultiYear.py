@@ -13,8 +13,7 @@ from numpy.typing import ArrayLike
 
 class HourlyGeothermalLoadMultiYear(_HourlyData):
     """
-    This class contains all the information for geothermal load data with a monthly resolution and absolute input.
-    This means that the inputs are both in kWh/month and kW/month.
+    This class contains all the information for building load data with an hourly resolution.
     """
 
     def __init__(self, extraction_load: ArrayLike = None, injection_load: ArrayLike = None, *args, **kwargs):

@@ -40,7 +40,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         self._baseload_cooling: np.ndarray = np.zeros(12)
         self._peak_heating: np.ndarray = np.zeros(12)
         self._peak_cooling: np.ndarray = np.zeros(12)
-        self._dhw = 0.
+        self._dhw = None
 
         self._cop = None
         self._eer = None
@@ -465,9 +465,10 @@ class _LoadDataBuilding(_LoadData, ABC):
         if self.eer._range_part_load:
             part_load = np.divide(self.monthly_baseload_cooling_simulation_period,
                                   np.tile(self.UPM, self.simulation_period)) / self.max_peak_cooling
-        return np.divide(
+        return np.multiply(
             self.monthly_baseload_cooling_simulation_period,
-            self.eer.get_EER(self.get_eer(False), part_load=part_load))
+            self.conversion_factor_secondary_to_primary_cooling(
+                self.eer.get_EER(self.get_eer(False), part_load=part_load)))
 
     @property
     def monthly_baseload_extraction_simulation_period(self) -> np.ndarray:
@@ -484,18 +485,20 @@ class _LoadDataBuilding(_LoadData, ABC):
         if self.cop._range_part_load:
             part_load = np.divide(self.monthly_baseload_heating_simulation_period,
                                   np.tile(self.UPM, self.simulation_period)) / self.max_peak_heating
-        extraction_due_to_heating = np.divide(
+        extraction_due_to_heating = np.multiply(
             self.monthly_baseload_heating_simulation_period,
-            self.cop.get_COP(self.get_cop(True), part_load=part_load))
+            self.conversion_factor_secondary_to_primary_heating(
+                self.cop.get_COP(self.get_cop(True), part_load=part_load)))
 
         if isinstance(self.dhw, (int, float)) and self.dhw == 0.:
             return extraction_due_to_heating
 
         part_load_dhw = self.monthly_baseload_dhw_power_simulation_period / np.max(
             self.monthly_baseload_dhw_power_simulation_period)
-        return extraction_due_to_heating + np.divide(
+        return extraction_due_to_heating + np.multiply(
             self.monthly_baseload_dhw_simulation_period,
-            self.cop_dhw.get_COP(self.get_cop(True), part_load=part_load_dhw))
+            self.conversion_factor_secondary_to_primary_heating(
+                self.cop_dhw.get_COP(self.get_cop(True), part_load=part_load_dhw)))
 
     @property
     def monthly_peak_injection_simulation_period(self) -> np.ndarray:
@@ -510,9 +513,10 @@ class _LoadDataBuilding(_LoadData, ABC):
         part_load = None
         if self.eer._range_part_load:
             part_load = self.monthly_peak_cooling_simulation_period / self.max_peak_cooling
-        return np.divide(
+        return np.multiply(
             self.monthly_peak_cooling_simulation_period,
-            self.eer.get_EER(self.get_eer(True), part_load=part_load))
+            self.conversion_factor_secondary_to_primary_cooling(
+                self.eer.get_EER(self.get_eer(True), part_load=part_load)))
 
     @property
     def monthly_peak_extraction_simulation_period(self) -> np.ndarray:
@@ -530,18 +534,20 @@ class _LoadDataBuilding(_LoadData, ABC):
         if self.cop._range_part_load:
             part_load = self.monthly_peak_heating_simulation_period / self.max_peak_heating
 
-        extraction_due_to_heating = np.divide(
+        extraction_due_to_heating = np.multiply(
             self.monthly_peak_heating_simulation_period,
-            self.cop.get_COP(self.get_cop(True), part_load=part_load))
+            self.conversion_factor_secondary_to_primary_heating(
+                self.cop.get_COP(self.get_cop(True), part_load=part_load)))
 
         if self.exclude_DHW_from_peak or (isinstance(self.dhw, (int, float)) and self.dhw == 0.):
             return extraction_due_to_heating
 
         part_load_dhw = self.monthly_baseload_dhw_power_simulation_period / np.max(
             self.monthly_baseload_dhw_power_simulation_period)
-        return extraction_due_to_heating + np.divide(
+        return extraction_due_to_heating + np.multiply(
             self.monthly_baseload_dhw_power_simulation_period,
-            self.cop_dhw.get_COP(self.get_cop(True), part_load=part_load_dhw))
+            self.conversion_factor_secondary_to_primary_heating(
+                self.cop_dhw.get_COP(self.get_cop(True), part_load=part_load_dhw)))
 
     @property
     def max_peak_cooling(self) -> float:

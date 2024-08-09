@@ -2,7 +2,6 @@ import pytest
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 
 from GHEtool import FOLDER
 from GHEtool.VariableClasses import HourlyGeothermalLoad, HourlyGeothermalLoadMultiYear, MonthlyGeothermalLoadAbsolute
@@ -111,7 +110,7 @@ def test_load_simulation_period():
     load.hourly_injection_load = np.linspace(50, 8759, 8760)
     assert np.array_equal(load.hourly_injection_load_simulation_period,
                           np.tile(np.linspace(50, 8759, 8760), load.simulation_period))
-    assert np.array_equal(load.hourly_load_simulation_period,
+    assert np.array_equal(load.hourly_net_resulting_power,
                           np.tile(-np.linspace(0, 8759, 8760) + np.linspace(50, 8759, 8760), load.simulation_period))
 
 
