@@ -1,4 +1,4 @@
-# from .HourlyBuildingLoad import HourlyGeothermalLoad
+# from .HourlyBuildingLoad import HourlyBuildingLoad
 from .MonthlyBuildingLoadAbsolute import MonthlyBuildingLoadAbsolute
-# from .HourlyBuildingLoadMultiYear import HourlyGeothermalLoadMultiYear
-# from .MonthlyBuildingLoadMultiYear import MonthlyGeothermalLoadMultiYear
+# from .HourlyBuildingLoadMultiYear import HourlyBuildingLoadMultiYear
+from .MonthlyBuildingLoadMultiYear import MonthlyBuildingLoadMultiYear

@@ -18,7 +18,7 @@ class _LoadDataBuilding(_LoadData, ABC):
     def __init__(self,
                  efficiency_heating: Union[int, float, COP, SCOP],
                  efficiency_cooling: Union[int, float, EER, SEER],
-                 dhw: Union[float, np.ndarray] = 0.,
+                 dhw: Union[float, np.ndarray] = None,
                  efficiency_dhw: Union[int, float, COP, SCOP] = 4):
         """
 
@@ -664,6 +664,8 @@ class _LoadDataBuilding(_LoadData, ABC):
         -------
         DHW object
         """
+        if self._dhw is None:
+            return 0.
         return self._dhw
 
     @dhw.setter
@@ -687,7 +689,11 @@ class _LoadDataBuilding(_LoadData, ABC):
         -------
         None
         """
+        if dhw is None:
+            return
         if isinstance(dhw, (float, int)):
+            if self._multiyear:
+                raise ValueError('When using a multi year data input, it is not allowed to enter a yearly DHW demand.')
             if not dhw >= 0:
                 raise ValueError(f'Please fill in a positive value for the domestic hot water instead of {dhw}.')
             self._dhw = dhw

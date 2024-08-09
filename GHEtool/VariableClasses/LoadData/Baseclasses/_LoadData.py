@@ -83,7 +83,7 @@ class _LoadData(ABC):
         -------
         simulation period : int
         """
-        return int(len(self.monthly_baseload_extraction_simulation_period) / 12)
+        return int(len(self.monthly_baseload_injection_simulation_period) / 12)
 
     @property
     def all_months_equal(self) -> bool:

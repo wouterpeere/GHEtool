@@ -4,8 +4,6 @@ import numpy as np
 
 from GHEtool.VariableClasses.Efficiency import *
 from GHEtool.VariableClasses.LoadData.Baseclasses import _SingleYear, _LoadDataBuilding
-from GHEtool.VariableClasses.LoadData.GeothermalLoad import HourlyGeothermalLoad
-from GHEtool.VariableClasses.LoadData.GeothermalLoad.HourlyGeothermalLoadMultiYear import HourlyGeothermalLoadMultiYear
 
 from numpy.typing import ArrayLike
 from typing import Union
@@ -13,7 +11,7 @@ from typing import Union
 
 class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
     """
-    This class contains all the information for geothermal load data with a monthly resolution and absolute input.
+    This class contains all the information for building load data with a monthly resolution and absolute input.
     This means that the inputs are both in kWh/month and kW/month.
     """
 
@@ -26,7 +24,7 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
             simulation_period: int = 20,
             efficiency_heating: Union[int, float, COP, SCOP] = 5,
             efficiency_cooling: Union[int, float, EER, SEER] = 20,
-            dhw: Union[float, np.ndarray] = 0.,
+            dhw: Union[float, np.ndarray] = None,
             efficiency_dhw: Union[int, float, COP, SCOP] = 4
     ):
         """
@@ -361,87 +359,6 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
             Peak cooling for the whole simulation period
         """
         return np.tile(self.peak_cooling, self.simulation_period)
-
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, MonthlyBuildingLoadAbsolute):
-            return False
-        if not np.array_equal(self.baseload_heating, other.baseload_heating):
-            return False
-        if not np.array_equal(self.baseload_cooling, other.baseload_cooling):
-            return False
-        if not np.array_equal(self.peak_heating, other.peak_heating):
-            return False
-        if not np.array_equal(self.peak_cooling, other.peak_cooling):
-            return False
-        if not self.simulation_period == other.simulation_period:
-            return False
-        return True
-
-    def __add__(self, other):
-        if isinstance(other, MonthlyBuildingLoadAbsolute):
-            if self.simulation_period != other.simulation_period:
-                warnings.warn(
-                    f"The simulation period for both load classes are different. "
-                    f"The maximum simulation period of "
-                    f"{max(self.simulation_period, other.simulation_period)} years will be taken."
-                )
-            if self.peak_cooling_duration != other.peak_cooling_duration:
-                warnings.warn(
-                    f"The peak cooling duration for both load classes are different. "
-                    f"The maximum peak cooling duration of "
-                    f"{max(self.peak_cooling_duration, other.peak_cooling_duration)} hours will be taken."
-                )
-            if self.peak_heating_duration != other.peak_heating_duration:
-                warnings.warn(
-                    f"The peak heating duration for both load classes are different. "
-                    f"The maximum peak heating duration of "
-                    f"{max(self.peak_heating_duration, other.peak_heating_duration)} hours will be taken."
-                )
-
-            result = MonthlyBuildingLoadAbsolute(
-                self._baseload_heating + other._baseload_heating,
-                self._baseload_cooling + other._baseload_cooling,
-                self._peak_heating + other._peak_extraction,
-                self._peak_cooling + other._peak_injection,
-                max(self.simulation_period, other.simulation_period),
-                self.dhw + other.dhw,
-            )
-            result.peak_cooling_duration = max(self._peak_injection_duration, other._peak_injection_duration)
-            result.peak_heating_duration = max(self._peak_extraction_duration, other._peak_extraction_duration)
-
-            return result
-
-        # multiyear hourly
-        if isinstance(other, HourlyGeothermalLoadMultiYear):
-            raise TypeError("You cannot add an HourlyMultiYear input with a monthly based input.")
-
-        # hourly load
-        if isinstance(other, HourlyGeothermalLoad):
-            warnings.warn("You add an hourly to a monthly load, the result will hence be a monthly load.")
-            if self.simulation_period != other.simulation_period:
-                warnings.warn(
-                    f"The simulation period for both load classes are different. "
-                    f"The maximum simulation period of "
-                    f"{max(self.simulation_period, other.simulation_period)} years will be taken."
-                )
-
-            peak_heating, baseload_heating = other.resample_to_monthly(other._hourly_heating_load)
-            peak_cooling, baseload_cooling = other.resample_to_monthly(other._hourly_cooling_load)
-
-            result = MonthlyBuildingLoadAbsolute(
-                self._baseload_heating + baseload_heating,
-                self._baseload_cooling + baseload_cooling,
-                self._peak_heating + peak_heating,
-                self._peak_cooling + peak_cooling,
-                max(self.simulation_period, other.simulation_period),
-                self.dhw + other.dhw,
-            )
-            result.peak_injection_duration = self._peak_injection_duration
-            result.peak_extraction_duration = self._peak_extraction_duration
-
-            return result
-
-        raise TypeError("Cannot perform addition. Please check if you use correct classes.")
 
     def correct_for_start_month(self, array: np.ndarray) -> np.ndarray:
         """
