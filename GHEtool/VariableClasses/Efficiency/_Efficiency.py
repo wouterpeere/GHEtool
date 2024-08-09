@@ -133,14 +133,20 @@ class _Efficiency(_EfficiencyBase):
             if self._range_part_load:
                 raise ValueError('The EER class requires a value for the part-load.')
 
+        # get maximum length
+        _max_length = np.max([len(i) if i is not None and not isinstance(i, (float, int)) else 1 for i in
+                              (primary_temperature, secondary_temperature, part_load)])
+
         # convert to arrays
         primary_temperature = np.array(
-            [primary_temperature] if isinstance(primary_temperature, (float, int)) else primary_temperature)
+            np.full(_max_length, primary_temperature) if isinstance(primary_temperature,
+                                                                    (float, int)) else primary_temperature)
         secondary_temperature = np.array(
-            [secondary_temperature] if isinstance(secondary_temperature, (float, int)) else secondary_temperature)
-        part_load = np.array([part_load] if isinstance(part_load, (float, int)) else part_load)
+            np.full(_max_length, secondary_temperature) if isinstance(secondary_temperature,
+                                                                      (float, int)) else secondary_temperature)
+        part_load = np.array(np.full(_max_length, part_load) if isinstance(part_load, (float, int)) else part_load)
 
-        # clip
+        # clip, so that no values fall outside of the provided values
         primary_temperature_clipped = np.clip(primary_temperature,
                                               np.min(self.__range_primary_),
                                               np.max(self.__range_primary_))

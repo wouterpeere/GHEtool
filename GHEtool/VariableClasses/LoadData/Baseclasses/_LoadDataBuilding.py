@@ -387,7 +387,7 @@ class _LoadDataBuilding(_LoadData, ABC):
             return self.results.Tf
         if peak:
             return self.results.peak_extraction
-        return self.results.baseload_extraction
+        return self.results.monthly_extraction
 
     def get_eer(self, peak: bool) -> Union[float, np.ndarray]:
         """
@@ -410,7 +410,7 @@ class _LoadDataBuilding(_LoadData, ABC):
             return self.results.Tf
         if peak:
             return self.results.peak_injection
-        return self.results.baseload_injection
+        return self.results.monthly_injection
 
     @staticmethod
     def conversion_factor_secondary_to_primary_heating(cop_value: Union[int, float, np.ndarray]) -> Union[
@@ -431,7 +431,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         return 1 - 1 / cop_value
 
     @staticmethod
-    def conversion_factor_secondary_to_primary_cooling(eer_value: np.ndarray):
+    def conversion_factor_secondary_to_primary_cooling(eer_value: Union[int, float, np.ndarray]):
         """
         This function returns the correction factor to convert a secondary cooling load to the primary load
         using the definition of the EER = Ql/W.

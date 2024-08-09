@@ -651,8 +651,8 @@ class _LoadData(ABC):
             return False
         return True
 
-    def set_results(self, results) -> None:
+    def set_results(self, results) -> None:  # pragma: no cover
         pass
 
-    def reset_results(self, min_temperature: float, max_temperature: float) -> None:
+    def reset_results(self, min_temperature: float, max_temperature: float) -> None:  # pragma: no cover
         pass
