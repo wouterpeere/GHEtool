@@ -18,6 +18,7 @@ class _LoadDataBuilding(_LoadData, ABC):
     def __init__(self,
                  efficiency_heating: Union[int, float, COP, SCOP],
                  efficiency_cooling: Union[int, float, EER, SEER],
+                 dhw: Union[float, np.ndarray] = None,
                  efficiency_dhw: Union[int, float, COP, SCOP] = 4):
         """
 
@@ -27,6 +28,8 @@ class _LoadDataBuilding(_LoadData, ABC):
             Efficiency in heating
         efficiency_cooling : int, float, EER, SEER
             Efficiency in cooling
+        dhw : float, np.ndarray
+            Yearly value of array with energy demand for domestic hot water (DHW) [kWh]
         efficiency_dhw : int, float, COP, SCOP,
             Efficiency in DHW
         """
@@ -37,7 +40,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         self._baseload_cooling: np.ndarray = np.zeros(12)
         self._peak_heating: np.ndarray = np.zeros(12)
         self._peak_cooling: np.ndarray = np.zeros(12)
-        self._dhw: np.ndarray = np.zeros(12)
+        self._dhw = 0.
 
         self._cop = None
         self._eer = None
@@ -459,7 +462,8 @@ class _LoadDataBuilding(_LoadData, ABC):
         """
         part_load = None
         if self.eer._range_part_load:
-            part_load = self.monthly_baseload_cooling_simulation_period / self.max_peak_cooling
+            part_load = np.divide(self.monthly_baseload_cooling_simulation_period,
+                                  np.tile(self.UPM, self.simulation_period)) / self.max_peak_cooling
         return np.divide(
             self.monthly_baseload_cooling_simulation_period,
             self.eer.get_EER(self.get_eer(False), part_load=part_load))
@@ -468,19 +472,29 @@ class _LoadDataBuilding(_LoadData, ABC):
     def monthly_baseload_extraction_simulation_period(self) -> np.ndarray:
         """
         This function returns the monthly extraction baseload in kWh/month for the whole simulation period.
+        This takes into account the DHW profile
 
         Returns
         -------
         baseload extraction : np.ndarray
             Baseload extraction for the whole simulation period
         """
-        ## include DHW
         part_load = None
         if self.cop._range_part_load:
-            part_load = self.monthly_baseload_heating_simulation_period / self.max_peak_heating
-        return np.divide(
+            part_load = np.divide(self.monthly_baseload_heating_simulation_period,
+                                  np.tile(self.UPM, self.simulation_period)) / self.max_peak_heating
+        extraction_due_to_heating = np.divide(
             self.monthly_baseload_heating_simulation_period,
             self.cop.get_COP(self.get_cop(True), part_load=part_load))
+
+        if self.dhw == 0.:
+            return extraction_due_to_heating
+
+        part_load_dhw = self.monthly_baseload_dhw_power_simulation_period / np.max(
+            self.monthly_baseload_dhw_power_simulation_period)
+        return extraction_due_to_heating + np.divide(
+            self.monthly_baseload_dhw_simulation_period,
+            self.cop_dhw.get_COP(self.get_cop(True), part_load=part_load_dhw))
 
     @property
     def monthly_peak_injection_simulation_period(self) -> np.ndarray:
@@ -503,19 +517,30 @@ class _LoadDataBuilding(_LoadData, ABC):
     def monthly_peak_extraction_simulation_period(self) -> np.ndarray:
         """
         This function returns the monthly extraction peak in kW/month for the whole simulation period.
+        DHW is by default taken into account for the calculation of the peak extraction.
+        This behaviour can be disabled by setting the 'exclude_DHW_from_peak' attribute to False.
 
         Returns
         -------
         peak extraction : np.ndarray
             Peak extraction for the whole simulation period
         """
-        ## include DHW
         part_load = None
         if self.cop._range_part_load:
             part_load = self.monthly_peak_heating_simulation_period / self.max_peak_heating
-        return np.divide(
+
+        extraction_due_to_heating = np.divide(
             self.monthly_peak_heating_simulation_period,
             self.cop.get_COP(self.get_cop(True), part_load=part_load))
+
+        if self.exclude_DHW_from_peak or self.dhw == 0.:
+            return extraction_due_to_heating
+
+        part_load_dhw = self.monthly_baseload_dhw_power_simulation_period / np.max(
+            self.monthly_baseload_dhw_power_simulation_period)
+        return extraction_due_to_heating + np.divide(
+            self.monthly_baseload_dhw_power_simulation_period,
+            self.cop_dhw.get_COP(self.get_cop(True), part_load=part_load_dhw))
 
     @property
     def max_peak_cooling(self) -> float:
@@ -612,3 +637,136 @@ class _LoadDataBuilding(_LoadData, ABC):
             yearly cooling for the whole simulation period
         """
         return np.max(np.reshape(self.monthly_peak_cooling_simulation_period, (self.simulation_period, 12)), axis=1)
+
+    def add_dhw(self, dhw: Union[float, np.ndarray]) -> None:
+        """
+        This function adds the domestic hot water (dhw).
+        An error is raised if the dhw is not positive.
+
+        Parameters
+        ----------
+        dhw : float, np.ndarray
+            Yearly value of array with energy demand for domestic hot water (DHW) [kWh]
+
+        Returns
+        -------
+        None
+        """
+        self.dhw = dhw
+
+    @property
+    def dhw(self) -> Union[float, np.ndarray]:
+        """
+        This function returns the DHW object.
+
+        Returns
+        -------
+        DHW object
+        """
+        return self._dhw
+
+    @dhw.setter
+    def dhw(self, dhw: Union[float, np.ndarray]) -> None:
+        """
+        This function adds the domestic hot water (dhw).
+        An error is raised is the dhw is not positive.
+
+        Parameters
+        ----------
+        dhw : float, np.ndarray
+            Yearly value of array with energy demand for domestic hot water (DHW) [kWh]
+
+        Raises
+        ------
+        ValueError
+            For negative DHW values
+            When the array is not the right length.
+
+        Returns
+        -------
+        None
+        """
+        if isinstance(dhw, (float, int)):
+            if not dhw >= 0:
+                raise ValueError(f'Please fill in a positive value for the domestic hot water instead of {dhw}.')
+        if not self._check_input(dhw):
+            raise ValueError('Wrong value for the DHW array. Please make sure the length matches that of the heating '
+                             'and cooling array.')
+        self._dhw = dhw
+
+    @property
+    def monthly_baseload_dhw_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the monthly domestic hot water baseload in kWh/month for the whole simulation period.
+
+        Returns
+        -------
+        baseload domestic hot water : np.ndarray
+            Baseload domestic hot water for the whole simulation period
+        """
+        if isinstance(self._dhw, (int, float)):
+            temp = self._dhw / (8760 if self._hourly else 12)
+            return np.full(self.simulation_period * (8760 if self._hourly else 12), temp)
+        return self._dhw
+
+    @property
+    def monthly_baseload_dhw_power_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the monthly baseload power coming from the domestic hot water demand
+        in kW/month for the whole simulation period.
+
+        Returns
+        -------
+        baseload power domestic hot water : np.ndarray
+            Baseload power domestic hot water for the whole simulation period
+        """
+        return np.divide(self.monthly_baseload_dhw_simulation_period, np.tile(self.UPM, self.simulation_period))
+
+    @property
+    def monthly_baseload_dhw(self) -> np.ndarray:
+        """
+        This function returns the monthly domestic hot water baseload in kWh/month for one year.
+
+        Returns
+        -------
+        baseload domestic hot water : np.ndarray
+            Baseload domestic hot water for one year
+        """
+
+        return np.max(self.monthly_baseload_dhw_simulation_period.reshape((self.simulation_period, 12)), axis=0)
+
+    @property
+    def monthly_peak_dhw(self) -> np.ndarray:
+        """
+        This function returns the monthly domestic hot water peak in kW/month for one year.
+
+        Returns
+        -------
+        peak domestic hot water : np.ndarray
+            Peak domestic hot water for one year
+        """
+        return np.max(self.monthly_peak_dhw_simulation_period.reshape((self.simulation_period, 12)), axis=0)
+
+    @property
+    def yearly_average_dhw_load(self) -> float:
+        """
+        This function returns the average yearly DHW load in kWh.
+
+        Returns
+        -------
+        float
+            Yearly dhw load kWh/year
+        """
+        return np.sum(self.monthly_baseload_dhw)
+
+    @property
+    def yearly_dhw_load_simulation_period(self) -> np.array:
+        """
+        This function returns the yearly DHW demand in kWh/year for the whole simulation period.
+
+        Returns
+        -------
+        yearly DHW : np.ndarray
+            yearly DHW for the whole simulation period
+        """
+        return np.sum(np.reshape(self.monthly_baseload_dhw_simulation_period, (self.simulation_period, 12)), axis=1)

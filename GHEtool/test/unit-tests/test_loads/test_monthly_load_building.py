@@ -55,6 +55,23 @@ def test_start_month_general():
     assert load.start_month == 1
 
 
+def test_different_start_month():
+    load = MonthlyBuildingLoadAbsolute(baseload_heating=np.arange(1, 13, 1),
+                                       baseload_cooling=np.arange(1, 13, 1),
+                                       peak_cooling=np.arange(1, 13, 1),
+                                       peak_heating=np.arange(1, 13, 1))
+    load.start_month = 2
+    result = np.array([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1])
+    assert np.allclose(load.baseload_heating, result)
+    assert np.allclose(load.baseload_cooling, result)
+    assert np.allclose(load.peak_heating, result)
+    assert np.allclose(load.peak_cooling, result)
+    assert np.allclose(load.monthly_baseload_heating_simulation_period, np.tile(result, 20))
+    assert np.allclose(load.monthly_baseload_cooling_simulation_period, np.tile(result, 20))
+    assert np.allclose(load.monthly_peak_heating_simulation_period, np.tile(result, 20))
+    assert np.allclose(load.monthly_peak_cooling_simulation_period, np.tile(result, 20))
+
+
 def test_monthly_baseload_heating_simulation_period():
     load = MonthlyBuildingLoadAbsolute(*load_case(1), 10, 5, 5)
     assert np.allclose(load.monthly_baseload_heating_simulation_period, np.tile(load_case(1)[0], 10))
@@ -291,15 +308,15 @@ def test_monthly_baseload_injection_simulation_period():
     load.eer = eer_pl
     load.reset_results(0, 1)
     assert np.allclose(load.monthly_baseload_injection_simulation_period,
-                       np.tile(np.array([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]), 10))
+                       np.tile(np.array([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 5, 5, 5, 5, 5, 5]), 10))
     load.reset_results(0, 10)
     assert np.allclose(load.monthly_baseload_injection_simulation_period,
-                       np.tile(np.array([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]) / 2, 10))
+                       np.tile(np.array([1.25, 1.25, 1.25, 1.25, 1.25, 1.25, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5]), 10))
     load.set_results(results_monthly_test)
     assert np.allclose(load.monthly_baseload_injection_simulation_period,
                        np.tile(np.array(
-                           [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 0.34615385, 0.34615385, 0.34615385, 0.34615385, 0.34615385,
-                            0.34615385]), 10))
+                           [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 3.46153846, 3.46153846, 3.46153846, 3.46153846, 3.46153846,
+                            3.46153846]), 10))
 
 
 def test_monthly_baseload_extraction_simulation_period():
@@ -318,15 +335,15 @@ def test_monthly_baseload_extraction_simulation_period():
     load.cop = cop_pl
     load.reset_results(1, 11)
     assert np.allclose(load.monthly_baseload_extraction_simulation_period,
-                       np.tile(np.array([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]), 10))
+                       np.tile(np.array([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 5, 5, 5, 5, 5, 5]), 10))
     load.reset_results(10, 110)
     assert np.allclose(load.monthly_baseload_extraction_simulation_period,
-                       np.tile(np.array([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]) / 2, 10))
+                       np.tile(np.array([1.25, 1.25, 1.25, 1.25, 1.25, 1.25, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5]), 10))
     load.set_results(results_monthly_test)
     assert np.allclose(load.monthly_baseload_extraction_simulation_period,
                        np.tile(np.array(
-                           [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 0.34615385, 0.34615385, 0.34615385, 0.34615385, 0.34615385,
-                            0.34615385]), 10))
+                           [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 3.46153846, 3.46153846, 3.46153846, 3.46153846, 3.46153846,
+                            3.46153846]), 10))
 
 
 def test_monthly_peak_injection_simulation_period():

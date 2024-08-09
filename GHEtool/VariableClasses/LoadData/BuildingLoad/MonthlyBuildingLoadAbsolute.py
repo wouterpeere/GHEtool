@@ -27,7 +27,7 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
             simulation_period: int = 20,
             efficiency_heating: Union[int, float, COP, SCOP] = 5,
             efficiency_cooling: Union[int, float, EER, SEER] = 20,
-            dhw: float = 0.0,
+            dhw: Union[float, np.ndarray] = None,
             efficiency_dhw: Union[int, float, COP, SCOP] = None
     ):
         """
@@ -48,13 +48,13 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
             Efficiency in heating
         efficiency_cooling : int, float, EER, SEER
             Efficiency in cooling
-        dhw : float
-            Yearly consumption of domestic hot water [kWh/year]
+        dhw : float, np.ndarray
+            Yearly value of array with energy demand for domestic hot water (DHW) [kWh]
         efficiency_dhw : int, float, COP, SCOP,
             Efficiency in DHW
         """
 
-        _LoadDataBuilding.__init__(self, efficiency_heating, efficiency_cooling, efficiency_dhw)
+        _LoadDataBuilding.__init__(self, efficiency_heating, efficiency_cooling, dhw, efficiency_dhw)
         _SingleYear.__init__(self, simulation_period)
 
         # initiate variables
@@ -68,7 +68,6 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
         self.baseload_cooling = np.zeros(12) if baseload_cooling is None else baseload_cooling
         self.peak_heating = np.zeros(12) if peak_heating is None else peak_heating
         self.peak_cooling = np.zeros(12) if peak_cooling is None else peak_cooling
-        self.dhw = dhw
 
     @property
     def baseload_cooling(self) -> np.ndarray:
