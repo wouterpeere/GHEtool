@@ -201,6 +201,21 @@ class HourlyBuildingLoad(_SingleYear, _HourlyDataBuilding):
         return np.tile(self.hourly_heating_load, self.simulation_period)
 
     @property
+    def hourly_dhw_load_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the hourly DHW load in kWh/h for the whole simulation period.
+
+        Returns
+        -------
+        hourly DHW : np.ndarray
+            Hourly DHW values [kWh/h] for the whole simulation period
+        """
+        if isinstance(self._dhw, (int, float)):
+            temp = self._dhw / 8760
+            return np.tile(temp, self.simulation_period * 8760)
+        return np.tile(self._dhw, self.simulation_period)
+
+    @property
     def _start_hour(self) -> int:
         """
         This function returns the hour at which the year starts based on the start month.

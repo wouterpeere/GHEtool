@@ -229,6 +229,7 @@ def test_dhw():
     assert np.allclose(load.monthly_peak_dhw, np.linspace(1, 12, 12))
     assert np.allclose(load.monthly_baseload_dhw_simulation_period, np.tile(np.linspace(1, 12, 12) * 730, 10))
     assert np.allclose(load.monthly_baseload_dhw_power_simulation_period, np.tile(np.linspace(1, 12, 12), 10))
+    assert np.allclose(load.monthly_peak_dhw_simulation_period, np.tile(np.linspace(1, 12, 12), 10))
     assert np.allclose(load.monthly_baseload_extraction_power_simulation_period,
                        np.tile(np.linspace(1, 12, 12), 10) * 3 / 4)
     assert np.allclose(load.monthly_peak_extraction_simulation_period, np.tile(np.linspace(1, 12, 12), 10) * 3 / 4)

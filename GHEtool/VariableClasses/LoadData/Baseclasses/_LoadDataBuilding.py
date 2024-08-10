@@ -579,9 +579,9 @@ class _LoadDataBuilding(_LoadData, ABC):
         if self.exclude_DHW_from_peak or (isinstance(self.dhw, (int, float)) and self.dhw == 0.):
             return extraction_due_to_heating
 
-        part_load_dhw = self.monthly_baseload_dhw_power_simulation_period / self.max_peak_dhw
+        part_load_dhw = self.monthly_peak_dhw_simulation_period / self.max_peak_dhw
         return extraction_due_to_heating + np.multiply(
-            self.monthly_baseload_dhw_power_simulation_period,
+            self.monthly_peak_dhw_simulation_period,
             self.conversion_factor_secondary_to_primary_heating(self._get_monthly_cop_dhw(True, part_load_dhw)))
 
     @property
@@ -761,6 +761,19 @@ class _LoadDataBuilding(_LoadData, ABC):
             Baseload power domestic hot water for the whole simulation period
         """
         return np.divide(self.monthly_baseload_dhw_simulation_period, np.tile(self.UPM, self.simulation_period))
+
+    @property
+    def monthly_peak_dhw_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the monthly peak power coming from the domestic hot water demand
+        in kW/month for the whole simulation period.
+
+        Returns
+        -------
+        peak power domestic hot water : np.ndarray
+            Peak power domestic hot water for the whole simulation period
+        """
+        return self.monthly_baseload_dhw_power_simulation_period
 
     @property
     def monthly_baseload_dhw(self) -> np.ndarray:

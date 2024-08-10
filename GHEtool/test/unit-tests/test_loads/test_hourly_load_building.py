@@ -202,7 +202,62 @@ def test_results():
 
 def test_reset_results():
     load = HourlyBuildingLoad(np.linspace(1, 8760 - 1, 8760), np.linspace(1, 8760 - 1, 8760) * 2, 2, scop, seer)
-    load.set_results(results_hourly1)
-    assert load.results == results_hourly1
+    load.set_results(results_hourly2)
+    assert load.results == results_hourly2
     load.reset_results(5, 10)
     assert load.results == (5, 10)
+
+
+def test_dhw():
+    load = HourlyBuildingLoad(np.zeros(8760), np.linspace(1, 8760 - 1, 8760) * 2, 10, scop, seer)
+
+    assert load.dhw == 0
+
+    with pytest.raises(ValueError):
+        load.add_dhw(-100)
+    with pytest.raises(ValueError):
+        load.add_dhw('test')
+    with pytest.raises(ValueError):
+        load.add_dhw(np.full(120, 10))
+    with pytest.raises(ValueError):
+        load.dhw = -100
+    with pytest.raises(ValueError):
+        load.dhw = 'test'
+    with pytest.raises(ValueError):
+        load.dhw = np.full(120, 10)
+
+    load.dhw = 8760
+    assert load.dhw == 8760
+    assert np.allclose(load.hourly_dhw_load_simulation_period, np.full(87600, 1))
+    assert np.allclose(load.monthly_baseload_dhw, np.full(12, 730))
+    assert np.allclose(load.monthly_peak_dhw, np.full(12, 1))
+    assert np.allclose(load.monthly_baseload_dhw_simulation_period, np.full(120, 730))
+    assert np.allclose(load.monthly_baseload_dhw_power_simulation_period, np.full(120, 1))
+    assert np.allclose(load.hourly_extraction_load_simulation_period, np.full(87600, 1) * 3 / 4)
+    assert np.allclose(load.monthly_baseload_extraction_power_simulation_period, np.full(120, 1) * 3 / 4)
+    assert np.allclose(load.monthly_peak_extraction_simulation_period, np.full(120, 1) * 3 / 4)
+    assert np.allclose(load.yearly_dhw_load_simulation_period, np.full(10, 730 * 12))
+    assert load.max_peak_dhw == 1
+    assert np.isclose(load.yearly_average_dhw_load, 730 * 12)
+    load.exclude_DHW_from_peak = True
+    assert np.allclose(load.monthly_peak_extraction_simulation_period, np.zeros(120))
+    load.exclude_DHW_from_peak = False
+
+    arr = np.linspace(1, 8760, 8760)
+    load.dhw = arr
+    assert np.allclose(load.dhw, np.linspace(1, 8760, 8760))
+    assert np.allclose(load.monthly_baseload_dhw, np.sum(arr.reshape(-1, 730), axis=1))
+    assert np.allclose(load.monthly_peak_dhw, np.sum(arr.reshape(-1, 730), axis=1) / 730)
+    assert np.allclose(load.monthly_baseload_dhw_simulation_period,
+                       np.tile(np.sum(arr.reshape(-1, 730), axis=1), 10))
+    assert np.allclose(load.monthly_baseload_dhw_power_simulation_period,
+                       np.tile(np.sum(arr.reshape(-1, 730), axis=1) / 730, 10))
+    assert np.allclose(load.monthly_baseload_extraction_power_simulation_period,
+                       np.tile(np.sum(arr.reshape(-1, 730), axis=1) / 730, 10) * 3 / 4)
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       np.tile(np.max(arr.reshape(-1, 730), axis=1), 10) * 3 / 4)
+    assert np.allclose(load.yearly_dhw_load_simulation_period, np.full(10, np.sum(arr)))
+    assert np.isclose(load.yearly_average_dhw_load, np.sum(arr))
+    assert load.max_peak_dhw == 8760
+    load.exclude_DHW_from_peak = True
+    assert np.allclose(load.monthly_peak_extraction_simulation_period, np.zeros(120))

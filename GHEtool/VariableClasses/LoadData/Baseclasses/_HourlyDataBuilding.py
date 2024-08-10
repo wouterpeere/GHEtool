@@ -192,7 +192,8 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         if self.eer._range_part_load:
             part_load = self.hourly_cooling_load_simulation_period / self.max_peak_cooling
         return np.multiply(
-            self.hourly_cooling_load_simulation_period, self._get_hourly_eer(part_load))
+            self.hourly_cooling_load_simulation_period,
+            self.conversion_factor_secondary_to_primary_cooling(self._get_hourly_eer(part_load)))
 
     @property
     def hourly_extraction_load_simulation_period(self) -> np.ndarray:
@@ -208,14 +209,16 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         if self.cop._range_part_load:
             part_load = self.hourly_heating_load_simulation_period / self.max_peak_heating
         extraction_due_to_heating = np.multiply(
-            self.hourly_heating_load_simulation_period, self._get_hourly_cop(part_load))
+            self.hourly_heating_load_simulation_period,
+            self.conversion_factor_secondary_to_primary_heating(self._get_hourly_cop(part_load)))
 
         if isinstance(self.dhw, (int, float)) and self.dhw == 0.:
             return extraction_due_to_heating
 
         part_load_dhw = self.hourly_dhw_load_simulation_period / self.max_peak_dhw
         return extraction_due_to_heating + np.multiply(
-            self.hourly_dhw_load_simulation_period, self._get_hourly_cop_dhw(part_load_dhw))
+            self.hourly_dhw_load_simulation_period,
+            self.conversion_factor_secondary_to_primary_heating(self._get_hourly_cop_dhw(part_load_dhw)))
 
     @property
     def monthly_baseload_heating_simulation_period(self) -> np.ndarray:
@@ -275,6 +278,19 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         baseload domestic hot water : np.ndarray
             Baseload domestic hot water for the whole simulation period
         """
+        return self.resample_to_monthly(self.hourly_dhw_load_simulation_period)[1]
+
+    @property
+    def monthly_peak_dhw_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the monthly peak power coming from the domestic hot water demand
+        in kW/month for the whole simulation period.
+
+        Returns
+        -------
+        peak power domestic hot water : np.ndarray
+            Peak power domestic hot water for the whole simulation period
+        """
         return self.resample_to_monthly(self.hourly_dhw_load_simulation_period)[0]
 
     def set_results(self, results: Union[ResultsMonthly, ResultsHourly]) -> None:
@@ -305,3 +321,36 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
                 f'The results have a length of {len(results.Tb)} whereas, with a simulation period of {self.simulation_period} years '
                 f'a length of {self.simulation_period * 8760} was expected for a ResultsHourly.')
         self._results = results
+
+    @property
+    def max_peak_cooling(self) -> float:
+        """
+        This returns the max peak cooling in kW.
+
+        Returns
+        -------
+        max peak cooling : float
+        """
+        return np.max(self.hourly_cooling_load_simulation_period)
+
+    @property
+    def max_peak_heating(self) -> float:
+        """
+        This returns the max peak heating in kW.
+
+        Returns
+        -------
+        max peak heating : float
+        """
+        return np.max(self.hourly_heating_load_simulation_period)
+
+    @property
+    def max_peak_dhw(self) -> float:
+        """
+        This returns the max peak DHW in kW.
+
+        Returns
+        -------
+        max peak DHW : float
+        """
+        return np.max(self.hourly_dhw_load_simulation_period)
