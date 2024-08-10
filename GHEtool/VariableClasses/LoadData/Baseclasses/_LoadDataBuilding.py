@@ -101,6 +101,37 @@ class _LoadDataBuilding(_LoadData, ABC):
         """
 
     @property
+    def monthly_baseload_dhw_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the monthly domestic hot water baseload in kWh/month for the whole simulation period.
+
+        Returns
+        -------
+        baseload domestic hot water : np.ndarray
+            Baseload domestic hot water for the whole simulation period
+        """
+
+    @abc.abstractmethod
+    def set_results(self, results: Union[ResultsMonthly, ResultsHourly]) -> None:
+        """
+        This function sets the temperature results.
+
+        Parameters
+        ----------
+        results : ResultsMonthly, ResultsHourly
+            Results object
+
+        Raises
+        ------
+        ValueError
+            If the length of the results is not equal to the length of the data in the load class.
+
+        Returns
+        -------
+        None
+        """
+
+    @property
     def monthly_baseload_cooling(self) -> np.ndarray:
         """
         This function returns the monthly baseload cooling in kWh/month.
@@ -263,32 +294,6 @@ class _LoadDataBuilding(_LoadData, ABC):
             return
         self._cop_dhw = efficiency_dhw
 
-    def set_results(self, results: Union[ResultsMonthly, ResultsHourly]) -> None:
-        """
-        This function sets the temperature results.
-
-        Parameters
-        ----------
-        results : ResultsMonthly, ResultsHourly
-            Results object
-
-        Raises
-        ------
-        ValueError
-            If the length of the results is not equal to the length of the data in the load class.
-
-        Returns
-        -------
-        None
-        """
-        # check if the length is correct
-        if len(results.Tb) != self.simulation_period * (8760 if self._hourly else 12) or (
-                self._hourly != isinstance(results, ResultsHourly)):
-            raise ValueError(
-                'The results have a length of {len(results.Tb)} whereas, with a simulation period of {self.simulation_period} years '
-                'a length of {self.simulation_period * (8760 if self._hourly else 12)} was expected.')
-        self._results = results
-
     def reset_results(self, min_temperature: float, max_temperature: float) -> None:
         """
         This function resets the result object sets the temperature boundaries to the minimum and maximum temperature.
@@ -376,15 +381,17 @@ class _LoadDataBuilding(_LoadData, ABC):
         """
         self._peak_injection_duration = duration
 
-    def get_cop(self, peak: bool) -> Union[float, np.ndarray]:
+    def _get_monthly_cop(self, peak: bool, part_load: np.ndarray = None) -> Union[float, np.ndarray]:
         """
-        This function returns the COP value for the given temperature result profile.
+        This function returns the monthly COP value for the given temperature result profile.
 
         Parameters
         ----------
         peak : bool
             True if the COP values for the peak load in heating should be given.
             When False, the values for the baseload heating are given.
+        part_load : np.ndarray
+            Array with part_load data.
 
         Returns
         -------
@@ -392,22 +399,51 @@ class _LoadDataBuilding(_LoadData, ABC):
             Array of COP values
         """
         if isinstance(self.results, tuple):
-            return self.results[0]
-        if isinstance(self.results, ResultsHourly):
-            return self.results.Tf
-        if peak:
-            return self.results.peak_extraction
-        return self.results.monthly_extraction
+            temperature = self.results[0]
+        elif peak:
+            temperature = self.results.peak_extraction
+        else:
+            temperature = self.results.monthly_extraction
 
-    def get_eer(self, peak: bool) -> Union[float, np.ndarray]:
+        return self.cop.get_COP(temperature, part_load=part_load)
+
+    def _get_monthly_cop_dhw(self, peak: bool, part_load: np.ndarray = None) -> Union[float, np.ndarray]:
         """
-        This function returns the EER value for the given temperature result profile.
+        This function returns the monthly COP DHW value for the given temperature result profile.
+
+        Parameters
+        ----------
+        peak : bool
+            True if the COP values for the peak load in heating should be given.
+            When False, the values for the baseload heating are given.
+        part_load : np.ndarray
+            Array with part_load data.
+
+        Returns
+        -------
+        COP : float | np.ndarray
+            Array of COP values
+        """
+        if isinstance(self.results, tuple):
+            temperature = self.results[0]
+        elif peak:
+            temperature = self.results.peak_extraction
+        else:
+            temperature = self.results.monthly_extraction
+
+        return self.cop_dhw.get_COP(temperature, part_load=part_load)
+
+    def _get_monthly_eer(self, peak: bool, part_load: np.ndarray = None) -> Union[float, np.ndarray]:
+        """
+        This function returns the monthly EER value for the given temperature result profile.
 
         Parameters
         ----------
         peak : bool
             True if the EER values for the peak load in cooling should be given.
             When False, the values for the baseload cooling are given.
+        part_load : np.ndarray
+            Array with part_load data.
 
         Returns
         -------
@@ -415,12 +451,13 @@ class _LoadDataBuilding(_LoadData, ABC):
             Array of EER values
         """
         if isinstance(self.results, tuple):
-            return self.results[1]
-        if isinstance(self.results, ResultsHourly):
-            return self.results.Tf
-        if peak:
-            return self.results.peak_injection
-        return self.results.monthly_injection
+            temperature = self.results[1]
+        elif peak:
+            temperature = self.results.peak_injection
+        else:
+            temperature = self.results.monthly_injection
+
+        return self.eer.get_EER(temperature, part_load=part_load)
 
     @staticmethod
     def conversion_factor_secondary_to_primary_heating(cop_value: Union[int, float, np.ndarray]) -> Union[
@@ -473,8 +510,7 @@ class _LoadDataBuilding(_LoadData, ABC):
                                   np.tile(self.UPM, self.simulation_period)) / self.max_peak_cooling
         return np.multiply(
             self.monthly_baseload_cooling_simulation_period,
-            self.conversion_factor_secondary_to_primary_cooling(
-                self.eer.get_EER(self.get_eer(False), part_load=part_load)))
+            self.conversion_factor_secondary_to_primary_cooling(self._get_monthly_eer(False, part_load)))
 
     @property
     def monthly_baseload_extraction_simulation_period(self) -> np.ndarray:
@@ -493,18 +529,15 @@ class _LoadDataBuilding(_LoadData, ABC):
                                   np.tile(self.UPM, self.simulation_period)) / self.max_peak_heating
         extraction_due_to_heating = np.multiply(
             self.monthly_baseload_heating_simulation_period,
-            self.conversion_factor_secondary_to_primary_heating(
-                self.cop.get_COP(self.get_cop(True), part_load=part_load)))
+            self.conversion_factor_secondary_to_primary_heating(self._get_monthly_cop(False, part_load)))
 
         if isinstance(self.dhw, (int, float)) and self.dhw == 0.:
             return extraction_due_to_heating
 
-        part_load_dhw = self.monthly_baseload_dhw_power_simulation_period / np.max(
-            self.monthly_baseload_dhw_power_simulation_period)
+        part_load_dhw = self.monthly_baseload_dhw_power_simulation_period / self.max_peak_dhw
         return extraction_due_to_heating + np.multiply(
             self.monthly_baseload_dhw_simulation_period,
-            self.conversion_factor_secondary_to_primary_heating(
-                self.cop_dhw.get_COP(self.get_cop(True), part_load=part_load_dhw)))
+            self.conversion_factor_secondary_to_primary_heating(self._get_monthly_cop_dhw(False, part_load_dhw)))
 
     @property
     def monthly_peak_injection_simulation_period(self) -> np.ndarray:
@@ -521,8 +554,7 @@ class _LoadDataBuilding(_LoadData, ABC):
             part_load = self.monthly_peak_cooling_simulation_period / self.max_peak_cooling
         return np.multiply(
             self.monthly_peak_cooling_simulation_period,
-            self.conversion_factor_secondary_to_primary_cooling(
-                self.eer.get_EER(self.get_eer(True), part_load=part_load)))
+            self.conversion_factor_secondary_to_primary_cooling(self._get_monthly_eer(True, part_load)))
 
     @property
     def monthly_peak_extraction_simulation_period(self) -> np.ndarray:
@@ -542,18 +574,15 @@ class _LoadDataBuilding(_LoadData, ABC):
 
         extraction_due_to_heating = np.multiply(
             self.monthly_peak_heating_simulation_period,
-            self.conversion_factor_secondary_to_primary_heating(
-                self.cop.get_COP(self.get_cop(True), part_load=part_load)))
+            self.conversion_factor_secondary_to_primary_heating(self._get_monthly_cop(True, part_load)))
 
         if self.exclude_DHW_from_peak or (isinstance(self.dhw, (int, float)) and self.dhw == 0.):
             return extraction_due_to_heating
 
-        part_load_dhw = self.monthly_baseload_dhw_power_simulation_period / np.max(
-            self.monthly_baseload_dhw_power_simulation_period)
+        part_load_dhw = self.monthly_baseload_dhw_power_simulation_period / self.max_peak_dhw
         return extraction_due_to_heating + np.multiply(
             self.monthly_baseload_dhw_power_simulation_period,
-            self.conversion_factor_secondary_to_primary_heating(
-                self.cop_dhw.get_COP(self.get_cop(True), part_load=part_load_dhw)))
+            self.conversion_factor_secondary_to_primary_heating(self._get_monthly_cop_dhw(True, part_load_dhw)))
 
     @property
     def max_peak_cooling(self) -> float:
@@ -576,6 +605,17 @@ class _LoadDataBuilding(_LoadData, ABC):
         max peak heating : float
         """
         return np.max(self.monthly_peak_heating_simulation_period)
+
+    @property
+    def max_peak_dhw(self) -> float:
+        """
+        This returns the max peak DHW in kW.
+
+        Returns
+        -------
+        max peak DHW : float
+        """
+        return np.max(self.monthly_baseload_dhw_power_simulation_period)
 
     @property
     def yearly_average_cooling_load(self) -> float:
@@ -691,12 +731,6 @@ class _LoadDataBuilding(_LoadData, ABC):
         dhw : float, np.ndarray
             Yearly value of array with energy demand for domestic hot water (DHW) [kWh]
 
-        Raises
-        ------
-        ValueError
-            For negative DHW values
-            When the array is not the right length.
-
         Returns
         -------
         None
@@ -714,23 +748,6 @@ class _LoadDataBuilding(_LoadData, ABC):
             raise ValueError('Wrong value for the DHW array. Please make sure the length matches that of the heating '
                              'and cooling array.')
         self._dhw = dhw
-
-    @property
-    def monthly_baseload_dhw_simulation_period(self) -> np.ndarray:
-        """
-        This function returns the monthly domestic hot water baseload in kWh/month for the whole simulation period.
-
-        Returns
-        -------
-        baseload domestic hot water : np.ndarray
-            Baseload domestic hot water for the whole simulation period
-        """
-        if isinstance(self._dhw, (int, float)):
-            temp = self._dhw * self.UPM / 8760  # divide DHW across the months relative to the UPM
-            return np.tile(temp, self.simulation_period)
-        if self._multiyear:
-            return self._dhw
-        return np.tile(self._dhw, self.simulation_period)
 
     @property
     def monthly_baseload_dhw_power_simulation_period(self) -> np.ndarray:

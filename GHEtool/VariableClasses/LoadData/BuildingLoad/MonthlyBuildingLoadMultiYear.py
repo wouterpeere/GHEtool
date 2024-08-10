@@ -4,6 +4,7 @@ import numpy as np
 
 from GHEtool.VariableClasses.Efficiency import *
 from GHEtool.VariableClasses.LoadData.Baseclasses import _LoadDataBuilding
+from GHEtool.VariableClasses.Result import ResultsMonthly, ResultsHourly
 
 from numpy.typing import ArrayLike
 from typing import Union
@@ -50,7 +51,7 @@ class MonthlyBuildingLoadMultiYear(_LoadDataBuilding):
 
         _LoadDataBuilding.__init__(self, efficiency_heating, efficiency_cooling, dhw, efficiency_dhw)
         self._multiyear = True
-        
+
         # initiate variables
         self._baseload_heating: np.ndarray = np.zeros(12)
         self._baseload_cooling: np.ndarray = np.zeros(12)
@@ -264,3 +265,46 @@ class MonthlyBuildingLoadMultiYear(_LoadDataBuilding):
             self._peak_heating = np.array(load)
             return
         raise ValueError
+
+    @property
+    def monthly_baseload_dhw_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the monthly domestic hot water baseload in kWh/month for the whole simulation period.
+
+        Returns
+        -------
+        baseload domestic hot water : np.ndarray
+            Baseload domestic hot water for the whole simulation period
+        """
+        if isinstance(self._dhw, (int, float)):
+            temp = self._dhw * self.UPM / 8760  # divide DHW across the months relative to the UPM
+            return np.tile(temp, self.simulation_period)
+        return self._dhw
+
+    def set_results(self, results: ResultsMonthly) -> None:
+        """
+        This function sets the temperature results.
+
+        Parameters
+        ----------
+        results : ResultsMonthly
+            Results object
+
+        Raises
+        ------
+        ValueError
+            If the simulation period of the results do not match the simulation period of the load data.
+            If a ResultHourly was given as result argument.
+
+        Returns
+        -------
+        None
+        """
+        # check if the length is correct
+        if len(results.Tb) != self.simulation_period * 12:
+            raise ValueError(
+                'The results have a length of {len(results.Tb)} whereas, with a simulation period of {self.simulation_period} years '
+                'a length of {self.simulation_period * (8760 if self._hourly else 12)} was expected.')
+        if isinstance(results, ResultsHourly):
+            raise ValueError('You cannot use an hourly result class for a monthly load class.')
+        self._results = results

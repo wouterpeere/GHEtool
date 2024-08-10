@@ -5,6 +5,31 @@ import numpy as np
 
 from GHEtool import FOLDER
 from GHEtool.VariableClasses import HourlyBuildingLoad
+from GHEtool.VariableClasses.Result import ResultsMonthly, ResultsHourly
+
+from GHEtool.VariableClasses.Efficiency import *
+
+scop = SCOP(6)
+seer = SEER(5)
+cop_basic = COP(np.array([2, 20]), np.array([1, 10]))
+eer_basic = EER(np.array([2, 20]), np.array([1, 10]))
+cop_pl = COP(np.array([[2, 20], [4, 40]]), np.array([1, 10]), range_part_load=np.array([0.5, 1]))
+eer_pl = EER(np.array([[2, 20], [4, 40]]), np.array([1, 10]), range_part_load=np.array([0.5, 1]))
+
+results_monthly1 = ResultsMonthly(np.linspace(0, 120 - 1, 12),
+                                  np.linspace(0, 120 - 1, 12) * 2,
+                                  np.linspace(0, 120 - 1, 12) * 3,
+                                  np.linspace(0, 120 - 1, 12) * 4,
+                                  np.linspace(0, 120 - 1, 12) * 5)
+results_monthly2 = ResultsMonthly(np.linspace(0, 120 - 1, 24),
+                                  np.linspace(0, 120 - 1, 24) * 2,
+                                  np.linspace(0, 120 - 1, 24) * 3,
+                                  np.linspace(0, 120 - 1, 24) * 4,
+                                  np.linspace(0, 120 - 1, 24) * 5)
+results_hourly1 = ResultsHourly(np.linspace(0, 8760 * 2 - 1, 8760),
+                                np.linspace(0, 8760 * 2 - 1, 8760) * 2)
+results_hourly2 = ResultsHourly(np.linspace(0, 8760 * 2 - 1, 8760 * 2),
+                                np.linspace(0, 8760 * 2 - 1, 8760 * 2) * 2)
 
 
 def test_load_hourly_data():
@@ -155,3 +180,29 @@ def test_different_start_month():
     assert load.hourly_heating_load[0] == 1417
     assert load.hourly_cooling_load_simulation_period[0] == 1417
     assert load.hourly_heating_load_simulation_period[0] == 1417
+
+
+def test_results():
+    load2 = HourlyBuildingLoad(np.linspace(1, 8760 - 1, 8760), np.linspace(1, 8760 - 1, 8760) * 2, 2, scop, seer)
+    load1 = HourlyBuildingLoad(np.linspace(1, 8760 - 1, 8760), np.linspace(1, 8760 - 1, 8760) * 2, 1, scop, seer)
+
+    assert load2.results == (0, 17)
+    assert load1.results == (0, 17)
+
+    with pytest.raises(ValueError):
+        load2.set_results(results_monthly1)
+    with pytest.raises(ValueError):
+        load1.set_results(results_hourly2)
+
+    load2.set_results(results_hourly2)
+    assert load2.results == results_hourly2
+    load2.set_results(results_monthly2)
+    assert load2.results == results_monthly2
+
+
+def test_reset_results():
+    load = HourlyBuildingLoad(np.linspace(1, 8760 - 1, 8760), np.linspace(1, 8760 - 1, 8760) * 2, 2, scop, seer)
+    load.set_results(results_hourly1)
+    assert load.results == results_hourly1
+    load.reset_results(5, 10)
+    assert load.results == (5, 10)
