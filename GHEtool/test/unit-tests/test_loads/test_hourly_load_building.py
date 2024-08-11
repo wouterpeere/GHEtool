@@ -260,4 +260,5 @@ def test_dhw():
     assert np.isclose(load.yearly_average_dhw_load, np.sum(arr))
     assert load.max_peak_dhw == 8760
     load.exclude_DHW_from_peak = True
+    # idem since we started with an hourly data resolution
     assert np.allclose(load.monthly_peak_extraction_simulation_period, np.zeros(120))

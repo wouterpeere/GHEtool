@@ -281,7 +281,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         baseload injection : np.ndarray
             baseload injection for the whole simulation period
         """
-        if isinstance(self.dhw, ResultsMonthly):
+        if isinstance(self.results, ResultsMonthly):
             return super(_HourlyDataBuilding, self).monthly_baseload_injection_simulation_period
         return self.resample_to_monthly(self.hourly_injection_load_simulation_period)[1]
 
@@ -298,7 +298,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         baseload extraction : np.ndarray
             baseload extraction for the whole simulation period
         """
-        if isinstance(self.dhw, ResultsMonthly):
+        if isinstance(self.results, ResultsMonthly):
             return super(_HourlyDataBuilding, self).monthly_baseload_extraction_simulation_period
         return self.resample_to_monthly(self.hourly_extraction_load_simulation_period)[1]
 
@@ -315,7 +315,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         peak injection : np.ndarray
             peak injection for the whole simulation period
         """
-        if isinstance(self.dhw, ResultsMonthly):
+        if isinstance(self.results, ResultsMonthly):
             return super(_HourlyDataBuilding, self).monthly_peak_injection_simulation_period
         return self.resample_to_monthly(self.hourly_injection_load_simulation_period)[0]
 
@@ -332,9 +332,20 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         peak extraction : np.ndarray
             peak extraction for the whole simulation period
         """
-        if isinstance(self.dhw, ResultsMonthly):
+        if isinstance(self.results, ResultsMonthly):
             return super(_HourlyDataBuilding, self).monthly_peak_extraction_simulation_period
-        return self.resample_to_monthly(self.hourly_extraction_load_simulation_period)[0]
+
+        total_extraction = self.resample_to_monthly(self.hourly_extraction_load_simulation_period)[0]
+
+        if not self.exclude_DHW_from_peak:
+            return total_extraction
+
+        # subtract dhw load
+        part_load_dhw = self.hourly_dhw_load_simulation_period / self.max_peak_dhw
+        extraction_due_to_dhw = np.multiply(
+            self.hourly_dhw_load_simulation_period,
+            self.conversion_factor_secondary_to_primary_heating(self._get_hourly_cop_dhw(part_load_dhw)))
+        return total_extraction - self.resample_to_monthly(extraction_due_to_dhw)[0]
 
     @property
     def monthly_baseload_dhw_simulation_period(self) -> np.ndarray:
