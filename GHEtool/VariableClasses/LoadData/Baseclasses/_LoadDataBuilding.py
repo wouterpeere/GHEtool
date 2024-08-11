@@ -100,7 +100,7 @@ class _LoadDataBuilding(_LoadData, ABC):
             Peak cooling for the whole simulation period
         """
 
-    @property
+    @abc.abstractmethod
     def monthly_baseload_dhw_simulation_period(self) -> np.ndarray:
         """
         This function returns the monthly domestic hot water baseload in kWh/month for the whole simulation period.

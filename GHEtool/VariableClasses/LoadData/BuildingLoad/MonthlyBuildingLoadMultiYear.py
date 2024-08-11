@@ -276,9 +276,6 @@ class MonthlyBuildingLoadMultiYear(_LoadDataBuilding):
         baseload domestic hot water : np.ndarray
             Baseload domestic hot water for the whole simulation period
         """
-        if isinstance(self._dhw, (int, float)):
-            temp = self._dhw * self.UPM / 8760  # divide DHW across the months relative to the UPM
-            return np.tile(temp, self.simulation_period)
         return self._dhw
 
     def set_results(self, results: ResultsMonthly) -> None:
@@ -300,11 +297,10 @@ class MonthlyBuildingLoadMultiYear(_LoadDataBuilding):
         -------
         None
         """
-        # check if the length is correct
-        if len(results.Tb) != self.simulation_period * 12:
-            raise ValueError(
-                'The results have a length of {len(results.Tb)} whereas, with a simulation period of {self.simulation_period} years '
-                'a length of {self.simulation_period * (8760 if self._hourly else 12)} was expected.')
         if isinstance(results, ResultsHourly):
             raise ValueError('You cannot use an hourly result class for a monthly load class.')
+        if len(results.Tb) != self.simulation_period * 12:
+            raise ValueError(
+                f'The results have a length of {len(results.Tb)} whereas, with a simulation period of {self.simulation_period} years '
+                f'a length of {self.simulation_period * (8760 if self._hourly else 12)} was expected.')
         self._results = results

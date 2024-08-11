@@ -246,48 +246,6 @@ class HourlyBuildingLoad(_SingleYear, _HourlyDataBuilding):
             return array
         return np.concatenate((array[self._start_hour:], array[: self._start_hour]))
 
-    def load_hourly_profile(
-            self, file_path: str, header: bool = True, separator: str = ";", decimal_seperator: str = ".",
-            col_heating: int = 0, col_cooling: int = 1
-    ) -> None:
-        """
-        This function loads in an hourly load profile [kW].
-
-        Parameters
-        ----------
-        file_path : str
-            Path to the hourly load file
-        header : bool
-            True if this file contains a header row
-        separator : str
-            Symbol used in the file to separate the columns
-        decimal_seperator : str
-            Symbol used for the decimal number separation
-        col_heating : int
-            Column index for heating data
-        col_cooling : int
-            Column index for cooling data
-
-        Returns
-        -------
-        None
-        """
-        if header:
-            header: int = 0
-        else:
-            header = None
-
-        # TODO implement single column
-        # if col_heating == col_cooling:
-        #     ghe_logger.info('Only one column with data selected. Load will be splitted into heating and cooling load.')
-
-        # import data
-        df = pd.read_csv(file_path, sep=separator, header=header, decimal=decimal_seperator)
-
-        # set data
-        self.hourly_heating_load = np.array(df.iloc[:, col_heating])
-        self.hourly_cooling_load = np.array(df.iloc[:, col_cooling])
-
     def plot_load_duration(self, legend: bool = False) -> Tuple[plt.Figure, plt.Axes]:
         """
         This function makes a load-duration curve from the hourly values.
