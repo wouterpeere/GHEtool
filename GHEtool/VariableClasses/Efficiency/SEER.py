@@ -17,7 +17,7 @@ class SEER(_EfficiencyBase):
 
         self._SEER = None
         self.SEER = SEER
-        self._range_part_load = False
+        self._has_part_load: bool = False
 
     @property
     def SEER(self) -> float:

@@ -10,9 +10,8 @@ scop = SCOP(6)
 seer = SEER(5)
 cop_basic = COP(np.array([2, 20]), np.array([1, 10]))
 eer_basic = EER(np.array([2, 20]), np.array([1, 10]))
-cop_pl = COP(np.array([[2, 20], [4, 40]]), np.array([1, 10]), range_part_load=np.array([0.5, 1]))
-eer_pl = EER(np.array([[2, 20], [4, 40]]), np.array([1, 10]), range_part_load=np.array([0.5, 1]))
-
+cop_pl = COP(np.array([2, 20, 4, 40]), np.array([[1, 0.5], [10, 0.5], [1, 1], [10, 1]]), part_load=True)
+eer_pl = EER(np.array([2, 20, 4, 40]), np.array([[1, 0.5], [10, 0.5], [1, 1], [10, 1]]), part_load=True)
 results_monthly = ResultsMonthly(np.linspace(0, 120 - 1, 120),
                                  np.linspace(0, 120 - 1, 120) * 2,
                                  np.linspace(0, 120 - 1, 120) * 3,

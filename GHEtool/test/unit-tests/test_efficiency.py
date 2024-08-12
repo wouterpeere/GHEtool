@@ -194,8 +194,8 @@ def test_EER_part_load():
 
 def test_EER_full():
     eer_full = EER(np.array([1, 2, 2, 4, 2, 4, 4, 8]),
-                   np.array([[1.5, 2.5, 0], [2.5, 2.5, 0], [1.5, 4.5, 0], [2.5, 4.5, 0],
-                             [1.5, 2.5, 1], [2.5, 2.5, 1], [1.5, 4.5, 1], [2.5, 4.5, 1]]),
+                   np.array([[1.5, 2.5, 4.5], [2.5, 2.5, 4.5], [1.5, 4.5, 4.5], [2.5, 4.5, 4.5],
+                             [1.5, 2.5, 8.5], [2.5, 2.5, 8.5], [1.5, 4.5, 8.5], [2.5, 4.5, 8.5]]),
                    secondary=True, part_load=True)
     assert eer_full._has_part_load
     assert eer_full._has_secondary

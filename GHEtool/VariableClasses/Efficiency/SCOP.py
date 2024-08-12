@@ -16,7 +16,7 @@ class SCOP(_EfficiencyBase):
         """
         self._SCOP = None
         self.SCOP = SCOP
-        self._range_part_load = False
+        self._has_part_load: bool = False
 
     @property
     def SCOP(self) -> float:
