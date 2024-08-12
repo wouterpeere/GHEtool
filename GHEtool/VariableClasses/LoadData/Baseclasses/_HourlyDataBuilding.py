@@ -216,7 +216,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
             Hourly injection values [kWh/h] for the whole simulation period
         """
         part_load = None
-        if self.eer._range_part_load:
+        if self.eer._has_part_load:
             part_load = self.hourly_cooling_load_simulation_period / self.max_peak_cooling
         return np.multiply(
             self.hourly_cooling_load_simulation_period,
@@ -233,7 +233,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
             Hourly extraction values [kWh/h] for the whole simulation period
         """
         part_load = None
-        if self.cop._range_part_load:
+        if self.cop._has_part_load:
             part_load = self.hourly_heating_load_simulation_period / self.max_peak_heating
         extraction_due_to_heating = np.multiply(
             self.hourly_heating_load_simulation_period,

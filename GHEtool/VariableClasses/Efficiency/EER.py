@@ -13,25 +13,22 @@ class EER(_Efficiency):
 
     def __init__(self,
                  data: np.ndarray,
-                 range_avg_primary_temperature: np.ndarray,
-                 range_avg_secondary_temperature: np.ndarray = None,
-                 range_part_load: np.ndarray = None):
+                 coordinates: np.ndarray,
+                 part_load: bool = False,
+                 secondary: bool = False):
         """
 
         Parameters
         ----------
-         data : np.ndarray
-            Array with all the interpolation data, at least 1D, but up to 3D depending on whether the range for
-            average secondary temperatures or the part load data is provided.
-        range_avg_primary_temperature : np.ndarray
-            Array with all the values for the average primary temperature of the heat pump that are present
-            in the data.
-        range_avg_secondary_temperature : np.ndarray
-            Array with all the values for the average secondary temperature of the heat pump that are present
-            in the data. (Optional)
-        range_part_load : np.ndarray
-            Array with all the values for the part-load data of the heat pump that are present in the data.
-            All these values have to be between 0-1. (Optional).
+          data : np.ndarray
+            1D-array with all efficiency values.
+        coordinates : np.ndarray
+            1D array with all the coordinates at which the efficiency values can be found. These coordinates can be
+            1D up to 3D, depending on whether secondary temperature and/or part load is taken into account.
+        part_load : bool
+            True if the data contains part load information.
+        secondary : bool
+            True if the data contains secondary temperature information
 
         Raises
         ------
@@ -39,7 +36,7 @@ class EER(_Efficiency):
             When the shape of the data does not equal the provided ranges.
 
         """
-        super().__init__(data, range_avg_primary_temperature, range_avg_secondary_temperature, range_part_load)
+        super().__init__(data, coordinates, part_load, secondary)
 
     def get_EER(self,
                 primary_temperature: Union[float, np.ndarray],

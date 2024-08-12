@@ -505,7 +505,7 @@ class _LoadDataBuilding(_LoadData, ABC):
             Baseload injection for the whole simulation period
         """
         part_load = None
-        if self.eer._range_part_load:
+        if self.eer._has_part_load:
             part_load = np.tile(self.monthly_baseload_cooling_power, self.simulation_period) / self.max_peak_cooling
         return np.multiply(
             self.monthly_baseload_cooling_simulation_period,
@@ -523,7 +523,7 @@ class _LoadDataBuilding(_LoadData, ABC):
             Baseload extraction for the whole simulation period
         """
         part_load = None
-        if self.cop._range_part_load:
+        if self.cop._has_part_load:
             part_load = np.tile(self.monthly_baseload_heating_power, self.simulation_period) / self.max_peak_heating
         extraction_due_to_heating = np.multiply(
             self.monthly_baseload_heating_simulation_period,
@@ -548,7 +548,7 @@ class _LoadDataBuilding(_LoadData, ABC):
             Peak injection for the whole simulation period
         """
         part_load = None
-        if self.eer._range_part_load:
+        if self.eer._has_part_load:
             part_load = self.monthly_peak_cooling_simulation_period / self.max_peak_cooling
         return np.multiply(
             self.monthly_peak_cooling_simulation_period,
@@ -567,7 +567,7 @@ class _LoadDataBuilding(_LoadData, ABC):
             Peak extraction for the whole simulation period
         """
         part_load = None
-        if self.cop._range_part_load:
+        if self.cop._has_part_load:
             part_load = self.monthly_peak_heating_simulation_period / self.max_peak_heating
 
         extraction_due_to_heating = np.multiply(

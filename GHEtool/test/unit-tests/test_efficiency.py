@@ -24,17 +24,19 @@ def test_SEER():
         SEER(0)
 
 
-def test_COP_basic():
+def test_COP_error():
     with pytest.raises(ValueError):
-        COP(np.array([3, 4, 6]), np.array([5, 15]))
+        COP(np.array([-3, 4, 6]), np.array([5, 15, 6]))
     with pytest.raises(ValueError):
-        COP(np.array([3, 4, 6]), np.array([5, 10, 15]), np.array([5, 6]))
+        COP(np.array([3, 4, 6]), np.array([5, 10]))
     with pytest.raises(ValueError):  # no efficiencies equal or smaller than 0
-        COP(np.array([0, 4, 6]), np.array([5, 10, 15]))
+        COP(np.array([0, 4, 6]), np.array([5, 10, 15]), part_load=True)
 
+
+def test_COP_basic():
     cop_basic = COP(np.array([3, 4, 6]), np.array([5, 10, 15]))
-    assert not cop_basic._range_secondary
-    assert not cop_basic._range_part_load
+    assert not cop_basic._has_secondary
+    assert not cop_basic._has_part_load
 
     assert cop_basic.get_COP(5) == 3
     assert np.array_equal(cop_basic.get_COP(np.array([7.5, 10])), np.array([3.5, 4]))
@@ -50,14 +52,9 @@ def test_COP_basic():
 
 
 def test_COP_secondary():
-    with pytest.raises(ValueError):
-        COP(np.array([[1, 2], [2, 4]]), np.array([5, 15]))
-    with pytest.raises(ValueError):
-        COP(np.array([[1, 2], [2, 4]]), np.array([1.5, 2.5]), np.array([2.5, 4.5]), np.array([2.5, 4.5]))
-
-    cop_sec = COP(np.array([[1, 2], [2, 4]]), np.array([1.5, 2.5]), np.array([2.5, 4.5]))
-    assert cop_sec._range_secondary
-    assert not cop_sec._range_part_load
+    cop_sec = COP(np.array([1, 2, 2, 4]), np.array([[1.5, 2.5], [2.5, 2.5], [1.5, 4.5], [2.5, 4.5]]), secondary=True)
+    assert cop_sec._has_secondary
+    assert not cop_sec._has_part_load
 
     with pytest.raises(ValueError):
         assert cop_sec.get_COP(5) == 3
@@ -74,14 +71,9 @@ def test_COP_secondary():
 
 
 def test_COP_part_load():
-    with pytest.raises(ValueError):
-        COP(np.array([[1, 2], [2, 4]]), np.array([5, 15]))
-    with pytest.raises(ValueError):
-        COP(np.array([[1, 2], [2, 4]]), np.array([1.5, 2.5]), np.array([2.5, 4.5]), np.array([2.5, 4.5]))
-
-    cop_part = COP(np.array([[1, 2], [2, 4]]), np.array([1.5, 2.5]), range_part_load=np.array([2.5, 4.5]))
-    assert cop_part._range_part_load
-    assert not cop_part._range_secondary
+    cop_part = COP(np.array([1, 2, 2, 4]), np.array([[1.5, 2.5], [2.5, 2.5], [1.5, 4.5], [2.5, 4.5]]), part_load=True)
+    assert cop_part._has_part_load
+    assert not cop_part._has_secondary
 
     with pytest.raises(ValueError):
         assert cop_part.get_COP(5) == 3
@@ -100,17 +92,13 @@ def test_COP_part_load():
 
 
 def test_COP_full():
-    with pytest.raises(ValueError):
-        COP(np.array([[1, 2], [2, 4]]), np.array([5, 15]))
-    with pytest.raises(ValueError):
-        COP(np.array([[1, 2], [2, 4]]), np.array([1.5, 2.5]), np.array([2.5, 4.5]), np.array([2.5, 4.5]))
-    with pytest.raises(ValueError):
-        COP(np.array([[[1, 2], [2, 4]], [[1, 2], [2, 4]]]), np.array([1.5, 2.5]), np.array([2.5, 4.5, 4.5]),
-            np.array([2.5, 4.5]))
-    cop_full = COP(np.array([[[1, 2], [2, 4]], [[2, 4], [4, 8]]]), np.array([1.5, 2.5]), np.array([2.5, 4.5]),
-                   np.array([4.5, 8.5]))
-    assert cop_full._range_part_load
-    assert cop_full._range_secondary
+    cop_full = COP(np.array([1, 2, 2, 4, 2, 4, 4, 8]),
+                   np.array([[1.5, 2.5, 4.5], [2.5, 2.5, 4.5], [1.5, 4.5, 4.5], [2.5, 4.5, 4.5],
+                             [1.5, 2.5, 8.5], [2.5, 2.5, 8.5], [1.5, 4.5, 8.5], [2.5, 4.5, 8.5]]),
+                   secondary=True, part_load=True)
+
+    assert cop_full._has_part_load
+    assert cop_full._has_secondary
 
     with pytest.raises(ValueError):
         assert cop_full.get_COP(5, 3) == 3
@@ -125,8 +113,10 @@ def test_COP_full():
 
 
 def test_COP_get_SCOP():
-    cop_full = COP(np.array([[[1, 2], [2, 4]], [[2, 4], [4, 8]]]), np.array([1.5, 2.5]), np.array([2.5, 4.5]),
-                   np.array([0, 1]))
+    cop_full = COP(np.array([1, 2, 2, 4, 2, 4, 4, 8]),
+                   np.array([[1.5, 2.5, 0], [2.5, 2.5, 0], [1.5, 4.5, 0], [2.5, 4.5, 0],
+                             [1.5, 2.5, 1], [2.5, 2.5, 1], [1.5, 4.5, 1], [2.5, 4.5, 1]]),
+                   secondary=True, part_load=True)
 
     with pytest.raises(ValueError):
         cop_full.get_SCOP([10, 5], 10, [2, 3, 4])
@@ -135,7 +125,7 @@ def test_COP_get_SCOP():
     assert np.isclose(cop_full.get_SCOP([10, 5], 10, [1.5, 2.5], [2.5, 2.5]), 45 / 20)
 
 
-def test_EER_basic():
+def test_error_EER():
     with pytest.raises(ValueError):
         EER(np.array([3, 4, 6]), np.array([5, 15]))
     with pytest.raises(ValueError):
@@ -143,9 +133,11 @@ def test_EER_basic():
     with pytest.raises(ValueError):  # no efficiencies equal or smaller than 0
         EER(np.array([0, 4, 6]), np.array([5, 10, 15]))
 
+
+def test_EER_basic():
     eer_basic = EER(np.array([3, 4, 6]), np.array([5, 10, 15]))
-    assert not eer_basic._range_secondary
-    assert not eer_basic._range_part_load
+    assert not eer_basic._has_secondary
+    assert not eer_basic._has_part_load
 
     assert eer_basic.get_EER(5) == 3
     assert np.array_equal(eer_basic.get_EER(np.array([7.5, 10])), np.array([3.5, 4]))
@@ -161,14 +153,9 @@ def test_EER_basic():
 
 
 def test_EER_secondary():
-    with pytest.raises(ValueError):
-        EER(np.array([[1, 2], [2, 4]]), np.array([5, 15]))
-    with pytest.raises(ValueError):
-        EER(np.array([[1, 2], [2, 4]]), np.array([1.5, 2.5]), np.array([2.5, 4.5]), np.array([2.5, 4.5]))
-
-    eer_sec = EER(np.array([[1, 2], [2, 4]]), np.array([1.5, 2.5]), np.array([2.5, 4.5]))
-    assert eer_sec._range_secondary
-    assert not eer_sec._range_part_load
+    eer_sec = EER(np.array([1, 2, 2, 4]), np.array([[1.5, 2.5], [2.5, 2.5], [1.5, 4.5], [2.5, 4.5]]), secondary=True)
+    assert eer_sec._has_secondary
+    assert not eer_sec._has_part_load
 
     with pytest.raises(ValueError):
         assert eer_sec.get_EER(5) == 3
@@ -185,14 +172,9 @@ def test_EER_secondary():
 
 
 def test_EER_part_load():
-    with pytest.raises(ValueError):
-        EER(np.array([[1, 2], [2, 4]]), np.array([5, 15]))
-    with pytest.raises(ValueError):
-        EER(np.array([[1, 2], [2, 4]]), np.array([1.5, 2.5]), np.array([2.5, 4.5]), np.array([2.5, 4.5]))
-
-    eer_part = EER(np.array([[1, 2], [2, 4]]), np.array([1.5, 2.5]), range_part_load=np.array([2.5, 4.5]))
-    assert eer_part._range_part_load
-    assert not eer_part._range_secondary
+    eer_part = EER(np.array([1, 2, 2, 4]), np.array([[1.5, 2.5], [2.5, 2.5], [1.5, 4.5], [2.5, 4.5]]), part_load=True)
+    assert eer_part._has_part_load
+    assert not eer_part._has_secondary
 
     with pytest.raises(ValueError):
         assert eer_part.get_EER(5) == 3
@@ -211,17 +193,12 @@ def test_EER_part_load():
 
 
 def test_EER_full():
-    with pytest.raises(ValueError):
-        EER(np.array([[1, 2], [2, 4]]), np.array([5, 15]))
-    with pytest.raises(ValueError):
-        EER(np.array([[1, 2], [2, 4]]), np.array([1.5, 2.5]), np.array([2.5, 4.5]), np.array([2.5, 4.5]))
-    with pytest.raises(ValueError):
-        EER(np.array([[[1, 2], [2, 4]], [[1, 2], [2, 4]]]), np.array([1.5, 2.5]), np.array([2.5, 4.5, 4.5]),
-            np.array([2.5, 4.5]))
-    eer_full = EER(np.array([[[1, 2], [2, 4]], [[2, 4], [4, 8]]]), np.array([1.5, 2.5]), np.array([2.5, 4.5]),
-                   np.array([4.5, 8.5]))
-    assert eer_full._range_part_load
-    assert eer_full._range_secondary
+    eer_full = EER(np.array([1, 2, 2, 4, 2, 4, 4, 8]),
+                   np.array([[1.5, 2.5, 0], [2.5, 2.5, 0], [1.5, 4.5, 0], [2.5, 4.5, 0],
+                             [1.5, 2.5, 1], [2.5, 2.5, 1], [1.5, 4.5, 1], [2.5, 4.5, 1]]),
+                   secondary=True, part_load=True)
+    assert eer_full._has_part_load
+    assert eer_full._has_secondary
 
     with pytest.raises(ValueError):
         assert eer_full.get_EER(5, 3) == 3
@@ -236,8 +213,10 @@ def test_EER_full():
 
 
 def test_EER_get_SEER():
-    eer_full = EER(np.array([[[1, 2], [2, 4]], [[2, 4], [4, 8]]]), np.array([1.5, 2.5]), np.array([2.5, 4.5]),
-                   np.array([0, 1]))
+    eer_full = EER(np.array([1, 2, 2, 4, 2, 4, 4, 8]),
+                   np.array([[1.5, 2.5, 0], [2.5, 2.5, 0], [1.5, 4.5, 0], [2.5, 4.5, 0],
+                             [1.5, 2.5, 1], [2.5, 2.5, 1], [1.5, 4.5, 1], [2.5, 4.5, 1]]),
+                   secondary=True, part_load=True)
 
     with pytest.raises(ValueError):
         eer_full.get_SEER([10, 5], 10, [2, 3, 4])
@@ -263,16 +242,16 @@ def test_eq():
 
     cop_basic1 = COP(np.array([1, 10]), np.array([1, 10]))
     eer_basic1 = EER(np.array([1, 10]), np.array([1, 10]))
-    cop_pl1 = COP(np.array([[1, 10], [2, 20]]), np.array([1, 10]), range_part_load=np.array([0.5, 1]))
-    eer_pl1 = EER(np.array([[1, 10], [2, 20]]), np.array([1, 10]), range_part_load=np.array([0.5, 1]))
+    cop_pl1 = COP(np.array([1, 10, 2, 20]), np.array([[1, 0.5], [10, 0.5], [1, 1], [10, 1]]), part_load=True)
+    eer_pl1 = EER(np.array([1, 10, 2, 20]), np.array([[1, 0.5], [10, 0.5], [1, 1], [10, 1]]), part_load=True)
     cop_basic2 = COP(np.array([2, 10]), np.array([1, 10]))
     eer_basic2 = EER(np.array([2, 10]), np.array([1, 10]))
-    cop_pl2 = COP(np.array([[2, 10], [2, 20]]), np.array([1, 10]), range_part_load=np.array([0.5, 1]))
-    eer_pl2 = EER(np.array([[2, 10], [2, 20]]), np.array([1, 10]), range_part_load=np.array([0.5, 1]))
+    cop_pl2 = COP(np.array([2, 10, 2, 20]), np.array([[1, 0.5], [10, 0.5], [1, 1], [10, 1]]), part_load=True)
+    eer_pl2 = EER(np.array([2, 10, 2, 20]), np.array([[1, 0.5], [10, 0.5], [1, 1], [10, 1]]), part_load=True)
     cop_basic3 = COP(np.array([1, 10]), np.array([1, 10]))
     eer_basic3 = EER(np.array([1, 10]), np.array([1, 10]))
-    cop_pl3 = COP(np.array([[1, 10], [2, 20]]), np.array([1, 10]), range_part_load=np.array([0.5, 1]))
-    eer_pl3 = EER(np.array([[1, 10], [2, 20]]), np.array([1, 10]), range_part_load=np.array([0.5, 1]))
+    cop_pl3 = COP(np.array([1, 10, 2, 20]), np.array([[1, 0.5], [10, 0.5], [1, 1], [10, 1]]), part_load=True)
+    eer_pl3 = EER(np.array([1, 10, 2, 20]), np.array([[1, 0.5], [10, 0.5], [1, 1], [10, 1]]), part_load=True)
 
     assert cop_basic1 != cop_basic2
     assert eer_basic1 != eer_basic2
