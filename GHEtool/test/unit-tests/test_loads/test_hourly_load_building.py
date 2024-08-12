@@ -578,7 +578,7 @@ def test_hourly_extraction_load_simulation_period_monthly_data():
     load.dhw = test_load
     load.cop_dhw = cop_basic
     with pytest.raises(TypeError):
-        load.hourly_extraction_load_simulation_period
+        load._get_hourly_cop_dhw()
     assert np.allclose(load.monthly_baseload_extraction_simulation_period,
                        load.resample_to_monthly(
                            np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9))), 10))[
