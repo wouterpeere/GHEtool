@@ -170,4 +170,6 @@ class HourlyBuildingLoadMultiYear(_HourlyDataBuilding):
         hourly DHW : np.ndarray
             Hourly DHW values [kWh/h] for the whole simulation period
         """
+        if self._dhw is None:
+            return np.zeros(8760 * self.simulation_period)
         return self._dhw

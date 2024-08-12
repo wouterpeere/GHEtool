@@ -60,6 +60,8 @@ def test_imbalance():
     assert np.isclose(load.imbalance, -60882)
     load = HourlyBuildingLoad(np.ones(8760), np.ones(8760) * 10)
     assert np.isclose(load.imbalance, 84972)
+    load.dhw = 8000
+    assert np.isclose(load.imbalance, 84972 - 8000 * 3 / 4)
 
 
 def test_load_duration(monkeypatch):
@@ -88,6 +90,7 @@ def test_yearly_loads():
     assert np.array_equal(load.yearly_heating_load_simulation_period, [38364420] * 10)
     assert np.array_equal(load.yearly_cooling_peak_simulation_period, [17518] * 10)
     assert np.array_equal(load.yearly_heating_peak_simulation_period, [8759] * 10)
+    assert np.array_equal(load.yearly_dhw_load_simulation_period, [0, 0])
 
 
 def test_baseload_heating():
@@ -225,6 +228,22 @@ def test_dhw():
         load.dhw = 'test'
     with pytest.raises(ValueError):
         load.dhw = np.full(120, 10)
+
+    assert np.allclose(load.dhw, 0)
+    assert np.allclose(load.hourly_dhw_load_simulation_period, np.zeros(87600))
+    assert np.allclose(load.monthly_baseload_dhw, np.zeros(12))
+    assert np.allclose(load.monthly_peak_dhw, np.zeros(12))
+    assert np.allclose(load.monthly_baseload_dhw_simulation_period, np.zeros(120))
+    assert np.allclose(load.monthly_baseload_dhw_power_simulation_period, np.zeros(120))
+    assert np.allclose(load.monthly_peak_dhw_simulation_period, np.zeros(120))
+    assert np.allclose(load.monthly_baseload_extraction_power_simulation_period, np.zeros(120))
+    assert np.allclose(load.monthly_peak_extraction_simulation_period, np.zeros(120))
+    assert np.allclose(load.yearly_dhw_load_simulation_period, np.zeros(10))
+    assert np.isclose(load.yearly_average_dhw_load, 0)
+    assert load.max_peak_dhw == 0
+    load.exclude_DHW_from_peak = True
+    assert np.allclose(load.monthly_peak_extraction_simulation_period, np.zeros(120))
+    load.exclude_DHW_from_peak = False
 
     load.dhw = 8760
     assert load.dhw == 8760

@@ -32,7 +32,7 @@ def test_set_hourly_load_multi_year():
     assert np.array_equal(load.hourly_injection_load, np.linspace(0 + 8760 / 2, 8759 + 8760 / 2, 8760))
     assert np.array_equal(load.hourly_injection_load_simulation_period, load._hourly_injection_load)
     load._hourly_injection_load = load._hourly_injection_load - 20
-    assert np.array_equal(load.hourly_net_resulting_power,
+    assert np.array_equal(load.hourly_net_resulting_injection_power,
                           load._hourly_injection_load - load._hourly_extraction_load)
 
 

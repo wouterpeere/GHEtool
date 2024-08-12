@@ -1670,7 +1670,7 @@ class Borefield(BaseClass):
             if not self.load._hourly:
                 raise ValueError("There is no hourly resolution available!")
 
-            hourly_load = self.load.hourly_net_resulting_power
+            hourly_load = self.load.hourly_net_resulting_injection_power
 
             # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
             # g-function. This dataset is checked over and over again and is correct

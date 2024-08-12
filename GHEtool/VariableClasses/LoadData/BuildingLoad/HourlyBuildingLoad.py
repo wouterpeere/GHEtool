@@ -210,10 +210,13 @@ class HourlyBuildingLoad(_SingleYear, _HourlyDataBuilding):
         hourly DHW : np.ndarray
             Hourly DHW values [kWh/h] for the whole simulation period
         """
-        if isinstance(self._dhw, (int, float)):
-            temp = self._dhw / 8760
+        dhw = self._dhw
+        if dhw is None:
+            dhw = 0.
+        if isinstance(dhw, (int, float)):
+            temp = dhw / 8760
             return np.tile(temp, self.simulation_period * 8760)
-        return np.tile(self._dhw, self.simulation_period)
+        return np.tile(dhw, self.simulation_period)
 
     @property
     def _start_hour(self) -> int:

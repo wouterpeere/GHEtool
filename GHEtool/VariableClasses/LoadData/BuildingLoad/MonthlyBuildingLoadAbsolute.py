@@ -371,10 +371,13 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
         baseload domestic hot water : np.ndarray
             Baseload domestic hot water for the whole simulation period
         """
-        if isinstance(self._dhw, (int, float)):
-            temp = self._dhw * self.UPM / 8760  # divide DHW across the months relative to the UPM
+        dhw = self._dhw
+        if dhw is None:
+            dhw = 0.
+        if isinstance(dhw, (int, float)):
+            temp = dhw * self.UPM / 8760  # divide DHW across the months relative to the UPM
             return np.tile(temp, self.simulation_period)
-        return np.tile(self._dhw, self.simulation_period)
+        return np.tile(dhw, self.simulation_period)
 
     def correct_for_start_month(self, array: np.ndarray) -> np.ndarray:
         """

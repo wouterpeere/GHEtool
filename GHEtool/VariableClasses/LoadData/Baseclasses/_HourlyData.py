@@ -70,7 +70,7 @@ class _HourlyData(_LoadData, ABC):
         return np.mean(self.hourly_extraction_load_simulation_period.reshape((self.simulation_period, 8760)), axis=0)
 
     @property
-    def hourly_net_resulting_power(self) -> np.ndarray:
+    def hourly_net_resulting_injection_power(self) -> np.ndarray:
         """
         This function calculates the net resulting hourly load in kW for the whole simulation period.
         A negative value means the borefield is extraction dominated.
