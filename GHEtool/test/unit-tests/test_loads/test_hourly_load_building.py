@@ -31,6 +31,13 @@ results_hourly_test = ResultsHourly(np.tile(temp, 10), np.tile(temp, 10))
 test_load = temp + 5
 test_load_sim_per = np.tile(test_load, 10)
 
+temp = np.array([0, 0, 0, 0, 0, 0, 5, 5, 5, 5, 5, 5])
+results_monthly_test = ResultsMonthly(np.tile(temp, 10),
+                                      np.tile(temp, 10),
+                                      np.tile(temp, 10),
+                                      np.tile(temp, 10),
+                                      np.tile(temp, 10))
+
 results_hourly1 = ResultsHourly(np.linspace(0, 8760 * 2 - 1, 8760),
                                 np.linspace(0, 8760 * 2 - 1, 8760) * 2)
 results_hourly2 = ResultsHourly(np.linspace(0, 8760 * 2 - 1, 8760 * 2),
@@ -505,6 +512,82 @@ def test_hourly_extraction_load_simulation_period_hourly_data():
     load.set_results(results_hourly_test)
     assert np.allclose(load.hourly_extraction_load_simulation_period,
                        np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9.65384615))), 10))
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9.65384615))), 10))[1])
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9.65384615))), 10))[0])
+
+
+def test_hourly_injection_load_simulation_period_monthly_data():
+    # these results are the same as with hourly resolution, since the baseload and the peak load have the same
+    # temperature result and are also the same power, since the hourly load is a constant, so it reduces to the same
+    # power for both the peak and baseload
+    load = HourlyBuildingLoad(np.zeros(8760), np.zeros(8760), 10, scop, seer)
+    load.hourly_cooling_load = test_load
+    load.set_results(results_monthly_test)
+    load.eer = eer_basic
+    with pytest.raises(TypeError):
+        load.hourly_injection_load_simulation_period
+
+    assert np.allclose(load.monthly_baseload_injection_simulation_period,
+                       load.resample_to_monthly(np.tile(np.concatenate((np.full(4380, 7.5),
+                                                                        np.full(4380, 11))), 10))[1])
+    assert np.allclose(load.monthly_peak_injection_simulation_period,
+                       load.resample_to_monthly(np.tile(np.concatenate((np.full(4380, 7.5),
+                                                                        np.full(4380, 11))), 10))[0])
+    load.eer = eer_pl
+    assert np.allclose(load.monthly_baseload_injection_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 7.5), np.full(4380, 10.34615385))), 10))[1])
+    assert np.allclose(load.monthly_peak_injection_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 7.5), np.full(4380, 10.34615385))), 10))[0])
+
+
+def test_hourly_extraction_load_simulation_period_monthly_data():
+    # these results are the same as with hourly resolution, since the baseload and the peak load have the same
+    # temperature result and are also the same power, since the hourly load is a constant, so it reduces to the same
+    # power for both the peak and baseload
+    load = HourlyBuildingLoad(np.zeros(8760), np.zeros(8760), 10, scop, seer)
+    load.hourly_heating_load = test_load
+
+    load.cop = cop_basic
+    load.set_results(results_monthly_test)
+    with pytest.raises(TypeError):
+        load.hourly_extraction_load_simulation_period
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9))), 10))[
+                           1])
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9))), 10))[
+                           0])
+    load.cop = cop_pl
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9.65384615))), 10))[1])
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9.65384615))), 10))[0])
+
+    # now for only DHW
+    load.hourly_heating_load = np.zeros(8760)
+    load.dhw = test_load
+    load.cop_dhw = cop_basic
+    with pytest.raises(TypeError):
+        load.hourly_extraction_load_simulation_period
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9))), 10))[
+                           1])
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9))), 10))[
+                           0])
+    load.cop_dhw = cop_pl
     assert np.allclose(load.monthly_baseload_extraction_simulation_period,
                        load.resample_to_monthly(
                            np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9.65384615))), 10))[1])

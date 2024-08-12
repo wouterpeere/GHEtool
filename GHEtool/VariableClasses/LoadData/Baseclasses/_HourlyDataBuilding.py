@@ -124,11 +124,18 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         part_load : np.ndarray
             Array with part_load data.
 
+        Raises
+        ------
+        TypeError
+            When the results are provided on a monthly basis
+
         Returns
         -------
         COP : float | np.ndarray
             Array of COP values
         """
+        if isinstance(self.results, ResultsMonthly):
+            raise TypeError('You cannot get an hourly EER values based on monthly temperature results.')
         if isinstance(self.results, tuple):
             temperature = self.results[1]
         else:
@@ -145,11 +152,18 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         part_load : np.ndarray
             Array with part_load data.
 
+        Raises
+        ------
+        TypeError
+            When the results are provided on a monthly basis
+
         Returns
         -------
         COP : float | np.ndarray
             Array of COP values
         """
+        if isinstance(self.results, ResultsMonthly):
+            raise TypeError('You cannot get an hourly EER values based on monthly temperature results.')
         if isinstance(self.results, tuple):
             temperature = self.results[1]
         else:
@@ -166,11 +180,18 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         part_load : np.ndarray
             Array with part_load data.
 
+        Raises
+        ------
+        TypeError
+            When the results are provided on a monthly basis
+
         Returns
         -------
         EER : float | np.ndarray
             Array of EER values
         """
+        if isinstance(self.results, ResultsMonthly):
+            raise TypeError('You cannot get an hourly EER values based on monthly temperature results.')
         if isinstance(self.results, tuple):
             temperature = self.results[1]
         else:
