@@ -6,7 +6,7 @@ from __future__ import annotations
 import copy
 import warnings
 from math import pi
-from typing import Tuple
+from typing import Tuple, Union
 import logging
 
 import matplotlib.pyplot as plt
@@ -19,7 +19,7 @@ from scipy.signal import convolve
 from GHEtool.VariableClasses import FluidData, Borehole, GroundConstantTemperature, ResultsMonthly, ResultsHourly
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, CalculationSetup
 from GHEtool.VariableClasses.LoadData import *
-from GHEtool.VariableClasses.LoadData import _LoadData
+from GHEtool.VariableClasses.LoadData import _LoadData, _LoadDataBuilding
 from GHEtool.VariableClasses.PipeData import _PipeData
 from GHEtool.VariableClasses.BaseClass import BaseClass, UnsolvableDueToTemperatureGradient, MaximumNumberOfIterations
 from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
@@ -1111,6 +1111,11 @@ class Borefield(BaseClass):
         if not quadrant_sizing in range(0, 5):
             raise ValueError(f"Quadrant {quadrant_sizing} does not exist.")
 
+        # check if it is building load
+        if isinstance(self.load, _LoadDataBuilding):
+            warnings.warn('The L2 method does not work with building load data. The L3 method will be used instead.')
+            return self.size_L3(H_init, quadrant_sizing)
+
         # initiate with a given depth
         self.H: float = H_init if H_init is not None else self._calculation_setup.H_init
 
@@ -1581,6 +1586,7 @@ class Borefield(BaseClass):
         None
         """
         self.results = ResultsMonthly()
+        self.load.reset_results(self.Tf_min, self.Tf_max)
 
     def _calculate_temperature_profile(self, H: float = None, hourly: bool = False) -> None:
         """
@@ -1589,7 +1595,7 @@ class Borefield(BaseClass):
         Parameters
         ----------
         H : float
-            Depth at which the temperatures should be evaluated [m]. If None, than the current depth is taken.
+            Depth at which the temperatures should be evaluated [m]. If None, then the current depth is taken.
         hourly : bool
             True if the temperature evolution should be calculated on an hourly basis.
 
@@ -1598,97 +1604,126 @@ class Borefield(BaseClass):
         None
         """
 
-        # set Rb* value
-        Rb = self.borehole.get_Rb(H if H is not None else self.H, self.D, self.r_b, self.ground_data.k_s(self.H))
-        H = H if H is not None else self.H
+        def calculate_temperatures(H):
+            # set Rb* value
+            Rb = self.borehole.get_Rb(H if H is not None else self.H, self.D, self.r_b, self.ground_data.k_s(self.H))
+            H = H if H is not None else self.H
 
-        if not hourly:
-            # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
-            # g-function. This dataset is checked over and over again and is correct
-            g_values = self.gfunction(self.load.time_L3, H)
+            results = None
 
-            # the g-function value of the peak with length_peak hours
-            g_value_peak_injection = self.gfunction(self.load.peak_injection_duration, H)[0]
-            if self.load.peak_injection_duration == self.load.peak_extraction_duration:
-                g_value_peak_extraction = g_value_peak_injection
-            else:
-                g_value_peak_extraction = self.gfunction(self.load.peak_extraction_duration, H)[0]
+            if not hourly:
+                # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
+                # g-function. This dataset is checked over and over again and is correct
+                g_values = self.gfunction(self.load.time_L3, H)
 
-            # calculation of needed differences of the g-function values. These are the weight factors in the calculation
-            # of Tb.
-            g_value_differences = np.diff(g_values, prepend=0)
+                # the g-function value of the peak with length_peak hours
+                g_value_peak_injection = self.gfunction(self.load.peak_injection_duration, H)[0]
+                if self.load.peak_injection_duration == self.load.peak_extraction_duration:
+                    g_value_peak_extraction = g_value_peak_injection
+                else:
+                    g_value_peak_extraction = self.gfunction(self.load.peak_extraction_duration, H)[0]
 
-            # convolution to get the monthly results
-            results = convolve(self.load.monthly_average_injection_power_simulation_period * 1000, g_value_differences)[
-                      : 12 * self.simulation_period]
+                # calculation of needed differences of the g-function values. These are the weight factors in the calculation
+                # of Tb.
+                g_value_differences = np.diff(g_values, prepend=0)
 
-            # calculation the borehole wall temperature for every month i
-            k_s = self.ground_data.k_s(H)
-            Tb = results / (2 * pi * k_s) / (H * self.number_of_boreholes) + self._Tg(H)
+                # convolution to get the monthly results
+                results = convolve(self.load.monthly_average_injection_power_simulation_period * 1000,
+                                   g_value_differences)[
+                          : 12 * self.simulation_period]
 
-            # now the Tf will be calculated based on
-            # Tf = Tb + Q * R_b
-            results_month_injection = Tb + self.load.monthly_baseload_injection_power_simulation_period * 1000 * (
-                    Rb / self.number_of_boreholes / H)
-            results_month_extraction = Tb - self.load.monthly_baseload_extraction_power_simulation_period * 1000 * (
-                    Rb / self.number_of_boreholes / H)
+                # calculation the borehole wall temperature for every month i
+                k_s = self.ground_data.k_s(H)
+                Tb = results / (2 * pi * k_s) / (H * self.number_of_boreholes) + self._Tg(H)
 
-            # extra summation if the g-function value for the peak is included
-            results_peak_injection = (
-                    results_month_injection
-                    + (
-                            self.load.monthly_peak_injection_simulation_period - self.load.monthly_baseload_injection_power_simulation_period)
-                    * 1000
-                    * (g_value_peak_injection / k_s / 2 / pi + Rb)
-                    / self.number_of_boreholes
-                    / H
+                # now the Tf will be calculated based on
+                # Tf = Tb + Q * R_b
+                results_month_injection = Tb + self.load.monthly_baseload_injection_power_simulation_period * 1000 * (
+                        Rb / self.number_of_boreholes / H)
+                results_month_extraction = Tb - self.load.monthly_baseload_extraction_power_simulation_period * 1000 * (
+                        Rb / self.number_of_boreholes / H)
+
+                # extra summation if the g-function value for the peak is included
+                results_peak_injection = (
+                        results_month_injection
+                        + (
+                                self.load.monthly_peak_injection_simulation_period - self.load.monthly_baseload_injection_power_simulation_period)
+                        * 1000
+                        * (g_value_peak_injection / k_s / 2 / pi + Rb)
+                        / self.number_of_boreholes
+                        / H
+                )
+                results_peak_extraction = (
+                        results_month_extraction
+                        - (
+                                self.load.monthly_peak_extraction_simulation_period - self.load.monthly_baseload_extraction_power_simulation_period)
+                        * 1000
+                        * (g_value_peak_extraction / k_s / 2 / pi + Rb)
+                        / self.number_of_boreholes
+                        / H
+                )
+
+                # save temperatures under variable
+                results = ResultsMonthly(
+                    borehole_wall_temp=Tb,
+                    peak_extraction=results_peak_extraction,
+                    peak_injection=results_peak_injection,
+                    monthly_extraction=results_month_extraction,
+                    monthly_injection=results_month_injection,
+                )
+
+            if hourly:
+                # check for hourly data if this is requested
+                if not self.load._hourly:
+                    raise ValueError("There is no hourly resolution available!")
+
+                hourly_load = self.load.hourly_net_resulting_injection_power
+
+                # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
+                # g-function. This dataset is checked over and over again and is correct
+                g_values = self.gfunction(self.load.time_L4, H)
+
+                # calculation of needed differences of the g-function values. These are the weight factors in the calculation
+                # of Tb.
+                g_value_differences = np.diff(g_values, prepend=0)
+
+                # convolution to get the monthly results
+                results = convolve(hourly_load * 1000, g_value_differences)[: len(hourly_load)]
+
+                # calculation the borehole wall temperature for every month i
+                Tb = results / (2 * pi * self.ground_data.k_s(H)) / (H * self.number_of_boreholes) + self._Tg(H)
+
+                # now the Tf will be calculated based on
+                # Tf = Tb + Q * R_b
+                temperature_result = Tb + hourly_load * 1000 * (Rb / self.number_of_boreholes / H)
+
+                # reset other variables
+                results = ResultsHourly(borehole_wall_temp=Tb, temperature_fluid=temperature_result)
+
+            return results
+
+        def calculate_difference(results_old: Union[ResultsMonthly, ResultsHourly],
+                                 result_new: Union[ResultsMonthly, ResultsHourly]) -> float:
+            return np.max(
+                (result_new.peak_injection - results_old.peak_injection) / self.load.max_peak_injection,
+                (result_new.peak_extraction - results_old.peak_extraction) / self.load.max_peak_extraction,
             )
-            results_peak_extraction = (
-                    results_month_extraction
-                    - (
-                            self.load.monthly_peak_extraction_simulation_period - self.load.monthly_baseload_extraction_power_simulation_period)
-                    * 1000
-                    * (g_value_peak_extraction / k_s / 2 / pi + Rb)
-                    / self.number_of_boreholes
-                    / H
-            )
 
-            # save temperatures under variable
-            self.results = ResultsMonthly(
-                borehole_wall_temp=Tb,
-                peak_extraction=results_peak_extraction,
-                peak_injection=results_peak_injection,
-                monthly_extraction=results_month_extraction,
-                monthly_injection=results_month_injection,
-            )
+        if isinstance(self.load, _LoadDataBuilding):
+            # when building load is given, the load should be updated after each temperature calculation.
+            results_old = calculate_temperatures(H)
+            self.load.set_results(results_old)
+            results = calculate_temperatures(H)
 
-        if hourly:
-            # check for hourly data if this is requested
-            if not self.load._hourly:
-                raise ValueError("There is no hourly resolution available!")
+            # safety
+            i = 0
+            while calculate_difference(results_old, results) > 0.1 and i < 50:
+                results_old = results
+                self.load.set_results(results)
+                results = calculate_temperatures(H)
+                i += 1
 
-            hourly_load = self.load.hourly_net_resulting_injection_power
-
-            # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
-            # g-function. This dataset is checked over and over again and is correct
-            g_values = self.gfunction(self.load.time_L4, H)
-
-            # calculation of needed differences of the g-function values. These are the weight factors in the calculation
-            # of Tb.
-            g_value_differences = np.diff(g_values, prepend=0)
-
-            # convolution to get the monthly results
-            results = convolve(hourly_load * 1000, g_value_differences)[: len(hourly_load)]
-
-            # calculation the borehole wall temperature for every month i
-            Tb = results / (2 * pi * self.ground_data.k_s(H)) / (H * self.number_of_boreholes) + self._Tg(H)
-
-            # now the Tf will be calculated based on
-            # Tf = Tb + Q * R_b
-            temperature_result = Tb + hourly_load * 1000 * (Rb / self.number_of_boreholes / H)
-
-            # reset other variables
-            self.results = ResultsHourly(borehole_wall_temp=Tb, temperature_fluid=temperature_result)
+        self.results = calculate_temperatures(H)
 
     def set_options_gfunction_calculation(self, options: dict) -> None:
         """

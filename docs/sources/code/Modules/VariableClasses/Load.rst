@@ -11,27 +11,27 @@ There are hence 8 different load classes .
 
 All of the load classes are based children of the abstract load classes.
 
-.. automodule:: GHEtool.VariableClasses.Baseclasses._SingleYear
+.. automodule:: GHEtool.VariableClasses.LoadData.Baseclasses._SingleYear
     :members:
     :show-inheritance:
     :private-members:
 
-.. automodule:: GHEtool.VariableClasses.Baseclasses._LoadData
+.. automodule:: GHEtool.VariableClasses.LoadData.Baseclasses._LoadData
     :members:
     :show-inheritance:
     :private-members:
 
-.. automodule:: GHEtool.VariableClasses.Baseclasses._LoadDataBuilding
+.. automodule:: GHEtool.VariableClasses.LoadData.Baseclasses._LoadDataBuilding
     :members:
     :show-inheritance:
     :private-members:
 
-.. automodule:: GHEtool.VariableClasses.Baseclasses._HourlyData
+.. automodule:: GHEtool.VariableClasses.LoadData.Baseclasses._HourlyData
     :members:
     :show-inheritance:
     :private-members:
 
-.. automodule:: GHEtool.VariableClasses.Baseclasses._HourlyDataBuilding
+.. automodule:: GHEtool.VariableClasses.LoadData.Baseclasses._HourlyDataBuilding
     :members:
     :show-inheritance:
     :private-members:
@@ -52,18 +52,18 @@ All of the load classes are based children of the abstract load classes.
     :members:
     :show-inheritance:
 
-.. automodule:: GHEtool.VariableClasses.LoadData.GeothermalLoad.MonthlyBuildingLoadAbsolute
+.. automodule:: GHEtool.VariableClasses.LoadData.BuildingLoad.MonthlyBuildingLoadAbsolute
     :members:
     :show-inheritance:
 
-.. automodule:: GHEtool.VariableClasses.LoadData.GeothermalLoad.HourlyBuildingLoad
+.. automodule:: GHEtool.VariableClasses.LoadData.BuildingLoad.HourlyBuildingLoad
     :members:
     :show-inheritance:
 
-.. automodule:: GHEtool.VariableClasses.LoadData.GeothermalLoad.MonthlyBuildingLoadMultiYear
+.. automodule:: GHEtool.VariableClasses.LoadData.BuildingLoad.MonthlyBuildingLoadMultiYear
     :members:
     :show-inheritance:
 
-.. automodule:: GHEtool.VariableClasses.LoadData.GeothermalLoad.HourlyBuildingLoadMultiYear
+.. automodule:: GHEtool.VariableClasses.LoadData.BuildingLoad.HourlyBuildingLoadMultiYear
     :members:
     :show-inheritance:
