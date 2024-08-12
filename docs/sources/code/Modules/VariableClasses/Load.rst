@@ -2,27 +2,36 @@
 Load data
 ***************
 
-GHEtool supports different types of load data (and more are coming, check our project for more information: https://github.com/users/wouterpeere/projects/2)
-Currently you can use:
+GHEtool supports different types of load data:
+#. Geothermal load or building load
+#. Monthly or hourly data
+#. Single or multi-year data
 
-#. Geothermal loads with a monthly resolution for one year (so it repeats itself every year)
-#. Geothermal loads with an hourly resolution for one year (so it repeats itself every year)
-#. Geothermal loads with an monthly resolution but multiple years (it does not repeat itself)
-#. Geothermal loads with an hourly resolution but multiple years (it does not repeat itself)
+There are hence 8 different load classes .
 
-All of the load classes are based children of the abstract _LoadData class.
+All of the load classes are based children of the abstract load classes.
 
 .. automodule:: GHEtool.VariableClasses.Baseclasses._SingleYear
     :members:
     :show-inheritance:
     :private-members:
 
-.. automodule:: GHEtool.VariableClasses.Baseclasses._MonthlyData
+.. automodule:: GHEtool.VariableClasses.Baseclasses._LoadData
+    :members:
+    :show-inheritance:
+    :private-members:
+
+.. automodule:: GHEtool.VariableClasses.Baseclasses._LoadDataBuilding
     :members:
     :show-inheritance:
     :private-members:
 
 .. automodule:: GHEtool.VariableClasses.Baseclasses._HourlyData
+    :members:
+    :show-inheritance:
+    :private-members:
+
+.. automodule:: GHEtool.VariableClasses.Baseclasses._HourlyDataBuilding
     :members:
     :show-inheritance:
     :private-members:
@@ -40,5 +49,21 @@ All of the load classes are based children of the abstract _LoadData class.
     :show-inheritance:
 
 .. automodule:: GHEtool.VariableClasses.LoadData.GeothermalLoad.HourlyGeothermalLoadMultiYear
+    :members:
+    :show-inheritance:
+
+.. automodule:: GHEtool.VariableClasses.LoadData.GeothermalLoad.MonthlyBuildingLoadAbsolute
+    :members:
+    :show-inheritance:
+
+.. automodule:: GHEtool.VariableClasses.LoadData.GeothermalLoad.HourlyBuildingLoad
+    :members:
+    :show-inheritance:
+
+.. automodule:: GHEtool.VariableClasses.LoadData.GeothermalLoad.MonthlyBuildingLoadMultiYear
+    :members:
+    :show-inheritance:
+
+.. automodule:: GHEtool.VariableClasses.LoadData.GeothermalLoad.HourlyBuildingLoadMultiYear
     :members:
     :show-inheritance:

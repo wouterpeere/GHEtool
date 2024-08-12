@@ -104,7 +104,7 @@ class Borefield(BaseClass):
 
         if len(kwargs) > 0:
             raise DeprecationWarning(
-                'Since version 2.3.0, it is no longer possible to set a heating and cooling load (see issue 220).'
+                'Since version 2.3.0, it is no longer possible to set a heating and cooling load (see issue #220).'
                 'Please use the load classes.')
 
         self.limiting_quadrant: int = 0  # parameter that tells in which quadrant the field is limited
@@ -144,7 +144,9 @@ class Borefield(BaseClass):
         if load is not None:
             self.load = load
         else:
-            self.load = MonthlyGeothermalLoadAbsolute(baseload_extraction, baseload_injection, peak_extraction,
+            self.load = MonthlyGeothermalLoadAbsolute(baseload_extraction,
+                                                      baseload_injection,
+                                                      peak_extraction,
                                                       peak_injection)
 
         # set investment cost
@@ -152,8 +154,6 @@ class Borefield(BaseClass):
 
         # set a custom borefield
         self.borefield = borefield
-
-        ghe_logger.main_info("Borefield object has been created.")
 
     @staticmethod
     def activate_logger() -> None:
@@ -478,7 +478,6 @@ class Borefield(BaseClass):
         """
 
         self.custom_gfunction = load_custom_gfunction(location)
-        ghe_logger.main_info("Custom g-function has been loaded.")
 
     def set_investment_cost(self, investment_cost: list = None) -> None:
         """
@@ -1039,7 +1038,6 @@ class Borefield(BaseClass):
                 f"Please change your configuration accordingly to have a not so shallow field."
             )
 
-        ghe_logger.info("The borefield has been sized.")
         return depth
 
     def _select_size(self, size_max_temp: float, size_min_temp: float, hourly: bool = False) -> float:
@@ -1583,7 +1581,6 @@ class Borefield(BaseClass):
         None
         """
         self.results = ResultsMonthly()
-        ghe_logger.info("Deleted all stored temperatures from previous calculations.")
 
     def _calculate_temperature_profile(self, H: float = None, hourly: bool = False) -> None:
         """
