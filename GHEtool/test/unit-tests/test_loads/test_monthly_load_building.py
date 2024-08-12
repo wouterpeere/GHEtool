@@ -366,6 +366,34 @@ def test_monthly_baseload_extraction_simulation_period():
                            [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 6.53846154, 6.53846154, 6.53846154, 6.53846154, 6.53846154,
                             6.53846154]), 10))
 
+    # now with only DHW
+    load.cop_dhw = scop
+    load.baseload_heating = np.zeros(12)
+    load.dhw = test_load
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period, test_load_sim_per * 5 / 6)
+    load.cop_dhw = cop_basic
+    load.reset_results(1, 11)
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period, test_load_sim_per * 1 / 2)
+    load.reset_results(10, 110)
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period, test_load_sim_per * 19 / 20)
+    load.set_results(results_monthly_test)
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       np.tile(np.array([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 9, 9, 9, 9, 9, 9]), 10))
+    # this will follow the data for the baseload, since the part load data is the same, because peak_heating is not
+    # relevant for the dhw power
+    load.cop_dhw = cop_pl
+    load.reset_results(1, 11)
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       np.tile(np.array([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 9.5, 9.5, 9.5, 9.5, 9.5, 9.5]), 10))
+    load.reset_results(10, 110)
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       np.tile(np.array([3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 9.75, 9.75, 9.75, 9.75, 9.75, 9.75]), 10))
+    load.set_results(results_monthly_test)
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       np.tile(np.array(
+                           [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 9.65384615, 9.65384615, 9.65384615, 9.65384615, 9.65384615,
+                            9.65384615]), 10))
+
 
 def test_monthly_peak_injection_simulation_period():
     load = MonthlyBuildingLoadAbsolute(*load_case(2), 10, scop, seer)
@@ -410,6 +438,34 @@ def test_monthly_peak_extraction_simulation_period():
     assert np.allclose(load.monthly_peak_extraction_simulation_period,
                        np.tile(np.array([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 9, 9, 9, 9, 9, 9]), 10))
     load.cop = cop_pl
+    load.reset_results(1, 11)
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       np.tile(np.array([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 9.5, 9.5, 9.5, 9.5, 9.5, 9.5]), 10))
+    load.reset_results(10, 110)
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       np.tile(np.array([3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 9.75, 9.75, 9.75, 9.75, 9.75, 9.75]),
+                               10))
+    load.set_results(results_monthly_test)
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       np.tile(np.array(
+                           [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 9.65384615, 9.65384615, 9.65384615, 9.65384615, 9.65384615,
+                            9.65384615]), 10))
+
+    # now with only DHW
+    load.cop_dhw = scop
+    load.peak_heating = np.zeros(12)
+    load.baseload_heating = np.zeros(12)
+    load.dhw = test_load * 730
+    assert np.allclose(load.monthly_peak_extraction_simulation_period, test_load_sim_per * 5 / 6)
+    load.cop_dhw = cop_basic
+    load.reset_results(1, 11)
+    assert np.allclose(load.monthly_peak_extraction_simulation_period, test_load_sim_per * 1 / 2)
+    load.reset_results(10, 110)
+    assert np.allclose(load.monthly_peak_extraction_simulation_period, test_load_sim_per * 19 / 20)
+    load.set_results(results_monthly_test)
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       np.tile(np.array([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 9, 9, 9, 9, 9, 9]), 10))
+    load.cop_dhw = cop_pl
     load.reset_results(1, 11)
     assert np.allclose(load.monthly_peak_extraction_simulation_period,
                        np.tile(np.array([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 9.5, 9.5, 9.5, 9.5, 9.5, 9.5]), 10))

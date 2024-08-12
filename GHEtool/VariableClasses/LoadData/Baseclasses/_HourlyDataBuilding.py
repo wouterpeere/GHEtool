@@ -134,7 +134,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         else:
             temperature = self.results.Tf
 
-        return self.cop.get_COP(temperature, part_load=part_load)
+        return self.cop.get_COP(temperature, part_load=np.nan_to_num(part_load))
 
     def _get_hourly_cop_dhw(self, part_load: np.ndarray = None) -> Union[float, np.ndarray]:
         """
@@ -155,7 +155,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         else:
             temperature = self.results.Tf
 
-        return self.cop_dhw.get_COP(temperature, part_load=part_load)
+        return self.cop_dhw.get_COP(temperature, part_load=np.nan_to_num(part_load))
 
     def _get_hourly_eer(self, part_load: np.ndarray = None) -> Union[float, np.ndarray]:
         """
@@ -176,7 +176,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         else:
             temperature = self.results.Tf
 
-        return self.eer.get_EER(temperature, part_load=part_load)
+        return self.eer.get_EER(temperature, part_load=np.nan_to_num(part_load))
 
     @property
     def hourly_injection_load_simulation_period(self) -> np.ndarray:
