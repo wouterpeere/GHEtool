@@ -113,7 +113,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         hourly DHW : np.ndarray
             Hourly DHW values [kWh/h] for one year, so the length of the array is 8760
         """
-        return np.mean(self.hourly_heating_load_simulation_period.reshape((self.simulation_period, 8760)), axis=0)
+        return np.mean(self.hourly_dhw_load_simulation_period.reshape((self.simulation_period, 8760)), axis=0)
 
     def _get_hourly_cop(self, part_load: np.ndarray = None) -> Union[float, np.ndarray]:
         """
