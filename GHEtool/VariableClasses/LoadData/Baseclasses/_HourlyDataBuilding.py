@@ -135,7 +135,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
             Array of COP values
         """
         if isinstance(self.cop, SCOP) and isinstance(self.eer, SEER) and isinstance(self.cop_dhw, SCOP):
-            return self.cop.get_COP(np.zeros(8760 * self.simulation_period), part_load=np.nan_to_num(part_load))
+            return self.cop.get_COP(0, part_load=np.nan_to_num(part_load))
         if isinstance(self.results, ResultsMonthly):
             raise TypeError('You cannot get an hourly EER values based on monthly temperature results.')
         if isinstance(self.results, tuple):
@@ -165,7 +165,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
             Array of COP values
         """
         if isinstance(self.cop, SCOP) and isinstance(self.eer, SEER) and isinstance(self.cop_dhw, SCOP):
-            return self.cop_dhw.get_COP(np.zeros(8760 * self.simulation_period), part_load=np.nan_to_num(part_load))
+            return self.cop_dhw.get_COP(0, part_load=np.nan_to_num(part_load))
         if isinstance(self.results, ResultsMonthly):
             raise TypeError('You cannot get an hourly EER values based on monthly temperature results.')
         if isinstance(self.results, tuple):
@@ -195,7 +195,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
             Array of EER values
         """
         if isinstance(self.cop, SCOP) and isinstance(self.eer, SEER) and isinstance(self.cop_dhw, SCOP):
-            return self.eer.get_EER(np.zeros(8760 * self.simulation_period), part_load=np.nan_to_num(part_load))
+            return self.eer.get_EER(0, part_load=np.nan_to_num(part_load))
         if isinstance(self.results, ResultsMonthly):
             raise TypeError('You cannot get an hourly EER values based on monthly temperature results.')
         if isinstance(self.results, tuple):

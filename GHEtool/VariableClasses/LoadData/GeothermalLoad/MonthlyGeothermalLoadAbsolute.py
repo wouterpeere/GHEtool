@@ -189,8 +189,7 @@ class MonthlyGeothermalLoadAbsolute(_SingleYear, _LoadData):
         peak cooling : np.ndarray
             Peak cooling values for one year, so the length of the array is 12
         """
-        return self.correct_for_start_month(
-            np.maximum(self._peak_injection, self.monthly_baseload_injection_power))
+        return np.maximum(self.correct_for_start_month(self._peak_injection), self.monthly_baseload_injection_power)
 
     @peak_injection.setter
     def peak_injection(self, load) -> None:
@@ -250,8 +249,7 @@ class MonthlyGeothermalLoadAbsolute(_SingleYear, _LoadData):
         peak heating : np.ndarray
             Peak heating values for one year, so the length of the array is 12
         """
-        return self.correct_for_start_month(
-            np.maximum(np.array(self._peak_extraction), self.monthly_baseload_extraction_power))
+        return np.maximum(self.correct_for_start_month(self._peak_extraction), self.monthly_baseload_extraction_power)
 
     @peak_extraction.setter
     def peak_extraction(self, load: ArrayLike) -> None:

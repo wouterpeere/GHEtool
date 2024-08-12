@@ -201,8 +201,7 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
         peak cooling : np.ndarray
             Peak cooling values for one year, so the length of the array is 12
         """
-        return self.correct_for_start_month(
-            np.maximum(self._peak_cooling, self.monthly_baseload_cooling_power))
+        return np.maximum(self.correct_for_start_month(self._peak_cooling), self.monthly_baseload_cooling_power)
 
     @peak_cooling.setter
     def peak_cooling(self, load) -> None:
@@ -262,8 +261,7 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
         peak heating : np.ndarray
             Peak heating values for one year, so the length of the array is 12
         """
-        return self.correct_for_start_month(
-            np.maximum(self._peak_heating, self.monthly_baseload_heating_power))
+        return np.maximum(self.correct_for_start_month(self._peak_heating), self.monthly_baseload_heating_power)
 
     @peak_heating.setter
     def peak_heating(self, load: ArrayLike) -> None:

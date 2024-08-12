@@ -43,6 +43,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fix plot_load_duration (issue #260).
 - Problem in CI/CD and testing for python <3.12 (issue #274).
 - Fix compatibility with numpy 2.0 (issue #274).
+- Fix problem with start month and zero peak loads (issue #288).
 
 ## [2.2.2] - 2024-05-16
 
