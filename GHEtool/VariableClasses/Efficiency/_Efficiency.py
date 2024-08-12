@@ -31,25 +31,27 @@ class _Efficiency(_EfficiencyBase):
 
     def __init__(self,
                  data: np.ndarray,
-                 range_avg_primary_temperature: np.ndarray,
-                 range_avg_secondary_temperature: np.ndarray = None,
-                 range_part_load: np.ndarray = None):
+                 coordinates: np.ndarray,
+                 nb_of_points_primary_temperature: int,
+                 nb_of_points_secondary_temperature: int = 0,
+                 nb_of_points_part_load: int = 0):
         """
 
         Parameters
         ----------
-         data : np.ndarray
-            Array with all the interpolation data, at least 1D, but up to 3D depending on whether the range for
-            average secondary temperatures or the part load data is provided.
-        range_avg_primary_temperature : np.ndarray
-            Array with all the values for the average primary temperature of the heat pump that are present
+        data : np.ndarray
+            1D-array with all efficiency values.
+        coordinates : np.ndarray
+            1D array with all the coordinates at which the efficiency values can be found. These coordinates can be
+            1D up to 3D, depending on whether secondary temperature and/or part load is taken into account.
+        nb_of_points_primary_temperature : np.ndarray
+            The resolution for the interpolation grid for primary temperature.
+        nb_of_points_secondary_temperature : np.ndarray
+            The resolution for the interpolation grid for primary temperature. 0 if there are no secondary temperatures
             in the data.
-        range_avg_secondary_temperature : np.ndarray
-            Array with all the values for the average secondary temperature of the heat pump that are present
-            in the data. (Optional)
-        range_part_load : np.ndarray
-            Array with all the values for the part-load data of the heat pump that are present in the data.
-            All these values have to be between 0-1. (Optional).
+        nb_of_points_part_load : np.ndarray
+            The resolution for the interpolation grid for primary temperature. 0 if there are no part loads
+            in the data.
 
         Raises
         ------
@@ -60,43 +62,55 @@ class _Efficiency(_EfficiencyBase):
 
         """
         self._data = data
-        self._range_secondary: bool = range_avg_secondary_temperature is not None
-        self._range_part_load: bool = range_part_load is not None
-        self.__range_primary_ = range_avg_primary_temperature
-        self.__range_secondary_ = range_avg_secondary_temperature
-        self.__range_part_load_ = range_part_load
+        self._has_secondary: bool = nb_of_points_secondary_temperature > 0
+        self._has_part_load: bool = nb_of_points_part_load > 0
+        self._range_primary = ()
+        self._range_secondary = ()
+        self._range_part_load = ()
 
         # check if all data points are higher than 0
         if not np.all(self._data > 0):
             raise ValueError('The efficiencies should all be above zero!')
 
-        # set points
-        self._points = [range_avg_primary_temperature]
+        # check if the data has the same length as the coordinates
+        if len(data) != len(coordinates):
+            raise ValueError('The provided data and coordinates array are not of the same length!')
 
-        if range_avg_secondary_temperature is not None:
-            self._points.append(range_avg_secondary_temperature)
-        if range_part_load is not None:
-            self._points.append(range_part_load)
+        # check dimension
+        dimensions = len(coordinates[0])
+        if dimensions != 1 + self._has_secondary + self._has_part_load:
+            raise ValueError(f'The provided coordinate data has {dimensions} dimensions whereas '
+                             f'{1 + self._has_secondary + self._has_part_load} dimensions where provided.'
+                             'Please check the nb_of_points for both secondary temperature and part load.')
 
-        # test if data is correct provided
+        # set range
+        self._range_primary = (np.min(coordinates[:, 0]), np.max(coordinates[:, 0]))
+        if self._has_secondary and self._has_part_load:
+            self._range_secondary = (np.min(coordinates[:, 1]), np.max(coordinates[:, 1]))
+            self._range_part_load = (np.min(coordinates[:, 2]), np.max(coordinates[:, 2]))
+            # make rectangular interpolation grid
+            self._points = np.mgrid(
+                np.linspace(self._range_primary[0], self._range_primary[1], nb_of_points_primary_temperature),
+                np.linspace(self._range_secondary[0], self._range_secondary[1], nb_of_points_secondary_temperature),
+                np.linspace(self._range_part_load[0], self._range_part_load[1], nb_of_points_primary_temperature))
+        elif self._has_secondary:
+            self._range_secondary = (np.min(coordinates[:, 1]), np.max(coordinates[:, 1]))
+            # make rectangular interpolation grid
+            self._points = np.mgrid(
+                np.linspace(self._range_primary[0], self._range_primary[1], nb_of_points_primary_temperature),
+                np.linspace(self._range_secondary[0], self._range_secondary[1], nb_of_points_secondary_temperature))
+        elif self._has_part_load:
+            self._range_part_load = (np.min(coordinates[:, 1]), np.max(coordinates[:, 1]))
+            # make rectangular interpolation grid
+            self._points = np.mgrid(
+                np.linspace(self._range_primary[0], self._range_primary[1], nb_of_points_primary_temperature),
+                np.linspace(self._range_part_load[0], self._range_part_load[1], nb_of_points_primary_temperature))
+        else:
+            self._points = np.mgrid(
+                np.linspace(self._range_primary[0], self._range_primary[1], nb_of_points_primary_temperature))
 
-        if range_avg_secondary_temperature is None and range_part_load is None:
-            if np.shape(self._points[0]) != np.shape(self._data):
-                raise ValueError('Please make sure the dimensions of the dataset are correct!')
-            return
-        if self._range_part_load and self._range_secondary:
-            try:
-                # if
-                interpolate.interpn(self._points, self._data, (1, 1, 1), bounds_error=False)
-
-                return
-            except ValueError:
-                raise ValueError('Please make sure the dimensions of the dataset are correct!')
-        # test incorrect shape
-        try:
-            np.shape(self._points)
-        except ValueError:
-            raise ValueError('Please make sure the dimensions of the dataset are correct!')
+        # create data grid for later interpolation
+        self._data = interpolate.griddata(coordinates, data, self._points, fill_value=np.nan)
 
     def _get_efficiency(self,
                         primary_temperature: Union[float, np.ndarray],
@@ -126,11 +140,11 @@ class _Efficiency(_EfficiencyBase):
             np.ndarray
         """
         # check if all the required values are present
-        if self._range_secondary != (secondary_temperature is not None):
-            if self._range_secondary:
+        if self._has_secondary != (secondary_temperature is not None):
+            if self._has_secondary:
                 raise ValueError('The EER class requires a value for the secondary temperature.')
-        if self._range_part_load != (part_load is not None):
-            if self._range_part_load:
+        if self._has_part_load != (part_load is not None):
+            if self._has_part_load:
                 raise ValueError('The EER class requires a value for the part-load.')
 
         # get maximum length
@@ -152,18 +166,18 @@ class _Efficiency(_EfficiencyBase):
                                               np.max(self.__range_primary_))
         secondary_temperature_clipped = None
         part_load_clipped = None
-        if self._range_secondary:
+        if self._has_secondary:
             secondary_temperature_clipped = np.clip(secondary_temperature, np.min(self.__range_secondary_),
                                                     np.max(self.__range_secondary_))
-        if self._range_part_load:
+        if self._has_part_load:
             part_load_clipped = np.clip(part_load, np.min(self.__range_part_load_), np.max(self.__range_part_load_))
 
         xi = primary_temperature_clipped
-        if self._range_part_load and self._range_secondary:
+        if self._has_part_load and self._has_secondary:
             xi = list(zip(primary_temperature_clipped, secondary_temperature_clipped, part_load_clipped))
-        elif self._range_secondary:
+        elif self._has_secondary:
             xi = list(zip(primary_temperature_clipped, secondary_temperature_clipped))
-        elif self._range_part_load:
+        elif self._has_part_load:
             xi = list(zip(primary_temperature_clipped, part_load_clipped))
 
         interp = interpolate.interpn(self._points, self._data, xi, bounds_error=False, fill_value=np.nan)
