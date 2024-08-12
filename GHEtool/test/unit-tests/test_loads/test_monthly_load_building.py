@@ -76,12 +76,18 @@ def test_monthly_baseload_heating_simulation_period():
     load = MonthlyBuildingLoadAbsolute(*load_case(1), 10, 5, 5)
     assert np.allclose(load.monthly_baseload_heating_simulation_period, np.tile(load_case(1)[0], 10))
     assert np.allclose(load.monthly_baseload_extraction_simulation_period, np.tile(load_case(1)[0] * 4 / 5, 10))
+    load.peak_heating = np.zeros(12)
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.monthly_baseload_extraction_power_simulation_period)
 
 
 def test_monthly_baseload_cooling_simulation_period():
     load = MonthlyBuildingLoadAbsolute(*load_case(1), 10, 5, 5)
     assert np.allclose(load.monthly_baseload_cooling_simulation_period, np.tile(load_case(1)[1], 10))
     assert np.allclose(load.monthly_baseload_injection_simulation_period, np.tile(load_case(1)[1] * 6 / 5, 10))
+    load.peak_cooling = np.zeros(12)
+    assert np.allclose(load.monthly_peak_injection_simulation_period,
+                       load.monthly_baseload_injection_power_simulation_period)
 
 
 def test_monthly_peak_heating_simulation_period():

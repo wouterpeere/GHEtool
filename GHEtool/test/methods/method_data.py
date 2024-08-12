@@ -507,3 +507,57 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 4, 25, 
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 4, 25, 89.242, 98.362,
                                                    56.147, 74.421, 55.020, 56.866,
                                                    name='Optimise load profile (stuck in loop) (energy)', power=False))
+
+ground_data = GroundFluxTemperature(3, 10)
+fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
+borefield = Borefield()
+borefield.create_rectangular_borefield(5, 4, 6, 6, 110, 4, 0.075)
+borefield.set_ground_parameters(ground_data)
+borefield.set_fluid_parameters(fluid_data)
+borefield.set_pipe_parameters(pipe_data)
+borefield.calculation_setup(use_constant_Rb=False)
+borefield.set_max_avg_fluid_temperature(17)
+borefield.set_min_avg_fluid_temperature(3)
+hourly_load_building = HourlyBuildingLoad()
+hourly_load_building.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,
+                                         separator=";", col_cooling=0, col_heating=1)
+hourly_load_building.hourly_cooling_load = hourly_load_building.hourly_cooling_load * 20 / 21
+hourly_load_building.hourly_heating_load = hourly_load_building.hourly_heating_load * 5 / 4
+borefield.load = hourly_load_building
+list_of_test_objects.add(SizingObject(borefield, L2_output=136.294, L3_output=136.294, L4_output=101.285, quadrant=1,
+                                      name='BS2023 Auditorium'))
+
+borefield = Borefield()
+borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 4, 0.075)
+borefield.set_ground_parameters(ground_data)
+borefield.set_fluid_parameters(fluid_data)
+borefield.set_pipe_parameters(pipe_data)
+borefield.calculation_setup(use_constant_Rb=False)
+borefield.set_max_avg_fluid_temperature(17)
+borefield.set_min_avg_fluid_temperature(3)
+hourly_load_building.simulation_period = 20
+hourly_load_building.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\office.csv"), header=True,
+                                         separator=";", col_cooling=0, col_heating=1)
+hourly_load_building.hourly_cooling_load = hourly_load_building.hourly_cooling_load * 20 / 21
+hourly_load_building.hourly_heating_load = hourly_load_building.hourly_heating_load * 5 / 4
+borefield.load = hourly_load_building
+list_of_test_objects.add(
+    SizingObject(borefield, L2_output=113.069, L3_output=113.069, L4_output=107.08131844420905, quadrant=2,
+                 name='BS2023 Office'))
+
+borefield = Borefield()
+borefield.create_rectangular_borefield(15, 20, 6, 6, 110, 4, 0.075)
+borefield.set_ground_parameters(ground_data)
+borefield.set_fluid_parameters(fluid_data)
+borefield.set_pipe_parameters(pipe_data)
+borefield.calculation_setup(use_constant_Rb=False)
+borefield.set_max_avg_fluid_temperature(17)
+borefield.set_min_avg_fluid_temperature(3)
+hourly_load_building.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\swimming_pool.csv"), header=True,
+                                         separator=";", col_cooling=0, col_heating=1)
+hourly_load_building.hourly_cooling_load = hourly_load_building.hourly_cooling_load * 20 / 21
+hourly_load_building.hourly_heating_load = hourly_load_building.hourly_heating_load * 5 / 4
+borefield.load = hourly_load_building
+list_of_test_objects.add(SizingObject(borefield, L2_output=310.725, L3_output=310.725, L4_output=308.269, quadrant=4,
+                                      name='BS2023 Swimming pool'))

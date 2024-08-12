@@ -1604,7 +1604,7 @@ class Borefield(BaseClass):
         None
         """
 
-        def calculate_temperatures(H):
+        def calculate_temperatures(H, hourly=hourly):
             # set Rb* value
             Rb = self.borehole.get_Rb(H if H is not None else self.H, self.D, self.r_b, self.ground_data.k_s(self.H))
             H = H if H is not None else self.H
@@ -1704,26 +1704,27 @@ class Borefield(BaseClass):
 
         def calculate_difference(results_old: Union[ResultsMonthly, ResultsHourly],
                                  result_new: Union[ResultsMonthly, ResultsHourly]) -> float:
-            return np.max(
-                (result_new.peak_injection - results_old.peak_injection) / self.load.max_peak_injection,
-                (result_new.peak_extraction - results_old.peak_extraction) / self.load.max_peak_extraction,
-            )
+            return max(
+                np.max((result_new.peak_injection - results_old.peak_injection) / self.load.max_peak_injection),
+                np.max((result_new.peak_extraction - results_old.peak_extraction) / self.load.max_peak_extraction))
 
         if isinstance(self.load, _LoadDataBuilding):
             # when building load is given, the load should be updated after each temperature calculation.
-            results_old = calculate_temperatures(H)
+            results_old = calculate_temperatures(H, hourly=hourly)
             self.load.set_results(results_old)
-            results = calculate_temperatures(H)
+            results = calculate_temperatures(H, hourly=hourly)
 
             # safety
             i = 0
             while calculate_difference(results_old, results) > 0.1 and i < 50:
                 results_old = results
                 self.load.set_results(results)
-                results = calculate_temperatures(H)
+                results = calculate_temperatures(H, hourly=hourly)
                 i += 1
+            self.results = results
+            return
 
-        self.results = calculate_temperatures(H)
+        self.results = calculate_temperatures(H, hourly=hourly)
 
     def set_options_gfunction_calculation(self, options: dict) -> None:
         """

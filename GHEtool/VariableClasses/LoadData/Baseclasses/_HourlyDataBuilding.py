@@ -134,6 +134,8 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         COP : float | np.ndarray
             Array of COP values
         """
+        if isinstance(self.cop, SCOP) and isinstance(self.eer, SEER) and isinstance(self.cop_dhw, SCOP):
+            return self.cop.get_COP(np.zeros(8760 * self.simulation_period), part_load=np.nan_to_num(part_load))
         if isinstance(self.results, ResultsMonthly):
             raise TypeError('You cannot get an hourly EER values based on monthly temperature results.')
         if isinstance(self.results, tuple):
@@ -162,6 +164,8 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         COP : float | np.ndarray
             Array of COP values
         """
+        if isinstance(self.cop, SCOP) and isinstance(self.eer, SEER) and isinstance(self.cop_dhw, SCOP):
+            return self.cop_dhw.get_COP(np.zeros(8760 * self.simulation_period), part_load=np.nan_to_num(part_load))
         if isinstance(self.results, ResultsMonthly):
             raise TypeError('You cannot get an hourly EER values based on monthly temperature results.')
         if isinstance(self.results, tuple):
@@ -190,6 +194,8 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         EER : float | np.ndarray
             Array of EER values
         """
+        if isinstance(self.cop, SCOP) and isinstance(self.eer, SEER) and isinstance(self.cop_dhw, SCOP):
+            return self.eer.get_EER(np.zeros(8760 * self.simulation_period), part_load=np.nan_to_num(part_load))
         if isinstance(self.results, ResultsMonthly):
             raise TypeError('You cannot get an hourly EER values based on monthly temperature results.')
         if isinstance(self.results, tuple):
@@ -495,3 +501,31 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         # set data
         self.hourly_heating_load = np.array(df.iloc[:, col_heating])
         self.hourly_cooling_load = np.array(df.iloc[:, col_cooling])
+
+    # @property
+    # def max_peak_injection(self) -> float:
+    #     """
+    #     This returns the max peak injection in kW.
+    #
+    #     Returns
+    #     -------
+    #     max peak injection : float
+    #     """
+    #     if isinstance(self._results, ResultsMonthly) and \
+    #             (isinstance(self.cop, COP) or isinstance(self.eer, EER) or isinstance(self.cop_dhw, COP)):
+    #         return np.max(self.monthly_peak_injection_simulation_period)
+    #     return np.max(self.hourly_injection_load_simulation_period)
+    #
+    # @property
+    # def max_peak_extraction(self) -> float:
+    #     """
+    #     This returns the max peak extraction in kW.
+    #
+    #     Returns
+    #     -------
+    #     max peak extraction : float
+    #     """
+    #     if isinstance(self._results, ResultsMonthly) and \
+    #             (isinstance(self.cop, COP) or isinstance(self.eer, EER) or isinstance(self.cop_dhw, COP)):
+    #         return np.max(self.monthly_peak_extraction_simulation_period)
+    #     return np.max(self.hourly_extraction_load_simulation_period)
