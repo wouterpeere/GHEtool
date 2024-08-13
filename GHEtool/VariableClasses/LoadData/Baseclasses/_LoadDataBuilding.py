@@ -886,6 +886,11 @@ class _LoadDataBuilding(_LoadData, ABC):
         -------
         Yearly heating electricity consumption : np.ndarray
         """
+        heating = np.sum(np.reshape(self.monthly_baseload_heating_simulation_period,
+                                    (self.simulation_period, 12)), axis=1)
+        extraction = np.sum(np.reshape(self._monthly_baseload_extraction_heating_simulation_period,
+                                       (self.simulation_period, 12)), axis=1)
+        return heating / (heating - extraction)
 
     @property
     def yearly_electricity_consumption_dhw(self) -> np.ndarray:
@@ -896,6 +901,11 @@ class _LoadDataBuilding(_LoadData, ABC):
         -------
         Yearly DHW electricity consumption : np.ndarray
         """
+        dhw = np.sum(np.reshape(self.monthly_baseload_dhw_simulation_period,
+                                (self.simulation_period, 12)), axis=1)
+        extraction = np.sum(np.reshape(self._monthly_baseload_extraction_dhw_simulation_period,
+                                       (self.simulation_period, 12)), axis=1)
+        return dhw / (dhw - extraction)
 
     @property
     def SEER(self) -> float:
