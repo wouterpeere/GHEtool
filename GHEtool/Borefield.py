@@ -513,7 +513,8 @@ class Borefield(BaseClass):
         self.load = load
 
     @property
-    def load(self) -> HourlyGeothermalLoad | MonthlyGeothermalLoadAbsolute:
+    def load(self) -> HourlyGeothermalLoad | MonthlyGeothermalLoadAbsolute | \
+                      HourlyBuildingLoad | MonthlyBuildingLoadAbsolute:
         """
         This returns the LoadData object.
 

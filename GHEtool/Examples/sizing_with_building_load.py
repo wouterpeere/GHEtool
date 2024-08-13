@@ -9,6 +9,7 @@ import numpy as np
 import pygfunction as gt
 
 from GHEtool import *
+from typing import Tuple
 
 # define building loads in kWh/year
 building_demand_heating = np.array(
@@ -23,7 +24,7 @@ pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.42, 0.0425)
 fluid_data = FluidData(k_f=0.475, rho=1033, Cp=3930, mu=0.0079, vfr=0.186)
 
 
-def size_with_scop() -> float:
+def size_with_scop() -> Tuple[float, float]:
     """
     Size the borefield using a constant value for the cop and eer.
 
@@ -53,12 +54,12 @@ def size_with_scop() -> float:
 
     depth = borefield.size_L3(100)
     print(f'When sizing with a constant SCOP, the required borehole depth is {depth:.2f}m. The SCOP (incl. DHW) is '
-          f'{borefield.load.SCOP:.2f}')
+          f'{borefield.load.SCOP_total:.2f}')
     borefield.print_temperature_profile()
-    return depth, borefield.load.SCOP
+    return depth, borefield.load.SCOP_total
 
 
-def size_with_variable_ground_temperature():
+def size_with_variable_ground_temperature() -> Tuple[float, float]:
     """
     Size the borefield using cop that depends on the average primary temperature.
 
@@ -88,12 +89,12 @@ def size_with_variable_ground_temperature():
 
     depth = borefield.size_L3(100)
     print(f'When sizing with a inlet temperature dependent COP, the required borehole depth is {depth:.2f}m. '
-          f'The SCOP (incl. DHW) is {borefield.load.SCOP:.2f}')
+          f'The SCOP (incl. DHW) is {borefield.load.SCOP_total:.2f}')
     borefield.print_temperature_profile()
-    return depth, borefield.load.SCOP
+    return depth, borefield.load.SCOP_total
 
 
-def size_with_part_load_data():
+def size_with_part_load_data() -> Tuple[float, float]:
     """
     Size the borefield using cop that depends on both the average primary temperature and the part load data.
 
@@ -141,9 +142,9 @@ def size_with_part_load_data():
     depth = borefield.size_L3(100)
     print(
         f'When sizing with a inlet temperature and part-load dependent COP, the required borehole depth is {depth:.2f}m. '
-        f'The SCOP (incl. DHW) is {borefield.load.SCOP:.2f}')
+        f'The SCOP (incl. DHW) is {borefield.load.SCOP_total:.2f}')
     borefield.print_temperature_profile()
-    return depth, borefield.load.SCOP
+    return depth, borefield.load.SCOP_total
 
 
 if __name__ == "__main__":

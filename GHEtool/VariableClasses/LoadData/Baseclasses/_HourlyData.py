@@ -34,17 +34,6 @@ class _HourlyData(_LoadData, ABC):
             Hourly injection values [kWh/h] for the whole simulation period
         """
 
-    @abc.abstractmethod
-    def hourly_extraction_load_simulation_period(self) -> np.ndarray:
-        """
-        This function returns the hourly extraction load in kWh/h for the whole simulation period.
-
-        Returns
-        -------
-        hourly extraction : np.ndarray
-            Hourly extraction values [kWh/h] for the whole simulation period
-        """
-
     @property
     def hourly_injection_load(self) -> np.ndarray:
         """

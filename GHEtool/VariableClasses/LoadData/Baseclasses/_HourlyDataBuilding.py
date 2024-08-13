@@ -215,9 +215,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         hourly injection : np.ndarray
             Hourly injection values [kWh/h] for the whole simulation period
         """
-        part_load = None
-        if self.eer._has_part_load:
-            part_load = self.hourly_cooling_load_simulation_period
+        part_load = self.hourly_cooling_load_simulation_period
         return np.multiply(
             self.hourly_cooling_load_simulation_period,
             self.conversion_factor_secondary_to_primary_cooling(self._get_hourly_eer(part_load)))
@@ -232,18 +230,37 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         hourly extraction : np.ndarray
             Hourly extraction values [kWh/h] for the whole simulation period
         """
-        part_load = None
-        if self.cop._has_part_load:
-            part_load = self.hourly_heating_load_simulation_period
-        extraction_due_to_heating = np.multiply(
+        if isinstance(self.dhw, (int, float)) and self.dhw == 0.:
+            return self._hourly_extraction_load_heating_simulation_period
+        return self._hourly_extraction_load_heating_simulation_period + self._hourly_extraction_load_dhw_simulation_period
+
+    @property
+    def _hourly_extraction_load_heating_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the hourly extraction load for space heating in kWh/h for the whole simulation period.
+
+        Returns
+        -------
+        hourly extraction : np.ndarray
+            Hourly extraction values [kWh/h] for the whole simulation period
+        """
+        part_load = self.hourly_heating_load_simulation_period
+        return np.multiply(
             self.hourly_heating_load_simulation_period,
             self.conversion_factor_secondary_to_primary_heating(self._get_hourly_cop(part_load)))
 
-        if isinstance(self.dhw, (int, float)) and self.dhw == 0.:
-            return extraction_due_to_heating
+    @property
+    def _hourly_extraction_load_dhw_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the hourly extraction load for DHW in kWh/h for the whole simulation period.
 
+        Returns
+        -------
+        hourly extraction : np.ndarray
+            Hourly extraction values [kWh/h] for the whole simulation period
+        """
         part_load_dhw = self.hourly_dhw_load_simulation_period
-        return extraction_due_to_heating + np.multiply(
+        return np.multiply(
             self.hourly_dhw_load_simulation_period,
             self.conversion_factor_secondary_to_primary_heating(self._get_hourly_cop_dhw(part_load_dhw)))
 

@@ -504,9 +504,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         baseload injection : np.ndarray
             Baseload injection for the whole simulation period
         """
-        part_load = None
-        if self.eer._has_part_load:
-            part_load = np.tile(self.monthly_baseload_cooling_power, self.simulation_period)
+        part_load = np.tile(self.monthly_baseload_cooling_power, self.simulation_period)
         return np.multiply(
             self.monthly_baseload_cooling_simulation_period,
             self.conversion_factor_secondary_to_primary_cooling(self._get_monthly_eer(False, part_load)))
@@ -547,9 +545,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         peak injection : np.ndarray
             Peak injection for the whole simulation period
         """
-        part_load = None
-        if self.eer._has_part_load:
-            part_load = self.monthly_peak_cooling_simulation_period
+        part_load = self.monthly_peak_cooling_simulation_period
         return np.multiply(
             self.monthly_peak_cooling_simulation_period,
             self.conversion_factor_secondary_to_primary_cooling(self._get_monthly_eer(True, part_load)))
@@ -856,6 +852,16 @@ class _LoadDataBuilding(_LoadData, ABC):
         """
 
     @property
+    def yearly_electricity_consumption_dhw(self) -> np.ndarray:
+        """
+        This function returns the electricity consumption for DHW production in kWh for every year in the simulation period.
+
+        Returns
+        -------
+        Yearly DHW electricity consumption : np.ndarray
+        """
+
+    @property
     def SEER(self) -> float:
         """
         This function returns the average SEER over the simulation period.
@@ -877,8 +883,30 @@ class _LoadDataBuilding(_LoadData, ABC):
         -------
         SCOP : float
         """
-        return (self.yearly_average_heating_load + self.yearly_average_dhw_load) / (
-                self.yearly_average_heating_load + self.yearly_average_dhw_load - self.yearly_average_extraction_load)
+        return (self.yearly_average_heating_load + self.yearly_average_dhw_load) / \
+            (self.yearly_electricity_consumption_heating + self.yearly_electricity_consumption_dhw)
+
+    @property
+    def SCOP_heating(self) -> float:
+        """
+        This function returns the SCOP for space heating for the whole simulation period.
+
+        Returns
+        -------
+        SCOP : float
+        """
+        return self.yearly_average_heating_load / np.mean(self.yearly_electricity_consumption_heating)
+
+    @property
+    def SCOP_DHW(self) -> float:
+        """
+        This function returns the SCOP for DHW production for the whole simulation period.
+
+        Returns
+        -------
+        SCOP : float
+        """
+        return self.yearly_average_dhw_load / np.mean(self.yearly_electricity_consumption_dhw)
 
     @property
     def yearly_SEER(self) -> np.ndarray:
@@ -890,7 +918,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         SEER : np.ndarray
         """
         # negative sign to get a positive value
-        return -self.yearly_cooling_load_simulation_period / (self.yearly_electricity_consumption_cooling)
+        return -self.yearly_cooling_load_simulation_period / self.yearly_electricity_consumption_cooling
 
     @property
     def yearly_SCOP_total(self) -> np.ndarray:
@@ -902,4 +930,37 @@ class _LoadDataBuilding(_LoadData, ABC):
         SCOP : np.ndarray
         """
         return (self.yearly_heating_load_simulation_period + self.yearly_dhw_load_simulation_period) / (
-            self.yearly_extraction_load_simulation_period)
+                self.yearly_electricity_consumption_heating + self.yearly_electricity_consumption_dhw)
+
+    @property
+    def yearly_SCOP_heating(self) -> np.ndarray:
+        """
+        This function returns the SCOP for space heating for every year of the simulation period.
+
+        Returns
+        -------
+        SCOP : np.ndarray
+        """
+        return self.yearly_heating_load_simulation_period / self.yearly_electricity_consumption_heating
+
+    @property
+    def yearly_SCOP_DHW(self) -> np.ndarray:
+        """
+        This function returns the SCOP of the DHW production for every year of the simulation period.
+
+        Returns
+        -------
+        SCOP : np.ndarray
+        """
+        return self.yearly_dhw_load_simulation_period / self.yearly_electricity_consumption_dhw
+
+    @property
+    def simulation_period(self) -> int:
+        """
+        This property returns the simulation period.
+
+        Returns
+        -------
+        simulation period : int
+        """
+        return int(len(self.monthly_baseload_cooling_simulation_period) / 12)
