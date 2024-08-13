@@ -10,8 +10,8 @@ scop = SCOP(6)
 seer = SEER(5)
 cop_basic = COP(np.array([2, 20]), np.array([1, 10]))
 eer_basic = EER(np.array([2, 20]), np.array([1, 10]))
-cop_pl = COP(np.array([2, 20, 4, 40]), np.array([[1, 0.5], [10, 0.5], [1, 1], [10, 1]]), part_load=True)
-eer_pl = EER(np.array([2, 20, 4, 40]), np.array([[1, 0.5], [10, 0.5], [1, 1], [10, 1]]), part_load=True)
+cop_pl = COP(np.array([2, 20, 4, 40]), np.array([[1, 5], [10, 5], [1, 10], [10, 10]]), part_load=True)
+eer_pl = EER(np.array([2, 20, 4, 40]), np.array([[1, 5], [10, 5], [1, 10], [10, 10]]), part_load=True)
 results_monthly = ResultsMonthly(np.linspace(0, 120 - 1, 120),
                                  np.linspace(0, 120 - 1, 120) * 2,
                                  np.linspace(0, 120 - 1, 120) * 3,
@@ -342,12 +342,11 @@ def test_monthly_baseload_injection_simulation_period():
                        np.tile(np.array([7.5, 7.5, 7.5, 7.5, 7.5, 7.5, 15, 15, 15, 15, 15, 15]), 10))
     load.reset_results(0, 10)
     assert np.allclose(load.monthly_baseload_injection_simulation_period,
-                       np.tile(np.array([6.25, 6.25, 6.25, 6.25, 6.25, 6.25, 12.5, 12.5, 12.5, 12.5, 12.5, 12.5]), 10))
+                       np.tile(np.array([5.25, 5.25, 5.25, 5.25, 5.25, 5.25, 10.5, 10.5, 10.5, 10.5, 10.5, 10.5]), 10))
     load.set_results(results_monthly_test)
     assert np.allclose(load.monthly_baseload_injection_simulation_period,
                        np.tile(np.array(
-                           [7.5, 7.5, 7.5, 7.5, 7.5, 7.5, 13.46153846, 13.46153846, 13.46153846, 13.46153846,
-                            13.46153846, 13.46153846]), 10))
+                           [7.5, 7.5, 7.5, 7.5, 7.5, 7.5, 11, 11, 11, 11, 11, 11]), 10))
 
 
 def test_monthly_baseload_extraction_simulation_period():
@@ -369,12 +368,11 @@ def test_monthly_baseload_extraction_simulation_period():
                        np.tile(np.array([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 5., 5., 5., 5., 5., 5.]), 10))
     load.reset_results(10, 110)
     assert np.allclose(load.monthly_baseload_extraction_simulation_period,
-                       np.tile(np.array([3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 7.5, 7.5, 7.5, 7.5, 7.5, 7.5]), 10))
+                       np.tile(np.array([4.75, 4.75, 4.75, 4.75, 4.75, 4.75, 9.5, 9.5, 9.5, 9.5, 9.5, 9.5]), 10))
     load.set_results(results_monthly_test)
     assert np.allclose(load.monthly_baseload_extraction_simulation_period,
                        np.tile(np.array(
-                           [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 6.53846154, 6.53846154, 6.53846154, 6.53846154, 6.53846154,
-                            6.53846154]), 10))
+                           [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 9, 9, 9, 9, 9, 9]), 10))
 
     # now with only DHW
     load.cop_dhw = scop
@@ -394,15 +392,14 @@ def test_monthly_baseload_extraction_simulation_period():
     load.cop_dhw = cop_pl
     load.reset_results(1, 11)
     assert np.allclose(load.monthly_baseload_extraction_simulation_period,
-                       np.tile(np.array([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 9.5, 9.5, 9.5, 9.5, 9.5, 9.5]), 10))
+                       np.tile(np.array([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 5., 5., 5., 5., 5., 5.]), 10))
     load.reset_results(10, 110)
     assert np.allclose(load.monthly_baseload_extraction_simulation_period,
-                       np.tile(np.array([3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 9.75, 9.75, 9.75, 9.75, 9.75, 9.75]), 10))
+                       np.tile(np.array([4.75, 4.75, 4.75, 4.75, 4.75, 4.75, 9.5, 9.5, 9.5, 9.5, 9.5, 9.5]), 10))
     load.set_results(results_monthly_test)
     assert np.allclose(load.monthly_baseload_extraction_simulation_period,
                        np.tile(np.array(
-                           [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 9.65384615, 9.65384615, 9.65384615, 9.65384615, 9.65384615,
-                            9.65384615]), 10))
+                           [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 9, 9, 9, 9, 9, 9]), 10))
 
 
 def test_monthly_peak_injection_simulation_period():
@@ -421,17 +418,16 @@ def test_monthly_peak_injection_simulation_period():
     load.eer = eer_pl
     load.reset_results(0, 1)
     assert np.allclose(load.monthly_peak_injection_simulation_period,
-                       np.tile(np.array([7.5, 7.5, 7.5, 7.5, 7.5, 7.5, 10.5, 10.5, 10.5, 10.5, 10.5, 10.5]), 10))
+                       np.tile(np.array([7.5, 7.5, 7.5, 7.5, 7.5, 7.5, 12.5, 12.5, 12.5, 12.5, 12.5, 12.5]), 10))
     load.reset_results(0, 10)
     assert np.allclose(load.monthly_peak_injection_simulation_period,
                        np.tile(
-                           np.array([6.25, 6.25, 6.25, 6.25, 6.25, 6.25, 10.25, 10.25, 10.25, 10.25, 10.25, 10.25]),
+                           np.array([5.25, 5.25, 5.25, 5.25, 5.25, 5.25, 10.25, 10.25, 10.25, 10.25, 10.25, 10.25]),
                            10))
     load.set_results(results_monthly_test)
     assert np.allclose(load.monthly_peak_injection_simulation_period,
                        np.tile(np.array(
-                           [7.5, 7.5, 7.5, 7.5, 7.5, 7.5, 10.34615385, 10.34615385, 10.34615385, 10.34615385,
-                            10.34615385, 10.34615385]), 10))
+                           [7.5, 7.5, 7.5, 7.5, 7.5, 7.5, 10.5, 10.5, 10.5, 10.5, 10.5, 10.5]), 10))
 
 
 def test_monthly_peak_extraction_simulation_period():
@@ -450,16 +446,13 @@ def test_monthly_peak_extraction_simulation_period():
     load.cop = cop_pl
     load.reset_results(1, 11)
     assert np.allclose(load.monthly_peak_extraction_simulation_period,
-                       np.tile(np.array([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 9.5, 9.5, 9.5, 9.5, 9.5, 9.5]), 10))
+                       np.tile(np.array([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 7.5, 7.5, 7.5, 7.5, 7.5, 7.5]), 10))
     load.reset_results(10, 110)
     assert np.allclose(load.monthly_peak_extraction_simulation_period,
-                       np.tile(np.array([3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 9.75, 9.75, 9.75, 9.75, 9.75, 9.75]),
-                               10))
+                       np.tile(np.array([4.75, 4.75, 4.75, 4.75, 4.75, 4.75, 9.75, 9.75, 9.75, 9.75, 9.75, 9.75]), 10))
     load.set_results(results_monthly_test)
     assert np.allclose(load.monthly_peak_extraction_simulation_period,
-                       np.tile(np.array(
-                           [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 9.65384615, 9.65384615, 9.65384615, 9.65384615, 9.65384615,
-                            9.65384615]), 10))
+                       np.tile(np.array([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 9.5, 9.5, 9.5, 9.5, 9.5, 9.5]), 10))
 
     # now with only DHW
     load.cop_dhw = scop
@@ -478,16 +471,13 @@ def test_monthly_peak_extraction_simulation_period():
     load.cop_dhw = cop_pl
     load.reset_results(1, 11)
     assert np.allclose(load.monthly_peak_extraction_simulation_period,
-                       np.tile(np.array([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 9.5, 9.5, 9.5, 9.5, 9.5, 9.5]), 10))
+                       np.tile(np.array([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 7.5, 7.5, 7.5, 7.5, 7.5, 7.5]), 10))
     load.reset_results(10, 110)
     assert np.allclose(load.monthly_peak_extraction_simulation_period,
-                       np.tile(np.array([3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 9.75, 9.75, 9.75, 9.75, 9.75, 9.75]),
-                               10))
+                       np.tile(np.array([4.75, 4.75, 4.75, 4.75, 4.75, 4.75, 9.75, 9.75, 9.75, 9.75, 9.75, 9.75]), 10))
     load.set_results(results_monthly_test)
     assert np.allclose(load.monthly_peak_extraction_simulation_period,
-                       np.tile(np.array(
-                           [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 9.65384615, 9.65384615, 9.65384615, 9.65384615, 9.65384615,
-                            9.65384615]), 10))
+                       np.tile(np.array([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 9.5, 9.5, 9.5, 9.5, 9.5, 9.5]), 10))
 
 
 def test_max_loads():

@@ -46,8 +46,8 @@ def test_COP_basic():
     assert np.array_equal(cop_basic.get_COP(np.array([7.5, 10, 0]), secondary_temperature=np.array([5, 6])),
                           np.array([3.5, 4, 3]))
 
-    assert np.array_equal(cop_basic.get_COP(np.array([7.5, 10]), part_load=5), np.array([3.5, 4]))
-    assert np.array_equal(cop_basic.get_COP(np.array([7.5, 10, 0]), part_load=np.array([5, 6])),
+    assert np.array_equal(cop_basic.get_COP(np.array([7.5, 10]), power=5), np.array([3.5, 4]))
+    assert np.array_equal(cop_basic.get_COP(np.array([7.5, 10, 0]), power=np.array([5, 6])),
                           np.array([3.5, 4, 3]))
 
 
@@ -78,17 +78,17 @@ def test_COP_part_load():
     with pytest.raises(ValueError):
         assert cop_part.get_COP(5) == 3
 
-    assert cop_part.get_COP(1.5, part_load=3.5) == 1.5
-    assert np.array_equal(cop_part.get_COP(np.array([1.5, 2]), part_load=np.array([3, 4])), np.array([1.25, 2.625]))
-    assert np.array_equal(cop_part.get_COP(np.array([1.5, 3]), part_load=np.array([3, 4])), np.array([1.25, 3.5]))
+    assert cop_part.get_COP(1.5, power=3.5) == 1.5
+    assert np.array_equal(cop_part.get_COP(np.array([1.5, 2]), power=np.array([3, 4])), np.array([1.25, 2.625]))
+    assert np.array_equal(cop_part.get_COP(np.array([1.5, 3]), power=np.array([3, 4])), np.array([1.25, 3.5]))
 
-    assert cop_part.get_COP(1.5, secondary_temperature=1, part_load=3.5) == 1.5
-    assert np.array_equal(cop_part.get_COP(np.array([1.5, 2]), part_load=np.array([3, 4]), secondary_temperature=1),
+    assert cop_part.get_COP(1.5, secondary_temperature=1, power=3.5) == 1.5
+    assert np.array_equal(cop_part.get_COP(np.array([1.5, 2]), power=np.array([3, 4]), secondary_temperature=1),
                           np.array([1.25, 2.625]))
     assert np.array_equal(
-        cop_part.get_COP(np.array([1.5, 3]), part_load=np.array([3, 4]), secondary_temperature=np.array([1, 2])),
+        cop_part.get_COP(np.array([1.5, 3]), power=np.array([3, 4]), secondary_temperature=np.array([1, 2])),
         np.array([1.25, 3.5]))
-    assert np.array_equal(cop_part.get_COP(1.5, part_load=np.array([2.5, 4.5])), np.array([1, 2]))
+    assert np.array_equal(cop_part.get_COP(1.5, power=np.array([2.5, 4.5])), np.array([1, 2]))
 
 
 def test_COP_full():
@@ -108,7 +108,7 @@ def test_COP_full():
                           np.array([3.375, 5.625]))
     assert np.array_equal(cop_full.get_COP(np.array([2, 2.5, 5]), np.array([3.5, 3.5, 3.5]), np.array([6.5, 8, 8])),
                           np.array([3.375, 5.625, 5.625]))
-    assert np.array_equal(cop_full.get_COP(1.5, secondary_temperature=np.array([2.5, 4.5]), part_load=4.5),
+    assert np.array_equal(cop_full.get_COP(1.5, secondary_temperature=np.array([2.5, 4.5]), power=4.5),
                           np.array([1, 2]))
 
 
@@ -147,8 +147,8 @@ def test_EER_basic():
     assert np.array_equal(eer_basic.get_EER(np.array([7.5, 10, 0]), secondary_temperature=np.array([5, 6])),
                           np.array([3.5, 4, 3]))
 
-    assert np.array_equal(eer_basic.get_EER(np.array([7.5, 10]), part_load=5), np.array([3.5, 4]))
-    assert np.array_equal(eer_basic.get_EER(np.array([7.5, 10, 0]), part_load=np.array([5, 6])),
+    assert np.array_equal(eer_basic.get_EER(np.array([7.5, 10]), power=5), np.array([3.5, 4]))
+    assert np.array_equal(eer_basic.get_EER(np.array([7.5, 10, 0]), power=np.array([5, 6])),
                           np.array([3.5, 4, 3]))
 
 
@@ -179,17 +179,17 @@ def test_EER_part_load():
     with pytest.raises(ValueError):
         assert eer_part.get_EER(5) == 3
 
-    assert eer_part.get_EER(1.5, part_load=3.5) == 1.5
-    assert np.array_equal(eer_part.get_EER(np.array([1.5, 2]), part_load=np.array([3, 4])), np.array([1.25, 2.625]))
-    assert np.array_equal(eer_part.get_EER(np.array([1.5, 3]), part_load=np.array([3, 4])), np.array([1.25, 3.5]))
+    assert eer_part.get_EER(1.5, power=3.5) == 1.5
+    assert np.array_equal(eer_part.get_EER(np.array([1.5, 2]), power=np.array([3, 4])), np.array([1.25, 2.625]))
+    assert np.array_equal(eer_part.get_EER(np.array([1.5, 3]), power=np.array([3, 4])), np.array([1.25, 3.5]))
 
-    assert eer_part.get_EER(1.5, secondary_temperature=1, part_load=3.5) == 1.5
-    assert np.array_equal(eer_part.get_EER(np.array([1.5, 2]), part_load=np.array([3, 4]), secondary_temperature=1),
+    assert eer_part.get_EER(1.5, secondary_temperature=1, power=3.5) == 1.5
+    assert np.array_equal(eer_part.get_EER(np.array([1.5, 2]), power=np.array([3, 4]), secondary_temperature=1),
                           np.array([1.25, 2.625]))
     assert np.array_equal(
-        eer_part.get_EER(np.array([1.5, 3]), part_load=np.array([3, 4]), secondary_temperature=np.array([1, 2])),
+        eer_part.get_EER(np.array([1.5, 3]), power=np.array([3, 4]), secondary_temperature=np.array([1, 2])),
         np.array([1.25, 3.5]))
-    assert np.array_equal(eer_part.get_EER(1.5, part_load=np.array([2.5, 4.5])), np.array([1, 2]))
+    assert np.array_equal(eer_part.get_EER(1.5, power=np.array([2.5, 4.5])), np.array([1, 2]))
 
 
 def test_EER_full():
@@ -208,7 +208,7 @@ def test_EER_full():
                           np.array([3.375, 5.625]))
     assert np.array_equal(eer_full.get_EER(np.array([2, 2.5, 5]), np.array([3.5, 3.5, 3.5]), np.array([6.5, 8, 8])),
                           np.array([3.375, 5.625, 5.625]))
-    assert np.array_equal(eer_full.get_EER(1.5, secondary_temperature=np.array([2.5, 4.5]), part_load=4.5),
+    assert np.array_equal(eer_full.get_EER(1.5, secondary_temperature=np.array([2.5, 4.5]), power=4.5),
                           np.array([1, 2]))
 
 

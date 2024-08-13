@@ -115,14 +115,14 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         """
         return np.mean(self.hourly_dhw_load_simulation_period.reshape((self.simulation_period, 8760)), axis=0)
 
-    def _get_hourly_cop(self, part_load: np.ndarray = None) -> Union[float, np.ndarray]:
+    def _get_hourly_cop(self, power: np.ndarray = None) -> Union[float, np.ndarray]:
         """
         This function returns the hourly COP value for the given temperature result profile.
 
         Parameters
         ----------
-        part_load : np.ndarray
-            Array with part_load data.
+        power : np.ndarray
+            Array with power data.
 
         Raises
         ------
@@ -135,7 +135,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
             Array of COP values
         """
         if isinstance(self.cop, SCOP) and isinstance(self.eer, SEER) and isinstance(self.cop_dhw, SCOP):
-            return self.cop.get_COP(0, part_load=np.nan_to_num(part_load))
+            return self.cop.get_COP(0, power=np.nan_to_num(power))
         if isinstance(self.results, ResultsMonthly):
             raise TypeError('You cannot get an hourly EER values based on monthly temperature results.')
         if isinstance(self.results, tuple):
@@ -143,16 +143,16 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         else:
             temperature = self.results.Tf
 
-        return self.cop.get_COP(temperature, part_load=np.nan_to_num(part_load))
+        return self.cop.get_COP(temperature, power=np.nan_to_num(power))
 
-    def _get_hourly_cop_dhw(self, part_load: np.ndarray = None) -> Union[float, np.ndarray]:
+    def _get_hourly_cop_dhw(self, power: np.ndarray = None) -> Union[float, np.ndarray]:
         """
         This function returns the hourly COP DHW value for the given temperature result profile.
 
         Parameters
         ----------
-        part_load : np.ndarray
-            Array with part_load data.
+        power : np.ndarray
+            Array with power data.
 
         Raises
         ------
@@ -165,7 +165,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
             Array of COP values
         """
         if isinstance(self.cop, SCOP) and isinstance(self.eer, SEER) and isinstance(self.cop_dhw, SCOP):
-            return self.cop_dhw.get_COP(0, part_load=np.nan_to_num(part_load))
+            return self.cop_dhw.get_COP(0, power=np.nan_to_num(power))
         if isinstance(self.results, ResultsMonthly):
             raise TypeError('You cannot get an hourly EER values based on monthly temperature results.')
         if isinstance(self.results, tuple):
@@ -173,16 +173,16 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         else:
             temperature = self.results.Tf
 
-        return self.cop_dhw.get_COP(temperature, part_load=np.nan_to_num(part_load))
+        return self.cop_dhw.get_COP(temperature, power=np.nan_to_num(power))
 
-    def _get_hourly_eer(self, part_load: np.ndarray = None) -> Union[float, np.ndarray]:
+    def _get_hourly_eer(self, power: np.ndarray = None) -> Union[float, np.ndarray]:
         """
         This function returns the hourly EER value for the given temperature result profile.
 
         Parameters
         ----------
-        part_load : np.ndarray
-            Array with part_load data.
+        power : np.ndarray
+            Array with power data.
 
         Raises
         ------
@@ -195,7 +195,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
             Array of EER values
         """
         if isinstance(self.cop, SCOP) and isinstance(self.eer, SEER) and isinstance(self.cop_dhw, SCOP):
-            return self.eer.get_EER(0, part_load=np.nan_to_num(part_load))
+            return self.eer.get_EER(0, power=np.nan_to_num(power))
         if isinstance(self.results, ResultsMonthly):
             raise TypeError('You cannot get an hourly EER values based on monthly temperature results.')
         if isinstance(self.results, tuple):
@@ -203,7 +203,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         else:
             temperature = self.results.Tf
 
-        return self.eer.get_EER(temperature, part_load=np.nan_to_num(part_load))
+        return self.eer.get_EER(temperature, power=np.nan_to_num(power))
 
     @property
     def hourly_injection_load_simulation_period(self) -> np.ndarray:
@@ -217,7 +217,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         """
         part_load = None
         if self.eer._has_part_load:
-            part_load = self.hourly_cooling_load_simulation_period / self.max_peak_cooling
+            part_load = self.hourly_cooling_load_simulation_period
         return np.multiply(
             self.hourly_cooling_load_simulation_period,
             self.conversion_factor_secondary_to_primary_cooling(self._get_hourly_eer(part_load)))
@@ -234,7 +234,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         """
         part_load = None
         if self.cop._has_part_load:
-            part_load = self.hourly_heating_load_simulation_period / self.max_peak_heating
+            part_load = self.hourly_heating_load_simulation_period
         extraction_due_to_heating = np.multiply(
             self.hourly_heating_load_simulation_period,
             self.conversion_factor_secondary_to_primary_heating(self._get_hourly_cop(part_load)))
@@ -242,7 +242,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         if isinstance(self.dhw, (int, float)) and self.dhw == 0.:
             return extraction_due_to_heating
 
-        part_load_dhw = self.hourly_dhw_load_simulation_period / self.max_peak_dhw
+        part_load_dhw = self.hourly_dhw_load_simulation_period
         return extraction_due_to_heating + np.multiply(
             self.hourly_dhw_load_simulation_period,
             self.conversion_factor_secondary_to_primary_heating(self._get_hourly_cop_dhw(part_load_dhw)))
@@ -368,7 +368,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
             return total_extraction
 
         # subtract dhw load
-        part_load_dhw = self.hourly_dhw_load_simulation_period / self.max_peak_dhw
+        part_load_dhw = self.hourly_dhw_load_simulation_period
         extraction_due_to_dhw = np.multiply(
             self.hourly_dhw_load_simulation_period,
             self.conversion_factor_secondary_to_primary_heating(self._get_hourly_cop_dhw(part_load_dhw)))

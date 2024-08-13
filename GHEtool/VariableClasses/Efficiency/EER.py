@@ -41,7 +41,7 @@ class EER(_Efficiency):
     def get_EER(self,
                 primary_temperature: Union[float, np.ndarray],
                 secondary_temperature: Union[float, np.ndarray] = None,
-                part_load: Union[float, np.ndarray] = None) -> np.ndarray:
+                power: Union[float, np.ndarray] = None) -> np.ndarray:
         """
         This function calculates the EER. This function uses a linear interpolation and sets the out-of-bound values
         to the nearest value in the dataset. This function does hence not extrapolate.
@@ -52,20 +52,20 @@ class EER(_Efficiency):
             Value(s) for the average primary temperature of the heat pump for the EER calculation.
         secondary_temperature : np.ndarray or float
             Value(s) for the average secondary temperature of the heat pump for the EER calculation.
-        part_load : np.ndarray or float
+        power : np.ndarray or float
             Value(s) for the part load data of the heat pump for the EER calculation.
 
         Raises
         ------
         ValueError
-            When secondary_temperature is in the dataset, and it is not provided. Same for part_load.
+            When secondary_temperature is in the dataset, and it is not provided. Same for power.
 
         Returns
         -------
         EER
             np.ndarray
         """
-        return self._get_efficiency(primary_temperature, secondary_temperature, part_load)
+        return self._get_efficiency(primary_temperature, secondary_temperature, power)
 
     def get_SEER(self,
                  power: np.ndarray,

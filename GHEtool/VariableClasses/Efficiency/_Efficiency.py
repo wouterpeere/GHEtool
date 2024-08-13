@@ -184,7 +184,7 @@ class _Efficiency(_EfficiencyBase):
         Raises
         ------
         ValueError
-            When secondary_temperature is in the dataset, and it is not provided. Same for part_load.
+            When secondary_temperature is in the dataset, and it is not provided. Same for power.
 
         Returns
         -------
