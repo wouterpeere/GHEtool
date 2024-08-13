@@ -821,3 +821,85 @@ class _LoadDataBuilding(_LoadData, ABC):
             yearly DHW for the whole simulation period
         """
         return np.sum(np.reshape(self.monthly_baseload_dhw_simulation_period, (self.simulation_period, 12)), axis=1)
+
+    @property
+    def yearly_electricity_consumption(self) -> np.ndarray:
+        """
+        This function returns the electricity consumption for the whole building demand in kWh
+        for every year in the simulation period.
+
+        Returns
+        -------
+        Yearly electricity consumption : np.ndarray
+        """
+        return self.yearly_electricity_consumption_cooling + self.yearly_electricity_consumption_heating
+
+    @property
+    def yearly_electricity_consumption_cooling(self) -> np.ndarray:
+        """
+        This function returns the electricity consumption for cooling in kWh for every year in the simulation period.
+
+        Returns
+        -------
+        Yearly cooling electricity consumption : np.ndarray
+        """
+        return self.yearly_cooling_load_simulation_period - self.yearly_injection_load_simulation_period
+
+    @property
+    def yearly_electricity_consumption_heating(self) -> np.ndarray:
+        """
+        This function returns the electricity consumption for heating in kWh for every year in the simulation period.
+
+        Returns
+        -------
+        Yearly heating electricity consumption : np.ndarray
+        """
+
+    @property
+    def SEER(self) -> float:
+        """
+        This function returns the average SEER over the simulation period.
+
+        Returns
+        -------
+        SEER : float
+        """
+        # negative sign to get a positive value
+        return -self.yearly_average_cooling_load / (
+                self.yearly_average_cooling_load - self.yearly_average_injection_load)
+
+    @property
+    def SCOP_total(self) -> float:
+        """
+        This function returns the SCOP (including DHW demand) for the whole simulation period.
+
+        Returns
+        -------
+        SCOP : float
+        """
+        return (self.yearly_average_heating_load + self.yearly_average_dhw_load) / (
+                self.yearly_average_heating_load + self.yearly_average_dhw_load - self.yearly_average_extraction_load)
+
+    @property
+    def yearly_SEER(self) -> np.ndarray:
+        """
+        This function returns the SEER for every year of the simulation period.
+
+        Returns
+        -------
+        SEER : np.ndarray
+        """
+        # negative sign to get a positive value
+        return -self.yearly_cooling_load_simulation_period / (self.yearly_electricity_consumption_cooling)
+
+    @property
+    def yearly_SCOP_total(self) -> np.ndarray:
+        """
+        This function returns the SCOP (including DHW) for every year of the simulation period.
+
+        Returns
+        -------
+        SCOP : np.ndarray
+        """
+        return (self.yearly_heating_load_simulation_period + self.yearly_dhw_load_simulation_period) / (
+            self.yearly_extraction_load_simulation_period)

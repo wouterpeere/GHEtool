@@ -53,9 +53,9 @@ def size_with_scop() -> float:
 
     depth = borefield.size_L3(100)
     print(f'When sizing with a constant SCOP, the required borehole depth is {depth:.2f}m. The SCOP (incl. DHW) is '
-          f'{((borefield.load.yearly_average_heating_load + borefield.load.yearly_average_dhw_load) / (borefield.load.yearly_average_heating_load + borefield.load.yearly_average_dhw_load - borefield.load.yearly_average_extraction_load)):.2f}')
+          f'{borefield.load.SCOP:.2f}')
     borefield.print_temperature_profile()
-    return depth
+    return depth, borefield.load.SCOP
 
 
 def size_with_variable_ground_temperature():
@@ -88,9 +88,9 @@ def size_with_variable_ground_temperature():
 
     depth = borefield.size_L3(100)
     print(f'When sizing with a inlet temperature dependent COP, the required borehole depth is {depth:.2f}m. '
-          f'The SCOP (incl. DHW) is {((borefield.load.yearly_average_heating_load + borefield.load.yearly_average_dhw_load) / (borefield.load.yearly_average_heating_load + borefield.load.yearly_average_dhw_load - borefield.load.yearly_average_extraction_load)):.2f}')
+          f'The SCOP (incl. DHW) is {borefield.load.SCOP:.2f}')
     borefield.print_temperature_profile()
-    return depth
+    return depth, borefield.load.SCOP
 
 
 def size_with_part_load_data():
@@ -141,9 +141,9 @@ def size_with_part_load_data():
     depth = borefield.size_L3(100)
     print(
         f'When sizing with a inlet temperature and part-load dependent COP, the required borehole depth is {depth:.2f}m. '
-        f'The SCOP (incl. DHW) is {((borefield.load.yearly_average_heating_load + borefield.load.yearly_average_dhw_load) / (borefield.load.yearly_average_heating_load + borefield.load.yearly_average_dhw_load - borefield.load.yearly_average_extraction_load)):.2f}')
+        f'The SCOP (incl. DHW) is {borefield.load.SCOP:.2f}')
     borefield.print_temperature_profile()
-    return depth
+    return depth, borefield.load.SCOP
 
 
 if __name__ == "__main__":
