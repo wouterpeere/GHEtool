@@ -330,21 +330,32 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         return self.resample_to_monthly(self.hourly_injection_load_simulation_period)[1]
 
     @property
-    def monthly_baseload_extraction_simulation_period(self) -> np.ndarray:
+    def _monthly_baseload_extraction_heating_simulation_period(self) -> np.ndarray:
         """
-        This function returns the monthly extraction baseload in kWh/month for the whole simulation period.
-        Redefined for Hourly Building data. When the results are in hourly format, the monthly baseload extraction
-        should be calculated based on the hourly extraction load. When results are available in a monthly format,
-        the monthly baseload extraction should be based on the monthly baseload heating.
+        This function returns the monthly extraction baseload for space heating.in kWh/month for the whole simulation period.
 
         Returns
         -------
         baseload extraction : np.ndarray
-            baseload extraction for the whole simulation period
+            Baseload extraction for the whole simulation period
         """
         if isinstance(self.results, ResultsMonthly):
-            return super(_HourlyDataBuilding, self).monthly_baseload_extraction_simulation_period
-        return self.resample_to_monthly(self.hourly_extraction_load_simulation_period)[1]
+            return super(_HourlyDataBuilding, self)._monthly_baseload_extraction_heating_simulation_period
+        return self.resample_to_monthly(self._hourly_extraction_load_heating_simulation_period)[1]
+
+    @property
+    def _monthly_baseload_extraction_dhw_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the monthly extraction baseload for DHW production in kWh/month for the whole simulation period.
+
+        Returns
+        -------
+        baseload extraction : np.ndarray
+            Baseload extraction for the whole simulation period
+        """
+        if isinstance(self.results, ResultsMonthly):
+            return super(_HourlyDataBuilding, self)._monthly_baseload_extraction_dhw_simulation_period
+        return self.resample_to_monthly(self._hourly_extraction_load_dhw_simulation_period)[1]
 
     @property
     def monthly_peak_injection_simulation_period(self) -> np.ndarray:
@@ -364,32 +375,31 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         return self.resample_to_monthly(self.hourly_injection_load_simulation_period)[0]
 
     @property
-    def monthly_peak_extraction_simulation_period(self) -> np.ndarray:
+    def _monthly_peak_extraction_heating_simulation_period(self) -> np.ndarray:
         """
-        This function returns the monthly extraction peak in kW/month for the whole simulation period.
-        Redefined for Hourly Building data. When the results are in hourly format, the monthly peak extraction
-        should be calculated based on the hourly extraction load. When results are available in a monthly format,
-        the monthly peak extraction should be based on the monthly peak heating.
+        This function returns the monthly extraction peak of space heating in kW/month for the whole simulation period.
 
         Returns
         -------
         peak extraction : np.ndarray
-            peak extraction for the whole simulation period
+            Peak extraction for the whole simulation period
         """
         if isinstance(self.results, ResultsMonthly):
-            return super(_HourlyDataBuilding, self).monthly_peak_extraction_simulation_period
+            return super(_HourlyDataBuilding, self)._monthly_peak_extraction_heating_simulation_period
+        return self.resample_to_monthly(self._hourly_extraction_load_heating_simulation_period)[0]
 
-        total_extraction = self.resample_to_monthly(self.hourly_extraction_load_simulation_period)[0]
-
-        if not self.exclude_DHW_from_peak:
-            return total_extraction
-
-        # subtract dhw load
-        part_load_dhw = self.hourly_dhw_load_simulation_period
-        extraction_due_to_dhw = np.multiply(
-            self.hourly_dhw_load_simulation_period,
-            self.conversion_factor_secondary_to_primary_heating(self._get_hourly_cop_dhw(part_load_dhw)))
-        return total_extraction - self.resample_to_monthly(extraction_due_to_dhw)[0]
+    @property
+    def _monthly_peak_extraction_dhw_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the monthly extraction peak of the DHW production in kW/month for the whole simulation period.
+        Returns
+        -------
+        peak extraction : np.ndarray
+            Peak extraction for the whole simulation period
+        """
+        if isinstance(self.results, ResultsMonthly):
+            return super(_HourlyDataBuilding, self)._monthly_peak_extraction_dhw_simulation_period
+        return self.resample_to_monthly(self._hourly_extraction_load_dhw_simulation_period)[0]
 
     @property
     def monthly_baseload_dhw_simulation_period(self) -> np.ndarray:

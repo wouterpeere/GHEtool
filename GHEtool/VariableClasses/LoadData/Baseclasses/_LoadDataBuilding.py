@@ -513,25 +513,44 @@ class _LoadDataBuilding(_LoadData, ABC):
     def monthly_baseload_extraction_simulation_period(self) -> np.ndarray:
         """
         This function returns the monthly extraction baseload in kWh/month for the whole simulation period.
-        This takes into account the DHW profile
+        This takes into account the DHW profile.
 
         Returns
         -------
         baseload extraction : np.ndarray
             Baseload extraction for the whole simulation period
         """
-        part_load = None
-        if self.cop._has_part_load:
-            part_load = np.tile(self.monthly_baseload_heating_power, self.simulation_period)
-        extraction_due_to_heating = np.multiply(
+        if isinstance(self.dhw, (int, float)) and self.dhw == 0.:
+            return self._monthly_baseload_extraction_heating_simulation_period
+        return self._monthly_baseload_extraction_heating_simulation_period + self._monthly_baseload_extraction_dhw_simulation_period
+
+    @property
+    def _monthly_baseload_extraction_heating_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the monthly extraction baseload for space heating.in kWh/month for the whole simulation period.
+
+        Returns
+        -------
+        baseload extraction : np.ndarray
+            Baseload extraction for the whole simulation period
+        """
+        part_load = np.tile(self.monthly_baseload_heating_power, self.simulation_period)
+        return np.multiply(
             self.monthly_baseload_heating_simulation_period,
             self.conversion_factor_secondary_to_primary_heating(self._get_monthly_cop(False, part_load)))
 
-        if isinstance(self.dhw, (int, float)) and self.dhw == 0.:
-            return extraction_due_to_heating
+    @property
+    def _monthly_baseload_extraction_dhw_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the monthly extraction baseload for DHW production in kWh/month for the whole simulation period.
 
+        Returns
+        -------
+        baseload extraction : np.ndarray
+            Baseload extraction for the whole simulation period
+        """
         part_load_dhw = self.monthly_baseload_dhw_power_simulation_period
-        return extraction_due_to_heating + np.multiply(
+        return np.multiply(
             self.monthly_baseload_dhw_simulation_period,
             self.conversion_factor_secondary_to_primary_heating(self._get_monthly_cop_dhw(False, part_load_dhw)))
 
@@ -562,19 +581,36 @@ class _LoadDataBuilding(_LoadData, ABC):
         peak extraction : np.ndarray
             Peak extraction for the whole simulation period
         """
-        part_load = None
-        if self.cop._has_part_load:
-            part_load = self.monthly_peak_heating_simulation_period
+        if self.exclude_DHW_from_peak or (isinstance(self.dhw, (int, float)) and self.dhw == 0.):
+            return self._monthly_peak_extraction_heating_simulation_period
+        return self._monthly_peak_extraction_heating_simulation_period + self._monthly_peak_extraction_dhw_simulation_period
 
-        extraction_due_to_heating = np.multiply(
+    @property
+    def _monthly_peak_extraction_heating_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the monthly extraction peak of space heating in kW/month for the whole simulation period.
+
+        Returns
+        -------
+        peak extraction : np.ndarray
+            Peak extraction for the whole simulation period
+        """
+        part_load = self.monthly_peak_heating_simulation_period
+        return np.multiply(
             self.monthly_peak_heating_simulation_period,
             self.conversion_factor_secondary_to_primary_heating(self._get_monthly_cop(True, part_load)))
 
-        if self.exclude_DHW_from_peak or (isinstance(self.dhw, (int, float)) and self.dhw == 0.):
-            return extraction_due_to_heating
-
+    @property
+    def _monthly_peak_extraction_dhw_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the monthly extraction peak of the DHW production in kW/month for the whole simulation period.
+        Returns
+        -------
+        peak extraction : np.ndarray
+            Peak extraction for the whole simulation period
+        """
         part_load_dhw = self.monthly_peak_dhw_simulation_period
-        return extraction_due_to_heating + np.multiply(
+        return np.multiply(
             self.monthly_peak_dhw_simulation_period,
             self.conversion_factor_secondary_to_primary_heating(self._get_monthly_cop_dhw(True, part_load_dhw)))
 
