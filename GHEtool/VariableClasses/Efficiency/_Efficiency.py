@@ -75,7 +75,8 @@ class _Efficiency(_EfficiencyBase):
             raise ValueError('The provided data and coordinates array are not of the same length!')
 
         # check dimension
-        dimensions = 1 if isinstance(coordinates[0], (int, float, np.int32)) else len(coordinates[0])
+        dimensions = 1 if isinstance(coordinates[0], (int, float, np.int32, np.int64, np.float16, np.float32)) else len(
+            coordinates[0])
         if dimensions != 1 + self._has_secondary + self._has_part_load:
             raise ValueError(f'The provided coordinate data has {dimensions} dimensions whereas '
                              f'{1 + self._has_secondary + self._has_part_load} dimensions where provided.'

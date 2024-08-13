@@ -52,7 +52,8 @@ def size_with_scop() -> float:
     borefield.create_rectangular_borefield(3, 14, 7, 7, 94, r_b=0.0655)
 
     depth = borefield.size_L3(100)
-    print(f'When sizing with a constant SCOP, the required borehole depth is {depth:.2f}m')
+    print(f'When sizing with a constant SCOP, the required borehole depth is {depth:.2f}m. The SCOP (incl. DHW) is '
+          f'{((borefield.load.yearly_average_heating_load + borefield.load.yearly_average_dhw_load) / (borefield.load.yearly_average_heating_load + borefield.load.yearly_average_dhw_load - borefield.load.yearly_average_extraction_load)):.2f}')
     borefield.print_temperature_profile()
     return depth
 
@@ -86,7 +87,8 @@ def size_with_variable_ground_temperature():
     borefield.create_rectangular_borefield(3, 14, 7, 7, 94, r_b=0.0655)
 
     depth = borefield.size_L3(100)
-    print(f'When sizing with a inlet temperature dependent COP, the required borehole depth is {depth:.2f}m.')
+    print(f'When sizing with a inlet temperature dependent COP, the required borehole depth is {depth:.2f}m. '
+          f'The SCOP (incl. DHW) is {((borefield.load.yearly_average_heating_load + borefield.load.yearly_average_dhw_load) / (borefield.load.yearly_average_heating_load + borefield.load.yearly_average_dhw_load - borefield.load.yearly_average_extraction_load)):.2f}')
     borefield.print_temperature_profile()
     return depth
 
@@ -138,7 +140,8 @@ def size_with_part_load_data():
 
     depth = borefield.size_L3(100)
     print(
-        f'When sizing with a inlet temperature and part-load dependent COP, the required borehole depth is {depth:.2f}m')
+        f'When sizing with a inlet temperature and part-load dependent COP, the required borehole depth is {depth:.2f}m. '
+        f'The SCOP (incl. DHW) is {((borefield.load.yearly_average_heating_load + borefield.load.yearly_average_dhw_load) / (borefield.load.yearly_average_heating_load + borefield.load.yearly_average_dhw_load - borefield.load.yearly_average_extraction_load)):.2f}')
     borefield.print_temperature_profile()
     return depth
 
