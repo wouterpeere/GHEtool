@@ -86,8 +86,7 @@ def size_with_variable_ground_temperature():
     borefield.create_rectangular_borefield(3, 14, 7, 7, 94, r_b=0.0655)
 
     depth = borefield.size_L3(100)
-    print(f'When sizing with a inlet temperature dependent COP, the required borehole depth is {depth:.2f}m.'
-          f'The SCOP is {cop.get_SCOP()}')
+    print(f'When sizing with a inlet temperature dependent COP, the required borehole depth is {depth:.2f}m.')
     borefield.print_temperature_profile()
     return depth
 
@@ -107,18 +106,20 @@ def size_with_part_load_data():
          5.62, 6.19, 3.8, 4.3, 4.86, 5.44, 5.9, 3.76, 4.25, 4.79, 5.34, 5.74]),
         np.array([[-5, 1.06], [0, 1.25], [5, 1.45], [10, 1.66], [15, 1.9], [-5, 2.05], [0, 2.42], [5, 2.81], [10, 3.2],
                   [15, 3.54], [-5, 3.05], [0, 3.6], [5, 4.17], [10, 4.73], [15, 5.18], [-5, 4.04], [0, 4.77], [5, 5.54],
-                  [10, 6.27], [15, 6.82], [-5, 5.03], [0, 5.95], [5, 6.9], [10, 7.81], [15, 8.46]]),
-        secondary=True, part_load=True)
-    cop_dhw = COP(np.array([[2.88, 3.21, 3.63, 4.04, 4.51],
-                            [2.64, 2.97, 3.35, 3.76, 4.15],
-                            [2.57, 2.9, 3.27, 3.68, 4.04],
-                            [2.54, 2.86, 3.23, 3.64, 3.99],
-                            [2.52, 2.84, 3.2, 3.61, 3.96]]),
-                  np.array([[-5, 1.06], [0, 1.25], [5, 1.45], [10, 1.66], [15, 1.9], [-5, 2.05], [0, 2.42], [5, 2.81],
-                            [10, 3.2], [15, 3.54], [-5, 3.05], [0, 3.6], [5, 4.17], [10, 4.73], [15, 5.18], [-5, 4.04],
-                            [0, 4.77], [5, 5.54], [10, 6.27], [15, 6.82], [-5, 5.03], [0, 5.95], [5, 6.9], [10, 7.81],
-                            [15, 8.46]]),
-                  secondary=True, part_load=True)
+                  [10, 6.27], [15, 6.82], [-5, 5.03], [0, 5.95], [5, 6.9], [10, 7.81], [15, 8.46]]), part_load=True)
+    cop._points = [cop._points[0], np.array(cop._points[1]) * 9]
+    cop._range_part_load = np.array(cop._range_part_load) * 9
+
+    cop_dhw = COP(np.array(
+        [2.88, 3.21, 3.63, 4.04, 4.51, 2.64, 2.97, 3.35, 3.76, 4.15, 2.57, 2.9, 3.27, 3.68, 4.04, 2.54, 2.86, 3.23,
+         3.64, 3.99, 2.52, 2.84, 3.2, 3.61, 3.96]),
+        np.array([[-5, 1.06], [0, 1.25], [5, 1.45], [10, 1.66], [15, 1.9], [-5, 2.05], [0, 2.42], [5, 2.81],
+                  [10, 3.2], [15, 3.54], [-5, 3.05], [0, 3.6], [5, 4.17], [10, 4.73], [15, 5.18], [-5, 4.04],
+                  [0, 4.77], [5, 5.54], [10, 6.27], [15, 6.82], [-5, 5.03], [0, 5.95], [5, 6.9], [10, 7.81],
+                  [15, 8.46]]), part_load=True)
+    cop_dhw._points = [cop_dhw._points[0], np.array(cop_dhw._points[1]) * 9]
+    cop_dhw._range_part_load = np.array(cop_dhw._range_part_load) * 9
+
     load = MonthlyBuildingLoadAbsolute(building_demand_heating,
                                        building_demand_cooling,
                                        building_peak_heating,

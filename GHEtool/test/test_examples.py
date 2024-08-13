@@ -56,4 +56,4 @@ def test_sizing_with_building_load(monkeypatch):
         size_with_part_load_data
     assert np.isclose(size_with_scop(), 96.5589765783911)
     assert np.isclose(size_with_variable_ground_temperature(), 95.30820514433977)
-    assert np.isclose(size_with_part_load_data(), 95.58399835541903)
+    assert np.isclose(size_with_part_load_data(), 97.78104414783081)
