@@ -875,7 +875,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         -------
         Yearly cooling electricity consumption : np.ndarray
         """
-        return self.yearly_cooling_load_simulation_period - self.yearly_injection_load_simulation_period
+        return -self.yearly_cooling_load_simulation_period + self.yearly_injection_load_simulation_period
 
     @property
     def yearly_electricity_consumption_heating(self) -> np.ndarray:
@@ -917,8 +917,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         SEER : float
         """
         # negative sign to get a positive value
-        return -self.yearly_average_cooling_load / (
-                self.yearly_average_cooling_load - self.yearly_average_injection_load)
+        return self.yearly_average_cooling_load / np.mean(self.yearly_electricity_consumption_cooling)
 
     @property
     def SCOP_total(self) -> float:
@@ -964,7 +963,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         SEER : np.ndarray
         """
         # negative sign to get a positive value
-        return -self.yearly_cooling_load_simulation_period / self.yearly_electricity_consumption_cooling
+        return self.yearly_cooling_load_simulation_period / self.yearly_electricity_consumption_cooling
 
     @property
     def yearly_SCOP_total(self) -> np.ndarray:
