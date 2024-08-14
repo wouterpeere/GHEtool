@@ -54,7 +54,7 @@ def size_with_scop() -> Tuple[float, float]:
 
     depth = borefield.size_L3(100)
     print(f'When sizing with a constant SCOP, the required borehole depth is {depth:.2f}m. The SCOP (incl. DHW) is '
-          f'{borefield.load.SCOP_total:.2f}')
+          f'{borefield.load.SCOP_total:.2f}.')
     borefield.print_temperature_profile()
     return depth, borefield.load.SCOP_total
 
@@ -89,7 +89,7 @@ def size_with_variable_ground_temperature() -> Tuple[float, float]:
 
     depth = borefield.size_L3(100)
     print(f'When sizing with a inlet temperature dependent COP, the required borehole depth is {depth:.2f}m. '
-          f'The SCOP (incl. DHW) is {borefield.load.SCOP_total:.2f}')
+          f'The SCOP (incl. DHW) is {borefield.load.SCOP_total:.2f}.')
     borefield.print_temperature_profile()
     return depth, borefield.load.SCOP_total
 
@@ -139,7 +139,7 @@ def size_with_part_load_data() -> Tuple[float, float]:
     depth = borefield.size_L3(100)
     print(
         f'When sizing with a inlet temperature and part-load dependent COP, the required borehole depth is {depth:.2f}m. '
-        f'The SCOP (incl. DHW) is {borefield.load.SCOP_total:.2f}')
+        f'The SCOP (incl. DHW) is {borefield.load.SCOP_total:.2f}.')
     borefield.print_temperature_profile()
     return depth, borefield.load.SCOP_total
 

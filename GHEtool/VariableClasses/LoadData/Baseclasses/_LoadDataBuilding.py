@@ -864,7 +864,8 @@ class _LoadDataBuilding(_LoadData, ABC):
         -------
         Yearly electricity consumption : np.ndarray
         """
-        return self.yearly_electricity_consumption_cooling + self.yearly_electricity_consumption_heating
+        return self.yearly_electricity_consumption_cooling + self.yearly_electricity_consumption_heating + \
+            self.yearly_electricity_consumption_dhw
 
     @property
     def yearly_electricity_consumption_cooling(self) -> np.ndarray:

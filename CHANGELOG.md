@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## Changed
 
 - No longer support of Python 3.8.
+- Vfr in FluidData now returns also a value if vfr = None based on the mfr.
 - Changed definition of the geothermal load classes to use injection/extraction terminology instead of cooling/heating (
   issue #220).
 - Change skopt to Optuna in active_passive_cooling (issue #258).
@@ -31,7 +32,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Removed depreciated 'optimise_load_profile', '_percentage_heating', '_percentage_cooling' from Borefield.py (issue
   #268).
 - Removed '_external_load', '_secundary_borefield_load', '_building_load' from Borefield.py (issue #268).
-- Vfr in FluidData now returns also a value if vfr = None based on the mfr.
+- Added DHW profiles to Building load classes (issue #273).
 - Split Results class into ResultsHourly and ResultsMonthly (issue #281).
 - Moved implementation of 'optimise_load_profile_power' and 'optimise_load_profile_energy' into a separate document (
   issue #283).

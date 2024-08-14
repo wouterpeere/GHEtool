@@ -519,8 +519,6 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
             header = None
 
         # TODO implement single column
-        # if col_heating == col_cooling:
-        #     ghe_logger.info('Only one column with data selected. Load will be splitted into heating and cooling load.')
 
         # import data
         df = pd.read_csv(file_path, sep=separator, header=header, decimal=decimal_seperator)
@@ -529,30 +527,46 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         self.hourly_heating_load = np.array(df.iloc[:, col_heating])
         self.hourly_cooling_load = np.array(df.iloc[:, col_cooling])
 
-    # @property
-    # def max_peak_injection(self) -> float:
-    #     """
-    #     This returns the max peak injection in kW.
-    #
-    #     Returns
-    #     -------
-    #     max peak injection : float
-    #     """
-    #     if isinstance(self._results, ResultsMonthly) and \
-    #             (isinstance(self.cop, COP) or isinstance(self.eer, EER) or isinstance(self.cop_dhw, COP)):
-    #         return np.max(self.monthly_peak_injection_simulation_period)
-    #     return np.max(self.hourly_injection_load_simulation_period)
-    #
-    # @property
-    # def max_peak_extraction(self) -> float:
-    #     """
-    #     This returns the max peak extraction in kW.
-    #
-    #     Returns
-    #     -------
-    #     max peak extraction : float
-    #     """
-    #     if isinstance(self._results, ResultsMonthly) and \
-    #             (isinstance(self.cop, COP) or isinstance(self.eer, EER) or isinstance(self.cop_dhw, COP)):
-    #         return np.max(self.monthly_peak_extraction_simulation_period)
-    #     return np.max(self.hourly_extraction_load_simulation_period)
+    @property
+    def max_peak_injection(self) -> float:
+        """
+        This returns the max peak injection in kW.
+
+        Returns
+        -------
+        max peak injection : float
+        """
+        if isinstance(self._results, ResultsMonthly) and \
+                (isinstance(self.cop, COP) or isinstance(self.eer, EER) or isinstance(self.cop_dhw, COP)):
+            return np.max(self.monthly_peak_injection_simulation_period)
+        return np.max(self.hourly_injection_load_simulation_period)
+
+    @property
+    def max_peak_extraction(self) -> float:
+        """
+        This returns the max peak extraction in kW.
+
+        Returns
+        -------
+        max peak extraction : float
+        """
+        if isinstance(self._results, ResultsMonthly) and \
+                (isinstance(self.cop, COP) or isinstance(self.eer, EER) or isinstance(self.cop_dhw, COP)):
+            return np.max(self.monthly_peak_extraction_simulation_period)
+        return np.max(self.hourly_extraction_load_simulation_period)
+
+    @property
+    def imbalance(self) -> float:
+        """
+        This function calculates the average yearly ground imbalance.
+        A positive imbalance means that the field is injection dominated, i.e. it heats up every year.
+
+        Returns
+        -------
+        imbalance : float
+        """
+        if isinstance(self._results, ResultsMonthly) and \
+                (isinstance(self.cop, COP) or isinstance(self.eer, EER) or isinstance(self.cop_dhw, COP)):
+            return super(_HourlyData, self).imbalance
+        return np.sum(
+            self.hourly_injection_load_simulation_period - self.hourly_extraction_load_simulation_period) / self.simulation_period

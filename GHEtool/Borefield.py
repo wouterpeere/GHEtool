@@ -1711,6 +1711,7 @@ class Borefield(BaseClass):
 
         if isinstance(self.load, _LoadDataBuilding):
             # when building load is given, the load should be updated after each temperature calculation.
+            self.load.reset_results(self.Tf_min, self.Tf_max)
             results_old = calculate_temperatures(H, hourly=hourly)
             self.load.set_results(results_old)
             results = calculate_temperatures(H, hourly=hourly)
