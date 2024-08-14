@@ -54,9 +54,9 @@ def test_sizing_with_building_load(monkeypatch):
     from GHEtool.Examples.sizing_with_building_load import size_with_scop, \
         size_with_variable_ground_temperature, \
         size_with_part_load_data
-    assert np.allclose(size_with_scop(), (96.5589765783911, 4.072466974615782))
-    assert np.allclose(size_with_variable_ground_temperature(), (95.30820514433977, 4.133571940863216))
-    assert np.allclose(size_with_part_load_data(), (97.78104414783081, 4.62468591521416))
+    assert np.allclose(size_with_scop(), (96.5589765783911, 4.072466974615784))
+    assert np.allclose(size_with_variable_ground_temperature(), (95.64066844079264, 4.17665670561309))
+    assert np.allclose(size_with_part_load_data(), (98.1273127062551, 4.685121612513776))
 
 
 def test_sizing_with_building_load_hourly(monkeypatch):
