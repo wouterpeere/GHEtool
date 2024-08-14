@@ -7,7 +7,6 @@ The results are returned.
 """
 import numpy as np
 
-# import all the relevant functions
 from GHEtool import *
 
 
@@ -28,7 +27,7 @@ def optimise():
     borefield.create_rectangular_borefield(10, 10, 6, 6, 150, 1, 0.075)
 
     # load the hourly profile
-    load = HourlyGeothermalLoad()
+    load = HourlyBuildingLoad(efficiency_heating=10 ** 6, efficiency_cooling=10 ** 6)
     load.load_hourly_profile("hourly_profile.csv", header=True, separator=";")
 
     # optimise the load for a 10x10 field (see data above) and a fixed depth of 150m.

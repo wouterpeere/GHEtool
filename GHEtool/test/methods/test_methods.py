@@ -47,17 +47,16 @@ def test_L4(model: Borefield, result):
                          ids=list_of_test_objects.names_optimise_load_profile)
 def test_optimise(input, result):
     model: Borefield = input[0]
-    load, depth, SCOP, SEER, power, hourly, max_peak_extraction, max_peak_injection = input[1:]
+    load, depth, power, hourly, max_peak_extraction, max_peak_injection = input[1:]
     if power:
         primary_borefield_load, secondary_borefield_load, external_load = optimise_load_profile_power(model, load,
-                                                                                                      depth, SCOP, SEER,
+                                                                                                      depth,
                                                                                                       use_hourly_resolution=hourly,
                                                                                                       max_peak_heating=max_peak_extraction,
                                                                                                       max_peak_cooling=max_peak_injection)
     else:
         primary_borefield_load, secondary_borefield_load, external_load = optimise_load_profile_energy(model, load,
-                                                                                                       depth, SCOP,
-                                                                                                       SEER,
+                                                                                                       depth,
                                                                                                        max_peak_heating=max_peak_extraction,
                                                                                                        max_peak_cooling=max_peak_injection)
     percentage_extraction, percentage_injection, peak_extraction_geo, peak_injection_geo, peak_extraction_ext, peak_injection_ext = \

@@ -37,6 +37,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Moved implementation of 'optimise_load_profile_power' and 'optimise_load_profile_energy' into a separate document (
   issue #283).
 - Removed a couple of log messages (issue #288).
+- Optimise load profile works with a variable COP/EER (issue #288).
 
 ## Fixed
 
