@@ -32,9 +32,10 @@ class _Efficiency(_EfficiencyBase):
     def __init__(self,
                  data: np.ndarray,
                  coordinates: np.ndarray,
-                 part_load: bool,
-                 secondary: bool = False
-                 ):
+                 part_load: bool = False,
+                 secondary: bool = False,
+                 reference_nominal_power: float = None,
+                 nominal_power: float = None):
         """
 
         Parameters
@@ -48,6 +49,13 @@ class _Efficiency(_EfficiencyBase):
             True if the data contains part load information.
         secondary : bool
             True if the data contains secondary temperature information
+        reference_nominal_power : float
+            If you want to use the efficiency class as a reference of different heat pumps, you need to define a reference
+            for the nominal power, at which the data is defined. This is only relevant when part load data is available.
+        nominal_power : float
+            The nominal power at which to define the current efficiency class. This converts the provided efficiency data
+            from the reference_nominal_power to the nominal_power. This is only relevant when part load data is available
+            and the reference_nominal_power is provided.
 
         Raises
         ------
@@ -164,6 +172,13 @@ class _Efficiency(_EfficiencyBase):
         else:
             p = self._range_primary.argsort()
             self._data = data[p]
+
+        # correct for nominal power
+        if nominal_power is not None and reference_nominal_power is None:
+            raise ValueError('Please enter a reference nominal power.')
+
+        if self._has_part_load and nominal_power is not None:
+            self._range_part_load *= nominal_power / reference_nominal_power
 
     def _get_efficiency(self,
                         primary_temperature: Union[float, np.ndarray],

@@ -115,14 +115,14 @@ def test_COP_full():
 def test_COP_get_SCOP():
     cop_full = COP(np.array([1, 2, 2, 4, 2, 4, 4, 8]),
                    np.array([[1.5, 2.5, 0], [2.5, 2.5, 0], [1.5, 4.5, 0], [2.5, 4.5, 0],
-                             [1.5, 2.5, 1], [2.5, 2.5, 1], [1.5, 4.5, 1], [2.5, 4.5, 1]]),
+                             [1.5, 2.5, 10], [2.5, 2.5, 10], [1.5, 4.5, 10], [2.5, 4.5, 10]]),
                    secondary=True, part_load=True)
 
     with pytest.raises(ValueError):
-        cop_full.get_SCOP([10, 5], 10, [2, 3, 4])
+        cop_full.get_SCOP([10, 5], [2, 3, 4])
 
-    assert np.isclose(cop_full.get_SCOP([10, 10], 10, [1.5, 2.5], [2.5, 2.5]), 16 / 6)
-    assert np.isclose(cop_full.get_SCOP([10, 5], 10, [1.5, 2.5], [2.5, 2.5]), 45 / 20)
+    assert np.isclose(cop_full.get_SCOP([10, 10], [1.5, 2.5], [2.5, 2.5]), 16 / 6)
+    assert np.isclose(cop_full.get_SCOP([10, 5], [1.5, 2.5], [2.5, 2.5]), 45 / 20)
 
 
 def test_error_EER():
@@ -215,14 +215,14 @@ def test_EER_full():
 def test_EER_get_SEER():
     eer_full = EER(np.array([1, 2, 2, 4, 2, 4, 4, 8]),
                    np.array([[1.5, 2.5, 0], [2.5, 2.5, 0], [1.5, 4.5, 0], [2.5, 4.5, 0],
-                             [1.5, 2.5, 1], [2.5, 2.5, 1], [1.5, 4.5, 1], [2.5, 4.5, 1]]),
+                             [1.5, 2.5, 10], [2.5, 2.5, 10], [1.5, 4.5, 10], [2.5, 4.5, 10]]),
                    secondary=True, part_load=True)
 
     with pytest.raises(ValueError):
-        eer_full.get_SEER([10, 5], 10, [2, 3, 4])
+        eer_full.get_SEER([10, 5], [2, 3, 4])
 
-    assert np.isclose(eer_full.get_SEER([10, 10], 10, [1.5, 2.5], [2.5, 2.5]), 16 / 6)
-    assert np.isclose(eer_full.get_SEER([10, 5], 10, [1.5, 2.5], [2.5, 2.5]), 45 / 20)
+    assert np.isclose(eer_full.get_SEER([10, 10], [1.5, 2.5], [2.5, 2.5]), 16 / 6)
+    assert np.isclose(eer_full.get_SEER([10, 5], [1.5, 2.5], [2.5, 2.5]), 45 / 20)
 
 
 def test_eq():
@@ -265,3 +265,31 @@ def test_eq():
     assert eer_pl1 != cop_pl1
     assert cop_pl1 == cop_pl3
     assert eer_pl1 == eer_pl3
+
+
+def test_scale_EER():
+    with pytest.raises(ValueError):
+        eer_full = EER(np.array([1, 2, 2, 4, 2, 4, 4, 8]),
+                       np.array([[1.5, 2.5, 0], [2.5, 2.5, 0], [1.5, 4.5, 0], [2.5, 4.5, 0],
+                                 [1.5, 2.5, 10], [2.5, 2.5, 10], [1.5, 4.5, 10], [2.5, 4.5, 10]]),
+                       secondary=True, part_load=True, nominal_power=8)
+    eer_full = EER(np.array([1, 2, 2, 4, 2, 4, 4, 8]),
+                   np.array([[1.5, 2.5, 0], [2.5, 2.5, 0], [1.5, 4.5, 0], [2.5, 4.5, 0],
+                             [1.5, 2.5, 10], [2.5, 2.5, 10], [1.5, 4.5, 10], [2.5, 4.5, 10]]),
+                   secondary=True, part_load=True, nominal_power=1, reference_nominal_power=10)
+    assert np.array_equal(eer_full._range_part_load, np.array([0, 1]))
+    assert np.array_equal(eer_full._points[-1], np.array([0, 1]))
+
+
+def test_scale_COP():
+    with pytest.raises(ValueError):
+        cop_full = COP(np.array([1, 2, 2, 4, 2, 4, 4, 8]),
+                       np.array([[1.5, 2.5, 0], [2.5, 2.5, 0], [1.5, 4.5, 0], [2.5, 4.5, 0],
+                                 [1.5, 2.5, 10], [2.5, 2.5, 10], [1.5, 4.5, 10], [2.5, 4.5, 10]]),
+                       secondary=True, part_load=True, nominal_power=8)
+    cop_full = COP(np.array([1, 2, 2, 4, 2, 4, 4, 8]),
+                   np.array([[1.5, 2.5, 0], [2.5, 2.5, 0], [1.5, 4.5, 0], [2.5, 4.5, 0],
+                             [1.5, 2.5, 10], [2.5, 2.5, 10], [1.5, 4.5, 10], [2.5, 4.5, 10]]),
+                   secondary=True, part_load=True, nominal_power=1, reference_nominal_power=10)
+    assert np.array_equal(cop_full._range_part_load, np.array([0, 1]))
+    assert np.array_equal(cop_full._points[-1], np.array([0, 1]))
