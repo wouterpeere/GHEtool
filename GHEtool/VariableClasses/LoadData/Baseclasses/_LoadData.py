@@ -8,6 +8,10 @@ from numpy.typing import ArrayLike
 
 
 class _LoadData(ABC):
+    """
+    This class contains all the general functionalities for the load classes.
+    """
+
     AVG_UPM: int = 730  # number of hours per month
     DEFAULT_LENGTH_PEAK: int = 6  # hours
 
@@ -16,7 +20,8 @@ class _LoadData(ABC):
         self._all_months_equal: bool = True  # true if it is assumed that all months are of the same length
         self._peak_injection_duration: int = _LoadData.DEFAULT_LENGTH_PEAK
         self._peak_extraction_duration: int = _LoadData.DEFAULT_LENGTH_PEAK
-        self.hourly_resolution = False
+        self._multiyear = False
+        self._hourly = False
 
         # initiate variables
         self._baseload_extraction: np.ndarray = np.zeros(12)
@@ -77,7 +82,7 @@ class _LoadData(ABC):
         -------
         simulation period : int
         """
-        return int(len(self.monthly_baseload_extraction_simulation_period) / 12)
+        return int(len(self.monthly_baseload_injection_simulation_period) / 12)
 
     @property
     def all_months_equal(self) -> bool:
@@ -128,10 +133,11 @@ class _LoadData(ABC):
     @property
     def monthly_baseload_injection(self) -> np.ndarray:
         """
+        This function returns the monthly baseload injection in kWh/month.
 
         Returns
         -------
-
+        monthly baseload injection : np.ndarray
         """
         return np.mean(self.monthly_baseload_injection_simulation_period.reshape((self.simulation_period, 12)),
                        axis=0)
@@ -139,10 +145,11 @@ class _LoadData(ABC):
     @property
     def monthly_baseload_extraction(self) -> np.ndarray:
         """
+        This function returns the monthly baseload extraction in kWh/month.
 
         Returns
         -------
-
+        monthly baseload extraction : np.ndarray
         """
         return np.mean(self.monthly_baseload_extraction_simulation_period.reshape((self.simulation_period, 12)),
                        axis=0)
@@ -150,10 +157,11 @@ class _LoadData(ABC):
     @property
     def monthly_peak_injection(self) -> np.ndarray:
         """
+        This function returns the monthly peak injection in kW/month.
 
         Returns
         -------
-
+        monthly peak injection : np.ndarray
         """
         return np.mean(self.monthly_peak_injection_simulation_period.reshape((self.simulation_period, 12)),
                        axis=0)
@@ -161,10 +169,11 @@ class _LoadData(ABC):
     @property
     def monthly_peak_extraction(self) -> np.ndarray:
         """
+        This function returns the monthly peak extraction in kW/month.
 
         Returns
         -------
-
+        monthly peak extraction : np.ndarray
         """
         return np.mean(self.monthly_peak_extraction_simulation_period.reshape((self.simulation_period, 12)),
                        axis=0)
@@ -172,20 +181,22 @@ class _LoadData(ABC):
     @property
     def monthly_baseload_injection_power(self) -> np.ndarray:
         """
+        This function returns the monthly injection power due to the baseload injection in kW/month.
 
         Returns
         -------
-
+        monthly baseload injection power : np.ndarray
         """
         return np.divide(self.monthly_baseload_injection, self.UPM)
 
     @property
     def monthly_baseload_extraction_power(self) -> np.ndarray:
         """
+        This function returns the monthly extraction power due to the baseload extraction in kW/month.
 
         Returns
         -------
-
+        monthly baseload extraction power : np.ndarray
         """
         return np.divide(self.monthly_baseload_extraction, self.UPM)
 
@@ -297,21 +308,22 @@ class _LoadData(ABC):
             self.monthly_baseload_injection_simulation_period - self.monthly_baseload_extraction_simulation_period) / self.simulation_period
 
     @property
-    def monthly_average_power(self) -> np.ndarray:
+    def monthly_average_injection_power(self) -> np.ndarray:
         """
-        This function calculates the average monthly load in kW.
+        This function calculates the average monthly injection power in kW.
         A negative load means it is extraction dominated.
 
         Returns
         -------
         monthly average load : np.ndarray
         """
-        return np.mean(self.monthly_average_power_simulation_period.reshape((self.simulation_period, 12)), axis=0)
+        return np.mean(self.monthly_average_injection_power_simulation_period.reshape((self.simulation_period, 12)),
+                       axis=0)
 
     @property
-    def monthly_average_power_simulation_period(self) -> np.ndarray:
+    def monthly_average_injection_power_simulation_period(self) -> np.ndarray:
         """
-        This function calculates the average monthly power in kW for the whole simulation period.
+        This function calculates the average monthly injection power in kW for the whole simulation period.
         A negative load means it is extraction dominated.
 
         Returns
@@ -377,7 +389,7 @@ class _LoadData(ABC):
     @property
     def peak_duration(self) -> None:
         """
-        Dummy object to set the length peak for both heating and cooling.
+        Dummy object to set the length peak for both extraction and injection.
 
         Returns
         -------
@@ -520,7 +532,7 @@ class _LoadData(ABC):
             # Select month with the highest peak load and take both the peak and average load from that month
             month_index = self.get_month_index(self.monthly_peak_extraction,
                                                self.monthly_baseload_extraction)
-            qm = self.monthly_average_power[month_index] * 1000.
+            qm = self.monthly_average_injection_power[month_index] * 1000.
             qh = self.max_peak_extraction * 1000.
 
             # correct signs
@@ -536,7 +548,7 @@ class _LoadData(ABC):
             # Select month with the highest peak load and take both the peak and average load from that month
             month_index = self.get_month_index(self.monthly_peak_injection,
                                                self.monthly_baseload_injection_power)
-            qm = self.monthly_average_power[month_index] * 1000.
+            qm = self.monthly_average_injection_power[month_index] * 1000.
             qh = self.max_peak_injection * 1000.
 
         return th, qh, qm, qa
@@ -571,12 +583,12 @@ class _LoadData(ABC):
                                                self.monthly_baseload_extraction_power)
             qh = self.max_peak_extraction * 1000.
 
-            qm = self.monthly_average_power[month_index] * 1000.
+            qm = self.monthly_average_injection_power[month_index] * 1000.
 
             if month_index < 1:
                 qpm = 0
             else:
-                qpm = np.sum(self.monthly_average_power[:month_index]) * 1000 / (month_index + 1)
+                qpm = np.sum(self.monthly_average_injection_power[:month_index]) * 1000 / (month_index + 1)
 
             qm = -qm
         else:
@@ -590,21 +602,24 @@ class _LoadData(ABC):
                                                self.monthly_baseload_injection_power)
             qh = self.max_peak_injection * 1000.
 
-            qm = self.monthly_average_power[month_index] * 1000.
+            qm = self.monthly_average_injection_power[month_index] * 1000.
             if month_index < 1:
                 qpm = 0
             else:
-                qpm = np.sum(self.monthly_average_power[:month_index]) * 1000 / (month_index + 1)
+                qpm = np.sum(self.monthly_average_injection_power[:month_index]) * 1000 / (month_index + 1)
 
         tcm = self.time_L3[month_index]
         tpm = self.time_L3[month_index - 1] if month_index > 0 else 0
 
         return th, tpm, tcm, qh, qpm, qm
 
-    @abc.abstractmethod
     def _check_input(self, load_array: ArrayLike) -> bool:
         """
         This function checks whether the input is valid or not.
+        The input is correct if and only if:
+        1) the input is a np.ndarray, list or tuple
+        2) the length of the input is (a multiple of) 12 or 8760, depending on if it is an hourly load or not
+        3) the input does not contain any negative values.
 
         Parameters
         ----------
@@ -615,3 +630,34 @@ class _LoadData(ABC):
         bool
             True if the inputs are valid
         """
+        if not isinstance(load_array, (np.ndarray, list, tuple)):
+            ghe_logger.error("The load should be of type np.ndarray, list or tuple.")
+            return False
+        if self._multiyear:
+            if self._hourly:
+                if not len(load_array) % 8760 == 0:
+                    ghe_logger.error("The length of the load should be a multiple of 8760.")
+                    return False
+            else:
+                if not len(load_array) % 12 == 0:
+                    ghe_logger.error("The length of the load should be a multiple of 12.")
+                    return False
+        else:
+            if self._hourly:
+                if not len(load_array) == 8760:
+                    ghe_logger.error("The length of the load should be 8760.")
+                    return False
+            else:
+                if not len(load_array) == 12:
+                    ghe_logger.error("The length of the load should be 12.")
+                    return False
+        if np.min(load_array) < 0:
+            ghe_logger.error("No value in the load can be smaller than zero.")
+            return False
+        return True
+
+    def set_results(self, results) -> None:  # pragma: no cover
+        pass
+
+    def reset_results(self, min_temperature: float, max_temperature: float) -> None:  # pragma: no cover
+        pass

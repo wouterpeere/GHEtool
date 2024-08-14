@@ -40,6 +40,16 @@ class _Results(ABC):
 
         """
 
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, self.__class__):
+            return False
+        for key in self.__dict__:
+            value1 = self.__dict__[key]
+            value2 = other.__dict__[key]
+            if not np.array_equal(value1, value2):
+                return False
+        return True
+
 
 class ResultsMonthly(_Results):
     """
