@@ -190,6 +190,8 @@ def optimise_load_profile_energy(
     # set to use a constant Rb* value but save the initial parameters
     borefield.Rb = borefield.borehole.get_Rb(depth, borefield.D, borefield.r_b, borefield.ground_data.k_s)
 
+    building_load_copy = copy.deepcopy(building_load)
+
     # if building load is not a multi-year load, convert to multiyear
     if isinstance(building_load, HourlyBuildingLoad):
         building_load = HourlyBuildingLoadMultiYear(building_load.hourly_heating_load_simulation_period,
@@ -218,8 +220,8 @@ def optimise_load_profile_energy(
     power_cooling_range = np.linspace(0.001, building_load.max_peak_cooling, nb_points)
 
     # relationship between the peak load and the corresponding monthly load
-    heating_peak_bl = np.zeros((nb_points, 12 * borefield.simulation_period))
-    cooling_peak_bl = np.zeros((nb_points, 12 * borefield.simulation_period))
+    heating_peak_bl = np.zeros((nb_points, 12 * building_load.simulation_period))
+    cooling_peak_bl = np.zeros((nb_points, 12 * building_load.simulation_period))
 
     for idx in range(nb_points):
         heating_peak_bl[idx] = building_load.resample_to_monthly(
@@ -318,8 +320,10 @@ def optimise_load_profile_energy(
     # calculate external load
     external_load = HourlyBuildingLoadMultiYear()
     external_load.set_hourly_heating_load(
-        np.maximum(0, building_load.hourly_heating_load - borefield_load.hourly_heating_load))
+        np.maximum(0,
+                   building_load_copy.hourly_heating_load_simulation_period - borefield_load.hourly_heating_load_simulation_period))
     external_load.set_hourly_cooling_load(
-        np.maximum(0, building_load.hourly_cooling_load - borefield_load.hourly_cooling_load))
+        np.maximum(0,
+                   building_load_copy.hourly_cooling_load_simulation_period - borefield_load.hourly_cooling_load_simulation_period))
 
     return borefield_load, external_load
