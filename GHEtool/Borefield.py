@@ -1718,7 +1718,8 @@ class Borefield(BaseClass):
 
             # safety
             i = 0
-            while calculate_difference(results_old, results) > 0.1 and i < 50:
+            while calculate_difference(results_old,
+                                       results) > 0.01 and i < self._calculation_setup.max_nb_of_iterations:
                 results_old = results
                 self.load.set_results(results)
                 results = calculate_temperatures(H, hourly=hourly)
