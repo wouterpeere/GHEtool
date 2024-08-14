@@ -23,8 +23,8 @@ def test_set_hourly_load_multi_year():
     load.hourly_cooling_load = np.linspace(0, 8759 * 2 + 1, 8760 * 2)
     assert len(load._hourly_heating_load) == 8760 * 2
     assert len(load.hourly_heating_load) == 8760
-    assert (load.max_peak_heating, 8759 * 2 + 1)
-    assert (load.max_peak_cooling, 8759 * 2 + 1)
+    assert load.max_peak_heating, 8759 * 2 + 1
+    assert load.max_peak_cooling, 8759 * 2 + 1
     assert load.simulation_period == 2
     assert np.array_equal(load.hourly_heating_load, np.linspace(0 + 8760 / 2, 8759 + 8760 / 2, 8760))
     assert np.array_equal(load.hourly_heating_load_simulation_period, load._hourly_heating_load)
