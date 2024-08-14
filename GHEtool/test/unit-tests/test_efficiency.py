@@ -129,7 +129,7 @@ def test_error_EER():
     with pytest.raises(ValueError):
         EER(np.array([3, 4, 6]), np.array([5, 15]))
     with pytest.raises(ValueError):
-        EER(np.array([3, 4, 6]), np.array([5, 10, 15]), np.array([5, 6]))
+        EER(np.array([3, 4, 6]), np.array([5, 10, 15]), True, True)
     with pytest.raises(ValueError):  # no efficiencies equal or smaller than 0
         EER(np.array([0, 4, 6]), np.array([5, 10, 15]))
 
@@ -293,3 +293,15 @@ def test_scale_COP():
                    secondary=True, part_load=True, nominal_power=1, reference_nominal_power=10)
     assert np.array_equal(cop_full._range_part_load, np.array([0, 1]))
     assert np.array_equal(cop_full._points[-1], np.array([0, 1]))
+
+
+def test_interpolation():
+    cop = COP(np.array([1, 2, 2, 3]), np.array([[1, 1], [1, 3], [2, 1], [2, 2]]), part_load=True)
+    assert np.array_equal(cop._range_part_load, np.array([1, 2, 3]))
+    assert np.array_equal(cop._data, np.array([[1, 1.5, 2], [2, 3, 3]]))
+
+    cop = COP(np.array([1, 2, 2, 3, 1, 2, 2, 3]),
+              np.array([[1, 1, 1], [1, 1, 3], [2, 1, 1], [2, 1, 2], [1, 2, 1], [1, 2, 3], [2, 2, 1], [2, 2, 2]]),
+              part_load=True, secondary=True)
+    assert np.array_equal(cop._range_part_load, np.array([1, 2, 3]))
+    assert np.array_equal(cop._data, np.array([[[1, 1.5, 2], [1, 1.5, 2]], [[2, 3, 3], [2, 3, 3]]]))

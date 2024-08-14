@@ -118,7 +118,7 @@ class _Efficiency(_EfficiencyBase):
 
             # the data point exists
             if len(index) > 0:
-                return data[index][0]
+                return data[index[0]]
 
             # the data point does not exist, so we have to interpolate to get it
             x_array = []
@@ -183,9 +183,9 @@ class _Efficiency(_EfficiencyBase):
     def _get_efficiency(self,
                         primary_temperature: Union[float, np.ndarray],
                         secondary_temperature: Union[float, np.ndarray] = None,
-                        part_load: Union[float, np.ndarray] = None) -> np.ndarray:
+                        power: Union[float, np.ndarray] = None) -> np.ndarray:
         """
-        This function calculates the efficiency. This function uses a barycentric interpolation and sets the out-of-bound values
+        This function calculates the efficiency. This function uses interpolation and sets the out-of-bound values
         to the nearest value in the dataset. This function does hence not extrapolate.
 
         Parameters
@@ -194,7 +194,7 @@ class _Efficiency(_EfficiencyBase):
             Value(s) for the average primary temperature of the heat pump for the efficiency calculation.
         secondary_temperature : np.ndarray or float
             Value(s) for the average secondary temperature of the heat pump for the efficiency calculation.
-        part_load : np.ndarray or float
+        power : np.ndarray or float
             Value(s) for the part load data of the heat pump for the efficiency calculation.
 
         Raises
@@ -211,13 +211,13 @@ class _Efficiency(_EfficiencyBase):
         if self._has_secondary != (secondary_temperature is not None):
             if self._has_secondary:
                 raise ValueError('The EER class requires a value for the secondary temperature.')
-        if self._has_part_load != (part_load is not None):
+        if self._has_part_load != (power is not None):
             if self._has_part_load:
                 raise ValueError('The EER class requires a value for the part-load.')
 
         # get maximum length
         _max_length = np.max([len(i) if i is not None and not isinstance(i, (float, int)) else 1 for i in
-                              (primary_temperature, secondary_temperature, part_load)])
+                              (primary_temperature, secondary_temperature, power)])
 
         # convert to arrays
         primary_temperature = np.array(
@@ -226,7 +226,7 @@ class _Efficiency(_EfficiencyBase):
         secondary_temperature = np.array(
             np.full(_max_length, secondary_temperature) if isinstance(secondary_temperature,
                                                                       (float, int)) else secondary_temperature)
-        part_load = np.array(np.full(_max_length, part_load) if isinstance(part_load, (float, int)) else part_load)
+        power = np.array(np.full(_max_length, power) if isinstance(power, (float, int)) else power)
 
         # clip, so that no values fall outside the provided values
         primary_temperature_clipped = np.clip(primary_temperature,
@@ -238,7 +238,7 @@ class _Efficiency(_EfficiencyBase):
             secondary_temperature_clipped = np.clip(secondary_temperature, np.min(self._range_secondary),
                                                     np.max(self._range_secondary))
         if self._has_part_load:
-            part_load_clipped = np.clip(part_load, np.min(self._range_part_load), np.max(self._range_part_load))
+            part_load_clipped = np.clip(power, np.min(self._range_part_load), np.max(self._range_part_load))
 
         xi = primary_temperature_clipped
         if self._has_part_load and self._has_secondary:
