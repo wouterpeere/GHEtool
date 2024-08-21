@@ -6,7 +6,7 @@ from __future__ import annotations
 import copy
 import warnings
 from math import pi
-from typing import Tuple
+from typing import Tuple, Union
 import logging
 
 import matplotlib.pyplot as plt
@@ -19,7 +19,7 @@ from scipy.signal import convolve
 from GHEtool.VariableClasses import FluidData, Borehole, GroundConstantTemperature, ResultsMonthly, ResultsHourly
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, CalculationSetup
 from GHEtool.VariableClasses.LoadData import *
-from GHEtool.VariableClasses.LoadData import _LoadData
+from GHEtool.VariableClasses.LoadData import _LoadData, _LoadDataBuilding
 from GHEtool.VariableClasses.PipeData import _PipeData
 from GHEtool.VariableClasses.BaseClass import BaseClass, UnsolvableDueToTemperatureGradient, MaximumNumberOfIterations
 from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
@@ -104,7 +104,7 @@ class Borefield(BaseClass):
 
         if len(kwargs) > 0:
             raise DeprecationWarning(
-                'Since version 2.3.0, it is no longer possible to set a heating and cooling load (see issue 220).'
+                'Since version 2.3.0, it is no longer possible to set a heating and cooling load (see issue #220).'
                 'Please use the load classes.')
 
         self.limiting_quadrant: int = 0  # parameter that tells in which quadrant the field is limited
@@ -144,7 +144,9 @@ class Borefield(BaseClass):
         if load is not None:
             self.load = load
         else:
-            self.load = MonthlyGeothermalLoadAbsolute(baseload_extraction, baseload_injection, peak_extraction,
+            self.load = MonthlyGeothermalLoadAbsolute(baseload_extraction,
+                                                      baseload_injection,
+                                                      peak_extraction,
                                                       peak_injection)
 
         # set investment cost
@@ -152,8 +154,6 @@ class Borefield(BaseClass):
 
         # set a custom borefield
         self.borefield = borefield
-
-        ghe_logger.main_info("Borefield object has been created.")
 
     @staticmethod
     def activate_logger() -> None:
@@ -478,7 +478,6 @@ class Borefield(BaseClass):
         """
 
         self.custom_gfunction = load_custom_gfunction(location)
-        ghe_logger.main_info("Custom g-function has been loaded.")
 
     def set_investment_cost(self, investment_cost: list = None) -> None:
         """
@@ -514,7 +513,8 @@ class Borefield(BaseClass):
         self.load = load
 
     @property
-    def load(self) -> HourlyGeothermalLoad | MonthlyGeothermalLoadAbsolute:
+    def load(self) -> HourlyGeothermalLoad | MonthlyGeothermalLoadAbsolute | \
+                      HourlyBuildingLoad | MonthlyBuildingLoadAbsolute:
         """
         This returns the LoadData object.
 
@@ -1039,7 +1039,6 @@ class Borefield(BaseClass):
                 f"Please change your configuration accordingly to have a not so shallow field."
             )
 
-        ghe_logger.info("The borefield has been sized.")
         return depth
 
     def _select_size(self, size_max_temp: float, size_min_temp: float, hourly: bool = False) -> float:
@@ -1112,6 +1111,11 @@ class Borefield(BaseClass):
         # check quadrants
         if not quadrant_sizing in range(0, 5):
             raise ValueError(f"Quadrant {quadrant_sizing} does not exist.")
+
+        # check if it is building load
+        if isinstance(self.load, _LoadDataBuilding):
+            warnings.warn('The L2 method does not work with building load data. The L3 method will be used instead.')
+            return self.size_L3(H_init, quadrant_sizing)
 
         # initiate with a given depth
         self.H: float = H_init if H_init is not None else self._calculation_setup.H_init
@@ -1273,7 +1277,7 @@ class Borefield(BaseClass):
             raise ValueError(f"Quadrant {quadrant_sizing} does not exist.")
 
         # check if hourly data is given
-        if not self.load.hourly_resolution:
+        if not self.load._hourly:
             raise ValueError("There is no hourly resolution available!")
 
         # initiate with a given depth
@@ -1583,7 +1587,7 @@ class Borefield(BaseClass):
         None
         """
         self.results = ResultsMonthly()
-        ghe_logger.info("Deleted all stored temperatures from previous calculations.")
+        self.load.reset_results(self.Tf_min, self.Tf_max)
 
     def _calculate_temperature_profile(self, H: float = None, hourly: bool = False) -> None:
         """
@@ -1592,7 +1596,7 @@ class Borefield(BaseClass):
         Parameters
         ----------
         H : float
-            Depth at which the temperatures should be evaluated [m]. If None, than the current depth is taken.
+            Depth at which the temperatures should be evaluated [m]. If None, then the current depth is taken.
         hourly : bool
             True if the temperature evolution should be calculated on an hourly basis.
 
@@ -1601,97 +1605,129 @@ class Borefield(BaseClass):
         None
         """
 
-        # set Rb* value
-        Rb = self.borehole.get_Rb(H if H is not None else self.H, self.D, self.r_b, self.ground_data.k_s(self.H))
-        H = H if H is not None else self.H
+        def calculate_temperatures(H, hourly=hourly):
+            # set Rb* value
+            Rb = self.borehole.get_Rb(H if H is not None else self.H, self.D, self.r_b, self.ground_data.k_s(self.H))
+            H = H if H is not None else self.H
 
-        if not hourly:
-            # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
-            # g-function. This dataset is checked over and over again and is correct
-            g_values = self.gfunction(self.load.time_L3, H)
+            results = None
 
-            # the g-function value of the peak with length_peak hours
-            g_value_peak_injection = self.gfunction(self.load.peak_injection_duration, H)[0]
-            if self.load.peak_injection_duration == self.load.peak_extraction_duration:
-                g_value_peak_extraction = g_value_peak_injection
-            else:
-                g_value_peak_extraction = self.gfunction(self.load.peak_extraction_duration, H)[0]
+            if not hourly:
+                # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
+                # g-function. This dataset is checked over and over again and is correct
+                g_values = self.gfunction(self.load.time_L3, H)
 
-            # calculation of needed differences of the g-function values. These are the weight factors in the calculation
-            # of Tb.
-            g_value_differences = np.diff(g_values, prepend=0)
+                # the g-function value of the peak with length_peak hours
+                g_value_peak_injection = self.gfunction(self.load.peak_injection_duration, H)[0]
+                if self.load.peak_injection_duration == self.load.peak_extraction_duration:
+                    g_value_peak_extraction = g_value_peak_injection
+                else:
+                    g_value_peak_extraction = self.gfunction(self.load.peak_extraction_duration, H)[0]
 
-            # convolution to get the monthly results
-            results = convolve(self.load.monthly_average_power_simulation_period * 1000, g_value_differences)[
-                      : 12 * self.simulation_period]
+                # calculation of needed differences of the g-function values. These are the weight factors in the calculation
+                # of Tb.
+                g_value_differences = np.diff(g_values, prepend=0)
 
-            # calculation the borehole wall temperature for every month i
-            k_s = self.ground_data.k_s(H)
-            Tb = results / (2 * pi * k_s) / (H * self.number_of_boreholes) + self._Tg(H)
+                # convolution to get the monthly results
+                results = convolve(self.load.monthly_average_injection_power_simulation_period * 1000,
+                                   g_value_differences)[
+                          : 12 * self.simulation_period]
 
-            # now the Tf will be calculated based on
-            # Tf = Tb + Q * R_b
-            results_month_injection = Tb + self.load.monthly_baseload_injection_power_simulation_period * 1000 * (
-                    Rb / self.number_of_boreholes / H)
-            results_month_extraction = Tb - self.load.monthly_baseload_extraction_power_simulation_period * 1000 * (
-                    Rb / self.number_of_boreholes / H)
+                # calculation the borehole wall temperature for every month i
+                k_s = self.ground_data.k_s(H)
+                Tb = results / (2 * pi * k_s) / (H * self.number_of_boreholes) + self._Tg(H)
 
-            # extra summation if the g-function value for the peak is included
-            results_peak_injection = (
-                    results_month_injection
-                    + (
-                            self.load.monthly_peak_injection_simulation_period - self.load.monthly_baseload_injection_power_simulation_period)
-                    * 1000
-                    * (g_value_peak_injection / k_s / 2 / pi + Rb)
-                    / self.number_of_boreholes
-                    / H
-            )
-            results_peak_extraction = (
-                    results_month_extraction
-                    - (
-                            self.load.monthly_peak_extraction_simulation_period - self.load.monthly_baseload_extraction_power_simulation_period)
-                    * 1000
-                    * (g_value_peak_extraction / k_s / 2 / pi + Rb)
-                    / self.number_of_boreholes
-                    / H
-            )
+                # now the Tf will be calculated based on
+                # Tf = Tb + Q * R_b
+                results_month_injection = Tb + self.load.monthly_baseload_injection_power_simulation_period * 1000 * (
+                        Rb / self.number_of_boreholes / H)
+                results_month_extraction = Tb - self.load.monthly_baseload_extraction_power_simulation_period * 1000 * (
+                        Rb / self.number_of_boreholes / H)
 
-            # save temperatures under variable
-            self.results = ResultsMonthly(
-                borehole_wall_temp=Tb,
-                peak_extraction=results_peak_extraction,
-                peak_injection=results_peak_injection,
-                monthly_extraction=results_month_extraction,
-                monthly_injection=results_month_injection,
-            )
+                # extra summation if the g-function value for the peak is included
+                results_peak_injection = (
+                        results_month_injection
+                        + (
+                                self.load.monthly_peak_injection_simulation_period - self.load.monthly_baseload_injection_power_simulation_period)
+                        * 1000
+                        * (g_value_peak_injection / k_s / 2 / pi + Rb)
+                        / self.number_of_boreholes
+                        / H
+                )
+                results_peak_extraction = (
+                        results_month_extraction
+                        - (
+                                self.load.monthly_peak_extraction_simulation_period - self.load.monthly_baseload_extraction_power_simulation_period)
+                        * 1000
+                        * (g_value_peak_extraction / k_s / 2 / pi + Rb)
+                        / self.number_of_boreholes
+                        / H
+                )
 
-        if hourly:
-            # check for hourly data if this is requested
-            if not self.load.hourly_resolution:
-                raise ValueError("There is no hourly resolution available!")
+                # save temperatures under variable
+                results = ResultsMonthly(
+                    borehole_wall_temp=Tb,
+                    peak_extraction=results_peak_extraction,
+                    peak_injection=results_peak_injection,
+                    monthly_extraction=results_month_extraction,
+                    monthly_injection=results_month_injection,
+                )
 
-            hourly_load = self.load.hourly_load_simulation_period
+            if hourly:
+                # check for hourly data if this is requested
+                if not self.load._hourly:
+                    raise ValueError("There is no hourly resolution available!")
 
-            # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
-            # g-function. This dataset is checked over and over again and is correct
-            g_values = self.gfunction(self.load.time_L4, H)
+                hourly_load = self.load.hourly_net_resulting_injection_power
 
-            # calculation of needed differences of the g-function values. These are the weight factors in the calculation
-            # of Tb.
-            g_value_differences = np.diff(g_values, prepend=0)
+                # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
+                # g-function. This dataset is checked over and over again and is correct
+                g_values = self.gfunction(self.load.time_L4, H)
 
-            # convolution to get the monthly results
-            results = convolve(hourly_load * 1000, g_value_differences)[: len(hourly_load)]
+                # calculation of needed differences of the g-function values. These are the weight factors in the calculation
+                # of Tb.
+                g_value_differences = np.diff(g_values, prepend=0)
 
-            # calculation the borehole wall temperature for every month i
-            Tb = results / (2 * pi * self.ground_data.k_s(H)) / (H * self.number_of_boreholes) + self._Tg(H)
+                # convolution to get the monthly results
+                results = convolve(hourly_load * 1000, g_value_differences)[: len(hourly_load)]
 
-            # now the Tf will be calculated based on
-            # Tf = Tb + Q * R_b
-            temperature_result = Tb + hourly_load * 1000 * (Rb / self.number_of_boreholes / H)
+                # calculation the borehole wall temperature for every month i
+                Tb = results / (2 * pi * self.ground_data.k_s(H)) / (H * self.number_of_boreholes) + self._Tg(H)
 
-            # reset other variables
-            self.results = ResultsHourly(borehole_wall_temp=Tb, temperature_fluid=temperature_result)
+                # now the Tf will be calculated based on
+                # Tf = Tb + Q * R_b
+                temperature_result = Tb + hourly_load * 1000 * (Rb / self.number_of_boreholes / H)
+
+                # reset other variables
+                results = ResultsHourly(borehole_wall_temp=Tb, temperature_fluid=temperature_result)
+
+            return results
+
+        def calculate_difference(results_old: Union[ResultsMonthly, ResultsHourly],
+                                 result_new: Union[ResultsMonthly, ResultsHourly]) -> float:
+            return max(
+                np.max((result_new.peak_injection - results_old.peak_injection) / self.load.max_peak_injection),
+                np.max((result_new.peak_extraction - results_old.peak_extraction) / self.load.max_peak_extraction))
+
+        if isinstance(self.load, _LoadDataBuilding):
+            # when building load is given, the load should be updated after each temperature calculation.
+            self.load.reset_results(self.Tf_min, self.Tf_max)
+            results_old = calculate_temperatures(H, hourly=hourly)
+            self.load.set_results(results_old)
+            results = calculate_temperatures(H, hourly=hourly)
+
+            # safety
+            i = 0
+            while calculate_difference(results_old,
+                                       results) > 0.01 and i < self._calculation_setup.max_nb_of_iterations:
+                results_old = results
+                self.load.set_results(results)
+                results = calculate_temperatures(H, hourly=hourly)
+                i += 1
+            self.results = results
+            return
+
+        self.results = calculate_temperatures(H, hourly=hourly)
 
     def set_options_gfunction_calculation(self, options: dict) -> None:
         """
@@ -1821,111 +1857,97 @@ class Borefield(BaseClass):
 
     def optimise_load_profile_power(
             self,
-            building_load: HourlyGeothermalLoad,
+            building_load: Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear],
             depth: float = None,
-            SCOP: float = 10 ** 6,
-            SEER: float = 10 ** 6,
             temperature_threshold: float = 0.05,
             use_hourly_resolution: bool = True,
-            max_peak_extraction: float = None,
-            max_peak_injection: float = None
-    ) -> tuple[HourlyGeothermalLoad, HourlyGeothermalLoad]:
+            max_peak_heating: float = None,
+            max_peak_cooling: float = None
+    ) -> tuple[HourlyBuildingLoad, HourlyBuildingLoad]:
         """
-        This function optimises the load based on the given borefield and the given hourly load.
-        (When the load is not geothermal, the SCOP and SEER are used to convert it to a geothermal load.)
-        It does so based on a load-duration curve. The temperatures of the borefield are calculated on a monthly
-        basis, even though we have hourly data, for an hourly calculation of the temperatures
-        would take a very long time.
+        This function optimises the load for maximum power in extraction and injection based on the given borefield and
+        the given hourly building load. It does so based on a load-duration curve.
+        The temperatures of the borefield are calculated on a monthly basis, even though we have hourly data,
+        for an hourly calculation of the temperatures would take a very long time.
 
         Parameters
         ----------
-        building_load : _LoadData
-            Load data used for the optimisation
+        borefield : Borefield
+            Borefield object
+        building_load : HourlyBuildingLoad | HourlyBuildingLoadMultiYear
+            Load data used for the optimisation.
         depth : float
-            Depth of the boreholes in the borefield [m]
-        SCOP : float
-            SCOP of the geothermal system (needed to convert hourly building load to geothermal load)
-        SEER : float
-            SEER of the geothermal system (needed to convert hourly building load to geothermal load)
+            Depth of the boreholes in the borefield [m].
         temperature_threshold : float
             The maximum allowed temperature difference between the maximum and minimum fluid temperatures and their
             respective limits. The lower this threshold, the longer the convergence will take.
         use_hourly_resolution : bool
             If use_hourly_resolution is used, the hourly data will be used for this optimisation. This can take some
             more time than using the monthly resolution, but it will give more accurate results.
-        max_peak_extraction : float
-            The maximum peak power for geothermal extraction [kW]
-        max_peak_injection : float
-            The maximum peak power for geothermal injection [kW]
+        max_peak_heating : float
+            The maximum peak power for the heating (building side) [kW]
+        max_peak_cooling : float
+            The maximum peak power for the cooling (building side) [kW]
 
         Returns
         -------
-        tuple [HourlyGeothermalLoad, HourlyGeothermalLoad]
-            borefield load (secundary), external load (secundary)
+        tuple [HourlyBuildingLoad, HourlyBuildingLoad]
+            borefield load, external load
 
         Raises
         ------
         ValueError
-            ValueError if no hourly load is given or the threshold is negative
+            ValueError if no correct load data is given or the threshold is negative
         """
-        primary_borefield_load, secondary_borefield_load, external_load = optimise_load_profile_power(
-            self, building_load, depth, SCOP, SEER, temperature_threshold, use_hourly_resolution,
-            max_peak_extraction, max_peak_injection
-        )
-        self.load = primary_borefield_load
-        return secondary_borefield_load, external_load
+        borefield_load, external_load = optimise_load_profile_power(
+            self, building_load, depth, temperature_threshold, use_hourly_resolution, max_peak_heating,
+            max_peak_cooling)
+        self.load = borefield_load
+        return borefield_load, external_load
 
     def optimise_load_profile_energy(
             self,
-            building_load: HourlyGeothermalLoad,
+            building_load: Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear],
             depth: float = None,
-            SCOP: float = 10 ** 6,
-            SEER: float = 10 ** 6,
             temperature_threshold: float = 0.05,
-            max_peak_extraction: float = None,
-            max_peak_injection: float = None
-    ) -> tuple[HourlyGeothermalLoadMultiYear, HourlyGeothermalLoadMultiYear]:
+            max_peak_heating: float = None,
+            max_peak_cooling: float = None
+    ) -> tuple[HourlyBuildingLoadMultiYear, HourlyBuildingLoadMultiYear]:
         """
-        This function optimises the load based on the given borefield and the given hourly load.
-        (When the load is not geothermal, the SCOP and SEER are used to convert it to a geothermal load.)
-        It does so based on a load-duration curve. The temperatures of the borefield are calculated on a monthly
-        basis, even though we have hourly data, for an hourly calculation of the temperatures
-        would take a very long time.
+        This function optimises the load for maximum energy extraction and injection based on the given borefield and
+        the given hourly building load. It does so by iterating over every month of the simulation period and increasing or
+        decreasing the amount of geothermal heating and cooling until it meets the temperature requirements.
 
         Parameters
         ----------
-        building_load : _LoadData
+        borefield : Borefield
+            Borefield object
+        building_load : HourlyBuildingLoad | HourlyBuildingLoadMultiYear
             Load data used for the optimisation
         depth : float
             Depth of the boreholes in the borefield [m]
-        SCOP : float
-            SCOP of the geothermal system (needed to convert hourly building load to geothermal load)
-        SEER : float
-            SEER of the geothermal system (needed to convert hourly building load to geothermal load)
         temperature_threshold : float
             The maximum allowed temperature difference between the maximum and minimum fluid temperatures and their
             respective limits. The lower this threshold, the longer the convergence will take.
-        max_peak_extraction : float
-            The maximum peak power for geothermal extraction [kW]
-        max_peak_injection : float
-            The maximum peak power for geothermal injection [kW]
+        max_peak_heating : float
+            The maximum peak power for heating (building side) [kW]
+        max_peak_cooling : float
+            The maximum peak power for cooling (building side) [kW]
 
         Returns
         -------
-        tuple [HourlyGeothermalLoadMultiYear, HourlyGeothermalLoadMultiYear]
-            borefield load (secundary), external load (secundary)
+        tuple [HourlyBuildingLoadMultiYear, HourlyBuildingLoadMultiYear]
+            borefield load, external load
 
         Raises
         ------
         ValueError
-            ValueError if no hourly load is given or the threshold is negative
+            ValueError if no correct load data is given or the threshold is negative
         """
-        primary_borefield_load, secondary_borefield_load, external_load = optimise_load_profile_energy(
-            self, building_load, depth, SCOP, SEER, temperature_threshold,
-            max_peak_extraction, max_peak_injection
-        )
-        self.load = primary_borefield_load
-        return secondary_borefield_load, external_load
+        borefield_load, external_load = optimise_load_profile_energy(
+            self, building_load, depth, temperature_threshold, max_peak_heating, max_peak_cooling)
+        self.load = borefield_load
+        return borefield_load, external_load
 
     def calculate_quadrant(self) -> int:
         """

@@ -135,9 +135,9 @@ def test_monthly_average_load():
     assert np.allclose(load.monthly_baseload_extraction_simulation_period,
                        np.tile(load.baseload_extraction, 20))
 
-    assert np.allclose(load.monthly_average_power,
+    assert np.allclose(load.monthly_average_injection_power,
                        load.monthly_baseload_injection_power - load.monthly_baseload_extraction_power)
-    assert np.allclose(load.monthly_average_power_simulation_period,
+    assert np.allclose(load.monthly_average_injection_power_simulation_period,
                        load.monthly_baseload_injection_power_simulation_period - load.monthly_baseload_extraction_power_simulation_period)
 
     # test now with different month loads
@@ -343,6 +343,11 @@ def test_different_start_month():
     assert np.allclose(load.monthly_baseload_injection_simulation_period, np.tile(result, 20))
     assert np.allclose(load.monthly_peak_extraction_simulation_period, np.tile(result, 20))
     assert np.allclose(load.monthly_peak_injection_simulation_period, np.tile(result, 20))
+    
+    load.peak_injection = np.zeros(12)
+    load.peak_extraction = np.zeros(12)
+    assert np.allclose(load.monthly_peak_extraction_simulation_period, np.tile(result, 20) / 730)
+    assert np.allclose(load.monthly_peak_injection_simulation_period, np.tile(result, 20) / 730)
 
 
 def test_yearly_loads():

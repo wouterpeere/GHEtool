@@ -1,6 +1,7 @@
-import matplotlib.pyplot as plt
-import pygfunction as gt
 import pytest
+
+import matplotlib.pyplot as plt
+import numpy as np
 
 from GHEtool import *
 
@@ -46,3 +47,20 @@ def test_start_in_different_month(monkeypatch):
 def test_multiple_ground_layers():
     from GHEtool.Examples.multiple_ground_layers import multiple_ground_layers
     multiple_ground_layers()
+
+
+def test_sizing_with_building_load(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    from GHEtool.Examples.sizing_with_building_load import size_with_scop, \
+        size_with_variable_ground_temperature, \
+        size_with_part_load_data
+    assert np.allclose(size_with_scop(), (96.5589765783911, 4.072466974615784))
+    assert np.allclose(size_with_variable_ground_temperature(), (95.64066844079264, 4.17665670561309))
+    assert np.allclose(size_with_part_load_data(), (98.1273127062551, 4.685121612513776))
+
+
+def test_sizing_with_building_load_hourly(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    from GHEtool.Examples.sizing_with_building_load_hourly import L3_sizing, L4_sizing
+    assert np.allclose(L3_sizing(), (127.05154931011464, 6.131588043404349))
+    assert np.allclose(L4_sizing(), (153.26361812264668, 6.237959315069309))

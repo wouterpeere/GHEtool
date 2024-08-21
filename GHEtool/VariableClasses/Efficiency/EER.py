@@ -13,25 +13,31 @@ class EER(_Efficiency):
 
     def __init__(self,
                  data: np.ndarray,
-                 range_avg_primary_temperature: np.ndarray,
-                 range_avg_secondary_temperature: np.ndarray = None,
-                 range_part_load: np.ndarray = None):
+                 coordinates: np.ndarray,
+                 part_load: bool = False,
+                 secondary: bool = False,
+                 reference_nominal_power: float = None,
+                 nominal_power: float = None):
         """
 
         Parameters
         ----------
-         data : np.ndarray
-            Array with all the interpolation data, at least 1D, but up to 3D depending on whether the range for
-            average secondary temperatures or the part load data is provided.
-        range_avg_primary_temperature : np.ndarray
-            Array with all the values for the average primary temperature of the heat pump that are present
-            in the data.
-        range_avg_secondary_temperature : np.ndarray
-            Array with all the values for the average secondary temperature of the heat pump that are present
-            in the data. (Optional)
-        range_part_load : np.ndarray
-            Array with all the values for the part-load data of the heat pump that are present in the data.
-            All these values have to be between 0-1. (Optional).
+          data : np.ndarray
+            1D-array with all efficiency values.
+        coordinates : np.ndarray
+            1D array with all the coordinates at which the efficiency values can be found. These coordinates can be
+            1D up to 3D, depending on whether secondary temperature and/or part load is taken into account.
+        part_load : bool
+            True if the data contains part load information.
+        secondary : bool
+            True if the data contains secondary temperature information
+        reference_nominal_power : float
+            If you want to use the efficiency class as a reference of different heat pumps, you need to define a reference
+            for the nominal power, at which the data is defined. This is only relevant when part load data is available.
+        nominal_power : float
+            The nominal power at which to define the current efficiency class. This converts the provided efficiency data
+            from the reference_nominal_power to the nominal_power. This is only relevant when part load data is available
+            and the reference_nominal_power is provided.
 
         Raises
         ------
@@ -39,12 +45,12 @@ class EER(_Efficiency):
             When the shape of the data does not equal the provided ranges.
 
         """
-        super().__init__(data, range_avg_primary_temperature, range_avg_secondary_temperature, range_part_load)
+        super().__init__(data, coordinates, part_load, secondary, reference_nominal_power, nominal_power)
 
     def get_EER(self,
                 primary_temperature: Union[float, np.ndarray],
                 secondary_temperature: Union[float, np.ndarray] = None,
-                part_load: Union[float, np.ndarray] = None) -> np.ndarray:
+                power: Union[float, np.ndarray] = None) -> np.ndarray:
         """
         This function calculates the EER. This function uses a linear interpolation and sets the out-of-bound values
         to the nearest value in the dataset. This function does hence not extrapolate.
@@ -55,24 +61,23 @@ class EER(_Efficiency):
             Value(s) for the average primary temperature of the heat pump for the EER calculation.
         secondary_temperature : np.ndarray or float
             Value(s) for the average secondary temperature of the heat pump for the EER calculation.
-        part_load : np.ndarray or float
+        power : np.ndarray or float
             Value(s) for the part load data of the heat pump for the EER calculation.
 
         Raises
         ------
         ValueError
-            When secondary_temperature is in the dataset, and it is not provided. Same for part_load.
+            When secondary_temperature is in the dataset, and it is not provided. Same for power.
 
         Returns
         -------
         EER
             np.ndarray
         """
-        return self._get_efficiency(primary_temperature, secondary_temperature, part_load)
+        return self._get_efficiency(primary_temperature, secondary_temperature, power)
 
     def get_SEER(self,
                  power: np.ndarray,
-                 nom_power: float,
                  primary_temperature: np.ndarray,
                  secondary_temperature: np.ndarray = None
                  ) -> float:
@@ -83,8 +88,6 @@ class EER(_Efficiency):
         ----------
         power : np.ndarray
             Array with the hourly secondary power of the heat pump [kW]
-        nom_power : float
-            Nominal power of the heat pump [kW]
         primary_temperature : np.ndarray
             Values for the average primary temperature of the heat pump for the EER calculation.
         secondary_temperature : np.ndarray
@@ -105,8 +108,7 @@ class EER(_Efficiency):
                 secondary_temperature is None or len(secondary_temperature) == len(power)):
             raise ValueError('The hourly arrays should have equal length!')
 
-        part_load = np.array(power) / nom_power
-        cop_array = self.get_EER(primary_temperature, secondary_temperature, part_load)
+        cop_array = self.get_EER(primary_temperature, secondary_temperature, power)
 
         # SEER = sum(Q)/sum(W)
         w_array = np.array(power) / cop_array

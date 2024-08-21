@@ -17,8 +17,7 @@ if TYPE_CHECKING:
 
 class HourlyGeothermalLoad(_SingleYear, _HourlyData):
     """
-    This class contains all the information for geothermal load data with a monthly resolution and absolute input.
-    This means that the inputs are both in kWh/month and kW/month.
+    This class contains all the information for building load data with an hourly resolution.
     """
 
     def __init__(self, extraction_load: ArrayLike = None,
@@ -47,6 +46,7 @@ class HourlyGeothermalLoad(_SingleYear, _HourlyData):
 
         _HourlyData.__init__(self)
         _SingleYear.__init__(self, simulation_period)
+        self._hourly = True
 
         # initiate variables
         self._hourly_extraction_load: np.ndarray = np.zeros(8760)
@@ -56,34 +56,6 @@ class HourlyGeothermalLoad(_SingleYear, _HourlyData):
         self.hourly_extraction_load: np.ndarray = np.zeros(8760) if extraction_load is None else np.array(
             extraction_load)
         self.hourly_injection_load: np.ndarray = np.zeros(8760) if injection_load is None else np.array(injection_load)
-
-    def _check_input(self, load_array: ArrayLike) -> bool:
-        """
-        This function checks whether the input is valid or not.
-        The input is correct if and only if:
-        1) the input is a np.ndarray, list or tuple
-        2) the length of the input is 8760
-        3) the input does not contain any negative values.
-
-        Parameters
-        ----------
-        load_array : np.ndarray, list or tuple
-
-        Returns
-        -------
-        bool
-            True if the inputs are valid
-        """
-        if not isinstance(load_array, (np.ndarray, list, tuple)):
-            ghe_logger.error("The load should be of type np.ndarray, list or tuple.")
-            return False
-        if not len(load_array) == 8760:
-            ghe_logger.error("The length of the load should be 8760.")
-            return False
-        if np.min(load_array) < 0:
-            ghe_logger.error("No value in the load can be smaller than zero.")
-            return False
-        return True
 
     @property
     def hourly_extraction_load(self) -> np.ndarray:
@@ -266,8 +238,6 @@ class HourlyGeothermalLoad(_SingleYear, _HourlyData):
         # set data
         self.hourly_extraction_load = np.array(df.iloc[:, col_extraction])
         self.hourly_injection_load = np.array(df.iloc[:, col_injection])
-
-        ghe_logger.info("Hourly profile loaded!")
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, HourlyGeothermalLoad):

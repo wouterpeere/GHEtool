@@ -81,7 +81,7 @@ def test_baseload_injection_power_simulation_period():
 
 def test_monthly_average_load_simulation_period():
     expected_output = (baseload_injection / load_data.UPM) - (baseload_extraction / load_data.UPM)
-    assert np.array_equal(load_data.monthly_average_power_simulation_period, expected_output)
+    assert np.array_equal(load_data.monthly_average_injection_power_simulation_period, expected_output)
 
 
 def test_baseload_extraction_setter():

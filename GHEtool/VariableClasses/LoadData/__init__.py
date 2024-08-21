@@ -1,2 +1,3 @@
 from .GeothermalLoad import *
-from .Baseclasses._LoadData import _LoadData
+from .BuildingLoad import *
+from .Baseclasses import _LoadData, _LoadDataBuilding

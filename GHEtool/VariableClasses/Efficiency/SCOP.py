@@ -1,4 +1,7 @@
-class SCOP:
+from ._Efficiency import _EfficiencyBase
+
+
+class SCOP(_EfficiencyBase):
     """
     Class for constant SCOP efficiency
     """
@@ -13,6 +16,7 @@ class SCOP:
         """
         self._SCOP = None
         self.SCOP = SCOP
+        self._has_part_load: bool = False
 
     @property
     def SCOP(self) -> float:

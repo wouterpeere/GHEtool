@@ -20,19 +20,21 @@ def test_checks_multiyear():
 def test_set_hourly_load_multi_year():
     load = HourlyGeothermalLoadMultiYear()
     load.hourly_extraction_load = np.linspace(0, 8759 * 2 + 1, 8760 * 2)
+    load.hourly_injection_load = np.linspace(0, 8759 * 2 + 1, 8760 * 2)
     assert len(load._hourly_extraction_load) == 8760 * 2
     assert len(load.hourly_extraction_load) == 8760
+    assert load.max_peak_extraction, 8759 * 2 + 1
+    assert load.max_peak_injection, 8759 * 2 + 1
     assert load.simulation_period == 2
     assert np.array_equal(load.hourly_extraction_load, np.linspace(0 + 8760 / 2, 8759 + 8760 / 2, 8760))
     assert np.array_equal(load.hourly_extraction_load_simulation_period, load._hourly_extraction_load)
-    load.hourly_injection_load = np.linspace(0, 8759 * 2 + 1, 8760 * 2)
     assert len(load._hourly_injection_load) == 8760 * 2
     assert len(load.hourly_injection_load) == 8760
     assert load.simulation_period == 2
     assert np.array_equal(load.hourly_injection_load, np.linspace(0 + 8760 / 2, 8759 + 8760 / 2, 8760))
     assert np.array_equal(load.hourly_injection_load_simulation_period, load._hourly_injection_load)
     load._hourly_injection_load = load._hourly_injection_load - 20
-    assert np.array_equal(load.hourly_load_simulation_period,
+    assert np.array_equal(load.hourly_net_resulting_injection_power,
                           load._hourly_injection_load - load._hourly_extraction_load)
 
 
@@ -63,7 +65,7 @@ def test_monthly_based_on_hourly_multi_year():
     assert np.allclose(load.monthly_baseload_injection_simulation_period, heating_bl * 2)
     assert np.allclose(load.monthly_baseload_extraction_power_simulation_period, heating_bl / 730)
     assert np.allclose(load.monthly_baseload_injection_power_simulation_period, heating_bl * 2 / 730)
-    assert np.allclose(load.monthly_average_power_simulation_period, heating_bl / 730)
+    assert np.allclose(load.monthly_average_injection_power_simulation_period, heating_bl / 730)
 
 
 def test_resample_to_monthly_multiyear():

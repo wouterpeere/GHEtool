@@ -1,4 +1,7 @@
-class SEER:
+from ._Efficiency import _EfficiencyBase
+
+
+class SEER(_EfficiencyBase):
     """
     Class for constant SEER efficiency
     """
@@ -14,6 +17,7 @@ class SEER:
 
         self._SEER = None
         self.SEER = SEER
+        self._has_part_load: bool = False
 
     @property
     def SEER(self) -> float:
