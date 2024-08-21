@@ -29,10 +29,10 @@ class Separatus(SingleUTube):
             Grout thermal conductivity [W/mK]
         """
         super().__init__(k_g=k_g,
-                         r_in=(35.74 / 2 - 1.5) * 0.001,
+                         r_in=(35.74 / 2 - 3) * 0.001,
                          r_out=(35.74 / 2) * 0.001,
                          k_p=0.44,
-                         D_s=36 / 2)
+                         D_s=36 / 2 * 0.001)
 
     def pipe_model(self, fluid_data: FluidData, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
         """

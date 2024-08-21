@@ -64,3 +64,11 @@ def test_sizing_with_building_load_hourly(monkeypatch):
     from GHEtool.Examples.sizing_with_building_load_hourly import L3_sizing, L4_sizing
     assert np.allclose(L3_sizing(), (127.05154931011464, 6.131588043404349))
     assert np.allclose(L4_sizing(), (153.26361812264668, 6.237959315069309))
+
+
+def test_separatus(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    from GHEtool.Examples.separatus import design_with_single_U, design_with_double_U, design_with_separatus
+    design_with_single_U()
+    design_with_double_U()
+    design_with_separatus()

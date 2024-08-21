@@ -97,6 +97,10 @@ Concretely, the classes you can use are:
 * _Single U-tubes (special case of multiple U-tubes)_
 * _Double U-tubes (special case of multiple U-tubes)_
 * _Coaxial pipe_
+* _Separatus tube_: The Separatus geothermal heat exchanger is an innovation in the geothermal domain. It consists of a
+  single, DN50 pipe with a unique 'splitpipe'-technology that separates the cold and the hot side of the fluid. For
+  design purposes, it is advised to use this with rather small borehole diameters of DN90. For more information visit
+  the [Separatus website]('https://separatus.ch/en/').
 
 Please note that it is possible to add your own pipe types by inheriting the attributes from the abstract _PipeData
 class.
