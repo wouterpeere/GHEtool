@@ -195,7 +195,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
             Array of EER values
         """
         if isinstance(self.cop, SCOP) and isinstance(self.eer, SEER) and isinstance(self.cop_dhw, SCOP):
-            return self.eer.get_EER(0, power=np.nan_to_num(power), month_indices=self._month_indices)
+            return self.eer.get_EER(0, power=np.nan_to_num(power), month_indices=self.month_indices)
         if isinstance(self.results, ResultsMonthly):
             raise TypeError('You cannot get an hourly EER values based on monthly temperature results.')
         if isinstance(self.results, tuple):
@@ -203,7 +203,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         else:
             temperature = self.results.Tf
 
-        return self.eer.get_EER(temperature, power=np.nan_to_num(power), month_indices=self._month_indices)
+        return self.eer.get_EER(temperature, power=np.nan_to_num(power), month_indices=self.month_indices)
 
     @property
     def hourly_injection_load_simulation_period(self) -> np.ndarray:
@@ -572,7 +572,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
             self.hourly_injection_load_simulation_period - self.hourly_extraction_load_simulation_period) / self.simulation_period
 
     @property
-    def _month_indices(self) -> np.ndarray:
+    def month_indices(self) -> np.ndarray:
         """
         This property returns the array of all monthly indices for the simulation period.
 

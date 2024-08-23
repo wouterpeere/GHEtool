@@ -397,7 +397,7 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
         return np.concatenate((array[self.start_month - 1:], array[: self.start_month - 1]))
 
     @property
-    def _month_indices(self) -> np.ndarray:
+    def month_indices(self) -> np.ndarray:
         """
         This property returns the array of all monthly indices for the simulation period.
 

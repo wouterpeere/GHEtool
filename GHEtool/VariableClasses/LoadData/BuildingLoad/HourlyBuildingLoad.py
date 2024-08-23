@@ -250,7 +250,7 @@ class HourlyBuildingLoad(_SingleYear, _HourlyDataBuilding):
         return np.concatenate((array[self._start_hour:], array[: self._start_hour]))
 
     @property
-    def _month_indices(self) -> np.ndarray:
+    def month_indices(self) -> np.ndarray:
         """
         This property returns the array of all monthly indices for the simulation period.
 

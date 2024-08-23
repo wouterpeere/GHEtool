@@ -243,7 +243,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         return self._eer
 
     @eer.setter
-    def eer(self, efficiency_cooling: Union[int, float, EER, SEER]) -> None:
+    def eer(self, efficiency_cooling: Union[int, float, EER, SEER, EERCombined]) -> None:
         """
         This function defines the efficiency in cooling.
         Integer and float values will be automatically converted to an SEER object.
@@ -456,7 +456,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         else:
             temperature = self.results.monthly_injection
 
-        return self.eer.get_EER(temperature, power=np.nan_to_num(power), month_indices=self._month_indices)
+        return self.eer.get_EER(temperature, power=np.nan_to_num(power), month_indices=self.month_indices)
 
     @staticmethod
     def conversion_factor_secondary_to_primary_heating(cop_value: Union[int, float, np.ndarray]) -> Union[
@@ -1011,7 +1011,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         return int(len(self.monthly_baseload_cooling_simulation_period) / 12)
 
     @property
-    def _month_indices(self) -> np.ndarray:
+    def month_indices(self) -> np.ndarray:
         """
         This property returns the array of all month indices for the simulation period.
 

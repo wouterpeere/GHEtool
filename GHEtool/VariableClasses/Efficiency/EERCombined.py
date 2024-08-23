@@ -16,7 +16,7 @@ class EERCombined:
                  efficiency_passive_cooling: Union[EER, SEER, float],
                  efficiency_active_cooling: Union[EER, SEER, float],
                  threshold_temperature: float = None,
-                 months_active_cooling: np.ndarray = None):
+                 months_active_cooling: Union[np.ndarray, list] = None):
         """
 
         Parameters
@@ -27,7 +27,7 @@ class EERCombined:
             The efficiency class for the active cooling. Floats will be converted to SEER.
         threshold_temperature : float
             Temperature threshold above which active cooling is chosen.
-        months_active_cooling : np.ndarray
+        months_active_cooling : np.ndarray, list
             Months at which by default there is active cooling (jan:1, feb:2 etc.).
 
         Raises
@@ -39,7 +39,7 @@ class EERCombined:
         self.efficiency_passive_cooling = efficiency_passive_cooling
         self.efficiency_active_cooling = efficiency_active_cooling
         self.threshold_temperature = threshold_temperature
-        self.time_active_cooling = months_active_cooling
+        self.time_active_cooling = np.array(months_active_cooling) if months_active_cooling is not None else None
 
         if isinstance(efficiency_active_cooling, (float, int)):
             self.efficiency_active_cooling = SEER(efficiency_active_cooling)
@@ -127,6 +127,7 @@ class EERCombined:
         Time series active cooling : np.ndarray
             Array with boolean values to indicate when there is active cooling
         """
+
         active_cooling_bool = np.full(primary_temperature.shape, False)
 
         if self.threshold_temperature is not None:
@@ -144,7 +145,7 @@ class EERCombined:
                 primary_temperature: Union[float, np.ndarray],
                 secondary_temperature: Union[float, np.ndarray] = None,
                 power: Union[float, np.ndarray] = None,
-                month_indices: Union[float, np.ndarray] = None) -> EER | float:
+                month_indices: Union[float, np.ndarray] = None) -> Union[np.ndarray, float]:
         """
         This function calculates the EER. This function uses a linear interpolation and sets the out-of-bound values
         to the nearest value in the dataset. This function does hence not extrapolate.
@@ -172,7 +173,8 @@ class EERCombined:
             np.ndarray
         """
 
-        if isinstance(primary_temperature, (float, int)):
+        if isinstance(primary_temperature, (float, int)) and (
+                isinstance(month_indices, (float, int)) or month_indices is None):
             # check temperature threshold
             active_cooling_bool = False
             if self.threshold_temperature is not None and primary_temperature > self.threshold_temperature:
@@ -191,6 +193,9 @@ class EERCombined:
         # now for monthly loads
         active_cooling_eer = self.efficiency_active_cooling.get_EER(primary_temperature, secondary_temperature, power)
         passive_cooling_eer = self.efficiency_passive_cooling.get_EER(primary_temperature, secondary_temperature, power)
+
+        if month_indices is not None and isinstance(primary_temperature, (float, int)):
+            primary_temperature = np.full(month_indices.shape, primary_temperature)
 
         active_cooling_bool = self.get_time_series_active_cooling(primary_temperature, month_indices)
 
