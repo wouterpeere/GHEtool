@@ -108,6 +108,38 @@ class EERCombined:
         """
         return self.efficiency_passive_cooling.get_EER(primary_temperature, secondary_temperature, power)
 
+    def get_time_series_active_cooling(self, primary_temperature: np.ndarray,
+                                       month_indices: np.ndarray = None) -> np.ndarray:
+        """
+        This function calculates the time series when there is active cooling based on the primary fluid temperature
+        and the month indices.
+
+        Parameters
+        ----------
+        primary_temperature : np.ndarray
+            Array with the primary fluid temperatures
+        month_indices : np.ndarray
+            Array with all the monthly indices, after correction for the start month. Should be the same length as
+            the primary_temperature
+
+        Returns
+        -------
+        Time series active cooling : np.ndarray
+            Array with boolean values to indicate when there is active cooling
+        """
+        active_cooling_bool = np.full(primary_temperature.shape, False)
+
+        if self.threshold_temperature is not None:
+            active_cooling_bool = primary_temperature > self.threshold_temperature
+
+        if self.time_active_cooling is not None:
+            if month_indices is None:
+                raise ValueError('Please provide a month value, for otherwise the system cannot decide if it is '
+                                 'active or passive cooling.')
+            active_cooling_bool = np.add(active_cooling_bool, np.isin(month_indices, self.time_active_cooling))
+
+        return active_cooling_bool
+
     def get_EER(self,
                 primary_temperature: Union[float, np.ndarray],
                 secondary_temperature: Union[float, np.ndarray] = None,
@@ -160,16 +192,7 @@ class EERCombined:
         active_cooling_eer = self.efficiency_active_cooling.get_EER(primary_temperature, secondary_temperature, power)
         passive_cooling_eer = self.efficiency_passive_cooling.get_EER(primary_temperature, secondary_temperature, power)
 
-        active_cooling_bool = np.full(primary_temperature.shape, False)
-
-        if self.threshold_temperature is not None:
-            active_cooling_bool = primary_temperature > self.threshold_temperature
-
-        if self.time_active_cooling is not None:
-            if month_indices is None:
-                raise ValueError('Please provide a month value, for otherwise the system cannot decide if it is '
-                                 'active or passive cooling.')
-            active_cooling_bool = np.add(active_cooling_bool, np.isin(month_indices, self.time_active_cooling))
+        active_cooling_bool = self.get_time_series_active_cooling(primary_temperature, month_indices)
 
         # select correct data
         return active_cooling_eer * active_cooling_bool + passive_cooling_eer * np.invert(active_cooling_bool)

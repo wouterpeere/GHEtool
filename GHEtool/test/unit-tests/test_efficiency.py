@@ -317,7 +317,8 @@ def test_EERCombined():
     assert eer.get_EER(10, 0, 0, 0) == 20
     assert eer.get_EER(20, 0, 0, 0) == 5
     assert np.allclose(eer.get_EER(np.array([1, 10, 20])), np.array([20, 20, 5]))
-
+    assert np.allclose(eer.get_time_series_active_cooling(np.array([1, 10, 20]), month_indices=np.array([5, 6, 7])),
+                       np.array([False, False, True]))
     # with month array
     eer = EERCombined(20, 5, months_active_cooling=np.array([7, 8, 9]))
     with pytest.raises(ValueError):
@@ -325,10 +326,11 @@ def test_EERCombined():
     with pytest.raises(ValueError):
         eer.get_EER(np.array([1, 10, 20]))
     assert eer.get_EER(1, 0, 0, month_indices=1) == 20
-    assert eer.get_EER(10, 0, 0, month_indices=1) == 20
+    assert eer.get_EER(15, 0, 0, month_indices=1) == 20
     assert eer.get_EER(20, 0, 0, month_indices=7) == 5
-    assert np.allclose(eer.get_EER(np.array([1, 10, 20]), month_indices=np.array([5, 6, 7])), np.array([20, 20, 5]))
-
+    assert np.allclose(eer.get_EER(np.array([1, 15, 20]), month_indices=np.array([5, 6, 7])), np.array([20, 20, 5]))
+    assert np.allclose(eer.get_time_series_active_cooling(np.array([1, 10, 20]), month_indices=np.array([5, 6, 7])),
+                       np.array([False, False, True]))
     # with threshold and month array
     eer = EERCombined(20, 5, 10, months_active_cooling=np.array([7, 8, 9]))
     with pytest.raises(ValueError):
@@ -339,3 +341,5 @@ def test_EERCombined():
     assert eer.get_EER(15, 0, 0, month_indices=1) == 5
     assert eer.get_EER(20, 0, 0, month_indices=7) == 5
     assert np.allclose(eer.get_EER(np.array([1, 15, 20]), month_indices=np.array([5, 6, 7])), np.array([20, 5, 5]))
+    assert np.allclose(eer.get_time_series_active_cooling(np.array([1, 15, 20]), month_indices=np.array([5, 6, 7])),
+                       np.array([False, True, True]))
