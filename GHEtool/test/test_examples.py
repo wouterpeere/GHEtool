@@ -64,3 +64,10 @@ def test_sizing_with_building_load_hourly(monkeypatch):
     from GHEtool.Examples.sizing_with_building_load_hourly import L3_sizing, L4_sizing
     assert np.allclose(L3_sizing(), (127.05154931011464, 6.131588043404349))
     assert np.allclose(L4_sizing(), (153.26361812264668, 6.237959315069309))
+
+
+def test_combined_active_and_passive_cooling(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    from GHEtool.Examples.combined_active_and_passive_cooling import active_above_threshold, default_cooling_in_summer
+    assert np.isclose(active_above_threshold(), 7908.254000000003)
+    assert np.isclose(default_cooling_in_summer(), 67683.27999999997)

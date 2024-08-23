@@ -47,9 +47,12 @@ def default_cooling_in_summer():
     active_cooling_array = borefield.load.eer.get_time_series_active_cooling(borefield.results.peak_injection,
                                                                              load.month_indices)
     active_cooling_energy = load.hourly_cooling_load_simulation_period * active_cooling_array
+    passive_cooling_energy = load.hourly_cooling_load_simulation_period * np.invert(active_cooling_array)
     print(f'{np.sum(active_cooling_energy) / load.simulation_period:.0f}kWh of active cooling on average per year. '
           f'This is {np.sum(active_cooling_energy) / np.sum(load.hourly_cooling_load_simulation_period) * 100:.2f}% '
           f'of the building cooling load.')
+    print(
+        f'The peak power for active and passive cooling is: {np.max(active_cooling_energy):.2f}kW and {np.max(passive_cooling_energy):.2f}kW respectively.')
 
     # create graphs
     fig = plt.figure()
@@ -70,6 +73,7 @@ def default_cooling_in_summer():
     ax.set_ylabel('Energy per year [kWh]')
     ax.set_xticks(range(0, load.simulation_period + 1, 2))
     plt.show()
+    return np.sum(active_cooling_energy)
 
 
 def active_above_threshold():
@@ -92,9 +96,12 @@ def active_above_threshold():
     active_cooling_array = borefield.load.eer.get_time_series_active_cooling(borefield.results.peak_injection,
                                                                              load.month_indices)
     active_cooling_energy = load.hourly_cooling_load_simulation_period * active_cooling_array
+    passive_cooling_energy = load.hourly_cooling_load_simulation_period * np.invert(active_cooling_array)
     print(f'{np.sum(active_cooling_energy) / load.simulation_period:.0f}kWh of active cooling on average per year. '
           f'This is {np.sum(active_cooling_energy) / np.sum(load.hourly_cooling_load_simulation_period) * 100:.2f}% '
           f'of the building cooling load.')
+    print(
+        f'The peak power for active and passive cooling is: {np.max(active_cooling_energy):.2f}kW and {np.max(passive_cooling_energy):.2f}kW respectively.')
 
     # create graphs
     fig = plt.figure()
@@ -115,6 +122,7 @@ def active_above_threshold():
     ax.set_ylabel('Energy per year [kWh]')
     ax.set_xticks(range(0, load.simulation_period + 1, 2))
     plt.show()
+    return np.sum(active_cooling_energy)
 
 
 if __name__ == "__main__":

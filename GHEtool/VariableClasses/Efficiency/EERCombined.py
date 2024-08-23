@@ -50,64 +50,6 @@ class EERCombined:
         if threshold_temperature is None and months_active_cooling is None:
             raise ValueError('Please set either a threshold temperature or the months for active cooling.')
 
-    def _get_EER_active(self, primary_temperature: Union[float, np.ndarray],
-                        secondary_temperature: Union[float, np.ndarray] = None,
-                        power: Union[float, np.ndarray] = None):
-        """
-        This function calculates the EER for active cooling.
-        This function uses a linear interpolation and sets the out-of-bound values
-        to the nearest value in the dataset. This function does hence not extrapolate.
-
-        Parameters
-        ----------
-        primary_temperature : np.ndarray or float
-            Value(s) for the average primary temperature of the heat pump for the EER calculation.
-        secondary_temperature : np.ndarray or float
-            Value(s) for the average secondary temperature of the heat pump for the EER calculation.
-        power : np.ndarray or float
-            Value(s) for the part load data of the heat pump for the EER calculation.
-
-        Raises
-        ------
-        ValueError
-            When secondary_temperature is in the dataset, and it is not provided. Same for power.
-
-        Returns
-        -------
-        EER
-            np.ndarray
-        """
-        return self.efficiency_active_cooling.get_EER(primary_temperature, secondary_temperature, power)
-
-    def _get_EER_passive(self, primary_temperature: Union[float, np.ndarray],
-                         secondary_temperature: Union[float, np.ndarray] = None,
-                         power: Union[float, np.ndarray] = None):
-        """
-        This function calculates the EER for passive cooling.
-        This function uses a linear interpolation and sets the out-of-bound values
-        to the nearest value in the dataset. This function does hence not extrapolate.
-
-        Parameters
-        ----------
-        primary_temperature : np.ndarray or float
-            Value(s) for the average primary temperature of the heat pump for the EER calculation.
-        secondary_temperature : np.ndarray or float
-            Value(s) for the average secondary temperature of the heat pump for the EER calculation.
-        power : np.ndarray or float
-            Value(s) for the part load data of the heat pump for the EER calculation.
-
-        Raises
-        ------
-        ValueError
-            When secondary_temperature is in the dataset, and it is not provided. Same for power.
-
-        Returns
-        -------
-        EER
-            np.ndarray
-        """
-        return self.efficiency_passive_cooling.get_EER(primary_temperature, secondary_temperature, power)
-
     def get_time_series_active_cooling(self, primary_temperature: np.ndarray,
                                        month_indices: np.ndarray = None) -> np.ndarray:
         """
@@ -232,8 +174,9 @@ class EERCombined:
             float
         """
 
-        if len(primary_temperature) != len(power) and (
-                secondary_temperature is None or len(secondary_temperature) == len(power)):
+        if len(primary_temperature) != len(power) or (
+                secondary_temperature is not None and len(secondary_temperature) != len(power)) \
+                or (month_indices is not None and len(month_indices) != len(power)):
             raise ValueError('The hourly arrays should have equal length!')
 
         eer_array = self.get_EER(primary_temperature, secondary_temperature, power, month_indices)

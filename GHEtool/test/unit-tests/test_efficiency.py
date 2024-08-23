@@ -341,5 +341,12 @@ def test_EERCombined():
     assert eer.get_EER(15, 0, 0, month_indices=1) == 5
     assert eer.get_EER(20, 0, 0, month_indices=7) == 5
     assert np.allclose(eer.get_EER(np.array([1, 15, 20]), month_indices=np.array([5, 6, 7])), np.array([20, 5, 5]))
+    assert np.allclose(eer.get_EER(1, month_indices=np.array([5, 6, 7])), np.array([20, 20, 5]))
+
     assert np.allclose(eer.get_time_series_active_cooling(np.array([1, 15, 20]), month_indices=np.array([5, 6, 7])),
                        np.array([False, True, True]))
+
+    with pytest.raises(ValueError):
+        eer.get_SEER(np.array([10, 10, 10]), np.array([1, 15, 20]), month_indices=np.array([6, 7]))
+    assert np.isclose(eer.get_SEER(np.array([10, 10, 10]), np.array([1, 15, 20]), month_indices=np.array([5, 6, 7])),
+                      30 / 4.5)
