@@ -23,7 +23,7 @@ class MonthlyBuildingLoadMultiYear(_LoadDataBuilding):
             peak_heating: ArrayLike = None,
             peak_cooling: ArrayLike = None,
             efficiency_heating: Union[int, float, COP, SCOP] = 5,
-            efficiency_cooling: Union[int, float, EER, SEER] = 20,
+            efficiency_cooling: Union[int, float, EER, SEER, EERCombined] = 20,
             dhw: Union[float, np.ndarray] = None,
             efficiency_dhw: Union[int, float, COP, SCOP] = 4
     ):

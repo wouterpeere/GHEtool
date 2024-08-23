@@ -225,4 +225,4 @@ def test_time_array():
         baseload_cooling=np.tile(baseload_cooling, 10),
         peak_heating=np.tile(peak_heating, 10),
         peak_cooling=np.tile(peak_cooling, 10))
-    assert np.allclose(load._time_array, np.tile(np.arange(1, 13), 10))
+    assert np.allclose(load._month_indices, np.tile(np.arange(1, 13), 10))

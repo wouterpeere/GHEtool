@@ -24,7 +24,7 @@ class HourlyBuildingLoad(_SingleYear, _HourlyDataBuilding):
                  cooling_load: ArrayLike = None,
                  simulation_period: int = 20,
                  efficiency_heating: Union[int, float, COP, SCOP] = 5,
-                 efficiency_cooling: Union[int, float, EER, SEER] = 20,
+                 efficiency_cooling: Union[int, float, EER, SEER, EERCombined] = 20,
                  dhw: Union[float, np.ndarray] = None,
                  efficiency_dhw: Union[int, float, COP, SCOP] = 4):
         """
@@ -250,7 +250,7 @@ class HourlyBuildingLoad(_SingleYear, _HourlyDataBuilding):
         return np.concatenate((array[self._start_hour:], array[: self._start_hour]))
 
     @property
-    def _time_array(self) -> np.ndarray:
+    def _month_indices(self) -> np.ndarray:
         """
         This property returns the array of all monthly indices for the simulation period.
 

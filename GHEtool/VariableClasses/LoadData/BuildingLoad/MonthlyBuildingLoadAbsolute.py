@@ -24,7 +24,7 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
             peak_cooling: ArrayLike = None,
             simulation_period: int = 20,
             efficiency_heating: Union[int, float, COP, SCOP] = 5,
-            efficiency_cooling: Union[int, float, EER, SEER] = 20,
+            efficiency_cooling: Union[int, float, EER, SEER, EERCombined] = 20,
             dhw: Union[float, np.ndarray] = None,
             efficiency_dhw: Union[int, float, COP, SCOP] = 4
     ):
@@ -397,7 +397,7 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
         return np.concatenate((array[self.start_month - 1:], array[: self.start_month - 1]))
 
     @property
-    def _time_array(self) -> np.ndarray:
+    def _month_indices(self) -> np.ndarray:
         """
         This property returns the array of all monthly indices for the simulation period.
 
