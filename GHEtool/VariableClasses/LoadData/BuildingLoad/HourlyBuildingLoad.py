@@ -252,13 +252,13 @@ class HourlyBuildingLoad(_SingleYear, _HourlyDataBuilding):
     @property
     def _time_array(self) -> np.ndarray:
         """
-        This property returns the array of all hourly indices for the simulation period.
+        This property returns the array of all monthly indices for the simulation period.
 
         Returns
         -------
         time array : np.ndarray
         """
-        return np.tile(self.correct_for_start_month(np.arange(0, 8760)), self.simulation_period)
+        return np.tile(self.correct_for_start_month(np.repeat(np.arange(1, 13), self.UPM)), self.simulation_period)
 
     def plot_load_duration(self, legend: bool = False) -> Tuple[plt.Figure, plt.Axes]:
         """

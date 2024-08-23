@@ -405,7 +405,7 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
         -------
         time array : np.ndarray
         """
-        return np.tile(self.correct_for_start_month(np.arange(0, 12)), self.simulation_period)
+        return np.tile(self.correct_for_start_month(np.arange(1, 13)), self.simulation_period)
 
     def set_results(self, results: ResultsMonthly) -> None:
         """

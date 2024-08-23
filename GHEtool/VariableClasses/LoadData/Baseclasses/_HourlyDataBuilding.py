@@ -574,10 +574,10 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
     @property
     def _time_array(self) -> np.ndarray:
         """
-        This property returns the array of all hourly indices for the simulation period.
+        This property returns the array of all monthly indices for the simulation period.
 
         Returns
         -------
         time array : np.ndarray
         """
-        return np.tile(np.arange(0, 8760), self.simulation_period)
+        return np.tile(np.repeat(np.arange(1, 13), self.UPM), self.simulation_period)
