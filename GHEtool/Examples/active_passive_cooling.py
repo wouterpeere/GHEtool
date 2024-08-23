@@ -27,7 +27,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
 
     # variable COP and EER data
     COP = [0.122, 4.365]  # ax+b
-    EER = [-3.916, 17.901]  # ax+b
+    EER = [-0.3916, 17.901]  # ax+b
     threshold_active_cooling = 16
 
     # set simulation period
@@ -81,7 +81,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         Geothermal cooling load : np.ndarray
         """
         EER_array = temp_profile * EER[0] + EER[1]
-        passive: np.ndarray = temp_profile < threshold_active_cooling
+        passive: np.ndarray = temp_profile <= threshold_active_cooling
         active = np.invert(passive)
         return active * load_profile * (1 + 1 / EER_array) + passive * load_profile
 
@@ -177,6 +177,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
     heating_ground = heating_building.copy()
 
     borefield.set_max_avg_fluid_temperature(25)
+    borefield.gfunction_calculation_object.store_previous_values = False
     while abs(depths[0] - depths[1]) > 0.1:
         # set loads
         load = HourlyGeothermalLoadMultiYear()

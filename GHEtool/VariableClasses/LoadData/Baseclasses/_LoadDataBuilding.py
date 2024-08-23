@@ -17,7 +17,7 @@ class _LoadDataBuilding(_LoadData, ABC):
 
     def __init__(self,
                  efficiency_heating: Union[int, float, COP, SCOP],
-                 efficiency_cooling: Union[int, float, EER, SEER],
+                 efficiency_cooling: Union[int, float, EER, SEER, EERCombined],
                  dhw: Union[float, np.ndarray] = None,
                  efficiency_dhw: Union[int, float, COP, SCOP] = 4):
         """
@@ -62,8 +62,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         This function returns the monthly heating baseload in kWh/month for the whole simulation period.
 
         Returns
-        -------
-        baseload heating : np.ndarray
+        -------        baseload heating : np.ndarray
             Baseload heating for the whole simulation period
         """
 
@@ -244,7 +243,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         return self._eer
 
     @eer.setter
-    def eer(self, efficiency_cooling: Union[int, float, EER, SEER]) -> None:
+    def eer(self, efficiency_cooling: Union[int, float, EER, SEER, EERCombined]) -> None:
         """
         This function defines the efficiency in cooling.
         Integer and float values will be automatically converted to an SEER object.
@@ -457,7 +456,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         else:
             temperature = self.results.monthly_injection
 
-        return self.eer.get_EER(temperature, power=np.nan_to_num(power))
+        return self.eer.get_EER(temperature, power=np.nan_to_num(power), month_indices=self.month_indices)
 
     @staticmethod
     def conversion_factor_secondary_to_primary_heating(cop_value: Union[int, float, np.ndarray]) -> Union[
@@ -1010,3 +1009,14 @@ class _LoadDataBuilding(_LoadData, ABC):
         simulation period : int
         """
         return int(len(self.monthly_baseload_cooling_simulation_period) / 12)
+
+    @property
+    def month_indices(self) -> np.ndarray:
+        """
+        This property returns the array of all month indices for the simulation period.
+
+        Returns
+        -------
+        time array : np.ndarray
+        """
+        return np.tile(np.arange(1, 13), self.simulation_period)

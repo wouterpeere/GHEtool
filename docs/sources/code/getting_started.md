@@ -115,6 +115,7 @@ These efficiencies can be used in the Building load classes (cf. infra). The dif
 * _SEER_: Constant seasonal performance for cooling
 * _COP_: Instant efficiency for heating, with inlet temperature, outlet temperature and part load dependency
 * _EER_: Instant efficiency for cooling, with inlet temperature, outlet temperature and part load dependency
+* _EERCombined_: EER for combined active and passive cooling
 
 ### Load data
 

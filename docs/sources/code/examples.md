@@ -4,6 +4,7 @@
 :maxdepth: 2
 
 Examples/active_passive_cooling.rst
+Examples/combined_active_and_passive_cooling.rst
 Examples/custom_borefield_configuration.rst
 Examples/effect_of_borehole_configuration.rst
 Examples/import_data.rst

@@ -174,6 +174,7 @@ These efficiencies can be used in the Building load classes (cf. infra). The dif
 * _SEER_: Constant seasonal performance for cooling
 * _COP_: Instant efficiency for heating, with inlet temperature, outlet temperature and part load dependency
 * _EER_: Instant efficiency for cooling, with inlet temperature, outlet temperature and part load dependency
+* _EERCombined_: EER for combined active and passive cooling
 
 #### Load data
 
@@ -388,7 +389,6 @@ KU Leuven, Belgium.
 
 Dion G., Pasquier, P., Perraudin, D. (2024). Sizing equation based on the outlet fluid temperature of closed-loop ground
 heat exchangers. In _Proceedings of International Ground Source Heat Pump Association_. Montréal (Canada), 28-30 May
-
 2024.
 
 Peere, W. (2024). Are Rules of Thumb Misleading? The Complexity of Borefield Sizing and the Importance of Design
