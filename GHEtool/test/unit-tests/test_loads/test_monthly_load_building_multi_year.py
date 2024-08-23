@@ -217,3 +217,12 @@ def test_dhw():
     assert load.max_peak_dhw == 12
     load.exclude_DHW_from_peak = True
     assert np.allclose(load.monthly_peak_extraction_simulation_period, np.zeros(120))
+
+
+def test_time_array():
+    load = MonthlyBuildingLoadMultiYear(
+        baseload_heating=np.tile(baseload_heating, 10),
+        baseload_cooling=np.tile(baseload_cooling, 10),
+        peak_heating=np.tile(peak_heating, 10),
+        peak_cooling=np.tile(peak_cooling, 10))
+    assert np.allclose(load._time_array, np.tile(np.arange(0, 12), 10))

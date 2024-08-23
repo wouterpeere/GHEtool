@@ -145,3 +145,8 @@ def test_dhw():
     load.exclude_DHW_from_peak = True
     # idem since we started with an hourly data resolution
     assert np.allclose(load.monthly_peak_extraction_simulation_period, np.zeros(120))
+
+
+def test_time_array():
+    load = HourlyBuildingLoadMultiYear(np.zeros(8760 * 10), np.linspace(1, 8760 * 10 - 1, 8760 * 10) * 2, 6, 5)
+    assert np.allclose(load._time_array, np.tile(np.arange(0, 8760), 10))

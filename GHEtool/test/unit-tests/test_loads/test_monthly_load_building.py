@@ -626,3 +626,10 @@ def test_electricity_consumption():
     assert np.allclose(load.yearly_electricity_consumption_heating, np.tile(300000 / 5, 10))
     assert np.allclose(load.yearly_electricity_consumption_dhw, np.tile(10000 / 4, 10))
     assert np.allclose(load.yearly_electricity_consumption, np.tile(10000 / 4 + 300000 / 5 + 150000 / 20, 10))
+
+
+def test_time_array():
+    load = MonthlyBuildingLoadAbsolute(*load_case(1), 10)
+    assert np.allclose(load._time_array, np.tile(np.arange(0, 12), 10))
+    load.start_month = 2
+    assert np.allclose(load._time_array, np.tile(np.concatenate((np.arange(1, 12), [0])), 10))

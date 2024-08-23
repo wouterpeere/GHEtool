@@ -62,8 +62,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         This function returns the monthly heating baseload in kWh/month for the whole simulation period.
 
         Returns
-        -------
-        baseload heating : np.ndarray
+        -------        baseload heating : np.ndarray
             Baseload heating for the whole simulation period
         """
 
@@ -1010,3 +1009,14 @@ class _LoadDataBuilding(_LoadData, ABC):
         simulation period : int
         """
         return int(len(self.monthly_baseload_cooling_simulation_period) / 12)
+
+    @property
+    def _time_array(self) -> np.ndarray:
+        """
+        This property returns the array of all month indices for the simulation period.
+
+        Returns
+        -------
+        time array : np.ndarray
+        """
+        return np.tile(np.arange(0, 12), self.simulation_period)

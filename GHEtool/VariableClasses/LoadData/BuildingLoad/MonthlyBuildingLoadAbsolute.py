@@ -396,6 +396,17 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
             return array
         return np.concatenate((array[self.start_month - 1:], array[: self.start_month - 1]))
 
+    @property
+    def _time_array(self) -> np.ndarray:
+        """
+        This property returns the array of all monthly indices for the simulation period.
+
+        Returns
+        -------
+        time array : np.ndarray
+        """
+        return np.tile(self.correct_for_start_month(np.arange(0, 12)), self.simulation_period)
+
     def set_results(self, results: ResultsMonthly) -> None:
         """
         This function sets the temperature results.

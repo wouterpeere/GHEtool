@@ -108,9 +108,9 @@ class EER(_Efficiency):
                 secondary_temperature is None or len(secondary_temperature) == len(power)):
             raise ValueError('The hourly arrays should have equal length!')
 
-        cop_array = self.get_EER(primary_temperature, secondary_temperature, power)
+        eer_array = self.get_EER(primary_temperature, secondary_temperature, power)
 
         # SEER = sum(Q)/sum(W)
-        w_array = np.array(power) / cop_array
+        w_array = np.array(power) / eer_array
 
         return np.sum(power) / np.sum(w_array)

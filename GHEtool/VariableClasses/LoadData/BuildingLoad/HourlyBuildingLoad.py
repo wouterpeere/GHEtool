@@ -234,7 +234,7 @@ class HourlyBuildingLoad(_SingleYear, _HourlyDataBuilding):
         """
         This function corrects the load for the correct start month.
         If the simulation starts in september, the start month is 9 and hence the array should start
-        at index 9.
+        at index of the first hour of month 9.
 
         Parameters
         ----------
@@ -248,6 +248,17 @@ class HourlyBuildingLoad(_SingleYear, _HourlyDataBuilding):
         if self.start_month == 1:
             return array
         return np.concatenate((array[self._start_hour:], array[: self._start_hour]))
+
+    @property
+    def _time_array(self) -> np.ndarray:
+        """
+        This property returns the array of all hourly indices for the simulation period.
+
+        Returns
+        -------
+        time array : np.ndarray
+        """
+        return np.tile(self.correct_for_start_month(np.arange(0, 8760)), self.simulation_period)
 
     def plot_load_duration(self, legend: bool = False) -> Tuple[plt.Figure, plt.Axes]:
         """

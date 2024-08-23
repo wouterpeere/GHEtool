@@ -632,3 +632,10 @@ def test_hourly_extraction_load_simulation_period_monthly_data():
                            np.tile(np.concatenate((np.full(4380, 3.75), np.full(4380, 9.5))), 10))[0])
     assert np.allclose(load._monthly_baseload_extraction_heating_simulation_period, np.zeros(120))
     assert np.allclose(load._monthly_peak_extraction_heating_simulation_period, np.zeros(120))
+
+
+def test_time_array():
+    load = HourlyBuildingLoad(np.zeros(8760), np.zeros(8760), 10, scop, seer)
+    assert np.allclose(load._time_array, np.tile(np.arange(0, 8760), 10))
+    load.start_month = 2
+    assert np.allclose(load._time_array, np.tile(np.concatenate((np.arange(730, 8760), np.arange(0, 730))), 10))

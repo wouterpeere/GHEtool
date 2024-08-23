@@ -570,3 +570,14 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
             return super(_HourlyData, self).imbalance
         return np.sum(
             self.hourly_injection_load_simulation_period - self.hourly_extraction_load_simulation_period) / self.simulation_period
+
+    @property
+    def _time_array(self) -> np.ndarray:
+        """
+        This property returns the array of all hourly indices for the simulation period.
+
+        Returns
+        -------
+        time array : np.ndarray
+        """
+        return np.tile(np.arange(0, 8760), self.simulation_period)
