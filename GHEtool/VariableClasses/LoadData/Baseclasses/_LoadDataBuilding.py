@@ -19,7 +19,8 @@ class _LoadDataBuilding(_LoadData, ABC):
                  efficiency_heating: Union[int, float, COP, SCOP],
                  efficiency_cooling: Union[int, float, EER, SEER, EERCombined],
                  dhw: Union[float, np.ndarray] = None,
-                 efficiency_dhw: Union[int, float, COP, SCOP] = 4):
+                 efficiency_dhw: Union[int, float, COP, SCOP] = 4,
+                 multiyear: bool = False):
         """
 
         Parameters
@@ -32,9 +33,13 @@ class _LoadDataBuilding(_LoadData, ABC):
             Yearly value of array with energy demand for domestic hot water (DHW) [kWh]
         efficiency_dhw : int, float, COP, SCOP,
             Efficiency in DHW
+        multiyear : bool
+            True if multiyear data
         """
         super().__init__()
 
+        self._multiyear = multiyear
+        
         # initiate variables
         self._baseload_heating: np.ndarray = np.zeros(12)
         self._baseload_cooling: np.ndarray = np.zeros(12)
