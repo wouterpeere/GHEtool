@@ -355,8 +355,10 @@ def test_EERCombined():
 def test_eq_eer_combined():
     eer_combined = EERCombined(20, 5, 10)
     eer_combined2 = EERCombined(20, 50, 10)
+    eer_combined3 = EERCombined(20, 50, 10)
 
     seer = SEER(20)
 
     assert eer_combined != seer
     assert eer_combined2 != eer_combined
+    assert eer_combined2 == eer_combined3
