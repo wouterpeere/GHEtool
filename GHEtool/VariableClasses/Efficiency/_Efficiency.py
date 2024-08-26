@@ -69,8 +69,8 @@ class _Efficiency(_EfficiencyBase):
         self._nearestp = None
         self._has_secondary: bool = secondary
         self._has_part_load: bool = part_load
-        self._data: np.ndarray = data
-        self._coordinates: np.ndarray = coordinates      
+        self.__data_: np.ndarray = data
+        self.__coordinates_: np.ndarray = coordinates      
         self._reference_nominal_power: float = reference_nominal_power
         self._nominal_power: float = nominal_power
                      
