@@ -185,3 +185,15 @@ class EERCombined:
         w_array = np.array(power) / eer_array
 
         return np.sum(power) / np.sum(w_array)
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, self.__class__):
+            return False
+
+        if self.efficiency_passive_cooling != other.efficiency_passive_cooling or \
+                self.efficiency_active_cooling != other.efficiency_active_cooling or \
+                self.threshold_temperature != other.threshold_temperature or \
+                np.all(self.months_active_cooling != other.months_active_cooling):
+            return False
+
+        return True

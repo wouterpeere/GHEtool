@@ -350,3 +350,13 @@ def test_EERCombined():
         eer.get_SEER(np.array([10, 10, 10]), np.array([1, 15, 20]), month_indices=np.array([6, 7]))
     assert np.isclose(eer.get_SEER(np.array([10, 10, 10]), np.array([1, 15, 20]), month_indices=np.array([5, 6, 7])),
                       30 / 4.5)
+
+
+def test_eq_eer_combined():
+    eer_combined = EERCombined(20, 5, 10)
+    eer_combined2 = EERCombined(20, 50, 10)
+
+    seer = SEER(20)
+
+    assert eer_combined != seer
+    assert eer_combined2 != eer_combined
