@@ -343,7 +343,7 @@ def test_different_start_month():
     assert np.allclose(load.monthly_baseload_injection_simulation_period, np.tile(result, 20))
     assert np.allclose(load.monthly_peak_extraction_simulation_period, np.tile(result, 20))
     assert np.allclose(load.monthly_peak_injection_simulation_period, np.tile(result, 20))
-    
+
     load.peak_injection = np.zeros(12)
     load.peak_extraction = np.zeros(12)
     assert np.allclose(load.monthly_peak_extraction_simulation_period, np.tile(result, 20) / 730)
@@ -362,3 +362,15 @@ def test_yearly_loads():
 def test_depreciation_warning():
     with pytest.raises(DeprecationWarning):
         MonthlyGeothermalLoadAbsolute(baseload_heating=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+
+
+def test_eq():
+    load = MonthlyGeothermalLoadAbsolute(*load_case(2))
+    load2 = MonthlyGeothermalLoadAbsolute(*load_case(1))
+    load3 = MonthlyGeothermalLoadMultiYear(*load_case(2))
+    load4 = MonthlyGeothermalLoadAbsolute(*load_case(1))
+
+    assert load != load3
+    assert load != load2
+    assert load2 != load3
+    assert load2 == load4
