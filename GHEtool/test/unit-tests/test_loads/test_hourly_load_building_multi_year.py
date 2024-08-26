@@ -96,6 +96,7 @@ def test_yearly_loads_multiyear():
 
 
 def test_dhw():
+    HourlyBuildingLoadMultiYear(np.zeros(8760 * 10), np.ones(8760 * 10), 5, 20, np.ones(8760 * 10), 3)
     load = HourlyBuildingLoadMultiYear(np.zeros(8760 * 10), np.linspace(1, 8760 * 10 - 1, 8760 * 10) * 2, 6, 5)
 
     assert load.dhw == 0

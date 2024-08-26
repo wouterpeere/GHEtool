@@ -36,10 +36,8 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         multiyear : bool
             True if multiyear data
         """
-        _LoadDataBuilding.__init__(self, efficiency_heating, efficiency_cooling, efficiency_dhw, multiyear)
+        _LoadDataBuilding.__init__(self, efficiency_heating, efficiency_cooling, dhw, efficiency_dhw, multiyear)
         _HourlyData.__init__(self)
-
-        self.dhw = dhw
 
         # initiate variables
         self._hourly_heating_load: np.ndarray = np.zeros(8760)

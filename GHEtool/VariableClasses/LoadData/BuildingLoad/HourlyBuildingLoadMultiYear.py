@@ -37,7 +37,7 @@ class HourlyBuildingLoadMultiYear(_HourlyDataBuilding):
             Efficiency in DHW
         """
 
-        _HourlyDataBuilding.__init__(self, efficiency_heating, efficiency_cooling, dhw, efficiency_dhw)
+        _HourlyDataBuilding.__init__(self, efficiency_heating, efficiency_cooling, dhw, efficiency_dhw, True)
         self._multiyear = True
 
         # set variables

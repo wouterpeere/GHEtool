@@ -160,6 +160,13 @@ def test_set_results():
 
 
 def test_dhw():
+    MonthlyBuildingLoadMultiYear(
+        baseload_heating=np.tile(baseload_heating, 10),
+        baseload_cooling=np.tile(baseload_cooling, 10),
+        peak_heating=np.tile(peak_heating, 10),
+        peak_cooling=np.tile(peak_cooling, 10),
+        dhw=np.ones(120))
+
     load = MonthlyBuildingLoadMultiYear(
         baseload_heating=np.tile(baseload_heating, 10),
         baseload_cooling=np.tile(baseload_cooling, 10),

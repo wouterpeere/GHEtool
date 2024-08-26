@@ -37,9 +37,8 @@ class _LoadDataBuilding(_LoadData, ABC):
             True if multiyear data
         """
         super().__init__()
-
         self._multiyear = multiyear
-        
+
         # initiate variables
         self._baseload_heating: np.ndarray = np.zeros(12)
         self._baseload_cooling: np.ndarray = np.zeros(12)
