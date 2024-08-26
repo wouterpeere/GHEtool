@@ -362,15 +362,3 @@ def test_yearly_loads():
 def test_depreciation_warning():
     with pytest.raises(DeprecationWarning):
         MonthlyGeothermalLoadAbsolute(baseload_heating=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
-
-
-def test_eq():
-    load = MonthlyGeothermalLoadAbsolute(*load_case(2))
-    load2 = MonthlyGeothermalLoadAbsolute(*load_case(1))
-    load3 = MonthlyGeothermalLoadMultiYear(*load_case(2))
-    load4 = MonthlyGeothermalLoadAbsolute(*load_case(1))
-
-    assert load != load3
-    assert load != load2
-    assert load2 != load3
-    assert load2 == load4

@@ -661,18 +661,3 @@ class _LoadData(ABC):
 
     def reset_results(self, min_temperature: float, max_temperature: float) -> None:  # pragma: no cover
         pass
-
-    def __eq__(self, other):
-        if not isinstance(other, self.__class__):
-            return False
-        if not np.all(
-                self.monthly_peak_injection_simulation_period == other.monthly_peak_injection_simulation_period) or \
-                not np.all(
-                    self.monthly_peak_extraction_simulation_period == other.monthly_peak_extraction_simulation_period) or \
-                not np.all(
-                    self.monthly_baseload_extraction_simulation_period == other.monthly_baseload_extraction_simulation_period) or \
-                not np.all(
-                    self.monthly_baseload_injection_simulation_period == other.monthly_baseload_injection_simulation_period):
-            return False
-
-        return True
