@@ -89,9 +89,11 @@ def optimise_load_profile_power(
     while not cool_ok or not heat_ok:
         # limit the primary geothermal extraction and injection load to peak_heat_load and peak_cool_load
         borefield.load.set_hourly_cooling_load(
-            np.minimum(peak_cool_load, building_load.hourly_cooling_load))
+            np.minimum(peak_cool_load, building_load.hourly_cooling_load
+            if isinstance(borefield.load, HourlyBuildingLoad) else building_load.hourly_cooling_load_simulation_period))
         borefield.load.set_hourly_heating_load(
-            np.minimum(peak_heat_load, building_load.hourly_heating_load))
+            np.minimum(peak_heat_load, building_load.hourly_heating_load
+            if isinstance(borefield.load, HourlyBuildingLoad) else building_load.hourly_heating_load_simulation_period))
 
         # calculate temperature profile, just for the results
         borefield.calculate_temperatures(depth=depth, hourly=use_hourly_resolution)

@@ -10,7 +10,8 @@ from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData,
     CalculationSetup, FOLDER, MultipleUTube
 from GHEtool.logger import ghe_logger
 from GHEtool.Validation.cases import load_case
-from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad, HourlyBuildingLoad
+from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad, HourlyBuildingLoad, \
+    HourlyBuildingLoadMultiYear
 from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient
 
 data = GroundConstantTemperature(3, 10)
@@ -856,6 +857,23 @@ def test_optimise_load_profile_power(monkeypatch):
     assert borefield.load.simulation_period == 40
     assert secundary_borefield_load.simulation_period == 40
     assert external_load.simulation_period == 40
+    assert len(borefield.results.peak_extraction) == 0
+
+
+def test_optimise_load_profile_power_multiyear(monkeypatch):
+    # multiyear should also have a multiyear as output
+    borefield = Borefield()
+    monkeypatch.setattr(plt, "show", lambda: None)
+    borefield.set_ground_parameters(ground_data_constant)
+    borefield.borefield = copy.deepcopy(borefield_gt)
+    load = HourlyBuildingLoad(efficiency_heating=10 ** 6, efficiency_cooling=10 * 66)
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load_my = HourlyBuildingLoadMultiYear(load.hourly_heating_load_simulation_period,
+                                          load.hourly_cooling_load_simulation_period)
+    secundary_borefield_load, external_load = borefield.optimise_load_profile_power(load_my, 150)
+    assert borefield.load.simulation_period == 20
+    assert secundary_borefield_load.simulation_period == 20
+    assert external_load.simulation_period == 20
     assert len(borefield.results.peak_extraction) == 0
 
 
