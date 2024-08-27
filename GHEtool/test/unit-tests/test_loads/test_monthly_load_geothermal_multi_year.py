@@ -1,7 +1,7 @@
 import pytest
 
 import numpy as np
-from GHEtool import MonthlyGeothermalLoadMultiYear
+from GHEtool import MonthlyGeothermalLoadMultiYear, MonthlyBuildingLoadMultiYear
 
 # Initialize test data
 baseload_extraction = np.array([1000] * 12)  # 1000 kWh/month for each month
@@ -166,7 +166,14 @@ def test_eq():
         peak_extraction=peak_extraction,
         peak_injection=peak_injection
     )
+    load4 = MonthlyBuildingLoadMultiYear(
+        baseload_heating=baseload_extraction,
+        baseload_cooling=baseload_injection,
+        peak_heating=peak_extraction,
+        peak_cooling=peak_injection
+    )
 
     assert load == load3
     assert load != load2
     assert load2 != load3
+    assert load2 != load4

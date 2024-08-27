@@ -561,6 +561,7 @@ def test_hourly_injection_load_simulation_period_monthly_data():
     assert np.allclose(load.monthly_peak_injection_simulation_period,
                        load.resample_to_monthly(np.tile(np.concatenate((np.full(4380, 7.5),
                                                                         np.full(4380, 11))), 10))[0])
+    assert np.isclose(load.max_peak_injection, 11)
     load.eer = eer_pl
     assert np.allclose(load.monthly_baseload_injection_simulation_period,
                        load.resample_to_monthly(
@@ -595,6 +596,9 @@ def test_hourly_extraction_load_simulation_period_monthly_data():
                            np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9))), 10))[0])
     assert np.allclose(load._monthly_baseload_extraction_dhw_simulation_period, np.zeros(120))
     assert np.allclose(load._monthly_peak_extraction_dhw_simulation_period, np.zeros(120))
+    assert np.isclose(load.max_peak_extraction, 9)
+    assert np.isclose(load.imbalance, -50370.0)
+
     load.cop = cop_pl
     assert np.allclose(load.monthly_baseload_extraction_simulation_period,
                        load.resample_to_monthly(
