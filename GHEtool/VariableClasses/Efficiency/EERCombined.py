@@ -39,7 +39,7 @@ class EERCombined:
         self.efficiency_passive_cooling = efficiency_passive_cooling
         self.efficiency_active_cooling = efficiency_active_cooling
         self.threshold_temperature = threshold_temperature
-        self.time_active_cooling = np.array(months_active_cooling) if months_active_cooling is not None else None
+        self.months_active_cooling = np.array(months_active_cooling) if months_active_cooling is not None else None
 
         if isinstance(efficiency_active_cooling, (float, int)):
             self.efficiency_active_cooling = SEER(efficiency_active_cooling)
@@ -75,11 +75,11 @@ class EERCombined:
         if self.threshold_temperature is not None:
             active_cooling_bool = primary_temperature > self.threshold_temperature
 
-        if self.time_active_cooling is not None:
+        if self.months_active_cooling is not None:
             if month_indices is None:
                 raise ValueError('Please provide a month value, for otherwise the system cannot decide if it is '
                                  'active or passive cooling.')
-            active_cooling_bool = np.add(active_cooling_bool, np.isin(month_indices, self.time_active_cooling))
+            active_cooling_bool = np.add(active_cooling_bool, np.isin(month_indices, self.months_active_cooling))
 
         return active_cooling_bool
 
@@ -122,11 +122,11 @@ class EERCombined:
             if self.threshold_temperature is not None and primary_temperature > self.threshold_temperature:
                 active_cooling_bool = True
 
-            if not active_cooling_bool and self.time_active_cooling is not None:
+            if not active_cooling_bool and self.months_active_cooling is not None:
                 if month_indices is None:
                     raise ValueError('Please provide a month value, for otherwise the system cannot decide if it is '
                                      'active or passive cooling.')
-                active_cooling_bool = month_indices in self.time_active_cooling
+                active_cooling_bool = month_indices in self.months_active_cooling
 
             if active_cooling_bool:
                 return self.efficiency_active_cooling.get_EER(primary_temperature, secondary_temperature, power)
@@ -185,3 +185,15 @@ class EERCombined:
         w_array = np.array(power) / eer_array
 
         return np.sum(power) / np.sum(w_array)
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, self.__class__):
+            return False
+
+        if self.efficiency_passive_cooling != other.efficiency_passive_cooling or \
+                self.efficiency_active_cooling != other.efficiency_active_cooling or \
+                self.threshold_temperature != other.threshold_temperature or \
+                np.all(self.months_active_cooling != other.months_active_cooling):
+            return False
+
+        return True

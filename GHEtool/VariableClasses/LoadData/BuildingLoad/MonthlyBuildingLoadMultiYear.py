@@ -49,7 +49,7 @@ class MonthlyBuildingLoadMultiYear(_LoadDataBuilding):
             Efficiency in DHW
         """
 
-        _LoadDataBuilding.__init__(self, efficiency_heating, efficiency_cooling, dhw, efficiency_dhw)
+        _LoadDataBuilding.__init__(self, efficiency_heating, efficiency_cooling, dhw, efficiency_dhw, True)
         self._multiyear = True
 
         # initiate variables
