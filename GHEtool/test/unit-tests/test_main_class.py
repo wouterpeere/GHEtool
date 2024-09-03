@@ -1086,3 +1086,24 @@ def test_deep_sizing(case, result):
 def test_depreciation_warning():
     with pytest.raises(DeprecationWarning):
         Borefield(baseload_heating=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+
+
+def test_optimise_load_borefield():
+    load = HourlyBuildingLoad()
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load.simulation_period = 10
+    borefield = Borefield(load=load)
+    borefield.set_min_avg_fluid_temperature(2)
+    borefield.set_max_avg_fluid_temperature(17)
+    borefield.borefield = gt.boreholes.rectangle_field(20, 4, 6, 6, 150, 1, 0.07)
+    borefield.Rb = 0.1699
+    ground_data = GroundFluxTemperature(2, 9.6, flux=0.07)
+    borefield.ground_data = ground_data
+    borefield_load, external_load = borefield.optimise_load_profile_energy(load)
+    assert np.isclose(borefield_load.imbalance, -228386.82055766508)
+    borefield.load = borefield_load
+    borefield.calculate_temperatures(hourly=False)
+    assert np.isclose(np.max(borefield.results.peak_injection), 17.044473901670603)
+    assert np.isclose(np.min(borefield.results.peak_extraction), 1.9471241454443655)
+    assert np.isclose(borefield.load.max_peak_cooling, 329.9393053)
+    assert np.isclose(np.sum(borefield.load.hourly_heating_load), 593385.1066074175)
