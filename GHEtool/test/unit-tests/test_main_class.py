@@ -7,7 +7,7 @@ import pygfunction as gt
 import pytest
 
 from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, DoubleUTube, Borefield, \
-    CalculationSetup, FOLDER, MultipleUTube
+    CalculationSetup, FOLDER, MultipleUTube, EERCombined
 from GHEtool.logger import ghe_logger
 from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad, HourlyBuildingLoad, \
@@ -519,6 +519,26 @@ def test_size_L4():
     assert np.isclose(174.23648328808213, borefield.size(100, quadrant_sizing=4))
     assert np.isclose(174.23648328808213, borefield.H)
     assert borefield.calculate_quadrant() == 4
+
+
+def test_calculate_temperatures_eer_combined():
+    eer_combined = EERCombined(20, 5, 17)
+    borefield = Borefield()
+    borefield.set_ground_parameters(ground_data_constant)
+    load = HourlyBuildingLoad(efficiency_cooling=eer_combined)
+
+    borefield.borefield = copy.deepcopy(borefield_gt)
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    borefield.load = load
+    borefield.calculate_temperatures(hourly=True)
+
+    active_cooling_array = borefield.load.eer.get_time_series_active_cooling(borefield.results.peak_injection,
+                                                                             borefield.load.month_indices)
+    assert np.allclose(borefield.load.hourly_cooling_load_simulation_period * active_cooling_array *
+                       (1 + 1 / 5) + borefield.load.hourly_cooling_load_simulation_period * np.invert(
+        active_cooling_array) *
+                       (1 + 1 / 20),
+                       borefield.load.hourly_injection_load_simulation_period)
 
 
 def test_investment_cost():

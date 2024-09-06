@@ -1725,6 +1725,7 @@ class Borefield(BaseClass):
                 results = calculate_temperatures(H, hourly=hourly)
                 i += 1
             self.results = results
+            results = calculate_temperatures(H, hourly=hourly)
             return
 
         self.results = calculate_temperatures(H, hourly=hourly)
