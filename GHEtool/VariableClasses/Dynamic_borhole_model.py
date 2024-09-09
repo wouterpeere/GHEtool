@@ -62,7 +62,7 @@ class DynamicsBH(object):
         # Calculate the far field radius, which influences the number of ground cells
         # To do: only works for rectangular field, adjust for more general approaches
         if number_of_boreholes == 0:
-            print('Error: no borefield has been initiated')
+            ghe_logger.warning(f"Borefield should consist of at least one borehole")
         elif number_of_boreholes < 4:
             far_field_radius = 10
         else: 
@@ -78,9 +78,9 @@ class DynamicsBH(object):
         short_term_parameters = ShortTermEffectsParameters(**short_term_effects_parameters)
         self.short_term_parameters = short_term_parameters
 
-        self.factor_time = 50 # parameter to modify final time 
-        self.rho_cp_grout = self.short_term_parameters.rho_cp_grout  # Sandbox
-        self.rho_cp_pipe = self.short_term_parameters.rho_cp_pipe  # not aan te passen voor sandbox
+        self.factor_time = 50 # parameter to modify default final time 
+        self.rho_cp_grout = self.short_term_parameters.rho_cp_grout  
+        self.rho_cp_pipe = self.short_term_parameters.rho_cp_pipe  
         
         # Starting Rb, needs to be updated every iteration
         self.resist_bh_effective = self.borefield.Rb
@@ -157,7 +157,7 @@ class DynamicsBH(object):
             # pipe thickness is equivalent to original tube thickness
             self.thickness_conv = (self.r_in_tube - self.r_in_convection) / self.num_conv_cells
             self.thickness_fluid = (self.r_in_convection - self.r_fluid) / self.num_fluid_cells
-            self.thickness_pipe = (self.u_tube*self.thickness_pipe) / self.num_pipe_cells
+            self.thickness_pipe = (2*self.thickness_pipe) / self.num_pipe_cells
             ghe_logger.info(f"Double U-tube cells defined for numerical model")
 
         # other
@@ -168,10 +168,7 @@ class DynamicsBH(object):
         self.g_bhw = np.array([], dtype=np.double)
         self.lntts = np.array([], dtype=np.double)
         self.c_0 = 2.0 * pi * self.ground_ghe.k_s()
-        soil_diffusivity = self.ground_ghe.k_s() / (self.ground_ghe.volumetric_heat_capacity())  # = alpha
         self.t_s = self.boreholes[0].H ** 2 / (9 * self.ground_ghe.alpha())
-        # default is at least 49 hours, or up to -8.6 log time
-        self.calc_time_in_sec = max([self.t_s * exp(-8.6), 49.0 * 3600.0])
         self.t_b = 5 * (self.boreholes[0].r_b) ** 2 / self.ground_ghe.alpha()  
         self.final_time = self.factor_time * self.t_b
         self.g_sts = None
