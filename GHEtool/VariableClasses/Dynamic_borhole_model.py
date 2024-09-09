@@ -139,7 +139,7 @@ class DynamicsBH(object):
             self.thickness_conv = (self.r_in_tube - self.r_in_convection) / self.num_conv_cells
             self.thickness_fluid = (self.r_in_convection - self.r_fluid) / self.num_fluid_cells
             # Fixing error of thickness pipe cells, divide by number of pipe cells
-            #self.thickness_pipe = self.thickness_pipe / self.num_pipe_cells
+            self.thickness_pipe = self.thickness_pipe / self.num_pipe_cells
             ghe_logger.info(f"Single U-tube cells defined for numerical model")
 
         else:
@@ -209,6 +209,8 @@ class DynamicsBH(object):
 
             outer_radius = center_radius + self.thickness_fluid / 2.0
 
+            print('fluid cell', idx, self.r_fluid, inner_radius, outer_radius, outer_radius-inner_radius)
+
             # The equivalent thermal mass of the fluid can be calculated from
             # equation (2)
             # pi (r_in_conv ** 2 - r_f **2) C_eq_f = 2pi r_p_in**2 * C_f
@@ -269,7 +271,7 @@ class DynamicsBH(object):
             inner_radius = self.r_in_tube + j * self.thickness_pipe
             center_radius = inner_radius + self.thickness_pipe / 2.0
             outer_radius = inner_radius + self.thickness_pipe
-            conductivity = log(self.r_borehole / self.r_in_tube) / (2.0 * pi * resist_p_eq)
+            conductivity = log(self.r_borehole / self.r_in_tube) / (2.0 * pi * resist_tg_eq)
             # rho_cp = self.single_u_tube.pipe.rhoCp
             rho_cp = self.rho_cp_pipe
             volume = pi * (outer_radius ** 2 - inner_radius ** 2)
