@@ -185,7 +185,7 @@ class DynamicsBH(object):
                     9 * self.ground_ghe.alpha())  # self.t_s = single_u_tube.b.H ** 2 / (9 * soil_diffusivity)
         self.calc_time_in_sec = max([self.t_s * exp(-8.6), 49.0 * 3600.0])
 
-    def fill_radial_cell(self, radial_cell, resist_p_eq, resist_f_eq, resist_tg_eq):
+    def fill_radial_cell(self, radial_cell, resist_f_eq, resist_tg_eq):
 
         num_fluid_cells = self.num_fluid_cells
         num_conv_cells = self.num_conv_cells
@@ -359,13 +359,12 @@ class DynamicsBH(object):
 
         # check the resistances
         resist_f_eq = R_f / 2 * self.u_tube
-        resist_p_eq = R_p  / 2 * self.u_tube
         resist_tg_eq = self.resist_bh_effective - resist_f_eq
 
         # Pass radial cell by reference and fill here so that it can be
         # destroyed when this method returns
         radial_cell = np.zeros(shape=(len(CellProps), self.num_cells), dtype=np.double)
-        self.fill_radial_cell(radial_cell, resist_p_eq, resist_f_eq, resist_tg_eq)
+        self.fill_radial_cell(radial_cell, resist_f_eq, resist_tg_eq)
 
         self.t_b = 5 * (self.boreholes[0].r_b) ** 2 / self.ground_ghe.alpha()
 
