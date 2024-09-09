@@ -120,18 +120,18 @@ class DynamicsBH(object):
         self.r_borehole = self.boreholes[0].r_b
 
         # pipe thickness
-        self.thickness_pipe = self.pipes_ghe.r_out - self.pipes_ghe.r_in
+        self.thickness_pipe_actual = self.pipes_ghe.r_out - self.pipes_ghe.r_in
 
         # outer tube radius is set to sqrt(2) * r_p_o, tube region has 4 cells
         if self.u_tube == 1:
             # outer tube radius is set to sqrt(2) * r_p_o, tube region has 4 cells
             self.r_out_tube = sqrt(2) * self.pipes_ghe.r_out
             # inner tube radius is set to r_out_tube-t_p
-            self.r_in_tube = self.r_out_tube - self.thickness_pipe
+            self.r_in_tube = self.r_out_tube - self.thickness_pipe_actual
             # r_in_convection is set to r_in_tube - 1/4 * t
-            self.r_in_convection = self.r_in_tube - self.thickness_pipe / 4.0
+            self.r_in_convection = self.r_in_tube - self.thickness_pipe_actual / 4.0
             # r_fluid is set to r_in_convection - 3/4 * t
-            self.r_fluid = self.r_in_convection - (3.0 / 4.0 * self.thickness_pipe)
+            self.r_fluid = self.r_in_convection - (3.0 / 4.0 * self.thickness_pipe_actual)
             # Thicknesses of the grid regions
             self.thickness_soil = (self.r_far_field - self.r_borehole) / self.num_soil_cells
             self.thickness_grout = (self.r_borehole - self.r_out_tube) / self.num_grout_cells
@@ -139,25 +139,25 @@ class DynamicsBH(object):
             self.thickness_conv = (self.r_in_tube - self.r_in_convection) / self.num_conv_cells
             self.thickness_fluid = (self.r_in_convection - self.r_fluid) / self.num_fluid_cells
             # Fixing error of thickness pipe cells, divide by number of pipe cells
-            self.thickness_pipe = self.thickness_pipe / self.num_pipe_cells
+            self.thickness_pipe = self.thickness_pipe_actual / self.num_pipe_cells
             ghe_logger.info(f"Single U-tube cells defined for numerical model")
 
         else:
             # outer tube radius is set to sqrt(2) * r_p_o, tube region has 4 cells
-            self.r_out_tube = sqrt(2) * self.pipes_ghe.r_out + 2*self.thickness_pipe
+            self.r_out_tube = sqrt(2) * self.pipes_ghe.r_out + 2*self.thickness_pipe_actual
             # inner tube radius is set to r_out_tube-t_p
-            self.r_in_tube = self.r_out_tube - 2.0 * self.thickness_pipe
+            self.r_in_tube = self.r_out_tube - 2.0 * self.thickness_pipe_actual
             # r_in_convection is set to r_in_tube - 1/4 * t
-            self.r_in_convection = self.r_in_tube - self.thickness_pipe / 2.0
+            self.r_in_convection = self.r_in_tube - self.thickness_pipe_actual / 2.0
             # r_fluid is set to r_in_convection - 3/4 * t
-            self.r_fluid = self.r_in_convection - (3.0 / 2.0 * self.thickness_pipe)
+            self.r_fluid = self.r_in_convection - (3.0 / 2.0 * self.thickness_pipe_actual)
             # Thicknesses of the grid regions
             self.thickness_soil = (self.r_far_field - self.r_borehole) / self.num_soil_cells
             self.thickness_grout = (self.r_borehole - self.r_out_tube) / self.num_grout_cells
             # pipe thickness is equivalent to original tube thickness
             self.thickness_conv = (self.r_in_tube - self.r_in_convection) / self.num_conv_cells
             self.thickness_fluid = (self.r_in_convection - self.r_fluid) / self.num_fluid_cells
-            self.thickness_pipe = (2*self.thickness_pipe) / self.num_pipe_cells
+            self.thickness_pipe = (2*self.thickness_pipe_actual) / self.num_pipe_cells
             ghe_logger.info(f"Double U-tube cells defined for numerical model")
 
         # other
@@ -197,16 +197,10 @@ class DynamicsBH(object):
 
         # load fluid cells
         for idx in range(cell_summation, num_fluid_cells + cell_summation):
-            center_radius = self.r_fluid + idx * self.thickness_fluid
-
-            if idx == 0:
-                inner_radius = center_radius
-            else:
-                inner_radius = center_radius - self.thickness_fluid / 2.0
-
-            outer_radius = center_radius + self.thickness_fluid / 2.0
-
-            print('fluid cell', idx, self.r_fluid, inner_radius, outer_radius, outer_radius-inner_radius)
+           
+            inner_radius = self.r_fluid + idx * self.thickness_fluid
+            center_radius = inner_radius + self.thickness_fluid / 2.0
+            outer_radius = inner_radius + self.thickness_fluid
 
             # The equivalent thermal mass of the fluid can be calculated from
             # equation (2)
