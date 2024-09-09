@@ -44,7 +44,6 @@ def Office():
             ground_data = GroundTemperatureGradient(k_s=3, T_g=10, volumetric_heat_capacity= 2.4 * 10**6, gradient=grad)
             fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
             pipe_data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, pipes)
-            plot_load = True
             # initiate borefield
             borefield = Borefield()
 
@@ -157,8 +156,7 @@ def Office():
             Tf_L4_ste = borefield.results.peak_injection
             Tb_L4_ste = borefield.results.Tb
 
-
-            if num_pipes == 1:
+            if pipes == 1:
                 print(f"Results for Single-U-tube boreholes and gradient equal to {grad} K/100m:")
             else:
                 print(f"Results for Double-U-tube boreholes and gradient equal to {grad} K/100m:")

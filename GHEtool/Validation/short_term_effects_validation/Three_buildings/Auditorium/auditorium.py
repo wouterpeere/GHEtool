@@ -157,7 +157,7 @@ def Auditorium():
             Tf_L4_ste = borefield.results.peak_injection
             Tb_L4_ste = borefield.results.Tb
 
-            if num_pipes == 1:
+            if pipes == 1:
                 print(f"Results for Single-U-tube boreholes and gradient equal to {grad} K/100m:")
             else:
                 print(f"Results for Double-U-tube boreholes and gradient equal to {grad} K/100m:")
