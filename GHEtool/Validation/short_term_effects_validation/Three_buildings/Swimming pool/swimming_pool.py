@@ -57,8 +57,8 @@ def Swimming_pool():
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
     load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'swimming_pool.csv'), header=True, separator=";",
-                             decimal_seperator=".", col_heating=1,
-                             col_cooling=0)
+                             decimal_seperator=".", col_extraction=1,
+                             col_injection=0)
     borefield.load = load
 
     SEER = 20
@@ -66,15 +66,15 @@ def Swimming_pool():
 
     # load hourly heating and cooling load and convert it to geothermal loads
     primary_geothermal_load = HourlyGeothermalLoad(simulation_period=load.simulation_period)
-    primary_geothermal_load.set_hourly_cooling(load.hourly_cooling_load.copy() * (1 + 1 / SEER))
-    primary_geothermal_load.set_hourly_heating(load.hourly_heating_load.copy() * (1 - 1 / SCOP))
+    primary_geothermal_load.set_hourly_injection_load(load.hourly_injection_load.copy() * (1 + 1 / SEER))
+    primary_geothermal_load.set_hourly_extraction_load(load.hourly_extraction_load.copy() * (1 - 1 / SCOP))
     # set geothermal load
     borefield.load = primary_geothermal_load
 
     if plot_load:
         #Plotting Load
-        heating = load.hourly_heating_load.copy() * (1 + 1 / SCOP)
-        cooling = load.hourly_cooling_load.copy() * (1 + 1 / SEER)
+        heating = load.hourly_extraction_load.copy() * (1 + 1 / SCOP)
+        cooling = load.hourly_injection_load.copy() * (1 + 1 / SEER)
         t = [i for i in range(8760)]
         fig = plt.subplots(figsize =(12, 8)) 
         plt.plot(t, heating, color ='orange', lw=2, label ='Heating')
@@ -100,7 +100,7 @@ def Swimming_pool():
     depth_L4 = borefield.size(100, L4_sizing=True)
     Rb_L4 = borefield.Rb
     L4_stop = time.time()
-    Tf_L4 = borefield.results.peak_cooling
+    Tf_L4 = borefield.results.peak_injection
     Tb_L4 = borefield.results.Tb
 
     # initiate borefield
@@ -151,7 +151,7 @@ def Swimming_pool():
     depth_L4_ste = borefield.size(100, L4_sizing=True)
     Rb_L4_ste = borefield.Rb
     L4_ste_stop = time.time()
-    Tf_L4_ste = borefield.results.peak_cooling
+    Tf_L4_ste = borefield.results.peak_injection
     Tb_L4_ste = borefield.results.Tb
 
 

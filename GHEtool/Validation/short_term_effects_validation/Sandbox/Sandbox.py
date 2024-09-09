@@ -45,12 +45,12 @@ def Sandbox():
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=10)
     load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'Sandbox_Q_elec_1uur.csv'), header=True, separator=";",
-                             decimal_seperator=".", col_heating=1,
-                             col_cooling=0)
+                             decimal_seperator=".", col_extraction=1,
+                             col_injection=0)
     borefield.load = load
 
     borefield.calculate_temperatures(hourly=True)
-    Tf_L4 = borefield.results.peak_cooling
+    Tf_L4 = borefield.results.peak_injection
     Tb_L4 = borefield.results.Tb
 
     # initiate borefield
@@ -93,7 +93,7 @@ def Sandbox():
     borefield.set_options_gfunction_calculation(options)
 
     borefield.calculate_temperatures(hourly=True)
-    Tf_L4_ste = borefield.results.peak_cooling
+    Tf_L4_ste = borefield.results.peak_extraction
     Tb_L4_ste = borefield.results.Tb
 
     # Load modelica data and experimental data for plotting
