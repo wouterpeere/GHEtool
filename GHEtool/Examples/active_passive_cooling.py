@@ -19,7 +19,6 @@ import optuna
 
 
 def active_passive_cooling(location='Active_passive_example.csv'):
-
     # load data
     columnNames = ['HeatingSpace', 'HeatingAHU', 'CoolingSpace', 'CoolingAHU']
     df = pd.read_csv(location, names=columnNames, header=0)
@@ -28,7 +27,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
 
     # variable COP and EER data
     COP = [0.122, 4.365]  # ax+b
-    EER = [-3.916, 17.901]  # ax+b
+    EER = [-0.3916, 17.901]  # ax+b
     threshold_active_cooling = 16
 
     # set simulation period
@@ -37,8 +36,8 @@ def active_passive_cooling(location='Active_passive_example.csv'):
     cooling_building: np.ndarray = np.tile(np.array(cooling_data), SIMULATION_PERIOD)
 
     def update_load_COP(temp_profile: np.ndarray,
-                    COP:np.ndarray,
-                    load_profile: np.ndarray) -> np.ndarray:
+                        COP: np.ndarray,
+                        load_profile: np.ndarray) -> np.ndarray:
         """
         This function updates the geothermal load for heating based on a variable COP
 
@@ -56,8 +55,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         Geothermal heating load : np.ndarray
         """
         COP_array = temp_profile * COP[0] + COP[1]
-        return load_profile * (1 - 1/COP_array)
-
+        return load_profile * (1 - 1 / COP_array)
 
     def update_load_EER(temp_profile: np.ndarray,
                         EER: np.ndarray,
@@ -83,16 +81,14 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         Geothermal cooling load : np.ndarray
         """
         EER_array = temp_profile * EER[0] + EER[1]
-        passive: np.ndarray = temp_profile < threshold_active_cooling
+        passive: np.ndarray = temp_profile <= threshold_active_cooling
         active = np.invert(passive)
-        return active * load_profile * (1 + 1/EER_array) + passive * load_profile
+        return active * load_profile * (1 + 1 / EER_array) + passive * load_profile
 
-
-    costs = {"C_elec": 0.2159,      #  electricity cost (EUR/kWh)
-             "C_borefield": 35,     #  inv cost per m borefield (EUR/m)
-             "DR": 0.0011,          #  discount rate(-)
+    costs = {"C_elec": 0.2159,  # electricity cost (EUR/kWh)
+             "C_borefield": 35,  # inv cost per m borefield (EUR/m)
+             "DR": 0.0011,  # discount rate(-)
              "sim_period": SIMULATION_PERIOD}
-
 
     def calculate_costs(borefield: Borefield, heating_building: np.ndarray, heating_geothermal: np.ndarray,
                         cooling_building: np.ndarray, cooling_geothermal: np.ndarray, costs: dict) -> tuple:
@@ -139,7 +135,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         cost_cooling = np.sum(discounted_cooling_cost)
         cost_heating = np.sum(discounted_heating_cost)
 
-        return investment_borefield, cost_heating, cost_cooling, cost_heating+cost_cooling
+        return investment_borefield, cost_heating, cost_cooling, cost_heating + cost_cooling
 
     borefield = Borefield()
     borefield.simulation_period = SIMULATION_PERIOD
@@ -159,8 +155,8 @@ def active_passive_cooling(location='Active_passive_example.csv'):
     while abs(depths[0] - depths[1]) > 0.1:
         # set loads
         load = HourlyGeothermalLoadMultiYear()
-        load.hourly_heating_load = heating_ground
-        load.hourly_cooling_load = cooling_ground
+        load.hourly_extraction_load = heating_ground
+        load.hourly_injection_load = cooling_ground
         borefield.load = load
 
         # size borefield
@@ -168,11 +164,10 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         depths.insert(0, depth_passive)
 
         # get temperature profile
-        temp_profile = borefield.results.peak_heating
+        temp_profile = borefield.results.peak_extraction
 
         # recalculate heating load
         heating_ground = update_load_COP(temp_profile, COP, heating_building)
-
 
     ### ACTIVE COOLING
     depths = [0.9, 0]
@@ -182,11 +177,12 @@ def active_passive_cooling(location='Active_passive_example.csv'):
     heating_ground = heating_building.copy()
 
     borefield.set_max_avg_fluid_temperature(25)
+    borefield.gfunction_calculation_object.store_previous_values = False
     while abs(depths[0] - depths[1]) > 0.1:
         # set loads
         load = HourlyGeothermalLoadMultiYear()
-        load.hourly_heating_load = heating_ground
-        load.hourly_cooling_load = cooling_ground
+        load.hourly_extraction_load = heating_ground
+        load.hourly_injection_load = cooling_ground
         borefield.load = load
 
         # size borefield
@@ -194,12 +190,11 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         depths.insert(0, depth_active)
 
         # get temperature profile
-        temp_profile = borefield.results.peak_heating
+        temp_profile = borefield.results.peak_extraction
 
         # recalculate heating load
         heating_ground = update_load_COP(temp_profile, COP, heating_building)
         cooling_ground = update_load_EER(temp_profile, EER, threshold_active_cooling, cooling_building)
-
 
     ### RUN OPTIMISATION
 
@@ -210,7 +205,6 @@ def active_passive_cooling(location='Active_passive_example.csv'):
     investment_costs = []
     total_costs = []
     depths = []
-
 
     def f(depth: float) -> float:
         """
@@ -240,13 +234,13 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         while np.sum(cooling_ground + heating_ground - heating_ground_prev - cooling_ground_prev) > 100:
             # set loads
             load = HourlyGeothermalLoadMultiYear()
-            load.hourly_heating_load = heating_ground
-            load.hourly_cooling_load = cooling_ground
+            load.hourly_extraction_load = heating_ground
+            load.hourly_injection_load = cooling_ground
             borefield.load = load
 
             # get temperature profile
             borefield.calculate_temperatures(depth, hourly=True)
-            temp_profile = borefield.results.peak_heating
+            temp_profile = borefield.results.peak_extraction
 
             # set previous loads
             heating_ground_prev = heating_ground.copy()
@@ -258,9 +252,9 @@ def active_passive_cooling(location='Active_passive_example.csv'):
 
         # calculate costs
         investment, cost_heating, cost_cooling, operational_cost = calculate_costs(borefield,
-                                                                                 heating_building, heating_ground,
-                                                                                 cooling_building, cooling_ground,
-                                                                                 costs)
+                                                                                   heating_building, heating_ground,
+                                                                                   cooling_building, cooling_ground,
+                                                                                   costs)
         total_costs.append(investment + operational_cost)
         operational_costs.append(operational_cost)
         operational_costs_cooling.append(cost_cooling)
@@ -288,11 +282,18 @@ def active_passive_cooling(location='Active_passive_example.csv'):
     # plot figures
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
-    ax1.plot(depths_sorted, [total_costs[depths_old_new[idx]]/1000 for idx, _ in enumerate(depths_sorted)], marker='o', label="TC")
-    ax1.plot(depths_sorted, [investment_costs[depths_old_new[idx]]/1000 for idx, _ in enumerate(depths_sorted)], marker='o', label="IC")
-    ax1.plot(depths_sorted, [operational_costs[depths_old_new[idx]]/1000 for idx, _ in enumerate(depths_sorted)], marker='o', label="OC")
-    ax1.plot(depths_sorted, [operational_costs_cooling[depths_old_new[idx]]/1000 for idx, _ in enumerate(depths_sorted)], marker='o', label="OCc")
-    ax1.plot(depths_sorted, [operational_costs_heating[depths_old_new[idx]]/1000 for idx, _ in enumerate(depths_sorted)], marker='o', label="OCh")
+    ax1.plot(depths_sorted, [total_costs[depths_old_new[idx]] / 1000 for idx, _ in enumerate(depths_sorted)],
+             marker='o', label="TC")
+    ax1.plot(depths_sorted, [investment_costs[depths_old_new[idx]] / 1000 for idx, _ in enumerate(depths_sorted)],
+             marker='o', label="IC")
+    ax1.plot(depths_sorted, [operational_costs[depths_old_new[idx]] / 1000 for idx, _ in enumerate(depths_sorted)],
+             marker='o', label="OC")
+    ax1.plot(depths_sorted,
+             [operational_costs_cooling[depths_old_new[idx]] / 1000 for idx, _ in enumerate(depths_sorted)], marker='o',
+             label="OCc")
+    ax1.plot(depths_sorted,
+             [operational_costs_heating[depths_old_new[idx]] / 1000 for idx, _ in enumerate(depths_sorted)], marker='o',
+             label="OCh")
     ax1.set_xlabel(r'Depth (m)', fontsize=14)
     ax1.set_ylabel(r'Costs ($k€$)', fontsize=14)
     ax1.legend(loc='lower left', ncol=3)

@@ -2,6 +2,7 @@ import pytest
 import numpy as np
 from GHEtool import Borefield
 from GHEtool.test.methods.method_data import list_of_test_objects
+from GHEtool.Methods import *
 
 
 @pytest.mark.parametrize("model,result",
@@ -46,27 +47,29 @@ def test_L4(model: Borefield, result):
                          ids=list_of_test_objects.names_optimise_load_profile)
 def test_optimise(input, result):
     model: Borefield = input[0]
-    load, depth, SCOP, SEER, power, hourly, max_peak_heating, max_peak_cooling = input[1:]
+    load, depth, power, hourly, max_peak_extraction, max_peak_injection = input[1:]
     if power:
-        secundary_borefield_load, external_load = model.optimise_load_profile_power(load, depth, SCOP, SEER,
-                                                                                    use_hourly_resolution=hourly,
-                                                                                    max_peak_heating=max_peak_heating,
-                                                                                    max_peak_cooling=max_peak_cooling)
+        borefield_load, external_load = optimise_load_profile_power(model, load,
+                                                                    depth,
+                                                                    use_hourly_resolution=hourly,
+                                                                    max_peak_heating=max_peak_extraction,
+                                                                    max_peak_cooling=max_peak_injection)
     else:
-        secundary_borefield_load, external_load = model.optimise_load_profile_energy(load, depth, SCOP, SEER,
-                                                                                     max_peak_heating=max_peak_heating,
-                                                                                     max_peak_cooling=max_peak_cooling)
-    percentage_heating, percentage_cooling, peak_heating_geo, peak_cooling_geo, peak_heating_ext, peak_cooling_ext = \
+        borefield_load, external_load = optimise_load_profile_energy(model, load,
+                                                                     depth,
+                                                                     max_peak_heating=max_peak_extraction,
+                                                                     max_peak_cooling=max_peak_injection)
+    percentage_extraction, percentage_injection, peak_extraction_geo, peak_injection_geo, peak_extraction_ext, peak_injection_ext = \
         result
 
-    _percentage_heating = np.sum(secundary_borefield_load.hourly_heating_load_simulation_period) / \
-                          np.sum(load.hourly_heating_load_simulation_period) * 100
-    _percentage_cooling = np.sum(secundary_borefield_load.hourly_cooling_load_simulation_period) / \
-                          np.sum(load.hourly_cooling_load_simulation_period) * 100
+    _percentage_extraction = np.sum(borefield_load.hourly_heating_load_simulation_period) / \
+                             np.sum(load.hourly_heating_load_simulation_period) * 100
+    _percentage_injection = np.sum(borefield_load.hourly_cooling_load_simulation_period) / \
+                            np.sum(load.hourly_cooling_load_simulation_period) * 100
 
-    assert np.isclose(_percentage_heating, percentage_heating)
-    assert np.isclose(_percentage_cooling, percentage_cooling)
-    assert np.isclose(model.load.max_peak_heating, peak_heating_geo)
-    assert np.isclose(model.load.max_peak_cooling, peak_cooling_geo)
-    assert np.isclose(external_load.max_peak_heating, peak_heating_ext)
-    assert np.isclose(external_load.max_peak_cooling, peak_cooling_ext)
+    assert np.isclose(_percentage_extraction, percentage_extraction)
+    assert np.isclose(_percentage_injection, percentage_injection)
+    assert np.isclose(borefield_load.max_peak_extraction, peak_extraction_geo)
+    assert np.isclose(borefield_load.max_peak_injection, peak_injection_geo)
+    assert np.isclose(external_load.max_peak_heating, peak_extraction_ext)
+    assert np.isclose(external_load.max_peak_cooling, peak_injection_ext)

@@ -15,9 +15,9 @@ from GHEtool import Borefield, FluidData, DoubleUTube, GroundConstantTemperature
 
 def main_functionalities():
     # relevant borefield data for the calculations
-    data = GroundConstantTemperature(3,             # conductivity of the soil (W/mK)
-                                     10,            # Ground temperature at infinity (degrees C)
-                                     2.4 * 10**6)   # ground volumetric heat capacity (J/m3K)
+    data = GroundConstantTemperature(3,  # conductivity of the soil (W/mK)
+                                     10,  # Ground temperature at infinity (degrees C)
+                                     2.4 * 10 ** 6)  # ground volumetric heat capacity (J/m3K)
 
     # monthly loading values
     peak_cooling = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak cooling in kW
@@ -28,12 +28,13 @@ def main_functionalities():
     annual_cooling_load = 160 * 10 ** 3  # kWh
 
     # percentage of annual load per month (15.5% for January ...)
-    monthly_load_heating_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
+    monthly_load_heating_percentage = np.array(
+        [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
     monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
 
     # resulting load per month
-    monthly_load_heating = annual_heating_load * monthly_load_heating_percentage   # kWh
-    monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage   # kWh
+    monthly_load_heating = annual_heating_load * monthly_load_heating_percentage  # kWh
+    monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage  # kWh
 
     # set the load
     load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
@@ -51,15 +52,16 @@ def main_functionalities():
     borefield.Rb = 0.12  # equivalent borehole resistance (K/W)
 
     # set temperature boundaries
-    borefield.set_max_avg_fluid_temperature(16)   # maximum temperature
-    borefield.set_min_avg_fluid_temperature(0)    # minimum temperature
+    borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
+    borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
 
     # size borefield
     depth = borefield.size()
     print("The borehole depth is: ", depth, "m")
 
     # print imbalance
-    print("The borefield imbalance is: ", borefield._borefield_load.imbalance, "kWh/y. (A negative imbalance means the the field is heat extraction dominated so it cools down year after year.)") # print imbalance
+    print("The borefield imbalance is: ", borefield._borefield_load.imbalance,
+          "kWh/y. (A negative imbalance means the the field is heat extraction dominated so it cools down year after year.)")  # print imbalance
 
     # plot temperature profile for the calculated depth
     borefield.print_temperature_profile(legend=True)
@@ -70,7 +72,7 @@ def main_functionalities():
     # print gives the array of monthly temperatures for peak cooling without showing the plot
     borefield.calculate_temperatures(depth=90)
     print("Result array for cooling peaks")
-    print(borefield.results.peak_cooling)
+    print(borefield.results.peak_injection)
     print("---------------------------------------------")
 
     # size the borefield for quadrant 3

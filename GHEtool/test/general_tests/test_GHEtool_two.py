@@ -10,7 +10,6 @@ import pytest
 from GHEtool import *
 from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient
 
-
 data = GroundConstantTemperature(3, 10)
 data_ground_flux = GroundFluxTemperature(3, 10)
 
@@ -30,8 +29,8 @@ def load_case(number):
         monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
         monthly_load_heating = monthly_load_heating_percentage * 300 * 10 ** 3  # kWh
         monthly_load_cooling = monthly_load_cooling_percentage * 150 * 10 ** 3  # kWh
-        peak_cooling = np.array([0., 0., 22., 44., 83., 117., 134., 150., 100., 23., 0., 0.])
-        peak_heating = np.zeros(12)
+        peak_injection = np.array([0., 0., 22., 44., 83., 117., 134., 150., 100., 23., 0., 0.])
+        peak_extraction = np.zeros(12)
 
     elif number == 2:
         # case 2
@@ -41,8 +40,8 @@ def load_case(number):
         monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
         monthly_load_heating = monthly_load_heating_percentage * 160 * 10 ** 3  # kWh
         monthly_load_cooling = monthly_load_cooling_percentage * 240 * 10 ** 3  # kWh
-        peak_cooling = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak cooling in kW
-        peak_heating = np.array([160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.])
+        peak_injection = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak cooling in kW
+        peak_extraction = np.array([160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.])
 
     else:
         # case 4
@@ -52,10 +51,10 @@ def load_case(number):
         monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
         monthly_load_heating = monthly_load_heating_percentage * 300 * 10 ** 3  # kWh
         monthly_load_cooling = monthly_load_cooling_percentage * 150 * 10 ** 3  # kWh
-        peak_cooling = np.array([0., 0., 22., 44., 83., 117., 134., 150., 100., 23., 0., 0.])
-        peak_heating = np.array([300., 268., 191., 103., 75., 0., 0., 38., 76., 160., 224., 255.])
+        peak_injection = np.array([0., 0., 22., 44., 83., 117., 134., 150., 100., 23., 0., 0.])
+        peak_extraction = np.array([300., 268., 191., 103., 75., 0., 0., 38., 76., 160., 224., 255.])
 
-    return monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling
+    return monthly_load_heating, monthly_load_cooling, peak_extraction, peak_injection
 
 
 def test_different_heating_cooling_peaks():
@@ -85,12 +84,12 @@ def test_different_heating_cooling_peaks():
     # set temperature boundaries
     borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
     borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
-    borefield.load.peak_cooling_duration = 8
-    assert borefield.load.peak_cooling_duration == 8 * 3600
-    assert borefield.load.peak_heating_duration == 6 * 3600
+    borefield.load.peak_injection_duration = 8
+    assert borefield.load.peak_injection_duration == 8 * 3600
+    assert borefield.load.peak_extraction_duration == 6 * 3600
     assert np.isclose(borefield.size(), 94.05270927679376)
-    assert borefield.load.peak_cooling_duration == 8 * 3600
-    assert borefield.load.peak_heating_duration == 6 * 3600
+    assert borefield.load.peak_injection_duration == 8 * 3600
+    assert borefield.load.peak_extraction_duration == 6 * 3600
 
 
 def test_stuck_in_loop():
@@ -106,13 +105,13 @@ def test_stuck_in_loop():
     borefield.calculation_setup(max_nb_of_iterations=500)
 
     borefield.size()
-    borefield.load.peak_cooling_duration = 8
-    borefield.load.peak_heating_duration = 8
-    assert borefield.load.peak_cooling_duration == 8 * 3600
-    assert borefield.load.peak_heating_duration == 8 * 3600
+    borefield.load.peak_injection_duration = 8
+    borefield.load.peak_extraction_duration = 8
+    assert borefield.load.peak_injection_duration == 8 * 3600
+    assert borefield.load.peak_extraction_duration == 8 * 3600
     borefield.size()
     assert np.isclose(borefield.size(), 100.91784885721547)
-    borefield.load.peak_heating_duration = 7
+    borefield.load.peak_extraction_duration = 7
     assert np.isclose(borefield.size(), 100.15133835697398)
 
 
@@ -142,16 +141,16 @@ def test_reset_temp_profiles_when_loaded(monkeypatch):
     borefield.set_borefield(copy.copy(borefield_gt))
 
     borefield.calculate_temperatures()
-    Tmax = borefield.results.peak_cooling.copy()
-    Tmin = borefield.results.peak_heating.copy()
+    Tmax = borefield.results.peak_injection.copy()
+    Tmin = borefield.results.peak_extraction.copy()
 
     load = MonthlyGeothermalLoadAbsolute(*load_case(2))
     borefield.load = load
 
     borefield.print_temperature_profile()
 
-    assert not np.array_equal(Tmax, borefield.results.peak_heating)
-    assert not np.array_equal(Tmin, borefield.results.peak_cooling)
+    assert not np.array_equal(Tmax, borefield.results.peak_extraction)
+    assert not np.array_equal(Tmin, borefield.results.peak_injection)
 
 
 def test_no_possible_solution():
@@ -168,13 +167,13 @@ def test_no_possible_solution():
     # limited by heating, but no problem for cooling
     borefield.set_max_avg_fluid_temperature(15)
     borefield.set_min_avg_fluid_temperature(2)
-    borefield.load.baseload_heating = borefield.load.baseload_heating * 5
+    borefield.load.baseload_extraction = borefield.load.monthly_baseload_extraction * 5
     borefield.size()
 
     # limited by heating, but problem for cooling --> no solution
     borefield.set_max_avg_fluid_temperature(14)
     borefield.set_min_avg_fluid_temperature(2)
-    borefield.load.baseload_heating = borefield.load.baseload_heating * 5
+    borefield.load.baseload_extraction = borefield.load.monthly_baseload_extraction * 5
     with pytest.raises(UnsolvableDueToTemperatureGradient):
         borefield.size(L3_sizing=True)
 
@@ -185,8 +184,8 @@ def test_problem_with_gfunction_calc_obj():
     borefield_gt = gt.boreholes.rectangle_field(11, 11, 6, 6, 110, 1, 0.075)
 
     # Monthly loading values
-    peak_cooling = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak cooling in kW
-    peak_heating = np.array([160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.])  # Peak heating in kW
+    peak_injection = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak cooling in kW
+    peak_extraction = np.array([160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.])  # Peak heating in kW
 
     # annual heating and cooling load
     annual_heating_load = 150 * 10 ** 3  # kWh
@@ -202,7 +201,7 @@ def test_problem_with_gfunction_calc_obj():
     monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage  # kWh
 
     # create the borefield object
-    load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
+    load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_extraction, peak_injection)
     borefield = Borefield(load=load)
 
     borefield.set_ground_parameters(data)
@@ -242,8 +241,8 @@ def test_size_with_multiple_ground_layers():
     borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(4))
 
-    borefield.load.peak_cooling_duration = 8
-    borefield.load.peak_heating_duration = 6
+    borefield.load.peak_injection_duration = 8
+    borefield.load.peak_extraction_duration = 6
     assert np.isclose(97.16160816008234, borefield.size(L2_sizing=True))
     assert np.isclose(97.89883260681054, borefield.size(L3_sizing=True))
 
@@ -273,8 +272,8 @@ def test_if_gfunction_history_is_cleared_with_groundlayers():
     borefield = Borefield()
     borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 1, 0.075)
     borefield.ground_data = GroundFluxTemperature(1.7, 10)
-    borefield.gfunction(3600*20, 100)
-    borefield.gfunction(3600*20, 150)
+    borefield.gfunction(3600 * 20, 100)
+    borefield.gfunction(3600 * 20, 150)
     assert np.array_equal([100, 150], borefield.gfunction_calculation_object.depth_array)
 
     # now with multiple layers

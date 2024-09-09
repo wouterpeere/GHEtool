@@ -12,7 +12,6 @@ import pygfunction as gt
 import copy
 import itertools
 
-
 # set parameters
 glycol_single_lam = FluidData(0.2, 0.5, 1021.7, 3919, 0.0033)
 glycol_double_lam = FluidData(0.225, 0.5, 1021.7, 3919, 0.0033)
@@ -28,18 +27,17 @@ fluid_pipes_single = list(zip([glycol_single_lam, glycol_single_tur], [singe_u_p
 fluid_pipes_double = list(zip([glycol_double_lam, glycol_double_tur], [double_u_pipe_bad, double_u_pipe_good]))
 fluid_pipes = fluid_pipes_single + fluid_pipes_double
 
-
 office_load = HourlyGeothermalLoad()
 auditorium_load = HourlyGeothermalLoad()
 residential_load = HourlyGeothermalLoad()
-office_load.load_hourly_profile('office.csv', header=True, separator=";", col_cooling=0, col_heating=1)
-auditorium_load.load_hourly_profile('auditorium.csv', header=True, separator=";", col_cooling=0, col_heating=1)
-residential_load.load_hourly_profile('residential.csv', header=True, separator=";", col_cooling=1, col_heating=0)
+office_load.load_hourly_profile('office.csv', header=True, separator=";", col_injection=0, col_extraction=1)
+auditorium_load.load_hourly_profile('auditorium.csv', header=True, separator=";", col_injection=0, col_extraction=1)
+residential_load.load_hourly_profile('residential.csv', header=True, separator=";", col_injection=1, col_extraction=0)
 loads = [auditorium_load, office_load, residential_load]
 
 # convert to geothermal load using a SCOP of 5
 SCOP = 5
-factor = 1 - 1/SCOP
+factor = 1 - 1 / SCOP
 for load in loads:
     load.hourly_heating_load = load.hourly_heating_load * factor
 
@@ -74,7 +72,6 @@ def figure_1_2() -> None:
     # iterate over the different buildings and size the borefield
     for idx, (field, load) in enumerate(zip([auditorium_field, office_field, residential_field],
                                             [auditorium_load, office_load, residential_load])):
-
         borefield = Borefield(borefield=field, load=load)
         borefield.set_ground_parameters(ground_high_cond_low_gradient)
         borefield.set_max_ground_temperature(17)
@@ -141,8 +138,9 @@ def figure_3() -> None:
 
     # iterate over all flow type-pipe combinations
     field, load = auditorium_field, auditorium_load
-    for idx, (fluid, pipe) in enumerate(zip([glycol_double_lam, glycol_double_tur, glycol_single_lam, glycol_single_tur],
-                           [double_u_pipe_good, double_u_pipe_good, singe_u_pipe_good, singe_u_pipe_good])):
+    for idx, (fluid, pipe) in enumerate(
+            zip([glycol_double_lam, glycol_double_tur, glycol_single_lam, glycol_single_tur],
+                [double_u_pipe_good, double_u_pipe_good, singe_u_pipe_good, singe_u_pipe_good])):
         borefield = Borefield(borefield=field, load=load)
         borefield.set_ground_parameters(ground_high_cond_low_gradient)
         borefield.set_max_ground_temperature(17)
@@ -235,7 +233,7 @@ def figure_5_6() -> None:
     def calc() -> list:
         size_per_field = []
         for idx, (field, load) in enumerate(zip([auditorium_field, office_field, residential_field],
-                                                    [auditorium_load, office_load, residential_load])):
+                                                [auditorium_load, office_load, residential_load])):
             sizes = []
             for ground in grounds:
                 for fluid, pipe in fluid_pipes:
@@ -276,12 +274,18 @@ def figure_5_6() -> None:
     plt.plot(x, y, 'r.', alpha=0.2, label='Individual sizings')
 
     # add sizing based on rule of thumb
-    plt.arrow(0.4, auditorium_load.max_peak_cooling/ROT, -0.2, 0, length_includes_head=True, head_width=500, head_length=0.04, color="#377eb8", label='Rule of thumb cooling')  # cooling
-    plt.arrow(0.4, auditorium_load.max_peak_heating/ROT, -0.2, 0, length_includes_head=True, head_width=500, head_length=0.04, color="#ff7f00", label='Rule of thumb heating')
-    plt.arrow(1.4, office_load.max_peak_cooling/ROT, -0.2, 0, length_includes_head=True, head_width=500, head_length=0.04, color="#377eb8")  # cooling
-    plt.arrow(1.4, office_load.max_peak_heating/ROT, -0.2, 0, length_includes_head=True, head_width=500, head_length=0.04, color="#ff7f00")
-    plt.arrow(2.4, residential_load.max_peak_cooling/ROT, -0.2, 0, length_includes_head=True, head_width=500, head_length=0.04, color="#377eb8")  # cooling
-    plt.arrow(2.4, residential_load.max_peak_heating/ROT, -0.2, 0, length_includes_head=True, head_width=500, head_length=0.04, color="#ff7f00")
+    plt.arrow(0.4, auditorium_load.max_peak_cooling / ROT, -0.2, 0, length_includes_head=True, head_width=500,
+              head_length=0.04, color="#377eb8", label='Rule of thumb cooling')  # cooling
+    plt.arrow(0.4, auditorium_load.max_peak_heating / ROT, -0.2, 0, length_includes_head=True, head_width=500,
+              head_length=0.04, color="#ff7f00", label='Rule of thumb heating')
+    plt.arrow(1.4, office_load.max_peak_cooling / ROT, -0.2, 0, length_includes_head=True, head_width=500,
+              head_length=0.04, color="#377eb8")  # cooling
+    plt.arrow(1.4, office_load.max_peak_heating / ROT, -0.2, 0, length_includes_head=True, head_width=500,
+              head_length=0.04, color="#ff7f00")
+    plt.arrow(2.4, residential_load.max_peak_cooling / ROT, -0.2, 0, length_includes_head=True, head_width=500,
+              head_length=0.04, color="#377eb8")  # cooling
+    plt.arrow(2.4, residential_load.max_peak_heating / ROT, -0.2, 0, length_includes_head=True, head_width=500,
+              head_length=0.04, color="#ff7f00")
 
     # labels
     plt.ylabel('Total required borehole length [m]')
