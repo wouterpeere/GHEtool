@@ -33,7 +33,7 @@ def Swimming_pool():
     # put same pipe and grout vol. heat cap in modelica
     # size this model with modelica (based on average fluid temp)
 
-    num_pipes = [1, 2]
+    num_pipes = [2]
     gradients = [0, 1, 2]
 
     plot_load = False
@@ -137,7 +137,6 @@ def Swimming_pool():
             }
 
             options = {'nSegments': 12,
-                        'segment_ratios': None,
                         'disp': False,
                         'profiles': True,
                         'method': 'equivalent',

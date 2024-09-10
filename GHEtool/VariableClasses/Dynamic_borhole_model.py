@@ -487,7 +487,7 @@ class DynamicsBH(object):
                     ghe_logger.info(f"Perfect convergence with long-term g-function after {time/3600} hours")
                     
                 else:
-                    ghe_logger.info(f"No perfect convergence between long-term and short term g-functions, switch made after {time/3600} hours")
+                    ghe_logger.info(f"No perfect convergence between long-term and short term g-functions, switch made after {time/3600} hours with g-function difference of {stop_crit}")
                 break
             
         
