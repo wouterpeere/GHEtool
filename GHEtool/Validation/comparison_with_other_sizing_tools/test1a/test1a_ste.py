@@ -309,7 +309,6 @@ def test_1a_1h_ste():
     }
 
     options = {'nSegments': 12,
-                   'segment_ratios': None,
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
