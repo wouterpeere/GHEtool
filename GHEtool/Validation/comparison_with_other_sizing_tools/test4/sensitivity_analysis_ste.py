@@ -207,7 +207,6 @@ def test_4_sensitivity_ste():
     }
 
     options = {'nSegments': 12,
-                   'segment_ratios': None,
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
@@ -303,7 +302,6 @@ def test_4_sensitivity_ste():
     }
 
     options = {'nSegments': 12,
-                   'segment_ratios': None,
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
@@ -399,7 +397,6 @@ def test_4_sensitivity_ste():
     }
 
     options = {'nSegments': 12,
-                   'segment_ratios': None,
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
@@ -492,7 +489,6 @@ def test_4_sensitivity_ste():
     }
 
     options = {'nSegments': 12,
-                   'segment_ratios': None,
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
@@ -588,7 +584,6 @@ def test_4_sensitivity_ste():
     }
 
     options = {'nSegments': 12,
-                   'segment_ratios': None,
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
@@ -684,7 +679,6 @@ def test_4_sensitivity_ste():
     }
 
     options = {'nSegments': 12,
-                   'segment_ratios': None,
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
@@ -780,7 +774,6 @@ def test_4_sensitivity_ste():
     }
 
     options = {'nSegments': 12,
-                   'segment_ratios': None,
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
