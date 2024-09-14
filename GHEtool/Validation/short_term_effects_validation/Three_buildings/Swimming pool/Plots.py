@@ -26,7 +26,7 @@ GHEtool = [pd.read_csv("exports/L2_temperature_profile.csv", comment='#', sep=",
            pd.read_csv("exports/L4_temperature_profile.csv", comment='#', sep=",", header=None)[0]]
 
 max_temps = [np.max(i) - 273.15 for i in modelica]
-min_temps = [np.min(i) - 273.15for i in modelica]
+min_temps = [np.min(i) - 273.15 for i in modelica]
 
 rel_diff_max = [(17-i)/17*100 for i in max_temps]
 rel_diff_min = [(i-3)/3*100 for i in min_temps]

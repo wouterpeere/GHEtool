@@ -28,7 +28,7 @@ def test_4_sensitivity_ste():
 
     ## Peak magnitude 1 --PM_1
     # -125.7581 kW
-    # change peak mangnitude for all (3) months with higher cooling peaks
+    # change peak mangnitude for all (3) months with higher injection peaks
 
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=1.9, T_g=15, volumetric_heat_capacity=2052000, flux=0)
@@ -47,21 +47,21 @@ def test_4_sensitivity_ste():
     borefield.set_Rb(Rb_static)
 
     # load the monthly profile
-    baseload_heating = np.array([7.938 * 744, 3.784 * 720, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.853 * 744])
-    baseload_cooling = np.array(
+    baseload_extraction = np.array([7.938 * 744, 3.784 * 720, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.853 * 744])
+    baseload_injection = np.array(
         [0, 0, 8.085 * 744, 21.107 * 720, 35.048 * 744, 43.666 * 720, 46.983 * 744, 44.389 * 744, 34.678 * 720,
          18.686 * 744, 2.983 * 720, 0])
-    peak_heating = np.array([64.946, 60.735, 43.518, 37.849, 0, 0, 0, 0, 0, 5.737, 42.315, 57.209])
-    peak_cooling = np.array(
+    peak_extraction = np.array([64.946, 60.735, 43.518, 37.849, 0, 0, 0, 0, 0, 5.737, 42.315, 57.209])
+    peak_injection = np.array(
         [35.77, 53.548, 83.086, 93.549, 120.782, 125.7581, 125.7581, 125.7581, 111.780, 97.338, 52.843, 34.284])
 
-    load = MonthlyGeothermalLoadAbsolute(baseload_heating=baseload_heating, baseload_cooling=baseload_cooling,
-                                         peak_heating=peak_heating, peak_cooling=peak_cooling,
+    load = MonthlyGeothermalLoadAbsolute(baseload_extraction=baseload_extraction, baseload_injection=baseload_injection,
+                                         peak_extraction=peak_extraction, peak_injection=peak_injection,
                                          simulation_period=20)
     borefield.load = load
 
     # convert inlet fluid temperature to heap pump constraints to constraints on average fluid temperature
-    delta_t = max(load.max_peak_cooling, load.max_peak_cooling) * 1000 / (fluid_data.Cp * fluid_data.mfr) / 25
+    delta_t = max(load.max_peak_extraction, load.max_peak_injection) * 1000 / (fluid_data.Cp * fluid_data.mfr) / 25
 
     # set temperature bounds
     borefield.set_max_avg_fluid_temperature(38 + delta_t / 2)
@@ -101,21 +101,21 @@ def test_4_sensitivity_ste():
 
     # load the hourly profile
     # 
-    baseload_heating = np.array([7.938 * 744, 3.784 * 720, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.853 * 744])
-    baseload_cooling = np.array(
+    baseload_extraction = np.array([7.938 * 744, 3.784 * 720, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.853 * 744])
+    baseload_injection = np.array(
         [0, 0, 8.085 * 744, 21.107 * 720, 35.048 * 744, 43.666 * 720, 46.983 * 744, 44.389 * 744, 34.678 * 720,
          18.686 * 744, 2.983 * 720, 0])
-    peak_heating = np.array([64.946, 60.735, 43.518, 37.849, 0, 0, 0, 0, 0, 5.737, 42.315, 57.209])
-    peak_cooling = np.array(
+    peak_extraction = np.array([64.946, 60.735, 43.518, 37.849, 0, 0, 0, 0, 0, 5.737, 42.315, 57.209])
+    peak_injection = np.array(
         [35.77, 53.548, 83.086, 93.549, 120.782, 130.893, 153.7044, 131.761, 111.780, 97.338, 52.843, 34.284])
 
-    load = MonthlyGeothermalLoadAbsolute(baseload_heating=baseload_heating, baseload_cooling=baseload_cooling,
-                                         peak_heating=peak_heating, peak_cooling=peak_cooling,
+    load = MonthlyGeothermalLoadAbsolute(baseload_extraction=baseload_extraction, baseload_injection=baseload_injection,
+                                         peak_extraction=peak_extraction, peak_injection=peak_injection,
                                          simulation_period=20)
     borefield.load = load
 
     # convert inlet fluid temperature to heap pump constraints to constraints on average fluid temperature
-    delta_t = max(load.max_peak_cooling, load.max_peak_cooling) * 1000 / (fluid_data.Cp * fluid_data.mfr) / 25
+    delta_t = max(load.max_peak_extraction, load.max_peak_injection) * 1000 / (fluid_data.Cp * fluid_data.mfr) / 25
 
     # set temperature bounds
     borefield.set_max_avg_fluid_temperature(38 + delta_t / 2)
@@ -158,7 +158,7 @@ def test_4_sensitivity_ste():
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
     load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test4.csv'), header=True, separator=",",
-                             col_heating=1, col_cooling=0)
+                             col_extraction=1, col_injection=0)
     borefield.load = load
 
     # Sizing with constant Rb
@@ -252,7 +252,7 @@ def test_4_sensitivity_ste():
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
     load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test4.csv'), header=True, separator=",",
-                             col_heating=1, col_cooling=0)
+                             col_extraction=1, col_injection=0)
     borefield.load = load
 
     # Sizing with constant Rb
@@ -347,7 +347,7 @@ def test_4_sensitivity_ste():
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
     load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test4.csv'), header=True, separator=",",
-                             col_heating=1, col_cooling=0)
+                             col_extraction=1, col_injection=0)
     borefield.load = load
 
     # Sizing with constant Rb
@@ -534,7 +534,7 @@ def test_4_sensitivity_ste():
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
     load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test4.csv'), header=True, separator=",",
-                             col_heating=1, col_cooling=0)
+                             col_extraction=1, col_injection=0)
     borefield.load = load
 
     # Sizing with constant Rb
@@ -629,7 +629,7 @@ def test_4_sensitivity_ste():
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
     load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test4.csv'), header=True, separator=",",
-                             col_heating=1, col_cooling=0)
+                             col_extraction=1, col_injection=0)
     borefield.load = load
 
     # Sizing with constant Rb
@@ -724,7 +724,7 @@ def test_4_sensitivity_ste():
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
     load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test4.csv'), header=True, separator=",",
-                             col_heating=1, col_cooling=0)
+                             col_extraction=1, col_injection=0)
     borefield.load = load
 
     # Sizing with constant Rb
@@ -819,7 +819,7 @@ def test_4_sensitivity_ste():
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
     load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test4.csv'), header=True, separator=",",
-                             col_heating=1, col_cooling=0)
+                             col_extraction=1, col_injection=0)
     borefield.load = load
 
     # Sizing with constant Rb

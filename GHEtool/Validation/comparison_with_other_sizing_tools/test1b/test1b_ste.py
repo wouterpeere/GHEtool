@@ -41,11 +41,11 @@ def test_1b_ste():
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=10)
     load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test1b.csv'), header=True, separator=";",
-                             decimal_seperator=",", col_heating=1,
-                             col_cooling=0)
+                             decimal_seperator=",", col_extraction=1,
+                             col_injection=0)
     borefield.load = load
 
-    delta_t = max(load.max_peak_cooling, load.max_peak_cooling) * 1000 / (fluid_data.Cp * fluid_data.mfr)
+    delta_t = max(load.max_peak_extraction, load.max_peak_injection) * 1000 / (fluid_data.Cp * fluid_data.mfr)
 
     # set temperature bounds
     borefield.set_max_avg_fluid_temperature(35 + delta_t / 2)
