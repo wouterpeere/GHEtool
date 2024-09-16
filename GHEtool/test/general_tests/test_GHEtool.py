@@ -7,6 +7,8 @@ import numpy as np
 import pandas as pd
 import pygfunction as gt
 import pytest
+import pickle
+
 from pytest import raises
 
 from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, Borefield, CalculationSetup, FOLDER, \
@@ -300,3 +302,30 @@ def test_size_with_different_peak_lengths(borefield):
     borefield.load.peak_injection_duration = 8
     borefield.load.peak_extraction_duration = 6
     assert np.isclose(99.33058400216774, borefield.size(L3_sizing=True))
+
+
+def test_convergence_eer_combined():
+    borefield1: Borefield = pickle.load(open('test_optimise.pkl', 'rb'))
+    borefield1.set_max_avg_fluid_temperature(16)
+    borefield1.calculate_temperatures(hourly=True)
+    results_16 = copy.deepcopy(borefield1.results)
+    borefield1.set_max_avg_fluid_temperature(25)
+    borefield1.calculate_temperatures(hourly=True)
+    results_25 = copy.deepcopy(borefield1.results)
+    assert np.allclose(results_16.peak_injection, results_25.peak_injection)
+
+
+def test_optimise_load_eer_combined():
+    borefield1: Borefield = pickle.load(open('test_optimise.pkl', 'rb'))
+    borefield1.set_max_avg_fluid_temperature(16)
+    borefield1.calculate_temperatures(hourly=True)
+    results_16 = copy.deepcopy(borefield1.results)
+    borefield1.set_max_avg_fluid_temperature(25)
+    _, sec_load = borefield1.optimise_load_profile_power(borefield1.load)
+    borefield1.calculate_temperatures(hourly=True)
+    results_25 = copy.deepcopy(borefield1.results)
+    assert np.allclose(results_16.peak_injection, results_25.peak_injection)
+    _, sec_load = borefield1.optimise_load_profile_energy(borefield1.load)
+    borefield1.calculate_temperatures(hourly=True)
+    results_25 = copy.deepcopy(borefield1.results)
+    assert np.allclose(results_16.peak_injection, results_25.peak_injection)
