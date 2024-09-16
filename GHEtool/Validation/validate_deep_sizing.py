@@ -26,8 +26,9 @@ def validate():
     borefield.set_max_avg_fluid_temperature(17)
     borefield.set_min_avg_fluid_temperature(3)
     hourly_load = HourlyGeothermalLoad()
-    hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True, separator=";",
-                                  col_cooling=0, col_heating=1)
+    hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,
+                                    separator=";",
+                                    col_injection=0, col_extraction=1)
     borefield.load = hourly_load
 
     # initiate lists
@@ -39,10 +40,10 @@ def validate():
         print(f'The current depth is {depth} m.')
         borefield.calculate_temperatures(depth)
         Tg_list.append(borefield.ground_data.calculate_Tg(depth))
-        max_Tf_list.append(np.max(borefield.results.peak_cooling))
+        max_Tf_list.append(np.max(borefield.results.peak_injection))
 
     def f(x, a, b):
-        return a/x + b
+        return a / x + b
 
     # determine temperature difference between peak cooling temperature and ground temperature
     diff = np.array(max_Tf_list) - np.array(Tg_list)
@@ -65,10 +66,11 @@ def validate():
     plt.plot(depth_list, f(np.array(depth_list), *popt), label='Fitted difference')
     plt.xlabel('Depth [m]')
     plt.ylabel('Temperature difference [deg C]')
-    plt.title('Temperature difference between maximum peak cooling fluid\ntemperature and undistrubed ground temperature')
+    plt.title(
+        'Temperature difference between maximum peak cooling fluid\ntemperature and undistrubed ground temperature')
     plt.legend()
     plt.show()
 
 
-if __name__ == "__main__":   # pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
     validate()

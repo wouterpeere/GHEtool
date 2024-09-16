@@ -2,7 +2,8 @@ import pytest
 
 import numpy as np
 
-from GHEtool.VariableClasses import GroundFluxTemperature, GroundConstantTemperature, GroundTemperatureGradient, GroundLayer
+from GHEtool.VariableClasses import GroundFluxTemperature, GroundConstantTemperature, GroundTemperatureGradient, \
+    GroundLayer
 from GHEtool.VariableClasses import FluidData
 
 
@@ -17,16 +18,10 @@ def test_ground_layer_class():
     assert layer_2 != layer_1
     assert 10 == layer_2.non_negative(10)
     assert None is layer_2.non_negative(None)
-    try:
+    with pytest.raises(ValueError):
         layer_2.non_negative(0)
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
-    try:
+    with pytest.raises(ValueError):
         layer_2.non_negative(-10)
-        assert False  # pragma: no cover
-    except ValueError:
-        assert True
 
 
 def test_empty():
@@ -37,20 +32,20 @@ def test_empty():
 
 
 def test_ground_data_equal():
-    data = GroundFluxTemperature(3, 10, 2.4*10**6, 0.06)
-    data2 = GroundFluxTemperature(3, 10, 2.4*10**6, 0.06)
+    data = GroundFluxTemperature(3, 10, 2.4 * 10 ** 6, 0.06)
+    data2 = GroundFluxTemperature(3, 10, 2.4 * 10 ** 6, 0.06)
     assert data == data2
-    data = GroundConstantTemperature(3, 10, 2.4*10**6)
-    data2 = GroundConstantTemperature(3, 10, 2.4*10**6)
+    data = GroundConstantTemperature(3, 10, 2.4 * 10 ** 6)
+    data2 = GroundConstantTemperature(3, 10, 2.4 * 10 ** 6)
     assert data == data2
 
 
 def test_ground_data_unequal():
-    data = GroundFluxTemperature(3, 10, 2.4*10**6)
-    data2 = GroundFluxTemperature(3, 11, 2.4*10**6)
+    data = GroundFluxTemperature(3, 10, 2.4 * 10 ** 6)
+    data2 = GroundFluxTemperature(3, 11, 2.4 * 10 ** 6)
     assert data != data2
-    data = GroundConstantTemperature(3, 10, 2.4*10**6)
-    data2 = GroundConstantTemperature(3, 11, 2.4*10**6)
+    data = GroundConstantTemperature(3, 10, 2.4 * 10 ** 6)
+    data2 = GroundConstantTemperature(3, 11, 2.4 * 10 ** 6)
     assert data != data2
     fluid = FluidData(0.3, 3, 9710, 4165, 0.0001)
     assert fluid != data
@@ -64,9 +59,9 @@ def test_alpha():
 
 
 def test_Tg():
-    ground_flux_temperature = GroundFluxTemperature(3, 10, 2.4*10**6, 0.06)
+    ground_flux_temperature = GroundFluxTemperature(3, 10, 2.4 * 10 ** 6, 0.06)
     ground_constant_temperature = GroundConstantTemperature(3, 10)
-    ground_temperature_gradient = GroundTemperatureGradient(3, 10, 2.4*10**6, 2)
+    ground_temperature_gradient = GroundTemperatureGradient(3, 10, 2.4 * 10 ** 6, 2)
 
     assert ground_constant_temperature.calculate_Tg(100) == 10
     assert ground_flux_temperature.calculate_Tg(0) == 10
@@ -217,11 +212,12 @@ def test_multilayer_values():
     assert 1 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 1)
     assert 1 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 5)
     assert 1 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 10)
-    assert 1*10/11 + 2*1/11 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 11)
-    assert 1*10/20 + 2*10/20 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 20)
-    assert 1*10/24 + 2*14/24 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 24)
-    assert 1*10/25 + 2*15/25 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 25)
-    assert 1*10/30 + 2*15/30 + 1*5/30 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 30)
+    assert 1 * 10 / 11 + 2 * 1 / 11 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 11)
+    assert 1 * 10 / 20 + 2 * 10 / 20 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 20)
+    assert 1 * 10 / 24 + 2 * 14 / 24 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 24)
+    assert 1 * 10 / 25 + 2 * 15 / 25 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 25)
+    assert 1 * 10 / 30 + 2 * 15 / 30 + 1 * 5 / 30 == constant.calculate_value(depth_array, np.cumsum(depth_array),
+                                                                              k_s_array, 30)
     assert np.isclose(1.99997, constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 1000000))
 
     layer_1 = GroundLayer(k_s=1, thickness=10)
@@ -231,5 +227,5 @@ def test_multilayer_values():
 
     constant = GroundConstantTemperature()
     constant.add_layer_on_bottom([layer_1, layer_2, layer_3, layer_4])
-    assert 1*10/30 + 2*15/30 + 1*5/30 == constant.k_s(30)
+    assert 1 * 10 / 30 + 2 * 15 / 30 + 1 * 5 / 30 == constant.k_s(30)
     assert 2400000.0 == constant.volumetric_heat_capacity(30)

@@ -16,16 +16,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   yearly_heating_peak_simulation_period and yearly_cooling_peak_simulation_period to the Load class (issue #265).
 - Added max peak heating/cooling to optimise_load_profile functions (issue #276).
 - Added pressure drop across a U-tube (issue #278).
+- Efficiency classes for COP, EER, SCOP, SEER (issue #285).
+- Added building laod classes (issue #288).
+- Added __eq__ method for Result and Efficiency classes (issue #288).
+- Added _time_array to building loads (issue #291).
+- Added EERCombined for combined active and passive cooling efficiency (issue #291, #296).
 
 ## Changed
 
+- No longer support of Python 3.8.
+- Vfr in FluidData now returns also a value if vfr = None based on the mfr.
+- Changed definition of the geothermal load classes to use injection/extraction terminology instead of cooling/heating (
+  issue #220).
 - Change skopt to Optuna in active_passive_cooling (issue #258).
 - Moved plot_load_duration to HourlyLoad class (issue #260).
 - Clean up Baseclass (issue #260).
 - Removed depreciated 'optimise_load_profile', '_percentage_heating', '_percentage_cooling' from Borefield.py (issue
   #268).
 - Removed '_external_load', '_secundary_borefield_load', '_building_load' from Borefield.py (issue #268).
-- Vfr in FluidData now returns also a value if vfr = None based on the mfr.
+- Added DHW profiles to Building load classes (issue #273).
+- Split Results class into ResultsHourly and ResultsMonthly (issue #281).
+- Moved implementation of 'optimise_load_profile_power' and 'optimise_load_profile_energy' into a separate document (
+  issue #283).
+- Removed a couple of log messages (issue #288).
+- Optimise load profile works with a variable COP/EER (issue #288).
 
 ## Fixed
 
@@ -33,6 +47,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fix plot_load_duration (issue #260).
 - Problem in CI/CD and testing for python <3.12 (issue #274).
 - Fix compatibility with numpy 2.0 (issue #274).
+- Fix problem with start month and zero peak loads (issue #288).
 
 ## [2.2.2] - 2024-05-16
 
