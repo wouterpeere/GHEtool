@@ -199,7 +199,9 @@ def optimise_load_profile_energy(
         building_load = HourlyBuildingLoadMultiYear(building_load.hourly_heating_load_simulation_period,
                                                     building_load.hourly_cooling_load_simulation_period,
                                                     building_load._cop,
-                                                    building_load._eer)
+                                                    building_load._eer,
+                                                    building_load.hourly_dhw_load_simulation_period,
+                                                    building_load._cop_dhw)
 
     # set max peak values
     init_peak_heating = building_load.hourly_heating_load_simulation_period.copy()
@@ -239,7 +241,9 @@ def optimise_load_profile_energy(
             peak_heating=building_load.monthly_peak_heating_simulation_period,
             peak_cooling=building_load.monthly_peak_cooling_simulation_period,
             efficiency_heating=building_load._cop,
-            efficiency_cooling=building_load._eer)
+            efficiency_cooling=building_load._eer,
+            dhw=building_load.monthly_baseload_dhw_simulation_period,
+            efficiency_dhw=building_load._cop_dhw)
 
     borefield.load = monthly_load
 
