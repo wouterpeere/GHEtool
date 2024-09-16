@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from GHEtool import FOLDER
-from GHEtool.VariableClasses import HourlyBuildingLoad
+from GHEtool.VariableClasses import HourlyBuildingLoad, Cluster
 from GHEtool.VariableClasses.Result import ResultsMonthly, ResultsHourly
 
 from GHEtool.VariableClasses.Efficiency import *
@@ -645,3 +645,33 @@ def test_time_array():
     load.start_month = 2
     assert np.allclose(load.month_indices, np.tile(np.concatenate((
         np.repeat(np.arange(1, 13), load.UPM)[730:], np.repeat(np.arange(1, 13), load.UPM)[:730])), 10))
+
+
+def test_cluster():
+    load1 = HourlyBuildingLoad(np.linspace(1, 2000, 8760), np.linspace(1, 8760 - 1, 8760) * 2, 10, cop_basic, eer_basic)
+    load2 = HourlyBuildingLoad(np.linspace(1, 2000, 8760), np.linspace(1, 8760 - 1, 8760) * 2, 10, cop_basic, eer_basic)
+    load = HourlyBuildingLoad(np.linspace(1, 2000, 8760) * 2, np.linspace(1, 8760 - 1, 8760) * 2 * 2, 10, cop_basic,
+                              eer_basic)
+
+    cluster = Cluster([load1, load2])
+
+    assert np.allclose(load.monthly_baseload_extraction,
+                       cluster.monthly_baseload_extraction)
+    assert np.allclose(load.monthly_baseload_injection,
+                       cluster.monthly_baseload_injection)
+    assert np.allclose(load.monthly_peak_extraction,
+                       cluster.monthly_peak_extraction)
+    assert np.allclose(load.monthly_peak_injection,
+                       cluster.monthly_peak_injection)
+    assert np.allclose(load.hourly_extraction_load, cluster.hourly_extraction_load)
+    assert np.allclose(load.hourly_injection_load, cluster.hourly_injection_load)
+
+    load.reset_results(0, 10)
+    cluster.reset_results(0, 10)
+    assert np.allclose(load.hourly_extraction_load, cluster.hourly_extraction_load)
+    assert np.allclose(load.hourly_injection_load, cluster.hourly_injection_load)
+
+    load.set_results(results_hourly_test)
+    cluster.set_results(results_hourly_test)
+    assert np.allclose(load.hourly_extraction_load, cluster.hourly_extraction_load)
+    assert np.allclose(load.hourly_injection_load, cluster.hourly_injection_load)

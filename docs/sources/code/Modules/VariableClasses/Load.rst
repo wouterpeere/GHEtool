@@ -67,3 +67,7 @@ All of the load classes are based children of the abstract load classes.
 .. automodule:: GHEtool.VariableClasses.LoadData.BuildingLoad.HourlyBuildingLoadMultiYear
     :members:
     :show-inheritance:
+
+.. automodule:: GHEtool.VariableClasses.LoadData.Cluster.Cluster
+    :members:
+    :show-inheritance:

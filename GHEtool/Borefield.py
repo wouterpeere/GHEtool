@@ -17,7 +17,7 @@ from numpy.typing import ArrayLike
 from scipy.signal import convolve
 
 from GHEtool.VariableClasses import FluidData, Borehole, GroundConstantTemperature, ResultsMonthly, ResultsHourly
-from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, CalculationSetup
+from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, CalculationSetup, Cluster
 from GHEtool.VariableClasses.LoadData import *
 from GHEtool.VariableClasses.LoadData import _LoadData, _LoadDataBuilding
 from GHEtool.VariableClasses.PipeData import _PipeData
@@ -497,13 +497,13 @@ class Borefield(BaseClass):
             investment_cost = Borefield.DEFAULT_INVESTMENT
         self.cost_investment: list = investment_cost
 
-    def set_load(self, load: _LoadData) -> None:
+    def set_load(self, load: Union[_LoadData, Cluster]) -> None:
         """
         This function sets the _load attribute.
 
         Parameters
         ----------
-        load : _LoadData
+        load : _LoadData or Cluster
             Load data object
 
         Returns
@@ -525,13 +525,13 @@ class Borefield(BaseClass):
         return self._borefield_load
 
     @load.setter
-    def load(self, load: _LoadData) -> None:
+    def load(self, load: Union[_LoadData, Cluster]) -> None:
         """
         This function sets the _load attribute.
 
         Parameters
         ----------
-        load : _LoadData
+        load : _LoadData or Cluster
             Load data object
 
         Returns
