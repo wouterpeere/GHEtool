@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added __eq__ method for Result and Efficiency classes (issue #288).
 - Added _time_array to building loads (issue #291).
 - Added EERCombined for combined active and passive cooling efficiency (issue #291, #296).
+- Cluster Class (issue #298).
 
 ## Changed
 
