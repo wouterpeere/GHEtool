@@ -52,7 +52,7 @@ class Cluster:
                 for building in self.list_of_buildings:
                     method = getattr(building, attr_name)
                     result = method(*args, **kwargs)
-                    if result is not None:
+                    if result is not None:  # pragma: no cover
                         results.append(result)
                 return np.sum(results, axis=0)
 

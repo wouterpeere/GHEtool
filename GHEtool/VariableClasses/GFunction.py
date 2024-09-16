@@ -9,7 +9,7 @@ from scipy import interpolate
 
 from .CustomGFunction import _time_values
 
-from GHEtool.VariableClasses._Cylindrical_correction import update_pygfunction
+from GHEtool.VariableClasses.Cylindrical_correction import update_pygfunction
 
 # add cylindrical correction to pygfunction
 update_pygfunction()
