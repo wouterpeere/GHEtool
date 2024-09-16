@@ -316,7 +316,7 @@ def test_convergence_eer_combined():
 
 
 def test_optimise_load_eer_combined():
-    borefield1: Borefield = pickle.load(open('test_optimise.pkl', 'rb'))
+    borefield1: Borefield = pickle.load(open(FOLDER.joinpath("test/general_tests/test_optimise.pkl"), 'rb'))
     borefield1.set_max_avg_fluid_temperature(16)
     borefield1.calculate_temperatures(hourly=True)
     results_16 = copy.deepcopy(borefield1.results)
