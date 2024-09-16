@@ -368,7 +368,9 @@ def test_cluster():
     load1 = MonthlyGeothermalLoadAbsolute(*load_case(1))
     load2 = MonthlyGeothermalLoadAbsolute(*load_case(2))
     cluster = Cluster([load1, load2])
-
+    cluster2 = Cluster()
+    cluster2.add_building(load1)
+    cluster2.add_building(load2)
     assert np.allclose(load1.monthly_baseload_extraction + load2.monthly_baseload_extraction,
                        cluster.monthly_baseload_extraction)
     assert np.allclose(load1.monthly_baseload_injection + load2.monthly_baseload_injection,
@@ -377,6 +379,13 @@ def test_cluster():
                        cluster.monthly_peak_extraction)
     assert np.allclose(load1.monthly_peak_injection + load2.monthly_peak_injection,
                        cluster.monthly_peak_injection)
-
+    assert np.allclose(load1.monthly_baseload_extraction + load2.monthly_baseload_extraction,
+                       cluster2.monthly_baseload_extraction)
+    assert np.allclose(load1.monthly_baseload_injection + load2.monthly_baseload_injection,
+                       cluster2.monthly_baseload_injection)
+    assert np.allclose(load1.monthly_peak_extraction + load2.monthly_peak_extraction,
+                       cluster2.monthly_peak_extraction)
+    assert np.allclose(load1.monthly_peak_injection + load2.monthly_peak_injection,
+                       cluster2.monthly_peak_injection)
     cluster.simulation_period = 21
     assert cluster.list_of_buildings[0].simulation_period == 21

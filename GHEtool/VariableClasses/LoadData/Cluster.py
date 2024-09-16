@@ -5,7 +5,7 @@ from GHEtool.VariableClasses.LoadData.Baseclasses._LoadData import _LoadData
 
 class Cluster:
 
-    def __init__(self, buildings: list[_LoadData]):
+    def __init__(self, buildings: list[_LoadData] = []):
         """
         Parameters
         ----------
