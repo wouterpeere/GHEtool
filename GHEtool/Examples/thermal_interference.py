@@ -229,7 +229,7 @@ def main():
     hourly_load = HourlyGeothermalLoad()
     hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\hourly_profile.csv"), header=True,
                                     separator=";",
-                                    col_cooling=1, col_heating=0)
+                                    col_injection=1, col_extraction=0)
     borefield.load = hourly_load
 
     # Borefields

@@ -1,4 +1,5 @@
 import copy
+import pickle
 
 import numpy as np
 import pandas as pd
@@ -6,6 +7,8 @@ import pygfunction as gt
 import matplotlib.pyplot as plt
 
 from GHEtool import *
+from GHEtool.Examples.thermal_interference import get_cross_gfunction
+from GHEtool.VariableClasses.CustomGFunction import _time_values
 
 # design parameters
 ground_data = GroundConstantTemperature(2.29, 12.3, 2.41 * 10 ** 6)
@@ -81,7 +84,7 @@ for idx, row in coordinates.iterrows():
     borefield2.append(gt.boreholes.Borehole(H=H + row['Z'], D=-row['Z'], r_b=r_b, x=row['X'], y=row['Y']))
 
 
-def make_results(borefield, name, sec_load=None):
+def make_results(borefield, name, sec_load=None, individual=False):
     # get further results
     active_cooling_array = borefield.load.eer.get_time_series_active_cooling(borefield.results.peak_injection,
                                                                              borefield.load.month_indices)
@@ -107,8 +110,8 @@ def make_results(borefield, name, sec_load=None):
             f'LW cooling: {np.max(sec_load.max_peak_cooling):.2f}kW | {sec_load.yearly_average_cooling_load / 1000:.2f}MWh')
         print(
             f'LW heating: {np.max(sec_load.max_peak_heating):.2f}kW | {sec_load.yearly_average_heating_load / 1000:.2f}MWh')
-
-    make_TCO(borefield, sec_load)
+    if not individual:
+        make_TCO(borefield, sec_load)
 
     # plot active/passive and SEER
     fig3, ax5 = plt.subplots()
@@ -349,6 +352,20 @@ def multiple_fields():
 
     names = ["kantoor", "hotel", "terminal"]
 
+    # cross_g_functions = get_cross_gfunction([borefield_kantoor, borefield_hotel, borefield_terminal], _time_values(),
+    #                                        ground_data.alpha())
+    # pickle.dump(cross_g_function, open('cross_g_function.pkl', 'wb'))
+    # cross_g_functions[i][j] = g(j->i) met 0: kantoor, 1: hotel en 2: terminal
+
+    cross_g_functions = pickle.load(open('cross_g_function.pkl', 'rb'))
+    options_BWT = {
+        'nSegments': 8,
+        'disp': False,
+        'kClusters': 1,
+        'profiles': True}
+    time_array = kantoor.time_L4 / 12 / 3600 / 730
+
+    # set params
     for idx, borefield in enumerate(borefields):
         borefield.ground_data = ground_data
         borefield.set_pipe_parameters(pipe_data)
@@ -356,10 +373,47 @@ def multiple_fields():
         borefield.set_max_avg_fluid_temperature(17)
         borefield.set_min_avg_fluid_temperature(2)
 
-        borefield.calculate_temperatures(hourly=True)
-        make_results(borefield, names[idx])
+    # 1) calculate temperatures
+    for iter in range(5):
+        # calculate temperatures
+        for idx, borefield in enumerate(borefields):
+            borefield.calculate_temperatures(hourly=True)
 
+        # correct for temperature difference
+        Tb_diff = [0, 0, 0]
+        for i in range(3):
+            for j in range(3):
+                if i != j:
+                    borefield = copy.deepcopy(borefields[j])
+                    borefield.custom_gfunction = CustomGFunction(_time_values(), np.array([borefield.H]), options_BWT)
+                    borefield.custom_gfunction.gvalues_array[0] = cross_g_functions[i][j]
+                    _ = HourlyGeothermalLoadMultiYear(borefields[j].load.hourly_extraction_load_simulation_period,
+                                                      borefields[j].load.hourly_injection_load_simulation_period)
+                    borefield.load = _
+                    borefield.Tg_initial = None
+                    borefield.calculate_temperatures(hourly=True)
+                    Tb_diff[i] += -ground_data.calculate_Tg(borefield.H) + borefield.results.Tb
+                    # plt.figure()
+                    # plt.plot(time_array, -ground_data.calculate_Tg(borefield.H) + borefield.results.Tb)
+                    # plt.title(f'Temperatuurseffect van veld {names[j]} op veld {names[i]}')
+                    # plt.xlabel('Tijd [jaar]')
+                    # plt.ylabel('DT [°C]')
+                    # plt.show()
+            # plt.figure()
+            # plt.plot(time_array, Tb_diff[i])
+            # plt.xlabel('Tijd [jaar]')
+            # plt.ylabel('DT [°C]')
+            # plt.title(f'Temperatuursdaling {names[i]}')
+            # plt.show()
 
+        # update temperatures
+        for idx, borefield in enumerate(borefields):
+            borefield.Tg_initial = Tb_diff[idx]
+
+    for idx, borefield in enumerate(borefields):
+        make_results(borefield, names[idx], individual=True)
+
+    
 if __name__ == "__main__":
-    one_field()
-    # multiple_fields()
+    # one_field()
+    multiple_fields()

@@ -121,7 +121,7 @@ class Borefield(BaseClass):
 
         # initialize variables for temperature plotting
         self.results: ResultsMonthly | ResultsHourly = ResultsMonthly()
-
+        self.Tg_initial = None
         # initiate ground parameters
         self._H = 0.0  # borehole depth m
         self._ground_data: _GroundData = GroundConstantTemperature()
@@ -1694,6 +1694,8 @@ class Borefield(BaseClass):
 
                 # calculation the borehole wall temperature for every month i
                 Tb = results / (2 * pi * self.ground_data.k_s(H)) / (H * self.number_of_boreholes) + self._Tg(H)
+                if self.Tg_initial is not None:
+                    Tb += self.Tg_initial
 
                 # now the Tf will be calculated based on
                 # Tf = Tb + Q * R_b
