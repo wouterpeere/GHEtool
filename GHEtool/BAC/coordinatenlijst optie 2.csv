@@ -1,0 +1,634 @@
+﻿KOLOM;RIJ;ID;X;Y;Z;;ID_RVT;NOTA_RVT
+1;1;001-001;0;4;-1;;11157839;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+1;2;001-002;0;12,1;-1;;11157838;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+1;3;001-003;0;20,2;-1;;11157837;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+1;4;001-004;0;28,3;-2,5;;11157836;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+1;5;001-005;0;36,4;-1;;11157835;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+1;6;001-006;0;44,5;-1;;11157834;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+1;7;001-007;0;52,6;-1;;11157833;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+1;8;001-008;0;60,7;-1;;11157832;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+1;9;001-009;0;68,8;-1;;11157831;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+1;10;001-010;0;76,9;-1;;11157830;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+1;11;001-011;0;85;-1;;11157829;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+1;12;001-012;0;93,1;-1;;11157828;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+1;13;001-013;0;101,2;-1;;11157827;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+1;14;001-014;0;109,3;-1;;11157826;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+1;15;001-015;0;117,4;-1;;11159682;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+2;1;002-001;4,05;0;-1;;11157853;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+2;2;002-002;4,05;8,1;-1;;11157852;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+2;3;002-003;4,05;16,2;-1;;11157851;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+2;4;002-004;4,05;24,3;-2,5;;11157850;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+2;5;002-005;4,05;32,4;-2,5;;11157849;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+2;6;002-006;4,05;40,5;-1;;11157848;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+2;7;002-007;4,05;48,6;-1;;11157847;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+2;8;002-008;4,05;56,7;-1;;11157846;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+2;9;002-009;4,05;64,8;-1;;11157845;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+2;10;002-010;4,05;72,9;-1;;11157844;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+2;11;002-011;4,05;81;-1;;11157843;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+2;12;002-012;4,05;89,1;-1;;11157842;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+2;13;002-013;4,05;97,2;-1;;11157841;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+2;14;002-014;4,05;105,3;-1;;11157840;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+2;15;002-015;4,05;113,4;-1;;11159684;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+2;16;002-016;4,05;121,5;-1;;11159683;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+3;1;003-001;8,1;4;-1;;11157867;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+3;2;003-002;8,1;12,1;-1;;11157866;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+3;3;003-003;8,1;20,2;-1;;11157865;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+3;4;003-004;8,1;28,3;-2,5;;11157864;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+3;5;003-005;8,1;36,4;-1;;11157863;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+3;6;003-006;8,1;44,5;-1;;11157862;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+3;7;003-007;8,1;52,6;-1;;11157861;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+3;8;003-008;8,1;60,7;-1;;11157860;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+3;9;003-009;8,1;68,8;-1;;11157859;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+3;10;003-010;8,1;76,9;-1;;11157858;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+3;11;003-011;8,1;85;-1;;11157857;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+3;12;003-012;8,1;93,1;-1;;11157856;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+3;13;003-013;8,1;101,2;-1;;11157855;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+3;14;003-014;8,1;109,3;-1;;11157854;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+3;15;003-015;8,1;117,4;-1;;11159686;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+4;1;004-001;12,15;0;-1;;11157881;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+4;2;004-002;12,15;8,1;-1;;11157880;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+4;3;004-003;12,15;16,2;-1;;11157879;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+4;4;004-004;12,15;24,3;-2,5;;11157878;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+4;5;004-005;12,15;32,4;-2,5;;11157877;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+4;6;004-006;12,15;40,5;-1;;11157876;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+4;7;004-007;12,15;48,6;-1;;11157875;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+4;8;004-008;12,15;56,7;-1;;11157874;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+4;9;004-009;12,15;64,8;-1;;11157873;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+4;10;004-010;12,15;72,9;-1;;11157872;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+4;11;004-011;12,15;81;-1;;11157871;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+4;12;004-012;12,15;89,1;-1;;11157870;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+4;13;004-013;12,15;97,2;-1;;11157869;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+4;14;004-014;12,15;105,3;-1;;11157868;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+4;15;004-015;12,15;113,4;-1;;11159688;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+4;16;004-016;12,15;121,5;-1;;11159687;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+5;1;005-001;16,2;4;-1;;11157895;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+5;2;005-002;16,2;12,1;-1;;11157894;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+5;3;005-003;16,2;20,2;-1;;11157893;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+5;4;005-004;16,2;28,3;-2,5;;11157892;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+5;5;005-005;16,2;36,4;-1;;11157891;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+5;6;005-006;16,2;44,5;-1;;11157890;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+5;7;005-007;16,2;52,6;-1;;11157889;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+5;8;005-008;16,2;60,7;-1;;11157888;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+5;9;005-009;16,2;68,8;-1;;11157887;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+5;10;005-010;16,2;76,9;-1;;11157886;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+5;11;005-011;16,2;85;-1;;11157885;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+5;12;005-012;16,2;93,1;-1;;11157884;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+5;13;005-013;16,2;101,2;-1;;11157883;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+5;14;005-014;16,2;109,3;-1;;11157882;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+5;15;005-015;16,2;117,4;-1;;11159690;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+6;1;006-001;20,25;0;-1;;11157909;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+6;2;006-002;20,25;8,1;-1;;11157908;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+6;3;006-003;20,25;16,2;-1;;11157907;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+6;4;006-004;20,25;24,3;-2,5;;11157906;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+6;5;006-005;20,25;32,4;-2,5;;11157905;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+6;6;006-006;20,25;40,5;-1;;11157904;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+6;7;006-007;20,25;48,6;-1;;11157903;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+6;8;006-008;20,25;56,7;-1;;11157902;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+6;9;006-009;20,25;64,8;-1;;11157901;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+6;10;006-010;20,25;72,9;-1;;11157900;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+6;11;006-011;20,25;81;-1;;11157899;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+6;12;006-012;20,25;89,1;-1;;11157898;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+6;13;006-013;20,25;97,2;-1;;11157897;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+6;14;006-014;20,25;105,3;-1;;11157896;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+6;15;006-015;20,25;113,4;-1;;11159692;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+6;16;006-016;20,25;121,5;-1;;11159691;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+7;1;007-001;24,3;4;-1;;11157923;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+7;2;007-002;24,3;12,1;-1;;11157922;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+7;4;007-004;24,3;28,3;-2,5;;11157920;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+7;5;007-005;24,3;36,4;-1;;11157919;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+7;6;007-006;24,3;44,5;-1;;11157918;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+7;7;007-007;24,3;52,6;-1;;11157917;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+7;8;007-008;24,3;60,7;-1;;11157916;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+7;9;007-009;24,3;68,8;-1;;11157915;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+7;10;007-010;24,3;76,9;-1;;11157914;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+7;11;007-011;24,3;85;-1;;11157913;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+7;12;007-012;24,3;93,1;-1;;11157912;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+7;13;007-013;24,3;101,2;-1;;11157911;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+7;14;007-014;24,3;109,3;-1;;11157910;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+7;15;007-015;24,3;117,4;-1;;11159694;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+8;1;008-001;28,35;0;-1;;11157937;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+8;2;008-002;28,35;8,1;-1;;11157936;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+8;5;008-005;28,35;32,4;-2,5;;11157933;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+8;6;008-006;28,35;40,5;-1;;11157932;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+8;7;008-007;28,35;48,6;-1;;11157931;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+8;8;008-008;28,35;56,7;-1;;11157930;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+8;9;008-009;28,35;64,8;-1;;11157929;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+8;10;008-010;28,35;72,9;-1;;11157928;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+8;11;008-011;28,35;81;-1;;11157927;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+8;12;008-012;28,35;89,1;-1;;11157926;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+8;13;008-013;28,35;97,2;-1;;11157925;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+8;14;008-014;28,35;105,3;-1;;11157924;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+8;15;008-015;28,35;113,4;-1;;11159696;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+8;16;008-016;28,35;121,5;-1;;11159695;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+9;1;009-001;32,4;4;-1;;11157951;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+9;2;009-002;32,4;12,1;-1;;11157950;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+9;4;009-004;32,4;28,3;-5;;11157948;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+9;5;009-005;32,4;36,4;-5;;11157947;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+9;6;009-006;32,4;44,5;-1;;11157946;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+9;7;009-007;32,4;52,6;-1;;11157945;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+9;8;009-008;32,4;60,7;-1;;11157944;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+9;9;009-009;32,4;68,8;-1;;11157943;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+9;10;009-010;32,4;76,9;-1;;11157942;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+9;11;009-011;32,4;85;-1;;11157941;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+9;12;009-012;32,4;93,1;-1;;11157940;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+9;13;009-013;32,4;101,2;-1;;11157939;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+9;14;009-014;32,4;109,3;-1;;11157938;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+9;15;009-015;32,4;117,4;-1;;11159698;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+10;1;010-001;36,45;0;-1;;11157965;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+10;2;010-002;36,45;8,1;-1;;11157964;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+10;3;010-003;36,45;16,2;-1;;11157963;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+10;4;010-004;36,45;24,3;-2,5;;11157962;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+10;5;010-005;36,45;32,4;-5;;11157961;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+10;6;010-006;36,45;40,5;-1;;11157960;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+10;7;010-007;36,45;48,6;-1;;11157959;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+10;8;010-008;36,45;56,7;-1;;11157958;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+10;9;010-009;36,45;64,8;-1;;11157957;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+10;10;010-010;36,45;72,9;-1;;11157956;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+10;11;010-011;36,45;81;-1;;11157955;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+10;12;010-012;36,45;89,1;-1;;11157954;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+10;13;010-013;36,45;97,2;-1;;11157953;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+10;14;010-014;36,45;105,3;-1;;11157952;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+10;15;010-015;36,45;113,4;-1;;11159700;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+10;16;010-016;36,45;121,5;-1;;11159699;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+11;1;011-001;40,5;4;-1;;11157979;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+11;2;011-002;40,5;12,1;-1;;11157978;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+11;3;011-003;40,5;20,2;-1;;11157977;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+11;4;011-004;40,5;28,3;-5;;11157976;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+11;5;011-005;40,5;36,4;-5;;11157975;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+11;6;011-006;40,5;44,5;-1;;11157974;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+11;7;011-007;40,5;52,6;-1;;11157973;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+11;8;011-008;40,5;60,7;-1;;11157972;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+11;9;011-009;40,5;68,8;-1;;11157971;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+11;10;011-010;40,5;76,9;-1;;11157970;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+11;11;011-011;40,5;85;-1;;11157969;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+11;12;011-012;40,5;93,1;-1;;11157968;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+11;13;011-013;40,5;101,2;-1;;11157967;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+11;14;011-014;40,5;109,3;-1;;11157966;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+11;15;011-015;40,5;117,4;-1;;11159702;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+12;1;012-001;44,55;0;-1;;11157993;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+12;2;012-002;44,55;8,1;-1;;11157992;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+12;3;012-003;44,55;16,2;-1;;11157991;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+12;4;012-004;44,55;24,3;-2,5;;11157990;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+12;5;012-005;44,55;32,4;-5;;11157989;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+12;6;012-006;44,55;40,5;-1;;11157988;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+12;7;012-007;44,55;48,6;-1;;11157987;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+12;8;012-008;44,55;56,7;-1;;11157986;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+12;9;012-009;44,55;64,8;-1;;11157985;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+12;10;012-010;44,55;72,9;-1;;11157984;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+12;11;012-011;44,55;81;-1;;11157983;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+12;12;012-012;44,55;89,1;-1;;11157982;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+12;13;012-013;44,55;97,2;-1;;11157981;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+12;14;012-014;44,55;105,3;-1;;11157980;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+12;15;012-015;44,55;113,4;-1;;11159704;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+12;16;012-016;44,55;121,5;-1;;11159703;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+13;1;013-001;48,6;4;-1;;11158007;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+13;2;013-002;48,6;12,1;-1;;11158006;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+13;3;013-003;48,6;20,2;-1;;11158005;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+13;4;013-004;48,6;28,3;-5;;11158004;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+13;5;013-005;48,6;36,4;-5;;11158003;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+13;6;013-006;48,6;44,5;-1;;11158002;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+13;7;013-007;48,6;52,6;-1;;11158001;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+13;8;013-008;48,6;60,7;-1;;11158000;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+13;9;013-009;48,6;68,8;-1;;11157999;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+13;10;013-010;48,6;76,9;-1;;11157998;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+13;11;013-011;48,6;85;-1;;11157997;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+13;12;013-012;48,6;93,1;-1;;11157996;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+13;13;013-013;48,6;101,2;-1;;11157995;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+13;14;013-014;48,6;109,3;-1;;11157994;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+13;15;013-015;48,6;117,4;-1;;11159706;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+14;1;014-001;52,65;0;-1;;11158021;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+14;2;014-002;52,65;8,1;-1;;11158020;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+14;3;014-003;52,65;16,2;-1;;11158019;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+14;4;014-004;52,65;24,3;-2,5;;11158018;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+14;5;014-005;52,65;32,4;-5;;11158017;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+14;6;014-006;52,65;40,5;-1;;11158016;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+14;7;014-007;52,65;48,6;-1;;11158015;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+14;8;014-008;52,65;56,7;-1;;11158014;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+14;9;014-009;52,65;64,8;-1;;11158013;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+14;10;014-010;52,65;72,9;-1;;11158012;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+14;11;014-011;52,65;81;-1;;11158011;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+14;12;014-012;52,65;89,1;-1;;11158010;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+14;13;014-013;52,65;97,2;-1;;11158009;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+14;14;014-014;52,65;105,3;-1;;11158008;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+14;15;014-015;52,65;113,4;-1;;11159708;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+14;16;014-016;52,65;121,5;-1;;11159707;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+15;1;015-001;56,7;4;-1;;11158035;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+15;2;015-002;56,7;12,1;-1;;11158034;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+15;4;015-004;56,7;28,3;-5;;11158032;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+15;5;015-005;56,7;36,4;-5;;11158031;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+15;6;015-006;56,7;44,5;-1;;11158030;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+15;7;015-007;56,7;52,6;-1;;11158029;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+15;8;015-008;56,7;60,7;-1;;11158028;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+15;9;015-009;56,7;68,8;-1;;11158027;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+15;10;015-010;56,7;76,9;-1;;11158026;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+15;11;015-011;56,7;85;-1;;11158025;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+15;12;015-012;56,7;93,1;-1;;11158024;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+15;13;015-013;56,7;101,2;-1;;11158023;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+15;14;015-014;56,7;109,3;-1;;11158022;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+15;15;015-015;56,7;117,4;-1;;11159710;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+16;1;016-001;60,75;0;-1;;11158049;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+16;2;016-002;60,75;8,1;-1;;11158048;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+16;5;016-005;60,75;32,4;-5;;11158045;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+16;6;016-006;60,75;40,5;-1;;11158044;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+16;7;016-007;60,75;48,6;-1;;11158043;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+16;8;016-008;60,75;56,7;-1;;11158042;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+16;9;016-009;60,75;64,8;-1;;11158041;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+16;10;016-010;60,75;72,9;-1;;11158040;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+16;11;016-011;60,75;81;-1;;11158039;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+16;12;016-012;60,75;89,1;-1;;11158038;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+16;13;016-013;60,75;97,2;-1;;11158037;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+16;14;016-014;60,75;105,3;-1;;11158036;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+16;15;016-015;60,75;113,4;-1;;11159712;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+16;16;016-016;60,75;121,5;-1;;11159711;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+17;1;017-001;64,8;4;-1;;11158063;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+17;2;017-002;64,8;12,1;-1;;11158062;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+17;4;017-004;64,8;28,3;-5;;11158060;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+17;5;017-005;64,8;36,4;-5;;11158059;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+17;6;017-006;64,8;44,5;-1;;11158058;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+17;7;017-007;64,8;52,6;-1;;11158057;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+17;8;017-008;64,8;60,7;-1;;11158056;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+17;9;017-009;64,8;68,8;-1;;11158055;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+17;10;017-010;64,8;76,9;-1;;11158054;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+17;11;017-011;64,8;85;-1;;11158053;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+17;12;017-012;64,8;93,1;-1;;11158052;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+17;13;017-013;64,8;101,2;-1;;11158051;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+17;14;017-014;64,8;109,3;-1;;11158050;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+17;15;017-015;64,8;117,4;-1;;11159714;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+18;1;018-001;68,85;0;-1;;11158077;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+18;2;018-002;68,85;8,1;-1;;11158076;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+18;3;018-003;68,85;16,2;-1;;11158075;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+18;4;018-004;68,85;24,3;-2,5;;11158074;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+18;5;018-005;68,85;32,4;-5;;11158073;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+18;6;018-006;68,85;40,5;-1;;11158072;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+18;7;018-007;68,85;48,6;-1;;11158071;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+18;8;018-008;68,85;56,7;-1;;11158070;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+18;9;018-009;68,85;64,8;-1;;11158069;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+18;10;018-010;68,85;72,9;-1;;11158068;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+18;11;018-011;68,85;81;-1;;11158067;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+18;12;018-012;68,85;89,1;-1;;11158066;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+18;13;018-013;68,85;97,2;-1;;11158065;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+18;14;018-014;68,85;105,3;-1;;11158064;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+18;15;018-015;68,85;113,4;-1;;11159716;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+18;16;018-016;68,85;121,5;-1;;11159715;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+19;1;019-001;72,9;4;-1;;11158091;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+19;2;019-002;72,9;12,1;-1;;11158090;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+19;3;019-003;72,9;20,2;-1;;11158089;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+19;4;019-004;72,9;28,3;-5;;11158088;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+19;5;019-005;72,9;36,4;-5;;11158087;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+19;6;019-006;72,9;44,5;-1;;11158086;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+19;7;019-007;72,9;52,6;-1;;11158085;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+19;8;019-008;72,9;60,7;-1;;11158084;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+19;9;019-009;72,9;68,8;-1;;11158083;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+19;10;019-010;72,9;76,9;-1;;11158082;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+19;11;019-011;72,9;85;-1;;11158081;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+19;12;019-012;72,9;93,1;-1;;11158080;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+19;13;019-013;72,9;101,2;-1;;11158079;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+19;14;019-014;72,9;109,3;-1;;11158078;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+19;15;019-015;72,9;117,4;-1;;11159718;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+20;1;020-001;76,95;0;-1;;11158105;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+20;2;020-002;76,95;8,1;-1;;11158104;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+20;3;020-003;76,95;16,2;-1;;11158103;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+20;4;020-004;76,95;24,3;-2,5;;11158102;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+20;5;020-005;76,95;32,4;-5;;11158101;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+20;6;020-006;76,95;40,5;-1;;11158100;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+20;7;020-007;76,95;48,6;-1;;11158099;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+20;8;020-008;76,95;56,7;-1;;11158098;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+20;9;020-009;76,95;64,8;-1;;11158097;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+20;10;020-010;76,95;72,9;-1;;11158096;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+20;11;020-011;76,95;81;-1;;11158095;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+20;12;020-012;76,95;89,1;-1;;11158094;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+20;13;020-013;76,95;97,2;-1;;11158093;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+20;14;020-014;76,95;105,3;-1;;11158092;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+20;15;020-015;76,95;113,4;-1;;11159720;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+20;16;020-016;76,95;121,5;-1;;11159719;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+21;1;021-001;81;4;-1;;11158119;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+21;2;021-002;81;12,1;-1;;11158118;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+21;3;021-003;81;20,2;-1;;11158117;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+21;4;021-004;81;28,3;-5;;11158116;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+21;5;021-005;81;36,4;-5;;11158115;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+21;6;021-006;81;44,5;-1;;11158114;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+21;7;021-007;81;52,6;-1;;11158113;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+21;8;021-008;81;60,7;-1;;11158112;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+21;9;021-009;81;68,8;-1;;11158111;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+21;10;021-010;81;76,9;-1;;11158110;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+21;11;021-011;81;85;-1;;11158109;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+21;12;021-012;81;93,1;-1;;11158108;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+21;13;021-013;81;101,2;-1;;11158107;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+21;14;021-014;81;109,3;-1;;11158106;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+21;15;021-015;81;117,4;-1;;11159722;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+22;1;022-001;85,05;0;-1;;11158133;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+22;2;022-002;85,05;8,1;-1;;11158132;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+22;3;022-003;85,05;16,2;-1;;11158131;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+22;4;022-004;85,05;24,3;-2,5;;11158130;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+22;5;022-005;85,05;32,4;-5;;11158129;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+22;6;022-006;85,05;40,5;-1;;11158128;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+22;7;022-007;85,05;48,6;-1;;11158127;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+22;8;022-008;85,05;56,7;-1;;11158126;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+22;9;022-009;85,05;64,8;-1;;11158125;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+22;10;022-010;85,05;72,9;-1;;11158124;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+22;11;022-011;85,05;81;-1;;11158123;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+22;12;022-012;85,05;89,1;-1;;11158122;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+22;13;022-013;85,05;97,2;-1;;11158121;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+22;14;022-014;85,05;105,3;-1;;11158120;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+22;15;022-015;85,05;113,4;-1;;11159724;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+23;1;023-001;89,1;4;-1;;11161599;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+23;2;023-002;89,1;12,1;-1;;11161598;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+23;3;023-003;89,1;20,2;-1;;11161597;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+23;4;023-004;89,1;28,3;-5;;11161596;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+23;5;023-005;89,1;36,4;-5;;11161595;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+23;6;023-006;89,1;44,5;-1;;11161594;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+23;7;023-007;89,1;52,6;-1;;11161593;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+23;8;023-008;89,1;60,7;-1;;11161592;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+23;9;023-009;89,1;68,8;-1;;11161591;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+23;10;023-010;89,1;76,9;-1;;11161590;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+23;11;023-011;89,1;85;-1;;11161589;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+23;12;023-012;89,1;93,1;-1;;11161588;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+23;13;023-013;89,1;101,2;-1;;11161587;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+23;14;023-014;89,1;109,3;-1;;11161586;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+23;15;023-015;89,1;117,4;-1;;11161642;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+24;1;024-001;93,15;0;-1;;11161613;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+24;2;024-002;93,15;8,1;-1;;11161612;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+24;3;024-003;93,15;16,2;-1;;11161611;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+24;5;024-005;93,15;32,4;-5;;11161609;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+24;6;024-006;93,15;40,5;-1;;11161608;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+24;7;024-007;93,15;48,6;-1;;11161607;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+24;8;024-008;93,15;56,7;-1;;11161606;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+24;9;024-009;93,15;64,8;-1;;11161605;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+24;10;024-010;93,15;72,9;-1;;11161604;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+24;11;024-011;93,15;81;-1;;11161603;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+24;12;024-012;93,15;89,1;-1;;11161602;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+24;13;024-013;93,15;97,2;-1;;11161601;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+24;14;024-014;93,15;105,3;-1;;11161600;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+24;15;024-015;93,15;113,4;-1;;11161644;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+24;16;024-016;93,15;121,5;-1;;11161643;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+25;1;025-001;97,2;4;-1;;11161668;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+25;2;025-002;97,2;12,1;-1;;11161667;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+25;3;025-003;97,2;20,2;-1;;11161666;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+25;4;025-004;97,2;28,3;-5;;11161665;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+25;5;025-005;97,2;36,4;-5;;11161664;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+25;6;025-006;97,2;44,5;-1;;11161663;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+25;7;025-007;97,2;52,6;-1;;11161662;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+25;8;025-008;97,2;60,7;-1;;11161661;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+25;9;025-009;97,2;68,8;-1;;11161660;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+25;10;025-010;97,2;76,9;-1;;11161659;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+25;11;025-011;97,2;85;-1;;11161658;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+25;12;025-012;97,2;93,1;-1;;11161657;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+25;13;025-013;97,2;101,2;-1;;11161656;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+25;14;025-014;97,2;109,3;-1;;11161655;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+25;15;025-015;97,2;117,4;-1;;11161711;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+26;1;026-001;101,25;0;-1;;11161682;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+26;2;026-002;101,25;8,1;-1;;11161681;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+26;3;026-003;101,25;16,2;-1;;11161680;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+26;4;026-004;101,25;24,3;-2,5;;11161679;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+26;5;026-005;101,25;32,4;-5;;11161678;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+26;6;026-006;101,25;40,5;-1;;11161677;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+26;7;026-007;101,25;48,6;-1;;11161676;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+26;8;026-008;101,25;56,7;-1;;11161675;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+26;9;026-009;101,25;64,8;-1;;11161674;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+26;10;026-010;101,25;72,9;-1;;11161673;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+26;11;026-011;101,25;81;-1;;11161672;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+26;12;026-012;101,25;89,1;-1;;11161671;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+26;13;026-013;101,25;97,2;-1;;11161670;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+26;14;026-014;101,25;105,3;-1;;11161669;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+26;15;026-015;101,25;113,4;-1;;11161713;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+26;16;026-016;101,25;121,5;-1;;11161712;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+27;1;027-001;105,3;4;-1;;11161737;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+27;2;027-002;105,3;12,1;-1;;11161736;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+27;4;027-004;105,3;28,3;-5;;11161734;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+27;5;027-005;105,3;36,4;-5;;11161733;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+27;6;027-006;105,3;44,5;-1;;11161732;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+27;7;027-007;105,3;52,6;-1;;11161731;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+27;8;027-008;105,3;60,7;-1;;11161730;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+27;9;027-009;105,3;68,8;-1;;11161729;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+27;10;027-010;105,3;76,9;-1;;11161728;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+27;11;027-011;105,3;85;-1;;11161727;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+27;12;027-012;105,3;93,1;-1;;11161726;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+27;13;027-013;105,3;101,2;-1;;11161725;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+27;14;027-014;105,3;109,3;-1;;11161724;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+27;15;027-015;105,3;117,4;-1;;11161780;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+28;1;028-001;109,35;0;-1;;11161751;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+28;2;028-002;109,35;8,1;-1;;11161750;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+28;5;028-005;109,35;32,4;-5;;11161747;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+28;6;028-006;109,35;40,5;-1;;11161746;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+28;7;028-007;109,35;48,6;-1;;11161745;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+28;8;028-008;109,35;56,7;-1;;11161744;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+28;9;028-009;109,35;64,8;-1;;11161743;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+28;10;028-010;109,35;72,9;-1;;11161742;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+28;11;028-011;109,35;81;-1;;11161741;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+28;12;028-012;109,35;89,1;-1;;11161740;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+28;13;028-013;109,35;97,2;-1;;11161739;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+28;14;028-014;109,35;105,3;-1;;11161738;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+28;15;028-015;109,35;113,4;-1;;11161782;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+28;16;028-016;109,35;121,5;-1;;11161781;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+29;1;029-001;113,4;4;-1;;11161806;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+29;2;029-002;113,4;12,1;-1;;11161805;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+29;4;029-004;113,4;28,3;-5;;11161803;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+29;5;029-005;113,4;36,4;-5;;11161802;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+29;6;029-006;113,4;44,5;-1;;11161801;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+29;7;029-007;113,4;52,6;-1;;11161800;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+29;8;029-008;113,4;60,7;-1;;11161799;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+29;9;029-009;113,4;68,8;-1;;11161798;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+29;10;029-010;113,4;76,9;-1;;11161797;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+29;11;029-011;113,4;85;-1;;11161796;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+29;12;029-012;113,4;93,1;-1;;11161795;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+29;13;029-013;113,4;101,2;-1;;11161794;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+29;14;029-014;113,4;109,3;-1;;11161793;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+29;15;029-015;113,4;117,4;-1;;11161849;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+30;1;030-001;117,45;0;-1;;11161820;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+30;2;030-002;117,45;8,1;-1;;11161819;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+30;3;030-003;117,45;16,2;-1;;11161818;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+30;4;030-004;117,45;24,3;-2,5;;11161817;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+30;5;030-005;117,45;32,4;-5;;11161816;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+30;6;030-006;117,45;40,5;-1;;11161815;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+30;7;030-007;117,45;48,6;-1;;11161814;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+30;8;030-008;117,45;56,7;-1;;11161813;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+30;9;030-009;117,45;64,8;-1;;11161812;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+30;10;030-010;117,45;72,9;-1;;11161811;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+30;11;030-011;117,45;81;-1;;11161810;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+30;12;030-012;117,45;89,1;-1;;11161809;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+30;13;030-013;117,45;97,2;-1;;11161808;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+30;14;030-014;117,45;105,3;-1;;11161807;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+30;15;030-015;117,45;113,4;-1;;11161851;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+30;16;030-016;117,45;121,5;-1;;11161850;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+31;1;031-001;121,5;4;-1;;11161877;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+31;2;031-002;121,5;12,1;-1;;11161876;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+31;4;031-004;121,5;28,3;-5;;11161874;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+31;5;031-005;121,5;36,4;-5;;11161873;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+31;6;031-006;121,5;44,5;-1;;11161872;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+31;7;031-007;121,5;52,6;-1;;11161871;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+31;8;031-008;121,5;60,7;-1;;11161870;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+31;9;031-009;121,5;68,8;-1;;11161869;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+31;10;031-010;121,5;76,9;-1;;11161868;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+31;11;031-011;121,5;85;-1;;11161867;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+31;12;031-012;121,5;93,1;-1;;11161866;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+31;13;031-013;121,5;101,2;-1;;11161865;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+31;14;031-014;121,5;109,3;-1;;11161864;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+31;15;031-015;121,5;117,4;-1;;11161920;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+32;1;032-001;125,55;0;-1;;11161891;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+32;2;032-002;125,55;8,1;-1;;11161890;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+32;5;032-005;125,55;32,4;-5;;11161887;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+32;6;032-006;125,55;40,5;-1;;11161886;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+32;7;032-007;125,55;48,6;-1;;11161885;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+32;8;032-008;125,55;56,7;-1;;11161884;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+32;9;032-009;125,55;64,8;-1;;11161883;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+32;10;032-010;125,55;72,9;-1;;11161882;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+32;11;032-011;125,55;81;-1;;11161881;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+32;12;032-012;125,55;89,1;-1;;11161880;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+32;13;032-013;125,55;97,2;-1;;11161879;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+32;14;032-014;125,55;105,3;-1;;11161878;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+32;15;032-015;125,55;113,4;-1;;11161922;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+32;16;032-016;125,55;121,5;-1;;11161921;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal onder tramsporen optie 2
+33;1;033-001;129,6;4;-1;;11161946;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+33;2;033-002;129,6;12,1;-1;;11161945;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+33;4;033-004;129,6;28,3;-5;;11161943;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+33;5;033-005;129,6;36,4;-5;;11161942;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+33;6;033-006;129,6;44,5;-1;;11161941;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+33;7;033-007;129,6;52,6;-1;;11161940;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+33;8;033-008;129,6;60,7;-1;;11161939;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+33;9;033-009;129,6;68,8;-1;;11161938;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+33;10;033-010;129,6;76,9;-1;;11161937;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+33;11;033-011;129,6;85;-1;;11161936;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+33;12;033-012;129,6;93,1;-1;;11161935;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+33;13;033-013;129,6;101,2;-1;;11161934;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+33;14;033-014;129,6;109,3;-1;;11161933;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+33;15;033-015;129,6;117,4;-1;;11161989;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+34;1;034-001;133,65;0;-1;;11161960;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+34;2;034-002;133,65;8,1;-1;;11161959;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+34;3;034-003;133,65;16,2;-1;;11161958;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+34;4;034-004;133,65;24,3;-2,5;;11161957;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+34;5;034-005;133,65;32,4;-2,5;;11161956;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+34;6;034-006;133,65;40,5;-1;;11161955;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+34;7;034-007;133,65;48,6;-1;;11161954;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+34;8;034-008;133,65;56,7;-1;;11161953;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+34;9;034-009;133,65;64,8;-1;;11161952;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+34;10;034-010;133,65;72,9;-1;;11161951;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+34;11;034-011;133,65;81;-1;;11161950;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+34;12;034-012;133,65;89,1;-1;;11161949;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+34;13;034-013;133,65;97,2;-1;;11161948;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+34;14;034-014;133,65;105,3;-1;;11161947;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+34;15;034-015;133,65;113,4;-1;;11161991;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+34;16;034-016;133,65;121,5;-1;;11161990;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+35;1;035-001;137,7;4;-1;;11162015;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+35;2;035-002;137,7;12,1;-1;;11162014;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+35;3;035-003;137,7;20,2;-1;;11162013;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+35;4;035-004;137,7;28,3;-2,5;;11162012;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+35;5;035-005;137,7;36,4;-1;;11162011;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+35;6;035-006;137,7;44,5;-1;;11162010;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+35;7;035-007;137,7;52,6;-1;;11162009;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+35;8;035-008;137,7;60,7;-1;;11162008;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+35;9;035-009;137,7;68,8;-1;;11162007;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+35;10;035-010;137,7;76,9;-1;;11162006;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+35;11;035-011;137,7;85;-1;;11162005;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+35;12;035-012;137,7;93,1;-1;;11162004;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+35;13;035-013;137,7;101,2;-1;;11162003;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+35;14;035-014;137,7;109,3;-1;;11162002;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+35;15;035-015;137,7;117,4;-1;;11162058;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+36;1;036-001;141,75;0;-1;;11162029;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+36;2;036-002;141,75;8,1;-1;;11162028;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+36;3;036-003;141,75;16,2;-1;;11162027;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+36;4;036-004;141,75;24,3;-2,5;;11162026;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+36;5;036-005;141,75;32,4;-2,5;;11162025;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+36;6;036-006;141,75;40,5;-1;;11162024;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+36;7;036-007;141,75;48,6;-1;;11162023;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+36;8;036-008;141,75;56,7;-1;;11162022;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+36;9;036-009;141,75;64,8;-1;;11162021;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+36;10;036-010;141,75;72,9;-1;;11162020;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+36;11;036-011;141,75;81;-1;;11162019;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+36;12;036-012;141,75;89,1;-1;;11162018;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+36;13;036-013;141,75;97,2;-1;;11162017;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+36;14;036-014;141,75;105,3;-1;;11162016;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+36;15;036-015;141,75;113,4;-1;;11162060;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+36;16;036-016;141,75;121,5;-1;;11162059;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+37;1;037-001;145,8;4;-1;;11162084;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+37;2;037-002;145,8;12,1;-1;;11162083;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+37;3;037-003;145,8;20,2;-1;;11162082;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+37;4;037-004;145,8;28,3;-2,5;;11162081;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+37;5;037-005;145,8;36,4;-1;;11162080;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+37;6;037-006;145,8;44,5;-1;;11162079;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+37;7;037-007;145,8;52,6;-1;;11162078;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+37;8;037-008;145,8;60,7;-1;;11162077;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+37;9;037-009;145,8;68,8;-1;;11162076;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+37;10;037-010;145,8;76,9;-1;;11162075;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+37;11;037-011;145,8;85;-1;;11162074;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+37;12;037-012;145,8;93,1;-1;;11162073;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+37;13;037-013;145,8;101,2;-1;;11162072;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+37;14;037-014;145,8;109,3;-1;;11162071;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+37;15;037-015;145,8;117,4;-1;;11162127;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+38;1;038-001;149,85;0;-1;;11162098;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+38;2;038-002;149,85;8,1;-1;;11162097;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+38;3;038-003;149,85;16,2;-1;;11162096;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+38;4;038-004;149,85;24,3;-2,5;;11162095;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+38;5;038-005;149,85;32,4;-2,5;;11162094;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+38;6;038-006;149,85;40,5;-1;;11162093;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+38;7;038-007;149,85;48,6;-1;;11162092;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+38;8;038-008;149,85;56,7;-1;;11162091;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+38;9;038-009;149,85;64,8;-1;;11162090;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+38;10;038-010;149,85;72,9;-1;;11162089;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+38;11;038-011;149,85;81;-1;;11162088;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+38;12;038-012;149,85;89,1;-1;;11162087;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+38;13;038-013;149,85;97,2;-1;;11162086;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+38;14;038-014;149,85;105,3;-1;;11162085;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+38;15;038-015;149,85;113,4;-1;;11162129;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+38;16;038-016;149,85;121,5;-1;;11162128;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+39;1;039-001;153,9;4;-1;;11162153;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+39;2;039-002;153,9;12,1;-1;;11162152;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+39;3;039-003;153,9;20,2;-1;;11162151;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+39;4;039-004;153,9;28,3;-2,5;;11162150;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+39;5;039-005;153,9;36,4;-1;;11162149;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+39;6;039-006;153,9;44,5;-1;;11162148;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+39;7;039-007;153,9;52,6;-1;;11162147;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+39;8;039-008;153,9;60,7;-1;;11162146;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+39;9;039-009;153,9;68,8;-1;;11162145;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+39;10;039-010;153,9;76,9;-1;;11162144;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+39;11;039-011;153,9;85;-1;;11162143;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+39;12;039-012;153,9;93,1;-1;;11162142;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+39;13;039-013;153,9;101,2;-1;;11162141;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+39;14;039-014;153,9;109,3;-1;;11162140;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+39;15;039-015;153,9;117,4;-1;;11162196;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+40;1;040-001;157,95;0;-1;;11162167;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+40;2;040-002;157,95;8,1;-1;;11162166;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+40;3;040-003;157,95;16,2;-1;;11162165;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+40;4;040-004;157,95;24,3;-2,5;;11162164;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+40;5;040-005;157,95;32,4;-2,5;;11162163;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+40;6;040-006;157,95;40,5;-1;;11162162;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+40;7;040-007;157,95;48,6;-1;;11162161;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+40;8;040-008;157,95;56,7;-1;;11162160;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+40;9;040-009;157,95;64,8;-1;;11162159;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+40;10;040-010;157,95;72,9;-1;;11162158;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+40;11;040-011;157,95;81;-1;;11162157;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+40;12;040-012;157,95;89,1;-1;;11162156;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+40;13;040-013;157,95;97,2;-1;;11162155;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+40;14;040-014;157,95;105,3;-1;;11162154;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+40;15;040-015;157,95;113,4;-1;;11162198;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+40;16;040-016;157,95;121,5;-1;;11162197;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+41;1;041-001;162;4;-1;;11162222;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+41;2;041-002;162;12,1;-1;;11162221;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+41;3;041-003;162;20,2;-1;;11162220;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+41;4;041-004;162;28,3;-2,5;;11162219;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+41;5;041-005;162;36,4;-1;;11162218;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+41;6;041-006;162;44,5;-1;;11162217;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+41;7;041-007;162;52,6;-1;;11162216;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+41;8;041-008;162;60,7;-1;;11162215;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+41;9;041-009;162;68,8;-1;;11162214;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+41;10;041-010;162;76,9;-1;;11162213;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+41;11;041-011;162;85;-1;;11162212;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+41;12;041-012;162;93,1;-1;;11162211;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+41;13;041-013;162;101,2;-1;;11162210;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+41;14;041-014;162;109,3;-1;;11162209;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+41;15;041-015;162;117,4;-1;;11162265;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+42;1;042-001;166,05;0;-1;;11162236;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+42;2;042-002;166,05;8,1;-1;;11162235;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+42;3;042-003;166,05;16,2;-1;;11162234;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+42;4;042-004;166,05;24,3;-2,5;;11162233;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+42;5;042-005;166,05;32,4;-2,5;;11162232;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+42;6;042-006;166,05;40,5;-1;;11162231;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+42;7;042-007;166,05;48,6;-1;;11162230;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+42;8;042-008;166,05;56,7;-1;;11162229;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+42;9;042-009;166,05;64,8;-1;;11162228;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+42;10;042-010;166,05;72,9;-1;;11162227;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld onder kantoor & hotel optie 2
+42;11;042-011;166,05;81;-1;;11162226;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+42;12;042-012;166,05;89,1;-1;;11162225;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+42;13;042-013;166,05;97,2;-1;;11162224;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+42;14;042-014;166,05;105,3;-1;;11162223;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+42;15;042-015;166,05;113,4;-1;;11162267;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
+42;16;042-016;166,05;121,5;-1;;11162266;NLRS_50_ME_UN_ruimtecomponent beo veld_gen_CGA: BEO veld thv OV terminal niet onder tramsporen optie 2
