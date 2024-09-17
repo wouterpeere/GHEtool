@@ -1,3 +1,5 @@
+import copy
+
 import numpy as np
 import pandas as pd
 import pygfunction as gt
@@ -202,12 +204,12 @@ def make_TCO(borefield, sec_load):
                                     axis=1)
 
     electricity_consumption_per_year = borefield.load.yearly_electricity_consumption
-    peak_ac = np.max(active_cooling_power)
-    peak_pc = np.max(passive_cooling_power)
-    peak_heating = borefield.load.max_peak_heating
 
-    investment_cost = max(peak_heating,
-                          peak_ac) * COST_GSHP + peak_pc * COST_HEX + borefield.number_of_boreholes * borefield.H * COST_BOREFIELD
+    peak_ac, peak_pc, peak_heating, lw_heating, lw_cooling = get_individual_powers_one_field(borefield, sec_load)
+
+    investment_cost = np.sum(np.maximum(peak_heating, peak_ac)) * COST_GSHP \
+                      + np.sum(peak_pc) * COST_HEX + borefield.number_of_boreholes * borefield.H * COST_BOREFIELD \
+                      + np.sum(np.maximum(lw_heating, lw_cooling))
 
     if sec_load is not None:
         electricity_consumption_per_year += sec_load.yearly_cooling_load_simulation_period / SEER_LW
@@ -223,6 +225,54 @@ def make_TCO(borefield, sec_load):
     print(
         f'Electricity cost: €{np.sum([electricity_consumption_per_year[i - 1] * E_PRICE / (1 + RDR) ** i for i in range(1, 26)]):,.0f}')
     print(f'TCO: €{TCO:,.0f}')
+
+
+def get_individual_powers_one_field(borefield, sec_load=None):
+    names = ["kantoor", "hotel", "terminal"]
+
+    loads = [kantoor, hotel, terminal]
+
+    peak_ac, peak_pc, peak_heating, lw_heating, lw_cooling = [], [], [], [], []
+
+    for idx, load in enumerate(loads):
+        load_temp = HourlyBuildingLoadMultiYear(load.hourly_heating_load_simulation_period,
+                                                load.hourly_cooling_load_simulation_period,
+                                                SCOP,
+                                                eer_active_passive,
+                                                load.hourly_dhw_load_simulation_period,
+                                                SCOP_DHW)
+        cooling_sec = np.array([0])
+        heating_sec = np.array([0])
+        if sec_load is not None:
+            ratio = np.divide(borefield.load.hourly_cooling_load_simulation_period,
+                              combined.hourly_cooling_load_simulation_period)
+            load_temp.hourly_cooling_load = load_temp.hourly_cooling_load_simulation_period * np.nan_to_num(ratio,
+                                                                                                            nan=1)
+            cooling_sec = load.hourly_cooling_load_simulation_period * (1 - np.nan_to_num(ratio, nan=1))
+            ratio = np.divide(borefield.load.hourly_heating_load_simulation_period,
+                              combined.hourly_heating_load_simulation_period)
+            load_temp.hourly_heating_load = load_temp.hourly_heating_load_simulation_period * np.nan_to_num(ratio,
+                                                                                                            nan=1)
+            heating_sec = load.hourly_heating_load_simulation_period * (1 - np.nan_to_num(ratio, nan=1))
+
+        active_cooling_array = load_temp.eer.get_time_series_active_cooling(borefield.results.peak_injection,
+                                                                            load_temp.month_indices)
+        active_cooling_power = load_temp.hourly_cooling_load_simulation_period * active_cooling_array
+        passive_cooling_power = load_temp.hourly_cooling_load_simulation_period * np.invert(active_cooling_array)
+
+        peak_ac.append(np.max(active_cooling_power))
+        peak_pc.append(np.max(passive_cooling_power))
+        peak_heating.append(np.max(load_temp.max_peak_heating))
+        lw_heating.append(np.max(heating_sec))
+        lw_cooling.append(np.max(cooling_sec))
+        print('***********')
+        print(f'WW heating {names[idx]}: {peak_heating[idx]:.2f}kW')
+        print(f'WW ac {names[idx]}: {peak_ac[idx]:.2f}kW')
+        print(f'HEX pc {names[idx]}: {peak_pc[idx]:.2f}kW')
+        print(f'LW heating {names[idx]}: {lw_heating[idx]:.2f}kW')
+        print(f'LW cooling {names[idx]}: {lw_cooling[idx]:.2f}kW')
+
+    return peak_ac, peak_pc, peak_heating, lw_heating, lw_cooling
 
 
 def one_field():
