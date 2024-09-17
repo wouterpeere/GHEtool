@@ -34,12 +34,24 @@ COST_GSHP = 550  # €/kW
 COST_ASHP = 650  # €/kW
 COST_HEX = 46  # €/kW
 
+vermogen_lw_terminal = 7 * 238
+vermogen_lw_kantoor = 2 * 468
+vermogen_lw_hotel = 3 * 330
+vermogen_ww_terminal = 2 * 180
+vermogen_ww_kantoor = 2 * 280
+vermogen_ww_hotel = 2 * 280
+vermogen_lw = vermogen_lw_terminal + vermogen_lw_hotel + vermogen_lw_kantoor
+vermogen_ww = vermogen_ww_hotel + vermogen_ww_kantoor + vermogen_ww_terminal
+
 # load data
 eer_active_passive = EERCombined(SEER_PC, SEER_AC, 17)
 
-kantoor = HourlyBuildingLoad(simulation_period=25, efficiency_heating=5, efficiency_cooling=20, efficiency_dhw=2.5)
-terminal = HourlyBuildingLoad(simulation_period=25, efficiency_heating=5, efficiency_cooling=20, efficiency_dhw=2.5)
-hotel = HourlyBuildingLoad(simulation_period=25, efficiency_heating=5, efficiency_cooling=20, efficiency_dhw=2.5)
+kantoor = HourlyBuildingLoad(simulation_period=SIMULATION_PERIOD, efficiency_heating=SCOP,
+                             efficiency_cooling=eer_active_passive, efficiency_dhw=SCOP_DHW)
+terminal = HourlyBuildingLoad(simulation_period=SIMULATION_PERIOD, efficiency_heating=SCOP,
+                              efficiency_cooling=eer_active_passive, efficiency_dhw=SCOP_DHW)
+hotel = HourlyBuildingLoad(simulation_period=SIMULATION_PERIOD, efficiency_heating=SCOP,
+                           efficiency_cooling=eer_active_passive, efficiency_dhw=SCOP_DHW)
 
 kantoor.load_hourly_profile('kantoor.csv', decimal_seperator=',', col_cooling=0, col_heating=1)
 terminal.load_hourly_profile('terminal.csv', decimal_seperator=',', col_cooling=0, col_heating=1)
@@ -59,21 +71,12 @@ combined.add_dhw(np.array(sww['Totale warmtelevering [kW] SWW']))
 coordinates = pd.read_csv('coordinatenlijst optie 1.csv', header=0, sep=";", decimal=",")
 borefield1 = []
 for idx, row in coordinates.iterrows():
-    borefield1.append(gt.boreholes.Borehole(H=H + row['Z'], D=-row['Z'], r_b=r_b, x=row['X'], y=row['Y']))
+    borefield1.append(gt.boreholes.Borehole(H=H + row['Z'], D=-row['Z'], r_b=r_b, x=row['X'], y=-row['Y']))
 
-# coordinates = pd.read_csv('coordinatenlijst optie 2.csv', header=0, sep=";", decimal=",")
-# borefield2 = []
-# for idx, row in coordinates.iterrows():
-#     borefield2.append(gt.boreholes.Borehole(H=H + row['Z'], D=-row['Z'], r_b=r_b, x=row['X'], y=row['Y']))
-
-# initiate borefield
-borefield = Borefield(borefield=borefield1, load=combined)
-
-borefield.ground_data = ground_data
-borefield.set_pipe_parameters(pipe_data)
-borefield.set_fluid_parameters(fluid_data)
-borefield.set_max_avg_fluid_temperature(17)
-borefield.set_min_avg_fluid_temperature(2)
+coordinates = pd.read_csv('coordinatenlijst optie 2.csv', header=0, sep=";", decimal=",")
+borefield2 = []
+for idx, row in coordinates.iterrows():
+    borefield2.append(gt.boreholes.Borehole(H=H + row['Z'], D=-row['Z'], r_b=r_b, x=row['X'], y=row['Y']))
 
 
 def make_results(borefield, name, sec_load=None):
@@ -82,19 +85,19 @@ def make_results(borefield, name, sec_load=None):
                                                                              borefield.load.month_indices)
     yearly_share_active_cooling = np.sum(
         np.reshape(borefield.load.hourly_cooling_load_simulation_period * active_cooling_array,
-                   (borefield.load.simulation_period, 8760)),
-        axis=1) / borefield.load.yearly_injection_load_simulation_period * 100
+                   (SIMULATION_PERIOD, 8760)), axis=1) / borefield.load.yearly_injection_load_simulation_period * 100
     active_cooling_power = borefield.load.hourly_cooling_load_simulation_period * active_cooling_array
     passive_cooling_power = borefield.load.hourly_cooling_load_simulation_period * np.invert(active_cooling_array)
-    active_cooling_energy = np.sum(np.reshape(active_cooling_power, (borefield.load.simulation_period, 8760)), axis=1)
-    passive_cooling_energy = np.sum(np.reshape(passive_cooling_power, (borefield.load.simulation_period, 8760)), axis=1)
+    active_cooling_energy = np.sum(np.reshape(active_cooling_power, (SIMULATION_PERIOD, 8760)), axis=1)
+    passive_cooling_energy = np.sum(np.reshape(passive_cooling_power, (SIMULATION_PERIOD, 8760)), axis=1)
 
     # print numerical results
     print(f'\n{name}')
     print(f'Average SEER {borefield.load.SEER:.2f}')
     print(
         f'Geothermal heating: {borefield.load.max_peak_heating:.2f}kW | {borefield.load.yearly_average_heating_load / 1000:.2f}MWh')
-    print(f'Geothermal active: {np.max(active_cooling_power):.2f}kW | {np.mean(active_cooling_energy) / 1000:.2f}MWh')
+    print(
+        f'Geothermal active: {np.max(active_cooling_power):.2f}kW | {np.mean(active_cooling_energy) / 1000:.2f}MWh')
     print(
         f'Geothermal passive: {np.max(passive_cooling_power):.2f}kW | {np.mean(passive_cooling_energy) / 1000:.2f}MWh')
     if sec_load is not None:
@@ -107,9 +110,10 @@ def make_results(borefield, name, sec_load=None):
 
     # plot active/passive and SEER
     fig3, ax5 = plt.subplots()
-    ax5.plot(range(1, borefield.load.simulation_period + 1), borefield.load.yearly_SEER, linestyle='-', label='SEER')
+    ax5.plot(range(1, SIMULATION_PERIOD + 1), borefield.load.yearly_SEER, linestyle='-',
+             label='SEER')
     ax2 = ax5.twinx()
-    ax2.plot(range(1, borefield.load.simulation_period + 1), yearly_share_active_cooling, linestyle='--',
+    ax2.plot(range(1, SIMULATION_PERIOD + 1), yearly_share_active_cooling, linestyle='--',
              label='Actief koelen')
 
     handles1, labels1 = ax5.get_legend_handles_labels()
@@ -117,7 +121,7 @@ def make_results(borefield, name, sec_load=None):
     handles = handles1 + handles2
     labels = labels1 + labels2
     ax5.legend(handles, labels, loc='upper center', ncol=2)
-    ax5.set_xlim(left=1, right=borefield.load.simulation_period)
+    ax5.set_xlim(left=1, right=SIMULATION_PERIOD)
     ax5.set_ylim(bottom=7, top=15)
     ax2.set_ylim(bottom=30, top=70)
     ax5.set_xlabel('Tijd [jaar]')
@@ -138,7 +142,8 @@ def make_results(borefield, name, sec_load=None):
         fig1, ax1 = plt.subplots()
         # First pie chart - Cooling load
         labels = ['BEO (A)', 'BEO (P)', 'LW']
-        sizes = [np.mean(active_cooling_energy), np.mean(passive_cooling_energy), sec_load.yearly_average_cooling_load]
+        sizes = [np.mean(active_cooling_energy), np.mean(passive_cooling_energy),
+                 sec_load.yearly_average_cooling_load]
         ax1.pie(sizes, labels=labels, autopct='%1.1f%%')
         ax1.set_title('Aandeel koeling')
 
@@ -146,10 +151,10 @@ def make_results(borefield, name, sec_load=None):
         fig2, ax3 = plt.subplots()
 
         # Add sorted loads to plot
-        ax3.plot(range(1, borefield.load.simulation_period + 1),
+        ax3.plot(range(1, SIMULATION_PERIOD + 1),
                  borefield.load.yearly_heating_load_simulation_period / 1000,
                  'r-', label='Geothermische verwarming')
-        ax3.plot(range(1, borefield.load.simulation_period + 1),
+        ax3.plot(range(1, SIMULATION_PERIOD + 1),
                  borefield.load.yearly_cooling_load_simulation_period / 1000,
                  'b-', label='Geothermische koeling')
 
@@ -157,10 +162,12 @@ def make_results(borefield, name, sec_load=None):
         ax4 = ax3.twinx()
 
         # Optionally, plot something on the second y-axis
-        ax4.plot(range(1, borefield.load.simulation_period + 1), borefield.load.yearly_heating_peak_simulation_period,
+        ax4.plot(range(1, SIMULATION_PERIOD + 1),
+                 borefield.load.yearly_heating_peak_simulation_period,
                  'r--',
                  label='Geothermische piekverwarming')
-        ax4.plot(range(1, borefield.load.simulation_period + 1), borefield.load.yearly_cooling_peak_simulation_period,
+        ax4.plot(range(1, SIMULATION_PERIOD + 1),
+                 borefield.load.yearly_cooling_peak_simulation_period,
                  'b--',
                  label='Geothermische piekkoeling')
 
@@ -173,7 +180,7 @@ def make_results(borefield, name, sec_load=None):
         # Plot legend with combined handles and labels
         ax3.legend(handles, labels)
 
-        ax3.set_xlim(left=1, right=borefield.load.simulation_period)
+        ax3.set_xlim(left=1, right=SIMULATION_PERIOD)
         ax3.set_xlabel('Tijd [jaar]')
         ax3.set_ylabel(f'Energie [MWh]')
 
@@ -181,7 +188,7 @@ def make_results(borefield, name, sec_load=None):
         ax4.set_ylabel(f'Vermogen [kW]')
 
     # plot borefield
-    # borefield.print_temperature_profile(plot_hourly=True)
+    borefield.print_temperature_profile(plot_hourly=True)
 
 
 def make_TCO(borefield, sec_load):
@@ -218,47 +225,91 @@ def make_TCO(borefield, sec_load):
     print(f'TCO: €{TCO:,.0f}')
 
 
-# do calculations
-# 1) all load on one field
-borefield.set_max_avg_fluid_temperature(17)
-borefield.calculate_temperatures(hourly=True)
-make_results(borefield, 'All load on one field')
+def one_field():
+    # initiate borefield
+    borefield = Borefield(borefield=borefield1, load=combined)
 
-# 2p) optimise power (100% passive)
-_, sec_load = borefield.optimise_load_profile_power(combined)
-borefield.calculate_temperatures(hourly=True)
-make_results(borefield, 'Optimise power, 100% passive', sec_load)
+    borefield.ground_data = ground_data
+    borefield.set_pipe_parameters(pipe_data)
+    borefield.set_fluid_parameters(fluid_data)
+    borefield.set_max_avg_fluid_temperature(17)
+    borefield.set_min_avg_fluid_temperature(2)
 
-# # 2e) optimise energy (100% passive)
-# borefield.set_max_avg_fluid_temperature(16)
-# _, sec_load = borefield.optimise_load_profile_energy(combined)
-# borefield.calculate_temperatures(hourly=True)
-# make_results(borefield, 'Optimise energy, 100% passive', sec_load)
+    # do calculations
+    # 1) all load on one field
+    borefield.set_max_avg_fluid_temperature(17)
+    borefield.calculate_temperatures(hourly=True)
+    make_results(borefield, 'All load on one field')
 
-# # 3p) optimise power
-# borefield.set_max_avg_fluid_temperature(25)
-# _, sec_load = borefield.optimise_load_profile_power(combined)
-# borefield.calculate_temperatures(hourly=True)
-# make_results(borefield, 'Optimise power', sec_load)
-#
-# # 3e) optimise energy
-# borefield.set_max_avg_fluid_temperature(25)
-# _, sec_load = borefield.optimise_load_profile_energy(combined)
-# borefield.calculate_temperatures(hourly=True)
-# make_results(borefield, 'Optimise energy', sec_load)
+    # 2p) optimise power (100% passive)
+    _, sec_load = borefield.optimise_load_profile_power(combined)
+    borefield.calculate_temperatures(hourly=True)
+    make_results(borefield, 'Optimise power, 100% passive', sec_load)
 
-# adapt size borefield
+    # # 2e) optimise energy (100% passive)
+    # borefield.set_max_avg_fluid_temperature(16)
+    # _, sec_load = borefield.optimise_load_profile_energy(combined)
+    # borefield.calculate_temperatures(hourly=True)
+    # make_results(borefield, 'Optimise energy, 100% passive', sec_load)
 
-borefield_smaller = [bor for bor in borefield1 if bor.y < 74]
-borefield.borefield = borefield_smaller
-# 4p) optimise power
-borefield.set_max_avg_fluid_temperature(25)
-_, sec_load = borefield.optimise_load_profile_power(combined)
-borefield.calculate_temperatures(hourly=True)
-make_results(borefield, 'Optimise power, +- 50% koelvermogen', sec_load)
+    # # 3p) optimise power
+    # borefield.set_max_avg_fluid_temperature(25)
+    # _, sec_load = borefield.optimise_load_profile_power(combined)
+    # borefield.calculate_temperatures(hourly=True)
+    # make_results(borefield, 'Optimise power', sec_load)
+    #
+    # # 3e) optimise energy
+    # borefield.set_max_avg_fluid_temperature(25)
+    # _, sec_load = borefield.optimise_load_profile_energy(combined)
+    # borefield.calculate_temperatures(hourly=True)
+    # make_results(borefield, 'Optimise energy', sec_load)
 
-# # 4e) optimise energy
-# borefield.set_max_avg_fluid_temperature(25)
-# _, sec_load = borefield.optimise_load_profile_energy(combined)
-# borefield.calculate_temperatures(hourly=True)
-# make_results(borefield, 'Optimise energy, max 50% cooling', sec_load)
+    # adapt size borefield
+
+    borefield_smaller = [bor for bor in borefield1 if bor.y > -74]
+    borefield.borefield = borefield_smaller
+    # 4p) optimise power
+    borefield.set_max_avg_fluid_temperature(25)
+    _, sec_load = borefield.optimise_load_profile_power(combined)
+    borefield.calculate_temperatures(hourly=True)
+    make_results(borefield, 'Optimise power, +- 50% koelvermogen', sec_load)
+
+    # # 4e) optimise energy
+    # borefield.set_max_avg_fluid_temperature(25)
+    # _, sec_load = borefield.optimise_load_profile_energy(combined)
+    # borefield.calculate_temperatures(hourly=True)
+    # make_results(borefield, 'Optimise energy, max 50% cooling', sec_load)
+
+
+def multiple_fields():
+    def select_borefield(x_min, x_max, y_max):
+        borefield_temp = []
+        for bor in borefield1:
+            if bor.x >= x_min and bor.x < x_max and bor.y > -y_max:
+                borefield_temp.append(bor)
+        return borefield_temp
+
+    borefield_kantoor = select_borefield(0, 70, 120)
+    borefield_hotel = select_borefield(70, 100, 120)
+    borefield_terminal = select_borefield(100, 180, 120)
+
+    borefields = [Borefield(borefield=borefield_kantoor, load=kantoor),
+                  Borefield(borefield=borefield_hotel, load=hotel),
+                  Borefield(borefield=borefield_terminal, load=terminal)]
+
+    names = ["kantoor", "hotel", "terminal"]
+
+    for idx, borefield in enumerate(borefields):
+        borefield.ground_data = ground_data
+        borefield.set_pipe_parameters(pipe_data)
+        borefield.set_fluid_parameters(fluid_data)
+        borefield.set_max_avg_fluid_temperature(17)
+        borefield.set_min_avg_fluid_temperature(2)
+
+        borefield.calculate_temperatures(hourly=True)
+        make_results(borefield, names[idx])
+
+
+if __name__ == "__main__":
+    one_field()
+    # multiple_fields()
