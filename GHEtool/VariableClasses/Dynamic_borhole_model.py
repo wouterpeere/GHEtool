@@ -69,6 +69,8 @@ class DynamicsBH(object):
             distance_between_boreholes = np.sqrt((self.boreholes[1].x - self.boreholes[0].x)**2 + (self.boreholes[1].y - self.boreholes[0].y)**2)
             far_field_radius = distance_between_boreholes/2
 
+        print(f"far field radius used: {far_field_radius}")
+
         self.num_soil_cells = int(far_field_radius/10*500)
         self.init_temp = self.ground_ghe.Tg
 

@@ -181,7 +181,7 @@ def test_3_6h_ste():
 
             load = HourlyGeothermalLoad(simulation_period=s)
             load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test3.csv'), header=True, separator=",",
-                             col_heating=1, col_cooling=0)
+                             col_extraction=1, col_injection=0)
             borefield.load = load
 
             # Sample dictionary with short-term effect parameters
