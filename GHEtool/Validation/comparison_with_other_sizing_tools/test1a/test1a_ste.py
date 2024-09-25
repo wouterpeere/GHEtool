@@ -97,7 +97,7 @@ def test_1a_6h_ste():
     'rho_cp_pipe': rho_cp_pipe,
     }
 
-    options = {'nSegments': 12,
+    options = {
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
@@ -180,7 +180,7 @@ def test_1a_6h_ste():
     'rho_cp_pipe': rho_cp_pipe,
     }
 
-    options = {'nSegments': 12,
+    options = {
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
@@ -306,7 +306,7 @@ def test_1a_1h_ste():
     'rho_cp_pipe': rho_cp_pipe,
     }
 
-    options = {'nSegments': 12,
+    options = {
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
@@ -386,7 +386,7 @@ def test_1a_1h_ste():
     'rho_cp_pipe': rho_cp_pipe,
     }
 
-    options = {'nSegments': 12,
+    options = {
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',

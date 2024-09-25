@@ -206,7 +206,7 @@ def test_4_sensitivity_ste():
     'rho_cp_pipe': rho_cp_pipe,
     }
 
-    options = {'nSegments': 12,
+    options = {
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
@@ -301,7 +301,7 @@ def test_4_sensitivity_ste():
     'rho_cp_pipe': rho_cp_pipe,
     }
 
-    options = {'nSegments': 12,
+    options = {
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
@@ -396,7 +396,7 @@ def test_4_sensitivity_ste():
     'rho_cp_pipe': rho_cp_pipe,
     }
 
-    options = {'nSegments': 12,
+    options = {
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
@@ -488,7 +488,7 @@ def test_4_sensitivity_ste():
     'rho_cp_pipe': rho_cp_pipe,
     }
 
-    options = {'nSegments': 12,
+    options = {
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
@@ -583,7 +583,7 @@ def test_4_sensitivity_ste():
     'rho_cp_pipe': rho_cp_pipe,
     }
 
-    options = {'nSegments': 12,
+    options = {
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
@@ -678,7 +678,7 @@ def test_4_sensitivity_ste():
     'rho_cp_pipe': rho_cp_pipe,
     }
 
-    options = {'nSegments': 12,
+    options = {
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
@@ -773,7 +773,7 @@ def test_4_sensitivity_ste():
     'rho_cp_pipe': rho_cp_pipe,
     }
 
-    options = {'nSegments': 12,
+    options = {
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
@@ -868,7 +868,7 @@ def test_4_sensitivity_ste():
     'rho_cp_pipe': rho_cp_pipe,
     }
 
-    options = {'nSegments': 12,
+    options = {
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',

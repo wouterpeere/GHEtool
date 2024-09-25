@@ -100,7 +100,7 @@ def test_1b_ste():
     'rho_cp_pipe': rho_cp_pipe,
     }
 
-    options = {'nSegments': 12,
+    options = {'nSegments': 8,
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
@@ -186,7 +186,7 @@ def test_1b_ste():
     'rho_cp_pipe': rho_cp_pipe,
     }
 
-    options = {'nSegments': 12,
+    options = {'nSegments': 8,
                    'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
