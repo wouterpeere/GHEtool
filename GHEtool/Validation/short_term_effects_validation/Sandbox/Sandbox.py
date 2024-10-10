@@ -96,25 +96,25 @@ def Sandbox():
 
     # Load modelica data and experimental data for plotting
     # import data
-    df_st = pd.read_csv(os.path.join(os.path.dirname(__file__), 'Modelica_Tf_static.csv'), header=0, decimal=".")
-    df_dyn = pd.read_csv(os.path.join(os.path.dirname(__file__), 'Modelica_Tf_dynamic.csv'), header=0, decimal=".")
+    df_mod = pd.read_csv(os.path.join(os.path.dirname(__file__), 'modelica_sim_hourly_temperature.csv'), header=0, decimal=".")
     df_exp = pd.read_csv(os.path.join(os.path.dirname(__file__), 'Tf_values_exp_modelica.csv'), header=0, decimal=".")
+    df_mod_Tb = pd.read_csv(os.path.join(os.path.dirname(__file__), 'modelica_sim_hourly_Tb.csv'), header=0, decimal=".")
 
     # set data
-    Tf_mod_st = np.array(df_st.iloc[:, 0])
-    Tf_mod_dyn = np.array(df_dyn.iloc[:, 0])
+    #Tf_mod_st = np.array(df_st.iloc[:, 0])
+    Tf_mod = np.array(df_mod.iloc[:, 0])
     Tf_exp = np.array(df_exp.iloc[:, 0])
 
     
     #Absolute differences between experimental and model fluid temperatures
-    DTf_mod_st_a = Tf_mod_st - Tf_exp
-    DTf_mod_dyn_a = Tf_mod_dyn - Tf_exp
+    #DTf_mod_st_a = Tf_mod_st - Tf_exp
+    DTf_mod_a = Tf_mod - Tf_exp
     DTf_L4_a = Tf_L4[:8760] - Tf_exp
     DTf_L4_ste_a = Tf_L4_ste[:8760] - Tf_exp
 
     #Relative differences between experimental and model fluid temperatures
-    DTf_mod_st_r = (Tf_mod_st - Tf_exp)/Tf_exp*100
-    DTf_mod_dyn_r = (Tf_mod_dyn - Tf_exp)/Tf_exp*100
+    #DTf_mod_st_r = (Tf_mod_st - Tf_exp)/Tf_exp*100
+    DTf_mod_r = (Tf_mod - Tf_exp)/Tf_exp*100
     DTf_L4_r = (Tf_L4[:8760] - Tf_exp)/Tf_exp*100
     DTf_L4_ste_r = (Tf_L4_ste[:8760] - Tf_exp)/Tf_exp*100
    
@@ -135,13 +135,13 @@ def Sandbox():
     ax.yaxis.label.set_color(plt.rcParams["axes.labelcolor"])
     ax.xaxis.label.set_color(plt.rcParams["axes.labelcolor"])
     # plot Temperatures
-    ax.step(time_array, Tb_L4[:8760], "k-", where="post", lw=1.5, label="Tb")
-    ax.step(time_array, Tb_L4_ste[:8760], "k-", where="post", lw=1.5, label="Tb incl. ste")
+    ax.step(time_array, Tb_L4[:8760], "k-", where="post", lw=1, label="Tb")
+    ax.step(time_array, Tb_L4_ste[:8760], "k-", where="post", linestyle="dashed", lw=1, label="Tb incl. ste")
+    ax.step(time_array, df_mod_Tb[:8760], "g-", where="post", lw=1, label="Tb mod")
     ax.step(time_array, Tf_L4[:8760], "b-", where="post", lw=1, label="Tf L4")
-    ax.step(time_array, Tf_L4_ste[:8760], "r-", where="post", lw=1, label="Tf incl. ste")
-    ax.step(time_array, Tf_mod_st, "c-", where="post", lw=1, label="Tf mod static")
-    ax.step(time_array, Tf_mod_dyn, "g-", where="post", lw=1, label="Tf mod dynamic")
-    ax.step(time_array, Tf_exp, "m-", where="post", lw=1, label="Tf experimental")
+    ax.step(time_array, Tf_L4_ste[:8760], "b-", linestyle="dashed", where="post", lw=1, label="Tf incl. ste")
+    ax.step(time_array, Tf_mod, "g-", where="post", lw=1, label="Tf mod dynamic")
+    ax.step(time_array, Tf_exp, "r-", where="post", lw=1, label="Tf experimental")
     ax.set_xticks(range(0, 52 + 1, 5))
 
     # Plot legend
@@ -154,17 +154,15 @@ def Sandbox():
     plt.figure("PVT versus PV")
     nb_subplots = 2
     ax1 = plt.subplot(nb_subplots, 1, 1)
-    ax1.plot(time_array, DTf_mod_st_a, label='mod st',  color='blue')
-    ax1.plot(time_array, DTf_mod_dyn_a, label='mod dyn',  color='green')
-    ax1.plot(time_array, DTf_L4_a, label='L4',  color='m')
-    ax1.plot(time_array, DTf_L4_ste_a, label='L4 ste',  color='r')
+    ax1.plot(time_array, DTf_mod_a, label='mod dyn',  color='g')
+    ax1.plot(time_array, DTf_L4_a, label='L4',  color='b')
+    ax1.plot(time_array, DTf_L4_ste_a, label='L4 ste', color= "b", linestyle="dashed",)
     ax1.legend()
     ax1.grid()
     ax2 = plt.subplot(nb_subplots, 1, 2, sharex=ax1)
-    ax2.plot(time_array, DTf_mod_st_r, label='mod st',  color='blue')
-    ax2.plot(time_array, DTf_mod_dyn_r, label='mod dyn',  color='green')
-    ax2.plot(time_array, DTf_L4_r, label='L4',  color='m')
-    ax2.plot(time_array, DTf_L4_ste_r, label='L4 ste',  color='r')
+    ax2.plot(time_array, DTf_mod_r, label='mod dyn',  color='g')
+    ax2.plot(time_array, DTf_L4_r, label='L4',  color='b')
+    ax2.plot(time_array, DTf_L4_ste_r, label='L4 ste', color= "b", linestyle="dashed",)
     ax2.legend()
     ax2.grid()
     plt.suptitle('Absolute(top) and relative (bottom) error of fluid temperature', fontsize=16)
