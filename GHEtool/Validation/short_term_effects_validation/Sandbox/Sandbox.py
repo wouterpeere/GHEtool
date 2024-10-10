@@ -50,8 +50,7 @@ def Sandbox():
     borefield.load = load
 
     borefield.calculate_temperatures(hourly=True)
-    Tf_L4_inj = borefield.results.peak_injection
-    Tf_L4_ext = borefield.results.peak_extraction
+    Tf_L4 = borefield.results.peak_injection
     Tb_L4 = borefield.results.Tb
 
     # initiate borefield
@@ -106,12 +105,26 @@ def Sandbox():
     Tf_mod_dyn = np.array(df_dyn.iloc[:, 0])
     Tf_exp = np.array(df_exp.iloc[:, 0])
 
+    
+    #Absolute differences between experimental and model fluid temperatures
+    DTf_mod_st_a = Tf_mod_st - Tf_exp
+    DTf_mod_dyn_a = Tf_mod_dyn - Tf_exp
+    DTf_L4_a = Tf_L4[:8760] - Tf_exp
+    DTf_L4_ste_a = Tf_L4_ste[:8760] - Tf_exp
+
+    #Relative differences between experimental and model fluid temperatures
+    DTf_mod_st_r = (Tf_mod_st - Tf_exp)/Tf_exp*100
+    DTf_mod_dyn_r = (Tf_mod_dyn - Tf_exp)/Tf_exp*100
+    DTf_L4_r = (Tf_L4[:8760] - Tf_exp)/Tf_exp*100
+    DTf_L4_ste_r = (Tf_L4_ste[:8760] - Tf_exp)/Tf_exp*100
+   
+
     ### Plotting figures
     legend = True
     # make a time array
     time_array = borefield.load.time_L4 / 3600
-    time_array = time_array[:8759]
-    print(time_array)
+    time_array = time_array[:8760]
+    print(time_array, len(time_array))
     # plt.rc('figure')
     # create new figure and axes if it not already exits otherwise clear it.
     fig = plt.figure()
@@ -121,16 +134,14 @@ def Sandbox():
     ax.set_ylabel(r"Temperature ($^\circ C$)")
     ax.yaxis.label.set_color(plt.rcParams["axes.labelcolor"])
     ax.xaxis.label.set_color(plt.rcParams["axes.labelcolor"])
-
     # plot Temperatures
-    ax.step(time_array, Tb_L4[:8759], "k-", where="post", lw=1.5, label="Tb")
-    ax.step(time_array, Tb_L4_ste[:8759], "k-", where="post", lw=1.5, label="Tb incl. ste")
-    ax.step(time_array, Tf_L4_inj[:8759], "b-", where="post", lw=1, label="Tf inj")
-    ax.step(time_array, Tf_L4_ext[:8759], "b-", where="post", lw=1, linestyle = 'dashed', label="Tf ext")
-    ax.step(time_array, Tf_L4_ste[:8759], "r-", where="post", lw=1, label="Tf incl. ste")
-    ax.step(time_array, Tf_mod_st[:8759], "c-", where="post", lw=1, label="Tf mod static")
-    ax.step(time_array, Tf_mod_dyn[:8759], "g-", where="post", lw=1, label="Tf mod dynamic")
-    ax.step(time_array, Tf_exp[:8759], "m-", where="post", lw=1, label="Tf experimental")
+    ax.step(time_array, Tb_L4[:8760], "k-", where="post", lw=1.5, label="Tb")
+    ax.step(time_array, Tb_L4_ste[:8760], "k-", where="post", lw=1.5, label="Tb incl. ste")
+    ax.step(time_array, Tf_L4[:8760], "b-", where="post", lw=1, label="Tf L4")
+    ax.step(time_array, Tf_L4_ste[:8760], "r-", where="post", lw=1, label="Tf incl. ste")
+    ax.step(time_array, Tf_mod_st, "c-", where="post", lw=1, label="Tf mod static")
+    ax.step(time_array, Tf_mod_dyn, "g-", where="post", lw=1, label="Tf mod dynamic")
+    ax.step(time_array, Tf_exp, "m-", where="post", lw=1, label="Tf experimental")
     ax.set_xticks(range(0, 52 + 1, 5))
 
     # Plot legend
@@ -139,6 +150,25 @@ def Sandbox():
     ax.set_xlim(left=0, right=52)
     plt.show()
 
+    
+    plt.figure("PVT versus PV")
+    nb_subplots = 2
+    ax1 = plt.subplot(nb_subplots, 1, 1)
+    ax1.plot(time_array, DTf_mod_st_a, label='mod st',  color='blue')
+    ax1.plot(time_array, DTf_mod_dyn_a, label='mod dyn',  color='green')
+    ax1.plot(time_array, DTf_L4_a, label='L4',  color='m')
+    ax1.plot(time_array, DTf_L4_ste_a, label='L4 ste',  color='r')
+    ax1.legend()
+    ax1.grid()
+    ax2 = plt.subplot(nb_subplots, 1, 2, sharex=ax1)
+    ax2.plot(time_array, DTf_mod_st_r, label='mod st',  color='blue')
+    ax2.plot(time_array, DTf_mod_dyn_r, label='mod dyn',  color='green')
+    ax2.plot(time_array, DTf_L4_r, label='L4',  color='m')
+    ax2.plot(time_array, DTf_L4_ste_r, label='L4 ste',  color='r')
+    ax2.legend()
+    ax2.grid()
+    plt.suptitle('Absolute(top) and relative (bottom) error of fluid temperature', fontsize=16)
+    plt.show()
 
 if __name__ == "__main__":  # pragma: no cover
     Sandbox()
