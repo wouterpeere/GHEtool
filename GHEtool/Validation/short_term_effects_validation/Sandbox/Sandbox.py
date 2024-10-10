@@ -39,7 +39,7 @@ def Sandbox():
     borefield.set_ground_parameters(ground_data)
     borefield.set_fluid_parameters(fluid_data)
     borefield.set_pipe_parameters(pipe_data)
-    borefield.create_rectangular_borefield(N_1=1, N_2=1, B_1=0, B_2=0, H=18.3, D=0, r_b=0.063)
+    borefield.create_rectangular_borefield(N_1=1, N_2=1, B_1=0, B_2=0, H=18.3, D=2, r_b=0.063)
     borefield.set_Rb(0.165)
 
     # load the hourly profile
@@ -50,7 +50,8 @@ def Sandbox():
     borefield.load = load
 
     borefield.calculate_temperatures(hourly=True)
-    Tf_L4 = borefield.results.peak_injection
+    Tf_L4_inj = borefield.results.peak_injection
+    Tf_L4_ext = borefield.results.peak_extraction
     Tb_L4 = borefield.results.Tb
 
     # initiate borefield
@@ -76,9 +77,7 @@ def Sandbox():
     'rho_cp_pipe': rho_cp_pipe,
     }
 
-    options = {'nSegments': 12,
-                   'segment_ratios': None,
-                   'disp': False,
+    options = {'disp': False,
                    'profiles': True,
                    'method': 'equivalent',
                    'cylindrical_correction': True,
@@ -100,10 +99,12 @@ def Sandbox():
     # import data
     df_st = pd.read_csv(os.path.join(os.path.dirname(__file__), 'Modelica_Tf_static.csv'), header=0, decimal=".")
     df_dyn = pd.read_csv(os.path.join(os.path.dirname(__file__), 'Modelica_Tf_dynamic.csv'), header=0, decimal=".")
+    df_exp = pd.read_csv(os.path.join(os.path.dirname(__file__), 'Tf_values_exp_modelica.csv'), header=0, decimal=".")
 
     # set data
     Tf_mod_st = np.array(df_st.iloc[:, 0])
     Tf_mod_dyn = np.array(df_dyn.iloc[:, 0])
+    Tf_exp = np.array(df_exp.iloc[:, 0])
 
     ### Plotting figures
     legend = True
@@ -124,10 +125,12 @@ def Sandbox():
     # plot Temperatures
     ax.step(time_array, Tb_L4[:8759], "k-", where="post", lw=1.5, label="Tb")
     ax.step(time_array, Tb_L4_ste[:8759], "k-", where="post", lw=1.5, label="Tb incl. ste")
-    ax.step(time_array, Tf_L4[:8759], "b-", where="post", lw=1, label="Tf")
+    ax.step(time_array, Tf_L4_inj[:8759], "b-", where="post", lw=1, label="Tf inj")
+    ax.step(time_array, Tf_L4_ext[:8759], "b-", where="post", lw=1, linestyle = 'dashed', label="Tf ext")
     ax.step(time_array, Tf_L4_ste[:8759], "r-", where="post", lw=1, label="Tf incl. ste")
     ax.step(time_array, Tf_mod_st[:8759], "c-", where="post", lw=1, label="Tf mod static")
     ax.step(time_array, Tf_mod_dyn[:8759], "g-", where="post", lw=1, label="Tf mod dynamic")
+    ax.step(time_array, Tf_exp[:8759], "m-", where="post", lw=1, label="Tf experimental")
     ax.set_xticks(range(0, 52 + 1, 5))
 
     # Plot legend
