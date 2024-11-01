@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Added
 
+- Added the Separatus probe.
 - Extra validation based on the work of Ahmadfard & Bernier (issue #243).
 - Added the option to exclude DHW from the peak heating load (issue #252).
 - Added vfr to Fluid Class (issue #262).

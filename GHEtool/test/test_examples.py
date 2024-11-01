@@ -71,3 +71,10 @@ def test_combined_active_and_passive_cooling(monkeypatch):
     from GHEtool.Examples.combined_active_and_passive_cooling import active_above_threshold, default_cooling_in_summer
     assert np.isclose(active_above_threshold(), 7483.480000000002)
     assert np.isclose(default_cooling_in_summer(), 67683.27999999997)
+
+def test_separatus(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    from GHEtool.Examples.separatus import design_with_single_U, design_with_double_U, design_with_separatus
+    design_with_single_U()
+    design_with_double_U()
+    design_with_separatus()
