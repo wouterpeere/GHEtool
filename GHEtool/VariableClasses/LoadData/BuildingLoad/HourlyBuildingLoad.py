@@ -24,7 +24,7 @@ class HourlyBuildingLoad(_SingleYear, _HourlyDataBuilding):
                  cooling_load: ArrayLike = None,
                  simulation_period: int = 20,
                  efficiency_heating: Union[int, float, COP, SCOP] = 5,
-                 efficiency_cooling: Union[int, float, EER, SEER] = 20,
+                 efficiency_cooling: Union[int, float, EER, SEER, EERCombined] = 20,
                  dhw: Union[float, np.ndarray] = None,
                  efficiency_dhw: Union[int, float, COP, SCOP] = 4):
         """
@@ -234,7 +234,7 @@ class HourlyBuildingLoad(_SingleYear, _HourlyDataBuilding):
         """
         This function corrects the load for the correct start month.
         If the simulation starts in september, the start month is 9 and hence the array should start
-        at index 9.
+        at index of the first hour of month 9.
 
         Parameters
         ----------
@@ -248,6 +248,17 @@ class HourlyBuildingLoad(_SingleYear, _HourlyDataBuilding):
         if self.start_month == 1:
             return array
         return np.concatenate((array[self._start_hour:], array[: self._start_hour]))
+
+    @property
+    def month_indices(self) -> np.ndarray:
+        """
+        This property returns the array of all monthly indices for the simulation period.
+
+        Returns
+        -------
+        time array : np.ndarray
+        """
+        return np.tile(self.correct_for_start_month(np.repeat(np.arange(1, 13), self.UPM)), self.simulation_period)
 
     def plot_load_duration(self, legend: bool = False) -> Tuple[plt.Figure, plt.Axes]:
         """

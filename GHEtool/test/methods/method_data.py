@@ -560,3 +560,28 @@ hourly_load_building.hourly_heating_load = hourly_load_building.hourly_heating_l
 borefield.load = hourly_load_building
 list_of_test_objects.add(SizingObject(borefield, L2_output=310.725, L3_output=310.725, L4_output=308.269, quadrant=4,
                                       name='BS2023 Swimming pool'))
+
+eer_combined = EERCombined(20, 5, 10)
+borefield = Borefield()
+borefield.create_rectangular_borefield(3, 6, 6, 6, 146, 4)
+borefield.set_min_avg_fluid_temperature(3)
+borefield.set_max_avg_fluid_temperature(16)
+borefield.load.peak_duration = 6
+load = HourlyBuildingLoad(efficiency_heating=4, efficiency_cooling=eer_combined)
+# column order is inverted
+load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_heating=1, col_cooling=0)
+load.simulation_period = 40
+borefield.load = load
+
+borefield.set_ground_parameters(GroundTemperatureGradient(1.9, 10, gradient=2))
+borefield.set_fluid_parameters(FluidData(0.1, 0.475, 1033, 3930, 0.001))
+borefield.set_pipe_parameters(SingleUTube(1.5, 0.016, 0.02, 0.42, 0.04))
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 45.978137699335, 11.029080983424729,
+                                                   52.82586122830533, 28.00877268650213, 605.9817888622596,
+                                                   512.6954920945816,
+                                                   name='Optimise load profile (eer combined) (power)', power=True,
+                                                   hourly=False))
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 38.165390819460434, 4.08828744800462,
+                                                   75.9124206410309, 86.06503815919983, 631.1307699700886, 535.936136,
+                                                   name='Optimise load profile (eer combined) (energy)', power=False,
+                                                   hourly=False))

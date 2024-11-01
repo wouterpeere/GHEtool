@@ -17,9 +17,10 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
 
     def __init__(self,
                  efficiency_heating: Union[int, float, COP, SCOP],
-                 efficiency_cooling: Union[int, float, EER, SEER],
+                 efficiency_cooling: Union[int, float, EER, SEER, EERCombined],
                  dhw: Union[float, np.ndarray] = None,
-                 efficiency_dhw: Union[int, float, COP, SCOP] = 4):
+                 efficiency_dhw: Union[int, float, COP, SCOP] = 4,
+                 multiyear: bool = False):
         """
 
         Parameters
@@ -32,8 +33,10 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
             Yearly value of array with energy demand for domestic hot water (DHW) [kWh]
         efficiency_dhw : int, float, COP, SCOP,
             Efficiency in DHW
+        multiyear : bool
+            True if multiyear data
         """
-        _LoadDataBuilding.__init__(self, efficiency_heating, efficiency_cooling, dhw, efficiency_dhw)
+        _LoadDataBuilding.__init__(self, efficiency_heating, efficiency_cooling, dhw, efficiency_dhw, multiyear)
         _HourlyData.__init__(self)
 
         # initiate variables
@@ -195,7 +198,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
             Array of EER values
         """
         if isinstance(self.cop, SCOP) and isinstance(self.eer, SEER) and isinstance(self.cop_dhw, SCOP):
-            return self.eer.get_EER(0, power=np.nan_to_num(power))
+            return self.eer.get_EER(0, power=np.nan_to_num(power), month_indices=self.month_indices)
         if isinstance(self.results, ResultsMonthly):
             raise TypeError('You cannot get an hourly EER values based on monthly temperature results.')
         if isinstance(self.results, tuple):
@@ -203,7 +206,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         else:
             temperature = self.results.Tf
 
-        return self.eer.get_EER(temperature, power=np.nan_to_num(power))
+        return self.eer.get_EER(temperature, power=np.nan_to_num(power), month_indices=self.month_indices)
 
     @property
     def hourly_injection_load_simulation_period(self) -> np.ndarray:
@@ -536,8 +539,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         -------
         max peak injection : float
         """
-        if isinstance(self._results, ResultsMonthly) and \
-                (isinstance(self.cop, COP) or isinstance(self.eer, EER) or isinstance(self.cop_dhw, COP)):
+        if isinstance(self._results, ResultsMonthly):
             return np.max(self.monthly_peak_injection_simulation_period)
         return np.max(self.hourly_injection_load_simulation_period)
 
@@ -550,8 +552,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         -------
         max peak extraction : float
         """
-        if isinstance(self._results, ResultsMonthly) and \
-                (isinstance(self.cop, COP) or isinstance(self.eer, EER) or isinstance(self.cop_dhw, COP)):
+        if isinstance(self._results, ResultsMonthly):
             return np.max(self.monthly_peak_extraction_simulation_period)
         return np.max(self.hourly_extraction_load_simulation_period)
 
@@ -565,8 +566,18 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         -------
         imbalance : float
         """
-        if isinstance(self._results, ResultsMonthly) and \
-                (isinstance(self.cop, COP) or isinstance(self.eer, EER) or isinstance(self.cop_dhw, COP)):
+        if isinstance(self._results, ResultsMonthly):
             return super(_HourlyData, self).imbalance
         return np.sum(
             self.hourly_injection_load_simulation_period - self.hourly_extraction_load_simulation_period) / self.simulation_period
+
+    @property
+    def month_indices(self) -> np.ndarray:
+        """
+        This property returns the array of all monthly indices for the simulation period.
+
+        Returns
+        -------
+        time array : np.ndarray
+        """
+        return np.tile(np.repeat(np.arange(1, 13), self.UPM), self.simulation_period)

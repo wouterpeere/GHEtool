@@ -2,7 +2,7 @@ import pytest
 
 import numpy as np
 
-from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad, MonthlyGeothermalLoadMultiYear
+from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad, Cluster
 from GHEtool.Validation.cases import load_case
 
 
@@ -343,7 +343,7 @@ def test_different_start_month():
     assert np.allclose(load.monthly_baseload_injection_simulation_period, np.tile(result, 20))
     assert np.allclose(load.monthly_peak_extraction_simulation_period, np.tile(result, 20))
     assert np.allclose(load.monthly_peak_injection_simulation_period, np.tile(result, 20))
-    
+
     load.peak_injection = np.zeros(12)
     load.peak_extraction = np.zeros(12)
     assert np.allclose(load.monthly_peak_extraction_simulation_period, np.tile(result, 20) / 730)
@@ -362,3 +362,30 @@ def test_yearly_loads():
 def test_depreciation_warning():
     with pytest.raises(DeprecationWarning):
         MonthlyGeothermalLoadAbsolute(baseload_heating=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+
+
+def test_cluster():
+    load1 = MonthlyGeothermalLoadAbsolute(*load_case(1))
+    load2 = MonthlyGeothermalLoadAbsolute(*load_case(2))
+    cluster = Cluster([load1, load2])
+    cluster2 = Cluster()
+    cluster2.add_building(load1)
+    cluster2.add_building(load2)
+    assert np.allclose(load1.monthly_baseload_extraction + load2.monthly_baseload_extraction,
+                       cluster.monthly_baseload_extraction)
+    assert np.allclose(load1.monthly_baseload_injection + load2.monthly_baseload_injection,
+                       cluster.monthly_baseload_injection)
+    assert np.allclose(load1.monthly_peak_extraction + load2.monthly_peak_extraction,
+                       cluster.monthly_peak_extraction)
+    assert np.allclose(load1.monthly_peak_injection + load2.monthly_peak_injection,
+                       cluster.monthly_peak_injection)
+    assert np.allclose(load1.monthly_baseload_extraction + load2.monthly_baseload_extraction,
+                       cluster2.monthly_baseload_extraction)
+    assert np.allclose(load1.monthly_baseload_injection + load2.monthly_baseload_injection,
+                       cluster2.monthly_baseload_injection)
+    assert np.allclose(load1.monthly_peak_extraction + load2.monthly_peak_extraction,
+                       cluster2.monthly_peak_extraction)
+    assert np.allclose(load1.monthly_peak_injection + load2.monthly_peak_injection,
+                       cluster2.monthly_peak_injection)
+    cluster.simulation_period = 21
+    assert cluster.list_of_buildings[0].simulation_period == 21

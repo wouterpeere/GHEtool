@@ -15,6 +15,10 @@ Efficiency data
     :members:
     :show-inheritance:
 
+.. automodule:: GHEtool.VariableClasses.Efficiency.EERCombined
+    :members:
+    :show-inheritance:
+
 .. automodule:: GHEtool.VariableClasses.Efficiency.SCOP
     :members:
     :show-inheritance:

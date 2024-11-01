@@ -7,10 +7,11 @@ import pygfunction as gt
 import pytest
 
 from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, DoubleUTube, Borefield, \
-    CalculationSetup, FOLDER, MultipleUTube
+    CalculationSetup, FOLDER, MultipleUTube, EERCombined
 from GHEtool.logger import ghe_logger
 from GHEtool.Validation.cases import load_case
-from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad, HourlyBuildingLoad
+from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad, HourlyBuildingLoad, \
+    HourlyBuildingLoadMultiYear
 from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient
 
 data = GroundConstantTemperature(3, 10)
@@ -520,6 +521,26 @@ def test_size_L4():
     assert borefield.calculate_quadrant() == 4
 
 
+def test_calculate_temperatures_eer_combined():
+    eer_combined = EERCombined(20, 5, 17)
+    borefield = Borefield()
+    borefield.set_ground_parameters(ground_data_constant)
+    load = HourlyBuildingLoad(efficiency_cooling=eer_combined)
+
+    borefield.borefield = copy.deepcopy(borefield_gt)
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    borefield.load = load
+    borefield.calculate_temperatures(hourly=True)
+
+    active_cooling_array = borefield.load.eer.get_time_series_active_cooling(borefield.results.peak_injection,
+                                                                             borefield.load.month_indices)
+    assert np.allclose(borefield.load.hourly_cooling_load_simulation_period * active_cooling_array *
+                       (1 + 1 / 5) + borefield.load.hourly_cooling_load_simulation_period * np.invert(
+        active_cooling_array) *
+                       (1 + 1 / 20),
+                       borefield.load.hourly_injection_load_simulation_period)
+
+
 def test_investment_cost():
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
@@ -859,6 +880,23 @@ def test_optimise_load_profile_power(monkeypatch):
     assert len(borefield.results.peak_extraction) == 0
 
 
+def test_optimise_load_profile_power_multiyear(monkeypatch):
+    # multiyear should also have a multiyear as output
+    borefield = Borefield()
+    monkeypatch.setattr(plt, "show", lambda: None)
+    borefield.set_ground_parameters(ground_data_constant)
+    borefield.borefield = copy.deepcopy(borefield_gt)
+    load = HourlyBuildingLoad(efficiency_heating=10 ** 6, efficiency_cooling=10 * 66)
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load_my = HourlyBuildingLoadMultiYear(load.hourly_heating_load_simulation_period,
+                                          load.hourly_cooling_load_simulation_period)
+    secundary_borefield_load, external_load = borefield.optimise_load_profile_power(load_my, 150)
+    assert borefield.load.simulation_period == 20
+    assert secundary_borefield_load.simulation_period == 20
+    assert external_load.simulation_period == 20
+    assert len(borefield.results.peak_extraction) == 0
+
+
 def test_optimise_load_profile_energy(monkeypatch):
     borefield = Borefield()
     monkeypatch.setattr(plt, "show", lambda: None)
@@ -1068,3 +1106,24 @@ def test_deep_sizing(case, result):
 def test_depreciation_warning():
     with pytest.raises(DeprecationWarning):
         Borefield(baseload_heating=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+
+
+def test_optimise_load_borefield():
+    load = HourlyBuildingLoad()
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load.simulation_period = 10
+    borefield = Borefield(load=load)
+    borefield.set_min_avg_fluid_temperature(2)
+    borefield.set_max_avg_fluid_temperature(17)
+    borefield.borefield = gt.boreholes.rectangle_field(20, 4, 6, 6, 150, 1, 0.07)
+    borefield.Rb = 0.1699
+    ground_data = GroundFluxTemperature(2, 9.6, flux=0.07)
+    borefield.ground_data = ground_data
+    borefield_load, external_load = borefield.optimise_load_profile_energy(load)
+    assert np.isclose(borefield_load.imbalance, -228386.82055766508)
+    borefield.load = borefield_load
+    borefield.calculate_temperatures(hourly=False)
+    assert np.isclose(np.max(borefield.results.peak_injection), 17.044473901670603)
+    assert np.isclose(np.min(borefield.results.peak_extraction), 1.9471241454443655)
+    assert np.isclose(borefield.load.max_peak_cooling, 329.9393053)
+    assert np.isclose(np.sum(borefield.load.hourly_heating_load), 593385.1066074175)

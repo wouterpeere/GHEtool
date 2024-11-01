@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from GHEtool import FOLDER
-from GHEtool.VariableClasses import HourlyBuildingLoad
+from GHEtool.VariableClasses import HourlyBuildingLoad, Cluster
 from GHEtool.VariableClasses.Result import ResultsMonthly, ResultsHourly
 
 from GHEtool.VariableClasses.Efficiency import *
@@ -561,6 +561,7 @@ def test_hourly_injection_load_simulation_period_monthly_data():
     assert np.allclose(load.monthly_peak_injection_simulation_period,
                        load.resample_to_monthly(np.tile(np.concatenate((np.full(4380, 7.5),
                                                                         np.full(4380, 11))), 10))[0])
+    assert np.isclose(load.max_peak_injection, 11)
     load.eer = eer_pl
     assert np.allclose(load.monthly_baseload_injection_simulation_period,
                        load.resample_to_monthly(
@@ -595,6 +596,9 @@ def test_hourly_extraction_load_simulation_period_monthly_data():
                            np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9))), 10))[0])
     assert np.allclose(load._monthly_baseload_extraction_dhw_simulation_period, np.zeros(120))
     assert np.allclose(load._monthly_peak_extraction_dhw_simulation_period, np.zeros(120))
+    assert np.isclose(load.max_peak_extraction, 9)
+    assert np.isclose(load.imbalance, -50370.0)
+
     load.cop = cop_pl
     assert np.allclose(load.monthly_baseload_extraction_simulation_period,
                        load.resample_to_monthly(
@@ -632,3 +636,42 @@ def test_hourly_extraction_load_simulation_period_monthly_data():
                            np.tile(np.concatenate((np.full(4380, 3.75), np.full(4380, 9.5))), 10))[0])
     assert np.allclose(load._monthly_baseload_extraction_heating_simulation_period, np.zeros(120))
     assert np.allclose(load._monthly_peak_extraction_heating_simulation_period, np.zeros(120))
+
+
+def test_time_array():
+    load = HourlyBuildingLoad(np.zeros(8760), np.zeros(8760), 10, scop, seer)
+    assert np.allclose(load.month_indices, np.tile(np.repeat(np.arange(1, 13), load.UPM), 10))
+
+    load.start_month = 2
+    assert np.allclose(load.month_indices, np.tile(np.concatenate((
+        np.repeat(np.arange(1, 13), load.UPM)[730:], np.repeat(np.arange(1, 13), load.UPM)[:730])), 10))
+
+
+def test_cluster():
+    load1 = HourlyBuildingLoad(np.linspace(1, 2000, 8760), np.linspace(1, 8760 - 1, 8760) * 2, 10, cop_basic, eer_basic)
+    load2 = HourlyBuildingLoad(np.linspace(1, 2000, 8760), np.linspace(1, 8760 - 1, 8760) * 2, 10, cop_basic, eer_basic)
+    load = HourlyBuildingLoad(np.linspace(1, 2000, 8760) * 2, np.linspace(1, 8760 - 1, 8760) * 2 * 2, 10, cop_basic,
+                              eer_basic)
+
+    cluster = Cluster([load1, load2])
+
+    assert np.allclose(load.monthly_baseload_extraction,
+                       cluster.monthly_baseload_extraction)
+    assert np.allclose(load.monthly_baseload_injection,
+                       cluster.monthly_baseload_injection)
+    assert np.allclose(load.monthly_peak_extraction,
+                       cluster.monthly_peak_extraction)
+    assert np.allclose(load.monthly_peak_injection,
+                       cluster.monthly_peak_injection)
+    assert np.allclose(load.hourly_extraction_load, cluster.hourly_extraction_load)
+    assert np.allclose(load.hourly_injection_load, cluster.hourly_injection_load)
+
+    load.reset_results(0, 10)
+    cluster.reset_results(0, 10)
+    assert np.allclose(load.hourly_extraction_load, cluster.hourly_extraction_load)
+    assert np.allclose(load.hourly_injection_load, cluster.hourly_injection_load)
+
+    load.set_results(results_hourly_test)
+    cluster.set_results(results_hourly_test)
+    assert np.allclose(load.hourly_extraction_load, cluster.hourly_extraction_load)
+    assert np.allclose(load.hourly_injection_load, cluster.hourly_injection_load)

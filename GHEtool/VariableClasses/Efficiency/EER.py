@@ -50,7 +50,8 @@ class EER(_Efficiency):
     def get_EER(self,
                 primary_temperature: Union[float, np.ndarray],
                 secondary_temperature: Union[float, np.ndarray] = None,
-                power: Union[float, np.ndarray] = None) -> np.ndarray:
+                power: Union[float, np.ndarray] = None,
+                **kwargs) -> np.ndarray:
         """
         This function calculates the EER. This function uses a linear interpolation and sets the out-of-bound values
         to the nearest value in the dataset. This function does hence not extrapolate.
@@ -79,8 +80,8 @@ class EER(_Efficiency):
     def get_SEER(self,
                  power: np.ndarray,
                  primary_temperature: np.ndarray,
-                 secondary_temperature: np.ndarray = None
-                 ) -> float:
+                 secondary_temperature: np.ndarray = None,
+                 **kwargs) -> float:
         """
         This function calculates and returns the SEER.
 
@@ -108,9 +109,9 @@ class EER(_Efficiency):
                 secondary_temperature is None or len(secondary_temperature) == len(power)):
             raise ValueError('The hourly arrays should have equal length!')
 
-        cop_array = self.get_EER(primary_temperature, secondary_temperature, power)
+        eer_array = self.get_EER(primary_temperature, secondary_temperature, power)
 
         # SEER = sum(Q)/sum(W)
-        w_array = np.array(power) / cop_array
+        w_array = np.array(power) / eer_array
 
         return np.sum(power) / np.sum(w_array)

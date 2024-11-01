@@ -119,6 +119,7 @@ These efficiencies can be used in the Building load classes (cf. infra). The dif
 * _SEER_: Constant seasonal performance for cooling
 * _COP_: Instant efficiency for heating, with inlet temperature, outlet temperature and part load dependency
 * _EER_: Instant efficiency for cooling, with inlet temperature, outlet temperature and part load dependency
+* _EERCombined_: EER for combined active and passive cooling
 
 ### Load data
 
@@ -150,9 +151,11 @@ Depending on your answer on these three questions, you can opt for one of eight 
 * _MonthlyBuildingLoadMultiYear_: You can set the monthly heating and cooling load for multiple years (i.e. for
   the whole simulation period).
 
+On the other hand, you can also choose a Cluster load where you can add multiple loads together. Be careful however
+when mixing hourly and monthly loads!
+
 All building load classes also have the option to add a yearly domestic hot water (DHW) demand and require you to define
-an
-efficiency for heating, cooling (and optionally DHW) (cf. supra).
+an efficiency for heating, cooling (and optionally DHW) (cf. supra).
 
 Please note that it is possible to add your own load types by inheriting the attributes from the abstract _LoadData,
 _HourlyLoad, _LoadDataBuilding and _HourlyLoadBuilding classes.

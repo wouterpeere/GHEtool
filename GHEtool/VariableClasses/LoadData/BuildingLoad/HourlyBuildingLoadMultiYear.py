@@ -16,7 +16,7 @@ class HourlyBuildingLoadMultiYear(_HourlyDataBuilding):
     def __init__(self, heating_load: ArrayLike = None,
                  cooling_load: ArrayLike = None,
                  efficiency_heating: Union[int, float, COP, SCOP] = 5,
-                 efficiency_cooling: Union[int, float, EER, SEER] = 20,
+                 efficiency_cooling: Union[int, float, EER, SEER, EERCombined] = 20,
                  dhw: Union[float, np.ndarray] = None,
                  efficiency_dhw: Union[int, float, COP, SCOP] = 4):
         """
@@ -37,9 +37,8 @@ class HourlyBuildingLoadMultiYear(_HourlyDataBuilding):
             Efficiency in DHW
         """
 
-        _HourlyDataBuilding.__init__(self, efficiency_heating, efficiency_cooling, dhw, efficiency_dhw)
+        _HourlyDataBuilding.__init__(self, efficiency_heating, efficiency_cooling, dhw, efficiency_dhw, True)
         self._multiyear = True
-        self._hourly = True
 
         # set variables
         heating_load = np.zeros(8760) if heating_load is None and cooling_load is None else heating_load

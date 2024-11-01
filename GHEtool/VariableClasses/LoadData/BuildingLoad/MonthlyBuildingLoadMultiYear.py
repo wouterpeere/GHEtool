@@ -23,7 +23,7 @@ class MonthlyBuildingLoadMultiYear(_LoadDataBuilding):
             peak_heating: ArrayLike = None,
             peak_cooling: ArrayLike = None,
             efficiency_heating: Union[int, float, COP, SCOP] = 5,
-            efficiency_cooling: Union[int, float, EER, SEER] = 20,
+            efficiency_cooling: Union[int, float, EER, SEER, EERCombined] = 20,
             dhw: Union[float, np.ndarray] = None,
             efficiency_dhw: Union[int, float, COP, SCOP] = 4
     ):
@@ -49,7 +49,7 @@ class MonthlyBuildingLoadMultiYear(_LoadDataBuilding):
             Efficiency in DHW
         """
 
-        _LoadDataBuilding.__init__(self, efficiency_heating, efficiency_cooling, dhw, efficiency_dhw)
+        _LoadDataBuilding.__init__(self, efficiency_heating, efficiency_cooling, dhw, efficiency_dhw, True)
         self._multiyear = True
 
         # initiate variables

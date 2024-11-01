@@ -89,9 +89,11 @@ def optimise_load_profile_power(
     while not cool_ok or not heat_ok:
         # limit the primary geothermal extraction and injection load to peak_heat_load and peak_cool_load
         borefield.load.set_hourly_cooling_load(
-            np.minimum(peak_cool_load, building_load.hourly_cooling_load))
+            np.minimum(peak_cool_load, building_load.hourly_cooling_load
+            if isinstance(borefield.load, HourlyBuildingLoad) else building_load.hourly_cooling_load_simulation_period))
         borefield.load.set_hourly_heating_load(
-            np.minimum(peak_heat_load, building_load.hourly_heating_load))
+            np.minimum(peak_heat_load, building_load.hourly_heating_load
+            if isinstance(borefield.load, HourlyBuildingLoad) else building_load.hourly_heating_load_simulation_period))
 
         # calculate temperature profile, just for the results
         borefield.calculate_temperatures(depth=depth, hourly=use_hourly_resolution)
@@ -197,7 +199,9 @@ def optimise_load_profile_energy(
         building_load = HourlyBuildingLoadMultiYear(building_load.hourly_heating_load_simulation_period,
                                                     building_load.hourly_cooling_load_simulation_period,
                                                     building_load._cop,
-                                                    building_load._eer)
+                                                    building_load._eer,
+                                                    building_load.hourly_dhw_load_simulation_period,
+                                                    building_load._cop_dhw)
 
     # set max peak values
     init_peak_heating = building_load.hourly_heating_load_simulation_period.copy()
@@ -237,7 +241,9 @@ def optimise_load_profile_energy(
             peak_heating=building_load.monthly_peak_heating_simulation_period,
             peak_cooling=building_load.monthly_peak_cooling_simulation_period,
             efficiency_heating=building_load._cop,
-            efficiency_cooling=building_load._eer)
+            efficiency_cooling=building_load._eer,
+            dhw=building_load.monthly_baseload_dhw_simulation_period,
+            efficiency_dhw=building_load._cop_dhw)
 
     borefield.load = monthly_load
 
