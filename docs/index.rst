@@ -13,26 +13,28 @@ Here one can find (extensive) documentation of GHEtool codebase. Please find bel
 
 Graphical user interface
 ========================
-There are two graphical user interfaces available which are built using GHEtool: GHEtool Pro and GHEtool Community
+There are two graphical user interfaces available which are built using GHEtool: GHEtool Cloud and GHEtool Community
 
-GHEtool Pro
+GHEtool Cloud
 -----------
-GHEtool Pro is the official and supported version of GHEtool which supports drilling companies, engineering firms, architects, government organizations in their geothermal design process.
-With GHEtool Pro they can minimize the environmental and societal impact while maximizing the cost-effective utilization of geothermal projects.
-Visit our website at `https://ghetool.eu <https://ghetool.eu>`_ to learn more about the synergy between this open-source package and GHEtool Pro.
+GHEtool Cloud is the official and supported version of GHEtool which supports drilling companies, engineering firms,
+architects, government organizations in their geothermal design process.
+With GHEtool Cloud they can minimize the environmental and societal impact while maximizing the cost-effective
+utilization of geothermal projects.
+Visit our website at `https://ghetool.eu <https://ghetool.eu>`_ to learn more about GHEtool Cloud and what it can do for you.
 
-The user manual for GHEtool Pro, together with instructions for installation, you can find `here <https://manual.ghetool.eu>`_.
+You can find the documentation for GHEtool Cloud `here <https://manual.ghetool.eu>`_.
 
-.. image:: GHEtoolPro.png
-  :alt: Image of GHEtool Pro
+.. image:: GHEtoolCloud.jpg
+  :alt: Image of GHEtool Cloud
   :width: 450
   :align: center
 
 
 GHEtool Community
 -----------------
-Besides GHEtool Pro, an open-source alternative for the graphical user interface is available in the form of *GHEtool Community*.
-This version is built and maintained by the community, and **has no official support like GHEtool Pro**. You can read all about this
+Besides GHEtool Cloud, an open-source alternative for the graphical user interface is available in the form of *GHEtool Community*.
+This version is built and maintained by the community, and **has no official support like GHEtool Cloud**. You can read all about this
 *GHEtool Community* on their `GitHub Repo <https://github.com/wouterpeere/ghetool-gui>`_.
 
 .. toctree::
