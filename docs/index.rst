@@ -30,13 +30,6 @@ You can find the documentation for GHEtool Cloud `here <https://manual.ghetool.e
   :width: 450
   :align: center
 
-
-GHEtool Community
------------------
-Besides GHEtool Cloud, an open-source alternative for the graphical user interface is available in the form of *GHEtool Community*.
-This version is built and maintained by the community, and **has no official support like GHEtool Cloud**. You can read all about this
-*GHEtool Community* on their `GitHub Repo <https://github.com/wouterpeere/ghetool-gui>`_.
-
 .. toctree::
     :caption: GHEtool
     :maxdepth: 1
