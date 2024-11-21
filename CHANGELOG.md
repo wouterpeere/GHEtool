@@ -5,7 +5,13 @@ our [project board](https://github.com/users/wouterpeere/projects/2) on GitHub.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [2.3.0] - unpublished
+## [2.3.1] - unpublished
+
+## Fixed
+
+- Problem with optimise energy profile (issue #306).
+
+## [2.3.0] - 2024-11-05
 
 ## Added
 
@@ -353,6 +359,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 
 - fixed bug in interpolation
+
+[2.3.0]: https://github.com/wouterpeere/GHEtool/compare/v2.2.2...v2.3.0
 
 [2.2.2]: https://github.com/wouterpeere/GHEtool/compare/v2.2.1...v2.2.2
 
