@@ -248,8 +248,8 @@ def optimise_load_profile_energy(
     borefield.load = monthly_load
 
     # store initial monthly peak loads
-    peak_heating = monthly_load.monthly_peak_heating_simulation_period
-    peak_cooling = monthly_load.monthly_peak_cooling_simulation_period
+    peak_heating = copy.copy(monthly_load.monthly_peak_heating_simulation_period)
+    peak_cooling = copy.copy(monthly_load.monthly_peak_cooling_simulation_period)
 
     for i in range(12 * borefield.load.simulation_period):
         # set iteration criteria

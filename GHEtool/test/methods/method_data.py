@@ -503,8 +503,8 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 80.3414
                                                    21.65199, 35.8583, 56.14555, 61.92114,
                                                    name='Optimise load profile (stuck in loop) (power, hourly)',
                                                    power=True, hourly=True))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 89.1681, 97.6848,
-                                                   56.49199, 71.1038, 55.13048, 66.55643,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 89.31225880363472, 98.37453537405028,
+                                                   56.49199, 74.7635850227125, 54.86173917367975, 56.577818731384966,
                                                    name='Optimise load profile (stuck in loop) (energy)', power=False))
 
 ground_data = GroundFluxTemperature(3, 10)
@@ -581,7 +581,21 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 45.9781
                                                    512.6954920945816,
                                                    name='Optimise load profile (eer combined) (power)', power=True,
                                                    hourly=False))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 38.165390819460434, 4.08828744800462,
-                                                   75.9124206410309, 86.06503815919983, 631.1307699700886, 535.936136,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 50.187981717163034, 12.82812330930278,
+                                                   95.636899472386, 66.33595162152281, 603.0319153178363,
+                                                   509.73531422797737,
                                                    name='Optimise load profile (eer combined) (energy)', power=False,
+                                                   hourly=False))
+
+data = GroundFluxTemperature(1.8, 9.7, flux=0.08)
+borefield = Borefield()
+borefield.set_ground_parameters(data)
+borefield.Rb = 0.131
+borefield.create_rectangular_borefield(3, 5, 6, 6, 100, 1, 0.07)
+load = HourlyBuildingLoad(efficiency_heating=4.5, efficiency_cooling=20)
+load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True, separator=";",
+                         col_cooling=0, col_heating=1)
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 100, 100.0, 92.80988709011142,
+                                                   25.315, 42.463997436869896, 0.0, 64.1435824039379,
+                                                   name='Optimise load profile (auditorium) (energy)', power=False,
                                                    hourly=False))
