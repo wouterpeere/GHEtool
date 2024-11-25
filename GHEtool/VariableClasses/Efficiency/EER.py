@@ -115,3 +115,8 @@ class EER(_Efficiency):
         w_array = np.array(power) / eer_array
 
         return np.sum(power) / np.sum(w_array)
+
+    def __repr__(self):
+        if self._has_part_load:
+            return 'Temperature and part-load dependent EER'
+        return 'Temperature dependent EER'

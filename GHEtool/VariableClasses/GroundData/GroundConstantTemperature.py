@@ -2,12 +2,11 @@ from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
 
 
 class GroundConstantTemperature(_GroundData):
-
     __slots__ = _GroundData.__slots__
 
     def __init__(self, k_s: float = None,
                  T_g: float = None,
-                 volumetric_heat_capacity: float = 2.4 * 10**6):
+                 volumetric_heat_capacity: float = 2.4 * 10 ** 6):
         """
 
         Parameters
@@ -54,3 +53,6 @@ class GroundConstantTemperature(_GroundData):
             Difference in depth [m]
         """
         return 0
+
+    def __repr__(self):
+        return f'Constant ground temperature\n\tGround temperature at infinity [°C]: {self.Tg}\n\t' + super().__repr__()

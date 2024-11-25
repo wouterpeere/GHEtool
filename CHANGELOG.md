@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [2.3.1] - unpublished
 
+## Added
+
+- __repr__ for every class (issue #310).
+
 ## Fixed
 
 - Problem with optimise energy profile (issue #306).

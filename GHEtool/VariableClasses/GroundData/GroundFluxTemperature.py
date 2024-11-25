@@ -2,12 +2,11 @@ from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
 
 
 class GroundFluxTemperature(_GroundData):
-
     __slots__ = _GroundData.__slots__ + ('flux',)
 
     def __init__(self, k_s: float = None,
                  T_g: float = None,
-                 volumetric_heat_capacity: float = 2.4 * 10**6,
+                 volumetric_heat_capacity: float = 2.4 * 10 ** 6,
                  flux: float = 0.06):
         """
 
@@ -62,3 +61,7 @@ class GroundFluxTemperature(_GroundData):
             Difference in depth [m]
         """
         return temperature_diff * 2 * self.k_s(H) / self.flux
+
+    def __repr__(self):
+        return f'Ground flux temperature\n\tGround surface temperature [°C]: {self.Tg}' \
+               f'\n\tGround flux [W/m²]: {self.flux}\n\t' + super().__repr__()

@@ -60,3 +60,6 @@ class Separatus(SingleUTube):
         single_u.R_fp += 0.03
 
         return single_u
+
+    def __repr__(self):
+        return 'Separatus heat exchanger'

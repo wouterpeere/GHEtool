@@ -306,3 +306,10 @@ class MonthlyBuildingLoadMultiYear(_LoadDataBuilding):
                 f'The results have a length of {len(results.Tb)} whereas, with a simulation period of {self.simulation_period} years '
                 f'a length of {self.simulation_period * (8760 if self._hourly else 12)} was expected.')
         self._results = results
+
+    def __repr__(self):
+        return f'Multiyear monthly building load\n' \
+               f'Efficiency heating: {self.cop.__repr__()}\n' \
+               f'Efficiency cooling: {self.eer.__repr__()}\n' \
+               f'Peak cooling duration [hour]: {self.peak_injection_duration / 3600:.1f}\n' \
+               f'Peak heating duration [hour]: {self.peak_extraction_duration / 3600:.1f}'

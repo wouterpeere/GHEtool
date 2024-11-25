@@ -114,3 +114,8 @@ class COP(_Efficiency):
         w_array = np.array(power) / cop_array
 
         return np.sum(power) / np.sum(w_array)
+
+    def __repr__(self):
+        if self._has_part_load:
+            return 'Temperature and part-load dependent COP'
+        return 'Temperature dependent COP'

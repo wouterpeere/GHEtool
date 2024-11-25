@@ -444,3 +444,15 @@ class MonthlyGeothermalLoadAbsolute(_SingleYear, _LoadData):
         if self.start_month == 1:
             return array
         return np.concatenate((array[self.start_month - 1:], array[: self.start_month - 1]))
+
+    def __repr__(self):
+        temp = f'Monthly geothermal load\n'
+        temp += f'Month\tPeak extraction [kW] \t Peak injection [kW] \t Baseload extraction [kWh] \t Baseload injection [kWh]\n'
+        for i in range(12):
+            temp += f'{i + 1}\t{self.peak_extraction[i]:.2f}\t{self.peak_injection[i]:.2f}\t' \
+                    f'{self.baseload_extraction[i]:.2f}\t{self.baseload_injection[i]:.2f}\n'
+        temp += f'Peak injection duration [hour]: {self.peak_injection_duration / 3600:.1f}\n'
+        temp += f'Peak extraction duration [hour]: {self.peak_extraction_duration / 3600:.1f}\n'
+        temp += f'Simulation period [year]: {self.simulation_period}\n' \
+                f'First month of simulation [-]: {self.start_month}'
+        return temp
