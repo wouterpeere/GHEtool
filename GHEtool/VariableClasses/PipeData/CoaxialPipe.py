@@ -199,9 +199,9 @@ class CoaxialPipe(_PipeData):
     def __repr__(self):
         return f'Coaxial pipe' \
                f'\n\tInner pipe diameter [mm]: {self.r_in_out * 2 * 1000}' \
-               f'\n\tInner pipe wall thickness [mm]: {self.r_in_out * 1000 - self.r_in_in * 1000}' \
+               f'\n\tInner pipe wall thickness [mm]: {(self.r_in_out * 1000 - self.r_in_in * 1000):.1f}' \
                f'\n\tOuter pipe diameter [mm]: {self.r_out_out * 2 * 1000}' \
-               f'\n\tOuter pipe wall thickness [mm]: {self.r_out_out * 1000 - self.r_out_in * 1000}' \
+               f'\n\tOuter pipe wall thickness [mm]: {(self.r_out_out * 1000 - self.r_out_in * 1000):.1f}' \
                f'\n\tGrout conductivity [W/(m·K)]: {self.k_g}' \
                f'\n\tInner pipe conductivity [W/(m·K)]: {self.k_p}' \
                f'\n\tOuter pipe conductivity [W/(m·K)]: {self.k_p_out}' \

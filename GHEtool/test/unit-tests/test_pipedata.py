@@ -218,3 +218,37 @@ def test_pressure_drop():
     assert np.isclose(double.pressure_drop(fluid_data, 100), 10.339838859988387)
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
     assert np.isclose(coaxial.pressure_drop(fluid_data, 100), 0.16366613552554135)
+
+
+def test_repr_():
+    single = MultipleUTube(1, 0.018, 0.02, 0.4, 0.05, 1)
+    double = MultipleUTube(1, 0.013, 0.016, 0.4, 0.05, 2)
+    coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
+    separatus = Separatus(2)
+
+    assert 'U tube\n' \
+           '\tNumber of U tubes [-]: 1\n' \
+           '\tPipe wall thickness [mm]: 2.0\n' \
+           '\tPipe diameter [mm]: 40.0\n' \
+           '\tDistance from pipe to borehole center [mm]: 50\n' \
+           '\tGrout conductivity [W/(m·K)]: 1\n' \
+           '\tPipe conductivity [W/(m·K)]: 0.4\n' \
+           '\tPipe roughness [mm]: 0.001' == single.__repr__()
+    assert 'U tube\n' \
+           '\tNumber of U tubes [-]: 2\n' \
+           '\tPipe wall thickness [mm]: 3.0\n' \
+           '\tPipe diameter [mm]: 32.0\n' \
+           '\tDistance from pipe to borehole center [mm]: 50\n' \
+           '\tGrout conductivity [W/(m·K)]: 1\n' \
+           '\tPipe conductivity [W/(m·K)]: 0.4\n' \
+           '\tPipe roughness [mm]: 0.001' == double.__repr__()
+    assert 'Coaxial pipe\n' \
+           '\tInner pipe diameter [mm]: 50.0\n' \
+           '\tInner pipe wall thickness [mm]: 2.9\n' \
+           '\tOuter pipe diameter [mm]: 110.0\n' \
+           '\tOuter pipe wall thickness [mm]: 6.3\n' \
+           '\tGrout conductivity [W/(m·K)]: 1.0\n' \
+           '\tInner pipe conductivity [W/(m·K)]: 0.4\n' \
+           '\tOuter pipe conductivity [W/(m·K)]: 0.4\n' \
+           '\tPipe roughness [mm]: 0.001' == coaxial.__repr__()
+    assert 'Separatus heat exchanger\n\tGrout conductivity [W/(m·K)]: 2' == separatus.__repr__()
