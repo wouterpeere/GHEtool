@@ -12,7 +12,6 @@ import pygfunction as gt
 
 
 class Borehole(BaseClass):
-
     """
     The borehole class contains all the functionalities related to the calculation of the equivalent
     borehole thermal resistance and contains a fluid and pipe class object.
@@ -239,3 +238,8 @@ class Borehole(BaseClass):
             if getattr(self, i) != getattr(other, i):
                 return False
         return True
+
+    def __repr__(self):
+        if self.use_constant_Rb:
+            return f'Borehole effective thermal resistance [(m·K)/W]: {self.Rb}'
+        return 'Borehole parameters:\n' + self.fluid_data.__repr__() + '\n' + self.pipe_data.__repr__()

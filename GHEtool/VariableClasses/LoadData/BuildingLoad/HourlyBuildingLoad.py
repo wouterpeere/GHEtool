@@ -299,3 +299,17 @@ class HourlyBuildingLoad(_SingleYear, _HourlyDataBuilding):
             ax.legend()  #
         plt.show()
         return fig, ax
+
+    def __repr__(self):
+        temp = f'Hourly building load\n' \
+               f'Efficiency heating: {self.cop.__repr__()}\n' \
+               f'Efficiency cooling: {self.eer.__repr__()}\n' \
+               f'Peak cooling duration [hour]: {self.peak_injection_duration / 3600:.1f}\n' \
+               f'Peak heating duration [hour]: {self.peak_extraction_duration / 3600:.1f}\n' \
+               f'Simulation period [year]: {self.simulation_period}\n' \
+               f'First month of simulation [-]: {self.start_month}'
+        if self.max_peak_dhw == 0:
+            return temp
+
+        return temp + f'\nDHW demand [kWh/year]: {self.yearly_average_dhw_load:.0f}\n' \
+                      f'Efficiency DHW: {self.cop_dhw.__repr__()}'

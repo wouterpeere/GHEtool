@@ -339,3 +339,10 @@ class HourlyGeothermalLoad(_SingleYear, _HourlyData):
             ax.legend()  #
         plt.show()
         return fig, ax
+
+    def __repr__(self):
+        return f'Hourly geothermal load\n' \
+               f'Peak injection duration [hour]: {self.peak_injection_duration / 3600:.1f}\n' \
+               f'Peak extraction duration [hour]: {self.peak_extraction_duration / 3600:.1f}\n' \
+               f'Simulation period [year]: {self.simulation_period}\n' \
+               f'First month of simulation [-]: {self.start_month}'

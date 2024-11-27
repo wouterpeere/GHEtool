@@ -7,7 +7,6 @@ import pytest
 from GHEtool import FluidData, DoubleUTube, SingleUTube, MultipleUTube
 from GHEtool.VariableClasses import Borehole
 
-
 fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
 pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 
@@ -117,10 +116,37 @@ def test_Rb_values():
         borehole.fluid_data = fluid_data
         Rb_list.append(borehole.get_Rb(100, 1, 0.075, 3))
 
-    assert np.allclose(Rb_list, [0.2696064888020322, 0.16229265041543758, 0.11073836048982678, 0.09483159131195469, 0.08742765267449451, 0.08315828854931047, 0.08046372254501538, 0.07864703705590415, 0.07735912210040842, 0.07640933344353783])
+    assert np.allclose(Rb_list, [0.2696064888020322, 0.16229265041543758, 0.11073836048982678, 0.09483159131195469,
+                                 0.08742765267449451, 0.08315828854931047, 0.08046372254501538, 0.07864703705590415,
+                                 0.07735912210040842, 0.07640933344353783])
 
 
 def test_assign_by_initiation():
     borehole = Borehole(fluid_data, pipe_data)
     assert np.isclose(borehole.calculate_Rb(100, 1, 0.075, 3), 0.09483159131195469)
     assert not borehole.use_constant_Rb
+
+
+def test_repr_():
+    borehole = Borehole()
+    borehole.pipe_data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2)
+    borehole.fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+
+    assert 'Borehole parameters:\n' \
+           'Fluid parameters\n' \
+           '\tThermal conductivity of the fluid [W/(m·K)]: 0.568\n' \
+           '\tDensity of the fluid [kg/m³]: 998\n' \
+           '\tThermal capacity of the fluid [J/(kg·K)]: 4180\n' \
+           '\tDynamic viscosity [Pa·s]: 0.001\n' \
+           '\tMass flow rate [kg/s] : 0.2\n' \
+           'U tube\n' \
+           '\tNumber of U tubes [-]: 2\n' \
+           '\tPipe wall thickness [mm]: 5.0\n' \
+           '\tPipe diameter [mm]: 40.0\n' \
+           '\tDistance from pipe to borehole center [mm]: 50\n' \
+           '\tGrout conductivity [W/(m·K)]: 1\n' \
+           '\tPipe conductivity [W/(m·K)]: 0.4\n' \
+           '\tPipe roughness [mm]: 0.001' == borehole.__repr__()
+
+    borehole = Borehole()
+    assert 'Borehole effective thermal resistance [(m·K)/W]: 0.12' == borehole.__repr__()

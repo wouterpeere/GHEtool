@@ -75,3 +75,6 @@ class SEER(_EfficiencyBase):
             float
         """
         return self.SEER
+
+    def __repr__(self):
+        return f'SEER [-]: {self.SEER}'

@@ -2,12 +2,11 @@ from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
 
 
 class GroundTemperatureGradient(_GroundData):
-
     __slots__ = _GroundData.__slots__ + ('gradient',)
 
     def __init__(self, k_s: float = None,
                  T_g: float = None,
-                 volumetric_heat_capacity: float = 2.4 * 10**6,
+                 volumetric_heat_capacity: float = 2.4 * 10 ** 6,
                  gradient: float = 3.0):
         """
 
@@ -60,3 +59,7 @@ class GroundTemperatureGradient(_GroundData):
             Difference in depth [m]
         """
         return temperature_diff * 2 * 100 / self.gradient
+
+    def __repr__(self):
+        return f'Ground gradient temperature\n\tGround surface temperature [°C]: {self.Tg}' \
+               f'\n\tGradient [K/100m]: {self.gradient}\n\t' + super().__repr__()

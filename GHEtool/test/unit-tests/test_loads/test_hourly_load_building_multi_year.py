@@ -151,3 +151,13 @@ def test_dhw():
 def test_time_array():
     load = HourlyBuildingLoadMultiYear(np.zeros(8760 * 10), np.linspace(1, 8760 * 10 - 1, 8760 * 10) * 2, 6, 5)
     assert np.allclose(load.month_indices, np.tile(np.repeat(np.arange(1, 13), load.UPM), 10))
+
+
+def test_repr_():
+    load = HourlyBuildingLoadMultiYear(np.zeros(8760 * 10), np.linspace(1, 8760 * 10 - 1, 8760 * 10) * 2, 6, 5)
+
+    assert 'Multiyear hourly building load\n' \
+           'Efficiency heating: SCOP [-]: 6\n' \
+           'Efficiency cooling: SEER [-]: 5\n' \
+           'Peak cooling duration [hour]: 6.0\n' \
+           'Peak heating duration [hour]: 6.0' == load.__repr__()
