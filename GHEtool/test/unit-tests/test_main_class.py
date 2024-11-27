@@ -1127,3 +1127,41 @@ def test_optimise_load_borefield():
     assert np.isclose(np.min(borefield.results.peak_extraction), 1.9471241454443655)
     assert np.isclose(borefield.load.max_peak_cooling, 329.9393053)
     assert np.isclose(np.sum(borefield.load.hourly_heating_load), 593385.1066074175)
+
+
+def test_repr_():
+    borefield = Borefield()
+    borefield.borefield = copy.deepcopy(borefield_gt)
+    borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(3))
+    borefield.set_ground_parameters(ground_data_constant)
+
+    assert 'Maximum average fluid temperature [-]: 16.0\n' \
+           'Minimum average fluid temperature [-]: 0.0\n' \
+           'Average buried depth [m]: 4.0\n' \
+           'Average borehole depth [m]: 110.0\n' \
+           'Borehole diameter [mm]: 150\n' \
+           'Number of boreholes [m]: 120\n' \
+           'Constant ground temperature\n' \
+           '\tGround temperature at infinity [°C]: 10\n' \
+           '\tConductivity [W/(m·K)]: 3\n' \
+           '\tVolumetric heat capacity [MJ/(m³·K)]: 2.4\n' \
+           'Borehole effective thermal resistance [(m·K)/W]: 0.12\n' \
+           'Monthly geothermal load\n' \
+           'Month\tPeak extraction [kW] \t Peak injection [kW] \t Baseload extraction ' \
+           '[kWh] \t Baseload injection [kWh]\n' \
+           '1\t300.00\t8.22\t24800.00\t6000.00\n' \
+           '2\t266.25\t16.44\t23680.00\t12000.00\n' \
+           '3\t191.25\t16.44\t20000.00\t12000.00\n' \
+           '4\t103.12\t16.44\t15840.00\t12000.00\n' \
+           '5\t14.03\t24.66\t10240.00\t18000.00\n' \
+           '6\t0.00\t32.88\t0.00\t24000.00\n' \
+           '7\t0.00\t65.75\t0.00\t48000.00\n' \
+           '8\t0.00\t65.75\t0.00\t48000.00\n' \
+           '9\t75.75\t32.88\t9760.00\t24000.00\n' \
+           '10\t159.38\t24.66\t13920.00\t18000.00\n' \
+           '11\t223.12\t16.44\t18720.00\t12000.00\n' \
+           '12\t255.00\t8.22\t23040.00\t6000.00\n' \
+           'Peak injection duration [hour]: 6.0\n' \
+           'Peak extraction duration [hour]: 6.0\n' \
+           'Simulation period [year]: 20\n' \
+           'First month of simulation [-]: 1' == borefield.__repr__()

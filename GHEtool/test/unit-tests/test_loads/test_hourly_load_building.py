@@ -675,3 +675,16 @@ def test_cluster():
     cluster.set_results(results_hourly_test)
     assert np.allclose(load.hourly_extraction_load, cluster.hourly_extraction_load)
     assert np.allclose(load.hourly_injection_load, cluster.hourly_injection_load)
+
+
+def test_repr_():
+    load = HourlyBuildingLoad()
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+
+    assert 'Hourly building load\n' \
+           'Efficiency heating: SCOP [-]: 5\n' \
+           'Efficiency cooling: SEER [-]: 20\n' \
+           'Peak cooling duration [hour]: 6.0\n' \
+           'Peak heating duration [hour]: 6.0\n' \
+           'Simulation period [year]: 20\n' \
+           'First month of simulation [-]: 1' == load.__repr__()

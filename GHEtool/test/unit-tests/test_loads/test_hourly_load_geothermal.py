@@ -264,3 +264,14 @@ def test_add():
 def test_depreciation_warning():
     with pytest.raises(DeprecationWarning):
         HourlyGeothermalLoad(hourly_heating=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+
+
+def test_repr_():
+    load = HourlyGeothermalLoad()
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+
+    assert 'Hourly geothermal load\n' \
+           'Peak injection duration [hour]: 6.0\n' \
+           'Peak extraction duration [hour]: 6.0\n' \
+           'Simulation period [year]: 20\n' \
+           'First month of simulation [-]: 1' == load.__repr__()

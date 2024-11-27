@@ -233,3 +233,17 @@ def test_time_array():
         peak_heating=np.tile(peak_heating, 10),
         peak_cooling=np.tile(peak_cooling, 10))
     assert np.allclose(load.month_indices, np.tile(np.arange(1, 13), 10))
+
+
+def test_repr_():
+    load = MonthlyBuildingLoadMultiYear(
+        baseload_heating=np.tile(baseload_heating, 10),
+        baseload_cooling=np.tile(baseload_cooling, 10),
+        peak_heating=np.tile(peak_heating, 10),
+        peak_cooling=np.tile(peak_cooling, 10))
+
+    assert 'Multiyear monthly building load\n' \
+           'Efficiency heating: SCOP [-]: 5\n' \
+           'Efficiency cooling: SEER [-]: 20\n' \
+           'Peak cooling duration [hour]: 6.0\n' \
+           'Peak heating duration [hour]: 6.0' == load.__repr__()
