@@ -637,7 +637,7 @@ def test_time_array():
 
 def test_repr_():
     load = MonthlyBuildingLoadAbsolute(*load_case(1), 10, 5, 5)
-
+    load.dhw = 10000
     assert 'Monthly building load\n' \
            'Month\tPeak heating [kW] \t Peak cooling [kW] \t Baseload heating [kWh] \t ' \
            'Baseload cooling [kWh]\n' \
@@ -658,4 +658,6 @@ def test_repr_():
            'Efficiency heating: SCOP [-]: 5\n' \
            'Efficiency cooling: SEER [-]: 5\n' \
            'Simulation period [year]: 10\n' \
-           'First month of simulation [-]: 1' == load.__repr__()
+           'First month of simulation [-]: 1\n' \
+           'DHW demand [kWh/year]: 10000\n' \
+           'Efficiency DHW: SCOP [-]: 4' == load.__repr__()

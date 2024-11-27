@@ -391,3 +391,11 @@ def test_repr_():
     assert 'Temperature dependent EER' == eer_sec.__repr__()
     assert 'Temperature and part-load dependent EER' == eer_part.__repr__()
     assert 'Temperature and part-load dependent EER' == eer_full.__repr__()
+
+    eer_combined = EERCombined(20, 5, 10)
+    assert '\n' \
+           'Active cooling:\n' \
+           '\tSEER [-]: 5\n' \
+           'Passive cooling:\n' \
+           '\tSEER [-]: 20\n' \
+           'With active cooling above [°C]: 10' == eer_combined.__repr__()

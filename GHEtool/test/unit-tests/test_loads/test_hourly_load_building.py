@@ -680,6 +680,7 @@ def test_cluster():
 def test_repr_():
     load = HourlyBuildingLoad()
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load.dhw = 10000
 
     assert 'Hourly building load\n' \
            'Efficiency heating: SCOP [-]: 5\n' \
@@ -687,4 +688,6 @@ def test_repr_():
            'Peak cooling duration [hour]: 6.0\n' \
            'Peak heating duration [hour]: 6.0\n' \
            'Simulation period [year]: 20\n' \
-           'First month of simulation [-]: 1' == load.__repr__()
+           'First month of simulation [-]: 1\n' \
+           'DHW demand [kWh/year]: 10000\n' \
+           'Efficiency DHW: SCOP [-]: 4' == load.__repr__()
