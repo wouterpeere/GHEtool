@@ -135,8 +135,8 @@ def test_repr_():
     assert 'Borehole parameters:\n' \
            'Fluid parameters\n' \
            '\tThermal conductivity of the fluid [W/(m·K)]: 0.568\n' \
-           '\tDensity of the fluid [kg/m³]: 998\n' \
-           '\tThermal capacity of the fluid [J/(kg·K)]: 4180\n' \
+           '\tDensity of the fluid [kg/m³]: 998.000\n' \
+           '\tThermal capacity of the fluid [J/(kg·K)]: 4180.000\n' \
            '\tDynamic viscosity [Pa·s]: 0.001\n' \
            '\tMass flow rate [kg/s] : 0.2\n' \
            'U tube\n' \

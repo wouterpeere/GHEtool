@@ -261,8 +261,8 @@ def test_repr_():
     assert 'Constant ground temperature\n' \
            '\tGround temperature at infinity [°C]: None\n' \
            '\tLayers:\n' \
-           '\t- Thickness [m]: 10, Conductivity [W/(mK)]: 1, Volumetric heat capacity [MJ/(m³K)]: 2.4\n' \
-           '\t- Thickness [m]: 15, Conductivity [W/(mK)]: 2, Volumetric heat capacity [MJ/(m³K)]: 2.4\n' \
-           '\t- Thickness [m]: 20, Conductivity [W/(mK)]: 1, Volumetric heat capacity [MJ/(m³K)]: 2.4\n' \
-           '\t- Thickness [m]: None, Conductivity [W/(mK)]: 2, Volumetric heat capacity [MJ/(m³K)]: 2.4' \
+           '\t- Thickness [m]: 10, Conductivity [W/(m·K)]: 1, Volumetric heat capacity [MJ/(m³·K)]: 2.4\n' \
+           '\t- Thickness [m]: 15, Conductivity [W/(m·K)]: 2, Volumetric heat capacity [MJ/(m³·K)]: 2.4\n' \
+           '\t- Thickness [m]: 20, Conductivity [W/(m·K)]: 1, Volumetric heat capacity [MJ/(m³·K)]: 2.4\n' \
+           '\t- Thickness [m]: None, Conductivity [W/(m·K)]: 2, Volumetric heat capacity [MJ/(m³·K)]: 2.4' \
            == constant.__repr__()

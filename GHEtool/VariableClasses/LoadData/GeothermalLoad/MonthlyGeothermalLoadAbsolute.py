@@ -447,7 +447,7 @@ class MonthlyGeothermalLoadAbsolute(_SingleYear, _LoadData):
 
     def __repr__(self):
         temp = f'Monthly geothermal load\n'
-        temp += f'Month\tPeak extraction [kW] \t Peak injection [kW] \t Baseload extraction [kWh] \t Baseload injection [kWh]\n'
+        temp += f'Month\tPeak extraction [kW]\tPeak injection [kW]\tBaseload extraction [kWh]\tBaseload injection [kWh]\n'
         for i in range(12):
             temp += f'{i + 1}\t{self.peak_extraction[i]:.2f}\t{self.peak_injection[i]:.2f}\t' \
                     f'{self.baseload_extraction[i]:.2f}\t{self.baseload_injection[i]:.2f}\n'
