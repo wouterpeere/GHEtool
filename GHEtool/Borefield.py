@@ -2009,8 +2009,8 @@ class Borefield(BaseClass):
         return 2
 
     def __repr__(self):
-        return f'Maximum average fluid temperature [-]: {self.Tf_max}\n' \
-               f'Minimum average fluid temperature [-]: {self.Tf_min}\n' \
+        return f'Maximum average fluid temperature [°C]: {self.Tf_max}\n' \
+               f'Minimum average fluid temperature [°C]: {self.Tf_min}\n' \
                f'Average buried depth [m]: {self.D}\n' \
                f'Average borehole depth [m]: {self.H}\n' \
                f'Borehole diameter [mm]: {self.r_b * 2000:.0f}\n' \
