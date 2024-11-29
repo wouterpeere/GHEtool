@@ -1140,7 +1140,7 @@ def test_repr_():
            'Average buried depth [m]: 4.0\n' \
            'Average borehole depth [m]: 110.0\n' \
            'Borehole diameter [mm]: 150\n' \
-           'Number of boreholes [m]: 120\n' \
+           'Number of boreholes [-]: 120\n' \
            'Constant ground temperature\n' \
            '\tGround temperature at infinity [°C]: 10\n' \
            '\tConductivity [W/(m·K)]: 3\n' \
