@@ -22,9 +22,9 @@ class GroundLayer(BaseClass):
         Parameters
         ----------
         k_s : float
-            Layer thermal conductivity [W/(mK)]
+            Layer thermal conductivity [W/(m·K)]
         volumetric_heat_capacity : float
-            Layer volumetric heat capacity [J/m³K]
+            Layer volumetric heat capacity [J/(m³·K)]
         thickness : float
             Layer thickness [m]. None is assumed infinite depth
         """
@@ -65,8 +65,8 @@ class GroundLayer(BaseClass):
         return True
 
     def __repr__(self):
-        return f'- Thickness [m]: {self.thickness}, Conductivity [W/(mK)]: {self.k_s}, ' \
-               f'Volumetric heat capacity [MJ/(m³K)]: {self.volumetric_heat_capacity / 10 ** 6}'
+        return f'- Thickness [m]: {self.thickness}, Conductivity [W/(m·K)]: {self.k_s}, ' \
+               f'Volumetric heat capacity [MJ/(m³·K)]: {self.volumetric_heat_capacity / 10 ** 6}'
 
 
 class _GroundData(BaseClass, ABC):

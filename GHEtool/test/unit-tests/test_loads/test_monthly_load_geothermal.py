@@ -395,8 +395,8 @@ def test_repr_():
     load = MonthlyGeothermalLoadAbsolute(*load_case(1))
 
     assert 'Monthly geothermal load\n' \
-           'Month\tPeak extraction [kW] \t Peak injection [kW] \t Baseload extraction ' \
-           '[kWh] \t Baseload injection [kWh]\n' \
+           'Month\tPeak extraction [kW]\tPeak injection [kW]\tBaseload extraction ' \
+           '[kWh]\tBaseload injection [kWh]\n' \
            '1\t63.70\t5.14\t46500.00\t3750.00\n' \
            '2\t60.82\t10.27\t44400.00\t7500.00\n' \
            '3\t51.37\t22.00\t37500.00\t7500.00\n' \

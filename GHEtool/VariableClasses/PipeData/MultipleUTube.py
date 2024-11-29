@@ -194,7 +194,7 @@ class MultipleUTube(_PipeData):
     def __repr__(self):
         return f'U tube' \
                f'\n\tNumber of U tubes [-]: {self.number_of_pipes}' \
-               f'\n\tPipe wall thickness [mm]: {self.r_out * 1000 - self.r_in * 1000}' \
+               f'\n\tPipe wall thickness [mm]: {(self.r_out * 1000 - self.r_in * 1000):.1f}' \
                f'\n\tPipe diameter [mm]: {self.r_out * 2 * 1000}' \
                f'\n\tDistance from pipe to borehole center [mm]: {math.sqrt(self.pos[0][0] ** 2 + self.pos[0][1] ** 2) * 1000:.0f}' \
                f'\n\tGrout conductivity [W/(m·K)]: {self.k_g}' \

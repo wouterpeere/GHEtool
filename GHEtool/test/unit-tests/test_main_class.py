@@ -1135,20 +1135,20 @@ def test_repr_():
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(3))
     borefield.set_ground_parameters(ground_data_constant)
 
-    assert 'Maximum average fluid temperature [-]: 16.0\n' \
-           'Minimum average fluid temperature [-]: 0.0\n' \
+    assert 'Maximum average fluid temperature [°C]: 16.0\n' \
+           'Minimum average fluid temperature [°C]: 0.0\n' \
            'Average buried depth [m]: 4.0\n' \
            'Average borehole depth [m]: 110.0\n' \
            'Borehole diameter [mm]: 150\n' \
-           'Number of boreholes [m]: 120\n' \
+           'Number of boreholes [-]: 120\n' \
            'Constant ground temperature\n' \
            '\tGround temperature at infinity [°C]: 10\n' \
            '\tConductivity [W/(m·K)]: 3\n' \
            '\tVolumetric heat capacity [MJ/(m³·K)]: 2.4\n' \
            'Borehole effective thermal resistance [(m·K)/W]: 0.12\n' \
            'Monthly geothermal load\n' \
-           'Month\tPeak extraction [kW] \t Peak injection [kW] \t Baseload extraction ' \
-           '[kWh] \t Baseload injection [kWh]\n' \
+           'Month\tPeak extraction [kW]\tPeak injection [kW]\tBaseload extraction ' \
+           '[kWh]\tBaseload injection [kWh]\n' \
            '1\t300.00\t8.22\t24800.00\t6000.00\n' \
            '2\t266.25\t16.44\t23680.00\t12000.00\n' \
            '3\t191.25\t16.44\t20000.00\t12000.00\n' \

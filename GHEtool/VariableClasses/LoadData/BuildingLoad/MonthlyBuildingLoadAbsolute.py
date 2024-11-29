@@ -437,7 +437,7 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
 
     def __repr__(self):
         temp = f'Monthly building load\n'
-        temp += f'Month\tPeak heating [kW] \t Peak cooling [kW] \t Baseload heating [kWh] \t Baseload cooling [kWh]\n'
+        temp += f'Month\tPeak heating [kW]\tPeak cooling [kW]\tBaseload heating [kWh]\tBaseload cooling [kWh]\n'
         for i in range(12):
             temp += f'{i + 1}\t{self.peak_heating[i]:.2f}\t{self.peak_cooling[i]:.2f}\t' \
                     f'{self.baseload_heating[i]:.2f}\t{self.baseload_cooling[i]:.2f}\n'
