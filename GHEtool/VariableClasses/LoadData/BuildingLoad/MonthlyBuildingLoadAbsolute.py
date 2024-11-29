@@ -452,4 +452,4 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
             return temp
 
         return temp + f'\nDHW demand [kWh/year]: {self.yearly_average_dhw_load:.0f}\n' \
-                      f'Efficiency DHW: {self.cop_dhw.__repr__()}'
+                      f'Efficiency DHW [-]: {self.cop_dhw.__repr__()}'
