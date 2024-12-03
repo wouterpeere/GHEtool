@@ -1,16 +1,3 @@
-"""
-The different L4-model inclusing the short-term effects is validated based on three different buildings: an auditorium, an office and a swimming
-pool. The three buildings were simulated previously in IESVE and the resulting heating and cooling demand profiles
-were exported (Peere et al., 2023). 
-
-References:
------------
-    - Meertens, L., Peere, W., and Helsen, L. (2024). Influence of short-term dynamic effects on geothermal borefield size. 
-In _Proceedings of International Ground Source Heat Pump Association Conference 2024_. Montreal (Canada), 28-30 May 2024. 
-https://doi.org/10.22488/okstate.24.000004 
-    - Peere, W., L. Hermans, W. Boydens, and L. Helsen. 2023. Evaluation of the oversizing and computational speed of different
-open-source borefield sizing methods. BS2023 Conference, Shanghai, China, April
-"""
 import os
 import time
 
@@ -18,9 +5,6 @@ import numpy as np
 import pandas as pd
 
 import matplotlib.pyplot as plt
-
-import sys
-sys.path.append("C:\Workdir\Develop\ghetool")
 
 from GHEtool import *
 
@@ -78,7 +62,7 @@ def Auditorium():
         plt.title('Profile 1: Yearly geothermal load profile auditorium building', fontsize = 22)
         plt.show() 
 
-
+    #options for g-function calculation, given to other package pygfunction (Massimo)
     options = {'nSegments': 12,
                 'disp': False,
                 'profiles': True,

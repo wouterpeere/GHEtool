@@ -130,7 +130,7 @@ def Sandbox():
     fig = plt.figure()
     ax = fig.add_subplot(111)
     # set axes labelsv
-    ax.set_xlabel(r"Time (year)")
+    ax.set_xlabel(r"Time (hours)")
     ax.set_ylabel(r"Temperature ($^\circ C$)")
     ax.yaxis.label.set_color(plt.rcParams["axes.labelcolor"])
     ax.xaxis.label.set_color(plt.rcParams["axes.labelcolor"])
@@ -140,7 +140,7 @@ def Sandbox():
     ax.step(time_array, df_mod_Tb[:8760], "g-", where="post", lw=1, label="Tb mod")
     ax.step(time_array, Tf_L4[:8760], "b-", where="post", lw=1, label="Tf L4")
     ax.step(time_array, Tf_L4_ste[:8760], "b-", linestyle="dashed", where="post", lw=1, label="Tf incl. ste")
-    ax.step(time_array, Tf_mod, "g-", where="post", lw=1, label="Tf mod dynamic")
+    ax.step(time_array, Tf_mod, "m-", where="post", lw=1, label="Tf mod dynamic")
     ax.step(time_array, Tf_exp, "r-", where="post", lw=1, label="Tf experimental")
     ax.set_xticks(range(0, 52 + 1, 5))
 
@@ -154,13 +154,13 @@ def Sandbox():
     plt.figure("PVT versus PV")
     nb_subplots = 2
     ax1 = plt.subplot(nb_subplots, 1, 1)
-    ax1.plot(time_array, DTf_mod_a, label='mod dyn',  color='g')
+    ax1.plot(time_array, DTf_mod_a, label='mod dyn',  color='m')
     ax1.plot(time_array, DTf_L4_a, label='L4',  color='b')
     ax1.plot(time_array, DTf_L4_ste_a, label='L4 ste', color= "b", linestyle="dashed",)
     ax1.legend()
     ax1.grid()
     ax2 = plt.subplot(nb_subplots, 1, 2, sharex=ax1)
-    ax2.plot(time_array, DTf_mod_r, label='mod dyn',  color='g')
+    ax2.plot(time_array, DTf_mod_r, label='mod dyn',  color='m')
     ax2.plot(time_array, DTf_L4_r, label='L4',  color='b')
     ax2.plot(time_array, DTf_L4_ste_r, label='L4 ste', color= "b", linestyle="dashed",)
     ax2.legend()
