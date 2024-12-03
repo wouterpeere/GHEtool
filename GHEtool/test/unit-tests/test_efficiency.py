@@ -362,3 +362,40 @@ def test_eq_eer_combined():
     assert eer_combined != seer
     assert eer_combined2 != eer_combined
     assert eer_combined2 == eer_combined3
+
+
+def test_repr_():
+    scop = SCOP(5)
+    seer = SEER(5)
+    assert 'SCOP [-]: 5' == scop.__repr__()
+    assert 'SEER [-]: 5' == seer.__repr__()
+    cop_basic = COP(np.array([3, 4, 6]), np.array([5, 10, 15]))
+    eer_basic = EER(np.array([3, 4, 6]), np.array([5, 10, 15]))
+    cop_sec = COP(np.array([1, 2, 2, 4]), np.array([[1.5, 2.5], [2.5, 2.5], [1.5, 4.5], [2.5, 4.5]]), secondary=True)
+    cop_part = COP(np.array([1, 2, 2, 4]), np.array([[1.5, 2.5], [2.5, 2.5], [1.5, 4.5], [2.5, 4.5]]), part_load=True)
+    cop_full = COP(np.array([1, 2, 2, 4, 2, 4, 4, 8]),
+                   np.array([[1.5, 2.5, 4.5], [2.5, 2.5, 4.5], [1.5, 4.5, 4.5], [2.5, 4.5, 4.5],
+                             [1.5, 2.5, 8.5], [2.5, 2.5, 8.5], [1.5, 4.5, 8.5], [2.5, 4.5, 8.5]]),
+                   secondary=True, part_load=True)
+    eer_sec = EER(np.array([1, 2, 2, 4]), np.array([[1.5, 2.5], [2.5, 2.5], [1.5, 4.5], [2.5, 4.5]]), secondary=True)
+    eer_part = EER(np.array([1, 2, 2, 4]), np.array([[1.5, 2.5], [2.5, 2.5], [1.5, 4.5], [2.5, 4.5]]), part_load=True)
+    eer_full = EER(np.array([1, 2, 2, 4, 2, 4, 4, 8]),
+                   np.array([[1.5, 2.5, 4.5], [2.5, 2.5, 4.5], [1.5, 4.5, 4.5], [2.5, 4.5, 4.5],
+                             [1.5, 2.5, 8.5], [2.5, 2.5, 8.5], [1.5, 4.5, 8.5], [2.5, 4.5, 8.5]]),
+                   secondary=True, part_load=True)
+    assert 'Temperature dependent COP' == cop_basic.__repr__()
+    assert 'Temperature dependent EER' == eer_basic.__repr__()
+    assert 'Temperature dependent COP' == cop_sec.__repr__()
+    assert 'Temperature and part-load dependent COP' == cop_part.__repr__()
+    assert 'Temperature and part-load dependent COP' == cop_full.__repr__()
+    assert 'Temperature dependent EER' == eer_sec.__repr__()
+    assert 'Temperature and part-load dependent EER' == eer_part.__repr__()
+    assert 'Temperature and part-load dependent EER' == eer_full.__repr__()
+
+    eer_combined = EERCombined(20, 5, 10)
+    assert '\n' \
+           'Active cooling:\n' \
+           '\tSEER [-]: 5\n' \
+           'Passive cooling:\n' \
+           '\tSEER [-]: 20\n' \
+           'With active cooling above [°C]: 10' == eer_combined.__repr__()

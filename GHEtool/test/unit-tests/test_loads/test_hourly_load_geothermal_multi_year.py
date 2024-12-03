@@ -171,3 +171,12 @@ def test_yearly_loads_multiyear():
 def test_depreciation_warning():
     with pytest.raises(DeprecationWarning):
         HourlyGeothermalLoadMultiYear(hourly_heating=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+
+
+def test_repr_():
+    load = HourlyGeothermalLoadMultiYear(extraction_load=np.linspace(0, 8759 * 2 + 1, 8760 * 2),
+                                         injection_load=np.linspace(0, 8759 * 2 + 1, 8760 * 2) * 2)
+
+    assert 'Multiyear hourly geothermal load\n' \
+           'Peak injection duration [hour]: 6.0\n' \
+           'Peak extraction duration [hour]: 6.0' == load.__repr__()

@@ -539,8 +539,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         -------
         max peak injection : float
         """
-        if isinstance(self._results, ResultsMonthly) and \
-                (isinstance(self.cop, COP) or isinstance(self.eer, EER) or isinstance(self.cop_dhw, COP)):
+        if isinstance(self._results, ResultsMonthly):
             return np.max(self.monthly_peak_injection_simulation_period)
         return np.max(self.hourly_injection_load_simulation_period)
 
@@ -553,8 +552,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         -------
         max peak extraction : float
         """
-        if isinstance(self._results, ResultsMonthly) and \
-                (isinstance(self.cop, COP) or isinstance(self.eer, EER) or isinstance(self.cop_dhw, COP)):
+        if isinstance(self._results, ResultsMonthly):
             return np.max(self.monthly_peak_extraction_simulation_period)
         return np.max(self.hourly_extraction_load_simulation_period)
 
@@ -568,8 +566,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         -------
         imbalance : float
         """
-        if isinstance(self._results, ResultsMonthly) and \
-                (isinstance(self.cop, COP) or isinstance(self.eer, EER) or isinstance(self.cop_dhw, COP)):
+        if isinstance(self._results, ResultsMonthly):
             return super(_HourlyData, self).imbalance
         return np.sum(
             self.hourly_injection_load_simulation_period - self.hourly_extraction_load_simulation_period) / self.simulation_period

@@ -15,16 +15,16 @@ class GroundLayer(BaseClass):
     __slots__ = "k_s", "volumetric_heat_capacity", "thickness"
 
     def __init__(self, k_s: float = None,
-                 volumetric_heat_capacity: float = 2.4 * 10**6,
+                 volumetric_heat_capacity: float = 2.4 * 10 ** 6,
                  thickness: float = None):
         """
 
         Parameters
         ----------
         k_s : float
-            Layer thermal conductivity [W/mK]
+            Layer thermal conductivity [W/(m·K)]
         volumetric_heat_capacity : float
-            Layer volumetric heat capacity [J/m³K]
+            Layer volumetric heat capacity [J/(m³·K)]
         thickness : float
             Layer thickness [m]. None is assumed infinite depth
         """
@@ -64,6 +64,10 @@ class GroundLayer(BaseClass):
                 return False
         return True
 
+    def __repr__(self):
+        return f'- Thickness [m]: {self.thickness}, Conductivity [W/(m·K)]: {self.k_s}, ' \
+               f'Volumetric heat capacity [MJ/(m³·K)]: {self.volumetric_heat_capacity / 10 ** 6}'
+
 
 class _GroundData(BaseClass, ABC):
     """
@@ -73,7 +77,7 @@ class _GroundData(BaseClass, ABC):
     __slots__ = 'layers', 'layer_depths', 'variable_Tg', 'Tg', 'last_layer_infinite'
 
     def __init__(self, k_s: float = None,
-                 volumetric_heat_capacity: float = 2.4 * 10**6):
+                 volumetric_heat_capacity: float = 2.4 * 10 ** 6):
         """
 
         Parameters
@@ -196,7 +200,7 @@ class _GroundData(BaseClass, ABC):
                              f'One can set the last_layer_infinite assumption to True in the ground class.')
 
         warnings.warn(f'The depth of {H}m exceeds the maximum depth that is provided: {highest_depth}m. '
-                             f'In order to continue, it is assumed the deepest layer is infinite.')
+                      f'In order to continue, it is assumed the deepest layer is infinite.')
         return True
 
     def calculate_value(self, thickness_list: list, cumulative_thickness_list: list, y_range: list, H: float) -> float:
@@ -230,7 +234,8 @@ class _GroundData(BaseClass, ABC):
         for idx, val in enumerate(y_range[:idx_of_layer_in_which_H_falls]):
             result += val * thickness_list[idx + 1] / H
 
-        result += y_range[idx_of_layer_in_which_H_falls] * (H - cumulative_thickness_list[idx_of_layer_in_which_H_falls]) / H
+        result += y_range[idx_of_layer_in_which_H_falls] * (
+                H - cumulative_thickness_list[idx_of_layer_in_which_H_falls]) / H
         return result
 
     def k_s(self, H: float = 100) -> float:
@@ -250,7 +255,8 @@ class _GroundData(BaseClass, ABC):
         self.check_depth(H)
         if len(self.layers) == 1 and (self.layers[0].thickness is None or self.last_layer_infinite):
             return self.layers[0].k_s
-        return self.calculate_value([0] + [layer.thickness for layer in self.layers], self.layer_depths, [layer.k_s for layer in self.layers], H)
+        return self.calculate_value([0] + [layer.thickness for layer in self.layers], self.layer_depths,
+                                    [layer.k_s for layer in self.layers], H)
 
     def volumetric_heat_capacity(self, H: float = 100) -> float:
         """
@@ -269,7 +275,8 @@ class _GroundData(BaseClass, ABC):
         self.check_depth(H)
         if len(self.layers) == 1 and (self.layers[0].thickness is None or self.last_layer_infinite):
             return self.layers[0].volumetric_heat_capacity
-        return self.calculate_value([0] + [layer.thickness for layer in self.layers], self.layer_depths, [layer.volumetric_heat_capacity for layer in self.layers], H)
+        return self.calculate_value([0] + [layer.thickness for layer in self.layers], self.layer_depths,
+                                    [layer.volumetric_heat_capacity for layer in self.layers], H)
 
     def alpha(self, H: float = 100) -> float:
         """
@@ -338,7 +345,7 @@ class _GroundData(BaseClass, ABC):
         Depth : float
             Maximum depth [m]
         """
-        return self.calculate_delta_H(max_temp-self.Tg)
+        return self.calculate_delta_H(max_temp - self.Tg)
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -347,3 +354,13 @@ class _GroundData(BaseClass, ABC):
             if getattr(self, i) != getattr(other, i):
                 return False
         return True
+
+    def __repr__(self):
+        if len(self.layers) == 1:
+            return f'Conductivity [W/(m·K)]: {self.layers[0].k_s}\n\t' \
+                   f'Volumetric heat capacity [MJ/(m³·K)]: {self.layers[0].volumetric_heat_capacity / 10 ** 6}'
+        else:
+            temp = 'Layers:'
+            for layer in self.layers:
+                temp += '\n\t' + layer.__repr__()
+            return temp

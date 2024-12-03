@@ -25,31 +25,30 @@ website [https://GHEtool.eu](https://GHEtool.eu) for more information.
 ### Read The Docs
 
 GHEtool has an elaborate documentation were all the functionalities of the tool are explained, with examples, literature
-and validation.
-This can be found on [https://docs.ghetool.eu](https://docs.ghetool.eu).
+and validation. This can be found on [https://docs.ghetool.eu](https://docs.ghetool.eu).
 
 ## Graphical user interface
 
-There are two graphical user interfaces available which are built using GHEtool: GHEtool Pro and GHEtool Community
+There are two graphical user interfaces available which are built using GHEtool: GHEtool Cloud and GHEtool Community
 
-#### GHEtool Pro
+#### GHEtool Cloud
 
-GHEtool Pro is the official and supported version of GHEtool which supports drilling companies, engineering firms,
+GHEtool Cloud is the official and supported version of GHEtool which supports drilling companies, engineering firms,
 architects, government organizations in their geothermal design process.
-With GHEtool Pro they can minimize the environmental and societal impact while maximizing the cost-effective utilization
-of geothermal projects.
-Visit our website at [https://ghetool.eu](https://ghetool.eu) to learn more about the synergy between this open-source
-package and GHEtool Pro.
+With GHEtool Cloud they can minimize the environmental and societal impact while maximizing the cost-effective
+utilization of geothermal projects.
+Visit our website at [https://ghetool.eu](https://ghetool.eu) to learn more about GHEtool Cloud and what it can do for
+you.
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/wouterpeere/GHEtool/main/docs/GHEtoolPro.png" width="600">
+<img src="https://ghetool.eu/wp-content/uploads/2024/08/GHEtool-Cloud-squarish.png" width="600">
 </p>
 
 #### GHEtool Community
 
-Besides GHEtool Pro, an open-source alternative for the graphical user interface is available in the form of *GHEtool
+Besides GHEtool Cloud, an open-source alternative for the graphical user interface is available in the form of *GHEtool
 Community*.
-This version is built and maintained by the community, and **has no official support like GHEtool Pro**. You can read
+This version is built and maintained by the community, and **has no official support like GHEtool Cloud**. You can read
 all about this
 *GHEtool Community* on their [GitHub repo](https://github.com/wouterpeere/ghetool-gui).
 
@@ -156,6 +155,10 @@ Concretely, the classes you can use are:
 * _Single U-tubes (special case of multiple U-tubes)_
 * _Double U-tubes (special case of multiple U-tubes)_
 * _Coaxial pipe_
+* _Separatus tube_: The Separatus geothermal heat exchanger is an innovation in the geothermal domain. It consists of a
+  single, DN50 pipe with a unique 'splitpipe'-technology that separates the cold and the hot side of the fluid. For
+  design purposes, it is advised to use this with rather small borehole diameters of DN90. For more information visit
+  the [Separatus website]('https://separatus.ch/en/').
 
 Please note that it is possible to add your own pipe types by inheriting the attributes from the abstract _PipeData
 class.
@@ -205,6 +208,9 @@ Depending on your answer on these three questions, you can opt for one of eight 
   i.e. for the whole simulation period).
 * _MonthlyBuildingLoadMultiYear_: You can set the monthly heating and cooling load for multiple years (i.e. for
   the whole simulation period).
+
+On the other hand, you can also choose a Cluster load where you can add multiple loads together. Be careful however when
+mixing hourly and monthly loads!
 
 All building load classes also have the option to add a yearly domestic hot water (DHW) demand and require you to define
 an
@@ -387,8 +393,16 @@ KU Leuven, Belgium.
 
 ### Applications/Mentions of GHEtool
 
+Meertens, L. (2024). Reducing Capital Cost for Geothermal Heat Pump Systems Through Dynamic Borefield Sizing. _IEA HPT
+Magazine 42_(2), https://doi.org/10.23697/9r3w-jm57.
+
+Blanke, T., Born, H., Döring, B. et al. Model for dimensioning borehole heat exchanger applied to
+mixed-integer-linear-problem (MILP) energy system optimization. _Geotherm Energy_ 12, 30 (
+2024). https://doi.org/10.1186/s40517-024-00301-w.
+
 Dion G., Pasquier, P., Perraudin, D. (2024). Sizing equation based on the outlet fluid temperature of closed-loop ground
 heat exchangers. In _Proceedings of International Ground Source Heat Pump Association_. Montréal (Canada), 28-30 May
+
 2024.
 
 Peere, W. (2024). Are Rules of Thumb Misleading? The Complexity of Borefield Sizing and the Importance of Design

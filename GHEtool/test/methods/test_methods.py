@@ -66,7 +66,6 @@ def test_optimise(input, result):
                              np.sum(load.hourly_heating_load_simulation_period) * 100
     _percentage_injection = np.sum(borefield_load.hourly_cooling_load_simulation_period) / \
                             np.sum(load.hourly_cooling_load_simulation_period) * 100
-
     assert np.isclose(_percentage_extraction, percentage_extraction)
     assert np.isclose(_percentage_injection, percentage_injection)
     assert np.isclose(borefield_load.max_peak_extraction, peak_extraction_geo)

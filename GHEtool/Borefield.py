@@ -17,7 +17,8 @@ from numpy.typing import ArrayLike
 from scipy.signal import convolve
 
 from GHEtool.VariableClasses import FluidData, Borehole, GroundConstantTemperature, ResultsMonthly, ResultsHourly
-from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, CalculationSetup
+from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, CalculationSetup, Cluster, \
+    EERCombined
 from GHEtool.VariableClasses.LoadData import *
 from GHEtool.VariableClasses.LoadData import _LoadData, _LoadDataBuilding
 from GHEtool.VariableClasses.PipeData import _PipeData
@@ -497,13 +498,13 @@ class Borefield(BaseClass):
             investment_cost = Borefield.DEFAULT_INVESTMENT
         self.cost_investment: list = investment_cost
 
-    def set_load(self, load: _LoadData) -> None:
+    def set_load(self, load: Union[_LoadData, Cluster]) -> None:
         """
         This function sets the _load attribute.
 
         Parameters
         ----------
-        load : _LoadData
+        load : _LoadData or Cluster
             Load data object
 
         Returns
@@ -525,13 +526,13 @@ class Borefield(BaseClass):
         return self._borefield_load
 
     @load.setter
-    def load(self, load: _LoadData) -> None:
+    def load(self, load: Union[_LoadData, Cluster]) -> None:
         """
         This function sets the _load attribute.
 
         Parameters
         ----------
-        load : _LoadData
+        load : _LoadData or Cluster
             Load data object
 
         Returns
@@ -1706,12 +1707,16 @@ class Borefield(BaseClass):
         def calculate_difference(results_old: Union[ResultsMonthly, ResultsHourly],
                                  result_new: Union[ResultsMonthly, ResultsHourly]) -> float:
             return max(
-                np.max((result_new.peak_injection - results_old.peak_injection) / self.load.max_peak_injection),
-                np.max((result_new.peak_extraction - results_old.peak_extraction) / self.load.max_peak_extraction))
+                np.max(result_new.peak_injection - results_old.peak_injection),
+                np.max(result_new.peak_extraction - results_old.peak_extraction))
 
         if isinstance(self.load, _LoadDataBuilding):
             # when building load is given, the load should be updated after each temperature calculation.
-            self.load.reset_results(self.Tf_min, self.Tf_max)
+            # check if active_passive, because then, threshold should be taken
+            if isinstance(self.load.eer, EERCombined) and self.load.eer.threshold_temperature is not None:
+                self.load.reset_results(self.Tf_min, self.load.eer.threshold_temperature)
+            else:
+                self.load.reset_results(self.Tf_min, self.Tf_max)
             results_old = calculate_temperatures(H, hourly=hourly)
             self.load.set_results(results_old)
             results = calculate_temperatures(H, hourly=hourly)
@@ -1719,12 +1724,13 @@ class Borefield(BaseClass):
             # safety
             i = 0
             while calculate_difference(results_old,
-                                       results) > 0.01 and i < self._calculation_setup.max_nb_of_iterations:
+                                       results) > self._calculation_setup.atol and i < self._calculation_setup.max_nb_of_iterations:
                 results_old = results
                 self.load.set_results(results)
                 results = calculate_temperatures(H, hourly=hourly)
                 i += 1
             self.results = results
+            self.load.set_results(results)
             return
 
         self.results = calculate_temperatures(H, hourly=hourly)
@@ -2001,3 +2007,14 @@ class Borefield(BaseClass):
             # limited by minimum temperature
             return 3
         return 2
+
+    def __repr__(self):
+        return f'Maximum average fluid temperature [°C]: {self.Tf_max}\n' \
+               f'Minimum average fluid temperature [°C]: {self.Tf_min}\n' \
+               f'Average buried depth [m]: {self.D}\n' \
+               f'Average borehole depth [m]: {self.H}\n' \
+               f'Borehole diameter [mm]: {self.r_b * 2000:.0f}\n' \
+               f'Number of boreholes [-]: {self.number_of_boreholes}\n' \
+               f'{self.ground_data.__repr__()}\n' \
+               f'{self.borehole.__repr__()}\n' \
+               f'{self.load.__repr__()}'

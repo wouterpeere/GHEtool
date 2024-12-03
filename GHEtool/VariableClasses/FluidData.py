@@ -154,3 +154,14 @@ class FluidData(BaseClass):
             if getattr(self, i) != getattr(other, i):
                 return False
         return True
+
+    def __repr__(self):
+        temp = f'Fluid parameters\n\tThermal conductivity of the fluid [W/(m·K)]: {self.k_f:.3f}\n\t' \
+               f'Density of the fluid [kg/m³]: {self.rho:.3f}\n\t' \
+               f'Thermal capacity of the fluid [J/(kg·K)]: {self.Cp:.3f}\n\t' \
+               f'Dynamic viscosity [Pa·s]: {self.mu:.3f}\n\t'
+        if self._vfr is not None:
+            temp += f'Volume flow rate [l/s]: {self.vfr}'
+        else:
+            temp += f'Mass flow rate [kg/s] : {self.mfr}'
+        return temp

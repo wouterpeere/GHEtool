@@ -251,3 +251,8 @@ class MonthlyGeothermalLoadMultiYear(_LoadData):
             self._peak_extraction = np.array(load)
             return
         raise ValueError
+
+    def __repr__(self):
+        return f'Multiyear monthly geothermal load\n' \
+               f'Peak injection duration [hour]: {self.peak_injection_duration / 3600:.1f}\n' \
+               f'Peak extraction duration [hour]: {self.peak_extraction_duration / 3600:.1f}'

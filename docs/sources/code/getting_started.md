@@ -97,6 +97,10 @@ Concretely, the classes you can use are:
 * _Single U-tubes (special case of multiple U-tubes)_
 * _Double U-tubes (special case of multiple U-tubes)_
 * _Coaxial pipe_
+* _Separatus tube_: The Separatus geothermal heat exchanger is an innovation in the geothermal domain. It consists of a
+  single, DN50 pipe with a unique 'splitpipe'-technology that separates the cold and the hot side of the fluid. For
+  design purposes, it is advised to use this with rather small borehole diameters of DN90. For more information visit
+  the [Separatus website]('https://separatus.ch/en/').
 
 Please note that it is possible to add your own pipe types by inheriting the attributes from the abstract _PipeData
 class.
@@ -147,9 +151,11 @@ Depending on your answer on these three questions, you can opt for one of eight 
 * _MonthlyBuildingLoadMultiYear_: You can set the monthly heating and cooling load for multiple years (i.e. for
   the whole simulation period).
 
+On the other hand, you can also choose a Cluster load where you can add multiple loads together. Be careful however
+when mixing hourly and monthly loads!
+
 All building load classes also have the option to add a yearly domestic hot water (DHW) demand and require you to define
-an
-efficiency for heating, cooling (and optionally DHW) (cf. supra).
+an efficiency for heating, cooling (and optionally DHW) (cf. supra).
 
 Please note that it is possible to add your own load types by inheriting the attributes from the abstract _LoadData,
 _HourlyLoad, _LoadDataBuilding and _HourlyLoadBuilding classes.

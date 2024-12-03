@@ -55,19 +55,26 @@ def test_sizing_with_building_load(monkeypatch):
         size_with_variable_ground_temperature, \
         size_with_part_load_data
     assert np.allclose(size_with_scop(), (96.5589765783911, 4.072466974615784))
-    assert np.allclose(size_with_variable_ground_temperature(), (95.64066844079264, 4.17665670561309))
-    assert np.allclose(size_with_part_load_data(), (98.1273127062551, 4.685121612513776))
+    assert np.allclose(size_with_variable_ground_temperature(), (95.63725412552411, 4.134065429053346))
+    assert np.allclose(size_with_part_load_data(), (98.12508584747407, 4.625118577257844))
 
 
 def test_sizing_with_building_load_hourly(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     from GHEtool.Examples.sizing_with_building_load_hourly import L3_sizing, L4_sizing
-    assert np.allclose(L3_sizing(), (127.05154931011464, 6.131588043404349))
-    assert np.allclose(L4_sizing(), (153.26361812264668, 6.237959315069309))
+    assert np.allclose(L3_sizing(), (128.48637749558208, 6.288025315353533))
+    assert np.allclose(L4_sizing(), (154.34184329022935, 6.385782647864632))
 
 
 def test_combined_active_and_passive_cooling(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     from GHEtool.Examples.combined_active_and_passive_cooling import active_above_threshold, default_cooling_in_summer
-    assert np.isclose(active_above_threshold(), 7908.254000000003)
+    assert np.isclose(active_above_threshold(), 7483.480000000002)
     assert np.isclose(default_cooling_in_summer(), 67683.27999999997)
+
+def test_separatus(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    from GHEtool.Examples.separatus import design_with_single_U, design_with_double_U, design_with_separatus
+    design_with_single_U()
+    design_with_double_U()
+    design_with_separatus()

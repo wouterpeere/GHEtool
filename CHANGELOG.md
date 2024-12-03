@@ -5,10 +5,21 @@ our [project board](https://github.com/users/wouterpeere/projects/2) on GitHub.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [2.3.0] - unpublished
+## [2.3.1] - unpublished
 
 ## Added
 
+- __repr__ for every class (issue #310).
+
+## Fixed
+
+- Problem with optimise energy profile (issue #306).
+
+## [2.3.0] - 2024-11-05
+
+## Added
+
+- Added the Separatus probe.
 - Extra validation based on the work of Ahmadfard & Bernier (issue #243).
 - Added the option to exclude DHW from the peak heating load (issue #252).
 - Added vfr to Fluid Class (issue #262).
@@ -20,7 +31,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added building laod classes (issue #288).
 - Added __eq__ method for Result and Efficiency classes (issue #288).
 - Added _time_array to building loads (issue #291).
-- Added EERCombined for combined active and passive cooling efficiency (issue #291).
+- Added EERCombined for combined active and passive cooling efficiency (issue #291, #296).
+- Cluster Class (issue #298).
 
 ## Changed
 
@@ -40,6 +52,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   issue #283).
 - Removed a couple of log messages (issue #288).
 - Optimise load profile works with a variable COP/EER (issue #288).
+- Rename cylindrical_correction.py (issue #298).
 
 ## Fixed
 
@@ -48,6 +61,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Problem in CI/CD and testing for python <3.12 (issue #274).
 - Fix compatibility with numpy 2.0 (issue #274).
 - Fix problem with start month and zero peak loads (issue #288).
+- Problem with EERCombined (issue #300).
 
 ## [2.2.2] - 2024-05-16
 
@@ -349,6 +363,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 
 - fixed bug in interpolation
+
+[2.3.0]: https://github.com/wouterpeere/GHEtool/compare/v2.2.2...v2.3.0
 
 [2.2.2]: https://github.com/wouterpeere/GHEtool/compare/v2.2.1...v2.2.2
 

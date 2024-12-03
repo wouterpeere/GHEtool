@@ -188,3 +188,8 @@ class HourlyGeothermalLoadMultiYear(_HourlyData):
             return other.__add__(self)
         except TypeError:  # pragma: no cover
             raise TypeError("Cannot perform addition. Please check if you use correct classes.")  # pragma: no cover
+
+    def __repr__(self):
+        return f'Multiyear hourly geothermal load\n' \
+               f'Peak injection duration [hour]: {self.peak_injection_duration / 3600:.1f}\n' \
+               f'Peak extraction duration [hour]: {self.peak_extraction_duration / 3600:.1f}'

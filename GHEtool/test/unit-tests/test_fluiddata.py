@@ -79,3 +79,21 @@ def test_import_fluid_from_pygfunction():
     assert data_fluid.rho == test_data.rho
     assert data_fluid.Cp == test_data.cp
     assert data_fluid.k_f == test_data.k
+
+
+def test_repr_():
+    data_fluid = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    assert 'Fluid parameters\n' \
+           '\tThermal conductivity of the fluid [W/(m·K)]: 0.568\n' \
+           '\tDensity of the fluid [kg/m³]: 998.000\n' \
+           '\tThermal capacity of the fluid [J/(kg·K)]: 4180.000\n' \
+           '\tDynamic viscosity [Pa·s]: 0.001\n' \
+           '\tMass flow rate [kg/s] : 0.2' == data_fluid.__repr__()
+
+    data_fluid = FluidData(None, 0.568, 998, 4180, 1e-3, 0.2)
+    assert 'Fluid parameters\n' \
+           '\tThermal conductivity of the fluid [W/(m·K)]: 0.568\n' \
+           '\tDensity of the fluid [kg/m³]: 998.000\n' \
+           '\tThermal capacity of the fluid [J/(kg·K)]: 4180.000\n' \
+           '\tDynamic viscosity [Pa·s]: 0.001\n' \
+           '\tVolume flow rate [l/s]: 0.2' == data_fluid.__repr__()

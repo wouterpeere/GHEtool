@@ -177,3 +177,16 @@ def test_eq():
     assert load != load2
     assert load2 != load3
     assert load2 != load4
+
+
+def test_repr_():
+    load = MonthlyGeothermalLoadMultiYear(
+        baseload_extraction=baseload_extraction,
+        baseload_injection=baseload_injection,
+        peak_extraction=peak_extraction,
+        peak_injection=peak_injection
+    )
+
+    assert 'Multiyear monthly geothermal load\n' \
+           'Peak injection duration [hour]: 6.0\n' \
+           'Peak extraction duration [hour]: 6.0' == load.__repr__()

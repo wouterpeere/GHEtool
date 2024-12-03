@@ -229,3 +229,40 @@ def test_multilayer_values():
     constant.add_layer_on_bottom([layer_1, layer_2, layer_3, layer_4])
     assert 1 * 10 / 30 + 2 * 15 / 30 + 1 * 5 / 30 == constant.k_s(30)
     assert 2400000.0 == constant.volumetric_heat_capacity(30)
+
+
+def test_repr_():
+    ground_flux_temperature = GroundFluxTemperature(3, 11, 2.4 * 10 ** 6, 0.06)
+    ground_constant_temperature = GroundConstantTemperature(3, 11)
+    ground_temperature_gradient = GroundTemperatureGradient(3, 11, 2.4 * 10 ** 6, 2)
+    assert 'Ground flux temperature\n' \
+           '\tGround surface temperature [°C]: 11\n' \
+           '\tGround flux [W/m²]: 0.06\n' \
+           '\tConductivity [W/(m·K)]: 3\n' \
+           '\tVolumetric heat capacity [MJ/(m³·K)]: 2.4' == ground_flux_temperature.__repr__()
+    assert 'Constant ground temperature\n' \
+           '\tGround temperature at infinity [°C]: 11\n' \
+           '\tConductivity [W/(m·K)]: 3\n' \
+           '\tVolumetric heat capacity [MJ/(m³·K)]: 2.4' == ground_constant_temperature.__repr__()
+    assert 'Ground gradient temperature\n' \
+           '\tGround surface temperature [°C]: 11\n' \
+           '\tGradient [K/100m]: 2\n' \
+           '\tConductivity [W/(m·K)]: 3\n' \
+           '\tVolumetric heat capacity [MJ/(m³·K)]: 2.4' == ground_temperature_gradient.__repr__()
+
+    # layers
+    layer_1 = GroundLayer(k_s=1, thickness=10)
+    layer_2 = GroundLayer(k_s=2, thickness=15)
+    layer_3 = GroundLayer(k_s=1, thickness=20)
+    layer_4 = GroundLayer(k_s=2, thickness=None)
+
+    constant = GroundConstantTemperature()
+    constant.add_layer_on_bottom([layer_1, layer_2, layer_3, layer_4])
+    assert 'Constant ground temperature\n' \
+           '\tGround temperature at infinity [°C]: None\n' \
+           '\tLayers:\n' \
+           '\t- Thickness [m]: 10, Conductivity [W/(m·K)]: 1, Volumetric heat capacity [MJ/(m³·K)]: 2.4\n' \
+           '\t- Thickness [m]: 15, Conductivity [W/(m·K)]: 2, Volumetric heat capacity [MJ/(m³·K)]: 2.4\n' \
+           '\t- Thickness [m]: 20, Conductivity [W/(m·K)]: 1, Volumetric heat capacity [MJ/(m³·K)]: 2.4\n' \
+           '\t- Thickness [m]: None, Conductivity [W/(m·K)]: 2, Volumetric heat capacity [MJ/(m³·K)]: 2.4' \
+           == constant.__repr__()

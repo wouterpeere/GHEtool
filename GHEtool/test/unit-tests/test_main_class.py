@@ -7,7 +7,7 @@ import pygfunction as gt
 import pytest
 
 from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, DoubleUTube, Borefield, \
-    CalculationSetup, FOLDER, MultipleUTube
+    CalculationSetup, FOLDER, MultipleUTube, EERCombined
 from GHEtool.logger import ghe_logger
 from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad, HourlyBuildingLoad, \
@@ -519,6 +519,26 @@ def test_size_L4():
     assert np.isclose(174.23648328808213, borefield.size(100, quadrant_sizing=4))
     assert np.isclose(174.23648328808213, borefield.H)
     assert borefield.calculate_quadrant() == 4
+
+
+def test_calculate_temperatures_eer_combined():
+    eer_combined = EERCombined(20, 5, 17)
+    borefield = Borefield()
+    borefield.set_ground_parameters(ground_data_constant)
+    load = HourlyBuildingLoad(efficiency_cooling=eer_combined)
+
+    borefield.borefield = copy.deepcopy(borefield_gt)
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    borefield.load = load
+    borefield.calculate_temperatures(hourly=True)
+
+    active_cooling_array = borefield.load.eer.get_time_series_active_cooling(borefield.results.peak_injection,
+                                                                             borefield.load.month_indices)
+    assert np.allclose(borefield.load.hourly_cooling_load_simulation_period * active_cooling_array *
+                       (1 + 1 / 5) + borefield.load.hourly_cooling_load_simulation_period * np.invert(
+        active_cooling_array) *
+                       (1 + 1 / 20),
+                       borefield.load.hourly_injection_load_simulation_period)
 
 
 def test_investment_cost():
@@ -1086,3 +1106,62 @@ def test_deep_sizing(case, result):
 def test_depreciation_warning():
     with pytest.raises(DeprecationWarning):
         Borefield(baseload_heating=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+
+
+def test_optimise_load_borefield():
+    load = HourlyBuildingLoad()
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load.simulation_period = 10
+    borefield = Borefield(load=load)
+    borefield.set_min_avg_fluid_temperature(2)
+    borefield.set_max_avg_fluid_temperature(17)
+    borefield.borefield = gt.boreholes.rectangle_field(20, 4, 6, 6, 150, 1, 0.07)
+    borefield.Rb = 0.1699
+    ground_data = GroundFluxTemperature(2, 9.6, flux=0.07)
+    borefield.ground_data = ground_data
+    borefield_load, external_load = borefield.optimise_load_profile_energy(load)
+    assert np.isclose(borefield_load.imbalance, -228386.82055766508)
+    borefield.load = borefield_load
+    borefield.calculate_temperatures(hourly=False)
+    assert np.isclose(np.max(borefield.results.peak_injection), 17.044473901670603)
+    assert np.isclose(np.min(borefield.results.peak_extraction), 1.9471241454443655)
+    assert np.isclose(borefield.load.max_peak_cooling, 329.9393053)
+    assert np.isclose(np.sum(borefield.load.hourly_heating_load), 593385.1066074175)
+
+
+def test_repr_():
+    borefield = Borefield()
+    borefield.borefield = copy.deepcopy(borefield_gt)
+    borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(3))
+    borefield.set_ground_parameters(ground_data_constant)
+
+    assert 'Maximum average fluid temperature [°C]: 16.0\n' \
+           'Minimum average fluid temperature [°C]: 0.0\n' \
+           'Average buried depth [m]: 4.0\n' \
+           'Average borehole depth [m]: 110.0\n' \
+           'Borehole diameter [mm]: 150\n' \
+           'Number of boreholes [-]: 120\n' \
+           'Constant ground temperature\n' \
+           '\tGround temperature at infinity [°C]: 10\n' \
+           '\tConductivity [W/(m·K)]: 3\n' \
+           '\tVolumetric heat capacity [MJ/(m³·K)]: 2.4\n' \
+           'Borehole effective thermal resistance [(m·K)/W]: 0.12\n' \
+           'Monthly geothermal load\n' \
+           'Month\tPeak extraction [kW]\tPeak injection [kW]\tBaseload extraction ' \
+           '[kWh]\tBaseload injection [kWh]\n' \
+           '1\t300.00\t8.22\t24800.00\t6000.00\n' \
+           '2\t266.25\t16.44\t23680.00\t12000.00\n' \
+           '3\t191.25\t16.44\t20000.00\t12000.00\n' \
+           '4\t103.12\t16.44\t15840.00\t12000.00\n' \
+           '5\t14.03\t24.66\t10240.00\t18000.00\n' \
+           '6\t0.00\t32.88\t0.00\t24000.00\n' \
+           '7\t0.00\t65.75\t0.00\t48000.00\n' \
+           '8\t0.00\t65.75\t0.00\t48000.00\n' \
+           '9\t75.75\t32.88\t9760.00\t24000.00\n' \
+           '10\t159.38\t24.66\t13920.00\t18000.00\n' \
+           '11\t223.12\t16.44\t18720.00\t12000.00\n' \
+           '12\t255.00\t8.22\t23040.00\t6000.00\n' \
+           'Peak injection duration [hour]: 6.0\n' \
+           'Peak extraction duration [hour]: 6.0\n' \
+           'Simulation period [year]: 20\n' \
+           'First month of simulation [-]: 1' == borefield.__repr__()
