@@ -84,11 +84,11 @@ def run_sizing_case(borefield, load, ground_data, fluid_data, pipe_data, peak_du
             print(f"\nRe-initializing borefield for {method} method.")
             borefield = initialize_borefield(load, delta_t, ground_data, fluid_data, pipe_data)
             borefield.set_options_gfunction_calculation(options)
-
             # Perform sizing with short-term effects
             depth = borefield.size(100, L3_sizing=(method == 'L3_ste'), L4_sizing=(method == 'L4_ste'))
         else:
             # Perform sizing for regular methods (L2, L3, L4)
+            borefield = initialize_borefield(load, delta_t, ground_data, fluid_data, pipe_data)
             depth = borefield.size(100, L2_sizing=(method == 'L2'), L3_sizing=(method == 'L3'), L4_sizing=(method == 'L4'))
 
         results[method] = {
@@ -100,7 +100,7 @@ def run_sizing_case(borefield, load, ground_data, fluid_data, pipe_data, peak_du
     return results
 
 
-def test_geothermal_borefield():
+def test1a_ste():
     """
     Test the L2, L3, L4, L3_ste, and L4_ste sizing methods of the GHEtool library on a synthetic balanced load profile.
     """
@@ -187,4 +187,4 @@ def test_geothermal_borefield():
         """
 
 if __name__ == "__main__":
-    test_geothermal_borefield()
+    test1a_ste()
