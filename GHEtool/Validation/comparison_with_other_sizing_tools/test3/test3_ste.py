@@ -15,6 +15,7 @@ import os
 import time
 
 import numpy as np
+import pygfunction as gt
 
 import sys
 sys.path.append("C:\Workdir\Develop\ghetool")
