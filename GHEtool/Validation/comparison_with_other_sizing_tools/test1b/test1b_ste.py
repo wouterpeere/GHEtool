@@ -102,7 +102,7 @@ def run_sizing_case(borefield, load, ground_data, fluid_data, pipe_data, peak_du
     return results
 
 
-def test1b_ste():
+def test1b_ste(use_pygfunction_media=False, Tf=0):
     """
     Test the L2, L3, L4, L3_ste, and L4_ste sizing methods of the GHEtool library on a synthetic balanced load profile.
     """
@@ -117,14 +117,18 @@ def test1b_ste():
 
     # Base mass flow rate (kg/s)
     base_mfr = 0.5585
-    # Create a water fluid object using pygfunction
-    fluid_str = 'Water'  # Default fluid in pygfunction
-    percent = 0          # No mixture, pure water
-    T_f = 0              # Temperature (e.g., 0°C)
-    fluid_object = gt.media.Fluid(fluid_str, percent, T=T_f)  # Create fluid object
-    # Create FluidData object and load fluid properties from pygfunction
-    fluid_data = FluidData(mfr=base_mfr, rho=1052, Cp=3795, mu=0.0052, k_f=0.48)
-    fluid_data.import_fluid_from_pygfunction(fluid_object)  # Import fluid data
+    # Initialize fluid data
+    if use_pygfunction_media:
+        # Use pygfunction to determine fluid data
+        # Create a water fluid object using pygfunction
+        fluid_str = 'Water'  # Default fluid in pygfunction
+        percent = 0          # No mixture, pure water
+        fluid_object = gt.media.Fluid(fluid_str, percent, T=Tf)
+        fluid_data = FluidData()
+        fluid_data.import_fluid_from_pygfunction(fluid_object)
+    else:
+        # Use manual fluid data input
+        fluid_data = FluidData(mfr=base_mfr, rho=1052, Cp=3795, mu=0.0052, k_f=0.48)
 
     # Create pipe data for a Multiple U-Tube configuration
     pipe_data = MultipleUTube(r_in=0.0137, r_out=0.0167, D_s=0.075 / 2, k_g=1.4, k_p=0.43, number_of_pipes=1)
@@ -186,4 +190,4 @@ def test1b_ste():
         """
 
 if __name__ == "__main__":
-    test1b_ste()
+    test1b_ste(use_pygfunction_media=False)
