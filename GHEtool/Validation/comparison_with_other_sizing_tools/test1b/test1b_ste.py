@@ -21,7 +21,7 @@ sys.path.append(r"C:\Workdir\Develop\ghetool")  # Adjust the path to your GHEtoo
 from GHEtool import *
 
 
-def initialize_borefield(load, delta_t, ground_data, fluid_data, pipe_data):
+def initialize_borefield(load, delta_t, ground_data, fluid_data, pipe_data, imposed_Rb=None):
     """
     Initialize and set up borefield with necessary parameters.
     """
@@ -34,6 +34,11 @@ def initialize_borefield(load, delta_t, ground_data, fluid_data, pipe_data):
     borefield.set_pipe_parameters(pipe_data)
     borefield.create_rectangular_borefield(1, 1, 6, 6, 110, 4, 0.075)
 
+    # Set imposed Rb if provided
+    if imposed_Rb is not None:
+        borefield.set_Rb(imposed_Rb)
+        borefield.calculation_setup(use_constant_Rb=True)
+
     # Load the load profile into borefield
     borefield.load = load
 
@@ -44,7 +49,7 @@ def initialize_borefield(load, delta_t, ground_data, fluid_data, pipe_data):
     return borefield
 
 
-def run_sizing_case(borefield, load, ground_data, fluid_data, pipe_data, peak_duration, delta_t, imposed_Rb=None):
+def run_sizing_case(borefield, load, ground_data, fluid_data, pipe_data, peak_duration, delta_t, use_constant_Rb=None):
     """
     Run sizing for L2, L3, L4, L3_ste, and L4_ste methods with imposed Rb and return results.
     If imposed_Rb is None, it uses the default calculated Rb.
@@ -71,24 +76,22 @@ def run_sizing_case(borefield, load, ground_data, fluid_data, pipe_data, peak_du
     # Set results dictionary
     results = {}
 
-    # Set imposed Rb if provided
-    if imposed_Rb is not None:
-        borefield.set_Rb(imposed_Rb)
-
     for method in methods:
         start_time = time.time()
 
         # Re-initialize borefield if switching from L4 to L3_ste or L4_ste
         if method in ['L3_ste', 'L4_ste']:
             print(f"\nRe-initializing borefield for {method} method.")
-            borefield = initialize_borefield(load, delta_t, ground_data, fluid_data, pipe_data)
+            borefield = initialize_borefield(load, delta_t, ground_data, fluid_data, pipe_data, imposed_Rb=borefield.Rb)
             borefield.set_options_gfunction_calculation(options)
             # Perform sizing with short-term effects
-            depth = borefield.size(100, L3_sizing=(method == 'L3_ste'), L4_sizing=(method == 'L4_ste'))
+            depth = borefield.size(100, L3_sizing=(method == 'L3_ste'), L4_sizing=(method == 'L4_ste'), use_constant_Rb=use_constant_Rb)
+            print(borefield.Rb)
         else:
             # Perform sizing for regular methods (L2, L3, L4)
-            borefield = initialize_borefield(load, delta_t, ground_data, fluid_data, pipe_data)
-            depth = borefield.size(100, L2_sizing=(method == 'L2'), L3_sizing=(method == 'L3'), L4_sizing=(method == 'L4'))
+            borefield = initialize_borefield(load, delta_t, ground_data, fluid_data, pipe_data, imposed_Rb=borefield.Rb)
+            depth = borefield.size(100, L2_sizing=(method == 'L2'), L3_sizing=(method == 'L3'), L4_sizing=(method == 'L4'), use_constant_Rb=use_constant_Rb)
+            print(borefield.Rb)
 
         results[method] = {
             'depth': depth,
@@ -99,7 +102,7 @@ def run_sizing_case(borefield, load, ground_data, fluid_data, pipe_data, peak_du
     return results
 
 
-def test1a_ste():
+def test1b_ste():
     """
     Test the L2, L3, L4, L3_ste, and L4_ste sizing methods of the GHEtool library on a synthetic balanced load profile.
     """
@@ -114,20 +117,17 @@ def test1a_ste():
 
     # Base mass flow rate (kg/s)
     base_mfr = 0.5585
-
     # Create a water fluid object using pygfunction
     fluid_str = 'Water'  # Default fluid in pygfunction
     percent = 0          # No mixture, pure water
-    T_f = 35              # Temperature (e.g., 0°C)
+    T_f = 0              # Temperature (e.g., 0°C)
     fluid_object = gt.media.Fluid(fluid_str, percent, T=T_f)  # Create fluid object
-
     # Create FluidData object and load fluid properties from pygfunction
     fluid_data = FluidData(mfr=base_mfr, rho=1052, Cp=3795, mu=0.0052, k_f=0.48)
     fluid_data.import_fluid_from_pygfunction(fluid_object)  # Import fluid data
 
     # Create pipe data for a Multiple U-Tube configuration
     pipe_data = MultipleUTube(r_in=0.0137, r_out=0.0167, D_s=0.075 / 2, k_g=1.4, k_p=0.43, number_of_pipes=1)
-
 
     # Load hourly profile
     load = HourlyGeothermalLoad(simulation_period=10)
@@ -158,10 +158,10 @@ def test1a_ste():
 
         # Run sizing for imposed Rb (static value)
         Rb_static = 0.13  # Imposed Rb value
+        use_constant_Rb = True
         # Initialize borefield with required parameters
-        borefield = initialize_borefield(load, delta_t, ground_data, fluid_data, pipe_data)
-        borefield.set_Rb(Rb_static)
-        results_imposed_Rb = run_sizing_case(borefield, load, ground_data, fluid_data, pipe_data, peak_duration, delta_t, imposed_Rb=Rb_static)
+        borefield = initialize_borefield(load, delta_t, ground_data, fluid_data, pipe_data, Rb_static)   
+        results_imposed_Rb = run_sizing_case(borefield, load, ground_data, fluid_data, pipe_data, peak_duration, delta_t, use_constant_Rb)
 
         # Print results for imposed Rb
         print("\n--- Results for imposed Rb (Rb* = 0.13) ---")
@@ -186,4 +186,4 @@ def test1a_ste():
         """
 
 if __name__ == "__main__":
-    test1a_ste()
+    test1b_ste()
