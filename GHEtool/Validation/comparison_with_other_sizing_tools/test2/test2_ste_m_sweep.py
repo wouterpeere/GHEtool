@@ -1,31 +1,33 @@
 """
-The work of (Ahmadfard and Bernier, 2019) provides a set of test cases that can be used to compare
+The work of Ahmadfard and Bernier (2019) provides a set of test cases that can be used to compare
 software tools with the ultimate goal of improving the reliability of design methods for sizing
 vertical ground heat exchangers. This document delivers the results on the test file using the GHEtool
-L2-, L3- and L4-sizing methods.
+L2-, L3-, and L4-sizing methods.
 
-Test 1 -Synthetic balanced load – one borehole
+Test 2 – Shonder's test – 120 boreholes
 
 References:
 -----------
     - Ahmadfard, M., and M. Bernier. 2019. A review of vertical ground heat exchanger sizing tools including an inter-model
-comparison [in eng]. Renewable sustainable energy reviews (OXFORD) 110:247–265.
+      comparison [in eng]. Renewable sustainable energy reviews (OXFORD) 110:247–265.
 """
 import os
 import time
 import numpy as np
+import pygfunction as gt
+import sys
 from GHEtool import *
 
-def test_1b_6h_ste():
+def test_2_6h_ste_m_sweep():
     # Ground properties
-    ground_data = GroundFluxTemperature(k_s=1.8, T_g=17.5, volumetric_heat_capacity=2073600, flux=0)
-
+    ground_data = GroundFluxTemperature(k_s=2.25, T_g=12.41, volumetric_heat_capacity=2877000, flux=0)
+   
     # Load fluid properties into FluidData
-    base_mfr = 0.440  # Baseline mass flow rate (kg/s)
-    fluid_data = FluidData(mfr=base_mfr, rho=1052, Cp=3795, mu=0.0052, k_f=0.48)
- 
+    base_mfr = 0.2416667  # Baseline mass flow rate (kg/s)
+    fluid_data = FluidData(mfr=base_mfr, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
+
     # Pipe properties
-    pipe_data = MultipleUTube(r_in=0.0137, r_out=0.0167, D_s=0.075 / 2, k_g=1.4, k_p=0.43, number_of_pipes=1)
+    pipe_data = MultipleUTube(r_in=0.0137, r_out=0.0167, D_s=0.0471 / 2, k_g=1.73, k_p=0.45)
 
     # Short-term effect parameters
     rho_cp_grout = 3800000.0  
@@ -35,24 +37,30 @@ def test_1b_6h_ste():
     results = {}
 
     # Define function to store results
-    def log_results(method, depth, borefield, start_time):
-        results[method] = {
+    def log_results(method, depth, borefield, start_time, massflow_factor):
+        results[f"{method}_mfr_{massflow_factor}"] = {
             'depth': depth,
             'Rb': borefield.Rb,
-            'time': time.time() - start_time
+            'time': time.time() - start_time,
+            'massflow_factor': massflow_factor
         }
 
     # Load hourly profile
     load = HourlyGeothermalLoad(simulation_period=10)
-    load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test1a.csv'), header=True, separator=",",
+    load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test2.csv'), header=True, separator=",",
                              col_extraction=1, col_injection=0)
 
     # Calculate temperature bounds
-    delta_t = max(load.max_peak_extraction, load.max_peak_injection) * 1000 / (fluid_data.Cp * fluid_data.mfr) 
+    delta_t = max(load.max_peak_extraction, load.max_peak_injection) * 1000 / (fluid_data.Cp * fluid_data.mfr) / 120
 
-    for peak_duration in [6, 1]:
-        print(f"\nRunning test case for peak_duration = {peak_duration}")
+    # Mass flow rate factors to test
+    massflow_factors = [0.2, 0.5, 1.0, 1.5, 2.0]
 
+    # Test each mass flow rate factor
+    for massflow_factor in massflow_factors:
+        # Adjust mass flow rate based on the factor
+        fluid_data.mfr = base_mfr * massflow_factor
+        
         # Test each sizing method
         for method, dynamic_rb, short_term_effects in [
             ('L2', True, False), ('L3', True, False), ('L4', True, False), ('L3_ste', True, True),
@@ -64,22 +72,19 @@ def test_1b_6h_ste():
             borefield.set_ground_parameters(ground_data)
             borefield.set_fluid_parameters(fluid_data)
             borefield.set_pipe_parameters(pipe_data)
-            borefield.create_rectangular_borefield(1, 1, 6, 6, 110, 4, 0.075)
-            # Set peak duration
-            borefield.load.peak_duration = peak_duration
-            
+            borefield.create_rectangular_borefield(12, 10, 6, 6, 110, 3, 0.054)
+            borefield.load = load
+
             # Set temperature bounds
             borefield.set_max_avg_fluid_temperature(35 + delta_t / 2)
-            borefield.set_min_avg_fluid_temperature(0 - delta_t / 2)
-
-            borefield.load = load
+            borefield.set_min_avg_fluid_temperature(4.4 - delta_t / 2)
 
             # Handle short-term effects
             if short_term_effects:
                 short_term_effects_parameters = {
-                        'rho_cp_grout': rho_cp_grout,
-                        'rho_cp_pipe': rho_cp_pipe,
-                        }
+                    'rho_cp_grout': rho_cp_grout,
+                    'rho_cp_pipe': rho_cp_pipe,
+                }
 
                 options = {
                     'disp': False,
@@ -92,21 +97,21 @@ def test_1b_6h_ste():
                     'pipe_data': pipe_data,
                     'borefield': borefield,
                     'short_term_effects_parameters': short_term_effects_parameters,
-                        }
+                }
                 borefield.set_options_gfunction_calculation(options)
 
             # Use constant Rb if required
             if not dynamic_rb:
-                borefield.set_Rb(0.13)
+                borefield.set_Rb(0.113)
 
             # Perform sizing
             start_time = time.time()
             depth = borefield.size(100, L2_sizing=(method.startswith('L2')), L3_sizing=(method.startswith('L3')), L4_sizing=(method.startswith('L4')))
-            log_results(method, depth, borefield, start_time)
+            log_results(method, depth, borefield, start_time, massflow_factor)
 
-        # Print results
-        for method, result in results.items():
-            print(f"Method {method}: Depth = {result['depth']:.2f}m, Rb* = {result['Rb']:.3f}, Time = {result['time']:.2f}s")
+    # Print results
+    for method, result in results.items():
+        print(f"Method {method}: Depth = {result['depth']:.2f}m, Rb* = {result['Rb']:.3f}, Time = {result['time']:.2f}s, Massflow Factor = {result['massflow_factor']}")
 
 if __name__ == "__main__":
-    test_1b_6h_ste()
+    test_2_6h_ste_m_sweep()

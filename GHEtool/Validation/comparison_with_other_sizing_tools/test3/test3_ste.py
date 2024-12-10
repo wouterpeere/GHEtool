@@ -15,170 +15,101 @@ import os
 import time
 import numpy as np
 import pygfunction as gt
+import sys
 from GHEtool import *
 
+def test_3_6h_ste():
+    # Ground properties
+    ground_data = GroundFluxTemperature(k_s=2.25, T_g=10, volumetric_heat_capacity=2592000, flux=0)
+   
+    # Load fluid properties into FluidData
+    base_mfr = 33.1 / 49  # Baseline mass flow rate (kg/s)
+    fluid_data = FluidData(mfr=base_mfr, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
 
-def initialize_borefield(load, delta_t, ground_data, fluid_data, pipe_data, imposed_Rb=None):
-    """
-    Initialize and set up borefield with necessary parameters.
-    """
-    # Initiate borefield
-    borefield = Borefield()
+    # Pipe properties
+    pipe_data = MultipleUTube(r_in=0.013, r_out=0.0167, D_s=0.075 / 2, k_g=1.73, k_p=0.4, number_of_pipes=1)
 
-    # Set ground data in borefield
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
-    borefield.create_rectangular_borefield(7, 7, 5, 5, 110, 2.5, 0.075)
+    # Short-term effect parameters
+    rho_cp_grout = 3800000.0  
+    rho_cp_pipe = 1540000.0  
 
-    # Set imposed Rb if provided
-    if imposed_Rb is not None:
-        borefield.set_Rb(imposed_Rb)
-        borefield.calculation_setup(use_constant_Rb=True)
-
-    # Load the load profile into borefield
-    borefield.load = load
-
-    # Set temperature bounds
-    borefield.set_max_avg_fluid_temperature(35 + delta_t / 2)
-    borefield.set_min_avg_fluid_temperature(0 - delta_t / 2)
-
-    return borefield
-
-
-def run_sizing_case(borefield, load, ground_data, fluid_data, pipe_data, peak_duration, delta_t, use_constant_Rb=None):
-    """
-    Run sizing for L2, L3, L4, L3_ste, and L4_ste methods with imposed Rb and return results.
-    If imposed_Rb is None, it uses the default calculated Rb.
-    """
-    # Set peak duration
-    borefield.load.peak_duration = peak_duration
-
-    # Define methods and short-term effects parameters
-    methods = ['L2', 'L3', 'L4', 'L3_ste', 'L4_ste']
-    short_term_params = {'rho_cp_grout': 3800000.0, 'rho_cp_pipe': 1540000.0}
-    options = {
-        'disp': False,
-        'profiles': True,
-        'method': 'equivalent',
-        'cylindrical_correction': True,
-        'short_term_effects': True,
-        'ground_data': ground_data,
-        'fluid_data': fluid_data,
-        'pipe_data': pipe_data,
-        'borefield': borefield,
-        'short_term_effects_parameters': short_term_params,
-    }
-
-    # Set results dictionary
+    # Initialize results dictionary
     results = {}
 
-    for method in methods:
-        start_time = time.time()
-
-        # Re-initialize borefield if switching from L4 to L3_ste or L4_ste
-        if method in ['L3_ste', 'L4_ste']:
-            print(f"\nRe-initializing borefield for {method} method.")
-            borefield = initialize_borefield(load, delta_t, ground_data, fluid_data, pipe_data, imposed_Rb=borefield.Rb)
-            borefield.set_options_gfunction_calculation(options)
-            # Perform sizing with short-term effects
-            depth = borefield.size(100, L3_sizing=(method == 'L3_ste'), L4_sizing=(method == 'L4_ste'), use_constant_Rb=use_constant_Rb)
-            print(borefield.Rb)
-        else:
-            # Perform sizing for regular methods (L2, L3, L4)
-            borefield = initialize_borefield(load, delta_t, ground_data, fluid_data, pipe_data, imposed_Rb=borefield.Rb)
-            depth = borefield.size(100, L2_sizing=(method == 'L2'), L3_sizing=(method == 'L3'), L4_sizing=(method == 'L4'), use_constant_Rb=use_constant_Rb)
-            print(borefield.Rb)
-
+    # Define function to store results
+    def log_results(method, depth, borefield, start_time):
         results[method] = {
             'depth': depth,
             'Rb': borefield.Rb,
             'time': time.time() - start_time
         }
 
-    return results
+    spacing = [3, 5, 7]
+    simulation_period = [1, 10]
 
+    for s in simulation_period:
+        for B in spacing:
+            # Test each sizing method
+            for method, dynamic_rb, short_term_effects in [
+                ('L2', True, False), ('L3', True, False), ('L4', True, False), ('L3_ste', True, True),
+                ('L4_ste', True, True), ('L2_static', False, False), ('L3_static', False, False),
+                ('L4_static', False, False), ('L3_static_ste', False, True), ('L4_static_ste', False, True)
+            ]:
+                # Initialize borefield
+                borefield = Borefield()
+                borefield.set_ground_parameters(ground_data)
+                borefield.set_fluid_parameters(fluid_data)
+                borefield.set_pipe_parameters(pipe_data)
+                borefield.create_rectangular_borefield(7, 7, B, B, 110, 2.5, 0.075)
+                
+                # Load hourly profile
+                load = HourlyGeothermalLoad(simulation_period=s)
+                load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test3.csv'), header=True, separator=",",
+                                        col_extraction=1, col_injection=0)
+                borefield.load = load
 
-def test3_ste(use_pygfunction_media=False, Tf=0):
-    """
-    Test the L2, L3, L4, L3_ste, and L4_ste sizing methods of the GHEtool library on a synthetic balanced load profile.
-    """
-    # Initialize ground, fluid, and pipe data
-    ground_data = GroundFluxTemperature(k_s=2.25, T_g=10, volumetric_heat_capacity=2592000, flux=0)
-    
-    # Base mass flow rate (kg/s)
-    base_mfr = 33.1 / 49
-    # Initialize fluid data
-    if use_pygfunction_media:
-        # Use pygfunction to determine fluid data
-        # Create a water fluid object using pygfunction
-        fluid_str = 'Water'  # Default fluid in pygfunction
-        percent = 0          # No mixture, pure water
-        fluid_object = gt.media.Fluid(fluid_str, percent, T=Tf)
-        fluid_data = FluidData()
-        fluid_data.import_fluid_from_pygfunction(fluid_object)
-    else:
-        # Use manual fluid data input
-        fluid_data = FluidData(mfr=base_mfr, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
+                # Calculate temperature bounds
+                delta_t = max(load.max_peak_extraction, load.max_peak_injection) * 1000 / (fluid_data.Cp * fluid_data.mfr) / 49                
 
-    # Create pipe data for a Multiple U-Tube configuration
-    pipe_data = MultipleUTube(r_in=0.013, r_out=0.0167, D_s=0.075 / 2, k_g=1.73, k_p=0.4, number_of_pipes=1)
+                # Set temperature bounds
+                borefield.set_max_avg_fluid_temperature(35 + delta_t / 2)
+                borefield.set_min_avg_fluid_temperature(0 - delta_t / 2)
 
-    # Load hourly profile
-    load = HourlyGeothermalLoad(simulation_period=10)
-    csv_file_path = os.path.join(os.path.dirname(__file__), 'test3.csv')
-    load.load_hourly_profile(csv_file_path, header=True, separator=",", col_extraction=1, col_injection=0)
+                # Handle short-term effects
+                if short_term_effects:
+                    short_term_effects_parameters = {
+                            'rho_cp_grout': rho_cp_grout,
+                            'rho_cp_pipe': rho_cp_pipe,
+                            }
 
-    # Calculate delta temperature
-    delta_t = max(load.max_peak_extraction, load.max_peak_injection) * 1000 / (fluid_data.Cp * fluid_data.mfr)
+                    options = {
+                        'disp': False,
+                        'profiles': True,
+                        'method': 'equivalent',
+                        'cylindrical_correction': True,
+                        'short_term_effects': True,
+                        'ground_data': ground_data,
+                        'fluid_data': fluid_data,
+                        'pipe_data': pipe_data,
+                        'borefield': borefield,
+                        'short_term_effects_parameters': short_term_effects_parameters,
+                            }
+                    borefield.set_options_gfunction_calculation(options)
 
-    # Test cases: for peak durations 6 hours and 1 hour
-    for peak_duration in [6]:
-        print(f"\nRunning test case for peak_duration = {peak_duration}")
+                # Use constant Rb if required
+                if not dynamic_rb:
+                    borefield.set_Rb(0.1)
 
-        # Initialize borefield with required parameters
-        borefield = initialize_borefield(load, delta_t, ground_data, fluid_data, pipe_data)
+                # Perform sizing
+                start_time = time.time()
+                depth = borefield.size(100, L2_sizing=(method.startswith('L2')), L3_sizing=(method.startswith('L3')), L4_sizing=(method.startswith('L4')))
+                log_results(method, depth, borefield, start_time)
 
-        # Run sizing for calculated Rb (default behavior)
-        results_default_Rb = run_sizing_case(borefield, load, ground_data, fluid_data, pipe_data, peak_duration, delta_t)
+            # Print results
+            print(f"\n--- Results for {s}year simulation and {B}m spacing ---")
+            for method, result in results.items():
+                print(f"Method {method}: Depth = {result['depth']:.2f}m, Rb* = {result['Rb']:.3f}, Time = {result['time']:.2f}s")
 
-        # Print results for default Rb
-        print("\n--- Results for calculated Rb ---")
-        for method, result in results_default_Rb.items():
-            print(f"Method: {method}")
-            print(f"  Depth: {result['depth']:.2f} m")
-            print(f"  Rb: {result['Rb']:.3f}")
-            print(f"  Time: {result['time']:.2f} s")
-        print("\n----------------------------------")
-
-        # Run sizing for imposed Rb (static value)
-        Rb_static = 0.1  # Imposed Rb value
-        use_constant_Rb = True
-        # Initialize borefield with required parameters
-        borefield = initialize_borefield(load, delta_t, ground_data, fluid_data, pipe_data, Rb_static)   
-        results_imposed_Rb = run_sizing_case(borefield, load, ground_data, fluid_data, pipe_data, peak_duration, delta_t, use_constant_Rb)
-
-        # Print results for imposed Rb
-        print("\n--- Results for imposed Rb (Rb* = 0.13) ---")
-        for method, result in results_imposed_Rb.items():
-            print(f"Method: {method}")
-            print(f"  Depth: {result['depth']:.2f} m")
-            print(f"  Rb: {result['Rb']:.3f}")
-            print(f"  Time: {result['time']:.2f} s")
-        print("\n--------------------------------------------")
-
-        """
-        # Add assertions for validation (replace with expected values for your case)
-        if peak_duration == 6:
-            assert np.isclose(results_default_Rb['L2']['depth'], 59.366, atol=0.1)
-            assert np.isclose(results_default_Rb['L3']['depth'], 59.543, atol=0.1)
-            assert np.isclose(results_default_Rb['L4']['depth'], 56.266, atol=0.1)
-            assert np.isclose(results_default_Rb['L4_ste']['depth'], 52.347, atol=0.1)
-            assert np.isclose(results_default_Rb['L3_ste']['depth'], 58.123, atol=0.1)  # Example value
-        else:
-            # Adjust expected values based on 1-hour peak duration results
-            pass
-        """
 
 if __name__ == "__main__":
-    test3_ste(use_pygfunction_media=False)
+    test_3_6h_ste()
