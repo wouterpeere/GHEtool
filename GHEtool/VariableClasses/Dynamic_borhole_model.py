@@ -101,7 +101,7 @@ class DynamicsBH(object):
             self.num_fluid_cells = 12
             self.num_conv_cells = 4
             self.num_pipe_cells = 16
-            self.num_grout_cells = 20
+            self.num_grout_cells = 18 #20
         else:
             ghe_logger.warning(f"Choose for single or double U-tube")
 
@@ -146,7 +146,8 @@ class DynamicsBH(object):
 
         else:
             # outer tube radius is set to sqrt(2) * r_p_o, tube region has 4 cells
-            self.r_out_tube = sqrt(2) * self.pipes_ghe.r_out + 2*self.thickness_pipe_actual
+            #self.r_out_tube = sqrt(2) * self.pipes_ghe.r_out + 2*self.thickness_pipe_actual
+            self.r_out_tube = 2 * self.pipes_ghe.r_out 
             # inner tube radius is set to r_out_tube-t_p
             self.r_in_tube = self.r_out_tube - 2.0 * self.thickness_pipe_actual
             # r_in_convection is set to r_in_tube - 1/4 * t

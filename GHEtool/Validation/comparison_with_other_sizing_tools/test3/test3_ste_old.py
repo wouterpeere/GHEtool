@@ -26,7 +26,17 @@ from GHEtool import *
 def test_3_6h_ste():
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=2.25, T_g=10, volumetric_heat_capacity=2592000, flux=0)
-    fluid_data = FluidData(mfr=33.1 / 49, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
+    base_mfr = 33.1 / 49 # Basis massastroom (kg/s)
+    
+    # Maak een water vloeistofobject via pygfunction
+    fluid_str = 'Water'  # 'Water' is de standaard vloeistof in pygfunction
+    percent = 0  # Geen mengsel, dus 0% andere vloeistoffen
+    T_f = 0  # Temperatuur (bijvoorbeeld 20°C)
+    fluid_object = gt.media.Fluid(fluid_str, percent, T=T_f)  # Maak fluid object
+    
+    # Maak FluidData object aan en laad vloeistofgegevens van pygfunction
+    fluid_data = FluidData(mfr=base_mfr, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
+    fluid_data.import_fluid_from_pygfunction(fluid_object)  # Laad de vloeistofgegevens in FluidData
     pipe_data = MultipleUTube(r_in=0.013, r_out=0.0167, D_s=0.075 / 2, k_g=1.73, k_p=0.4, number_of_pipes=1)
 
     # start test with dynamic Rb*
@@ -67,6 +77,7 @@ def test_3_6h_ste():
     # according to L4
     L4_start = time.time()
     depth_L4 = borefield.size(100, L4_sizing=True)
+    borefield._plot_temperature_profile(plot_hourly=True)
     Rb_L4 = borefield.Rb
     L4_stop = time.time()
 

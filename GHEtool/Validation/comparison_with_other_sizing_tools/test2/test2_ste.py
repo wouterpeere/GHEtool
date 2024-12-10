@@ -45,7 +45,8 @@ def initialize_borefield(load, delta_t, ground_data, fluid_data, pipe_data, impo
     # Set temperature bounds
     borefield.set_max_avg_fluid_temperature(35 + delta_t / 2)
     borefield.set_min_avg_fluid_temperature(4.4 - delta_t / 2)
-
+    
+    print('initrialisatie', 35 + delta_t / 2, borefield.Rb)
     return borefield
 
 

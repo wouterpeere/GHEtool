@@ -15,9 +15,6 @@ import os
 import time
 import numpy as np
 import pygfunction as gt
-import sys
-
-sys.path.append(r"C:\Workdir\Develop\ghetool")  # Adjust the path to your GHEtool directory
 from GHEtool import *
 
 
