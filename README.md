@@ -25,7 +25,7 @@ website [https://GHEtool.eu](https://GHEtool.eu) for more information.
 ### Read The Docs
 
 GHEtool has an elaborate documentation were all the functionalities of the tool are explained, with examples, literature
-and validation. This can be found on [https://docs.ghetool.eu](https://docs.ghetool.eu).
+and validation. This can be found on [https://ghetool.readthedocs.io/en/latest/](https://ghetool.readthedocs.io/en/latest/).
 
 ## Graphical user interface
 
@@ -141,7 +141,7 @@ Within GHEtool, there are multiple ways of setting the ground data. Currently, y
   gradient.
 
 * You can also use multiple ground layers to define your ground model. Please take a look
-  at [our example](https://docs.ghetool.eu/en/latest/sources/code/Examples/start_in_different_month.html).
+  at [our example](https://ghetool.readthedocs.io/en/latest//en/latest/sources/code/Examples/start_in_different_month.html).
 
 Please note that it is possible to add your own ground types by inheriting the attributes from the abstract _GroundData
 class.
@@ -337,7 +337,7 @@ A full list of functionalities is given below.
 GHEtool offers functionalities of value to all different disciplines working with borefields. The features are available
 both in the code environment and in the GUI.
 For more information about the functionalities of GHEtool, please visit the documentation
-on [https://docs.ghetool.eu](https://docs.ghetool.eu).
+on [https://ghetool.readthedocs.io/en/latest/](https://ghetool.readthedocs.io/en/latest/).
 
 ## License
 
@@ -360,7 +360,7 @@ Peere, W., Blanke, T.(2022). GHEtool: An open-source tool for borefield sizing i
 Software, 7_(76), 4406, https://doi.org/10.21105/joss.04406
 
 For more information on how to cite GHEtool, please visit the ReadTheDocs
-at [https://docs.ghetool.eu](https://docs.ghetool.eu/en/stable/).
+at [https://ghetool.readthedocs.io/en/latest/](https://ghetool.readthedocs.io/en/latest//en/stable/).
 
 ## References
 
