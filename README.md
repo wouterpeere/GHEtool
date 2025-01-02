@@ -141,7 +141,7 @@ Within GHEtool, there are multiple ways of setting the ground data. Currently, y
   gradient.
 
 * You can also use multiple ground layers to define your ground model. Please take a look
-  at [our example](https://ghetool.readthedocs.io/en/latest//en/latest/sources/code/Examples/start_in_different_month.html).
+  at [our example](https://ghetool.readthedocs.io/en/latest/sources/code/Examples/start_in_different_month.html).
 
 Please note that it is possible to add your own ground types by inheriting the attributes from the abstract _GroundData
 class.
@@ -360,7 +360,7 @@ Peere, W., Blanke, T.(2022). GHEtool: An open-source tool for borefield sizing i
 Software, 7_(76), 4406, https://doi.org/10.21105/joss.04406
 
 For more information on how to cite GHEtool, please visit the ReadTheDocs
-at [https://ghetool.readthedocs.io/en/latest/](https://ghetool.readthedocs.io/en/latest//en/stable/).
+at [https://ghetool.readthedocs.io/en/latest/](https://ghetool.readthedocs.io/en/latest/).
 
 ## References
 
