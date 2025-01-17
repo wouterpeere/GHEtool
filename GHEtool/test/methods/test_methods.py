@@ -48,15 +48,14 @@ def test_L4(model: Borefield, result):
 def test_optimise(input, result):
     model: Borefield = input[0]
     load, depth, power, hourly, max_peak_extraction, max_peak_injection = input[1:]
+    model.H = depth
     if power:
         borefield_load, external_load = optimise_load_profile_power(model, load,
-                                                                    depth,
                                                                     use_hourly_resolution=hourly,
                                                                     max_peak_heating=max_peak_extraction,
                                                                     max_peak_cooling=max_peak_injection)
     else:
         borefield_load, external_load = optimise_load_profile_energy(model, load,
-                                                                     depth,
                                                                      max_peak_heating=max_peak_extraction,
                                                                      max_peak_cooling=max_peak_injection)
     percentage_extraction, percentage_injection, peak_extraction_geo, peak_injection_geo, peak_extraction_ext, peak_injection_ext = \

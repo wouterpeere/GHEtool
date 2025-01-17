@@ -353,6 +353,7 @@ list_of_test_objects.add(
     SizingObject(borefield, L4_output=18602.210559679363, quadrant=3, name='Hourly profile, quadrant 3'))
 hourly_load = HourlyBuildingLoad(efficiency_heating=10 ** 6, efficiency_cooling=10 ** 6)
 hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"))
+# set borefield depth to 150
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 87.506, 97.012,
                                                    305.842, 384.204, 230.193, 292.212,
                                                    name='Optimise load profile 1 (power)', power=True, hourly=False))

@@ -8,7 +8,6 @@ from GHEtool.VariableClasses import HourlyBuildingLoad, MonthlyBuildingLoadMulti
 def optimise_load_profile_power(
         borefield,
         building_load: Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear],
-        depth: float = None,
         temperature_threshold: float = 0.05,
         use_hourly_resolution: bool = True,
         max_peak_heating: float = None,
@@ -26,8 +25,6 @@ def optimise_load_profile_power(
         Borefield object
     building_load : HourlyBuildingLoad | HourlyBuildingLoadMultiYear
         Load data used for the optimisation.
-    depth : float
-        Depth of the boreholes in the borefield [m].
     temperature_threshold : float
         The maximum allowed temperature difference between the maximum and minimum fluid temperatures and their
         respective limits. The lower this threshold, the longer the convergence will take.
@@ -60,12 +57,9 @@ def optimise_load_profile_power(
     if temperature_threshold < 0:
         raise ValueError(f"The temperature threshold is {temperature_threshold}, but it cannot be below 0!")
 
-    # set depth
-    if depth is None:
-        depth = borefield.H
-
     # since the depth does not change, the Rb* value is constant
-    borefield.Rb = borefield.borehole.get_Rb(depth, borefield.D, borefield.r_b, borefield.ground_data.k_s(depth))
+    borefield.Rb = borefield.borehole.get_Rb(borefield.H, borefield.D, borefield.r_b,
+                                             borefield.ground_data.k_s(borefield.depth))
 
     # set load
     borefield.load = copy.deepcopy(building_load)
@@ -96,7 +90,7 @@ def optimise_load_profile_power(
             if isinstance(borefield.load, HourlyBuildingLoad) else building_load.hourly_heating_load_simulation_period))
 
         # calculate temperature profile, just for the results
-        borefield.calculate_temperatures(depth=depth, hourly=use_hourly_resolution)
+        borefield.calculate_temperatures(depth=borefield.H, hourly=use_hourly_resolution)
 
         # deviation from minimum temperature
         if abs(min(borefield.results.peak_extraction) - borefield.Tf_min) > temperature_threshold:
@@ -137,7 +131,6 @@ def optimise_load_profile_power(
 def optimise_load_profile_energy(
         borefield,
         building_load: Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear],
-        depth: float = None,
         temperature_threshold: float = 0.05,
         max_peak_heating: float = None,
         max_peak_cooling: float = None
@@ -153,8 +146,6 @@ def optimise_load_profile_energy(
         Borefield object
     building_load : HourlyBuildingLoad | HourlyBuildingLoadMultiYear
         Load data used for the optimisation
-    depth : float
-        Depth of the boreholes in the borefield [m]
     temperature_threshold : float
         The maximum allowed temperature difference between the maximum and minimum fluid temperatures and their
         respective limits. The lower this threshold, the longer the convergence will take.
@@ -184,13 +175,10 @@ def optimise_load_profile_energy(
     if temperature_threshold < 0:
         raise ValueError(f"The temperature threshold is {temperature_threshold}, but it cannot be below 0!")
 
-    # set depth
-    if depth is None:
-        depth = borefield.H
-
     # since the depth does not change, the Rb* value is constant
     # set to use a constant Rb* value but save the initial parameters
-    borefield.Rb = borefield.borehole.get_Rb(depth, borefield.D, borefield.r_b, borefield.ground_data.k_s)
+    borefield.Rb = borefield.borehole.get_Rb(borefield.H, borefield.D, borefield.r_b,
+                                             borefield.ground_data.k_s(borefield.depth))
 
     building_load_copy = copy.deepcopy(building_load)
 
@@ -257,7 +245,7 @@ def optimise_load_profile_energy(
 
         while not cool_ok or not heat_ok:
             # calculate temperature profile, just for the results
-            borefield.calculate_temperatures(depth)
+            borefield.calculate_temperatures(borefield.H)
 
             # deviation from minimum temperature
             if abs(borefield.results.peak_extraction[i] - borefield.Tf_min) > temperature_threshold:
