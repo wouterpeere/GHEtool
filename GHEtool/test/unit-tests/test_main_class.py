@@ -75,24 +75,24 @@ def test_nb_of_boreholes():
     assert np.isclose(borefield.D, 0.1)
     assert borefield.number_of_boreholes == 25
     borefield.gfunction(5000, 110)
-    assert np.any(borefield.gfunction_calculation_object.depth_array)
+    assert np.any(borefield.gfunction_calculation_object.borehole_length_array)
     borefield.borefield = gt.boreholes.rectangle_field(6, 5, 6, 6, 100, 1, 0.075)
-    assert not np.any(borefield.gfunction_calculation_object.depth_array)
+    assert not np.any(borefield.gfunction_calculation_object.borehole_length_array)
     assert np.isclose(borefield.H, 100)
     assert np.isclose(borefield.r_b, 0.075)
     assert np.isclose(borefield.D, 1)
     borefield.gfunction(5000, 110)
-    assert np.any(borefield.gfunction_calculation_object.depth_array)
+    assert np.any(borefield.gfunction_calculation_object.borehole_length_array)
     assert borefield.number_of_boreholes == 30
     borefield.borefield = None
-    assert not np.any(borefield.gfunction_calculation_object.depth_array)
+    assert not np.any(borefield.gfunction_calculation_object.borehole_length_array)
     assert borefield.gfunction_calculation_object
     assert borefield.number_of_boreholes == 0
     borefield.borefield = gt.boreholes.rectangle_field(6, 5, 6, 6, 100, 1, 0.075)
     borefield.gfunction(5000, 110)
-    assert np.any(borefield.gfunction_calculation_object.depth_array)
+    assert np.any(borefield.gfunction_calculation_object.borehole_length_array)
     borefield.set_borefield(None)
-    assert not np.any(borefield.gfunction_calculation_object.depth_array)
+    assert not np.any(borefield.gfunction_calculation_object.borehole_length_array)
     assert borefield.number_of_boreholes == 0
 
 
@@ -261,23 +261,23 @@ def test_ground_data_jit_gfunction():
 
     # calculate gfunction
     borefield.gfunction([5000, 10000], 150)
-    assert np.any(borefield.gfunction_calculation_object.depth_array)
+    assert np.any(borefield.gfunction_calculation_object.borehole_length_array)
 
     # test for property setter
     borefield.ground_data = ground_data_constant
     assert borefield.ground_data == ground_data_constant
     assert borefield._ground_data == ground_data_constant
-    assert not np.any(borefield.gfunction_calculation_object.depth_array)
+    assert not np.any(borefield.gfunction_calculation_object.borehole_length_array)
 
     # calculate gfunction
     borefield.gfunction([5000, 10000], 150)
-    assert np.any(borefield.gfunction_calculation_object.depth_array)
+    assert np.any(borefield.gfunction_calculation_object.borehole_length_array)
 
     # test for set function
     borefield.set_ground_parameters(data_ground_flux)
     assert borefield.ground_data == data_ground_flux
     assert borefield._ground_data == data_ground_flux
-    assert not np.any(borefield.gfunction_calculation_object.depth_array)
+    assert not np.any(borefield.gfunction_calculation_object.borehole_length_array)
 
 
 def test_set_fluid_params():

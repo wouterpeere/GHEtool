@@ -15,8 +15,8 @@ class CalculationSetup(BaseClass):
     """
 
     __slots__ = '_L2_sizing', '_L3_sizing', '_L4_sizing', 'quadrant_sizing', '_backup', \
-                'atol', 'rtol', 'max_nb_of_iterations', 'interpolate_gfunctions', 'H_init',\
-                'use_precalculated_dataset', 'deep_sizing', 'force_deep_sizing'
+        'atol', 'rtol', 'max_nb_of_iterations', 'interpolate_gfunctions', 'H_init', \
+        'use_precalculated_dataset', 'deep_sizing', 'force_deep_sizing'
 
     def __init__(self, quadrant_sizing: int = 0,
                  L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None,
@@ -50,7 +50,7 @@ class CalculationSetup(BaseClass):
             for if you run a sizing twice, the second time the algorithm can interpolate, so it (can) converge(s) to
             a slightly different result.
         H_init : float
-            The initial depth for the different methods.
+            The initial borehole length for the different methods.
         use_precalculated_dataset : bool
             True if a precalculated dataset of g-function should be used.
         deep_sizing : bool
