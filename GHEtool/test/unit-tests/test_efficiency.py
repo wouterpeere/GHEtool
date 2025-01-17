@@ -399,3 +399,11 @@ def test_repr_():
            'Passive cooling:\n' \
            '\tSEER [-]: 20\n' \
            'With active cooling above [°C]: 10' == eer_combined.__repr__()
+
+    eer_combined = EERCombined(20, 5, months_active_cooling=[5, 6])
+    assert '\n' \
+           'Active cooling:\n' \
+           '\tSEER [-]: 5\n' \
+           'Passive cooling:\n' \
+           '\tSEER [-]: 20\n' \
+           'With active cooling in months [-]: [5 6]' == eer_combined.__repr__()
