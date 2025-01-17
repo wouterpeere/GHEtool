@@ -191,6 +191,18 @@ class Borefield(BaseClass):
         return len(self.borefield) if self.borefield is not None else 0
 
     @property
+    def depth(self) -> float:
+        """
+        This function returns the average borehole depth.
+
+        Returns
+        -------
+        float
+            Average borehole depth [meters]
+        """
+        return self.H + self.D
+
+    @property
     def H(self) -> float:
         """
         This function returns the borehole depth.
@@ -1864,7 +1876,6 @@ class Borefield(BaseClass):
     def optimise_load_profile_power(
             self,
             building_load: Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear],
-            depth: float = None,
             temperature_threshold: float = 0.05,
             use_hourly_resolution: bool = True,
             max_peak_heating: float = None,
@@ -1882,8 +1893,6 @@ class Borefield(BaseClass):
             Borefield object
         building_load : HourlyBuildingLoad | HourlyBuildingLoadMultiYear
             Load data used for the optimisation.
-        depth : float
-            Depth of the boreholes in the borefield [m].
         temperature_threshold : float
             The maximum allowed temperature difference between the maximum and minimum fluid temperatures and their
             respective limits. The lower this threshold, the longer the convergence will take.
@@ -1906,15 +1915,13 @@ class Borefield(BaseClass):
             ValueError if no correct load data is given or the threshold is negative
         """
         borefield_load, external_load = optimise_load_profile_power(
-            self, building_load, depth, temperature_threshold, use_hourly_resolution, max_peak_heating,
-            max_peak_cooling)
+            self, building_load, temperature_threshold, use_hourly_resolution, max_peak_heating, max_peak_cooling)
         self.load = borefield_load
         return borefield_load, external_load
 
     def optimise_load_profile_energy(
             self,
             building_load: Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear],
-            depth: float = None,
             temperature_threshold: float = 0.05,
             max_peak_heating: float = None,
             max_peak_cooling: float = None
@@ -1930,8 +1937,6 @@ class Borefield(BaseClass):
             Borefield object
         building_load : HourlyBuildingLoad | HourlyBuildingLoadMultiYear
             Load data used for the optimisation
-        depth : float
-            Depth of the boreholes in the borefield [m]
         temperature_threshold : float
             The maximum allowed temperature difference between the maximum and minimum fluid temperatures and their
             respective limits. The lower this threshold, the longer the convergence will take.
@@ -1951,7 +1956,7 @@ class Borefield(BaseClass):
             ValueError if no correct load data is given or the threshold is negative
         """
         borefield_load, external_load = optimise_load_profile_energy(
-            self, building_load, depth, temperature_threshold, max_peak_heating, max_peak_cooling)
+            self, building_load, temperature_threshold, max_peak_heating, max_peak_cooling)
         self.load = borefield_load
         return borefield_load, external_load
 

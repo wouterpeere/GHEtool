@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## Fixed
 
 - Problem with optimise energy profile (issue #306).
+- Problem with ground parameters in optimise_energy_profile (issue #317).
+- Removed 'depth' parameter in optimise load functions, for it is already included in the Borefield object (issue #317).
 
 ## [2.3.0] - 2024-11-05
 
