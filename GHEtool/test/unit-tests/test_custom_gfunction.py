@@ -34,10 +34,10 @@ def test_update_min_max_borehole_length():
     custom_gfunction = CustomGFunction()
     assert custom_gfunction.max_borehole_length == CustomGFunction.DEFAULT_LENGTH_ARRAY[-1]
     assert custom_gfunction.min_borehole_length == CustomGFunction.DEFAULT_LENGTH_ARRAY[0]
-    assert np.array_equal(custom_gfunction.depth_array, CustomGFunction.DEFAULT_LENGTH_ARRAY)
+    assert np.array_equal(custom_gfunction.borehole_length_array, CustomGFunction.DEFAULT_LENGTH_ARRAY)
 
-    custom_gfunction.depth_array = np.array([1, 5, 10])
-    assert np.array_equal(custom_gfunction.depth_array, np.array([1, 5, 10]))
+    custom_gfunction.borehole_length_array = np.array([1, 5, 10])
+    assert np.array_equal(custom_gfunction.borehole_length_array, np.array([1, 5, 10]))
     assert custom_gfunction.max_borehole_length == 10
     assert custom_gfunction.min_borehole_length == 1
 
@@ -100,7 +100,7 @@ def test_unequal():
 
 def test_unequal2():
     custom_gfunction = CustomGFunction()
-    custom_gfunction2 = CustomGFunction(depth_array=[1, 5])
+    custom_gfunction2 = CustomGFunction(borehole_length_array=[1, 5])
     assert not custom_gfunction == custom_gfunction2
 
 

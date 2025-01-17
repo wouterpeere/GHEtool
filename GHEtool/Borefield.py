@@ -610,7 +610,7 @@ class Borefield(BaseClass):
         Rb : float
             Equivalent borehole thermal resistance [mK/W]
         """
-        return self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s)
+        return self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s, self.depth)
 
     @Rb.setter
     def Rb(self, Rb: float) -> None:
@@ -1641,8 +1641,9 @@ class Borefield(BaseClass):
         def calculate_temperatures(H, hourly=hourly):
             # set Rb* value
             H = H if H is not None else self.H
+            depth = self.calculate_depth(H, self.D)
             Rb = self.borehole.get_Rb(H, self.D, self.r_b,
-                                      self.ground_data.k_s(self.calculate_depth(H, self.D), self.D))
+                                      self.ground_data.k_s(depth, self.D), depth)
 
             results = None
 
