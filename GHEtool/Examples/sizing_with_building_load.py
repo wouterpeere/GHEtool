@@ -30,8 +30,8 @@ def size_with_scop() -> Tuple[float, float]:
 
     Returns
     -------
-    Length : float
-        Required borehole length
+    Depth : float
+        Required borehole depth
     """
     scop = SCOP(4.5)
     seer = SEER(1000)
@@ -52,11 +52,11 @@ def size_with_scop() -> Tuple[float, float]:
 
     borefield.create_rectangular_borefield(3, 14, 7, 7, 94, r_b=0.0655)
 
-    length = borefield.size_L3(100)
-    print(f'When sizing with a constant SCOP, the required borehole length is {length:.2f}m. The SCOP (incl. DHW) is '
+    depth = borefield.size_L3(100)
+    print(f'When sizing with a constant SCOP, the required borehole depth is {depth:.2f}m. The SCOP (incl. DHW) is '
           f'{borefield.load.SCOP_total:.2f}.')
     borefield.print_temperature_profile()
-    return length, borefield.load.SCOP_total
+    return depth, borefield.load.SCOP_total
 
 
 def size_with_variable_ground_temperature() -> Tuple[float, float]:
@@ -65,8 +65,8 @@ def size_with_variable_ground_temperature() -> Tuple[float, float]:
 
     Returns
     -------
-    Length : float
-        Required borehole length
+    Depth : float
+        Required borehole depth
     """
     seer = SEER(1000)
     cop = COP(np.array([3.76, 4.25, 4.79, 5.34, 5.74]), np.array([-5, 0, 5, 10, 15]))
@@ -87,11 +87,11 @@ def size_with_variable_ground_temperature() -> Tuple[float, float]:
 
     borefield.create_rectangular_borefield(3, 14, 7, 7, 94, r_b=0.0655)
 
-    length = borefield.size_L3(100)
-    print(f'When sizing with a inlet temperature dependent COP, the required borehole length is {length:.2f}m. '
+    depth = borefield.size_L3(100)
+    print(f'When sizing with a inlet temperature dependent COP, the required borehole depth is {depth:.2f}m. '
           f'The SCOP (incl. DHW) is {borefield.load.SCOP_total:.2f}.')
     borefield.print_temperature_profile()
-    return length, borefield.load.SCOP_total
+    return depth, borefield.load.SCOP_total
 
 
 def size_with_part_load_data() -> Tuple[float, float]:
@@ -100,8 +100,8 @@ def size_with_part_load_data() -> Tuple[float, float]:
 
     Returns
     -------
-    Length : float
-        Required borehole length
+    Depth : float
+        Required borehole depth
     """
     seer = SEER(1000)
     cop = COP(np.array(
@@ -136,12 +136,12 @@ def size_with_part_load_data() -> Tuple[float, float]:
 
     borefield.create_rectangular_borefield(3, 14, 7, 7, 94, r_b=0.0655)
 
-    length = borefield.size_L3(100)
+    depth = borefield.size_L3(100)
     print(
-        f'When sizing with a inlet temperature and part-load dependent COP, the required borehole length is {length:.2f}m. '
+        f'When sizing with a inlet temperature and part-load dependent COP, the required borehole depth is {depth:.2f}m. '
         f'The SCOP (incl. DHW) is {borefield.load.SCOP_total:.2f}.')
     borefield.print_temperature_profile()
-    return length, borefield.load.SCOP_total
+    return depth, borefield.load.SCOP_total
 
 
 if __name__ == "__main__":

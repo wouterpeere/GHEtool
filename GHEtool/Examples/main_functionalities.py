@@ -3,7 +3,7 @@ This file contains all the main functionalities of GHEtool being:
     * sizing of the borefield
     * sizing of the borefield for a specific quadrant
     * plotting the temperature evolution
-    * plotting the temperature evolution for a specific length
+    * plotting the temperature evolution for a specific depth
     * printing the array of the temperature
 """
 
@@ -56,30 +56,30 @@ def main_functionalities():
     borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
 
     # size borefield
-    length = borefield.size()
-    print("The borehole length is: ", len(), "m")
+    depth = borefield.size()
+    print("The borehole depth is: ", depth, "m")
 
     # print imbalance
     print("The borefield imbalance is: ", borefield._borefield_load.imbalance,
           "kWh/y. (A negative imbalance means the the field is heat extraction dominated so it cools down year after year.)")  # print imbalance
 
-    # plot temperature profile for the calculated length
+    # plot temperature profile for the calculated depth
     borefield.print_temperature_profile(legend=True)
 
-    # plot temperature profile for a fixed length
-    borefield.print_temperature_profile_fixed_length(length=75, legend=False)
+    # plot temperature profile for a fixed depth
+    borefield.print_temperature_profile_fixed_depth(depth=75, legend=False)
 
     # print gives the array of monthly temperatures for peak cooling without showing the plot
-    borefield.calculate_temperatures(length=90)
+    borefield.calculate_temperatures(depth=90)
     print("Result array for cooling peaks")
     print(borefield.results.peak_injection)
     print("---------------------------------------------")
 
     # size the borefield for quadrant 3
     # for more information about borefield quadrants, see (Peere et al., 2021)
-    length = borefield.size(quadrant_sizing=3)
-    print("The borehole length is: ", str(round(length, 2)), "m for a sizing in quadrant 3")
-    # plot temperature profile for the calculated length
+    depth = borefield.size(quadrant_sizing=3)
+    print("The borehole depth is: ", str(round(depth, 2)), "m for a sizing in quadrant 3")
+    # plot temperature profile for the calculated depth
     borefield.print_temperature_profile(legend=True)
 
     # size with a dynamic Rb* value
@@ -95,8 +95,8 @@ def main_functionalities():
     # when it is given as an argument to the size function, it will size correctly, but the plot will be with
     # constant Rb* since it has not been changed in the setup function
     borefield.calculation_setup(use_constant_Rb=False)
-    length = borefield.size()
-    print("The borehole length is: ", str(round(length, 2)), "m for a sizing with dynamic Rb*.")
+    depth = borefield.size()
+    print("The borehole depth is: ", str(round(depth, 2)), "m for a sizing with dynamic Rb*.")
     borefield.print_temperature_profile(legend=True)
 
 

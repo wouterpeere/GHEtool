@@ -30,9 +30,9 @@ def optimise():
     load = HourlyBuildingLoad(efficiency_heating=10 ** 6, efficiency_cooling=10 ** 6)
     load.load_hourly_profile("hourly_profile.csv", header=True, separator=";")
 
-    # optimise the load for a 10x10 field (see data above) and a fixed borehole length of 150m.
+    # optimise the load for a 10x10 field (see data above) and a fixed depth of 150m.
     # first for an optimisation based on the power
-    borefield.optimise_load_profile_power(building_load=load, length=150)
+    borefield.optimise_load_profile_power(building_load=load, depth=150)
 
     print(f'Max heating power (primary): {borefield.load.max_peak_extraction:,.0f}kW')
     print(f'Max cooling power (primary): {borefield.load.max_peak_injection:,.0f}kW')
@@ -46,7 +46,7 @@ def optimise():
     borefield.print_temperature_profile(plot_hourly=True)
 
     # first for an optimisation based on the energy
-    borefield.optimise_load_profile_energy(building_load=load, length=150)
+    borefield.optimise_load_profile_energy(building_load=load, depth=150)
 
     print(f'Max heating power (primary): {borefield.load.max_peak_extraction:,.0f}kW')
     print(f'Max cooling power (primary): {borefield.load.max_peak_injection:,.0f}kW')
