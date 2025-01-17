@@ -90,7 +90,7 @@ def optimise_load_profile_power(
             if isinstance(borefield.load, HourlyBuildingLoad) else building_load.hourly_heating_load_simulation_period))
 
         # calculate temperature profile, just for the results
-        borefield.calculate_temperatures(depth=borefield.H, hourly=use_hourly_resolution)
+        borefield.calculate_temperatures(length=borefield.H, hourly=use_hourly_resolution)
 
         # deviation from minimum temperature
         if abs(min(borefield.results.peak_extraction) - borefield.Tf_min) > temperature_threshold:

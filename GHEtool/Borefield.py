@@ -917,7 +917,7 @@ class Borefield(BaseClass):
             gfunc_uniform_T = self.gfunction(time_steps, max(1, self.H))
 
             # calculate the thermal resistances
-            k_s = self.ground_data.k_s(self.depth, self.H)
+            k_s = self.ground_data.k_s(self.depth, self.D)
             Rpm = (gfunc_uniform_T[2] - gfunc_uniform_T[1]) / (2 * pi * k_s)
             Rcm = (gfunc_uniform_T[1] - gfunc_uniform_T[0]) / (2 * pi * k_s)
             Rh = (gfunc_uniform_T[0]) / (2 * pi * k_s)

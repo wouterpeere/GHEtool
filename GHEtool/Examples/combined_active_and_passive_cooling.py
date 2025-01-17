@@ -40,7 +40,6 @@ def default_cooling_in_summer():
     # set variables
     load.eer = eer
     borefield.load = load
-    print(borefield)
     borefield.print_temperature_profile(plot_hourly=True)
 
     # get active cooling data

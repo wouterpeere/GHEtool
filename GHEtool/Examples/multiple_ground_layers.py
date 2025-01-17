@@ -9,7 +9,7 @@ from GHEtool.Validation.cases import load_case
 def multiple_ground_layers():
     # initiate borefield model
     borefield = Borefield()
-    borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 1, 0.075)
+    borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 0, 0.075)
     borefield.set_Rb(0.12)
 
     # set temperature boundaries
