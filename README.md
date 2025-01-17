@@ -25,7 +25,8 @@ website [https://GHEtool.eu](https://GHEtool.eu) for more information.
 ### Read The Docs
 
 GHEtool has an elaborate documentation were all the functionalities of the tool are explained, with examples, literature
-and validation. This can be found on [https://ghetool.readthedocs.io/en/latest/](https://ghetool.readthedocs.io/en/latest/).
+and validation. This can be found
+on [https://ghetool.readthedocs.io/en/latest/](https://ghetool.readthedocs.io/en/latest/).
 
 ## Graphical user interface
 
@@ -233,7 +234,7 @@ atol and rtol is chosen when sizing. The options are:
   converged, a RuntimeError is thrown.
 * _use_precalculated_dataset_: This option makes sure the custom g-function dataset (if available) is not used.
 * _interpolate_gfunctions_: Calculating the gvalues gives a large overhead cost, although they are not that sensitive to
-  a change in borehole depth. If this parameter is True
+  a change in borehole length. If this parameter is True
   it is allowed that gfunctions are interpolated. (To change the threshold for this interpolation, go to the Gfunction
   class.)
 * _deep_sizing_: An alternative sizing method for cases with high injection (peaks) and a variable ground temperature.
@@ -320,8 +321,8 @@ Once a Borefield object is created, one can make use of all the functionalities 
 borefield using:
 
 ```Python
-depth = borefield.size()
-print("The borehole depth is: ", depth, "m")
+length = borefield.size()
+print("The borehole length is: ", length, "m")
 ```
 
 Or one can plot the temperature profile by using

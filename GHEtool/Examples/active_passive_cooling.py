@@ -146,13 +146,13 @@ def active_passive_cooling(location='Active_passive_example.csv'):
     borefield.Rb = 0.12
 
     ### PASSIVE COOLING
-    depths = [0.9, 0]
+    lengths = [0.9, 0]
 
     # set initial loads
     cooling_ground = cooling_building.copy()
     heating_ground = heating_building.copy()
 
-    while abs(depths[0] - depths[1]) > 0.1:
+    while abs(lengths[0] - lengths[1]) > 0.1:
         # set loads
         load = HourlyGeothermalLoadMultiYear()
         load.hourly_extraction_load = heating_ground
@@ -160,8 +160,8 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         borefield.load = load
 
         # size borefield
-        depth_passive = borefield.size_L4()
-        depths.insert(0, depth_passive)
+        length_passive = borefield.size_L4()
+        lengths.insert(0, length_passive)
 
         # get temperature profile
         temp_profile = borefield.results.peak_extraction
@@ -170,7 +170,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         heating_ground = update_load_COP(temp_profile, COP, heating_building)
 
     ### ACTIVE COOLING
-    depths = [0.9, 0]
+    lengths = [0.9, 0]
 
     # set initial loads
     cooling_ground = cooling_building.copy()
@@ -178,7 +178,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
 
     borefield.set_max_avg_fluid_temperature(25)
     borefield.gfunction_calculation_object.store_previous_values = False
-    while abs(depths[0] - depths[1]) > 0.1:
+    while abs(lengths[0] - lengths[1]) > 0.1:
         # set loads
         load = HourlyGeothermalLoadMultiYear()
         load.hourly_extraction_load = heating_ground
@@ -186,8 +186,8 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         borefield.load = load
 
         # size borefield
-        depth_active = borefield.size_L4()
-        depths.insert(0, depth_active)
+        lenght_active = borefield.size_L4()
+        lengths.insert(0, lenght_active)
 
         # get temperature profile
         temp_profile = borefield.results.peak_extraction
@@ -204,24 +204,23 @@ def active_passive_cooling(location='Active_passive_example.csv'):
     operational_costs_heating = []
     investment_costs = []
     total_costs = []
-    depths = []
+    lengths = []
 
-    def f(depth: float) -> float:
+    def f(length: float) -> float:
         """
         Optimisation function.
 
         Parameters
         ----------
-        depth : float
-            Depth of the borefield in meters
+        length : float
+            Average length of the borehole [m]
 
         Returns
         -------
         total_cost : float
         """
-        borefield._update_borefield_depth(depth)
-        borefield.H = depth
-        depths.append(depth)
+        borefield.H = length
+        lengths.append(length)
 
         # initialise
         heating_ground = heating_building.copy()
@@ -239,7 +238,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
             borefield.load = load
 
             # get temperature profile
-            borefield.calculate_temperatures(depth, hourly=True)
+            borefield.calculate_temperatures(length, hourly=True)
             temp_profile = borefield.results.peak_extraction
 
             # set previous loads
@@ -263,38 +262,40 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         return investment + operational_cost
 
     # add boundaries to figure
-    MIN_BOUNDARY = depth_active
-    MAX_BOUNDARY = depth_passive
+    MIN_BOUNDARY = lenght_active
+    MAX_BOUNDARY = length_passive
 
     def objective(trial: optuna.Trial):
-        depth = trial.suggest_float('depth', MIN_BOUNDARY, MAX_BOUNDARY)
-        return f(depth)
+        length = trial.suggest_float('length', MIN_BOUNDARY, MAX_BOUNDARY)
+        return f(length)
 
     study = optuna.create_study()
     study.optimize(objective, n_trials=100)
 
-    depths_sorted = copy.deepcopy(depths)
-    depths_sorted.sort()
-    depths_old_new = {}
-    for idx, depth in enumerate(depths_sorted):
-        depths_old_new[idx] = depths.index(depth)
+    lenghts_sorted = copy.deepcopy(lengths)
+    lenghts_sorted.sort()
+    lenghts_old_new = {}
+    for idx, length in enumerate(lenghts_sorted):
+        lenghts_old_new[idx] = lengths.index(length)
 
     # plot figures
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
-    ax1.plot(depths_sorted, [total_costs[depths_old_new[idx]] / 1000 for idx, _ in enumerate(depths_sorted)],
+    ax1.plot(lenghts_sorted, [total_costs[lenghts_old_new[idx]] / 1000 for idx, _ in enumerate(lenghts_sorted)],
              marker='o', label="TC")
-    ax1.plot(depths_sorted, [investment_costs[depths_old_new[idx]] / 1000 for idx, _ in enumerate(depths_sorted)],
+    ax1.plot(lenghts_sorted, [investment_costs[lenghts_old_new[idx]] / 1000 for idx, _ in enumerate(lenghts_sorted)],
              marker='o', label="IC")
-    ax1.plot(depths_sorted, [operational_costs[depths_old_new[idx]] / 1000 for idx, _ in enumerate(depths_sorted)],
+    ax1.plot(lenghts_sorted, [operational_costs[lenghts_old_new[idx]] / 1000 for idx, _ in enumerate(lenghts_sorted)],
              marker='o', label="OC")
-    ax1.plot(depths_sorted,
-             [operational_costs_cooling[depths_old_new[idx]] / 1000 for idx, _ in enumerate(depths_sorted)], marker='o',
+    ax1.plot(lenghts_sorted,
+             [operational_costs_cooling[lenghts_old_new[idx]] / 1000 for idx, _ in enumerate(lenghts_sorted)],
+             marker='o',
              label="OCc")
-    ax1.plot(depths_sorted,
-             [operational_costs_heating[depths_old_new[idx]] / 1000 for idx, _ in enumerate(depths_sorted)], marker='o',
+    ax1.plot(lenghts_sorted,
+             [operational_costs_heating[lenghts_old_new[idx]] / 1000 for idx, _ in enumerate(lenghts_sorted)],
+             marker='o',
              label="OCh")
-    ax1.set_xlabel(r'Depth (m)', fontsize=14)
+    ax1.set_xlabel(r'Borehole length (m)', fontsize=14)
     ax1.set_ylabel(r'Costs ($k€$)', fontsize=14)
     ax1.legend(loc='lower left', ncol=3)
     ax1.tick_params(labelsize=14)

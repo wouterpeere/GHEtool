@@ -2,7 +2,7 @@
 This document compares the sizing with a constant Rb*-value with sizing where the Rb*-value is being recalculated.
 For the test, the L2 sizing method is used.
 The comparison is based on speed and relative accuracy in the result.
-It is shown that the speed difference is significant, but so is the difference in the result. With a constant Rb* value, it is important that the initial depth is rather accurate.
+It is shown that the speed difference is significant, but so is the difference in the result. With a constant Rb* value, it is important that the initial length is rather accurate.
 """
 
 import time
@@ -37,7 +37,7 @@ def sizing_with_Rb():
             peak_load_heating_array[i, j] = np.random.randint(monthly_load_heating_array[i, j], max_value_heating)
 
     # initiate borefield model
-    data = GroundConstantTemperature(3, 10)  # ground data with an inaccurate guess of 100m for the depth of the borefield
+    data = GroundConstantTemperature(3, 10)  # ground data with an inaccurate guess of 100m for the borehole length
     fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
     pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 
@@ -52,12 +52,13 @@ def sizing_with_Rb():
     annual_cooling_load = 160 * 10 ** 3  # kWh
 
     # percentage of annual load per month (15.5% for January ...)
-    monthly_load_heating_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
+    monthly_load_heating_percentage = np.array(
+        [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
     monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
 
     # resulting load per month
-    monthly_load_heating = annual_heating_load * monthly_load_heating_percentage   # kWh
-    monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage   # kWh
+    monthly_load_heating = annual_heating_load * monthly_load_heating_percentage  # kWh
+    monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage  # kWh
 
     # set the load
     load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
@@ -75,8 +76,8 @@ def sizing_with_Rb():
     borefield.create_custom_dataset()
 
     # set temperature boundaries
-    borefield.set_max_avg_fluid_temperature(16)   # maximum temperature
-    borefield.set_min_avg_fluid_temperature(0)    # minimum temperature
+    borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
+    borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
 
     # size with constant Rb* value
     borefield.calculation_setup(use_constant_Rb=True)
@@ -88,7 +89,7 @@ def sizing_with_Rb():
     for i in range(number_of_iterations):
         # set the load
         load = MonthlyGeothermalLoadAbsolute(monthly_load_heating_array[i], monthly_load_cooling_array[i],
-                                              peak_load_heating_array[i], peak_load_cooling_array[i])
+                                             peak_load_heating_array[i], peak_load_cooling_array[i])
         borefield.load = load
         results_Rb_static[i] = borefield.size()
     end_Rb_constant = time.time()
@@ -100,7 +101,7 @@ def sizing_with_Rb():
     for i in range(number_of_iterations):
         # set the load
         load = MonthlyGeothermalLoadAbsolute(monthly_load_heating_array[i], monthly_load_cooling_array[i],
-                                              peak_load_heating_array[i], peak_load_cooling_array[i])
+                                             peak_load_heating_array[i], peak_load_cooling_array[i])
         borefield.load = load
         results_Rb_dynamic[i] = borefield.size()
     end_Rb_dynamic = time.time()
@@ -114,13 +115,20 @@ def sizing_with_Rb():
     for i in range(number_of_iterations):
         difference_results[i] = results_Rb_dynamic[i] - results_Rb_static[i]
 
-    print("The maximal difference between the sizing with a constant and a dynamic Rb* value:", np.round(np.max(difference_results), 3), "m or", np.round(np.max(difference_results) / results_Rb_static[np.argmax(difference_results)] * 100, 3), "% w.r.t. the constant Rb* approach.")
-    print("The mean difference between the sizing with a constant and a dynamic Rb* value:", np.round(np.mean(difference_results), 3), "m or", np.round(np.mean(difference_results) / np.mean(results_Rb_static) * 100, 3), "% w.r.t. the constant Rb* approach.")
+    print("The maximal difference between the sizing with a constant and a dynamic Rb* value:",
+          np.round(np.max(difference_results), 3), "m or",
+          np.round(np.max(difference_results) / results_Rb_static[np.argmax(difference_results)] * 100, 3),
+          "% w.r.t. the constant Rb* approach.")
+    print("The mean difference between the sizing with a constant and a dynamic Rb* value:",
+          np.round(np.mean(difference_results), 3), "m or",
+          np.round(np.mean(difference_results) / np.mean(results_Rb_static) * 100, 3),
+          "% w.r.t. the constant Rb* approach.")
     print("------------------------------------------------------------------------------")
 
-    # Do the same thing but with another constant Rb* value based on a borehole depth of 185m.
+    # Do the same thing but with another constant Rb* value based on a borehole length of 185m.
 
-    borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 185, 1, 0.075) # borefield with an accurate guess of 185m for the depth of the borefield
+    borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 185, 1,
+                                                0.075)  # borefield with an accurate guess of 185m for the borehole length
     borefield.set_borefield(borefield_gt)
 
     # size with a constant Rb* value

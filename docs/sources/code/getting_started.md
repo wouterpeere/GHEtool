@@ -241,8 +241,8 @@ Once a Borefield object is created, one can make use of all the functionalities 
 borefield using:
 
 ```Python
-depth = borefield.size()
-print("The borehole depth is: ", depth, "m")
+length = borefield.size()
+print("The borehole length is: ", length, "m")
 ```
 
 Or one can plot the temperature profile by using

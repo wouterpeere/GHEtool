@@ -31,11 +31,11 @@ def start_in_different_month():
 
     plt.figure()
     plt.bar(range(1, 13, 1), depth_list)
-    plt.ylabel('Required depth [m]')
+    plt.ylabel('Required borehole length [m]')
     plt.xlabel('First month of operation')
     plt.xlim(0)
     plt.ylim(0)
-    plt.title('Required depth as a function of the first month of operation')
+    plt.title('Required borehole length as a function of the first month of operation')
     plt.show()
 
 

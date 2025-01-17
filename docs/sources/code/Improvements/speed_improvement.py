@@ -19,6 +19,7 @@ def supress_stdout(func):
         with open(os.devnull, 'w') as devnull:
             with contextlib.redirect_stdout(devnull):
                 return func(*a, **ka)
+
     return wrapper
 
 
@@ -67,7 +68,7 @@ def optimise_load_profile() -> None:
     load.load_hourly_profile("hourly_profile.csv", header=True, separator=";")
     borefield.load = load
 
-    # optimise the load for a 10x10 field (see data above) and a fixed depth of 150m.
+    # optimise the load for a 10x10 field (see data above) and a fixed length of 150m.
     borefield.optimise_load_profile(depth=150, print_results=False)
 
 
@@ -261,17 +262,17 @@ def benchmark(callable, name: str) -> None:
         start_time = time.time()
         run_without_messages(callable)
         end_time = time.time()
-        diff = diff * i/(i+1) + (end_time - start_time)/(i+1)
+        diff = diff * i / (i + 1) + (end_time - start_time) / (i + 1)
 
         GFunction.DEFAULT_STORE_PREVIOUS_VALUES = False
 
         start_time_without = time.time()
         run_without_messages(callable)
         end_time_without = time.time()
-        diff_without = diff_without * i/(i+1) + (end_time_without - start_time_without)/(i+1)
+        diff_without = diff_without * i / (i + 1) + (end_time_without - start_time_without) / (i + 1)
 
     print(f'{name} took  {round(diff_without, 2)} ms in v2.1.0 and '
-          f'{round(diff, 2)} ms in v2.1.1. This is an improvement of {round((diff_without-diff)/diff*100)}%.')
+          f'{round(diff, 2)} ms in v2.1.1. This is an improvement of {round((diff_without - diff) / diff * 100)}%.')
 
 
 # run examples
