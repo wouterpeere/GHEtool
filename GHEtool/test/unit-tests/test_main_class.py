@@ -75,24 +75,24 @@ def test_nb_of_boreholes():
     assert np.isclose(borefield.D, 0.1)
     assert borefield.number_of_boreholes == 25
     borefield.gfunction(5000, 110)
-    assert np.any(borefield.gfunction_calculation_object.depth_array)
+    assert np.any(borefield.gfunction_calculation_object.borehole_length_array)
     borefield.borefield = gt.boreholes.rectangle_field(6, 5, 6, 6, 100, 1, 0.075)
-    assert not np.any(borefield.gfunction_calculation_object.depth_array)
+    assert not np.any(borefield.gfunction_calculation_object.borehole_length_array)
     assert np.isclose(borefield.H, 100)
     assert np.isclose(borefield.r_b, 0.075)
     assert np.isclose(borefield.D, 1)
     borefield.gfunction(5000, 110)
-    assert np.any(borefield.gfunction_calculation_object.depth_array)
+    assert np.any(borefield.gfunction_calculation_object.borehole_length_array)
     assert borefield.number_of_boreholes == 30
     borefield.borefield = None
-    assert not np.any(borefield.gfunction_calculation_object.depth_array)
+    assert not np.any(borefield.gfunction_calculation_object.borehole_length_array)
     assert borefield.gfunction_calculation_object
     assert borefield.number_of_boreholes == 0
     borefield.borefield = gt.boreholes.rectangle_field(6, 5, 6, 6, 100, 1, 0.075)
     borefield.gfunction(5000, 110)
-    assert np.any(borefield.gfunction_calculation_object.depth_array)
+    assert np.any(borefield.gfunction_calculation_object.borehole_length_array)
     borefield.set_borefield(None)
-    assert not np.any(borefield.gfunction_calculation_object.depth_array)
+    assert not np.any(borefield.gfunction_calculation_object.borehole_length_array)
     assert borefield.number_of_boreholes == 0
 
 
@@ -164,15 +164,15 @@ def test_update_depth():
     init_H = borefield.borefield[0].H
 
     borefield.H = init_H + 1
-    borefield._update_borefield_depth(20)
+    borefield.H = 20
     for bor in borefield.borefield:
         assert bor.H == 20
 
-    borefield._update_borefield_depth(init_H + 2)
+    borefield.H = init_H + 2
     for bor in borefield.borefield:
         assert bor.H == init_H + 2
 
-    borefield._update_borefield_depth(init_H + 2)
+    borefield.H = init_H + 2
     for bor in borefield.borefield:
         assert bor.H == init_H + 2
 
@@ -261,23 +261,23 @@ def test_ground_data_jit_gfunction():
 
     # calculate gfunction
     borefield.gfunction([5000, 10000], 150)
-    assert np.any(borefield.gfunction_calculation_object.depth_array)
+    assert np.any(borefield.gfunction_calculation_object.borehole_length_array)
 
     # test for property setter
     borefield.ground_data = ground_data_constant
     assert borefield.ground_data == ground_data_constant
     assert borefield._ground_data == ground_data_constant
-    assert not np.any(borefield.gfunction_calculation_object.depth_array)
+    assert not np.any(borefield.gfunction_calculation_object.borehole_length_array)
 
     # calculate gfunction
     borefield.gfunction([5000, 10000], 150)
-    assert np.any(borefield.gfunction_calculation_object.depth_array)
+    assert np.any(borefield.gfunction_calculation_object.borehole_length_array)
 
     # test for set function
     borefield.set_ground_parameters(data_ground_flux)
     assert borefield.ground_data == data_ground_flux
     assert borefield._ground_data == data_ground_flux
-    assert not np.any(borefield.gfunction_calculation_object.depth_array)
+    assert not np.any(borefield.gfunction_calculation_object.borehole_length_array)
 
 
 def test_set_fluid_params():
@@ -329,7 +329,7 @@ def test_Tg():
     zip(
         [ground_data_constant, data_ground_flux, ground_data_constant, data_ground_flux],
         [True, True, False, False],
-        [39.994203323480214, 38.70946566704161, 30.924434615896764, 30.245606119498383],
+        [39.994203323480214, 38.45978496550447, 30.924434615896764, 30.047718917393134],
     ),
 )
 def test_Ahmadfard(ground_data, constant_Rb, result):
@@ -341,8 +341,8 @@ def test_Ahmadfard(ground_data, constant_Rb, result):
     borefield.set_pipe_parameters(pipeData)
     borefield.calculation_setup(use_constant_Rb=constant_Rb)
     th, qh, qm, qa = load._calculate_last_year_params(True)
-    assert np.isclose(result, borefield._Ahmadfard(th, qh, qm, qa, 0))
-    assert np.isclose(result, borefield.H)
+    assert np.isclose(borefield._Ahmadfard(th, qh, qm, qa, 0), result)
+    assert np.isclose(borefield.H, result)
 
 
 @pytest.mark.parametrize(
@@ -350,7 +350,7 @@ def test_Ahmadfard(ground_data, constant_Rb, result):
     zip(
         [ground_data_constant, data_ground_flux, ground_data_constant, data_ground_flux],
         [True, True, False, False],
-        [48.76844845370183, 46.593433439950985, 38.53491016745154, 37.100782551185],
+        [48.76844845370183, 46.254155886276564, 38.53491016745154, 36.81621398703887],
     ),
 )
 def test_Carcel(ground_data, constant_Rb, result):
@@ -363,8 +363,8 @@ def test_Carcel(ground_data, constant_Rb, result):
     borefield.set_pipe_parameters(pipeData)
     borefield.calculation_setup(use_constant_Rb=constant_Rb)
     th, _, tcm, qh, qpm, qm = load._calculate_first_year_params(True)
-    assert np.isclose(result, borefield._Carcel(th, tcm, qh, qpm, qm, 0))
-    assert np.isclose(result, borefield.H)
+    assert np.isclose(borefield._Carcel(th, tcm, qh, qpm, qm, 0), result)
+    assert np.isclose(borefield.H, result)
 
 
 def test_set_sizing_setup():
@@ -832,7 +832,7 @@ def test_gfunction_with_irregular_depth():
     borefield.borefield = temp
     assert borefield.H == 100
     g_values = borefield.gfunction([6000, 60000, 600000])
-    borefield._update_borefield_depth(100)
+    borefield.H = 100
     assert not np.array_equal(borefield.gfunction([6000, 60000, 600000]), g_values)
 
     borefield = Borefield()
@@ -861,8 +861,8 @@ def test_load_duration(monkeypatch):
     load = HourlyBuildingLoad(efficiency_heating=10 ** 6, efficiency_cooling=10 * 66)
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     borefield.load = load
-    borefield.optimise_load_profile_power(load, 150)
-    borefield.optimise_load_profile_energy(load, 150)
+    borefield.optimise_load_profile_power(load)
+    borefield.optimise_load_profile_energy(load)
 
 
 def test_optimise_load_profile_power(monkeypatch):
@@ -873,7 +873,7 @@ def test_optimise_load_profile_power(monkeypatch):
     load = HourlyBuildingLoad(efficiency_heating=10 ** 6, efficiency_cooling=10 * 66)
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     load.simulation_period = 40
-    secundary_borefield_load, external_load = borefield.optimise_load_profile_power(load, 150)
+    secundary_borefield_load, external_load = borefield.optimise_load_profile_power(load)
     assert borefield.load.simulation_period == 40
     assert secundary_borefield_load.simulation_period == 40
     assert external_load.simulation_period == 40
@@ -890,7 +890,7 @@ def test_optimise_load_profile_power_multiyear(monkeypatch):
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     load_my = HourlyBuildingLoadMultiYear(load.hourly_heating_load_simulation_period,
                                           load.hourly_cooling_load_simulation_period)
-    secundary_borefield_load, external_load = borefield.optimise_load_profile_power(load_my, 150)
+    secundary_borefield_load, external_load = borefield.optimise_load_profile_power(load_my)
     assert borefield.load.simulation_period == 20
     assert secundary_borefield_load.simulation_period == 20
     assert external_load.simulation_period == 20
@@ -905,7 +905,7 @@ def test_optimise_load_profile_energy(monkeypatch):
     load = HourlyBuildingLoad(efficiency_heating=10 ** 6, efficiency_cooling=10 * 66)
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     load.simulation_period = 40
-    borefield_load, external_load = borefield.optimise_load_profile_energy(load, 150)
+    borefield_load, external_load = borefield.optimise_load_profile_energy(load)
     assert borefield.load.simulation_period == 40
     assert borefield_load.simulation_period == 40
     assert external_load.simulation_period == 40
@@ -920,7 +920,7 @@ def test_optimise_borefield_small_power(monkeypatch):
     load = HourlyBuildingLoad(efficiency_heating=10 ** 6, efficiency_cooling=10 * 66)
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     load.simulation_period = 40
-    secundary_borefield_load, external_load = borefield.optimise_load_profile_power(load, 150)
+    secundary_borefield_load, external_load = borefield.optimise_load_profile_power(load)
     assert borefield.load.simulation_period == 40
     assert secundary_borefield_load.simulation_period == 40
     assert external_load.simulation_period == 40
@@ -934,7 +934,7 @@ def test_optimise_borefield_small_energy(monkeypatch):
     load = HourlyBuildingLoad(efficiency_heating=10 ** 6, efficiency_cooling=10 * 66)
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     load.simulation_period = 40
-    borefield.optimise_load_profile_energy(load, 150)
+    borefield.optimise_load_profile_energy(load)
     assert borefield.load.simulation_period == 40
 
 
@@ -947,7 +947,7 @@ def test_optimise_borefield_wrong_threshold_power(monkeypatch):
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     load.simulation_period = 40
     with pytest.raises(ValueError):
-        borefield.optimise_load_profile_power(load, 150, temperature_threshold=-0.5)
+        borefield.optimise_load_profile_power(load, temperature_threshold=-0.5)
 
 
 def test_optimise_borefield_wrong_threshold_energy(monkeypatch):
@@ -959,7 +959,7 @@ def test_optimise_borefield_wrong_threshold_energy(monkeypatch):
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     load.simulation_period = 40
     with pytest.raises(ValueError):
-        borefield.optimise_load_profile_energy(load, 150, temperature_threshold=-0.5)
+        borefield.optimise_load_profile_energy(load, temperature_threshold=-0.5)
 
 
 def test_calculate_quadrants_without_data():
@@ -1075,15 +1075,15 @@ def test_calculate_next_depth_deep_sizing():
     borefield.load = load
 
     borefield.calculate_temperatures(75)
-    assert np.isclose(borefield.calculate_next_depth_deep_sizing(75), 117.98660599828808)
-    borefield.calculate_temperatures(117.98660599828808)
-    assert np.isclose(borefield.calculate_next_depth_deep_sizing(117.98660599828808), 128.16618036528823)
-    borefield.calculate_temperatures(128.16618036528823)
-    assert np.isclose(borefield.calculate_next_depth_deep_sizing(128.16618036528823), 130.8812255630479)
+    assert np.isclose(borefield.calculate_next_depth_deep_sizing(75), 118.26269556337864)
+    borefield.calculate_temperatures(118.26269556337864)
+    assert np.isclose(borefield.calculate_next_depth_deep_sizing(118.26269556337864), 128.6225651998528)
+    borefield.calculate_temperatures(128.6225651998528)
+    assert np.isclose(borefield.calculate_next_depth_deep_sizing(128.6225651998528), 131.41962184720694)
 
 
 @pytest.mark.parametrize("case, result",
-                         zip((1, 2, 3, 4), [131.90418292004594, 0, 139.46239300837794, 131.90418292004594]))
+                         zip((1, 2, 3, 4), [132.4920010915831, 0, 140.25177132242135, 132.4920010915831]))
 def test_deep_sizing(case, result):
     borefield = Borefield()
     borefield.ground_data = GroundFluxTemperature(3, 10)
@@ -1120,13 +1120,13 @@ def test_optimise_load_borefield():
     ground_data = GroundFluxTemperature(2, 9.6, flux=0.07)
     borefield.ground_data = ground_data
     borefield_load, external_load = borefield.optimise_load_profile_energy(load)
-    assert np.isclose(borefield_load.imbalance, -228386.82055766508)
+    assert np.isclose(borefield_load.imbalance, -229303.76869817785)
     borefield.load = borefield_load
     borefield.calculate_temperatures(hourly=False)
-    assert np.isclose(np.max(borefield.results.peak_injection), 17.044473901670603)
-    assert np.isclose(np.min(borefield.results.peak_extraction), 1.9471241454443655)
+    assert np.isclose(np.max(borefield.results.peak_injection), 17.046329116754006)
+    assert np.isclose(np.min(borefield.results.peak_extraction), 1.9475137898511852)
     assert np.isclose(borefield.load.max_peak_cooling, 329.9393053)
-    assert np.isclose(np.sum(borefield.load.hourly_heating_load), 593385.1066074175)
+    assert np.isclose(np.sum(borefield.load.hourly_heating_load), 594114.6208002889)
 
 
 def test_repr_():
@@ -1138,7 +1138,8 @@ def test_repr_():
     assert 'Maximum average fluid temperature [°C]: 16.0\n' \
            'Minimum average fluid temperature [°C]: 0.0\n' \
            'Average buried depth [m]: 4.0\n' \
-           'Average borehole depth [m]: 110.0\n' \
+           'Average borehole length [m]: 110.0\n' \
+           'Average borehole depth [m]: 114.0\n' \
            'Borehole diameter [mm]: 150\n' \
            'Number of boreholes [-]: 120\n' \
            'Constant ground temperature\n' \

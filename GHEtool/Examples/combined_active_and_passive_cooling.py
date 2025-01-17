@@ -40,7 +40,6 @@ def default_cooling_in_summer():
     # set variables
     load.eer = eer
     borefield.load = load
-    print(borefield)
     borefield.print_temperature_profile(plot_hourly=True)
 
     # get active cooling data
@@ -101,7 +100,7 @@ def active_above_threshold():
           f'This is {np.sum(active_cooling_energy) / np.sum(load.hourly_cooling_load_simulation_period) * 100:.2f}% '
           f'of the building cooling load.')
     print(
-        f'The peak power for active and passive cooling is: {np.max(active_cooling_energy):.2f}kW and {np.max(passive_cooling_energy):.2f}kW respectively.')
+        f'The peak power for active and passive cooling is {np.max(active_cooling_energy):.2f}kW and {np.max(passive_cooling_energy):.2f}kW respectively.')
 
     # create graphs
     fig = plt.figure()

@@ -146,13 +146,13 @@ def active_passive_cooling(location='Active_passive_example.csv'):
     borefield.Rb = 0.12
 
     ### PASSIVE COOLING
-    depths = [0.9, 0]
+    borehole_lengths = [0.9, 0]
 
     # set initial loads
     cooling_ground = cooling_building.copy()
     heating_ground = heating_building.copy()
 
-    while abs(depths[0] - depths[1]) > 0.1:
+    while abs(borehole_lengths[0] - borehole_lengths[1]) > 0.1:
         # set loads
         load = HourlyGeothermalLoadMultiYear()
         load.hourly_extraction_load = heating_ground
@@ -160,8 +160,8 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         borefield.load = load
 
         # size borefield
-        depth_passive = borefield.size_L4()
-        depths.insert(0, depth_passive)
+        borehole_length_passive = borefield.size_L4()
+        borehole_lengths.insert(0, borehole_length_passive)
 
         # get temperature profile
         temp_profile = borefield.results.peak_extraction
@@ -170,7 +170,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         heating_ground = update_load_COP(temp_profile, COP, heating_building)
 
     ### ACTIVE COOLING
-    depths = [0.9, 0]
+    borehole_lengths = [0.9, 0]
 
     # set initial loads
     cooling_ground = cooling_building.copy()
@@ -178,7 +178,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
 
     borefield.set_max_avg_fluid_temperature(25)
     borefield.gfunction_calculation_object.store_previous_values = False
-    while abs(depths[0] - depths[1]) > 0.1:
+    while abs(borehole_lengths[0] - borehole_lengths[1]) > 0.1:
         # set loads
         load = HourlyGeothermalLoadMultiYear()
         load.hourly_extraction_load = heating_ground
@@ -186,8 +186,8 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         borefield.load = load
 
         # size borefield
-        depth_active = borefield.size_L4()
-        depths.insert(0, depth_active)
+        borehole_length_active = borefield.size_L4()
+        borehole_lengths.insert(0, borehole_length_active)
 
         # get temperature profile
         temp_profile = borefield.results.peak_extraction
@@ -204,24 +204,23 @@ def active_passive_cooling(location='Active_passive_example.csv'):
     operational_costs_heating = []
     investment_costs = []
     total_costs = []
-    depths = []
+    borehole_lengths = []
 
-    def f(depth: float) -> float:
+    def f(borehole_length: float) -> float:
         """
         Optimisation function.
 
         Parameters
         ----------
-        depth : float
+        borehole_length : float
             Depth of the borefield in meters
 
         Returns
         -------
         total_cost : float
         """
-        borefield._update_borefield_depth(depth)
-        borefield.H = depth
-        depths.append(depth)
+        borefield.H = borehole_length
+        borehole_lengths.append(borehole_length)
 
         # initialise
         heating_ground = heating_building.copy()
@@ -239,7 +238,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
             borefield.load = load
 
             # get temperature profile
-            borefield.calculate_temperatures(depth, hourly=True)
+            borefield.calculate_temperatures(borehole_length, hourly=True)
             temp_profile = borefield.results.peak_extraction
 
             # set previous loads
@@ -263,38 +262,43 @@ def active_passive_cooling(location='Active_passive_example.csv'):
         return investment + operational_cost
 
     # add boundaries to figure
-    MIN_BOUNDARY = depth_active
-    MAX_BOUNDARY = depth_passive
+    MIN_BOUNDARY = borehole_length_active
+    MAX_BOUNDARY = borehole_length_passive
 
     def objective(trial: optuna.Trial):
-        depth = trial.suggest_float('depth', MIN_BOUNDARY, MAX_BOUNDARY)
-        return f(depth)
+        borehole_length = trial.suggest_float('borehole_length', MIN_BOUNDARY, MAX_BOUNDARY)
+        return f(borehole_length)
 
     study = optuna.create_study()
     study.optimize(objective, n_trials=100)
 
-    depths_sorted = copy.deepcopy(depths)
-    depths_sorted.sort()
-    depths_old_new = {}
-    for idx, depth in enumerate(depths_sorted):
-        depths_old_new[idx] = depths.index(depth)
+    borehole_lengths_sorted = copy.deepcopy(borehole_lengths)
+    borehole_lengths_sorted.sort()
+    borehole_lengths_old_new = {}
+    for idx, borehole_length in enumerate(borehole_lengths_sorted):
+        borehole_lengths_old_new[idx] = borehole_lengths.index(borehole_length)
 
     # plot figures
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
-    ax1.plot(depths_sorted, [total_costs[depths_old_new[idx]] / 1000 for idx, _ in enumerate(depths_sorted)],
+    ax1.plot(borehole_lengths_sorted,
+             [total_costs[borehole_lengths_old_new[idx]] / 1000 for idx, _ in enumerate(borehole_lengths_sorted)],
              marker='o', label="TC")
-    ax1.plot(depths_sorted, [investment_costs[depths_old_new[idx]] / 1000 for idx, _ in enumerate(depths_sorted)],
+    ax1.plot(borehole_lengths_sorted,
+             [investment_costs[borehole_lengths_old_new[idx]] / 1000 for idx, _ in enumerate(borehole_lengths_sorted)],
              marker='o', label="IC")
-    ax1.plot(depths_sorted, [operational_costs[depths_old_new[idx]] / 1000 for idx, _ in enumerate(depths_sorted)],
+    ax1.plot(borehole_lengths_sorted,
+             [operational_costs[borehole_lengths_old_new[idx]] / 1000 for idx, _ in enumerate(borehole_lengths_sorted)],
              marker='o', label="OC")
-    ax1.plot(depths_sorted,
-             [operational_costs_cooling[depths_old_new[idx]] / 1000 for idx, _ in enumerate(depths_sorted)], marker='o',
+    ax1.plot(borehole_lengths_sorted,
+             [operational_costs_cooling[borehole_lengths_old_new[idx]] / 1000 for idx, _ in
+              enumerate(borehole_lengths_sorted)], marker='o',
              label="OCc")
-    ax1.plot(depths_sorted,
-             [operational_costs_heating[depths_old_new[idx]] / 1000 for idx, _ in enumerate(depths_sorted)], marker='o',
+    ax1.plot(borehole_lengths_sorted,
+             [operational_costs_heating[borehole_lengths_old_new[idx]] / 1000 for idx, _ in
+              enumerate(borehole_lengths_sorted)], marker='o',
              label="OCh")
-    ax1.set_xlabel(r'Depth (m)', fontsize=14)
+    ax1.set_xlabel(r'Borehole length (m)', fontsize=14)
     ax1.set_ylabel(r'Costs ($k€$)', fontsize=14)
     ax1.legend(loc='lower left', ncol=3)
     ax1.tick_params(labelsize=14)

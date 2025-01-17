@@ -15,7 +15,8 @@ from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData,
     DoubleUTube
 from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient, MaximumNumberOfIterations
 from GHEtool.Validation.cases import load_case
-from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
+from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad, EERCombined, \
+    HourlyBuildingLoad, EER
 
 data = GroundConstantTemperature(3, 10)
 data_ground_flux = GroundFluxTemperature(3, 10)
@@ -246,7 +247,7 @@ def test_value_error_cooling_dom_temp_gradient():
     borefield.set_borefield(borefield_pyg)
     borefield.set_Rb(0.2)
 
-    with raises(MaximumNumberOfIterations):
+    with raises(UnsolvableDueToTemperatureGradient):
         borefield.size()
 
     borefield.calculation_setup(max_nb_of_iterations=500)
@@ -305,7 +306,30 @@ def test_size_with_different_peak_lengths(borefield):
 
 
 def test_convergence_eer_combined():
-    borefield1: Borefield = pickle.load(open(FOLDER.joinpath("test/general_tests/test_optimise.pkl"), 'rb'))
+    ground_data = GroundFluxTemperature(3, 10)
+    fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
+
+    load = HourlyBuildingLoad(efficiency_heating=5)  # use SCOP of 5 for heating
+    load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,
+                             separator=";", col_cooling=0, col_heating=1)
+
+    eer_active = EER(np.array([15.943, 6.153]),
+                     np.array([5, 30]))  # based on the data of the WRE092 chiller of Galletti
+    borefield1 = Borefield()
+    borefield1.create_rectangular_borefield(3, 3, 6, 6, 110, 0.7, 0.075)
+    borefield1.set_ground_parameters(ground_data)
+    borefield1.set_fluid_parameters(fluid_data)
+    borefield1.set_pipe_parameters(pipe_data)
+    borefield1.set_max_avg_fluid_temperature(25)
+    borefield1.set_min_avg_fluid_temperature(3)
+
+    # create combined active and passive EER
+    eer = EERCombined(20, eer_active, threshold_temperature=17)
+
+    # set variables
+    load.eer = eer
+    borefield1.load = load
     borefield1.set_max_avg_fluid_temperature(16)
     borefield1.calculate_temperatures(hourly=True)
     results_16 = copy.deepcopy(borefield1.results)
@@ -316,7 +340,29 @@ def test_convergence_eer_combined():
 
 
 def test_optimise_load_eer_combined():
-    borefield1: Borefield = pickle.load(open(FOLDER.joinpath("test/general_tests/test_optimise.pkl"), 'rb'))
+    ground_data = GroundFluxTemperature(3, 10)
+    fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
+
+    load = HourlyBuildingLoad(efficiency_heating=5)  # use SCOP of 5 for heating
+    load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,
+                             separator=";", col_cooling=0, col_heating=1)
+
+    eer_active = EER(np.array([15.943, 6.153]),
+                     np.array([5, 30]))  # based on the data of the WRE092 chiller of Galletti
+    borefield1 = Borefield()
+    borefield1.create_rectangular_borefield(4, 3, 6, 6, 110, 0.7, 0.075)
+    borefield1.set_ground_parameters(ground_data)
+    borefield1.set_fluid_parameters(fluid_data)
+    borefield1.set_pipe_parameters(pipe_data)
+    borefield1.set_max_avg_fluid_temperature(25)
+    borefield1.set_min_avg_fluid_temperature(3)
+
+    # create combined active and passive EER
+    eer = EERCombined(20, eer_active, threshold_temperature=17)
+    load.eer = eer
+    borefield1.load = load
+
     borefield1.set_max_avg_fluid_temperature(16)
     borefield1.calculate_temperatures(hourly=True)
     results_16 = copy.deepcopy(borefield1.results)

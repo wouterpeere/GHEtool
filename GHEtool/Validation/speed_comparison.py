@@ -49,7 +49,7 @@ def test_64_boreholes():
 
     # size borefield
     t1 = time.time()
-    depth_precalculated = borefield.size()
+    length_precalculated = borefield.size()
     t1_end = time.time()
 
     # delete precalculated data
@@ -57,13 +57,13 @@ def test_64_boreholes():
 
     ### size without the precalculation
     t2 = time.time()
-    depth_calculated = borefield.size()
+    length_calculated = borefield.size()
     t2_end = time.time()
 
     print("With precalculated data, the sizing took", round(t1_end - t1, 3), "s for 64 boreholes.")
     print("Without the precalculated data, the sizing took", round(t2_end - t2, 3), "s for 64 boreholes.")
     print("The difference in accuracy between the two results is",
-          round((depth_calculated - depth_precalculated) / depth_calculated * 100, 3), "%.")
+          round((length_calculated - length_precalculated) / length_calculated * 100, 3), "%.")
 
 
 def test_10_boreholes():
@@ -105,7 +105,7 @@ def test_10_boreholes():
 
     # size borefield
     t1 = time.time()
-    depth_precalculated = borefield.size()
+    length_precalculated = borefield.size()
     t1_end = time.time()
 
     # delete precalculated data
@@ -113,13 +113,13 @@ def test_10_boreholes():
 
     ### size without the precalculation
     t2 = time.time()
-    depth_calculated = borefield.size()
+    length_calculated = borefield.size()
     t2_end = time.time()
 
     print("With precalculated data, the sizing took", round(t1_end - t1, 3), "s for 10 boreholes.")
     print("Without the precalculated data, the sizing took", round(t2_end - t2, 3), "s for 10 boreholes.")
     print("The difference in accuracy between the two results is",
-          round((depth_calculated-depth_precalculated) / depth_calculated * 100, 3), "%.\n")
+          round((length_calculated - length_precalculated) / length_calculated * 100, 3), "%.\n")
 
 
 if __name__ == "__main__":  # pragma: no cover

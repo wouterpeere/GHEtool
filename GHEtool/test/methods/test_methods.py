@@ -48,15 +48,14 @@ def test_L4(model: Borefield, result):
 def test_optimise(input, result):
     model: Borefield = input[0]
     load, depth, power, hourly, max_peak_extraction, max_peak_injection = input[1:]
+    model.H = depth
     if power:
         borefield_load, external_load = optimise_load_profile_power(model, load,
-                                                                    depth,
                                                                     use_hourly_resolution=hourly,
                                                                     max_peak_heating=max_peak_extraction,
                                                                     max_peak_cooling=max_peak_injection)
     else:
         borefield_load, external_load = optimise_load_profile_energy(model, load,
-                                                                     depth,
                                                                      max_peak_heating=max_peak_extraction,
                                                                      max_peak_cooling=max_peak_injection)
     percentage_extraction, percentage_injection, peak_extraction_geo, peak_injection_geo, peak_extraction_ext, peak_injection_ext = \
@@ -66,6 +65,12 @@ def test_optimise(input, result):
                              np.sum(load.hourly_heating_load_simulation_period) * 100
     _percentage_injection = np.sum(borefield_load.hourly_cooling_load_simulation_period) / \
                             np.sum(load.hourly_cooling_load_simulation_period) * 100
+    # print(_percentage_extraction)
+    # print(_percentage_injection)
+    # print(borefield_load.max_peak_extraction)
+    # print(borefield_load.max_peak_injection)
+    # print(external_load.max_peak_heating)
+    # print(external_load.max_peak_cooling)
     assert np.isclose(_percentage_extraction, percentage_extraction)
     assert np.isclose(_percentage_injection, percentage_injection)
     assert np.isclose(borefield_load.max_peak_extraction, peak_extraction_geo)

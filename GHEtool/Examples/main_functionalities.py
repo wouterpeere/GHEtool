@@ -56,21 +56,21 @@ def main_functionalities():
     borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
 
     # size borefield
-    depth = borefield.size()
-    print("The borehole depth is: ", depth, "m")
+    length = borefield.size()
+    print("The borehole length is: ", length, "m")
 
     # print imbalance
     print("The borefield imbalance is: ", borefield._borefield_load.imbalance,
-          "kWh/y. (A negative imbalance means the the field is heat extraction dominated so it cools down year after year.)")  # print imbalance
+          "kWh/y. (A negative imbalance means the the field is heat extraction dominated so it cools down year after year.)")
 
-    # plot temperature profile for the calculated depth
+    # plot temperature profile for the calculated borehole length
     borefield.print_temperature_profile(legend=True)
 
-    # plot temperature profile for a fixed depth
-    borefield.print_temperature_profile_fixed_depth(depth=75, legend=False)
+    # plot temperature profile for a fixed borehole length
+    borefield.print_temperature_profile_fixed_length(length=75, legend=False)
 
     # print gives the array of monthly temperatures for peak cooling without showing the plot
-    borefield.calculate_temperatures(depth=90)
+    borefield.calculate_temperatures(length=90)
     print("Result array for cooling peaks")
     print(borefield.results.peak_injection)
     print("---------------------------------------------")

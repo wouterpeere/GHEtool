@@ -32,7 +32,7 @@ class Borefield(BaseClass):
     """Main borefield class"""
 
     UPM: float = 730.0  # number of hours per month
-    THRESHOLD_BOREHOLE_DEPTH: float = 0.05  # threshold for iteration
+    THRESHOLD_BOREHOLE_LENGTH: float = 0.05  # threshold for iteration
 
     # define default values
     DEFAULT_INVESTMENT: list = [35, 0]  # 35 EUR/m
@@ -123,7 +123,7 @@ class Borefield(BaseClass):
         self.results: ResultsMonthly | ResultsHourly = ResultsMonthly()
 
         # initiate ground parameters
-        self._H = 0.0  # borehole depth m
+        self._H = 0.0  # borehole length [m]
         self._ground_data: _GroundData = GroundConstantTemperature()
         self.D: float = 0.0  # buried depth of the borehole [m]
         self.r_b: float = 0.0  # borehole radius [m]
@@ -191,33 +191,69 @@ class Borefield(BaseClass):
         return len(self.borefield) if self.borefield is not None else 0
 
     @property
-    def H(self) -> float:
+    def depth(self) -> float:
         """
-        This function returns the borehole depth.
+        This function returns the average borehole depth.
 
         Returns
         -------
         float
-            Borehole depth [meters]
+            Average borehole depth [meters]
+        """
+        return self.calculate_depth(self.H, self.D)
+
+    def calculate_depth(self, borehole_length: float, buried_depth: float) -> float:
+        """
+        This function calculates the depth of the borehole.
+
+        Parameters
+        ----------
+        borehole_length : float
+            Length of the borehole [m]
+        buried_depth : float
+            Buried depth of the borehole [m]
+
+        Returns
+        -------
+        float
+            Depth of the borehole [m]
+        """
+        # TODO take into account tilt
+        return borehole_length + buried_depth
+
+    @property
+    def H(self) -> float:
+        """
+        This function returns the borehole length as measured alongside the axis of the borehole.
+
+        Returns
+        -------
+        float
+            Borehole length [meters]
         """
         return self._H
 
     @H.setter
     def H(self, H: float) -> None:
         """
-        This function sets the borehole depth.
+        This function sets the borehole length as measured alongside the axis of the borehole.
 
         Parameters
         ----------
         H : float
-            Borehole depth [meters]
+            Borehole length [meters]
 
         Returns
         -------
         None
         """
         self._H = H
-        self._update_borefield_depth(H)
+        for bor in self._borefield:
+            bor.H = H
+
+        # the boreholes are equal in length
+        self.gfunction_calculation_object.store_previous_values = \
+            self.gfunction_calculation_object._store_previous_values_backup
 
     def set_borefield(self, borefield: list[gt.boreholes.Borehole] = None) -> None:
         """
@@ -252,7 +288,7 @@ class Borefield(BaseClass):
         B_2 : int
             Distance between adjacent boreholes in the y direction [m]
         H : float
-            Borehole depth [m]
+            Borehole length [m]
         D : float
             Borehole buried depth [m]
         r_b : float
@@ -280,7 +316,7 @@ class Borefield(BaseClass):
         R : float
             Distance of boreholes from the center of the field
         H : float
-            Borehole depth [m]
+            Borehole length [m]
         D : float
             Borehole buried depth [m]
         r_b : float
@@ -312,7 +348,7 @@ class Borefield(BaseClass):
         B_2 : int
             Distance between adjacent boreholes in the y direction [m]
         H : float
-            Borehole depth [m]
+            Borehole length [m]
         D : float
             Borehole buried depth [m]
         r_b : float
@@ -344,7 +380,7 @@ class Borefield(BaseClass):
         B_2 : int
             Distance between adjacent boreholes in the y direction [m]
         H : float
-            Borehole depth [m]
+            Borehole length [m]
         D : float
             Borehole buried depth [m]
         r_b : float
@@ -376,7 +412,7 @@ class Borefield(BaseClass):
         B_2 : int
             Distance between adjacent boreholes in the y direction [m]
         H : float
-            Borehole depth [m]
+            Borehole length [m]
         D : float
             Borehole buried depth [m]
         r_b : float
@@ -423,9 +459,9 @@ class Borefield(BaseClass):
         self.r_b = np.average([bor.r_b for bor in borefield])
         self._H = np.average([bor.H for bor in borefield])
         self.gfunction_calculation_object.remove_previous_data()
-        unequal_depth = np.any([bor.H != borefield[0].H for bor in borefield])
-        if unequal_depth:
-            self.gfunction_calculation_object._store_previous_values = not unequal_depth
+        unequal_length = np.any([bor.H != borefield[0].H for bor in borefield])
+        if unequal_length:
+            self.gfunction_calculation_object._store_previous_values = not unequal_length
         else:
             self.gfunction_calculation_object.store_previous_values = \
                 self.gfunction_calculation_object._store_previous_values_backup
@@ -443,26 +479,6 @@ class Borefield(BaseClass):
         self._borefield = None
         self.gfunction_calculation_object.remove_previous_data()
         self.custom_gfunction = None
-
-    def _update_borefield_depth(self, H: float) -> None:
-        """
-        This function updates the borehole depth.
-
-        Parameters
-        ----------
-        H : float
-            Borehole depth.
-
-        Returns
-        -------
-        None
-        """
-        for bor in self._borefield:
-            bor.H = H
-
-        # the boreholes are equal in length
-        self.gfunction_calculation_object.store_previous_values = \
-            self.gfunction_calculation_object._store_previous_values_backup
 
     def load_custom_gfunction(self, location: str) -> None:
         """
@@ -579,7 +595,7 @@ class Borefield(BaseClass):
         Rb : float
             Equivalent borehole thermal resistance [mK/W]
         """
-        return self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s)
+        return self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s, self.depth)
 
     @Rb.setter
     def Rb(self, Rb: float) -> None:
@@ -757,26 +773,26 @@ class Borefield(BaseClass):
         if H is None:
             H = self.H
 
-        return self.ground_data.calculate_Tg(H)
+        return self.ground_data.calculate_Tg(self.calculate_depth(H, self.D), self.D)
 
-    def _check_convergence(self, new_depth: float, old_depth: float, iter: int) -> bool:
+    def _check_convergence(self, new_length: float, old_length: float, iter: int) -> bool:
         """
-        This function checks, with the absolute and relative tolerance, if the depth is converged.
+        This function checks, with the absolute and relative tolerance, if the borehole length is converged.
         This is the case if both criteria are met. Raises MaximumNumberOfIterations error if the max number of iterations is crossed.
 
         Parameters
         ----------
-        new_depth : float
-            Depth from the current interation [m]
-        old_depth : float
-            Depth from the previous iteration [m]
+        new_length : float
+            Borehole length from the current interation [m]
+        old_length : float
+            Borehole length from the previous iteration [m]
         iter : int
             Current number of iteration
 
         Returns
         -------
         bool
-            True if the depth is converged
+            True if the borehole length is converged
 
         Raises
         ------
@@ -786,12 +802,12 @@ class Borefield(BaseClass):
         if iter + 1 > self._calculation_setup.max_nb_of_iterations:
             raise MaximumNumberOfIterations(self._calculation_setup.max_nb_of_iterations)
 
-        if old_depth == 0:
+        if old_length == 0:
             return False
         test_a_tol = abs(
-            new_depth - old_depth) <= self._calculation_setup.atol if self._calculation_setup.atol != False else True
+            new_length - old_length) <= self._calculation_setup.atol if self._calculation_setup.atol != False else True
         test_rtol = abs(
-            new_depth - old_depth) / old_depth <= self._calculation_setup.rtol if self._calculation_setup.rtol != False else True
+            new_length - old_length) / old_length <= self._calculation_setup.rtol if self._calculation_setup.rtol != False else True
 
         return test_a_tol and test_rtol
 
@@ -818,7 +834,7 @@ class Borefield(BaseClass):
         Returns
         -------
         H : float
-            Required borehole depth [m]
+            Required borehole length [m]
 
         References
         ----------
@@ -829,24 +845,24 @@ class Borefield(BaseClass):
         """
         # initiate iteration
         H_prev = 0
-        # set minimal depth to 50 m
+        # set minimal length to 50 m
         self.H = 50 if self.H < 1 else self.H
 
         time = np.array([th, th + self.load.tm, self.load.ty + self.load.tm + th])
         # Iterates as long as there is no convergence
-        # (convergence if difference between depth in iterations is smaller than THRESHOLD_BOREHOLE_DEPTH)
+        # (convergence if difference between borehole length in iterations is smaller than THRESHOLD_BOREHOLE_LENGTH)
         i = 0
         while not self._check_convergence(self.H, H_prev, i):
             # calculate the required g-function values
             gfunct_uniform_T = self.gfunction(time, max(1, self.H))
             # calculate the thermal resistances
-            k_s = self.ground_data.k_s(self.H)
+            k_s = self.ground_data.k_s(self.depth, self.D)
             Ra = (gfunct_uniform_T[2] - gfunct_uniform_T[1]) / (2 * pi * k_s)
             Rm = (gfunct_uniform_T[1] - gfunct_uniform_T[0]) / (2 * pi * k_s)
             Rd = (gfunct_uniform_T[0]) / (2 * pi * k_s)
             # calculate the total borehole length
             L = (qa * Ra + qm * Rm + qh * Rd + qh * self.Rb) / abs(Tf - self._Tg())
-            # updating the depth values
+            # updating the borehole length values
             H_prev = self.H
             self.H = L / self.number_of_boreholes
             i += 1
@@ -878,7 +894,7 @@ class Borefield(BaseClass):
         Returns
         -------
         H : float
-            Required borehole depth [m]
+            Required borehole length [m]
 
         References
         ----------
@@ -894,14 +910,14 @@ class Borefield(BaseClass):
             self.H = 50
 
         # Iterates as long as there is no convergence
-        # (convergence if difference between depth in iterations is smaller than THRESHOLD_BOREHOLE_DEPTH)
+        # (convergence if difference between the borehole lengths in iterations is smaller than THRESHOLD_BOREHOLE_LENGTH)
         i = 0
         while not self._check_convergence(self.H, H_prev, i):
             # get the g-function values
             gfunc_uniform_T = self.gfunction(time_steps, max(1, self.H))
 
             # calculate the thermal resistances
-            k_s = self.ground_data.k_s(self.H)
+            k_s = self.ground_data.k_s(self.depth, self.D)
             Rpm = (gfunc_uniform_T[2] - gfunc_uniform_T[1]) / (2 * pi * k_s)
             Rcm = (gfunc_uniform_T[1] - gfunc_uniform_T[0]) / (2 * pi * k_s)
             Rh = (gfunc_uniform_T[0]) / (2 * pi * k_s)
@@ -909,7 +925,7 @@ class Borefield(BaseClass):
             # calculate the total length
             L = (qh * self.Rb + qh * Rh + qm * Rcm + qpm * Rpm) / abs(Tf - self._Tg())
 
-            # updating the depth values
+            # updating the borehole lengths
             H_prev = self.H
             self.H = L / self.number_of_boreholes
             i += 1
@@ -978,7 +994,7 @@ class Borefield(BaseClass):
         Parameters
         ----------
         H_init : float
-            Initial depth for the iteration. If None, the default H_init is chosen.
+            Initial borehole length for the iteration. If None, the default H_init is chosen.
         use_constant_Rb : bool
             True if a constant borehole equivalent resistance (Rb*) value should be used
         L2_sizing : bool
@@ -996,7 +1012,7 @@ class Borefield(BaseClass):
 
         Returns
         -------
-        borehole depth : float
+        borehole length : float
 
         Raises
         ------
@@ -1021,26 +1037,26 @@ class Borefield(BaseClass):
 
         # sizes according to the correct algorithm
         if self._calculation_setup.L2_sizing:
-            depth = self.size_L2(H_init, self._calculation_setup.quadrant_sizing)
+            length = self.size_L2(H_init, self._calculation_setup.quadrant_sizing)
         if self._calculation_setup.L3_sizing:
-            depth = self.size_L3(H_init, self._calculation_setup.quadrant_sizing)
+            length = self.size_L3(H_init, self._calculation_setup.quadrant_sizing)
         if self._calculation_setup.L4_sizing:
-            depth = self.size_L4(H_init, self._calculation_setup.quadrant_sizing)
+            length = self.size_L4(H_init, self._calculation_setup.quadrant_sizing)
 
         # reset initial parameters
         self._calculation_setup.restore_backup()
         self.borehole.use_constant_Rb = use_constant_Rb_backup
 
         # check if the field is not shallow
-        if depth < self.THRESHOLD_WARNING_SHALLOW_FIELD:
+        if length < self.THRESHOLD_WARNING_SHALLOW_FIELD:
             ghe_logger.warning(
-                f"The field has a calculated depth of {round(depth, 2)}"
+                f"The field has a calculated borehole length of {round(length, 2)}"
                 f"m which is lower than the proposed minimum "
                 f"of {self.THRESHOLD_WARNING_SHALLOW_FIELD} m. "
                 f"Please change your configuration accordingly to have a not so shallow field."
             )
 
-        return depth
+        return length
 
     def _select_size(self, size_max_temp: float, size_min_temp: float, hourly: bool = False) -> float:
         """
@@ -1061,8 +1077,8 @@ class Borefield(BaseClass):
 
         Returns
         -------
-        depth : float
-            Required borehole depth [m]
+        length : float
+            Required borehole length [m]
 
         Raises
         ------
@@ -1087,19 +1103,19 @@ class Borefield(BaseClass):
         """
         This function sizes the  of the given configuration according to the methodology explained in
         (Peere et al., 2021) [#PeereBS]_, which is a L2 method. When quadrant sizing is other than 0, it sizes the field based on
-        the asked quadrant. It returns the borefield depth.
+        the asked quadrant. It returns the borehole length.
 
         Parameters
         ----------
         H_init : float
-            Initial depth from where to start the iteration [m]
+            Initial length from where to start the iteration [m]
         quadrant_sizing : int
             If a quadrant is given the sizing is performed for this quadrant else for the relevant
 
         Returns
         -------
         H : float
-            Required depth of the borefield [m]
+            Required borehole length [m]
 
         Raises
         ------
@@ -1118,7 +1134,7 @@ class Borefield(BaseClass):
             warnings.warn('The L2 method does not work with building load data. The L3 method will be used instead.')
             return self.size_L3(H_init, quadrant_sizing)
 
-        # initiate with a given depth
+        # initiate with a given length
         self.H: float = H_init if H_init is not None else self._calculation_setup.H_init
 
         def size_quadrant1():
@@ -1189,14 +1205,14 @@ class Borefield(BaseClass):
         Parameters
         ----------
         H_init : float
-            Initial depth from where to start the iteration [m]
+            Initial borehole length from where to start the iteration [m]
         quadrant_sizing : int
             If a quadrant is given the sizing is performed for this quadrant else for the relevant
 
         Returns
         -------
         H : float
-            Required depth of the borefield [m]
+            Required borehole length of the borefield [m]
 
         Raises
         ------
@@ -1212,7 +1228,7 @@ class Borefield(BaseClass):
         if not quadrant_sizing in range(0, 5):
             raise ValueError(f"Quadrant {quadrant_sizing} does not exist.")
 
-        # initiate with a given depth
+        # initiate with a given borehole length
         self.H: float = H_init if H_init is not None else self._calculation_setup.H_init
 
         if quadrant_sizing != 0:
@@ -1254,14 +1270,14 @@ class Borefield(BaseClass):
         Parameters
         ----------
         H_init : float
-            Initial depth from where to start the iteration [m]
+            Initial borehole length from where to start the iteration [m]
         quadrant_sizing : int
             If a quadrant is given the sizing is performed for this quadrant else for the relevant
 
         Returns
         -------
         H : float
-            Required depth of the borefield [m]
+            Required borehole length of the borefield [m]
 
         Raises
         ------
@@ -1281,7 +1297,7 @@ class Borefield(BaseClass):
         if not self.load._hourly:
             raise ValueError("There is no hourly resolution available!")
 
-        # initiate with a given depth
+        # initiate with a given borehole length
         self.H: float = H_init if H_init is not None else self._calculation_setup.H_init
 
         if quadrant_sizing != 0:
@@ -1324,38 +1340,39 @@ class Borefield(BaseClass):
                 return min_temp
             raise UnsolvableDueToTemperatureGradient
 
-    def calculate_next_depth_deep_sizing(self, current_depth: float) -> float:
+    def calculate_next_depth_deep_sizing(self, current_length: float) -> float:
         """
-        This method is a slower but more robust way of calculating the next depth in the sizing iteration when the
+        This method is a slower but more robust way of calculating the next borehole length in the sizing iteration when the
         borefield is sized for the maximum fluid temperature when there is a non-constant ground temperature.
         The method is based (as can be seen in its corresponding validation document) on the assumption that the
         difference between the maximum temperature in peak injection and the average undisturbed ground temperature
-        is irreversily proportional to the depth. In this way, given this difference in temperature and the current
-        depth, a new depth can be calculated.
+        is irreversily proportional to the borehole length. In this way, given this difference in temperature and the current
+        borehole length, a new borehole length can be calculated.
 
         Parameters
         ----------
-        current_depth : float
-            The current depth of the borefield [m]
+        current_length : float
+            The current borehole length  [m]
 
         Returns
         -------
         float
-            New depth of the borefield [m]
+            New borehole length [m]
         """
-        # diff between the max temperature in peak injection and the avg undisturbed ground temperature at current_depth
-        delta_temp = np.max(self.results.peak_injection - self.ground_data.calculate_Tg(current_depth))
+        # diff between the max temperature in peak injection and the avg undisturbed ground temperature at current_length
+        delta_temp = np.max(
+            self.results.peak_injection - self.ground_data.calculate_Tg(self.calculate_depth(current_length, self.D)))
 
         # calculate the maximum temperature difference between the temperature limit and the ground temperature
-        # at current_depth
-        delta_wrt_max = self.Tf_max - self.ground_data.calculate_Tg(current_depth)
+        # at current_length
+        delta_wrt_max = self.Tf_max - self.ground_data.calculate_Tg(self.calculate_depth(current_length, self.D))
 
         # delta_t1/H1 ~ delta_t2/H2
-        # H2 = delta_t2/delta_t1*current_depth
+        # H2 = delta_t2/delta_t1*current_length
         rel_diff = delta_wrt_max / delta_temp
-        new_depth = current_depth / rel_diff
+        new_length = current_length / rel_diff
 
-        return new_depth
+        return new_length
 
     def _size_based_on_temperature_profile(self, quadrant: int, hourly: bool = False, deep_sizing: bool = False) -> (
             float, bool):
@@ -1375,10 +1392,10 @@ class Borefield(BaseClass):
 
         Returns
         -------
-        Depth : float
-            Required depth of the borefield [m]
+        Borehole length : float
+            Required borehole length of the borefield [m]
         Sized : bool
-            True if the required depth also satisfies the other temperature constraint [m]
+            True if the required borehole length also satisfies the other temperature constraint [m]
         """
         # initiate iteration
         H_prev = 0
@@ -1387,11 +1404,11 @@ class Borefield(BaseClass):
             self.H = 50
 
         if deep_sizing:
-            # set borefield to minimal depth
+            # set borefield to minimal borehole length
             self.H = 20
 
         # Iterates as long as there is no convergence
-        # (convergence if difference between depth in iterations is smaller than THRESHOLD_BOREHOLE_DEPTH)
+        # (convergence if difference between borehole length in iterations is smaller than THRESHOLD_BOREHOLE_LENGTH)
         i = 0
         while not self._check_convergence(self.H, H_prev, i):
             if hourly:
@@ -1456,15 +1473,15 @@ class Borefield(BaseClass):
         """
         return np.polyval(self.cost_investment, self.H * self.number_of_boreholes)
 
-    def calculate_temperatures(self, depth: float = None, hourly: bool = False) -> None:
+    def calculate_temperatures(self, length: float = None, hourly: bool = False) -> None:
         """
-        Calculate all the temperatures without plotting the figure. When depth is given, it calculates it for a given
-        depth.
+        Calculate all the temperatures without plotting the figure. When length is given, it calculates it for a given
+        borehole length.
 
         Parameters
         ----------
-        depth : float
-            Depth for which the temperature profile should be calculated for [m]
+        length : float
+            Borehole length for which the temperature profile should be calculated for [m]
         hourly : bool
             True when the temperatures should be calculated based on hourly data
 
@@ -1472,11 +1489,11 @@ class Borefield(BaseClass):
         -------
         None
         """
-        self._calculate_temperature_profile(H=depth, hourly=hourly)
+        self._calculate_temperature_profile(H=length, hourly=hourly)
 
     def print_temperature_profile(self, legend: bool = True, plot_hourly: bool = False) -> None:
         """
-        This function plots the temperature profile for the calculated depth.
+        This function plots the temperature profile for the calculated borehole length.
         It uses the available temperature profile data.
 
         Parameters
@@ -1496,15 +1513,15 @@ class Borefield(BaseClass):
 
         return self._plot_temperature_profile(legend=legend, plot_hourly=plot_hourly)
 
-    def print_temperature_profile_fixed_depth(self, depth: float, legend: bool = True, plot_hourly: bool = False):
+    def print_temperature_profile_fixed_length(self, length: float, legend: bool = True, plot_hourly: bool = False):
         """
-        This function plots the temperature profile for a fixed depth.
+        This function plots the temperature profile for a fixed borehole length.
         It uses the already calculated temperature profile data, if available.
 
         Parameters
         ----------
-        depth : float
-            Depth at which the temperature profile should be shown
+        length : float
+            Borehole length at which the temperature profile should be shown
         legend : bool
             True if the legend should be printed
         plot_hourly : bool
@@ -1516,7 +1533,7 @@ class Borefield(BaseClass):
             Figure object
         """
         # calculate temperature profile
-        self._calculate_temperature_profile(H=depth, hourly=plot_hourly)
+        self._calculate_temperature_profile(H=length, hourly=plot_hourly)
 
         return self._plot_temperature_profile(legend=legend, plot_hourly=plot_hourly)
 
@@ -1597,7 +1614,7 @@ class Borefield(BaseClass):
         Parameters
         ----------
         H : float
-            Depth at which the temperatures should be evaluated [m]. If None, then the current depth is taken.
+            Borehole length at which the temperatures should be evaluated [m]. If None, then the current length is taken.
         hourly : bool
             True if the temperature evolution should be calculated on an hourly basis.
 
@@ -1608,8 +1625,10 @@ class Borefield(BaseClass):
 
         def calculate_temperatures(H, hourly=hourly):
             # set Rb* value
-            Rb = self.borehole.get_Rb(H if H is not None else self.H, self.D, self.r_b, self.ground_data.k_s(self.H))
             H = H if H is not None else self.H
+            depth = self.calculate_depth(H, self.D)
+            Rb = self.borehole.get_Rb(H, self.D, self.r_b,
+                                      self.ground_data.k_s(depth, self.D), depth)
 
             results = None
 
@@ -1635,7 +1654,7 @@ class Borefield(BaseClass):
                           : 12 * self.simulation_period]
 
                 # calculation the borehole wall temperature for every month i
-                k_s = self.ground_data.k_s(H)
+                k_s = self.ground_data.k_s(self.calculate_depth(H, self.D), self.D)
                 Tb = results / (2 * pi * k_s) / (H * self.number_of_boreholes) + self._Tg(H)
 
                 # now the Tf will be calculated based on
@@ -1693,7 +1712,8 @@ class Borefield(BaseClass):
                 results = convolve(hourly_load * 1000, g_value_differences)[: len(hourly_load)]
 
                 # calculation the borehole wall temperature for every month i
-                Tb = results / (2 * pi * self.ground_data.k_s(H)) / (H * self.number_of_boreholes) + self._Tg(H)
+                Tb = results / (2 * pi * self.ground_data.k_s(self.calculate_depth(H, self.D), self.D)) / (
+                        H * self.number_of_boreholes) + self._Tg(H)
 
                 # now the Tf will be calculated based on
                 # Tf = Tb + Q * R_b
@@ -1763,8 +1783,8 @@ class Borefield(BaseClass):
         time_value : list, float, np.ndarray
             Time value(s) in seconds at which the gfunctions should be calculated
         H : float
-            Depth [m] at which the gfunctions should be calculated.
-            If no depth is given, the current depth is taken.
+            Borehole length [m] at which the gfunctions should be calculated.
+            If no length is given, the current borehole length is taken.
 
         Returns
         -------
@@ -1787,12 +1807,12 @@ class Borefield(BaseClass):
             gvalues : np.ndarray
                 1D array with the g-values for the requested time intervals
             """
-            # set the correct depth of the borefield
+            # set the correct borehole length
             if not H is None:
-                # only update if H is provided, otherwise the depths of the borefield itself will be used
-                self._update_borefield_depth(H=H)
+                # only update if H is provided, otherwise the borehole length of the borefield itself will be used
+                self.H = H
             return self.gfunction_calculation_object.calculate(
-                time_value, self.borefield, self.ground_data.alpha(H_var),
+                time_value, self.borefield, self.ground_data.alpha(self.depth, self.D),
                 interpolate=self._calculation_setup.interpolate_gfunctions
             )
 
@@ -1811,7 +1831,7 @@ class Borefield(BaseClass):
         ## 3 calculate g-function jit
         return jit_gfunction_calculation()
 
-    def create_custom_dataset(self, time_array: ArrayLike = None, depth_array: ArrayLike = None,
+    def create_custom_dataset(self, time_array: ArrayLike = None, borehole_length_array: ArrayLike = None,
                               options: dict = {}) -> None:
         """
         This function makes a datafile for a given custom borefield and sets it for the borefield object.
@@ -1822,8 +1842,8 @@ class Borefield(BaseClass):
         ----------
         time_array : list, np.array
             Time values (in seconds) used for the calculation of the datafile
-        depth_array : list, np.array
-            List or arrays of depths for which the datafile should be created
+        borehole_length_array : list, np.array
+            List or arrays of borehole lengths for which the datafile should be created
         options : dict
             Options for the g-function calculation (check pygfunction.gfunction.gFunction() for more information)
 
@@ -1842,11 +1862,11 @@ class Borefield(BaseClass):
         except TypeError:
             raise ValueError("No borefield is set for which the gfunctions should be calculated")
         try:
-            self.ground_data.alpha(H=100)
+            self.ground_data.alpha(depth=100)
         except AttributeError:
             raise ValueError("No ground data is set for which the gfunctions should be calculated")
 
-        self.custom_gfunction = CustomGFunction(time_array, depth_array, options)
+        self.custom_gfunction = CustomGFunction(time_array, borehole_length_array, options)
         self.custom_gfunction.create_custom_dataset(self.borefield, self.ground_data.alpha)
 
     @property
@@ -1864,7 +1884,6 @@ class Borefield(BaseClass):
     def optimise_load_profile_power(
             self,
             building_load: Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear],
-            depth: float = None,
             temperature_threshold: float = 0.05,
             use_hourly_resolution: bool = True,
             max_peak_heating: float = None,
@@ -1882,8 +1901,6 @@ class Borefield(BaseClass):
             Borefield object
         building_load : HourlyBuildingLoad | HourlyBuildingLoadMultiYear
             Load data used for the optimisation.
-        depth : float
-            Depth of the boreholes in the borefield [m].
         temperature_threshold : float
             The maximum allowed temperature difference between the maximum and minimum fluid temperatures and their
             respective limits. The lower this threshold, the longer the convergence will take.
@@ -1906,15 +1923,13 @@ class Borefield(BaseClass):
             ValueError if no correct load data is given or the threshold is negative
         """
         borefield_load, external_load = optimise_load_profile_power(
-            self, building_load, depth, temperature_threshold, use_hourly_resolution, max_peak_heating,
-            max_peak_cooling)
+            self, building_load, temperature_threshold, use_hourly_resolution, max_peak_heating, max_peak_cooling)
         self.load = borefield_load
         return borefield_load, external_load
 
     def optimise_load_profile_energy(
             self,
             building_load: Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear],
-            depth: float = None,
             temperature_threshold: float = 0.05,
             max_peak_heating: float = None,
             max_peak_cooling: float = None
@@ -1930,8 +1945,6 @@ class Borefield(BaseClass):
             Borefield object
         building_load : HourlyBuildingLoad | HourlyBuildingLoadMultiYear
             Load data used for the optimisation
-        depth : float
-            Depth of the boreholes in the borefield [m]
         temperature_threshold : float
             The maximum allowed temperature difference between the maximum and minimum fluid temperatures and their
             respective limits. The lower this threshold, the longer the convergence will take.
@@ -1951,7 +1964,7 @@ class Borefield(BaseClass):
             ValueError if no correct load data is given or the threshold is negative
         """
         borefield_load, external_load = optimise_load_profile_energy(
-            self, building_load, depth, temperature_threshold, max_peak_heating, max_peak_cooling)
+            self, building_load, temperature_threshold, max_peak_heating, max_peak_cooling)
         self.load = borefield_load
         return borefield_load, external_load
 
@@ -2012,7 +2025,8 @@ class Borefield(BaseClass):
         return f'Maximum average fluid temperature [°C]: {self.Tf_max}\n' \
                f'Minimum average fluid temperature [°C]: {self.Tf_min}\n' \
                f'Average buried depth [m]: {self.D}\n' \
-               f'Average borehole depth [m]: {self.H}\n' \
+               f'Average borehole length [m]: {self.H}\n' \
+               f'Average borehole depth [m]: {self.depth}\n' \
                f'Borehole diameter [mm]: {self.r_b * 2000:.0f}\n' \
                f'Number of boreholes [-]: {self.number_of_boreholes}\n' \
                f'{self.ground_data.__repr__()}\n' \

@@ -10,10 +10,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## Added
 
 - __repr__ for every class (issue #310).
+- Added start_depth to calculation of k_s, volumetric_heat_capacity, calculate_value, calculate_Tg and alpha in _
+  GroundData (issue #137).
+- Added start_depth to the calculation of Tg in all GroundClasses (issue #137).
+- Added property 'depth' to Borefield class (issue #137).
+- Added function 'calculate_depth' to Borefield class (issue #137).
 
 ## Fixed
 
 - Problem with optimise energy profile (issue #306).
+- Problem with ground parameters in optimise_energy_profile (issue #317).
+
+## Changed
+
+- Make terminology consistent: borehole length != borehole depth (issue #317).
+- _GroundData changed argument of check_depth, k_s, volumetric_heat_capacity, calculate_Tg, calculate_value and alpha
+  from 'H' to 'depth' (issue #137).
+- Removed 'depth' attribute in optimise load functions, for it is already included in the Borefield object (issue #317).
+- Added 'depth' attribute to get_Rb and calculate_Rb functions in the Borehole class (issue #317).
+- Changed 'depth' attribute to 'length' in print_temperature_profile_fixed_length, calculate_temperatures (issue #317).
 
 ## [2.3.0] - 2024-11-05
 

@@ -8,9 +8,9 @@ from pytest import raises
 from GHEtool import Borefield
 from GHEtool.VariableClasses import FIFO, GFunction
 
-depth_array = np.array([1, 5, 6])
-depth_array_empty = np.array([])
-depth_array_threshold = np.array([30, 60, 100])
+borehole_length_array = np.array([1, 5, 6])
+borehole_length_array_empty = np.array([])
+borehole_length_array_threshold = np.array([30, 60, 100])
 time_value_array_empty = np.array([])
 time_value_array = np.array([1, 100, 1000, 10000])
 
@@ -41,7 +41,7 @@ def test_unequal_borefields():
 def test_equal_borefields2():
     borefield1 = gt.boreholes.rectangle_field(10, 10, 5, 5, 100, 4, 0.075)
     borefield2 = gt.boreholes.rectangle_field(10, 10, 5, 5, 100, 4, 0.075)
-    
+
     gfunc = GFunction()
     gfunc.borefield = borefield1
     assert gfunc._check_borefield(borefield2)
@@ -88,41 +88,41 @@ def test_unequal_alpha():
 
 def test_nearest_value_empty():
     gfunc = GFunction()
-    assert False == gfunc._nearest_value(depth_array_empty, 5)
+    assert False == gfunc._nearest_value(borehole_length_array_empty, 5)
 
 
 def test_nearest_value_index():
     gfunc = GFunction()
-    assert 1, 0 == gfunc._nearest_value(depth_array, 0)
-    assert 1, 0 == gfunc._nearest_value(depth_array, 1)
-    assert 1, 0 == gfunc._nearest_value(depth_array, 2)
-    assert 5, 1 == gfunc._nearest_value(depth_array, 4)
-    assert 5, 1 == gfunc._nearest_value(depth_array, 5)
-    assert 6, 2 == gfunc._nearest_value(depth_array, 100)
+    assert 1, 0 == gfunc._nearest_value(borehole_length_array, 0)
+    assert 1, 0 == gfunc._nearest_value(borehole_length_array, 1)
+    assert 1, 0 == gfunc._nearest_value(borehole_length_array, 2)
+    assert 5, 1 == gfunc._nearest_value(borehole_length_array, 4)
+    assert 5, 1 == gfunc._nearest_value(borehole_length_array, 5)
+    assert 6, 2 == gfunc._nearest_value(borehole_length_array, 100)
 
 
-def test_nearest_depth_index():
+def test_nearest_borehole_length_index():
     gfunc = GFunction()
-    gfunc.depth_array = np.array([1, 5, 6])
-    assert (None, 0) == gfunc._get_nearest_depth_index(0.9)
-    assert (None, None) == gfunc._get_nearest_depth_index(100)
-    assert (None, None) == gfunc._get_nearest_depth_index(3)
-    assert (1, 1) == gfunc._get_nearest_depth_index(5)
-    assert (2, None) == gfunc._get_nearest_depth_index(7)
-    gfunc.depth_array = np.array([4, 5, 6])
-    assert (0, 1) == gfunc._get_nearest_depth_index(4.8)
+    gfunc.borehole_length_array = np.array([1, 5, 6])
+    assert (None, 0) == gfunc._get_nearest_borehole_length_index(0.9)
+    assert (None, None) == gfunc._get_nearest_borehole_length_index(100)
+    assert (None, None) == gfunc._get_nearest_borehole_length_index(3)
+    assert (1, 1) == gfunc._get_nearest_borehole_length_index(5)
+    assert (2, None) == gfunc._get_nearest_borehole_length_index(7)
+    gfunc.borehole_length_array = np.array([4, 5, 6])
+    assert (0, 1) == gfunc._get_nearest_borehole_length_index(4.8)
 
     with raises(ValueError):
-        gfunc._get_nearest_depth_index(-100)
+        gfunc._get_nearest_borehole_length_index(-100)
 
 
-def test_nearest_depth_index_threshold():
+def test_nearest_borehole_length_index_threshold():
     gfunc = GFunction()
-    gfunc.depth_array = depth_array_threshold
-    assert (None, None) == gfunc._get_nearest_depth_index(5)
-    assert (None, None) == gfunc._get_nearest_depth_index(50)
-    assert (None, None) == gfunc._get_nearest_depth_index(95)
-    assert (None, None) == gfunc._get_nearest_depth_index(40)
+    gfunc.borehole_length_array = borehole_length_array_threshold
+    assert (None, None) == gfunc._get_nearest_borehole_length_index(5)
+    assert (None, None) == gfunc._get_nearest_borehole_length_index(50)
+    assert (None, None) == gfunc._get_nearest_borehole_length_index(95)
+    assert (None, None) == gfunc._get_nearest_borehole_length_index(40)
 
 
 def test_check_time_values():
@@ -143,7 +143,7 @@ def test_check_time_values():
 
 def test_set_options():
     gfunc = GFunction()
-    test = {"method": "similarities", "linear_threshold": 24*3600}
+    test = {"method": "similarities", "linear_threshold": 24 * 3600}
     gfunc.set_options_gfunction_calculation(test)
     assert gfunc.options == test
     gfunc.set_options_gfunction_calculation({"method": "similarities"})
@@ -233,9 +233,9 @@ def test_interpolation_1D():
     assert np.array_equal(test, gfunc.previous_gfunctions)
 
 
-def _change_borefield_depth(borefield, depth):
+def _change_borefield_borehole_length(borefield, borehole_length):
     for idx, _ in enumerate(borefield):
-        setattr(borefield[idx], "H", depth)
+        setattr(borefield[idx], "H", borehole_length)
 
 
 def test_store_2D_data():
@@ -246,50 +246,50 @@ def test_store_2D_data():
     gfunc.calculate(time_values, borefield, alpha)
     gfunc_val = copy.copy(gfunc.previous_gfunctions)
 
-    _change_borefield_depth(borefield, 120)
+    _change_borefield_borehole_length(borefield, 120)
     gfunc.calculate(time_values, borefield, alpha)
 
-    assert gfunc.depth_array.shape[0] == 2
+    assert gfunc.borehole_length_array.shape[0] == 2
     assert np.array_equal(gfunc.previous_gfunctions[0], gfunc_val)
 
-    _change_borefield_depth(borefield, 80)
+    _change_borefield_borehole_length(borefield, 80)
     gfunc.calculate(time_values, borefield, alpha)
 
-    assert gfunc.depth_array.shape[0] == 3
+    assert gfunc.borehole_length_array.shape[0] == 3
     assert np.array_equal(gfunc.previous_gfunctions[1], gfunc_val)
 
     gfunc.remove_previous_data()
 
     # do the same but now first with other sequence of 100, 80, 120m
-    _change_borefield_depth(borefield, 100)
+    _change_borefield_borehole_length(borefield, 100)
     gfunc.calculate(time_values, borefield, alpha)
     gfunc_val = copy.copy(gfunc.previous_gfunctions)
 
-    _change_borefield_depth(borefield, 80)
+    _change_borefield_borehole_length(borefield, 80)
     gfunc.calculate(time_values, borefield, alpha)
 
-    assert gfunc.depth_array.shape[0] == 2
+    assert gfunc.borehole_length_array.shape[0] == 2
     assert np.array_equal(gfunc.previous_gfunctions[1], gfunc_val)
 
-    _change_borefield_depth(borefield, 120)
+    _change_borefield_borehole_length(borefield, 120)
     gfunc.calculate(time_values, borefield, alpha)
 
-    assert gfunc.depth_array.shape[0] == 3
+    assert gfunc.borehole_length_array.shape[0] == 3
     assert np.array_equal(gfunc.previous_gfunctions[1], gfunc_val)
 
     # test if data is removed
-    _change_borefield_depth(borefield, 130)
+    _change_borefield_borehole_length(borefield, 130)
     gfunc.calculate(time_values, borefield, alpha * 1.01)
-    assert gfunc.depth_array.size == 1
+    assert gfunc.borehole_length_array.size == 1
 
-    _change_borefield_depth(borefield, 110)
+    _change_borefield_borehole_length(borefield, 110)
     gfunc.calculate(time_values, borefield, alpha * 1.01)
-    assert gfunc.depth_array.shape[0] == 2
+    assert gfunc.borehole_length_array.shape[0] == 2
 
     # test if data is removed
     borefield_2 = gt.boreholes.rectangle_field(5, 6, 5, 5, 100, 1, 0.075)
     gfunc.calculate(time_values, borefield_2, alpha * 1.01)
-    assert gfunc.depth_array.size == 1
+    assert gfunc.borehole_length_array.size == 1
 
 
 def test_interpolate_2D():
@@ -298,28 +298,28 @@ def test_interpolate_2D():
     time_values = borefield_ghe.load.time_L4
 
     # populate data
-    _change_borefield_depth(borefield, 100)
+    _change_borefield_borehole_length(borefield, 100)
     gfunc.calculate(time_values, borefield, alpha)
 
-    _change_borefield_depth(borefield, 120)
+    _change_borefield_borehole_length(borefield, 120)
     gfunc.calculate(time_values, borefield, alpha)
 
-    _change_borefield_depth(borefield, 80)
+    _change_borefield_borehole_length(borefield, 80)
     gfunc.calculate(time_values, borefield, alpha)
 
-    _change_borefield_depth(borefield, 110)
+    _change_borefield_borehole_length(borefield, 110)
     gfunc_calc = gfunc.calculate(gfunc.time_array, borefield, alpha)
     gfunc_pyg = gt.gfunction.gFunction(borefield, alpha, gfunc.time_array).gFunc
 
-    assert np.array_equal(gfunc.depth_array, np.array([80, 100, 120]))
+    assert np.array_equal(gfunc.borehole_length_array, np.array([80, 100, 120]))
     assert gfunc_calc.shape == gfunc_pyg.shape
     assert not np.array_equal(gfunc_calc, gfunc_pyg)
 
-    _change_borefield_depth(borefield, 100)
+    _change_borefield_borehole_length(borefield, 100)
     gfunc_calc = gfunc.calculate(borefield_ghe.load.time_L3[:20], borefield, alpha)
     gfunc_pyg = gt.gfunction.gFunction(borefield, alpha, borefield_ghe.load.time_L3[:20]).gFunc
 
-    assert np.array_equal(gfunc.depth_array, np.array([80, 100, 120]))
+    assert np.array_equal(gfunc.borehole_length_array, np.array([80, 100, 120]))
     assert gfunc_pyg.size == gfunc_calc.size
     assert not np.array_equal(gfunc_calc, gfunc_pyg)
 
@@ -329,7 +329,7 @@ def test_interpolate_2D():
     gfunc_calc = gfunc.calculate(time_double, borefield, alpha)
     gfunc_pyg = gt.gfunction.gFunction(borefield, alpha, time_double[:-1]).gFunc
 
-    assert np.array_equal(gfunc.depth_array, np.array([80, 100, 120]))
+    assert np.array_equal(gfunc.borehole_length_array, np.array([80, 100, 120]))
     assert gfunc_pyg.size + 1 == gfunc_calc.size
     assert not np.array_equal(gfunc_calc[:-1], gfunc_pyg)
     assert gfunc_calc[-1] == gfunc_calc[-2]
@@ -337,14 +337,14 @@ def test_interpolate_2D():
     # calculate anyhow
     gfunc.store_previous_values = False
     gfunc_calc = gfunc.calculate(borefield_ghe.load.time_L3[:20], borefield, alpha)
-    assert np.allclose(gfunc_calc, [14.89758799, 19.00729376, 21.25068071, 22.6936062,  23.70823959, 24.4633899,
+    assert np.allclose(gfunc_calc, [14.89758799, 19.00729376, 21.25068071, 22.6936062, 23.70823959, 24.4633899,
                                     25.04810995, 25.51433124, 25.89459298, 26.21041712, 26.47665307, 26.70390003,
                                     26.89993724, 27.07060881, 27.22039279, 27.35277941, 27.47052956, 27.57585579,
                                     27.67055182, 27.75608682])
     gfunc.store_previous_values = True
     gfunc_calc = gfunc.calculate(borefield_ghe.load.time_L3[:20], borefield, alpha)
     assert np.allclose(gfunc_calc, [15.21723783, 19.21174728, 21.39698711, 22.78389769, 23.78126837, 24.51443669,
-                                    25.09618046, 25.5292184,  25.90238329, 26.22140026, 26.48339286, 26.70550955,
+                                    25.09618046, 25.5292184, 25.90238329, 26.22140026, 26.48339286, 26.70550955,
                                     26.90228268, 27.07574976, 27.20792103, 27.33922595, 27.46457098, 27.56161827,
                                     27.65866557, 27.74718794])
 
@@ -388,18 +388,18 @@ def test_floating_number():
     time_values = borefield_ghe.load.time_L4
 
     # populate data
-    _change_borefield_depth(borefield, 100)
+    _change_borefield_borehole_length(borefield, 100)
     gfunc.calculate(time_values, borefield, alpha)
 
-    _change_borefield_depth(borefield, 120)
+    _change_borefield_borehole_length(borefield, 120)
     gfunc.calculate(time_values, borefield, alpha)
 
-    _change_borefield_depth(borefield, 80)
+    _change_borefield_borehole_length(borefield, 80)
     gfunc.calculate(time_values, borefield, alpha)
 
-    _change_borefield_depth(borefield, 100)
+    _change_borefield_borehole_length(borefield, 100)
     assert gfunc.calculate(7500., borefield, alpha) != gt.gfunction.gFunction(borefield, alpha, 7500.).gFunc
-    assert gfunc.calculate(gfunc.time_array[0], borefield, alpha) ==\
+    assert gfunc.calculate(gfunc.time_array[0], borefield, alpha) == \
            gt.gfunction.gFunction(borefield, alpha, gfunc.time_array[0]).gFunc
 
 
