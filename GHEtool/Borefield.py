@@ -200,7 +200,26 @@ class Borefield(BaseClass):
         float
             Average borehole depth [meters]
         """
-        return self.H + self.D
+        return self.calculate_depth(self.H, self.D)
+
+    def calculate_depth(self, borehole_length: float, buried_depth: float) -> float:
+        """
+        This function calculates the depth of the borehole.
+
+        Parameters
+        ----------
+        borehole_length : float
+            Length of the borehole [m]
+        buried_depth : float
+            Buried depth of the borehole [m]
+
+        Returns
+        -------
+        float
+            Depth of the borehole [m]
+        """
+        # TODO take into account tilt
+        return borehole_length + buried_depth
 
     @property
     def H(self) -> float:
@@ -769,7 +788,7 @@ class Borefield(BaseClass):
         if H is None:
             H = self.H
 
-        return self.ground_data.calculate_Tg(H)
+        return self.ground_data.calculate_Tg(self.calculate_depth(H, self.D), self.D)
 
     def _check_convergence(self, new_depth: float, old_depth: float, iter: int) -> bool:
         """
@@ -852,7 +871,7 @@ class Borefield(BaseClass):
             # calculate the required g-function values
             gfunct_uniform_T = self.gfunction(time, max(1, self.H))
             # calculate the thermal resistances
-            k_s = self.ground_data.k_s(self.H)
+            k_s = self.ground_data.k_s(self.depth, self.D)
             Ra = (gfunct_uniform_T[2] - gfunct_uniform_T[1]) / (2 * pi * k_s)
             Rm = (gfunct_uniform_T[1] - gfunct_uniform_T[0]) / (2 * pi * k_s)
             Rd = (gfunct_uniform_T[0]) / (2 * pi * k_s)
@@ -913,7 +932,7 @@ class Borefield(BaseClass):
             gfunc_uniform_T = self.gfunction(time_steps, max(1, self.H))
 
             # calculate the thermal resistances
-            k_s = self.ground_data.k_s(self.H)
+            k_s = self.ground_data.k_s(self.depth, self.H)
             Rpm = (gfunc_uniform_T[2] - gfunc_uniform_T[1]) / (2 * pi * k_s)
             Rcm = (gfunc_uniform_T[1] - gfunc_uniform_T[0]) / (2 * pi * k_s)
             Rh = (gfunc_uniform_T[0]) / (2 * pi * k_s)
@@ -1620,8 +1639,9 @@ class Borefield(BaseClass):
 
         def calculate_temperatures(H, hourly=hourly):
             # set Rb* value
-            Rb = self.borehole.get_Rb(H if H is not None else self.H, self.D, self.r_b, self.ground_data.k_s(self.H))
             H = H if H is not None else self.H
+            Rb = self.borehole.get_Rb(H, self.D, self.r_b,
+                                      self.ground_data.k_s(self.calculate_depth(H, self.D), self.D))
 
             results = None
 
@@ -1647,7 +1667,7 @@ class Borefield(BaseClass):
                           : 12 * self.simulation_period]
 
                 # calculation the borehole wall temperature for every month i
-                k_s = self.ground_data.k_s(H)
+                k_s = self.ground_data.k_s(self.calculate_depth(H, self.D), self.D)
                 Tb = results / (2 * pi * k_s) / (H * self.number_of_boreholes) + self._Tg(H)
 
                 # now the Tf will be calculated based on
@@ -1705,7 +1725,8 @@ class Borefield(BaseClass):
                 results = convolve(hourly_load * 1000, g_value_differences)[: len(hourly_load)]
 
                 # calculation the borehole wall temperature for every month i
-                Tb = results / (2 * pi * self.ground_data.k_s(H)) / (H * self.number_of_boreholes) + self._Tg(H)
+                Tb = results / (2 * pi * self.ground_data.k_s(self.calculate_depth(H, self.D), self.D)) / (
+                        H * self.number_of_boreholes) + self._Tg(H)
 
                 # now the Tf will be calculated based on
                 # Tf = Tb + Q * R_b
@@ -1804,7 +1825,7 @@ class Borefield(BaseClass):
                 # only update if H is provided, otherwise the depths of the borefield itself will be used
                 self._update_borefield_depth(H=H)
             return self.gfunction_calculation_object.calculate(
-                time_value, self.borefield, self.ground_data.alpha(H_var),
+                time_value, self.borefield, self.ground_data.alpha(self.depth, self.D),
                 interpolate=self._calculation_setup.interpolate_gfunctions
             )
 
@@ -1854,7 +1875,7 @@ class Borefield(BaseClass):
         except TypeError:
             raise ValueError("No borefield is set for which the gfunctions should be calculated")
         try:
-            self.ground_data.alpha(H=100)
+            self.ground_data.alpha(depth=100)
         except AttributeError:
             raise ValueError("No ground data is set for which the gfunctions should be calculated")
 
