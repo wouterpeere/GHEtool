@@ -5,6 +5,7 @@ This example sizes a borefield using the advanced option of using multiple groun
 from GHEtool import *
 from GHEtool.Validation.cases import load_case
 
+
 def multiple_ground_layers():
     # initiate borefield model
     borefield = Borefield()
@@ -31,10 +32,12 @@ def multiple_ground_layers():
 
     # size borefield according to the two different ground data variables
     borefield.ground_data = constant_ks
-    print(f'The required borehole depth is {borefield.size():.3f}m if you use a constant approximation for the ground conductivity.')
+    print(
+        f'The required borehole length is {borefield.size():.3f}m if you use a constant approximation for the ground conductivity.')
 
     borefield.ground_data = layered_ground
-    print(f'The required borehole depth is {borefield.size():.3f}m if you use a detailed ground model with multiple layers.')
+    print(
+        f'The required borehole length is {borefield.size():.3f}m if you use a detailed ground model with multiple layers.')
 
 
 if __name__ == "__main__":  # pragma: no cover

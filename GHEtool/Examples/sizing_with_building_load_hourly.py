@@ -29,7 +29,7 @@ def L3_sizing() -> Tuple[float, float]:
 
     Returns
     -------
-    depth, SCOP
+    length, SCOP
     """
     # initiate borefield
     borefield = Borefield()
@@ -53,12 +53,12 @@ def L3_sizing() -> Tuple[float, float]:
     borefield.load = load
 
     # size the borefield and plot the resulting temperature evolution
-    depth = borefield.size(100, L3_sizing=True)
+    length = borefield.size(100, L3_sizing=True)
     print(
-        f'When sizing with an L3 method, the required borehole depth is {depth:.2f}m. '
+        f'When sizing with an L3 method, the required borehole length is {length:.2f}m. '
         f'The SCOP is {borefield.load.SCOP_total:.2f}.')
     borefield.print_temperature_profile()
-    return depth, borefield.load.SCOP_heating
+    return length, borefield.load.SCOP_heating
 
 
 def L4_sizing() -> Tuple[float, float]:
@@ -67,7 +67,7 @@ def L4_sizing() -> Tuple[float, float]:
 
     Returns
     -------
-    depth, SCOP
+    length, SCOP
     """
     # initiate borefield
     borefield = Borefield()
@@ -91,12 +91,12 @@ def L4_sizing() -> Tuple[float, float]:
     borefield.load = load
 
     # size the borefield and plot the resulting temperature evolution
-    depth = borefield.size(100, L4_sizing=True)
+    length = borefield.size(100, L4_sizing=True)
     print(
-        f'When sizing with an L4 method, the required borehole depth is {depth:.2f}m. '
+        f'When sizing with an L4 method, the required borehole length is {length:.2f}m. '
         f'The SCOP is {borefield.load.SCOP_total:.2f}.')
     borefield.print_temperature_profile(plot_hourly=True)
-    return depth, borefield.load.SCOP_heating
+    return length, borefield.load.SCOP_heating
 
 
 if __name__ == "__main__":

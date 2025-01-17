@@ -22,20 +22,20 @@ def start_in_different_month():
     borefield.set_min_avg_fluid_temperature(3)
     borefield.calculation_setup(max_nb_of_iterations=100)
 
-    depth_list = []
+    length_list = []
 
     # iterate over all the start months
     for month in range(1, 13, 1):
         borefield.load.start_month = month
-        depth_list.append(borefield.size_L3())
+        length_list.append(borefield.size_L3())
 
     plt.figure()
-    plt.bar(range(1, 13, 1), depth_list)
-    plt.ylabel('Required depth [m]')
+    plt.bar(range(1, 13, 1), length_list)
+    plt.ylabel('Required borehole length [m]')
     plt.xlabel('First month of operation')
     plt.xlim(0)
     plt.ylim(0)
-    plt.title('Required depth as a function of the first month of operation')
+    plt.title('Required borehole length as a function of the first month of operation')
     plt.show()
 
 

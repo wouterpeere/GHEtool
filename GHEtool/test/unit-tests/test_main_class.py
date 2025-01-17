@@ -164,15 +164,15 @@ def test_update_depth():
     init_H = borefield.borefield[0].H
 
     borefield.H = init_H + 1
-    borefield._update_borefield_depth(20)
+    borefield.H = 20
     for bor in borefield.borefield:
         assert bor.H == 20
 
-    borefield._update_borefield_depth(init_H + 2)
+    borefield.H = init_H + 2
     for bor in borefield.borefield:
         assert bor.H == init_H + 2
 
-    borefield._update_borefield_depth(init_H + 2)
+    borefield.H = init_H + 2
     for bor in borefield.borefield:
         assert bor.H == init_H + 2
 
@@ -832,7 +832,7 @@ def test_gfunction_with_irregular_depth():
     borefield.borefield = temp
     assert borefield.H == 100
     g_values = borefield.gfunction([6000, 60000, 600000])
-    borefield._update_borefield_depth(100)
+    borefield.H = 100
     assert not np.array_equal(borefield.gfunction([6000, 60000, 600000]), g_values)
 
     borefield = Borefield()
@@ -1138,7 +1138,8 @@ def test_repr_():
     assert 'Maximum average fluid temperature [°C]: 16.0\n' \
            'Minimum average fluid temperature [°C]: 0.0\n' \
            'Average buried depth [m]: 4.0\n' \
-           'Average borehole depth [m]: 110.0\n' \
+           'Average borehole length [m]: 110.0\n' \
+           'Average borehole depth [m]: 114.0\n' \
            'Borehole diameter [mm]: 150\n' \
            'Number of boreholes [-]: 120\n' \
            'Constant ground temperature\n' \
