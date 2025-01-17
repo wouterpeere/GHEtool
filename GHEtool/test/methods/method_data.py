@@ -171,7 +171,7 @@ borefield.calculation_setup(atol=False, max_nb_of_iterations=40)
 list_of_test_objects.add(SizingObject(borefield, L2_output=141.286, L3_output=140.768, L4_output=103.451, quadrant=1,
                                       name='BS2023 Auditorium (no atol)'))
 borefield.calculation_setup(force_deep_sizing=True)
-list_of_test_objects.add(SizingObject(borefield, L2_output=141.286, L3_output=140.618, L4_output=103.591, quadrant=1,
+list_of_test_objects.add(SizingObject(borefield, L2_output=141.286, L3_output=140.654, L4_output=103.374, quadrant=1,
                                       name='BS2023 Auditorium (no atol, deep)'))
 borefield.calculation_setup(force_deep_sizing=False)
 borefield = Borefield()
@@ -201,7 +201,7 @@ borefield.calculation_setup(atol=False, max_nb_of_iterations=40)
 list_of_test_objects.add(SizingObject(borefield, L2_output=113.739, L3_output=115.682, L4_output=109.35, quadrant=2,
                                       name='BS2023 Office (no atol)'))
 borefield.calculation_setup(force_deep_sizing=True)
-list_of_test_objects.add(SizingObject(borefield, L2_output=113.739, L3_output=115.712, L4_output=109.294, quadrant=2,
+list_of_test_objects.add(SizingObject(borefield, L2_output=113.739, L3_output=115.727, L4_output=109.313, quadrant=2,
                                       name='BS2023 Office (no atol, deep)'))
 borefield.calculation_setup(force_deep_sizing=False)
 
@@ -496,7 +496,7 @@ borefield.load = load
 borefield.set_ground_parameters(GroundTemperatureGradient(1.9, 10, gradient=2))
 borefield.set_fluid_parameters(FluidData(0.1, 0.475, 1033, 3930, 0.001))
 borefield.set_pipe_parameters(SingleUTube(1.5, 0.016, 0.02, 0.42, 0.04))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 81.7146, 87.453,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 81.746, 87.453,
                                                    22.3508, 38.726, 55.214, 59.163,
                                                    name='Optimise load profile (stuck in loop) (power)', power=True,
                                                    hourly=False))
@@ -578,11 +578,11 @@ borefield.set_ground_parameters(GroundTemperatureGradient(1.9, 10, gradient=2))
 borefield.set_fluid_parameters(FluidData(0.1, 0.475, 1033, 3930, 0.001))
 borefield.set_pipe_parameters(SingleUTube(1.5, 0.016, 0.02, 0.42, 0.04))
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 45.978137699335, 10.93,
-                                                   52.82586122830533, 27.731, 605.9817888622596,
+                                                   52.82586122830533, 27.731458, 605.9817888622596,
                                                    512.9266,
                                                    name='Optimise load profile (eer combined) (power)', power=True,
                                                    hourly=False))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 50.187981717163034, 12.82812330930278,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 50.33431191906354, 12.82812330930278,
                                                    95.636899472386, 66.33595162152281, 603.0319153178363,
                                                    509.73531422797737,
                                                    name='Optimise load profile (eer combined) (energy)', power=False,

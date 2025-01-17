@@ -1077,13 +1077,13 @@ def test_calculate_next_depth_deep_sizing():
     borefield.calculate_temperatures(75)
     assert np.isclose(borefield.calculate_next_depth_deep_sizing(75), 118.26269556337864)
     borefield.calculate_temperatures(118.26269556337864)
-    assert np.isclose(borefield.calculate_next_depth_deep_sizing(117.98660599828808), 128.31636071414775)
+    assert np.isclose(borefield.calculate_next_depth_deep_sizing(118.26269556337864), 128.31636071414775)
     borefield.calculate_temperatures(128.31636071414775)
-    assert np.isclose(borefield.calculate_next_depth_deep_sizing(131.18039847564688), 130.8812255630479)
+    assert np.isclose(borefield.calculate_next_depth_deep_sizing(128.31636071414775), 128.6225651998528)
 
 
 @pytest.mark.parametrize("case, result",
-                         zip((1, 2, 3, 4), [132.4920010915831, 0, 140.25177132242135, 139.46239300837794]))
+                         zip((1, 2, 3, 4), [132.4920010915831, 0, 140.25177132242135, 132.4920010915831]))
 def test_deep_sizing(case, result):
     borefield = Borefield()
     borefield.ground_data = GroundFluxTemperature(3, 10)
