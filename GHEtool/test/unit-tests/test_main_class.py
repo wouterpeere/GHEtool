@@ -329,7 +329,7 @@ def test_Tg():
     zip(
         [ground_data_constant, data_ground_flux, ground_data_constant, data_ground_flux],
         [True, True, False, False],
-        [39.994203323480214, 38.70946566704161, 30.924434615896764, 30.245606119498383],
+        [39.994203323480214, 38.45978496550447, 30.924434615896764, 30.047718917393134],
     ),
 )
 def test_Ahmadfard(ground_data, constant_Rb, result):
@@ -341,8 +341,8 @@ def test_Ahmadfard(ground_data, constant_Rb, result):
     borefield.set_pipe_parameters(pipeData)
     borefield.calculation_setup(use_constant_Rb=constant_Rb)
     th, qh, qm, qa = load._calculate_last_year_params(True)
-    assert np.isclose(result, borefield._Ahmadfard(th, qh, qm, qa, 0))
-    assert np.isclose(result, borefield.H)
+    assert np.isclose(borefield._Ahmadfard(th, qh, qm, qa, 0), result)
+    assert np.isclose(borefield.H, result)
 
 
 @pytest.mark.parametrize(
@@ -350,7 +350,7 @@ def test_Ahmadfard(ground_data, constant_Rb, result):
     zip(
         [ground_data_constant, data_ground_flux, ground_data_constant, data_ground_flux],
         [True, True, False, False],
-        [48.76844845370183, 46.593433439950985, 38.53491016745154, 37.100782551185],
+        [48.76844845370183, 46.254155886276564, 38.53491016745154, 36.81621398703887],
     ),
 )
 def test_Carcel(ground_data, constant_Rb, result):
@@ -363,8 +363,8 @@ def test_Carcel(ground_data, constant_Rb, result):
     borefield.set_pipe_parameters(pipeData)
     borefield.calculation_setup(use_constant_Rb=constant_Rb)
     th, _, tcm, qh, qpm, qm = load._calculate_first_year_params(True)
-    assert np.isclose(result, borefield._Carcel(th, tcm, qh, qpm, qm, 0))
-    assert np.isclose(result, borefield.H)
+    assert np.isclose(borefield._Carcel(th, tcm, qh, qpm, qm, 0), result)
+    assert np.isclose(borefield.H, result)
 
 
 def test_set_sizing_setup():
@@ -1075,15 +1075,15 @@ def test_calculate_next_depth_deep_sizing():
     borefield.load = load
 
     borefield.calculate_temperatures(75)
-    assert np.isclose(borefield.calculate_next_depth_deep_sizing(75), 117.98660599828808)
-    borefield.calculate_temperatures(117.98660599828808)
-    assert np.isclose(borefield.calculate_next_depth_deep_sizing(117.98660599828808), 128.16618036528823)
-    borefield.calculate_temperatures(128.16618036528823)
-    assert np.isclose(borefield.calculate_next_depth_deep_sizing(128.16618036528823), 130.8812255630479)
+    assert np.isclose(borefield.calculate_next_depth_deep_sizing(75), 118.26269556337864)
+    borefield.calculate_temperatures(118.26269556337864)
+    assert np.isclose(borefield.calculate_next_depth_deep_sizing(117.98660599828808), 128.31636071414775)
+    borefield.calculate_temperatures(128.31636071414775)
+    assert np.isclose(borefield.calculate_next_depth_deep_sizing(131.18039847564688), 130.8812255630479)
 
 
 @pytest.mark.parametrize("case, result",
-                         zip((1, 2, 3, 4), [131.90418292004594, 0, 139.46239300837794, 131.90418292004594]))
+                         zip((1, 2, 3, 4), [132.4920010915831, 0, 140.25177132242135, 139.46239300837794]))
 def test_deep_sizing(case, result):
     borefield = Borefield()
     borefield.ground_data = GroundFluxTemperature(3, 10)
@@ -1120,13 +1120,13 @@ def test_optimise_load_borefield():
     ground_data = GroundFluxTemperature(2, 9.6, flux=0.07)
     borefield.ground_data = ground_data
     borefield_load, external_load = borefield.optimise_load_profile_energy(load)
-    assert np.isclose(borefield_load.imbalance, -228386.82055766508)
+    assert np.isclose(borefield_load.imbalance, -229303.76869817785)
     borefield.load = borefield_load
     borefield.calculate_temperatures(hourly=False)
-    assert np.isclose(np.max(borefield.results.peak_injection), 17.044473901670603)
-    assert np.isclose(np.min(borefield.results.peak_extraction), 1.9471241454443655)
+    assert np.isclose(np.max(borefield.results.peak_injection), 17.046329116754006)
+    assert np.isclose(np.min(borefield.results.peak_extraction), 1.9475137898511852)
     assert np.isclose(borefield.load.max_peak_cooling, 329.9393053)
-    assert np.isclose(np.sum(borefield.load.hourly_heating_load), 593385.1066074175)
+    assert np.isclose(np.sum(borefield.load.hourly_heating_load), 594114.6208002889)
 
 
 def test_repr_():

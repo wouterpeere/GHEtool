@@ -1375,11 +1375,12 @@ class Borefield(BaseClass):
             New depth of the borefield [m]
         """
         # diff between the max temperature in peak injection and the avg undisturbed ground temperature at current_depth
-        delta_temp = np.max(self.results.peak_injection - self.ground_data.calculate_Tg(current_depth))
+        delta_temp = np.max(
+            self.results.peak_injection - self.ground_data.calculate_Tg(self.calculate_depth(current_depth, self.D)))
 
         # calculate the maximum temperature difference between the temperature limit and the ground temperature
         # at current_depth
-        delta_wrt_max = self.Tf_max - self.ground_data.calculate_Tg(current_depth)
+        delta_wrt_max = self.Tf_max - self.ground_data.calculate_Tg(self.calculate_depth(current_depth, self.D))
 
         # delta_t1/H1 ~ delta_t2/H2
         # H2 = delta_t2/delta_t1*current_depth
