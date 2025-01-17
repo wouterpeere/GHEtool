@@ -26,7 +26,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Make terminology consistent: borehole length != borehole depth (issue #317).
 - _GroundData changed argument of check_depth, k_s, volumetric_heat_capacity, calculate_Tg, calculate_value and alpha
   from 'H' to 'depth' (issue #137).
-- Removed 'depth' parameter in optimise load functions, for it is already included in the Borefield object (issue #317).
+- Removed 'depth' attribute in optimise load functions, for it is already included in the Borefield object (issue #317).
+- Added 'depth' attribute to get_Rb and calculate_Rb functions in the Borehole class (issue #317).
 
 ## [2.3.0] - 2024-11-05
 
