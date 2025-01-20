@@ -79,3 +79,9 @@ def test_separatus(monkeypatch):
     design_with_single_U()
     design_with_double_U()
     design_with_separatus()
+
+
+def test_tilted(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    from GHEtool.Examples.tilted_borefield import tilted
+    tilted()

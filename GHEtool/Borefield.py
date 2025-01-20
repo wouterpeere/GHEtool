@@ -4,6 +4,7 @@ This file contains all the code for the borefield calculations.
 from __future__ import annotations
 
 import copy
+import math
 import warnings
 from math import pi
 from typing import Tuple, Union
@@ -116,9 +117,6 @@ class Borefield(BaseClass):
         self.custom_gfunction: CustomGFunction = custom_gfunction
         self.gfunction_calculation_object: GFunction = GFunction()
 
-        ## params w.r.t. pygfunction
-        self.options_pygfunction: dict = {"method": "equivalent"}
-
         # initialize variables for temperature plotting
         self.results: ResultsMonthly | ResultsHourly = ResultsMonthly()
 
@@ -133,6 +131,7 @@ class Borefield(BaseClass):
         self.Tf_min: float = 0.0  # minimum temperature of the fluid
 
         # initiale borehole
+        self.avg_tilt: float = 0.
         self.borehole = Borehole()
 
         # initiate different sizing
@@ -204,7 +203,7 @@ class Borefield(BaseClass):
 
     def calculate_depth(self, borehole_length: float, buried_depth: float) -> float:
         """
-        This function calculates the depth of the borehole.
+        This function calculates the depth of the borehole given the average tilt of the borefield.
 
         Parameters
         ----------
@@ -218,8 +217,9 @@ class Borefield(BaseClass):
         float
             Depth of the borehole [m]
         """
-        # TODO take into account tilt
-        return borehole_length + buried_depth
+        if np.isclose(self.avg_tilt, 0):
+            return borehole_length + buried_depth
+        return np.average([bor.H * math.cos(bor.tilt) for bor in self.borefield]) + buried_depth
 
     @property
     def H(self) -> float:
@@ -458,6 +458,9 @@ class Borefield(BaseClass):
         self.D = np.average([bor.D for bor in borefield])
         self.r_b = np.average([bor.r_b for bor in borefield])
         self._H = np.average([bor.H for bor in borefield])
+        self.avg_tilt = np.average([bor.tilt for bor in borefield])
+        if not np.isclose(self.avg_tilt, 0):
+            self.gfunction_calculation_object.options['method'] = 'similarities'
         self.gfunction_calculation_object.remove_previous_data()
         unequal_length = np.any([bor.H != borefield[0].H for bor in borefield])
         if unequal_length:
