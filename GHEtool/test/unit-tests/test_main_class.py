@@ -12,7 +12,7 @@ from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData,
 from GHEtool.logger import ghe_logger
 from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad, HourlyBuildingLoad, \
-    HourlyBuildingLoadMultiYear
+    HourlyBuildingLoadMultiYear, MonthlyBuildingLoadAbsolute
 from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient
 
 data = GroundConstantTemperature(3, 10)
@@ -1182,3 +1182,33 @@ def test_repr_():
            'Peak extraction duration [hour]: 6.0\n' \
            'Simulation period [year]: 20\n' \
            'First month of simulation [-]: 1' == borefield.__repr__()
+
+
+def test_with_titled_borefield():
+    # define params
+    ground_data = GroundFluxTemperature(1.9, 10)
+    pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+    fluid_data = FluidData(mfr=0.2)
+    fluid_data.import_fluid_from_pygfunction(gt.media.Fluid('MPG', 30, 2))
+    load_data = MonthlyBuildingLoadAbsolute(
+        np.array([.176, .174, .141, .1, .045, 0, 0, 0, 0.012, 0.065, 0.123, 0.164]) * 8 * 1350,
+        np.array([0, 0, 0, 0, .112, .205, .27, .264, .149, 0, 0, 0]) * 4 * 700,
+        np.array([1, .991, .802, .566, .264, 0, 0, 0, .0606, .368, .698, .934]) * 8,
+        np.array([0, 0, 0, 0, .415, .756, 1, .976, .549, 0, 0, 0]) * 4
+    )
+
+    # define borefield
+    borefield_tilted = [gt.boreholes.Borehole(150, 0.75, 0.07, -3, 0, math.pi / 7, orientation=math.pi),
+                        gt.boreholes.Borehole(150, 0.75, 0.07, 3, 0, math.pi / 7, orientation=0)]
+
+    # initiate GHEtool object with tilted borefield
+    borefield = Borefield(borefield=borefield_tilted, load=load_data)
+    borefield.set_ground_parameters(ground_data)
+    borefield.set_pipe_parameters(pipe_data)
+    borefield.set_fluid_parameters(fluid_data)
+    borefield.set_max_avg_fluid_temperature(17)
+
+    assert np.isclose(borefield.depth, 150 * math.cos(math.pi / 7) + 0.75)
+    assert np.isclose(borefield.ground_data.calculate_Tg(borefield.depth, borefield.D), 12.157557845032045)
+
+    assert np.isclose(borefield.size_L3(), 111.58488656187147)

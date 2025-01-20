@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added start_depth to the calculation of Tg in all GroundClasses (issue #137).
 - Added property 'depth' to Borefield class (issue #137).
 - Added function 'calculate_depth' to Borefield class (issue #137).
+- Added support for titled boreholes (issue #318).
 
 ## Fixed
 

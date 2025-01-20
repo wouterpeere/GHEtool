@@ -117,9 +117,6 @@ class Borefield(BaseClass):
         self.custom_gfunction: CustomGFunction = custom_gfunction
         self.gfunction_calculation_object: GFunction = GFunction()
 
-        ## params w.r.t. pygfunction
-        self.options_pygfunction: dict = {"method": "equivalent"}
-
         # initialize variables for temperature plotting
         self.results: ResultsMonthly | ResultsHourly = ResultsMonthly()
 
@@ -462,6 +459,8 @@ class Borefield(BaseClass):
         self.r_b = np.average([bor.r_b for bor in borefield])
         self._H = np.average([bor.H for bor in borefield])
         self.avg_tilt = np.average([bor.tilt for bor in borefield])
+        # if not np.isclose(self.avg_tilt, 0):
+        self.gfunction_calculation_object.options['method'] = 'similarities'
         self.gfunction_calculation_object.remove_previous_data()
         unequal_length = np.any([bor.H != borefield[0].H for bor in borefield])
         if unequal_length:
