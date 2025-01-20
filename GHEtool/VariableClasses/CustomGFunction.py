@@ -2,6 +2,7 @@
 This file contains both the CustomGFunction class and all the relevant information w.r.t. custom gfunctions.
 """
 import copy
+import math
 import pickle
 import warnings
 from typing import List, Union
@@ -225,10 +226,10 @@ class CustomGFunction:
 
             # calculate borehole buried depth
             D = np.average([bor.D for bor in borefield])
-            # TODO correct for tilt
+            tilt = np.average([bor.tilt for bor in borefield])
+            depth = borehole_length * math.cos(tilt) + D
             gfunc_uniform_T = gt.gfunction.gFunction(borefield,
-                                                     alpha if isinstance(alpha, float) else alpha(borehole_length + D,
-                                                                                                  D),
+                                                     alpha if isinstance(alpha, float) else alpha(depth, D),
                                                      self.time_array, options=self.options,
                                                      method=self.options["method"])
 
