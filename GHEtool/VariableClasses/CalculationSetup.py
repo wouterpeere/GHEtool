@@ -16,7 +16,7 @@ class CalculationSetup(BaseClass):
 
     __slots__ = '_L2_sizing', '_L3_sizing', '_L4_sizing', 'quadrant_sizing', '_backup', \
         'atol', 'rtol', 'max_nb_of_iterations', 'interpolate_gfunctions', 'H_init', \
-        'use_precalculated_dataset', 'deep_sizing', 'force_deep_sizing'
+        'use_precalculated_dataset', 'deep_sizing', 'force_deep_sizing', 'use_neural_network'
 
     def __init__(self, quadrant_sizing: int = 0,
                  L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None,
