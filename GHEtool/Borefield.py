@@ -1817,7 +1817,7 @@ class Borefield(BaseClass):
             return self.gfunction_calculation_object.calculate(
                 time_value, self.borefield, self.ground_data.alpha(self.depth, self.D),
                 interpolate=self._calculation_setup.interpolate_gfunctions,
-                neural_network=self._calculation_setup.neural_network
+                use_neural_network=self._calculation_setup.use_neural_network
             )
 
         ## 1 bypass any possible precalculated g-functions

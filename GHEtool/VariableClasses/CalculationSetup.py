@@ -23,7 +23,7 @@ class CalculationSetup(BaseClass):
                  atol: float = 0.05, rtol: float = 0.005, max_nb_of_iterations: int = 40,
                  interpolate_gfunctions: bool = None, H_init: float = 100.,
                  use_precalculated_dataset: bool = True, deep_sizing: bool = False,
-                 force_deep_sizing: bool = False):
+                 force_deep_sizing: bool = False, use_neural_network: bool = False):
         """
 
         Parameters
@@ -61,6 +61,9 @@ class CalculationSetup(BaseClass):
             sizing is done again with this other methodology.
         force_deep_sizing : bool
             True when deep_sizing should be done always
+        use_neural_network : bool
+            True if the neural network simplification should be used. This uses a NN trained on previous calculated
+            gvalues.
 
         References
         ----------
@@ -81,6 +84,7 @@ class CalculationSetup(BaseClass):
         self.use_precalculated_dataset: bool = use_precalculated_dataset
         self.deep_sizing: bool = deep_sizing
         self.force_deep_sizing: bool = force_deep_sizing
+        self.use_neural_network: bool = use_neural_network
 
         self._backup: CalculationSetup = None
 
