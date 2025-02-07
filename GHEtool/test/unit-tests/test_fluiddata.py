@@ -17,6 +17,12 @@ def test_fluid_data():
     assert np.isclose(data.vfr, 0.20040080160320642)
 
 
+def test_prandtl():
+    data = FluidData()
+    data.import_fluid_from_pygfunction(gt.media.Fluid('water', 100))
+    assert np.isclose(data.Pr, 7.0030835773088835)
+
+
 def test_fluid_data_equal():
     data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
     data2 = FluidData(0.2, 0.568, 998, 4180, 1e-3)
