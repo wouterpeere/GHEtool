@@ -5,9 +5,15 @@ our [project board](https://github.com/users/wouterpeere/projects/2) on GitHub.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [2.3.1] - 2025-01-23
+## [2.3.2] - unpublished
 
 ## Added
+
+- Added Prandtl number to FluidData class (issue #326).
+
+## [2.3.1] - 2025-01-23
+
+### Added
 
 - __repr__ for every class (issue #310).
 - Added start_depth to calculation of k_s, volumetric_heat_capacity, calculate_value, calculate_Tg and alpha in _
@@ -17,12 +23,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added function 'calculate_depth' to Borefield class (issue #137).
 - Added support for titled boreholes (issue #318).
 
-## Fixed
+### Fixed
 
 - Problem with optimise energy profile (issue #306).
 - Problem with ground parameters in optimise_energy_profile (issue #317).
 
-## Changed
+### Changed
 
 - Make terminology consistent: borehole length != borehole depth (issue #317).
 - _GroundData changed argument of check_depth, k_s, volumetric_heat_capacity, calculate_Tg, calculate_value and alpha
@@ -33,7 +39,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [2.3.0] - 2024-11-05
 
-## Added
+### Added
 
 - Added the Separatus probe.
 - Extra validation based on the work of Ahmadfard & Bernier (issue #243).
@@ -50,7 +56,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added EERCombined for combined active and passive cooling efficiency (issue #291, #296).
 - Cluster Class (issue #298).
 
-## Changed
+### Changed
 
 - No longer support of Python 3.8.
 - Vfr in FluidData now returns also a value if vfr = None based on the mfr.
@@ -70,7 +76,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Optimise load profile works with a variable COP/EER (issue #288).
 - Rename cylindrical_correction.py (issue #298).
 
-## Fixed
+### Fixed
 
 - Problems with optimise_load_profile_energy (issue #255).
 - Fix plot_load_duration (issue #260).
@@ -81,7 +87,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [2.2.2] - 2024-05-16
 
-## Added
+### Added
 
 - Added multiple ground layers (issue #97).
 - Function to create box, U and L-shaped borefields (issue #224).
@@ -90,7 +96,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added optimise_load_profile_energy (issue #229).
 - Added k_p_out to Coaxial Pipe class (issue #239).
 
-## Changed
+### Changed
 
 - Removed set_peak_length from Borefield class (issue #227).
 - Definition of the optimise_load_profile_class (issue #229).
@@ -102,14 +108,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Renamed main_class.py to borefield.py for consistent naming convention (issue #244).
 - Removed parameter 'Tf' from borefield.py since it is no longer needed (issue #249).
 
-## Fixed
+### Fixed
 
 - Small typo's in functions (issue #224).
 - Bug when using borefield with different borehole lengths (issue #233).
 
 ## [2.2.1] - 2024-01-27
 
-## Added
+### Added
 
 - GHEtool is available on conda-forge (issue #107).
 - Possibility to start in another month (issue #140).
@@ -117,13 +123,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Cylindrical borehole correction (issue #187).
 - __add__ functionality for the load classes (issue #202).
 
-## Changed
+### Changed
 
 - Negative reference temperatures for the fluid are now possible (issue #192).
 - Move code related to the GUI to a separate repo (issue #210).
 - Autorelease to PyPi and testPyPi (issue #212).
 
-## Fixed
+### Fixed
 
 - Problem with multiyear hourly data and L3 sizing (issue #153).
 - Problem with negative g-function values (issue #187).
@@ -134,7 +140,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [2.2.0] - 2023-10-17
 
-## Added
+### Added
 
 - Extra warning message if one wants to load a GHEtool file that was created with a newer version.
 - Borehole thermal resistance is now visible at the borehole thermal resistance page (issue #51).
@@ -155,7 +161,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Temperature and flux database (Europe) implemented (issue #178).
 - Yearly heating/cooling load in LoadClass (issue #180).
 
-## Changed
+### Changed
 
 - GUI was moved to a separate project: [ScenarioGUI](https://github.com/tblanke/ScenarioGUI).
 - H_init was removed from the sizing functions since it was not used.
@@ -182,7 +188,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Changed 'minimal average fluid temperature' to 'minimum average fluid temperature' in GUI (issue #172).
 - Max value of SEER is now 1000 (issue #178).
 
-## Fixed
+### Fixed
 
 - Fixed problem with L2 sizing, when the peak load was the same in all months (issue #146).
 - Small bug in faster g-function calculation solved. When changing the borefield, the previously calculated g-functions
