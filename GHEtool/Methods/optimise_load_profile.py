@@ -11,7 +11,7 @@ def optimise_load_profile_power(
         temperature_threshold: float = 0.05,
         use_hourly_resolution: bool = True,
         max_peak_heating: float = None,
-        max_peak_cooling: float = None
+        max_peak_cooling: float = None,
 ) -> tuple[HourlyBuildingLoad, HourlyBuildingLoad]:
     """
     This function optimises the load for maximum power in extraction and injection based on the given borefield and
@@ -66,6 +66,7 @@ def optimise_load_profile_power(
 
     # set initial peak loads
     init_peak_heating: float = borefield.load.max_peak_heating
+    init_peak_dhw: float = borefield.load.max_peak_dhw
     init_peak_cooling: float = borefield.load.max_peak_cooling
 
     # correct for max peak powers
@@ -76,6 +77,7 @@ def optimise_load_profile_power(
 
     # peak loads for iteration
     peak_heat_load: float = init_peak_heating
+    peak_dhw_load: float = init_peak_dhw
     peak_cool_load: float = init_peak_cooling
 
     # set iteration criteria
@@ -88,6 +90,9 @@ def optimise_load_profile_power(
         borefield.load.set_hourly_heating_load(
             np.minimum(peak_heat_load, building_load.hourly_heating_load
             if isinstance(borefield.load, HourlyBuildingLoad) else building_load.hourly_heating_load_simulation_period))
+        borefield.load.set_hourly_dhw_load(
+            np.minimum(peak_dhw_load, building_load.hourly_dhw_load
+            if isinstance(borefield.load, HourlyBuildingLoad) else building_load.hourly_dhw_load_simulation_period))
 
         # calculate temperature profile, just for the results
         borefield.calculate_temperatures(length=borefield.H, hourly=use_hourly_resolution)
@@ -124,6 +129,8 @@ def optimise_load_profile_power(
         np.maximum(0, building_load.hourly_heating_load - borefield.load.hourly_heating_load))
     external_load.set_hourly_cooling_load(
         np.maximum(0, building_load.hourly_cooling_load - borefield.load.hourly_cooling_load))
+    external_load.set_hourly_dhw_load(
+        np.maximum(0, building_load.hourly_dhw_load - borefield.load.hourly_dhw_load))
 
     return borefield.load, external_load
 

@@ -161,6 +161,8 @@ def test_set_hourly_values():
         load.set_hourly_heating_load(np.ones(10))
     with pytest.raises(ValueError):
         load.set_hourly_cooling_load(np.ones(10))
+    with pytest.raises(ValueError):
+        load.set_hourly_dhw_load(np.ones(10))
 
 
 def test_start_month_general():
@@ -244,6 +246,12 @@ def test_dhw():
         load.dhw = 'test'
     with pytest.raises(ValueError):
         load.dhw = np.full(120, 10)
+    with pytest.raises(ValueError):
+        load.set_hourly_dhw_load(-100)
+    with pytest.raises(ValueError):
+        load.set_hourly_dhw_load('test')
+    with pytest.raises(ValueError):
+        load.set_hourly_dhw_load(np.full(120, 10))
 
     assert np.allclose(load.dhw, 0)
     assert np.allclose(load.hourly_dhw_load_simulation_period, np.zeros(87600))
