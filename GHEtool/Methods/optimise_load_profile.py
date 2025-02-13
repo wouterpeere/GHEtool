@@ -213,6 +213,7 @@ def optimise_load_profile_energy(
     # set max peak values
     init_peak_heating = building_load.hourly_heating_load_simulation_period.copy()
     init_peak_cooling = building_load.hourly_cooling_load_simulation_period.copy()
+    init_peak_dhw = building_load.hourly_dhw_load_simulation_period.copy()
 
     # correct for max peak powers
     if max_peak_heating is not None:
@@ -223,22 +224,27 @@ def optimise_load_profile_energy(
     # update loads
     building_load.hourly_heating_load = init_peak_heating
     building_load.hourly_cooling_load = init_peak_cooling
+    building_load.set_hourly_dhw_load(init_peak_dhw)
 
     # set relation qh-qm
     nb_points = 100
 
     power_heating_range = np.linspace(0.001, building_load.max_peak_heating, nb_points)
     power_cooling_range = np.linspace(0.001, building_load.max_peak_cooling, nb_points)
+    power_dhw_range = np.linspace(0.001, building_load.max_peak_dhw, nb_points)
 
     # relationship between the peak load and the corresponding monthly load
     heating_peak_bl = np.zeros((nb_points, 12 * building_load.simulation_period))
     cooling_peak_bl = np.zeros((nb_points, 12 * building_load.simulation_period))
+    dhw_peak_bl = np.zeros((nb_points, 12 * building_load.simulation_period))
 
     for idx in range(nb_points):
         heating_peak_bl[idx] = building_load.resample_to_monthly(
             np.minimum(power_heating_range[idx], building_load.hourly_heating_load_simulation_period))[1]
         cooling_peak_bl[idx] = building_load.resample_to_monthly(
             np.minimum(power_cooling_range[idx], building_load.hourly_cooling_load_simulation_period))[1]
+        dhw_peak_bl[idx] = building_load.resample_to_monthly(
+            np.minimum(power_dhw_range[idx], building_load.hourly_dhw_load_simulation_period))[1]
 
     # create monthly multi-load
     monthly_load = \
@@ -257,6 +263,7 @@ def optimise_load_profile_energy(
     # store initial monthly peak loads
     peak_heating = copy.copy(monthly_load.monthly_peak_heating_simulation_period)
     peak_cooling = copy.copy(monthly_load.monthly_peak_cooling_simulation_period)
+    peak_dhw = copy.copy(monthly_load.monthly_peak_dhw_simulation_period)
 
     for i in range(12 * borefield.load.simulation_period):
         # set iteration criteria
@@ -329,6 +336,8 @@ def optimise_load_profile_energy(
                                            borefield.load.monthly_peak_heating_simulation_period)
     borefield_load.hourly_cooling_load = f(building_load.hourly_cooling_load_simulation_period,
                                            borefield.load.monthly_peak_cooling_simulation_period)
+    borefield_load.set_hourly_dhw_load = f(building_load.hourly_dhw_load_simulation_period,
+                                           borefield.load.monthly_peak_dhw_simulation_period)
 
     # calculate external load
     external_load = HourlyBuildingLoadMultiYear()
@@ -338,5 +347,8 @@ def optimise_load_profile_energy(
     external_load.set_hourly_cooling_load(
         np.maximum(0,
                    building_load_copy.hourly_cooling_load_simulation_period - borefield_load.hourly_cooling_load_simulation_period))
+    external_load.set_hourly_dhw_load(
+        np.maximum(0,
+                   building_load_copy.hourly_dhw_load_simulation_period - borefield_load.hourly_dhw_load_simulation_period))
 
     return borefield_load, external_load
