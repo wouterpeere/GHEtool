@@ -113,7 +113,7 @@ def optimise_load_profile_power(
                             borefield.Tf_min - min(borefield.results.peak_extraction))))
             else:
                 if (dhw_preferential and peak_heat_load != init_peak_heating) or (
-                        not dhw_preferential and 0 == peak_dhw_load):
+                        not dhw_preferential and 0.1 >= peak_dhw_load):
                     peak_heat_load = min(init_peak_heating, peak_heat_load * 1.01)
                 else:
                     peak_dhw_load = min(init_peak_dhw, peak_dhw_load * 1.01)

@@ -619,7 +619,7 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 
                                                    power=True,
                                                    hourly=True, dhw_preferential=False))
 hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_heating=1,
-                                col_cooling=0, col_dhw=0)
+                                col_cooling=0, col_dhw=1)
 hourly_load.set_hourly_heating_load(np.zeros(8760))
 hourly_load.cop_dhw = 10 ** 6
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.976, 66.492,
