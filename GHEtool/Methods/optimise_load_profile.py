@@ -12,6 +12,7 @@ def optimise_load_profile_power(
         use_hourly_resolution: bool = True,
         max_peak_heating: float = None,
         max_peak_cooling: float = None,
+        dhw_preferential: bool = True
 ) -> tuple[HourlyBuildingLoad, HourlyBuildingLoad]:
     """
     This function optimises the load for maximum power in extraction and injection based on the given borefield and
@@ -35,6 +36,8 @@ def optimise_load_profile_power(
         The maximum peak power for the heating (building side) [kW]
     max_peak_cooling : float
         The maximum peak power for the cooling (building side) [kW]
+    dhw_preferential : bool
+        True if heating should first be reduced only after which the dhw share is reduced.
 
     Returns
     -------
@@ -101,11 +104,20 @@ def optimise_load_profile_power(
         if abs(min(borefield.results.peak_extraction) - borefield.Tf_min) > temperature_threshold:
             # check if it goes below the threshold
             if min(borefield.results.peak_extraction) < borefield.Tf_min:
-                peak_heat_load = max(0.1, peak_heat_load - 1 * max(1, 10 * (
-                        borefield.Tf_min - min(borefield.results.peak_extraction))))
+                if (dhw_preferential and peak_heat_load != 0.1) or (not dhw_preferential and peak_dhw_load == 0.1):
+                    # first reduce the peak load in heating before touching the dhw load
+                    peak_heat_load = max(0.1, peak_heat_load - 1 * max(1, 10 * (
+                            borefield.Tf_min - min(borefield.results.peak_extraction))))
+                else:
+                    peak_dhw_load = max(0.1, peak_dhw_load - 1 * max(1, 10 * (
+                            borefield.Tf_min - min(borefield.results.peak_extraction))))
             else:
-                peak_heat_load = min(init_peak_heating, peak_heat_load * 1.01)
-                if peak_heat_load == init_peak_heating:
+                if (dhw_preferential and peak_heat_load != init_peak_heating) or (
+                        not dhw_preferential and init_peak_dhw == peak_dhw_load):
+                    peak_heat_load = min(init_peak_heating, peak_heat_load * 1.01)
+                else:
+                    peak_dhw_load = min(init_peak_dhw, peak_dhw_load * 1.01)
+                if peak_heat_load == init_peak_heating and peak_dhw_load == init_peak_dhw:
                     heat_ok = True
         else:
             heat_ok = True

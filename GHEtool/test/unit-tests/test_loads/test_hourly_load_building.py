@@ -51,11 +51,16 @@ def test_load_hourly_data():
     load1.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_heating=1, col_cooling=0)
     assert np.array_equal(load.hourly_cooling_load, load1.hourly_heating_load)
     assert np.array_equal(load.hourly_heating_load, load1.hourly_cooling_load)
+    assert np.array_equal(load.hourly_dhw_load, load1.hourly_dhw_load)
     load2 = HourlyBuildingLoad()
     load2.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile_without_header.csv"),
                               header=False)
     assert np.array_equal(load.hourly_cooling_load, load2.hourly_cooling_load)
     assert np.array_equal(load.hourly_heating_load, load2.hourly_heating_load)
+    assert np.array_equal(load.hourly_dhw_load, load2.hourly_dhw_load)
+    load2.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile_without_header.csv"),
+                              header=False, col_heating=1, col_cooling=0, col_dhw=1)
+    assert np.allclose(load2.hourly_dhw_load, load2.hourly_heating_load)
 
 
 def test_checks():
