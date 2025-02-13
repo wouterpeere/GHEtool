@@ -29,7 +29,7 @@ def optimise():
     # borefield.print_temperature_profile(plot_hourly=False)
     # optimise the load for a 10x10 field (see data above) and a fixed length of 150m.
     # first for an optimisation based on the power
-    borefield.optimise_load_profile_energy(building_load=load, length=100)
+    borefield.optimise_load_profile_energy(building_load=load)
 
     print(f'Max heating power (primary): {borefield.load.max_peak_extraction:,.0f}kW')
     print(f'Max cooling power (primary): {borefield.load.max_peak_injection:,.0f}kW')
