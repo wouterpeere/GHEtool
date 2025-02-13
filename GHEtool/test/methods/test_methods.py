@@ -61,9 +61,10 @@ def test_optimise(input, result):
                                                                      max_peak_cooling=max_peak_injection)
     percentage_extraction, percentage_injection, peak_extraction_geo, peak_injection_geo, peak_extraction_ext, peak_injection_ext = \
         result
-
-    _percentage_extraction = np.sum(borefield_load.hourly_heating_load_simulation_period) / \
-                             np.sum(load.hourly_heating_load_simulation_period) * 100
+    _percentage_extraction = (np.sum(borefield_load.hourly_heating_load_simulation_period) + np.sum(
+        borefield_load.hourly_dhw_load_simulation_period)) / \
+                             (np.sum(load.hourly_heating_load_simulation_period) + np.sum(
+                                 load.hourly_dhw_load_simulation_period)) * 100
     _percentage_injection = np.sum(borefield_load.hourly_cooling_load_simulation_period) / \
                             np.sum(load.hourly_cooling_load_simulation_period) * 100
     # print(_percentage_extraction)
