@@ -28,7 +28,7 @@ def optimise():
 
     # load the hourly profile
     load = HourlyBuildingLoad(efficiency_heating=5, efficiency_cooling=25)
-    load.load_hourly_profile("hourly_profile.csv", header=True, separator=";")
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), header=True, separator=";")
     load.dhw = 100000  # add domestic hot water
 
     # optimise the load for a 10x10 field (see data above) and a fixed depth of 150m.
