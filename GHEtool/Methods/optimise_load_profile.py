@@ -104,7 +104,7 @@ def optimise_load_profile_power(
         if abs(min(borefield.results.peak_extraction) - borefield.Tf_min) > temperature_threshold:
             # check if it goes below the threshold
             if min(borefield.results.peak_extraction) < borefield.Tf_min:
-                if (dhw_preferential and peak_heat_load != 0.1) or (not dhw_preferential and peak_dhw_load <= 0.1):
+                if (dhw_preferential and peak_heat_load > 0.1) or (not dhw_preferential and peak_dhw_load <= 0.1):
                     # first reduce the peak load in heating before touching the dhw load
                     peak_heat_load = max(0.1, peak_heat_load - 1 * max(1, 10 * (
                             borefield.Tf_min - min(borefield.results.peak_extraction))))
@@ -152,7 +152,8 @@ def optimise_load_profile_energy(
         building_load: Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear],
         temperature_threshold: float = 0.05,
         max_peak_heating: float = None,
-        max_peak_cooling: float = None
+        max_peak_cooling: float = None,
+        dhw_preferential: bool = True
 ) -> tuple[HourlyBuildingLoadMultiYear, HourlyBuildingLoadMultiYear]:
     """
     This function optimises the load for maximum energy extraction and injection based on the given borefield and
@@ -172,6 +173,8 @@ def optimise_load_profile_energy(
         The maximum peak power for heating (building side) [kW]
     max_peak_cooling : float
         The maximum peak power for cooling (building side) [kW]
+    dhw_preferential : bool
+        True if heating should first be reduced only after which the dhw share is reduced.
 
     Returns
     -------
