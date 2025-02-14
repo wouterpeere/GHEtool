@@ -159,6 +159,27 @@ class HourlyBuildingLoadMultiYear(_HourlyDataBuilding):
         """
         self.hourly_heating_load = load
 
+    def set_hourly_dhw_load(self, load: ArrayLike) -> None:
+        """
+        This function sets the hourly domestic hot water load [kWh/h] after it has been checked.
+
+        Parameters
+        ----------
+        load : np.ndarray, list or tuple
+            Hourly dhw load [kWh/h]
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            When either the length is not 8760, the input is not of the correct type, or it contains negative
+            values
+        """
+        self.dhw = load
+
     @property
     def hourly_dhw_load_simulation_period(self) -> np.ndarray:
         """

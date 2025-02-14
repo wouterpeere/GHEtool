@@ -448,7 +448,6 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 
                                                    639.283, 195.053, 37.132, 340.983,
                                                    name='Optimise load profile 1, reversed (power, hourly)', power=True,
                                                    hourly=True))
-
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.999, 72.205,
                                                    676.415, 345.9849, 22.46646, 342.1411,
                                                    name='Optimise load profile 1, reversed (energy)', power=False))
@@ -600,3 +599,46 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 100, 100.0, 
                                                    25.315, 42.2817092190839, 0.0, 64.4014083207306,
                                                    name='Optimise load profile (auditorium) (energy)', power=False,
                                                    hourly=False))
+borefield = Borefield()
+data = GroundConstantTemperature(3, 10)
+borefield.set_ground_parameters(data)
+borefield.set_Rb(0.2)
+borefield.set_borefield(borefield_gt)
+borefield.set_max_avg_fluid_temperature(16)
+borefield.set_min_avg_fluid_temperature(0)
+hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_heating=1,
+                                col_cooling=0)
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.976, 66.492,
+                                                   643.137, 195.331, 33.278, 340.705,
+                                                   name='Optimise load profile 1, reversed (power, dhw not preferential)',
+                                                   power=True,
+                                                   hourly=False, dhw_preferential=False))
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.971, 66.424,
+                                                   639.283, 195.053, 37.132, 340.983,
+                                                   name='Optimise load profile 1, reversed (power, hourly, dhw not preferential)',
+                                                   power=True,
+                                                   hourly=True, dhw_preferential=False))
+hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_heating=1,
+                                col_cooling=0, col_dhw=1)
+hourly_load.set_hourly_heating_load(np.zeros(8760))
+hourly_load.cop_dhw = 10 ** 6
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.976, 66.492,
+                                                   643.137, 195.331, 0, 340.705,
+                                                   name='Optimise load profile 1, reversed (power, dhw load)',
+                                                   power=True,
+                                                   hourly=False, dhw_preferential=False))
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.971, 66.424,
+                                                   639.283, 195.053, 0, 340.983,
+                                                   name='Optimise load profile 1, reversed (power, hourly, dhw load)',
+                                                   power=True,
+                                                   hourly=True, dhw_preferential=False))
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.976, 66.492,
+                                                   643.137, 195.331, 0, 340.705,
+                                                   name='Optimise load profile 1, reversed (power, dhw load, preferential)',
+                                                   power=True,
+                                                   hourly=False, dhw_preferential=True))
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.971, 66.424,
+                                                   639.283, 195.053, 0, 340.983,
+                                                   name='Optimise load profile 1, reversed (power, hourly, dhw load, preferential)',
+                                                   power=True,
+                                                   hourly=True, dhw_preferential=True))

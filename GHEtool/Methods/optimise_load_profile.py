@@ -11,7 +11,8 @@ def optimise_load_profile_power(
         temperature_threshold: float = 0.05,
         use_hourly_resolution: bool = True,
         max_peak_heating: float = None,
-        max_peak_cooling: float = None
+        max_peak_cooling: float = None,
+        dhw_preferential: bool = None
 ) -> tuple[HourlyBuildingLoad, HourlyBuildingLoad]:
     """
     This function optimises the load for maximum power in extraction and injection based on the given borefield and
@@ -35,6 +36,9 @@ def optimise_load_profile_power(
         The maximum peak power for the heating (building side) [kW]
     max_peak_cooling : float
         The maximum peak power for the cooling (building side) [kW]
+    dhw_preferential : bool
+        True if heating should first be reduced only after which the dhw share is reduced.
+        If it is None, then the dhw profile is not optimised and kept constant.
 
     Returns
     -------
@@ -66,6 +70,7 @@ def optimise_load_profile_power(
 
     # set initial peak loads
     init_peak_heating: float = borefield.load.max_peak_heating
+    init_peak_dhw: float = borefield.load.max_peak_dhw
     init_peak_cooling: float = borefield.load.max_peak_cooling
 
     # correct for max peak powers
@@ -76,6 +81,7 @@ def optimise_load_profile_power(
 
     # peak loads for iteration
     peak_heat_load: float = init_peak_heating
+    peak_dhw_load: float = init_peak_dhw
     peak_cool_load: float = init_peak_cooling
 
     # set iteration criteria
@@ -88,6 +94,9 @@ def optimise_load_profile_power(
         borefield.load.set_hourly_heating_load(
             np.minimum(peak_heat_load, building_load.hourly_heating_load
             if isinstance(borefield.load, HourlyBuildingLoad) else building_load.hourly_heating_load_simulation_period))
+        borefield.load.set_hourly_dhw_load(
+            np.minimum(peak_dhw_load, building_load.hourly_dhw_load
+            if isinstance(borefield.load, HourlyBuildingLoad) else building_load.hourly_dhw_load_simulation_period))
 
         # calculate temperature profile, just for the results
         borefield.calculate_temperatures(length=borefield.H, hourly=use_hourly_resolution)
@@ -96,11 +105,23 @@ def optimise_load_profile_power(
         if abs(min(borefield.results.peak_extraction) - borefield.Tf_min) > temperature_threshold:
             # check if it goes below the threshold
             if min(borefield.results.peak_extraction) < borefield.Tf_min:
-                peak_heat_load = max(0.1, peak_heat_load - 1 * max(1, 10 * (
-                        borefield.Tf_min - min(borefield.results.peak_extraction))))
+                if (dhw_preferential and peak_heat_load > 0.1) \
+                        or (not dhw_preferential and peak_dhw_load <= 0.1) \
+                        or dhw_preferential is None:
+                    # first reduce the peak load in heating before touching the dhw load
+                    # if dhw_preferential is None, it is not optimised and kept constant
+                    peak_heat_load = max(0.1, peak_heat_load - 1 * max(1, 10 * (
+                            borefield.Tf_min - min(borefield.results.peak_extraction))))
+                else:
+                    peak_dhw_load = max(0.1, peak_dhw_load - 1 * max(1, 10 * (
+                            borefield.Tf_min - min(borefield.results.peak_extraction))))
             else:
-                peak_heat_load = min(init_peak_heating, peak_heat_load * 1.01)
-                if peak_heat_load == init_peak_heating:
+                if (dhw_preferential and peak_heat_load != init_peak_heating) or (
+                        not dhw_preferential and 0.1 >= peak_dhw_load) or dhw_preferential is None:
+                    peak_heat_load = min(init_peak_heating, peak_heat_load * 1.01)
+                else:
+                    peak_dhw_load = min(init_peak_dhw, peak_dhw_load * 1.01)
+                if peak_heat_load == init_peak_heating and peak_dhw_load == init_peak_dhw:
                     heat_ok = True
         else:
             heat_ok = True
@@ -124,6 +145,8 @@ def optimise_load_profile_power(
         np.maximum(0, building_load.hourly_heating_load - borefield.load.hourly_heating_load))
     external_load.set_hourly_cooling_load(
         np.maximum(0, building_load.hourly_cooling_load - borefield.load.hourly_cooling_load))
+    external_load.set_hourly_dhw_load(
+        np.maximum(0, building_load.hourly_dhw_load - borefield.load.hourly_dhw_load))
 
     return borefield.load, external_load
 
@@ -133,7 +156,7 @@ def optimise_load_profile_energy(
         building_load: Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear],
         temperature_threshold: float = 0.05,
         max_peak_heating: float = None,
-        max_peak_cooling: float = None
+        max_peak_cooling: float = None,
 ) -> tuple[HourlyBuildingLoadMultiYear, HourlyBuildingLoadMultiYear]:
     """
     This function optimises the load for maximum energy extraction and injection based on the given borefield and

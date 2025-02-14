@@ -27,34 +27,35 @@ def optimise():
     borefield.create_rectangular_borefield(10, 10, 6, 6, 150, 1, 0.075)
 
     # load the hourly profile
-    load = HourlyBuildingLoad(efficiency_heating=10 ** 6, efficiency_cooling=10 ** 6)
-    load.load_hourly_profile("hourly_profile.csv", header=True, separator=";")
+    load = HourlyBuildingLoad(efficiency_heating=5, efficiency_cooling=25)
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), header=True, separator=";")
+    load.dhw = 100000  # add domestic hot water
 
     # optimise the load for a 10x10 field (see data above) and a fixed depth of 150m.
     # first for an optimisation based on the power
-    borefield.optimise_load_profile_power(building_load=load, depth=150)
+    borefield.optimise_load_profile_power(building_load=load)
 
-    print(f'Max heating power (primary): {borefield.load.max_peak_extraction:,.0f}kW')
-    print(f'Max cooling power (primary): {borefield.load.max_peak_injection:,.0f}kW')
+    print(f'Max extraction power (primary): {borefield.load.max_peak_extraction:,.0f}kW')
+    print(f'Max injection power (primary): {borefield.load.max_peak_injection:,.0f}kW')
 
     print(
         f'Total energy extracted from the borefield over simulation period: {np.sum(borefield.load.monthly_baseload_extraction_simulation_period):,.0f}MWh')
     print(
-        f'Total energy injected in the borefield over simulation period): {np.sum(borefield.load.monthly_baseload_injection_simulation_period):,.0f}MWh')
+        f'Total energy injected in the borefield over simulation period: {np.sum(borefield.load.monthly_baseload_injection_simulation_period):,.0f}MWh')
     print('------------------------------------------------------------------------')
     borefield.calculate_temperatures(hourly=True)
     borefield.print_temperature_profile(plot_hourly=True)
 
     # first for an optimisation based on the energy
-    borefield.optimise_load_profile_energy(building_load=load, depth=150)
+    borefield.optimise_load_profile_energy(building_load=load)
 
-    print(f'Max heating power (primary): {borefield.load.max_peak_extraction:,.0f}kW')
-    print(f'Max cooling power (primary): {borefield.load.max_peak_injection:,.0f}kW')
+    print(f'Max extraction power (primary): {borefield.load.max_peak_extraction:,.0f}kW')
+    print(f'Max injection power (primary): {borefield.load.max_peak_injection:,.0f}kW')
 
     print(
         f'Total energy extracted from the borefield over simulation period: {np.sum(borefield.load.monthly_baseload_extraction_simulation_period):,.0f}MWh')
     print(
-        f'Total energy injected in the borefield over simulation period): {np.sum(borefield.load.monthly_baseload_injection_simulation_period):,.0f}MWh')
+        f'Total energy injected in the borefield over simulation period: {np.sum(borefield.load.monthly_baseload_injection_simulation_period):,.0f}MWh')
 
     borefield.calculate_temperatures(hourly=True)
     borefield.print_temperature_profile(plot_hourly=True)

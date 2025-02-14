@@ -493,7 +493,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
 
     def load_hourly_profile(
             self, file_path: str, header: bool = True, separator: str = ";", decimal_seperator: str = ".",
-            col_heating: int = 0, col_cooling: int = 1) -> None:
+            col_heating: int = 0, col_cooling: int = 1, col_dhw: int = None) -> None:
         """
         This function loads in an hourly load profile [kW].
 
@@ -511,6 +511,8 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
             Column index for heating data
         col_cooling : int
             Column index for cooling data
+        col_dhw : int
+            Column index for dhw data. None if not applicable
 
         Returns
         -------
@@ -529,6 +531,8 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         # set data
         self.hourly_heating_load = np.array(df.iloc[:, col_heating])
         self.hourly_cooling_load = np.array(df.iloc[:, col_cooling])
+        if col_dhw is not None:
+            self.dhw = np.array(df.iloc[:, col_dhw])
 
     @property
     def max_peak_injection(self) -> float:
