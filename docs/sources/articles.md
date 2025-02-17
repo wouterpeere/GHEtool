@@ -13,12 +13,15 @@ The articles for which this is the case, are:
 articles/HPT_magazine.rst
 ```
 
+> Aitmad, M. (2025). Techno-Economic Analysis of using Ground-Source Heat Exchangers in Pakistan (Master thesis).
+
+> Jahn, A. (2024). Softwarekonzept zur vereinfachten Wärmeplanung von Städten und Quartieren bei variabler Datenbasis (Master thesis).
+
 > Meertens, L. (2024). Reducing Capital Cost for Geothermal Heat Pump Systems Through Dynamic Borefield Sizing. _IEA HPT
 Magazine 42_(2), https://doi.org/10.23697/9r3w-jm57.
 
 > Blanke, T., Born, H., Döring, B. et al. Model for dimensioning borehole heat exchanger applied to
-> mixed-integer-linear-problem (MILP) energy system optimization. _Geotherm Energy_ 12, 30 (
-> 2024). https://doi.org/10.1186/s40517-024-00301-w.
+> mixed-integer-linear-problem (MILP) energy system optimization. _Geotherm Energy_ 12, 30 (2024). https://doi.org/10.1186/s40517-024-00301-w.
 
 > Meertens, L., Peere, W., and Helsen, L. (2024). Influence of short-term dynamic effects on geothermal borefield size.
 > In _Proceedings of International Ground Source Heat Pump Association Conference 2024_. Montr�al (Canada), 28-30 May
