@@ -13,16 +13,17 @@ The articles for which this is the case, are:
 articles/HPT_magazine.rst
 ```
 
-> Meertens, L. (2024). Reducing Capital Cost for Geothermal Heat Pump Systems Through Dynamic Borefield Sizing. _IEA HPT
-Magazine 42_(2), https://doi.org/10.23697/9r3w-jm57.
+> Aitmad, M. (2025). Techno-Economic Analysis of using Ground-Source Heat Exchangers in Pakistan (Master thesis).
+
+> Jahn, A. (2024). Softwarekonzept zur vereinfachten Wärmeplanung von Städten und Quartieren bei variabler Datenbasis (Master thesis).
+
+> Meertens, L. (2024). Reducing Capital Cost for Geothermal Heat Pump Systems Through Dynamic Borefield Sizing. _IEA HPT Magazine 42_(2), https://doi.org/10.23697/9r3w-jm57.
 
 > Blanke, T., Born, H., Döring, B. et al. Model for dimensioning borehole heat exchanger applied to
-> mixed-integer-linear-problem (MILP) energy system optimization. _Geotherm Energy_ 12, 30 (
-> 2024). https://doi.org/10.1186/s40517-024-00301-w.
+> mixed-integer-linear-problem (MILP) energy system optimization. _Geotherm Energy_ 12, 30 (2024). https://doi.org/10.1186/s40517-024-00301-w.
 
 > Meertens, L., Peere, W., and Helsen, L. (2024). Influence of short-term dynamic effects on geothermal borefield size.
-> In _Proceedings of International Ground Source Heat Pump Association Conference 2024_. Montr�al (Canada), 28-30 May
-2024. https://doi.org/10.22488/okstate.24.000004
+> In _Proceedings of International Ground Source Heat Pump Association Conference 2024_. Montr�al (Canada), 28-30 May 2024. https://doi.org/10.22488/okstate.24.000004
 
 > Dion G., Pasquier, P., Perraudin, D. (2024). Sizing equation based on the outlet fluid temperature of closed-loop
 > ground heat exchangers. In Proceedings of International Ground Source Heat Pump Association. Montr�al (Canada), 28-30
@@ -46,12 +47,10 @@ Magazine 42_(2), https://doi.org/10.23697/9r3w-jm57.
 > ESCO-structuren. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
 
 > Hermans, L., Haesen, R., Uytterhoeven, A., Peere, W., Boydens, W., Helsen, L. (2023). Pre-design of collective
-> residential solar districts with seasonal thermal energy storage: Importance of level of detail. _Applied thermal
-engineering_ 226, Art.No. 120203, 10.1016/j.applthermaleng.2023.120203.
+> residential solar districts with seasonal thermal energy storage: Importance of level of detail. _Applied thermal engineering_ 226, Art.No. 120203, 10.1016/j.applthermaleng.2023.120203.
 
 > Cimmino, M., Cook., J. C. (2022). pygfunction 2.2 : New Features and Improvements in Accuracy and Computational
-> Efficiency. In _Proceedings of IGSHPA Research Track 2022_. Las Vegas (USA), 6-8 December
-2022. https://doi.org/10.22488/okstate.22.000015
+> Efficiency. In _Proceedings of IGSHPA Research Track 2022_. Las Vegas (USA), 6-8 December 2022. https://doi.org/10.22488/okstate.22.000015
 
 > Verleyen, L., Peere, W., Michiels, E., Boydens, W., Helsen, L. (2022). The beauty of reason and insight: a story about
 > 30 years old borefield equations. _IEA HPT Magazine 40_(3), 36-39, https://doi.org/10.23697/6q4n-3223
@@ -66,8 +65,7 @@ engineering_ 226, Art.No. 120203, 10.1016/j.applthermaleng.2023.120203.
 > Peere, W. (2022). Technologieën voor de energietransitie. Presented at the Energietransitie in meergezinswoningen en
 > kantoorgebouwen: uitdagingen!, VUB Brussel Bruxelles - U Residence.
 
-> Peere, W., Blanke, T.(2022). GHEtool: An open-source tool for borefield sizing in Python. _Journal of Open Source
-Software, 7_(76), 4406, https://doi.org/10.21105/joss.04406
+> Peere, W., Blanke, T.(2022). GHEtool: An open-source tool for borefield sizing in Python. _Journal of Open Source Software, 7_(76), 4406, https://doi.org/10.21105/joss.04406
 
 > Sharifi., M. (2022). Early-Stage Integrated Design Methods for Hybrid GEOTABS Buildings. PhD thesis, Department of
 > Architecture and Urban Planning, Faculty of Engineering and Architecture, Ghent University.
