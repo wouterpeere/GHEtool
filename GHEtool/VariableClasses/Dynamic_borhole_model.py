@@ -366,7 +366,7 @@ class DynamicsBH(object):
         # Pass radial cell by reference and fill here so that it can be
         # destroyed when this method returns
         radial_cell = np.zeros(shape=(len(CellProps), self.num_cells), dtype=np.double)
-        self.fill_radial_cell(radial_cell, resist_p_eq, resist_f_eq, resist_tg_eq)
+        self.fill_radial_cell(radial_cell, resist_f_eq, resist_tg_eq)
 
         self.t_b = 5 * (self.boreholes[0].r_b) ** 2 / self.ground_ghe.alpha()
 
