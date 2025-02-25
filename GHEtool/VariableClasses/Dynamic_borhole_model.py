@@ -53,7 +53,7 @@ class DynamicsBH(object):
         if number_of_boreholes == 1:
             self.fluid_factor = 1
         else:
-            self.fluid_factor = 3
+            self.fluid_factor = 1
 
         # number of pipes
         # 1 for single U tube, 2 for dubble U tube (not possible yet) 
