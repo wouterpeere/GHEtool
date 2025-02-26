@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Added support for DHW profiles in optimisation (issue #272).
 - Added Prandtl number to FluidData class (issue #326).
+- Pressure drop calculation for horizontal pipe and total system (issue #332).
 
 ## Changed
 
