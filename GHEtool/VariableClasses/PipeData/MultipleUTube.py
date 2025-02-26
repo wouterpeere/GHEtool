@@ -163,7 +163,7 @@ class MultipleUTube(_PipeData):
 
         # add 0.2 for the local losses
         # (source: https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html)
-        return ((fd * (borehole_length * 2) / (2 * self.r_in) + 0.0) * fluid_data.rho * V ** 2 / 2) / 1000
+        return ((fd * (borehole_length * 2) / (2 * self.r_in) + 0.2) * fluid_data.rho * V ** 2 / 2) / 1000
 
     def draw_borehole_internal(self, r_b: float) -> None:
         """
