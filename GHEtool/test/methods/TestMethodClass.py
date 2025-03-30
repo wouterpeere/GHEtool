@@ -28,7 +28,7 @@ class OptimiseLoadProfileObject:
     def __init__(self, borefield: Borefield, load, depth: float, percentage_heating: float,
                  percentage_cooling: float, peak_heating_geo: float, peak_cooling_geo: float,
                  peak_heating_ext: float,
-                 peak_cooling_ext: float, name: str = "", power: bool = True, hourly: bool = True,
+                 peak_cooling_ext: float, name: str = "", power: int = 1, hourly: bool = True,
                  max_peak_heating: float = None,
                  max_peak_cooling: float = None,
                  dhw_preferential: bool = True):

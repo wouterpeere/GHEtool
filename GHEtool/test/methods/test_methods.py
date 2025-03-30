@@ -49,16 +49,31 @@ def test_optimise(input, result):
     model: Borefield = input[0]
     load, depth, power, hourly, max_peak_extraction, max_peak_injection, dhw_preferential = input[1:]
     model.H = depth
-    if power:
+    if power == 1:
+        return
         borefield_load, external_load = optimise_load_profile_power(model, load,
                                                                     use_hourly_resolution=hourly,
                                                                     max_peak_heating=max_peak_extraction,
                                                                     max_peak_cooling=max_peak_injection,
                                                                     dhw_preferential=dhw_preferential)
-    else:
+    elif power == 2:
+        return
         borefield_load, external_load = optimise_load_profile_energy(model, load,
                                                                      max_peak_heating=max_peak_extraction,
                                                                      max_peak_cooling=max_peak_injection)
+
+    elif power == 3:
+        borefield_load, external_load = optimise_load_profile_balance(model, load,
+                                                                      use_hourly_resolution=hourly,
+                                                                      max_peak_heating=max_peak_extraction,
+                                                                      max_peak_cooling=max_peak_injection,
+                                                                      dhw_preferential=dhw_preferential)
+        print("imbalance", borefield_load.imbalance,
+              borefield_load.imbalance / np.maximum(borefield_load.yearly_average_extraction_load,
+                                                    borefield_load.yearly_average_injection_load))
+        model.load = borefield_load
+        model.calculate_temperatures(hourly=True)
+        print(borefield_load.results.min_temperature, borefield_load.results.max_temperature)
     percentage_extraction, percentage_injection, peak_extraction_geo, peak_injection_geo, peak_extraction_ext, peak_injection_ext = \
         result
     _percentage_extraction = (np.sum(borefield_load.hourly_heating_load_simulation_period) + np.sum(
