@@ -8,6 +8,7 @@ The results are returned.
 import numpy as np
 
 from GHEtool import *
+from GHEtool.Methods import *
 
 
 def optimise():
@@ -22,7 +23,8 @@ def optimise():
 
     # optimise the load for a 10x10 field (see data above) and a fixed length of 150m.
     # first for an optimisation based on the power
-    borefield.optimise_load_profile_energy(building_load=load)
+    building_load, _ = optimise_load_profile_energy(borefield, load)
+    borefield.load = building_load
 
     print(f'Max heating power (primary): {borefield.load.max_peak_extraction:,.0f}kW')
     print(f'Max cooling power (primary): {borefield.load.max_peak_injection:,.0f}kW')

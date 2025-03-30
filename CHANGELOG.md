@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## Changed
 
 - Added U-bend to the pressure drop calculation of the pipe (issue #332).
+- Remove optimise_load_power and optimise_load_energy from Borefield object (issue #332).
 
 ## Fixed
 
