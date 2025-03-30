@@ -12,10 +12,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added support for DHW profiles in optimisation (issue #272).
 - Added Prandtl number to FluidData class (issue #326).
 - Pressure drop calculation for horizontal pipe and total system (issue #332).
+- Added optimisation function for balanced borefield (issue #335).
+- Min_temperature and Max_temperature property to results class (issue #335).
 
 ## Changed
 
 - Added U-bend to the pressure drop calculation of the pipe (issue #332).
+
+## Fixed
+
+- Increase accuracy of optimise load profile (issue #335).
 
 ## [2.3.1] - 2025-01-23
 

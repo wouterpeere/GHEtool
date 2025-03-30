@@ -17,8 +17,6 @@ def optimise_load_profile_power(
     """
     This function optimises the load for maximum power in extraction and injection based on the given borefield and
     the given hourly building load. It does so based on a load-duration curve.
-    The temperatures of the borefield are calculated on a monthly basis, even though we have hourly data,
-    for an hourly calculation of the temperatures would take a very long time.
 
     Parameters
     ----------
@@ -115,6 +113,7 @@ def optimise_load_profile_power(
                 else:
                     peak_dhw_load = max(0.1, peak_dhw_load - 1 * max(1, 10 * (
                             borefield.Tf_min - min(borefield.results.peak_extraction))))
+                heat_ok = False
             else:
                 if (dhw_preferential and peak_heat_load != init_peak_heating) or (
                         not dhw_preferential and 0.1 >= peak_dhw_load) or dhw_preferential is None:
@@ -132,6 +131,7 @@ def optimise_load_profile_power(
             if np.max(borefield.results.peak_injection) > borefield.Tf_max:
                 peak_cool_load = max(0.1, peak_cool_load - 1 * max(1, 10 * (
                         -borefield.Tf_max + np.max(borefield.results.peak_injection))))
+                cool_ok = False
             else:
                 peak_cool_load = min(init_peak_cooling, peak_cool_load * 1.01)
                 if peak_cool_load == init_peak_cooling:

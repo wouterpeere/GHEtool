@@ -67,12 +67,15 @@ def test_optimise(input, result):
                                  load.hourly_dhw_load_simulation_period)) * 100
     _percentage_injection = np.sum(borefield_load.hourly_cooling_load_simulation_period) / \
                             np.sum(load.hourly_cooling_load_simulation_period) * 100
-    # print(_percentage_extraction)
-    # print(_percentage_injection)
-    # print(borefield_load.max_peak_extraction)
-    # print(borefield_load.max_peak_injection)
-    # print(external_load.max_peak_heating)
-    # print(external_load.max_peak_cooling)
+    print(_percentage_extraction)
+    print(_percentage_injection)
+    print(borefield_load.max_peak_extraction)
+    print(borefield_load.max_peak_injection)
+    print(external_load.max_peak_heating)
+    print(external_load.max_peak_cooling)
+    model.load = borefield_load
+    model.calculate_temperatures(hourly=True)
+
     assert np.isclose(_percentage_extraction, percentage_extraction)
     assert np.isclose(_percentage_injection, percentage_injection)
     assert np.isclose(borefield_load.max_peak_extraction, peak_extraction_geo)
