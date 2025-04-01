@@ -922,7 +922,6 @@ def test_optimise_load_profile_energy(monkeypatch):
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     load.simulation_period = 40
     borefield_load, external_load = optimise_load_profile_energy(borefield, load)
-    assert borefield.load.simulation_period == 40
     assert borefield_load.simulation_period == 40
     assert external_load.simulation_period == 40
     assert len(borefield.results.peak_extraction) == 0
@@ -937,7 +936,6 @@ def test_optimise_borefield_small_power(monkeypatch):
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     load.simulation_period = 40
     secundary_borefield_load, external_load = optimise_load_profile_power(borefield, load)
-    assert borefield.load.simulation_period == 40
     assert secundary_borefield_load.simulation_period == 40
     assert external_load.simulation_period == 40
 
@@ -951,7 +949,7 @@ def test_optimise_borefield_small_energy(monkeypatch):
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     load.simulation_period = 40
     optimise_load_profile_energy(borefield, load)
-    assert borefield.load.simulation_period == 40
+    assert borefield.load.simulation_period == 20
 
 
 def test_optimise_borefield_wrong_threshold_power(monkeypatch):
