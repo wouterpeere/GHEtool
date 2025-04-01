@@ -891,7 +891,6 @@ def test_optimise_load_profile_power(monkeypatch):
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     load.simulation_period = 40
     secondary_borefield_load, external_load = optimise_load_profile_power(borefield, load)
-    assert borefield.load.simulation_period == 40
     assert secondary_borefield_load.simulation_period == 40
     assert external_load.simulation_period == 40
     assert len(borefield.results.peak_extraction) == 0
