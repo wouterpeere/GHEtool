@@ -771,21 +771,20 @@ borefield.load = load
 borefield.set_ground_parameters(GroundTemperatureGradient(1.9, 10, gradient=2))
 borefield.set_fluid_parameters(FluidData(0.1, 0.475, 1033, 3930, 0.001))
 borefield.set_pipe_parameters(SingleUTube(1.5, 0.016, 0.02, 0.42, 0.04))
-# borefield.print_temperature_profile(plot_hourly=True)
 
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 146, 99.99999, 31.1983,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 99.99999, 31.1983,
                                                    511.59302, 89.29736, 0, 461.62167,
                                                    name='Optimise balance with EER',
                                                    power=3,
                                                    hourly=True, dhw_preferential=None))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 146, 99.99999, 31.1983,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 99.99999, 31.1983,
                                                    511.59302, 89.29736, 0, 461.62167,
                                                    name='Optimise balance with EER and dhw preferential',
                                                    power=3,
                                                    hourly=True, dhw_preferential=True))
 load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_dhw=0, col_cooling=1)
 load.hourly_heating_load = np.zeros(8760)
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 146, 55.7643, 82.92732,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 55.7643, 82.92732,
                                                    115.882806, 250.72453, 0, 467.47916,
                                                    name='Optimise balance with EER and dhw preferential and dhw',
                                                    power=3,
