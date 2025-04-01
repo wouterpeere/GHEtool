@@ -1136,7 +1136,7 @@ def test_optimise_load_borefield():
     borefield.Rb = 0.1699
     ground_data = GroundFluxTemperature(2, 9.6, flux=0.07)
     borefield.ground_data = ground_data
-    borefield_load, external_load = borefield.optimise_load_profile_energy(load)
+    borefield_load, external_load = optimise_load_profile_energy(borefield, load)
     assert np.isclose(borefield_load.imbalance, -229303.76869817785)
     borefield.load = borefield_load
     borefield.calculate_temperatures(hourly=False)
