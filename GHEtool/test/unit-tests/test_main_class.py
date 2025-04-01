@@ -1005,6 +1005,8 @@ def test_optimise_load_profile_balance_errors():
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     with pytest.raises(ValueError):
         optimise_load_profile_balance(borefield, load, temperature_threshold=-0.5)
+    with pytest.raises(ValueError):
+        optimise_load_profile_balance(borefield, load, imbalance_factor=-0.5)
 
 
 def test_load_load():

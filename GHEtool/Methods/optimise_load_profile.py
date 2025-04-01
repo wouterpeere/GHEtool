@@ -353,7 +353,8 @@ def optimise_load_profile_balance(
         use_hourly_resolution: bool = True,
         max_peak_heating: float = None,
         max_peak_cooling: float = None,
-        dhw_preferential: bool = None
+        dhw_preferential: bool = None,
+        imbalance_factor: float = 0.01,
 ) -> tuple[HourlyBuildingLoad, HourlyBuildingLoad]:
     """
     This function optimises the load for maximum power in extraction and injection based on the given borefield and
@@ -378,7 +379,10 @@ def optimise_load_profile_balance(
     dhw_preferential : bool
         True if heating should first be reduced only after which the dhw share is reduced.
         If it is None, then the dhw profile is not optimised and kept constant.
-
+    imbalance_factor : float
+        Maximum allowed imbalance w.r.t. to the maximum of either the heat injection or extraction.
+        It should be given in a range of 0-1.
+        
     Returns
     -------
     tuple [HourlyBuildingLoad, HourlyBuildingLoad]
@@ -399,6 +403,9 @@ def optimise_load_profile_balance(
     # check if threshold is positive
     if temperature_threshold < 0:
         raise ValueError(f"The temperature threshold is {temperature_threshold}, but it cannot be below 0!")
+
+    if imbalance_factor > 1 or imbalance_factor < 0:
+        raise ValueError(f"The imbalance factor is {imbalance_factor}, but it should be between 0-1!")
 
     # since the depth does not change, the Rb* value is constant
     borefield.Rb = borefield.borehole.get_Rb(borefield.H, borefield.D, borefield.r_b,
@@ -446,7 +453,7 @@ def optimise_load_profile_balance(
 
         # deviation from minimum temperature
         if abs(min(borefield.results.peak_extraction) - borefield.Tf_min) > temperature_threshold or \
-                (abs(imbalance) > 0.01 and imbalance < 0):
+                (abs(imbalance) > imbalance_factor and imbalance < 0):
             # check if it goes below the threshold
             if min(borefield.results.peak_extraction) < borefield.Tf_min:
                 if (dhw_preferential and peak_heat_load > 0.1) \
@@ -461,7 +468,7 @@ def optimise_load_profile_balance(
                             borefield.Tf_min - min(borefield.results.peak_extraction))))
                 heat_ok = False
             else:
-                if abs(imbalance) > 0.01 and imbalance < 0:
+                if abs(imbalance) > imbalance_factor and imbalance < 0:
                     # remove imbalance
                     if (dhw_preferential and peak_heat_load > 0.1) \
                             or (not dhw_preferential and peak_dhw_load <= 0.1) \
@@ -471,7 +478,7 @@ def optimise_load_profile_balance(
                         peak_heat_load = peak_heat_load * 0.99
                     else:
                         peak_dhw_load = peak_dhw_load * 0.99
-                elif abs(imbalance) > 0.01 and imbalance > 0:
+                elif abs(imbalance) > imbalance_factor and imbalance > 0:
                     if (dhw_preferential and peak_heat_load != init_peak_heating) or (
                             not dhw_preferential and 0.1 >= peak_dhw_load) or dhw_preferential is None:
                         peak_heat_load = min(init_peak_heating, peak_heat_load * 1.01)
@@ -487,17 +494,17 @@ def optimise_load_profile_balance(
 
         # deviation from maximum temperature
         if abs(np.max(borefield.results.peak_injection) - borefield.Tf_max) > temperature_threshold or \
-                (abs(imbalance) > 0.01 and imbalance > 0):
+                (abs(imbalance) > imbalance_factor and imbalance > 0):
             # check if it goes above the threshold
             if np.max(borefield.results.peak_injection) > borefield.Tf_max:
                 peak_cool_load = max(0.1, peak_cool_load - 1 * max(1, 10 * (
                         -borefield.Tf_max + np.max(borefield.results.peak_injection))))
                 cool_ok = False
             else:
-                if abs(imbalance) > 0.01 and imbalance > 0:
+                if abs(imbalance) > imbalance_factor and imbalance > 0:
                     # remove imbalance
                     peak_cool_load = peak_cool_load * 0.99
-                elif abs(imbalance) > 0.01 and imbalance < 0:
+                elif abs(imbalance) > imbalance_factor and imbalance < 0:
                     peak_cool_load = min(init_peak_cooling, peak_cool_load * 1.01)
                     if peak_cool_load == init_peak_cooling or heat_ok:
                         cool_ok = True
