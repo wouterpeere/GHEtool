@@ -756,3 +756,37 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 
                                                    name='Optimise load profile 1, reversed (balance, hourly, dhw load, preferential)',
                                                    power=3,
                                                    hourly=True, dhw_preferential=True))
+borefield = Borefield()
+eer_combined = EERCombined(20, 5, 10)
+borefield.create_rectangular_borefield(10, 10, 6, 6, 146, 4)
+borefield.set_min_avg_fluid_temperature(0)
+borefield.set_max_avg_fluid_temperature(18)
+borefield.load.peak_duration = 6
+load = HourlyBuildingLoad(efficiency_heating=4, efficiency_cooling=eer_combined)
+# column order is inverted
+load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_heating=1, col_cooling=0)
+load.simulation_period = 40
+load.add_dhw(50000)
+borefield.load = load
+borefield.set_ground_parameters(GroundTemperatureGradient(1.9, 10, gradient=2))
+borefield.set_fluid_parameters(FluidData(0.1, 0.475, 1033, 3930, 0.001))
+borefield.set_pipe_parameters(SingleUTube(1.5, 0.016, 0.02, 0.42, 0.04))
+# borefield.print_temperature_profile(plot_hourly=True)
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.949, 41.871,
+                                                   624.26656, 108.333, 0, 427.703,
+                                                   name='Optimise balance with EER',
+                                                   power=3,
+                                                   hourly=True, dhw_preferential=None))
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.949, 41.871,
+                                                   624.26656, 108.333, 0, 427.703,
+                                                   name='Optimise balance with EER and dhw preferential',
+                                                   power=3,
+                                                   hourly=True, dhw_preferential=True))
+load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_dhw=0, col_cooling=1)
+load.hourly_heating_load = np.zeros(8760)
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.949, 41.871,
+                                                   624.26656, 108.333, 0, 427.703,
+                                                   name='Optimise balance with EER and dhw preferential and dhw',
+                                                   power=3,
+                                                   hourly=True, dhw_preferential=True))

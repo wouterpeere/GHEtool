@@ -997,6 +997,16 @@ def test_optimise_load_profile_energy_without_data():
         optimise_load_profile_energy(borefield, MonthlyGeothermalLoadAbsolute())
 
 
+def test_optimise_load_profile_balance_errors():
+    borefield = Borefield()
+    with pytest.raises(ValueError):
+        optimise_load_profile_balance(borefield, MonthlyGeothermalLoadAbsolute())
+    load = HourlyBuildingLoad(efficiency_heating=10 ** 6, efficiency_cooling=10 * 66)
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    with pytest.raises(ValueError):
+        optimise_load_profile_balance(borefield, load, temperature_threshold=-0.5)
+
+
 def test_load_load():
     borefield1 = Borefield()
     borefield2 = Borefield()
