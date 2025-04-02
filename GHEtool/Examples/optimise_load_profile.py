@@ -8,6 +8,7 @@ The results are returned.
 import numpy as np
 
 from GHEtool import *
+from GHEtool.Methods import *
 
 
 def optimise():
@@ -33,7 +34,8 @@ def optimise():
 
     # optimise the load for a 10x10 field (see data above) and a fixed depth of 150m.
     # first for an optimisation based on the power
-    borefield.optimise_load_profile_power(building_load=load)
+    building_load, _ = optimise_load_profile_power(borefield, load)
+    borefield.load = building_load
 
     print(f'Max extraction power (primary): {borefield.load.max_peak_extraction:,.0f}kW')
     print(f'Max injection power (primary): {borefield.load.max_peak_injection:,.0f}kW')
@@ -47,7 +49,23 @@ def optimise():
     borefield.print_temperature_profile(plot_hourly=True)
 
     # first for an optimisation based on the energy
-    borefield.optimise_load_profile_energy(building_load=load)
+    building_load, _ = optimise_load_profile_energy(borefield, load)
+    borefield.load = building_load
+
+    print(f'Max extraction power (primary): {borefield.load.max_peak_extraction:,.0f}kW')
+    print(f'Max injection power (primary): {borefield.load.max_peak_injection:,.0f}kW')
+
+    print(
+        f'Total energy extracted from the borefield over simulation period: {np.sum(borefield.load.monthly_baseload_extraction_simulation_period):,.0f}MWh')
+    print(
+        f'Total energy injected in the borefield over simulation period: {np.sum(borefield.load.monthly_baseload_injection_simulation_period):,.0f}MWh')
+
+    borefield.calculate_temperatures(hourly=True)
+    borefield.print_temperature_profile(plot_hourly=True)
+
+    # first for an optimisation based on the balance
+    building_load, _ = optimise_load_profile_balance(borefield, load)
+    borefield.load = building_load
 
     print(f'Max extraction power (primary): {borefield.load.max_peak_extraction:,.0f}kW')
     print(f'Max injection power (primary): {borefield.load.max_peak_injection:,.0f}kW')
