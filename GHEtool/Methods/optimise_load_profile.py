@@ -381,7 +381,7 @@ def optimise_load_profile_balance(
         If it is None, then the dhw profile is not optimised and kept constant.
     imbalance_factor : float
         Maximum allowed imbalance w.r.t. to the maximum of either the heat injection or extraction.
-        It should be given in a range of 0-1.
+        It should be given in a range of 0-1. At 1, it converges to the solution for optimise for power.
         
     Returns
     -------
