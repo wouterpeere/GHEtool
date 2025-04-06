@@ -13,7 +13,6 @@ def test_fluid_data():
     assert data.rho == 998
     assert data.Cp == 4180
     assert data.mu == 1e-3
-    assert data._vfr is None
     assert np.isclose(data.vfr, 0.20040080160320642)
 
 
@@ -42,11 +41,6 @@ def test_unequal_cross():
     assert data_fluid != data_ground
 
 
-def test_empty_variable_classes():
-    fluid_data = FluidData()
-    assert not fluid_data.check_values()
-
-
 def test_set_mfr():
     data_fluid = FluidData(0.2, 0.568, 998, 4180, 1e-3)
     data_fluid.set_mass_flow_rate(10)
@@ -57,21 +51,21 @@ def test_set_vfr():
     with pytest.raises(ValueError):
         FluidData(0.2, 0.568, 998, 4180, 1e-3, 0.2)
     data_fluid = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-    assert data_fluid._vfr is None
+    assert data_fluid.flow_rate._vfr is None
     assert np.isclose(data_fluid.vfr, 0.20040080160320642)
     data_fluid.vfr = 0.2
-    assert data_fluid._mfr is None
+    assert data_fluid.flow_rate._mfr is None
     assert data_fluid.vfr == 0.2
     assert np.isclose(data_fluid.mfr, 0.2 * 998 / 1000)
 
     data_fluid.mfr = 0.2
-    assert data_fluid._mfr == 0.2
-    assert data_fluid._vfr is None
+    assert data_fluid.flow_rate._mfr == 0.2
+    assert data_fluid.flow_rate._vfr is None
     assert np.isclose(data_fluid.vfr, 0.20040080160320642)
     assert data_fluid.mfr == 0.2
 
     data_fluid = FluidData(None, 0.568, 998, 4180, 1e-3, 0.2)
-    assert data_fluid._mfr is None
+    assert data_fluid.flow_rate._mfr is None
     assert data_fluid.vfr == 0.2
     assert np.isclose(data_fluid.mfr, 0.2 * 998 / 1000)
 

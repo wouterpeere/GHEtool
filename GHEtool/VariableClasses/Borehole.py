@@ -76,7 +76,8 @@ class Borehole(BaseClass):
 
         Returns
         -------
-        Reynolds number : float
+        float
+            Reynolds number
         """
         return self.pipe_data.Re(self.fluid_data)
 
