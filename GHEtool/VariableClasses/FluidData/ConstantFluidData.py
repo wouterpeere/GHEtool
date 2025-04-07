@@ -7,9 +7,10 @@ class ConstantFluidData(_FluidData, BaseClass):
     Contains information regarding the fluid data of the borefield, assuming there is no temperature dependency.
     """
 
-    __slots__ = '_k_f', '_rho', '_cp', '_mu'
+    __slots__ = '_k_f', '_rho', '_cp', '_mu', '_freezing_point'
+    __allow_none__ = '_freezing_point'
 
-    def __init__(self, k_f: float, rho: float, cp: float, mu: float):
+    def __init__(self, k_f: float, rho: float, cp: float, mu: float, freezing_point: float = None):
         """
 
         Parameters
@@ -22,11 +23,14 @@ class ConstantFluidData(_FluidData, BaseClass):
             Thermal capacity of the fluid [J/(kgK)]
         mu : float
             Dynamic viscosity of the fluid [Pa.s]
+        freezing_point : float
+            Freezing point of the fluid (optional) [°C]
         """
         self._k_f: float = k_f  # Thermal conductivity W/(mK)
-        self._rho: float = rho  # Density kg/m3
+        self._rho: float = rho  # Density kg/m^3
         self._cp: float = cp  # Thermal capacity J/(kgK)
         self._mu: float = mu  # Dynamic viscosity Pa.s
+        super().__init__(freezing_point)
 
     def k_f(self, **kwargs) -> float:
         """
@@ -78,3 +82,14 @@ class ConstantFluidData(_FluidData, BaseClass):
         if self._k_f != other._k_f or self._mu != other._mu or self._rho != other._rho or self._cp != other._cp:
             return False
         return True
+
+    def __repr__(self):
+        return {
+            'k_f': self.k_f(),
+            'rho': self.rho(),
+            'cp': self.cp(),
+            'mu': self.mu(),
+            'nu': self.nu(),
+            'Pr': self.Pr(),
+            'freezing_point': self.freezing_point
+        }

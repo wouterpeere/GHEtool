@@ -10,6 +10,7 @@ mentioned are the ones with which the code is tested)
 * pandas >= 1.4.3
 * pygfunction >= 2.2.3
 * scipy >= 1.8.1
+* secondarycoolantprops >= 1.1
 
 For the tests
 

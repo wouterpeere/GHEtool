@@ -68,6 +68,7 @@ mentioned are the ones with which the code is tested)
 * pandas >= 1.4.3
 * pygfunction >= 2.2.3
 * scipy >= 1.8.1
+* secondarycoolantprops >= 1.1
 
 For the tests
 
@@ -396,16 +397,19 @@ KU Leuven, Belgium.
 
 Aitmad, M. (2025). Techno-Economic Analysis of using Ground-Source Heat Exchangers in Pakistan (Master thesis).
 
-Jahn, A. (2024). Softwarekonzept zur vereinfachten Wärmeplanung von Städten und Quartieren bei variabler Datenbasis (Master thesis).
+Jahn, A. (2024). Softwarekonzept zur vereinfachten Wärmeplanung von Städten und Quartieren bei variabler Datenbasis (
+Master thesis).
 
 Meertens, L. (2024). Reducing Capital Cost for Geothermal Heat Pump Systems Through Dynamic Borefield Sizing. _IEA HPT
 Magazine 42_(2), https://doi.org/10.23697/9r3w-jm57.
 
 Blanke, T., Born, H., Döring, B. et al. Model for dimensioning borehole heat exchanger applied to
-mixed-integer-linear-problem (MILP) energy system optimization. _Geotherm Energy_ 12, 30 (2024). https://doi.org/10.1186/s40517-024-00301-w.
+mixed-integer-linear-problem (MILP) energy system optimization. _Geotherm Energy_ 12, 30 (
+2024). https://doi.org/10.1186/s40517-024-00301-w.
 
 Dion G., Pasquier, P., Perraudin, D. (2024). Sizing equation based on the outlet fluid temperature of closed-loop ground
-heat exchangers. In _Proceedings of International Ground Source Heat Pump Association_. Montréal (Canada), 28-30 May 2024.
+heat exchangers. In _Proceedings of International Ground Source Heat Pump Association_. Montréal (Canada), 28-30 May
+2024.
 
 Peere, W. (2024). Are Rules of Thumb Misleading? The Complexity of Borefield Sizing and the Importance of Design
 Software. _IEA HPT Magazine 42_(1), https://doi.org/10.23697/7nec-0g78.
@@ -421,7 +425,8 @@ residential solar districts with seasonal thermal energy storage: Importance of 
 engineering_ 226, Art.No. 120203, 10.1016/j.applthermaleng.2023.120203
 
 Cimmino, M., Cook., J. C. (2022). pygfunction 2.2 : New Features and Improvements in Accuracy and Computational
-Efficiency. In _Proceedings of IGSHPA Research Track 2022_. Las Vegas (USA), 6-8 December 2022. https://doi.org/10.22488/okstate.22.000015.
+Efficiency. In _Proceedings of IGSHPA Research Track 2022_. Las Vegas (USA), 6-8 December
+2022. https://doi.org/10.22488/okstate.22.000015.
 
 Verleyen, L., Peere, W., Michiels, E., Boydens, W., Helsen, L. (2022). The beauty of reason and insight: a story about
 30 years old borefield equations. _IEA HPT Magazine 40_(3), 36-39, https://doi.org/10.23697/6q4n-3223.

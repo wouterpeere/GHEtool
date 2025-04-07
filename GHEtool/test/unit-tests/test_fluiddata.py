@@ -97,3 +97,67 @@ def test_repr_():
            '\tThermal capacity of the fluid [J/(kg·K)]: 4180.000\n' \
            '\tDynamic viscosity [Pa·s]: 0.001\n' \
            '\tVolume flow rate [l/s]: 0.2' == data_fluid.__repr__()
+
+
+def test_constant_fluid_data():
+    fluid = ConstantFluidData(0.568, 998, 4180, 1e-3)
+    assert fluid.k_f() == 0.568
+    assert fluid.rho() == 998
+    assert fluid.cp() == 4180
+    assert fluid.mu() == 1e-3
+    assert fluid.freezing_point is None
+    assert fluid.k_f(temperature=0) == 0.568
+    assert fluid.rho(temperature=0) == 998
+    assert fluid.cp(temperature=0) == 4180
+    assert fluid.mu(temperature=0) == 1e-3
+    fluid = ConstantFluidData(0.568, 998, 4180, 1e-3, -5)
+    assert fluid.freezing_point == -5
+
+
+def test_check_constant_fluid_data():
+    fluid = ConstantFluidData(0.568, 998, 4180, 1e-3)
+    assert fluid.check_values()
+
+
+def test_equal():
+    fluid1 = ConstantFluidData(0.568, 998, 4180, 1e-3)
+    fluid2 = ConstantFluidData(0.568, 998, 4180, 2e-3)
+    fluid3 = ConstantFluidData(0.568, 998, 4180, 1e-3)
+    fluid = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    assert fluid2 != fluid1
+    assert fluid1 == fluid3
+    assert fluid != fluid1
+
+
+def test_repr_constant_fluid_data():
+    fluid = ConstantFluidData(0.568, 998, 4180, 1e-3)
+    assert fluid.__repr__() == {'Pr': 7.359154929577465,
+                                'cp': 4180,
+                                'freezing_point': None,
+                                'k_f': 0.568,
+                                'mu': 0.001,
+                                'nu': 1.002004008016032e-06,
+                                'rho': 998}
+
+
+def test_repr_temperature_dependent_fluid_data():
+    fluid = TemperatureDependentFluidData('MPG', 25)
+    assert fluid.__repr__() == {'name': 'MPG', 'percentage': 25}
+
+
+def test_check_values_temperature_dependent_fluid_data():
+    fluid = TemperatureDependentFluidData('MPG', 25)
+    assert fluid.check_values()
+
+
+def test_eq_temperature_dependent_fluid_data():
+    fluid = TemperatureDependentFluidData('MPG', 25)
+    fluid1 = TemperatureDependentFluidData('MPG', 35)
+    fluid2 = TemperatureDependentFluidData('MEG', 25)
+    fluid3 = TemperatureDependentFluidData('MPG', 25)
+    fluid4 = ConstantFluidData(0.568, 998, 4180, 1e-3)
+
+    assert fluid != fluid4
+    assert fluid != fluid1
+    assert fluid == fluid3
+    assert fluid != fluid2

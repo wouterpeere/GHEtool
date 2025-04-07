@@ -5,7 +5,7 @@ from GHEtool.VariableClasses.BaseClass import BaseClass
 
 class ConstantFlowRate(_FlowRateData, BaseClass):
 
-    def __init__(self, mfr: float = None, vfr: float = None):
+    def __init__(self, *, mfr: float = None, vfr: float = None):
         """
 
         Parameters
@@ -46,7 +46,7 @@ class ConstantFlowRate(_FlowRateData, BaseClass):
             return self._vfr
         if fluid_data is None:
             raise ValueError(
-                'The volume flow rate is based on the volume flow rate, so both fluid data and reference temperature is needed.')
+                'The volume flow rate is based on the volume flow rate, the fluid data is needed.')
         return self.mfr(**kwargs) / fluid_data.rho(**kwargs) * 1000
 
     def mfr(self, fluid_data: _FluidData = None, **kwargs) -> float:
@@ -73,8 +73,11 @@ class ConstantFlowRate(_FlowRateData, BaseClass):
             return self._mfr
         if fluid_data is None:
             raise ValueError(
-                'The mass flow rate is based on the volume flow rate, so both fluid data and reference temperature is needed.')
+                'The mass flow rate is based on the volume flow rate, so the fluid data is needed.')
         return self.vfr(**kwargs) / 1000 * fluid_data.rho(**kwargs)
+
+    def check_values(self) -> bool:
+        return self._vfr is not None or self._mfr is not None
 
     def __eq__(self, other):
         if not isinstance(other, ConstantFlowRate):
@@ -82,3 +85,9 @@ class ConstantFlowRate(_FlowRateData, BaseClass):
         if self._vfr != other._vfr or self._mfr != other._mfr:
             return False
         return True
+
+    def __repr__(self):
+        if self._mfr is not None:
+            return {'mfr': self.mfr()}
+        if self._vfr is not None:
+            return {'vfr': self.vfr()}

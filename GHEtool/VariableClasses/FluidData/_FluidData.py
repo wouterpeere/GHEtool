@@ -10,6 +10,16 @@ class _FluidData(ABC):
     Contains information regarding the fluid data of the borefield.
     """
 
+    def __init__(self, freezing_point: float):
+        """
+
+        Parameters
+        ----------
+        freezing_point : float
+            Freezing point of the fluid °C
+        """
+        self._freezing_point = freezing_point
+        
     @abc.abstractmethod
     def k_f(self, **kwargs) -> float:
         """
@@ -53,6 +63,18 @@ class _FluidData(ABC):
         float
             Dynamic viscosity [Pa.s]
         """
+
+    @property
+    def freezing_point(self) -> float:
+        """
+        This function returns the freezing point of the fluid in °C.
+
+        Returns
+        -------
+        float
+            Freezing point °C
+        """
+        return self._freezing_point
 
     def nu(self, **kwargs) -> float:
         """

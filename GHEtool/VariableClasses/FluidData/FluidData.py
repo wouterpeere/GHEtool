@@ -4,6 +4,7 @@ This document contains the variable classes for the fluid data.
 from __future__ import annotations
 
 import pygfunction as gt
+import warnings
 
 from GHEtool.VariableClasses.BaseClass import BaseClass
 from GHEtool.VariableClasses.FluidData import ConstantFluidData
@@ -38,8 +39,10 @@ class FluidData(BaseClass):
         vfr : float
             Volume flow rate per borehole [l/s]
         """
+        warnings.warn('This class will be depreciated in a future version. Please use the ConstantFluidData and '
+                      'ConstantFlowRate class.', DeprecationWarning)
 
-        self.flow_rate = ConstantFlowRate(mfr, vfr)
+        self.flow_rate = ConstantFlowRate(mfr=mfr, vfr=vfr)
         self.fluid_data = ConstantFluidData(k_f, rho, Cp, mu)
 
     @property
