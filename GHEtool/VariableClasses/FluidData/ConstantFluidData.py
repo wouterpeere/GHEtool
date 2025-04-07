@@ -85,11 +85,11 @@ class ConstantFluidData(_FluidData, BaseClass):
 
     def __repr__(self):
         return {
-            'k_f': self.k_f(),
-            'rho': self.rho(),
-            'cp': self.cp(),
-            'mu': self.mu(),
-            'nu': self.nu(),
+            'k_f [W/(m·K)]': self.k_f(),
+            'rho [kg/m³]': self.rho(),
+            'cp [J/(kg·K)]': self.cp(),
+            'mu [Pa·s]': self.mu(),
+            'nu [m²/s]': self.nu(),
             'Pr': self.Pr(),
-            'freezing_point': self.freezing_point
+            'freezing_point [°C]': self.freezing_point
         }

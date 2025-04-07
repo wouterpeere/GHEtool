@@ -62,5 +62,5 @@ class Separatus(SingleUTube):
         return single_u
 
     def __repr__(self):
-        return 'Separatus heat exchanger\n' \
-               f'\tGrout conductivity [W/(m·K)]: {self.k_g}'
+        return {'type': 'Separatus',
+                'k_g [W/(m·K)]': self.k_g}

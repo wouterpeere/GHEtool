@@ -88,6 +88,6 @@ class ConstantFlowRate(_FlowRateData, BaseClass):
 
     def __repr__(self):
         if self._mfr is not None:
-            return {'mfr': self.mfr()}
+            return {'mfr [kg/s]': self.mfr()}
         if self._vfr is not None:
-            return {'vfr': self.vfr()}
+            return {'vfr [l/s]': self.vfr()}

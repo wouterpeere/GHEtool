@@ -5,9 +5,16 @@ our [project board](https://github.com/users/wouterpeere/projects/2) on GitHub.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [2.3.3] - Unpublished
+
+### Added
+
+- Freezing point to fluid data (issue #314).
+- Temperature dependent fluid properties (issue #143).
+
 ## [2.3.2] - 2025-04-02
 
-## Added
+### Added
 
 - Added support for DHW profiles in optimisation (issue #272).
 - Added Prandtl number to FluidData class (issue #326).
@@ -15,12 +22,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added optimisation function for balanced borefield (issue #335).
 - Min_temperature and Max_temperature property to results class (issue #335).
 
-## Changed
+### Changed
 
 - Added U-bend to the pressure drop calculation of the pipe (issue #332).
 - Remove optimise_load_power and optimise_load_energy from Borefield object (issue #332).
 
-## Fixed
+### Fixed
 
 - Increase accuracy of optimise load profile (issue #335).
 
@@ -398,6 +405,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 
 - fixed bug in interpolation
+
+[2.3.2]: https://github.com/wouterpeere/GHEtool/compare/v2.3.1...v2.3.2
 
 [2.3.1]: https://github.com/wouterpeere/GHEtool/compare/v2.3.0...v2.3.1
 

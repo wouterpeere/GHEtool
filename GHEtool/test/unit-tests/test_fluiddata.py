@@ -132,12 +132,31 @@ def test_equal():
 def test_repr_constant_fluid_data():
     fluid = ConstantFluidData(0.568, 998, 4180, 1e-3)
     assert fluid.__repr__() == {'Pr': 7.359154929577465,
-                                'cp': 4180,
-                                'freezing_point': None,
-                                'k_f': 0.568,
-                                'mu': 0.001,
-                                'nu': 1.002004008016032e-06,
-                                'rho': 998}
+                                'cp [J/(kg·K)]': 4180,
+                                'freezing_point [°C]': None,
+                                'k_f [W/(m·K)]': 0.568,
+                                'mu [Pa·s]': 0.001,
+                                'nu [m²/s]': 1.002004008016032e-06,
+                                'rho [kg/m³]': 998}
+
+
+def test_temperature_dependent_fluid_data():
+    for fluid_str in ('Water', 'MEG', 'MPG', 'MMA', 'MEA'):
+        for percentage in (10, 20, 30):
+            for temperature in (1, 5, 20):
+                fluid = TemperatureDependentFluidData(fluid_str, percentage)
+                fluid_gt = gt.media.Fluid(fluid_str, percentage, temperature)
+                assert fluid.k_f(temperature) == fluid_gt.thermal_conductivity()
+                assert fluid.cp(temperature) == fluid_gt.specific_heat_capacity()
+                assert fluid.rho(temperature) == fluid_gt.density()
+                assert fluid.mu(temperature) == fluid_gt.dynamic_viscosity()
+
+
+def test_create_constant():
+    fluid = TemperatureDependentFluidData('MPG', 25)
+    constant_fluid = fluid.create_constant(20)
+    assert constant_fluid == ConstantFluidData(0.4678524157362136, 1019.2776018578963, 3920.4675131518143,
+                                               0.0024452321100532394, -9.786660880295903)
 
 
 def test_repr_temperature_dependent_fluid_data():
