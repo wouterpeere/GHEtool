@@ -6,11 +6,11 @@ import pygfunction as gt
 from GHEtool import *
 from GHEtool.VariableClasses.PipeData import _PipeData
 from GHEtool.VariableClasses.FluidData import _FluidData
-from GHEtool.VariableClasses.FlowRateData import _FlowRateData
+from GHEtool.VariableClasses.FlowRateData import _FlowData
 from math import pi
 
 
-def calculate_pressure_drop_horizontal(fluid_data: _FluidData, flow_rate_data: _FlowRateData, r_in: float,
+def calculate_pressure_drop_horizontal(fluid_data: _FluidData, flow_rate_data: _FlowData, r_in: float,
                                        length: float, minor_losses: float, **kwargs) -> float:
     """
     This function calculates the pressure drop in the horizontal pipe.
@@ -46,7 +46,7 @@ def calculate_pressure_drop_horizontal(fluid_data: _FluidData, flow_rate_data: _
     return ((fd * length / (2 * r_in) + minor_losses) * fluid_data.rho(**kwargs) * V ** 2 / 2) / 1000
 
 
-def calculate_total_pressure_drop(pipe_data: _PipeData, fluid_data: _FluidData, flow_rate_data: _FlowRateData,
+def calculate_total_pressure_drop(pipe_data: _PipeData, fluid_data: _FluidData, flow_rate_data: _FlowData,
                                   borehole_length: float,
                                   r_in: float, distance: float, minor_losses: float, **kwargs) -> float:
     """
@@ -80,7 +80,7 @@ def calculate_total_pressure_drop(pipe_data: _PipeData, fluid_data: _FluidData, 
         calculate_pressure_drop_horizontal(fluid_data, flow_rate_data, r_in, distance * 2, minor_losses, **kwargs)
 
 
-def create_pressure_drop_curve(pipe_data: _PipeData, fluid_data: _FluidData, flow_rate_data: _FlowRateData,
+def create_pressure_drop_curve(pipe_data: _PipeData, fluid_data: _FluidData, flow_rate_data: _FlowData,
                                borehole_length: float,
                                r_in: float, distance: float, minor_losses: float, range: float = 2,
                                datapoints: int = 30, **kwargs) -> tuple:

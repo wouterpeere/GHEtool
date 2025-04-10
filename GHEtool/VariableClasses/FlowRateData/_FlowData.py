@@ -2,7 +2,7 @@ import abc
 from abc import ABC
 
 
-class _FlowRateData(ABC):
+class _FlowData(ABC):
 
     @abc.abstractmethod
     def vfr(self, **kwargs):

@@ -9,7 +9,6 @@ import pytest
 
 from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, DoubleUTube, Borefield, \
     CalculationSetup, FOLDER, MultipleUTube, EERCombined
-from GHEtool.logger import ghe_logger
 from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad, HourlyBuildingLoad, \
     HourlyBuildingLoadMultiYear, MonthlyBuildingLoadAbsolute
@@ -54,15 +53,6 @@ def test_set_investment_cost():
     assert borefield.cost_investment == Borefield.DEFAULT_INVESTMENT
     borefield.set_investment_cost([0, 39])
     assert borefield.cost_investment == [0, 39]
-
-
-def test_logging():
-    borefield = Borefield()
-    assert ghe_logger.level == 20
-    borefield.activate_logger()
-    assert ghe_logger.level == 15
-    borefield.deactivate_logger()
-    assert ghe_logger.level == 20
 
 
 def test_nb_of_boreholes():

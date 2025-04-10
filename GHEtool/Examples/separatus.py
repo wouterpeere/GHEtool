@@ -16,8 +16,8 @@ from GHEtool import *
 
 # set general parameters
 ground_data = GroundFluxTemperature(1.9, 9.6, flux=0.07)
-fluid_data = FluidData(mfr=0.3)
-fluid_data.import_fluid_from_pygfunction(gt.media.Fluid('MPG', 0, 6))
+flow_data = ConstantFlowRate(mfr=0.3)
+fluid_data = TemperatureDependentFluidData('MPG', 0)
 
 # set building load
 load = MonthlyBuildingLoadAbsolute(

@@ -1,9 +1,9 @@
-from GHEtool.VariableClasses.FlowRateData._FlowRateData import _FlowRateData
+from GHEtool.VariableClasses.FlowRateData._FlowData import _FlowData
 from GHEtool.VariableClasses.FluidData._FluidData import _FluidData
 from GHEtool.VariableClasses.BaseClass import BaseClass
 
 
-class ConstantFlowRate(_FlowRateData, BaseClass):
+class ConstantFlowRate(_FlowData, BaseClass):
 
     def __init__(self, *, mfr: float = None, vfr: float = None):
         """

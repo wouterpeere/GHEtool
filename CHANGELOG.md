@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 
 - The __repr__ of the different classes. It now returns a dictionary.
+- Remove ghe_logger since no longer used.
 
 ## [2.3.2] - 2025-04-02
 

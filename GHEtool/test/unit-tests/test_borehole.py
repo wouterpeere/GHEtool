@@ -73,7 +73,7 @@ def test_calculate_Rb():
     borehole = Borehole()
     borehole.pipe_data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2)
     borehole.fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
-    borehole.flow_rate_data = ConstantFlowRate(mfr=0.2)
+    borehole.flow_data = ConstantFlowRate(mfr=0.2)
 
     assert np.isclose(borehole.calculate_Rb(100, 1, 0.075, 3), 0.09483159131195469)
 
@@ -90,7 +90,7 @@ def test_Rb():
     # set pipe and fluid data
     borehole.fluid_data = fluid_data
     borehole.pipe_data = pipe_data
-    borehole.flow_rate_data = flow_data
+    borehole.flow_data = flow_data
 
     assert np.isclose(borehole.calculate_Rb(100, 1, 0.075, 3), 0.09483159131195469)
 
@@ -101,7 +101,7 @@ def test_Rb():
     # set pipe and fluid data
     borehole.fluid_data = fluid_data
     borehole.pipe_data = pipe_data
-    borehole.flow_rate_data = flow_data
+    borehole.flow_data = flow_data
 
     assert np.isclose(borehole.calculate_Rb(100, 1, 0.075, 3), 0.09483159131195469)
     del borehole.pipe_data
@@ -146,7 +146,7 @@ def test_repr_():
     borehole = Borehole()
     borehole.pipe_data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2)
     borehole.fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
-    borehole.flow_rate_data = ConstantFlowRate(vfr=0.2)
+    borehole.flow_data = ConstantFlowRate(vfr=0.2)
 
     assert {'fluid': {'Pr': 7.359154929577465,
                       'cp [J/(kg·K)]': 4180,

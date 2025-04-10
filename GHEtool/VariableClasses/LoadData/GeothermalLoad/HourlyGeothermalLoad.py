@@ -9,7 +9,6 @@ import warnings
 from typing import Tuple, TYPE_CHECKING
 
 from GHEtool.VariableClasses.LoadData.Baseclasses import _SingleYear, _HourlyData
-from GHEtool.logger import ghe_logger
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike

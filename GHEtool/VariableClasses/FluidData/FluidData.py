@@ -39,7 +39,7 @@ class FluidData(BaseClass):
         vfr : float
             Volume flow rate per borehole [l/s]
         """
-        warnings.warn('This class will be depreciated in a future version. Please use the ConstantFluidData and '
+        warnings.warn('This class will be depreciated in version 2.4.0. Please use the ConstantFluidData and '
                       'ConstantFlowRate class.', DeprecationWarning)
 
         self.flow_rate = ConstantFlowRate(mfr=mfr, vfr=vfr)

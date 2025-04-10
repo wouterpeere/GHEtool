@@ -4,7 +4,7 @@ This document contains all the information of the borehole class.
 
 from GHEtool.VariableClasses.BaseClass import BaseClass
 from GHEtool.VariableClasses.FluidData import _FluidData, FluidData
-from GHEtool.VariableClasses.FlowRateData import _FlowRateData
+from GHEtool.VariableClasses.FlowRateData import _FlowData
 from GHEtool.VariableClasses.PipeData import _PipeData, MultipleUTube
 from typing import Union
 
@@ -22,7 +22,7 @@ class Borehole(BaseClass):
 
     def __init__(self, fluid_data: _FluidData = None,
                  pipe_data: _PipeData = None,
-                 flow_data: _FlowRateData = None):
+                 flow_data: _FlowData = None):
         """
 
         Parameters
@@ -88,7 +88,7 @@ class Borehole(BaseClass):
         float
             Reynolds number
         """
-        return self.pipe_data.Re(self.fluid_data, self.flow_rate_data, **kwargs)
+        return self.pipe_data.Re(self.fluid_data, self.flow_data, **kwargs)
 
     @property
     def data_available(self) -> bool:
@@ -197,18 +197,18 @@ class Borehole(BaseClass):
         self.use_constant_Rb = True
 
     @property
-    def flow_rate_data(self) -> _FlowRateData:
+    def flow_data(self) -> _FlowData:
         """
-        This function returns the flow rate data object.
+        This function returns the flow data object.
 
         Returns
         -------
-        FlowRateData
+        FlowData
         """
         return self._flow_data
 
-    @flow_rate_data.setter
-    def flow_rate_data(self, flow_rate_data: _FlowRateData) -> None:
+    @flow_data.setter
+    def flow_data(self, flow_data: _FlowData) -> None:
         """
         This function sets the flow rate data.
         Furthermore, it sets the use_constant_Rb to False (if the pipe data is available) so the next time the Rb*
@@ -216,19 +216,19 @@ class Borehole(BaseClass):
 
         Parameters
         ----------
-        flow_rate_data : FlowRateData
-            Flow rate Data
+        flow_data : FlowData
+            Flow data
 
         Returns
         -------
         None
         """
-        self._flow_data = flow_rate_data
+        self._flow_data = flow_data
         if self.data_available:
             self.use_constant_Rb = False
 
-    @flow_rate_data.deleter
-    def flow_rate_data(self) -> None:
+    @flow_data.deleter
+    def flow_data(self) -> None:
         """
         This function resets the flow rate data object and sets the use_constant_Rb to True.
 
@@ -278,12 +278,12 @@ class Borehole(BaseClass):
 
         # initiate temporary borefield
         borehole = gt.boreholes.Borehole(H, D, r_b, 0, 0)
-        self.pipe_data.calculate_resistances(self.fluid_data, self.flow_rate_data, **kwargs)
+        self.pipe_data.calculate_resistances(self.fluid_data, self.flow_data, **kwargs)
 
         # initiate pipe
         pipe = self.pipe_data.pipe_model(k_s if isinstance(k_s, (float, int)) else k_s(depth, D), borehole)
 
-        return pipe.effective_borehole_thermal_resistance(self.flow_rate_data.mfr(fluid_data=self.fluid_data, **kwargs),
+        return pipe.effective_borehole_thermal_resistance(self.flow_data.mfr(fluid_data=self.fluid_data, **kwargs),
                                                           self.fluid_data.cp(**kwargs))
 
     def get_Rb(self, H: float, D: float, r_b: float, k_s: Union[callable, float], depth: float = None) -> float:
@@ -331,4 +331,4 @@ class Borehole(BaseClass):
             return {'Rb': self.Rb}
         return {'fluid': self.fluid_data.__repr__(),
                 'pipe': self.pipe_data.__repr__(),
-                'flow': self.flow_rate_data.__repr__()}
+                'flow': self.flow_data.__repr__()}

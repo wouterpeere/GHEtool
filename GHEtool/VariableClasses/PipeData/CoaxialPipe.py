@@ -5,7 +5,7 @@ from math import pi
 
 from GHEtool.VariableClasses.PipeData._PipeData import _PipeData
 from GHEtool.VariableClasses.FluidData import _FluidData
-from GHEtool.VariableClasses.FlowRateData import _FlowRateData
+from GHEtool.VariableClasses.FlowRateData import _FlowData
 
 
 class CoaxialPipe(_PipeData):
@@ -53,7 +53,7 @@ class CoaxialPipe(_PipeData):
         self.R_fp: float = 0.
         self.k_p_out = k_p if k_p_out is None else k_p_out
 
-    def calculate_resistances(self, fluid_data: _FluidData, flow_rate_data: _FlowRateData, **kwargs) -> None:
+    def calculate_resistances(self, fluid_data: _FluidData, flow_rate_data: _FlowData, **kwargs) -> None:
         """
         This function calculates the conductive and convective resistances, which are constant.
 
@@ -118,7 +118,7 @@ class CoaxialPipe(_PipeData):
                                 np.array([self.r_in_out, self.r_out_out]),
                                 borehole=borehole, k_s=k_s, k_g=self.k_g, R_ff=self.R_ff, R_fp=self.R_fp, J=2)
 
-    def Re(self, fluid_data: _FluidData, flow_rate_data: _FlowRateData, **kwargs) -> float:
+    def Re(self, fluid_data: _FluidData, flow_rate_data: _FlowData, **kwargs) -> float:
         """
         Reynolds number.
         Note: This code is based on pygfunction, 'convective_heat_transfer_coefficient_concentric_annulus' in the
@@ -146,7 +146,7 @@ class CoaxialPipe(_PipeData):
         # Reynolds number
         return fluid_data.rho(**kwargs) * V * D_h / fluid_data.mu(**kwargs)
 
-    def pressure_drop(self, fluid_data: _FluidData, flow_rate_data: _FlowRateData, borehole_length: float,
+    def pressure_drop(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float,
                       **kwargs) -> float:
         """
         Calculates the pressure drop across the entire borehole.

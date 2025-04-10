@@ -1,2 +1,2 @@
-from ._FlowRateData import _FlowRateData
+from ._FlowData import _FlowData
 from .ConstantFlowRate import ConstantFlowRate

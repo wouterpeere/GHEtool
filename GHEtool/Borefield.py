@@ -23,6 +23,9 @@ from GHEtool.VariableClasses.LoadData import _LoadData, _LoadDataBuilding
 from GHEtool.VariableClasses.PipeData import _PipeData
 from GHEtool.VariableClasses.BaseClass import BaseClass, UnsolvableDueToTemperatureGradient, MaximumNumberOfIterations
 from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
+from GHEtool.VariableClasses.FluidData._FluidData import _FluidData
+from GHEtool.VariableClasses.FlowRateData._FlowData import _FlowData
+from GHEtool.VariableClasses.PipeData._PipeData import _PipeData
 
 
 class Borefield(BaseClass):
@@ -46,7 +49,12 @@ class Borefield(BaseClass):
             baseload_injection: ArrayLike = None,
             borefield: list[gt.boreholes.Borehole] = None,
             custom_gfunction: CustomGFunction = None,
+            *,
             load: _LoadData = None,
+            ground_data: _GroundData = GroundConstantTemperature(),
+            fluid_data: _FluidData = None,
+            flow_data: _FlowData = None,
+            pipe_data: _PipeData = None,
             **kwargs
     ):
         """
@@ -65,52 +73,28 @@ class Borefield(BaseClass):
             Set the borefield for which the calculations will be carried out
         custom_gfunction : CustomGFunction
             Custom gfunction dataset
-
-        Examples
-        --------
-
-        monthly peak values [kW]
-
-        >>> peak_injection = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])
-        >>> peak_extraction = np.array([160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.])
-
-        annual extraction and injection load [kWh]
-
-        >>> annual_extraction_load = 300 * 10 ** 3
-        >>> annual_injection_load = 160 * 10 ** 3
-
-        percentage of annual load per month (15.5% for January ...)
-
-        >>> monthly_load_extraction_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
-        >>> monthly_load_injection_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
-
-        resulting load per month [kWh]
-
-        >>> monthly_load_extraction = annual_extraction_load * monthly_load_extraction_percentage
-        >>> monthly_load_injection = annual_injection_load * monthly_load_injection_percentage
-
-        create the borefield object
-
-        >>> borefield = Borefield()
-
-        set the load
-
-        >>> load = MonthlyGeothermalLoadAbsolute(monthly_load_extraction, monthly_load_injection, peak_extraction, peak_injection)
-        >>> borefield.load = load
-
+        load : _LoadData
+            Load data of the borefield
+        ground_data : _GroundData
+            Ground data for the borefield
+        fluid_data : FluidData
+            Fluid data for the borefield
+        flow_data : FlowData
+            Flow data for the borefield
+        pipe_data : PipeData
+            Pipe data of the borehole
         """
-
-        if len(kwargs) > 0:
-            raise DeprecationWarning(
-                'Since version 2.3.0, it is no longer possible to set a heating and cooling load (see issue #220).'
-                'Please use the load classes.')
 
         self.limiting_quadrant: int = 0  # parameter that tells in which quadrant the field is limited
         # m hereafter one needs to chance to fewer boreholes with more depth, because the calculations are no longer
         # that accurate.
         self.THRESHOLD_WARNING_SHALLOW_FIELD: int = 50
 
-        self.custom_gfunction: CustomGFunction = custom_gfunction
+        if custom_gfunction is not None:
+            warnings.warn(
+                'From version 2.4.0 it will no longer be possible to initiate a borefield object with a custom gfunction.'
+                'Please use the load_custom_gfunction function.', DeprecationWarning)
+            self.custom_gfunction: CustomGFunction = custom_gfunction
         self.gfunction_calculation_object: GFunction = GFunction()
 
         # initialize variables for temperature plotting
@@ -118,7 +102,7 @@ class Borefield(BaseClass):
 
         # initiate ground parameters
         self._H = 0.0  # borehole length [m]
-        self._ground_data: _GroundData = GroundConstantTemperature()
+        self._ground_data: _GroundData = ground_data
         self.D: float = 0.0  # buried depth of the borehole [m]
         self.r_b: float = 0.0  # borehole radius [m]
 
@@ -126,9 +110,12 @@ class Borefield(BaseClass):
         self.Tf_max: float = 16.0  # maximum temperature of the fluid
         self.Tf_min: float = 0.0  # minimum temperature of the fluid
 
-        # initiale borehole
+        # initiate borehole
         self.avg_tilt: float = 0.
         self.borehole = Borehole()
+        self.pipe_data = pipe_data
+        self.flow_data = flow_data
+        self.fluid_data = fluid_data
 
         # initiate different sizing
         self._calculation_setup: CalculationSetup = CalculationSetup()
@@ -140,6 +127,8 @@ class Borefield(BaseClass):
         if load is not None:
             self.load = load
         else:
+            warnings.warn('From version 2.4.0 you will need to load a load object instead of the base and peak load.',
+                          DeprecationWarning)
             self.load = MonthlyGeothermalLoadAbsolute(baseload_extraction,
                                                       baseload_injection,
                                                       peak_extraction,
@@ -638,11 +627,96 @@ class Borefield(BaseClass):
         -------
         None
         """
-
-        # Ground properties
+        warnings.warn(
+            'From version 2.4.0 this function will be depreciated. Please set the ground properties by using a direct '
+            'assignment.', DeprecationWarning)
         self.ground_data = data
 
-    def set_fluid_parameters(self, data: FluidData) -> None:
+    @property
+    def pipe_data(self) -> _PipeData:
+        """
+        This function returns the pipe data.
+
+        Returns
+        -------
+        pipe data : PipeData
+
+        """
+        return self.borehole.pipe_data
+
+    @pipe_data.setter
+    def pipe_data(self, data: _PipeData) -> None:
+        """
+        This function sets the relevant pipe parameters.
+
+        Parameters
+        ----------
+        data : PipeData
+            All the relevant pipe data
+
+        Returns
+        -------
+        None
+        """
+        self.borehole.pipe_data = data
+
+    @property
+    def fluid_data(self) -> _FluidData:
+        """
+        This function returns the fluid data.
+
+        Returns
+        -------
+        fluid data : FluidData
+
+        """
+        return self.borehole.fluid_data
+
+    @fluid_data.setter
+    def fluid_data(self, data: _FluidData) -> None:
+        """
+        This function sets the relevant fluid parameters.
+
+        Parameters
+        ----------
+        data : FluidData
+            All the relevant fluid data
+
+        Returns
+        -------
+        None
+        """
+        self.borehole.fluid_data = data
+
+    @property
+    def flow_data(self) -> _FlowData:
+        """
+        This function returns the flow rate data.
+
+        Returns
+        -------
+        flow data : FlowData
+
+        """
+        return self.borehole.flow_data
+
+    @flow_data.setter
+    def flow_data(self, data: _FlowData) -> None:
+        """
+        This function sets the relevant flow rate parameters.
+
+        Parameters
+        ----------
+        data : FlowData
+            All the relevant flow data
+
+        Returns
+        -------
+        None
+        """
+        self.borehole.flow_data = data
+
+    def set_fluid_parameters(self, data: _FluidData) -> None:
         """
         This function sets the fluid parameters.
 
@@ -655,7 +729,10 @@ class Borefield(BaseClass):
         -------
         None
         """
-        self.borehole.fluid_data = data
+        warnings.warn(
+            'From version 2.4.0 this function will be depreciated. Please set the fluid properties by using a direct '
+            'assignment.', DeprecationWarning)
+        self.fluid_data = data
 
     def set_pipe_parameters(self, data: _PipeData) -> None:
         """
@@ -670,7 +747,10 @@ class Borefield(BaseClass):
         -------
         None
         """
-        self.borehole.pipe_data = data
+        warnings.warn(
+            'From version 2.4.0 this function will be depreciated. Please set the pipe properties by using a direct '
+            'assignment.', DeprecationWarning)
+        self.pipe_data = data
 
     def set_Rb(self, Rb: float) -> None:
         """

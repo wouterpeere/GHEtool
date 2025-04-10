@@ -5,7 +5,6 @@ import numpy as np
 from GHEtool.VariableClasses.LoadData.Baseclasses import _SingleYear, _LoadData
 from GHEtool.VariableClasses.LoadData.GeothermalLoad import HourlyGeothermalLoad
 from GHEtool.VariableClasses.LoadData.GeothermalLoad.HourlyGeothermalLoadMultiYear import HourlyGeothermalLoadMultiYear
-from GHEtool.logger.ghe_logger import ghe_logger
 
 from numpy.typing import ArrayLike
 

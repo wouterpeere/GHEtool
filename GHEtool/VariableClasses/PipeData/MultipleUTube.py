@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from math import pi
 from GHEtool.VariableClasses.PipeData._PipeData import _PipeData
 from GHEtool.VariableClasses.FluidData import _FluidData
-from GHEtool.VariableClasses.FlowRateData import _FlowRateData
+from GHEtool.VariableClasses.FlowRateData import _FlowData
 
 
 class MultipleUTube(_PipeData):
@@ -74,7 +74,7 @@ class MultipleUTube(_PipeData):
                 self.D_s * np.cos(2.0 * i * dt + pi + dt), self.D_s * np.sin(2.0 * i * dt + pi + dt))
         return pos
 
-    def calculate_resistances(self, fluid_data: _FluidData, flow_rate_data: _FlowRateData, **kwargs) -> None:
+    def calculate_resistances(self, fluid_data: _FluidData, flow_rate_data: _FlowData, **kwargs) -> None:
         """
         This function calculates the conductive and convective resistances, which are constant.
 
@@ -118,7 +118,7 @@ class MultipleUTube(_PipeData):
         return gt.pipes.MultipleUTube(self.pos, self.r_in, self.r_out, borehole, k_s, self.k_g,
                                       self.R_p + self.R_f, self.number_of_pipes, J=2)
 
-    def Re(self, fluid_data: _FluidData, flow_rate_data: _FlowRateData, **kwargs) -> float:
+    def Re(self, fluid_data: _FluidData, flow_rate_data: _FlowData, **kwargs) -> float:
         """
         Reynolds number.
 
@@ -135,7 +135,7 @@ class MultipleUTube(_PipeData):
             (pi * self.r_in ** 2)
         return fluid_data.rho(**kwargs) * u * self.r_in * 2 / fluid_data.mu(**kwargs)
 
-    def pressure_drop(self, fluid_data: _FluidData, flow_rate_data: _FlowRateData, borehole_length: float,
+    def pressure_drop(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float,
                       **kwargs) -> float:
         """
         Calculates the pressure drop across the entire borehole.

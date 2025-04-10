@@ -10,7 +10,6 @@ from typing import List, Union
 import numpy as np
 import pygfunction as gt
 from scipy import interpolate
-from GHEtool.logger.ghe_logger import ghe_logger
 
 
 def _time_values(dt=3600., t_max=100. * 8760 * 3600.) -> np.array:
@@ -216,7 +215,7 @@ class CustomGFunction:
             self.options["method"] = "equivalent"
 
         for idx, borehole_length in enumerate(self.borehole_length_array):
-            ghe_logger.info(f'Start length: {borehole_length}')
+            print(f'Start length: {borehole_length} m')
 
             # Calculate the g-function for uniform borehole wall temperature
             borefield = copy.deepcopy(borefield)
