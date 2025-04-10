@@ -3,12 +3,10 @@ This file contains all the code for the borefield calculations.
 """
 from __future__ import annotations
 
-import copy
 import math
 import warnings
 from math import pi
 from typing import Tuple, Union
-import logging
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -25,8 +23,6 @@ from GHEtool.VariableClasses.LoadData import _LoadData, _LoadDataBuilding
 from GHEtool.VariableClasses.PipeData import _PipeData
 from GHEtool.VariableClasses.BaseClass import BaseClass, UnsolvableDueToTemperatureGradient, MaximumNumberOfIterations
 from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
-from GHEtool.logger.ghe_logger import ghe_logger
-from GHEtool.Methods import *
 
 
 class Borefield(BaseClass):
@@ -154,28 +150,6 @@ class Borefield(BaseClass):
 
         # set a custom borefield
         self.borefield = borefield
-
-    @staticmethod
-    def activate_logger() -> None:
-        """
-        This function activates the logging.
-
-        Returns
-        -------
-        None
-        """
-        ghe_logger.setLevel("MAIN_INFO")
-
-    @staticmethod
-    def deactivate_logger() -> None:
-        """
-        This function deactivates the logging.
-
-        Returns
-        -------
-        None
-        """
-        ghe_logger.setLevel(logging.INFO)
 
     @property
     def number_of_boreholes(self) -> int:
@@ -1052,7 +1026,7 @@ class Borefield(BaseClass):
 
         # check if the field is not shallow
         if length < self.THRESHOLD_WARNING_SHALLOW_FIELD:
-            ghe_logger.warning(
+            print(
                 f"The field has a calculated borehole length of {round(length, 2)}"
                 f"m which is lower than the proposed minimum "
                 f"of {self.THRESHOLD_WARNING_SHALLOW_FIELD} m. "
@@ -1906,8 +1880,8 @@ class Borefield(BaseClass):
 
         # calculate temperatures if they are not calculated
         if not np.any(self.results.peak_extraction):
-            ghe_logger.warning(
-                "There are not yet temperatures calculated, hence there is no limiting quadrant." "The temperature is calculated now, based on monthly values."
+            print(
+                "There are not yet temperatures calculated, hence there is no limiting quadrant. The temperature is calculated now, based on monthly values."
             )
             self.calculate_temperatures()
 
