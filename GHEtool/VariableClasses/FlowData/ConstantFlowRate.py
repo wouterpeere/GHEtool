@@ -1,4 +1,4 @@
-from GHEtool.VariableClasses.FlowRateData._FlowData import _FlowData
+from GHEtool.VariableClasses.FlowData._FlowData import _FlowData
 from GHEtool.VariableClasses.FluidData._FluidData import _FluidData
 from GHEtool.VariableClasses.BaseClass import BaseClass
 

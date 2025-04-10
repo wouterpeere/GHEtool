@@ -24,7 +24,7 @@ from GHEtool.VariableClasses.PipeData import _PipeData
 from GHEtool.VariableClasses.BaseClass import BaseClass, UnsolvableDueToTemperatureGradient, MaximumNumberOfIterations
 from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
 from GHEtool.VariableClasses.FluidData._FluidData import _FluidData
-from GHEtool.VariableClasses.FlowRateData._FlowData import _FlowData
+from GHEtool.VariableClasses.FlowData._FlowData import _FlowData
 from GHEtool.VariableClasses.PipeData._PipeData import _PipeData
 
 

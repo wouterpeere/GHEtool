@@ -8,7 +8,7 @@ import warnings
 
 from GHEtool.VariableClasses.BaseClass import BaseClass
 from GHEtool.VariableClasses.FluidData import ConstantFluidData
-from GHEtool.VariableClasses.FlowRateData import ConstantFlowRate
+from GHEtool.VariableClasses.FlowData import ConstantFlowRate
 
 
 class FluidData(BaseClass):

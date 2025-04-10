@@ -3,7 +3,7 @@ import pygfunction as gt
 from abc import ABC
 from GHEtool.VariableClasses.BaseClass import BaseClass
 from GHEtool.VariableClasses.FluidData import _FluidData
-from GHEtool.VariableClasses.FlowRateData import _FlowData
+from GHEtool.VariableClasses.FlowData import _FlowData
 
 
 class _PipeData(BaseClass, ABC):
@@ -41,7 +41,7 @@ class _PipeData(BaseClass, ABC):
         ----------
         fluid_data : FluidData
             Fluid data
-        flow_rate_data : FlowRateData
+        flow_rate_data : FlowData
             Flow rate data
 
         Returns
@@ -75,7 +75,7 @@ class _PipeData(BaseClass, ABC):
         ----------
         fluid_data: FluidData
             Fluid data
-        flow_rate_data : FlowRateData
+        flow_rate_data : FlowData
             Flow rate data
 
         Returns
@@ -94,7 +94,7 @@ class _PipeData(BaseClass, ABC):
         ----------
         fluid_data: FluidData
             Fluid data
-        flow_rate_data : FlowRateData
+        flow_rate_data : FlowData
             Flow rate data
         borehole_length : float
             Borehole length [m]

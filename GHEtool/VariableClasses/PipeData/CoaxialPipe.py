@@ -5,7 +5,7 @@ from math import pi
 
 from GHEtool.VariableClasses.PipeData._PipeData import _PipeData
 from GHEtool.VariableClasses.FluidData import _FluidData
-from GHEtool.VariableClasses.FlowRateData import _FlowData
+from GHEtool.VariableClasses.FlowData import _FlowData
 
 
 class CoaxialPipe(_PipeData):
@@ -61,7 +61,7 @@ class CoaxialPipe(_PipeData):
         ----------
         fluid_data : FluidData
             Fluid data
-        flow_rate_data : FlowRateData
+        flow_rate_data : FlowData
             Flow rate data
 
         Returns
@@ -128,7 +128,7 @@ class CoaxialPipe(_PipeData):
         ----------
         fluid_data : FluidData
             Fluid data
-        flow_rate_data : FlowRateData
+        flow_rate_data : FlowData
             Flow rate data
         Returns
         -------
@@ -156,7 +156,7 @@ class CoaxialPipe(_PipeData):
         ----------
         fluid_data: FluidData
             Fluid data
-        flow_rate_data : FlowRateData
+        flow_rate_data : FlowData
             Flow rate data
         borehole_length : float
             Borehole length [m]

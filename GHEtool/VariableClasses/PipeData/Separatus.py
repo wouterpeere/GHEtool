@@ -1,7 +1,6 @@
 import pygfunction as gt
 
 from GHEtool.VariableClasses.PipeData.SingleUTube import SingleUTube
-from GHEtool.VariableClasses.FluidData import FluidData
 
 
 class Separatus(SingleUTube):

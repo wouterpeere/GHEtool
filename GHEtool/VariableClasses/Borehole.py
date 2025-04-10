@@ -4,7 +4,7 @@ This document contains all the information of the borehole class.
 
 from GHEtool.VariableClasses.BaseClass import BaseClass
 from GHEtool.VariableClasses.FluidData import _FluidData, FluidData
-from GHEtool.VariableClasses.FlowRateData import _FlowData
+from GHEtool.VariableClasses.FlowData import _FlowData
 from GHEtool.VariableClasses.PipeData import _PipeData, MultipleUTube
 from typing import Union
 
@@ -31,7 +31,7 @@ class Borehole(BaseClass):
             Fluid data
         pipe_data : PipeData
             Pipe data
-        flow_data : FlowRateData
+        flow_data : FlowData
             Flow rate data
         """
         self._Rb: float = 0.12
