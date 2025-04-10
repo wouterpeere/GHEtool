@@ -9,8 +9,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- Freezing point to fluid data (issue #314).
 - Temperature dependent fluid properties (issue #143).
+- Freezing point to fluid data (issue #314).
+
+### Changed
+
+- The __repr__ of the different classes. It now returns a dictionary.
 
 ## [2.3.2] - 2025-04-02
 

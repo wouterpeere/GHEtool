@@ -1,3 +1,5 @@
+import numpy as np
+
 from scp.ethyl_alcohol import EthylAlcohol
 from scp.ethylene_glycol import EthyleneGlycol
 from scp.methyl_alcohol import MethylAlcohol
@@ -14,6 +16,8 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
     """
     Contains information regarding the fluid data of the borefield, assuming there is temperature dependency.
     """
+
+    NB_OF_SAMPLES = 500
 
     __slots__ = '_name', '_percentage'
 
@@ -35,6 +39,13 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
         super().__init__(0)
 
         self.set_fluid(name, percentage)
+
+        # create interp array
+        self._spacing = np.linspace(self.freezing_point, 100, TemperatureDependentFluidData.NB_OF_SAMPLES)
+        self._k_f_array = np.array([self._fluid.conductivity(i) for i in self._spacing])
+        self._mu_array = np.array([self._fluid.viscosity(i) for i in self._spacing])
+        self._rho_array = np.array([self._fluid.density(i) for i in self._spacing])
+        self._cp_array = np.array([self._fluid.specific_heat(i) for i in self._spacing])
 
     def set_fluid(self, name, percentage) -> None:
         """
@@ -73,7 +84,7 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
             return
         raise ValueError(f'The fluid {name} is not yet supported by GHEtool.')
 
-    def k_f(self, temperature: float, **kwargs) -> float:
+    def k_f(self, temperature: float | np.ndarray, **kwargs) -> float | np.ndarray:
         """
         This function returns the conductivity of the fluid in W/(mK).
 
@@ -87,9 +98,9 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
         float
             Fluid thermal conductivity [W/(mK)]
         """
-        return self._fluid.conductivity(temperature)
+        return np.interp(temperature, self._spacing, self._k_f_array)
 
-    def rho(self, temperature: float, **kwargs) -> float:
+    def rho(self, temperature: float | np.ndarray, **kwargs) -> float | np.ndarray:
         """
         This function returns the density of the fluid in kg/m^3.
 
@@ -103,9 +114,9 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
         float
             Density [kg/m^3]
         """
-        return self._fluid.density(temperature)
+        return np.interp(temperature, self._spacing, self._rho_array)
 
-    def cp(self, temperature: float, **kwargs) -> float:
+    def cp(self, temperature: float | np.ndarray, **kwargs) -> float | np.ndarray:
         """
         This function returns the heat capacity of the fluid in J/(kgK).
 
@@ -119,9 +130,9 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
         float
             Heat capacity of the fluid [J/(kgK)]
         """
-        return self._fluid.specific_heat(temperature)
+        return np.interp(temperature, self._spacing, self._cp_array)
 
-    def mu(self, temperature: float, **kwargs) -> float:
+    def mu(self, temperature: float | np.ndarray, **kwargs) -> float | np.ndarray:
         """
         This function returns the dynamic viscosity of the fluid in Pa.s.
 
@@ -135,7 +146,7 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
         float
             Dynamic viscosity [Pa.s]
         """
-        return self._fluid.viscosity(temperature)
+        return np.interp(temperature, self._spacing, self._mu_array)
 
     def create_constant(self, temperature: float) -> ConstantFluidData:
         """

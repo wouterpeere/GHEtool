@@ -142,21 +142,22 @@ def test_repr_constant_fluid_data():
 
 def test_temperature_dependent_fluid_data():
     for fluid_str in ('Water', 'MEG', 'MPG', 'MMA', 'MEA'):
-        for percentage in (10, 20, 30):
-            for temperature in (1, 5, 20):
+        for percentage in (0, 10, 20, 30):
+            for temperature in np.linspace(TemperatureDependentFluidData(fluid_str, percentage).freezing_point, 100,
+                                           200):
                 fluid = TemperatureDependentFluidData(fluid_str, percentage)
                 fluid_gt = gt.media.Fluid(fluid_str, percentage, temperature)
-                assert fluid.k_f(temperature) == fluid_gt.thermal_conductivity()
-                assert fluid.cp(temperature) == fluid_gt.specific_heat_capacity()
-                assert fluid.rho(temperature) == fluid_gt.density()
-                assert fluid.mu(temperature) == fluid_gt.dynamic_viscosity()
+                assert np.isclose(fluid.k_f(temperature), fluid_gt.thermal_conductivity(), rtol=5e-3)
+                assert np.isclose(fluid.cp(temperature), fluid_gt.specific_heat_capacity(), rtol=5e-3)
+                assert np.isclose(fluid.rho(temperature), fluid_gt.density(), rtol=5e-3)
+                assert np.isclose(fluid.mu(temperature), fluid_gt.dynamic_viscosity(), rtol=5e-3)
 
 
 def test_create_constant():
     fluid = TemperatureDependentFluidData('MPG', 25)
     constant_fluid = fluid.create_constant(20)
-    assert constant_fluid == ConstantFluidData(0.4678524157362136, 1019.2776018578963, 3920.4675131518143,
-                                               0.0024452321100532394, -9.786660880295903)
+    assert constant_fluid == ConstantFluidData(0.4678523588342376, 1019.2770761862255, 3920.4674905851116,
+                                               0.00244555428898062, -9.786660880295903)
 
 
 def test_repr_temperature_dependent_fluid_data():
@@ -180,3 +181,8 @@ def test_eq_temperature_dependent_fluid_data():
     assert fluid != fluid1
     assert fluid == fluid3
     assert fluid != fluid2
+
+
+def test_multiple_temperature_dependent_fluid_data():
+    fluid = TemperatureDependentFluidData('MEA', 30)
+    print(fluid.k_f(temperature=np.array([-5, 0, 5, 10, 15, 40, 50, 60])))

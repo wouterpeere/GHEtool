@@ -283,7 +283,7 @@ class Borehole(BaseClass):
         # initiate pipe
         pipe = self.pipe_data.pipe_model(k_s if isinstance(k_s, (float, int)) else k_s(depth, D), borehole)
 
-        return pipe.effective_borehole_thermal_resistance(self.flow_rate_data.mfr(**kwargs),
+        return pipe.effective_borehole_thermal_resistance(self.flow_rate_data.mfr(fluid_data=self.fluid_data, **kwargs),
                                                           self.fluid_data.cp(**kwargs))
 
     def get_Rb(self, H: float, D: float, r_b: float, k_s: Union[callable, float], depth: float = None) -> float:
