@@ -8,6 +8,7 @@ The results are returned.
 import numpy as np
 
 from GHEtool import *
+from GHEtool.Methods import *
 
 
 def optimise():
@@ -19,17 +20,11 @@ def optimise():
     load = HourlyBuildingLoad(efficiency_heating=4.5, efficiency_cooling=20)
     load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True, separator=";",
                              col_cooling=0, col_heating=1)
-    import matplotlib.pyplot as plt
 
-    # plt.figure()
-    # plt.plot(load.hourly_cooling_load_simulation_period)
-    # plt.plot(load.hourly_heating_load_simulation_period)
-    # plt.show()
-    # borefield.calculate_temperatures()
-    # borefield.print_temperature_profile(plot_hourly=False)
     # optimise the load for a 10x10 field (see data above) and a fixed length of 150m.
     # first for an optimisation based on the power
-    borefield.optimise_load_profile_energy(building_load=load, length=100)
+    building_load, _ = optimise_load_profile_energy(borefield, load)
+    borefield.load = building_load
 
     print(f'Max heating power (primary): {borefield.load.max_peak_extraction:,.0f}kW')
     print(f'Max cooling power (primary): {borefield.load.max_peak_injection:,.0f}kW')

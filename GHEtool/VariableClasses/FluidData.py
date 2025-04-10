@@ -147,6 +147,19 @@ class FluidData(BaseClass):
         self.Cp = fluid_object.cp
         self.mu = fluid_object.mu
 
+    @property
+    def Pr(self) -> float:
+        """
+        This function returns the Prandtl number which is defined as the ratio of momentum diffusivity
+        to thermal diffusivity.
+
+        Returns
+        -------
+        float
+            Prandtl number
+        """
+        return self.Cp * self.mu / self.k_f
+
     def __eq__(self, other):
         if not isinstance(other, FluidData):
             return False

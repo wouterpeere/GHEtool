@@ -85,3 +85,9 @@ def test_tilted(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     from GHEtool.Examples.tilted_borefield import tilted
     tilted()
+
+
+def test_optimise(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    from GHEtool.Examples.optimise_load_profile import optimise
+    optimise()

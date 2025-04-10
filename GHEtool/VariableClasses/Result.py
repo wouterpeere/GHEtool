@@ -40,6 +40,30 @@ class _Results(ABC):
 
         """
 
+    @property
+    def min_temperature(self) -> float:
+        """
+        Minimum average fluid temperature.
+
+        Returns
+        -------
+        Minimum average fluid temperature
+            float
+        """
+        return np.min(self.peak_extraction)
+
+    @property
+    def max_temperature(self) -> float:
+        """
+        Maximum average fluid temperature.
+
+        Returns
+        -------
+        Maximum average fluid temperature
+            float
+        """
+        return np.max(self.peak_injection)
+
     def __eq__(self, other) -> bool:
         if not isinstance(other, self.__class__):
             return False

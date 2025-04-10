@@ -607,6 +607,7 @@ class _LoadDataBuilding(_LoadData, ABC):
     def _monthly_peak_extraction_dhw_simulation_period(self) -> np.ndarray:
         """
         This function returns the monthly extraction peak of the DHW production in kW/month for the whole simulation period.
+
         Returns
         -------
         peak extraction : np.ndarray

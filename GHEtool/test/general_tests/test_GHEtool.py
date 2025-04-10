@@ -17,6 +17,7 @@ from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient
 from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad, EERCombined, \
     HourlyBuildingLoad, EER
+from GHEtool.Methods import *
 
 data = GroundConstantTemperature(3, 10)
 data_ground_flux = GroundFluxTemperature(3, 10)
@@ -367,11 +368,11 @@ def test_optimise_load_eer_combined():
     borefield1.calculate_temperatures(hourly=True)
     results_16 = copy.deepcopy(borefield1.results)
     borefield1.set_max_avg_fluid_temperature(25)
-    _, sec_load = borefield1.optimise_load_profile_power(borefield1.load)
+    _, sec_load = optimise_load_profile_power(borefield1, borefield1.load)
     borefield1.calculate_temperatures(hourly=True)
     results_25 = copy.deepcopy(borefield1.results)
     assert np.allclose(results_16.peak_injection, results_25.peak_injection)
-    _, sec_load = borefield1.optimise_load_profile_energy(borefield1.load)
+    _, sec_load = optimise_load_profile_energy(borefield1, borefield1.load)
     borefield1.calculate_temperatures(hourly=True)
     results_25 = copy.deepcopy(borefield1.results)
     assert np.allclose(results_16.peak_injection, results_25.peak_injection)
