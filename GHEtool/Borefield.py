@@ -153,6 +153,7 @@ class Borefield(BaseClass):
         self.cost_investment: list = Borefield.DEFAULT_INVESTMENT
 
         # set a custom borefield
+        self._borefield_description = None
         self.borefield = borefield
 
     @staticmethod
@@ -268,6 +269,7 @@ class Borefield(BaseClass):
         -------
         None
         """
+        self._borefield_description = None
         self.borefield = borefield
 
     def create_rectangular_borefield(self, N_1: int, N_2: int, B_1: float, B_2: float, H: float, D: float = 1,
@@ -300,7 +302,7 @@ class Borefield(BaseClass):
         """
         borefield = gt.boreholes.rectangle_field(N_1, N_2, B_1, B_2, H, D, r_b)
         self.set_borefield(borefield)
-
+        self._borefield_description = {'N_1': N_1, 'N_2': N_2, 'B_1': B_1, 'B_2': B_2, 'type': 'rect'}
         return borefield
 
     def create_circular_borefield(self, N: int, R: float, H: float, D: float = 1, r_b: float = 0.075):
@@ -360,6 +362,7 @@ class Borefield(BaseClass):
         """
         borefield = gt.boreholes.U_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
         self.set_borefield(borefield)
+        self._borefield_description = {'N_1': N_1, 'N_2': N_2, 'B_1': B_1, 'B_2': B_2, 'type': 'U'}
         return borefield
 
     def create_L_shaped_borefield(self, N_1: int, N_2: int, B_1: float, B_2: float, H: float, D: float = 1,
@@ -392,6 +395,8 @@ class Borefield(BaseClass):
         """
         borefield = gt.boreholes.L_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
         self.set_borefield(borefield)
+        self._borefield_description = {'N_1': N_1, 'N_2': N_2, 'B_1': B_1, 'B_2': B_2, 'type': 'L'}
+
         return borefield
 
     def create_box_shaped_borefield(self, N_1: int, N_2: int, B_1: float, B_2: float, H: float, D: float = 1,
@@ -424,6 +429,7 @@ class Borefield(BaseClass):
         """
         borefield = gt.boreholes.box_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
         self.set_borefield(borefield)
+        self._borefield_description = {'N_1': N_1, 'N_2': N_2, 'B_1': B_1, 'B_2': B_2, 'type': 'box'}
         return borefield
 
     @property
@@ -1817,7 +1823,8 @@ class Borefield(BaseClass):
             return self.gfunction_calculation_object.calculate(
                 time_value, self.borefield, self.ground_data.alpha(self.depth, self.D),
                 interpolate=self._calculation_setup.interpolate_gfunctions,
-                use_neural_network=self._calculation_setup.use_neural_network
+                use_neural_network=self._calculation_setup.use_neural_network,
+                borefield_description=self._borefield_description
             )
 
         ## 1 bypass any possible precalculated g-functions

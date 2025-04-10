@@ -137,7 +137,7 @@ class GFunction:
         self._store_previous_values_backup = store
 
     def calculate(self, time_value: Union[list, float, np.ndarray], borefield: List[gt.boreholes.Borehole],
-                  alpha: float, interpolate: bool = None, use_neural_network: bool = False):
+                  alpha: float, interpolate: bool = None, use_neural_network: bool = False, **kwargs):
         """
         This function returns the gvalues either by interpolation or by calculating them.
         It does so by calling the function gvalues which does this calculation.
@@ -164,11 +164,42 @@ class GFunction:
             1D array with all the requested gvalues
         """
 
-        def calculate_with_neural_network(borefield, alpha):
-            pass
+        def calculate_with_neural_network(alpha: float, borefield: list, borefield_description: dict) -> np.ndarray:
+            """
+            This function calculates the gfunctions using a trained ANN.
+            (For more information, visit Blanke et al. ([#BlankeEtAl]_).
+
+            References
+            ----------
+            .. [#BlankeEtAl] Blanke T., Pfeiffer F., Göttsche J., Döring B. (2024) Artificial neural networks use for the design of geothermal probe fields. In Proceedings of BauSim Conference 2024:  10th Conference of IBPSA-Germany and Austria. Vienna (Austria), 23-26 September 2024. https://doi.org/10.26868/29761662.2024.12
+
+            Parameters
+            ----------
+            alpha : float
+                Thermal diffusivity of the ground [m2/s]
+            borefield : list
+                List of boreholes
+            borefield_description : dict
+                Description of the borefield with keys: {N_1, N_2, B_1, B_2, type}
+
+            Returns
+            -------
+            gvalues : np.ndarray
+                Array with the gvalues for the default timesteps
+            """
+            # parameters can be extracted from a random borehole since for the ANN model, all boreholes should be the same.
+            H = borefield[0].H
+            D = borefield[0].D
+            r_b = borefield[0].r_b
+
+            # TODO implement checks to see if it falls between the boundaries of the ANN.
+
+            # calculate gvalues based on the ANN
+            return
 
         def gvalues(time_values: np.ndarray, borefield: List[gt.boreholes.Borehole], alpha: float,
-                    borehole_length: float, interpolate: bool = None, use_neural_network: bool = False) -> np.ndarray:
+                    borehole_length: float, interpolate: bool = None, use_neural_network: bool = False,
+                    **kwargs) -> np.ndarray:
             """
             This function returns the gvalues either by interpolation or by calculating them.
 
@@ -196,8 +227,11 @@ class GFunction:
 
             # use neural network
             if use_neural_network:
+                if not 'borefield_description' in kwargs:
+                    raise ValueError('You can only use the ANN when you have a regular configuration. Please use the '
+                                     'create_rectangle_borefield or similar methods in the Borefield class.')
                 return np.interp(GFunction.DEFAULT_TIMESTEPS, time_values,
-                                 calculate_with_neural_network(borefield, alpha))
+                                 calculate_with_neural_network(alpha, **kwargs))
 
             # check if the value is in the fifo_list
             # if the value is in self.borehole_length_array, there is no problem, since the interpolation will be exact anyway
@@ -272,7 +306,7 @@ class GFunction:
 
             # calculate g-function values
             gfunc_uniform_T = gvalues(time_value_new, borefield, alpha, borehole_length, interpolate,
-                                      use_neural_network)
+                                      use_neural_network, **kwargs)
 
             # return interpolated values
             return np.interp(time_value, time_value_new, gfunc_uniform_T)
@@ -281,12 +315,13 @@ class GFunction:
         if not isinstance(time_value, (float, int)) and time_value_np.size != np.unique(np.asarray(time_value)).size:
             # calculate g-function values
             gfunc_uniform_T = gvalues(np.unique(time_value_np), borefield, alpha, borehole_length, interpolate,
-                                      use_neural_network)
+                                      use_neural_network, **kwargs)
 
             return np.interp(time_value, np.unique(time_value_np), gfunc_uniform_T)
 
         # calculate g-function values
-        gfunc_uniform_T = gvalues(time_value_np, borefield, alpha, borehole_length, interpolate, use_neural_network)
+        gfunc_uniform_T = gvalues(time_value_np, borefield, alpha, borehole_length, interpolate, use_neural_network,
+                                  **kwargs)
 
         return gfunc_uniform_T
 
