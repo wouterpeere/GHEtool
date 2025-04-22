@@ -10,7 +10,8 @@ This file contains all the main functionalities of GHEtool being:
 import numpy as np
 
 # import all the relevant functions
-from GHEtool import Borefield, FluidData, DoubleUTube, GroundConstantTemperature, MonthlyGeothermalLoadAbsolute
+from GHEtool import Borefield, ConstantFlowRate, ConstantFluidData, DoubleUTube, GroundConstantTemperature, \
+    MonthlyGeothermalLoadAbsolute
 
 
 def main_functionalities():
@@ -46,7 +47,7 @@ def main_functionalities():
     # borefield.activate_logger()
     # borefield.deactivate_logger()
 
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
     borefield.create_rectangular_borefield(10, 12, 6, 6, 100, 4, 0.075)
 
     borefield.Rb = 0.12  # equivalent borehole resistance (K/W)
@@ -86,10 +87,12 @@ def main_functionalities():
     # note that the original Rb* value will be overwritten!
 
     # this requires pipe and fluid data
-    fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
+    flow_data = ConstantFlowRate(mfr=0.2)
     pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+    borefield.flow_data = flow_data
 
     # disable the use of constant_Rb with the setup, in order to plot the profile correctly
     # when it is given as an argument to the size function, it will size correctly, but the plot will be with

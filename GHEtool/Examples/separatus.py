@@ -43,10 +43,8 @@ def design_with_single_U():
     """
     pipe_data = SingleUTube(2, 0.013, 0.016, 0.42, 0.035)
 
-    borefield = Borefield(load=load)
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield = Borefield(load=load, ground_data=ground_data, fluid_data=fluid_data, flow_data=flow_data,
+                          pipe_data=pipe_data)
     borefield.set_min_avg_fluid_temperature(6)
     borefield.set_max_avg_fluid_temperature(17)
 
@@ -64,10 +62,9 @@ def design_with_double_U():
     """
     pipe_data = DoubleUTube(2, 0.013, 0.016, 0.42, 0.035)
 
-    borefield = Borefield(load=load)
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield = Borefield(load=load, ground_data=ground_data, fluid_data=fluid_data, flow_data=flow_data,
+                          pipe_data=pipe_data)
+
     borefield.set_min_avg_fluid_temperature(6)
     borefield.set_max_avg_fluid_temperature(17)
 
@@ -85,10 +82,9 @@ def design_with_separatus():
     """
     pipe_data = Separatus(2)
 
-    borefield = Borefield(load=load)
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield = Borefield(load=load, ground_data=ground_data, fluid_data=fluid_data, flow_data=flow_data,
+                          pipe_data=pipe_data)
+
     borefield.set_min_avg_fluid_temperature(6)
     borefield.set_max_avg_fluid_temperature(17)
 
