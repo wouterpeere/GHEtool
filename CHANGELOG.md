@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## Fixed
 
 - Increase accuracy of optimise load profile (issue #335).
+- Problem with MonthlyBuildingLoadMultiYear (issue #339).
 
 ## [2.3.1] - 2025-01-23
 
