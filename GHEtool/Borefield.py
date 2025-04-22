@@ -554,14 +554,15 @@ class Borefield(BaseClass):
     @property
     def Rb(self) -> float:
         """
-        This function returns the equivalent borehole thermal resistance.
+        This function returns the equivalent borehole thermal resistance at the minimum average fluid temperature.
 
         Returns
         -------
         Rb : float
             Equivalent borehole thermal resistance [mK/W]
         """
-        return self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s, self.depth)
+        return self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s, self.depth,
+                                    temperature=min(self.Tf_min, self.results.min_temperature))
 
     @Rb.setter
     def Rb(self, Rb: float) -> None:

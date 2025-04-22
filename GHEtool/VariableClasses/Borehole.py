@@ -78,7 +78,6 @@ class Borehole(BaseClass):
         self._Rb = Rb
         self.use_constant_Rb = True
 
-    @property
     def Re(self, **kwargs) -> float:
         """
         Reynolds number.
@@ -286,7 +285,8 @@ class Borehole(BaseClass):
         return pipe.effective_borehole_thermal_resistance(self.flow_data.mfr(fluid_data=self.fluid_data, **kwargs),
                                                           self.fluid_data.cp(**kwargs))
 
-    def get_Rb(self, H: float, D: float, r_b: float, k_s: Union[callable, float], depth: float = None) -> float:
+    def get_Rb(self, H: float, D: float, r_b: float, k_s: Union[callable, float], depth: float = None,
+               **kwargs) -> float:
         """
         This function returns the equivalent borehole thermal resistance.
         If use_constant_Rb is True, self._Rb is returned, otherwise the resistance is calculated.
@@ -316,7 +316,7 @@ class Borehole(BaseClass):
         if self.use_constant_Rb:
             return self.Rb
 
-        return self.calculate_Rb(H, D, r_b, k_s if isinstance(k_s, (int, float)) else k_s(depth, D))
+        return self.calculate_Rb(H, D, r_b, k_s if isinstance(k_s, (int, float)) else k_s(depth, D), **kwargs)
 
     def __eq__(self, other):
         if not isinstance(other, Borehole):
