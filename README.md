@@ -60,7 +60,7 @@ our [project board](https://github.com/users/wouterpeere/projects/2) to check ou
 
 ## Requirements
 
-This code is tested with Python 3.9, 3.10, 3.11 and 3.12 and requires the following libraries (the versions
+This code is tested with Python 3.9, 3.10, 3.11, 3.12 and 3.13 and requires the following libraries (the versions
 mentioned are the ones with which the code is tested)
 
 * matplotlib >= 3.5.2
@@ -418,7 +418,6 @@ mixed-integer-linear-problem (MILP) energy system optimization. _Geotherm Energy
 
 Dion G., Pasquier, P., Perraudin, D. (2024). Sizing equation based on the outlet fluid temperature of closed-loop ground
 heat exchangers. In _Proceedings of International Ground Source Heat Pump Association_. Montréal (Canada), 28-30 May
-
 2024.
 
 Peere, W. (2024). Are Rules of Thumb Misleading? The Complexity of Borefield Sizing and the Importance of Design
@@ -436,7 +435,6 @@ engineering_ 226, Art.No. 120203, 10.1016/j.applthermaleng.2023.120203
 
 Cimmino, M., Cook., J. C. (2022). pygfunction 2.2 : New Features and Improvements in Accuracy and Computational
 Efficiency. In _Proceedings of IGSHPA Research Track 2022_. Las Vegas (USA), 6-8 December
-
 2022. https://doi.org/10.22488/okstate.22.000015.
 
 Verleyen, L., Peere, W., Michiels, E., Boydens, W., Helsen, L. (2022). The beauty of reason and insight: a story about
