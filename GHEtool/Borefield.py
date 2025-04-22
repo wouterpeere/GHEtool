@@ -562,7 +562,8 @@ class Borefield(BaseClass):
             Equivalent borehole thermal resistance [mK/W]
         """
         return self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s, self.depth,
-                                    temperature=min(self.Tf_min, self.results.min_temperature))
+                                    temperature=min(self.Tf_min,
+                                                    self.results.min_temperature if self.results.min_temperature is not None else 10000))
 
     @Rb.setter
     def Rb(self, Rb: float) -> None:
@@ -1690,6 +1691,15 @@ class Borefield(BaseClass):
 
             results = None
 
+            def get_rb(temperature):
+                if len(temperature) == 0:
+                    return self.borehole.get_Rb(H, self.D, self.r_b,
+                                                self.ground_data.k_s(depth, self.D), depth,
+                                                temperature=self.Tf_min)
+                return self.borehole.get_Rb(H, self.D, self.r_b,
+                                            self.ground_data.k_s(depth, self.D), depth,
+                                            temperature=temperature)
+
             if not hourly:
                 # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
                 # g-function. This dataset is checked over and over again and is correct
@@ -1718,30 +1728,25 @@ class Borefield(BaseClass):
                 # now the Tf will be calculated based on
                 # Tf = Tb + Q * R_b
                 results_month_injection = Tb + self.load.monthly_baseload_injection_power_simulation_period * 1000 * (
-                        Rb / self.number_of_boreholes / H)
+                        get_rb(self.results.monthly_injection) / self.number_of_boreholes / H)
                 results_month_extraction = Tb - self.load.monthly_baseload_extraction_power_simulation_period * 1000 * (
-                        Rb / self.number_of_boreholes / H)
+                        get_rb(self.results.monthly_extraction) / self.number_of_boreholes / H)
 
                 # extra summation if the g-function value for the peak is included
                 results_peak_injection = (
-                        results_month_injection
-                        + (
-                                self.load.monthly_peak_injection_simulation_period - self.load.monthly_baseload_injection_power_simulation_period)
-                        * 1000
-                        * (g_value_peak_injection / k_s / 2 / pi + Rb)
-                        / self.number_of_boreholes
-                        / H
+                        Tb
+                        + (self.load.monthly_peak_injection_simulation_period
+                           * (g_value_peak_injection / k_s / 2 / pi + get_rb(self.results.peak_injection))
+                           - self.load.monthly_baseload_injection_power_simulation_period * g_value_peak_injection / k_s / 2 / pi)
+                        * 1000 / self.number_of_boreholes / H
                 )
                 results_peak_extraction = (
-                        results_month_extraction
-                        - (
-                                self.load.monthly_peak_extraction_simulation_period - self.load.monthly_baseload_extraction_power_simulation_period)
-                        * 1000
-                        * (g_value_peak_extraction / k_s / 2 / pi + Rb)
-                        / self.number_of_boreholes
-                        / H
+                        Tb +
+                        (- self.load.monthly_peak_extraction_simulation_period
+                         * (g_value_peak_extraction / k_s / 2 / pi + get_rb(self.results.peak_extraction))
+                         + self.load.monthly_baseload_extraction_power_simulation_period * g_value_peak_extraction / k_s / 2 / pi)
+                        * 1000 / self.number_of_boreholes / H
                 )
-
                 # save temperatures under variable
                 results = ResultsMonthly(
                     borehole_wall_temp=Tb,
@@ -1775,7 +1780,8 @@ class Borefield(BaseClass):
 
                 # now the Tf will be calculated based on
                 # Tf = Tb + Q * R_b
-                temperature_result = Tb + hourly_load * 1000 * (Rb / self.number_of_boreholes / H)
+                temperature_result = Tb + hourly_load * 1000 * (
+                        get_rb(self.results.peak_injection) / self.number_of_boreholes / H)
 
                 # reset other variables
                 results = ResultsHourly(borehole_wall_temp=Tb, temperature_fluid=temperature_result)
