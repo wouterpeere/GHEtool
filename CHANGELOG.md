@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Pressure drop calculation for horizontal pipe and total system (issue #332).
 - Added optimisation function for balanced borefield (issue #335).
 - Min_temperature and Max_temperature property to results class (issue #335).
+- Support for Python 3.13 (issue #319).
 
 ## Changed
 
