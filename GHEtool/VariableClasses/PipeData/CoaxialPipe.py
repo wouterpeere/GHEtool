@@ -209,7 +209,7 @@ class CoaxialPipe(_PipeData):
         pipe.visualize_pipes()
         plt.show()
 
-    def __repr__(self):
+    def __export__(self):
         return {
             'type': 'Coaxial',
             'inner_diameter [mm]': self.r_in_out * 2 * 1000,

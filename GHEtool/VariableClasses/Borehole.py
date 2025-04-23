@@ -137,6 +137,9 @@ class Borehole(BaseClass):
             self._flow_data = fluid_data.flow_rate
         else:
             self._fluid_data = fluid_data
+        if isinstance(self._pipe_data, _PipeData):
+            self.pipe_data.R_f = 0
+            self.pipe_data.R_p = 0
         if self.data_available:
             self.use_constant_Rb = False
 
@@ -180,6 +183,9 @@ class Borehole(BaseClass):
         None
         """
         self._pipe_data = pipe_data
+        if isinstance(self._pipe_data, _PipeData):
+            self.pipe_data.R_f = 0
+            self.pipe_data.R_p = 0
         if self.data_available:
             self.use_constant_Rb = False
 
@@ -223,6 +229,9 @@ class Borehole(BaseClass):
         None
         """
         self._flow_data = flow_data
+        if isinstance(self._pipe_data, _PipeData):
+            self.pipe_data.R_f = 0
+            self.pipe_data.R_p = 0
         if self.data_available:
             self.use_constant_Rb = False
 
@@ -326,9 +335,9 @@ class Borehole(BaseClass):
                 return False
         return True
 
-    def __repr__(self):
+    def __export__(self):
         if self.use_constant_Rb:
             return {'Rb': self.Rb}
-        return {'fluid': self.fluid_data.__repr__(),
-                'pipe': self.pipe_data.__repr__(),
-                'flow': self.flow_data.__repr__()}
+        return {'fluid': self.fluid_data.__export__(),
+                'pipe': self.pipe_data.__export__(),
+                'flow': self.flow_data.__export__()}

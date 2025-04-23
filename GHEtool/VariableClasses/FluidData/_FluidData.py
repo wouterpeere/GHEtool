@@ -3,9 +3,10 @@ This document contains the variable classes for the fluid data.
 """
 import abc
 from abc import ABC
+from GHEtool.VariableClasses.BaseClass import BaseClass
 
 
-class _FluidData(ABC):
+class _FluidData(ABC, BaseClass):
     """
     Contains information regarding the fluid data of the borefield.
     """
@@ -19,7 +20,7 @@ class _FluidData(ABC):
             Freezing point of the fluid °C
         """
         self._freezing_point = freezing_point
-        
+
     @abc.abstractmethod
     def k_f(self, **kwargs) -> float:
         """

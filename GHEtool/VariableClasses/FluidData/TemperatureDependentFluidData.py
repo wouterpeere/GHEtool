@@ -171,7 +171,7 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
             self.freezing_point
         )
 
-    def __repr__(self):
+    def __export__(self):
         return {
             'name': self._name,
             'percentage': self._percentage

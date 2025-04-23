@@ -1,8 +1,9 @@
 import abc
 from abc import ABC
+from GHEtool.VariableClasses.BaseClass import BaseClass
 
 
-class _FlowData(ABC):
+class _FlowData(ABC, BaseClass):
 
     @abc.abstractmethod
     def vfr(self, **kwargs):

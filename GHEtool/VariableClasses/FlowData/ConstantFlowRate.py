@@ -86,7 +86,7 @@ class ConstantFlowRate(_FlowData, BaseClass):
             return False
         return True
 
-    def __repr__(self):
+    def __export__(self):
         if self._mfr is not None:
             return {'mfr [kg/s]': self.mfr()}
         if self._vfr is not None:

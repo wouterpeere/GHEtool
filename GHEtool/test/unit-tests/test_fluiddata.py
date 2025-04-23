@@ -131,13 +131,13 @@ def test_equal():
 
 def test_repr_constant_fluid_data():
     fluid = ConstantFluidData(0.568, 998, 4180, 1e-3)
-    assert fluid.__repr__() == {'Pr': 7.359154929577465,
-                                'cp [J/(kg·K)]': 4180,
-                                'freezing_point [°C]': None,
-                                'k_f [W/(m·K)]': 0.568,
-                                'mu [Pa·s]': 0.001,
-                                'nu [m²/s]': 1.002004008016032e-06,
-                                'rho [kg/m³]': 998}
+    assert fluid.__export__() == {'Pr': 7.359154929577465,
+                                  'cp [J/(kg·K)]': 4180,
+                                  'freezing_point [°C]': None,
+                                  'k_f [W/(m·K)]': 0.568,
+                                  'mu [Pa·s]': 0.001,
+                                  'nu [m²/s]': 1.002004008016032e-06,
+                                  'rho [kg/m³]': 998}
 
 
 def test_temperature_dependent_fluid_data():
@@ -156,13 +156,13 @@ def test_temperature_dependent_fluid_data():
 def test_create_constant():
     fluid = TemperatureDependentFluidData('MPG', 25)
     constant_fluid = fluid.create_constant(20)
-    assert constant_fluid == ConstantFluidData(0.4678523588342376, 1019.2770761862255, 3920.4674905851116,
-                                               0.00244555428898062, -9.786660880295903)
+    assert constant_fluid == ConstantFluidData(0.46785241126305993, 1019.2775612579634, 3920.4675112024747,
+                                               0.0024452566486468344, -9.786660880295903)
 
 
 def test_repr_temperature_dependent_fluid_data():
     fluid = TemperatureDependentFluidData('MPG', 25)
-    assert fluid.__repr__() == {'name': 'MPG', 'percentage': 25}
+    assert fluid.__export__() == {'name': 'MPG', 'percentage': 25}
 
 
 def test_check_values_temperature_dependent_fluid_data():

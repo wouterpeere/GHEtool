@@ -36,9 +36,9 @@ def test_conversion_mass_flow_volume_flow():
 
 def test_repr_constant_flow_rate():
     fluid = ConstantFlowRate(mfr=0.2)
-    assert fluid.__repr__() == {'mfr [kg/s]': 0.2}
+    assert fluid.__export__() == {'mfr [kg/s]': 0.2}
     fluid = ConstantFlowRate(vfr=0.2)
-    assert fluid.__repr__() == {'vfr [l/s]': 0.2}
+    assert fluid.__export__() == {'vfr [l/s]': 0.2}
 
 
 def test_eq():

@@ -1,3 +1,5 @@
+import numpy as np
+
 from GHEtool.VariableClasses.FluidData._FluidData import _FluidData
 from GHEtool.VariableClasses.BaseClass import BaseClass
 
@@ -79,11 +81,11 @@ class ConstantFluidData(_FluidData, BaseClass):
     def __eq__(self, other):
         if not isinstance(other, ConstantFluidData):
             return False
-        if self._k_f != other._k_f or self._mu != other._mu or self._rho != other._rho or self._cp != other._cp:
-            return False
-        return True
+        return np.allclose([self._k_f, self._mu, self._rho, self._cp],
+                           [other._k_f, other._mu, other._rho,
+                            other._cp]) and self.freezing_point == other.freezing_point
 
-    def __repr__(self):
+    def __export__(self):
         return {
             'k_f [W/(m·K)]': self.k_f(),
             'rho [kg/m³]': self.rho(),

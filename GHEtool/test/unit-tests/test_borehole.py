@@ -13,6 +13,28 @@ flow_data = ConstantFlowRate(mfr=0.2)
 pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 
 
+def test_seq():
+    borehole = Borehole()
+    assert borehole.fluid_data is None
+    borehole.fluid_data = fluid_data
+    assert borehole.fluid_data == fluid_data
+    del borehole.fluid_data
+    assert borehole.fluid_data is None
+    borehole = Borehole()
+    borehole.pipe_data = pipe_data
+    assert borehole.pipe_data.R_f == 0
+    borehole.fluid_data = fluid_data
+    assert borehole.pipe_data.R_f == 0
+    borehole.pipe_data.calculate_resistances(fluid_data, flow_data)
+    assert np.isclose(0.01663038005086118, borehole.pipe_data.R_f)
+    borehole = Borehole()
+    borehole.pipe_data = pipe_data
+    borehole.fluid_data = fluid_data
+    assert borehole.pipe_data.R_f == 0
+    borehole.pipe_data.calculate_resistances(fluid_data, flow_data)
+    assert np.isclose(0.01663038005086118, borehole.pipe_data.R_f)
+
+
 def test_fluid_data_without_pipe():
     borehole = Borehole()
     assert borehole.fluid_data is None
@@ -163,7 +185,7 @@ def test_repr_():
                      'spacing [mm]': 50.0,
                      'thickness [mm]': 5.0,
                      'type': 'U'},
-            'flow': {'vfr [l/s]': 0.2}} == borehole.__repr__()
+            'flow': {'vfr [l/s]': 0.2}} == borehole.__export__()
 
     borehole = Borehole()
-    assert {'Rb': 0.12} == borehole.__repr__()
+    assert {'Rb': 0.12} == borehole.__export__()

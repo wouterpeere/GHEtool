@@ -58,6 +58,6 @@ class Separatus(SingleUTube):
 
         return single_u
 
-    def __repr__(self):
+    def __export__(self):
         return {'type': 'Separatus',
                 'k_g [W/(m·K)]': self.k_g}

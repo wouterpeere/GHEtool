@@ -196,7 +196,7 @@ class MultipleUTube(_PipeData):
         pipe.visualize_pipes()
         plt.show()
 
-    def __repr__(self):
+    def __export__(self):
         return {'type': 'U',
                 'nb_of_tubes': self.number_of_pipes,
                 'thickness [mm]': (self.r_out * 1000 - self.r_in * 1000),

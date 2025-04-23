@@ -175,7 +175,7 @@ class FluidData(BaseClass):
             return True
         return False
 
-    def __repr__(self):
+    def __export__(self):
         temp = f'Fluid parameters\n\tThermal conductivity of the fluid [W/(m·K)]: {self.fluid_data.k_f():.3f}\n\t' \
                f'Density of the fluid [kg/m³]: {self.fluid_data.rho():.3f}\n\t' \
                f'Thermal capacity of the fluid [J/(kg·K)]: {self.fluid_data.cp():.3f}\n\t' \
