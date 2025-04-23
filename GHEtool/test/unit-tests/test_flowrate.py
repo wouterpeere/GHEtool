@@ -49,4 +49,5 @@ def test_eq():
 
     assert fluid != fluid2
     assert fluid3 != fluid2
+    assert fluid2 != fluid3
     assert fluid4 == fluid2

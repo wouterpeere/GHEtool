@@ -185,4 +185,9 @@ def test_eq_temperature_dependent_fluid_data():
 
 def test_multiple_temperature_dependent_fluid_data():
     fluid = TemperatureDependentFluidData('MEA', 30)
-    print(fluid.k_f(temperature=np.array([-5, 0, 5, 10, 15, 40, 50, 60])))
+    fluid.k_f(temperature=np.array([-5, 0, 5, 10, 15, 40, 50, 60]))
+
+
+def test_unsupported_fluid():
+    with pytest.raises(ValueError):
+        TemperatureDependentFluidData('Ai', 30)
