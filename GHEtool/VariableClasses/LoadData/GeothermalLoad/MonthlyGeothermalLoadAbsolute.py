@@ -444,14 +444,16 @@ class MonthlyGeothermalLoadAbsolute(_SingleYear, _LoadData):
             return array
         return np.concatenate((array[self.start_month - 1:], array[: self.start_month - 1]))
 
-    def __repr__(self):
-        temp = f'Monthly geothermal load\n'
-        temp += f'Month\tPeak extraction [kW]\tPeak injection [kW]\tBaseload extraction [kWh]\tBaseload injection [kWh]\n'
+    def __export__(self):
+        temp = {'type': 'Monthly geothermal load', 'load': {}}
         for i in range(12):
-            temp += f'{i + 1}\t{self.peak_extraction[i]:.2f}\t{self.peak_injection[i]:.2f}\t' \
-                    f'{self.baseload_extraction[i]:.2f}\t{self.baseload_injection[i]:.2f}\n'
-        temp += f'Peak injection duration [hour]: {self.peak_injection_duration / 3600:.1f}\n'
-        temp += f'Peak extraction duration [hour]: {self.peak_extraction_duration / 3600:.1f}\n'
-        temp += f'Simulation period [year]: {self.simulation_period}\n' \
-                f'First month of simulation [-]: {self.start_month}'
+            temp['load'][i + 1] = {'Peak extraction [kW]': self.peak_extraction[i],
+                                   'Peak injection [kW]': self.peak_injection[i],
+                                   'Baseload extraction [kWh]': self.baseload_extraction[i],
+                                   'Baseload injection [kWh]': self.baseload_injection[i]
+                                   }
+        temp['Peak injection duration [hour]'] = self.peak_injection_duration / 3600
+        temp['Peak extraction duration [hour]'] = self.peak_extraction_duration / 3600
+        temp['Simulation period [year]'] = self.simulation_period
+        temp['First month of simulation [-]'] = self.start_month
         return temp

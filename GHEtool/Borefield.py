@@ -1999,13 +1999,15 @@ class Borefield(BaseClass):
         return 2
 
     def __export__(self):
-        return f'Maximum average fluid temperature [°C]: {self.Tf_max}\n' \
-               f'Minimum average fluid temperature [°C]: {self.Tf_min}\n' \
-               f'Average buried depth [m]: {self.D}\n' \
-               f'Average borehole length [m]: {self.H}\n' \
-               f'Average borehole depth [m]: {self.depth}\n' \
-               f'Borehole diameter [mm]: {self.r_b * 2000:.0f}\n' \
-               f'Number of boreholes [-]: {self.number_of_boreholes}\n' \
-               f'{self.ground_data.__export__()}\n' \
-               f'{self.borehole.__export__()}\n' \
-               f'{self.load.__export__()}'
+        return {
+            'Maximum average fluid temperature [°C]': self.Tf_max,
+            'Minimum average fluid temperature [°C]': self.Tf_min,
+            'Average buried depth [m]': self.D,
+            'Average borehole length [m]': self.H,
+            'Average borehole depth [m]': self.depth,
+            'Borehole diameter [mm]': self.r_b * 2000,
+            'Number of boreholes [-]': self.number_of_boreholes,
+            'Ground data': self.ground_data.__export__(),
+            'Borehole data': self.borehole.__export__(),
+            'Load data': self.load.__export__()
+        }

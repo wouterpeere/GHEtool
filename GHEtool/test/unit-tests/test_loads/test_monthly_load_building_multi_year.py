@@ -266,8 +266,8 @@ def test_repr_():
         peak_heating=np.tile(peak_heating, 10),
         peak_cooling=np.tile(peak_cooling, 10))
 
-    assert 'Multiyear monthly building load\n' \
-           'Efficiency heating: SCOP [-]: 5\n' \
-           'Efficiency cooling: SEER [-]: 20\n' \
-           'Peak cooling duration [hour]: 6.0\n' \
-           'Peak heating duration [hour]: 6.0' == load.__repr__()
+    assert {'Efficiency cooling': {'SEER [-]': 20},
+            'Efficiency heating': {'SCOP [-]': 5},
+            'Peak cooling duration [hour]': 6.0,
+            'Peak heating duration [hour]': 6.0,
+            'type': 'Multiyear monthly building load'} == load.__export__()

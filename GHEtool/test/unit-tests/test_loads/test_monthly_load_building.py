@@ -637,49 +637,117 @@ def test_time_array():
 
 def test_repr_():
     load = MonthlyBuildingLoadAbsolute(*load_case(1), 10, 5, 5)
-    assert 'Monthly building load\n' \
-           'Month\tPeak heating [kW]\tPeak cooling [kW]\tBaseload heating [kWh]\t' \
-           'Baseload cooling [kWh]\n' \
-           '1\t63.70\t5.14\t46500.00\t3750.00\n' \
-           '2\t60.82\t10.27\t44400.00\t7500.00\n' \
-           '3\t51.37\t22.00\t37500.00\t7500.00\n' \
-           '4\t40.68\t44.00\t29700.00\t7500.00\n' \
-           '5\t26.30\t83.00\t19200.00\t11250.00\n' \
-           '6\t0.00\t117.00\t0.00\t15000.00\n' \
-           '7\t0.00\t134.00\t0.00\t30000.00\n' \
-           '8\t0.00\t150.00\t0.00\t30000.00\n' \
-           '9\t25.07\t100.00\t18300.00\t15000.00\n' \
-           '10\t35.75\t23.00\t26100.00\t11250.00\n' \
-           '11\t48.08\t10.27\t35100.00\t7500.00\n' \
-           '12\t59.18\t5.14\t43200.00\t3750.00\n' \
-           'Peak cooling duration [hour]: 6.0\n' \
-           'Peak heating duration [hour]: 6.0\n' \
-           'Efficiency heating: SCOP [-]: 5\n' \
-           'Efficiency cooling: SEER [-]: 5\n' \
-           'Simulation period [year]: 10\n' \
-           'First month of simulation [-]: 1' == load.__repr__()
+    assert {'Efficiency cooling': {'SEER [-]': 5},
+            'Efficiency heating': {'SCOP [-]': 5},
+            'First month of simulation [-]': 1,
+            'Peak cooling duration [hour]': 6.0,
+            'Peak heating duration [hour]': 6.0,
+            'Simulation period [year]': 10,
+            'load': {1: {'Baseload cooling [kWh]': 3750.0,
+                         'Baseload heating [kWh]': 46500.0,
+                         'Peak cooling [kW]': 5.136986301369863,
+                         'Peak heating [kW]': 63.6986301369863},
+                     2: {'Baseload cooling [kWh]': 7500.0,
+                         'Baseload heating [kWh]': 44400.0,
+                         'Peak cooling [kW]': 10.273972602739725,
+                         'Peak heating [kW]': 60.821917808219176},
+                     3: {'Baseload cooling [kWh]': 7500.0,
+                         'Baseload heating [kWh]': 37500.0,
+                         'Peak cooling [kW]': 22.0,
+                         'Peak heating [kW]': 51.36986301369863},
+                     4: {'Baseload cooling [kWh]': 7500.0,
+                         'Baseload heating [kWh]': 29700.000000000004,
+                         'Peak cooling [kW]': 44.0,
+                         'Peak heating [kW]': 40.684931506849324},
+                     5: {'Baseload cooling [kWh]': 11250.0,
+                         'Baseload heating [kWh]': 19200.0,
+                         'Peak cooling [kW]': 83.0,
+                         'Peak heating [kW]': 26.301369863013697},
+                     6: {'Baseload cooling [kWh]': 15000.0,
+                         'Baseload heating [kWh]': 0.0,
+                         'Peak cooling [kW]': 117.0,
+                         'Peak heating [kW]': 0.0},
+                     7: {'Baseload cooling [kWh]': 30000.0,
+                         'Baseload heating [kWh]': 0.0,
+                         'Peak cooling [kW]': 134.0,
+                         'Peak heating [kW]': 0.0},
+                     8: {'Baseload cooling [kWh]': 30000.0,
+                         'Baseload heating [kWh]': 0.0,
+                         'Peak cooling [kW]': 150.0,
+                         'Peak heating [kW]': 0.0},
+                     9: {'Baseload cooling [kWh]': 15000.0,
+                         'Baseload heating [kWh]': 18300.0,
+                         'Peak cooling [kW]': 100.0,
+                         'Peak heating [kW]': 25.068493150684933},
+                     10: {'Baseload cooling [kWh]': 11250.0,
+                          'Baseload heating [kWh]': 26099.999999999996,
+                          'Peak cooling [kW]': 23.0,
+                          'Peak heating [kW]': 35.75342465753424},
+                     11: {'Baseload cooling [kWh]': 7500.0,
+                          'Baseload heating [kWh]': 35100.0,
+                          'Peak cooling [kW]': 10.273972602739725,
+                          'Peak heating [kW]': 48.082191780821915},
+                     12: {'Baseload cooling [kWh]': 3750.0,
+                          'Baseload heating [kWh]': 43199.99999999999,
+                          'Peak cooling [kW]': 5.136986301369863,
+                          'Peak heating [kW]': 59.17808219178081}},
+            'type': 'Monthly building load'} == load.__export__()
 
     load.dhw = 10000
-    assert 'Monthly building load\n' \
-           'Month\tPeak heating [kW]\tPeak cooling [kW]\tBaseload heating [kWh]\t' \
-           'Baseload cooling [kWh]\n' \
-           '1\t63.70\t5.14\t46500.00\t3750.00\n' \
-           '2\t60.82\t10.27\t44400.00\t7500.00\n' \
-           '3\t51.37\t22.00\t37500.00\t7500.00\n' \
-           '4\t40.68\t44.00\t29700.00\t7500.00\n' \
-           '5\t26.30\t83.00\t19200.00\t11250.00\n' \
-           '6\t0.00\t117.00\t0.00\t15000.00\n' \
-           '7\t0.00\t134.00\t0.00\t30000.00\n' \
-           '8\t0.00\t150.00\t0.00\t30000.00\n' \
-           '9\t25.07\t100.00\t18300.00\t15000.00\n' \
-           '10\t35.75\t23.00\t26100.00\t11250.00\n' \
-           '11\t48.08\t10.27\t35100.00\t7500.00\n' \
-           '12\t59.18\t5.14\t43200.00\t3750.00\n' \
-           'Peak cooling duration [hour]: 6.0\n' \
-           'Peak heating duration [hour]: 6.0\n' \
-           'Efficiency heating: SCOP [-]: 5\n' \
-           'Efficiency cooling: SEER [-]: 5\n' \
-           'Simulation period [year]: 10\n' \
-           'First month of simulation [-]: 1\n' \
-           'DHW demand [kWh/year]: 10000\n' \
-           'Efficiency DHW: SCOP [-]: 4' == load.__repr__()
+    assert {'DHW demand [kWh/year]': 10000.0,
+            'Efficiency DHW': {'SCOP [-]': 4},
+            'Efficiency cooling': {'SEER [-]': 5},
+            'Efficiency heating': {'SCOP [-]': 5},
+            'First month of simulation [-]': 1,
+            'Peak cooling duration [hour]': 6.0,
+            'Peak heating duration [hour]': 6.0,
+            'Simulation period [year]': 10,
+            'load': {1: {'Baseload cooling [kWh]': 3750.0,
+                         'Baseload heating [kWh]': 46500.0,
+                         'Peak cooling [kW]': 5.136986301369863,
+                         'Peak heating [kW]': 63.6986301369863},
+                     2: {'Baseload cooling [kWh]': 7500.0,
+                         'Baseload heating [kWh]': 44400.0,
+                         'Peak cooling [kW]': 10.273972602739725,
+                         'Peak heating [kW]': 60.821917808219176},
+                     3: {'Baseload cooling [kWh]': 7500.0,
+                         'Baseload heating [kWh]': 37500.0,
+                         'Peak cooling [kW]': 22.0,
+                         'Peak heating [kW]': 51.36986301369863},
+                     4: {'Baseload cooling [kWh]': 7500.0,
+                         'Baseload heating [kWh]': 29700.000000000004,
+                         'Peak cooling [kW]': 44.0,
+                         'Peak heating [kW]': 40.684931506849324},
+                     5: {'Baseload cooling [kWh]': 11250.0,
+                         'Baseload heating [kWh]': 19200.0,
+                         'Peak cooling [kW]': 83.0,
+                         'Peak heating [kW]': 26.301369863013697},
+                     6: {'Baseload cooling [kWh]': 15000.0,
+                         'Baseload heating [kWh]': 0.0,
+                         'Peak cooling [kW]': 117.0,
+                         'Peak heating [kW]': 0.0},
+                     7: {'Baseload cooling [kWh]': 30000.0,
+                         'Baseload heating [kWh]': 0.0,
+                         'Peak cooling [kW]': 134.0,
+                         'Peak heating [kW]': 0.0},
+                     8: {'Baseload cooling [kWh]': 30000.0,
+                         'Baseload heating [kWh]': 0.0,
+                         'Peak cooling [kW]': 150.0,
+                         'Peak heating [kW]': 0.0},
+                     9: {'Baseload cooling [kWh]': 15000.0,
+                         'Baseload heating [kWh]': 18300.0,
+                         'Peak cooling [kW]': 100.0,
+                         'Peak heating [kW]': 25.068493150684933},
+                     10: {'Baseload cooling [kWh]': 11250.0,
+                          'Baseload heating [kWh]': 26099.999999999996,
+                          'Peak cooling [kW]': 23.0,
+                          'Peak heating [kW]': 35.75342465753424},
+                     11: {'Baseload cooling [kWh]': 7500.0,
+                          'Baseload heating [kWh]': 35100.0,
+                          'Peak cooling [kW]': 10.273972602739725,
+                          'Peak heating [kW]': 48.082191780821915},
+                     12: {'Baseload cooling [kWh]': 3750.0,
+                          'Baseload heating [kWh]': 43199.99999999999,
+                          'Peak cooling [kW]': 5.136986301369863,
+                          'Peak heating [kW]': 59.17808219178081}},
+            'type': 'Monthly building load'} == load.__export__()

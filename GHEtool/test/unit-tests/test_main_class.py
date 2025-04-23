@@ -1151,37 +1151,71 @@ def test_repr_():
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(3))
     borefield.ground_data = ground_data_constant
 
-    assert 'Maximum average fluid temperature [°C]: 16.0\n' \
-           'Minimum average fluid temperature [°C]: 0.0\n' \
-           'Average buried depth [m]: 4.0\n' \
-           'Average borehole length [m]: 110.0\n' \
-           'Average borehole depth [m]: 114.0\n' \
-           'Borehole diameter [mm]: 150\n' \
-           'Number of boreholes [-]: 120\n' \
-           'Constant ground temperature\n' \
-           '\tGround temperature at infinity [°C]: 10\n' \
-           '\tConductivity [W/(m·K)]: 3\n' \
-           '\tVolumetric heat capacity [MJ/(m³·K)]: 2.4\n' \
-           'Borehole effective thermal resistance [(m·K)/W]: 0.12\n' \
-           'Monthly geothermal load\n' \
-           'Month\tPeak extraction [kW]\tPeak injection [kW]\tBaseload extraction ' \
-           '[kWh]\tBaseload injection [kWh]\n' \
-           '1\t300.00\t8.22\t24800.00\t6000.00\n' \
-           '2\t266.25\t16.44\t23680.00\t12000.00\n' \
-           '3\t191.25\t16.44\t20000.00\t12000.00\n' \
-           '4\t103.12\t16.44\t15840.00\t12000.00\n' \
-           '5\t14.03\t24.66\t10240.00\t18000.00\n' \
-           '6\t0.00\t32.88\t0.00\t24000.00\n' \
-           '7\t0.00\t65.75\t0.00\t48000.00\n' \
-           '8\t0.00\t65.75\t0.00\t48000.00\n' \
-           '9\t75.75\t32.88\t9760.00\t24000.00\n' \
-           '10\t159.38\t24.66\t13920.00\t18000.00\n' \
-           '11\t223.12\t16.44\t18720.00\t12000.00\n' \
-           '12\t255.00\t8.22\t23040.00\t6000.00\n' \
-           'Peak injection duration [hour]: 6.0\n' \
-           'Peak extraction duration [hour]: 6.0\n' \
-           'Simulation period [year]: 20\n' \
-           'First month of simulation [-]: 1' == borefield.__export__()
+    assert {'Average borehole depth [m]': 114.0,
+            'Average borehole length [m]': 110.0,
+            'Average buried depth [m]': 4.0,
+            'Borehole data': {'Rb': 0.12},
+            'Borehole diameter [mm]': 149.99999999999997,
+            'Ground data': {'Conductivity [W/(m·K)]': 3,
+                            'Ground temperature at infinity [°C]': 10,
+                            'Volumetric heat capacity [MJ/(m³·K)]': 2.4,
+                            'type': 'Constant ground temperature'},
+            'Load data': {'First month of simulation [-]': 1,
+                          'Peak extraction duration [hour]': 6.0,
+                          'Peak injection duration [hour]': 6.0,
+                          'Simulation period [year]': 20,
+                          'load': {1: {'Baseload extraction [kWh]': 24800.0,
+                                       'Baseload injection [kWh]': 6000.0,
+                                       'Peak extraction [kW]': 300.0,
+                                       'Peak injection [kW]': 8.219178082191782},
+                                   2: {'Baseload extraction [kWh]': 23680.0,
+                                       'Baseload injection [kWh]': 12000.0,
+                                       'Peak extraction [kW]': 266.25,
+                                       'Peak injection [kW]': 16.438356164383563},
+                                   3: {'Baseload extraction [kWh]': 20000.0,
+                                       'Baseload injection [kWh]': 12000.0,
+                                       'Peak extraction [kW]': 191.25,
+                                       'Peak injection [kW]': 16.438356164383563},
+                                   4: {'Baseload extraction [kWh]': 15840.0,
+                                       'Baseload injection [kWh]': 12000.0,
+                                       'Peak extraction [kW]': 103.125,
+                                       'Peak injection [kW]': 16.438356164383563},
+                                   5: {'Baseload extraction [kWh]': 10240.0,
+                                       'Baseload injection [kWh]': 18000.0,
+                                       'Peak extraction [kW]': 14.027397260273972,
+                                       'Peak injection [kW]': 24.65753424657534},
+                                   6: {'Baseload extraction [kWh]': 0.0,
+                                       'Baseload injection [kWh]': 24000.0,
+                                       'Peak extraction [kW]': 0.0,
+                                       'Peak injection [kW]': 32.87671232876713},
+                                   7: {'Baseload extraction [kWh]': 0.0,
+                                       'Baseload injection [kWh]': 48000.0,
+                                       'Peak extraction [kW]': 0.0,
+                                       'Peak injection [kW]': 65.75342465753425},
+                                   8: {'Baseload extraction [kWh]': 0.0,
+                                       'Baseload injection [kWh]': 48000.0,
+                                       'Peak extraction [kW]': 0.0,
+                                       'Peak injection [kW]': 65.75342465753425},
+                                   9: {'Baseload extraction [kWh]': 9760.0,
+                                       'Baseload injection [kWh]': 24000.0,
+                                       'Peak extraction [kW]': 75.75,
+                                       'Peak injection [kW]': 32.87671232876713},
+                                   10: {'Baseload extraction [kWh]': 13919.999999999998,
+                                        'Baseload injection [kWh]': 18000.0,
+                                        'Peak extraction [kW]': 159.375,
+                                        'Peak injection [kW]': 24.65753424657534},
+                                   11: {'Baseload extraction [kWh]': 18720.000000000004,
+                                        'Baseload injection [kWh]': 12000.0,
+                                        'Peak extraction [kW]': 223.125,
+                                        'Peak injection [kW]': 16.438356164383563},
+                                   12: {'Baseload extraction [kWh]': 23040.0,
+                                        'Baseload injection [kWh]': 6000.0,
+                                        'Peak extraction [kW]': 255.0,
+                                        'Peak injection [kW]': 8.219178082191782}},
+                          'type': 'Monthly geothermal load'},
+            'Maximum average fluid temperature [°C]': 16.0,
+            'Minimum average fluid temperature [°C]': 0.0,
+            'Number of boreholes [-]': 120} == borefield.__export__()
 
 
 def test_with_titled_borefield():
