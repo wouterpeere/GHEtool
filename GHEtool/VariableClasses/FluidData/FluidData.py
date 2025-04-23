@@ -165,7 +165,7 @@ class FluidData(BaseClass):
         """
         return self.fluid_data.Pr()
 
-    def check_values(self) -> bool:
+    def check_values(self) -> bool:  # pragma : no cover
         return self.fluid_data.check_values()
 
     def __eq__(self, other):

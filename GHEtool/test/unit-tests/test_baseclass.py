@@ -79,3 +79,8 @@ def test_with_slots():
     test_class2 = TestClassesWithSlots()
     test_class2.clear()
     assert not test_class2.check_values()
+
+
+def test_export():
+    test = TestClass()
+    assert test.__export__() is None

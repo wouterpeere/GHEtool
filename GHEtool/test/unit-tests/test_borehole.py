@@ -11,28 +11,22 @@ from GHEtool.VariableClasses import Borehole
 fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
 flow_data = ConstantFlowRate(mfr=0.2)
 pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
+old_fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
 
 
-def test_seq():
-    borehole = Borehole()
-    assert borehole.fluid_data is None
-    borehole.fluid_data = fluid_data
+def test_load_old_fluid_data():
+    borehole = Borehole(fluid_data=old_fluid_data, pipe_data=pipe_data)
     assert borehole.fluid_data == fluid_data
-    del borehole.fluid_data
-    assert borehole.fluid_data is None
+    assert borehole.flow_data == flow_data
+
+
+def test_del_flow_data():
     borehole = Borehole()
-    borehole.pipe_data = pipe_data
-    assert borehole.pipe_data.R_f == 0
-    borehole.fluid_data = fluid_data
-    assert borehole.pipe_data.R_f == 0
-    borehole.pipe_data.calculate_resistances(fluid_data, flow_data)
-    assert np.isclose(0.01663038005086118, borehole.pipe_data.R_f)
-    borehole = Borehole()
-    borehole.pipe_data = pipe_data
-    borehole.fluid_data = fluid_data
-    assert borehole.pipe_data.R_f == 0
-    borehole.pipe_data.calculate_resistances(fluid_data, flow_data)
-    assert np.isclose(0.01663038005086118, borehole.pipe_data.R_f)
+    assert borehole.flow_data is None
+    borehole.flow_data = flow_data
+    assert borehole.flow_data == flow_data
+    del borehole.flow_data
+    assert borehole.flow_data is None
 
 
 def test_fluid_data_without_pipe():

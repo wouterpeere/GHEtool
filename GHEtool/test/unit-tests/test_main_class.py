@@ -8,18 +8,20 @@ import pygfunction as gt
 import pytest
 
 from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, DoubleUTube, Borefield, \
-    CalculationSetup, FOLDER, MultipleUTube, EERCombined
+    CalculationSetup, FOLDER, MultipleUTube, EERCombined, ConstantFlowRate
 from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad, HourlyBuildingLoad, \
     HourlyBuildingLoadMultiYear, MonthlyBuildingLoadAbsolute
 from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient
 from GHEtool.Methods import *
+from GHEtool import CustomGFunction
 
 data = GroundConstantTemperature(3, 10)
 ground_data_constant = data
 data_ground_flux = GroundFluxTemperature(3, 10)
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
 pipeData = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
+flowData = ConstantFlowRate(vfr=0.2)
 
 borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
 
@@ -292,6 +294,15 @@ def test_set_fluid_params():
     assert borefield.borehole.fluid_data is None
     borefield.fluid_data = fluidData
     assert borefield.borehole.fluid_data == fluidData.fluid_data
+    assert borefield.fluid_data == fluidData.fluid_data
+
+
+def test_set_flow_params():
+    borefield = Borefield()
+    assert borefield.borehole.flow_data is None
+    borefield.flow_data = flowData
+    assert borefield.borehole.flow_data == flowData
+    assert borefield.flow_data == flowData
 
 
 def test_set_pipe_params():
@@ -299,6 +310,7 @@ def test_set_pipe_params():
     assert borefield.borehole.pipe_data is None
     borefield.pipe_data = pipeData
     assert borefield.borehole.pipe_data == pipeData
+    assert borefield.pipe_data == pipeData
 
 
 def test_set_max_temp():
@@ -1246,3 +1258,8 @@ def test_with_titled_borefield():
     assert np.isclose(borefield.ground_data.calculate_Tg(borefield.depth, borefield.D), 12.157557845032045)
 
     assert np.isclose(borefield.size_L3(), 111.58488656187147)
+
+
+def test_warning_custom_gfunction():
+    with pytest.warns(DeprecationWarning):
+        Borefield(custom_gfunction=CustomGFunction())
