@@ -162,7 +162,8 @@ def test_repr_():
                      'nb_of_tubes': 2,
                      'spacing [mm]': 50.0,
                      'thickness [mm]': 5.0,
-                     'type': 'U'}} == borehole.__repr__()
+                     'type': 'U'},
+            'flow': {'vfr [l/s]': 0.2}} == borehole.__repr__()
 
     borehole = Borehole()
     assert {'Rb': 0.12} == borehole.__repr__()
