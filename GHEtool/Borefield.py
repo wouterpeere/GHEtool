@@ -1686,8 +1686,6 @@ class Borefield(BaseClass):
             # set Rb* value
             H = H if H is not None else self.H
             depth = self.calculate_depth(H, self.D)
-            Rb = self.borehole.get_Rb(H, self.D, self.r_b,
-                                      self.ground_data.k_s(depth, self.D), depth)
 
             results = None
 

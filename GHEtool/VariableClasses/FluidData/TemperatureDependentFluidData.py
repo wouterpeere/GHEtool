@@ -10,6 +10,7 @@ from scp.base_melinder import BaseMelinder
 from GHEtool.VariableClasses.FluidData._FluidData import _FluidData
 from GHEtool.VariableClasses.FluidData.ConstantFluidData import ConstantFluidData
 from GHEtool.VariableClasses.BaseClass import BaseClass
+from typing import Optional
 
 
 class TemperatureDependentFluidData(_FluidData, BaseClass):
@@ -84,7 +85,7 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
             return
         raise ValueError(f'The fluid {name} is not yet supported by GHEtool.')
 
-    def k_f(self, temperature: float | np.ndarray, **kwargs) -> float | np.ndarray:
+    def k_f(self, temperature: Optional[float, np.ndarray], **kwargs) -> Optional[float, np.ndarray]:
         """
         This function returns the conductivity of the fluid in W/(mK).
 
@@ -100,7 +101,7 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
         """
         return np.interp(temperature, self._spacing, self._k_f_array)
 
-    def rho(self, temperature: float | np.ndarray, **kwargs) -> float | np.ndarray:
+    def rho(self, temperature: Optional[float, np.ndarray], **kwargs) -> Optional[float, np.ndarray]:
         """
         This function returns the density of the fluid in kg/m^3.
 
@@ -116,7 +117,7 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
         """
         return np.interp(temperature, self._spacing, self._rho_array)
 
-    def cp(self, temperature: float | np.ndarray, **kwargs) -> float | np.ndarray:
+    def cp(self, temperature: Optional[float, np.ndarray], **kwargs) -> Optional[float, np.ndarray]:
         """
         This function returns the heat capacity of the fluid in J/(kgK).
 
@@ -132,7 +133,7 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
         """
         return np.interp(temperature, self._spacing, self._cp_array)
 
-    def mu(self, temperature: float | np.ndarray, **kwargs) -> float | np.ndarray:
+    def mu(self, temperature: Optional[float, np.ndarray], **kwargs) -> Optional[float, np.ndarray]:
         """
         This function returns the dynamic viscosity of the fluid in Pa.s.
 
