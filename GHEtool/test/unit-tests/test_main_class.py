@@ -289,15 +289,15 @@ def test_ground_data_jit_gfunction():
 
 def test_set_fluid_params():
     borefield = Borefield()
-    assert borefield.borehole.fluid_data == FluidData()
-    borefield.set_fluid_parameters(fluidData)
-    assert borefield.borehole.fluid_data == fluidData
+    assert borefield.borehole.fluid_data is None
+    borefield.fluid_data = fluidData
+    assert borefield.borehole.fluid_data == fluidData.fluid_data
 
 
 def test_set_pipe_params():
     borefield = Borefield()
-    assert borefield.borehole.pipe_data == MultipleUTube()
-    borefield.set_pipe_parameters(pipeData)
+    assert borefield.borehole.pipe_data is None
+    borefield.pipe_data = pipeData
     assert borefield.borehole.pipe_data == pipeData
 
 
@@ -323,10 +323,10 @@ def test_set_min_temp():
 
 def test_Tg():
     borefield = Borefield()
-    borefield.set_ground_parameters(ground_data_constant)
+    borefield.ground_data = ground_data_constant
     assert borefield._Tg() == borefield.ground_data.calculate_Tg(borefield.H)
     assert borefield._Tg(20) == borefield.ground_data.calculate_Tg(20)
-    borefield.set_ground_parameters(data_ground_flux)
+    borefield.ground_data = data_ground_flux
     assert borefield._Tg() == borefield.ground_data.calculate_Tg(borefield.H)
     assert borefield._Tg(20) == borefield.ground_data.calculate_Tg(20)
 
@@ -560,9 +560,9 @@ def test_investment_cost():
 
 def test_reynolds_number():
     borefield = Borefield()
-    borefield.set_pipe_parameters(pipeData)
-    borefield.set_fluid_parameters(fluidData)
-    assert np.isclose(4244.131815783876, borefield.Re)
+    borefield.pipe_data = pipeData
+    borefield.fluid_data = fluidData
+    assert np.isclose(4244.131815783876, borefield.Re())
 
 
 def test_last_year_params():

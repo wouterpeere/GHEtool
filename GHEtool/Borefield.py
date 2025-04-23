@@ -1931,8 +1931,7 @@ class Borefield(BaseClass):
         self.custom_gfunction = CustomGFunction(time_array, borehole_length_array, options)
         self.custom_gfunction.create_custom_dataset(self.borefield, self.ground_data.alpha)
 
-    @property
-    def Re(self) -> float:
+    def Re(self, **kwargs) -> float:
         """
         Reynolds number.
 
@@ -1941,7 +1940,7 @@ class Borefield(BaseClass):
         float
             Reynolds number
         """
-        return self.borehole.Re
+        return self.borehole.Re(**kwargs)
 
     def calculate_quadrant(self) -> int:
         """
@@ -1996,7 +1995,7 @@ class Borefield(BaseClass):
             return 3
         return 2
 
-    def __repr__(self):
+    def __export__(self):
         return f'Maximum average fluid temperature [°C]: {self.Tf_max}\n' \
                f'Minimum average fluid temperature [°C]: {self.Tf_min}\n' \
                f'Average buried depth [m]: {self.D}\n' \
@@ -2004,6 +2003,6 @@ class Borefield(BaseClass):
                f'Average borehole depth [m]: {self.depth}\n' \
                f'Borehole diameter [mm]: {self.r_b * 2000:.0f}\n' \
                f'Number of boreholes [-]: {self.number_of_boreholes}\n' \
-               f'{self.ground_data.__repr__()}\n' \
-               f'{self.borehole.__repr__()}\n' \
+               f'{self.ground_data.__export__()}\n' \
+               f'{self.borehole.__export__()}\n' \
                f'{self.load.__repr__()}'
