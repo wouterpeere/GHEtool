@@ -1120,7 +1120,7 @@ def test_deep_sizing(case, result):
 
 
 def test_depreciation_warning():
-    with pytest.raises(DeprecationWarning):
+    with pytest.raises(ValueError):
         Borefield(baseload_heating=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
 
 
@@ -1149,7 +1149,7 @@ def test_repr_():
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(3))
-    borefield.set_ground_parameters(ground_data_constant)
+    borefield.ground_data = ground_data_constant
 
     assert 'Maximum average fluid temperature [°C]: 16.0\n' \
            'Minimum average fluid temperature [°C]: 0.0\n' \
@@ -1181,7 +1181,7 @@ def test_repr_():
            'Peak injection duration [hour]: 6.0\n' \
            'Peak extraction duration [hour]: 6.0\n' \
            'Simulation period [year]: 20\n' \
-           'First month of simulation [-]: 1' == borefield.__repr__()
+           'First month of simulation [-]: 1' == borefield.__export__()
 
 
 def test_with_titled_borefield():

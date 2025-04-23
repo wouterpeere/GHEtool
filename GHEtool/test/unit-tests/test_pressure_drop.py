@@ -33,7 +33,11 @@ def test_total_pressure_drop():
     fluid_data = TemperatureDependentFluidData('MPG', 25)
     assert np.isclose(
         calculate_total_pressure_drop(double_u, fluid_data, flow_data, 100, 0.02 - 0.0037 / 2, 10, 2, temperature=20),
-        11.139813565855187)
+        14.09063698815773)
+    temp = fluid_data.create_constant(20)
+    assert np.isclose(
+        calculate_total_pressure_drop(double_u, temp, flow_data, 100, 0.02 - 0.0037 / 2, 10, 2, temperature=20),
+        14.09063698815773)
 
 
 def test_range_pressure_drop():

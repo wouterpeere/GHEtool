@@ -4,9 +4,10 @@ import numpy as np
 
 from abc import ABC
 from numpy.typing import ArrayLike
+from GHEtool.VariableClasses.BaseClass import BaseClass
 
 
-class _LoadData(ABC):
+class _LoadData(ABC, BaseClass):
     """
     This class contains all the general functionalities for the load classes.
     """

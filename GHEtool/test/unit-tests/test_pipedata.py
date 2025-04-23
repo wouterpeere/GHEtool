@@ -238,7 +238,7 @@ def test_repr_():
             'nb_of_tubes': 1,
             'spacing [mm]': 50.0,
             'thickness [mm]': 2.0,
-            'type': 'U'} == single.__repr__()
+            'type': 'U'} == single.__export__()
     assert {'diameter [mm]': 3.2,
             'epsilon [mm]': 0.001,
             'k_g [W/(m·K)]': 1,
@@ -246,7 +246,7 @@ def test_repr_():
             'nb_of_tubes': 2,
             'spacing [mm]': 50.0,
             'thickness [mm]': 3.0,
-            'type': 'U'} == double.__repr__()
+            'type': 'U'} == double.__export__()
     assert {'epsilon [mm]': 1e-06,
             'inner_diameter [mm]': 50.0,
             'inner_thickness [mm]': 2.8999999999999986,
@@ -255,5 +255,5 @@ def test_repr_():
             'k_p_out [W/(m·K)]': 0.4,
             'outer_diameter [mm]': 110.0,
             'outer_thickness [mm]': 6.299999999999997,
-            'type': 'Coaxial'} == coaxial.__repr__()
-    assert {'k_g [W/(m·K)]': 2, 'type': 'Separatus'} == separatus.__repr__()
+            'type': 'Coaxial'} == coaxial.__export__()
+    assert {'k_g [W/(m·K)]': 2, 'type': 'Separatus'} == separatus.__export__()

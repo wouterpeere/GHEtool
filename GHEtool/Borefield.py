@@ -90,6 +90,9 @@ class Borefield(BaseClass):
         # that accurate.
         self.THRESHOLD_WARNING_SHALLOW_FIELD: int = 50
 
+        if len(kwargs) != 0:
+            raise ValueError('Please check your input for the Borefield class')
+
         if custom_gfunction is not None:
             warnings.warn(
                 'From version 2.4.0 it will no longer be possible to initiate a borefield object with a custom gfunction.'
@@ -2005,4 +2008,4 @@ class Borefield(BaseClass):
                f'Number of boreholes [-]: {self.number_of_boreholes}\n' \
                f'{self.ground_data.__export__()}\n' \
                f'{self.borehole.__export__()}\n' \
-               f'{self.load.__repr__()}'
+               f'{self.load.__export__()}'
