@@ -297,7 +297,7 @@ class Borefield(BaseClass):
         -------
         pygfunction borefield object
         """
-        borefield = gt.borefield.Borefieldrectangle_field(N_1, N_2, B_1, B_2, H, D, r_b)
+        borefield = gt.borefield.Borefield.rectangle_field(N_1, N_2, B_1, B_2, H, D, r_b)
         self.set_borefield(borefield)
 
         return borefield
@@ -325,7 +325,7 @@ class Borefield(BaseClass):
         -------
         pygfunction borefield object
         """
-        borefield = gt.borefield.Borefieldcircle_field(N, R, H, D, r_b)
+        borefield = gt.borefield.Borefield.circle_field(N, R, H, D, r_b)
         self.set_borefield(borefield)
         return borefield
 
@@ -357,7 +357,7 @@ class Borefield(BaseClass):
         -------
         pygfunction borefield object
         """
-        borefield = gt.borefield.BorefieldU_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
+        borefield = gt.borefield.Borefield.U_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
         self.set_borefield(borefield)
         return borefield
 
@@ -389,7 +389,7 @@ class Borefield(BaseClass):
         -------
         pygfunction borefield object
         """
-        borefield = gt.borefield.BorefieldL_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
+        borefield = gt.borefield.Borefield.L_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
         self.set_borefield(borefield)
         return borefield
 
@@ -421,7 +421,7 @@ class Borefield(BaseClass):
         -------
         pygfunction borefield object
         """
-        borefield = gt.borefield.Borefieldbox_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
+        borefield = gt.borefield.Borefield.box_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
         self.set_borefield(borefield)
         return borefield
 

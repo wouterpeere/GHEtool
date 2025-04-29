@@ -22,7 +22,7 @@ data_ground_flux = GroundFluxTemperature(3, 10)
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
 pipeData = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 
-borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
+borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
 
 # Monthly loading values
 peakCooling = [0.0, 0, 34.0, 69.0, 133.0, 187.0, 213.0, 240.0, 160.0, 37.0, 0.0, 0.0]  # Peak cooling in kW
