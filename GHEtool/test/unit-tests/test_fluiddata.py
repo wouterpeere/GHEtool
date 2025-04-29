@@ -191,3 +191,14 @@ def test_multiple_temperature_dependent_fluid_data():
 def test_unsupported_fluid():
     with pytest.raises(ValueError):
         TemperatureDependentFluidData('Ai', 30)
+
+
+def test_freezing_point():
+    fluid = ConstantFluidData(0.5, 1000, 4186, 0.001)
+    with pytest.raises(ValueError):
+        fluid.test_freezing(5)
+
+    fluid = TemperatureDependentFluidData('MPG', 30)
+
+    assert not fluid.test_freezing(-5)
+    assert fluid.test_freezing(-50)

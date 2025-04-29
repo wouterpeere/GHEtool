@@ -2,8 +2,13 @@
 This document contains the variable classes for the fluid data.
 """
 import abc
+import warnings
+
+import numpy as np
+
 from abc import ABC
 from GHEtool.VariableClasses.BaseClass import BaseClass
+from typing import Union
 
 
 class _FluidData(ABC, BaseClass):
@@ -99,3 +104,31 @@ class _FluidData(ABC, BaseClass):
             Prandtl number
         """
         return self.cp(**kwargs) * self.mu(**kwargs) / self.k_f(**kwargs)
+
+    def test_freezing(self, temperature: Union[float, int, np.ndarray]) -> bool:
+        """
+        This function returns false if all the temperatures are above the freezing point and true otherwise.
+        If no freezing point is set, a ValueError is raised.
+
+        Parameters
+        ----------
+        temperature : int, float, np.ndarray
+            Fluid temperatures
+
+        Returns
+        -------
+        bool
+            False if all temperatures are above the freezing point, true otherwise.
+
+        Raises
+        ------
+        ValueError
+            When no freezing point was given
+        """
+
+        if self.freezing_point is None:
+            raise ValueError('No freezing point was given.')
+
+        if np.all(np.array(temperature) > self.freezing_point):
+            return False
+        return True
