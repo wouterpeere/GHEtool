@@ -217,7 +217,7 @@ class Borefield(BaseClass):
         float
             Depth of the borehole [m]
         """
-        if np.all(self.borefield.tilt == 0):
+        if self.borefield is None or np.all(self.borefield.tilt == 0):
             return borehole_length + buried_depth
         return np.average([bor.H * math.cos(bor.tilt) for bor in self.borefield]) + buried_depth
 
