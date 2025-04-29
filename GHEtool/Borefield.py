@@ -187,7 +187,7 @@ class Borefield(BaseClass):
         int
             Number of boreholes
         """
-        return len(self.borefield) if self.borefield is not None else 0
+        return self.borefield.nBoreholes if self.borefield is not None else 0
 
     @property
     def depth(self) -> float:
@@ -217,7 +217,7 @@ class Borefield(BaseClass):
         float
             Depth of the borehole [m]
         """
-        if np.isclose(self.avg_tilt, 0):
+        if np.all(self.borefield.tilt == 0):
             return borehole_length + buried_depth
         return np.average([bor.H * math.cos(bor.tilt) for bor in self.borefield]) + buried_depth
 
@@ -248,8 +248,7 @@ class Borefield(BaseClass):
         None
         """
         self._H = H
-        for bor in self._borefield:
-            bor.H = H
+        self._borefield.H = np.full(self.number_of_boreholes, H)
 
         # the boreholes are equal in length
         self.gfunction_calculation_object.store_previous_values = \
@@ -455,14 +454,14 @@ class Borefield(BaseClass):
             del self.borefield
             return
         self._borefield = borefield
-        self.D = np.average([bor.D for bor in borefield])
-        self.r_b = np.average([bor.r_b for bor in borefield])
-        self._H = np.average([bor.H for bor in borefield])
-        self.avg_tilt = np.average([bor.tilt for bor in borefield])
-        if not np.isclose(self.avg_tilt, 0):
+        self.D = np.average(borefield.D)
+        self.r_b = np.average(borefield.r_b)
+        self._H = np.average(borefield.H)
+        self.avg_tilt = np.average(borefield.tilt)
+        if not np.all(borefield.tilt == 0):
             self.gfunction_calculation_object.options['method'] = 'similarities'
         self.gfunction_calculation_object.remove_previous_data()
-        unequal_length = np.any([bor.H != borefield[0].H for bor in borefield])
+        unequal_length = not np.all(borefield.H == self.H)
         if unequal_length:
             self.gfunction_calculation_object._store_previous_values = not unequal_length
         else:
