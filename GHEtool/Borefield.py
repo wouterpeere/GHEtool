@@ -1859,9 +1859,7 @@ class Borefield(BaseClass):
             When no borefield or ground data is set
         """
 
-        try:
-            self.borefield[0]
-        except TypeError:
+        if self.borefield is None:
             raise ValueError("No borefield is set for which the gfunctions should be calculated")
         try:
             self.ground_data.alpha(depth=100)

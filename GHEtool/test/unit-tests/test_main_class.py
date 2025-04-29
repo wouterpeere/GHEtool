@@ -842,9 +842,9 @@ def test_gfunction_with_irregular_depth():
     borefield = Borefield()
     borefield.set_ground_parameters(data_ground_flux)
     temp = [
-        gt.borefield.Borefield.Borehole(100, 4, 0.075, 0, 0),
-        gt.borefield.Borefield.Borehole(150, 4, 0.075, 10, 0),
-        gt.borefield.Borefield.Borehole(50, 4, 0.075, 100, 0)
+        gt.boreholes.Borehole(100, 4, 0.075, 0, 0),
+        gt.boreholes.Borehole(150, 4, 0.075, 10, 0),
+        gt.boreholes.Borehole(50, 4, 0.075, 100, 0)
     ]
     borefield.borefield = temp
     assert borefield.H == 100
@@ -855,16 +855,16 @@ def test_gfunction_with_irregular_depth():
     borefield = Borefield()
     borefield.set_ground_parameters(data_ground_flux)
     temp = [
-        gt.borefield.Borefield.Borehole(100, 4, 0.075, 0, 0),
-        gt.borefield.Borefield.Borehole(150, 4, 0.075, 10, 0),
-        gt.borefield.Borefield.Borehole(50, 4, 0.075, 100, 0)
+        gt.boreholes.Borehole(100, 4, 0.075, 0, 0),
+        gt.boreholes.Borehole(150, 4, 0.075, 10, 0),
+        gt.boreholes.Borehole(50, 4, 0.075, 100, 0)
     ]
     borefield.borefield = temp
     assert borefield.H == 100
     temp = [
-        gt.borefield.Borefield.Borehole(100, 4, 0.075, 0, 0),
-        gt.borefield.Borefield.Borehole(100, 4, 0.075, 10, 0),
-        gt.borefield.Borefield.Borehole(100, 4, 0.075, 100, 0)
+        gt.boreholes.Borehole(100, 4, 0.075, 0, 0),
+        gt.boreholes.Borehole(100, 4, 0.075, 10, 0),
+        gt.boreholes.Borehole(100, 4, 0.075, 100, 0)
     ]
     borefield.borefield = temp
     assert not np.array_equal(borefield.gfunction([6000, 60000, 600000]), g_values)
