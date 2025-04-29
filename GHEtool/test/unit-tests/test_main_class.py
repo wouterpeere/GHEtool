@@ -23,7 +23,7 @@ fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
 pipeData = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 flowData = ConstantFlowRate(vfr=0.2)
 
-borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
+borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
 
 # Monthly loading values
 peakCooling = [0.0, 0, 34.0, 69.0, 133.0, 187.0, 213.0, 240.0, 160.0, 37.0, 0.0, 0.0]  # Peak cooling in kW
@@ -63,7 +63,7 @@ def test_nb_of_boreholes():
     borefield = Borefield(borefield=copy.deepcopy(borefield_gt))
     borefield.set_ground_parameters(data_ground_flux)
     assert borefield.number_of_boreholes == 120
-    borefield.set_borefield(gt.boreholes.rectangle_field(5, 5, 6, 6, 110, 0.1, 0.07))
+    borefield.set_borefield(gt.borefield.Borefield.rectangle_field(5, 5, 6, 6, 110, 0.1, 0.07))
     assert np.isclose(borefield.avg_tilt, 0)
     assert np.isclose(borefield.H, 110)
     assert np.isclose(borefield.r_b, 0.07)
@@ -71,7 +71,7 @@ def test_nb_of_boreholes():
     assert borefield.number_of_boreholes == 25
     borefield.gfunction(5000, 110)
     assert np.any(borefield.gfunction_calculation_object.borehole_length_array)
-    borefield.borefield = gt.boreholes.rectangle_field(6, 5, 6, 6, 100, 1, 0.075)
+    borefield.borefield = gt.borefield.Borefield.rectangle_field(6, 5, 6, 6, 100, 1, 0.075)
     assert not np.any(borefield.gfunction_calculation_object.borehole_length_array)
     assert np.isclose(borefield.avg_tilt, 0)
     assert np.isclose(borefield.H, 100)
@@ -85,7 +85,7 @@ def test_nb_of_boreholes():
     assert not np.any(borefield.gfunction_calculation_object.borehole_length_array)
     assert borefield.gfunction_calculation_object
     assert borefield.number_of_boreholes == 0
-    borefield.borefield = gt.boreholes.rectangle_field(6, 5, 6, 6, 100, 1, 0.075)
+    borefield.borefield = gt.borefield.Borefield.rectangle_field(6, 5, 6, 6, 100, 1, 0.075)
     borefield.gfunction(5000, 110)
     assert np.any(borefield.gfunction_calculation_object.borehole_length_array)
     assert np.isclose(borefield.avg_tilt, 0)
@@ -96,19 +96,19 @@ def test_nb_of_boreholes():
 
 def test_set_borefield():
     borefield = Borefield()
-    borefield.set_borefield([
+    borefield.set_borefield(gt.borefield.Borefield.from_boreholes([
         gt.boreholes.Borehole(100, 4, 0.075, 0, 0),
         gt.boreholes.Borehole(150, 4, 0.075, 10, 0)
-    ])
+    ]))
     assert borefield.H == 125
 
 
 def test_tilt():
     borefield = Borefield()
-    borefield.set_borefield([
+    borefield.set_borefield(gt.borefield.Borefield.from_boreholes([
         gt.boreholes.Borehole(100, 4, 0.075, 0, 0),
         gt.boreholes.Borehole(150, 4, 0.075, 10, 0, tilt=math.pi / 9)
-    ])
+    ]))
     assert borefield.H == 125
     assert np.isclose(borefield.avg_tilt, math.pi / 18)
     assert np.isclose(borefield.depth, 4 + (100 + 150 * math.cos(math.pi / 9)) / 2)
@@ -117,15 +117,15 @@ def test_tilt():
 def test_gfunction_with_irregular_borehole_depth():
     borefield = Borefield()
     borefield.ground_data = ground_data_constant
-    borefield.set_borefield([
+    borefield.set_borefield(gt.borefield.Borefield.from_boreholes([
         gt.boreholes.Borehole(150, 4, 0.075, 0, 0),
         gt.boreholes.Borehole(100, 4, 0.075, 10, 0)
-    ])
+    ]))
     borehole_irr = borefield.gfunction([3600, 3600 * 20, 3600 * 800])
-    borefield.set_borefield([
+    borefield.set_borefield(gt.borefield.Borefield.from_boreholes([
         gt.boreholes.Borehole(125, 4, 0.075, 0, 0),
         gt.boreholes.Borehole(125, 4, 0.075, 10, 0)
-    ])
+    ]))
     borehole_reg = borefield.gfunction([3600, 3600 * 20, 3600 * 800])
 
     # the gfunctions for those two classes should not be equal
@@ -136,35 +136,35 @@ def test_create_rectangular_field():
     borefield = Borefield()
     borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 4, 0.075)
     assert borefield.number_of_boreholes == 100
-    borefields_equal(borefield.borefield, gt.boreholes.rectangle_field(10, 10, 6, 6, 110, 4, 0.075))
+    borefields_equal(borefield.borefield, gt.borefield.Borefield.rectangle_field(10, 10, 6, 6, 110, 4, 0.075))
 
 
 def test_create_circular_field():
     borefield = Borefield()
     borefield.create_circular_borefield(10, 10, 100, 1)
     assert borefield.number_of_boreholes == 10
-    borefields_equal(borefield.borefield, gt.boreholes.circle_field(10, 10, 100, 1, 0.075))
+    borefields_equal(borefield.borefield, gt.borefield.Borefield.circle_field(10, 10, 100, 1, 0.075))
 
 
 def test_create_U_shaped_field():
     borefield = Borefield()
     borefield.create_U_shaped_borefield(10, 9, 6, 6, 110, 4, 0.075)
     assert borefield.number_of_boreholes == 9 * 2 + (10 - 2)
-    borefields_equal(borefield.borefield, gt.boreholes.U_shaped_field(10, 10, 6, 6, 110, 4, 0.075))
+    borefields_equal(borefield.borefield, gt.borefield.Borefield.U_shaped_field(10, 10, 6, 6, 110, 4, 0.075))
 
 
 def test_create_L_shaped_field():
     borefield = Borefield()
     borefield.create_L_shaped_borefield(10, 9, 6, 6, 110, 4, 0.075)
     assert borefield.number_of_boreholes == 10 + 8
-    borefields_equal(borefield.borefield, gt.boreholes.L_shaped_field(10, 10, 6, 6, 110, 4, 0.075))
+    borefields_equal(borefield.borefield, gt.borefield.Borefield.L_shaped_field(10, 10, 6, 6, 110, 4, 0.075))
 
 
 def test_create_box_shaped_field():
     borefield = Borefield()
     borefield.create_box_shaped_borefield(10, 8, 6, 6, 110, 4, 0.075)
     assert borefield.number_of_boreholes == 10 * 2 + (8 - 2) * 2
-    borefields_equal(borefield.borefield, gt.boreholes.box_shaped_field(10, 10, 6, 6, 110, 4, 0.075))
+    borefields_equal(borefield.borefield, gt.borefield.Borefield.box_shaped_field(10, 10, 6, 6, 110, 4, 0.075))
 
 
 def test_update_depth():
@@ -848,7 +848,7 @@ def test_gfunction_with_irregular_depth():
         gt.boreholes.Borehole(150, 4, 0.075, 10, 0),
         gt.boreholes.Borehole(50, 4, 0.075, 100, 0)
     ]
-    borefield.borefield = temp
+    borefield.borefield = gt.borefield.Borefield.from_boreholes(temp)
     assert borefield.H == 100
     g_values = borefield.gfunction([6000, 60000, 600000])
     borefield.H = 100
@@ -861,14 +861,14 @@ def test_gfunction_with_irregular_depth():
         gt.boreholes.Borehole(150, 4, 0.075, 10, 0),
         gt.boreholes.Borehole(50, 4, 0.075, 100, 0)
     ]
-    borefield.borefield = temp
+    borefield.borefield = gt.borefield.Borefield.from_boreholes(temp)
     assert borefield.H == 100
     temp = [
         gt.boreholes.Borehole(100, 4, 0.075, 0, 0),
         gt.boreholes.Borehole(100, 4, 0.075, 10, 0),
         gt.boreholes.Borehole(100, 4, 0.075, 100, 0)
     ]
-    borefield.borefield = temp
+    borefield.borefield = gt.borefield.Borefield.from_boreholes(temp)
     assert not np.array_equal(borefield.gfunction([6000, 60000, 600000]), g_values)
 
 
@@ -1143,7 +1143,7 @@ def test_optimise_load_borefield():
     borefield = Borefield(load=load)
     borefield.set_min_avg_fluid_temperature(2)
     borefield.set_max_avg_fluid_temperature(17)
-    borefield.borefield = gt.boreholes.rectangle_field(20, 4, 6, 6, 150, 1, 0.07)
+    borefield.borefield = gt.borefield.Borefield.rectangle_field(20, 4, 6, 6, 150, 1, 0.07)
     borefield.Rb = 0.1699
     ground_data = GroundFluxTemperature(2, 9.6, flux=0.07)
     borefield.ground_data = ground_data
@@ -1244,8 +1244,9 @@ def test_with_titled_borefield():
     )
 
     # define borefield
-    borefield_tilted = [gt.boreholes.Borehole(150, 0.75, 0.07, -3, 0, math.pi / 7, orientation=math.pi),
-                        gt.boreholes.Borehole(150, 0.75, 0.07, 3, 0, math.pi / 7, orientation=0)]
+    borefield_tilted = gt.borefield.Borefield.from_boreholes(
+        [gt.boreholes.Borehole(150, 0.75, 0.07, -3, 0, math.pi / 7, orientation=math.pi),
+         gt.boreholes.Borehole(150, 0.75, 0.07, 3, 0, math.pi / 7, orientation=0)])
 
     # initiate GHEtool object with tilted borefield
     borefield = Borefield(borefield=borefield_tilted, load=load_data)

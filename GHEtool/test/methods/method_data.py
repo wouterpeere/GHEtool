@@ -44,7 +44,7 @@ borefield.calculation_setup(atol=False)
 list_of_test_objects.add(SizingObject(borefield, L2_output=52.716, L3_output=52.741, quadrant=1,
                                       name='Main functionalities (2), no atol'))
 
-borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
+borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
 borefield = Borefield()
 borefield.set_ground_parameters(data)
 borefield.Rb = 0.12
@@ -71,13 +71,13 @@ borefield.set_ground_parameters(data)
 borefield.Rb = 0.2
 borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
 borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
-custom_field = gt.boreholes.L_shaped_field(N_1=4, N_2=5, B_1=5., B_2=5., H=100., D=4, r_b=0.05)
+custom_field = gt.borefield.Borefield.L_shaped_field(N_1=4, N_2=5, B_1=5., B_2=5., H=100., D=4, r_b=0.05)
 borefield.set_borefield(custom_field)
 
 list_of_test_objects.add(SizingObject(borefield, L2_output=305.176, L3_output=306.898, quadrant=1,
                                       name='Custom config (1)'))
 
-borefield_gt = gt.boreholes.rectangle_field(11, 11, 6, 6, 110, 1, 0.075)
+borefield_gt = gt.borefield.Borefield.rectangle_field(11, 11, 6, 6, 110, 1, 0.075)
 peak_injection = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak injection in kW
 peak_extraction = np.array([160., 142, 102., 55., 0., 0., 0., 0., 40.4, 85., 119., 136.])  # Peak extraction in kW
 annual_extraction_load = 150 * 10 ** 3  # kWh
@@ -97,14 +97,14 @@ borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
 list_of_test_objects.add(SizingObject(borefield, L2_output=190.223, L3_output=195.939, quadrant=2,
                                       name='Effect of borehole configuration (1)'))
 
-borefield_gt = gt.boreholes.rectangle_field(6, 20, 6, 6, 110, 1, 0.075)
+borefield_gt = gt.borefield.Borefield.rectangle_field(6, 20, 6, 6, 110, 1, 0.075)
 borefield.set_borefield(borefield_gt)
 
 list_of_test_objects.add(SizingObject(borefield, L2_output=186.5208, L3_output=191.196, quadrant=2,
                                       name='Effect of borehole configuration (2)'))
 
 data = GroundConstantTemperature(3.5, 10)
-borefield_gt = gt.boreholes.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)
+borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)
 correct_answers_L2 = (56.75, 117.223, 66.94, 91.266)
 correct_answers_L3 = (56.771, 118.738, 66.471, 91.240)
 for i in (1, 2, 3, 4):
@@ -120,7 +120,7 @@ for i in (1, 2, 3, 4):
 
 correct_answers_L2 = (56.749, 117.223, 66.941, 91.266)
 correct_answers_L3 = (56.770, 118.738, 66.471, 91.240)
-customField = gt.boreholes.rectangle_field(N_1=12, N_2=10, B_1=6.5, B_2=6.5, H=110., D=4, r_b=0.075)
+customField = gt.borefield.Borefield.rectangle_field(N_1=12, N_2=10, B_1=6.5, B_2=6.5, H=110., D=4, r_b=0.075)
 for i in (1, 2, 3, 4):
     load = MonthlyGeothermalLoadAbsolute(*load_case(i))
     borefield = Borefield(load=load)
@@ -325,7 +325,7 @@ list_of_test_objects.add(
 list_of_test_objects.add(SizingObject(borefield, error_L4=ValueError, quadrant=2, name='Cannot size L4'))
 
 data = GroundConstantTemperature(3, 10)
-borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
+borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
 borefield = Borefield()
 borefield.set_max_avg_fluid_temperature(16)
 borefield.set_min_avg_fluid_temperature(0)

@@ -19,7 +19,7 @@ def validate():
     # initiate parameters
     ground_data = GroundConstantTemperature(3,
                                             10)  # ground data with an inaccurate guess of 100m for the borehole length
-    borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 100, 1, 0.075)
+    borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 100, 1, 0.075)
     pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05, epsilon=1e-6)
 
     # initiate borefield model

@@ -44,7 +44,7 @@ def sizing_with_Rb():
     flow_data = ConstantFlowRate(mfr=0.2)
     pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 
-    borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 100, 1, 0.075)
+    borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 100, 1, 0.075)
 
     # Monthly loading values
     peak_cooling = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak cooling in kW
@@ -127,8 +127,8 @@ def sizing_with_Rb():
 
     # Do the same thing but with another constant Rb* value based on a borehole length of 185m.
 
-    borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 185, 1,
-                                                0.075)  # borefield with an accurate guess of 185m for the borehole length
+    borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 185, 1,
+                                                          0.075)  # borefield with an accurate guess of 185m for the borehole length
     borefield.set_borefield(borefield_gt)
 
     # size with a constant Rb* value
