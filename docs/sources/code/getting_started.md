@@ -8,12 +8,12 @@ mentioned are the ones with which the code is tested)
 * matplotlib >= 3.5.2
 * numpy >= 1.23.1
 * pandas >= 1.4.3
-* pygfunction >= 2.2.3
+* pygfunction >= 3.0.0
 * scipy >= 1.8.1
 
 For the tests
 
-* Pytest >= 7.1.2
+* pytest >= 7.1.2
 
 For the active/passive example
 

@@ -66,12 +66,12 @@ mentioned are the ones with which the code is tested)
 * matplotlib >= 3.5.2
 * numpy >= 1.23.1
 * pandas >= 1.4.3
-* pygfunction >= 2.2.3
+* pygfunction >= 3.0.0
 * scipy >= 1.8.1
 
 For the tests
 
-* Pytest >= 7.1.2
+* pytest >= 7.1.2
 
 For the active/passive example
 
@@ -408,6 +408,7 @@ mixed-integer-linear-problem (MILP) energy system optimization. _Geotherm Energy
 
 Dion G., Pasquier, P., Perraudin, D. (2024). Sizing equation based on the outlet fluid temperature of closed-loop ground
 heat exchangers. In _Proceedings of International Ground Source Heat Pump Association_. Montréal (Canada), 28-30 May
+
 2024.
 
 Peere, W. (2024). Are Rules of Thumb Misleading? The Complexity of Borefield Sizing and the Importance of Design
@@ -425,6 +426,7 @@ engineering_ 226, Art.No. 120203, 10.1016/j.applthermaleng.2023.120203
 
 Cimmino, M., Cook., J. C. (2022). pygfunction 2.2 : New Features and Improvements in Accuracy and Computational
 Efficiency. In _Proceedings of IGSHPA Research Track 2022_. Las Vegas (USA), 6-8 December
+
 2022. https://doi.org/10.22488/okstate.22.000015.
 
 Verleyen, L., Peere, W., Michiels, E., Boydens, W., Helsen, L. (2022). The beauty of reason and insight: a story about
