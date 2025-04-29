@@ -48,7 +48,7 @@ class Borefield(BaseClass):
             peak_injection: ArrayLike = None,
             baseload_extraction: ArrayLike = None,
             baseload_injection: ArrayLike = None,
-            borefield: list[gt.boreholes.Borehole] = None,
+            borefield: gt.borefield.Borefield = None,
             custom_gfunction: CustomGFunction = None,
             load: _LoadData = None,
             **kwargs
@@ -255,13 +255,13 @@ class Borefield(BaseClass):
         self.gfunction_calculation_object.store_previous_values = \
             self.gfunction_calculation_object._store_previous_values_backup
 
-    def set_borefield(self, borefield: list[gt.boreholes.Borehole] = None) -> None:
+    def set_borefield(self, borefield: gt.borefield.Borefield = None) -> None:
         """
         This function set the borefield object. When None is given, the borefield will be deleted.
 
         Parameters
         ----------
-        borefield : List[pygfunction.boreholes.Borehole]
+        borefield : pygfunction.borefield.Borefield
             Borefield created with the pygfunction package
 
         Returns
@@ -298,7 +298,7 @@ class Borefield(BaseClass):
         -------
         pygfunction borefield object
         """
-        borefield = gt.boreholes.rectangle_field(N_1, N_2, B_1, B_2, H, D, r_b)
+        borefield = gt.borefield.Borefieldrectangle_field(N_1, N_2, B_1, B_2, H, D, r_b)
         self.set_borefield(borefield)
 
         return borefield
@@ -326,7 +326,7 @@ class Borefield(BaseClass):
         -------
         pygfunction borefield object
         """
-        borefield = gt.boreholes.circle_field(N, R, H, D, r_b)
+        borefield = gt.borefield.Borefieldcircle_field(N, R, H, D, r_b)
         self.set_borefield(borefield)
         return borefield
 
@@ -358,7 +358,7 @@ class Borefield(BaseClass):
         -------
         pygfunction borefield object
         """
-        borefield = gt.boreholes.U_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
+        borefield = gt.borefield.BorefieldU_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
         self.set_borefield(borefield)
         return borefield
 
@@ -390,7 +390,7 @@ class Borefield(BaseClass):
         -------
         pygfunction borefield object
         """
-        borefield = gt.boreholes.L_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
+        borefield = gt.borefield.BorefieldL_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
         self.set_borefield(borefield)
         return borefield
 
@@ -422,7 +422,7 @@ class Borefield(BaseClass):
         -------
         pygfunction borefield object
         """
-        borefield = gt.boreholes.box_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
+        borefield = gt.borefield.Borefieldbox_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
         self.set_borefield(borefield)
         return borefield
 
@@ -438,13 +438,13 @@ class Borefield(BaseClass):
         return self._borefield
 
     @borefield.setter
-    def borefield(self, borefield: list[gt.boreholes.Borehole] = None) -> None:
+    def borefield(self, borefield: gt.borefield.Borefield = None) -> None:
         """
         This function sets the borefield configuration. When no input is given, the borefield variable will be deleted.
 
         Parameters
         ----------
-        borefield : List[pygfunction.boreholes.Borehole]
+        borefield : pygfunction.borefield.Borefield
             Borefield created with the pygfunction package
 
         Returns
