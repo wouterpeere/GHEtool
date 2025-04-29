@@ -234,8 +234,7 @@ def test_interpolation_1D():
 
 
 def _change_borefield_borehole_length(borefield, borehole_length):
-    for idx, _ in enumerate(borefield):
-        setattr(borefield[idx], "H", borehole_length)
+    borefield.H = np.full(borefield.nBoreholes, borehole_length)
 
 
 def test_store_2D_data():
