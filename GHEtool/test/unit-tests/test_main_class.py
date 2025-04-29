@@ -846,7 +846,7 @@ def test_gfunction_with_irregular_depth():
         gt.boreholes.Borehole(150, 4, 0.075, 10, 0),
         gt.boreholes.Borehole(50, 4, 0.075, 100, 0)
     ]
-    borefield.borefield = temp
+    borefield.borefield = gt.borefield.Borefield.from_boreholes(temp)
     assert borefield.H == 100
     g_values = borefield.gfunction([6000, 60000, 600000])
     borefield.H = 100
@@ -859,14 +859,14 @@ def test_gfunction_with_irregular_depth():
         gt.boreholes.Borehole(150, 4, 0.075, 10, 0),
         gt.boreholes.Borehole(50, 4, 0.075, 100, 0)
     ]
-    borefield.borefield = temp
+    borefield.borefield = gt.borefield.Borefield.from_boreholes(temp)
     assert borefield.H == 100
     temp = [
         gt.boreholes.Borehole(100, 4, 0.075, 0, 0),
         gt.boreholes.Borehole(100, 4, 0.075, 10, 0),
         gt.boreholes.Borehole(100, 4, 0.075, 100, 0)
     ]
-    borefield.borefield = temp
+    borefield.borefield = gt.borefield.Borefield.from_boreholes(temp)
     assert not np.array_equal(borefield.gfunction([6000, 60000, 600000]), g_values)
 
 
@@ -1209,8 +1209,8 @@ def test_with_titled_borefield():
 
     # define borefield
     borefield_tilted = gt.borefield.Borefield.from_boreholes(
-        [gt.borefield.Borefield.Borehole(150, 0.75, 0.07, -3, 0, math.pi / 7, orientation=math.pi),
-         gt.borefield.Borefield.Borehole(150, 0.75, 0.07, 3, 0, math.pi / 7, orientation=0)])
+        [gt.boreholes.Borehole(150, 0.75, 0.07, -3, 0, math.pi / 7, orientation=math.pi),
+         gt.boreholes.Borehole(150, 0.75, 0.07, 3, 0, math.pi / 7, orientation=0)])
 
     # initiate GHEtool object with tilted borefield
     borefield = Borefield(borefield=borefield_tilted, load=load_data)
