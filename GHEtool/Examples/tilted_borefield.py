@@ -24,10 +24,11 @@ def tilted():
     )
 
     # define borefield
-    borefield_tilted = [gt.boreholes.Borehole(150, 0.75, 0.07, -3, 0, math.pi / 7, orientation=math.pi),
-                        gt.boreholes.Borehole(150, 0.75, 0.07, 3, 0, math.pi / 7, orientation=0)]
-    borefield_without_tilt = [gt.boreholes.Borehole(150, 0.75, 0.07, -3, 0),
-                              gt.boreholes.Borehole(150, 0.75, 0.07, 3, 0)]
+    borefield_tilted = gt.borefield.Borefield.from_boreholes(
+        [gt.boreholes.Borehole(150, 0.75, 0.07, -3, 0, math.pi / 7, orientation=math.pi),
+         gt.boreholes.Borehole(150, 0.75, 0.07, 3, 0, math.pi / 7, orientation=0)])
+    borefield_without_tilt = gt.borefield.Borefield.from_boreholes([gt.boreholes.Borehole(150, 0.75, 0.07, -3, 0),
+                                                                    gt.boreholes.Borehole(150, 0.75, 0.07, 3, 0)])
 
     # initiate GHEtool object with tilted borefield
     borefield = Borefield(borefield=borefield_tilted, load=load_data)

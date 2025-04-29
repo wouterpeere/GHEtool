@@ -13,9 +13,9 @@ from GHEtool import Borefield, GroundConstantTemperature, MonthlyGeothermalLoadA
 
 # relevant borefield data for the calculations
 data = GroundConstantTemperature(3.5,  # conductivity of the soil (W/mK)
-                                 10)   # Ground temperature at infinity (degrees C)
+                                 10)  # Ground temperature at infinity (degrees C)
 
-borefield_gt = gt.boreholes.rectangle_field(10, 12, 6.5, 6.5, 100, 4, 0.075)
+borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6.5, 6.5, 100, 4, 0.075)
 
 
 def load_case(number):
@@ -24,7 +24,8 @@ def load_case(number):
     if number == 1:
         # case 1
         # limited in the first year by cooling
-        monthly_load_heating_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
+        monthly_load_heating_percentage = np.array(
+            [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
         monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
         monthly_load_heating = monthly_load_heating_percentage * 300 * 10 ** 3  # kWh
         monthly_load_cooling = monthly_load_cooling_percentage * 150 * 10 ** 3  # kWh
@@ -34,7 +35,8 @@ def load_case(number):
     elif number == 2:
         # case 2
         # limited in the last year by cooling
-        monthly_load_heating_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, .117, 0.144])
+        monthly_load_heating_percentage = np.array(
+            [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, .117, 0.144])
         monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
         monthly_load_heating = monthly_load_heating_percentage * 160 * 10 ** 3  # kWh
         monthly_load_cooling = monthly_load_cooling_percentage * 240 * 10 ** 3  # kWh
@@ -44,7 +46,8 @@ def load_case(number):
     elif number == 3:
         # case 3
         # limited in the first year by heating
-        monthly_load_heating_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, .117, 0.144])
+        monthly_load_heating_percentage = np.array(
+            [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, .117, 0.144])
         monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
         monthly_load_heating = monthly_load_heating_percentage * 160 * 10 ** 3  # kWh
         monthly_load_cooling = monthly_load_cooling_percentage * 240 * 10 ** 3  # kWh
@@ -54,7 +57,8 @@ def load_case(number):
     else:
         # case 4
         # limited in the last year by heating
-        monthly_load_heating_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
+        monthly_load_heating_percentage = np.array(
+            [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
         monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
         monthly_load_heating = monthly_load_heating_percentage * 300 * 10 ** 3  # kWh
         monthly_load_cooling = monthly_load_cooling_percentage * 150 * 10 ** 3  # kWh
@@ -65,7 +69,6 @@ def load_case(number):
 
 
 def check_cases():
-
     """
     This function checks whether the borefield sizing gives the correct (i.e. validated) results for the 4 cases.
     If not, an assertion error is raised.
@@ -87,14 +90,14 @@ def check_cases():
         borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
 
         borefield.size(100, L2_sizing=True)
-        print(f'correct answer L2: {correct_answers_L2[i-1]}; calculated answer L2: {round(borefield.H,2)}; error: '
+        print(f'correct answer L2: {correct_answers_L2[i - 1]}; calculated answer L2: {round(borefield.H, 2)}; error: '
               f'{round(abs(1 - borefield.H / correct_answers_L2[i - 1]) * 100, 4)} %')
-        assert np.isclose(borefield.H, correct_answers_L2[i-1], rtol=0.001)
+        assert np.isclose(borefield.H, correct_answers_L2[i - 1], rtol=0.001)
 
         borefield.size(100, L3_sizing=True)
         print(f'correct answer L3: {correct_answers_L3[i - 1]}; calculated answer L3: {round(borefield.H, 2)}; error: '
               f'{round(abs(1 - borefield.H / correct_answers_L3[i - 1]) * 100, 4)} %')
-        assert np.isclose(borefield.H, correct_answers_L3[i-1], rtol=0.001)
+        assert np.isclose(borefield.H, correct_answers_L3[i - 1], rtol=0.001)
 
 
 def check_custom_datafile():
@@ -107,7 +110,7 @@ def check_custom_datafile():
 
     correct_answers = (56.75, 117.23, 66.94, 91.32)
 
-    custom_field = gt.boreholes.rectangle_field(N_1=12, N_2=10, B_1=6.5, B_2=6.5, H=110., D=4, r_b=0.075)
+    custom_field = gt.borefield.Borefield.rectangle_field(N_1=12, N_2=10, B_1=6.5, B_2=6.5, H=110., D=4, r_b=0.075)
 
     for i in (1, 2, 3, 4):
         borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(i)))
@@ -121,11 +124,11 @@ def check_custom_datafile():
         borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
 
         borefield.size(100, L3_sizing=True)
-        print(f'correct answer: {correct_answers[i-1]}; calculated '
-              f'answer: {round(borefield.H,2)}; error: '
-              f'{round(abs(1-borefield.H/correct_answers[i - 1])*100,4)} %')
+        print(f'correct answer: {correct_answers[i - 1]}; calculated '
+              f'answer: {round(borefield.H, 2)}; error: '
+              f'{round(abs(1 - borefield.H / correct_answers[i - 1]) * 100, 4)} %')
 
 
-if __name__ == "__main__":   # pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
     check_cases()  # check different cases
     check_custom_datafile()  # check if the custom datafile is correct

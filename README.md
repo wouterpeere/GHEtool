@@ -63,15 +63,15 @@ our [project board](https://github.com/users/wouterpeere/projects/2) to check ou
 This code is tested with Python 3.9, 3.10, 3.11, 3.12 and 3.13 and requires the following libraries (the versions
 mentioned are the ones with which the code is tested)
 
-* matplotlib >= 3.5.2
-* numpy >= 1.23.1
+* matplotlib >= 3.9.2
+* numpy >= 1.26.4
 * pandas >= 1.4.3
-* pygfunction >= 2.2.3
+* pygfunction >= 2.3.0
 * scipy >= 1.8.1
 
 For the tests
 
-* Pytest >= 7.1.2
+* pytest >= 7.1.2
 
 For the active/passive example
 
@@ -313,7 +313,7 @@ if you want more complex designs.
 import pygfunction as gt
 
 # set a rectangular borefield
-borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
+borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
 borefield.set_borefield(borefield_gt)
 ```
 
@@ -408,6 +408,7 @@ mixed-integer-linear-problem (MILP) energy system optimization. _Geotherm Energy
 
 Dion G., Pasquier, P., Perraudin, D. (2024). Sizing equation based on the outlet fluid temperature of closed-loop ground
 heat exchangers. In _Proceedings of International Ground Source Heat Pump Association_. Montréal (Canada), 28-30 May
+
 2024.
 
 Peere, W. (2024). Are Rules of Thumb Misleading? The Complexity of Borefield Sizing and the Importance of Design
@@ -425,6 +426,7 @@ engineering_ 226, Art.No. 120203, 10.1016/j.applthermaleng.2023.120203
 
 Cimmino, M., Cook., J. C. (2022). pygfunction 2.2 : New Features and Improvements in Accuracy and Computational
 Efficiency. In _Proceedings of IGSHPA Research Track 2022_. Las Vegas (USA), 6-8 December
+
 2022. https://doi.org/10.22488/okstate.22.000015.
 
 Verleyen, L., Peere, W., Michiels, E., Boydens, W., Helsen, L. (2022). The beauty of reason and insight: a story about

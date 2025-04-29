@@ -8,7 +8,7 @@ from GHEtool import *
 
 # initiate ground data
 data = GroundConstantTemperature(3, 10, 2.4 * 10 ** 6)
-borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
+borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
 
 # initiate borefield
 borefield = Borefield()

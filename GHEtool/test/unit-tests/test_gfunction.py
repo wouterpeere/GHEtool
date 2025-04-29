@@ -14,15 +14,15 @@ borehole_length_array_threshold = np.array([30, 60, 100])
 time_value_array_empty = np.array([])
 time_value_array = np.array([1, 100, 1000, 10000])
 
-borefield = gt.boreholes.rectangle_field(5, 5, 5, 5, 100, 1, 0.075)
-borefield_less_deep = gt.boreholes.rectangle_field(5, 5, 5, 5, 80, 1, 0.075)
-borefield_more_deep = gt.boreholes.rectangle_field(5, 5, 5, 5, 110, 1, 0.075)
+borefield = gt.borefield.Borefield.rectangle_field(5, 5, 5, 5, 100, 1, 0.075)
+borefield_less_deep = gt.borefield.Borefield.rectangle_field(5, 5, 5, 5, 80, 1, 0.075)
+borefield_more_deep = gt.borefield.Borefield.rectangle_field(5, 5, 5, 5, 110, 1, 0.075)
 borefield_ghe = Borefield()
 
 
 def test_equal_borefields():
-    borefield1 = gt.boreholes.rectangle_field(1, 1, 5, 5, 100, 4, 0.075)
-    borefield2 = gt.boreholes.rectangle_field(1, 1, 5, 5, 100, 4, 0.075)
+    borefield1 = gt.borefield.Borefield.rectangle_field(1, 1, 5, 5, 100, 4, 0.075)
+    borefield2 = gt.borefield.Borefield.rectangle_field(1, 1, 5, 5, 100, 4, 0.075)
 
     gfunc = GFunction()
     gfunc.borefield = borefield1
@@ -30,8 +30,8 @@ def test_equal_borefields():
 
 
 def test_unequal_borefields():
-    borefield1 = gt.boreholes.rectangle_field(1, 1, 5, 5, 100, 4, 0.075)
-    borefield2 = gt.boreholes.rectangle_field(2, 1, 5, 5, 100, 4, 0.075)
+    borefield1 = gt.borefield.Borefield.rectangle_field(1, 1, 5, 5, 100, 4, 0.075)
+    borefield2 = gt.borefield.Borefield.rectangle_field(2, 1, 5, 5, 100, 4, 0.075)
 
     gfunc = GFunction()
     gfunc.borefield = borefield1
@@ -39,8 +39,8 @@ def test_unequal_borefields():
 
 
 def test_equal_borefields2():
-    borefield1 = gt.boreholes.rectangle_field(10, 10, 5, 5, 100, 4, 0.075)
-    borefield2 = gt.boreholes.rectangle_field(10, 10, 5, 5, 100, 4, 0.075)
+    borefield1 = gt.borefield.Borefield.rectangle_field(10, 10, 5, 5, 100, 4, 0.075)
+    borefield2 = gt.borefield.Borefield.rectangle_field(10, 10, 5, 5, 100, 4, 0.075)
 
     gfunc = GFunction()
     gfunc.borefield = borefield1
@@ -48,8 +48,8 @@ def test_equal_borefields2():
 
 
 def test_unequal_borefields2():
-    borefield1 = gt.boreholes.rectangle_field(10, 10, 5, 5, 100, 4, 0.075)
-    borefield2 = gt.boreholes.rectangle_field(10, 10, 6, 5, 100, 4, 0.075)
+    borefield1 = gt.borefield.Borefield.rectangle_field(10, 10, 5, 5, 100, 4, 0.075)
+    borefield2 = gt.borefield.Borefield.rectangle_field(10, 10, 6, 5, 100, 4, 0.075)
 
     gfunc = GFunction()
     gfunc.borefield = borefield1
@@ -234,8 +234,7 @@ def test_interpolation_1D():
 
 
 def _change_borefield_borehole_length(borefield, borehole_length):
-    for idx, _ in enumerate(borefield):
-        setattr(borefield[idx], "H", borehole_length)
+    borefield.H = np.full(borefield.nBoreholes, borehole_length)
 
 
 def test_store_2D_data():
@@ -287,7 +286,7 @@ def test_store_2D_data():
     assert gfunc.borehole_length_array.shape[0] == 2
 
     # test if data is removed
-    borefield_2 = gt.boreholes.rectangle_field(5, 6, 5, 5, 100, 1, 0.075)
+    borefield_2 = gt.borefield.Borefield.rectangle_field(5, 6, 5, 5, 100, 1, 0.075)
     gfunc.calculate(time_values, borefield_2, alpha * 1.01)
     assert gfunc.borehole_length_array.size == 1
 
@@ -448,7 +447,7 @@ def test_stuck_in_loop():
 def test_negative_values():
     gfunc = GFunction()
     gfunc.use_cyl_correction_when_negative = False
-    field = gt.boreholes.rectangle_field(10, 7, 2, 2, 150, 2, 0.2)
+    field = gt.borefield.Borefield.rectangle_field(10, 7, 2, 2, 150, 2, 0.2)
     time = gt.load_aggregation.ClaessonJaved(3600, 3600 * 8760 * 20).get_times_for_simulation()
     g_func = gfunc.calculate(time, field, 1 / 5000 / 1000, interpolate=False)
     assert not np.all(g_func > 0)

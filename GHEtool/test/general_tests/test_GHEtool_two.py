@@ -16,7 +16,7 @@ data_ground_flux = GroundFluxTemperature(3, 10)
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
 pipeData = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 
-borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
+borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
 
 
 def load_case(number):
@@ -181,7 +181,7 @@ def test_no_possible_solution():
 def test_problem_with_gfunction_calc_obj():
     # GroundData for an initial field of 11 x 11
     data = GroundConstantTemperature(3, 10)
-    borefield_gt = gt.boreholes.rectangle_field(11, 11, 6, 6, 110, 1, 0.075)
+    borefield_gt = gt.borefield.Borefield.rectangle_field(11, 11, 6, 6, 110, 1, 0.075)
 
     # Monthly loading values
     peak_injection = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak cooling in kW
@@ -217,7 +217,7 @@ def test_problem_with_gfunction_calc_obj():
 
     # borefield of 6x20
     data = GroundConstantTemperature(3, 10)
-    borefield_gt = gt.boreholes.rectangle_field(6, 20, 6, 6, 110, 1, 0.075)
+    borefield_gt = gt.borefield.Borefield.rectangle_field(6, 20, 6, 6, 110, 1, 0.075)
 
     # set ground parameters to borefield
     borefield.set_borefield(borefield_gt)

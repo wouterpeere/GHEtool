@@ -61,31 +61,31 @@ range_rectangle_min = {}
 
 @cache
 def line(x, y):
-    temp = gt.boreholes.rectangle_field(x, y, max(B_max, width / x), max(B_max, length / y), 100, 0.7, 0.07)
+    temp = gt.borefield.Borefield.rectangle_field(x, y, max(B_max, width / x), max(B_max, length / y), 100, 0.7, 0.07)
     return len(temp), temp
 
 
 @cache
 def L(x, y):
-    temp = gt.boreholes.L_shaped_field(x, y, max(B_max, width / x), max(B_max, length / y), 100, 0.7, 0.07)
+    temp = gt.borefield.Borefield.L_shaped_field(x, y, max(B_max, width / x), max(B_max, length / y), 100, 0.7, 0.07)
     return len(temp), temp
 
 
 @cache
 def U(x, y):
-    temp = gt.boreholes.U_shaped_field(x, y, max(B_max, width / x), max(B_max, length / y), 100, 0.7, 0.07)
+    temp = gt.borefield.Borefield.U_shaped_field(x, y, max(B_max, width / x), max(B_max, length / y), 100, 0.7, 0.07)
     return len(temp), temp
 
 
 @cache
 def box(x, y):
-    temp = gt.boreholes.box_shaped_field(x, y, max(B_max, width / x), max(B_max, length / y), 100, 0.7, 0.07)
+    temp = gt.borefield.Borefield.box_shaped_field(x, y, max(B_max, width / x), max(B_max, length / y), 100, 0.7, 0.07)
     return len(temp), temp
 
 
 @cache
 def rectangle(x, y):
-    temp = gt.boreholes.rectangle_field(x, y, max(B_max, width / x), max(B_max, length / y), 100, 0.7, 0.07)
+    temp = gt.borefield.Borefield.rectangle_field(x, y, max(B_max, width / x), max(B_max, length / y), 100, 0.7, 0.07)
     return len(temp), temp
 
 
