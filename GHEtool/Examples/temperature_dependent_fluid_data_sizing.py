@@ -6,6 +6,8 @@ from GHEtool import *
 
 from GHEtool.Validation.cases import load_case
 
+import matplotlib.pyplot as plt
+
 
 def size_with_temperature_dependence():
     # load data
@@ -29,15 +31,31 @@ def size_with_temperature_dependence():
 
     # calculate required size with variable temperature
     size_variable = borefield.size_L3()
-    borefield.print_temperature_profile()
+    results_variable = borefield.results
 
     # calculate required size with fixed temperature
     borefield.fluid_data = fluid_data.create_constant(2)
     size_fixed = borefield.size_L3()
-    borefield.print_temperature_profile()
+    results_fixed = borefield.results
+
+    peak_extraction_diff = results_fixed.peak_extraction - results_variable.peak_extraction
+    peak_injection_diff = results_fixed.peak_injection - results_variable.peak_injection
 
     print(f'Sizing with temperature dependent fluid properties: {size_variable:.2f}m')
     print(f'Sizing with constant fluid properties: {size_fixed:.2f}m')
+    print(f'Max temperature difference in extraction: {min(peak_extraction_diff):.2f}°C')
+    print(f'Max temperature difference in injection: {max(peak_injection_diff):.2f}°C')
+
+    time_array = borefield.load.time_L3 / 12 / 730.0 / 3600.0
+    plt.figure()
+    plt.plot(time_array, peak_extraction_diff, label="Difference in peak extraction temperature")
+    plt.plot(time_array, peak_injection_diff, label="Difference in peak injection temperature")
+    plt.ylabel('Temperature difference in peak power [°C]')
+    plt.xlabel('Time [year]')
+    plt.xticks(range(0, borefield.simulation_period + 1, 2))
+    plt.legend()
+
+    borefield.print_temperature_profile()
 
 
 if __name__ == "__main__":  # pragma: no-cover

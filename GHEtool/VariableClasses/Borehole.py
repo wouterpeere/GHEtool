@@ -324,7 +324,7 @@ class Borehole(BaseClass):
                     'pipe': str(self.pipe_data),
                     'flow': str(self.flow_data)
                 }
-                if stored_interp_data != self._stored_interp_data and self._use_stored_data:
+                if stored_interp_data != self._stored_interp_data or not self._use_stored_data:
                     self._temperature_range = np.concatenate((
                         np.linspace(self.fluid_data.freezing_point, 30,
                                     kwargs.get('nb_of_points', self._nb_of_data_points)), np.arange(35, 105, 5)))

@@ -59,10 +59,6 @@ def optimise_load_profile_power(
     if temperature_threshold < 0:
         raise ValueError(f"The temperature threshold is {temperature_threshold}, but it cannot be below 0!")
 
-    # since the depth does not change, the Rb* value is constant
-    borefield.Rb = borefield.borehole.get_Rb(borefield.H, borefield.D, borefield.r_b,
-                                             borefield.ground_data.k_s(borefield.depth, borefield.D))
-
     # set load
     borefield.load = copy.deepcopy(building_load)
 
@@ -197,11 +193,6 @@ def optimise_load_profile_energy(
     # check if threshold is positive
     if temperature_threshold < 0:
         raise ValueError(f"The temperature threshold is {temperature_threshold}, but it cannot be below 0!")
-
-    # since the depth does not change, the Rb* value is constant
-    # set to use a constant Rb* value but save the initial parameters
-    borefield.Rb = borefield.borehole.get_Rb(borefield.H, borefield.D, borefield.r_b,
-                                             borefield.ground_data.k_s(borefield.depth, borefield.D))
 
     building_load_copy = copy.deepcopy(building_load)
 
@@ -406,10 +397,6 @@ def optimise_load_profile_balance(
 
     if imbalance_factor > 1 or imbalance_factor < 0:
         raise ValueError(f"The imbalance factor is {imbalance_factor}, but it should be between 0-1!")
-
-    # since the depth does not change, the Rb* value is constant
-    borefield.Rb = borefield.borehole.get_Rb(borefield.H, borefield.D, borefield.r_b,
-                                             borefield.ground_data.k_s(borefield.depth, borefield.D))
 
     # set load
     borefield.load = copy.deepcopy(building_load)

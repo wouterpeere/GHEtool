@@ -43,7 +43,10 @@ list_of_test_objects.add(SizingObject(borefield, L2_output=52.7, L3_output=52.73
 
 borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
 list_of_test_objects.add(SizingObject(borefield, L2_output=70.0197, L3_output=69.37579, quadrant=1,
-                                      name='Main functionalities (2), MPG'))
+                                      name='Main functionalities (2), MPG, variable'))
+borefield.fluid_data = TemperatureDependentFluidData('MPG', 25).create_constant(0)
+list_of_test_objects.add(SizingObject(borefield, L2_output=70.0197, L3_output=69.37579, quadrant=1,
+                                      name='Main functionalities (2), MPG, fixed'))
 borefield.fluid_data = fluid_data
 borefield.calculation_setup(atol=False)
 list_of_test_objects.add(SizingObject(borefield, L2_output=52.716, L3_output=52.741, quadrant=1,
@@ -61,6 +64,14 @@ borefield.load = hourly_load
 
 list_of_test_objects.add(SizingObject(borefield, L2_output=182.73, L3_output=182.656, L4_output=182.337, quadrant=1,
                                       name='Hourly profile (1)'))
+borefield.pipe_data = pipe_data
+borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
+list_of_test_objects.add(SizingObject(borefield, L2_output=182.73155, L3_output=182.655, L4_output=182.337, quadrant=1,
+                                      name='Hourly profile (1), MPG, variable'))
+borefield.fluid_data = TemperatureDependentFluidData('MPG', 25).create_constant(0)
+list_of_test_objects.add(SizingObject(borefield, L2_output=182.73155, L3_output=182.655, L4_output=182.337, quadrant=1,
+                                      name='Hourly profile (1), MPG, constant'))
+borefield.Rb = 0.12
 
 peak_injection = np.array([0., 0, 3.4, 6.9, 13., 18., 21., 50., 16., 3.7, 0., 0.])  # Peak injection in kW
 peak_extraction = np.array([60., 42., 10., 5., 0., 0., 0., 0., 4.4, 8.5, 19., 36.])  # Peak extraction in kW
