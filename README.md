@@ -60,18 +60,18 @@ our [project board](https://github.com/users/wouterpeere/projects/2) to check ou
 
 ## Requirements
 
-This code is tested with Python 3.9, 3.10, 3.11 and 3.12 and requires the following libraries (the versions
+This code is tested with Python 3.9, 3.10, 3.11, 3.12 and 3.13 and requires the following libraries (the versions
 mentioned are the ones with which the code is tested)
 
-* matplotlib >= 3.5.2
-* numpy >= 1.23.1
+* matplotlib >= 3.9.2
+* numpy >= 1.26.4
 * pandas >= 1.4.3
-* pygfunction >= 2.2.3
+* pygfunction >= 2.3.0
 * scipy >= 1.8.1
 
 For the tests
 
-* Pytest >= 7.1.2
+* pytest >= 7.1.2
 
 For the active/passive example
 
@@ -313,7 +313,7 @@ if you want more complex designs.
 import pygfunction as gt
 
 # set a rectangular borefield
-borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
+borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
 borefield.set_borefield(borefield_gt)
 ```
 

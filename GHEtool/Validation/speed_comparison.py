@@ -12,7 +12,7 @@ from GHEtool import Borefield, GroundConstantTemperature, MonthlyGeothermalLoadA
 
 def test_64_boreholes():
     data = GroundConstantTemperature(3, 10)
-    borefield_64 = gt.boreholes.rectangle_field(8, 8, 6, 6, 110, 1, 0.075)
+    borefield_64 = gt.borefield.Borefield.rectangle_field(8, 8, 6, 6, 110, 1, 0.075)
 
     # monthly loading values
     peak_cooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]  # Peak cooling in kW
@@ -68,7 +68,7 @@ def test_64_boreholes():
 
 def test_10_boreholes():
     data = GroundConstantTemperature(3, 10)
-    borefield_10 = gt.boreholes.rectangle_field(2, 5, 6, 6, 110, 1, 0.075)
+    borefield_10 = gt.borefield.Borefield.rectangle_field(2, 5, 6, 6, 110, 1, 0.075)
 
     # monthly loading values
     peak_cooling = [0., 0, 3., 9., 13., 20., 43., 30., 16., 7., 0., 0.]  # Peak cooling in kW

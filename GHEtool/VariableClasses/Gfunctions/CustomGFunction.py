@@ -196,13 +196,13 @@ class CustomGFunction:
 
         return True
 
-    def create_custom_dataset(self, borefield: List[gt.boreholes.Borehole], alpha: Union[float, callable]) -> None:
+    def create_custom_dataset(self, borefield: gt.borefield.Borefield, alpha: Union[float, callable]) -> None:
         """
         This function creates the custom dataset.
 
         Parameters
         ----------
-        borefield : list[pygfunction.boreholes.Borehole]
+        borefield : pygfunction.borefield.Borefield
             Borefield object for which the custom dataset should be created
         alpha : float or callable
             Ground thermal diffusivity [m2/s] or function to calculate it at a certain borehole length
@@ -221,12 +221,12 @@ class CustomGFunction:
             # Calculate the g-function for uniform borehole wall temperature
             borefield = copy.deepcopy(borefield)
             # set borehole borehole length in borefield
-            for borehole in borefield:
-                borehole.H = borehole_length
+            borefield.H = np.full(borefield.nBoreholes, borehole_length)
 
             # calculate borehole buried depth
-            D = np.average([bor.D for bor in borefield])
-            tilt = np.average([bor.tilt for bor in borefield])
+            D = np.average(borefield.D)
+            tilt = np.average(borefield.tilt)
+
             depth = borehole_length * math.cos(tilt) + D
             gfunc_uniform_T = gt.gfunction.gFunction(borefield,
                                                      alpha if isinstance(alpha, float) else alpha(depth, D),

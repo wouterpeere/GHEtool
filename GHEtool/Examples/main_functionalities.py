@@ -42,10 +42,6 @@ def main_functionalities():
     # create the borefield object
     borefield = Borefield(load=load)
 
-    # one can activate or deactive the logger, by default it is deactivated
-    # borefield.activate_logger()
-    # borefield.deactivate_logger()
-
     borefield.set_ground_parameters(data)
     borefield.create_rectangular_borefield(10, 12, 6, 6, 100, 4, 0.075)
 

@@ -10,6 +10,7 @@ from numpy._typing import NDArray
 from scipy import interpolate
 
 from GHEtool.VariableClasses.Cylindrical_correction import update_pygfunction
+import GHEtool
 from .CustomGFunction import _time_values
 
 # add cylindrical correction to pygfunction
@@ -95,22 +96,24 @@ class GFunction:
         self._store_previous_values_backup: bool = GFunction.DEFAULT_STORE_PREVIOUS_VALUES
         self.options: dict = {"method": "equivalent"}
         self.alpha: float = 0.0
-        self.borefield: list[gt.boreholes.Borehole] = []
+        self.borefield: gt.borefield.Borefield = None
         self.borehole_length_array: np.ndarray = np.array([])
         self.time_array: np.ndarray = np.array([])
         self.previous_gfunctions: np.ndarray = np.array([])
         self.previous_borehole_length: float = 0.0
         self.use_cyl_correction_when_negative: bool = True
-        self.use_neural_model: bool = False
+        self.use_neural_network: bool = False
 
         self.no_extrapolation: bool = True
         self.threshold_borehole_length_interpolation: float = 0.25  # %
 
         self.fifo_list: FIFO = FIFO(8)
-        # stuff for neural network
-        self.normalize_vec = np.array((1 / 20, 1 / 20, 1 / 9, 1 / 9, 1 / 1000, 1 / 100, 1 / 0.4, 1 / (10 ** -6), 1/6))
-        from GHEtool import FOLDER
-        self.model_weights = [pd.read_csv(FOLDER.joinpath(f"VariableClasses/GFunctions/layer_{i}_weights_diff_fields.csv"), sep=";").values for i in range(6)]
+
+        # initiate ANN
+        self.normalize_vec = np.array((1 / 20, 1 / 20, 1 / 9, 1 / 9, 1 / 1000, 1 / 100, 1 / 0.4, 1 / (10 ** -6), 1 / 6))
+        self.model_weights = [
+            pd.read_csv(GHEtool.FOLDER.joinpath(f"VariableClasses/GFunctions/layer_{i}_weights_diff_fields.csv"),
+                        sep=";").values for i in range(6)]
 
     @property
     def store_previous_values(self) -> bool:
@@ -141,15 +144,8 @@ class GFunction:
         self._store_previous_values = store
         self._store_previous_values_backup = store
 
-    def calculate(
-        self,
-        time_value: Union[list, float, np.ndarray],
-        borefield: List[gt.boreholes.Borehole],
-        alpha: float,
-        interpolate: bool = None,
-        use_neural_network: bool = False,
-        **kwargs,
-    ):
+    def calculate(self, time_value: Union[list, float, np.ndarray], borefield: gt.borefield.Borefield,
+                  alpha: float, interpolate: bool = None, use_neural_network: bool = False, **kwargs):
         """
         This function returns the gvalues either by interpolation or by calculating them.
         It does so by calling the function gvalues which does this calculation.
@@ -160,7 +156,7 @@ class GFunction:
         ----------
         time_value : list, float, np.ndarray
             Array with all the time values [s] for which gvalues should be calculated
-        borefield : list[pygfunction.boreholes.Borehole]
+        borefield : pygfunction.borefield.Borefield
             Borefield model for which the gvalues should be calculated
         alpha : float
             Thermal diffusivity of the ground [m2/s]
@@ -169,14 +165,15 @@ class GFunction:
         use_neural_network : bool
             True if the neural network simplification should be used. This uses a NN trained on previous calculated
             gvalues.
-
+        
         Returns
         -------
         gvalues : np.ndarray
             1D array with all the requested gvalues
         """
 
-        def calculate_with_neural_network(alpha: float, borefield: list, borefield_description: dict) -> np.ndarray:
+        def calculate_with_neural_network(alpha: float, borefield: gt.borefield.Borefield,
+                                          borefield_description: dict) -> np.ndarray:
             """
             This function calculates the gfunctions using a trained ANN.
             (For more information, visit Blanke et al. ([#BlankeEtAl]_).
@@ -189,8 +186,8 @@ class GFunction:
             ----------
             alpha : float
                 Thermal diffusivity of the ground [m2/s]
-            borefield : list
-                List of boreholes
+            borefield : pygfunction.borefield.Borefield
+                Pygfunction borefield object
             borefield_description : dict
                 Description of the borefield with keys: {N_1, N_2, B_1, B_2, type}
 
@@ -221,22 +218,22 @@ class GFunction:
                 warnings.warn("B_2 outside ANN limits!")
             if r_b > 0.2:
                 warnings.warn("r_b outside ANN limits!")
-            if not(0.2/1000 < alpha < 3/1000):
+            if not (0.2 / 1000 < alpha < 3 / 1000):
                 warnings.warn("alpha outside ANN limits!")
-            if not(0 <= borefield_description["type"] < 6):
+            if not (0 <= borefield_description["type"] < 6):
                 warnings.warn("r_b outside ANN limits!")
             input_data = np.array([n_x, n_y, b_x, b_y, H, D, r_b, alpha, borefield_description["type"]])
             res = calc_network_using_numpy(input_data, self.model_weights, self.normalize_vec)
             return res
 
         def gvalues(
-            time_values: np.ndarray,
-            borefield: List[gt.boreholes.Borehole],
-            alpha: float,
-            borehole_length: float,
-            interpolate: bool = None,
-            use_neural_network: bool = False,
-            **kwargs,
+                time_values: np.ndarray,
+                borefield: gt.borefield.Borefield,
+                alpha: float,
+                borehole_length: float,
+                interpolate: bool = None,
+                use_neural_network: bool = False,
+                **kwargs,
         ) -> np.ndarray:
             """
             This function returns the gvalues either by interpolation or by calculating them.
@@ -245,7 +242,7 @@ class GFunction:
             ----------
             time_values : np.ndarray
                 Array with all the time values [s] for which gvalues should be calculated
-            borefield : list[pygfunction.boreholes.Borehole]
+            borefield : pygfunction.borefield.Borefield
                 Borefield model for which the gvalues should be calculated
             alpha : float
                 Thermal diffusivity of the ground [m2/s]
@@ -264,13 +261,14 @@ class GFunction:
             """
 
             # use neural network
-            if use_neural_network:
+            if use_neural_network or self.use_neural_network:
                 if not "borefield_description" in kwargs:
                     raise ValueError(
                         "You can only use the ANN when you have a regular configuration. Please use the "
                         "create_rectangle_borefield or similar methods in the Borefield class."
                     )
-                return np.interp(GFunction.DEFAULT_TIMESTEPS, time_values, calculate_with_neural_network(alpha, borefield, **kwargs))
+                return np.interp(GFunction.DEFAULT_TIMESTEPS, time_values,
+                                 calculate_with_neural_network(alpha, borefield, **kwargs))
 
             # check if the value is in the fifo_list
             # if the value is in self.borehole_length_array, there is no problem, since the interpolation will be exact anyway
@@ -298,14 +296,16 @@ class GFunction:
                 self.previous_borehole_length = borehole_length
             # do interpolation
             interpolate = interpolate if interpolate is not None else self.store_previous_values
-            gfunc_interpolated = self.interpolate_gfunctions(time_values, borehole_length, alpha, borefield) if interpolate else np.array([])
+            gfunc_interpolated = self.interpolate_gfunctions(time_values, borehole_length, alpha,
+                                                             borefield) if interpolate else np.array([])
 
             # if there are g-values calculated, return them
             if np.any(gfunc_interpolated):
                 return gfunc_interpolated
 
             # calculate the g-values for uniform borehole wall temperature
-            gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options, method=self.options["method"]).gFunc
+            gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options,
+                                                      method=self.options["method"]).gFunc
             if np.any(gfunc_calculated < 0):
                 warnings.warn("There are negative g-values. This can be caused by a large borehole radius.")
                 if self.use_cyl_correction_when_negative:
@@ -319,7 +319,8 @@ class GFunction:
                     backup = self.options.get("Cylindrical_correction")
 
                     self.options["cylindrical_correction"] = True
-                    gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options, method=self.options["method"]).gFunc
+                    gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options,
+                                                              method=self.options["method"]).gFunc
                     self.options["cylindrical_correction"] = backup
 
             # store the calculated g-values
@@ -343,7 +344,8 @@ class GFunction:
             time_value_new = _time_values(t_max=time_value[-1])
 
             # calculate g-function values
-            gfunc_uniform_T = gvalues(time_value_new, borefield, alpha, borehole_length, interpolate, use_neural_network, **kwargs)
+            gfunc_uniform_T = gvalues(time_value_new, borefield, alpha, borehole_length, interpolate,
+                                      use_neural_network, **kwargs)
 
             # return interpolated values
             return np.interp(time_value, time_value_new, gfunc_uniform_T)
@@ -351,18 +353,19 @@ class GFunction:
         # check if there are double values
         if not isinstance(time_value, (float, int)) and time_value_np.size != np.unique(np.asarray(time_value)).size:
             # calculate g-function values
-            gfunc_uniform_T = gvalues(np.unique(time_value_np), borefield, alpha, borehole_length, interpolate, use_neural_network, **kwargs)
+            gfunc_uniform_T = gvalues(np.unique(time_value_np), borefield, alpha, borehole_length, interpolate,
+                                      use_neural_network, **kwargs)
 
             return np.interp(time_value, np.unique(time_value_np), gfunc_uniform_T)
 
         # calculate g-function values
-        gfunc_uniform_T = gvalues(time_value_np, borefield, alpha, borehole_length, interpolate, use_neural_network, **kwargs)
+        gfunc_uniform_T = gvalues(time_value_np, borefield, alpha, borehole_length, interpolate, use_neural_network,
+                                  **kwargs)
 
         return gfunc_uniform_T
 
-    def interpolate_gfunctions(
-        self, time_value: Union[list, float, np.ndarray], borehole_length: float, alpha: float, borefield: List[gt.boreholes.Borehole]
-    ) -> np.ndarray:
+    def interpolate_gfunctions(self, time_value: Union[list, float, np.ndarray], borehole_length: float,
+                               alpha: float, borefield: List[gt.boreholes.Borehole]) -> np.ndarray:
         """
         This function returns the gvalues by interpolation them. If interpolation is not possible, an emtpy
         array is returned.
@@ -407,7 +410,8 @@ class GFunction:
                 gvalues = interpolate.interpn([self.time_array], self.previous_gfunctions, time_value)
             else:
                 gvalues = interpolate.interpn(
-                    (self.borehole_length_array, self.time_array), self.previous_gfunctions, np.array([[borehole_length, t] for t in time_value])
+                    (self.borehole_length_array, self.time_array), self.previous_gfunctions,
+                    np.array([[borehole_length, t] for t in time_value])
                 )
 
             return gvalues
@@ -478,13 +482,14 @@ class GFunction:
             # the nearest index is the first in the array and the borehole length is smaller than the smallest value in the array
             # but the difference is smaller than the threshold for interpolation
             if (
-                idx_borehole_length == self.borehole_length_array.size - 1
-                and borehole_length - val_borehole_length < self.threshold_borehole_length_interpolation * borehole_length
+                    idx_borehole_length == self.borehole_length_array.size - 1
+                    and borehole_length - val_borehole_length < self.threshold_borehole_length_interpolation * borehole_length
             ):
                 return idx_borehole_length, None
             elif idx_borehole_length != self.borehole_length_array.size - 1:
                 idx_next = idx_borehole_length + 1
-                if self.borehole_length_array[idx_next] - val_borehole_length < self.threshold_borehole_length_interpolation * borehole_length:
+                if self.borehole_length_array[
+                    idx_next] - val_borehole_length < self.threshold_borehole_length_interpolation * borehole_length:
                     return idx_borehole_length, idx_next
         else:
             # the nearest index is the last in the array and the borehole length is larger than the highest value in the array
@@ -493,7 +498,8 @@ class GFunction:
                 return None, idx_borehole_length
             elif idx_borehole_length != 0:
                 idx_prev = idx_borehole_length - 1
-                if val_borehole_length - self.borehole_length_array[idx_prev] < self.threshold_borehole_length_interpolation * borehole_length:
+                if val_borehole_length - self.borehole_length_array[
+                    idx_prev] < self.threshold_borehole_length_interpolation * borehole_length:
                     return idx_prev, idx_borehole_length
 
         # no correct interpolation indices are found
@@ -572,7 +578,8 @@ class GFunction:
         self.borefield = []
         self.fifo_list.clear()
 
-    def set_new_calculated_data(self, time_values: np.ndarray, borehole_length: float, gvalues: np.ndarray, borefield, alpha) -> bool:
+    def set_new_calculated_data(self, time_values: np.ndarray, borehole_length: float, gvalues: np.ndarray, borefield,
+                                alpha) -> bool:
         """
         This function stores the newly calculated gvalues if this is needed.
 
@@ -675,7 +682,7 @@ class GFunction:
 
         return True
 
-    def _check_borefield(self, borefield: List[gt.boreholes.Borehole]) -> bool:
+    def _check_borefield(self, borefield: gt.borefield.Borefield) -> bool:
         """
         This function checks whether the new borefield object is equal to the previous one.
         It does so by comparing all the parameters (neglecting the borehole length).
@@ -684,7 +691,7 @@ class GFunction:
 
         Parameters
         ----------
-        borefield : list[pygfunction.boreholes.Borehole]
+        borefield : pygfunction.borefield.Borefield
             New borefield for which the gfunctions should be calculated
 
         Returns
@@ -730,7 +737,8 @@ class GFunction:
         return True
 
 
-def calc_network_using_numpy(input_data: NDArray[np.float64], model_weights: list[NDArray[np.float64]], normalize_vec: NDArray[np.float64]) -> NDArray[
+def calc_network_using_numpy(input_data: NDArray[np.float64], model_weights: list[NDArray[np.float64]],
+                             normalize_vec: NDArray[np.float64]) -> NDArray[
     np.float64]:
     input_data = (input_data * normalize_vec).reshape(9, 1)
     res = np.maximum(0, model_weights[0].T.dot(input_data) + model_weights[1])

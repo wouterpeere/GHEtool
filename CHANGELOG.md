@@ -14,15 +14,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Pressure drop calculation for horizontal pipe and total system (issue #332).
 - Added optimisation function for balanced borefield (issue #335).
 - Min_temperature and Max_temperature property to results class (issue #335).
+- Support for Python 3.13 (issue #319).
 
 ## Changed
 
 - Added U-bend to the pressure drop calculation of the pipe (issue #332).
 - Remove optimise_load_power and optimise_load_energy from Borefield object (issue #332).
+- Changed back-end to be compatible with pygfunction 2.3.0 (issue #345).
 
 ## Fixed
 
 - Increase accuracy of optimise load profile (issue #335).
+- Problem with MonthlyBuildingLoadMultiYear (issue #339).
 
 ## [2.3.1] - 2025-01-23
 

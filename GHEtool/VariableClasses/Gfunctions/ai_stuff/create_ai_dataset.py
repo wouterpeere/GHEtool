@@ -47,18 +47,19 @@ def calc_f_gunc(vals: tuple[int, int, float, float, float, float, float, float, 
     N_1, N_2, B_1, B_2, H, D, r_b, alpha, shape = vals
     N_1, N_2 = int(N_1), int(N_2)
     if shape < 1:
-        borefield = gt.boreholes.L_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
+        borefield = gt.borefield.Borefield.L_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
     elif shape < 2:
-        borefield = gt.boreholes.U_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
+        borefield = gt.borefield.Borefield.U_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
     elif shape < 3:
-        borefield = gt.boreholes.box_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
+        borefield = gt.borefield.Borefield.box_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
     elif shape < 4:
-        borefield = gt.boreholes.rectangle_field(N_1, N_2, B_1, B_2, H, D, r_b)
+        borefield = gt.borefield.Borefield.rectangle_field(N_1, N_2, B_1, B_2, H, D, r_b)
     else:
-        borefield = gt.boreholes.staggered_rectangle_field(N_1, N_2, B_1, B_2, H, D, r_b, False)
+        borefield = gt.borefield.Borefield.staggered_rectangle_field(N_1, N_2, B_1, B_2, H, D, r_b, False)
 
     dt1 = process_time_ns()
-    gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=options, method=options["method"]).gFunc
+    gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=options,
+                                              method=options["method"]).gFunc
     dt = (process_time_ns() - dt1) / 1000_000_000
     res_i = [N_1, N_2, B_1, B_2, H, D, r_b, alpha, shape, dt] + list(gfunc_calculated)
     return res_i
@@ -66,7 +67,8 @@ def calc_f_gunc(vals: tuple[int, int, float, float, float, float, float, float, 
 
 def main():
     # define column names
-    columns = ["N_1", "N_2", "B_1", "B_2", "H", "D", "r_b", "alpha", "shape", "dt"] + [f"result_{i}" for i in range(len(time_values))]
+    columns = ["N_1", "N_2", "B_1", "B_2", "H", "D", "r_b", "alpha", "shape", "dt"] + [f"result_{i}" for i in
+                                                                                       range(len(time_values))]
     # start list
     values = []
     # create sets of variables
