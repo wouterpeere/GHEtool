@@ -50,7 +50,7 @@ class Borehole(BaseClass):
         if self.data_available:
             self.use_constant_Rb: bool = False
 
-        self.stored_interp_data = {}
+        self._stored_interp_data = {}
         self._y_val = None
         self._temperature_range = None
         self._use_stored_data = True
@@ -320,12 +320,14 @@ class Borehole(BaseClass):
                     'H': H,
                     'r_b': r_b,
                     'k_s': k_s if isinstance(k_s, (float, int)) else k_s(depth, D),
-                    'fluid': self.fluid_data,
-                    'pipe': self.pipe_data
+                    'fluid': str(self.fluid_data),
+                    'pipe': str(self.pipe_data),
+                    'flow': str(self.flow_data)
                 }
-                if stored_interp_data != self.stored_interp_data and self._use_stored_data:
-                    self._temperature_range = np.linspace(self.fluid_data.freezing_point, 100,
-                                                          kwargs.get('nb_of_points', self._nb_of_data_points))
+                if stored_interp_data != self._stored_interp_data and self._use_stored_data:
+                    self._temperature_range = np.concatenate((
+                        np.linspace(self.fluid_data.freezing_point, 30,
+                                    kwargs.get('nb_of_points', self._nb_of_data_points)), np.arange(35, 105, 5)))
 
                     self._y_val = np.zeros(self._temperature_range.shape)
 
@@ -333,13 +335,14 @@ class Borehole(BaseClass):
                         kwargs_new['temperature'] = temperature
                         self._y_val[idx] = calculate(**kwargs_new)
 
-                    self.stored_interp_data = {
+                    self._stored_interp_data = {
                         'D': D,
                         'H': H,
                         'r_b': r_b,
                         'k_s': k_s if isinstance(k_s, (float, int)) else k_s(depth, D),
-                        'fluid': self.fluid_data,
-                        'pipe': self.pipe_data
+                        'fluid': str(self.fluid_data),
+                        'pipe': str(self.pipe_data),
+                        'flow': str(self.flow_data)
                     }
 
                 # interpolate

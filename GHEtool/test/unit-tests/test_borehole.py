@@ -220,3 +220,33 @@ def test_uncertainty():
 
         diff = calculated - manual
         print(max(diff), max(diff / manual))
+
+
+def test_saved_data_reynolds():
+    borehole = Borehole()
+    borehole.pipe_data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2)
+    borehole.fluid_data = TemperatureDependentFluidData('MPG', 25)
+    borehole.flow_data = ConstantFlowRate(vfr=0.3)
+
+    resistance1 = borehole.calculate_Rb(100, 1, 0.075, 3, temperature=np.array([0, 1, 2, 5]))
+    assert borehole._stored_interp_data == {'D': 1,
+                                            'H': 100,
+                                            'flow': "{'vfr [l/s]': 0.3}",
+                                            'fluid': "{'name': 'MPG', 'percentage': 25}",
+                                            'k_s': 3,
+                                            'pipe': "{'type': 'U', 'nb_of_tubes': 2, 'thickness [mm]': 5.0, 'diameter "
+                                                    "[mm]': 4.0, 'spacing [mm]': 50.0, 'k_g [W/(m·K)]': 1, 'k_p "
+                                                    "[W/(m·K)]': 0.4, 'epsilon [mm]': 0.001}",
+                                            'r_b': 0.075}
+    resistance2 = borehole.calculate_Rb(110, 1, 0.075, 3, temperature=np.array([0, 1, 2, 5]))
+    assert not np.allclose(resistance1, resistance2)
+    assert borehole._stored_interp_data == {'D': 1,
+                                            'H': 110,
+                                            'flow': "{'vfr [l/s]': 0.3}",
+                                            'fluid': "{'name': 'MPG', 'percentage': 25}",
+                                            'k_s': 3,
+                                            'pipe': "{'type': 'U', 'nb_of_tubes': 2, 'thickness [mm]': 5.0, 'diameter "
+                                                    "[mm]': 4.0, 'spacing [mm]': 50.0, 'k_g [W/(m·K)]': 1, 'k_p "
+                                                    "[W/(m·K)]': 0.4, 'epsilon [mm]': 0.001}",
+                                            'r_b': 0.075}
+    assert np.allclose(resistance1, borehole.calculate_Rb(100, 1, 0.075, 3, temperature=np.array([0, 1, 2, 5])))
