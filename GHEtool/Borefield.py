@@ -565,7 +565,7 @@ class Borefield(BaseClass):
         """
         return self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s, self.depth,
                                     temperature=min(self.Tf_min,
-                                                    self.results.min_temperature if self.results.min_temperature is not None else 10000))
+                                                    self.results.min_temperature if self.results.min_temperature is not None else 10e6))
 
     @Rb.setter
     def Rb(self, Rb: float) -> None:

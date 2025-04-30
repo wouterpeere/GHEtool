@@ -1,15 +1,17 @@
 """
 This document contains all the information of the borehole class.
 """
+import copy
+
+import pygfunction as gt
 
 from GHEtool.VariableClasses.BaseClass import BaseClass
-from GHEtool.VariableClasses.FluidData import _FluidData, FluidData
+from GHEtool.VariableClasses.FluidData import _FluidData, FluidData, ConstantFluidData
 from GHEtool.VariableClasses.FlowData import _FlowData
 from GHEtool.VariableClasses.PipeData import _PipeData
 from typing import Union
 
 import numpy as np
-import pygfunction as gt
 
 
 class Borehole(BaseClass):
@@ -286,13 +288,38 @@ class Borehole(BaseClass):
 
         # initiate temporary borefield
         borehole = gt.boreholes.Borehole(H, D, r_b, 0, 0)
-        self.pipe_data.calculate_resistances(self.fluid_data, self.flow_data, **kwargs)
 
-        # initiate pipe
-        pipe = self.pipe_data.pipe_model(k_s if isinstance(k_s, (float, int)) else k_s(depth, D), borehole)
+        def calculate(**kwargs):
+            self.pipe_data.calculate_resistances(self.fluid_data, self.flow_data, **kwargs)
 
-        return pipe.effective_borehole_thermal_resistance(self.flow_data.mfr(fluid_data=self.fluid_data, **kwargs),
-                                                          self.fluid_data.cp(**kwargs))
+            # initiate pipe
+            pipe = self.pipe_data.pipe_model(k_s if isinstance(k_s, (float, int)) else k_s(depth, D), borehole)
+
+            return pipe.effective_borehole_thermal_resistance(self.flow_data.mfr(fluid_data=self.fluid_data, **kwargs),
+                                                              self.fluid_data.cp(**kwargs))
+
+        if 'temperature' in kwargs:
+            kwargs_new = copy.deepcopy(kwargs)
+            if isinstance(kwargs_new['temperature'], (int, float)):
+                return calculate(**kwargs_new)
+            elif isinstance(self.fluid_data, ConstantFluidData):
+                kwargs_new['temperature'] = 0  # does not matter since constant
+                return np.full(kwargs['temperature'].shape, calculate(**kwargs_new))
+
+            else:
+                # there are multiple values to be calculated
+                temperature_range = np.linspace(self.fluid_data.freezing_point, 100, kwargs.get('nb_of_points', 50))
+
+                y_val = np.zeros(temperature_range.shape)
+
+                for idx, temperature in enumerate(temperature_range):
+                    kwargs_new['temperature'] = temperature
+                    y_val[idx] = calculate(**kwargs_new)
+
+                # interpolate
+                return np.interp(kwargs['temperature'], temperature_range, y_val)
+
+        return calculate(**kwargs)
 
     def get_Rb(self, H: float, D: float, r_b: float, k_s: Union[callable, float], depth: float = None,
                **kwargs) -> float:

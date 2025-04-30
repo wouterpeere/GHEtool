@@ -1,3 +1,4 @@
+import copy
 import math
 
 import numpy as np
@@ -92,6 +93,7 @@ class MultipleUTube(_PipeData):
         # Pipe thermal resistance [m.K/W]
         self.R_p = gt.pipes.conduction_thermal_resistance_circular_pipe(
             self.r_in, self.r_out, self.k_p)
+
         # Convection heat transfer coefficient [W/(m^2.K)]
         h_f = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(
             flow_rate_data.mfr(fluid_data=fluid_data, **kwargs) / self.number_of_pipes,
@@ -125,7 +127,9 @@ class MultipleUTube(_PipeData):
         Parameters
         ----------
         fluid_data: FluidData
-            fluid data
+            Fluid data
+        flow_rate_data : FlowData
+            Flow rate data
 
         Returns
         -------
@@ -145,6 +149,8 @@ class MultipleUTube(_PipeData):
         ----------
         fluid_data: FluidData
             Fluid data
+        flow_rate_data : FlowData
+            Flow rate data
         borehole_length : float
             Borehole length [m]
 

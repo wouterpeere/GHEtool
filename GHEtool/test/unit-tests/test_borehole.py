@@ -183,3 +183,40 @@ def test_repr_():
 
     borehole = Borehole()
     assert {'Rb': 0.12} == borehole.__export__()
+
+
+def test_calculate_rb_range():
+    borehole = Borehole()
+    borehole.pipe_data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2)
+    borehole.fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
+    borehole.flow_data = ConstantFlowRate(mfr=0.2)
+
+    val = borehole.calculate_Rb(100, 1, 0.075, 3, temperature=5)
+    assert np.allclose([val, val, val], borehole.calculate_Rb(100, 1, 0.075, 3, temperature=np.array([1, 5, 10])))
+
+    # with temperature dependent range
+    borehole.fluid_data = TemperatureDependentFluidData('MPG', 25)
+
+    assert np.allclose(np.array([borehole.calculate_Rb(100, 1, 0.075, 3, temperature=1),
+                                 borehole.calculate_Rb(100, 1, 0.075, 3, temperature=5),
+                                 borehole.calculate_Rb(100, 1, 0.075, 3, temperature=10)]),
+                       borehole.calculate_Rb(100, 1, 0.075, 3, temperature=np.array([1, 5, 10])))
+
+
+def test_uncertainty():
+    borehole = Borehole()
+    borehole.pipe_data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2)
+    borehole.fluid_data = TemperatureDependentFluidData('MPG', 25)
+    borehole.flow_data = ConstantFlowRate(mfr=0.2)
+
+    nb_of_points = [10, 25, 50, 75, 100]
+
+    for idx, nb in enumerate(nb_of_points):
+        calculated = borehole.calculate_Rb(100, 1, 0.075, 3,
+                                           temperature=np.linspace(borehole.fluid_data.freezing_point, 100, 500),
+                                           nb_of_points=nb)
+        manual = np.array([borehole.calculate_Rb(100, 1, 0.075, 3, temperature=i) for i in
+                           np.linspace(borehole.fluid_data.freezing_point, 100, 500)])
+
+        diff = calculated - manual
+        print(max(diff), max(diff / manual))
