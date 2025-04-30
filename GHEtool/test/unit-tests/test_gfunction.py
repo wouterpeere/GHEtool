@@ -6,7 +6,7 @@ import pandas as pd
 import pygfunction as gt
 from pytest import raises
 
-from GHEtool import Borefield
+from GHEtool import Borefield, FOLDER
 from GHEtool.VariableClasses import FIFO, GFunction
 
 borehole_length_array = np.array([1, 5, 6])
@@ -461,7 +461,7 @@ def test_negative_values():
 
 
 def test_ann_borefield():
-    borefield1 = gt.boreholes.rectangle_field(1, 2, 5, 6, 100, 4, 0.075)
+    borefield1 = gt.borefield.Borefield.rectangle_field(1, 2, 5, 6, 100, 4, 0.075)
 
     gfunc = GFunction()
     gfunc.borefield = borefield1
@@ -473,7 +473,7 @@ def test_ann_borefield():
     input_data = (np.array([1, 2, 5, 6, 100, 4, 0.075, 1 / 5000 / 1000, 3]) * np.array(
         [1 / 20, 1 / 20, 1 / 9, 1 / 9, 1 / 1000, 1 / 100, 1 / 0.4, 1 / (10 ** -6),
          1 / 6])).reshape(9, 1)
-    from GHEtool import FOLDER
+
     model_weights = [
         pd.read_csv(FOLDER.joinpath(f"VariableClasses/GFunctions/layer_{i}_weights_diff_fields.csv"), sep=";").values
         for i in range(6)]

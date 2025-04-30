@@ -10,7 +10,6 @@ from numpy._typing import NDArray
 from scipy import interpolate
 
 from GHEtool.VariableClasses.Cylindrical_correction import update_pygfunction
-import GHEtool
 from .CustomGFunction import _time_values
 
 # add cylindrical correction to pygfunction
@@ -111,8 +110,9 @@ class GFunction:
 
         # initiate ANN
         self.normalize_vec = np.array((1 / 20, 1 / 20, 1 / 9, 1 / 9, 1 / 1000, 1 / 100, 1 / 0.4, 1 / (10 ** -6), 1 / 6))
+        from GHEtool import FOLDER
         self.model_weights = [
-            pd.read_csv(GHEtool.FOLDER.joinpath(f"VariableClasses/GFunctions/layer_{i}_weights_diff_fields.csv"),
+            pd.read_csv(FOLDER.joinpath(f"VariableClasses/GFunctions/layer_{i}_weights_diff_fields.csv"),
                         sep=";").values for i in range(6)]
 
     @property
