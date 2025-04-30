@@ -50,6 +50,11 @@ class Borehole(BaseClass):
         if self.data_available:
             self.use_constant_Rb: bool = False
 
+        self.stored_interp_data = {}
+        self._y_val = None
+        self._temperature_range = None
+        self._use_stored_data = True
+
     @property
     def Rb(self) -> float:
         """
@@ -308,16 +313,36 @@ class Borehole(BaseClass):
 
             else:
                 # there are multiple values to be calculated
-                temperature_range = np.linspace(self.fluid_data.freezing_point, 100, kwargs.get('nb_of_points', 50))
+                # check if stored data is still accurate
+                stored_interp_data = {
+                    'D': D,
+                    'H': H,
+                    'r_b': r_b,
+                    'k_s': k_s if isinstance(k_s, (float, int)) else k_s(depth, D),
+                    'fluid': self.fluid_data,
+                    'pipe': self.pipe_data
+                }
+                if stored_interp_data != self.stored_interp_data and self._use_stored_data:
+                    self._temperature_range = np.linspace(self.fluid_data.freezing_point, 100,
+                                                          kwargs.get('nb_of_points', 50))
 
-                y_val = np.zeros(temperature_range.shape)
+                    self._y_val = np.zeros(self._temperature_range.shape)
 
-                for idx, temperature in enumerate(temperature_range):
-                    kwargs_new['temperature'] = temperature
-                    y_val[idx] = calculate(**kwargs_new)
+                    for idx, temperature in enumerate(self._temperature_range):
+                        kwargs_new['temperature'] = temperature
+                        self._y_val[idx] = calculate(**kwargs_new)
+
+                    self.stored_interp_data = {
+                        'D': D,
+                        'H': H,
+                        'r_b': r_b,
+                        'k_s': k_s if isinstance(k_s, (float, int)) else k_s(depth, D),
+                        'fluid': self.fluid_data,
+                        'pipe': self.pipe_data
+                    }
 
                 # interpolate
-                return np.interp(kwargs['temperature'], temperature_range, y_val)
+                return np.interp(kwargs['temperature'], self._temperature_range, self._y_val)
 
         return calculate(**kwargs)
 

@@ -1,11 +1,11 @@
 """
-This file contains a design example with the Separatus probe, in comparison with a single and double U-tube.
-A borehole diameter of DN90 was chosen for the Separatus probe whereas for the single and double U-tube a DN140 was assumed.
+This file contains a design example with the separatus probe, in comparison with a single and double U-tube.
+A borehole diameter of DN90 was chosen for the separatus probe whereas for the single and double U-tube a DN140 was assumed.
 A mass flow rate of 0.3 kg/s was assumed for all cases and no glycol was taken into account.
 The grout thermal conductivity is 2 W/(mK), and the borehole dimensions where 1x4 with a borehole length of 110m.
 The building heating and cooling demand was obtained from a residential building in Belgium.
 
-It is shown that both single U and Separatus have similar performance, whilst the double U-tube has a somewhat better
+It is shown that both single U and separatus have similar performance, whilst the double U-tube has a somewhat better
 performance. These results have to be placed next to an economic evaluation of the different borefield designs.
 """
 
@@ -74,7 +74,7 @@ def design_with_double_U():
 
 def design_with_separatus():
     """
-    This function plots the temperature profile for a system with a Separatus probe.
+    This function plots the temperature profile for a system with a separatus probe.
 
     Returns
     -------

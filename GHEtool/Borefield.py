@@ -15,7 +15,8 @@ import pygfunction as gt
 from numpy.typing import ArrayLike
 from scipy.signal import convolve
 
-from GHEtool.VariableClasses import FluidData, Borehole, GroundConstantTemperature, ResultsMonthly, ResultsHourly
+from GHEtool.VariableClasses import FluidData, Borehole, GroundConstantTemperature, ResultsMonthly, ResultsHourly, \
+    TemperatureDependentFluidData
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, CalculationSetup, Cluster, \
     EERCombined
 from GHEtool.VariableClasses.LoadData import *
@@ -1687,7 +1688,7 @@ class Borefield(BaseClass):
         # reset self.results
         self.results = ResultsMonthly()
 
-        def calculate_temperatures(H, hourly=hourly):
+        def calculate_temperatures(H, hourly=hourly, results_temperature=ResultsMonthly()):
             # set Rb* value
             H = H if H is not None else self.H
             depth = self.calculate_depth(H, self.D)
@@ -1731,22 +1732,22 @@ class Borefield(BaseClass):
                 # now the Tf will be calculated based on
                 # Tf = Tb + Q * R_b
                 results_month_injection = Tb + self.load.monthly_baseload_injection_power_simulation_period * 1000 * (
-                        get_rb(self.results.monthly_injection) / self.number_of_boreholes / H)
+                        get_rb(results_temperature.monthly_injection) / self.number_of_boreholes / H)
                 results_month_extraction = Tb - self.load.monthly_baseload_extraction_power_simulation_period * 1000 * (
-                        get_rb(self.results.monthly_extraction) / self.number_of_boreholes / H)
+                        get_rb(results_temperature.monthly_extraction) / self.number_of_boreholes / H)
 
                 # extra summation if the g-function value for the peak is included
                 results_peak_injection = (
                         Tb
                         + (self.load.monthly_peak_injection_simulation_period
-                           * (g_value_peak_injection / k_s / 2 / pi + get_rb(self.results.peak_injection))
+                           * (g_value_peak_injection / k_s / 2 / pi + get_rb(results_temperature.peak_injection))
                            - self.load.monthly_baseload_injection_power_simulation_period * g_value_peak_injection / k_s / 2 / pi)
                         * 1000 / self.number_of_boreholes / H
                 )
                 results_peak_extraction = (
                         Tb +
                         (- self.load.monthly_peak_extraction_simulation_period
-                         * (g_value_peak_extraction / k_s / 2 / pi + get_rb(self.results.peak_extraction))
+                         * (g_value_peak_extraction / k_s / 2 / pi + get_rb(results_temperature.peak_extraction))
                          + self.load.monthly_baseload_extraction_power_simulation_period * g_value_peak_extraction / k_s / 2 / pi)
                         * 1000 / self.number_of_boreholes / H
                 )
@@ -1784,7 +1785,7 @@ class Borefield(BaseClass):
                 # now the Tf will be calculated based on
                 # Tf = Tb + Q * R_b
                 temperature_result = Tb + hourly_load * 1000 * (
-                        get_rb(self.results.peak_injection) / self.number_of_boreholes / H)
+                        get_rb(results_temperature.peak_injection) / self.number_of_boreholes / H)
 
                 # reset other variables
                 results = ResultsHourly(borehole_wall_temp=Tb, temperature_fluid=temperature_result)
@@ -1797,24 +1798,26 @@ class Borefield(BaseClass):
                 np.max(result_new.peak_injection - results_old.peak_injection),
                 np.max(result_new.peak_extraction - results_old.peak_extraction))
 
-        if isinstance(self.load, _LoadDataBuilding):
+        if isinstance(self.load, _LoadDataBuilding) or \
+                isinstance(self.borehole.fluid_data, TemperatureDependentFluidData):
             # when building load is given, the load should be updated after each temperature calculation.
             # check if active_passive, because then, threshold should be taken
-            if isinstance(self.load.eer, EERCombined) and self.load.eer.threshold_temperature is not None:
+            if isinstance(self.load, _LoadDataBuilding) and \
+                    isinstance(self.load.eer, EERCombined) and self.load.eer.threshold_temperature is not None:
                 self.load.reset_results(self.Tf_min, self.load.eer.threshold_temperature)
             else:
                 self.load.reset_results(self.Tf_min, self.Tf_max)
             results_old = calculate_temperatures(H, hourly=hourly)
             self.load.set_results(results_old)
-            results = calculate_temperatures(H, hourly=hourly)
+            results = calculate_temperatures(H, hourly=hourly, results_temperature=results_old)
 
             # safety
             i = 0
-            while calculate_difference(results_old,
-                                       results) > self._calculation_setup.atol and i < self._calculation_setup.max_nb_of_iterations:
+            while calculate_difference(results_old, results) > self._calculation_setup.atol \
+                    and i < self._calculation_setup.max_nb_of_iterations:
                 results_old = results
                 self.load.set_results(results)
-                results = calculate_temperatures(H, hourly=hourly)
+                results = calculate_temperatures(H, hourly=hourly, results_temperature=results)
                 i += 1
             self.results = results
             self.load.set_results(results)
