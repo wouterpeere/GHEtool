@@ -475,7 +475,8 @@ def test_ann_borefield():
          1 / 6])).reshape(9, 1)
 
     model_weights = [
-        pd.read_csv(FOLDER.joinpath(f"VariableClasses/GFunctions/layer_{i}_weights_diff_fields.csv"), sep=";").values
+        pd.read_csv(FOLDER.joinpath(f"VariableClasses/GFunctions/ANN layers/layer_{i}_weights_diff_fields.csv"),
+                    sep=";").values
         for i in range(6)]
     res = np.maximum(0, model_weights[0].T.dot(input_data) + model_weights[1])
     res = np.maximum(0, model_weights[2].T.dot(res) + model_weights[3])
