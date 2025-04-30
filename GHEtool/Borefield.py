@@ -1684,6 +1684,9 @@ class Borefield(BaseClass):
         None
         """
 
+        # reset self.results
+        self.results = ResultsMonthly()
+
         def calculate_temperatures(H, hourly=hourly):
             # set Rb* value
             H = H if H is not None else self.H
