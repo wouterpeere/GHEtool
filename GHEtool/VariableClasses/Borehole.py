@@ -54,6 +54,7 @@ class Borehole(BaseClass):
         self._y_val = None
         self._temperature_range = None
         self._use_stored_data = True
+        self._nb_of_data_points = 50
 
     @property
     def Rb(self) -> float:
@@ -324,7 +325,7 @@ class Borehole(BaseClass):
                 }
                 if stored_interp_data != self.stored_interp_data and self._use_stored_data:
                     self._temperature_range = np.linspace(self.fluid_data.freezing_point, 100,
-                                                          kwargs.get('nb_of_points', 50))
+                                                          kwargs.get('nb_of_points', self._nb_of_data_points))
 
                     self._y_val = np.zeros(self._temperature_range.shape)
 

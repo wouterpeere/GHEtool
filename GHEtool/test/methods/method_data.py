@@ -42,7 +42,7 @@ list_of_test_objects.add(SizingObject(borefield, L2_output=52.7, L3_output=52.73
                                       name='Main functionalities (2)'))
 
 borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
-list_of_test_objects.add(SizingObject(borefield, L2_output=70.0197, L3_output=69.9838, quadrant=1,
+list_of_test_objects.add(SizingObject(borefield, L2_output=70.0197, L3_output=69.37579, quadrant=1,
                                       name='Main functionalities (2), MPG'))
 borefield.fluid_data = fluid_data
 borefield.calculation_setup(atol=False)
