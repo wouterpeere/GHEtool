@@ -50,6 +50,8 @@ class _Results(ABC):
         Minimum average fluid temperature
             float
         """
+        if len(self.peak_extraction) == 0:
+            return None
         return np.min(self.peak_extraction)
 
     @property
@@ -62,6 +64,8 @@ class _Results(ABC):
         Maximum average fluid temperature
             float
         """
+        if len(self.peak_injection) == 0:
+            return None
         return np.max(self.peak_injection)
 
     def __eq__(self, other) -> bool:

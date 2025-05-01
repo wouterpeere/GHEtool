@@ -177,6 +177,5 @@ def test_repr_():
     load = HourlyGeothermalLoadMultiYear(extraction_load=np.linspace(0, 8759 * 2 + 1, 8760 * 2),
                                          injection_load=np.linspace(0, 8759 * 2 + 1, 8760 * 2) * 2)
 
-    assert 'Multiyear hourly geothermal load\n' \
-           'Peak injection duration [hour]: 6.0\n' \
-           'Peak extraction duration [hour]: 6.0' == load.__repr__()
+    assert {'Peak extraction duration [hour]': 6.0, 'Peak injection duration [hour]': 6.0,
+            'type': 'Multiyear hourly geothermal load'} == load.__export__()

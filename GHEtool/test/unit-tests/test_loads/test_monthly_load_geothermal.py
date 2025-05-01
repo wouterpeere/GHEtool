@@ -394,22 +394,56 @@ def test_cluster():
 def test_repr_():
     load = MonthlyGeothermalLoadAbsolute(*load_case(1))
 
-    assert 'Monthly geothermal load\n' \
-           'Month\tPeak extraction [kW]\tPeak injection [kW]\tBaseload extraction ' \
-           '[kWh]\tBaseload injection [kWh]\n' \
-           '1\t63.70\t5.14\t46500.00\t3750.00\n' \
-           '2\t60.82\t10.27\t44400.00\t7500.00\n' \
-           '3\t51.37\t22.00\t37500.00\t7500.00\n' \
-           '4\t40.68\t44.00\t29700.00\t7500.00\n' \
-           '5\t26.30\t83.00\t19200.00\t11250.00\n' \
-           '6\t0.00\t117.00\t0.00\t15000.00\n' \
-           '7\t0.00\t134.00\t0.00\t30000.00\n' \
-           '8\t0.00\t150.00\t0.00\t30000.00\n' \
-           '9\t25.07\t100.00\t18300.00\t15000.00\n' \
-           '10\t35.75\t23.00\t26100.00\t11250.00\n' \
-           '11\t48.08\t10.27\t35100.00\t7500.00\n' \
-           '12\t59.18\t5.14\t43200.00\t3750.00\n' \
-           'Peak injection duration [hour]: 6.0\n' \
-           'Peak extraction duration [hour]: 6.0\n' \
-           'Simulation period [year]: 20\n' \
-           'First month of simulation [-]: 1' == load.__repr__()
+    assert {'First month of simulation [-]': 1,
+            'Peak extraction duration [hour]': 6.0,
+            'Peak injection duration [hour]': 6.0,
+            'Simulation period [year]': 20,
+            'load': {1: {'Baseload extraction [kWh]': 46500.0,
+                         'Baseload injection [kWh]': 3750.0,
+                         'Peak extraction [kW]': 63.6986301369863,
+                         'Peak injection [kW]': 5.136986301369863},
+                     2: {'Baseload extraction [kWh]': 44400.0,
+                         'Baseload injection [kWh]': 7500.0,
+                         'Peak extraction [kW]': 60.821917808219176,
+                         'Peak injection [kW]': 10.273972602739725},
+                     3: {'Baseload extraction [kWh]': 37500.0,
+                         'Baseload injection [kWh]': 7500.0,
+                         'Peak extraction [kW]': 51.36986301369863,
+                         'Peak injection [kW]': 22.0},
+                     4: {'Baseload extraction [kWh]': 29700.000000000004,
+                         'Baseload injection [kWh]': 7500.0,
+                         'Peak extraction [kW]': 40.684931506849324,
+                         'Peak injection [kW]': 44.0},
+                     5: {'Baseload extraction [kWh]': 19200.0,
+                         'Baseload injection [kWh]': 11250.0,
+                         'Peak extraction [kW]': 26.301369863013697,
+                         'Peak injection [kW]': 83.0},
+                     6: {'Baseload extraction [kWh]': 0.0,
+                         'Baseload injection [kWh]': 15000.0,
+                         'Peak extraction [kW]': 0.0,
+                         'Peak injection [kW]': 117.0},
+                     7: {'Baseload extraction [kWh]': 0.0,
+                         'Baseload injection [kWh]': 30000.0,
+                         'Peak extraction [kW]': 0.0,
+                         'Peak injection [kW]': 134.0},
+                     8: {'Baseload extraction [kWh]': 0.0,
+                         'Baseload injection [kWh]': 30000.0,
+                         'Peak extraction [kW]': 0.0,
+                         'Peak injection [kW]': 150.0},
+                     9: {'Baseload extraction [kWh]': 18300.0,
+                         'Baseload injection [kWh]': 15000.0,
+                         'Peak extraction [kW]': 25.068493150684933,
+                         'Peak injection [kW]': 100.0},
+                     10: {'Baseload extraction [kWh]': 26099.999999999996,
+                          'Baseload injection [kWh]': 11250.0,
+                          'Peak extraction [kW]': 35.75342465753424,
+                          'Peak injection [kW]': 23.0},
+                     11: {'Baseload extraction [kWh]': 35100.0,
+                          'Baseload injection [kWh]': 7500.0,
+                          'Peak extraction [kW]': 48.082191780821915,
+                          'Peak injection [kW]': 10.273972602739725},
+                     12: {'Baseload extraction [kWh]': 43199.99999999999,
+                          'Baseload injection [kWh]': 3750.0,
+                          'Peak extraction [kW]': 59.17808219178081,
+                          'Peak injection [kW]': 5.136986301369863}},
+            'type': 'Monthly geothermal load'} == load.__export__()

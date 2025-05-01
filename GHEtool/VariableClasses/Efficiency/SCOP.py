@@ -75,5 +75,5 @@ class SCOP(_EfficiencyBase):
         """
         return self.SCOP
 
-    def __repr__(self):
-        return f'SCOP [-]: {self.SCOP}'
+    def __export__(self):
+        return {'SCOP [-]': self.SCOP}

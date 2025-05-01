@@ -1,7 +1,6 @@
 import pygfunction as gt
 
 from GHEtool.VariableClasses.PipeData.SingleUTube import SingleUTube
-from GHEtool.VariableClasses.FluidData import FluidData
 
 
 class Separatus(SingleUTube):
@@ -34,7 +33,7 @@ class Separatus(SingleUTube):
                          k_p=0.44,
                          D_s=36 / 2 * 0.001)
 
-    def pipe_model(self, fluid_data: FluidData, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
+    def pipe_model(self, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
         """
         This function returns the pipe model for the Separatus probe.
         A Separatus heat exchanger can be modelled by using the model of a single U tube, with an extra contact resistance
@@ -43,8 +42,6 @@ class Separatus(SingleUTube):
 
         Parameters
         ----------
-        fluid_data : FluidData
-            Fluid data
         k_s : float
             Ground thermal conductivity
         borehole : Borehole
@@ -54,13 +51,13 @@ class Separatus(SingleUTube):
         -------
         BasePipe
         """
-        single_u: gt.pipes._BasePipe = super().pipe_model(fluid_data, k_s, borehole)
+        single_u: gt.pipes._BasePipe = super().pipe_model(k_s, borehole)
 
         # add 0.03 W/(mK) as a contact resistance
         single_u.R_fp += 0.03
 
         return single_u
 
-    def __repr__(self):
-        return 'Separatus heat exchanger\n' \
-               f'\tGrout conductivity [W/(m·K)]: {self.k_g}'
+    def __export__(self):
+        return {'type': 'Separatus',
+                'k_g [W/(m·K)]': self.k_g}

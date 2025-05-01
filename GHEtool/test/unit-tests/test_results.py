@@ -5,6 +5,15 @@ import numpy as np
 from GHEtool import ResultsMonthly, ResultsHourly
 
 
+def test_empty():
+    results = ResultsMonthly()
+    assert results.min_temperature is None
+    assert results.max_temperature is None
+    results = ResultsHourly()
+    assert results.min_temperature is None
+    assert results.max_temperature is None
+
+
 def test_monthly():
     results = ResultsMonthly(np.linspace(0, 120 - 1, 120),
                              np.linspace(0, 120 - 1, 120) * 2,

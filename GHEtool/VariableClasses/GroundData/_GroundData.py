@@ -64,9 +64,11 @@ class GroundLayer(BaseClass):
                 return False
         return True
 
-    def __repr__(self):
-        return f'- Thickness [m]: {self.thickness}, Conductivity [W/(m·K)]: {self.k_s}, ' \
-               f'Volumetric heat capacity [MJ/(m³·K)]: {self.volumetric_heat_capacity / 10 ** 6}'
+    def __export__(self):
+        return {'Thickness [m]': self.thickness,
+                'Conductivity [W/(m·K)]': self.k_s,
+                'Volumetric heat capacity [MJ/(m³·K)]': self.volumetric_heat_capacity / 10 ** 6
+                }
 
 
 class _GroundData(BaseClass, ABC):
@@ -382,12 +384,14 @@ class _GroundData(BaseClass, ABC):
                 return False
         return True
 
-    def __repr__(self):
+    def __export__(self):
         if len(self.layers) == 1:
-            return f'Conductivity [W/(m·K)]: {self.layers[0].k_s}\n\t' \
-                   f'Volumetric heat capacity [MJ/(m³·K)]: {self.layers[0].volumetric_heat_capacity / 10 ** 6}'
+            return {
+                'Conductivity [W/(m·K)]': self.layers[0].k_s,
+                'Volumetric heat capacity [MJ/(m³·K)]': self.layers[0].volumetric_heat_capacity / 10 ** 6
+            }
         else:
-            temp = 'Layers:'
-            for layer in self.layers:
-                temp += '\n\t' + layer.__repr__()
-            return temp
+            result = {'layers': dict()}
+            for idx, layer in enumerate(self.layers):
+                result['layers'][idx + 1] = layer.__export__()
+            return result

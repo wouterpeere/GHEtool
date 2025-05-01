@@ -10,6 +10,7 @@ mentioned are the ones with which the code is tested)
 * pandas >= 1.4.3
 * pygfunction >= 2.3.0
 * scipy >= 1.8.1
+* secondarycoolantprops >= 1.1
 
 For the tests
 
@@ -105,9 +106,18 @@ Concretely, the classes you can use are:
 Please note that it is possible to add your own pipe types by inheriting the attributes from the abstract _PipeData
 class.
 
-### Fluid data
+#### Fluid data
 
-You can set the fluid data by using the FluidData class. In the future, more fluid data classes will be made available.
+You can set the fluid data by using the FluidData class.
+
+* _ConstantFluidData_: Temperature independent fluid properties
+* _TemperatureDependentFluidData_: Temperature dependent fluid data (Water, MPG, MEG, MMA, MEA)
+
+#### Flow rate data
+
+Currently, only constant flow rates are compatible with GHEtool, but this will change in the future.
+
+* _ConstantFlowRate_
 
 #### Efficiency data
 

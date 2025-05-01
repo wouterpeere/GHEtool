@@ -255,20 +255,24 @@ def test_repr_():
     ground_flux_temperature = GroundFluxTemperature(3, 11, 2.4 * 10 ** 6, 0.06)
     ground_constant_temperature = GroundConstantTemperature(3, 11)
     ground_temperature_gradient = GroundTemperatureGradient(3, 11, 2.4 * 10 ** 6, 2)
-    assert 'Ground flux temperature\n' \
-           '\tGround surface temperature [°C]: 11\n' \
-           '\tGround flux [W/m²]: 0.06\n' \
-           '\tConductivity [W/(m·K)]: 3\n' \
-           '\tVolumetric heat capacity [MJ/(m³·K)]: 2.4' == ground_flux_temperature.__repr__()
-    assert 'Constant ground temperature\n' \
-           '\tGround temperature at infinity [°C]: 11\n' \
-           '\tConductivity [W/(m·K)]: 3\n' \
-           '\tVolumetric heat capacity [MJ/(m³·K)]: 2.4' == ground_constant_temperature.__repr__()
-    assert 'Ground gradient temperature\n' \
-           '\tGround surface temperature [°C]: 11\n' \
-           '\tGradient [K/100m]: 2\n' \
-           '\tConductivity [W/(m·K)]: 3\n' \
-           '\tVolumetric heat capacity [MJ/(m³·K)]: 2.4' == ground_temperature_gradient.__repr__()
+    assert {'type': 'Ground flux temperature',
+            'Ground surface temperature [°C]': 11,
+            'Ground flux [W/m²]': 0.06,
+            'Conductivity [W/(m·K)]': 3,
+            'Volumetric heat capacity [MJ/(m³·K)]': 2.4
+            } == ground_flux_temperature.__export__()
+    assert {'type': 'Constant ground temperature',
+            'Ground temperature at infinity [°C]': 11,
+            'Conductivity [W/(m·K)]': 3,
+            'Volumetric heat capacity [MJ/(m³·K)]': 2.4
+            } == ground_constant_temperature.__export__()
+    assert {
+               'type': 'Ground gradient temperature',
+               'Ground surface temperature [°C]': 11,
+               'Gradient [K/100m]': 2,
+               'Conductivity [W/(m·K)]': 3,
+               'Volumetric heat capacity [MJ/(m³·K)]': 2.4
+           } == ground_temperature_gradient.__export__()
 
     # layers
     layer_1 = GroundLayer(k_s=1, thickness=10)
@@ -278,11 +282,17 @@ def test_repr_():
 
     constant = GroundConstantTemperature()
     constant.add_layer_on_bottom([layer_1, layer_2, layer_3, layer_4])
-    assert 'Constant ground temperature\n' \
-           '\tGround temperature at infinity [°C]: None\n' \
-           '\tLayers:\n' \
-           '\t- Thickness [m]: 10, Conductivity [W/(m·K)]: 1, Volumetric heat capacity [MJ/(m³·K)]: 2.4\n' \
-           '\t- Thickness [m]: 15, Conductivity [W/(m·K)]: 2, Volumetric heat capacity [MJ/(m³·K)]: 2.4\n' \
-           '\t- Thickness [m]: 20, Conductivity [W/(m·K)]: 1, Volumetric heat capacity [MJ/(m³·K)]: 2.4\n' \
-           '\t- Thickness [m]: None, Conductivity [W/(m·K)]: 2, Volumetric heat capacity [MJ/(m³·K)]: 2.4' \
-           == constant.__repr__()
+    assert {'Ground temperature at infinity [°C]': None,
+            'layers': {1: {'Conductivity [W/(m·K)]': 1,
+                           'Thickness [m]': 10,
+                           'Volumetric heat capacity [MJ/(m³·K)]': 2.4},
+                       2: {'Conductivity [W/(m·K)]': 2,
+                           'Thickness [m]': 15,
+                           'Volumetric heat capacity [MJ/(m³·K)]': 2.4},
+                       3: {'Conductivity [W/(m·K)]': 1,
+                           'Thickness [m]': 20,
+                           'Volumetric heat capacity [MJ/(m³·K)]': 2.4},
+                       4: {'Conductivity [W/(m·K)]': 2,
+                           'Thickness [m]': None,
+                           'Volumetric heat capacity [MJ/(m³·K)]': 2.4}},
+            'type': 'Constant ground temperature'} == constant.__export__()

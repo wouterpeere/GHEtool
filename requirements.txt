@@ -4,3 +4,4 @@ pyarrow>=15.0.0
 pandas>=2.2.0
 pygfunction>=2.2.3
 scipy>=1.8.1
+secondarycoolantprops >= 1.1

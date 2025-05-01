@@ -5,10 +5,13 @@ import pygfunction as gt
 
 from GHEtool import *
 from GHEtool.VariableClasses.PipeData import _PipeData
+from GHEtool.VariableClasses.FluidData import _FluidData
+from GHEtool.VariableClasses.FlowData import _FlowData
 from math import pi
 
 
-def calculate_pressure_drop_horizontal(fluid_data: FluidData, r_in: float, length: float, minor_losses: float) -> float:
+def calculate_pressure_drop_horizontal(fluid_data: _FluidData, flow_data: _FlowData, r_in: float,
+                                       length: float, minor_losses: float, **kwargs) -> float:
     """
     This function calculates the pressure drop in the horizontal pipe.
 
@@ -16,6 +19,8 @@ def calculate_pressure_drop_horizontal(fluid_data: FluidData, r_in: float, lengt
     ----------
     fluid_data : FluidData
         Fluid data
+    flow_data : FlowData
+        Flow rate data
     r_in : float
         Inner pipe diameter [m]
     length : float
@@ -30,19 +35,20 @@ def calculate_pressure_drop_horizontal(fluid_data: FluidData, r_in: float, lengt
     """
     # Darcy fluid factor
     fd = gt.pipes.fluid_friction_factor_circular_pipe(
-        fluid_data.mfr,
+        flow_data.mfr(fluid_data=fluid_data, **kwargs),
         r_in,
-        fluid_data.mu,
-        fluid_data.rho,
+        fluid_data.mu(**kwargs),
+        fluid_data.rho(**kwargs),
         1e-6)
     A = pi * r_in ** 2
-    V = (fluid_data.vfr / 1000) / A
+    V = (flow_data.vfr(fluid_data=fluid_data, **kwargs) / 1000) / A
 
-    return ((fd * length / (2 * r_in) + minor_losses) * fluid_data.rho * V ** 2 / 2) / 1000
+    return ((fd * length / (2 * r_in) + minor_losses) * fluid_data.rho(**kwargs) * V ** 2 / 2) / 1000
 
 
-def calculate_total_pressure_drop(pipe_data: _PipeData, fluid_data: FluidData, borehole_length: float,
-                                  r_in: float, distance: float, minor_losses: float) -> float:
+def calculate_total_pressure_drop(pipe_data: _PipeData, fluid_data: _FluidData, flow_data: _FlowData,
+                                  borehole_length: float,
+                                  r_in: float, distance: float, minor_losses: float, **kwargs) -> float:
     """
     This function calculates the total pressure drop of your system, assuming every borehole is brought individually
     to the main collector.
@@ -53,6 +59,8 @@ def calculate_total_pressure_drop(pipe_data: _PipeData, fluid_data: FluidData, b
         Pipe data
     fluid_data : FluidData
         Fluid data
+    flow_data : FlowData
+        Flow rate data
     borehole_length : float
         Borehole length [m]
     r_in : float
@@ -68,13 +76,14 @@ def calculate_total_pressure_drop(pipe_data: _PipeData, fluid_data: FluidData, b
         Pressure drop [kPa]
     """
 
-    return pipe_data.pressure_drop(fluid_data, borehole_length) + \
-        calculate_pressure_drop_horizontal(fluid_data, r_in, distance * 2, minor_losses)
+    return pipe_data.pressure_drop(fluid_data, flow_data, borehole_length, **kwargs) + \
+        calculate_pressure_drop_horizontal(fluid_data, flow_data, r_in, distance * 2, minor_losses, **kwargs)
 
 
-def create_pressure_drop_curve(pipe_data: _PipeData, fluid_data: FluidData, borehole_length: float,
+def create_pressure_drop_curve(pipe_data: _PipeData, fluid_data: _FluidData, flow_data: _FlowData,
+                               borehole_length: float,
                                r_in: float, distance: float, minor_losses: float, range: float = 2,
-                               datapoints: int = 30) -> tuple:
+                               datapoints: int = 30, **kwargs) -> tuple:
     """
     This function calculates the pressure drop for different flow rates.
 
@@ -84,6 +93,8 @@ def create_pressure_drop_curve(pipe_data: _PipeData, fluid_data: FluidData, bore
         Pipe data
     fluid_data : FluidData
         Fluid data
+    flow_data : FlowData
+        Flow rate data
     borehole_length : float
         Borehole length [m]
     r_in : float
@@ -103,14 +114,13 @@ def create_pressure_drop_curve(pipe_data: _PipeData, fluid_data: FluidData, bore
         Array with the pressure drops [kPa], Array with the flow rates per borehole [l/s]
     """
 
-    flow_rates = np.linspace(0, range * fluid_data.vfr, datapoints)
+    flow_rates = np.linspace(0, range * flow_data.vfr(fluid_data=fluid_data, **kwargs), datapoints)
     pressure_drops = np.zeros(flow_rates.shape)
 
-    new_fluid = copy.copy(fluid_data)
-
     for i, val in enumerate(flow_rates):
-        new_fluid.vfr = val
-        pressure_drops[i] = calculate_total_pressure_drop(pipe_data, new_fluid, borehole_length, r_in, distance,
-                                                          minor_losses)
+        new_flow_data = ConstantFlowRate(vfr=val)
+        pressure_drops[i] = calculate_total_pressure_drop(pipe_data, fluid_data, new_flow_data, borehole_length,
+                                                          r_in, distance,
+                                                          minor_losses, **kwargs)
 
     return np.nan_to_num(pressure_drops), flow_rates

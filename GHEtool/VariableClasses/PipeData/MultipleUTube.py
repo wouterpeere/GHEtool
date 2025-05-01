@@ -1,3 +1,4 @@
+import copy
 import math
 
 import numpy as np
@@ -6,7 +7,8 @@ import matplotlib.pyplot as plt
 
 from math import pi
 from GHEtool.VariableClasses.PipeData._PipeData import _PipeData
-from GHEtool.VariableClasses.FluidData import FluidData
+from GHEtool.VariableClasses.FluidData import _FluidData
+from GHEtool.VariableClasses.FlowData import _FlowData
 
 
 class MultipleUTube(_PipeData):
@@ -73,7 +75,7 @@ class MultipleUTube(_PipeData):
                 self.D_s * np.cos(2.0 * i * dt + pi + dt), self.D_s * np.sin(2.0 * i * dt + pi + dt))
         return pos
 
-    def calculate_resistances(self, fluid_data: FluidData) -> None:
+    def calculate_resistances(self, fluid_data: _FluidData, flow_rate_data: _FlowData, **kwargs) -> None:
         """
         This function calculates the conductive and convective resistances, which are constant.
 
@@ -81,6 +83,8 @@ class MultipleUTube(_PipeData):
         ----------
         fluid_data : FluidData
             Fluid data
+        flow_rate_data : FlowData
+            Flow rate data
 
         Returns
         -------
@@ -89,21 +93,21 @@ class MultipleUTube(_PipeData):
         # Pipe thermal resistance [m.K/W]
         self.R_p = gt.pipes.conduction_thermal_resistance_circular_pipe(
             self.r_in, self.r_out, self.k_p)
-        # Convection heat transfer coefficient [W/m2.K]
-        h_f = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(fluid_data.mfr / self.number_of_pipes,
-                                                                          self.r_in, fluid_data.mu, fluid_data.rho,
-                                                                          fluid_data.k_f, fluid_data.Cp, self.epsilon)
+
+        # Convection heat transfer coefficient [W/(m^2.K)]
+        h_f = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(
+            flow_rate_data.mfr(fluid_data=fluid_data, **kwargs) / self.number_of_pipes,
+            self.r_in, fluid_data.mu(**kwargs), fluid_data.rho(**kwargs),
+            fluid_data.k_f(**kwargs), fluid_data.cp(**kwargs), self.epsilon)
         # Film thermal resistance [m.K/W]
         self.R_f = 1.0 / (h_f * 2 * np.pi * self.r_in)
 
-    def pipe_model(self, fluid_data: FluidData, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
+    def pipe_model(self, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
         """
         This function returns the BasePipe model.
 
         Parameters
         ----------
-        fluid_data : FluidData
-            Fluid data
         k_s : float
             Ground thermal conductivity
         borehole : Borehole
@@ -116,24 +120,27 @@ class MultipleUTube(_PipeData):
         return gt.pipes.MultipleUTube(self.pos, self.r_in, self.r_out, borehole, k_s, self.k_g,
                                       self.R_p + self.R_f, self.number_of_pipes, J=2)
 
-    def Re(self, fluid_data: FluidData) -> float:
+    def Re(self, fluid_data: _FluidData, flow_rate_data: _FlowData, **kwargs) -> float:
         """
         Reynolds number.
 
         Parameters
         ----------
         fluid_data: FluidData
-            fluid data
+            Fluid data
+        flow_rate_data : FlowData
+            Flow rate data
 
         Returns
         -------
         Reynolds number : float
         """
-        u = fluid_data.mfr / self.number_of_pipes / fluid_data.rho / \
+        u = flow_rate_data.mfr(fluid_data=fluid_data, **kwargs) / self.number_of_pipes / fluid_data.rho(**kwargs) / \
             (pi * self.r_in ** 2)
-        return fluid_data.rho * u * self.r_in * 2 / fluid_data.mu
+        return fluid_data.rho(**kwargs) * u * self.r_in * 2 / fluid_data.mu(**kwargs)
 
-    def pressure_drop(self, fluid_data: FluidData, borehole_length: float) -> float:
+    def pressure_drop(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float,
+                      **kwargs) -> float:
         """
         Calculates the pressure drop across the entire borehole.
         It assumed that the U-tubes are all connected in parallel.
@@ -142,6 +149,8 @@ class MultipleUTube(_PipeData):
         ----------
         fluid_data: FluidData
             Fluid data
+        flow_rate_data : FlowData
+            Flow rate data
         borehole_length : float
             Borehole length [m]
 
@@ -153,17 +162,17 @@ class MultipleUTube(_PipeData):
 
         # Darcy fluid factor
         fd = gt.pipes.fluid_friction_factor_circular_pipe(
-            fluid_data.mfr / self.number_of_pipes,
+            flow_rate_data.mfr(fluid_data=fluid_data, **kwargs) / self.number_of_pipes,
             self.r_in,
-            fluid_data.mu,
-            fluid_data.rho,
+            fluid_data.mu(**kwargs),
+            fluid_data.rho(**kwargs),
             self.epsilon)
         A = pi * self.r_in ** 2
-        V = (fluid_data.vfr / 1000) / A / self.number_of_pipes
+        V = (flow_rate_data.vfr(fluid_data=fluid_data, **kwargs) / 1000) / A / self.number_of_pipes
 
         # add 0.2 for the local losses
         # (source: https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html)
-        return ((fd * (borehole_length * 2) / (2 * self.r_in) + 0.2) * fluid_data.rho * V ** 2 / 2) / 1000
+        return ((fd * (borehole_length * 2) / (2 * self.r_in) + 0.2) * fluid_data.rho(**kwargs) * V ** 2 / 2) / 1000
 
     def draw_borehole_internal(self, r_b: float) -> None:
         """
@@ -185,20 +194,20 @@ class MultipleUTube(_PipeData):
         if self.R_p == 0:
             self.R_p = 0.1
             self.R_f = 0.1
-            pipe = self.pipe_model(FluidData(), 2, borehole)
+            pipe = self.pipe_model(2, borehole)
             self.R_p, self.R_f = 0, 0
         else:
-            pipe = self.pipe_model(FluidData(), 2, borehole)
+            pipe = self.pipe_model(2, borehole)
 
         pipe.visualize_pipes()
         plt.show()
 
-    def __repr__(self):
-        return f'U tube' \
-               f'\n\tNumber of U tubes [-]: {self.number_of_pipes}' \
-               f'\n\tPipe wall thickness [mm]: {(self.r_out * 1000 - self.r_in * 1000):.1f}' \
-               f'\n\tPipe diameter [mm]: {self.r_out * 2 * 1000}' \
-               f'\n\tDistance from pipe to borehole center [mm]: {math.sqrt(self.pos[0][0] ** 2 + self.pos[0][1] ** 2) * 1000:.0f}' \
-               f'\n\tGrout conductivity [W/(m·K)]: {self.k_g}' \
-               f'\n\tPipe conductivity [W/(m·K)]: {self.k_p}' \
-               f'\n\tPipe roughness [mm]: {self.epsilon * 1000}'
+    def __export__(self):
+        return {'type': 'U',
+                'nb_of_tubes': self.number_of_pipes,
+                'thickness [mm]': (self.r_out * 1000 - self.r_in * 1000),
+                'diameter [mm]': self.r_out * 2 * 100,
+                'spacing [mm]': math.sqrt(self.pos[0][0] ** 2 + self.pos[0][1] ** 2) * 1000,
+                'k_g [W/(m·K)]': self.k_g,
+                'k_p [W/(m·K)]': self.k_p,
+                'epsilon [mm]': self.epsilon * 1000}

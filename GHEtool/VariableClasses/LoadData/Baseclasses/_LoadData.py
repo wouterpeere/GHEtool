@@ -3,11 +3,11 @@ import abc
 import numpy as np
 
 from abc import ABC
-from GHEtool.logger.ghe_logger import ghe_logger
 from numpy.typing import ArrayLike
+from GHEtool.VariableClasses.BaseClass import BaseClass
 
 
-class _LoadData(ABC):
+class _LoadData(ABC, BaseClass):
     """
     This class contains all the general functionalities for the load classes.
     """
@@ -631,28 +631,28 @@ class _LoadData(ABC):
             True if the inputs are valid
         """
         if not isinstance(load_array, (np.ndarray, list, tuple)):
-            ghe_logger.error("The load should be of type np.ndarray, list or tuple.")
+            print("The load should be of type np.ndarray, list or tuple.")
             return False
         if self._multiyear:
             if self._hourly:
                 if not len(load_array) % 8760 == 0:
-                    ghe_logger.error("The length of the load should be a multiple of 8760.")
+                    print("The length of the load should be a multiple of 8760.")
                     return False
             else:
                 if not len(load_array) % 12 == 0:
-                    ghe_logger.error("The length of the load should be a multiple of 12.")
+                    print("The length of the load should be a multiple of 12.")
                     return False
         else:
             if self._hourly:
                 if not len(load_array) == 8760:
-                    ghe_logger.error("The length of the load should be 8760.")
+                    print("The length of the load should be 8760.")
                     return False
             else:
                 if not len(load_array) == 12:
-                    ghe_logger.error("The length of the load should be 12.")
+                    print("The length of the load should be 12.")
                     return False
         if np.min(load_array) < 0:
-            ghe_logger.error("No value in the load can be smaller than zero.")
+            print("No value in the load can be smaller than zero.")
             return False
         return True
 

@@ -2,7 +2,7 @@
 Ground data
 ***************
 
-The ground data classes you can use have either:
+For the ground data classes you can use have either:
 
 #. A constant ground temperature
 #. A constant ground geothermal heat flux

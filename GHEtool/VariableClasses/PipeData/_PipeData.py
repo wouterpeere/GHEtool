@@ -2,7 +2,8 @@ import abc
 import pygfunction as gt
 from abc import ABC
 from GHEtool.VariableClasses.BaseClass import BaseClass
-from GHEtool.VariableClasses.FluidData import FluidData
+from GHEtool.VariableClasses.FluidData import _FluidData
+from GHEtool.VariableClasses.FlowData import _FlowData
 
 
 class _PipeData(BaseClass, ABC):
@@ -32,7 +33,7 @@ class _PipeData(BaseClass, ABC):
         self.epsilon = epsilon  # pipe roughness m
 
     @abc.abstractmethod
-    def calculate_resistances(self, fluid_data: FluidData) -> None:
+    def calculate_resistances(self, fluid_data: _FluidData, flow_rate_data: _FlowData, **kwargs) -> None:
         """
         This function calculates the conductive and convective resistances, which are constant.
 
@@ -40,6 +41,8 @@ class _PipeData(BaseClass, ABC):
         ----------
         fluid_data : FluidData
             Fluid data
+        flow_rate_data : FlowData
+            Flow rate data
 
         Returns
         -------
@@ -47,14 +50,12 @@ class _PipeData(BaseClass, ABC):
         """
 
     @abc.abstractmethod
-    def pipe_model(self, fluid_data: FluidData, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
+    def pipe_model(self, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
         """
         This function returns the BasePipe model.
 
         Parameters
         ----------
-        fluid_data : FluidData
-            Fluid data
         k_s : float
             Ground thermal conductivity
         borehole : Borehole
@@ -66,7 +67,7 @@ class _PipeData(BaseClass, ABC):
         """
 
     @abc.abstractmethod
-    def Re(self, fluid_data: FluidData) -> float:
+    def Re(self, fluid_data: _FluidData, flow_rate_data: _FlowData, **kwargs) -> float:
         """
         Reynolds number.
 
@@ -74,6 +75,8 @@ class _PipeData(BaseClass, ABC):
         ----------
         fluid_data: FluidData
             Fluid data
+        flow_rate_data : FlowData
+            Flow rate data
 
         Returns
         -------
@@ -81,7 +84,8 @@ class _PipeData(BaseClass, ABC):
         """
 
     @abc.abstractmethod
-    def pressure_drop(self, fluid_data: FluidData, borehole_length: float) -> float:
+    def pressure_drop(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float,
+                      **kwargs) -> float:
         """
         Calculates the pressure drop across the entire borehole.
         It assumed that the U-tubes are all connected in parallel.
@@ -90,6 +94,8 @@ class _PipeData(BaseClass, ABC):
         ----------
         fluid_data: FluidData
             Fluid data
+        flow_rate_data : FlowData
+            Flow rate data
         borehole_length : float
             Borehole length [m]
 

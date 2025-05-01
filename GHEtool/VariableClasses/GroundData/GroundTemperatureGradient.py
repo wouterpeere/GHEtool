@@ -68,6 +68,11 @@ class GroundTemperatureGradient(_GroundData):
         """
         return temperature_diff * 2 * 100 / self.gradient
 
-    def __repr__(self):
-        return f'Ground gradient temperature\n\tGround surface temperature [°C]: {self.Tg}' \
-               f'\n\tGradient [K/100m]: {self.gradient}\n\t' + super().__repr__()
+    def __export__(self):
+        temp = {
+            'type': 'Ground gradient temperature',
+            'Ground surface temperature [°C]': self.Tg,
+            'Gradient [K/100m]': self.gradient
+        }
+        temp.update(super().__export__())
+        return temp

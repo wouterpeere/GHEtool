@@ -9,7 +9,6 @@ import warnings
 from typing import Tuple, TYPE_CHECKING
 
 from GHEtool.VariableClasses.LoadData.Baseclasses import _SingleYear, _HourlyData
-from GHEtool.logger import ghe_logger
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
@@ -340,9 +339,10 @@ class HourlyGeothermalLoad(_SingleYear, _HourlyData):
         plt.show()
         return fig, ax
 
-    def __repr__(self):
-        return f'Hourly geothermal load\n' \
-               f'Peak injection duration [hour]: {self.peak_injection_duration / 3600:.1f}\n' \
-               f'Peak extraction duration [hour]: {self.peak_extraction_duration / 3600:.1f}\n' \
-               f'Simulation period [year]: {self.simulation_period}\n' \
-               f'First month of simulation [-]: {self.start_month}'
+    def __export__(self):
+        return {'type': 'Hourly geothermal load',
+                'Peak injection duration [hour]': self.peak_injection_duration / 3600,
+                'Peak extraction duration [hour]': self.peak_extraction_duration / 3600,
+                'Simulation period [year]': self.simulation_period,
+                'First month of simulation [-]': self.start_month
+                }
