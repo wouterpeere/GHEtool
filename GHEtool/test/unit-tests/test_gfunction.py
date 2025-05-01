@@ -485,3 +485,23 @@ def test_ann_borefield():
     time_steps_default = gt.load_aggregation.ClaessonJaved(3600, 3600 * 8760 * 100).get_times_for_simulation()
     g_func_numpy = np.interp(time_steps, time_steps_default, g_func_numpy)
     assert np.allclose(g_func, g_func_numpy)
+
+
+def test_ann_borefield_result():
+    borefield1 = gt.borefield.Borefield.rectangle_field(1, 2, 5, 6, 100, 4, 0.075)
+
+    gfunc = GFunction()
+    gfunc.borefield = borefield1
+    time_steps = np.arange(3600, 3600 * 24 * 365 * 100, 3600)
+    g_func_regular = gfunc.calculate(time_steps, borefield1, 1 / 5000 / 1000, use_neural_network=False,
+                                     borefield_description={"type": 3, "N_1": 1, "N_2": 2,
+                                                            "B_1": 5, "B_2": 6})
+    g_func_ann = gfunc.calculate(time_steps, borefield1, 1 / 5000 / 1000, use_neural_network=True,
+                                 borefield_description={"type": 3, "N_1": 1, "N_2": 2,
+                                                        "B_1": 5, "B_2": 6})
+    import matplotlib.pyplot as plt
+    plt.plot(g_func_ann, label="With ANN")
+    plt.plot(g_func_regular, label="Regular, without ANN")
+    plt.legend()
+    plt.show()
+    assert np.allclose(g_func_regular, g_func_ann)
