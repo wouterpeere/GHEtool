@@ -694,21 +694,21 @@ def test_repr_():
     load = HourlyBuildingLoad()
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
 
-    assert 'Hourly building load\n' \
-           'Efficiency heating: SCOP [-]: 5\n' \
-           'Efficiency cooling: SEER [-]: 20\n' \
-           'Peak cooling duration [hour]: 6.0\n' \
-           'Peak heating duration [hour]: 6.0\n' \
-           'Simulation period [year]: 20\n' \
-           'First month of simulation [-]: 1' == load.__repr__()
+    assert {'type': 'Hourly building load',
+            'Efficiency heating': {'SCOP [-]': 5},
+            'Efficiency cooling': {'SEER [-]': 20},
+            'Peak cooling duration [hour]': 6.0,
+            'Peak heating duration [hour]': 6.0,
+            'Simulation period [year]': 20,
+            'First month of simulation [-]': 1} == load.__export__()
 
     load.dhw = 10000
-    assert 'Hourly building load\n' \
-           'Efficiency heating: SCOP [-]: 5\n' \
-           'Efficiency cooling: SEER [-]: 20\n' \
-           'Peak cooling duration [hour]: 6.0\n' \
-           'Peak heating duration [hour]: 6.0\n' \
-           'Simulation period [year]: 20\n' \
-           'First month of simulation [-]: 1\n' \
-           'DHW demand [kWh/year]: 10000\n' \
-           'Efficiency DHW: SCOP [-]: 4' == load.__repr__()
+    assert {'type': 'Hourly building load',
+            'Efficiency heating': {'SCOP [-]': 5},
+            'Efficiency cooling': {'SEER [-]': 20},
+            'Peak cooling duration [hour]': 6.0,
+            'Peak heating duration [hour]': 6.0,
+            'Simulation period [year]': 20,
+            'First month of simulation [-]': 1,
+            'DHW demand [kWh/year]': 10000.000000000005,
+            'Efficiency DHW': {'SCOP [-]': 4}} == load.__export__()

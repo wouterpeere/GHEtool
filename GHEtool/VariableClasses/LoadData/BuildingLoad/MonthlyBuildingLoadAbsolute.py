@@ -435,21 +435,23 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
 
         self._results = results
 
-    def __repr__(self):
-        temp = f'Monthly building load\n'
-        temp += f'Month\tPeak heating [kW]\tPeak cooling [kW]\tBaseload heating [kWh]\tBaseload cooling [kWh]\n'
+    def __export__(self):
+        temp = {'type': 'Monthly building load', 'load': {}}
         for i in range(12):
-            temp += f'{i + 1}\t{self.peak_heating[i]:.2f}\t{self.peak_cooling[i]:.2f}\t' \
-                    f'{self.baseload_heating[i]:.2f}\t{self.baseload_cooling[i]:.2f}\n'
-        temp += f'Peak cooling duration [hour]: {self.peak_injection_duration / 3600:.1f}\n'
-        temp += f'Peak heating duration [hour]: {self.peak_extraction_duration / 3600:.1f}\n'
-        temp += f'Efficiency heating: {self.cop.__repr__()}\n' \
-                f'Efficiency cooling: {self.eer.__repr__()}\n' \
-                f'Simulation period [year]: {self.simulation_period}\n' \
-                f'First month of simulation [-]: {self.start_month}'
-
+            temp['load'][i + 1] = {'Peak heating [kW]': self.peak_heating[i],
+                                   'Peak cooling [kW]': self.peak_cooling[i],
+                                   'Baseload heating [kWh]': self.baseload_heating[i],
+                                   'Baseload cooling [kWh]': self.baseload_cooling[i]
+                                   }
+        temp['Peak cooling duration [hour]'] = self.peak_injection_duration / 3600
+        temp['Peak heating duration [hour]'] = self.peak_extraction_duration / 3600
+        temp['Simulation period [year]'] = self.simulation_period
+        temp['First month of simulation [-]'] = self.start_month
+        temp['Efficiency heating'] = self.cop.__export__()
+        temp['Efficiency cooling'] = self.eer.__export__()
         if self.max_peak_dhw == 0:
             return temp
 
-        return temp + f'\nDHW demand [kWh/year]: {self.yearly_average_dhw_load:.0f}\n' \
-                      f'Efficiency DHW: {self.cop_dhw.__repr__()}'
+        temp['DHW demand [kWh/year]'] = self.yearly_average_dhw_load
+        temp['Efficiency DHW'] = self.cop_dhw.__export__()
+        return temp

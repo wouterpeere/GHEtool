@@ -70,6 +70,11 @@ class GroundFluxTemperature(_GroundData):
         """
         return temperature_diff * 2 * self.k_s(H) / self.flux
 
-    def __repr__(self):
-        return f'Ground flux temperature\n\tGround surface temperature [°C]: {self.Tg}' \
-               f'\n\tGround flux [W/m²]: {self.flux}\n\t' + super().__repr__()
+    def __export__(self):
+        temp = {
+            'type': 'Ground flux temperature',
+            'Ground surface temperature [°C]': self.Tg,
+            'Ground flux [W/m²]': self.flux
+        }
+        temp.update(super().__export__())
+        return temp

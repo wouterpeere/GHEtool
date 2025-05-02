@@ -3,7 +3,6 @@ import abc
 import numpy as np
 
 from abc import ABC
-from GHEtool.logger.ghe_logger import ghe_logger
 from GHEtool.VariableClasses.Efficiency import *
 from GHEtool.VariableClasses.LoadData.Baseclasses import _LoadData
 from GHEtool.VariableClasses.Result import ResultsMonthly, ResultsHourly

@@ -70,9 +70,9 @@ def test_1a_6h():
     borefield = Borefield()
 
     # set ground data in borefield
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
     borefield.create_rectangular_borefield(1, 1, 6, 6, 110, 4, 0.075)
     Rb_static = 0.13
     borefield.set_Rb(Rb_static)
@@ -128,9 +128,9 @@ def test_1a_1h():
     borefield = Borefield()
 
     # set ground data in borefield
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
     borefield.create_rectangular_borefield(1, 1, 6, 6, 110, 4, 0.075)
 
     # load the hourly profile
@@ -169,9 +169,9 @@ def test_1a_1h():
     borefield = Borefield()
 
     # set ground data in borefield
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
     borefield.create_rectangular_borefield(1, 1, 6, 6, 110, 4, 0.075)
     Rb_static = 0.13
     borefield.set_Rb(Rb_static)

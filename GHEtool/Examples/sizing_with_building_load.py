@@ -21,7 +21,8 @@ building_demand_DHW = 88_030
 
 ground_data = GroundFluxTemperature(1.5, 11, flux=0.07)
 pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.42, 0.0425)
-fluid_data = FluidData(k_f=0.475, rho=1033, Cp=3930, mu=0.0079, vfr=0.186)
+fluid_data = ConstantFluidData(k_f=0.475, rho=1033, cp=3930, mu=0.0079)
+flow_data = ConstantFlowRate(vfr=0.186)
 
 
 def size_with_scop() -> Tuple[float, float]:
@@ -45,10 +46,8 @@ def size_with_scop() -> Tuple[float, float]:
     load.start_month = 9
 
     # create borefield object
-    borefield = Borefield(load=load)
-    borefield.ground_data = ground_data
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield = Borefield(load=load, ground_data=ground_data, pipe_data=pipe_data, fluid_data=fluid_data,
+                          flow_data=flow_data)
 
     borefield.create_rectangular_borefield(3, 14, 7, 7, 94, r_b=0.0655)
 
@@ -80,10 +79,8 @@ def size_with_variable_ground_temperature() -> Tuple[float, float]:
     load.start_month = 9
 
     # create borefield object
-    borefield = Borefield(load=load)
-    borefield.ground_data = ground_data
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield = Borefield(load=load, ground_data=ground_data, pipe_data=pipe_data, fluid_data=fluid_data,
+                          flow_data=flow_data)
 
     borefield.create_rectangular_borefield(3, 14, 7, 7, 94, r_b=0.0655)
 
@@ -129,10 +126,8 @@ def size_with_part_load_data() -> Tuple[float, float]:
     load.start_month = 9
 
     # create borefield object
-    borefield = Borefield(load=load)
-    borefield.ground_data = ground_data
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield = Borefield(load=load, ground_data=ground_data, pipe_data=pipe_data, fluid_data=fluid_data,
+                          flow_data=flow_data)
 
     borefield.create_rectangular_borefield(3, 14, 7, 7, 94, r_b=0.0655)
 

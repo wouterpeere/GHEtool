@@ -39,7 +39,7 @@ def L3_sizing() -> Tuple[float, float]:
     borefield.set_max_avg_fluid_temperature(25)
 
     # set ground data in borefield
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
 
     # set Rb
     borefield.Rb = 0.12
@@ -77,7 +77,7 @@ def L4_sizing() -> Tuple[float, float]:
     borefield.set_max_avg_fluid_temperature(25)
 
     # set ground data in borefield
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
 
     # set Rb
     borefield.Rb = 0.12

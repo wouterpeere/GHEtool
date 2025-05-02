@@ -14,7 +14,7 @@ from GHEtool.Methods import *
 def optimise():
     data = GroundFluxTemperature(1.8, 9.7, flux=0.08)
     borefield = Borefield()
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
     borefield.Rb = 0.131
     borefield.create_rectangular_borefield(3, 5, 6, 6, 100, 1, 0.07)
     load = HourlyBuildingLoad(efficiency_heating=4.5, efficiency_cooling=20)

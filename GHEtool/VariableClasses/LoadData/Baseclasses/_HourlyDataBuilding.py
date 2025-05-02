@@ -8,7 +8,6 @@ from ._HourlyData import _HourlyData
 from ._LoadDataBuilding import _LoadDataBuilding
 from abc import ABC
 from typing import Union
-from GHEtool.logger import ghe_logger
 from GHEtool.VariableClasses.Efficiency import *
 from GHEtool.VariableClasses.Result import ResultsMonthly, ResultsHourly
 

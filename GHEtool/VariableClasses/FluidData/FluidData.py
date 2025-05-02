@@ -4,17 +4,17 @@ This document contains the variable classes for the fluid data.
 from __future__ import annotations
 
 import pygfunction as gt
+import warnings
 
 from GHEtool.VariableClasses.BaseClass import BaseClass
+from GHEtool.VariableClasses.FluidData import ConstantFluidData
+from GHEtool.VariableClasses.FlowData import ConstantFlowRate
 
 
 class FluidData(BaseClass):
     """
     Contains information regarding the fluid data of the borefield.
     """
-
-    __slots__ = 'k_f', 'rho', 'Cp', 'mu', '_mfr', '_vfr'
-    __allow_none__ = ['_vfr', '_mfr']
 
     def __init__(self, mfr: float = None,
                  k_f: float = None,
@@ -39,15 +39,11 @@ class FluidData(BaseClass):
         vfr : float
             Volume flow rate per borehole [l/s]
         """
-        self.k_f: float | None = k_f  # Thermal conductivity W/mK
-        self._mfr: float | None = mfr  # Mass flow rate per borehole kg/s
-        self.rho: float | None = rho  # Density kg/m3
-        self.Cp: float | None = Cp  # Thermal capacity J/kgK
-        self.mu: float | None = mu  # Dynamic viscosity Pa/s
-        self._vfr: float | None = vfr  # Volume flow rate l/s
+        warnings.warn('This class will be depreciated in version 2.4.0. Please use the ConstantFluidData and '
+                      'ConstantFlowRate class.', DeprecationWarning)
 
-        if self._mfr is not None and self._vfr is not None:
-            raise ValueError('You cannot set both the mass flow rate and volume flow rate')
+        self.flow_rate = ConstantFlowRate(mfr=mfr, vfr=vfr)
+        self.fluid_data = ConstantFluidData(k_f, rho, Cp, mu)
 
     @property
     def vfr(self) -> float:
@@ -59,9 +55,7 @@ class FluidData(BaseClass):
         float
             volume flow rate [l/s]
         """
-        if self._vfr is not None:
-            return self._vfr
-        return self.mfr / self.rho * 1000
+        return self.flow_rate.vfr(self.fluid_data)
 
     @vfr.setter
     def vfr(self, vfr: float) -> None:
@@ -78,8 +72,24 @@ class FluidData(BaseClass):
         -------
         None
         """
-        self._vfr = vfr
-        self._mfr = None
+        self.flow_rate._vfr = vfr
+        self.flow_rate._mfr = None
+
+    @property
+    def k_f(self) -> float:
+        return self.fluid_data.k_f()
+
+    @property
+    def rho(self) -> float:
+        return self.fluid_data.rho()
+
+    @property
+    def Cp(self) -> float:
+        return self.fluid_data.cp()
+
+    @property
+    def mu(self) -> float:
+        return self.fluid_data.mu()
 
     @property
     def mfr(self) -> float:
@@ -92,9 +102,7 @@ class FluidData(BaseClass):
         float
             mass flow rate [kg/s]
         """
-        if self._mfr is not None:
-            return self._mfr
-        return self.vfr / 1000 * self.rho
+        return self.flow_rate.mfr(self.fluid_data)
 
     @mfr.setter
     def mfr(self, mfr: float) -> None:
@@ -111,8 +119,8 @@ class FluidData(BaseClass):
         -------
         None
         """
-        self._mfr = mfr
-        self._vfr = None
+        self.flow_rate._mfr = mfr
+        self.flow_rate._vfr = None
 
     def set_mass_flow_rate(self, mfr: float) -> None:
         """
@@ -127,7 +135,7 @@ class FluidData(BaseClass):
         -------
         None
         """
-        self.mfr = mfr
+        self.flow_rate._mfr = mfr
 
     def import_fluid_from_pygfunction(self, fluid_object: gt.media.Fluid) -> None:
         """
@@ -142,10 +150,7 @@ class FluidData(BaseClass):
         -------
         None
         """
-        self.k_f = fluid_object.k
-        self.rho = fluid_object.rho
-        self.Cp = fluid_object.cp
-        self.mu = fluid_object.mu
+        self.fluid_data = ConstantFluidData(fluid_object.k, fluid_object.rho, fluid_object.cp, fluid_object.mu)
 
     @property
     def Pr(self) -> float:
@@ -158,23 +163,25 @@ class FluidData(BaseClass):
         float
             Prandtl number
         """
-        return self.Cp * self.mu / self.k_f
+        return self.fluid_data.Pr()
+
+    def check_values(self) -> bool:  # pragma: no cover
+        return self.fluid_data.check_values()
 
     def __eq__(self, other):
         if not isinstance(other, FluidData):
             return False
-        for i in self.__slots__:
-            if getattr(self, i) != getattr(other, i):
-                return False
-        return True
+        if self.fluid_data == other.fluid_data and self.flow_rate == other.flow_rate:
+            return True
+        return False
 
-    def __repr__(self):
-        temp = f'Fluid parameters\n\tThermal conductivity of the fluid [W/(m·K)]: {self.k_f:.3f}\n\t' \
-               f'Density of the fluid [kg/m³]: {self.rho:.3f}\n\t' \
-               f'Thermal capacity of the fluid [J/(kg·K)]: {self.Cp:.3f}\n\t' \
-               f'Dynamic viscosity [Pa·s]: {self.mu:.3f}\n\t'
-        if self._vfr is not None:
-            temp += f'Volume flow rate [l/s]: {self.vfr}'
+    def __export__(self):
+        temp = f'Fluid parameters\n\tThermal conductivity of the fluid [W/(m·K)]: {self.fluid_data.k_f():.3f}\n\t' \
+               f'Density of the fluid [kg/m³]: {self.fluid_data.rho():.3f}\n\t' \
+               f'Thermal capacity of the fluid [J/(kg·K)]: {self.fluid_data.cp():.3f}\n\t' \
+               f'Dynamic viscosity [Pa·s]: {self.fluid_data.mu():.3f}\n\t'
+        if self.flow_rate._vfr is not None:
+            temp += f'Volume flow rate [l/s]: {self.flow_rate.vfr()}'
         else:
-            temp += f'Mass flow rate [kg/s] : {self.mfr}'
+            temp += f'Mass flow rate [kg/s] : {self.flow_rate.mfr()}'
         return temp
