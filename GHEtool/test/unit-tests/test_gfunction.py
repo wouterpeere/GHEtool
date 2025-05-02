@@ -493,17 +493,21 @@ def test_ann_borefield_result():
     gfunc = GFunction()
     gfunc.borefield = borefield1
     time_steps = np.arange(3600, 3600 * 24 * 365 * 100, 3600)
-    g_func_regular = gfunc.calculate(time_steps, borefield1, 0.001, use_neural_network=False,
+    g_func_regular = gfunc.calculate(time_steps, borefield1, 0.75 / 1000000, use_neural_network=False,
                                      borefield_description={"type": 3, "N_1": 4, "N_2": 7,
                                                             "B_1": 5, "B_2": 6})
-    g_func_ann = gfunc.calculate(time_steps, borefield1, 0.001, use_neural_network=True,
+    g_func_ann = gfunc.calculate(time_steps, borefield1, 0.75 / 1000000, use_neural_network=True,
                                  borefield_description={"type": 3, "N_1": 4, "N_2": 7,
                                                         "B_1": 5, "B_2": 6})
-
     import matplotlib.pyplot as plt
-    plt.plot(g_func_ann[1:], label="With ANN")
+    plt.figure()
+    plt.plot(g_func_ann, label="With ANN")
     plt.plot(g_func_regular, label="Regular, without ANN")
+    plt.legend()
+
+    plt.figure()
+    plt.plot((g_func_ann - g_func_regular) / g_func_regular * 100, label="Rel diff [%]")
     plt.legend()
     plt.show()
 
-    assert np.allclose(g_func_regular, g_func_ann, rtol=0.3, atol=0.5)
+    assert np.allclose(g_func_regular, g_func_ann)
