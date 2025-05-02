@@ -744,4 +744,4 @@ def calc_network_using_numpy(input_data: NDArray[np.float64], model_weights: lis
     res = np.maximum(0, model_weights[0].T.dot(input_data) + model_weights[1])
     res = np.maximum(0, model_weights[2].T.dot(res) + model_weights[3])
     res = np.maximum(0, model_weights[4].T.dot(res) + model_weights[5])
-    return np.cumsum(res, axis=1).reshape(87)
+    return np.cumsum(res, axis=0).reshape(87)
