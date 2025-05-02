@@ -4,6 +4,7 @@ import time
 import numpy as np
 import pandas as pd
 import pygfunction as gt
+import pytest
 from pytest import raises
 
 from GHEtool import Borefield, FOLDER
@@ -487,6 +488,120 @@ def test_ann_borefield():
     assert np.allclose(g_func, g_func_numpy)
 
 
+def test_ann_boundaries():
+    gfunc = GFunction()
+    time_steps = np.arange(3600, 3600 * 24 * 365 * 100, 3600)
+    with pytest.warns():
+        borefield = gt.borefield.Borefield.rectangle_field(5, 1, 4, 6, 20, 0.5, 0.1)
+        gfunc.borefield = borefield
+        gfunc.calculate(time_steps, borefield, 1.1249999999999998e-06, use_neural_network=True,
+                        borefield_description={"type": 3, "N_1": 2, "N_2": 1,
+                                               "B_1": 4, "B_2": 6})
+    with pytest.warns():
+        borefield = gt.borefield.Borefield.rectangle_field(5, 1, 4, 6, 500, 0.5, 0.1)
+        gfunc.borefield = borefield
+        gfunc.calculate(time_steps, borefield, 1.1249999999999998e-06, use_neural_network=True,
+                        borefield_description={"type": 3, "N_1": 2, "N_2": 1,
+                                               "B_1": 4, "B_2": 6})
+    with pytest.warns():
+        borefield = gt.borefield.Borefield.rectangle_field(5, 1, 4, 6, 100, 2, 0.1)
+        gfunc.borefield = borefield
+        gfunc.calculate(time_steps, borefield, 1.1249999999999998e-06, use_neural_network=True,
+                        borefield_description={"type": 3, "N_1": 2, "N_2": 1,
+                                               "B_1": 4, "B_2": 6})
+    with pytest.warns():
+        borefield = gt.borefield.Borefield.rectangle_field(5, 1, 4, 6, 100, -2, 0.1)
+        gfunc.borefield = borefield
+        gfunc.calculate(time_steps, borefield, 1.1249999999999998e-06, use_neural_network=True,
+                        borefield_description={"type": 3, "N_1": 2, "N_2": 1,
+                                               "B_1": 4, "B_2": 6})
+    with pytest.warns():
+        borefield = gt.borefield.Borefield.rectangle_field(5, 1, 4, 6, 100, 0.5, 0.1)
+        gfunc.borefield = borefield
+        gfunc.calculate(time_steps, borefield, 1.1249999999999998e-06, use_neural_network=True,
+                        borefield_description={"type": 3, "N_1": 20, "N_2": 1,
+                                               "B_1": 4, "B_2": 6})
+    with pytest.warns():
+        borefield = gt.borefield.Borefield.rectangle_field(5, 1, 4, 6, 100, 0.5, 0.1)
+        gfunc.borefield = borefield
+        gfunc.calculate(time_steps, borefield, 1.1249999999999998e-06, use_neural_network=True,
+                        borefield_description={"type": 3, "N_1": 0, "N_2": 1,
+                                               "B_1": 4, "B_2": 6})
+    with pytest.warns():
+        borefield = gt.borefield.Borefield.rectangle_field(5, 1, 4, 6, 100, 0.5, 0.1)
+        gfunc.borefield = borefield
+        gfunc.calculate(time_steps, borefield, 1.1249999999999998e-06, use_neural_network=True,
+                        borefield_description={"type": 3, "N_1": 2, "N_2": 20,
+                                               "B_1": 4, "B_2": 6})
+    with pytest.warns():
+        borefield = gt.borefield.Borefield.rectangle_field(5, 1, 4, 6, 100, 0.5, 0.1)
+        gfunc.borefield = borefield
+        gfunc.calculate(time_steps, borefield, 1.1249999999999998e-06, use_neural_network=True,
+                        borefield_description={"type": 3, "N_1": 1, "N_2": 0,
+                                               "B_1": 4, "B_2": 6})
+
+    with pytest.warns():
+        borefield = gt.borefield.Borefield.rectangle_field(5, 1, 4, 6, 100, 0.5, 0.1)
+        gfunc.borefield = borefield
+        gfunc.calculate(time_steps, borefield, 1.1249999999999998e-06, use_neural_network=True,
+                        borefield_description={"type": 3, "N_1": 1, "N_2": 2,
+                                               "B_1": 1, "B_2": 6})
+    with pytest.warns():
+        borefield = gt.borefield.Borefield.rectangle_field(5, 1, 4, 6, 100, 0.5, 0.1)
+        gfunc.borefield = borefield
+        gfunc.calculate(time_steps, borefield, 1.1249999999999998e-06, use_neural_network=True,
+                        borefield_description={"type": 3, "N_1": 1, "N_2": 2,
+                                               "B_1": 8, "B_2": 6})
+    with pytest.warns():
+        borefield = gt.borefield.Borefield.rectangle_field(5, 1, 4, 6, 100, 0.5, 0.1)
+        gfunc.borefield = borefield
+        gfunc.calculate(time_steps, borefield, 1.1249999999999998e-06, use_neural_network=True,
+                        borefield_description={"type": 3, "N_1": 1, "N_2": 2,
+                                               "B_1": 2, "B_2": 1})
+    with pytest.warns():
+        borefield = gt.borefield.Borefield.rectangle_field(5, 1, 4, 6, 100, 0.5, 0.1)
+        gfunc.borefield = borefield
+        gfunc.calculate(time_steps, borefield, 1.1249999999999998e-06, use_neural_network=True,
+                        borefield_description={"type": 3, "N_1": 1, "N_2": 2,
+                                               "B_1": 2, "B_2": 10})
+    with pytest.warns():
+        borefield = gt.borefield.Borefield.rectangle_field(5, 1, 4, 6, 100, 0.5, 0.01)
+        gfunc.borefield = borefield
+        gfunc.calculate(time_steps, borefield, 1.1249999999999998e-06, use_neural_network=True,
+                        borefield_description={"type": 3, "N_1": 1, "N_2": 2,
+                                               "B_1": 2, "B_2": 2})
+    with pytest.warns():
+        borefield = gt.borefield.Borefield.rectangle_field(5, 1, 4, 6, 100, 0.5, 0.2)
+        gfunc.borefield = borefield
+        gfunc.calculate(time_steps, borefield, 1.1249999999999998e-06, use_neural_network=True,
+                        borefield_description={"type": 3, "N_1": 1, "N_2": 2,
+                                               "B_1": 2, "B_2": 2})
+    with pytest.warns():
+        borefield = gt.borefield.Borefield.rectangle_field(5, 1, 4, 6, 100, 0.5, 0.1)
+        gfunc.borefield = borefield
+        gfunc.calculate(time_steps, borefield, 1e-8, use_neural_network=True,
+                        borefield_description={"type": 3, "N_1": 1, "N_2": 2,
+                                               "B_1": 2, "B_2": 2})
+    with pytest.warns():
+        borefield = gt.borefield.Borefield.rectangle_field(5, 1, 4, 6, 100, 0.5, 0.1)
+        gfunc.borefield = borefield
+        gfunc.calculate(time_steps, borefield, 1e-5, use_neural_network=True,
+                        borefield_description={"type": 3, "N_1": 1, "N_2": 2,
+                                               "B_1": 2, "B_2": 2})
+    with pytest.warns():
+        borefield = gt.borefield.Borefield.rectangle_field(5, 1, 4, 6, 100, 0.5, 0.1)
+        gfunc.borefield = borefield
+        gfunc.calculate(time_steps, borefield, 1e-6, use_neural_network=True,
+                        borefield_description={"type": -1, "N_1": 1, "N_2": 2,
+                                               "B_1": 2, "B_2": 2})
+    with pytest.warns():
+        borefield = gt.borefield.Borefield.rectangle_field(5, 1, 4, 6, 100, 0.5, 0.1)
+        gfunc.borefield = borefield
+        gfunc.calculate(time_steps, borefield, 1e-6, use_neural_network=True,
+                        borefield_description={"type": 7, "N_1": 1, "N_2": 2,
+                                               "B_1": 2, "B_2": 2})
+
+
 def test_ann_borefield_result_TB():
     borefield1 = gt.borefield.Borefield.rectangle_field(2, 1, 4, 6, 100, 2, 0.1)
     # N_1,N_2,B_1,B_2,H,D,r_b,alpha,shape,dt,result_0,result_1,result_2,result_3,result_4,result_5,result_6,result_7,result_8,result_9,result_10,result_11,result_12,result_13,result_14,result_15,result_16,result_17,result_18,result_19,result_20,result_21,result_22,result_23,result_24,result_25,result_26,result_27,result_28,result_29,result_30,result_31,result_32,result_33,result_34,result_35,result_36,result_37,result_38,result_39,result_40,result_41,result_42,result_43,result_44,result_45,result_46,result_47,result_48,result_49,result_50,result_51,result_52,result_53,result_54,result_55,result_56,result_57,result_58,result_59,result_60,result_61,result_62,result_63,result_64,result_65,result_66,result_67,result_68,result_69,result_70,result_71,result_72,result_73,result_74,result_75,result_76,result_77,result_78,result_79,result_80,result_81,result_82,result_83,result_84,result_85,result_86
@@ -522,13 +637,13 @@ def test_ann_borefield_result_TB():
     g_func_ann = gfunc.calculate(time_steps, borefield1, 1.1249999999999998e-06, use_neural_network=True,
                                  borefield_description={"type": 3, "N_1": 2, "N_2": 1,
                                                         "B_1": 4, "B_2": 6})
-    """import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt
     plt.plot(g_func_ann, label="With ANN")
     plt.plot(g_func_data, label="Input ANN")
     plt.plot(g_func_regular, label="Regular, without ANN")
     plt.legend()
     plt.show()
-    """
+
     assert np.allclose(g_func_data, g_func_ann, rtol=0.03)
     assert np.allclose(g_func_regular, g_func_ann, rtol=0.05, atol=0.5)
 
