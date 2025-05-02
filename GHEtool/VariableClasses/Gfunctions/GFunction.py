@@ -204,21 +204,21 @@ class GFunction:
             n_y = borefield_description["N_2"]
             b_x = borefield_description["B_1"]
             b_y = borefield_description["B_2"]
-            if H > 500:
+            if not (50 < H < 200):
                 warnings.warn("Depth outside ANN limits!")
-            if D > 5:
+            if D > 1:
                 warnings.warn("Burial depth outside ANN limits!")
-            if n_x > 35:
+            if n_x > 10:
                 warnings.warn("N_1 outside ANN limits!")
-            if n_y > 35:
+            if n_y > 10:
                 warnings.warn("N_2 outside ANN limits!")
-            if b_x > 11:
+            if b_x > 6:
                 warnings.warn("B_1 outside ANN limits!")
-            if b_y > 11:
+            if b_y > 6:
                 warnings.warn("B_2 outside ANN limits!")
             if r_b > 0.2:
                 warnings.warn("r_b outside ANN limits!")
-            if not (0.2 / 1000 < alpha < 3 / 1000):
+            if not (0.625 / 1000000 < alpha < 1.125 / 1000000):
                 warnings.warn("alpha outside ANN limits!")
             if not (0 <= borefield_description["type"] < 6):
                 warnings.warn("r_b outside ANN limits!")
