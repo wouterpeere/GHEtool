@@ -2,6 +2,6 @@
 GFunction
 ***************
 
-.. automodule:: GHEtool.VariableClasses.GFunction
+.. automodule:: GHEtool.VariableClasses.Gfunctions.GFunction
     :members:
     :show-inheritance:

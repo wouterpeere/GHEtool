@@ -377,6 +377,10 @@ at [https://ghetool.readthedocs.io/en/latest/](https://ghetool.readthedocs.io/en
 
 ### Development of GHEtool
 
+Blanke T., Pfeiffer F., Göttsche J., Döring B. (2024) Artificial neural networks use for the design of geothermal probe
+fields. In Proceedings of BauSim Conference 2024:  10th Conference of IBPSA-Germany and Austria. Vienna (Austria), 23-26
+September 2024. https://doi.org/10.26868/29761662.2024.12
+
 Meertens, L., Peere, W., Helsen, L. (2024). Influence of short-term dynamic effects on geothermal borefield size. In
 _Proceedings of International Ground Source Heat Pump Association_. Montréal (Canada), 28-30 May 2024.
 
@@ -408,6 +412,10 @@ Aitmad, M. (2025). Techno-Economic Analysis of using Ground-Source Heat Exchange
 
 Jahn, A. (2024). Softwarekonzept zur vereinfachten Wärmeplanung von Städten und Quartieren bei variabler Datenbasis (
 Master thesis).
+
+Blanke T., Pfeiffer F., Göttsche J., Döring B. (2024) Artificial neural networks use for the design of geothermal probe
+fields. In Proceedings of BauSim Conference 2024:  10th Conference of IBPSA-Germany and Austria. Vienna (Austria), 23-26
+September 2024. https://doi.org/10.26868/29761662.2024.12
 
 Meertens, L. (2024). Reducing Capital Cost for Geothermal Heat Pump Systems Through Dynamic Borefield Sizing. _IEA HPT
 Magazine 42_(2), https://doi.org/10.23697/9r3w-jm57.

@@ -2,6 +2,6 @@
 CustomGFunction
 ***************
 
-.. automodule:: GHEtool.VariableClasses.CustomGFunction
+.. automodule:: GHEtool.VariableClasses.Gfunctions.CustomGFunction
     :members:
     :show-inheritance:
