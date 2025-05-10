@@ -113,6 +113,12 @@ def test_dhw():
         load.dhw = 'test'
     with pytest.raises(ValueError):
         load.dhw = np.full(120, 10)
+    with pytest.raises(ValueError):
+        load.set_hourly_dhw_load(-100)
+    with pytest.raises(ValueError):
+        load.set_hourly_dhw_load('test')
+    with pytest.raises(ValueError):
+        load.set_hourly_dhw_load(np.full(120, 10))
 
     assert np.allclose(load.dhw, 0)
     assert np.allclose(load.hourly_dhw_load_simulation_period, np.zeros(87600))
@@ -156,8 +162,8 @@ def test_time_array():
 def test_repr_():
     load = HourlyBuildingLoadMultiYear(np.zeros(8760 * 10), np.linspace(1, 8760 * 10 - 1, 8760 * 10) * 2, 6, 5)
 
-    assert 'Multiyear hourly building load\n' \
-           'Efficiency heating: SCOP [-]: 6\n' \
-           'Efficiency cooling: SEER [-]: 5\n' \
-           'Peak cooling duration [hour]: 6.0\n' \
-           'Peak heating duration [hour]: 6.0' == load.__repr__()
+    assert {'type': 'Multiyear hourly building load',
+            'Efficiency heating': {'SCOP [-]': 6},
+            'Efficiency cooling': {'SEER [-]': 5},
+            'Peak cooling duration [hour]': 6.0,
+            'Peak heating duration [hour]': 6.0} == load.__export__()

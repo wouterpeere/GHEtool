@@ -36,7 +36,7 @@ def sizing_method_comparison():
 
     # initiate borefield model
     data = GroundConstantTemperature(3, 10)
-    borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
+    borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
 
     # Monthly loading values
     peak_cooling = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak cooling in kW
@@ -47,12 +47,13 @@ def sizing_method_comparison():
     annual_cooling_load = 160 * 10 ** 3  # kWh
 
     # percentage of annual load per month (15.5% for January ...)
-    monthly_load_heating_percentage = np.array([0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
+    monthly_load_heating_percentage = np.array(
+        [0.155, 0.148, 0.125, .099, .064, 0., 0., 0., 0.061, 0.087, 0.117, 0.144])
     monthly_load_cooling_percentage = np.array([0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .075, .05, .025])
 
     # resulting load per month
-    monthly_load_heating = annual_heating_load * monthly_load_heating_percentage   # kWh
-    monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage   # kWh
+    monthly_load_heating = annual_heating_load * monthly_load_heating_percentage  # kWh
+    monthly_load_cooling = annual_cooling_load * monthly_load_cooling_percentage  # kWh
 
     # set the load
     load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
@@ -64,8 +65,8 @@ def sizing_method_comparison():
     borefield.Rb = 0.2
 
     # set temperature boundaries
-    borefield.set_max_avg_fluid_temperature(16)   # maximum temperature
-    borefield.set_min_avg_fluid_temperature(0)    # minimum temperature
+    borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
+    borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
 
     # size according to L2 method
     start_L2 = time.time()
@@ -87,16 +88,21 @@ def sizing_method_comparison():
         results_L3[i] = borefield.size(L3_sizing=True)
     end_L3 = time.time()
 
-    print("Time for sizing according to L2:", end_L2 - start_L2, "s (or ", round((end_L2 - start_L2) / number_of_iterations * 1000, 3), "ms/sizing)")
-    print("Time for sizing according to L3:", end_L3 - start_L3, "s (or ", round((end_L3 - start_L3) / number_of_iterations * 1000, 3), "ms/sizing)")
+    print("Time for sizing according to L2:", end_L2 - start_L2, "s (or ",
+          round((end_L2 - start_L2) / number_of_iterations * 1000, 3), "ms/sizing)")
+    print("Time for sizing according to L3:", end_L3 - start_L3, "s (or ",
+          round((end_L3 - start_L3) / number_of_iterations * 1000, 3), "ms/sizing)")
 
     # calculate differences
     for i in range(number_of_iterations):
         difference_results[i] = results_L3[i] - results_L2[i]
 
-    print("The maximal difference between the sizing of L2 and L3 was:", np.round(np.max(difference_results), 3), "m or", np.round(np.max(difference_results) / results_L2[np.argmax(difference_results)] * 100, 3), "% w.r.t. the L2 sizing.")
-    print("The mean difference between the sizing of L2 and L3 was:", np.round(np.mean(difference_results), 3), "m or", np.round(np.mean(difference_results) / np.mean(results_L2) * 100, 3), "% w.r.t. the L2 sizing.")
+    print("The maximal difference between the sizing of L2 and L3 was:", np.round(np.max(difference_results), 3),
+          "m or", np.round(np.max(difference_results) / results_L2[np.argmax(difference_results)] * 100, 3),
+          "% w.r.t. the L2 sizing.")
+    print("The mean difference between the sizing of L2 and L3 was:", np.round(np.mean(difference_results), 3), "m or",
+          np.round(np.mean(difference_results) / np.mean(results_L2) * 100, 3), "% w.r.t. the L2 sizing.")
 
 
-if __name__ == "__main__":   # pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
     sizing_method_comparison()

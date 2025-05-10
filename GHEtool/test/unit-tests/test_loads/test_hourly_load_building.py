@@ -51,11 +51,16 @@ def test_load_hourly_data():
     load1.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_heating=1, col_cooling=0)
     assert np.array_equal(load.hourly_cooling_load, load1.hourly_heating_load)
     assert np.array_equal(load.hourly_heating_load, load1.hourly_cooling_load)
+    assert np.array_equal(load.hourly_dhw_load, load1.hourly_dhw_load)
     load2 = HourlyBuildingLoad()
     load2.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile_without_header.csv"),
                               header=False)
     assert np.array_equal(load.hourly_cooling_load, load2.hourly_cooling_load)
     assert np.array_equal(load.hourly_heating_load, load2.hourly_heating_load)
+    assert np.array_equal(load.hourly_dhw_load, load2.hourly_dhw_load)
+    load2.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile_without_header.csv"),
+                              header=False, col_heating=1, col_cooling=0, col_dhw=1)
+    assert np.allclose(load2.hourly_dhw_load, load2.hourly_heating_load)
 
 
 def test_checks():
@@ -161,6 +166,8 @@ def test_set_hourly_values():
         load.set_hourly_heating_load(np.ones(10))
     with pytest.raises(ValueError):
         load.set_hourly_cooling_load(np.ones(10))
+    with pytest.raises(ValueError):
+        load.set_hourly_dhw_load(np.ones(10))
 
 
 def test_start_month_general():
@@ -244,6 +251,12 @@ def test_dhw():
         load.dhw = 'test'
     with pytest.raises(ValueError):
         load.dhw = np.full(120, 10)
+    with pytest.raises(ValueError):
+        load.set_hourly_dhw_load(-100)
+    with pytest.raises(ValueError):
+        load.set_hourly_dhw_load('test')
+    with pytest.raises(ValueError):
+        load.set_hourly_dhw_load(np.full(120, 10))
 
     assert np.allclose(load.dhw, 0)
     assert np.allclose(load.hourly_dhw_load_simulation_period, np.zeros(87600))
@@ -681,21 +694,21 @@ def test_repr_():
     load = HourlyBuildingLoad()
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
 
-    assert 'Hourly building load\n' \
-           'Efficiency heating: SCOP [-]: 5\n' \
-           'Efficiency cooling: SEER [-]: 20\n' \
-           'Peak cooling duration [hour]: 6.0\n' \
-           'Peak heating duration [hour]: 6.0\n' \
-           'Simulation period [year]: 20\n' \
-           'First month of simulation [-]: 1' == load.__repr__()
+    assert {'type': 'Hourly building load',
+            'Efficiency heating': {'SCOP [-]': 5},
+            'Efficiency cooling': {'SEER [-]': 20},
+            'Peak cooling duration [hour]': 6.0,
+            'Peak heating duration [hour]': 6.0,
+            'Simulation period [year]': 20,
+            'First month of simulation [-]': 1} == load.__export__()
 
     load.dhw = 10000
-    assert 'Hourly building load\n' \
-           'Efficiency heating: SCOP [-]: 5\n' \
-           'Efficiency cooling: SEER [-]: 20\n' \
-           'Peak cooling duration [hour]: 6.0\n' \
-           'Peak heating duration [hour]: 6.0\n' \
-           'Simulation period [year]: 20\n' \
-           'First month of simulation [-]: 1\n' \
-           'DHW demand [kWh/year]: 10000\n' \
-           'Efficiency DHW: SCOP [-]: 4' == load.__repr__()
+    assert {'type': 'Hourly building load',
+            'Efficiency heating': {'SCOP [-]': 5},
+            'Efficiency cooling': {'SEER [-]': 20},
+            'Peak cooling duration [hour]': 6.0,
+            'Peak heating duration [hour]': 6.0,
+            'Simulation period [year]': 20,
+            'First month of simulation [-]': 1,
+            'DHW demand [kWh/year]': 10000.000000000005,
+            'Efficiency DHW': {'SCOP [-]': 4}} == load.__export__()

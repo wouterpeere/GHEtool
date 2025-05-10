@@ -40,6 +40,6 @@ def optimise_borefield_configuration(
     study = optuna.create_study()
     study.optimize(objective, n_trials=100)
     params, total_borehole_length = study.best_trials[0].params, study.best_trials[0].value
-    return gt.boreholes.rectangle_field(params['n_1'], params['n_2'], params['b_1'], params['b_2'],
-                                        total_borehole_length / params['n_1'] / params['n_2'], borefield.D,
-                                        borefield.r_b)
+    return gt.borefield.Borefield.rectangle_field(params['n_1'], params['n_2'], params['b_1'], params['b_2'],
+                                                  total_borehole_length / params['n_1'] / params['n_2'], borefield.D,
+                                                  borefield.r_b)

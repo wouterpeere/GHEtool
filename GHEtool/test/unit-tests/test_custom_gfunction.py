@@ -11,7 +11,7 @@ from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction
 def custom_gfunction():
     custom_gfunction = CustomGFunction()
 
-    rect_field = gt.boreholes.rectangle_field(10, 10, 6, 6, 100, 4, 0.075)
+    rect_field = gt.borefield.Borefield.rectangle_field(10, 10, 6, 6, 100, 4, 0.075)
 
     custom_gfunction.create_custom_dataset(rect_field, 0.2 * 10 ** -6)
 
@@ -56,11 +56,13 @@ def test_update_min_max_t():
 
 def test_create_dataset():
     custom_gfunction = CustomGFunction()
-    custom_gfunction.create_custom_dataset(gt.boreholes.rectangle_field(10, 10, 6, 6, 100, 4, 0.075), 2. * 10 ** -6)
+    custom_gfunction.create_custom_dataset(gt.borefield.Borefield.rectangle_field(10, 10, 6, 6, 100, 4, 0.075),
+                                           2. * 10 ** -6)
     assert np.any(custom_gfunction.gvalues_array)
     temp = copy.copy((custom_gfunction.gvalues_array))
     custom_gfunction.options = {}
-    custom_gfunction.create_custom_dataset(gt.boreholes.rectangle_field(10, 10, 6, 6, 100, 4, 0.075), 2. * 10 ** -6)
+    custom_gfunction.create_custom_dataset(gt.borefield.Borefield.rectangle_field(10, 10, 6, 6, 100, 4, 0.075),
+                                           2. * 10 ** -6)
     assert np.any(custom_gfunction.gvalues_array)
     assert np.array_equal(custom_gfunction.gvalues_array, temp)
     custom_gfunction.delete_custom_gfunction()

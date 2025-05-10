@@ -17,13 +17,14 @@ from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient
 from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad, EERCombined, \
     HourlyBuildingLoad, EER
+from GHEtool.Methods import *
 
 data = GroundConstantTemperature(3, 10)
 data_ground_flux = GroundFluxTemperature(3, 10)
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
 pipeData = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 
-borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
+borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
 
 # Monthly loading values
 peak_injection = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]  # Peak cooling in kW
@@ -41,7 +42,7 @@ baseload_injectionPercentage = [0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .0
 baseload_extraction = list(map(lambda x: x * annualHeatingLoad, baseload_extractionPercentage))  # kWh
 baseload_injection = list(map(lambda x: x * annualCoolingLoad, baseload_injectionPercentage))  # kWh
 
-custom_field = gt.boreholes.L_shaped_field(N_1=4, N_2=5, B_1=5., B_2=5., H=100., D=4, r_b=0.05)
+custom_field = gt.borefield.Borefield.L_shaped_field(N_1=4, N_2=5, B_1=5., B_2=5., H=100., D=4, r_b=0.05)
 
 
 def test_borefield():
@@ -68,7 +69,7 @@ def borefield_quadrants():
     data = GroundConstantTemperature(3.5,  # conductivity of the soil (W/mK)
                                      10)  # Ground temperature at infinity (degrees C)
 
-    borefield_gt = gt.boreholes.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)
+    borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)
 
     borefield = Borefield()
     borefield.set_Rb(0.2)
@@ -239,7 +240,7 @@ def test_no_ground_data():
 
 def test_value_error_cooling_dom_temp_gradient():
     data = GroundFluxTemperature(3, 12)
-    borefield_pyg = gt.boreholes.rectangle_field(5, 5, 6, 6, 110, 4, 0.075)
+    borefield_pyg = gt.borefield.Borefield.rectangle_field(5, 5, 6, 6, 110, 4, 0.075)
 
     borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(1)))
 
@@ -367,11 +368,11 @@ def test_optimise_load_eer_combined():
     borefield1.calculate_temperatures(hourly=True)
     results_16 = copy.deepcopy(borefield1.results)
     borefield1.set_max_avg_fluid_temperature(25)
-    _, sec_load = borefield1.optimise_load_profile_power(borefield1.load)
+    _, sec_load = optimise_load_profile_power(borefield1, borefield1.load)
     borefield1.calculate_temperatures(hourly=True)
     results_25 = copy.deepcopy(borefield1.results)
     assert np.allclose(results_16.peak_injection, results_25.peak_injection)
-    _, sec_load = borefield1.optimise_load_profile_energy(borefield1.load)
+    _, sec_load = optimise_load_profile_energy(borefield1, borefield1.load)
     borefield1.calculate_temperatures(hourly=True)
     results_25 = copy.deepcopy(borefield1.results)
     assert np.allclose(results_16.peak_injection, results_25.peak_injection)

@@ -11,7 +11,7 @@ from GHEtool import Borefield, FOLDER, GroundConstantTemperature, HourlyGeotherm
 def test_multiple_years_L4():
     load_factor = 7
     data = GroundConstantTemperature(3, 10)
-    borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
+    borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
     borefield = Borefield()
     borefield.set_ground_parameters(data)
     borefield.Rb = 0.12
@@ -44,7 +44,7 @@ def test_multiple_years_L4():
 def test_multiple_years_L3():
     load_factor = 7
     data = GroundConstantTemperature(3, 10)
-    borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
+    borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
     borefield = Borefield()
     borefield.set_ground_parameters(data)
     borefield.Rb = 0.12
@@ -98,7 +98,7 @@ def test_multiple_years_L3():
 def test_multiple_years_L3_monthly_data():
     load_factor = 7
     data = GroundConstantTemperature(3, 10)
-    borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
+    borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
     borefield = Borefield()
     borefield.set_ground_parameters(data)
     borefield.Rb = 0.12

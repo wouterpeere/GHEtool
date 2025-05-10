@@ -56,5 +56,10 @@ class GroundConstantTemperature(_GroundData):
         """
         return 0
 
-    def __repr__(self):
-        return f'Constant ground temperature\n\tGround temperature at infinity [°C]: {self.Tg}\n\t' + super().__repr__()
+    def __export__(self):
+        temp = {
+            'type': 'Constant ground temperature',
+            'Ground temperature at infinity [°C]': self.Tg
+        }
+        temp.update(super().__export__())
+        return temp

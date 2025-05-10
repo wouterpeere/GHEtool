@@ -60,18 +60,19 @@ our [project board](https://github.com/users/wouterpeere/projects/2) to check ou
 
 ## Requirements
 
-This code is tested with Python 3.9, 3.10, 3.11 and 3.12 and requires the following libraries (the versions
+This code is tested with Python 3.9, 3.10, 3.11, 3.12 and 3.13 and requires the following libraries (the versions
 mentioned are the ones with which the code is tested)
 
-* matplotlib >= 3.5.2
-* numpy >= 1.23.1
+* matplotlib >= 3.9.2
+* numpy >= 1.26.4
 * pandas >= 1.4.3
-* pygfunction >= 2.2.3
+* pygfunction >= 2.3.0
 * scipy >= 1.8.1
+* secondarycoolantprops >= 1.1
 
 For the tests
 
-* Pytest >= 7.1.2
+* pytest >= 7.1.2
 
 For the active/passive example
 
@@ -166,7 +167,16 @@ class.
 
 #### Fluid data
 
-You can set the fluid data by using the FluidData class. In the future, more fluid data classes will be made available.
+You can set the fluid data by using the FluidData class.
+
+* _ConstantFluidData_: Temperature independent fluid properties
+* _TemperatureDependentFluidData_: Temperature dependent fluid data (Water, MPG, MEG, MMA, MEA)
+
+#### Flow rate data
+
+Currently, only constant flow rates are compatible with GHEtool, but this will change in the future.
+
+* _ConstantFlowRate_
 
 #### Efficiency data
 
@@ -313,7 +323,7 @@ if you want more complex designs.
 import pygfunction as gt
 
 # set a rectangular borefield
-borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
+borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
 borefield.set_borefield(borefield_gt)
 ```
 
@@ -367,6 +377,10 @@ at [https://ghetool.readthedocs.io/en/latest/](https://ghetool.readthedocs.io/en
 
 ### Development of GHEtool
 
+Blanke T., Pfeiffer F., Göttsche J., Döring B. (2024) Artificial neural networks use for the design of geothermal probe
+fields. In Proceedings of BauSim Conference 2024:  10th Conference of IBPSA-Germany and Austria. Vienna (Austria), 23-26
+September 2024. https://doi.org/10.26868/29761662.2024.12
+
 Meertens, L., Peere, W., Helsen, L. (2024). Influence of short-term dynamic effects on geothermal borefield size. In
 _Proceedings of International Ground Source Heat Pump Association_. Montréal (Canada), 28-30 May 2024.
 
@@ -393,6 +407,15 @@ Department of Mechanical Engineering,
 KU Leuven, Belgium.
 
 ### Applications/Mentions of GHEtool
+
+Aitmad, M. (2025). Techno-Economic Analysis of using Ground-Source Heat Exchangers in Pakistan (Master thesis).
+
+Jahn, A. (2024). Softwarekonzept zur vereinfachten Wärmeplanung von Städten und Quartieren bei variabler Datenbasis (
+Master thesis).
+
+Blanke T., Pfeiffer F., Göttsche J., Döring B. (2024) Artificial neural networks use for the design of geothermal probe
+fields. In Proceedings of BauSim Conference 2024:  10th Conference of IBPSA-Germany and Austria. Vienna (Austria), 23-26
+September 2024. https://doi.org/10.26868/29761662.2024.12
 
 Meertens, L. (2024). Reducing Capital Cost for Geothermal Heat Pump Systems Through Dynamic Borefield Sizing. _IEA HPT
 Magazine 42_(2), https://doi.org/10.23697/9r3w-jm57.

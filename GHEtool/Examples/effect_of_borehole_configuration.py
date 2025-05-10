@@ -11,7 +11,7 @@ import pygfunction as gt
 def effect_borefield_configuration():
     # GroundData for an initial field of 11 x 11
     data = GroundConstantTemperature(3, 10)
-    borefield_gt = gt.boreholes.rectangle_field(11, 11, 6, 6, 110, 1, 0.075)
+    borefield_gt = gt.borefield.Borefield.rectangle_field(11, 11, 6, 6, 110, 1, 0.075)
 
     # Monthly loading values
     peak_cooling = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak cooling in kW
@@ -36,7 +36,7 @@ def effect_borefield_configuration():
     # create the borefield object
     borefield = Borefield(load=load)
 
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
     borefield.set_borefield(borefield_gt)
     borefield.Rb = 0.2
 
@@ -52,7 +52,7 @@ def effect_borefield_configuration():
 
     # borefield of 6x20
     data = GroundConstantTemperature(3, 10)
-    borefield_gt = gt.boreholes.rectangle_field(6, 20, 6, 6, 110, 1, 0.075)
+    borefield_gt = gt.borefield.Borefield.rectangle_field(6, 20, 6, 6, 110, 1, 0.075)
 
     # set ground parameters to borefield
     borefield.set_borefield(borefield_gt)

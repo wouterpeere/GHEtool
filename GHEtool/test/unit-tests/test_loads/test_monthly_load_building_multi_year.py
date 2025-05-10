@@ -42,10 +42,34 @@ def test_checks_multiyear_monthly():
 
 
 def test_baseload_heating():
+    load = MonthlyBuildingLoadMultiYear(np.full(12, 0), np.full(12, 0), np.full(12, 0), np.full(12, 0), 10, 5)
+    assert np.allclose(load.baseload_heating, np.full(12, 0))
+    load.baseload_heating = np.linspace(0, 11, 12)
+    assert np.allclose(load.baseload_heating, np.linspace(0, 11, 12))
+    load.baseload_heating = np.linspace(1, 12, 12)
+    assert np.allclose(load.baseload_heating, np.linspace(1, 12, 12))
+    assert np.allclose(load.baseload_heating / 730, load.monthly_baseload_heating_power)
+    assert np.allclose(load.monthly_baseload_heating_power, load.peak_heating)
+    assert np.allclose(load.monthly_baseload_extraction_power_simulation_period,
+                       load.monthly_peak_extraction_simulation_period)
+    with pytest.raises(ValueError):
+        load.baseload_heating = np.ones(11)
     assert np.array_equal(load_data.baseload_heating, baseload_heating)
 
 
 def test_baseload_cooling():
+    load = MonthlyBuildingLoadMultiYear(np.full(12, 0), np.full(12, 0), np.full(12, 0), np.full(12, 0), 10, 5)
+    assert np.allclose(load.baseload_cooling, np.full(12, 0))
+    load.baseload_cooling = np.linspace(0, 11, 12)
+    assert np.allclose(load.baseload_cooling, np.linspace(0, 11, 12))
+    load.baseload_cooling = np.linspace(1, 12, 12)
+    assert np.allclose(load.baseload_cooling, np.linspace(1, 12, 12))
+    assert np.allclose(load.baseload_cooling / 730, load.monthly_baseload_cooling_power)
+    assert np.allclose(load.monthly_baseload_cooling_power, load.peak_cooling)
+    assert np.allclose(load.monthly_baseload_injection_power_simulation_period,
+                       load.monthly_peak_injection_simulation_period)
+    with pytest.raises(ValueError):
+        load.baseload_cooling = np.ones(11)
     assert np.array_equal(load_data.baseload_cooling, baseload_cooling)
 
 
@@ -242,8 +266,8 @@ def test_repr_():
         peak_heating=np.tile(peak_heating, 10),
         peak_cooling=np.tile(peak_cooling, 10))
 
-    assert 'Multiyear monthly building load\n' \
-           'Efficiency heating: SCOP [-]: 5\n' \
-           'Efficiency cooling: SEER [-]: 20\n' \
-           'Peak cooling duration [hour]: 6.0\n' \
-           'Peak heating duration [hour]: 6.0' == load.__repr__()
+    assert {'Efficiency cooling': {'SEER [-]': 20},
+            'Efficiency heating': {'SCOP [-]': 5},
+            'Peak cooling duration [hour]': 6.0,
+            'Peak heating duration [hour]': 6.0,
+            'type': 'Multiyear monthly building load'} == load.__export__()

@@ -13,6 +13,15 @@ The articles for which this is the case, are:
 articles/HPT_magazine.rst
 ```
 
+> Aitmad, M. (2025). Techno-Economic Analysis of using Ground-Source Heat Exchangers in Pakistan (Master thesis).
+
+> Jahn, A. (2024). Softwarekonzept zur vereinfachten Wärmeplanung von Städten und Quartieren bei variabler Datenbasis (
+> Master thesis).
+
+> Blanke T., Pfeiffer F., Göttsche J., Döring B. (2024) Artificial neural networks use for the design of geothermal
+> probe fields. In Proceedings of BauSim Conference 2024:  10th Conference of IBPSA-Germany and Austria. Vienna (Austria),
+> 23-26 September 2024. https://doi.org/10.26868/29761662.2024.12
+
 > Meertens, L. (2024). Reducing Capital Cost for Geothermal Heat Pump Systems Through Dynamic Borefield Sizing. _IEA HPT
 Magazine 42_(2), https://doi.org/10.23697/9r3w-jm57.
 

@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 from math import pi
 
 from GHEtool.VariableClasses.PipeData._PipeData import _PipeData
-from GHEtool.VariableClasses.FluidData import FluidData
+from GHEtool.VariableClasses.FluidData import _FluidData
+from GHEtool.VariableClasses.FlowData import _FlowData
 
 
 class CoaxialPipe(_PipeData):
@@ -52,7 +53,7 @@ class CoaxialPipe(_PipeData):
         self.R_fp: float = 0.
         self.k_p_out = k_p if k_p_out is None else k_p_out
 
-    def calculate_resistances(self, fluid_data: FluidData) -> None:
+    def calculate_resistances(self, fluid_data: _FluidData, flow_rate_data: _FlowData, **kwargs) -> None:
         """
         This function calculates the conductive and convective resistances, which are constant.
 
@@ -60,6 +61,8 @@ class CoaxialPipe(_PipeData):
         ----------
         fluid_data : FluidData
             Fluid data
+        flow_rate_data : FlowData
+            Flow rate data
 
         Returns
         -------
@@ -76,27 +79,29 @@ class CoaxialPipe(_PipeData):
         # Fluid-to-fluid thermal resistance [m.K/W]
         # Inner pipe
         h_f_in = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(
-            fluid_data.mfr, self.r_in_in, fluid_data.mu, fluid_data.rho, fluid_data.k_f, fluid_data.Cp, self.epsilon)
+            flow_rate_data.mfr(fluid_data=fluid_data, **kwargs), self.r_in_in, fluid_data.mu(**kwargs),
+            fluid_data.rho(**kwargs),
+            fluid_data.k_f(**kwargs), fluid_data.cp(**kwargs), self.epsilon)
         R_f_in = 1.0 / (h_f_in * 2 * np.pi * self.r_in_in)
         # Outer pipe
         h_f_a_in, h_f_a_out = \
             gt.pipes.convective_heat_transfer_coefficient_concentric_annulus(
-                fluid_data.mfr, self.r_in_out, self.r_out_in, fluid_data.mu, fluid_data.rho, fluid_data.k_f,
-                fluid_data.Cp, self.epsilon)
+                flow_rate_data.mfr(fluid_data=fluid_data, **kwargs), self.r_in_out, self.r_out_in,
+                fluid_data.mu(**kwargs),
+                fluid_data.rho(**kwargs), fluid_data.k_f(**kwargs),
+                fluid_data.cp(**kwargs), self.epsilon)
         R_f_out_in = 1.0 / (h_f_a_in * 2 * np.pi * self.r_in_out)
         self.R_ff = R_f_in + R_p_in + R_f_out_in
         # Coaxial GHE in borehole
         R_f_out_out = 1.0 / (h_f_a_out * 2 * np.pi * self.r_out_in)
         self.R_fp = R_p_out + R_f_out_out
 
-    def pipe_model(self, fluid_data: FluidData, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
+    def pipe_model(self, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
         """
         This function returns the BasePipe model.
 
         Parameters
         ----------
-        fluid_data : FluidData
-            Fluid data
         k_s : float
             Ground thermal conductivity
         borehole : Borehole
@@ -113,7 +118,7 @@ class CoaxialPipe(_PipeData):
                                 np.array([self.r_in_out, self.r_out_out]),
                                 borehole=borehole, k_s=k_s, k_g=self.k_g, R_ff=self.R_ff, R_fp=self.R_fp, J=2)
 
-    def Re(self, fluid_data: FluidData) -> float:
+    def Re(self, fluid_data: _FluidData, flow_rate_data: _FlowData, **kwargs) -> float:
         """
         Reynolds number.
         Note: This code is based on pygfunction, 'convective_heat_transfer_coefficient_concentric_annulus' in the
@@ -121,9 +126,10 @@ class CoaxialPipe(_PipeData):
 
         Parameters
         ----------
-        fluid_data: FluidData
-            fluid data
-
+        fluid_data : FluidData
+            Fluid data
+        flow_rate_data : FlowData
+            Flow rate data
         Returns
         -------
         Reynolds number : float
@@ -134,13 +140,14 @@ class CoaxialPipe(_PipeData):
         # Cross-sectional area of the annulus region
         A_c = pi * ((self.r_out_in ** 2) - (self.r_in_out ** 2))
         # Volume flow rate
-        V_dot = fluid_data.mfr / fluid_data.rho
+        V_dot = flow_rate_data.mfr(fluid_data=fluid_data, **kwargs) / fluid_data.rho(**kwargs)
         # Average velocity
         V = V_dot / A_c
         # Reynolds number
-        return fluid_data.rho * V * D_h / fluid_data.mu
+        return fluid_data.rho(**kwargs) * V * D_h / fluid_data.mu(**kwargs)
 
-    def pressure_drop(self, fluid_data: FluidData, borehole_depth: float) -> float:
+    def pressure_drop(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float,
+                      **kwargs) -> float:
         """
         Calculates the pressure drop across the entire borehole.
         It assumed that the U-tubes are all connected in parallel.
@@ -149,8 +156,10 @@ class CoaxialPipe(_PipeData):
         ----------
         fluid_data: FluidData
             Fluid data
-        borehole_depth : float
-            Borehole depth [m]
+        flow_rate_data : FlowData
+            Flow rate data
+        borehole_length : float
+            Borehole length [m]
 
         Returns
         -------
@@ -162,12 +171,16 @@ class CoaxialPipe(_PipeData):
         # Cross-sectional area of the annulus region
         A_c = pi * ((self.r_out_in ** 2) - (self.r_in_in ** 2))
         # Average velocity
-        V = (fluid_data.vfr / 1000) / A_c
+        V = (flow_rate_data.vfr(fluid_data=fluid_data, **kwargs) / 1000) / A_c
 
         # Darcy-Wiesbach friction factor
         fd = gt.pipes.fluid_friction_factor_circular_pipe(
-            fluid_data.mfr, r_h, fluid_data.mu, fluid_data.rho, self.epsilon)
-        return (fd * (borehole_depth * 2) / (2 * r_h) * fluid_data.rho * V ** 2 / 2) / 1000
+            flow_rate_data.mfr(fluid_data=fluid_data, **kwargs), r_h, fluid_data.mu(**kwargs), fluid_data.rho(**kwargs),
+            self.epsilon)
+
+        # add 0.2 for the local losses
+        # (source: https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html)
+        return ((fd * (borehole_length * 2) / (2 * r_h) + 0.2) * fluid_data.rho(**kwargs) * V ** 2 / 2) / 1000
 
     def draw_borehole_internal(self, r_b: float) -> None:
         """
@@ -188,21 +201,23 @@ class CoaxialPipe(_PipeData):
         if self.R_ff == 0:
             self.R_fp = 0.1
             self.R_ff = 0.1
-            pipe = self.pipe_model(FluidData(), 2, borehole)
+            pipe = self.pipe_model(2, borehole)
             self.R_fp, self.R_ff = 0, 0
         else:
-            pipe = self.pipe_model(FluidData(), 2, borehole)
+            pipe = self.pipe_model(2, borehole)
 
         pipe.visualize_pipes()
         plt.show()
 
-    def __repr__(self):
-        return f'Coaxial pipe' \
-               f'\n\tInner pipe diameter [mm]: {self.r_in_out * 2 * 1000}' \
-               f'\n\tInner pipe wall thickness [mm]: {(self.r_in_out * 1000 - self.r_in_in * 1000):.1f}' \
-               f'\n\tOuter pipe diameter [mm]: {self.r_out_out * 2 * 1000}' \
-               f'\n\tOuter pipe wall thickness [mm]: {(self.r_out_out * 1000 - self.r_out_in * 1000):.1f}' \
-               f'\n\tGrout conductivity [W/(m·K)]: {self.k_g}' \
-               f'\n\tInner pipe conductivity [W/(m·K)]: {self.k_p}' \
-               f'\n\tOuter pipe conductivity [W/(m·K)]: {self.k_p_out}' \
-               f'\n\tPipe roughness [mm]: {self.epsilon * 1000}'
+    def __export__(self):
+        return {
+            'type': 'Coaxial',
+            'inner_diameter [mm]': self.r_in_out * 2 * 1000,
+            'inner_thickness [mm]': (self.r_in_out * 1000 - self.r_in_in * 1000),
+            'outer_diameter [mm]': self.r_out_out * 2 * 1000,
+            'outer_thickness [mm]': (self.r_out_out * 1000 - self.r_out_in * 1000),
+            'k_g [W/(m·K)]': self.k_g,
+            'k_p_in [W/(m·K)]': self.k_p,
+            'k_p_out [W/(m·K)]': self.k_p_out,
+            'epsilon [mm]': self.epsilon
+        }

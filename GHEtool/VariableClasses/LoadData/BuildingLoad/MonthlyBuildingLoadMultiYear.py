@@ -200,7 +200,8 @@ class MonthlyBuildingLoadMultiYear(_LoadDataBuilding):
         peak cooling : np.ndarray
             Peak cooling values for all years
         """
-        return self._peak_cooling
+        return np.maximum(self._peak_cooling, np.divide(self.monthly_baseload_cooling_simulation_period,
+                                                        np.tile(self.UPM, self.simulation_period)))
 
     @peak_cooling.setter
     def peak_cooling(self, load) -> None:
@@ -238,7 +239,8 @@ class MonthlyBuildingLoadMultiYear(_LoadDataBuilding):
         peak heating : np.ndarray
             Peak heating values for all years
         """
-        return self._peak_heating
+        return np.maximum(self._peak_heating, np.divide(self.monthly_baseload_heating_simulation_period,
+                                                        np.tile(self.UPM, self.simulation_period)))
 
     @peak_heating.setter
     def peak_heating(self, load: ArrayLike) -> None:
@@ -307,9 +309,11 @@ class MonthlyBuildingLoadMultiYear(_LoadDataBuilding):
                 f'a length of {self.simulation_period * (8760 if self._hourly else 12)} was expected.')
         self._results = results
 
-    def __repr__(self):
-        return f'Multiyear monthly building load\n' \
-               f'Efficiency heating: {self.cop.__repr__()}\n' \
-               f'Efficiency cooling: {self.eer.__repr__()}\n' \
-               f'Peak cooling duration [hour]: {self.peak_injection_duration / 3600:.1f}\n' \
-               f'Peak heating duration [hour]: {self.peak_extraction_duration / 3600:.1f}'
+    def __export__(self):
+        return {
+            'type': 'Multiyear monthly building load',
+            'Efficiency heating': self.cop.__export__(),
+            'Efficiency cooling': self.eer.__export__(),
+            'Peak cooling duration [hour]': self.peak_injection_duration / 3600,
+            'Peak heating duration [hour]': self.peak_extraction_duration / 3600
+        }

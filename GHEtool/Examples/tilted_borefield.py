@@ -14,8 +14,8 @@ def tilted():
     # define params
     ground_data = GroundFluxTemperature(1.9, 10)
     pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
-    fluid_data = FluidData(mfr=0.2)
-    fluid_data.import_fluid_from_pygfunction(gt.media.Fluid('MPG', 30, 2))
+    flow_data = ConstantFlowRate(mfr=0.2)
+    fluid_data = TemperatureDependentFluidData('MPG', 30)
     load_data = MonthlyBuildingLoadAbsolute(
         np.array([.176, .174, .141, .1, .045, 0, 0, 0, 0.012, 0.065, 0.123, 0.164]) * 8 * 1350,
         np.array([0, 0, 0, 0, .112, .205, .27, .264, .149, 0, 0, 0]) * 4 * 700,
@@ -24,24 +24,27 @@ def tilted():
     )
 
     # define borefield
-    borefield_tilted = [gt.boreholes.Borehole(150, 0.75, 0.07, -3, 0, math.pi / 7, orientation=math.pi),
-                        gt.boreholes.Borehole(150, 0.75, 0.07, 3, 0, math.pi / 7, orientation=0)]
-    borefield_without_tilt = [gt.boreholes.Borehole(150, 0.75, 0.07, -3, 0),
-                              gt.boreholes.Borehole(150, 0.75, 0.07, 3, 0)]
+    borefield_tilted = gt.borefield.Borefield.from_boreholes(
+        [gt.boreholes.Borehole(150, 0.75, 0.07, -3, 0, math.pi / 7, orientation=math.pi),
+         gt.boreholes.Borehole(150, 0.75, 0.07, 3, 0, math.pi / 7, orientation=0)])
+    borefield_without_tilt = gt.borefield.Borefield.from_boreholes([gt.boreholes.Borehole(150, 0.75, 0.07, -3, 0),
+                                                                    gt.boreholes.Borehole(150, 0.75, 0.07, 3, 0)])
 
     # initiate GHEtool object with tilted borefield
     borefield = Borefield(borefield=borefield_tilted, load=load_data)
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_pipe_parameters(pipe_data)
-    borefield.set_fluid_parameters(fluid_data)
+    borefield.ground_data = ground_data
+    borefield.pipe_data = pipe_data
+    borefield.fluid_data = fluid_data
+    borefield.flow_data = flow_data
 
     borefield.print_temperature_profile()
 
     # initiate GHEtool object without tilted borefield
     borefield = Borefield(borefield=borefield_without_tilt, load=load_data)
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_pipe_parameters(pipe_data)
-    borefield.set_fluid_parameters(fluid_data)
+    borefield.ground_data = ground_data
+    borefield.pipe_data = pipe_data
+    borefield.fluid_data = fluid_data
+    borefield.flow_data = flow_data
 
     borefield.print_temperature_profile()
 

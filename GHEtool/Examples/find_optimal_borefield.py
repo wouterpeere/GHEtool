@@ -7,18 +7,19 @@ import pygfunction as gt
 
 # set general parameters
 ground_data = GroundFluxTemperature(3, 10)
-fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+fluid_data = ConstantFluidData(0.2, 0.568, 998, 4180, 1e-3)
+flow_data = ConstantFlowRate(mfr=0.2)
 pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 
 load = HourlyBuildingLoad()  # use SCOP of 5 for heating
 load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,
                          separator=";", col_cooling=1, col_heating=0)
 
-borefield = Borefield()
-borefield.set_ground_parameters(ground_data)
-borefield.set_fluid_parameters(fluid_data)
-borefield.set_pipe_parameters(pipe_data)
-borefield.load = load
+borefield = Borefield(ground_data=ground_data,
+                      flow_data=flow_data,
+                      fluid_data=fluid_data,
+                      pipe_data=pipe_data,
+                      load=load)
 borefield.set_max_avg_fluid_temperature(20)
 borefield.set_min_avg_fluid_temperature(3)
 
@@ -61,31 +62,31 @@ range_rectangle_min = {}
 
 @cache
 def line(x, y):
-    temp = gt.boreholes.rectangle_field(x, y, max(B_max, width / x), max(B_max, length / y), 100, 0.7, 0.07)
+    temp = gt.borefield.Borefield.rectangle_field(x, y, max(B_max, width / x), max(B_max, length / y), 100, 0.7, 0.07)
     return len(temp), temp
 
 
 @cache
 def L(x, y):
-    temp = gt.boreholes.L_shaped_field(x, y, max(B_max, width / x), max(B_max, length / y), 100, 0.7, 0.07)
+    temp = gt.borefield.Borefield.L_shaped_field(x, y, max(B_max, width / x), max(B_max, length / y), 100, 0.7, 0.07)
     return len(temp), temp
 
 
 @cache
 def U(x, y):
-    temp = gt.boreholes.U_shaped_field(x, y, max(B_max, width / x), max(B_max, length / y), 100, 0.7, 0.07)
+    temp = gt.borefield.Borefield.U_shaped_field(x, y, max(B_max, width / x), max(B_max, length / y), 100, 0.7, 0.07)
     return len(temp), temp
 
 
 @cache
 def box(x, y):
-    temp = gt.boreholes.box_shaped_field(x, y, max(B_max, width / x), max(B_max, length / y), 100, 0.7, 0.07)
+    temp = gt.borefield.Borefield.box_shaped_field(x, y, max(B_max, width / x), max(B_max, length / y), 100, 0.7, 0.07)
     return len(temp), temp
 
 
 @cache
 def rectangle(x, y):
-    temp = gt.boreholes.rectangle_field(x, y, max(B_max, width / x), max(B_max, length / y), 100, 0.7, 0.07)
+    temp = gt.borefield.Borefield.rectangle_field(x, y, max(B_max, width / x), max(B_max, length / y), 100, 0.7, 0.07)
     return len(temp), temp
 
 

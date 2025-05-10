@@ -5,6 +5,15 @@ import numpy as np
 from GHEtool import ResultsMonthly, ResultsHourly
 
 
+def test_empty():
+    results = ResultsMonthly()
+    assert results.min_temperature is None
+    assert results.max_temperature is None
+    results = ResultsHourly()
+    assert results.min_temperature is None
+    assert results.max_temperature is None
+
+
 def test_monthly():
     results = ResultsMonthly(np.linspace(0, 120 - 1, 120),
                              np.linspace(0, 120 - 1, 120) * 2,
@@ -16,6 +25,8 @@ def test_monthly():
     assert np.array_equal(results.peak_injection, np.linspace(0, 120 - 1, 120) * 3)
     assert np.array_equal(results.monthly_extraction, np.linspace(0, 120 - 1, 120) * 4)
     assert np.array_equal(results.monthly_injection, np.linspace(0, 120 - 1, 120) * 5)
+    assert np.isclose(np.min(results.peak_extraction), results.min_temperature)
+    assert np.isclose(np.max(results.peak_injection), results.max_temperature)
 
 
 def test_hourly():
@@ -24,6 +35,8 @@ def test_hourly():
     assert np.array_equal(results.Tf, np.array([1, 5, 6]))
     assert np.array_equal(results.peak_extraction, np.array([1, 5, 6]))
     assert np.array_equal(results.peak_injection, np.array([1, 5, 6]))
+    assert np.isclose(np.min(results.peak_extraction), results.min_temperature)
+    assert np.isclose(np.max(results.peak_extraction), results.max_temperature)
 
 
 def test_eq():

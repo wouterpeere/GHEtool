@@ -12,7 +12,7 @@ from typing import Tuple
 
 # initiate ground data
 data = GroundFluxTemperature(2.1, 10, flux=0.07)
-borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
+borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
 
 cop = COP(np.array(
     [4.42, 5.21, 6.04, 7.52, 9.5, 3.99, 4.58, 5.21, 6.02, 6.83, 3.86, 4.39, 4.97,
@@ -39,7 +39,7 @@ def L3_sizing() -> Tuple[float, float]:
     borefield.set_max_avg_fluid_temperature(25)
 
     # set ground data in borefield
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
 
     # set Rb
     borefield.Rb = 0.12
@@ -77,7 +77,7 @@ def L4_sizing() -> Tuple[float, float]:
     borefield.set_max_avg_fluid_temperature(25)
 
     # set ground data in borefield
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
 
     # set Rb
     borefield.Rb = 0.12

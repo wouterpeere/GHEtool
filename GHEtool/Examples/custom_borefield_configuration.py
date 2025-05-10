@@ -45,7 +45,7 @@ def custom_borefield_configuration():
     # create the borefield object
     borefield = Borefield(load=load)
 
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
     borefield.Rb = 0.2
 
     # set temperature boundaries
@@ -53,7 +53,7 @@ def custom_borefield_configuration():
     borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
 
     # create custom borefield based on pygfunction
-    custom_field = gt.boreholes.L_shaped_field(N_1=4, N_2=5, B_1=5., B_2=5., H=100., D=4, r_b=0.05)
+    custom_field = gt.borefield.Borefield.L_shaped_field(N_1=4, N_2=5, B_1=5., B_2=5., H=100., D=4, r_b=0.05)
 
     # set the custom borefield (so the number of boreholes is correct)
     borefield.set_borefield(custom_field)

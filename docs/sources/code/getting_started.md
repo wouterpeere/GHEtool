@@ -2,18 +2,19 @@
 
 ## Requirements
 
-This code is tested with Python 3.9, 3.10, 3.11 and 3.12 and requires the following libraries (the versions
+This code is tested with Python 3.9, 3.10, 3.11, 3.12 and 3.13 and requires the following libraries (the versions
 mentioned are the ones with which the code is tested)
 
-* matplotlib >= 3.5.2
-* numpy >= 1.23.1
+* matplotlib >= 3.9.2
+* numpy >= 1.26.4
 * pandas >= 1.4.3
-* pygfunction >= 2.2.3
+* pygfunction >= 2.3.0
 * scipy >= 1.8.1
+* secondarycoolantprops >= 1.1
 
 For the tests
 
-* Pytest >= 7.1.2
+* pytest >= 7.1.2
 
 For the active/passive example
 
@@ -83,7 +84,7 @@ Within GHEtool, there are multiple ways of setting the ground data. Currently, y
   gradient.
 
 * You can also use multiple ground layers to define your ground model. Please take a look
-  at [our example](https://docs.ghetool.eu/en/latest/sources/code/Examples/start_in_different_month.html).
+  at [our example](https://ghetool.readthedocs.io/en/latest/sources/code/Examples/start_in_different_month.html).
 
 Please note that it is possible to add your own ground types by inheriting the attributes from the abstract _GroundData
 class.
@@ -105,9 +106,18 @@ Concretely, the classes you can use are:
 Please note that it is possible to add your own pipe types by inheriting the attributes from the abstract _PipeData
 class.
 
-### Fluid data
+#### Fluid data
 
-You can set the fluid data by using the FluidData class. In the future, more fluid data classes will be made available.
+You can set the fluid data by using the FluidData class.
+
+* _ConstantFluidData_: Temperature independent fluid properties
+* _TemperatureDependentFluidData_: Temperature dependent fluid data (Water, MPG, MEG, MMA, MEA)
+
+#### Flow rate data
+
+Currently, only constant flow rates are compatible with GHEtool, but this will change in the future.
+
+* _ConstantFlowRate_
 
 #### Efficiency data
 
@@ -233,7 +243,7 @@ if you want more complex designs.
 import pygfunction as gt
 
 # set a rectangular borefield
-borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
+borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 110, 1, 0.075)
 borefield.set_borefield(borefield_gt)
 ```
 

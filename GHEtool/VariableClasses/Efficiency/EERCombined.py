@@ -198,10 +198,13 @@ class EERCombined:
 
         return True
 
-    def __repr__(self):
-        temp = f'\nActive cooling:\n\t{self.efficiency_active_cooling.__repr__()}\nPassive cooling:\n\t{self.efficiency_passive_cooling.__repr__()}'
+    def __export__(self):
+        temp = {
+            'Active cooling': self.efficiency_active_cooling.__export__(),
+            'Passive cooling': self.efficiency_passive_cooling.__export__()
+        }
         if self.threshold_temperature is not None:
-            temp += f'\nWith active cooling above [°C]: {self.threshold_temperature}'
+            temp['With active cooling above [°C]'] = self.threshold_temperature
         if self.months_active_cooling is not None:
-            temp += f'\nWith active cooling in months [-]: {self.months_active_cooling}'
+            temp['With active cooling in months [-]'] = list(self.months_active_cooling)
         return temp
