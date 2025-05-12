@@ -33,6 +33,8 @@ class DynamicsBH(object):
 
         print('in dynamic model')
 
+        #loading all necessary variables and adding to self
+
         self.boreholes = boreholes
         self.ground_ghe = ground_data
         self.fluid_ghe = fluid_data
@@ -45,22 +47,33 @@ class DynamicsBH(object):
 
         self.g_lt = interp1d(self.time, self.gFunc)
 
-        # make function based on number of boreholes (1 or more) and half of the distance between boreholes
+        # The number of boreholes here is calculated for two things: (1) For a single borehole the fluid_factor should be set 
+        # to 1, since no connections (except if the distance to the collector is very far and know) between boreholes are present
+        # and therefore the only fluid capacity is the one in the borehole itself (2) To calculate the far field radius of the 
+        # 1D numerical model. For a single borehole the far field radius is set to 10m, for a field the far field radius is
+        # set to half of the distance between two boreholes. 
+
+        # To do: Future development on above topics should include: (1) Calculating the length of the piping connection from the coordinates
+        # maybe also include an option to give the piping from the closest borehole to the collector, or option to give coordinates 
+        # of collector and function calculated al the piping including the pipes going to the collector (2) for not trivial (fixed)
+        # distance between boreholes an 'average' borehole-to-borehole distance should be calculated to decide on the far field radius
+
+
         number_of_boreholes = len(self.boreholes)
 
-        # Fluid factor takes into account the fluid inside of the system but outside of the boreholes
-        # To do: calculate fluid factor based on borehole configuration
+        # Definition: Fluid factor takes into account the fluid inside of the system but outside of the boreholes
         if number_of_boreholes == 1:
             self.fluid_factor = 1
         else:
-            self.fluid_factor = 3
+            self.fluid_factor = 2
 
-        # number of pipes
-        # 1 for single U tube, 2 for dubble U tube (not possible yet) 
+        # Definition: number of pipes refers to single or double U pipe. Depending on this value a different equivalent borehole 
+        # model (different equivalent radia and number of cells) is choosen to represent the borehole. 1 for single U tube, 2 for dubble U tube 
+        # To do: extend method to coaxial pipes
         self.u_tube = self.pipes_ghe.number_of_pipes
 
         # Calculate the far field radius, which influences the number of ground cells
-        # To do: only works for rectangular field, adjust for more general approaches
+        # To do: only works for rectangular field, adjust for more general approaches (as discussed above)
         if number_of_boreholes == 0:
             ghe_logger.warning(f"Borefield should consist of at least one borehole")
         elif number_of_boreholes < 4:
@@ -71,8 +84,13 @@ class DynamicsBH(object):
 
         print(f"far field radius used: {far_field_radius}")
 
+        # Number of ground cells for 10m is set to 500 (Xu&Spitler 2006), scaling is introduced for far field radia smaller 
+        # then 10m
         self.num_soil_cells = int(far_field_radius/10*500)
-        self.init_temp = self.ground_ghe.Tg
+
+        # Reference temperature is now taken di
+        #self.init_temp = self.ground_ghe.Tg
+        self.init_temp = 0
 
         # Create a namedtuple type
         ShortTermEffectsParameters = namedtuple('ShortTermEffectsParameters', short_term_effects_parameters.keys())
