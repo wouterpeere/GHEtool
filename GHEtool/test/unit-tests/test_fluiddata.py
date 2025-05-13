@@ -202,3 +202,7 @@ def test_freezing_point():
 
     assert not fluid.test_freezing(-5)
     assert fluid.test_freezing(-50)
+
+
+def test_commercial_fluids():
+    fluid = TemperatureDependentFluidData('Kilfrost GEO', 25)
