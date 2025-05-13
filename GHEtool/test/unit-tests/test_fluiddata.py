@@ -205,4 +205,7 @@ def test_freezing_point():
 
 
 def test_commercial_fluids():
+    from GHEtool.VariableClasses.FluidData.CommercialFluids.Kilfrost_GEO import KilfrostGEO
+    fluid = KilfrostGEO(0.3)
+    fluid.conductivity(10)
     fluid = TemperatureDependentFluidData('Kilfrost GEO', 25)

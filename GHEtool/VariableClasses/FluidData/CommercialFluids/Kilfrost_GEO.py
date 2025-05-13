@@ -5,11 +5,11 @@ from GHEtool.VariableClasses.FluidData.CommercialFluids._CommercialFluids import
 
 class KilfrostGEO(_CommercialFluids):
 
-    def __init__(self, percentage: float):
+    def __init__(self, volume_ratio: float):
         super().__init__()
 
         self._temperatures = np.arange(-35, 45, 5)
-        self._volume_percentages = np.array([20, 24, 32, 35, 39, 50, 60]) / 100
+        self._volume_ratio_array = np.array([20, 24, 32, 35, 39, 50, 60]) / 100
 
         self._freezing_array = np.array([-8.3, -10, -15, -17.5, -20, -30, -40])
         self._k_f_array = np.array([
@@ -34,5 +34,5 @@ class KilfrostGEO(_CommercialFluids):
         self._rho_array = np.array([])
         self._cp_array = np.array([])
 
-        if self.check_percentage(percentage):
-            self._percentage = percentage
+        if self.check_volume_ratio(volume_ratio):
+            self._volume_ratio = volume_ratio
