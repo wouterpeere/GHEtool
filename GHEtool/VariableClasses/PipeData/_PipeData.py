@@ -85,7 +85,7 @@ class _PipeData(BaseClass, ABC):
 
     @abc.abstractmethod
     def pressure_drop(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float,
-                      **kwargs) -> float:
+                      include_bend: bool = True, **kwargs) -> float:
         """
         Calculates the pressure drop across the entire borehole.
         It assumed that the U-tubes are all connected in parallel.
@@ -98,6 +98,8 @@ class _PipeData(BaseClass, ABC):
             Flow rate data
         borehole_length : float
             Borehole length [m]
+        include_bend : bool
+            True if the losses in the bend should be included
 
         Returns
         -------

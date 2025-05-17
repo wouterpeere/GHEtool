@@ -220,9 +220,12 @@ def test_pressure_drop():
     single = MultipleUTube(1, 0.02, 0.02, 0.4, 0.05, 1)
     double = MultipleUTube(1, 0.013, 0.016, 0.4, 0.05, 2)
     assert np.isclose(single.pressure_drop(fluid_data, flow_data, 100), 4.474549607676448)
+    assert np.isclose(single.pressure_drop(fluid_data, flow_data, 100, False), 4.4688388696204555)
     assert np.isclose(double.pressure_drop(fluid_data, flow_data, 100), 10.347836812519452)
+    assert np.isclose(double.pressure_drop(fluid_data, flow_data, 100, False), 10.339838859988387)
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
     assert np.isclose(coaxial.pressure_drop(fluid_data, flow_data, 100), 0.1639237572210245)
+    assert np.isclose(coaxial.pressure_drop(fluid_data, flow_data, 100, False), 0.16366613552554135)
 
 
 def test_repr_():

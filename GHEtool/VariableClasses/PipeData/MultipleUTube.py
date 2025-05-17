@@ -140,7 +140,7 @@ class MultipleUTube(_PipeData):
         return fluid_data.rho(**kwargs) * u * self.r_in * 2 / fluid_data.mu(**kwargs)
 
     def pressure_drop(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float,
-                      **kwargs) -> float:
+                      include_bend: bool = True, **kwargs) -> float:
         """
         Calculates the pressure drop across the entire borehole.
         It assumed that the U-tubes are all connected in parallel.
@@ -153,6 +153,8 @@ class MultipleUTube(_PipeData):
             Flow rate data
         borehole_length : float
             Borehole length [m]
+        include_bend : bool
+            True if the losses in the bend should be included
 
         Returns
         -------
@@ -170,9 +172,12 @@ class MultipleUTube(_PipeData):
         A = pi * self.r_in ** 2
         V = (flow_rate_data.vfr(fluid_data=fluid_data, **kwargs) / 1000) / A / self.number_of_pipes
 
-        # add 0.2 for the local losses
-        # (source: https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html)
-        return ((fd * (borehole_length * 2) / (2 * self.r_in) + 0.2) * fluid_data.rho(**kwargs) * V ** 2 / 2) / 1000
+        bend = 0
+        if include_bend:
+            # add 0.2 for the local losses
+            # (source: https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html)
+            bend = 0.2
+        return ((fd * (borehole_length * 2) / (2 * self.r_in) + bend) * fluid_data.rho(**kwargs) * V ** 2 / 2) / 1000
 
     def draw_borehole_internal(self, r_b: float) -> None:
         """
