@@ -162,7 +162,7 @@ def test_create_constant():
 
 def test_repr_temperature_dependent_fluid_data():
     fluid = TemperatureDependentFluidData('MPG', 25)
-    assert fluid.__export__() == {'name': 'MPG', 'percentage': 25}
+    assert fluid.__export__() == {'name': 'MPG', 'percentage': 25, 'type': 'mass percentage'}
 
 
 def test_check_values_temperature_dependent_fluid_data():

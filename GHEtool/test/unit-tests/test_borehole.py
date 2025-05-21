@@ -232,7 +232,7 @@ def test_saved_data_reynolds():
     assert borehole._stored_interp_data == {'D': 1,
                                             'H': 100,
                                             'flow': "{'vfr [l/s]': 0.3}",
-                                            'fluid': "{'name': 'MPG', 'percentage': 25}",
+                                            'fluid': "{'name': 'MPG', 'percentage': 25, 'type': 'mass percentage'}",
                                             'k_s': 3,
                                             'pipe': "{'type': 'U', 'nb_of_tubes': 2, 'thickness [mm]': 5.0, 'diameter "
                                                     "[mm]': 4.0, 'spacing [mm]': 50.0, 'k_g [W/(m·K)]': 1, 'k_p "
@@ -243,7 +243,7 @@ def test_saved_data_reynolds():
     assert borehole._stored_interp_data == {'D': 1,
                                             'H': 110,
                                             'flow': "{'vfr [l/s]': 0.3}",
-                                            'fluid': "{'name': 'MPG', 'percentage': 25}",
+                                            'fluid': "{'name': 'MPG', 'percentage': 25, 'type': 'mass percentage'}",
                                             'k_s': 3,
                                             'pipe': "{'type': 'U', 'nb_of_tubes': 2, 'thickness [mm]': 5.0, 'diameter "
                                                     "[mm]': 4.0, 'spacing [mm]': 50.0, 'k_g [W/(m·K)]': 1, 'k_p "
