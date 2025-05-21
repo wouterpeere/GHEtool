@@ -24,7 +24,7 @@ website [https://GHEtool.eu](https://GHEtool.eu) for more information.
 
 ### Read The Docs
 
-GHEtool has an elaborate documentation were all the functionalities of the tool are explained, with examples, literature
+GHEtool has an elaborate documentation where all the functionalities of the tool are explained, with examples, literature
 and validation. This can be found
 on [https://ghetool.readthedocs.io/en/latest/](https://ghetool.readthedocs.io/en/latest/).
 
@@ -102,8 +102,8 @@ conda install GHEtool
 
 Developers can clone this repository.
 
-It is a good practise to use virtual environments (venv) when working on a (new) Python project so different Python and
-package versions don't conflict with eachother. For GHEtool, Python 3.8 or higher is recommended. General information
+It is a good practice to use virtual environments (venv) when working on a (new) Python project so different Python and
+package versions don't conflict with each other. For GHEtool, Python 3.8 or higher is recommended. General information
 about Python virtual environments can be found [here](https://docs.Python.org/3.9/library/venv.html) and
 in [this article](https://www.freecodecamp.org/news/how-to-setup-virtual-environments-in-python/).
 
@@ -115,14 +115,14 @@ To check whether everything is installed correctly, run the following command
 pytest --pyargs GHEtool
 ```
 
-This runs some predefined cases to see whether all the internal dependencies work correctly. All test should pass
+This runs some predefined cases to see whether all the internal dependencies work correctly. All tests should pass
 successfully.
 
 ## Get started with GHEtool
 
 ### Building blocks of GHEtool
 
-GHEtool is a flexible package that can be extend with methods
+GHEtool is a flexible package that can be extended with methods
 from [pygfunction](https://pygfunction.readthedocs.io/en/stable/).
 To work efficiently with GHEtool, it is important to understand the main structure of the package.
 
@@ -425,7 +425,7 @@ Peere, W. (2024). Are Rules of Thumb Misleading? The Complexity of Borefield Siz
 Software. _IEA HPT Magazine 42_(1), https://doi.org/10.23697/7nec-0g78.
 
 Meertens, L. (2024). Invloed van dynamische korte-termijneffecten op de dimensionering van geothermische boorvelden.
-Master thesis, Department of Mechanical Engineering, KU Lueven, Belgium.
+Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
 
 Weynjes, J. (2023). Methode voor het dimensioneren van een geothermisch systeem met regeneratie binnen verschillende
 ESCO-structuren. Master thesis, Department of Mechanical Engineering, KU Leuven, Belgium.
