@@ -202,3 +202,22 @@ def test_freezing_point():
 
     assert not fluid.test_freezing(-5)
     assert fluid.test_freezing(-50)
+
+
+def test_with_volume_percentage():
+    fluid_vol_per = TemperatureDependentFluidData('MPG', 25, mass_percentage=False)
+    mass_per = fluid_vol_per._convert_to_mass_percentage(25)
+    fluid_mass_per = TemperatureDependentFluidData('MPG', mass_per)
+    assert fluid_vol_per.create_constant(5) == fluid_mass_per.create_constant(5)
+
+
+def test_stability_convert_percentages():
+    # check circular behaviour
+    fluid = TemperatureDependentFluidData('MPG', 20)
+
+    assert np.isclose(20, fluid._convert_to_vol_percentage(fluid._convert_to_mass_percentage(20)))
+    assert np.isclose(5, fluid._convert_to_vol_percentage(fluid._convert_to_mass_percentage(5)))
+
+    fluid = TemperatureDependentFluidData('MEG', 20)
+    assert np.isclose(20, fluid._convert_to_vol_percentage(fluid._convert_to_mass_percentage(20)))
+    assert np.isclose(5, fluid._convert_to_vol_percentage(fluid._convert_to_mass_percentage(5)))
