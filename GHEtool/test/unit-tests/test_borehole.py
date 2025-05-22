@@ -171,7 +171,7 @@ def test_repr_():
                       'mu [Pa·s]': 0.001,
                       'nu [m²/s]': 1.002004008016032e-06,
                       'rho [kg/m³]': 998},
-            'pipe': {'diameter [mm]': 4.0,
+            'pipe': {'diameter [mm]': 40,
                      'epsilon [mm]': 0.001,
                      'k_g [W/(m·K)]': 1,
                      'k_p [W/(m·K)]': 0.4,
@@ -235,7 +235,7 @@ def test_saved_data_reynolds():
                                             'fluid': "{'name': 'MPG', 'percentage': 25, 'type': 'mass percentage'}",
                                             'k_s': 3,
                                             'pipe': "{'type': 'U', 'nb_of_tubes': 2, 'thickness [mm]': 5.0, 'diameter "
-                                                    "[mm]': 4.0, 'spacing [mm]': 50.0, 'k_g [W/(m·K)]': 1, 'k_p "
+                                                    "[mm]': 40, 'spacing [mm]': 50.0, 'k_g [W/(m·K)]': 1, 'k_p "
                                                     "[W/(m·K)]': 0.4, 'epsilon [mm]': 0.001}",
                                             'r_b': 0.075}
     resistance2 = borehole.calculate_Rb(110, 1, 0.075, 3, temperature=np.array([0, 1, 2, 5]))
@@ -246,7 +246,7 @@ def test_saved_data_reynolds():
                                             'fluid': "{'name': 'MPG', 'percentage': 25, 'type': 'mass percentage'}",
                                             'k_s': 3,
                                             'pipe': "{'type': 'U', 'nb_of_tubes': 2, 'thickness [mm]': 5.0, 'diameter "
-                                                    "[mm]': 4.0, 'spacing [mm]': 50.0, 'k_g [W/(m·K)]': 1, 'k_p "
+                                                    "[mm]': 40, 'spacing [mm]': 50.0, 'k_g [W/(m·K)]': 1, 'k_p "
                                                     "[W/(m·K)]': 0.4, 'epsilon [mm]': 0.001}",
                                             'r_b': 0.075}
     assert np.allclose(resistance1, borehole.calculate_Rb(100, 1, 0.075, 3, temperature=np.array([0, 1, 2, 5])))

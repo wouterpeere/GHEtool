@@ -19,6 +19,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - The __repr__ of the different classes. It now returns a dictionary.
 - Remove ghe_logger since no longer used.
 
+### Fixed
+
+- Fix export multiple U pipes (issue #352).
+
 ## [2.3.2] - 2025-04-02
 
 ### Added

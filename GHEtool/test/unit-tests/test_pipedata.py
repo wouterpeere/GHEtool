@@ -231,7 +231,7 @@ def test_repr_():
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
     separatus = Separatus(2)
 
-    assert {'diameter [mm]': 4.0,
+    assert {'diameter [mm]': 40,
             'epsilon [mm]': 0.001,
             'k_g [W/(m·K)]': 1,
             'k_p [W/(m·K)]': 0.4,
@@ -239,7 +239,7 @@ def test_repr_():
             'spacing [mm]': 50.0,
             'thickness [mm]': 2.0,
             'type': 'U'} == single.__export__()
-    assert {'diameter [mm]': 3.2,
+    assert {'diameter [mm]': 32,
             'epsilon [mm]': 0.001,
             'k_g [W/(m·K)]': 1,
             'k_p [W/(m·K)]': 0.4,
