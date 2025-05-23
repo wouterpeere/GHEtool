@@ -11,12 +11,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Temperature dependent fluid properties (issue #143).
 - Freezing point to fluid data (issue #314).
+- Mass and volume percentage support(issue #350).
+- Add Thermox DTX and Coolflow NFT
 
 ### Changed
 
 - Changed back-end to be compatible with pygfunction 2.3.0 (issue #345).
 - The __repr__ of the different classes. It now returns a dictionary.
 - Remove ghe_logger since no longer used.
+- Make Re a property in borefield just like Rb.
+- Calculate Re and Rb at minimum temperature or, if there is no temperature, the Tf_min.
+
+### Fixed
+
+- Fix export multiple U pipes (issue #352).
 
 ## [2.3.2] - 2025-04-02
 
