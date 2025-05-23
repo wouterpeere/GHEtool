@@ -9,7 +9,7 @@ from scp.base_melinder import BaseMelinder
 
 from GHEtool.VariableClasses.FluidData._FluidData import _FluidData
 from GHEtool.VariableClasses.FluidData.CommercialFluids._CommercialFluids import _CommercialFluids
-from GHEtool.VariableClasses.FluidData.CommercialFluids import ThermoxDTX
+from GHEtool.VariableClasses.FluidData.CommercialFluids import *
 from GHEtool.VariableClasses.FluidData.ConstantFluidData import ConstantFluidData
 from GHEtool.VariableClasses.BaseClass import BaseClass
 from typing import Union
@@ -153,6 +153,9 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
             return fluid, fluid.freeze_point(percentage / 100)
         if name == 'Thermox DTX':
             fluid = ThermoxDTX(percentage / 100)
+            return fluid, fluid.freeze_point(percentage / 100)
+        if name == 'Coolflow NTP':
+            fluid = CoolflowNTP(percentage / 100)
             return fluid, fluid.freeze_point(percentage / 100)
         raise ValueError(f'The fluid {name} is not yet supported by GHEtool.')
 
