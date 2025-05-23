@@ -9,7 +9,7 @@ from scp.base_melinder import BaseMelinder
 
 from GHEtool.VariableClasses.FluidData._FluidData import _FluidData
 from GHEtool.VariableClasses.FluidData.CommercialFluids._CommercialFluids import _CommercialFluids
-from GHEtool.VariableClasses.FluidData.CommercialFluids import KilfrostGEO
+from GHEtool.VariableClasses.FluidData.CommercialFluids import ThermoxDTX
 from GHEtool.VariableClasses.FluidData.ConstantFluidData import ConstantFluidData
 from GHEtool.VariableClasses.BaseClass import BaseClass
 from typing import Union
@@ -47,15 +47,15 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
         self.set_fluid(name, percentage)
 
         if isinstance(self._fluid, _CommercialFluids):
-            self._spacing = self._fluid._temperatures
+            self._spacing = self._fluid._temperatures[::-1]
         else:
             # create interp array
             self._spacing = np.linspace(self.freezing_point, 100, TemperatureDependentFluidData.NB_OF_SAMPLES)
 
-        self._k_f_array = np.array([self._fluid.conductivity(i) for i in self._spacing])
-        self._mu_array = np.array([self._fluid.viscosity(i) for i in self._spacing])
-        self._rho_array = np.array([self._fluid.density(i) for i in self._spacing])
-        self._cp_array = np.array([self._fluid.specific_heat(i) for i in self._spacing])
+        self._k_f_array = np.array([float(self._fluid.conductivity(i)) for i in self._spacing])
+        self._mu_array = np.array([float(self._fluid.viscosity(i)) for i in self._spacing])
+        self._rho_array = np.array([float(self._fluid.density(i)) for i in self._spacing])
+        self._cp_array = np.array([float(self._fluid.specific_heat(i)) for i in self._spacing])
 
     def _calc_density_antifreeze(self, percentage: float = 30) -> float:
         """
@@ -151,6 +151,9 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
         if name == 'MEA':
             fluid = EthylAlcohol(percentage / 100)
             return fluid, fluid.freeze_point(percentage / 100)
+        if name == 'Thermox DTX':
+            fluid = ThermoxDTX(percentage / 100)
+            return fluid, fluid.freeze_point(percentage / 100)
         raise ValueError(f'The fluid {name} is not yet supported by GHEtool.')
 
     def set_fluid(self, name: str, percentage: float) -> None:
@@ -172,9 +175,9 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
         if name in ['Water', 'MPG', 'MEG', 'MMA', 'MEA'] and not self._mass_percentage:
             # these properties are saved as mass percentage so the percentage should be converted
             percentage = self._convert_to_mass_percentage(percentage)
-        # if name not in ['Water', 'MPG', 'MEG', 'MMA', 'MEA'] and self._mass_percentage:
-        #     # these properties are saved as volume percentage so the percentage should be converted
-        #     percentage = self._convert_to_vol_percentage(percentage)
+        if name not in ['Water', 'MPG', 'MEG', 'MMA', 'MEA'] and self._mass_percentage:
+            # these properties are saved as volume percentage so the percentage should be converted
+            percentage = self._convert_to_vol_percentage(percentage)
 
         self._fluid, self._freezing_point = self._get_fluid(name, percentage)
 

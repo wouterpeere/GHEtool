@@ -1,1 +1,1 @@
-from .Kilfrost_GEO import KilfrostGEO
+from .ThermoxDTX import ThermoxDTX

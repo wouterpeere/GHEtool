@@ -8,7 +8,7 @@ import scipy as sc
 
 class _CommercialFluids:
 
-    def __init__(self):
+    def __init__(self, _volume_ratio):
         self._temperatures = np.array([])
         self._volume_ratio_array = np.array([])
         self._volume_ratio = 0
@@ -47,18 +47,18 @@ class _CommercialFluids:
         if self.check_volume_ratio(volume_ratio):
             return np.interp(volume_ratio, self._volume_ratio_array, self._freezing_array)
 
-    def conductivity(self, temperature: float, volume_ratio: float = None):
+    def conductivity(self, temp: float, volume_ratio: float = None):
         return sc.interpolate.interpn((self._temperatures, self._volume_ratio_array), self._k_f_array,
-                                      (temperature, self._volume_ratio if volume_ratio is None else volume_ratio))
+                                      (temp, self._volume_ratio if volume_ratio is None else volume_ratio))
 
-    def viscosity(self, temperature: float, percentage: float = None):
-        return sc.interpolate.interpn((self._volume_ratio, self._temperatures), self._mu_array,
-                                      (temperature, self._percentage if percentage is None else percentage))
+    def viscosity(self, temp: float, volume_ratio: float = None):
+        return sc.interpolate.interpn((self._temperatures, self._volume_ratio_array), self._mu_array,
+                                      (temp, self._volume_ratio if volume_ratio is None else volume_ratio))
 
-    def density(self, temperature: float, percentage: float = None):
-        return sc.interpolate.interpn((self._volume_ratio, self._temperatures), self._rho_array,
-                                      (temperature, self._percentage if percentage is None else percentage))
+    def density(self, temp: float, volume_ratio: float = None):
+        return sc.interpolate.interpn((self._temperatures, self._volume_ratio_array), self._rho_array,
+                                      (temp, self._volume_ratio if volume_ratio is None else volume_ratio))
 
-    def specific_heat(self, temperature: float, percentage: float = None):
-        return sc.interpolate.interpn((self._volume_ratio, self._temperatures), self._cp_array,
-                                      (temperature, self._percentage if percentage is None else percentage))
+    def specific_heat(self, temp: float, volume_ratio: float = None):
+        return sc.interpolate.interpn((self._temperatures, self._volume_ratio_array), self._cp_array,
+                                      (temp, self._volume_ratio if volume_ratio is None else volume_ratio))
