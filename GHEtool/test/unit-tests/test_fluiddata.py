@@ -262,3 +262,6 @@ def test_commercial_fluids_data():
     assert np.isclose(fluid.rho(10), 1037)
     assert np.isclose(fluid.cp(10), 3820)
     assert np.isclose(fluid.mu(10), 5.46 * fluid.rho(10) * 10e-6)
+
+    with pytest.raises(ValueError):
+        fluid = ThermoxDTX(100)
