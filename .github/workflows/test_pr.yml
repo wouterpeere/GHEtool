@@ -10,7 +10,7 @@ on:
 jobs:
 
   test_methods:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.12
@@ -31,7 +31,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
 
   test_general:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.12
@@ -52,7 +52,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
 
   test_examples:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.12
@@ -73,7 +73,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
 
   test_validation:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.12
@@ -97,8 +97,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
-        python-version: [ '3.9', '3.10', '3.11', '3.12' ]
+        os: [ windows-latest, macos-latest ]
+        python-version: [ '3.9', '3.10', '3.11', '3.12', '3.13' ]
 
     steps:
       - uses: actions/checkout@v3
