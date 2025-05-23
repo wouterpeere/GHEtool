@@ -1,6 +1,7 @@
 import pytest
 
 from GHEtool import *
+from GHEtool.VariableClasses.FluidData.CommercialFluids import *
 
 import numpy as np
 import pygfunction as gt
@@ -221,3 +222,46 @@ def test_stability_convert_percentages():
     fluid = TemperatureDependentFluidData('MEG', 20)
     assert np.isclose(20, fluid._convert_to_vol_percentage(fluid._convert_to_mass_percentage(20)))
     assert np.isclose(5, fluid._convert_to_vol_percentage(fluid._convert_to_mass_percentage(5)))
+
+    fluid = TemperatureDependentFluidData('Thermox DTX', 28, mass_percentage=False)
+    assert np.isclose(20, fluid._convert_to_vol_percentage(fluid._convert_to_mass_percentage(20)))
+    assert np.isclose(5, fluid._convert_to_vol_percentage(fluid._convert_to_mass_percentage(5)))
+
+
+def test_commercial_fluids_data():
+    fluid = ThermoxDTX(0.28)
+    assert np.isclose(fluid.freeze_point(0.28), -15)
+    assert np.isclose(fluid.conductivity(10), 0.475)
+    assert np.isclose(fluid.conductivity(5), 0.473)
+    assert np.isclose(fluid.density(10), 1046)
+    assert np.isclose(fluid.specific_heat(10), 3780)
+    assert np.isclose(fluid.viscosity(10), 3.28 * fluid.density(10) * 10e-6)
+
+    fluid = TemperatureDependentFluidData('Thermox DTX', 28, mass_percentage=False)
+    assert np.isclose(fluid.freezing_point, -15)
+    assert np.isclose(fluid.k_f(10), 0.475)
+    assert np.isclose(fluid.k_f(5), 0.473)
+    assert np.isclose(fluid.rho(10), 1046)
+    assert np.isclose(fluid.cp(10), 3780)
+    assert np.isclose(fluid.mu(10), 3.28 * fluid.rho(10) * 10e-6)
+
+    assert (np.isclose(fluid.rho(100), fluid.rho(80)))
+
+    fluid = CoolflowNTP(0.33)
+    assert np.isclose(fluid.freeze_point(0.33), -15)
+    assert np.isclose(fluid.conductivity(10), 0.444)
+    assert np.isclose(fluid.conductivity(5), 0.443)
+    assert np.isclose(fluid.density(10), 1037)
+    assert np.isclose(fluid.specific_heat(10), 3820)
+    assert np.isclose(fluid.viscosity(10), 5.46 * fluid.density(10) * 10e-6)
+
+    fluid = TemperatureDependentFluidData('Coolflow NTP', 33, mass_percentage=False)
+    assert np.isclose(fluid.freezing_point, -15)
+    assert np.isclose(fluid.k_f(10), 0.444)
+    assert np.isclose(fluid.k_f(5), 0.443)
+    assert np.isclose(fluid.rho(10), 1037)
+    assert np.isclose(fluid.cp(10), 3820)
+    assert np.isclose(fluid.mu(10), 5.46 * fluid.rho(10) * 10e-6)
+
+    with pytest.raises(ValueError):
+        fluid = ThermoxDTX(100)
