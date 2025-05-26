@@ -16,7 +16,14 @@ import time
 import numpy as np
 import pygfunction as gt
 import sys
-from GHEtool import *
+
+# Add the path of your local GHEtool root folder explicitly to the front of sys.path
+# Adjust this path to where your local GHEtool package root folder is (the one containing the GHEtool directory)
+local_ghetool_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
+if local_ghetool_path not in sys.path:
+    sys.path.insert(0, local_ghetool_path)
+
+print("sys.path:", sys.path)
 
 def test_2_6h_ste():
     # Ground properties

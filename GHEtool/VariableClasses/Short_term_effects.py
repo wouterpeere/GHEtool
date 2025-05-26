@@ -15,6 +15,7 @@ from pygfunction.heat_transfer import finite_line_source, finite_line_source_vec
     finite_line_source_equivalent_boreholes_vectorized
 from pygfunction.networks import network_thermal_resistance
 
+
 from scipy.integrate import quad_vec
 from scipy.special import j0, j1, y0, y1
 
@@ -157,9 +158,16 @@ def __init__(self, boreholes, network, time, boundary_condition,
 
 def _ShortTermEffects(self, time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, borefield, short_term_parameters):
 
-    from .Dynamic_borhole_model import DynamicsBH
+    print('test')
 
-    dynamic_numerical = DynamicsBH(time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, borefield, short_term_parameters)
+    from .Dynamic_borhole_model import GFunctionCalculator
+
+    print("Before instantiation")
+    g = GFunctionCalculator(0, None, [], 0, None, None, None, None, None)
+    print("After instantiation")
+
+
+    dynamic_numerical = GFunctionCalculator(time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, borefield, short_term_parameters)
 
     dynamic_numerical.calc_sts_g_functions()
 
