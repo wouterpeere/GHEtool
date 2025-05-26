@@ -922,7 +922,9 @@ class Borefield(BaseClass):
             Rm = (gfunct_uniform_T[1] - gfunct_uniform_T[0]) / (2 * pi * k_s)
             Rd = (gfunct_uniform_T[0]) / (2 * pi * k_s)
             # calculate the total borehole length
-            L = (qa * Ra + qm * Rm + qh * Rd + qh * self.Rb) / abs(Tf - self._Tg())
+            L = (qa * Ra + qm * Rm + qh * Rd + qh * self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s,
+                                                                         self.depth,
+                                                                         temperature=Tf)) / abs(Tf - self._Tg())
             # updating the borehole length values
             H_prev = self.H
             self.H = L / self.number_of_boreholes
@@ -984,7 +986,8 @@ class Borefield(BaseClass):
             Rh = (gfunc_uniform_T[0]) / (2 * pi * k_s)
 
             # calculate the total length
-            L = (qh * self.Rb + qh * Rh + qm * Rcm + qpm * Rpm) / abs(Tf - self._Tg())
+            L = (qh * self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s, self.depth,
+                                           temperature=Tf) + qh * Rh + qm * Rcm + qpm * Rpm) / abs(Tf - self._Tg())
 
             # updating the borehole lengths
             H_prev = self.H
