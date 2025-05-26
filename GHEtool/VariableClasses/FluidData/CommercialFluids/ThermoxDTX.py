@@ -4,7 +4,6 @@ Visit https://www.hydratech.co.uk/Thermox-DTX for more information.
 """
 
 import numpy as np
-
 from GHEtool.VariableClasses.FluidData.CommercialFluids._CommercialFluids import _CommercialFluids
 
 
@@ -17,6 +16,7 @@ class ThermoxDTX(_CommercialFluids):
         self._volume_ratio_array = np.array([22, 28, 33, 38, 42, 46, 50, 52, 54.3]) / 100
 
         self._freezing_array = np.array([-10, -15, -20, -25, -30, -35, -40, -45, -50])
+
         self._k_f_array = np.array([
             [0.544, 0.508, 0.480, 0.452, 0.431, 0.412, 0.394, 0.386, 0.374],  # 80°C
             [0.541, 0.506, 0.478, 0.451, 0.432, 0.413, 0.396, 0.387, 0.376],  # 75°C
@@ -136,3 +136,6 @@ class ThermoxDTX(_CommercialFluids):
 
         if self.check_volume_ratio(volume_ratio):
             self._volume_ratio = volume_ratio
+
+        # update nan values
+        self._fill_nan_values_vertically()

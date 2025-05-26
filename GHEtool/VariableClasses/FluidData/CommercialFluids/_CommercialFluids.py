@@ -3,6 +3,7 @@ This document contains the framework for all the commercial fluids.
 """
 
 import numpy as np
+import pandas as pd
 import scipy as sc
 
 
@@ -45,20 +46,49 @@ class _CommercialFluids:
 
     def freeze_point(self, volume_ratio: float) -> float:
         if self.check_volume_ratio(volume_ratio):
-            return np.interp(volume_ratio, self._volume_ratio_array, self._freezing_array)
+            return float(np.interp(volume_ratio, self._volume_ratio_array, self._freezing_array))
 
     def conductivity(self, temp: float, volume_ratio: float = None):
-        return sc.interpolate.interpn((self._temperatures, self._volume_ratio_array), self._k_f_array,
-                                      (temp, self._volume_ratio if volume_ratio is None else volume_ratio))
+        temp = sc.interpolate.interpn((self._temperatures, self._volume_ratio_array), self._k_f_array,
+                                      (temp, self._volume_ratio if volume_ratio is None else volume_ratio),
+                                      bounds_error=False)
+        if len(temp) == 1:
+            return float(temp)
+        return temp
 
     def viscosity(self, temp: float, volume_ratio: float = None):
-        return sc.interpolate.interpn((self._temperatures, self._volume_ratio_array), self._mu_array,
-                                      (temp, self._volume_ratio if volume_ratio is None else volume_ratio))
+        temp = sc.interpolate.interpn((self._temperatures, self._volume_ratio_array), self._mu_array,
+                                      (temp, self._volume_ratio if volume_ratio is None else volume_ratio),
+                                      bounds_error=False)
+        if len(temp) == 1:
+            return float(temp)
+        return temp
 
     def density(self, temp: float, volume_ratio: float = None):
-        return sc.interpolate.interpn((self._temperatures, self._volume_ratio_array), self._rho_array,
-                                      (temp, self._volume_ratio if volume_ratio is None else volume_ratio))
+        temp = sc.interpolate.interpn((self._temperatures, self._volume_ratio_array), self._rho_array,
+                                      (temp, self._volume_ratio if volume_ratio is None else volume_ratio),
+                                      bounds_error=False)
+        if len(temp) == 1:
+            return float(temp)
+        return temp
 
     def specific_heat(self, temp: float, volume_ratio: float = None):
-        return sc.interpolate.interpn((self._temperatures, self._volume_ratio_array), self._cp_array,
-                                      (temp, self._volume_ratio if volume_ratio is None else volume_ratio))
+        temp = sc.interpolate.interpn((self._temperatures, self._volume_ratio_array), self._cp_array,
+                                      (temp, self._volume_ratio if volume_ratio is None else volume_ratio),
+                                      bounds_error=False)
+        if len(temp) == 1:
+            return float(temp)
+        return temp
+
+    def _fill_nan_values_vertically(self) -> None:
+        """
+        Fill NaN values in a 2D array by interpolating vertically (column-wise).
+
+        Returns
+        -------
+        None
+        """
+        self._k_f_array = pd.DataFrame(self._k_f_array).interpolate(axis=0, limit_direction='both').to_numpy()
+        self._rho_array = pd.DataFrame(self._rho_array).interpolate(axis=0, limit_direction='both').to_numpy()
+        self._mu_array = pd.DataFrame(self._mu_array).interpolate(axis=0, limit_direction='both').to_numpy()
+        self._cp_array = pd.DataFrame(self._cp_array).interpolate(axis=0, limit_direction='both').to_numpy()

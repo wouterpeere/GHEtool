@@ -130,3 +130,6 @@ class CoolflowNTP(_CommercialFluids):
 
         if self.check_volume_ratio(volume_ratio):
             self._volume_ratio = volume_ratio
+
+        # update nan values
+        self._fill_nan_values_vertically()
