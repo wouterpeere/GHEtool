@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Remove ghe_logger since no longer used.
 - Make Re a property in borefield just like Rb.
 - Calculate Re and Rb at minimum temperature or, if there is no temperature, the Tf_min.
+- Hydraulic calculations of Separatus.
 
 ### Fixed
 
