@@ -4,7 +4,6 @@ Visit https://www.hydratech.co.uk/Thermox-DTX for more information.
 """
 
 import numpy as np
-
 from GHEtool.VariableClasses.FluidData.CommercialFluids._CommercialFluids import _CommercialFluids
 
 
@@ -17,6 +16,7 @@ class ThermoxDTX(_CommercialFluids):
         self._volume_ratio_array = np.array([22, 28, 33, 38, 42, 46, 50, 52, 54.3]) / 100
 
         self._freezing_array = np.array([-10, -15, -20, -25, -30, -35, -40, -45, -50])
+
         self._k_f_array = np.array([
             [0.544, 0.508, 0.480, 0.452, 0.431, 0.412, 0.394, 0.386, 0.374],  # 80°C
             [0.541, 0.506, 0.478, 0.451, 0.432, 0.413, 0.396, 0.387, 0.376],  # 75°C
@@ -103,7 +103,7 @@ class ThermoxDTX(_CommercialFluids):
             [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, 247.80, 395.42, 401.36],  # -40°C
             [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, 627.39, 762.70],  # -45°C
             [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, 1433.75],  # -50°C
-        ]) * 10e-6 * self._rho_array  # convert from kinematic viscosity in mm²/s to dynamic viscosity in Pa.s
+        ]) * 1e-6 * self._rho_array  # convert from kinematic viscosity in mm²/s to dynamic viscosity in Pa.s
         self._cp_array = np.array([
             [3.97, 3.89, 3.82, 3.75, 3.68, 3.62, 3.56, 3.53, 3.49],  # 80°C
             [3.97, 3.88, 3.81, 3.73, 3.67, 3.60, 3.55, 3.52, 3.47],  # 75°C
@@ -136,3 +136,6 @@ class ThermoxDTX(_CommercialFluids):
 
         if self.check_volume_ratio(volume_ratio):
             self._volume_ratio = volume_ratio
+
+        # update nan values
+        self._fill_nan_values_vertically()

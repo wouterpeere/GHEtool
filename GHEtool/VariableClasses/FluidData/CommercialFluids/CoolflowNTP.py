@@ -98,7 +98,7 @@ class CoolflowNTP(_CommercialFluids):
             [np.nan, np.nan, np.nan, np.nan, 171.56, 261.75, 275.05],  # -30°C
             [np.nan, np.nan, np.nan, np.nan, np.nan, 415.79, 391.37],  # -35°C
             [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, 552.34],  # -40°C
-        ]) * 10e-6 * self._rho_array  # convert from kinematic viscosity in mm²/s to dynamic viscosity in Pa.s
+        ]) * 1e-6 * self._rho_array  # convert from kinematic viscosity in mm²/s to dynamic viscosity in Pa.s
 
         self._cp_array = np.array([
             [4.05, 3.97, 3.91, 3.85, 3.79, 3.72, 3.60],  # 80°C
@@ -130,3 +130,6 @@ class CoolflowNTP(_CommercialFluids):
 
         if self.check_volume_ratio(volume_ratio):
             self._volume_ratio = volume_ratio
+
+        # update nan values
+        self._fill_nan_values_vertically()

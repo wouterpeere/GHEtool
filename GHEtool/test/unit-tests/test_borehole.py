@@ -98,6 +98,11 @@ def test_calculate_Rb():
         np.isclose(borehole.calculate_Rb(100, 1, 0.075, 3), 0.09483159131195469)
     assert np.isclose(borehole.calculate_Rb(100, 1, 0.075, 3, temperature=20), 0.13807578911314267)
 
+    borehole.fluid_data = TemperatureDependentFluidData('Thermox DTX', 25)
+    with pytest.raises(TypeError):
+        np.isclose(borehole.calculate_Rb(100, 1, 0.075, 3), 0.09483159131195469)
+    assert np.isclose(borehole.calculate_Rb(100, 1, 0.075, 3, temperature=20), 0.13513271096418708)
+
 
 def test_Rb():
     borehole = Borehole()
@@ -250,3 +255,13 @@ def test_saved_data_reynolds():
                                                     "[W/(m·K)]': 0.4, 'epsilon [mm]': 0.001}",
                                             'r_b': 0.075}
     assert np.allclose(resistance1, borehole.calculate_Rb(100, 1, 0.075, 3, temperature=np.array([0, 1, 2, 5])))
+
+
+def test_saved_data_reynolds_commercial():
+    borehole = Borehole()
+    borehole.pipe_data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2)
+    borehole.fluid_data = TemperatureDependentFluidData('Thermox DTX', 25)
+    borehole.flow_data = ConstantFlowRate(vfr=0.3)
+
+    assert np.allclose([0.12849791, 0.12843995, 0.1283812, 0.12820668],
+                       borehole.calculate_Rb(100, 1, 0.075, 3, temperature=np.array([0, 1, 2, 5])))
