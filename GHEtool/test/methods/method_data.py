@@ -42,7 +42,7 @@ list_of_test_objects.add(SizingObject(borefield, L2_output=52.7, L3_output=52.73
                                       name='Main functionalities (2)'))
 
 borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
-list_of_test_objects.add(SizingObject(borefield, L2_output=70.0197, L3_output=69.37579, quadrant=1,
+list_of_test_objects.add(SizingObject(borefield, L2_output=69.412, L3_output=69.37579, quadrant=1,
                                       name='Main functionalities (2), MPG, variable'))
 borefield.fluid_data = TemperatureDependentFluidData('MPG', 25).create_constant(0)
 list_of_test_objects.add(SizingObject(borefield, L2_output=70.0197, L3_output=69.98384673547854, quadrant=1,
@@ -179,6 +179,17 @@ hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\audit
 borefield.load = hourly_load
 list_of_test_objects.add(SizingObject(borefield, L2_output=142.001, L3_output=141.453, L4_output=103.761, quadrant=1,
                                       name='BS2023 Auditorium'))
+borefield.set_max_avg_fluid_temperature(19)
+borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
+list_of_test_objects.add(SizingObject(borefield, L2_output=119.5189, L3_output=119.3097, L4_output=101.353, quadrant=1,
+                                      name='BS2023 Auditorium (MPG, Variable limit)'))
+borefield.fluid_data = TemperatureDependentFluidData('MPG', 25).create_constant(3)
+list_of_test_objects.add(SizingObject(borefield, L2_output=121.0716, L3_output=120.866, L4_output=102.7196, quadrant=1,
+                                      name='BS2023 Auditorium (MPG, fixed limit)'))
+borefield.fluid_data = fluid_data
+borefield.set_max_avg_fluid_temperature(17)
+list_of_test_objects.add(SizingObject(borefield, L2_output=142.001, L3_output=141.453, L4_output=103.761, quadrant=1,
+                                      name='BS2023 Auditorium (Variable limit)'))
 borefield.calculation_setup(max_nb_of_iterations=2)
 list_of_test_objects.add(SizingObject(borefield, error_L2=MaximumNumberOfIterations, error_L3=MaximumNumberOfIterations,
                                       error_L4=MaximumNumberOfIterations, quadrant=1,
@@ -202,9 +213,17 @@ hourly_load.simulation_period = 20
 hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\office.csv"), header=True, separator=";",
                                 col_injection=0, col_extraction=1)
 borefield.load = hourly_load
+list_of_test_objects.add(SizingObject(borefield, L2_output=113.955, L3_output=115.945, L4_output=109.629, quadrant=2,
+                                      name='BS2023 Office'))
+borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
 list_of_test_objects.add(
-    SizingObject(borefield, L2_output=113.955, L3_output=115.945, L4_output=109.629, quadrant=2,
-                 name='BS2023 Office'))
+    SizingObject(borefield, L2_output=169.373, L3_output=172.3739, L4_output=160.922, quadrant=2,
+                 name='BS2023 Office, (MPG, variable)'))
+borefield.fluid_data = TemperatureDependentFluidData('MPG', 25).create_constant(3)
+list_of_test_objects.add(
+    SizingObject(borefield, L2_output=172.41551490145127, L3_output=175.528, L4_output=163.5176, quadrant=2,
+                 name='BS2023 Office, (MPG, fixed)'))
+borefield.fluid_data = fluid_data
 borefield.calculation_setup(max_nb_of_iterations=5)
 list_of_test_objects.add(SizingObject(borefield, error_L2=MaximumNumberOfIterations, error_L3=MaximumNumberOfIterations,
                                       error_L4=MaximumNumberOfIterations, quadrant=2,
