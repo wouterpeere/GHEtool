@@ -103,7 +103,7 @@ class ThermoxDTX(_CommercialFluids):
             [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, 247.80, 395.42, 401.36],  # -40°C
             [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, 627.39, 762.70],  # -45°C
             [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, 1433.75],  # -50°C
-        ]) * 10e-6 * self._rho_array  # convert from kinematic viscosity in mm²/s to dynamic viscosity in Pa.s
+        ]) * 1e-6 * self._rho_array  # convert from kinematic viscosity in mm²/s to dynamic viscosity in Pa.s
         self._cp_array = np.array([
             [3.97, 3.89, 3.82, 3.75, 3.68, 3.62, 3.56, 3.53, 3.49],  # 80°C
             [3.97, 3.88, 3.81, 3.73, 3.67, 3.60, 3.55, 3.52, 3.47],  # 75°C
