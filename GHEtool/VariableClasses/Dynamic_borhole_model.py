@@ -194,18 +194,7 @@ class DynamicsBH(object):
         self.final_time = self.factor_time * self.t_b
         self.g_sts = None
 
-    def partial_init(self):
-        # TODO: unravel how to eliminate this.
-        # - It was calling the full class ctor "self.__init__()" which is just plain wrong...
-        # - Now we're calling a stripped down version with only the most essential
-        #   variables which are required.
-        # - This is here partially because equivalent boreholes are generated.
-
-        soil_diffusivity = self.ground_ghe.k_s() / self.ground_ghe.volumetric_heat_capacity()  # kon k_s niet terugvinden dus soil.k genomen
-        self.t_s = self.boreholes[0].H ** 2 / (
-                    9 * self.ground_ghe.alpha())  # self.t_s = single_u_tube.b.H ** 2 / (9 * soil_diffusivity)
-        self.calc_time_in_sec = max([self.t_s * exp(-8.6), 49.0 * 3600.0])
-
+  
     def fill_radial_cell(self, radial_cell, resist_f_eq, resist_tg_eq):
         """
         Initialize radial discretization cells with thermal properties for each layer:
@@ -321,7 +310,6 @@ class DynamicsBH(object):
         """
 
         # === Initialization and geometry setup ===
-        self.partial_init()
         self.m_flow_borehole = self.fluid_ghe.mfr
         final_time = self.final_time if final_time is None else final_time
         self.pipe_roughness = 1e-6
