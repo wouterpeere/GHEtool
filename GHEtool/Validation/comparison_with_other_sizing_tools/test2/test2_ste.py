@@ -15,26 +15,19 @@ import os
 import time
 import numpy as np
 import pygfunction as gt
-import sys
-
-# Add the path of your local GHEtool root folder explicitly to the front of sys.path
-# Adjust this path to where your local GHEtool package root folder is (the one containing the GHEtool directory)
-local_ghetool_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
-if local_ghetool_path not in sys.path:
-    sys.path.insert(0, local_ghetool_path)
-
-print("sys.path:", sys.path)
+import GHEtool as ghe
+print(ghe.__file__)  # Should point inside the local repo
 
 def test_2_6h_ste():
     # Ground properties
-    ground_data = GroundFluxTemperature(k_s=2.25, T_g=12.41, volumetric_heat_capacity=2877000, flux=0)
+    ground_data = ghe.GroundFluxTemperature(k_s=2.25, T_g=12.41, volumetric_heat_capacity=2877000, flux=0)
    
     # Load fluid properties into FluidData
     base_mfr = 2*29/120  # Baseline mass flow rate (kg/s)
-    fluid_data = FluidData(mfr=base_mfr, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
+    fluid_data = ghe.FluidData(mfr=base_mfr, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
 
     # Pipe properties
-    pipe_data = MultipleUTube(r_in=0.0137, r_out=0.0167, D_s=0.0471 / 2, k_g=1.73, k_p=0.45)
+    pipe_data = ghe.MultipleUTube(r_in=0.0137, r_out=0.0167, D_s=0.0471 / 2, k_g=1.73, k_p=0.45)
 
     # Short-term effect parameters
     rho_cp_grout = 3800000.0  
@@ -52,7 +45,7 @@ def test_2_6h_ste():
         }
 
     # Load hourly profile
-    load = HourlyGeothermalLoad(simulation_period=10)
+    load = ghe.HourlyGeothermalLoad(simulation_period=10)
     load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'test2.csv'), header=True, separator=",",
                              col_extraction=1, col_injection=0)
 
@@ -66,7 +59,7 @@ def test_2_6h_ste():
         ('L4_static', False, False), ('L3_static_ste', False, True), ('L4_static_ste', False, True)
     ]:
         # Initialize borefield
-        borefield = Borefield()
+        borefield = ghe.Borefield()
         borefield.set_ground_parameters(ground_data)
         borefield.set_fluid_parameters(fluid_data)
         borefield.set_pipe_parameters(pipe_data)
