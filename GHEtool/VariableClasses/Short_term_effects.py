@@ -160,15 +160,9 @@ def _ShortTermEffects(self, time, gFunc, boreholes, alpha, ground_data, fluid_da
 
     print('test')
 
-    from .Dynamic_borhole_model import GFunctionCalculator
+    from .Dynamic_borhole_model import DynamicsBH
 
-    print("Before instantiation")
-    g = GFunctionCalculator(0, None, [], 0, None, None, None, None, None)
-    print("After instantiation")
-
-
-    dynamic_numerical = GFunctionCalculator(time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, borefield, short_term_parameters)
-
+    dynamic_numerical = DynamicsBH(time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, borefield, short_term_parameters)
     dynamic_numerical.calc_sts_g_functions()
 
     g = combine_sts_lts(

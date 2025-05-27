@@ -355,195 +355,191 @@ class DynamicsBH(object):
         cell_summation += num_soil_cells
 
     def calc_sts_g_functions(self, final_time=None) -> tuple:
+        """
+        Compute short-term g-functions using a finite difference approach for radial heat conduction
+        in the borehole.
+
+        This method simulates transient heat transfer from the circulating fluid to the surrounding ground 
+        through pipe walls and the borehole. It implements the cylindrical heat source model (Xu & Spitler)
+        and solves a tri-diagonal matrix system at each time step to simulate the radial temperature distribution.
+
+        Parameters:
+            final_time (float, optional): The final simulation time in seconds. If not provided, uses `self.final_time`.
+
+        Returns:
+            tuple: Contains the following arrays/interpolators:
+                - lntts (np.ndarray): Log time steps [s]
+                - g (np.ndarray): Short-term g-function values
+                - g_sts (interp1d): Interpolated short-term g-function
+                - g_plot (np.ndarray): Alternative g-function used for plotting
+                - qb (np.ndarray): Normalized heat flux to the ground
+        """
+
+        # === Initialization and geometry setup ===
         self.partial_init()
         self.m_flow_borehole = self.fluid_ghe.mfr
-        final_time = self.final_time
-
-        self.pipe_roughness = 1e-06
+        final_time = self.final_time if final_time is None else final_time
+        self.pipe_roughness = 1e-6
         self.bh = gt.boreholes
         self.H = self.boreholes[0].H
-        print(f"Borehole lenght of current iteration is {self.H}m")
+        print(f"Borehole length of current iteration is {self.H} m")
         self.r_b = self.r_borehole
         self.D = self.boreholes[0].D
-        self.h_f = self.pipes_gt.convective_heat_transfer_coefficient_circular_pipe(self.m_flow_borehole,
-                                                                                    self.pipes_ghe.r_in,
-                                                                                    self.fluid_ghe.mu,
-                                                                                    self.fluid_ghe.rho,
-                                                                                    self.fluid_ghe.k_f,
-                                                                                    self.fluid_ghe.Cp,
-                                                                                    self.pipe_roughness)
-        R_f = 1 / (self.h_f * 2 * pi * self.pipes_ghe.r_in)
-        R_p = self.pipes_gt.conduction_thermal_resistance_circular_pipe(self.pipes_ghe.r_in, self.pipes_ghe.r_out,
-                                                                        self.pipes_ghe.k_p)
-    
-        self.resist_bh_effective = self.borefield.Rb 
 
-        # check the resistances
+        # === Convective heat transfer coefficient and resistances ===
+        self.h_f = self.pipes_gt.convective_heat_transfer_coefficient_circular_pipe(
+            self.m_flow_borehole,
+            self.pipes_ghe.r_in,
+            self.fluid_ghe.mu,
+            self.fluid_ghe.rho,
+            self.fluid_ghe.k_f,
+            self.fluid_ghe.Cp,
+            self.pipe_roughness
+        )
+
+        # Convective resistance inside pipe
+        R_f = 1 / (self.h_f * 2 * pi * self.pipes_ghe.r_in)
+
+        # Conduction resistance through the pipe wall
+        R_p = self.pipes_gt.conduction_thermal_resistance_circular_pipe(
+            self.pipes_ghe.r_in,
+            self.pipes_ghe.r_out,
+            self.pipes_ghe.k_p
+        )
+
+        # Borehole effective resistance (includes ground)
+        self.resist_bh_effective = self.borefield.Rb
+
+        # === Apply Xu & Spitler framework for equivalent resistances ===
+        # Requiv,TG = RBH - Rf/2*u_tube
         resist_f_eq = R_f / 2 * self.u_tube
         resist_tg_eq = self.resist_bh_effective - resist_f_eq
 
-        # Pass radial cell by reference and fill here so that it can be
-        # destroyed when this method returns
-        radial_cell = np.zeros(shape=(len(CellProps), self.num_cells), dtype=np.double)
+        # === Build radial cell structure ===
+        radial_cell = np.zeros((len(CellProps), self.num_cells), dtype=np.double)
         self.fill_radial_cell(radial_cell, resist_f_eq, resist_tg_eq)
 
-        self.t_b = 5 * (self.boreholes[0].r_b) ** 2 / self.ground_ghe.alpha()
+        # === Characteristic time definitions ===
+        self.t_b = 5 * (self.boreholes[0].r_b)**2 / self.ground_ghe.alpha()
+        self.t_s = self.boreholes[0].H**2 / (9 * self.ground_ghe.alpha())
 
-        final_time = self.final_time  
-        self.t_s = self.boreholes[0].H ** 2 / (9 * self.ground_ghe.alpha())
-   
-        g = []
-        g_plot = []
-        lntts = []
-        plottime = [2e-12]
-        Tf = [self.init_temp]
-        Tb = [self.init_temp]
-        diff = [0]
-        qb=[]
-        gFunc_CHS = []
+        # === Time loop variables ===
+        g, g_plot, lntts, plottime = [], [], [], [2e-12]
+        Tf, Tb, diff, qb, gFunc_CHS = [self.init_temp], [self.init_temp], [0], [], []
+        time, time_step = 1e-12 - 120, 120
+        heat_flux, init_temp = 1.0, self.init_temp
 
+        # === Matrix setup for finite difference solver ===
         _dl = np.zeros(self.num_cells - 1)
         _d = np.zeros(self.num_cells)
         _du = np.zeros(self.num_cells - 1)
         _b = np.zeros(self.num_cells)
 
-        heat_flux = 1.0
-        init_temp = self.init_temp
+        _fe_1, _fe_2 = np.zeros(self.num_cells - 2), np.zeros(self.num_cells - 2)
+        _ae = np.zeros_like(_fe_1)
+        _fw_1, _fw_2, _aw, _ad = map(np.zeros_like, (_ae, _ae, _ae, _ae))
 
-        time = 1e-12 - 120
-        time_step = 120
+        _west_cell = radial_cell[:, 0:self.num_cells - 2]
+        _center_cell = radial_cell[:, 1:self.num_cells - 1]
+        _east_cell = radial_cell[:, 2:self.num_cells]
 
-        _fe_1 = np.zeros(shape=(self.num_cells - 2), dtype=np.double)
-        _fe_2 = np.zeros_like(_fe_1)
-        _ae = np.zeros_like(_fe_2)
-        _fw_1 = np.zeros_like(_ae)
-        _fw_2 = np.zeros_like(_fw_1)
-        _aw = np.zeros_like(_fw_2)
-        _ad = np.zeros_like(_aw)
-
-        _west_cell = radial_cell[:, 0: self.num_cells - 2]
-        _center_cell = radial_cell[:, 1: self.num_cells - 1]
-        _east_cell = radial_cell[:, 2: self.num_cells - 0]
-
-        fe_1 = log(radial_cell[CellProps.R_OUT, 0] / radial_cell[CellProps.R_CENTER, 0])
-        fe_1 /= (2.0 * pi * radial_cell[CellProps.K, 0])
-
-        fe_2 = log(radial_cell[CellProps.R_CENTER, 1] / radial_cell[CellProps.R_IN, 1])
-        fe_2 /= (2.0 * pi * radial_cell[CellProps.K, 1])
-
+        # === Boundary condition coefficients ===
+        fe_1 = log(radial_cell[CellProps.R_OUT, 0] / radial_cell[CellProps.R_CENTER, 0]) / (2 * pi * radial_cell[CellProps.K, 0])
+        fe_2 = log(radial_cell[CellProps.R_CENTER, 1] / radial_cell[CellProps.R_IN, 1]) / (2 * pi * radial_cell[CellProps.K, 1])
         ae = 1 / (fe_1 + fe_2)
         ad = radial_cell[CellProps.RHO_CP, 0] * radial_cell[CellProps.VOL, 0] / time_step
         _d[0] = -ae / ad - 1
         _du[0] = ae / ad
 
+        # === Define helper fill functions ===
         def fill_f1(fx_1, cell):
-            fx_1[:] = np.log(cell[CellProps.R_OUT, :] / cell[CellProps.R_CENTER, :]) / (2.0 * pi * cell[CellProps.K, :])
+            fx_1[:] = np.log(cell[CellProps.R_OUT, :] / cell[CellProps.R_CENTER, :]) / (2 * pi * cell[CellProps.K, :])
 
         def fill_f2(fx_2, cell):
-            fx_2[:] = np.log(cell[CellProps.R_CENTER, :] / cell[CellProps.R_IN, :]) / (2.0 * pi * cell[CellProps.K, :])
+            fx_2[:] = np.log(cell[CellProps.R_CENTER, :] / cell[CellProps.R_IN, :]) / (2 * pi * cell[CellProps.K, :])
 
+        # === Fill matrix coefficients ===
         fill_f1(_fe_1, _center_cell)
         fill_f2(_fe_2, _east_cell)
-        _ae[:] = 1.0 / (_fe_1 + _fe_2)
+        _ae[:] = 1 / (_fe_1 + _fe_2)
 
         fill_f1(_fw_1, _west_cell)
         fill_f2(_fw_2, _center_cell)
-        _aw[:] = -1.0 / (_fw_1 + _fw_2)
+        _aw[:] = -1 / (_fw_1 + _fw_2)
 
-        _ad[:] = (_center_cell[CellProps.RHO_CP, :] * _center_cell[CellProps.VOL, :] / time_step)
-        _dl[0: self.num_cells - 2] = -_aw / _ad
-        _d[1: self.num_cells - 1] = _aw / _ad - _ae / _ad - 1.0
-        _du[1: self.num_cells - 1] = _ae / _ad
+        _ad[:] = (_center_cell[CellProps.RHO_CP, :] * _center_cell[CellProps.VOL, :]) / time_step
+        _dl[:self.num_cells - 2] = -_aw / _ad
+        _d[1:self.num_cells - 1] = _aw / _ad - _ae / _ad - 1
+        _du[1:self.num_cells - 1] = _ae / _ad
 
+        # === Time loop ===
         while True:
-
             time += time_step
 
-            # For the idx == 0 case:
-
             _b[0] = -radial_cell[CellProps.TEMP, 0] - heat_flux / ad
+            _dl[-1] = 0
+            _d[-1] = 1
+            _b[-1] = radial_cell[CellProps.TEMP, -1]
+            _b[1:self.num_cells - 1] = -radial_cell[CellProps.TEMP, 1:self.num_cells - 1]
 
-            # For the idx == n-1 case
-
-            _dl[self.num_cells - 2] = 0.0
-            _d[self.num_cells - 1] = 1.0
-            _b[self.num_cells - 1] = radial_cell[CellProps.TEMP, self.num_cells - 1]
-
-            # Now handle the 1 to n-2 cases with numpy slicing and vectorization
-            _b[1: self.num_cells - 1] = -radial_cell[CellProps.TEMP, 1: self.num_cells - 1]
-
-            # Tri-diagonal matrix solver
-            # High level interface to LAPACK routine
-            # https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.lapack.dgtsv.html#scipy.linalg.lapack.dgtsv
-            dgtsv(_dl, _d, _du, _b, overwrite_b=1) 
-
+            dgtsv(_dl, _d, _du, _b, overwrite_b=1)
             radial_cell[CellProps.TEMP, :] = _b
 
-            # compute standard g-functions
-            g.append(self.c_0 * ((radial_cell[CellProps.TEMP, 0] - init_temp) / heat_flux - self.resist_bh_effective))
-            #g_plot can be adapted to plot certain relation outside of this function, this variable is returned
-            g_plot.append(self.c_0 * ((radial_cell[CellProps.TEMP, 0] - init_temp) / heat_flux))
-            qb.append(1- (self.resist_bh_effective - (radial_cell[CellProps.TEMP, 0]-radial_cell[CellProps.TEMP, self.bh_wall_idx])))
-            gFunc_CHS.append(2*np.pi*gt.heat_transfer.cylindrical_heat_source(time, self.ground_ghe.alpha(), self.boreholes[0].r_b,self.boreholes[0].r_b))
+            # g-function calculation
+            g_val = self.c_0 * ((radial_cell[CellProps.TEMP, 0] - init_temp) / heat_flux - self.resist_bh_effective)
+            g_plot_val = self.c_0 * ((radial_cell[CellProps.TEMP, 0] - init_temp) / heat_flux)
+            q_val = 1 - (self.resist_bh_effective - (radial_cell[CellProps.TEMP, 0] - radial_cell[CellProps.TEMP, self.bh_wall_idx]))
+
+            g.append(g_val)
+            g_plot.append(g_plot_val)
+            qb.append(q_val)
+            gFunc_CHS.append(
+                2 * pi * gt.heat_transfer.cylindrical_heat_source(
+                    time, self.ground_ghe.alpha(), self.boreholes[0].r_b, self.boreholes[0].r_b
+                )
+            )
 
             if time > 3600:
-                stop_crit = self.g_lt(time) - self.c_0 * ((radial_cell[CellProps.TEMP, 0] - init_temp) / heat_flux - self.resist_bh_effective)
+                stop_crit = self.g_lt(time) - g_val
             else:
                 stop_crit = 1
-        
-            T0 = radial_cell[CellProps.TEMP, 0]
-            TBH = radial_cell[CellProps.TEMP, self.bh_wall_idx]
-            d= T0-TBH
 
-            Tf.append(T0)
-            Tb.append(TBH)
-            diff.append(d)
-
+            Tf.append(radial_cell[CellProps.TEMP, 0])
+            Tb.append(radial_cell[CellProps.TEMP, self.bh_wall_idx])
+            diff.append(Tf[-1] - Tb[-1])
             lntts.append(time)
             plottime.append(time)
 
-          
             if stop_crit < 0 or time >= (final_time - time_step):
                 if stop_crit < 0:
-                    ghe_logger.info(f"Perfect convergence with long-term g-function after {time/3600} hours")
-                    
+                    ghe_logger.info(f"Perfect convergence with long-term g-function after {time / 3600:.1f} hours")
                 else:
-                    ghe_logger.info(f"No perfect convergence between long-term and short term g-functions, switch made after {time/3600} hours with g-function difference of {stop_crit}")
+                    ghe_logger.info(
+                        f"No perfect convergence; switch after {time / 3600:.1f} hours "
+                        f"with g-function difference of {stop_crit:.5f}"
+                    )
                 break
-            
-        
-        #Plotting short-term and long-term g-function on 1 graph
+
+        # === Plot g-functions ===
         fig = plt.figure()
         ax1 = fig.add_subplot(111)
-
         plt.tight_layout()
-
-        ax1.plot(self.time, self.gFunc, c='b', marker="s", label='g_lt')
-        ax1.plot(lntts,g, c='r', label='g_st')
+        ax1.plot(self.time, self.gFunc, c='b', marker='s', label='g_lt')
+        ax1.plot(lntts, g, c='r', label='g_st')
         plt.legend(loc='upper left')
-        
 
-        # quickly chop down the total values to a more manageable set
-
-
-        num_intervals = int(1000)
-        g_tmp = interp1d(lntts, g)
+        # === Interpolation and downsampling ===
+        num_intervals = 1000
         uniform_lntts_vals = np.linspace(lntts[0], lntts[-1], num_intervals)
-        uniform_g_vals = g_tmp(uniform_lntts_vals)
+        self.lntts = np.array(uniform_lntts_vals)
 
-
-        qb_tmp =interp1d(lntts,qb)
+        g_tmp = interp1d(lntts, g)
+        qb_tmp = interp1d(lntts, qb)
         g_plot_tmp = interp1d(lntts, g_plot)
 
-
-        uniform_qb_vals = qb_tmp(uniform_lntts_vals)
-        uniform_g_plot_vals = g_plot_tmp(uniform_lntts_vals)
-
-        # set the final arrays and interpolator objects
-        self.lntts = np.array(uniform_lntts_vals)
-        self.g = np.array(uniform_g_vals)
-        self.qb = np.array(uniform_qb_vals)
+        self.g = g_tmp(self.lntts)
+        self.qb = qb_tmp(self.lntts)
+        self.g_plot = g_plot_tmp(self.lntts)
         self.g_sts = interp1d(self.lntts, self.g)
-        self.g_plot = np.array(uniform_g_plot_vals)
 
         return self.lntts, self.g, self.g_sts, self.g_plot, self.qb
