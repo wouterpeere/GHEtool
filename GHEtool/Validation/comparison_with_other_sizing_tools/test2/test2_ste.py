@@ -16,7 +16,6 @@ import time
 import numpy as np
 import pygfunction as gt
 import GHEtool as ghe
-print(ghe.__file__)  # Should point inside the local repo
 
 def test_2_6h_ste():
     # Ground properties

@@ -323,7 +323,6 @@ class DynamicsBH:
         self.pipe_roughness = 1e-6
         self.bh = gt.boreholes
         self.H = self.boreholes[0].H
-        print(f"Borehole length of current iteration is {self.H} m")
         self.r_b = self.r_borehole
         self.D = self.boreholes[0].D
 
