@@ -21,178 +21,186 @@ class CellProps(IntEnum):
     VOL = auto()
 
 
-class DynamicsBH(object):
+class DynamicsBH:
     """
-    X. Xu and Jeffrey D. Spitler. 2006. 'Modeling of Vertical Ground Loop Heat
-    Exchangers with Variable Convective Resistance and Thermal Mass of the
-    Fluid.' in Proceedings of the 10th International Conference on Thermal
-    Energy Storage-EcoStock. Pomona, NJ, May 31-June 2.
+    This dynamic borehole model describes heat transfer inside boreholes using the methodology 
+    of Xu and Spitler (2006). Heat transfer outside the borehole is calculated using the g-function 
+    from the pygfunction package. For physical coupling accuracy, the FLS g-functions are corrected for 
+    borehole geometry via the cylindrical correction of Li et al. (2014).
+
+    The effect of combining these short-term effects is detailed in Meertens et al. (2024) and 
+    the methodology is implemented here. Validation against experimental data is described in 
+    Meertens et al. (2025).
+
+    Geometry and numerical discretization for single and double U-tube boreholes follow:
+
+    - Far-field radius (r_far) is set to 10 m for a single borehole or half the distance between 
+      boreholes for a borefield. Soil region discretized into ~500 cells scaled by r_far.
+    - Borehole radius (r_borehole) equals the actual borehole radius.
+    - Tube outer radius (r_out_tube) equals sqrt(2) * r_out for single U-tube, 2 * r_out for double U-tube.
+    - Tube inner radius (r_in_tube) is r_out_tube minus pipe wall thickness(es).
+    - Convection layer inner radius (r_in_convection) is r_in_tube minus 1/4 (single) or 1/2 (double) pipe thickness.
+    - Fluid radius (r_fluid) is r_in_convection minus 3/4 (single) or 3/2 (double) pipe thickness.
+    - Number of discretization cells are assigned per region: fluid, convection, pipe, grout, soil.
+    - Fluid factor accounts for fluid volume outside boreholes (1 for single borehole, 2 otherwise).
+
+    The fluid is modeled as an annulus with uniform temperature and very high thermal conductivity 
+    to enforce lumped capacitance.
+
+    Note: The original Xu and Spitler (2006) method is limited to single U-tube boreholes. 
+    An extension to double U-tube geometries has been developed by Meertens (SySi Team, KU Leuven) 
+    and is implemented in this model.
+
+    References:
+    ----------
+        Meertens, L., Helsen, L., and Peere, W. (2024). Influence of short-term dynamic effects on geothermal borefield size. 
+        IGSHPA Research Conference, Montréal, May 28-30, 2024.
+
+        Xu, X., and Spitler, J. D. (2006). Modeling of Vertical Ground Loop Heat Exchangers with Variable Convective Resistance and Thermal Mass of the Fluid. 
+        Proceedings of the 10th International Conference on Thermal Energy Storage–EcoStock, Pomona, NJ.
+
+        Li, M., Li, P., Chan, V., and Lai, A. C. K. (2014). Full-scale temperature response function (G-function) for heat transfer by borehole ground heat exchangers (GHEs) from sub-hour to decades. 
+        Applied Energy, 136, 197–205.
+
+        Meertens, L., and Helsen, L. (2025). Validation of dynamic borehole model with experimental measurements. 
+        Manuscript submitted for publication.
     """
+
 
     def __init__(self, time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, borefield, short_term_effects_parameters):
 
-        print('in dynamic model')
-
-        #loading all necessary variables and adding to self
-
+        # Assign input parameters to instance variables
         self.boreholes = boreholes
         self.ground_ghe = ground_data
         self.fluid_ghe = fluid_data
         self.pipes_ghe = pipe_data
-        self.pipes_gt = gt.pipes
+        self.pipes_gt = gt.pipes  # Note: ensure `gt` is imported or passed correctly
         self.short_term_effects_parameters = short_term_effects_parameters
         self.borefield = borefield
         self.gFunc = gFunc
         self.time = time
 
+        # Interpolate long-term g-function for continuous time evaluation
         self.g_lt = interp1d(self.time, self.gFunc)
 
-        # The number of boreholes here is calculated for two things: (1) For a single borehole the fluid_factor should be set 
-        # to 1, since no connections (except if the distance to the collector is very far and know) between boreholes are present
-        # and therefore the only fluid capacity is the one in the borehole itself (2) To calculate the far field radius of the 
-        # 1D numerical model. For a single borehole the far field radius is set to 10m, for a field the far field radius is
-        # set to half of the distance between two boreholes. 
-
-        # To do: Future development on above topics should include: (1) Calculating the length of the piping connection from the coordinates
-        # maybe also include an option to give the piping from the closest borehole to the collector, or option to give coordinates 
-        # of collector and function calculated al the piping including the pipes going to the collector (2) for not trivial (fixed)
-        # distance between boreholes an 'average' borehole-to-borehole distance should be calculated to decide on the far field radius
-
-
+        # Calculate number of boreholes in the field
         number_of_boreholes = len(self.boreholes)
 
-        # Definition: Fluid factor takes into account the fluid inside of the system but outside of the boreholes
-        if number_of_boreholes == 1:
-            self.fluid_factor = 1
-        else:
-            self.fluid_factor = 2
+        # Fluid factor accounts for fluid inside the system outside boreholes:
+        # - For a single borehole: fluid_factor = 1 (no connections)
+        # - For multiple boreholes: fluid_factor = 2 (connections considered)
+        self.fluid_factor = 1 if number_of_boreholes == 1 else 2
 
-        # Definition: number of pipes refers to single or double U pipe. Depending on this value a different equivalent borehole 
-        # model (different equivalent radia and number of cells) is choosen to represent the borehole. 1 for single U tube, 2 for dubble U tube 
-        # To do: extend method to coaxial pipes
+        # Number of pipes per borehole (single or double U-tube)
         self.u_tube = self.pipes_ghe.number_of_pipes
 
-        # Calculate the far field radius, which influences the number of ground cells
-        # To do: only works for rectangular field, adjust for more general approaches (as discussed above)
+        # Calculate far-field radius affecting ground cells count
         if number_of_boreholes == 0:
-            ghe_logger.warning(f"Borefield should consist of at least one borehole")
+            ghe_logger.warning("Borefield should contain at least one borehole")
+            far_field_radius = 10  # default fallback
         elif number_of_boreholes < 4:
-            far_field_radius = 10
-        else: 
-            distance_between_boreholes = np.sqrt((self.boreholes[1].x - self.boreholes[0].x)**2 + (self.boreholes[1].y - self.boreholes[0].y)**2)
-            far_field_radius = distance_between_boreholes/2
+            far_field_radius = 10  # meters for small field or single borehole
+        else:
+            # Approximate borehole spacing (assumes rectangular layout)
+            dist = np.sqrt((self.boreholes[1].x - self.boreholes[0].x)**2 + (self.boreholes[1].y - self.boreholes[0].y)**2)
+            far_field_radius = dist / 2
 
-        print(f"far field radius used: {far_field_radius}")
+        # Number of soil cells scales linearly with far-field radius (500 cells at 10 m)
+        self.num_soil_cells = int(far_field_radius / 10 * 500)
 
-        # Number of ground cells for 10m is set to 500 (Xu&Spitler 2006), scaling is introduced for far field radia smaller 
-        # then 10m
-        self.num_soil_cells = int(far_field_radius/10*500)
-
-        # Reference temperature is now taken di
-        #self.init_temp = self.ground_ghe.Tg
+        # Initial temperature reference (set to zero here, can be changed)
         self.init_temp = 0
 
-        # Create a namedtuple type
+        # Use namedtuple for short-term effect parameters for clean access
         ShortTermEffectsParameters = namedtuple('ShortTermEffectsParameters', short_term_effects_parameters.keys())
-        # Create an instance of the namedtuple
-        short_term_parameters = ShortTermEffectsParameters(**short_term_effects_parameters)
-        self.short_term_parameters = short_term_parameters
+        self.short_term_parameters = ShortTermEffectsParameters(**short_term_effects_parameters)
 
-        self.factor_time = 50 # parameter to modify default final time 
+        self.factor_time = 50  # Parameter modifying default final time
         self.rho_cp_grout = self.short_term_parameters.rho_cp_grout  
         self.rho_cp_pipe = self.short_term_parameters.rho_cp_pipe  
-        
-        # Starting Rb, needs to be updated every iteration
+
+        # Initial effective borehole resistance (updated iteratively)
         self.resist_bh_effective = self.borefield.Rb
-               
-        # "The one dimensional model has a fluid core, an equivalent convective
-        # resistance layer, a tube layer, a grout layer and is surrounded by the
-        # ground."
+
+        # Define cell counts for different regions of borehole model
         if self.u_tube == 1:
-        # cell numbers
             self.num_fluid_cells = 3
             self.num_conv_cells = 1
             self.num_pipe_cells = 4
             self.num_grout_cells = 27
-
         elif self.u_tube == 2:
             self.num_fluid_cells = 12
             self.num_conv_cells = 4
             self.num_pipe_cells = 16
-            self.num_grout_cells = 18 #20
+            self.num_grout_cells = 18  # was 20, adjusted here
         else:
-            ghe_logger.warning(f"Choose for single or double U-tube")
+            ghe_logger.warning("Only single or double U-tube configurations supported")
 
+        # Total number of cells in radial discretization
+        self.num_cells = (self.num_fluid_cells + self.num_conv_cells + self.num_pipe_cells +
+                          self.num_grout_cells + self.num_soil_cells)
 
-        self.num_cells = self.num_fluid_cells + self.num_conv_cells + self.num_pipe_cells
-        self.num_cells += self.num_grout_cells + self.num_soil_cells
+        # Index where borehole wall starts (used for boundary conditions)
+        self.bh_wall_idx = (self.num_fluid_cells + self.num_conv_cells + self.num_pipe_cells + self.num_grout_cells)
 
-        self.bh_wall_idx = self.num_fluid_cells + self.num_conv_cells + self.num_pipe_cells + self.num_grout_cells
+        # Geometry setup for grid and heat transfer regions
 
-        # Geometry and grid procedure
-
-        # far-field radius is set to half of the distance between two boreholes or 10m when a single borehole is used;
-        # the soil region is represented by (500/10 * far-field radius) cells
-      
+        # Far-field radius from borehole center (subtract borehole radius)
         self.r_far_field = far_field_radius - self.boreholes[0].r_b
 
-        # borehole radius is set to the actual radius of the borehole
+        # Borehole radius (from first borehole)
         self.r_borehole = self.boreholes[0].r_b
 
-        # pipe thickness
+        # Actual pipe wall thickness
         self.thickness_pipe_actual = self.pipes_ghe.r_out - self.pipes_ghe.r_in
 
-        # outer tube radius is set to sqrt(2) * r_p_o, tube region has 4 cells
+        # Radii of different regions based on pipe and tube geometry
         if self.u_tube == 1:
-            # outer tube radius is set to sqrt(2) * r_p_o, tube region has 4 cells
+            # Single U-tube geometry setup
             self.r_out_tube = sqrt(2) * self.pipes_ghe.r_out
-            # inner tube radius is set to r_out_tube-t_p
             self.r_in_tube = self.r_out_tube - self.thickness_pipe_actual
-            # r_in_convection is set to r_in_tube - 1/4 * t
             self.r_in_convection = self.r_in_tube - self.thickness_pipe_actual / 4.0
-            # r_fluid is set to r_in_convection - 3/4 * t
             self.r_fluid = self.r_in_convection - (3.0 / 4.0 * self.thickness_pipe_actual)
-            # Thicknesses of the grid regions
+
+            # Thicknesses of radial cells for each region
             self.thickness_soil_cell = (self.r_far_field - self.r_borehole) / self.num_soil_cells
             self.thickness_grout_cell = (self.r_borehole - self.r_out_tube) / self.num_grout_cells
-            # pipe thickness is equivalent to original tube thickness
             self.thickness_conv_cell = (self.r_in_tube - self.r_in_convection) / self.num_conv_cells
             self.thickness_fluid_cell = (self.r_in_convection - self.r_fluid) / self.num_fluid_cells
-            # Fixing error of thickness pipe cells, divide by number of pipe cells
             self.thickness_pipe_cell = self.thickness_pipe_actual / self.num_pipe_cells
-            ghe_logger.info(f"Single U-tube cells defined for numerical model")
+
+            ghe_logger.info("Single U-tube cells defined for numerical model")
 
         else:
-            # outer tube radius is set to sqrt(2) * r_p_o, tube region has 4 cells
-            #self.r_out_tube = sqrt(2) * self.pipes_ghe.r_out + 2*self.thickness_pipe_actual
-            self.r_out_tube = 2 * self.pipes_ghe.r_out 
-            # inner tube radius is set to r_out_tube-t_p
+            # Double U-tube geometry setup
+            self.r_out_tube = 2 * self.pipes_ghe.r_out
             self.r_in_tube = self.r_out_tube - 2.0 * self.thickness_pipe_actual
-            # r_in_convection is set to r_in_tube - 1/4 * t
             self.r_in_convection = self.r_in_tube - self.thickness_pipe_actual / 2.0
-            # r_fluid is set to r_in_convection - 3/4 * t
             self.r_fluid = self.r_in_convection - (3.0 / 2.0 * self.thickness_pipe_actual)
-            # Thicknesses of the grid regions
+
             self.thickness_soil_cell = (self.r_far_field - self.r_borehole) / self.num_soil_cells
             self.thickness_grout_cell = (self.r_borehole - self.r_out_tube) / self.num_grout_cells
-            # pipe thickness is equivalent to original tube thickness
             self.thickness_conv_cell = (self.r_in_tube - self.r_in_convection) / self.num_conv_cells
             self.thickness_fluid_cell = (self.r_in_convection - self.r_fluid) / self.num_fluid_cells
-            self.thickness_pipe_cell = (2*self.thickness_pipe_actual) / self.num_pipe_cells
-            ghe_logger.info(f"Double U-tube cells defined for numerical model")
+            self.thickness_pipe_cell = (2 * self.thickness_pipe_actual) / self.num_pipe_cells
 
-        # other
+            ghe_logger.info("Double U-tube cells defined for numerical model")
+
+        # Initialize arrays and parameters used in calculations
         self.g = np.array([], dtype=np.double)
         self.Tf = np.array([], dtype=np.double)
         self.Tb = np.array([], dtype=np.double)
         self.diff = np.array([], dtype=np.double)
         self.g_bhw = np.array([], dtype=np.double)
         self.lntts = np.array([], dtype=np.double)
+
+        # Constants for heat transfer calculations
         self.c_0 = 2.0 * pi * self.ground_ghe.k_s()
         self.t_s = self.boreholes[0].H ** 2 / (9 * self.ground_ghe.alpha())
-        self.t_b = 5 * (self.boreholes[0].r_b) ** 2 / self.ground_ghe.alpha()  
+        self.t_b = 5 * (self.boreholes[0].r_b) ** 2 / self.ground_ghe.alpha()
         self.final_time = self.factor_time * self.t_b
-        self.g_sts = None
+
+        self.g_sts = None  # Placeholder for short-term g-function interpolator
 
   
     def fill_radial_cell(self, radial_cell, resist_f_eq, resist_tg_eq):
