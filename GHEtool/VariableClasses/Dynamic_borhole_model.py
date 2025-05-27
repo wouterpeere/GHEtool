@@ -207,7 +207,24 @@ class DynamicsBH(object):
         self.calc_time_in_sec = max([self.t_s * exp(-8.6), 49.0 * 3600.0])
 
     def fill_radial_cell(self, radial_cell, resist_f_eq, resist_tg_eq):
+        """
+        Initialize radial discretization cells with thermal properties for each layer:
+        fluid, convection, pipe, grout, and soil.
 
+        Parameters:
+        - radial_cell: ndarray to be filled with cell properties (radius, conductivity, etc.)
+        - resist_f_eq: Equivalent convective resistance between fluid and tube wall (m·K/W)
+        - resist_tg_eq: Equivalent thermal resistance of borehole minus convection layer (m·K/W)
+
+        The equivalent volumetric heat capacity and conductivities are computed per Xu & Spitler:
+        - Fluid: Equivalent thermal mass based on volumetric heat capacity adjusted by tube geometry.
+        - Convection: Modeled as thin layer with equivalent conductivity from convective resistance; near-zero thermal mass.
+        - Pipe and Grout: Equivalent conductivity derived from multipole method using resist_tg_eq.
+        - Soil: Properties taken from ground model.
+
+        Each cell's radius and volume are computed to form a radial grid for thermal calculations.
+        """
+        # Unpack cell counts
         num_fluid_cells = self.num_fluid_cells
         num_conv_cells = self.num_conv_cells
         num_pipe_cells = self.num_pipe_cells
@@ -216,143 +233,71 @@ class DynamicsBH(object):
 
         cell_summation = 0
 
-        # load fluid cells
-        for idx in range(cell_summation, num_fluid_cells + cell_summation):
-           
-            inner_radius = self.r_fluid + idx * self.thickness_fluid_cell
-            center_radius = inner_radius + self.thickness_fluid_cell / 2.0
-            outer_radius = inner_radius + self.thickness_fluid_cell
-
-            # The equivalent thermal mass of the fluid can be calculated from
-            # equation (2)
-            # pi (r_in_conv ** 2 - r_f **2) C_eq_f = 2pi r_p_in**2 * C_f
-            rho_cp_eq = (self.fluid_factor * self.u_tube * 2.0
-                         * (self.pipes_ghe.r_in ** 2)
-                         * self.fluid_ghe.Cp * self.fluid_ghe.rho
-                         ) / ((self.r_in_convection ** 2) - (self.r_fluid ** 2))
-
+        # Fluid cells
+        for idx in range(cell_summation, cell_summation + num_fluid_cells):
+            inner_r = self.r_fluid + idx * self.thickness_fluid_cell
+            center_r = inner_r + self.thickness_fluid_cell / 2.0
+            outer_r = inner_r + self.thickness_fluid_cell
+            rho_cp_eq = (self.fluid_factor * self.u_tube * 2.0 * self.pipes_ghe.r_in ** 2
+                        * self.fluid_ghe.Cp * self.fluid_ghe.rho) / (self.r_in_convection ** 2 - self.r_fluid ** 2)
             k_eq = rho_cp_eq / self.fluid_ghe.Cp
-
-            volume = pi * (outer_radius ** 2 - inner_radius ** 2)
-            radial_cell[:, idx] = np.array(
-                [
-                    inner_radius,
-                    center_radius,
-                    outer_radius,
-                    k_eq,
-                    rho_cp_eq,
-                    self.init_temp,
-                    volume,
-                ],
-                dtype=np.double,
-            )
+            volume = pi * (outer_r**2 - inner_r**2)
+            radial_cell[:, idx] = np.array([inner_r, center_r, outer_r, k_eq, rho_cp_eq, self.init_temp, volume], dtype=np.double)
         cell_summation += num_fluid_cells
 
-        # TODO: verify whether errors are possible here and raise exception if needed
-        # assert cell_summation == num_fluid_cells
-
-        # load convection cells
-        for idx in range(cell_summation, num_conv_cells + cell_summation):
+        # Convection cells (near-zero thermal mass)
+        for idx in range(cell_summation, cell_summation + num_conv_cells):
             j = idx - cell_summation
-            inner_radius = self.r_in_convection + j * self.thickness_conv_cell
-            center_radius = inner_radius + self.thickness_conv_cell / 2.0
-            outer_radius = inner_radius + self.thickness_conv_cell
+            inner_r = self.r_in_convection + j * self.thickness_conv_cell
+            center_r = inner_r + self.thickness_conv_cell / 2.0
+            outer_r = inner_r + self.thickness_conv_cell
             k_eq = log(self.r_in_tube / self.r_in_convection) / (2.0 * pi * resist_f_eq)
             rho_cp = 1.0
-            volume = pi * (outer_radius ** 2 - inner_radius ** 2)
-            radial_cell[:, idx] = np.array(
-                [
-                    inner_radius,
-                    center_radius,
-                    outer_radius,
-                    k_eq,
-                    rho_cp,
-                    self.init_temp,
-                    volume,
-                ],
-                dtype=np.double,
-            )
+            volume = pi * (outer_r**2 - inner_r**2)
+            radial_cell[:, idx] = np.array([inner_r, center_r, outer_r, k_eq, rho_cp, self.init_temp, volume], dtype=np.double)
         cell_summation += num_conv_cells
 
-        # TODO: verify whether errors are possible here and raise exception if needed
-        # assert cell_summation == (num_fluid_cells + num_conv_cells)
-
-        # load pipe cells
-        for idx in range(cell_summation, num_pipe_cells + cell_summation):
+        # Pipe cells
+        for idx in range(cell_summation, cell_summation + num_pipe_cells):
             j = idx - cell_summation
-            inner_radius = self.r_in_tube + j * self.thickness_pipe_cell
-            center_radius = inner_radius + self.thickness_pipe_cell / 2.0
-            outer_radius = inner_radius + self.thickness_pipe_cell
+            inner_r = self.r_in_tube + j * self.thickness_pipe_cell
+            center_r = inner_r + self.thickness_pipe_cell / 2.0
+            outer_r = inner_r + self.thickness_pipe_cell
             conductivity = log(self.r_borehole / self.r_in_tube) / (2.0 * pi * resist_tg_eq)
-            # rho_cp = self.single_u_tube.pipe.rhoCp
             rho_cp = self.rho_cp_pipe
-            volume = pi * (outer_radius ** 2 - inner_radius ** 2)
-            radial_cell[:, idx] = np.array(
-                [
-                    inner_radius,
-                    center_radius,
-                    outer_radius,
-                    conductivity,
-                    rho_cp,
-                    self.init_temp,
-                    volume,
-                ],
-                dtype=np.double,
-            )
+            volume = pi * (outer_r**2 - inner_r**2)
+            radial_cell[:, idx] = np.array([inner_r, center_r, outer_r, conductivity, rho_cp, self.init_temp, volume], dtype=np.double)
         cell_summation += num_pipe_cells
 
-        # TODO: verify whether errors are possible here and raise exception if needed
-        # assert cell_summation == (num_fluid_cells + num_conv_cells + num_pipe_cells)
-
-        # load grout cells
-        for idx in range(cell_summation, num_grout_cells + cell_summation):
+        # Grout cells
+        for idx in range(cell_summation, cell_summation + num_grout_cells):
             j = idx - cell_summation
-            inner_radius = self.r_out_tube + j * self.thickness_grout_cell
-            center_radius = inner_radius + self.thickness_grout_cell / 2.0
-            outer_radius = inner_radius + self.thickness_grout_cell
+            inner_r = self.r_out_tube + j * self.thickness_grout_cell
+            center_r = inner_r + self.thickness_grout_cell / 2.0
+            outer_r = inner_r + self.thickness_grout_cell
             conductivity = log(self.r_borehole / self.r_in_tube) / (2.0 * pi * resist_tg_eq)
-            # rho_cp = self.single_u_tube.grout.rhoCp
             rho_cp = self.rho_cp_grout
-            volume = pi * (outer_radius ** 2 - inner_radius ** 2)
-            radial_cell[:, idx] = np.array(
-                [
-                    inner_radius,
-                    center_radius,
-                    outer_radius,
-                    conductivity,
-                    rho_cp,
-                    self.init_temp,
-                    volume,
-                ],
-                dtype=np.double,
-            )
+            volume = pi * (outer_r**2 - inner_r**2)
+            radial_cell[:, idx] = np.array([inner_r, center_r, outer_r, conductivity, rho_cp, self.init_temp, volume], dtype=np.double)
         cell_summation += num_grout_cells
 
-        # TODO: verify whether errors are possible here and raise exception if needed
-        # assert cell_summation == (num_fluid_cells + num_conv_cells + num_pipe_cells + num_grout_cells)
-
-        # load soil cells
-        for idx in range(cell_summation, num_soil_cells + cell_summation):
+        # Soil cells
+        for idx in range(cell_summation, cell_summation + num_soil_cells):
             j = idx - cell_summation
-            inner_radius = self.r_borehole + j * self.thickness_soil_cell
-            center_radius = inner_radius + self.thickness_soil_cell / 2.0
-            outer_radius = inner_radius + self.thickness_soil_cell
+            inner_r = self.r_borehole + j * self.thickness_soil_cell
+            center_r = inner_r + self.thickness_soil_cell / 2.0
+            outer_r = inner_r + self.thickness_soil_cell
             conductivity = self.ground_ghe.k_s()
             rho_cp = self.ground_ghe.volumetric_heat_capacity()
-            volume = pi * (outer_radius ** 2 - inner_radius ** 2)
-            radial_cell[:, idx] = np.array(
-                [
-                    inner_radius,
-                    center_radius,
-                    outer_radius,
-                    conductivity,
-                    rho_cp,
-                    self.init_temp,
-                    volume,
-                ],
-                dtype=np.double,
-            )
+            volume = pi * (outer_r**2 - inner_r**2)
+            radial_cell[:, idx] = np.array([inner_r, center_r, outer_r, conductivity, rho_cp, self.init_temp, volume], dtype=np.double)
         cell_summation += num_soil_cells
+
+        # === Validation Check ===
+        expected_cells = num_fluid_cells + num_conv_cells + num_pipe_cells + num_grout_cells + num_soil_cells
+        if cell_summation != expected_cells:
+            raise ValueError(f"Total cells filled ({cell_summation}) do not match expected ({expected_cells})")
+
 
     def calc_sts_g_functions(self, final_time=None) -> tuple:
         """
