@@ -5,6 +5,12 @@ our [project board](https://github.com/users/wouterpeere/projects/2) on GitHub.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [2.3.4] - Unpublished
+
+## Fixed
+
+- Small bug in pressure drop lateral pipe.
+
 ## [2.3.3] - 2025-05-28
 
 ### Added
