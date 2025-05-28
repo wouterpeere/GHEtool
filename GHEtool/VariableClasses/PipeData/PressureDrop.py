@@ -133,7 +133,7 @@ class PressureDrop:
         -------
         Pressure drop in kPa
         """
-        return self.calculate_pressure_drop_borehole(**kwargs) + \
+        return self.calculate_pressure_drop_borehole(**kwargs) * self.series_factor + \
             self.calculate_pressure_drop_lateral(**kwargs) + \
             self.calculate_pressure_drop_main(**kwargs)
 

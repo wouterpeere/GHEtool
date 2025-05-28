@@ -103,6 +103,11 @@ def test_total_pressure_drop():
     assert np.isclose(pressure_drop.calculate_total_pressure_drop(),
                       pressure_drop.calculate_pressure_drop_borehole() + pressure_drop.calculate_pressure_drop_lateral()
                       + pressure_drop.calculate_pressure_drop_main())
+    pressure_drop = PressureDrop(single_u, fluid_data, flow_data, 0, 100, 0.02 - 0.0037 / 2, 15, 1, 0.02 - 0.0037 / 2,
+                                 15, 2, 8, 2, 1)
+    assert np.isclose(pressure_drop.calculate_total_pressure_drop(),
+                      pressure_drop.calculate_pressure_drop_borehole() * 2 + pressure_drop.calculate_pressure_drop_lateral()
+                      + pressure_drop.calculate_pressure_drop_main())
 
 
 def test_range_pressure_drop():
