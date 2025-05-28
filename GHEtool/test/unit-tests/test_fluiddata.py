@@ -283,3 +283,11 @@ def test_commercial_fluids_data():
 
     with pytest.raises(ValueError):
         fluid = ThermoxDTX(100)
+
+
+def test_temp():
+    temp = []
+    for i in [0, 10, 20, 30, 40, 50, 60]:
+        fluid = TemperatureDependentFluidData('MMA', i, mass_percentage=False)
+        temp.append(round(fluid.freezing_point, 3))
+    print(temp)
