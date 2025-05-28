@@ -111,13 +111,14 @@ class PressureDrop:
         """
         # Darcy fluid factor
         fd = gt.pipes.fluid_friction_factor_circular_pipe(
-            self.flow_data.mfr(fluid_data=self.fluid_data, **kwargs) * self.nb_of_boreholes,
+            self.flow_data.mfr(fluid_data=self.fluid_data, **kwargs) * self.nb_of_boreholes / self.series_factor,
             self.r_in_main,
             self.fluid_data.mu(**kwargs),
             self.fluid_data.rho(**kwargs),
             1e-6)
         A = pi * self.r_in_main ** 2
-        V = (self.flow_data.vfr(fluid_data=self.fluid_data, **kwargs) / 1000) / A * self.nb_of_boreholes
+        V = (self.flow_data.vfr(fluid_data=self.fluid_data,
+                                **kwargs) / 1000) / A * self.nb_of_boreholes / self.series_factor
 
         # distance_later * 2 for back and forth
         return ((fd * self.distance_main * 2 / (

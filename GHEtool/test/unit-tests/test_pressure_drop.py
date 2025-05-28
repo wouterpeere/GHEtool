@@ -67,6 +67,8 @@ def test_main_header():
                                  15, 0, 8, 1, 1)
     pressure_drop_eight = PressureDrop(single_u, fluid_data, ConstantFlowRate(mfr=1.6), 0, 100, 0.02 - 0.0037 / 2, 15,
                                        0, 0.02 - 0.0037 / 2, 15, 0, 8, 1, 1)
+    pressure_drop_four = PressureDrop(single_u, fluid_data, ConstantFlowRate(mfr=0.8), 0, 100, 0.02 - 0.0037 / 2, 15,
+                                      0, 0.02 - 0.0037 / 2, 15, 0, 8, 1, 1)
 
     pressure_drop_series = PressureDrop(single_u, fluid_data, flow_data,
                                         0, 100, 0.02 - 0.0037 / 2, 15, 0, 0.02 - 0.0037 / 2, 15, 0, 8, 2, 1)
@@ -78,11 +80,11 @@ def test_main_header():
     assert np.isclose(pressure_drop.calculate_pressure_drop_main(),
                       pressure_drop_eight.calculate_pressure_drop_lateral())
     assert np.isclose(pressure_drop_series.calculate_pressure_drop_main(),
-                      pressure_drop_eight.calculate_pressure_drop_lateral())
+                      pressure_drop_four.calculate_pressure_drop_lateral())
     assert np.isclose(pressure_drop_tichelmann.calculate_pressure_drop_main(),
                       pressure_drop_eight.calculate_pressure_drop_lateral())
     assert np.isclose(pressure_drop_both.calculate_pressure_drop_main(),
-                      pressure_drop_eight.calculate_pressure_drop_lateral())
+                      pressure_drop_four.calculate_pressure_drop_lateral())
 
     pressure_drop.minor_losses_main = 2
     pressure_drop_eight.minor_losses_lateral = 2
