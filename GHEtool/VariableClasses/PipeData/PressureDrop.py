@@ -15,7 +15,7 @@ class PressureDrop:
     def __init__(self, pipe_data: _PipeData, fluid_data: _FluidData, flow_data: _FlowData, minor_losses_borehole: float,
                  borehole_length: float, r_in_lateral: float, distance_lateral: float, minor_losses_lateral: float,
                  r_in_main: float, distance_main: float, minor_losses_main: float,
-                 nb_of_boreholes: int, series_factor: int, tichelmann_factor: int):
+                 nb_of_boreholes: int, series_factor: int, tichelmann_factor: int, **kwargs):
         """
 
         Parameters
