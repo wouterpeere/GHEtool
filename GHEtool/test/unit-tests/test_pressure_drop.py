@@ -114,6 +114,7 @@ def test_range_pressure_drop():
                                  15, 2, 8, 1, 1)
 
     pressure_pipe, pressure_lat, pressure_main, flow = pressure_drop.create_pressure_drop_curve(2, 30, temperature=20)
+    assert pressure_drop.flow_data == ConstantFlowRate(mfr=0.2)
 
     for idx, val in enumerate(flow):
         if idx == 0:

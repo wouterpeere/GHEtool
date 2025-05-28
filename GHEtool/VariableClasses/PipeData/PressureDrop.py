@@ -152,6 +152,9 @@ class PressureDrop:
         pressure drop in the borehole, pressure drop in the lateral pipes, pressure drop in the main header, flow rates : np.ndarray, np.ndarray, np.ndarray, np.ndarray
             Array with the pressure drops in the borehole [kPa], Array with the pressure drops in the lateral pipe [kPa], Array with the pressure drops in the main header [kPa], Array with the flow rates per borehole [l/s]
         """
+        # backup
+        flow_backup = copy.copy(self.flow_data)
+
         flow_rates = np.linspace(0, range * self.flow_data.vfr(fluid_data=self.fluid_data, **kwargs), datapoints)
         pressure_drops_pipe = np.zeros(flow_rates.shape)
         pressure_drops_lateral = np.zeros(flow_rates.shape)
@@ -163,5 +166,7 @@ class PressureDrop:
             pressure_drops_lateral[i] = self.calculate_pressure_drop_lateral(**kwargs)
             pressure_drops_main[i] = self.calculate_pressure_drop_main(**kwargs)
 
+        # reset backup
+        self.flow_data = flow_backup
         return np.nan_to_num(pressure_drops_pipe), np.nan_to_num(pressure_drops_lateral), \
             np.nan_to_num(pressure_drops_main), flow_rates
