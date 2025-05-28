@@ -34,8 +34,6 @@ def test_lateral():
     pressure_drop = PressureDrop(single_u, fluid_data, flow_data, 0, 100, 0.02 - 0.0037 / 2, 15, 0, 0, 0, 0, 8, 1, 1)
     pressure_drop_double = PressureDrop(single_u, fluid_data, ConstantFlowRate(mfr=0.4), 0, 100, 0.02 - 0.0037 / 2, 15,
                                         0, 0, 0, 0, 8, 1, 1)
-    pressure_drop_four = PressureDrop(single_u, fluid_data, ConstantFlowRate(mfr=0.8), 0, 100, 0.02 - 0.0037 / 2, 15, 0,
-                                      0, 0, 0, 8, 1, 1)
 
     pressure_drop_series = PressureDrop(single_u, fluid_data, flow_data,
                                         0, 100, 0.02 - 0.0037 / 2, 15, 0, 0, 0, 0, 8, 2, 1)
@@ -45,12 +43,11 @@ def test_lateral():
                                       0, 100, 0.02 - 0.0037 / 2, 15, 0, 0, 0, 0, 8, 2, 2)
 
     assert np.isclose(pressure_drop.calculate_pressure_drop_lateral(), 0.26307939880441045 * 2)
-    assert np.isclose(pressure_drop_series.calculate_pressure_drop_lateral(),
-                      pressure_drop_double.calculate_pressure_drop_lateral())
+    assert np.isclose(pressure_drop_series.calculate_pressure_drop_lateral(), 0.26307939880441045 * 2)
     assert np.isclose(pressure_drop_tichelmann.calculate_pressure_drop_lateral(),
                       pressure_drop_double.calculate_pressure_drop_lateral())
     assert np.isclose(pressure_drop_both.calculate_pressure_drop_lateral(),
-                      pressure_drop_four.calculate_pressure_drop_lateral())
+                      pressure_drop_double.calculate_pressure_drop_lateral())
 
     pressure_drop.minor_losses_lateral = 2
     assert np.isclose(pressure_drop.calculate_pressure_drop_lateral(), 0.5635804695478487)
