@@ -211,7 +211,7 @@ class MultipleUTube(_PipeData):
         return {'type': 'U',
                 'nb_of_tubes': self.number_of_pipes,
                 'thickness [mm]': (self.r_out * 1000 - self.r_in * 1000),
-                'diameter [mm]': self.r_out * 2 * 100,
+                'diameter [mm]': self.r_out * 2 * 1000,
                 'spacing [mm]': math.sqrt(self.pos[0][0] ** 2 + self.pos[0][1] ** 2) * 1000,
                 'k_g [W/(m·K)]': self.k_g,
                 'k_p [W/(m·K)]': self.k_p,

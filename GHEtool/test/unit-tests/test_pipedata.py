@@ -212,6 +212,8 @@ def test_reynolds_number():
     assert np.isclose(double.Re(fluid_data=fluid_data, flow_rate_data=flow_data), 4244.131815783876)
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
     assert np.isclose(coaxial.Re(fluid_data=fluid_data, flow_rate_data=flow_data), 1727.5977540504243)
+    assert np.isclose(SingleUTube(1.5, 0.02551 / 2, 0.03151 / 2, 0.4, 0.035).Re(fluid_data, flow_data),
+                      Separatus(1.5).Re(fluid_data, flow_data))
 
 
 def test_pressure_drop():
@@ -225,7 +227,8 @@ def test_pressure_drop():
     assert np.isclose(double.pressure_drop(fluid_data, flow_data, 100, False), 10.339838859988387)
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
     assert np.isclose(coaxial.pressure_drop(fluid_data, flow_data, 100), 0.1639237572210245)
-    assert np.isclose(coaxial.pressure_drop(fluid_data, flow_data, 100, False), 0.16366613552554135)
+    assert np.isclose(SingleUTube(1.5, 0.02551 / 2, 0.03151 / 2, 0.4, 0.035).pressure_drop(fluid_data, flow_data, 100),
+                      Separatus(1.5).pressure_drop(fluid_data, flow_data, 100))
 
 
 def test_repr_():
@@ -234,7 +237,7 @@ def test_repr_():
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
     separatus = Separatus(2)
 
-    assert {'diameter [mm]': 4.0,
+    assert {'diameter [mm]': 40,
             'epsilon [mm]': 0.001,
             'k_g [W/(m·K)]': 1,
             'k_p [W/(m·K)]': 0.4,
@@ -242,7 +245,7 @@ def test_repr_():
             'spacing [mm]': 50.0,
             'thickness [mm]': 2.0,
             'type': 'U'} == single.__export__()
-    assert {'diameter [mm]': 3.2,
+    assert {'diameter [mm]': 32,
             'epsilon [mm]': 0.001,
             'k_g [W/(m·K)]': 1,
             'k_p [W/(m·K)]': 0.4,

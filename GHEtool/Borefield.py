@@ -565,8 +565,7 @@ class Borefield(BaseClass):
             Equivalent borehole thermal resistance [mK/W]
         """
         return self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s, self.depth,
-                                    temperature=min(self.Tf_min,
-                                                    self.results.min_temperature if self.results.min_temperature is not None else 10e6))
+                                    temperature=self.results.min_temperature if self.results.min_temperature is not None else self.Tf_min)
 
     @Rb.setter
     def Rb(self, Rb: float) -> None:
@@ -923,7 +922,9 @@ class Borefield(BaseClass):
             Rm = (gfunct_uniform_T[1] - gfunct_uniform_T[0]) / (2 * pi * k_s)
             Rd = (gfunct_uniform_T[0]) / (2 * pi * k_s)
             # calculate the total borehole length
-            L = (qa * Ra + qm * Rm + qh * Rd + qh * self.Rb) / abs(Tf - self._Tg())
+            L = (qa * Ra + qm * Rm + qh * Rd + qh * self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s,
+                                                                         self.depth,
+                                                                         temperature=Tf)) / abs(Tf - self._Tg())
             # updating the borehole length values
             H_prev = self.H
             self.H = L / self.number_of_boreholes
@@ -985,7 +986,8 @@ class Borefield(BaseClass):
             Rh = (gfunc_uniform_T[0]) / (2 * pi * k_s)
 
             # calculate the total length
-            L = (qh * self.Rb + qh * Rh + qm * Rcm + qpm * Rpm) / abs(Tf - self._Tg())
+            L = (qh * self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s, self.depth,
+                                           temperature=Tf) + qh * Rh + qm * Rcm + qpm * Rpm) / abs(Tf - self._Tg())
 
             # updating the borehole lengths
             H_prev = self.H
@@ -1937,7 +1939,8 @@ class Borefield(BaseClass):
         self.custom_gfunction = CustomGFunction(time_array, borehole_length_array, options)
         self.custom_gfunction.create_custom_dataset(self.borefield, self.ground_data.alpha)
 
-    def Re(self, **kwargs) -> float:
+    @property
+    def Re(self) -> float:
         """
         Reynolds number.
 
@@ -1946,7 +1949,8 @@ class Borefield(BaseClass):
         float
             Reynolds number
         """
-        return self.borehole.Re(**kwargs)
+        return self.borehole.Re(
+            temperature=self.results.min_temperature if self.results.min_temperature is not None else self.Tf_min)
 
     def calculate_quadrant(self) -> int:
         """

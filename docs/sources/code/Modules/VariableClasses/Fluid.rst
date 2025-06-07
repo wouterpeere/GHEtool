@@ -10,6 +10,10 @@ For the fluid data classes you can use have either:
     :members:
     :show-inheritance:
 
+.. automodule:: GHEtool.VariableClasses.CommercialFluids._CommercialFluids
+    :members:
+    :show-inheritance:
+
 .. automodule:: GHEtool.VariableClasses.ConstantFluidData
     :members:
     :show-inheritance:
