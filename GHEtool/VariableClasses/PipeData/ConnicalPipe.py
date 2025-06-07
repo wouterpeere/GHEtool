@@ -77,7 +77,8 @@ class ConicalPipe(MultipleUTube):
         if y < self.begin_conical or y > self.end_conical:
             raise ValueError(
                 f'The value of {y} is not within the conical range of {self.begin_conical}m and {self.end_conical}m.')
-        r_end = (self.r_in_stop - self.r_in_start) / (self.end_conical - self.begin_conical) * y + self.r_in_start
+        r_end = (self.r_in_stop - self.r_in_start) / (self.end_conical - self.begin_conical) * (
+                y - self.begin_conical) + self.r_in_start
         r_avg = (r_end + self.r_in_start) / 2
         return MultipleUTube(self.k_g, r_avg, self.r_out, self.k_p, self.D_s, self.number_of_pipes, self.epsilon), \
             MultipleUTube(self.k_g, r_end, self.r_out, self.k_p, self.D_s, self.number_of_pipes, self.epsilon)

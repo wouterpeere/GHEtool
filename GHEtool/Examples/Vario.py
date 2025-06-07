@@ -43,15 +43,19 @@ r_f_regular_pn12 = []
 r_p_regular_pn12 = []
 r_f_vario = []
 r_p_vario = []
+dp_regular = []
+dp_vario = []
+dp_regular_pn12 = []
+
 for vfr in vfr_range:
     flow = ConstantFlowRate(vfr=vfr)
     borehole_regular = Borehole(fluid, regular_pipe, flow)
     borehole_vario = Borehole(fluid, vario, flow)
     borehole_regular_pn12 = Borehole(fluid, regular_pipe_PN12, flow)
-    rb_regular.append(borehole_regular.get_Rb(160, 1, 0.07, 2))
-    rb_regular_pn12.append(borehole_regular_pn12.get_Rb(160, 1, 0.07, 2))
+    rb_regular.append(borehole_regular.get_Rb(150, 1, 0.07, 2))
+    rb_regular_pn12.append(borehole_regular_pn12.get_Rb(150, 1, 0.07, 2))
 
-    rb_vario.append(borehole_vario.get_Rb(160, 1, 0.07, 2))
+    rb_vario.append(borehole_vario.get_Rb(150, 1, 0.07, 2))
     r_f_regular.append(borehole_regular.pipe_data.R_f)
     r_f_regular_pn12.append(borehole_regular_pn12.pipe_data.R_f)
     r_p_regular.append(borehole_regular.pipe_data.R_p)
@@ -59,10 +63,13 @@ for vfr in vfr_range:
     r_f_vario.append(borehole_vario.pipe_data.R_f)
     r_p_vario.append(borehole_vario.pipe_data.R_p)
 
+    dp_regular.append(regular_pipe.pressure_drop(fluid, flow, borehole_length=150))
+    dp_regular_pn12.append(regular_pipe_PN12.pressure_drop(fluid, flow, borehole_length=150))
+    dp_vario.append(vario.pressure_drop(fluid, flow, borehole_length=150))
+
 plt.figure()
 plt.plot(vfr_range, rb_vario, label="vario")
 plt.plot(vfr_range, rb_regular, label="regular PN 16")
-plt.plot(vfr_range, rb_regular_pn12, label="regular PN12")
 
 plt.xlabel('Volume flow rate [l/s]')
 plt.ylabel('Effective borehole thermal resistance [W/(mK)]')
@@ -77,5 +84,13 @@ plt.plot(vfr_range, r_f_regular, label="R_f regular PN16")
 plt.plot(vfr_range, r_f_regular_pn12, label="R_f regular PN12")
 plt.xlabel('Volume flow rate [l/s]')
 plt.ylabel('Effective borehole thermal resistance [W/(mK)]')
+plt.legend()
+
+plt.figure()
+plt.plot(vfr_range, dp_vario, label="Vario")
+plt.plot(vfr_range, dp_regular, label="Regular PN16")
+plt.plot(vfr_range, dp_regular_pn12, label="Regular PN12")
+plt.xlabel('Volume flow rate [l/s]')
+plt.ylabel('Pressure drop [kPa]')
 plt.legend()
 plt.show()
