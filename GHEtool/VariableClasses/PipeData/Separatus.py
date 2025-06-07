@@ -114,7 +114,7 @@ class Separatus(SingleUTube):
 
         # add 0.2 for the local losses
         # (source: https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html)
-        return ((fd * (borehole_length * 2) / (0.02551) + 0.2) * fluid_data.rho(**kwargs) * V ** 2 / 2) / 1000
+        return ((fd * (borehole_length * 2) / 0.02551 + 0.2) * fluid_data.rho(**kwargs) * V ** 2 / 2) / 1000
 
     def __export__(self):
         return {'type': 'Separatus',
