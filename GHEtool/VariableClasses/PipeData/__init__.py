@@ -4,4 +4,5 @@ from .DoubleUTube import DoubleUTube
 from .MultipleUTube import MultipleUTube
 from .CoaxialPipe import CoaxialPipe
 from .Separatus import Separatus
+from .ConnicalPipe import ConicalPipe
 from .PressureDrop import PressureDrop
