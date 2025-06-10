@@ -1,5 +1,6 @@
 import numpy as np
 import pygfunction as gt
+import math
 
 from math import pi
 
@@ -111,29 +112,37 @@ class ConicalPipe(MultipleUTube):
         first_fraction = self.begin_conical / borehole_length
 
         if borehole_length <= self.end_conical:
+            # work with the cross-section at the borehole length
             conical_part = self._get_pipe_model(borehole_length)[1]
             conical_part.calculate_resistances(fluid_data, flow_rate_data, **kwargs)
             conical_part_R_f_end = conical_part.R_f
             conical_part_R_p_end = conical_part.R_p
+
+            # average the R_f and R_p values for the conical part
             conical_R_f_avg = (conical_part_R_f_end + self._top_pipe.R_f) / 2
             conical_R_p_avg = (conical_part_R_p_end + self._top_pipe.R_p) / 2
 
+            # weigh the R_f and R_p for both the first part and the conical part based on the ratio of their lengths
             self.R_f = self._top_pipe.R_f * first_fraction + conical_R_f_avg * (1 - first_fraction)
             self.R_p = self._top_pipe.R_p * first_fraction + conical_R_p_avg * (1 - first_fraction)
             return
 
         conical_fraction = (self.end_conical - self.begin_conical) / borehole_length
 
+        # work with the cross-section at the borehole length
         conical_part = self._get_pipe_model(self.end_conical)[1]
         conical_part.calculate_resistances(fluid_data, flow_rate_data, **kwargs)
-
         conical_part_R_f_end = conical_part.R_f
         conical_part_R_p_end = conical_part.R_p
+
+        # average the R_f and R_p values for the conical part
         conical_R_f_avg = (conical_part_R_f_end + self._top_pipe.R_f) / 2
         conical_R_p_avg = (conical_part_R_p_end + self._top_pipe.R_p) / 2
 
+        # calculate R_f and R_p for the final pipe
         self._end_pipe.calculate_resistances(fluid_data, flow_rate_data, **kwargs)
 
+        # weigh the R_f and R_f for both the first, conical and last part based on the ratio of their lengths
         self.R_f = self._top_pipe.R_f * first_fraction + \
                    conical_R_f_avg * conical_fraction + \
                    self._end_pipe.R_f * (1 - first_fraction - conical_fraction)
@@ -210,6 +219,7 @@ class ConicalPipe(MultipleUTube):
             fluid_data.rho(**kwargs),
             self.epsilon)
 
+        # work with diameter at the borehole length
         _, pipe_end = self._get_pipe_model(end)
         A = pi * pipe_end.r_in ** 2
         v_end = (flow_rate_data.vfr(fluid_data=fluid_data, **kwargs) / 1000) / A / self.number_of_pipes
@@ -220,11 +230,14 @@ class ConicalPipe(MultipleUTube):
             fluid_data.rho(**kwargs),
             self.epsilon)
 
+        # take the average of the squares of the velocities
         v_avg_quadratic = (v_begin ** 2 + v_end ** 2) / 2
+        # take the regular average for the inner radius and friction factor
         f_avg = (f_begin + f_end) / 2
         r_in_avg = (self.r_in_start + pipe_end.r_in) / 2
-        return ((f_avg * (end - self.begin_conical) / (2 * r_in_avg)) * fluid_data.rho(
-            **kwargs) * v_avg_quadratic ** 2 / 2) / 1000
+
+        return ((f_avg * (end - self.begin_conical) * 2 / (2 * r_in_avg)) * fluid_data.rho(
+            **kwargs) * v_avg_quadratic / 2) / 1000
 
     def pressure_drop(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float,
                       **kwargs) -> float:
@@ -267,4 +280,15 @@ class ConicalPipe(MultipleUTube):
         return first_part + conical_part + last_part
 
     def __export__(self):
-        pass
+        return {'type': 'U',
+                'nb_of_tubes': self.number_of_pipes,
+                'start thickness [mm]': (self.r_out * 1000 - self.r_in_start * 1000),
+                'end thickness [mm]': (self.r_out * 1000 - self.r_in_stop * 1000),
+                'begin conical [m]': self.begin_conical,
+                'end conical [m]': self.end_conical,
+                'diameter [mm]': self.r_out * 2 * 1000,
+                'spacing [mm]': math.sqrt(self.pos[0][0] ** 2 + self.pos[0][1] ** 2) * 1000,
+                'k_g [W/(m·K)]': self.k_g,
+                'k_p [W/(m·K)]': self.k_p,
+                'epsilon [mm]': self.epsilon * 1000
+                }
