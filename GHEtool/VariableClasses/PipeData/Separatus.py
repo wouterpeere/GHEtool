@@ -77,8 +77,7 @@ class Separatus(SingleUTube):
         -------
         Reynolds number : float
         """
-        u = flow_rate_data.mfr(fluid_data=fluid_data, **kwargs) / fluid_data.rho(**kwargs) / \
-            (pi * (0.02551 / 2) ** 2)
+        u = flow_rate_data.mfr(fluid_data=fluid_data, **kwargs) / fluid_data.rho(**kwargs) / (705.27 * 1e-6)
         return fluid_data.rho(**kwargs) * u * 0.02551 / fluid_data.mu(**kwargs)
 
     def pressure_drop(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float,
