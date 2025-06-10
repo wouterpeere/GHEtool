@@ -109,12 +109,12 @@ class Separatus(SingleUTube):
             fluid_data.mu(**kwargs),
             fluid_data.rho(**kwargs),
             self.epsilon)
-        A = pi * (0.02551 / 2) ** 2
+        A = 705.27 * 1e-6  # cross-sectional area of the separatus
         V = (flow_rate_data.vfr(fluid_data=fluid_data, **kwargs) / 1000) / A
 
         # add 0.2 for the local losses
         # (source: https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html)
-        return ((fd * (borehole_length * 2) / (0.02551) + 0.2) * fluid_data.rho(**kwargs) * V ** 2 / 2) / 1000
+        return ((fd * (borehole_length * 2) / 0.02551 + 0.2) * fluid_data.rho(**kwargs) * V ** 2 / 2) / 1000
 
     def __export__(self):
         return {'type': 'Separatus',
