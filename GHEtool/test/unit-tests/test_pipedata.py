@@ -270,6 +270,23 @@ def test_conical_resistances():
     assert np.isclose(0.17492415197256533, pipe.R_f)
 
 
+def test_conical_pressure_drop():
+    pipe = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
+    fluid = TemperatureDependentFluidData('MPG', 20).create_constant(0)
+    flow = ConstantFlowRate(vfr=0.2)
+    assert 0 == pipe._pressure_conical(fluid, flow, end=80)
+
+
+def test_conical_pressure_drop_total():
+    pipe = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
+    fluid = TemperatureDependentFluidData('MPG', 20).create_constant(0)
+    flow = ConstantFlowRate(vfr=0.2)
+
+    assert pipe._top_pipe.pressure_drop(fluid, flow, 60) == pipe.pressure_drop(fluid, flow, 60)
+    assert np.isclose(13.287983793150875, pipe.pressure_drop(fluid, flow, 100))
+    assert np.isclose(31.27107478947142, pipe.pressure_drop(fluid, flow, 180))
+
+
 def test_conical_reynolds():
     pipe = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
     begin_pipe = SingleUTube(1.5, 0.0135, 0.016, 0.4, 0.035)

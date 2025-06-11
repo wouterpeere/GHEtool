@@ -98,6 +98,8 @@ Concretely, the classes you can use are:
 * _Single U-tubes (special case of multiple U-tubes)_
 * _Double U-tubes (special case of multiple U-tubes)_
 * _Coaxial pipe_
+* _Conical pipe_ (like the Vario probes from
+  HakaGerodur ([learn more]('https://www.hakagerodur.ch/de/gerotherm-vario/')))
 * _Separatus tube_: The Separatus geothermal heat exchanger is an innovation in the geothermal domain. It consists of a
   single, DN50 pipe with a unique 'splitpipe'-technology that separates the cold and the hot side of the fluid. For
   design purposes, it is advised to use this with rather small borehole diameters of DN90. For more information visit

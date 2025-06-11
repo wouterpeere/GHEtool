@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 
 - Add flag in pressure drop calculation to in or exclude the pressure drop in the bend.
+- Added conical borehole heat exchangers (like the Vario probe from HakaGerodur).
 
 ### Fixed
 
