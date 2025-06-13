@@ -180,10 +180,11 @@ class Turbocollector(MultipleUTube):
         return ((fd * (borehole_length * 2) / (2 * self.r_in) + 0.2) * fluid_data.rho(**kwargs) * V ** 2 / 2) / 1000
 
     def __export__(self):
-        return {'type': 'Turbocollector',
-                'nb_of_tubes': self.number_of_pipes,
-                'thickness [mm]': (self.r_out * 1000 - self.r_in * 1000),
-                'diameter [mm]': self.r_out * 2 * 1000,
-                'spacing [mm]': math.sqrt(self.pos[0][0] ** 2 + self.pos[0][1] ** 2) * 1000,
-                'k_g [W/(m·K)]': self.k_g,
-                }
+        return {
+            'type': 'Turbocollector',
+            'nb_of_tubes': self.number_of_pipes,
+            'thickness [mm]': (self.r_out * 1000 - self.r_in * 1000),
+            'diameter [mm]': self.r_out * 2 * 1000,
+            'spacing [mm]': math.sqrt(self.pos[0][0] ** 2 + self.pos[0][1] ** 2) * 1000,
+            'k_g [W/(m·K)]': self.k_g,
+        }
