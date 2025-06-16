@@ -10,6 +10,7 @@ You can use:
 #. Double U-tubes (special case of multiple U-tubes)
 #. Coaxial pipe
 #. Separatus pipe (https://separatus.ch/en)
+#. Turbocollector pipe (https://www.muovitech.com/group/?page=turbo)
 
 All of the classes above are children from the abstract _PipeData class.
 
@@ -35,5 +36,9 @@ All of the classes above are children from the abstract _PipeData class.
     :show-inheritance:
 
 .. automodule:: GHEtool.VariableClasses.PipeData.Separatus
+    :members:
+    :show-inheritance:
+
+.. automodule:: GHEtool.VariableClasses.PipeData.Turbocollector
     :members:
     :show-inheritance:
