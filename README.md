@@ -161,11 +161,9 @@ Concretely, the classes you can use are:
   single, DN50 pipe with a unique 'splitpipe'-technology that separates the cold and the hot side of the fluid. For
   design purposes, it is advised to use this with rather small borehole diameters of DN90. For more information visit
   the [Separatus website]('https://separatus.ch/en/').
-*
-    * _Turbocollector_: The Turbocollector from Muovitech has internal fins which enhances the turbulent flow character
-      at
-      lower flow rates. Visit their website for more
-      information [turbocollector website](https://www.muovitech.com/group/?page=turbo).
+* _Turbocollector_: The Turbocollector from Muovitech has internal fins which enhances the turbulent flow character
+  at lower flow rates. Visit their website for more
+  information [turbocollector website](https://www.muovitech.com/group/?page=turbo).
 
 Please note that it is possible to add your own pipe types by inheriting the attributes from the abstract _PipeData
 class.
