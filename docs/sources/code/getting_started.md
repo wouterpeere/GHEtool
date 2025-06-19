@@ -100,11 +100,13 @@ Concretely, the classes you can use are:
 * _Coaxial pipe_
 * _Separatus tube_: The Separatus geothermal heat exchanger is an innovation in the geothermal domain. It consists of a
   single, DN50 pipe with a unique 'splitpipe'-technology that separates the cold and the hot side of the fluid. For
-  design purposes, it is advised to use this with rather small borehole diameters of DN90. For more information visit
-  the [Separatus website](https://separatus.ch/en/).
-* _Turbocollector_: The Turbocollector from Muovitech has internal fins which enhances the turbulent flow character at
-  lower flow rates. Visit their website for more
-  information [turbocollector website](https://www.muovitech.com/group/?page=turbo).
+  design purposes, it is advised to use this with rather small borehole diameters of DN90. For more information, visit
+  the [separatus website](https://separatus.ch/en/). An example in GHEtool can be
+  found [here](https://ghetool.readthedocs.io/en/latest/sources/code/Examples/separatus.html).
+* _Turbocollector_: The Turbocollector from Muovitech has internal fins which enhances the turbulent flow character
+  at lower flow rates. Visit their website for more
+  information [turbocollector website](https://www.muovitech.com/group/?page=turbo). An example in GHEtool can be
+  found [here](https://ghetool.readthedocs.io/en/latest/sources/code/Examples/turbocollector.html).
 
 Please note that it is possible to add your own pipe types by inheriting the attributes from the abstract _PipeData
 class.
@@ -114,7 +116,8 @@ class.
 You can set the fluid data by using the FluidData class.
 
 * _ConstantFluidData_: Temperature independent fluid properties
-* _TemperatureDependentFluidData_: Temperature dependent fluid data (Water, MPG, MEG, MMA, MEA)
+* _TemperatureDependentFluidData_: Temperature dependent fluid data (Water, MPG, MEG, MMA, MEA, Thermox DTX, Coolflow
+  NTP)
 
 #### Flow rate data
 

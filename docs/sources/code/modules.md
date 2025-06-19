@@ -20,5 +20,4 @@ Modules/VariableClasses.md
 Modules/CustomGFunction.rst
 Modules/GFunction.rst
 Modules/SizingSetup.rst
-Modules/Logger.rst
 ```

@@ -251,6 +251,26 @@ def test_multilayer_values():
     assert 2400000.0 == constant.volumetric_heat_capacity(30)
 
 
+def test_ground_temp_layer():
+    ground = GroundTemperatureGradient(None, 10, gradient=4)
+    ground.add_layer_on_bottom(GroundLayer(k_s=1, thickness=50))
+    ground.add_layer_on_bottom(GroundLayer(k_s=2, thickness=50))
+    assert ground.k_s(100) == 1.5
+    assert ground.calculate_Tg(50) == 11
+    assert ground.calculate_Tg(100) == 12
+    ground = GroundFluxTemperature(None, 10, flux=0.08)
+    ground_1 = GroundFluxTemperature(1, 10, flux=0.08)
+    ground_15 = GroundFluxTemperature(1.5, 10, flux=0.08)
+    ground.add_layer_on_bottom(GroundLayer(k_s=1, thickness=50))
+    ground.add_layer_on_bottom(GroundLayer(k_s=2, thickness=50))
+    assert ground.k_s(50) == 1
+    assert ground_1.calculate_Tg(50) == 12
+    assert ground.calculate_Tg(50) == 12
+    assert ground.k_s(100) == 1.5
+    assert np.isclose(ground_15.calculate_Tg(100), 12.6ra te66666666666664)
+    assert np.isclose(ground.calculate_Tg(100), 12.666666666666664)
+
+
 def test_repr_():
     ground_flux_temperature = GroundFluxTemperature(3, 11, 2.4 * 10 ** 6, 0.06)
     ground_constant_temperature = GroundConstantTemperature(3, 11)
