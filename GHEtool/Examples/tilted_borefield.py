@@ -49,5 +49,5 @@ def tilted():
     borefield.print_temperature_profile()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no-cover
     tilted()

@@ -16,5 +16,6 @@ Examples/sizing_with_building_load_hourly.rst
 Examples/sizing_with_Rb_calculation.rst
 Examples/start_in_different_month.rst
 Examples/temperature_dependent_fluid_data_sizing.rst
+Examples/turbocollector.rst
 Examples/multiple_ground_layers.rst
 ```

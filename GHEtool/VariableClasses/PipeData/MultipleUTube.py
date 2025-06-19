@@ -30,13 +30,13 @@ class MultipleUTube(_PipeData):
         Parameters
         ----------
         k_g : float
-            Grout thermal conductivity [W/mK]
+            Grout thermal conductivity [W/(mK)]
         r_in : float
             Inner pipe radius [m]
         r_out : float
             Outer pipe radius [m]
         k_p : float
-            Pipe thermal conductivity [W/mK]
+            Pipe thermal conductivity [W/(mK)]
         D_s : float
             Distance of the pipe until center [m]
         number_of_pipes : int
@@ -99,6 +99,7 @@ class MultipleUTube(_PipeData):
             flow_rate_data.mfr(fluid_data=fluid_data, **kwargs) / self.number_of_pipes,
             self.r_in, fluid_data.mu(**kwargs), fluid_data.rho(**kwargs),
             fluid_data.k_f(**kwargs), fluid_data.cp(**kwargs), self.epsilon)
+
         # Film thermal resistance [m.K/W]
         self.R_f = 1.0 / (h_f * 2 * np.pi * self.r_in)
 
@@ -210,4 +211,5 @@ class MultipleUTube(_PipeData):
                 'spacing [mm]': math.sqrt(self.pos[0][0] ** 2 + self.pos[0][1] ** 2) * 1000,
                 'k_g [W/(m·K)]': self.k_g,
                 'k_p [W/(m·K)]': self.k_p,
-                'epsilon [mm]': self.epsilon * 1000}
+                'epsilon [mm]': self.epsilon * 1000
+                }

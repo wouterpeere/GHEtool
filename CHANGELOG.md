@@ -7,7 +7,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [2.3.4] - Unpublished
 
-## Fixed
+###
+
+- Added Turbocollector from Muovitech.
+
+### Fixed
 
 - Small bug in pressure drop lateral pipe.
 - Small bug in pressure drop calculation of separatus.

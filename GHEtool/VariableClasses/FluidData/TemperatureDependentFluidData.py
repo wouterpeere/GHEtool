@@ -30,7 +30,7 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
         Parameters
         ----------
         name : str
-            Name of the antifreeze. Currently, there is: Water, MEG, MPG, MEA, MMA
+            Name of the antifreeze. Currently, there is: Water, MEG, MPG, MEA, MMA, Thermox DTX, Coolflow NTP
         percentage : float
             Percentage of the antifreeze [%]
         mass_percentage : bool
@@ -123,7 +123,7 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
         Parameters
         ----------
         name : str
-            Name of the antifreeze. Currently, there is: Water, MEG, MPG, MEA, MMA
+            Name of the antifreeze. Currently, there is: Water, MEG, MPG, MEA, MMA, Thermox DTX, Coolflow NTP
         percentage : float
             Percentage of the antifreeze [%]
 
@@ -166,7 +166,7 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
         Parameters
         ----------
         name : str
-            Name of the antifreeze. Currently, there is: Water, MEG, MPG, MEA, MMA
+            Name of the antifreeze. Currently, there is: Water, MEG, MPG, MEA, MMA, Thermox DTX, Coolflow NTP
         percentage : float
             Percentage of the antifreeze [%]
 

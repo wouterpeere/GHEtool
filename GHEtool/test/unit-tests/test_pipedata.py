@@ -233,7 +233,7 @@ def test_repr_():
     double = MultipleUTube(1, 0.013, 0.016, 0.4, 0.05, 2)
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
     separatus = Separatus(2)
-
+    turbo = Turbocollector(1.5, 0.013, 0.016, 0.05, 1)
     assert {'diameter [mm]': 40,
             'epsilon [mm]': 0.001,
             'k_g [W/(m·K)]': 1,
@@ -260,3 +260,9 @@ def test_repr_():
             'outer_thickness [mm]': 6.299999999999997,
             'type': 'Coaxial'} == coaxial.__export__()
     assert {'k_g [W/(m·K)]': 2, 'type': 'Separatus'} == separatus.__export__()
+    assert {'diameter [mm]': 32.0,
+            'k_g [W/(m·K)]': 1.5,
+            'nb_of_tubes': 1,
+            'spacing [mm]': 50.0,
+            'thickness [mm]': 3.0,
+            'type': 'Turbocollector'} == turbo.__export__()
