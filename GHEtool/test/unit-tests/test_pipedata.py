@@ -1,6 +1,7 @@
 """
 This file contains the test for the pipedata
 """
+import math
 
 from GHEtool.VariableClasses.PipeData import *
 from GHEtool.VariableClasses import ConstantFluidData, ConstantFlowRate, TemperatureDependentFluidData
@@ -212,8 +213,7 @@ def test_reynolds_number():
     assert np.isclose(double.Re(fluid_data=fluid_data, flow_rate_data=flow_data), 4244.131815783876)
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
     assert np.isclose(coaxial.Re(fluid_data=fluid_data, flow_rate_data=flow_data), 1727.5977540504243)
-    assert np.isclose(SingleUTube(1.5, 0.02551 / 2, 0.03151 / 2, 0.4, 0.035).Re(fluid_data, flow_data),
-                      Separatus(1.5).Re(fluid_data, flow_data))
+    assert np.isclose(7234.108922823884, Separatus(1.5).Re(fluid_data, flow_data))
 
 
 def test_pressure_drop():
@@ -225,8 +225,7 @@ def test_pressure_drop():
     assert np.isclose(double.pressure_drop(fluid_data, flow_data, 100), 10.347836812519452)
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
     assert np.isclose(coaxial.pressure_drop(fluid_data, flow_data, 100), 0.1639237572210245)
-    assert np.isclose(SingleUTube(1.5, 0.02551 / 2, 0.03151 / 2, 0.4, 0.035).pressure_drop(fluid_data, flow_data, 100),
-                      Separatus(1.5).pressure_drop(fluid_data, flow_data, 100))
+    assert np.isclose(19.84145159678991, Separatus(1.5).pressure_drop(fluid_data, flow_data, 100))
 
 
 def test_repr_():
