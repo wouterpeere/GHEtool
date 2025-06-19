@@ -267,7 +267,7 @@ def test_ground_temp_layer():
     assert ground_1.calculate_Tg(50) == 12
     assert ground.calculate_Tg(50) == 12
     assert ground.k_s(100) == 1.5
-    assert np.isclose(ground_15.calculate_Tg(100), 12.6ra te66666666666664)
+    assert np.isclose(ground_15.calculate_Tg(100), 12.666666666666664)
     assert np.isclose(ground.calculate_Tg(100), 12.666666666666664)
 
 
