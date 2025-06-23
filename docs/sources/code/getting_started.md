@@ -62,7 +62,7 @@ successfully.
 
 ## Building blocks of GHEtool
 
-GHEtool is a flexible package that can be extend with methods
+GHEtool is a flexible package that can be extended with methods
 from [pygfunction](https://pygfunction.readthedocs.io/en/stable/) (
 and [ScenarioGUI](https://github.com/tblanke/ScenarioGUI) for the GUI part).
 To work efficiently with GHEtool, it is important to understand the main structure of the package.
@@ -150,7 +150,7 @@ when it comes to choosing the right load data class.
 
 Depending on your answer on these three questions, you can opt for one of eight different load classes:
 
-* _MonthlyGeothermalLoadAbsolute_: You can set one the monthly baseload and peak load for extraction and injection for
+* _MonthlyGeothermalLoadAbsolute_: You can set the monthly baseload and peak load for extraction and injection for
   one standard year which will be used for all years within the simulation period.
 * _HourlyGeothermalLoad_: You can set (or load) the hourly extraction and injection load of a standard year which will
   be used for all years within the simulation period.
@@ -185,14 +185,14 @@ constant ground temperature (e.g. from a TRT-test),
 and we will provide the load with a monthly resolution.
 
 ```Python
-from GHEtool import Borefield, GroundDataConstantTemperature, MonthlyGeothermalLoadAbsolute
+from GHEtool import Borefield, GroundConstantTemperature, MonthlyGeothermalLoadAbsolute
 ```
 
 After importing the necessary classes, the relevant ground data parameters are set.
 
 ```Python
 data =
-GroundDataConstantTemperature(3,  # ground thermal conductivity (W/mK)
+GroundConstantTemperature(3,  # ground thermal conductivity (W/mK)
                               10,  # initial/undisturbed ground temperature (deg C)
                               2.4 * 10 ** 6)  # volumetric heat capacity of the ground (J/m3K) 
 ```
@@ -216,7 +216,7 @@ load = MonthlyGeothermalLoadAbsolute(monthly_load_extraction, monthly_load_injec
 
 Next, we create the borefield object in GHEtool and set the temperature constraints and the ground data.
 Here, since we do not use a pipe and fluid model (
-see [Examples](https://ghetool.readthedocs.io/en/stable/sources/code/examples.html) if you need examples were no
+see [Examples](https://ghetool.readthedocs.io/en/stable/sources/code/examples.html) if you need examples where no
 borehole thermal resistance is given),
 we set the borehole equivalent thermal resistance.
 

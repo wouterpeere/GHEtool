@@ -24,7 +24,7 @@ website [https://GHEtool.eu](https://GHEtool.eu) for more information.
 
 ### Read The Docs
 
-GHEtool has an elaborate documentation were all the functionalities of the tool are explained, with examples, literature
+GHEtool has an elaborate documentation where all the functionalities of the tool are explained, with examples, literature
 and validation. This can be found
 on [https://ghetool.readthedocs.io/en/latest/](https://ghetool.readthedocs.io/en/latest/).
 
@@ -136,7 +136,7 @@ All attributes (ground properties, load data ...) are set inside the borefield o
 
 Within GHEtool, there are multiple ways of setting the ground data. Currently, your options are:
 
-* _GroundConstantTemperature_: if you want to model your borefield with a constant, know ground temperature.
+* _GroundConstantTemperature_: if you want to model your borefield with a constant, known ground temperature.
 * _GroundFluxTemperature_: if you want to model your ground with a varying ground temperature due to a constant
   geothermal heat flux.
 * _GroundTemperatureGradient_: if you want to model your ground with a varying ground temperature due to a geothermal
@@ -209,7 +209,7 @@ when it comes to choosing the right load data class.
 
 Depending on your answer on these three questions, you can opt for one of eight different load classes:
 
-* _MonthlyGeothermalLoadAbsolute_: You can set one the monthly baseload and peak load for extraction and injection for
+* _MonthlyGeothermalLoadAbsolute_: You can set the monthly baseload and peak load for extraction and injection for
   one standard year which will be used for all years within the simulation period.
 * _HourlyGeothermalLoad_: You can set (or load) the hourly extraction and injection load of a standard year which will
   be used for all years within the simulation period.
@@ -217,7 +217,7 @@ Depending on your answer on these three questions, you can opt for one of eight 
   i.e. for the whole simulation period).
 * _MonthlyGeothermalLoadMultiYear_: You can set the monthly extraction and injection load for multiple years (i.e. for
   the whole simulation period).
-* _MonthlyBuildingLoadAbsolute_: You can set one the monthly baseload and peak load for heating and cooling for
+* _MonthlyBuildingLoadAbsolute_: You can set the monthly baseload and peak load for heating and cooling for
   one standard year which will be used for all years within the simulation period.
 * _HourlyBuildingLoad_: You can set (or load) the hourly heating and cooling load of a standard year which will
   be used for all years within the simulation period.
@@ -266,13 +266,13 @@ constant ground temperature (e.g. from a TRT-test),
 and we will provide the load with a monthly resolution.
 
 ```Python
-from GHEtool import Borefield, GroundDataConstantTemperature, MonthlyGeothermalLoadAbsolute
+from GHEtool import Borefield, GroundConstantTemperature, MonthlyGeothermalLoadAbsolute
 ```
 
 After importing the necessary classes, the relevant ground data parameters are set.
 
 ```Python
-data = GroundDataConstantTemperature(3,  # ground thermal conductivity (W/mK)
+data = GroundConstantTemperature(3,  # ground thermal conductivity (W/mK)
                                      10,  # initial/undisturbed ground temperature (deg C)
                                      2.4 * 10 ** 6)  # volumetric heat capacity of the ground (J/m3K) 
 ```
@@ -296,7 +296,7 @@ load = MonthlyGeothermalLoadAbsolute(monthly_load_extraction, monthly_load_injec
 
 Next, we create the borefield object in GHEtool and set the temperature constraints and the ground data.
 Here, since we do not use a pipe and fluid model (
-see [Examples](https://ghetool.readthedocs.io/en/stable/sources/code/examples.html) if you need examples were no
+see [Examples](https://ghetool.readthedocs.io/en/stable/sources/code/examples.html) if you need examples where no
 borehole thermal resistance is given),
 we set the borehole equivalent thermal resistance.
 
