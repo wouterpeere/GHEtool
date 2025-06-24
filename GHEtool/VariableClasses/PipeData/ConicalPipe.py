@@ -280,7 +280,7 @@ class ConicalPipe(MultipleUTube):
         return first_part + conical_part + last_part
 
     def __export__(self):
-        return {'type': 'U',
+        return {'type': 'Conical',
                 'nb_of_tubes': self.number_of_pipes,
                 'start thickness [mm]': (self.r_out * 1000 - self.r_in_start * 1000),
                 'end thickness [mm]': (self.r_out * 1000 - self.r_in_stop * 1000),

@@ -352,4 +352,4 @@ def test_repr_():
             'nb_of_tubes': 1,
             'spacing [mm]': 35.0,
             'start thickness [mm]': 2.5,
-            'type': 'U'} == vario.__export__()
+            'type': 'Conical'} == vario.__export__()

@@ -5,5 +5,5 @@ from .MultipleUTube import MultipleUTube
 from .CoaxialPipe import CoaxialPipe
 from .Separatus import Separatus
 from .Turbocollector import Turbocollector
-from .ConnicalPipe import ConicalPipe
+from .ConicalPipe import ConicalPipe
 from .PressureDrop import PressureDrop
