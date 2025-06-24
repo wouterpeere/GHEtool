@@ -62,7 +62,7 @@ successfully.
 
 ## Building blocks of GHEtool
 
-GHEtool is a flexible package that can be extend with methods
+GHEtool is a flexible package that can be extended with methods
 from [pygfunction](https://pygfunction.readthedocs.io/en/stable/) (
 and [ScenarioGUI](https://github.com/tblanke/ScenarioGUI) for the GUI part).
 To work efficiently with GHEtool, it is important to understand the main structure of the package.
@@ -102,8 +102,13 @@ Concretely, the classes you can use are:
   HakaGerodur ([learn more]('https://www.hakagerodur.ch/de/gerotherm-vario/')))
 * _Separatus tube_: The Separatus geothermal heat exchanger is an innovation in the geothermal domain. It consists of a
   single, DN50 pipe with a unique 'splitpipe'-technology that separates the cold and the hot side of the fluid. For
-  design purposes, it is advised to use this with rather small borehole diameters of DN90. For more information visit
-  the [Separatus website]('https://separatus.ch/en/').
+  design purposes, it is advised to use this with rather small borehole diameters of DN90. For more information, visit
+  the [separatus website](https://separatus.ch/en/). An example in GHEtool can be
+  found [here](https://ghetool.readthedocs.io/en/latest/sources/code/Examples/separatus.html).
+* _Turbocollector_: The Turbocollector from Muovitech has internal fins which enhances the turbulent flow character
+  at lower flow rates. Visit their website for more
+  information [turbocollector website](https://www.muovitech.com/group/?page=turbo). An example in GHEtool can be
+  found [here](https://ghetool.readthedocs.io/en/latest/sources/code/Examples/turbocollector.html).
 
 Please note that it is possible to add your own pipe types by inheriting the attributes from the abstract _PipeData
 class.
@@ -113,7 +118,8 @@ class.
 You can set the fluid data by using the FluidData class.
 
 * _ConstantFluidData_: Temperature independent fluid properties
-* _TemperatureDependentFluidData_: Temperature dependent fluid data (Water, MPG, MEG, MMA, MEA)
+* _TemperatureDependentFluidData_: Temperature dependent fluid data (Water, MPG, MEG, MMA, MEA, Thermox DTX, Coolflow
+  NTP)
 
 #### Flow rate data
 
@@ -146,7 +152,7 @@ when it comes to choosing the right load data class.
 
 Depending on your answer on these three questions, you can opt for one of eight different load classes:
 
-* _MonthlyGeothermalLoadAbsolute_: You can set one the monthly baseload and peak load for extraction and injection for
+* _MonthlyGeothermalLoadAbsolute_: You can set the monthly baseload and peak load for extraction and injection for
   one standard year which will be used for all years within the simulation period.
 * _HourlyGeothermalLoad_: You can set (or load) the hourly extraction and injection load of a standard year which will
   be used for all years within the simulation period.
@@ -181,14 +187,14 @@ constant ground temperature (e.g. from a TRT-test),
 and we will provide the load with a monthly resolution.
 
 ```Python
-from GHEtool import Borefield, GroundDataConstantTemperature, MonthlyGeothermalLoadAbsolute
+from GHEtool import Borefield, GroundConstantTemperature, MonthlyGeothermalLoadAbsolute
 ```
 
 After importing the necessary classes, the relevant ground data parameters are set.
 
 ```Python
 data =
-GroundDataConstantTemperature(3,  # ground thermal conductivity (W/mK)
+GroundConstantTemperature(3,  # ground thermal conductivity (W/mK)
                               10,  # initial/undisturbed ground temperature (deg C)
                               2.4 * 10 ** 6)  # volumetric heat capacity of the ground (J/m3K) 
 ```
@@ -212,7 +218,7 @@ load = MonthlyGeothermalLoadAbsolute(monthly_load_extraction, monthly_load_injec
 
 Next, we create the borefield object in GHEtool and set the temperature constraints and the ground data.
 Here, since we do not use a pipe and fluid model (
-see [Examples](https://ghetool.readthedocs.io/en/stable/sources/code/examples.html) if you need examples were no
+see [Examples](https://ghetool.readthedocs.io/en/stable/sources/code/examples.html) if you need examples where no
 borehole thermal resistance is given),
 we set the borehole equivalent thermal resistance.
 

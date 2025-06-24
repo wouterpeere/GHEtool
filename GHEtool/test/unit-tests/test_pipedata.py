@@ -1,6 +1,7 @@
 """
 This file contains the test for the pipedata
 """
+import math
 import pytest
 
 from GHEtool.VariableClasses.PipeData import *
@@ -213,8 +214,7 @@ def test_reynolds_number():
     assert np.isclose(double.Re(fluid_data=fluid_data, flow_rate_data=flow_data), 4244.131815783876)
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
     assert np.isclose(coaxial.Re(fluid_data=fluid_data, flow_rate_data=flow_data), 1727.5977540504243)
-    assert np.isclose(SingleUTube(1.5, 0.02551 / 2, 0.03151 / 2, 0.4, 0.035).Re(fluid_data, flow_data),
-                      Separatus(1.5).Re(fluid_data, flow_data))
+    assert np.isclose(7234.108922823884, Separatus(1.5).Re(fluid_data, flow_data))
 
 
 def test_pressure_drop():
@@ -228,8 +228,7 @@ def test_pressure_drop():
     assert np.isclose(double.pressure_drop(fluid_data, flow_data, 100, False), 10.339838859988387)
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
     assert np.isclose(coaxial.pressure_drop(fluid_data, flow_data, 100), 0.1639237572210245)
-    assert np.isclose(SingleUTube(1.5, 0.02551 / 2, 0.03151 / 2, 0.4, 0.035).pressure_drop(fluid_data, flow_data, 100),
-                      Separatus(1.5).pressure_drop(fluid_data, flow_data, 100))
+    assert np.isclose(19.84145159678991, Separatus(1.5).pressure_drop(fluid_data, flow_data, 100))
 
 
 def test_conical_pipe_get_pipe_model():
@@ -309,8 +308,8 @@ def test_repr_():
     double = MultipleUTube(1, 0.013, 0.016, 0.4, 0.05, 2)
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
     separatus = Separatus(2)
+    turbo = Turbocollector(1.5, 0.013, 0.016, 0.05, 1)
     vario = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
-
     assert {'diameter [mm]': 40,
             'epsilon [mm]': 0.001,
             'k_g [W/(m·K)]': 1,
@@ -337,6 +336,12 @@ def test_repr_():
             'outer_thickness [mm]': 6.299999999999997,
             'type': 'Coaxial'} == coaxial.__export__()
     assert {'k_g [W/(m·K)]': 2, 'type': 'Separatus'} == separatus.__export__()
+    assert {'diameter [mm]': 32.0,
+            'k_g [W/(m·K)]': 1.5,
+            'nb_of_tubes': 1,
+            'spacing [mm]': 50.0,
+            'thickness [mm]': 3.0,
+            'type': 'Turbocollector'} == turbo.__export__()
     assert {'begin conical [m]': 80,
             'diameter [mm]': 32.0,
             'end conical [m]': 160,
