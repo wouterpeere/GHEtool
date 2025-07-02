@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from GHEtool import FluidData, DoubleUTube, SingleUTube, MultipleUTube, ConstantFluidData, ConstantFlowRate, \
-    TemperatureDependentFluidData
+    TemperatureDependentFluidData, ConicalPipe
 from GHEtool.VariableClasses import Borehole
 
 fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
@@ -265,3 +265,20 @@ def test_saved_data_reynolds_commercial():
 
     assert np.allclose([0.12849791, 0.12843995, 0.1283812, 0.12820668],
                        borehole.calculate_Rb(100, 1, 0.075, 3, temperature=np.array([0, 1, 2, 5])))
+
+
+def test_borehole_resistance_conical():
+    borehole = Borehole()
+    borehole.pipe_data = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
+    borehole.fluid_data = TemperatureDependentFluidData('MEG', 25)
+    borehole.flow_data = ConstantFlowRate(vfr=0.3)
+    assert np.allclose([0.12693282, 0.12664951, 0.12644177, 0.12588726],
+                       borehole.calculate_Rb(60, 1, 0.075, 3, temperature=np.array([0, 1, 2, 5])))
+    borehole.pipe_data = SingleUTube(1.5, 0.0135, 0.016, 0.4, 0.035)
+    assert np.allclose([0.12693282, 0.12664951, 0.12644177, 0.12588726],
+                       borehole.calculate_Rb(60, 1, 0.075, 3, temperature=np.array([0, 1, 2, 5])))
+    borehole.pipe_data = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
+    borehole.fluid_data = TemperatureDependentFluidData('MEG', 25)
+    borehole.flow_data = ConstantFlowRate(vfr=0.3)
+    assert np.allclose([0.13332881, 0.13306602, 0.1328651, 0.13232777],
+                       borehole.calculate_Rb(120, 1, 0.075, 3, temperature=np.array([0, 1, 2, 5])))

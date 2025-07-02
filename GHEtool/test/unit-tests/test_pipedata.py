@@ -2,6 +2,7 @@
 This file contains the test for the pipedata
 """
 import math
+import pytest
 
 from GHEtool.VariableClasses.PipeData import *
 from GHEtool.VariableClasses import ConstantFluidData, ConstantFlowRate, TemperatureDependentFluidData
@@ -222,10 +223,84 @@ def test_pressure_drop():
     single = MultipleUTube(1, 0.02, 0.02, 0.4, 0.05, 1)
     double = MultipleUTube(1, 0.013, 0.016, 0.4, 0.05, 2)
     assert np.isclose(single.pressure_drop(fluid_data, flow_data, 100), 4.474549607676448)
+    assert np.isclose(single.pressure_drop(fluid_data, flow_data, 100, False), 4.4688388696204555)
     assert np.isclose(double.pressure_drop(fluid_data, flow_data, 100), 10.347836812519452)
+    assert np.isclose(double.pressure_drop(fluid_data, flow_data, 100, False), 10.339838859988387)
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
     assert np.isclose(coaxial.pressure_drop(fluid_data, flow_data, 100), 0.1639237572210245)
     assert np.isclose(19.84145159678991, Separatus(1.5).pressure_drop(fluid_data, flow_data, 100))
+
+
+def test_conical_pipe_get_pipe_model():
+    pipe = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
+    with pytest.raises(ValueError):
+        pipe._get_pipe_model(1)
+    with pytest.raises(ValueError):
+        pipe._get_pipe_model(170)
+
+    assert pipe._top_pipe == MultipleUTube(1.5, 0.0135, 0.016, 0.4, 0.035, 1)
+    assert pipe._end_pipe == MultipleUTube(1.5, 0.013, 0.016, 0.4, 0.035, 1)
+
+    assert pipe._top_pipe == pipe._get_pipe_model(80)[0]
+    assert pipe._top_pipe == pipe._get_pipe_model(80)[1]
+    assert MultipleUTube(1.5, 0.01325, 0.016, 0.4, 0.035, 1) == pipe._get_pipe_model(160)[0]
+    assert pipe._end_pipe == pipe._get_pipe_model(160)[1]
+
+
+def test_conical_resistances():
+    pipe = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
+    begin_pipe = SingleUTube(1.5, 0.0135, 0.016, 0.4, 0.035)
+    fluid = TemperatureDependentFluidData('MPG', 20).create_constant(0)
+    flow = ConstantFlowRate(vfr=0.2)
+
+    # below threshold
+    pipe.calculate_resistances(fluid, flow, 60)
+    begin_pipe.calculate_resistances(fluid, flow, borehole_length=60)
+
+    assert pipe.R_p == begin_pipe.R_p
+    assert pipe.R_f == begin_pipe.R_f
+
+    pipe.calculate_resistances(fluid, flow, 100)
+    assert np.isclose(0.06797080927504552, pipe.R_p)
+    assert np.isclose(0.18460159035588664, pipe.R_f)
+
+    pipe.calculate_resistances(fluid, flow, 200)
+    assert np.isclose(0.07360723858372777, pipe.R_p)
+    assert np.isclose(0.17492415197256533, pipe.R_f)
+
+
+def test_conical_pressure_drop():
+    pipe = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
+    fluid = TemperatureDependentFluidData('MPG', 20).create_constant(0)
+    flow = ConstantFlowRate(vfr=0.2)
+    assert 0 == pipe._pressure_conical(fluid, flow, end=80)
+
+
+def test_conical_pressure_drop_total():
+    pipe = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
+    fluid = TemperatureDependentFluidData('MPG', 20).create_constant(0)
+    flow = ConstantFlowRate(vfr=0.2)
+
+    assert pipe._top_pipe.pressure_drop(fluid, flow, 60) == pipe.pressure_drop(fluid, flow, 60)
+    assert np.isclose(13.287983793150875, pipe.pressure_drop(fluid, flow, 100))
+    assert np.isclose(31.27107478947142, pipe.pressure_drop(fluid, flow, 180))
+
+
+def test_conical_reynolds():
+    pipe = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
+    begin_pipe = SingleUTube(1.5, 0.0135, 0.016, 0.4, 0.035)
+    end_pipe = SingleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+    fluid = TemperatureDependentFluidData('MPG', 20).create_constant(0)
+    flow = ConstantFlowRate(vfr=0.2)
+
+    assert begin_pipe.Re(fluid, flow) == pipe.Re(fluid, flow, borehole_length=60)
+    pipe = ConicalPipe(1.5, 0.0135, 0.013, 0, 100, 0.016, 0.4, 0.035, 1)
+    assert np.isclose(SingleUTube(1.5, 0.01325, 0.016, 0.4, 0.035).Re(fluid, flow),
+                      pipe.Re(fluid, flow, borehole_length=100))
+    pipe = ConicalPipe(1.5, 0.0135, 0.013, 0, 100, 0.016, 0.4, 0.035, 1)
+    assert np.isclose(
+        SingleUTube(1.5, 0.01325, 0.016, 0.4, 0.035).Re(fluid, flow) * 0.5 + end_pipe.Re(fluid, flow) * 0.5,
+        pipe.Re(fluid, flow, borehole_length=200))
 
 
 def test_repr_():
@@ -234,6 +309,7 @@ def test_repr_():
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
     separatus = Separatus(2)
     turbo = Turbocollector(1.5, 0.013, 0.016, 0.05, 1)
+    vario = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
     assert {'diameter [mm]': 40,
             'epsilon [mm]': 0.001,
             'k_g [W/(m·K)]': 1,
@@ -266,3 +342,14 @@ def test_repr_():
             'spacing [mm]': 50.0,
             'thickness [mm]': 3.0,
             'type': 'Turbocollector'} == turbo.__export__()
+    assert {'begin conical [m]': 80,
+            'diameter [mm]': 32.0,
+            'end conical [m]': 160,
+            'end thickness [mm]': 3.0,
+            'epsilon [mm]': 0.001,
+            'k_g [W/(m·K)]': 1.5,
+            'k_p [W/(m·K)]': 0.4,
+            'nb_of_tubes': 1,
+            'spacing [mm]': 35.0,
+            'start thickness [mm]': 2.5,
+            'type': 'Conical'} == vario.__export__()

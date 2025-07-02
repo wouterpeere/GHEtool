@@ -1950,7 +1950,8 @@ class Borefield(BaseClass):
             Reynolds number
         """
         return self.borehole.Re(
-            temperature=self.results.min_temperature if self.results.min_temperature is not None else self.Tf_min)
+            temperature=self.results.min_temperature if self.results.min_temperature is not None else self.Tf_min,
+            borehole_length=self.H)  # for conical pipes
 
     def calculate_quadrant(self) -> int:
         """

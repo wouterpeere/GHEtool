@@ -98,6 +98,8 @@ Concretely, the classes you can use are:
 * _Single U-tubes (special case of multiple U-tubes)_
 * _Double U-tubes (special case of multiple U-tubes)_
 * _Coaxial pipe_
+* _Conical pipe_ (like the GEROtherm VARIO and FLUX probes from
+  HakaGerodur ([learn more]('https://www.hakagerodur.ch/de/gerotherm-vario/')))
 * _Separatus tube_: The Separatus geothermal heat exchanger is an innovation in the geothermal domain. It consists of a
   single, DN50 pipe with a unique 'splitpipe'-technology that separates the cold and the hot side of the fluid. For
   design purposes, it is advised to use this with rather small borehole diameters of DN90. For more information, visit
@@ -193,8 +195,8 @@ After importing the necessary classes, the relevant ground data parameters are s
 ```Python
 data =
 GroundConstantTemperature(3,  # ground thermal conductivity (W/mK)
-                              10,  # initial/undisturbed ground temperature (deg C)
-                              2.4 * 10 ** 6)  # volumetric heat capacity of the ground (J/m3K) 
+                          10,  # initial/undisturbed ground temperature (deg C)
+                          2.4 * 10 ** 6)  # volumetric heat capacity of the ground (J/m3K) 
 ```
 
 Furthermore, for our loads, we need to set the peak loads as well as the monthly base loads for extraction and
