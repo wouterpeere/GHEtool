@@ -113,7 +113,7 @@ def borefield_custom_data():
 @pytest.fixture
 def hourly_borefield():
     borefield = Borefield()
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
     borefield.set_Rb(0.2)
     borefield.set_borefield(borefield_gt)
     load = HourlyGeothermalLoad()
