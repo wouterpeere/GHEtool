@@ -144,8 +144,3 @@ def calculate_load(weather_file, load_data: Union[HourlyBuildingLoad, HourlyBuil
                       'top cooling': top_cooling,
                       'bottom heating': bottom_heating,
                       'bottom cooling': bottom_cooling}
-
-
-if __name__ == "__main__":
-    load = HourlyBuildingLoad(np.full(8760, 100), np.full(8760, 100))
-    calculate_load(open('../test/unit-tests/test_epw.epw', 'rb'), load)

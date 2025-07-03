@@ -7,20 +7,20 @@ from GHEtool.VariableClasses import HourlyBuildingLoad, HourlyBuildingLoadMultiY
 from typing import Union
 
 
-def test_load(data, load: Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear],
+def test_load(data_, load: Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear],
               new_load: Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear]):
-    sum_heating = data['borefield heating'] + data['excess heating'] + data['top heating'] + data['bottom heating']
-    sum_cooling = data['borefield cooling'] + data['excess cooling'] + data['top cooling'] + data['bottom cooling']
+    sum_heating = data_['borefield heating'] + data_['excess heating'] + data_['top heating'] + data_['bottom heating']
+    sum_cooling = data_['borefield cooling'] + data_['excess cooling'] + data_['top cooling'] + data_['bottom cooling']
     if isinstance(load, HourlyBuildingLoad):
         assert np.allclose(load.hourly_heating_load, sum_heating)
         assert np.allclose(load.hourly_cooling_load, sum_cooling)
-        assert np.allclose(data['borefield heating'], new_load.hourly_heating_load)
-        assert np.allclose(data['borefield cooling'], new_load.hourly_cooling_load)
+        assert np.allclose(data_['borefield heating'], new_load.hourly_heating_load)
+        assert np.allclose(data_['borefield cooling'], new_load.hourly_cooling_load)
         return
     assert np.allclose(load.hourly_heating_load_simulation_period, sum_heating)
     assert np.allclose(load.hourly_cooling_load_simulation_period, sum_cooling)
-    assert np.allclose(data['borefield heating'], new_load.hourly_heating_load_simulation_period)
-    assert np.allclose(data['borefield cooling'], new_load.hourly_cooling_load_simulation_period)
+    assert np.allclose(data_['borefield heating'], new_load.hourly_heating_load_simulation_period)
+    assert np.allclose(data_['borefield cooling'], new_load.hourly_cooling_load_simulation_period)
 
 
 def test_value_error():
@@ -65,6 +65,34 @@ def test_calculate_load_yearly():
     assert np.allclose(data['borefield cooling'], hourly_load.hourly_cooling_load / 2)
     assert np.allclose(data['excess heating'], hourly_load.hourly_heating_load / 2)
     assert np.allclose(data['excess cooling'], hourly_load.hourly_cooling_load / 2)
+    new_load, data = calculate_load(open(FOLDER.joinpath("test/unit-tests/data/test_epw.epw"), 'rb'), hourly_load,
+                                    max_peak_cooling_borefield=50, max_peak_heating_borefield=50,
+                                    max_peak_heating_top=50, threshold_heating_top=15)
+    test_load(data, hourly_load, new_load)
+    new_load, data = calculate_load(open(FOLDER.joinpath("test/unit-tests/data/test_epw.epw"), 'rb'), hourly_load,
+                                    max_peak_cooling_borefield=50, max_peak_heating_borefield=50,
+                                    max_peak_cooling_top=50, threshold_cooling_top=15)
+    test_load(data, hourly_load, new_load)
+    new_load, data = calculate_load(open(FOLDER.joinpath("test/unit-tests/data/test_epw.epw"), 'rb'), hourly_load,
+                                    max_peak_cooling_borefield=50, max_peak_heating_borefield=50,
+                                    max_peak_heating_bottom=50, threshold_heating_bottom=15)
+    test_load(data, hourly_load, new_load)
+    new_load, data = calculate_load(open(FOLDER.joinpath("test/unit-tests/data/test_epw.epw"), 'rb'), hourly_load,
+                                    max_peak_cooling_borefield=50, max_peak_heating_borefield=50,
+                                    max_peak_cooling_bottom=50, threshold_cooling_bottom=15)
+    test_load(data, hourly_load, new_load)
+
+
+def test_calculate_load_multiyearl():
+    hourly_load = HourlyBuildingLoadMultiYear(np.full(8760 * 2, 100), np.full(8760 * 2, 100), efficiency_heating=8)
+
+    new_load, data = calculate_load(open(FOLDER.joinpath("test/unit-tests/data/test_epw.epw"), 'rb'), hourly_load,
+                                    max_peak_cooling_borefield=50, max_peak_heating_borefield=50)
+    test_load(data, hourly_load, new_load)
+    assert np.allclose(data['borefield heating'], hourly_load.hourly_heating_load_simulation_period / 2)
+    assert np.allclose(data['borefield cooling'], hourly_load.hourly_cooling_load_simulation_period / 2)
+    assert np.allclose(data['excess heating'], hourly_load.hourly_heating_load_simulation_period / 2)
+    assert np.allclose(data['excess cooling'], hourly_load.hourly_cooling_load_simulation_period / 2)
     new_load, data = calculate_load(open(FOLDER.joinpath("test/unit-tests/data/test_epw.epw"), 'rb'), hourly_load,
                                     max_peak_cooling_borefield=50, max_peak_heating_borefield=50,
                                     max_peak_heating_top=50, threshold_heating_top=15)
