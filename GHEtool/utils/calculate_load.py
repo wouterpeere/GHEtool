@@ -106,14 +106,14 @@ def calculate_load(weather_file, load_data: Union[HourlyBuildingLoad, HourlyBuil
     except:
         raise ValueError('There is something wrong with the epw-file.')
 
-    heating_demand = load_data.hourly_heating_load
-    cooling_demand = load_data.hourly_cooling_load
+    heating_demand = copy.copy(load_data._hourly_heating_load)
+    cooling_demand = copy.copy(load_data._hourly_cooling_load)
 
     if isinstance(load_data, HourlyBuildingLoadMultiYear):
         # we need to tile the temperature data
         temperature = np.tile(temperature, load_data.simulation_period)
-        heating_demand = load_data.hourly_heating_load_simulation_period
-        cooling_demand = load_data.hourly_cooling_load_simulation_period
+        heating_demand = copy.copy(load_data.hourly_heating_load_simulation_period)
+        cooling_demand = copy.copy(load_data.hourly_cooling_load_simulation_period)
 
     # define parameters
     top_heating = np.zeros(temperature.shape)
@@ -141,6 +141,15 @@ def calculate_load(weather_file, load_data: Union[HourlyBuildingLoad, HourlyBuil
     new_load.hourly_heating_load = borefield_heating
     new_load.hourly_cooling_load = borefield_cooling
 
+    if isinstance(new_load, HourlyBuildingLoad):
+        return new_load, {'borefield cooling': load_data.correct_for_start_month(borefield_cooling),
+                          'borefield heating': load_data.correct_for_start_month(borefield_heating),
+                          'excess cooling': load_data.correct_for_start_month(excess_cooling),
+                          'excess heating': load_data.correct_for_start_month(excess_heating),
+                          'top heating': load_data.correct_for_start_month(top_heating),
+                          'top cooling': load_data.correct_for_start_month(top_cooling),
+                          'bottom heating': load_data.correct_for_start_month(bottom_heating),
+                          'bottom cooling': load_data.correct_for_start_month(bottom_cooling)}
     return new_load, {'borefield cooling': borefield_cooling,
                       'borefield heating': borefield_heating,
                       'excess cooling': excess_cooling,
