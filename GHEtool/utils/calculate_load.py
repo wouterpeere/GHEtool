@@ -13,7 +13,7 @@ from typing import Union
 
 
 def calculate_load(weather_file, load_data: Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear],
-                   max_peak_heating_borefield: float = 10 ** 9, max_peak_cooling_borefield: float = 10 ** 9,
+                   max_peak_heating_borefield: float = None, max_peak_cooling_borefield: float = None,
                    max_peak_heating_top: float = None, max_peak_heating_bottom: float = None,
                    max_peak_cooling_top: float = None, max_peak_cooling_bottom: float = None,
                    threshold_heating_top: float = None, threshold_heating_bottom: float = None,
@@ -86,6 +86,11 @@ def calculate_load(weather_file, load_data: Union[HourlyBuildingLoad, HourlyBuil
 
     if not isinstance(load_data, (HourlyBuildingLoad, HourlyBuildingLoadMultiYear)):
         raise ValueError('Make sure the load data is either the HourlyBuildingLoad or HourlyBuildingLoadMultiYear.')
+
+    if max_peak_cooling_borefield is None:
+        max_peak_cooling_borefield = 10 ** 9
+    if max_peak_heating_borefield is None:
+        max_peak_heating_borefield = 10 ** 9
 
     # read weather file
     temperature = np.array([])

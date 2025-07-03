@@ -81,6 +81,8 @@ def test_calculate_load_yearly():
                                     max_peak_cooling_borefield=50, max_peak_heating_borefield=50,
                                     max_peak_cooling_bottom=50, threshold_cooling_bottom=15)
     load_equals(data, hourly_load, new_load)
+    new_load, data = calculate_load(open(FOLDER.joinpath("test/unit-tests/data/test_epw.epw"), 'rb'), hourly_load)
+    load_equals(data, hourly_load, new_load)
 
 
 def test_calculate_load_multiyearl():
