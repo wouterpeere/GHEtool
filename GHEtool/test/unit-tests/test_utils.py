@@ -12,10 +12,10 @@ def load_equals(data, load: Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYea
     sum_heating = data['borefield heating'] + data['excess heating'] + data['top heating'] + data['bottom heating']
     sum_cooling = data['borefield cooling'] + data['excess cooling'] + data['top cooling'] + data['bottom cooling']
     if isinstance(load, HourlyBuildingLoad):
-        assert np.allclose(load.hourly_heating_load, sum_heating)
-        assert np.allclose(load.hourly_cooling_load, sum_cooling)
-        assert np.allclose(data['borefield heating'], new_load.hourly_heating_load)
-        assert np.allclose(data['borefield cooling'], new_load.hourly_cooling_load)
+        assert np.allclose(load.hourly_heating_load, load.correct_for_start_month(sum_heating))
+        assert np.allclose(load.hourly_cooling_load, load.correct_for_start_month(sum_cooling))
+        assert np.allclose(load.correct_for_start_month(data['borefield heating']), new_load.hourly_heating_load)
+        assert np.allclose(load.correct_for_start_month(data['borefield cooling']), new_load.hourly_cooling_load)
         return
     assert np.allclose(load.hourly_heating_load_simulation_period, sum_heating)
     assert np.allclose(load.hourly_cooling_load_simulation_period, sum_cooling)
@@ -90,7 +90,7 @@ def test_calculate_load_yearly():
 
 
 def test_calculate_load_multiyear():
-    hourly_load = HourlyBuildingLoadMultiYear(np.arange(0, 8760 * 2 - 1, 1), np.arange(0, 8760 * 2 - 1, 1) * 2,
+    hourly_load = HourlyBuildingLoadMultiYear(np.arange(0, 8760 * 2, 1), np.arange(0, 8760 * 2, 1) * 2,
                                               efficiency_heating=8)
 
     new_load, data = calculate_load(open(FOLDER.joinpath("test/unit-tests/data/test_epw.epw"), 'rb'), hourly_load)
