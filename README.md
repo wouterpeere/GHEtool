@@ -179,7 +179,7 @@ You can set the fluid data by using the FluidData class.
 
 * _ConstantFluidData_: Temperature independent fluid properties
 * _TemperatureDependentFluidData_: Temperature dependent fluid data (Water, MPG, MEG, MMA, MEA, Thermox DTX, Coolflow
-  NTP)
+  NTP, Kilfrost GEO or Kilfrost GEO Plus)
 
 #### Flow rate data
 
