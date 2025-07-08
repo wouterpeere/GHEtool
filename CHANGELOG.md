@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added Turbocollector from Muovitech.
 - Add flag in pressure drop calculation to in or exclude the pressure drop in the bend.
 - Added conical borehole heat exchangers (like the GEROtherm VARIO and FLUX probe from HakaGerodur).
+- Add Kilfrost GEO and Kilfrost GEO Plus as commercial fluids (#issue 343).
 - Add utility function to calculate resulting load for hybrid systems (#issue 367).
 
 ### Fixed

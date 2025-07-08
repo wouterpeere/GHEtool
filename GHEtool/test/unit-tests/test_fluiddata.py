@@ -284,6 +284,40 @@ def test_commercial_fluids_data():
     with pytest.raises(ValueError):
         fluid = ThermoxDTX(100)
 
+    # test kilfrost
+    fluid = KilfrostGEO(0.35)
+    assert np.isclose(fluid.freeze_point(0.35), -17.5)
+    assert np.isclose(fluid.conductivity(10), 0.504)
+    assert np.isclose(fluid.conductivity(5), 0.497)
+    assert np.isclose(fluid.density(10), 1148.5)
+    assert np.isclose(fluid.specific_heat(10), 3176)
+    assert np.isclose(fluid.viscosity(10), 3.6821 * 1e-3)
+
+    fluid = TemperatureDependentFluidData('Kilfrost GEO', 35, mass_percentage=False)
+    assert np.isclose(fluid.freezing_point, -17.5)
+    assert np.isclose(fluid.k_f(10), 0.504)
+    assert np.isclose(fluid.k_f(5), 0.497)
+    assert np.isclose(fluid.rho(10), 1148.5)
+    assert np.isclose(fluid.cp(10), 3176)
+    assert np.isclose(fluid.mu(10), 3.6821 * 1e-3)
+
+    # test kilfrost GEO Plus
+    fluid = KilfrostGEOPlus(0.42)
+    assert np.isclose(fluid.freeze_point(0.42), -20)
+    assert np.isclose(fluid.conductivity(10), 0.494)
+    assert np.isclose(fluid.conductivity(5), 0.487)
+    assert np.isclose(fluid.density(10), 1162.8)
+    assert np.isclose(fluid.specific_heat(10), 2960)
+    assert np.isclose(fluid.viscosity(10), 3.9509 * 1e-3)
+
+    fluid = TemperatureDependentFluidData('Kilfrost GEO Plus', 42, mass_percentage=False)
+    assert np.isclose(fluid.freezing_point, -20)
+    assert np.isclose(fluid.k_f(10), 0.494)
+    assert np.isclose(fluid.k_f(5), 0.487)
+    assert np.isclose(fluid.rho(10), 1162.8)
+    assert np.isclose(fluid.cp(10), 2960)
+    assert np.isclose(fluid.mu(10), 3.9509 * 1e-3)
+
 
 def test_temp():
     temp = []
