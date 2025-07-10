@@ -278,29 +278,51 @@ def test_conical_pressure_drop():
 
 def test_conical_pressure_drop_total():
     pipe = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
+    pipe_double = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 2)
+    pipe.use_approx = True
+    pipe_double.use_approx = True
     fluid = TemperatureDependentFluidData('MPG', 20).create_constant(0)
     flow = ConstantFlowRate(vfr=0.2)
 
     assert pipe._top_pipe.pressure_drop(fluid, flow, 60) == pipe.pressure_drop(fluid, flow, 60)
     assert np.isclose(13.287983793150875, pipe.pressure_drop(fluid, flow, 100))
     assert np.isclose(31.27107478947142, pipe.pressure_drop(fluid, flow, 180))
+    assert pipe_double._top_pipe.pressure_drop(fluid, flow, 60) == pipe_double.pressure_drop(fluid, flow, 60)
+    assert np.isclose(6.640762214442462, pipe_double.pressure_drop(fluid, flow, 100))
+    assert np.isclose(12.552561831103098, pipe_double.pressure_drop(fluid, flow, 180))
+
+    # more accurate simulate using the average integral theorem
+    pipe.use_approx = False
+    pipe_double.use_approx = False
+    fluid = TemperatureDependentFluidData('MPG', 20).create_constant(0)
+    flow = ConstantFlowRate(vfr=0.2)
+
+    assert np.isclose(7.94740480425995, pipe.pressure_drop(fluid, flow, 60))
+    assert np.isclose(13.287595907784938, pipe.pressure_drop(fluid, flow, 100))
+    # this is significantly lower than the approximation, since there is a laminar-transient boundary crossed
+    # in the approximation, this causes the whole conical section to become transient, where the more accurate method
+    # only makes part of it transient, leading to a lower pressure drop in the end
+    assert np.isclose(28.880311539363454, pipe.pressure_drop(fluid, flow, 180))
+
+    assert np.isclose(pipe_double._top_pipe.pressure_drop(fluid, flow, 60), pipe_double.pressure_drop(fluid, flow, 60))
+    assert np.isclose(6.640568081247919, pipe_double.pressure_drop(fluid, flow, 100))
+    assert np.isclose(12.539012292217867, pipe_double.pressure_drop(fluid, flow, 180))
 
 
 def test_conical_reynolds():
     pipe = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
+    pipe_double = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 2)
     begin_pipe = SingleUTube(1.5, 0.0135, 0.016, 0.4, 0.035)
-    end_pipe = SingleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
     fluid = TemperatureDependentFluidData('MPG', 20).create_constant(0)
     flow = ConstantFlowRate(vfr=0.2)
 
     assert begin_pipe.Re(fluid, flow) == pipe.Re(fluid, flow, borehole_length=60)
+    assert np.isclose(begin_pipe.Re(fluid, flow) / 2, pipe_double.Re(fluid, flow, borehole_length=60))
     pipe = ConicalPipe(1.5, 0.0135, 0.013, 0, 100, 0.016, 0.4, 0.035, 1)
-    assert np.isclose(SingleUTube(1.5, 0.01325, 0.016, 0.4, 0.035).Re(fluid, flow),
-                      pipe.Re(fluid, flow, borehole_length=100))
+    assert np.isclose(2273.275997711447, pipe.Re(fluid, flow, borehole_length=100))
+    assert np.isclose(1116.4960021656223, pipe_double.Re(fluid, flow, borehole_length=100))
     pipe = ConicalPipe(1.5, 0.0135, 0.013, 0, 100, 0.016, 0.4, 0.035, 1)
-    assert np.isclose(
-        SingleUTube(1.5, 0.01325, 0.016, 0.4, 0.035).Re(fluid, flow) * 0.5 + end_pipe.Re(fluid, flow) * 0.5,
-        pipe.Re(fluid, flow, borehole_length=200))
+    assert np.isclose(2294.99693335425, pipe.Re(fluid, flow, borehole_length=200))
 
 
 def test_repr_():
