@@ -105,6 +105,37 @@ class ConicalPipe(MultipleUTube):
         -------
         None
         """
+
+        if not self.use_approx:
+            # rate increase in wall thickness of conical part
+            a = (self.r_in_start - self.r_in_stop) / (self.end_conical - self.begin_conical)
+
+            def calc_r_in(length):
+                if length <= self.begin_conical:
+                    return self.r_in_start
+                elif self.begin_conical < length <= self.end_conical:
+                    return self.r_in_start - a * (length - self.begin_conical)
+                else:
+                    return self.r_in_stop
+
+            def r_p_func(length):
+                return math.log(self.r_out / calc_r_in(length)) / (2 * pi * self.k_p)
+
+            def r_f_func(length):
+                # Convection heat transfer coefficient [W/(m^2.K)]
+                h_f = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(
+                    flow_rate_data.mfr(fluid_data=fluid_data, **kwargs) / self.number_of_pipes,
+                    calc_r_in(length), fluid_data.mu(**kwargs), fluid_data.rho(**kwargs),
+                    fluid_data.k_f(**kwargs), fluid_data.cp(**kwargs), self.epsilon)
+
+                # Film thermal resistance [m.K/W]
+                return 1.0 / (h_f * 2 * np.pi * calc_r_in(length))
+
+            self.R_p = quad(r_p_func, 0, borehole_length)[0] / borehole_length
+            self.R_f = quad(r_f_func, 0, borehole_length)[0] / borehole_length
+
+            return
+        
         self._top_pipe.calculate_resistances(fluid_data, flow_rate_data, **kwargs)
 
         if borehole_length <= self.begin_conical:
@@ -152,7 +183,6 @@ class ConicalPipe(MultipleUTube):
         self.R_p = self._top_pipe.R_p * first_fraction + \
                    conical_R_p_avg * conical_fraction + \
                    self._end_pipe.R_p * (1 - first_fraction - conical_fraction)
-
         return
 
     def Re(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float, **kwargs) -> float:

@@ -249,6 +249,7 @@ def test_conical_pipe_get_pipe_model():
 
 def test_conical_resistances():
     pipe = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
+    pipe.use_approx = True
     begin_pipe = SingleUTube(1.5, 0.0135, 0.016, 0.4, 0.035)
     fluid = TemperatureDependentFluidData('MPG', 20).create_constant(0)
     flow = ConstantFlowRate(vfr=0.2)
@@ -267,6 +268,22 @@ def test_conical_resistances():
     pipe.calculate_resistances(fluid, flow, 200)
     assert np.isclose(0.07360723858372777, pipe.R_p)
     assert np.isclose(0.17492415197256533, pipe.R_f)
+
+    pipe.use_approx = False
+    # below threshold
+    pipe.calculate_resistances(fluid, flow, 60)
+    begin_pipe.calculate_resistances(fluid, flow, borehole_length=60)
+
+    assert np.isclose(pipe.R_p, begin_pipe.R_p)
+    assert np.isclose(pipe.R_f, begin_pipe.R_f)
+
+    pipe.calculate_resistances(fluid, flow, 100)
+    assert np.isclose(0.06797080927504552, pipe.R_p)
+    assert np.isclose(0.18460159035588664, pipe.R_f)
+
+    pipe.calculate_resistances(fluid, flow, 200)
+    assert np.isclose(0.07358834823796871, pipe.R_p)
+    assert np.isclose(0.17880743362651824, pipe.R_f)
 
 
 def test_conical_pressure_drop():
