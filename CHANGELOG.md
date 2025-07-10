@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Small bug in pressure drop lateral pipe.
 - Small bug in pressure drop calculation of separatus.
+- Suppress overflow warning in _LoadData.
 
 ## [2.3.3] - 2025-05-28
 

@@ -133,9 +133,8 @@ class ConicalPipe(MultipleUTube):
 
             self.R_p = quad(r_p_func, 0, borehole_length)[0] / borehole_length
             self.R_f = quad(r_f_func, 0, borehole_length)[0] / borehole_length
-
             return
-        
+
         self._top_pipe.calculate_resistances(fluid_data, flow_rate_data, **kwargs)
 
         if borehole_length <= self.begin_conical:
