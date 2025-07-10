@@ -447,10 +447,9 @@ class _LoadData(ABC, BaseClass):
         -------
         Times for the L4 sizing : np.ndarray
         """
-        # set the time constant for the L4 sizing while surpressing overflow warning
+        # set the time constant for the L4 sizing while suppressing overflow warning
         with np.errstate(over='ignore'):
             time_L4 = 3600 * np.arange(1, 8760 * self.simulation_period + 1, dtype=np.float16)
-        time_L4 = 3600 * np.arange(1, 8760 * self.simulation_period + 1, dtype=np.float16)
         if np.isinf(time_L4).any():
             # 16 bit is not enough, go to 32
             time_L4 = 3600 * np.arange(1, 8760 * self.simulation_period + 1, dtype=np.float32)
