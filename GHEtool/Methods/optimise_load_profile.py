@@ -260,6 +260,8 @@ def optimise_load_profile_energy(
             dhw=building_load.monthly_baseload_dhw_simulation_period,
             efficiency_dhw=building_load._cop_dhw)
 
+    monthly_load.exclude_DHW_from_peak = building_load.exclude_DHW_from_peak
+
     borefield.load = monthly_load
 
     # store initial monthly peak loads
