@@ -7,6 +7,7 @@ from math import pi
 from GHEtool.VariableClasses.PipeData.SingleUTube import MultipleUTube
 from GHEtool.VariableClasses.FluidData import _FluidData
 from GHEtool.VariableClasses.FlowData import _FlowData
+from scipy.integrate import quad
 
 
 class ConicalPipe(MultipleUTube):
@@ -56,6 +57,8 @@ class ConicalPipe(MultipleUTube):
         self._top_pipe = MultipleUTube(k_g, r_in_start, r_out, k_p, D_s, number_of_pipes, epsilon)
         self._end_pipe = MultipleUTube(k_g, r_in_stop, r_out, k_p, D_s, number_of_pipes, epsilon)
 
+        self.use_approx: bool = False
+
     def _get_pipe_model(self, y: float) -> tuple:
         """
         This function returns average pipe model at position y as well as the pipe model at the end.
@@ -102,6 +105,36 @@ class ConicalPipe(MultipleUTube):
         -------
         None
         """
+
+        if not self.use_approx:
+            # rate increase in wall thickness of conical part
+            a = (self.r_in_start - self.r_in_stop) / (self.end_conical - self.begin_conical)
+
+            def calc_r_in(length):
+                if length <= self.begin_conical:
+                    return self.r_in_start
+                elif self.begin_conical < length <= self.end_conical:
+                    return self.r_in_start - a * (length - self.begin_conical)
+                else:
+                    return self.r_in_stop
+
+            def r_p_func(length):
+                return math.log(self.r_out / calc_r_in(length)) / (2 * pi * self.k_p)
+
+            def r_f_func(length):
+                # Convection heat transfer coefficient [W/(m^2.K)]
+                h_f = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(
+                    flow_rate_data.mfr(fluid_data=fluid_data, **kwargs) / self.number_of_pipes,
+                    calc_r_in(length), fluid_data.mu(**kwargs), fluid_data.rho(**kwargs),
+                    fluid_data.k_f(**kwargs), fluid_data.cp(**kwargs), self.epsilon)
+
+                # Film thermal resistance [m.K/W]
+                return 1.0 / (h_f * 2 * np.pi * calc_r_in(length))
+
+            self.R_p = quad(r_p_func, 0, borehole_length)[0] / borehole_length
+            self.R_f = quad(r_f_func, 0, borehole_length)[0] / borehole_length
+            return
+
         self._top_pipe.calculate_resistances(fluid_data, flow_rate_data, **kwargs)
 
         if borehole_length <= self.begin_conical:
@@ -149,12 +182,11 @@ class ConicalPipe(MultipleUTube):
         self.R_p = self._top_pipe.R_p * first_fraction + \
                    conical_R_p_avg * conical_fraction + \
                    self._end_pipe.R_p * (1 - first_fraction - conical_fraction)
-
         return
 
     def Re(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float, **kwargs) -> float:
         """
-        Average Reynolds number over the total borehole length.
+        Average Reynolds number over the total borehole length using the average integral theorem.
 
         Parameters
         ----------
@@ -169,26 +201,22 @@ class ConicalPipe(MultipleUTube):
         -------
         Reynolds number : float
         """
-        first_part = self._top_pipe.Re(fluid_data, flow_rate_data, **kwargs)
+
+        # rate increase in wall thickness of conical part
+        a = (self.r_in_start - self.r_in_stop) / (self.end_conical - self.begin_conical)
+        scaling = 1 / borehole_length * 4 * fluid_data.rho(**kwargs) * flow_rate_data.vfr(
+            **kwargs) / 1000 / self.number_of_pipes / (pi * fluid_data.mu(**kwargs))
+
         if borehole_length <= self.begin_conical:
-            # only the first part
-            return first_part
-
-        first_fraction = self.begin_conical / borehole_length
-
-        if borehole_length <= self.end_conical:
-            conical_part = self._get_pipe_model(borehole_length)[0].Re(fluid_data, flow_rate_data, **kwargs)
-            return first_part * first_fraction + \
-                conical_part * (1 - first_fraction)
-
-        conical_fraction = (self.end_conical - self.begin_conical) / borehole_length
-
-        conical_part = self._get_pipe_model(self.end_conical)[0].Re(fluid_data, flow_rate_data, **kwargs)
-        last_part = self._end_pipe.Re(fluid_data, flow_rate_data, **kwargs)
-
-        return first_part * first_fraction + \
-            conical_part * conical_fraction + \
-            last_part * (1 - first_fraction - conical_fraction)
+            return self._top_pipe.Re(fluid_data, flow_rate_data, **kwargs)
+        elif self.begin_conical < borehole_length <= self.end_conical:
+            return scaling * (self.begin_conical / (2 * self.r_in_start) - 1 / (2 * a) * (
+                    math.log(self.r_in_start * 2 - 2 * a * (borehole_length - self.begin_conical)) -
+                    math.log(2 * self.r_in_start)))
+        else:
+            return scaling * (self.begin_conical / (2 * self.r_in_start) - 1 / (2 * a) * (
+                    math.log(self.r_in_start * 2 - 2 * a * (self.end_conical - self.begin_conical)) -
+                    math.log(2 * self.r_in_start)) + (borehole_length - self.end_conical) / (2 * self.r_in_stop))
 
     def _pressure_conical(self, fluid_data, flow_rate_data, end, **kwargs) -> float:
         """
@@ -258,6 +286,39 @@ class ConicalPipe(MultipleUTube):
         Pressure drop : float
             Pressure drop [kPa]
         """
+
+        # use the average integral theorem
+        if not self.use_approx:
+            # rate increase in wall thickness of conical part
+            a = (self.r_in_start - self.r_in_stop) / (self.end_conical - self.begin_conical)
+
+            def calc_r_in(length):
+                if length <= self.begin_conical:
+                    return self.r_in_start
+                elif self.begin_conical < length <= self.end_conical:
+                    return self.r_in_start - a * (length - self.begin_conical)
+                else:
+                    return self.r_in_stop
+
+            def calc_pressure(length):
+                # calculate inner radius at the borehole length
+                r_in = calc_r_in(length)
+
+                A = pi * r_in ** 2
+                V = flow_rate_data.vfr(**kwargs) / 1000 / A / self.number_of_pipes
+                f = gt.pipes.fluid_friction_factor_circular_pipe(
+                    flow_rate_data.mfr(fluid_data=fluid_data) / self.number_of_pipes,
+                    r_in,
+                    fluid_data.mu(**kwargs),
+                    fluid_data.rho(**kwargs),
+                    self.epsilon)
+
+                return ((f / (r_in * 2)) * fluid_data.rho() * V ** 2 / 2) / 1000
+
+            A = 3.1415 * calc_r_in(borehole_length) ** 2
+            V = flow_rate_data.vfr(**kwargs) / 1000 / A / self.number_of_pipes
+            bend = 0.2
+            return quad(calc_pressure, 0, borehole_length)[0] * 2 + bend * V ** 2 * fluid_data.rho(**kwargs) / 2 / 1000
 
         if borehole_length <= self.begin_conical:
             # only the first part
