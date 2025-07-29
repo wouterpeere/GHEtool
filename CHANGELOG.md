@@ -5,7 +5,7 @@ our [project board](https://github.com/users/wouterpeere/projects/2) on GitHub.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [2.3.4] - Unpublished
+## [2.3.4] - 2025-07-29
 
 ### Added
 
@@ -440,6 +440,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 
 - fixed bug in interpolation
+
+[2.3.4]: https://github.com/wouterpeere/GHEtool/compare/v2.3.2...v2.3.4
 
 [2.3.3]: https://github.com/wouterpeere/GHEtool/compare/v2.3.2...v2.3.3
 
