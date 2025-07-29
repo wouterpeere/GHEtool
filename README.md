@@ -142,7 +142,6 @@ Within GHEtool, there are multiple ways of setting the ground data. Currently, y
   geothermal heat flux.
 * _GroundTemperatureGradient_: if you want to model your ground with a varying ground temperature due to a geothermal
   gradient.
-
 * You can also use multiple ground layers to define your ground model. Please take a look
   at [our example](https://ghetool.readthedocs.io/en/latest/sources/code/Examples/start_in_different_month.html).
 
@@ -385,6 +384,8 @@ at [https://ghetool.readthedocs.io/en/latest/](https://ghetool.readthedocs.io/en
 ## References
 
 ### Development of GHEtool
+
+Peere, W. (2025). Three ways to design a hybrid geothermal heating and cooling system for an office building. In _Proceedings of Geo-Rin Conference_. Benasque (Spain), 2-6 June 2025.
 
 Meertens, L., Peere, W., Helsen, L. (2024). Influence of short-term dynamic effects on geothermal borefield size. In
 _Proceedings of International Ground Source Heat Pump Association_. Montréal (Canada), 28-30 May 2024.
