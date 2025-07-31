@@ -1,9 +1,11 @@
 import copy
 import numpy as np
 
+from math import pi
 from typing import Union
 from GHEtool.VariableClasses import HourlyBuildingLoad, MonthlyBuildingLoadMultiYear, HourlyBuildingLoadMultiYear, \
-    ConstantFluidData, ConstantFlowRate
+    ConstantFluidData, ConstantFlowRate, TemperatureDependentFluidData, EERCombined
+from GHEtool.VariableClasses.LoadData.Baseclasses import _LoadDataBuilding
 
 
 def optimise_load_profile_power(
@@ -217,6 +219,9 @@ def optimise_load_profile_energy(
                                                     building_load._eer,
                                                     building_load.hourly_dhw_load_simulation_period,
                                                     building_load._cop_dhw)
+        building_load.exclude_DHW_from_peak = building_load_copy.exclude_DHW_from_peak
+        building_load.peak_extraction_duration = building_load_copy.peak_extraction_duration / 3600
+        building_load.peak_injection_duration = building_load_copy.peak_injection_duration / 3600
 
     # set max peak values
     init_peak_heating = building_load.hourly_heating_load_simulation_period.copy()
@@ -261,6 +266,8 @@ def optimise_load_profile_energy(
             efficiency_dhw=building_load._cop_dhw)
 
     monthly_load.exclude_DHW_from_peak = building_load.exclude_DHW_from_peak
+    monthly_load.peak_extraction_duration = building_load.peak_extraction_duration / 3600
+    monthly_load.peak_injection_duration = building_load.peak_injection_duration / 3600
 
     borefield.load = monthly_load
 
@@ -268,21 +275,107 @@ def optimise_load_profile_energy(
     peak_heating = copy.copy(monthly_load.monthly_peak_heating_simulation_period)
     peak_cooling = copy.copy(monthly_load.monthly_peak_cooling_simulation_period)
 
+    # set constants for optimisation
+    g_value_peak_injection = borefield.gfunction(borefield.load.peak_injection_duration, borefield.H)[0]
+    if borefield.load.peak_injection_duration == borefield.load.peak_extraction_duration:
+        g_value_peak_extraction = g_value_peak_injection
+    else:
+        g_value_peak_extraction = borefield.gfunction(borefield.load.peak_extraction_duration, borefield.H)[0]
+
+    g_value = borefield.gfunction(borefield.load.time_L3, borefield.H)[0]
+    k_s = borefield.ground_data.k_s(borefield.calculate_depth(borefield.H, borefield.D), borefield.D)
+
+    def update_last_month(idx, init_load) -> (float, float):
+        def calculate(Tmin: float = None, Tmax: float = None, *args):
+            if Tmin is None:
+                Tmin = borefield.Tf_min
+                Tmax = borefield.Tf_max
+            Tb = borefield.results.Tb[idx]
+
+            # convert to result
+            result = (Tb - borefield._Tg(borefield.H)) * (2 * pi * k_s) * borefield.H * borefield.number_of_boreholes
+
+            # correct result for previous load
+            result -= g_value * init_load * 1000
+
+            # calculate new Tb
+            result += g_value * borefield.load.monthly_average_injection_power_simulation_period[idx] * 1000
+            Tb = result / (2 * pi * k_s) / (borefield.H * borefield.number_of_boreholes) + borefield._Tg(borefield.H)
+
+            # calculate new temperature
+            extraction = Tb + \
+                         (-borefield.load.monthly_peak_extraction_simulation_period[idx] *
+                          (g_value_peak_extraction / (k_s * 2 * pi) + borefield.borehole.get_Rb(borefield.H,
+                                                                                                borefield.D,
+                                                                                                borefield.r_b,
+                                                                                                k_s, borefield.depth,
+                                                                                                temperature=Tmin))
+                          + borefield.load.monthly_baseload_extraction_power_simulation_period[idx] *
+                          (g_value_peak_extraction / (
+                                  k_s * 2 * pi))) * 1000 / borefield.number_of_boreholes / borefield.H
+
+            injection = Tb + \
+                        (borefield.load.monthly_peak_injection_simulation_period[idx] *
+                         (g_value_peak_injection / (k_s * 2 * pi) + borefield.borehole.get_Rb(borefield.H, borefield.D,
+                                                                                              borefield.r_b,
+                                                                                              k_s, borefield.depth,
+                                                                                              temperature=Tmax))
+                         - borefield.load.monthly_baseload_injection_power_simulation_period[idx] *
+                         (g_value_peak_injection / (k_s * 2 * pi))) * 1000 / borefield.number_of_boreholes / borefield.H
+            return extraction, injection, Tb
+
+        # add some iteration for convergence
+        # check if active_passive, because then, threshold should be taken
+        if isinstance(borefield.load, _LoadDataBuilding) and \
+                isinstance(borefield.load.eer,
+                           EERCombined) and borefield.load.eer.threshold_temperature is not None:
+            borefield.load.reset_results(borefield.Tf_min, borefield.load.eer.threshold_temperature)
+        else:
+            borefield.load.reset_results(borefield.Tf_min, borefield.Tf_max)
+        results_old = calculate()
+        # set results, but manually
+        if borefield.load._results is None:
+            borefield.load.set_results(borefield.results)
+        borefield.load._results._peak_extraction[idx] = results_old[0]
+        borefield.load._results._peak_injection[idx] = results_old[1]
+        results = calculate(*results_old)
+
+        # safety
+        i = 0
+
+        def calculate_difference(results_old, result_new) -> float:
+            return max(
+                np.max(result_new[0] - results_old[0]),
+                np.max(result_new[1] - results_old[1]))
+
+        while calculate_difference(results_old, results) > borefield._calculation_setup.atol \
+                and i < borefield._calculation_setup.max_nb_of_iterations:
+            results_old = results
+            # set results, but manually
+            borefield.load._results._peak_extraction[idx] = results_old[0]
+            borefield.load._results._peak_injection[idx] = results_old[1]
+            results = calculate(*results_old)
+            i += 1
+        return calculate()
+
     for i in range(12 * borefield.load.simulation_period):
         # set iteration criteria
+        borefield.calculate_temperatures(borefield.H)
+        # optimise month i
+        init_load = borefield.load.monthly_average_injection_power_simulation_period[i]
         cool_ok, heat_ok = False, False
 
         while not cool_ok or not heat_ok:
             # calculate temperature profile, just for the results
-            borefield.calculate_temperatures(borefield.H)
+            peak_extraction, peak_injection, _ = update_last_month(i, init_load)
 
             # deviation from minimum temperature
-            if abs(borefield.results.peak_extraction[i] - borefield.Tf_min) > temperature_threshold:
+            if abs(peak_extraction - borefield.Tf_min) > temperature_threshold:
                 # check if it goes below the threshold
                 current_heating_peak = borefield.load.monthly_peak_heating_simulation_period[i]
-                if borefield.results.peak_extraction[i] < borefield.Tf_min:
+                if peak_extraction < borefield.Tf_min:
                     current_heating_peak = max(0.1, current_heating_peak - 1 * max(1, 10 * (
-                            borefield.Tf_min - borefield.results.peak_extraction[i])))
+                            borefield.Tf_min - peak_extraction)))
                 else:
                     current_heating_peak = min(peak_heating[i], current_heating_peak * 1.01)
                     if current_heating_peak == peak_heating[i]:
@@ -293,12 +386,12 @@ def optimise_load_profile_energy(
                 heat_ok = True
 
             # deviation from maximum temperature
-            if abs(borefield.results.peak_injection[i] - borefield.Tf_max) > temperature_threshold:
+            if abs(peak_injection - borefield.Tf_max) > temperature_threshold:
                 # check if it goes above the threshold
                 current_cooling_peak = borefield.load.monthly_peak_cooling_simulation_period[i]
-                if borefield.results.peak_injection[i] > borefield.Tf_max:
+                if peak_injection > borefield.Tf_max:
                     current_cooling_peak = max(0.1, current_cooling_peak - 1 * max(1, 10 * (
-                            -borefield.Tf_max + borefield.results.peak_injection[i])))
+                            -borefield.Tf_max + peak_injection)))
                 else:
                     current_cooling_peak = min(peak_cooling[i], current_cooling_peak * 1.01)
                     if current_cooling_peak == peak_cooling[i]:

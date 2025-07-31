@@ -1148,13 +1148,17 @@ def test_optimise_load_borefield():
     ground_data = GroundFluxTemperature(2, 9.6, flux=0.07)
     borefield.ground_data = ground_data
     borefield_load, external_load = optimise_load_profile_energy(borefield, load)
-    assert np.isclose(borefield_load.imbalance, -229303.76869817785)
+    assert np.isclose(borefield_load.imbalance, -229270.593357212)
     borefield.load = borefield_load
     borefield.calculate_temperatures(hourly=False)
-    assert np.isclose(np.max(borefield.results.peak_injection), 17.046329116754006)
-    assert np.isclose(np.min(borefield.results.peak_extraction), 1.9475137898511852)
+    assert np.isclose(np.max(borefield.results.peak_injection), 17.039423481043194)
+    assert np.isclose(np.min(borefield.results.peak_extraction), 1.953454037320081)
     assert np.isclose(borefield.load.max_peak_cooling, 329.9393053)
-    assert np.isclose(np.sum(borefield.load.hourly_heating_load), 594114.6208002889)
+    assert np.isclose(np.sum(borefield.load.hourly_heating_load), 593960.7811708137)
+    load.peak_extraction_duration = 10
+    borefield_load_, external_load = optimise_load_profile_energy(borefield, load)
+    assert not borefield_load == borefield_load_
+    assert np.isclose(borefield_load_.peak_extraction_duration, 3600 * 10)
 
 
 def test_repr_():
