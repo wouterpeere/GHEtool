@@ -461,6 +461,8 @@ def optimise_load_profile_energy(
             efficiency_dhw=building_load._cop_dhw)
 
     monthly_load.exclude_DHW_from_peak = building_load.exclude_DHW_from_peak
+    monthly_load.peak_extraction_duration = building_load.peak_extraction_duration / 3600
+    monthly_load.peak_injection_duration = building_load.peak_injection_duration / 3600
 
     borefield.load = monthly_load
 

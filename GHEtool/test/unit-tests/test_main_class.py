@@ -1157,6 +1157,9 @@ def test_optimise_load_borefield():
     assert np.isclose(np.sum(borefield.load.hourly_heating_load), 593960.7811708137)
     load.peak_extraction_duration = 10
     borefield_load, external_load = optimise_load_profile_energy(borefield, load)
+    borefield.load = borefield_load
+    assert not np.isclose(np.max(borefield.results.peak_injection), 17.039423481043194)
+    assert not np.isclose(np.min(borefield.results.peak_extraction), 1.953454037320081)
 
 
 def test_repr_():
