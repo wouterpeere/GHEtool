@@ -417,6 +417,9 @@ def optimise_load_profile_energy(
                                                     building_load._eer,
                                                     building_load.hourly_dhw_load_simulation_period,
                                                     building_load._cop_dhw)
+        building_load.exclude_DHW_from_peak = building_load_copy.exclude_DHW_from_peak
+        building_load.peak_extraction_duration = building_load_copy.peak_extraction_duration / 3600
+        building_load.peak_injection_duration = building_load_copy.peak_injection_duration / 3600
 
     # set max peak values
     init_peak_heating = building_load.hourly_heating_load_simulation_period.copy()
