@@ -1724,8 +1724,7 @@ class Borefield(BaseClass):
 
                 # convolution to get the monthly results
                 results = convolve(self.load.monthly_average_injection_power_simulation_period * 1000,
-                                   g_value_differences)[
-                          : 12 * self.simulation_period]
+                                   g_value_differences)[: 12 * self.simulation_period]
 
                 # calculation the borehole wall temperature for every month i
                 k_s = self.ground_data.k_s(self.calculate_depth(H, self.D), self.D)
