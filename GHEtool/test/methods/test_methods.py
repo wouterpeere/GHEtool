@@ -50,7 +50,6 @@ def test_optimise(input, result):
     load, depth, power, hourly, max_peak_extraction, max_peak_injection, dhw_preferential = input[1:]
     model.H = depth
     if power == 1:
-        return
         borefield_load, external_load = optimise_load_profile_power(model, load,
                                                                     use_hourly_resolution=hourly,
                                                                     max_peak_heating=max_peak_extraction,
@@ -62,7 +61,6 @@ def test_optimise(input, result):
                                                                      max_peak_cooling=max_peak_injection)
 
     elif power == 3:
-        return
         borefield_load, external_load = optimise_load_profile_balance(model, load,
                                                                       use_hourly_resolution=hourly,
                                                                       max_peak_heating=max_peak_extraction,
