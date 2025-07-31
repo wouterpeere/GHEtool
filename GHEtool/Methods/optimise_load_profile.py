@@ -469,8 +469,6 @@ def optimise_load_profile_energy(
     peak_cooling = copy.copy(monthly_load.monthly_peak_cooling_simulation_period)
 
     # set constants for optimisation
-    g_value = borefield.gfunction(borefield.load.time_L3, borefield.H)[0]
-
     g_value_peak_injection = borefield.gfunction(borefield.load.peak_injection_duration, borefield.H)[0]
     if borefield.load.peak_injection_duration == borefield.load.peak_extraction_duration:
         g_value_peak_extraction = g_value_peak_injection
@@ -533,6 +531,8 @@ def optimise_load_profile_energy(
                 borefield.load.reset_results(borefield.Tf_min, borefield.Tf_max)
             results_old = calculate()
             # set results, but manually
+            if borefield.load._results is None:
+                borefield.load.set_results(borefield.results)
             borefield.load._results._peak_extraction[idx] = results_old[0]
             borefield.load._results._peak_injection[idx] = results_old[1]
             results = calculate(*results_old)
@@ -553,7 +553,7 @@ def optimise_load_profile_energy(
                 borefield.load._results._peak_injection[idx] = results_old[1]
                 results = calculate(*results_old)
                 i += 1
-            return
+            return results
 
         return calculate()
 
