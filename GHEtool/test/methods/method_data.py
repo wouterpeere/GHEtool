@@ -863,8 +863,8 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 55.7643
                                                    hourly=True, dhw_preferential=True))
 
 borefield.fluid_data = TemperatureDependentFluidData('MEG', 25)
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 94.9485, 74.641,
-                                                   948.433, 267.3739, 427.4687, 317.0219,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 94.94969, 74.6129,
+                                                   948.5874, 267.3178, 427.4712, 316.3346,
                                                    name='Optimise load profile 1, reversed (energy, dhw load, include DHW, variable fluid)',
                                                    power=2,
                                                    hourly=False, dhw_preferential=False))
