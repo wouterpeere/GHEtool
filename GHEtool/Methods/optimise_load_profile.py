@@ -162,7 +162,7 @@ def optimise_load_profile_energy_old(
         temperature_threshold: float = 0.05,
         max_peak_heating: float = None,
         max_peak_cooling: float = None,
-) -> tuple[HourlyBuildingLoadMultiYear, HourlyBuildingLoadMultiYear]:
+) -> tuple[HourlyBuildingLoadMultiYear, HourlyBuildingLoadMultiYear]:  # pragma: no-cover
     """
     This function optimises the load for maximum energy extraction and injection based on the given borefield and
     the given hourly building load. It does so by iterating over every month of the simulation period and increasing or
@@ -518,43 +518,37 @@ def optimise_load_profile_energy(
             return extraction, injection, Tb
 
         # add some iteration for convergence
+        # check if active_passive, because then, threshold should be taken
+        if isinstance(borefield.load, _LoadDataBuilding) and \
+                isinstance(borefield.load.eer,
+                           EERCombined) and borefield.load.eer.threshold_temperature is not None:
+            borefield.load.reset_results(borefield.Tf_min, borefield.load.eer.threshold_temperature)
+        else:
+            borefield.load.reset_results(borefield.Tf_min, borefield.Tf_max)
+        results_old = calculate()
+        # set results, but manually
+        if borefield.load._results is None:
+            borefield.load.set_results(borefield.results)
+        borefield.load._results._peak_extraction[idx] = results_old[0]
+        borefield.load._results._peak_injection[idx] = results_old[1]
+        results = calculate(*results_old)
 
-        if isinstance(borefield.load, _LoadDataBuilding) or \
-                isinstance(borefield.borehole.fluid_data, TemperatureDependentFluidData):
-            # when building load is given, the load should be updated after each temperature calculation.
-            # check if active_passive, because then, threshold should be taken
-            if isinstance(borefield.load, _LoadDataBuilding) and \
-                    isinstance(borefield.load.eer,
-                               EERCombined) and borefield.load.eer.threshold_temperature is not None:
-                borefield.load.reset_results(borefield.Tf_min, borefield.load.eer.threshold_temperature)
-            else:
-                borefield.load.reset_results(borefield.Tf_min, borefield.Tf_max)
-            results_old = calculate()
+        # safety
+        i = 0
+
+        def calculate_difference(results_old, result_new) -> float:
+            return max(
+                np.max(result_new[0] - results_old[0]),
+                np.max(result_new[1] - results_old[1]))
+
+        while calculate_difference(results_old, results) > borefield._calculation_setup.atol \
+                and i < borefield._calculation_setup.max_nb_of_iterations:
+            results_old = results
             # set results, but manually
-            if borefield.load._results is None:
-                borefield.load.set_results(borefield.results)
             borefield.load._results._peak_extraction[idx] = results_old[0]
             borefield.load._results._peak_injection[idx] = results_old[1]
             results = calculate(*results_old)
-
-            # safety
-            i = 0
-
-            def calculate_difference(results_old, result_new) -> float:
-                return max(
-                    np.max(result_new[0] - results_old[0]),
-                    np.max(result_new[1] - results_old[1]))
-
-            while calculate_difference(results_old, results) > borefield._calculation_setup.atol \
-                    and i < borefield._calculation_setup.max_nb_of_iterations:
-                results_old = results
-                # set results, but manually
-                borefield.load._results._peak_extraction[idx] = results_old[0]
-                borefield.load._results._peak_injection[idx] = results_old[1]
-                results = calculate(*results_old)
-                i += 1
-            return results
-
+            i += 1
         return calculate()
 
     for i in range(12 * borefield.load.simulation_period):
