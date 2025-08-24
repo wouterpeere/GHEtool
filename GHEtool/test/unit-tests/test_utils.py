@@ -53,6 +53,9 @@ def test_value_error():
     data, _ = calculate_load(open(FOLDER.joinpath("test/unit-tests/data/test_epw.epw"), 'rb'), multiyear_load)
     assert multiyear_load == data
     load_equals(_, multiyear_load, data)
+    data, _ = calculate_load(open(FOLDER.joinpath("test/unit-tests/data/test_epw_pvgis.epw"), 'rb'), hourly_load)
+    assert hourly_load == data
+    load_equals(_, hourly_load, data)
 
 
 def test_calculate_load_yearly():

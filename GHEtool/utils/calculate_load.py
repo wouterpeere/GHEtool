@@ -93,8 +93,8 @@ def calculate_load(weather_file, load_data: Union[HourlyBuildingLoad, HourlyBuil
         max_peak_heating_borefield = 10 ** 9
 
     # read weather file
-    temperature = np.array([])
     try:
+        weather_file.seek(0)
         TMY: pd.DataFrame = pd.read_csv(weather_file, sep=",", header=None, skiprows=8)
 
         # drop first 6 columns
@@ -104,7 +104,19 @@ def calculate_load(weather_file, load_data: Union[HourlyBuildingLoad, HourlyBuil
         temperature: np.ndarray = np.array(TMY.iloc[:, 1])
         assert len(temperature) == 8760
     except:
-        raise ValueError('There is something wrong with the epw-file.')
+        # for PVGIS the file format is different
+        try:
+            weather_file.seek(0)
+            TMY = pd.read_csv(weather_file, header=None, skiprows=18).iloc[:-10, :]
+
+            # drop first 1 column
+            TMY.drop(columns=TMY.columns[:1], axis=1, inplace=True)
+
+            # set dry bulb temperature
+            temperature: np.ndarray = TMY.iloc[:, 0].astype(float).to_numpy()
+            assert len(temperature) == 8760
+        except:
+            raise ValueError('There is something wrong with the epw-file.')
 
     heating_demand = copy.copy(load_data._hourly_heating_load)
     cooling_demand = copy.copy(load_data._hourly_cooling_load)

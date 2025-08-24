@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 
 - Changed implementation of `optimise_for_energy` to make it three times faster (issue #308).
+- Add support for EPW files from PVGIS (issue #376).
 
 ## [2.3.4] - 2025-07-29
 
