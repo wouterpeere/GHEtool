@@ -314,7 +314,7 @@ class ConicalPipe(MultipleUTube):
                     fluid_data.rho(**kwargs),
                     self.epsilon)
 
-                return ((f / (r_in * 2)) * fluid_data.rho() * V ** 2 / 2) / 1000
+                return ((f / (r_in * 2)) * fluid_data.rho(**kwargs) * V ** 2 / 2) / 1000
 
             A = 3.1415 * calc_r_in(borehole_length) ** 2
             V = flow_rate_data.vfr(fluid_data=fluid_data, **kwargs) / 1000 / A / self.number_of_pipes
