@@ -324,10 +324,11 @@ def test_conical_pressure_drop_total():
     assert np.isclose(6.640568081247919, pipe_double.pressure_drop(fluid, flow, 100))
     assert np.isclose(12.539012292217867, pipe_double.pressure_drop(fluid, flow, 180))
 
+    fluid = TemperatureDependentFluidData('MPG', 20)
     flow = ConstantFlowRate(mfr=0.2)
 
-    assert np.isclose(7.790713878176526, pipe.pressure_drop(fluid, flow, 60))
-    assert np.isclose(13.025770150586625, pipe.pressure_drop(fluid, flow, 100))
+    assert np.isclose(7.790713878176526, pipe.pressure_drop(fluid, flow, 60, temperature=0))
+    assert np.isclose(13.025770150586625, pipe.pressure_drop(fluid, flow, 100, temperature=0))
 
 
 def test_conical_reynolds():
