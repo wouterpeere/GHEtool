@@ -320,10 +320,14 @@ def test_conical_pressure_drop_total():
     # in the approximation, this causes the whole conical section to become transient, where the more accurate method
     # only makes part of it transient, leading to a lower pressure drop in the end
     assert np.isclose(28.880311539363454, pipe.pressure_drop(fluid, flow, 180))
-
     assert np.isclose(pipe_double._top_pipe.pressure_drop(fluid, flow, 60), pipe_double.pressure_drop(fluid, flow, 60))
     assert np.isclose(6.640568081247919, pipe_double.pressure_drop(fluid, flow, 100))
     assert np.isclose(12.539012292217867, pipe_double.pressure_drop(fluid, flow, 180))
+
+    flow = ConstantFlowRate(mfr=0.2)
+
+    assert np.isclose(7.790713878176526, pipe.pressure_drop(fluid, flow, 60))
+    assert np.isclose(13.025770150586625, pipe.pressure_drop(fluid, flow, 100))
 
 
 def test_conical_reynolds():
@@ -340,6 +344,17 @@ def test_conical_reynolds():
     assert np.isclose(1116.4960021656223, pipe_double.Re(fluid, flow, borehole_length=100))
     pipe = ConicalPipe(1.5, 0.0135, 0.013, 0, 100, 0.016, 0.4, 0.035, 1)
     assert np.isclose(2294.99693335425, pipe.Re(fluid, flow, borehole_length=200))
+
+    flow = ConstantFlowRate(mfr=0.2)
+    pipe = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
+
+    assert begin_pipe.Re(fluid, flow) == pipe.Re(fluid, flow, borehole_length=70)
+    assert np.isclose(begin_pipe.Re(fluid, flow) / 2, pipe_double.Re(fluid, flow, borehole_length=60))
+    pipe = ConicalPipe(1.5, 0.0135, 0.013, 0, 100, 0.016, 0.4, 0.035, 1)
+    assert np.isclose(2228.5248303199014, pipe.Re(fluid, flow, borehole_length=100))
+    assert np.isclose(1094.5169289975574, pipe_double.Re(fluid, flow, borehole_length=100))
+    pipe = ConicalPipe(1.5, 0.0135, 0.013, 0, 100, 0.016, 0.4, 0.035, 1)
+    assert np.isclose(2249.818172820547, pipe.Re(fluid, flow, borehole_length=200))
 
 
 def test_repr_():

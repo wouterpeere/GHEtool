@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Changed implementation of `optimise_for_energy` to make it three times faster (issue #308).
 - Add support for EPW files from PVGIS (issue #376).
 
+### Fixed
+
+- Problem in ConicalPipe class when working with vfr (issue #378).
+
 ## [2.3.4] - 2025-07-29
 
 ### Added

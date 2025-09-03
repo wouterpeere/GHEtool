@@ -46,7 +46,7 @@ class ConstantFlowRate(_FlowData, BaseClass):
             return self._vfr
         if fluid_data is None:
             raise ValueError(
-                'The volume flow rate is based on the volume flow rate, the fluid data is needed.')
+                'The volume flow rate is based on the mass flow rate, the fluid data is needed.')
         return self.mfr(**kwargs) / fluid_data.rho(**kwargs) * 1000
 
     def mfr(self, fluid_data: _FluidData = None, **kwargs) -> float:
