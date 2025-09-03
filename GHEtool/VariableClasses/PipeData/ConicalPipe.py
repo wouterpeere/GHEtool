@@ -204,8 +204,9 @@ class ConicalPipe(MultipleUTube):
 
         # rate increase in wall thickness of conical part
         a = (self.r_in_start - self.r_in_stop) / (self.end_conical - self.begin_conical)
-        scaling = 1 / borehole_length * 4 * fluid_data.rho(**kwargs) * flow_rate_data.vfr(
-            **kwargs) / 1000 / self.number_of_pipes / (pi * fluid_data.mu(**kwargs))
+        scaling = 1 / borehole_length * 4 * fluid_data.rho(**kwargs) * flow_rate_data.vfr(fluid_data=fluid_data,
+                                                                                          **kwargs) / 1000 / self.number_of_pipes / (
+                          pi * fluid_data.mu(**kwargs))
 
         if borehole_length <= self.begin_conical:
             return self._top_pipe.Re(fluid_data, flow_rate_data, **kwargs)
@@ -305,18 +306,18 @@ class ConicalPipe(MultipleUTube):
                 r_in = calc_r_in(length)
 
                 A = pi * r_in ** 2
-                V = flow_rate_data.vfr(**kwargs) / 1000 / A / self.number_of_pipes
+                V = flow_rate_data.vfr(fluid_data=fluid_data, **kwargs) / 1000 / A / self.number_of_pipes
                 f = gt.pipes.fluid_friction_factor_circular_pipe(
-                    flow_rate_data.mfr(fluid_data=fluid_data) / self.number_of_pipes,
+                    flow_rate_data.mfr(fluid_data=fluid_data, **kwargs) / self.number_of_pipes,
                     r_in,
                     fluid_data.mu(**kwargs),
                     fluid_data.rho(**kwargs),
                     self.epsilon)
 
-                return ((f / (r_in * 2)) * fluid_data.rho() * V ** 2 / 2) / 1000
+                return ((f / (r_in * 2)) * fluid_data.rho(**kwargs) * V ** 2 / 2) / 1000
 
             A = 3.1415 * calc_r_in(borehole_length) ** 2
-            V = flow_rate_data.vfr(**kwargs) / 1000 / A / self.number_of_pipes
+            V = flow_rate_data.vfr(fluid_data=fluid_data, **kwargs) / 1000 / A / self.number_of_pipes
             bend = 0.2
             return quad(calc_pressure, 0, borehole_length)[0] * 2 + bend * V ** 2 * fluid_data.rho(**kwargs) / 2 / 1000
 
