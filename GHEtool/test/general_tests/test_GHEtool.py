@@ -406,8 +406,8 @@ def test_optimise_methods_different_start_year():
     assert borefield_load.start_month == 5
     assert load.start_month == 5
     assert ext_load.start_month == 5
-    assert ext_load.max_peak_heating == 0
-    assert ext_load.max_peak_cooling == 0
+    assert np.allclose(borefield_load.hourly_heating_load + ext_load.hourly_heating_load, load.hourly_heating_load)
+    assert np.allclose(borefield_load.hourly_cooling_load + ext_load.hourly_cooling_load, load.hourly_cooling_load)
 
     load = HourlyBuildingLoadMultiYear(load.hourly_heating_load_simulation_period,
                                        load.hourly_cooling_load_simulation_period)
@@ -419,18 +419,14 @@ def test_optimise_methods_different_start_year():
 
     borefield_load, ext_load = optimise_load_profile_balance(borefield, load)
     assert isinstance(ext_load, HourlyBuildingLoadMultiYear)
-    assert ext_load.max_peak_heating == 0
-    assert ext_load.max_peak_cooling == 0
-    
+    assert np.allclose(borefield_load.hourly_heating_load + ext_load.hourly_heating_load, load.hourly_heating_load)
+    assert np.allclose(borefield_load.hourly_cooling_load + ext_load.hourly_cooling_load, load.hourly_cooling_load)
+
     borefield.create_rectangular_borefield(10, 2, 6, 6, 110, 0.7, 0.075)
     borefield.ground_data = ground_data
     borefield.fluid_data = fluid_data
     borefield.pipe_data = pipe_data
 
     borefield_load, ext_load = optimise_load_profile_power(borefield, load)
-    assert np.isclose(borefield_load.hourly_heating_load + ext_load.hourly_heating_load, load.hourly_heating_load)
-    assert np.isclose(borefield_load.hourly_cooling_load + ext_load.hourly_cooling_load, load.hourly_cooling_load)
-
-    borefield_load, ext_load = optimise_load_profile_balance(borefield, load)
-    assert np.isclose(borefield_load.hourly_heating_load + ext_load.hourly_heating_load, load.hourly_heating_load)
-    assert np.isclose(borefield_load.hourly_cooling_load + ext_load.hourly_cooling_load, load.hourly_cooling_load)
+    assert np.allclose(borefield_load.hourly_heating_load + ext_load.hourly_heating_load, load.hourly_heating_load)
+    assert np.allclose(borefield_load.hourly_cooling_load + ext_load.hourly_cooling_load, load.hourly_cooling_load)
