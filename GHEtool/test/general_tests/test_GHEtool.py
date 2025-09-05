@@ -16,7 +16,7 @@ from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData,
 from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient, MaximumNumberOfIterations
 from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad, EERCombined, \
-    HourlyBuildingLoad, EER
+    HourlyBuildingLoad, EER, HourlyBuildingLoadMultiYear
 from GHEtool.Methods import *
 
 data = GroundConstantTemperature(3, 10)
@@ -353,9 +353,9 @@ def test_optimise_load_eer_combined():
                      np.array([5, 30]))  # based on the data of the WRE092 chiller of Galletti
     borefield1 = Borefield()
     borefield1.create_rectangular_borefield(4, 3, 6, 6, 110, 0.7, 0.075)
-    borefield1.set_ground_parameters(ground_data)
-    borefield1.set_fluid_parameters(fluid_data)
-    borefield1.set_pipe_parameters(pipe_data)
+    borefield1.ground_data = ground_data
+    borefield1.fluid_data = fluid_data
+    borefield1.pipe_data = pipe_data
     borefield1.set_max_avg_fluid_temperature(25)
     borefield1.set_min_avg_fluid_temperature(3)
 
@@ -376,3 +376,57 @@ def test_optimise_load_eer_combined():
     borefield1.calculate_temperatures(hourly=True)
     results_25 = copy.deepcopy(borefield1.results)
     assert np.allclose(results_16.peak_injection, results_25.peak_injection)
+
+
+def test_optimise_methods_different_start_year():
+    ground_data = GroundFluxTemperature(3, 10)
+    fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
+
+    load = HourlyBuildingLoad(efficiency_heating=5)  # use SCOP of 5 for heating
+    load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,
+                             separator=";", col_cooling=0, col_heating=1)
+    load.start_month = 5
+
+    borefield = Borefield()
+    borefield.create_rectangular_borefield(20, 5, 6, 6, 110, 0.7, 0.075)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+
+    borefield_load, ext_load = optimise_load_profile_power(borefield, load)
+    assert borefield_load.start_month == 5
+    assert load.start_month == 5
+    assert ext_load.start_month == 5
+    assert ext_load.max_peak_heating == 0
+    assert ext_load.max_peak_cooling == 0
+    assert isinstance(ext_load, HourlyBuildingLoad)
+
+    borefield_load, ext_load = optimise_load_profile_balance(borefield, load)
+    assert borefield_load.start_month == 5
+    assert load.start_month == 5
+    assert ext_load.start_month == 5
+    assert np.allclose(borefield_load.hourly_heating_load + ext_load.hourly_heating_load, load.hourly_heating_load)
+    assert np.allclose(borefield_load.hourly_cooling_load + ext_load.hourly_cooling_load, load.hourly_cooling_load)
+
+    load = HourlyBuildingLoadMultiYear(load.hourly_heating_load_simulation_period,
+                                       load.hourly_cooling_load_simulation_period)
+
+    borefield_load, ext_load = optimise_load_profile_power(borefield, load)
+    assert isinstance(ext_load, HourlyBuildingLoadMultiYear)
+    assert ext_load.max_peak_heating == 0
+    assert ext_load.max_peak_cooling == 0
+
+    borefield_load, ext_load = optimise_load_profile_balance(borefield, load)
+    assert isinstance(ext_load, HourlyBuildingLoadMultiYear)
+    assert np.allclose(borefield_load.hourly_heating_load + ext_load.hourly_heating_load, load.hourly_heating_load)
+    assert np.allclose(borefield_load.hourly_cooling_load + ext_load.hourly_cooling_load, load.hourly_cooling_load)
+
+    borefield.create_rectangular_borefield(10, 2, 6, 6, 110, 0.7, 0.075)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+
+    borefield_load, ext_load = optimise_load_profile_power(borefield, load)
+    assert np.allclose(borefield_load.hourly_heating_load + ext_load.hourly_heating_load, load.hourly_heating_load)
+    assert np.allclose(borefield_load.hourly_cooling_load + ext_load.hourly_cooling_load, load.hourly_cooling_load)
