@@ -121,6 +121,7 @@ def test_dhw():
 
     assert np.allclose(load.dhw, 0)
     assert np.allclose(load.hourly_dhw_load_simulation_period, np.zeros(87600))
+    assert np.allclose(load.hourly_dhw_load, np.zeros(8760))
     assert np.allclose(load.monthly_baseload_dhw, np.zeros(12))
     assert np.allclose(load.monthly_peak_dhw, np.zeros(12))
     assert np.allclose(load.monthly_baseload_dhw_simulation_period, np.zeros(120))

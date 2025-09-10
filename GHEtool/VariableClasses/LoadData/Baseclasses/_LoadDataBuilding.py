@@ -796,19 +796,6 @@ class _LoadDataBuilding(_LoadData, ABC):
         None
         """
         self._set_dhw(dhw)
-        if dhw is None:
-            return
-        if isinstance(dhw, (float, int)):
-            if self._multiyear:
-                raise ValueError('When using a multi year data input, it is not allowed to enter a yearly DHW demand.')
-            if not dhw >= 0:
-                raise ValueError(f'Please fill in a positive value for the domestic hot water instead of {dhw}.')
-            self._dhw = dhw
-            return
-        if not self._check_input(dhw):
-            raise ValueError('Wrong value for the DHW array. Please make sure the length matches that of the heating '
-                             'and cooling array.')
-        self._dhw = dhw
 
     @property
     def monthly_baseload_dhw_power_simulation_period(self) -> np.ndarray:

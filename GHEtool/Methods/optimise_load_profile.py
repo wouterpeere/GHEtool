@@ -568,7 +568,6 @@ def optimise_load_profile_balance(
         # calculate relative imbalance
         imbalance = borefield.load.imbalance / np.maximum(borefield.load.yearly_average_injection_load,
                                                           borefield.load.yearly_average_extraction_load)
-
         # deviation from minimum temperature
         if abs(min(borefield.results.peak_extraction) - borefield.Tf_min) > temperature_threshold or \
                 (abs(imbalance) > imbalance_factor and imbalance < 0):
