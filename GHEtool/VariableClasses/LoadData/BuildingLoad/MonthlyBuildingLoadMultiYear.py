@@ -176,6 +176,8 @@ class MonthlyBuildingLoadMultiYear(_LoadDataBuilding):
         baseload DHW : np.ndarray
             Baseload DHW values [kWh/month] for all years
         """
+        if self._baseload_dhw is None:
+            return np.zeros(12 * self.simulation_period)
         return self._baseload_dhw
 
     @baseload_dhw.setter
@@ -318,9 +320,7 @@ class MonthlyBuildingLoadMultiYear(_LoadDataBuilding):
         baseload domestic hot water : np.ndarray
             Baseload domestic hot water for the whole simulation period
         """
-        if self._baseload_dhw is None:
-            return np.zeros(12 * self.simulation_period)
-        return self._baseload_dhw
+        return self.baseload_dhw
 
     def set_results(self, results: ResultsMonthly) -> None:
         """

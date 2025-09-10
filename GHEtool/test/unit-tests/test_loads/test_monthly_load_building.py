@@ -548,6 +548,7 @@ def test_dhw():
     assert np.allclose(load.dhw, 0)
     assert np.allclose(load.monthly_baseload_dhw, np.zeros(12))
     assert np.allclose(load.monthly_peak_dhw, np.zeros(12))
+    assert np.allclose(load.baseload_dhw, np.zeros(12))
     assert np.allclose(load.monthly_baseload_dhw_simulation_period, np.zeros(120))
     assert np.allclose(load.monthly_baseload_dhw_power_simulation_period, np.zeros(120))
     assert np.allclose(load.monthly_peak_dhw_simulation_period, np.zeros(120))
@@ -567,6 +568,7 @@ def test_dhw():
     load.dhw = 730 * 12
     assert np.allclose(load.dhw, 730)
     assert np.allclose(load.monthly_baseload_dhw, np.full(12, 730))
+    assert np.allclose(load.baseload_dhw, np.full(12, 730))
     assert np.allclose(load.monthly_peak_dhw, np.full(12, 1))
     assert np.allclose(load.monthly_baseload_dhw_simulation_period, np.full(120, 730))
     assert np.allclose(load.monthly_baseload_dhw_power_simulation_period, np.full(120, 1))
