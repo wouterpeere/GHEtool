@@ -61,7 +61,7 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
         self._peak_heating: np.ndarray = np.zeros(12)
         self._peak_cooling: np.ndarray = np.zeros(12)
         self._baseload_dhw: np.ndarray = np.zeros(12)
-        
+
         # set variables
         self.baseload_heating = np.zeros(12) if baseload_heating is None else baseload_heating
         self.baseload_cooling = np.zeros(12) if baseload_cooling is None else baseload_cooling
@@ -204,7 +204,7 @@ class MonthlyBuildingLoadAbsolute(_SingleYear, _LoadDataBuilding):
         baseload DHW : np.ndarray
             Baseload DHW values [kWh/month] for months
         """
-        return self._baseload_dhw
+        return self.correct_for_start_month(self._baseload_dhw)
 
     @baseload_dhw.setter
     def baseload_dhw(self, load: ArrayLike) -> None:

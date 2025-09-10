@@ -198,6 +198,9 @@ def test_different_start_month():
     load.dhw = np.arange(1, 8761, 1)
     load.start_month = 3
     assert load.start_month == 3
+    assert load.monthly_baseload_cooling[0] == 1332615
+    assert load.monthly_baseload_dhw[0] == 1332615
+    assert load.monthly_baseload_heating[0] == 1332615
     assert load.hourly_cooling_load[0] == 731 * 2 - 1
     assert load.hourly_heating_load[0] == 731 * 2 - 1
     assert load.hourly_dhw_load[0] == 731 * 2 - 1
