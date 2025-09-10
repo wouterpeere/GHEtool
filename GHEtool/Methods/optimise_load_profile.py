@@ -98,7 +98,7 @@ def optimise_load_profile_power(
             np.minimum(peak_heat_load, building_load._hourly_heating_load
             if isinstance(borefield.load, HourlyBuildingLoad) else building_load.hourly_heating_load_simulation_period))
         borefield.load.set_hourly_dhw_load(
-            np.minimum(peak_dhw_load, building_load.hourly_dhw_load
+            np.minimum(peak_dhw_load, building_load._hourly_dhw_load
             if isinstance(borefield.load, HourlyBuildingLoad) else building_load.hourly_dhw_load_simulation_period))
 
         # calculate temperature profile, just for the results
@@ -154,7 +154,7 @@ def optimise_load_profile_power(
         external_load.set_hourly_cooling_load(
             np.maximum(0, building_load._hourly_cooling_load - borefield.load._hourly_cooling_load))
         external_load.set_hourly_dhw_load(
-            np.maximum(0, building_load.hourly_dhw_load - borefield.load.hourly_dhw_load))
+            np.maximum(0, building_load._hourly_dhw_load - borefield.load._hourly_dhw_load))
 
         return borefield.load, external_load
 
@@ -559,7 +559,7 @@ def optimise_load_profile_balance(
             np.minimum(peak_heat_load, building_load._hourly_heating_load
             if isinstance(borefield.load, HourlyBuildingLoad) else building_load.hourly_heating_load_simulation_period))
         borefield.load.set_hourly_dhw_load(
-            np.minimum(peak_dhw_load, building_load.hourly_dhw_load
+            np.minimum(peak_dhw_load, building_load._hourly_dhw_load
             if isinstance(borefield.load, HourlyBuildingLoad) else building_load.hourly_dhw_load_simulation_period))
 
         # calculate temperature profile, just for the results
@@ -568,7 +568,6 @@ def optimise_load_profile_balance(
         # calculate relative imbalance
         imbalance = borefield.load.imbalance / np.maximum(borefield.load.yearly_average_injection_load,
                                                           borefield.load.yearly_average_extraction_load)
-
         # deviation from minimum temperature
         if abs(min(borefield.results.peak_extraction) - borefield.Tf_min) > temperature_threshold or \
                 (abs(imbalance) > imbalance_factor and imbalance < 0):
@@ -642,7 +641,7 @@ def optimise_load_profile_balance(
         external_load.set_hourly_cooling_load(
             np.maximum(0, building_load._hourly_cooling_load - borefield.load._hourly_cooling_load))
         external_load.set_hourly_dhw_load(
-            np.maximum(0, building_load.hourly_dhw_load - borefield.load.hourly_dhw_load))
+            np.maximum(0, building_load._hourly_dhw_load - borefield.load._hourly_dhw_load))
 
         return borefield.load, external_load
 

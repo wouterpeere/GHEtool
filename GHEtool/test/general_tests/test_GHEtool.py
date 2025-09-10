@@ -430,3 +430,41 @@ def test_optimise_methods_different_start_year():
     borefield_load, ext_load = optimise_load_profile_power(borefield, load)
     assert np.allclose(borefield_load.hourly_heating_load + ext_load.hourly_heating_load, load.hourly_heating_load)
     assert np.allclose(borefield_load.hourly_cooling_load + ext_load.hourly_cooling_load, load.hourly_cooling_load)
+
+
+def test_optimise_methods_different_start_year_dhw():
+    ground_data = GroundFluxTemperature(3, 10)
+    fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
+
+    load = HourlyBuildingLoad(efficiency_heating=5)  # use SCOP of 5 for heating
+    load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,
+                             separator=";", col_cooling=0, col_heating=1, col_dhw=1)
+    load.hourly_heating_load = np.zeros(8760)
+    load.start_month = 5
+
+    borefield = Borefield()
+    borefield.create_rectangular_borefield(20, 5, 6, 6, 110, 0.7, 0.075)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+
+    borefield_load, ext_load = optimise_load_profile_power(borefield, load)
+    assert borefield_load.start_month == 5
+    assert load.start_month == 5
+    assert ext_load.start_month == 5
+    assert ext_load.max_peak_heating == 0
+    assert ext_load.max_peak_cooling == 0
+    assert ext_load.max_peak_dhw == 0
+    assert isinstance(ext_load, HourlyBuildingLoad)
+
+    borefield_load, ext_load = optimise_load_profile_balance(borefield, load, dhw_preferential=False)
+    assert borefield_load.start_month == 5
+    assert load.start_month == 5
+    assert ext_load.start_month == 5
+    assert np.allclose(borefield_load.hourly_heating_load + ext_load.hourly_heating_load, load.hourly_heating_load)
+    assert np.allclose(borefield_load.hourly_cooling_load + ext_load.hourly_cooling_load, load.hourly_cooling_load)
+    assert np.allclose(borefield_load.hourly_dhw_load + ext_load.hourly_dhw_load, load.hourly_dhw_load)
+
+    load = HourlyBuildingLoadMultiYear(load.hourly_heating_load_simulation_period,
+                                       load.hourly_cooling_load_simulation_period)
