@@ -49,7 +49,7 @@ class MonthlyBuildingLoadMultiYear(_LoadDataBuilding):
             Efficiency in DHW
         """
 
-        _LoadDataBuilding.__init__(self, efficiency_heating, efficiency_cooling, dhw, efficiency_dhw, True)
+        _LoadDataBuilding.__init__(self, efficiency_heating, efficiency_cooling, efficiency_dhw, True)
         self._multiyear = True
 
         # initiate variables
@@ -57,12 +57,15 @@ class MonthlyBuildingLoadMultiYear(_LoadDataBuilding):
         self._baseload_cooling: np.ndarray = np.zeros(12)
         self._peak_heating: np.ndarray = np.zeros(12)
         self._peak_cooling: np.ndarray = np.zeros(12)
+        self._baseload_dhw: np.ndarray = None
 
         # set variables
         self.baseload_heating = np.zeros(12) if baseload_heating is None else baseload_heating
         self.baseload_cooling = np.zeros(12) if baseload_cooling is None else baseload_cooling
         self.peak_heating = np.zeros(12) if peak_heating is None else peak_heating
         self.peak_cooling = np.zeros(12) if peak_cooling is None else peak_cooling
+
+        self._set_dhw(dhw)
 
     @property
     def monthly_baseload_cooling_simulation_period(self) -> np.ndarray:
@@ -162,6 +165,43 @@ class MonthlyBuildingLoadMultiYear(_LoadDataBuilding):
             Baseload heating values [kWh/month] for all years
         """
         return self._baseload_heating
+
+    @property
+    def baseload_dhw(self) -> np.ndarray:
+        """
+        This function returns the baseload DHW in kWh/month for the whole simulation period.
+
+        Returns
+        -------
+        baseload DHW : np.ndarray
+            Baseload DHW values [kWh/month] for all years
+        """
+        return self._baseload_dhw
+
+    @baseload_dhw.setter
+    def baseload_dhw(self, load: ArrayLike) -> None:
+        """
+        This function sets the baseload DHW [kWh/month] after it has been checked.
+
+        Parameters
+        ----------
+        load : np.ndarray, list or tuple
+            Baseload DHW [kWh/month]
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            When either the length is not a multiple of 12 , the input is not of the correct type, or it contains negative
+            values
+        """
+        if self._check_input(load):
+            self._baseload_dhw = np.array(load)
+            return
+        raise ValueError
 
     @baseload_heating.setter
     def baseload_heating(self, load: ArrayLike) -> None:
@@ -278,9 +318,9 @@ class MonthlyBuildingLoadMultiYear(_LoadDataBuilding):
         baseload domestic hot water : np.ndarray
             Baseload domestic hot water for the whole simulation period
         """
-        if self._dhw is None:
+        if self._baseload_dhw is None:
             return np.zeros(12 * self.simulation_period)
-        return self._dhw
+        return self._baseload_dhw
 
     def set_results(self, results: ResultsMonthly) -> None:
         """

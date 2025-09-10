@@ -98,8 +98,7 @@ def test_yearly_loads_multiyear():
 def test_dhw():
     HourlyBuildingLoadMultiYear(np.zeros(8760 * 10), np.ones(8760 * 10), 5, 20, np.ones(8760 * 10), 3)
     load = HourlyBuildingLoadMultiYear(np.zeros(8760 * 10), np.linspace(1, 8760 * 10 - 1, 8760 * 10) * 2, 6, 5)
-
-    assert load.dhw == 0
+    assert np.allclose(load.dhw, 0)
 
     with pytest.raises(ValueError):
         load.add_dhw(100)
@@ -152,6 +151,25 @@ def test_dhw():
     load.exclude_DHW_from_peak = True
     # idem since we started with an hourly data resolution
     assert np.allclose(load.monthly_peak_extraction_simulation_period, np.zeros(120))
+    load.exclude_DHW_from_peak = False
+
+    arr = np.tile(np.linspace(1, 8760, 8760), 10)
+    load.hourly_dhw_load = arr
+    assert np.allclose(load.dhw, arr)
+    assert np.allclose(load.monthly_baseload_dhw, np.sum(arr.reshape(-1, 730), axis=1)[:12])
+    assert np.allclose(load.monthly_peak_dhw, np.sum(arr.reshape(-1, 730), axis=1)[:12] / 730)
+    assert np.allclose(load.monthly_baseload_dhw_simulation_period, np.sum(arr.reshape(-1, 730), axis=1))
+    assert np.allclose(load.monthly_baseload_dhw_power_simulation_period, np.sum(arr.reshape(-1, 730), axis=1) / 730)
+    assert np.allclose(load.monthly_baseload_extraction_power_simulation_period,
+                       np.sum(arr.reshape(-1, 730), axis=1) / 730 * 3 / 4)
+    assert np.allclose(load.monthly_peak_extraction_simulation_period, np.max(arr.reshape(-1, 730), axis=1) * 3 / 4)
+    assert np.allclose(load.yearly_dhw_load_simulation_period, np.full(10, np.sum(arr[:8760])))
+    assert np.isclose(load.yearly_average_dhw_load, np.sum(arr[:8760]))
+    assert load.max_peak_dhw == 8760
+    load.exclude_DHW_from_peak = True
+    # idem since we started with an hourly data resolution
+    assert np.allclose(load.monthly_peak_extraction_simulation_period, np.zeros(120))
+    load.exclude_DHW_from_peak = False
 
 
 def test_time_array():

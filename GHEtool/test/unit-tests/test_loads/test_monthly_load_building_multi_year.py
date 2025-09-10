@@ -199,7 +199,7 @@ def test_dhw():
     load.peak_heating = np.zeros(120)
     load.baseload_heating = np.zeros(120)
 
-    assert load.dhw == 0
+    assert np.allclose(load.dhw, 0)
 
     with pytest.raises(ValueError):
         load.add_dhw(-100)
@@ -248,6 +248,24 @@ def test_dhw():
     assert load.max_peak_dhw == 12
     load.exclude_DHW_from_peak = True
     assert np.allclose(load.monthly_peak_extraction_simulation_period, np.zeros(120))
+    load.exclude_DHW_from_peak = False
+
+    load.baseload_dhw = np.tile(np.linspace(1, 12, 12), 10) * 730
+    assert np.allclose(load.dhw, np.tile(np.linspace(1, 12, 12), 10) * 730)
+    assert np.allclose(load.monthly_baseload_dhw, np.linspace(1, 12, 12) * 730)
+    assert np.allclose(load.monthly_peak_dhw, np.linspace(1, 12, 12))
+    assert np.allclose(load.monthly_baseload_dhw_simulation_period, np.tile(np.linspace(1, 12, 12) * 730, 10))
+    assert np.allclose(load.monthly_baseload_dhw_power_simulation_period, np.tile(np.linspace(1, 12, 12), 10))
+    assert np.allclose(load.monthly_peak_dhw_simulation_period, np.tile(np.linspace(1, 12, 12), 10))
+    assert np.allclose(load.monthly_baseload_extraction_power_simulation_period,
+                       np.tile(np.linspace(1, 12, 12), 10) * 3 / 4)
+    assert np.allclose(load.monthly_peak_extraction_simulation_period, np.tile(np.linspace(1, 12, 12), 10) * 3 / 4)
+    assert np.allclose(load.yearly_dhw_load_simulation_period, np.full(10, np.sum(np.linspace(1, 12, 12) * 730)))
+    assert np.isclose(load.yearly_average_dhw_load, np.sum(np.linspace(1, 12, 12) * 730))
+    assert load.max_peak_dhw == 12
+    load.exclude_DHW_from_peak = True
+    assert np.allclose(load.monthly_peak_extraction_simulation_period, np.zeros(120))
+    load.exclude_DHW_from_peak = False
 
 
 def test_time_array():

@@ -195,17 +195,22 @@ def test_start_month_general():
 
 def test_different_start_month():
     load = HourlyBuildingLoad(np.arange(1, 8761, 1), np.arange(1, 8761, 1))
+    load.dhw = np.arange(1, 8761, 1)
     load.start_month = 3
     assert load.start_month == 3
     assert load.hourly_cooling_load[0] == 731 * 2 - 1
     assert load.hourly_heating_load[0] == 731 * 2 - 1
+    assert load.hourly_dhw_load[0] == 731 * 2 - 1
     assert load.hourly_cooling_load_simulation_period[0] == 731 * 2 - 1
     assert load.hourly_heating_load_simulation_period[0] == 731 * 2 - 1
+    assert load.hourly_dhw_load_simulation_period[0] == 731 * 2 - 1
     load.all_months_equal = False
     assert load.hourly_cooling_load[0] == 1417
     assert load.hourly_heating_load[0] == 1417
+    assert load.hourly_dhw_load[0] == 1417
     assert load.hourly_cooling_load_simulation_period[0] == 1417
     assert load.hourly_heating_load_simulation_period[0] == 1417
+    assert load.hourly_dhw_load_simulation_period[0] == 1417
 
 
 def test_results():
@@ -237,7 +242,7 @@ def test_reset_results():
 def test_dhw():
     load = HourlyBuildingLoad(np.zeros(8760), np.linspace(1, 8760 - 1, 8760) * 2, 10, scop, seer)
 
-    assert load.dhw == 0
+    assert np.allclose(load.dhw, 0)
 
     with pytest.raises(ValueError):
         load.add_dhw(-100)
@@ -276,7 +281,7 @@ def test_dhw():
     load.exclude_DHW_from_peak = False
 
     load.dhw = 8760
-    assert load.dhw == 8760
+    assert np.allclose(load.dhw, 1)
     assert np.allclose(load.hourly_dhw_load_simulation_period, np.full(87600, 1))
     assert np.allclose(load.hourly_dhw_load, np.full(8760, 1))
     assert np.allclose(load.monthly_baseload_dhw, np.full(12, 730))
@@ -312,6 +317,28 @@ def test_dhw():
     load.exclude_DHW_from_peak = True
     # idem since we started with an hourly data resolution
     assert np.allclose(load.monthly_peak_extraction_simulation_period, np.zeros(120))
+    load.exclude_DHW_from_peak = False
+
+    arr = np.linspace(1, 8760, 8760)
+    load.hourly_dhw_load = arr
+    assert np.allclose(load.dhw, np.linspace(1, 8760, 8760))
+    assert np.allclose(load.monthly_baseload_dhw, np.sum(arr.reshape(-1, 730), axis=1))
+    assert np.allclose(load.monthly_peak_dhw, np.sum(arr.reshape(-1, 730), axis=1) / 730)
+    assert np.allclose(load.monthly_baseload_dhw_simulation_period,
+                       np.tile(np.sum(arr.reshape(-1, 730), axis=1), 10))
+    assert np.allclose(load.monthly_baseload_dhw_power_simulation_period,
+                       np.tile(np.sum(arr.reshape(-1, 730), axis=1) / 730, 10))
+    assert np.allclose(load.monthly_baseload_extraction_power_simulation_period,
+                       np.tile(np.sum(arr.reshape(-1, 730), axis=1) / 730, 10) * 3 / 4)
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       np.tile(np.max(arr.reshape(-1, 730), axis=1), 10) * 3 / 4)
+    assert np.allclose(load.yearly_dhw_load_simulation_period, np.full(10, np.sum(arr)))
+    assert np.isclose(load.yearly_average_dhw_load, np.sum(arr))
+    assert load.max_peak_dhw == 8760
+    load.exclude_DHW_from_peak = True
+    # idem since we started with an hourly data resolution
+    assert np.allclose(load.monthly_peak_extraction_simulation_period, np.zeros(120))
+    load.exclude_DHW_from_peak = False
 
 
 def test_get_monthly_cop():

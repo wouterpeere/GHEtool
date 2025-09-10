@@ -35,18 +35,24 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         multiyear : bool
             True if multiyear data
         """
-        _LoadDataBuilding.__init__(self, efficiency_heating, efficiency_cooling, dhw, efficiency_dhw, multiyear)
+        _LoadDataBuilding.__init__(self, efficiency_heating, efficiency_cooling, efficiency_dhw, multiyear)
         _HourlyData.__init__(self)
+
+        # overwritten by HourlyData
+        self._multiyear = multiyear
 
         # initiate variables
         self._hourly_heating_load: np.ndarray = np.zeros(8760)
         self._hourly_cooling_load: np.ndarray = np.zeros(8760)
+        self._hourly_dhw_load: np.ndarray = None
+        self._set_dhw(dhw)
 
         # delete unnecessary variables
         del self._peak_cooling
         del self._peak_heating
         del self._baseload_cooling
         del self._baseload_heating
+        del self._baseload_dhw
 
     @abc.abstractmethod
     def hourly_cooling_load_simulation_period(self) -> np.ndarray:
@@ -116,6 +122,40 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
             Hourly DHW values [kWh/h] for one year, so the length of the array is 8760
         """
         return np.mean(self.hourly_dhw_load_simulation_period.reshape((self.simulation_period, 8760)), axis=0)
+
+    def _set_dhw(self, dhw: Union[float, np.ndarray]) -> None:
+        """
+        This function sets the dhw.
+
+        Parameters
+        ----------
+        dhw : float, np.ndarray
+            Yearly value of array with energy demand for domestic hot water (DHW) [kWh]
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            When a yearly value is given or values are negative.
+        """
+        if dhw is None:
+            return
+        if self._multiyear:
+            if isinstance(dhw, (float, int)):
+                raise ValueError('When using a multi year data input, it is not allowed to enter a yearly DHW demand.')
+            self.hourly_dhw_load = dhw
+            return
+
+        # just hourly load
+        if isinstance(dhw, (float, int)):
+            if not dhw >= 0:
+                raise ValueError(f'Please fill in a positive value for the domestic hot water instead of {dhw}.')
+            self.hourly_dhw_load = np.full(8760, dhw / 8760)
+            return
+        self.hourly_dhw_load = dhw
 
     def _get_hourly_cop(self, power: np.ndarray = None) -> Union[float, np.ndarray]:
         """
@@ -232,8 +272,6 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         hourly extraction : np.ndarray
             Hourly extraction values [kWh/h] for the whole simulation period
         """
-        if isinstance(self.dhw, (int, float)) and self.dhw == 0.:
-            return self._hourly_extraction_load_heating_simulation_period
         return self._hourly_extraction_load_heating_simulation_period + self._hourly_extraction_load_dhw_simulation_period
 
     @property
