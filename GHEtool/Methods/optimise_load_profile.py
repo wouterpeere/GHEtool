@@ -592,9 +592,11 @@ def optimise_load_profile_balance(
                             or dhw_preferential is None:
                         # first reduce the peak load in heating before touching the dhw load
                         # if dhw_preferential is None, it is not optimised and kept constant
-                        peak_heat_load = peak_heat_load * 0.99
+                        peak_heat_load -= np.maximum(peak_heat_load * 0.5, 1)
+                        peak_heat_load = np.maximum(0.1, peak_heat_load)
                     else:
-                        peak_dhw_load = peak_dhw_load * 0.99
+                        peak_dhw_load -= np.maximum(peak_dhw_load * 0.5, 1)
+                        peak_dhw_load = np.maximum(0.1, peak_dhw_load)
                 elif abs(imbalance) > imbalance_factor and imbalance > 0:
                     if (dhw_preferential and peak_heat_load != init_peak_heating) or (
                             not dhw_preferential and 0.1 >= peak_dhw_load) or dhw_preferential is None:
