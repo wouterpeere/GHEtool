@@ -112,7 +112,7 @@ class GFunction:
         self.normalize_vec = np.array((1 / 20, 1 / 20, 1 / 9, 1 / 9, 1 / 1000, 1 / 100, 1 / 0.4, 1 / (10 ** -6), 1 / 6))
         from GHEtool import FOLDER
         self.model_weights = [
-            pd.read_csv(FOLDER.joinpath(f"VariableClasses/Gfunctions/ANN layers/layer_{i}_weights_diff_fields.csv"),
+            pd.read_csv(FOLDER.joinpath(f"VariableClasses/Gfunctions/ANN layers/layer_{i}_weights_diff_fields_big.csv"),
                         sep=";").values for i in range(6)]
 
     @property
