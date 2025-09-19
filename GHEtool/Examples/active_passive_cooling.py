@@ -142,7 +142,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
     borefield.set_max_avg_fluid_temperature(17)
 
     borefield.create_rectangular_borefield(12, 12, 6, 6, 100)
-    borefield.set_ground_parameters(GroundConstantTemperature(2.1, 11))
+    borefield.ground_data = GroundConstantTemperature(2.1, 11)
     borefield.Rb = 0.12
 
     ### PASSIVE COOLING

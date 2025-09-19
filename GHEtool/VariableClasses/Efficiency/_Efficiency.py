@@ -2,9 +2,10 @@ import numpy as np
 
 from scipy.interpolate import interpn, interp1d
 from typing import Union
+from GHEtool.VariableClasses.BaseClass import BaseClass
 
 
-class _EfficiencyBase:
+class _EfficiencyBase(BaseClass):
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, self.__class__):
@@ -24,7 +25,7 @@ class _EfficiencyBase:
         return True
 
 
-class _Efficiency(_EfficiencyBase):
+class _Efficiency(_EfficiencyBase, BaseClass):
     """
     Baseclass for all the efficiencies
     """
@@ -70,10 +71,10 @@ class _Efficiency(_EfficiencyBase):
         self._has_secondary: bool = secondary
         self._has_part_load: bool = part_load
         self._data_: np.ndarray = data
-        self._coordinates_: np.ndarray = coordinates      
+        self._coordinates_: np.ndarray = coordinates
         self._reference_nominal_power: float = reference_nominal_power
         self._nominal_power: float = nominal_power
-                     
+
         self._range_primary: np.ndarray = np.array([])
         self._range_secondary: np.ndarray = np.array([])
         self._range_part_load: np.ndarray = np.array([])

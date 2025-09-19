@@ -5,24 +5,36 @@ our [project board](https://github.com/users/wouterpeere/projects/2) on GitHub.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [2.3.3] - Unpublished
+
+### Added
+
+- Temperature dependent fluid properties (issue #143).
+- Freezing point to fluid data (issue #314).
+
+### Changed
+
+- Changed back-end to be compatible with pygfunction 2.3.0 (issue #345).
+- The __repr__ of the different classes. It now returns a dictionary.
+- Remove ghe_logger since no longer used.
+
 ## [2.3.2] - 2025-04-02
 
-## Added
+### Added
 
 - Added support for DHW profiles in optimisation (issue #272).
+- Support for Python 3.13 (issue #319).
 - Added Prandtl number to FluidData class (issue #326).
 - Pressure drop calculation for horizontal pipe and total system (issue #332).
 - Added optimisation function for balanced borefield (issue #335).
 - Min_temperature and Max_temperature property to results class (issue #335).
-- Support for Python 3.13 (issue #319).
 
-## Changed
+### Changed
 
 - Added U-bend to the pressure drop calculation of the pipe (issue #332).
 - Remove optimise_load_power and optimise_load_energy from Borefield object (issue #332).
-- Changed back-end to be compatible with pygfunction 2.3.0 (issue #345).
 
-## Fixed
+### Fixed
 
 - Increase accuracy of optimise load profile (issue #335).
 - Problem with MonthlyBuildingLoadMultiYear (issue #339).
@@ -402,6 +414,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 
 - fixed bug in interpolation
+
+[2.3.2]: https://github.com/wouterpeere/GHEtool/compare/v2.3.1...v2.3.2
 
 [2.3.1]: https://github.com/wouterpeere/GHEtool/compare/v2.3.0...v2.3.1
 

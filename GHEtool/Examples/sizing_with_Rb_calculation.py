@@ -10,7 +10,8 @@ import time
 import numpy as np
 import pygfunction as gt
 
-from GHEtool import Borefield, FluidData, GroundConstantTemperature, DoubleUTube, MonthlyGeothermalLoadAbsolute
+from GHEtool import Borefield, ConstantFluidData, ConstantFlowRate, GroundConstantTemperature, DoubleUTube, \
+    MonthlyGeothermalLoadAbsolute
 
 
 def sizing_with_Rb():
@@ -39,7 +40,8 @@ def sizing_with_Rb():
     # initiate borefield model
     data = GroundConstantTemperature(3,
                                      10)  # ground data with an inaccurate guess of 100m for the borehole length of the borefield
-    fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
+    flow_data = ConstantFlowRate(mfr=0.2)
     pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 
     borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 100, 1, 0.075)
@@ -65,11 +67,8 @@ def sizing_with_Rb():
     load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_heating, peak_cooling)
 
     # create the borefield object
-    borefield = Borefield(load=load)
+    borefield = Borefield(load=load, ground_data=data, pipe_data=pipe_data, fluid_data=fluid_data, flow_data=flow_data)
 
-    borefield.set_ground_parameters(data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
     borefield.Rb = 0.2
     borefield.set_borefield(borefield_gt)
 

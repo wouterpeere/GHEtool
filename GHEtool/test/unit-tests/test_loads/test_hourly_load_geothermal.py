@@ -270,8 +270,6 @@ def test_repr_():
     load = HourlyGeothermalLoad()
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
 
-    assert 'Hourly geothermal load\n' \
-           'Peak injection duration [hour]: 6.0\n' \
-           'Peak extraction duration [hour]: 6.0\n' \
-           'Simulation period [year]: 20\n' \
-           'First month of simulation [-]: 1' == load.__repr__()
+    assert {'type': 'Hourly geothermal load', 'Peak injection duration [hour]': 6.0,
+            'Peak extraction duration [hour]': 6.0, 'Simulation period [year]': 20,
+            'First month of simulation [-]': 1} == load.__export__()

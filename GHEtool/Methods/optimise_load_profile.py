@@ -2,7 +2,8 @@ import copy
 import numpy as np
 
 from typing import Union
-from GHEtool.VariableClasses import HourlyBuildingLoad, MonthlyBuildingLoadMultiYear, HourlyBuildingLoadMultiYear
+from GHEtool.VariableClasses import HourlyBuildingLoad, MonthlyBuildingLoadMultiYear, HourlyBuildingLoadMultiYear, \
+    ConstantFluidData, ConstantFlowRate
 
 
 def optimise_load_profile_power(
@@ -59,9 +60,11 @@ def optimise_load_profile_power(
     if temperature_threshold < 0:
         raise ValueError(f"The temperature threshold is {temperature_threshold}, but it cannot be below 0!")
 
-    # since the depth does not change, the Rb* value is constant
-    borefield.Rb = borefield.borehole.get_Rb(borefield.H, borefield.D, borefield.r_b,
-                                             borefield.ground_data.k_s(borefield.depth, borefield.D))
+    # since the depth does not change, the Rb* value is constant, if there is no temperature dependent fluid data
+    if isinstance(borefield.borehole.fluid_data, ConstantFluidData) \
+            and isinstance(borefield.borehole.flow_data, ConstantFlowRate):
+        borefield.Rb = borefield.borehole.get_Rb(borefield.H, borefield.D, borefield.r_b,
+                                                 borefield.ground_data.k_s(borefield.depth, borefield.D))
 
     # set load
     borefield.load = copy.deepcopy(building_load)
@@ -198,10 +201,11 @@ def optimise_load_profile_energy(
     if temperature_threshold < 0:
         raise ValueError(f"The temperature threshold is {temperature_threshold}, but it cannot be below 0!")
 
-    # since the depth does not change, the Rb* value is constant
-    # set to use a constant Rb* value but save the initial parameters
-    borefield.Rb = borefield.borehole.get_Rb(borefield.H, borefield.D, borefield.r_b,
-                                             borefield.ground_data.k_s(borefield.depth, borefield.D))
+    # since the depth does not change, the Rb* value is constant, if there is no temperature dependent fluid data
+    if isinstance(borefield.borehole.fluid_data, ConstantFluidData) \
+            and isinstance(borefield.borehole.flow_data, ConstantFlowRate):
+        borefield.Rb = borefield.borehole.get_Rb(borefield.H, borefield.D, borefield.r_b,
+                                                 borefield.ground_data.k_s(borefield.depth, borefield.D))
 
     building_load_copy = copy.deepcopy(building_load)
 
@@ -407,9 +411,11 @@ def optimise_load_profile_balance(
     if imbalance_factor > 1 or imbalance_factor < 0:
         raise ValueError(f"The imbalance factor is {imbalance_factor}, but it should be between 0-1!")
 
-    # since the depth does not change, the Rb* value is constant
-    borefield.Rb = borefield.borehole.get_Rb(borefield.H, borefield.D, borefield.r_b,
-                                             borefield.ground_data.k_s(borefield.depth, borefield.D))
+    # since the depth does not change, the Rb* value is constant, if there is no temperature dependent fluid data
+    if isinstance(borefield.borehole.fluid_data, ConstantFluidData) \
+            and isinstance(borefield.borehole.flow_data, ConstantFlowRate):
+        borefield.Rb = borefield.borehole.get_Rb(borefield.H, borefield.D, borefield.r_b,
+                                                 borefield.ground_data.k_s(borefield.depth, borefield.D))
 
     # set load
     borefield.load = copy.deepcopy(building_load)

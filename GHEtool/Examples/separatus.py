@@ -1,11 +1,11 @@
 """
-This file contains a design example with the Separatus probe, in comparison with a single and double U-tube.
-A borehole diameter of DN90 was chosen for the Separatus probe whereas for the single and double U-tube a DN140 was assumed.
+This file contains a design example with the separatus probe, in comparison with a single and double U-tube.
+A borehole diameter of DN90 was chosen for the separatus probe whereas for the single and double U-tube a DN140 was assumed.
 A mass flow rate of 0.3 kg/s was assumed for all cases and no glycol was taken into account.
 The grout thermal conductivity is 2 W/(mK), and the borehole dimensions where 1x4 with a borehole length of 110m.
 The building heating and cooling demand was obtained from a residential building in Belgium.
 
-It is shown that both single U and Separatus have similar performance, whilst the double U-tube has a somewhat better
+It is shown that both single U and separatus have similar performance, whilst the double U-tube has a somewhat better
 performance. These results have to be placed next to an economic evaluation of the different borefield designs.
 """
 
@@ -16,8 +16,8 @@ from GHEtool import *
 
 # set general parameters
 ground_data = GroundFluxTemperature(1.9, 9.6, flux=0.07)
-fluid_data = FluidData(mfr=0.3)
-fluid_data.import_fluid_from_pygfunction(gt.media.Fluid('MPG', 0, 6))
+flow_data = ConstantFlowRate(mfr=0.3)
+fluid_data = TemperatureDependentFluidData('MPG', 0)
 
 # set building load
 load = MonthlyBuildingLoadAbsolute(
@@ -43,10 +43,8 @@ def design_with_single_U():
     """
     pipe_data = SingleUTube(2, 0.013, 0.016, 0.42, 0.035)
 
-    borefield = Borefield(load=load)
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield = Borefield(load=load, ground_data=ground_data, fluid_data=fluid_data, flow_data=flow_data,
+                          pipe_data=pipe_data)
     borefield.set_min_avg_fluid_temperature(6)
     borefield.set_max_avg_fluid_temperature(17)
 
@@ -64,10 +62,9 @@ def design_with_double_U():
     """
     pipe_data = DoubleUTube(2, 0.013, 0.016, 0.42, 0.035)
 
-    borefield = Borefield(load=load)
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield = Borefield(load=load, ground_data=ground_data, fluid_data=fluid_data, flow_data=flow_data,
+                          pipe_data=pipe_data)
+
     borefield.set_min_avg_fluid_temperature(6)
     borefield.set_max_avg_fluid_temperature(17)
 
@@ -77,7 +74,7 @@ def design_with_double_U():
 
 def design_with_separatus():
     """
-    This function plots the temperature profile for a system with a Separatus probe.
+    This function plots the temperature profile for a system with a separatus probe.
 
     Returns
     -------
@@ -85,10 +82,9 @@ def design_with_separatus():
     """
     pipe_data = Separatus(2)
 
-    borefield = Borefield(load=load)
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield = Borefield(load=load, ground_data=ground_data, fluid_data=fluid_data, flow_data=flow_data,
+                          pipe_data=pipe_data)
+
     borefield.set_min_avg_fluid_temperature(6)
     borefield.set_max_avg_fluid_temperature(17)
 

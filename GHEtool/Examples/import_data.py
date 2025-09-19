@@ -14,7 +14,7 @@ borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 110, 1, 0.07
 borefield = Borefield()
 
 # set ground data in borefield
-borefield.set_ground_parameters(data)
+borefield.ground_data = data
 
 # set Rb
 borefield.Rb = 0.12

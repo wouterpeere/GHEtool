@@ -15,8 +15,9 @@ from GHEtool import *
 
 # set general parameters
 ground_data = GroundFluxTemperature(3, 10)
-fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
 pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
+flow_data = ConstantFlowRate(mfr=0.2)
 
 load = HourlyBuildingLoad(efficiency_heating=5)  # use SCOP of 5 for heating
 load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,
@@ -28,9 +29,10 @@ eer_active = EER(np.array([15.943, 6.153]), np.array([5, 30]))  # based on the d
 def default_cooling_in_summer():
     borefield = Borefield()
     borefield.create_rectangular_borefield(3, 3, 6, 6, 110, 0.7, 0.075)
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+    borefield.flow_data = flow_data
     borefield.set_max_avg_fluid_temperature(25)
     borefield.set_min_avg_fluid_temperature(3)
 
@@ -78,9 +80,10 @@ def default_cooling_in_summer():
 def active_above_threshold():
     borefield = Borefield()
     borefield.create_rectangular_borefield(3, 3, 6, 6, 110, 0.7, 0.075)
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+    borefield.flow_data = flow_data
     borefield.set_max_avg_fluid_temperature(25)
     borefield.set_min_avg_fluid_temperature(3)
 

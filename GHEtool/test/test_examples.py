@@ -91,3 +91,9 @@ def test_optimise(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     from GHEtool.Examples.optimise_load_profile import optimise
     optimise()
+
+
+def test_temperature_dependent_fluid_data(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    from GHEtool.Examples.temperature_dependent_fluid_data_sizing import size_with_temperature_dependence
+    size_with_temperature_dependence()
