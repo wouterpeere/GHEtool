@@ -13,6 +13,8 @@ The articles for which this is the case, are:
 articles/HPT_magazine.rst
 ```
 
+> Peere, W. (2025). Three ways to design a hybrid geothermal heating and cooling system for an office building. In _Proceedings of Geo-Rin Conference_. Benasque (Spain), 2-6 June 2025.
+
 > Aitmad, M. (2025). Techno-Economic Analysis of using Ground-Source Heat Exchangers in Pakistan (Master thesis).
 
 > Jahn, A. (2024). Softwarekonzept zur vereinfachten Wärmeplanung von Städten und Quartieren bei variabler Datenbasis (

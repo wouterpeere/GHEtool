@@ -8,7 +8,7 @@ import pygfunction as gt
 import pytest
 
 from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, DoubleUTube, Borefield, \
-    CalculationSetup, FOLDER, MultipleUTube, EERCombined, ConstantFlowRate
+    CalculationSetup, FOLDER, MultipleUTube, EERCombined, ConstantFlowRate, TemperatureDependentFluidData
 from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad, HourlyBuildingLoad, \
     HourlyBuildingLoadMultiYear, MonthlyBuildingLoadAbsolute
@@ -574,7 +574,7 @@ def test_reynolds_number():
     borefield = Borefield()
     borefield.pipe_data = pipeData
     borefield.fluid_data = fluidData
-    assert np.isclose(4244.131815783876, borefield.Re())
+    assert np.isclose(4244.131815783876, borefield.Re)
 
 
 def test_last_year_params():
@@ -612,7 +612,7 @@ def test_first_year_params():
 def test_calculate_temperatures():
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
-    borefield.set_ground_parameters(ground_data_constant)
+    borefield.ground_data = ground_data_constant
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
 
     borefield.calculate_temperatures(120)
@@ -1148,13 +1148,17 @@ def test_optimise_load_borefield():
     ground_data = GroundFluxTemperature(2, 9.6, flux=0.07)
     borefield.ground_data = ground_data
     borefield_load, external_load = optimise_load_profile_energy(borefield, load)
-    assert np.isclose(borefield_load.imbalance, -229303.76869817785)
+    assert np.isclose(borefield_load.imbalance, -229270.593357212)
     borefield.load = borefield_load
     borefield.calculate_temperatures(hourly=False)
-    assert np.isclose(np.max(borefield.results.peak_injection), 17.046329116754006)
-    assert np.isclose(np.min(borefield.results.peak_extraction), 1.9475137898511852)
+    assert np.isclose(np.max(borefield.results.peak_injection), 17.039423481043194)
+    assert np.isclose(np.min(borefield.results.peak_extraction), 1.953454037320081)
     assert np.isclose(borefield.load.max_peak_cooling, 329.9393053)
-    assert np.isclose(np.sum(borefield.load.hourly_heating_load), 594114.6208002889)
+    assert np.isclose(np.sum(borefield.load.hourly_heating_load), 593960.7811708137)
+    load.peak_extraction_duration = 10
+    borefield_load_, external_load = optimise_load_profile_energy(borefield, load)
+    assert not borefield_load == borefield_load_
+    assert np.isclose(borefield_load_.peak_extraction_duration, 3600 * 10)
 
 
 def test_repr_():
@@ -1250,9 +1254,9 @@ def test_with_titled_borefield():
 
     # initiate GHEtool object with tilted borefield
     borefield = Borefield(borefield=borefield_tilted, load=load_data)
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_pipe_parameters(pipe_data)
-    borefield.set_fluid_parameters(fluid_data)
+    borefield.ground_data = ground_data
+    borefield.pipe_data = pipe_data
+    borefield.fluid_data = fluid_data
     borefield.set_max_avg_fluid_temperature(17)
 
     assert np.isclose(borefield.depth, 150 * math.cos(math.pi / 7) + 0.75)
@@ -1264,3 +1268,27 @@ def test_with_titled_borefield():
 def test_warning_custom_gfunction():
     with pytest.warns(DeprecationWarning):
         Borefield(custom_gfunction=CustomGFunction())
+
+
+def test_Rb_and_Re_with_temperture_dep_data():
+    ground_data = GroundFluxTemperature(1.9, 10)
+    pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+    flow_data = ConstantFlowRate(vfr=0.2)
+    fluid_data = TemperatureDependentFluidData('MPG', 30)
+    load_data = MonthlyBuildingLoadAbsolute(
+        np.array([.176, .174, .141, .1, .045, 0, 0, 0, 0.012, 0.065, 0.123, 0.164]) * 8 * 1350,
+        np.array([0, 0, 0, 0, .112, .205, .27, .264, .149, 0, 0, 0]) * 4 * 700,
+        np.array([1, .991, .802, .566, .264, 0, 0, 0, .0606, .368, .698, .934]) * 8,
+        np.array([0, 0, 0, 0, .415, .756, 1, .976, .549, 0, 0, 0]) * 4
+    )
+
+    borefield = Borefield(ground_data=ground_data, pipe_data=pipe_data, fluid_data=fluid_data, flow_data=flow_data,
+                          load=load_data)
+
+    borefield.create_rectangular_borefield(4, 1, 7, 7, 100, 1, 0.075)
+    assert np.isclose(borefield.Re, 709.7715066160362)
+    assert np.isclose(borefield.Rb, 0.15719115050343702)
+
+    borefield.calculate_temperatures()
+    assert np.isclose(borefield.Re, 949.0513333574957)
+    assert np.isclose(borefield.Rb, 0.15660083491337237)

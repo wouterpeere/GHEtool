@@ -1,9 +1,11 @@
 import copy
 import numpy as np
 
+from math import pi
 from typing import Union
 from GHEtool.VariableClasses import HourlyBuildingLoad, MonthlyBuildingLoadMultiYear, HourlyBuildingLoadMultiYear, \
-    ConstantFluidData, ConstantFlowRate
+    ConstantFluidData, ConstantFlowRate, TemperatureDependentFluidData, EERCombined
+from GHEtool.VariableClasses.LoadData.Baseclasses import _LoadDataBuilding
 
 
 def optimise_load_profile_power(
@@ -14,7 +16,8 @@ def optimise_load_profile_power(
         max_peak_heating: float = None,
         max_peak_cooling: float = None,
         dhw_preferential: bool = None
-) -> tuple[HourlyBuildingLoad, HourlyBuildingLoad]:
+) -> tuple[
+    Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear], Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear]]:
     """
     This function optimises the load for maximum power in extraction and injection based on the given borefield and
     the given hourly building load. It does so based on a load-duration curve.
@@ -41,7 +44,7 @@ def optimise_load_profile_power(
 
     Returns
     -------
-    tuple [HourlyBuildingLoad, HourlyBuildingLoad]
+    tuple [HourlyBuildingLoad, HourlyBuildingLoad] or tuple [HourlyBuildingLoadMultiYear, HourlyBuildingLoadMultiYear]
         borefield load, external load
 
     Raises
@@ -68,7 +71,6 @@ def optimise_load_profile_power(
 
     # set load
     borefield.load = copy.deepcopy(building_load)
-
     # set initial peak loads
     init_peak_heating: float = borefield.load.max_peak_heating
     init_peak_dhw: float = borefield.load.max_peak_dhw
@@ -90,13 +92,13 @@ def optimise_load_profile_power(
     while not cool_ok or not heat_ok:
         # limit the primary geothermal extraction and injection load to peak_heat_load and peak_cool_load
         borefield.load.set_hourly_cooling_load(
-            np.minimum(peak_cool_load, building_load.hourly_cooling_load
+            np.minimum(peak_cool_load, building_load._hourly_cooling_load
             if isinstance(borefield.load, HourlyBuildingLoad) else building_load.hourly_cooling_load_simulation_period))
         borefield.load.set_hourly_heating_load(
-            np.minimum(peak_heat_load, building_load.hourly_heating_load
+            np.minimum(peak_heat_load, building_load._hourly_heating_load
             if isinstance(borefield.load, HourlyBuildingLoad) else building_load.hourly_heating_load_simulation_period))
         borefield.load.set_hourly_dhw_load(
-            np.minimum(peak_dhw_load, building_load.hourly_dhw_load
+            np.minimum(peak_dhw_load, building_load._hourly_dhw_load
             if isinstance(borefield.load, HourlyBuildingLoad) else building_load.hourly_dhw_load_simulation_period))
 
         # calculate temperature profile, just for the results
@@ -143,13 +145,29 @@ def optimise_load_profile_power(
             cool_ok = True
 
     # calculate external load
-    external_load = HourlyBuildingLoad(simulation_period=building_load.simulation_period)
+    if isinstance(building_load, HourlyBuildingLoad):
+        external_load = HourlyBuildingLoad(simulation_period=building_load.simulation_period)
+        external_load.start_month = building_load.start_month
+
+        external_load.set_hourly_heating_load(
+            np.maximum(0, building_load._hourly_heating_load - borefield.load._hourly_heating_load))
+        external_load.set_hourly_cooling_load(
+            np.maximum(0, building_load._hourly_cooling_load - borefield.load._hourly_cooling_load))
+        external_load.set_hourly_dhw_load(
+            np.maximum(0, building_load._hourly_dhw_load - borefield.load._hourly_dhw_load))
+
+        return borefield.load, external_load
+
+    external_load = HourlyBuildingLoadMultiYear()
     external_load.set_hourly_heating_load(
-        np.maximum(0, building_load.hourly_heating_load - borefield.load.hourly_heating_load))
+        np.maximum(0,
+                   building_load.hourly_heating_load_simulation_period - borefield.load.hourly_heating_load_simulation_period))
     external_load.set_hourly_cooling_load(
-        np.maximum(0, building_load.hourly_cooling_load - borefield.load.hourly_cooling_load))
+        np.maximum(0,
+                   building_load.hourly_cooling_load_simulation_period - borefield.load.hourly_cooling_load_simulation_period))
     external_load.set_hourly_dhw_load(
-        np.maximum(0, building_load.hourly_dhw_load - borefield.load.hourly_dhw_load))
+        np.maximum(0,
+                   building_load.hourly_dhw_load_simulation_period - borefield.load.hourly_dhw_load_simulation_period))
 
     return borefield.load, external_load
 
@@ -217,6 +235,9 @@ def optimise_load_profile_energy(
                                                     building_load._eer,
                                                     building_load.hourly_dhw_load_simulation_period,
                                                     building_load._cop_dhw)
+        building_load.exclude_DHW_from_peak = building_load_copy.exclude_DHW_from_peak
+        building_load.peak_extraction_duration = building_load_copy.peak_extraction_duration / 3600
+        building_load.peak_injection_duration = building_load_copy.peak_injection_duration / 3600
 
     # set max peak values
     init_peak_heating = building_load.hourly_heating_load_simulation_period.copy()
@@ -260,27 +281,117 @@ def optimise_load_profile_energy(
             dhw=building_load.monthly_baseload_dhw_simulation_period,
             efficiency_dhw=building_load._cop_dhw)
 
+    monthly_load.exclude_DHW_from_peak = building_load.exclude_DHW_from_peak
+    monthly_load.peak_extraction_duration = building_load.peak_extraction_duration / 3600
+    monthly_load.peak_injection_duration = building_load.peak_injection_duration / 3600
+
     borefield.load = monthly_load
 
     # store initial monthly peak loads
     peak_heating = copy.copy(monthly_load.monthly_peak_heating_simulation_period)
     peak_cooling = copy.copy(monthly_load.monthly_peak_cooling_simulation_period)
 
+    # set constants for optimisation
+    g_value_peak_injection = borefield.gfunction(borefield.load.peak_injection_duration, borefield.H)[0]
+    if borefield.load.peak_injection_duration == borefield.load.peak_extraction_duration:
+        g_value_peak_extraction = g_value_peak_injection
+    else:
+        g_value_peak_extraction = borefield.gfunction(borefield.load.peak_extraction_duration, borefield.H)[0]
+
+    g_value = borefield.gfunction(borefield.load.time_L3, borefield.H)[0]
+    k_s = borefield.ground_data.k_s(borefield.calculate_depth(borefield.H, borefield.D), borefield.D)
+
+    def update_last_month(idx, init_load) -> (float, float):
+        def calculate(Tmin: float = None, Tmax: float = None, *args):
+            if Tmin is None:
+                Tmin = borefield.Tf_min
+                Tmax = borefield.Tf_max
+            Tb = borefield.results.Tb[idx]
+
+            # convert to result
+            result = (Tb - borefield._Tg(borefield.H)) * (2 * pi * k_s) * borefield.H * borefield.number_of_boreholes
+
+            # correct result for previous load
+            result -= g_value * init_load * 1000
+
+            # calculate new Tb
+            result += g_value * borefield.load.monthly_average_injection_power_simulation_period[idx] * 1000
+            Tb = result / (2 * pi * k_s) / (borefield.H * borefield.number_of_boreholes) + borefield._Tg(borefield.H)
+
+            # calculate new temperature
+            extraction = Tb + \
+                         (-borefield.load.monthly_peak_extraction_simulation_period[idx] *
+                          (g_value_peak_extraction / (k_s * 2 * pi) + borefield.borehole.get_Rb(borefield.H,
+                                                                                                borefield.D,
+                                                                                                borefield.r_b,
+                                                                                                k_s, borefield.depth,
+                                                                                                temperature=Tmin))
+                          + borefield.load.monthly_baseload_extraction_power_simulation_period[idx] *
+                          (g_value_peak_extraction / (
+                                  k_s * 2 * pi))) * 1000 / borefield.number_of_boreholes / borefield.H
+
+            injection = Tb + \
+                        (borefield.load.monthly_peak_injection_simulation_period[idx] *
+                         (g_value_peak_injection / (k_s * 2 * pi) + borefield.borehole.get_Rb(borefield.H, borefield.D,
+                                                                                              borefield.r_b,
+                                                                                              k_s, borefield.depth,
+                                                                                              temperature=Tmax))
+                         - borefield.load.monthly_baseload_injection_power_simulation_period[idx] *
+                         (g_value_peak_injection / (k_s * 2 * pi))) * 1000 / borefield.number_of_boreholes / borefield.H
+            return extraction, injection, Tb
+
+        # add some iteration for convergence
+        # check if active_passive, because then, threshold should be taken
+        if isinstance(borefield.load, _LoadDataBuilding) and \
+                isinstance(borefield.load.eer,
+                           EERCombined) and borefield.load.eer.threshold_temperature is not None:
+            borefield.load.reset_results(borefield.Tf_min, borefield.load.eer.threshold_temperature)
+        else:
+            borefield.load.reset_results(borefield.Tf_min, borefield.Tf_max)
+        results_old = calculate()
+        # set results, but manually
+        if borefield.load._results is None:
+            borefield.load.set_results(borefield.results)
+        borefield.load._results._peak_extraction[idx] = results_old[0]
+        borefield.load._results._peak_injection[idx] = results_old[1]
+        results = calculate(*results_old)
+
+        # safety
+        i = 0
+
+        def calculate_difference(results_old, result_new) -> float:
+            return max(
+                np.max(result_new[0] - results_old[0]),
+                np.max(result_new[1] - results_old[1]))
+
+        while calculate_difference(results_old, results) > borefield._calculation_setup.atol \
+                and i < borefield._calculation_setup.max_nb_of_iterations:
+            results_old = results
+            # set results, but manually
+            borefield.load._results._peak_extraction[idx] = results_old[0]
+            borefield.load._results._peak_injection[idx] = results_old[1]
+            results = calculate(*results_old)
+            i += 1
+        return calculate()
+
     for i in range(12 * borefield.load.simulation_period):
         # set iteration criteria
+        borefield.calculate_temperatures(borefield.H)
+        # optimise month i
+        init_load = borefield.load.monthly_average_injection_power_simulation_period[i]
         cool_ok, heat_ok = False, False
 
         while not cool_ok or not heat_ok:
             # calculate temperature profile, just for the results
-            borefield.calculate_temperatures(borefield.H)
+            peak_extraction, peak_injection, _ = update_last_month(i, init_load)
 
             # deviation from minimum temperature
-            if abs(borefield.results.peak_extraction[i] - borefield.Tf_min) > temperature_threshold:
+            if abs(peak_extraction - borefield.Tf_min) > temperature_threshold:
                 # check if it goes below the threshold
                 current_heating_peak = borefield.load.monthly_peak_heating_simulation_period[i]
-                if borefield.results.peak_extraction[i] < borefield.Tf_min:
+                if peak_extraction < borefield.Tf_min:
                     current_heating_peak = max(0.1, current_heating_peak - 1 * max(1, 10 * (
-                            borefield.Tf_min - borefield.results.peak_extraction[i])))
+                            borefield.Tf_min - peak_extraction)))
                 else:
                     current_heating_peak = min(peak_heating[i], current_heating_peak * 1.01)
                     if current_heating_peak == peak_heating[i]:
@@ -291,12 +402,12 @@ def optimise_load_profile_energy(
                 heat_ok = True
 
             # deviation from maximum temperature
-            if abs(borefield.results.peak_injection[i] - borefield.Tf_max) > temperature_threshold:
+            if abs(peak_injection - borefield.Tf_max) > temperature_threshold:
                 # check if it goes above the threshold
                 current_cooling_peak = borefield.load.monthly_peak_cooling_simulation_period[i]
-                if borefield.results.peak_injection[i] > borefield.Tf_max:
+                if peak_injection > borefield.Tf_max:
                     current_cooling_peak = max(0.1, current_cooling_peak - 1 * max(1, 10 * (
-                            -borefield.Tf_max + borefield.results.peak_injection[i])))
+                            -borefield.Tf_max + peak_injection)))
                 else:
                     current_cooling_peak = min(peak_cooling[i], current_cooling_peak * 1.01)
                     if current_cooling_peak == peak_cooling[i]:
@@ -359,7 +470,8 @@ def optimise_load_profile_balance(
         max_peak_cooling: float = None,
         dhw_preferential: bool = None,
         imbalance_factor: float = 0.01,
-) -> tuple[HourlyBuildingLoad, HourlyBuildingLoad]:
+) -> tuple[
+    Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear], Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear]]:
     """
     This function optimises the load for maximum power in extraction and injection based on the given borefield and
     the given hourly building load, by maintaining a zero imbalance. It does so based on a load-duration curve.
@@ -389,7 +501,7 @@ def optimise_load_profile_balance(
         
     Returns
     -------
-    tuple [HourlyBuildingLoad, HourlyBuildingLoad]
+    tuple [HourlyBuildingLoad, HourlyBuildingLoad] or tuple [HourlyBuildingLoadMultiYear, HourlyBuildingLoadMultiYear]
         borefield load, external load
 
     Raises
@@ -441,13 +553,13 @@ def optimise_load_profile_balance(
     while not cool_ok or not heat_ok:
         # limit the primary geothermal extraction and injection load to peak_heat_load and peak_cool_load
         borefield.load.set_hourly_cooling_load(
-            np.minimum(peak_cool_load, building_load.hourly_cooling_load
+            np.minimum(peak_cool_load, building_load._hourly_cooling_load
             if isinstance(borefield.load, HourlyBuildingLoad) else building_load.hourly_cooling_load_simulation_period))
         borefield.load.set_hourly_heating_load(
-            np.minimum(peak_heat_load, building_load.hourly_heating_load
+            np.minimum(peak_heat_load, building_load._hourly_heating_load
             if isinstance(borefield.load, HourlyBuildingLoad) else building_load.hourly_heating_load_simulation_period))
         borefield.load.set_hourly_dhw_load(
-            np.minimum(peak_dhw_load, building_load.hourly_dhw_load
+            np.minimum(peak_dhw_load, building_load._hourly_dhw_load
             if isinstance(borefield.load, HourlyBuildingLoad) else building_load.hourly_dhw_load_simulation_period))
 
         # calculate temperature profile, just for the results
@@ -456,7 +568,6 @@ def optimise_load_profile_balance(
         # calculate relative imbalance
         imbalance = borefield.load.imbalance / np.maximum(borefield.load.yearly_average_injection_load,
                                                           borefield.load.yearly_average_extraction_load)
-
         # deviation from minimum temperature
         if abs(min(borefield.results.peak_extraction) - borefield.Tf_min) > temperature_threshold or \
                 (abs(imbalance) > imbalance_factor and imbalance < 0):
@@ -521,12 +632,28 @@ def optimise_load_profile_balance(
             cool_ok = True
 
     # calculate external load
-    external_load = HourlyBuildingLoad(simulation_period=building_load.simulation_period)
+    if isinstance(building_load, HourlyBuildingLoad):
+        external_load = HourlyBuildingLoad(simulation_period=building_load.simulation_period)
+        external_load.start_month = building_load.start_month
+
+        external_load.set_hourly_heating_load(
+            np.maximum(0, building_load._hourly_heating_load - borefield.load._hourly_heating_load))
+        external_load.set_hourly_cooling_load(
+            np.maximum(0, building_load._hourly_cooling_load - borefield.load._hourly_cooling_load))
+        external_load.set_hourly_dhw_load(
+            np.maximum(0, building_load._hourly_dhw_load - borefield.load._hourly_dhw_load))
+
+        return borefield.load, external_load
+
+    external_load = HourlyBuildingLoadMultiYear()
     external_load.set_hourly_heating_load(
-        np.maximum(0, building_load.hourly_heating_load - borefield.load.hourly_heating_load))
+        np.maximum(0,
+                   building_load.hourly_heating_load_simulation_period - borefield.load.hourly_heating_load_simulation_period))
     external_load.set_hourly_cooling_load(
-        np.maximum(0, building_load.hourly_cooling_load - borefield.load.hourly_cooling_load))
+        np.maximum(0,
+                   building_load.hourly_cooling_load_simulation_period - borefield.load.hourly_cooling_load_simulation_period))
     external_load.set_hourly_dhw_load(
-        np.maximum(0, building_load.hourly_dhw_load - borefield.load.hourly_dhw_load))
+        np.maximum(0,
+                   building_load.hourly_dhw_load_simulation_period - borefield.load.hourly_dhw_load_simulation_period))
 
     return borefield.load, external_load

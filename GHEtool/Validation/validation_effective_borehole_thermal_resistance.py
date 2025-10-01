@@ -12,7 +12,7 @@ import pandas as pd
 import pygfunction as gt
 
 from GHEtool import Borefield, FOLDER
-from GHEtool.VariableClasses import FluidData, GroundConstantTemperature, DoubleUTube
+from GHEtool.VariableClasses import ConstantFluidData, ConstantFlowRate, GroundConstantTemperature, DoubleUTube
 
 
 def validate():
@@ -24,8 +24,8 @@ def validate():
 
     # initiate borefield model
     borefield = Borefield()
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.ground_data = ground_data
+    borefield.pipe_data = pipe_data
     borefield.set_borefield(borefield_gt)
     borefield.Rb = 0.12
 
@@ -41,8 +41,10 @@ def validate():
 
     # calculate effective borehole thermal resistance (Rb*)
     for mfr in mfr_range:
-        fluid_data = FluidData(mfr, 0.568, 998, 4180, 1e-3)
-        borefield.set_fluid_parameters(fluid_data)
+        fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
+        flow_data = ConstantFlowRate(mfr=mfr)
+        borefield.fluid_data = fluid_data
+        borefield.flow_data = flow_data
         Rb.append(borefield.Rb)
         R_p.append(borefield.borehole.pipe_data.R_p)
         R_fp.append(borefield.borehole.pipe_data.R_f)
