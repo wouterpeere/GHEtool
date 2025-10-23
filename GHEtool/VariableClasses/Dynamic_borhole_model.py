@@ -5,11 +5,12 @@ from math import exp, log, pi, sqrt
 from collections import namedtuple
 import numpy as np
 import matplotlib.pyplot as plt
+import logging
 from scipy.interpolate import interp1d
 from scipy.linalg.lapack import dgtsv
 
 import pygfunction as gt
-from GHEtool.logger.ghe_logger import ghe_logger
+
 
 class CellProps(IntEnum):
     R_IN = 0
@@ -66,8 +67,8 @@ class DynamicsBH:
         Manuscript submitted for publication.
     """
 
-
-    def __init__(self, time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, borefield, short_term_effects_parameters):
+    def __init__(self, time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, borefield,
+                 short_term_effects_parameters):
 
         # Assign input parameters to instance variables
         self.boreholes = boreholes
@@ -96,13 +97,14 @@ class DynamicsBH:
 
         # Calculate far-field radius affecting ground cells count
         if number_of_boreholes == 0:
-            ghe_logger.warning("Borefield should contain at least one borehole")
+            logging.warning("Borefield should contain at least one borehole")
             far_field_radius = 10  # default fallback
         elif number_of_boreholes < 4:
             far_field_radius = 10  # meters for small field or single borehole
         else:
             # Approximate borehole spacing (assumes rectangular layout)
-            dist = np.sqrt((self.boreholes[1].x - self.boreholes[0].x)**2 + (self.boreholes[1].y - self.boreholes[0].y)**2)
+            dist = np.sqrt(
+                (self.boreholes[1].x - self.boreholes[0].x) ** 2 + (self.boreholes[1].y - self.boreholes[0].y) ** 2)
             far_field_radius = dist / 2
 
         # Number of soil cells scales linearly with far-field radius (500 cells at 10 m)
@@ -116,8 +118,8 @@ class DynamicsBH:
         self.short_term_parameters = ShortTermEffectsParameters(**short_term_effects_parameters)
 
         self.factor_time = 50  # Parameter modifying default final time
-        self.rho_cp_grout = self.short_term_parameters.rho_cp_grout  
-        self.rho_cp_pipe = self.short_term_parameters.rho_cp_pipe  
+        self.rho_cp_grout = self.short_term_parameters.rho_cp_grout
+        self.rho_cp_pipe = self.short_term_parameters.rho_cp_pipe
 
         # Initial effective borehole resistance (updated iteratively)
         self.resist_bh_effective = self.borefield.Rb
@@ -134,7 +136,7 @@ class DynamicsBH:
             self.num_pipe_cells = 16
             self.num_grout_cells = 18  # was 20, adjusted here
         else:
-            ghe_logger.warning("Only single or double U-tube configurations supported")
+            logging.warning("Only single or double U-tube configurations supported")
 
         # Total number of cells in radial discretization
         self.num_cells = (self.num_fluid_cells + self.num_conv_cells + self.num_pipe_cells +
@@ -169,7 +171,7 @@ class DynamicsBH:
             self.thickness_fluid_cell = (self.r_in_convection - self.r_fluid) / self.num_fluid_cells
             self.thickness_pipe_cell = self.thickness_pipe_actual / self.num_pipe_cells
 
-            ghe_logger.info("Single U-tube cells defined for numerical model")
+            logging.info("Single U-tube cells defined for numerical model")
 
         else:
             # Double U-tube geometry setup
@@ -184,7 +186,7 @@ class DynamicsBH:
             self.thickness_fluid_cell = (self.r_in_convection - self.r_fluid) / self.num_fluid_cells
             self.thickness_pipe_cell = (2 * self.thickness_pipe_actual) / self.num_pipe_cells
 
-            ghe_logger.info("Double U-tube cells defined for numerical model")
+            logging.info("Double U-tube cells defined for numerical model")
 
         # Initialize arrays and parameters used in calculations
         self.g = np.array([], dtype=np.double)
@@ -202,7 +204,6 @@ class DynamicsBH:
 
         self.g_sts = None  # Placeholder for short-term g-function interpolator
 
-  
     def fill_radial_cell(self, radial_cell, resist_f_eq, resist_tg_eq):
         """
         Initialize radial discretization cells with thermal properties for each layer:
@@ -236,10 +237,11 @@ class DynamicsBH:
             center_r = inner_r + self.thickness_fluid_cell / 2.0
             outer_r = inner_r + self.thickness_fluid_cell
             rho_cp_eq = (self.fluid_factor * self.u_tube * 2.0 * self.pipes_ghe.r_in ** 2
-                        * self.fluid_ghe.Cp * self.fluid_ghe.rho) / (self.r_in_convection ** 2 - self.r_fluid ** 2)
+                         * self.fluid_ghe.Cp * self.fluid_ghe.rho) / (self.r_in_convection ** 2 - self.r_fluid ** 2)
             k_eq = rho_cp_eq / self.fluid_ghe.Cp
-            volume = pi * (outer_r**2 - inner_r**2)
-            radial_cell[:, idx] = np.array([inner_r, center_r, outer_r, k_eq, rho_cp_eq, self.init_temp, volume], dtype=np.double)
+            volume = pi * (outer_r ** 2 - inner_r ** 2)
+            radial_cell[:, idx] = np.array([inner_r, center_r, outer_r, k_eq, rho_cp_eq, self.init_temp, volume],
+                                           dtype=np.double)
         cell_summation += num_fluid_cells
 
         # Convection cells (near-zero thermal mass)
@@ -250,8 +252,9 @@ class DynamicsBH:
             outer_r = inner_r + self.thickness_conv_cell
             k_eq = log(self.r_in_tube / self.r_in_convection) / (2.0 * pi * resist_f_eq)
             rho_cp = 1.0
-            volume = pi * (outer_r**2 - inner_r**2)
-            radial_cell[:, idx] = np.array([inner_r, center_r, outer_r, k_eq, rho_cp, self.init_temp, volume], dtype=np.double)
+            volume = pi * (outer_r ** 2 - inner_r ** 2)
+            radial_cell[:, idx] = np.array([inner_r, center_r, outer_r, k_eq, rho_cp, self.init_temp, volume],
+                                           dtype=np.double)
         cell_summation += num_conv_cells
 
         # Pipe cells
@@ -262,8 +265,9 @@ class DynamicsBH:
             outer_r = inner_r + self.thickness_pipe_cell
             conductivity = log(self.r_borehole / self.r_in_tube) / (2.0 * pi * resist_tg_eq)
             rho_cp = self.rho_cp_pipe
-            volume = pi * (outer_r**2 - inner_r**2)
-            radial_cell[:, idx] = np.array([inner_r, center_r, outer_r, conductivity, rho_cp, self.init_temp, volume], dtype=np.double)
+            volume = pi * (outer_r ** 2 - inner_r ** 2)
+            radial_cell[:, idx] = np.array([inner_r, center_r, outer_r, conductivity, rho_cp, self.init_temp, volume],
+                                           dtype=np.double)
         cell_summation += num_pipe_cells
 
         # Grout cells
@@ -274,8 +278,9 @@ class DynamicsBH:
             outer_r = inner_r + self.thickness_grout_cell
             conductivity = log(self.r_borehole / self.r_in_tube) / (2.0 * pi * resist_tg_eq)
             rho_cp = self.rho_cp_grout
-            volume = pi * (outer_r**2 - inner_r**2)
-            radial_cell[:, idx] = np.array([inner_r, center_r, outer_r, conductivity, rho_cp, self.init_temp, volume], dtype=np.double)
+            volume = pi * (outer_r ** 2 - inner_r ** 2)
+            radial_cell[:, idx] = np.array([inner_r, center_r, outer_r, conductivity, rho_cp, self.init_temp, volume],
+                                           dtype=np.double)
         cell_summation += num_grout_cells
 
         # Soil cells
@@ -286,15 +291,15 @@ class DynamicsBH:
             outer_r = inner_r + self.thickness_soil_cell
             conductivity = self.ground_ghe.k_s()
             rho_cp = self.ground_ghe.volumetric_heat_capacity()
-            volume = pi * (outer_r**2 - inner_r**2)
-            radial_cell[:, idx] = np.array([inner_r, center_r, outer_r, conductivity, rho_cp, self.init_temp, volume], dtype=np.double)
+            volume = pi * (outer_r ** 2 - inner_r ** 2)
+            radial_cell[:, idx] = np.array([inner_r, center_r, outer_r, conductivity, rho_cp, self.init_temp, volume],
+                                           dtype=np.double)
         cell_summation += num_soil_cells
 
         # === Validation Check ===
         expected_cells = num_fluid_cells + num_conv_cells + num_pipe_cells + num_grout_cells + num_soil_cells
         if cell_summation != expected_cells:
             raise ValueError(f"Total cells filled ({cell_summation}) do not match expected ({expected_cells})")
-
 
     def calc_sts_g_functions(self, final_time=None) -> tuple:
         """
@@ -360,8 +365,8 @@ class DynamicsBH:
         self.fill_radial_cell(radial_cell, resist_f_eq, resist_tg_eq)
 
         # === Characteristic time definitions ===
-        self.t_b = 5 * (self.boreholes[0].r_b)**2 / self.ground_ghe.alpha()
-        self.t_s = self.boreholes[0].H**2 / (9 * self.ground_ghe.alpha())
+        self.t_b = 5 * (self.boreholes[0].r_b) ** 2 / self.ground_ghe.alpha()
+        self.t_s = self.boreholes[0].H ** 2 / (9 * self.ground_ghe.alpha())
 
         # === Time loop variables ===
         g, g_plot, lntts, plottime = [], [], [], [2e-12]
@@ -384,8 +389,10 @@ class DynamicsBH:
         _east_cell = radial_cell[:, 2:self.num_cells]
 
         # === Boundary condition coefficients ===
-        fe_1 = log(radial_cell[CellProps.R_OUT, 0] / radial_cell[CellProps.R_CENTER, 0]) / (2 * pi * radial_cell[CellProps.K, 0])
-        fe_2 = log(radial_cell[CellProps.R_CENTER, 1] / radial_cell[CellProps.R_IN, 1]) / (2 * pi * radial_cell[CellProps.K, 1])
+        fe_1 = log(radial_cell[CellProps.R_OUT, 0] / radial_cell[CellProps.R_CENTER, 0]) / (
+                    2 * pi * radial_cell[CellProps.K, 0])
+        fe_2 = log(radial_cell[CellProps.R_CENTER, 1] / radial_cell[CellProps.R_IN, 1]) / (
+                    2 * pi * radial_cell[CellProps.K, 1])
         ae = 1 / (fe_1 + fe_2)
         ad = radial_cell[CellProps.RHO_CP, 0] * radial_cell[CellProps.VOL, 0] / time_step
         _d[0] = -ae / ad - 1
@@ -428,7 +435,8 @@ class DynamicsBH:
             # g-function calculation
             g_val = self.c_0 * ((radial_cell[CellProps.TEMP, 0] - init_temp) / heat_flux - self.resist_bh_effective)
             g_plot_val = self.c_0 * ((radial_cell[CellProps.TEMP, 0] - init_temp) / heat_flux)
-            q_val = 1 - (self.resist_bh_effective - (radial_cell[CellProps.TEMP, 0] - radial_cell[CellProps.TEMP, self.bh_wall_idx]))
+            q_val = 1 - (self.resist_bh_effective - (
+                        radial_cell[CellProps.TEMP, 0] - radial_cell[CellProps.TEMP, self.bh_wall_idx]))
 
             g.append(g_val)
             g_plot.append(g_plot_val)
@@ -452,9 +460,9 @@ class DynamicsBH:
 
             if stop_crit < 0 or time >= (final_time - time_step):
                 if stop_crit < 0:
-                    ghe_logger.info(f"Perfect convergence with long-term g-function after {time / 3600:.1f} hours")
+                    logging.info(f"Perfect convergence with long-term g-function after {time / 3600:.1f} hours")
                 else:
-                    ghe_logger.info(
+                    logging.info(
                         f"No perfect convergence; switch after {time / 3600:.1f} hours "
                         f"with g-function difference of {stop_crit:.5f}"
                     )
