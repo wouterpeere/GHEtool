@@ -56,9 +56,7 @@ def Swimming_pool_seg():
         # load the hourly profile
         load = HourlyGeothermalLoad(simulation_period=20)
         load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'swimming_pool.csv'), header=True,
-                                 separator=";",
-                                 decimal_seperator=".", col_heating=1,
-                                 col_cooling=0)
+                                 separator=";", decimal_seperator=".", col_extraction=1, col_injection=0)
         borefield.load = load
 
         SEER = 20

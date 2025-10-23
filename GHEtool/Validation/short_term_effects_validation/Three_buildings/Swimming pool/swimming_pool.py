@@ -22,13 +22,14 @@ import matplotlib.pyplot as plt
 import pygfunction as gt
 
 import sys
+
 sys.path.append("C:\Workdir\Develop\ghetool")
 
 from GHEtool import *
 
 
 def Swimming_pool():
-    ## To do:
+    # TODO:
     # check load (ground) ghetool is same as input to modelica
     # put same pipe and grout vol. heat cap in modelica
     # size this model with modelica (based on average fluid temp)
@@ -39,11 +40,12 @@ def Swimming_pool():
     plot_load = False
 
     for pipes in num_pipes:
-        for grad in gradients: 
+        for grad in gradients:
 
             # Rb calculated by tool
             # initiate ground, fluid and pipe data
-            ground_data = GroundTemperatureGradient(k_s=3, T_g=10, volumetric_heat_capacity= 2.4 * 10**6, gradient=grad)
+            ground_data = GroundTemperatureGradient(k_s=3, T_g=10, volumetric_heat_capacity=2.4 * 10 ** 6,
+                                                    gradient=grad)
             fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
             pipe_data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, pipes)
 
@@ -55,7 +57,7 @@ def Swimming_pool():
             borefield.set_fluid_parameters(fluid_data)
             borefield.set_pipe_parameters(pipe_data)
             borefield.create_rectangular_borefield(15, 20, 6, 6, 100, 4, 0.075)
-            #borefield.set_Rb(0.12)
+            # borefield.set_Rb(0.12)
 
             # set temperature bounds
             borefield.set_max_avg_fluid_temperature(17)
@@ -63,9 +65,10 @@ def Swimming_pool():
 
             # load the hourly profile
             load = HourlyGeothermalLoad(simulation_period=20)
-            load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'swimming_pool.csv'), header=True, separator=";",
-                                    decimal_seperator=".", col_extraction=1,
-                                    col_injection=0)
+            load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'swimming_pool.csv'), header=True,
+                                     separator=";",
+                                     decimal_seperator=".", col_extraction=1,
+                                     col_injection=0)
             borefield.load = load
 
             SEER = 20
@@ -79,25 +82,24 @@ def Swimming_pool():
             borefield.load = primary_geothermal_load
 
             if plot_load:
-                #Plotting Load
+                # Plotting Load
                 heating = load.hourly_extraction_load.copy() * (1 + 1 / SCOP)
                 cooling = load.hourly_injection_load.copy() * (1 + 1 / SEER)
                 t = [i for i in range(8760)]
-                fig = plt.subplots(figsize =(12, 8)) 
-                plt.plot(t, heating, color ='orange', lw=2, label ='Heating')
-                plt.plot(t, cooling, color ='b', lw=2, label ='Cooling')
-                plt.xlabel('Time [h]', fontsize = 18)
-                plt.ylabel('Load [kW]', fontsize = 18)
-                plt.legend(fontsize = 16)
-                plt.title('Profile 3: Yearly geothermal load profile swimming pool building', fontsize = 22)
-                plt.show() 
+                fig = plt.subplots(figsize=(12, 8))
+                plt.plot(t, heating, color='orange', lw=2, label='Heating')
+                plt.plot(t, cooling, color='b', lw=2, label='Cooling')
+                plt.xlabel('Time [h]', fontsize=18)
+                plt.ylabel('Load [kW]', fontsize=18)
+                plt.legend(fontsize=16)
+                plt.title('Profile 3: Yearly geothermal load profile swimming pool building', fontsize=22)
+                plt.show()
 
-            
             options = {'nSegments': 12,
-                        'disp': False,
-                        'profiles': True,
-                        'method': 'equivalent'
-                            }
+                       'disp': False,
+                       'profiles': True,
+                       'method': 'equivalent'
+                       }
 
             borefield.set_options_gfunction_calculation(options)
 
@@ -117,39 +119,38 @@ def Swimming_pool():
             borefield.set_fluid_parameters(fluid_data)
             borefield.set_pipe_parameters(pipe_data)
             borefield.create_rectangular_borefield(15, 20, 6, 6, 100, 4, 0.075)
-            #borefield.set_Rb(0.12)
+            # borefield.set_Rb(0.12)
             # set temperature bounds
             borefield.set_max_avg_fluid_temperature(17)
             borefield.set_min_avg_fluid_temperature(3)
 
             # load the hourly profile
             borefield.load = primary_geothermal_load
-            
+
             # Addidional input data needed for short-term model
-            rho_cp_grout = 3800000.0  
-            rho_cp_pipe = 2150000.0  
+            rho_cp_grout = 3800000.0
+            rho_cp_pipe = 2150000.0
 
             # Sample dictionary with short-term effect parameters
             short_term_effects_parameters = {
-            'rho_cp_grout': rho_cp_grout,
-            'rho_cp_pipe': rho_cp_pipe,
+                'rho_cp_grout': rho_cp_grout,
+                'rho_cp_pipe': rho_cp_pipe,
             }
 
             options = {'nSegments': 12,
-                        'disp': False,
-                        'profiles': True,
-                        'method': 'equivalent',
-                        'cylindrical_correction': False,
-                        'short_term_effects': True,
-                        'ground_data': ground_data,
-                        'fluid_data': fluid_data,
-                        'pipe_data': pipe_data,
-                        'borefield': borefield,
-                        'short_term_effects_parameters': short_term_effects_parameters,
-                            }
+                       'disp': False,
+                       'profiles': True,
+                       'method': 'equivalent',
+                       'cylindrical_correction': False,
+                       'short_term_effects': True,
+                       'ground_data': ground_data,
+                       'fluid_data': fluid_data,
+                       'pipe_data': pipe_data,
+                       'borefield': borefield,
+                       'short_term_effects_parameters': short_term_effects_parameters,
+                       }
 
             borefield.set_options_gfunction_calculation(options)
-            
 
             # according to L4 including short-term effects
             L4_ste_start = time.time()
@@ -168,10 +169,9 @@ def Swimming_pool():
             print(
                 f"The sizing according to L4 (including short-term effects) has a depth of {depth_L4_ste:.2f}m (using dynamic Rb* of {Rb_L4_ste:.3f})")
             print(
-                f"Time needed for L4-sizing is {L4_stop-L4_start:.2f}s (using dynamic Rb*)")
+                f"Time needed for L4-sizing is {L4_stop - L4_start:.2f}s (using dynamic Rb*)")
             print(
-                f"Time needed for L4-sizing including short-term effect is {L4_ste_stop-L4_ste_start:.2f}s (using dynamic Rb*)")
-            
+                f"Time needed for L4-sizing including short-term effect is {L4_ste_stop - L4_ste_start:.2f}s (using dynamic Rb*)")
 
             """
             # Load modelica data and experimental data for plotting
@@ -215,8 +215,9 @@ def Swimming_pool():
             plt.show()
 
             """
-    
+
     plt.show()
+
 
 if __name__ == "__main__":  # pragma: no cover
     Swimming_pool()

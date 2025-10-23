@@ -73,13 +73,15 @@ def evaluate_g_function(self, time):
 
 
 def __init__(self, boreholes, network, time, boundary_condition,
+             m_flow_borehole=None, m_flow_network=None, cp_f=None,
              nSegments=8, segment_ratios=gt.utilities.segment_ratios,
              approximate_FLS=False, mQuad=11, nFLS=10,
              linear_threshold=None, cylindrical_correction=False, short_term_effects=False,
              ground_data=None, fluid_data=None, pipe_data=None, borefield=None,
              short_term_effects_parameters=None,
              disp=False, profiles=False, kind='linear', dtype=np.double,
-             **other_options):
+             **other_options
+             ):
     self.boreholes = boreholes
     self.network = network
     # Convert time to a 1d array
@@ -110,7 +112,8 @@ def __init__(self, boreholes, network, time, boundary_condition,
     # Shortcut for segment_ratios comparisons
     self._equal_segment_ratios = \
         (np.all(np.array(self.nBoreSegments, dtype=np.uint) == self.nBoreSegments[0])
-         and np.all([np.allclose(segment_ratios, self.segment_ratios[0]) for segment_ratios in self.segment_ratios]))
+         and np.all([np.allclose(segment_ratios, self.segment_ratios[0]) for segment_ratios in
+                     self.segment_ratios]))
     # Boreholes with a uniform discretization
     self._uniform_segment_ratios = [
         np.allclose(segment_ratios,
@@ -122,6 +125,20 @@ def __init__(self, boreholes, network, time, boundary_condition,
                         for i in range(nBoreholes)]
     self._i1Segments = [sum(self.nBoreSegments[0:(i + 1)])
                         for i in range(nBoreholes)]
+    self.nMassFlow = 0
+    self.m_flow_borehole = m_flow_borehole
+    if self.m_flow_borehole is not None:
+        if not self.m_flow_borehole.ndim == 1:
+            self.nMassFlow = np.size(self.m_flow_borehole, axis=0)
+        self.m_flow_borehole = np.atleast_2d(self.m_flow_borehole)
+        self.m_flow = self.m_flow_borehole
+    self.m_flow_network = m_flow_network
+    if self.m_flow_network is not None:
+        if not isinstance(self.m_flow_network, (np.floating, float)):
+            self.nMassFlow = len(self.m_flow_network)
+        self.m_flow_network = np.atleast_1d(self.m_flow_network)
+        self.m_flow = self.m_flow_network
+    self.cp_f = cp_f
     self.approximate_FLS = approximate_FLS
     self.mQuad = mQuad
     self.nFLS = nFLS
@@ -133,6 +150,7 @@ def __init__(self, boreholes, network, time, boundary_condition,
     self._check_inputs()
     # Initialize the solver with solver-specific options
     self.nSources = self.initialize(**other_options)
+
     return
 
 
