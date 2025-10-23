@@ -22,21 +22,20 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 import sys
+
 sys.path.append("C:\Workdir\Develop\ghetool")
 
 from GHEtool import *
 
 
 def Auditorium_seg():
-
-    number_of_segments = [8,10,12]
+    number_of_segments = [8, 10, 12]
     results_cst = []
     results_not_cst = []
-    
-    for nSeg in number_of_segments:
 
+    for nSeg in number_of_segments:
         # initiate ground, fluid and pipe data
-        ground_data = GroundFluxTemperature(k_s=3, T_g=10, volumetric_heat_capacity= 2.4 * 10**6, flux=0.06)
+        ground_data = GroundFluxTemperature(k_s=3, T_g=10, volumetric_heat_capacity=2.4 * 10 ** 6, flux=0.06)
         fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
         pipe_data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 1)
 
@@ -48,7 +47,7 @@ def Auditorium_seg():
         borefield.set_fluid_parameters(fluid_data)
         borefield.set_pipe_parameters(pipe_data)
         borefield.create_rectangular_borefield(5, 4, 6, 6, 100, 4, 0.075)
-        #borefield.set_Rb(0.12)
+        # borefield.set_Rb(0.12)
 
         # set temperature bounds
         borefield.set_max_avg_fluid_temperature(17)
@@ -57,8 +56,7 @@ def Auditorium_seg():
         # load the hourly profile
         load = HourlyGeothermalLoad(simulation_period=20)
         load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'auditorium.csv'), header=True, separator=";",
-                                decimal_seperator=".", col_heating=1,
-                                col_cooling=0)
+                                 decimal_seperator=".", col_extraction=1, col_injection=0)
         borefield.load = load
 
         SEER = 20
@@ -66,28 +64,27 @@ def Auditorium_seg():
 
         # load hourly heating and cooling load and convert it to geothermal loads
         primary_geothermal_load = HourlyGeothermalLoad(simulation_period=load.simulation_period)
-        primary_geothermal_load.set_hourly_cooling(load.hourly_cooling_load.copy() * (1 + 1 / SEER))
-        primary_geothermal_load.set_hourly_heating(load.hourly_heating_load.copy() * (1 - 1 / SCOP))
+        primary_geothermal_load.set_hourly_injection_load(load.hourly_injection_load.copy() * (1 + 1 / SEER))
+        primary_geothermal_load.set_hourly_extraction_load(load.hourly_extraction_load.copy() * (1 - 1 / SCOP))
         # set geothermal load
         borefield.load = primary_geothermal_load
 
         options = {'nSegments': nSeg,
-                    'segment_ratios': None,
-                    'disp': False,
-                    'profiles': True,
-                    'method': 'equivalent'
-                        }
+                   'segment_ratios': None,
+                   'disp': False,
+                   'profiles': True,
+                   'method': 'equivalent'
+                   }
 
         borefield.set_options_gfunction_calculation(options)
 
         # according to L4
         depth_L4 = borefield.size(100, L4_sizing=True)
         results_cst = np.append(results_cst, depth_L4)
-    
-    for nSeg in number_of_segments:
 
+    for nSeg in number_of_segments:
         # initiate ground, fluid and pipe data
-        ground_data = GroundFluxTemperature(k_s=3, T_g=10, volumetric_heat_capacity= 2.4 * 10**6, flux=0.06)
+        ground_data = GroundFluxTemperature(k_s=3, T_g=10, volumetric_heat_capacity=2.4 * 10 ** 6, flux=0.06)
         fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
         pipe_data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 1)
 
@@ -95,11 +92,11 @@ def Auditorium_seg():
         borefield = Borefield()
 
         # set ground data in borefield
-        borefield.set_ground_parameters(ground_data)
-        borefield.set_fluid_parameters(fluid_data)
-        borefield.set_pipe_parameters(pipe_data)
+        borefield.ground_data = ground_data
+        borefield.fluid_data = fluid_data
+        borefield.pipe_data = pipe_data
         borefield.create_rectangular_borefield(5, 4, 6, 6, 100, 4, 0.075)
-        #borefield.set_Rb(0.12)
+        # borefield.set_Rb(0.12)
 
         # set temperature bounds
         borefield.set_max_avg_fluid_temperature(17)
@@ -108,8 +105,7 @@ def Auditorium_seg():
         # load the hourly profile
         load = HourlyGeothermalLoad(simulation_period=20)
         load.load_hourly_profile(os.path.join(os.path.dirname(__file__), 'auditorium.csv'), header=True, separator=";",
-                                decimal_seperator=".", col_heating=1,
-                                col_cooling=0)
+                                 decimal_seperator=".", col_extraction=1, col_injection=0)
         borefield.load = load
 
         SEER = 20
@@ -117,16 +113,16 @@ def Auditorium_seg():
 
         # load hourly heating and cooling load and convert it to geothermal loads
         primary_geothermal_load = HourlyGeothermalLoad(simulation_period=load.simulation_period)
-        primary_geothermal_load.set_hourly_cooling(load.hourly_cooling_load.copy() * (1 + 1 / SEER))
-        primary_geothermal_load.set_hourly_heating(load.hourly_heating_load.copy() * (1 - 1 / SCOP))
+        primary_geothermal_load.set_hourly_injection_load(load.hourly_injection_load.copy() * (1 + 1 / SEER))
+        primary_geothermal_load.set_hourly_extraction_load(load.hourly_extraction_load.copy() * (1 - 1 / SCOP))
         # set geothermal load
         borefield.load = primary_geothermal_load
 
         options = {'nSegments': nSeg,
-                    'disp': False,
-                    'profiles': True,
-                    'method': 'equivalent'
-                        }
+                   'disp': False,
+                   'profiles': True,
+                   'method': 'equivalent'
+                   }
 
         borefield.set_options_gfunction_calculation(options)
 
@@ -134,14 +130,12 @@ def Auditorium_seg():
         depth_L4 = borefield.size(100, L4_sizing=True)
         results_not_cst = np.append(results_not_cst, depth_L4)
 
-  
     print(
         f"The sizing according to L4 and using {number_of_segments[0]}segments has a depth of {results_cst[0]}m (using segments of equal length) and {results_not_cst[0]}m (using pygfunction default segments lenghts)")
     print(
         f"The sizing according to L4 and using {number_of_segments[1]}segments has a depth of {results_cst[1]}m (using segments of equal length) and {results_not_cst[1]}m (using pygfunction default segments lenghts)")
     print(
         f"The sizing according to L4 and using {number_of_segments[2]}segments has a depth of {results_cst[2]}m (using segments of equal length) and {results_not_cst[2]}m (using pygfunction default segments lenghts)")
-    
 
 
 if __name__ == "__main__":  # pragma: no cover

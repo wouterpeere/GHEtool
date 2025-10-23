@@ -52,19 +52,19 @@ class DynamicsBH:
     An extension to double U-tube geometries has been developed by Meertens (SySi Team, KU Leuven) 
     and is implemented in this model.
 
-    References:
+    References
     ----------
-        Meertens, L., Helsen, L., and Peere, W. (2024). Influence of short-term dynamic effects on geothermal borefield size. 
-        IGSHPA Research Conference, Montréal, May 28-30, 2024.
+    Meertens, L., Peere, W. and Helsen, L. (2024). Influence of short-term dynamic effects on geothermal borefield size.
+    IGSHPA Research Conference, Montréal, May 28-30, 2024.
 
-        Xu, X., and Spitler, J. D. (2006). Modeling of Vertical Ground Loop Heat Exchangers with Variable Convective Resistance and Thermal Mass of the Fluid. 
-        Proceedings of the 10th International Conference on Thermal Energy Storage–EcoStock, Pomona, NJ.
+    Xu, X., and Spitler, J. D. (2006). Modeling of Vertical Ground Loop Heat Exchangers with Variable Convective Resistance and Thermal Mass of the Fluid.
+    Proceedings of the 10th International Conference on Thermal Energy Storage–EcoStock, Pomona, NJ.
 
-        Li, M., Li, P., Chan, V., and Lai, A. C. K. (2014). Full-scale temperature response function (G-function) for heat transfer by borehole ground heat exchangers (GHEs) from sub-hour to decades. 
-        Applied Energy, 136, 197–205.
+    Li, M., Li, P., Chan, V., and Lai, A. C. K. (2014). Full-scale temperature response function (G-function) for heat transfer by borehole ground heat exchangers (GHEs) from sub-hour to decades.
+    Applied Energy, 136, 197–205.
 
-        Meertens, L., and Helsen, L. (2025). Validation of dynamic borehole model with experimental measurements. 
-        Manuscript submitted for publication.
+    Meertens, L., and Helsen, L. (2025). Validation of dynamic borehole model with experimental measurements.
+    Manuscript submitted for publication.
     """
 
     def __init__(self, time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, borefield,
@@ -204,15 +204,19 @@ class DynamicsBH:
 
         self.g_sts = None  # Placeholder for short-term g-function interpolator
 
-    def fill_radial_cell(self, radial_cell, resist_f_eq, resist_tg_eq):
+    def fill_radial_cell(self, radial_cell: np.ndarray, resist_f_eq, resist_tg_eq) -> None:
+        # TODO: add types (int, float etc.) to the arguments of the function
+        # TODO: is radial_cell really an input? To me it seems like it is updated in this function, so it is better an output of this function it seems
         """
         Initialize radial discretization cells with thermal properties for each layer:
         fluid, convection, pipe, grout, and soil.
 
-        Parameters:
-        - radial_cell: ndarray to be filled with cell properties (radius, conductivity, etc.)
-        - resist_f_eq: Equivalent convective resistance between fluid and tube wall (m·K/W)
-        - resist_tg_eq: Equivalent thermal resistance of borehole minus convection layer (m·K/W)
+        Parameters
+        ----------
+        radial_cell : ndarray
+            Filled with cell properties (radius, conductivity, etc.)
+        resist_f_eq: Equivalent convective resistance between fluid and tube wall (m·K/W)
+        resist_tg_eq: Equivalent thermal resistance of borehole minus convection layer (m·K/W)
 
         The equivalent volumetric heat capacity and conductivities are computed per Xu & Spitler:
         - Fluid: Equivalent thermal mass based on volumetric heat capacity adjusted by tube geometry.
@@ -301,7 +305,7 @@ class DynamicsBH:
         if cell_summation != expected_cells:
             raise ValueError(f"Total cells filled ({cell_summation}) do not match expected ({expected_cells})")
 
-    def calc_sts_g_functions(self, final_time=None) -> tuple:
+    def calc_sts_g_functions(self, final_time: float = None) -> tuple:
         """
         Compute short-term g-functions using a finite difference approach for radial heat conduction
         in the borehole.
@@ -310,11 +314,15 @@ class DynamicsBH:
         through pipe walls and the borehole. It implements the cylindrical heat source model (Xu & Spitler)
         and solves a tri-diagonal matrix system at each time step to simulate the radial temperature distribution.
 
-        Parameters:
-            final_time (float, optional): The final simulation time in seconds. If not provided, uses `self.final_time`.
+        Parameters
+        ----------
+        final_time : float
+            The final simulation time in seconds. If not provided, uses `self.final_time`.
 
-        Returns:
-            tuple: Contains the following arrays/interpolators:
+        Returns
+        -------
+        tuple
+            Contains the following arrays/interpolators:
                 - lntts (np.ndarray): Log time steps [s]
                 - g (np.ndarray): Short-term g-function values
                 - g_sts (interp1d): Interpolated short-term g-function
@@ -390,9 +398,9 @@ class DynamicsBH:
 
         # === Boundary condition coefficients ===
         fe_1 = log(radial_cell[CellProps.R_OUT, 0] / radial_cell[CellProps.R_CENTER, 0]) / (
-                    2 * pi * radial_cell[CellProps.K, 0])
+                2 * pi * radial_cell[CellProps.K, 0])
         fe_2 = log(radial_cell[CellProps.R_CENTER, 1] / radial_cell[CellProps.R_IN, 1]) / (
-                    2 * pi * radial_cell[CellProps.K, 1])
+                2 * pi * radial_cell[CellProps.K, 1])
         ae = 1 / (fe_1 + fe_2)
         ad = radial_cell[CellProps.RHO_CP, 0] * radial_cell[CellProps.VOL, 0] / time_step
         _d[0] = -ae / ad - 1
@@ -436,7 +444,7 @@ class DynamicsBH:
             g_val = self.c_0 * ((radial_cell[CellProps.TEMP, 0] - init_temp) / heat_flux - self.resist_bh_effective)
             g_plot_val = self.c_0 * ((radial_cell[CellProps.TEMP, 0] - init_temp) / heat_flux)
             q_val = 1 - (self.resist_bh_effective - (
-                        radial_cell[CellProps.TEMP, 0] - radial_cell[CellProps.TEMP, self.bh_wall_idx]))
+                    radial_cell[CellProps.TEMP, 0] - radial_cell[CellProps.TEMP, self.bh_wall_idx]))
 
             g.append(g_val)
             g_plot.append(g_plot_val)

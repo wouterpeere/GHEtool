@@ -15,7 +15,6 @@ from pygfunction.heat_transfer import finite_line_source, finite_line_source_vec
     finite_line_source_equivalent_boreholes_vectorized
 from pygfunction.networks import network_thermal_resistance
 
-
 from scipy.integrate import quad_vec
 from scipy.special import j0, j1, y0, y1
 
@@ -23,60 +22,61 @@ from scipy.interpolate import interp1d as interp1d
 from time import perf_counter
 from .Dynamic_borhole_model import DynamicsBH
 
-#update pygfunction
+
+# update pygfunction
 def evaluate_g_function(self, time):
-        """
-        Evaluate the g-function.
+    """
+    Evaluate the g-function.
 
-        Parameters
-        ----------
-        time : float or array
-            Values of time (in seconds) for which the g-function is evaluated.
+    Parameters
+    ----------
+    time : float or array
+        Values of time (in seconds) for which the g-function is evaluated.
 
-        Returns
-        -------
-        gFunction : float or array
-            Values of the g-function
+    Returns
+    -------
+    gFunction : float or array
+        Values of the g-function
 
-        """
-        time = np.maximum(np.atleast_1d(time), 0.)
-        assert len(time) == 1 or np.all(time[:-1] <= time[1:]), \
-            "Time values must be provided in increasing order."
-        # Save time values
-        self.time = time
-        if self.solver.disp:
-            print(60*'-')
-            print(f"Calculating g-function for boundary condition : "
-                  f"'{self.boundary_condition}'".center(60))
-            print(60*'-')
-        # Initialize chrono
-        tic = perf_counter()
+    """
+    time = np.maximum(np.atleast_1d(time), 0.)
+    assert len(time) == 1 or np.all(time[:-1] <= time[1:]), \
+        "Time values must be provided in increasing order."
+    # Save time values
+    self.time = time
+    if self.solver.disp:
+        print(60 * '-')
+        print(f"Calculating g-function for boundary condition : "
+              f"'{self.boundary_condition}'".center(60))
+        print(60 * '-')
+    # Initialize chrono
+    tic = perf_counter()
 
-        # Evaluate g-function
-        # When cylindrical correction is True, this correction on the g-function is done in the next line
-        self.gFunc = self.solver.solve(time, self.alpha)
-       
-        if self.solver.short_term_effects:
-            self.gFunc = _ShortTermEffects(self, self.time, self.gFunc, self.boreholes, self.alpha, self.solver.ground_data,
-                                           self.solver.fluid_data, self.solver.pipe_data, self.solver.borefield, self.solver.short_term_effects_parameters)
-            toc = perf_counter()
+    # Evaluate g-function
+    # When cylindrical correction is True, this correction on the g-function is done in the next line
+    self.gFunc = self.solver.solve(time, self.alpha)
 
-        else:
-            toc = perf_counter()
+    if self.solver.short_term_effects:
+        self.gFunc = _ShortTermEffects(self, self.time, self.gFunc, self.boreholes, self.alpha, self.solver.ground_data,
+                                       self.solver.fluid_data, self.solver.pipe_data, self.solver.borefield,
+                                       self.solver.short_term_effects_parameters)
+        toc = perf_counter()
 
-        if self.solver.disp:
-            print(f'Total time for g-function evaluation: '
-                  f'{toc - tic:.3f} sec')
-            print(60*'-')
-        return self.gFunc
+    else:
+        toc = perf_counter()
 
+    if self.solver.disp:
+        print(f'Total time for g-function evaluation: '
+              f'{toc - tic:.3f} sec')
+        print(60 * '-')
+    return self.gFunc
 
 
 def __init__(self, boreholes, network, time, boundary_condition,
              nSegments=8, segment_ratios=gt.utilities.segment_ratios,
              approximate_FLS=False, mQuad=11, nFLS=10,
              linear_threshold=None, cylindrical_correction=False, short_term_effects=False,
-             ground_data=None, fluid_data=None, pipe_data=None, borefield=None, 
+             ground_data=None, fluid_data=None, pipe_data=None, borefield=None,
              short_term_effects_parameters=None,
              disp=False, profiles=False, kind='linear', dtype=np.double,
              **other_options):
@@ -103,7 +103,7 @@ def __init__(self, boreholes, network, time, boundary_condition,
     if isinstance(segment_ratios, np.ndarray):
         segment_ratios = [segment_ratios] * nBoreholes
     elif segment_ratios is None:
-        segment_ratios = [np.full(n, 1./n) for n in self.nBoreSegments]
+        segment_ratios = [np.full(n, 1. / n) for n in self.nBoreSegments]
     elif callable(segment_ratios):
         segment_ratios = [segment_ratios(n) for n in self.nBoreSegments]
     self.segment_ratios = segment_ratios
@@ -136,9 +136,10 @@ def __init__(self, boreholes, network, time, boundary_condition,
     return
 
 
-def _ShortTermEffects(self, time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, borefield, short_term_parameters):
-
-    dynamic_numerical = DynamicsBH(time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, borefield, short_term_parameters)
+def _ShortTermEffects(self, time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, borefield,
+                      short_term_parameters):
+    dynamic_numerical = DynamicsBH(time, gFunc, boreholes, alpha, ground_data, fluid_data, pipe_data, borefield,
+                                   short_term_parameters)
     dynamic_numerical.calc_sts_g_functions()
 
     g = combine_sts_lts(
@@ -153,8 +154,8 @@ def _ShortTermEffects(self, time, gFunc, boreholes, alpha, ground_data, fluid_da
     return g
 
 
-def combine_sts_lts(time_lts: list, g_lts: list, 
-                    time_sts: list, g_sts: list, 
+def combine_sts_lts(time_lts: list, g_lts: list,
+                    time_sts: list, g_sts: list,
                     g_plot: list, boreholes, alpha) -> list:
     """
     Combine short-term and long-term g-functions by aligning and merging time and g-values.
@@ -203,7 +204,6 @@ def combine_sts_lts(time_lts: list, g_lts: list,
     return combined_g
 
 
-
 def update_pygfunction_short_term_effects() -> None:
     """
     This function updates pygfunction by adding the cylindrical correction methods to it.
@@ -211,10 +211,7 @@ def update_pygfunction_short_term_effects() -> None:
     Returns
     -------
     None
-    """      
+    """
     gt.gfunction._ShortTermEffects = _ShortTermEffects
     gt.gfunction.gFunction.evaluate_g_function = evaluate_g_function
     gt.gfunction._BaseSolver.__init__ = __init__
-
-    
-
