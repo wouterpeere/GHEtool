@@ -2,6 +2,7 @@
 This file contains both the CustomGFunction class and all the relevant information w.r.t. custom gfunctions.
 """
 import copy
+import math
 import pickle
 import warnings
 from typing import List, Union
@@ -9,7 +10,6 @@ from typing import List, Union
 import numpy as np
 import pygfunction as gt
 from scipy import interpolate
-from GHEtool.logger.ghe_logger import ghe_logger
 
 
 def _time_values(dt=3600., t_max=100. * 8760 * 3600.) -> np.array:
@@ -40,46 +40,45 @@ def _time_values(dt=3600., t_max=100. * 8760 * 3600.) -> np.array:
 
 
 class CustomGFunction:
-
     """
     This class contains all the functionalities related to custom gfunctions.
     """
 
-    DEFAULT_DEPTH_ARRAY: np.ndarray = np.arange(0, 351, 25)  # m
-    DEFAULT_DEPTH_ARRAY[0] = 10  # m
+    DEFAULT_LENGTH_ARRAY: np.ndarray = np.arange(0, 351, 25)  # m
+    DEFAULT_LENGTH_ARRAY[0] = 10  # m
     DEFAULT_TIME_ARRAY: np.ndarray = _time_values()  # sec
 
-    def __init__(self, time_array: np.ndarray = None, depth_array: np.ndarray = None, options: dict = None):
+    def __init__(self, time_array: np.ndarray = None, borehole_length_array: np.ndarray = None, options: dict = None):
         """
 
         Parameters
         ----------
         time_array : np.ndarray
             Time value(s) in seconds at which the gfunctions should be calculated
-        depth_array : np.ndarray
-            Depths [m] for which the gfunctions should be calculated
+        borehole_length_array : np.ndarray
+            Borehole lengths [m] for which the gfunctions should be calculated
         options : dict
             Dictionary with options for the gFunction class of pygfunction
         """
         self._time_array: np.ndarray = np.array([])
-        self._depth_array: np.ndarray = np.array([])
+        self._borehole_length_array: np.ndarray = np.array([])
 
-        self.max_H: float = 0.
-        self.min_H: float = 0.
+        self.max_borehole_length: float = 0.
+        self.min_borehole_length: float = 0.
         self.max_t: float = 0.
         self.min_t: float = 0.
 
         self.time_array = CustomGFunction.DEFAULT_TIME_ARRAY
-        self.depth_array = CustomGFunction.DEFAULT_DEPTH_ARRAY
+        self.borehole_length_array = CustomGFunction.DEFAULT_LENGTH_ARRAY
 
-        self.gvalues_array: np.ndarray = np.zeros((self.depth_array.size, self.time_array.size))
+        self.gvalues_array: np.ndarray = np.zeros((self.borehole_length_array.size, self.time_array.size))
         self.options: dict = {"method": "equivalent", "display": True}
 
         # set values
         if time_array is not None:
             self.time_array = time_array
-        if depth_array is not None:
-            self.depth_array = depth_array
+        if borehole_length_array is not None:
+            self.borehole_length_array = borehole_length_array
         if options is not None:
             self.options = options
 
@@ -93,21 +92,22 @@ class CustomGFunction:
         self.max_t = time_array[-1]
         self.min_t = time_array[0]
         # initialise gvalue array
-        self.gvalues_array = np.zeros((self.depth_array.size, self.time_array.size))
+        self.gvalues_array = np.zeros((self.borehole_length_array.size, self.time_array.size))
 
     @property
-    def depth_array(self) -> np.ndarray:
-        return self._depth_array
+    def borehole_length_array(self) -> np.ndarray:
+        return self._borehole_length_array
 
-    @depth_array.setter
-    def depth_array(self, depth_array) -> None:
-        self._depth_array = np.sort(depth_array)
-        self.max_H = self._depth_array[-1]
-        self.min_H = self._depth_array[0]
+    @borehole_length_array.setter
+    def borehole_length_array(self, borehole_length_array) -> None:
+        self._borehole_length_array = np.sort(borehole_length_array)
+        self.max_borehole_length = self._borehole_length_array[-1]
+        self.min_borehole_length = self._borehole_length_array[0]
         # initialise gvalue array
-        self.gvalues_array = np.zeros((self.depth_array.size, self.time_array.size))
+        self.gvalues_array = np.zeros((self.borehole_length_array.size, self.time_array.size))
 
-    def calculate_gfunction(self, time_value: Union[list, float, np.ndarray], H: float, check: bool = False) -> np.ndarray:
+    def calculate_gfunction(self, time_value: Union[list, float, np.ndarray], borehole_length: float,
+                            check: bool = False) -> np.ndarray:
         """
         This function returns the gfunction value, based on interpolation between precalculated values.
 
@@ -115,11 +115,11 @@ class CustomGFunction:
         ----------
         time_value : list, float, np.ndarray
             Time value(s) in seconds at which the gfunctions should be calculated
-        H : float
-            Depth [m] at which the gfunctions should be calculated.
-            If no depth is given, the current depth is taken.
+        borehole_length : float
+            Borehole lengths [m] at which the gfunctions should be calculated.
+            If no borehole length is given, the current borehole length is taken.
         check : bool
-            True if it should be check whether or not the requested gvalues can be interpolated based on the
+            True if it should be checked whether the requested gvalues can be interpolated based on the
             precalculated values
 
         Returns
@@ -130,18 +130,20 @@ class CustomGFunction:
         """
 
         # check if the requested value is within the range
-        if check and not self.within_range(time_value, H):
+        if check and not self.within_range(time_value, borehole_length):
             return False
 
         if not isinstance(time_value, (float, int)):
             # multiple values are requested
-            g_value = interpolate.interpn((self.depth_array, self.time_array), self.gvalues_array, np.array([[H, t] for t in time_value]))
+            g_value = interpolate.interpn((self.borehole_length_array, self.time_array), self.gvalues_array,
+                                          np.array([[borehole_length, t] for t in time_value]))
         else:
             # only one value is requested
-            g_value = interpolate.interpn((self.depth_array, self.time_array), self.gvalues_array, np.array([H, time_value]))
+            g_value = interpolate.interpn((self.borehole_length_array, self.time_array), self.gvalues_array,
+                                          np.array([borehole_length, time_value]))
         return g_value
 
-    def within_range(self, time_value: Union[list, float, np.ndarray], H: float) -> bool:
+    def within_range(self, time_value: Union[list, float, np.ndarray], borehole_length: float) -> bool:
         """
         This function checks whether or not the requested data can be calculated using the custom dataset.
 
@@ -149,9 +151,9 @@ class CustomGFunction:
         ----------
         time_value : list, float, np.ndarray
             Time value(s) in seconds at which the gfunctions should be calculated
-        H : float
-            Depth [m] at which the gfunctions should be calculated.
-            If no depth is given, the current depth is taken.
+        borehole_length : float
+            Borehole lengths [m] at which the gfunctions should be calculated.
+            If no borehole length is given, the current borehole length is taken.
 
         Returns
         -------
@@ -166,11 +168,13 @@ class CustomGFunction:
         max_time_value = time_value if isinstance(time_value, (float, int)) else max(time_value)
         min_time_value = time_value if isinstance(time_value, (float, int)) else min(time_value)
 
-        # check if H in precalculated data range
-        if H > self.max_H or H < self.min_H:
-            warnings.warn("The requested depth of " + str(H) + "m is outside the bounds of " + str(self.min_H) +
-                          " and " + str(self.max_H) +
-                          " of the precalculated data. The gfunctions will be calculated jit.", UserWarning)
+        # check if borehole_length in precalculated data range
+        if borehole_length > self.max_borehole_length or borehole_length < self.min_borehole_length:
+            warnings.warn(
+                "The requested borehole length of " + str(borehole_length) + "m is outside the bounds of " + str(
+                    self.min_borehole_length) +
+                " and " + str(self.max_borehole_length) +
+                " of the precalculated data. The gfunctions will be calculated jit.", UserWarning)
             return False
 
         # check if max time in precalculated data range
@@ -191,16 +195,16 @@ class CustomGFunction:
 
         return True
 
-    def create_custom_dataset(self, borefield: List[gt.boreholes.Borehole], alpha: Union[float, callable]) -> None:
+    def create_custom_dataset(self, borefield: gt.borefield.Borefield, alpha: Union[float, callable]) -> None:
         """
         This function creates the custom dataset.
 
         Parameters
         ----------
-        borefield : list[pygfunction.boreholes.Borehole]
+        borefield : pygfunction.borefield.Borefield
             Borefield object for which the custom dataset should be created
         alpha : float or callable
-            Ground thermal diffusivity [m2/s] or function to calculate it at a certain depth
+            Ground thermal diffusivity [m2/s] or function to calculate it at a certain borehole length
 
         Returns
         -------
@@ -210,16 +214,21 @@ class CustomGFunction:
         if not "method" in self.options:
             self.options["method"] = "equivalent"
 
-        for idx, H in enumerate(self.depth_array):
-            ghe_logger.info(f'Start H: {H}')
+        for idx, borehole_length in enumerate(self.borehole_length_array):
+            print(f'Start length: {borehole_length} m')
 
             # Calculate the g-function for uniform borehole wall temperature
             borefield = copy.deepcopy(borefield)
-            # set borehole depth in borefield
-            for borehole in borefield:
-                borehole.H = H
+            # set borehole borehole length in borefield
+            borefield.H = np.full(borefield.nBoreholes, borehole_length)
 
-            gfunc_uniform_T = gt.gfunction.gFunction(borefield, alpha if isinstance(alpha, float) else alpha(H),
+            # calculate borehole buried depth
+            D = np.average(borefield.D)
+            tilt = np.average(borefield.tilt)
+
+            depth = borehole_length * math.cos(tilt) + D
+            gfunc_uniform_T = gt.gfunction.gFunction(borefield,
+                                                     alpha if isinstance(alpha, float) else alpha(depth, D),
                                                      self.time_array, options=self.options,
                                                      method=self.options["method"])
 

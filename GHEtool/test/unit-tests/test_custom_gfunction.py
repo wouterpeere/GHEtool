@@ -11,9 +11,9 @@ from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction
 def custom_gfunction():
     custom_gfunction = CustomGFunction()
 
-    rect_field = gt.boreholes.rectangle_field(10, 10, 6, 6, 100, 4, 0.075)
+    rect_field = gt.borefield.Borefield.rectangle_field(10, 10, 6, 6, 100, 4, 0.075)
 
-    custom_gfunction.create_custom_dataset(rect_field, 0.2*10**-6)
+    custom_gfunction.create_custom_dataset(rect_field, 0.2 * 10 ** -6)
 
     return custom_gfunction
 
@@ -26,20 +26,20 @@ def test_initiate_with_random_values():
     custom_gfunction = CustomGFunction(np.array([1, 5, 6]), np.array([2, 5, 7]))
     assert custom_gfunction.max_t == 6
     assert custom_gfunction.min_t == 1
-    assert custom_gfunction.max_H == 7
-    assert custom_gfunction.min_H == 2
+    assert custom_gfunction.max_borehole_length == 7
+    assert custom_gfunction.min_borehole_length == 2
 
 
-def test_update_min_max_H():
+def test_update_min_max_borehole_length():
     custom_gfunction = CustomGFunction()
-    assert custom_gfunction.max_H == CustomGFunction.DEFAULT_DEPTH_ARRAY[-1]
-    assert custom_gfunction.min_H == CustomGFunction.DEFAULT_DEPTH_ARRAY[0]
-    assert np.array_equal(custom_gfunction.depth_array, CustomGFunction.DEFAULT_DEPTH_ARRAY)
+    assert custom_gfunction.max_borehole_length == CustomGFunction.DEFAULT_LENGTH_ARRAY[-1]
+    assert custom_gfunction.min_borehole_length == CustomGFunction.DEFAULT_LENGTH_ARRAY[0]
+    assert np.array_equal(custom_gfunction.borehole_length_array, CustomGFunction.DEFAULT_LENGTH_ARRAY)
 
-    custom_gfunction.depth_array = np.array([1, 5, 10])
-    assert np.array_equal(custom_gfunction.depth_array, np.array([1, 5, 10]))
-    assert custom_gfunction.max_H == 10
-    assert custom_gfunction.min_H == 1
+    custom_gfunction.borehole_length_array = np.array([1, 5, 10])
+    assert np.array_equal(custom_gfunction.borehole_length_array, np.array([1, 5, 10]))
+    assert custom_gfunction.max_borehole_length == 10
+    assert custom_gfunction.min_borehole_length == 1
 
 
 def test_update_min_max_t():
@@ -56,11 +56,13 @@ def test_update_min_max_t():
 
 def test_create_dataset():
     custom_gfunction = CustomGFunction()
-    custom_gfunction.create_custom_dataset(gt.boreholes.rectangle_field(10, 10, 6, 6, 100, 4, 0.075), 2.*10**-6)
+    custom_gfunction.create_custom_dataset(gt.borefield.Borefield.rectangle_field(10, 10, 6, 6, 100, 4, 0.075),
+                                           2. * 10 ** -6)
     assert np.any(custom_gfunction.gvalues_array)
     temp = copy.copy((custom_gfunction.gvalues_array))
     custom_gfunction.options = {}
-    custom_gfunction.create_custom_dataset(gt.boreholes.rectangle_field(10, 10, 6, 6, 100, 4, 0.075), 2. * 10 ** -6)
+    custom_gfunction.create_custom_dataset(gt.borefield.Borefield.rectangle_field(10, 10, 6, 6, 100, 4, 0.075),
+                                           2. * 10 ** -6)
     assert np.any(custom_gfunction.gvalues_array)
     assert np.array_equal(custom_gfunction.gvalues_array, temp)
     custom_gfunction.delete_custom_gfunction()
@@ -100,7 +102,7 @@ def test_unequal():
 
 def test_unequal2():
     custom_gfunction = CustomGFunction()
-    custom_gfunction2 = CustomGFunction(depth_array=[1, 5])
+    custom_gfunction2 = CustomGFunction(borehole_length_array=[1, 5])
     assert not custom_gfunction == custom_gfunction2
 
 
@@ -120,10 +122,10 @@ def test_within_range(custom_gfunction):
     time_array = np.array([3600, 5000, 10000])
     assert not custom_gfunction.within_range(time_array, 0.5)
     assert not custom_gfunction.within_range(time_array, 500)
-    assert not custom_gfunction.within_range(np.array([3600, 10**11]), 50)
+    assert not custom_gfunction.within_range(np.array([3600, 10 ** 11]), 50)
     assert not custom_gfunction.within_range(np.array([10, 3600]), 50)
     assert custom_gfunction.within_range(time_array, 50)
-    assert custom_gfunction.within_range(np.array([3600, 10**5]), 50)
+    assert custom_gfunction.within_range(np.array([3600, 10 ** 5]), 50)
 
     custom_gfunction.delete_custom_gfunction()
     assert not custom_gfunction.within_range(time_array, 50)
@@ -135,4 +137,5 @@ def test_gfunction_calculation(custom_gfunction):
     # test with loading
     loaded_custom_gfunction = load_custom_gfunction("test.gvalues")
     assert np.isclose(0.03586207, loaded_custom_gfunction.calculate_gfunction(4000, 100, True)[0])
-    assert np.allclose(np.array([0.03586207, 0.1343308]), loaded_custom_gfunction.calculate_gfunction([4000, 8000], 100, True))
+    assert np.allclose(np.array([0.03586207, 0.1343308]),
+                       loaded_custom_gfunction.calculate_gfunction([4000, 8000], 100, True))

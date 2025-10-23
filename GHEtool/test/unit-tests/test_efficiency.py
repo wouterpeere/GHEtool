@@ -367,8 +367,8 @@ def test_eq_eer_combined():
 def test_repr_():
     scop = SCOP(5)
     seer = SEER(5)
-    assert 'SCOP [-]: 5' == scop.__repr__()
-    assert 'SEER [-]: 5' == seer.__repr__()
+    assert {'SCOP [-]': 5} == scop.__export__()
+    assert {'SEER [-]': 5} == seer.__export__()
     cop_basic = COP(np.array([3, 4, 6]), np.array([5, 10, 15]))
     eer_basic = EER(np.array([3, 4, 6]), np.array([5, 10, 15]))
     cop_sec = COP(np.array([1, 2, 2, 4]), np.array([[1.5, 2.5], [2.5, 2.5], [1.5, 4.5], [2.5, 4.5]]), secondary=True)
@@ -383,19 +383,19 @@ def test_repr_():
                    np.array([[1.5, 2.5, 4.5], [2.5, 2.5, 4.5], [1.5, 4.5, 4.5], [2.5, 4.5, 4.5],
                              [1.5, 2.5, 8.5], [2.5, 2.5, 8.5], [1.5, 4.5, 8.5], [2.5, 4.5, 8.5]]),
                    secondary=True, part_load=True)
-    assert 'Temperature dependent COP' == cop_basic.__repr__()
-    assert 'Temperature dependent EER' == eer_basic.__repr__()
-    assert 'Temperature dependent COP' == cop_sec.__repr__()
-    assert 'Temperature and part-load dependent COP' == cop_part.__repr__()
-    assert 'Temperature and part-load dependent COP' == cop_full.__repr__()
-    assert 'Temperature dependent EER' == eer_sec.__repr__()
-    assert 'Temperature and part-load dependent EER' == eer_part.__repr__()
-    assert 'Temperature and part-load dependent EER' == eer_full.__repr__()
+    assert {'type': 'Temperature dependent COP'} == cop_basic.__export__()
+    assert {'type': 'Temperature dependent EER'} == eer_basic.__export__()
+    assert {'type': 'Temperature dependent COP'} == cop_sec.__export__()
+    assert {'type': 'Temperature and part-load dependent COP'} == cop_part.__export__()
+    assert {'type': 'Temperature and part-load dependent COP'} == cop_full.__export__()
+    assert {'type': 'Temperature dependent EER'} == eer_sec.__export__()
+    assert {'type': 'Temperature and part-load dependent EER'} == eer_part.__export__()
+    assert {'type': 'Temperature and part-load dependent EER'} == eer_full.__export__()
 
     eer_combined = EERCombined(20, 5, 10)
-    assert '\n' \
-           'Active cooling:\n' \
-           '\tSEER [-]: 5\n' \
-           'Passive cooling:\n' \
-           '\tSEER [-]: 20\n' \
-           'With active cooling above [°C]: 10' == eer_combined.__repr__()
+    assert {'Active cooling': {'SEER [-]': 5}, 'Passive cooling': {'SEER [-]': 20},
+            'With active cooling above [°C]': 10} == eer_combined.__export__()
+
+    eer_combined = EERCombined(20, 5, months_active_cooling=[5, 6])
+    assert {'Active cooling': {'SEER [-]': 5}, 'Passive cooling': {'SEER [-]': 20},
+            'With active cooling in months [-]': [5, 6]} == eer_combined.__export__()

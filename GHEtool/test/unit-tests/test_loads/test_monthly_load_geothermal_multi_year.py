@@ -187,6 +187,5 @@ def test_repr_():
         peak_injection=peak_injection
     )
 
-    assert 'Multiyear monthly geothermal load\n' \
-           'Peak injection duration [hour]: 6.0\n' \
-           'Peak extraction duration [hour]: 6.0' == load.__repr__()
+    assert {'Peak extraction duration [hour]': 6.0, 'Peak injection duration [hour]': 6.0,
+            'type': 'Multiyear monthly geothermal load'} == load.__export__()

@@ -12,7 +12,7 @@ from GHEtool import Borefield, GroundConstantTemperature, MonthlyGeothermalLoadA
 
 def test_64_boreholes():
     data = GroundConstantTemperature(3, 10)
-    borefield_64 = gt.boreholes.rectangle_field(8, 8, 6, 6, 110, 1, 0.075)
+    borefield_64 = gt.borefield.Borefield.rectangle_field(8, 8, 6, 6, 110, 1, 0.075)
 
     # monthly loading values
     peak_cooling = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]  # Peak cooling in kW
@@ -49,7 +49,7 @@ def test_64_boreholes():
 
     # size borefield
     t1 = time.time()
-    depth_precalculated = borefield.size()
+    length_precalculated = borefield.size()
     t1_end = time.time()
 
     # delete precalculated data
@@ -57,18 +57,18 @@ def test_64_boreholes():
 
     ### size without the precalculation
     t2 = time.time()
-    depth_calculated = borefield.size()
+    length_calculated = borefield.size()
     t2_end = time.time()
 
     print("With precalculated data, the sizing took", round(t1_end - t1, 3), "s for 64 boreholes.")
     print("Without the precalculated data, the sizing took", round(t2_end - t2, 3), "s for 64 boreholes.")
     print("The difference in accuracy between the two results is",
-          round((depth_calculated - depth_precalculated) / depth_calculated * 100, 3), "%.")
+          round((length_calculated - length_precalculated) / length_calculated * 100, 3), "%.")
 
 
 def test_10_boreholes():
     data = GroundConstantTemperature(3, 10)
-    borefield_10 = gt.boreholes.rectangle_field(2, 5, 6, 6, 110, 1, 0.075)
+    borefield_10 = gt.borefield.Borefield.rectangle_field(2, 5, 6, 6, 110, 1, 0.075)
 
     # monthly loading values
     peak_cooling = [0., 0, 3., 9., 13., 20., 43., 30., 16., 7., 0., 0.]  # Peak cooling in kW
@@ -105,7 +105,7 @@ def test_10_boreholes():
 
     # size borefield
     t1 = time.time()
-    depth_precalculated = borefield.size()
+    length_precalculated = borefield.size()
     t1_end = time.time()
 
     # delete precalculated data
@@ -113,13 +113,13 @@ def test_10_boreholes():
 
     ### size without the precalculation
     t2 = time.time()
-    depth_calculated = borefield.size()
+    length_calculated = borefield.size()
     t2_end = time.time()
 
     print("With precalculated data, the sizing took", round(t1_end - t1, 3), "s for 10 boreholes.")
     print("Without the precalculated data, the sizing took", round(t2_end - t2, 3), "s for 10 boreholes.")
     print("The difference in accuracy between the two results is",
-          round((depth_calculated-depth_precalculated) / depth_calculated * 100, 3), "%.\n")
+          round((length_calculated - length_precalculated) / length_calculated * 100, 3), "%.\n")
 
 
 if __name__ == "__main__":  # pragma: no cover

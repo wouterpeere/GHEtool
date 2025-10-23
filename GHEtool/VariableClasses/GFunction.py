@@ -94,14 +94,15 @@ class GFunction:
         self._store_previous_values_backup: bool= GFunction.DEFAULT_STORE_PREVIOUS_VALUES
         self.options: dict = {'method': 'equivalent'}
         self.alpha: float = 0.
-        self.borefield: list[gt.boreholes.Borehole] = []
-        self.depth_array: np.ndarray = np.array([])
+        self.borefield: gt.borefield.Borefield = None
+        self.borehole_length_array: np.ndarray = np.array([])
         self.time_array: np.ndarray = np.array([])
         self.previous_gfunctions: np.ndarray = np.array([])
-        self.previous_depth: float = 0.
+        self.previous_borehole_length: float = 0.
         self.use_cyl_correction_when_negative: bool = True
         self.no_extrapolation: bool = True
-        self.threshold_depth_interpolation: float = .25  # %
+        self.threshold_borehole_length_interpolation: float = .25  # %
+
         self.fifo_list: FIFO = FIFO(8)
 
      
@@ -135,7 +136,7 @@ class GFunction:
         self._store_previous_values = store
         self._store_previous_values_backup = store
 
-    def calculate(self, time_value: Union[list, float, np.ndarray], borefield: List[gt.boreholes.Borehole],
+    def calculate(self, time_value: Union[list, float, np.ndarray], borefield: gt.borefield.Borefield,
                   alpha: float, interpolate: bool = None):
         """
         This function returns the gvalues either by interpolation or by calculating them.
@@ -147,7 +148,7 @@ class GFunction:
         ----------
         time_value : list, float, np.ndarray
             Array with all the time values [s] for which gvalues should be calculated
-        borefield : list[pygfunction.boreholes.Borehole]
+        borefield : pygfunction.borefield.Borefield
             Borefield model for which the gvalues should be calculated
         alpha : float
             Thermal diffusivity of the ground [m2/s]
@@ -160,8 +161,8 @@ class GFunction:
             1D array with all the requested gvalues
         """
 
-        def gvalues(time_values: np.ndarray, borefield: List[gt.boreholes.Borehole], alpha: float,
-                    depth: float, interpolate: bool = None) -> np.ndarray:
+        def gvalues(time_values: np.ndarray, borefield: gt.borefield.Borefield, alpha: float,
+                    borehole_length: float, interpolate: bool = None) -> np.ndarray:
             """
             This function returns the gvalues either by interpolation or by calculating them.
 
@@ -169,12 +170,12 @@ class GFunction:
             ----------
             time_values : np.ndarray
                 Array with all the time values [s] for which gvalues should be calculated
-            borefield : list[pygfunction.boreholes.Borehole]
+            borefield : pygfunction.borefield.Borefield
                 Borefield model for which the gvalues should be calculated
             alpha : float
                 Thermal diffusivity of the ground [m2/s]
-            depth : float
-                Depth of the borefield [m]
+            borehole_length : float
+                Borehole length [m]
             interpolate : bool
                 True if results should be interpolated when possible, False otherwise. If None, the default is chosen.
 
@@ -191,32 +192,32 @@ class GFunction:
                 self.options["short_term_effects"] = False
             
             # check if the value is in the fifo_list
-            # if the value is in self.depth_array, there is no problem, since the interpolation will be exact anyway
-            if self.fifo_list.in_fifo_list(depth) and depth not in self.depth_array:
+            # if the value is in self.borehole_length_array, there is no problem, since the interpolation will be exact anyway
+            if self.fifo_list.in_fifo_list(borehole_length) and borehole_length not in self.borehole_length_array:
                 # chances are we are stuck in a loop, so calculate the gfunction and do not iterate
 
                 # calculate the g-values for uniform borehole wall temperature
                 gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options).gFunc
                 
                 # store the calculated g-values
-                self.set_new_calculated_data(time_values, depth, gfunc_calculated, borefield, alpha)
+                self.set_new_calculated_data(time_values, borehole_length, gfunc_calculated, borefield, alpha)
 
-                self.fifo_list.add(depth)
+                self.fifo_list.add(borehole_length)
 
                 return gfunc_calculated
 
             # store in fifo_list to make sure we are not stuck in iterations
-            self.fifo_list.add(depth)
+            self.fifo_list.add(borehole_length)
 
-            # check if previous depth is close to current one
+            # check if previous borehole_length is close to current one
             # if so, returns previous gfunction data to speed up sizing convergence
-            if np.abs(self.previous_depth - depth) < 1:
-                depth = self.previous_depth
+            if np.abs(self.previous_borehole_length - borehole_length) < 1:
+                borehole_length = self.previous_borehole_length
             else:
-                self.previous_depth = depth
+                self.previous_borehole_length = borehole_length
             # do interpolation
             interpolate = interpolate if interpolate is not None else self.store_previous_values
-            gfunc_interpolated = self.interpolate_gfunctions(time_values, depth, alpha, borefield) \
+            gfunc_interpolated = self.interpolate_gfunctions(time_values, borehole_length, alpha, borefield) \
                 if interpolate else np.array([])
 
             # if there are g-values calculated, return them
@@ -241,12 +242,12 @@ class GFunction:
                     self.options["cylindrical_correction"] = backup
             
             # store the calculated g-values
-            self.set_new_calculated_data(time_values, depth, gfunc_calculated, borefield, alpha)
+            self.set_new_calculated_data(time_values, borehole_length, gfunc_calculated, borefield, alpha)
 
             return gfunc_calculated
 
-        # get depth from borefield
-        depth = borefield[0].H
+        # get borehole_length from borefield
+        borehole_length = borefield[0].H
 
         # make numpy array from time_values
         if isinstance(time_value, (float, int)):
@@ -261,7 +262,7 @@ class GFunction:
             time_value_new = _time_values(t_max=time_value[-1])
 
             # calculate g-function values
-            gfunc_uniform_T = gvalues(time_value_new, borefield, alpha, depth, interpolate)
+            gfunc_uniform_T = gvalues(time_value_new, borefield, alpha, borehole_length, interpolate)
 
             # return interpolated values
             return np.interp(time_value, time_value_new, gfunc_uniform_T)
@@ -269,17 +270,17 @@ class GFunction:
         # check if there are double values
         if not isinstance(time_value, (float, int)) and time_value_np.size != np.unique(np.asarray(time_value)).size:
             # calculate g-function values
-            gfunc_uniform_T = gvalues(np.unique(time_value_np), borefield, alpha, depth, interpolate)
+            gfunc_uniform_T = gvalues(np.unique(time_value_np), borefield, alpha, borehole_length, interpolate)
 
             return np.interp(time_value, np.unique(time_value_np), gfunc_uniform_T)
 
         # calculate g-function values
-        gfunc_uniform_T = gvalues(time_value_np, borefield, alpha, depth, interpolate)
+        gfunc_uniform_T = gvalues(time_value_np, borefield, alpha, borehole_length, interpolate)
 
         return gfunc_uniform_T
 
-    def interpolate_gfunctions(self, time_value: Union[list, float, np.ndarray], depth: float,
-                               alpha: float, borefield: List[gt.boreholes.Borehole]) -> np.ndarray:
+    def interpolate_gfunctions(self, time_value: Union[list, float, np.ndarray], borehole_length: float,
+                               alpha: float, borefield: gt.borefield.Borefield) -> np.ndarray:
         """
         This function returns the gvalues by interpolation them. If interpolation is not possible, an emtpy
         array is returned.
@@ -288,8 +289,8 @@ class GFunction:
         ----------
         time_value : list, float, np.ndarray
             Time value(s) [s] for which gvalues should be calculated
-        depth : float
-            Depth of the borefield [m]
+        borehole_length : float
+            Borehole length [m]
         alpha : float
             Thermal diffusivity of the ground [m2/s]
         borefield : list[pygfunction.boreholes.Borehole]
@@ -311,20 +312,20 @@ class GFunction:
         if not self._check_time_values(time_value):
             return gvalues
 
-        # find nearest depth indices
-        idx_prev, idx_next = self._get_nearest_depth_index(depth)
+        # find nearest borehole_length indices
+        idx_prev, idx_next = self._get_nearest_borehole_length_index(borehole_length)
 
         if self.no_extrapolation:
-            # no interpolation can be made since depth is not in between values in the depth array
+            # no interpolation can be made since borehole length is not in between values in the borehole length array
             if idx_prev is None or idx_next is None:
                 return gvalues
 
             # do interpolation
-            if self.depth_array.size == 1:
+            if self.borehole_length_array.size == 1:
                 gvalues = interpolate.interpn([self.time_array], self.previous_gfunctions, time_value)
             else:
-                gvalues = interpolate.interpn((self.depth_array, self.time_array), self.previous_gfunctions,
-                                              np.array([[depth, t] for t in time_value]))
+                gvalues = interpolate.interpn((self.borehole_length_array, self.time_array), self.previous_gfunctions,
+                                              np.array([[borehole_length, t] for t in time_value]))
 
             return gvalues
 
@@ -353,61 +354,63 @@ class GFunction:
         idx = (np.abs(array - value)).argmin()
         return array[idx], idx
 
-    def _get_nearest_depth_index(self, depth: float) -> Tuple[int, int]:
+    def _get_nearest_borehole_length_index(self, borehole_length: float) -> Tuple[int, int]:
         """
-        This function returns the nearest depth indices w.r.t. a specific depth.
+        This function returns the nearest borehole length indices w.r.t. a specific borehole length.
 
         Parameters
         ----------
-        depth : float
-            Depth for which the nearest indices in the depth_array should be searched.
+        borehole_length : float
+            Borehole length for which the nearest indices in the borehole_length_array should be searched.
 
         Returns
         -------
         tuple(int, int)
             (None, None) if no indices exist that are closer than the threshold value
-            (None, int) if the current depth is lower then the minimum in the depth array, but closer then the
+            (None, int) if the current borehole length is lower then the minimum in the borehole_length array, but closer then the
             threshold value
-            (int, None) if the current depth is higher then the maximum in the depth array, but closer then the
+            (int, None) if the current borehole length is higher then the maximum in the borehole_length array, but closer then the
             threshold value
-            (int, int) if the current depth is between two previous calculated depths which are closer together
+            (int, int) if the current borehole length is between two previous calculated borehole_lengths which are closer together
             then the threshold value
 
         Raises
         ------
         ValueError
-            When the depth is smaller or equal to zero
+            When the borehole length is smaller or equal to zero
         """
         # raise error when value is negative
-        if depth <= 0:
-            raise ValueError(f"The depth {depth} is smaller then zero!")
+        if borehole_length <= 0:
+            raise ValueError(f"The borehole length {borehole_length} is smaller then zero!")
 
-        # get nearest depth index
-        val_depth, idx_depth = self._nearest_value(self.depth_array, depth)
+        # get nearest borehole_length index
+        val_borehole_length, idx_borehole_length = self._nearest_value(self.borehole_length_array, borehole_length)
 
-        # the exact depth is in the previous calculated data
+        # the exact borehole_length is in the previous calculated data
         # two times the same index is returned
-        if val_depth == depth:
-            return idx_depth, idx_depth
+        if val_borehole_length == borehole_length:
+            return idx_borehole_length, idx_borehole_length
 
-        if depth > val_depth:
-            # the nearest index is the first in the array and the depth is smaller than the smallest value in the array
+        if borehole_length > val_borehole_length:
+            # the nearest index is the first in the array and the borehole length is smaller than the smallest value in the array
             # but the difference is smaller than the threshold for interpolation
-            if idx_depth == self.depth_array.size - 1 and depth - val_depth < self.threshold_depth_interpolation * depth:
-                return idx_depth, None
-            elif idx_depth != self.depth_array.size - 1:
-                idx_next = idx_depth + 1
-                if self.depth_array[idx_next] - val_depth < self.threshold_depth_interpolation * depth:
-                    return idx_depth, idx_next
+            if idx_borehole_length == self.borehole_length_array.size - 1 and borehole_length - val_borehole_length < self.threshold_borehole_length_interpolation * borehole_length:
+                return idx_borehole_length, None
+            elif idx_borehole_length != self.borehole_length_array.size - 1:
+                idx_next = idx_borehole_length + 1
+                if self.borehole_length_array[
+                    idx_next] - val_borehole_length < self.threshold_borehole_length_interpolation * borehole_length:
+                    return idx_borehole_length, idx_next
         else:
-            # the nearest index is the last in the array and the depth is larger than the highest value in the array
+            # the nearest index is the last in the array and the borehole length is larger than the highest value in the array
             # but the difference is smaller than the threshold for interpolation
-            if idx_depth == 0 and val_depth - depth < self.threshold_depth_interpolation * depth:
-                return None, idx_depth
-            elif idx_depth != 0:
-                idx_prev = idx_depth - 1
-                if val_depth - self.depth_array[idx_prev] < self.threshold_depth_interpolation * depth:
-                    return idx_prev, idx_depth
+            if idx_borehole_length == 0 and val_borehole_length - borehole_length < self.threshold_borehole_length_interpolation * borehole_length:
+                return None, idx_borehole_length
+            elif idx_borehole_length != 0:
+                idx_prev = idx_borehole_length - 1
+                if val_borehole_length - self.borehole_length_array[
+                    idx_prev] < self.threshold_borehole_length_interpolation * borehole_length:
+                    return idx_prev, idx_borehole_length
 
         # no correct interpolation indices are found
         # None, None is returned
@@ -471,21 +474,21 @@ class GFunction:
 
     def remove_previous_data(self) -> None:
         """
-        This function removes the previous calculated data by setting the depth_array, time_array and
+        This function removes the previous calculated data by setting the borehole_length_array, time_array and
         previous_gfunctions back to empty arrays.
 
         Returns
         -------
         None
         """
-        self.depth_array = np.array([])
+        self.borehole_length_array = np.array([])
         self.time_array = np.array([])
         self.previous_gfunctions = np.array([])
         self.alpha = 0
         self.borefield = []
         self.fifo_list.clear()
 
-    def set_new_calculated_data(self, time_values: np.ndarray, depth: float, gvalues: np.ndarray,
+    def set_new_calculated_data(self, time_values: np.ndarray, borehole_length: float, gvalues: np.ndarray,
                                 borefield, alpha) -> bool:
         """
         This function stores the newly calculated gvalues if this is needed.
@@ -494,8 +497,8 @@ class GFunction:
         ----------
         time_values : np.ndarray
             Array with all the time values [s] for which gvalues should be calculated
-        depth : float
-            Depth of the borefield [m]
+        borehole_length : float
+            Borehole length [m]
         gvalues : np.ndarray
             Array with all the calculated gvalues for the corresponding borefield, alpha and time_values
         borefield : list[pygfunction.borehole]
@@ -568,37 +571,37 @@ class GFunction:
         nearest_idx = 0
 
         if np.any(self.previous_gfunctions):
-            nearest_val, nearest_idx = self._nearest_value(self.depth_array, depth)
-            if self.depth_array[nearest_idx] < depth:
+            nearest_val, nearest_idx = self._nearest_value(self.borehole_length_array, borehole_length)
+            if self.borehole_length_array[nearest_idx] < borehole_length:
                 nearest_idx += 1
 
         # insert data in stored data
-        if self.depth_array.size == 1:
+        if self.borehole_length_array.size == 1:
             # self.previous_gfunctions should be converted to a 2D-array
-            if self.depth_array[0] > depth:
+            if self.borehole_length_array[0] > borehole_length:
                 self.previous_gfunctions = np.vstack((gvalues, self.previous_gfunctions))
             else:
                 self.previous_gfunctions = np.vstack((self.previous_gfunctions, gvalues))
         else:
             self.previous_gfunctions = np.insert(self.previous_gfunctions, nearest_idx, gvalues, 0)
 
-        self.depth_array = np.insert(self.depth_array, nearest_idx, depth)
+        self.borehole_length_array = np.insert(self.borehole_length_array, nearest_idx, borehole_length)
         self.time_array = time_values
         self.borefield = borefield
         self.alpha = alpha
 
         return True
 
-    def _check_borefield(self, borefield: List[gt.boreholes.Borehole]) -> bool:
+    def _check_borefield(self, borefield: gt.borefield.Borefield) -> bool:
         """
         This function checks whether the new borefield object is equal to the previous one.
-        It does so by comparing all the parameters (neglecting the depth).
+        It does so by comparing all the parameters (neglecting the borehole length).
         If the borefield objects are unequal, the borefield variable is set to the new borefield
         and all the previously saved gfunctions are deleted.
 
         Parameters
         ----------
-        borefield : list[pygfunction.boreholes.Borehole]
+        borefield : pygfunction.borefield.Borefield
             New borefield for which the gfunctions should be calculated
 
         Returns

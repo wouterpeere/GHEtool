@@ -25,14 +25,16 @@ class GroundTemperatureGradient(_GroundData):
         self.gradient = gradient
         self.Tg = T_g
 
-    def calculate_Tg(self, H: float) -> float:
+    def calculate_Tg(self, depth: float = 100, start_depth: float = 0) -> float:
         """
-        This function gives back the ground temperature at a depth H.
+        This function gives back the average ground temperature for the borehole.
 
         Parameters
         ----------
-        H : float
-            Depth at which the temperature should be calculated [m]
+        depth : float
+            Depth of the borehole [m]
+        start_depth : float
+            Depth at which the borehole starts [m]
 
         Returns
         -------
@@ -42,7 +44,13 @@ class GroundTemperatureGradient(_GroundData):
         # geothermal gradient is equal to the geothermal heat flux divided by the thermal conductivity
         # avg ground temperature is (Tg + gradient + Tg) / 2 = Tg + gradient / 2
         # divide by 100 since the gradient is in K/100m
-        return self.Tg + H * self.gradient / 2 / 100
+        # take the average between the depth and the start depth
+        temperature_at_bottom_borehole = self.Tg + (depth * self.gradient / 2 / 100)
+        temperature_at_start_borehole = self.Tg + (start_depth * self.gradient / 2 / 100)
+        if depth == 0:
+            return temperature_at_bottom_borehole
+        return (temperature_at_bottom_borehole * depth - temperature_at_start_borehole * start_depth) / (
+                depth - start_depth)
 
     def calculate_delta_H(self, temperature_diff: float) -> float:
         """
@@ -60,6 +68,11 @@ class GroundTemperatureGradient(_GroundData):
         """
         return temperature_diff * 2 * 100 / self.gradient
 
-    def __repr__(self):
-        return f'Ground gradient temperature\n\tGround surface temperature [°C]: {self.Tg}' \
-               f'\n\tGradient [K/100m]: {self.gradient}\n\t' + super().__repr__()
+    def __export__(self):
+        temp = {
+            'type': 'Ground gradient temperature',
+            'Ground surface temperature [°C]': self.Tg,
+            'Gradient [K/100m]': self.gradient
+        }
+        temp.update(super().__export__())
+        return temp

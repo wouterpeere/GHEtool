@@ -22,14 +22,16 @@ class GroundConstantTemperature(_GroundData):
         super().__init__(k_s=k_s, volumetric_heat_capacity=volumetric_heat_capacity)
         self.Tg = T_g
 
-    def calculate_Tg(self, H: float = None) -> float:
+    def calculate_Tg(self, depth: float = 100, start_depth: float = 0) -> float:
         """
-        This function gives back the ground temperature.
+        This function gives back the average ground temperature for the borehole.
 
         Parameters
         ----------
-        H : float
-            Depth of the borefield [m] (not used)
+        depth : float
+            Depth of the borehole [m]
+        start_depth : float
+            Depth at which the borehole starts [m]
 
         Returns
         -------
@@ -54,5 +56,10 @@ class GroundConstantTemperature(_GroundData):
         """
         return 0
 
-    def __repr__(self):
-        return f'Constant ground temperature\n\tGround temperature at infinity [°C]: {self.Tg}\n\t' + super().__repr__()
+    def __export__(self):
+        temp = {
+            'type': 'Constant ground temperature',
+            'Ground temperature at infinity [°C]': self.Tg
+        }
+        temp.update(super().__export__())
+        return temp

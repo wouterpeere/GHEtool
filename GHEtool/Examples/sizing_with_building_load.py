@@ -21,7 +21,8 @@ building_demand_DHW = 88_030
 
 ground_data = GroundFluxTemperature(1.5, 11, flux=0.07)
 pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.42, 0.0425)
-fluid_data = FluidData(k_f=0.475, rho=1033, Cp=3930, mu=0.0079, vfr=0.186)
+fluid_data = ConstantFluidData(k_f=0.475, rho=1033, cp=3930, mu=0.0079)
+flow_data = ConstantFlowRate(vfr=0.186)
 
 
 def size_with_scop() -> Tuple[float, float]:
@@ -31,7 +32,7 @@ def size_with_scop() -> Tuple[float, float]:
     Returns
     -------
     Depth : float
-        Required borehole depth
+        Required borehole length
     """
     scop = SCOP(4.5)
     seer = SEER(1000)
@@ -45,18 +46,16 @@ def size_with_scop() -> Tuple[float, float]:
     load.start_month = 9
 
     # create borefield object
-    borefield = Borefield(load=load)
-    borefield.ground_data = ground_data
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield = Borefield(load=load, ground_data=ground_data, pipe_data=pipe_data, fluid_data=fluid_data,
+                          flow_data=flow_data)
 
     borefield.create_rectangular_borefield(3, 14, 7, 7, 94, r_b=0.0655)
 
-    depth = borefield.size_L3(100)
-    print(f'When sizing with a constant SCOP, the required borehole depth is {depth:.2f}m. The SCOP (incl. DHW) is '
+    length = borefield.size_L3(100)
+    print(f'When sizing with a constant SCOP, the required borehole length is {length:.2f}m. The SCOP (incl. DHW) is '
           f'{borefield.load.SCOP_total:.2f}.')
     borefield.print_temperature_profile()
-    return depth, borefield.load.SCOP_total
+    return length, borefield.load.SCOP_total
 
 
 def size_with_variable_ground_temperature() -> Tuple[float, float]:
@@ -66,7 +65,7 @@ def size_with_variable_ground_temperature() -> Tuple[float, float]:
     Returns
     -------
     Depth : float
-        Required borehole depth
+        Required borehole length
     """
     seer = SEER(1000)
     cop = COP(np.array([3.76, 4.25, 4.79, 5.34, 5.74]), np.array([-5, 0, 5, 10, 15]))
@@ -80,18 +79,16 @@ def size_with_variable_ground_temperature() -> Tuple[float, float]:
     load.start_month = 9
 
     # create borefield object
-    borefield = Borefield(load=load)
-    borefield.ground_data = ground_data
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield = Borefield(load=load, ground_data=ground_data, pipe_data=pipe_data, fluid_data=fluid_data,
+                          flow_data=flow_data)
 
     borefield.create_rectangular_borefield(3, 14, 7, 7, 94, r_b=0.0655)
 
-    depth = borefield.size_L3(100)
-    print(f'When sizing with a inlet temperature dependent COP, the required borehole depth is {depth:.2f}m. '
+    length = borefield.size_L3(100)
+    print(f'When sizing with a inlet temperature dependent COP, the required borehole length is {length:.2f}m. '
           f'The SCOP (incl. DHW) is {borefield.load.SCOP_total:.2f}.')
     borefield.print_temperature_profile()
-    return depth, borefield.load.SCOP_total
+    return length, borefield.load.SCOP_total
 
 
 def size_with_part_load_data() -> Tuple[float, float]:
@@ -101,7 +98,7 @@ def size_with_part_load_data() -> Tuple[float, float]:
     Returns
     -------
     Depth : float
-        Required borehole depth
+        Required borehole length
     """
     seer = SEER(1000)
     cop = COP(np.array(
@@ -129,19 +126,17 @@ def size_with_part_load_data() -> Tuple[float, float]:
     load.start_month = 9
 
     # create borefield object
-    borefield = Borefield(load=load)
-    borefield.ground_data = ground_data
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield = Borefield(load=load, ground_data=ground_data, pipe_data=pipe_data, fluid_data=fluid_data,
+                          flow_data=flow_data)
 
     borefield.create_rectangular_borefield(3, 14, 7, 7, 94, r_b=0.0655)
 
-    depth = borefield.size_L3(100)
+    length = borefield.size_L3(100)
     print(
-        f'When sizing with a inlet temperature and part-load dependent COP, the required borehole depth is {depth:.2f}m. '
+        f'When sizing with a inlet temperature and part-load dependent COP, the required borehole length is {length:.2f}m. '
         f'The SCOP (incl. DHW) is {borefield.load.SCOP_total:.2f}.')
     borefield.print_temperature_profile()
-    return depth, borefield.load.SCOP_total
+    return length, borefield.load.SCOP_total
 
 
 if __name__ == "__main__":

@@ -51,11 +51,16 @@ def test_load_hourly_data():
     load1.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_heating=1, col_cooling=0)
     assert np.array_equal(load.hourly_cooling_load, load1.hourly_heating_load)
     assert np.array_equal(load.hourly_heating_load, load1.hourly_cooling_load)
+    assert np.array_equal(load.hourly_dhw_load, load1.hourly_dhw_load)
     load2 = HourlyBuildingLoad()
     load2.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile_without_header.csv"),
                               header=False)
     assert np.array_equal(load.hourly_cooling_load, load2.hourly_cooling_load)
     assert np.array_equal(load.hourly_heating_load, load2.hourly_heating_load)
+    assert np.array_equal(load.hourly_dhw_load, load2.hourly_dhw_load)
+    load2.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile_without_header.csv"),
+                              header=False, col_heating=1, col_cooling=0, col_dhw=1)
+    assert np.allclose(load2.hourly_dhw_load, load2.hourly_heating_load)
 
 
 def test_checks():
@@ -161,6 +166,8 @@ def test_set_hourly_values():
         load.set_hourly_heating_load(np.ones(10))
     with pytest.raises(ValueError):
         load.set_hourly_cooling_load(np.ones(10))
+    with pytest.raises(ValueError):
+        load.set_hourly_dhw_load(np.ones(10))
 
 
 def test_start_month_general():
@@ -188,17 +195,25 @@ def test_start_month_general():
 
 def test_different_start_month():
     load = HourlyBuildingLoad(np.arange(1, 8761, 1), np.arange(1, 8761, 1))
+    load.dhw = np.arange(1, 8761, 1)
     load.start_month = 3
     assert load.start_month == 3
+    assert load.monthly_baseload_cooling[0] == 1332615
+    assert load.monthly_baseload_dhw[0] == 1332615
+    assert load.monthly_baseload_heating[0] == 1332615
     assert load.hourly_cooling_load[0] == 731 * 2 - 1
     assert load.hourly_heating_load[0] == 731 * 2 - 1
+    assert load.hourly_dhw_load[0] == 731 * 2 - 1
     assert load.hourly_cooling_load_simulation_period[0] == 731 * 2 - 1
     assert load.hourly_heating_load_simulation_period[0] == 731 * 2 - 1
+    assert load.hourly_dhw_load_simulation_period[0] == 731 * 2 - 1
     load.all_months_equal = False
     assert load.hourly_cooling_load[0] == 1417
     assert load.hourly_heating_load[0] == 1417
+    assert load.hourly_dhw_load[0] == 1417
     assert load.hourly_cooling_load_simulation_period[0] == 1417
     assert load.hourly_heating_load_simulation_period[0] == 1417
+    assert load.hourly_dhw_load_simulation_period[0] == 1417
 
 
 def test_results():
@@ -230,7 +245,7 @@ def test_reset_results():
 def test_dhw():
     load = HourlyBuildingLoad(np.zeros(8760), np.linspace(1, 8760 - 1, 8760) * 2, 10, scop, seer)
 
-    assert load.dhw == 0
+    assert np.allclose(load.dhw, 0)
 
     with pytest.raises(ValueError):
         load.add_dhw(-100)
@@ -244,6 +259,12 @@ def test_dhw():
         load.dhw = 'test'
     with pytest.raises(ValueError):
         load.dhw = np.full(120, 10)
+    with pytest.raises(ValueError):
+        load.set_hourly_dhw_load(-100)
+    with pytest.raises(ValueError):
+        load.set_hourly_dhw_load('test')
+    with pytest.raises(ValueError):
+        load.set_hourly_dhw_load(np.full(120, 10))
 
     assert np.allclose(load.dhw, 0)
     assert np.allclose(load.hourly_dhw_load_simulation_period, np.zeros(87600))
@@ -263,7 +284,7 @@ def test_dhw():
     load.exclude_DHW_from_peak = False
 
     load.dhw = 8760
-    assert load.dhw == 8760
+    assert np.allclose(load.dhw, 1)
     assert np.allclose(load.hourly_dhw_load_simulation_period, np.full(87600, 1))
     assert np.allclose(load.hourly_dhw_load, np.full(8760, 1))
     assert np.allclose(load.monthly_baseload_dhw, np.full(12, 730))
@@ -299,6 +320,28 @@ def test_dhw():
     load.exclude_DHW_from_peak = True
     # idem since we started with an hourly data resolution
     assert np.allclose(load.monthly_peak_extraction_simulation_period, np.zeros(120))
+    load.exclude_DHW_from_peak = False
+
+    arr = np.linspace(1, 8760, 8760)
+    load.hourly_dhw_load = arr
+    assert np.allclose(load.dhw, np.linspace(1, 8760, 8760))
+    assert np.allclose(load.monthly_baseload_dhw, np.sum(arr.reshape(-1, 730), axis=1))
+    assert np.allclose(load.monthly_peak_dhw, np.sum(arr.reshape(-1, 730), axis=1) / 730)
+    assert np.allclose(load.monthly_baseload_dhw_simulation_period,
+                       np.tile(np.sum(arr.reshape(-1, 730), axis=1), 10))
+    assert np.allclose(load.monthly_baseload_dhw_power_simulation_period,
+                       np.tile(np.sum(arr.reshape(-1, 730), axis=1) / 730, 10))
+    assert np.allclose(load.monthly_baseload_extraction_power_simulation_period,
+                       np.tile(np.sum(arr.reshape(-1, 730), axis=1) / 730, 10) * 3 / 4)
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       np.tile(np.max(arr.reshape(-1, 730), axis=1), 10) * 3 / 4)
+    assert np.allclose(load.yearly_dhw_load_simulation_period, np.full(10, np.sum(arr)))
+    assert np.isclose(load.yearly_average_dhw_load, np.sum(arr))
+    assert load.max_peak_dhw == 8760
+    load.exclude_DHW_from_peak = True
+    # idem since we started with an hourly data resolution
+    assert np.allclose(load.monthly_peak_extraction_simulation_period, np.zeros(120))
+    load.exclude_DHW_from_peak = False
 
 
 def test_get_monthly_cop():
@@ -680,14 +723,22 @@ def test_cluster():
 def test_repr_():
     load = HourlyBuildingLoad()
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
-    load.dhw = 10000
 
-    assert 'Hourly building load\n' \
-           'Efficiency heating: SCOP [-]: 5\n' \
-           'Efficiency cooling: SEER [-]: 20\n' \
-           'Peak cooling duration [hour]: 6.0\n' \
-           'Peak heating duration [hour]: 6.0\n' \
-           'Simulation period [year]: 20\n' \
-           'First month of simulation [-]: 1\n' \
-           'DHW demand [kWh/year]: 10000\n' \
-           'Efficiency DHW: SCOP [-]: 4' == load.__repr__()
+    assert {'type': 'Hourly building load',
+            'Efficiency heating': {'SCOP [-]': 5},
+            'Efficiency cooling': {'SEER [-]': 20},
+            'Peak cooling duration [hour]': 6.0,
+            'Peak heating duration [hour]': 6.0,
+            'Simulation period [year]': 20,
+            'First month of simulation [-]': 1} == load.__export__()
+
+    load.dhw = 10000
+    assert {'type': 'Hourly building load',
+            'Efficiency heating': {'SCOP [-]': 5},
+            'Efficiency cooling': {'SEER [-]': 20},
+            'Peak cooling duration [hour]': 6.0,
+            'Peak heating duration [hour]': 6.0,
+            'Simulation period [year]': 20,
+            'First month of simulation [-]': 1,
+            'DHW demand [kWh/year]': 10000.000000000005,
+            'Efficiency DHW': {'SCOP [-]': 4}} == load.__export__()

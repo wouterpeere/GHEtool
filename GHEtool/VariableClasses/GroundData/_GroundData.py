@@ -64,9 +64,11 @@ class GroundLayer(BaseClass):
                 return False
         return True
 
-    def __repr__(self):
-        return f'- Thickness [m]: {self.thickness}, Conductivity [W/(m·K)]: {self.k_s}, ' \
-               f'Volumetric heat capacity [MJ/(m³·K)]: {self.volumetric_heat_capacity / 10 ** 6}'
+    def __export__(self):
+        return {'Thickness [m]': self.thickness,
+                'Conductivity [W/(m·K)]': self.k_s,
+                'Volumetric heat capacity [MJ/(m³·K)]': self.volumetric_heat_capacity / 10 ** 6
+                }
 
 
 class _GroundData(BaseClass, ABC):
@@ -163,7 +165,7 @@ class _GroundData(BaseClass, ABC):
         self.layers.append(layer)
         self.layer_depths.append(0 if len(self.layers) == 1 else self.layers[-2].thickness + self.layer_depths[-1])
 
-    def check_depth(self, H: float) -> bool:
+    def check_depth(self, depth: float) -> bool:
         """
         Checks if the depth is correct.
         A depth is False when it is lower than 0 or it exceeds the deepest ground layer and
@@ -171,8 +173,8 @@ class _GroundData(BaseClass, ABC):
 
         Parameters
         ----------
-        H : float
-            Depth [m]
+        depth : float
+            Borehole depth [m]
 
         Returns
         -------
@@ -192,18 +194,19 @@ class _GroundData(BaseClass, ABC):
             return True
 
         highest_depth = self.layer_depths[-1] + self.layers[-1].thickness
-        if H <= highest_depth:
+        if depth <= highest_depth:
             return True
 
         if not self.last_layer_infinite:
-            raise ValueError(f'The depth of {H}m exceeds the maximum depth that is provided: {highest_depth}m. '
+            raise ValueError(f'The depth of {depth}m exceeds the maximum depth that is provided: {highest_depth}m. '
                              f'One can set the last_layer_infinite assumption to True in the ground class.')
 
-        warnings.warn(f'The depth of {H}m exceeds the maximum depth that is provided: {highest_depth}m. '
+        warnings.warn(f'The depth of {depth}m exceeds the maximum depth that is provided: {highest_depth}m. '
                       f'In order to continue, it is assumed the deepest layer is infinite.')
         return True
 
-    def calculate_value(self, thickness_list: list, cumulative_thickness_list: list, y_range: list, H: float) -> float:
+    def calculate_value(self, thickness_list: list, cumulative_thickness_list: list, y_range: list,
+                        depth: float, start_depth: float) -> float:
         """
         This function calculates the average value of a certain y_range of values for a certain depth,
         given the thickness of the ground layers.
@@ -216,77 +219,101 @@ class _GroundData(BaseClass, ABC):
             Cumulative sum of all the layer thicknesses
         y_range : list
             Range with the values for each layer
-        H : float
-            Depth [m]
+        depth : float
+            Depth of the borehole [m]
+        start_depth : float
+            Depth at which the borehole starts [m]
 
         Returns
         -------
         float
             Calculated value for either k_s or volumetric heat capacity
         """
-        if H <= 0:
+        if depth <= 0:
             # For negative values, the first conductivity is returned
             return y_range[0]
 
-        result = 0
+        # raise error when the start_depth is larger or equal to the end_depth
+        if depth - start_depth <= 0:
+            raise ValueError('The length of the borehole is 0.')
 
-        idx_of_layer_in_which_H_falls = [i for i, v in enumerate(cumulative_thickness_list) if v <= H][-1]
+        result_buried = 0
+        result_depth = 0
+
+        if start_depth == 0:
+            result_buried = 0
+        else:
+            idx_of_layer_in_which_H_falls = [i for i, v in enumerate(cumulative_thickness_list) if v <= start_depth][-1]
+            for idx, val in enumerate(y_range[:idx_of_layer_in_which_H_falls]):
+                result_buried += val * thickness_list[idx + 1] / start_depth
+
+            result_buried += y_range[idx_of_layer_in_which_H_falls] * (
+                    start_depth - cumulative_thickness_list[idx_of_layer_in_which_H_falls]) / start_depth
+
+        idx_of_layer_in_which_H_falls = [i for i, v in enumerate(cumulative_thickness_list) if v <= depth][-1]
         for idx, val in enumerate(y_range[:idx_of_layer_in_which_H_falls]):
-            result += val * thickness_list[idx + 1] / H
+            result_depth += val * thickness_list[idx + 1] / depth
 
-        result += y_range[idx_of_layer_in_which_H_falls] * (
-                H - cumulative_thickness_list[idx_of_layer_in_which_H_falls]) / H
-        return result
+        result_depth += y_range[idx_of_layer_in_which_H_falls] * (
+                depth - cumulative_thickness_list[idx_of_layer_in_which_H_falls]) / depth
 
-    def k_s(self, H: float = 100) -> float:
+        return (result_depth * depth - result_buried * start_depth) / (depth - start_depth)
+
+    def k_s(self, depth: float = 100, start_depth: float = 0) -> float:
         """
         Returns the ground thermal conductivity in W/mK for a given depth.
 
         Parameters
         ----------
-        H : float
-            Depth in meters.
+        depth : float
+            Depth of the borehole [m]
+        start_depth : float
+            Depth at which the borehole starts [m]
 
         Returns
         -------
         float
             Ground thermal conductivity in W/mK for a given depth.
         """
-        self.check_depth(H)
+        self.check_depth(depth)
         if len(self.layers) == 1 and (self.layers[0].thickness is None or self.last_layer_infinite):
             return self.layers[0].k_s
         return self.calculate_value([0] + [layer.thickness for layer in self.layers], self.layer_depths,
-                                    [layer.k_s for layer in self.layers], H)
+                                    [layer.k_s for layer in self.layers], depth, start_depth)
 
-    def volumetric_heat_capacity(self, H: float = 100) -> float:
+    def volumetric_heat_capacity(self, depth: float = 100, start_depth: float = 0) -> float:
         """
         Returns the ground volumetric heat capacity in J/m³K for a given depth.
 
         Parameters
         ----------
-        H : float
-            Depth in meters.
+        depth : float
+            Depth of the borehole [m]
+        start_depth : float
+            Depth at which the borehole starts [m]
 
         Returns
         -------
         float
             Ground volumetric heat capacity in J/m³K for a given depth.
         """
-        self.check_depth(H)
+        self.check_depth(depth)
         if len(self.layers) == 1 and (self.layers[0].thickness is None or self.last_layer_infinite):
             return self.layers[0].volumetric_heat_capacity
         return self.calculate_value([0] + [layer.thickness for layer in self.layers], self.layer_depths,
-                                    [layer.volumetric_heat_capacity for layer in self.layers], H)
+                                    [layer.volumetric_heat_capacity for layer in self.layers], depth, start_depth)
 
-    def alpha(self, H: float = 100) -> float:
+    def alpha(self, depth: float = 100, start_depth: float = 0) -> float:
         """
         Returns the ground thermal diffusivity in m²/s for a given depth.
         If no volumetric heat capacity or conductivity is given, None is returned.
 
         Parameters
         ----------
-        H : float
-            Depth in meters.
+        depth : float
+            Depth of the borehole [m]
+        start_depth : float
+            Depth at which the borehole starts [m]
 
         Returns
         -------
@@ -297,17 +324,19 @@ class _GroundData(BaseClass, ABC):
         if not np.any(self.layers):
             return None
         else:
-            return self.k_s(H) / self.volumetric_heat_capacity(H)  # m2/s
+            return self.k_s(depth, start_depth) / self.volumetric_heat_capacity(depth, start_depth)  # m2/s
 
     @abc.abstractmethod
-    def calculate_Tg(self, H: float) -> float:
+    def calculate_Tg(self, depth: float = 100, start_depth: float = 0) -> float:
         """
-        This function gives back the ground temperature
+        This function gives back the average ground temperature for the borehole.
 
         Parameters
         ----------
-        H : float
-            Depth of the borefield [m]
+        depth : float
+            Depth of the borehole [m]
+        start_depth : float
+            Depth at which the borehole starts [m]
 
         Returns
         -------
@@ -332,7 +361,7 @@ class _GroundData(BaseClass, ABC):
 
     def max_depth(self, max_temp: float) -> float:
         """
-        This function returns the maximum depth, based on the maximum temperature.
+        This function returns the maximum borehole depth, based on the maximum temperature.
         The maximum is the depth where the ground temperature equals the maximum temperature limit.
 
         Parameters
@@ -355,12 +384,14 @@ class _GroundData(BaseClass, ABC):
                 return False
         return True
 
-    def __repr__(self):
+    def __export__(self):
         if len(self.layers) == 1:
-            return f'Conductivity [W/(m·K)]: {self.layers[0].k_s}\n\t' \
-                   f'Volumetric heat capacity [MJ/(m³·K)]: {self.layers[0].volumetric_heat_capacity / 10 ** 6}'
+            return {
+                'Conductivity [W/(m·K)]': self.layers[0].k_s,
+                'Volumetric heat capacity [MJ/(m³·K)]': self.layers[0].volumetric_heat_capacity / 10 ** 6
+            }
         else:
-            temp = 'Layers:'
-            for layer in self.layers:
-                temp += '\n\t' + layer.__repr__()
-            return temp
+            result = {'layers': dict()}
+            for idx, layer in enumerate(self.layers):
+                result['layers'][idx + 1] = layer.__export__()
+            return result

@@ -95,6 +95,31 @@ class HourlyBuildingLoadMultiYear(_HourlyDataBuilding):
             return
         raise ValueError
 
+    @_HourlyDataBuilding.hourly_dhw_load.setter
+    def hourly_dhw_load(self, load: ArrayLike) -> np.ndarray:
+        """
+        This function sets the hourly DHW load in kWh/h after it has been checked.
+
+        Parameters
+        ----------
+        load : np.ndarray, list or tuple
+            Hourly cooling load [kWh/h]
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            When either the length is not 8760, the input is not of the correct type, or it contains negative
+            values
+        """
+        if self._check_input(load):
+            self._hourly_dhw_load = load
+            return
+        raise ValueError
+
     @property
     def hourly_cooling_load_simulation_period(self) -> np.ndarray:
         """
@@ -118,6 +143,49 @@ class HourlyBuildingLoadMultiYear(_HourlyDataBuilding):
             hourly heating for the whole simulation period
         """
         return self._hourly_heating_load
+
+    @property
+    def hourly_dhw_load_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the hourly DHW load in kWh/h for the whole simulation period.
+
+        Returns
+        -------
+        hourly DHW : np.ndarray
+            Hourly DHW values [kWh/h] for the whole simulation period
+        """
+        if self._hourly_dhw_load is None:
+            return np.zeros(8760 * self.simulation_period)
+        return self._hourly_dhw_load
+
+    @property
+    def dhw(self) -> np.ndarray:
+        """
+        This function returns the hourly DHW values
+
+        Returns
+        -------
+        hourly heating : np.ndarray
+            Hourly DHW values [kWh/h] for the whole simulation period
+        """
+        return self.hourly_dhw_load_simulation_period
+
+    @dhw.setter
+    def dhw(self, dhw: Union[float, np.ndarray]) -> None:
+        """
+        This function adds the domestic hot water (dhw).
+        An error is raised is the dhw is not positive.
+
+        Parameters
+        ----------
+        dhw : float, np.ndarray
+            Yearly value of array with energy demand for domestic hot water (DHW) [kWh]
+
+        Returns
+        -------
+        None
+        """
+        self._set_dhw(dhw)
 
     def set_hourly_cooling_load(self, load: ArrayLike) -> None:
         """
@@ -159,23 +227,32 @@ class HourlyBuildingLoadMultiYear(_HourlyDataBuilding):
         """
         self.hourly_heating_load = load
 
-    @property
-    def hourly_dhw_load_simulation_period(self) -> np.ndarray:
+    def set_hourly_dhw_load(self, load: ArrayLike) -> None:
         """
-        This function returns the hourly DHW load in kWh/h for the whole simulation period.
+        This function sets the hourly domestic hot water load [kWh/h] after it has been checked.
+
+        Parameters
+        ----------
+        load : np.ndarray, list or tuple
+            Hourly dhw load [kWh/h]
 
         Returns
         -------
-        hourly DHW : np.ndarray
-            Hourly DHW values [kWh/h] for the whole simulation period
-        """
-        if self._dhw is None:
-            return np.zeros(8760 * self.simulation_period)
-        return self._dhw
+        None
 
-    def __repr__(self):
-        return f'Multiyear hourly building load\n' \
-               f'Efficiency heating: {self.cop.__repr__()}\n' \
-               f'Efficiency cooling: {self.eer.__repr__()}\n' \
-               f'Peak cooling duration [hour]: {self.peak_injection_duration / 3600:.1f}\n' \
-               f'Peak heating duration [hour]: {self.peak_extraction_duration / 3600:.1f}'
+        Raises
+        ------
+        ValueError
+            When either the length is not 8760, the input is not of the correct type, or it contains negative
+            values
+        """
+        self.dhw = load
+
+    def __export__(self):
+        return {
+            'type': 'Multiyear hourly building load',
+            'Efficiency heating': self.cop.__export__(),
+            'Efficiency cooling': self.eer.__export__(),
+            'Peak cooling duration [hour]': self.peak_injection_duration / 3600,
+            'Peak heating duration [hour]': self.peak_extraction_duration / 3600
+        }

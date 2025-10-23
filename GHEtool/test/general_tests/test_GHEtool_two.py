@@ -16,7 +16,7 @@ data_ground_flux = GroundFluxTemperature(3, 10)
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
 pipeData = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 
-borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
+borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
 
 
 def load_case(number):
@@ -181,7 +181,7 @@ def test_no_possible_solution():
 def test_problem_with_gfunction_calc_obj():
     # GroundData for an initial field of 11 x 11
     data = GroundConstantTemperature(3, 10)
-    borefield_gt = gt.boreholes.rectangle_field(11, 11, 6, 6, 110, 1, 0.075)
+    borefield_gt = gt.borefield.Borefield.rectangle_field(11, 11, 6, 6, 110, 1, 0.075)
 
     # Monthly loading values
     peak_injection = np.array([0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.])  # Peak cooling in kW
@@ -217,7 +217,7 @@ def test_problem_with_gfunction_calc_obj():
 
     # borefield of 6x20
     data = GroundConstantTemperature(3, 10)
-    borefield_gt = gt.boreholes.rectangle_field(6, 20, 6, 6, 110, 1, 0.075)
+    borefield_gt = gt.borefield.Borefield.rectangle_field(6, 20, 6, 6, 110, 1, 0.075)
 
     # set ground parameters to borefield
     borefield.set_borefield(borefield_gt)
@@ -243,8 +243,8 @@ def test_size_with_multiple_ground_layers():
 
     borefield.load.peak_injection_duration = 8
     borefield.load.peak_extraction_duration = 6
-    assert np.isclose(97.16160816008234, borefield.size(L2_sizing=True))
-    assert np.isclose(97.89883260681054, borefield.size(L3_sizing=True))
+    assert np.isclose(96.87238165292221, borefield.size(L2_sizing=True))
+    assert np.isclose(97.60790804951675, borefield.size(L3_sizing=True))
 
     # now with multiple layers
     layer_1 = GroundLayer(k_s=1.7, thickness=4.9)
@@ -257,15 +257,15 @@ def test_size_with_multiple_ground_layers():
     flux = GroundFluxTemperature(T_g=10)
     flux.add_layer_on_bottom([layer_1, layer_2, layer_3, layer_4, layer_5, layer_6])
     borefield.ground_data = flux
-    assert np.isclose(98.05035285309258, borefield.size(L2_sizing=True))
-    assert np.isclose(98.7940117048903, borefield.size(L3_sizing=True))
+    assert np.isclose(97.76029903346078, borefield.size(L2_sizing=True))
+    assert np.isclose(98.50277640726456, borefield.size(L3_sizing=True))
 
-    ks_saved = flux.k_s(borefield.H)
+    ks_saved = flux.k_s(borefield.depth, borefield.D)
 
     flux_new = GroundFluxTemperature(ks_saved, 10)
     borefield.ground_data = flux_new
-    assert np.isclose(98.05035285309258, borefield.size(L2_sizing=True), rtol=1e-3)
-    assert np.isclose(98.7940117048903, borefield.size(L3_sizing=True), rtol=1e-3)
+    assert np.isclose(97.7575067283266, borefield.size(L2_sizing=True), rtol=1e-3)
+    assert np.isclose(98.50624530678785, borefield.size(L3_sizing=True), rtol=1e-3)
 
 
 def test_if_gfunction_history_is_cleared_with_groundlayers():
@@ -274,7 +274,7 @@ def test_if_gfunction_history_is_cleared_with_groundlayers():
     borefield.ground_data = GroundFluxTemperature(1.7, 10)
     borefield.gfunction(3600 * 20, 100)
     borefield.gfunction(3600 * 20, 150)
-    assert np.array_equal([100, 150], borefield.gfunction_calculation_object.depth_array)
+    assert np.array_equal([100, 150], borefield.gfunction_calculation_object.borehole_length_array)
 
     # now with multiple layers
     layer_1 = GroundLayer(k_s=1.7, thickness=4.9)
@@ -290,4 +290,4 @@ def test_if_gfunction_history_is_cleared_with_groundlayers():
     borefield.gfunction(3600 * 20, 100)
     borefield.gfunction(3600 * 20, 150)
     # 100 is removed
-    assert np.array_equal([150.], borefield.gfunction_calculation_object.depth_array)
+    assert np.array_equal([150.], borefield.gfunction_calculation_object.borehole_length_array)

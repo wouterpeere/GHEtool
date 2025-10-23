@@ -53,7 +53,7 @@ def test_ground_data_unequal():
 
 def test_alpha():
     data = GroundFluxTemperature(3)
-    assert np.isclose(data.alpha(H=100), 3 / data.volumetric_heat_capacity(H=100))
+    assert np.isclose(data.alpha(100), 3 / data.volumetric_heat_capacity(100))
     data = GroundFluxTemperature()
     assert data.alpha() is None
 
@@ -64,10 +64,14 @@ def test_Tg():
     ground_temperature_gradient = GroundTemperatureGradient(3, 10, 2.4 * 10 ** 6, 2)
 
     assert ground_constant_temperature.calculate_Tg(100) == 10
+    assert ground_constant_temperature.calculate_Tg(100, 1) == 10
     assert ground_flux_temperature.calculate_Tg(0) == 10
     assert ground_flux_temperature.calculate_Tg(100) == 11
+    assert ground_flux_temperature.calculate_Tg(100, 10) == 11.1
     assert ground_temperature_gradient.calculate_Tg(0) == 10
     assert ground_temperature_gradient.calculate_Tg(100) == 11
+    assert ground_temperature_gradient.calculate_Tg(100, 10) == 11.1
+    assert np.isclose(ground_temperature_gradient.calculate_Tg(100, 99.9), 11.998999999999114)
 
 
 def test_delta_H():
@@ -89,12 +93,14 @@ def test_one_ground_layer_data():
     assert ground_data.k_s(1) == 3
     assert ground_data.k_s(10) == 3
     assert ground_data.k_s(1000) == 3
+    assert ground_data.k_s(1000, 1) == 3
     assert ground_data.k_s(10e8) == 3
 
     assert ground_data.volumetric_heat_capacity(0) == 2400000
     assert ground_data.volumetric_heat_capacity(1) == 2400000
     assert ground_data.volumetric_heat_capacity(10) == 2400000
     assert ground_data.volumetric_heat_capacity(1000) == 2400000
+    assert ground_data.volumetric_heat_capacity(1000, 1) == 2400000
     assert ground_data.volumetric_heat_capacity(10e8) == 2400000
 
 
@@ -208,17 +214,31 @@ def test_multilayer_values():
     k_s_array = [1, 2, 1, 2]
     depth_array = [0, 10, 15, 20]
     constant = GroundConstantTemperature()
-    assert 1 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 0)
-    assert 1 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 1)
-    assert 1 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 5)
-    assert 1 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 10)
-    assert 1 * 10 / 11 + 2 * 1 / 11 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 11)
-    assert 1 * 10 / 20 + 2 * 10 / 20 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 20)
-    assert 1 * 10 / 24 + 2 * 14 / 24 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 24)
-    assert 1 * 10 / 25 + 2 * 15 / 25 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 25)
-    assert 1 * 10 / 30 + 2 * 15 / 30 + 1 * 5 / 30 == constant.calculate_value(depth_array, np.cumsum(depth_array),
-                                                                              k_s_array, 30)
-    assert np.isclose(1.99997, constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 1000000))
+    assert 1 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 0, 0)
+    assert 1 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 1, 0)
+    assert 1 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 5, 0)
+    assert 1 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 10, 0)
+    assert 1 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 0, 0)
+    with pytest.raises(ValueError):
+        constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 1, 1)
+    assert 1 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 5, 1)
+    assert 1 == constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 10, 1)
+    assert np.isclose(1 * 10 / 11 + 2 * 1 / 11,
+                      constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 11, 0))
+    assert np.isclose(((1 * 10 / 11 + 2 * 1 / 11) * 11 - 1) / 10,
+                      constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 11, 1))
+    assert np.isclose(2,
+                      constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 11, 10))
+    assert np.isclose(1 * 10 / 20 + 2 * 10 / 20,
+                      constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 20, 0))
+    assert np.isclose(1 * 10 / 24 + 2 * 14 / 24,
+                      constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 24, 0))
+    assert np.isclose(1 * 10 / 25 + 2 * 15 / 25,
+                      constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 25, 0))
+    assert np.isclose(1 * 10 / 30 + 2 * 15 / 30 + 1 * 5 / 30,
+                      constant.calculate_value(depth_array, np.cumsum(depth_array),
+                                               k_s_array, 30, 0))
+    assert np.isclose(1.99997, constant.calculate_value(depth_array, np.cumsum(depth_array), k_s_array, 1000000, 0))
 
     layer_1 = GroundLayer(k_s=1, thickness=10)
     layer_2 = GroundLayer(k_s=2, thickness=15)
@@ -231,24 +251,48 @@ def test_multilayer_values():
     assert 2400000.0 == constant.volumetric_heat_capacity(30)
 
 
+def test_ground_temp_layer():
+    ground = GroundTemperatureGradient(None, 10, gradient=4)
+    ground.add_layer_on_bottom(GroundLayer(k_s=1, thickness=50))
+    ground.add_layer_on_bottom(GroundLayer(k_s=2, thickness=50))
+    assert ground.k_s(100) == 1.5
+    assert ground.calculate_Tg(50) == 11
+    assert ground.calculate_Tg(100) == 12
+    ground = GroundFluxTemperature(None, 10, flux=0.08)
+    ground_1 = GroundFluxTemperature(1, 10, flux=0.08)
+    ground_15 = GroundFluxTemperature(1.5, 10, flux=0.08)
+    ground.add_layer_on_bottom(GroundLayer(k_s=1, thickness=50))
+    ground.add_layer_on_bottom(GroundLayer(k_s=2, thickness=50))
+    assert ground.k_s(50) == 1
+    assert ground_1.calculate_Tg(50) == 12
+    assert ground.calculate_Tg(50) == 12
+    assert ground.k_s(100) == 1.5
+    assert np.isclose(ground_15.calculate_Tg(100), 12.666666666666664)
+    assert np.isclose(ground.calculate_Tg(100), 12.666666666666664)
+
+
 def test_repr_():
     ground_flux_temperature = GroundFluxTemperature(3, 11, 2.4 * 10 ** 6, 0.06)
     ground_constant_temperature = GroundConstantTemperature(3, 11)
     ground_temperature_gradient = GroundTemperatureGradient(3, 11, 2.4 * 10 ** 6, 2)
-    assert 'Ground flux temperature\n' \
-           '\tGround surface temperature [°C]: 11\n' \
-           '\tGround flux [W/m²]: 0.06\n' \
-           '\tConductivity [W/(m·K)]: 3\n' \
-           '\tVolumetric heat capacity [MJ/(m³·K)]: 2.4' == ground_flux_temperature.__repr__()
-    assert 'Constant ground temperature\n' \
-           '\tGround temperature at infinity [°C]: 11\n' \
-           '\tConductivity [W/(m·K)]: 3\n' \
-           '\tVolumetric heat capacity [MJ/(m³·K)]: 2.4' == ground_constant_temperature.__repr__()
-    assert 'Ground gradient temperature\n' \
-           '\tGround surface temperature [°C]: 11\n' \
-           '\tGradient [K/100m]: 2\n' \
-           '\tConductivity [W/(m·K)]: 3\n' \
-           '\tVolumetric heat capacity [MJ/(m³·K)]: 2.4' == ground_temperature_gradient.__repr__()
+    assert {'type': 'Ground flux temperature',
+            'Ground surface temperature [°C]': 11,
+            'Ground flux [W/m²]': 0.06,
+            'Conductivity [W/(m·K)]': 3,
+            'Volumetric heat capacity [MJ/(m³·K)]': 2.4
+            } == ground_flux_temperature.__export__()
+    assert {'type': 'Constant ground temperature',
+            'Ground temperature at infinity [°C]': 11,
+            'Conductivity [W/(m·K)]': 3,
+            'Volumetric heat capacity [MJ/(m³·K)]': 2.4
+            } == ground_constant_temperature.__export__()
+    assert {
+               'type': 'Ground gradient temperature',
+               'Ground surface temperature [°C]': 11,
+               'Gradient [K/100m]': 2,
+               'Conductivity [W/(m·K)]': 3,
+               'Volumetric heat capacity [MJ/(m³·K)]': 2.4
+           } == ground_temperature_gradient.__export__()
 
     # layers
     layer_1 = GroundLayer(k_s=1, thickness=10)
@@ -258,11 +302,17 @@ def test_repr_():
 
     constant = GroundConstantTemperature()
     constant.add_layer_on_bottom([layer_1, layer_2, layer_3, layer_4])
-    assert 'Constant ground temperature\n' \
-           '\tGround temperature at infinity [°C]: None\n' \
-           '\tLayers:\n' \
-           '\t- Thickness [m]: 10, Conductivity [W/(m·K)]: 1, Volumetric heat capacity [MJ/(m³·K)]: 2.4\n' \
-           '\t- Thickness [m]: 15, Conductivity [W/(m·K)]: 2, Volumetric heat capacity [MJ/(m³·K)]: 2.4\n' \
-           '\t- Thickness [m]: 20, Conductivity [W/(m·K)]: 1, Volumetric heat capacity [MJ/(m³·K)]: 2.4\n' \
-           '\t- Thickness [m]: None, Conductivity [W/(m·K)]: 2, Volumetric heat capacity [MJ/(m³·K)]: 2.4' \
-           == constant.__repr__()
+    assert {'Ground temperature at infinity [°C]': None,
+            'layers': {1: {'Conductivity [W/(m·K)]': 1,
+                           'Thickness [m]': 10,
+                           'Volumetric heat capacity [MJ/(m³·K)]': 2.4},
+                       2: {'Conductivity [W/(m·K)]': 2,
+                           'Thickness [m]': 15,
+                           'Volumetric heat capacity [MJ/(m³·K)]': 2.4},
+                       3: {'Conductivity [W/(m·K)]': 1,
+                           'Thickness [m]': 20,
+                           'Volumetric heat capacity [MJ/(m³·K)]': 2.4},
+                       4: {'Conductivity [W/(m·K)]': 2,
+                           'Thickness [m]': None,
+                           'Volumetric heat capacity [MJ/(m³·K)]': 2.4}},
+            'type': 'Constant ground temperature'} == constant.__export__()

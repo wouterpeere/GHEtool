@@ -15,14 +15,16 @@ from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData,
     DoubleUTube
 from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient, MaximumNumberOfIterations
 from GHEtool.Validation.cases import load_case
-from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad
+from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad, EERCombined, \
+    HourlyBuildingLoad, EER, HourlyBuildingLoadMultiYear
+from GHEtool.Methods import *
 
 data = GroundConstantTemperature(3, 10)
 data_ground_flux = GroundFluxTemperature(3, 10)
 fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
 pipeData = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 
-borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
+borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
 
 # Monthly loading values
 peak_injection = [0., 0, 34., 69., 133., 187., 213., 240., 160., 37., 0., 0.]  # Peak cooling in kW
@@ -40,7 +42,7 @@ baseload_injectionPercentage = [0.025, 0.05, 0.05, .05, .075, .1, .2, .2, .1, .0
 baseload_extraction = list(map(lambda x: x * annualHeatingLoad, baseload_extractionPercentage))  # kWh
 baseload_injection = list(map(lambda x: x * annualCoolingLoad, baseload_injectionPercentage))  # kWh
 
-custom_field = gt.boreholes.L_shaped_field(N_1=4, N_2=5, B_1=5., B_2=5., H=100., D=4, r_b=0.05)
+custom_field = gt.borefield.Borefield.L_shaped_field(N_1=4, N_2=5, B_1=5., B_2=5., H=100., D=4, r_b=0.05)
 
 
 def test_borefield():
@@ -67,7 +69,7 @@ def borefield_quadrants():
     data = GroundConstantTemperature(3.5,  # conductivity of the soil (W/mK)
                                      10)  # Ground temperature at infinity (degrees C)
 
-    borefield_gt = gt.boreholes.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)
+    borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)
 
     borefield = Borefield()
     borefield.set_Rb(0.2)
@@ -111,7 +113,7 @@ def borefield_custom_data():
 @pytest.fixture
 def hourly_borefield():
     borefield = Borefield()
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
     borefield.set_Rb(0.2)
     borefield.set_borefield(borefield_gt)
     load = HourlyGeothermalLoad()
@@ -238,7 +240,7 @@ def test_no_ground_data():
 
 def test_value_error_cooling_dom_temp_gradient():
     data = GroundFluxTemperature(3, 12)
-    borefield_pyg = gt.boreholes.rectangle_field(5, 5, 6, 6, 110, 4, 0.075)
+    borefield_pyg = gt.borefield.Borefield.rectangle_field(5, 5, 6, 6, 110, 4, 0.075)
 
     borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(1)))
 
@@ -246,7 +248,7 @@ def test_value_error_cooling_dom_temp_gradient():
     borefield.set_borefield(borefield_pyg)
     borefield.set_Rb(0.2)
 
-    with raises(MaximumNumberOfIterations):
+    with raises(UnsolvableDueToTemperatureGradient):
         borefield.size()
 
     borefield.calculation_setup(max_nb_of_iterations=500)
@@ -305,7 +307,30 @@ def test_size_with_different_peak_lengths(borefield):
 
 
 def test_convergence_eer_combined():
-    borefield1: Borefield = pickle.load(open(FOLDER.joinpath("test/general_tests/test_optimise.pkl"), 'rb'))
+    ground_data = GroundFluxTemperature(3, 10)
+    fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
+
+    load = HourlyBuildingLoad(efficiency_heating=5)  # use SCOP of 5 for heating
+    load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,
+                             separator=";", col_cooling=0, col_heating=1)
+
+    eer_active = EER(np.array([15.943, 6.153]),
+                     np.array([5, 30]))  # based on the data of the WRE092 chiller of Galletti
+    borefield1 = Borefield()
+    borefield1.create_rectangular_borefield(3, 3, 6, 6, 110, 0.7, 0.075)
+    borefield1.set_ground_parameters(ground_data)
+    borefield1.set_fluid_parameters(fluid_data)
+    borefield1.set_pipe_parameters(pipe_data)
+    borefield1.set_max_avg_fluid_temperature(25)
+    borefield1.set_min_avg_fluid_temperature(3)
+
+    # create combined active and passive EER
+    eer = EERCombined(20, eer_active, threshold_temperature=17)
+
+    # set variables
+    load.eer = eer
+    borefield1.load = load
     borefield1.set_max_avg_fluid_temperature(16)
     borefield1.calculate_temperatures(hourly=True)
     results_16 = copy.deepcopy(borefield1.results)
@@ -316,16 +341,130 @@ def test_convergence_eer_combined():
 
 
 def test_optimise_load_eer_combined():
-    borefield1: Borefield = pickle.load(open(FOLDER.joinpath("test/general_tests/test_optimise.pkl"), 'rb'))
+    ground_data = GroundFluxTemperature(3, 10)
+    fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
+
+    load = HourlyBuildingLoad(efficiency_heating=5)  # use SCOP of 5 for heating
+    load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,
+                             separator=";", col_cooling=0, col_heating=1)
+
+    eer_active = EER(np.array([15.943, 6.153]),
+                     np.array([5, 30]))  # based on the data of the WRE092 chiller of Galletti
+    borefield1 = Borefield()
+    borefield1.create_rectangular_borefield(4, 3, 6, 6, 110, 0.7, 0.075)
+    borefield1.ground_data = ground_data
+    borefield1.fluid_data = fluid_data
+    borefield1.pipe_data = pipe_data
+    borefield1.set_max_avg_fluid_temperature(25)
+    borefield1.set_min_avg_fluid_temperature(3)
+
+    # create combined active and passive EER
+    eer = EERCombined(20, eer_active, threshold_temperature=17)
+    load.eer = eer
+    borefield1.load = load
+
     borefield1.set_max_avg_fluid_temperature(16)
     borefield1.calculate_temperatures(hourly=True)
     results_16 = copy.deepcopy(borefield1.results)
     borefield1.set_max_avg_fluid_temperature(25)
-    _, sec_load = borefield1.optimise_load_profile_power(borefield1.load)
+    _, sec_load = optimise_load_profile_power(borefield1, borefield1.load)
     borefield1.calculate_temperatures(hourly=True)
     results_25 = copy.deepcopy(borefield1.results)
     assert np.allclose(results_16.peak_injection, results_25.peak_injection)
-    _, sec_load = borefield1.optimise_load_profile_energy(borefield1.load)
+    _, sec_load = optimise_load_profile_energy(borefield1, borefield1.load)
     borefield1.calculate_temperatures(hourly=True)
     results_25 = copy.deepcopy(borefield1.results)
     assert np.allclose(results_16.peak_injection, results_25.peak_injection)
+
+
+def test_optimise_methods_different_start_year():
+    ground_data = GroundFluxTemperature(3, 10)
+    fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
+
+    load = HourlyBuildingLoad(efficiency_heating=5)  # use SCOP of 5 for heating
+    load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,
+                             separator=";", col_cooling=0, col_heating=1)
+    load.start_month = 5
+
+    borefield = Borefield()
+    borefield.create_rectangular_borefield(20, 5, 6, 6, 110, 0.7, 0.075)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+
+    borefield_load, ext_load = optimise_load_profile_power(borefield, load)
+    assert borefield_load.start_month == 5
+    assert load.start_month == 5
+    assert ext_load.start_month == 5
+    assert ext_load.max_peak_heating == 0
+    assert ext_load.max_peak_cooling == 0
+    assert isinstance(ext_load, HourlyBuildingLoad)
+
+    borefield_load, ext_load = optimise_load_profile_balance(borefield, load)
+    assert borefield_load.start_month == 5
+    assert load.start_month == 5
+    assert ext_load.start_month == 5
+    assert np.allclose(borefield_load.hourly_heating_load + ext_load.hourly_heating_load, load.hourly_heating_load)
+    assert np.allclose(borefield_load.hourly_cooling_load + ext_load.hourly_cooling_load, load.hourly_cooling_load)
+
+    load = HourlyBuildingLoadMultiYear(load.hourly_heating_load_simulation_period,
+                                       load.hourly_cooling_load_simulation_period)
+
+    borefield_load, ext_load = optimise_load_profile_power(borefield, load)
+    assert isinstance(ext_load, HourlyBuildingLoadMultiYear)
+    assert ext_load.max_peak_heating == 0
+    assert ext_load.max_peak_cooling == 0
+
+    borefield_load, ext_load = optimise_load_profile_balance(borefield, load)
+    assert isinstance(ext_load, HourlyBuildingLoadMultiYear)
+    assert np.allclose(borefield_load.hourly_heating_load + ext_load.hourly_heating_load, load.hourly_heating_load)
+    assert np.allclose(borefield_load.hourly_cooling_load + ext_load.hourly_cooling_load, load.hourly_cooling_load)
+
+    borefield.create_rectangular_borefield(10, 2, 6, 6, 110, 0.7, 0.075)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+
+    borefield_load, ext_load = optimise_load_profile_power(borefield, load)
+    assert np.allclose(borefield_load.hourly_heating_load + ext_load.hourly_heating_load, load.hourly_heating_load)
+    assert np.allclose(borefield_load.hourly_cooling_load + ext_load.hourly_cooling_load, load.hourly_cooling_load)
+
+
+def test_optimise_methods_different_start_year_dhw():
+    ground_data = GroundFluxTemperature(3, 10)
+    fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
+
+    load = HourlyBuildingLoad(efficiency_heating=5)  # use SCOP of 5 for heating
+    load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,
+                             separator=";", col_cooling=0, col_heating=1, col_dhw=1)
+    load.hourly_heating_load = np.zeros(8760)
+    load.start_month = 5
+
+    borefield = Borefield()
+    borefield.create_rectangular_borefield(20, 5, 6, 6, 110, 0.7, 0.075)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+
+    borefield_load, ext_load = optimise_load_profile_power(borefield, load)
+    assert borefield_load.start_month == 5
+    assert load.start_month == 5
+    assert ext_load.start_month == 5
+    assert ext_load.max_peak_heating == 0
+    assert ext_load.max_peak_cooling == 0
+    assert ext_load.max_peak_dhw == 0
+    assert isinstance(ext_load, HourlyBuildingLoad)
+
+    borefield_load, ext_load = optimise_load_profile_balance(borefield, load, dhw_preferential=False)
+    assert borefield_load.start_month == 5
+    assert load.start_month == 5
+    assert ext_load.start_month == 5
+    assert np.allclose(borefield_load.hourly_heating_load + ext_load.hourly_heating_load, load.hourly_heating_load)
+    assert np.allclose(borefield_load.hourly_cooling_load + ext_load.hourly_cooling_load, load.hourly_cooling_load)
+    assert np.allclose(borefield_load.hourly_dhw_load + ext_load.hourly_dhw_load, load.hourly_dhw_load)
+
+    load = HourlyBuildingLoadMultiYear(load.hourly_heating_load_simulation_period,
+                                       load.hourly_cooling_load_simulation_period)

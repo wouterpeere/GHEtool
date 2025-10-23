@@ -12,19 +12,20 @@ import pandas as pd
 import pygfunction as gt
 
 from GHEtool import Borefield, FOLDER
-from GHEtool.VariableClasses import FluidData, GroundConstantTemperature, DoubleUTube
+from GHEtool.VariableClasses import ConstantFluidData, ConstantFlowRate, GroundConstantTemperature, DoubleUTube
 
 
 def validate():
     # initiate parameters
-    ground_data = GroundConstantTemperature(3, 10)  # ground data with an inaccurate guess of 100m for the depth of the borefield
-    borefield_gt = gt.boreholes.rectangle_field(10, 12, 6, 6, 100, 1, 0.075)
+    ground_data = GroundConstantTemperature(3,
+                                            10)  # ground data with an inaccurate guess of 100m for the borehole length
+    borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 100, 1, 0.075)
     pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05, epsilon=1e-6)
 
     # initiate borefield model
     borefield = Borefield()
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.ground_data = ground_data
+    borefield.pipe_data = pipe_data
     borefield.set_borefield(borefield_gt)
     borefield.Rb = 0.12
 
@@ -40,12 +41,13 @@ def validate():
 
     # calculate effective borehole thermal resistance (Rb*)
     for mfr in mfr_range:
-        fluid_data = FluidData(mfr, 0.568, 998, 4180, 1e-3)
-        borefield.set_fluid_parameters(fluid_data)
+        fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
+        flow_data = ConstantFlowRate(mfr=mfr)
+        borefield.fluid_data = fluid_data
+        borefield.flow_data = flow_data
         Rb.append(borefield.Rb)
         R_p.append(borefield.borehole.pipe_data.R_p)
         R_fp.append(borefield.borehole.pipe_data.R_f)
-
 
     # make figure
     plt.figure()
@@ -57,7 +59,7 @@ def validate():
     plt.legend()
 
     plt.figure()
-    plt.plot(mfr_range, (R_fp - data_EED["R_fp"])/data_EED["R_fp"]*100, 'bo')
+    plt.plot(mfr_range, (R_fp - data_EED["R_fp"]) / data_EED["R_fp"] * 100, 'bo')
     plt.xlabel("Mass flow rate per borehole l/s")
     plt.ylabel("Difference in fluid-pipe resistance %")
     plt.title("Comparison R_fp from GHEtool with EED (relative)")
@@ -71,7 +73,7 @@ def validate():
     plt.legend()
 
     plt.figure()
-    plt.plot(mfr_range, (Rb - data_EED["Rb*"])/data_EED["Rb*"]*100, 'bo')
+    plt.plot(mfr_range, (Rb - data_EED["Rb*"]) / data_EED["Rb*"] * 100, 'bo')
     plt.xlabel("Mass flow rate per borehole l/s")
     plt.ylabel("Difference in effective borehole thermal resistance %")
     plt.title("Comparison Rb* from GHEtool with EED (relative)")
@@ -79,5 +81,5 @@ def validate():
     plt.show()
 
 
-if __name__ == '__main__':   # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     validate()

@@ -4,7 +4,6 @@ as was documented here: https://github.com/MassimoCimmino/pygfunction/issues/269
 Note that this is a temporary solution, until issue #44 of pygfunction is solved.
 """
 
-
 import pygfunction as gt
 import numpy as np
 
@@ -18,6 +17,7 @@ from scipy.special import j0, j1, y0, y1
 
 from scipy.interpolate import interp1d as interp1d
 from time import perf_counter
+
 
 # update pygfunction
 def cylindrical_heat_source(
@@ -65,11 +65,11 @@ def cylindrical_heat_source(
     #     CHS_integrand = ( 1. / (u**2 * np.pi**2) * (np.exp(-u**2 * Fo) - 1.0)
     #         / (j1(u)**2 + y1(u)**2) * (j0(p * u) * y1(u) - j1(u) * y0(p * u)) )
     #     return CHS_integrand
-    CHS_integrand = lambda u: ( 1. / (u**2 * np.pi**2) * (np.exp(-u**2 * Fo) - 1.0)
-        / (j1(u)**2 + y1(u)**2) * (j0(p * u) * y1(u) - j1(u) * y0(p * u)) )
+    CHS_integrand = lambda u: (1. / (u ** 2 * np.pi ** 2) * (np.exp(-u ** 2 * Fo) - 1.0)
+                               / (j1(u) ** 2 + y1(u) ** 2) * (j0(p * u) * y1(u) - j1(u) * y0(p * u)))
 
     # Fourier number
-    Fo = alpha * time / r_b**2
+    Fo = alpha * time / r_b ** 2
     # Normalized distance from borehole axis
     p = r / r_b
     # Lower bound of integration
@@ -111,21 +111,24 @@ def infinite_line_source(
     >>> G = gt.heat_transfer.infinite_line_source(4*168*3600., 1.0e-6, 0.1, b)
     I =
     """
-    I = gt.utilities.exp1(r**2 / (4 * alpha * time))
+    I = gt.utilities.exp1(r ** 2 / (4 * alpha * time))
 
     return I
+
 
 def thermal_response_factors(self, time, alpha, kind='linear'):
     """
     Evaluate the segment-to-segment thermal response factors for all pairs
     of segments in the borefield at all time steps using the finite line
     source solution.
+
     This method returns a scipy.interpolate.interp1d object of the matrix
     of thermal response factors, containing a copy of the matrix accessible
     by h_ij.y[:nSources,:nSources,:nt+1]. The first index along the
     third axis corresponds to time t=0. The interp1d object can be used to
     obtain thermal response factors at any intermediate time by
     h_ij(t)[:nSources,:nSources].
+
     Parameters
     ----------
     time : float or array
@@ -136,11 +139,13 @@ def thermal_response_factors(self, time, alpha, kind='linear'):
         Interpolation method used for segment-to-segment thermal response
         factors. See documentation for scipy.interpolate.interp1d.
         Default is linear.
+
     Returns
     -------
     h_ij : interp1d
         interp1d object (scipy.interpolate) of the matrix of
         segment-to-segment thermal response factors.
+
     """
     if self.disp:
         print('Calculating segment to segment response factors ...',
@@ -151,8 +156,9 @@ def thermal_response_factors(self, time, alpha, kind='linear'):
     # Initialize chrono
     tic = perf_counter()
     # Initialize segment-to-segment response factors
-    h_ij = np.zeros((self.nSources, self.nSources, nt+1), dtype=self.dtype)
+    h_ij = np.zeros((self.nSources, self.nSources, nt + 1), dtype=self.dtype)
     segment_lengths = self.segment_lengths()
+
     # ---------------------------------------------------------------------
     # Segment-to-segment thermal response factors for borehole-to-borehole
     # thermal interactions
@@ -180,7 +186,8 @@ def thermal_response_factors(self, time, alpha, kind='linear'):
             h_ij[j_segment, i_segment, 1:] = h[k, k_pair, :]
             if not i == j:
                 h_ij[i_segment, j_segment, 1:] = (h[k, k_pair, :].T \
-                    * segment_lengths[j_segment]/segment_lengths[i_segment]).T
+                                                  * segment_lengths[j_segment] / segment_lengths[i_segment]).T
+
     # ---------------------------------------------------------------------
     # Segment-to-segment thermal response factors for same-borehole thermal
     # interactions
@@ -213,24 +220,29 @@ def thermal_response_factors(self, time, alpha, kind='linear'):
 
             if self.cylindrical_correction:
                 r_b = self.boreholes[i].r_b
-                ii_segment = j_segment[j_segment==i_segment]
+                ii_segment = j_segment[j_segment == i_segment]
                 h_ils = infinite_line_source(time, alpha, dis)
                 h_chs = cylindrical_heat_source(time, alpha, r_b, r_b)
                 h_ij[ii_segment, ii_segment, 1:] = (
-                    h_ij[ii_segment, ii_segment, 1:] + 2 * np.pi * h_chs - 0.5 * h_ils)
+                        h_ij[ii_segment, ii_segment, 1:] + 2 * np.pi * h_chs - 0.5 * h_ils)
+
     # Return 2d array if time is a scalar
     if np.isscalar(time):
-        h_ij = h_ij[:,:,1]
+        h_ij = h_ij[:, :, 1]
+
     # Interp1d object for thermal response factors
     h_ij = interp1d(np.hstack((0., time)), h_ij,
                     kind=kind, copy=True, axis=2)
     toc = perf_counter()
     if self.disp: print(f' {toc - tic:.3f} sec')
+
     return h_ij
+
 
 def solve(self, time, alpha):
     """
     Build and solve the system of equations.
+
     Parameters
     ----------
     time : float or array
@@ -407,12 +419,13 @@ def solve(self, time, alpha):
     if self.disp: print(f' {toc - tic:.3f} sec')
     return gFunc
 
+
 def __init__(self, boreholes, network, time, boundary_condition,
+             m_flow_borehole=None, m_flow_network=None, cp_f=None,
              nSegments=8, segment_ratios=gt.utilities.segment_ratios,
              approximate_FLS=False, mQuad=11, nFLS=10,
-             linear_threshold=None, cylindrical_correction=False,
-             disp=False, profiles=False, kind='linear', dtype=np.double,
-             **other_options):
+             linear_threshold=None, disp=False, profiles=False,
+             kind='linear', dtype=np.double, cylindrical_correction=False, **other_options):
     self.boreholes = boreholes
     self.network = network
     # Convert time to a 1d array
@@ -430,7 +443,7 @@ def __init__(self, boreholes, network, time, boundary_condition,
     if isinstance(segment_ratios, np.ndarray):
         segment_ratios = [segment_ratios] * nBoreholes
     elif segment_ratios is None:
-        segment_ratios = [np.full(n, 1./n) for n in self.nBoreSegments]
+        segment_ratios = [np.full(n, 1. / n) for n in self.nBoreSegments]
     elif callable(segment_ratios):
         segment_ratios = [segment_ratios(n) for n in self.nBoreSegments]
     self.segment_ratios = segment_ratios
@@ -449,6 +462,20 @@ def __init__(self, boreholes, network, time, boundary_condition,
                         for i in range(nBoreholes)]
     self._i1Segments = [sum(self.nBoreSegments[0:(i + 1)])
                         for i in range(nBoreholes)]
+    self.nMassFlow = 0
+    self.m_flow_borehole = m_flow_borehole
+    if self.m_flow_borehole is not None:
+        if not self.m_flow_borehole.ndim == 1:
+            self.nMassFlow = np.size(self.m_flow_borehole, axis=0)
+        self.m_flow_borehole = np.atleast_2d(self.m_flow_borehole)
+        self.m_flow = self.m_flow_borehole
+    self.m_flow_network = m_flow_network
+    if self.m_flow_network is not None:
+        if not isinstance(self.m_flow_network, (np.floating, float)):
+            self.nMassFlow = len(self.m_flow_network)
+        self.m_flow_network = np.atleast_1d(self.m_flow_network)
+        self.m_flow = self.m_flow_network
+    self.cp_f = cp_f
     self.approximate_FLS = approximate_FLS
     self.mQuad = mQuad
     self.nFLS = nFLS
@@ -460,6 +487,7 @@ def __init__(self, boreholes, network, time, boundary_condition,
     self._check_inputs()
     # Initialize the solver with solver-specific options
     self.nSources = self.initialize(**other_options)
+
     return
 
 def update_pygfunction() -> None:

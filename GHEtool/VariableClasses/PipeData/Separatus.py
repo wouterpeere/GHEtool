@@ -1,7 +1,9 @@
 import pygfunction as gt
+from math import pi
 
 from GHEtool.VariableClasses.PipeData.SingleUTube import SingleUTube
-from GHEtool.VariableClasses.FluidData import FluidData
+from GHEtool.VariableClasses.FluidData import _FluidData
+from GHEtool.VariableClasses.FlowData import _FlowData
 
 
 class Separatus(SingleUTube):
@@ -34,7 +36,7 @@ class Separatus(SingleUTube):
                          k_p=0.44,
                          D_s=36 / 2 * 0.001)
 
-    def pipe_model(self, fluid_data: FluidData, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
+    def pipe_model(self, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
         """
         This function returns the pipe model for the Separatus probe.
         A Separatus heat exchanger can be modelled by using the model of a single U tube, with an extra contact resistance
@@ -43,8 +45,6 @@ class Separatus(SingleUTube):
 
         Parameters
         ----------
-        fluid_data : FluidData
-            Fluid data
         k_s : float
             Ground thermal conductivity
         borehole : Borehole
@@ -54,13 +54,67 @@ class Separatus(SingleUTube):
         -------
         BasePipe
         """
-        single_u: gt.pipes._BasePipe = super().pipe_model(fluid_data, k_s, borehole)
+        single_u: gt.pipes._BasePipe = super().pipe_model(k_s, borehole)
 
         # add 0.03 W/(mK) as a contact resistance
         single_u.R_fp += 0.03
 
         return single_u
 
-    def __repr__(self):
-        return 'Separatus heat exchanger\n' \
-               f'\tGrout conductivity [W/(m·K)]: {self.k_g}'
+    def Re(self, fluid_data: _FluidData, flow_rate_data: _FlowData, **kwargs) -> float:
+        """
+        Reynolds number.
+        This model uses the hydraulic diameter of 25.51 mm.
+
+        Parameters
+        ----------
+        fluid_data: FluidData
+            Fluid data
+        flow_rate_data : FlowData
+            Flow rate data
+
+        Returns
+        -------
+        Reynolds number : float
+        """
+        u = flow_rate_data.mfr(fluid_data=fluid_data, **kwargs) / fluid_data.rho(**kwargs) / (705.27 * 1e-6)
+        return fluid_data.rho(**kwargs) * u * 0.02551 / fluid_data.mu(**kwargs)
+
+    def pressure_drop(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float,
+                      **kwargs) -> float:
+        """
+        Calculates the pressure drop across the entire borehole.
+        This model uses the hydraulic diameter of 25.51 mm.
+
+        Parameters
+        ----------
+        fluid_data: FluidData
+            Fluid data
+        flow_rate_data : FlowData
+            Flow rate data
+        borehole_length : float
+            Borehole length [m]
+
+        Returns
+        -------
+        Pressure drop : float
+            Pressure drop [kPa]
+        """
+
+        # Darcy fluid factor
+        fd = gt.pipes.fluid_friction_factor_circular_pipe(
+            flow_rate_data.mfr(fluid_data=fluid_data, **kwargs),
+            (0.02551 / 2),
+            fluid_data.mu(**kwargs),
+            fluid_data.rho(**kwargs),
+            self.epsilon)
+        A = 705.27 * 1e-6  # cross-sectional area of the separatus
+        V = (flow_rate_data.vfr(fluid_data=fluid_data, **kwargs) / 1000) / A
+
+        # add 0.2 for the local losses
+        # (source: https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html)
+        return ((fd * (borehole_length * 2) / 0.02551 + 0.2) * fluid_data.rho(**kwargs) * V ** 2 / 2) / 1000
+
+    def __export__(self):
+        return {'type': 'Separatus',
+                'k_g [W/(m·K)]': self.k_g}
