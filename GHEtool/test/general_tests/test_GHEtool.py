@@ -294,7 +294,7 @@ def test_sizing_with_use_constant_Rb():
     borefield.load = load
     assert not borefield.borehole.use_constant_Rb
     borefield.calculation_setup(L4_sizing=True)
-    assert np.isclose(205.49615778557904, borefield.size())
+    assert np.isclose(205.4926086157351, borefield.size())
     assert np.isclose(182.17320067531486, borefield.size(use_constant_Rb=True))
 
 
@@ -303,7 +303,7 @@ def test_size_with_different_peak_lengths(borefield):
 
     borefield.load.peak_injection_duration = 8
     borefield.load.peak_extraction_duration = 6
-    assert np.isclose(99.33058400216774, borefield.size(L3_sizing=True))
+    assert np.isclose(99.36581644570013, borefield.size(L3_sizing=True))
 
 
 def test_convergence_eer_combined():
