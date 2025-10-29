@@ -18,6 +18,7 @@ from GHEtool.Validation.cases import load_case
 from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad, EERCombined, \
     HourlyBuildingLoad, EER, HourlyBuildingLoadMultiYear
 from GHEtool.Methods import *
+from GHEtool import *
 
 data = GroundConstantTemperature(3, 10)
 data_ground_flux = GroundFluxTemperature(3, 10)
@@ -468,3 +469,31 @@ def test_optimise_methods_different_start_year_dhw():
 
     load = HourlyBuildingLoadMultiYear(load.hourly_heating_load_simulation_period,
                                        load.hourly_cooling_load_simulation_period)
+
+
+def test_case_issue_390():
+    ground_data = GroundFluxTemperature(1.57, 9.6, flux=0.07)
+    fluid = TemperatureDependentFluidData('MPG', 25, False)
+    flow = ConstantFlowRate(mfr=0.3)
+    pipe = SingleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+
+    borehole = Borehole(fluid, pipe, flow)
+
+    peak_cooling = [0, 0, 0, 0, 6.225, 11.339999999999998, 15, 14.639999999999999, 8.235, 0, 0, 0]
+    peak_heating = [31.3, 31.0183, 25.102600000000002, 17.7158, 8.2632, 0, 0, 0, 2.0658, 11.5184, 21.8474, 29.2342]
+    baseload_cooling = [0, 0, 0, 0, 1232, 2255, 2970, 2904, 1639, 0, 0, 0]
+    baseload_heating = [11017.6, 10892.4, 8826.6, 6260, 2817, 0, 0, 0, 751.1999999999999, 4069, 7699.8, 10266.4]
+
+    load = MonthlyBuildingLoadAbsolute(baseload_heating, baseload_cooling, peak_heating, peak_cooling, dhw=5000,
+                                       efficiency_dhw=3, efficiency_cooling=20, simulation_period=25)
+
+    borefield = Borefield(ground_data=ground_data, load=load)
+
+    borefield.create_rectangular_borefield(4, 4, 6, 6, 100, 1, 0.07)
+
+    borefield.set_min_avg_fluid_temperature(0)
+    borefield.set_max_avg_fluid_temperature(17)
+
+    borefield.borehole = borehole
+    borefield.size_L3()
+    assert borefield.H == 86.4119598683636
