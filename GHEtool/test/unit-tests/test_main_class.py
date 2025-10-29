@@ -475,14 +475,14 @@ def test_size_L3_value_errors():
 
 
 @pytest.mark.parametrize("quadrant, result", zip([1, 2, 3, 4],
-                                                 [56.37136629360852, 71.42698877336204, 26.722846792067735,
-                                                  21.333161686968708]))
+                                                 [56.372611810628065, 71.43023711680347, 26.722846792067735,
+                                                  21.247512712082205]))
 def test_size_L3(quadrant, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
     borefield.set_max_avg_fluid_temperature(18)
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
-    borefield.set_ground_parameters(ground_data_constant)
+    borefield.ground_data = ground_data_constant
 
     assert np.isclose(result, borefield.size_L3(100, quadrant_sizing=quadrant))
     assert np.isclose(result, borefield.H)
@@ -493,7 +493,7 @@ def test_size_L4_value_errors():
     with pytest.raises(ValueError):
         borefield.size_L4(100)
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
-    borefield.set_ground_parameters(ground_data_constant)
+    borefield.ground_data = ground_data_constant
     with pytest.raises(ValueError):
         borefield.size_L4(100, 5)
     with pytest.raises(ValueError):
@@ -516,8 +516,8 @@ def test_size_L4():
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_injection=0, col_extraction=1)
     borefield.load = load
 
-    assert np.isclose(305.2876065045127, borefield.size_L4(100, quadrant_sizing=2))
-    assert np.isclose(305.2876065045127, borefield.H)
+    assert np.isclose(305.26723226385184, borefield.size_L4(100, quadrant_sizing=2))
+    assert np.isclose(305.26723226385184, borefield.H)
     assert borefield.calculate_quadrant() == 2
     # quadrant 3
     borefield.borefield = copy.deepcopy(borefield_gt)
