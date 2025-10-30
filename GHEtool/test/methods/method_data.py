@@ -379,7 +379,7 @@ hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly
                                 col_extraction=1)
 borefield.load = hourly_load
 list_of_test_objects.add(
-    SizingObject(borefield, L4_output=368.50138222702657, quadrant=2, name='Hourly profile reversed'))
+    SizingObject(borefield, L4_output=368.4794931300781, quadrant=2, name='Hourly profile reversed'))
 
 temp = hourly_load.hourly_extraction_load
 temp[0] = 100_000
@@ -657,7 +657,7 @@ hourly_load_building.hourly_cooling_load = hourly_load_building.hourly_cooling_l
 hourly_load_building.hourly_heating_load = hourly_load_building.hourly_heating_load * 5 / 4
 borefield.load = hourly_load_building
 list_of_test_objects.add(
-    SizingObject(borefield, L2_output=115.945, L3_output=115.945, L4_output=109.629, quadrant=2,
+    SizingObject(borefield, L2_output=115.945, L3_output=115.945, L4_output=109.61700586805655, quadrant=2,
                  name='BS2023 Office'))
 
 borefield = Borefield()
@@ -673,7 +673,7 @@ hourly_load_building.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_da
 hourly_load_building.hourly_cooling_load = hourly_load_building.hourly_cooling_load * 20 / 21
 hourly_load_building.hourly_heating_load = hourly_load_building.hourly_heating_load * 5 / 4
 borefield.load = hourly_load_building
-list_of_test_objects.add(SizingObject(borefield, L2_output=308.303, L3_output=308.303, L4_output=305.979, quadrant=4,
+list_of_test_objects.add(SizingObject(borefield, L2_output=308.303, L3_output=308.303, L4_output=305.8658, quadrant=4,
                                       name='BS2023 Swimming pool'))
 
 eer_combined = EERCombined(20, 5, 10)

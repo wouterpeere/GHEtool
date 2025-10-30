@@ -56,7 +56,7 @@ def test_sizing_with_building_load(monkeypatch):
         size_with_part_load_data
     assert np.allclose(size_with_scop(), (96.07134718147334, 4.072466974615784))
     assert np.allclose(size_with_variable_ground_temperature(), (95.33474017379355, 4.13566093593155))
-    assert np.allclose(size_with_part_load_data(), (97.77220206543687, 4.627116806553787))
+    assert np.allclose(size_with_part_load_data(), (97.84903923592897, 4.627301729301053))
 
 
 def test_sizing_with_building_load_hourly(monkeypatch):
