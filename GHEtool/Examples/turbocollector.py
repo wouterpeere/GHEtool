@@ -55,7 +55,7 @@ def create_graphs():
         plt.plot(flow_rates, list_rb_double_smooth, label="Double smooth")
 
         plt.title(f'Borehole thermal resistance for {fluid._name}')
-        plt.ylabel('Effective borehole thermal resistance [W/(mK)]')
+        plt.ylabel('Effective borehole thermal resistance [mK/W]')
         plt.xlabel('Flow rate [l/s]')
         plt.legend()
         plt.figure()

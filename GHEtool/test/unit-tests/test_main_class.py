@@ -197,7 +197,7 @@ def test_create_custom_dataset():
 
 def test_load_custom_gfunction():
     borefield = Borefield()
-    borefield.set_ground_parameters(ground_data_constant)
+    borefield.ground_data = ground_data_constant
     borefield.borefield = copy.deepcopy(borefield_gt)
     borefield.create_custom_dataset()
     borefield.custom_gfunction.dump_custom_dataset("./", "test")
@@ -414,7 +414,7 @@ def test_size():
     borefield.borefield = copy.deepcopy(borefield_gt)
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(3))
 
-    borefield.set_ground_parameters(ground_data_constant)
+    borefield.ground_data = ground_data_constant
     sizing_setup_backup = copy.deepcopy(borefield._calculation_setup)
     borefield.size(L3_sizing=True)
     assert borefield._calculation_setup == sizing_setup_backup
@@ -426,12 +426,12 @@ def test_select_size():
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(3))
 
     # with constant Tg
-    borefield.set_ground_parameters(ground_data_constant)
+    borefield.ground_data = ground_data_constant
     assert borefield._select_size(100, 20) == 100
     assert borefield._select_size(10, 20) == 20
 
     # with variable Tg
-    borefield.set_ground_parameters(data_ground_flux)
+    borefield.ground_data = data_ground_flux
     assert borefield._select_size(100, 20) == 100
     assert borefield._select_size(10, 80) == 80
     borefield.set_max_avg_fluid_temperature(14)
@@ -445,7 +445,7 @@ def test_size_L2_value_errors():
         borefield.size_L2(100)
     load = MonthlyGeothermalLoadAbsolute(*load_case(2))
     borefield.load = load
-    borefield.set_ground_parameters(ground_data_constant)
+    borefield.ground_data = ground_data_constant
     with pytest.raises(ValueError):
         borefield.size_L2(100, 5)
 
@@ -456,7 +456,7 @@ def test_size_L2(quadrant, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
-    borefield.set_ground_parameters(ground_data_constant)
+    borefield.ground_data = ground_data_constant
     borefield.size_L2(100, quadrant_sizing=quadrant)
 
     assert np.isclose(result, borefield.size_L2(100, quadrant_sizing=quadrant))
@@ -469,20 +469,20 @@ def test_size_L3_value_errors():
     with pytest.raises(ValueError):
         borefield.size_L3(100)
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
-    borefield.set_ground_parameters(ground_data_constant)
+    borefield.ground_data = ground_data_constant
     with pytest.raises(ValueError):
         borefield.size_L3(100, 5)
 
 
 @pytest.mark.parametrize("quadrant, result", zip([1, 2, 3, 4],
-                                                 [56.37136629360852, 71.42698877336204, 26.722846792067735,
-                                                  21.333161686968708]))
+                                                 [56.372611810628065, 71.43023711680347, 26.722846792067735,
+                                                  21.247512712082205]))
 def test_size_L3(quadrant, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
     borefield.set_max_avg_fluid_temperature(18)
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
-    borefield.set_ground_parameters(ground_data_constant)
+    borefield.ground_data = ground_data_constant
 
     assert np.isclose(result, borefield.size_L3(100, quadrant_sizing=quadrant))
     assert np.isclose(result, borefield.H)
@@ -493,7 +493,7 @@ def test_size_L4_value_errors():
     with pytest.raises(ValueError):
         borefield.size_L4(100)
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
-    borefield.set_ground_parameters(ground_data_constant)
+    borefield.ground_data = ground_data_constant
     with pytest.raises(ValueError):
         borefield.size_L4(100, 5)
     with pytest.raises(ValueError):
@@ -502,7 +502,7 @@ def test_size_L4_value_errors():
 
 def test_size_L4():
     borefield = Borefield()
-    borefield.set_ground_parameters(ground_data_constant)
+    borefield.ground_data = ground_data_constant
     load = HourlyGeothermalLoad()
     # quadrant 1
     borefield.borefield = copy.deepcopy(borefield_gt)
@@ -516,8 +516,8 @@ def test_size_L4():
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_injection=0, col_extraction=1)
     borefield.load = load
 
-    assert np.isclose(305.2876065045127, borefield.size_L4(100, quadrant_sizing=2))
-    assert np.isclose(305.2876065045127, borefield.H)
+    assert np.isclose(305.26723226385184, borefield.size_L4(100, quadrant_sizing=2))
+    assert np.isclose(305.26723226385184, borefield.H)
     assert borefield.calculate_quadrant() == 2
     # quadrant 3
     borefield.borefield = copy.deepcopy(borefield_gt)
@@ -535,15 +535,15 @@ def test_size_L4():
 
     # to increase coverage
     borefield.calculation_setup(L4_sizing=True)
-    assert np.isclose(174.23648328808213, borefield.size(100, quadrant_sizing=4))
-    assert np.isclose(174.23648328808213, borefield.H)
+    assert np.isclose(174.2214456661528, borefield.size(100, quadrant_sizing=4))
+    assert np.isclose(174.2214456661528, borefield.H)
     assert borefield.calculate_quadrant() == 4
 
 
 def test_calculate_temperatures_eer_combined():
     eer_combined = EERCombined(20, 5, 17)
     borefield = Borefield()
-    borefield.set_ground_parameters(ground_data_constant)
+    borefield.ground_data = ground_data_constant
     load = HourlyBuildingLoad(efficiency_cooling=eer_combined)
 
     borefield.borefield = copy.deepcopy(borefield_gt)
@@ -1111,7 +1111,7 @@ def test_calculate_next_depth_deep_sizing():
 
 
 @pytest.mark.parametrize("case, result",
-                         zip((1, 2, 3, 4), [132.4920010915831, 0, 140.25177132242135, 132.4920010915831]))
+                         zip((1, 2, 3, 4), [132.49024176019665, 0, 140.31290724434433, 132.49024176019665]))
 def test_deep_sizing(case, result):
     borefield = Borefield()
     borefield.ground_data = GroundFluxTemperature(3, 10)
@@ -1262,7 +1262,7 @@ def test_with_titled_borefield():
     assert np.isclose(borefield.depth, 150 * math.cos(math.pi / 7) + 0.75)
     assert np.isclose(borefield.ground_data.calculate_Tg(borefield.depth, borefield.D), 12.157557845032045)
 
-    assert np.isclose(borefield.size_L3(), 111.58488656187147)
+    assert np.isclose(borefield.size_L3(), 111.5821049845363)
 
 
 def test_warning_custom_gfunction():

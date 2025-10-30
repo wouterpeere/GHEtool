@@ -1,5 +1,5 @@
 """
-This document contains all the code to run create the figures of (Peere W., 2023).
+This document contains all the code to create the figures of (Peere W., 2023).
 The code is created and should be work with GHEtool v2.2.0. Further compatibility is not guaranteed.
 """
 

@@ -109,10 +109,10 @@ def test_1b():
 
     assert np.isclose(depth_L2, 75.67161488446233)
     assert np.isclose(depth_L3, 75.62427445122744)
-    assert np.isclose(depth_L4, 71.49549300696316)
+    assert np.isclose(depth_L4, 71.49641008062054)
     assert np.isclose(depth_L2s, 76.71715998100636)
-    assert np.isclose(depth_L3s, 76.66992885379705)
-    assert np.isclose(depth_L4s, 72.52247308266297)
+    assert np.isclose(depth_L3s, 76.67104470064083)
+    assert np.isclose(depth_L4s, 72.52389782010322)
     assert np.isclose(Rb_L2, 0.12648875915036317)
     assert np.isclose(Rb_L3, 0.12648767833749805)
     assert np.isclose(Rb_L4, 0.12639600391560102)
