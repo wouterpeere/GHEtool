@@ -109,11 +109,18 @@ class GFunction:
         self.fifo_list: FIFO = FIFO(8)
 
         # initiate ANN
-        self.normalize_vec = np.array((1 / 20, 1 / 20, 1 / 9, 1 / 9, 1 / 1000, 1 / 100, 1 / 0.4, 1 / (10 ** -6), 1 / 6))
+        self.normalize_vec = np.array((1 / 20, 1 / 20, 1 / 9, 1 / 9, 1 / 1000, 1 / 100, 1 / 0.4, 1 / (10 ** -6)))
         from GHEtool import FOLDER
-        self.model_weights = [
-            pd.read_csv(FOLDER.joinpath(f"VariableClasses/Gfunctions/ANN layers/layer_{i}_weights_diff_fields_big.csv"),
-                        sep=";").values for i in range(6)]
+        self.model_weights: dict[int, list[NDArray[np.float64]]] = {
+            i: [
+                pd.read_csv(
+                    FOLDER.joinpath(f"VariableClasses/Gfunctions/ANN layers/ai_model_shape_{i}_weight_{j}.csv"),
+                    sep=","
+                ).to_numpy()
+                for j in range(8)
+            ]
+            for i in range(5)
+        }
 
     @property
     def store_previous_values(self) -> bool:
@@ -222,8 +229,8 @@ class GFunction:
                 warnings.warn("alpha outside ANN limits!")
             if not (0 <= borefield_description["type"] < 6):
                 warnings.warn("r_b outside ANN limits!")
-            input_data = np.array([n_x, n_y, b_x, b_y, H, D, r_b, alpha, borefield_description["type"]])
-            res = calc_network_using_numpy(input_data, self.model_weights, self.normalize_vec)
+            input_data = np.array([n_x, n_y, b_x, b_y, H, D, r_b, alpha])
+            res = calc_network_using_numpy(input_data, self.model_weights[borefield_description["type"]], self.normalize_vec)
             return res
 
         def gvalues(
@@ -738,10 +745,10 @@ class GFunction:
 
 
 def calc_network_using_numpy(input_data: NDArray[np.float64], model_weights: list[NDArray[np.float64]],
-                             normalize_vec: NDArray[np.float64]) -> NDArray[
-    np.float64]:
-    input_data = (input_data * normalize_vec).reshape(9, 1)
+                             normalize_vec: NDArray[np.float64]) -> NDArray[np.float64]:
+    input_data = (input_data * normalize_vec).reshape(8, 1)
     res = np.maximum(0, model_weights[0].T.dot(input_data) + model_weights[1])
     res = np.maximum(0, model_weights[2].T.dot(res) + model_weights[3])
     res = np.maximum(0, model_weights[4].T.dot(res) + model_weights[5])
+    res = np.maximum(0, model_weights[6].T.dot(res) + model_weights[7])
     return np.cumsum(res, axis=0).reshape(87)
