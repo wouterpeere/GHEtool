@@ -164,7 +164,7 @@ class _HourlyData(_LoadData, ABC):
 
         Returns
         -------
-        peak loads [kW], monthly average loads [kWh/month] : np.ndarray, np.ndarray
+        peak loads [kW], monthly energy demand [kWh/month] : np.ndarray, np.ndarray
         """
 
         data = np.array_split(hourly_load, np.cumsum(np.tile(self.UPM, int(len(hourly_load) / 8760)))[:-1])

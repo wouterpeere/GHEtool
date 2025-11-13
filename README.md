@@ -24,7 +24,8 @@ website [https://GHEtool.eu](https://GHEtool.eu) for more information.
 
 ### Read The Docs
 
-GHEtool has an elaborate documentation were all the functionalities of the tool are explained, with examples, literature
+GHEtool has an elaborate documentation where all the functionalities of the tool are explained, with examples,
+literature
 and validation. This can be found
 on [https://ghetool.readthedocs.io/en/latest/](https://ghetool.readthedocs.io/en/latest/).
 
@@ -136,12 +137,11 @@ All attributes (ground properties, load data ...) are set inside the borefield o
 
 Within GHEtool, there are multiple ways of setting the ground data. Currently, your options are:
 
-* _GroundConstantTemperature_: if you want to model your borefield with a constant, know ground temperature.
+* _GroundConstantTemperature_: if you want to model your borefield with a constant, known ground temperature.
 * _GroundFluxTemperature_: if you want to model your ground with a varying ground temperature due to a constant
   geothermal heat flux.
 * _GroundTemperatureGradient_: if you want to model your ground with a varying ground temperature due to a geothermal
   gradient.
-
 * You can also use multiple ground layers to define your ground model. Please take a look
   at [our example](https://ghetool.readthedocs.io/en/latest/sources/code/Examples/start_in_different_month.html).
 
@@ -157,10 +157,17 @@ Concretely, the classes you can use are:
 * _Single U-tubes (special case of multiple U-tubes)_
 * _Double U-tubes (special case of multiple U-tubes)_
 * _Coaxial pipe_
+* _Conical pipe_ (like the GEROtherm VARIO and FLUX probes from
+  HakaGerodur ([learn more]('https://www.hakagerodur.ch/de/gerotherm-vario/')))
 * _Separatus tube_: The Separatus geothermal heat exchanger is an innovation in the geothermal domain. It consists of a
   single, DN50 pipe with a unique 'splitpipe'-technology that separates the cold and the hot side of the fluid. For
-  design purposes, it is advised to use this with rather small borehole diameters of DN90. For more information visit
-  the [Separatus website]('https://separatus.ch/en/').
+  design purposes, it is advised to use this with rather small borehole diameters of DN90. For more information, visit
+  the [separatus website](https://separatus.ch/en/). An example in GHEtool can be
+  found [here](https://ghetool.readthedocs.io/en/latest/sources/code/Examples/separatus.html).
+* _Turbocollector_: The Turbocollector from Muovitech has internal fins which enhances the turbulent flow character
+  at lower flow rates. Visit their website for more
+  information [turbocollector website](https://www.muovitech.com/group/?page=turbo). An example in GHEtool can be
+  found [here](https://ghetool.readthedocs.io/en/latest/sources/code/Examples/turbocollector.html).
 
 Please note that it is possible to add your own pipe types by inheriting the attributes from the abstract _PipeData
 class.
@@ -170,7 +177,8 @@ class.
 You can set the fluid data by using the FluidData class.
 
 * _ConstantFluidData_: Temperature independent fluid properties
-* _TemperatureDependentFluidData_: Temperature dependent fluid data (Water, MPG, MEG, MMA, MEA)
+* _TemperatureDependentFluidData_: Temperature dependent fluid data (Water, MPG, MEG, MMA, MEA, Thermox DTX, Coolflow
+  NTP, Kilfrost GEO or Kilfrost GEO Plus)
 
 #### Flow rate data
 
@@ -203,7 +211,7 @@ when it comes to choosing the right load data class.
 
 Depending on your answer on these three questions, you can opt for one of eight different load classes:
 
-* _MonthlyGeothermalLoadAbsolute_: You can set one the monthly baseload and peak load for extraction and injection for
+* _MonthlyGeothermalLoadAbsolute_: You can set the monthly baseload and peak load for extraction and injection for
   one standard year which will be used for all years within the simulation period.
 * _HourlyGeothermalLoad_: You can set (or load) the hourly extraction and injection load of a standard year which will
   be used for all years within the simulation period.
@@ -211,7 +219,7 @@ Depending on your answer on these three questions, you can opt for one of eight 
   i.e. for the whole simulation period).
 * _MonthlyGeothermalLoadMultiYear_: You can set the monthly extraction and injection load for multiple years (i.e. for
   the whole simulation period).
-* _MonthlyBuildingLoadAbsolute_: You can set one the monthly baseload and peak load for heating and cooling for
+* _MonthlyBuildingLoadAbsolute_: You can set the monthly baseload and peak load for heating and cooling for
   one standard year which will be used for all years within the simulation period.
 * _HourlyBuildingLoad_: You can set (or load) the hourly heating and cooling load of a standard year which will
   be used for all years within the simulation period.
@@ -260,15 +268,15 @@ constant ground temperature (e.g. from a TRT-test),
 and we will provide the load with a monthly resolution.
 
 ```Python
-from GHEtool import Borefield, GroundDataConstantTemperature, MonthlyGeothermalLoadAbsolute
+from GHEtool import Borefield, GroundConstantTemperature, MonthlyGeothermalLoadAbsolute
 ```
 
 After importing the necessary classes, the relevant ground data parameters are set.
 
 ```Python
-data = GroundDataConstantTemperature(3,  # ground thermal conductivity (W/mK)
-                                     10,  # initial/undisturbed ground temperature (deg C)
-                                     2.4 * 10 ** 6)  # volumetric heat capacity of the ground (J/m3K) 
+data = GroundConstantTemperature(3,  # ground thermal conductivity (W/mK)
+                                 10,  # initial/undisturbed ground temperature (deg C)
+                                 2.4 * 10 ** 6)  # volumetric heat capacity of the ground (J/m3K) 
 ```
 
 Furthermore, for our loads, we need to set the peak loads as well as the monthly base loads for extraction and
@@ -290,7 +298,7 @@ load = MonthlyGeothermalLoadAbsolute(monthly_load_extraction, monthly_load_injec
 
 Next, we create the borefield object in GHEtool and set the temperature constraints and the ground data.
 Here, since we do not use a pipe and fluid model (
-see [Examples](https://ghetool.readthedocs.io/en/stable/sources/code/examples.html) if you need examples were no
+see [Examples](https://ghetool.readthedocs.io/en/stable/sources/code/examples.html) if you need examples where no
 borehole thermal resistance is given),
 we set the borehole equivalent thermal resistance.
 
@@ -377,6 +385,8 @@ at [https://ghetool.readthedocs.io/en/latest/](https://ghetool.readthedocs.io/en
 
 ### Development of GHEtool
 
+Peere, W. (2025). Three ways to design a hybrid geothermal heating and cooling system for an office building. In _Proceedings of Geo-Rin Conference_. Benasque (Spain), 2-6 June 2025.
+
 Blanke T., Pfeiffer F., Göttsche J., Döring B. (2024) Artificial neural networks use for the design of geothermal probe
 fields. In Proceedings of BauSim Conference 2024:  10th Conference of IBPSA-Germany and Austria. Vienna (Austria), 23-26
 September 2024. https://doi.org/10.26868/29761662.2024.12
@@ -407,6 +417,8 @@ Department of Mechanical Engineering,
 KU Leuven, Belgium.
 
 ### Applications/Mentions of GHEtool
+
+Peere, W. (2025). Three ways to design a hybrid geothermal heating and cooling system for an office building. In _Proceedings of Geo-Rin Conference_. Benasque (Spain), 2-6 June 2025.
 
 Aitmad, M. (2025). Techno-Economic Analysis of using Ground-Source Heat Exchangers in Pakistan (Master thesis).
 

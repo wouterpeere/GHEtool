@@ -25,7 +25,7 @@ class HourlyBuildingLoad(_SingleYear, _HourlyDataBuilding):
                  simulation_period: int = 20,
                  efficiency_heating: Union[int, float, COP, SCOP] = 5,
                  efficiency_cooling: Union[int, float, EER, SEER, EERCombined] = 20,
-                 dhw: Union[float, np.ndarray] = None,
+                 dhw: Union[float, np.ndarray] = 0,
                  efficiency_dhw: Union[int, float, COP, SCOP] = 4):
         """
 
@@ -54,11 +54,12 @@ class HourlyBuildingLoad(_SingleYear, _HourlyDataBuilding):
         # initiate variables
         self._hourly_heating_load: np.ndarray = np.zeros(8760)
         self._hourly_cooling_load: np.ndarray = np.zeros(8760)
+        self._hourly_dhw_load: np.ndarray = np.zeros(8760)
 
         # set variables
-        self.hourly_heating_load: np.ndarray = np.zeros(8760) if heating_load is None else np.array(
-            heating_load)
+        self.hourly_heating_load: np.ndarray = np.zeros(8760) if heating_load is None else np.array(heating_load)
         self.hourly_cooling_load: np.ndarray = np.zeros(8760) if cooling_load is None else np.array(cooling_load)
+        self.hourly_dhw_load: np.ndarray = np.zeros(8760)
 
     @property
     def hourly_heating_load(self) -> np.ndarray:
@@ -118,6 +119,43 @@ class HourlyBuildingLoad(_SingleYear, _HourlyDataBuilding):
         """
         self.hourly_heating_load = load
 
+    @property
+    def hourly_dhw_load(self) -> np.ndarray:
+        """
+        This function returns the hourly heating load in kWh/h including DHW.
+
+        Returns
+        -------
+        hourly heating : np.ndarray
+            Hourly heating values (incl. DHW) [kWh/h] for one year, so the length of the array is 8760
+        """
+        return self.correct_for_start_month(self._hourly_dhw_load)
+
+    @hourly_dhw_load.setter
+    def hourly_dhw_load(self, load: ArrayLike):
+        """
+        This function sets the hourly dhw load [kWh/h] after it has been checked.
+
+        Parameters
+        ----------
+        load : np.ndarray, list or tuple
+            Hourly dhw [kWh/h]
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            When either the length is not 8760, the input is not of the correct type, or it contains negative
+            values
+        """
+        if self._check_input(load):
+            self._hourly_dhw_load = load
+            return
+        raise ValueError
+
     def set_hourly_dhw_load(self, load: ArrayLike) -> None:
         """
         This function sets the hourly domestic hot water load [kWh/h] after it has been checked.
@@ -137,7 +175,36 @@ class HourlyBuildingLoad(_SingleYear, _HourlyDataBuilding):
             When either the length is not 8760, the input is not of the correct type, or it contains negative
             values
         """
-        self.dhw = load
+        self.hourly_dhw_load = load
+
+    @property
+    def dhw(self) -> np.ndarray:
+        """
+        This function returns the hourly DHW load in kWh/h.
+
+        Returns
+        -------
+        hourly heating : np.ndarray
+            Hourly DHW values [kWh/h] for one year, so the length of the array is 8760
+        """
+        return self.hourly_dhw_load
+
+    @dhw.setter
+    def dhw(self, dhw: Union[float, np.ndarray]) -> None:
+        """
+        This function adds the domestic hot water (dhw).
+        An error is raised is the dhw is not positive.
+
+        Parameters
+        ----------
+        dhw : float, np.ndarray
+            Yearly value of array with energy demand for domestic hot water (DHW) [kWh]
+
+        Returns
+        -------
+        None
+        """
+        self._set_dhw(dhw)
 
     @property
     def hourly_cooling_load(self) -> np.ndarray:
@@ -231,13 +298,7 @@ class HourlyBuildingLoad(_SingleYear, _HourlyDataBuilding):
         hourly DHW : np.ndarray
             Hourly DHW values [kWh/h] for the whole simulation period
         """
-        dhw = self._dhw
-        if dhw is None:
-            dhw = 0.
-        if isinstance(dhw, (int, float)):
-            temp = dhw / 8760
-            return np.tile(temp, self.simulation_period * 8760)
-        return np.tile(dhw, self.simulation_period)
+        return np.tile(self.hourly_dhw_load, self.simulation_period)
 
     @property
     def _start_hour(self) -> int:

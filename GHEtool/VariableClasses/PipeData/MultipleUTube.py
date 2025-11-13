@@ -30,13 +30,13 @@ class MultipleUTube(_PipeData):
         Parameters
         ----------
         k_g : float
-            Grout thermal conductivity [W/mK]
+            Grout thermal conductivity [W/(mK)]
         r_in : float
             Inner pipe radius [m]
         r_out : float
             Outer pipe radius [m]
         k_p : float
-            Pipe thermal conductivity [W/mK]
+            Pipe thermal conductivity [W/(mK)]
         D_s : float
             Distance of the pipe until center [m]
         number_of_pipes : int
@@ -99,6 +99,7 @@ class MultipleUTube(_PipeData):
             flow_rate_data.mfr(fluid_data=fluid_data, **kwargs) / self.number_of_pipes,
             self.r_in, fluid_data.mu(**kwargs), fluid_data.rho(**kwargs),
             fluid_data.k_f(**kwargs), fluid_data.cp(**kwargs), self.epsilon)
+
         # Film thermal resistance [m.K/W]
         self.R_f = 1.0 / (h_f * 2 * np.pi * self.r_in)
 
@@ -140,7 +141,7 @@ class MultipleUTube(_PipeData):
         return fluid_data.rho(**kwargs) * u * self.r_in * 2 / fluid_data.mu(**kwargs)
 
     def pressure_drop(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float,
-                      **kwargs) -> float:
+                      include_bend: bool = True, **kwargs) -> float:
         """
         Calculates the pressure drop across the entire borehole.
         It assumed that the U-tubes are all connected in parallel.
@@ -153,6 +154,8 @@ class MultipleUTube(_PipeData):
             Flow rate data
         borehole_length : float
             Borehole length [m]
+        include_bend : bool
+            True if the losses in the bend should be included
 
         Returns
         -------
@@ -170,9 +173,12 @@ class MultipleUTube(_PipeData):
         A = pi * self.r_in ** 2
         V = (flow_rate_data.vfr(fluid_data=fluid_data, **kwargs) / 1000) / A / self.number_of_pipes
 
-        # add 0.2 for the local losses
-        # (source: https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html)
-        return ((fd * (borehole_length * 2) / (2 * self.r_in) + 0.2) * fluid_data.rho(**kwargs) * V ** 2 / 2) / 1000
+        bend = 0
+        if include_bend:
+            # add 0.2 for the local losses
+            # (source: https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html)
+            bend = 0.2
+        return ((fd * (borehole_length * 2) / (2 * self.r_in) + bend) * fluid_data.rho(**kwargs) * V ** 2 / 2) / 1000
 
     def draw_borehole_internal(self, r_b: float) -> None:
         """
@@ -206,8 +212,9 @@ class MultipleUTube(_PipeData):
         return {'type': 'U',
                 'nb_of_tubes': self.number_of_pipes,
                 'thickness [mm]': (self.r_out * 1000 - self.r_in * 1000),
-                'diameter [mm]': self.r_out * 2 * 100,
+                'diameter [mm]': self.r_out * 2 * 1000,
                 'spacing [mm]': math.sqrt(self.pos[0][0] ** 2 + self.pos[0][1] ** 2) * 1000,
                 'k_g [W/(m·K)]': self.k_g,
                 'k_p [W/(m·K)]': self.k_p,
-                'epsilon [mm]': self.epsilon * 1000}
+                'epsilon [mm]': self.epsilon * 1000
+                }

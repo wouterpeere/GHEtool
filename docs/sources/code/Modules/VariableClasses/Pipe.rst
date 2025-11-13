@@ -9,7 +9,10 @@ You can use:
 #. Single U-tubes (special case of multiple U-tubes)
 #. Double U-tubes (special case of multiple U-tubes)
 #. Coaxial pipe
+#. Conical pipe (https://www.hakagerodur.ch/de/gerotherm-vario/)
 #. Separatus pipe (https://separatus.ch/en)
+#. Turbocollector pipe (https://www.muovitech.com/group/?page=turbo)
+
 
 All of the classes above are children from the abstract _PipeData class.
 
@@ -34,6 +37,14 @@ All of the classes above are children from the abstract _PipeData class.
     :members:
     :show-inheritance:
 
+.. automodule:: GHEtool.VariableClasses.PipeData.ConicalPipe
+    :members:
+    :show-inheritance:
+
 .. automodule:: GHEtool.VariableClasses.PipeData.Separatus
+    :members:
+    :show-inheritance:
+
+.. automodule:: GHEtool.VariableClasses.PipeData.Turbocollector
     :members:
     :show-inheritance:

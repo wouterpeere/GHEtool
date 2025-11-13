@@ -5,18 +5,59 @@ our [project board](https://github.com/users/wouterpeere/projects/2) on GitHub.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [2.3.3] - Unpublished
+## [2.4.0] - Unpublished
+
+### Changed
+
+- Changed implementation of `optimise_for_energy` to make it three times faster (issue #308).
+- Add support for EPW files from PVGIS (issue #376).
+- Fix problem with start month in optimise for power/balance (issue #380).
+- Return multiyear external load if multiyear load is given as an input (issue #380).
+- Change how DHW is stored in the classes (issue #381).
+
+### Fixed
+
+- Problem in ConicalPipe class when working with vfr (issue #378).
+- Problem with start month DHW and optimisation (issue #378).
+
+## [2.3.4] - 2025-07-29
+
+### Added
+
+- Added Turbocollector from Muovitech.
+- Add flag in pressure drop calculation to in or exclude the pressure drop in the bend.
+- Added conical borehole heat exchangers (like the GEROtherm VARIO and FLUX probe from HakaGerodur).
+- Add Kilfrost GEO and Kilfrost GEO Plus as commercial fluids (#issue 343).
+- Add utility function to calculate resulting load for hybrid systems (#issue 367).
+
+### Fixed
+
+- Small bug in pressure drop lateral pipe.
+- Small bug in pressure drop calculation of separatus.
+- Suppress overflow warning in _LoadData.
+- Exclude_DHW_from_peak in optimisation methods (#issue 372).
+
+## [2.3.3] - 2025-05-28
 
 ### Added
 
 - Temperature dependent fluid properties (issue #143).
 - Freezing point to fluid data (issue #314).
+- Mass and volume percentage support(issue #350).
+- Add commercial fluids: Thermox DTX and Coolflow NTP from Hydratech.
 
 ### Changed
 
 - Changed back-end to be compatible with pygfunction 2.3.0 (issue #345).
 - The __repr__ of the different classes. It now returns a dictionary.
 - Remove ghe_logger since no longer used.
+- Make Re a property in borefield just like Rb.
+- Calculate Re and Rb at minimum temperature or, if there is no temperature, the Tf_min.
+- Hydraulic calculations of Separatus.
+
+### Fixed
+
+- Fix export multiple U pipes (issue #352).
 
 ## [2.3.2] - 2025-04-02
 
@@ -28,6 +69,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Pressure drop calculation for horizontal pipe and total system (issue #332).
 - Added optimisation function for balanced borefield (issue #335).
 - Min_temperature and Max_temperature property to results class (issue #335).
+- Add PressureDrop class (issue #358).
 
 ### Changed
 
@@ -414,6 +456,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 
 - fixed bug in interpolation
+
+[2.3.4]: https://github.com/wouterpeere/GHEtool/compare/v2.3.2...v2.3.4
+
+[2.3.3]: https://github.com/wouterpeere/GHEtool/compare/v2.3.2...v2.3.3
 
 [2.3.2]: https://github.com/wouterpeere/GHEtool/compare/v2.3.1...v2.3.2
 

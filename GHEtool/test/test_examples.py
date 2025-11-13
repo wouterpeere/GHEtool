@@ -97,3 +97,9 @@ def test_temperature_dependent_fluid_data(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     from GHEtool.Examples.temperature_dependent_fluid_data_sizing import size_with_temperature_dependence
     size_with_temperature_dependence()
+
+
+def test_trubocollector(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    from GHEtool.Examples.turbocollector import create_graphs
+    create_graphs()

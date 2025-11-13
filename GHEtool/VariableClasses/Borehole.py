@@ -296,7 +296,7 @@ class Borehole(BaseClass):
         borehole = gt.boreholes.Borehole(H, D, r_b, 0, 0)
 
         def calculate(**kwargs):
-            self.pipe_data.calculate_resistances(self.fluid_data, self.flow_data, **kwargs)
+            self.pipe_data.calculate_resistances(self.fluid_data, self.flow_data, borehole_length=H, **kwargs)
 
             # initiate pipe
             pipe = self.pipe_data.pipe_model(k_s if isinstance(k_s, (float, int)) else k_s(depth, D), borehole)

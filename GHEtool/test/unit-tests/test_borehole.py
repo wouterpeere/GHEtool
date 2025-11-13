@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from GHEtool import FluidData, DoubleUTube, SingleUTube, MultipleUTube, ConstantFluidData, ConstantFlowRate, \
-    TemperatureDependentFluidData
+    TemperatureDependentFluidData, ConicalPipe
 from GHEtool.VariableClasses import Borehole
 
 fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
@@ -98,6 +98,11 @@ def test_calculate_Rb():
         np.isclose(borehole.calculate_Rb(100, 1, 0.075, 3), 0.09483159131195469)
     assert np.isclose(borehole.calculate_Rb(100, 1, 0.075, 3, temperature=20), 0.13807578911314267)
 
+    borehole.fluid_data = TemperatureDependentFluidData('Thermox DTX', 25)
+    with pytest.raises(TypeError):
+        np.isclose(borehole.calculate_Rb(100, 1, 0.075, 3), 0.09483159131195469)
+    assert np.isclose(borehole.calculate_Rb(100, 1, 0.075, 3, temperature=20), 0.13513271096418708)
+
 
 def test_Rb():
     borehole = Borehole()
@@ -171,7 +176,7 @@ def test_repr_():
                       'mu [Pa·s]': 0.001,
                       'nu [m²/s]': 1.002004008016032e-06,
                       'rho [kg/m³]': 998},
-            'pipe': {'diameter [mm]': 4.0,
+            'pipe': {'diameter [mm]': 40,
                      'epsilon [mm]': 0.001,
                      'k_g [W/(m·K)]': 1,
                      'k_p [W/(m·K)]': 0.4,
@@ -232,10 +237,10 @@ def test_saved_data_reynolds():
     assert borehole._stored_interp_data == {'D': 1,
                                             'H': 100,
                                             'flow': "{'vfr [l/s]': 0.3}",
-                                            'fluid': "{'name': 'MPG', 'percentage': 25}",
+                                            'fluid': "{'name': 'MPG', 'percentage': 25, 'type': 'mass percentage'}",
                                             'k_s': 3,
                                             'pipe': "{'type': 'U', 'nb_of_tubes': 2, 'thickness [mm]': 5.0, 'diameter "
-                                                    "[mm]': 4.0, 'spacing [mm]': 50.0, 'k_g [W/(m·K)]': 1, 'k_p "
+                                                    "[mm]': 40.0, 'spacing [mm]': 50.0, 'k_g [W/(m·K)]': 1, 'k_p "
                                                     "[W/(m·K)]': 0.4, 'epsilon [mm]': 0.001}",
                                             'r_b': 0.075}
     resistance2 = borehole.calculate_Rb(110, 1, 0.075, 3, temperature=np.array([0, 1, 2, 5]))
@@ -243,10 +248,37 @@ def test_saved_data_reynolds():
     assert borehole._stored_interp_data == {'D': 1,
                                             'H': 110,
                                             'flow': "{'vfr [l/s]': 0.3}",
-                                            'fluid': "{'name': 'MPG', 'percentage': 25}",
+                                            'fluid': "{'name': 'MPG', 'percentage': 25, 'type': 'mass percentage'}",
                                             'k_s': 3,
                                             'pipe': "{'type': 'U', 'nb_of_tubes': 2, 'thickness [mm]': 5.0, 'diameter "
-                                                    "[mm]': 4.0, 'spacing [mm]': 50.0, 'k_g [W/(m·K)]': 1, 'k_p "
+                                                    "[mm]': 40.0, 'spacing [mm]': 50.0, 'k_g [W/(m·K)]': 1, 'k_p "
                                                     "[W/(m·K)]': 0.4, 'epsilon [mm]': 0.001}",
                                             'r_b': 0.075}
     assert np.allclose(resistance1, borehole.calculate_Rb(100, 1, 0.075, 3, temperature=np.array([0, 1, 2, 5])))
+
+
+def test_saved_data_reynolds_commercial():
+    borehole = Borehole()
+    borehole.pipe_data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2)
+    borehole.fluid_data = TemperatureDependentFluidData('Thermox DTX', 25)
+    borehole.flow_data = ConstantFlowRate(vfr=0.3)
+
+    assert np.allclose([0.12849791, 0.12843995, 0.1283812, 0.12820668],
+                       borehole.calculate_Rb(100, 1, 0.075, 3, temperature=np.array([0, 1, 2, 5])))
+
+
+def test_borehole_resistance_conical():
+    borehole = Borehole()
+    borehole.pipe_data = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
+    borehole.fluid_data = TemperatureDependentFluidData('MEG', 25)
+    borehole.flow_data = ConstantFlowRate(vfr=0.3)
+    assert np.allclose([0.12693282, 0.12664951, 0.12644177, 0.12588726],
+                       borehole.calculate_Rb(60, 1, 0.075, 3, temperature=np.array([0, 1, 2, 5])))
+    borehole.pipe_data = SingleUTube(1.5, 0.0135, 0.016, 0.4, 0.035)
+    assert np.allclose([0.12693282, 0.12664951, 0.12644177, 0.12588726],
+                       borehole.calculate_Rb(60, 1, 0.075, 3, temperature=np.array([0, 1, 2, 5])))
+    borehole.pipe_data = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
+    borehole.fluid_data = TemperatureDependentFluidData('MEG', 25)
+    borehole.flow_data = ConstantFlowRate(vfr=0.3)
+    assert np.allclose([0.13332321, 0.13306411, 0.1328632, 0.13232588],
+                       borehole.calculate_Rb(120, 1, 0.075, 3, temperature=np.array([0, 1, 2, 5])))
