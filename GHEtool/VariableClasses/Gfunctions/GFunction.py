@@ -117,7 +117,7 @@ class GFunction:
                     FOLDER.joinpath(f"VariableClasses/Gfunctions/ANN layers/ai_model_shape_{i}_weight_{j}.csv"),
                     sep=","
                 ).to_numpy()
-                for j in range(8)
+                for j in range(6)
             ]
             for i in range(5)
         }
@@ -750,5 +750,5 @@ def calc_network_using_numpy(input_data: NDArray[np.float64], model_weights: lis
     res = np.maximum(0, model_weights[0].T.dot(input_data) + model_weights[1])
     res = np.maximum(0, model_weights[2].T.dot(res) + model_weights[3])
     res = np.maximum(0, model_weights[4].T.dot(res) + model_weights[5])
-    res = np.maximum(0, model_weights[6].T.dot(res) + model_weights[7])
+    #res = np.maximum(0, model_weights[6].T.dot(res) + model_weights[7])
     return np.cumsum(res, axis=0).reshape(87)

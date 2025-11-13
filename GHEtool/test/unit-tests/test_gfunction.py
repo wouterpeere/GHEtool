@@ -623,10 +623,10 @@ def test_ann_borefield_result_TB():
     gfunc.borefield = borefield1
     time_steps = np.arange(3600, 3600 * 24 * 365 * 100, 3600)
     g_func_regular = gfunc.calculate(time_steps, borefield1, 1.1249999999999998e-06, use_neural_network=False,
-                                     borefield_description={"type": 4, "N_1": 12, "N_2": 10,
+                                     borefield_description={"type": 3, "N_1": 12, "N_2": 10,
                                                             "B_1": 10, "B_2": 8})
     g_func_ann = gfunc.calculate(time_steps, borefield1, 1.1249999999999998e-06, use_neural_network=True,
-                                 borefield_description={"type": 4, "N_1": 12, "N_2": 10,
+                                 borefield_description={"type": 3, "N_1": 12, "N_2": 10,
                                                         "B_1": 10, "B_2": 8})
     import matplotlib.pyplot as plt
     plt.plot(g_func_ann, label="With ANN")
