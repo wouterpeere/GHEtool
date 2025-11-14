@@ -172,7 +172,7 @@ class GFunction:
         use_neural_network : bool
             True if the neural network simplification should be used. This uses a NN trained on previous calculated
             gvalues.
-        
+
         Returns
         -------
         gvalues : np.ndarray
@@ -196,7 +196,8 @@ class GFunction:
             borefield : pygfunction.borefield.Borefield
                 Pygfunction borefield object
             borefield_description : dict
-                Description of the borefield with keys: {N_1, N_2, B_1, B_2, type}
+                Description of the borefield with keys: {N_1, N_2, B_1, B_2, type}, where type 0: L, type 1: U,
+                type 2: box, type 3: rectangle, type 4: staggered
 
             Returns
             -------
@@ -211,26 +212,27 @@ class GFunction:
             n_y = borefield_description["N_2"]
             b_x = borefield_description["B_1"]
             b_y = borefield_description["B_2"]
-            if not (50 <= H <= 200):
+            if not (50 <= H <= 400):
                 warnings.warn("Depth outside ANN limits!")
-            if not (0 <= D <= 1):
+            if not (0 <= D <= 4):
                 warnings.warn("Burial depth outside ANN limits!")
-            if not (1 <= n_x <= 10):
+            if not (1 <= n_x <= 30):
                 warnings.warn("N_1 outside ANN limits!")
-            if not (1 <= n_y <= 10):
+            if not (1 <= n_y <= 30):
                 warnings.warn("N_2 outside ANN limits!")
-            if not (2 <= b_x <= 6):
+            if not (2 <= b_x <= 10):
                 warnings.warn("B_1 outside ANN limits!")
-            if not (2 <= b_y <= 6):
+            if not (2 <= b_y <= 10):
                 warnings.warn("B_2 outside ANN limits!")
-            if not (0.05 <= r_b <= 0.1):
+            if not (0.05 <= r_b <= 0.15):
                 warnings.warn("r_b outside ANN limits!")
-            if not (0.625 / 1e6 < alpha < 1.125 / 1e6):
+            if not (0.25 / 1e6 < alpha < 2.67 / 1e6):
                 warnings.warn("alpha outside ANN limits!")
-            if not (0 <= borefield_description["type"] < 6):
+            if not (0 <= borefield_description["type"] <= 5):
                 warnings.warn("r_b outside ANN limits!")
             input_data = np.array([n_x, n_y, b_x, b_y, H, D, r_b, alpha])
-            res = calc_network_using_numpy(input_data, self.model_weights[borefield_description["type"]], self.normalize_vec)
+            res = calc_network_using_numpy(input_data, self.model_weights[borefield_description["type"]],
+                                           self.normalize_vec)
             return res
 
         def gvalues(
@@ -274,7 +276,7 @@ class GFunction:
                         "You can only use the ANN when you have a regular configuration. Please use the "
                         "create_rectangle_borefield or similar methods in the Borefield class."
                     )
-                return np.interp(GFunction.DEFAULT_TIMESTEPS, time_values,
+                return np.interp(time_values, GFunction.DEFAULT_TIMESTEPS,
                                  calculate_with_neural_network(alpha, borefield, **kwargs))
 
             # check if the value is in the fifo_list
@@ -750,5 +752,4 @@ def calc_network_using_numpy(input_data: NDArray[np.float64], model_weights: lis
     res = np.maximum(0, model_weights[0].T.dot(input_data) + model_weights[1])
     res = np.maximum(0, model_weights[2].T.dot(res) + model_weights[3])
     res = np.maximum(0, model_weights[4].T.dot(res) + model_weights[5])
-    #res = np.maximum(0, model_weights[6].T.dot(res) + model_weights[7])
     return np.cumsum(res, axis=0).reshape(87)
