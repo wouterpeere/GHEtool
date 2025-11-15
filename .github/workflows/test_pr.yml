@@ -11,6 +11,8 @@ jobs:
 
   test_methods:
     runs-on: windows-latest
+    env:
+      MPLBACKEND: Agg
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.12
@@ -32,6 +34,8 @@ jobs:
 
   test_general:
     runs-on: windows-latest
+    env:
+      MPLBACKEND: Agg
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.12
@@ -53,6 +57,8 @@ jobs:
 
   test_examples:
     runs-on: windows-latest
+    env:
+      MPLBACKEND: Agg
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.12
@@ -74,6 +80,8 @@ jobs:
 
   test_validation:
     runs-on: windows-latest
+    env:
+      MPLBACKEND: Agg
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.12
@@ -99,7 +107,8 @@ jobs:
       matrix:
         os: [ windows-latest, macos-latest ]
         python-version: [ '3.9', '3.10', '3.11', '3.12', '3.13' ]
-
+    env:
+      MPLBACKEND: Agg
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
