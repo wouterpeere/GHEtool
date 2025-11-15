@@ -232,7 +232,7 @@ class GFunction:
             if not (0.25 / 1e6 < alpha < 2.67 / 1e6):
                 warnings.warn("alpha outside ANN limits!")
             if not (0 <= borefield_description["type"] <= 5):
-                warnings.warn("r_b outside ANN limits!")
+                raise ValueError("type outside ANN limits!")
             input_data = np.array([n_x, n_y, b_x, b_y, H, D, r_b, alpha])
             res = calc_network_using_numpy(input_data, self.model_weights[borefield_description["type"]],
                                            self.normalize_vec)
