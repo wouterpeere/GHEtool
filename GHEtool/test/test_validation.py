@@ -58,3 +58,9 @@ def test_validation_ahmadfard():
     test_3_6h()
     test_4()
     test_4_sensitivity()
+
+
+def test_validation_ANN():
+    from GHEtool.Validation.artificial_neural_network import validate_L3, validate_L4
+    validate_L3()
+    validate_L4()

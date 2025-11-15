@@ -13,7 +13,37 @@ The articles for which this is the case, are:
 articles/HPT_magazine.rst
 ```
 
-> Peere, W. (2025). Three ways to design a hybrid geothermal heating and cooling system for an office building. In _Proceedings of Geo-Rin Conference_. Benasque (Spain), 2-6 June 2025.
+> Peere, W. (2025). Integrating Temperature and Part-Load Dependent COP in Shallow Geothermal Borefield Design. In
+_Proceedings of German Geothermal Congress DGK 2025_. Frankfurt (Germany), 18-20 November 2025.
+
+> Peere, W., Steinbock, G., Niklaus, E. (2025). Thermo-hydraulische Modellenentwicklung einer konischen Erdwärmesonde
+> und
+> ein Praxisbeispiel in Sachsen. In _Proceedings of Geothermie Symposium_. Salzburg (Austria), 5-7 November 2025.
+
+> Peere, W. (2025). Aktiv und passive: die perfekte Kombination? Kühlung mit geothermischen Bohrfeldern. _Geothermische
+Energie 34_(112)
+
+> Dion, G., & Pasquier, P. (2025). Ground heat exchanger sizing using borehole outlet transfer function. _Science and
+Technology for the Built Environment_, 1–13. https://doi.org/10.1080/23744731.2025.2523200
+
+> Romanov, D., Becker-Grupe, I., Jodeiri, A. M., Cozzini, M., Holler, S. (2025). Rapid Open-Source-Based Simulation
+> Approach for Coaxial Medium-Deep and Deep Borehole Heat Exchanger Systems. _Energies_, 18(18),
+> 4921, https://doi.org/10.3390/en18184921
+
+> Hermans, L., Dell'Isola, A., Helsen, L. (2025). Non-Linear Integrated Optimal Control and Sizing Methodology for
+> Hybrid,
+> Multi-Energy Heating and Cooling Systems Including Borehole Thermal Energy Storage. _Applied Energy_ (Preprint)
+
+> Pfeiffer, J., & Kunick, M. (2025). Development Of An Integrated Software Workflow For District Heating Network
+> Planning:
+> A Structured Methodological Approach. _ACC Journal_, 31(1), 48-63.
+
+> Peere, W. (2025). Three ways to design a hybrid geothermal heating and cooling system for an office building. In
+_Proceedings of Geo-Rin Conference_. Benasque (Spain), 2-6 June 2025.
+
+> Pernter, B. (2025). Die separatus® Splitpipe-Technologie in der Praxis: Wie Kosten für Erdwärmesonden auf das Niveau
+> von Luft-WP-Systemen gesenkt werden können. _Bd. 4 (2025): GeoTHERM Abstract Band._ Offenburg (Germany), 20-21
+> February
 
 > Aitmad, M. (2025). Techno-Economic Analysis of using Ground-Source Heat Exchangers in Pakistan (Master thesis).
 
@@ -21,7 +51,8 @@ articles/HPT_magazine.rst
 > Master thesis).
 
 > Blanke T., Pfeiffer F., Göttsche J., Döring B. (2024) Artificial neural networks use for the design of geothermal
-> probe fields. In Proceedings of BauSim Conference 2024:  10th Conference of IBPSA-Germany and Austria. Vienna (Austria),
+> probe fields. In Proceedings of BauSim Conference 2024:  10th Conference of IBPSA-Germany and Austria. Vienna (
+> Austria),
 > 23-26 September 2024. https://doi.org/10.26868/29761662.2024.12
 
 > Meertens, L. (2024). Reducing Capital Cost for Geothermal Heat Pump Systems Through Dynamic Borefield Sizing. _IEA HPT
@@ -32,11 +63,11 @@ Magazine 42_(2), https://doi.org/10.23697/9r3w-jm57.
 > 2024). https://doi.org/10.1186/s40517-024-00301-w.
 
 > Meertens, L., Peere, W., and Helsen, L. (2024). Influence of short-term dynamic effects on geothermal borefield size.
-> In _Proceedings of International Ground Source Heat Pump Association Conference 2024_. Montr�al (Canada), 28-30 May
-2024. https://doi.org/10.22488/okstate.24.000004
+> In _Proceedings of International Ground Source Heat Pump Association Conference 2024_. Montréal (Canada),
+> 28-30 May 2024. https://doi.org/10.22488/okstate.24.000004
 
 > Dion G., Pasquier, P., Perraudin, D. (2024). Sizing equation based on the outlet fluid temperature of closed-loop
-> ground heat exchangers. In Proceedings of International Ground Source Heat Pump Association. Montr�al (Canada), 28-30
+> ground heat exchangers. In Proceedings of International Ground Source Heat Pump Association. Montréal (Canada), 28-30
 > May 2024.
 
 > Peere, W. (2024). Are Rules of Thumb Misleading? The Complexity of Borefield Sizing and the Importance of Design
@@ -62,6 +93,7 @@ engineering_ 226, Art.No. 120203, 10.1016/j.applthermaleng.2023.120203.
 
 > Cimmino, M., Cook., J. C. (2022). pygfunction 2.2 : New Features and Improvements in Accuracy and Computational
 > Efficiency. In _Proceedings of IGSHPA Research Track 2022_. Las Vegas (USA), 6-8 December
+
 2022. https://doi.org/10.22488/okstate.22.000015
 
 > Verleyen, L., Peere, W., Michiels, E., Boydens, W., Helsen, L. (2022). The beauty of reason and insight: a story about

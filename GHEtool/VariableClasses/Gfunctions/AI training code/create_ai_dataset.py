@@ -111,5 +111,35 @@ def main():
         save_thread.start()
 
 
+def short_term_corrections():
+    times = gt.load_aggregation.ClaessonJaved(3600, 100 * 8760 * 3600).get_times_for_simulation()
+    times = times[times < 3600 * 24]
+    # create sets of variables
+    depth = list(range(50, 200, 50)) + list(range(200, 500, 100))
+    alpha = np.array([0.25, 0.4, 0.625, 0.8, 0.9, 1, 1.125, 1.75, 2.25, 2.67]) / 1000000
+    radii = list(np.arange(0.05, 0.15, 0.025).round(2)) + [0.15]
+    burials = [0, 0.2, 0.5, 1, 2, 4]
+    g_store = np.zeros((len(depth), len(burials), len(alpha), len(radii), len(times)))
+
+    # create data list
+    for i, H in enumerate(depth):
+        for j, D in enumerate(burials):
+            for k, alp in enumerate(alpha):
+                for l, r_b in enumerate(radii):
+                    g = gt.gfunction.gFunction(
+                        gt.boreholes.Borehole(H, D, r_b, 0, 0),
+                        alp,
+                        times
+                    )
+                    g_store[i, j, k, l, :] = g.gFunc
+                    print(H, D, alp, r_b)
+    np.save("g_store.npy", g_store)
+    np.save("depth.npy", depth)
+    np.save("burials.npy", burials)
+    np.save("alpha.npy", alpha)
+    np.save("radii.npy", radii)
+    np.save("times.npy", times)
+
+
 if __name__ == "__main__":
     main()

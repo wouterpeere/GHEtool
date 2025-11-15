@@ -6,6 +6,7 @@ from typing import List, Tuple, Union
 import numpy as np
 import pandas as pd
 import pygfunction as gt
+import scipy as sc
 from numpy._typing import NDArray
 from scipy import interpolate
 
@@ -121,6 +122,12 @@ class GFunction:
             ]
             for i in range(5)
         }
+        # load short term corrections
+        self._g_store = np.load(FOLDER.joinpath(f"VariableClasses/Gfunctions/short term ANN corrections/g_store.npy"))
+        self._depth = np.load(FOLDER.joinpath(f"VariableClasses/Gfunctions/short term ANN corrections/depth.npy"))
+        self._burials = np.load(FOLDER.joinpath(f"VariableClasses/Gfunctions/short term ANN corrections/burials.npy"))
+        self._alpha = np.load(FOLDER.joinpath(f"VariableClasses/Gfunctions/short term ANN corrections/alpha.npy"))
+        self._radii = np.load(FOLDER.joinpath(f"VariableClasses/Gfunctions/short term ANN corrections/radii.npy"))
 
     @property
     def store_previous_values(self) -> bool:
@@ -172,7 +179,7 @@ class GFunction:
         use_neural_network : bool
             True if the neural network simplification should be used. This uses a NN trained on previous calculated
             gvalues.
-        
+
         Returns
         -------
         gvalues : np.ndarray
@@ -183,11 +190,16 @@ class GFunction:
                                           borefield_description: dict) -> np.ndarray:
             """
             This function calculates the gfunctions using a trained ANN.
+            The first 24 hours are based on interpolation on the training data set, since these values were overshooted
+            by the ANN.
+
             (For more information, visit Blanke et al. ([#BlankeEtAl]_).
 
             References
             ----------
-            .. [#BlankeEtAl] Blanke T., Pfeiffer F., Göttsche J., Döring B. (2024) Artificial neural networks use for the design of geothermal probe fields. In Proceedings of BauSim Conference 2024:  10th Conference of IBPSA-Germany and Austria. Vienna (Austria), 23-26 September 2024. https://doi.org/10.26868/29761662.2024.12
+            .. [#BlankeEtAl] Blanke T., Pfeiffer F., Göttsche J., Döring B. (2024) Artificial neural networks use
+            for the design of geothermal probe fields. In Proceedings of BauSim Conference 2024:  10th Conference of
+            IBPSA-Germany and Austria. Vienna (Austria), 23-26 September 2024. https://doi.org/10.26868/29761662.2024.12
 
             Parameters
             ----------
@@ -196,14 +208,16 @@ class GFunction:
             borefield : pygfunction.borefield.Borefield
                 Pygfunction borefield object
             borefield_description : dict
-                Description of the borefield with keys: {N_1, N_2, B_1, B_2, type}
+                Description of the borefield with keys: {N_1, N_2, B_1, B_2, type}, where type 0: L, type 1: U,
+                type 2: box, type 3: rectangle, type 4: staggered
 
             Returns
             -------
             gvalues : np.ndarray
                 Array with the gvalues for the default timesteps
             """
-            # parameters can be extracted from a random borehole since for the ANN model, all boreholes should be the same.
+            # parameters can be extracted from a random borehole since for the ANN model,
+            # all boreholes should be the same.
             H = borefield[0].H
             D = borefield[0].D
             r_b = borefield[0].r_b
@@ -211,26 +225,39 @@ class GFunction:
             n_y = borefield_description["N_2"]
             b_x = borefield_description["B_1"]
             b_y = borefield_description["B_2"]
-            if not (50 <= H <= 200):
+            if not (50 <= H <= 400):
                 warnings.warn("Depth outside ANN limits!")
-            if not (0 <= D <= 1):
+            if not (0 <= D <= 4):
                 warnings.warn("Burial depth outside ANN limits!")
-            if not (1 <= n_x <= 10):
+            if not (1 <= n_x <= 30):
                 warnings.warn("N_1 outside ANN limits!")
-            if not (1 <= n_y <= 10):
+            if not (1 <= n_y <= 30):
                 warnings.warn("N_2 outside ANN limits!")
-            if not (2 <= b_x <= 6):
+            if not (2 <= b_x <= 10):
                 warnings.warn("B_1 outside ANN limits!")
-            if not (2 <= b_y <= 6):
+            if not (2 <= b_y <= 10):
                 warnings.warn("B_2 outside ANN limits!")
-            if not (0.05 <= r_b <= 0.1):
+            if not (0.05 <= r_b <= 0.15):
                 warnings.warn("r_b outside ANN limits!")
-            if not (0.625 / 1e6 < alpha < 1.125 / 1e6):
+            if not (0.25 / 1e6 < alpha < 2.67 / 1e6):
                 warnings.warn("alpha outside ANN limits!")
-            if not (0 <= borefield_description["type"] < 6):
-                warnings.warn("r_b outside ANN limits!")
+            if not (0 <= borefield_description["type"] <= 5):
+                raise ValueError("type outside ANN limits!")
             input_data = np.array([n_x, n_y, b_x, b_y, H, D, r_b, alpha])
-            res = calc_network_using_numpy(input_data, self.model_weights[borefield_description["type"]], self.normalize_vec)
+            res = calc_network_using_numpy(input_data, self.model_weights[borefield_description["type"]],
+                                           self.normalize_vec)
+
+            # correct the first 24 hours with general interpolation, since the ANN model overestimates this
+            # for the parameter set of the ANN, there is no interference between neighbouring boreholes in the
+            # borefield at this short timescale.
+            try:
+                short_term_ann_correction = sc.interpolate.interpn(
+                    (self._depth, self._burials, self._alpha, self._radii),
+                    self._g_store, [[H, D, alpha, r_b]])
+
+                res[:12] = short_term_ann_correction[0]
+            except:
+                pass
             return res
 
         def gvalues(
@@ -750,5 +777,4 @@ def calc_network_using_numpy(input_data: NDArray[np.float64], model_weights: lis
     res = np.maximum(0, model_weights[0].T.dot(input_data) + model_weights[1])
     res = np.maximum(0, model_weights[2].T.dot(res) + model_weights[3])
     res = np.maximum(0, model_weights[4].T.dot(res) + model_weights[5])
-    #res = np.maximum(0, model_weights[6].T.dot(res) + model_weights[7])
     return np.cumsum(res, axis=0).reshape(87)
