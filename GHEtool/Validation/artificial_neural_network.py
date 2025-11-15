@@ -1,6 +1,6 @@
 """
 The goal of this file is to validate the artificial neural network, based on the work of Blanke et al. ([#BlankeEtAl]_).
-It shows that all simulations are withing 5% and that the ANN gives a slight overestimation (so it is on the safe side).
+It shows that all simulations are withing 2% and that the ANN gives a slight overestimation (so it is on the safe side).
 The simulation time is 200-1000 times faster.
 
 References
@@ -64,7 +64,7 @@ borefield.create_rectangular_borefield(15, 20, 6, 6, 110, 4, 0.075)
 borefield_swimming_pool = copy.deepcopy(borefield)
 
 # define lists
-list_borefields_L23 = [
+list_borefields_L3 = [
     ('case 1', borefield_case_1),
     ('case 2', borefield_case_2),
     ('case 3', borefield_case_3),
@@ -83,7 +83,7 @@ list_borefields_L4 = [
 
 def validate_L3():
     print('--- L3 ---')
-    for name, borefield in list_borefields_L23:
+    for name, borefield in list_borefields_L3:
         borefield.calculation_setup(use_neural_network=False)
         start = time.time()
         depth_reg = borefield.size_L3()
@@ -98,7 +98,7 @@ def validate_L3():
               f'(difference of {((depth_ann - depth_reg) / depth_reg * 100):.2f}%). The calculation time was '
               f'{time_reg:.4f}s (regular) and {time_ann:.4f}s (ANN) (factor of {(time_reg / time_ann):.0f}).')
 
-        # assert (depth_ann - depth_reg) / depth_reg < 0.05  # should be under 5%
+        assert (depth_ann - depth_reg) / depth_reg < 0.02  # should be under 2%
 
 
 def validate_L4():
@@ -118,7 +118,7 @@ def validate_L4():
               f'(difference of {((depth_ann - depth_reg) / depth_reg * 100):.2f}%). The calculation time was '
               f'{time_reg:.4f}s (regular) and {time_ann:.4f}s (ANN) (factor of {(time_reg / time_ann):.0f}).')
 
-        # assert (depth_ann - depth_reg) / depth_reg < 0.05  # should be under 5%
+        assert (depth_ann - depth_reg) / depth_reg < 0.02  # should be under 2%
 
 
 if __name__ == "__main__":  # pragma: no cover

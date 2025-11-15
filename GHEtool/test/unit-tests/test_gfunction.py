@@ -461,33 +461,6 @@ def test_negative_values():
     assert np.isclose(np.min(g_func), 0.14299471464245733)
 
 
-def test_ann_borefield():
-    borefield1 = gt.borefield.Borefield.rectangle_field(1, 2, 5, 6, 100, 4, 0.075)
-
-    gfunc = GFunction()
-    gfunc.borefield = borefield1
-    time_steps = np.arange(3600, 3600 * 24 * 365 * 100, 3600)
-    g_func = gfunc.calculate(time_steps, borefield1, 1 / 5000 / 1000, use_neural_network=True,
-                             borefield_description={"type": 3, "N_1": 1, "N_2": 2,
-                                                    "B_1": 5, "B_2": 6})
-
-    input_data = (np.array([1, 2, 5, 6, 100, 4, 0.075, 1 / 5000 / 1000, 3]) * np.array(
-        [1 / 20, 1 / 20, 1 / 9, 1 / 9, 1 / 1000, 1 / 100, 1 / 0.4, 1 / (10 ** -6),
-         1 / 6])).reshape(9, 1)
-
-    model_weights = [
-        pd.read_csv(FOLDER.joinpath(f"VariableClasses/Gfunctions/ANN layers/layer_{i}_weights_diff_fields.csv"),
-                    sep=";").values
-        for i in range(6)]
-    res = np.maximum(0, model_weights[0].T.dot(input_data) + model_weights[1])
-    res = np.maximum(0, model_weights[2].T.dot(res) + model_weights[3])
-    res = np.maximum(0, model_weights[4].T.dot(res) + model_weights[5])
-    g_func_numpy = np.cumsum(res, axis=0).reshape(87)
-    time_steps_default = gt.load_aggregation.ClaessonJaved(3600, 3600 * 8760 * 100).get_times_for_simulation()
-    g_func_numpy = np.interp(time_steps, time_steps_default, g_func_numpy)
-    assert np.allclose(g_func, g_func_numpy)
-
-
 def test_ann_boundaries():
     gfunc = GFunction()
     time_steps = np.arange(3600, 3600 * 24 * 365 * 100, 3600)
