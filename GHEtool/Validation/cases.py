@@ -1,5 +1,5 @@
 """
-This document contains checks to see whether or not adaptations to the code still comply with some specific cases.
+This document contains checks to see whether the adaptations to the code still comply with some specific cases.
 It also shows the difference between the original L2 sizing methode (Peere et al., 2021) and a more general L3 one.
 
 This document contains 4 different cases referring to the paper: Peere, W., Picard, D., Cupeiro Figueroa, I., Boydens, W., and Helsen, L. Validated combined first and last year borefield sizing methodology. In Proceedings of International Building Simulation Conference 2021 (2021). Brugge (Belgium), 1-3 September 2021.
