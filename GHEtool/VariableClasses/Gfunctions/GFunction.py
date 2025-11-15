@@ -6,6 +6,7 @@ from typing import List, Tuple, Union
 import numpy as np
 import pandas as pd
 import pygfunction as gt
+import scipy as sc
 from numpy._typing import NDArray
 from scipy import interpolate
 
@@ -121,6 +122,12 @@ class GFunction:
             ]
             for i in range(5)
         }
+        # load short term corrections
+        self._g_store = np.load(FOLDER.joinpath(f"VariableClasses/Gfunctions/short term ANN corrections/g_store.npy"))
+        self._depth = np.load(FOLDER.joinpath(f"VariableClasses/Gfunctions/short term ANN corrections/depth.npy"))
+        self._burials = np.load(FOLDER.joinpath(f"VariableClasses/Gfunctions/short term ANN corrections/burials.npy"))
+        self._alpha = np.load(FOLDER.joinpath(f"VariableClasses/Gfunctions/short term ANN corrections/alpha.npy"))
+        self._radii = np.load(FOLDER.joinpath(f"VariableClasses/Gfunctions/short term ANN corrections/radii.npy"))
 
     @property
     def store_previous_values(self) -> bool:
@@ -183,6 +190,9 @@ class GFunction:
                                           borefield_description: dict) -> np.ndarray:
             """
             This function calculates the gfunctions using a trained ANN.
+            The first 24 hours are based on interpolation on the training data set, since these values were overshooted
+            by the ANN.
+
             (For more information, visit Blanke et al. ([#BlankeEtAl]_).
 
             References
@@ -236,6 +246,18 @@ class GFunction:
             input_data = np.array([n_x, n_y, b_x, b_y, H, D, r_b, alpha])
             res = calc_network_using_numpy(input_data, self.model_weights[borefield_description["type"]],
                                            self.normalize_vec)
+
+            # correct the first 24 hours with general interpolation, since the ANN model overestimates this
+            # for the parameter set of the ANN, there is no interference between neighbouring boreholes in the
+            # borefield at this short timescale.
+            try:
+                short_term_ann_correction = sc.interpolate.interpn(
+                    (self._depth, self._burials, self._alpha, self._radii),
+                    self._g_store, [[H, D, alpha, r_b]])
+
+                res[:12] = short_term_ann_correction[0]
+            except:
+                pass
             return res
 
         def gvalues(
