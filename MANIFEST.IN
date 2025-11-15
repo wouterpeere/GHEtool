@@ -2,3 +2,4 @@ exclude GHEtool/Examples/
 exclude GHEtool/test/
 include GHEtool/test/unit-tests
 include GHEtool/VariableClasses/Gfunctions/ANN layers
+include GHEtool/VariableClasses/Gfunctions/short term ANN corrections
