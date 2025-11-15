@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [2.4.0] - Unpublished
 
+### Added
+
+- Artificial Neural Network to speed up calculations (issue #322).
+
 ### Changed
 
 - Changed implementation of `optimise_for_energy` to make it three times faster (issue #308).

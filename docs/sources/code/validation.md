@@ -49,3 +49,11 @@ The results and their interpretations from this comparison across four different
 
 Validation/inter_sizing_tool_comparison.rst
 ```
+
+The validation of the artificial neural network, used in GHEtool, can be found here.
+
+```{toctree}
+:maxdepth: 1
+
+Validation/artificial_neural_network.rst
+```

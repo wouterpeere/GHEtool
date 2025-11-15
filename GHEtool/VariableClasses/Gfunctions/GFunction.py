@@ -187,7 +187,9 @@ class GFunction:
 
             References
             ----------
-            .. [#BlankeEtAl] Blanke T., Pfeiffer F., Göttsche J., Döring B. (2024) Artificial neural networks use for the design of geothermal probe fields. In Proceedings of BauSim Conference 2024:  10th Conference of IBPSA-Germany and Austria. Vienna (Austria), 23-26 September 2024. https://doi.org/10.26868/29761662.2024.12
+            .. [#BlankeEtAl] Blanke T., Pfeiffer F., Göttsche J., Döring B. (2024) Artificial neural networks use
+            for the design of geothermal probe fields. In Proceedings of BauSim Conference 2024:  10th Conference of
+            IBPSA-Germany and Austria. Vienna (Austria), 23-26 September 2024. https://doi.org/10.26868/29761662.2024.12
 
             Parameters
             ----------
@@ -204,7 +206,8 @@ class GFunction:
             gvalues : np.ndarray
                 Array with the gvalues for the default timesteps
             """
-            # parameters can be extracted from a random borehole since for the ANN model, all boreholes should be the same.
+            # parameters can be extracted from a random borehole since for the ANN model,
+            # all boreholes should be the same.
             H = borefield[0].H
             D = borefield[0].D
             r_b = borefield[0].r_b

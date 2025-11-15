@@ -81,7 +81,7 @@ def check_cases():
     for i in (1, 2, 3, 4):
         borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(i)))
 
-        borefield.set_ground_parameters(data)
+        borefield.ground_data = data
         borefield.set_borefield(borefield_gt)
         borefield.Rb = 0.2
 
@@ -115,7 +115,7 @@ def check_custom_datafile():
     for i in (1, 2, 3, 4):
         borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(i)))
 
-        borefield.set_ground_parameters(data)
+        borefield.ground_data = data
         borefield.set_borefield(custom_field)
         borefield.Rb = 0.2
 

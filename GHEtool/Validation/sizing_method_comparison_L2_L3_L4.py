@@ -19,7 +19,7 @@ def compare():
     borefield = Borefield()
 
     # set ground data in borefield
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
 
     # set Rb
     borefield.Rb = 0.12
