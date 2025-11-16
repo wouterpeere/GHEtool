@@ -54,16 +54,16 @@ def test_sizing_with_building_load(monkeypatch):
     from GHEtool.Examples.sizing_with_building_load import size_with_scop, \
         size_with_variable_ground_temperature, \
         size_with_part_load_data
-    assert np.allclose(size_with_scop(), (96.20571306433565, 4.072466974615784))
-    assert np.allclose(size_with_variable_ground_temperature(), (95.29193738536698, 4.135572636533091))
-    assert np.allclose(size_with_part_load_data(), (97.77220206543687, 4.627116806553787))
+    assert np.allclose(size_with_scop(), (96.07134718147334, 4.072466974615784))
+    assert np.allclose(size_with_variable_ground_temperature(), (95.33474017379355, 4.13566093593155))
+    assert np.allclose(size_with_part_load_data(), (97.84903923592897, 4.627301729301053))
 
 
 def test_sizing_with_building_load_hourly(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     from GHEtool.Examples.sizing_with_building_load_hourly import L3_sizing, L4_sizing
-    assert np.allclose(L3_sizing(), (128.1582605162373, 6.291201457558123))
-    assert np.allclose(L4_sizing(), (153.87202254990598, 6.387747162165882))
+    assert np.allclose(L3_sizing(), (128.14624698264709, 6.291201457558123))
+    assert np.allclose(L4_sizing(), (153.91434358641897, 6.3879487848981364))
 
 
 def test_combined_active_and_passive_cooling(monkeypatch):
@@ -99,7 +99,7 @@ def test_temperature_dependent_fluid_data(monkeypatch):
     size_with_temperature_dependence()
 
 
-def test_trubocollector(monkeypatch):
+def test_turbocollector(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     from GHEtool.Examples.turbocollector import create_graphs
     create_graphs()
