@@ -142,6 +142,7 @@ class Borefield(BaseClass):
         self.cost_investment: list = Borefield.DEFAULT_INVESTMENT
 
         # set a custom borefield
+        self._borefield_description = None
         self.borefield = borefield
 
     @property
@@ -234,6 +235,7 @@ class Borefield(BaseClass):
         -------
         None
         """
+        self._borefield_description = None
         self.borefield = borefield
 
     def create_rectangular_borefield(self, N_1: int, N_2: int, B_1: float, B_2: float, H: float, D: float = 1,
@@ -266,7 +268,7 @@ class Borefield(BaseClass):
         """
         borefield = gt.borefield.Borefield.rectangle_field(N_1, N_2, B_1, B_2, H, D, r_b)
         self.set_borefield(borefield)
-
+        self._borefield_description = {'N_1': N_1, 'N_2': N_2, 'B_1': B_1, 'B_2': B_2, 'type': 3}
         return borefield
 
     def create_circular_borefield(self, N: int, R: float, H: float, D: float = 1, r_b: float = 0.075):
@@ -326,6 +328,7 @@ class Borefield(BaseClass):
         """
         borefield = gt.borefield.Borefield.U_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
         self.set_borefield(borefield)
+        self._borefield_description = {'N_1': N_1, 'N_2': N_2, 'B_1': B_1, 'B_2': B_2, 'type': 1}
         return borefield
 
     def create_L_shaped_borefield(self, N_1: int, N_2: int, B_1: float, B_2: float, H: float, D: float = 1,
@@ -358,6 +361,8 @@ class Borefield(BaseClass):
         """
         borefield = gt.borefield.Borefield.L_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
         self.set_borefield(borefield)
+        self._borefield_description = {'N_1': N_1, 'N_2': N_2, 'B_1': B_1, 'B_2': B_2, 'type': 0}
+
         return borefield
 
     def create_box_shaped_borefield(self, N_1: int, N_2: int, B_1: float, B_2: float, H: float, D: float = 1,
@@ -390,6 +395,41 @@ class Borefield(BaseClass):
         """
         borefield = gt.borefield.Borefield.box_shaped_field(N_1, N_2, B_1, B_2, H, D, r_b)
         self.set_borefield(borefield)
+        self._borefield_description = {'N_1': N_1, 'N_2': N_2, 'B_1': B_1, 'B_2': B_2, 'type': 2}
+        return borefield
+
+    def create_staggered_shaped_borefield(self, N_1: int, N_2: int, B_1: float, B_2: float, H: float, D: float = 1,
+                                          r_b: float = 0.075):
+        """
+        This function creates a staggered shaped borefield.
+        It calls the pygfunction module in the background.
+        The documentation of this function is based on pygfunction.
+
+        Parameters
+        ----------
+        N_1 : int
+            Number of boreholes in the x direction
+        N_2 : int
+            Number of boreholes in the y direction
+        B_1 : int
+            Distance between adjacent boreholes in the x direction [m]
+        B_2 : int
+            Distance between adjacent boreholes in the y direction [m]
+        H : float
+            Borehole length [m]
+        D : float
+            Borehole buried depth [m]
+        r_b : float
+            Borehole radius [m]
+
+        Returns
+        -------
+        pygfunction borefield object
+        """
+        borefield = gt.borefield.Borefield.staggered_rectangle_field(N_1, N_2, B_1, B_2, H, D, r_b,
+                                                                     include_last_borehole=False)
+        self.set_borefield(borefield)
+        self._borefield_description = {'N_1': N_1, 'N_2': N_2, 'B_1': B_1, 'B_2': B_2, 'type': 4}
         return borefield
 
     @property
@@ -1886,7 +1926,9 @@ class Borefield(BaseClass):
                 self.H = H
             return self.gfunction_calculation_object.calculate(
                 time_value, self.borefield, self.ground_data.alpha(self.depth, self.D),
-                interpolate=self._calculation_setup.interpolate_gfunctions
+                interpolate=self._calculation_setup.interpolate_gfunctions,
+                use_neural_network=self._calculation_setup.use_neural_network,
+                borefield_description=self._borefield_description
             )
 
         ## 1 bypass any possible precalculated g-functions

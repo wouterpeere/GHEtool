@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [2.4.0] - Unpublished
 
+### Added
+
+- Artificial Neural Network to speed up calculations (issue #322).
+
 ### Changed
 
 - Changed implementation of `optimise_for_energy` to make it three times faster (issue #308).
@@ -93,6 +97,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added property 'depth' to Borefield class (issue #137).
 - Added function 'calculate_depth' to Borefield class (issue #137).
 - Added support for titled boreholes (issue #318).
+- Added neural network for faster batch calculations (issue #322).
 
 ### Fixed
 

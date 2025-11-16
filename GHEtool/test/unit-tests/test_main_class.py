@@ -139,6 +139,14 @@ def test_create_rectangular_field():
     borefields_equal(borefield.borefield, gt.borefield.Borefield.rectangle_field(10, 10, 6, 6, 110, 4, 0.075))
 
 
+def test_create_staggered_field():
+    borefield = Borefield()
+    borefield.create_staggered_shaped_borefield(10, 10, 6, 6, 110, 4, 0.075)
+    assert borefield.number_of_boreholes == 95
+    borefields_equal(borefield.borefield, gt.borefield.Borefield.staggered_rectangle_field(10, 10, 6, 6, 110, 4, 0.075,
+                                                                                           include_last_borehole=False))
+
+
 def test_create_circular_field():
     borefield = Borefield()
     borefield.create_circular_borefield(10, 10, 100, 1)
