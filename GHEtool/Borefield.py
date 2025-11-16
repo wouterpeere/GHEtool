@@ -1515,6 +1515,8 @@ class Borefield(BaseClass):
         # (convergence if difference between borehole length in iterations is smaller than THRESHOLD_BOREHOLE_LENGTH)
         i = 0
         while not self._check_convergence(self.H, H_prev, i):
+            if H_prev != 0:
+                self.H = self.H * .5 + H_prev * 0.5
             if hourly:
                 self._calculate_temperature_profile(self.H, hourly=True)
             else:

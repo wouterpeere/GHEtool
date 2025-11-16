@@ -244,7 +244,7 @@ def test_size_with_multiple_ground_layers():
     borefield.load.peak_injection_duration = 8
     borefield.load.peak_extraction_duration = 6
     assert np.isclose(96.87238165292221, borefield.size(L2_sizing=True))
-    assert np.isclose(97.60790804951675, borefield.size(L3_sizing=True))
+    assert np.isclose(97.46310736940708, borefield.size(L3_sizing=True))
 
     # now with multiple layers
     layer_1 = GroundLayer(k_s=1.7, thickness=4.9)
