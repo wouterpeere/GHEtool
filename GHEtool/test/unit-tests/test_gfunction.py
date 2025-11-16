@@ -568,5 +568,4 @@ def test_no_borefield_description_ann():
     gfunc = GFunction()
     time_steps = np.arange(3600, 3600 * 24 * 365 * 100, 3600)
     with pytest.raises(ValueError):
-        gfunc.calculate(time_steps, borefield, 1e-6, use_neural_network=True,
-                        borefield_description={"type": 7, "N_1": 1, "N_2": 2, "B_1": 2, "B_2": 2})
+        gfunc.calculate(time_steps, borefield, 1e-6, use_neural_network=True)
