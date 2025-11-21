@@ -143,7 +143,7 @@ Within GHEtool, there are multiple ways of setting the ground data. Currently, y
 * _GroundTemperatureGradient_: if you want to model your ground with a varying ground temperature due to a geothermal
   gradient.
 * You can also use multiple ground layers to define your ground model. Please take a look
-  at [our example](https://ghetool.readthedocs.io/en/latest/sources/code/Examples/start_in_different_month.html).
+  at [our example](https://ghetool.readthedocs.io/en/latest/sources/code/Examples/multiple_ground_layers.html).
 
 Please note that it is possible to add your own ground types by inheriting the attributes from the abstract _GroundData
 class.
