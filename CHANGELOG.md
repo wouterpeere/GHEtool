@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- Artificial Neural Network to speed up calculations (issue #322).
+- Artificial Neural Network to speed up calculations (issue #322, @tblanke).
 
 ### Changed
 
@@ -24,6 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Problem in ConicalPipe class when working with vfr (issue #378).
 - Problem with start month DHW and optimisation (issue #378).
 - Problem with convergence (issue #390).
+- Fixed example link to multiple ground layers (PR by @elimh).
 
 ## [2.3.4] - 2025-07-29
 
