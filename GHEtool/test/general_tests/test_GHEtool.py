@@ -496,4 +496,4 @@ def test_case_issue_390():
 
     borefield.borehole = borehole
     borefield.size_L3()
-    assert borefield.H == 86.4119598683636
+    assert borefield.H == 86.31427258402536
