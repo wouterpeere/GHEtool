@@ -40,6 +40,8 @@ class Borefield(BaseClass):
     DEFAULT_LENGTH_PEAK: int = 6  # hours
     THRESHOLD_DEPTH_ERROR: int = 10000  # m
 
+    USE_SPEED_UP_IN_SIZING: bool = True
+
     HOURLY_LOAD_ARRAY: np.ndarray = np.arange(0, 8761, UPM).astype(np.uint32)
 
     def __init__(
@@ -1338,6 +1340,10 @@ class Borefield(BaseClass):
         if quadrant_sizing != 0:
             # size according to a specific quadrant
             self.H, _ = self._size_based_on_temperature_profile(quadrant_sizing)
+
+            # simulate with the correct temperatures
+            self.calculate_temperatures()
+
             return self.H
         else:
             try:
@@ -1352,6 +1358,10 @@ class Borefield(BaseClass):
             if sized:
                 # already correct size
                 self.H = max_temp
+
+                # simulate with the correct temperatures
+                self.calculate_temperatures()
+
                 if self.load.imbalance <= 0:
                     self.limiting_quadrant = 1
                 else:
@@ -1360,6 +1370,10 @@ class Borefield(BaseClass):
             min_temp, sized = self._size_based_on_temperature_profile(20)
             if sized:
                 self.H = min_temp
+
+                # simulate with the correct temperatures
+                self.calculate_temperatures()
+
                 if self.load.imbalance <= 0:
                     self.limiting_quadrant = 4
                 else:
@@ -1407,6 +1421,10 @@ class Borefield(BaseClass):
         if quadrant_sizing != 0:
             # size according to a specific quadrant
             self.H, _ = self._size_based_on_temperature_profile(quadrant_sizing, hourly=True)
+
+            # simulate with the correct temperatures
+            self.calculate_temperatures(hourly=True)
+
             return self.H
         else:
             try:
@@ -1428,6 +1446,10 @@ class Borefield(BaseClass):
             if sized:
                 # already correct size
                 self.H = max_temp
+
+                # simulate with the correct temperatures
+                self.calculate_temperatures(hourly=True)
+
                 if self.load.imbalance <= 0:
                     self.limiting_quadrant = 1
                 else:
@@ -1441,6 +1463,10 @@ class Borefield(BaseClass):
                 else:
                     self.limiting_quadrant = 3
                 self.H = min_temp
+
+                # simulate with the correct temperatures
+                self.calculate_temperatures(hourly=True)
+
                 return min_temp
             raise UnsolvableDueToTemperatureGradient
 
@@ -1450,7 +1476,7 @@ class Borefield(BaseClass):
         borefield is sized for the maximum fluid temperature when there is a non-constant ground temperature.
         The method is based (as can be seen in its corresponding validation document) on the assumption that the
         difference between the maximum temperature in peak injection and the average undisturbed ground temperature
-        is irreversily proportional to the borehole length. In this way, given this difference in temperature and the current
+        is irreversibly proportional to the borehole length. In this way, given this difference in temperature and the current
         borehole length, a new borehole length can be calculated.
 
         Parameters
@@ -1517,10 +1543,11 @@ class Borefield(BaseClass):
         while not self._check_convergence(self.H, H_prev, i):
             if H_prev != 0:
                 self.H = self.H * .5 + H_prev * 0.5
+            limit = self.Tf_min if quadrant in (3, 4, 20) else self.Tf_max
             if hourly:
-                self._calculate_temperature_profile(self.H, hourly=True)
+                self._calculate_temperature_profile(self.H, hourly=True, fluid_temperature=limit)
             else:
-                self._calculate_temperature_profile(self.H, hourly=False)
+                self._calculate_temperature_profile(self.H, hourly=False, fluid_temperature=limit)
             H_prev = self.H
             if not deep_sizing:
                 if quadrant == 1:
@@ -1713,7 +1740,8 @@ class Borefield(BaseClass):
         self.results = ResultsMonthly()
         self.load.reset_results(self.Tf_min, self.Tf_max)
 
-    def _calculate_temperature_profile(self, H: float = None, hourly: bool = False) -> None:
+    def _calculate_temperature_profile(self, H: float = None, hourly: bool = False,
+                                       fluid_temperature: float = None) -> None:
         """
         This function calculates the evolution in the fluid temperature and borehole wall temperature.
 
@@ -1723,6 +1751,8 @@ class Borefield(BaseClass):
             Borehole length at which the temperatures should be evaluated [m]. If None, then the current length is taken.
         hourly : bool
             True if the temperature evolution should be calculated on an hourly basis.
+        fluid_temperature : float
+            During sizing, this differs from None so the specific temperature is taken.
 
         Returns
         -------
@@ -1740,12 +1770,13 @@ class Borefield(BaseClass):
             results = None
 
             def get_rb(temperature):
+                if fluid_temperature is not None and Borefield.USE_SPEED_UP_IN_SIZING:
+                    return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
+                                                temperature=fluid_temperature)
                 if len(temperature) == 0:
-                    return self.borehole.get_Rb(H, self.D, self.r_b,
-                                                self.ground_data.k_s(depth, self.D), depth,
+                    return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
                                                 temperature=self.Tf_min)
-                return self.borehole.get_Rb(H, self.D, self.r_b,
-                                            self.ground_data.k_s(depth, self.D), depth,
+                return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
                                             temperature=temperature)
 
             if not hourly:
