@@ -40,6 +40,8 @@ class Borefield(BaseClass):
     DEFAULT_LENGTH_PEAK: int = 6  # hours
     THRESHOLD_DEPTH_ERROR: int = 10000  # m
 
+    USE_SPEED_UP_IN_SIZING: bool = True
+
     HOURLY_LOAD_ARRAY: np.ndarray = np.arange(0, 8761, UPM).astype(np.uint32)
 
     def __init__(
@@ -1768,7 +1770,7 @@ class Borefield(BaseClass):
             results = None
 
             def get_rb(temperature):
-                if fluid_temperature is not None:
+                if fluid_temperature is not None and Borefield.USE_SPEED_UP_IN_SIZING:
                     return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
                                                 temperature=fluid_temperature)
                 if len(temperature) == 0:
