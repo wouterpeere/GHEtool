@@ -1517,10 +1517,11 @@ class Borefield(BaseClass):
         while not self._check_convergence(self.H, H_prev, i):
             if H_prev != 0:
                 self.H = self.H * .5 + H_prev * 0.5
+            limit = self.Tf_min if quadrant in (3, 4, 20) else self.Tf_max
             if hourly:
-                self._calculate_temperature_profile(self.H, hourly=True)
+                self._calculate_temperature_profile(self.H, hourly=True, fluid_temperature=limit)
             else:
-                self._calculate_temperature_profile(self.H, hourly=False)
+                self._calculate_temperature_profile(self.H, hourly=False, fluid_temperature=limit)
             H_prev = self.H
             if not deep_sizing:
                 if quadrant == 1:
@@ -1713,7 +1714,8 @@ class Borefield(BaseClass):
         self.results = ResultsMonthly()
         self.load.reset_results(self.Tf_min, self.Tf_max)
 
-    def _calculate_temperature_profile(self, H: float = None, hourly: bool = False) -> None:
+    def _calculate_temperature_profile(self, H: float = None, hourly: bool = False,
+                                       fluid_temperature: float = None) -> None:
         """
         This function calculates the evolution in the fluid temperature and borehole wall temperature.
 
@@ -1723,6 +1725,8 @@ class Borefield(BaseClass):
             Borehole length at which the temperatures should be evaluated [m]. If None, then the current length is taken.
         hourly : bool
             True if the temperature evolution should be calculated on an hourly basis.
+        fluid_temperature : float
+            During sizing, this differs from None so the specific temperature is taken.
 
         Returns
         -------
@@ -1740,12 +1744,13 @@ class Borefield(BaseClass):
             results = None
 
             def get_rb(temperature):
+                if fluid_temperature is not None:
+                    return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
+                                                temperature=fluid_temperature)
                 if len(temperature) == 0:
-                    return self.borehole.get_Rb(H, self.D, self.r_b,
-                                                self.ground_data.k_s(depth, self.D), depth,
+                    return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
                                                 temperature=self.Tf_min)
-                return self.borehole.get_Rb(H, self.D, self.r_b,
-                                            self.ground_data.k_s(depth, self.D), depth,
+                return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
                                             temperature=temperature)
 
             if not hourly:
