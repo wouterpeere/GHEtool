@@ -1,5 +1,5 @@
 exclude GHEtool/Examples/
 exclude GHEtool/test/
 include GHEtool/test/unit-tests
-include GHEtool/VariableClasses/Gfunctions/ANN layers
-include GHEtool/VariableClasses/Gfunctions/short term ANN corrections
+include GHEtool/VariableClasses/Gfunctions/ANN_layers/*.csv
+include GHEtool/VariableClasses/Gfunctions/short_term_ANN_corrections/*.npy
