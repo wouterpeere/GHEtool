@@ -1421,7 +1421,7 @@ class Borefield(BaseClass):
             self.H, _ = self._size_based_on_temperature_profile(quadrant_sizing, hourly=True)
 
             # simulate with the correct temperatures
-            self.calculate_temperatures()
+            self.calculate_temperatures(hourly=True)
 
             return self.H
         else:
@@ -1446,7 +1446,7 @@ class Borefield(BaseClass):
                 self.H = max_temp
 
                 # simulate with the correct temperatures
-                self.calculate_temperatures()
+                self.calculate_temperatures(hourly=True)
 
                 if self.load.imbalance <= 0:
                     self.limiting_quadrant = 1
@@ -1463,7 +1463,7 @@ class Borefield(BaseClass):
                 self.H = min_temp
 
                 # simulate with the correct temperatures
-                self.calculate_temperatures()
+                self.calculate_temperatures(hourly=True)
 
                 return min_temp
             raise UnsolvableDueToTemperatureGradient
