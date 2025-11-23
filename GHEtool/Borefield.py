@@ -1338,6 +1338,10 @@ class Borefield(BaseClass):
         if quadrant_sizing != 0:
             # size according to a specific quadrant
             self.H, _ = self._size_based_on_temperature_profile(quadrant_sizing)
+
+            # simulate with the correct temperatures
+            self.calculate_temperatures()
+
             return self.H
         else:
             try:
@@ -1352,6 +1356,10 @@ class Borefield(BaseClass):
             if sized:
                 # already correct size
                 self.H = max_temp
+
+                # simulate with the correct temperatures
+                self.calculate_temperatures()
+
                 if self.load.imbalance <= 0:
                     self.limiting_quadrant = 1
                 else:
@@ -1360,6 +1368,10 @@ class Borefield(BaseClass):
             min_temp, sized = self._size_based_on_temperature_profile(20)
             if sized:
                 self.H = min_temp
+
+                # simulate with the correct temperatures
+                self.calculate_temperatures()
+
                 if self.load.imbalance <= 0:
                     self.limiting_quadrant = 4
                 else:
@@ -1407,6 +1419,10 @@ class Borefield(BaseClass):
         if quadrant_sizing != 0:
             # size according to a specific quadrant
             self.H, _ = self._size_based_on_temperature_profile(quadrant_sizing, hourly=True)
+
+            # simulate with the correct temperatures
+            self.calculate_temperatures()
+
             return self.H
         else:
             try:
@@ -1428,6 +1444,10 @@ class Borefield(BaseClass):
             if sized:
                 # already correct size
                 self.H = max_temp
+
+                # simulate with the correct temperatures
+                self.calculate_temperatures()
+
                 if self.load.imbalance <= 0:
                     self.limiting_quadrant = 1
                 else:
@@ -1441,6 +1461,10 @@ class Borefield(BaseClass):
                 else:
                     self.limiting_quadrant = 3
                 self.H = min_temp
+
+                # simulate with the correct temperatures
+                self.calculate_temperatures()
+
                 return min_temp
             raise UnsolvableDueToTemperatureGradient
 
@@ -1450,7 +1474,7 @@ class Borefield(BaseClass):
         borefield is sized for the maximum fluid temperature when there is a non-constant ground temperature.
         The method is based (as can be seen in its corresponding validation document) on the assumption that the
         difference between the maximum temperature in peak injection and the average undisturbed ground temperature
-        is irreversily proportional to the borehole length. In this way, given this difference in temperature and the current
+        is irreversibly proportional to the borehole length. In this way, given this difference in temperature and the current
         borehole length, a new borehole length can be calculated.
 
         Parameters
