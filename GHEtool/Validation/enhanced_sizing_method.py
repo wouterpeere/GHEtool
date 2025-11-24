@@ -210,8 +210,7 @@ def test_case_auditorium():
     hourly_load = HourlyGeothermalLoad()
     hourly_load.simulation_period = 20
     hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,
-                                    separator=";",
-                                    col_injection=0, col_extraction=1)
+                                    separator=";", col_injection=0, col_extraction=1)
     borefield.load = hourly_load
     borefield.create_rectangular_borefield(5, 4, 6, 6, 110, 4, 0.075)
 
@@ -247,8 +246,7 @@ def test_case_swimming_pool():
     hourly_load.simulation_period = 20
 
     hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\swimming_pool.csv"), header=True,
-                                    separator=";",
-                                    col_injection=0, col_extraction=1)
+                                    separator=";", col_injection=0, col_extraction=1)
     borefield.load = hourly_load
     borefield.create_rectangular_borefield(15, 20, 6, 6, 110, 4, 0.075)
     start = time.time()
@@ -266,4 +264,39 @@ def test_case_swimming_pool():
     assert np.isclose(borefield.H, 301.7227592617909)
     assert np.isclose(borefield.results.min_temperature, 3.0001877071926537)
     assert np.isclose(borefield.results.max_temperature, 12.919492619924261)
+    print(f'Simulation time without speed up {time.time() - start}s')
+
+
+def test_case_auditorium_active_passive():
+    borefield = Borefield()
+    borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 4, 0.075)
+    borefield.ground_data = GroundFluxTemperature(3, 10)
+    borefield.fluid_data = TemperatureDependentFluidData('MPG', 25, mass_percentage=False)
+    borefield.flow_data = ConstantFlowRate(vfr=0.3)
+    borefield.pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
+    borefield.calculation_setup(use_constant_Rb=False)
+    borefield.set_max_avg_fluid_temperature(25)
+    borefield.set_min_avg_fluid_temperature(3)
+    hourly_load = HourlyBuildingLoad()
+    hourly_load.simulation_period = 20
+    hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,
+                                    separator=";", col_cooling=0, col_heating=1)
+    hourly_load.eer = EERCombined(20, 5, 17)
+    borefield.load = hourly_load
+    borefield.create_rectangular_borefield(5, 4, 6, 6, 110, 4, 0.075)
+    start = time.time()
+
+    borefield.size_L4()
+    assert np.isclose(borefield.H, 51.676740693499106)
+    assert np.isclose(borefield.results.min_temperature, 3.0002733156958086)
+    assert np.isclose(borefield.results.max_temperature, 23.824518064283197)
+    print(f'Simulation time with speed up {time.time() - start}s')
+
+    borefield.USE_SPEED_UP_IN_SIZING = False
+    start = time.time()
+
+    borefield.size_L4()
+    assert np.isclose(borefield.H, 51.676740693499106)
+    assert np.isclose(borefield.results.min_temperature, 3.0002733156958086)
+    assert np.isclose(borefield.results.max_temperature, 23.824518064283197)
     print(f'Simulation time without speed up {time.time() - start}s')

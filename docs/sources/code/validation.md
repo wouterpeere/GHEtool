@@ -57,3 +57,11 @@ The validation of the artificial neural network, used in GHEtool, can be found h
 
 Validation/artificial_neural_network.rst
 ```
+
+The validation for the enhanced and faster sizing method, can be found here.
+
+```{toctree}
+:maxdepth: 1
+
+Validation/enhanced_sizing_method.rst
+```

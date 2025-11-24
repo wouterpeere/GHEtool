@@ -16,7 +16,7 @@ from numpy.typing import ArrayLike
 from scipy.signal import convolve
 
 from GHEtool.VariableClasses import FluidData, Borehole, GroundConstantTemperature, ResultsMonthly, ResultsHourly, \
-    TemperatureDependentFluidData
+    TemperatureDependentFluidData, SCOP, SEER
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, CalculationSetup, Cluster, \
     EERCombined
 from GHEtool.VariableClasses.LoadData import *
@@ -1769,7 +1769,11 @@ class Borefield(BaseClass):
             results = None
 
             def get_rb(temperature, limit=None):
-                if self.USE_SPEED_UP_IN_SIZING and sizing:
+                variable_efficiency = isinstance(self.load, _LoadDataBuilding) and not (
+                        isinstance(self.load.cop, SCOP) and isinstance(self.load.cop_dhw, SCOP) and isinstance(
+                    self.load.eer, SEER))
+                if self.USE_SPEED_UP_IN_SIZING and sizing and not variable_efficiency:
+                    # use only extreme temperatures when sizing
                     if limit is not None:
                         if len(temperature) == 0:
                             return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
