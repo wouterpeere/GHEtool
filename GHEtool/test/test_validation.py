@@ -64,3 +64,17 @@ def test_validation_ANN():
     from GHEtool.Validation.artificial_neural_network import validate_L3, validate_L4
     validate_L3()
     validate_L4()
+
+
+def test_faster_sizing():
+    from GHEtool.Validation.enhanced_sizing_method import test_monthly_quadrant_1, \
+        test_monthly_quadrant_1_more_data_points, test_monthly_quadrant_2, test_monthly_quadrant_4, test_case_office, \
+        test_case_auditorium, test_case_swimming_pool, test_case_auditorium_active_passive
+    test_monthly_quadrant_1()
+    test_monthly_quadrant_2()
+    test_monthly_quadrant_4()
+    test_monthly_quadrant_1_more_data_points()
+    test_case_auditorium()
+    test_case_office()
+    test_case_swimming_pool()
+    test_case_auditorium_active_passive()
