@@ -67,8 +67,13 @@ def test_validation_ANN():
 
 
 def test_faster_sizing():
-    from GHEtool.Validation.enhanced_sizing_method import *
+    from GHEtool.Validation.enhanced_sizing_method import test_monthly_quadrant_1, \
+        test_monthly_quadrant_1_more_data_points, test_monthly_quadrant_2, test_monthly_quadrant_4, test_case_office, \
+        test_case_auditorium, test_case_swimming_pool
     test_monthly_quadrant_1()
     test_monthly_quadrant_2()
     test_monthly_quadrant_4()
     test_monthly_quadrant_1_more_data_points()
+    test_case_auditorium()
+    test_case_office()
+    test_case_swimming_pool()

@@ -149,6 +149,7 @@ class ResultsHourly(_Results):
         """
         self._Tf = temperature_fluid
 
+        self._Tf_extraction = None
         super().__init__(borehole_wall_temp)
         self.hourly = True
 
@@ -158,6 +159,8 @@ class ResultsHourly(_Results):
 
     @property
     def peak_extraction(self) -> np.ndarray:
+        if self._Tf_extraction is not None:
+            return self._Tf_extraction
         return self.Tf
 
     @property
