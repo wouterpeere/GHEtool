@@ -452,7 +452,25 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 50.7546, 75.436,
                                                    181.2417, 209.5633, 402.086, 553.3226,
                                                    name='Optimise load profile 3 (energy)', power=2))
+temp_borehole = copy.deepcopy(borefield.borehole)
+borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
+borefield.flow_data = ConstantFlowRate(vfr=0.3)
+borefield.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
 
+borefield.borehole.use_constant_Rb = False
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 97.8714, 99.97627,
+                                                   536.035599, 676.41694, 174.8434, 131.74828,
+                                                   name='Optimise load profile 1 (energy, var temp)', power=2))
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 86.56681, 99.65407,
+                                                   536.0355, 669.798, 280.6328, 296.0579,
+                                                   name='Optimise load profile 2 (energy, var temp)', power=2))
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 62.18321, 89.9022,
+                                                   262.3691, 329.9396, 368.47340, 487.24708,
+                                                   name='Optimise load profile 3 (energy, var temp)', power=2))
+borefield.borehole = temp_borehole
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 67.621, 81.579,
                                                    200, 200, 336.036, 476.416,
                                                    name='Optimise load profile 1 (power, limit)', power=1,
@@ -463,6 +481,16 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 
                                                    200, 200, 336.036, 476.416,
                                                    name='Optimise load profile 1 (energy, limit)', power=2,
                                                    max_peak_heating=200, max_peak_cooling=200))
+temp_borehole = copy.deepcopy(borefield.borehole)
+borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
+borefield.flow_data = ConstantFlowRate(vfr=0.3)
+borefield.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+borefield.borehole.use_constant_Rb = False
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 67.621, 81.579,
+                                                   200, 200, 336.036, 476.416,
+                                                   name='Optimise load profile 1 (energy, limit, var temp)', power=2,
+                                                   max_peak_heating=200, max_peak_cooling=200))
+borefield.borehole = temp_borehole
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 9.8902, 23.6774,
                                                    20.6834, 30, 515.352, 646.416,
                                                    name='Optimise load profile 1 (balance, limit)', power=3,
@@ -501,6 +529,7 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 100, 100,
                                                    536.036, 676.417, 0, 0, name='Optimise load profile 100% (energy)',
                                                    power=2))
+
 borefield.set_max_avg_fluid_temperature(17)
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 40.9204, 97.914,
                                                    105.219, 413.455, 430.817, 262.961,
@@ -540,6 +569,18 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.999, 72.193,
                                                    676.415, 345.694, 23.00968, 342.182,
                                                    name='Optimise load profile 1, reversed (energy)', power=2))
+temp_borehole = copy.deepcopy(borefield.borehole)
+borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
+borefield.flow_data = ConstantFlowRate(vfr=0.3)
+borefield.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+
+borefield.borehole.use_constant_Rb = False
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 100, 78.77365,
+                                                   676.4155, 482.4967, 0, 323.34919,
+                                                   name='Optimise load profile 1, reversed (energy, var temp)',
+                                                   power=2))
+borefield.borehole = temp_borehole
 borefield.set_max_avg_fluid_temperature(20)
 borefield.set_min_avg_fluid_temperature(4)
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 97.012, 87.506,
@@ -587,7 +628,23 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 96.316, 77.5254,
                                                    417.4359, 385.3091, 420.12788, 316.34701,
                                                    name='Optimise load profile 3, reversed (energy)', power=2))
+temp_borehole = copy.deepcopy(borefield.borehole)
+borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
+borefield.flow_data = ConstantFlowRate(vfr=0.3)
+borefield.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
 
+borefield.borehole.use_constant_Rb = False
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.98173, 98.066344,
+                                                   676.41559, 536.0366720, 120.256612, 169.86651323,
+                                                   name='Optimise load profile 2, reversed (energy, var temp)',
+                                                   power=2))
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 99.72142, 87.0802,
+                                                   676.415594, 536.0366720, 285.3761686, 278.54479,
+                                                   name='Optimise load profile 3, reversed (energy, var temp)',
+                                                   power=2))
+borefield.borehole = temp_borehole
 borefield = Borefield()
 borefield.create_rectangular_borefield(3, 6, 6, 6, 146, 4)
 borefield.set_min_avg_fluid_temperature(3)
@@ -701,6 +758,20 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 50.2929
                                                    509.995718403938,
                                                    name='Optimise load profile (eer combined) (energy)', power=2,
                                                    hourly=False))
+temp_borehole = copy.deepcopy(borefield.borehole)
+borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
+borefield.flow_data = ConstantFlowRate(vfr=0.3)
+borefield.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+
+borefield.borehole.use_constant_Rb = False
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 50.29292463948734, 12.75068338499146,
+                                                   95.92330946070751, 66.21612115506214, 602.8180923300746,
+                                                   509.995718403938,
+                                                   name='Optimise load profile (eer combined) (energy, var temp)',
+                                                   power=2,
+                                                   hourly=False))
+borefield.borehole = temp_borehole
 borefield.create_rectangular_borefield(6, 6, 6, 6, 146, 4)
 list_of_test_objects.add(
     OptimiseLoadProfileObject(borefield, load, 146, 3.7914, 0.98138, 3.123036, 2.00507225, 672.2522, 534.3652,
@@ -718,6 +789,19 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 100, 100.0, 
                                                    25.315, 42.119132843891755, 0.0, 64.4014083207306,
                                                    name='Optimise load profile (auditorium) (energy)', power=2,
                                                    hourly=False))
+temp_borehole = copy.deepcopy(borefield.borehole)
+borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
+borefield.flow_data = ConstantFlowRate(vfr=0.3)
+borefield.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+
+borefield.borehole.use_constant_Rb = False
+
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 100, 100.0, 92.62620369846371,
+                                                   25.315, 42.119132843891755, 0.0, 64.4014083207306,
+                                                   name='Optimise load profile (auditorium) (energy)', power=2,
+                                                   hourly=False))
+borefield.borehole = temp_borehole
+
 borefield = Borefield()
 data = GroundConstantTemperature(3, 10)
 borefield.ground_data = data
@@ -865,6 +949,7 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 55.7643
 borefield.fluid_data = TemperatureDependentFluidData('MEG', 25)
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 95.11186051930216, 74.6663486051536,
                                                    952.85809, 267.77306, 423.861705246, 316.33466586,
-                                                   name='Optimise load profile 1, reversed (energy, dhw load, include DHW, variable fluid)',
+                                                   name='Optimise load profile 1, reversed (energy, dhw load, '
+                                                        'include DHW, variable fluid)',
                                                    power=2,
                                                    hourly=False, dhw_preferential=False))
