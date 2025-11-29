@@ -771,12 +771,11 @@ borefield.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
 
 borefield.borehole.use_constant_Rb = False
 
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 59.25229098341299, 15.344802614881173,
-                                                   128.589968025, 87.752679252, 581.5496934382606,
-                                                   503.6232152236446,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 56.16000737, 14.8980537,
+                                                   120.9641560, 87.75267, 589.428823958,
+                                                   504.26187781319,
                                                    name='Optimise load profile (eer combined) (energy, var temp)',
-                                                   power=2,
-                                                   hourly=False))
+                                                   power=2, hourly=False))
 borefield.borehole = temp_borehole
 borefield.create_rectangular_borefield(6, 6, 6, 6, 146, 4)
 list_of_test_objects.add(
@@ -954,8 +953,8 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 55.7643
                                                    hourly=True, dhw_preferential=True))
 
 borefield.fluid_data = TemperatureDependentFluidData('MEG', 25)
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 95.11186051930216, 74.6663486051536,
-                                                   952.85809, 267.77306, 423.861705246, 316.33466586,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 94.94969483547132, 74.61296857235718,
+                                                   948.587403343, 267.317836, 427.471233, 316.3346658,
                                                    name='Optimise load profile 1, reversed (energy, dhw load, '
                                                         'include DHW, variable fluid)',
                                                    power=2,
