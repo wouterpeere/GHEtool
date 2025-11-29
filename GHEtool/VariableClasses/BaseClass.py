@@ -69,3 +69,13 @@ class MaximumNumberOfIterations(RuntimeError):
 
     def __init__(self, iter: int):
         super().__init__(f'The maximum number of iterations {iter} is crossed. There is no size convergence.')
+
+
+class UnsolvableOptimalFieldError(Exception):
+    """
+    This Exception occurs when the parameters for the optimal field size are such that no solution can be found.
+    """
+
+    def __init__(self):
+        super().__init__('No solution can be found with the current restrictions and iterations. Please try'
+                         'increasing the field size, allowed depths and/or the number of try"s.')

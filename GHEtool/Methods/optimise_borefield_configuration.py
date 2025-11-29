@@ -1,8 +1,11 @@
 import numpy as np
 
 from GHEtool import Borefield
+from GHEtool.VariableClasses.BaseClass import UnsolvableOptimalFieldError
 import pygfunction as gt
 import optuna
+
+optuna.logging.disable_default_handler()
 
 
 def optimise_borefield_configuration_config(
@@ -127,19 +130,16 @@ def optimise_borefield_configuration_config_all_in_once(
                                                                                    borefield.r_b, False)
         try:
             if borefield.number_of_boreholes < nb_min or borefield.number_of_boreholes > nb_max:
-                return max_value * 2
+                return max_value * 2, max_value * 2
             if size_L3:
                 depth = borefield.size_L3()
             else:
                 depth = borefield.size_L4()
             if h_min <= depth <= h_max:
-                if optimise == 'length':
-                    return depth * borefield.number_of_boreholes
-                else:
-                    return borefield.number_of_boreholes
-            return max_value * 2
+                return depth * borefield.number_of_boreholes, borefield.number_of_boreholes
+            return max_value * 2, max_value * 2
         except:
-            return max_value * 2
+            return max_value * 2, max_value * 2
 
     def objective(trial: optuna.Trial):
         max_value = int(l_1_max / b_min) * int(l_2_max / b_min) * h_max
@@ -154,11 +154,14 @@ def optimise_borefield_configuration_config_all_in_once(
         max_n_2 = int(l_2_max / b_2)  # Ensure n_2 * b_2 < l_2_max
         n_2 = trial.suggest_int('n_2', 1, max_n_2)
         shape = trial.suggest_categorical('shape', types)
-        return f(n_1, n_2, b_1, b_2, h_min, h_max, max_value, shape)
+
+        total_length, number = f(n_1, n_2, b_1, b_2, h_min, h_max, max_value, shape)
+        trial.set_user_attr("n_boreholes", number)
+        trial.set_user_attr("total_length", total_length)
+        return total_length if optimise == 'length' else number
 
     study = optuna.create_study()
     study.optimize(objective, n_trials=nb_of_trials)
-    params, total_borehole_length = study.best_trials[0].params, study.best_trials[0].value
     results = []
 
     seen_params = set()
@@ -170,20 +173,25 @@ def optimise_borefield_configuration_config_all_in_once(
 
         val = trial.values[0]
         params = trial.params
+        total_length = trial.user_attrs.get('total_length')
+        n_boreholes = trial.user_attrs.get('n_boreholes')
 
         # make hashable, order independent
         params_key = tuple(sorted(params.items()))
 
         # keep only if both value and params are new
-        if params_key not in seen_params and val not in seen_values:
+        if params_key not in seen_params and (n_boreholes, total_length) not in seen_values:
             seen_params.add(params_key)
-            seen_values.add(val)
-            results.append((val, params))
+            seen_values.add((n_boreholes, total_length))
+            results.append((total_length, params, n_boreholes if n_boreholes is not None else n_boreholes))
 
-    # Optional: sort by objective value
-    results.sort(key=lambda x: x[0])
+    if optimise == 'length':
+        # x = (objective_value, params, total_length, n_boreholes)
+        results.sort(key=lambda x: (x[0], x[2]))
+    else:
+        results.sort(key=lambda x: (x[2], x[0]))
 
-    def find_borefield(params):
+    def find_borefield(params, total_borehole_length):
         # return optimised field
         if params['shape'] < 1:
             temp = gt.borefield.Borefield.L_shaped_field(params['n_1'], params['n_2'], params['b_1'], params['b_2'],
@@ -212,7 +220,12 @@ def optimise_borefield_configuration_config_all_in_once(
             temp.H = total_borehole_length / temp.nBoreholes
             return temp
 
-    return [(i[0], i[1], find_borefield(i[1])) for i in results]
+    max_value = int(l_1_max / b_min) * int(l_2_max / b_min) * h_max
+    if results[0][0] == max_value * 2:
+        # no solution is found
+        raise UnsolvableOptimalFieldError
+
+    return [(i[0], i[1], i[2], find_borefield(i[1], i[0])) for i in results]
 
 
 def brute_force_config(
