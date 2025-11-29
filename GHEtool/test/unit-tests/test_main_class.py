@@ -21,7 +21,7 @@ data = GroundConstantTemperature(3, 10)
 ground_data_constant = data
 data_ground_flux = GroundFluxTemperature(3, 10)
 fluidData = ConstantFluidData(0.568, 998, 4180, 1e-3)
-constantFlowData = ConstantFlowRate(mfr=.02)
+constantFlowData = ConstantFlowRate(mfr=0.2)
 pipeData = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 flowData = ConstantFlowRate(vfr=0.2)
 
@@ -367,7 +367,7 @@ def test_Ahmadfard(ground_data, constant_Rb, result):
     load = MonthlyGeothermalLoadAbsolute(*load_case(3))
     borefield.ground_data = ground_data
     borefield.fluid_data = fluidData
-    borefield.flow_data = flowData
+    borefield.flow_data = constantFlowData
     borefield.pipe_data = pipeData
     borefield.calculation_setup(use_constant_Rb=constant_Rb)
     th, qh, qm, qa = load._calculate_last_year_params(True)
