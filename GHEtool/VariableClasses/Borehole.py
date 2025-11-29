@@ -6,7 +6,7 @@ import copy
 import pygfunction as gt
 
 from GHEtool.VariableClasses.BaseClass import BaseClass
-from GHEtool.VariableClasses.FluidData import _FluidData, FluidData, ConstantFluidData
+from GHEtool.VariableClasses.FluidData import _FluidData, ConstantFluidData
 from GHEtool.VariableClasses.FlowData import _FlowData
 from GHEtool.VariableClasses.PipeData import _PipeData
 from typing import Union
@@ -42,10 +42,6 @@ class Borehole(BaseClass):
         self._fluid_data = fluid_data
         self._pipe_data = pipe_data
         self._flow_data = flow_data
-
-        if isinstance(fluid_data, FluidData):
-            self._fluid_data = fluid_data.fluid_data
-            self._flow_data = fluid_data.flow_rate
 
         if self.data_available:
             self.use_constant_Rb: bool = False
@@ -140,11 +136,7 @@ class Borehole(BaseClass):
         -------
         None
         """
-        if isinstance(fluid_data, FluidData):
-            self._fluid_data = fluid_data.fluid_data
-            self._flow_data = fluid_data.flow_rate
-        else:
-            self._fluid_data = fluid_data
+        self._fluid_data = fluid_data
         if isinstance(self._pipe_data, _PipeData):
             self.pipe_data.R_f = 0
             self.pipe_data.R_p = 0

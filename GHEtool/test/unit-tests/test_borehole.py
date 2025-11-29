@@ -11,13 +11,6 @@ from GHEtool.VariableClasses import Borehole
 fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
 flow_data = ConstantFlowRate(mfr=0.2)
 pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
-old_fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-
-
-def test_load_old_fluid_data():
-    borehole = Borehole(fluid_data=old_fluid_data, pipe_data=pipe_data)
-    assert borehole.fluid_data == fluid_data
-    assert borehole.flow_data == flow_data
 
 
 def test_del_flow_data():
