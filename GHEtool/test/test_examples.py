@@ -106,7 +106,7 @@ def test_turbocollector(monkeypatch):
 
 
 def test_optimal_borehole_config():
-    from GHEtool.Examples.optimal_borehole_configuration_multipleconfig import borefield_case_1, borefield_case_2, \
+    from GHEtool.Examples.optimal_borehole_configuration import borefield_case_1, borefield_case_2, \
         borefield_case_3, borefield_case_4, borefield_office, borefield_auditorium, borefield_swimming_pool
     borefield_case_1()
     borefield_case_2()
