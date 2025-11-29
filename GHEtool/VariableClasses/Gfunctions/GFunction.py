@@ -115,7 +115,7 @@ class GFunction:
         self.model_weights: dict[int, list[NDArray[np.float64]]] = {
             i: [
                 pd.read_csv(
-                    FOLDER.joinpath(f"VariableClasses/Gfunctions/ANN layers/ai_model_shape_{i}_weight_{j}.csv"),
+                    FOLDER.joinpath(f"VariableClasses/Gfunctions/ANN_layers/ai_model_shape_{i}_weight_{j}.csv"),
                     sep=","
                 ).to_numpy()
                 for j in range(6)
@@ -123,11 +123,11 @@ class GFunction:
             for i in range(5)
         }
         # load short term corrections
-        self._g_store = np.load(FOLDER.joinpath(f"VariableClasses/Gfunctions/short term ANN corrections/g_store.npy"))
-        self._depth = np.load(FOLDER.joinpath(f"VariableClasses/Gfunctions/short term ANN corrections/depth.npy"))
-        self._burials = np.load(FOLDER.joinpath(f"VariableClasses/Gfunctions/short term ANN corrections/burials.npy"))
-        self._alpha = np.load(FOLDER.joinpath(f"VariableClasses/Gfunctions/short term ANN corrections/alpha.npy"))
-        self._radii = np.load(FOLDER.joinpath(f"VariableClasses/Gfunctions/short term ANN corrections/radii.npy"))
+        self._g_store = np.load(FOLDER.joinpath(f"VariableClasses/Gfunctions/short_term_ANN_corrections/g_store.npy"))
+        self._depth = np.load(FOLDER.joinpath(f"VariableClasses/Gfunctions/short_term_ANN_corrections/depth.npy"))
+        self._burials = np.load(FOLDER.joinpath(f"VariableClasses/Gfunctions/short_term_ANN_corrections/burials.npy"))
+        self._alpha = np.load(FOLDER.joinpath(f"VariableClasses/Gfunctions/short_term_ANN_corrections/alpha.npy"))
+        self._radii = np.load(FOLDER.joinpath(f"VariableClasses/Gfunctions/short_term_ANN_corrections/radii.npy"))
 
     @property
     def store_previous_values(self) -> bool:

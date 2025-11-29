@@ -16,7 +16,7 @@ from numpy.typing import ArrayLike
 from scipy.signal import convolve
 
 from GHEtool.VariableClasses import FluidData, Borehole, GroundConstantTemperature, ResultsMonthly, ResultsHourly, \
-    TemperatureDependentFluidData
+    TemperatureDependentFluidData, SCOP, SEER
 from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFunction, CalculationSetup, Cluster, \
     EERCombined
 from GHEtool.VariableClasses.LoadData import *
@@ -39,6 +39,8 @@ class Borefield(BaseClass):
     DEFAULT_INVESTMENT: list = [35, 0]  # 35 EUR/m
     DEFAULT_LENGTH_PEAK: int = 6  # hours
     THRESHOLD_DEPTH_ERROR: int = 10000  # m
+
+    USE_SPEED_UP_IN_SIZING: bool = True
 
     HOURLY_LOAD_ARRAY: np.ndarray = np.arange(0, 8761, UPM).astype(np.uint32)
 
@@ -1338,6 +1340,10 @@ class Borefield(BaseClass):
         if quadrant_sizing != 0:
             # size according to a specific quadrant
             self.H, _ = self._size_based_on_temperature_profile(quadrant_sizing)
+
+            # simulate with the correct temperatures
+            self.calculate_temperatures()
+
             return self.H
         else:
             try:
@@ -1352,6 +1358,10 @@ class Borefield(BaseClass):
             if sized:
                 # already correct size
                 self.H = max_temp
+
+                # simulate with the correct temperatures
+                self.calculate_temperatures()
+
                 if self.load.imbalance <= 0:
                     self.limiting_quadrant = 1
                 else:
@@ -1360,6 +1370,10 @@ class Borefield(BaseClass):
             min_temp, sized = self._size_based_on_temperature_profile(20)
             if sized:
                 self.H = min_temp
+
+                # simulate with the correct temperatures
+                self.calculate_temperatures()
+
                 if self.load.imbalance <= 0:
                     self.limiting_quadrant = 4
                 else:
@@ -1407,6 +1421,10 @@ class Borefield(BaseClass):
         if quadrant_sizing != 0:
             # size according to a specific quadrant
             self.H, _ = self._size_based_on_temperature_profile(quadrant_sizing, hourly=True)
+
+            # simulate with the correct temperatures
+            self.calculate_temperatures(hourly=True)
+
             return self.H
         else:
             try:
@@ -1428,6 +1446,10 @@ class Borefield(BaseClass):
             if sized:
                 # already correct size
                 self.H = max_temp
+
+                # simulate with the correct temperatures
+                self.calculate_temperatures(hourly=True)
+
                 if self.load.imbalance <= 0:
                     self.limiting_quadrant = 1
                 else:
@@ -1441,6 +1463,10 @@ class Borefield(BaseClass):
                 else:
                     self.limiting_quadrant = 3
                 self.H = min_temp
+
+                # simulate with the correct temperatures
+                self.calculate_temperatures(hourly=True)
+
                 return min_temp
             raise UnsolvableDueToTemperatureGradient
 
@@ -1450,7 +1476,7 @@ class Borefield(BaseClass):
         borefield is sized for the maximum fluid temperature when there is a non-constant ground temperature.
         The method is based (as can be seen in its corresponding validation document) on the assumption that the
         difference between the maximum temperature in peak injection and the average undisturbed ground temperature
-        is irreversily proportional to the borehole length. In this way, given this difference in temperature and the current
+        is irreversibly proportional to the borehole length. In this way, given this difference in temperature and the current
         borehole length, a new borehole length can be calculated.
 
         Parameters
@@ -1517,10 +1543,11 @@ class Borefield(BaseClass):
         while not self._check_convergence(self.H, H_prev, i):
             if H_prev != 0:
                 self.H = self.H * .5 + H_prev * 0.5
+            limit = self.Tf_min if quadrant in (3, 4, 20) else self.Tf_max
             if hourly:
-                self._calculate_temperature_profile(self.H, hourly=True)
+                self._calculate_temperature_profile(self.H, hourly=True, sizing=True)
             else:
-                self._calculate_temperature_profile(self.H, hourly=False)
+                self._calculate_temperature_profile(self.H, hourly=False, sizing=True)
             H_prev = self.H
             if not deep_sizing:
                 if quadrant == 1:
@@ -1713,7 +1740,7 @@ class Borefield(BaseClass):
         self.results = ResultsMonthly()
         self.load.reset_results(self.Tf_min, self.Tf_max)
 
-    def _calculate_temperature_profile(self, H: float = None, hourly: bool = False) -> None:
+    def _calculate_temperature_profile(self, H: float = None, hourly: bool = False, sizing: bool = False) -> None:
         """
         This function calculates the evolution in the fluid temperature and borehole wall temperature.
 
@@ -1723,6 +1750,8 @@ class Borefield(BaseClass):
             Borehole length at which the temperatures should be evaluated [m]. If None, then the current length is taken.
         hourly : bool
             True if the temperature evolution should be calculated on an hourly basis.
+        sizing : bool
+            True if this method is called during sizing.
 
         Returns
         -------
@@ -1739,13 +1768,27 @@ class Borefield(BaseClass):
 
             results = None
 
-            def get_rb(temperature):
+            def get_rb(temperature, limit=None):
+                variable_efficiency = isinstance(self.load, _LoadDataBuilding) and not (
+                        isinstance(self.load.cop, SCOP) and isinstance(self.load.cop_dhw, SCOP) and isinstance(
+                    self.load.eer, SEER))
+                if self.USE_SPEED_UP_IN_SIZING and sizing and not variable_efficiency:
+                    # use only extreme temperatures when sizing
+                    if limit is not None:
+                        if len(temperature) == 0:
+                            return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
+                                                        temperature=self.Tf_min)
+                        elif limit == self.Tf_max:
+                            return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
+                                                        temperature=max(temperature))
+                        else:
+                            return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
+                                                        temperature=min(temperature))
                 if len(temperature) == 0:
-                    return self.borehole.get_Rb(H, self.D, self.r_b,
-                                                self.ground_data.k_s(depth, self.D), depth,
+                    return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
                                                 temperature=self.Tf_min)
-                return self.borehole.get_Rb(H, self.D, self.r_b,
-                                            self.ground_data.k_s(depth, self.D), depth,
+
+                return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
                                             temperature=temperature)
 
             if not hourly:
@@ -1775,22 +1818,24 @@ class Borefield(BaseClass):
                 # now the Tf will be calculated based on
                 # Tf = Tb + Q * R_b
                 results_month_injection = Tb + self.load.monthly_baseload_injection_power_simulation_period * 1000 * (
-                        get_rb(results_temperature.monthly_injection) / self.number_of_boreholes / H)
+                        get_rb(results_temperature.monthly_injection, self.Tf_max) / self.number_of_boreholes / H)
                 results_month_extraction = Tb - self.load.monthly_baseload_extraction_power_simulation_period * 1000 * (
-                        get_rb(results_temperature.monthly_extraction) / self.number_of_boreholes / H)
+                        get_rb(results_temperature.monthly_extraction, self.Tf_min) / self.number_of_boreholes / H)
 
                 # extra summation if the g-function value for the peak is included
                 results_peak_injection = (
                         Tb
                         + (self.load.monthly_peak_injection_simulation_period
-                           * (g_value_peak_injection / k_s / 2 / pi + get_rb(results_temperature.peak_injection))
+                           * (g_value_peak_injection / k_s / 2 / pi + get_rb(results_temperature.peak_injection,
+                                                                             self.Tf_max))
                            - self.load.monthly_baseload_injection_power_simulation_period * g_value_peak_injection / k_s / 2 / pi)
                         * 1000 / self.number_of_boreholes / H
                 )
                 results_peak_extraction = (
                         Tb +
                         (- self.load.monthly_peak_extraction_simulation_period
-                         * (g_value_peak_extraction / k_s / 2 / pi + get_rb(results_temperature.peak_extraction))
+                         * (g_value_peak_extraction / k_s / 2 / pi + get_rb(results_temperature.peak_extraction,
+                                                                            self.Tf_min))
                          + self.load.monthly_baseload_extraction_power_simulation_period * g_value_peak_extraction / k_s / 2 / pi)
                         * 1000 / self.number_of_boreholes / H
                 )
@@ -1828,10 +1873,14 @@ class Borefield(BaseClass):
                 # now the Tf will be calculated based on
                 # Tf = Tb + Q * R_b
                 temperature_result = Tb + hourly_load * 1000 * (
-                        get_rb(results_temperature.peak_injection) / self.number_of_boreholes / H)
+                        get_rb(results_temperature.peak_injection, self.Tf_max) / self.number_of_boreholes / H)
 
                 # reset other variables
                 results = ResultsHourly(borehole_wall_temp=Tb, temperature_fluid=temperature_result)
+                if sizing:
+                    # do the same for extraction
+                    results._Tf_extraction = Tb + hourly_load * 1000 * (
+                            get_rb(results_temperature.peak_extraction, self.Tf_min) / self.number_of_boreholes / H)
 
             return results
 
