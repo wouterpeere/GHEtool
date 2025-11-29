@@ -1,26 +1,8 @@
-"""
-The goal of this file is to validate the artificial neural network, based on the work of Blanke et al. ([#BlankeEtAl]_).
-It shows that all simulations are withing 2% and that the ANN gives a slight overestimation (so it is on the safe side).
-The simulation time is 200-1000 times faster.
-
-References
-----------
-.. [#BlankeEtAl] Blanke T., Pfeiffer F., Göttsche J., Döring B. (2024) Artificial neural networks use
-for the design of geothermal probe fields. In Proceedings of BauSim Conference 2024:  10th Conference of
-IBPSA-Germany and Austria. Vienna (Austria), 23-26 September 2024. https://doi.org/10.26868/29761662.2024.12
-"""
-import copy
-
-import pytest
-
 from GHEtool import *
 from GHEtool.Methods.optimise_borefield_configuration import optimise_borefield_configuration
 from GHEtool.Validation.cases import load_case
 
-import time
 
-
-## define cases
 def borefield_case_1():
     borefield = Borefield(ground_data=GroundConstantTemperature(3.5, 10),
                           load=MonthlyGeothermalLoadAbsolute(*load_case(1)))

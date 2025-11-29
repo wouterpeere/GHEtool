@@ -13,6 +13,20 @@ import optuna
 optuna.logging.disable_default_handler()
 
 
+def _find_borefield(borefield, n_1, n_2, b_1, b_2, shape) -> gt.borefield.Borefield:
+    if shape < 1:
+        return gt.borefield.Borefield.L_shaped_field(n_1, n_2, b_1, b_2, 100, borefield.D, borefield.r_b)
+    elif shape < 2:
+        return gt.borefield.Borefield.U_shaped_field(n_1, n_2, b_1, b_2, 100, borefield.D, borefield.r_b)
+    elif shape < 3:
+        return gt.borefield.Borefield.box_shaped_field(n_1, n_2, b_1, b_2, 100, borefield.D, borefield.r_b)
+    elif shape < 4:
+        return gt.borefield.Borefield.rectangle_field(n_1, n_2, b_1, b_2, 100, borefield.D, borefield.r_b)
+    else:
+        return gt.borefield.Borefield.staggered_rectangle_field(n_1, n_2, b_1, b_2, 100, borefield.D, borefield.r_b,
+                                                                False)
+
+
 def optimise_borefield_configuration(
         borefield: Borefield,
         l_1_max: float,
@@ -30,7 +44,8 @@ def optimise_borefield_configuration(
         optimise: str = 'length') -> list:
     """
     This function calculates the optimal borefield configuration within a certain area.
-    
+    This is done using the hyperparameter optimization framework optuna.
+
     Parameters
     ----------
     borefield
@@ -107,22 +122,7 @@ def optimise_borefield_configuration(
         tuple
             Total borehole length [m], number of boreholes [-]
         """
-        if shape < 1:
-            borefield_temp.borefield = gt.borefield.Borefield.L_shaped_field(n_1, n_2, b_1, b_2, 100, borefield_temp.D,
-                                                                             borefield_temp.r_b)
-        elif shape < 2:
-            borefield_temp.borefield = gt.borefield.Borefield.U_shaped_field(n_1, n_2, b_1, b_2, 100, borefield_temp.D,
-                                                                             borefield_temp.r_b)
-        elif shape < 3:
-            borefield_temp.borefield = gt.borefield.Borefield.box_shaped_field(n_1, n_2, b_1, b_2, 100,
-                                                                               borefield_temp.D, borefield_temp.r_b)
-        elif shape < 4:
-            borefield_temp.borefield = gt.borefield.Borefield.rectangle_field(n_1, n_2, b_1, b_2, 100, borefield_temp.D,
-                                                                              borefield_temp.r_b)
-        else:
-            borefield_temp.borefield = gt.borefield.Borefield.staggered_rectangle_field(n_1, n_2, b_1, b_2, 100,
-                                                                                        borefield_temp.D,
-                                                                                        borefield_temp.r_b, False)
+        borefield_temp.borefield = _find_borefield(borefield, n_1, n_2, b_1, b_2, shape)
         try:
             if borefield_temp.number_of_boreholes < nb_min or borefield_temp.number_of_boreholes > nb_max:
                 return max_value * 2, max_value * 2
@@ -242,26 +242,43 @@ def brute_force_config(
         b_max: float,
         b_step: float,
         h_min: float,
-        h_max: float
+        h_max: float,
+        types: list = [0, 1, 2, 3, 4],
+        size_L3: bool = True,
+        optimise: str = 'length'
 ):
-    length = 10 ** 8
-    data = []
-    for b_1 in np.arange(b_min, b_max + 0.1, b_step):
-        for b_2 in np.arange(b_min, b_max + 0.1, b_step):
-            for n_1 in range(1, int(l_1_max / b_1) + 1):
-                for n_2 in range(1, int(l_2_max / b_2) + 1):
-                    print(n_1, n_2, b_1, b_2)
+    borefield_temp = copy.deepcopy(borefield)
 
-                    try:
-                        borefield.create_rectangular_borefield(n_1, n_2, b_1, b_2, 100, borefield.D, borefield.r_b)
-                        depth = borefield.size_L3()
-                        if h_min <= depth <= h_max:
-                            length = min(depth * n_1 * n_2, length)
-                            if length == depth * n_1 * n_2:
-                                data = [n_1, n_2, b_1, b_2, depth]
-                        # else:
-                        #     print(n_1, n_2, b_1, b_2, depth)
-                    except:
-                        pass
-                        # print(n_1, n_2, b_1, b_2)
-    return gt.borefield.Borefield.rectangle_field(*data, borefield.D, borefield.r_b)
+    # set vars
+    nb_of_boreholes = 999
+    total_length = 1e9
+    params = None
+
+    for shape in types:
+        for b_1 in np.arange(b_min, b_max + 0.1, b_step):
+            for b_2 in np.arange(b_min, b_max + 0.1, b_step):
+                for n_1 in range(1, int(l_1_max / b_1) + 1):
+                    for n_2 in range(1, int(l_2_max / b_2) + 1):
+                        borefield_temp.borefield = _find_borefield(borefield, n_1, n_2, b_1, b_2, shape)
+                        try:
+                            if size_L3:
+                                depth = borefield_temp.size_L3()
+                            else:
+                                depth = borefield_temp.size_L4()
+                            if h_min <= depth <= h_max:
+
+                                if optimise == 'length':
+                                    if depth * borefield_temp.number_of_boreholes < total_length:
+                                        total_length = depth * borefield_temp.number_of_boreholes
+                                        nb_of_boreholes = borefield_temp.number_of_boreholes
+                                        params = [n_1, n_2, b_1, b_2, shape]
+                                else:
+                                    if borefield_temp.number_of_boreholes < nb_of_boreholes:
+                                        total_length = depth * borefield_temp.number_of_boreholes
+                                        nb_of_boreholes = borefield_temp.number_of_boreholes
+                                        params = [n_1, n_2, b_1, b_2, shape]
+                        except:
+                            pass
+    borefield = _find_borefield(borefield, *params)
+    borefield.H = total_length / nb_of_boreholes
+    return (total_length, params, nb_of_boreholes, borefield)

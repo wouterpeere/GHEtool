@@ -70,14 +70,12 @@ mentioned are the ones with which the code is tested)
 * pygfunction >= 2.3.0
 * scipy >= 1.8.1
 * secondarycoolantprops >= 1.1
+* optuna >= 3.6.1
+*
 
 For the tests
 
 * pytest >= 7.1.2
-
-For the active/passive example
-
-* optuna >= 3.6.1
 
 ## Quick start
 
