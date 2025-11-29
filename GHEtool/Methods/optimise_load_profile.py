@@ -316,7 +316,7 @@ def optimise_load_profile_energy(
 
     def update_last_month(idx, init_load) -> (float, float):
         def calculate(Tmin: float = None, Tmax: float = None, *args):
-            if Tmin is None:  # or (not variable_efficiency and borefield.USE_SPEED_UP_IN_SIZING):
+            if Tmin is None or (not variable_efficiency and borefield.USE_SPEED_UP_IN_SIZING):
                 Rb_min = Rb_min_const
                 Rb_max = Rb_max_const
             else:
