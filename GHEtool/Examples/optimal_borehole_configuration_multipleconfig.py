@@ -1,52 +1,128 @@
-from GHEtool import *
-from GHEtool.Methods import *
-from GHEtool.Validation.cases import load_case
+"""
+The goal of this file is to validate the artificial neural network, based on the work of Blanke et al. ([#BlankeEtAl]_).
+It shows that all simulations are withing 2% and that the ANN gives a slight overestimation (so it is on the safe side).
+The simulation time is 200-1000 times faster.
 
-ground_data = GroundFluxTemperature(2.5, 10)
-fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
-pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
+References
+----------
+.. [#BlankeEtAl] Blanke T., Pfeiffer F., Göttsche J., Döring B. (2024) Artificial neural networks use
+for the design of geothermal probe fields. In Proceedings of BauSim Conference 2024:  10th Conference of
+IBPSA-Germany and Austria. Vienna (Austria), 23-26 September 2024. https://doi.org/10.26868/29761662.2024.12
+"""
+import copy
+
+from GHEtool import *
+from GHEtool.Validation.cases import load_case
+from GHEtool.Methods.optimise_borefield_configuration import optimise_borefield_configuration_config_all_in_once
+import time
+
+
+## define cases
+
+def teest_borefield_case_1():
+    borefield = Borefield(ground_data=GroundConstantTemperature(3.5, 10),
+                          load=MonthlyGeothermalLoadAbsolute(*load_case(1)))
+    borefield.create_rectangular_borefield(10, 6, 6.5, 6.5, 100, 4, 0.075)
+    borefield.calculation_setup(use_neural_network=True)
+
+    result = optimise_borefield_configuration_config_all_in_once(borefield, 80, 70, 5, 7, 0.5, 60, 150,
+                                                                 nb_of_trials=100)
+    print(result)
+
+
+# 4 cases
+borefield_case_1 = Borefield(ground_data=GroundConstantTemperature(3.5, 10),
+                             load=MonthlyGeothermalLoadAbsolute(*load_case(1)))
+borefield_case_1.create_rectangular_borefield(10, 6, 6.5, 6.5, 100, 4, 0.075)
+
+borefield_case_2 = Borefield(ground_data=GroundConstantTemperature(3.5, 10),
+                             load=MonthlyGeothermalLoadAbsolute(*load_case(2)))
+borefield_case_2.create_rectangular_borefield(10, 6, 6.5, 6.5, 100, 4, 0.075)
+
+borefield_case_3 = Borefield(ground_data=GroundConstantTemperature(3.5, 10),
+                             load=MonthlyGeothermalLoadAbsolute(*load_case(3)))
+borefield_case_3.create_rectangular_borefield(10, 6, 6.5, 6.5, 100, 4, 0.075)
+
+borefield_case_4 = Borefield(ground_data=GroundConstantTemperature(3.5, 10),
+                             load=MonthlyGeothermalLoadAbsolute(*load_case(4)))
+borefield_case_4.create_rectangular_borefield(10, 6, 6.5, 6.5, 100, 4, 0.075)
 
 borefield = Borefield()
-borefield.create_rectangular_borefield(5, 4, 6, 6, 110, 0.7, 0.075)
-borefield.ground_data = ground_data
-borefield.fluid_data = fluid_data
-borefield.pipe_data = pipe_data
+borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 4, 0.075)
+borefield.ground_data = GroundFluxTemperature(3, 10)
+borefield.fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
+borefield.flow_data = ConstantFlowRate(mfr=0.2)
+borefield.pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 borefield.calculation_setup(use_constant_Rb=False)
 borefield.set_max_avg_fluid_temperature(17)
 borefield.set_min_avg_fluid_temperature(3)
-borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(1))
+hourly_load = HourlyGeothermalLoad()
+hourly_load.simulation_period = 20
+hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\office.csv"), header=True, separator=";",
+                                col_injection=0, col_extraction=1)
+borefield.load = hourly_load
+borefield_office = copy.deepcopy(borefield)
 
-# run optimisation with neural network
-borefield.calculation_setup(use_neural_network=True)
-import time
+hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True, separator=";",
+                                col_injection=0, col_extraction=1)
+borefield.load = hourly_load
+borefield.create_rectangular_borefield(5, 4, 6, 6, 110, 4, 0.075)
+borefield_auditorium = copy.deepcopy(borefield)
 
-start = time.time()
-# borefield_ann_opt = optimise_borefield_configuration_config(borefield, 40, 40, 4, 6, 0.5, 50, 200)
-borefield_ann_opt = optimise_borefield_configuration_config_all_in_once(borefield, 50, 50, 4, 6, 0.5, 50, 200, 300)
+hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\swimming_pool.csv"), header=True,
+                                separator=";",
+                                col_injection=0, col_extraction=1)
+borefield.load = hourly_load
+borefield.create_rectangular_borefield(15, 20, 6, 6, 110, 4, 0.075)
+borefield_swimming_pool = copy.deepcopy(borefield)
 
-for length, param, bor in borefield_ann_opt:
-    borefield.borefield = bor
-    print(param)
-    borefield.size_L3()
-    borefield.print_temperature_profile()
-# time_ann_opt = time.time() - start
-# start = time.time()
-# borefield_ann_brute_force = brute_force_config(borefield, 40, 40, 4, 6, 0.5, 50, 200)
-# time_ann_bf = time.time() - start
-# start = time.time()
-#
-# # run optimisation without neural network
-# borefield.calculation_setup(use_neural_network=False)
-# borefield_reg_opt = optimise_borefield_configuration(borefield, 40, 40, 4, 6, 0.5, 50, 200)
-# time_reg_opt = time.time() - start
-# start = time.time()
-# borefield_reg_brute_force = brute_force_config(borefield, 40, 40, 4, 6, 0.5, 50, 200)
-# time_reg_bf = time.time() - start
-# print(
-#     f'Total borehole length ANN optimisation {(borefield_ann_opt.nBoreholes * borefield_ann_opt.H[0]):.2f} m on {time_ann_opt}s')
-# print(
-#     f'Total borehole length ANN BF {(borefield_ann_brute_force.nBoreholes * borefield_ann_brute_force.H[0]):.2f} mon {time_ann_bf}s')
-# print(
-#     f'Total borehole length reg optimisation {(borefield_reg_opt.nBoreholes * borefield_reg_opt.H[0]):.2f} mon {time_reg_opt}s')
-# print(
-#     f'Total borehole length reg BF {(borefield_reg_brute_force.nBoreholes * borefield_reg_brute_force.H[0]):.2f} mon {time_reg_bf}s')
+# define lists
+list_borefields_L3 = [
+    ('case 1', borefield_case_1),
+    ('case 2', borefield_case_2),
+    ('case 3', borefield_case_3),
+    ('case 4', borefield_case_4),
+    ('office', borefield_office),
+    ('auditorium', borefield_auditorium),
+    ('swimming pool', borefield_swimming_pool)
+]
+
+list_borefields_L4 = [
+    ('office', borefield_office),
+    ('auditorium', borefield_auditorium),
+    ('swimming pool', borefield_swimming_pool)
+]
+
+
+def validate_L3():
+    print('--- L3 ---')
+    for name, borefield in list_borefields_L3:
+        borefield.calculation_setup(use_neural_network=True)
+        start = time.time()
+        optimise_borefield_configuration_config_all_in_once(borefield, 70, 70, 5, 7, 0.5, 80, 150)
+        time_ann = time.time() - start
+        print(time_ann)
+
+
+def validate_L4():
+    print('--- L4 ---')
+    for name, borefield in list_borefields_L4:
+        borefield.calculation_setup(use_neural_network=False)
+        start = time.time()
+        depth_reg = borefield.size_L4()
+        time_reg = time.time() - start
+
+        borefield.calculation_setup(use_neural_network=True)
+        start = time.time()
+        depth_ann = borefield.size_L4()
+        time_ann = time.time() - start
+
+        print(f'The required depth for case "{name}" is: {depth_reg:.2f}m (regular) or {depth_ann:.2f}m (ANN) '
+              f'(difference of {((depth_ann - depth_reg) / depth_reg * 100):.2f}%). The calculation time was '
+              f'{time_reg:.4f}s (regular) and {time_ann:.4f}s (ANN) (factor of {(time_reg / time_ann):.0f}).')
+
+        assert (depth_ann - depth_reg) / depth_reg < 0.02  # should be under 2%
+
+
+if __name__ == "__main__":  # pragma: no cover
+    teest_borefield_case_1()
