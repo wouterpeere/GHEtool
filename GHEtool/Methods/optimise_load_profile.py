@@ -304,7 +304,7 @@ def optimise_load_profile_energy(
     Rb_min_const = borefield.borehole.get_Rb(borefield.H, borefield.D,
                                              borefield.r_b,
                                              k_s, borefield.depth,
-                                             temperature=borefield.Tf_max)
+                                             temperature=borefield.Tf_min)
     Rb_max_const = borefield.borehole.get_Rb(borefield.H,
                                              borefield.D,
                                              borefield.r_b,
@@ -405,6 +405,7 @@ def optimise_load_profile_energy(
             if abs(peak_extraction - borefield.Tf_min) > temperature_threshold:
                 # check if it goes below the threshold
                 current_heating_peak = borefield.load.monthly_peak_heating_simulation_period[i]
+
                 if peak_extraction < borefield.Tf_min:
                     current_heating_peak = max(0.1, current_heating_peak - 1 * max(1, 10 * (
                             borefield.Tf_min - peak_extraction)))
@@ -514,7 +515,7 @@ def optimise_load_profile_balance(
     imbalance_factor : float
         Maximum allowed imbalance w.r.t. to the maximum of either the heat injection or extraction.
         It should be given in a range of 0-1. At 1, it converges to the solution for optimise for power.
-        
+
     Returns
     -------
     tuple [HourlyBuildingLoad, HourlyBuildingLoad] or tuple [HourlyBuildingLoadMultiYear, HourlyBuildingLoadMultiYear]
