@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Return multiyear external load if multiyear load is given as an input (issue #380).
 - Change how DHW is stored in the classes (issue #381).
 - Speed up calculate required depth (issue #403).
+- Speed up optimise energy profile (issue #406).
 
 ### Fixed
 
