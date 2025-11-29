@@ -176,12 +176,12 @@ def borefield_swimming_pool():
     borefield.calculation_setup(use_neural_network=True)
 
     # optimise for minimum borehole length
-    result = optimise_borefield_configuration_config_all_in_once(borefield, 120, 120, 5, 7, 0.5, 60, 150)
+    result = optimise_borefield_configuration_config_all_in_once(borefield, 120, 120, 5, 7, 0.5, 60, 300)
     borefield.borefield = result[0][-1]
     print(
         f'{len(result)} solutions are found. The optimal borehole length is: {result[0][0]:.2f}m. '
         f'There are {result[0][2]} boreholes. The configuration is {result[0][1]}.')
-    result = optimise_borefield_configuration_config_all_in_once(borefield, 120, 120, 5, 7, 0.5, 60, 150, optimise='nb')
+    result = optimise_borefield_configuration_config_all_in_once(borefield, 120, 120, 5, 7, 0.5, 60, 300, optimise='nb')
     borefield.borefield = result[0][-1]
     print(
         f'{len(result)} solutions are found. The optimal number of boreholes {result[0][2]}. '
