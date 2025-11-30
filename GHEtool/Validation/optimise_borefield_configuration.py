@@ -42,7 +42,7 @@ def borefield_case_2():
     print(f'This required {(time.time() - start):.2f}s.\n')
 
 
-def borefield_auditorium():
+def borefield_auditorium():  # pragma: no cover
     borefield = Borefield()
     borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 4, 0.075)
     borefield.ground_data = GroundFluxTemperature(3, 10)

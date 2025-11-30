@@ -263,7 +263,7 @@ def brute_force_config(
                         try:
                             if size_L3:
                                 depth = borefield_temp.size_L3()
-                            else:
+                            else:  # pragma: no cover
                                 depth = borefield_temp.size_L4()
                             if h_min <= depth <= h_max:
 

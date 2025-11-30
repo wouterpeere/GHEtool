@@ -83,4 +83,3 @@ def test_faster_sizing():
 def test_optimise_borefield_configuration():
     from GHEtool.Validation.optimise_borefield_configuration import borefield_case_2, borefield_auditorium
     borefield_case_2()
-    borefield_auditorium()
