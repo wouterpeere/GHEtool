@@ -139,11 +139,11 @@ def optimise_borefield_configuration(
             if borefield_temp.number_of_boreholes < nb_min or borefield_temp.number_of_boreholes > nb_max:
                 return max_value * 2, max_value * 2
             if size_L3:
-                depth = borefield_temp.size_L3()
+                length = borefield_temp.size_L3()
             else:
-                depth = borefield_temp.size_L4()
-            if h_min <= depth <= h_max:
-                return depth * borefield_temp.number_of_boreholes, borefield_temp.number_of_boreholes
+                length = borefield_temp.size_L4()
+            if h_min <= length + borefield_temp.D <= h_max:
+                return length * borefield_temp.number_of_boreholes, borefield_temp.number_of_boreholes
             return max_value * 2, max_value * 2
         except:
             return max_value * 2, max_value * 2
@@ -274,19 +274,19 @@ def brute_force_config(
                         borefield_temp.borefield = _find_borefield(borefield, n_1, n_2, b_1, b_2, shape)
                         try:
                             if size_L3:
-                                depth = borefield_temp.size_L3()
+                                length = borefield_temp.size_L3()
                             else:  # pragma: no cover
-                                depth = borefield_temp.size_L4()
-                            if h_min <= depth <= h_max:
+                                length = borefield_temp.size_L4()
+                            if h_min <= length + borefield_temp.D <= h_max:
 
                                 if optimise == 'length':
-                                    if depth * borefield_temp.number_of_boreholes < total_length:
-                                        total_length = depth * borefield_temp.number_of_boreholes
+                                    if length * borefield_temp.number_of_boreholes < total_length:
+                                        total_length = length * borefield_temp.number_of_boreholes
                                         nb_of_boreholes = borefield_temp.number_of_boreholes
                                         params = [n_1, n_2, b_1, b_2, shape]
                                 else:
                                     if borefield_temp.number_of_boreholes < nb_of_boreholes:
-                                        total_length = depth * borefield_temp.number_of_boreholes
+                                        total_length = length * borefield_temp.number_of_boreholes
                                         nb_of_boreholes = borefield_temp.number_of_boreholes
                                         params = [n_1, n_2, b_1, b_2, shape]
                         except:
