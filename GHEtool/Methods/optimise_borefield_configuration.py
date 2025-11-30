@@ -129,6 +129,12 @@ def optimise_borefield_configuration(
         """
         borefield_temp.borefield = _find_borefield(borefield, n_1, n_2, b_1, b_2, shape)
 
+        # correct flow rate
+        if flow_field is not None:
+            if flow_field._vfr is not None:
+                borefield_temp.flow_data = ConstantFlowRate(vfr=flow_field.vfr() / borefield_temp.number_of_boreholes)
+            else:
+                borefield_temp.flow_data = ConstantFlowRate(mfr=flow_field.mfr() / borefield_temp.number_of_boreholes)
         try:
             if borefield_temp.number_of_boreholes < nb_min or borefield_temp.number_of_boreholes > nb_max:
                 return max_value * 2, max_value * 2
