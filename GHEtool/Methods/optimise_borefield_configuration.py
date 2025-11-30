@@ -11,7 +11,8 @@ from GHEtool.VariableClasses.FlowData import *
 import pygfunction as gt
 import optuna
 
-optuna.logging.disable_default_handler()
+
+# optuna.logging.disable_default_handler()
 
 
 def _find_borefield(borefield, n_1, n_2, b_1, b_2, shape) -> gt.borefield.Borefield:
@@ -153,12 +154,12 @@ def optimise_borefield_configuration(
     def objective(trial: optuna.Trial):
         # Suggest b_1 first and calculate the max possible n_1 value
         b_1 = trial.suggest_float('b_1', b_min, b_max, step=b_step)
-        max_n_1 = int(l_1_max / b_1)  # Ensure n_1 * b_1 < l_1_max
+        max_n_1 = int(l_1_max / b_1) + 1  # Ensure n_1 * b_1 < l_1_max
         n_1 = trial.suggest_int('n_1', 1, max_n_1)
 
         # Suggest parameters for n_2 and b_2 similarly
         b_2 = trial.suggest_float('b_2', b_min, b_max, step=b_step)
-        max_n_2 = int(l_2_max / b_2)  # Ensure n_2 * b_2 < l_2_max
+        max_n_2 = int(l_2_max / b_2) + 1  # Ensure n_2 * b_2 < l_2_max
         n_2 = trial.suggest_int('n_2', 1, max_n_2)
         shape = trial.suggest_categorical('shape', types)
 

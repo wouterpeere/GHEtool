@@ -237,7 +237,6 @@ class Borefield(BaseClass):
         -------
         None
         """
-        self._borefield_description = None
         self.borefield = borefield
 
     def create_rectangular_borefield(self, N_1: int, N_2: int, B_1: float, B_2: float, H: float, D: float = 1,
@@ -1544,7 +1543,6 @@ class Borefield(BaseClass):
         while not self._check_convergence(self.H, H_prev, i):
             if H_prev != 0:
                 self.H = self.H * .5 + H_prev * 0.5
-            limit = self.Tf_min if quadrant in (3, 4, 20) else self.Tf_max
             if hourly:
                 self._calculate_temperature_profile(self.H, hourly=True, sizing=True)
             else:
@@ -1761,6 +1759,9 @@ class Borefield(BaseClass):
 
         # reset self.results
         self.results = ResultsMonthly()
+        variable_efficiency = isinstance(self.load, _LoadDataBuilding) and not (
+                isinstance(self.load.cop, SCOP) and isinstance(self.load.cop_dhw, SCOP) and isinstance(
+            self.load.eer, SEER))
 
         def calculate_temperatures(H, hourly=hourly, results_temperature=ResultsMonthly()):
             # set Rb* value
@@ -1770,9 +1771,7 @@ class Borefield(BaseClass):
             results = None
 
             def get_rb(temperature, limit=None):
-                variable_efficiency = isinstance(self.load, _LoadDataBuilding) and not (
-                        isinstance(self.load.cop, SCOP) and isinstance(self.load.cop_dhw, SCOP) and isinstance(
-                    self.load.eer, SEER))
+
                 if self.USE_SPEED_UP_IN_SIZING and sizing and not variable_efficiency:
                     # use only extreme temperatures when sizing
                     if limit is not None:
@@ -1902,7 +1901,10 @@ class Borefield(BaseClass):
                 self.load.reset_results(self.Tf_min, self.Tf_max)
             results_old = calculate_temperatures(H, hourly=hourly)
             self.load.set_results(results_old)
-            results = calculate_temperatures(H, hourly=hourly, results_temperature=results_old)
+            if sizing and variable_efficiency:
+                results = calculate_temperatures(H, hourly=hourly, results_temperature=results_old)
+            else:
+                results = results_old
 
             # safety
             i = 0
