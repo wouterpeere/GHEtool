@@ -174,7 +174,7 @@ def optimise_borefield_configuration(
 
     for trial in study.trials:
         if trial.values is None:
-            continue
+            continue  # pragma: no cover
 
         params = trial.params
         total_length = trial.user_attrs.get('total_length')

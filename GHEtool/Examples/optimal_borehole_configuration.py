@@ -139,6 +139,8 @@ def borefield_auditorium():
         f'{len(result)} solutions are found. The optimal number of boreholes {result[0][2]}. '
         f'The total borehole lengths is {result[0][0]:.2f}m. The configuration is {result[0][1]}.')
 
+    result = optimise_borefield_configuration(borefield, 80, 70, 5, 7, 0.5, 60, 150, size_L3=False)
+
 
 def borefield_swimming_pool():
     borefield = Borefield()
