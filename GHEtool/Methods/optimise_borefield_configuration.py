@@ -43,7 +43,7 @@ def optimise_borefield_configuration(
         types: list = [0, 1, 2, 3, 4],
         size_L3: bool = True,
         optimise: str = 'length',
-        flow_field: ConstantFlowRate = None) -> list:
+        flow_field: bool = None) -> list:
     """
     This function calculates the optimal borefield configuration within a certain area.
     This is done using the hyperparameter optimization framework optuna.
@@ -128,6 +128,8 @@ def optimise_borefield_configuration(
             Total borehole length [m], number of boreholes [-]
         """
         borefield_temp.borefield = _find_borefield(borefield, n_1, n_2, b_1, b_2, shape)
+        # set description
+        borefield_temp._borefield_description = {'B_1': b_1, 'B_2': b_2, 'N_1': n_1, 'N_2': n_2, 'type': shape}
 
         # correct flow rate
         if flow_field is not None:
@@ -272,6 +274,9 @@ def brute_force_config(
                 for n_1 in range(1, int(l_1_max / b_1) + 1):
                     for n_2 in range(1, int(l_2_max / b_2) + 1):
                         borefield_temp.borefield = _find_borefield(borefield, n_1, n_2, b_1, b_2, shape)
+                        # set description
+                        borefield_temp._borefield_description = {'B_1': b_1, 'B_2': b_2, 'N_1': n_1, 'N_2': n_2,
+                                                                 'type': shape}
                         try:
                             if size_L3:
                                 length = borefield_temp.size_L3()

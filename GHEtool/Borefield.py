@@ -476,6 +476,7 @@ class Borefield(BaseClass):
         else:
             self.gfunction_calculation_object.store_previous_values = \
                 self.gfunction_calculation_object._store_previous_values_backup
+        self._borefield_description = None
 
     @borefield.deleter
     def borefield(self):
