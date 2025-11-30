@@ -1543,6 +1543,7 @@ class Borefield(BaseClass):
         while not self._check_convergence(self.H, H_prev, i):
             if H_prev != 0:
                 self.H = self.H * .5 + H_prev * 0.5
+
             if hourly:
                 self._calculate_temperature_profile(self.H, hourly=True, sizing=True)
             else:
@@ -1586,7 +1587,6 @@ class Borefield(BaseClass):
                 return 0, False
 
             i += 1
-
         return self.H, (np.max(self.results.peak_injection) <= self.Tf_max + 0.05 or (
                 quadrant == 10 or quadrant == 1 or quadrant == 2)) and (
                                np.min(self.results.peak_extraction) >= self.Tf_min - 0.05 or (
@@ -1902,9 +1902,9 @@ class Borefield(BaseClass):
             results_old = calculate_temperatures(H, hourly=hourly)
             self.load.set_results(results_old)
             if sizing and not variable_efficiency:
-                results = calculate_temperatures(H, hourly=hourly, results_temperature=results_old)
-            else:
                 results = results_old
+            else:
+                results = calculate_temperatures(H, hourly=hourly, results_temperature=results_old)
 
             # safety
             i = 0
