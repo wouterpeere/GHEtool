@@ -1901,7 +1901,7 @@ class Borefield(BaseClass):
                 self.load.reset_results(self.Tf_min, self.Tf_max)
             results_old = calculate_temperatures(H, hourly=hourly)
             self.load.set_results(results_old)
-            if sizing and not variable_efficiency:
+            if sizing and not variable_efficiency and self._calculation_setup.approximate_req_depth:
                 results = results_old
             else:
                 results = calculate_temperatures(H, hourly=hourly, results_temperature=results_old)

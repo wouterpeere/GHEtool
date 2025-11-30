@@ -198,6 +198,8 @@ atol and rtol is chosen when sizing. The options are:
 * _force_deep_sizing_: When the alternative method from above should always be used.
 * _use_neural_network_: When the artificial neural network should be used. (This only works for regular borefield
   configurations configured withing GHEtool itself.)
+* _approximate_req_depth_: Sets the minimum and maximum fluid temperatures constant during sizing. Can cause significant
+  speed improvements with a slight overestimation of the required depth.
 
 ## Simple example
 

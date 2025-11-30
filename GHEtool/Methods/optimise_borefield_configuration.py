@@ -44,7 +44,7 @@ def optimise_borefield_configuration(
         types: list = [0, 1, 2, 3, 4],
         size_L3: bool = True,
         optimise: str = 'length',
-        flow_field: bool = None) -> list:
+        flow_field: ConstantFlowRate = None) -> list:
     """
     This function calculates the optimal borefield configuration within a certain area.
     This is done using the hyperparameter optimization framework optuna.
