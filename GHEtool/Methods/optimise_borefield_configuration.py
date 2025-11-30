@@ -7,6 +7,7 @@ import numpy as np
 
 from GHEtool import Borefield
 from GHEtool.VariableClasses.BaseClass import UnsolvableOptimalFieldError
+from GHEtool.VariableClasses.FlowData import *
 import pygfunction as gt
 import optuna
 
@@ -41,7 +42,8 @@ def optimise_borefield_configuration(
         nb_of_trials: int = 100,
         types: list = [0, 1, 2, 3, 4],
         size_L3: bool = True,
-        optimise: str = 'length') -> list:
+        optimise: str = 'length',
+        flow_field: ConstantFlowRate = None) -> list:
     """
     This function calculates the optimal borefield configuration within a certain area.
     This is done using the hyperparameter optimization framework optuna.
@@ -77,6 +79,9 @@ def optimise_borefield_configuration(
     optimise : str
         'Length' if the borefield should be optimised for the minimum borehole length, 'number' when the
         minimum number of boreholes should be selected.
+    flow_field : ConstantFlowRate
+        Contains the ConstantFlowRate object with the flow rate for the entire borefield. When this attribute is
+        given, the flow rate gets adapted based on the number of boreholes in the system.
 
     Returns
     -------
@@ -123,6 +128,7 @@ def optimise_borefield_configuration(
             Total borehole length [m], number of boreholes [-]
         """
         borefield_temp.borefield = _find_borefield(borefield, n_1, n_2, b_1, b_2, shape)
+
         try:
             if borefield_temp.number_of_boreholes < nb_min or borefield_temp.number_of_boreholes > nb_max:
                 return max_value * 2, max_value * 2
