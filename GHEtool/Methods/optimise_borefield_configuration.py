@@ -11,8 +11,7 @@ from GHEtool.VariableClasses.FlowData import *
 import pygfunction as gt
 import optuna
 
-
-# optuna.logging.disable_default_handler()
+optuna.logging.disable_default_handler()
 
 
 def _find_borefield(borefield, n_1, n_2, b_1, b_2, shape, **kwargs) -> gt.borefield.Borefield:
