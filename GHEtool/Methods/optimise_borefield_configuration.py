@@ -247,9 +247,16 @@ def optimise_borefield_configuration(
             temp.H = total_borehole_length / temp.nBoreholes
             return temp
         else:
-            temp = gt.borefield.Borefield.staggered_rectangle_field(params['n_1'], params['n_2'], params['b_1'],
-                                                                    params['b_2'], total_borehole_length, borefield.D,
-                                                                    borefield.r_b, False)
+            if dense:
+                temp = gt.borefield.Borefield.staggered_rectangle_field(params['n_1'], params['n_2'], params['b_1'],
+                                                                        params['b_1'], total_borehole_length,
+                                                                        borefield.D,
+                                                                        borefield.r_b, False)
+            else:
+                temp = gt.borefield.Borefield.staggered_rectangle_field(params['n_1'], params['n_2'], params['b_1'],
+                                                                        params['b_2'], total_borehole_length,
+                                                                        borefield.D,
+                                                                        borefield.r_b, False)
             temp.H = total_borehole_length / temp.nBoreholes
             return temp
 
