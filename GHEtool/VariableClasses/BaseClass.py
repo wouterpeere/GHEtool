@@ -77,5 +77,5 @@ class UnsolvableOptimalFieldError(Exception):
     """
 
     def __init__(self):
-        super().__init__('No solution can be found with the current restrictions and iterations. Please try'
-                         'increasing the field size, allowed depths and/or the number of try"s.')
+        super().__init__("No solution can be found with the current restrictions and iterations. Please try "
+                         "increasing the field size, allowed depths and/or the number of try's.")

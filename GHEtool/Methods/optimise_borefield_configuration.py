@@ -11,11 +11,10 @@ from GHEtool.VariableClasses.FlowData import *
 import pygfunction as gt
 import optuna
 
+optuna.logging.disable_default_handler()
 
-# optuna.logging.disable_default_handler()
 
-
-def _find_borefield(borefield, n_1, n_2, b_1, b_2, shape) -> gt.borefield.Borefield:
+def _find_borefield(borefield, n_1, n_2, b_1, b_2, shape, **kwargs) -> gt.borefield.Borefield:
     if shape < 1:
         return gt.borefield.Borefield.L_shaped_field(n_1, n_2, b_1, b_2, 100, borefield.D, borefield.r_b)
     elif shape < 2:
