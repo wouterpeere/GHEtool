@@ -15,6 +15,11 @@ def borefield_case_1():
     print(
         f'{len(result)} solutions are found. The optimal borehole length is: {result[0][0]:.2f}m. '
         f'There are {result[0][2]} boreholes. The configuration is {result[0][1]}.')
+    result = optimise_borefield_configuration(borefield, 80, 70, 5, 7, 0.5, 60, 150, dense=True)
+    borefield.borefield = result[0][-1]
+    print(
+        f'{len(result)} solutions are found. The optimal borehole length is: {result[0][0]:.2f}m. '
+        f'There are {result[0][2]} boreholes. The configuration is {result[0][1]}.')
     result = optimise_borefield_configuration(borefield, 80, 70, 5, 7, 0.5, 60, 150, optimise='nb')
     borefield.borefield = result[0][-1]
     print(
