@@ -254,7 +254,7 @@ def optimise_borefield_configuration(
             temp.H = total_borehole_length / temp.nBoreholes
             return temp
 
-    if results[0][0] == max_value * 2:
+    if len(results) == 0:
         # no solution is found
         raise UnsolvableOptimalFieldError
 
