@@ -141,9 +141,9 @@ def optimise_borefield_configuration(
             if borefield_temp.number_of_boreholes < nb_min or borefield_temp.number_of_boreholes > nb_max:
                 return max_value * 2, max_value * 2
             if size_L3:
-                length = borefield_temp.size_L3()
+                length = borefield_temp.size_L3(optimise=True)
             else:
-                length = borefield_temp.size_L4()
+                length = borefield_temp.size_L4(optimise=True)
             if h_min <= length + borefield_temp.D <= h_max:
                 return length * borefield_temp.number_of_boreholes, borefield_temp.number_of_boreholes
             return max_value * 2, max_value * 2
@@ -279,9 +279,9 @@ def brute_force_config(
                                                                  'type': shape}
                         try:
                             if size_L3:
-                                length = borefield_temp.size_L3()
+                                length = borefield_temp.size_L3(optimise=True)
                             else:  # pragma: no cover
-                                length = borefield_temp.size_L4()
+                                length = borefield_temp.size_L4(optimise=True)
                             if h_min <= length + borefield_temp.D <= h_max:
 
                                 if optimise == 'length':
