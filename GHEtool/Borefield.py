@@ -1304,7 +1304,7 @@ class Borefield(BaseClass):
 
         return self.H
 
-    def size_L3(self, H_init: float = None, quadrant_sizing: int = 0) -> float:
+    def size_L3(self, H_init: float = None, quadrant_sizing: int = 0, optimise: bool = False, **kwargs) -> float:
         """
         This function sizes the borefield based on a monthly (L3) method.
 
@@ -1314,6 +1314,9 @@ class Borefield(BaseClass):
             Initial borehole length from where to start the iteration [m]
         quadrant_sizing : int
             If a quadrant is given the sizing is performed for this quadrant else for the relevant
+        optimise : bool
+            True if this method is called from within the optimise borehole configuration function.
+            In that case, the final temperatures are not accurately calculated.
 
         Returns
         -------
@@ -1341,8 +1344,8 @@ class Borefield(BaseClass):
             # size according to a specific quadrant
             self.H, _ = self._size_based_on_temperature_profile(quadrant_sizing)
 
-            # simulate with the correct temperatures
-            self.calculate_temperatures()
+            if not optimise:
+                self.calculate_temperatures()
 
             return self.H
         else:
@@ -1359,8 +1362,8 @@ class Borefield(BaseClass):
                 # already correct size
                 self.H = max_temp
 
-                # simulate with the correct temperatures
-                self.calculate_temperatures()
+                if not optimise:
+                    self.calculate_temperatures()
 
                 if self.load.imbalance <= 0:
                     self.limiting_quadrant = 1
@@ -1372,7 +1375,8 @@ class Borefield(BaseClass):
                 self.H = min_temp
 
                 # simulate with the correct temperatures
-                self.calculate_temperatures()
+                if not optimise:
+                    self.calculate_temperatures()
 
                 if self.load.imbalance <= 0:
                     self.limiting_quadrant = 4
@@ -1381,7 +1385,7 @@ class Borefield(BaseClass):
                 return min_temp
             raise UnsolvableDueToTemperatureGradient
 
-    def size_L4(self, H_init: float = None, quadrant_sizing: int = 0) -> float:
+    def size_L4(self, H_init: float = None, quadrant_sizing: int = 0, optimise: bool = False, **kwargs) -> float:
         """
         This function sizes the borefield based on an hourly (L4) sizing methodology.
 
@@ -1391,6 +1395,9 @@ class Borefield(BaseClass):
             Initial borehole length from where to start the iteration [m]
         quadrant_sizing : int
             If a quadrant is given the sizing is performed for this quadrant else for the relevant
+        optimise : bool
+            True if this method is called from within the optimise borehole configuration function.
+            In that case, the final temperatures are not accurately calculated.
 
         Returns
         -------
@@ -1423,7 +1430,8 @@ class Borefield(BaseClass):
             self.H, _ = self._size_based_on_temperature_profile(quadrant_sizing, hourly=True)
 
             # simulate with the correct temperatures
-            self.calculate_temperatures(hourly=True)
+            if not optimise:
+                self.calculate_temperatures(hourly=True)
 
             return self.H
         else:
@@ -1447,8 +1455,8 @@ class Borefield(BaseClass):
                 # already correct size
                 self.H = max_temp
 
-                # simulate with the correct temperatures
-                self.calculate_temperatures(hourly=True)
+                if not optimise:
+                    self.calculate_temperatures(hourly=True)
 
                 if self.load.imbalance <= 0:
                     self.limiting_quadrant = 1
@@ -1464,8 +1472,8 @@ class Borefield(BaseClass):
                     self.limiting_quadrant = 3
                 self.H = min_temp
 
-                # simulate with the correct temperatures
-                self.calculate_temperatures(hourly=True)
+                if not optimise:
+                    self.calculate_temperatures(hourly=True)
 
                 return min_temp
             raise UnsolvableDueToTemperatureGradient
