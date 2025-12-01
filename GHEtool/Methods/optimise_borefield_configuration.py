@@ -11,7 +11,8 @@ from GHEtool.VariableClasses.FlowData import *
 import pygfunction as gt
 import optuna
 
-optuna.logging.disable_default_handler()
+
+# optuna.logging.disable_default_handler()
 
 
 def _find_borefield(borefield, n_1, n_2, b_1, b_2, shape, **kwargs) -> gt.borefield.Borefield:
@@ -43,7 +44,8 @@ def optimise_borefield_configuration(
         types: list = [0, 1, 2, 3, 4],
         size_L3: bool = True,
         optimise: str = 'length',
-        flow_field: ConstantFlowRate = None) -> list:
+        flow_field: ConstantFlowRate = None,
+        dense: bool = False) -> list:
     """
     This function calculates the optimal borefield configuration within a certain area.
     This is done using the hyperparameter optimization framework optuna.
@@ -82,6 +84,8 @@ def optimise_borefield_configuration(
     flow_field : ConstantFlowRate
         Contains the ConstantFlowRate object with the flow rate for the entire borefield. When this attribute is
         given, the flow rate gets adapted based on the number of boreholes in the system.
+    dense : bool
+        True if the staggered configuration is dense.
 
     Returns
     -------
@@ -151,20 +155,29 @@ def optimise_borefield_configuration(
             return max_value * 2, max_value * 2
 
     def objective(trial: optuna.Trial):
-        # Suggest b_1 first and calculate the max possible n_1 value
-        b_1 = trial.suggest_float('b_1', b_min, b_max, step=b_step)
-        max_n_1 = int(l_1_max / b_1) + 1  # Ensure n_1 * b_1 < l_1_max
-        n_1 = trial.suggest_int('n_1', 1, max_n_1)
-
-        # Suggest parameters for n_2 and b_2 similarly
-        b_2 = trial.suggest_float('b_2', b_min, b_max, step=b_step)
-        max_n_2 = int(l_2_max / b_2) + 1  # Ensure n_2 * b_2 < l_2_max
-        n_2 = trial.suggest_int('n_2', 1, max_n_2)
+        # Suggest shape first because b_2 depends on it
         shape = trial.suggest_categorical('shape', types)
 
+        # Suggest b_1 and n_1
+        b_1 = trial.suggest_float('b_1', b_min, b_max, step=b_step)
+        max_n_1 = int(l_1_max / b_1) + 1
+        n_1 = trial.suggest_int('n_1', 1, max_n_1)
+
+        # For shape 4 and dense, enforce b_2 = b_1
+        if shape == 4 and dense:
+            b_2 = b_1
+        else:
+            b_2 = trial.suggest_float('b_2', b_min, b_max, step=b_step)
+
+        max_n_2 = int(l_2_max / b_2) + 1
+        n_2 = trial.suggest_int('n_2', 1, max_n_2)
+
+        # Evaluate
         total_length, number = f(n_1, n_2, b_1, b_2, h_min, h_max, shape)
+
         trial.set_user_attr("n_boreholes", number)
         trial.set_user_attr("total_length", total_length)
+
         return total_length if optimise == 'length' else number
 
     study = optuna.create_study()
@@ -186,7 +199,8 @@ def optimise_borefield_configuration(
         params_key = tuple(sorted(params.items()))
 
         # keep only if both value and params are new
-        if params_key not in seen_params and (n_boreholes, total_length) not in seen_values:
+        if params_key not in seen_params and (n_boreholes, total_length) not in seen_values and \
+                total_length != max_value * 2:
             seen_params.add(params_key)
             seen_values.add((n_boreholes, total_length))
             results.append((total_length, params, n_boreholes if n_boreholes is not None else n_boreholes))
@@ -240,7 +254,7 @@ def optimise_borefield_configuration(
             temp.H = total_borehole_length / temp.nBoreholes
             return temp
 
-    if results[0][0] == max_value * 2:
+    if len(results) == 0:
         # no solution is found
         raise UnsolvableOptimalFieldError
 
