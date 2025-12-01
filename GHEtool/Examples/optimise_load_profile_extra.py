@@ -10,22 +10,29 @@ import numpy as np
 from GHEtool import *
 from GHEtool.Methods import *
 
+import time
+
 
 def optimise():
-    data = GroundFluxTemperature(1.8, 9.7, flux=0.08)
+    data = GroundFluxTemperature(2, 9.6, flux=0.07)
     borefield = Borefield()
     borefield.ground_data = data
-    borefield.Rb = 0.131
-    borefield.create_rectangular_borefield(3, 5, 6, 6, 100, 1, 0.07)
-    load = HourlyBuildingLoad(efficiency_heating=4.5, efficiency_cooling=20)
-    load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True, separator=";",
-                             col_cooling=0, col_heating=1)
-
-    # optimise the load for a 10x10 field (see data above) and a fixed length of 150m.
-    # first for an optimisation based on the power
+    borefield.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+    borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
+    borefield.flow_data = ConstantFlowRate(mfr=0.3)
+    borefield.borehole.use_constant_Rb = False
+    borefield.create_rectangular_borefield(20, 4, 6, 6, 150, 1, 0.07)
+    load = HourlyBuildingLoad(efficiency_heating=5, efficiency_cooling=20)
+    load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\hourly_profile.csv"), header=True,
+                             separator=";", col_cooling=1, col_heating=0)
+    load.simulation_period = 10
+    borefield.set_min_avg_fluid_temperature(3)
+    borefield.USE_SPEED_UP_IN_SIZING = False
+    # first optimise with the speed
+    start = time.time()
     building_load, _ = optimise_load_profile_energy(borefield, load)
     borefield.load = building_load
-
+    print(time.time() - start)
     print(f'Max heating power (primary): {borefield.load.max_peak_extraction:,.0f}kW')
     print(f'Max cooling power (primary): {borefield.load.max_peak_injection:,.0f}kW')
 

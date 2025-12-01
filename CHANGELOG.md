@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Optimise number of boreholes (issue #162).
 - Artificial Neural Network to speed up calculations (issue #322, @tblanke).
 
 ### Changed
