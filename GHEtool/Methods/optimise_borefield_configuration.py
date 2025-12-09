@@ -28,6 +28,37 @@ def _find_borefield(borefield, n_1, n_2, b_1, b_2, shape, **kwargs) -> gt.borefi
                                                                 False)
 
 
+def _check_identical_field(new_params: dict, seen_params: set) -> bool:
+    if tuple(sorted(new_params.items())) in seen_params:
+        return False
+    for param in seen_params:
+        temp = {'shape': param[-1][1], 'n_1': param[2][1], 'b_1': param[0][1], 'n_2': param[3][1], 'b_2': param[1][1]}
+
+        # check for line
+        if (new_params.get('n_1') == 1 or new_params.get('n_2') == 1) and (
+                temp.get('n_1') == 1 or temp.get('n_2') == 1):
+            nb_new = max(new_params.get('n_1'), new_params.get('n_2'))
+            distance = new_params.get('b_1') if nb_new == new_params.get('n_1') else new_params.get('b_2')
+            if nb_new == max(temp.get('n_1'), temp.get('n_2')) and distance == (
+                    temp.get('b_1') if nb_new == temp.get('n_1') else temp.get('b_2')):
+                return False
+
+        # check for symmetrical solution in case of dense, rectangle, box or L
+        if new_params.get('shape') in (0, 2, 3, 4):
+            if new_params.get('shape') == temp.get('shape') and (
+                    (new_params.get('n_1') == temp.get('n_1') and
+                     new_params.get('n_2') == temp.get('n_2') and
+                     new_params.get('b_1') == temp.get('b_1') and
+                     new_params.get('b_2') == temp.get('b_2')) or
+                    (new_params.get('n_1') == temp.get('n_2') and
+                     new_params.get('n_2') == temp.get('n_1') and
+                     new_params.get('b_1') == temp.get('b_2') and
+                     new_params.get('b_2') == temp.get('b_1'))
+            ):
+                return False
+    return True
+
+
 def optimise_borefield_configuration(
         borefield: Borefield,
         l_1_max: float,
@@ -143,12 +174,22 @@ def optimise_borefield_configuration(
         try:
             if borefield_temp.number_of_boreholes < nb_min or borefield_temp.number_of_boreholes > nb_max:
                 return max_value * 2, max_value * 2
-            if size_L3:
-                length = borefield_temp.size_L3(optimise=True)
+            if h_min == h_max:
+                # only the number of boreholes can vary, no need for the simulation
+                length = 0
             else:
-                length = borefield_temp.size_L4(optimise=True)
+                if size_L3:
+                    length = borefield_temp.size_L3(optimise=True)
+                else:
+                    length = borefield_temp.size_L4(optimise=True)
             if h_min <= length + borefield_temp.D <= h_max:
                 return length * borefield_temp.number_of_boreholes, borefield_temp.number_of_boreholes
+            elif length + borefield_temp.D <= h_min:
+                # check min length
+                borefield_temp._calculate_temperature_profile(h_min - borefield_temp.D, hourly=not size_L3, sizing=True)
+                if borefield_temp.results.min_temperature + borefield_temp._calculation_setup.atol > borefield_temp.Tf_min and borefield_temp.results.max_temperature - borefield_temp._calculation_setup.atol < borefield_temp.Tf_max:
+                    return (h_min - borefield_temp.D) * borefield_temp.number_of_boreholes, \
+                        borefield_temp.number_of_boreholes
             return max_value * 2, max_value * 2
         except:
             return max_value * 2, max_value * 2
@@ -194,11 +235,15 @@ def optimise_borefield_configuration(
         total_length = trial.user_attrs.get('total_length')
         n_boreholes = trial.user_attrs.get('n_boreholes')
 
+        # box with a length/width of 2 should be rectangle
+        if params.get('shape') == 2 and (params.get('n_1') == 2 or params.get('n_2') == 2):
+            params['shape'] = 3  # pragma: no cover
+
         # make hashable, order independent
         params_key = tuple(sorted(params.items()))
 
         # keep only if both value and params are new
-        if params_key not in seen_params and (n_boreholes, total_length) not in seen_values and \
+        if _check_identical_field(params, seen_params) and (n_boreholes, total_length) not in seen_values and \
                 total_length != max_value * 2:
             seen_params.add(params_key)
             seen_values.add((n_boreholes, total_length))
