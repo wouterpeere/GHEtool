@@ -188,7 +188,8 @@ def optimise_borefield_configuration(
                 # check min length
                 borefield_temp._calculate_temperature_profile(h_min - borefield_temp.D, hourly=not size_L3, sizing=True)
                 if borefield_temp.results.min_temperature + borefield_temp._calculation_setup.atol > borefield_temp.Tf_min and borefield_temp.results.max_temperature - borefield_temp._calculation_setup.atol < borefield_temp.Tf_max:
-                    return h_min * borefield_temp.number_of_boreholes, borefield_temp.number_of_boreholes
+                    return (h_min - borefield_temp.D) * borefield_temp.number_of_boreholes, \
+                        borefield_temp.number_of_boreholes
             return max_value * 2, max_value * 2
         except:
             return max_value * 2, max_value * 2
