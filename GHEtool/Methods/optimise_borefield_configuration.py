@@ -28,6 +28,37 @@ def _find_borefield(borefield, n_1, n_2, b_1, b_2, shape, **kwargs) -> gt.borefi
                                                                 False)
 
 
+def _check_identical_field(new_params: dict, seen_params: set) -> bool:
+    if tuple(sorted(new_params.items())) in seen_params:
+        return False
+    for param in seen_params:
+        temp = {'shape': param[-1][1], 'n_1': param[2][1], 'b_1': param[0][1], 'n_2': param[3][1], 'b_2': param[1][1]}
+
+        # check for line
+        if (new_params.get('n_1') == 1 or new_params.get('n_2') == 1) and (
+                temp.get('n_1') == 1 or temp.get('n_2') == 1):
+            nb_new = max(new_params.get('n_1'), new_params.get('n_2'))
+            distance = new_params.get('b_1') if nb_new == new_params.get('n_1') else new_params.get('b_2')
+            if nb_new == max(temp.get('n_1'), temp.get('n_2')) and distance == (
+                    temp.get('b_1') if nb_new == temp.get('n_1') else temp.get('b_2')):
+                return False
+
+        # check for symmetrical solution in case of dense, rectangle, box or L
+        if new_params.get('shape') in (0, 2, 3, 4):
+            if new_params.get('shape') == temp.get('shape') and (
+                    (new_params.get('n_1') == temp.get('n_1') and
+                     new_params.get('n_2') == temp.get('n_2') and
+                     new_params.get('b_1') == temp.get('b_1') and
+                     new_params.get('b_2') == temp.get('b_2')) or
+                    (new_params.get('n_1') == temp.get('n_2') and
+                     new_params.get('n_2') == temp.get('n_1') and
+                     new_params.get('b_1') == temp.get('b_2') and
+                     new_params.get('b_2') == temp.get('b_1'))
+            ):
+                return False
+    return True
+
+
 def optimise_borefield_configuration(
         borefield: Borefield,
         l_1_max: float,
@@ -203,11 +234,15 @@ def optimise_borefield_configuration(
         total_length = trial.user_attrs.get('total_length')
         n_boreholes = trial.user_attrs.get('n_boreholes')
 
+        # box with a length/width of 2 should be rectangle
+        if params.get('shape') == 2 and (params.get('n_1') == 2 or params.get('n_2') == 2):
+            params['shape'] = 3  # pragma: no cover
+
         # make hashable, order independent
         params_key = tuple(sorted(params.items()))
 
         # keep only if both value and params are new
-        if params_key not in seen_params and (n_boreholes, total_length) not in seen_values and \
+        if _check_identical_field(params, seen_params) and (n_boreholes, total_length) not in seen_values and \
                 total_length != max_value * 2:
             seen_params.add(params_key)
             seen_values.add((n_boreholes, total_length))
