@@ -94,7 +94,7 @@ def test_different_heating_cooling_peaks():
 def test_stuck_in_loop():
     borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(4)))
 
-    borefield.ground_data= data
+    borefield.ground_data = data
     borefield.set_borefield(copy.copy(borefield_gt))
     borefield.Rb = 0.2
 
@@ -117,7 +117,8 @@ def test_stuck_in_loop():
 def test_different_results_with_other_peak_lengths():
     borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(4)))
 
-borefield.ground_data = data    borefield.set_borefield(copy.copy(borefield_gt))
+    borefield.ground_data = data
+    borefield.set_borefield(copy.copy(borefield_gt))
 
     # set temperature boundaries
     borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
@@ -135,7 +136,8 @@ def test_reset_temp_profiles_when_loaded(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(1)))
 
-borefield.ground_data = data    borefield.set_borefield(copy.copy(borefield_gt))
+    borefield.ground_data = data
+    borefield.set_borefield(copy.copy(borefield_gt))
 
     borefield.calculate_temperatures()
     Tmax = borefield.results.peak_injection.copy()
@@ -153,7 +155,7 @@ borefield.ground_data = data    borefield.set_borefield(copy.copy(borefield_gt))
 def test_no_possible_solution():
     borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(4)))
 
-    borefield.set_ground_parameters(data_ground_flux)
+    borefield.ground_data = data_ground_flux
     borefield.set_borefield(copy.copy(borefield_gt))
 
     # limited by cooling
@@ -201,7 +203,8 @@ def test_problem_with_gfunction_calc_obj():
     load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_extraction, peak_injection)
     borefield = Borefield(load=load)
 
-borefield.ground_data = data    borefield.set_borefield(borefield_gt)
+    borefield.ground_data = data
+    borefield.set_borefield(borefield_gt)
     borefield.Rb = 0.2
 
     # set temperature boundaries
@@ -217,7 +220,7 @@ borefield.ground_data = data    borefield.set_borefield(borefield_gt)
 
     # set ground parameters to borefield
     borefield.set_borefield(borefield_gt)
-borefield.ground_data = data
+    borefield.ground_data = data
     # set Rb
     borefield.Rb = 0.2
 

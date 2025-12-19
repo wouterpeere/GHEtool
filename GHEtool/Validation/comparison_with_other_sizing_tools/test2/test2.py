@@ -22,7 +22,8 @@ from GHEtool import *
 def test_2_6h():
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=2.25, T_g=12.41, volumetric_heat_capacity=2877000, flux=0)
-    fluid_data = FluidData(mfr=0.2416667, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
+    fluid_data = ConstantFluidData(rho=1026, cp=4019, mu=0.003377, k_f=0.468)
+    flow_data = ConstantFlowRate(mfr=0.2416667)
     pipe_data = MultipleUTube(r_in=0.0137, r_out=0.0167, D_s=0.0471 / 2, k_g=1.73, k_p=0.45)
 
     # start test with dynamic Rb*
@@ -30,9 +31,10 @@ def test_2_6h():
     borefield = Borefield()
 
     # set ground data in borefield
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+    borefield.flow_data = flow_data
     borefield.create_rectangular_borefield(12, 10, 6, 6, 110, 3, 0.054)
 
     # load the hourly profile
@@ -41,7 +43,7 @@ def test_2_6h():
                              col_extraction=1, col_injection=0)
     borefield.load = load
 
-    delta_t = max(load.max_peak_extraction, load.max_peak_injection) * 1000 / (fluid_data.Cp * fluid_data.mfr) / 120
+    delta_t = max(load.max_peak_extraction, load.max_peak_injection) * 1000 / (fluid_data.cp() * flow_data.mfr()) / 120
 
     # set temperature bounds
     borefield.set_max_avg_fluid_temperature(35 + delta_t / 2)
@@ -70,9 +72,10 @@ def test_2_6h():
     borefield = Borefield()
 
     # set ground data in borefield
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+    borefield.flow_data = flow_data
     borefield.create_rectangular_borefield(12, 10, 6, 6, 110, 3, 0.054)
     Rb_static = 0.113
     borefield.set_Rb(Rb_static)
