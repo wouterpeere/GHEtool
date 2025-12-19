@@ -17,8 +17,8 @@ GHEtool is a Python package that contains all the functionalities needed to deal
 developed as a joint effort of KU Leuven (The SySi Team), boydens engineering (part of Sweco) and FH Aachen and is
 currently being maintained by Enead BV.
 The core of this package is the automated sizing of borefield under different conditions. By making use of combination
-of just-in-time calculations of thermal ground responses (
-using [pygfunction](https://github.com/MassimoCimmino/pygfunction)) with
+of just-in-time calculations of thermal ground responses
+(using [pygfunction](https://github.com/MassimoCimmino/pygfunction)) with
 intelligent interpolation, this automated sizing can be done in the order of milliseconds. Please visit our
 website [https://GHEtool.eu](https://GHEtool.eu) for more information.
 
