@@ -1253,8 +1253,7 @@ def test_with_titled_borefield():
     # define params
     ground_data = GroundFluxTemperature(1.9, 10)
     pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
-    fluid_data = FluidData(mfr=0.2)
-    fluid_data.import_fluid_from_pygfunction(gt.media.Fluid('MPG', 30, 2))
+    fluid_data = TemperatureDependentFluidData('MPG', 30).create_constant(2)
     load_data = MonthlyBuildingLoadAbsolute(
         np.array([.176, .174, .141, .1, .045, 0, 0, 0, 0.012, 0.065, 0.123, 0.164]) * 8 * 1350,
         np.array([0, 0, 0, 0, .112, .205, .27, .264, .149, 0, 0, 0]) * 4 * 700,
@@ -1272,17 +1271,13 @@ def test_with_titled_borefield():
     borefield.ground_data = ground_data
     borefield.pipe_data = pipe_data
     borefield.fluid_data = fluid_data
+    borefield.flow_data = ConstantFlowRate(mfr=0.2)
     borefield.set_max_avg_fluid_temperature(17)
 
     assert np.isclose(borefield.depth, 150 * math.cos(math.pi / 7) + 0.75)
     assert np.isclose(borefield.ground_data.calculate_Tg(borefield.depth, borefield.D), 12.157557845032045)
 
     assert np.isclose(borefield.size_L3(), 111.5821049845363)
-
-
-def test_warning_custom_gfunction():
-    with pytest.warns(DeprecationWarning):
-        Borefield(custom_gfunction=CustomGFunction())
 
 
 def test_Rb_and_Re_with_temperture_dep_data():
