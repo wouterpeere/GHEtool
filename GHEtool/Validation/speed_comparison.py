@@ -36,7 +36,7 @@ def test_64_boreholes():
     # create the borefield object
     borefield = Borefield(load=load)
 
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
     borefield.set_borefield(borefield_64)
     borefield.Rb = 0.2
 
