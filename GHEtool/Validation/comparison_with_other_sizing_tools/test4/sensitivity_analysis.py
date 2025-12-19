@@ -118,7 +118,7 @@ def test_4_sensitivity():
     borefield.load = load
 
     # convert inlet fluid temperature to heap pump constraints to constraints on average fluid temperature
-    delta_t = max(load.max_peak_injection, load.max_peak_extraction) * 1000 / (fluid_data.Cp * fluid_data.mfr) / 25
+    delta_t = max(load.max_peak_injection, load.max_peak_extraction) * 1000 / (fluid_data.cp() * flow_data.mfr()) / 25
 
     # set temperature bounds
     borefield.set_max_avg_fluid_temperature(38 + delta_t / 2)
