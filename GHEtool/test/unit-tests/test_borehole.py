@@ -140,9 +140,11 @@ def test_Rb_values():
     pipe_data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, number_of_pipes=2, epsilon=1e-6)
     borehole.pipe_data = pipe_data
     Rb_list = []
+    fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
+    borehole.fluid_data = fluid_data
+
     for mfr in mfr_range:
-        fluid_data = FluidData(mfr, 0.568, 998, 4180, 1e-3)
-        borehole.fluid_data = fluid_data
+        borehole.flow_data = ConstantFlowRate(mfr=mfr)
         Rb_list.append(borehole.get_Rb(100, 1, 0.075, 3))
 
     assert np.allclose(Rb_list, [0.2696064888020322, 0.16229265041543758, 0.11073836048982678, 0.09483159131195469,

@@ -22,7 +22,8 @@ from GHEtool import *
 def test_1a_6h():
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=1.8, T_g=17.5, volumetric_heat_capacity=2073600, flux=0)
-    fluid_data = FluidData(mfr=0.440, rho=1052, Cp=3795, mu=0.0052, k_f=0.48)
+    fluid_data = ConstantFluidData(rho=1052, cp=3795, mu=0.0052, k_f=0.48)
+    flow_data = ConstantFlowRate(mfr=0.44)
     pipe_data = MultipleUTube(r_in=0.0137, r_out=0.0167, D_s=0.075 / 2, k_g=1.4, k_p=0.43, number_of_pipes=1)
 
     # start test with dynamic Rb*
@@ -30,9 +31,10 @@ def test_1a_6h():
     borefield = Borefield()
 
     # set ground data in borefield
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+    borefield.flow_data = flow_data
     borefield.create_rectangular_borefield(1, 1, 6, 6, 110, 4, 0.075)
 
     # load the hourly profile
@@ -41,7 +43,7 @@ def test_1a_6h():
                              col_extraction=1, col_injection=0)
     borefield.load = load
 
-    delta_t = max(load.max_peak_extraction, load.max_peak_injection) * 1000 / (fluid_data.Cp * fluid_data.mfr)
+    delta_t = max(load.max_peak_extraction, load.max_peak_injection) * 1000 / (fluid_data.cp() * flow_data.mfr())
 
     # set temperature bounds
     borefield.set_max_avg_fluid_temperature(35 + delta_t / 2)
@@ -120,7 +122,8 @@ def test_1a_6h():
 def test_1a_1h():
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=1.8, T_g=17.5, volumetric_heat_capacity=2073600, flux=0)
-    fluid_data = FluidData(mfr=0.440, rho=1052, Cp=3795, mu=0.0052, k_f=0.48)
+    fluid_data = ConstantFluidData(rho=1052, cp=3795, mu=0.0052, k_f=0.48)
+    flow_data = ConstantFlowRate(mfr=0.44)
     pipe_data = MultipleUTube(r_in=0.0137, r_out=0.0167, D_s=0.075 / 2, k_g=1.4, k_p=0.43, number_of_pipes=1)
 
     # start test with dynamic Rb*
@@ -131,6 +134,7 @@ def test_1a_1h():
     borefield.ground_data = ground_data
     borefield.fluid_data = fluid_data
     borefield.pipe_data = pipe_data
+    borefield.flow_data = flow_data
     borefield.create_rectangular_borefield(1, 1, 6, 6, 110, 4, 0.075)
 
     # load the hourly profile
@@ -140,7 +144,7 @@ def test_1a_1h():
     borefield.load = load
     borefield.load.peak_duration = 1
 
-    delta_t = max(load.max_peak_extraction, load.max_peak_injection) * 1000 / (fluid_data.Cp * fluid_data.mfr)
+    delta_t = max(load.max_peak_extraction, load.max_peak_injection) * 1000 / (fluid_data.cp() * flow_data.mfr())
 
     # set temperature bounds
     borefield.set_max_avg_fluid_temperature(35 + delta_t / 2)

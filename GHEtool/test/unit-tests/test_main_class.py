@@ -306,8 +306,7 @@ def test_set_fluid_params():
     borefield = Borefield()
     assert borefield.borehole.fluid_data is None
     borefield.fluid_data = fluidData
-    assert borefield.borehole.fluid_data == fluidData.fluid_data
-    assert borefield.fluid_data == fluidData.fluid_data
+    assert borefield.fluid_data == fluidData
 
 
 def test_set_flow_params():
@@ -589,6 +588,7 @@ def test_reynolds_number():
     borefield = Borefield()
     borefield.pipe_data = pipeData
     borefield.fluid_data = fluidData
+    borefield.flow_data = constantFlowData
     assert np.isclose(4244.131815783876, borefield.Re)
 
 

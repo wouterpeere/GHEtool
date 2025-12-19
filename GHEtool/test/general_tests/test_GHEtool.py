@@ -11,18 +11,16 @@ import pickle
 
 from pytest import raises
 
-from GHEtool import GroundConstantTemperature, GroundFluxTemperature, FluidData, Borefield, CalculationSetup, FOLDER, \
-    DoubleUTube
 from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient, MaximumNumberOfIterations
 from GHEtool.Validation.cases import load_case
-from GHEtool.VariableClasses import MonthlyGeothermalLoadAbsolute, HourlyGeothermalLoad, EERCombined, \
-    HourlyBuildingLoad, EER, HourlyBuildingLoadMultiYear
+
 from GHEtool.Methods import *
 from GHEtool import *
 
 data = GroundConstantTemperature(3, 10)
 data_ground_flux = GroundFluxTemperature(3, 10)
-fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+fluidData = ConstantFluidData(0.568, 998, 4180, 1e-3)
+flowData = ConstantFlowRate(mfr=0.2)
 pipeData = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 
 borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
@@ -50,7 +48,7 @@ def test_borefield():
     load = MonthlyGeothermalLoadAbsolute(baseload_extraction, baseload_injection, peak_extraction, peak_injection)
     borefield = Borefield(load=load)
 
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
     borefield.set_borefield(borefield_gt)
     borefield.set_Rb(0.2)
 
@@ -74,7 +72,7 @@ def borefield_quadrants():
 
     borefield = Borefield()
     borefield.set_Rb(0.2)
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
     borefield.set_borefield(borefield_gt)
 
     return borefield
@@ -85,7 +83,7 @@ def borefield():
     load = MonthlyGeothermalLoadAbsolute(baseload_extraction, baseload_injection, peak_extraction, peak_injection)
     borefield = Borefield(load=load)
 
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
     borefield.set_borefield(borefield_gt)
     borefield.set_Rb(0.2)
 
@@ -100,7 +98,7 @@ def borefield_custom_data():
     load = MonthlyGeothermalLoadAbsolute(baseload_extraction, baseload_injection, peak_extraction, peak_injection)
     borefield = Borefield(load=load)
 
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
     borefield.set_borefield(borefield_gt)
     borefield.set_Rb(0.2)
     borefield.create_custom_dataset()
@@ -125,14 +123,12 @@ def hourly_borefield():
 
 @pytest.fixture
 def borefield_cooling_dom():
-    borefield = Borefield(peak_extraction=peak_extraction,
-                          peak_injection=peak_injection,
-                          baseload_extraction=baseload_extraction,
-                          baseload_injection=baseload_injection)
+    load = MonthlyGeothermalLoadAbsolute(baseload_extraction, baseload_injection, peak_extraction, peak_injection)
+    borefield = Borefield(load=load)
 
     borefield.load.baseload_injection = np.array(baseload_injection) * 2
 
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
     borefield.set_Rb(0.2)
     borefield.set_borefield(borefield_gt)
 
@@ -146,7 +142,7 @@ def test_imbalance(borefield):
 def test_sizing_L3_threshold_depth_error(borefield):
     max_temp = borefield.Tf_max
     borefield.set_max_avg_fluid_temperature(14)
-    borefield.set_ground_parameters(data_ground_flux)
+    borefield.ground_data = data_ground_flux
     borefield._calculation_setup.use_constant_Tg = False
     with raises(UnsolvableDueToTemperatureGradient):
         borefield.gfunction(3600, borefield.THRESHOLD_DEPTH_ERROR + 1)
@@ -225,10 +221,8 @@ def test_gfunction_jit(borefield):
 
 
 def test_no_ground_data():
-    borefield = Borefield(peak_extraction=peak_extraction,
-                          peak_injection=peak_injection,
-                          baseload_extraction=baseload_extraction,
-                          baseload_injection=baseload_injection)
+    borefield = Borefield(
+        load=MonthlyGeothermalLoadAbsolute(baseload_extraction, baseload_injection, peak_extraction, peak_injection))
 
     borefield.set_borefield(borefield_gt)
 
@@ -245,7 +239,7 @@ def test_value_error_cooling_dom_temp_gradient():
 
     borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(1)))
 
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
     borefield.set_borefield(borefield_pyg)
     borefield.set_Rb(0.2)
 
@@ -286,9 +280,10 @@ def test_borefield_with_constant_peaks(borefield):
 
 def test_sizing_with_use_constant_Rb():
     borefield = Borefield()
-    borefield.set_ground_parameters(data)
-    borefield.set_fluid_parameters(fluidData)
-    borefield.set_pipe_parameters(pipeData)
+    borefield.ground_data = data
+    borefield.fluid_data = fluidData
+    borefield.flow_data = flowData
+    borefield.pipe_data = pipeData
     borefield.borefield = copy.deepcopy(borefield_gt)
     load = HourlyGeothermalLoad()
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
@@ -309,7 +304,8 @@ def test_size_with_different_peak_lengths(borefield):
 
 def test_convergence_eer_combined():
     ground_data = GroundFluxTemperature(3, 10)
-    fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
+    flow_data = ConstantFlowRate(mfr=0.2)
     pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 
     load = HourlyBuildingLoad(efficiency_heating=5)  # use SCOP of 5 for heating
@@ -320,9 +316,10 @@ def test_convergence_eer_combined():
                      np.array([5, 30]))  # based on the data of the WRE092 chiller of Galletti
     borefield1 = Borefield()
     borefield1.create_rectangular_borefield(3, 3, 6, 6, 110, 0.7, 0.075)
-    borefield1.set_ground_parameters(ground_data)
-    borefield1.set_fluid_parameters(fluid_data)
-    borefield1.set_pipe_parameters(pipe_data)
+    borefield1.ground_data = ground_data
+    borefield1.fluid_data = fluid_data
+    borefield1.flow_data = flow_data
+    borefield1.pipe_data = pipe_data
     borefield1.set_max_avg_fluid_temperature(25)
     borefield1.set_min_avg_fluid_temperature(3)
 
@@ -343,7 +340,8 @@ def test_convergence_eer_combined():
 
 def test_optimise_load_eer_combined():
     ground_data = GroundFluxTemperature(3, 10)
-    fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
+    flow_data = ConstantFlowRate(mfr=0.2)
     pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 
     load = HourlyBuildingLoad(efficiency_heating=5)  # use SCOP of 5 for heating
@@ -356,6 +354,7 @@ def test_optimise_load_eer_combined():
     borefield1.create_rectangular_borefield(4, 3, 6, 6, 110, 0.7, 0.075)
     borefield1.ground_data = ground_data
     borefield1.fluid_data = fluid_data
+    borefield1.flow_data = flow_data
     borefield1.pipe_data = pipe_data
     borefield1.set_max_avg_fluid_temperature(25)
     borefield1.set_min_avg_fluid_temperature(3)
@@ -381,7 +380,8 @@ def test_optimise_load_eer_combined():
 
 def test_optimise_methods_different_start_year():
     ground_data = GroundFluxTemperature(3, 10)
-    fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
+    flow_data = ConstantFlowRate(mfr=0.2)
     pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 
     load = HourlyBuildingLoad(efficiency_heating=5)  # use SCOP of 5 for heating
@@ -393,6 +393,7 @@ def test_optimise_methods_different_start_year():
     borefield.create_rectangular_borefield(20, 5, 6, 6, 110, 0.7, 0.075)
     borefield.ground_data = ground_data
     borefield.fluid_data = fluid_data
+    borefield.flow_data = flow_data
     borefield.pipe_data = pipe_data
 
     borefield_load, ext_load = optimise_load_profile_power(borefield, load)
@@ -435,7 +436,8 @@ def test_optimise_methods_different_start_year():
 
 def test_optimise_methods_different_start_year_dhw():
     ground_data = GroundFluxTemperature(3, 10)
-    fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
+    flow_data = ConstantFlowRate(mfr=0.2)
     pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 
     load = HourlyBuildingLoad(efficiency_heating=5)  # use SCOP of 5 for heating
@@ -448,6 +450,7 @@ def test_optimise_methods_different_start_year_dhw():
     borefield.create_rectangular_borefield(20, 5, 6, 6, 110, 0.7, 0.075)
     borefield.ground_data = ground_data
     borefield.fluid_data = fluid_data
+    borefield.flow_data = flow_data
     borefield.pipe_data = pipe_data
 
     borefield_load, ext_load = optimise_load_profile_power(borefield, load)

@@ -56,7 +56,7 @@ def effect_borefield_configuration():
 
     # set ground parameters to borefield
     borefield.set_borefield(borefield_gt)
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
 
     # set Rb
     borefield.Rb = 0.2
