@@ -71,7 +71,6 @@ mentioned are the ones with which the code is tested)
 * scipy >= 1.8.1
 * secondarycoolantprops >= 1.1
 * optuna >= 3.6.1
-*
 
 For the tests
 
