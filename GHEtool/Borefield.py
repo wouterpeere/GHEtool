@@ -237,7 +237,6 @@ class Borefield(BaseClass):
         -------
         None
         """
-        self._borefield_description = None
         self.borefield = borefield
 
     def create_rectangular_borefield(self, N_1: int, N_2: int, B_1: float, B_2: float, H: float, D: float = 1,
@@ -476,6 +475,7 @@ class Borefield(BaseClass):
         else:
             self.gfunction_calculation_object.store_previous_values = \
                 self.gfunction_calculation_object._store_previous_values_backup
+        self._borefield_description = None
 
     @borefield.deleter
     def borefield(self):
@@ -1304,7 +1304,7 @@ class Borefield(BaseClass):
 
         return self.H
 
-    def size_L3(self, H_init: float = None, quadrant_sizing: int = 0) -> float:
+    def size_L3(self, H_init: float = None, quadrant_sizing: int = 0, optimise: bool = False, **kwargs) -> float:
         """
         This function sizes the borefield based on a monthly (L3) method.
 
@@ -1314,6 +1314,9 @@ class Borefield(BaseClass):
             Initial borehole length from where to start the iteration [m]
         quadrant_sizing : int
             If a quadrant is given the sizing is performed for this quadrant else for the relevant
+        optimise : bool
+            True if this method is called from within the optimise borehole configuration function.
+            In that case, the final temperatures are not accurately calculated.
 
         Returns
         -------
@@ -1341,8 +1344,8 @@ class Borefield(BaseClass):
             # size according to a specific quadrant
             self.H, _ = self._size_based_on_temperature_profile(quadrant_sizing)
 
-            # simulate with the correct temperatures
-            self.calculate_temperatures()
+            if not optimise:
+                self.calculate_temperatures()
 
             return self.H
         else:
@@ -1359,8 +1362,8 @@ class Borefield(BaseClass):
                 # already correct size
                 self.H = max_temp
 
-                # simulate with the correct temperatures
-                self.calculate_temperatures()
+                if not optimise:
+                    self.calculate_temperatures()
 
                 if self.load.imbalance <= 0:
                     self.limiting_quadrant = 1
@@ -1372,7 +1375,8 @@ class Borefield(BaseClass):
                 self.H = min_temp
 
                 # simulate with the correct temperatures
-                self.calculate_temperatures()
+                if not optimise:
+                    self.calculate_temperatures()
 
                 if self.load.imbalance <= 0:
                     self.limiting_quadrant = 4
@@ -1381,7 +1385,7 @@ class Borefield(BaseClass):
                 return min_temp
             raise UnsolvableDueToTemperatureGradient
 
-    def size_L4(self, H_init: float = None, quadrant_sizing: int = 0) -> float:
+    def size_L4(self, H_init: float = None, quadrant_sizing: int = 0, optimise: bool = False, **kwargs) -> float:
         """
         This function sizes the borefield based on an hourly (L4) sizing methodology.
 
@@ -1391,6 +1395,9 @@ class Borefield(BaseClass):
             Initial borehole length from where to start the iteration [m]
         quadrant_sizing : int
             If a quadrant is given the sizing is performed for this quadrant else for the relevant
+        optimise : bool
+            True if this method is called from within the optimise borehole configuration function.
+            In that case, the final temperatures are not accurately calculated.
 
         Returns
         -------
@@ -1423,7 +1430,8 @@ class Borefield(BaseClass):
             self.H, _ = self._size_based_on_temperature_profile(quadrant_sizing, hourly=True)
 
             # simulate with the correct temperatures
-            self.calculate_temperatures(hourly=True)
+            if not optimise:
+                self.calculate_temperatures(hourly=True)
 
             return self.H
         else:
@@ -1447,8 +1455,8 @@ class Borefield(BaseClass):
                 # already correct size
                 self.H = max_temp
 
-                # simulate with the correct temperatures
-                self.calculate_temperatures(hourly=True)
+                if not optimise:
+                    self.calculate_temperatures(hourly=True)
 
                 if self.load.imbalance <= 0:
                     self.limiting_quadrant = 1
@@ -1464,8 +1472,8 @@ class Borefield(BaseClass):
                     self.limiting_quadrant = 3
                 self.H = min_temp
 
-                # simulate with the correct temperatures
-                self.calculate_temperatures(hourly=True)
+                if not optimise:
+                    self.calculate_temperatures(hourly=True)
 
                 return min_temp
             raise UnsolvableDueToTemperatureGradient
@@ -1543,7 +1551,7 @@ class Borefield(BaseClass):
         while not self._check_convergence(self.H, H_prev, i):
             if H_prev != 0:
                 self.H = self.H * .5 + H_prev * 0.5
-            limit = self.Tf_min if quadrant in (3, 4, 20) else self.Tf_max
+
             if hourly:
                 self._calculate_temperature_profile(self.H, hourly=True, sizing=True)
             else:
@@ -1587,7 +1595,6 @@ class Borefield(BaseClass):
                 return 0, False
 
             i += 1
-
         return self.H, (np.max(self.results.peak_injection) <= self.Tf_max + 0.05 or (
                 quadrant == 10 or quadrant == 1 or quadrant == 2)) and (
                                np.min(self.results.peak_extraction) >= self.Tf_min - 0.05 or (
@@ -1760,6 +1767,9 @@ class Borefield(BaseClass):
 
         # reset self.results
         self.results = ResultsMonthly()
+        variable_efficiency = isinstance(self.load, _LoadDataBuilding) and not (
+                isinstance(self.load.cop, SCOP) and isinstance(self.load.cop_dhw, SCOP) and isinstance(
+            self.load.eer, SEER))
 
         def calculate_temperatures(H, hourly=hourly, results_temperature=ResultsMonthly()):
             # set Rb* value
@@ -1769,9 +1779,7 @@ class Borefield(BaseClass):
             results = None
 
             def get_rb(temperature, limit=None):
-                variable_efficiency = isinstance(self.load, _LoadDataBuilding) and not (
-                        isinstance(self.load.cop, SCOP) and isinstance(self.load.cop_dhw, SCOP) and isinstance(
-                    self.load.eer, SEER))
+
                 if self.USE_SPEED_UP_IN_SIZING and sizing and not variable_efficiency:
                     # use only extreme temperatures when sizing
                     if limit is not None:
@@ -1901,7 +1909,10 @@ class Borefield(BaseClass):
                 self.load.reset_results(self.Tf_min, self.Tf_max)
             results_old = calculate_temperatures(H, hourly=hourly)
             self.load.set_results(results_old)
-            results = calculate_temperatures(H, hourly=hourly, results_temperature=results_old)
+            if sizing and not variable_efficiency and self._calculation_setup.approximate_req_depth:
+                results = results_old
+            else:
+                results = calculate_temperatures(H, hourly=hourly, results_temperature=results_old)
 
             # safety
             i = 0

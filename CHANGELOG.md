@@ -9,7 +9,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Optimise number of boreholes (issue #162).
 - Artificial Neural Network to speed up calculations (issue #322, @tblanke).
+- Optimise number of boreholes with equal max and min depth constraints (issue #413).
 
 ### Changed
 
@@ -20,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Change how DHW is stored in the classes (issue #381).
 - Speed up calculate required depth (issue #403).
 - Speed up optimise energy profile (issue #406).
+- Clean up results in optimise number of boreholes (issue #413).
 
 ### Fixed
 

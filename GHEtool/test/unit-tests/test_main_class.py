@@ -139,6 +139,9 @@ def test_create_rectangular_field():
     borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 4, 0.075)
     assert borefield.number_of_boreholes == 100
     borefields_equal(borefield.borefield, gt.borefield.Borefield.rectangle_field(10, 10, 6, 6, 110, 4, 0.075))
+    assert borefield._borefield_description == {'B_1': 6, 'B_2': 6, 'N_1': 10, 'N_2': 10, 'type': 3}
+    borefield.borefield = gt.borefield.Borefield.dense_rectangle_field(10, 10, 5, 5, 1, 0.075, False)
+    assert borefield._borefield_description is None
 
 
 def test_create_staggered_field():

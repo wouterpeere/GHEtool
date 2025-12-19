@@ -16,14 +16,15 @@ class CalculationSetup(BaseClass):
 
     __slots__ = '_L2_sizing', '_L3_sizing', '_L4_sizing', 'quadrant_sizing', '_backup', \
         'atol', 'rtol', 'max_nb_of_iterations', 'interpolate_gfunctions', 'H_init', \
-        'use_precalculated_dataset', 'deep_sizing', 'force_deep_sizing', 'use_neural_network'
+        'use_precalculated_dataset', 'deep_sizing', 'force_deep_sizing', 'use_neural_network', 'approximate_req_depth'
 
     def __init__(self, quadrant_sizing: int = 0,
                  L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None,
                  atol: float = 0.05, rtol: float = 0.005, max_nb_of_iterations: int = 40,
                  interpolate_gfunctions: bool = None, H_init: float = 100.,
                  use_precalculated_dataset: bool = True, deep_sizing: bool = False,
-                 force_deep_sizing: bool = False, use_neural_network: bool = False):
+                 force_deep_sizing: bool = False, use_neural_network: bool = False,
+                 approximate_req_depth: bool = False):
         """
 
         Parameters
@@ -64,6 +65,9 @@ class CalculationSetup(BaseClass):
         use_neural_network : bool
             True if the neural network simplification should be used. This uses a NN trained on previous calculated
             gvalues.
+        approximate_req_depth : bool
+            True if constant fluid temperatures are used in the sizing. This can lead to slightly bigger borefields,
+            but a speed improvement of factor 2.
 
         References
         ----------

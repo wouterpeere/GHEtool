@@ -78,3 +78,8 @@ def test_faster_sizing():
     test_case_office()
     test_case_swimming_pool()
     test_case_auditorium_active_passive()
+
+
+def test_optimise_borefield_configuration():
+    from GHEtool.Validation.optimise_borefield_configuration import borefield_case_2, borefield_auditorium
+    borefield_case_2()
