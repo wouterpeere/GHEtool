@@ -31,16 +31,18 @@ def test_4_sensitivity():
 
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=1.9, T_g=15, volumetric_heat_capacity=2052000, flux=0)
-    fluid_data = FluidData(mfr=0.074 * 139.731 / 25, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
+    fluid_data = ConstantFluidData(rho=1026, cp=4019, mu=0.003377, k_f=0.468)
+    flow_data = ConstantFlowRate(mfr=0.074 * 139.731 / 25)
     pipe_data = MultipleUTube(r_in=0.013, r_out=0.0167, D_s=0.083 / 2, k_g=0.69, k_p=0.4)
 
     # initiate borefield
     borefield = Borefield()
 
     # set ground data in borefield
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+    borefield.flow_data = flow_data
     borefield.create_rectangular_borefield(5, 5, 8, 8, 110, 4, 0.075)
     Rb_static = 0.2
     borefield.set_Rb(Rb_static)
@@ -60,7 +62,7 @@ def test_4_sensitivity():
     borefield.load = load
 
     # convert inlet fluid temperature to heap pump constraints to constraints on average fluid temperature
-    delta_t = max(load.max_peak_injection, load.max_peak_extraction) * 1000 / (fluid_data.Cp * fluid_data.mfr) / 25
+    delta_t = max(load.max_peak_injection, load.max_peak_extraction) * 1000 / (fluid_data.cp() * flow_data.mfr()) / 25
 
     # set temperature bounds
     borefield.set_max_avg_fluid_temperature(38 + delta_t / 2)
@@ -84,16 +86,18 @@ def test_4_sensitivity():
 
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=1.9, T_g=15, volumetric_heat_capacity=2052000, flux=0)
-    fluid_data = FluidData(mfr=0.074 * 139.731 / 25, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
+    fluid_data = ConstantFluidData(rho=1026, cp=4019, mu=0.003377, k_f=0.468)
+    flow_data = ConstantFlowRate(mfr=0.074 * 139.731 / 25)
     pipe_data = MultipleUTube(r_in=0.013, r_out=0.0167, D_s=0.083 / 2, k_g=0.69, k_p=0.4)
 
     # initiate borefield
     borefield = Borefield()
 
     # set ground data in borefield
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+    borefield.flow_data = flow_data
     borefield.create_rectangular_borefield(5, 5, 8, 8, 110, 4, 0.075)
     Rb_static = 0.2
     borefield.set_Rb(Rb_static)
@@ -114,7 +118,7 @@ def test_4_sensitivity():
     borefield.load = load
 
     # convert inlet fluid temperature to heap pump constraints to constraints on average fluid temperature
-    delta_t = max(load.max_peak_injection, load.max_peak_extraction) * 1000 / (fluid_data.Cp * fluid_data.mfr) / 25
+    delta_t = max(load.max_peak_injection, load.max_peak_extraction) * 1000 / (fluid_data.cp() * flow_data.mfr()) / 25
 
     # set temperature bounds
     borefield.set_max_avg_fluid_temperature(38 + delta_t / 2)
@@ -136,16 +140,18 @@ def test_4_sensitivity():
     # 1.5 W/m-K
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=1.5, T_g=15, volumetric_heat_capacity=2052000, flux=0)
-    fluid_data = FluidData(mfr=0.074 * 139.731 / 25, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
+    fluid_data = ConstantFluidData(rho=1026, cp=4019, mu=0.003377, k_f=0.468)
+    flow_data = ConstantFlowRate(mfr=0.074 * 139.731 / 25)
     pipe_data = MultipleUTube(r_in=0.013, r_out=0.0167, D_s=0.083 / 2, k_g=0.69, k_p=0.4)
 
     # initiate borefield
     borefield = Borefield()
 
     # set ground data in borefield
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+    borefield.flow_data = flow_data
     borefield.create_rectangular_borefield(5, 5, 8, 8, 110, 4, 0.075)
     Rb_static = 0.2
     borefield.set_Rb(Rb_static)
@@ -182,16 +188,18 @@ def test_4_sensitivity():
     # 2.3 W/m-K
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=2.3, T_g=15, volumetric_heat_capacity=2052000, flux=0)
-    fluid_data = FluidData(mfr=0.074 * 139.731 / 25, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
+    fluid_data = ConstantFluidData(rho=1026, cp=4019, mu=0.003377, k_f=0.468)
+    flow_data = ConstantFlowRate(mfr=0.074 * 139.731 / 25)
     pipe_data = MultipleUTube(r_in=0.013, r_out=0.0167, D_s=0.083 / 2, k_g=0.69, k_p=0.4)
 
     # initiate borefield
     borefield = Borefield()
 
     # set ground data in borefield
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+    borefield.flow_data = flow_data
     borefield.create_rectangular_borefield(5, 5, 8, 8, 110, 4, 0.075)
     Rb_static = 0.2
     borefield.set_Rb(Rb_static)
@@ -228,16 +236,18 @@ def test_4_sensitivity():
     # 6 m 
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=1.9, T_g=15, volumetric_heat_capacity=2052000, flux=0)
-    fluid_data = FluidData(mfr=0.074 * 139.731 / 25, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
+    fluid_data = ConstantFluidData(rho=1026, cp=4019, mu=0.003377, k_f=0.468)
+    flow_data = ConstantFlowRate(mfr=0.074 * 139.731 / 25)
     pipe_data = MultipleUTube(r_in=0.013, r_out=0.0167, D_s=0.083 / 2, k_g=0.69, k_p=0.4)
 
     # initiate borefield
     borefield = Borefield()
 
     # set ground data in borefield
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+    borefield.flow_data = flow_data
     borefield.create_rectangular_borefield(5, 5, 6, 6, 110, 4, 0.075)
     Rb_static = 0.2
     borefield.set_Rb(Rb_static)
@@ -274,16 +284,18 @@ def test_4_sensitivity():
     # 10 m 
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=1.9, T_g=15, volumetric_heat_capacity=2052000, flux=0)
-    fluid_data = FluidData(mfr=0.074 * 139.731 / 25, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
+    fluid_data = ConstantFluidData(rho=1026, cp=4019, mu=0.003377, k_f=0.468)
+    flow_data = ConstantFlowRate(mfr=0.074 * 139.731 / 25)
     pipe_data = MultipleUTube(r_in=0.013, r_out=0.0167, D_s=0.083 / 2, k_g=0.69, k_p=0.4)
 
     # initiate borefield
     borefield = Borefield()
 
     # set ground data in borefield
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+    borefield.flow_data = flow_data
     borefield.create_rectangular_borefield(5, 5, 10, 10, 110, 4, 0.075)
     Rb_static = 0.2
     borefield.set_Rb(Rb_static)
@@ -320,16 +332,18 @@ def test_4_sensitivity():
     # 10 C 
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=1.9, T_g=10, volumetric_heat_capacity=2052000, flux=0)
-    fluid_data = FluidData(mfr=0.074 * 139.731 / 25, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
+    fluid_data = ConstantFluidData(rho=1026, cp=4019, mu=0.003377, k_f=0.468)
+    flow_data = ConstantFlowRate(mfr=0.074 * 139.731 / 25)
     pipe_data = MultipleUTube(r_in=0.013, r_out=0.0167, D_s=0.083 / 2, k_g=0.69, k_p=0.4)
 
     # initiate borefield
     borefield = Borefield()
 
     # set ground data in borefield
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+    borefield.flow_data = flow_data
     borefield.create_rectangular_borefield(5, 5, 8, 8, 110, 4, 0.075)
     Rb_static = 0.2
     borefield.set_Rb(Rb_static)
@@ -366,16 +380,18 @@ def test_4_sensitivity():
     # 20 C 
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=1.9, T_g=20, volumetric_heat_capacity=2052000, flux=0)
-    fluid_data = FluidData(mfr=0.074 * 139.731 / 25, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
+    fluid_data = ConstantFluidData(rho=1026, cp=4019, mu=0.003377, k_f=0.468)
+    flow_data = ConstantFlowRate(mfr=0.074 * 139.731 / 25)
     pipe_data = MultipleUTube(r_in=0.013, r_out=0.0167, D_s=0.083 / 2, k_g=0.69, k_p=0.4)
 
     # initiate borefield
     borefield = Borefield()
 
     # set ground data in borefield
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+    borefield.flow_data = flow_data
     borefield.create_rectangular_borefield(5, 5, 8, 8, 110, 4, 0.075)
     Rb_static = 0.2
     borefield.set_Rb(Rb_static)
@@ -412,16 +428,18 @@ def test_4_sensitivity():
     # 3x3 bores
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=1.9, T_g=15, volumetric_heat_capacity=2052000, flux=0)
-    fluid_data = FluidData(mfr=0.074 * 139.731 / 25, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
+    fluid_data = ConstantFluidData(rho=1026, cp=4019, mu=0.003377, k_f=0.468)
+    flow_data = ConstantFlowRate(mfr=0.074 * 139.731 / 25)
     pipe_data = MultipleUTube(r_in=0.013, r_out=0.0167, D_s=0.083 / 2, k_g=0.69, k_p=0.4)
 
     # initiate borefield
     borefield = Borefield()
 
     # set ground data in borefield
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+    borefield.flow_data = flow_data
     borefield.create_rectangular_borefield(3, 3, 8, 8, 110, 4, 0.075)
     Rb_static = 0.2
     borefield.set_Rb(Rb_static)
@@ -458,16 +476,18 @@ def test_4_sensitivity():
     # 7x7 bores
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=1.9, T_g=15, volumetric_heat_capacity=2052000, flux=0)
-    fluid_data = FluidData(mfr=0.074 * 139.731 / 25, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
+    fluid_data = ConstantFluidData(rho=1026, cp=4019, mu=0.003377, k_f=0.468)
+    flow_data = ConstantFlowRate(mfr=0.074 * 139.731 / 25)
     pipe_data = MultipleUTube(r_in=0.013, r_out=0.0167, D_s=0.083 / 2, k_g=0.69, k_p=0.4)
 
     # initiate borefield
     borefield = Borefield()
 
     # set ground data in borefield
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+    borefield.flow_data = flow_data
     borefield.create_rectangular_borefield(7, 7, 8, 8, 110, 4, 0.075)
     Rb_static = 0.2
     borefield.set_Rb(Rb_static)

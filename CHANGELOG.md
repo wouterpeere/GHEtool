@@ -16,6 +16,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 
 - Changed implementation of `optimise_for_energy` to make it three times faster (issue #308).
+- Remove FluidClass (issue #338).
+- Remove custom_gfunction from Borefield class initiation (issue #338).
+- Remove baseload extraction/injection and peak extraction/injection from Borefield class initiation (issue #338).
+- Remove set_ground_parameters, set_fluid_parameters, set_pipe_parameters from Borefield class (issue #338).
 - Add support for EPW files from PVGIS (issue #376).
 - Fix problem with start month in optimise for power/balance (issue #380).
 - Return multiyear external load if multiyear load is given as an input (issue #380).

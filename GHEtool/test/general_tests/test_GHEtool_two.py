@@ -13,7 +13,6 @@ from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient
 data = GroundConstantTemperature(3, 10)
 data_ground_flux = GroundFluxTemperature(3, 10)
 
-fluidData = FluidData(0.2, 0.568, 998, 4180, 1e-3)
 pipeData = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
 
 borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6, 6, 110, 4, 0.075)
@@ -77,7 +76,7 @@ def test_different_heating_cooling_peaks():
     load = MonthlyGeothermalLoadAbsolute(monthlyLoadHeating, monthlyLoadCooling, peakHeating, peakCooling)
     borefield = Borefield(load=load)
 
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
     borefield.set_borefield(copy.copy(borefield_gt))
     borefield.Rb = 0.2
 
@@ -95,7 +94,7 @@ def test_different_heating_cooling_peaks():
 def test_stuck_in_loop():
     borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(4)))
 
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
     borefield.set_borefield(copy.copy(borefield_gt))
     borefield.Rb = 0.2
 
@@ -118,7 +117,7 @@ def test_stuck_in_loop():
 def test_different_results_with_other_peak_lengths():
     borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(4)))
 
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
     borefield.set_borefield(copy.copy(borefield_gt))
 
     # set temperature boundaries
@@ -137,7 +136,7 @@ def test_reset_temp_profiles_when_loaded(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(1)))
 
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
     borefield.set_borefield(copy.copy(borefield_gt))
 
     borefield.calculate_temperatures()
@@ -156,7 +155,7 @@ def test_reset_temp_profiles_when_loaded(monkeypatch):
 def test_no_possible_solution():
     borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(4)))
 
-    borefield.set_ground_parameters(data_ground_flux)
+    borefield.ground_data = data_ground_flux
     borefield.set_borefield(copy.copy(borefield_gt))
 
     # limited by cooling
@@ -204,7 +203,7 @@ def test_problem_with_gfunction_calc_obj():
     load = MonthlyGeothermalLoadAbsolute(monthly_load_heating, monthly_load_cooling, peak_extraction, peak_injection)
     borefield = Borefield(load=load)
 
-    borefield.set_ground_parameters(data)
+    borefield.ground_data = data
     borefield.set_borefield(borefield_gt)
     borefield.Rb = 0.2
 
@@ -221,8 +220,7 @@ def test_problem_with_gfunction_calc_obj():
 
     # set ground parameters to borefield
     borefield.set_borefield(borefield_gt)
-    borefield.set_ground_parameters(data)
-
+    borefield.ground_data = data
     # set Rb
     borefield.Rb = 0.2
 

@@ -16,13 +16,15 @@ from scipy.optimize import curve_fit
 
 def validate():
     ground_data = GroundFluxTemperature(3, 10)
-    fluid_data = FluidData(0.2, 0.568, 998, 4180, 1e-3)
+    fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
+    flow_data = ConstantFlowRate(mfr=0.2)
     pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
     borefield = Borefield()
     borefield.create_rectangular_borefield(5, 4, 6, 6, 110, 4, 0.075)
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.flow_data = flow_data
+    borefield.pipe_data = pipe_data
     borefield.calculation_setup(use_constant_Rb=False)
     borefield.set_max_avg_fluid_temperature(17)
     borefield.set_min_avg_fluid_temperature(3)

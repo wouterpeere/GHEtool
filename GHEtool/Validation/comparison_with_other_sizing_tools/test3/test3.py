@@ -22,7 +22,8 @@ from GHEtool import *
 def test_3_6h():
     # initiate ground, fluid and pipe data
     ground_data = GroundFluxTemperature(k_s=2.25, T_g=10, volumetric_heat_capacity=2592000, flux=0)
-    fluid_data = FluidData(mfr=33.1 / 49, rho=1026, Cp=4019, mu=0.003377, k_f=0.468)
+    fluid_data = ConstantFluidData(rho=1026, cp=4019, mu=0.003377, k_f=0.468)
+    flow_data = ConstantFlowRate(mfr=33.1 / 49)
     pipe_data = MultipleUTube(r_in=0.013, r_out=0.0167, D_s=0.075 / 2, k_g=1.73, k_p=0.4, number_of_pipes=1)
 
     # start test with dynamic Rb*
@@ -30,9 +31,10 @@ def test_3_6h():
     borefield = Borefield()
 
     # set ground data in borefield
-    borefield.set_ground_parameters(ground_data)
-    borefield.set_fluid_parameters(fluid_data)
-    borefield.set_pipe_parameters(pipe_data)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+    borefield.flow_data = flow_data
     borefield.create_rectangular_borefield(7, 7, 5, 5, 110, 2.5, 0.075)
 
     # load the hourly profile
@@ -41,7 +43,7 @@ def test_3_6h():
                              col_extraction=1, col_injection=0)
     borefield.load = load
 
-    delta_t = max(load.max_peak_extraction, load.max_peak_injection) * 1000 / (fluid_data.Cp * fluid_data.mfr) / 49
+    delta_t = max(load.max_peak_extraction, load.max_peak_injection) * 1000 / (fluid_data.cp() * flow_data.mfr()) / 49
 
     # set temperature bounds
     borefield.set_max_avg_fluid_temperature(35 + delta_t / 2)
@@ -77,9 +79,10 @@ def test_3_6h():
             borefield = Borefield()
 
             # set ground data in borefield
-            borefield.set_ground_parameters(ground_data)
-            borefield.set_fluid_parameters(fluid_data)
-            borefield.set_pipe_parameters(pipe_data)
+            borefield.ground_data = ground_data
+            borefield.fluid_data = fluid_data
+            borefield.pipe_data = pipe_data
+            borefield.flow_data = flow_data
             borefield.create_rectangular_borefield(7, 7, B, B, 110, 2.5, 0.075)
             Rb_static = 0.1
             borefield.set_Rb(Rb_static)
