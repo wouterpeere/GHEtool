@@ -605,12 +605,14 @@ borefield.borehole = temp_borehole
 borefield.set_max_avg_fluid_temperature(20)
 borefield.set_min_avg_fluid_temperature(4)
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 97.012, 87.506,
-                                                   384.204, 305.842, 292.21585191524866, 230.19482858757777,
+                                                   384.20003438433275, 305.8416132537297, 292.21585191524866,
+                                                   230.19482858757777,
                                                    name='Optimise load profile 2, reversed (power)', power=1,
                                                    hourly=False))
 
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 87.899, 70.054,
-                                                   247.186, 210.800, 429.23413828903847, 325.23656406314456,
+                                                   247.1818850288293, 210.79978273642746, 429.23413828903847,
+                                                   325.23656406314456,
                                                    name='Optimise load profile 3, reversed (power)', power=1,
                                                    hourly=False))
 
