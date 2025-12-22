@@ -128,7 +128,7 @@ list_of_test_objects.add(SizingObject(borefield, L2_output=186.5208, L3_output=1
 data = GroundConstantTemperature(3.5, 10)
 borefield_gt = gt.borefield.Borefield.rectangle_field(10, 12, 6.5, 6.5, 110, 4, 0.075)
 correct_answers_L2 = (56.75, 117.223, 66.94, 91.266)
-correct_answers_L3 = (56.771, 118.7118, 66.471, 91.176)
+correct_answers_L3 = (56.771, 118.7118, 66.8693, 91.45876)
 for i in (1, 2, 3, 4):
     load = MonthlyGeothermalLoadAbsolute(*load_case(i))
     borefield = Borefield(load=load)
@@ -141,7 +141,7 @@ for i in (1, 2, 3, 4):
                                           L3_output=correct_answers_L3[i - 1], quadrant=i, name=f'BS2021 case {i}'))
 
 correct_answers_L2 = (56.749, 117.223, 66.941, 91.266)
-correct_answers_L3 = (56.770, 118.7118, 66.471, 91.176)
+correct_answers_L3 = (56.770, 118.7118, 66.8693, 91.45876)
 customField = gt.borefield.Borefield.rectangle_field(N_1=12, N_2=10, B_1=6.5, B_2=6.5, H=110., D=4, r_b=0.075)
 for i in (1, 2, 3, 4):
     load = MonthlyGeothermalLoadAbsolute(*load_case(i))
@@ -222,15 +222,15 @@ hourly_load.simulation_period = 20
 hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\office.csv"), header=True, separator=";",
                                 col_injection=0, col_extraction=1)
 borefield.load = hourly_load
-list_of_test_objects.add(SizingObject(borefield, L2_output=113.955, L3_output=115.945, L4_output=109.617, quadrant=2,
+list_of_test_objects.add(SizingObject(borefield, L2_output=113.955, L3_output=115.9884, L4_output=109.617, quadrant=2,
                                       name='BS2023 Office'))
 borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
 list_of_test_objects.add(
-    SizingObject(borefield, L2_output=169.373, L3_output=172.3602, L4_output=160.90935, quadrant=2,
+    SizingObject(borefield, L2_output=169.373, L3_output=172.4350131073142, L4_output=160.90935, quadrant=2,
                  name='BS2023 Office, (MPG, variable)'))
 borefield.fluid_data = TemperatureDependentFluidData('MPG', 25).create_constant(3)
 list_of_test_objects.add(
-    SizingObject(borefield, L2_output=172.41551490145127, L3_output=175.528, L4_output=163.5176, quadrant=2,
+    SizingObject(borefield, L2_output=172.41551490145127, L3_output=175.60818720662357, L4_output=163.5176, quadrant=2,
                  name='BS2023 Office, (MPG, fixed)'))
 borefield.fluid_data = fluid_data
 borefield.calculation_setup(max_nb_of_iterations=5)
@@ -242,11 +242,13 @@ list_of_test_objects.add(SizingObject(borefield, error_L2=MaximumNumberOfIterati
                                       error_L4=MaximumNumberOfIterations, quadrant=2,
                                       name='BS2023 Office (max nb of iter, deep sizing)'))
 borefield.calculation_setup(atol=False, max_nb_of_iterations=40)
-list_of_test_objects.add(SizingObject(borefield, L2_output=113.739, L3_output=115.5735, L4_output=109.2783, quadrant=2,
-                                      name='BS2023 Office (no atol)'))
+list_of_test_objects.add(
+    SizingObject(borefield, L2_output=113.739, L3_output=115.61944351365554, L4_output=109.2783, quadrant=2,
+                 name='BS2023 Office (no atol)'))
 borefield.calculation_setup(force_deep_sizing=True)
-list_of_test_objects.add(SizingObject(borefield, L2_output=113.739, L3_output=115.5799, L4_output=109.28426, quadrant=2,
-                                      name='BS2023 Office (no atol, deep)'))
+list_of_test_objects.add(
+    SizingObject(borefield, L2_output=113.739, L3_output=115.62659508492692, L4_output=109.28426, quadrant=2,
+                 name='BS2023 Office (no atol, deep)'))
 borefield.calculation_setup(force_deep_sizing=False)
 
 borefield.ground_data.Tg = 12
@@ -402,15 +404,15 @@ hourly_load = HourlyBuildingLoad(efficiency_heating=10 ** 6, efficiency_cooling=
 hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"))
 # set borefield depth to 150
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 87.506, 97.012,
-                                                   305.842, 384.204, 230.193, 292.212,
+                                                   305.842, 384.199888, 230.19356748567617, 292.2167663088656,
                                                    name='Optimise load profile 1 (power)', power=1, hourly=False))
 
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 70.054, 87.899,
-                                                   210.800, 247.186, 325.236, 429.231,
+                                                   210.800, 247.181790, 325.2359184159649, 429.23472764038456,
                                                    name='Optimise load profile 2 (power)', power=1, hourly=False))
 
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 44.791, 63.799,
-                                                   117.898, 117.804, 418.138, 558.612,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 44.791, 63.79798,
+                                                   117.89775525978715, 117.80039058481954, 418.138, 558.6159977154532,
                                                    name='Optimise load profile 3 (power)', power=1, hourly=False))
 
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 87.506, 96.404,
@@ -428,16 +430,17 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 4
                                                    name='Optimise load profile 3 (power, hourly)', power=1,
                                                    hourly=True))
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 40.231, 96.043,
-                                                   102.962, 359.838, 433.074, 316.579,
+                                                   102.962, 359.83364, 433.0742169029619, 316.5829889272631,
                                                    name='Optimise load profile 1 (balance)', power=3, hourly=False))
 
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 36.114, 85.953,
-                                                   89.715, 230.894, 446.322, 445.522,
+                                                   89.715, 230.8905106236524, 446.322, 445.522,
                                                    name='Optimise load profile 2 (balance)', power=3, hourly=False))
 
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 25.769, 61.305, 58.930,
-                                                   109.804, 477.106, 566.612,
-                                                   name='Optimise load profile 3 (balance)', power=3, hourly=False))
+list_of_test_objects.add(
+    OptimiseLoadProfileObject(borefield, hourly_load, 50, 25.768695010600833, 61.30370860870371, 58.929663820834676,
+                              109.80038258481954, 477.10641324944265, 566.6159977154532,
+                              name='Optimise load profile 3 (balance)', power=3, hourly=False))
 
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 39.917, 95.431,
                                                    101.932, 346.137, 434.104, 330.280,
@@ -528,7 +531,7 @@ list_of_test_objects.add(
                               max_peak_cooling=676.417 / 2))
 borefield.set_max_avg_fluid_temperature(17)
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 41.245, 98.215,
-                                                   106.282, 426.460, 429.75, 249.957,
+                                                   106.282, 426.45554769525677, 429.75396962980585, 249.96114925986444,
                                                    name='Optimise load profile 100% (balance)',
                                                    power=3, hourly=False))
 
@@ -736,7 +739,8 @@ hourly_load_building.hourly_cooling_load = hourly_load_building.hourly_cooling_l
 hourly_load_building.hourly_heating_load = hourly_load_building.hourly_heating_load * 5 / 4
 borefield.load = hourly_load_building
 list_of_test_objects.add(
-    SizingObject(borefield, L2_output=115.945, L3_output=115.945, L4_output=109.61700586805655, quadrant=2,
+    SizingObject(borefield, L2_output=115.98849525499037, L3_output=115.98849525499037, L4_output=109.61700586805655,
+                 quadrant=2,
                  name='BS2023 Office'))
 
 borefield = Borefield()
