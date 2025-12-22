@@ -786,8 +786,8 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 45.9781
                                                    512.9266,
                                                    name='Optimise load profile (eer combined) (power)', power=1,
                                                    hourly=False))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 50.29292463948734, 12.75068338499146,
-                                                   95.92330946070751, 66.21612115506214, 602.8180923300746,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 50.20552887448856, 12.775993964027224,
+                                                   96.0348641865927, 66.16134683885466, 602.987477171566,
                                                    509.995718403938,
                                                    name='Optimise load profile (eer combined) (energy)', power=2,
                                                    hourly=False))
