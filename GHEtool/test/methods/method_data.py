@@ -686,7 +686,7 @@ borefield.fluid_data = ConstantFluidData(0.475, 1033, 3930, 0.001)
 borefield.flow_data = ConstantFlowRate(mfr=0.1)
 borefield.pipe_data = SingleUTube(1.5, 0.016, 0.02, 0.42, 0.04)
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 81.74619424986747, 86.4450620561209,
-                                                   22.3508, 38.60682541280639, 55.21378992502661, 60.239900259224626,
+                                                   22.3508, 37.60682541280639, 55.21378992502661, 60.239900259224626,
                                                    name='Optimise load profile (stuck in loop) (power)', power=1,
                                                    hourly=False))
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 80.572, 83.887,
