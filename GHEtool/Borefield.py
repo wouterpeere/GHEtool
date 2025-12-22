@@ -876,6 +876,14 @@ class Borefield(BaseClass):
         time = np.array([th, th + self.load.tm, self.load.ty + self.load.tm + th])
         # Iterates as long as there is no convergence
         # (convergence if difference between borehole length in iterations is smaller than THRESHOLD_BOREHOLE_LENGTH)
+
+        if self._calculation_setup.size_based_on == 'inlet':
+            Tf = self.calculate_borefield_inlet_outlet_temperature(qh / 1000, Tf)[0]
+        elif self._calculation_setup.size_based_on == 'outlet':
+            Tf = self.calculate_borefield_inlet_outlet_temperature(qh / 1000, Tf)[1]
+        else:
+            pass
+
         i = 0
         while not self._check_convergence(self.H, H_prev, i):
             # calculate the required g-function values
@@ -903,7 +911,7 @@ class Borefield(BaseClass):
         It uses the methodology developed by (Monzo et al., 2016) [#Monzo]_ and adapted by (Peere et al., 2021) [#PeereBS]_.
         The concept of borefield quadrants is developed by (Peere et al., 2021) [#PeereBS]_, [#PeereThesis]_.
 
-                Parameters
+        Parameters
         ----------
         th : float
             Peak duration [s]
@@ -938,6 +946,14 @@ class Borefield(BaseClass):
 
         # Iterates as long as there is no convergence
         # (convergence if difference between the borehole lengths in iterations is smaller than THRESHOLD_BOREHOLE_LENGTH)
+
+        if self._calculation_setup.size_based_on == 'inlet':
+            Tf = self.calculate_borefield_inlet_outlet_temperature(qh / 1000, Tf)[0]
+        elif self._calculation_setup.size_based_on == 'outlet':
+            Tf = self.calculate_borefield_inlet_outlet_temperature(qh / 1000, Tf)[1]
+        else:
+            pass
+
         i = 0
         while not self._check_convergence(self.H, H_prev, i):
             # get the g-function values
@@ -2036,6 +2052,41 @@ class Borefield(BaseClass):
             # limited by minimum temperature
             return 3
         return 2
+
+    def calculate_borefield_inlet_outlet_temperature(self, power: Union[float, np.ndarray],
+                                                     temperature: Union[float, np.ndarray]) -> tuple:
+        """
+        This function calculates the inlet and outlet temperature of the borefield given the power and the average
+        fluid temperature.
+
+        Parameters
+        ----------
+        power : float, np.ndarray
+            Power for which the inlet and outlet temperatures are calculated [kW]
+        temperature : float, np.ndarray
+            Temperature for which the inlet and outlet temperatures are calculated [°C]
+
+        Returns
+        -------
+        tuple
+            Borefield inlet temperature [°C] (float, np.ndarray), Borefield outlet temperature [°C] (float, np.ndarray)
+
+        Raises
+        ------
+        TypeError
+            Raises TypeError when a constant borehole thermal resistance is used.
+        """
+        if self.borehole.use_constant_Rb:
+            raise TypeError("The inlet and outlet temperatures cannot be calculated when a constant effective borehole"
+                            "thermal resistance is used.")
+
+        delta_temp = power / (
+                self.borehole.fluid_data.cp(temperature=temperature) / 1000 *
+                self.borehole.flow_data.mfr(fluid_data=self.fluid_data, temperature=temperature) *
+                self.number_of_boreholes)
+
+        # power < 0 when in extraction
+        return temperature + delta_temp / 2, temperature - delta_temp / 2
 
     def __export__(self):
         return {

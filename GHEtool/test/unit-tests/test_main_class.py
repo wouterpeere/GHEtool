@@ -1318,3 +1318,86 @@ def test_Rb_and_Re_with_temperture_dep_data():
     borefield.calculate_temperatures()
     assert np.isclose(borefield.Re, 949.0513333574957)
     assert np.isclose(borefield.Rb, 0.15660083491337237)
+
+
+def test_inlet_outlet_temperatures():
+    borefield = Borefield()
+    with pytest.raises(TypeError):
+        borefield.calculate_borefield_inlet_outlet_temperature(10, 5)
+    borefield.create_rectangular_borefield(1, 1, 6, 6, 100)
+    borefield.borehole.pipe_data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2)
+    borefield.borehole.fluid_data = ConstantFluidData(0.5, 1200, 4000, 0.001)
+    borefield.borehole.flow_data = ConstantFlowRate(mfr=1)
+    borefield.borehole.use_constant_Rb = False
+
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(10, 0), (1.25, -1.25))
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), 0),
+                       ((0.625, 1.25), (-0.625, -1.25)))
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(10, np.array([0, 1])),
+                       ((1.25, 2.25), (-1.25, -0.25)))
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), np.array([0, 1])),
+                       ((0.625, 2.25), (-0.625, -0.25)))
+    borefield.borehole.flow_data = ConstantFlowRate(vfr=1)
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), np.array([0, 1])),
+                       ((0.52083333, 2.04166667), (-0.52083333, -0.04166667)))  # equal since rho is equal
+    borefield.borehole.fluid_data = TemperatureDependentFluidData('MEG', 25)
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), np.array([0, 1])),
+                       ((0.64067241, 2.28081611), (-0.64067241, -0.28081611)))
+    borefield.create_rectangular_borefield(2, 1, 6, 6, 100)
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), np.array([0, 1])),
+                       ((0.3203362, 1.64040806), (-0.3203362, 0.35959194)))
+
+
+def test_size_inlet_outlet_l2():
+    borefield = Borefield()
+    borefield.borefield = copy.deepcopy(borefield_gt)
+    load = MonthlyGeothermalLoadAbsolute(*load_case(3))
+    borefield.ground_data = GroundConstantTemperature(2, 10)
+    borefield.fluid_data = ConstantFluidData(0.5, 1200, 4000, 0.001)
+    borefield.flow_data = ConstantFlowRate(mfr=1)
+    borefield.pipe_data = pipeData
+    borefield.calculation_setup(use_constant_Rb=False, interpolate_gfunctions=False, atol=0.0005)
+
+    # extraction
+    th, _, tcm, qh, qpm, qm = load._calculate_first_year_params(True)
+    borefield.calculation_setup(size_based_on='inlet')
+    size_inlet = borefield._Carcel(th, tcm, qh, qpm, qm, 0)
+    borefield.calculation_setup(size_based_on='outlet')
+    size_outlet = borefield._Carcel(th, tcm, qh, qpm, qm, 0)
+    borefield.calculation_setup(size_based_on='average')
+    delta_T = qh / 1000 / (borefield.fluid_data.cp() / 1000 * borefield.flow_data.mfr() * borefield.number_of_boreholes)
+    assert np.isclose(size_inlet, borefield._Carcel(th, tcm, qh, qpm, qm, delta_T / 2))
+    assert np.isclose(size_outlet, borefield._Carcel(th, tcm, qh, qpm, qm, -delta_T / 2))
+
+    # injection
+    th, _, tcm, qh, qpm, qm = load._calculate_first_year_params(False)
+    borefield.calculation_setup(size_based_on='inlet')
+    size_inlet = borefield._Carcel(th, tcm, qh, qpm, qm, 0)
+    borefield.calculation_setup(size_based_on='outlet')
+    size_outlet = borefield._Carcel(th, tcm, qh, qpm, qm, 0)
+    borefield.calculation_setup(size_based_on='average')
+    delta_T = qh / 1000 / (borefield.fluid_data.cp() / 1000 * borefield.flow_data.mfr() * borefield.number_of_boreholes)
+    assert np.isclose(size_inlet, borefield._Carcel(th, tcm, qh, qpm, qm, delta_T / 2))
+    assert np.isclose(size_outlet, borefield._Carcel(th, tcm, qh, qpm, qm, -delta_T / 2))
+
+    # extraction
+    th, qh, qm, qa = load._calculate_last_year_params(True)
+    borefield.calculation_setup(size_based_on='inlet')
+    size_inlet = borefield._Ahmadfard(th, qh, qm, qa, 0)
+    borefield.calculation_setup(size_based_on='outlet')
+    size_outlet = borefield._Ahmadfard(th, qh, qm, qa, 0)
+    borefield.calculation_setup(size_based_on='average')
+    delta_T = qh / 1000 / (borefield.fluid_data.cp() / 1000 * borefield.flow_data.mfr() * borefield.number_of_boreholes)
+    assert np.isclose(size_inlet, borefield._Ahmadfard(th, qh, qm, qa, delta_T / 2))
+    assert np.isclose(size_outlet, borefield._Ahmadfard(th, qh, qm, qa, -delta_T / 2))
+
+    # injection
+    th, qh, qm, qa = load._calculate_last_year_params(False)
+    borefield.calculation_setup(size_based_on='inlet')
+    size_inlet = borefield._Ahmadfard(th, qh, qm, qa, 0)
+    borefield.calculation_setup(size_based_on='outlet')
+    size_outlet = borefield._Ahmadfard(th, qh, qm, qa, 0)
+    borefield.calculation_setup(size_based_on='average')
+    delta_T = qh / 1000 / (borefield.fluid_data.cp() / 1000 * borefield.flow_data.mfr() * borefield.number_of_boreholes)
+    assert np.isclose(size_inlet, borefield._Ahmadfard(th, qh, qm, qa, delta_T / 2))
+    assert np.isclose(size_outlet, borefield._Ahmadfard(th, qh, qm, qa, -delta_T / 2))

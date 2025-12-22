@@ -16,7 +16,8 @@ class CalculationSetup(BaseClass):
 
     __slots__ = '_L2_sizing', '_L3_sizing', '_L4_sizing', 'quadrant_sizing', '_backup', \
         'atol', 'rtol', 'max_nb_of_iterations', 'interpolate_gfunctions', 'H_init', \
-        'use_precalculated_dataset', 'deep_sizing', 'force_deep_sizing', 'use_neural_network', 'approximate_req_depth'
+        'use_precalculated_dataset', 'deep_sizing', 'force_deep_sizing', 'use_neural_network', 'approximate_req_depth', \
+        'size_based_on'
 
     def __init__(self, quadrant_sizing: int = 0,
                  L2_sizing: bool = None, L3_sizing: bool = None, L4_sizing: bool = None,
@@ -24,7 +25,7 @@ class CalculationSetup(BaseClass):
                  interpolate_gfunctions: bool = None, H_init: float = 100.,
                  use_precalculated_dataset: bool = True, deep_sizing: bool = False,
                  force_deep_sizing: bool = False, use_neural_network: bool = False,
-                 approximate_req_depth: bool = False):
+                 approximate_req_depth: bool = False, size_based_on: str = 'average'):
         """
 
         Parameters
@@ -68,6 +69,10 @@ class CalculationSetup(BaseClass):
         approximate_req_depth : bool
             True if constant fluid temperatures are used in the sizing. This can lead to slightly bigger borefields,
             but a speed improvement of factor 2.
+        size_based_on : str
+            'average' (default) if the borefield should be sized based on the average fluid temperature,
+            'inlet' if the borefield should be sized on the borefield inlet temperature,
+            'outlet' if the borefield should be sized based on the borefield outlet temperature
 
         References
         ----------
@@ -89,6 +94,8 @@ class CalculationSetup(BaseClass):
         self.deep_sizing: bool = deep_sizing
         self.force_deep_sizing: bool = force_deep_sizing
         self.use_neural_network: bool = use_neural_network
+        self.approximate_req_depth: bool = approximate_req_depth
+        self.size_based_on: str = size_based_on
 
         self._backup: CalculationSetup = None
 
