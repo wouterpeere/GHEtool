@@ -3,6 +3,8 @@ This file implements a Result class for temperature profiles.
 """
 import abc
 import numpy as np
+import warnings
+
 from abc import ABC
 
 
@@ -89,7 +91,8 @@ class ResultsMonthly(_Results):
                  peak_extraction: np.ndarray = np.array([]),
                  peak_injection: np.ndarray = np.array([]),
                  monthly_extraction: np.ndarray = np.array([]),
-                 monthly_injection: np.ndarray = np.array([])):
+                 monthly_injection: np.ndarray = np.array([]),
+                 baseload_temp: np.ndarray = np.array([])):
         """
 
         Parameters
@@ -97,18 +100,21 @@ class ResultsMonthly(_Results):
         borehole_wall_temp : np.ndarray
             Borehole wall temperature [deg C]
         peak_extraction : np.ndarray
-            Average fluid temperature in peak heating [deg C]
+            Average fluid temperature in peak extraction [deg C]
         peak_injection : np.ndarray
-            Average fluid temperature in peak cooling [deg C]
+            Average fluid temperature in peak injection [deg C]
         monthly_extraction : np.ndarray
-            Average temperature due to average monthly heating [deg C]
+            Average temperature due to average monthly extraction [deg C]
         monthly_injection : np.ndarray
-            Average temperature due to average monthly cooling [deg C]
+            Average temperature due to average monthly injection [deg C]
+        baseload_temp : np.ndarray
+            Average fluid temperature due to the baseload [deg C]
         """
         self._peak_extraction = peak_extraction
         self._peak_injection = peak_injection
         self._monthly_extraction = monthly_extraction
         self._monthly_injection = monthly_injection
+        self._baseload_temp = baseload_temp
 
         super().__init__(borehole_wall_temp)
         self.hourly = False
@@ -123,11 +129,19 @@ class ResultsMonthly(_Results):
 
     @property
     def monthly_extraction(self) -> np.ndarray:
+        warnings.warn("This will be removed in version 2.5.0. Please use 'baseload_temperature' instead.",
+                      DeprecationWarning)
         return self._monthly_extraction
 
     @property
     def monthly_injection(self) -> np.ndarray:
+        warnings.warn("This will be removed in version 2.5.0. Please use 'baseload_temperature' instead.",
+                      DeprecationWarning)
         return self._monthly_injection
+
+    @property
+    def baseload_temperature(self) -> np.ndarray:
+        return self._baseload_temp
 
 
 class ResultsHourly(_Results):

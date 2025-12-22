@@ -450,7 +450,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         elif peak:
             temperature = self.results.peak_injection
         else:
-            temperature = self.results.monthly_injection
+            temperature = self.results.baseload_temperature
 
         return self.eer.get_EER(temperature, power=np.nan_to_num(power), month_indices=self.month_indices)
 
