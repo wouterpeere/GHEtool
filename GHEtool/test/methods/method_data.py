@@ -798,9 +798,9 @@ borefield.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
 
 borefield.borehole.use_constant_Rb = False
 
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 56.08842937920029, 14.8980537,
-                                                   120.9641560, 87.75267, 589.428823958,
-                                                   504.26187781319,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 56.08842937920029, 14.933843858740387,
+                                                   120.94477115082148, 87.752679252, 589.5522141862185,
+                                                   504.2618778131993,
                                                    name='Optimise load profile (eer combined) (energy, var temp)',
                                                    power=2, hourly=False))
 borefield.borehole = temp_borehole
@@ -915,7 +915,7 @@ hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly
 hourly_load.cop_dhw = 10 ** 6
 hourly_load.exclude_DHW_from_peak = True
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 50.0408, 66.59413927618634,
-                                                   642.3146384835514, 195.75123383540765, 34.10098970116769,
+                                                   642.4146383835514, 195.75123383540765, 34.10098970116769,
                                                    340.28509791563044,
                                                    name='Optimise load profile 1, reversed (power, dhw load, include DHW)',
                                                    power=1,
@@ -926,7 +926,7 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 
                                                    power=2,
                                                    hourly=False, dhw_preferential=False))
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 50.0313, 41.83306546766215,
-                                                   627.8416521743445, 108.20894217579638, 48.573990483375496,
+                                                   627.9416520743445, 108.20894217579638, 48.573990483375496,
                                                    427.82730203303765,
                                                    name='Optimise load profile 1, reversed (balance, dhw load, include DHW)',
                                                    power=3,
