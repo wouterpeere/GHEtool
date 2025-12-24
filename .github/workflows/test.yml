@@ -12,7 +12,10 @@ jobs:
         test_name:
           - test_L2
           - test_L3
-          - test_optimise
+          - test_L4
+          - test_optimise_power
+          - test_optimise_energy
+          - test_optimise_balance
     env:
       MPLBACKEND: Agg
     steps:
