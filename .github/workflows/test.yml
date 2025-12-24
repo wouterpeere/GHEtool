@@ -6,7 +6,7 @@ on:
 jobs:
 
   test_methods:
-    runs-on: windows-latest
+    runs-on: windows-2022
     strategy:
       matrix:
         test_name:
