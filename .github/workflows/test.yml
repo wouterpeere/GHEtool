@@ -6,7 +6,7 @@ on:
 jobs:
 
   test_methods:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     strategy:
       matrix:
         test_name:
@@ -15,6 +15,7 @@ jobs:
           - test_L4
           - test_optimise_power
           - test_optimise_energy
+          - test_optimise_energy_slow_var_temp
           - test_optimise_balance
     env:
       MPLBACKEND: Agg
