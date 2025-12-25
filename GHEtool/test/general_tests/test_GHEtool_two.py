@@ -242,7 +242,7 @@ def test_size_with_multiple_ground_layers():
     borefield.load.peak_injection_duration = 8
     borefield.load.peak_extraction_duration = 6
     assert np.isclose(96.87238165292221, borefield.size(L2_sizing=True))
-    assert np.isclose(97.46310736940708, borefield.size(L3_sizing=True))
+    assert np.isclose(97.96037939221804, borefield.size(L3_sizing=True))
 
     # now with multiple layers
     layer_1 = GroundLayer(k_s=1.7, thickness=4.9)
@@ -256,14 +256,14 @@ def test_size_with_multiple_ground_layers():
     flux.add_layer_on_bottom([layer_1, layer_2, layer_3, layer_4, layer_5, layer_6])
     borefield.ground_data = flux
     assert np.isclose(97.76029903346078, borefield.size(L2_sizing=True))
-    assert np.isclose(98.50277640726456, borefield.size(L3_sizing=True))
+    assert np.isclose(98.88258413062785, borefield.size(L3_sizing=True))
 
     ks_saved = flux.k_s(borefield.depth, borefield.D)
 
     flux_new = GroundFluxTemperature(ks_saved, 10)
     borefield.ground_data = flux_new
     assert np.isclose(97.7575067283266, borefield.size(L2_sizing=True), rtol=1e-3)
-    assert np.isclose(98.50624530678785, borefield.size(L3_sizing=True), rtol=1e-3)
+    assert np.isclose(98.88258413062785, borefield.size(L3_sizing=True), rtol=1e-3)
 
 
 def test_if_gfunction_history_is_cleared_with_groundlayers():

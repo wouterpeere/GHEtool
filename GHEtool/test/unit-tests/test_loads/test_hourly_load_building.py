@@ -36,6 +36,7 @@ results_monthly_test = ResultsMonthly(np.tile(temp, 10),
                                       np.tile(temp, 10),
                                       np.tile(temp, 10),
                                       np.tile(temp, 10),
+                                      np.tile(temp, 10),
                                       np.tile(temp, 10))
 
 results_hourly1 = ResultsHourly(np.linspace(0, 8760 * 2 - 1, 8760),

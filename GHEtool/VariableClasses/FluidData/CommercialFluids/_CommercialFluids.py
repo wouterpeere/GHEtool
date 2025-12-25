@@ -53,7 +53,7 @@ class _CommercialFluids:
                                       (temp, self._volume_ratio if volume_ratio is None else volume_ratio),
                                       bounds_error=False)
         if len(temp) == 1:
-            return float(temp)
+            return temp[0]
         return temp
 
     def viscosity(self, temp: float, volume_ratio: float = None):
@@ -61,7 +61,7 @@ class _CommercialFluids:
                                       (temp, self._volume_ratio if volume_ratio is None else volume_ratio),
                                       bounds_error=False)
         if len(temp) == 1:
-            return float(temp)
+            return temp[0]
         return temp
 
     def density(self, temp: float, volume_ratio: float = None):
@@ -69,7 +69,7 @@ class _CommercialFluids:
                                       (temp, self._volume_ratio if volume_ratio is None else volume_ratio),
                                       bounds_error=False)
         if len(temp) == 1:
-            return float(temp)
+            return temp[0]
         return temp
 
     def specific_heat(self, temp: float, volume_ratio: float = None):
@@ -77,7 +77,7 @@ class _CommercialFluids:
                                       (temp, self._volume_ratio if volume_ratio is None else volume_ratio),
                                       bounds_error=False)
         if len(temp) == 1:
-            return float(temp)
+            return temp[0]
         return temp
 
     def _fill_nan_values_vertically(self) -> None:

@@ -19,14 +19,28 @@ def test_monthly():
                              np.linspace(0, 120 - 1, 120) * 2,
                              np.linspace(0, 120 - 1, 120) * 3,
                              np.linspace(0, 120 - 1, 120) * 4,
-                             np.linspace(0, 120 - 1, 120) * 5)
+                             np.linspace(0, 120 - 1, 120) * 5,
+                             np.linspace(0, 120 - 1, 120) * 6)
     assert np.array_equal(results.Tb, np.linspace(0, 120 - 1, 120))
     assert np.array_equal(results.peak_extraction, np.linspace(0, 120 - 1, 120) * 2)
     assert np.array_equal(results.peak_injection, np.linspace(0, 120 - 1, 120) * 3)
     assert np.array_equal(results.monthly_extraction, np.linspace(0, 120 - 1, 120) * 4)
     assert np.array_equal(results.monthly_injection, np.linspace(0, 120 - 1, 120) * 5)
+    assert np.array_equal(results.baseload_temperature, np.linspace(0, 120 - 1, 120) * 6)
     assert np.isclose(np.min(results.peak_extraction), results.min_temperature)
     assert np.isclose(np.max(results.peak_injection), results.max_temperature)
+
+
+def test_depreciation():
+    results = ResultsMonthly(np.linspace(0, 120 - 1, 120),
+                             np.linspace(0, 120 - 1, 120) * 2,
+                             np.linspace(0, 120 - 1, 120) * 3,
+                             np.linspace(0, 120 - 1, 120) * 4,
+                             np.linspace(0, 120 - 1, 120) * 5)
+    with pytest.warns(DeprecationWarning):
+        assert np.array_equal(results.monthly_extraction, np.linspace(0, 120 - 1, 120) * 4)
+    with pytest.warns(DeprecationWarning):
+        assert np.array_equal(results.monthly_injection, np.linspace(0, 120 - 1, 120) * 5)
 
 
 def test_hourly():

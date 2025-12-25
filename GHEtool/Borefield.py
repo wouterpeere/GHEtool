@@ -1641,10 +1641,8 @@ class Borefield(BaseClass):
             ax.step(time_array, self.results.peak_injection, "b-", where="post", lw=1.5, label="Tf peak injection")
             ax.step(time_array, self.results.peak_extraction, "r-", where="post", lw=1.5, label="Tf peak extraction")
 
-            ax.step(time_array, self.results.monthly_injection, color="b", linestyle="dashed", where="post", lw=1.5,
-                    label="Tf base injection")
-            ax.step(time_array, self.results.monthly_extraction, color="r", linestyle="dashed", where="post", lw=1.5,
-                    label="Tf base extraction")
+            ax.step(time_array, self.results.baseload_temperature, color="b", linestyle="dashed", where="post", lw=1.5,
+                    label="Tf baseload")
 
         # define temperature bounds
         ax.hlines(self.Tf_min, 0, self.simulation_period, colors="r", linestyles="dashed", label="", lw=1)
@@ -1747,10 +1745,8 @@ class Borefield(BaseClass):
 
                 # now the Tf will be calculated based on
                 # Tf = Tb + Q * R_b
-                results_month_injection = Tb + self.load.monthly_baseload_injection_power_simulation_period * 1000 * (
-                        get_rb(results_temperature.monthly_injection, self.Tf_max) / self.number_of_boreholes / H)
-                results_month_extraction = Tb - self.load.monthly_baseload_extraction_power_simulation_period * 1000 * (
-                        get_rb(results_temperature.monthly_extraction, self.Tf_min) / self.number_of_boreholes / H)
+                results_month_avg = Tb + self.load.monthly_average_injection_power_simulation_period * 1000 * (
+                        get_rb(results_temperature.baseload_temperature, self.Tf_min) / self.number_of_boreholes / H)
 
                 # extra summation if the g-function value for the peak is included
                 results_peak_injection = (
@@ -1758,7 +1754,8 @@ class Borefield(BaseClass):
                         + (self.load.monthly_peak_injection_simulation_period
                            * (g_value_peak_injection / k_s / 2 / pi + get_rb(results_temperature.peak_injection,
                                                                              self.Tf_max))
-                           - self.load.monthly_baseload_injection_power_simulation_period * g_value_peak_injection / k_s / 2 / pi)
+                           - np.maximum(0,
+                                        self.load.monthly_average_injection_power_simulation_period) * g_value_peak_injection / k_s / 2 / pi)
                         * 1000 / self.number_of_boreholes / H
                 )
                 results_peak_extraction = (
@@ -1766,9 +1763,17 @@ class Borefield(BaseClass):
                         (- self.load.monthly_peak_extraction_simulation_period
                          * (g_value_peak_extraction / k_s / 2 / pi + get_rb(results_temperature.peak_extraction,
                                                                             self.Tf_min))
-                         + self.load.monthly_baseload_extraction_power_simulation_period * g_value_peak_extraction / k_s / 2 / pi)
+                         - np.minimum(0,
+                                      self.load.monthly_average_injection_power_simulation_period) * g_value_peak_extraction / k_s / 2 / pi)
                         * 1000 / self.number_of_boreholes / H
                 )
+
+                # these results will be depreciated in v2.5.0
+                results_month_injection = Tb + self.load.monthly_baseload_injection_power_simulation_period * 1000 * (
+                        get_rb(results_temperature.monthly_injection, self.Tf_max) / self.number_of_boreholes / H)
+                results_month_extraction = Tb - self.load.monthly_baseload_extraction_power_simulation_period * 1000 * (
+                        get_rb(results_temperature.monthly_extraction, self.Tf_min) / self.number_of_boreholes / H)
+
                 # save temperatures under variable
                 results = ResultsMonthly(
                     borehole_wall_temp=Tb,
@@ -1776,6 +1781,7 @@ class Borefield(BaseClass):
                     peak_injection=results_peak_injection,
                     monthly_extraction=results_month_extraction,
                     monthly_injection=results_month_injection,
+                    baseload_temp=results_month_avg
                 )
 
             if hourly:
