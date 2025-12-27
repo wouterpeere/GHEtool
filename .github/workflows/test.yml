@@ -15,17 +15,16 @@ jobs:
           - test_L4
           - test_optimise_power
           - test_optimise_energy
-          - test_optimise_energy_slow_var_temp
           - test_optimise_balance
     env:
       MPLBACKEND: Agg
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.13'
 
       - name: Install dependencies
         run: |
@@ -47,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ '3.9', '3.10', '3.11', '3.12', '3.13' ]
+        python-version: [ '3.10', '3.11', '3.12', '3.13' ]
     env:
       MPLBACKEND: Agg
     steps:

@@ -112,9 +112,6 @@ def test_optimise_power(input, result):
     _assert_optimisation(model, load, borefield_load, external_load, result)
 
 
-SLOW_ENERGY_TEST_ID = "Optimise load profile (eer combined) (energy, var temp)"
-
-
 @pytest.mark.parametrize(
     "input,result,test_id",
     zip(
@@ -130,39 +127,6 @@ def test_optimise_energy(input, result, test_id):
 
     if power != 2:
         pytest.skip("Not an energy based optimisation case")
-
-    if test_id == SLOW_ENERGY_TEST_ID:
-        pytest.skip("Handled in dedicated slow energy test")
-
-    model.H = depth
-
-    borefield_load, external_load = optimise_load_profile_energy(
-        model,
-        load,
-        max_peak_heating=max_peak_extraction,
-        max_peak_cooling=max_peak_injection,
-    )
-
-    _assert_optimisation(model, load, borefield_load, external_load, result)
-
-
-@pytest.mark.parametrize(
-    "input,result,test_id",
-    zip(
-        list_of_test_objects.optimise_load_profile_input,
-        list_of_test_objects.optimise_load_profile_output,
-        list_of_test_objects.names_optimise_load_profile,
-    ),
-    ids=list_of_test_objects.names_optimise_load_profile,
-)
-def test_optimise_energy_slow_var_temp(input, result, test_id):
-    if test_id != SLOW_ENERGY_TEST_ID:
-        pytest.skip("Not the slow energy var temp case")
-
-    model = input[0]
-    load, depth, power, _, max_peak_extraction, max_peak_injection, _ = input[1:]
-
-    assert power == 2  # sanity check
 
     model.H = depth
 
