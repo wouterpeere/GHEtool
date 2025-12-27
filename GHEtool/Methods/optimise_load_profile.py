@@ -400,74 +400,37 @@ def optimise_load_profile_energy(
         while not cool_ok or not heat_ok:
             # calculate temperature profile, just for the results
             peak_extraction, peak_injection, _ = update_last_month(i, init_load)
+
             # deviation from minimum temperature
             if abs(peak_extraction - borefield.Tf_min) > temperature_threshold:
+                # check if it goes below the threshold
                 current_heating_peak = borefield.load.monthly_peak_heating_simulation_period[i]
 
-                error = peak_extraction - borefield.Tf_min
-                # error < 0  → too cold → reduce heating
-                # error > 0  → margin → can increase heating
-
-                # proportional gain with damping
-                gain = min(5.0, abs(error))
-                delta = gain * error
-
-                # cap relative step to avoid overshoot (±5 %)
-                max_step = 0.05 * max(current_heating_peak, 1.0)
-                delta = np.clip(delta, -max_step, max_step)
-
-                # apply update (note the sign)
-                current_heating_peak = current_heating_peak + delta
-
-                # enforce bounds
-                current_heating_peak = min(
-                    peak_heating[i],
-                    max(0.1, current_heating_peak)
-                )
-
-                # check if fully restored
-                if current_heating_peak == peak_heating[i] and error > 0:
-                    heat_ok = True
-
+                if peak_extraction < borefield.Tf_min:
+                    current_heating_peak = max(0.1, current_heating_peak - 1 * max(1, 10 * (
+                            borefield.Tf_min - peak_extraction)))
+                else:
+                    current_heating_peak = min(peak_heating[i], current_heating_peak * 1.01)
+                    if current_heating_peak == peak_heating[i]:
+                        heat_ok = True
                 borefield.load._peak_heating[i], borefield.load._baseload_heating[i] = \
-                    current_heating_peak, np.interp(
-                        current_heating_peak,
-                        power_heating_range,
-                        heating_peak_bl[:, i]
-                    )
+                    current_heating_peak, np.interp(current_heating_peak, power_heating_range, heating_peak_bl[:, i])
             else:
                 heat_ok = True
 
             # deviation from maximum temperature
             if abs(peak_injection - borefield.Tf_max) > temperature_threshold:
+                # check if it goes above the threshold
                 current_cooling_peak = borefield.load.monthly_peak_cooling_simulation_period[i]
-
-                error = borefield.Tf_max - peak_injection
-                # error < 0 → too hot → reduce cooling
-                # error > 0 → margin → can increase cooling
-
-                gain = min(5.0, abs(error))
-                delta = gain * error
-
-                max_step = 0.1 * max(current_cooling_peak, 1.0)
-                delta = np.clip(delta, -max_step, max_step)
-
-                current_cooling_peak = current_cooling_peak + delta
-
-                current_cooling_peak = min(
-                    peak_cooling[i],
-                    max(0.1, current_cooling_peak)
-                )
-
-                if current_cooling_peak == peak_cooling[i] and error > 0:
-                    cool_ok = True
-
+                if peak_injection > borefield.Tf_max:
+                    current_cooling_peak = max(0.1, current_cooling_peak - 1 * max(1, 10 * (
+                            -borefield.Tf_max + peak_injection)))
+                else:
+                    current_cooling_peak = min(peak_cooling[i], current_cooling_peak * 1.01)
+                    if current_cooling_peak == peak_cooling[i]:
+                        cool_ok = True
                 borefield.load._peak_cooling[i], borefield.load._baseload_cooling[i] = \
-                    current_cooling_peak, np.interp(
-                        current_cooling_peak,
-                        power_cooling_range,
-                        cooling_peak_bl[:, i]
-                    )
+                    current_cooling_peak, np.interp(current_cooling_peak, power_cooling_range, cooling_peak_bl[:, i])
             else:
                 cool_ok = True
 
