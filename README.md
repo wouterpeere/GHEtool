@@ -61,13 +61,13 @@ our [project board](https://github.com/users/wouterpeere/projects/2) to check ou
 
 ## Requirements
 
-This code is tested with Python 3.9, 3.10, 3.11, 3.12 and 3.13 and requires the following libraries (the versions
+This code is tested with Python 3.10, 3.11, 3.12, 3.13 and 3.14 and requires the following libraries (the versions
 mentioned are the ones with which the code is tested)
 
 * matplotlib >= 3.9.2
 * numpy >= 1.26.4
 * pandas >= 1.4.3
-* pygfunction >= 2.3.0
+* pygfunction >= 2.3.1
 * scipy >= 1.8.1
 * secondarycoolantprops >= 1.1
 * optuna >= 3.6.1

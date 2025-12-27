@@ -500,6 +500,6 @@ def update_pygfunction() -> None:
     """
     gt.heat_transfer.cylindrical_heat_source = cylindrical_heat_source
     gt.heat_transfer.infinite_line_source = infinite_line_source
-    gt.gfunction._Equivalent.thermal_response_factors = thermal_response_factors
-    gt.gfunction._BaseSolver.solve = solve
-    gt.gfunction._BaseSolver.__init__ = __init__
+    gt.solvers.Equivalent.thermal_response_factors = thermal_response_factors
+    gt.solvers._BaseSolver.solve = solve
+    gt.solvers._BaseSolver.__init__ = __init__
