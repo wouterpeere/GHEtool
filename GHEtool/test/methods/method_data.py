@@ -797,12 +797,14 @@ borefield.flow_data = ConstantFlowRate(vfr=0.3)
 borefield.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
 
 borefield.borehole.use_constant_Rb = False
-
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 56.08842937920029, 14.933843858740387,
-                                                   120.94477115082148, 87.752679252, 589.5522141862185,
-                                                   504.2618778131993,
+borefield.load.simulation_period = 20
+borefield.create_rectangular_borefield(12, 10, 6, 6, 146, 4)
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 100, 45.045203865870945,
+                                                   507.312202875, 253.00675132778284, 0,
+                                                   434.48501426970086,
                                                    name='Optimise load profile (eer combined) (energy, var temp)',
                                                    power=2, hourly=False))
+borefield.load.simulation_period = 40
 borefield.borehole = temp_borehole
 borefield.create_rectangular_borefield(6, 6, 6, 6, 146, 4)
 list_of_test_objects.add(
