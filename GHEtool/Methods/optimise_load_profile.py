@@ -65,7 +65,8 @@ def optimise_load_profile_power(
 
     # since the depth does not change, the Rb* value is constant, if there is no temperature dependent fluid data
     if isinstance(borefield.borehole.fluid_data, ConstantFluidData) \
-            and isinstance(borefield.borehole.flow_data, ConstantFlowRate):
+            and isinstance(borefield.borehole.flow_data,
+                           ConstantFlowRate) and borefield._calculation_setup.size_based_on == 'average':
         borefield.Rb = borefield.borehole.get_Rb(borefield.H, borefield.D, borefield.r_b,
                                                  borefield.ground_data.k_s(borefield.depth, borefield.D))
 
@@ -230,8 +231,10 @@ def optimise_load_profile_energy(
         raise ValueError(f"The temperature threshold is {temperature_threshold}, but it cannot be below 0!")
 
     # since the depth does not change, the Rb* value is constant, if there is no temperature dependent fluid data
+    # TODO the last check should be based on the type of flow rate
     if isinstance(borefield.borehole.fluid_data, ConstantFluidData) \
-            and isinstance(borefield.borehole.flow_data, ConstantFlowRate):
+            and isinstance(borefield.borehole.flow_data,
+                           ConstantFlowRate) and borefield._calculation_setup.size_based_on == 'average':
         borefield.Rb = borefield.borehole.get_Rb(borefield.H, borefield.D, borefield.r_b,
                                                  borefield.ground_data.k_s(borefield.depth, borefield.D))
 
@@ -566,7 +569,8 @@ def optimise_load_profile_balance(
 
     # since the depth does not change, the Rb* value is constant, if there is no temperature dependent fluid data
     if isinstance(borefield.borehole.fluid_data, ConstantFluidData) \
-            and isinstance(borefield.borehole.flow_data, ConstantFlowRate):
+            and isinstance(borefield.borehole.flow_data,
+                           ConstantFlowRate) and borefield._calculation_setup.size_based_on == 'average':
         borefield.Rb = borefield.borehole.get_Rb(borefield.H, borefield.D, borefield.r_b,
                                                  borefield.ground_data.k_s(borefield.depth, borefield.D))
 
