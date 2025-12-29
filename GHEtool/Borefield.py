@@ -1920,7 +1920,7 @@ class Borefield(BaseClass):
                 if not self.borehole.use_constant_Rb:
                     results._baseload_temp_inlet, results._baseload_temp_outlet = self.calculate_borefield_inlet_outlet_temperature(
                         self.load.monthly_average_injection_power_simulation_period, results.baseload_temperature)
-                    results._peak_injection_injection, results._peak_injection_outlet = self.calculate_borefield_inlet_outlet_temperature(
+                    results._peak_injection_inlet, results._peak_injection_outlet = self.calculate_borefield_inlet_outlet_temperature(
                         self.load.monthly_peak_injection_simulation_period, results.peak_injection)
                     # (-1) needed since the peak power is always defined positive but for the Delta T it should be signed
                     results._peak_extraction_inlet, results._peak_extraction_outlet = self.calculate_borefield_inlet_outlet_temperature(
