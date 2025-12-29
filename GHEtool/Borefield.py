@@ -1962,8 +1962,8 @@ class Borefield(BaseClass):
                     results._Tf_inlet, results._Tf_outlet = self.calculate_borefield_inlet_outlet_temperature(
                         self.load.hourly_net_resulting_injection_power, results.peak_injection)
                     if sizing:
-                        results._Tf_extraction_inlet, results._Tf_extraction_outlet = Tb + hourly_load * 1000 * (
-                                get_rb(results_temperature.peak_extraction, Tmin) / self.number_of_boreholes / H)
+                        results._Tf_extraction_inlet, results._Tf_extraction_outlet = self.calculate_borefield_inlet_outlet_temperature(
+                            self.load.hourly_net_resulting_injection_power, results._Tf_extraction)
             return results
 
         def calculate_difference(results_old: Union[ResultsMonthly, ResultsHourly],
