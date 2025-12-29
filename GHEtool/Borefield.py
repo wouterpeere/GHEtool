@@ -1810,6 +1810,8 @@ class Borefield(BaseClass):
         -------
         None
         """
+        Tmin = Tmin if Tmin is not None else self.Tf_min
+        Tmax = Tmax if Tmax is not None else self.Tf_max
 
         # reset self.results
         self.results = ResultsMonthly()
@@ -1831,7 +1833,7 @@ class Borefield(BaseClass):
                     if limit is not None:
                         if len(temperature) == 0:
                             return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
-                                                        temperature=Tmin if Tmin is not None else self.Tf_min)
+                                                        temperature=Tmin)
                         elif limit == (Tmax if Tmax is not None else self.Tf_max):
                             return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
                                                         temperature=max(temperature))
@@ -1840,7 +1842,7 @@ class Borefield(BaseClass):
                                                         temperature=min(temperature))
                 if len(temperature) == 0:
                     return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
-                                                temperature=Tmin if Tmin is not None else self.Tf_min)
+                                                temperature=Tmin)
 
                 return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
                                             temperature=temperature)
