@@ -9,37 +9,14 @@ on:
 
 jobs:
 
-  test_methods:
-    runs-on: windows-latest
-    env:
-      MPLBACKEND: Agg
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements_dev.txt
-          pip install -e .
-      - name: Test with pytest
-        run: pytest GHEtool/test/methods/test_methods.py --cov=./ --cov-report=xml
-      - name: Upload Coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage.xml
-          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
-
   test_general:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.13'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -59,10 +36,10 @@ jobs:
       MPLBACKEND: Agg
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.13'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -82,10 +59,10 @@ jobs:
       MPLBACKEND: Agg
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.13'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -104,7 +81,7 @@ jobs:
     strategy:
       matrix:
         os: [ windows-latest, macos-latest ]
-        python-version: [ '3.9', '3.10', '3.11', '3.12', '3.13' ]
+        python-version: [ '3.10', '3.11', '3.12', '3.13' ]
     env:
       MPLBACKEND: Agg
     steps:

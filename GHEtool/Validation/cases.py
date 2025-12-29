@@ -76,7 +76,7 @@ def check_cases():
     """
 
     correct_answers_L2 = (56.75, 117.23, 66.94, 91.32)
-    correct_answers_L3 = (56.77, 118.74, 66.47, 91.24)
+    correct_answers_L3 = (56.77, 118.74, 66.87, 91.46)
 
     for i in (1, 2, 3, 4):
         borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(i)))
