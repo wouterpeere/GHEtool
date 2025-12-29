@@ -263,7 +263,7 @@ class ResultsHourly(_Results):
 
     @property
     def peak_injection_inlet(self) -> np.ndarray:
-        if not np.any(self._Tf_extraction_inlet):
+        if not np.any(self._Tf_inlet):
             raise ValueError('No inlet temperature is set.')
         return self._Tf_inlet
 

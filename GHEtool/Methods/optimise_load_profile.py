@@ -365,7 +365,22 @@ def optimise_load_profile_energy(
                          (g_value_peak_injection / (k_s * 2 * pi) + Rb_max)
                          - borefield.load.monthly_baseload_injection_power_simulation_period[idx] *
                          (g_value_peak_injection / (k_s * 2 * pi))) * 1000 / borefield.number_of_boreholes / borefield.H
-            return extraction, injection, Tb
+
+            # correct for inlet and outlet
+            if borefield._calculation_setup.size_based_on == 'average':
+                return extraction, injection, Tb
+            elif borefield._calculation_setup.size_based_on == 'inlet':
+                injection_inlet, _ = borefield.calculate_borefield_inlet_outlet_temperature(
+                    borefield.load.monthly_peak_extraction_simulation_period[idx], injection)
+                extraction_inlet, _ = borefield.calculate_borefield_inlet_outlet_temperature(
+                    borefield.load.monthly_peak_injection_simulation_period[idx], extraction)
+                return extraction_inlet, injection_inlet, Tb
+            else:
+                _, injection_outlet = borefield.calculate_borefield_inlet_outlet_temperature(
+                    borefield.load.monthly_peak_extraction_simulation_period[idx], injection)
+                _, extraction_outlet = borefield.calculate_borefield_inlet_outlet_temperature(
+                    borefield.load.monthly_peak_injection_simulation_period[idx], extraction)
+                return extraction_outlet, injection_outlet, Tb
 
         # add some iteration for convergence
         # check if active_passive, because then, threshold should be taken
@@ -398,7 +413,7 @@ def optimise_load_profile_energy(
             borefield.load._results._peak_injection[idx] = results_old[1]
             results = calculate(*results_old)
             i += 1
-        return calculate()
+        return results
 
     for i in range(12 * borefield.load.simulation_period):
         # set iteration criteria

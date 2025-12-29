@@ -541,8 +541,8 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 5
                                                    220.095094, 329.93963, 380.234193, 491.59407,
                                                    name='Optimise load profile 3 (energy, var temp)', power=2))
 borefield.USE_SPEED_UP_IN_SIZING = False
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 58.0151808, 88.56452,
-                                                   220.095094, 329.93963, 380.234193, 491.59407,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 58.0067153977, 88.55886814,
+                                                   220.03500576, 329.93963, 380.2660849, 492.1787567,
                                                    name='Optimise load profile 3 (energy, var temp, no speed up)',
                                                    power=2))
 borefield.USE_SPEED_UP_IN_SIZING = True
@@ -1025,25 +1025,83 @@ borefield.pipe_data = SingleUTube(1.5, 0.016, 0.02, 0.42, 0.04)
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 99.99999, 31.1983,
                                                    511.59302, 89.29736, 0, 461.62167,
                                                    name='Optimise balance with EER',
-                                                   power=3,
-                                                   hourly=True, dhw_preferential=None))
+                                                   power=3, hourly=True, dhw_preferential=None))
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 99.99999, 31.1983,
                                                    511.59302, 89.29736, 0, 461.62167,
                                                    name='Optimise balance with EER and dhw preferential',
-                                                   power=3,
-                                                   hourly=True, dhw_preferential=True))
+                                                   power=3, hourly=True, dhw_preferential=True))
 load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_dhw=0, col_cooling=1)
 load.hourly_heating_load = np.zeros(8760)
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 55.7643, 82.92732,
                                                    115.882806, 250.72453, 0, 467.47916,
                                                    name='Optimise balance with EER and dhw preferential and dhw',
-                                                   power=3,
-                                                   hourly=True, dhw_preferential=True))
+                                                   power=3, hourly=True, dhw_preferential=True))
 
 borefield.fluid_data = TemperatureDependentFluidData('MEG', 25)
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 94.94969483547132, 74.61296857235718,
                                                    948.587403343, 267.317836, 427.471233, 316.3346658,
                                                    name='Optimise load profile 1, reversed (energy, dhw load, '
                                                         'include DHW, variable fluid)',
-                                                   power=2,
-                                                   hourly=False, dhw_preferential=False))
+                                                   power=2, hourly=False, dhw_preferential=False))
+
+borefield = Borefield()
+borefield.create_rectangular_borefield(3, 6, 6, 6, 146, 4)
+borefield.set_min_fluid_temperature(2)
+borefield.set_max_fluid_temperature(17)
+borefield.load.peak_duration = 6
+load = HourlyBuildingLoad(efficiency_heating=4, efficiency_cooling=20)
+load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_heating=0, col_cooling=1)
+load.simulation_period = 20
+borefield.load = load
+
+borefield.ground_data = GroundTemperatureGradient(1.9, 10, gradient=2)
+borefield.fluid_data = ConstantFluidData(0.475, 1033, 3930, 0.001)
+borefield.flow_data = ConstantFlowRate(mfr=0.15)
+borefield.pipe_data = SingleUTube(1.5, 0.016, 0.02, 0.42, 0.04)
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 27.78528424167, 30.91226214261,
+                                                   48.3385715, 43.49507, 471.584707,
+                                                   634.99238764,
+                                                   name='Optimise load profile (power, average)', power=1,
+                                                   hourly=False))
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 45.978137699335, 10.93,
+                                                   52.82586122830533, 27.731458, 605.9817888622596,
+                                                   512.9266,
+                                                   name='Optimise load profile (energy, average)', power=2,
+                                                   hourly=False))
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 45.978137699335, 10.93,
+                                                   52.82586122830533, 27.731458, 605.9817888622596,
+                                                   512.9266,
+                                                   name='Optimise load profile (balance, average)', power=3,
+                                                   hourly=False))
+borefield.calculation_setup(size_based_on='inlet')
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 45.978137699335, 10.93,
+                                                   52.82586122830533, 27.731458, 605.9817888622596,
+                                                   512.9266,
+                                                   name='Optimise load profile (power, inlet)', power=1,
+                                                   hourly=False))
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 45.978137699335, 10.93,
+                                                   52.82586122830533, 27.731458, 605.9817888622596,
+                                                   512.9266,
+                                                   name='Optimise load profile (energy, inlet)', power=2,
+                                                   hourly=False))
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 45.978137699335, 10.93,
+                                                   52.82586122830533, 27.731458, 605.9817888622596,
+                                                   512.9266,
+                                                   name='Optimise load profile (balance, inlet)', power=3,
+                                                   hourly=False))
+borefield.calculation_setup(size_based_on='outlet')
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 45.978137699335, 10.93,
+                                                   52.82586122830533, 27.731458, 605.9817888622596,
+                                                   512.9266,
+                                                   name='Optimise load profile (power, outlet)', power=1,
+                                                   hourly=False))
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 45.978137699335, 10.93,
+                                                   52.82586122830533, 27.731458, 605.9817888622596,
+                                                   512.9266,
+                                                   name='Optimise load profile (energy, outlet)', power=2,
+                                                   hourly=False))
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 45.978137699335, 10.93,
+                                                   52.82586122830533, 27.731458, 605.9817888622596,
+                                                   512.9266,
+                                                   name='Optimise load profile (balance, outlet)', power=3,
+                                                   hourly=False))
