@@ -1422,6 +1422,5 @@ def test_plot_inlet_outlet(monkeypatch):
     borefield.print_temperature_profile(type='outlet')
 
     borefield.load = HourlyGeothermalLoad(np.full(8760, 1), np.full(8760, 2))
-    borefield.load = HourlyGeothermalLoad(np.full(8760, 1), np.full(8760, 2))
-    borefield.print_temperature_profile(type='inlet')
-    borefield.print_temperature_profile(type='outlet')
+    borefield.print_temperature_profile(type='inlet', plot_hourly=True)
+    borefield.print_temperature_profile(type='outlet', plot_hourly=True)
