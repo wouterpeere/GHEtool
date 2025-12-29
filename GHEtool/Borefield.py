@@ -1145,13 +1145,9 @@ class Borefield(BaseClass):
         if self._calculation_setup.size_based_on == 'average':
             temperatures = self.results.peak_injection
         elif self._calculation_setup.size_based_on == 'inlet':
-            temperatures = self.calculate_borefield_inlet_outlet_temperature(
-                self.load.hourly_net_resulting_injection_power if hourly else self.load.monthly_peak_injection_simulation_period,
-                self.results.peak_injection)[0]
+            temperatures = self.results.peak_injection_inlet
         else:
-            temperatures = self.calculate_borefield_inlet_outlet_temperature(
-                self.load.hourly_net_resulting_injection_power if hourly else self.load.monthly_peak_injection_simulation_period,
-                self.results.peak_injection)[1]
+            temperatures = self.results.peak_injection_outlet
 
         if np.max(temperatures) <= self.Tf_max:
             return size_min_temp
@@ -1602,31 +1598,11 @@ class Borefield(BaseClass):
             min_temperatures = self.results.peak_extraction
             max_temperatures = self.results.peak_injection
         elif self._calculation_setup.size_based_on == 'outlet':
-            if hourly:
-                max_temperatures = \
-                    self.calculate_borefield_inlet_outlet_temperature(self.load.hourly_net_resulting_injection_power,
-                                                                      self.results.peak_injection)[1]
-                min_temperatures = max_temperatures
-            else:
-                max_temperatures = self.calculate_borefield_inlet_outlet_temperature(
-                    self.load.monthly_peak_injection_simulation_period,
-                    self.results.peak_injection)[1]
-                min_temperatures = self.calculate_borefield_inlet_outlet_temperature(
-                    (-1) * self.load.monthly_peak_extraction_simulation_period,
-                    self.results.peak_extraction)[1]
+            max_temperatures = self.results.peak_injection_outlet
+            min_temperatures = self.results.peak_extraction_outlet
         else:
-            if hourly:
-                max_temperatures = \
-                    self.calculate_borefield_inlet_outlet_temperature(self.load.hourly_net_resulting_injection_power,
-                                                                      self.results.peak_extraction)[0]
-                min_temperatures = max_temperatures
-            else:
-                max_temperatures = self.calculate_borefield_inlet_outlet_temperature(
-                    self.load.monthly_peak_injection_simulation_period,
-                    self.results.peak_injection)[0]
-                min_temperatures = self.calculate_borefield_inlet_outlet_temperature(
-                    (-1) * self.load.monthly_peak_extraction_simulation_period,
-                    self.results.peak_extraction)[0]
+            max_temperatures = self.results.peak_injection_inlet
+            min_temperatures = self.results.peak_extraction_inlet
 
         return self.H, (np.max(max_temperatures) <= self.Tf_max + 0.05 or (
                 quadrant == 10 or quadrant == 1 or quadrant == 2)) and (
@@ -1775,29 +1751,23 @@ class Borefield(BaseClass):
                         lw=1.5,
                         label="Tf (average) baseload")
             elif type == 'outlet':
-                ax.step(time_array, self.calculate_borefield_inlet_outlet_temperature(
-                    self.load.monthly_peak_injection_simulation_period, self.results.peak_injection)[1], "b-",
+                ax.step(time_array, self.results.peak_injection_outlet, "b-",
                         where="post", lw=1.5, label="Tf (outlet) peak injection")
-                ax.step(time_array, self.calculate_borefield_inlet_outlet_temperature(
-                    (-1) * self.load.monthly_peak_extraction_simulation_period, self.results.peak_extraction)[1], "r-",
+                ax.step(time_array, self.results.peak_extraction_outlet, "r-",
                         where="post", lw=1.5,
                         label="Tf (outlet) peak extraction")
 
-                ax.step(time_array, self.calculate_borefield_inlet_outlet_temperature(
-                    self.load.monthly_average_injection_power_simulation_period, self.results.baseload_temperature)[1],
+                ax.step(time_array, self.results.baseload_temperature_outlet,
                         color="b", linestyle="dashed", where="post",
                         lw=1.5, label="Tf (outlet) baseload")
             else:
-                ax.step(time_array, self.calculate_borefield_inlet_outlet_temperature(
-                    self.load.monthly_peak_injection_simulation_period, self.results.peak_injection)[0], "b-",
+                ax.step(time_array, self.results.peak_injection_inlet, "b-",
                         where="post", lw=1.5, label="Tf (inlet) peak injection")
-                ax.step(time_array, self.calculate_borefield_inlet_outlet_temperature(
-                    (-1) * self.load.monthly_peak_extraction_simulation_period, self.results.peak_extraction)[0], "r-",
+                ax.step(time_array, self.results.peak_extraction_inlet, "r-",
                         where="post", lw=1.5,
                         label="Tf (inlet) peak extraction")
 
-                ax.step(time_array, self.calculate_borefield_inlet_outlet_temperature(
-                    self.load.monthly_average_injection_power_simulation_period, self.results.baseload_temperature)[0],
+                ax.step(time_array, self.results.baseload_temperature_inlet,
                         color="b", linestyle="dashed", where="post",
                         lw=1.5, label="Tf (inlet) baseload")
 
@@ -1991,6 +1961,9 @@ class Borefield(BaseClass):
                 if not self.borehole.use_constant_Rb:
                     results._Tf_inlet, results._Tf_outlet = self.calculate_borefield_inlet_outlet_temperature(
                         self.load.hourly_net_resulting_injection_power, results.peak_injection)
+                    if sizing:
+                        results._Tf_extraction_inlet, results._Tf_extraction_outlet = Tb + hourly_load * 1000 * (
+                                get_rb(results_temperature.peak_extraction, Tmin) / self.number_of_boreholes / H)
             return results
 
         def calculate_difference(results_old: Union[ResultsMonthly, ResultsHourly],
@@ -2190,27 +2163,11 @@ class Borefield(BaseClass):
             max_temp = np.max(self.results.peak_injection)
             min_temp = np.min(self.results.peak_extraction)
         elif self._calculation_setup.size_based_on == 'inlet':
-            max_temp = np.max(self.calculate_borefield_inlet_outlet_temperature(
-                self.load.monthly_peak_injection_simulation_period if isinstance(self.results, ResultsMonthly)
-                else self.load.hourly_net_resulting_injection_power,
-                self.results.peak_injection
-            )[0])
-            min_temp = np.min(self.calculate_borefield_inlet_outlet_temperature(
-                (-1) * self.load.monthly_peak_extraction_simulation_period if isinstance(self.results, ResultsMonthly)
-                else self.load.hourly_net_resulting_injection_power,
-                self.results.peak_extraction
-            )[0])
+            max_temp = np.max(self.results.peak_injection_inlet)
+            min_temp = np.min(self.results.peak_extraction_inlet)
         else:
-            max_temp = np.max(self.calculate_borefield_inlet_outlet_temperature(
-                self.load.monthly_peak_injection_simulation_period if isinstance(self.results, ResultsMonthly)
-                else self.load.hourly_net_resulting_injection_power,
-                self.results.peak_injection
-            )[1])
-            min_temp = np.min(self.calculate_borefield_inlet_outlet_temperature(
-                (-1) * self.load.monthly_peak_extraction_simulation_period if isinstance(self.results, ResultsMonthly)
-                else self.load.hourly_net_resulting_injection_power,
-                self.results.peak_extraction
-            )[1])
+            max_temp = np.max(self.results.peak_injection_outlet)
+            min_temp = np.min(self.results.peak_extraction_outlet)
 
         # calculate temperature difference w.r.t. the limits
         DT_max = -self.Tf_max + max_temp + 1000  # + 1000 to have no problems with negative temperatures

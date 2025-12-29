@@ -241,6 +241,8 @@ class ResultsHourly(_Results):
         self._Tf_extraction = None
         self._Tf_inlet = np.array([])
         self._Tf_outlet = np.array([])
+        self._Tf_extraction_inlet = np.array([])
+        self._Tf_extraction_outlet = np.array([])
 
         super().__init__(borehole_wall_temp)
         self.hourly = True
@@ -260,24 +262,28 @@ class ResultsHourly(_Results):
         return self.Tf
 
     @property
-    def peak_extraction_inlet(self) -> np.ndarray:
-        if not np.any(self._Tf_inlet):
+    def peak_injection_inlet(self) -> np.ndarray:
+        if not np.any(self._Tf_extraction_inlet):
             raise ValueError('No inlet temperature is set.')
         return self._Tf_inlet
 
     @property
-    def peak_extraction_outlet(self) -> np.ndarray:
+    def peak_injection_outlet(self) -> np.ndarray:
         if not np.any(self._Tf_outlet):
             raise ValueError('No outlet temperature is set.')
         return self._Tf_outlet
 
     @property
-    def peak_injection_inlet(self) -> np.ndarray:
-        return self.peak_extraction_inlet
+    def peak_extraction_inlet(self) -> np.ndarray:
+        if not np.any(self._Tf_extraction_inlet):
+            return self.peak_injection_inlet
+        return self._Tf_extraction_inlet
 
     @property
-    def peak_injection_outlet(self) -> np.ndarray:
-        return self.peak_extraction_outlet
+    def peak_extraction_outlet(self) -> np.ndarray:
+        if not np.any(self._Tf_extraction_outlet):
+            return self.peak_injection_outlet
+        return self._Tf_extraction_outlet
 
     @property
     def peak_extraction_delta(self) -> np.ndarray:
@@ -300,7 +306,7 @@ class ResultsHourly(_Results):
         Temperature delta between the inlet and outlet fluid temperatures during peak injection [°C]
         """
         # identical
-        return self.peak_extraction_outlet - self.peak_extraction_inlet
+        return self.peak_injection_outlet - self.peak_injection_inlet
 
     @property
     def Tf_inlet(self) -> np.ndarray:
@@ -320,4 +326,4 @@ class ResultsHourly(_Results):
         Temperature delta between the inlet and outlet fluid temperatures during peak injection [°C]
         """
         # identical
-        return self.peak_extraction_outlet - self.peak_extraction_inlet
+        return self.peak_injection_outlet - self.peak_injection_inlet

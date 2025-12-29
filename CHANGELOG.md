@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Inlet and outlet water temperature (issue #271).
 - Added 'type' attribute to temperature profile plotting so also the inlet and outlet temperatures can be shown (issue
   #271).
+- Added inlet and outlet temperatures to Results class (issue #271).
 - Add set_min_fluid_temperature and set_max_fluid_temperature to the Borefield class (issue #271).
 - Average baseload fluid temperature (issue #418).
 
