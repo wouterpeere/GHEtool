@@ -1405,3 +1405,21 @@ def test_size_inlet_outlet_l2():
     delta_T = qh / 1000 / (borefield.fluid_data.cp() / 1000 * borefield.flow_data.mfr() * borefield.number_of_boreholes)
     assert np.isclose(size_inlet, borefield._Ahmadfard(th, qh, qm, qa, delta_T / 2))
     assert np.isclose(size_outlet, borefield._Ahmadfard(th, qh, qm, qa, -delta_T / 2))
+
+
+def test_plot_inlet_outlet(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    borefield = Borefield()
+    borefield.borefield = copy.deepcopy(borefield_gt)
+    load = MonthlyGeothermalLoadAbsolute(*load_case(3))
+    borefield.ground_data = GroundConstantTemperature(2, 10)
+    borefield.fluid_data = ConstantFluidData(0.5, 1200, 4000, 0.001)
+    borefield.flow_data = ConstantFlowRate(mfr=1)
+    borefield.pipe_data = pipeData
+    borefield.load = load
+    borefield.calculation_setup(use_constant_Rb=False, interpolate_gfunctions=False, atol=0.0005)
+    borefield.print_temperature_profile(type='inlet')
+    borefield.print_temperature_profile(type='outlet')
+
+    borefield.load = HourlyGeothermalLoad(np.full(8760, 1), np.full(8760, 2))
+    borefield.load = HourlyGeothermalLoad(np.full(8760, 1), np.full(8760, 2))

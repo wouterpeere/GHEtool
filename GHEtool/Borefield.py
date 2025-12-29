@@ -1674,7 +1674,7 @@ class Borefield(BaseClass):
         """
         self._calculate_temperature_profile(H=length, hourly=hourly)
 
-    def print_temperature_profile(self, legend: bool = True, plot_hourly: bool = False) -> None:
+    def print_temperature_profile(self, legend: bool = True, plot_hourly: bool = False, type: str = 'average') -> None:
         """
         This function plots the temperature profile for the calculated borehole length.
         It uses the available temperature profile data.
@@ -1685,6 +1685,8 @@ class Borefield(BaseClass):
             True if the legend should be printed
         plot_hourly : bool
             True if the temperature profile printed should be based on the hourly load profile.
+        type : str
+            'Average', 'Inlet' or 'Outlet' depending on the temperature profile you want to plot.
 
         Returns
         -------
@@ -1694,9 +1696,10 @@ class Borefield(BaseClass):
         # calculate temperature profile
         self._calculate_temperature_profile(hourly=plot_hourly)
 
-        return self._plot_temperature_profile(legend=legend, plot_hourly=plot_hourly)
+        return self._plot_temperature_profile(legend=legend, plot_hourly=plot_hourly, type=type)
 
-    def print_temperature_profile_fixed_length(self, length: float, legend: bool = True, plot_hourly: bool = False):
+    def print_temperature_profile_fixed_length(self, length: float, legend: bool = True, plot_hourly: bool = False,
+                                               type: str = 'average'):
         """
         This function plots the temperature profile for a fixed borehole length.
         It uses the already calculated temperature profile data, if available.
@@ -1709,6 +1712,8 @@ class Borefield(BaseClass):
             True if the legend should be printed
         plot_hourly : bool
             True if the temperature profile printed should be based on the hourly load profile.
+        type : str
+            'Average', 'Inlet' or 'Outlet' depending on the temperature profile you want to plot.
 
         Returns
         -------
@@ -1718,9 +1723,10 @@ class Borefield(BaseClass):
         # calculate temperature profile
         self._calculate_temperature_profile(H=length, hourly=plot_hourly)
 
-        return self._plot_temperature_profile(legend=legend, plot_hourly=plot_hourly)
+        return self._plot_temperature_profile(legend=legend, plot_hourly=plot_hourly, type=type)
 
-    def _plot_temperature_profile(self, legend: bool = True, plot_hourly: bool = False) -> Tuple[plt.Figure, plt.Axes]:
+    def _plot_temperature_profile(self, legend: bool = True, plot_hourly: bool = False, type: str = 'average') -> Tuple[
+        plt.Figure, plt.Axes]:
         """
         This function plots the temperature profile.
 
@@ -1730,6 +1736,8 @@ class Borefield(BaseClass):
             True if the legend should be printed
         plot_hourly : bool
             True if the temperature profile printed should be based on the hourly load profile.
+        type : str
+            'Average', 'Inlet' or 'Outlet' depending on the temperature profile you want to plot.
 
         Returns
         -------
@@ -1757,13 +1765,53 @@ class Borefield(BaseClass):
         ax.step(time_array, self.results.Tb, "k-", where="post", lw=1.5, label="Tb")
 
         if plot_hourly:
-            ax.step(time_array, self.results.Tf, "b-", where="post", lw=1, label="Tf")
-        else:
-            ax.step(time_array, self.results.peak_injection, "b-", where="post", lw=1.5, label="Tf peak injection")
-            ax.step(time_array, self.results.peak_extraction, "r-", where="post", lw=1.5, label="Tf peak extraction")
+            if type == 'average':
+                ax.step(time_array, self.results.Tf, "b-", where="post", lw=1, label="Tf (average)")
+            elif type == 'outlet':
+                ax.step(time_array, self.calculate_borefield_inlet_outlet_temperature(
+                    self.load.hourly_injection_load_simulation_period, self.results.Tf)[1], "b-", where="post", lw=1,
+                        label="Tf (outlet)")
+            else:
+                ax.step(time_array, self.calculate_borefield_inlet_outlet_temperature(
+                    self.load.hourly_injection_load_simulation_period, self.results.Tf)[1], "b-", where="post", lw=1,
+                        label="Tf (inlet)")
 
-            ax.step(time_array, self.results.baseload_temperature, color="b", linestyle="dashed", where="post", lw=1.5,
-                    label="Tf baseload")
+        else:
+            if type == 'average':
+                ax.step(time_array, self.results.peak_injection, "b-", where="post", lw=1.5,
+                        label="Tf (average) peak injection")
+                ax.step(time_array, self.results.peak_extraction, "r-", where="post", lw=1.5,
+                        label="Tf (average) peak extraction")
+
+                ax.step(time_array, self.results.baseload_temperature, color="b", linestyle="dashed", where="post",
+                        lw=1.5,
+                        label="Tf (average) baseload")
+            elif type == 'outlet':
+                ax.step(time_array, self.calculate_borefield_inlet_outlet_temperature(
+                    self.load.monthly_peak_injection_simulation_period, self.results.peak_injection)[1], "b-",
+                        where="post", lw=1.5, label="Tf (outlet) peak injection")
+                ax.step(time_array, self.calculate_borefield_inlet_outlet_temperature(
+                    (-1) * self.load.monthly_peak_extraction_simulation_period, self.results.peak_extraction)[1], "r-",
+                        where="post", lw=1.5,
+                        label="Tf (outlet) peak extraction")
+
+                ax.step(time_array, self.calculate_borefield_inlet_outlet_temperature(
+                    self.load.monthly_average_injection_power_simulation_period, self.results.baseload_temperature)[1],
+                        color="b", linestyle="dashed", where="post",
+                        lw=1.5, label="Tf (outlet) baseload")
+            else:
+                ax.step(time_array, self.calculate_borefield_inlet_outlet_temperature(
+                    self.load.monthly_peak_injection_simulation_period, self.results.peak_injection)[0], "b-",
+                        where="post", lw=1.5, label="Tf (inlet) peak injection")
+                ax.step(time_array, self.calculate_borefield_inlet_outlet_temperature(
+                    (-1) * self.load.monthly_peak_extraction_simulation_period, self.results.peak_extraction)[0], "r-",
+                        where="post", lw=1.5,
+                        label="Tf (inlet) peak extraction")
+
+                ax.step(time_array, self.calculate_borefield_inlet_outlet_temperature(
+                    self.load.monthly_average_injection_power_simulation_period, self.results.baseload_temperature)[0],
+                        color="b", linestyle="dashed", where="post",
+                        lw=1.5, label="Tf (inlet) baseload")
 
         # define temperature bounds
         ax.hlines(self.Tf_min, 0, self.simulation_period, colors="r", linestyles="dashed", label="", lw=1)
