@@ -194,6 +194,30 @@ list_of_test_objects.add(SizingObject(borefield, L2_output=119.5189, L3_output=1
 borefield.fluid_data = TemperatureDependentFluidData('MPG', 25).create_constant(3)
 list_of_test_objects.add(SizingObject(borefield, L2_output=121.0716, L3_output=120.8516, L4_output=102.7196, quadrant=1,
                                       name='BS2023 Auditorium (MPG, fixed limit)'))
+borefield.calculation_setup(size_based_on='inlet')
+borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
+borefield.set_max_avg_fluid_temperature(23)
+list_of_test_objects.add(
+    SizingObject(borefield, L2_output=99.73867482021556, L3_output=99.59088033375507, L4_output=85.73751704134587,
+                 quadrant=1,
+                 name='BS2023 Auditorium (MPG, Variable limit, inlet)'))
+borefield.fluid_data = TemperatureDependentFluidData('MPG', 25).create_constant(3)
+list_of_test_objects.add(
+    SizingObject(borefield, L2_output=100.847412852, L3_output=100.70122075570458, L4_output=86.80658085033203,
+                 quadrant=1,
+                 name='BS2023 Auditorium (MPG, fixed limit, inlet)'))
+borefield.calculation_setup(size_based_on='outlet')
+borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
+list_of_test_objects.add(
+    SizingObject(borefield, L2_output=64.38776970267729, L3_output=65.28538350504957, L4_output=60.942615648726196,
+                 quadrant=1,
+                 name='BS2023 Auditorium (MPG, Variable limit, outlet)'))
+borefield.fluid_data = TemperatureDependentFluidData('MPG', 25).create_constant(3)
+list_of_test_objects.add(
+    SizingObject(borefield, L2_output=64.19954433467, L3_output=65.28912237173243, L4_output=60.94524740941217,
+                 quadrant=4,
+                 name='BS2023 Auditorium (MPG, fixed limit, outlet)'))
+borefield.calculation_setup(size_based_on='average')
 borefield.fluid_data = fluid_data
 borefield.set_max_avg_fluid_temperature(17)
 list_of_test_objects.add(SizingObject(borefield, L2_output=142.001, L3_output=141.453, L4_output=103.761, quadrant=1,
@@ -232,6 +256,27 @@ borefield.fluid_data = TemperatureDependentFluidData('MPG', 25).create_constant(
 list_of_test_objects.add(
     SizingObject(borefield, L2_output=172.41551490145127, L3_output=175.60818720662357, L4_output=163.5176, quadrant=2,
                  name='BS2023 Office, (MPG, fixed)'))
+borefield.set_max_avg_fluid_temperature(20)
+borefield.calculation_setup(size_based_on='inlet')
+list_of_test_objects.add(
+    SizingObject(borefield, L2_output=137.801376, L3_output=139.60742073304235, L4_output=131.326824817385, quadrant=2,
+                 name='BS2023 Office, (MPG, variable, inlet)'))
+borefield.fluid_data = TemperatureDependentFluidData('MPG', 25).create_constant(3)
+list_of_test_objects.add(
+    SizingObject(borefield, L2_output=137.8013763, L3_output=139.60742073304235, L4_output=131.326824817385,
+                 quadrant=2,
+                 name='BS2023 Office, (MPG, fixed, inlet)'))
+borefield.set_max_avg_fluid_temperature(17)
+borefield.calculation_setup(size_based_on='outlet')
+list_of_test_objects.add(
+    SizingObject(borefield, L2_output=96.20402464, L3_output=97.21734710484408, L4_output=94.278108727, quadrant=2,
+                 name='BS2023 Office, (MPG, variable, outlet)'))
+borefield.fluid_data = TemperatureDependentFluidData('MPG', 25).create_constant(3)
+list_of_test_objects.add(
+    SizingObject(borefield, L2_output=96.204024648, L3_output=97.21734710484408, L4_output=94.27810872711586,
+                 quadrant=2,
+                 name='BS2023 Office, (MPG, fixed, outlet)'))
+borefield.calculation_setup(size_based_on='average')
 borefield.fluid_data = fluid_data
 borefield.calculation_setup(max_nb_of_iterations=5)
 list_of_test_objects.add(SizingObject(borefield, error_L2=MaximumNumberOfIterations, error_L3=MaximumNumberOfIterations,
@@ -273,6 +318,16 @@ hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\swimmi
 borefield.load = hourly_load
 list_of_test_objects.add(SizingObject(borefield, L2_output=303.172, L3_output=308.303, L4_output=305.8658, quadrant=4,
                                       name='BS2023 Swimming pool'))
+borefield.calculation_setup(size_based_on='inlet')
+list_of_test_objects.add(
+    SizingObject(borefield, L2_output=337.18203201720564, L3_output=342.0561260799836, L4_output=335.1396044,
+                 quadrant=4,
+                 name='BS2023 Swimming pool, inlet'))
+borefield.calculation_setup(size_based_on='outlet')
+list_of_test_objects.add(
+    SizingObject(borefield, L2_output=272.6762852815378, L3_output=279.1327314039608, L4_output=280.309456, quadrant=4,
+                 name='BS2023 Swimming pool, outlet'))
+borefield.calculation_setup(size_based_on='average')
 borefield.calculation_setup(atol=False, max_nb_of_iterations=40)
 list_of_test_objects.add(SizingObject(borefield, L2_output=303.162, L3_output=308.4918, L4_output=306.0602, quadrant=4,
                                       name='BS2023 Swimming pool (no atol)'))

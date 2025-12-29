@@ -876,13 +876,13 @@ class Borefield(BaseClass):
         time = np.array([th, th + self.load.tm, self.load.ty + self.load.tm + th])
         # Iterates as long as there is no convergence
         # (convergence if difference between borehole length in iterations is smaller than THRESHOLD_BOREHOLE_LENGTH)
-
+        corr = 1 if Tf == self.Tf_max else -1
         if self._calculation_setup.size_based_on == 'inlet':
-            Tf = self.calculate_borefield_inlet_outlet_temperature(qh / 1000, Tf)[0]
+            Tfint = Tf - self.calculate_borefield_inlet_outlet_temperature(corr * qh / 1000, 0)[0]
         elif self._calculation_setup.size_based_on == 'outlet':
-            Tf = self.calculate_borefield_inlet_outlet_temperature(qh / 1000, Tf)[1]
+            Tfint = Tf - self.calculate_borefield_inlet_outlet_temperature(corr * qh / 1000, 0)[1]
         else:
-            pass
+            Tfint = Tf
 
         i = 0
         while not self._check_convergence(self.H, H_prev, i):
@@ -896,7 +896,7 @@ class Borefield(BaseClass):
             # calculate the total borehole length
             L = (qa * Ra + qm * Rm + qh * Rd + qh * self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s,
                                                                          self.depth,
-                                                                         temperature=Tf)) / abs(Tf - self._Tg())
+                                                                         temperature=Tfint)) / abs(Tfint - self._Tg())
             # updating the borehole length values
             H_prev = self.H
             self.H = L / self.number_of_boreholes
@@ -946,13 +946,13 @@ class Borefield(BaseClass):
 
         # Iterates as long as there is no convergence
         # (convergence if difference between the borehole lengths in iterations is smaller than THRESHOLD_BOREHOLE_LENGTH)
-
+        corr = 1 if Tf == self.Tf_max else -1
         if self._calculation_setup.size_based_on == 'inlet':
-            Tf = self.calculate_borefield_inlet_outlet_temperature(qh / 1000, Tf)[0]
+            Tfint = Tf - self.calculate_borefield_inlet_outlet_temperature(corr * qh / 1000, 0)[0]
         elif self._calculation_setup.size_based_on == 'outlet':
-            Tf = self.calculate_borefield_inlet_outlet_temperature(qh / 1000, Tf)[1]
+            Tfint = Tf - self.calculate_borefield_inlet_outlet_temperature(corr * qh / 1000, 0)[1]
         else:
-            pass
+            Tfint = Tf
 
         i = 0
         while not self._check_convergence(self.H, H_prev, i):
@@ -967,7 +967,8 @@ class Borefield(BaseClass):
 
             # calculate the total length
             L = (qh * self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s, self.depth,
-                                           temperature=Tf) + qh * Rh + qm * Rcm + qpm * Rpm) / abs(Tf - self._Tg())
+                                           temperature=Tfint) + qh * Rh + qm * Rcm + qpm * Rpm) / abs(
+                Tfint - self._Tg())
 
             # updating the borehole lengths
             H_prev = self.H
@@ -1139,7 +1140,18 @@ class Borefield(BaseClass):
 
         # check if sizing by the minimum temperature (quadrant 3/4) does not cross the temperature boundary
         self.calculate_temperatures(size_min_temp, hourly=hourly)
-        if np.max(self.results.peak_injection) <= self.Tf_max:
+        if self._calculation_setup.size_based_on == 'average':
+            temperatures = self.results.peak_injection
+        elif self._calculation_setup.size_based_on == 'inlet':
+            temperatures = self.calculate_borefield_inlet_outlet_temperature(
+                self.load.hourly_net_resulting_injection_power if hourly else self.load.monthly_peak_injection_simulation_period,
+                self.results.peak_injection)[0]
+        else:
+            temperatures = self.calculate_borefield_inlet_outlet_temperature(
+                self.load.hourly_net_resulting_injection_power if hourly else self.load.monthly_peak_injection_simulation_period,
+                self.results.peak_injection)[1]
+
+        if np.max(temperatures) <= self.Tf_max:
             return size_min_temp
         raise UnsolvableDueToTemperatureGradient
 
@@ -1489,17 +1501,18 @@ class Borefield(BaseClass):
         Tmin = self.Tf_min
         Tmax = self.Tf_max
 
-        def correct_limits(power):
+        def correct_limits(power, Tmin, Tmax, boundary: str):
             if self._calculation_setup.size_based_on == 'average':
-                return
+                return Tmin, Tmax
             if self._calculation_setup.size_based_on == 'inlet':
                 Tf = self.calculate_borefield_inlet_outlet_temperature(power, 0)[0]
             else:
                 Tf = self.calculate_borefield_inlet_outlet_temperature(power, 0)[1]
 
-            global Tmin, Tmax
-            Tmin = self.Tf_min - Tf
-            Tmax = self.Tf_max - Tf
+            tmin = self.Tf_min if boundary == 'max' else self.Tf_min - Tf
+            tmax = self.Tf_max if boundary == 'min' else self.Tf_max - Tf
+
+            return tmin, tmax
 
         while not self._check_convergence(self.H, H_prev, i):
             if H_prev != 0:
@@ -1517,8 +1530,9 @@ class Borefield(BaseClass):
                     slice = self.results.peak_injection[: 8760 if hourly else 12]
                     idx = np.argmax(slice)
                     max_val = slice[idx]
-                    correct_limits(self.load.hourly_injection_load_simulation_period[:8760][idx] if hourly else
-                                   self.load.monthly_peak_injection_simulation_period[:12][idx])
+                    Tmin, Tmax = correct_limits(
+                        self.load.hourly_net_resulting_injection_power[:8760][idx] if hourly else
+                        self.load.monthly_peak_injection_simulation_period[:12][idx], Tmin, Tmax, 'max')
                     self.H = (max_val - self._Tg()) / (Tmax - self._Tg()) * H_prev
                 elif quadrant == 2:
                     # maximum temperature
@@ -1526,8 +1540,9 @@ class Borefield(BaseClass):
                     slice = self.results.peak_injection[-8760 if hourly else -12:]
                     idx = np.argmax(slice)
                     max_val = slice[idx]
-                    correct_limits(self.load.hourly_injection_load_simulation_period[-8760:][idx] if hourly else
-                                   self.load.monthly_peak_injection_simulation_period[-12:][idx])
+                    Tmin, Tmax = correct_limits(
+                        self.load.hourly_net_resulting_injection_power[-8760:][idx] if hourly else
+                        self.load.monthly_peak_injection_simulation_period[-12:][idx], Tmin, Tmax, 'max')
                     self.H = (max_val - self._Tg()) / (Tmax - self._Tg()) * H_prev
                 elif quadrant == 3:
                     # minimum temperature
@@ -1535,8 +1550,9 @@ class Borefield(BaseClass):
                     slice = self.results.peak_extraction[: 8760 if hourly else 12]
                     idx = np.argmin(slice)
                     min_val = slice[idx]
-                    correct_limits(self.load.hourly_extraction_load_simulation_period[:8760][idx] if hourly else
-                                   self.load.monthly_peak_extraction_simulation_period[:12][idx])
+                    Tmin, Tmax = correct_limits(
+                        self.load.hourly_net_resulting_injection_power[:8760][idx] if hourly else
+                        (-1) * self.load.monthly_peak_extraction_simulation_period[:12][idx], Tmin, Tmax, 'min')
                     self.H = (min_val - self._Tg()) / (Tmin - self._Tg()) * H_prev
                 elif quadrant == 4:
                     # minimum temperature
@@ -1544,8 +1560,9 @@ class Borefield(BaseClass):
                     slice = self.results.peak_extraction[-8760 if hourly else -12:]
                     idx = np.argmin(slice)
                     min_val = slice[idx]
-                    correct_limits(self.load.hourly_extraction_load_simulation_period[-8760:][idx] if hourly else
-                                   self.load.monthly_peak_extraction_simulation_period[-12:][idx])
+                    Tmin, Tmax = correct_limits(
+                        self.load.hourly_net_resulting_injection_power[-8760:][idx] if hourly else
+                        (-1) * self.load.monthly_peak_extraction_simulation_period[-12:][idx], Tmin, Tmax, 'min')
                     self.H = (min_val - self._Tg()) / (Tmin - self._Tg()) * H_prev
                 elif quadrant == 10:
                     # over all years
@@ -1554,8 +1571,9 @@ class Borefield(BaseClass):
                     slice = self.results.peak_injection
                     idx = np.argmax(slice)
                     max_val = slice[idx]
-                    correct_limits(self.load.hourly_injection_load_simulation_period[idx] if hourly else
-                                   self.load.monthly_peak_injection_simulation_period[idx])
+                    Tmin, Tmax = correct_limits(
+                        self.load.hourly_net_resulting_injection_power[idx] if hourly else
+                        self.load.monthly_peak_injection_simulation_period[idx], Tmin, Tmax, 'max')
                     self.H = (max_val - self._Tg()) / (Tmax - self._Tg()) * H_prev
                 elif quadrant == 20:
                     # over all years
@@ -1564,8 +1582,10 @@ class Borefield(BaseClass):
                     slice = self.results.peak_extraction
                     idx = np.argmin(slice)
                     min_val = slice[idx]
-                    correct_limits(self.load.hourly_extraction_load_simulation_period[idx] if hourly else
-                                   self.load.monthly_peak_extraction_simulation_period[idx])
+                    Tmin, Tmax = correct_limits(self.load.hourly_net_resulting_injection_power[idx] if hourly else
+                                                (-1) * self.load.monthly_peak_extraction_simulation_period[idx], Tmin,
+                                                Tmax,
+                                                'min')
                     self.H = (min_val - self._Tg()) / (Tmin - self._Tg()) * H_prev
             elif self.ground_data.variable_Tg:
                 # for when the temperature gradient is active and it is injection
@@ -1574,9 +1594,41 @@ class Borefield(BaseClass):
                 return 0, False
 
             i += 1
-        return self.H, (np.max(self.results.peak_injection) <= Tmax + 0.05 or (
+
+        # calculate the relevant parameters for the sizing check
+        if self._calculation_setup.size_based_on == 'average':
+            min_temperatures = self.results.peak_extraction
+            max_temperatures = self.results.peak_injection
+        elif self._calculation_setup.size_based_on == 'outlet':
+            if hourly:
+                max_temperatures = \
+                    self.calculate_borefield_inlet_outlet_temperature(self.load.hourly_net_resulting_injection_power,
+                                                                      self.results.peak_injection)[1]
+                min_temperatures = max_temperatures
+            else:
+                max_temperatures = self.calculate_borefield_inlet_outlet_temperature(
+                    self.load.monthly_peak_injection_simulation_period,
+                    self.results.peak_injection)[1]
+                min_temperatures = self.calculate_borefield_inlet_outlet_temperature(
+                    (-1) * self.load.monthly_peak_extraction_simulation_period,
+                    self.results.peak_extraction)[1]
+        else:
+            if hourly:
+                max_temperatures = \
+                    self.calculate_borefield_inlet_outlet_temperature(self.load.hourly_net_resulting_injection_power,
+                                                                      self.results.peak_extraction)[0]
+                min_temperatures = max_temperatures
+            else:
+                max_temperatures = self.calculate_borefield_inlet_outlet_temperature(
+                    self.load.monthly_peak_injection_simulation_period,
+                    self.results.peak_injection)[0]
+                min_temperatures = self.calculate_borefield_inlet_outlet_temperature(
+                    (-1) * self.load.monthly_peak_extraction_simulation_period,
+                    self.results.peak_extraction)[0]
+
+        return self.H, (np.max(max_temperatures) <= self.Tf_max + 0.05 or (
                 quadrant == 10 or quadrant == 1 or quadrant == 2)) and (
-                               np.min(self.results.peak_extraction) >= Tmin - 0.05 or (
+                               np.min(min_temperatures) >= self.Tf_min - 0.05 or (
                                quadrant == 20 or quadrant == 3 or quadrant == 4)
                        )
 
@@ -2106,7 +2158,7 @@ class Borefield(BaseClass):
         Parameters
         ----------
         power : float, np.ndarray
-            Power for which the inlet and outlet temperatures are calculated [kW]
+            Power for which the inlet and outlet temperatures are calculated (negative means extraction) [kW]
         temperature : float, np.ndarray
             Temperature for which the inlet and outlet temperatures are calculated [°C]
 
