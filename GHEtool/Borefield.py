@@ -2136,8 +2136,32 @@ class Borefield(BaseClass):
             self.calculate_temperatures()
 
         # calculate max/min fluid temperatures
-        max_temp = np.max(self.results.peak_injection)
-        min_temp = np.min(self.results.peak_extraction)
+        # correct for inlet and outlet sizing
+        if self._calculation_setup.size_based_on == 'average':
+            max_temp = np.max(self.results.peak_injection)
+            min_temp = np.min(self.results.peak_extraction)
+        elif self._calculation_setup.size_based_on == 'inlet':
+            max_temp = np.max(self.calculate_borefield_inlet_outlet_temperature(
+                self.load.monthly_peak_injection_simulation_period if isinstance(self.results, ResultsMonthly)
+                else self.load.hourly_net_resulting_injection_power,
+                self.results.peak_injection
+            )[0])
+            min_temp = np.min(self.calculate_borefield_inlet_outlet_temperature(
+                (-1) * self.load.monthly_peak_extraction_simulation_period if isinstance(self.results, ResultsMonthly)
+                else self.load.hourly_net_resulting_injection_power,
+                self.results.peak_extraction
+            )[0])
+        else:
+            max_temp = np.max(self.calculate_borefield_inlet_outlet_temperature(
+                self.load.monthly_peak_injection_simulation_period if isinstance(self.results, ResultsMonthly)
+                else self.load.hourly_net_resulting_injection_power,
+                self.results.peak_injection
+            )[1])
+            min_temp = np.min(self.calculate_borefield_inlet_outlet_temperature(
+                (-1) * self.load.monthly_peak_extraction_simulation_period if isinstance(self.results, ResultsMonthly)
+                else self.load.hourly_net_resulting_injection_power,
+                self.results.peak_extraction
+            )[1])
 
         # calculate temperature difference w.r.t. the limits
         DT_max = -self.Tf_max + max_temp + 1000  # + 1000 to have no problems with negative temperatures

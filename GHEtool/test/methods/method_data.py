@@ -210,7 +210,7 @@ borefield.calculation_setup(size_based_on='outlet')
 borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
 list_of_test_objects.add(
     SizingObject(borefield, L2_output=64.38776970267729, L3_output=65.28538350504957, L4_output=60.942615648726196,
-                 quadrant=1,
+                 quadrant=4,
                  name='BS2023 Auditorium (MPG, Variable limit, outlet)'))
 borefield.fluid_data = TemperatureDependentFluidData('MPG', 25).create_constant(3)
 list_of_test_objects.add(

@@ -396,7 +396,7 @@ def optimise_load_profile_energy(
         # optimise month i
         init_load = borefield.load.monthly_average_injection_power_simulation_period[i]
         cool_ok, heat_ok = False, False
-
+        print(i)
         while not cool_ok or not heat_ok:
             # calculate temperature profile, just for the results
             peak_extraction, peak_injection, _ = update_last_month(i, init_load)
