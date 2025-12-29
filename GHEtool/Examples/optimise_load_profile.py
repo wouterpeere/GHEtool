@@ -981,8 +981,8 @@ def optimise():
 
     # optimise the load for a 10x10 field (see data above) and a fixed depth of 150m.
     # first for an optimisation based on the power
-    borefield.set_max_avg_fluid_temperature(35)
-    borefield.set_min_avg_fluid_temperature(-1.5)
+    borefield.set_max_fluid_temperature(35)
+    borefield.set_min_fluid_temperature(-1.5)
     building_load, _ = optimise_load_profile_power(borefield, load)
     borefield.load = building_load
 

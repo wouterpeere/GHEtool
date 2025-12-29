@@ -10,10 +10,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 
 - Inlet and outlet water temperature (issue #271).
+- Add set_min_fluid_temperature and set_max_fluid_temperature to the Borefield class (issue #271).
 - Average baseload fluid temperature (issue #418).
 
 ## Changed
 
+- Depreciate set_min_avg_fluid_temperature and set_max_avg_fluid_temperature (issue #271).
 - Added deprecation warning for baseload heating and cooling temperatures in Result class (issue #418).
 - Bring up-to-date with numpy 2.4.0 (issue #420).
 - Remove Python 3.9 compatibility (issue #420).

@@ -736,13 +736,25 @@ class Borefield(BaseClass):
         self.borehole.Rb = Rb
 
     def set_max_avg_fluid_temperature(self, temp: float) -> None:
+
+        warnings.warn(DeprecationWarning(
+            'This function is depreciated and will be removed in v2.5.0. Please use set_max_fluid_temperature instead.'))
+        self.set_max_fluid_temperature(temp)
+
+    def set_min_avg_fluid_temperature(self, temp: float) -> None:
+
+        warnings.warn(DeprecationWarning(
+            'This function is depreciated and will be removed in v2.5.0. Please use set_min_fluid_temperature instead.'))
+        self.set_min_fluid_temperature(temp)
+
+    def set_max_fluid_temperature(self, temp: float) -> None:
         """
-        This functions sets the maximal average fluid temperature to temp.
+        This functions sets the maximal fluid temperature to temp.
 
         Parameters
         ----------
         temp : float
-            Maximal average fluid temperature [deg C]
+            Maximal fluid temperature [deg C]
 
         Returns
         -------
@@ -751,21 +763,21 @@ class Borefield(BaseClass):
         Raises
         ------
         ValueError
-            When the maximal average fluid temperature is lower than the minimal average fluid temperature
+            When the maximal fluid temperature is lower than the minimal fluid temperature
         """
         if temp <= self.Tf_min:
             raise ValueError(
                 f"The maximum average fluid temperature {temp} is lower than the minimum average fluid temperature {self.Tf_min}")
         self.Tf_max: float = temp
 
-    def set_min_avg_fluid_temperature(self, temp: float) -> None:
+    def set_min_fluid_temperature(self, temp: float) -> None:
         """
-        This functions sets the minimal average fluid temperature to temp.
+        This functions sets the minimal fluid temperature to temp.
 
         Parameters
         ----------
         temp : float
-            Minimal average fluid temperature [deg C]
+            Minimal fluid temperature [deg C]
 
         Returns
         -------
@@ -774,7 +786,7 @@ class Borefield(BaseClass):
         Raises
         ------
         ValueError
-            When the maximal average temperature is lower than the minimal average temperature
+            When the maximal temperature is lower than the minimal temperature
         """
         if temp >= self.Tf_max:
             raise ValueError(

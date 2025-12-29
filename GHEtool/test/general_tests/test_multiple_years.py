@@ -16,8 +16,8 @@ def test_multiple_years_L4():
     borefield.ground_data = data
     borefield.Rb = 0.12
     borefield.set_borefield(borefield_gt)
-    borefield.set_min_avg_fluid_temperature(0)
-    borefield.set_max_avg_fluid_temperature(17)
+    borefield.set_min_fluid_temperature(0)
+    borefield.set_max_fluid_temperature(17)
     load = pd.read_csv(FOLDER.joinpath("test/methods/hourly_data/multiple_years.csv"), sep=",")
     # load["heating"][8760*25:] = 0
     hourly_load = HourlyGeothermalLoadMultiYear(load["heating"].clip(0) * load_factor,
@@ -49,8 +49,8 @@ def test_multiple_years_L3():
     borefield.ground_data = data
     borefield.Rb = 0.12
     borefield.set_borefield(borefield_gt)
-    borefield.set_min_avg_fluid_temperature(0)
-    borefield.set_max_avg_fluid_temperature(17)
+    borefield.set_min_fluid_temperature(0)
+    borefield.set_max_fluid_temperature(17)
     load = pd.read_csv(FOLDER.joinpath("test/methods/hourly_data/multiple_years.csv"), sep=",")
     hourly_load = HourlyGeothermalLoadMultiYear(load["heating"].clip(0) * load_factor,
                                                 load["cooling"].clip(0) * load_factor)
@@ -103,8 +103,8 @@ def test_multiple_years_L3_monthly_data():
     borefield.ground_data = data
     borefield.Rb = 0.12
     borefield.set_borefield(borefield_gt)
-    borefield.set_min_avg_fluid_temperature(0)
-    borefield.set_max_avg_fluid_temperature(17)
+    borefield.set_min_fluid_temperature(0)
+    borefield.set_max_fluid_temperature(17)
     load = pd.read_csv(FOLDER.joinpath("test/methods/hourly_data/multiple_years.csv"), sep=",")
     monthly_heating_load = np.array([np.mean((load["heating"].clip(0) * load_factor)[i - 730:i]) for i in
                                      range(730, len(load["heating"]) + 1, 730)])

@@ -26,7 +26,7 @@ def optimise():
     load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\hourly_profile.csv"), header=True,
                              separator=";", col_cooling=1, col_heating=0)
     load.simulation_period = 10
-    borefield.set_min_avg_fluid_temperature(3)
+    borefield.set_min_fluid_temperature(3)
     borefield.USE_SPEED_UP_IN_SIZING = False
     # first optimise with the speed
     start = time.time()

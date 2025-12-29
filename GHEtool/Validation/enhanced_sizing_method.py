@@ -178,8 +178,8 @@ def test_monthly_quadrant_2():
     load.peak_duration = 8
     borefield.load = load
     borefield.USE_SPEED_UP_IN_SIZING = True
-    borefield.set_min_avg_fluid_temperature(0)
-    borefield.set_max_avg_fluid_temperature(17)
+    borefield.set_min_fluid_temperature(0)
+    borefield.set_max_fluid_temperature(17)
 
     start = time.time()
 
@@ -218,8 +218,8 @@ def test_case_office():
     borefield.flow_data = ConstantFlowRate(vfr=0.3)
     borefield.pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
     borefield.calculation_setup(use_constant_Rb=False)
-    borefield.set_max_avg_fluid_temperature(17)
-    borefield.set_min_avg_fluid_temperature(3)
+    borefield.set_max_fluid_temperature(17)
+    borefield.set_min_fluid_temperature(3)
     hourly_load = HourlyGeothermalLoad()
     hourly_load.simulation_period = 20
     hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\office.csv"), header=True, separator=";",
@@ -263,8 +263,8 @@ def test_case_auditorium():
     borefield.flow_data = ConstantFlowRate(vfr=0.3)
     borefield.pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
     borefield.calculation_setup(use_constant_Rb=False)
-    borefield.set_max_avg_fluid_temperature(17)
-    borefield.set_min_avg_fluid_temperature(3)
+    borefield.set_max_fluid_temperature(17)
+    borefield.set_min_fluid_temperature(3)
     hourly_load = HourlyGeothermalLoad()
     hourly_load.simulation_period = 20
     hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,
@@ -309,8 +309,8 @@ def test_case_swimming_pool():
     borefield.flow_data = ConstantFlowRate(vfr=0.3)
     borefield.pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
     borefield.calculation_setup(use_constant_Rb=False)
-    borefield.set_max_avg_fluid_temperature(17)
-    borefield.set_min_avg_fluid_temperature(3)
+    borefield.set_max_fluid_temperature(17)
+    borefield.set_min_fluid_temperature(3)
     hourly_load = HourlyGeothermalLoad()
     hourly_load.simulation_period = 20
 
@@ -355,8 +355,8 @@ def test_case_auditorium_active_passive():
     borefield.flow_data = ConstantFlowRate(vfr=0.3)
     borefield.pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
     borefield.calculation_setup(use_constant_Rb=False)
-    borefield.set_max_avg_fluid_temperature(25)
-    borefield.set_min_avg_fluid_temperature(3)
+    borefield.set_max_fluid_temperature(25)
+    borefield.set_min_fluid_temperature(3)
     hourly_load = HourlyBuildingLoad()
     hourly_load.simulation_period = 20
     hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,

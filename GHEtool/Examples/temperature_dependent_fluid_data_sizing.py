@@ -24,8 +24,8 @@ def size_with_temperature_dependence():
         load=MonthlyGeothermalLoadAbsolute(*load_case(4))
     )
 
-    borefield.set_min_avg_fluid_temperature(2)
-    borefield.set_max_avg_fluid_temperature(17)
+    borefield.set_min_fluid_temperature(2)
+    borefield.set_max_fluid_temperature(17)
 
     borefield.create_rectangular_borefield(12, 5, 6, 6, 150)
 

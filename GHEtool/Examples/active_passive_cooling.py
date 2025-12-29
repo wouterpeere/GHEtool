@@ -139,7 +139,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
 
     borefield = Borefield()
     borefield.simulation_period = SIMULATION_PERIOD
-    borefield.set_max_avg_fluid_temperature(17)
+    borefield.set_max_fluid_temperature(17)
 
     borefield.create_rectangular_borefield(12, 12, 6, 6, 100)
     borefield.ground_data = GroundConstantTemperature(2.1, 11)
@@ -176,7 +176,7 @@ def active_passive_cooling(location='Active_passive_example.csv'):
     cooling_ground = cooling_building.copy()
     heating_ground = heating_building.copy()
 
-    borefield.set_max_avg_fluid_temperature(25)
+    borefield.set_max_fluid_temperature(25)
     borefield.gfunction_calculation_object.store_previous_values = False
     while abs(borehole_lengths[0] - borehole_lengths[1]) > 0.1:
         # set loads

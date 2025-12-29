@@ -50,8 +50,8 @@ def borefield_auditorium():  # pragma: no cover
     borefield.flow_data = ConstantFlowRate(mfr=0.2)
     borefield.pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
     borefield.calculation_setup(use_constant_Rb=False)
-    borefield.set_max_avg_fluid_temperature(17)
-    borefield.set_min_avg_fluid_temperature(3)
+    borefield.set_max_fluid_temperature(17)
+    borefield.set_min_fluid_temperature(3)
     hourly_load = HourlyGeothermalLoad()
     hourly_load.simulation_period = 20
     hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,

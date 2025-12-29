@@ -20,8 +20,8 @@ borefield = Borefield(ground_data=ground_data,
                       fluid_data=fluid_data,
                       pipe_data=pipe_data,
                       load=load)
-borefield.set_max_avg_fluid_temperature(20)
-borefield.set_min_avg_fluid_temperature(3)
+borefield.set_max_fluid_temperature(20)
+borefield.set_min_fluid_temperature(3)
 
 width = 60
 length = 40

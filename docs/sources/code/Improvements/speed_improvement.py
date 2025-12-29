@@ -19,6 +19,7 @@ def supress_stdout(func):
         with open(os.devnull, 'w') as devnull:
             with contextlib.redirect_stdout(devnull):
                 return func(*a, **ka)
+
     return wrapper
 
 
@@ -127,8 +128,8 @@ def size_L2() -> None:
     borefield.set_borefield(borefield_gt)
 
     # set temperature boundaries
-    borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
-    borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
+    borefield.set_max_fluid_temperature(16)  # maximum temperature
+    borefield.set_min_fluid_temperature(0)  # minimum temperature
 
     # size according to L2 method
     for i in range(number_of_iterations):
@@ -195,8 +196,8 @@ def size_L3() -> None:
     borefield.set_borefield(borefield_gt)
 
     # set temperature boundaries
-    borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
-    borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
+    borefield.set_max_fluid_temperature(16)  # maximum temperature
+    borefield.set_min_fluid_temperature(0)  # minimum temperature
 
     # size according to L3 method
     for i in range(number_of_iterations):
@@ -261,17 +262,17 @@ def benchmark(callable, name: str) -> None:
         start_time = time.time()
         run_without_messages(callable)
         end_time = time.time()
-        diff = diff * i/(i+1) + (end_time - start_time)/(i+1)
+        diff = diff * i / (i + 1) + (end_time - start_time) / (i + 1)
 
         GFunction.DEFAULT_STORE_PREVIOUS_VALUES = False
 
         start_time_without = time.time()
         run_without_messages(callable)
         end_time_without = time.time()
-        diff_without = diff_without * i/(i+1) + (end_time_without - start_time_without)/(i+1)
+        diff_without = diff_without * i / (i + 1) + (end_time_without - start_time_without) / (i + 1)
 
     print(f'{name} took  {round(diff_without, 2)} ms in v2.1.0 and '
-          f'{round(diff, 2)} ms in v2.1.1. This is an improvement of {round((diff_without-diff)/diff*100)}%.')
+          f'{round(diff, 2)} ms in v2.1.1. This is an improvement of {round((diff_without - diff) / diff * 100)}%.')
 
 
 # run examples

@@ -53,8 +53,8 @@ def test_borefield():
     borefield.set_Rb(0.2)
 
     # set temperature boundaries
-    borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
-    borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
+    borefield.set_max_fluid_temperature(16)  # maximum temperature
+    borefield.set_min_fluid_temperature(0)  # minimum temperature
 
     assert borefield.simulation_period == 20
     assert borefield.Tf_min == 0
@@ -88,8 +88,8 @@ def borefield():
     borefield.set_Rb(0.2)
 
     # set temperature boundaries
-    borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
-    borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
+    borefield.set_max_fluid_temperature(16)  # maximum temperature
+    borefield.set_min_fluid_temperature(0)  # minimum temperature
     return borefield
 
 
@@ -104,8 +104,8 @@ def borefield_custom_data():
     borefield.create_custom_dataset()
 
     # set temperature boundaries
-    borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
-    borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
+    borefield.set_max_fluid_temperature(16)  # maximum temperature
+    borefield.set_min_fluid_temperature(0)  # minimum temperature
     return borefield
 
 
@@ -141,13 +141,13 @@ def test_imbalance(borefield):
 
 def test_sizing_L3_threshold_depth_error(borefield):
     max_temp = borefield.Tf_max
-    borefield.set_max_avg_fluid_temperature(14)
+    borefield.set_max_fluid_temperature(14)
     borefield.ground_data = data_ground_flux
     borefield._calculation_setup.use_constant_Tg = False
     with raises(UnsolvableDueToTemperatureGradient):
         borefield.gfunction(3600, borefield.THRESHOLD_DEPTH_ERROR + 1)
     borefield._calculation_setup.use_constant_Tg = True
-    borefield.set_max_avg_fluid_temperature(max_temp)
+    borefield.set_max_fluid_temperature(max_temp)
     borefield.ground_data.flux = 0
 
 
@@ -227,8 +227,8 @@ def test_no_ground_data():
     borefield.set_borefield(borefield_gt)
 
     # set temperature boundaries
-    borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
-    borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
+    borefield.set_max_fluid_temperature(16)  # maximum temperature
+    borefield.set_min_fluid_temperature(0)  # minimum temperature
     with raises(ValueError):
         borefield.size()
 
@@ -320,8 +320,8 @@ def test_convergence_eer_combined():
     borefield1.fluid_data = fluid_data
     borefield1.flow_data = flow_data
     borefield1.pipe_data = pipe_data
-    borefield1.set_max_avg_fluid_temperature(25)
-    borefield1.set_min_avg_fluid_temperature(3)
+    borefield1.set_max_fluid_temperature(25)
+    borefield1.set_min_fluid_temperature(3)
 
     # create combined active and passive EER
     eer = EERCombined(20, eer_active, threshold_temperature=17)
@@ -329,10 +329,10 @@ def test_convergence_eer_combined():
     # set variables
     load.eer = eer
     borefield1.load = load
-    borefield1.set_max_avg_fluid_temperature(16)
+    borefield1.set_max_fluid_temperature(16)
     borefield1.calculate_temperatures(hourly=True)
     results_16 = copy.deepcopy(borefield1.results)
-    borefield1.set_max_avg_fluid_temperature(25)
+    borefield1.set_max_fluid_temperature(25)
     borefield1.calculate_temperatures(hourly=True)
     results_25 = copy.deepcopy(borefield1.results)
     assert np.allclose(results_16.peak_injection, results_25.peak_injection)
@@ -356,18 +356,18 @@ def test_optimise_load_eer_combined():
     borefield1.fluid_data = fluid_data
     borefield1.flow_data = flow_data
     borefield1.pipe_data = pipe_data
-    borefield1.set_max_avg_fluid_temperature(25)
-    borefield1.set_min_avg_fluid_temperature(3)
+    borefield1.set_max_fluid_temperature(25)
+    borefield1.set_min_fluid_temperature(3)
 
     # create combined active and passive EER
     eer = EERCombined(20, eer_active, threshold_temperature=17)
     load.eer = eer
     borefield1.load = load
 
-    borefield1.set_max_avg_fluid_temperature(16)
+    borefield1.set_max_fluid_temperature(16)
     borefield1.calculate_temperatures(hourly=True)
     results_16 = copy.deepcopy(borefield1.results)
-    borefield1.set_max_avg_fluid_temperature(25)
+    borefield1.set_max_fluid_temperature(25)
     _, sec_load = optimise_load_profile_power(borefield1, borefield1.load)
     borefield1.calculate_temperatures(hourly=True)
     results_25 = copy.deepcopy(borefield1.results)
@@ -494,8 +494,8 @@ def test_case_issue_390():
 
     borefield.create_rectangular_borefield(4, 4, 6, 6, 100, 1, 0.07)
 
-    borefield.set_min_avg_fluid_temperature(0)
-    borefield.set_max_avg_fluid_temperature(17)
+    borefield.set_min_fluid_temperature(0)
+    borefield.set_max_fluid_temperature(17)
 
     borefield.borehole = borehole
     borefield.size_L3()
