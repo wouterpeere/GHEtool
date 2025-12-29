@@ -9,9 +9,47 @@ def test_empty():
     results = ResultsMonthly()
     assert results.min_temperature is None
     assert results.max_temperature is None
+    with pytest.raises(ValueError):
+        results.baseload_temperature_inlet
+    with pytest.raises(ValueError):
+        results.baseload_temperature_outlet
+    with pytest.raises(ValueError):
+        results.peak_extraction_outlet
+    with pytest.raises(ValueError):
+        results.peak_extraction_inlet
+    with pytest.raises(ValueError):
+        results.peak_injection_outlet
+    with pytest.raises(ValueError):
+        results.peak_injection_inlet
     results = ResultsHourly()
     assert results.min_temperature is None
     assert results.max_temperature is None
+
+    results = ResultsHourly()
+    with pytest.raises(ValueError):
+        results.peak_injection_inlet
+    with pytest.raises(ValueError):
+        results.peak_injection_outlet
+
+
+def test_delta():
+    results = ResultsMonthly()
+    results._peak_extraction_outlet = np.array([5, 5])
+    results._peak_extraction_inlet = np.array([4, 4])
+    assert np.allclose([1, 1], results.peak_extraction_delta)
+    results._peak_injection_outlet = np.array([5, 5])
+    results._peak_injection_inlet = np.array([4, 4])
+    assert np.allclose([1, 1], results.peak_injection_delta)
+    results._baseload_temp_outlet = np.array([5, 5])
+    results._baseload_temp_inlet = np.array([4, 4])
+    assert np.allclose([1, 1], results.baseload_temperature_delta)
+
+    results = ResultsHourly()
+    results._Tf_outlet = np.array([5, 5])
+    results._Tf_inlet = np.array([4, 4])
+    assert np.allclose([1, 1], results.Tf_delta)
+    assert np.allclose([1, 1], results.peak_injection_delta)
+    assert np.allclose([1, 1], results.peak_extraction_delta)
 
 
 def test_monthly():
