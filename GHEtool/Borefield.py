@@ -76,7 +76,6 @@ class Borefield(BaseClass):
         self.limiting_quadrant: int = 0  # parameter that tells in which quadrant the field is limited
         # m hereafter one needs to chance to fewer boreholes with more depth, because the calculations are no longer
         # that accurate.
-        self.THRESHOLD_WARNING_SHALLOW_FIELD: int = 50
 
         if len(kwargs) != 0:
             raise ValueError('Please check your input for the Borefield class')
@@ -1104,15 +1103,6 @@ class Borefield(BaseClass):
         self._calculation_setup.restore_backup()
         self.borehole.use_constant_Rb = use_constant_Rb_backup
 
-        # check if the field is not shallow
-        if length < self.THRESHOLD_WARNING_SHALLOW_FIELD:
-            print(
-                f"The field has a calculated borehole length of {round(length, 2)}"
-                f"m which is lower than the proposed minimum "
-                f"of {self.THRESHOLD_WARNING_SHALLOW_FIELD} m. "
-                f"Please change your configuration accordingly to have a not so shallow field."
-            )
-
         return length
 
     def _select_size(self, size_max_temp: float, size_min_temp: float, hourly: bool = False) -> float:
@@ -1768,12 +1758,10 @@ class Borefield(BaseClass):
             if type == 'average':
                 ax.step(time_array, self.results.Tf, "b-", where="post", lw=1, label="Tf (average)")
             elif type == 'outlet':
-                ax.step(time_array, self.calculate_borefield_inlet_outlet_temperature(
-                    self.load.hourly_injection_load_simulation_period, self.results.Tf)[1], "b-", where="post", lw=1,
+                ax.step(time_array, self.results.Tf_outlet, "b-", where="post", lw=1,
                         label="Tf (outlet)")
             else:
-                ax.step(time_array, self.calculate_borefield_inlet_outlet_temperature(
-                    self.load.hourly_injection_load_simulation_period, self.results.Tf)[1], "b-", where="post", lw=1,
+                ax.step(time_array, self.results.Tf_inlet, "b-", where="post", lw=1,
                         label="Tf (inlet)")
 
         else:
@@ -1958,6 +1946,15 @@ class Borefield(BaseClass):
                     baseload_temp=results_month_avg
                 )
 
+                # calculate inlet/outlet temperatures when possible
+                if not self.borehole.use_constant_Rb:
+                    results._baseload_temp_inlet, results._baseload_temp_outlet = self.calculate_borefield_inlet_outlet_temperature(
+                        self.load.monthly_average_injection_power_simulation_period, results.baseload_temperature)
+                    results._peak_injection_injection, results._peak_injection_outlet = self.calculate_borefield_inlet_outlet_temperature(
+                        self.load.monthly_peak_injection_simulation_period, results.peak_injection)
+                    # (-1) needed since the peak power is always defined positive but for the Delta T it should be signed
+                    results._peak_extraction_inlet, results._peak_extraction_outlet = self.calculate_borefield_inlet_outlet_temperature(
+                        (-1) * self.load.monthly_peak_extraction_simulation_period, results.peak_extraction)
             if hourly:
                 # check for hourly data if this is requested
                 if not self.load._hourly:
@@ -1991,7 +1988,9 @@ class Borefield(BaseClass):
                     # do the same for extraction
                     results._Tf_extraction = Tb + hourly_load * 1000 * (
                             get_rb(results_temperature.peak_extraction, Tmin) / self.number_of_boreholes / H)
-
+                if not self.borehole.use_constant_Rb:
+                    results._Tf_inlet, results._Tf_outlet = self.calculate_borefield_inlet_outlet_temperature(
+                        self.load.hourly_net_resulting_injection_power, results.peak_injection)
             return results
 
         def calculate_difference(results_old: Union[ResultsMonthly, ResultsHourly],

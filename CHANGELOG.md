@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## Changed
 
 - Depreciate set_min_avg_fluid_temperature and set_max_avg_fluid_temperature (issue #271).
+- Removed shallow borefield warning (issue #271).
 - Added deprecation warning for baseload heating and cooling temperatures in Result class (issue #418).
 - Bring up-to-date with numpy 2.4.0 (issue #420).
 - Remove Python 3.9 compatibility (issue #420).

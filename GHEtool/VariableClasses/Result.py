@@ -115,6 +115,12 @@ class ResultsMonthly(_Results):
         self._monthly_extraction = monthly_extraction
         self._monthly_injection = monthly_injection
         self._baseload_temp = baseload_temp
+        self._peak_extraction_inlet = np.array([])
+        self._peak_extraction_outlet = np.array([])
+        self._peak_injection_inlet = np.array([])
+        self._peak_injection_outlet = np.array([])
+        self._baseload_temp_inlet = np.array([])
+        self._baseload_temp_outlet = np.array([])
 
         super().__init__(borehole_wall_temp)
         self.hourly = False
@@ -143,6 +149,75 @@ class ResultsMonthly(_Results):
     def baseload_temperature(self) -> np.ndarray:
         return self._baseload_temp
 
+    @property
+    def baseload_temperature_inlet(self) -> np.ndarray:
+        if not np.any(self._baseload_temp_inlet):
+            raise ValueError('No inlet temperature for the baseload is set.')
+        return self._baseload_temp_inlet
+
+    @property
+    def baseload_temperature_outlet(self) -> np.ndarray:
+        if not np.any(self._baseload_temp_outlet):
+            raise ValueError('No outlet temperature for the baseload is set.')
+        return self._baseload_temp_outlet
+
+    @property
+    def baseload_temperature_delta(self) -> np.ndarray:
+        """
+        Temperature difference between inlet and outlet defined as temp_outlet - temp_inlet.
+
+        Returns
+        -------
+        Temperature delta between the inlet and outlet fluid temperatures during baseload [°C]
+        """
+        return self.baseload_temperature_outlet - self.baseload_temperature_inlet
+
+    @property
+    def peak_injection_inlet(self) -> np.ndarray:
+        if not np.any(self._peak_injection_inlet):
+            raise ValueError('No inlet temperature for the peak injection is set.')
+        return self._peak_injection_inlet
+
+    @property
+    def peak_injection_outlet(self) -> np.ndarray:
+        if not np.any(self._peak_injection_outlet):
+            raise ValueError('No outlet temperature for the peak injection is set.')
+        return self._peak_injection_outlet
+
+    @property
+    def peak_injection_delta(self) -> np.ndarray:
+        """
+        Temperature difference between inlet and outlet defined as temp_outlet - temp_inlet.
+
+        Returns
+        -------
+        Temperature delta between the inlet and outlet fluid temperatures during peak injection [°C]
+        """
+        return self.peak_injection_outlet - self.peak_injection_inlet
+
+    @property
+    def peak_extraction_inlet(self) -> np.ndarray:
+        if not np.any(self._peak_extraction_inlet):
+            raise ValueError('No inlet temperature for the peak extraction is set.')
+        return self._peak_extraction_inlet
+
+    @property
+    def peak_extraction_outlet(self) -> np.ndarray:
+        if not np.any(self._peak_extraction_outlet):
+            raise ValueError('No outlet temperature for the peak extraction is set.')
+        return self._peak_extraction_outlet
+
+    @property
+    def peak_extraction_delta(self) -> np.ndarray:
+        """
+        Temperature difference between inlet and outlet defined as temp_outlet - temp_inlet.
+
+        Returns
+        -------
+        Temperature delta between the inlet and outlet fluid temperatures during peak extraction [°C]
+        """
+        return self.peak_extraction_outlet - self.peak_extraction_inlet
+
 
 class ResultsHourly(_Results):
     """
@@ -164,6 +239,9 @@ class ResultsHourly(_Results):
         self._Tf = temperature_fluid
 
         self._Tf_extraction = None
+        self._Tf_inlet = np.array([])
+        self._Tf_outlet = np.array([])
+
         super().__init__(borehole_wall_temp)
         self.hourly = True
 
@@ -180,3 +258,66 @@ class ResultsHourly(_Results):
     @property
     def peak_injection(self) -> np.ndarray:
         return self.Tf
+
+    @property
+    def peak_extraction_inlet(self) -> np.ndarray:
+        if not np.any(self._Tf_inlet):
+            raise ValueError('No inlet temperature is set.')
+        return self._Tf_inlet
+
+    @property
+    def peak_extraction_outlet(self) -> np.ndarray:
+        if not np.any(self._Tf_outlet):
+            raise ValueError('No outlet temperature is set.')
+        return self._Tf_outlet
+
+    @property
+    def peak_injection_inlet(self) -> np.ndarray:
+        return self.peak_extraction_inlet
+
+    @property
+    def peak_injection_outlet(self) -> np.ndarray:
+        return self.peak_extraction_outlet
+
+    @property
+    def peak_extraction_delta(self) -> np.ndarray:
+        """
+        Temperature difference between inlet and outlet defined as temp_outlet - temp_inlet.
+
+        Returns
+        -------
+        Temperature delta between the inlet and outlet fluid temperatures during peak extraction [°C]
+        """
+        return self.peak_extraction_outlet - self.peak_extraction_inlet
+
+    @property
+    def peak_injection_delta(self) -> np.ndarray:
+        """
+        Temperature difference between inlet and outlet defined as temp_outlet - temp_inlet.
+
+        Returns
+        -------
+        Temperature delta between the inlet and outlet fluid temperatures during peak injection [°C]
+        """
+        # identical
+        return self.peak_extraction_outlet - self.peak_extraction_inlet
+
+    @property
+    def Tf_inlet(self) -> np.ndarray:
+        return self.peak_injection_inlet
+
+    @property
+    def Tf_outlet(self) -> np.ndarray:
+        return self.peak_injection_outlet
+
+    @property
+    def Tf_delta(self) -> np.ndarray:
+        """
+        Temperature difference between inlet and outlet defined as temp_outlet - temp_inlet.
+
+        Returns
+        -------
+        Temperature delta between the inlet and outlet fluid temperatures during peak injection [°C]
+        """
+        # identical
+        return self.peak_extraction_outlet - self.peak_extraction_inlet
