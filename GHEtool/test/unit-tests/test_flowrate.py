@@ -40,6 +40,8 @@ def test_flow_rate_borefield_series1():
 
     with pytest.raises(ValueError):
         bor_mfr.mfr_borehole()
+    with pytest.raises(ValueError):
+        bor_mfr.vfr_borehole()
     assert np.isclose(bor_mfr.mfr_borehole(nb_of_boreholes=2), 0.5)
     assert np.isclose(bor_mfr.mfr_borehole(nb_of_boreholes=2, series_factor=2), 1)
     assert np.isclose(bor_mfr.mfr_borefield(), 1)
@@ -48,6 +50,8 @@ def test_flow_rate_borefield_series1():
 
     with pytest.raises(ValueError):
         bor_vfr.vfr_borehole()
+    with pytest.raises(ValueError):
+        bor_vfr.mfr_borehole()
     assert np.isclose(bor_vfr.vfr_borehole(nb_of_boreholes=2), 0.5)
     assert np.isclose(bor_vfr.vfr_borehole(nb_of_boreholes=2, series_factor=2), 1)
     assert np.isclose(bor_vfr.vfr_borefield(), 1)
@@ -81,7 +85,9 @@ def test_flow_rate_borehole():
     with pytest.raises(ValueError):
         bor_mfr.mfr_borefield()
     with pytest.raises(ValueError):
-        bor_vfr.mfr_borefield()
+        bor_mfr.vfr_borehole()
+    with pytest.raises(ValueError):
+        bor_vfr.mfr_borehole()
     assert np.isclose(bor_mfr.mfr_borehole(nb_of_boreholes=2), 1)
     assert np.isclose(bor_mfr.mfr_borehole(nb_of_boreholes=2, series_factor=2), 1)
     assert np.isclose(bor_mfr.mfr_borefield(nb_of_boreholes=6), 3)

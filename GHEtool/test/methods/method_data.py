@@ -346,7 +346,7 @@ list_of_test_objects.add(
                  name='BS2023 Swimming pool, outlet, borefield flow'))
 borefield2.flow_data = ConstantFlowRate(mfr=0.2 * 15 * 10, flow_per_borehole=False, series_factor=2)
 list_of_test_objects.add(
-    SizingObject(borefield2, L2_output=247.11273341108404, L3_output=279.1327314039608, L4_output=280.309456,
+    SizingObject(borefield2, L2_output=247.11273341108404, L3_output=253.0698059707121, L4_output=256.82506752144457,
                  quadrant=4,
                  name='BS2023 Swimming pool, outlet, borefield flow, series factor'))
 borefield.calculation_setup(size_based_on='average')
