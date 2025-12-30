@@ -35,7 +35,7 @@ def test_equal_hmin_hmax():
     optimise_borefield_configuration(borefield, 100, 100, 5, 7, 0.5, 150, 150, nb_max=50)
 
 
-def test_check_idetical_field():
+def test_check_identical_field():
     existing_fields = set()
     existing_fields.add((('b_1', 6), ('b_2', 5), ('n_1', 3), ('n_2', 2), ('shape', 3)))
     existing_fields.add((('b_1', 6), ('b_2', 5), ('n_1', 1), ('n_2', 2), ('shape', 3)))

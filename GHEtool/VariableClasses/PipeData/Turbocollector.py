@@ -173,7 +173,7 @@ class Turbocollector(MultipleUTube):
         fd = f_turbo(self.Re(fluid_data, flow_rate_data, **kwargs))
 
         A = math.pi * self.r_in ** 2
-        V = (flow_rate_data.vfr(fluid_data=fluid_data, **kwargs) / 1000) / A / self.number_of_pipes
+        V = (flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / 1000) / A / self.number_of_pipes
 
         # add 0.2 for the local losses
         # (source: https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html)

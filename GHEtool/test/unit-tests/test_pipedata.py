@@ -65,6 +65,14 @@ def test_equivalent_borehole_resistance_U_tubes():
     pipe = double.pipe_model(2, borehole)
     assert np.isclose(pipe.effective_borehole_thermal_resistance(0.2, 4180), 0.09065168435087693)
 
+    flow_data = ConstantFlowRate(mfr=0.4, flow_per_borehole=False)
+    single.calculate_resistances(fluid_data, flow_data, nb_of_boreholes=2)
+    double.calculate_resistances(fluid_data, flow_data, nb_of_boreholes=2)
+    pipe = single.pipe_model(2, borehole)
+    assert np.isclose(pipe.effective_borehole_thermal_resistance(0.1, 4180), 0.13637413925456277)
+    pipe = double.pipe_model(2, borehole)
+    assert np.isclose(pipe.effective_borehole_thermal_resistance(0.2, 4180), 0.09065168435087693)
+
 
 def test_draw_internals(monkeypatch):
     pipe = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05)
@@ -135,6 +143,10 @@ def test_calculate_resistance_coaxial():
     pipe = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=False)
     flow_data = ConstantFlowRate(mfr=0.5)
     pipe.calculate_resistances(fluid, flow_data, temperature=20)
+    assert np.isclose(pipe.R_fp, 0.11803503887356001)
+    assert np.isclose(pipe.R_ff, 0.16491519753761458)
+    flow_data = ConstantFlowRate(mfr=1, flow_per_borehole=False)
+    pipe.calculate_resistances(fluid, flow_data, temperature=20, nb_of_boreholes=2)
     assert np.isclose(pipe.R_fp, 0.11803503887356001)
     assert np.isclose(pipe.R_ff, 0.16491519753761458)
 
@@ -216,6 +228,23 @@ def test_reynolds_number():
     assert np.isclose(coaxial.Re(fluid_data=fluid_data, flow_rate_data=flow_data), 1727.5977540504243)
     assert np.isclose(7234.108922823884, Separatus(1.5).Re(fluid_data, flow_data))
 
+    # now with a flow per borefield
+    flow_data = ConstantFlowRate(mfr=0.4, flow_per_borehole=False)
+    double = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2)
+    assert np.isclose(double.Re(fluid_data=fluid_data, flow_rate_data=flow_data, nb_of_boreholes=2), 4244.131815783876)
+    coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
+    assert np.isclose(coaxial.Re(fluid_data=fluid_data, flow_rate_data=flow_data, nb_of_boreholes=2),
+                      1727.5977540504243)
+    assert np.isclose(7234.108922823884, Separatus(1.5).Re(fluid_data, flow_data, nb_of_boreholes=2))
+
+    flow_data = ConstantFlowRate(mfr=0.2, flow_per_borehole=False, series_factor=2)
+    double = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2)
+    assert np.isclose(double.Re(fluid_data=fluid_data, flow_rate_data=flow_data, nb_of_boreholes=2), 4244.131815783876)
+    coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
+    assert np.isclose(coaxial.Re(fluid_data=fluid_data, flow_rate_data=flow_data, nb_of_boreholes=2),
+                      1727.5977540504243)
+    assert np.isclose(7234.108922823884, Separatus(1.5).Re(fluid_data, flow_data, nb_of_boreholes=2))
+
 
 def test_pressure_drop():
     fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
@@ -229,6 +258,55 @@ def test_pressure_drop():
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
     assert np.isclose(coaxial.pressure_drop(fluid_data, flow_data, 100), 0.1639237572210245)
     assert np.isclose(19.84145159678991, Separatus(1.5).pressure_drop(fluid_data, flow_data, 100))
+
+    # with flow rate per borefield
+    flow_data = ConstantFlowRate(mfr=0.6, flow_per_borehole=False)
+    single = MultipleUTube(1, 0.02, 0.02, 0.4, 0.05, 1)
+    double = MultipleUTube(1, 0.013, 0.016, 0.4, 0.05, 2)
+    assert np.isclose(single.pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2), 4.474549607676448)
+    assert np.isclose(single.pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2, include_bend=False),
+                      4.4688388696204555)
+    assert np.isclose(double.pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2), 10.347836812519452)
+    assert np.isclose(double.pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2, include_bend=False),
+                      10.339838859988387)
+    coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
+    assert np.isclose(coaxial.pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2), 0.1639237572210245)
+    assert np.isclose(19.84145159678991, Separatus(1.5).pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2))
+
+    flow_data = ConstantFlowRate(mfr=0.3, flow_per_borehole=False, series_factor=2)
+    single = MultipleUTube(1, 0.02, 0.02, 0.4, 0.05, 1)
+    double = MultipleUTube(1, 0.013, 0.016, 0.4, 0.05, 2)
+    assert np.isclose(single.pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2), 4.474549607676448)
+    assert np.isclose(single.pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2, include_bend=False),
+                      4.4688388696204555)
+    assert np.isclose(double.pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2), 10.347836812519452)
+    assert np.isclose(double.pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2, include_bend=False),
+                      10.339838859988387)
+    coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
+    assert np.isclose(coaxial.pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2), 0.1639237572210245)
+    assert np.isclose(19.84145159678991, Separatus(1.5).pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2))
+
+
+def test_turbocollector():
+    turbo = Turbocollector(1.5, 0.013, 0.016, 0.035, 1)
+    flow_borehole = ConstantFlowRate(vfr=0.25)
+    flow_borefield = ConstantFlowRate(vfr=0.5, flow_per_borehole=False)
+    fluid = TemperatureDependentFluidData('MPG', 25)
+
+    assert np.isclose(turbo.Re(fluid, flow_borehole, temperature=5),
+                      turbo.Re(fluid, flow_borefield, temperature=5, nb_of_boreholes=2))
+    # TODO test Rb en Dp
+    assert np.isclose(turbo.pressure_drop(fluid, flow_borehole, 100, temperature=5),
+                      turbo.pressure_drop(fluid, flow_borefield, 100, temperature=5, nb_of_boreholes=2))
+    borehole = gt.boreholes.Borehole(100, 1, 0.07, 0, 0)
+    turbo1 = turbo
+    turbo.calculate_resistances(fluid, flow_borehole, temperature=5)
+    turbo1.calculate_resistances(fluid, flow_borefield, temperature=5, nb_of_boreholes=2)
+
+    assert np.isclose(turbo.pipe_model(2, borehole).effective_borehole_thermal_resistance(
+        flow_borehole.mfr_borehole(fluid, temperature=5), fluid.cp(temperature=5)),
+        turbo1.pipe_model(2, borehole).effective_borehole_thermal_resistance(
+            flow_borefield.mfr_borehole(fluid, temperature=5, nb_of_boreholes=2), fluid.cp(temperature=5)))
 
 
 def test_conical_pipe_get_pipe_model():
@@ -268,6 +346,24 @@ def test_conical_resistances():
     pipe.calculate_resistances(fluid, flow, 200)
     assert np.isclose(0.07360723858372777, pipe.R_p)
     assert np.isclose(0.17492415197256533, pipe.R_f)
+
+    flow = ConstantFlowRate(vfr=0.4, flow_per_borehole=False)
+
+    pipe.calculate_resistances(fluid, flow, 60, nb_of_boreholes=2)
+    begin_pipe.calculate_resistances(fluid, flow, borehole_length=60, nb_of_boreholes=2)
+
+    assert pipe.R_p == begin_pipe.R_p
+    assert pipe.R_f == begin_pipe.R_f
+
+    pipe.calculate_resistances(fluid, flow, 100, nb_of_boreholes=2)
+    assert np.isclose(0.06797080927504552, pipe.R_p)
+    assert np.isclose(0.18460159035588664, pipe.R_f)
+
+    pipe.calculate_resistances(fluid, flow, 200, nb_of_boreholes=2)
+    assert np.isclose(0.07360723858372777, pipe.R_p)
+    assert np.isclose(0.17492415197256533, pipe.R_f)
+
+    flow = ConstantFlowRate(vfr=0.2)
 
     pipe.use_approx = False
     # below threshold
@@ -329,6 +425,12 @@ def test_conical_pressure_drop_total():
 
     assert np.isclose(7.790713878176526, pipe.pressure_drop(fluid, flow, 60, temperature=0))
     assert np.isclose(13.025770150586625, pipe.pressure_drop(fluid, flow, 100, temperature=0))
+    assert np.isclose(12.292102456222025, pipe_double.pressure_drop(fluid, flow, 180, temperature=0))
+
+    flow = ConstantFlowRate(mfr=0.4, flow_per_borehole=False)
+    assert np.isclose(7.790713878176526, pipe.pressure_drop(fluid, flow, 60, temperature=0, nb_of_boreholes=2))
+    assert np.isclose(13.025770150586625, pipe.pressure_drop(fluid, flow, 100, temperature=0, nb_of_boreholes=2))
+    assert np.isclose(12.292102456222025, pipe_double.pressure_drop(fluid, flow, 180, temperature=0, nb_of_boreholes=2))
 
 
 def test_conical_reynolds():
@@ -337,7 +439,6 @@ def test_conical_reynolds():
     begin_pipe = SingleUTube(1.5, 0.0135, 0.016, 0.4, 0.035)
     fluid = TemperatureDependentFluidData('MPG', 20).create_constant(0)
     flow = ConstantFlowRate(vfr=0.2)
-
     assert begin_pipe.Re(fluid, flow) == pipe.Re(fluid, flow, borehole_length=60)
     assert np.isclose(begin_pipe.Re(fluid, flow) / 2, pipe_double.Re(fluid, flow, borehole_length=60))
     pipe = ConicalPipe(1.5, 0.0135, 0.013, 0, 100, 0.016, 0.4, 0.035, 1)
@@ -345,6 +446,20 @@ def test_conical_reynolds():
     assert np.isclose(1116.4960021656223, pipe_double.Re(fluid, flow, borehole_length=100))
     pipe = ConicalPipe(1.5, 0.0135, 0.013, 0, 100, 0.016, 0.4, 0.035, 1)
     assert np.isclose(2294.99693335425, pipe.Re(fluid, flow, borehole_length=200))
+
+    pipe = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
+    pipe_double = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 2)
+    begin_pipe = SingleUTube(1.5, 0.0135, 0.016, 0.4, 0.035)
+    fluid = TemperatureDependentFluidData('MPG', 20).create_constant(0)
+    flow = ConstantFlowRate(vfr=0.4, flow_per_borehole=False)
+    assert begin_pipe.Re(fluid, flow, nb_of_boreholes=2) == pipe.Re(fluid, flow, borehole_length=60, nb_of_boreholes=2)
+    assert np.isclose(begin_pipe.Re(fluid, flow, nb_of_boreholes=2) / 2,
+                      pipe_double.Re(fluid, flow, borehole_length=60, nb_of_boreholes=2))
+    pipe = ConicalPipe(1.5, 0.0135, 0.013, 0, 100, 0.016, 0.4, 0.035, 1)
+    assert np.isclose(2273.275997711447, pipe.Re(fluid, flow, borehole_length=100, nb_of_boreholes=2))
+    assert np.isclose(1116.4960021656223, pipe_double.Re(fluid, flow, borehole_length=100, nb_of_boreholes=2))
+    pipe = ConicalPipe(1.5, 0.0135, 0.013, 0, 100, 0.016, 0.4, 0.035, 1)
+    assert np.isclose(2294.99693335425, pipe.Re(fluid, flow, borehole_length=200, nb_of_boreholes=2))
 
     flow = ConstantFlowRate(mfr=0.2)
     pipe = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)

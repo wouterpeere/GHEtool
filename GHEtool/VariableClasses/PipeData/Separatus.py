@@ -77,7 +77,7 @@ class Separatus(SingleUTube):
         -------
         Reynolds number : float
         """
-        u = flow_rate_data.mfr(fluid_data=fluid_data, **kwargs) / fluid_data.rho(**kwargs) / (705.27 * 1e-6)
+        u = flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / (705.27 * 1e-6) / 1000
         return fluid_data.rho(**kwargs) * u * 0.02551 / fluid_data.mu(**kwargs)
 
     def pressure_drop(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float,
@@ -103,13 +103,13 @@ class Separatus(SingleUTube):
 
         # Darcy fluid factor
         fd = gt.pipes.fluid_friction_factor_circular_pipe(
-            flow_rate_data.mfr(fluid_data=fluid_data, **kwargs),
+            flow_rate_data.mfr_borehole(fluid_data=fluid_data, **kwargs),
             (0.02551 / 2),
             fluid_data.mu(**kwargs),
             fluid_data.rho(**kwargs),
             self.epsilon)
         A = 705.27 * 1e-6  # cross-sectional area of the separatus
-        V = (flow_rate_data.vfr(fluid_data=fluid_data, **kwargs) / 1000) / A
+        V = (flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / 1000) / A
 
         # add 0.2 for the local losses
         # (source: https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html)
