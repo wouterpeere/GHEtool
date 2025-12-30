@@ -49,8 +49,8 @@ def main_functionalities():
     borefield.Rb = 0.12  # equivalent borehole resistance (K/W)
 
     # set temperature boundaries
-    borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
-    borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
+    borefield.set_max_fluid_temperature(16)  # maximum temperature
+    borefield.set_min_fluid_temperature(0)  # minimum temperature
 
     # size borefield
     length = borefield.size()

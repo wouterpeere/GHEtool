@@ -81,8 +81,8 @@ def test_different_heating_cooling_peaks():
     borefield.Rb = 0.2
 
     # set temperature boundaries
-    borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
-    borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
+    borefield.set_max_fluid_temperature(16)  # maximum temperature
+    borefield.set_min_fluid_temperature(0)  # minimum temperature
     borefield.load.peak_injection_duration = 8
     assert borefield.load.peak_injection_duration == 8 * 3600
     assert borefield.load.peak_extraction_duration == 6 * 3600
@@ -99,8 +99,8 @@ def test_stuck_in_loop():
     borefield.Rb = 0.2
 
     # set temperature boundaries
-    borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
-    borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
+    borefield.set_max_fluid_temperature(16)  # maximum temperature
+    borefield.set_min_fluid_temperature(0)  # minimum temperature
     borefield.calculation_setup(max_nb_of_iterations=500)
 
     borefield.size()
@@ -121,8 +121,8 @@ def test_different_results_with_other_peak_lengths():
     borefield.set_borefield(copy.copy(borefield_gt))
 
     # set temperature boundaries
-    borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
-    borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
+    borefield.set_max_fluid_temperature(16)  # maximum temperature
+    borefield.set_min_fluid_temperature(0)  # minimum temperature
 
     borefield.load.peak_duration = 2
     init_length_L2 = borefield.size_L2()
@@ -159,19 +159,19 @@ def test_no_possible_solution():
     borefield.set_borefield(copy.copy(borefield_gt))
 
     # limited by cooling
-    borefield.set_max_avg_fluid_temperature(14)  # maximum temperature
-    borefield.set_min_avg_fluid_temperature(3)  # minimum temperature
+    borefield.set_max_fluid_temperature(14)  # maximum temperature
+    borefield.set_min_fluid_temperature(3)  # minimum temperature
     borefield.size()
 
     # limited by heating, but no problem for cooling
-    borefield.set_max_avg_fluid_temperature(15)
-    borefield.set_min_avg_fluid_temperature(2)
+    borefield.set_max_fluid_temperature(15)
+    borefield.set_min_fluid_temperature(2)
     borefield.load.baseload_extraction = borefield.load.monthly_baseload_extraction * 5
     borefield.size()
 
     # limited by heating, but problem for cooling --> no solution
-    borefield.set_max_avg_fluid_temperature(14)
-    borefield.set_min_avg_fluid_temperature(2)
+    borefield.set_max_fluid_temperature(14)
+    borefield.set_min_fluid_temperature(2)
     borefield.load.baseload_extraction = borefield.load.monthly_baseload_extraction * 5
     with pytest.raises(UnsolvableDueToTemperatureGradient):
         borefield.size(L3_sizing=True)
@@ -208,8 +208,8 @@ def test_problem_with_gfunction_calc_obj():
     borefield.Rb = 0.2
 
     # set temperature boundaries
-    borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
-    borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
+    borefield.set_max_fluid_temperature(16)  # maximum temperature
+    borefield.set_min_fluid_temperature(0)  # minimum temperature
 
     # size borefield
     assert np.isclose(borefield.size(), 190.2116676694166)
@@ -235,8 +235,8 @@ def test_size_with_multiple_ground_layers():
     borefield.set_Rb(0.12)
 
     # set temperature boundaries
-    borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
-    borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
+    borefield.set_max_fluid_temperature(16)  # maximum temperature
+    borefield.set_min_fluid_temperature(0)  # minimum temperature
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(4))
 
     borefield.load.peak_injection_duration = 8

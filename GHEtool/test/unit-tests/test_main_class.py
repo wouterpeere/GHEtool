@@ -327,22 +327,26 @@ def test_set_pipe_params():
 
 def test_set_max_temp():
     borefield = Borefield()
-    borefield.set_max_avg_fluid_temperature(13)
+    borefield.set_max_fluid_temperature(13)
     assert borefield.Tf_max == 13
-    borefield.set_max_avg_fluid_temperature(14)
+    borefield.set_max_avg_fluid_temperature(15)
+    assert borefield.Tf_max == 15
+    borefield.set_max_fluid_temperature(14)
     assert borefield.Tf_max == 14
     with pytest.raises(ValueError):
-        borefield.set_max_avg_fluid_temperature(borefield.Tf_min - 1)
+        borefield.set_max_fluid_temperature(borefield.Tf_min - 1)
 
 
 def test_set_min_temp():
     borefield = Borefield()
-    borefield.set_min_avg_fluid_temperature(3)
+    borefield.set_min_fluid_temperature(3)
     assert borefield.Tf_min == 3
-    borefield.set_min_avg_fluid_temperature(4)
+    borefield.set_min_avg_fluid_temperature(5)
+    assert borefield.Tf_min == 5
+    borefield.set_min_fluid_temperature(4)
     assert borefield.Tf_min == 4
     with pytest.raises(ValueError):
-        borefield.set_min_avg_fluid_temperature(borefield.Tf_max + 1)
+        borefield.set_min_fluid_temperature(borefield.Tf_max + 1)
 
 
 def test_Tg():
@@ -448,7 +452,7 @@ def test_select_size():
     borefield.ground_data = data_ground_flux
     assert borefield._select_size(100, 20) == 100
     assert borefield._select_size(10, 80) == 80
-    borefield.set_max_avg_fluid_temperature(14)
+    borefield.set_max_fluid_temperature(14)
     with pytest.raises(UnsolvableDueToTemperatureGradient):
         borefield._select_size(10, 80)
 
@@ -494,7 +498,7 @@ def test_size_L3_value_errors():
 def test_size_L3(quadrant, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
-    borefield.set_max_avg_fluid_temperature(18)
+    borefield.set_max_fluid_temperature(18)
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
     borefield.ground_data = ground_data_constant
 
@@ -538,7 +542,7 @@ def test_size_L4():
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_injection=0, col_extraction=1)
     borefield.load = load
 
-    borefield.set_max_avg_fluid_temperature(25)
+    borefield.set_max_fluid_temperature(25)
     assert np.isclose(109.4742962707615, borefield.size_L4(100, quadrant_sizing=3))
     assert np.isclose(109.4742962707615, borefield.H)
     assert borefield.calculate_quadrant() == 3
@@ -1012,7 +1016,7 @@ def test_optimise_borefield_wrong_threshold_energy(monkeypatch):
 def test_calculate_quadrants_without_data():
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
-    borefield.set_max_avg_fluid_temperature(18)
+    borefield.set_max_fluid_temperature(18)
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
     borefield.ground_data = ground_data_constant
     borefield.calculate_quadrant()
@@ -1172,8 +1176,8 @@ def test_optimise_load_borefield():
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
     load.simulation_period = 10
     borefield = Borefield(load=load)
-    borefield.set_min_avg_fluid_temperature(2)
-    borefield.set_max_avg_fluid_temperature(17)
+    borefield.set_min_fluid_temperature(2)
+    borefield.set_max_fluid_temperature(17)
     borefield.borefield = gt.borefield.Borefield.rectangle_field(20, 4, 6, 6, 150, 1, 0.07)
     borefield.Rb = 0.1699
     ground_data = GroundFluxTemperature(2, 9.6, flux=0.07)
@@ -1288,7 +1292,7 @@ def test_with_titled_borefield():
     borefield.pipe_data = pipe_data
     borefield.fluid_data = fluid_data
     borefield.flow_data = ConstantFlowRate(mfr=0.2)
-    borefield.set_max_avg_fluid_temperature(17)
+    borefield.set_max_fluid_temperature(17)
 
     assert np.isclose(borefield.depth, 150 * math.cos(math.pi / 7) + 0.75)
     assert np.isclose(borefield.ground_data.calculate_Tg(borefield.depth, borefield.D), 12.157557845032045)
@@ -1318,3 +1322,105 @@ def test_Rb_and_Re_with_temperture_dep_data():
     borefield.calculate_temperatures()
     assert np.isclose(borefield.Re, 949.0513333574957)
     assert np.isclose(borefield.Rb, 0.15660083491337237)
+
+
+def test_inlet_outlet_temperatures():
+    borefield = Borefield()
+    with pytest.raises(TypeError):
+        borefield.calculate_borefield_inlet_outlet_temperature(10, 5)
+    borefield.create_rectangular_borefield(1, 1, 6, 6, 100)
+    borefield.borehole.pipe_data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2)
+    borefield.borehole.fluid_data = ConstantFluidData(0.5, 1200, 4000, 0.001)
+    borefield.borehole.flow_data = ConstantFlowRate(mfr=1)
+    borefield.borehole.use_constant_Rb = False
+
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(10, 0), (1.25, -1.25))
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), 0),
+                       ((0.625, 1.25), (-0.625, -1.25)))
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(10, np.array([0, 1])),
+                       ((1.25, 2.25), (-1.25, -0.25)))
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), np.array([0, 1])),
+                       ((0.625, 2.25), (-0.625, -0.25)))
+    borefield.borehole.flow_data = ConstantFlowRate(vfr=1)
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), np.array([0, 1])),
+                       ((0.52083333, 2.04166667), (-0.52083333, -0.04166667)))  # equal since rho is equal
+    borefield.borehole.fluid_data = TemperatureDependentFluidData('MEG', 25)
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), np.array([0, 1])),
+                       ((0.64067241, 2.28081611), (-0.64067241, -0.28081611)))
+    borefield.create_rectangular_borefield(2, 1, 6, 6, 100)
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), np.array([0, 1])),
+                       ((0.3203362, 1.64040806), (-0.3203362, 0.35959194)))
+
+
+def test_size_inlet_outlet_l2():
+    borefield = Borefield()
+    borefield.borefield = copy.deepcopy(borefield_gt)
+    load = MonthlyGeothermalLoadAbsolute(*load_case(3))
+    borefield.ground_data = GroundConstantTemperature(2, 10)
+    borefield.fluid_data = ConstantFluidData(0.5, 1200, 4000, 0.001)
+    borefield.flow_data = ConstantFlowRate(mfr=1)
+    borefield.pipe_data = pipeData
+    borefield.calculation_setup(use_constant_Rb=False, interpolate_gfunctions=False, atol=0.0005)
+
+    # extraction
+    th, _, tcm, qh, qpm, qm = load._calculate_first_year_params(True)
+    borefield.calculation_setup(size_based_on='inlet')
+    size_inlet = borefield._Carcel(th, tcm, qh, qpm, qm, 0)
+    borefield.calculation_setup(size_based_on='outlet')
+    size_outlet = borefield._Carcel(th, tcm, qh, qpm, qm, 0)
+    borefield.calculation_setup(size_based_on='average')
+    delta_T = qh / 1000 / (borefield.fluid_data.cp() / 1000 * borefield.flow_data.mfr() * borefield.number_of_boreholes)
+    assert np.isclose(size_inlet, borefield._Carcel(th, tcm, qh, qpm, qm, delta_T / 2))
+    assert np.isclose(size_outlet, borefield._Carcel(th, tcm, qh, qpm, qm, -delta_T / 2))
+
+    # injection
+    th, _, tcm, qh, qpm, qm = load._calculate_first_year_params(False)
+    borefield.calculation_setup(size_based_on='inlet')
+    size_inlet = borefield._Carcel(th, tcm, qh, qpm, qm, 0)
+    borefield.calculation_setup(size_based_on='outlet')
+    size_outlet = borefield._Carcel(th, tcm, qh, qpm, qm, 0)
+    borefield.calculation_setup(size_based_on='average')
+    delta_T = qh / 1000 / (borefield.fluid_data.cp() / 1000 * borefield.flow_data.mfr() * borefield.number_of_boreholes)
+    assert np.isclose(size_inlet, borefield._Carcel(th, tcm, qh, qpm, qm, delta_T / 2))
+    assert np.isclose(size_outlet, borefield._Carcel(th, tcm, qh, qpm, qm, -delta_T / 2))
+
+    # extraction
+    th, qh, qm, qa = load._calculate_last_year_params(True)
+    borefield.calculation_setup(size_based_on='inlet')
+    size_inlet = borefield._Ahmadfard(th, qh, qm, qa, 0)
+    borefield.calculation_setup(size_based_on='outlet')
+    size_outlet = borefield._Ahmadfard(th, qh, qm, qa, 0)
+    borefield.calculation_setup(size_based_on='average')
+    delta_T = qh / 1000 / (borefield.fluid_data.cp() / 1000 * borefield.flow_data.mfr() * borefield.number_of_boreholes)
+    assert np.isclose(size_inlet, borefield._Ahmadfard(th, qh, qm, qa, delta_T / 2))
+    assert np.isclose(size_outlet, borefield._Ahmadfard(th, qh, qm, qa, -delta_T / 2))
+
+    # injection
+    th, qh, qm, qa = load._calculate_last_year_params(False)
+    borefield.calculation_setup(size_based_on='inlet')
+    size_inlet = borefield._Ahmadfard(th, qh, qm, qa, 0)
+    borefield.calculation_setup(size_based_on='outlet')
+    size_outlet = borefield._Ahmadfard(th, qh, qm, qa, 0)
+    borefield.calculation_setup(size_based_on='average')
+    delta_T = qh / 1000 / (borefield.fluid_data.cp() / 1000 * borefield.flow_data.mfr() * borefield.number_of_boreholes)
+    assert np.isclose(size_inlet, borefield._Ahmadfard(th, qh, qm, qa, delta_T / 2))
+    assert np.isclose(size_outlet, borefield._Ahmadfard(th, qh, qm, qa, -delta_T / 2))
+
+
+def test_plot_inlet_outlet(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    borefield = Borefield()
+    borefield.borefield = copy.deepcopy(borefield_gt)
+    load = MonthlyGeothermalLoadAbsolute(*load_case(3))
+    borefield.ground_data = GroundConstantTemperature(2, 10)
+    borefield.fluid_data = ConstantFluidData(0.5, 1200, 4000, 0.001)
+    borefield.flow_data = ConstantFlowRate(mfr=1)
+    borefield.pipe_data = pipeData
+    borefield.load = load
+    borefield.calculation_setup(use_constant_Rb=False, interpolate_gfunctions=False, atol=0.0005)
+    borefield.print_temperature_profile(type='inlet')
+    borefield.print_temperature_profile(type='outlet')
+
+    borefield.load = HourlyGeothermalLoad(np.full(8760, 1), np.full(8760, 2))
+    borefield.print_temperature_profile(type='inlet', plot_hourly=True)
+    borefield.print_temperature_profile(type='outlet', plot_hourly=True)

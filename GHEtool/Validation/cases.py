@@ -86,8 +86,8 @@ def check_cases():
         borefield.Rb = 0.2
 
         # set temperature boundaries
-        borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
-        borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
+        borefield.set_max_fluid_temperature(16)  # maximum temperature
+        borefield.set_min_fluid_temperature(0)  # minimum temperature
 
         borefield.size(100, L2_sizing=True)
         print(f'correct answer L2: {correct_answers_L2[i - 1]}; calculated answer L2: {round(borefield.H, 2)}; error: '
@@ -120,8 +120,8 @@ def check_custom_datafile():
         borefield.Rb = 0.2
 
         # set temperature boundaries
-        borefield.set_max_avg_fluid_temperature(16)  # maximum temperature
-        borefield.set_min_avg_fluid_temperature(0)  # minimum temperature
+        borefield.set_max_fluid_temperature(16)  # maximum temperature
+        borefield.set_min_fluid_temperature(0)  # minimum temperature
 
         borefield.size(100, L3_sizing=True)
         print(f'correct answer: {correct_answers[i - 1]}; calculated '

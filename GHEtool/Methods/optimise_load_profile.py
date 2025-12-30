@@ -65,7 +65,8 @@ def optimise_load_profile_power(
 
     # since the depth does not change, the Rb* value is constant, if there is no temperature dependent fluid data
     if isinstance(borefield.borehole.fluid_data, ConstantFluidData) \
-            and isinstance(borefield.borehole.flow_data, ConstantFlowRate):
+            and isinstance(borefield.borehole.flow_data,
+                           ConstantFlowRate) and borefield._calculation_setup.size_based_on == 'average':
         borefield.Rb = borefield.borehole.get_Rb(borefield.H, borefield.D, borefield.r_b,
                                                  borefield.ground_data.k_s(borefield.depth, borefield.D))
 
@@ -104,20 +105,30 @@ def optimise_load_profile_power(
         # calculate temperature profile, just for the results
         borefield.calculate_temperatures(length=borefield.H, hourly=use_hourly_resolution)
 
+        if borefield._calculation_setup.size_based_on == 'average':
+            min_temperature, max_temperature = np.min(borefield.results.min_temperature), np.max(
+                borefield.results.max_temperature)
+        elif borefield._calculation_setup.size_based_on == 'inlet':
+            min_temperature, max_temperature = np.min(borefield.results.peak_extraction_inlet), np.max(
+                borefield.results.peak_injection_inlet)
+        else:
+            min_temperature, max_temperature = np.min(borefield.results.peak_extraction_outlet), np.max(
+                borefield.results.peak_injection_outlet)
+
         # deviation from minimum temperature
-        if abs(borefield.results.min_temperature - borefield.Tf_min) > temperature_threshold:
+        if abs(min_temperature - borefield.Tf_min) > temperature_threshold:
             # check if it goes below the threshold
-            if borefield.results.min_temperature < borefield.Tf_min:
+            if min_temperature < borefield.Tf_min:
                 if (dhw_preferential and peak_heat_load > 0.1) \
                         or (not dhw_preferential and peak_dhw_load <= 0.1) \
                         or dhw_preferential is None:
                     # first reduce the peak load in heating before touching the dhw load
                     # if dhw_preferential is None, it is not optimised and kept constant
                     peak_heat_load = max(0.1, peak_heat_load - 1 * max(1, 10 * (
-                            borefield.Tf_min - borefield.results.min_temperature)))
+                            borefield.Tf_min - min_temperature)))
                 else:
                     peak_dhw_load = max(0.1, peak_dhw_load - 1 * max(1, 10 * (
-                            borefield.Tf_min - borefield.results.min_temperature)))
+                            borefield.Tf_min - min_temperature)))
                 heat_ok = False
             else:
                 if (dhw_preferential and peak_heat_load != init_peak_heating) or (
@@ -131,11 +142,11 @@ def optimise_load_profile_power(
             heat_ok = True
 
         # deviation from maximum temperature
-        if abs(borefield.results.max_temperature - borefield.Tf_max) > temperature_threshold:
+        if abs(max_temperature - borefield.Tf_max) > temperature_threshold:
             # check if it goes above the threshold
-            if borefield.results.max_temperature > borefield.Tf_max:
+            if max_temperature > borefield.Tf_max:
                 peak_cool_load = max(0.1, peak_cool_load - 1 * max(1, 10 * (
-                        -borefield.Tf_max + borefield.results.max_temperature)))
+                        -borefield.Tf_max + max_temperature)))
                 cool_ok = False
             else:
                 peak_cool_load = min(init_peak_cooling, peak_cool_load * 1.01)
@@ -220,8 +231,10 @@ def optimise_load_profile_energy(
         raise ValueError(f"The temperature threshold is {temperature_threshold}, but it cannot be below 0!")
 
     # since the depth does not change, the Rb* value is constant, if there is no temperature dependent fluid data
+    # TODO the last check should be based on the type of flow rate
     if isinstance(borefield.borehole.fluid_data, ConstantFluidData) \
-            and isinstance(borefield.borehole.flow_data, ConstantFlowRate):
+            and isinstance(borefield.borehole.flow_data,
+                           ConstantFlowRate) and borefield._calculation_setup.size_based_on == 'average':
         borefield.Rb = borefield.borehole.get_Rb(borefield.H, borefield.D, borefield.r_b,
                                                  borefield.ground_data.k_s(borefield.depth, borefield.D))
 
@@ -355,7 +368,22 @@ def optimise_load_profile_energy(
                          (g_value_peak_injection / (k_s * 2 * pi) + Rb_max)
                          - borefield.load.monthly_baseload_injection_power_simulation_period[idx] *
                          (g_value_peak_injection / (k_s * 2 * pi))) * 1000 / borefield.number_of_boreholes / borefield.H
-            return extraction, injection, Tb
+
+            # correct for inlet and outlet
+            if borefield._calculation_setup.size_based_on == 'average':
+                return extraction, injection, Tb
+            elif borefield._calculation_setup.size_based_on == 'inlet':
+                injection_inlet, _ = borefield.calculate_borefield_inlet_outlet_temperature(
+                    borefield.load.monthly_peak_extraction_simulation_period[idx], injection)
+                extraction_inlet, _ = borefield.calculate_borefield_inlet_outlet_temperature(
+                    borefield.load.monthly_peak_injection_simulation_period[idx], extraction)
+                return extraction_inlet, injection_inlet, Tb
+            else:
+                _, injection_outlet = borefield.calculate_borefield_inlet_outlet_temperature(
+                    borefield.load.monthly_peak_extraction_simulation_period[idx], injection)
+                _, extraction_outlet = borefield.calculate_borefield_inlet_outlet_temperature(
+                    borefield.load.monthly_peak_injection_simulation_period[idx], extraction)
+                return extraction_outlet, injection_outlet, Tb
 
         # add some iteration for convergence
         # check if active_passive, because then, threshold should be taken
@@ -388,7 +416,7 @@ def optimise_load_profile_energy(
             borefield.load._results._peak_injection[idx] = results_old[1]
             results = calculate(*results_old)
             i += 1
-        return calculate()
+        return results
 
     for i in range(12 * borefield.load.simulation_period):
         # set iteration criteria
@@ -396,7 +424,6 @@ def optimise_load_profile_energy(
         # optimise month i
         init_load = borefield.load.monthly_average_injection_power_simulation_period[i]
         cool_ok, heat_ok = False, False
-
         while not cool_ok or not heat_ok:
             # calculate temperature profile, just for the results
             peak_extraction, peak_injection, _ = update_last_month(i, init_load)
@@ -542,7 +569,8 @@ def optimise_load_profile_balance(
 
     # since the depth does not change, the Rb* value is constant, if there is no temperature dependent fluid data
     if isinstance(borefield.borehole.fluid_data, ConstantFluidData) \
-            and isinstance(borefield.borehole.flow_data, ConstantFlowRate):
+            and isinstance(borefield.borehole.flow_data,
+                           ConstantFlowRate) and borefield._calculation_setup.size_based_on == 'average':
         borefield.Rb = borefield.borehole.get_Rb(borefield.H, borefield.D, borefield.r_b,
                                                  borefield.ground_data.k_s(borefield.depth, borefield.D))
 
@@ -582,24 +610,34 @@ def optimise_load_profile_balance(
         # calculate temperature profile, just for the results
         borefield.calculate_temperatures(length=borefield.H, hourly=use_hourly_resolution)
 
+        if borefield._calculation_setup.size_based_on == 'average':
+            min_temperature, max_temperature = np.min(borefield.results.min_temperature), np.max(
+                borefield.results.max_temperature)
+        elif borefield._calculation_setup.size_based_on == 'inlet':
+            min_temperature, max_temperature = np.min(borefield.results.peak_extraction_inlet), np.max(
+                borefield.results.peak_injection_inlet)
+        else:
+            min_temperature, max_temperature = np.min(borefield.results.peak_extraction_outlet), np.max(
+                borefield.results.peak_injection_outlet)
+
         # calculate relative imbalance
         imbalance = borefield.load.imbalance / np.maximum(borefield.load.yearly_average_injection_load,
                                                           borefield.load.yearly_average_extraction_load)
         # deviation from minimum temperature
-        if abs(borefield.results.min_temperature - borefield.Tf_min) > temperature_threshold or \
+        if abs(min_temperature - borefield.Tf_min) > temperature_threshold or \
                 (abs(imbalance) > imbalance_factor and imbalance < 0):
             # check if it goes below the threshold
-            if borefield.results.min_temperature < borefield.Tf_min:
+            if min_temperature < borefield.Tf_min:
                 if (dhw_preferential and peak_heat_load > 0.1) \
                         or (not dhw_preferential and peak_dhw_load <= 0.1) \
                         or dhw_preferential is None:
                     # first reduce the peak load in heating before touching the dhw load
                     # if dhw_preferential is None, it is not optimised and kept constant
                     peak_heat_load = max(0.1, peak_heat_load - 1 * max(1, 10 * (
-                            borefield.Tf_min - borefield.results.min_temperature)))
+                            borefield.Tf_min - min_temperature)))
                 else:
                     peak_dhw_load = max(0.1, peak_dhw_load - 1 * max(1, 10 * (
-                            borefield.Tf_min - borefield.results.min_temperature)))
+                            borefield.Tf_min - min_temperature)))
                 heat_ok = False
             else:
                 if abs(imbalance) > imbalance_factor and imbalance < 0:
@@ -627,12 +665,12 @@ def optimise_load_profile_balance(
             heat_ok = True
 
         # deviation from maximum temperature
-        if abs(borefield.results.max_temperature - borefield.Tf_max) > temperature_threshold or \
+        if abs(max_temperature - borefield.Tf_max) > temperature_threshold or \
                 (abs(imbalance) > imbalance_factor and imbalance > 0):
             # check if it goes above the threshold
-            if np.max(borefield.results.peak_injection) > borefield.Tf_max:
+            if max_temperature > borefield.Tf_max:
                 peak_cool_load = max(0.1, peak_cool_load - 1 * max(1, 10 * (
-                        -borefield.Tf_max + borefield.results.max_temperature)))
+                        -borefield.Tf_max + max_temperature)))
                 cool_ok = False
             else:
                 if abs(imbalance) > imbalance_factor and imbalance > 0:

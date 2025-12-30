@@ -18,8 +18,8 @@ def start_in_different_month():
     borefield.ground_data = ground_data
     borefield.create_rectangular_borefield(10, 8, 6, 6, 100)
 
-    borefield.set_max_avg_fluid_temperature(17)
-    borefield.set_min_avg_fluid_temperature(3)
+    borefield.set_max_fluid_temperature(17)
+    borefield.set_min_fluid_temperature(3)
     borefield.calculation_setup(max_nb_of_iterations=100)
 
     length_list = []

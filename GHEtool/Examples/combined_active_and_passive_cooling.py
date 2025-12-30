@@ -33,8 +33,8 @@ def default_cooling_in_summer():
     borefield.fluid_data = fluid_data
     borefield.pipe_data = pipe_data
     borefield.flow_data = flow_data
-    borefield.set_max_avg_fluid_temperature(25)
-    borefield.set_min_avg_fluid_temperature(3)
+    borefield.set_max_fluid_temperature(25)
+    borefield.set_min_fluid_temperature(3)
 
     # create combined active and passive EER
     eer = EERCombined(20, eer_active, months_active_cooling=[6, 7, 8])
@@ -84,8 +84,8 @@ def active_above_threshold():
     borefield.fluid_data = fluid_data
     borefield.pipe_data = pipe_data
     borefield.flow_data = flow_data
-    borefield.set_max_avg_fluid_temperature(25)
-    borefield.set_min_avg_fluid_temperature(3)
+    borefield.set_max_fluid_temperature(25)
+    borefield.set_min_fluid_temperature(3)
 
     eer = EERCombined(20, eer_active, threshold_temperature=17)
 

@@ -47,8 +47,8 @@ def test_1b():
     delta_t = max(load.max_peak_extraction, load.max_peak_injection) * 1000 / (fluid_data.cp() * flow_data.mfr())
 
     # set temperature bounds
-    borefield.set_max_avg_fluid_temperature(35 + delta_t / 2)
-    borefield.set_min_avg_fluid_temperature(0 - delta_t / 2)
+    borefield.set_max_fluid_temperature(35 + delta_t / 2)
+    borefield.set_min_fluid_temperature(0 - delta_t / 2)
 
     # Sizing with dynamic Rb
     # according to L2
@@ -83,8 +83,8 @@ def test_1b():
     borefield.set_Rb(Rb_static)
 
     # set temperature bounds
-    borefield.set_max_avg_fluid_temperature(35 + delta_t / 2)
-    borefield.set_min_avg_fluid_temperature(0 - delta_t / 2)
+    borefield.set_max_fluid_temperature(35 + delta_t / 2)
+    borefield.set_min_fluid_temperature(0 - delta_t / 2)
 
     # load the hourly profile
     borefield.load = load

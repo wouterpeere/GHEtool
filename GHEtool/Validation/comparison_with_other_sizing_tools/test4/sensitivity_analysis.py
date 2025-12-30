@@ -65,8 +65,8 @@ def test_4_sensitivity():
     delta_t = max(load.max_peak_injection, load.max_peak_extraction) * 1000 / (fluid_data.cp() * flow_data.mfr()) / 25
 
     # set temperature bounds
-    borefield.set_max_avg_fluid_temperature(38 + delta_t / 2)
-    borefield.set_min_avg_fluid_temperature(0 - delta_t / 2)
+    borefield.set_max_fluid_temperature(38 + delta_t / 2)
+    borefield.set_min_fluid_temperature(0 - delta_t / 2)
 
     # Sizing with constant Rb
     L2s_start = time.time()
@@ -121,8 +121,8 @@ def test_4_sensitivity():
     delta_t = max(load.max_peak_injection, load.max_peak_extraction) * 1000 / (fluid_data.cp() * flow_data.mfr()) / 25
 
     # set temperature bounds
-    borefield.set_max_avg_fluid_temperature(38 + delta_t / 2)
-    borefield.set_min_avg_fluid_temperature(0 - delta_t / 2)
+    borefield.set_max_fluid_temperature(38 + delta_t / 2)
+    borefield.set_min_fluid_temperature(0 - delta_t / 2)
 
     # Sizing with constant Rb
     L2s_start = time.time()
@@ -157,8 +157,8 @@ def test_4_sensitivity():
     borefield.set_Rb(Rb_static)
 
     # set temperature bounds
-    borefield.set_max_avg_fluid_temperature(38 + delta_t / 2)
-    borefield.set_min_avg_fluid_temperature(0 - delta_t / 2)
+    borefield.set_max_fluid_temperature(38 + delta_t / 2)
+    borefield.set_min_fluid_temperature(0 - delta_t / 2)
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
@@ -205,8 +205,8 @@ def test_4_sensitivity():
     borefield.set_Rb(Rb_static)
 
     # set temperature bounds
-    borefield.set_max_avg_fluid_temperature(38 + delta_t / 2)
-    borefield.set_min_avg_fluid_temperature(0 - delta_t / 2)
+    borefield.set_max_fluid_temperature(38 + delta_t / 2)
+    borefield.set_min_fluid_temperature(0 - delta_t / 2)
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
@@ -253,8 +253,8 @@ def test_4_sensitivity():
     borefield.set_Rb(Rb_static)
 
     # set temperature bounds
-    borefield.set_max_avg_fluid_temperature(38 + delta_t / 2)
-    borefield.set_min_avg_fluid_temperature(0 - delta_t / 2)
+    borefield.set_max_fluid_temperature(38 + delta_t / 2)
+    borefield.set_min_fluid_temperature(0 - delta_t / 2)
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
@@ -301,8 +301,8 @@ def test_4_sensitivity():
     borefield.set_Rb(Rb_static)
 
     # set temperature bounds
-    borefield.set_max_avg_fluid_temperature(38 + delta_t / 2)
-    borefield.set_min_avg_fluid_temperature(0 - delta_t / 2)
+    borefield.set_max_fluid_temperature(38 + delta_t / 2)
+    borefield.set_min_fluid_temperature(0 - delta_t / 2)
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
@@ -349,8 +349,8 @@ def test_4_sensitivity():
     borefield.set_Rb(Rb_static)
 
     # set temperature bounds
-    borefield.set_max_avg_fluid_temperature(38 + delta_t / 2)
-    borefield.set_min_avg_fluid_temperature(0 - delta_t / 2)
+    borefield.set_max_fluid_temperature(38 + delta_t / 2)
+    borefield.set_min_fluid_temperature(0 - delta_t / 2)
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
@@ -397,8 +397,8 @@ def test_4_sensitivity():
     borefield.set_Rb(Rb_static)
 
     # set temperature bounds
-    borefield.set_max_avg_fluid_temperature(38 + delta_t / 2)
-    borefield.set_min_avg_fluid_temperature(0 - delta_t / 2)
+    borefield.set_max_fluid_temperature(38 + delta_t / 2)
+    borefield.set_min_fluid_temperature(0 - delta_t / 2)
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
@@ -445,8 +445,8 @@ def test_4_sensitivity():
     borefield.set_Rb(Rb_static)
 
     # set temperature bounds
-    borefield.set_max_avg_fluid_temperature(38 + delta_t / 2)
-    borefield.set_min_avg_fluid_temperature(0 - delta_t / 2)
+    borefield.set_max_fluid_temperature(38 + delta_t / 2)
+    borefield.set_min_fluid_temperature(0 - delta_t / 2)
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
@@ -493,8 +493,8 @@ def test_4_sensitivity():
     borefield.set_Rb(Rb_static)
 
     # set temperature bounds
-    borefield.set_max_avg_fluid_temperature(38 + delta_t / 2)
-    borefield.set_min_avg_fluid_temperature(0 - delta_t / 2)
+    borefield.set_max_fluid_temperature(38 + delta_t / 2)
+    borefield.set_min_fluid_temperature(0 - delta_t / 2)
 
     # load the hourly profile
     load = HourlyGeothermalLoad(simulation_period=20)
