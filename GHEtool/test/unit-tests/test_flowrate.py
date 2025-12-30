@@ -36,9 +36,13 @@ def test_conversion_mass_flow_volume_flow():
 
 def test_repr_constant_flow_rate():
     fluid = ConstantFlowRate(mfr=0.2)
-    assert fluid.__export__() == {'mfr [kg/s]': 0.2}
+    assert fluid.__export__() == {'mfr per borehole [kg/s]': 0.2}
     fluid = ConstantFlowRate(vfr=0.2)
-    assert fluid.__export__() == {'vfr [l/s]': 0.2}
+    assert fluid.__export__() == {'vfr per borehole [l/s]': 0.2}
+    fluid = ConstantFlowRate(mfr=0.2, flow_per_borehole=False, series_factor=2)
+    assert fluid.__export__() == {'mfr per borefield [kg/s]': 0.2, 'series factor [-]': 2}
+    fluid = ConstantFlowRate(vfr=0.2, flow_per_borehole=False, series_factor=2)
+    assert fluid.__export__() == {'vfr per borefield [l/s]': 0.2, 'series factor [-]': 2}
 
 
 def test_eq():
