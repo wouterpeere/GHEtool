@@ -52,6 +52,10 @@ def test_flow_rate_borefield_series1():
         bor_vfr.vfr_borehole()
     with pytest.raises(ValueError):
         bor_vfr.mfr_borehole()
+    with pytest.raises(ValueError):
+        bor_vfr.mfr_borefield()
+    with pytest.raises(ValueError):
+        bor_mfr.vfr_borefield()
     assert np.isclose(bor_vfr.vfr_borehole(nb_of_boreholes=2), 0.5)
     assert np.isclose(bor_vfr.vfr_borehole(nb_of_boreholes=2, series_factor=2), 1)
     assert np.isclose(bor_vfr.vfr_borefield(), 1)
