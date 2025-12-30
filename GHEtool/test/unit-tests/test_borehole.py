@@ -277,3 +277,21 @@ def test_borehole_resistance_conical():
     borehole.flow_data = ConstantFlowRate(vfr=0.3)
     assert np.allclose([0.13332321, 0.13306411, 0.1328632, 0.13232588],
                        borehole.calculate_Rb(120, 1, 0.075, 3, temperature=np.array([0, 1, 2, 5])))
+
+
+def test_flow_rate_borefield():
+    control_bor = Borehole()
+    control_bor.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+    control_bor.fluid_data = TemperatureDependentFluidData('MEG', 25)
+    control_bor.flow_data = ConstantFlowRate(mfr=0.3)
+    bor = Borehole()
+    bor.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+    bor.fluid_data = TemperatureDependentFluidData('MEG', 25)
+    bor.flow_data = ConstantFlowRate(mfr=0.6, flow_per_borehole=False)
+
+    assert np.isclose(control_bor.get_Rb(100, 1, 0.075, 2, 101, temperature=5, nb_of_boreholes=2),
+                      bor.get_Rb(100, 1, 0.075, 2, 101, temperature=5, nb_of_boreholes=2))
+    bor.flow_data = ConstantFlowRate(vfr=0.6, flow_per_borehole=False)
+    control_bor.flow_data = ConstantFlowRate(vfr=0.3)
+    assert np.isclose(control_bor.get_Rb(100, 1, 0.075, 2, 101, temperature=5, nb_of_boreholes=2),
+                      bor.get_Rb(100, 1, 0.075, 2, 101, temperature=5, nb_of_boreholes=2))

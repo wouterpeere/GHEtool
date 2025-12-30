@@ -124,7 +124,7 @@ class ConicalPipe(MultipleUTube):
             def r_f_func(length):
                 # Convection heat transfer coefficient [W/(m^2.K)]
                 h_f = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(
-                    flow_rate_data.mfr(fluid_data=fluid_data, **kwargs) / self.number_of_pipes,
+                    flow_rate_data.mfr_borehole(fluid_data=fluid_data, **kwargs) / self.number_of_pipes,
                     calc_r_in(length), fluid_data.mu(**kwargs), fluid_data.rho(**kwargs),
                     fluid_data.k_f(**kwargs), fluid_data.cp(**kwargs), self.epsilon)
 
