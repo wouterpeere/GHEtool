@@ -14,12 +14,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   #271).
 - Added inlet and outlet temperatures to Results class (issue #271).
 - Add set_min_fluid_temperature and set_max_fluid_temperature to the Borefield class (issue #271).
+- Add flow per borefield to flow classes (issue #408).
 - Average baseload fluid temperature (issue #418).
 
 ## Changed
 
 - Depreciate set_min_avg_fluid_temperature and set_max_avg_fluid_temperature (issue #271).
 - Removed shallow borefield warning (issue #271).
+- Remove flow_field from optimise_borefield_configuration (issue #408).
 - Added deprecation warning for baseload heating and cooling temperatures in Result class (issue #418).
 - Bring up-to-date with numpy 2.4.0 (issue #420).
 - Remove Python 3.9 compatibility (issue #420).

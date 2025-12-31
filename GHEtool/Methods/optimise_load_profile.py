@@ -68,7 +68,8 @@ def optimise_load_profile_power(
             and isinstance(borefield.borehole.flow_data,
                            ConstantFlowRate) and borefield._calculation_setup.size_based_on == 'average':
         borefield.Rb = borefield.borehole.get_Rb(borefield.H, borefield.D, borefield.r_b,
-                                                 borefield.ground_data.k_s(borefield.depth, borefield.D))
+                                                 borefield.ground_data.k_s(borefield.depth, borefield.D),
+                                                 nb_of_boreholes=borefield.number_of_boreholes)
 
     # set load
     borefield.load = copy.deepcopy(building_load)
@@ -236,7 +237,8 @@ def optimise_load_profile_energy(
             and isinstance(borefield.borehole.flow_data,
                            ConstantFlowRate) and borefield._calculation_setup.size_based_on == 'average':
         borefield.Rb = borefield.borehole.get_Rb(borefield.H, borefield.D, borefield.r_b,
-                                                 borefield.ground_data.k_s(borefield.depth, borefield.D))
+                                                 borefield.ground_data.k_s(borefield.depth, borefield.D),
+                                                 nb_of_boreholes=borefield.number_of_boreholes)
 
     building_load_copy = copy.deepcopy(building_load)
 
@@ -317,12 +319,14 @@ def optimise_load_profile_energy(
     Rb_min_const = borefield.borehole.get_Rb(borefield.H, borefield.D,
                                              borefield.r_b,
                                              k_s, borefield.depth,
-                                             temperature=borefield.Tf_min)
+                                             temperature=borefield.Tf_min,
+                                             nb_of_boreholes=borefield.number_of_boreholes)
     Rb_max_const = borefield.borehole.get_Rb(borefield.H,
                                              borefield.D,
                                              borefield.r_b,
                                              k_s, borefield.depth,
-                                             temperature=borefield.Tf_max)
+                                             temperature=borefield.Tf_max,
+                                             nb_of_boreholes=borefield.number_of_boreholes)
     variable_efficiency = isinstance(borefield.load, _LoadDataBuilding) and not (
             isinstance(borefield.load.cop, SCOP) and isinstance(borefield.load.cop_dhw, SCOP) and isinstance(
         borefield.load.eer, SEER))
@@ -336,12 +340,14 @@ def optimise_load_profile_energy(
                 Rb_min = borefield.borehole.get_Rb(borefield.H, borefield.D,
                                                    borefield.r_b,
                                                    k_s, borefield.depth,
-                                                   temperature=Tmin)
+                                                   temperature=Tmin,
+                                                   nb_of_boreholes=borefield.number_of_boreholes)
                 Rb_max = borefield.borehole.get_Rb(borefield.H,
                                                    borefield.D,
                                                    borefield.r_b,
                                                    k_s, borefield.depth,
-                                                   temperature=Tmax)
+                                                   temperature=Tmax,
+                                                   nb_of_boreholes=borefield.number_of_boreholes)
 
             Tb = borefield.results.Tb[idx]
 
@@ -572,7 +578,8 @@ def optimise_load_profile_balance(
             and isinstance(borefield.borehole.flow_data,
                            ConstantFlowRate) and borefield._calculation_setup.size_based_on == 'average':
         borefield.Rb = borefield.borehole.get_Rb(borefield.H, borefield.D, borefield.r_b,
-                                                 borefield.ground_data.k_s(borefield.depth, borefield.D))
+                                                 borefield.ground_data.k_s(borefield.depth, borefield.D),
+                                                 nb_of_boreholes=borefield.number_of_boreholes)
 
     # set load
     borefield.load = copy.deepcopy(building_load)

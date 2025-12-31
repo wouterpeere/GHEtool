@@ -73,7 +73,8 @@ class PressureDrop:
         -------
         Pressure drop in kPa
         """
-        return self.pipe_data.pressure_drop(self.fluid_data, self.flow_data, self.borehole_length, **kwargs)
+        return self.pipe_data.pressure_drop(self.fluid_data, self.flow_data, self.borehole_length,
+                                            nb_of_boreholes=self.nb_of_boreholes, **kwargs)
 
     def calculate_pressure_drop_lateral(self, **kwargs) -> float:
         """
@@ -87,14 +88,15 @@ class PressureDrop:
 
         # Darcy fluid factor
         fd = gt.pipes.fluid_friction_factor_circular_pipe(
-            self.flow_data.mfr(fluid_data=self.fluid_data, **kwargs) * self.tichelmann_factor,
+            self.flow_data.mfr_borehole(fluid_data=self.fluid_data, nb_of_boreholes=self.nb_of_boreholes,
+                                        **kwargs) * self.tichelmann_factor,
             self.r_in_lateral,
             self.fluid_data.mu(**kwargs),
             self.fluid_data.rho(**kwargs),
             1e-6)
         A = pi * self.r_in_lateral ** 2
-        V = (self.flow_data.vfr(fluid_data=self.fluid_data,
-                                **kwargs) / 1000) / A * self.tichelmann_factor
+        V = (self.flow_data.vfr_borehole(fluid_data=self.fluid_data, nb_of_boreholes=self.nb_of_boreholes,
+                                         **kwargs) / 1000) / A * self.tichelmann_factor
 
         # distance_later * 2 for back and forth
         return ((fd * self.distance_lateral * 2 / (
@@ -111,19 +113,19 @@ class PressureDrop:
         """
         # Darcy fluid factor
         fd = gt.pipes.fluid_friction_factor_circular_pipe(
-            self.flow_data.mfr(fluid_data=self.fluid_data, **kwargs) * self.nb_of_boreholes / self.series_factor,
+            self.flow_data.mfr_borefield(fluid_data=self.fluid_data, nb_of_boreholes=self.nb_of_boreholes,
+                                         series_factor=self.series_factor, **kwargs),
             self.r_in_main,
             self.fluid_data.mu(**kwargs),
             self.fluid_data.rho(**kwargs),
             1e-6)
         A = pi * self.r_in_main ** 2
-        V = (self.flow_data.vfr(fluid_data=self.fluid_data,
-                                **kwargs) / 1000) / A * self.nb_of_boreholes / self.series_factor
+        V = (self.flow_data.vfr_borefield(fluid_data=self.fluid_data, nb_of_boreholes=self.nb_of_boreholes,
+                                          series_factor=self.series_factor, **kwargs) / 1000) / A
 
         # distance_later * 2 for back and forth
         return ((fd * self.distance_main * 2 / (
-                2 * self.r_in_main) + self.minor_losses_main) * self.fluid_data.rho(
-            **kwargs) * V ** 2 / 2) / 1000
+                2 * self.r_in_main) + self.minor_losses_main) * self.fluid_data.rho(**kwargs) * V ** 2 / 2) / 1000
 
     def calculate_total_pressure_drop(self, **kwargs) -> float:
         """
@@ -156,7 +158,9 @@ class PressureDrop:
         # backup
         flow_backup = copy.copy(self.flow_data)
 
-        flow_rates = np.linspace(0, range * self.flow_data.vfr(fluid_data=self.fluid_data, **kwargs), datapoints)
+        flow_rates = np.linspace(0, range * self.flow_data.vfr_borehole(fluid_data=self.fluid_data,
+                                                                        nb_of_boreholes=self.nb_of_boreholes, **kwargs),
+                                 datapoints)
         pressure_drops_pipe = np.zeros(flow_rates.shape)
         pressure_drops_lateral = np.zeros(flow_rates.shape)
         pressure_drops_main = np.zeros(flow_rates.shape)

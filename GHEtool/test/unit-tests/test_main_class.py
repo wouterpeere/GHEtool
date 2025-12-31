@@ -1303,7 +1303,7 @@ def test_with_titled_borefield():
 def test_Rb_and_Re_with_temperture_dep_data():
     ground_data = GroundFluxTemperature(1.9, 10)
     pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
-    flow_data = ConstantFlowRate(vfr=0.2)
+    flow_data = ConstantFlowRate(vfr=0.2, series_factor=2)
     fluid_data = TemperatureDependentFluidData('MPG', 30)
     load_data = MonthlyBuildingLoadAbsolute(
         np.array([.176, .174, .141, .1, .045, 0, 0, 0, 0.012, 0.065, 0.123, 0.164]) * 8 * 1350,
@@ -1315,6 +1315,28 @@ def test_Rb_and_Re_with_temperture_dep_data():
     borefield = Borefield(ground_data=ground_data, pipe_data=pipe_data, fluid_data=fluid_data, flow_data=flow_data,
                           load=load_data)
 
+    borefield.create_rectangular_borefield(4, 1, 7, 7, 100, 1, 0.075)
+    assert np.isclose(borefield.Re, 709.7715066160362)
+    assert np.isclose(borefield.Rb, 0.15719115050343702)
+
+    borefield.calculate_temperatures()
+    assert np.isclose(borefield.Re, 949.0513333574957)
+    assert np.isclose(borefield.Rb, 0.15660083491337237)
+
+    borefield = Borefield(ground_data=ground_data, pipe_data=pipe_data, fluid_data=fluid_data, flow_data=flow_data,
+                          load=load_data)
+    borefield.borehole.flow_data = ConstantFlowRate(vfr=0.8, flow_per_borehole=False)
+    borefield.create_rectangular_borefield(4, 1, 7, 7, 100, 1, 0.075)
+    assert np.isclose(borefield.Re, 709.7715066160362)
+    assert np.isclose(borefield.Rb, 0.15719115050343702)
+
+    borefield.calculate_temperatures()
+    assert np.isclose(borefield.Re, 949.0513333574957)
+    assert np.isclose(borefield.Rb, 0.15660083491337237)
+
+    borefield = Borefield(ground_data=ground_data, pipe_data=pipe_data, fluid_data=fluid_data, flow_data=flow_data,
+                          load=load_data)
+    borefield.borehole.flow_data = ConstantFlowRate(vfr=0.4, flow_per_borehole=False, series_factor=2)
     borefield.create_rectangular_borefield(4, 1, 7, 7, 100, 1, 0.075)
     assert np.isclose(borefield.Re, 709.7715066160362)
     assert np.isclose(borefield.Rb, 0.15719115050343702)
@@ -1341,6 +1363,41 @@ def test_inlet_outlet_temperatures():
                        ((1.25, 2.25), (-1.25, -0.25)))
     assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), np.array([0, 1])),
                        ((0.625, 2.25), (-0.625, -0.25)))
+    borefield.borehole.flow_data = ConstantFlowRate(mfr=2, series_factor=2)
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(10, 0), (1.25, -1.25))
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), 0),
+                       ((0.625, 1.25), (-0.625, -1.25)))
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(10, np.array([0, 1])),
+                       ((1.25, 2.25), (-1.25, -0.25)))
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), np.array([0, 1])),
+                       ((0.625, 2.25), (-0.625, -0.25)))
+
+    borefield.borehole.flow_data = ConstantFlowRate(mfr=1, flow_per_borehole=False)
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(10, 0), (1.25, -1.25))
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), 0),
+                       ((0.625, 1.25), (-0.625, -1.25)))
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(10, np.array([0, 1])),
+                       ((1.25, 2.25), (-1.25, -0.25)))
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), np.array([0, 1])),
+                       ((0.625, 2.25), (-0.625, -0.25)))
+    borefield.create_rectangular_borefield(4, 1, 6, 6, 100)
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(10, 0), (1.25, -1.25))
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), 0),
+                       ((0.625, 1.25), (-0.625, -1.25)))
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(10, np.array([0, 1])),
+                       ((1.25, 2.25), (-1.25, -0.25)))
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), np.array([0, 1])),
+                       ((0.625, 2.25), (-0.625, -0.25)))
+    borefield.borehole.flow_data = ConstantFlowRate(mfr=1, flow_per_borehole=False, series_factor=2)
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(10, 0), (1.25, -1.25))
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), 0),
+                       ((0.625, 1.25), (-0.625, -1.25)))
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(10, np.array([0, 1])),
+                       ((1.25, 2.25), (-1.25, -0.25)))
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), np.array([0, 1])),
+                       ((0.625, 2.25), (-0.625, -0.25)))
+
+    borefield.create_rectangular_borefield(1, 1, 6, 6, 100)
     borefield.borehole.flow_data = ConstantFlowRate(vfr=1)
     assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), np.array([0, 1])),
                        ((0.52083333, 2.04166667), (-0.52083333, -0.04166667)))  # equal since rho is equal
@@ -1350,6 +1407,13 @@ def test_inlet_outlet_temperatures():
     borefield.create_rectangular_borefield(2, 1, 6, 6, 100)
     assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), np.array([0, 1])),
                        ((0.3203362, 1.64040806), (-0.3203362, 0.35959194)))
+    borefield.borehole.flow_data = ConstantFlowRate(vfr=1, flow_per_borehole=False)
+    borefield.borehole.fluid_data = ConstantFluidData(0.5, 1200, 4000, 0.001)
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), np.array([0, 1])),
+                       ((0.52083333, 2.04166667), (-0.52083333, -0.04166667)))  # equal since rho is equal
+    borefield.borehole.fluid_data = TemperatureDependentFluidData('MEG', 25)
+    assert np.allclose(borefield.calculate_borefield_inlet_outlet_temperature(np.array([5, 10]), np.array([0, 1])),
+                       ((0.64067241, 2.28081611), (-0.64067241, -0.28081611)))
 
 
 def test_size_inlet_outlet_l2():

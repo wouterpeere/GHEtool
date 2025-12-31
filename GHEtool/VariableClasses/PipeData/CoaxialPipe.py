@@ -79,14 +79,14 @@ class CoaxialPipe(_PipeData):
         # Fluid-to-fluid thermal resistance [m.K/W]
         # Inner pipe
         h_f_in = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(
-            flow_rate_data.mfr(fluid_data=fluid_data, **kwargs), self.r_in_in, fluid_data.mu(**kwargs),
+            flow_rate_data.mfr_borehole(fluid_data=fluid_data, **kwargs), self.r_in_in, fluid_data.mu(**kwargs),
             fluid_data.rho(**kwargs),
             fluid_data.k_f(**kwargs), fluid_data.cp(**kwargs), self.epsilon)
         R_f_in = 1.0 / (h_f_in * 2 * np.pi * self.r_in_in)
         # Outer pipe
         h_f_a_in, h_f_a_out = \
             gt.pipes.convective_heat_transfer_coefficient_concentric_annulus(
-                flow_rate_data.mfr(fluid_data=fluid_data, **kwargs), self.r_in_out, self.r_out_in,
+                flow_rate_data.mfr_borehole(fluid_data=fluid_data, **kwargs), self.r_in_out, self.r_out_in,
                 fluid_data.mu(**kwargs),
                 fluid_data.rho(**kwargs), fluid_data.k_f(**kwargs),
                 fluid_data.cp(**kwargs), self.epsilon)
@@ -140,7 +140,7 @@ class CoaxialPipe(_PipeData):
         # Cross-sectional area of the annulus region
         A_c = pi * ((self.r_out_in ** 2) - (self.r_in_out ** 2))
         # Volume flow rate
-        V_dot = flow_rate_data.mfr(fluid_data=fluid_data, **kwargs) / fluid_data.rho(**kwargs)
+        V_dot = flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / 1000
         # Average velocity
         V = V_dot / A_c
         # Reynolds number
@@ -173,11 +173,12 @@ class CoaxialPipe(_PipeData):
         # Cross-sectional area of the annulus region
         A_c = pi * ((self.r_out_in ** 2) - (self.r_in_in ** 2))
         # Average velocity
-        V = (flow_rate_data.vfr(fluid_data=fluid_data, **kwargs) / 1000) / A_c
+        V = (flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / 1000) / A_c
 
         # Darcy-Wiesbach friction factor
         fd = gt.pipes.fluid_friction_factor_circular_pipe(
-            flow_rate_data.mfr(fluid_data=fluid_data, **kwargs), r_h, fluid_data.mu(**kwargs), fluid_data.rho(**kwargs),
+            flow_rate_data.mfr_borehole(fluid_data=fluid_data, **kwargs), r_h, fluid_data.mu(**kwargs),
+            fluid_data.rho(**kwargs),
             self.epsilon)
 
         bend = 0

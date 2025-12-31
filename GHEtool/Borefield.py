@@ -582,7 +582,8 @@ class Borefield(BaseClass):
             Equivalent borehole thermal resistance [mK/W]
         """
         return self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s, self.depth,
-                                    temperature=self.results.min_temperature if self.results.min_temperature is not None else self.Tf_min)
+                                    temperature=self.results.min_temperature if self.results.min_temperature is not None else self.Tf_min,
+                                    nb_of_boreholes=self.number_of_boreholes)
 
     @Rb.setter
     def Rb(self, Rb: float) -> None:
@@ -905,9 +906,9 @@ class Borefield(BaseClass):
             Rm = (gfunct_uniform_T[1] - gfunct_uniform_T[0]) / (2 * pi * k_s)
             Rd = (gfunct_uniform_T[0]) / (2 * pi * k_s)
             # calculate the total borehole length
-            L = (qa * Ra + qm * Rm + qh * Rd + qh * self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s,
-                                                                         self.depth,
-                                                                         temperature=Tfint)) / abs(Tfint - self._Tg())
+            L = (qa * Ra + qm * Rm + qh * Rd + qh *
+                 self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s, self.depth, temperature=Tfint,
+                                      nb_of_boreholes=self.number_of_boreholes)) / abs(Tfint - self._Tg())
             # updating the borehole length values
             H_prev = self.H
             self.H = L / self.number_of_boreholes
@@ -978,7 +979,8 @@ class Borefield(BaseClass):
 
             # calculate the total length
             L = (qh * self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s, self.depth,
-                                           temperature=Tfint) + qh * Rh + qm * Rcm + qpm * Rpm) / abs(
+                                           temperature=Tfint,
+                                           nb_of_boreholes=self.number_of_boreholes) + qh * Rh + qm * Rcm + qpm * Rpm) / abs(
                 Tfint - self._Tg())
 
             # updating the borehole lengths
@@ -1839,19 +1841,21 @@ class Borefield(BaseClass):
                     if limit is not None:
                         if len(temperature) == 0:
                             return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
-                                                        temperature=Tmin)
+                                                        temperature=Tmin, nb_of_boreholes=self.number_of_boreholes)
                         elif limit == (Tmax if Tmax is not None else self.Tf_max):
                             return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
-                                                        temperature=max(temperature))
+                                                        temperature=max(temperature),
+                                                        nb_of_boreholes=self.number_of_boreholes)
                         else:
                             return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
-                                                        temperature=min(temperature))
+                                                        temperature=min(temperature),
+                                                        nb_of_boreholes=self.number_of_boreholes)
                 if len(temperature) == 0:
                     return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
-                                                temperature=Tmin)
+                                                temperature=Tmin, nb_of_boreholes=self.number_of_boreholes)
 
                 return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
-                                            temperature=temperature)
+                                            temperature=temperature, nb_of_boreholes=self.number_of_boreholes)
 
             if not hourly:
                 # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
@@ -2128,7 +2132,7 @@ class Borefield(BaseClass):
         """
         return self.borehole.Re(
             temperature=self.results.min_temperature if self.results.min_temperature is not None else self.Tf_min,
-            borehole_length=self.H)  # for conical pipes
+            borehole_length=self.H, nb_of_boreholes=self.number_of_boreholes)  # for conical pipes
 
     def calculate_quadrant(self) -> int:
         """
@@ -2220,8 +2224,8 @@ class Borefield(BaseClass):
 
         delta_temp = power / (
                 self.borehole.fluid_data.cp(temperature=temperature) / 1000 *
-                self.borehole.flow_data.mfr(fluid_data=self.fluid_data, temperature=temperature) *
-                self.number_of_boreholes)
+                self.borehole.flow_data.mfr_borefield(fluid_data=self.fluid_data, temperature=temperature,
+                                                      nb_of_boreholes=self.number_of_boreholes))
 
         # power < 0 when in extraction
         return temperature + delta_temp / 2, temperature - delta_temp / 2

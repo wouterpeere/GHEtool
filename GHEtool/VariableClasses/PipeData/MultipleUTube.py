@@ -96,7 +96,7 @@ class MultipleUTube(_PipeData):
 
         # Convection heat transfer coefficient [W/(m^2.K)]
         h_f = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(
-            flow_rate_data.mfr(fluid_data=fluid_data, **kwargs) / self.number_of_pipes,
+            flow_rate_data.mfr_borehole(fluid_data=fluid_data, **kwargs) / self.number_of_pipes,
             self.r_in, fluid_data.mu(**kwargs), fluid_data.rho(**kwargs),
             fluid_data.k_f(**kwargs), fluid_data.cp(**kwargs), self.epsilon)
 
@@ -136,8 +136,8 @@ class MultipleUTube(_PipeData):
         -------
         Reynolds number : float
         """
-        u = flow_rate_data.mfr(fluid_data=fluid_data, **kwargs) / self.number_of_pipes / fluid_data.rho(**kwargs) / \
-            (pi * self.r_in ** 2)
+        u = flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / self.number_of_pipes / \
+            (pi * self.r_in ** 2) / 1000
         return fluid_data.rho(**kwargs) * u * self.r_in * 2 / fluid_data.mu(**kwargs)
 
     def pressure_drop(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float,
@@ -165,13 +165,13 @@ class MultipleUTube(_PipeData):
 
         # Darcy fluid factor
         fd = gt.pipes.fluid_friction_factor_circular_pipe(
-            flow_rate_data.mfr(fluid_data=fluid_data, **kwargs) / self.number_of_pipes,
+            flow_rate_data.mfr_borehole(fluid_data=fluid_data, **kwargs) / self.number_of_pipes,
             self.r_in,
             fluid_data.mu(**kwargs),
             fluid_data.rho(**kwargs),
             self.epsilon)
         A = pi * self.r_in ** 2
-        V = (flow_rate_data.vfr(fluid_data=fluid_data, **kwargs) / 1000) / A / self.number_of_pipes
+        V = (flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / 1000) / A / self.number_of_pipes
 
         bend = 0
         if include_bend:

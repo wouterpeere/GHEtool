@@ -74,8 +74,8 @@ def optimise_borefield_configuration(
         types: list = [0, 1, 2, 3, 4],
         size_L3: bool = True,
         optimise: str = 'length',
-        flow_field: ConstantFlowRate = None,
-        dense: bool = False) -> list:
+        dense: bool = False,
+        **kwargs) -> list:
     """
     This function calculates the optimal borefield configuration within a certain area.
     This is done using the hyperparameter optimization framework optuna.
@@ -111,9 +111,6 @@ def optimise_borefield_configuration(
     optimise : str
         'Length' if the borefield should be optimised for the minimum borehole length, 'number' when the
         minimum number of boreholes should be selected.
-    flow_field : ConstantFlowRate
-        Contains the ConstantFlowRate object with the flow rate for the entire borefield. When this attribute is
-        given, the flow rate gets adapted based on the number of boreholes in the system.
     dense : bool
         True if the staggered configuration is dense.
 
@@ -128,6 +125,11 @@ def optimise_borefield_configuration(
     UnsolvableOptimalFieldError
         When it is infeasible to find an optimal borefield size given the parameters
     """
+
+    if 'flow_field' in kwargs:
+        raise AttributeError(
+            'flow_field is no longer an option to this function. Please define your borefield with a flow rate '
+            'per borefield to achieve the same result.')
 
     # set a theoretical maximum value of the total borehole length
     max_value = int(l_1_max / b_min) * int(l_2_max / b_min) * h_max
@@ -165,12 +167,6 @@ def optimise_borefield_configuration(
         # set description
         borefield_temp._borefield_description = {'B_1': b_1, 'B_2': b_2, 'N_1': n_1, 'N_2': n_2, 'type': shape}
 
-        # correct flow rate
-        if flow_field is not None:
-            if flow_field._vfr is not None:
-                borefield_temp.flow_data = ConstantFlowRate(vfr=flow_field.vfr() / borefield_temp.number_of_boreholes)
-            else:
-                borefield_temp.flow_data = ConstantFlowRate(mfr=flow_field.mfr() / borefield_temp.number_of_boreholes)
         try:
             if borefield_temp.number_of_boreholes < nb_min or borefield_temp.number_of_boreholes > nb_max:
                 return max_value * 2, max_value * 2

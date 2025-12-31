@@ -179,7 +179,7 @@ def test_repr_():
                      'spacing [mm]': 50.0,
                      'thickness [mm]': 5.0,
                      'type': 'U'},
-            'flow': {'vfr [l/s]': 0.2}} == borehole.__export__()
+            'flow': {'vfr per borehole [l/s]': 0.2}} == borehole.__export__()
 
     borehole = Borehole()
     assert {'Rb': 0.12} == borehole.__export__()
@@ -231,7 +231,7 @@ def test_saved_data_reynolds():
     resistance1 = borehole.calculate_Rb(100, 1, 0.075, 3, temperature=np.array([0, 1, 2, 5]))
     assert borehole._stored_interp_data == {'D': 1,
                                             'H': 100,
-                                            'flow': "{'vfr [l/s]': 0.3}",
+                                            'flow': "{'vfr per borehole [l/s]': 0.3}",
                                             'fluid': "{'name': 'MPG', 'percentage': 25, 'type': 'mass percentage'}",
                                             'k_s': 3,
                                             'pipe': "{'type': 'U', 'nb_of_tubes': 2, 'thickness [mm]': 5.0, 'diameter "
@@ -242,7 +242,7 @@ def test_saved_data_reynolds():
     assert not np.allclose(resistance1, resistance2)
     assert borehole._stored_interp_data == {'D': 1,
                                             'H': 110,
-                                            'flow': "{'vfr [l/s]': 0.3}",
+                                            'flow': "{'vfr per borehole [l/s]': 0.3}",
                                             'fluid': "{'name': 'MPG', 'percentage': 25, 'type': 'mass percentage'}",
                                             'k_s': 3,
                                             'pipe': "{'type': 'U', 'nb_of_tubes': 2, 'thickness [mm]': 5.0, 'diameter "
@@ -277,3 +277,21 @@ def test_borehole_resistance_conical():
     borehole.flow_data = ConstantFlowRate(vfr=0.3)
     assert np.allclose([0.13332321, 0.13306411, 0.1328632, 0.13232588],
                        borehole.calculate_Rb(120, 1, 0.075, 3, temperature=np.array([0, 1, 2, 5])))
+
+
+def test_flow_rate_borefield():
+    control_bor = Borehole()
+    control_bor.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+    control_bor.fluid_data = TemperatureDependentFluidData('MEG', 25)
+    control_bor.flow_data = ConstantFlowRate(mfr=0.3)
+    bor = Borehole()
+    bor.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+    bor.fluid_data = TemperatureDependentFluidData('MEG', 25)
+    bor.flow_data = ConstantFlowRate(mfr=0.6, flow_per_borehole=False)
+
+    assert np.isclose(control_bor.get_Rb(100, 1, 0.075, 2, 101, temperature=5, nb_of_boreholes=2),
+                      bor.get_Rb(100, 1, 0.075, 2, 101, temperature=5, nb_of_boreholes=2))
+    bor.flow_data = ConstantFlowRate(vfr=0.6, flow_per_borehole=False)
+    control_bor.flow_data = ConstantFlowRate(vfr=0.3)
+    assert np.isclose(control_bor.get_Rb(100, 1, 0.075, 2, 101, temperature=5, nb_of_boreholes=2),
+                      bor.get_Rb(100, 1, 0.075, 2, 101, temperature=5, nb_of_boreholes=2))

@@ -194,13 +194,13 @@ def borefield_case_1_flow_rate():
         f'{len(result)} solutions are found for a constant flow/borehole. The optimal borehole length is: {result[0][0]:.2f}m. '
         f'There are {result[0][2]} boreholes. The configuration is {result[0][1]}.')
 
-    result = optimise_borefield_configuration(borefield, 80, 70, 5, 7, 0.5, 60, 150,
-                                              flow_field=ConstantFlowRate(mfr=10))
-    print(
-        f'{len(result)} solutions are found for a constant flow/borefield. The optimal number of boreholes {result[0][2]}. '
-        f'The total borehole lengths is {result[0][0]:.2f}m. The configuration is {result[0][1]}.')
-    result = optimise_borefield_configuration(borefield, 80, 70, 5, 7, 0.5, 60, 150,
-                                              flow_field=ConstantFlowRate(vfr=10))
+    # result = optimise_borefield_configuration(borefield, 80, 70, 5, 7, 0.5, 60, 150,
+    #                                           flow_field=ConstantFlowRate(mfr=10))
+    # print(
+    #     f'{len(result)} solutions are found for a constant flow/borefield. The optimal number of boreholes {result[0][2]}. '
+    #     f'The total borehole lengths is {result[0][0]:.2f}m. The configuration is {result[0][1]}.')
+    # result = optimise_borefield_configuration(borefield, 80, 70, 5, 7, 0.5, 60, 150,
+    #                                           flow_field=ConstantFlowRate(vfr=10))
 
 
 if __name__ == "__main__":  # pragma: no cover
