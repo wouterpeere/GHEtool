@@ -56,7 +56,7 @@ class Turbocollector(MultipleUTube):
         ----------
         .. [#Niklas] Niklas Hidman, Daniel Almgren, Kim Johansson, Eskil Nilsson, How internal fins enhance the thermohydraulic performance of geothermal pipes: A direct numerical simulation study, International Journal of Heat and Mass Transfer, Volume 256, Part 3, 2026, 128114, ISSN 0017-9310, https://doi.org/10.1016/j.ijheatmasstransfer.2025.128114.
         """
-        m_dot = np.asarray(flow_data.mfr_borehole(**kwargs, fluid_data=fluid_data), dtype=np.float64)
+        m_dot = np.atleast_1d(np.asarray(flow_data.mfr_borehole(**kwargs, fluid_data=fluid_data), dtype=np.float64))
 
         # Reynolds number
         re = 4.0 * m_dot / (fluid_data.mu(**kwargs) * np.pi * self.r_in * 2) / self.number_of_pipes
@@ -66,40 +66,45 @@ class Turbocollector(MultipleUTube):
 
         nu_sl = 3.66
 
-        pr = fluid_data.Pr(**kwargs)
+        pr = np.atleast_1d(np.asarray(fluid_data.Pr(**kwargs)))
 
         # Laminar turbo correlation (Re ≤ 1700)
         laminar = re <= 1700.0
         if np.any(laminar):
-            nu[laminar] = np.sqrt(nu_sl ** 2 + ((5.5e-7) * re[laminar] ** 1.77 * pr ** 0.5) ** 2)
+            nu[laminar] = np.sqrt(nu_sl ** 2 + ((5.5e-7) * re[laminar] ** 1.77 * pr[laminar] ** 0.5) ** 2)
 
         # Transitional turbo correlation (1700 < Re ≤ 4000)
         transitional = (re > 1700.0) & (re <= 4000.0)
         if np.any(transitional):
-            nu[transitional] = np.sqrt(nu_sl ** 2 + (0.86 * (re[transitional] - 1699.0) ** 0.39 * pr ** 0.32) ** 2)
+            nu[transitional] = np.sqrt(
+                nu_sl ** 2 + (0.86 * (re[transitional] - 1699.0) ** 0.39 * pr[transitional] ** 0.32) ** 2)
 
         # Turbulent region (Re > 4000)
         turbulent = re > 4000.0
         if np.any(turbulent):
             # constant enhancement relative to smooth pipe correlation
-            nu_4000 = np.sqrt(nu_sl ** 2 + (0.86 * (4000.0 - 1699.0) ** 0.39 * pr ** 0.32) ** 2)
+            # TODO fix this to work with constant fluid properties and variable flow
+            nu_4000 = np.sqrt(nu_sl ** 2 + (0.86 * (4000.0 - 1699.0) ** 0.39 * pr[turbulent] ** 0.32) ** 2)
 
             if kwargs.get('haaland', False):
                 f = friction_factor_Haaland(4000.0, self.r_in, self.epsilon, **kwargs)
             else:
                 f = friction_factor_darcy_weisbach(4000.0, self.r_in, self.epsilon, **kwargs)
 
-            nu_base_4000 = turbulent_nusselt(fluid_data, 4000, f, **kwargs)
+            nu_base_4000 = turbulent_nusselt(fluid_data, 4000, f, array=turbulent, **kwargs)
             diff = nu_4000 - nu_base_4000
 
             if kwargs.get('haaland', False):
                 f = friction_factor_Haaland(re[turbulent], self.r_in, self.epsilon, **kwargs)
             else:
                 f = friction_factor_darcy_weisbach(re[turbulent], self.r_in, self.epsilon, **kwargs)
-            nu[turbulent] = turbulent_nusselt(fluid_data, re[turbulent], f, **kwargs) + diff
+            nu[turbulent] = turbulent_nusselt(fluid_data, re[turbulent], f, array=turbulent, **kwargs) + diff
 
         # Convective resistance
-        return 1.0 / (nu * np.pi * fluid_data.k_f(**kwargs))
+        R_conv = 1.0 / (nu * np.pi * fluid_data.k_f(**kwargs))
+        if R_conv.size == 1:
+            return R_conv.item()
+        return R_conv
 
     def calculate_resistances(self, fluid_data: _FluidData, flow_rate_data: _FlowData, **kwargs) -> None:
         """

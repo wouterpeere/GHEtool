@@ -243,7 +243,7 @@ class MultipleUTube(_PipeData):
                 f = friction_factor_Haaland(re[turbulent], self.r_in, self.epsilon, **kwargs)
             else:
                 f = friction_factor_darcy_weisbach(re[turbulent], self.r_in, self.epsilon, **kwargs)
-            nu[turbulent] = turbulent_nusselt(fluid_data, re[turbulent], f, **kwargs)
+            nu[turbulent] = turbulent_nusselt(fluid_data, re[turbulent], f, array=turbulent, **kwargs)
 
         # Transitional interpolation
         transitional = (~laminar) & (~turbulent)
@@ -254,8 +254,8 @@ class MultipleUTube(_PipeData):
                 # no array here to get a better fit with pygfunction (see validation file)
                 f = friction_factor_Haaland(high_re, self.r_in, self.epsilon, **kwargs)
             else:
-                f = friction_factor_darcy_weisbach(re, self.r_in, self.epsilon, **kwargs)
-            nu_high = turbulent_nusselt(fluid_data, high_re, f, **kwargs)[transitional]
+                f = friction_factor_darcy_weisbach(re[transitional], self.r_in, self.epsilon, **kwargs)
+            nu_high = turbulent_nusselt(fluid_data, high_re, f, array=transitional, **kwargs)
 
             re_t = re[transitional]
             nu[transitional] = (nu_low + (re_t - low_re) * (nu_high - nu_low) / (high_re - low_re))

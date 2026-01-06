@@ -74,6 +74,56 @@ def test_equivalent_borehole_resistance_U_tubes():
     assert np.isclose(pipe.effective_borehole_thermal_resistance(0.2, 4180), 0.09065168435087693)
 
 
+def test_convective_resistance():
+    # TODO add variable flow rate as well
+    fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
+    flow_data = ConstantFlowRate(mfr=0.2)
+    single = SingleUTube(1, 0.016, 0.02, 2, 0.04)
+    double = DoubleUTube(1, 0.016, 0.02, 2, 0.04)
+
+    assert np.isclose(single.calculate_convective_resistance(flow_data, fluid_data), 0.00869800367167177)
+    assert np.isclose(single.calculate_convective_resistance(flow_data, fluid_data, temperature=5), 0.00869800367167177)
+    assert np.allclose(single.calculate_convective_resistance(flow_data, fluid_data, temperature=np.array([5, 6])),
+                       [0.00869800367167177, 0.00869800367167177])
+    fluid_data = TemperatureDependentFluidData('MPG', 30)
+    assert np.isclose(single.calculate_convective_resistance(flow_data, fluid_data, temperature=5), 0.2011253894370123)
+    assert np.allclose(single.calculate_convective_resistance(flow_data, fluid_data, temperature=np.array([5, 6])),
+                       [0.2011253894370123, 0.20075604])
+    # test array-model
+    individual = []
+    temp_range = np.arange(-5, 20, 1)
+    for temp in temp_range:
+        single.calculate_resistances(fluid_data, flow_data, temperature=temp)
+        individual.append(single.R_f)
+    array = single.calculate_convective_resistance(flow_data, fluid_data, temperature=temp_range)
+    assert np.allclose(array, individual)
+
+    temp_range = np.arange(-5, 20, 1)
+    individual = []
+    for temp in temp_range:
+        double.calculate_resistances(fluid_data, flow_data, temperature=temp)
+        individual.append(double.R_f)
+    array = double.calculate_convective_resistance(flow_data, fluid_data, temperature=temp_range)
+    assert np.allclose(array, individual)
+
+    fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
+    individual = []
+    temp_range = np.arange(-5, 20, 1)
+    for temp in temp_range:
+        single.calculate_resistances(fluid_data, flow_data, temperature=temp)
+        individual.append(single.R_f)
+    array = single.calculate_convective_resistance(flow_data, fluid_data, temperature=temp_range)
+    assert np.allclose(array, individual)
+
+    temp_range = np.arange(-5, 20, 1)
+    individual = []
+    for temp in temp_range:
+        double.calculate_resistances(fluid_data, flow_data, temperature=temp)
+        individual.append(double.R_f)
+    array = double.calculate_convective_resistance(flow_data, fluid_data, temperature=temp_range)
+    assert np.allclose(array, individual)
+
+
 def test_draw_internals(monkeypatch):
     pipe = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05)
     monkeypatch.setattr(plt, 'show', lambda: None)
@@ -307,6 +357,24 @@ def test_turbocollector():
         flow_borehole.mfr_borehole(fluid, temperature=5), fluid.cp(temperature=5)),
         turbo1.pipe_model(2, borehole).effective_borehole_thermal_resistance(
             flow_borefield.mfr_borehole(fluid, temperature=5, nb_of_boreholes=2), fluid.cp(temperature=5)))
+
+    # test array-model
+    individual = []
+    temp_range = np.arange(-5, 20, 1)
+    for temp in temp_range:
+        turbo.calculate_resistances(fluid, flow_borehole, temperature=temp)
+        individual.append(turbo.R_f)
+    array = turbo.calculate_convective_resistance(flow_borehole, fluid, temperature=temp_range)
+    assert np.allclose(array, individual)
+
+    individual = []
+    temp_range = np.arange(-5, 20, 1)
+    turbo.number_of_pipes = 2
+    for temp in temp_range:
+        turbo.calculate_resistances(fluid, flow_borehole, temperature=temp)
+        individual.append(turbo.R_f)
+    array = turbo.calculate_convective_resistance(flow_borehole, fluid, temperature=temp_range)
+    assert np.allclose(array, individual)
 
 
 def test_conical_pipe_get_pipe_model():
