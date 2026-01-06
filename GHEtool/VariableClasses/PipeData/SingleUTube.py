@@ -5,6 +5,7 @@ class SingleUTube(MultipleUTube):
     """
     Class for the single U-Tube borehole.
     """
+
     def __init__(self, k_g: float = None,
                  r_in: float = None,
                  r_out: float = None,
