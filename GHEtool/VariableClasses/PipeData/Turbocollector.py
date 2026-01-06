@@ -3,6 +3,7 @@ import math
 import numpy as np
 import pygfunction as gt
 
+from GHEtool.utils.calculate_friction_factor import *
 from GHEtool.VariableClasses.PipeData.SingleUTube import MultipleUTube
 from GHEtool.VariableClasses.FluidData import _FluidData
 from GHEtool.VariableClasses.FlowData import _FlowData
@@ -35,6 +36,71 @@ class Turbocollector(MultipleUTube):
         """
         super().__init__(k_g=k_g, r_in=r_in, r_out=r_out, k_p=0.4, D_s=D_s, number_of_pipes=number_of_pipes)
 
+    def calculate_convective_resistance(self, flow_data: _FlowData, fluid_data: _FluidData, **kwargs):
+        """
+        This function calculates the convective resistance based on the work of (Hidman, N) [#Niklas]_.
+
+        Parameters
+        ----------
+        flow_data : _FlowData
+            Flow data object
+        fluid_data : _FluidData
+            Fluid data object
+
+        Returns
+        -------
+        float or np.ndarray
+            Convective resistances
+
+        References
+        ----------
+        .. [#Niklas] Niklas Hidman, Daniel Almgren, Kim Johansson, Eskil Nilsson, How internal fins enhance the thermohydraulic performance of geothermal pipes: A direct numerical simulation study, International Journal of Heat and Mass Transfer, Volume 256, Part 3, 2026, 128114, ISSN 0017-9310, https://doi.org/10.1016/j.ijheatmasstransfer.2025.128114.
+        """
+        m_dot = np.asarray(flow_data.mfr_borehole(**kwargs, fluid_data=fluid_data), dtype=np.float64)
+
+        # Reynolds number
+        re = 4.0 * m_dot / (fluid_data.mu(**kwargs) * np.pi * self.r_in * 2) / self.number_of_pipes
+
+        # Allocate Nusselt array
+        nu = np.empty_like(re)
+
+        nu_sl = 3.66
+
+        pr = fluid_data.Pr(**kwargs)
+
+        # Laminar turbo correlation (Re ≤ 1700)
+        laminar = re <= 1700.0
+        if np.any(laminar):
+            nu[laminar] = np.sqrt(nu_sl ** 2 + ((5.5e-7) * re[laminar] ** 1.77 * pr ** 0.5) ** 2)
+
+        # Transitional turbo correlation (1700 < Re ≤ 4000)
+        transitional = (re > 1700.0) & (re <= 4000.0)
+        if np.any(transitional):
+            nu[transitional] = np.sqrt(nu_sl ** 2 + (0.86 * (re[transitional] - 1699.0) ** 0.39 * pr ** 0.32) ** 2)
+
+        # Turbulent region (Re > 4000)
+        turbulent = re > 4000.0
+        if np.any(turbulent):
+            # constant enhancement relative to smooth pipe correlation
+            nu_4000 = np.sqrt(nu_sl ** 2 + (0.86 * (4000.0 - 1699.0) ** 0.39 * pr ** 0.32) ** 2)
+
+            if kwargs.get('haaland', False):
+                f = friction_factor_Haaland(4000.0, self.r_in, self.epsilon, **kwargs)
+            else:
+                f = friction_factor_darcy_weisbach(4000.0, self.r_in, self.epsilon, **kwargs)
+
+            nu_base_4000 = turbulent_nusselt(fluid_data, 4000, f, **kwargs)
+            diff = nu_4000 - nu_base_4000
+
+            if kwargs.get('haaland', False):
+                f = friction_factor_Haaland(re[turbulent], self.r_in, self.epsilon, **kwargs)
+            else:
+                f = friction_factor_darcy_weisbach(re[turbulent], self.r_in, self.epsilon, **kwargs)
+            nu[turbulent] = turbulent_nusselt(fluid_data, re[turbulent], f, **kwargs) + diff
+
+        # Convective resistance
+        return 1.0 / (nu * np.pi * fluid_data.k_f(**kwargs))
+
     def calculate_resistances(self, fluid_data: _FluidData, flow_rate_data: _FlowData, **kwargs) -> None:
         """
         This function calculates the conductive and convective resistances, which are constant.
@@ -52,81 +118,11 @@ class Turbocollector(MultipleUTube):
         None
         """
 
-        def colebrook_white(Re: float, Pr: float) -> float:
-            """
-            Traditional Colebrook-White equation for rough pipes.
-
-            Parameters
-            ----------
-            Re : float
-                Reynolds number [-]
-            Pr : float
-                Prandtl number [-]
-
-            Returns
-            -------
-            Nussel number : float
-                Nusselt number for tradition, rough pipes
-            """
-            # Colebrook-White equation for rough pipes
-            fDarcy = 0.02
-            df = 1.0e99
-            while abs(df / fDarcy) > 1e-6:
-                one_over_sqrt_f = -2.0 * np.log10(1e-4 / 3.7
-                                                  + 2.51 / (Re * np.sqrt(fDarcy)))
-                fDarcy_new = 1.0 / one_over_sqrt_f ** 2
-                df = fDarcy_new - fDarcy
-                fDarcy = fDarcy_new
-            return 0.125 * fDarcy * (Re - 1.0e3) * Pr / \
-                (1.0 + 12.7 * np.sqrt(0.125 * fDarcy) * (Pr ** (2.0 / 3.0) - 1.0))
-
-        def nusselt_turbo(Re: float, Pr: float) -> float:
-            """
-            This function returns the Nusselt number for the turbocollector using the correlation defined by
-            (H. Niklas, 2025).
-
-            Parameters
-            ----------
-            Re : float
-                Reynolds number [-]
-            Pr : float
-                Prandtl number [-]
-
-            Returns
-            -------
-            Nussel number : float
-                Nusselt number for the turbo collector
-            """
-            nu_sl = 3.66
-
-            def nusselt_lam_turbo(Re, Pr):
-                return np.sqrt(nu_sl ** 2 + ((5.5 * 1e-7) * Re ** 1.77 * Pr ** 0.5) ** 2)
-
-            def nusselt_tur_turbo(Re, Pr):
-                return np.sqrt(nu_sl ** 2 + (0.86 * (Re - 1699) ** .39 * Pr ** .32) ** 2)
-
-            if Re <= 1700:
-                return nusselt_lam_turbo(Re, Pr)
-            if 1700 < Re <= 4000:
-                return nusselt_tur_turbo(Re, Pr)
-
-            # add a constant improvement to the traditional Nusselt number for Re > 4000
-            diff = nusselt_turbo(4000, Pr) - colebrook_white(4000, Pr)
-            return colebrook_white(Re, Pr) + diff
-
         # Pipe thermal resistance [m.K/W]
         self.R_p = gt.pipes.conduction_thermal_resistance_circular_pipe(
             self.r_in, self.r_out, self.k_p)
 
-        Re = self.Re(fluid_data, flow_rate_data, **kwargs)
-        Pr = fluid_data.Pr(**kwargs)
-
-        nusselt_number = nusselt_turbo(Re, Pr)
-
-        h_f = fluid_data.k_f(**kwargs) * nusselt_number / (self.r_in * 2)
-
-        # Film thermal resistance [m.K/W]
-        self.R_f = 1.0 / (h_f * 2 * np.pi * self.r_in)
+        self.R_f = self.calculate_convective_resistance(flow_data=flow_rate_data, fluid_data=fluid_data, **kwargs)
 
     def pressure_drop(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float,
                       **kwargs) -> float:

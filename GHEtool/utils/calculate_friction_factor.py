@@ -115,7 +115,6 @@ def friction_factor_darcy_weisbach(Re: Union[float, np.ndarray], r_in: float, ep
             f = f_new
 
         fDarcy[turbulent] = f
-    print(Re, fDarcy)
     return fDarcy
 
 

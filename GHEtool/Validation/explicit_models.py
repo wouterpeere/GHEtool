@@ -61,8 +61,9 @@ def validate_convective_resistance():
     plt.legend()
     plt.show()
 
-    assert np.isclose(np.mean(Rf_pygfunction), 0.0569210708867547)
-    assert np.isclose(np.mean(Rf_explicit_haaland), 0.05706228270598758)
+    assert np.isclose(np.mean(Rf_pygfunction), 0.03824377850561424)
+    assert np.isclose(np.mean(Rf_explicit_haaland), 0.03844466321909467)
+    assert np.allclose(Rf_explicit_darcy_weisbach, Rf_pygfunction)
 
 
 if __name__ == "__main__":
