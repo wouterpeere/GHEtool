@@ -473,6 +473,22 @@ def test_conical_reynolds():
     assert np.isclose(2249.818172820547, pipe.Re(fluid, flow, borehole_length=200))
 
 
+def test_explicit_method_errors():
+    single = SingleUTube(1.5, 0.013, 0.016, 0.04, 0.035)
+    double = DoubleUTube(1.5, 0.013, 0.016, 0.04, 0.035)
+    triple = MultipleUTube(1.5, 0.013, 0.016, 0.04, 0.035, 3)
+    flow_borehole = ConstantFlowRate(vfr=0.25)
+    fluid = TemperatureDependentFluidData('MPG', 25).create_constant(0)
+    borehole = gt.boreholes.Borehole(100, 1, 0.075, 0, 0)
+
+    with pytest.raises(NotImplementedError):
+        single.explicit_model_borehole_resistance(fluid, flow_borehole, 2, borehole, order=3)
+    with pytest.raises(NotImplementedError):
+        double.explicit_model_borehole_resistance(fluid, flow_borehole, 2, borehole, order=2)
+    with pytest.raises(NotImplementedError):
+        triple.explicit_model_borehole_resistance(fluid, flow_borehole, 2, borehole, order=2)
+
+
 def test_repr_():
     single = MultipleUTube(1, 0.018, 0.02, 0.4, 0.05, 1)
     double = MultipleUTube(1, 0.013, 0.016, 0.4, 0.05, 2)

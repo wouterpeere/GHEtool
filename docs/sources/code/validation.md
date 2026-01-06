@@ -65,3 +65,11 @@ The validation for the enhanced and faster sizing method, can be found here.
 
 Validation/enhanced_sizing_method.rst
 ```
+
+The validation for the explicit models for the borehole thermal resistance calculation, can be found here.
+
+```{toctree}
+:maxdepth: 1
+
+Validation/explicit_models.rst
+```

@@ -6,7 +6,7 @@ import pygfunction as gt
 import matplotlib.pyplot as plt
 
 from math import pi
-from GHEtool.utils.calculate_friction_factor import turbulent_nusselt
+from GHEtool.utils.calculate_friction_factor import *
 from GHEtool.VariableClasses.PipeData._PipeData import _PipeData
 from GHEtool.VariableClasses.FluidData import _FluidData
 from GHEtool.VariableClasses.FlowData import _FlowData
@@ -209,7 +209,7 @@ class MultipleUTube(_PipeData):
         pipe.visualize_pipes()
         plt.show()
 
-    def calculate_convective_resistance(self, flow: _FlowData, fluid: _FluidData, **kwargs):
+    def calculate_convective_resistance(self, flow_data: _FlowData, fluid_data: _FluidData, **kwargs):
         """
         This function calculates the convective resistance.
         For the laminar flow, a fixed Nusselt number of 3.66 is used, for the turbulent flow, the Gnielinski
@@ -217,9 +217,9 @@ class MultipleUTube(_PipeData):
 
         Parameters
         ----------
-        flow : _FlowData
+        flow_data : _FlowData
             Flow data object
-        fluid : _FluidData
+        fluid_data : _FluidData
             Fluid data object
 
         Returns
@@ -230,10 +230,10 @@ class MultipleUTube(_PipeData):
         low_re = 2300.0
         high_re = 4000.0
 
-        m_dot = np.asarray(flow.mfr_borehole(**kwargs), dtype=np.float64)
+        m_dot = np.asarray(flow_data.mfr_borehole(**kwargs, fluid_data=fluid_data), dtype=np.float64)
 
         # Reynolds number
-        re = 4.0 * m_dot / (fluid.mu(**kwargs) * np.pi * self.r_in * 2)
+        re = 4.0 * m_dot / (fluid_data.mu(**kwargs) * np.pi * self.r_in * 2) / self.number_of_pipes
 
         # Allocate Nusselt array
         nu = np.empty_like(re)
@@ -244,27 +244,38 @@ class MultipleUTube(_PipeData):
 
         # Turbulent
         turbulent = re > high_re
-        nu[turbulent] = turbulent_nusselt(fluid, re[turbulent], **kwargs)
+        if np.any(nu[turbulent]):
+            if kwargs.get('haaland', False):
+                f = friction_factor_Haaland(re[turbulent], self.r_in, self.epsilon, **kwargs)
+            else:
+                f = friction_factor_darcy_weisbach(re[turbulent], self.r_in, self.epsilon, **kwargs)
+            nu[turbulent] = turbulent_nusselt(fluid_data, re[turbulent], f, **kwargs)
 
         # Transitional interpolation
         transitional = (~laminar) & (~turbulent)
 
         if np.any(transitional):
             nu_low = 3.66
-            nu_high = turbulent_nusselt(fluid, high_re, **kwargs)
+            if kwargs.get('haaland', False):
+                # no array here to get a better fit with pygfunction (see validation file)
+                f = friction_factor_Haaland(high_re, self.r_in, self.epsilon, **kwargs)
+            else:
+                f = friction_factor_darcy_weisbach(re[transitional], self.r_in, self.epsilon, **kwargs)
+            nu_high = turbulent_nusselt(fluid_data, high_re, f, **kwargs)
 
             re_t = re[transitional]
             nu[transitional] = (nu_low + (re_t - low_re) * (nu_high - nu_low) / (high_re - low_re))
 
         # Convective resistance
-        return 1.0 / (nu * np.pi * fluid.k_f(**kwargs))
+        return 1.0 / (nu * np.pi * fluid_data.k_f(**kwargs))
 
-    def explicit_model(self, fluid_data: _FluidData, flow_rate_data: _FlowData, k_s: float,
-                       borehole: gt.boreholes.Borehole, order: int = 1, **kwargs) -> None:
+    def explicit_model_borehole_resistance(self, fluid_data: _FluidData, flow_rate_data: _FlowData, k_s: float,
+                                           borehole: gt.boreholes.Borehole, order: int = 1, **kwargs) -> None:
         """
         This function calculates the conductive and convective resistances, which are constant.
         For the single U case, the formulas from (Claesson & Javed, 2018) are taken [#CJ2018]_.
         For double U probes, this is based on (Claesson & Javed, 2019) [#CJ2019]_.
+
         Parameters
         ----------
         fluid_data : FluidData
@@ -296,10 +307,8 @@ class MultipleUTube(_PipeData):
         R_p_conv = self.calculate_convective_resistance(flow_rate_data, fluid_data, **kwargs)
 
         R_p = R_p_cond + R_p_conv
-        R_a = 0
-        R_b = 0
 
-        sigma = (self.k_g - 2) / (self.k_g + 2)
+        sigma = (self.k_g - k_s) / (self.k_g + k_s)
 
         if self.number_of_pipes == 1:
             # use solution from (Claesson & Javed, 2018)
@@ -364,7 +373,7 @@ class MultipleUTube(_PipeData):
                 R_a = 2 * R_min - 2 * B2_min
                 R_b = R_plus / 2 - B2_plus / 2
             else:
-                raise ValueError(
+                raise NotImplementedError(
                     'Explicit models are only implemented for single U probes are only implemented for orders 0 to 2.')
         else:
             # use solution from (Claesson & Javed, 2019)
@@ -394,9 +403,9 @@ class MultipleUTube(_PipeData):
                 R_a = 2 * R_min - 2 * B1_min
                 R_b = R_plus / 2 - B1_plus / 2
             else:
-                raise ValueError(
+                raise NotImplementedError(
                     'Explicit models are only implemented for double U probes are only implemented for orders 0 an 1.')
-        r_v = borehole.H / (flow_rate_data.mfr_borehole(**kwargs) * fluid_data.cp(**kwargs))
+        r_v = borehole.H / (flow_rate_data.mfr_borehole(**kwargs, fluid_data=fluid_data) * fluid_data.cp(**kwargs))
         n = r_v / (R_b * R_a) ** 0.5
         return R_b * n * np.cosh(n) / np.sinh(n)
 
