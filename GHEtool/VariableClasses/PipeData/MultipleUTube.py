@@ -95,14 +95,8 @@ class MultipleUTube(_PipeData):
         self.R_p = gt.pipes.conduction_thermal_resistance_circular_pipe(
             self.r_in, self.r_out, self.k_p)
 
-        # Convection heat transfer coefficient [W/(m^2.K)]
-        h_f = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(
-            flow_rate_data.mfr_borehole(fluid_data=fluid_data, **kwargs) / self.number_of_pipes,
-            self.r_in, fluid_data.mu(**kwargs), fluid_data.rho(**kwargs),
-            fluid_data.k_f(**kwargs), fluid_data.cp(**kwargs), self.epsilon)
-
         # Film thermal resistance [m.K/W]
-        self.R_f = 1.0 / (h_f * 2 * np.pi * self.r_in)
+        self.R_f = self.calculate_convective_resistance(flow_rate_data, fluid_data, **kwargs)
 
     def pipe_model(self, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
         """
@@ -230,7 +224,7 @@ class MultipleUTube(_PipeData):
         low_re = 2300.0
         high_re = 4000.0
 
-        m_dot = np.asarray(flow_data.mfr_borehole(**kwargs, fluid_data=fluid_data), dtype=np.float64)
+        m_dot = np.atleast_1d(np.asarray(flow_data.mfr_borehole(**kwargs, fluid_data=fluid_data), dtype=np.float64))
 
         # Reynolds number
         re = 4.0 * m_dot / (fluid_data.mu(**kwargs) * np.pi * self.r_in * 2) / self.number_of_pipes
@@ -244,7 +238,7 @@ class MultipleUTube(_PipeData):
 
         # Turbulent
         turbulent = re > high_re
-        if np.any(nu[turbulent]):
+        if np.any(turbulent):
             if kwargs.get('haaland', False):
                 f = friction_factor_Haaland(re[turbulent], self.r_in, self.epsilon, **kwargs)
             else:
@@ -260,14 +254,17 @@ class MultipleUTube(_PipeData):
                 # no array here to get a better fit with pygfunction (see validation file)
                 f = friction_factor_Haaland(high_re, self.r_in, self.epsilon, **kwargs)
             else:
-                f = friction_factor_darcy_weisbach(re[transitional], self.r_in, self.epsilon, **kwargs)
-            nu_high = turbulent_nusselt(fluid_data, high_re, f, **kwargs)
+                f = friction_factor_darcy_weisbach(re, self.r_in, self.epsilon, **kwargs)
+            nu_high = turbulent_nusselt(fluid_data, high_re, f, **kwargs)[transitional]
 
             re_t = re[transitional]
             nu[transitional] = (nu_low + (re_t - low_re) * (nu_high - nu_low) / (high_re - low_re))
 
         # Convective resistance
-        return 1.0 / (nu * np.pi * fluid_data.k_f(**kwargs))
+        R_conv = 1.0 / (nu * np.pi * fluid_data.k_f(**kwargs))
+        if R_conv.size == 1:
+            return R_conv.item()
+        return R_conv
 
     def explicit_model_borehole_resistance(self, fluid_data: _FluidData, flow_rate_data: _FlowData, k_s: float,
                                            borehole: gt.boreholes.Borehole, order: int = 1, **kwargs) -> None:
