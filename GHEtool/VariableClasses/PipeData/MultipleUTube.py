@@ -418,7 +418,7 @@ class MultipleUTube(_PipeData):
                     'Explicit models are only implemented for double U probes are only implemented for orders 0 an 1.')
         r_v = borehole.H / (flow_rate_data.mfr_borehole(**kwargs, fluid_data=fluid_data) * fluid_data.cp(
             **kwargs) / self.number_of_pipes)
-        n = r_v / (2 * R_b * R_a) ** 0.5
+        n = r_v / (self.number_of_pipes * R_b * R_a) ** 0.5
         return R_b * n * np.cosh(n) / np.sinh(n)
 
     def __export__(self):
