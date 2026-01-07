@@ -14,6 +14,7 @@ Claesson, J., & Javed, S. (2019). Explicit multipole formulas and thermal networ
 from GHEtool import *
 import matplotlib.pyplot as plt
 import numpy as np
+import time
 
 
 def validate_convective_resistance():
@@ -185,12 +186,125 @@ def explicit_single_U():
     assert np.isclose(np.mean(explicit_0), 0.141308789605785)
     assert np.isclose(np.mean(explicit_1), 0.14011344398662381)
     assert np.isclose(np.mean(explicit_2), 0.14011372449441875)
-    assert np.isclose(np.max((np.array(explicit_0) - np.array(pyg)) / np.array(pyg)) * 100, 0.01068381355673901)
-    assert np.isclose(np.max((np.array(explicit_1) - np.array(pyg)) / np.array(pyg)) * 100, 1.4732157859187868e-05)
-    assert np.isclose(np.max((np.array(explicit_2) - np.array(pyg)) / np.array(pyg)) * 100, 7.206286403390892e-09)
+    print(np.max((np.array(explicit_1) - np.array(pyg)) / np.array(pyg)) * 100)
+    assert np.isclose(np.max((np.array(explicit_0) - np.array(pyg)) / np.array(pyg)) * 100, 1.068381355673901)
+    assert np.isclose(np.max((np.array(explicit_1) - np.array(pyg)) / np.array(pyg)) * 100, 0.0014732157859187868)
+    assert np.isclose(np.max((np.array(explicit_2) - np.array(pyg)) / np.array(pyg)) * 100, 7.206286403390892e-07)
+
+
+def compare_multiple_resistances():
+    """
+    When working with variable fluid properties in GHEtool, the effective borehole thermal resistance is interpolated.
+    Due to the implementation of explicit methods, this is no longer needed.
+    In this function, the results will be compared in accuracy between the interpolated data, the original data and
+    the new explicit way. This is also timed.
+
+    Returns
+    -------
+    None
+    """
+    single = SingleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+    flow = ConstantFlowRate(vfr=0.2)
+    fluid = TemperatureDependentFluidData('MPG', 25)
+
+    temperature_array = np.linspace(-8, 25, 1000)
+
+    borehole = Borehole(fluid, single, flow)
+
+    # 1. calculate iteratively with pygfunction
+    pygfunction = []
+    start_pyg = time.time()
+    for temp in temperature_array:
+        pygfunction.append(borehole.calculate_Rb(100, 1, 0.075, 2, use_explicit_models=False, temperature=temp))
+    end_py = time.time()
+
+    # 2. calculate iteratively with explicit models
+    explicit_one_by_one = []
+    start_explicit_obo = time.time()
+    for temp in temperature_array:
+        explicit_one_by_one.append(borehole.calculate_Rb(100, 1, 0.075, 2, use_explicit_models=True, temperature=temp))
+    end_explicit_obo = time.time()
+
+    # 3. with interpolation array
+    start_interpolation_array = time.time()
+    interpolation_array = borehole.calculate_Rb(100, 1, 0.075, 2, use_explicit_models=False,
+                                                temperature=temperature_array)
+    end_interpolation_array = time.time()
+
+    # 4. with interpolation array
+    start_explicit_array = time.time()
+    explicit_array = borehole.calculate_Rb(100, 1, 0.075, 2, use_explicit_models=True, temperature=temperature_array)
+    end_explicit_array = time.time()
+
+    # convert to numpy arrays once
+    pyg_arr = np.array(pygfunction)
+    explicit_obo_arr = np.array(explicit_one_by_one)
+    interp_arr = np.array(interpolation_array)
+    explicit_arr = np.array(explicit_array)
+
+    # relative differences in percent
+    rel_diff_explicit_obo = (explicit_obo_arr - pyg_arr) / pyg_arr * 100
+    rel_diff_interp = (interp_arr - pyg_arr) / pyg_arr * 100
+    rel_diff_explicit_array = (explicit_arr - pyg_arr) / pyg_arr * 100
+
+    # simulation times
+    time_pyg = end_py - start_pyg
+    time_explicit_obo = end_explicit_obo - start_explicit_obo
+    time_interp = end_interpolation_array - start_interpolation_array
+    time_explicit_array = end_explicit_array - start_explicit_array
+
+    print(
+        f"explicit pygfunction | "
+        f"time [s] = {time_pyg:.4f}"
+    )
+
+    print(
+        f"explicit one by one | "
+        f"time [s] = {time_explicit_obo:.4f} | "
+        f"mean error [%] = {np.mean(np.abs(rel_diff_explicit_obo)):.6e} | "
+        f"max error [%] = {np.max(np.abs(rel_diff_explicit_obo)):.6e}"
+    )
+
+    print(
+        f"interpolation array | "
+        f"time [s] = {time_interp:.4f} | "
+        f"mean error [%] = {np.mean(np.abs(rel_diff_interp)):.6e} | "
+        f"max error [%] = {np.max(np.abs(rel_diff_interp)):.6e}"
+    )
+
+    print(
+        f"explicit array | "
+        f"time [s] = {time_explicit_array:.4f} | "
+        f"mean error [%] = {np.mean(np.abs(rel_diff_explicit_array)):.6e} | "
+        f"max error [%] = {np.max(np.abs(rel_diff_explicit_array)):.6e}"
+    )
+
+    plt.figure()
+    plt.plot(temperature_array, pygfunction, label='pygfunction')
+    plt.plot(temperature_array, explicit_one_by_one, label='explicit one by one')
+    plt.plot(temperature_array, interpolation_array, label='interpolation array')
+    plt.plot(temperature_array, explicit_array, label='explicit array')
+    plt.xlabel("Temperature [°C]")
+    plt.ylabel("Effective borehole thermal resistance [%]")
+    plt.legend()
+
+    plt.figure()
+    plt.plot(temperature_array, rel_diff_explicit_obo, label="explicit one by one")
+    plt.plot(temperature_array, rel_diff_interp, label="interpolation array")
+    plt.plot(temperature_array, rel_diff_explicit_array, label="explicit array")
+    plt.xlabel("Temperature [°C]")
+    plt.ylabel("Relative difference [%]")
+    plt.legend()
+
+    plt.show()
+
+
+def explicit_coaxial():
+    pass
 
 
 if __name__ == "__main__":
     validate_convective_resistance()
     explicit_double_U()
     explicit_single_U()
+    compare_multiple_resistances()

@@ -1297,7 +1297,7 @@ def test_with_titled_borefield():
     assert np.isclose(borefield.depth, 150 * math.cos(math.pi / 7) + 0.75)
     assert np.isclose(borefield.ground_data.calculate_Tg(borefield.depth, borefield.D), 12.157557845032045)
 
-    assert np.isclose(borefield.size_L3(), 111.5821049845363)
+    assert np.isclose(borefield.size_L3(), 111.52916196039564)
 
 
 def test_Rb_and_Re_with_temperture_dep_data():
@@ -1317,10 +1317,10 @@ def test_Rb_and_Re_with_temperture_dep_data():
 
     borefield.create_rectangular_borefield(4, 1, 7, 7, 100, 1, 0.075)
     assert np.isclose(borefield.Re, 709.7715066160362)
-    assert np.isclose(borefield.Rb, 0.15719115050343702)
+    assert np.isclose(borefield.Rb, 0.15710871734747398)
 
     borefield.calculate_temperatures()
-    assert np.isclose(borefield.Re, 949.0513333574957)
+    assert np.isclose(borefield.Re, 949.1077655988564)
     assert np.isclose(borefield.Rb, 0.15660083491337237)
 
     borefield = Borefield(ground_data=ground_data, pipe_data=pipe_data, fluid_data=fluid_data, flow_data=flow_data,

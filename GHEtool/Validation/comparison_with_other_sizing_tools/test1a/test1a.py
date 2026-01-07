@@ -107,16 +107,15 @@ def test_1a_6h():
         f"The sizing according to L3 has a depth of {depth_L3:.2f}m (using dynamic Rb* of {Rb_L3:.3f}) and {depth_L3s:.2f}m (using constant Rb*)")
     print(
         f"The sizing according to L4 has a depth of {depth_L4:.2f}m (using dynamic Rb* of {Rb_L4:.3f}) and {depth_L4s:.2f}m (using constant Rb*)")
-
-    assert np.isclose(depth_L2, 59.366333293365)
-    assert np.isclose(depth_L3, 59.542511807290666)
-    assert np.isclose(depth_L4, 56.2659729399716)
-    assert np.isclose(depth_L2s, 59.83238790604271)
-    assert np.isclose(depth_L3s, 60.00736579796592)
+    assert np.isclose(depth_L2, 59.3636198458606)
+    assert np.isclose(depth_L3, 59.539512919146844)
+    assert np.isclose(depth_L4, 56.263487685923195)
+    assert np.isclose(depth_L2s, 59.8323879060427)
+    assert np.isclose(depth_L3s, 60.00760582636102)
     assert np.isclose(depth_L4s, 56.732044011668464)
-    assert np.isclose(Rb_L2, 0.12801945735995454)
-    assert np.isclose(Rb_L3, 0.1280244880933401)
-    assert np.isclose(Rb_L4, 0.12793335445966403)
+    assert np.isclose(Rb_L2, 0.12800794794314643)
+    assert np.isclose(Rb_L3, 0.12801297090220962)
+    assert np.isclose(Rb_L4, 0.1279218446632468)
 
 
 def test_1a_1h():
@@ -209,16 +208,15 @@ def test_1a_1h():
         f"The sizing according to L3 has a depth of {depth_L3:.2f}m (using dynamic Rb* of {Rb_L3:.3f}) and {depth_L3s:.2f}m (using constant Rb*)")
     print(
         f"The sizing according to L4 has a depth of {depth_L4:.2f}m (using dynamic Rb* of {Rb_L4:.3f}) and {depth_L4s:.2f}m (using constant Rb*)")
-
-    assert np.isclose(depth_L2, 46.44356767605206)
-    assert np.isclose(depth_L3, 46.73933500137179)
-    assert np.isclose(depth_L4, 56.2659729399716)
+    assert np.isclose(depth_L2, 46.4408463170366)
+    assert np.isclose(depth_L3, 46.73652745970898)
+    assert np.isclose(depth_L4, 56.26298710970397)
     assert np.isclose(depth_L2s, 46.986986159967906)
-    assert np.isclose(depth_L3s, 47.28220733547535)
-    assert np.isclose(depth_L4s, 56.73136082379056)
-    assert np.isclose(Rb_L2, 0.12769092836836982)
-    assert np.isclose(Rb_L3, 0.12769755355584275)
-    assert np.isclose(Rb_L4, 0.12793335445966403)
+    assert np.isclose(depth_L3s, 47.282207335475356)
+    assert np.isclose(depth_L4s, 56.73157055683088)
+    assert np.isclose(Rb_L2, 0.12767939520070198)
+    assert np.isclose(Rb_L3, 0.1276860188802275)
+    assert np.isclose(Rb_L4, 0.12792183113119798)
 
 
 if __name__ == "__main__":  # pragma: no cover

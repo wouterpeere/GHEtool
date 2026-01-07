@@ -87,7 +87,9 @@ def test_optimise_borefield_configuration():
 
 def test_explicit_models(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
-    from GHEtool.Validation.explicit_models import validate_convective_resistance, explicit_single_U, explicit_double_U
+    from GHEtool.Validation.explicit_models import validate_convective_resistance, explicit_single_U, explicit_double_U, \
+        compare_multiple_resistances
     validate_convective_resistance()
     explicit_single_U()
     explicit_double_U()
+    compare_multiple_resistances()
