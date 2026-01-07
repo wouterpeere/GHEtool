@@ -262,6 +262,13 @@ def test_convective_coaxial():
     array = pipe.calculate_convective_resistance(flow, fluid, temperature=temp_range)[1]
     assert np.allclose(array + R_p_out, individual)
 
+    individual = []
+    for temp in temp_range:
+        pipe.calculate_resistances(fluid, flow, temperature=temp, haaland=True)
+        individual.append(pipe.R_fp)
+    array = pipe.calculate_convective_resistance(flow, fluid, temperature=temp_range, haaland=True)[1]
+    assert np.allclose(array + R_p_out, individual)
+
 
 def test_calculate_resistance_coaxial_different_outer_conductivity():
     pipe = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True, k_p_out=0.2)
@@ -456,6 +463,15 @@ def test_turbocollector():
         turbo.calculate_resistances(fluid, flow_borehole, temperature=temp)
         individual.append(turbo.R_f)
     array = turbo.calculate_convective_resistance(flow_borehole, fluid, temperature=temp_range)
+    assert np.allclose(array, individual)
+
+    individual = []
+    temp_range = np.arange(-5, 20, 1)
+    turbo.number_of_pipes = 2
+    for temp in temp_range:
+        turbo.calculate_resistances(fluid, flow_borehole, temperature=temp, haaland=True)
+        individual.append(turbo.R_f)
+    array = turbo.calculate_convective_resistance(flow_borehole, fluid, temperature=temp_range, haaland=True)
     assert np.allclose(array, individual)
 
 
