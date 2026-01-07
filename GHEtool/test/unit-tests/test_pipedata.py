@@ -528,6 +528,28 @@ def test_conical_resistances():
     assert np.isclose(0.17880743362651824, pipe.R_f)
 
 
+def test_conical_convective_resistance():
+    pipe = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
+    pipe.use_approx = True
+    fluid = TemperatureDependentFluidData('MPG', 20)
+
+    flow = ConstantFlowRate(vfr=0.2)
+    temp_range = np.arange(-5, 20, 1)
+    individual = []
+    for temp in temp_range:
+        pipe.calculate_resistances(fluid, flow, temperature=temp, borehole_length=200)
+        individual.append(pipe.R_f)
+    array = pipe.calculate_convective_resistance(flow, fluid, temperature=temp_range, borehole_length=200)
+    assert np.allclose(array, individual)
+    pipe.use_approx = False
+    individual = []
+    for temp in temp_range:
+        pipe.calculate_resistances(fluid, flow, temperature=temp, borehole_length=200)
+        individual.append(pipe.R_f)
+    array = pipe.calculate_convective_resistance(flow, fluid, temperature=temp_range, borehole_length=200)
+    assert np.allclose(array, individual)
+
+
 def test_conical_pressure_drop():
     pipe = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
     fluid = TemperatureDependentFluidData('MPG', 20).create_constant(0)

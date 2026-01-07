@@ -8,7 +8,7 @@ from GHEtool.utils.calculate_friction_factor import *
 from GHEtool.VariableClasses.PipeData.SingleUTube import MultipleUTube
 from GHEtool.VariableClasses.FluidData import _FluidData
 from GHEtool.VariableClasses.FlowData import _FlowData
-from scipy.integrate import quad
+from scipy.integrate import quad_vec
 
 
 class ConicalPipe(MultipleUTube):
@@ -159,7 +159,7 @@ class ConicalPipe(MultipleUTube):
                 return calculate_convective_resistance(flow_data, fluid_data, r_in=calc_r_in(length),
                                                        epsilon=self.epsilon, nb_of_pipes=self.number_of_pipes, **kwargs)
 
-            return quad(r_f_func, 0, borehole_length)[0] / borehole_length
+            return quad_vec(r_f_func, 0, borehole_length)[0] / borehole_length
 
         R_f_top = calculate_convective_resistance(flow_data, fluid_data, r_in=self.r_in_start, epsilon=self.epsilon,
                                                   nb_of_pipes=self.number_of_pipes, **kwargs)
@@ -228,7 +228,7 @@ class ConicalPipe(MultipleUTube):
             def r_p_func(length):
                 return math.log(self.r_out / calc_r_in(length)) / (2 * pi * self.k_p)
 
-            return quad(r_p_func, 0, borehole_length)[0] / borehole_length
+            return quad_vec(r_p_func, 0, borehole_length)[0] / borehole_length
 
         R_p_top = gt.pipes.conduction_thermal_resistance_circular_pipe(self.r_in_start, self.r_out, self.k_p)
         if borehole_length <= self.begin_conical:
@@ -427,7 +427,8 @@ class ConicalPipe(MultipleUTube):
             A = 3.1415 * calc_r_in(borehole_length) ** 2
             V = flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / 1000 / A / self.number_of_pipes
             bend = 0.2
-            return quad(calc_pressure, 0, borehole_length)[0] * 2 + bend * V ** 2 * fluid_data.rho(**kwargs) / 2 / 1000
+            return quad_vec(calc_pressure, 0, borehole_length)[0] * 2 + bend * V ** 2 * fluid_data.rho(
+                **kwargs) / 2 / 1000
 
         if borehole_length <= self.begin_conical:
             # only the first part
