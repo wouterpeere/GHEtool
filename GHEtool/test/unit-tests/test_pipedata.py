@@ -144,6 +144,10 @@ def test_pipe_data():
     assert data.k_p == 0.4
     assert data.D_s == 0.05
     assert data.number_of_pipes == 2
+    assert data.config == 'diagonal'
+
+    with pytest.raises(ValueError):
+        MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2, config='false')
 
 
 def test_pipe_data_equal():
@@ -674,6 +678,66 @@ def test_explicit_method_errors():
         double.explicit_model_borehole_resistance(fluid, flow_borehole, 2, borehole, order=2)
     with pytest.raises(NotImplementedError):
         triple.explicit_model_borehole_resistance(fluid, flow_borehole, 2, borehole, order=2)
+
+
+def test_explicit_models_double_U():
+    fluid = ConstantFluidData(0.5, 997, 4180, 1e-3)
+    flow = ConstantFlowRate(vfr=1.5 / 3.6)
+    pipe = DoubleUTube(1.5, 0.013, 0.016, 0.04, 0.02263, config='adjacent')
+
+    borehole = gt.boreholes.Borehole(200, 1, 0.0575, 0, 0)
+    assert np.isclose(0.11158, pipe.explicit_model_borehole_resistance(fluid, flow, 3, borehole, 0, R_p=0.05))
+    assert np.isclose(0.10619291343027408,
+                      pipe.explicit_model_borehole_resistance(fluid, flow, 3, borehole, 1, R_p=0.05))
+
+    pipe = DoubleUTube(1.5, 0.013, 0.016, 0.04, 0.02811, config='adjacent')
+    borehole = gt.boreholes.Borehole(200, 1, 0.0575, 0, 0)
+    assert np.isclose(0.09129134992731155,
+                      pipe.explicit_model_borehole_resistance(fluid, flow, 3, borehole, 0, R_p=0.05))
+    assert np.isclose(0.08651348537507986,
+                      pipe.explicit_model_borehole_resistance(fluid, flow, 3, borehole, 1, R_p=0.05))
+
+    pipe = DoubleUTube(1.5, 0.013, 0.016, 0.04, 0.04150, config='adjacent')
+    borehole = gt.boreholes.Borehole(200, 1, 0.0575, 0, 0)
+    assert np.isclose(0.05621610475625225,
+                      pipe.explicit_model_borehole_resistance(fluid, flow, 3, borehole, 0, R_p=0.05))
+    assert np.isclose(0.05277181048770085,
+                      pipe.explicit_model_borehole_resistance(fluid, flow, 3, borehole, 1, R_p=0.05))
+
+    fluid = ConstantFluidData(0.5, 997, 4180, 1e-3)
+    flow = ConstantFlowRate(vfr=1.5 / 3.6)
+    pipe = DoubleUTube(1.5, 0.013, 0.016, 0.04, 0.02263, config='diagonal')
+
+    borehole = gt.boreholes.Borehole(200, 1, 0.0575, 0, 0)
+    assert np.isclose(0.13035143887026063,
+                      pipe.explicit_model_borehole_resistance(fluid, flow, 3, borehole, 0, R_p=0.05))
+    assert np.isclose(0.12352580854979858,
+                      pipe.explicit_model_borehole_resistance(fluid, flow, 3, borehole, 1, R_p=0.05))
+
+    pipe = DoubleUTube(1.5, 0.013, 0.016, 0.04, 0.02811, config='diagonal')
+    borehole = gt.boreholes.Borehole(200, 1, 0.0575, 0, 0)
+    assert np.isclose(0.10393757819451128,
+                      pipe.explicit_model_borehole_resistance(fluid, flow, 3, borehole, 0, R_p=0.05))
+    assert np.isclose(0.09823530789411018,
+                      pipe.explicit_model_borehole_resistance(fluid, flow, 3, borehole, 1, R_p=0.05))
+
+    pipe = DoubleUTube(1.5, 0.013, 0.016, 0.04, 0.04150, config='diagonal')
+    borehole = gt.boreholes.Borehole(200, 1, 0.0575, 0, 0)
+    assert np.isclose(0.06347912807774306,
+                      pipe.explicit_model_borehole_resistance(fluid, flow, 3, borehole, 0, R_p=0.05))
+    assert np.isclose(0.0595478420593229,
+                      pipe.explicit_model_borehole_resistance(fluid, flow, 3, borehole, 1, R_p=0.05))
+
+
+def test_audit():
+    fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
+    flow_data = ConstantFlowRate(mfr=0.2)
+    pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
+    from GHEtool import Borehole
+
+    borehole = Borehole(fluid_data, pipe_data, flow_data)
+    print(borehole.get_Rb(103.761, 4, 0.075, 3))
+    print(borehole.get_Rb(103.761, 4, 0.075, 3, use_explicit_models=True))
 
 
 def test_repr_():

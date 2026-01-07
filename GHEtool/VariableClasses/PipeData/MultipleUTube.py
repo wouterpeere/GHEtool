@@ -26,7 +26,8 @@ class MultipleUTube(_PipeData):
                  k_p: float = None,
                  D_s: float = None,
                  number_of_pipes: int = 1,
-                 epsilon: float = 1e-6):
+                 epsilon: float = 1e-6,
+                 config: str = 'diagonal'):
         """
 
         Parameters
@@ -45,14 +46,18 @@ class MultipleUTube(_PipeData):
             Number of pipes [#] (single U-tube: 1, double U-tube:2)
         epsilon : float
             Pipe roughness [m]
+        config : str
+            Either 'diagonal' or 'adjacent'
         """
-
+        if config not in ('diagonal', 'adjacent'):
+            raise ValueError('Invalid value for config. Only diagonal and adjacent is allowed.')
         super().__init__(k_g, k_p, epsilon)
 
         self.r_in = r_in  # inner pipe radius m
         self.r_out = r_out  # outer pipe radius m
         self.D_s = D_s  # distance of pipe until center m
         self.number_of_pipes = number_of_pipes  # number of pipes #
+        self.config = config
         self.pos = []
         self.R_p = 0  # pipe thermal resistance mK/W
         self.R_f = 0  # film (i.e. fluid) thermal resistance mK/W
@@ -71,9 +76,16 @@ class MultipleUTube(_PipeData):
         """
         dt: float = pi / float(self.number_of_pipes)
         pos: list = [(0., 0.)] * 2 * self.number_of_pipes
+        if self.config == 'diagonal':
+            for i in range(self.number_of_pipes):
+                pos[i] = (self.D_s * np.cos(2.0 * i * dt + pi), self.D_s * np.sin(2.0 * i * dt + pi))
+                pos[i + self.number_of_pipes] = (
+                    self.D_s * np.cos(2.0 * i * dt + pi + dt), self.D_s * np.sin(2.0 * i * dt + pi + dt))
+            return pos
+
         for i in range(self.number_of_pipes):
-            pos[i] = (self.D_s * np.cos(2.0 * i * dt + pi), self.D_s * np.sin(2.0 * i * dt + pi))
-            pos[i + self.number_of_pipes] = (
+            pos[2 * i] = (self.D_s * np.cos(2.0 * i * dt + pi), self.D_s * np.sin(2.0 * i * dt + pi))
+            pos[2 * i + 1] = (
                 self.D_s * np.cos(2.0 * i * dt + pi + dt), self.D_s * np.sin(2.0 * i * dt + pi + dt))
         return pos
 
@@ -244,7 +256,8 @@ class MultipleUTube(_PipeData):
         return gt.pipes.conduction_thermal_resistance_circular_pipe(self.r_in, self.r_out, self.k_p)
 
     def explicit_model_borehole_resistance(self, fluid_data: _FluidData, flow_rate_data: _FlowData, k_s: float,
-                                           borehole: gt.boreholes.Borehole, order: int = 1, **kwargs) -> None:
+                                           borehole: gt.boreholes.Borehole, order: int = 1, R_p: float = None,
+                                           **kwargs) -> float:
         """
         This function calculates the conductive and convective resistances, which are constant.
         For the single U case, the formulas from (Claesson & Javed, 2018) are taken [#CJ2018]_.
@@ -263,10 +276,13 @@ class MultipleUTube(_PipeData):
         order : int
             Order of the model. For the single U, a zeroth, first and second order explicit model is implemented,
             for the double U, only a zeroth and first order.
+        R_p : float
+            Pipe thermal resistance [mK/W], when this is not given, it is calculated explicitly.
 
         Returns
         -------
-        None
+        float
+            Effective borehole thermal resistance [mK/W]
 
         References
         ----------
@@ -277,10 +293,11 @@ class MultipleUTube(_PipeData):
             raise NotImplementedError('Explicit models are only implemented for the single and double probes.')
 
         # Pipe resistance [m.K/W]
-        R_p_cond = self.calculate_conductive_resistance(**kwargs)
-        R_p_conv = self.calculate_convective_resistance(flow_rate_data, fluid_data, **kwargs)
+        if R_p is None:
+            R_p_cond = self.calculate_conductive_resistance(**kwargs)
+            R_p_conv = self.calculate_convective_resistance(flow_rate_data, fluid_data, **kwargs)
 
-        R_p = R_p_cond + R_p_conv
+            R_p = R_p_cond + R_p_conv
 
         sigma = (self.k_g - k_s) / (self.k_g + k_s)
 
@@ -351,11 +368,18 @@ class MultipleUTube(_PipeData):
                     'Explicit models are only implemented for single U probes are only implemented for orders 0 to 2.')
         else:
             # use solution from (Claesson & Javed, 2019)
-            R_min = R_p + 1 / (2 * np.pi * self.k_g) * (np.log(self.D_s / (self.r_out)) + sigma * np.log(
-                (borehole.r_b ** 4 + self.D_s ** 4) / (borehole.r_b ** 4 - self.D_s ** 4)))
             R_plus = R_p / 2 + 1 / (4 * np.pi * self.k_g) * (
                     np.log(borehole.r_b ** 4 / (4 * self.r_out * self.D_s ** 3)) + sigma * np.log(
                 borehole.r_b ** 8 / (borehole.r_b ** 8 - self.D_s ** 8)))
+
+            if self.config == 'diagonal':
+                # FOR DIAGONAL
+                R_min = R_p + 1 / (2 * np.pi * self.k_g) * (np.log(self.D_s / (self.r_out)) + sigma * np.log(
+                    (borehole.r_b ** 4 + self.D_s ** 4) / (borehole.r_b ** 4 - self.D_s ** 4)))
+            else:
+                # FOR ADJACENT
+                R_min = R_p + 1 / (2 * np.pi * self.k_g) * (np.log(2 * self.D_s / (self.r_out)) + sigma * np.log(
+                    (borehole.r_b ** 2 + self.D_s ** 2) / (borehole.r_b ** 2 - self.D_s ** 2)))
 
             if order == 0:
                 # calculate internal resistance and local borehole resistance
@@ -368,20 +392,33 @@ class MultipleUTube(_PipeData):
                 pb = borehole.r_b ** 2 / ((borehole.r_b ** 8 - self.D_s ** 8) ** (1 / 4))
                 b1 = (1 - beta) / (1 + beta)
 
-                B1_min = 1 / (2 * np.pi * self.k_g) * (b1 * ppc * (1 + 8 * sigma * pc ** 2 * pb ** 2) ** 2) / (
-                        1 - b1 * ppc * (3 - 32 * sigma * (pc ** 2 * pb ** 6 + pc ** 6 * pb ** 2)))
                 B1_plus = 1 / (4 * np.pi * self.k_g) * (b1 * ppc * (3 - 8 * sigma * pc ** 4) ** 2) / (
                         1 + b1 * ppc * (5 + 64 * sigma * pc ** 4 * pb ** 4))
 
-                # calculate internal resistance and local borehole resistance
-                R_a = 2 * R_min - 2 * B1_min
+                if self.config == 'diagonal':
+                    # FOR DIAGONAL
+                    B1_min = 1 / (2 * np.pi * self.k_g) * (b1 * ppc * (1 + 8 * sigma * pc ** 2 * pb ** 2) ** 2) / (
+                            1 - b1 * ppc * (3 - 32 * sigma * (pc ** 2 * pb ** 6 + pc ** 6 * pb ** 2)))
+                else:
+                    # FOR ADJACENT
+                    # calculate internal resistance and local borehole resistance
+                    M11 = 1 + 16 * b1 * sigma * ppc * (3 * pc ** 3 * pb ** 5 + pc ** 7 * pb)
+                    M21 = b1 * ppc
+                    M12 = -M21
+                    V1 = 1 - 8 * sigma * pc ** 3 * pb
+                    M22 = -1 - 16 * b1 * sigma * ppc * (pc * pb ** 7 + 3 * pc ** 5 * pb ** 3)
+                    V2 = 3 + 8 * sigma * pc * pb ** 3
+                    B1_min = -1 / (2 * pi * self.k_g) * b1 * ppc / 2 * (
+                            V2 ** 2 * M11 - 2 * V1 * V2 * M21 - V1 ** 2 * M22) / (M11 * M22 + M21 ** 2)
+
+                R_a = 2 * R_min - 2 * B1_min  # See paper
                 R_b = R_plus / 2 - B1_plus / 2
             else:
                 raise NotImplementedError(
                     'Explicit models are only implemented for double U probes are only implemented for orders 0 an 1.')
         r_v = borehole.H / (flow_rate_data.mfr_borehole(**kwargs, fluid_data=fluid_data) * fluid_data.cp(
             **kwargs) / self.number_of_pipes)
-        n = r_v / (R_b * R_a) ** 0.5
+        n = r_v / (2 * R_b * R_a) ** 0.5
         return R_b * n * np.cosh(n) / np.sinh(n)
 
     def __export__(self):

@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Average baseload fluid temperature (issue #418).
 - Explicit formulations of the multipole method (issue #425).
 - Convective resistance calculation with array inputs (issue #425).
+- Option to change pipe configuration in MultipleUTube (either diagonal (default) or adjacent) (issue #425).
 
 ## Changed
 

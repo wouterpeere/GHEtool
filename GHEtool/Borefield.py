@@ -583,7 +583,8 @@ class Borefield(BaseClass):
         """
         return self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s, self.depth,
                                     temperature=self.results.min_temperature if self.results.min_temperature is not None else self.Tf_min,
-                                    nb_of_boreholes=self.number_of_boreholes)
+                                    nb_of_boreholes=self.number_of_boreholes,
+                                    use_explicit_models=self._calculation_setup.use_explicit_multipole)
 
     @Rb.setter
     def Rb(self, Rb: float) -> None:
@@ -908,7 +909,9 @@ class Borefield(BaseClass):
             # calculate the total borehole length
             L = (qa * Ra + qm * Rm + qh * Rd + qh *
                  self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s, self.depth, temperature=Tfint,
-                                      nb_of_boreholes=self.number_of_boreholes)) / abs(Tfint - self._Tg())
+                                      nb_of_boreholes=self.number_of_boreholes,
+                                      use_explicit_models=self._calculation_setup.use_explicit_multipole)) / abs(
+                Tfint - self._Tg())
             # updating the borehole length values
             H_prev = self.H
             self.H = L / self.number_of_boreholes
@@ -980,7 +983,8 @@ class Borefield(BaseClass):
             # calculate the total length
             L = (qh * self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s, self.depth,
                                            temperature=Tfint,
-                                           nb_of_boreholes=self.number_of_boreholes) + qh * Rh + qm * Rcm + qpm * Rpm) / abs(
+                                           nb_of_boreholes=self.number_of_boreholes,
+                                           use_explicit_models=self._calculation_setup.use_explicit_multipole) + qh * Rh + qm * Rcm + qpm * Rpm) / abs(
                 Tfint - self._Tg())
 
             # updating the borehole lengths
@@ -1835,27 +1839,31 @@ class Borefield(BaseClass):
             results = None
 
             def get_rb(temperature, limit=None):
-
                 if self.USE_SPEED_UP_IN_SIZING and sizing and not variable_efficiency:
                     # use only extreme temperatures when sizing
                     if limit is not None:
                         if len(temperature) == 0:
                             return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
-                                                        temperature=Tmin, nb_of_boreholes=self.number_of_boreholes)
+                                                        temperature=Tmin, nb_of_boreholes=self.number_of_boreholes,
+                                                        use_explicit_models=self._calculation_setup.use_explicit_multipole)
                         elif limit == (Tmax if Tmax is not None else self.Tf_max):
                             return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
                                                         temperature=max(temperature),
-                                                        nb_of_boreholes=self.number_of_boreholes)
+                                                        nb_of_boreholes=self.number_of_boreholes,
+                                                        use_explicit_models=self._calculation_setup.use_explicit_multipole)
                         else:
                             return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
                                                         temperature=min(temperature),
-                                                        nb_of_boreholes=self.number_of_boreholes)
+                                                        nb_of_boreholes=self.number_of_boreholes,
+                                                        use_explicit_models=self._calculation_setup.use_explicit_multipole)
                 if len(temperature) == 0:
                     return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
-                                                temperature=Tmin, nb_of_boreholes=self.number_of_boreholes)
+                                                temperature=Tmin, nb_of_boreholes=self.number_of_boreholes,
+                                                use_explicit_models=self._calculation_setup.use_explicit_multipole)
 
                 return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
-                                            temperature=temperature, nb_of_boreholes=self.number_of_boreholes)
+                                            temperature=temperature, nb_of_boreholes=self.number_of_boreholes,
+                                            use_explicit_models=self._calculation_setup.use_explicit_multipole)
 
             if not hourly:
                 # self.g-function is a function that uses the precalculated data to interpolate the correct values of the

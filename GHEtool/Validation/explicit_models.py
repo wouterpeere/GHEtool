@@ -66,5 +66,37 @@ def validate_convective_resistance():
     assert np.allclose(Rf_explicit_darcy_weisbach, Rf_pygfunction)
 
 
+def explicit_double_U():
+    fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
+    pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
+
+    pygfunction = []
+    explicit = []
+    flow_range = np.linspace(0.1, 3, 41)
+
+    for flow in flow_range:
+        borehole = Borehole(fluid_data, pipe_data, ConstantFlowRate(mfr=flow))
+        pygfunction.append(borehole.calculate_Rb(100, 4, 0.075, 3))
+        explicit.append(borehole.calculate_Rb(100, 4, 0.075, 3, use_explicit_models=True))
+        print(borehole.Re(), explicit[-1], pygfunction[-1],
+              pipe_data.calculate_conductive_resistance(),
+              pipe_data.calculate_convective_resistance(ConstantFlowRate(mfr=flow), fluid_data))
+    plt.figure()
+    plt.plot(flow_range, pygfunction, label="pygfunction")
+    plt.plot(flow_range, explicit, label="explicit (first order)")
+    plt.legend()
+    plt.xlabel('Mass flow rate per borehole [kg/s]')
+    plt.ylabel('Borehole effective thermal resistance [mK/W]')
+
+    plt.figure()
+    plt.plot(flow_range, (np.array(explicit) - np.array(pygfunction)) / np.array(pygfunction) * 100,
+             label="explicit (first order)")
+    plt.legend()
+    plt.xlabel('Mass flow rate per borehole [kg/s]')
+    plt.ylabel('Borehole effective thermal resistance [%]')
+    plt.show()
+
+
 if __name__ == "__main__":
-    validate_convective_resistance()
+    # validate_convective_resistance()
+    explicit_double_U()

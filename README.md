@@ -259,6 +259,8 @@ atol and rtol is chosen when sizing. The options are:
   configurations configured withing GHEtool itself.)
 * _approximate_req_depth_: Sets the minimum and maximum fluid temperatures constant during sizing. Can cause significant
   speed improvements with a slight overestimation of the required depth.
+* _use_explicit_multipole_: True if the explict multipole method should be used, false if the method from pygfunction
+  should be used.
 
 ### Simple example
 
