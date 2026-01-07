@@ -6,6 +6,7 @@ import pygfunction as gt
 import matplotlib.pyplot as plt
 
 from math import pi
+
 from GHEtool.utils.calculate_friction_factor import *
 from GHEtool.VariableClasses.PipeData._PipeData import _PipeData
 from GHEtool.VariableClasses.FluidData import _FluidData
@@ -231,6 +232,17 @@ class MultipleUTube(_PipeData):
         return calculate_convective_resistance(
             flow_data, fluid_data, r_in=self.r_in, nb_of_pipes=self.number_of_pipes, epsilon=self.epsilon, **kwargs)
 
+    def calculate_conductive_resistance(self, **kwargs) -> float:
+        """
+        This function calculates the pipe thermal conductive resistance.
+
+        Returns
+        -------
+        float
+            Conductive resistance [mK/W]
+        """
+        return gt.pipes.conduction_thermal_resistance_circular_pipe(self.r_in, self.r_out, self.k_p)
+
     def explicit_model_borehole_resistance(self, fluid_data: _FluidData, flow_rate_data: _FlowData, k_s: float,
                                            borehole: gt.boreholes.Borehole, order: int = 1, **kwargs) -> None:
         """
@@ -265,7 +277,7 @@ class MultipleUTube(_PipeData):
             raise NotImplementedError('Explicit models are only implemented for the single and double probes.')
 
         # Pipe resistance [m.K/W]
-        R_p_cond = gt.pipes.conduction_thermal_resistance_circular_pipe(self.r_in, self.r_out, self.k_p)
+        R_p_cond = self.calculate_conductive_resistance(**kwargs)
         R_p_conv = self.calculate_convective_resistance(flow_rate_data, fluid_data, **kwargs)
 
         R_p = R_p_cond + R_p_conv

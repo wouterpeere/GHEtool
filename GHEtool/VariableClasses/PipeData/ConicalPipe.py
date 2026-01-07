@@ -4,6 +4,7 @@ import math
 
 from math import pi
 
+from GHEtool.utils.calculate_friction_factor import *
 from GHEtool.VariableClasses.PipeData.SingleUTube import MultipleUTube
 from GHEtool.VariableClasses.FluidData import _FluidData
 from GHEtool.VariableClasses.FlowData import _FlowData
@@ -59,6 +60,33 @@ class ConicalPipe(MultipleUTube):
 
         self.use_approx: bool = False
 
+    def _get_pipe_radius(self, y: float) -> tuple:
+        """
+        This function returns average pipe radius at position y as well as the pipe radius at the end.
+
+        Parameters
+        ----------
+        y : float
+            Depth at which the pipe radii should be given.
+
+        Returns
+        -------
+        Pipe radius: float
+            Average pipe radius at position y as well as the pipe radius at the end.
+
+        Raises
+        ------
+        ValueError
+            When y is not in the conical range.
+        """
+        if y < self.begin_conical or y > self.end_conical:
+            raise ValueError(
+                f'The value of {y} is not within the conical range of {self.begin_conical}m and {self.end_conical}m.')
+        r_end = (self.r_in_stop - self.r_in_start) / (self.end_conical - self.begin_conical) * (
+                y - self.begin_conical) + self.r_in_start
+        r_avg = (r_end + self.r_in_start) / 2
+        return r_avg, r_end
+
     def _get_pipe_model(self, y: float) -> tuple:
         """
         This function returns average pipe model at position y as well as the pipe model at the end.
@@ -78,34 +106,113 @@ class ConicalPipe(MultipleUTube):
         ValueError
             When y is not in the conical range.
         """
-        if y < self.begin_conical or y > self.end_conical:
-            raise ValueError(
-                f'The value of {y} is not within the conical range of {self.begin_conical}m and {self.end_conical}m.')
-        r_end = (self.r_in_stop - self.r_in_start) / (self.end_conical - self.begin_conical) * (
-                y - self.begin_conical) + self.r_in_start
-        r_avg = (r_end + self.r_in_start) / 2
+        r_avg, r_end = self._get_pipe_radius(y)
         return MultipleUTube(self.k_g, r_avg, self.r_out, self.k_p, self.D_s, self.number_of_pipes, self.epsilon), \
             MultipleUTube(self.k_g, r_end, self.r_out, self.k_p, self.D_s, self.number_of_pipes, self.epsilon)
 
-    def calculate_resistances(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float,
-                              **kwargs) -> None:
+    def calculate_convective_resistance(self, flow_data: _FlowData, fluid_data: _FluidData, borehole_length: float,
+                                        **kwargs):
         """
-        This function calculates the conductive and convective resistances, which are constant.
+        This function calculates the convective resistance for a conical pipe based on the work of (Peere et al., 2025)
+        [#Peere2025]_.
+        For the laminar flow, a fixed Nusselt number of 3.66 is used, for the turbulent flow, the Gnielinski
+        equation is used. Linear interpolation is used over the range 2300 < Re < 4000 for the evaluation of the Nusselt number,
+        as proposed by Gnielinski (2013) [#Gnielinksi2013]_.
 
         Parameters
         ----------
-        fluid_data : FluidData
-            Fluid data
-        flow_rate_data : FlowData
-            Flow rate data
+        flow_data : _FlowData
+            Flow data object
+        fluid_data : _FluidData
+            Fluid data object
         borehole_length : float
             Borehole length [m]
 
         Returns
         -------
-        None
-        """
+        float or np.ndarray
+            Convective resistances
 
+        References
+        ----------
+        .. [#Gnielinksi2013] Gnielinski, V. (2013). On heat transfer in tubes.
+            International Journal of Heat and Mass Transfer, 63, 134–140.
+            https://doi.org/10.1016/j.ijheatmasstransfer.2013.04.015
+        .. [#Peere2025] Peere, W., Steinbock, G., Niklaus, E. (2025). Thermo-hydraulische Modellenentwicklung einer
+            konischen Erdwärmesonde und ein Praxisbeispiel in Sachsen. In Proceedings of Geothermie Symposium. Salzburg
+            (Austria), 5-7 November 2025.
+        """
+        if not self.use_approx:
+            # rate increase in wall thickness of conical part
+            a = (self.r_in_start - self.r_in_stop) / (self.end_conical - self.begin_conical)
+
+            def calc_r_in(length):
+                if length <= self.begin_conical:
+                    return self.r_in_start
+                elif self.begin_conical < length <= self.end_conical:
+                    return self.r_in_start - a * (length - self.begin_conical)
+                else:
+                    return self.r_in_stop
+
+            def r_f_func(length):
+                # Film thermal resistance [m.K/W]
+                return calculate_convective_resistance(flow_data, fluid_data, r_in=calc_r_in(length),
+                                                       epsilon=self.epsilon, nb_of_pipes=self.number_of_pipes, **kwargs)
+
+            return quad(r_f_func, 0, borehole_length)[0] / borehole_length
+
+        R_f_top = calculate_convective_resistance(flow_data, fluid_data, r_in=self.r_in_start, epsilon=self.epsilon,
+                                                  nb_of_pipes=self.number_of_pipes, **kwargs)
+
+        if borehole_length <= self.begin_conical:
+            return R_f_top
+
+        first_fraction = self.begin_conical / borehole_length
+
+        if borehole_length <= self.end_conical:
+            # work with the cross-section at the borehole length
+            R_f_conical_end = calculate_convective_resistance(
+                flow_data, fluid_data, r_in=self._get_pipe_radius(borehole_length)[1], epsilon=self.epsilon,
+                nb_of_pipes=self.number_of_pipes, **kwargs)
+            # average the R_f values for the conical part
+            conical_R_f_avg = (R_f_conical_end + R_f_top) / 2
+
+            # weigh the R_f for both the first part and the conical part based on the ratio of their lengths
+            return R_f_top * first_fraction + conical_R_f_avg * (1 - first_fraction)
+
+        conical_fraction = (self.end_conical - self.begin_conical) / borehole_length
+
+        # work with the cross-section at the borehole length
+        R_f_conical_end = calculate_convective_resistance(
+            flow_data, fluid_data, r_in=self._get_pipe_radius(self.end_conical)[1], epsilon=self.epsilon,
+            nb_of_pipes=self.number_of_pipes, **kwargs)
+        # average the R_f values for the conical part
+        conical_R_f_avg = (R_f_conical_end + R_f_top) / 2
+
+        # calculate R_f for the final pipe
+        R_f_end = calculate_convective_resistance(
+            flow_data, fluid_data, r_in=self.r_in_stop, epsilon=self.epsilon,
+            nb_of_pipes=self.number_of_pipes, **kwargs)
+
+        # weigh the R_f for both the first, conical and last part based on the ratio of their lengths
+        return R_f_top * first_fraction + \
+            conical_R_f_avg * conical_fraction + \
+            R_f_end * (1 - first_fraction - conical_fraction)
+
+    def calculate_conductive_resistance(self, borehole_length: float, **kwargs) -> float:
+        """
+        This function calculates the pipe thermal conductive resistance.
+
+        Parameters
+        ----------
+        borehole_length : float
+            Borehole length [m]
+
+        Returns
+        -------
+        float
+            Conductive resistance [mK/W]
+        """
         if not self.use_approx:
             # rate increase in wall thickness of conical part
             a = (self.r_in_start - self.r_in_stop) / (self.end_conical - self.begin_conical)
@@ -121,68 +228,70 @@ class ConicalPipe(MultipleUTube):
             def r_p_func(length):
                 return math.log(self.r_out / calc_r_in(length)) / (2 * pi * self.k_p)
 
-            def r_f_func(length):
-                # Convection heat transfer coefficient [W/(m^2.K)]
-                h_f = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(
-                    flow_rate_data.mfr_borehole(fluid_data=fluid_data, **kwargs) / self.number_of_pipes,
-                    calc_r_in(length), fluid_data.mu(**kwargs), fluid_data.rho(**kwargs),
-                    fluid_data.k_f(**kwargs), fluid_data.cp(**kwargs), self.epsilon)
+            return quad(r_p_func, 0, borehole_length)[0] / borehole_length
 
-                # Film thermal resistance [m.K/W]
-                return 1.0 / (h_f * 2 * np.pi * calc_r_in(length))
-
-            self.R_p = quad(r_p_func, 0, borehole_length)[0] / borehole_length
-            self.R_f = quad(r_f_func, 0, borehole_length)[0] / borehole_length
-            return
-
-        self._top_pipe.calculate_resistances(fluid_data, flow_rate_data, **kwargs)
-
+        R_p_top = gt.pipes.conduction_thermal_resistance_circular_pipe(self.r_in_start, self.r_out, self.k_p)
         if borehole_length <= self.begin_conical:
-            self.R_f = self._top_pipe.R_f
-            self.R_p = self._top_pipe.R_p
-            return
+            return R_p_top
 
         first_fraction = self.begin_conical / borehole_length
 
         if borehole_length <= self.end_conical:
             # work with the cross-section at the borehole length
-            conical_part = self._get_pipe_model(borehole_length)[1]
-            conical_part.calculate_resistances(fluid_data, flow_rate_data, **kwargs)
-            conical_part_R_f_end = conical_part.R_f
-            conical_part_R_p_end = conical_part.R_p
+            conical_part_R_p_end = gt.pipes.conduction_thermal_resistance_circular_pipe(
+                self._get_pipe_radius(borehole_length)[1], self.r_out, self.k_p)
 
-            # average the R_f and R_p values for the conical part
-            conical_R_f_avg = (conical_part_R_f_end + self._top_pipe.R_f) / 2
-            conical_R_p_avg = (conical_part_R_p_end + self._top_pipe.R_p) / 2
+            # average the R_p values for the conical part
+            conical_R_p_avg = (conical_part_R_p_end + R_p_top) / 2
 
-            # weigh the R_f and R_p for both the first part and the conical part based on the ratio of their lengths
-            self.R_f = self._top_pipe.R_f * first_fraction + conical_R_f_avg * (1 - first_fraction)
-            self.R_p = self._top_pipe.R_p * first_fraction + conical_R_p_avg * (1 - first_fraction)
-            return
+            # weigh the R_p for both the first part and the conical part based on the ratio of their lengths
+            return R_p_top * first_fraction + conical_R_p_avg * (1 - first_fraction)
 
         conical_fraction = (self.end_conical - self.begin_conical) / borehole_length
 
         # work with the cross-section at the borehole length
-        conical_part = self._get_pipe_model(self.end_conical)[1]
-        conical_part.calculate_resistances(fluid_data, flow_rate_data, **kwargs)
-        conical_part_R_f_end = conical_part.R_f
-        conical_part_R_p_end = conical_part.R_p
+        conical_part_R_p_end = gt.pipes.conduction_thermal_resistance_circular_pipe(
+            self._get_pipe_radius(self.end_conical)[1], self.r_out, self.k_p)
 
-        # average the R_f and R_p values for the conical part
-        conical_R_f_avg = (conical_part_R_f_end + self._top_pipe.R_f) / 2
-        conical_R_p_avg = (conical_part_R_p_end + self._top_pipe.R_p) / 2
+        # average the R_p values for the conical part
+        conical_R_p_avg = (conical_part_R_p_end + R_p_top) / 2
 
-        # calculate R_f and R_p for the final pipe
-        self._end_pipe.calculate_resistances(fluid_data, flow_rate_data, **kwargs)
+        # calculate R_p for the final pipe
+        R_p_end = gt.pipes.conduction_thermal_resistance_circular_pipe(self.r_in_stop, self.r_out, self.k_p)
 
         # weigh the R_f and R_f for both the first, conical and last part based on the ratio of their lengths
-        self.R_f = self._top_pipe.R_f * first_fraction + \
-                   conical_R_f_avg * conical_fraction + \
-                   self._end_pipe.R_f * (1 - first_fraction - conical_fraction)
-        self.R_p = self._top_pipe.R_p * first_fraction + \
-                   conical_R_p_avg * conical_fraction + \
-                   self._end_pipe.R_p * (1 - first_fraction - conical_fraction)
-        return
+        return R_p_top * first_fraction + \
+            conical_R_p_avg * conical_fraction + \
+            R_p_end * (1 - first_fraction - conical_fraction)
+
+    def calculate_resistances(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float,
+                              **kwargs) -> None:
+        """
+        This function calculates the resistances for a conical pipe based on the work of (Peere et al., 2025)
+        [#Peere2025]_.
+        This function calculates the conductive and convective resistances, which are constant.
+
+        Parameters
+        ----------
+        fluid_data : FluidData
+            Fluid data
+        flow_rate_data : FlowData
+            Flow rate data
+        borehole_length : float
+            Borehole length [m]
+
+        Returns
+        -------
+        None
+
+        References
+        ----------
+        .. [#Peere2025] Peere, W., Steinbock, G., Niklaus, E. (2025). Thermo-hydraulische Modellenentwicklung einer
+            konischen Erdwärmesonde und ein Praxisbeispiel in Sachsen. In Proceedings of Geothermie Symposium. Salzburg
+            (Austria), 5-7 November 2025.
+        """
+        self.R_f = self.calculate_convective_resistance(flow_rate_data, fluid_data, borehole_length, **kwargs)
+        self.R_p = self.calculate_conductive_resistance(borehole_length, **kwargs)
 
     def Re(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float, **kwargs) -> float:
         """
