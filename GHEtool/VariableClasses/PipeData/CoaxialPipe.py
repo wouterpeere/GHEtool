@@ -3,6 +3,7 @@ import pygfunction as gt
 import matplotlib.pyplot as plt
 from math import pi
 
+from GHEtool.utils.calculate_friction_factor import *
 from GHEtool.VariableClasses.PipeData._PipeData import _PipeData
 from GHEtool.VariableClasses.FluidData import _FluidData
 from GHEtool.VariableClasses.FlowData import _FlowData
@@ -53,6 +54,113 @@ class CoaxialPipe(_PipeData):
         self.R_fp: float = 0.
         self.k_p_out = k_p if k_p_out is None else k_p_out
 
+    def calculate_convective_resistance(self, flow_data: _FlowData, fluid_data: _FluidData, **kwargs):
+        """
+        This function evaluates the inner and outer convective resistance for the annulus region of the concentric pipe.
+        Grundmann (2016) [#Grundmann2016]_ referenced Hellström (1991) [#Hellstrom1991b]_ in the discussion about
+        inner and outer convection coefficients in an annulus region of a concentric pipe arrangement.
+        Cengel and Ghajar (2015) [#ConvCoeff-CengelGhajar2015]_ state that inner and outer Nusselt numbers
+        are approximately equivalent for turbulent flow. They additionally state that Gnielinski can be used for turbulent
+        flow. Linear interpolation is used over the range 2300 < Re < 4000 for the evaluation of the Nusselt number,
+        as proposed by Gnielinski (2013) [#Gnielinksi2013]_.
+
+        Parameters
+        ----------
+        flow_data : _FlowData
+            Flow data object
+        fluid_data : _FluidData
+            Fluid data object
+
+        Returns
+        -------
+        (float or np.ndarray, float or np.ndarray)
+            Convective resistances for the inner pipe (circular and inner annular part),
+            Convective resistance for the outer pipe (outer annular part)
+
+        References
+        ----------
+        .. [#Hellstrom1991b] Hellstrom, G. (1991). Ground heat storage. Thermal
+           Analyses of Duct Storage Systems I: Theory. PhD Thesis. University of
+           Lund, Department of Mathematical Physics. Lund, Sweden.
+        .. [#Grundmann2016] Grundmann, R. (2016) Improved design methods for ground
+            heat exchangers. Oklahoma State University, M.S. Thesis.
+        .. [#ConvCoeff-CengelGhajar2015] Çengel, Y.A., & Ghajar, A.J. (2015). Heat
+            and mass transfer: fundamentals & applications (Fifth edition.).
+            McGraw-Hill.
+        .. [#Gnielinksi2013] Gnielinski, V. (2013). On heat transfer in tubes.
+            International Journal of Heat and Mass Transfer, 63, 134–140.
+            https://doi.org/10.1016/j.ijheatmasstransfer.2013.04.015
+
+        """
+        low_re = 2300.0
+        high_re = 4000.0
+
+        # Hydraulic diameter and radius for concentric tube annulus region
+        D_h = 2 * (self.r_out_in - self.r_in_out)
+        r_h = D_h / 2
+        # Cross-sectional area of the annulus region
+        A_c = pi * ((self.r_out_in ** 2) - (self.r_in_out ** 2))
+
+        # Ratio of radii (Grundmann, 2016)
+        r_star = self.r_in_out / self.r_out_in
+
+        m_dot = np.atleast_1d(np.asarray(flow_data.mfr_borehole(**kwargs, fluid_data=fluid_data), dtype=np.float64))
+
+        # Reynolds number
+
+        V = m_dot / A_c / fluid_data.rho(**kwargs)
+
+        re = fluid_data.rho(**kwargs) * V * D_h / fluid_data.mu(**kwargs)
+
+        # Allocate Nusselt array
+        nu_inner = np.empty_like(re)
+        nu_outer = np.empty_like(re)
+
+        # Laminar
+        laminar = re < low_re
+        nu_inner[laminar] = 3.66 + 1.2 * r_star ** (-0.8)
+        nu_outer[laminar] = 3.66 + 1.2 * r_star ** 0.5
+
+        # Turbulent
+        turbulent = re > high_re
+        if np.any(turbulent):
+            if kwargs.get('haaland', False):
+                f = friction_factor_Haaland(re[turbulent], r_h, self.epsilon, **kwargs)
+            else:
+                f = friction_factor_darcy_weisbach(re[turbulent], r_h, self.epsilon, **kwargs)
+            nu_inner[turbulent] = turbulent_nusselt(fluid_data, re[turbulent], f, array=turbulent, **kwargs)
+            nu_outer[turbulent] = nu_inner[turbulent]
+
+        # Transitional interpolation
+        transitional = (~laminar) & (~turbulent)
+
+        if np.any(transitional):
+            nu_low_inner = 3.66 + 1.2 * r_star ** (-0.8)
+            nu_low_outer = 3.66 + 1.2 * r_star ** 0.5
+
+            if kwargs.get('haaland', False):
+                # no array here to get a better fit with pygfunction (see validation file)
+                f = friction_factor_Haaland(high_re, r_h, self.epsilon, **kwargs)
+            else:
+                f = friction_factor_darcy_weisbach(re[transitional], r_h, self.epsilon, **kwargs)
+            nu_high = turbulent_nusselt(fluid_data, high_re, f, array=transitional, **kwargs)
+
+            re_t = re[transitional]
+            nu_inner[transitional] = (nu_low_inner + (re_t - low_re) * (nu_high - nu_low_inner) / (high_re - low_re))
+            nu_outer[transitional] = (nu_low_outer + (re_t - low_re) * (nu_high - nu_low_outer) / (high_re - low_re))
+
+        # Convective resistance for the annular part of the coaxial probe
+        R_conv_inner = D_h / (nu_inner * np.pi * fluid_data.k_f(**kwargs) * self.r_in_out * 2)
+        R_conv_outer = D_h / (nu_outer * np.pi * fluid_data.k_f(**kwargs) * self.r_out_in * 2)
+
+        # create inner pipe object for the convective resistance calculation of the inner pipe
+        R_conv_inner_inner = calculate_convective_resistance(
+            flow_data, fluid_data, r_in=self.r_in_in, nb_of_pipes=1, epsilon=self.epsilon, **kwargs)
+
+        if R_conv_inner.size == 1:
+            return R_conv_inner.item() + R_conv_inner_inner, R_conv_outer.item()
+        return R_conv_inner + R_conv_inner_inner, R_conv_outer
+
     def calculate_resistances(self, fluid_data: _FluidData, flow_rate_data: _FlowData, **kwargs) -> None:
         """
         This function calculates the conductive and convective resistances, which are constant.
@@ -77,24 +185,10 @@ class CoaxialPipe(_PipeData):
             self.r_out_in, self.r_out_out, self.k_p_out)
 
         # Fluid-to-fluid thermal resistance [m.K/W]
-        # Inner pipe
-        h_f_in = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(
-            flow_rate_data.mfr_borehole(fluid_data=fluid_data, **kwargs), self.r_in_in, fluid_data.mu(**kwargs),
-            fluid_data.rho(**kwargs),
-            fluid_data.k_f(**kwargs), fluid_data.cp(**kwargs), self.epsilon)
-        R_f_in = 1.0 / (h_f_in * 2 * np.pi * self.r_in_in)
-        # Outer pipe
-        h_f_a_in, h_f_a_out = \
-            gt.pipes.convective_heat_transfer_coefficient_concentric_annulus(
-                flow_rate_data.mfr_borehole(fluid_data=fluid_data, **kwargs), self.r_in_out, self.r_out_in,
-                fluid_data.mu(**kwargs),
-                fluid_data.rho(**kwargs), fluid_data.k_f(**kwargs),
-                fluid_data.cp(**kwargs), self.epsilon)
-        R_f_out_in = 1.0 / (h_f_a_in * 2 * np.pi * self.r_in_out)
-        self.R_ff = R_f_in + R_p_in + R_f_out_in
+        Rfin, Rfout = self.calculate_convective_resistance(flow_rate_data, fluid_data, **kwargs)
+        self.R_ff = R_p_in + Rfin
         # Coaxial GHE in borehole
-        R_f_out_out = 1.0 / (h_f_a_out * 2 * np.pi * self.r_out_in)
-        self.R_fp = R_p_out + R_f_out_out
+        self.R_fp = R_p_out + Rfout
 
     def pipe_model(self, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
         """

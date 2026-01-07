@@ -191,7 +191,7 @@ for val in np.linspace(0.1, 2, 100):
         (0.075 ** 4 + pipe.D_s ** 4) / (0.075 ** 4 - pipe.D_s ** 4)))
     r_a = Ra_0  # R_a
     r_b = Rb_0  # R_b
-    r_v = 100 / (val * fluid.cp(temperature=5))  # (K/(w/m)) thermal resistance factor
+    r_v = 100 / (val / 2 * fluid.cp(temperature=5))  # (K/(w/m)) thermal resistance factor
     n = r_v / (r_b * r_a) ** 0.5
     Rb_explicit_0.append(r_b * n * np.cosh(n) / np.sinh(n))
 print(f'Explicit 0: {(time.time() - start)} ms')
@@ -221,7 +221,7 @@ for val in np.linspace(0.1, 2, 100):
 
     r_a = Ra_0 - Ba_1  # R_a
     r_b = Rb_0 - Bb_1  # R_b
-    r_v = 100 / (val * fluid.cp(temperature=5))  # (K/(w/m)) thermal resistance factor
+    r_v = 100 / (val / 2 * fluid.cp(temperature=5))  # (K/(w/m)) thermal resistance factor
     n = r_v / (r_b * r_a) ** 0.5
     Rb_explicit_1.append(r_b * n * np.cosh(n) / np.sinh(n))
 print(f'Explicit 1: {(time.time() - start)} ms')

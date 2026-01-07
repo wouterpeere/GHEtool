@@ -1,5 +1,6 @@
 import numpy as np
 from GHEtool.VariableClasses.FluidData._FluidData import _FluidData
+from GHEtool.VariableClasses.FlowData._FlowData import _FlowData
 from GHEtool.VariableClasses.PipeData._PipeData import _PipeData
 from typing import Union
 
@@ -148,3 +149,81 @@ def turbulent_nusselt(fluid: _FluidData, Re: Union[float, np.ndarray], f: Union[
         # this puts a mask on what values to calculate to save time
         pr = pr[kwargs.get('array')]
     return np.asarray((f / 8) * (Re - 1000) * pr / (1 + 12.7 * (f / 8) ** 0.5 * (pr ** (2 / 3) - 1)))
+
+
+def calculate_convective_resistance(flow_data: _FlowData, fluid_data: _FluidData, r_in: float, nb_of_pipes: int,
+                                    epsilon: float, **kwargs):
+    """
+    This function calculates the convective resistance.
+    For the laminar flow, a fixed Nusselt number of 3.66 is used, for the turbulent flow, the Gnielinski
+    equation is used. Linear interpolation is used over the range 2300 < Re < 4000 for the evaluation of the Nusselt number,
+    as proposed by Gnielinski (2013) [#Gnielinksi2013]_.
+
+    Parameters
+    ----------
+    flow_data : _FlowData
+        Flow data object
+    fluid_data : _FluidData
+        Fluid data object
+    r_in : float
+        Inner pipe radius [m]
+    nb_of_pipes : int
+        Number of pipes [-]
+    epsilon : float
+        Pipe roughness [m]
+
+    Returns
+    -------
+    float or np.ndarray
+        Convective resistances
+
+    References
+    ----------
+    .. [#Gnielinksi2013] Gnielinski, V. (2013). On heat transfer in tubes.
+        International Journal of Heat and Mass Transfer, 63, 134–140.
+        https://doi.org/10.1016/j.ijheatmasstransfer.2013.04.015
+    """
+    low_re = 2300.0
+    high_re = 4000.0
+
+    m_dot = np.atleast_1d(np.asarray(flow_data.mfr_borehole(**kwargs, fluid_data=fluid_data), dtype=np.float64))
+
+    # Reynolds number
+    re = 4.0 * m_dot / (fluid_data.mu(**kwargs) * np.pi * r_in * 2) / nb_of_pipes
+
+    # Allocate Nusselt array
+    nu = np.empty_like(re)
+
+    # Laminar
+    laminar = re < low_re
+    nu[laminar] = 3.66
+
+    # Turbulent
+    turbulent = re > high_re
+    if np.any(turbulent):
+        if kwargs.get('haaland', False):
+            f = friction_factor_Haaland(re[turbulent], r_in, epsilon, **kwargs)
+        else:
+            f = friction_factor_darcy_weisbach(re[turbulent], r_in, epsilon, **kwargs)
+        nu[turbulent] = turbulent_nusselt(fluid_data, re[turbulent], f, array=turbulent, **kwargs)
+
+    # Transitional interpolation
+    transitional = (~laminar) & (~turbulent)
+
+    if np.any(transitional):
+        nu_low = 3.66
+        if kwargs.get('haaland', False):
+            # no array here to get a better fit with pygfunction (see validation file)
+            f = friction_factor_Haaland(high_re, r_in, epsilon, **kwargs)
+        else:
+            f = friction_factor_darcy_weisbach(re[transitional], r_in, epsilon, **kwargs)
+        nu_high = turbulent_nusselt(fluid_data, high_re, f, array=transitional, **kwargs)
+
+        re_t = re[transitional]
+        nu[transitional] = (nu_low + (re_t - low_re) * (nu_high - nu_low) / (high_re - low_re))
+
+    # Convective resistance
+    R_conv = 1.0 / (nu * np.pi * fluid_data.k_f(**kwargs))
+    if R_conv.size == 1:
+        return R_conv.item()
+    return R_conv

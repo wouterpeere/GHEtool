@@ -201,6 +201,64 @@ def test_calculate_resistance_coaxial():
     assert np.isclose(pipe.R_ff, 0.16491519753761458)
 
 
+def test_convective_coaxial():
+    fluid = TemperatureDependentFluidData('MPG', 25)
+    pipe = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
+
+    R_p_in = gt.pipes.conduction_thermal_resistance_circular_pipe(
+        pipe.r_in_in, pipe.r_in_out, pipe.k_p)
+    # Outer pipe
+    R_p_out = gt.pipes.conduction_thermal_resistance_circular_pipe(
+        pipe.r_out_in, pipe.r_out_out, pipe.k_p_out)
+    flow = ConstantFlowRate(mfr=0.5)
+    individual = []
+    temp_range = np.arange(-5, 20, 1)
+    for temp in temp_range:
+        pipe.calculate_resistances(fluid, flow, temperature=temp)
+        individual.append(pipe.R_ff)
+    array = pipe.calculate_convective_resistance(flow, fluid, temperature=temp_range)[0]
+    assert np.allclose(array + R_p_in, individual)
+
+    individual = []
+    for temp in temp_range:
+        pipe.calculate_resistances(fluid, flow, temperature=temp)
+        individual.append(pipe.R_fp)
+    array = pipe.calculate_convective_resistance(flow, fluid, temperature=temp_range)[1]
+    assert np.allclose(array + R_p_out, individual)
+
+    flow = ConstantFlowRate(mfr=0.1)
+    individual = []
+    temp_range = np.arange(-5, 20, 1)
+    for temp in temp_range:
+        pipe.calculate_resistances(fluid, flow, temperature=temp)
+        individual.append(pipe.R_ff)
+    array = pipe.calculate_convective_resistance(flow, fluid, temperature=temp_range)[0]
+    assert np.allclose(array + R_p_in, individual)
+
+    individual = []
+    for temp in temp_range:
+        pipe.calculate_resistances(fluid, flow, temperature=temp)
+        individual.append(pipe.R_fp)
+    array = pipe.calculate_convective_resistance(flow, fluid, temperature=temp_range)[1]
+    assert np.allclose(array + R_p_out, individual)
+
+    flow = ConstantFlowRate(mfr=1.5)
+    individual = []
+    temp_range = np.arange(-5, 20, 1)
+    for temp in temp_range:
+        pipe.calculate_resistances(fluid, flow, temperature=temp)
+        individual.append(pipe.R_ff)
+    array = pipe.calculate_convective_resistance(flow, fluid, temperature=temp_range)[0]
+    assert np.allclose(array + R_p_in, individual)
+
+    individual = []
+    for temp in temp_range:
+        pipe.calculate_resistances(fluid, flow, temperature=temp)
+        individual.append(pipe.R_fp)
+    array = pipe.calculate_convective_resistance(flow, fluid, temperature=temp_range)[1]
+    assert np.allclose(array + R_p_out, individual)
+
+
 def test_calculate_resistance_coaxial_different_outer_conductivity():
     pipe = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True, k_p_out=0.2)
     fluid = TemperatureDependentFluidData('MPG', 20)
@@ -278,6 +336,15 @@ def test_reynolds_number():
     assert np.isclose(coaxial.Re(fluid_data=fluid_data, flow_rate_data=flow_data), 1727.5977540504243)
     assert np.isclose(7234.108922823884, Separatus(1.5).Re(fluid_data, flow_data))
 
+    fluid = TemperatureDependentFluidData('MPG', 30)
+    flow = ConstantFlowRate(vfr=0.2)
+    assert np.allclose(
+        coaxial.Re(fluid_data=fluid, flow_rate_data=flow, temperature=np.array([0, 5]), borehole_length=200), [
+            coaxial.Re(flow_rate_data=flow, fluid_data=fluid, temperature=0, borehole_length=200),
+            coaxial.Re(flow_rate_data=flow, fluid_data=fluid, temperature=5, borehole_length=200)
+        ])
+    fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
+
     # now with a flow per borefield
     flow_data = ConstantFlowRate(mfr=0.4, flow_per_borehole=False)
     double = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2)
@@ -294,6 +361,17 @@ def test_reynolds_number():
     assert np.isclose(coaxial.Re(fluid_data=fluid_data, flow_rate_data=flow_data, nb_of_boreholes=2),
                       1727.5977540504243)
     assert np.isclose(7234.108922823884, Separatus(1.5).Re(fluid_data, flow_data, nb_of_boreholes=2))
+
+
+def test_multiple_reynolds():
+    fluid = TemperatureDependentFluidData('MPG', 30)
+    flow = ConstantFlowRate(vfr=0.2)
+    pipe = SingleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+    assert np.allclose(pipe.Re(fluid_data=fluid, flow_rate_data=flow, temperature=np.array([0, 5])),
+                       [
+                           pipe.Re(flow_rate_data=flow, fluid_data=fluid, temperature=0),
+                           pipe.Re(flow_rate_data=flow, fluid_data=fluid, temperature=5)
+                       ])
 
 
 def test_pressure_drop():
@@ -539,6 +617,25 @@ def test_conical_reynolds():
     assert np.isclose(1094.5169289975574, pipe_double.Re(fluid, flow, borehole_length=100))
     pipe = ConicalPipe(1.5, 0.0135, 0.013, 0, 100, 0.016, 0.4, 0.035, 1)
     assert np.isclose(2249.818172820547, pipe.Re(fluid, flow, borehole_length=200))
+
+    fluid = TemperatureDependentFluidData('MPG', 30)
+    flow = ConstantFlowRate(vfr=0.2)
+    assert np.allclose(
+        pipe.Re(fluid_data=fluid, flow_rate_data=flow, temperature=np.array([0, 5]), borehole_length=200), [
+            pipe.Re(flow_rate_data=flow, fluid_data=fluid, temperature=0, borehole_length=200),
+            pipe.Re(flow_rate_data=flow, fluid_data=fluid, temperature=5, borehole_length=200)
+        ])
+
+
+def test_separatus():
+    separatus = Separatus(1.5)
+    single = SingleUTube(r_in=(35.74 / 2 - 3) * 0.001, r_out=(35.74 / 2) * 0.001, k_p=0.44, D_s=36 / 2 * 0.001)
+    fluid = TemperatureDependentFluidData('MPG', 30)
+    flow = ConstantFlowRate(vfr=0.2)
+    temp_range = np.arange(-5, 20, 1)
+
+    assert np.allclose(separatus.calculate_convective_resistance(flow, fluid, temperature=temp_range),
+                       single.calculate_convective_resistance(flow, fluid, temperature=temp_range))
 
 
 def test_explicit_method_errors():
