@@ -110,6 +110,7 @@ def test_4():
         f"The sizing according to L3 has a depth of {depth_L3:.2f}m (using dynamic Rb* of {Rb_L3:.3f}) and {depth_L3s:.2f}m (using constant Rb*)")
     print(
         f"The sizing according to L4 has a depth of {depth_L4:.2f}m (using dynamic Rb* of {Rb_L4:.3f}) and {depth_L4s:.2f}m (using constant Rb*)")
+    print(depth_L2, depth_L3, depth_L4, depth_L2s, depth_L3s, depth_L4s, Rb_L2, Rb_L3, Rb_L4)
 
     assert np.isclose(depth_L2, 124.02695636769329)
     assert np.isclose(depth_L3, 124.67495153457973)
