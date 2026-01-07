@@ -26,7 +26,7 @@ class CalculationSetup(BaseClass):
                  use_precalculated_dataset: bool = True, deep_sizing: bool = False,
                  force_deep_sizing: bool = False, use_neural_network: bool = False,
                  approximate_req_depth: bool = False, size_based_on: str = 'average',
-                 use_explicit_multipole: bool = False):
+                 use_explicit_multipole: bool = True):
         """
 
         Parameters
