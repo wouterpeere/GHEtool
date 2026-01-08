@@ -186,7 +186,6 @@ def explicit_single_U():
     assert np.isclose(np.mean(explicit_0), 0.141308789605785)
     assert np.isclose(np.mean(explicit_1), 0.14011344398662381)
     assert np.isclose(np.mean(explicit_2), 0.14011372449441875)
-    print(np.max((np.array(explicit_1) - np.array(pyg)) / np.array(pyg)) * 100)
     assert np.isclose(np.max((np.array(explicit_0) - np.array(pyg)) / np.array(pyg)) * 100, 1.068381355673901)
     assert np.isclose(np.max((np.array(explicit_1) - np.array(pyg)) / np.array(pyg)) * 100, 0.0014732157859187868)
     assert np.isclose(np.max((np.array(explicit_2) - np.array(pyg)) / np.array(pyg)) * 100, 7.206286403390892e-07)
@@ -300,7 +299,49 @@ def compare_multiple_resistances():
 
 
 def explicit_coaxial():
-    pass
+    """
+    This function compares the implementation of the explicit coaxial model with the one in pygfunction.
+    There is excellent overlap.
+
+    Returns
+    -------
+    None
+    """
+    r_in_in = 0.0221
+    r_in_out = 0.025
+    r_out_in = 0.0487
+    r_out_out = 0.055
+
+    fluid_data = TemperatureDependentFluidData('MPG', 25).create_constant(3)
+    pipe = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, 0.4, 1)
+
+    pyg = []
+    explicit_1 = []
+
+    flow_range = np.linspace(0.1, 3, 41)
+
+    for flow in flow_range:
+        borehole = Borehole(fluid_data, pipe, ConstantFlowRate(mfr=flow))
+        pyg.append(borehole.calculate_Rb(100, 4, 0.075, 2, use_explicit_models=False))
+        explicit_1.append(borehole.calculate_Rb(100, 4, 0.075, 2, use_explicit_models=True, order=1))
+
+    plt.figure()
+    plt.plot(flow_range, pyg, label="pygfunction")
+    plt.plot(flow_range, explicit_1, label="explicit (first order)")
+
+    plt.legend()
+    plt.xlabel('Mass flow rate per borehole [kg/s]')
+    plt.ylabel('Borehole effective thermal resistance [mK/W]')
+
+    plt.figure()
+    plt.plot(flow_range, (np.array(explicit_1) - np.array(pyg)) / np.array(pyg) * 100,
+             label="explicit (first order)")
+    plt.legend()
+    plt.xlabel('Mass flow rate per borehole [kg/s]')
+    plt.ylabel('Borehole effective thermal resistance [%]')
+    plt.show()
+
+    assert np.allclose(np.array(explicit_1) - np.array(pyg), 0)
 
 
 if __name__ == "__main__":
@@ -308,3 +349,4 @@ if __name__ == "__main__":
     explicit_double_U()
     explicit_single_U()
     compare_multiple_resistances()
+    explicit_coaxial()

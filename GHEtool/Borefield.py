@@ -40,7 +40,7 @@ class Borefield(BaseClass):
     DEFAULT_LENGTH_PEAK: int = 6  # hours
     THRESHOLD_DEPTH_ERROR: int = 10000  # m
 
-    USE_SPEED_UP_IN_SIZING: bool = False
+    USE_SPEED_UP_IN_SIZING: bool = True
 
     HOURLY_LOAD_ARRAY: np.ndarray = np.arange(0, 8761, UPM).astype(np.uint32)
 

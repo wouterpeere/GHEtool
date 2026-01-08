@@ -1321,29 +1321,29 @@ def test_Rb_and_Re_with_temperture_dep_data():
 
     borefield.calculate_temperatures()
     assert np.isclose(borefield.Re, 949.1077655988564)
-    assert np.isclose(borefield.Rb, 0.15660083491337237)
+    assert np.isclose(borefield.Rb, 0.15651916404927088)
 
     borefield = Borefield(ground_data=ground_data, pipe_data=pipe_data, fluid_data=fluid_data, flow_data=flow_data,
                           load=load_data)
     borefield.borehole.flow_data = ConstantFlowRate(vfr=0.8, flow_per_borehole=False)
     borefield.create_rectangular_borefield(4, 1, 7, 7, 100, 1, 0.075)
     assert np.isclose(borefield.Re, 709.7715066160362)
-    assert np.isclose(borefield.Rb, 0.15719115050343702)
+    assert np.isclose(borefield.Rb, 0.15710871734747398)
 
     borefield.calculate_temperatures()
-    assert np.isclose(borefield.Re, 949.0513333574957)
-    assert np.isclose(borefield.Rb, 0.15660083491337237)
+    assert np.isclose(borefield.Re, 949.1077655988564)
+    assert np.isclose(borefield.Rb, 0.15651916404927088)
 
     borefield = Borefield(ground_data=ground_data, pipe_data=pipe_data, fluid_data=fluid_data, flow_data=flow_data,
                           load=load_data)
     borefield.borehole.flow_data = ConstantFlowRate(vfr=0.4, flow_per_borehole=False, series_factor=2)
     borefield.create_rectangular_borefield(4, 1, 7, 7, 100, 1, 0.075)
     assert np.isclose(borefield.Re, 709.7715066160362)
-    assert np.isclose(borefield.Rb, 0.15719115050343702)
+    assert np.isclose(borefield.Rb, 0.15710871734747398)
 
     borefield.calculate_temperatures()
-    assert np.isclose(borefield.Re, 949.0513333574957)
-    assert np.isclose(borefield.Rb, 0.15660083491337237)
+    assert np.isclose(borefield.Re, 949.1077655988564)
+    assert np.isclose(borefield.Rb, 0.15651916404927088)
 
 
 def test_inlet_outlet_temperatures():

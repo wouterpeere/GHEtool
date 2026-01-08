@@ -190,6 +190,55 @@ class CoaxialPipe(_PipeData):
         # Coaxial GHE in borehole
         self.R_fp = R_p_out + Rfout
 
+    def explicit_model_borehole_resistance(self, fluid_data: _FluidData, flow_rate_data: _FlowData, k_s: float,
+                                           borehole: gt.boreholes.Borehole, R_p: float = None,
+                                           **kwargs) -> float:
+        """
+        This function calculates the borehole thermal resistance for a coaxial pipe using a simplified 1D
+        resistance network model [#Grundmann]_.
+
+        Parameters
+        ----------
+        fluid_data : FluidData
+            Fluid data
+        flow_rate_data : FlowData
+            Flow rate data
+        k_s : float
+            Ground thermal conductivity
+        borehole : Borehole
+            Borehole object
+        R_p : float
+            Pipe thermal resistance [mK/W], when this is not given, it is calculated explicitly.
+
+        Returns
+        -------
+        float
+            Effective borehole thermal resistance [mK/W]
+
+        References
+        ----------
+        .. [#Grundmann] Grundmann, Rachel Marie. "Improved design methods for ground heat exchangers." Master's thesis, Oklahoma State University, 2016.
+        """
+
+        # Pipe thermal resistances [m.K/W]
+        # Inner pipe
+        R_p_in = gt.pipes.conduction_thermal_resistance_circular_pipe(
+            self.r_in_in, self.r_in_out, self.k_p)
+        # Outer pipe
+        R_p_out = gt.pipes.conduction_thermal_resistance_circular_pipe(
+            self.r_out_in, self.r_out_out, self.k_p_out)
+
+        R_conv_inner, R_conv_outer = self.calculate_convective_resistance(flow_rate_data, fluid_data, **kwargs)
+
+        R_cond_grout = np.log(borehole.r_b / self.r_out_out) / (2 * pi * self.k_g)
+
+        r_a = R_conv_inner + R_p_in
+        r_b = R_conv_outer + R_p_out + R_cond_grout
+
+        rv = borehole.H / (flow_rate_data.mfr_borehole(**kwargs, fluid_data=fluid_data) * fluid_data.cp(**kwargs))
+        n = rv / (2 * r_b) * (1 + 4 * r_b / r_a) ** (1 / 2)
+        return r_b * n * np.cosh(n) / np.sinh(n)
+
     def pipe_model(self, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
         """
         This function returns the BasePipe model.
