@@ -464,10 +464,11 @@ def test_turbocollector():
         individual.append(turbo.R_f)
     array = turbo.calculate_convective_resistance(flow_borehole, fluid, temperature=temp_range)
     assert np.allclose(array, individual)
+    flow_borehole = ConstantFlowRate(vfr=1)
 
     individual = []
     temp_range = np.arange(-5, 20, 1)
-    turbo.number_of_pipes = 2
+    turbo.number_of_pipes = 1
     for temp in temp_range:
         turbo.calculate_resistances(fluid, flow_borehole, temperature=temp, haaland=True)
         individual.append(turbo.R_f)
