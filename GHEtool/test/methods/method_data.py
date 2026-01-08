@@ -1121,9 +1121,9 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 30.0202
                                                    632.7677068959224,
                                                    name='Optimise load profile (energy, outlet)', power=2,
                                                    hourly=False))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 24.351371814200366, 41.44394841883654,
-                                                   41.38266855590197, 63.95513378282438, 480.8592445921308,
-                                                   615.5066192782625,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 24.35487121997234, 41.447031654987214,
+                                                   41.38948177347761, 63.961651031610266, 480.8501603020299,
+                                                   615.5004123746569,
                                                    name='Optimise load profile (balance, outlet)', power=3,
                                                    hourly=False))
 borefield.flow_data = ConstantFlowRate(mfr=0.15 * 18, flow_per_borehole=False)
@@ -1138,9 +1138,9 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 30.0202
                                                    name='Optimise load profile (energy, outlet, flow borefield)',
                                                    power=2,
                                                    hourly=False))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 24.351371814200366, 41.44394841883654,
-                                                   41.38266855590197, 63.95513378282438, 480.8592445921308,
-                                                   615.5066192782625,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 24.35487121997234, 41.447031654987214,
+                                                   41.38948177347761, 63.961651031610266, 480.8501603020299,
+                                                   615.5004123746569,
                                                    name='Optimise load profile (balance, outlet, flow borefield)',
                                                    power=3,
                                                    hourly=False))
