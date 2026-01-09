@@ -128,6 +128,14 @@ def test_flow_rate_borefield_series2():
     assert np.isclose(bor_vfr.vfr_borefield(nb_of_boreholes=6, series_factor=2), 1)
 
 
+def test_multiple_temperatures():
+    bor_mfr = ConstantFlowRate(mfr=1, flow_per_borehole=False, series_factor=2)
+    fluid = TemperatureDependentFluidData('MPG', 20)
+    assert np.isclose(bor_mfr.mfr_borefield(nb_of_boreholes=2, fluid_data=fluid, temperature=np.array([2, 3])), 1)
+    assert np.allclose(bor_mfr.vfr_borefield(nb_of_boreholes=2, fluid_data=fluid, temperature=np.array([2, 3])),
+                       [0.98066981, 0.98086133])
+
+
 def test_repr_constant_flow_rate():
     fluid = ConstantFlowRate(mfr=0.2)
     assert fluid.__export__() == {'mfr per borehole [kg/s]': 0.2}

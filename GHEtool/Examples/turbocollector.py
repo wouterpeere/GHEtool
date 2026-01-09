@@ -6,7 +6,7 @@ compared with the traditional single and double smooth pipe of DN32.
 The correlations for both the convective heat transfer coefficient and the friction factor, which are used internally
 to calculate respectively the effective borehole thermal resistance and the pressure drop, were created by Niklas Hidman,
 Division of Fluid Dynamics, Department of Mechanical and Maritime Sciences, Chalmers University of Technology, Gothenburg, Sweden.
-The study can be found here: https://www.muovitech.com/studies/Thermohydraulic_performance_evaluation_250519.pdf
+The study can be found here: https://www.sciencedirect.com/science/article/pii/S0017931025014498?via%3Dihub
 """
 import matplotlib.pyplot as plt
 import numpy as np

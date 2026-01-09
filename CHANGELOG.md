@@ -16,6 +16,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Add set_min_fluid_temperature and set_max_fluid_temperature to the Borefield class (issue #271).
 - Add flow per borefield to flow classes (issue #408).
 - Average baseload fluid temperature (issue #418).
+- Explicit formulations of the multipole method (issue #425).
+- Convective resistance calculation with array inputs (issue #425).
+- Option to change pipe configuration in MultipleUTube (either diagonal (default) or adjacent) (issue #425).
 
 ## Changed
 
@@ -26,6 +29,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Bring up-to-date with numpy 2.4.0 (issue #420).
 - Remove Python 3.9 compatibility (issue #420).
 - Change default test to 3.13 instead of 3.12 (issue #420).
+
+## Fixed
+
+- Fixed minor mistake in Separatus Rb* calculation (issue #425).
 
 ## [2.4.0] - 2025-12-19
 

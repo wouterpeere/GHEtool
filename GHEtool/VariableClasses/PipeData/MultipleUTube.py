@@ -6,6 +6,8 @@ import pygfunction as gt
 import matplotlib.pyplot as plt
 
 from math import pi
+
+from GHEtool.utils.calculate_friction_factor import *
 from GHEtool.VariableClasses.PipeData._PipeData import _PipeData
 from GHEtool.VariableClasses.FluidData import _FluidData
 from GHEtool.VariableClasses.FlowData import _FlowData
@@ -24,7 +26,8 @@ class MultipleUTube(_PipeData):
                  k_p: float = None,
                  D_s: float = None,
                  number_of_pipes: int = 1,
-                 epsilon: float = 1e-6):
+                 epsilon: float = 1e-6,
+                 config: str = 'diagonal'):
         """
 
         Parameters
@@ -43,14 +46,18 @@ class MultipleUTube(_PipeData):
             Number of pipes [#] (single U-tube: 1, double U-tube:2)
         epsilon : float
             Pipe roughness [m]
+        config : str
+            Either 'diagonal' or 'adjacent'
         """
-
+        if config not in ('diagonal', 'adjacent'):
+            raise ValueError('Invalid value for config. Only diagonal and adjacent is allowed.')
         super().__init__(k_g, k_p, epsilon)
 
         self.r_in = r_in  # inner pipe radius m
         self.r_out = r_out  # outer pipe radius m
         self.D_s = D_s  # distance of pipe until center m
         self.number_of_pipes = number_of_pipes  # number of pipes #
+        self.config = config
         self.pos = []
         self.R_p = 0  # pipe thermal resistance mK/W
         self.R_f = 0  # film (i.e. fluid) thermal resistance mK/W
@@ -69,9 +76,16 @@ class MultipleUTube(_PipeData):
         """
         dt: float = pi / float(self.number_of_pipes)
         pos: list = [(0., 0.)] * 2 * self.number_of_pipes
+        if self.config == 'diagonal':
+            for i in range(self.number_of_pipes):
+                pos[i] = (self.D_s * np.cos(2.0 * i * dt + pi), self.D_s * np.sin(2.0 * i * dt + pi))
+                pos[i + self.number_of_pipes] = (
+                    self.D_s * np.cos(2.0 * i * dt + pi + dt), self.D_s * np.sin(2.0 * i * dt + pi + dt))
+            return pos
+
         for i in range(self.number_of_pipes):
-            pos[i] = (self.D_s * np.cos(2.0 * i * dt + pi), self.D_s * np.sin(2.0 * i * dt + pi))
-            pos[i + self.number_of_pipes] = (
+            pos[2 * i] = (self.D_s * np.cos(2.0 * i * dt + pi), self.D_s * np.sin(2.0 * i * dt + pi))
+            pos[2 * i + 1] = (
                 self.D_s * np.cos(2.0 * i * dt + pi + dt), self.D_s * np.sin(2.0 * i * dt + pi + dt))
         return pos
 
@@ -94,14 +108,8 @@ class MultipleUTube(_PipeData):
         self.R_p = gt.pipes.conduction_thermal_resistance_circular_pipe(
             self.r_in, self.r_out, self.k_p)
 
-        # Convection heat transfer coefficient [W/(m^2.K)]
-        h_f = gt.pipes.convective_heat_transfer_coefficient_circular_pipe(
-            flow_rate_data.mfr_borehole(fluid_data=fluid_data, **kwargs) / self.number_of_pipes,
-            self.r_in, fluid_data.mu(**kwargs), fluid_data.rho(**kwargs),
-            fluid_data.k_f(**kwargs), fluid_data.cp(**kwargs), self.epsilon)
-
         # Film thermal resistance [m.K/W]
-        self.R_f = 1.0 / (h_f * 2 * np.pi * self.r_in)
+        self.R_f = self.calculate_convective_resistance(flow_rate_data, fluid_data, **kwargs)
 
     def pipe_model(self, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
         """
@@ -207,6 +215,211 @@ class MultipleUTube(_PipeData):
 
         pipe.visualize_pipes()
         plt.show()
+
+    def calculate_convective_resistance(self, flow_data: _FlowData, fluid_data: _FluidData, **kwargs):
+        """
+        This function calculates the convective resistance.
+        For the laminar flow, a fixed Nusselt number of 3.66 is used, for the turbulent flow, the Gnielinski
+        equation is used. Linear interpolation is used over the range 2300 < Re < 4000 for the evaluation of the Nusselt number,
+        as proposed by Gnielinski (2013) [#Gnielinksi2013]_.
+
+        Parameters
+        ----------
+        flow_data : _FlowData
+            Flow data object
+        fluid_data : _FluidData
+            Fluid data object
+
+        Returns
+        -------
+        float or np.ndarray
+            Convective resistances
+
+        References
+        ----------
+        .. [#Gnielinksi2013] Gnielinski, V. (2013). On heat transfer in tubes.
+            International Journal of Heat and Mass Transfer, 63, 134–140.
+            https://doi.org/10.1016/j.ijheatmasstransfer.2013.04.015
+        """
+        return calculate_convective_resistance(
+            flow_data, fluid_data, r_in=self.r_in, nb_of_pipes=self.number_of_pipes, epsilon=self.epsilon, **kwargs)
+
+    def calculate_conductive_resistance(self, **kwargs) -> float:
+        """
+        This function calculates the pipe thermal conductive resistance.
+
+        Returns
+        -------
+        float
+            Conductive resistance [mK/W]
+        """
+        return gt.pipes.conduction_thermal_resistance_circular_pipe(self.r_in, self.r_out, self.k_p)
+
+    def explicit_model_borehole_resistance(self, fluid_data: _FluidData, flow_rate_data: _FlowData, k_s: float,
+                                           borehole: gt.boreholes.Borehole, order: int = 1, R_p: float = None,
+                                           **kwargs) -> float:
+        """
+        This function calculates the conductive and convective resistances, which are constant.
+        For the single U case, the formulas from (Claesson & Javed, 2018) are taken [#CJ2018]_.
+        For double U probes, this is based on (Claesson & Javed, 2019) [#CJ2019]_.
+
+        Parameters
+        ----------
+        fluid_data : FluidData
+            Fluid data
+        flow_rate_data : FlowData
+            Flow rate data
+        k_s : float
+            Ground thermal conductivity
+        borehole : Borehole
+            Borehole object
+        order : int
+            Order of the model. For the single U, a zeroth, first and second order explicit model is implemented,
+            for the double U, only a zeroth and first order.
+        R_p : float
+            Pipe thermal resistance [mK/W], when this is not given, it is calculated explicitly.
+
+        Returns
+        -------
+        float
+            Effective borehole thermal resistance [mK/W]
+
+        References
+        ----------
+        .. [#CJ2018] Claesson, J., & Javed, S. (2018). Explicit Multipole Formulas for Calculating Thermal Resistance of Single U-Tube Ground Heat Exchangers. Energies, 11(1), 214. https://doi.org/10.3390/en11010214
+        .. [#CJ2019] Claesson, J., & Javed, S. (2019). Explicit multipole formulas and thermal network models for calculating thermal resistances of double U-pipe borehole heat exchangers. Science and Technology for the Built Environment, 25(8), 980–992. https://doi.org/10.1080/23744731.2019.1620565
+        """
+        if self.number_of_pipes > 2:
+            raise NotImplementedError('Explicit models are only implemented for the single and double probes.')
+
+        # Pipe resistance [m.K/W]
+        if R_p is None:
+            R_p_cond = self.calculate_conductive_resistance(**kwargs)
+            R_p_conv = self.calculate_convective_resistance(flow_rate_data, fluid_data, **kwargs)
+
+            R_p = R_p_cond + R_p_conv
+
+        sigma = (self.k_g - k_s) / (self.k_g + k_s)
+
+        if self.number_of_pipes == 1:
+            # use solution from (Claesson & Javed, 2018)
+            # calculate zeroth order
+            R_plus = R_p + 1 / (2 * np.pi * self.k_g) * (
+                    np.log(borehole.r_b ** 2 / (2 * self.r_out * self.D_s)) + sigma * np.log(
+                borehole.r_b ** 4 / (borehole.r_b ** 4 - self.D_s ** 4)))
+            R_min = R_p + 1 / (2 * np.pi * self.k_g) * (np.log(2 * self.D_s / (self.r_out)) + sigma * np.log(
+                (borehole.r_b ** 2 + self.D_s ** 2) / (borehole.r_b ** 2 - self.D_s ** 2)))
+            if order == 0:
+                # calculate internal resistance and local borehole resistance
+                R_a = 2 * R_min
+                R_b = R_plus / 2
+            elif order == 1:
+                beta = R_p * 2 * np.pi * self.k_g
+                p0 = self.r_out / (2 * self.D_s)
+                p1 = self.r_out * self.D_s / (borehole.r_b ** 2 - self.D_s ** 2)
+                p2 = self.r_out * self.D_s / (borehole.r_b ** 2 + self.D_s ** 2)
+                b1 = (1 - beta) / (1 + beta)
+
+                B1_plus = 1 / (2 * np.pi * self.k_g) * ((b1 * (-p0 + sigma * p1 - sigma * p2) ** 2) / (
+                        1 + b1 * (p0 ** 2 + sigma * (p1 * (p1 + 2 * p0) + p2 * (p2 - 2 * p0)))))
+                B1_min = 1 / (2 * np.pi * self.k_g) * ((b1 * (p0 + sigma * p1 + sigma * p2) ** 2) / (
+                        1 + b1 * ((-1) * p0 ** 2 + sigma * (p1 * (p1 + 2 * p0) + p2 * (p2 - 2 * p0) * (-1)))))
+
+                # calculate internal resistance and local borehole resistance
+                R_a = 2 * R_min - 2 * B1_min
+                R_b = R_plus / 2 - B1_plus / 2
+            elif order == 2:
+                beta = R_p * 2 * np.pi * self.k_g
+                p0 = self.r_out / (2 * self.D_s)
+                p1 = self.r_out * self.D_s / (borehole.r_b ** 2 - self.D_s ** 2)
+                p2 = self.r_out * self.D_s / (borehole.r_b ** 2 + self.D_s ** 2)
+                b1 = (1 - beta) / (1 + beta)
+                b2 = (1 - 2 * beta) / (1 + 2 * beta)
+
+                A12_plus = -2 * p0 ** 3 + 2 * sigma * (p1 ** 2 * (p1 + 2 * p0) - p2 ** 2 * (p2 - 2 * p0))
+                A12_min = +2 * p0 ** 3 + 2 * sigma * (p1 ** 2 * (p1 + 2 * p0) - p2 ** 2 * (p2 - 2 * p0) * (-1))
+                A22_plus = 6 * p0 ** 4 + 2 * sigma * (p1 ** 2 * (3 * p1 ** 3 + 8 * p1 * p0 + 4 * p0 ** 2) + p2 ** 2 * (
+                        3 * p2 ** 2 - 8 * p2 * p0 + 4 * p0 ** 2))
+                A22_min = (-1) * 6 * p0 ** 4 + 2 * sigma * (
+                        p1 ** 2 * (3 * p1 ** 3 + 8 * p1 * p0 + 4 * p0 ** 2) + p2 ** 2 * (
+                        3 * p2 ** 2 - 8 * p2 * p0 + 4 * p0 ** 2) * (-1))
+                V1_plus = -p0 + sigma * p1 - sigma * p2
+                V1_min = p0 + sigma * p1 + sigma * p2
+                A11_plus = p0 ** 2 + sigma * (p1 * (p1 + 2 * p0) + p2 * (p2 - 2 * p0))
+                A11_min = -p0 ** 2 - sigma * (p1 * (p1 + 2 * p0) - p2 * (p2 - 2 * p0))
+                V2_plus = p0 ** 2 + sigma * p1 ** 2 + sigma * p2 ** 2
+                V2_min = (-1) * p0 ** 2 + sigma * p1 ** 2 + sigma * p2 ** 2 * (-1)
+
+                B2_plus = 1 / (2 * np.pi * self.k_g) * ((b1 * V1_plus ** 2) * (
+                        2 + b2 * A22_plus) - 2 * b1 * b2 * V1_plus * V2_plus * A12_plus + b2 * V2_plus ** 2 * (
+                                                                1 + b1 * A11_plus)) / (
+                                  (1 + b1 * A11_plus) * (2 + b2 * A22_plus) - b1 * b2 * A12_plus ** 2)
+
+                B2_min = 1 / (2 * np.pi * self.k_g) * ((b1 * V1_min ** 2) * (
+                        2 + b2 * A22_min) - 2 * b1 * b2 * V1_min * V2_min * A12_min + b2 * V2_min ** 2 * (
+                                                               1 + b1 * A11_min)) / (
+                                 (1 + b1 * A11_min) * (2 + b2 * A22_min) - b1 * b2 * A12_min ** 2)
+
+                # calculate internal resistance and local borehole resistance
+                R_a = 2 * R_min - 2 * B2_min
+                R_b = R_plus / 2 - B2_plus / 2
+            else:
+                raise NotImplementedError(
+                    'Explicit models are only implemented for single U probes are only implemented for orders 0 to 2.')
+        else:
+            # use solution from (Claesson & Javed, 2019)
+            R_plus = R_p / 2 + 1 / (4 * np.pi * self.k_g) * (
+                    np.log(borehole.r_b ** 4 / (4 * self.r_out * self.D_s ** 3)) + sigma * np.log(
+                borehole.r_b ** 8 / (borehole.r_b ** 8 - self.D_s ** 8)))
+
+            if self.config == 'diagonal':
+                # FOR DIAGONAL
+                R_min = R_p + 1 / (2 * np.pi * self.k_g) * (np.log(self.D_s / (self.r_out)) + sigma * np.log(
+                    (borehole.r_b ** 4 + self.D_s ** 4) / (borehole.r_b ** 4 - self.D_s ** 4)))
+            else:
+                # FOR ADJACENT
+                R_min = R_p + 1 / (2 * np.pi * self.k_g) * (np.log(2 * self.D_s / (self.r_out)) + sigma * np.log(
+                    (borehole.r_b ** 2 + self.D_s ** 2) / (borehole.r_b ** 2 - self.D_s ** 2)))
+
+            if order == 0:
+                # calculate internal resistance and local borehole resistance
+                R_a = 2 * R_min
+                R_b = R_plus / 2
+            elif order == 1:
+                beta = R_p * 2 * np.pi * self.k_g
+                ppc = self.r_out ** 2 / (4 * self.D_s ** 2)
+                pc = self.D_s ** 2 / ((borehole.r_b ** 8 - self.D_s ** 8) ** (1 / 4))
+                pb = borehole.r_b ** 2 / ((borehole.r_b ** 8 - self.D_s ** 8) ** (1 / 4))
+                b1 = (1 - beta) / (1 + beta)
+
+                B1_plus = 1 / (4 * np.pi * self.k_g) * (b1 * ppc * (3 - 8 * sigma * pc ** 4) ** 2) / (
+                        1 + b1 * ppc * (5 + 64 * sigma * pc ** 4 * pb ** 4))
+
+                if self.config == 'diagonal':
+                    # FOR DIAGONAL
+                    B1_min = 1 / (2 * np.pi * self.k_g) * (b1 * ppc * (1 + 8 * sigma * pc ** 2 * pb ** 2) ** 2) / (
+                            1 - b1 * ppc * (3 - 32 * sigma * (pc ** 2 * pb ** 6 + pc ** 6 * pb ** 2)))
+                else:
+                    # FOR ADJACENT
+                    # calculate internal resistance and local borehole resistance
+                    M11 = 1 + 16 * b1 * sigma * ppc * (3 * pc ** 3 * pb ** 5 + pc ** 7 * pb)
+                    M21 = b1 * ppc
+                    M12 = -M21
+                    V1 = 1 - 8 * sigma * pc ** 3 * pb
+                    M22 = -1 - 16 * b1 * sigma * ppc * (pc * pb ** 7 + 3 * pc ** 5 * pb ** 3)
+                    V2 = 3 + 8 * sigma * pc * pb ** 3
+                    B1_min = -1 / (2 * pi * self.k_g) * b1 * ppc / 2 * (
+                            V2 ** 2 * M11 - 2 * V1 * V2 * M21 - V1 ** 2 * M22) / (M11 * M22 + M21 ** 2)
+
+                R_a = 2 * R_min - 2 * B1_min  # See paper
+                R_b = R_plus / 2 - B1_plus / 2
+            else:
+                raise NotImplementedError(
+                    'Explicit models are only implemented for double U probes are only implemented for orders 0 an 1.')
+        r_v = borehole.H / (flow_rate_data.mfr_borehole(**kwargs, fluid_data=fluid_data) * fluid_data.cp(
+            **kwargs) / self.number_of_pipes)
+        n = r_v / (self.number_of_pipes * R_b * R_a) ** 0.5
+        return R_b * n * np.cosh(n) / np.sinh(n)
 
     def __export__(self):
         return {'type': 'U',

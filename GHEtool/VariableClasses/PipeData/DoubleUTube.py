@@ -5,12 +5,14 @@ class DoubleUTube(MultipleUTube):
     """
     Class for the double U-Tube borehole.
     """
+
     def __init__(self, k_g: float = None,
                  r_in: float = None,
                  r_out: float = None,
                  k_p: float = None,
                  D_s: float = None,
-                 epsilon: float = 1e-6):
+                 epsilon: float = 1e-6,
+                 config: str = 'diagonal'):
         """
 
         Parameters
@@ -27,5 +29,7 @@ class DoubleUTube(MultipleUTube):
             Distance of the pipe until center [m]
         epsilon : float
             Pipe roughness [m]
+        config : str
+            Either 'diagonal' or 'adjacent'
         """
-        super().__init__(k_g, r_in, r_out, k_p, D_s, 2, epsilon)
+        super().__init__(k_g, r_in, r_out, k_p, D_s, 2, epsilon, config)

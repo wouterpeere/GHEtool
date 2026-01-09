@@ -2,6 +2,7 @@
 This document contains all the information of the borehole class.
 """
 import copy
+import numbers
 
 import pygfunction as gt
 
@@ -39,9 +40,12 @@ class Borehole(BaseClass):
         self._Rb: float = 0.12
         self.use_constant_Rb: bool = True
 
-        self._fluid_data = fluid_data
-        self._pipe_data = pipe_data
-        self._flow_data = flow_data
+        self._fluid_data = None
+        self._pipe_data = None
+        self._flow_data = None
+        self.fluid_data = fluid_data
+        self.pipe_data = pipe_data
+        self.flow_data = flow_data
 
         if self.data_available:
             self.use_constant_Rb: bool = False
@@ -248,7 +252,7 @@ class Borehole(BaseClass):
         self.use_constant_Rb = True
 
     def calculate_Rb(self, H: float, D: float, r_b: float, k_s: Union[float, callable], depth: float = None,
-                     **kwargs) -> float:
+                     use_explicit_models: bool = False, **kwargs) -> float:
         """
         This function calculates the equivalent borehole thermal resistance.
 
@@ -264,6 +268,8 @@ class Borehole(BaseClass):
             (Function to calculate the) ground thermal conductivity [mk/W]
         depth : float
             Borehole depth [m] (only needed if k_s is a function, not a number)
+        use_explicit_models : bool
+            True if the explicit multipole method should be used.
 
         Returns
         -------
@@ -287,11 +293,15 @@ class Borehole(BaseClass):
         # initiate temporary borefield
         borehole = gt.boreholes.Borehole(H, D, r_b, 0, 0)
 
+        if use_explicit_models:
+            return self.pipe_data.explicit_model_borehole_resistance(self.fluid_data, self.flow_data, (
+                k_s if isinstance(k_s, numbers.Real) else k_s(depth, D)), borehole, borehole_length=H, **kwargs)
+
         def calculate(**kwargs):
             self.pipe_data.calculate_resistances(self.fluid_data, self.flow_data, borehole_length=H, **kwargs)
 
             # initiate pipe
-            pipe = self.pipe_data.pipe_model(k_s if isinstance(k_s, (float, int)) else k_s(depth, D), borehole)
+            pipe = self.pipe_data.pipe_model(k_s if isinstance(k_s, numbers.Real) else k_s(depth, D), borehole)
 
             return pipe.effective_borehole_thermal_resistance(
                 self.flow_data.mfr_borehole(fluid_data=self.fluid_data, **kwargs),
@@ -299,7 +309,7 @@ class Borehole(BaseClass):
 
         if 'temperature' in kwargs:
             kwargs_new = copy.deepcopy(kwargs)
-            if isinstance(kwargs_new['temperature'], (int, float)):
+            if isinstance(kwargs_new['temperature'], numbers.Real):
                 return calculate(**kwargs_new)
             elif isinstance(self.fluid_data, ConstantFluidData):
                 kwargs_new['temperature'] = 0  # does not matter since constant

@@ -290,7 +290,7 @@ def test_sizing_with_use_constant_Rb():
     borefield.load = load
     assert not borefield.borehole.use_constant_Rb
     borefield.calculation_setup(L4_sizing=True)
-    assert np.isclose(205.4926086157351, borefield.size())
+    assert np.isclose(205.5033531828061, borefield.size())
     assert np.isclose(182.17320067531486, borefield.size(use_constant_Rb=True))
 
 
@@ -499,4 +499,4 @@ def test_case_issue_390():
 
     borefield.borehole = borehole
     borefield.size_L3()
-    assert np.isclose(borefield.H, 86.21112039367148)
+    assert np.isclose(borefield.H, 86.20617039094199)

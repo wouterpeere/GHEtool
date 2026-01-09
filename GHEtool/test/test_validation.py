@@ -83,3 +83,14 @@ def test_faster_sizing():
 def test_optimise_borefield_configuration():
     from GHEtool.Validation.optimise_borefield_configuration import borefield_case_2, borefield_auditorium
     borefield_case_2()
+
+
+def test_explicit_models(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    from GHEtool.Validation.explicit_models import validate_convective_resistance, explicit_single_U, explicit_double_U, \
+        compare_multiple_resistances, explicit_coaxial
+    validate_convective_resistance()
+    explicit_single_U()
+    explicit_double_U()
+    compare_multiple_resistances()
+    explicit_coaxial()

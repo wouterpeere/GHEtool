@@ -36,6 +36,36 @@ class Separatus(SingleUTube):
                          k_p=0.44,
                          D_s=36 / 2 * 0.001)
 
+    def explicit_model_borehole_resistance(self, fluid_data: _FluidData, flow_rate_data: _FlowData, k_s: float,
+                                           borehole: gt.boreholes.Borehole, order: int = 1, R_p: float = None,
+                                           **kwargs) -> float:
+        """
+        This function returns the effective borehole thermal resistance for the Separatus probe based on an explicit
+        model (always second order).
+        A Separatus heat exchanger can be modelled by using the model of a single U tube, with an extra contact resistance
+        of 0.03 W/(mK) to account for the intermediate wall inside the probe. This value of 0.03W/(mK) was obtained by
+        the company based on real-life measurements.
+
+        Parameters
+        ----------
+        k_s : float
+            Ground thermal conductivity
+        borehole : Borehole
+            Borehole object
+
+        Returns
+        -------
+        BasePipe
+        """
+        if R_p is None:
+            R_p_cond = self.calculate_conductive_resistance(**kwargs)
+            R_p_conv = self.calculate_convective_resistance(flow_rate_data, fluid_data, **kwargs)
+
+            R_p = R_p_cond + R_p_conv + 0.03
+
+        return super().explicit_model_borehole_resistance(fluid_data, flow_rate_data, k_s, borehole, 2, R_p,
+                                                          **kwargs)
+
     def pipe_model(self, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
         """
         This function returns the pipe model for the Separatus probe.
@@ -58,6 +88,7 @@ class Separatus(SingleUTube):
 
         # add 0.03 W/(mK) as a contact resistance
         single_u.R_fp += 0.03
+        single_u.update_thermal_resistances(single_u.R_fp)
 
         return single_u
 
