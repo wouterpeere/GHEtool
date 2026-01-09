@@ -2,6 +2,7 @@
 This document contains all the information of the borehole class.
 """
 import copy
+import numbers
 
 import pygfunction as gt
 
@@ -294,13 +295,13 @@ class Borehole(BaseClass):
 
         if use_explicit_models:
             return self.pipe_data.explicit_model_borehole_resistance(self.fluid_data, self.flow_data, (
-                k_s if isinstance(k_s, (float, int)) else k_s(depth, D)), borehole, borehole_length=H, **kwargs)
+                k_s if isinstance(k_s, numbers.Real) else k_s(depth, D)), borehole, borehole_length=H, **kwargs)
 
         def calculate(**kwargs):
             self.pipe_data.calculate_resistances(self.fluid_data, self.flow_data, borehole_length=H, **kwargs)
 
             # initiate pipe
-            pipe = self.pipe_data.pipe_model(k_s if isinstance(k_s, (float, int)) else k_s(depth, D), borehole)
+            pipe = self.pipe_data.pipe_model(k_s if isinstance(k_s, numbers.Real) else k_s(depth, D), borehole)
 
             return pipe.effective_borehole_thermal_resistance(
                 self.flow_data.mfr_borehole(fluid_data=self.fluid_data, **kwargs),
@@ -308,7 +309,7 @@ class Borehole(BaseClass):
 
         if 'temperature' in kwargs:
             kwargs_new = copy.deepcopy(kwargs)
-            if isinstance(kwargs_new['temperature'], (int, float)):
+            if isinstance(kwargs_new['temperature'], numbers.Real):
                 return calculate(**kwargs_new)
             elif isinstance(self.fluid_data, ConstantFluidData):
                 kwargs_new['temperature'] = 0  # does not matter since constant

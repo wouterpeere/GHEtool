@@ -30,6 +30,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Remove Python 3.9 compatibility (issue #420).
 - Change default test to 3.13 instead of 3.12 (issue #420).
 
+## Fixed
+
+- Fixed minor mistake in Separatus Rb* calculation (issue #425).
+
 ## [2.4.0] - 2025-12-19
 
 ### Added

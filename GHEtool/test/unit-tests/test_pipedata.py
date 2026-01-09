@@ -5,7 +5,7 @@ import math
 import pytest
 
 from GHEtool.VariableClasses.PipeData import *
-from GHEtool.VariableClasses import ConstantFluidData, ConstantFlowRate, TemperatureDependentFluidData
+from GHEtool.VariableClasses import ConstantFluidData, ConstantFlowRate, TemperatureDependentFluidData, Borehole
 import matplotlib.pyplot as plt
 import numpy as np
 import pygfunction as gt
@@ -679,6 +679,40 @@ def test_separatus():
 
     assert np.allclose(separatus.calculate_convective_resistance(flow, fluid, temperature=temp_range),
                        single.calculate_convective_resistance(flow, fluid, temperature=temp_range))
+
+    fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
+    flow_data = ConstantFlowRate(mfr=0.2)
+    separatus = Separatus(1.5)
+
+    # test array-model
+    individual = []
+    temp_range = np.arange(-5, 20, 1)
+    for temp in temp_range:
+        separatus.calculate_resistances(fluid_data, flow_data, temperature=temp)
+        individual.append(separatus.R_f)
+    array = separatus.calculate_convective_resistance(flow_data, fluid_data, temperature=temp_range)
+    assert np.allclose(array, individual)
+
+    # test array-model
+    individual = []
+    fluid_data = TemperatureDependentFluidData('MPG', 25)
+    temp_range = np.arange(-5, 20, 1)
+    for temp in temp_range:
+        separatus.calculate_resistances(fluid_data, flow_data, temperature=temp)
+        individual.append(separatus.R_f)
+    array = separatus.calculate_convective_resistance(flow_data, fluid_data, temperature=temp_range)
+    assert np.allclose(array, individual)
+
+    # test array-model
+    individual = []
+    fluid_data = TemperatureDependentFluidData('MPG', 25)
+    temp_range = np.arange(-5, 20, 1)
+    borehole = Borehole(fluid_data, separatus, flow_data)
+    for temp in temp_range:
+        Rb = borehole.get_Rb(100, 1, 0.075, 2, temperature=temp, use_explicit_models=False)
+        individual.append(Rb)
+    array = borehole.get_Rb(100, 1, 0.075, 2, temperature=temp_range, use_explicit_models=True)
+    assert np.allclose(array, individual)
 
 
 def test_explicit_method_errors():
