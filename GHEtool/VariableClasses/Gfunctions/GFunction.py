@@ -310,7 +310,8 @@ class GFunction:
                 # chances are we are stuck in a loop, so calculate the gfunction and do not iterate
 
                 # calculate the g-values for uniform borehole wall temperature
-                gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options).gFunc
+                gfunc_calculated = gt.gfunction.gFunction(borefield, alpha, time_values, options=self.options,
+                                                          method=self.options["method"]).gFunc
 
                 # store the calculated g-values
                 self.set_new_calculated_data(time_values, borehole_length, gfunc_calculated, borefield, alpha)
