@@ -417,12 +417,9 @@ class ConicalPipe(MultipleUTube):
                 V = flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / 1000 / A / self.number_of_pipes
                 Re = fluid_data.rho(**kwargs) * V * r_in * 2 / fluid_data.mu(**kwargs)
                 if kwargs.get('haaland', False):
-                    fd = friction_factor_Haaland(Re,
-                                                 calc_r_in(length), self.epsilon, **kwargs)
+                    fd = friction_factor_Haaland(Re, calc_r_in(length), self.epsilon, **kwargs)
                 else:
-                    fd = friction_factor_darcy_weisbach(
-                        Re,
-                        calc_r_in(length), self.epsilon, **kwargs)
+                    fd = friction_factor_darcy_weisbach(Re, calc_r_in(length), self.epsilon, **kwargs)
 
                 return ((fd / (r_in * 2)) * fluid_data.rho(**kwargs) * V ** 2 / 2) / 1000
 
