@@ -1,7 +1,6 @@
 """
 This file contains the test for the pipedata
 """
-import math
 import pytest
 
 from GHEtool import VariableHourlyFlowRate
@@ -396,7 +395,7 @@ def test_pressure_drop():
     assert np.isclose(double.pressure_drop(fluid_data, flow_data, 100), 10.347836812519452)
     assert np.isclose(double.pressure_drop(fluid_data, flow_data, 100, False), 10.339838859988387)
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
-    assert np.isclose(coaxial.pressure_drop(fluid_data, flow_data, 100), 0.1639237572210245)
+    assert np.isclose(coaxial.pressure_drop(fluid_data, flow_data, 100), 0.28813886186599036)
     assert np.isclose(19.84145159678991, Separatus(1.5).pressure_drop(fluid_data, flow_data, 100))
 
     # with flow rate per borefield
@@ -410,7 +409,7 @@ def test_pressure_drop():
     assert np.isclose(double.pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2, include_bend=False),
                       10.339838859988387)
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
-    assert np.isclose(coaxial.pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2), 0.1639237572210245)
+    assert np.isclose(coaxial.pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2), 0.28813886186599036)
     assert np.isclose(19.84145159678991, Separatus(1.5).pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2))
 
     flow_data = ConstantFlowRate(mfr=0.3, flow_per_borehole=False, series_factor=2)
@@ -423,8 +422,47 @@ def test_pressure_drop():
     assert np.isclose(double.pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2, include_bend=False),
                       10.339838859988387)
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
-    assert np.isclose(coaxial.pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2), 0.1639237572210245)
+    assert np.isclose(coaxial.pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2), 0.28813886186599036)
     assert np.isclose(19.84145159678991, Separatus(1.5).pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2))
+
+    flow_range = np.linspace(0.1, 5, 8760)
+    flow = VariableHourlyFlowRate(mfr=flow_range)
+    control = []
+    for val in flow_range:
+        control.append(single.pressure_drop(fluid_data, ConstantFlowRate(mfr=val), 100,
+                                            nb_of_boreholes=2, simulation_period=1, haaland=False))
+    assert np.allclose(control, single.pressure_drop(fluid_data, flow, 100, nb_of_boreholes=2, simulation_period=1,
+                                                     haaland=False))
+    control = []
+    for val in flow_range:
+        control.append(double.pressure_drop(fluid_data, ConstantFlowRate(mfr=val), 100,
+                                            nb_of_boreholes=2, simulation_period=1, haaland=False))
+    assert np.allclose(control, double.pressure_drop(fluid_data, flow, 100, nb_of_boreholes=2, simulation_period=1,
+                                                     haaland=False))
+    control = []
+    for val in flow_range:
+        control.append(coaxial.pressure_drop(fluid_data, ConstantFlowRate(mfr=val), 100,
+                                             nb_of_boreholes=2, simulation_period=1, haaland=False))
+    assert np.allclose(control, coaxial.pressure_drop(fluid_data, flow, 100, nb_of_boreholes=2, simulation_period=1,
+                                                      haaland=False))
+    control = []
+    for val in flow_range:
+        control.append(single.pressure_drop(fluid_data, ConstantFlowRate(mfr=val), 100,
+                                            nb_of_boreholes=2, simulation_period=1, haaland=True))
+    assert np.allclose(control, single.pressure_drop(fluid_data, flow, 100, nb_of_boreholes=2, simulation_period=1,
+                                                     haaland=True))
+    control = []
+    for val in flow_range:
+        control.append(double.pressure_drop(fluid_data, ConstantFlowRate(mfr=val), 100,
+                                            nb_of_boreholes=2, simulation_period=1, haaland=True))
+    assert np.allclose(control, double.pressure_drop(fluid_data, flow, 100, nb_of_boreholes=2, simulation_period=1,
+                                                     haaland=True))
+    control = []
+    for val in flow_range:
+        control.append(coaxial.pressure_drop(fluid_data, ConstantFlowRate(mfr=val), 100,
+                                             nb_of_boreholes=2, simulation_period=1, haaland=True))
+    assert np.allclose(control, coaxial.pressure_drop(fluid_data, flow, 100, nb_of_boreholes=2, simulation_period=1,
+                                                      haaland=True))
 
 
 def test_turbocollector():
@@ -475,6 +513,23 @@ def test_turbocollector():
         individual.append(turbo.R_f)
     array = turbo.calculate_convective_resistance(flow_borehole, fluid, temperature=temp_range, haaland=True)
     assert np.allclose(array, individual)
+
+    flow_range = np.linspace(0.1, 5, 8760)
+    flow = VariableHourlyFlowRate(mfr=flow_range)
+    control = []
+    for val in flow_range:
+        control.append(turbo.pressure_drop(fluid, ConstantFlowRate(mfr=val), 100,
+                                           nb_of_boreholes=2, simulation_period=1, temperature=0, haaland=False))
+    assert np.allclose(control,
+                       turbo.pressure_drop(fluid, flow, 100, nb_of_boreholes=2, simulation_period=1, temperature=0,
+                                           haaland=False))
+    control = []
+    for val in flow_range:
+        control.append(turbo.pressure_drop(fluid, ConstantFlowRate(mfr=val), 100,
+                                           nb_of_boreholes=2, simulation_period=1, temperature=0, haaland=True))
+    assert np.allclose(control,
+                       turbo.pressure_drop(fluid, flow, 100, nb_of_boreholes=2, simulation_period=1, temperature=0,
+                                           haaland=True))
 
 
 def test_conical_pipe_get_pipe_model():
@@ -577,6 +632,22 @@ def test_conical_pressure_drop():
     fluid = TemperatureDependentFluidData('MPG', 20).create_constant(0)
     flow = ConstantFlowRate(vfr=0.2)
     assert 0 == pipe._pressure_conical(fluid, flow, end=80)
+    flow_range = np.linspace(0.1, 5, 8760)
+    flow = VariableHourlyFlowRate(mfr=flow_range)
+    control = []
+    for val in flow_range[:100]:
+        control.append(pipe.pressure_drop(fluid, ConstantFlowRate(mfr=val), 100,
+                                          nb_of_boreholes=2, simulation_period=1, temperature=0, haaland=False))
+    assert np.allclose(control,
+                       pipe.pressure_drop(fluid, flow, 100, nb_of_boreholes=2, simulation_period=1, temperature=0,
+                                          haaland=False)[:100])
+    control = []
+    for val in flow_range[:100]:
+        control.append(pipe.pressure_drop(fluid, ConstantFlowRate(mfr=val), 100,
+                                          nb_of_boreholes=2, simulation_period=1, temperature=0, haaland=True))
+    assert np.allclose(control,
+                       pipe.pressure_drop(fluid, flow, 100, nb_of_boreholes=2, simulation_period=1, temperature=0,
+                                          haaland=True)[:100])
 
 
 def test_conical_pressure_drop_total():
@@ -714,6 +785,22 @@ def test_separatus():
         individual.append(Rb)
     array = borehole.get_Rb(100, 1, 0.075, 2, temperature=temp_range, use_explicit_models=True)
     assert np.allclose(array, individual)
+    flow_range = np.linspace(0.1, 5, 8760)
+    flow = VariableHourlyFlowRate(mfr=flow_range)
+    control = []
+    for val in flow_range:
+        control.append(separatus.pressure_drop(fluid, ConstantFlowRate(mfr=val), 100,
+                                               nb_of_boreholes=2, simulation_period=1, temperature=0, haaland=False))
+    assert np.allclose(control,
+                       separatus.pressure_drop(fluid, flow, 100, nb_of_boreholes=2, simulation_period=1, temperature=0,
+                                               haaland=False))
+    control = []
+    for val in flow_range:
+        control.append(separatus.pressure_drop(fluid, ConstantFlowRate(mfr=val), 100,
+                                               nb_of_boreholes=2, simulation_period=1, temperature=0, haaland=True))
+    assert np.allclose(control,
+                       separatus.pressure_drop(fluid, flow, 100, nb_of_boreholes=2, simulation_period=1, temperature=0,
+                                               haaland=True))
 
 
 def test_explicit_method_errors():

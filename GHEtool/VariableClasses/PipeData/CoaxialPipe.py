@@ -279,7 +279,7 @@ class CoaxialPipe(_PipeData):
         """
         # Hydraulic diameter and radius for concentric tube annulus region
         D_h = 2 * (self.r_out_in - self.r_in_out)
-        r_h = D_h / 2
+
         # Cross-sectional area of the annulus region
         A_c = pi * ((self.r_out_in ** 2) - (self.r_in_out ** 2))
         # Volume flow rate
@@ -293,7 +293,6 @@ class CoaxialPipe(_PipeData):
                       include_bend: bool = True, **kwargs) -> float:
         """
         Calculates the pressure drop across the entire borehole.
-        It assumed that the U-tubes are all connected in parallel.
 
         Parameters
         ----------
@@ -312,17 +311,17 @@ class CoaxialPipe(_PipeData):
             Pressure drop [kPa]
         """
 
-        r_h = (self.r_out_in - self.r_in_in)
+        r_h = (self.r_out_in - self.r_in_out)
         # Cross-sectional area of the annulus region
-        A_c = pi * ((self.r_out_in ** 2) - (self.r_in_in ** 2))
+        A_c = pi * ((self.r_out_in ** 2) - (self.r_in_out ** 2))
         # Average velocity
         V = (flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / 1000) / A_c
 
-        # Darcy-Wiesbach friction factor
-        fd = gt.pipes.fluid_friction_factor_circular_pipe(
-            flow_rate_data.mfr_borehole(fluid_data=fluid_data, **kwargs), r_h, fluid_data.mu(**kwargs),
-            fluid_data.rho(**kwargs),
-            self.epsilon)
+        if kwargs.get('haaland', False):
+            fd = friction_factor_Haaland(self.Re(fluid_data, flow_rate_data, **kwargs), r_h, self.epsilon, **kwargs)
+        else:
+            fd = friction_factor_darcy_weisbach(self.Re(fluid_data, flow_rate_data, **kwargs), r_h, self.epsilon,
+                                                **kwargs)
 
         bend = 0
         if include_bend:

@@ -27,6 +27,17 @@ def test_borehole():
                       pressure_drop_both.calculate_pressure_drop_borehole())
 
 
+def test_borehole_variable_flow():
+    single_u = SingleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+    fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
+    flow_data = VariableHourlyFlowRate(mfr=np.linspace(0.1, 5, 8760))
+
+    pressure_drop = PressureDrop(single_u, fluid_data, flow_data, 0, 100,
+                                 0.02 - 0.0037 / 2, 15, 0, 0.02 - 0.0037 / 2,
+                                 15, 0, 8, 1, 1)
+    pressure_drop.calculate_pressure_drop_borehole(simulation_period=1)
+
+
 def test_borehole_flow_borefield():
     single_u = SingleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
     fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
