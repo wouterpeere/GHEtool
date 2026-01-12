@@ -15,7 +15,7 @@ from GHEtool.VariableClasses.LoadData import MonthlyGeothermalLoadAbsolute, Hour
     HourlyBuildingLoadMultiYear, MonthlyBuildingLoadAbsolute
 from GHEtool.VariableClasses.BaseClass import UnsolvableDueToTemperatureGradient
 from GHEtool.Methods import *
-from GHEtool import CustomGFunction
+from GHEtool.VariableClasses.FlowData import VariableHourlyFlowRate, VariableHourlyMultiyearFlowRate
 
 data = GroundConstantTemperature(3, 10)
 ground_data_constant = data
@@ -1488,3 +1488,21 @@ def test_plot_inlet_outlet(monkeypatch):
     borefield.load = HourlyGeothermalLoad(np.full(8760, 1), np.full(8760, 2))
     borefield.print_temperature_profile(type='inlet', plot_hourly=True)
     borefield.print_temperature_profile(type='outlet', plot_hourly=True)
+
+
+def test_hourly_flow_rate():
+    borefield = Borefield()
+    borefield.borefield = copy.deepcopy(borefield_gt)
+    load = HourlyGeothermalLoad()
+    borefield.ground_data = GroundConstantTemperature(2, 10)
+    borefield.fluid_data = ConstantFluidData(0.5, 1200, 4000, 0.001)
+    borefield.flow_data = VariableHourlyFlowRate(mfr=np.full(8760, 0.3))
+    borefield.pipe_data = pipeData
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    borefield.load = load
+
+    with pytest.raises(ValueError):
+        borefield.size_L2()
+    with pytest.raises(ValueError):
+        borefield.size_L3()
+    borefield.size_L4()

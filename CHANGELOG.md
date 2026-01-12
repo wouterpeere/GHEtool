@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   #271).
 - Added inlet and outlet temperatures to Results class (issue #271).
 - Add set_min_fluid_temperature and set_max_fluid_temperature to the Borefield class (issue #271).
+- Add _VariableHourlyFlowRate_, _VariableHourlyMultiyearFlowRate_ to FlowRate class (issue #309).
 - Add flow per borefield to flow classes (issue #408).
 - Average baseload fluid temperature (issue #418).
 - Explicit formulations of the multipole method (issue #425).

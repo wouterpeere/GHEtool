@@ -27,6 +27,7 @@ from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
 from GHEtool.VariableClasses.FluidData._FluidData import _FluidData
 from GHEtool.VariableClasses.FlowData._FlowData import _FlowData
 from GHEtool.VariableClasses.PipeData._PipeData import _PipeData
+from GHEtool.VariableClasses.FlowData import VariableHourlyFlowRate, VariableHourlyMultiyearFlowRate
 
 
 class Borefield(BaseClass):
@@ -584,7 +585,8 @@ class Borefield(BaseClass):
         return self.borehole.get_Rb(self.H, self.D, self.r_b, self.ground_data.k_s, self.depth,
                                     temperature=self.results.min_temperature if self.results.min_temperature is not None else self.Tf_min,
                                     nb_of_boreholes=self.number_of_boreholes,
-                                    use_explicit_models=self._calculation_setup.use_explicit_multipole)
+                                    use_explicit_models=self._calculation_setup.use_explicit_multipole,
+                                    simulation_period=self.load.simulation_period)
 
     @Rb.setter
     def Rb(self, Rb: float) -> None:
@@ -1189,6 +1191,11 @@ class Borefield(BaseClass):
         if not quadrant_sizing in range(0, 5):
             raise ValueError(f"Quadrant {quadrant_sizing} does not exist.")
 
+        # check flow rate
+        if not self.borehole.use_constant_Rb and isinstance(self.borehole.flow_data,
+                                                            (VariableHourlyFlowRate, VariableHourlyMultiyearFlowRate)):
+            raise ValueError('The L2 sizing method is incompatible with an hourly flow rate.')
+
         # check if it is building load
         if isinstance(self.load, _LoadDataBuilding):
             warnings.warn('The L2 method does not work with building load data. The L3 method will be used instead.')
@@ -1290,6 +1297,10 @@ class Borefield(BaseClass):
         # check quadrants
         if not quadrant_sizing in range(0, 5):
             raise ValueError(f"Quadrant {quadrant_sizing} does not exist.")
+        # check flow rate
+        if not self.borehole.use_constant_Rb and isinstance(self.borehole.flow_data,
+                                                            (VariableHourlyFlowRate, VariableHourlyMultiyearFlowRate)):
+            raise ValueError('The L2 sizing method is incompatible with an hourly flow rate.')
 
         # initiate with a given borehole length
         self.H: float = H_init if H_init is not None else self._calculation_setup.H_init
@@ -1845,25 +1856,30 @@ class Borefield(BaseClass):
                         if len(temperature) == 0:
                             return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
                                                         temperature=Tmin, nb_of_boreholes=self.number_of_boreholes,
-                                                        use_explicit_models=self._calculation_setup.use_explicit_multipole)
+                                                        use_explicit_models=self._calculation_setup.use_explicit_multipole,
+                                                        simulation_period=self.load.simulation_period)
                         elif limit == (Tmax if Tmax is not None else self.Tf_max):
                             return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
                                                         temperature=max(temperature),
                                                         nb_of_boreholes=self.number_of_boreholes,
-                                                        use_explicit_models=self._calculation_setup.use_explicit_multipole)
+                                                        use_explicit_models=self._calculation_setup.use_explicit_multipole,
+                                                        simulation_period=self.load.simulation_period)
                         else:
                             return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
                                                         temperature=min(temperature),
                                                         nb_of_boreholes=self.number_of_boreholes,
-                                                        use_explicit_models=self._calculation_setup.use_explicit_multipole)
+                                                        use_explicit_models=self._calculation_setup.use_explicit_multipole,
+                                                        simulation_period=self.load.simulation_period)
                 if len(temperature) == 0:
                     return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
                                                 temperature=Tmin, nb_of_boreholes=self.number_of_boreholes,
-                                                use_explicit_models=self._calculation_setup.use_explicit_multipole)
+                                                use_explicit_models=self._calculation_setup.use_explicit_multipole,
+                                                simulation_period=self.load.simulation_period)
 
                 return self.borehole.get_Rb(H, self.D, self.r_b, self.ground_data.k_s(depth, self.D), depth,
                                             temperature=temperature, nb_of_boreholes=self.number_of_boreholes,
-                                            use_explicit_models=self._calculation_setup.use_explicit_multipole)
+                                            use_explicit_models=self._calculation_setup.use_explicit_multipole,
+                                            simulation_period=self.load.simulation_period)
 
             if not hourly:
                 # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
@@ -1972,10 +1988,12 @@ class Borefield(BaseClass):
                             get_rb(results_temperature.peak_extraction, Tmin) / self.number_of_boreholes / H)
                 if not self.borehole.use_constant_Rb:
                     results._Tf_inlet, results._Tf_outlet = self.calculate_borefield_inlet_outlet_temperature(
-                        self.load.hourly_net_resulting_injection_power, results.peak_injection)
+                        self.load.hourly_net_resulting_injection_power, results.peak_injection,
+                        simulation_period=self.load.simulation_period)
                     if sizing:
                         results._Tf_extraction_inlet, results._Tf_extraction_outlet = self.calculate_borefield_inlet_outlet_temperature(
-                            self.load.hourly_net_resulting_injection_power, results._Tf_extraction)
+                            self.load.hourly_net_resulting_injection_power, results._Tf_extraction,
+                            simulation_period=self.load.simulation_period)
             return results
 
         def calculate_difference(results_old: Union[ResultsMonthly, ResultsHourly],
@@ -2204,7 +2222,7 @@ class Borefield(BaseClass):
         return 2
 
     def calculate_borefield_inlet_outlet_temperature(self, power: Union[float, np.ndarray],
-                                                     temperature: Union[float, np.ndarray]) -> tuple:
+                                                     temperature: Union[float, np.ndarray], **kwargs) -> tuple:
         """
         This function calculates the inlet and outlet temperature of the borefield given the power and the average
         fluid temperature.
@@ -2233,7 +2251,7 @@ class Borefield(BaseClass):
         delta_temp = power / (
                 self.borehole.fluid_data.cp(temperature=temperature) / 1000 *
                 self.borehole.flow_data.mfr_borefield(fluid_data=self.fluid_data, temperature=temperature,
-                                                      nb_of_boreholes=self.number_of_boreholes))
+                                                      nb_of_boreholes=self.number_of_boreholes, **kwargs))
 
         # power < 0 when in extraction
         return temperature + delta_temp / 2, temperature - delta_temp / 2

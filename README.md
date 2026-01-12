@@ -179,9 +179,9 @@ You can set the fluid data by using the FluidData class.
 
 #### Flow rate data
 
-Currently, only constant flow rates are compatible with GHEtool, but this will change in the future.
-
-* _ConstantFlowRate_
+* _ConstantFlowRate_: A single, unique constant flow rate for the system.
+* _VariableHourlyFlowRate_: An hourly varying flow rate for the system.
+* _VariableHourlyMultiyearFlowRate_: An multiyear hourly varying flow rate for the system.
 
 #### Efficiency data
 

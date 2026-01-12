@@ -4,6 +4,7 @@ This file contains the test for the pipedata
 import math
 import pytest
 
+from GHEtool import VariableHourlyFlowRate
 from GHEtool.VariableClasses.PipeData import *
 from GHEtool.VariableClasses import ConstantFluidData, ConstantFlowRate, TemperatureDependentFluidData, Borehole
 import matplotlib.pyplot as plt
@@ -778,6 +779,102 @@ def test_explicit_models_double_U():
                       pipe.explicit_model_borehole_resistance(fluid, flow, 3, borehole, 0, R_p=0.05))
     assert np.isclose(0.0595478420593229,
                       pipe.explicit_model_borehole_resistance(fluid, flow, 3, borehole, 1, R_p=0.05))
+
+
+def test_convective_resistance_variable_flow_constant_fluid():
+    single = SingleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+    coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
+    conical = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
+    separatus = Separatus(1.5)
+    turbo = Turbocollector(1.5, 0.013, 0.016, 0.035, 1)
+
+    constant_fluid = TemperatureDependentFluidData('MPG', 25).create_constant(0)
+
+    flow_range = np.linspace(0.01, 10, 8760)
+    variable_flow = VariableHourlyFlowRate(mfr=flow_range)
+
+    control = []
+    for flow in flow_range:
+        const_flow = ConstantFlowRate(mfr=flow)
+        control.append(single.calculate_convective_resistance(const_flow, constant_fluid))
+    results_var = single.calculate_convective_resistance(variable_flow, constant_fluid, simulation_period=1)
+    assert np.allclose(control, results_var)
+    control = []
+    for flow in flow_range:
+        const_flow = ConstantFlowRate(mfr=flow)
+        control.append(coaxial.calculate_convective_resistance(const_flow, constant_fluid))
+    results_var = coaxial.calculate_convective_resistance(variable_flow, constant_fluid, simulation_period=1)
+    assert np.allclose(np.transpose(control), results_var)
+    control = []
+    for flow in flow_range[100:200]:
+        const_flow = ConstantFlowRate(mfr=flow)
+        control.append(conical.calculate_convective_resistance(const_flow, constant_fluid, borehole_length=200))
+    results_var = conical.calculate_convective_resistance(variable_flow, constant_fluid, simulation_period=1,
+                                                          borehole_length=200)[100:200]
+    assert np.allclose(control, results_var)
+    control = []
+    for flow in flow_range:
+        const_flow = ConstantFlowRate(mfr=flow)
+        control.append(separatus.calculate_convective_resistance(const_flow, constant_fluid))
+    results_var = separatus.calculate_convective_resistance(variable_flow, constant_fluid, simulation_period=1)
+    assert np.allclose(control, results_var)
+    control = []
+    for flow in flow_range:
+        const_flow = ConstantFlowRate(mfr=flow)
+        control.append(turbo.calculate_convective_resistance(const_flow, constant_fluid))
+    results_var = turbo.calculate_convective_resistance(variable_flow, constant_fluid, simulation_period=1)
+    assert np.allclose(control, results_var)
+
+
+def test_convective_resistance_variable_flow_constant_var_fluid():
+    single = SingleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+    coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
+    conical = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
+    separatus = Separatus(1.5)
+    turbo = Turbocollector(1.5, 0.013, 0.016, 0.035, 1)
+
+    var_fluid = TemperatureDependentFluidData('MPG', 25)
+
+    flow_range = np.linspace(0.01, 10, 8760)
+    variable_flow = VariableHourlyFlowRate(mfr=flow_range)
+    temperatures = np.linspace(-5, 25, 8760)
+
+    control = []
+    for idx, flow in enumerate(flow_range):
+        const_flow = ConstantFlowRate(mfr=flow)
+        control.append(single.calculate_convective_resistance(const_flow, var_fluid, temperature=temperatures[idx]))
+    results_var = single.calculate_convective_resistance(variable_flow, var_fluid, simulation_period=1,
+                                                         temperature=temperatures)
+    assert np.allclose(control, results_var)
+    control = []
+    for idx, flow in enumerate(flow_range):
+        const_flow = ConstantFlowRate(mfr=flow)
+        control.append(coaxial.calculate_convective_resistance(const_flow, var_fluid, temperature=temperatures[idx]))
+    results_var = coaxial.calculate_convective_resistance(variable_flow, var_fluid, simulation_period=1,
+                                                          temperature=temperatures)
+    assert np.allclose(np.transpose(control), results_var)
+    control = []
+    for idx, flow in enumerate(flow_range[:100]):
+        const_flow = ConstantFlowRate(mfr=flow)
+        control.append(conical.calculate_convective_resistance(const_flow, var_fluid, borehole_length=200,
+                                                               temperature=temperatures[idx]))
+    results_var = conical.calculate_convective_resistance(variable_flow, var_fluid, simulation_period=1,
+                                                          borehole_length=200, temperature=temperatures)[:100]
+    assert np.allclose(control, results_var)
+    control = []
+    for idx, flow in enumerate(flow_range):
+        const_flow = ConstantFlowRate(mfr=flow)
+        control.append(separatus.calculate_convective_resistance(const_flow, var_fluid, temperature=temperatures[idx]))
+    results_var = separatus.calculate_convective_resistance(variable_flow, var_fluid, simulation_period=1,
+                                                            temperature=temperatures)
+    assert np.allclose(control, results_var)
+    control = []
+    for idx, flow in enumerate(flow_range):
+        const_flow = ConstantFlowRate(mfr=flow)
+        control.append(turbo.calculate_convective_resistance(const_flow, var_fluid, temperature=temperatures[idx]))
+    results_var = turbo.calculate_convective_resistance(variable_flow, var_fluid, simulation_period=1,
+                                                        temperature=temperatures)
+    assert np.allclose(control, results_var)
 
 
 def test_audit():

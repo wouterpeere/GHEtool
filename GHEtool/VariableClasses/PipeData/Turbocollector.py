@@ -71,20 +71,22 @@ class Turbocollector(MultipleUTube):
         # Laminar turbo correlation (Re ≤ 1700)
         laminar = re <= 1700.0
         if np.any(laminar):
-            nu[laminar] = np.sqrt(nu_sl ** 2 + ((5.5e-7) * re[laminar] ** 1.77 * pr[laminar] ** 0.5) ** 2)
+            pr_formula = pr[laminar] if len(pr) > 1 else pr[0]
+            nu[laminar] = np.sqrt(nu_sl ** 2 + ((5.5e-7) * re[laminar] ** 1.77 * pr_formula ** 0.5) ** 2)
 
         # Transitional turbo correlation (1700 < Re ≤ 4000)
         transitional = (re > 1700.0) & (re <= 4000.0)
         if np.any(transitional):
+            pr_formula = pr[transitional] if len(pr) > 1 else pr[0]
             nu[transitional] = np.sqrt(
-                nu_sl ** 2 + (0.86 * (re[transitional] - 1699.0) ** 0.39 * pr[transitional] ** 0.32) ** 2)
+                nu_sl ** 2 + (0.86 * (re[transitional] - 1699.0) ** 0.39 * pr_formula ** 0.32) ** 2)
 
         # Turbulent region (Re > 4000)
         turbulent = re > 4000.0
         if np.any(turbulent):
             # constant enhancement relative to smooth pipe correlation
-            # TODO fix this to work with constant fluid properties and variable flow
-            nu_4000 = np.sqrt(nu_sl ** 2 + (0.86 * (4000.0 - 1699.0) ** 0.39 * pr[turbulent] ** 0.32) ** 2)
+            pr_formula = pr[turbulent] if len(pr) > 1 else pr[0]
+            nu_4000 = np.sqrt(nu_sl ** 2 + (0.86 * (4000.0 - 1699.0) ** 0.39 * pr_formula ** 0.32) ** 2)
 
             if kwargs.get('haaland', False):
                 f = friction_factor_Haaland(4000.0, self.r_in, self.epsilon, **kwargs)
