@@ -3,6 +3,8 @@ import numpy as np
 
 from math import pi
 from typing import Union
+
+from GHEtool import VariableHourlyFlowRate, VariableHourlyMultiyearFlowRate
 from GHEtool.VariableClasses import HourlyBuildingLoad, MonthlyBuildingLoadMultiYear, HourlyBuildingLoadMultiYear, \
     ConstantFluidData, ConstantFlowRate, TemperatureDependentFluidData, EERCombined, SCOP, SEER
 from GHEtool.VariableClasses.LoadData.Baseclasses import _LoadDataBuilding
@@ -54,6 +56,11 @@ def optimise_load_profile_power(
     """
     # copy borefield
     borefield = copy.deepcopy(borefield)
+
+    # check if hourly flow rate is given and the temperature profile is monthly
+    if (not use_hourly_resolution and not borefield.borehole.use_constant_Rb and
+            isinstance(borefield.borehole.flow_data, (VariableHourlyFlowRate, VariableHourlyMultiyearFlowRate))):
+        raise ValueError('No monthly resolution can be used when working with an hourly flow rate.')
 
     # check if hourly load is given
     if not isinstance(building_load, (HourlyBuildingLoad, HourlyBuildingLoadMultiYear)):
@@ -220,6 +227,12 @@ def optimise_load_profile_energy(
     ValueError
         ValueError if no correct load data is given or the threshold is negative
     """
+
+    # check if hourly flow rate is given and the temperature profile is monthly
+    if (not borefield.borehole.use_constant_Rb and
+            isinstance(borefield.borehole.flow_data, (VariableHourlyFlowRate, VariableHourlyMultiyearFlowRate))):
+        raise ValueError('No hourly flow rate can be used when working with this method.')
+
     # copy borefield
     borefield = copy.deepcopy(borefield)
 
@@ -559,6 +572,10 @@ def optimise_load_profile_balance(
     ValueError
         ValueError if no correct load data is given or the threshold is negative
     """
+    # check if hourly flow rate is given and the temperature profile is monthly
+    if (not use_hourly_resolution and not borefield.borehole.use_constant_Rb and
+            isinstance(borefield.borehole.flow_data, (VariableHourlyFlowRate, VariableHourlyMultiyearFlowRate))):
+        raise ValueError('No monthly resolution can be used when working with an hourly flow rate.')
     # copy borefield
     borefield = copy.deepcopy(borefield)
 

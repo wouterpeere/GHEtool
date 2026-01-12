@@ -1493,7 +1493,7 @@ def test_plot_inlet_outlet(monkeypatch):
 def test_hourly_flow_rate():
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
-    load = HourlyGeothermalLoad()
+    load = HourlyBuildingLoad()
     borefield.ground_data = GroundConstantTemperature(2, 10)
     borefield.fluid_data = ConstantFluidData(0.5, 1200, 4000, 0.001)
     borefield.flow_data = VariableHourlyFlowRate(mfr=np.full(8760, 0.3))
@@ -1505,4 +1505,12 @@ def test_hourly_flow_rate():
         borefield.size_L2()
     with pytest.raises(ValueError):
         borefield.size_L3()
+    with pytest.raises(ValueError):
+        borefield.calculate_temperatures(hourly=False)
+    with pytest.raises(ValueError):
+        optimise_load_profile_power(borefield, load, use_hourly_resolution=False)
+    with pytest.raises(ValueError):
+        optimise_load_profile_balance(borefield, load, use_hourly_resolution=False)
+    with pytest.raises(ValueError):
+        optimise_load_profile_energy(borefield, load)
     borefield.size_L4()

@@ -182,9 +182,15 @@ def test_variable_hourly_flow_rate():
     with pytest.raises(ValueError):
         flow.vfr_borehole()
     with pytest.raises(ValueError):
+        flow.vfr_borehole(simulation_period=1)
+    with pytest.raises(ValueError):
         flow.vfr_borefield()
     with pytest.raises(ValueError):
         flow.mfr_borefield()
+    with pytest.raises(ValueError):
+        flow.vfr_borefield(simulation_period=1)
+    with pytest.raises(ValueError):
+        flow.mfr_borefield(simulation_period=1)
     assert np.allclose(flow.mfr_borehole(simulation_period=2, fluid_data=fluid, nb_of_boreholes=2),
                        np.tile(np.linspace(0, 8760, 8760), 2))
     assert np.allclose(flow.mfr_borefield(simulation_period=2, nb_of_boreholes=2, fluid_data=fluid),
@@ -197,6 +203,8 @@ def test_variable_hourly_flow_rate():
     flow = VariableHourlyFlowRate(vfr=np.linspace(0, 8760, 8760))
     with pytest.raises(ValueError):
         flow.mfr_borehole()
+    with pytest.raises(ValueError):
+        flow.mfr_borehole(simulation_period=1)
     with pytest.raises(ValueError):
         flow.vfr_borefield()
     with pytest.raises(ValueError):
@@ -217,7 +225,7 @@ def test_variable_hourly_flow_rate():
     with pytest.raises(ValueError):
         flow.vfr_borehole(simulation_period=1, fluid_data=fluid)
     with pytest.raises(ValueError):
-        flow.vfr_borehole(simulation_period=1, fluid_data=fluid)
+        flow.vfr_borefield(simulation_period=1)
     assert np.allclose(flow.mfr_borehole(simulation_period=2, fluid_data=fluid, nb_of_boreholes=2),
                        np.tile(np.linspace(0, 8760, 8760) / 2, 2))
     assert np.allclose(flow.mfr_borefield(simulation_period=2, nb_of_boreholes=2, fluid_data=fluid),

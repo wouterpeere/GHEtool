@@ -1882,6 +1882,11 @@ class Borefield(BaseClass):
                                             simulation_period=self.load.simulation_period)
 
             if not hourly:
+                if not self.borehole.use_constant_Rb and isinstance(self.borehole.flow_data, (VariableHourlyFlowRate,
+                                                                                              VariableHourlyMultiyearFlowRate)):
+                    raise ValueError(
+                        'No monthly temperature profile can be calculated when an hourly flow rate is given.')
+
                 # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
                 # g-function. This dataset is checked over and over again and is correct
                 g_values = self.gfunction(self.load.time_L3, H)

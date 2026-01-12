@@ -194,6 +194,12 @@ borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
 list_of_test_objects.add(
     SizingObject(borefield, L2_output=119.5189, L3_output=119.3097, L4_output=101.33915035063208, quadrant=1,
                  name='BS2023 Auditorium (MPG, Variable limit)'))
+borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
+borefield.flow_data = VariableHourlyFlowRate(mfr=np.full(8760, 0.2))
+list_of_test_objects.add(
+    SizingObject(borefield, L4_output=101.33915035063208, quadrant=1,
+                 name='BS2023 Auditorium (MPG, Variable limit, variable flow)'))
+borefield.flow_data = ConstantFlowRate(mfr=0.2)
 borefield.fluid_data = TemperatureDependentFluidData('MPG', 25).create_constant(3)
 list_of_test_objects.add(SizingObject(borefield, L2_output=121.0716, L3_output=120.8516, L4_output=102.7196, quadrant=1,
                                       name='BS2023 Auditorium (MPG, fixed limit)'))
