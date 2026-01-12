@@ -167,6 +167,15 @@ def test_eq():
     assert fluid2 != fluid3
     assert fluid4 == fluid2
 
+    fluid = VariableHourlyMultiyearFlowRate(mfr=np.full(8760, 1))
+    fluid2 = VariableHourlyMultiyearFlowRate(vfr=np.full(8760, 1))
+    fluid3 = ConstantFluidData(1, 1, 1, 1)
+    fluid4 = VariableHourlyMultiyearFlowRate(vfr=np.full(8760, 1))
+    assert fluid != fluid2
+    assert fluid3 != fluid2
+    assert fluid2 != fluid3
+    assert fluid4 == fluid2
+
 
 def test_variable_hourly_flow_rate():
     fluid = TemperatureDependentFluidData('MPG', 20).create_constant(0)
@@ -252,6 +261,82 @@ def test_variable_hourly_flow_rate():
                        np.tile(np.linspace(0, 8760, 8760), 2))
 
 
+def test_variable_hourly_multiyear_flow_rate():
+    fluid = TemperatureDependentFluidData('MPG', 20).create_constant(0)
+    with pytest.raises(ValueError):
+        VariableHourlyMultiyearFlowRate(mfr=np.full(8760, 8760), vfr=np.full(8760, 8760))
+    with pytest.raises(ValueError):
+        VariableHourlyMultiyearFlowRate(mfr=np.full(8760 * 12 - 1, 1))
+    with pytest.raises(ValueError):
+        VariableHourlyMultiyearFlowRate(vfr=np.full(8760 * 12 - 1, 1))
+
+    # flow per borehole
+    flow = VariableHourlyMultiyearFlowRate(mfr=np.tile(np.linspace(0, 8760, 8760), 2))
+    with pytest.raises(ValueError):
+        flow.vfr_borehole()
+    with pytest.raises(ValueError):
+        flow.vfr_borefield()
+    with pytest.raises(ValueError):
+        flow.mfr_borefield()
+    assert np.allclose(flow.mfr_borehole(fluid_data=fluid, nb_of_boreholes=2),
+                       np.tile(np.linspace(0, 8760, 8760), 2))
+    assert np.allclose(flow.mfr_borefield(nb_of_boreholes=2, fluid_data=fluid),
+                       np.tile(np.linspace(0, 8760, 8760) * 2, 2))
+    assert np.allclose(flow.vfr_borehole(fluid_data=fluid, nb_of_boreholes=2),
+                       np.tile(np.linspace(0, 8760, 8760) / fluid.rho() * 1000, 2))
+    assert np.allclose(flow.vfr_borefield(nb_of_boreholes=2, fluid_data=fluid),
+                       np.tile(np.linspace(0, 8760, 8760) * 2 / fluid.rho() * 1000, 2))
+
+    flow = VariableHourlyMultiyearFlowRate(vfr=np.tile(np.linspace(0, 8760, 8760), 2))
+    with pytest.raises(ValueError):
+        flow.mfr_borehole()
+    with pytest.raises(ValueError):
+        flow.vfr_borefield()
+    with pytest.raises(ValueError):
+        flow.mfr_borefield()
+    assert np.allclose(flow.mfr_borehole(fluid_data=fluid, nb_of_boreholes=2),
+                       np.tile(np.linspace(0, 8760, 8760) / 1000 * fluid.rho(), 2))
+    assert np.allclose(flow.mfr_borefield(nb_of_boreholes=2, fluid_data=fluid),
+                       np.tile(np.linspace(0, 8760, 8760) * 2 / 1000 * fluid.rho(), 2))
+    assert np.allclose(flow.vfr_borehole(fluid_data=fluid, nb_of_boreholes=2),
+                       np.tile(np.linspace(0, 8760, 8760), 2))
+    assert np.allclose(flow.vfr_borefield(nb_of_boreholes=2, fluid_data=fluid),
+                       np.tile(np.linspace(0, 8760, 8760) * 2, 2))
+
+    # flow per borefield
+    flow = VariableHourlyMultiyearFlowRate(mfr=np.tile(np.linspace(0, 8760, 8760), 2), flow_per_borehole=False)
+    with pytest.raises(ValueError):
+        flow.mfr_borehole(fluid_data=fluid)
+    with pytest.raises(ValueError):
+        flow.vfr_borehole(fluid_data=fluid)
+    with pytest.raises(ValueError):
+        flow.vfr_borefield()
+    assert np.allclose(flow.mfr_borehole(fluid_data=fluid, nb_of_boreholes=2),
+                       np.tile(np.linspace(0, 8760, 8760) / 2, 2))
+    assert np.allclose(flow.mfr_borefield(nb_of_boreholes=2, fluid_data=fluid),
+                       np.tile(np.linspace(0, 8760, 8760), 2))
+    assert np.allclose(flow.vfr_borehole(fluid_data=fluid, nb_of_boreholes=2),
+                       np.tile(np.linspace(0, 8760, 8760) / 2 / fluid.rho() * 1000, 2))
+    assert np.allclose(flow.vfr_borefield(nb_of_boreholes=2, fluid_data=fluid),
+                       np.tile(np.linspace(0, 8760, 8760) / fluid.rho() * 1000, 2))
+
+    flow = VariableHourlyMultiyearFlowRate(vfr=np.tile(np.linspace(0, 8760, 8760), 2), flow_per_borehole=False)
+    with pytest.raises(ValueError):
+        flow.mfr_borehole(fluid_data=fluid)
+    with pytest.raises(ValueError):
+        flow.vfr_borehole(fluid_data=fluid)
+    with pytest.raises(ValueError):
+        flow.mfr_borefield()
+    assert np.allclose(flow.mfr_borehole(fluid_data=fluid, nb_of_boreholes=2),
+                       np.tile(np.linspace(0, 8760, 8760) / 2 / 1000 * fluid.rho(), 2))
+    assert np.allclose(flow.mfr_borefield(nb_of_boreholes=2, fluid_data=fluid),
+                       np.tile(np.linspace(0, 8760, 8760) / 1000 * fluid.rho(), 2))
+    assert np.allclose(flow.vfr_borehole(fluid_data=fluid, nb_of_boreholes=2),
+                       np.tile(np.linspace(0, 8760, 8760) / 2, 2))
+    assert np.allclose(flow.vfr_borefield(nb_of_boreholes=2, fluid_data=fluid),
+                       np.tile(np.linspace(0, 8760, 8760), 2))
+
+
 def test_repr_constant_hourly_flow_rate():
     flow = VariableHourlyFlowRate(mfr=np.linspace(0, 8760, 8760))
     assert flow.__export__() == {'type': 'Hourly mfr per borehole [kg/s]'}
@@ -261,3 +346,14 @@ def test_repr_constant_hourly_flow_rate():
     assert flow.__export__() == {'type': 'Hourly mfr per borefield [kg/s]', 'series factor [-]': 2}
     flow = VariableHourlyFlowRate(vfr=np.linspace(0, 8760, 8760), flow_per_borehole=False, series_factor=2)
     assert flow.__export__() == {'type': 'Hourly vfr per borefield [l/s]', 'series factor [-]': 2}
+
+
+def test_repr_constant_hourly_multiyear_flow_rate():
+    flow = VariableHourlyMultiyearFlowRate(mfr=np.linspace(0, 8760, 8760))
+    assert flow.__export__() == {'type': 'Hourly multiyear mfr per borehole [kg/s]'}
+    flow = VariableHourlyMultiyearFlowRate(vfr=np.linspace(0, 8760, 8760))
+    assert flow.__export__() == {'type': 'Hourly multiyear vfr per borehole [l/s]'}
+    flow = VariableHourlyMultiyearFlowRate(mfr=np.linspace(0, 8760, 8760), flow_per_borehole=False, series_factor=2)
+    assert flow.__export__() == {'type': 'Hourly multiyear mfr per borefield [kg/s]', 'series factor [-]': 2}
+    flow = VariableHourlyMultiyearFlowRate(vfr=np.linspace(0, 8760, 8760), flow_per_borehole=False, series_factor=2)
+    assert flow.__export__() == {'type': 'Hourly multiyear vfr per borefield [l/s]', 'series factor [-]': 2}

@@ -7,7 +7,7 @@ from GHEtool.VariableClasses.FlowData.VariableHourlyFlowRate import VariableHour
 class VariableHourlyMultiyearFlowRate(VariableHourlyFlowRate):
 
     def __init__(self, *, mfr: np.ndarray = None, vfr: np.ndarray = None, flow_per_borehole: bool = True,
-                 series_factor: int = 1, simulation_period: int = 1, **kwargs) -> None:
+                 series_factor: int = 1, **kwargs) -> None:
         """
 
         Parameters
@@ -20,25 +20,20 @@ class VariableHourlyMultiyearFlowRate(VariableHourlyFlowRate):
             True if the flow rate is given for a single borehole, False if it is given for the entire borefield
         series_factor : int
             Number of boreholes in series to couple the flow rate per borehole to the flow rate of the entire borefield
-        simulation_period : int
-            Length of the simulation period [years]
         """
 
         self._mfr = mfr
         self._vfr = vfr
         self._flow_per_borehole = flow_per_borehole
         self._series_factor = series_factor
-        self._simulation_period = simulation_period
 
         if self._mfr is not None and self._vfr is not None:
             raise ValueError('You cannot set both the mass flow rate and volume flow rate')
 
-        if self._mfr is not None and len(self._mfr) != 8760 * simulation_period:
-            raise ValueError(
-                f'VariableHourlyFlowRate requires an input length of {8760 * simulation_period} values, but only {len(self._mfr)} are given.')
-        if self._vfr is not None and len(self._vfr) != 8760 * simulation_period:
-            raise ValueError(
-                f'VariableHourlyFlowRate requires an input length of {8760 * simulation_period} values, but only {len(self._vfr)} are given.')
+        if self._mfr is not None and len(self._mfr) % 8760 != 0:
+            raise ValueError(f'VariableHourlyMultiyearFlowRate requires a multiple of 8760 hourly flow rate values.')
+        if self._vfr is not None and len(self._vfr) % 8760 != 0:
+            raise ValueError(f'VariableHourlyMultiyearFlowRate requires a multiple of 8760 hourly flow rate values.')
 
     def vfr_borehole(self, fluid_data: _FluidData = None, nb_of_boreholes: int = None, series_factor: int = 1,
                      **kwargs) -> np.ndarray:
@@ -65,7 +60,8 @@ class VariableHourlyMultiyearFlowRate(VariableHourlyFlowRate):
         ValueError
             When the constant flow rates is given for the volume and no fluid_data or temperature is given as an argument.
         """
-        return super().vfr_borehole(fluid_data, nb_of_boreholes, series_factor, self._simulation_period, **kwargs)
+        kwargs.pop('simulation_period', None)
+        return super().vfr_borehole(fluid_data, nb_of_boreholes, series_factor, 1, **kwargs)
 
     def mfr_borehole(self, fluid_data: _FluidData = None, nb_of_boreholes: int = None, series_factor: int = 1,
                      **kwargs) -> np.ndarray:
@@ -92,7 +88,8 @@ class VariableHourlyMultiyearFlowRate(VariableHourlyFlowRate):
         ValueError
             When the constant flow rate is given for the volume and no fluid_data or temperature is given as an argument.
         """
-        return super().mfr_borehole(fluid_data, nb_of_boreholes, series_factor, self._simulation_period, **kwargs)
+        kwargs.pop('simulation_period', None)
+        return super().mfr_borehole(fluid_data, nb_of_boreholes, series_factor, 1, **kwargs)
 
     def vfr_borefield(self, fluid_data: _FluidData = None, nb_of_boreholes: int = None, series_factor: int = 1,
                       **kwargs) -> np.ndarray:
@@ -119,7 +116,8 @@ class VariableHourlyMultiyearFlowRate(VariableHourlyFlowRate):
         ValueError
             When the constant flow rate is given for the volume and no fluid_data or temperature is given as an argument.
         """
-        return super().vfr_borefield(fluid_data, nb_of_boreholes, series_factor, self._simulation_period, **kwargs)
+        kwargs.pop('simulation_period', None)
+        return super().vfr_borefield(fluid_data, nb_of_boreholes, series_factor, 1, **kwargs)
 
     def mfr_borefield(self, fluid_data: _FluidData = None, nb_of_boreholes: int = None, series_factor: int = 1,
                       **kwargs) -> np.ndarray:
@@ -147,4 +145,30 @@ class VariableHourlyMultiyearFlowRate(VariableHourlyFlowRate):
         ValueError
             When the constant flow rate is given for the volume and no fluid_data or temperature is given as an argument.
         """
-        return super().mfr_borefield(fluid_data, nb_of_boreholes, series_factor, self._simulation_period, **kwargs)
+        kwargs.pop('simulation_period', None)
+        return super().mfr_borefield(fluid_data, nb_of_boreholes, series_factor, 1, **kwargs)
+
+    def __eq__(self, other):
+        if not isinstance(other, VariableHourlyMultiyearFlowRate):
+            return False
+        if ((self._vfr is None and other._vfr is not None or self._vfr is not None and other._vfr is None) or
+                (self._mfr is None and other._mfr is not None or self._mfr is not None and other._mfr is None) or
+                (self._mfr is not None and not np.allclose(self._mfr, other._mfr)) or
+                (self._vfr is not None and not np.allclose(self._vfr, other._vfr))
+                or self._series_factor != other._series_factor or
+                self._flow_per_borehole != other._flow_per_borehole or
+                self._simulation_period != other._simulation_period):
+            return False
+        return True
+
+    def __export__(self):
+        if self._mfr is not None:
+            if self._flow_per_borehole:
+                return {'type': 'Hourly multiyear mfr per borehole [kg/s]'}
+            else:
+                return {'type': 'Hourly multiyear mfr per borefield [kg/s]', 'series factor [-]': self._series_factor}
+        if self._vfr is not None:
+            if self._flow_per_borehole:
+                return {'type': 'Hourly multiyear vfr per borehole [l/s]'}
+            else:
+                return {'type': 'Hourly multiyear vfr per borefield [l/s]', 'series factor [-]': self._series_factor}
