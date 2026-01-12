@@ -30,6 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Bring up-to-date with numpy 2.4.0 (issue #420).
 - Remove Python 3.9 compatibility (issue #420).
 - Change default test to 3.13 instead of 3.12 (issue #420).
+- Change pressure drop functions to work with arrays (issue #426)
 
 ## Fixed
 
