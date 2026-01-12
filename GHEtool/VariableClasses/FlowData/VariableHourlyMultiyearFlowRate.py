@@ -156,7 +156,7 @@ class VariableHourlyMultiyearFlowRate(VariableHourlyFlowRate):
                 (self._mfr is not None and not np.allclose(self._mfr, other._mfr)) or
                 (self._vfr is not None and not np.allclose(self._vfr, other._vfr))
                 or self._series_factor != other._series_factor or
-                self._flow_per_borehole != other._flow_per_borehole:
+                self._flow_per_borehole != other._flow_per_borehole):
             return False
         return True
 
