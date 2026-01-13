@@ -35,7 +35,7 @@ class VariableHourlyMultiyearFlowRate(VariableHourlyFlowRate):
         if self._vfr is not None and len(self._vfr) % 8760 != 0:
             raise ValueError(f'VariableHourlyMultiyearFlowRate requires a multiple of 8760 hourly flow rate values.')
 
-    def vfr_borehole(self, fluid_data: _FluidData = None, nb_of_boreholes: int = None, series_factor: int = 1,
+    def vfr_borehole(self, fluid_data: _FluidData = None, nb_of_boreholes: int = None, series_factor: int = None,
                      **kwargs) -> np.ndarray:
         """
         This function returns the volume flow rate for a single borefield for the entire simulation period.
@@ -63,7 +63,7 @@ class VariableHourlyMultiyearFlowRate(VariableHourlyFlowRate):
         kwargs.pop('simulation_period', None)
         return super().vfr_borehole(fluid_data, nb_of_boreholes, series_factor, 1, **kwargs)
 
-    def mfr_borehole(self, fluid_data: _FluidData = None, nb_of_boreholes: int = None, series_factor: int = 1,
+    def mfr_borehole(self, fluid_data: _FluidData = None, nb_of_boreholes: int = None, series_factor: int = None,
                      **kwargs) -> np.ndarray:
         """
         This function returns the mass flow rate for a single borehole. Either based on a given mass flow rate,
@@ -91,7 +91,7 @@ class VariableHourlyMultiyearFlowRate(VariableHourlyFlowRate):
         kwargs.pop('simulation_period', None)
         return super().mfr_borehole(fluid_data, nb_of_boreholes, series_factor, 1, **kwargs)
 
-    def vfr_borefield(self, fluid_data: _FluidData = None, nb_of_boreholes: int = None, series_factor: int = 1,
+    def vfr_borefield(self, fluid_data: _FluidData = None, nb_of_boreholes: int = None, series_factor: int = None,
                       **kwargs) -> np.ndarray:
         """
         This function returns the volume flow rate for a single borefield. Either based on a given mass flow rate,
@@ -119,7 +119,7 @@ class VariableHourlyMultiyearFlowRate(VariableHourlyFlowRate):
         kwargs.pop('simulation_period', None)
         return super().vfr_borefield(fluid_data, nb_of_boreholes, series_factor, 1, **kwargs)
 
-    def mfr_borefield(self, fluid_data: _FluidData = None, nb_of_boreholes: int = None, series_factor: int = 1,
+    def mfr_borefield(self, fluid_data: _FluidData = None, nb_of_boreholes: int = None, series_factor: int = None,
                       **kwargs) -> np.ndarray:
         """
         This function returns the mass flow rate for the entire borefield. Either based on a given mass flow rate,

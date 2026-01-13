@@ -176,6 +176,15 @@ def test_eq():
     assert fluid2 != fluid3
     assert fluid4 == fluid2
 
+    fluid = ConstantDeltaTFlowRate(delta_temp_extraction=5, delta_temp_injection=4)
+    fluid2 = ConstantDeltaTFlowRate()
+    fluid3 = ConstantFluidData(1, 1, 1, 1)
+    fluid4 = ConstantDeltaTFlowRate()
+    assert fluid != fluid2
+    assert fluid3 != fluid2
+    assert fluid2 != fluid3
+    assert fluid4 == fluid2
+
 
 def test_variable_hourly_flow_rate():
     fluid = TemperatureDependentFluidData('MPG', 20).create_constant(0)
@@ -337,6 +346,46 @@ def test_variable_hourly_multiyear_flow_rate():
                        np.tile(np.linspace(0, 8760, 8760), 2))
 
 
+def test_constant_delta_t_flow_rate():
+    with pytest.raises(ValueError):
+        ConstantDeltaTFlowRate(delta_temp_extraction=0)
+    with pytest.raises(ValueError):
+        ConstantDeltaTFlowRate(delta_temp_extraction=0)
+    with pytest.raises(ValueError):
+        ConstantDeltaTFlowRate(series_factor=0)
+
+    flow = ConstantDeltaTFlowRate(delta_temp_extraction=4, delta_temp_injection=5)
+    fluid = ConstantFluidData(0.5, 2000, 4000, 1e-3)
+    with pytest.raises(ValueError):
+        flow.mfr_borehole()
+    with pytest.raises(ValueError):
+        flow.mfr_borehole(nb_of_boreholes=2)
+    with pytest.raises(ValueError):
+        flow.mfr_borehole(nb_of_boreholes=2, fluid_data=fluid)
+
+    assert np.isclose(flow.mfr_borefield(fluid_data=fluid, power=1), 1 / 4 / 4)
+    assert np.isclose(flow.mfr_borefield(fluid_data=fluid, power=-1), 1 / 4 / 5)
+    assert np.allclose(
+        flow.mfr_borefield(fluid_data=fluid, power=np.array([1, -1]), nb_of_boreholes=2, series_factor=2),
+        [1 / 4 / 4, 1 / 4 / 5])
+    assert np.allclose(
+        flow.vfr_borefield(fluid_data=fluid, power=np.array([1, -1]), nb_of_boreholes=2, series_factor=2),
+        np.array([1 / 4 / 4, 1 / 4 / 5]) / 2000 * 1000)
+    assert np.allclose(flow.mfr_borehole(fluid_data=fluid, power=np.array([1, -1]), nb_of_boreholes=2),
+                       np.array([1 / 4 / 4, 1 / 4 / 5]) / 2)
+    assert np.allclose(flow.vfr_borehole(fluid_data=fluid, power=np.array([1, -1]), nb_of_boreholes=2),
+                       np.array([1 / 4 / 4, 1 / 4 / 5]) / 2000 * 1000 / 2)
+    assert np.allclose(flow.mfr_borehole(fluid_data=fluid, power=np.array([1, -1]), nb_of_boreholes=2, series_factor=2),
+                       np.array([1 / 4 / 4, 1 / 4 / 5]))
+    assert np.allclose(flow.vfr_borehole(fluid_data=fluid, power=np.array([1, -1]), nb_of_boreholes=2, series_factor=2),
+                       np.array([1 / 4 / 4, 1 / 4 / 5]) / 2000 * 1000)
+    flow = ConstantDeltaTFlowRate(delta_temp_extraction=4, delta_temp_injection=5, series_factor=2)
+    assert np.allclose(flow.mfr_borehole(fluid_data=fluid, power=np.array([1, -1]), nb_of_boreholes=2),
+                       np.array([1 / 4 / 4, 1 / 4 / 5]))
+    assert np.allclose(flow.vfr_borehole(fluid_data=fluid, power=np.array([1, -1]), nb_of_boreholes=2),
+                       np.array([1 / 4 / 4, 1 / 4 / 5]) / 2000 * 1000)
+
+
 def test_repr_constant_hourly_flow_rate():
     flow = VariableHourlyFlowRate(mfr=np.linspace(0, 8760, 8760))
     assert flow.__export__() == {'type': 'Hourly mfr per borehole [kg/s]'}
@@ -357,3 +406,11 @@ def test_repr_constant_hourly_multiyear_flow_rate():
     assert flow.__export__() == {'type': 'Hourly multiyear mfr per borefield [kg/s]', 'series factor [-]': 2}
     flow = VariableHourlyMultiyearFlowRate(vfr=np.linspace(0, 8760, 8760), flow_per_borehole=False, series_factor=2)
     assert flow.__export__() == {'type': 'Hourly multiyear vfr per borefield [l/s]', 'series factor [-]': 2}
+
+
+def test_repr_constant_delta_temp_flow_rate():
+    flow = ConstantDeltaTFlowRate(delta_temp_extraction=5, delta_temp_injection=6, series_factor=2)
+    assert flow.__export__() == {'delta T in cooling': 6,
+                                 'delta T in heating': 5,
+                                 'series factor': 2,
+                                 'type': 'Constant delta T flow rate'}

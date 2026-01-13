@@ -18,3 +18,7 @@ Flow rate data
 .. automodule:: GHEtool.VariableClasses.FlowData.VariableHourlyMultiyearFlowRate
     :members:
     :show-inheritance:
+
+.. automodule:: GHEtool.VariableClasses.FlowData.ConstantDeltaTFlowRate
+    :members:
+    :show-inheritance:

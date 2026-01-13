@@ -123,6 +123,8 @@ You can set the fluid data by using the FluidData class.
 * _ConstantFlowRate_: A single, unique constant flow rate for the system.
 * _VariableHourlyFlowRate_: An hourly varying flow rate for the system.
 * _VariableHourlyMultiyearFlowRate_: An multiyear hourly varying flow rate for the system.
+* _ConstantDeltaTFlowRate_: Calculate the flow rate based on a fixed delta T for extraction and injection.
+*
 
 #### Efficiency data
 

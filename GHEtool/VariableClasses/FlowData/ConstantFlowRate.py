@@ -30,7 +30,7 @@ class ConstantFlowRate(_FlowData, BaseClass):
         if self._mfr is not None and self._vfr is not None:
             raise ValueError('You cannot set both the mass flow rate and volume flow rate')
 
-    def vfr_borehole(self, fluid_data: _FluidData = None, nb_of_boreholes: int = None, series_factor: int = 1,
+    def vfr_borehole(self, fluid_data: _FluidData = None, nb_of_boreholes: int = None, series_factor: int = None,
                      **kwargs) -> float:
         """
         This function returns the volume flow rate for a single borefield. Either based on a given mass flow rate,
@@ -61,14 +61,15 @@ class ConstantFlowRate(_FlowData, BaseClass):
             if self._flow_per_borehole:
                 return self._vfr
             else:
-                return self._vfr / nb_of_boreholes * max(series_factor, self._series_factor)
+                return self._vfr / nb_of_boreholes * (
+                    series_factor if series_factor is not None else self._series_factor)
         if fluid_data is None:
             raise ValueError(
                 'The volume flow rate is based on the mass flow rate, the fluid data is needed.')
         return self.mfr_borehole(nb_of_boreholes=nb_of_boreholes, series_factor=series_factor,
                                  **kwargs) / fluid_data.rho(**kwargs) * 1000
 
-    def mfr_borehole(self, fluid_data: _FluidData = None, nb_of_boreholes: int = None, series_factor: int = 1,
+    def mfr_borehole(self, fluid_data: _FluidData = None, nb_of_boreholes: int = None, series_factor: int = None,
                      **kwargs) -> float:
         """
         This function returns the mass flow rate for a single borehole. Either based on a given mass flow rate,
@@ -99,14 +100,15 @@ class ConstantFlowRate(_FlowData, BaseClass):
             if self._flow_per_borehole:
                 return self._mfr
             else:
-                return self._mfr / nb_of_boreholes * max(series_factor, self._series_factor)
+                return self._mfr / nb_of_boreholes * (
+                    series_factor if series_factor is not None else self._series_factor)
         if fluid_data is None:
             raise ValueError(
                 'The mass flow rate is based on the volume flow rate, so the fluid data is needed.')
         return self.vfr_borehole(nb_of_boreholes=nb_of_boreholes, series_factor=series_factor,
                                  **kwargs) / 1000 * fluid_data.rho(**kwargs)
 
-    def vfr_borefield(self, fluid_data: _FluidData = None, nb_of_boreholes: int = None, series_factor: int = 1,
+    def vfr_borefield(self, fluid_data: _FluidData = None, nb_of_boreholes: int = None, series_factor: int = None,
                       **kwargs) -> float:
         """
         This function returns the volume flow rate for a single borefield. Either based on a given mass flow rate,
@@ -135,7 +137,8 @@ class ConstantFlowRate(_FlowData, BaseClass):
             raise ValueError('The flow rate is given for the entire borefield but no number of boreholes is specified.')
         if self._vfr is not None:
             if self._flow_per_borehole:
-                return self._vfr * nb_of_boreholes / max(series_factor, self._series_factor)
+                return self._vfr * nb_of_boreholes / (
+                    series_factor if series_factor is not None else self._series_factor)
             else:
                 return self._vfr
         if fluid_data is None:
@@ -144,7 +147,7 @@ class ConstantFlowRate(_FlowData, BaseClass):
         return self.mfr_borefield(nb_of_boreholes=nb_of_boreholes, series_factor=series_factor,
                                   **kwargs) / fluid_data.rho(**kwargs) * 1000
 
-    def mfr_borefield(self, fluid_data: _FluidData = None, nb_of_boreholes: int = None, series_factor: int = 1,
+    def mfr_borefield(self, fluid_data: _FluidData = None, nb_of_boreholes: int = None, series_factor: int = None,
                       **kwargs) -> float:
         """
         This function returns the mass flow rate for the entire borefield. Either based on a given mass flow rate,
@@ -173,7 +176,8 @@ class ConstantFlowRate(_FlowData, BaseClass):
             raise ValueError('The flow rate is given for the entire borefield but no number of boreholes is specified.')
         if self._mfr is not None:
             if self._flow_per_borehole:
-                return self._mfr * nb_of_boreholes / max(series_factor, self._series_factor)
+                return self._mfr * nb_of_boreholes / (
+                    series_factor if series_factor is not None else self._series_factor)
             else:
                 return self._mfr
         if fluid_data is None:
