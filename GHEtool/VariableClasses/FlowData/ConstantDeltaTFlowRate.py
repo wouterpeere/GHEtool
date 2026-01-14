@@ -122,6 +122,7 @@ class ConstantDeltaTFlowRate(_FlowData, BaseClass):
         return self.mfr_borefield(fluid_data=fluid_data, power=power, **kwargs) / fluid_data.rho(**kwargs) * 1000
 
     def mfr_borefield(self, fluid_data: _FluidData = None, power: Union[float, np.ndarray] = None,
+                      min_power_percentage: float = 10,
                       **kwargs) -> np.ndarray:
         """
         This function returns the mass flow rate for the entire borefield. Either based on a given mass flow rate,
@@ -133,6 +134,8 @@ class ConstantDeltaTFlowRate(_FlowData, BaseClass):
             Fluid data class
         power : float | np.ndarray
             Power of the entire borefield, positive when injection, negative during extraction [kW]
+        min_power_percentage : float
+            Increase the minimum flow rate to at least this percentage of the maximum flow
 
         Returns
         -------
@@ -151,9 +154,10 @@ class ConstantDeltaTFlowRate(_FlowData, BaseClass):
 
         power = np.asarray(power)
 
-        deltaT = np.where(power >= 0, self._delta_temp_heating, self._delta_temp_cooling)
-
-        return np.abs(power) / (fluid_data.cp(**kwargs) / 1000 * deltaT)
+        deltaT = np.where(power <= 0, self._delta_temp_heating, self._delta_temp_cooling)
+        flow = np.abs(power) / (fluid_data.cp(**kwargs) / 1000 * deltaT)
+        flow = np.maximum(flow, min_power_percentage / 100 * np.max(flow))
+        return flow
 
     def check_values(self) -> bool:
         return self._delta_temp_cooling is not None or self._delta_temp_heating is not None

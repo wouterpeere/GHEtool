@@ -294,8 +294,8 @@ class Borehole(BaseClass):
         borehole = gt.boreholes.Borehole(H, D, r_b, 0, 0)
 
         if use_explicit_models:
-            return self.pipe_data.explicit_model_borehole_resistance(self.fluid_data, self.flow_data, (
-                k_s if isinstance(k_s, numbers.Real) else k_s(depth, D)), borehole, borehole_length=H, **kwargs)
+            return np.nan_to_num(self.pipe_data.explicit_model_borehole_resistance(self.fluid_data, self.flow_data, (
+                k_s if isinstance(k_s, numbers.Real) else k_s(depth, D)), borehole, borehole_length=H, **kwargs))
 
         if isinstance(self.flow_data, (VariableHourlyFlowRate, VariableHourlyMultiyearFlowRate)):
             raise ValueError('You can only use explicit models when working with an hourly flow rate.')

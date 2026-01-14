@@ -361,29 +361,31 @@ def test_constant_delta_t_flow_rate():
     with pytest.raises(ValueError):
         flow.mfr_borehole(nb_of_boreholes=2)
     with pytest.raises(ValueError):
-        flow.mfr_borehole(nb_of_boreholes=2, fluid_data=fluid)
+        flow.vfr_borehole()
+    with pytest.raises(ValueError):
+        flow.mfr_borehole(nb_of_boreholes=2, power=1)
 
-    assert np.isclose(flow.mfr_borefield(fluid_data=fluid, power=1), 1 / 4 / 4)
-    assert np.isclose(flow.mfr_borefield(fluid_data=fluid, power=-1), 1 / 4 / 5)
+    assert np.isclose(flow.mfr_borefield(fluid_data=fluid, power=-1), 1 / 4 / 4)
+    assert np.isclose(flow.mfr_borefield(fluid_data=fluid, power=1), 1 / 4 / 5)
     assert np.allclose(
         flow.mfr_borefield(fluid_data=fluid, power=np.array([1, -1]), nb_of_boreholes=2, series_factor=2),
-        [1 / 4 / 4, 1 / 4 / 5])
+        [1 / 4 / 5, 1 / 4 / 4])
     assert np.allclose(
         flow.vfr_borefield(fluid_data=fluid, power=np.array([1, -1]), nb_of_boreholes=2, series_factor=2),
-        np.array([1 / 4 / 4, 1 / 4 / 5]) / 2000 * 1000)
+        np.array([1 / 4 / 5, 1 / 4 / 4]) / 2000 * 1000)
     assert np.allclose(flow.mfr_borehole(fluid_data=fluid, power=np.array([1, -1]), nb_of_boreholes=2),
-                       np.array([1 / 4 / 4, 1 / 4 / 5]) / 2)
+                       np.array([1 / 4 / 5, 1 / 4 / 4]) / 2)
     assert np.allclose(flow.vfr_borehole(fluid_data=fluid, power=np.array([1, -1]), nb_of_boreholes=2),
-                       np.array([1 / 4 / 4, 1 / 4 / 5]) / 2000 * 1000 / 2)
+                       np.array([1 / 4 / 5, 1 / 4 / 4]) / 2000 * 1000 / 2)
     assert np.allclose(flow.mfr_borehole(fluid_data=fluid, power=np.array([1, -1]), nb_of_boreholes=2, series_factor=2),
-                       np.array([1 / 4 / 4, 1 / 4 / 5]))
+                       np.array([1 / 4 / 5, 1 / 4 / 4]))
     assert np.allclose(flow.vfr_borehole(fluid_data=fluid, power=np.array([1, -1]), nb_of_boreholes=2, series_factor=2),
-                       np.array([1 / 4 / 4, 1 / 4 / 5]) / 2000 * 1000)
+                       np.array([1 / 4 / 5, 1 / 4 / 4]) / 2000 * 1000)
     flow = ConstantDeltaTFlowRate(delta_temp_extraction=4, delta_temp_injection=5, series_factor=2)
     assert np.allclose(flow.mfr_borehole(fluid_data=fluid, power=np.array([1, -1]), nb_of_boreholes=2),
-                       np.array([1 / 4 / 4, 1 / 4 / 5]))
+                       np.array([1 / 4 / 5, 1 / 4 / 4]))
     assert np.allclose(flow.vfr_borehole(fluid_data=fluid, power=np.array([1, -1]), nb_of_boreholes=2),
-                       np.array([1 / 4 / 4, 1 / 4 / 5]) / 2000 * 1000)
+                       np.array([1 / 4 / 5, 1 / 4 / 4]) / 2000 * 1000)
 
 
 def test_repr_constant_hourly_flow_rate():
