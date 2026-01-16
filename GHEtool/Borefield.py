@@ -2270,7 +2270,7 @@ class Borefield(BaseClass):
                 self.borehole.fluid_data.cp(temperature=temperature) / 1000 *
                 self.borehole.flow_data.mfr_borefield(fluid_data=self.fluid_data, temperature=temperature,
                                                       nb_of_boreholes=self.number_of_boreholes, power=power, **kwargs))
-
+        delta_temp = np.nan_to_num(delta_temp, )
         # power < 0 when in extraction
         return temperature + delta_temp / 2, temperature - delta_temp / 2
 
