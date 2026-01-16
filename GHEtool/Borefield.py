@@ -1921,7 +1921,7 @@ class Borefield(BaseClass):
                 # now the Tf will be calculated based on
                 # Tf = Tb + Q * R_b
                 results_month_avg = Tb + self.load.monthly_average_injection_power_simulation_period * 1000 * (
-                        get_rb(results_temperature.baseload_temperature, self.Tf_min,
+                        get_rb(results_temperature.baseload_temperature, Tmin,
                                power=self.load.monthly_average_injection_power_simulation_period) / self.number_of_boreholes / H)
 
                 # extra summation if the g-function value for the peak is included
@@ -1930,8 +1930,7 @@ class Borefield(BaseClass):
                         + (self.load.monthly_peak_injection_simulation_period
                            * (g_value_peak_injection / k_s / 2 / pi + get_rb(results_temperature.peak_injection, Tmax,
                                                                              self.load.monthly_peak_injection_simulation_period))
-                           - np.maximum(0,
-                                        self.load.monthly_average_injection_power_simulation_period) * g_value_peak_injection / k_s / 2 / pi)
+                           - self.load.monthly_average_injection_power_simulation_period * g_value_peak_injection / k_s / 2 / pi)
                         * 1000 / self.number_of_boreholes / H
                 )
                 results_peak_extraction = (
@@ -1940,8 +1939,7 @@ class Borefield(BaseClass):
                          * (g_value_peak_extraction / k_s / 2 / pi + get_rb(results_temperature.peak_extraction, Tmin,
                                                                             self.load.monthly_peak_extraction_simulation_period * (
                                                                                 -1)))
-                         - np.minimum(0,
-                                      self.load.monthly_average_injection_power_simulation_period) * g_value_peak_extraction / k_s / 2 / pi)
+                         - self.load.monthly_average_injection_power_simulation_period * g_value_peak_extraction / k_s / 2 / pi)
                         * 1000 / self.number_of_boreholes / H
                 )
 
