@@ -587,7 +587,7 @@ class Borefield(BaseClass):
                                     nb_of_boreholes=self.number_of_boreholes,
                                     use_explicit_models=self._calculation_setup.use_explicit_multipole,
                                     simulation_period=self.load.simulation_period,
-                                    power=(-1) * self.load.peak_extraction)
+                                    power=(-1) * self.load.max_peak_extraction)
 
     @Rb.setter
     def Rb(self, Rb: float) -> None:
