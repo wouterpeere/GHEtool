@@ -120,7 +120,7 @@ def test_optimal_borehole_config():
     borefield_case_1_flow_rate()
 
 
-def tst_variable_flow(monkeypatch):
+def test_variable_flow(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     from GHEtool.Examples.variable_flow_rate import hourly
     hourly()
