@@ -416,4 +416,4 @@ def test_repr_constant_delta_temp_flow_rate():
                                  'delta T in heating [°C]': 5,
                                  'series factor [-]': 2,
                                  'type': 'Constant delta T flow rate',
-                                 'min_flow_percentage [%]': 10}
+                                 'minimum flow percentage [%]': 10}
