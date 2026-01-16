@@ -1,6 +1,7 @@
 import pygfunction as gt
 from math import pi
 
+from GHEtool.utils.calculate_friction_factor import *
 from GHEtool.VariableClasses.PipeData.SingleUTube import SingleUTube
 from GHEtool.VariableClasses.FluidData import _FluidData
 from GHEtool.VariableClasses.FlowData import _FlowData
@@ -133,12 +134,15 @@ class Separatus(SingleUTube):
         """
 
         # Darcy fluid factor
-        fd = gt.pipes.fluid_friction_factor_circular_pipe(
-            flow_rate_data.mfr_borehole(fluid_data=fluid_data, **kwargs),
-            (0.02551 / 2),
-            fluid_data.mu(**kwargs),
-            fluid_data.rho(**kwargs),
-            self.epsilon)
+
+        v = flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / (np.pi * 0.02551 ** 2 / 4) / 1000
+        Re = fluid_data.rho(**kwargs) * v * 0.02551 / fluid_data.mu(**kwargs)
+        # Darcy fluid factor
+        if kwargs.get('haaland', False):
+            fd = friction_factor_Haaland(Re, 0.02551 / 2, self.epsilon, **kwargs)
+        else:
+            fd = friction_factor_darcy_weisbach(Re, 0.02551 / 2, self.epsilon, **kwargs)
+
         A = 705.27 * 1e-6  # cross-sectional area of the separatus
         V = (flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / 1000) / A
 

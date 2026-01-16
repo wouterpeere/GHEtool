@@ -8,7 +8,8 @@ import pygfunction as gt
 
 from GHEtool.VariableClasses.BaseClass import BaseClass
 from GHEtool.VariableClasses.FluidData import _FluidData, ConstantFluidData
-from GHEtool.VariableClasses.FlowData import _FlowData
+from GHEtool.VariableClasses.FlowData import _FlowData, VariableHourlyFlowRate, VariableHourlyMultiyearFlowRate, \
+    ConstantDeltaTFlowRate
 from GHEtool.VariableClasses.PipeData import _PipeData
 from typing import Union
 
@@ -294,8 +295,12 @@ class Borehole(BaseClass):
         borehole = gt.boreholes.Borehole(H, D, r_b, 0, 0)
 
         if use_explicit_models:
-            return self.pipe_data.explicit_model_borehole_resistance(self.fluid_data, self.flow_data, (
-                k_s if isinstance(k_s, numbers.Real) else k_s(depth, D)), borehole, borehole_length=H, **kwargs)
+            return np.nan_to_num(self.pipe_data.explicit_model_borehole_resistance(self.fluid_data, self.flow_data, (
+                k_s if isinstance(k_s, numbers.Real) else k_s(depth, D)), borehole, borehole_length=H, **kwargs))
+
+        if isinstance(self.flow_data,
+                      (VariableHourlyFlowRate, VariableHourlyMultiyearFlowRate, ConstantDeltaTFlowRate)):
+            raise ValueError('You can only use explicit models when working with an hourly flow rate.')
 
         def calculate(**kwargs):
             self.pipe_data.calculate_resistances(self.fluid_data, self.flow_data, borehole_length=H, **kwargs)

@@ -61,7 +61,7 @@ our [project board](https://github.com/users/wouterpeere/projects/2) to check ou
 
 ## Requirements
 
-This code is tested with Python 3.10, 3.11, 3.12 and 3.13 and requires the following libraries (the versions
+This code is tested with Python 3.10, 3.11, 3.12, 3.13 and 3.14 and requires the following libraries (the versions
 mentioned are the ones with which the code is tested)
 
 * matplotlib >= 3.9.2
@@ -179,9 +179,10 @@ You can set the fluid data by using the FluidData class.
 
 #### Flow rate data
 
-Currently, only constant flow rates are compatible with GHEtool, but this will change in the future.
-
-* _ConstantFlowRate_
+* _ConstantFlowRate_: A single, unique constant flow rate for the system.
+* _VariableHourlyFlowRate_: An hourly varying flow rate for the system.
+* _VariableHourlyMultiyearFlowRate_: An multiyear hourly varying flow rate for the system.
+* _ConstantDeltaTFlowRate_: Calculate the flow rate based on a fixed delta T for extraction and injection.
 
 #### Efficiency data
 

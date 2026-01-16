@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from GHEtool import FluidData, DoubleUTube, SingleUTube, MultipleUTube, ConstantFluidData, ConstantFlowRate, \
-    TemperatureDependentFluidData, ConicalPipe
+    TemperatureDependentFluidData, ConicalPipe, VariableHourlyFlowRate
 from GHEtool.VariableClasses import Borehole
 
 fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
@@ -295,3 +295,14 @@ def test_flow_rate_borefield():
     control_bor.flow_data = ConstantFlowRate(vfr=0.3)
     assert np.isclose(control_bor.get_Rb(100, 1, 0.075, 2, 101, temperature=5, nb_of_boreholes=2),
                       bor.get_Rb(100, 1, 0.075, 2, 101, temperature=5, nb_of_boreholes=2))
+
+
+def test_error_borehole_variable_flow_rate():
+    control_bor = Borehole()
+    control_bor.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+    control_bor.fluid_data = TemperatureDependentFluidData('MEG', 25)
+    control_bor.flow_data = VariableHourlyFlowRate(mfr=np.full(8760, 0.3))
+
+    with pytest.raises(ValueError):
+        control_bor.calculate_Rb(100, 1, 0.075, 2, 101, temperature=5, nb_of_boreholes=2,
+                                 use_explicit_models=False)

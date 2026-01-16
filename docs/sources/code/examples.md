@@ -19,4 +19,5 @@ Examples/start_in_different_month.rst
 Examples/temperature_dependent_fluid_data_sizing.rst
 Examples/turbocollector.rst
 Examples/multiple_ground_layers.rst
+Examples/variable_flow_rate.rst
 ```

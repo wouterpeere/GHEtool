@@ -1,2 +1,5 @@
 from ._FlowData import _FlowData
 from .ConstantFlowRate import ConstantFlowRate
+from .VariableHourlyFlowRate import VariableHourlyFlowRate
+from .VariableHourlyMultiyearFlowRate import VariableHourlyMultiyearFlowRate
+from .ConstantDeltaTFlowRate import ConstantDeltaTFlowRate

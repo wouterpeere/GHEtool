@@ -27,6 +27,24 @@ def test_borehole():
                       pressure_drop_both.calculate_pressure_drop_borehole())
 
 
+def test_borehole_variable_flow():
+    single_u = SingleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+    fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
+    flow_range = np.linspace(0.1, 5, 8760)
+    flow_data = VariableHourlyFlowRate(mfr=flow_range)
+
+    pressure_drop = PressureDrop(single_u, fluid_data, flow_data, 0, 100,
+                                 0.02 - 0.0037 / 2, 15, 0, 0.02 - 0.0037 / 2,
+                                 15, 0, 8, 1, 1)
+    control = []
+    for flow in flow_range:
+        temp = PressureDrop(single_u, fluid_data, ConstantFlowRate(mfr=flow), 0, 100,
+                            0.02 - 0.0037 / 2, 15, 0, 0.02 - 0.0037 / 2,
+                            15, 0, 8, 1, 1)
+        control.append(temp.calculate_pressure_drop_borehole())
+    assert np.allclose(control, pressure_drop.calculate_pressure_drop_borehole(simulation_period=1))
+
+
 def test_borehole_flow_borefield():
     single_u = SingleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
     fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
@@ -76,6 +94,25 @@ def test_lateral():
 
     pressure_drop.fluid_data = TemperatureDependentFluidData('MPG', 25)
     assert np.isclose(pressure_drop.calculate_pressure_drop_lateral(temperature=20), 0.7050447750402659)
+
+    control = []
+    flow_range = np.linspace(0.1, 5, 8760)
+    flow_data = VariableHourlyFlowRate(mfr=flow_range)
+    pressure_drop = PressureDrop(single_u, fluid_data, flow_data, 0, 100, 0.02 - 0.0037 / 2, 15, 0, 0, 0, 0, 8, 1, 1)
+    for flow in flow_range:
+        temp = PressureDrop(single_u, fluid_data, ConstantFlowRate(mfr=flow), 0, 100, 0.02 - 0.0037 / 2, 15, 0, 0, 0, 0,
+                            8, 1,
+                            1)
+        control.append(temp.calculate_pressure_drop_lateral(haaland=False))
+    assert np.allclose(control, pressure_drop.calculate_pressure_drop_lateral(simulation_period=1, haaland=False))
+
+    control = []
+    for flow in flow_range:
+        temp = PressureDrop(single_u, fluid_data, ConstantFlowRate(mfr=flow), 0, 100, 0.02 - 0.0037 / 2, 15, 0, 0, 0, 0,
+                            8, 1,
+                            1)
+        control.append(temp.calculate_pressure_drop_lateral(haaland=True))
+    assert np.allclose(control, pressure_drop.calculate_pressure_drop_lateral(simulation_period=1, haaland=True))
 
 
 def test_lateral_flow_borefield():
@@ -144,6 +181,27 @@ def test_main_header():
     pressure_drop_eight.fluid_data = TemperatureDependentFluidData('MPG', 25)
     assert np.isclose(pressure_drop.calculate_pressure_drop_main(temperature=20),
                       pressure_drop_eight.calculate_pressure_drop_lateral(temperature=20))
+
+    flow_range = np.linspace(0.1, 5, 8760)
+    flow_data = VariableHourlyFlowRate(mfr=flow_range)
+    pressure_drop = PressureDrop(single_u, fluid_data, flow_data,
+                                 0, 100, 0.02 - 0.0037 / 2, 15, 0, 0.02 - 0.0037 / 2, 15, 0, 8, 2, 2)
+    control = []
+    for flow in flow_range:
+        temp = PressureDrop(single_u, fluid_data, ConstantFlowRate(mfr=flow),
+                            0, 100, 0.02 - 0.0037 / 2, 15, 0, 0.02 - 0.0037 / 2, 15, 0, 8, 2, 2)
+
+        control.append(temp.calculate_pressure_drop_main(temperature=0, haaland=False))
+    assert np.allclose(control,
+                       pressure_drop.calculate_pressure_drop_main(simulation_period=1, temperature=0, haaland=False))
+    control = []
+    for flow in flow_range:
+        temp = PressureDrop(single_u, fluid_data, ConstantFlowRate(mfr=flow),
+                            0, 100, 0.02 - 0.0037 / 2, 15, 0, 0.02 - 0.0037 / 2, 15, 0, 8, 2, 2)
+
+        control.append(temp.calculate_pressure_drop_main(temperature=0, haaland=True))
+    assert np.allclose(control,
+                       pressure_drop.calculate_pressure_drop_main(simulation_period=1, temperature=0, haaland=True))
 
 
 def test_main_header_flow_field():

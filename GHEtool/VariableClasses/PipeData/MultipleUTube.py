@@ -105,8 +105,7 @@ class MultipleUTube(_PipeData):
         None
         """
         # Pipe thermal resistance [m.K/W]
-        self.R_p = gt.pipes.conduction_thermal_resistance_circular_pipe(
-            self.r_in, self.r_out, self.k_p)
+        self.R_p = gt.pipes.conduction_thermal_resistance_circular_pipe(self.r_in, self.r_out, self.k_p)
 
         # Film thermal resistance [m.K/W]
         self.R_f = self.calculate_convective_resistance(flow_rate_data, fluid_data, **kwargs)
@@ -172,12 +171,13 @@ class MultipleUTube(_PipeData):
         """
 
         # Darcy fluid factor
-        fd = gt.pipes.fluid_friction_factor_circular_pipe(
-            flow_rate_data.mfr_borehole(fluid_data=fluid_data, **kwargs) / self.number_of_pipes,
-            self.r_in,
-            fluid_data.mu(**kwargs),
-            fluid_data.rho(**kwargs),
-            self.epsilon)
+        if kwargs.get('haaland', False):
+            fd = friction_factor_Haaland(self.Re(fluid_data, flow_rate_data, **kwargs), self.r_in, self.epsilon,
+                                         **kwargs)
+        else:
+            fd = friction_factor_darcy_weisbach(self.Re(fluid_data, flow_rate_data, **kwargs), self.r_in, self.epsilon,
+                                                **kwargs)
+
         A = pi * self.r_in ** 2
         V = (flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / 1000) / A / self.number_of_pipes
 

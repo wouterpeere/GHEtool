@@ -3,8 +3,10 @@ import numpy as np
 
 from math import pi
 from typing import Union
+
+from GHEtool import VariableHourlyFlowRate, VariableHourlyMultiyearFlowRate
 from GHEtool.VariableClasses import HourlyBuildingLoad, MonthlyBuildingLoadMultiYear, HourlyBuildingLoadMultiYear, \
-    ConstantFluidData, ConstantFlowRate, TemperatureDependentFluidData, EERCombined, SCOP, SEER
+    ConstantFluidData, ConstantFlowRate, TemperatureDependentFluidData, EERCombined, SCOP, SEER, ConstantDeltaTFlowRate
 from GHEtool.VariableClasses.LoadData.Baseclasses import _LoadDataBuilding
 
 
@@ -54,6 +56,11 @@ def optimise_load_profile_power(
     """
     # copy borefield
     borefield = copy.deepcopy(borefield)
+
+    # check if hourly flow rate is given and the temperature profile is monthly
+    if (not use_hourly_resolution and not borefield.borehole.use_constant_Rb and
+            isinstance(borefield.borehole.flow_data, (VariableHourlyFlowRate, VariableHourlyMultiyearFlowRate))):
+        raise ValueError('No monthly resolution can be used when working with an hourly flow rate.')
 
     # check if hourly load is given
     if not isinstance(building_load, (HourlyBuildingLoad, HourlyBuildingLoadMultiYear)):
@@ -220,6 +227,12 @@ def optimise_load_profile_energy(
     ValueError
         ValueError if no correct load data is given or the threshold is negative
     """
+
+    # check if hourly flow rate is given and the temperature profile is monthly
+    if (not borefield.borehole.use_constant_Rb and
+            isinstance(borefield.borehole.flow_data, (VariableHourlyFlowRate, VariableHourlyMultiyearFlowRate))):
+        raise ValueError('No hourly flow rate can be used when working with this method.')
+
     # copy borefield
     borefield = copy.deepcopy(borefield)
 
@@ -316,24 +329,31 @@ def optimise_load_profile_energy(
     g_value = borefield.gfunction(borefield.load.time_L3, borefield.H)[0]
     k_s = borefield.ground_data.k_s(borefield.calculate_depth(borefield.H, borefield.D), borefield.D)
 
-    Rb_min_const = borefield.borehole.get_Rb(borefield.H, borefield.D,
-                                             borefield.r_b,
-                                             k_s, borefield.depth,
-                                             temperature=borefield.Tf_min,
-                                             nb_of_boreholes=borefield.number_of_boreholes)
-    Rb_max_const = borefield.borehole.get_Rb(borefield.H,
-                                             borefield.D,
-                                             borefield.r_b,
-                                             k_s, borefield.depth,
-                                             temperature=borefield.Tf_max,
-                                             nb_of_boreholes=borefield.number_of_boreholes)
     variable_efficiency = isinstance(borefield.load, _LoadDataBuilding) and not (
             isinstance(borefield.load.cop, SCOP) and isinstance(borefield.load.cop_dhw, SCOP) and isinstance(
         borefield.load.eer, SEER))
 
+    Rb_min_const, Rb_max_const = None, None
+    if not (isinstance(borefield.borehole.flow_data,
+                       ConstantDeltaTFlowRate) and not borefield.borehole.use_constant_Rb):
+        Rb_min_const = borefield.borehole.get_Rb(borefield.H, borefield.D,
+                                                 borefield.r_b,
+                                                 k_s, borefield.depth,
+                                                 temperature=borefield.Tf_min,
+                                                 nb_of_boreholes=borefield.number_of_boreholes,
+                                                 use_explicit_models=borefield._calculation_setup.use_explicit_multipole)
+        Rb_max_const = borefield.borehole.get_Rb(borefield.H,
+                                                 borefield.D,
+                                                 borefield.r_b,
+                                                 k_s, borefield.depth,
+                                                 temperature=borefield.Tf_max,
+                                                 nb_of_boreholes=borefield.number_of_boreholes,
+                                                 use_explicit_models=borefield._calculation_setup.use_explicit_multipole)
+
     def update_last_month(idx, init_load) -> (float, float):
         def calculate(Tmin: float = None, Tmax: float = None, *args):
-            if Tmin is None or (not variable_efficiency and borefield.USE_SPEED_UP_IN_SIZING):
+            if (Tmin is None or (
+                    not variable_efficiency and borefield.USE_SPEED_UP_IN_SIZING)) and not Rb_min_const is None:
                 Rb_min = Rb_min_const
                 Rb_max = Rb_max_const
             else:
@@ -341,13 +361,17 @@ def optimise_load_profile_energy(
                                                    borefield.r_b,
                                                    k_s, borefield.depth,
                                                    temperature=Tmin,
-                                                   nb_of_boreholes=borefield.number_of_boreholes)
+                                                   nb_of_boreholes=borefield.number_of_boreholes,
+                                                   use_explicit_models=borefield._calculation_setup.use_explicit_multipole,
+                                                   power=borefield.load.monthly_peak_extraction_simulation_period[idx])
                 Rb_max = borefield.borehole.get_Rb(borefield.H,
                                                    borefield.D,
                                                    borefield.r_b,
                                                    k_s, borefield.depth,
                                                    temperature=Tmax,
-                                                   nb_of_boreholes=borefield.number_of_boreholes)
+                                                   nb_of_boreholes=borefield.number_of_boreholes,
+                                                   use_explicit_models=borefield._calculation_setup.use_explicit_multipole,
+                                                   power=borefield.load.monthly_peak_injection_simulation_period[idx])
 
             Tb = borefield.results.Tb[idx]
 
@@ -559,6 +583,10 @@ def optimise_load_profile_balance(
     ValueError
         ValueError if no correct load data is given or the threshold is negative
     """
+    # check if hourly flow rate is given and the temperature profile is monthly
+    if (not use_hourly_resolution and not borefield.borehole.use_constant_Rb and
+            isinstance(borefield.borehole.flow_data, (VariableHourlyFlowRate, VariableHourlyMultiyearFlowRate))):
+        raise ValueError('No monthly resolution can be used when working with an hourly flow rate.')
     # copy borefield
     borefield = copy.deepcopy(borefield)
 

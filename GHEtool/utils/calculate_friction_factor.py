@@ -145,7 +145,7 @@ def turbulent_nusselt(fluid: _FluidData, Re: Union[float, np.ndarray], f: Union[
 
     """
     pr = np.atleast_1d(np.asarray(fluid.Pr(**kwargs)))
-    if 'array' in kwargs:
+    if 'array' in kwargs and len(pr) != 1:
         # this puts a mask on what values to calculate to save time
         pr = pr[kwargs.get('array')]
     return np.asarray((f / 8) * (Re - 1000) * pr / (1 + 12.7 * (f / 8) ** 0.5 * (pr ** (2 / 3) - 1)))

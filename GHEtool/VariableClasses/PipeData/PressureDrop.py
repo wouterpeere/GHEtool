@@ -3,10 +3,12 @@ import copy
 import numpy as np
 import pygfunction as gt
 
+from GHEtool.utils.calculate_friction_factor import *
 from GHEtool.VariableClasses.PipeData._PipeData import _PipeData
 from GHEtool.VariableClasses.FluidData._FluidData import _FluidData
 from GHEtool.VariableClasses.FlowData.ConstantFlowRate import ConstantFlowRate
 from GHEtool.VariableClasses.FlowData._FlowData import _FlowData
+
 from math import pi
 
 
@@ -87,16 +89,16 @@ class PressureDrop:
         """
 
         # Darcy fluid factor
-        fd = gt.pipes.fluid_friction_factor_circular_pipe(
-            self.flow_data.mfr_borehole(fluid_data=self.fluid_data, nb_of_boreholes=self.nb_of_boreholes,
-                                        **kwargs) * self.tichelmann_factor,
-            self.r_in_lateral,
-            self.fluid_data.mu(**kwargs),
-            self.fluid_data.rho(**kwargs),
-            1e-6)
         A = pi * self.r_in_lateral ** 2
         V = (self.flow_data.vfr_borehole(fluid_data=self.fluid_data, nb_of_boreholes=self.nb_of_boreholes,
                                          **kwargs) / 1000) / A * self.tichelmann_factor
+
+        Re = self.fluid_data.rho(**kwargs) * V * self.r_in_lateral * 2 / self.fluid_data.mu(**kwargs)
+
+        if kwargs.get('haaland', False):
+            fd = friction_factor_Haaland(Re, self.r_in_lateral, 1e-6, **kwargs)
+        else:
+            fd = friction_factor_darcy_weisbach(Re, self.r_in_lateral, 1e-6, **kwargs)
 
         # distance_later * 2 for back and forth
         return ((fd * self.distance_lateral * 2 / (
@@ -112,16 +114,15 @@ class PressureDrop:
         Pressure drop in kPa
         """
         # Darcy fluid factor
-        fd = gt.pipes.fluid_friction_factor_circular_pipe(
-            self.flow_data.mfr_borefield(fluid_data=self.fluid_data, nb_of_boreholes=self.nb_of_boreholes,
-                                         series_factor=self.series_factor, **kwargs),
-            self.r_in_main,
-            self.fluid_data.mu(**kwargs),
-            self.fluid_data.rho(**kwargs),
-            1e-6)
         A = pi * self.r_in_main ** 2
         V = (self.flow_data.vfr_borefield(fluid_data=self.fluid_data, nb_of_boreholes=self.nb_of_boreholes,
                                           series_factor=self.series_factor, **kwargs) / 1000) / A
+        Re = self.fluid_data.rho(**kwargs) * V * self.r_in_main * 2 / self.fluid_data.mu(**kwargs)
+
+        if kwargs.get('haaland', False):
+            fd = friction_factor_Haaland(Re, self.r_in_main, 1e-6, **kwargs)
+        else:
+            fd = friction_factor_darcy_weisbach(Re, self.r_in_main, 1e-6, **kwargs)
 
         # distance_later * 2 for back and forth
         return ((fd * self.distance_main * 2 / (
