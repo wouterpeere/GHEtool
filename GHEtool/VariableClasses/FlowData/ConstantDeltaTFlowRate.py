@@ -9,7 +9,7 @@ from typing import Union
 class ConstantDeltaTFlowRate(_FlowData, BaseClass):
 
     def __init__(self, *, delta_temp_extraction: float = 4, delta_temp_injection: float = 4, series_factor: int = 1,
-                 **kwargs):
+                 min_flow_percentage: float = 10, **kwargs):
         """
 
         Parameters
@@ -20,11 +20,14 @@ class ConstantDeltaTFlowRate(_FlowData, BaseClass):
             (Positive) temperature difference between the borehole inlet and outlet temperature during injection [°C]
         series_factor : int
             Number of boreholes in series to couple the flow rate per borehole to the flow rate of the entire borefield
+        min_flow_percentage : float
+            Set the minimum allowed flow rate to this percentage of the maximum [%]. This prevents the flow rate to drop to ~0.
         """
 
         self._delta_temp_heating = delta_temp_extraction
         self._delta_temp_cooling = delta_temp_injection
         self._series_factor = series_factor
+        self._min_flow_percentage = min_flow_percentage
 
         if series_factor < 1:
             raise ValueError('The series factor cannot be less than 1.')
@@ -122,8 +125,7 @@ class ConstantDeltaTFlowRate(_FlowData, BaseClass):
         return self.mfr_borefield(fluid_data=fluid_data, power=power, **kwargs) / fluid_data.rho(**kwargs) * 1000
 
     def mfr_borefield(self, fluid_data: _FluidData = None, power: Union[float, np.ndarray] = None,
-                      min_power_percentage: float = 10,
-                      **kwargs) -> np.ndarray:
+                      min_flow_percentage: float = None, **kwargs) -> np.ndarray:
         """
         This function returns the mass flow rate for the entire borefield. Either based on a given mass flow rate,
         or calculated based on a volume flow rate.
@@ -134,7 +136,7 @@ class ConstantDeltaTFlowRate(_FlowData, BaseClass):
             Fluid data class
         power : float | np.ndarray
             Power of the entire borefield, positive when injection, negative during extraction [kW]
-        min_power_percentage : float
+        min_flow_percentage : float
             Increase the minimum flow rate to at least this percentage of the maximum flow
 
         Returns
@@ -151,12 +153,13 @@ class ConstantDeltaTFlowRate(_FlowData, BaseClass):
             raise ValueError('Please provide a valid (array of) powers to calculate the flow rate')
         if fluid_data is None:
             raise ValueError('Fluid data is required to calculate the flow rate.')
-
+        if min_flow_percentage is None:
+            min_flow_percentage = self._min_flow_percentage
         power = np.asarray(power)
 
         deltaT = np.where(power <= 0, self._delta_temp_heating, self._delta_temp_cooling)
         flow = np.abs(power) / (fluid_data.cp(**kwargs) / 1000 * deltaT)
-        flow = np.maximum(flow, min_power_percentage / 100 * np.max(flow))
+        flow = np.maximum(flow, min_flow_percentage / 100 * np.max(flow))
         return flow
 
     def check_values(self) -> bool:
@@ -173,7 +176,8 @@ class ConstantDeltaTFlowRate(_FlowData, BaseClass):
 
     def __export__(self):
         return {'type': 'Constant delta T flow rate',
-                'delta T in heating': self._delta_temp_heating,
-                'delta T in cooling': self._delta_temp_cooling,
-                'series factor': self._series_factor
+                'delta T in heating [°C]': self._delta_temp_heating,
+                'delta T in cooling [°C]': self._delta_temp_cooling,
+                'series factor [-]': self._series_factor,
+                'minimum flow percentage [%]': self._min_flow_percentage
                 }

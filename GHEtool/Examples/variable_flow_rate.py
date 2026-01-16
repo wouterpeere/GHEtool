@@ -5,7 +5,14 @@ from matplotlib import pyplot as plt
 from GHEtool import *
 
 
-def hourly():
+def sizing():
+    """
+    This function compares the sizing (L2, L3 and L4) of a constant flow rate with a variable one.
+
+    Returns
+    -------
+    None
+    """
     # define params
     ground_data = GroundFluxTemperature(2.1, 10, flux=0.06)
     pipe = SingleUTube(2, 0.013, 0.016, 0.4, 0.035)
@@ -44,6 +51,13 @@ def hourly():
     print(f'Required borehole depth for a variable flow: {variable_depth_L3:.2f} (L3) '
           f'(difference of {(variable_depth_L3 - constant_depth_L3) / constant_depth_L3 * 100:.2f}%)')
 
+    borefield_constant_flow.calculation_setup(size_based_on='outlet')
+    borefield_variable_flow.calculation_setup(size_based_on='outlet')
+    constant_depth_L3 = borefield_constant_flow.size_L3()
+    variable_depth_L3 = borefield_variable_flow.size_L3()
+    print(f'Required borehole depth for a constant flow: {constant_depth_L3:.2f} (L3)')
+    print(f'Required borehole depth for a variable flow: {variable_depth_L3:.2f} (L3) '
+          f'(difference of {(variable_depth_L3 - constant_depth_L3) / constant_depth_L3 * 100:.2f}%)')
     borefield_constant_flow.print_temperature_profile(plot_hourly=True)
     borefield_variable_flow.calculate_temperatures(hourly=True)
 
@@ -57,18 +71,23 @@ def hourly():
                                                                nb_of_boreholes=borefield_constant_flow.number_of_boreholes,
                                                                use_explicit_models=True)
 
-    plt.figure()
-    plt.plot(borefield_variable_flow.results.peak_injection, label='variable flow')
-    plt.plot(borefield_constant_flow.results.peak_injection, label='constant flow')
-    plt.legend()
-    plt.show()
-    plt.figure()
-    plt.plot(rb_variable_flow, label='variable flow')
-    plt.plot(rb_constant_flow, label='constant flow')
+    time_array = borefield_variable_flow.load.time_L4 / 12 / 3600 / 730
 
+    plt.figure()
+    plt.plot(time_array, borefield_variable_flow.results.peak_injection, label='variable flow')
+    plt.plot(time_array, borefield_constant_flow.results.peak_injection, label='constant flow')
+    plt.legend()
+    plt.ylabel('Average fluid temperature [°C]')
+    plt.xlabel('Time [years]')
+
+    plt.figure()
+    plt.plot(time_array, rb_variable_flow, label='variable flow')
+    plt.plot(time_array, rb_constant_flow, label='constant flow')
+    plt.ylabel('Effective borehole thermal resistance [mK/W]')
+    plt.xlabel('Time [years]')
     plt.legend()
     plt.show()
 
 
 if __name__ == "__main__":
-    hourly()
+    sizing()
