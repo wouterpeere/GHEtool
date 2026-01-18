@@ -386,6 +386,7 @@ def test_constant_delta_t_flow_rate():
                        np.array([1 / 4 / 5, 1 / 4 / 4]))
     assert np.allclose(flow.vfr_borehole(fluid_data=fluid, power=np.array([1, -1]), nb_of_boreholes=2),
                        np.array([1 / 4 / 5, 1 / 4 / 4]) / 2000 * 1000)
+    assert np.isclose(flow.vfr_borehole(fluid_data=fluid, power=0, nb_of_boreholes=2), 0)
 
 
 def test_repr_constant_hourly_flow_rate():

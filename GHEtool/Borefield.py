@@ -1933,6 +1933,9 @@ class Borefield(BaseClass):
                            - self.load.monthly_average_injection_power_simulation_period * g_value_peak_injection / k_s / 2 / pi)
                         * 1000 / self.number_of_boreholes / H
                 )
+                results_peak_injection[self.load.monthly_peak_injection_simulation_period == 0] = Tb[
+                    self.load.monthly_peak_injection_simulation_period == 0]
+
                 results_peak_extraction = (
                         Tb +
                         (- self.load.monthly_peak_extraction_simulation_period
@@ -1942,6 +1945,9 @@ class Borefield(BaseClass):
                          - self.load.monthly_average_injection_power_simulation_period * g_value_peak_extraction / k_s / 2 / pi)
                         * 1000 / self.number_of_boreholes / H
                 )
+
+                results_peak_extraction[self.load.monthly_peak_extraction_simulation_period == 0] = Tb[
+                    self.load.monthly_peak_extraction_simulation_period == 0]
 
                 # these results will be depreciated in v2.5.0
                 results_month_injection = Tb + self.load.monthly_baseload_injection_power_simulation_period * 1000 * (

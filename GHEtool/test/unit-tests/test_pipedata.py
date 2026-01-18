@@ -75,7 +75,6 @@ def test_equivalent_borehole_resistance_U_tubes():
 
 
 def test_convective_resistance():
-    # TODO add variable flow rate as well
     fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
     flow_data = ConstantFlowRate(mfr=0.2)
     single = SingleUTube(1, 0.016, 0.02, 2, 0.04)
