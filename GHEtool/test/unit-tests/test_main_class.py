@@ -636,7 +636,6 @@ def test_calculate_temperatures():
     borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
 
     borefield.calculate_temperatures(120)
-    print(borefield.results.peak_injection)
     np.testing.assert_array_almost_equal(borefield.results.peak_extraction,
                                          np.array([
                                              7.72762934, 7.99146503, 8.51833967, 9.15095610, 9.80800074,
