@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Add flow_rates as explicit argument in PressureDrop curve function.
 - Inlet and outlet water temperature (issue #271).
 - Added 'type' attribute to temperature profile plotting so also the inlet and outlet temperatures can be shown (issue
   #271).

@@ -140,7 +140,8 @@ class PressureDrop:
             self.calculate_pressure_drop_lateral(**kwargs) + \
             self.calculate_pressure_drop_main(**kwargs)
 
-    def create_pressure_drop_curve(self, range: float = 2, datapoints: int = 30, **kwargs):
+    def create_pressure_drop_curve(self, range: float = 2, datapoints: int = 30, flow_rates: np.ndarray = None,
+                                   **kwargs):
         """
         This function calculates the total pressure drop for different flow rates.
 
@@ -150,6 +151,8 @@ class PressureDrop:
             Multiplier of the flow rate for the range of the data.
         datapoints : int
             Number of datapoints.
+        flow_rates : np.ndarray
+            Give the flow range directly.
 
         Returns
         -------
@@ -159,9 +162,11 @@ class PressureDrop:
         # backup
         flow_backup = copy.copy(self.flow_data)
 
-        flow_rates = np.linspace(0, range * self.flow_data.vfr_borehole(fluid_data=self.fluid_data,
-                                                                        nb_of_boreholes=self.nb_of_boreholes, **kwargs),
-                                 datapoints)
+        if flow_rates is None:
+            flow_rates = np.linspace(0, range * self.flow_data.vfr_borehole(
+                fluid_data=self.fluid_data,
+                nb_of_boreholes=self.nb_of_boreholes,
+                **kwargs), datapoints)
         pressure_drops_pipe = np.zeros(flow_rates.shape)
         pressure_drops_lateral = np.zeros(flow_rates.shape)
         pressure_drops_main = np.zeros(flow_rates.shape)
