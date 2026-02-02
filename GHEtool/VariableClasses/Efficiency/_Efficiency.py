@@ -161,6 +161,23 @@ class _Efficiency(_EfficiencyBase, BaseClass):
                         self._data[i, j, k] = find_value(self._range_primary[i],
                                                          self._range_secondary[j],
                                                          self._range_part_load[k])
+            # get max powers per temperature
+            x = coordinates[:, 0]
+            y = coordinates[:, 1]
+            z = coordinates[:, 2]
+
+            ix = np.searchsorted(self._range_primary, x)
+            iy = np.searchsorted(self._range_secondary, y)
+
+            flat_idx = ix * len(self._range_secondary) + iy
+
+            max_z_flat = np.full(len(self._range_primary) * len(self._range_secondary), -np.inf)
+            np.maximum.at(max_z_flat, flat_idx, z)
+
+            max_z = max_z_flat.reshape(len(self._range_primary), len(self._range_secondary))
+            # convert index to part load value
+            self._max_part_load = max_z
+
         elif dimensions == 2:
             self._data = np.empty(
                 (len(self._range_primary), max(len(self._range_secondary), len(self._range_part_load))))
@@ -174,6 +191,17 @@ class _Efficiency(_EfficiencyBase, BaseClass):
                     for j in range(self._data.shape[1]):
                         self._data[i, j] = find_value(self._range_primary[i],
                                                       self._range_part_load[j])
+
+                # get max powers per temperature
+                x = coordinates[:, 0]
+                y = coordinates[:, 1]
+
+                idx = np.searchsorted(self._range_primary, x)
+
+                max_y = np.full(len(self._range_primary), -np.inf)
+                np.maximum.at(max_y, idx, y)
+
+                self._max_part_load = max_y
         else:
             p = self._range_primary.argsort()
             self._data = data[p]
@@ -256,3 +284,71 @@ class _Efficiency(_EfficiencyBase, BaseClass):
         interp = interpn(self._points, self._data, xi, bounds_error=False, fill_value=np.nan)
         if not np.isnan(interp).any():
             return interp
+
+    def _get_max_power(self,
+                       primary_temperature: Union[float, np.ndarray],
+                       secondary_temperature: Union[float, np.ndarray] = None) -> np.ndarray:
+        """
+        This function returns the maximum available power for a certain primary and secondary temperature.
+
+        Parameters
+        ----------
+        primary_temperature : np.ndarray or float
+            Value(s) for the average primary temperature of the heat pump for the efficiency calculation.
+        secondary_temperature : np.ndarray or float
+            Value(s) for the average secondary temperature of the heat pump for the efficiency calculation.
+
+        Raises
+        ------
+        ValueError
+            When secondary_temperature is in the dataset, and it is not provided. Same for power.
+
+        Returns
+        -------
+        Efficiency
+            np.ndarray
+        """
+
+        if not self._has_part_load:
+            return 1e16
+
+            # reuse your existing clipping and array logic
+        _max_length = np.max([
+            len(i) if i is not None and not isinstance(i, (float, int)) else 1
+            for i in (primary_temperature, secondary_temperature)
+        ])
+
+        Tp = np.array(
+            np.full(_max_length, primary_temperature)
+            if isinstance(primary_temperature, (float, int))
+            else primary_temperature
+        )
+
+        Ts = None
+        if self._has_secondary:
+            if secondary_temperature is None:
+                raise ValueError("Secondary temperature is required.")
+            Ts = np.array(
+                np.full(_max_length, secondary_temperature)
+                if isinstance(secondary_temperature, (float, int))
+                else secondary_temperature
+            )
+
+        # clip
+        Tp = np.clip(Tp, np.min(self._range_primary), np.max(self._range_primary))
+        if self._has_secondary:
+            Ts = np.clip(Ts, np.min(self._range_secondary), np.max(self._range_secondary))
+
+        # interpolate directly on precomputed surface
+        if self._has_secondary:
+            xi = list(zip(Tp, Ts))
+        else:
+            xi = Tp
+
+        return interpn(
+            self._points[:1 + self._has_secondary],
+            self._max_part_load,
+            xi,
+            bounds_error=False,
+            fill_value=np.nan
+        )

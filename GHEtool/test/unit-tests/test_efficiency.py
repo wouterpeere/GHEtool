@@ -49,6 +49,7 @@ def test_COP_basic():
     assert np.array_equal(cop_basic.get_COP(np.array([7.5, 10]), power=5), np.array([3.5, 4]))
     assert np.array_equal(cop_basic.get_COP(np.array([7.5, 10, 0]), power=np.array([5, 6])),
                           np.array([3.5, 4, 3]))
+    assert np.allclose(cop_basic._get_max_power(np.array([1, 1.5, 2, 2.5, 3])), 1e16)
 
 
 def test_COP_secondary():
@@ -68,6 +69,7 @@ def test_COP_secondary():
     assert np.array_equal(cop_sec.get_COP(np.array([1.5, 3]), np.array([3, 4]), np.array([1, 2])),
                           np.array([1.25, 3.5]))
     assert np.array_equal(cop_sec.get_COP(1.5, np.array([2.5, 4.5])), np.array([1, 2]))
+    assert np.allclose(cop_sec._get_max_power(np.array([1, 1.5, 2, 2.5, 3])), 1e16)
 
 
 def test_COP_part_load():
@@ -79,6 +81,8 @@ def test_COP_part_load():
         assert cop_part.get_COP(5) == 3
 
     assert cop_part.get_COP(1.5, power=3.5) == 1.5
+    assert cop_part.get_COP(1.5, power=5.5) == 2
+
     assert np.array_equal(cop_part.get_COP(np.array([1.5, 2]), power=np.array([3, 4])), np.array([1.25, 2.625]))
     assert np.array_equal(cop_part.get_COP(np.array([1.5, 3]), power=np.array([3, 4])), np.array([1.25, 3.5]))
 
@@ -89,6 +93,24 @@ def test_COP_part_load():
         cop_part.get_COP(np.array([1.5, 3]), power=np.array([3, 4]), secondary_temperature=np.array([1, 2])),
         np.array([1.25, 3.5]))
     assert np.array_equal(cop_part.get_COP(1.5, power=np.array([2.5, 4.5])), np.array([1, 2]))
+
+    assert cop_part._get_max_power(1.5) == 4.5
+    assert cop_part._get_max_power(1) == 4.5
+    cop_part = COP(np.array([1, 2, 2, 4]), np.array([[1.5, 2.5], [2.5, 2.5], [1.5, 4.5], [2.5, 5.5]]), part_load=True)
+    assert np.allclose(cop_part._get_max_power(np.array([1, 1.5, 2, 2.5, 3])), [4.5, 4.5, 5, 5.5, 5.5])
+
+
+def test_COP_part_load_real():
+    cop = COP(np.array(
+        [4.42, 5.21, 6.04, 7.52, 9.5, 3.99, 4.58, 5.21, 6.02, 6.83, 3.86, 4.39, 4.97,
+         5.62, 6.19, 3.8, 4.3, 4.86, 5.44, 5.9, 3.76, 4.25, 4.79, 5.34, 5.74]),
+        np.array([[-5, 1.06], [0, 1.25], [5, 1.45], [10, 1.66], [15, 1.9], [-5, 2.05], [0, 2.42], [5, 2.81], [10, 3.2],
+                  [15, 3.54], [-5, 3.05], [0, 3.6], [5, 4.17], [10, 4.73], [15, 5.18], [-5, 4.04], [0, 4.77], [5, 5.54],
+                  [10, 6.27], [15, 6.82], [-5, 5.03], [0, 5.95], [5, 6.9], [10, 7.81], [15, 8.46]]),
+        part_load=True)
+    assert np.isclose(cop.get_COP(0, power=1.25), 5.21)
+    assert np.allclose(cop.get_COP(np.array([0, 5]), power=np.array([1.25, 1.45])), [5.21, 6.04])
+    assert np.allclose(cop._get_max_power(np.array([0, 5])), [5.95, 6.9])
 
 
 def test_COP_full():
@@ -110,6 +132,16 @@ def test_COP_full():
                           np.array([3.375, 5.625, 5.625]))
     assert np.array_equal(cop_full.get_COP(1.5, secondary_temperature=np.array([2.5, 4.5]), power=4.5),
                           np.array([1, 2]))
+
+    with pytest.raises(ValueError):
+        assert cop_full._get_max_power(1.5)
+    assert cop_full._get_max_power(1.5, 4.5) == 8.5
+    cop_full = COP(np.array([1, 2, 2, 4, 2, 4, 4, 8]),
+                   np.array([[1.5, 2.5, 4.5], [2.5, 2.5, 4.5], [1.5, 4.5, 3.5], [2.5, 4.5, 5.5],
+                             [1.5, 2.5, 8.5], [2.5, 2.5, 10.5], [1.5, 4.5, 7.5], [2.5, 4.5, 9.5]]),
+                   secondary=True, part_load=True)
+    assert np.allclose(cop_full._get_max_power(np.array([1.5, 1.5, 2.5, 2.5]), np.array([2.5, 4.5, 2.5, 4.5])),
+                       [8.5, 7.5, 10.5, 9.5])
 
 
 def test_COP_get_SCOP():
