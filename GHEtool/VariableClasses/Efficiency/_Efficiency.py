@@ -3,6 +3,7 @@ import numpy as np
 from scipy.interpolate import interpn, interp1d
 from typing import Union
 from GHEtool.VariableClasses.BaseClass import BaseClass
+from collections import defaultdict
 
 
 class _EfficiencyBase(BaseClass):
@@ -352,3 +353,360 @@ class _Efficiency(_EfficiencyBase, BaseClass):
             bounds_error=False,
             fill_value=np.nan
         )
+
+
+def plot_heat_pump_envelope(points, eff, ax=None, label_prefix="T"):
+    """
+    Plot heat pump efficiency as a function of power for each primary temperature.
+
+    Parameters
+    ----------
+    points : ndarray of shape (N, 2)
+        Array of (primary_temperature, available_power) pairs.
+    eff : ndarray of shape (N,)
+        Efficiencies corresponding to `points`.
+    ax : matplotlib.axes.Axes, optional
+        Axis to plot on. If None, a new figure and axis are created.
+    label_prefix : str, optional
+        Prefix for legend labels. Default is "T".
+
+    Returns
+    -------
+    ax : matplotlib.axes.Axes
+        Axis containing the plot.
+    """
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from collections import defaultdict
+
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    # group by temperature
+    grouped = defaultdict(lambda: {"power": [], "eff": []})
+
+    for (T, P), e in zip(points, eff):
+        grouped[T]["power"].append(P)
+        grouped[T]["eff"].append(e)
+
+    # plot each temperature
+    for T in sorted(grouped.keys()):
+        p = np.asarray(grouped[T]["power"])
+        e = np.asarray(grouped[T]["eff"])
+
+        # sort and remove duplicate power values
+        idx = np.argsort(p)
+        p = p[idx]
+        e = e[idx]
+
+        p_unique, idx_unique = np.unique(p, return_index=True)
+        e_unique = e[idx_unique]
+
+        ax.plot(p_unique, e_unique, marker="o", label=f"{label_prefix} = {T}")
+
+    ax.set_xlabel("Power")
+    ax.set_ylabel("Efficiency")
+    ax.grid(True)
+    ax.legend()
+
+    return ax
+
+
+def combine_n_heat_pumps(points_list, eff_list):
+    """
+    Combine the operating envelopes of multiple modulating heat pumps into a
+    single equivalent operating envelope using strict cascade staging.
+
+    At each primary temperature, the heat pumps are ordered by increasing
+    minimum available power and combined according to a deterministic
+    staging strategy:
+
+    Operating logic (per temperature)
+    ---------------------------------
+    1. Single-machine operation
+       Below the sum of the minimum powers of the two smallest heat pumps,
+       only the smallest heat pump may operate.
+
+    2. Single-machine overlap (HP1 vs HP2 only)
+       In the same low-power region, both of the two smallest heat pumps
+       may operate individually. At equal part load, the heat pump with
+       the highest efficiency is selected.
+
+       No overlap regions are allowed beyond this first staging level.
+
+    3. Cascade operation with strict staging
+       Once the combined minimum power of k heat pumps is reached,
+       exactly k heat pumps operate simultaneously.
+
+       For each cascade stage:
+       - All active heat pumps operate at the same part load ratio.
+       - The combined efficiency is computed as a power-weighted average.
+       - Operation with fewer heat pumps is no longer allowed once a
+         higher cascade stage is available.
+
+       This enforces a monotonic staging sequence:
+       1 → 2 → 3 → … → n heat pumps.
+
+    Interpolation is permitted within the operating envelope of each heat
+    pump. Extrapolation outside the envelope is not allowed.
+
+    Parameters
+    ----------
+    points_list : list of ndarray
+        List of arrays, one per heat pump. Each array has shape (Ni, 2) and
+        contains (primary_temperature, available_power) pairs.
+    eff_list : list of ndarray
+        List of efficiency arrays corresponding to `points_list`. Each array
+        has shape (Ni,).
+
+    Returns
+    -------
+    combined_points : ndarray of shape (K, 2)
+        Combined array of (primary_temperature, available_power) pairs
+        representing the equivalent operating envelope.
+    combined_eff : ndarray of shape (K,)
+        Efficiencies corresponding to `combined_points`.
+
+    Notes
+    -----
+    - Multiple power levels per primary temperature are supported.
+    - Each primary temperature is processed independently.
+    - Once a cascade with k heat pumps is possible, operation with fewer
+      heat pumps is strictly disallowed.
+    - The output envelope represents physically allowed operating states
+      under a strict cascade control philosophy.
+    - The output format matches the input format.
+    """
+
+    def group_by_temperature(points, eff):
+        """
+        Group power and efficiency data by primary temperature.
+
+        Parameters
+        ----------
+        points : ndarray of shape (N, 2)
+            Array of (temperature, power) pairs.
+        eff : ndarray of shape (N,)
+            Efficiencies corresponding to `points`.
+
+        Returns
+        -------
+        grouped : dict
+            Dictionary keyed by temperature with values containing sorted
+            power and efficiency arrays.
+        """
+        grouped = defaultdict(lambda: {"power": [], "eff": []})
+
+        for (T, P), e in zip(points, eff):
+            grouped[T]["power"].append(P)
+            grouped[T]["eff"].append(e)
+
+        for T in grouped:
+            p = np.asarray(grouped[T]["power"])
+            e = np.asarray(grouped[T]["eff"])
+            idx = np.argsort(p)
+            grouped[T]["power"] = p[idx]
+            grouped[T]["eff"] = e[idx]
+
+        return grouped
+
+    def interp_eff(P, p_arr, e_arr):
+        """
+        Interpolate efficiency at a given power level.
+        """
+        return np.interp(P, p_arr, e_arr)
+
+    def combine_at_temperature_n(
+            hps,
+            n_pl_single=25,
+            n_pl_cascade=40
+    ):
+        """
+    Combine multiple heat pumps at a fixed primary temperature using strict
+    cascade staging and linspace-based part load discretization.
+
+    Heat pumps are ordered by increasing minimum available power and combined
+    according to the following rules:
+
+    - Below the first cascade threshold, only single-machine operation is
+      allowed.
+    - A single overlap zone exists only between the two smallest heat pumps
+      and only below the first cascade threshold.
+    - Above each cascade threshold, exactly k heat pumps operate
+      simultaneously.
+    - Once a higher cascade stage is available, operation with fewer heat
+      pumps is not permitted.
+
+    Part load behavior is evaluated on uniform linspace grids to produce
+    smooth operating envelopes.
+
+    Parameters
+    ----------
+    hps : list of dict
+        List of heat pump operating envelopes available at this temperature.
+        Each dict contains:
+        - "power" : ndarray
+            Sorted array of available powers.
+        - "eff" : ndarray
+            Efficiencies corresponding to "power".
+    n_pl_single : int, optional
+        Number of part load points used for the single-machine overlap region
+        between the two smallest heat pumps.
+    n_pl_cascade : int, optional
+        Number of part load points used for each cascade stage.
+
+    Returns
+    -------
+    P_comb : ndarray
+        Combined available powers at this temperature.
+    E_comb : ndarray
+        Corresponding combined efficiencies.
+
+    Notes
+    -----
+    - All active heat pumps in a cascade stage operate at the same part load.
+    - Combined efficiencies are computed as power-weighted averages.
+    - Strict staging ensures that exactly one operating mode is valid for
+      each power level.
+    """
+        # sort heat pumps by minimum power
+        hps = sorted(hps, key=lambda hp: hp["power"][0])
+        n = len(hps)
+
+        p_min = [hp["power"][0] for hp in hps]
+        p_max = [hp["power"][-1] for hp in hps]
+
+        P_comb = []
+        E_comb = []
+
+        # -------------------------
+        # zone 1: single HP1 only
+        # -------------------------
+        for P in hps[0]["power"]:
+            if n == 1 or P < p_min[1]:
+                P_comb.append(P)
+                E_comb.append(
+                    interp_eff(P, hps[0]["power"], hps[0]["eff"])
+                )
+
+        # -------------------------
+        # overlap zone: HP1 vs HP2 ONLY
+        # -------------------------
+        if n >= 2:
+            hp1 = hps[0]
+            hp2 = hps[1]
+
+            P_overlap_max = p_min[0] + p_min[1]
+
+            pl_grid = np.linspace(0.0, 1.0, n_pl_single)
+
+            for pl in pl_grid:
+                P1 = p_min[0] + pl * (p_max[0] - p_min[0])
+                P2 = p_min[1] + pl * (p_max[1] - p_min[1])
+
+                candidates = []
+
+                if p_min[0] <= P1 <= p_max[0]:
+                    candidates.append(
+                        (P1, interp_eff(P1, hp1["power"], hp1["eff"]))
+                    )
+
+                if p_min[1] <= P2 <= p_max[1]:
+                    candidates.append(
+                        (P2, interp_eff(P2, hp2["power"], hp2["eff"]))
+                    )
+
+                if not candidates:
+                    continue
+
+                P_best, E_best = max(candidates, key=lambda x: x[1])
+
+                if P_best < P_overlap_max:
+                    P_comb.append(P_best)
+                    E_comb.append(E_best)
+
+        # -------------------------
+        # cascade zones: exactly k+1 machines
+        # -------------------------
+        for k in range(1, n):
+            active = hps[:k + 1]
+
+            P_min_stage = sum(p_min[:k + 1])
+            P_max_stage = (
+                sum(p_min[:k + 2]) if k + 1 < n else np.inf
+            )
+
+            pl_grid = np.linspace(0.0, 1.0, n_pl_cascade)
+
+            for pl in pl_grid:
+                powers = []
+                effs = []
+
+                for i, hp in enumerate(active):
+                    Pi = p_min[i] + pl * (p_max[i] - p_min[i])
+                    if Pi < p_min[i] or Pi > p_max[i]:
+                        break
+                    powers.append(Pi)
+                    effs.append(
+                        interp_eff(Pi, hp["power"], hp["eff"])
+                    )
+                else:
+                    P_tot = sum(powers)
+
+                    # STRICT staging window
+                    if not (P_min_stage <= P_tot < P_max_stage):
+                        continue
+
+                    E_tot = np.dot(powers, effs) / P_tot
+
+                    P_comb.append(P_tot)
+                    E_comb.append(E_tot)
+
+        # -------------------------
+        # cleanup
+        # -------------------------
+        P_comb = np.asarray(P_comb)
+        E_comb = np.asarray(E_comb)
+
+        mask = np.isfinite(E_comb)
+        idx = np.argsort(P_comb[mask])
+
+        return P_comb[mask][idx], E_comb[mask][idx]
+
+    # group each heat pump by temperature
+    hp_groups = [
+        group_by_temperature(points, eff)
+        for points, eff in zip(points_list, eff_list)
+    ]
+
+    combined_points = []
+    combined_eff = []
+
+    # all temperatures across all heat pumps
+    all_T = sorted(
+        set().union(*[hp.keys() for hp in hp_groups])
+    )
+
+    for T in all_T:
+        # collect all heat pumps available at this temperature
+        hps_at_T = [
+            hp[T] for hp in hp_groups if T in hp
+        ]
+
+        if not hps_at_T:
+            continue
+
+        if len(hps_at_T) == 1:
+            # only one machine available
+            P = hps_at_T[0]["power"]
+            E = hps_at_T[0]["eff"]
+        else:
+            # multiple machines → combine
+            P, E = combine_at_temperature_n(hps_at_T)
+
+        for p, e in zip(P, E):
+            combined_points.append((T, p))
+            combined_eff.append(e)
+
+    return np.asarray(combined_points), np.asarray(combined_eff)
