@@ -537,6 +537,7 @@ def test_graph_efficiency(monkeypatch):
 def test_combine_heat_pumps():
     combine_n_heat_pumps([points_HP300, points_HP300, points_HP300], [eff_HP300, eff_HP300, eff_HP300])
     combine_n_heat_pumps([points_HP300], [eff_HP300])
+    combine_n_heat_pumps([points_HP300, points_HP400], [eff_HP300, eff_HP400])
     combine_n_heat_pumps([points_HP300, points_HP300_new], [eff_HP300, eff_HP300_new])
 
 

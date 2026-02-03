@@ -611,7 +611,7 @@ def combine_n_heat_pumps(points_list, eff_list):
                 if p_min[1] <= P2 <= p_max[1]:
                     candidates.append((P2, interp_eff(P2, hp2["power"], hp2["eff"])))
 
-                if not candidates:
+                if not candidates:  # pragma: no cover
                     continue
 
                 P_best, E_best = max(candidates, key=lambda x: x[1])
@@ -638,7 +638,7 @@ def combine_n_heat_pumps(points_list, eff_list):
                 for i, hp in enumerate(active):
                     Pi = p_min[i] + pl * (p_max[i] - p_min[i])
                     if Pi < p_min[i] or Pi > p_max[i]:
-                        break
+                        break  # pragma: no cover
                     powers.append(Pi)
                     effs.append(
                         interp_eff(Pi, hp["power"], hp["eff"])
@@ -679,7 +679,7 @@ def combine_n_heat_pumps(points_list, eff_list):
         # collect all heat pumps available at this temperature
         hps_at_T = [hp[T] for hp in hp_groups if T in hp]
 
-        if not hps_at_T:
+        if not hps_at_T:  # pragma: no cover
             continue
 
         if len(hps_at_T) == 1:
