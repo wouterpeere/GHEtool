@@ -33,6 +33,26 @@ eff_HP300 = np.array([
     5.04, 5.72, 5.30,
     5.41, 6.17, 5.63,
 ])
+points_HP300_new = np.array([
+    [-1.5, 58.7],
+    [-1.5, 43.7],
+    [-1.5, 25.5],
+    [3.5, 67.9],
+    [3.5, 50.7],
+    [3.5, 29.6],
+    [8.5, 77.6],
+    [8.5, 58.3],
+    [8.5, 33.9],
+    [11.5, 83.9],
+    [11.5, 62.9],
+    [11.5, 36.6],
+])
+eff_HP300_new = np.array([
+    4.08, 4.60, 4.18,
+    4.53, 5.12, 4.70,
+    5.04, 5.72, 5.30,
+    5.41, 6.17, 5.63,
+])
 points_HP400 = np.array([
     [-4.5, 67.2],
     [-4.5, 49.9],
@@ -516,6 +536,8 @@ def test_graph_efficiency(monkeypatch):
 
 def test_combine_heat_pumps():
     combine_n_heat_pumps([points_HP300, points_HP300, points_HP300], [eff_HP300, eff_HP300, eff_HP300])
+    combine_n_heat_pumps([points_HP300], [eff_HP300])
+    combine_n_heat_pumps([points_HP300, points_HP300_new], [eff_HP300, eff_HP300_new])
 
 
 def test_find_optimal_heat_pump_configuration():
