@@ -6,8 +6,7 @@ import pytest
 import numpy as np
 
 from GHEtool.VariableClasses.Efficiency import *
-from GHEtool.VariableClasses.Efficiency._Efficiency import combine_heat_pumps, plot_heat_pump_envelope, \
-    combine_n_heat_pumps
+from GHEtool.VariableClasses.Efficiency._Efficiency import plot_heat_pump_envelope, combine_n_heat_pumps
 
 
 def test_SCOP():
