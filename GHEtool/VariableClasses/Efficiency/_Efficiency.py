@@ -1,10 +1,12 @@
+import itertools
+
+import matplotlib.pyplot as plt
 import numpy as np
 
-from scipy.interpolate import interpn, interp1d
-from typing import Union
-from GHEtool.VariableClasses.BaseClass import BaseClass
 from collections import defaultdict
-import itertools
+from GHEtool.VariableClasses.BaseClass import BaseClass
+from scipy.interpolate import interpn
+from typing import Union
 
 
 class _EfficiencyBase(BaseClass):
@@ -376,10 +378,6 @@ def plot_heat_pump_envelope(points, eff, ax=None, label_prefix="T"):
     ax : matplotlib.axes.Axes
         Axis containing the plot.
     """
-
-    import numpy as np
-    import matplotlib.pyplot as plt
-    from collections import defaultdict
 
     if ax is None:
         fig, ax = plt.subplots()
