@@ -4,6 +4,7 @@ from scipy.interpolate import interpn, interp1d
 from typing import Union
 from GHEtool.VariableClasses.BaseClass import BaseClass
 from collections import defaultdict
+import itertools
 
 
 class _EfficiencyBase(BaseClass):
@@ -696,3 +697,47 @@ def combine_n_heat_pumps(points_list, eff_list):
             combined_eff.append(e)
 
     return np.asarray(combined_points), np.asarray(combined_eff)
+
+
+def _find_optimal_heat_pump_configuration(heat_pumps: list[_Efficiency], power: float, prim_temp: float,
+                                          sec_temp: float = None) -> list:
+    """
+    This function finds the required combination of different heat pumps to be able to deliver the required power
+    at a certain primary (and secondary) temperature.
+
+    Parameters
+    ----------
+    heat_pumps : list
+        List of efficiency objects
+    power : float
+        Required power [kW]
+    prim_temp : float
+        Primary temperature at which the power is required [°C]
+    sec_temp : float
+        Secondary temperature at which the power is required [°C]
+
+    Returns
+    -------
+    list
+        List with the number of heat pumps required for a certain power.
+    """
+
+    best = None
+    n = len(heat_pumps)
+
+    heat_pump_max_powers = [heat_pump._get_max_power(primary_temperature=prim_temp, secondary_temperature=sec_temp)[0]
+                            for
+                            heat_pump in heat_pumps]
+
+    for mask in itertools.product([0, 1], repeat=n):
+        mask = np.array(mask)
+        total = heat_pump_max_powers @ mask
+        if total >= power:
+            units = mask.sum()
+            overshoot = total - power
+            candidate = (units, overshoot, -total)
+            if best is None or candidate < best:
+                best = candidate
+                best_mask = mask
+
+    return best_mask
