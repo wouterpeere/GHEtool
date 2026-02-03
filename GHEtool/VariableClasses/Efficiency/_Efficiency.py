@@ -586,9 +586,8 @@ def combine_n_heat_pumps(points_list, eff_list):
         for P in hps[0]["power"]:
             if n == 1 or P < p_min[1]:
                 P_comb.append(P)
-                E_comb.append(
-                    interp_eff(P, hps[0]["power"], hps[0]["eff"])
-                )
+                E_comb.append(interp_eff(P, hps[0]["power"], hps[0]["eff"]))
+                E_comb.append(interp_eff(P, hps[0]["power"], hps[0]["eff"]))
 
         # -------------------------
         # overlap zone: HP1 vs HP2 ONLY
@@ -608,14 +607,10 @@ def combine_n_heat_pumps(points_list, eff_list):
                 candidates = []
 
                 if p_min[0] <= P1 <= p_max[0]:
-                    candidates.append(
-                        (P1, interp_eff(P1, hp1["power"], hp1["eff"]))
-                    )
+                    candidates.append((P1, interp_eff(P1, hp1["power"], hp1["eff"])))
 
                 if p_min[1] <= P2 <= p_max[1]:
-                    candidates.append(
-                        (P2, interp_eff(P2, hp2["power"], hp2["eff"]))
-                    )
+                    candidates.append((P2, interp_eff(P2, hp2["power"], hp2["eff"])))
 
                 if not candidates:
                     continue
@@ -633,9 +628,7 @@ def combine_n_heat_pumps(points_list, eff_list):
             active = hps[:k + 1]
 
             P_min_stage = sum(p_min[:k + 1])
-            P_max_stage = (
-                sum(p_min[:k + 2]) if k + 1 < n else np.inf
-            )
+            P_max_stage = (sum(p_min[:k + 2]) if k + 1 < n else np.inf)
 
             pl_grid = np.linspace(0.0, 1.0, n_pl_cascade)
 
@@ -675,24 +668,17 @@ def combine_n_heat_pumps(points_list, eff_list):
         return P_comb[mask][idx], E_comb[mask][idx]
 
     # group each heat pump by temperature
-    hp_groups = [
-        group_by_temperature(points, eff)
-        for points, eff in zip(points_list, eff_list)
-    ]
+    hp_groups = [group_by_temperature(points, eff) for points, eff in zip(points_list, eff_list)]
 
     combined_points = []
     combined_eff = []
 
     # all temperatures across all heat pumps
-    all_T = sorted(
-        set().union(*[hp.keys() for hp in hp_groups])
-    )
+    all_T = sorted(set().union(*[hp.keys() for hp in hp_groups]))
 
     for T in all_T:
         # collect all heat pumps available at this temperature
-        hps_at_T = [
-            hp[T] for hp in hp_groups if T in hp
-        ]
+        hps_at_T = [hp[T] for hp in hp_groups if T in hp]
 
         if not hps_at_T:
             continue
