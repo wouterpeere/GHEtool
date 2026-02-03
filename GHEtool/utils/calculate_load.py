@@ -98,7 +98,7 @@ def calculate_load(weather_file, load_data: Union[HourlyBuildingLoad, HourlyBuil
         TMY: pd.DataFrame = pd.read_csv(weather_file, sep=",", header=None, skiprows=8)
 
         # drop first 6 columns
-        TMY.drop(columns=TMY.columns[:5], axis=1, inplace=True)
+        TMY.drop(columns=TMY.columns[:5], inplace=True)
 
         # set dry bulb temperature
         temperature: np.ndarray = np.array(TMY.iloc[:, 1])
@@ -110,7 +110,7 @@ def calculate_load(weather_file, load_data: Union[HourlyBuildingLoad, HourlyBuil
             TMY = pd.read_csv(weather_file, header=None, skiprows=18).iloc[:-10, :]
 
             # drop first 1 column
-            TMY.drop(columns=TMY.columns[:1], axis=1, inplace=True)
+            TMY.drop(columns=TMY.columns[:1], inplace=True)
 
             # set dry bulb temperature
             temperature: np.ndarray = TMY.iloc[:, 0].astype(float).to_numpy()
