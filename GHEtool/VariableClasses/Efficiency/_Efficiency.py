@@ -586,7 +586,6 @@ def combine_n_heat_pumps(points_list, eff_list):
             if n == 1 or P < p_min[1]:
                 P_comb.append(P)
                 E_comb.append(interp_eff(P, hps[0]["power"], hps[0]["eff"]))
-                E_comb.append(interp_eff(P, hps[0]["power"], hps[0]["eff"]))
 
         # -------------------------
         # overlap zone: HP1 vs HP2 ONLY
