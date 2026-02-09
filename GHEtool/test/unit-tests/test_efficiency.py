@@ -509,6 +509,10 @@ def test_EERCombined_max_power():
 
     # with month array
     eer = EERCombined(20, eer_part, months_active_cooling=np.array([7, 8, 9]))
+    with pytest.raises(ValueError):
+        eer._get_max_power(1)
+    with pytest.raises(ValueError):
+        eer._get_max_power(np.array([1, 10, 20]))
     assert eer._get_max_power(1, 0, 0) == 1e16
     assert eer._get_max_power(11, 0, 0) == 1e16
     assert np.allclose(eer._get_max_power(np.array([1, 11, 20]), month_indices=np.array([6, 7,8])), np.array([1e16, 4.5,4.5]))
