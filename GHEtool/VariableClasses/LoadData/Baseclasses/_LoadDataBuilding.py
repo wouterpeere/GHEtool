@@ -474,7 +474,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         if isinstance(self.results, tuple):
             temperature = self.results[1]
         else:
-            temperature = self.results.Tf
+            temperature = self.results.peak_extraction
         return np.minimum(self.monthly_peak_heating_simulation_period, self.cop._get_max_power(temperature))
 
     def _get_max_power_dhw_monthly(self) -> Union[float, np.ndarray]:
@@ -493,7 +493,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         if isinstance(self.results, tuple):
             temperature = self.results[1]
         else:
-            temperature = self.results.Tf
+            temperature = self.results.peak_extraction
         return np.minimum(self.monthly_peak_dhw_simulation_period, self.cop_dhw._get_max_power(temperature))
 
     def _get_max_power_cooling_monthly(self) -> Union[float, np.ndarray]:
@@ -512,7 +512,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         if isinstance(self.results, tuple):
             temperature = self.results[1]
         else:
-            temperature = self.results.Tf
+            temperature = self.results.peak_injection
         return np.minimum(self.monthly_peak_cooling_simulation_period, self.eer._get_max_power(temperature, month_indices=self.month_indices))
 
     @staticmethod

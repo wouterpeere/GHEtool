@@ -291,7 +291,7 @@ class _Efficiency(_EfficiencyBase, BaseClass):
 
     def _get_max_power(self,
                        primary_temperature: Union[float, np.ndarray],
-                       secondary_temperature: Union[float, np.ndarray] = None) -> np.ndarray:
+                       secondary_temperature: Union[float, np.ndarray] = None,**kwargs) -> np.ndarray:
         """
         This function returns the maximum available power for a certain primary and secondary temperature.
 
