@@ -76,5 +76,8 @@ class SEER(_EfficiencyBase):
         """
         return self.SEER
 
+    def _get_max_power(self, *args, **kwargs) -> float:
+        return 1e16
+
     def __export__(self):
         return {'SEER [-]': self.SEER}

@@ -349,13 +349,8 @@ class _Efficiency(_EfficiencyBase, BaseClass):
         else:
             xi = Tp
 
-        return interpn(
-            self._points[:1 + self._has_secondary],
-            self._max_part_load,
-            xi,
-            bounds_error=False,
-            fill_value=np.nan
-        )
+        return interpn(self._points[:1 + self._has_secondary], self._max_part_load, xi, bounds_error=False,
+                       fill_value=np.nan)
 
 
 def plot_heat_pump_envelope(points, eff, ax=None, label_prefix="T"):
