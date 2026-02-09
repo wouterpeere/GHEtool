@@ -520,6 +520,8 @@ def test_EERCombined_max_power():
     assert eer._get_max_power(1, 0, 0) == 4.5
     assert eer._get_max_power(11, 0, 0) == 4.5
     assert np.allclose(eer._get_max_power(np.array([1, 11, 20]), month_indices=np.array([6, 7,8])), np.array([4.5, 1e16, 1e16]))
+    assert np.allclose(eer._get_max_power(1, month_indices=np.array([6, 7,8])), np.array([4.5, 1e16, 1e16]))
+
     # with threshold and month array
     eer = EERCombined(20, eer_part, 10, months_active_cooling=np.array([7, 8, 9]))
     assert eer._get_max_power(1, 0, 0) == 1e16

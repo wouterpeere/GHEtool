@@ -961,8 +961,6 @@ def test_hourly_extraction_load_simulation_period_monthly_data_limit():
     load.set_results(results_monthly_test)
     with pytest.raises(TypeError):
         load.hourly_extraction_load_simulation_period
-    with pytest.raises(TypeError):
-        load._hourly_extraction_load_dhw_simulation_period
     assert np.allclose(load.monthly_baseload_extraction_simulation_period,
                        load.resample_to_monthly(
                            np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9))), 10))[1])
@@ -992,6 +990,8 @@ def test_hourly_extraction_load_simulation_period_monthly_data_limit():
     load.hourly_heating_load = np.zeros(8760)
     load.dhw = test_load
     load.cop_dhw = cop_basic
+    with pytest.raises(TypeError):
+        load._hourly_extraction_load_dhw_simulation_period
     assert np.allclose(load.monthly_baseload_extraction_simulation_period,
                        load.resample_to_monthly(
                            np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9))), 10))[
