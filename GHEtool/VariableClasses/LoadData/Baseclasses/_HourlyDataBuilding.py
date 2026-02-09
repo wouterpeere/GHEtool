@@ -179,7 +179,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         if isinstance(self.cop, SCOP) and isinstance(self.eer, SEER) and isinstance(self.cop_dhw, SCOP):
             return self.cop.get_COP(0, power=np.nan_to_num(power))
         if isinstance(self.results, ResultsMonthly):
-            raise TypeError('You cannot get an hourly EER values based on monthly temperature results.')
+            raise TypeError('You cannot get an hourly COP values based on monthly temperature results.')
         if isinstance(self.results, tuple):
             temperature = self.results[1]
         else:
@@ -209,7 +209,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         if isinstance(self.cop, SCOP) and isinstance(self.eer, SEER) and isinstance(self.cop_dhw, SCOP):
             return self.cop_dhw.get_COP(0, power=np.nan_to_num(power))
         if isinstance(self.results, ResultsMonthly):
-            raise TypeError('You cannot get an hourly EER values based on monthly temperature results.')
+            raise TypeError('You cannot get an hourly COP values based on monthly temperature results.')
         if isinstance(self.results, tuple):
             temperature = self.results[1]
         else:
@@ -247,6 +247,64 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
 
         return self.eer.get_EER(temperature, power=np.nan_to_num(power), month_indices=self.month_indices)
 
+    def _get_max_power_heating(self) -> Union[float, np.ndarray]:
+        """
+        This function returns the maximum power available in heating, taking into account the maximum power of the
+        heat pump (when available). When the attribute '_limit_to_max_heat_pump_power' is False, the input array
+        is simply returned.
+
+        Returns
+        -------
+        maximum heating power : float | np.ndarray
+            Array with the maximum heating power
+        """
+        if isinstance(self.cop, SCOP):
+            return self.hourly_heating_load_simulation_period
+        if isinstance(self.results, tuple):
+            temperature = self.results[1]
+        else:
+            temperature = self.results.Tf
+        return np.minimum(self.hourly_heating_load_simulation_period, self.cop._get_max_power(temperature))
+
+    def _get_max_power_dhw(self) -> Union[float, np.ndarray]:
+        """
+        This function returns the maximum power available in dhw, taking into account the maximum power of the
+        heat pump (when available). When the attribute '_limit_to_max_heat_pump_power' is False, the input array
+        is simply returned.
+
+        Returns
+        -------
+        maximum dhw power : float | np.ndarray
+            Array with the maximum dhw power
+        """
+        if isinstance(self.cop_dhw, SCOP):
+            return self.hourly_dhw_load_simulation_period
+        if isinstance(self.results, tuple):
+            temperature = self.results[1]
+        else:
+            temperature = self.results.Tf
+        return np.minimum(self.hourly_dhw_load_simulation_period, self.cop_dhw._get_max_power(temperature))
+
+    def _get_max_power_cooling(self) -> Union[float, np.ndarray]:
+        """
+        This function returns the maximum power available in cooling, taking into account the maximum power of the
+        heat pump (when available). When the attribute '_limit_to_max_heat_pump_power' is False, the input array
+        is simply returned.
+
+        Returns
+        -------
+        maximum cooling power : float | np.ndarray
+            Array with the maximum cooling power
+        """
+        if isinstance(self.eer, SEER):
+            return self.hourly_cooling_load_simulation_period
+        if isinstance(self.results, tuple):
+            temperature = self.results[1]
+        else:
+            temperature = self.results.Tf
+        return np.minimum(self.hourly_cooling_load_simulation_period, self.eer._get_max_power(temperature, month_indices=self.month_indices))
+
+
     @property
     def hourly_injection_load_simulation_period(self) -> np.ndarray:
         """
@@ -258,6 +316,10 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
             Hourly injection values [kWh/h] for the whole simulation period
         """
         part_load = self.hourly_cooling_load_simulation_period
+        if self._limit_to_max_heat_pump_power:
+            return np.multiply(
+            self._get_max_power_cooling(),
+            self.conversion_factor_secondary_to_primary_cooling(self._get_hourly_eer(part_load)))
         return np.multiply(
             self.hourly_cooling_load_simulation_period,
             self.conversion_factor_secondary_to_primary_cooling(self._get_hourly_eer(part_load)))
@@ -285,6 +347,10 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
             Hourly extraction values [kWh/h] for the whole simulation period
         """
         part_load = self.hourly_heating_load_simulation_period
+        if self._limit_to_max_heat_pump_power:
+            return np.multiply(
+            self._get_max_power_heating(),
+            self.conversion_factor_secondary_to_primary_heating(self._get_hourly_cop(part_load)))
         return np.multiply(
             self.hourly_heating_load_simulation_period,
             self.conversion_factor_secondary_to_primary_heating(self._get_hourly_cop(part_load)))
@@ -300,6 +366,9 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
             Hourly extraction values [kWh/h] for the whole simulation period
         """
         part_load_dhw = self.hourly_dhw_load_simulation_period
+        if self._limit_to_max_heat_pump_power:
+            return np.multiply(            self._get_max_power_dhw(),
+                self.conversion_factor_secondary_to_primary_heating(self._get_hourly_cop_dhw(part_load_dhw)))
         return np.multiply(
             self.hourly_dhw_load_simulation_period,
             self.conversion_factor_secondary_to_primary_heating(self._get_hourly_cop_dhw(part_load_dhw)))

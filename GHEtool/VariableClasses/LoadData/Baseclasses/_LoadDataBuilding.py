@@ -47,8 +47,12 @@ class _LoadDataBuilding(_LoadData, ABC):
         self._cop_dhw = None
         self._results = None
         self._results_fixed = (0, 17)
-        self.exclude_DHW_from_peak: bool = False  # by default, the DHW increase the peak load. Set to false,
+
+        # False by default, the DHW increase the peak load. Set to false,
         # if you only want the heating load to determine the peak in extraction
+        self.exclude_DHW_from_peak: bool = False
+
+        self._limit_to_max_heat_pump_power: bool = False
 
         # set variables
         self.cop = efficiency_heating
@@ -398,7 +402,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         elif peak:
             temperature = self.results.peak_extraction
         else:
-            temperature = self.results.monthly_extraction
+            temperature = self.results.baseload_temperature
 
         return self.cop.get_COP(temperature, power=np.nan_to_num(power))
 
@@ -424,7 +428,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         elif peak:
             temperature = self.results.peak_extraction
         else:
-            temperature = self.results.monthly_extraction
+            temperature = self.results.baseload_temperature
 
         return self.cop_dhw.get_COP(temperature, power=np.nan_to_num(power))
 
@@ -453,6 +457,63 @@ class _LoadDataBuilding(_LoadData, ABC):
             temperature = self.results.baseload_temperature
 
         return self.eer.get_EER(temperature, power=np.nan_to_num(power), month_indices=self.month_indices)
+
+    def _get_max_power_heating_monthly(self) -> Union[float, np.ndarray]:
+        """
+        This function returns the maximum power available in heating, taking into account the maximum power of the
+        heat pump (when available). When the attribute '_limit_to_max_heat_pump_power' is False, the input array
+        is simply returned.
+
+        Returns
+        -------
+        maximum heating power : float | np.ndarray
+            Array with the maximum heating power
+        """
+        if isinstance(self.cop, SCOP):
+            return self.monthly_peak_heating_simulation_period
+        if isinstance(self.results, tuple):
+            temperature = self.results[1]
+        else:
+            temperature = self.results.Tf
+        return np.minimum(self.monthly_peak_heating_simulation_period, self.cop._get_max_power(temperature))
+
+    def _get_max_power_dhw_monthly(self) -> Union[float, np.ndarray]:
+        """
+        This function returns the maximum power available in dhw, taking into account the maximum power of the
+        heat pump (when available). When the attribute '_limit_to_max_heat_pump_power' is False, the input array
+        is simply returned.
+
+        Returns
+        -------
+        maximum dhw power : float | np.ndarray
+            Array with the maximum dhw power
+        """
+        if isinstance(self.cop_dhw, SCOP):
+            return self.monthly_peak_dhw_simulation_period
+        if isinstance(self.results, tuple):
+            temperature = self.results[1]
+        else:
+            temperature = self.results.Tf
+        return np.minimum(self.monthly_peak_dhw_simulation_period, self.cop_dhw._get_max_power(temperature))
+
+    def _get_max_power_cooling_monthly(self) -> Union[float, np.ndarray]:
+        """
+        This function returns the maximum power available in cooling, taking into account the maximum power of the
+        heat pump (when available). When the attribute '_limit_to_max_heat_pump_power' is False, the input array
+        is simply returned.
+
+        Returns
+        -------
+        maximum cooling power : float | np.ndarray
+            Array with the maximum cooling power
+        """
+        if isinstance(self.eer, SEER):
+            return self.monthly_peak_cooling_simulation_period
+        if isinstance(self.results, tuple):
+            temperature = self.results[1]
+        else:
+            temperature = self.results.Tf
+        return np.minimum(self.monthly_peak_cooling_simulation_period, self.eer._get_max_power(temperature, month_indices=self.month_indices))
 
     @staticmethod
     def conversion_factor_secondary_to_primary_heating(cop_value: Union[int, float, np.ndarray]) -> Union[
@@ -560,6 +621,10 @@ class _LoadDataBuilding(_LoadData, ABC):
             Peak injection for the whole simulation period
         """
         part_load = self.monthly_peak_cooling_simulation_period
+        if self._limit_to_max_heat_pump_power:
+            return np.multiply(
+            self._get_max_power_cooling_monthly(),
+            self.conversion_factor_secondary_to_primary_cooling(self._get_monthly_eer(True,part_load)))
         return np.multiply(
             self.monthly_peak_cooling_simulation_period,
             self.conversion_factor_secondary_to_primary_cooling(self._get_monthly_eer(True, part_load)))
@@ -591,6 +656,10 @@ class _LoadDataBuilding(_LoadData, ABC):
             Peak extraction for the whole simulation period
         """
         part_load = self.monthly_peak_heating_simulation_period
+        if self._limit_to_max_heat_pump_power:
+            return np.multiply(
+            self._get_max_power_heating_monthly(),
+            self.conversion_factor_secondary_to_primary_heating(self._get_monthly_cop(True,part_load)))
         return np.multiply(
             self.monthly_peak_heating_simulation_period,
             self.conversion_factor_secondary_to_primary_heating(self._get_monthly_cop(True, part_load)))
@@ -606,6 +675,10 @@ class _LoadDataBuilding(_LoadData, ABC):
             Peak extraction for the whole simulation period
         """
         part_load_dhw = self.monthly_peak_dhw_simulation_period
+        if self._limit_to_max_heat_pump_power:
+            return np.multiply(
+            self._get_max_power_dhw_monthly(),
+            self.conversion_factor_secondary_to_primary_heating(self._get_monthly_cop_dhw(True,part_load_dhw)))
         return np.multiply(
             self.monthly_peak_dhw_simulation_period,
             self.conversion_factor_secondary_to_primary_heating(self._get_monthly_cop_dhw(True, part_load_dhw)))
