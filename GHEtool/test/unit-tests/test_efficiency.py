@@ -114,6 +114,7 @@ def test_SCOP():
 def test_SEER():
     seer = SEER(50)
     assert seer.get_SEER(12, test=5) == 50
+    assert seer._get_max_power()==1e16
     assert seer.get_EER(12, test=5) == 50
     with pytest.raises(ValueError):
         SEER(0)
@@ -478,6 +479,47 @@ def test_EERCombined():
     assert np.isclose(eer.get_SEER(np.array([10, 10, 10]), np.array([1, 15, 20]), month_indices=np.array([5, 6, 7])),
                       30 / 4.5)
 
+def test_EERCombined_max_power():
+    # with threshold
+    eer = EERCombined(20, 5, 10)
+    assert eer._get_max_power(1, 0, 0) == 1e16
+    assert np.allclose(eer._get_max_power(np.array([1, 10, 20])), np.array([1e16, 1e16, 1e16]))
+
+    # with month array
+    eer = EERCombined(20, 5, months_active_cooling=np.array([7, 8, 9]))
+    assert eer._get_max_power(1, 0, 0) == 1e16
+    assert np.allclose(eer._get_max_power(np.array([1, 10, 20]), month_indices=np.array([6, 7,8])), np.array([1e16, 1e16, 1e16]))
+
+    # with threshold and month array
+    eer = EERCombined(20, 5, 10, months_active_cooling=np.array([7, 8, 9]))
+    assert eer._get_max_power(1, 0, 0) == 1e16
+    assert np.allclose(eer._get_max_power(np.array([1, 10, 20]), month_indices=np.array([6, 7,8])), np.array([1e16, 1e16, 1e16]))
+
+    eer_part = EER(np.array([1, 2, 2, 4]), np.array([[1.5, 2.5], [2.5, 2.5], [1.5, 4.5], [2.5, 4.5]]), part_load=True)
+    # with threshold
+    eer = EERCombined(20, eer_part, 10)
+    assert eer._get_max_power(1, 0, 0) == 1e16
+    assert eer._get_max_power(11, 0, 0) == 4.5
+    assert np.allclose(eer._get_max_power(np.array([1, 11, 20])), np.array([1e16,4.5,4.5]))
+
+    eer = EERCombined(eer_part, 20, 10)
+    assert eer._get_max_power(1, 0, 0) == 4.5
+    assert eer._get_max_power(11, 0, 0) == 1e16
+    assert np.allclose(eer._get_max_power(np.array([1, 11, 20])), np.array([4.5,1e16,1e16]))
+
+    # with month array
+    eer = EERCombined(20, eer_part, months_active_cooling=np.array([7, 8, 9]))
+    assert eer._get_max_power(1, 0, 0) == 1e16
+    assert eer._get_max_power(11, 0, 0) == 1e16
+    assert np.allclose(eer._get_max_power(np.array([1, 11, 20]), month_indices=np.array([6, 7,8])), np.array([1e16, 4.5,4.5]))
+    eer = EERCombined(eer_part, 10, months_active_cooling=np.array([7, 8, 9]))
+    assert eer._get_max_power(1, 0, 0) == 4.5
+    assert eer._get_max_power(11, 0, 0) == 4.5
+    assert np.allclose(eer._get_max_power(np.array([1, 11, 20]), month_indices=np.array([6, 7,8])), np.array([4.5, 1e16, 1e16]))
+    # with threshold and month array
+    eer = EERCombined(20, eer_part, 10, months_active_cooling=np.array([7, 8, 9]))
+    assert eer._get_max_power(1, 0, 0) == 1e16
+    assert np.allclose(eer._get_max_power(np.array([1, 10, 20]), month_indices=np.array([6, 7,8])), np.array([1e16, 4.5, 4.5]))
 
 def test_eq_eer_combined():
     eer_combined = EERCombined(20, 5, 10)
