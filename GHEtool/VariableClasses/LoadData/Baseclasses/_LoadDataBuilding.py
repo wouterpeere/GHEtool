@@ -472,7 +472,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         if isinstance(self.cop, SCOP):
             return self.monthly_peak_heating_simulation_period
         if isinstance(self.results, tuple):
-            temperature = self.results[1]
+            temperature = self.results[0]
         else:
             temperature = self.results.peak_extraction
         return np.minimum(self.monthly_peak_heating_simulation_period, self.cop._get_max_power(temperature))
@@ -491,7 +491,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         if isinstance(self.cop_dhw, SCOP):
             return self.monthly_peak_dhw_simulation_period
         if isinstance(self.results, tuple):
-            temperature = self.results[1]
+            temperature = self.results[0]
         else:
             temperature = self.results.peak_extraction
         return np.minimum(self.monthly_peak_dhw_simulation_period, self.cop_dhw._get_max_power(temperature))

@@ -181,7 +181,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         if isinstance(self.results, ResultsMonthly):
             raise TypeError('You cannot get an hourly COP values based on monthly temperature results.')
         if isinstance(self.results, tuple):
-            temperature = self.results[1]
+            temperature = self.results[0]
         else:
             temperature = self.results.Tf
 
@@ -211,7 +211,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         if isinstance(self.results, ResultsMonthly):
             raise TypeError('You cannot get an hourly COP values based on monthly temperature results.')
         if isinstance(self.results, tuple):
-            temperature = self.results[1]
+            temperature = self.results[0]
         else:
             temperature = self.results.Tf
 
@@ -268,7 +268,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         if isinstance(self.results, ResultsMonthly):
             raise TypeError('You cannot get an hourly COP values based on monthly temperature results.')
         if isinstance(self.results, tuple):
-            temperature = self.results[1]
+            temperature = self.results[0]
         else:
             temperature = self.results.Tf
         return np.minimum(self.hourly_heating_load_simulation_period, self.cop._get_max_power(temperature))
@@ -294,7 +294,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         if isinstance(self.results, ResultsMonthly):
             raise TypeError('You cannot get an hourly COP values based on monthly temperature results.')
         if isinstance(self.results, tuple):
-            temperature = self.results[1]
+            temperature = self.results[0]
         else:
             temperature = self.results.Tf
         return np.minimum(self.hourly_dhw_load_simulation_period, self.cop_dhw._get_max_power(temperature))
