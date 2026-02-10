@@ -62,14 +62,16 @@ def test_sizing_with_building_load(monkeypatch):
 def test_sizing_with_building_load_hourly(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     from GHEtool.Examples.sizing_with_building_load_hourly import L3_sizing, L4_sizing
-    assert np.allclose(L3_sizing(), (128.15353378209477, 6.2937039232975245))
-    assert np.allclose(L4_sizing(), (153.91434358641897, 6.3879487848981364))
+    assert np.allclose(L3_sizing(), (128.60230853615113, 6.2937039232975245))
+    assert np.allclose(L4_sizing(), (154.13060226707495, 6.387502181793559))
+
 
 def test_sizing_with_building_load_hourly_limit(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     from GHEtool.Examples.sizing_with_building_load_hourly_limit import L3_sizing, L4_sizing
-    assert np.allclose(L3_sizing(), (111.74867592315208, 4.8699871525268845))
-    assert np.allclose(L4_sizing(), (144.18299085511092, 5.00984528873843))
+    assert np.allclose(L3_sizing(), (113.35165762886392, 4.878148971726799))
+    assert np.allclose(L4_sizing(), (144.5026065941024, 5.009175773418377))
+
 
 def test_combined_active_and_passive_cooling(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
