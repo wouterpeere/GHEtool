@@ -114,6 +114,45 @@ class _LoadDataBuilding(_LoadData, ABC):
             Baseload domestic hot water for the whole simulation period
         """
 
+    @property
+    def _monthly_baseload_heating_simulation_period_with_limit(self) -> np.ndarray:
+        """
+        This function returns the monthly heating baseload in kWh/month actually provided by the
+        heat pump taking into account the maximum power for the whole simulation period.
+
+        Returns
+        -------
+        baseload heating : np.ndarray
+            Baseload heating for the whole simulation period
+        """
+        return self.monthly_baseload_heating_simulation_period
+
+    @property
+    def _monthly_baseload_cooling_simulation_period_with_limit(self) -> np.ndarray:
+        """
+        This function returns the monthly cooling baseload in kWh/month actually provided by the
+        heat pump taking into account the maximum power for the whole simulation period.
+
+        Returns
+        -------
+        baseload cooling : np.ndarray
+            Baseload cooling for the whole simulation period
+        """
+        return self.monthly_baseload_cooling_simulation_period
+
+    @property
+    def _monthly_baseload_dhw_simulation_period_with_limit(self) -> np.ndarray:
+        """
+        This function returns the monthly domestic hot water baseload in kWh/month actually provided by the
+        heat pump taking into account the maximum power for the whole simulation period.
+
+        Returns
+        -------
+        baseload domestic hot water : np.ndarray
+            Baseload domestic hot water for the whole simulation period
+        """
+        return self.monthly_baseload_dhw_simulation_period
+
     @abc.abstractmethod
     def set_results(self, results: Union[ResultsMonthly, ResultsHourly]) -> None:
         """
@@ -513,7 +552,8 @@ class _LoadDataBuilding(_LoadData, ABC):
             temperature = self.results[1]
         else:
             temperature = self.results.peak_injection
-        return np.minimum(self.monthly_peak_cooling_simulation_period, self.eer._get_max_power(temperature, month_indices=self.month_indices))
+        return np.minimum(self.monthly_peak_cooling_simulation_period,
+                          self.eer._get_max_power(temperature, month_indices=self.month_indices))
 
     @staticmethod
     def conversion_factor_secondary_to_primary_heating(cop_value: Union[int, float, np.ndarray]) -> Union[
@@ -623,8 +663,8 @@ class _LoadDataBuilding(_LoadData, ABC):
         part_load = self.monthly_peak_cooling_simulation_period
         if self._limit_to_max_heat_pump_power:
             return np.multiply(
-            self._get_max_power_cooling_monthly(),
-            self.conversion_factor_secondary_to_primary_cooling(self._get_monthly_eer(True,part_load)))
+                self._get_max_power_cooling_monthly(),
+                self.conversion_factor_secondary_to_primary_cooling(self._get_monthly_eer(True, part_load)))
         return np.multiply(
             self.monthly_peak_cooling_simulation_period,
             self.conversion_factor_secondary_to_primary_cooling(self._get_monthly_eer(True, part_load)))
@@ -658,8 +698,8 @@ class _LoadDataBuilding(_LoadData, ABC):
         part_load = self.monthly_peak_heating_simulation_period
         if self._limit_to_max_heat_pump_power:
             return np.multiply(
-            self._get_max_power_heating_monthly(),
-            self.conversion_factor_secondary_to_primary_heating(self._get_monthly_cop(True,part_load)))
+                self._get_max_power_heating_monthly(),
+                self.conversion_factor_secondary_to_primary_heating(self._get_monthly_cop(True, part_load)))
         return np.multiply(
             self.monthly_peak_heating_simulation_period,
             self.conversion_factor_secondary_to_primary_heating(self._get_monthly_cop(True, part_load)))
@@ -677,8 +717,8 @@ class _LoadDataBuilding(_LoadData, ABC):
         part_load_dhw = self.monthly_peak_dhw_simulation_period
         if self._limit_to_max_heat_pump_power:
             return np.multiply(
-            self._get_max_power_dhw_monthly(),
-            self.conversion_factor_secondary_to_primary_heating(self._get_monthly_cop_dhw(True,part_load_dhw)))
+                self._get_max_power_dhw_monthly(),
+                self.conversion_factor_secondary_to_primary_heating(self._get_monthly_cop_dhw(True, part_load_dhw)))
         return np.multiply(
             self.monthly_peak_dhw_simulation_period,
             self.conversion_factor_secondary_to_primary_heating(self._get_monthly_cop_dhw(True, part_load_dhw)))
@@ -765,6 +805,36 @@ class _LoadDataBuilding(_LoadData, ABC):
         """
         return np.sum(np.reshape(self.monthly_baseload_cooling_simulation_period, (self.simulation_period, 12)),
                       axis=1)
+
+    @property
+    def _yearly_heating_load_simulation_period_with_limit(self) -> np.array:
+        """
+        This function returns the yearly heating demand in kWh/year actually provided by the
+        heat pump taking into account the maximum power for the whole simulation period.
+
+        Returns
+        -------
+        yearly heating : np.ndarray
+            yearly heating for the whole simulation period
+        """
+        return np.sum(
+            np.reshape(self._monthly_baseload_heating_simulation_period_with_limit, (self.simulation_period, 12)),
+            axis=1)
+
+    @property
+    def _yearly_cooling_load_simulation_period_with_limit(self) -> np.array:
+        """
+        This function returns the yearly cooling demand in kWh/year actually provided by the
+        heat pump taking into account the maximum power for the whole simulation period.
+
+        Returns
+        -------
+        yearly cooling : np.ndarray
+            yearly cooling for the whole simulation period
+        """
+        return np.sum(
+            np.reshape(self._monthly_baseload_cooling_simulation_period_with_limit, (self.simulation_period, 12)),
+            axis=1)
 
     @property
     def yearly_heating_peak_simulation_period(self) -> np.array:
@@ -946,6 +1016,20 @@ class _LoadDataBuilding(_LoadData, ABC):
         return np.sum(np.reshape(self.monthly_baseload_dhw_simulation_period, (self.simulation_period, 12)), axis=1)
 
     @property
+    def _yearly_dhw_load_simulation_period_with_limit(self) -> np.array:
+        """
+        This function returns the yearly DHW demand in kWh/year actually provided by the
+        heat pump taking into account the maximum power for the whole simulation period.
+
+        Returns
+        -------
+        yearly DHW : np.ndarray
+            yearly DHW for the whole simulation period
+        """
+        return np.sum(np.reshape(self._monthly_baseload_dhw_simulation_period_with_limit, (self.simulation_period, 12)),
+                      axis=1)
+
+    @property
     def yearly_electricity_consumption(self) -> np.ndarray:
         """
         This function returns the electricity consumption for the whole building demand in kWh
@@ -967,7 +1051,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         -------
         Yearly cooling electricity consumption : np.ndarray
         """
-        return -self.yearly_cooling_load_simulation_period + self.yearly_injection_load_simulation_period
+        return -self._yearly_cooling_load_simulation_period_with_limit + self.yearly_injection_load_simulation_period
 
     @property
     def yearly_electricity_consumption_heating(self) -> np.ndarray:
@@ -978,7 +1062,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         -------
         Yearly heating electricity consumption : np.ndarray
         """
-        heating = np.sum(np.reshape(self.monthly_baseload_heating_simulation_period,
+        heating = np.sum(np.reshape(self._monthly_baseload_heating_simulation_period_with_limit,
                                     (self.simulation_period, 12)), axis=1)
         extraction = np.sum(np.reshape(self._monthly_baseload_extraction_heating_simulation_period,
                                        (self.simulation_period, 12)), axis=1)
@@ -993,7 +1077,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         -------
         Yearly DHW electricity consumption : np.ndarray
         """
-        dhw = np.sum(np.reshape(self.monthly_baseload_dhw_simulation_period,
+        dhw = np.sum(np.reshape(self._monthly_baseload_dhw_simulation_period_with_limit,
                                 (self.simulation_period, 12)), axis=1)
         extraction = np.sum(np.reshape(self._monthly_baseload_extraction_dhw_simulation_period,
                                        (self.simulation_period, 12)), axis=1)
@@ -1009,7 +1093,8 @@ class _LoadDataBuilding(_LoadData, ABC):
         SEER : float
         """
         # negative sign to get a positive value
-        return self.yearly_average_cooling_load / np.mean(self.yearly_electricity_consumption_cooling)
+        return np.mean(self._yearly_cooling_load_simulation_period_with_limit) / np.mean(
+            self.yearly_electricity_consumption_cooling)
 
     @property
     def SCOP_total(self) -> float:
@@ -1020,7 +1105,8 @@ class _LoadDataBuilding(_LoadData, ABC):
         -------
         SCOP : float
         """
-        return (self.yearly_average_heating_load + self.yearly_average_dhw_load) / \
+        return (np.mean(self._yearly_heating_load_simulation_period_with_limit) + np.mean(
+            self._yearly_dhw_load_simulation_period_with_limit)) / \
             np.mean(self.yearly_electricity_consumption_heating + self.yearly_electricity_consumption_dhw)
 
     @property
@@ -1032,7 +1118,8 @@ class _LoadDataBuilding(_LoadData, ABC):
         -------
         SCOP : float
         """
-        return self.yearly_average_heating_load / np.mean(self.yearly_electricity_consumption_heating)
+        return np.mean(self._yearly_heating_load_simulation_period_with_limit) / np.mean(
+            self.yearly_electricity_consumption_heating)
 
     @property
     def SCOP_DHW(self) -> float:
@@ -1043,7 +1130,8 @@ class _LoadDataBuilding(_LoadData, ABC):
         -------
         SCOP : float
         """
-        return self.yearly_average_dhw_load / np.mean(self.yearly_electricity_consumption_dhw)
+        return np.mean(self._yearly_dhw_load_simulation_period_with_limit) / np.mean(
+            self.yearly_electricity_consumption_dhw)
 
     @property
     def yearly_SEER(self) -> np.ndarray:
@@ -1055,7 +1143,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         SEER : np.ndarray
         """
         # negative sign to get a positive value
-        return self.yearly_cooling_load_simulation_period / self.yearly_electricity_consumption_cooling
+        return self._yearly_cooling_load_simulation_period_with_limit / self.yearly_electricity_consumption_cooling
 
     @property
     def yearly_SCOP_total(self) -> np.ndarray:
@@ -1066,7 +1154,8 @@ class _LoadDataBuilding(_LoadData, ABC):
         -------
         SCOP : np.ndarray
         """
-        return (self.yearly_heating_load_simulation_period + self.yearly_dhw_load_simulation_period) / (
+        return (
+                self._yearly_heating_load_simulation_period_with_limit + self._yearly_dhw_load_simulation_period_with_limit) / (
                 self.yearly_electricity_consumption_heating + self.yearly_electricity_consumption_dhw)
 
     @property
@@ -1078,7 +1167,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         -------
         SCOP : np.ndarray
         """
-        return self.yearly_heating_load_simulation_period / self.yearly_electricity_consumption_heating
+        return self._yearly_heating_load_simulation_period_with_limit / self.yearly_electricity_consumption_heating
 
     @property
     def yearly_SCOP_DHW(self) -> np.ndarray:
@@ -1089,7 +1178,7 @@ class _LoadDataBuilding(_LoadData, ABC):
         -------
         SCOP : np.ndarray
         """
-        return self.yearly_dhw_load_simulation_period / self.yearly_electricity_consumption_dhw
+        return self._yearly_dhw_load_simulation_period_with_limit / self.yearly_electricity_consumption_dhw
 
     @property
     def simulation_period(self) -> int:
