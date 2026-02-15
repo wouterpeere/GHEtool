@@ -118,12 +118,20 @@ def test_baseload_heating():
     assert np.array_equal(load.monthly_baseload_heating, np.linspace(0, 11, 12) * 730)
     assert np.array_equal(load.monthly_baseload_heating / 730, load.monthly_baseload_heating_power)
     assert np.array_equal(load.monthly_baseload_heating_power, load.monthly_peak_heating)
+    load._limit_to_max_heat_pump_power = True
+    assert np.array_equal(load.monthly_baseload_heating, np.linspace(0, 11, 12) * 730)
+    assert np.array_equal(load.monthly_baseload_heating / 730, load.monthly_baseload_heating_power)
+    assert np.array_equal(load.monthly_baseload_heating_power, load.monthly_peak_heating)
 
 
 def test_baseload_cooling():
     load = HourlyBuildingLoad()
     assert np.array_equal(load.monthly_baseload_cooling, np.zeros(12))
     load.hourly_cooling_load = np.repeat(np.linspace(0, 11, 12), 730)
+    assert np.array_equal(load.monthly_baseload_cooling, np.linspace(0, 11, 12) * 730)
+    assert np.array_equal(load.monthly_baseload_cooling / 730, load.monthly_baseload_cooling_power)
+    assert np.array_equal(load.monthly_baseload_cooling_power, load.monthly_peak_cooling)
+    load._limit_to_max_heat_pump_power = True
     assert np.array_equal(load.monthly_baseload_cooling, np.linspace(0, 11, 12) * 730)
     assert np.array_equal(load.monthly_baseload_cooling / 730, load.monthly_baseload_cooling_power)
     assert np.array_equal(load.monthly_baseload_cooling_power, load.monthly_peak_cooling)
@@ -138,6 +146,13 @@ def test_peak_heating():
     load.hourly_heating_load = np.repeat(np.linspace(1, 12, 12), 730)
     assert np.array_equal(load.monthly_peak_heating, np.linspace(1, 12, 12))
     assert np.isclose(load.max_peak_heating, 12)
+    load._limit_to_max_heat_pump_power = True
+    assert np.array_equal(load.monthly_peak_heating, np.linspace(1, 12, 12))
+    assert np.isclose(load.max_peak_heating, 12)
+    cop_part = COP(np.array([1, 2, 2, 4]), np.array([[1.5, 2.5], [2.5, 2.5], [1.5, 4.5], [2.5, 4.5]]), part_load=True)
+    load.cop = cop_part
+    assert np.array_equal(load.monthly_peak_heating, np.linspace(1, 12, 12))
+    assert np.isclose(load.max_peak_heating, 12)
 
 
 def test_peak_cooling():
@@ -147,6 +162,13 @@ def test_peak_cooling():
     assert np.array_equal(load.hourly_cooling_load, np.repeat(np.linspace(0, 11, 12), 730))
     assert np.array_equal(load.monthly_peak_cooling, np.linspace(0, 11, 12))
     load.hourly_cooling_load = np.repeat(np.linspace(1, 12, 12), 730)
+    assert np.array_equal(load.monthly_peak_cooling, np.linspace(1, 12, 12))
+    assert np.isclose(load.max_peak_cooling, 12)
+    load._limit_to_max_heat_pump_power = True
+    assert np.array_equal(load.monthly_peak_cooling, np.linspace(1, 12, 12))
+    assert np.isclose(load.max_peak_cooling, 12)
+    eer_part = EER(np.array([1, 2, 2, 4]), np.array([[1.5, 2.5], [2.5, 2.5], [1.5, 4.5], [2.5, 4.5]]), part_load=True)
+    load.eer = eer_part
     assert np.array_equal(load.monthly_peak_cooling, np.linspace(1, 12, 12))
     assert np.isclose(load.max_peak_cooling, 12)
 
@@ -437,6 +459,69 @@ def test_hourly_injection_load_simulation_period_hourly_data():
                            np.tile(np.concatenate((np.full(4380, 6.25), np.full(4380, 10.5))), 10))[0])
 
 
+def test_hourly_injection_load_simulation_period_hourly_data_limit():
+    load = HourlyBuildingLoad(np.zeros(8760), np.zeros(8760), 10, scop, seer)
+    load.hourly_cooling_load = test_load
+    load._limit_to_max_heat_pump_power = True
+    assert np.allclose(load.hourly_injection_load_simulation_period, test_load_sim_per * 6 / 5)
+    assert np.allclose(load.monthly_baseload_injection_simulation_period,
+                       load.resample_to_monthly(test_load_sim_per * 6 / 5)[1])
+    assert np.allclose(load.monthly_peak_injection_simulation_period,
+                       load.resample_to_monthly(test_load_sim_per * 6 / 5)[0])
+    load.eer = eer_basic
+    load.reset_results(0, 1)
+    assert np.allclose(load.hourly_injection_load_simulation_period, test_load_sim_per * 3 / 2)
+    assert np.allclose(load.monthly_baseload_injection_simulation_period,
+                       load.resample_to_monthly(test_load_sim_per * 3 / 2)[1])
+    assert np.allclose(load.monthly_peak_injection_simulation_period,
+                       load.resample_to_monthly(test_load_sim_per * 3 / 2)[0])
+    load.reset_results(0, 10)
+    assert np.allclose(load.hourly_injection_load_simulation_period, test_load_sim_per * 21 / 20)
+    assert np.allclose(load.monthly_baseload_injection_simulation_period,
+                       load.resample_to_monthly(test_load_sim_per * 21 / 20)[1])
+    assert np.allclose(load.monthly_peak_injection_simulation_period,
+                       load.resample_to_monthly(test_load_sim_per * 21 / 20)[0])
+    load.set_results(results_hourly_test)
+    assert np.allclose(load.hourly_injection_load_simulation_period,
+                       np.tile(np.concatenate((np.full(4380, 7.5), np.full(4380, 11))), 10))
+    assert np.allclose(load.monthly_baseload_injection_simulation_period,
+                       load.resample_to_monthly(np.tile(np.concatenate((np.full(4380, 7.5), np.full(4380, 11))), 10))[
+                           1])
+    assert np.allclose(load.monthly_peak_injection_simulation_period,
+                       load.resample_to_monthly(np.tile(np.concatenate((np.full(4380, 7.5), np.full(4380, 11))), 10))[
+                           0])
+    load.eer = eer_pl
+    load.reset_results(0, 1)
+    assert np.allclose(load.hourly_injection_load_simulation_period,
+                       np.tile(np.concatenate((np.full(4380, 6.25 / 5), np.full(4380, 12.5 / 10))), 10))
+    assert np.allclose(load.monthly_baseload_injection_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 6.25 / 5), np.full(4380, 12.5 / 10))), 10))[
+                           1])
+    assert np.allclose(load.monthly_peak_injection_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 6.25 / 5), np.full(4380, 12.5 / 10))), 10))[
+                           0])
+    load.reset_results(0, 10)
+    assert np.allclose(load.hourly_injection_load_simulation_period,
+                       np.tile(np.concatenate((np.full(4380, 5.125 / 5), np.full(4380, 10.25 / 10))), 10))
+    assert np.allclose(load.monthly_baseload_injection_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 5.125 / 5), np.full(4380, 10.25 / 10))), 10))[1])
+    assert np.allclose(load.monthly_peak_injection_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 5.125 / 5), np.full(4380, 10.25 / 10))), 10))[0])
+    load.set_results(results_hourly_test)
+    assert np.allclose(load.hourly_injection_load_simulation_period,
+                       np.tile(np.concatenate((np.full(4380, 6.25 / 5), np.full(4380, 10.5 / 10))), 10))
+    assert np.allclose(load.monthly_baseload_injection_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 6.25 / 5), np.full(4380, 10.5 / 10))), 10))[1])
+    assert np.allclose(load.monthly_peak_injection_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 6.25 / 5), np.full(4380, 10.5 / 10))), 10))[0])
+
+
 def test_hourly_extraction_load_simulation_period_hourly_data():
     load = HourlyBuildingLoad(np.zeros(8760), np.zeros(8760), 10, scop, seer)
     load.hourly_heating_load = test_load
@@ -453,7 +538,7 @@ def test_hourly_extraction_load_simulation_period_hourly_data():
                        load.resample_to_monthly(test_load_sim_per * 1 / 2)[1])
     assert np.allclose(load.monthly_peak_extraction_simulation_period,
                        load.resample_to_monthly(test_load_sim_per * 1 / 2)[0])
-    load.reset_results(0, 10)
+    load.reset_results(10, 10)
     assert np.allclose(load.hourly_extraction_load_simulation_period, test_load_sim_per * 19 / 20)
     assert np.allclose(load.monthly_baseload_extraction_simulation_period,
                        load.resample_to_monthly(test_load_sim_per * 19 / 20)[1])
@@ -482,7 +567,7 @@ def test_hourly_extraction_load_simulation_period_hourly_data():
                        load.resample_to_monthly(
                            np.tile(np.concatenate((np.full(4380, 3.75), np.full(4380, 7.5))), 10))[
                            0])
-    load.reset_results(0, 10)
+    load.reset_results(10, 10)
     assert np.allclose(load.hourly_extraction_load_simulation_period,
                        np.tile(np.concatenate((np.full(4380, 4.875), np.full(4380, 9.75))), 10))
     assert np.allclose(load.monthly_baseload_extraction_simulation_period,
@@ -528,7 +613,7 @@ def test_hourly_extraction_load_simulation_period_hourly_data():
                        load.resample_to_monthly(test_load_sim_per * 1 / 2)[1])
     assert np.allclose(load.monthly_peak_extraction_simulation_period,
                        load.resample_to_monthly(test_load_sim_per * 1 / 2)[0])
-    load.reset_results(0, 10)
+    load.reset_results(10, 10)
     assert np.allclose(load.hourly_extraction_load_simulation_period, test_load_sim_per * 19 / 20)
     assert np.allclose(load.monthly_baseload_extraction_simulation_period,
                        load.resample_to_monthly(test_load_sim_per * 19 / 20)[1])
@@ -557,7 +642,7 @@ def test_hourly_extraction_load_simulation_period_hourly_data():
                        load.resample_to_monthly(
                            np.tile(np.concatenate((np.full(4380, 3.75), np.full(4380, 7.5))), 10))[
                            0])
-    load.reset_results(0, 10)
+    load.reset_results(10, 10)
     assert np.allclose(load.hourly_extraction_load_simulation_period,
                        np.tile(np.concatenate((np.full(4380, 4.875), np.full(4380, 9.75))), 10))
     assert np.allclose(load.monthly_baseload_extraction_simulation_period,
@@ -588,6 +673,157 @@ def test_hourly_extraction_load_simulation_period_hourly_data():
     assert np.allclose(load._monthly_peak_extraction_heating_simulation_period, np.zeros(120))
 
 
+def test_hourly_extraction_load_simulation_period_hourly_data_max_power():
+    load = HourlyBuildingLoad(np.zeros(8760), np.zeros(8760), 10, scop, seer)
+    load.hourly_heating_load = test_load
+    load._limit_to_max_heat_pump_power = True
+    assert np.allclose(load.hourly_extraction_load_simulation_period, test_load_sim_per * 5 / 6)
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       load.resample_to_monthly(test_load_sim_per * 5 / 6)[1])
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.resample_to_monthly(test_load_sim_per * 5 / 6)[0])
+    load.cop = cop_basic
+    load.reset_results(0, 1)
+    assert np.allclose(load.hourly_extraction_load_simulation_period, test_load_sim_per * 1 / 2)
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       load.resample_to_monthly(test_load_sim_per * 1 / 2)[1])
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.resample_to_monthly(test_load_sim_per * 1 / 2)[0])
+    load.reset_results(10, 10)
+    assert np.allclose(load.hourly_extraction_load_simulation_period, test_load_sim_per * 19 / 20)
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       load.resample_to_monthly(test_load_sim_per * 19 / 20)[1])
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.resample_to_monthly(test_load_sim_per * 19 / 20)[0])
+    load.set_results(results_hourly_test)
+    assert np.allclose(load.hourly_extraction_load_simulation_period,
+                       np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9))), 10))
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9))), 10))[
+                           1])
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9))), 10))[
+                           0])
+    load.cop = cop_pl
+    load.reset_results(0, 1)
+    assert np.allclose(load.hourly_extraction_load_simulation_period,
+                       np.tile(np.concatenate((np.full(4380, 1 * 3.75 / 5), np.full(4380, 1 * 7.5 / 10))), 10))
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 3.75 / 5), np.full(4380, 7.5 / 10))), 10))[
+                           1])
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 3.75 / 5), np.full(4380, 7.5 / 10))), 10))[
+                           0])
+    load.reset_results(10, 10)
+    assert np.allclose(load.hourly_extraction_load_simulation_period,
+                       np.tile(np.concatenate((np.full(4380, 4.875 / 5), np.full(4380, 9.75 / 10))), 10))
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 4.875 / 5), np.full(4380, 9.75 / 10))), 10))[1])
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 4.875 / 5), np.full(4380, 9.75 / 10))), 10))[0])
+    load.set_results(results_hourly_test)
+    assert np.allclose(load.hourly_extraction_load_simulation_period,
+                       np.tile(np.concatenate((np.full(4380, 3.75 / 5), np.full(4380, 9.5 / 10))), 10))
+    assert np.allclose(load._hourly_extraction_load_heating_simulation_period,
+                       np.tile(np.concatenate((np.full(4380, 3.75 / 5), np.full(4380, 9.5 / 10))), 10))
+    assert np.allclose(load._hourly_extraction_load_dhw_simulation_period, np.zeros(87600))
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 3.75 / 5), np.full(4380, 9.5 / 10))), 10))[1])
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 3.75 / 5), np.full(4380, 9.5 / 10))), 10))[0])
+    assert np.allclose(load._monthly_baseload_extraction_heating_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 3.75 / 5), np.full(4380, 9.5 / 10))), 10))[1])
+    assert np.allclose(load._monthly_peak_extraction_heating_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 3.75 / 5), np.full(4380, 9.5 / 10))), 10))[0])
+    assert np.allclose(load._monthly_baseload_extraction_dhw_simulation_period, np.zeros(120))
+    assert np.allclose(load._monthly_peak_extraction_dhw_simulation_period, np.zeros(120))
+
+    # now for only DHW
+    load.hourly_heating_load = np.zeros(8760)
+    load.dhw = test_load
+    load.cop_dhw = scop
+    assert np.allclose(load.hourly_extraction_load_simulation_period, test_load_sim_per * 5 / 6)
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       load.resample_to_monthly(test_load_sim_per * 5 / 6)[1])
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.resample_to_monthly(test_load_sim_per * 5 / 6)[0])
+    load.cop_dhw = cop_basic
+    load.reset_results(0, 1)
+    assert np.allclose(load.hourly_extraction_load_simulation_period, test_load_sim_per * 1 / 2)
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       load.resample_to_monthly(test_load_sim_per * 1 / 2)[1])
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.resample_to_monthly(test_load_sim_per * 1 / 2)[0])
+    load.reset_results(10, 10)
+    assert np.allclose(load.hourly_extraction_load_simulation_period, test_load_sim_per * 19 / 20)
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       load.resample_to_monthly(test_load_sim_per * 19 / 20)[1])
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.resample_to_monthly(test_load_sim_per * 19 / 20)[0])
+    load.set_results(results_hourly_test)
+    assert np.allclose(load.hourly_extraction_load_simulation_period,
+                       np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9))), 10))
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9))), 10))[
+                           1])
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9))), 10))[
+                           0])
+    load.cop_dhw = cop_pl
+    load.reset_results(0, 1)
+    assert np.allclose(load.hourly_extraction_load_simulation_period,
+                       np.tile(np.concatenate((np.full(4380, 3.75 / 5), np.full(4380, 7.5 / 10))), 10))
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 3.75 / 5), np.full(4380, 7.5 / 10))), 10))[
+                           1])
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 3.75 / 5), np.full(4380, 7.5 / 10))), 10))[
+                           0])
+    load.reset_results(10, 10)
+    assert np.allclose(load.hourly_extraction_load_simulation_period,
+                       np.tile(np.concatenate((np.full(4380, 4.875 / 5), np.full(4380, 9.75 / 10))), 10))
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 4.875 / 5), np.full(4380, 9.75 / 10))), 10))[1])
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 4.875 / 5), np.full(4380, 9.75 / 10))), 10))[0])
+    load.set_results(results_hourly_test)
+    assert np.allclose(load.hourly_extraction_load_simulation_period,
+                       np.tile(np.concatenate((np.full(4380, 3.75 / 5), np.full(4380, 9.5 / 10))), 10))
+    assert np.allclose(load._hourly_extraction_load_dhw_simulation_period,
+                       np.tile(np.concatenate((np.full(4380, 3.75 / 5), np.full(4380, 9.5 / 10))), 10))
+    assert np.allclose(load._hourly_extraction_load_heating_simulation_period, np.zeros(87600))
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 3.75 / 5), np.full(4380, 9.5 / 10))), 10))[1])
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 3.75 / 5), np.full(4380, 9.5 / 10))), 10))[0])
+    assert np.allclose(load._monthly_baseload_extraction_dhw_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 3.75 / 5), np.full(4380, 9.5 / 10))), 10))[1])
+    assert np.allclose(load._monthly_peak_extraction_dhw_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 3.75 / 5), np.full(4380, 9.5 / 10))), 10))[0])
+    assert np.allclose(load._monthly_baseload_extraction_heating_simulation_period, np.zeros(120))
+    assert np.allclose(load._monthly_peak_extraction_heating_simulation_period, np.zeros(120))
+
+
 def test_hourly_injection_load_simulation_period_monthly_data():
     # these results are the same as with hourly resolution, since the baseload and the peak load have the same
     # temperature result and are also the same power, since the hourly load is a constant, so it reduces to the same
@@ -613,6 +849,47 @@ def test_hourly_injection_load_simulation_period_monthly_data():
     assert np.allclose(load.monthly_peak_injection_simulation_period,
                        load.resample_to_monthly(
                            np.tile(np.concatenate((np.full(4380, 6.25), np.full(4380, 10.5))), 10))[0])
+
+
+def test_hourly_injection_load_simulation_period_monthly_data_limit():
+    # these results are the same as with hourly resolution, since the baseload and the peak load have the same
+    # temperature result and are also the same power, since the hourly load is a constant, so it reduces to the same
+    # power for both the peak and baseload
+    load = HourlyBuildingLoad(np.zeros(8760), np.zeros(8760), 10, scop, seer)
+    load.hourly_cooling_load = test_load
+    load._limit_to_max_heat_pump_power = True
+    assert np.allclose(load.monthly_peak_injection_simulation_period,
+                       load.resample_to_monthly(np.tile(np.concatenate((np.full(4380, 6),
+                                                                        np.full(4380, 12))), 10))[0])
+    load.set_results(results_monthly_test)
+    load.eer = eer_basic
+    with pytest.raises(TypeError):
+        load.hourly_injection_load_simulation_period
+
+    assert np.allclose(load.monthly_baseload_injection_simulation_period,
+                       load.resample_to_monthly(np.tile(np.concatenate((np.full(4380, 7.5),
+                                                                        np.full(4380, 11))), 10))[1])
+    assert np.allclose(load.monthly_peak_injection_simulation_period,
+                       load.resample_to_monthly(np.tile(np.concatenate((np.full(4380, 7.5),
+                                                                        np.full(4380, 11))), 10))[0])
+    assert np.isclose(load.max_peak_injection, 11)
+    load.eer = eer_pl
+    assert np.allclose(load.monthly_baseload_injection_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 6.25), np.full(4380, 10.5))), 10))[1])
+    assert np.allclose(load.monthly_peak_injection_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 6.25 / 5), np.full(4380, 10.5 / 10))), 10))[0])
+
+    load.reset_results(0, 20)
+    load.eer = eer_basic
+    assert np.allclose(load.monthly_baseload_injection_simulation_period,
+                       load.resample_to_monthly(np.tile(np.concatenate((np.full(4380, 5.25),
+                                                                        np.full(4380, 10.5))), 10))[1])
+    assert np.allclose(load.monthly_peak_injection_simulation_period,
+                       load.resample_to_monthly(np.tile(np.concatenate((np.full(4380, 5.25),
+                                                                        np.full(4380, 10.5))), 10))[0])
+    assert np.isclose(load.max_peak_injection, 10.5)
 
 
 def test_hourly_extraction_load_simulation_period_monthly_data():
@@ -678,6 +955,73 @@ def test_hourly_extraction_load_simulation_period_monthly_data():
     assert np.allclose(load._monthly_peak_extraction_dhw_simulation_period,
                        load.resample_to_monthly(
                            np.tile(np.concatenate((np.full(4380, 3.75), np.full(4380, 9.5))), 10))[0])
+    assert np.allclose(load._monthly_baseload_extraction_heating_simulation_period, np.zeros(120))
+    assert np.allclose(load._monthly_peak_extraction_heating_simulation_period, np.zeros(120))
+
+
+def test_hourly_extraction_load_simulation_period_monthly_data_limit():
+    # these results are the same as with hourly resolution, since the baseload and the peak load have the same
+    # temperature result and are also the same power, since the hourly load is a constant, so it reduces to the same
+    # power for both the peak and baseload
+    load = HourlyBuildingLoad(np.zeros(8760), np.zeros(8760), 10, scop, seer)
+    load.hourly_heating_load = test_load
+    load._limit_to_max_heat_pump_power = True
+    load.cop = cop_basic
+    load.set_results(results_monthly_test)
+    with pytest.raises(TypeError):
+        load.hourly_extraction_load_simulation_period
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9))), 10))[1])
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9))), 10))[0])
+    assert np.allclose(load._monthly_baseload_extraction_heating_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9))), 10))[1])
+    assert np.allclose(load._monthly_peak_extraction_heating_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9))), 10))[0])
+    assert np.allclose(load._monthly_baseload_extraction_dhw_simulation_period, np.zeros(120))
+    assert np.allclose(load._monthly_peak_extraction_dhw_simulation_period, np.zeros(120))
+    assert np.isclose(load.max_peak_extraction, 9)
+    assert np.isclose(load.imbalance, -50370.0)
+
+    load.cop = cop_pl
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 3.75), np.full(4380, 9.5))), 10))[1])
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 3.75 / 5), np.full(4380, 9.5 / 10))), 10))[0])
+
+    # now for only DHW
+    load.hourly_heating_load = np.zeros(8760)
+    load.dhw = test_load
+    load.cop_dhw = cop_basic
+    with pytest.raises(TypeError):
+        load._hourly_extraction_load_dhw_simulation_period
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9))), 10))[
+                           1])
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 2.5), np.full(4380, 9))), 10))[
+                           0])
+    load.cop_dhw = cop_pl
+    assert np.allclose(load.monthly_baseload_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 3.75), np.full(4380, 9.5))), 10))[1])
+    assert np.allclose(load.monthly_peak_extraction_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 3.75 / 5), np.full(4380, 9.5 / 10))), 10))[0])
+    assert np.allclose(load._monthly_baseload_extraction_dhw_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 3.75), np.full(4380, 9.5))), 10))[1])
+    assert np.allclose(load._monthly_peak_extraction_dhw_simulation_period,
+                       load.resample_to_monthly(
+                           np.tile(np.concatenate((np.full(4380, 3.75 / 5), np.full(4380, 9.5 / 10))), 10))[0])
     assert np.allclose(load._monthly_baseload_extraction_heating_simulation_period, np.zeros(120))
     assert np.allclose(load._monthly_peak_extraction_heating_simulation_period, np.zeros(120))
 

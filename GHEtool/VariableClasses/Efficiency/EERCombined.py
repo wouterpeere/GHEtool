@@ -186,6 +186,64 @@ class EERCombined:
 
         return np.sum(power) / np.sum(w_array)
 
+    def _get_max_power(self,
+                       primary_temperature: Union[float, np.ndarray],
+                       secondary_temperature: Union[float, np.ndarray] = None,
+                       month_indices: Union[float, np.ndarray] = None) -> Union[np.ndarray, float]:
+        """
+        This function calculates the maximum available power for a given primary and secondary temperature.
+
+        Parameters
+        ----------
+        primary_temperature : np.ndarray or float
+            Value(s) for the average primary temperature of the heat pump for the EER calculation.
+        secondary_temperature : np.ndarray or float
+            Value(s) for the average secondary temperature of the heat pump for the EER calculation.
+        month_indices : np.ndarray or float
+            Array with all the monthly indices, after correction for the start month. Should be the same length as the
+            other input parameters
+
+        Raises
+        ------
+        ValueError
+            When secondary_temperature is in the dataset, and it is not provided. Same for power.
+
+        Returns
+        -------
+        EER
+            np.ndarray
+        """
+
+        if isinstance(primary_temperature, (float, int)) and (
+                isinstance(month_indices, (float, int)) or month_indices is None):
+            # check temperature threshold
+            active_cooling_bool = False
+            if self.threshold_temperature is not None and primary_temperature > self.threshold_temperature:
+                active_cooling_bool = True
+
+            if not active_cooling_bool and self.months_active_cooling is not None:
+                if month_indices is None:
+                    raise ValueError('Please provide a month value, for otherwise the system cannot decide if it is '
+                                     'active or passive cooling.')
+                active_cooling_bool = month_indices in self.months_active_cooling
+
+            if active_cooling_bool:
+                return self.efficiency_active_cooling._get_max_power(primary_temperature, secondary_temperature)
+            return self.efficiency_passive_cooling._get_max_power(primary_temperature, secondary_temperature)
+
+        # now for monthly loads
+        active_cooling_power = self.efficiency_active_cooling._get_max_power(primary_temperature, secondary_temperature)
+        passive_cooling_power = self.efficiency_passive_cooling._get_max_power(primary_temperature,
+                                                                               secondary_temperature)
+
+        if month_indices is not None and isinstance(primary_temperature, (float, int)):
+            primary_temperature = np.full(month_indices.shape, primary_temperature)
+
+        active_cooling_bool = self.get_time_series_active_cooling(primary_temperature, month_indices)
+
+        # select correct data
+        return active_cooling_power * active_cooling_bool + passive_cooling_power * np.invert(active_cooling_bool)
+
     def __eq__(self, other) -> bool:
         if not isinstance(other, self.__class__):
             return False
