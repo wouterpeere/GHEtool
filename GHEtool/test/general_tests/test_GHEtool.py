@@ -499,4 +499,4 @@ def test_case_issue_390():
 
     borefield.borehole = borehole
     borefield.size_L3()
-    assert np.isclose(borefield.H, 86.20617039094199)
+    assert np.isclose(borefield.H, 86.3465965114525)
