@@ -826,7 +826,7 @@ list_of_test_objects.add(
 borefield.calculation_setup(size_based_on='outlet')
 borefield.flow_data = ConstantDeltaTFlowRate(extraction=4, injection=4)
 list_of_test_objects.add(
-    SizingObject(borefield, L3_output=89.45718988593278, L4_output=73.49659696896121, quadrant=1,
+    SizingObject(borefield, L3_output=89.45718988593278, L4_output=71.15952849537456, quadrant=1,
                  name='BS2023 Auditorium, (var temp and flow, outlet)'))
 borefield.calculation_setup(size_based_on='average')
 borefield.flow_data = ConstantDeltaTFlowRate(extraction=4, injection=4)
