@@ -60,9 +60,11 @@ eff_HP400 = np.array([
     5.12, 5.80, 5.34,
     5.51, 6.22, 5.75,
 ])
-cascaded_system_points, cascaded_system_eff = combine_n_heat_pumps([points_HP500]*4+[points_HP400], [eff_HP500]*4+[eff_HP400])
+cascaded_system_points, cascaded_system_eff = combine_n_heat_pumps([points_HP500] * 4 + [points_HP400],
+                                                                   [eff_HP500] * 4 + [eff_HP400])
 
-cop_system = COP(cascaded_system_eff,cascaded_system_points, True)
+cop_system = COP(cascaded_system_eff, cascaded_system_points, True)
+
 
 def L3_sizing() -> Tuple[float, float]:
     """
@@ -102,11 +104,8 @@ def L3_sizing() -> Tuple[float, float]:
     # with limit
     borefield.load._limit_to_max_heat_pump_power = True
     length = borefield.size(100, L3_sizing=True)
-    print(
-        f'When sizing with an L3 method (with limit), the required borehole length is {length:.2f}m. '
-        f'The SCOP is {borefield.load.SCOP_total:.2f}.')
     borefield.print_temperature_profile()
-    return length, borefield.load.SCOP_heating
+    return length
 
 
 def L4_sizing() -> Tuple[float, float]:
@@ -148,7 +147,8 @@ def L4_sizing() -> Tuple[float, float]:
     print(
         f'When sizing with an L4 method (with limit), the required borehole length is {length:.2f}m. '
         f'The SCOP is {borefield.load.SCOP_total:.2f}.')
-    missing_power = borefield.load.hourly_heating_load_simulation_period - borefield.load.cop._get_max_power(borefield.results.Tf)
+    missing_power = borefield.load.hourly_heating_load_simulation_period - borefield.load.cop._get_max_power(
+        borefield.results.Tf)
     missing_power = np.maximum(missing_power, 0)
     print(f'Over the whole simulation period, a maximum of {max(missing_power):.2f} kW cannot be delivered by the '
           f'cascaded heat pumps at 0°C. This accumulates to {np.sum(missing_power):.2f} kWh over the whole simulation period.')

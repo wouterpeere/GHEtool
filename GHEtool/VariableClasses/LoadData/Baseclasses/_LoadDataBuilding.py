@@ -817,6 +817,8 @@ class _LoadDataBuilding(_LoadData, ABC):
         yearly heating : np.ndarray
             yearly heating for the whole simulation period
         """
+        if not self._limit_to_max_heat_pump_power:
+            return self.yearly_heating_load_simulation_period
         return np.sum(
             np.reshape(self._monthly_baseload_heating_simulation_period_with_limit, (self.simulation_period, 12)),
             axis=1)
@@ -832,6 +834,8 @@ class _LoadDataBuilding(_LoadData, ABC):
         yearly cooling : np.ndarray
             yearly cooling for the whole simulation period
         """
+        if not self._limit_to_max_heat_pump_power:
+            return self.yearly_cooling_load_simulation_period
         return np.sum(
             np.reshape(self._monthly_baseload_cooling_simulation_period_with_limit, (self.simulation_period, 12)),
             axis=1)
@@ -1026,6 +1030,8 @@ class _LoadDataBuilding(_LoadData, ABC):
         yearly DHW : np.ndarray
             yearly DHW for the whole simulation period
         """
+        if not self._limit_to_max_heat_pump_power:
+            return self.yearly_dhw_load_simulation_period
         return np.sum(np.reshape(self._monthly_baseload_dhw_simulation_period_with_limit, (self.simulation_period, 12)),
                       axis=1)
 

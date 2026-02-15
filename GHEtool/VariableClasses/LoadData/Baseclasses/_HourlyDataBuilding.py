@@ -180,7 +180,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         if isinstance(self.cop, SCOP) and isinstance(self.eer, SEER) and isinstance(self.cop_dhw, SCOP):
             return self.cop.get_COP(0, power=np.nan_to_num(power))
         if isinstance(self.results, ResultsMonthly):
-            raise TypeError('You cannot get an hourly COP values based on monthly temperature results.')
+            raise TypeError('You cannot get hourly COP values based on monthly temperature results.')
         if isinstance(self.results, tuple):
             temperature = self.results[0]
         else:
@@ -265,10 +265,10 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         TypeError
             When the results are provided on a monthly basis
         """
-        if isinstance(self.cop, SCOP):
+        if isinstance(self.cop, SCOP) or not self._limit_to_max_heat_pump_power:
             return self.hourly_heating_load_simulation_period
         if isinstance(self.results, ResultsMonthly):
-            raise TypeError('You cannot get an hourly COP values based on monthly temperature results.')
+            raise TypeError('You cannot get hourly COP values based on monthly temperature results.')
         if isinstance(self.results, tuple):
             temperature = self.results[0]
         else:
@@ -292,7 +292,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         TypeError
             When the results are provided on a monthly basis
         """
-        if isinstance(self.cop_dhw, SCOP):
+        if isinstance(self.cop_dhw, SCOP) or not self._limit_to_max_heat_pump_power:
             return self.hourly_dhw_load_simulation_period
         if isinstance(self.results, ResultsMonthly):
             raise TypeError('You cannot get an hourly COP values based on monthly temperature results.')
@@ -319,7 +319,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         TypeError
             When the results are provided on a monthly basis
         """
-        if isinstance(self.eer, SEER):
+        if isinstance(self.eer, SEER) or not self._limit_to_max_heat_pump_power:
             return self.hourly_cooling_load_simulation_period
         if isinstance(self.results, ResultsMonthly):
             raise TypeError('You cannot get an hourly EER values based on monthly temperature results.')

@@ -2012,19 +2012,17 @@ class Borefield(BaseClass):
                                    hourly_load) / self.number_of_boreholes / H)
                 if not self.borehole.use_constant_Rb:
                     results._Tf_inlet, results._Tf_outlet = self.calculate_borefield_inlet_outlet_temperature(
-                        self.load.hourly_net_resulting_injection_power, results.peak_injection,
-                        simulation_period=self.load.simulation_period)
+                        hourly_load, results.peak_injection, simulation_period=self.load.simulation_period)
                     if sizing:
                         results._Tf_extraction_inlet, results._Tf_extraction_outlet = self.calculate_borefield_inlet_outlet_temperature(
-                            self.load.hourly_net_resulting_injection_power, results._Tf_extraction,
-                            simulation_period=self.load.simulation_period)
+                            hourly_load, results._Tf_extraction, simulation_period=self.load.simulation_period)
             return results
 
         def calculate_difference(results_old: Union[ResultsMonthly, ResultsHourly],
                                  result_new: Union[ResultsMonthly, ResultsHourly]) -> float:
             return max(
-                np.max(result_new.peak_injection - results_old.peak_injection),
-                np.max(result_new.peak_extraction - results_old.peak_extraction))
+                np.max(np.abs(result_new.peak_injection - results_old.peak_injection)),
+                np.max(np.abs(result_new.peak_extraction - results_old.peak_extraction)))
 
         if isinstance(self.load, _LoadDataBuilding) or \
                 isinstance(self.borehole.fluid_data, TemperatureDependentFluidData):

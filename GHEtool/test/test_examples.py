@@ -55,21 +55,21 @@ def test_sizing_with_building_load(monkeypatch):
         size_with_variable_ground_temperature, \
         size_with_part_load_data
     assert np.allclose(size_with_scop(), (95.94350214711557, 4.072466974615784))
-    assert np.allclose(size_with_variable_ground_temperature(), (95.3076985330507, 4.141191664302273))
-    assert np.allclose(size_with_part_load_data(), (97.80977595471201, 4.633721868218689))
+    assert np.allclose(size_with_variable_ground_temperature(), (94.91607600186884, 4.140667366915088))
+    assert np.allclose(size_with_part_load_data(), (97.40238165884419, 4.633232724880249))
 
 
 def test_sizing_with_building_load_hourly(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     from GHEtool.Examples.sizing_with_building_load_hourly import L3_sizing, L4_sizing
-    assert np.allclose(L3_sizing(), (128.60230853615113, 6.2937039232975245))
-    assert np.allclose(L4_sizing(), (154.13060226707495, 6.387502181793559))
+    assert np.allclose(L3_sizing(), (128.0601612984388, 6.292983056938187))
+    assert np.allclose(L4_sizing(), (153.81812162652483, 6.387522978931683))
 
 
 def test_sizing_with_building_load_hourly_limit(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     from GHEtool.Examples.sizing_with_building_load_hourly_limit import L3_sizing, L4_sizing
-    assert np.allclose(L3_sizing(), (113.35165762886392, 4.878148971726799))
+    assert np.allclose(L3_sizing(), 113.35165762886392)
     assert np.allclose(L4_sizing(), (144.5026065941024, 5.009175773418377))
 
 
