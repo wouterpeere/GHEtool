@@ -57,6 +57,7 @@ def L3_sizing() -> Tuple[float, float]:
     print(
         f'When sizing with an L3 method, the required borehole length is {length:.2f}m. '
         f'The SCOP is {borefield.load.SCOP_total:.2f}.')
+    borefield.load.SEER
     borefield.print_temperature_profile()
     return length, borefield.load.SCOP_heating
 

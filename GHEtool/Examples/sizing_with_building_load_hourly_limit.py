@@ -165,6 +165,7 @@ def L4_sizing() -> Tuple[float, float]:
           f'cascaded heat pumps at 0°C. This accumulates to {np.sum(missing_power):.2f} kWh over the whole simulation period.')
 
     borefield.print_temperature_profile(plot_hourly=True)
+    borefield.load.SEER
     return length, borefield.load.SCOP_heating
 
 
