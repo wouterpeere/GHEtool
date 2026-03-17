@@ -99,6 +99,7 @@ class CalculationSetup(BaseClass):
         self.use_neural_network: bool = use_neural_network
         self.approximate_req_depth: bool = approximate_req_depth
         self.size_based_on: str = size_based_on
+        self.use_explicit_multipole: bool = use_explicit_multipole
 
         self._backup: CalculationSetup = None
 
