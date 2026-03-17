@@ -30,7 +30,7 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
         Parameters
         ----------
         name : str
-            Name of the antifreeze. Currently, there is: Water, MEG, MPG, MEA, MMA, Thermox DTX, Coolflow NTP, Kilfrost GEO, Kilfrost GEO Plus
+            Name of the antifreeze. Currently, there is: Water, MEG, MPG, MEA, MMA, Thermox DTX, Coolflow NTP, Kilfrost GEO, Kilfrost GEO Plus, GeoPro
         percentage : float
             Percentage of the antifreeze [%]
         mass_percentage : bool
@@ -123,7 +123,7 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
         Parameters
         ----------
         name : str
-            Name of the antifreeze. Currently, there is: Water, MEG, MPG, MEA, MMA, Thermox DTX, Coolflow NTP, Kilfrost GEO, Kilfrost GEO Plus
+            Name of the antifreeze. Currently, there is: Water, MEG, MPG, MEA, MMA, Thermox DTX, Coolflow NTP, Kilfrost GEO, Kilfrost GEO Plus, GeoPro
         percentage : float
             Percentage of the antifreeze [%]
 
@@ -162,6 +162,9 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
             return fluid, fluid.freeze_point(percentage / 100)
         if name == 'Kilfrost GEO Plus':
             fluid = KilfrostGEOPlus(percentage / 100)
+            return fluid, fluid.freeze_point(percentage / 100)
+        if name == 'GeoPro':
+            fluid = GeoPro(percentage / 100)
             return fluid, fluid.freeze_point(percentage / 100)
         raise ValueError(f'The fluid {name} is not yet supported by GHEtool.')
 

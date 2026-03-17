@@ -225,6 +225,23 @@ def test_commercial_fluids_data():
     assert np.isclose(fluid.cp(10), 2960)
     assert np.isclose(fluid.mu(10), 3.9509 * 1e-3)
 
+    # test GeoPro
+    fluid = GeoPro(0.3)
+    assert np.isclose(fluid.freeze_point(0.30), -15)
+    assert np.isclose(fluid.conductivity(10), 0.501)
+    assert np.isclose(fluid.conductivity(5), 0.501 / 2 + 0.495 / 2)
+    assert np.isclose(fluid.density(10), 1139)
+    assert np.isclose(fluid.specific_heat(10), 3200)
+    assert np.isclose(fluid.viscosity(10), 0.00276777)
+
+    fluid = TemperatureDependentFluidData('GeoPro', 30, mass_percentage=False)
+    assert np.isclose(fluid.freezing_point, -15)
+    assert np.isclose(fluid.k_f(10), 0.501)
+    assert np.isclose(fluid.k_f(5), 0.501 / 2 + 0.495 / 2)
+    assert np.isclose(fluid.rho(10), 1139)
+    assert np.isclose(fluid.cp(10), 3200)
+    assert np.isclose(fluid.mu(10), 0.00276777)
+
 
 def test_temp():
     temp = []
