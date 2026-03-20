@@ -1505,6 +1505,7 @@ class Borefield(BaseClass):
         """
         # initiate iteration
         H_prev = 0
+        H_prev2 = 0
 
         if self.H < 1:
             self.H = 50
@@ -1535,12 +1536,18 @@ class Borefield(BaseClass):
         while not self._check_convergence(self.H, H_prev, i):
             if H_prev != 0:
                 self.H = self.H * .5 + H_prev * 0.5
-
             if hourly:
                 self._calculate_temperature_profile(self.H, hourly=True, sizing=True, Tmin=Tmin, Tmax=Tmax)
             else:
                 self._calculate_temperature_profile(self.H, hourly=False, sizing=True, Tmin=Tmin, Tmax=Tmax)
+
+            if np.isclose(H_prev2, self.H):
+                self.H = max(H_prev, self.H)
+                break
+
+            H_prev2 = H_prev
             H_prev = self.H
+            
             if not deep_sizing:
                 if quadrant == 1:
                     # maximum temperature
