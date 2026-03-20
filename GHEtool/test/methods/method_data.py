@@ -1230,3 +1230,22 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 0.10201
                                                    676.2470214522142,
                                                    name='Optimise load profile (balance, inlet, var flow)', power=3,
                                                    hourly=False))
+ground = GroundFluxTemperature(2.4, 10, flux=0.06, volumetric_heat_capacity=2.5 * 10 ** 6)
+load = MonthlyBuildingLoadAbsolute(
+    np.array([0.176, 0.174, 0.141, 0.1, 0.045, 0, 0, 0, 0.012, 0.065, 0.123, 0.164]) * 4680,
+    np.array([0, 0, 0, 0, 0.112, 0.205, 0.27, 0.264, 0.149, 0, 0, 0]) * 1350,
+    np.full(12, 3),
+    np.full(12, 1.8),
+    dhw=1950,
+    efficiency_dhw=3,
+)
+fluid = TemperatureDependentFluidData('MEG', 28, False)
+pipe = SingleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+flow = ConstantFlowRate(vfr=0.2)
+
+borefield = Borefield(ground_data=ground, load=load, flow_data=flow, fluid_data=fluid, pipe_data=pipe)
+borefield.create_rectangular_borefield(1, 1, 6, 6, 100, 1, 0.07)
+borefield.set_min_fluid_temperature(0)
+borefield.set_max_fluid_temperature(18)
+
+list_of_test_objects.add(SizingObject(borefield, L3_output=86.6729785967073, name='Issue 435'))
