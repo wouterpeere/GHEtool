@@ -1992,7 +1992,7 @@ class Borefield(BaseClass):
 
                 # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
                 # g-function. This dataset is checked over and over again and is correct
-                g_values = self.gfunction(self.load.time_L4, H)
+                g_values = self.gfunction(self.load.time_L4)
 
                 # calculation of needed differences of the g-function values. These are the weight factors in the calculation
                 # of Tb.
