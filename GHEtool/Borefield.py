@@ -1547,7 +1547,7 @@ class Borefield(BaseClass):
 
             H_prev2 = H_prev
             H_prev = self.H
-            
+
             if not deep_sizing:
                 if quadrant == 1:
                     # maximum temperature
@@ -1904,14 +1904,14 @@ class Borefield(BaseClass):
 
                 # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
                 # g-function. This dataset is checked over and over again and is correct
-                g_values = self.gfunction(self.load.time_L3, H)
+                g_values = self.gfunction(self.load.time_L3)
 
                 # the g-function value of the peak with length_peak hours
-                g_value_peak_injection = self.gfunction(self.load.peak_injection_duration, H)[0]
+                g_value_peak_injection = self.gfunction(self.load.peak_injection_duration)[0]
                 if self.load.peak_injection_duration == self.load.peak_extraction_duration:
                     g_value_peak_extraction = g_value_peak_injection
                 else:
-                    g_value_peak_extraction = self.gfunction(self.load.peak_extraction_duration, H)[0]
+                    g_value_peak_extraction = self.gfunction(self.load.peak_extraction_duration)[0]
 
                 # calculation of needed differences of the g-function values. These are the weight factors in the calculation
                 # of Tb.
