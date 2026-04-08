@@ -629,6 +629,20 @@ def test_first_year_params():
     assert np.isclose(21600.0, th)
 
 
+def test_calculate_temperatures_different_depth():
+    borefield = Borefield()
+    borefield.borefield = copy.deepcopy(borefield_gt)
+    borefield.ground_data = ground_data_constant
+    borefield.load = MonthlyGeothermalLoadAbsolute(*load_case(2))
+
+    borefield.borefield.H[0] = 200
+    temp = borefield.borefield
+    borefield.borefield = temp
+    assert borefield.borefield.H[0] == 200
+    borefield.calculate_temperatures()
+    assert borefield.borefield.H[0] == 200
+
+
 def test_calculate_temperatures():
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
