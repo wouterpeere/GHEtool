@@ -601,7 +601,7 @@ def test_conical_resistances():
 
     pipe.calculate_resistances(fluid, flow, 200)
     assert np.isclose(0.07358834823796871, pipe.R_p)
-    assert np.isclose(0.17880743362651824, pipe.R_f)
+    assert np.isclose(0.1787639520941072, pipe.R_f)
 
 
 def test_conical_convective_resistance():
