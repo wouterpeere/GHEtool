@@ -182,7 +182,7 @@ class ConicalPipe(MultipleUTube):
             # Contribution after conical section
             R3 = 0.0
             if L3 > 0:
-                rf_stop = r_f_func(self.end_conical)
+                rf_stop = r_f_func(borehole_length)
                 R3 = rf_stop * L3
 
             result = (R1 + R2 + R3) / borehole_length
