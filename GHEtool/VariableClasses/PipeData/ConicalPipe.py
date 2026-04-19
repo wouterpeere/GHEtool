@@ -169,44 +169,20 @@ class ConicalPipe(MultipleUTube):
             # Contribution before conical section
             R1 = 0.0
             if L1 > 0:
-                rf_start = calculate_convective_resistance(
-                    flow_data,
-                    fluid_data,
-                    r_in=self.r_in_start,
-                    epsilon=self.epsilon,
-                    nb_of_pipes=self.number_of_pipes,
-                    **kwargs
-                )
+                rf_start = r_f_func(0)
                 R1 = rf_start * L1
 
             # Contribution in conical section
             R2 = 0.0
             if L2 > 0:
                 z_cone = np.linspace(self.begin_conical, min(self.end_conical, borehole_length), 9)
-                rf_cone = np.array([
-                    calculate_convective_resistance(
-                        flow_data,
-                        fluid_data,
-                        r_in=calc_r_in(z),
-                        epsilon=self.epsilon,
-                        nb_of_pipes=self.number_of_pipes,
-                        **kwargs
-                    )
-                    for z in z_cone
-                ])
+                rf_cone = np.array([r_f_func(z) for z in z_cone])
                 R2 = scipy.integrate.simpson(rf_cone, x=z_cone, axis=0)
 
             # Contribution after conical section
             R3 = 0.0
             if L3 > 0:
-                rf_stop = calculate_convective_resistance(
-                    flow_data,
-                    fluid_data,
-                    r_in=self.r_in_stop,
-                    epsilon=self.epsilon,
-                    nb_of_pipes=self.number_of_pipes,
-                    **kwargs
-                )
+                rf_stop = r_f_func(self.end_conical)
                 R3 = rf_stop * L3
 
             result = (R1 + R2 + R3) / borehole_length
