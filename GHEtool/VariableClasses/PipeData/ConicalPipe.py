@@ -4,6 +4,8 @@ import math
 
 from math import pi
 
+import scipy
+
 from GHEtool.utils.calculate_friction_factor import *
 from GHEtool.VariableClasses.PipeData.SingleUTube import MultipleUTube
 from GHEtool.VariableClasses.FluidData import _FluidData
@@ -159,7 +161,32 @@ class ConicalPipe(MultipleUTube):
                 return calculate_convective_resistance(flow_data, fluid_data, r_in=calc_r_in(length),
                                                        epsilon=self.epsilon, nb_of_pipes=self.number_of_pipes, **kwargs)
 
-            return quad_vec(r_f_func, 0, borehole_length)[0] / borehole_length
+            # Lengths of the three regions
+            L1 = max(0.0, min(self.begin_conical, borehole_length))
+            L2 = max(0.0, min(self.end_conical, borehole_length) - self.begin_conical)
+            L3 = max(0.0, borehole_length - max(self.end_conical, 0.0))
+
+            # Contribution before conical section
+            R1 = 0.0
+            if L1 > 0:
+                rf_start = r_f_func(0)
+                R1 = rf_start * L1
+
+            # Contribution in conical section
+            R2 = 0.0
+            if L2 > 0:
+                z_cone = np.linspace(self.begin_conical, min(self.end_conical, borehole_length), 9)
+                rf_cone = np.array([r_f_func(z) for z in z_cone])
+                R2 = scipy.integrate.simpson(rf_cone, x=z_cone, axis=0)
+
+            # Contribution after conical section
+            R3 = 0.0
+            if L3 > 0:
+                rf_stop = r_f_func(borehole_length)
+                R3 = rf_stop * L3
+
+            result = (R1 + R2 + R3) / borehole_length
+            return result
 
         R_f_top = calculate_convective_resistance(flow_data, fluid_data, r_in=self.r_in_start, epsilon=self.epsilon,
                                                   nb_of_pipes=self.number_of_pipes, **kwargs)
