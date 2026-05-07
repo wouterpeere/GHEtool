@@ -152,7 +152,7 @@ def turbulent_nusselt(fluid: _FluidData, Re: Union[float, np.ndarray], f: Union[
 
 
 def calculate_convective_resistance(flow_data: _FlowData, fluid_data: _FluidData, r_in: float, nb_of_pipes: int,
-                                    epsilon: float, **kwargs):
+                                    epsilon: float, wetted_perimeter: float = None, area: float = None, **kwargs):
     """
     This function calculates the convective resistance.
     For the laminar flow, a fixed Nusselt number of 3.66 is used, for the turbulent flow, the Gnielinski
@@ -171,6 +171,10 @@ def calculate_convective_resistance(flow_data: _FlowData, fluid_data: _FluidData
         Number of pipes [-]
     epsilon : float
         Pipe roughness [m]
+    wetted_perimeter : float
+        Wetted perimeter [m]
+    area : float
+        Internal area [m^2]
 
     Returns
     -------
@@ -189,7 +193,10 @@ def calculate_convective_resistance(flow_data: _FlowData, fluid_data: _FluidData
     m_dot = np.atleast_1d(np.asarray(flow_data.mfr_borehole(**kwargs, fluid_data=fluid_data), dtype=np.float64))
 
     # Reynolds number
-    re = 4.0 * m_dot / (fluid_data.mu(**kwargs) * np.pi * r_in * 2) / nb_of_pipes
+    if area is None:
+        area = np.pi * r_in ** 2
+    re = 2 * m_dot * r_in / (fluid_data.mu(**kwargs) * np.pi * area) / nb_of_pipes
+    # re = 4.0 * m_dot / (fluid_data.mu(**kwargs) * np.pi * r_in * 2) / nb_of_pipes
 
     # Allocate Nusselt array
     nu = np.empty_like(re)
@@ -223,7 +230,10 @@ def calculate_convective_resistance(flow_data: _FlowData, fluid_data: _FluidData
         nu[transitional] = (nu_low + (re_t - low_re) * (nu_high - nu_low) / (high_re - low_re))
 
     # Convective resistance
-    R_conv = 1.0 / (nu * np.pi * fluid_data.k_f(**kwargs))
+    if wetted_perimeter is None:
+        R_conv = 1.0 / (nu * np.pi * fluid_data.k_f(**kwargs))
+    else:
+        R_conv = r_in * 2 / (nu * fluid_data.k_f(**kwargs) * wetted_perimeter)
     if R_conv.size == 1:
         return R_conv.item()
     return R_conv
