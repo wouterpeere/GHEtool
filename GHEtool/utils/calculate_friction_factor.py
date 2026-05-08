@@ -195,7 +195,7 @@ def calculate_convective_resistance(flow_data: _FlowData, fluid_data: _FluidData
     # Reynolds number
     if area is None:
         area = np.pi * r_in ** 2
-    re = 2 * m_dot * r_in / (fluid_data.mu(**kwargs) * np.pi * area) / nb_of_pipes
+    re = 2 * m_dot * r_in / (fluid_data.mu(**kwargs) * area) / nb_of_pipes
     # re = 4.0 * m_dot / (fluid_data.mu(**kwargs) * np.pi * r_in * 2) / nb_of_pipes
 
     # Allocate Nusselt array
