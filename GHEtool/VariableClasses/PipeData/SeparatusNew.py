@@ -68,10 +68,10 @@ class SeparatusNew():
         """
         self.k_g = k_g
         self.diameter = 51 * 1e-3
-        self.wall_thickness = 3.1 * 1e-3
+        self.wall_thickness = 3e-3  # 3.1 * 1e-3
         self.r_in = (self.diameter / 2) - self.wall_thickness
         self.r_out = (self.diameter / 2)
-        self.k_p = 0.42
+        self.k_p = 0.44  # 2
         self.D_s = 4 * self.r_in / (3 * np.pi)
         self.epsilon = 1e-6
         self.number_of_pipes = 1
@@ -186,9 +186,9 @@ class SeparatusNew():
 
             r_fp_pipe = R_p_cond_circle + R_p_conv_circle
             r_fp_center = R_p_cond_wall + R_p_conv_wall
-            print(R_p_cond_wall, R_p_cond_circle, R_p_conv_wall, R_p_conv_circle)
+            # print(R_p_cond_wall, R_p_cond_circle, R_p_conv_wall, R_p_conv_circle)
             R_b, R_a = self.predict_split_pipe_Rb_Ra_series(borehole.r_b, r_fp_pipe, r_fp_center, self.k_g, k_s)
-            print(f'New Rf pipe: {r_fp_pipe:.3f}, Rf center: {r_fp_center:.3f}, R_b: {R_b:.3f}, R_a= {R_a:.3f}')
+            # print(f'New Rf pipe: {r_fp_pipe:.3f}, Rf center: {r_fp_center:.3f}, R_b: {R_b:.3f}, R_a= {R_a:.3f}')
             r_v = borehole.H / (flow_rate_data.mfr_borehole(**kwargs, fluid_data=fluid_data) * fluid_data.cp(
                 **kwargs))
             n = r_v / (R_b * R_a) ** 0.5
