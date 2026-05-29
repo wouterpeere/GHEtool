@@ -123,6 +123,9 @@ class Borefield(BaseClass):
         self._borefield_description = None
         self.borefield = borefield
 
+        # temporary results
+        self._temp_results = {}
+
     @property
     def number_of_boreholes(self) -> int:
         """
@@ -1537,9 +1540,11 @@ class Borefield(BaseClass):
             if H_prev != 0:
                 self.H = self.H * .5 + H_prev * 0.5
             if hourly:
-                self._calculate_temperature_profile(self.H, hourly=True, sizing=True, Tmin=Tmin, Tmax=Tmax)
+                self._calculate_temperature_profile(self.H, hourly=True, sizing=True, Tmin=Tmin, Tmax=Tmax,
+                                                    first_last_year=False)
             else:
-                self._calculate_temperature_profile(self.H, hourly=False, sizing=True, Tmin=Tmin, Tmax=Tmax)
+                self._calculate_temperature_profile(self.H, hourly=False, sizing=True, Tmin=Tmin, Tmax=Tmax,
+                                                    first_last_year=False)
 
             if np.isclose(H_prev2, self.H):
                 self.H = max(H_prev, self.H)
@@ -1822,7 +1827,7 @@ class Borefield(BaseClass):
         self.load.reset_results(self.Tf_min, self.Tf_max)
 
     def _calculate_temperature_profile(self, H: float = None, hourly: bool = False, sizing: bool = False,
-                                       Tmin: float = None, Tmax: float = None) -> None:
+                                       Tmin: float = None, Tmax: float = None, **kwargs) -> None:
         """
         This function calculates the evolution in the fluid temperature and borehole wall temperature.
 
@@ -1847,15 +1852,15 @@ class Borefield(BaseClass):
         Tmax = Tmax if Tmax is not None else self.Tf_max
 
         if hourly:
-            g_values = self.gfunction(self.load.time_L4, H)
-            # calculation of needed differences of the g-function values. These are the weight factors in the calculation
-            # of Tb.
-            g_value_differences = np.diff(g_values, prepend=0)
+            g_values = kwargs.get('g_values')
+            if g_values is None:
+                g_values = self.gfunction(self.load.time_L4, H)
         else:
             # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
             # g-function. This dataset is checked over and over again and is correct
-            g_values = self.gfunction(self.load.time_L3, H)
-
+            g_values = kwargs.get('g_values')
+            if g_values is None:
+                g_values = self.gfunction(self.load.time_L3, H)
             # the g-function value of the peak with length_peak hours
             g_value_peak_injection = self.gfunction(self.load.peak_injection_duration, H)[0]
             if self.load.peak_injection_duration == self.load.peak_extraction_duration:
@@ -1864,14 +1869,19 @@ class Borefield(BaseClass):
                 g_value_peak_extraction = \
                     self.gfunction(self.load.peak_extraction_duration, H)[0]
 
-            # calculation of needed differences of the g-function values. These are the weight factors in the calculation
-            # of Tb.
+        # calculation of needed differences of the g-function values. These are the weight factors in the calculation
+        # of Tb.
+        g_value_differences = kwargs.get('g_value_differences')
+        if g_value_differences is None:
             g_value_differences = np.diff(g_values, prepend=0)
 
         # save temp
-        hourly_load_prev = None
-        result_convolution = None
-        temperature_result = None
+        self._temp_results['g_values'] = g_values
+        self._temp_results['g_value_differences'] = g_value_differences
+
+        self._temp_results['hourly_load_prev'] = kwargs.get('hourly_load_prev')
+        self._temp_results['result_convolution'] = kwargs.get('result_convolution')
+        self._temp_results['temperature_result'] = kwargs.get('temperature_result')
 
         # reset self.results
         self.results = ResultsMonthly()
@@ -1879,11 +1889,23 @@ class Borefield(BaseClass):
                 isinstance(self.load.cop, SCOP) and isinstance(self.load.cop_dhw, SCOP) and isinstance(
             self.load.eer, SEER))
 
-        def calculate_temperatures(H, hourly=hourly, results_temperature=ResultsMonthly(), indices=None):
-            nonlocal hourly_load_prev
-            nonlocal result_convolution
-            nonlocal temperature_result
+        kwargs.get('first_last_year', False)
+        index_mask = None
+        if kwargs.get('first_last_year', False) and not self.load._multiyear and not variable_efficiency:
+            if self.load._hourly:
+                index_mask = np.zeros(self.load.simulation_period * 8760, dtype=bool)
 
+                index_mask[:8760] = True  # first year
+                index_mask[-8760:] = True  # last year
+                index_mask = np.where(index_mask)[0]
+            else:
+                index_mask = np.zeros(self.load.simulation_period * 12, dtype=bool)
+
+                index_mask[:12] = True  # first year
+                index_mask[-12:] = True  # last year
+                index_mask = np.where(index_mask)[0]
+
+        def calculate_temperatures(H, hourly=hourly, results_temperature=ResultsMonthly(), indices=None):
             # set Rb* value
             H_var = H if H is not None else self.H
             depth = self.calculate_depth(H_var, self.D)
@@ -2008,15 +2030,16 @@ class Borefield(BaseClass):
                     raise ValueError("There is no hourly resolution available!")
 
                 hourly_load = self.load.hourly_net_resulting_injection_power
-                if hourly_load_prev is None:
+                if self._temp_results['hourly_load_prev'] is None:
                     # convolution to get the hourly results
-                    result_convolution = convolve(hourly_load * 1000, g_value_differences)[: len(hourly_load)]
-                    hourly_load_prev = hourly_load
-                    temperature_result = None
-                elif np.array_equal(hourly_load_prev, hourly_load):
+                    self._temp_results['result_convolution'] = convolve(hourly_load * 1000, g_value_differences)[
+                        : len(hourly_load)]
+                    self._temp_results['hourly_load_prev'] = hourly_load
+                    self._temp_results['temperature_result'] = None
+                elif np.array_equal(self._temp_results['hourly_load_prev'], hourly_load):
                     pass
                 else:
-                    mask = hourly_load_prev != hourly_load
+                    mask = self._temp_results['hourly_load_prev'] != hourly_load
 
                     # calculate the first index where there is difference
                     if np.any(mask):
@@ -2024,29 +2047,29 @@ class Borefield(BaseClass):
                     else:
                         first_idx = None
 
-                    hourly_load_prev = hourly_load
+                    self._temp_results['hourly_load_prev'] = hourly_load
 
                     # update only after this first index, since the first values do not change
-                    delta = (hourly_load[first_idx:] - hourly_load_prev[first_idx:]) * 1000
+                    delta = (hourly_load[first_idx:] - self._temp_results['hourly_load_prev'][first_idx:]) * 1000
                     update = convolve(delta, g_value_differences)
-                    result_convolution[first_idx:] += update[:len(result_convolution) - first_idx]
+                    self._temp_results['result_convolution'][first_idx:] += update[
+                        :len(self._temp_results['result_convolution']) - first_idx]
+                    self._temp_results['temperature_result'] = None
+
                 # print(f'Convolution: {time.time_ns() - start}ns')
                 # start = time.time_ns()
-                    temperature_result = None
                 # calculation the borehole wall temperature for every month i
-                # print('uh')
-                Tb = result_convolution / (
+                Tb = self._temp_results['result_convolution'] / (
                         2 * pi * self.ground_data.k_s(self.calculate_depth(H_var, self.D), self.D)) / (
                              H_var * self.number_of_boreholes) + self._Tg(H_var)
                 # print(f'Tb: {time.time_ns() - start}ns')
                 # start = time.time_ns()
                 # now the Tf will be calculated based on
                 # Tf = Tb + Q * R_b
-
                 idx = slice(None) if (indices is None) else indices
 
-                if temperature_result is not None:
-                    temperature_result[idx] = (
+                if self._temp_results['temperature_result'] is not None:
+                    self._temp_results['temperature_result'][idx] = (
                             Tb[idx]
                             + hourly_load[idx] * 1000
                             * get_rb(results_temperature.peak_injection[idx], Tmax,
@@ -2055,12 +2078,14 @@ class Borefield(BaseClass):
                             / H_var
                     )
                 else:
-                    temperature_result = Tb + hourly_load * 1000 * (
+                    self._temp_results['temperature_result'] = Tb + hourly_load * 1000 * (
                             get_rb(results_temperature.peak_injection, Tmax,
                                    hourly_load) / self.number_of_boreholes / H_var)
+                # print(f'Tf: {time.time_ns() - start}ns')
                 # start = time.time_ns()
                 # reset other variables
-                results = ResultsHourly(borehole_wall_temp=Tb, temperature_fluid=temperature_result)
+                results = ResultsHourly(borehole_wall_temp=Tb,
+                                        temperature_fluid=self._temp_results['temperature_result'])
                 if sizing:
                     # do the same for extraction
                     results._Tf_extraction = Tb + hourly_load * 1000 * (
@@ -2075,7 +2100,7 @@ class Borefield(BaseClass):
             return results
 
         def calculate_difference(results_old: Union[ResultsMonthly, ResultsHourly],
-                                 result_new: Union[ResultsMonthly, ResultsHourly], atol) -> list:
+                                 result_new: Union[ResultsMonthly, ResultsHourly], atol) -> np.ndarray:
             indices = np.where(
                 (np.abs(result_new.peak_injection - results_old.peak_injection) > atol)
                 |
@@ -2092,12 +2117,12 @@ class Borefield(BaseClass):
                 self.load.reset_results(Tmin, self.load.eer.threshold_temperature)
             else:
                 self.load.reset_results(Tmin, Tmax)
-            results_old = calculate_temperatures(H, hourly=hourly)
+            results_old = calculate_temperatures(H, hourly=hourly, indices=index_mask)
             self.load.set_results(results_old)
             if sizing and not variable_efficiency and self._calculation_setup.approximate_req_depth:
                 results = results_old
             else:
-                results = calculate_temperatures(H, hourly=hourly, results_temperature=results_old)
+                results = calculate_temperatures(H, hourly=hourly, results_temperature=results_old, indices=index_mask)
 
             # safety
             i = 0
