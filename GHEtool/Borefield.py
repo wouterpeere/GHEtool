@@ -2021,7 +2021,9 @@ class Borefield(BaseClass):
                     else:
                         first_idx = None
                     hourly_load_prev = hourly_load
-                    pass
+                    delta = (hourly_load[first_idx:] - hourly_load_prev[first_idx:]) * 1000
+                    update = convolve(delta, g_value_differences)
+                    result_convolution[first_idx:] += update[:len(result_convolution) - first_idx]
                 # print(f'Convolution: {time.time_ns() - start}ns')
                 # start = time.time_ns()
                 # calculation the borehole wall temperature for every month i
