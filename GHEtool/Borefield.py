@@ -1847,25 +1847,32 @@ class Borefield(BaseClass):
         Tmax = Tmax if Tmax is not None else self.Tf_max
 
         if hourly:
-            g_values = self.gfunction(self.load.time_L4, H)
+            g_values = self.gfunction(self.load.time_L4, H if H is not None else self.H)
             # calculation of needed differences of the g-function values. These are the weight factors in the calculation
             # of Tb.
             g_value_differences = np.diff(g_values, prepend=0)
         else:
             # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
             # g-function. This dataset is checked over and over again and is correct
-            g_values = self.gfunction(self.load.time_L3, H)
+            g_values = self.gfunction(self.load.time_L3, H if H is not None else self.H)
 
             # the g-function value of the peak with length_peak hours
-            g_value_peak_injection = self.gfunction(self.load.peak_injection_duration, H)[0]
+            g_value_peak_injection = self.gfunction(self.load.peak_injection_duration,
+                                                    H if H is not None else self.H)[0]
             if self.load.peak_injection_duration == self.load.peak_extraction_duration:
                 g_value_peak_extraction = g_value_peak_injection
             else:
-                g_value_peak_extraction = self.gfunction(self.load.peak_extraction_duration, H)[0]
+                g_value_peak_extraction = \
+                    self.gfunction(self.load.peak_extraction_duration,
+                                   H if H is not None else self.H)[0]
 
             # calculation of needed differences of the g-function values. These are the weight factors in the calculation
             # of Tb.
             g_value_differences = np.diff(g_values, prepend=0)
+
+        # save temp
+        hourly_load_prev = None
+        result_convolution = None
 
         # reset self.results
         self.results = ResultsMonthly()
@@ -1874,6 +1881,8 @@ class Borefield(BaseClass):
             self.load.eer, SEER))
 
         def calculate_temperatures(H, hourly=hourly, results_temperature=ResultsMonthly()):
+            nonlocal hourly_load_prev
+            nonlocal result_convolution
             # set Rb* value
             H_var = H if H is not None else self.H
             depth = self.calculate_depth(H_var, self.D)
@@ -1927,12 +1936,12 @@ class Borefield(BaseClass):
                         'No monthly temperature profile can be calculated when an hourly flow rate is given.')
 
                 # convolution to get the monthly results
-                results = convolve(self.load.monthly_average_injection_power_simulation_period * 1000,
-                                   g_value_differences)[: 12 * self.simulation_period]
+                result_convolution = convolve(self.load.monthly_average_injection_power_simulation_period * 1000,
+                                              g_value_differences)[: 12 * self.simulation_period]
 
                 # calculation the borehole wall temperature for every month i
                 k_s = self.ground_data.k_s(self.calculate_depth(H_var, self.D), self.D)
-                Tb = results / (2 * pi * k_s) / (H_var * self.number_of_boreholes) + self._Tg(H_var)
+                Tb = result_convolution / (2 * pi * k_s) / (H_var * self.number_of_boreholes) + self._Tg(H_var)
 
                 # now the Tf will be calculated based on
                 # Tf = Tb + Q * R_b
@@ -1998,22 +2007,37 @@ class Borefield(BaseClass):
                     raise ValueError("There is no hourly resolution available!")
 
                 hourly_load = self.load.hourly_net_resulting_injection_power
-                # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
-                # g-function. This dataset is checked over and over again and is correct
+                if hourly_load_prev is None:
+                    # convolution to get the hourly results
+                    result_convolution = convolve(hourly_load * 1000, g_value_differences)[: len(hourly_load)]
+                    hourly_load_prev = hourly_load
+                elif np.array_equal(hourly_load_prev, hourly_load):
+                    pass
+                else:
+                    mask = hourly_load_prev != hourly_load
 
-                # convolution to get the monthly results
-                results = convolve(hourly_load * 1000, g_value_differences)[: len(hourly_load)]
-
+                    if np.any(mask):
+                        first_idx = np.argmax(mask)
+                    else:
+                        first_idx = None
+                    hourly_load_prev = hourly_load
+                    pass
+                # print(f'Convolution: {time.time_ns() - start}ns')
+                # start = time.time_ns()
                 # calculation the borehole wall temperature for every month i
-                Tb = results / (2 * pi * self.ground_data.k_s(self.calculate_depth(H_var, self.D), self.D)) / (
-                        H_var * self.number_of_boreholes) + self._Tg(H_var)
-
+                # print('uh')
+                Tb = result_convolution / (
+                        2 * pi * self.ground_data.k_s(self.calculate_depth(H_var, self.D), self.D)) / (
+                             H_var * self.number_of_boreholes) + self._Tg(H_var)
+                # print(f'Tb: {time.time_ns() - start}ns')
+                # start = time.time_ns()
                 # now the Tf will be calculated based on
                 # Tf = Tb + Q * R_b
                 temperature_result = Tb + hourly_load * 1000 * (
                         get_rb(results_temperature.peak_injection, Tmax,
                                hourly_load) / self.number_of_boreholes / H_var)
-
+                # print(f'Tf: {time.time_ns() - start}ns')
+                # start = time.time_ns()
                 # reset other variables
                 results = ResultsHourly(borehole_wall_temp=Tb, temperature_fluid=temperature_result)
                 if sizing:
