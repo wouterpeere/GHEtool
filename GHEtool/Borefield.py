@@ -2101,12 +2101,14 @@ class Borefield(BaseClass):
 
             # safety
             i = 0
-            while calculate_difference(results_old, results) > self._calculation_setup.atol \
-                    and i < self._calculation_setup.max_nb_of_iterations:
+            _differences = calculate_difference(results_old, results, self._calculation_setup.atol)
+            while np.any(_differences) and i < self._calculation_setup.max_nb_of_iterations:
                 results_old = results
                 self.load.set_results(results)
-                results = calculate_temperatures(H, hourly=hourly, results_temperature=results)
+                results = calculate_temperatures(H, hourly=hourly, results_temperature=results, indices=_differences)
                 i += 1
+                _differences = calculate_difference(results_old, results, self._calculation_setup.atol)
+
             self.results = results
             self.load.set_results(results)
             return
