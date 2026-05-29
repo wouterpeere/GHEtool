@@ -1847,24 +1847,22 @@ class Borefield(BaseClass):
         Tmax = Tmax if Tmax is not None else self.Tf_max
 
         if hourly:
-            g_values = self.gfunction(self.load.time_L4, H if H is not None else self.H)
+            g_values = self.gfunction(self.load.time_L4, H)
             # calculation of needed differences of the g-function values. These are the weight factors in the calculation
             # of Tb.
             g_value_differences = np.diff(g_values, prepend=0)
         else:
             # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
             # g-function. This dataset is checked over and over again and is correct
-            g_values = self.gfunction(self.load.time_L3, H if H is not None else self.H)
+            g_values = self.gfunction(self.load.time_L3, H)
 
             # the g-function value of the peak with length_peak hours
-            g_value_peak_injection = self.gfunction(self.load.peak_injection_duration,
-                                                    H if H is not None else self.H)[0]
+            g_value_peak_injection = self.gfunction(self.load.peak_injection_duration, H)[0]
             if self.load.peak_injection_duration == self.load.peak_extraction_duration:
                 g_value_peak_extraction = g_value_peak_injection
             else:
                 g_value_peak_extraction = \
-                    self.gfunction(self.load.peak_extraction_duration,
-                                   H if H is not None else self.H)[0]
+                    self.gfunction(self.load.peak_extraction_duration, H)[0]
 
             # calculation of needed differences of the g-function values. These are the weight factors in the calculation
             # of Tb.
