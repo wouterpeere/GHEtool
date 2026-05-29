@@ -1846,6 +1846,27 @@ class Borefield(BaseClass):
         Tmin = Tmin if Tmin is not None else self.Tf_min
         Tmax = Tmax if Tmax is not None else self.Tf_max
 
+        if hourly:
+            g_values = self.gfunction(self.load.time_L4, H)
+            # calculation of needed differences of the g-function values. These are the weight factors in the calculation
+            # of Tb.
+            g_value_differences = np.diff(g_values, prepend=0)
+        else:
+            # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
+            # g-function. This dataset is checked over and over again and is correct
+            g_values = self.gfunction(self.load.time_L3, H)
+
+            # the g-function value of the peak with length_peak hours
+            g_value_peak_injection = self.gfunction(self.load.peak_injection_duration, H)[0]
+            if self.load.peak_injection_duration == self.load.peak_extraction_duration:
+                g_value_peak_extraction = g_value_peak_injection
+            else:
+                g_value_peak_extraction = self.gfunction(self.load.peak_extraction_duration, H)[0]
+
+            # calculation of needed differences of the g-function values. These are the weight factors in the calculation
+            # of Tb.
+            g_value_differences = np.diff(g_values, prepend=0)
+
         # reset self.results
         self.results = ResultsMonthly()
         variable_efficiency = isinstance(self.load, _LoadDataBuilding) and not (
@@ -1904,21 +1925,6 @@ class Borefield(BaseClass):
                                                                                               VariableHourlyMultiyearFlowRate)):
                     raise ValueError(
                         'No monthly temperature profile can be calculated when an hourly flow rate is given.')
-
-                # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
-                # g-function. This dataset is checked over and over again and is correct
-                g_values = self.gfunction(self.load.time_L3, H)
-
-                # the g-function value of the peak with length_peak hours
-                g_value_peak_injection = self.gfunction(self.load.peak_injection_duration, H)[0]
-                if self.load.peak_injection_duration == self.load.peak_extraction_duration:
-                    g_value_peak_extraction = g_value_peak_injection
-                else:
-                    g_value_peak_extraction = self.gfunction(self.load.peak_extraction_duration, H)[0]
-
-                # calculation of needed differences of the g-function values. These are the weight factors in the calculation
-                # of Tb.
-                g_value_differences = np.diff(g_values, prepend=0)
 
                 # convolution to get the monthly results
                 results = convolve(self.load.monthly_average_injection_power_simulation_period * 1000,
@@ -1992,14 +1998,8 @@ class Borefield(BaseClass):
                     raise ValueError("There is no hourly resolution available!")
 
                 hourly_load = self.load.hourly_net_resulting_injection_power
-
                 # self.g-function is a function that uses the precalculated data to interpolate the correct values of the
                 # g-function. This dataset is checked over and over again and is correct
-                g_values = self.gfunction(self.load.time_L4, H)
-
-                # calculation of needed differences of the g-function values. These are the weight factors in the calculation
-                # of Tb.
-                g_value_differences = np.diff(g_values, prepend=0)
 
                 # convolution to get the monthly results
                 results = convolve(hourly_load * 1000, g_value_differences)[: len(hourly_load)]
