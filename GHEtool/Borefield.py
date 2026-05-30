@@ -3,6 +3,7 @@ This file contains all the code for the borefield calculations.
 """
 from __future__ import annotations
 
+import copy
 import math
 import warnings
 from math import pi
@@ -1949,7 +1950,7 @@ class Borefield(BaseClass):
                                             temperature=temperature, nb_of_boreholes=self.number_of_boreholes,
                                             use_explicit_models=self._calculation_setup.use_explicit_multipole,
                                             simulation_period=self.load.simulation_period,
-                                            power=power)
+                                            power=power, indices=(slice(None) if (indices is None) else indices))
 
             if not hourly:
                 if not self.borehole.use_constant_Rb and isinstance(self.borehole.flow_data, (VariableHourlyFlowRate,
@@ -2064,7 +2065,9 @@ class Borefield(BaseClass):
                 # now the Tf will be calculated based on
                 # Tf = Tb + Q * R_b
                 idx = slice(None) if (indices is None) else indices
-                if self._temp_results['temperature_result'] is not None and indices is not None and False:
+                if self._temp_results['temperature_result'] is not None and indices is not None \
+                        and (not self.borehole.use_constant_Rb and not isinstance(self.borehole.flow_data,
+                                                                                  VariableHourlyFlowRate)):
                     self._temp_results['temperature_result'][idx] = Tb[idx] + hourly_load[idx] * 1000 * (
                             get_rb(results_temperature.peak_injection[idx], Tmax,
                                    hourly_load[idx]) / self.number_of_boreholes / H_var)
@@ -2089,14 +2092,20 @@ class Borefield(BaseClass):
                             hourly_load, results._Tf_extraction, simulation_period=self.load.simulation_period)
             return results
 
-        def calculate_difference(results_old: Union[ResultsMonthly, ResultsHourly],
-                                 result_new: Union[ResultsMonthly, ResultsHourly], atol) -> np.ndarray:
+        def calculate_difference(
+                results_old: Union[ResultsMonthly, ResultsHourly], result_new: Union[ResultsMonthly, ResultsHourly],
+                atol) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+
             indices = np.where(
                 (np.abs(result_new.peak_injection - results_old.peak_injection) > atol)
                 |
                 (np.abs(result_new.peak_extraction - results_old.peak_extraction) > atol)
             )[0]
-            return indices
+
+            injection_diff = (result_new.peak_injection - results_old.peak_injection)[indices]
+            extraction_diff = (result_new.peak_extraction - results_old.peak_extraction)[indices]
+
+            return indices, injection_diff, extraction_diff
 
         if isinstance(self.load, _LoadDataBuilding) or \
                 isinstance(self.borehole.fluid_data, TemperatureDependentFluidData):
@@ -2116,14 +2125,23 @@ class Borefield(BaseClass):
 
             # safety
             i = 0
-            _differences = calculate_difference(results_old, results, self._calculation_setup.atol)
+            _differences, injection_old, extraction_old = calculate_difference(results_old, results,
+                                                                               self._calculation_setup.atol)
+            injection_new, extraction_new = injection_old, extraction_old
             while np.any(_differences) and i < self._calculation_setup.max_nb_of_iterations:
                 results_old = results
                 self.load.set_results(results)
                 results = calculate_temperatures(H, hourly=hourly, results_temperature=results, indices=_differences)
                 i += 1
-                _differences = calculate_difference(results_old, results, self._calculation_setup.atol)
-
+                injection_old, extraction_old = injection_new, extraction_new
+                _differences, injection_new, extraction_new = calculate_difference(results_old, results,
+                                                                                   self._calculation_setup.atol)
+                if len(injection_new) == len(injection_old) and np.allclose(injection_new + injection_old, 0) \
+                        and len(extraction_new) == len(extraction_old) and np.allclose(extraction_new + extraction_old,
+                                                                                       0):
+                    break
+            else:
+                results = results_old.__avg__(results)
             self.results = results
             self.load.set_results(results)
             return
