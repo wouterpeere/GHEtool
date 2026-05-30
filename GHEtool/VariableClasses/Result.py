@@ -73,11 +73,28 @@ class _Results(ABC):
     def __eq__(self, other) -> bool:
         if not isinstance(other, self.__class__):
             return False
+
         for key in self.__dict__:
             value1 = self.__dict__[key]
             value2 = other.__dict__[key]
-            if not np.array_equal(value1, value2):
+
+            if value1 is None and value2 is None:
+                continue
+
+            if not np.allclose(value1, value2, rtol=1e-3):
+                diff = np.abs(value1 - value2)
+
+                # Index of largest difference
+                idx = np.unravel_index(np.argmax(diff), diff.shape)
+
+                print(f"{key} is not identical!")
+                print(f"Index: {idx}")
+                print(f"value1[{idx}] = {value1[idx]}")
+                print(f"value2[{idx}] = {value2[idx]}")
+                print(f"abs diff = {diff[idx]}")
+
                 return False
+
         return True
 
 

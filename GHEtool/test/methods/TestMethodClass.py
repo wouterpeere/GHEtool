@@ -148,6 +148,7 @@ class TestMethodClass():
                 continue
             if i.L3_output is not None or i.error_L3 is not None:
                 temp.append(copy.deepcopy(i.borefield))
+                temp[-1].name = i.name
         return temp
 
     @property
@@ -168,6 +169,7 @@ class TestMethodClass():
                 continue
             if i.L4_output is not None or i.error_L4 is not None:
                 temp.append(copy.deepcopy(i.borefield))
+                temp[-1].name = i.name
         return temp
 
     @property
@@ -188,6 +190,7 @@ class TestMethodClass():
                 continue
             temp.append((copy.deepcopy(i.borefield), copy.deepcopy(i.load), i.depth, i.power, i.hourly,
                          i.max_peak_heating, i.max_peak_cooling, i.dhw_preferential))
+            temp[-1][0].name = i.name
         return temp
 
     @property
