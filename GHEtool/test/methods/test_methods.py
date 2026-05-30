@@ -1,8 +1,28 @@
 import pytest
+import pickle as pkl
 import numpy as np
+
 from GHEtool import Borefield
 from GHEtool.test.methods.method_data import list_of_test_objects
 from GHEtool.Methods import *
+from GHEtool import FOLDER
+
+
+def _value_test(name: str, func: str, result) -> None:
+    path = FOLDER.joinpath(f"test/methods/results/{name}_{func}.pkl")
+
+    if not path.exists():  # pragma: no cover
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, "wb") as f:
+            pkl.dump(result, f)
+        return
+
+    with open(path, "rb") as f:
+        expected = pkl.load(f)
+
+    assert expected == result, (
+        f"Stored result for '{name}' does not match the current result."
+    )
 
 
 @pytest.mark.parametrize("model,result",
@@ -27,6 +47,7 @@ def test_L3(model: Borefield, result):
     else:
         assert np.isclose(model.size_L3(100), result[0], atol=1e-2)
         assert model.calculate_quadrant() == result[1]
+        _value_test(model.name, 'L3', model.results)
 
 
 @pytest.mark.parametrize("model,result",
@@ -39,9 +60,10 @@ def test_L4(model: Borefield, result):
     else:
         assert np.isclose(model.size_L4(100), result[0], atol=1e-2)
         assert model.calculate_quadrant() == result[1]
+        _value_test(model.name, 'L4', model.results)
 
 
-def _assert_optimisation(model, load, borefield_load, external_load, result):
+def _assert_optimisation(model, load, borefield_load, external_load, result, func):
     (
         percentage_extraction,
         percentage_injection,
@@ -81,6 +103,7 @@ def _assert_optimisation(model, load, borefield_load, external_load, result):
     assert np.isclose(borefield_load.max_peak_injection, peak_injection_geo)
     assert np.isclose(external_load.max_peak_heating, peak_extraction_ext)
     assert np.isclose(external_load.max_peak_cooling, peak_injection_ext)
+    _value_test(model.name, func, model.results)
 
 
 @pytest.mark.parametrize(
@@ -109,7 +132,7 @@ def test_optimise_power(input, result):
         dhw_preferential=dhw_preferential,
     )
 
-    _assert_optimisation(model, load, borefield_load, external_load, result)
+    _assert_optimisation(model, load, borefield_load, external_load, result, 'opt_pow')
 
 
 @pytest.mark.parametrize(
@@ -137,7 +160,7 @@ def test_optimise_energy(input, result, test_id):
         max_peak_cooling=max_peak_injection,
     )
 
-    _assert_optimisation(model, load, borefield_load, external_load, result)
+    _assert_optimisation(model, load, borefield_load, external_load, result, 'opt_ene')
 
 
 @pytest.mark.parametrize(
@@ -166,4 +189,4 @@ def test_optimise_balance(input, result):
         dhw_preferential=dhw_preferential,
     )
 
-    _assert_optimisation(model, load, borefield_load, external_load, result)
+    _assert_optimisation(model, load, borefield_load, external_load, result, 'opt_bal')
