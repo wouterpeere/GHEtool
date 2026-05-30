@@ -76,7 +76,11 @@ class _Results(ABC):
         for key in self.__dict__:
             value1 = self.__dict__[key]
             value2 = other.__dict__[key]
-            if not np.allclose(value1, value2):
+            if (value1 is None and value2 is not None) or (value2 is None and value1 is not None):
+                return False
+            elif (value1 is None and value2 is None):
+                pass
+            elif not np.allclose(value1, value2):
                 print(f'{key} is not identical!')
                 return False
         return True
