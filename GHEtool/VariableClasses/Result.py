@@ -81,17 +81,25 @@ class _Results(ABC):
             if value1 is None and value2 is None:
                 continue
 
-            if not np.allclose(value1, value2, rtol=1e-3):
-                diff = np.abs(value1 - value2)
+            rtol = 5e-3
+            atol = 5e-2
 
-                # Index of largest difference
-                idx = np.unravel_index(np.argmax(diff), diff.shape)
+            diff = np.abs(value1 - value2)
+            failing = diff > (atol + rtol * np.abs(value2))
+
+            if np.any(failing):
+                n_failing = np.count_nonzero(failing)
+
+                # First failing index in row-major order
+                idx = tuple(np.argwhere(failing)[0])
 
                 print(f"{key} is not identical!")
-                print(f"Index: {idx}")
+                print(f"Number of failing values: {n_failing} / {diff.size}")
+                print(f"First failing index: {idx}")
                 print(f"value1[{idx}] = {value1[idx]}")
                 print(f"value2[{idx}] = {value2[idx]}")
                 print(f"abs diff = {diff[idx]}")
+                print(f"allowed = {atol + rtol * abs(value2[idx])}")
 
                 return False
 

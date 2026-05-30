@@ -37,6 +37,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Remove Python 3.9 compatibility (issue #420).
 - Change default test to 3.13 instead of 3.12 (issue #420).
 - Change pressure drop functions to work with arrays (issue #426).
+- Speed up simulation time caculating temperature profile (issue #440).
 - Make compatible with python 3.14.
 
 ## Fixed
