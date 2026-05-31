@@ -147,7 +147,7 @@ def test_optimise_energy(input, result, test_id):
     model: Borefield = input[0]
     load, depth, power, _, max_peak_extraction, max_peak_injection, _ = input[1:]
 
-    if power != 2 or model.name != "Optimise load profile (energy, inlet, var flow)":
+    if power != 2:
         pytest.skip("Not an energy based optimisation case")
 
     model.H = depth
