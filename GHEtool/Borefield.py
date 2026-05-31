@@ -2041,10 +2041,9 @@ class Borefield(BaseClass):
                     mask = self._temp_results['hourly_load_prev'] != hourly_load
 
                     # calculate the first index where there is difference
+                    first_idx = None
                     if np.any(mask):
                         first_idx = np.argmax(mask)
-                    else:
-                        first_idx = None
                     # update only after this first index, since the first values do not change
                     delta = (hourly_load[first_idx:] - self._temp_results['hourly_load_prev'][first_idx:]) * 1000
                     update = convolve(delta, g_value_differences)
@@ -2133,7 +2132,7 @@ class Borefield(BaseClass):
                 if len(injection_new) == len(injection_old) and np.allclose(injection_new + injection_old, 0) \
                         and len(extraction_new) == len(extraction_old) and np.allclose(extraction_new + extraction_old,
                                                                                        0):
-                    pass  # break
+                    break
             else:
                 pass
                 # results = results_old.__avg__(results)
