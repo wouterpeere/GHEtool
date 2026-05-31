@@ -243,33 +243,33 @@ class ResultsMonthly(_Results):
         """
         return self.peak_extraction_outlet - self.peak_extraction_inlet
 
-    def __avg__(self, other):
-        if not isinstance(other, ResultsMonthly):
-            raise ValueError('Cannot add ResultsMonthly with other class.')
-        temp = ResultsMonthly(
-            (self.Tb + other.Tb) / 2,
-            (self.peak_extraction + other.peak_extraction) / 2,
-            (self.peak_injection + other.peak_injection) / 2,
-            (self.baseload_temperature + other.baseload_temperature) / 2
-        )
-        if self._peak_extraction_inlet.size > 0:
-            temp._peak_extraction_inlet = (self._peak_extraction_inlet + other._peak_extraction_inlet) / 2
-
-        if self._peak_extraction_outlet.size > 0:
-            temp._peak_extraction_outlet = (self._peak_extraction_outlet + other._peak_extraction_outlet) / 2
-
-        if self._peak_injection_inlet.size > 0:
-            temp._peak_injection_inlet = (self._peak_injection_inlet + other._peak_injection_inlet) / 2
-
-        if self._peak_injection_outlet.size > 0:
-            temp._peak_injection_outlet = (self._peak_injection_outlet + other._peak_injection_outlet) / 2
-
-        if self._baseload_temp_inlet.size > 0:
-            temp._baseload_temp_inlet = (self._baseload_temp_inlet + other._baseload_temp_inlet) / 2
-
-        if self._baseload_temp_outlet.size > 0:
-            temp._baseload_temp_outlet = (self._baseload_temp_outlet + other._baseload_temp_outlet) / 2
-        return temp
+    # def __avg__(self, other):
+    #     if not isinstance(other, ResultsMonthly):
+    #         raise ValueError('Cannot add ResultsMonthly with other class.')
+    #     temp = ResultsMonthly(
+    #         (self.Tb + other.Tb) / 2,
+    #         (self.peak_extraction + other.peak_extraction) / 2,
+    #         (self.peak_injection + other.peak_injection) / 2,
+    #         (self.baseload_temperature + other.baseload_temperature) / 2
+    #     )
+    #     if self._peak_extraction_inlet.size > 0:
+    #         temp._peak_extraction_inlet = (self._peak_extraction_inlet + other._peak_extraction_inlet) / 2
+    #
+    #     if self._peak_extraction_outlet.size > 0:
+    #         temp._peak_extraction_outlet = (self._peak_extraction_outlet + other._peak_extraction_outlet) / 2
+    #
+    #     if self._peak_injection_inlet.size > 0:
+    #         temp._peak_injection_inlet = (self._peak_injection_inlet + other._peak_injection_inlet) / 2
+    #
+    #     if self._peak_injection_outlet.size > 0:
+    #         temp._peak_injection_outlet = (self._peak_injection_outlet + other._peak_injection_outlet) / 2
+    #
+    #     if self._baseload_temp_inlet.size > 0:
+    #         temp._baseload_temp_inlet = (self._baseload_temp_inlet + other._baseload_temp_inlet) / 2
+    #
+    #     if self._baseload_temp_outlet.size > 0:
+    #         temp._baseload_temp_outlet = (self._baseload_temp_outlet + other._baseload_temp_outlet) / 2
+    #     return temp
 
 
 class ResultsHourly(_Results):
@@ -381,25 +381,25 @@ class ResultsHourly(_Results):
         # identical
         return self.peak_injection_outlet - self.peak_injection_inlet
 
-    def __avg__(self, other):
-        if not isinstance(other, ResultsHourly):
-            raise ValueError('Cannot add ResultsHourly with other class.')
-        temp = ResultsHourly(
-            (self.Tb + other.Tb) / 2,
-            (self.Tf + other.Tf) / 2,
-        )
-        if self._Tf_extraction is not None:
-            temp._Tf_extraction = (self._Tf_extraction + other._Tf_extraction) / 2
-
-        if self._Tf_inlet is not None:
-            temp._Tf_inlet = (self._Tf_inlet + other._Tf_inlet) / 2
-
-        if self._Tf_outlet is not None:
-            temp._Tf_outlet = (self._Tf_outlet + other._Tf_outlet) / 2
-
-        if self._Tf_extraction_inlet is not None:
-            temp._Tf_extraction_inlet = (self._Tf_extraction_inlet + other._Tf_extraction_inlet) / 2
-
-        if self._Tf_extraction_outlet is not None:
-            temp._Tf_extraction_outlet = (self._Tf_extraction_outlet + other._Tf_extraction_outlet) / 2
-        return temp
+    # def __avg__(self, other):
+    #     if not isinstance(other, ResultsHourly):
+    #         raise ValueError('Cannot add ResultsHourly with other class.')
+    #     temp = ResultsHourly(
+    #         (self.Tb + other.Tb) / 2,
+    #         (self.Tf + other.Tf) / 2,
+    #     )
+    #     if self._Tf_extraction is not None:
+    #         temp._Tf_extraction = (self._Tf_extraction + other._Tf_extraction) / 2
+    #
+    #     if self._Tf_inlet is not None:
+    #         temp._Tf_inlet = (self._Tf_inlet + other._Tf_inlet) / 2
+    #
+    #     if self._Tf_outlet is not None:
+    #         temp._Tf_outlet = (self._Tf_outlet + other._Tf_outlet) / 2
+    #
+    #     if self._Tf_extraction_inlet is not None:
+    #         temp._Tf_extraction_inlet = (self._Tf_extraction_inlet + other._Tf_extraction_inlet) / 2
+    #
+    #     if self._Tf_extraction_outlet is not None:
+    #         temp._Tf_extraction_outlet = (self._Tf_extraction_outlet + other._Tf_extraction_outlet) / 2
+    #     return temp

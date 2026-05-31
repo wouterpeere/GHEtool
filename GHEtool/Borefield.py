@@ -1896,12 +1896,14 @@ class Borefield(BaseClass):
                 index_mask[:8760] = True  # first year
                 index_mask[-8760:] = True  # last year
                 index_mask = np.where(index_mask)[0]
-            else:
-                index_mask = np.zeros(self.load.simulation_period * 12, dtype=bool)
 
-                index_mask[:12] = True  # first year
-                index_mask[-12:] = True  # last year
-                index_mask = np.where(index_mask)[0]
+            # TODO implement for monthly as well
+            # else:
+            #     index_mask = np.zeros(self.load.simulation_period * 12, dtype=bool)
+            #
+            #     index_mask[:12] = True  # first year
+            #     index_mask[-12:] = True  # last year
+            #     index_mask = np.where(index_mask)[0]
 
         def calculate_temperatures(H, hourly=hourly, results_temperature=ResultsMonthly(), indices=None):
             # set Rb* value
