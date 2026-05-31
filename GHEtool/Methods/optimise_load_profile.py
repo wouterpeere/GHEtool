@@ -111,12 +111,12 @@ def optimise_load_profile_power(
             if isinstance(borefield.load, HourlyBuildingLoad) else building_load.hourly_dhw_load_simulation_period))
 
         # calculate temperature profile, just for the results
-        borefield._calculate_temperature_profile(length=borefield.H, hourly=use_hourly_resolution,
-                                                 g_values=borefield._temp_results.get('g_values'),  # always the same
-                                                 g_value_differences=borefield._temp_results.get(
-                                                     'g_value_differences'),
-                                                 first_last_year=isinstance(borefield.load,
-                                                                            HourlyBuildingLoad))  # always the same
+        borefield._calculate_temperature_profile(length=borefield.H, hourly=use_hourly_resolution)  # ,
+        # g_values=borefield._temp_results.get('g_values'),  # always the same
+        # g_value_differences=borefield._temp_results.get(
+        #     'g_value_differences'),
+        # first_last_year=isinstance(borefield.load,
+        #                            HourlyBuildingLoad))  # always the same
 
         if borefield._calculation_setup.size_based_on == 'average':
             min_temperature, max_temperature = np.min(borefield.results.min_temperature), np.max(
@@ -455,10 +455,10 @@ def optimise_load_profile_energy(
 
     for i in range(12 * borefield.load.simulation_period):
         # set iteration criteria
-        borefield._calculate_temperature_profile(length=borefield.H,
-                                                 g_values=borefield._temp_results.get('g_values'),  # always the same
-                                                 g_value_differences=borefield._temp_results.get(
-                                                     'g_value_differences'))  # always the same
+        borefield._calculate_temperature_profile(length=borefield.H)  # ,
+        # g_values=borefield._temp_results.get('g_values'),  # always the same
+        # g_value_differences=borefield._temp_results.get(
+        #     'g_value_differences'))  # always the same
         # optimise month i
         init_load = borefield.load.monthly_average_injection_power_simulation_period[i]
         cool_ok, heat_ok = False, False
@@ -651,12 +651,12 @@ def optimise_load_profile_balance(
             if isinstance(borefield.load, HourlyBuildingLoad) else building_load.hourly_dhw_load_simulation_period))
 
         # calculate temperature profile, just for the results
-        borefield._calculate_temperature_profile(length=borefield.H, hourly=use_hourly_resolution,
-                                                 g_values=borefield._temp_results.get('g_values'),  # always the same
-                                                 g_value_differences=borefield._temp_results.get(
-                                                     'g_value_differences'),
-                                                 first_last_year=isinstance(borefield.load,
-                                                                            HourlyBuildingLoad))  # always the same
+        borefield._calculate_temperature_profile(length=borefield.H, hourly=use_hourly_resolution)
+        # g_values=borefield._temp_results.get('g_values'),  # always the same
+        # g_value_differences=borefield._temp_results.get(
+        #     'g_value_differences'),
+        # first_last_year=isinstance(borefield.load,
+        #                            HourlyBuildingLoad))  # always the same
 
         if borefield._calculation_setup.size_based_on == 'average':
             min_temperature, max_temperature = np.min(borefield.results.min_temperature), np.max(

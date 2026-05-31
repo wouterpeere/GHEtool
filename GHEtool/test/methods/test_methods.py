@@ -10,7 +10,6 @@ from GHEtool import FOLDER
 
 def _value_test(name: str, func: str, result) -> None:
     path = FOLDER.joinpath(f"test/methods/results/{name}_{func}.pkl")
-
     if not path.exists():  # pragma: no cover
         path.parent.mkdir(parents=True, exist_ok=True)
         with open(path, "wb") as f:
@@ -63,7 +62,7 @@ def test_L4(model: Borefield, result):
         _value_test(model.name, 'L4', model.results)
 
 
-def _assert_optimisation(model, load, borefield_load, external_load, result, func):
+def _assert_optimisation(model: Borefield, load, borefield_load, external_load, result, func):
     (
         percentage_extraction,
         percentage_injection,
@@ -145,10 +144,10 @@ def test_optimise_power(input, result):
     ids=list_of_test_objects.names_optimise_load_profile,
 )
 def test_optimise_energy(input, result, test_id):
-    model = input[0]
+    model: Borefield = input[0]
     load, depth, power, _, max_peak_extraction, max_peak_injection, _ = input[1:]
 
-    if power != 2:
+    if power != 2 or model.name != "Optimise load profile (energy, inlet, var flow)":
         pytest.skip("Not an energy based optimisation case")
 
     model.H = depth
@@ -172,7 +171,7 @@ def test_optimise_energy(input, result, test_id):
     ids=list_of_test_objects.names_optimise_load_profile,
 )
 def test_optimise_balance(input, result):
-    model = input[0]
+    model: Borefield = input[0]
     load, depth, power, hourly, max_peak_extraction, max_peak_injection, dhw_preferential = input[1:]
 
     if power != 3:

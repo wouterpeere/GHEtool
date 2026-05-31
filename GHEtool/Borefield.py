@@ -2053,11 +2053,6 @@ class Borefield(BaseClass):
                     self._temp_results['hourly_load_prev'] = hourly_load.copy()
                     self._temp_results['temperature_result'] = None
 
-                    # self._temp_results['result_convolution'] = convolve(hourly_load * 1000, g_value_differences)[
-                    #     : len(hourly_load)]
-                    # self._temp_results['hourly_load_prev'] = hourly_load
-                    # self._temp_results['temperature_result'] = None
-
                 # calculation the borehole wall temperature for every month i
                 Tb = self._temp_results['result_convolution'] / (
                         2 * pi * self.ground_data.k_s(self.calculate_depth(H_var, self.D), self.D)) / (
@@ -2077,9 +2072,7 @@ class Borefield(BaseClass):
                     self._temp_results['temperature_result'] = Tb + hourly_load * 1000 * (
                             get_rb(results_temperature.peak_injection, Tmax,
                                    hourly_load) / self.number_of_boreholes / H_var)
-                # self._temp_results['temperature_result'] = Tb + hourly_load * 1000 * (
-                #         get_rb(results_temperature.peak_injection, Tmax,
-                #                hourly_load) / self.number_of_boreholes / H_var)
+
                 # reset other variables
                 results = ResultsHourly(borehole_wall_temp=Tb,
                                         temperature_fluid=self._temp_results['temperature_result'].copy())
@@ -2100,11 +2093,8 @@ class Borefield(BaseClass):
                 results_old: Union[ResultsMonthly, ResultsHourly], result_new: Union[ResultsMonthly, ResultsHourly],
                 atol) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
 
-            indices = np.where(
-                (np.abs(result_new.peak_injection - results_old.peak_injection) > atol)
-                |
-                (np.abs(result_new.peak_extraction - results_old.peak_extraction) > atol)
-            )[0]
+            indices = np.where((np.abs(result_new.peak_injection - results_old.peak_injection) > atol)
+                               | (np.abs(result_new.peak_extraction - results_old.peak_extraction) > atol))[0]
 
             injection_diff = (result_new.peak_injection - results_old.peak_injection)[indices]
             extraction_diff = (result_new.peak_extraction - results_old.peak_extraction)[indices]
