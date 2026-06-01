@@ -1542,10 +1542,10 @@ class Borefield(BaseClass):
                 self.H = self.H * .5 + H_prev * 0.5
             if hourly:
                 self._calculate_temperature_profile(self.H, hourly=True, sizing=True, Tmin=Tmin, Tmax=Tmax,
-                                                    first_last_year=False)
+                                                    first_last_year=True)
             else:
                 self._calculate_temperature_profile(self.H, hourly=False, sizing=True, Tmin=Tmin, Tmax=Tmax,
-                                                    first_last_year=False)
+                                                    first_last_year=True)
 
             if np.isclose(H_prev2, self.H):
                 self.H = max(H_prev, self.H)
@@ -1655,7 +1655,7 @@ class Borefield(BaseClass):
         """
         return np.polyval(self.cost_investment, self.H * self.number_of_boreholes)
 
-    def calculate_temperatures(self, length: float = None, hourly: bool = False) -> None:
+    def calculate_temperatures(self, length: float = None, hourly: bool = False, **kwargs) -> None:
         """
         Calculate all the temperatures without plotting the figure. When length is given, it calculates it for a given
         borehole length.
@@ -1671,9 +1671,10 @@ class Borefield(BaseClass):
         -------
         None
         """
-        self._calculate_temperature_profile(H=length, hourly=hourly)
+        self._calculate_temperature_profile(H=length, hourly=hourly, **kwargs)
 
-    def print_temperature_profile(self, legend: bool = True, plot_hourly: bool = False, type: str = 'average') -> None:
+    def print_temperature_profile(self, legend: bool = True, plot_hourly: bool = False, type: str = 'average',
+                                  **kwargs) -> None:
         """
         This function plots the temperature profile for the calculated borehole length.
         It uses the available temperature profile data.
@@ -1693,12 +1694,12 @@ class Borefield(BaseClass):
             Figure object
         """
         # calculate temperature profile
-        self._calculate_temperature_profile(hourly=plot_hourly)
+        self._calculate_temperature_profile(hourly=plot_hourly, **kwargs)
 
         return self._plot_temperature_profile(legend=legend, plot_hourly=plot_hourly, type=type)
 
     def print_temperature_profile_fixed_length(self, length: float, legend: bool = True, plot_hourly: bool = False,
-                                               type: str = 'average'):
+                                               type: str = 'average', **kwargs):
         """
         This function plots the temperature profile for a fixed borehole length.
         It uses the already calculated temperature profile data, if available.
@@ -1720,7 +1721,7 @@ class Borefield(BaseClass):
             Figure object
         """
         # calculate temperature profile
-        self._calculate_temperature_profile(H=length, hourly=plot_hourly)
+        self._calculate_temperature_profile(H=length, hourly=plot_hourly, **kwargs)
 
         return self._plot_temperature_profile(legend=legend, plot_hourly=plot_hourly, type=type)
 
@@ -1889,13 +1890,14 @@ class Borefield(BaseClass):
             self.load.eer, SEER))
 
         index_mask = None
-        if kwargs.get('first_last_year', False) and not self.load._multiyear and not variable_efficiency:
-            if self.load._hourly:
-                index_mask = np.zeros(self.load.simulation_period * 8760, dtype=bool)
+        if (kwargs.get('first_last_year', False) or kwargs.get('index_mask') is not None) and not self.load._multiyear:
+            if self.load._hourly and kwargs.get('index_mask') is None:
+                n_hours = self.load.simulation_period * 8760
 
-                index_mask[:8760] = True  # first year
-                index_mask[-8760:] = True  # last year
-                index_mask = np.where(index_mask)[0]
+                index_mask = np.concatenate([np.arange(8760), np.arange(n_hours - 8760, n_hours)])
+
+            elif kwargs.get('index_mask') is not None:
+                index_mask = kwargs.get('index_mask')
 
             # TODO implement for monthly as well
             # else:
@@ -2031,10 +2033,18 @@ class Borefield(BaseClass):
 
                 hourly_load = self.load.hourly_net_resulting_injection_power
 
+                max_idx = (len(hourly_load) - 1) if indices is None else np.max(indices)
+
                 if self._temp_results['hourly_load_prev'] is None:
                     # convolution to get the hourly results
-                    self._temp_results['result_convolution'] = convolve(hourly_load * 1000, g_value_differences)[
-                        : len(hourly_load)]
+                    # self._temp_results['result_convolution'] = convolve(hourly_load * 1000, g_value_differences)[
+                    #     : len(hourly_load)]
+                    result_convolution = np.zeros_like(hourly_load, dtype=float)
+
+                    result_convolution[:max_idx + 1] = convolve(hourly_load[:max_idx + 1] * 1000, g_value_differences)[
+                        :max_idx + 1]
+
+                    self._temp_results['result_convolution'] = result_convolution
                     self._temp_results['hourly_load_prev'] = hourly_load.copy()
                     self._temp_results['temperature_result'] = None
                 elif np.allclose(self._temp_results['hourly_load_prev'], hourly_load):
@@ -2046,11 +2056,14 @@ class Borefield(BaseClass):
                     first_idx = None
                     if np.any(mask):
                         first_idx = np.argmax(mask)
+
                     # update only after this first index, since the first values do not change
-                    delta = (hourly_load[first_idx:] - self._temp_results['hourly_load_prev'][first_idx:]) * 1000
+                    delta = (hourly_load[first_idx:max_idx + 1] - self._temp_results['hourly_load_prev'][
+                        first_idx:max_idx + 1]) * 1000
+
                     update = convolve(delta, g_value_differences)
-                    self._temp_results['result_convolution'][first_idx:] += update[
-                        :len(self._temp_results['result_convolution']) - first_idx]
+
+                    self._temp_results['result_convolution'][first_idx:max_idx + 1] += update[:max_idx - first_idx + 1]
                     self._temp_results['hourly_load_prev'] = hourly_load.copy()
                     self._temp_results['temperature_result'] = None
 
@@ -2062,12 +2075,17 @@ class Borefield(BaseClass):
                 # now the Tf will be calculated based on
                 # Tf = Tb + Q * R_b
                 idx = slice(None) if (indices is None) else indices
-                if self._temp_results['temperature_result'] is not None and indices is not None \
-                        and (not self.borehole.use_constant_Rb and
-                             not isinstance(self.borehole.flow_data, VariableHourlyFlowRate)) \
-                        and not variable_efficiency:
+                if indices is not None and (not self.borehole.use_constant_Rb and
+                                            not isinstance(self.borehole.flow_data, VariableHourlyFlowRate)):
+                    if self._temp_results['temperature_result'] is None:
+                        self._temp_results['temperature_result'] = np.zeros_like(hourly_load, dtype=float)
+
+                    if variable_efficiency:
+                        # all indices are important up to the last one
+                        idx = np.arange(0, np.max(idx))
                     self._temp_results['temperature_result'][idx] = Tb[idx] + hourly_load[idx] * 1000 * (
-                            get_rb(results_temperature.peak_injection[idx], Tmax,
+                            get_rb([] if len(results_temperature.peak_injection) == 0 else
+                                   results_temperature.peak_injection[idx], Tmax,
                                    hourly_load[idx]) / self.number_of_boreholes / H_var)
                 else:
                     self._temp_results['temperature_result'] = Tb + hourly_load * 1000 * (
