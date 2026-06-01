@@ -2057,15 +2057,18 @@ class Borefield(BaseClass):
                     if np.any(mask):
                         first_idx = np.argmax(mask)
 
-                    # update only after this first index, since the first values do not change
-                    delta = (hourly_load[first_idx:max_idx + 1] - self._temp_results['hourly_load_prev'][
-                        first_idx:max_idx + 1]) * 1000
+                    if first_idx < max_idx:
+                        # update only after this first index, since the first values do not change
+                        delta = (hourly_load[first_idx:max_idx + 1] - self._temp_results['hourly_load_prev'][
+                            first_idx:max_idx + 1]) * 1000
+                        if len(delta) == 0:
+                            pass
+                        update = convolve(delta, g_value_differences)
 
-                    update = convolve(delta, g_value_differences)
-
-                    self._temp_results['result_convolution'][first_idx:max_idx + 1] += update[:max_idx - first_idx + 1]
-                    self._temp_results['hourly_load_prev'] = hourly_load.copy()
-                    self._temp_results['temperature_result'] = None
+                        self._temp_results['result_convolution'][first_idx:max_idx + 1] += update[
+                            :max_idx - first_idx + 1]
+                        self._temp_results['hourly_load_prev'] = hourly_load.copy()
+                        self._temp_results['temperature_result'] = None
 
                 # calculation the borehole wall temperature for every month i
                 Tb = self._temp_results['result_convolution'] / (
