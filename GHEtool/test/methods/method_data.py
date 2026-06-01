@@ -259,7 +259,7 @@ list_of_test_objects.add(SizingObject(borefield, L2_output=113.955, L3_output=11
                                       name='BS2023 Office'))
 borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
 list_of_test_objects.add(
-    SizingObject(borefield, L2_output=169.373, L3_output=172.4350131073142, L4_output=160.90935, quadrant=2,
+    SizingObject(borefield, L2_output=169.373, L3_output=172.4350131073142, L4_output=160.68693020401176, quadrant=2,
                  name='BS2023 Office, (MPG, variable)'))
 borefield.fluid_data = TemperatureDependentFluidData('MPG', 25).create_constant(3)
 list_of_test_objects.add(
@@ -873,7 +873,7 @@ hourly_load_building.hourly_cooling_load = hourly_load_building.hourly_cooling_l
 hourly_load_building.hourly_heating_load = hourly_load_building.hourly_heating_load * 5 / 4
 borefield.load = hourly_load_building
 list_of_test_objects.add(
-    SizingObject(borefield, L2_output=115.98849525499037, L3_output=115.98849525499037, L4_output=109.61700586805655,
+    SizingObject(borefield, L2_output=115.98849525499037, L3_output=115.98849525499037, L4_output=109.47590077900136,
                  quadrant=2,
                  name='BS2023 Office (1)'))
 
