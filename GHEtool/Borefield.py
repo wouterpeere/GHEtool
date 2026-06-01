@@ -2082,7 +2082,8 @@ class Borefield(BaseClass):
 
                     if variable_efficiency:
                         # all indices are important up to the last one
-                        idx = np.arange(0, np.max(idx))
+                        # requires plus 1, since arange excludes the last value
+                        idx = np.arange(0, np.max(idx) + 1)
                     self._temp_results['temperature_result'][idx] = Tb[idx] + hourly_load[idx] * 1000 * (
                             get_rb([] if len(results_temperature.peak_injection) == 0 else
                                    results_temperature.peak_injection[idx], Tmax,
