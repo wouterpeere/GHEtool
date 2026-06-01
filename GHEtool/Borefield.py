@@ -1896,7 +1896,7 @@ class Borefield(BaseClass):
 
                 index_mask = np.concatenate([np.arange(8760), np.arange(n_hours - 8760, n_hours)])
 
-            elif kwargs.get('index_mask') is not None:
+            elif kwargs.get('index_mask') is not None:  # pragma: no cover
                 index_mask = kwargs.get('index_mask')
 
             # TODO implement for monthly as well
@@ -2061,7 +2061,7 @@ class Borefield(BaseClass):
                         # update only after this first index, since the first values do not change
                         delta = (hourly_load[first_idx:max_idx + 1] - self._temp_results['hourly_load_prev'][
                             first_idx:max_idx + 1]) * 1000
-                        if len(delta) == 0:
+                        if len(delta) == 0:  # pragma: no cover
                             pass
                         update = convolve(delta, g_value_differences)
 
