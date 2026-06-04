@@ -1967,7 +1967,8 @@ class Borefield(BaseClass):
 
                 # calculation the borehole wall temperature for every month i
                 k_s = self.ground_data.k_s(self.calculate_depth(H_var, self.D), self.D)
-                Tb = result_convolution / (2 * pi * k_s) / (H_var * self.number_of_boreholes) + self._Tg(H_var)
+                Tb = (result_convolution + kwargs.get('offset_convolution', 0)) / (2 * pi * k_s) / (
+                            H_var * self.number_of_boreholes) + self._Tg(H_var)
 
                 # now the Tf will be calculated based on
                 # Tf = Tb + Q * R_b
