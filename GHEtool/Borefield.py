@@ -1890,7 +1890,8 @@ class Borefield(BaseClass):
             self.load.eer, SEER))
 
         index_mask = None
-        if (kwargs.get('first_last_year', False) or kwargs.get('index_mask') is not None) and not self.load._multiyear:
+        if ((kwargs.get('first_last_year', False) and not self.load._multiyear) or kwargs.get(
+                'index_mask') is not None):
             if self.load._hourly and kwargs.get('index_mask') is None:
                 n_hours = self.load.simulation_period * 8760
 
@@ -2032,13 +2033,10 @@ class Borefield(BaseClass):
                     raise ValueError("There is no hourly resolution available!")
 
                 hourly_load = self.load.hourly_net_resulting_injection_power
-
-                max_idx = (len(hourly_load) - 1) if indices is None else np.max(indices)
+                max_idx = (len(hourly_load) - 1) if (indices is None or len(indices) == 0) else np.max(indices)
 
                 if self._temp_results['hourly_load_prev'] is None:
                     # convolution to get the hourly results
-                    # self._temp_results['result_convolution'] = convolve(hourly_load * 1000, g_value_differences)[
-                    #     : len(hourly_load)]
                     result_convolution = np.zeros_like(hourly_load, dtype=float)
 
                     result_convolution[:max_idx + 1] = convolve(hourly_load[:max_idx + 1] * 1000, g_value_differences)[
@@ -2071,19 +2069,19 @@ class Borefield(BaseClass):
                         self._temp_results['temperature_result'] = None
 
                 # calculation the borehole wall temperature for every month i
-                Tb = self._temp_results['result_convolution'] / (
+                Tb = (self._temp_results['result_convolution'] + kwargs.get('offset_convolution', 0)) / (
                         2 * pi * self.ground_data.k_s(self.calculate_depth(H_var, self.D), self.D)) / (
                              H_var * self.number_of_boreholes) + self._Tg(H_var)
 
                 # now the Tf will be calculated based on
                 # Tf = Tb + Q * R_b
-                idx = slice(None) if (indices is None) else indices
+                idx = slice(None) if (indices is None or len(indices) == 0) else indices
                 if indices is not None and (not self.borehole.use_constant_Rb and
                                             not isinstance(self.borehole.flow_data, VariableHourlyFlowRate)):
                     if self._temp_results['temperature_result'] is None:
                         self._temp_results['temperature_result'] = np.zeros_like(hourly_load, dtype=float)
 
-                    if variable_efficiency:
+                    if variable_efficiency and not (indices is None or len(indices) == 0):
                         # all indices are important up to the last one
                         # requires plus 1, since arange excludes the last value
                         idx = np.arange(0, np.max(idx) + 1)
