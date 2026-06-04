@@ -26,6 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Convective resistance calculation with array inputs (issue #425).
 - Option to change pipe configuration in MultipleUTube (either diagonal (default) or adjacent) (issue #425).
 - Test for temperatures (issue #442).
+- Add convolution temperature offset in calculate temperature function (issue #444).
 
 ## Changed
 
