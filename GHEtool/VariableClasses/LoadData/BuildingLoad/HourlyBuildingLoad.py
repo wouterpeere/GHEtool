@@ -54,12 +54,10 @@ class HourlyBuildingLoad(_SingleYear, _HourlyDataBuilding):
         # initiate variables
         self._hourly_heating_load: np.ndarray = np.zeros(8760)
         self._hourly_cooling_load: np.ndarray = np.zeros(8760)
-        self._hourly_dhw_load: np.ndarray = np.zeros(8760)
 
         # set variables
         self.hourly_heating_load: np.ndarray = np.zeros(8760) if heating_load is None else np.array(heating_load)
         self.hourly_cooling_load: np.ndarray = np.zeros(8760) if cooling_load is None else np.array(cooling_load)
-        self.hourly_dhw_load: np.ndarray = np.zeros(8760)
 
     @property
     def hourly_heating_load(self) -> np.ndarray:
