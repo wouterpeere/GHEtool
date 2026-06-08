@@ -1,12 +1,42 @@
+import joblib
 import math
+import torch
+import torch.nn as nn
 
-import numpy as np
 import pygfunction as gt
 
 from GHEtool.utils.calculate_friction_factor import *
 from GHEtool.VariableClasses.PipeData.SingleUTube import SingleUTube
 from GHEtool.VariableClasses.FluidData import _FluidData
 from GHEtool.VariableClasses.FlowData import _FlowData
+
+
+class EllipseANN(nn.Module):
+    """
+    Small MLP for 5-input, 2-output regression.
+
+    Inputs:
+        r_b, spacing, R_fp, k_b, k_s
+
+    Outputs:
+        R_b, R_a
+    """
+
+    def __init__(self, n_inputs: int = 5, n_outputs: int = 2):
+        super().__init__()
+
+        self.net = nn.Sequential(
+            nn.Linear(n_inputs, 64),
+            nn.Tanh(),
+            nn.Linear(64, 64),
+            nn.Tanh(),
+            nn.Linear(64, 32),
+            nn.Tanh(),
+            nn.Linear(32, n_outputs),
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.net(x)
 
 
 class MuoviEllipse(SingleUTube):
@@ -38,37 +68,72 @@ class MuoviEllipse(SingleUTube):
         self.b = b
         self.wall_thickness = wall_thickness
 
-        self.area_outer = np.pi * a * b
-        h = (a - b) ** 2 / ((a + b) ** 2)
-        perimeter_outer = np.pi * (a + b) * (1 + (3 * h) / (10 + np.sqrt(4 - 3 * h)))
+        self._load_model(a, b)
+
+        self.area_outer = np.pi * a * b / 4
+        h = (a / 2 - b / 2) ** 2 / ((a / 2 + b / 2) ** 2)
+        perimeter_outer = np.pi * (a / 2 + b / 2) * (1 + (3 * h) / (10 + np.sqrt(4 - 3 * h)))
         self.hydraulic_diameter_outer = 4 * self.area_outer / perimeter_outer
 
-        self.area_inner = np.pi * (a - wall_thickness * 2) * (b - wall_thickness * 2)
-        h = ((a - wall_thickness * 2) - (b - wall_thickness * 2)) ** 2 / (
-                ((a - wall_thickness * 2) + (b - wall_thickness * 2)) ** 2)
-        perimeter_inner = np.pi * ((a - wall_thickness * 2) + (b - wall_thickness * 2)) * (
+        self.area_inner = np.pi * (a - wall_thickness * 2) * (b - wall_thickness * 2) / 4
+        h = ((a - wall_thickness * 2) / 2 - (b - wall_thickness * 2) / 2) ** 2 / (
+                ((a - wall_thickness * 2) / 2 + (b - wall_thickness * 2) / 2) ** 2)
+        perimeter_inner = np.pi * ((a - wall_thickness * 2) / 2 + (b - wall_thickness * 2) / 2) * (
                 1 + (3 * h) / (10 + np.sqrt(4 - 3 * h)))
         self.hydraulic_diameter_inner = 4 * self.area_inner / perimeter_inner
 
         super().__init__(k_g, self.hydraulic_diameter_inner / 2, self.hydraulic_diameter_outer / 2, 0.4, D_s)
 
-    def Re(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float, **kwargs) -> float:
+    def _load_model(self, a, b) -> None:
         """
-        Reynolds number.
-
-        Parameters
-        ----------
-        fluid_data: FluidData
-            Fluid data
-        flow_rate_data : FlowData
-            Flow rate data
-        borehole_length : float
-            Borehole length [m]
+        This function loads the trained ANN models for the MuoviELLIPSE.
 
         Returns
         -------
-        Reynolds number : float
+        None
+
+        Raises
+        ------
+        ValueError
+            When the a and b do not match the product specifics
         """
+        from GHEtool import FOLDER
+
+        if np.isclose(a, 37e-3) and np.isclose(b, 26e-3):
+            self._model_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE32/borehole_ann.pt")
+            self._x_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE32/X_scaler.joblib")
+            self._y_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE32/y_scaler.joblib")
+
+        elif np.isclose(a, 46e-3) and np.isclose(b, 33e-3):
+            self._model_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE40/borehole_ann.pt")
+            self._x_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE40/X_scaler.joblib")
+            self._y_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE40/y_scaler.joblib")
+
+        elif np.isclose(a, 51e-3) and np.isclose(b, 37e-3):
+            self._model_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE45/borehole_ann.pt")
+            self._x_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE45/X_scaler.joblib")
+            self._y_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE45/y_scaler.joblib")
+
+        elif np.isclose(a, 58e-3) and np.isclose(b, 41e-3):
+            self._model_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE50/borehole_ann.pt")
+            self._x_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE50/X_scaler.joblib")
+            self._y_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE50/y_scaler.joblib")
+
+        elif np.isclose(a, 64e-3) and np.isclose(b, 45e-3):
+            self._model_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE55/borehole_ann.pt")
+            self._x_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE55/X_scaler.joblib")
+            self._y_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE55/y_scaler.joblib")
+
+        elif np.isclose(a, 73e-3) and np.isclose(b, 52e-3):
+            self._model_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE63/borehole_ann.pt")
+            self._x_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE63/X_scaler.joblib")
+            self._y_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE63/y_scaler.joblib")
+
+        else:
+            raise ValueError(
+                f"No ANN model available for ellipse dimensions a={a * 1000:.1f} mm, "
+                f"b={b * 1000:.1f} mm."
+            )
 
     def pipe_model(self, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
         """
@@ -177,10 +242,106 @@ class MuoviEllipse(SingleUTube):
         None
         """
 
-        # Pipe thermal resistance [m.K/W]
-        self.R_p = gt.pipes.conduction_thermal_resistance_circular_pipe(self.r_in, self.r_out, self.k_p)
+        raise NotImplementedError('The MuoviELLIPSE can only be simulated with the explicit methods.')
 
-        self.R_f = self.calculate_convective_resistance(flow_data=flow_rate_data, fluid_data=fluid_data, **kwargs)
+    def predict_Rb_Ra_series(self, r_b, spacing, R_fp, k_b, k_s):
+        """
+        Vectorized prediction of R_b and R_a.
+
+        Parameters
+        ----------
+        Inputs can be float or array-like:
+            r_b
+            spacing
+            R_fp
+            k_b
+            k_s
+
+        Returns
+        -------
+        R_b, R_a : np.ndarray
+            Same shape as broadcasted inputs.
+        """
+        model = EllipseANN()
+        model.load_state_dict(torch.load(self._model_path, map_location="cpu"))
+        model.eval()
+
+        X_scaler = joblib.load(self._x_scaler_path)
+        y_scaler = joblib.load(self._y_scaler_path)
+
+        # Convert to arrays
+        r_b = np.asarray(r_b)
+        spacing = np.asarray(spacing)
+        R_fp = np.asarray(R_fp)
+        k_b = np.asarray(k_b)
+        k_s = np.asarray(k_s)
+
+        # Broadcast to common shape
+        r_b, spacing, R_fp, k_b, k_s = np.broadcast_arrays(
+            r_b, spacing, R_fp, k_b, k_s
+        )
+
+        shape = r_b.shape
+
+        # Build ANN input matrix
+        X = np.column_stack(
+            [
+                r_b.ravel(),
+                spacing.ravel(),
+                R_fp.ravel(),
+                k_b.ravel(),
+                k_s.ravel(),
+            ]
+        )
+
+        # Scale inputs
+        X_s = X_scaler.transform(X)
+
+        # Predict
+        with torch.no_grad():
+            y_s = model(torch.tensor(X_s, dtype=torch.float32)).numpy()
+
+        y = y_scaler.inverse_transform(y_s)
+
+        # Restore original shape
+        R_b = y[:, 0].reshape(shape)
+        R_a = y[:, 1].reshape(shape)
+
+        return R_b, R_a
+
+    def explicit_model_borehole_resistance(self, fluid_data: _FluidData, flow_rate_data: _FlowData, k_s: float,
+                                           borehole: gt.boreholes.Borehole, order: int = 1, R_p: float = None,
+                                           **kwargs) -> float:
+        """
+        This function returns the effective borehole thermal resistance for the Separatus probe based on an explicit
+        model (always second order).
+        A Separatus heat exchanger can be modelled by using the model of a single U tube, with an extra contact resistance
+        of 0.03 W/(mK) to account for the intermediate wall inside the probe. This value of 0.03W/(mK) was obtained by
+        the company based on real-life measurements.
+
+        Parameters
+        ----------
+        k_s : float
+            Ground thermal conductivity
+        borehole : Borehole
+            Borehole object
+
+        Returns
+        -------
+        BasePipe
+        """
+        if R_p is None:
+            R_cond = self.calculate_conductive_resistance(**kwargs)
+            R_conv = self.calculate_convective_resistance(flow_rate_data, fluid_data, **kwargs)
+
+            r_fp = R_cond + R_conv
+
+            R_b, R_a = self.predict_Rb_Ra_series(borehole.r_b, self.D_s, r_fp, self.k_g, k_s)
+
+            r_v = borehole.H / (flow_rate_data.mfr_borehole(**kwargs, fluid_data=fluid_data) * fluid_data.cp(
+                **kwargs))
+            n = r_v / (R_b * R_a) ** 0.5
+            return R_b * n * np.cosh(n) / np.sinh(n)
 
     def pressure_drop(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float,
                       **kwargs) -> float:
