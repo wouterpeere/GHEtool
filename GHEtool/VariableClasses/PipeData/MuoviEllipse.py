@@ -107,10 +107,10 @@ class MuoviEllipse(SingleUTube):
         ----------
         .. [#Niklas] Niklas Hidman, Daniel Almgren, Kim Johansson, Eskil Nilsson, How internal fins enhance the thermohydraulic performance of geothermal pipes: A direct numerical simulation study, International Journal of Heat and Mass Transfer, Volume 256, Part 3, 2026, 128114, ISSN 0017-9310, https://doi.org/10.1016/j.ijheatmasstransfer.2025.128114.
         """
-        v_dot = np.atleast_1d(np.asarray(flow_data.vfr_borehole(**kwargs, fluid_data=fluid_data), dtype=np.float64))
+        m_dot = np.atleast_1d(np.asarray(flow_data.mfr_borehole(**kwargs, fluid_data=fluid_data), dtype=np.float64))
 
         # Reynolds number
-        re = m_dot / (fluid_data.mu(**kwargs)
+        re = self.hydraulic_diameter_inner * m_dot / (fluid_data.mu(**kwargs) * self.area_inner)
 
         # Allocate Nusselt array
         nu = np.empty_like(re)
@@ -119,38 +119,39 @@ class MuoviEllipse(SingleUTube):
 
         pr = np.atleast_1d(np.asarray(fluid_data.Pr(**kwargs)))
 
-        # Laminar turbo correlation (Re ≤ 1700)
-        laminar = re <= 1700.0
+        # Laminar turbo correlation (Re ≤ 1850)
+        laminar = re <= 1850.0
         if np.any(laminar):
             pr_formula = pr[laminar] if len(pr) > 1 else pr[0]
-            nu[laminar] = np.sqrt(nu_sl ** 2 + ((5.5e-7) * re[laminar] ** 1.77 * pr_formula ** 0.5) ** 2)
+            nu[laminar] = np.sqrt(nu_sl ** 2 + ((-0.321) * re[laminar] ** 0.2 * pr_formula ** 0.21) ** 2)
 
         # Transitional turbo correlation (1700 < Re ≤ 4000)
-        transitional = (re > 1700.0) & (re <= 4000.0)
+        transitional = (re > 1850.0) & (re <= 4000.0)
         if np.any(transitional):
             pr_formula = pr[transitional] if len(pr) > 1 else pr[0]
             nu[transitional] = np.sqrt(
-                nu_sl ** 2 + (0.86 * (re[transitional] - 1699.0) ** 0.39 * pr_formula ** 0.32) ** 2)
+                nu_sl ** 2 + (1.96 * (re[transitional] - 1849.9) ** 0.295 * pr_formula ** 0.29) ** 2)
 
         # Turbulent region (Re > 4000)
         turbulent = re > 4000.0
         if np.any(turbulent):
             # constant enhancement relative to smooth pipe correlation
             pr_formula = pr[turbulent] if len(pr) > 1 else pr[0]
-            nu_4000 = np.sqrt(nu_sl ** 2 + (0.86 * (4000.0 - 1699.0) ** 0.39 * pr_formula ** 0.32) ** 2)
+            nu_4000 = np.sqrt(nu_sl ** 2 + (1.96 * (4000 - 1849.9) ** 0.295 * pr_formula ** 0.29) ** 2)
 
             if kwargs.get('haaland', False):
-                f = friction_factor_Haaland(4000.0, self.r_in, self.epsilon, **kwargs)
+                f = friction_factor_Haaland(4000.0, self.hydraulic_diameter_inner / 2, self.epsilon, **kwargs)
             else:
-                f = friction_factor_darcy_weisbach(4000.0, self.r_in, self.epsilon, **kwargs)
+                f = friction_factor_darcy_weisbach(4000.0, self.hydraulic_diameter_inner / 2, self.epsilon, **kwargs)
 
             nu_base_4000 = turbulent_nusselt(fluid_data, 4000, f, array=turbulent, **kwargs)
             diff = nu_4000 - nu_base_4000
 
             if kwargs.get('haaland', False):
-                f = friction_factor_Haaland(re[turbulent], self.r_in, self.epsilon, **kwargs)
+                f = friction_factor_Haaland(re[turbulent], self.hydraulic_diameter_inner / 2, self.epsilon, **kwargs)
             else:
-                f = friction_factor_darcy_weisbach(re[turbulent], self.r_in, self.epsilon, **kwargs)
+                f = friction_factor_darcy_weisbach(re[turbulent], self.hydraulic_diameter_inner / 2, self.epsilon,
+                                                   **kwargs)
             nu[turbulent] = turbulent_nusselt(fluid_data, re[turbulent], f, array=turbulent, **kwargs) + diff
 
         # Convective resistance
