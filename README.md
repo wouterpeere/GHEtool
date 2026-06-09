@@ -71,6 +71,8 @@ mentioned are the ones with which the code is tested)
 * scipy >= 1.8.1
 * secondarycoolantprops >= 1.1
 * optuna >= 3.6.1
+* joblib >= 1.5.3
+* torch >= 2.11.0
 
 For the tests
 

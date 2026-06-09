@@ -68,6 +68,9 @@ class MuoviEllipse(SingleUTube):
         self.b = b
         self.wall_thickness = wall_thickness
 
+        # check configuration
+
+        # load correct ANN model
         self._load_model(a, b)
 
         self.area_outer = np.pi * a * b / 4
@@ -76,8 +79,8 @@ class MuoviEllipse(SingleUTube):
         self.hydraulic_diameter_outer = 4 * self.area_outer / perimeter_outer
 
         self.area_inner = np.pi * (a - wall_thickness * 2) * (b - wall_thickness * 2) / 4
-        h = ((a - wall_thickness * 2) / 2 - (b - wall_thickness * 2) / 2) ** 2 / (
-                ((a - wall_thickness * 2) / 2 + (b - wall_thickness * 2) / 2) ** 2)
+        h = (((a - wall_thickness * 2) / 2 - (b - wall_thickness * 2) / 2) ** 2 /
+             (((a - wall_thickness * 2) / 2 + (b - wall_thickness * 2) / 2) ** 2))
         perimeter_inner = np.pi * ((a - wall_thickness * 2) / 2 + (b - wall_thickness * 2) / 2) * (
                 1 + (3 * h) / (10 + np.sqrt(4 - 3 * h)))
         self.hydraulic_diameter_inner = 4 * self.area_inner / perimeter_inner
@@ -170,7 +173,7 @@ class MuoviEllipse(SingleUTube):
 
         References
         ----------
-        .. [#Niklas] Niklas Hidman, Daniel Almgren, Kim Johansson, Eskil Nilsson, How internal fins enhance the thermohydraulic performance of geothermal pipes: A direct numerical simulation study, International Journal of Heat and Mass Transfer, Volume 256, Part 3, 2026, 128114, ISSN 0017-9310, https://doi.org/10.1016/j.ijheatmasstransfer.2025.128114.
+        .. [#Niklas] Niklas Hidman. (2026). Thermohydraulic performance evaluation of internally finned elliptical geothermal collector pipes
         """
         m_dot = np.atleast_1d(np.asarray(flow_data.mfr_borehole(**kwargs, fluid_data=fluid_data), dtype=np.float64))
 
@@ -228,7 +231,7 @@ class MuoviEllipse(SingleUTube):
     def calculate_resistances(self, fluid_data: _FluidData, flow_rate_data: _FlowData, **kwargs) -> None:
         """
         This function calculates the conductive and convective resistances, which are constant.
-        For the convective heat transfer coefficient, the correlation by (H. Niklas, 2025) is used.
+        For the convective heat transfer coefficient, the correlation by (H. Niklas, 2026) is used.
 
         Parameters
         ----------
@@ -246,7 +249,7 @@ class MuoviEllipse(SingleUTube):
 
     def predict_Rb_Ra_series(self, r_b, spacing, R_fp, k_b, k_s):
         """
-        Vectorized prediction of R_b and R_a.
+        Vectorized prediction of R_b and R_a based on the ANN-model.
 
         Parameters
         ----------
@@ -313,35 +316,43 @@ class MuoviEllipse(SingleUTube):
                                            borehole: gt.boreholes.Borehole, order: int = 1, R_p: float = None,
                                            **kwargs) -> float:
         """
-        This function returns the effective borehole thermal resistance for the Separatus probe based on an explicit
-        model (always second order).
-        A Separatus heat exchanger can be modelled by using the model of a single U tube, with an extra contact resistance
-        of 0.03 W/(mK) to account for the intermediate wall inside the probe. This value of 0.03W/(mK) was obtained by
-        the company based on real-life measurements.
+        This function returns the effective borehole thermal resistance for the MuoviELLIPSE based on an explicit
+        model (always second order). The borehole resistance is based on an artificial neural network that was
+        trained on 10.000 different simulations for each design of the MuoviELLIPSE.
 
         Parameters
         ----------
+        fluid_data : FluidData
+            Fluid data
+        flow_rate_data : FlowData
+            Flow rate data
         k_s : float
             Ground thermal conductivity
         borehole : Borehole
             Borehole object
+        order : int
+            Order of the model. For the single U, a zeroth, first and second order explicit model is implemented,
+            for the double U, only a zeroth and first order.
+        R_p : float
+            Pipe thermal resistance [mK/W], when this is not given, it is calculated explicitly.
 
         Returns
         -------
-        BasePipe
+        float or list
+            Effective borehole thermal resistance [mK/W]
         """
         if R_p is None:
             R_cond = self.calculate_conductive_resistance(**kwargs)
             R_conv = self.calculate_convective_resistance(flow_rate_data, fluid_data, **kwargs)
 
-            r_fp = R_cond + R_conv
+            R_p = R_cond + R_conv
 
-            R_b, R_a = self.predict_Rb_Ra_series(borehole.r_b, self.D_s, r_fp, self.k_g, k_s)
+        R_b, R_a = self.predict_Rb_Ra_series(borehole.r_b, self.D_s, R_p, self.k_g, k_s)
 
-            r_v = borehole.H / (flow_rate_data.mfr_borehole(**kwargs, fluid_data=fluid_data) * fluid_data.cp(
-                **kwargs))
-            n = r_v / (R_b * R_a) ** 0.5
-            return R_b * n * np.cosh(n) / np.sinh(n)
+        r_v = borehole.H / (flow_rate_data.mfr_borehole(**kwargs, fluid_data=fluid_data) * fluid_data.cp(
+            **kwargs))
+        n = r_v / (R_b * R_a) ** 0.5
+        return R_b * n * np.cosh(n) / np.sinh(n)
 
     def pressure_drop(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float,
                       **kwargs) -> float:
@@ -366,7 +377,7 @@ class MuoviEllipse(SingleUTube):
 
         def f_turbo(Re: float) -> float:
             """
-            This function calculates the friction factor of the turbocollector.
+            This function calculates the friction factor of the MuoviELLIPSE.
 
             Parameters
             ----------
@@ -376,7 +387,7 @@ class MuoviEllipse(SingleUTube):
             Returns
             -------
             Friction factor : float
-                Friction factor of the turbocollector.
+                Friction factor of the MuoviELLIPSE.
             """
 
             def w(Re) -> float:
@@ -414,9 +425,9 @@ class MuoviEllipse(SingleUTube):
     def __export__(self):
         return {
             'type': 'MuoviELLIPSE',
-            'nb_of_tubes': self.number_of_pipes,
-            'thickness [mm]': (self.r_out * 1000 - self.r_in * 1000),
-            'diameter [mm]': self.r_out * 2 * 1000,
-            'spacing [mm]': math.sqrt(self.pos[0][0] ** 2 + self.pos[0][1] ** 2) * 1000,
+            'thickness [mm]': self.wall_thickness,
+            'a [mm]': self.a,
+            'b [mm]': self.b,
+            'spacing [mm]': self.D_s,
             'k_g [W/(m·K)]': self.k_g,
         }
