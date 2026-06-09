@@ -526,8 +526,10 @@ def test_muoviEllipse():
 def test_muoviEllipse_error():
     with pytest.raises(ValueError):
         MuoviEllipse(1.5, 0.2, 0.2, 0.04, 0.03)
+    with pytest.raises(ValueError):
+        MuoviEllipse(1.5, 0.2, 0.2, 0.04, 0.3)
 
-    test = MuoviEllipse(1.5, 37e-3, 26e-3, 3, 0.3)
+    test = MuoviEllipse(1.5, 37e-3, 26e-3, 3e-3, 0.3)
 
     with pytest.raises(NotImplementedError):
         test.pipe_model(3, gt.boreholes.Borehole(100, 1, 0.075, 0, 0))
@@ -537,6 +539,16 @@ def test_muoviEllipse_error():
 
     with pytest.raises(NotImplementedError):
         test.calculate_resistances(fluid, flow_borefield)
+
+
+def test_muoviEllipse_repr():
+    test = MuoviEllipse(1.5, 37e-3, 26e-3, 3e-3, 0.03)
+    assert {'a [mm]': 37.0,
+            'b [mm]': 26.0,
+            'k_g [W/(m·K)]': 1.5,
+            'spacing [mm]': 30.0,
+            'thickness [mm]': 3.0,
+            'type': 'MuoviELLIPSE'} == test.__export__()
 
 
 def test_draw_muoviellipse(monkeypatch):

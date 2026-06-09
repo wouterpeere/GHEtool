@@ -1,5 +1,4 @@
 import joblib
-import math
 import torch
 import torch.nn as nn
 
@@ -181,7 +180,7 @@ class MuoviEllipse(SingleUTube):
         Eq. (24).
         """
         R_p = np.log((self.a + self.b) / ((self.a - self.wall_thickness * 2) + (self.b - self.wall_thickness * 2))) / (
-                    2 * np.pi * self.k_p)
+                2 * np.pi * self.k_p)
         return R_p
 
     def calculate_convective_resistance(self, flow_data: _FlowData, fluid_data: _FluidData, **kwargs):
@@ -501,9 +500,9 @@ class MuoviEllipse(SingleUTube):
     def __export__(self):
         return {
             'type': 'MuoviELLIPSE',
-            'thickness [mm]': self.wall_thickness,
-            'a [mm]': self.a,
-            'b [mm]': self.b,
-            'spacing [mm]': self.D_s,
+            'thickness [mm]': self.wall_thickness * 1000,
+            'a [mm]': self.a * 1000,
+            'b [mm]': self.b * 1000,
+            'spacing [mm]': self.D_s * 1000,
             'k_g [W/(m·K)]': self.k_g,
         }

@@ -14,6 +14,7 @@ mentioned are the ones with which the code is tested)
 * optuna >= 3.6.1
 * joblib >= 1.5.3
 * torch >= 2.11.0
+* scikit-learn >= 1.7.2
 
 For the tests
 
