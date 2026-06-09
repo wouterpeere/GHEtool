@@ -4,6 +4,8 @@ import torch
 import torch.nn as nn
 
 import pygfunction as gt
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 from GHEtool.utils.calculate_friction_factor import *
 from GHEtool.VariableClasses.PipeData.SingleUTube import SingleUTube
@@ -69,6 +71,8 @@ class MuoviEllipse(SingleUTube):
         self.wall_thickness = wall_thickness
 
         # check configuration
+        if D_s < b / 2:
+            raise ValueError(f'The distance of the pipe until the center should at least be {b / 2} m.')
 
         # load correct ANN model
         self._load_model(a, b)
@@ -154,6 +158,31 @@ class MuoviEllipse(SingleUTube):
         BasePipe
         """
         raise NotImplementedError('The MuoviELLIPSE can only be simulated with the explicit methods.')
+
+    def calculate_conductive_resistance(self, **kwargs) -> float:
+        """
+        This function calculates the pipe thermal conductive resistance.
+
+        Returns
+        -------
+        float
+            Conductive resistance [mK/W]
+
+        Notes
+        -----
+        Assumes confocal inner and outer ellipses. Analogous to the circular
+        ln(r_out/r_in)/(2*pi*k) formula, with r -> (a+b)/2.
+
+        References
+        ----------
+        Ecsedi & Baksa (2023), "Steady-state heat conduction problems for
+        non-homogeneous hollow elliptical two-dimensional domain",
+        Annals of Faculty Engineering Hunedoara, Vol. XXI, Fasc. 1, pp. 129-134.
+        Eq. (24).
+        """
+        R_p = np.log((self.a + self.b) / ((self.a - self.wall_thickness * 2) + (self.b - self.wall_thickness * 2))) / (
+                    2 * np.pi * self.k_p)
+        return R_p
 
     def calculate_convective_resistance(self, flow_data: _FlowData, fluid_data: _FluidData, **kwargs):
         """
@@ -420,7 +449,54 @@ class MuoviEllipse(SingleUTube):
         None
         """
 
-        pass
+        COLOR_SECONDARY = '#2196F3'  # left inner ellipse (flow in)
+        COLOR_RED = '#E53935'  # right inner ellipse (flow out)
+
+        # ── Derived values ───────────────────────────────────────────────────────────
+        borehole_radius = r_b
+        a_inner = self.a / 2 - self.wall_thickness
+        b_inner = self.b / 2 - self.wall_thickness
+
+        # Ellipse centers: left at (-spacing, 0), right at (+spacing, 0)
+        centers = [(-self.D_s, 0), (self.D_s, 0)]
+        inner_colors = [COLOR_SECONDARY, COLOR_RED]
+
+        # ── Plot ─────────────────────────────────────────────────────────────────────
+        fig, ax = plt.subplots(figsize=(5, 5))
+        ax.set_aspect('equal')
+        ax.axis('off')
+
+        # Borehole circle (black outline, no fill)
+        borehole = plt.Circle((0, 0), borehole_radius, fill=False, edgecolor='black', linewidth=2, zorder=1)
+        ax.add_patch(borehole)
+
+        # Ellipses
+        for i, (cx, cy) in enumerate(centers):
+            # Outer ellipse (black pipe wall)
+            outer = patches.Ellipse(
+                (cx, cy),
+                width=self.b, height=self.a,
+                facecolor='black',
+                zorder=2
+            )
+            ax.add_patch(outer)
+
+            # Inner ellipse (fluid channel)
+            inner = patches.Ellipse(
+                (cx, cy),
+                width=2 * b_inner, height=2 * a_inner,
+                facecolor=inner_colors[i],
+                zorder=3
+            )
+            ax.add_patch(inner)
+
+        # Axis limits with a small margin
+        margin = borehole_radius * 1.1
+        ax.set_xlim(-margin, margin)
+        ax.set_ylim(-margin, margin)
+
+        plt.tight_layout()
+        plt.show()
 
     def __export__(self):
         return {

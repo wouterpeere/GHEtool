@@ -60,7 +60,6 @@ def create_graphs():
 
 
 def realistic_case():
-
     mpg = TemperatureDependentFluidData('MPG', 25, mass_percentage=False)
 
     flow_rates = np.arange(0.1, 0.8, 0.01)
@@ -81,7 +80,7 @@ def realistic_case():
             borehole_turbo_collector.calculate_Rb(100, 0.7, (110e-3) / 2, 2, temperature=5,
                                                   use_explicit_models=True))
         list_rb_muoviellipse.append(
-            borehole_muoviellipse.calculate_Rb(100, 0.7, rb / 2, 2, temperature=5, use_explicit_models=True))
+            borehole_muoviellipse.calculate_Rb(100, 0.7, 90e-3 / 2, 2, temperature=5, use_explicit_models=True))
 
         list_dp_turbo_collector.append(turbo_collector.pressure_drop(mpg, flow, 100 - 0.7, temperature=5))
         list_dp_muoviellipse.append(muoviellipse.pressure_drop(mpg, flow, 100 - 0.7, temperature=5))
@@ -107,5 +106,5 @@ def realistic_case():
 
 
 if __name__ == "__main__":  # pragma: no-cover
-    # create_graphs()
+    create_graphs()
     realistic_case()
