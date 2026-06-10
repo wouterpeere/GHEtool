@@ -52,3 +52,19 @@ Whenever you use the model of the short-term effects, please use the citation be
 
 > Meertens, L., Peere, W., Helsen, L. (2024). Influence of short-term dynamic effects on geothermal borefield size. In
 _Proceedings of International Ground Source Heat Pump Association_. Montréal (Canada), 28-30 May 2024.
+
+## Working with modulating heat pumps
+
+Whenever you use the model of working with modulating heat pumps, please use the citation below.
+
+> Peere, W. (2025). Integrating Temperature and Part-Load Dependent COP in Shallow Geothermal Borefield Design. In
+_Proceedings of German Geothermal Congress DGK 2025_. Frankfurt (Germany), 18-20 November 2025.
+
+## Working with the TurboCollector
+
+Whenever you use the model of the TurboCollector, please use the citation below.
+
+> Hidman, N., Almgren, D., Johansson, K., Nilsson, E. (2026). How internal fins enhance the thermohydraulic performance
+> of geothermal pipes: A direct numerical simulation study,
+_International Journal of Heat and Mass Transfer_, Volume 256, Part 3, 128114, ISSN
+> 0017-9310, https://doi.org/10.1016/j.ijheatmasstransfer.2025.128114.
