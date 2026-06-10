@@ -221,7 +221,7 @@ class MuoviEllipse(SingleUTube):
             pr_formula = pr[laminar] if len(pr) > 1 else pr[0]
             nu[laminar] = np.sqrt(nu_sl ** 2 + ((-0.321) * re[laminar] ** 0.2 * pr_formula ** 0.21) ** 2)
 
-        # Transitional turbo correlation (1700 < Re ≤ 4000)
+        # Transitional turbo correlation (1850 < Re ≤ 4000)
         transitional = (re > 1850.0) & (re <= 4000.0)
         if np.any(transitional):
             pr_formula = pr[transitional] if len(pr) > 1 else pr[0]

@@ -11,7 +11,7 @@ from GHEtool.VariableClasses.FlowData import _FlowData
 
 class Turbocollector(MultipleUTube):
     """
-    This class contains the model for the turbocollector probe from Muovitech. The correlations for the Nusselt number
+    This class contains the model for the TurboCollector probe from Muovitech. The correlations for the Nusselt number
     and the friction factor where obtained from the work of (H. Niklas, 2025).
 
     More information on this technology and its advantages can be found here: https://www.turbocollector.com/.
@@ -154,7 +154,7 @@ class Turbocollector(MultipleUTube):
 
         def f_turbo(Re: float) -> float:
             """
-            This function calculates the friction factor of the turbocollector.
+            This function calculates the friction factor of the TurboCollector.
 
             Parameters
             ----------
@@ -164,7 +164,7 @@ class Turbocollector(MultipleUTube):
             Returns
             -------
             Friction factor : float
-                Friction factor of the turbocollector.
+                Friction factor of the TurboCollector.
             """
 
             def w(Re) -> float:
