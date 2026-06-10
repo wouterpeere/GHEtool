@@ -164,13 +164,17 @@ Concretely, the classes you can use are:
   design purposes, it is advised to use this with rather small borehole diameters of DN90. For more information, visit
   the [separatus website](https://separatus.ch/en/). An example in GHEtool can be
   found [here](https://ghetool.readthedocs.io/en/latest/sources/code/Examples/separatus.html).
-* _Turbocollector_: The Turbocollector from Muovitech has internal fins which enhances the turbulent flow character
+* _Turbocollector_: The TurboCollector from Muovitech has internal fins which enhances the turbulent flow character
   at lower flow rates. Visit their website for more
-  information [turbocollector website](https://www.muovitech.com/group/?page=turbo). An example in GHEtool can be
+  information [TurboCollector website](https://www.muovitech.com/group/?page=turbo). An example in GHEtool can be
   found [here](https://ghetool.readthedocs.io/en/latest/sources/code/Examples/turbocollector.html).
-
-Please note that it is possible to add your own pipe types by inheriting the attributes from the abstract _PipeData
-class.
+* _MuoviELLIPSE_: The MuoviELLIPSE is an elliptical heat exchanger from Muovitech with internal fins (like the
+  TurboCollector) which enhances the turbulent flow character
+  at lower flow rates. Visit their website for more
+  information [MuoviELLIPSE website](https://www.muovitech.com/group/?page=MuoviELLIPSE). An example in GHEtool can be
+  found [here](https://ghetool.readthedocs.io/en/latest/sources/code/Examples/muoviellipse.html).
+  Please note that it is possible to add your own pipe types by inheriting the attributes from the abstract _PipeData
+  class.
 
 #### Fluid data
 
@@ -432,6 +436,9 @@ KU Leuven, Belgium.
 
 ### Applications/Mentions of GHEtool
 
+Peere, W. (2026). AFür eine genauere Auslegung von Sondenfeldern: Von konstanten zu variablen Annahmen. _Geothermische
+Energie_(114)
+
 Peere, W. (2025). Integrating Temperature and Part-Load Dependent COP in Shallow Geothermal Borefield Design. In
 _Proceedings of German Geothermal Congress DGK 2025_. Frankfurt (Germany), 18-20 November 2025.
 
@@ -439,7 +446,7 @@ Peere, W., Steinbock, G., Niklaus, E. (2025). Thermo-hydraulische Modellenentwic
 ein Praxisbeispiel in Sachsen. In _Proceedings of Geothermie Symposium_. Salzburg (Austria), 5-7 November 2025.
 
 Peere, W. (2025). Aktiv und passive: die perfekte Kombination? Kühlung mit geothermischen Bohrfeldern. _Geothermische
-Energie 34_(112)
+Energie_(112)
 
 Dion, G., & Pasquier, P. (2025). Ground heat exchanger sizing using borehole outlet transfer function. _Science and
 Technology for the Built Environment_, 1–13. https://doi.org/10.1080/23744731.2025.2523200
