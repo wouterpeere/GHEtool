@@ -10,6 +10,7 @@ Examples/effect_of_borehole_configuration.rst
 Examples/import_data.rst
 Examples/kilfrost.rst
 Examples/main_functionalities.rst
+Examples/muovi_ellipse.rst
 Examples/optimise_load_profile.rst
 Examples/separatus.rst
 Examples/sizing_with_building_load.rst

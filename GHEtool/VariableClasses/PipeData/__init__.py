@@ -7,3 +7,4 @@ from .Separatus import Separatus
 from .Turbocollector import Turbocollector
 from .ConicalPipe import ConicalPipe
 from .PressureDrop import PressureDrop
+from .MuoviEllipse import MuoviEllipse

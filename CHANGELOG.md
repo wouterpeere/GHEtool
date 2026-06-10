@@ -27,6 +27,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Option to change pipe configuration in MultipleUTube (either diagonal (default) or adjacent) (issue #425).
 - Test for temperatures (issue #442).
 - Add convolution temperature offset in calculate temperature function (issue #444).
+- Add MuoviELLIPSE (issue #447).
 
 ## Changed
 

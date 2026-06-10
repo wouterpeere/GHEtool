@@ -41,6 +41,10 @@ All of the classes above are children from the abstract _PipeData class.
     :members:
     :show-inheritance:
 
+.. automodule:: GHEtool.VariableClasses.PipeData.MuoviEllipse
+    :members:
+    :show-inheritance:
+
 .. automodule:: GHEtool.VariableClasses.PipeData.Separatus
     :members:
     :show-inheritance:

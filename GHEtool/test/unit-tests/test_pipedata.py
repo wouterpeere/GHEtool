@@ -464,6 +464,99 @@ def test_pressure_drop():
                                                       haaland=True))
 
 
+def test_muoviEllipse():
+    test = MuoviEllipse(1.5, 37e-3, 26e-3, 3e-3, 0.3)
+    flow_borehole = ConstantFlowRate(vfr=0.25)
+    flow_borefield = ConstantFlowRate(vfr=0.5, flow_per_borehole=False)
+    fluid = TemperatureDependentFluidData('MPG', 25)
+
+    assert np.isclose(test.Re(fluid, flow_borehole, temperature=5),
+                      test.Re(fluid, flow_borefield, temperature=5, nb_of_boreholes=2))
+    assert np.isclose(test.pressure_drop(fluid, flow_borehole, 100, temperature=5),
+                      test.pressure_drop(fluid, flow_borefield, 100, temperature=5, nb_of_boreholes=2))
+
+    borehole = gt.boreholes.Borehole(100, 1, 0.07, 0, 0)
+    turbo1 = test
+
+    assert np.isclose(test.explicit_model_borehole_resistance(fluid, flow_borehole, 2, borehole,
+                                                              use_explicit_models=True, temperature=5),
+                      turbo1.explicit_model_borehole_resistance(fluid, flow_borehole, 2, borehole,
+                                                                use_explicit_models=True, temperature=5))
+
+    # test array-model
+    individual = []
+    temp_range = np.arange(-5, 20, 1)
+    for temp in temp_range:
+        individual.append(test.calculate_convective_resistance(flow_borehole, fluid, temperature=temp))
+    array = test.calculate_convective_resistance(flow_borehole, fluid, temperature=temp_range)
+    assert np.allclose(array, individual)
+
+    individual = []
+    temp_range = np.arange(-5, 20, 1)
+    for temp in temp_range:
+        individual.append(test.calculate_convective_resistance(flow_borehole, fluid, temperature=temp, haaland=True))
+    array = test.calculate_convective_resistance(flow_borehole, fluid, temperature=temp_range, haaland=True)
+    assert np.allclose(array, individual)
+
+    flow_range = np.linspace(0.1, 5, 8760)
+    flow = VariableHourlyFlowRate(mfr=flow_range)
+    control = []
+    for val in flow_range:
+        control.append(test.pressure_drop(fluid, ConstantFlowRate(mfr=val), 100,
+                                          nb_of_boreholes=2, simulation_period=1, temperature=0, haaland=False))
+    assert np.allclose(control,
+                       test.pressure_drop(fluid, flow, 100, nb_of_boreholes=2, simulation_period=1, temperature=0,
+                                          haaland=False))
+    control = []
+    for val in flow_range:
+        control.append(test.pressure_drop(fluid, ConstantFlowRate(mfr=val), 100,
+                                          nb_of_boreholes=2, simulation_period=1, temperature=0, haaland=True))
+    assert np.allclose(control,
+                       test.pressure_drop(fluid, flow, 100, nb_of_boreholes=2, simulation_period=1, temperature=0,
+                                          haaland=True))
+
+    # test other configurations
+    MuoviEllipse(1.5, 46e-3, 33e-3, 3e-3, 0.3)
+    MuoviEllipse(1.5, 51e-3, 37e-3, 3e-3, 0.3)
+    MuoviEllipse(1.5, 58e-3, 41e-3, 3e-3, 0.3)
+    MuoviEllipse(1.5, 64e-3, 45e-3, 3e-3, 0.3)
+    MuoviEllipse(1.5, 73e-3, 52e-3, 3e-3, 0.3)
+
+
+def test_muoviEllipse_error():
+    with pytest.raises(ValueError):
+        MuoviEllipse(1.5, 0.2, 0.2, 0.04, 0.03)
+    with pytest.raises(ValueError):
+        MuoviEllipse(1.5, 0.2, 0.2, 0.04, 0.3)
+
+    test = MuoviEllipse(1.5, 37e-3, 26e-3, 3e-3, 0.3)
+
+    with pytest.raises(NotImplementedError):
+        test.pipe_model(3, gt.boreholes.Borehole(100, 1, 0.075, 0, 0))
+
+    flow_borefield = ConstantFlowRate(vfr=0.5, flow_per_borehole=False)
+    fluid = TemperatureDependentFluidData('MPG', 25)
+
+    with pytest.raises(NotImplementedError):
+        test.calculate_resistances(fluid, flow_borefield)
+
+
+def test_muoviEllipse_repr():
+    test = MuoviEllipse(1.5, 37e-3, 26e-3, 3e-3, 0.03)
+    assert {'a [mm]': 37.0,
+            'b [mm]': 26.0,
+            'k_g [W/(m·K)]': 1.5,
+            'spacing [mm]': 30.0,
+            'thickness [mm]': 3.0,
+            'type': 'MuoviELLIPSE'} == test.__export__()
+
+
+def test_draw_muoviellipse(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    test = MuoviEllipse(1.5, 37e-3, 26e-3, 3, 0.3)
+    test.draw_borehole_internal(90e-3)
+
+
 def test_turbocollector():
     turbo = Turbocollector(1.5, 0.013, 0.016, 0.035, 1)
     flow_borehole = ConstantFlowRate(vfr=0.25)
