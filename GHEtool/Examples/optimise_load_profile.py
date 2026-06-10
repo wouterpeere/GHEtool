@@ -32,7 +32,7 @@ def optimise():
     load = HourlyBuildingLoad(efficiency_heating=4.3, efficiency_cooling=5)
     # load.dhw = 100000  # add domestic hot water
     load.start_month = 9
-    df = pd.read_csv(open("load_optimise.csv", 'rb'))
+    df = pd.read_csv(FOLDER.joinpath("Examples/load_optimise.csv"))
 
     cooling = df["cooling"].to_numpy()
     heating = df["heating"].to_numpy()
