@@ -114,7 +114,9 @@ class SeparatusNew():
         model_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/separatus.pt")
         x_scaler_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/separatus_x.joblib")
         y_scaler_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/separatus_y.joblib")
-
+        model_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/split_pipe_two_rfp_ann.pt")
+        x_scaler_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/split_pipe_two_rfp_X_scaler.joblib")
+        y_scaler_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/split_pipe_two_rfp_y_scaler.joblib")
         model = SplitPipeANN()
         model.load_state_dict(torch.load(model_path, map_location="cpu"))
         model.eval()
