@@ -93,7 +93,7 @@ class SeparatusNew():
         plate = hydraulic_diameter / (nu * fluid_data.k_f(**kwargs) * self.r_in * 2)
         return plate * 2, conv_circle
 
-    def predict_split_pipe_Rb_Ra_series(self, r_b, R_fp_pipe, R_fp_center, k_b, k_s):
+    def predict_split_pipe_Rb_Ra_series(self, r_b, R_fp_pipe, R_fp_center, k_b, k_s, **kwargs):
         """
         Vectorized prediction of R_b and R_a for the split-pipe ANN.
 
@@ -114,9 +114,12 @@ class SeparatusNew():
         model_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/separatus.pt")
         x_scaler_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/separatus_x.joblib")
         y_scaler_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/separatus_y.joblib")
-        model_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/split_pipe_two_rfp_ann.pt")
-        x_scaler_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/split_pipe_two_rfp_X_scaler.joblib")
-        y_scaler_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/split_pipe_two_rfp_y_scaler.joblib")
+        if kwargs.get('new', True):
+            model_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/split_pipe_two_rfp_ann.pt")
+            x_scaler_path = FOLDER.joinpath(
+                f"VariableClasses/PipeData/Model separatus/split_pipe_two_rfp_X_scaler.joblib")
+            y_scaler_path = FOLDER.joinpath(
+                f"VariableClasses/PipeData/Model separatus/split_pipe_two_rfp_y_scaler.joblib")
         model = SplitPipeANN()
         model.load_state_dict(torch.load(model_path, map_location="cpu"))
         model.eval()
@@ -188,8 +191,8 @@ class SeparatusNew():
 
             r_fp_pipe = R_p_cond_circle + R_p_conv_circle
             r_fp_center = R_p_cond_wall + R_p_conv_wall
-            # print(R_p_cond_wall, R_p_cond_circle, R_p_conv_wall, R_p_conv_circle)
-            R_b, R_a = self.predict_split_pipe_Rb_Ra_series(borehole.r_b, r_fp_pipe, r_fp_center, self.k_g, k_s)
+            R_b, R_a = self.predict_split_pipe_Rb_Ra_series(borehole.r_b, r_fp_pipe, r_fp_center, self.k_g, k_s,
+                                                            **kwargs)
             # print(f'New Rf pipe: {r_fp_pipe:.3f}, Rf center: {r_fp_center:.3f}, R_b: {R_b:.3f}, R_a= {R_a:.3f}')
             r_v = borehole.H / (flow_rate_data.mfr_borehole(**kwargs, fluid_data=fluid_data) * fluid_data.cp(
                 **kwargs))
