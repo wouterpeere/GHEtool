@@ -3,4 +3,15 @@ exclude GHEtool/test/
 include GHEtool/test/unit-tests
 include GHEtool/VariableClasses/Gfunctions/ANN_layers/*.csv
 include GHEtool/VariableClasses/Gfunctions/short_term_ANN_corrections/*.npy
-recursive-include GHEtool/VariableClasses/PipeData/ANN *
+include GHEtool/VariableClasses/PipeData/ANN/MuoviELLIPSE32/*.pt
+include GHEtool/VariableClasses/PipeData/ANN/MuoviELLIPSE32/*.jolib
+include GHEtool/VariableClasses/PipeData/ANN/MuoviELLIPSE40/*.pt
+include GHEtool/VariableClasses/PipeData/ANN/MuoviELLIPSE40/*.jolib
+include GHEtool/VariableClasses/PipeData/ANN/MuoviELLIPSE45/*.pt
+include GHEtool/VariableClasses/PipeData/ANN/MuoviELLIPSE45/*.jolib
+include GHEtool/VariableClasses/PipeData/ANN/MuoviELLIPSE50/*.pt
+include GHEtool/VariableClasses/PipeData/ANN/MuoviELLIPSE50/*.jolib
+include GHEtool/VariableClasses/PipeData/ANN/MuoviELLIPSE55/*.pt
+include GHEtool/VariableClasses/PipeData/ANN/MuoviELLIPSE55/*.jolib
+include GHEtool/VariableClasses/PipeData/ANN/MuoviELLIPSE63/*.pt
+include GHEtool/VariableClasses/PipeData/ANN/MuoviELLIPSE63/*.jolib
