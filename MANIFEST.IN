@@ -3,3 +3,4 @@ exclude GHEtool/test/
 include GHEtool/test/unit-tests
 include GHEtool/VariableClasses/Gfunctions/ANN_layers/*.csv
 include GHEtool/VariableClasses/Gfunctions/short_term_ANN_corrections/*.npy
+include GHEtool/VariableClasses/PipeData/ANN *

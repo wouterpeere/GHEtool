@@ -73,7 +73,7 @@ mentioned are the ones with which the code is tested)
 * optuna >= 3.6.1
 * joblib >= 1.5.3
 * torch >= 2.11.0
-* scikit-learn >= 1.7.2
+* scikit-learn == 1.8.0
 
 For the tests
 
@@ -182,7 +182,7 @@ You can set the fluid data by using the FluidData class.
 
 * _ConstantFluidData_: Temperature independent fluid properties
 * _TemperatureDependentFluidData_: Temperature dependent fluid data (Water, MPG, MEG, MMA, MEA, Thermox DTX, Coolflow
-  NTP, Kilfrost GEO or Kilfrost GEO Plus)
+  NTP, Kilfrost GEO, Kilfrost GEO Plus or GeoPro)
 
 #### Flow rate data
 
