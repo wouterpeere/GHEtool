@@ -41,7 +41,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Change pressure drop functions to work with arrays (issue #426).
 - Speed up simulation time caculating temperature profile (issue #440).
 - Fix problem with dhw in class definition HourlyBuildingLoad (issue #448).
-- Make compatible with python 3.14.
+- Make compatible with Python 3.14.
+- Drop support for Python 3.10.
 
 ## Fixed
 
