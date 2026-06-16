@@ -114,9 +114,10 @@ def test_turbocollector(monkeypatch):
 
 def test_muoviEllipse(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
-    from GHEtool.Examples.muoviellipse import create_graphs, realistic_case
+    from GHEtool.Examples.muoviellipse import create_graphs, realistic_case, realistic_case2
     create_graphs()
     realistic_case()
+    realistic_case2()
 
 
 def test_optimal_borehole_config():
