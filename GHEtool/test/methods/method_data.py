@@ -990,15 +990,15 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 
                                                    name='Optimise load profile 1, reversed (power, hourly, dhw not preferential)',
                                                    power=1,
                                                    hourly=True, dhw_preferential=False))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.956, 41.9184,
-                                                   625.2665677987167, 108.3334003483846, 51.14907743409026,
-                                                   427.7028439849075,
-                                                   name='Optimise load profile 1, reversed (balance, dhw not preferential)',
-                                                   power=3,
-                                                   hourly=False, dhw_preferential=False))
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.95623029709454, 41.91844124510459,
                                                    628.1333727290304, 108.48860678018737, 48.28226963696875,
                                                    427.54763770831096,
+                                                   name='Optimise load profile 1, reversed (balance, dhw not preferential)',
+                                                   power=3,
+                                                   hourly=False, dhw_preferential=False))
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.95087666245865, 41.87105995490491,
+                                                   625.2665677987167, 108.3334003483846, 51.14907743409026,
+                                                   427.7028439849075,
                                                    name='Optimise load profile 1, reversed (balance, hourly, dhw not preferential)',
                                                    power=3,
                                                    hourly=True, dhw_preferential=False))
