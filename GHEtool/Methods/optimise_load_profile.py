@@ -97,7 +97,7 @@ def optimise_load_profile_power(
     peak_cool_load: float = init_peak_cooling
 
     n_hours = borefield.load.simulation_period * 8760
-    if isinstance(borefield.load, HourlyBuildingLoad):
+    if isinstance(borefield.load, HourlyBuildingLoad) and use_hourly_resolution:
         index_mask = np.concatenate([np.arange(8760), np.arange(n_hours - 8760, n_hours)])
     else:
         index_mask = None
@@ -642,7 +642,7 @@ def optimise_load_profile_balance(
     peak_cool_load: float = init_peak_cooling
 
     n_hours = borefield.load.simulation_period * 8760
-    if isinstance(borefield.load, HourlyBuildingLoad):
+    if isinstance(borefield.load, HourlyBuildingLoad) and use_hourly_resolution:
         index_mask = np.concatenate([np.arange(8760), np.arange(n_hours - 8760, n_hours)])
     else:
         index_mask = None
