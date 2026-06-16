@@ -125,7 +125,7 @@ def optimise_load_profile_power(
                                                                             HourlyBuildingLoad))  # always the same
         if borefield._calculation_setup.size_based_on == 'average':
             min_temperature, max_temperature = np.min(borefield.results.peak_extraction[index_mask]), np.max(
-                borefield.results.peak_extraction[index_mask])
+                borefield.results.peak_injection[index_mask])
         elif borefield._calculation_setup.size_based_on == 'inlet':
             min_temperature, max_temperature = np.min(borefield.results.peak_extraction_inlet[index_mask]), np.max(
                 borefield.results.peak_injection_inlet[index_mask])
@@ -671,7 +671,7 @@ def optimise_load_profile_balance(
 
         if borefield._calculation_setup.size_based_on == 'average':
             min_temperature, max_temperature = np.min(borefield.results.peak_extraction[index_mask]), np.max(
-                borefield.results.peak_extraction[index_mask])
+                borefield.results.peak_injection[index_mask])
         elif borefield._calculation_setup.size_based_on == 'inlet':
             min_temperature, max_temperature = np.min(borefield.results.peak_extraction_inlet[index_mask]), np.max(
                 borefield.results.peak_injection_inlet[index_mask])
