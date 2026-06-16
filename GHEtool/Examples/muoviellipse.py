@@ -13,7 +13,7 @@ from GHEtool import *
 
 
 def create_graphs():
-    mpg = TemperatureDependentFluidData('MPG', 25, mass_percentage=False)
+    meg = TemperatureDependentFluidData('MEG', 25, mass_percentage=False)
 
     flow_rates = np.arange(0.1, 0.8, 0.01)
 
@@ -27,8 +27,8 @@ def create_graphs():
         for val in flow_rates:
             flow = ConstantFlowRate(vfr=val)
 
-            borehole_turbo_collector = Borehole(mpg, smooth, flow)
-            borehole_muoviellipse = Borehole(mpg, muoviellipse, flow)
+            borehole_turbo_collector = Borehole(meg, smooth, flow)
+            borehole_muoviellipse = Borehole(meg, muoviellipse, flow)
 
             list_rb_smooth.append(
                 borehole_turbo_collector.calculate_Rb(100, 0.7, rb / 2, 2, temperature=5,
@@ -36,14 +36,14 @@ def create_graphs():
             list_rb_muoviellipse.append(
                 borehole_muoviellipse.calculate_Rb(100, 0.7, rb / 2, 2, temperature=5, use_explicit_models=True))
 
-            list_dp_smooth.append(smooth.pressure_drop(mpg, flow, 100 - 0.7, temperature=5))
-            list_dp_muoviellipse.append(muoviellipse.pressure_drop(mpg, flow, 100 - 0.7, temperature=5))
+            list_dp_smooth.append(smooth.pressure_drop(meg, flow, 100 - 0.7, temperature=5))
+            list_dp_muoviellipse.append(muoviellipse.pressure_drop(meg, flow, 100 - 0.7, temperature=5))
 
         plt.figure()
         plt.plot(flow_rates, list_rb_smooth, label="Smooth (DN45)")
         plt.plot(flow_rates, list_rb_muoviellipse, label="MuoviELLIPSE (DN45)")
 
-        plt.title(f'Borehole thermal resistance for a borehole diameter of {rb * 1000} mm')
+        plt.title(f'Borehole thermal resistance (d={rb * 1000:.0f}mm, MEG 25v/v%)')
         plt.ylabel('Effective borehole thermal resistance [mK/W]')
         plt.xlabel('Flow rate [l/s]')
         plt.legend()
@@ -52,7 +52,7 @@ def create_graphs():
         plt.plot(flow_rates, list_dp_smooth, label="Smooth (DN45)")
         plt.plot(flow_rates, list_dp_muoviellipse, label="MuoviELLIPSE (DN45)")
 
-        plt.title(f'Pressure drop for a borehole diameter of {rb * 1000} mm')
+        plt.title(f'Pressure drop (MEG 25v/v%)')
         plt.ylabel('Pressure drop [kPa]')
         plt.xlabel('Flow rate [l/s]')
         plt.legend()
@@ -60,7 +60,7 @@ def create_graphs():
 
 
 def realistic_case():
-    mpg = TemperatureDependentFluidData('MPG', 25, mass_percentage=False)
+    meg = TemperatureDependentFluidData('MEG', 25, mass_percentage=False)
 
     flow_rates = np.arange(0.1, 0.8, 0.01)
 
@@ -73,8 +73,8 @@ def realistic_case():
     for val in flow_rates:
         flow = ConstantFlowRate(vfr=val)
 
-        borehole_smooth = Borehole(mpg, smooth_pipe, flow)
-        borehole_muoviellipse = Borehole(mpg, muoviellipse, flow)
+        borehole_smooth = Borehole(meg, smooth_pipe, flow)
+        borehole_muoviellipse = Borehole(meg, muoviellipse, flow)
 
         list_rb_smooth.append(
             borehole_smooth.calculate_Rb(100, 0.7, (110e-3) / 2, 2, temperature=5,
@@ -82,21 +82,21 @@ def realistic_case():
         list_rb_muoviellipse.append(
             borehole_muoviellipse.calculate_Rb(100, 0.7, 90e-3 / 2, 2, temperature=5, use_explicit_models=True))
 
-        list_dp_smooth.append(smooth_pipe.pressure_drop(mpg, flow, 100 - 0.7, temperature=5))
-        list_dp_muoviellipse.append(muoviellipse.pressure_drop(mpg, flow, 100 - 0.7, temperature=5))
+        list_dp_smooth.append(smooth_pipe.pressure_drop(meg, flow, 100 - 0.7, temperature=5))
+        list_dp_muoviellipse.append(muoviellipse.pressure_drop(meg, flow, 100 - 0.7, temperature=5))
 
     plt.figure()
-    plt.plot(flow_rates, list_rb_smooth, label="Smooth DN45 (rb=110mm)")
-    plt.plot(flow_rates, list_rb_muoviellipse, label="MuoviELLIPSE DN45 (rb=90mm)")
+    plt.plot(flow_rates, list_rb_smooth, label="Smooth DN45 (d=110mm)")
+    plt.plot(flow_rates, list_rb_muoviellipse, label="MuoviELLIPSE DN45 (d=90mm)")
 
-    plt.title(f'Borehole thermal resistance')
+    plt.title(f'Borehole thermal resistance (MEG 25v/v%)')
     plt.ylabel('Effective borehole thermal resistance [mK/W]')
     plt.xlabel('Flow rate [l/s]')
     plt.legend()
     plt.figure()
 
-    plt.plot(flow_rates, list_dp_smooth, label="Smooth DN45 (rb=110mm)")
-    plt.plot(flow_rates, list_dp_muoviellipse, label="MuoviELLIPSE DN45 (rb=90mm)")
+    plt.plot(flow_rates, list_dp_smooth, label="Smooth DN45 (d=110mm)")
+    plt.plot(flow_rates, list_dp_muoviellipse, label="MuoviELLIPSE DN45 (d=90mm)")
 
     plt.title(f'Pressure drop')
     plt.ylabel('Pressure drop [kPa]')
@@ -132,8 +132,8 @@ def realistic_case2():
         list_dp_muoviellipse.append(muoviellipse.pressure_drop(mpg, flow, 100 - 0.7, temperature=5))
 
     plt.figure()
-    plt.plot(flow_rates, list_rb_smooth, label="Smooth DN45 (rb=110mm)")
-    plt.plot(flow_rates, list_rb_muoviellipse, label="MuoviELLIPSE DN50 (rb=110mm)")
+    plt.plot(flow_rates, list_rb_smooth, label="Smooth DN45 (d=110mm)")
+    plt.plot(flow_rates, list_rb_muoviellipse, label="MuoviELLIPSE DN50 (d=110mm)")
 
     plt.title(f'Borehole thermal resistance')
     plt.ylabel('Effective borehole thermal resistance [mK/W]')
@@ -141,8 +141,8 @@ def realistic_case2():
     plt.legend()
     plt.figure()
 
-    plt.plot(flow_rates, list_dp_smooth, label="Smooth DN45 (rb=110mm)")
-    plt.plot(flow_rates, list_dp_muoviellipse, label="MuoviELLIPSE DN50 (rb=110mm)")
+    plt.plot(flow_rates, list_dp_smooth, label="Smooth DN45 (d=110mm)")
+    plt.plot(flow_rates, list_dp_muoviellipse, label="MuoviELLIPSE DN50 (d=110mm)")
 
     plt.title(f'Pressure drop')
     plt.ylabel('Pressure drop [kPa]')

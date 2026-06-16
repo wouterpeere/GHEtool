@@ -5,6 +5,12 @@ our [project board](https://github.com/users/wouterpeere/projects/2) on GitHub.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [2.4.2] - Unpublished
+
+### Fixed
+
+- Fix problem in optimisation for power/balance.
+
 ## [2.4.1] - 2026-06-15
 
 ### Added
