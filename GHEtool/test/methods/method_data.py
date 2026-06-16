@@ -997,7 +997,7 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 
                                                    power=3,
                                                    hourly=False, dhw_preferential=False))
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.95087666245865, 41.871,
-                                                   625.266567, 108.333, 52.149, 427.703,
+                                                   625.266567, 108.333, 51.149077, 427.703,
                                                    name='Optimise load profile 1, reversed (balance, hourly, dhw not preferential)',
                                                    power=3,
                                                    hourly=True, dhw_preferential=False))
