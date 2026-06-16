@@ -996,8 +996,9 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 
                                                    name='Optimise load profile 1, reversed (balance, dhw not preferential)',
                                                    power=3,
                                                    hourly=False, dhw_preferential=False))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.95087666245865, 41.871,
-                                                   625.266567, 108.333, 51.149077, 427.703,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.95623029709454, 41.91844124510459,
+                                                   628.1333727290304, 108.48860678018737, 48.28226963696875,
+                                                   427.54763770831096,
                                                    name='Optimise load profile 1, reversed (balance, hourly, dhw not preferential)',
                                                    power=3,
                                                    hourly=True, dhw_preferential=False))
@@ -1035,8 +1036,8 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 
                                                    name='Optimise load profile 1, reversed (balance, hourly, dhw load)',
                                                    power=3,
                                                    hourly=True, dhw_preferential=False))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.95087666245865, 41.9184,
-                                                   628.137, 108.4886, 0, 427.548,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.95623029709454, 41.9184,
+                                                   628.1333727290304, 108.48860678018737, 0, 427.54763770831096,
                                                    name='Optimise load profile 1, reversed (balance, dhw load, preferential)',
                                                    power=3,
                                                    hourly=False, dhw_preferential=True))
