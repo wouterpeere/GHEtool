@@ -96,6 +96,12 @@ def optimise_load_profile_power(
     peak_dhw_load: float = init_peak_dhw
     peak_cool_load: float = init_peak_cooling
 
+    n_hours = borefield.load.simulation_period * 8760
+    if isinstance(borefield.load, HourlyBuildingLoad):
+        index_mask = np.concatenate([np.arange(8760), np.arange(n_hours - 8760, n_hours)])
+    else:
+        index_mask = None
+
     # set iteration criteria
     cool_ok, heat_ok = False, False
     while not cool_ok or not heat_ok:
@@ -117,16 +123,15 @@ def optimise_load_profile_power(
                                                      'g_value_differences'),
                                                  first_last_year=isinstance(borefield.load,
                                                                             HourlyBuildingLoad))  # always the same
-
         if borefield._calculation_setup.size_based_on == 'average':
-            min_temperature, max_temperature = np.min(borefield.results.min_temperature), np.max(
-                borefield.results.max_temperature)
+            min_temperature, max_temperature = np.min(borefield.results.peak_extraction[index_mask]), np.max(
+                borefield.results.peak_extraction[index_mask])
         elif borefield._calculation_setup.size_based_on == 'inlet':
-            min_temperature, max_temperature = np.min(borefield.results.peak_extraction_inlet), np.max(
-                borefield.results.peak_injection_inlet)
+            min_temperature, max_temperature = np.min(borefield.results.peak_extraction_inlet[index_mask]), np.max(
+                borefield.results.peak_injection_inlet[index_mask])
         else:
-            min_temperature, max_temperature = np.min(borefield.results.peak_extraction_outlet), np.max(
-                borefield.results.peak_injection_outlet)
+            min_temperature, max_temperature = np.min(borefield.results.peak_extraction_outlet[index_mask]), np.max(
+                borefield.results.peak_injection_outlet[index_mask])
 
         # deviation from minimum temperature
         if abs(min_temperature - borefield.Tf_min) > temperature_threshold:
@@ -636,6 +641,12 @@ def optimise_load_profile_balance(
     peak_dhw_load: float = init_peak_dhw
     peak_cool_load: float = init_peak_cooling
 
+    n_hours = borefield.load.simulation_period * 8760
+    if isinstance(borefield.load, HourlyBuildingLoad):
+        index_mask = np.concatenate([np.arange(8760), np.arange(n_hours - 8760, n_hours)])
+    else:
+        index_mask = None
+
     # set iteration criteria
     cool_ok, heat_ok = False, False
     while not cool_ok or not heat_ok:
@@ -659,14 +670,14 @@ def optimise_load_profile_balance(
                                                                             HourlyBuildingLoad))  # always the same
 
         if borefield._calculation_setup.size_based_on == 'average':
-            min_temperature, max_temperature = np.min(borefield.results.min_temperature), np.max(
-                borefield.results.max_temperature)
+            min_temperature, max_temperature = np.min(borefield.results.peak_extraction[index_mask]), np.max(
+                borefield.results.peak_extraction[index_mask])
         elif borefield._calculation_setup.size_based_on == 'inlet':
-            min_temperature, max_temperature = np.min(borefield.results.peak_extraction_inlet), np.max(
-                borefield.results.peak_injection_inlet)
+            min_temperature, max_temperature = np.min(borefield.results.peak_extraction_inlet[index_mask]), np.max(
+                borefield.results.peak_injection_inlet[index_mask])
         else:
-            min_temperature, max_temperature = np.min(borefield.results.peak_extraction_outlet), np.max(
-                borefield.results.peak_injection_outlet)
+            min_temperature, max_temperature = np.min(borefield.results.peak_extraction_outlet[index_mask]), np.max(
+                borefield.results.peak_injection_outlet[index_mask])
 
         # calculate relative imbalance
         imbalance = borefield.load.imbalance / np.maximum(borefield.load.yearly_average_injection_load,
