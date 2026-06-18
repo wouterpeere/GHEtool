@@ -67,23 +67,24 @@ class SeparatusNew():
             Grout thermal conductivity [W/mK]
         """
         self.k_g = k_g
-        self.diameter = 51 * 1e-3
-        self.wall_thickness = 3e-3  # 3.1 * 1e-3
+        self.diameter = 51.9 * 1e-3
+        self.wall_thickness = 3.05e-3  # 3.1 * 1e-3
         self.r_in = (self.diameter / 2) - self.wall_thickness
         self.r_out = (self.diameter / 2)
-        self.k_p = 0.44  # 2
+        self.k_p = 0.4  # 2
         self.D_s = 4 * self.r_in / (3 * np.pi)
         self.epsilon = 1e-6
         self.number_of_pipes = 1
         self.pos = [(-self.D_s, 0), (self.D_s, 0)]
         self.pipe_inner_wall = 2.7 * 1e-3
+        self.d_hydraulic = 26.5e-3
 
     def calculate_conductive_resistance(self, **kwargs) -> tuple[float, float]:
         return (self.pipe_inner_wall / (self.k_p * self.r_in * 2),
                 gt.pipes.conduction_thermal_resistance_circular_pipe(self.r_in, self.r_out, self.k_p) * 2)
 
     def calculate_convective_resistance(self, flow_rate_data, fluid_data, **kwargs) -> tuple[float, float]:
-        hydraulic_diameter = 25.88 * 1e-3
+        hydraulic_diameter = self.d_hydraulic
 
         conv_circle = calculate_convective_resistance(
             flow_rate_data, fluid_data, r_in=hydraulic_diameter / 2, nb_of_pipes=1, epsilon=self.epsilon,
@@ -114,12 +115,18 @@ class SeparatusNew():
         model_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/separatus.pt")
         x_scaler_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/separatus_x.joblib")
         y_scaler_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/separatus_y.joblib")
-        if kwargs.get('new', True):
+        if kwargs.get('new', 1) == 1:
             model_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/split_pipe_two_rfp_ann.pt")
             x_scaler_path = FOLDER.joinpath(
                 f"VariableClasses/PipeData/Model separatus/split_pipe_two_rfp_X_scaler.joblib")
             y_scaler_path = FOLDER.joinpath(
                 f"VariableClasses/PipeData/Model separatus/split_pipe_two_rfp_y_scaler.joblib")
+        if kwargs.get('new', 1) == 2:
+            model_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/old/split_pipe_two_rfp_ann.pt")
+            x_scaler_path = FOLDER.joinpath(
+                f"VariableClasses/PipeData/Model separatus/old/split_pipe_two_rfp_X_scaler.joblib")
+            y_scaler_path = FOLDER.joinpath(
+                f"VariableClasses/PipeData/Model separatus/old/split_pipe_two_rfp_y_scaler.joblib")
         model = SplitPipeANN()
         model.load_state_dict(torch.load(model_path, map_location="cpu"))
         model.eval()
@@ -242,7 +249,7 @@ class SeparatusNew():
         Reynolds number : float
         """
         u = flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / (705.27 * 1e-6) / 1000
-        return fluid_data.rho(**kwargs) * u * 0.02551 / fluid_data.mu(**kwargs)
+        return fluid_data.rho(**kwargs) * u * self.d_hydraulic / fluid_data.mu(**kwargs)
 
     def pressure_drop(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float,
                       **kwargs) -> float:
