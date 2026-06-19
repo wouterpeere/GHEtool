@@ -43,7 +43,8 @@ class EllipseANN(nn.Module):
 class MuoviEllipse(SingleUTube):
     """
     This class contains the model for the MuoviELLIPSE probe from Muovitech. The correlations for the Nusselt number
-    and the friction factor where obtained from the work of (H. Niklas, 2026).
+    and the friction factor where obtained from the work of (H. Niklas, 2026). The borehole internals are calculated
+    using an ANN trained with 20k simulations from a Boundary Element Method model.
 
     More information on this technology and its advantages can be found here: https://www.muovitech.com/group/?page=MuoviELLIPSE.
     """

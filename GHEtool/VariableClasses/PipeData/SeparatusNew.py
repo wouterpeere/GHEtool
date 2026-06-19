@@ -6,7 +6,7 @@ import joblib
 
 from GHEtool import FOLDER
 from GHEtool.utils.calculate_friction_factor import *
-from GHEtool.VariableClasses.PipeData.SingleUTube import SingleUTube
+from GHEtool.VariableClasses.PipeData._PipeData import _PipeData
 from GHEtool.VariableClasses.FluidData import _FluidData
 from GHEtool.VariableClasses.FlowData import _FlowData
 
@@ -39,18 +39,11 @@ class SplitPipeANN(nn.Module):
         return self.net(x)
 
 
-class SeparatusNew():
+class SeparatusNew(_PipeData):
     """
-    This class contains the model for the Separatus probe. Separatus is a new player in the geothermal space and
-    uses a unique 'splitpipe'-technology. This technology inserts a membrane in the middel of a pipe with DN50, so that
-    the inlet and outlet flows are separated.
-
-    The model in this class has been obtained in close collaboration between Separatus AG (Swiss) and Enead BV (Belgium)
-    based on real-life measurements from projects. It was found that the Separatus probe can be modelled like
-    a single U-tube with a specific set of design parameters and an extra contact resistance.
-
-    The implemented model is the first step towards designing a system with the Separatus technology. In the future, this
-    model will be updated when new research has been conducted.
+    This class contains the model for the Separatus probe from separatus. The borehole internals are calculated
+    using an ANN trained with 20k simulations from a Boundary Element Method model. The heat transfer inside the pipe,
+    is calculated using the equivalent hydraulic diameter.
 
     More information on this technology and its advantages can be found here: https://separatus.ch/en.
     """
@@ -68,29 +61,65 @@ class SeparatusNew():
         """
         self.k_g = k_g
         self.diameter = 51.9 * 1e-3
-        self.wall_thickness = 3.05e-3  # 3.1 * 1e-3
+        self.wall_thickness = 3.05e-3
         self.r_in = (self.diameter / 2) - self.wall_thickness
         self.r_out = (self.diameter / 2)
-        self.k_p = 0.4  # 2
-        self.D_s = 4 * self.r_in / (3 * np.pi)
+        self.k_p = 0.4
         self.epsilon = 1e-6
-        self.number_of_pipes = 1
-        self.pos = [(-self.D_s, 0), (self.D_s, 0)]
         self.pipe_inner_wall = 2.7 * 1e-3
-        self.d_hydraulic = 26.5e-3
+        self.hydraulic_diameter = 26.5e-3
+        self.cross_sectional_area = (np.pi * self.r_in ** 2 - self.pipe_inner_wall * 2 * self.r_in) / 2
+        print(self.cross_sectional_area)
 
     def calculate_conductive_resistance(self, **kwargs) -> tuple[float, float]:
+        """
+        This function calculates the pipe thermal conductive resistance for both the inner pipe wall and the outer wall.
+
+        Returns
+        -------
+        tuple
+            Conductive resistance for the separation wall [mK/W], Conductive resistance for the outer wall [mK/W]
+        """
         return (self.pipe_inner_wall / (self.k_p * self.r_in * 2),
+                # multiplied by two since only half the pipe circumference is present
                 gt.pipes.conduction_thermal_resistance_circular_pipe(self.r_in, self.r_out, self.k_p) * 2)
 
     def calculate_convective_resistance(self, flow_rate_data, fluid_data, **kwargs) -> tuple[float, float]:
-        hydraulic_diameter = self.d_hydraulic
+        """
+            This function calculates the convective resistance for both the inner pipe wall and the outer wall
+            based on the hydraulic diameter.
 
-        conv_circle = calculate_convective_resistance(
-            flow_rate_data, fluid_data, r_in=hydraulic_diameter / 2, nb_of_pipes=1, epsilon=self.epsilon,
-            wetted_perimeter=np.pi * self.r_in, **kwargs)
+            Parameters
+            ----------
+            flow_data : _FlowData
+                Flow data object
+            fluid_data : _FluidData
+                Fluid data object
+
+            Returns
+            -------
+            float or np.ndarray
+                Convective resistances
+
+            References
+            ----------
+            .. [#Niklas] Niklas Hidman. (2026). Thermohydraulic performance evaluation of internally finned elliptical geothermal collector pipes
+            """
+        hydraulic_diameter = self.hydraulic_diameter
+
+        if kwargs.get('new', True):
+            conv_circle = calculate_convective_resistance(
+                flow_rate_data, fluid_data, r_in=hydraulic_diameter / 2, nb_of_pipes=1, area=self.cross_sectional_area,
+                epsilon=self.epsilon, wetted_perimeter=np.pi * self.r_in,
+                **kwargs)  # only circular part for the wetted perimeter
+        else:
+            conv_circle = calculate_convective_resistance(
+                flow_rate_data, fluid_data, r_in=hydraulic_diameter / 2, nb_of_pipes=1,
+                epsilon=self.epsilon, wetted_perimeter=np.pi * self.r_in,
+                **kwargs)  # only circular part for the wetted perimeter
         nu = hydraulic_diameter / conv_circle / (np.pi * self.r_in) / fluid_data.k_f(**kwargs)
 
+        # Rconv = 1/(hP) = Dh/(Nu*kf*P) with P wetted area (separation wall)
         plate = hydraulic_diameter / (nu * fluid_data.k_f(**kwargs) * self.r_in * 2)
         return plate * 2, conv_circle
 
@@ -112,21 +141,10 @@ class SeparatusNew():
         R_b, R_a : np.ndarray
             Same shape as broadcasted inputs
         """
-        model_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/separatus.pt")
-        x_scaler_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/separatus_x.joblib")
-        y_scaler_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/separatus_y.joblib")
-        if kwargs.get('new', 1) == 1:
-            model_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/split_pipe_two_rfp_ann.pt")
-            x_scaler_path = FOLDER.joinpath(
-                f"VariableClasses/PipeData/Model separatus/split_pipe_two_rfp_X_scaler.joblib")
-            y_scaler_path = FOLDER.joinpath(
-                f"VariableClasses/PipeData/Model separatus/split_pipe_two_rfp_y_scaler.joblib")
-        if kwargs.get('new', 1) == 2:
-            model_path = FOLDER.joinpath(f"VariableClasses/PipeData/Model separatus/old/split_pipe_two_rfp_ann.pt")
-            x_scaler_path = FOLDER.joinpath(
-                f"VariableClasses/PipeData/Model separatus/old/split_pipe_two_rfp_X_scaler.joblib")
-            y_scaler_path = FOLDER.joinpath(
-                f"VariableClasses/PipeData/Model separatus/old/split_pipe_two_rfp_y_scaler.joblib")
+        model_path = FOLDER.joinpath(f"VariableClasses/PipeData/ANN/separatus/separatus.pt")
+        x_scaler_path = FOLDER.joinpath(f"VariableClasses/PipeData/ANN/separatus/separatus_x.joblib")
+        y_scaler_path = FOLDER.joinpath(f"VariableClasses/PipeData/ANN/separatus/separatus_y.joblib")
+
         model = SplitPipeANN()
         model.load_state_dict(torch.load(model_path, map_location="cpu"))
         model.eval()
@@ -172,8 +190,7 @@ class SeparatusNew():
         return R_b, R_a
 
     def explicit_model_borehole_resistance(self, fluid_data: _FluidData, flow_rate_data: _FlowData, k_s: float,
-                                           borehole: gt.boreholes.Borehole, order: int = 1, R_p: float = None,
-                                           **kwargs) -> float:
+                                           borehole: gt.boreholes.Borehole, R_p: float = None, **kwargs) -> float:
         """
         This function returns the effective borehole thermal resistance for the Separatus probe based on an explicit
         model (always second order).
@@ -200,7 +217,7 @@ class SeparatusNew():
             r_fp_center = R_p_cond_wall + R_p_conv_wall
             R_b, R_a = self.predict_split_pipe_Rb_Ra_series(borehole.r_b, r_fp_pipe, r_fp_center, self.k_g, k_s,
                                                             **kwargs)
-            # print(f'New Rf pipe: {r_fp_pipe:.3f}, Rf center: {r_fp_center:.3f}, R_b: {R_b:.3f}, R_a= {R_a:.3f}')
+
             r_v = borehole.H / (flow_rate_data.mfr_borehole(**kwargs, fluid_data=fluid_data) * fluid_data.cp(
                 **kwargs))
             n = r_v / (R_b * R_a) ** 0.5
@@ -208,10 +225,7 @@ class SeparatusNew():
 
     def pipe_model(self, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
         """
-        This function returns the pipe model for the Separatus probe.
-        A Separatus heat exchanger can be modelled by using the model of a single U tube, with an extra contact resistance
-        of 0.03 W/(mK) to account for the intermediate wall inside the probe. This value of 0.03W/(mK) was obtained by
-        the company based on real-life measurements.
+        This function returns the BasePipe model.
 
         Parameters
         ----------
@@ -224,18 +238,30 @@ class SeparatusNew():
         -------
         BasePipe
         """
-        single_u: gt.pipes._BasePipe = super().pipe_model(k_s, borehole)
+        raise NotImplementedError('The separatus can only be simulated with the explicit methods.')
 
-        # add 0.03 W/(mK) as a contact resistance
-        single_u.R_fp += 0.03
-        single_u.update_thermal_resistances(single_u.R_fp)
+    def calculate_resistances(self, fluid_data: _FluidData, flow_rate_data: _FlowData, **kwargs) -> None:
+        """
+        This function calculates the conductive and convective resistances, which are constant.
 
-        return single_u
+        Parameters
+        ----------
+        fluid_data : FluidData
+            Fluid data
+        flow_rate_data : FlowData
+            Flow rate data
+
+        Returns
+        -------
+        None
+        """
+
+        raise NotImplementedError('The separatus can only be simulated with the explicit methods.')
 
     def Re(self, fluid_data: _FluidData, flow_rate_data: _FlowData, **kwargs) -> float:
         """
         Reynolds number.
-        This model uses the hydraulic diameter of 25.51 mm.
+        This model uses the hydraulic diameter of 26.5 mm.
 
         Parameters
         ----------
@@ -248,14 +274,14 @@ class SeparatusNew():
         -------
         Reynolds number : float
         """
-        u = flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / (705.27 * 1e-6) / 1000
-        return fluid_data.rho(**kwargs) * u * self.d_hydraulic / fluid_data.mu(**kwargs)
+        u = flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / self.cross_sectional_area / 1000
+        return fluid_data.rho(**kwargs) * u * self.hydraulic_diameter / fluid_data.mu(**kwargs)
 
     def pressure_drop(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float,
                       **kwargs) -> float:
         """
         Calculates the pressure drop across the entire borehole.
-        This model uses the hydraulic diameter of 25.51 mm.
+        This model uses the hydraulic diameter of 26.5 mm.
 
         Parameters
         ----------
@@ -272,22 +298,84 @@ class SeparatusNew():
             Pressure drop [kPa]
         """
 
-        # Darcy fluid factor
+        # calculate flow velocity
+        v = flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / self.cross_sectional_area / 1000
 
-        v = flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / (np.pi * 0.02551 ** 2 / 4) / 1000
-        Re = fluid_data.rho(**kwargs) * v * 0.02551 / fluid_data.mu(**kwargs)
         # Darcy fluid factor
         if kwargs.get('haaland', False):
-            fd = friction_factor_Haaland(Re, 0.02551 / 2, self.epsilon, **kwargs)
+            fd = friction_factor_Haaland(
+                self.Re(fluid_data, flow_rate_data, **kwargs), self.hydraulic_diameter / 2, self.epsilon, **kwargs)
         else:
-            fd = friction_factor_darcy_weisbach(Re, 0.02551 / 2, self.epsilon, **kwargs)
+            fd = friction_factor_darcy_weisbach(
+                self.Re(fluid_data, flow_rate_data, **kwargs), self.hydraulic_diameter / 2, self.epsilon, **kwargs)
 
-        A = 705.27 * 1e-6  # cross-sectional area of the separatus
-        V = (flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / 1000) / A
+        # add 0.75 for the local losses, according to simulations by OST
+        return ((fd * (borehole_length * 2) / self.hydraulic_diameter + 0.75) * fluid_data.rho(
+            **kwargs) * v ** 2 / 2) / 1000
 
-        # add 0.2 for the local losses
-        # (source: https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html)
-        return ((fd * (borehole_length * 2) / 0.02551 + 0.2) * fluid_data.rho(**kwargs) * V ** 2 / 2) / 1000
+    def draw_borehole_internal(self, r_b: float) -> None:
+        """
+        This function draws the internal structure of a borehole.
+        This means, it draws the pipes inside the borehole.
+
+        Parameters
+        ----------
+        r_b : float
+            Borehole radius [m]
+
+        Returns
+        -------
+        None
+        """
+
+        COLOR_SECONDARY = '#2196F3'  # left inner ellipse (flow in)
+        COLOR_RED = '#E53935'  # right inner ellipse (flow out)
+
+        # ── Derived values ───────────────────────────────────────────────────────────
+        borehole_radius = r_b
+        a_inner = self.a / 2 - self.wall_thickness
+        b_inner = self.b / 2 - self.wall_thickness
+
+        # Ellipse centers: left at (-spacing, 0), right at (+spacing, 0)
+        centers = [(-self.D_s, 0), (self.D_s, 0)]
+        inner_colors = [COLOR_SECONDARY, COLOR_RED]
+
+        # ── Plot ─────────────────────────────────────────────────────────────────────
+        fig, ax = plt.subplots(figsize=(5, 5))
+        ax.set_aspect('equal')
+        ax.axis('off')
+
+        # Borehole circle (black outline, no fill)
+        borehole = plt.Circle((0, 0), borehole_radius, fill=False, edgecolor='black', linewidth=2, zorder=1)
+        ax.add_patch(borehole)
+
+        # Ellipses
+        for i, (cx, cy) in enumerate(centers):
+            # Outer ellipse (black pipe wall)
+            outer = patches.Ellipse(
+                (cx, cy),
+                width=self.b, height=self.a,
+                facecolor='black',
+                zorder=2
+            )
+            ax.add_patch(outer)
+
+            # Inner ellipse (fluid channel)
+            inner = patches.Ellipse(
+                (cx, cy),
+                width=2 * b_inner, height=2 * a_inner,
+                facecolor=inner_colors[i],
+                zorder=3
+            )
+            ax.add_patch(inner)
+
+        # Axis limits with a small margin
+        margin = borehole_radius * 1.1
+        ax.set_xlim(-margin, margin)
+        ax.set_ylim(-margin, margin)
+
+        plt.tight_layout()
+        plt.show()
 
     def __export__(self):
         return {'type': 'Separatus',

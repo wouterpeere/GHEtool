@@ -15,3 +15,5 @@ include GHEtool/VariableClasses/PipeData/ANN/MuoviELLIPSE55/*.pt
 include GHEtool/VariableClasses/PipeData/ANN/MuoviELLIPSE55/*.jolib
 include GHEtool/VariableClasses/PipeData/ANN/MuoviELLIPSE63/*.pt
 include GHEtool/VariableClasses/PipeData/ANN/MuoviELLIPSE63/*.jolib
+include GHEtool/VariableClasses/PipeData/ANN/separatus/*.pt
+include GHEtool/VariableClasses/PipeData/ANN/separatus/*.jolib
