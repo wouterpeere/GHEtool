@@ -1968,13 +1968,16 @@ class Borefield(BaseClass):
                 # calculation the borehole wall temperature for every month i
                 k_s = self.ground_data.k_s(self.calculate_depth(H_var, self.D), self.D)
                 Tb = (result_convolution + kwargs.get('offset_convolution', 0)) / (2 * pi * k_s) / (
-                            H_var * self.number_of_boreholes) + self._Tg(H_var)
+                        H_var * self.number_of_boreholes) + self._Tg(H_var)
 
                 # now the Tf will be calculated based on
                 # Tf = Tb + Q * R_b
+                power = np.where(self.load.monthly_average_injection_power_simulation_period > 0,
+                                 self.load.monthly_peak_injection_simulation_period,
+                                 self.load.monthly_peak_extraction_simulation_period)
                 results_month_avg = Tb + self.load.monthly_average_injection_power_simulation_period * 1000 * (
                         get_rb(results_temperature.baseload_temperature, Tmin,
-                               power=self.load.monthly_average_injection_power_simulation_period) / self.number_of_boreholes / H_var)
+                               power=power) / self.number_of_boreholes / H_var)
 
                 # extra summation if the g-function value for the peak is included
                 results_peak_injection = (
