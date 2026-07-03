@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [2.4.2] - Unpublished
 
+### Changed
+
+- Move calculate_borefield_inlet_outlet_temperature to Borehole class (issue #464).
+
 ### Fixed
 
 - Fix issue with pyparsing.tools (issue #460, thans to helgakovacs).
