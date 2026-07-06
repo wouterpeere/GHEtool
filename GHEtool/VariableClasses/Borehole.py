@@ -391,6 +391,44 @@ class Borehole(BaseClass):
 
         return self.calculate_Rb(H, D, r_b, k_s if isinstance(k_s, (int, float)) else k_s(depth, D), **kwargs)
 
+    def _calculate_borefield_inlet_outlet_temperature(self, power: Union[float, np.ndarray],
+                                                      temperature: Union[float, np.ndarray],
+                                                      nb_of_boreholes: int, **kwargs) -> tuple:
+        """
+        This function calculates the inlet and outlet temperature of the borefield given the power and the average
+        fluid temperature.
+
+        Parameters
+        ----------
+        power : float, np.ndarray
+            Power for which the inlet and outlet temperatures are calculated (negative means extraction) [kW]
+        temperature : float, np.ndarray
+            Temperature for which the inlet and outlet temperatures are calculated [°C]
+        nb_of_boreholes : int
+            Number of boreholes
+
+        Returns
+        -------
+        tuple
+            Borefield inlet temperature [°C] (float, np.ndarray), Borefield outlet temperature [°C] (float, np.ndarray)
+
+        Raises
+        ------
+        TypeError
+            Raises TypeError when a constant borehole thermal resistance is used.
+        """
+        if self.use_constant_Rb:
+            raise TypeError("The inlet and outlet temperatures cannot be calculated when a constant effective borehole"
+                            "thermal resistance is used.")
+
+        delta_temp = power / (
+                self.fluid_data.cp(temperature=temperature) / 1000 *
+                self.flow_data.mfr_borefield(fluid_data=self.fluid_data, temperature=temperature,
+                                             nb_of_boreholes=nb_of_boreholes, power=power, **kwargs))
+        delta_temp = np.nan_to_num(delta_temp, )
+        # power < 0 when in extraction
+        return temperature + delta_temp / 2, temperature - delta_temp / 2
+
     def __eq__(self, other):
         if not isinstance(other, Borehole):
             return False

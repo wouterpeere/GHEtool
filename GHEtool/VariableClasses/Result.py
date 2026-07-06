@@ -42,6 +42,42 @@ class _Results(ABC):
 
         """
 
+    @abc.abstractmethod
+    def peak_extraction_outlet(self) -> np.ndarray:
+        """
+
+        Returns
+        -------
+
+        """
+
+    @abc.abstractmethod
+    def peak_injection_outlet(self) -> np.ndarray:
+        """
+
+        Returns
+        -------
+
+        """
+
+    @abc.abstractmethod
+    def peak_extraction_inlet(self) -> np.ndarray:
+        """
+
+        Returns
+        -------
+
+        """
+
+    @abc.abstractmethod
+    def peak_injection_inlet(self) -> np.ndarray:
+        """
+
+        Returns
+        -------
+
+        """
+
     @property
     def min_temperature(self) -> float:
         """
@@ -69,6 +105,64 @@ class _Results(ABC):
         if len(self.peak_injection) == 0:
             return None
         return np.max(self.peak_injection)
+
+    def get_peak_extraction(self, type: str):
+        """
+        Get peak extraction.
+
+        Parameters
+        ----------
+        type : str
+            Average, inlet or outlet
+
+        Return
+        ------
+        np.ndarray
+            Peak extraction
+
+        Raises
+        ------
+        ValueError
+            When type is not in (average, inlet or outlet)
+        """
+
+        if type == "average":
+            return self.peak_extraction
+        elif type == 'inlet':
+            return self.peak_extraction_inlet
+        elif type == 'outlet':
+            return self.peak_extraction_outlet
+        else:
+            raise ValueError(f'Type should be average, inlet or outlet but is {type}.')
+
+    def get_peak_injection(self, type: str):
+        """
+        Get peak injection.
+
+        Parameters
+        ----------
+        type : str
+            Average, inlet or outlet
+
+        Return
+        ------
+        np.ndarray
+            Peak injection
+
+        Raises
+        ------
+        ValueError
+            When type is not in (average, inlet or outlet)
+        """
+
+        if type == "average":
+            return self.peak_injection
+        elif type == 'inlet':
+            return self.peak_injection_inlet
+        elif type == 'outlet':
+            return self.peak_injection_outlet
+        else:
+            raise ValueError(f'Type should be average, inlet or outlet but is {type}.')
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, self.__class__):
@@ -185,6 +279,35 @@ class ResultsMonthly(_Results):
         if not np.any(self._baseload_temp_outlet):
             raise ValueError('No outlet temperature for the baseload is set.')
         return self._baseload_temp_outlet
+
+    def get_baseload(self, type: str):
+        """
+        Get peak baseload.
+
+        Parameters
+        ----------
+        type : str
+            Average, inlet or outlet
+
+        Return
+        ------
+        np.ndarray
+            Baseload
+
+        Raises
+        ------
+        ValueError
+            When type is not in (average, inlet or outlet)
+        """
+
+        if type == "average":
+            return self.baseload_temperature
+        elif type == 'inlet':
+            return self.baseload_temperature_inlet
+        elif type == 'outlet':
+            return self.baseload_temperature_outlet
+        else:
+            raise ValueError(f'Type should be average, inlet or outlet but is {type}.')
 
     @property
     def baseload_temperature_delta(self) -> np.ndarray:
