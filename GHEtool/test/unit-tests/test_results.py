@@ -63,6 +63,12 @@ def test_delta():
     assert np.allclose([4, 4], results.get_baseload('inlet'))
     assert np.allclose([5, 5], results.get_baseload('outlet'))
     assert np.allclose([3, 3], results.get_baseload('average'))
+    with pytest.raises(ValueError):
+        results.get_peak_injection('test')
+    with pytest.raises(ValueError):
+        results.get_peak_extraction('test')
+    with pytest.raises(ValueError):
+        results.get_baseload('test')
 
     results = ResultsHourly()
     results._Tf_outlet = np.array([5, 5])
