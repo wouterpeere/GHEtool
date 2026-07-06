@@ -393,7 +393,8 @@ class Borehole(BaseClass):
 
     def _calculate_borefield_inlet_outlet_temperature(self, power: Union[float, np.ndarray],
                                                       temperature: Union[float, np.ndarray],
-                                                      nb_of_boreholes: int, **kwargs) -> tuple:
+                                                      borehole_wall: Union[float, np.ndarray] = None,
+                                                      nb_of_boreholes: int = 0, **kwargs) -> tuple:
         """
         This function calculates the inlet and outlet temperature of the borefield given the power and the average
         fluid temperature.
@@ -404,6 +405,8 @@ class Borehole(BaseClass):
             Power for which the inlet and outlet temperatures are calculated (negative means extraction) [kW]
         temperature : float, np.ndarray
             Temperature for which the inlet and outlet temperatures are calculated [°C]
+        borehole_wall : float, np.ndarray
+            Temperature of the borehole wall as a limitation on the outlet temperature [°C]
         nb_of_boreholes : int
             Number of boreholes
 
@@ -425,7 +428,19 @@ class Borehole(BaseClass):
                 self.fluid_data.cp(temperature=temperature) / 1000 *
                 self.flow_data.mfr_borefield(fluid_data=self.fluid_data, temperature=temperature,
                                              nb_of_boreholes=nb_of_boreholes, power=power, **kwargs))
+
         delta_temp = np.nan_to_num(delta_temp, )
+
+        # limit delta temp to max 2x difference between fluid and borehole wall
+        if borehole_wall is not None:
+            diff = temperature - borehole_wall  # negative is extraction
+            max_delta = 2 * diff
+            delta_temp = np.where(
+                delta_temp > 0,
+                np.minimum(max_delta, delta_temp),
+                np.maximum(max_delta, delta_temp)
+            )
+
         # power < 0 when in extraction
         return temperature + delta_temp / 2, temperature - delta_temp / 2
 
