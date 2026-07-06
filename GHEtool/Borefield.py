@@ -2025,12 +2025,13 @@ class Borefield(BaseClass):
                 # calculate inlet/outlet temperatures when possible
                 if not self.borehole.use_constant_Rb:
                     results._baseload_temp_inlet, results._baseload_temp_outlet = self.calculate_borefield_inlet_outlet_temperature(
-                        self.load.monthly_average_injection_power_simulation_period, results.baseload_temperature)
+                        self.load.monthly_average_injection_power_simulation_period, results.baseload_temperature,
+                        results.Tb)
                     results._peak_injection_inlet, results._peak_injection_outlet = self.calculate_borefield_inlet_outlet_temperature(
-                        self.load.monthly_peak_injection_simulation_period, results.peak_injection)
+                        self.load.monthly_peak_injection_simulation_period, results.peak_injection, results.Tb)
                     # (-1) needed since the peak power is always defined positive but for the Delta T it should be signed
                     results._peak_extraction_inlet, results._peak_extraction_outlet = self.calculate_borefield_inlet_outlet_temperature(
-                        (-1) * self.load.monthly_peak_extraction_simulation_period, results.peak_extraction)
+                        (-1) * self.load.monthly_peak_extraction_simulation_period, results.peak_extraction, results.Tb)
             if hourly:
                 # check for hourly data if this is requested
                 if not self.load._hourly:
@@ -2108,10 +2109,11 @@ class Borefield(BaseClass):
                                    hourly_load) / self.number_of_boreholes / H_var)
                 if not self.borehole.use_constant_Rb:
                     results._Tf_inlet, results._Tf_outlet = self.calculate_borefield_inlet_outlet_temperature(
-                        hourly_load, results.peak_injection, simulation_period=self.load.simulation_period)
+                        hourly_load, results.peak_injection, results.Tb, simulation_period=self.load.simulation_period)
                     if sizing:
                         results._Tf_extraction_inlet, results._Tf_extraction_outlet = self.calculate_borefield_inlet_outlet_temperature(
-                            hourly_load, results._Tf_extraction, simulation_period=self.load.simulation_period)
+                            hourly_load, results._Tf_extraction, results.Tb,
+                            simulation_period=self.load.simulation_period)
             return results
 
         def calculate_difference(
@@ -2358,7 +2360,8 @@ class Borefield(BaseClass):
         return 2
 
     def calculate_borefield_inlet_outlet_temperature(self, power: Union[float, np.ndarray],
-                                                     temperature: Union[float, np.ndarray], **kwargs) -> tuple:
+                                                     temperature: Union[float, np.ndarray],
+                                                     borehole_wall: Union[float, np.ndarray] = None, **kwargs) -> tuple:
         """
         This function calculates the inlet and outlet temperature of the borefield given the power and the average
         fluid temperature.
@@ -2369,6 +2372,8 @@ class Borefield(BaseClass):
             Power for which the inlet and outlet temperatures are calculated (negative means extraction) [kW]
         temperature : float, np.ndarray
             Temperature for which the inlet and outlet temperatures are calculated [°C]
+        borehole_wall : float, np.ndarray
+            Temperature of the borehole wall as a limitation on the outlet temperature [°C]
 
         Returns
         -------
@@ -2380,8 +2385,8 @@ class Borefield(BaseClass):
         TypeError
             Raises TypeError when a constant borehole thermal resistance is used.
         """
-        return self.borehole._calculate_borefield_inlet_outlet_temperature(power, temperature, self.number_of_boreholes,
-                                                                           **kwargs)
+        return self.borehole._calculate_borefield_inlet_outlet_temperature(
+            power, temperature, borehole_wall, nb_of_boreholes=self.number_of_boreholes, **kwargs)
 
     def __export__(self):
         return {
