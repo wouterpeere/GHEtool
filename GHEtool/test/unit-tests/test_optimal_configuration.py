@@ -54,3 +54,16 @@ def test_flow_field():
     borefield.calculation_setup(use_neural_network=True)
     with pytest.raises(AttributeError):
         optimise_borefield_configuration(borefield, 100, 100, 5, 7, 0.5, 150, 150, nb_max=50, flow_field=1)
+
+
+def test_max_dp():
+    borefield = Borefield(load=MonthlyGeothermalLoadAbsolute(*load_case(1)))
+    borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 4, 0.075)
+    borefield.ground_data = GroundFluxTemperature(3, 10)
+    borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
+    borefield.flow_data = ConstantFlowRate(mfr=2)
+    borefield.pipe_data = DoubleUTube(1, 0.015, 0.02, 0.4, 0.05)
+    borefield.calculation_setup(use_constant_Rb=False)
+    borefield.calculation_setup(use_neural_network=True)
+    with pytest.raises(UnsolvableOptimalFieldError):
+        optimise_borefield_configuration(borefield, 100, 100, 5, 7, 0.5, 50, 150, nb_max=50, max_dp=1)
