@@ -181,13 +181,6 @@ def optimise_borefield_configuration(
                     length = borefield_temp.size_L3(optimise=True)
                 else:
                     length = borefield_temp.size_L4(optimise=True)
-            print(length, borefield_temp.borehole.pipe_data.pressure_drop(
-                borefield_temp.fluid_data, borefield_temp.flow_data,
-                length,
-                power=max(borefield_temp.load.max_peak_extraction,
-                          borefield_temp.load.max_peak_injection),
-                temperature=borefield_temp.Tf_min,
-                nb_of_boreholes=borefield_temp.number_of_boreholes))
             if not borefield_temp.borehole.use_constant_Rb and borefield_temp.borehole.pipe_data.pressure_drop(
                     borefield_temp.fluid_data, borefield_temp.flow_data,
                     length,
