@@ -75,6 +75,7 @@ def optimise_borefield_configuration(
         size_L3: bool = True,
         optimise: str = 'length',
         dense: bool = False,
+        max_dp: float = 1e10,
         **kwargs) -> list:
     """
     This function calculates the optimal borefield configuration within a certain area.
@@ -113,6 +114,8 @@ def optimise_borefield_configuration(
         minimum number of boreholes should be selected.
     dense : bool
         True if the staggered configuration is dense.
+    max_dp : float
+        Maximum pressure drop of the probe [kPa]
 
     Returns
     -------
@@ -178,6 +181,14 @@ def optimise_borefield_configuration(
                     length = borefield_temp.size_L3(optimise=True)
                 else:
                     length = borefield_temp.size_L4(optimise=True)
+            if not borefield_temp.borehole.use_constant_Rb and borefield_temp.borehole.pipe_data.pressure_drop(
+                    borefield_temp.fluid_data, borefield_temp.flow_data,
+                    length,
+                    power=max(borefield_temp.load.max_peak_extraction,
+                              borefield_temp.load.max_peak_injection),
+                    temperature=borefield_temp.Tf_min,
+                    nb_of_boreholes=borefield_temp.number_of_boreholes) > max_dp:
+                return max_value * 2, max_value * 2
             if h_min <= length + borefield_temp.D <= h_max:
                 return length * borefield_temp.number_of_boreholes, borefield_temp.number_of_boreholes
             elif length + borefield_temp.D <= h_min:

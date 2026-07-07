@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 
 - Function to get peak temperatures and baseload temperatures based on average, inlet or outlet.
+- Add pressure drop limitation to optimisation (issue #141).
 
 ### Changed
 
