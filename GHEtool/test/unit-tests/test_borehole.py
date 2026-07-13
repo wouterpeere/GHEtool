@@ -306,3 +306,25 @@ def test_error_borehole_variable_flow_rate():
     with pytest.raises(ValueError):
         control_bor.calculate_Rb(100, 1, 0.075, 2, 101, temperature=5, nb_of_boreholes=2,
                                  use_explicit_models=False)
+
+
+def test_with_inlet_outlet():
+    borehole = Borehole()
+    borehole.pipe_data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2)
+    borehole.fluid_data = ConstantFluidData(0.5, 1200, 4000, 0.001)
+    borehole.flow_data = ConstantFlowRate(mfr=1)
+    borehole.use_constant_Rb = False
+
+    assert np.allclose(borehole._calculate_borefield_inlet_outlet_temperature(10, 1, nb_of_boreholes=1), (2.25, -0.25))
+    assert np.allclose(borehole._calculate_borefield_inlet_outlet_temperature(-10, -1, nb_of_boreholes=1),
+                       (-2.25, 0.25))
+
+    assert np.allclose(
+        borehole._calculate_borefield_inlet_outlet_temperature(10, 1, borehole_wall=0.5, nb_of_boreholes=1),
+        (1.5, 0.5))
+    assert np.allclose(
+        borehole._calculate_borefield_inlet_outlet_temperature(-10, -1, borehole_wall=0.5, nb_of_boreholes=1),
+        (-2.25, 0.25))
+    assert np.allclose(
+        borehole._calculate_borefield_inlet_outlet_temperature(-10, -1, borehole_wall=0, nb_of_boreholes=1),
+        (-2, 0.))

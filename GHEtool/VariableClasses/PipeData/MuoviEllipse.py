@@ -78,8 +78,8 @@ class MuoviEllipse(SingleUTube):
 
         self.area_outer = np.pi * a * b / 4
         h = (a / 2 - b / 2) ** 2 / ((a / 2 + b / 2) ** 2)
-        perimeter_outer = np.pi * (a / 2 + b / 2) * (1 + (3 * h) / (10 + np.sqrt(4 - 3 * h)))
-        self.hydraulic_diameter_outer = 4 * self.area_outer / perimeter_outer
+        self.perimeter_outer = np.pi * (a / 2 + b / 2) * (1 + (3 * h) / (10 + np.sqrt(4 - 3 * h)))
+        self.hydraulic_diameter_outer = 4 * self.area_outer / self.perimeter_outer
 
         self.area_inner = np.pi * (a - wall_thickness * 2) * (b - wall_thickness * 2) / 4
         h = (((a - wall_thickness * 2) / 2 - (b - wall_thickness * 2) / 2) ** 2 /

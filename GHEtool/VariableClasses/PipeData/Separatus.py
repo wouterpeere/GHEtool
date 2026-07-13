@@ -25,7 +25,7 @@ class Separatus(SingleUTube):
 
     def __init__(self, k_g: float = None):
         """
-        
+
         Parameters
         ----------
         k_g : float

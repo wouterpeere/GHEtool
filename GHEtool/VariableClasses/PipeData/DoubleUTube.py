@@ -12,7 +12,8 @@ class DoubleUTube(MultipleUTube):
                  k_p: float = None,
                  D_s: float = None,
                  epsilon: float = 1e-6,
-                 config: str = 'diagonal'):
+                 config: str = 'diagonal',
+                 groundwater_filled: bool = False):
         """
 
         Parameters
@@ -31,5 +32,7 @@ class DoubleUTube(MultipleUTube):
             Pipe roughness [m]
         config : str
             Either 'diagonal' or 'adjacent'
+        groundwater_filled : bool
+            Filled with groundwater (overwrites the grout conductivity)
         """
-        super().__init__(k_g, r_in, r_out, k_p, D_s, 2, epsilon, config)
+        super().__init__(k_g, r_in, r_out, k_p, D_s, 2, epsilon, config, groundwater_filled=groundwater_filled)

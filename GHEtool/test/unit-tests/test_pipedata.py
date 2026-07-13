@@ -960,6 +960,21 @@ def test_explicit_models_double_U():
                       pipe.explicit_model_borehole_resistance(fluid, flow, 3, borehole, 1, R_p=0.05))
 
 
+def test_groundwater_filled():
+    fluid = TemperatureDependentFluidData('MEA', 25)
+    flow = ConstantFlowRate(vfr=1.5 * 2 / 3.6)
+    pipe = MultipleUTube(1.5, 0.0354 / 2, 0.02, 0.4, 0.035, number_of_pipes=1, groundwater_filled=True)
+    borehole = gt.boreholes.Borehole(80, 0, 0.110 / 2, 0, 0)
+
+    pipe.explicit_model_borehole_resistance(fluid, flow, 3, borehole, temperature_borehole_wall=10, temperature=10,
+                                            power=-30 * 80 * 9 / 1000, nb_of_boreholes=9)
+
+    pipe = MultipleUTube(1.5, 0.0354 / 2, 0.02, 0.4, 0.035, number_of_pipes=1)
+    print(
+        pipe.explicit_model_borehole_resistance(fluid, flow, 3, borehole, temperature_borehole_wall=10, temperature=10,
+                                                power=-30 * 80 * 9 / 1000, nb_of_boreholes=9))
+
+
 def test_convective_resistance_variable_flow_constant_fluid():
     single = SingleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
