@@ -68,7 +68,7 @@ def graphs():
                                                                                   power=q / 1000 * H, nb_of_boreholes=1,
                                                                                   temperature=T_fluid)
 
-                    while abs(temp_rb - temp_rb_prev) > 0.1:
+                    while abs(temp_rb - temp_rb_prev) > 0.01:
                         T_fluid = T_b + q * temp_rb
                         temp_rb_prev = temp_rb
 

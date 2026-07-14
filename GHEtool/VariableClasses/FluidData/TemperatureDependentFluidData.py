@@ -281,34 +281,6 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
             self.freezing_point
         )
 
-    def _interp_all(self, temperature: np.ndarray):
-        """
-        Single-pass interpolation of all four fluid properties at once.
-        Does one binary search instead of four.
-        """
-        T = np.asarray(temperature, dtype=np.float64)
-        xp = self._spacing
-
-        # One binary search for all properties
-        idx = np.searchsorted(xp, T, side='right')
-        idx = np.clip(idx, 1, len(xp) - 1)
-
-        # Interpolation weight
-        x0 = xp[idx - 1]
-        x1 = xp[idx]
-        w = (T - x0) / (x1 - x0)  # shape: (200k,)
-
-        # All four properties in one go — no repeated binary search
-        def _lerp(arr):
-            return arr[idx - 1] + w * (arr[idx] - arr[idx - 1])
-
-        return (
-            _lerp(self._k_f_array),
-            _lerp(self._mu_array),
-            _lerp(self._rho_array),
-            _lerp(self._cp_array),
-        )
-
     def __export__(self):
         return {
             'name': self._name,

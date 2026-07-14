@@ -972,6 +972,8 @@ def test_groundwater_filled():
     with pytest.raises(ValueError):
         pipe.explicit_model_borehole_resistance(fluid, flow, 3, borehole, temperature=10,
                                                 power=-30 * 80 * 9 / 1000, nb_of_boreholes=9)
+    with pytest.raises(ValueError):
+        pipe.pipe_model(2, borehole)
 
 
 def test_convective_resistance_variable_flow_constant_fluid():
