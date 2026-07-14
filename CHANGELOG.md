@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Function to get peak temperatures and baseload temperatures based on average, inlet or outlet.
 - Add pressure drop limitation to optimisation (issue #141).
+- Add groundwater filled boreholes (issue #470).
 
 ### Changed
 
@@ -18,7 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
-- Fix issue with pyparsing.tools (issue #460, thans to helgakovacs).
+- Fix issue with pyparsing.tools (issue #460, thanks to helgakovacs).
 - Fix problem in optimisation for power/balance.
 - Fix monthly temperature profile and variable flow rate (issue #462).
 - Fix problem with constant temperature difference and unphysical results (issue #466).

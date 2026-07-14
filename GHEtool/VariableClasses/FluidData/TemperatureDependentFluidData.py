@@ -57,6 +57,8 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
         self._rho_array = np.array([float(self._fluid.density(i)) for i in self._spacing])
         self._cp_array = np.array([float(self._fluid.specific_heat(i)) for i in self._spacing])
 
+        self._thermal_expansion = -np.gradient(self._rho_array, self._spacing) / self._rho_array
+
     def _calc_density_antifreeze(self, percentage: float = 30) -> float:
         """
         This function returns the density of the pure antifreeze in kg/m³.

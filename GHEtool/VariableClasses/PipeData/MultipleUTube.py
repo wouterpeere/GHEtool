@@ -27,7 +27,8 @@ class MultipleUTube(_PipeData):
                  D_s: float = None,
                  number_of_pipes: int = 1,
                  epsilon: float = 1e-6,
-                 config: str = 'diagonal'):
+                 config: str = 'diagonal',
+                 groundwater_filled: bool = False):
         """
 
         Parameters
@@ -48,10 +49,12 @@ class MultipleUTube(_PipeData):
             Pipe roughness [m]
         config : str
             Either 'diagonal' or 'adjacent'
+        groundwater_filled : bool
+            Filled with groundwater (overwrites the grout conductivity)
         """
         if config not in ('diagonal', 'adjacent'):
             raise ValueError('Invalid value for config. Only diagonal and adjacent is allowed.')
-        super().__init__(k_g, k_p, epsilon)
+        super().__init__(k_g, k_p, epsilon, groundwater_filled)
 
         self.r_in = r_in  # inner pipe radius m
         self.r_out = r_out  # outer pipe radius m
@@ -61,8 +64,12 @@ class MultipleUTube(_PipeData):
         self.pos = []
         self.R_p = 0  # pipe thermal resistance mK/W
         self.R_f = 0  # film (i.e. fluid) thermal resistance mK/W
+
         if self.check_values():
             self.pos = self._axis_symmetrical_pipe  # position of the pipes
+            # define for groundwater filled borehole
+            self.area_outer = np.pi * self.r_out ** 2
+            self.perimeter_outer = np.pi * self.r_out * 2
 
     @property
     def _axis_symmetrical_pipe(self) -> list:
@@ -125,6 +132,8 @@ class MultipleUTube(_PipeData):
         -------
         BasePipe
         """
+        if self.groundwater_filled:
+            ValueError('You cannot use the pipe model when the borehole is filled with groundwater.')
         return gt.pipes.MultipleUTube(self.pos, self.r_in, self.r_out, borehole, k_s, self.k_g,
                                       self.R_p + self.R_f, self.number_of_pipes, J=2)
 
@@ -253,6 +262,8 @@ class MultipleUTube(_PipeData):
         float
             Conductive resistance [mK/W]
         """
+        if self.groundwater_filled:
+            ValueError('You cannot use the pipe model when the borehole is filled with groundwater.')
         return gt.pipes.conduction_thermal_resistance_circular_pipe(self.r_in, self.r_out, self.k_p)
 
     def explicit_model_borehole_resistance(self, fluid_data: _FluidData, flow_rate_data: _FlowData, k_s: float,
@@ -260,8 +271,11 @@ class MultipleUTube(_PipeData):
                                            **kwargs) -> float:
         """
         This function calculates the conductive and convective resistances, which are constant.
-        For the single U case, the formulas from (Claesson & Javed, 2018) are taken [#CJ2018]_.
-        For double U probes, this is based on (Claesson & Javed, 2019) [#CJ2019]_.
+        For the single U case, the formulas from Claesson & Javed (2018) are taken [#CJ2018]_.
+        For double U probes, this is based on Claesson & Javed (2019) [#CJ2019]_.
+
+        When the borehole is filled with groundwater, the correlations by Spitler et al. (2016) [#S2016] and
+        Todorov et al. (2021) [T2021]_ are used.
 
         Parameters
         ----------
@@ -286,11 +300,12 @@ class MultipleUTube(_PipeData):
 
         References
         ----------
+        .. [#S2016] Spitler J., Javed S., Ramstad R. (2016). Natural convection in groundwater-filled boreholes and used as ground heat exchangers. Applied Energy, 164, 352-365.
         .. [#CJ2018] Claesson, J., & Javed, S. (2018). Explicit Multipole Formulas for Calculating Thermal Resistance of Single U-Tube Ground Heat Exchangers. Energies, 11(1), 214. https://doi.org/10.3390/en11010214
         .. [#CJ2019] Claesson, J., & Javed, S. (2019). Explicit multipole formulas and thermal network models for calculating thermal resistances of double U-pipe borehole heat exchangers. Science and Technology for the Built Environment, 25(8), 980–992. https://doi.org/10.1080/23744731.2019.1620565
+        .. [#T2021] Todorov O., Alanne K., Virtanen M., Kosonen R. (2021). Different Approaches for Evaluation and Modeling of Effective Thermal Resistance of Groundwater-filled Boreholes. Energies, 14, 6908.
+
         """
-        if self.number_of_pipes > 2:
-            raise NotImplementedError('Explicit models are only implemented for the single and double probes.')
 
         # Pipe resistance [m.K/W]
         if R_p is None:
@@ -298,6 +313,87 @@ class MultipleUTube(_PipeData):
             R_p_conv = self.calculate_convective_resistance(flow_rate_data, fluid_data, **kwargs)
 
             R_p = R_p_cond + R_p_conv
+
+        if self.groundwater_filled:
+            if 'temperature_borehole_wall' not in kwargs:
+                raise ValueError(
+                    'You cannot simulate a groundwater-filled borehole without specifying the borehole wall temperature.'
+                    'Please provide the "temperature_borehole_wall" parameter.')
+
+            from GHEtool import TemperatureDependentFluidData
+
+            # calculate the hydraulic diameter of the water-filled annulus (Spitler et al., 2016)
+            # adapted for n U-tubes and compatible with the MuoviEllipse
+            hydraulic_diameter_annulus = 4 * (
+                    np.pi * borehole.r_b ** 2 - 2 * self.number_of_pipes * self.area_outer) / (
+                                                 2 * np.pi * borehole.r_b + 2 * self.number_of_pipes * self.perimeter_outer)  # m
+            g = 9.81  # m/s²
+
+            # load water as a fluid
+            water = TemperatureDependentFluidData('Water', 100)
+
+            # get the volumetric expansion coefficient at the borehole wall
+            beta_bhw = np.interp(kwargs['temperature_borehole_wall'], water._spacing, water._thermal_expansion)  # 1 / K
+
+            # get the power per meter borehole length
+            q = kwargs['power'] * 1000 / borehole.H / kwargs['nb_of_boreholes']  # W/m
+
+            # according to Todorov et al. (2021)
+            q_bhw = q / (2 * np.pi * borehole.r_b)  # W/m²
+
+            # calculate Rayleigh number at the borehole wall with a constant heat flux q_bhw
+            Ra_bhw = np.maximum(5.4e5, np.abs(g * beta_bhw * q_bhw * hydraulic_diameter_annulus ** 4 / (
+                    water.k_f(temperature=kwargs['temperature_borehole_wall']) * water.nu(
+                temperature=kwargs['temperature_borehole_wall']) * water.alpha(
+                temperature=kwargs['temperature_borehole_wall']))))
+
+            # correlation according to Spitler et al. (2016)
+            Nu_bhw = 0.2 * (Ra_bhw) ** 0.25
+
+            # corresponding convective heat transfer coefficient and resistance (Todorov et al., 2021)
+            h_bhw = water.k_f(temperature=kwargs['temperature_borehole_wall']) * Nu_bhw / hydraulic_diameter_annulus
+            R_bhw = 1 / (2 * np.pi * borehole.r_b * h_bhw)
+
+            # calculate temperature at the outside of the pipe wall
+            # adopted to work with n pipes
+            Tpo = kwargs['temperature'] - q / (2 * self.number_of_pipes) * R_p
+
+            # according to Todorov et al. (2021)
+            # adopted to work with n pipes
+            q_poc = q / (2 * self.number_of_pipes * self.perimeter_outer)  # W/m²
+
+            # get the volumetric expansion coefficient at the outer pipe wall
+            beta_poc = np.interp(Tpo, water._spacing, water._thermal_expansion)  # 1 / K
+
+            # calculate Rayleigh number at the borehole wall with a constant heat flux q_poc
+            Ra_poc = np.maximum(1.8e6, np.abs(g * beta_poc * q_poc * hydraulic_diameter_annulus ** 4 / (
+                    water.k_f(temperature=Tpo) * water.nu(temperature=Tpo) * water.alpha(temperature=Tpo))))
+
+            # correlation according to Spitler et al. (2016)
+            Nu_poc = 0.3 * (Ra_poc) ** 0.25
+
+            # corresponding convective heat transfer coefficient and resistance (Todorov et al., 2021)
+            # adopted to work with n pipes
+            h_poc = water.k_f(temperature=Tpo) * Nu_poc / hydraulic_diameter_annulus
+            R_poc = 1 / (2 * self.number_of_pipes * self.perimeter_outer * h_poc)
+
+            # calculate internal resistances
+            R12 = 2 * (R_p + R_poc)
+            R_b = R_bhw + R_poc / (2 * self.number_of_pipes) + R_p / (2 * self.number_of_pipes)
+
+            # according to Todorov et al. (2021)
+            # factor 4 instead of 2 since here R_b is used instead of R_1b
+            R_a = 4 * R_b * R12 / (4 * R_b + R12)
+
+            # convert to the effective borehole resistance using the constant borehole wall boundary condition
+            r_v = borehole.H / (flow_rate_data.mfr_borehole(**kwargs, fluid_data=fluid_data) * fluid_data.cp(
+                **kwargs) / self.number_of_pipes)
+            n = r_v / (self.number_of_pipes * R_b * R_a) ** 0.5
+
+            return R_b * n * np.cosh(n) / np.sinh(n)
+
+        if self.number_of_pipes > 2:
+            raise NotImplementedError('Explicit models are only implemented for the single and double probes.')
 
         sigma = (self.k_g - k_s) / (self.k_g + k_s)
 

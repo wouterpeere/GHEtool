@@ -48,7 +48,8 @@ class MuoviEllipse(SingleUTube):
     More information on this technology and its advantages can be found here: https://www.muovitech.com/group/?page=MuoviELLIPSE.
     """
 
-    def __init__(self, k_g: float, a: float, b: float, wall_thickness: float, D_s: float = None):
+    def __init__(self, k_g: float, a: float, b: float, wall_thickness: float, D_s: float = None,
+                 groundwater_filled: bool = False):
         """
 
         Parameters
@@ -63,6 +64,8 @@ class MuoviEllipse(SingleUTube):
             Wall thickness [m]
         D_s : float
             Distance of the pipe until center [m]
+        groundwater_filled : bool
+            Filled with groundwater (overwrites the grout conductivity)
         """
         self.k_g = k_g
         self.a = a
@@ -78,8 +81,8 @@ class MuoviEllipse(SingleUTube):
 
         self.area_outer = np.pi * a * b / 4
         h = (a / 2 - b / 2) ** 2 / ((a / 2 + b / 2) ** 2)
-        perimeter_outer = np.pi * (a / 2 + b / 2) * (1 + (3 * h) / (10 + np.sqrt(4 - 3 * h)))
-        self.hydraulic_diameter_outer = 4 * self.area_outer / perimeter_outer
+        self.perimeter_outer = np.pi * (a / 2 + b / 2) * (1 + (3 * h) / (10 + np.sqrt(4 - 3 * h)))
+        self.hydraulic_diameter_outer = 4 * self.area_outer / self.perimeter_outer
 
         self.area_inner = np.pi * (a - wall_thickness * 2) * (b - wall_thickness * 2) / 4
         h = (((a - wall_thickness * 2) / 2 - (b - wall_thickness * 2) / 2) ** 2 /
@@ -88,7 +91,8 @@ class MuoviEllipse(SingleUTube):
                 1 + (3 * h) / (10 + np.sqrt(4 - 3 * h)))
         self.hydraulic_diameter_inner = 4 * self.area_inner / perimeter_inner
 
-        super().__init__(k_g, self.hydraulic_diameter_inner / 2, self.hydraulic_diameter_outer / 2, 0.4, D_s)
+        super().__init__(k_g, self.hydraulic_diameter_inner / 2, self.hydraulic_diameter_outer / 2, 0.4, D_s,
+                         groundwater_filled=groundwater_filled)
 
     def _load_model(self, a, b) -> None:
         """
