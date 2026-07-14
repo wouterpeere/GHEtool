@@ -139,3 +139,9 @@ def test_variable_flow(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     from GHEtool.Examples.variable_flow_rate import sizing
     sizing()
+
+
+def test_groundwater_filled_borehole(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    from GHEtool.Examples.groundwater_filled_boreholes import graphs
+    graphs()
