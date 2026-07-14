@@ -65,12 +65,11 @@ class MultipleUTube(_PipeData):
         self.R_p = 0  # pipe thermal resistance mK/W
         self.R_f = 0  # film (i.e. fluid) thermal resistance mK/W
 
-        # define for groundwater filled borehole
-        self.area_outer = np.pi * self.r_out ** 2
-        self.perimeter_outer = np.pi * self.r_out * 2
-
         if self.check_values():
             self.pos = self._axis_symmetrical_pipe  # position of the pipes
+            # define for groundwater filled borehole
+            self.area_outer = np.pi * self.r_out ** 2
+            self.perimeter_outer = np.pi * self.r_out * 2
 
     @property
     def _axis_symmetrical_pipe(self) -> list:
