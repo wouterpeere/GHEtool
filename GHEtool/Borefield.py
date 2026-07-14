@@ -593,7 +593,7 @@ class Borefield(BaseClass):
                                     simulation_period=self.load.simulation_period,
                                     power=(-1) * self.load.max_peak_extraction,
                                     temperature_borehole_wall=np.min(
-                                        self.results.Tb) if self.results.Tb is not None else 10)
+                                        self.results.Tb) if len(self.results.Tb) != 0 else 10)
 
     @Rb.setter
     def Rb(self, Rb: float) -> None:
