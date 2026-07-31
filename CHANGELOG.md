@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 
 - Move calculate_borefield_inlet_outlet_temperature to Borehole class (issue #464).
+- Change implementation ConicalProbe for speed improvement (#issue 472).
 
 ### Fixed
 

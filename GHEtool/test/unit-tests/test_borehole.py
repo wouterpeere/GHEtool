@@ -275,7 +275,7 @@ def test_borehole_resistance_conical():
     borehole.pipe_data = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
     borehole.fluid_data = TemperatureDependentFluidData('MEG', 25)
     borehole.flow_data = ConstantFlowRate(vfr=0.3)
-    assert np.allclose([0.13332321, 0.13306411, 0.1328632, 0.13232588],
+    assert np.allclose([0.13330983, 0.13305051, 0.13285073, 0.13231631],
                        borehole.calculate_Rb(120, 1, 0.075, 3, temperature=np.array([0, 1, 2, 5])))
 
 
