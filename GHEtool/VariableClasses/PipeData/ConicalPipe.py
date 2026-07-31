@@ -156,10 +156,11 @@ class ConicalPipe(MultipleUTube):
                 else:
                     return self.r_in_stop
 
-            def r_f_func(length):
+            def r_f_func(length, haaland=False):
                 # Film thermal resistance [m.K/W]
                 return calculate_convective_resistance(flow_data, fluid_data, r_in=calc_r_in(length),
-                                                       epsilon=self.epsilon, nb_of_pipes=self.number_of_pipes, **kwargs)
+                                                       epsilon=self.epsilon, nb_of_pipes=self.number_of_pipes,
+                                                       haaland=haaland, **kwargs)
 
             # Lengths of the three regions
             L1 = max(0.0, min(self.begin_conical, borehole_length))
@@ -175,11 +176,21 @@ class ConicalPipe(MultipleUTube):
             # Contribution in conical section
             R2 = 0.0
             if L2 > 0:
-                z_cone = np.linspace(self.begin_conical, min(self.end_conical, borehole_length), 9)
-                rf_cone = np.array([r_f_func(z) for z in z_cone])
-                R2 = scipy.integrate.simpson(rf_cone, x=z_cone, axis=0)
+                z_cone = np.linspace(self.begin_conical, min(self.end_conical, borehole_length), 3)
+                rf_cone = np.array([r_f_func(z, True) for z in z_cone])
 
-            # Contribution after conical section
+                def simpson_weights(z):
+                    h = np.diff(z)
+                    # for uniform spacing this reduces to the classic 1-4-2-4-...-4-1 pattern * h/3
+                    w = np.ones(len(z))
+                    w[1:-1:2] = 4
+                    w[2:-1:2] = 2
+                    return w * h[0] / 3  # only valid if spacing is uniform
+
+                weights = simpson_weights(z_cone)
+                R2 = weights @ rf_cone
+
+                # Contribution after conical section
             R3 = 0.0
             if L3 > 0:
                 rf_stop = r_f_func(borehole_length)
