@@ -1,6 +1,6 @@
 """
 This files contains the code to create graphs for the borehole thermal resistance and pressure drop for a
-MuoviELLIPSE DN45 from Muovitech for different borehole diameters. The results are compared with the TurboCollector DN45.
+MuoviELLIPSE DN45 from MuoviTech for different borehole diameters. The results are compared with the TurboCollector DN45.
 
 The correlations for both the convective heat transfer coefficient and the friction factor, which are used internally
 to calculate respectively the effective borehole thermal resistance and the pressure drop, were created by Niklas Hidman,
