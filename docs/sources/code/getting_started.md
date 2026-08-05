@@ -114,8 +114,11 @@ Concretely, the classes you can use are:
   at lower flow rates. Visit their website for more
   information [MuoviELLIPSE website](https://www.muovitech.com/group/?page=MuoviELLIPSE). An example in GHEtool can be
   found [here](https://ghetool.readthedocs.io/en/latest/sources/code/Examples/muoviellipse.html).
-  Please note that it is possible to add your own pipe types by inheriting the attributes from the abstract _PipeData
-  class.
+* _Multi-U-tube-probe_: The multi-U-tube-probe (or originally called _Multi-U-Rohrsonde_) is an innovative heat
+  exchanger by BLZ Geotechnik GmbH. It exists of one central pipe going down and 10 satellite pipes against the borehole
+  wall. Visit their website for more
+  information [Multi-U-tube website](https://www.blz-geotherm.de/en/). An example in GHEtool can
+  be found [here](https://ghetool.readthedocs.io/en/latest/sources/code/Examples/multi-u-tube.html).
 
 Please note that it is possible to add your own pipe types by inheriting the attributes from the abstract _PipeData
 class.
