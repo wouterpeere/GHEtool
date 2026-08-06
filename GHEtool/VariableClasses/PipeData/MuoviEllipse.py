@@ -350,7 +350,7 @@ class MuoviEllipse(SingleUTube):
         """
         This function returns the effective borehole thermal resistance for the MuoviELLIPSE based on an explicit
         model (always second order). The borehole resistance is based on an artificial neural network that was
-        trained on 10.000 different simulations for each design of the MuoviELLIPSE.
+        trained on 20.000 different simulations for each design of the MuoviELLIPSE.
 
         Parameters
         ----------

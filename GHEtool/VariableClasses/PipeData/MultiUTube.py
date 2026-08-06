@@ -44,33 +44,23 @@ class MultiUTube(_PipeData):
     More information on this technology and its advantages can be found here: https://www.blz-geotherm.de/en/
     """
 
-    def __init__(self, k_g: float, a: float, b: float, wall_thickness: float, D_s: float = None,
-                 groundwater_filled: bool = False):
+    def __init__(self, k_g: float, position_satellites: float, groundwater_filled: bool = False):
         """
 
         Parameters
         ----------
         k_g : float
             Grout thermal conductivity [W/(mK)]
-        a : float
-            Long axis diameter [m]
-        b: float
-            Short axis diameter [m]
-        wall_thickness : float
-            Wall thickness [m]
-        D_s : float
-            Distance of the pipe until center [m]
+        position_satellites : float
+            Distance of the center of the satellites and the borehole center [m]
         groundwater_filled : bool
             Filled with groundwater (overwrites the grout conductivity)
         """
-        self.k_g = k_g
-        self.a = a
-        self.b = b
-        self.wall_thickness = wall_thickness
+        super().__init__(k_g, 0.4)
 
         # check configuration
-        if D_s < b / 2:
-            raise ValueError(f'The distance of the pipe until the center should at least be {b / 2} m.')
+        if position_satellites < 20e-3:
+            raise ValueError(f'The distance of the pipe until the center should at least be 20 mm.')
 
         # load correct ANN model
         self._load_model()
@@ -79,8 +69,8 @@ class MultiUTube(_PipeData):
         self._r_sat_in = 0.5 * 16e-3 - 1.5e-3
         self._r_cen_out = 0.5 * 40e-3
         self._r_cen_in = 0.5 * 40e-3 - 3.7e-3
-        self._r_p_sat = 0.4
-        self._r_p_cen = 0.4
+        self._pos_sat = position_satellites
+        self._n_satellites = 10
 
         self._groundwater_filled = groundwater_filled
 
@@ -128,8 +118,8 @@ class MultiUTube(_PipeData):
         tuple
             Conductive resistance of central pipe [mK/W], Conductive resistance of satellite pipes [mK/W]
         """
-        R_p_sat = gt.pipes.conduction_thermal_resistance_circular_pipe(self._r_sat_in, self._r_sat_out, self._k_p_sat)
-        R_p_cen = gt.pipes.conduction_thermal_resistance_circular_pipe(self._r_cen_in, self._r_cen_out, self._k_p_cen)
+        R_p_sat = gt.pipes.conduction_thermal_resistance_circular_pipe(self._r_sat_in, self._r_sat_out, self.k_p)
+        R_p_cen = gt.pipes.conduction_thermal_resistance_circular_pipe(self._r_cen_in, self._r_cen_out, self.k_p)
 
         return R_p_cen, R_p_sat
 
@@ -152,12 +142,10 @@ class MultiUTube(_PipeData):
 
         # Convective resistance
         R_conv_sat = calculate_convective_resistance(
-            flow_data, fluid_data, r_in=self._r_sat_in, nb_of_pipes=10, epsilon=self.epsilon, **kwargs)
+            flow_data, fluid_data, r_in=self._r_sat_in, nb_of_pipes=self._n_satellites, epsilon=self.epsilon, **kwargs)
         R_conv_cen = calculate_convective_resistance(
             flow_data, fluid_data, r_in=self._r_cen_in, nb_of_pipes=1, epsilon=self.epsilon, **kwargs)
 
-        if R_conv_cen.size == 1:
-            return R_conv_cen.item(), R_conv_sat.item()
         return R_conv_cen, R_conv_sat
 
     def calculate_resistances(self, fluid_data: _FluidData, flow_rate_data: _FlowData, **kwargs) -> None:
@@ -179,7 +167,7 @@ class MultiUTube(_PipeData):
 
         raise NotImplementedError('The Multi-U-Tube can only be simulated with the explicit methods.')
 
-    def predict_Rb_Ra_series(self, r_b, spacing, R_fp, k_b, k_s):
+    def predict_Rb_Ra_series(self, r_b, r_outer_pos, R_fp_center, R_fp_sat, k_b, k_s):
         """
         Vectorized prediction of R_b and R_a based on the ANN-model.
 
@@ -187,8 +175,9 @@ class MultiUTube(_PipeData):
         ----------
         Inputs can be float or array-like:
             r_b
-            spacing
-            R_fp
+            r_outer_pos
+            R_fp_center
+            R_fp_sat
             k_b
             k_s
 
@@ -206,14 +195,15 @@ class MultiUTube(_PipeData):
 
         # Convert to arrays
         r_b = np.asarray(r_b)
-        spacing = np.asarray(spacing)
-        R_fp = np.asarray(R_fp)
+        r_outer_pos = np.asarray(r_outer_pos)
+        R_fp_center = np.asarray(R_fp_center)
+        R_fp_sat = np.asarray(R_fp_sat)
         k_b = np.asarray(k_b)
         k_s = np.asarray(k_s)
 
         # Broadcast to common shape
-        r_b, spacing, R_fp, k_b, k_s = np.broadcast_arrays(
-            r_b, spacing, R_fp, k_b, k_s
+        r_b, r_outer_pos, R_fp_center, R_fp_sat, k_b, k_s = np.broadcast_arrays(
+            r_b, r_outer_pos, R_fp_center, R_fp_sat, k_b, k_s
         )
 
         shape = r_b.shape
@@ -222,8 +212,9 @@ class MultiUTube(_PipeData):
         X = np.column_stack(
             [
                 r_b.ravel(),
-                spacing.ravel(),
-                R_fp.ravel(),
+                r_outer_pos.ravel(),
+                R_fp_center.ravel(),
+                R_fp_sat.ravel(),
                 k_b.ravel(),
                 k_s.ravel(),
             ]
@@ -244,13 +235,45 @@ class MultiUTube(_PipeData):
 
         return R_b, R_a
 
+    def Re(self, fluid_data: _FluidData, flow_rate_data: _FlowData, type: str = "avg", **kwargs) -> float:
+        """
+        This function returns the Reynolds number
+
+        Parameters
+        ----------
+        fluid_data: FluidData
+            Fluid data
+        flow_rate_data : FlowData
+            Flow rate data
+        type : str
+            Which Reynolds number should be calculated, either 'avg' for the entire pipe, 'cen' for the center pipe or 'sat' for the satellite pipes.
+
+        Returns
+        -------
+        Reynolds number : float
+        """
+
+        u_cen = flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / \
+                (np.pi * self._r_cen_in ** 2) / 1000
+        re_cen = fluid_data.rho(**kwargs) * u_cen * self._r_cen_in * 2 / fluid_data.mu(**kwargs)
+
+        u_sat = flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / \
+                (np.pi * self._r_sat_in ** 2) / 1000 / self._n_satellites
+        re_sat = fluid_data.rho(**kwargs) * u_sat * self._r_sat_in * 2 / fluid_data.mu(**kwargs)
+
+        if type == "avg":
+            return 0.5 * (re_sat + re_cen)
+        if type == "cen":
+            return re_cen
+        return re_sat
+
     def explicit_model_borehole_resistance(self, fluid_data: _FluidData, flow_rate_data: _FlowData, k_s: float,
                                            borehole: gt.boreholes.Borehole, order: int = 1, R_p: float = None,
                                            **kwargs) -> float:
         """
-        This function returns the effective borehole thermal resistance for the MuoviELLIPSE based on an explicit
+        This function returns the effective borehole thermal resistance for the Multi-U-Tube based on an explicit
         model (always second order). The borehole resistance is based on an artificial neural network that was
-        trained on 10.000 different simulations for each design of the MuoviELLIPSE.
+        trained on 20.000 different simulations for each design of the Multi-U-Tube.
 
         Parameters
         ----------
@@ -276,8 +299,17 @@ class MultiUTube(_PipeData):
         R_cond_cen, R_cond_sat = self.calculate_conductive_resistance(**kwargs)
         R_conv_cen, R_conv_sat = self.calculate_convective_resistance(flow_rate_data, fluid_data, **kwargs)
 
-        R_b, R_a = self.predict_Rb_Ra_series(borehole.r_b, self.D_s, R_p, self.k_g, k_s)
+        if self._pos_sat > borehole.r_b - self._r_sat_out:
+            raise ValueError('The satellites are outside of the probe.')
 
+        r_max = borehole.r_b - self._r_sat_out
+        r_min = self._r_sat_out + self._r_cen_out
+        rel_pos_sat = (self._pos_sat - r_min) / (r_max - r_min)
+
+        R_b, R_a = self.predict_Rb_Ra_series(borehole.r_b, rel_pos_sat, R_cond_cen + R_conv_cen,
+                                             R_cond_sat + R_conv_sat, self.k_g, k_s)
+        # R_b = 0.0645
+        # R_a = 0.08
         r_v = borehole.H / (flow_rate_data.mfr_borehole(**kwargs, fluid_data=fluid_data) * fluid_data.cp(
             **kwargs))
         n = r_v / (R_b * R_a) ** 0.5
@@ -304,40 +336,35 @@ class MultiUTube(_PipeData):
             Pressure drop [kPa]
         """
 
-        def f_turbo(Re: float) -> float:
-            """
-            This function calculates the friction factor of the MuoviELLIPSE.
-
-            Parameters
-            ----------
-            Re : float
-                Reynolds number [-]
-
-            Returns
-            -------
-            Friction factor : float
-                Friction factor of the MuoviELLIPSE.
-            """
-
-            def w(Re) -> float:
-                return 1 / (1 + np.exp(-5 * ((Re - 1850) / (2300 - 1850) - 0.5)))
-
-            return (1 - w(Re)) * 65 / Re + w(Re) * (-1.8 * np.log10(6.9 / Re)) ** -2
-
         # Darcy fluid factor
-        fd = f_turbo(self.Re(fluid_data, flow_rate_data, **kwargs))
+        if kwargs.get('haaland', False):
+            fd_cen = friction_factor_Haaland(self.Re(fluid_data, flow_rate_data, **kwargs), self._r_cen_in,
+                                             self.epsilon,
+                                             **kwargs)
+            fd_sat = friction_factor_Haaland(self.Re(fluid_data, flow_rate_data, **kwargs), self._r_sat_in,
+                                             self.epsilon, **kwargs)
+        else:
+            fd_cen = friction_factor_darcy_weisbach(self.Re(fluid_data, flow_rate_data, **kwargs), self._r_cen_in,
+                                                    self.epsilon,
+                                                    **kwargs)
+            fd_sat = friction_factor_darcy_weisbach(self.Re(fluid_data, flow_rate_data, **kwargs), self._r_sat_in,
+                                                    self.epsilon, **kwargs)
 
-        V = (flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / 1000) / self.area_inner
+        A_cen = np.pi * self._r_cen_in ** 2
+        V_cen = (flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / 1000) / A_cen
+        A_sat = np.pi * self._r_sat_in ** 2
+        V_sat = (flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / 1000) / A_sat / self._n_satellites
 
-        # add 0.2 for the local losses
-        # (source: https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html)
-        return ((fd * (borehole_length * 2) / self.hydraulic_diameter_inner + 0.2) * fluid_data.rho(
-            **kwargs) * V ** 2 / 2) / 1000
+        return (((fd_cen * borehole_length / (2 * self._r_cen_in) + 0.2) * fluid_data.rho(
+            **kwargs) * V_cen ** 2 / 2) / 1000 +
+                ((fd_sat * borehole_length / (2 * self._r_sat_in) + 0.2) * fluid_data.rho(
+                    **kwargs) * V_sat ** 2 / 2) / 1000)
 
     def draw_borehole_internal(self, r_b: float) -> None:
         """
-        This function draws the internal structure of a borehole.
-        This means, it draws the pipes inside the borehole.
+        This function draws the internal structure of a Multi-U-Tube borehole: a single central DN40 pipe
+        at the borehole center, surrounded by 10 DN16 satellite pipes evenly distributed on a circle at
+        radius ``self.pos_sat`` from the center.
 
         Parameters
         ----------
@@ -349,17 +376,10 @@ class MultiUTube(_PipeData):
         None
         """
 
-        COLOR_SECONDARY = '#2196F3'  # left inner ellipse (flow in)
-        COLOR_RED = '#E53935'  # right inner ellipse (flow out)
+        COLOR_CENTER = '#2196F3'  # central pipe (flow in)
+        COLOR_SATELLITE = '#E53935'  # satellite pipes (flow out)
 
-        # ── Derived values ───────────────────────────────────────────────────────────
         borehole_radius = r_b
-        a_inner = self.a / 2 - self.wall_thickness
-        b_inner = self.b / 2 - self.wall_thickness
-
-        # Ellipse centers: left at (-spacing, 0), right at (+spacing, 0)
-        centers = [(-self.D_s, 0), (self.D_s, 0)]
-        inner_colors = [COLOR_SECONDARY, COLOR_RED]
 
         # ── Plot ─────────────────────────────────────────────────────────────────────
         fig, ax = plt.subplots(figsize=(5, 5))
@@ -370,25 +390,22 @@ class MultiUTube(_PipeData):
         borehole = plt.Circle((0, 0), borehole_radius, fill=False, edgecolor='black', linewidth=2, zorder=1)
         ax.add_patch(borehole)
 
-        # Ellipses
-        for i, (cx, cy) in enumerate(centers):
-            # Outer ellipse (black pipe wall)
-            outer = patches.Ellipse(
-                (cx, cy),
-                width=self.b, height=self.a,
-                facecolor='black',
-                zorder=2
-            )
-            ax.add_patch(outer)
+        # Central DN40 pipe, at the borehole center
+        center_outer = plt.Circle((0, 0), self._r_cen_out, facecolor='black', zorder=2)
+        center_inner = plt.Circle((0, 0), self._r_cen_in, facecolor=COLOR_CENTER, zorder=3)
+        ax.add_patch(center_outer)
+        ax.add_patch(center_inner)
 
-            # Inner ellipse (fluid channel)
-            inner = patches.Ellipse(
-                (cx, cy),
-                width=2 * b_inner, height=2 * a_inner,
-                facecolor=inner_colors[i],
-                zorder=3
-            )
-            ax.add_patch(inner)
+        # 10 satellite DN16 pipes, evenly distributed on a circle of radius self.pos_sat
+        angles = np.linspace(0, 2 * np.pi, self._n_satellites, endpoint=False)
+        for angle in angles:
+            cx = self._pos_sat * np.cos(angle)
+            cy = self._pos_sat * np.sin(angle)
+
+            sat_outer = plt.Circle((cx, cy), self._r_sat_out, facecolor='black', zorder=2)
+            sat_inner = plt.Circle((cx, cy), self._r_sat_in, facecolor=COLOR_SATELLITE, zorder=3)
+            ax.add_patch(sat_outer)
+            ax.add_patch(sat_inner)
 
         # Axis limits with a small margin
         margin = borehole_radius * 1.1
@@ -400,10 +417,7 @@ class MultiUTube(_PipeData):
 
     def __export__(self):
         return {
-            'type': 'MuoviELLIPSE',
-            'thickness [mm]': self.wall_thickness * 1000,
-            'a [mm]': self.a * 1000,
-            'b [mm]': self.b * 1000,
-            'spacing [mm]': self.D_s * 1000,
+            'type': 'Multi-U-Tube',
+            'satellite position [mm]': self._pos_sat * 1000,
             'k_g [W/(m·K)]': self.k_g,
         }
