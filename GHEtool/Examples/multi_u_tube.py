@@ -108,7 +108,7 @@ def create_graphs_2():
     meg = TemperatureDependentFluidData('MEG', 25, mass_percentage=False)
 
     borehole_radius = 0.075
-    borehole_depth = 75
+    borehole_depth = 75  # TODO heavily depending on depth
     buried_depth = 0.7
     ground_conductivity = 2
     temperature = 5
