@@ -120,6 +120,14 @@ def test_muoviEllipse(monkeypatch):
     realistic_case2()
 
 
+def test_multi_u(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    from GHEtool.Examples.multi_u_tube import create_graphs, resistances, create_graphs_2
+    create_graphs()
+    resistances()
+    create_graphs_2()
+
+
 def test_optimal_borehole_config():
     from GHEtool.Examples.optimal_borehole_configuration import borefield_case_1, borefield_case_2, \
         borefield_case_3, borefield_case_4, borefield_office, borefield_auditorium, borefield_swimming_pool, \
