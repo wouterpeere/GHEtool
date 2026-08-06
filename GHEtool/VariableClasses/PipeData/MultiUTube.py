@@ -89,7 +89,7 @@ class MultiUTube(_PipeData):
         """
         from GHEtool import FOLDER
         self._model_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MultiUTube/borehole_ann.pt")
-        self._x_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MultiUTube/X_scaler.joblib")
+        self._x_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MultiUTube/x_scaler.joblib")
         self._y_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MultiUTube/y_scaler.joblib")
 
     def pipe_model(self, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
