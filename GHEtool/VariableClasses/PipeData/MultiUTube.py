@@ -308,8 +308,6 @@ class MultiUTube(_PipeData):
 
         R_b, R_a = self.predict_Rb_Ra_series(borehole.r_b, rel_pos_sat, R_cond_cen + R_conv_cen,
                                              R_cond_sat + R_conv_sat, self.k_g, k_s)
-        # R_b = 0.0645
-        # R_a = 0.08
         r_v = borehole.H / (flow_rate_data.mfr_borehole(**kwargs, fluid_data=fluid_data) * fluid_data.cp(
             **kwargs))
         n = r_v / (R_b * R_a) ** 0.5
@@ -338,16 +336,18 @@ class MultiUTube(_PipeData):
 
         # Darcy fluid factor
         if kwargs.get('haaland', False):
-            fd_cen = friction_factor_Haaland(self.Re(fluid_data, flow_rate_data, **kwargs), self._r_cen_in,
+            fd_cen = friction_factor_Haaland(self.Re(fluid_data, flow_rate_data, type="cen", **kwargs), self._r_cen_in,
                                              self.epsilon,
                                              **kwargs)
-            fd_sat = friction_factor_Haaland(self.Re(fluid_data, flow_rate_data, **kwargs), self._r_sat_in,
+            fd_sat = friction_factor_Haaland(self.Re(fluid_data, flow_rate_data, type="sat", **kwargs), self._r_sat_in,
                                              self.epsilon, **kwargs)
         else:
-            fd_cen = friction_factor_darcy_weisbach(self.Re(fluid_data, flow_rate_data, **kwargs), self._r_cen_in,
+            fd_cen = friction_factor_darcy_weisbach(self.Re(fluid_data, flow_rate_data, type="cen", **kwargs),
+                                                    self._r_cen_in,
                                                     self.epsilon,
                                                     **kwargs)
-            fd_sat = friction_factor_darcy_weisbach(self.Re(fluid_data, flow_rate_data, **kwargs), self._r_sat_in,
+            fd_sat = friction_factor_darcy_weisbach(self.Re(fluid_data, flow_rate_data, type="sat", **kwargs),
+                                                    self._r_sat_in,
                                                     self.epsilon, **kwargs)
 
         A_cen = np.pi * self._r_cen_in ** 2

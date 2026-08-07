@@ -673,6 +673,16 @@ def test_draw_muoviellipse(monkeypatch):
     test.draw_borehole_internal(90e-3)
 
 
+def test_muoviellipse_repr():
+    test = MuoviEllipse(1.5, 37e-3, 26e-3, 3, 0.3)
+    assert {'a [mm]': 37.0,
+            'b [mm]': 26.0,
+            'k_g [W/(m·K)]': 1.5,
+            'spacing [mm]': 300.0,
+            'thickness [mm]': 3000,
+            'type': 'MuoviELLIPSE'} == test.__export__()
+
+
 def test_turbocollector():
     turbo = Turbocollector(1.5, 0.013, 0.016, 0.035, 1)
     flow_borehole = ConstantFlowRate(vfr=0.25)
