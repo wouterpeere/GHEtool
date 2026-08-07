@@ -523,6 +523,101 @@ def test_muoviEllipse():
     MuoviEllipse(1.5, 73e-3, 52e-3, 3e-3, 0.3)
 
 
+def test_multi_u_tube():
+    test = MultiUTube(1.5, 0.05, False)
+    flow_borehole = ConstantFlowRate(vfr=0.25)
+    flow_borefield = ConstantFlowRate(vfr=0.5, flow_per_borehole=False)
+    fluid = TemperatureDependentFluidData('MPG', 25)
+
+    assert np.isclose(test.Re(fluid, flow_borehole, temperature=5),
+                      test.Re(fluid, flow_borefield, temperature=5, nb_of_boreholes=2))
+    assert np.isclose(test.pressure_drop(fluid, flow_borehole, 100, temperature=5),
+                      test.pressure_drop(fluid, flow_borefield, 100, temperature=5, nb_of_boreholes=2))
+
+    borehole = gt.boreholes.Borehole(100, 1, 0.075, 0, 0)
+    turbo1 = test
+
+    assert np.isclose(test.explicit_model_borehole_resistance(fluid, flow_borehole, 2, borehole,
+                                                              use_explicit_models=True, temperature=5),
+                      turbo1.explicit_model_borehole_resistance(fluid, flow_borehole, 2, borehole,
+                                                                use_explicit_models=True, temperature=5))
+
+    # test array-model
+    individual = []
+    temp_range = np.arange(-5, 20, 1)
+    for temp in temp_range:
+        individual.append(test.calculate_convective_resistance(flow_borehole, fluid, temperature=temp)[0])
+    array = test.calculate_convective_resistance(flow_borehole, fluid, temperature=temp_range)[0]
+    assert np.allclose(array, individual)
+
+    individual = []
+    temp_range = np.arange(-5, 20, 1)
+    for temp in temp_range:
+        individual.append(test.calculate_convective_resistance(flow_borehole, fluid, temperature=temp)[1])
+    array = test.calculate_convective_resistance(flow_borehole, fluid, temperature=temp_range)[1]
+    assert np.allclose(array, individual)
+
+    individual = []
+    temp_range = np.arange(-5, 20, 1)
+    for temp in temp_range:
+        individual.append(test.calculate_convective_resistance(flow_borehole, fluid, temperature=temp, haaland=True)[0])
+    array = test.calculate_convective_resistance(flow_borehole, fluid, temperature=temp_range, haaland=True)[0]
+    assert np.allclose(array, individual)
+
+    flow_range = np.linspace(0.1, 5, 8760)
+    flow = VariableHourlyFlowRate(mfr=flow_range)
+    control = []
+    for val in flow_range:
+        control.append(test.pressure_drop(fluid, ConstantFlowRate(mfr=val), 100,
+                                          nb_of_boreholes=2, simulation_period=1, temperature=0, haaland=False))
+    assert np.allclose(control,
+                       test.pressure_drop(fluid, flow, 100, nb_of_boreholes=2, simulation_period=1, temperature=0,
+                                          haaland=False))
+    control = []
+    for val in flow_range:
+        control.append(test.pressure_drop(fluid, ConstantFlowRate(mfr=val), 100,
+                                          nb_of_boreholes=2, simulation_period=1, temperature=0, haaland=True))
+    assert np.allclose(control,
+                       test.pressure_drop(fluid, flow, 100, nb_of_boreholes=2, simulation_period=1, temperature=0,
+                                          haaland=True))
+
+
+def test_multi_u_reynolds():
+    central = SingleUTube(1.5, 0.0163, 0.02, 0.4, 0.035)
+    outer = SingleUTube(1.5, 0.5 * 16e-3 - 1.5e-3, 8e-3, 0.4, 0.035)
+    multi_u = MultiUTube(1.5, 0.05)
+    fluid = TemperatureDependentFluidData('MPG', 25).create_constant(5)
+    flow = ConstantFlowRate(vfr=0.5, flow_per_borehole=True)
+
+    assert np.isclose(central.Re(fluid, flow), multi_u.Re(fluid, flow, type="cen"))
+    assert np.isclose(outer.Re(fluid, ConstantFlowRate(vfr=0.05, flow_per_borehole=True)),
+                      multi_u.Re(fluid, flow, type="sat"))
+    assert np.isclose(
+        central.Re(fluid, flow) * 0.5 + outer.Re(fluid, ConstantFlowRate(vfr=0.05, flow_per_borehole=True)) * 0.5,
+        multi_u.Re(fluid, flow))
+
+
+def test_multi_u_conductive():
+    central = SingleUTube(1.5, 0.0163, 0.02, 0.4, 0.035)
+    outer = SingleUTube(1.5, 0.5 * 16e-3 - 1.5e-3, 8e-3, 0.4, 0.035)
+    multi_u = MultiUTube(1.5, 0.05)
+    assert np.isclose(central.calculate_conductive_resistance(), multi_u.calculate_conductive_resistance()[0])
+    assert np.isclose(outer.calculate_conductive_resistance(), multi_u.calculate_conductive_resistance()[1])
+
+
+def test_multi_u_convective():
+    central = SingleUTube(1.5, 0.0163, 0.02, 0.4, 0.035)
+    outer = SingleUTube(1.5, 0.5 * 16e-3 - 1.5e-3, 8e-3, 0.4, 0.035)
+    multi_u = MultiUTube(1.5, 0.05)
+    fluid = TemperatureDependentFluidData('MPG', 25).create_constant(5)
+    flow = ConstantFlowRate(vfr=0.5, flow_per_borehole=True)
+
+    assert np.isclose(central.calculate_convective_resistance(flow, fluid),
+                      multi_u.calculate_convective_resistance(flow, fluid)[0])
+    assert np.isclose(outer.calculate_convective_resistance(ConstantFlowRate(vfr=0.05, flow_per_borehole=True), fluid),
+                      multi_u.calculate_convective_resistance(flow, fluid)[1])
+
+
 def test_muoviEllipse_error():
     with pytest.raises(ValueError):
         MuoviEllipse(1.5, 0.2, 0.2, 0.04, 0.03)
@@ -541,20 +636,51 @@ def test_muoviEllipse_error():
         test.calculate_resistances(fluid, flow_borefield)
 
 
-def test_muoviEllipse_repr():
-    test = MuoviEllipse(1.5, 37e-3, 26e-3, 3e-3, 0.03)
-    assert {'a [mm]': 37.0,
-            'b [mm]': 26.0,
-            'k_g [W/(m·K)]': 1.5,
-            'spacing [mm]': 30.0,
-            'thickness [mm]': 3.0,
-            'type': 'MuoviELLIPSE'} == test.__export__()
+def test_multi_u_error():
+    with pytest.raises(ValueError):
+        MultiUTube(1.5, 0.01, False)
+
+    test = MultiUTube(1.5, 0.5, False)
+
+    with pytest.raises(NotImplementedError):
+        test.pipe_model(3, gt.boreholes.Borehole(100, 1, 0.075, 0, 0))
+
+    flow_borefield = ConstantFlowRate(vfr=0.5, flow_per_borehole=False)
+    fluid = TemperatureDependentFluidData('MPG', 25)
+
+    with pytest.raises(NotImplementedError):
+        test.calculate_resistances(fluid, flow_borefield)
+
+    with pytest.raises(ValueError):
+        test.explicit_model_borehole_resistance(fluid, ConstantFlowRate(vfr=0.5), 2,
+                                                gt.boreholes.Borehole(100, 1, 0.02, 0, 0), temperature=5)
+
+
+def test_multi_u_repr():
+    test = MultiUTube(1.5, 0.5, False)
+    assert {'k_g [W/(m·K)]': 1.5, 'satellite position [mm]': 500.0, 'type': 'Multi-U-Tube'} == test.__export__()
+
+
+def test_draw_multi_u(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    test = MultiUTube(1.5, 0.5, False)
+    test.draw_borehole_internal(150e-3)
 
 
 def test_draw_muoviellipse(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     test = MuoviEllipse(1.5, 37e-3, 26e-3, 3, 0.3)
     test.draw_borehole_internal(90e-3)
+
+
+def test_muoviellipse_repr():
+    test = MuoviEllipse(1.5, 37e-3, 26e-3, 3, 0.3)
+    assert {'a [mm]': 37.0,
+            'b [mm]': 26.0,
+            'k_g [W/(m·K)]': 1.5,
+            'spacing [mm]': 300.0,
+            'thickness [mm]': 3000,
+            'type': 'MuoviELLIPSE'} == test.__export__()
 
 
 def test_turbocollector():

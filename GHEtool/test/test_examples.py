@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from GHEtool import *
+from GHEtool.Examples.multi_u_tube import resistances_2
 
 
 def test_main_functionalities(monkeypatch):
@@ -118,6 +119,15 @@ def test_muoviEllipse(monkeypatch):
     create_graphs()
     realistic_case()
     realistic_case2()
+
+
+def test_multi_u(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    from GHEtool.Examples.multi_u_tube import create_graphs, resistances, create_graphs_2, resistances_2
+    create_graphs()
+    resistances()
+    resistances_2()
+    create_graphs_2()
 
 
 def test_optimal_borehole_config():
