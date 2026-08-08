@@ -32,9 +32,9 @@ def _cop_carnot(temp_eva: Union[float, np.ndarray], temp_cond: Union[float, np.n
     return (temp_cond + 273.15) / (temp_cond - temp_eva)
 
 
-class COPNonModulating:
+class EERNonModulating:
     """
-    Class for COP efficiency for non-modulating heat pumps.
+    Class for EER efficiency for non-modulating heat pumps.
     The efficiency is calculated based on at least three measuring points and use these points to correct
     the carnot efficiency of the entire working range.
     """
@@ -42,7 +42,7 @@ class COPNonModulating:
     def __init__(self, temp_cond: np.ndarray, temp_eva: np.ndarray, power: np.ndarray, efficiency: np.ndarray,
                  min_temperature_lift: float = 20, min_condenser_temperature: float = 20,
                  max_condenser_temperature: float = 60,
-                 default_condenser_temperature: float = 33.5) -> None:
+                 default_evaporator_temperature: float = 33.5) -> None:
         """
         Create an efficiency correlation based on the temperature lift.
 
@@ -62,7 +62,7 @@ class COPNonModulating:
             The lowest (average) temperature the heat pump can deliver at the condenser [°C]
         max_condenser_temperature : float
             The highest (average) temperature the heat pump can deliver at the condenser [°C]
-        default_condenser_temperature : float
+        default_evaporator_temperature : float
             The default average condenser temperature [°C]
 
         Raises
@@ -85,12 +85,6 @@ class COPNonModulating:
         if not (np.all(efficiency > 0) and np.all(power > 0)):
             raise ValueError('All efficiencies and powers should be larger than 0.')
 
-        # store variables
-        self._temp_cond = temp_cond
-        self._temp_eva = temp_eva
-        self._power = power
-        self._efficiency = efficiency
-
         temperature_lift = temp_cond - temp_eva
         carnot_efficiency = _cop_carnot(temp_eva, temp_cond)
 
@@ -109,7 +103,7 @@ class COPNonModulating:
         self._min_lift = min_temperature_lift
         self._min_temperature = min_condenser_temperature
         self._max_temperature = max_condenser_temperature
-        self._secondary_temp = default_condenser_temperature
+        self._secondary_temp = default_evaporator_temperature
 
     def plot_efficiency_curve(self):
         """
@@ -294,17 +288,29 @@ class COPNonModulating:
         """
         from GHEtool.VariableClasses.Efficiency.EERNonModulating import EERNonModulating
 
-        eer = EERNonModulating(
-            temp_cond=self._temp_cond,
-            temp_eva=self._temp_eva,
-            efficiency=self._efficiency - 1,  # EER = COP -1
-            power=self._power * (1 - 1 / self._efficiency),  # Ql = Qh(1-1/COP)
-            min_temperature_lift=self._min_lift,
-            max_condenser_temperature=self._max_temperature,
-            min_condenser_temperature=self._min_temperature,
-            default_evaporator_temperature=default_evaporator_temperature
+        EERNonModulating = EERNonModulating(
+
         )
-        return eer
 
     def __export__(self):
         return {'type': 'Non-modulating COP'}
+
+
+if __name__ == '__main__':
+    cop = COPNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+    )
+    print(cop.get_COP(10, 35))
+    print(cop.get_COP(10, 45))
+    print(cop.get_COP(10, 55))
+    print(cop.get_COP(10, 60))
+    print(cop._get_max_power(10, 60))
+
+    cop.plot_efficiency_curve()

@@ -645,3 +645,116 @@ def test_cop_non_modulating_error():
             np.array([5, 5, -5]),
             np.array([4, 4, 4])
         )
+
+
+def test_cop_non_modulating_ranges():
+    cop = COPNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55,
+    )
+
+    assert 25 == cop._fit_within_range(-5)
+    assert 55 == cop._fit_within_range(500)
+
+
+def test_cop_non_modulating_envelope(monkeypatch):
+    import matplotlib.pyplot as plt
+    monkeypatch.setattr(plt, "show", lambda: None)
+    cop = COPNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55,
+    )
+    cop.plot_efficiency_curve()
+
+
+def test_cop_non_modulating_cop():
+    cop = COPNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55, default_condenser_temperature=35,
+        min_temperature_lift=22
+    )
+    assert np.isclose(cop._r_squared, 0.9386003022252285)
+    assert np.isclose(cop.get_COP(0, 35), 3.73314402328)
+    assert cop.get_COP(0) == cop.get_COP(0, 35)
+    assert cop.get_COP(0, 10) == cop.get_COP(0, 22)
+    assert cop.get_COP(0, 60) == cop.get_COP(0, 55)
+    assert cop.get_COP(50, 55) == cop.get_COP(50, 65)
+
+
+def test_cop_non_modulating_get_max_power():
+    cop = COPNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55, default_condenser_temperature=35,
+        min_temperature_lift=22
+    )
+
+    assert cop._get_max_power(0) == 3.52
+    assert cop._get_max_power(10, 45) == 3.52
+
+
+def test_cop_non_modulating_scop():
+    cop = COPNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55, default_condenser_temperature=35,
+        min_temperature_lift=22
+    )
+    with pytest.raises(ValueError):
+        cop.get_SCOP(np.array([1, 2]), np.array([1, 2, 3]))
+
+    assert cop.get_SCOP(np.array([1, 2, 3]), np.array([1, 2, 3])) == cop.get_SCOP(np.array([1, 2, 3]),
+                                                                                  np.array([1, 2, 3]),
+                                                                                  np.array([35, 35, 35]))
+    assert cop.get_SCOP(np.array([1, 2, 3]), np.array([1, 2, 3])) == 3.842963510674943
+    cop._min_lift = 35
+    assert cop.get_SCOP(np.array([1, 2, 3]), np.array([1, 2, 3])) == 3.7613899408578737
+
+
+def test_cop_non_modulating_export():
+    cop = COPNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55, default_condenser_temperature=35,
+        min_temperature_lift=22
+    )
+    assert {'type': 'Non-modulating COP'} == cop.__export__()
