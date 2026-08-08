@@ -9,6 +9,8 @@ from GHEtool.VariableClasses.Efficiency import *
 from GHEtool.VariableClasses.Efficiency._Efficiency import plot_heat_pump_envelope, combine_n_heat_pumps, \
     _find_optimal_heat_pump_configuration
 
+from GHEtool.VariableClasses.Efficiency.COPNonModulating import _cop_carnot
+
 points_HP300 = np.array([
     [-4.5, 53.6],
     [-4.5, 39.8],
@@ -114,7 +116,7 @@ def test_SCOP():
 def test_SEER():
     seer = SEER(50)
     assert seer.get_SEER(12, test=5) == 50
-    assert seer._get_max_power()==1e16
+    assert seer._get_max_power() == 1e16
     assert seer.get_EER(12, test=5) == 50
     with pytest.raises(ValueError):
         SEER(0)
@@ -479,6 +481,7 @@ def test_EERCombined():
     assert np.isclose(eer.get_SEER(np.array([10, 10, 10]), np.array([1, 15, 20]), month_indices=np.array([5, 6, 7])),
                       30 / 4.5)
 
+
 def test_EERCombined_max_power():
     # with threshold
     eer = EERCombined(20, 5, 10)
@@ -488,24 +491,26 @@ def test_EERCombined_max_power():
     # with month array
     eer = EERCombined(20, 5, months_active_cooling=np.array([7, 8, 9]))
     assert eer._get_max_power(1, 0, 0) == 1e16
-    assert np.allclose(eer._get_max_power(np.array([1, 10, 20]), month_indices=np.array([6, 7,8])), np.array([1e16, 1e16, 1e16]))
+    assert np.allclose(eer._get_max_power(np.array([1, 10, 20]), month_indices=np.array([6, 7, 8])),
+                       np.array([1e16, 1e16, 1e16]))
 
     # with threshold and month array
     eer = EERCombined(20, 5, 10, months_active_cooling=np.array([7, 8, 9]))
     assert eer._get_max_power(1, 0, 0) == 1e16
-    assert np.allclose(eer._get_max_power(np.array([1, 10, 20]), month_indices=np.array([6, 7,8])), np.array([1e16, 1e16, 1e16]))
+    assert np.allclose(eer._get_max_power(np.array([1, 10, 20]), month_indices=np.array([6, 7, 8])),
+                       np.array([1e16, 1e16, 1e16]))
 
     eer_part = EER(np.array([1, 2, 2, 4]), np.array([[1.5, 2.5], [2.5, 2.5], [1.5, 4.5], [2.5, 4.5]]), part_load=True)
     # with threshold
     eer = EERCombined(20, eer_part, 10)
     assert eer._get_max_power(1, 0, 0) == 1e16
     assert eer._get_max_power(11, 0, 0) == 4.5
-    assert np.allclose(eer._get_max_power(np.array([1, 11, 20])), np.array([1e16,4.5,4.5]))
+    assert np.allclose(eer._get_max_power(np.array([1, 11, 20])), np.array([1e16, 4.5, 4.5]))
 
     eer = EERCombined(eer_part, 20, 10)
     assert eer._get_max_power(1, 0, 0) == 4.5
     assert eer._get_max_power(11, 0, 0) == 1e16
-    assert np.allclose(eer._get_max_power(np.array([1, 11, 20])), np.array([4.5,1e16,1e16]))
+    assert np.allclose(eer._get_max_power(np.array([1, 11, 20])), np.array([4.5, 1e16, 1e16]))
 
     # with month array
     eer = EERCombined(20, eer_part, months_active_cooling=np.array([7, 8, 9]))
@@ -515,17 +520,21 @@ def test_EERCombined_max_power():
         eer._get_max_power(np.array([1, 10, 20]))
     assert eer._get_max_power(1, 0, 0) == 1e16
     assert eer._get_max_power(11, 0, 0) == 1e16
-    assert np.allclose(eer._get_max_power(np.array([1, 11, 20]), month_indices=np.array([6, 7,8])), np.array([1e16, 4.5,4.5]))
+    assert np.allclose(eer._get_max_power(np.array([1, 11, 20]), month_indices=np.array([6, 7, 8])),
+                       np.array([1e16, 4.5, 4.5]))
     eer = EERCombined(eer_part, 10, months_active_cooling=np.array([7, 8, 9]))
     assert eer._get_max_power(1, 0, 0) == 4.5
     assert eer._get_max_power(11, 0, 0) == 4.5
-    assert np.allclose(eer._get_max_power(np.array([1, 11, 20]), month_indices=np.array([6, 7,8])), np.array([4.5, 1e16, 1e16]))
-    assert np.allclose(eer._get_max_power(1, month_indices=np.array([6, 7,8])), np.array([4.5, 1e16, 1e16]))
+    assert np.allclose(eer._get_max_power(np.array([1, 11, 20]), month_indices=np.array([6, 7, 8])),
+                       np.array([4.5, 1e16, 1e16]))
+    assert np.allclose(eer._get_max_power(1, month_indices=np.array([6, 7, 8])), np.array([4.5, 1e16, 1e16]))
 
     # with threshold and month array
     eer = EERCombined(20, eer_part, 10, months_active_cooling=np.array([7, 8, 9]))
     assert eer._get_max_power(1, 0, 0) == 1e16
-    assert np.allclose(eer._get_max_power(np.array([1, 10, 20]), month_indices=np.array([6, 7,8])), np.array([1e16, 4.5, 4.5]))
+    assert np.allclose(eer._get_max_power(np.array([1, 10, 20]), month_indices=np.array([6, 7, 8])),
+                       np.array([1e16, 4.5, 4.5]))
+
 
 def test_eq_eer_combined():
     eer_combined = EERCombined(20, 5, 10)
@@ -598,3 +607,41 @@ def test_find_optimal_heat_pump_configuration():
     assert np.allclose(_find_optimal_heat_pump_configuration([hp_300, hp_400, hp_500], 70, prim_temp=-1), [0, 1, 0])
     assert np.allclose(_find_optimal_heat_pump_configuration([hp_300, hp_400, hp_500], 80, prim_temp=-1), [0, 0, 1])
     assert np.allclose(_find_optimal_heat_pump_configuration([hp_300, hp_500, hp_400], 120, prim_temp=-1), [1, 0, 1])
+
+
+def test_cop_carnot():
+    with pytest.raises(ValueError):
+        _cop_carnot(300, 200)
+
+    assert np.isclose(_cop_carnot(0, 10), 283.15 / 10)
+
+
+def test_cop_non_modulating_error():
+    with pytest.raises(ValueError):
+        COPNonModulating(
+            np.array([10, 10, 10]),
+            np.array([0, 1, 2]),
+            np.array([5, 5, 5]),
+            np.array([4, 4])
+        )
+    with pytest.raises(ValueError):
+        COPNonModulating(
+            np.array([10, 10, 10]),
+            np.array([0, 0, 0]),
+            np.array([5, 5, 5]),
+            np.array([4, 4, 4])
+        )
+    with pytest.raises(ValueError):
+        COPNonModulating(
+            np.array([10, 10, 10]),
+            np.array([0, 1, 12]),
+            np.array([5, 5, 5]),
+            np.array([4, 4, 4])
+        )
+    with pytest.raises(ValueError):
+        COPNonModulating(
+            np.array([10, 10, 10]),
+            np.array([0, 1, 2]),
+            np.array([5, 5, -5]),
+            np.array([4, 4, 4])
+        )

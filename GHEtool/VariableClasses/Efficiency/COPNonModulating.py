@@ -5,41 +5,84 @@ import matplotlib.pyplot as plt
 
 from typing import Union
 
-from GHEtool.VariableClasses.Efficiency._Efficiency import _Efficiency
 
+def _cop_carnot(temp_eva: Union[float, np.ndarray], temp_cond: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+    """
+    This function calculates the Carnot efficiency.
 
-def _cop_carnot(temp_eva, temp_cond):
+    Parameters
+    ----------
+    temp_eva : float, np.ndarray
+        Average fluid temperature at the evaporator [°C]
+    temp_cond : float, np.ndarray
+        Average fluid temperature at the condenser [°C]
+
+    Returns
+    -------
+    float, np.ndarray
+        Carnot efficiency [-]
+
+    Raises
+    ------
+    ValueError
+        When the temperature at the condenser is lower than at the evaporator.
+    """
+    if temp_cond < temp_eva:
+        raise ValueError('The temperature at the condenser should be higher than the evaporator.')
     return (temp_cond + 273.15) / (temp_cond - temp_eva)
 
 
-class COPSimplified():
+class COPNonModulating:
     """
-    Class for COP efficiency, with dependencies on main average inlet temperature, main average outlet temperature (optional)
-    and part-load (optional) conditions.
+    Class for COP efficiency for non-modulating heat pumps.
+    The efficiency is calculated based on at least three measuring points and use these points to correct
+    the carnot efficiency of the entire working range.
     """
 
-    def __init__(self, temp_cond: np.ndarray, temp_eva: np.ndarray, power: np.ndarray, efficiency: np.ndarray) -> None:
+    def __init__(self, temp_cond: np.ndarray, temp_eva: np.ndarray, power: np.ndarray, efficiency: np.ndarray,
+                 min_temperature_lift: float = 20, min_temperature: float = None, max_temperature: float = None,
+                 default_condenser_temperature: float = 33.5) -> None:
         """
         Create an efficiency correlation based on the temperature lift.
 
         Parameters
         ----------
         temp_cond : np.ndarray
-            Condenser temperatures.
+            Condenser temperatures [°C]
         temp_eva : np.ndarray
-            Evaporator temperatures.
+            Evaporator temperatures [°C]
         power : np.ndarray
-            Heat pump power values.
+            Heat pump power values [kW]
         efficiency : np.ndarray
-            Heat pump efficiency values.
+            Heat pump efficiency values [-]
+        min_temperature_lift : float
+            The minimum temperature lift between the evaporator and condenser side of the heat pump [°C]
+        min_temperature : float
+            The lowest (average) temperature the heat pump can deliver at the condenser [°C]
+        max_temperature : float
+            The highest (average) temperature the heat pump can deliver at the condenser [°C]
+        default_condenser_temperature : float
+            The default average condenser temperature [°C]
 
         Raises
         ------
         ValueError
             If the input arrays do not have equal lengths.
+            If there are less than 3 different temperatures lifts defined.
+            If not all condenser fluid temperatures are above the evaporator ones.
+            Not all powers and efficiencies are above 0.
         """
         if not (temp_cond.size == temp_eva.size == power.size == efficiency.size):
             raise ValueError("All input arrays must have equal lengths.")
+
+        if np.unique(temp_cond - temp_eva).size < 3:
+            raise ValueError("At least three different temperature lifts should be defined.")
+
+        if not np.all(temp_cond > temp_eva):
+            raise ValueError("All condenser fluid temperatures should be above the evaporator ones.")
+
+        if not (np.all(efficiency > 0) and np.all(power > 0)):
+            raise ValueError('All efficiencies and powers should be larger than 0.')
 
         temperature_lift = temp_cond - temp_eva
         carnot_efficiency = _cop_carnot(temp_eva, temp_cond)
@@ -54,10 +97,15 @@ class COPSimplified():
         self._power_sorted = power[order]
 
         # defaults
-        self._min_lift = 25
-        self._secondary_temp = 35
+        self._min_lift = min_temperature_lift
+        self._min_temperature = min_temperature
+        self._max_temperature = max_temperature
+        self._secondary_temp = default_condenser_temperature
 
     def plot_efficiency_curve(self):
+        """
+        This function plots the given efficiency of the
+        """
         plt.figure()
         plt.scatter([i[0] for i in self._scatter], [i[1] * 100 for i in self._scatter], legend="Data points")
 
@@ -67,6 +115,28 @@ class COPSimplified():
         plt.ylabel('Real efficiency w.r.t. Carnot COP[%]')
         plt.legend()
         plt.show()
+
+    def _fit_within_range(self, secondary_temperature: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        """
+        This function makes sure the secondary temperatures are within the minimum and maximum condenser temperatures
+        and that the minimum lift is also ensured.
+
+        Parameters
+        ----------
+        secondary_temperature : float, np.ndarray
+            Average fluid temperatures at the condenser side of the heat pump [°C]
+
+        Returns
+        -------
+        secondary_temperatures : float, np.ndarray
+            Average fluid temperatures at the condenser side of the heat pump [°C]
+        """
+
+        # Make sure the secondary temperature is within the operating range
+        secondary_temperature = np.maximum(secondary_temperature, self._min_temperature)
+        secondary_temperature = np.minimum(secondary_temperature, self._max_temperature)
+
+        return secondary_temperature
 
     def _get_efficiency(self,
                         primary_temperature: Union[float, np.ndarray],
@@ -90,10 +160,17 @@ class COPSimplified():
             np.ndarray
         """
         _secondary_temperature = copy.copy(secondary_temperature)
+
         if secondary_temperature is None:
             _secondary_temperature = self._secondary_temp
+
         # Ensure a minimum temperature lift of 25 K
-        _secondary_temperature = np.maximum(_secondary_temperature, primary_temperature + self._min_lift)
+        _secondary_temperature = np.maximum(secondary_temperature, primary_temperature + self._min_lift)
+
+        # Make sure the temperatures are within the working range of the heat pump
+        _secondary_temperature = self._fit_within_range(_secondary_temperature)
+
+        # Calculate Carnot efficiency
         cop_carnot = _cop_carnot(primary_temperature, _secondary_temperature)
 
         return cop_carnot * self.model(_secondary_temperature - primary_temperature)
@@ -121,7 +198,7 @@ class COPSimplified():
         Efficiency
             np.ndarray
         """
-
+        secondary_temperature = self._fit_within_range(copy.copy(secondary_temperature))
         lift = secondary_temperature - primary_temperature
 
         return np.interp(lift, self._lift_sorted, self._power_sorted)
@@ -155,11 +232,8 @@ class COPSimplified():
         """
         return self._get_efficiency(primary_temperature, secondary_temperature, power)
 
-    def get_SCOP(self,
-                 power: np.ndarray,
-                 primary_temperature: np.ndarray,
-                 secondary_temperature: np.ndarray = None
-                 ) -> float:
+    def get_SCOP(self, power: np.ndarray, primary_temperature: np.ndarray,
+                 secondary_temperature: np.ndarray = None) -> float:
         """
         This function calculates and returns the SCOP.
 
@@ -195,13 +269,11 @@ class COPSimplified():
         return np.sum(power) / np.sum(w_array)
 
     def __export__(self):
-        if self._has_part_load:
-            return {'type': 'Temperature and part-load dependent COP'}
-        return {'type': 'Temperature dependent COP'}
+        return {'type': 'Non-modulating COP'}
 
 
 if __name__ == '__main__':
-    cop = COPSimplified(
+    cop = COPNonModulating(
         np.array([35, 45, 55, 60, 65] * 6),
         np.repeat([0, 2, 4, 6, 8, 10], 5),
         np.array(
