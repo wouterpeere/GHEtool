@@ -147,6 +147,8 @@ These efficiencies can be used in the Building load classes (cf. infra). The dif
 * _COP_: Instant efficiency for heating, with inlet temperature, outlet temperature and part load dependency
 * _EER_: Instant efficiency for cooling, with inlet temperature, outlet temperature and part load dependency
 * _EERCombined_: EER for combined active and passive cooling
+* _COPNonModulating_: COP for non-modulating heat pumps
+* _EERNonModulating_: EER for non-modulating heat pumps
 
 ### Load data
 
