@@ -121,7 +121,7 @@ class COPNonModulating:
         polyline = np.linspace(35 - 10, 65, 100)
         plt.plot(polyline, self.model(polyline) * 100, legend="Fit")
         plt.xlabel('Temperature lift [°C]')
-        plt.ylabel('Real efficiency w.r.t. Carnot COP[%]')
+        plt.ylabel('Real efficiency w.r.t. Carnot COP [%]')
         plt.legend()
         plt.show()
 
@@ -219,8 +219,7 @@ class COPNonModulating:
                 secondary_temperature: Union[float, np.ndarray] = None,
                 power: Union[float, np.ndarray] = None) -> np.ndarray:
         """
-        This function calculates the COP. This function uses a linear interpolation and sets the out-of-bound values
-        to the nearest value in the dataset. This function does hence not extrapolate.
+        This function calculates the COP using the quadratic model and the Carnot efficiency.
 
         Parameters
         ----------
@@ -229,7 +228,7 @@ class COPNonModulating:
         secondary_temperature : np.ndarray or float
             Value(s) for the average secondary temperature of the heat pump for the COP calculation.
         power : np.ndarray or float
-            Value(s) for the part load data of the heat pump for the COP calculation.
+            Value(s) for the part load data of the heat pump for the COP calculation. (Not used)
 
         Raises
         ------
@@ -251,11 +250,11 @@ class COPNonModulating:
         Parameters
         ----------
         power : np.ndarray
-            Array with the hourly secondary power of the heat pump [kW]
+            Array with the hourly secondary power of the heat pump [kW] (not used)
         primary_temperature : np.ndarray
-            Values for the average primary temperature of the heat pump for the COP calculation.
+            Values for the average primary temperature of the heat pump for the COP calculation [°C].
         secondary_temperature : np.ndarray
-            Values for the average secondary temperature of the heat pump for the COP calculation.
+            Values for the average secondary temperature of the heat pump for the COP calculation [°C].
 
         Raises
         ------

@@ -10,6 +10,7 @@ from GHEtool.VariableClasses.Efficiency._Efficiency import plot_heat_pump_envelo
     _find_optimal_heat_pump_configuration
 
 from GHEtool.VariableClasses.Efficiency.COPNonModulating import _cop_carnot
+from GHEtool.VariableClasses.Efficiency.EERNonModulating import _eer_carnot
 
 points_HP300 = np.array([
     [-4.5, 53.6],
@@ -616,7 +617,15 @@ def test_cop_carnot():
     assert np.isclose(_cop_carnot(0, 10), 283.15 / 10)
 
 
-def test_cop_non_modulating_error():
+def test_eer_carnot():
+    with pytest.raises(ValueError):
+        _eer_carnot(300, 200)
+
+    assert np.isclose(_eer_carnot(0, 10), 283.15 / 10 - 1)
+    assert np.isclose(_eer_carnot(0, 10), _cop_carnot(0, 10) - 1)
+
+
+def test_cop_eer_non_modulating_error():
     with pytest.raises(ValueError):
         COPNonModulating(
             np.array([10, 10, 10]),
@@ -645,6 +654,34 @@ def test_cop_non_modulating_error():
             np.array([5, 5, -5]),
             np.array([4, 4, 4])
         )
+    with pytest.raises(ValueError):
+        EERNonModulating(
+            np.array([10, 10, 10]),
+            np.array([0, 1, 2]),
+            np.array([5, 5, 5]),
+            np.array([4, 4])
+        )
+    with pytest.raises(ValueError):
+        EERNonModulating(
+            np.array([10, 10, 10]),
+            np.array([0, 0, 0]),
+            np.array([5, 5, 5]),
+            np.array([4, 4, 4])
+        )
+    with pytest.raises(ValueError):
+        EERNonModulating(
+            np.array([10, 10, 10]),
+            np.array([0, 1, 12]),
+            np.array([5, 5, 5]),
+            np.array([4, 4, 4])
+        )
+    with pytest.raises(ValueError):
+        EERNonModulating(
+            np.array([10, 10, 10]),
+            np.array([0, 1, 2]),
+            np.array([5, 5, -5]),
+            np.array([4, 4, 4])
+        )
 
 
 def test_cop_non_modulating_ranges():
@@ -664,6 +701,23 @@ def test_cop_non_modulating_ranges():
     assert 55 == cop._fit_within_range(500)
 
 
+def test_eer_non_modulating_ranges():
+    eer = EERNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55,
+    )
+
+    assert 25 == eer._fit_within_range(-5)
+    assert 55 == eer._fit_within_range(500)
+
+
 def test_cop_non_modulating_envelope(monkeypatch):
     import matplotlib.pyplot as plt
     monkeypatch.setattr(plt, "show", lambda: None)
@@ -679,6 +733,23 @@ def test_cop_non_modulating_envelope(monkeypatch):
         min_condenser_temperature=25, max_condenser_temperature=55,
     )
     cop.plot_efficiency_curve()
+
+
+def test_eer_non_modulating_envelope(monkeypatch):
+    import matplotlib.pyplot as plt
+    monkeypatch.setattr(plt, "show", lambda: None)
+    eer = COPNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55,
+    )
+    eer.plot_efficiency_curve()
 
 
 def test_cop_non_modulating_cop():
@@ -702,6 +773,28 @@ def test_cop_non_modulating_cop():
     assert cop.get_COP(50, 55) == cop.get_COP(50, 65)
 
 
+def test_eer_non_modulating_cop():
+    eer = EERNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67,
+             3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67,
+             3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55, default_evaporator_temperature=7,
+        min_temperature_lift=22
+    )
+    assert np.isclose(eer._r_squared, 0.9667074164346418)
+    assert np.isclose(eer.get_EER(35, 0), 3.7308134424125146)
+    assert eer.get_EER(0) == eer.get_EER(29, 7)
+    assert eer.get_EER(44, 22) == eer.get_EER(0, 22)
+    assert eer.get_EER(55, 7) == eer.get_EER(60, 7)
+
+
 def test_cop_non_modulating_get_max_power():
     cop = COPNonModulating(
         np.array([35, 45, 55, 60, 65] * 6),
@@ -718,6 +811,24 @@ def test_cop_non_modulating_get_max_power():
 
     assert cop._get_max_power(0) == 3.52
     assert cop._get_max_power(10, 45) == 3.52
+
+
+def test_eer_non_modulating_get_max_power():
+    eer = EERNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55, default_evaporator_temperature=7,
+        min_temperature_lift=22
+    )
+
+    assert eer._get_max_power(0) == 4.33
+    assert eer._get_max_power(0) == eer._get_max_power(29)
 
 
 def test_cop_non_modulating_scop():
@@ -744,6 +855,30 @@ def test_cop_non_modulating_scop():
     assert cop.get_SCOP(np.array([1, 2, 3]), np.array([1, 2, 3])) == 3.7613899408578737
 
 
+def test_eer_non_modulating_seer():
+    eer = EERNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55, default_evaporator_temperature=7,
+        min_temperature_lift=22
+    )
+    with pytest.raises(ValueError):
+        eer.get_SEER(np.array([1, 2]), np.array([1, 2, 3]))
+
+    assert eer.get_SEER(np.array([1, 2, 3]), np.array([1, 2, 3])) == eer.get_SEER(np.array([1, 2, 3]),
+                                                                                  np.array([1, 2, 3]),
+                                                                                  np.array([7, 7, 7]))
+    assert eer.get_SEER(np.array([1, 2, 3]), np.array([1, 2, 3])) == 4.198785808630919
+    eer._min_lift = 35
+    assert eer.get_SEER(np.array([1, 2, 3]), np.array([1, 2, 3])) == 3.826422792941117
+
+
 def test_cop_non_modulating_export():
     cop = COPNonModulating(
         np.array([35, 45, 55, 60, 65] * 6),
@@ -758,3 +893,61 @@ def test_cop_non_modulating_export():
         min_temperature_lift=22
     )
     assert {'type': 'Non-modulating COP'} == cop.__export__()
+
+
+def test_eer_non_modulating_export():
+    eer = EERNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55, default_evaporator_temperature=35,
+        min_temperature_lift=22
+    )
+    assert {'type': 'Non-modulating EER'} == eer.__export__()
+
+
+def test_convert_cop_to_eer():
+    cop = COPNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55, default_condenser_temperature=35,
+        min_temperature_lift=22
+    )
+    eer = cop.convert_to_eer_non_modulating(7)
+    assert eer._min_lift == 22
+    assert eer._min_temperature == 25
+    assert eer._max_temperature == 55
+    assert np.isclose(eer._power[0], 2.5199999999999996)
+    assert eer._efficiency[0] == 2.52
+
+
+def test_convert_eer_to_cop():
+    eer = EERNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55, default_evaporator_temperature=7,
+        min_temperature_lift=22
+    )
+    cop = eer.convert_to_cop_non_modulating(35)
+    assert cop._min_lift == 22
+    assert cop._min_temperature == 25
+    assert cop._max_temperature == 55
+    assert np.isclose(cop._power[0], 4.916825396825398)
+    assert cop._efficiency[0] == 4.52

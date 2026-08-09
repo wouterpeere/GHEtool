@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 from typing import Union
 
 
-def _cop_carnot(temp_eva: Union[float, np.ndarray], temp_cond: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+def _eer_carnot(temp_eva: Union[float, np.ndarray], temp_cond: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
     """
-    This function calculates the Carnot efficiency.
+    This function calculates the Carnot efficiency for cooling.
 
     Parameters
     ----------
@@ -29,7 +29,7 @@ def _cop_carnot(temp_eva: Union[float, np.ndarray], temp_cond: Union[float, np.n
     """
     if np.all(temp_cond < temp_eva):
         raise ValueError('The temperature at the condenser should be higher than the evaporator.')
-    return (temp_cond + 273.15) / (temp_cond - temp_eva)
+    return (temp_cond + 273.15) / (temp_cond - temp_eva) - 1
 
 
 class EERNonModulating:
@@ -85,8 +85,14 @@ class EERNonModulating:
         if not (np.all(efficiency > 0) and np.all(power > 0)):
             raise ValueError('All efficiencies and powers should be larger than 0.')
 
+        # store variables
+        self._temp_cond = temp_cond
+        self._temp_eva = temp_eva
+        self._power = power
+        self._efficiency = efficiency
+
         temperature_lift = temp_cond - temp_eva
-        carnot_efficiency = _cop_carnot(temp_eva, temp_cond)
+        carnot_efficiency = _eer_carnot(temp_eva, temp_cond)
 
         relative_difference = efficiency / carnot_efficiency
         self._scatter = np.column_stack((temperature_lift, relative_difference))
@@ -115,31 +121,31 @@ class EERNonModulating:
         polyline = np.linspace(35 - 10, 65, 100)
         plt.plot(polyline, self.model(polyline) * 100, legend="Fit")
         plt.xlabel('Temperature lift [°C]')
-        plt.ylabel('Real efficiency w.r.t. Carnot COP[%]')
+        plt.ylabel('Real efficiency w.r.t. Carnot EER [%]')
         plt.legend()
         plt.show()
 
-    def _fit_within_range(self, secondary_temperature: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+    def _fit_within_range(self, primary_temperature: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """
-        This function makes sure the secondary temperatures are within the minimum and maximum condenser temperatures
+        This function makes sure the primary temperatures are within the minimum and maximum condenser temperatures
         and that the minimum lift is also ensured.
 
         Parameters
         ----------
-        secondary_temperature : float, np.ndarray
+        primary_temperature : float, np.ndarray
             Average fluid temperatures at the condenser side of the heat pump [°C]
 
         Returns
         -------
-        secondary_temperatures : float, np.ndarray
+        primary_temperature : float, np.ndarray
             Average fluid temperatures at the condenser side of the heat pump [°C]
         """
 
         # Make sure the secondary temperature is within the operating range
-        secondary_temperature = np.maximum(secondary_temperature, self._min_temperature)
-        secondary_temperature = np.minimum(secondary_temperature, self._max_temperature)
+        primary_temperature = np.maximum(primary_temperature, self._min_temperature)
+        primary_temperature = np.minimum(primary_temperature, self._max_temperature)
 
-        return secondary_temperature
+        return primary_temperature
 
     def _get_efficiency(self,
                         primary_temperature: Union[float, np.ndarray],
@@ -163,20 +169,20 @@ class EERNonModulating:
             np.ndarray
         """
         _secondary_temperature = copy.copy(secondary_temperature)
-
+        primary_temperature = copy.copy(primary_temperature)
         if secondary_temperature is None:
             _secondary_temperature = self._secondary_temp
 
         # Ensure a minimum temperature lift of 25 K
-        _secondary_temperature = np.maximum(_secondary_temperature, primary_temperature + self._min_lift)
+        primary_temperature = np.maximum(primary_temperature, _secondary_temperature + self._min_lift)
 
         # Make sure the temperatures are within the working range of the heat pump
-        _secondary_temperature = self._fit_within_range(_secondary_temperature)
+        primary_temperature = self._fit_within_range(primary_temperature)
 
         # Calculate Carnot efficiency
-        cop_carnot = _cop_carnot(primary_temperature, _secondary_temperature)
+        eer_carnot = _eer_carnot(_secondary_temperature, primary_temperature)
 
-        return cop_carnot * self.model(_secondary_temperature - primary_temperature)
+        return eer_carnot * self.model(primary_temperature - _secondary_temperature)
 
     def _get_max_power(self,
                        primary_temperature: Union[float, np.ndarray],
@@ -203,27 +209,26 @@ class EERNonModulating:
         """
         if secondary_temperature is None:
             secondary_temperature = self._secondary_temp
-        secondary_temperature = self._fit_within_range(copy.copy(secondary_temperature))
-        lift = secondary_temperature - primary_temperature
+        primary_temperature = self._fit_within_range(copy.copy(primary_temperature))
+        lift = primary_temperature - secondary_temperature
 
         return np.interp(lift, self._lift_sorted, self._power_sorted)
 
-    def get_COP(self,
+    def get_EER(self,
                 primary_temperature: Union[float, np.ndarray],
                 secondary_temperature: Union[float, np.ndarray] = None,
                 power: Union[float, np.ndarray] = None) -> np.ndarray:
         """
-        This function calculates the COP. This function uses a linear interpolation and sets the out-of-bound values
-        to the nearest value in the dataset. This function does hence not extrapolate.
+        This function calculates the EER using the quadratic model and the Carnot efficiency.
 
         Parameters
         ----------
         primary_temperature : np.ndarray or float
-            Value(s) for the average primary temperature of the heat pump for the COP calculation.
+            Value(s) for the average primary temperature of the heat pump for the EER calculation.
         secondary_temperature : np.ndarray or float
-            Value(s) for the average secondary temperature of the heat pump for the COP calculation.
+            Value(s) for the average secondary temperature of the heat pump for the EER calculation.
         power : np.ndarray or float
-            Value(s) for the part load data of the heat pump for the COP calculation.
+            Value(s) for the part load data of the heat pump for the EER calculation. (not used)
 
         Raises
         ------
@@ -232,24 +237,24 @@ class EERNonModulating:
 
         Returns
         -------
-        COP
+        EER
             np.ndarray
         """
         return self._get_efficiency(primary_temperature, secondary_temperature, power)
 
-    def get_SCOP(self, power: np.ndarray, primary_temperature: np.ndarray,
+    def get_SEER(self, power: np.ndarray, primary_temperature: np.ndarray,
                  secondary_temperature: np.ndarray = None) -> float:
         """
-        This function calculates and returns the SCOP.
+        This function calculates and returns the SEER.
 
         Parameters
         ----------
         power : np.ndarray
-            Array with the hourly secondary power of the heat pump [kW]
+            Array with the hourly secondary power of the heat pump [kW] (not used)
         primary_temperature : np.ndarray
-            Values for the average primary temperature of the heat pump for the COP calculation.
+            Values for the average primary temperature of the heat pump for the EER calculation.
         secondary_temperature : np.ndarray
-            Values for the average secondary temperature of the heat pump for the COP calculation.
+            Values for the average secondary temperature of the heat pump for the EER calculation.
 
         Raises
         ------
@@ -258,7 +263,7 @@ class EERNonModulating:
 
         Returns
         -------
-        SCOP
+        SEER
             float
         """
 
@@ -266,51 +271,39 @@ class EERNonModulating:
                 secondary_temperature is None or len(secondary_temperature) == len(power)):
             raise ValueError('The hourly arrays should have equal length!')
 
-        cop_array = self.get_COP(primary_temperature, secondary_temperature, power)
+        eer_array = self.get_EER(primary_temperature, secondary_temperature, power)
 
         # SCOP = sum(Q)/sum(W)
-        w_array = np.array(power) / cop_array
+        w_array = np.array(power) / eer_array
 
         return np.sum(power) / np.sum(w_array)
 
-    def convert_to_eer_non_modulating(self, default_evaporator_temperature: float = 12):
+    def convert_to_cop_non_modulating(self, default_condenser_temperature: float = 12):
         """
         This function converts the current class to its equivalent EER class.
 
         Parameters
         ----------
-        default_evaporator_temperature : float
-            Default average fluid temperature in the evaporator during cooling [°C]
+        default_condenser_temperature : float
+            Default average fluid temperature in the condenser during heating [°C]
 
         Returns
         -------
         EERNonModulating
         """
-        from GHEtool.VariableClasses.Efficiency.EERNonModulating import EERNonModulating
+        from GHEtool.VariableClasses.Efficiency.COPNonModulating import COPNonModulating
 
-        EERNonModulating = EERNonModulating(
-
+        cop = COPNonModulating(
+            temp_cond=self._temp_cond,
+            temp_eva=self._temp_eva,
+            efficiency=self._efficiency + 1,  # EER = COP -1
+            power=self._power / (1 - 1 / self._efficiency),  # Ql = Qh(1-1/COP)
+            min_temperature_lift=self._min_lift,
+            max_condenser_temperature=self._max_temperature,
+            min_condenser_temperature=self._min_temperature,
+            default_condenser_temperature=default_condenser_temperature
         )
+        return cop
 
     def __export__(self):
-        return {'type': 'Non-modulating COP'}
-
-
-if __name__ == '__main__':
-    cop = COPNonModulating(
-        np.array([35, 45, 55, 60, 65] * 6),
-        np.repeat([0, 2, 4, 6, 8, 10], 5),
-        np.array(
-            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
-             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
-        np.array(
-            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
-             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
-    )
-    print(cop.get_COP(10, 35))
-    print(cop.get_COP(10, 45))
-    print(cop.get_COP(10, 55))
-    print(cop.get_COP(10, 60))
-    print(cop._get_max_power(10, 60))
-
-    cop.plot_efficiency_curve()
+        return {'type': 'Non-modulating EER'}
