@@ -40,7 +40,8 @@ class _Efficiency(_EfficiencyBase, BaseClass):
                  part_load: bool = False,
                  secondary: bool = False,
                  reference_nominal_power: float = None,
-                 nominal_power: float = None):
+                 nominal_power: float = None,
+                 default_secondary_temperature: float = None):
         """
 
         Parameters
@@ -61,6 +62,9 @@ class _Efficiency(_EfficiencyBase, BaseClass):
             The nominal power at which to define the current efficiency class. This converts the provided efficiency data
             from the reference_nominal_power to the nominal_power. This is only relevant when part load data is available
             and the reference_nominal_power is provided.
+        default_secondary_temperature : float
+            Default average temperature at the secondary side of the heat pump. This is used to calculate the correct efficiency
+            in for example heating or dhw [°C]
 
         Raises
         ------
@@ -78,6 +82,7 @@ class _Efficiency(_EfficiencyBase, BaseClass):
         self._coordinates_: np.ndarray = coordinates
         self._reference_nominal_power: float = reference_nominal_power
         self._nominal_power: float = nominal_power
+        self._default_secondary_temperature: float = default_secondary_temperature
 
         self._range_primary: np.ndarray = np.array([])
         self._range_secondary: np.ndarray = np.array([])
@@ -246,7 +251,7 @@ class _Efficiency(_EfficiencyBase, BaseClass):
         """
         # check if all the required values are present
         if self._has_secondary != (secondary_temperature is not None):
-            if self._has_secondary:
+            if self._has_secondary and self._default_secondary_temperature is None:
                 raise ValueError('The EER class requires a value for the secondary temperature.')
         if self._has_part_load != (power is not None):
             if self._has_part_load:
@@ -260,9 +265,13 @@ class _Efficiency(_EfficiencyBase, BaseClass):
         primary_temperature = np.array(
             np.full(_max_length, primary_temperature) if isinstance(primary_temperature,
                                                                     (float, int)) else primary_temperature)
-        secondary_temperature = np.array(
-            np.full(_max_length, secondary_temperature) if isinstance(secondary_temperature,
-                                                                      (float, int)) else secondary_temperature)
+        if secondary_temperature is not None:
+            secondary_temperature = np.array(
+                np.full(_max_length, secondary_temperature) if isinstance(secondary_temperature,
+                                                                          (float, int)) else secondary_temperature)
+        elif self._default_secondary_temperature is not None:
+            secondary_temperature = np.full(_max_length, self._default_secondary_temperature)
+
         power = np.array(np.full(_max_length, power) if isinstance(power, (float, int)) else power)
 
         # clip, so that no values fall outside the provided values
@@ -291,7 +300,7 @@ class _Efficiency(_EfficiencyBase, BaseClass):
 
     def _get_max_power(self,
                        primary_temperature: Union[float, np.ndarray],
-                       secondary_temperature: Union[float, np.ndarray] = None,**kwargs) -> np.ndarray:
+                       secondary_temperature: Union[float, np.ndarray] = None, **kwargs) -> np.ndarray:
         """
         This function returns the maximum available power for a certain primary and secondary temperature.
 

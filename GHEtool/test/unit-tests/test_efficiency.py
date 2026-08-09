@@ -216,7 +216,7 @@ def test_COP_full():
     cop_full = COP(np.array([1, 2, 2, 4, 2, 4, 4, 8]),
                    np.array([[1.5, 2.5, 4.5], [2.5, 2.5, 4.5], [1.5, 4.5, 4.5], [2.5, 4.5, 4.5],
                              [1.5, 2.5, 8.5], [2.5, 2.5, 8.5], [1.5, 4.5, 8.5], [2.5, 4.5, 8.5]]),
-                   secondary=True, part_load=True)
+                   secondary=True, part_load=True, default_secondary_temperature=2.5)
 
     assert cop_full._has_part_load
     assert cop_full._has_secondary
@@ -225,6 +225,11 @@ def test_COP_full():
         assert cop_full.get_COP(5, 3) == 3
 
     assert cop_full.get_COP(2, 2.5, 4.5) == 1.5
+    assert cop_full.get_COP(1.5, 2.5, 8.5) == 2
+    assert cop_full.get_COP(1.5, power=8.5) == 2
+
+    assert cop_full.get_COP(1.5, 4.5, 8.5) == 4
+    assert cop_full.get_COP(1.5, 3.5, 8.5) == 3
     assert np.array_equal(cop_full.get_COP(np.array([2, 2.5]), np.array([3.5, 3.5]), np.array([6.5, 8])),
                           np.array([3.375, 5.625]))
     assert np.array_equal(cop_full.get_COP(np.array([2, 2.5, 5]), np.array([3.5, 3.5, 3.5]), np.array([6.5, 8, 8])),
@@ -327,7 +332,7 @@ def test_EER_full():
     eer_full = EER(np.array([1, 2, 2, 4, 2, 4, 4, 8]),
                    np.array([[1.5, 2.5, 4.5], [2.5, 2.5, 4.5], [1.5, 4.5, 4.5], [2.5, 4.5, 4.5],
                              [1.5, 2.5, 8.5], [2.5, 2.5, 8.5], [1.5, 4.5, 8.5], [2.5, 4.5, 8.5]]),
-                   secondary=True, part_load=True)
+                   secondary=True, part_load=True, default_secondary_temperature=2.5)
     assert eer_full._has_part_load
     assert eer_full._has_secondary
 
@@ -335,6 +340,11 @@ def test_EER_full():
         assert eer_full.get_EER(5, 3) == 3
 
     assert eer_full.get_EER(2, 2.5, 4.5) == 1.5
+    assert eer_full.get_EER(1.5, 2.5, 8.5) == 2
+    assert eer_full.get_EER(1.5, power=8.5) == 2
+
+    assert eer_full.get_EER(1.5, 4.5, 8.5) == 4
+    assert eer_full.get_EER(1.5, 3.5, 8.5) == 3
     assert np.array_equal(eer_full.get_EER(np.array([2, 2.5]), np.array([3.5, 3.5]), np.array([6.5, 8])),
                           np.array([3.375, 5.625]))
     assert np.array_equal(eer_full.get_EER(np.array([2, 2.5, 5]), np.array([3.5, 3.5, 3.5]), np.array([6.5, 8, 8])),
