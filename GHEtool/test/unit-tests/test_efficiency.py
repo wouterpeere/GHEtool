@@ -850,9 +850,9 @@ def test_cop_non_modulating_scop():
     assert cop.get_SCOP(np.array([1, 2, 3]), np.array([1, 2, 3])) == cop.get_SCOP(np.array([1, 2, 3]),
                                                                                   np.array([1, 2, 3]),
                                                                                   np.array([35, 35, 35]))
-    assert cop.get_SCOP(np.array([1, 2, 3]), np.array([1, 2, 3])) == 3.842963510674943
+    assert np.isclose(cop.get_SCOP(np.array([1, 2, 3]), np.array([1, 2, 3])), 3.842963510674943)
     cop._min_lift = 35
-    assert cop.get_SCOP(np.array([1, 2, 3]), np.array([1, 2, 3])) == 3.7613899408578737
+    assert np.isclose(cop.get_SCOP(np.array([1, 2, 3]), np.array([1, 2, 3])), 3.7613899408578737)
 
 
 def test_eer_non_modulating_seer():
@@ -874,9 +874,9 @@ def test_eer_non_modulating_seer():
     assert eer.get_SEER(np.array([1, 2, 3]), np.array([1, 2, 3])) == eer.get_SEER(np.array([1, 2, 3]),
                                                                                   np.array([1, 2, 3]),
                                                                                   np.array([7, 7, 7]))
-    assert eer.get_SEER(np.array([1, 2, 3]), np.array([1, 2, 3])) == 4.198785808630919
+    assert np.isclose(eer.get_SEER(np.array([1, 2, 3]), np.array([1, 2, 3])), 4.198785808630919)
     eer._min_lift = 35
-    assert eer.get_SEER(np.array([1, 2, 3]), np.array([1, 2, 3])) == 3.826422792941117
+    assert np.isclose(eer.get_SEER(np.array([1, 2, 3]), np.array([1, 2, 3])), 3.826422792941117)
 
 
 def test_cop_non_modulating_export():

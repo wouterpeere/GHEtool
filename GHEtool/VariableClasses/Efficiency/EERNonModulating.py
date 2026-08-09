@@ -116,10 +116,10 @@ class EERNonModulating:
         This function plots the given efficiency of the
         """
         plt.figure()
-        plt.scatter([i[0] for i in self._scatter], [i[1] * 100 for i in self._scatter], legend="Data points")
+        plt.scatter([i[0] for i in self._scatter], [i[1] * 100 for i in self._scatter], label="Data points")
 
         polyline = np.linspace(35 - 10, 65, 100)
-        plt.plot(polyline, self.model(polyline) * 100, legend="Fit")
+        plt.plot(polyline, self.model(polyline) * 100, label="Fit")
         plt.xlabel('Temperature lift [°C]')
         plt.ylabel('Real efficiency w.r.t. Carnot EER [%]')
         plt.legend()
