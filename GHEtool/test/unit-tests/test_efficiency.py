@@ -227,7 +227,10 @@ def test_COP_full():
     assert cop_full.get_COP(2, 2.5, 4.5) == 1.5
     assert cop_full.get_COP(1.5, 2.5, 8.5) == 2
     assert cop_full.get_COP(1.5, power=8.5) == 2
-
+    cop_full._default_secondary_temperature = 6
+    assert cop_full.get_cop(1.5, power=8.5) == 4
+    cop_full._default_secondary_temperature = -6
+    assert cop_full.get_COP(1.5, power=8.5) == 2
     assert cop_full.get_COP(1.5, 4.5, 8.5) == 4
     assert cop_full.get_COP(1.5, 3.5, 8.5) == 3
     assert np.array_equal(cop_full.get_COP(np.array([2, 2.5]), np.array([3.5, 3.5]), np.array([6.5, 8])),
@@ -342,7 +345,10 @@ def test_EER_full():
     assert eer_full.get_EER(2, 2.5, 4.5) == 1.5
     assert eer_full.get_EER(1.5, 2.5, 8.5) == 2
     assert eer_full.get_EER(1.5, power=8.5) == 2
-
+    eer_full._default_secondary_temperature = 6
+    assert eer_full.get_EER(1.5, power=8.5) == 4
+    eer_full._default_secondary_temperature = -6
+    assert eer_full.get_EER(1.5, power=8.5) == 2
     assert eer_full.get_EER(1.5, 4.5, 8.5) == 4
     assert eer_full.get_EER(1.5, 3.5, 8.5) == 3
     assert np.array_equal(eer_full.get_EER(np.array([2, 2.5]), np.array([3.5, 3.5]), np.array([6.5, 8])),
