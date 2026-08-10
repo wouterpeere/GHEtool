@@ -853,7 +853,7 @@ def combine_n_heat_pumps(points_list, eff_list,
         kwargs = [kwargs for _ in points_list]
     from GHEtool.VariableClasses.Efficiency.COP import COP
 
-    cops = [COP(data=eff, coordinates=pts, **kw)
+    cops = [COP(data=np.array(eff), coordinates=np.array(pts), **kw)
             for pts, eff, kw in zip(points_list, eff_list, kwargs)]
 
     # --- step 4: rank order, established once at the reference regime ---
