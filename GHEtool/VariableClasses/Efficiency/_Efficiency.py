@@ -269,10 +269,10 @@ class _Efficiency(_EfficiencyBase, BaseClass):
         # check if all the required values are present
         if self._has_secondary != (secondary_temperature is not None):
             if self._has_secondary and self._default_secondary_temperature is None:
-                raise ValueError('The EER class requires a value for the secondary temperature.')
+                raise ValueError('The efficiency class requires a value for the secondary temperature.')
         if self._has_part_load != (power is not None):
             if self._has_part_load:
-                raise ValueError('The EER class requires a value for the part-load.')
+                raise ValueError('The efficiency class requires a value for the part-load.')
 
         # get maximum length
         _max_length = np.max([len(i) if i is not None and not isinstance(i, (float, int)) else 1 for i in
@@ -306,7 +306,9 @@ class _Efficiency(_EfficiencyBase, BaseClass):
             # make sure it stays below the maximum available power
             part_load_clipped = np.minimum(part_load_clipped,
                                            self._get_max_power(primary_temperature, secondary_temperature))
-
+            # make sure it stays above the minimum available power
+            part_load_clipped = np.maximum(part_load_clipped,
+                                           self._get_min_power(primary_temperature, secondary_temperature, ))
         xi = primary_temperature_clipped
         if self._has_part_load and self._has_secondary:
             xi = list(zip(primary_temperature_clipped, secondary_temperature_clipped, part_load_clipped))
@@ -361,7 +363,11 @@ class _Efficiency(_EfficiencyBase, BaseClass):
         Ts = None
         if self._has_secondary:
             if secondary_temperature is None:
-                raise ValueError("Secondary temperature is required.")
+                if self._default_secondary_temperature is None:
+                    raise ValueError("Secondary temperature is required.")
+                else:
+                    secondary_temperature = self._default_secondary_temperature
+
             Ts = np.array(
                 np.full(_max_length, secondary_temperature)
                 if isinstance(secondary_temperature, (float, int))

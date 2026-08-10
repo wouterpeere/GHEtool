@@ -244,7 +244,7 @@ def test_COP_full():
     with pytest.raises(ValueError):
         assert cop_full._get_max_power(1.5)
     with pytest.raises(ValueError):
-        assert cop_full._get_max_power(1.5)
+        assert cop_full._get_min_power(1.5)
     assert cop_full._get_max_power(1.5, 4.5) == 8.5
     assert cop_full._get_min_power(1.5, 4.5) == 4.5
 
@@ -254,6 +254,25 @@ def test_COP_full():
                    secondary=True, part_load=True)
     assert np.allclose(cop_full._get_max_power(np.array([1.5, 1.5, 2.5, 2.5]), np.array([2.5, 4.5, 2.5, 4.5])),
                        [8.5, 7.5, 10.5, 9.5])
+
+
+def test_COP_full_case_2():
+    cop = COP(np.array(
+        [3.86, 4.28, 3.93, 4.08, 4.6, 4.18, 4.53, 5.12, 4.7, 5.04, 5.72, 5.3, 5.41, 6.17, 5.63, 2.53, 2.89, 2.52, 2.88,
+         3.02, 2.68, 3.14, 3.25, 2.89, 3.61, 3.52, 3.12, 3.83, 3.68, 3.32]),
+        np.array(
+            [[-4.5, 32.5, 53.6], [-4.5, 32.5, 39.8], [-4.5, 32.5, 23.2], [-1.5, 32.5, 58.7], [-1.5, 32.5, 43.7],
+             [-1.5, 32.5, 25.5], [3.5, 32.5, 67.9], [3.5, 32.5, 50.7], [3.5, 32.5, 29.6], [8.5, 32.5, 77.6],
+             [8.5, 32.5, 58.3], [8.5, 32.5, 33.9], [11.5, 32.5, 83.9], [11.5, 32.5, 62.9], [11.5, 32.5, 36.6],
+             [-4.5, 52.5, 44.8], [-4.5, 52.5, 34.1], [-4.5, 52.5, 18.9], [-1.5, 52.5, 49.3], [-1.5, 52.5, 37.4],
+             [-1.5, 52.5, 20.9], [3.5, 52.5, 57.2], [3.5, 52.5, 43.2], [3.5, 52.5, 24.3], [8.5, 52.5, 62.5],
+             [8.5, 52.5, 49.7], [8.5, 52.5, 28.1], [11.5, 52.5, 67.8], [11.5, 52.5, 53.7], [11.5, 52.5, 30.5]]),
+        secondary=True, part_load=True, default_secondary_temperature=32.5)
+    assert cop.get_COP(-4.5, power=53.6) == 3.86
+    assert cop.get_COP(-4.5, power=39.8) == 4.28
+    assert cop.get_COP(-4.5, power=23.2) == 3.93
+    assert cop.get_COP(8.5, power=33.9) == 5.3
+    assert cop.get_COP(8.5, power=20) == 5.3
 
 
 def test_COP_full_not_all_secondary_load():

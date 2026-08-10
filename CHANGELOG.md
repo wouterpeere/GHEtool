@@ -13,12 +13,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Add pressure drop limitation to optimisation (issue #141).
 - Add groundwater filled boreholes (issue #470).
 - Add class for non-modulating heat pumps (issue #476).
+- Added default secondary temperature to EER and COP class (issue #476).
+- Added _get_min_power to _Efficiency class (issue #476).
+-
 
 ### Changed
 
 - Move calculate_borefield_inlet_outlet_temperature to Borehole class (issue #464).
 - Change implementation ConicalProbe for speed improvement (issue #472).
-- Added default secondary temperature to EER and COP class (issue #476).
+- Change implementation of interpolation for _Efficiency class to cope with non-gridded data input (issue #472).
+- Change implementation of combine n heat pumps (issue #472).
 
 ### Fixed
 
