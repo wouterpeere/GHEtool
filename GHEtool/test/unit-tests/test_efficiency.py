@@ -228,7 +228,7 @@ def test_COP_full():
     assert cop_full.get_COP(1.5, 2.5, 8.5) == 2
     assert cop_full.get_COP(1.5, power=8.5) == 2
     cop_full._default_secondary_temperature = 6
-    assert cop_full.get_cop(1.5, power=8.5) == 4
+    assert cop_full.get_COP(1.5, power=8.5) == 4
     cop_full._default_secondary_temperature = -6
     assert cop_full.get_COP(1.5, power=8.5) == 2
     assert cop_full.get_COP(1.5, 4.5, 8.5) == 4
