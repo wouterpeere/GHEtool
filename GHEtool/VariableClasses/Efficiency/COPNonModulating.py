@@ -223,9 +223,9 @@ class COPNonModulating:
 
         query = np.column_stack((np.atleast_1d(primary_arr).ravel(), np.atleast_1d(secondary_arr).ravel()))
 
-        if self._power_linear_interp is not None:  # pragma: no cover
+        if self._power_linear_interp is not None:
             result = self._power_linear_interp(query)
-        else:
+        else:  # pragma: no cover
             result = np.full(len(query), np.nan)
 
         nan_mask = np.isnan(result)

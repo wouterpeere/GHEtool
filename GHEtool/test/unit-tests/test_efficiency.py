@@ -169,6 +169,7 @@ def test_COP_secondary():
                           np.array([1.25, 3.5]))
     assert np.array_equal(cop_sec.get_COP(1.5, np.array([2.5, 4.5])), np.array([1, 2]))
     assert np.allclose(cop_sec._get_max_power(np.array([1, 1.5, 2, 2.5, 3])), 1e16)
+    assert np.allclose(cop_sec._get_min_power(np.array([1, 1.5, 2, 2.5, 3])), 1e16)
 
 
 def test_COP_part_load():
@@ -242,7 +243,11 @@ def test_COP_full():
 
     with pytest.raises(ValueError):
         assert cop_full._get_max_power(1.5)
+    with pytest.raises(ValueError):
+        assert cop_full._get_max_power(1.5)
     assert cop_full._get_max_power(1.5, 4.5) == 8.5
+    assert cop_full._get_min_power(1.5, 4.5) == 4.5
+
     cop_full = COP(np.array([1, 2, 2, 4, 2, 4, 4, 8]),
                    np.array([[1.5, 2.5, 4.5], [2.5, 2.5, 4.5], [1.5, 4.5, 3.5], [2.5, 4.5, 5.5],
                              [1.5, 2.5, 8.5], [2.5, 2.5, 10.5], [1.5, 4.5, 7.5], [2.5, 4.5, 9.5]]),

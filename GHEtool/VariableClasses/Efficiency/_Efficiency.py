@@ -406,7 +406,7 @@ class _Efficiency(_EfficiencyBase, BaseClass):
             np.ndarray
         """
         if not self._has_part_load:
-            return 0.0  # non-modulating equivalent: no defined minimum, treat as fully off-capable
+            return self._get_max_power(primary_temperature, secondary_temperature)
 
         _max_length = np.max([
             len(i) if i is not None and not isinstance(i, (float, int)) else 1
