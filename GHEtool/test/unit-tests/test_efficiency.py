@@ -213,9 +213,9 @@ def test_COP_part_load_real():
 
 
 def test_COP_full():
-    cop_full = COP(np.array([1, 2, 2, 4, 2, 4, 4, 8]),
+    cop_full = COP(np.array([1, 2, 2, 4, 2, 4, 4, 8, 10]),
                    np.array([[1.5, 2.5, 4.5], [2.5, 2.5, 4.5], [1.5, 4.5, 4.5], [2.5, 4.5, 4.5],
-                             [1.5, 2.5, 8.5], [2.5, 2.5, 8.5], [1.5, 4.5, 8.5], [2.5, 4.5, 8.5]]),
+                             [1.5, 2.5, 8.5], [2.5, 2.5, 8.5], [1.5, 4.5, 8.5], [2.5, 4.5, 8.5], [2.5, 5.5, 10.5]]),
                    secondary=True, part_load=True, default_secondary_temperature=2.5)
 
     assert cop_full._has_part_load
@@ -249,6 +249,23 @@ def test_COP_full():
                    secondary=True, part_load=True)
     assert np.allclose(cop_full._get_max_power(np.array([1.5, 1.5, 2.5, 2.5]), np.array([2.5, 4.5, 2.5, 4.5])),
                        [8.5, 7.5, 10.5, 9.5])
+
+
+def test_COP_full_not_all_secondary_load():
+    cop_full = COP(np.array([1, 2, 2, 4, 2, 4, 4, 8, 10]),
+                   np.array([[1.5, 2.5, 4.5], [2.5, 2.5, 4.5], [1.5, 4.5, 4.5], [2.5, 4.5, 4.5],
+                             [1.5, 2.5, 8.5], [2.5, 2.5, 8.5], [1.5, 4.5, 8.5], [2.5, 4.5, 8.5], [2.5, 5.5, 10.5]]),
+                   secondary=True, part_load=True, default_secondary_temperature=2.5)
+    assert cop_full.get_COP(1.5, power=8.5) == 2
+    assert cop_full.get_COP(2.5, 5.5, 10.5) == 10
+    assert cop_full._get_max_power(2.5, 4.5, power=8.5) == 8.5
+    assert cop_full._get_max_power(2.5, 5.5, power=10.5) == 10.5
+    assert cop_full._get_max_power(1.5, 4.5) == 8.5
+    assert cop_full.get_COP(1.5, 4.5, power=8.5) == 4
+    assert cop_full.get_COP(1.5, 4.5, power=10.5) == 4
+    assert cop_full.get_COP(2.5, 5.5, power=10.5) == 10
+    assert cop_full.get_COP(2.5, 5.5, power=8.5) == 8
+    assert cop_full.get_COP(1.5, 5.5, power=10.5) == 4
 
 
 def test_COP_get_SCOP():
@@ -445,13 +462,13 @@ def test_scale_COP():
 def test_interpolation():
     cop = COP(np.array([1, 2, 2, 3]), np.array([[1, 1], [1, 3], [2, 1], [2, 2]]), part_load=True)
     assert np.array_equal(cop._range_part_load, np.array([1, 2, 3]))
-    assert np.array_equal(cop._data, np.array([[1, 1.5, 2], [2, 3, 3]]))
+    assert np.array_equal(cop._data, np.array([[1, 1.5, 2], [2, 3, 2]]))
 
     cop = COP(np.array([1, 2, 2, 3, 1, 2, 2, 3]),
               np.array([[1, 1, 1], [1, 1, 3], [2, 1, 1], [2, 1, 2], [1, 2, 1], [1, 2, 3], [2, 2, 1], [2, 2, 2]]),
               part_load=True, secondary=True)
     assert np.array_equal(cop._range_part_load, np.array([1, 2, 3]))
-    assert np.array_equal(cop._data, np.array([[[1, 1.5, 2], [1, 1.5, 2]], [[2, 3, 3], [2, 3, 3]]]))
+    assert np.array_equal(cop._data, np.array([[[1, 1.5, 2], [1, 1.5, 2]], [[2, 3, 2], [2, 3, 2]]]))
 
 
 def test_EERCombined():
@@ -826,6 +843,7 @@ def test_cop_non_modulating_get_max_power():
     )
 
     assert cop._get_max_power(0) == 3.52
+    assert cop._get_max_power(0, 35) == 3.52
     assert cop._get_max_power(10, 45) == 3.52
 
 
@@ -844,6 +862,7 @@ def test_eer_non_modulating_get_max_power():
     )
 
     assert eer._get_max_power(0) == 4.33
+    assert eer._get_max_power(0, 22) == 4.33
     assert eer._get_max_power(0) == eer._get_max_power(29)
 
 

@@ -5,6 +5,7 @@ import numpy as np
 
 from collections import defaultdict
 from GHEtool.VariableClasses.BaseClass import BaseClass
+from scipy.interpolate import LinearNDInterpolator, NearestNDInterpolator
 from scipy.interpolate import interpn
 from typing import Union
 
@@ -88,15 +89,12 @@ class _Efficiency(_EfficiencyBase, BaseClass):
         self._range_secondary: np.ndarray = np.array([])
         self._range_part_load: np.ndarray = np.array([])
 
-        # check if all data points are higher than 0
         if not np.all(data > 0):
             raise ValueError('The efficiencies should all be above zero!')
 
-        # check if the data has the same length as the coordinates
         if len(data) != len(coordinates):
             raise ValueError('The provided data and coordinates array are not of the same length!')
 
-        # check dimension
         dimensions = 1 if isinstance(coordinates[0], (int, float, np.int32, np.int64, np.float16, np.float32)) else len(
             coordinates[0])
         if dimensions != 1 + self._has_secondary + self._has_part_load:
@@ -104,7 +102,6 @@ class _Efficiency(_EfficiencyBase, BaseClass):
                              f'{1 + self._has_secondary + self._has_part_load} dimensions where provided.'
                              'Please check the nb_of_points for both secondary temperature and part load.')
 
-        # get ranges
         self._points = []
         if dimensions == 3:
             self._range_primary = np.sort(np.unique(coordinates[:, 0]))
@@ -124,53 +121,17 @@ class _Efficiency(_EfficiencyBase, BaseClass):
             self._range_primary = np.sort(coordinates)
         self._points.insert(0, self._range_primary)
 
-        def find_value(x, y, z=None):
-            if z is None:
-                index = np.nonzero(np.all(coordinates == (x, y), axis=1))[0]
-            else:
-                index = np.nonzero(np.all(coordinates == (x, y, z), axis=1))[0]
+        # === REMOVED: the `find_value(x, y, z=None)` closure ===
+        # (the whole nested function that built x_array/y_array and called
+        # np.interp per grid node — no longer needed)
 
-            # the data point exists
-            if len(index) > 0:
-                return data[index[0]]
-
-            # the data point does not exist, so we have to interpolate to get it
-            x_array = []
-            y_array = []
-            if z is None:
-                # only one dimension to check
-                for idx, val in enumerate(coordinates):
-                    if val[0] == x:
-                        x_array.append(val[1])
-                        y_array.append(data[idx])
-            else:
-                # two dimensions to check
-                for idx, val in enumerate(coordinates):
-                    if val[0] == x and val[1] == y:
-                        x_array.append(val[2])
-                        y_array.append(data[idx])
-            # as array
-            x_array = np.array(x_array)
-            y_array = np.array(y_array)
-
-            # sort array
-            p = x_array.argsort()
-            x_array = x_array[p]
-            y_array = y_array[p]
-
-            temp = np.interp(y if z is None else z, x_array, y_array)
-            return temp
-
-        # populate data matrix
+        # === CHANGED: grid population now goes through Delaunay filling ===
         if dimensions == 3:
-            self._data = np.empty((len(self._range_primary), len(self._range_secondary), len(self._range_part_load)))
-            for i in range(self._data.shape[0]):
-                for j in range(self._data.shape[1]):
-                    for k in range(self._data.shape[2]):
-                        self._data[i, j, k] = find_value(self._range_primary[i],
-                                                         self._range_secondary[j],
-                                                         self._range_part_load[k])
-            # get max powers per temperature
+            self._data = self._delaunay_fill_grid(
+                coordinates, data, (self._range_primary, self._range_secondary, self._range_part_load)
+            )
+
+            # get max powers per temperature (unchanged — not related to find_value)
             x = coordinates[:, 0]
             y = coordinates[:, 1]
             z = coordinates[:, 2]
@@ -184,24 +145,17 @@ class _Efficiency(_EfficiencyBase, BaseClass):
             np.maximum.at(max_z_flat, flat_idx, z)
 
             max_z = max_z_flat.reshape(len(self._range_primary), len(self._range_secondary))
-            # convert index to part load value
-            self._max_part_load = max_z
-
+            self._max_part_load = self._finalize_max_part_load(
+                max_z, (self._range_primary, self._range_secondary)
+            )
         elif dimensions == 2:
-            self._data = np.empty(
-                (len(self._range_primary), max(len(self._range_secondary), len(self._range_part_load))))
-            if self._has_secondary:
-                for i in range(self._data.shape[0]):
-                    for j in range(self._data.shape[1]):
-                        self._data[i, j] = find_value(self._range_primary[i],
-                                                      self._range_secondary[j])
-            else:
-                for i in range(self._data.shape[0]):
-                    for j in range(self._data.shape[1]):
-                        self._data[i, j] = find_value(self._range_primary[i],
-                                                      self._range_part_load[j])
+            secondary_axis = self._range_secondary if self._has_secondary else self._range_part_load
+            self._data = self._delaunay_fill_grid(
+                coordinates, data, (self._range_primary, secondary_axis)
+            )
 
-                # get max powers per temperature
+            if not self._has_secondary:
+                # get max powers per temperature (unchanged)
                 x = coordinates[:, 0]
                 y = coordinates[:, 1]
 
@@ -210,17 +164,83 @@ class _Efficiency(_EfficiencyBase, BaseClass):
                 max_y = np.full(len(self._range_primary), -np.inf)
                 np.maximum.at(max_y, idx, y)
 
-                self._max_part_load = max_y
+                self._max_part_load = self._finalize_max_part_load(
+                    max_y, (self._range_primary,)
+                )
         else:
             p = self._range_primary.argsort()
             self._data = data[p]
 
-        # correct for nominal power
         if nominal_power is not None and reference_nominal_power is None:
             raise ValueError('Please enter a reference nominal power.')
 
         if self._has_part_load and nominal_power is not None:
             self._range_part_load *= nominal_power / reference_nominal_power
+            self._max_part_load *= nominal_power / reference_nominal_power
+
+    @staticmethod
+    def _finalize_max_part_load(max_arr: np.ndarray, axes: tuple) -> np.ndarray:
+        """
+        Replaces -inf placeholder cells (primary/secondary combinations with
+        no underlying data) with a nearest-neighbor estimate from populated
+        cells, so the array is fully finite before being handed to interpn.
+        Unfilled -inf cells would otherwise produce NaN via 0 * -inf when
+        interpn assigns them zero weight during interpolation.
+        """
+        finite_mask = np.isfinite(max_arr)
+        if finite_mask.all():
+            return max_arr
+
+        if len(axes) == 1:
+            grid_points = axes[0].reshape(-1, 1)
+        else:
+            mesh = np.meshgrid(*axes, indexing='ij')
+            grid_points = np.column_stack([m.ravel() for m in mesh])
+
+        flat = max_arr.ravel().copy()
+        flat_finite_mask = finite_mask.ravel()
+
+        nearest = NearestNDInterpolator(grid_points[flat_finite_mask], flat[flat_finite_mask])
+        flat[~flat_finite_mask] = nearest(grid_points[~flat_finite_mask])
+
+        return flat.reshape(max_arr.shape)
+
+    @staticmethod
+    def _delaunay_fill_grid(coordinates: np.ndarray, data: np.ndarray, axes: tuple) -> np.ndarray:
+        """
+        Builds a complete rectilinear grid over `axes` from scattered
+        (coordinates, data), filling missing nodes via Delaunay-based linear
+        interpolation (LinearNDInterpolator), falling back to nearest-neighbor
+        for nodes outside the convex hull of the scattered points.
+        """
+        linear = LinearNDInterpolator(coordinates, data)
+        nearest = NearestNDInterpolator(coordinates, data)
+
+        mesh = np.meshgrid(*axes, indexing='ij')
+        grid_points = np.column_stack([m.ravel() for m in mesh])
+
+        existing = {tuple(row): val for row, val in zip(coordinates, data)}
+
+        values = np.empty(len(grid_points))
+        missing_mask = np.zeros(len(grid_points), dtype=bool)
+
+        for i, pt in enumerate(grid_points):
+            key = tuple(pt)
+            if key in existing:
+                values[i] = existing[key]
+            else:
+                missing_mask[i] = True
+
+        if missing_mask.any():
+            missing_pts = grid_points[missing_mask]
+            est = linear(missing_pts)
+            nan_mask = np.isnan(est)
+            if nan_mask.any():
+                est[nan_mask] = nearest(missing_pts[nan_mask])
+            values[missing_mask] = est
+
+        grid_shape = tuple(len(a) for a in axes)
+        return values.reshape(grid_shape)
 
     def _get_efficiency(self,
                         primary_temperature: Union[float, np.ndarray],
@@ -285,6 +305,10 @@ class _Efficiency(_EfficiencyBase, BaseClass):
                                                     np.max(self._range_secondary))
         if self._has_part_load:
             part_load_clipped = np.clip(power, np.min(self._range_part_load), np.max(self._range_part_load))
+
+            # make sure it stays below the maximum available power
+            part_load_clipped = np.minimum(part_load_clipped,
+                                           self._get_max_power(primary_temperature, secondary_temperature))
 
         xi = primary_temperature_clipped
         if self._has_part_load and self._has_secondary:

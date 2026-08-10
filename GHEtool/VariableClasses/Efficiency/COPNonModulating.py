@@ -211,7 +211,7 @@ class COPNonModulating:
             secondary_temperature = self._secondary_temp
         secondary_temperature = self._fit_within_range(copy.copy(secondary_temperature))
         lift = secondary_temperature - primary_temperature
-
+        print(lift, self._lift_sorted, self._power_sorted)
         return np.interp(lift, self._lift_sorted, self._power_sorted)
 
     def get_COP(self,
