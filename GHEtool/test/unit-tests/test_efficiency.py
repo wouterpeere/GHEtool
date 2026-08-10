@@ -844,7 +844,7 @@ def test_cop_non_modulating_get_max_power():
 
     assert cop._get_max_power(0) == 3.52
     assert cop._get_max_power(0, 35) == 3.52
-    assert cop._get_max_power(10, 45) == 3.52
+    assert cop._get_max_power(10, 45) == 3.95
 
 
 def test_eer_non_modulating_get_max_power():

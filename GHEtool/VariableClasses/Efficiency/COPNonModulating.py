@@ -3,6 +3,8 @@ import copy
 import numpy as np
 import matplotlib.pyplot as plt
 
+from scipy.interpolate import LinearNDInterpolator, NearestNDInterpolator
+from scipy.spatial import QhullError
 from typing import Union
 
 
@@ -101,9 +103,14 @@ class COPNonModulating:
         self._r_squared = 1 - np.sum((relative_difference - self.model(temperature_lift)) ** 2) / np.sum(
             (relative_difference - np.mean(relative_difference)) ** 2)
 
-        order = np.argsort(temperature_lift)
-        self._lift_sorted = temperature_lift[order]
-        self._power_sorted = power[order]
+        self._power_points = np.column_stack((temp_eva, temp_cond))
+        try:
+            self._power_linear_interp = LinearNDInterpolator(self._power_points, power)
+        except QhullError:
+            # degenerate/collinear point set — Delaunay can't triangulate;
+            # fall back to nearest-neighbor everywhere
+            self._power_linear_interp = None
+        self._power_nearest_interp = NearestNDInterpolator(self._power_points, power)
 
         # defaults
         self._min_lift = min_temperature_lift
@@ -188,31 +195,45 @@ class COPNonModulating:
                        primary_temperature: Union[float, np.ndarray],
                        secondary_temperature: Union[float, np.ndarray] = None, **kwargs) -> np.ndarray:
         """
-        This function returns the maximum available power for a certain primary and secondary temperature.
+        This function returns the maximum available power for a certain primary and secondary temperature,
+        using Delaunay-based linear interpolation over the raw (evaporator, condenser) scatter, with
+        nearest-neighbor fallback outside the convex hull (no extrapolation).
 
         Parameters
         ----------
         primary_temperature : np.ndarray or float
-            Value(s) for the average primary temperature of the heat pump for the efficiency calculation.
+            Value(s) for the average primary (evaporator) temperature of the heat pump.
         secondary_temperature : np.ndarray or float
-            Value(s) for the average secondary temperature of the heat pump for the efficiency calculation.
-
-        Raises
-        ------
-        ValueError
-            When secondary_temperature is in the dataset, and it is not provided. Same for power.
+            Value(s) for the average secondary (condenser) temperature of the heat pump.
 
         Returns
         -------
-        Efficiency
-            np.ndarray
+        Max power
+            np.ndarray or float
         """
         if secondary_temperature is None:
             secondary_temperature = self._secondary_temp
         secondary_temperature = self._fit_within_range(copy.copy(secondary_temperature))
-        lift = secondary_temperature - primary_temperature
-        print(lift, self._lift_sorted, self._power_sorted)
-        return np.interp(lift, self._lift_sorted, self._power_sorted)
+
+        primary_arr, secondary_arr = np.broadcast_arrays(
+            np.asarray(primary_temperature, dtype=float),
+            np.asarray(secondary_temperature, dtype=float)
+        )
+        scalar_input = primary_arr.ndim == 0
+
+        query = np.column_stack((np.atleast_1d(primary_arr).ravel(), np.atleast_1d(secondary_arr).ravel()))
+
+        if self._power_linear_interp is not None:
+            result = self._power_linear_interp(query)
+        else:
+            result = np.full(len(query), np.nan)
+
+        nan_mask = np.isnan(result)
+        if nan_mask.any():
+            result[nan_mask] = self._power_nearest_interp(query[nan_mask])
+
+        result = result.reshape(primary_arr.shape)
+        return result.item() if scalar_input else result
 
     def get_COP(self,
                 primary_temperature: Union[float, np.ndarray],
