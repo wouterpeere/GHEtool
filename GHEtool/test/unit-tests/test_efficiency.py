@@ -240,7 +240,7 @@ def test_COP_full():
                           np.array([3.375, 5.625, 5.625]))
     assert np.array_equal(cop_full.get_COP(1.5, secondary_temperature=np.array([2.5, 4.5]), power=4.5),
                           np.array([1, 2]))
-
+    cop_full._default_secondary_temperature = None
     with pytest.raises(ValueError):
         assert cop_full._get_max_power(1.5)
     with pytest.raises(ValueError):
