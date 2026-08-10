@@ -203,6 +203,20 @@ class _Efficiency(_EfficiencyBase, BaseClass):
         return flat.reshape(max_arr.shape)
 
     @staticmethod
+    def _normalize_coords(coordinates: np.ndarray):
+        """
+        Min-max normalizes each column of `coordinates` to [0, 1], so that
+        Delaunay triangulation isn't distorted by axes with very different
+        numeric ranges (e.g. temperature in single digits vs. power in tens).
+        Returns the normalized coordinates plus (mins, ranges) so the same
+        transform can be applied to query points.
+        """
+        mins = coordinates.min(axis=0)
+        ranges = coordinates.max(axis=0) - mins
+        ranges[ranges == 0] = 1.0  # guard against degenerate constant axes
+        return (coordinates - mins) / ranges, mins, ranges
+
+    @staticmethod
     def _delaunay_fill_grid(coordinates: np.ndarray, data: np.ndarray, axes: tuple) -> np.ndarray:
         """
         Builds a complete rectilinear grid over `axes` from scattered
@@ -215,7 +229,6 @@ class _Efficiency(_EfficiencyBase, BaseClass):
         """
         coordinates = np.asarray(coordinates, dtype=float)
 
-        # identify dimensions with actual variation
         ranges = coordinates.max(axis=0) - coordinates.min(axis=0)
         varying = ranges > 0
         n_varying = varying.sum()
@@ -238,26 +251,29 @@ class _Efficiency(_EfficiencyBase, BaseClass):
             missing_pts_full = grid_points_full[missing_mask]
 
             if n_varying == 0:
-                # every dimension is constant -- only one physical point exists;
-                # nothing meaningful to interpolate, just reuse that single value
                 values[missing_mask] = data[0]
             else:
                 coords_reduced = coordinates[:, varying]
                 missing_reduced = missing_pts_full[:, varying]
 
                 if n_varying == 1:
-                    # reduces to a 1D interpolation problem -- Delaunay needs >=2 dims,
-                    # so use np.interp on the single varying axis instead
                     order = np.argsort(coords_reduced[:, 0])
                     est = np.interp(missing_reduced[:, 0],
                                     coords_reduced[order, 0], data[order])
                 else:
-                    linear = LinearNDInterpolator(coords_reduced, data)
-                    est = linear(missing_reduced)
+                    # CHANGED: normalize both the fitting points and the query
+                    # points onto [0, 1] per axis before triangulating, so
+                    # Teva (small range) and power (large range) get equal
+                    # geometric weight in the Delaunay triangulation
+                    coords_norm, mins, ranges_norm = _Efficiency._normalize_coords(coords_reduced)
+                    missing_norm = (missing_reduced - mins) / ranges_norm
+
+                    linear = LinearNDInterpolator(coords_norm, data)
+                    est = linear(missing_norm)
                     nan_mask = np.isnan(est)
                     if nan_mask.any():
-                        nearest = NearestNDInterpolator(coords_reduced, data)
-                        est[nan_mask] = nearest(missing_reduced[nan_mask])
+                        nearest = NearestNDInterpolator(coords_norm, data)
+                        est[nan_mask] = nearest(missing_norm[nan_mask])
 
                 values[missing_mask] = est
 
@@ -498,8 +514,9 @@ def plot_heat_pump_envelope(points, eff, ax=None, label_prefix="T"):
     grouped = defaultdict(lambda: {"power": [], "eff": []})
 
     for (T, _, P), e in zip(points, eff):
-        grouped[T]["power"].append(P)
-        grouped[T]["eff"].append(e)
+        if _ == 52.5:
+            grouped[T]["power"].append(P)
+            grouped[T]["eff"].append(e)
 
     # plot each temperature
     for T in sorted(grouped.keys()):
@@ -811,7 +828,7 @@ def combine_n_heat_pumps_old(points_list, eff_list):  # pragma: no cover
 def combine_n_heat_pumps(points_list, eff_list,
                          reference_primary_temperature: float = 0.0,
                          reference_secondary_temperature: float = 35.0,
-                         n_pl_single: int = 25, n_pl_cascade: int = 40, **kwargs):
+                         n_pl_single: int = 3, n_pl_cascade: int = 10, **kwargs):
     """
     Combine the operating envelopes of multiple modulating heat pumps into a
     single equivalent operating envelope, using strict cascade staging.
@@ -917,45 +934,47 @@ def _combine_at_combo(Teva, Tcond, cops, n_pl_single, n_pl_cascade):
         return float(np.atleast_1d(active_cops[i]._get_efficiency(Teva, Tcond, P))[0])
 
     P_comb, E_comb = [], []
+
+    # combined minimum power once 2 machines are needed -- everything
+    # below this must be served by exactly one machine (or none)
+    two_machine_min = sum(sorted(p_min)[:2]) if n >= 2 else np.inf
+
+    # --- single-machine zone: try EVERY machine independently, at every
+    # power level it can individually cover below two_machine_min, and
+    # keep whichever gives the best efficiency at that level ---
     pl_grid = np.linspace(0.0, 1.0, n_pl_single)
-
-    # zone 1: smallest machine alone
     for pl in pl_grid:
-        P = p_min[0] + pl * (p_max[0] - p_min[0])
-        if n == 1 or P < p_min[1]:
+        candidates = []
+        for i in range(n):
+            P = p_min[i] + pl * (p_max[i] - p_min[i])
+            if P < two_machine_min:
+                candidates.append((P, eff_at(i, P)))
+        if not candidates:
+            continue
+        # group candidates that landed at (numerically) the same power
+        # level isn't necessary here since each i has its own P; instead,
+        # just keep every valid single-machine point -- duplicates at
+        # differing P are fine, they represent different machines' curves
+        for P, E in candidates:
             P_comb.append(P)
-            E_comb.append(eff_at(0, P))
+            E_comb.append(E)
 
-    # overlap zone: HP1 vs HP2 only
-    if n >= 2:
-        P_overlap_max = p_min[0] + p_min[1]
-        for pl in pl_grid:
-            P1 = p_min[0] + pl * (p_max[0] - p_min[0])
-            P2 = p_min[1] + pl * (p_max[1] - p_min[1])
+    # --- cascade zones: exactly k+1 machines active, sorted by p_min ---
+    order = np.argsort(p_min)
+    p_min_sorted = [p_min[i] for i in order]
+    p_max_sorted = [p_max[i] for i in order]
+    idx_sorted = [i for i in order]
 
-            candidates = []
-            if p_min[0] <= P1 <= p_max[0]:
-                candidates.append((P1, eff_at(0, P1)))
-            if p_min[1] <= P2 <= p_max[1]:
-                candidates.append((P2, eff_at(1, P2)))
-            if not candidates:
-                continue
-
-            P_best, E_best = max(candidates, key=lambda x: x[1])
-            if P_best < P_overlap_max:
-                P_comb.append(P_best)
-                E_comb.append(E_best)
-
-    # cascade zones: exactly k+1 machines active
     for k in range(1, n):
-        P_min_stage = sum(p_min[:k + 1])
-        P_max_stage = sum(p_min[:k + 2]) if k + 1 < n else np.inf
+        P_min_stage = sum(p_min_sorted[:k + 1])
+        P_max_stage = sum(p_min_sorted[:k + 2]) if k + 1 < n else np.inf
 
         for pl in np.linspace(0.0, 1.0, n_pl_cascade):
             powers, effs = [], []
-            for i in range(k + 1):
-                Pi = p_min[i] + pl * (p_max[i] - p_min[i])
-                if Pi < p_min[i] or Pi > p_max[i]:
+            for j in range(k + 1):
+                i = idx_sorted[j]
+                Pi = p_min_sorted[j] + pl * (p_max_sorted[j] - p_min_sorted[j])
+                if Pi < p_min_sorted[j] or Pi > p_max_sorted[j]:
                     break
                 powers.append(Pi)
                 effs.append(eff_at(i, Pi))

@@ -1,6 +1,7 @@
 """
 This file contains the test for the efficiency data
 """
+import matplotlib.pyplot as plt
 import pytest
 
 import numpy as np
@@ -29,6 +30,7 @@ points_HP300 = np.array([
     [11.5, 32.5, 62.9],
     [11.5, 32.5, 36.6],
 ])
+points_HP3 = np.array([[i[0], i[2]] for i in points_HP300])
 eff_HP300 = np.array([
     3.86, 4.28, 3.93,
     4.08, 4.60, 4.18,
@@ -73,6 +75,8 @@ points_HP400 = np.array([
     [11.5, 32.5, 79.0],
     [11.5, 32.5, 46.0],
 ])
+points_HP4 = np.array([[i[0], i[2]] for i in points_HP400])
+
 eff_HP400 = np.array([
     3.91, 4.38, 3.99,
     4.14, 4.64, 4.27,
@@ -97,6 +101,8 @@ points_HP500 = np.array([
     [11.5, 32.5, 105.4],
     [11.5, 32.5, 61.4],
 ])
+points_HP5 = np.array([[i[0], i[2]] for i in points_HP500])
+
 eff_HP500 = np.array([
     3.87, 4.12, 3.78,
     4.12, 4.39, 4.04,
@@ -517,13 +523,13 @@ def test_scale_COP():
 def test_interpolation():
     cop = COP(np.array([1, 2, 2, 3]), np.array([[1, 1], [1, 3], [2, 1], [2, 2]]), part_load=True)
     assert np.array_equal(cop._range_part_load, np.array([1, 2, 3]))
-    assert np.array_equal(cop._data, np.array([[1, 1.5, 2], [2, 3, 2]]))
+    assert np.array_equal(cop._data, np.array([[1, 1.5, 2], [2, 3, 3]]))
 
     cop = COP(np.array([1, 2, 2, 3, 1, 2, 2, 3]),
               np.array([[1, 1, 1], [1, 1, 3], [2, 1, 1], [2, 1, 2], [1, 2, 1], [1, 2, 3], [2, 2, 1], [2, 2, 2]]),
               part_load=True, secondary=True)
     assert np.array_equal(cop._range_part_load, np.array([1, 2, 3]))
-    assert np.array_equal(cop._data, np.array([[[1, 1.5, 2], [1, 1.5, 2]], [[2, 3, 2], [2, 3, 2]]]))
+    assert np.array_equal(cop._data, np.array([[[1, 1.5, 2], [1, 1.5, 2]], [[2, 3, 3], [2, 3, 3]]]))
 
 
 def test_EERCombined():
@@ -680,6 +686,31 @@ def test_graph_efficiency(monkeypatch):
     plot_heat_pump_envelope(points_HP300, eff_HP300)
 
 
+# def test_graph_efficiency_2(monkeypatch):
+#     data = [[-4.5, 32.5, 53.6], [-4.5, 32.5, 39.8], [-4.5, 32.5, 23.2], [-1.5, 32.5, 58.7], [-1.5, 32.5, 43.7],
+#             [-1.5, 32.5, 25.5], [3.5, 32.5, 67.9], [3.5, 32.5, 50.7], [3.5, 32.5, 29.6], [8.5, 32.5, 77.6],
+#             [8.5, 32.5, 58.3], [8.5, 32.5, 33.9], [11.5, 32.5, 83.9], [11.5, 32.5, 62.9], [11.5, 32.5, 36.6],
+#             [-4.5, 52.5, 44.8], [-4.5, 52.5, 34.1], [-4.5, 52.5, 18.9], [-1.5, 52.5, 49.3], [-1.5, 52.5, 37.4],
+#             [-1.5, 52.5, 20.9], [3.5, 52.5, 57.2], [3.5, 52.5, 43.2], [3.5, 52.5, 24.3], [8.5, 52.5, 62.5],
+#             [8.5, 52.5, 49.7], [8.5, 52.5, 28.1], [11.5, 52.5, 67.8], [11.5, 52.5, 53.7], [11.5, 52.5, 30.5]]
+#     eff = [3.86, 4.28, 3.93, 4.08, 4.6, 4.18, 4.53, 5.12, 4.7, 5.04, 5.72, 5.3, 5.41, 6.17, 5.63, 2.53, 2.89, 2.52,
+#            2.88, 3.02, 2.68, 3.14, 3.25, 2.89, 3.61, 3.52, 3.12, 3.83, 3.68, 3.32]
+#     # data = [
+#     #     [-4.5, 52.5, 44.8], [-4.5, 52.5, 34.1], [-4.5, 52.5, 18.9], [-1.5, 52.5, 49.3], [-1.5, 52.5, 37.4],
+#     #     [-1.5, 52.5, 20.9], [3.5, 52.5, 57.2], [3.5, 52.5, 43.2], [3.5, 52.5, 24.3], ]
+#     # eff = [2.53, 2.89, 2.52,
+#     #        2.88, 3.02, 2.68, 3.14, 3.25, 2.89, ]
+#     cop = COP(np.array(eff), np.array(data), part_load=True, secondary=True)
+#     range = np.linspace(35, 49.3, 10)
+#     plot_heat_pump_envelope([[-1.5, 52.5, i] for i in range], [cop.get_COP(-1.5, 52.5, i) for i in range], )
+#
+#     plot_heat_pump_envelope(data, eff)
+#     plt.show()
+#     cascaded_system_points, cascaded_system_eff = combine_n_heat_pumps([data] * 2, [eff] * 2)
+#     plot_heat_pump_envelope(cascaded_system_points, cascaded_system_eff)
+#     plt.show()
+
+
 def test_combine_heat_pumps():
     combine_n_heat_pumps([points_HP300, points_HP300, points_HP300], [eff_HP300, eff_HP300, eff_HP300])
     combine_n_heat_pumps([points_HP300], [eff_HP300])
@@ -688,9 +719,9 @@ def test_combine_heat_pumps():
 
 
 def test_find_optimal_heat_pump_configuration():
-    hp_300 = COP(eff_HP300, points_HP300, part_load=True)
-    hp_400 = COP(eff_HP400, points_HP400, part_load=True)
-    hp_500 = COP(eff_HP500, points_HP500, part_load=True)
+    hp_300 = COP(eff_HP300, points_HP3, part_load=True)
+    hp_400 = COP(eff_HP400, points_HP4, part_load=True)
+    hp_500 = COP(eff_HP500, points_HP5, part_load=True)
 
     assert np.allclose(_find_optimal_heat_pump_configuration([hp_300, hp_400, hp_500], 30, prim_temp=-1), [1, 0, 0])
     assert np.allclose(_find_optimal_heat_pump_configuration([hp_300, hp_400, hp_500], 70, prim_temp=-1), [0, 1, 0])
