@@ -207,21 +207,27 @@ class _Efficiency(_EfficiencyBase, BaseClass):
         """
         Builds a complete rectilinear grid over `axes` from scattered
         (coordinates, data), filling missing nodes via Delaunay-based linear
-        interpolation (LinearNDInterpolator), falling back to nearest-neighbor
-        for nodes outside the convex hull of the scattered points.
+        interpolation, falling back to nearest-neighbor for nodes outside the
+        convex hull. Degenerate coordinate dimensions (zero range -- e.g. a
+        dataset tested at a single fixed secondary temperature) are dropped
+        before triangulation, since Delaunay cannot triangulate points that
+        don't span all given dimensions, and re-inserted afterward.
         """
-        linear = LinearNDInterpolator(coordinates, data)
-        nearest = NearestNDInterpolator(coordinates, data)
+        coordinates = np.asarray(coordinates, dtype=float)
+
+        # identify dimensions with actual variation
+        ranges = coordinates.max(axis=0) - coordinates.min(axis=0)
+        varying = ranges > 0
+        n_varying = varying.sum()
 
         mesh = np.meshgrid(*axes, indexing='ij')
-        grid_points = np.column_stack([m.ravel() for m in mesh])
+        grid_points_full = np.column_stack([m.ravel() for m in mesh])
 
         existing = {tuple(row): val for row, val in zip(coordinates, data)}
 
-        values = np.empty(len(grid_points))
-        missing_mask = np.zeros(len(grid_points), dtype=bool)
-
-        for i, pt in enumerate(grid_points):
+        values = np.empty(len(grid_points_full))
+        missing_mask = np.zeros(len(grid_points_full), dtype=bool)
+        for i, pt in enumerate(grid_points_full):
             key = tuple(pt)
             if key in existing:
                 values[i] = existing[key]
@@ -229,12 +235,31 @@ class _Efficiency(_EfficiencyBase, BaseClass):
                 missing_mask[i] = True
 
         if missing_mask.any():
-            missing_pts = grid_points[missing_mask]
-            est = linear(missing_pts)
-            nan_mask = np.isnan(est)
-            if nan_mask.any():
-                est[nan_mask] = nearest(missing_pts[nan_mask])
-            values[missing_mask] = est
+            missing_pts_full = grid_points_full[missing_mask]
+
+            if n_varying == 0:
+                # every dimension is constant -- only one physical point exists;
+                # nothing meaningful to interpolate, just reuse that single value
+                values[missing_mask] = data[0]
+            else:
+                coords_reduced = coordinates[:, varying]
+                missing_reduced = missing_pts_full[:, varying]
+
+                if n_varying == 1:
+                    # reduces to a 1D interpolation problem -- Delaunay needs >=2 dims,
+                    # so use np.interp on the single varying axis instead
+                    order = np.argsort(coords_reduced[:, 0])
+                    est = np.interp(missing_reduced[:, 0],
+                                    coords_reduced[order, 0], data[order])
+                else:
+                    linear = LinearNDInterpolator(coords_reduced, data)
+                    est = linear(missing_reduced)
+                    nan_mask = np.isnan(est)
+                    if nan_mask.any():
+                        nearest = NearestNDInterpolator(coords_reduced, data)
+                        est[nan_mask] = nearest(missing_reduced[nan_mask])
+
+                values[missing_mask] = est
 
         grid_shape = tuple(len(a) for a in axes)
         return values.reshape(grid_shape)
@@ -472,7 +497,7 @@ def plot_heat_pump_envelope(points, eff, ax=None, label_prefix="T"):
     # group by temperature
     grouped = defaultdict(lambda: {"power": [], "eff": []})
 
-    for (T, P), e in zip(points, eff):
+    for (T, _, P), e in zip(points, eff):
         grouped[T]["power"].append(P)
         grouped[T]["eff"].append(e)
 
@@ -499,7 +524,7 @@ def plot_heat_pump_envelope(points, eff, ax=None, label_prefix="T"):
     return ax
 
 
-def combine_n_heat_pumps(points_list, eff_list):
+def combine_n_heat_pumps_old(points_list, eff_list):  # pragma: no cover
     """
     Combine the operating envelopes of multiple modulating heat pumps into a
     single equivalent operating envelope using strict cascade staging.
@@ -781,6 +806,172 @@ def combine_n_heat_pumps(points_list, eff_list):
             combined_eff.append(e)
 
     return np.asarray(combined_points), np.asarray(combined_eff)
+
+
+def combine_n_heat_pumps(points_list, eff_list,
+                         reference_primary_temperature: float = 0.0,
+                         reference_secondary_temperature: float = 35.0,
+                         n_pl_single: int = 25, n_pl_cascade: int = 40, **kwargs):
+    """
+    Combine the operating envelopes of multiple modulating heat pumps into a
+    single equivalent operating envelope, using strict cascade staging.
+    Each heat pump is modeled as a COP object and queried directly for
+    efficiency, minimum power, and maximum power at each (Teva, Tcond)
+    combination.
+
+    Parameters
+    ----------
+    points_list : list of np.ndarray
+        List of arrays, one per heat pump, each of shape (Ni, 3): the
+        (Teva, Tcond, power) coordinates for a COP(secondary=True, part_load=True).
+    eff_list : list of np.ndarray
+        List of efficiency arrays, one per heat pump, shape (Ni,).
+    kwargs_list : list of dict, optional
+        Extra kwargs per COP constructor call (e.g. nominal_power). Defaults
+        to `secondary=True, part_load=True` for every machine.
+    reference_primary_temperature, reference_secondary_temperature : float
+        The (Teva, Tcond) regime used once to rank the heat pumps by minimum
+        power before staging.
+    n_pl_single : int
+        Number of part-load points used for the single-machine zone and the
+        HP1-vs-HP2 overlap zone.
+    n_pl_cascade : int
+        Number of part-load points used for each cascade stage.
+
+    Returns
+    -------
+    combined_points : np.ndarray of shape (K, 3)
+        (Teva, Tcond, power) triples representing the combined envelope.
+    combined_eff : np.ndarray of shape (K,)
+        Efficiencies corresponding to `combined_points`.
+    """
+
+    # --- step 1: build a COP object per heat pump ---
+    if kwargs is None or kwargs == {}:
+        kwargs = [{'secondary': True, 'part_load': True} for _ in points_list]
+    else:
+        kwargs = [kwargs for _ in points_list]
+    from GHEtool.VariableClasses.Efficiency.COP import COP
+
+    cops = [COP(data=eff, coordinates=pts, **kw)
+            for pts, eff, kw in zip(points_list, eff_list, kwargs)]
+
+    # --- step 4: rank order, established once at the reference regime ---
+    rank_key = [
+        float(np.atleast_1d(cop._get_min_power(
+            reference_primary_temperature, reference_secondary_temperature))[0])
+        for cop in cops
+    ]
+    cops = [cops[i] for i in np.argsort(rank_key)]  # fixed order, smallest first
+
+    # --- step 2/3: all (Teva, Tcond) combinations across all machines ---
+    all_combos = set()
+    for cop in cops:
+        all_combos.update(itertools.product(cop._range_primary, cop._range_secondary))
+    all_combos = sorted(all_combos)
+
+    combined_points = []
+    combined_eff = []
+
+    for Teva, Tcond in all_combos:
+        P, E = _combine_at_combo(Teva, Tcond, cops, n_pl_single, n_pl_cascade)
+        for p, e in zip(P, E):
+            combined_points.append((Teva, Tcond, p))
+            combined_eff.append(e)
+
+    return np.asarray(combined_points), np.asarray(combined_eff)
+
+
+def _combine_at_combo(Teva, Tcond, cops, n_pl_single, n_pl_cascade):
+    """
+    Applies the same cascade-staging logic as before, but sourced from COP
+    objects instead of raw sorted arrays: p_min/p_max come from
+    _get_min_power/_get_max_power, and efficiency comes from _get_efficiency,
+    both queried at this specific (Teva, Tcond). Machines whose tested range
+    doesn't cover this (Teva, Tcond) are skipped entirely (no extrapolation),
+    but the relative order of the remaining machines is kept as established
+    by the reference-regime ranking -- this combo is not re-sorted on its own.
+    """
+    active_cops = []
+    p_min, p_max = [], []
+
+    for cop in cops:
+        if not (cop._range_primary.min() <= Teva <= cop._range_primary.max()
+                and cop._range_secondary.min() <= Tcond <= cop._range_secondary.max()):
+            continue  # this machine's tested envelope doesn't cover this combo
+
+        pmin = float(np.atleast_1d(cop._get_min_power(Teva, Tcond))[0])
+        pmax = float(np.atleast_1d(cop._get_max_power(Teva, Tcond))[0])
+        if not (np.isfinite(pmin) and np.isfinite(pmax)) or pmax < pmin:
+            continue
+
+        active_cops.append(cop)
+        p_min.append(pmin)
+        p_max.append(pmax)
+
+    n = len(active_cops)
+    if n == 0:
+        return np.empty(0), np.empty(0)
+
+    def eff_at(i, P):
+        return float(np.atleast_1d(active_cops[i]._get_efficiency(Teva, Tcond, P))[0])
+
+    P_comb, E_comb = [], []
+    pl_grid = np.linspace(0.0, 1.0, n_pl_single)
+
+    # zone 1: smallest machine alone
+    for pl in pl_grid:
+        P = p_min[0] + pl * (p_max[0] - p_min[0])
+        if n == 1 or P < p_min[1]:
+            P_comb.append(P)
+            E_comb.append(eff_at(0, P))
+
+    # overlap zone: HP1 vs HP2 only
+    if n >= 2:
+        P_overlap_max = p_min[0] + p_min[1]
+        for pl in pl_grid:
+            P1 = p_min[0] + pl * (p_max[0] - p_min[0])
+            P2 = p_min[1] + pl * (p_max[1] - p_min[1])
+
+            candidates = []
+            if p_min[0] <= P1 <= p_max[0]:
+                candidates.append((P1, eff_at(0, P1)))
+            if p_min[1] <= P2 <= p_max[1]:
+                candidates.append((P2, eff_at(1, P2)))
+            if not candidates:
+                continue
+
+            P_best, E_best = max(candidates, key=lambda x: x[1])
+            if P_best < P_overlap_max:
+                P_comb.append(P_best)
+                E_comb.append(E_best)
+
+    # cascade zones: exactly k+1 machines active
+    for k in range(1, n):
+        P_min_stage = sum(p_min[:k + 1])
+        P_max_stage = sum(p_min[:k + 2]) if k + 1 < n else np.inf
+
+        for pl in np.linspace(0.0, 1.0, n_pl_cascade):
+            powers, effs = [], []
+            for i in range(k + 1):
+                Pi = p_min[i] + pl * (p_max[i] - p_min[i])
+                if Pi < p_min[i] or Pi > p_max[i]:
+                    break
+                powers.append(Pi)
+                effs.append(eff_at(i, Pi))
+            else:
+                P_tot = sum(powers)
+                if not (P_min_stage <= P_tot < P_max_stage):
+                    continue
+                E_tot = float(np.dot(powers, effs) / P_tot)
+                P_comb.append(P_tot)
+                E_comb.append(E_tot)
+
+    P_comb = np.asarray(P_comb)
+    E_comb = np.asarray(E_comb)
+    mask = np.isfinite(E_comb) & np.isfinite(P_comb)
+    idx = np.argsort(P_comb[mask])
+    return P_comb[mask][idx], E_comb[mask][idx]
 
 
 def _find_optimal_heat_pump_configuration(heat_pumps: list[_Efficiency], power: float, prim_temp: float,
