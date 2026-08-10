@@ -5,6 +5,7 @@ import numpy as np
 
 from collections import defaultdict
 from GHEtool.VariableClasses.BaseClass import BaseClass
+from scipy.interpolate import LinearNDInterpolator, NearestNDInterpolator
 from scipy.interpolate import interpn
 from typing import Union
 
@@ -40,7 +41,8 @@ class _Efficiency(_EfficiencyBase, BaseClass):
                  part_load: bool = False,
                  secondary: bool = False,
                  reference_nominal_power: float = None,
-                 nominal_power: float = None):
+                 nominal_power: float = None,
+                 default_secondary_temperature: float = None):
         """
 
         Parameters
@@ -61,6 +63,9 @@ class _Efficiency(_EfficiencyBase, BaseClass):
             The nominal power at which to define the current efficiency class. This converts the provided efficiency data
             from the reference_nominal_power to the nominal_power. This is only relevant when part load data is available
             and the reference_nominal_power is provided.
+        default_secondary_temperature : float
+            Default average temperature at the secondary side of the heat pump. This is used to calculate the correct efficiency
+            in for example heating or dhw [°C]
 
         Raises
         ------
@@ -78,20 +83,18 @@ class _Efficiency(_EfficiencyBase, BaseClass):
         self._coordinates_: np.ndarray = coordinates
         self._reference_nominal_power: float = reference_nominal_power
         self._nominal_power: float = nominal_power
+        self._default_secondary_temperature: float = default_secondary_temperature
 
         self._range_primary: np.ndarray = np.array([])
         self._range_secondary: np.ndarray = np.array([])
         self._range_part_load: np.ndarray = np.array([])
 
-        # check if all data points are higher than 0
         if not np.all(data > 0):
             raise ValueError('The efficiencies should all be above zero!')
 
-        # check if the data has the same length as the coordinates
         if len(data) != len(coordinates):
             raise ValueError('The provided data and coordinates array are not of the same length!')
 
-        # check dimension
         dimensions = 1 if isinstance(coordinates[0], (int, float, np.int32, np.int64, np.float16, np.float32)) else len(
             coordinates[0])
         if dimensions != 1 + self._has_secondary + self._has_part_load:
@@ -99,7 +102,6 @@ class _Efficiency(_EfficiencyBase, BaseClass):
                              f'{1 + self._has_secondary + self._has_part_load} dimensions where provided.'
                              'Please check the nb_of_points for both secondary temperature and part load.')
 
-        # get ranges
         self._points = []
         if dimensions == 3:
             self._range_primary = np.sort(np.unique(coordinates[:, 0]))
@@ -119,53 +121,12 @@ class _Efficiency(_EfficiencyBase, BaseClass):
             self._range_primary = np.sort(coordinates)
         self._points.insert(0, self._range_primary)
 
-        def find_value(x, y, z=None):
-            if z is None:
-                index = np.nonzero(np.all(coordinates == (x, y), axis=1))[0]
-            else:
-                index = np.nonzero(np.all(coordinates == (x, y, z), axis=1))[0]
-
-            # the data point exists
-            if len(index) > 0:
-                return data[index[0]]
-
-            # the data point does not exist, so we have to interpolate to get it
-            x_array = []
-            y_array = []
-            if z is None:
-                # only one dimension to check
-                for idx, val in enumerate(coordinates):
-                    if val[0] == x:
-                        x_array.append(val[1])
-                        y_array.append(data[idx])
-            else:
-                # two dimensions to check
-                for idx, val in enumerate(coordinates):
-                    if val[0] == x and val[1] == y:
-                        x_array.append(val[2])
-                        y_array.append(data[idx])
-            # as array
-            x_array = np.array(x_array)
-            y_array = np.array(y_array)
-
-            # sort array
-            p = x_array.argsort()
-            x_array = x_array[p]
-            y_array = y_array[p]
-
-            temp = np.interp(y if z is None else z, x_array, y_array)
-            return temp
-
-        # populate data matrix
         if dimensions == 3:
-            self._data = np.empty((len(self._range_primary), len(self._range_secondary), len(self._range_part_load)))
-            for i in range(self._data.shape[0]):
-                for j in range(self._data.shape[1]):
-                    for k in range(self._data.shape[2]):
-                        self._data[i, j, k] = find_value(self._range_primary[i],
-                                                         self._range_secondary[j],
-                                                         self._range_part_load[k])
-            # get max powers per temperature
+            self._data = self._delaunay_fill_grid(
+                coordinates, data, (self._range_primary, self._range_secondary, self._range_part_load)
+            )
+
+            # get max powers per temperature (unchanged — not related to find_value)
             x = coordinates[:, 0]
             y = coordinates[:, 1]
             z = coordinates[:, 2]
@@ -177,26 +138,21 @@ class _Efficiency(_EfficiencyBase, BaseClass):
 
             max_z_flat = np.full(len(self._range_primary) * len(self._range_secondary), -np.inf)
             np.maximum.at(max_z_flat, flat_idx, z)
-
             max_z = max_z_flat.reshape(len(self._range_primary), len(self._range_secondary))
-            # convert index to part load value
-            self._max_part_load = max_z
+            self._max_part_load = self._finalize_part_load(max_z, (self._range_primary, self._range_secondary))
 
+            min_z_flat = np.full(len(self._range_primary) * len(self._range_secondary), np.inf)
+            np.minimum.at(min_z_flat, flat_idx, z)
+            min_z = min_z_flat.reshape(len(self._range_primary), len(self._range_secondary))
+            self._min_part_load = self._finalize_part_load(min_z, (self._range_primary, self._range_secondary))
         elif dimensions == 2:
-            self._data = np.empty(
-                (len(self._range_primary), max(len(self._range_secondary), len(self._range_part_load))))
-            if self._has_secondary:
-                for i in range(self._data.shape[0]):
-                    for j in range(self._data.shape[1]):
-                        self._data[i, j] = find_value(self._range_primary[i],
-                                                      self._range_secondary[j])
-            else:
-                for i in range(self._data.shape[0]):
-                    for j in range(self._data.shape[1]):
-                        self._data[i, j] = find_value(self._range_primary[i],
-                                                      self._range_part_load[j])
+            secondary_axis = self._range_secondary if self._has_secondary else self._range_part_load
+            self._data = self._delaunay_fill_grid(
+                coordinates, data, (self._range_primary, secondary_axis)
+            )
 
-                # get max powers per temperature
+            if not self._has_secondary:
+                # get max powers per temperature (unchanged)
                 x = coordinates[:, 0]
                 y = coordinates[:, 1]
 
@@ -204,18 +160,125 @@ class _Efficiency(_EfficiencyBase, BaseClass):
 
                 max_y = np.full(len(self._range_primary), -np.inf)
                 np.maximum.at(max_y, idx, y)
+                self._max_part_load = self._finalize_part_load(max_y, (self._range_primary,))
 
-                self._max_part_load = max_y
+                min_y = np.full(len(self._range_primary), np.inf)
+                np.minimum.at(min_y, idx, y)
+                self._min_part_load = self._finalize_part_load(min_y, (self._range_primary,))
         else:
             p = self._range_primary.argsort()
             self._data = data[p]
 
-        # correct for nominal power
         if nominal_power is not None and reference_nominal_power is None:
             raise ValueError('Please enter a reference nominal power.')
 
         if self._has_part_load and nominal_power is not None:
             self._range_part_load *= nominal_power / reference_nominal_power
+            self._max_part_load *= nominal_power / reference_nominal_power
+
+    @staticmethod
+    def _finalize_part_load(max_arr: np.ndarray, axes: tuple) -> np.ndarray:
+        """
+        Replaces +/-inf placeholder cells (primary/secondary combinations with
+        no underlying data) with a nearest-neighbor estimate from populated
+        cells, so the array is fully finite before being handed to interpn.
+        Works for both the max- and min-part-load arrays.
+        """
+        finite_mask = np.isfinite(max_arr)
+        if finite_mask.all():
+            return max_arr
+
+        if len(axes) == 1:  # pragma: no cover
+            grid_points = axes[0].reshape(-1, 1)
+        else:
+            mesh = np.meshgrid(*axes, indexing='ij')
+            grid_points = np.column_stack([m.ravel() for m in mesh])
+
+        flat = max_arr.ravel().copy()
+        flat_finite_mask = finite_mask.ravel()
+
+        nearest = NearestNDInterpolator(grid_points[flat_finite_mask], flat[flat_finite_mask])
+        flat[~flat_finite_mask] = nearest(grid_points[~flat_finite_mask])
+
+        return flat.reshape(max_arr.shape)
+
+    @staticmethod
+    def _normalize_coords(coordinates: np.ndarray):
+        """
+        Min-max normalizes each column of `coordinates` to [0, 1], so that
+        Delaunay triangulation isn't distorted by axes with very different
+        numeric ranges (e.g. temperature in single digits vs. power in tens).
+        Returns the normalized coordinates plus (mins, ranges) so the same
+        transform can be applied to query points.
+        """
+        mins = coordinates.min(axis=0)
+        ranges = coordinates.max(axis=0) - mins
+        ranges[ranges == 0] = 1.0  # guard against degenerate constant axes
+        return (coordinates - mins) / ranges, mins, ranges
+
+    @staticmethod
+    def _delaunay_fill_grid(coordinates: np.ndarray, data: np.ndarray, axes: tuple) -> np.ndarray:
+        """
+        Builds a complete rectilinear grid over `axes` from scattered
+        (coordinates, data), filling missing nodes via Delaunay-based linear
+        interpolation, falling back to nearest-neighbor for nodes outside the
+        convex hull. Degenerate coordinate dimensions (zero range -- e.g. a
+        dataset tested at a single fixed secondary temperature) are dropped
+        before triangulation, since Delaunay cannot triangulate points that
+        don't span all given dimensions, and re-inserted afterward.
+        """
+        coordinates = np.asarray(coordinates, dtype=float)
+
+        ranges = coordinates.max(axis=0) - coordinates.min(axis=0)
+        varying = ranges > 0
+        n_varying = varying.sum()
+
+        mesh = np.meshgrid(*axes, indexing='ij')
+        grid_points_full = np.column_stack([m.ravel() for m in mesh])
+
+        existing = {tuple(row): val for row, val in zip(coordinates, data)}
+
+        values = np.empty(len(grid_points_full))
+        missing_mask = np.zeros(len(grid_points_full), dtype=bool)
+        for i, pt in enumerate(grid_points_full):
+            key = tuple(pt)
+            if key in existing:
+                values[i] = existing[key]
+            else:
+                missing_mask[i] = True
+
+        if missing_mask.any():
+            missing_pts_full = grid_points_full[missing_mask]
+
+            if n_varying == 0:
+                values[missing_mask] = data[0]
+            else:
+                coords_reduced = coordinates[:, varying]
+                missing_reduced = missing_pts_full[:, varying]
+
+                if n_varying == 1:
+                    order = np.argsort(coords_reduced[:, 0])
+                    est = np.interp(missing_reduced[:, 0],
+                                    coords_reduced[order, 0], data[order])
+                else:
+                    # CHANGED: normalize both the fitting points and the query
+                    # points onto [0, 1] per axis before triangulating, so
+                    # Teva (small range) and power (large range) get equal
+                    # geometric weight in the Delaunay triangulation
+                    coords_norm, mins, ranges_norm = _Efficiency._normalize_coords(coords_reduced)
+                    missing_norm = (missing_reduced - mins) / ranges_norm
+
+                    linear = LinearNDInterpolator(coords_norm, data)
+                    est = linear(missing_norm)
+                    nan_mask = np.isnan(est)
+                    if nan_mask.any():
+                        nearest = NearestNDInterpolator(coords_norm, data)
+                        est[nan_mask] = nearest(missing_norm[nan_mask])
+
+                values[missing_mask] = est
+
+        grid_shape = tuple(len(a) for a in axes)
+        return values.reshape(grid_shape)
 
     def _get_efficiency(self,
                         primary_temperature: Union[float, np.ndarray],
@@ -246,11 +309,11 @@ class _Efficiency(_EfficiencyBase, BaseClass):
         """
         # check if all the required values are present
         if self._has_secondary != (secondary_temperature is not None):
-            if self._has_secondary:
-                raise ValueError('The EER class requires a value for the secondary temperature.')
+            if self._has_secondary and self._default_secondary_temperature is None:
+                raise ValueError('The efficiency class requires a value for the secondary temperature.')
         if self._has_part_load != (power is not None):
             if self._has_part_load:
-                raise ValueError('The EER class requires a value for the part-load.')
+                raise ValueError('The efficiency class requires a value for the part-load.')
 
         # get maximum length
         _max_length = np.max([len(i) if i is not None and not isinstance(i, (float, int)) else 1 for i in
@@ -260,9 +323,13 @@ class _Efficiency(_EfficiencyBase, BaseClass):
         primary_temperature = np.array(
             np.full(_max_length, primary_temperature) if isinstance(primary_temperature,
                                                                     (float, int)) else primary_temperature)
-        secondary_temperature = np.array(
-            np.full(_max_length, secondary_temperature) if isinstance(secondary_temperature,
-                                                                      (float, int)) else secondary_temperature)
+        if secondary_temperature is not None:
+            secondary_temperature = np.array(
+                np.full(_max_length, secondary_temperature) if isinstance(secondary_temperature,
+                                                                          (float, int)) else secondary_temperature)
+        elif self._default_secondary_temperature is not None:
+            secondary_temperature = np.full(_max_length, self._default_secondary_temperature)
+
         power = np.array(np.full(_max_length, power) if isinstance(power, (float, int)) else power)
 
         # clip, so that no values fall outside the provided values
@@ -277,6 +344,12 @@ class _Efficiency(_EfficiencyBase, BaseClass):
         if self._has_part_load:
             part_load_clipped = np.clip(power, np.min(self._range_part_load), np.max(self._range_part_load))
 
+            # make sure it stays below the maximum available power
+            part_load_clipped = np.minimum(part_load_clipped,
+                                           self._get_max_power(primary_temperature, secondary_temperature))
+            # make sure it stays above the minimum available power
+            part_load_clipped = np.maximum(part_load_clipped,
+                                           self._get_min_power(primary_temperature, secondary_temperature, ))
         xi = primary_temperature_clipped
         if self._has_part_load and self._has_secondary:
             xi = list(zip(primary_temperature_clipped, secondary_temperature_clipped, part_load_clipped))
@@ -291,7 +364,7 @@ class _Efficiency(_EfficiencyBase, BaseClass):
 
     def _get_max_power(self,
                        primary_temperature: Union[float, np.ndarray],
-                       secondary_temperature: Union[float, np.ndarray] = None,**kwargs) -> np.ndarray:
+                       secondary_temperature: Union[float, np.ndarray] = None, **kwargs) -> np.ndarray:
         """
         This function returns the maximum available power for a certain primary and secondary temperature.
 
@@ -316,7 +389,72 @@ class _Efficiency(_EfficiencyBase, BaseClass):
         if not self._has_part_load:
             return 1e16
 
-            # reuse your existing clipping and array logic
+        # reuse your existing clipping and array logic
+        _max_length = np.max([
+            len(i) if i is not None and not isinstance(i, (float, int)) else 1
+            for i in (primary_temperature, secondary_temperature)
+        ])
+
+        Tp = np.array(
+            np.full(_max_length, primary_temperature)
+            if isinstance(primary_temperature, (float, int))
+            else primary_temperature
+        )
+
+        Ts = None
+        if self._has_secondary:
+            if secondary_temperature is None:
+                if self._default_secondary_temperature is None:
+                    raise ValueError("Secondary temperature is required.")
+                else:
+                    secondary_temperature = self._default_secondary_temperature
+
+            Ts = np.array(
+                np.full(_max_length, secondary_temperature)
+                if isinstance(secondary_temperature, (float, int))
+                else secondary_temperature
+            )
+
+        # clip
+        Tp = np.clip(Tp, np.min(self._range_primary), np.max(self._range_primary))
+        if self._has_secondary:
+            Ts = np.clip(Ts, np.min(self._range_secondary), np.max(self._range_secondary))
+
+        # interpolate directly on precomputed surface
+        if self._has_secondary:
+            xi = list(zip(Tp, Ts))
+        else:
+            xi = Tp
+
+        return interpn(self._points[:1 + self._has_secondary], self._max_part_load, xi, bounds_error=False,
+                       fill_value=np.nan)
+
+    def _get_min_power(self,
+                       primary_temperature: Union[float, np.ndarray],
+                       secondary_temperature: Union[float, np.ndarray] = None, **kwargs) -> np.ndarray:
+        """
+        This function returns the minimum available power for a certain primary and secondary temperature.
+
+        Parameters
+        ----------
+        primary_temperature : np.ndarray or float
+            Value(s) for the average primary temperature of the heat pump for the efficiency calculation.
+        secondary_temperature : np.ndarray or float
+            Value(s) for the average secondary temperature of the heat pump for the efficiency calculation.
+
+        Raises
+        ------
+        ValueError
+            When secondary_temperature is in the dataset, and it is not provided.
+
+        Returns
+        -------
+        Efficiency
+            np.ndarray
+        """
+        if not self._has_part_load:
+            return self._get_max_power(primary_temperature, secondary_temperature)
+
         _max_length = np.max([
             len(i) if i is not None and not isinstance(i, (float, int)) else 1
             for i in (primary_temperature, secondary_temperature)
@@ -338,18 +476,13 @@ class _Efficiency(_EfficiencyBase, BaseClass):
                 else secondary_temperature
             )
 
-        # clip
         Tp = np.clip(Tp, np.min(self._range_primary), np.max(self._range_primary))
         if self._has_secondary:
             Ts = np.clip(Ts, np.min(self._range_secondary), np.max(self._range_secondary))
 
-        # interpolate directly on precomputed surface
-        if self._has_secondary:
-            xi = list(zip(Tp, Ts))
-        else:
-            xi = Tp
+        xi = list(zip(Tp, Ts)) if self._has_secondary else Tp
 
-        return interpn(self._points[:1 + self._has_secondary], self._max_part_load, xi, bounds_error=False,
+        return interpn(self._points[:1 + self._has_secondary], self._min_part_load, xi, bounds_error=False,
                        fill_value=np.nan)
 
 
@@ -380,9 +513,10 @@ def plot_heat_pump_envelope(points, eff, ax=None, label_prefix="T"):
     # group by temperature
     grouped = defaultdict(lambda: {"power": [], "eff": []})
 
-    for (T, P), e in zip(points, eff):
-        grouped[T]["power"].append(P)
-        grouped[T]["eff"].append(e)
+    for (T, _, P), e in zip(points, eff):
+        if _ == 52.5:
+            grouped[T]["power"].append(P)
+            grouped[T]["eff"].append(e)
 
     # plot each temperature
     for T in sorted(grouped.keys()):
@@ -407,7 +541,7 @@ def plot_heat_pump_envelope(points, eff, ax=None, label_prefix="T"):
     return ax
 
 
-def combine_n_heat_pumps(points_list, eff_list):
+def combine_n_heat_pumps_old(points_list, eff_list):  # pragma: no cover
     """
     Combine the operating envelopes of multiple modulating heat pumps into a
     single equivalent operating envelope using strict cascade staging.
@@ -689,6 +823,174 @@ def combine_n_heat_pumps(points_list, eff_list):
             combined_eff.append(e)
 
     return np.asarray(combined_points), np.asarray(combined_eff)
+
+
+def combine_n_heat_pumps(points_list, eff_list,
+                         reference_primary_temperature: float = 0.0,
+                         reference_secondary_temperature: float = 35.0,
+                         n_pl_single: int = 3, n_pl_cascade: int = 10, **kwargs):
+    """
+    Combine the operating envelopes of multiple modulating heat pumps into a
+    single equivalent operating envelope, using strict cascade staging.
+    Each heat pump is modeled as a COP object and queried directly for
+    efficiency, minimum power, and maximum power at each (Teva, Tcond)
+    combination.
+
+    Parameters
+    ----------
+    points_list : list of np.ndarray
+        List of arrays, one per heat pump, each of shape (Ni, 3): the
+        (Teva, Tcond, power) coordinates for a COP(secondary=True, part_load=True).
+    eff_list : list of np.ndarray
+        List of efficiency arrays, one per heat pump, shape (Ni,).
+    kwargs_list : list of dict, optional
+        Extra kwargs per COP constructor call (e.g. nominal_power). Defaults
+        to `secondary=True, part_load=True` for every machine.
+    reference_primary_temperature, reference_secondary_temperature : float
+        The (Teva, Tcond) regime used once to rank the heat pumps by minimum
+        power before staging.
+    n_pl_single : int
+        Number of part-load points used for the single-machine zone and the
+        HP1-vs-HP2 overlap zone.
+    n_pl_cascade : int
+        Number of part-load points used for each cascade stage.
+
+    Returns
+    -------
+    combined_points : np.ndarray of shape (K, 3)
+        (Teva, Tcond, power) triples representing the combined envelope.
+    combined_eff : np.ndarray of shape (K,)
+        Efficiencies corresponding to `combined_points`.
+    """
+
+    # --- step 1: build a COP object per heat pump ---
+    if kwargs is None or kwargs == {}:
+        kwargs = [{'secondary': True, 'part_load': True} for _ in points_list]
+    else:
+        kwargs = [kwargs for _ in points_list]
+    from GHEtool.VariableClasses.Efficiency.COP import COP
+
+    cops = [COP(data=np.array(eff), coordinates=np.array(pts), **kw)
+            for pts, eff, kw in zip(points_list, eff_list, kwargs)]
+
+    # --- step 4: rank order, established once at the reference regime ---
+    rank_key = [
+        float(np.atleast_1d(cop._get_min_power(
+            reference_primary_temperature, reference_secondary_temperature))[0])
+        for cop in cops
+    ]
+    cops = [cops[i] for i in np.argsort(rank_key)]  # fixed order, smallest first
+
+    # --- step 2/3: all (Teva, Tcond) combinations across all machines ---
+    all_combos = set()
+    for cop in cops:
+        all_combos.update(itertools.product(cop._range_primary, cop._range_secondary))
+    all_combos = sorted(all_combos)
+
+    combined_points = []
+    combined_eff = []
+
+    for Teva, Tcond in all_combos:
+        P, E = _combine_at_combo(Teva, Tcond, cops, n_pl_single, n_pl_cascade)
+        for p, e in zip(P, E):
+            combined_points.append((Teva, Tcond, p))
+            combined_eff.append(e)
+
+    return np.asarray(combined_points), np.asarray(combined_eff)
+
+
+def _combine_at_combo(Teva, Tcond, cops, n_pl_single, n_pl_cascade):
+    """
+    Applies the same cascade-staging logic as before, but sourced from COP
+    objects instead of raw sorted arrays: p_min/p_max come from
+    _get_min_power/_get_max_power, and efficiency comes from _get_efficiency,
+    both queried at this specific (Teva, Tcond). Machines whose tested range
+    doesn't cover this (Teva, Tcond) are skipped entirely (no extrapolation),
+    but the relative order of the remaining machines is kept as established
+    by the reference-regime ranking -- this combo is not re-sorted on its own.
+    """
+    active_cops = []
+    p_min, p_max = [], []
+
+    for cop in cops:
+        if not (cop._range_primary.min() <= Teva <= cop._range_primary.max()
+                and cop._range_secondary.min() <= Tcond <= cop._range_secondary.max()):
+            continue  # this machine's tested envelope doesn't cover this combo
+
+        pmin = float(np.atleast_1d(cop._get_min_power(Teva, Tcond))[0])
+        pmax = float(np.atleast_1d(cop._get_max_power(Teva, Tcond))[0])
+        if not (np.isfinite(pmin) and np.isfinite(pmax)) or pmax < pmin:
+            continue
+
+        active_cops.append(cop)
+        p_min.append(pmin)
+        p_max.append(pmax)
+
+    n = len(active_cops)
+    if n == 0:
+        return np.empty(0), np.empty(0)
+
+    def eff_at(i, P):
+        return float(np.atleast_1d(active_cops[i]._get_efficiency(Teva, Tcond, P))[0])
+
+    P_comb, E_comb = [], []
+
+    # combined minimum power once 2 machines are needed -- everything
+    # below this must be served by exactly one machine (or none)
+    two_machine_min = sum(sorted(p_min)[:2]) if n >= 2 else np.inf
+
+    # --- single-machine zone: try EVERY machine independently, at every
+    # power level it can individually cover below two_machine_min, and
+    # keep whichever gives the best efficiency at that level ---
+    pl_grid = np.linspace(0.0, 1.0, n_pl_single)
+    for pl in pl_grid:
+        candidates = []
+        for i in range(n):
+            P = p_min[i] + pl * (p_max[i] - p_min[i])
+            if P < two_machine_min:
+                candidates.append((P, eff_at(i, P)))
+        if not candidates:
+            continue
+        # group candidates that landed at (numerically) the same power
+        # level isn't necessary here since each i has its own P; instead,
+        # just keep every valid single-machine point -- duplicates at
+        # differing P are fine, they represent different machines' curves
+        for P, E in candidates:
+            P_comb.append(P)
+            E_comb.append(E)
+
+    # --- cascade zones: exactly k+1 machines active, sorted by p_min ---
+    order = np.argsort(p_min)
+    p_min_sorted = [p_min[i] for i in order]
+    p_max_sorted = [p_max[i] for i in order]
+    idx_sorted = [i for i in order]
+
+    for k in range(1, n):
+        P_min_stage = sum(p_min_sorted[:k + 1])
+        P_max_stage = sum(p_min_sorted[:k + 2]) if k + 1 < n else np.inf
+
+        for pl in np.linspace(0.0, 1.0, n_pl_cascade):
+            powers, effs = [], []
+            for j in range(k + 1):
+                i = idx_sorted[j]
+                Pi = p_min_sorted[j] + pl * (p_max_sorted[j] - p_min_sorted[j])
+                if Pi < p_min_sorted[j] or Pi > p_max_sorted[j]:
+                    break
+                powers.append(Pi)
+                effs.append(eff_at(i, Pi))
+            else:
+                P_tot = sum(powers)
+                if not (P_min_stage <= P_tot < P_max_stage):
+                    continue
+                E_tot = float(np.dot(powers, effs) / P_tot)
+                P_comb.append(P_tot)
+                E_comb.append(E_tot)
+
+    P_comb = np.asarray(P_comb)
+    E_comb = np.asarray(E_comb)
+    mask = np.isfinite(E_comb) & np.isfinite(P_comb)
+    idx = np.argsort(P_comb[mask])
+    return P_comb[mask][idx], E_comb[mask][idx]
 
 
 def _find_optimal_heat_pump_configuration(heat_pumps: list[_Efficiency], power: float, prim_temp: float,

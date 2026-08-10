@@ -1,6 +1,7 @@
 """
 This file contains the test for the efficiency data
 """
+import matplotlib.pyplot as plt
 import pytest
 
 import numpy as np
@@ -9,23 +10,27 @@ from GHEtool.VariableClasses.Efficiency import *
 from GHEtool.VariableClasses.Efficiency._Efficiency import plot_heat_pump_envelope, combine_n_heat_pumps, \
     _find_optimal_heat_pump_configuration
 
+from GHEtool.VariableClasses.Efficiency.COPNonModulating import _cop_carnot
+from GHEtool.VariableClasses.Efficiency.EERNonModulating import _eer_carnot
+
 points_HP300 = np.array([
-    [-4.5, 53.6],
-    [-4.5, 39.8],
-    [-4.5, 23.2],
-    [-1.5, 58.7],
-    [-1.5, 43.7],
-    [-1.5, 25.5],
-    [3.5, 67.9],
-    [3.5, 50.7],
-    [3.5, 29.6],
-    [8.5, 77.6],
-    [8.5, 58.3],
-    [8.5, 33.9],
-    [11.5, 83.9],
-    [11.5, 62.9],
-    [11.5, 36.6],
+    [-4.5, 32.5, 53.6],
+    [-4.5, 32.5, 39.8],
+    [-4.5, 32.5, 23.2],
+    [-1.5, 32.5, 58.7],
+    [-1.5, 32.5, 43.7],
+    [-1.5, 32.5, 25.5],
+    [3.5, 32.5, 67.9],
+    [3.5, 32.5, 50.7],
+    [3.5, 32.5, 29.6],
+    [8.5, 32.5, 77.6],
+    [8.5, 32.5, 58.3],
+    [8.5, 32.5, 33.9],
+    [11.5, 32.5, 83.9],
+    [11.5, 32.5, 62.9],
+    [11.5, 32.5, 36.6],
 ])
+points_HP3 = np.array([[i[0], i[2]] for i in points_HP300])
 eff_HP300 = np.array([
     3.86, 4.28, 3.93,
     4.08, 4.60, 4.18,
@@ -34,18 +39,18 @@ eff_HP300 = np.array([
     5.41, 6.17, 5.63,
 ])
 points_HP300_new = np.array([
-    [-1.5, 58.7],
-    [-1.5, 43.7],
-    [-1.5, 25.5],
-    [3.5, 67.9],
-    [3.5, 50.7],
-    [3.5, 29.6],
-    [8.5, 77.6],
-    [8.5, 58.3],
-    [8.5, 33.9],
-    [11.5, 83.9],
-    [11.5, 62.9],
-    [11.5, 36.6],
+    [-1.5, 32.5, 58.7],
+    [-1.5, 32.5, 43.7],
+    [-1.5, 32.5, 25.5],
+    [3.5, 32.5, 67.9],
+    [3.5, 32.5, 50.7],
+    [3.5, 32.5, 29.6],
+    [8.5, 32.5, 77.6],
+    [8.5, 32.5, 58.3],
+    [8.5, 32.5, 33.9],
+    [11.5, 32.5, 83.9],
+    [11.5, 32.5, 62.9],
+    [11.5, 32.5, 36.6],
 ])
 eff_HP300_new = np.array([
     4.08, 4.60, 4.18,
@@ -54,22 +59,24 @@ eff_HP300_new = np.array([
     5.41, 6.17, 5.63,
 ])
 points_HP400 = np.array([
-    [-4.5, 67.2],
-    [-4.5, 49.9],
-    [-4.5, 29.1],
-    [-1.5, 73.7],
-    [-1.5, 54.8],
-    [-1.5, 32.0],
-    [3.5, 85.2],
-    [3.5, 63.5],
-    [3.5, 37.2],
-    [8.5, 97.7],
-    [8.5, 73.1],
-    [8.5, 42.7],
-    [11.5, 105.7],
-    [11.5, 79.0],
-    [11.5, 46.0],
+    [-4.5, 32.5, 67.2],
+    [-4.5, 32.5, 49.9],
+    [-4.5, 32.5, 29.1],
+    [-1.5, 32.5, 73.7],
+    [-1.5, 32.5, 54.8],
+    [-1.5, 32.5, 32.0],
+    [3.5, 32.5, 85.2],
+    [3.5, 32.5, 63.5],
+    [3.5, 32.5, 37.2],
+    [8.5, 32.5, 97.7],
+    [8.5, 32.5, 73.1],
+    [8.5, 32.5, 42.7],
+    [11.5, 32.5, 105.7],
+    [11.5, 32.5, 79.0],
+    [11.5, 32.5, 46.0],
 ])
+points_HP4 = np.array([[i[0], i[2]] for i in points_HP400])
+
 eff_HP400 = np.array([
     3.91, 4.38, 3.99,
     4.14, 4.64, 4.27,
@@ -78,22 +85,24 @@ eff_HP400 = np.array([
     5.51, 6.22, 5.75,
 ])
 points_HP500 = np.array([
-    [-4.5, 84.7],
-    [-4.5, 66.3],
-    [-4.5, 38.6],
-    [-1.5, 93.0],
-    [-1.5, 72.9],
-    [-1.5, 42.4],
-    [3.5, 107.8],
-    [3.5, 84.6],
-    [3.5, 49.4],
-    [8.5, 123.5],
-    [8.5, 97.4],
-    [8.5, 56.9],
-    [11.5, 133.2],
-    [11.5, 105.4],
-    [11.5, 61.4],
+    [-4.5, 32.5, 84.7],
+    [-4.5, 32.5, 66.3],
+    [-4.5, 32.5, 38.6],
+    [-1.5, 32.5, 93.0],
+    [-1.5, 32.5, 72.9],
+    [-1.5, 32.5, 42.4],
+    [3.5, 32.5, 107.8],
+    [3.5, 32.5, 84.6],
+    [3.5, 32.5, 49.4],
+    [8.5, 32.5, 123.5],
+    [8.5, 32.5, 97.4],
+    [8.5, 32.5, 56.9],
+    [11.5, 32.5, 133.2],
+    [11.5, 32.5, 105.4],
+    [11.5, 32.5, 61.4],
 ])
+points_HP5 = np.array([[i[0], i[2]] for i in points_HP500])
+
 eff_HP500 = np.array([
     3.87, 4.12, 3.78,
     4.12, 4.39, 4.04,
@@ -114,7 +123,7 @@ def test_SCOP():
 def test_SEER():
     seer = SEER(50)
     assert seer.get_SEER(12, test=5) == 50
-    assert seer._get_max_power()==1e16
+    assert seer._get_max_power() == 1e16
     assert seer.get_EER(12, test=5) == 50
     with pytest.raises(ValueError):
         SEER(0)
@@ -166,6 +175,7 @@ def test_COP_secondary():
                           np.array([1.25, 3.5]))
     assert np.array_equal(cop_sec.get_COP(1.5, np.array([2.5, 4.5])), np.array([1, 2]))
     assert np.allclose(cop_sec._get_max_power(np.array([1, 1.5, 2, 2.5, 3])), 1e16)
+    assert np.allclose(cop_sec._get_min_power(np.array([1, 1.5, 2, 2.5, 3])), 1e16)
 
 
 def test_COP_part_load():
@@ -210,9 +220,9 @@ def test_COP_part_load_real():
 
 
 def test_COP_full():
-    cop_full = COP(np.array([1, 2, 2, 4, 2, 4, 4, 8]),
+    cop_full = COP(np.array([1, 2, 2, 4, 2, 4, 4, 8, 10]),
                    np.array([[1.5, 2.5, 4.5], [2.5, 2.5, 4.5], [1.5, 4.5, 4.5], [2.5, 4.5, 4.5],
-                             [1.5, 2.5, 8.5], [2.5, 2.5, 8.5], [1.5, 4.5, 8.5], [2.5, 4.5, 8.5]]),
+                             [1.5, 2.5, 8.5], [2.5, 2.5, 8.5], [1.5, 4.5, 8.5], [2.5, 4.5, 8.5], [2.5, 5.5, 10.5]]),
                    secondary=True, part_load=True)
 
     assert cop_full._has_part_load
@@ -220,24 +230,103 @@ def test_COP_full():
 
     with pytest.raises(ValueError):
         assert cop_full.get_COP(5, 3) == 3
-
+    cop_full._default_secondary_temperature = 2.5
     assert cop_full.get_COP(2, 2.5, 4.5) == 1.5
+    assert cop_full.get_COP(1.5, 2.5, 8.5) == 2
+    assert cop_full.get_COP(1.5, power=8.5) == 2
+    cop_full._default_secondary_temperature = 6
+    assert cop_full.get_COP(1.5, power=8.5) == 4
+    cop_full._default_secondary_temperature = -6
+    assert cop_full.get_COP(1.5, power=8.5) == 2
+    assert cop_full.get_COP(1.5, 4.5, 8.5) == 4
+    assert cop_full.get_COP(1.5, 3.5, 8.5) == 3
     assert np.array_equal(cop_full.get_COP(np.array([2, 2.5]), np.array([3.5, 3.5]), np.array([6.5, 8])),
                           np.array([3.375, 5.625]))
     assert np.array_equal(cop_full.get_COP(np.array([2, 2.5, 5]), np.array([3.5, 3.5, 3.5]), np.array([6.5, 8, 8])),
                           np.array([3.375, 5.625, 5.625]))
     assert np.array_equal(cop_full.get_COP(1.5, secondary_temperature=np.array([2.5, 4.5]), power=4.5),
                           np.array([1, 2]))
-
+    cop_full._default_secondary_temperature = None
     with pytest.raises(ValueError):
         assert cop_full._get_max_power(1.5)
+    with pytest.raises(ValueError):
+        assert cop_full._get_min_power(1.5)
     assert cop_full._get_max_power(1.5, 4.5) == 8.5
+    assert cop_full._get_min_power(1.5, 4.5) == 4.5
+
     cop_full = COP(np.array([1, 2, 2, 4, 2, 4, 4, 8]),
                    np.array([[1.5, 2.5, 4.5], [2.5, 2.5, 4.5], [1.5, 4.5, 3.5], [2.5, 4.5, 5.5],
                              [1.5, 2.5, 8.5], [2.5, 2.5, 10.5], [1.5, 4.5, 7.5], [2.5, 4.5, 9.5]]),
                    secondary=True, part_load=True)
     assert np.allclose(cop_full._get_max_power(np.array([1.5, 1.5, 2.5, 2.5]), np.array([2.5, 4.5, 2.5, 4.5])),
                        [8.5, 7.5, 10.5, 9.5])
+
+
+def test_COP_full_case_2():
+    cop = COP(np.array(
+        [3.86, 4.28, 3.93, 4.08, 4.6, 4.18, 4.53, 5.12, 4.7, 5.04, 5.72, 5.3, 5.41, 6.17, 5.63, 2.53, 2.89, 2.52, 2.88,
+         3.02, 2.68, 3.14, 3.25, 2.89, 3.61, 3.52, 3.12, 3.83, 3.68, 3.32]),
+        np.array(
+            [[-4.5, 32.5, 53.6], [-4.5, 32.5, 39.8], [-4.5, 32.5, 23.2], [-1.5, 32.5, 58.7], [-1.5, 32.5, 43.7],
+             [-1.5, 32.5, 25.5], [3.5, 32.5, 67.9], [3.5, 32.5, 50.7], [3.5, 32.5, 29.6], [8.5, 32.5, 77.6],
+             [8.5, 32.5, 58.3], [8.5, 32.5, 33.9], [11.5, 32.5, 83.9], [11.5, 32.5, 62.9], [11.5, 32.5, 36.6],
+             [-4.5, 52.5, 44.8], [-4.5, 52.5, 34.1], [-4.5, 52.5, 18.9], [-1.5, 52.5, 49.3], [-1.5, 52.5, 37.4],
+             [-1.5, 52.5, 20.9], [3.5, 52.5, 57.2], [3.5, 52.5, 43.2], [3.5, 52.5, 24.3], [8.5, 52.5, 62.5],
+             [8.5, 52.5, 49.7], [8.5, 52.5, 28.1], [11.5, 52.5, 67.8], [11.5, 52.5, 53.7], [11.5, 52.5, 30.5]]),
+        secondary=True, part_load=True, default_secondary_temperature=32.5)
+    assert cop.get_COP(-4.5, power=53.6) == 3.86
+    assert cop.get_COP(-4.5, power=39.8) == 4.28
+    assert cop.get_COP(-4.5, power=23.2) == 3.93
+    assert cop.get_COP(8.5, power=33.9) == 5.3
+    assert cop.get_COP(8.5, power=20) == 5.3
+
+
+def test_COP_full_case_3():
+    points_HP500 = np.array([
+        [-4.5, 32.5, 84.7],
+        [-4.5, 32.5, 66.3],
+        [-4.5, 32.5, 38.6],
+        [-1.5, 32.5, 93.0],
+        [-1.5, 32.5, 72.9],
+        [-1.5, 32.5, 42.4],
+        [3.5, 32.5, 107.8],
+        [3.5, 32.5, 84.6],
+        [3.5, 32.5, 49.4],
+        [8.5, 32.5, 123.5],
+        [8.5, 32.5, 97.4],
+        [8.5, 32.5, 56.9],
+        [11.5, 32.5, 133.2],
+        [11.5, 32.5, 105.4],
+        [11.5, 32.5, 61.4],
+    ])
+    eff_HP500 = np.array([
+        3.87, 4.12, 3.78,
+        4.12, 4.39, 4.04,
+        4.57, 4.89, 4.49,
+        5.10, 5.50, 5.08,
+        5.48, 5.92, 5.48,
+    ])
+    COP(eff_HP500, coordinates=points_HP500, secondary=True, part_load=True)
+
+
+def test_COP_full_not_all_secondary_load():
+    cop_full = COP(np.array([1, 2, 2, 4, 2, 4, 4, 8, 10]),
+                   np.array([[1.5, 2.5, 4.5], [2.5, 2.5, 4.5], [1.5, 4.5, 4.5], [2.5, 4.5, 4.5],
+                             [1.5, 2.5, 8.5], [2.5, 2.5, 8.5], [1.5, 4.5, 8.5], [2.5, 4.5, 8.5], [2.5, 5.5, 10.5]]),
+                   secondary=True, part_load=True, default_secondary_temperature=2.5)
+    assert cop_full.get_COP(1.5, power=8.5) == 2
+    assert cop_full.get_COP(2.5, 5.5, 10.5) == 10
+    assert cop_full._get_max_power(2.5, 4.5, power=8.5) == 8.5
+    assert cop_full._get_max_power(2.5, 5.5, power=10.5) == 10.5
+    assert cop_full._get_max_power(1.5, 4.5) == 8.5
+    assert cop_full._get_min_power(2.5, 4.5, power=8.5) == 4.5
+    assert cop_full._get_min_power(2.5, 5.5, power=10.5) == 10.5
+    assert cop_full._get_min_power(1.5, 4.5) == 4.5
+    assert cop_full.get_COP(1.5, 4.5, power=8.5) == 4
+    assert cop_full.get_COP(1.5, 4.5, power=10.5) == 4
+    assert cop_full.get_COP(2.5, 5.5, power=10.5) == 10
+    assert cop_full.get_COP(2.5, 5.5, power=8.5) == 10
+    assert cop_full.get_COP(1.5, 5.5, power=10.5) == 4
 
 
 def test_COP_get_SCOP():
@@ -324,7 +413,7 @@ def test_EER_full():
     eer_full = EER(np.array([1, 2, 2, 4, 2, 4, 4, 8]),
                    np.array([[1.5, 2.5, 4.5], [2.5, 2.5, 4.5], [1.5, 4.5, 4.5], [2.5, 4.5, 4.5],
                              [1.5, 2.5, 8.5], [2.5, 2.5, 8.5], [1.5, 4.5, 8.5], [2.5, 4.5, 8.5]]),
-                   secondary=True, part_load=True)
+                   secondary=True, part_load=True, default_secondary_temperature=2.5)
     assert eer_full._has_part_load
     assert eer_full._has_secondary
 
@@ -332,6 +421,14 @@ def test_EER_full():
         assert eer_full.get_EER(5, 3) == 3
 
     assert eer_full.get_EER(2, 2.5, 4.5) == 1.5
+    assert eer_full.get_EER(1.5, 2.5, 8.5) == 2
+    assert eer_full.get_EER(1.5, power=8.5) == 2
+    eer_full._default_secondary_temperature = 6
+    assert eer_full.get_EER(1.5, power=8.5) == 4
+    eer_full._default_secondary_temperature = -6
+    assert eer_full.get_EER(1.5, power=8.5) == 2
+    assert eer_full.get_EER(1.5, 4.5, 8.5) == 4
+    assert eer_full.get_EER(1.5, 3.5, 8.5) == 3
     assert np.array_equal(eer_full.get_EER(np.array([2, 2.5]), np.array([3.5, 3.5]), np.array([6.5, 8])),
                           np.array([3.375, 5.625]))
     assert np.array_equal(eer_full.get_EER(np.array([2, 2.5, 5]), np.array([3.5, 3.5, 3.5]), np.array([6.5, 8, 8])),
@@ -479,6 +576,7 @@ def test_EERCombined():
     assert np.isclose(eer.get_SEER(np.array([10, 10, 10]), np.array([1, 15, 20]), month_indices=np.array([5, 6, 7])),
                       30 / 4.5)
 
+
 def test_EERCombined_max_power():
     # with threshold
     eer = EERCombined(20, 5, 10)
@@ -488,24 +586,26 @@ def test_EERCombined_max_power():
     # with month array
     eer = EERCombined(20, 5, months_active_cooling=np.array([7, 8, 9]))
     assert eer._get_max_power(1, 0, 0) == 1e16
-    assert np.allclose(eer._get_max_power(np.array([1, 10, 20]), month_indices=np.array([6, 7,8])), np.array([1e16, 1e16, 1e16]))
+    assert np.allclose(eer._get_max_power(np.array([1, 10, 20]), month_indices=np.array([6, 7, 8])),
+                       np.array([1e16, 1e16, 1e16]))
 
     # with threshold and month array
     eer = EERCombined(20, 5, 10, months_active_cooling=np.array([7, 8, 9]))
     assert eer._get_max_power(1, 0, 0) == 1e16
-    assert np.allclose(eer._get_max_power(np.array([1, 10, 20]), month_indices=np.array([6, 7,8])), np.array([1e16, 1e16, 1e16]))
+    assert np.allclose(eer._get_max_power(np.array([1, 10, 20]), month_indices=np.array([6, 7, 8])),
+                       np.array([1e16, 1e16, 1e16]))
 
     eer_part = EER(np.array([1, 2, 2, 4]), np.array([[1.5, 2.5], [2.5, 2.5], [1.5, 4.5], [2.5, 4.5]]), part_load=True)
     # with threshold
     eer = EERCombined(20, eer_part, 10)
     assert eer._get_max_power(1, 0, 0) == 1e16
     assert eer._get_max_power(11, 0, 0) == 4.5
-    assert np.allclose(eer._get_max_power(np.array([1, 11, 20])), np.array([1e16,4.5,4.5]))
+    assert np.allclose(eer._get_max_power(np.array([1, 11, 20])), np.array([1e16, 4.5, 4.5]))
 
     eer = EERCombined(eer_part, 20, 10)
     assert eer._get_max_power(1, 0, 0) == 4.5
     assert eer._get_max_power(11, 0, 0) == 1e16
-    assert np.allclose(eer._get_max_power(np.array([1, 11, 20])), np.array([4.5,1e16,1e16]))
+    assert np.allclose(eer._get_max_power(np.array([1, 11, 20])), np.array([4.5, 1e16, 1e16]))
 
     # with month array
     eer = EERCombined(20, eer_part, months_active_cooling=np.array([7, 8, 9]))
@@ -515,17 +615,21 @@ def test_EERCombined_max_power():
         eer._get_max_power(np.array([1, 10, 20]))
     assert eer._get_max_power(1, 0, 0) == 1e16
     assert eer._get_max_power(11, 0, 0) == 1e16
-    assert np.allclose(eer._get_max_power(np.array([1, 11, 20]), month_indices=np.array([6, 7,8])), np.array([1e16, 4.5,4.5]))
+    assert np.allclose(eer._get_max_power(np.array([1, 11, 20]), month_indices=np.array([6, 7, 8])),
+                       np.array([1e16, 4.5, 4.5]))
     eer = EERCombined(eer_part, 10, months_active_cooling=np.array([7, 8, 9]))
     assert eer._get_max_power(1, 0, 0) == 4.5
     assert eer._get_max_power(11, 0, 0) == 4.5
-    assert np.allclose(eer._get_max_power(np.array([1, 11, 20]), month_indices=np.array([6, 7,8])), np.array([4.5, 1e16, 1e16]))
-    assert np.allclose(eer._get_max_power(1, month_indices=np.array([6, 7,8])), np.array([4.5, 1e16, 1e16]))
+    assert np.allclose(eer._get_max_power(np.array([1, 11, 20]), month_indices=np.array([6, 7, 8])),
+                       np.array([4.5, 1e16, 1e16]))
+    assert np.allclose(eer._get_max_power(1, month_indices=np.array([6, 7, 8])), np.array([4.5, 1e16, 1e16]))
 
     # with threshold and month array
     eer = EERCombined(20, eer_part, 10, months_active_cooling=np.array([7, 8, 9]))
     assert eer._get_max_power(1, 0, 0) == 1e16
-    assert np.allclose(eer._get_max_power(np.array([1, 10, 20]), month_indices=np.array([6, 7,8])), np.array([1e16, 4.5, 4.5]))
+    assert np.allclose(eer._get_max_power(np.array([1, 10, 20]), month_indices=np.array([6, 7, 8])),
+                       np.array([1e16, 4.5, 4.5]))
+
 
 def test_eq_eer_combined():
     eer_combined = EERCombined(20, 5, 10)
@@ -582,6 +686,31 @@ def test_graph_efficiency(monkeypatch):
     plot_heat_pump_envelope(points_HP300, eff_HP300)
 
 
+# def test_graph_efficiency_2(monkeypatch):
+#     data = [[-4.5, 32.5, 53.6], [-4.5, 32.5, 39.8], [-4.5, 32.5, 23.2], [-1.5, 32.5, 58.7], [-1.5, 32.5, 43.7],
+#             [-1.5, 32.5, 25.5], [3.5, 32.5, 67.9], [3.5, 32.5, 50.7], [3.5, 32.5, 29.6], [8.5, 32.5, 77.6],
+#             [8.5, 32.5, 58.3], [8.5, 32.5, 33.9], [11.5, 32.5, 83.9], [11.5, 32.5, 62.9], [11.5, 32.5, 36.6],
+#             [-4.5, 52.5, 44.8], [-4.5, 52.5, 34.1], [-4.5, 52.5, 18.9], [-1.5, 52.5, 49.3], [-1.5, 52.5, 37.4],
+#             [-1.5, 52.5, 20.9], [3.5, 52.5, 57.2], [3.5, 52.5, 43.2], [3.5, 52.5, 24.3], [8.5, 52.5, 62.5],
+#             [8.5, 52.5, 49.7], [8.5, 52.5, 28.1], [11.5, 52.5, 67.8], [11.5, 52.5, 53.7], [11.5, 52.5, 30.5]]
+#     eff = [3.86, 4.28, 3.93, 4.08, 4.6, 4.18, 4.53, 5.12, 4.7, 5.04, 5.72, 5.3, 5.41, 6.17, 5.63, 2.53, 2.89, 2.52,
+#            2.88, 3.02, 2.68, 3.14, 3.25, 2.89, 3.61, 3.52, 3.12, 3.83, 3.68, 3.32]
+#     # data = [
+#     #     [-4.5, 52.5, 44.8], [-4.5, 52.5, 34.1], [-4.5, 52.5, 18.9], [-1.5, 52.5, 49.3], [-1.5, 52.5, 37.4],
+#     #     [-1.5, 52.5, 20.9], [3.5, 52.5, 57.2], [3.5, 52.5, 43.2], [3.5, 52.5, 24.3], ]
+#     # eff = [2.53, 2.89, 2.52,
+#     #        2.88, 3.02, 2.68, 3.14, 3.25, 2.89, ]
+#     cop = COP(np.array(eff), np.array(data), part_load=True, secondary=True)
+#     range = np.linspace(35, 49.3, 10)
+#     plot_heat_pump_envelope([[-1.5, 52.5, i] for i in range], [cop.get_COP(-1.5, 52.5, i) for i in range], )
+#
+#     plot_heat_pump_envelope(data, eff)
+#     plt.show()
+#     cascaded_system_points, cascaded_system_eff = combine_n_heat_pumps([data] * 2, [eff] * 2)
+#     plot_heat_pump_envelope(cascaded_system_points, cascaded_system_eff)
+#     plt.show()
+
+
 def test_combine_heat_pumps():
     combine_n_heat_pumps([points_HP300, points_HP300, points_HP300], [eff_HP300, eff_HP300, eff_HP300])
     combine_n_heat_pumps([points_HP300], [eff_HP300])
@@ -590,11 +719,369 @@ def test_combine_heat_pumps():
 
 
 def test_find_optimal_heat_pump_configuration():
-    hp_300 = COP(eff_HP300, points_HP300, part_load=True)
-    hp_400 = COP(eff_HP400, points_HP400, part_load=True)
-    hp_500 = COP(eff_HP500, points_HP500, part_load=True)
+    hp_300 = COP(eff_HP300, points_HP3, part_load=True)
+    hp_400 = COP(eff_HP400, points_HP4, part_load=True)
+    hp_500 = COP(eff_HP500, points_HP5, part_load=True)
 
     assert np.allclose(_find_optimal_heat_pump_configuration([hp_300, hp_400, hp_500], 30, prim_temp=-1), [1, 0, 0])
     assert np.allclose(_find_optimal_heat_pump_configuration([hp_300, hp_400, hp_500], 70, prim_temp=-1), [0, 1, 0])
     assert np.allclose(_find_optimal_heat_pump_configuration([hp_300, hp_400, hp_500], 80, prim_temp=-1), [0, 0, 1])
     assert np.allclose(_find_optimal_heat_pump_configuration([hp_300, hp_500, hp_400], 120, prim_temp=-1), [1, 0, 1])
+
+
+def test_cop_carnot():
+    with pytest.raises(ValueError):
+        _cop_carnot(300, 200)
+
+    assert np.isclose(_cop_carnot(0, 10), 283.15 / 10)
+
+
+def test_eer_carnot():
+    with pytest.raises(ValueError):
+        _eer_carnot(300, 200)
+
+    assert np.isclose(_eer_carnot(0, 10), 283.15 / 10 - 1)
+    assert np.isclose(_eer_carnot(0, 10), _cop_carnot(0, 10) - 1)
+
+
+def test_cop_eer_non_modulating_error():
+    with pytest.raises(ValueError):
+        COPNonModulating(
+            np.array([10, 10, 10]),
+            np.array([0, 1, 2]),
+            np.array([5, 5, 5]),
+            np.array([4, 4])
+        )
+    with pytest.raises(ValueError):
+        COPNonModulating(
+            np.array([10, 10, 10]),
+            np.array([0, 0, 0]),
+            np.array([5, 5, 5]),
+            np.array([4, 4, 4])
+        )
+    with pytest.raises(ValueError):
+        COPNonModulating(
+            np.array([10, 10, 10]),
+            np.array([0, 1, 12]),
+            np.array([5, 5, 5]),
+            np.array([4, 4, 4])
+        )
+    with pytest.raises(ValueError):
+        COPNonModulating(
+            np.array([10, 10, 10]),
+            np.array([0, 1, 2]),
+            np.array([5, 5, -5]),
+            np.array([4, 4, 4])
+        )
+    with pytest.raises(ValueError):
+        EERNonModulating(
+            np.array([10, 10, 10]),
+            np.array([0, 1, 2]),
+            np.array([5, 5, 5]),
+            np.array([4, 4])
+        )
+    with pytest.raises(ValueError):
+        EERNonModulating(
+            np.array([10, 10, 10]),
+            np.array([0, 0, 0]),
+            np.array([5, 5, 5]),
+            np.array([4, 4, 4])
+        )
+    with pytest.raises(ValueError):
+        EERNonModulating(
+            np.array([10, 10, 10]),
+            np.array([0, 1, 12]),
+            np.array([5, 5, 5]),
+            np.array([4, 4, 4])
+        )
+    with pytest.raises(ValueError):
+        EERNonModulating(
+            np.array([10, 10, 10]),
+            np.array([0, 1, 2]),
+            np.array([5, 5, -5]),
+            np.array([4, 4, 4])
+        )
+
+
+def test_cop_non_modulating_ranges():
+    cop = COPNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55,
+    )
+
+    assert 25 == cop._fit_within_range(-5)
+    assert 55 == cop._fit_within_range(500)
+
+
+def test_eer_non_modulating_ranges():
+    eer = EERNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55,
+    )
+
+    assert 25 == eer._fit_within_range(-5)
+    assert 55 == eer._fit_within_range(500)
+
+
+def test_cop_non_modulating_envelope(monkeypatch):
+    import matplotlib.pyplot as plt
+    monkeypatch.setattr(plt, "show", lambda: None)
+    cop = COPNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55,
+    )
+    cop.plot_efficiency_curve()
+
+
+def test_eer_non_modulating_envelope(monkeypatch):
+    import matplotlib.pyplot as plt
+    monkeypatch.setattr(plt, "show", lambda: None)
+    eer = EERNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55,
+    )
+    eer.plot_efficiency_curve()
+
+
+def test_cop_non_modulating_cop():
+    cop = COPNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55, default_condenser_temperature=35,
+        min_temperature_lift=22
+    )
+    assert np.isclose(cop._r_squared, 0.9386003022252285)
+    assert np.isclose(cop.get_COP(0, 35), 3.73314402328)
+    assert cop.get_COP(0) == cop.get_COP(0, 35)
+    assert cop.get_COP(0, 10) == cop.get_COP(0, 22)
+    assert cop.get_COP(0, 60) == cop.get_COP(0, 55)
+    assert cop.get_COP(50, 55) == cop.get_COP(50, 65)
+
+
+def test_eer_non_modulating_cop():
+    eer = EERNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67,
+             3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67,
+             3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55, default_evaporator_temperature=7,
+        min_temperature_lift=22
+    )
+    assert np.isclose(eer._r_squared, 0.9667074164346418)
+    assert np.isclose(eer.get_EER(35, 0), 3.7308134424125146)
+    assert eer.get_EER(0) == eer.get_EER(29, 7)
+    assert eer.get_EER(44, 22) == eer.get_EER(0, 22)
+    assert eer.get_EER(55, 7) == eer.get_EER(60, 7)
+
+
+def test_cop_non_modulating_get_max_power():
+    cop = COPNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55, default_condenser_temperature=35,
+        min_temperature_lift=22
+    )
+
+    assert cop._get_max_power(0) == 3.52
+    assert cop._get_max_power(0, 35) == 3.52
+    assert cop._get_max_power(10, 45) == 3.95
+    cop = COPNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6 + [70]),
+        np.concatenate([np.repeat([0, 2, 4, 6, 8, 10], 5), [3]]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11, 8]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11, 8]),
+        min_condenser_temperature=25, max_condenser_temperature=75, default_condenser_temperature=35,
+        min_temperature_lift=22
+    )
+    assert cop._get_max_power(3, 70) == 8
+
+
+def test_eer_non_modulating_get_max_power():
+    eer = EERNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55, default_evaporator_temperature=7,
+        min_temperature_lift=22
+    )
+
+    assert eer._get_max_power(0) == 4.33
+    assert eer._get_max_power(0, 22) == 4.33
+    assert eer._get_max_power(0) == eer._get_max_power(29)
+
+
+def test_cop_non_modulating_scop():
+    cop = COPNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55, default_condenser_temperature=35,
+        min_temperature_lift=22
+    )
+    with pytest.raises(ValueError):
+        cop.get_SCOP(np.array([1, 2]), np.array([1, 2, 3]))
+
+    assert cop.get_SCOP(np.array([1, 2, 3]), np.array([1, 2, 3])) == cop.get_SCOP(np.array([1, 2, 3]),
+                                                                                  np.array([1, 2, 3]),
+                                                                                  np.array([35, 35, 35]))
+    assert np.isclose(cop.get_SCOP(np.array([1, 2, 3]), np.array([1, 2, 3])), 3.842963510674943)
+    cop._min_lift = 35
+    assert np.isclose(cop.get_SCOP(np.array([1, 2, 3]), np.array([1, 2, 3])), 3.7613899408578737)
+
+
+def test_eer_non_modulating_seer():
+    eer = EERNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55, default_evaporator_temperature=7,
+        min_temperature_lift=22
+    )
+    with pytest.raises(ValueError):
+        eer.get_SEER(np.array([1, 2]), np.array([1, 2, 3]))
+
+    assert eer.get_SEER(np.array([1, 2, 3]), np.array([1, 2, 3])) == eer.get_SEER(np.array([1, 2, 3]),
+                                                                                  np.array([1, 2, 3]),
+                                                                                  np.array([7, 7, 7]))
+    assert np.isclose(eer.get_SEER(np.array([1, 2, 3]), np.array([1, 2, 3])), 4.198785808630919)
+    eer._min_lift = 35
+    assert np.isclose(eer.get_SEER(np.array([1, 2, 3]), np.array([1, 2, 3])), 3.826422792941117)
+
+
+def test_cop_non_modulating_export():
+    cop = COPNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55, default_condenser_temperature=35,
+        min_temperature_lift=22
+    )
+    assert {'type': 'Non-modulating COP'} == cop.__export__()
+
+
+def test_eer_non_modulating_export():
+    eer = EERNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55, default_evaporator_temperature=35,
+        min_temperature_lift=22
+    )
+    assert {'type': 'Non-modulating EER'} == eer.__export__()
+
+
+def test_convert_cop_to_eer():
+    cop = COPNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55, default_condenser_temperature=35,
+        min_temperature_lift=22
+    )
+    eer = cop.convert_to_eer_non_modulating(7)
+    assert eer._min_lift == 22
+    assert eer._min_temperature == 25
+    assert eer._max_temperature == 55
+    assert np.isclose(eer._power[0], 2.5199999999999996)
+    assert eer._efficiency[0] == 2.52
+
+
+def test_convert_eer_to_cop():
+    eer = EERNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55, default_evaporator_temperature=7,
+        min_temperature_lift=22
+    )
+    cop = eer.convert_to_cop_non_modulating(35)
+    assert cop._min_lift == 22
+    assert cop._min_temperature == 25
+    assert cop._max_temperature == 55
+    assert np.isclose(cop._power[0], 4.916825396825398)
+    assert cop._efficiency[0] == 4.52
