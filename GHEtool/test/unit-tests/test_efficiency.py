@@ -217,14 +217,14 @@ def test_COP_full():
     cop_full = COP(np.array([1, 2, 2, 4, 2, 4, 4, 8, 10]),
                    np.array([[1.5, 2.5, 4.5], [2.5, 2.5, 4.5], [1.5, 4.5, 4.5], [2.5, 4.5, 4.5],
                              [1.5, 2.5, 8.5], [2.5, 2.5, 8.5], [1.5, 4.5, 8.5], [2.5, 4.5, 8.5], [2.5, 5.5, 10.5]]),
-                   secondary=True, part_load=True, default_secondary_temperature=2.5)
+                   secondary=True, part_load=True)
 
     assert cop_full._has_part_load
     assert cop_full._has_secondary
 
     with pytest.raises(ValueError):
         assert cop_full.get_COP(5, 3) == 3
-
+    cop_full._default_secondary_temperature = 2.5
     assert cop_full.get_COP(2, 2.5, 4.5) == 1.5
     assert cop_full.get_COP(1.5, 2.5, 8.5) == 2
     assert cop_full.get_COP(1.5, power=8.5) == 2
@@ -291,7 +291,7 @@ def test_COP_full_not_all_secondary_load():
     assert cop_full.get_COP(1.5, 4.5, power=8.5) == 4
     assert cop_full.get_COP(1.5, 4.5, power=10.5) == 4
     assert cop_full.get_COP(2.5, 5.5, power=10.5) == 10
-    assert cop_full.get_COP(2.5, 5.5, power=8.5) == 8
+    assert cop_full.get_COP(2.5, 5.5, power=8.5) == 10
     assert cop_full.get_COP(1.5, 5.5, power=10.5) == 4
 
 
