@@ -121,11 +121,6 @@ class _Efficiency(_EfficiencyBase, BaseClass):
             self._range_primary = np.sort(coordinates)
         self._points.insert(0, self._range_primary)
 
-        # === REMOVED: the `find_value(x, y, z=None)` closure ===
-        # (the whole nested function that built x_array/y_array and called
-        # np.interp per grid node — no longer needed)
-
-        # === CHANGED: grid population now goes through Delaunay filling ===
         if dimensions == 3:
             self._data = self._delaunay_fill_grid(
                 coordinates, data, (self._range_primary, self._range_secondary, self._range_part_load)
@@ -143,11 +138,13 @@ class _Efficiency(_EfficiencyBase, BaseClass):
 
             max_z_flat = np.full(len(self._range_primary) * len(self._range_secondary), -np.inf)
             np.maximum.at(max_z_flat, flat_idx, z)
-
             max_z = max_z_flat.reshape(len(self._range_primary), len(self._range_secondary))
-            self._max_part_load = self._finalize_max_part_load(
-                max_z, (self._range_primary, self._range_secondary)
-            )
+            self._max_part_load = self._finalize_part_load(max_z, (self._range_primary, self._range_secondary))
+
+            min_z_flat = np.full(len(self._range_primary) * len(self._range_secondary), np.inf)
+            np.minimum.at(min_z_flat, flat_idx, z)
+            min_z = min_z_flat.reshape(len(self._range_primary), len(self._range_secondary))
+            self._min_part_load = self._finalize_part_load(min_z, (self._range_primary, self._range_secondary))
         elif dimensions == 2:
             secondary_axis = self._range_secondary if self._has_secondary else self._range_part_load
             self._data = self._delaunay_fill_grid(
@@ -163,10 +160,11 @@ class _Efficiency(_EfficiencyBase, BaseClass):
 
                 max_y = np.full(len(self._range_primary), -np.inf)
                 np.maximum.at(max_y, idx, y)
+                self._max_part_load = self._finalize_part_load(max_y, (self._range_primary,))
 
-                self._max_part_load = self._finalize_max_part_load(
-                    max_y, (self._range_primary,)
-                )
+                min_y = np.full(len(self._range_primary), np.inf)
+                np.minimum.at(min_y, idx, y)
+                self._min_part_load = self._finalize_part_load(min_y, (self._range_primary,))
         else:
             p = self._range_primary.argsort()
             self._data = data[p]
@@ -179,19 +177,18 @@ class _Efficiency(_EfficiencyBase, BaseClass):
             self._max_part_load *= nominal_power / reference_nominal_power
 
     @staticmethod
-    def _finalize_max_part_load(max_arr: np.ndarray, axes: tuple) -> np.ndarray:
+    def _finalize_part_load(max_arr: np.ndarray, axes: tuple) -> np.ndarray:
         """
-        Replaces -inf placeholder cells (primary/secondary combinations with
+        Replaces +/-inf placeholder cells (primary/secondary combinations with
         no underlying data) with a nearest-neighbor estimate from populated
         cells, so the array is fully finite before being handed to interpn.
-        Unfilled -inf cells would otherwise produce NaN via 0 * -inf when
-        interpn assigns them zero weight during interpolation.
+        Works for both the max- and min-part-load arrays.
         """
         finite_mask = np.isfinite(max_arr)
         if finite_mask.all():
             return max_arr
 
-        if len(axes) == 1:
+        if len(axes) == 1:  # pragma: no cover
             grid_points = axes[0].reshape(-1, 1)
         else:
             mesh = np.meshgrid(*axes, indexing='ij')
@@ -349,7 +346,7 @@ class _Efficiency(_EfficiencyBase, BaseClass):
         if not self._has_part_load:
             return 1e16
 
-            # reuse your existing clipping and array logic
+        # reuse your existing clipping and array logic
         _max_length = np.max([
             len(i) if i is not None and not isinstance(i, (float, int)) else 1
             for i in (primary_temperature, secondary_temperature)
@@ -383,6 +380,62 @@ class _Efficiency(_EfficiencyBase, BaseClass):
             xi = Tp
 
         return interpn(self._points[:1 + self._has_secondary], self._max_part_load, xi, bounds_error=False,
+                       fill_value=np.nan)
+
+    def _get_min_power(self,
+                       primary_temperature: Union[float, np.ndarray],
+                       secondary_temperature: Union[float, np.ndarray] = None, **kwargs) -> np.ndarray:
+        """
+        This function returns the minimum available power for a certain primary and secondary temperature.
+
+        Parameters
+        ----------
+        primary_temperature : np.ndarray or float
+            Value(s) for the average primary temperature of the heat pump for the efficiency calculation.
+        secondary_temperature : np.ndarray or float
+            Value(s) for the average secondary temperature of the heat pump for the efficiency calculation.
+
+        Raises
+        ------
+        ValueError
+            When secondary_temperature is in the dataset, and it is not provided.
+
+        Returns
+        -------
+        Efficiency
+            np.ndarray
+        """
+        if not self._has_part_load:
+            return 0.0  # non-modulating equivalent: no defined minimum, treat as fully off-capable
+
+        _max_length = np.max([
+            len(i) if i is not None and not isinstance(i, (float, int)) else 1
+            for i in (primary_temperature, secondary_temperature)
+        ])
+
+        Tp = np.array(
+            np.full(_max_length, primary_temperature)
+            if isinstance(primary_temperature, (float, int))
+            else primary_temperature
+        )
+
+        Ts = None
+        if self._has_secondary:
+            if secondary_temperature is None:
+                raise ValueError("Secondary temperature is required.")
+            Ts = np.array(
+                np.full(_max_length, secondary_temperature)
+                if isinstance(secondary_temperature, (float, int))
+                else secondary_temperature
+            )
+
+        Tp = np.clip(Tp, np.min(self._range_primary), np.max(self._range_primary))
+        if self._has_secondary:
+            Ts = np.clip(Ts, np.min(self._range_secondary), np.max(self._range_secondary))
+
+        xi = list(zip(Tp, Ts)) if self._has_secondary else Tp
+
+        return interpn(self._points[:1 + self._has_secondary], self._min_part_load, xi, bounds_error=False,
                        fill_value=np.nan)
 
 

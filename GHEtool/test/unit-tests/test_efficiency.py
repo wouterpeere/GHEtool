@@ -261,6 +261,9 @@ def test_COP_full_not_all_secondary_load():
     assert cop_full._get_max_power(2.5, 4.5, power=8.5) == 8.5
     assert cop_full._get_max_power(2.5, 5.5, power=10.5) == 10.5
     assert cop_full._get_max_power(1.5, 4.5) == 8.5
+    assert cop_full._get_min_power(2.5, 4.5, power=8.5) == 4.5
+    assert cop_full._get_min_power(2.5, 5.5, power=10.5) == 10.5
+    assert cop_full._get_min_power(1.5, 4.5) == 4.5
     assert cop_full.get_COP(1.5, 4.5, power=8.5) == 4
     assert cop_full.get_COP(1.5, 4.5, power=10.5) == 4
     assert cop_full.get_COP(2.5, 5.5, power=10.5) == 10
@@ -771,7 +774,7 @@ def test_cop_non_modulating_envelope(monkeypatch):
 def test_eer_non_modulating_envelope(monkeypatch):
     import matplotlib.pyplot as plt
     monkeypatch.setattr(plt, "show", lambda: None)
-    eer = COPNonModulating(
+    eer = EERNonModulating(
         np.array([35, 45, 55, 60, 65] * 6),
         np.repeat([0, 2, 4, 6, 8, 10], 5),
         np.array(
@@ -845,6 +848,19 @@ def test_cop_non_modulating_get_max_power():
     assert cop._get_max_power(0) == 3.52
     assert cop._get_max_power(0, 35) == 3.52
     assert cop._get_max_power(10, 45) == 3.95
+    cop = COPNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6 + [70]),
+        np.concatenate([np.repeat([0, 2, 4, 6, 8, 10], 5), [3]]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11, 8]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11, 8]),
+        min_condenser_temperature=25, max_condenser_temperature=75, default_condenser_temperature=35,
+        min_temperature_lift=22
+    )
+    assert cop._get_max_power(3, 70) == 8
 
 
 def test_eer_non_modulating_get_max_power():
