@@ -820,6 +820,63 @@ def test_cop_non_modulating_ranges():
     assert 55 == cop._fit_within_range(500)
 
 
+def test_cop_non_modulating_convert():
+    cop_non_mod = COPNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.03, 2.83, 2.54, 2.35, 2.16, 3.26, 3.06, 2.77, 2.6, 2.39, 3.49, 3.3, 3.01, 2.84, 2.64, 2.74, 2.54, 3.26,
+             3.09, 2.89, 3.99, 3.8, 3.51, 3.34, 3.14, 4.25, 4.06, 3.78, 3.6, 3.41]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55,
+    )
+    cop_reg = cop_non_mod.convert_to_regular_COP(-10, 20)
+
+    # test efficiency
+    assert np.isclose(cop_non_mod.get_COP(0, 35, 1), cop_reg.get_COP(0, 35, 1))
+    assert np.isclose(cop_non_mod.get_COP(0, 15, 1), cop_reg.get_COP(0, 15, 1))
+    assert np.isclose(cop_non_mod.get_COP(0, 45, 1), cop_reg.get_COP(0, 45, 1))
+    assert np.isclose(cop_non_mod.get_COP(5, 35, 1), cop_reg.get_COP(5, 35, 1))
+    assert np.isclose(cop_non_mod.get_COP(-5, 35, 1), cop_reg.get_COP(-5, 35, 1))
+    assert np.isclose(cop_non_mod.get_COP(-5.5, 35, 1), cop_reg.get_COP(-5.5, 35, 1))
+
+    # test max power
+    assert np.isclose(cop_non_mod._get_max_power(0, 35), cop_reg._get_max_power(0, 35))
+    assert np.isclose(cop_non_mod._get_max_power(0, 45), cop_reg._get_max_power(0, 45))
+    assert np.isclose(cop_non_mod._get_max_power(5, 35), cop_reg._get_max_power(5, 35))
+    assert np.isclose(cop_non_mod._get_max_power(-5, 35), cop_reg._get_max_power(-5, 35))
+    assert np.isclose(cop_non_mod._get_max_power(-5.5, 35), cop_reg._get_max_power(-5.5, 35))
+
+
+def test_eer_non_modulating_convert():
+    eer_non_mod = EERNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.03, 2.83, 2.54, 2.35, 2.16, 3.26, 3.06, 2.77, 2.6, 2.39, 3.49, 3.3, 3.01, 2.84, 2.64, 2.74, 2.54, 3.26,
+             3.09, 2.89, 3.99, 3.8, 3.51, 3.34, 3.14, 4.25, 4.06, 3.78, 3.6, 3.41]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55,
+    )
+    eer_reg = eer_non_mod.convert_to_regular_EER(-10, 20)
+
+    # test efficiency
+    assert np.isclose(eer_non_mod.get_EER(35, 0, 1), eer_reg.get_EER(35, 0, 1))
+    assert np.isclose(eer_non_mod.get_EER(35, 7, 1), eer_reg.get_EER(35, 7, 1))
+    assert np.isclose(eer_non_mod.get_EER(35, 17, 1), eer_reg.get_EER(35, 17, 1))
+    assert np.isclose(eer_non_mod.get_EER(45, 10, 1), eer_reg.get_EER(45, 10, 1))
+
+    # test max power
+    assert np.isclose(eer_non_mod._get_max_power(35, 0), eer_reg._get_max_power(35, 0))
+    assert np.isclose(eer_non_mod._get_max_power(35, 7), eer_reg._get_max_power(35, 7))
+    assert np.isclose(eer_non_mod._get_max_power(35, 17), eer_reg._get_max_power(35, 17))
+    assert np.isclose(eer_non_mod._get_max_power(45, 10), eer_reg._get_max_power(45, 10))
+
+
 def test_eer_non_modulating_ranges():
     eer = EERNonModulating(
         np.array([35, 45, 55, 60, 65] * 6),

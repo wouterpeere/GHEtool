@@ -3,6 +3,7 @@ import copy
 import numpy as np
 import matplotlib.pyplot as plt
 
+from GHEtool.VariableClasses.Efficiency.EER import EER
 from scipy.interpolate import LinearNDInterpolator, NearestNDInterpolator
 from scipy.spatial import QhullError
 from typing import Union
@@ -330,6 +331,36 @@ class EERNonModulating:
             default_condenser_temperature=default_condenser_temperature
         )
         return cop
+
+    def convert_to_regular_EER(self, min_evaporator_temperature: float, max_evaporator_temperature: float) -> EER:
+        """
+        This function converts the current class to an equivalent EER class by creating an interpolation grid.
+
+        Parameters
+        ----------
+        min_evaporator_temperature : float
+            Minimum evaporator temperature to consider [°C]
+        max_evaporator_temperature : float
+            Maximum evaporator temperature to consider [°C]
+
+        Returns
+        -------
+        EER
+            EER object with the efficiency of the heat pump
+        """
+
+        eva_temperatures = np.arange(min_evaporator_temperature, max_evaporator_temperature, 1)
+        cond_temperatures = np.arange(self._min_temperature, self._max_temperature, 1)
+
+        data = []
+        eff = []
+        for eva_temp in eva_temperatures:
+            for cond_temp in cond_temperatures:
+                data.append([cond_temp, eva_temp, self._get_max_power(cond_temp, eva_temp)])
+                eff.append(self._get_efficiency(cond_temp, eva_temp))
+
+        return EER(np.array(eff), np.array(data), True, True,
+                   default_secondary_temperature=self._secondary_temp)
 
     def __export__(self):
         return {'type': 'Non-modulating EER'}
