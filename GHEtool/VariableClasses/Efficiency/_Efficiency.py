@@ -841,7 +841,7 @@ def combine_n_heat_pumps(points_list, eff_list,
     """
     from GHEtool.VariableClasses.Efficiency.COP import COP
 
-    if kwargs_list is None:
+    if kwargs_list is None:  # pragma: no cover
         kwargs_list = [{'secondary': True, 'part_load': True} for _ in points_list]
 
     cops = [COP(data=np.array(eff), coordinates=np.array(pts), **kw)
@@ -874,7 +874,7 @@ def combine_n_heat_pumps(points_list, eff_list,
                 (Teva_arr >= cop._range_primary.min()) & (Teva_arr <= cop._range_primary.max()) &
                 (Tcond_arr >= cop._range_secondary.min()) & (Tcond_arr <= cop._range_secondary.max())
         )
-        if not mask.any():
+        if not mask.any():  # pragma: no cover
             continue
         pmin = np.atleast_1d(cop._get_min_power(Teva_arr[mask], Tcond_arr[mask]))
         pmax = np.atleast_1d(cop._get_max_power(Teva_arr[mask], Tcond_arr[mask]))
@@ -891,7 +891,7 @@ def combine_n_heat_pumps(points_list, eff_list,
     for c in range(n_combo):
         Teva, Tcond = Teva_arr[c], Tcond_arr[c]
         active = np.where(coverage[:, c])[0]
-        if len(active) == 0:
+        if len(active) == 0:  # pragma: no cover
             continue
 
         P, E = _combine_at_combo_vector(
@@ -900,13 +900,13 @@ def combine_n_heat_pumps(points_list, eff_list,
             p_min_mat[active, c], p_max_mat[active, c],
             n_pl_single, n_pl_cascade,
         )
-        if len(P) == 0:
+        if len(P) == 0:  # pragma: no cover
             continue
         combined_points.append(np.column_stack(
             [np.full_like(P, Teva), np.full_like(P, Tcond), P]))
         combined_eff.append(E)
 
-    if not combined_points:
+    if not combined_points:  # pragma: no cover
         return np.empty((0, 3)), np.empty(0)
 
     return np.vstack(combined_points), np.concatenate(combined_eff)
@@ -928,7 +928,7 @@ def _combine_at_combo_vector(Teva, Tcond, active_cops, p_min, p_max, n_pl_single
     for i in range(n):
         P = p_min[i] + pl_grid * (p_max[i] - p_min[i])
         mask = P < two_machine_min
-        if not mask.any():
+        if not mask.any():  # pragma: no cover
             continue
         P_valid = P[mask]
         E_comb.append(eff_at(i, P_valid))

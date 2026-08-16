@@ -733,6 +733,9 @@ def test_combine_heat_pumps_2():
 
     assert np.isclose(hp._get_max_power(0, 35), 20)
 
+    cascaded_system_points, cascaded_system_eff = combine_n_heat_pumps([hp._coordinates_, points_HP300],
+                                                                       [hp._data_, eff_HP300])
+
 
 def test_combine_heat_pumps():
     import pickle
