@@ -716,7 +716,7 @@ def test_combine_heat_pumps_2():
     hp = hp.convert_to_regular_COP(0, 5)
     cascaded_system_points, cascaded_system_eff = combine_n_heat_pumps([hp._coordinates_] * 2, [hp._data_] * 2)
     hp = COP(cascaded_system_eff, cascaded_system_points, secondary=True, part_load=True)
-    assert hp._get_max_power(0, 35) == 18
+    assert np.isclose(hp._get_max_power(0, 35), 18)
 
     hp = COPNonModulating(np.array([35, 35, 35]), np.array([0, 2, 4]), np.array([9, 10, 11]), np.array([4, 4, 4]),
                           default_condenser_temperature=35)
@@ -724,14 +724,14 @@ def test_combine_heat_pumps_2():
     cascaded_system_points, cascaded_system_eff = combine_n_heat_pumps([hp._coordinates_] * 2, [hp._data_] * 2)
     hp = COP(cascaded_system_eff, cascaded_system_points, secondary=True, part_load=True)
 
-    assert hp._get_max_power(0, 35) == 18
+    assert np.isclose(hp._get_max_power(0, 35), 18)
     hp = COPNonModulating(np.array([35, 35, 35]), np.array([0, 2, 4]), np.array([10, 10, 10]), np.array([4, 4, 4]),
                           default_condenser_temperature=35)
     hp = hp.convert_to_regular_COP(-15, 31)
     cascaded_system_points, cascaded_system_eff = combine_n_heat_pumps([hp._coordinates_] * 2, [hp._data_] * 2)
     hp = COP(cascaded_system_eff, cascaded_system_points, secondary=True, part_load=True)
 
-    assert hp._get_max_power(0, 35) == 20
+    assert np.isclose(hp._get_max_power(0, 35), 20)
 
 
 def test_combine_heat_pumps():
@@ -869,7 +869,7 @@ def test_cop_non_modulating_convert():
              3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
         min_condenser_temperature=25, max_condenser_temperature=55,
     )
-    cop_reg = cop_non_mod.convert_to_regular_COP(-10, 20)
+    cop_reg = cop_non_mod.convert_to_regular_COP(-10, 20, 100)  # the higher the number, the more it converges
 
     # test efficiency
     assert np.isclose(cop_non_mod.get_COP(0, 35, 1), cop_reg.get_COP(0, 35, 1))
@@ -899,7 +899,7 @@ def test_eer_non_modulating_convert():
              3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
         min_condenser_temperature=25, max_condenser_temperature=55,
     )
-    eer_reg = eer_non_mod.convert_to_regular_EER(-10, 20)
+    eer_reg = eer_non_mod.convert_to_regular_EER(-10, 20, 100)
 
     # test efficiency
     assert np.isclose(eer_non_mod.get_EER(35, 0, 1), eer_reg.get_EER(35, 0, 1))

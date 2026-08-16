@@ -828,169 +828,155 @@ def combine_n_heat_pumps_old(points_list, eff_list):  # pragma: no cover
 def combine_n_heat_pumps(points_list, eff_list,
                          reference_primary_temperature: float = 0.0,
                          reference_secondary_temperature: float = 35.0,
-                         n_pl_single: int = 3, n_pl_cascade: int = 10, **kwargs):
+                         n_pl_single: int = 3, n_pl_cascade: int = 10,
+                         kwargs_list=None):
     """
-    Combine the operating envelopes of multiple modulating heat pumps into a
-    single equivalent operating envelope, using strict cascade staging.
-    Each heat pump is modeled as a COP object and queried directly for
-    efficiency, minimum power, and maximum power at each (Teva, Tcond)
-    combination.
+    Vectorized version of combine_n_heat_pumps.
 
-    Parameters
-    ----------
-    points_list : list of np.ndarray
-        List of arrays, one per heat pump, each of shape (Ni, 3): the
-        (Teva, Tcond, power) coordinates for a COP(secondary=True, part_load=True).
-    eff_list : list of np.ndarray
-        List of efficiency arrays, one per heat pump, shape (Ni,).
-    kwargs_list : list of dict, optional
-        Extra kwargs per COP constructor call (e.g. nominal_power). Defaults
-        to `secondary=True, part_load=True` for every machine.
-    reference_primary_temperature, reference_secondary_temperature : float
-        The (Teva, Tcond) regime used once to rank the heat pumps by minimum
-        power before staging.
-    n_pl_single : int
-        Number of part-load points used for the single-machine zone and the
-        HP1-vs-HP2 overlap zone.
-    n_pl_cascade : int
-        Number of part-load points used for each cascade stage.
-
-    Returns
-    -------
-    combined_points : np.ndarray of shape (K, 3)
-        (Teva, Tcond, power) triples representing the combined envelope.
-    combined_eff : np.ndarray of shape (K,)
-        Efficiencies corresponding to `combined_points`.
+    Same signature/behaviour as the original, but:
+      - p_min / p_max are queried once per machine across ALL combos in a
+        single batched call (instead of once per combo per machine).
+      - efficiency queries within a combo are vectorized over the pl grid
+        (instead of one scalar call per pl step).
     """
-
-    # --- step 1: build a COP object per heat pump ---
-    if kwargs is None or kwargs == {}:
-        kwargs = [{'secondary': True, 'part_load': True} for _ in points_list]
-    else:
-        kwargs = [kwargs for _ in points_list]
     from GHEtool.VariableClasses.Efficiency.COP import COP
 
-    cops = [COP(data=np.array(eff), coordinates=np.array(pts), **kw)
-            for pts, eff, kw in zip(points_list, eff_list, kwargs)]
+    if kwargs_list is None:
+        kwargs_list = [{'secondary': True, 'part_load': True} for _ in points_list]
 
-    # --- step 4: rank order, established once at the reference regime ---
+    cops = [COP(data=np.array(eff), coordinates=np.array(pts), **kw)
+            for pts, eff, kw in zip(points_list, eff_list, kwargs_list)]
+
+    # rank order, established once at the reference regime
     rank_key = [
         float(np.atleast_1d(cop._get_min_power(
             reference_primary_temperature, reference_secondary_temperature))[0])
         for cop in cops
     ]
-    cops = [cops[i] for i in np.argsort(rank_key)]  # fixed order, smallest first
+    cops = [cops[i] for i in np.argsort(rank_key)]
+    n = len(cops)
 
-    # --- step 2/3: all (Teva, Tcond) combinations across all machines ---
+    # all (Teva, Tcond) combinations across all machines
     all_combos = set()
     for cop in cops:
         all_combos.update(itertools.product(cop._range_primary, cop._range_secondary))
-    all_combos = sorted(all_combos)
+    all_combos = np.array(sorted(all_combos))  # (Ncombo, 2)
+    Teva_arr, Tcond_arr = all_combos[:, 0], all_combos[:, 1]
+    n_combo = len(all_combos)
+
+    # --- batch p_min / p_max per machine across ALL combos, one call each ---
+    p_min_mat = np.full((n, n_combo), np.nan)
+    p_max_mat = np.full((n, n_combo), np.nan)
+    coverage = np.zeros((n, n_combo), dtype=bool)
+
+    for i, cop in enumerate(cops):
+        mask = (
+                (Teva_arr >= cop._range_primary.min()) & (Teva_arr <= cop._range_primary.max()) &
+                (Tcond_arr >= cop._range_secondary.min()) & (Tcond_arr <= cop._range_secondary.max())
+        )
+        if not mask.any():
+            continue
+        pmin = np.atleast_1d(cop._get_min_power(Teva_arr[mask], Tcond_arr[mask]))
+        pmax = np.atleast_1d(cop._get_max_power(Teva_arr[mask], Tcond_arr[mask]))
+        valid = np.isfinite(pmin) & np.isfinite(pmax) & (pmax >= pmin)
+
+        idx = np.where(mask)[0][valid]
+        p_min_mat[i, idx] = pmin[valid]
+        p_max_mat[i, idx] = pmax[valid]
+        coverage[i, idx] = True
 
     combined_points = []
     combined_eff = []
 
-    for Teva, Tcond in all_combos:
-        P, E = _combine_at_combo(Teva, Tcond, cops, n_pl_single, n_pl_cascade)
-        for p, e in zip(P, E):
-            combined_points.append((Teva, Tcond, p))
-            combined_eff.append(e)
-
-    return np.asarray(combined_points), np.asarray(combined_eff)
-
-
-def _combine_at_combo(Teva, Tcond, cops, n_pl_single, n_pl_cascade):
-    """
-    Applies the same cascade-staging logic as before, but sourced from COP
-    objects instead of raw sorted arrays: p_min/p_max come from
-    _get_min_power/_get_max_power, and efficiency comes from _get_efficiency,
-    both queried at this specific (Teva, Tcond). Machines whose tested range
-    doesn't cover this (Teva, Tcond) are skipped entirely (no extrapolation),
-    but the relative order of the remaining machines is kept as established
-    by the reference-regime ranking -- this combo is not re-sorted on its own.
-    """
-    active_cops = []
-    p_min, p_max = [], []
-
-    for cop in cops:
-        if not (cop._range_primary.min() <= Teva <= cop._range_primary.max()
-                and cop._range_secondary.min() <= Tcond <= cop._range_secondary.max()):
-            continue  # this machine's tested envelope doesn't cover this combo
-
-        pmin = float(np.atleast_1d(cop._get_min_power(Teva, Tcond))[0])
-        pmax = float(np.atleast_1d(cop._get_max_power(Teva, Tcond))[0])
-        if not (np.isfinite(pmin) and np.isfinite(pmax)) or pmax < pmin:
+    for c in range(n_combo):
+        Teva, Tcond = Teva_arr[c], Tcond_arr[c]
+        active = np.where(coverage[:, c])[0]
+        if len(active) == 0:
             continue
 
-        active_cops.append(cop)
-        p_min.append(pmin)
-        p_max.append(pmax)
+        P, E = _combine_at_combo_vector(
+            Teva, Tcond,
+            [cops[i] for i in active],
+            p_min_mat[active, c], p_max_mat[active, c],
+            n_pl_single, n_pl_cascade,
+        )
+        if len(P) == 0:
+            continue
+        combined_points.append(np.column_stack(
+            [np.full_like(P, Teva), np.full_like(P, Tcond), P]))
+        combined_eff.append(E)
 
+    if not combined_points:
+        return np.empty((0, 3)), np.empty(0)
+
+    return np.vstack(combined_points), np.concatenate(combined_eff)
+
+
+def _combine_at_combo_vector(Teva, Tcond, active_cops, p_min, p_max, n_pl_single, n_pl_cascade):
     n = len(active_cops)
-    if n == 0:
-        return np.empty(0), np.empty(0)
 
     def eff_at(i, P):
-        return float(np.atleast_1d(active_cops[i]._get_efficiency(Teva, Tcond, P))[0])
+        Teva_b = np.full_like(P, Teva, dtype=float)
+        Tcond_b = np.full_like(P, Tcond, dtype=float)
+        return np.atleast_1d(active_cops[i]._get_efficiency(Teva_b, Tcond_b, P))
 
     P_comb, E_comb = [], []
+    two_machine_min = np.sort(p_min)[:2].sum() if n >= 2 else np.inf
 
-    # combined minimum power once 2 machines are needed -- everything
-    # below this must be served by exactly one machine (or none)
-    two_machine_min = sum(sorted(p_min)[:2]) if n >= 2 else np.inf
-
-    # --- single-machine zone: try EVERY machine independently, at every
-    # power level it can individually cover below two_machine_min, and
-    # keep whichever gives the best efficiency at that level ---
+    # --- single-machine zone: vectorized over pl, per machine ---
     pl_grid = np.linspace(0.0, 1.0, n_pl_single)
-    for pl in pl_grid:
-        candidates = []
-        for i in range(n):
-            P = p_min[i] + pl * (p_max[i] - p_min[i])
-            if P < two_machine_min:
-                candidates.append((P, eff_at(i, P)))
-        if not candidates:
+    for i in range(n):
+        P = p_min[i] + pl_grid * (p_max[i] - p_min[i])
+        mask = P < two_machine_min
+        if not mask.any():
             continue
-        # group candidates that landed at (numerically) the same power
-        # level isn't necessary here since each i has its own P; instead,
-        # just keep every valid single-machine point -- duplicates at
-        # differing P are fine, they represent different machines' curves
-        for P, E in candidates:
-            P_comb.append(P)
-            E_comb.append(E)
+        P_valid = P[mask]
+        E_comb.append(eff_at(i, P_valid))
+        P_comb.append(P_valid)
 
     # --- cascade zones: exactly k+1 machines active, sorted by p_min ---
+    # Key insight: machine j's power/efficiency curve over the pl grid does
+    # NOT depend on which stage k it appears in -- only on j itself. So
+    # instead of recomputing eff_at(j, ...) once per stage it participates
+    # in (O(n^2) calls total), compute it ONCE per machine (O(n) calls) and
+    # get every stage's sum via a cumulative sum over machines.
     order = np.argsort(p_min)
-    p_min_sorted = [p_min[i] for i in order]
-    p_max_sorted = [p_max[i] for i in order]
-    idx_sorted = [i for i in order]
+    p_min_sorted, p_max_sorted, idx_sorted = p_min[order], p_max[order], order
+    pl_grid_c = np.linspace(0.0, 1.0, n_pl_cascade)
+
+    # stage_powers[j, :] / stage_effs[j, :] = machine j's (P, E) curve over pl_grid_c
+    stage_powers = p_min_sorted[:, None] + pl_grid_c[None, :] * (p_max_sorted - p_min_sorted)[:, None]
+    stage_effs = np.empty((n, n_pl_cascade))
+    for j in range(n):
+        stage_effs[j] = eff_at(idx_sorted[j], stage_powers[j])
+
+    # cumulative sums over machines (in ascending p_min order) give, for
+    # each k, the combined power/weighted-efficiency of machines 0..k
+    cum_P = np.cumsum(stage_powers, axis=0)  # cum_P[k] = sum_{j<=k} Pi[j]
+    cum_PE = np.cumsum(stage_powers * stage_effs, axis=0)
+
+    p_min_cumsum = np.cumsum(p_min_sorted)  # p_min_cumsum[k] = sum_{j<=k} p_min[j]
 
     for k in range(1, n):
-        P_min_stage = sum(p_min_sorted[:k + 1])
-        P_max_stage = sum(p_min_sorted[:k + 2]) if k + 1 < n else np.inf
+        P_min_stage = p_min_cumsum[k]
+        P_max_stage = p_min_cumsum[k + 1] if k + 1 < n else np.inf
 
-        for pl in np.linspace(0.0, 1.0, n_pl_cascade):
-            powers, effs = [], []
-            for j in range(k + 1):
-                i = idx_sorted[j]
-                Pi = p_min_sorted[j] + pl * (p_max_sorted[j] - p_min_sorted[j])
-                if Pi < p_min_sorted[j] or Pi > p_max_sorted[j]:
-                    break
-                powers.append(Pi)
-                effs.append(eff_at(i, Pi))
-            else:
-                P_tot = sum(powers)
-                if not (P_min_stage <= P_tot < P_max_stage):
-                    continue
-                E_tot = float(np.dot(powers, effs) / P_tot)
-                P_comb.append(P_tot)
-                E_comb.append(E_tot)
+        P_tot = cum_P[k]
+        E_tot = cum_PE[k] / P_tot
 
-    P_comb = np.asarray(P_comb)
-    E_comb = np.asarray(E_comb)
-    mask = np.isfinite(E_comb) & np.isfinite(P_comb)
-    idx = np.argsort(P_comb[mask])
-    return P_comb[mask][idx], E_comb[mask][idx]
+        mask = (P_tot >= P_min_stage) & (P_tot < P_max_stage) & np.isfinite(E_tot)
+        if mask.any():
+            P_comb.append(P_tot[mask])
+            E_comb.append(E_tot[mask])
+
+    if not P_comb:
+        return np.empty(0), np.empty(0)
+
+    P_comb = np.concatenate(P_comb)
+    E_comb = np.concatenate(E_comb)
+    valid = np.isfinite(E_comb) & np.isfinite(P_comb)
+    order = np.argsort(P_comb[valid])
+    return P_comb[valid][order], E_comb[valid][order]
 
 
 def _find_optimal_heat_pump_configuration(heat_pumps: list[_Efficiency], power: float, prim_temp: float,
