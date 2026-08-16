@@ -181,7 +181,7 @@ class COPNonModulating:
         if secondary_temperature is None:
             _secondary_temperature = self._secondary_temp
 
-        # Ensure a minimum temperature lift of 25 K
+        # Ensure a minimum temperature lift of x K
         _secondary_temperature = np.maximum(_secondary_temperature, primary_temperature + self._min_lift)
 
         # Make sure the temperatures are within the working range of the heat pump

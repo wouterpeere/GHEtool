@@ -350,6 +350,7 @@ class _Efficiency(_EfficiencyBase, BaseClass):
             # make sure it stays above the minimum available power
             part_load_clipped = np.maximum(part_load_clipped,
                                            self._get_min_power(primary_temperature, secondary_temperature, ))
+            part_load_clipped = np.round(part_load_clipped, 6)
         xi = primary_temperature_clipped
         if self._has_part_load and self._has_secondary:
             xi = list(zip(primary_temperature_clipped, secondary_temperature_clipped, part_load_clipped))
@@ -969,7 +970,7 @@ def _combine_at_combo_vector(Teva, Tcond, active_cops, p_min, p_max, n_pl_single
             P_comb.append(P_tot[mask])
             E_comb.append(E_tot[mask])
 
-    if not P_comb:
+    if not P_comb:  # pragma: no cover
         return np.empty(0), np.empty(0)
 
     P_comb = np.concatenate(P_comb)
