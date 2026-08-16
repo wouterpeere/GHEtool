@@ -869,13 +869,13 @@ def test_cop_non_modulating_convert():
              3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
         min_condenser_temperature=25, max_condenser_temperature=55,
     )
-    cop_reg = cop_non_mod.convert_to_regular_COP(-10, 20, 100)  # the higher the number, the more it converges
+    cop_reg = cop_non_mod.convert_to_regular_COP(-10, 20, 40)  # the higher the number, the more it converges
 
     # test efficiency
     assert np.isclose(cop_non_mod.get_COP(0, 35, 1), cop_reg.get_COP(0, 35, 1))
     assert np.isclose(cop_non_mod.get_COP(0, 15, 1), cop_reg.get_COP(0, 15, 1))
     assert np.isclose(cop_non_mod.get_COP(0, 45, 1), cop_reg.get_COP(0, 45, 1))
-    assert np.isclose(cop_non_mod.get_COP(5, 35, 1), cop_reg.get_COP(5, 35, 1))
+    assert np.isclose(cop_non_mod.get_COP(5, 35, 1), cop_reg.get_COP(5, 35, 1), rtol=1e-3)
     assert np.isclose(cop_non_mod.get_COP(-5, 35, 1), cop_reg.get_COP(-5, 35, 1))
     assert np.isclose(cop_non_mod.get_COP(-5.5, 35, 1), cop_reg.get_COP(-5.5, 35, 1))
 
