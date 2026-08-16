@@ -327,7 +327,8 @@ class COPNonModulating:
         )
         return eer
 
-    def convert_to_regular_COP(self, min_evaporator_temperature: float, max_evaporator_temperature: float) -> COP:
+    def convert_to_regular_COP(self, min_evaporator_temperature: float, max_evaporator_temperature: float,
+                               nb_of_elements: int = 10) -> COP:
         """
         This function converts the current class to an equivalent COP class by creating an interpolation grid.
 
@@ -337,6 +338,8 @@ class COPNonModulating:
             Minimum evaporator temperature to consider [°C]
         max_evaporator_temperature : float
             Maximum evaporator temperature to consider [°C]
+        nb_of_elements : int
+            Number of elements in the interpolation grid [-]
 
         Returns
         -------
@@ -344,8 +347,8 @@ class COPNonModulating:
             COP object with the efficiency of the heat pump
         """
 
-        eva_temperatures = np.arange(min_evaporator_temperature, max_evaporator_temperature, 1)
-        cond_temperatures = np.arange(self._min_temperature, self._max_temperature, 1)
+        eva_temperatures = np.linspace(min_evaporator_temperature, max_evaporator_temperature, nb_of_elements)
+        cond_temperatures = np.linspace(self._min_temperature, self._max_temperature, nb_of_elements)
 
         data = []
         eff = []

@@ -6,6 +6,7 @@ import pytest
 
 import numpy as np
 
+from GHEtool import FOLDER
 from GHEtool.VariableClasses.Efficiency import *
 from GHEtool.VariableClasses.Efficiency._Efficiency import plot_heat_pump_envelope, combine_n_heat_pumps, \
     _find_optimal_heat_pump_configuration
@@ -709,13 +710,49 @@ def test_graph_efficiency(monkeypatch):
 #     cascaded_system_points, cascaded_system_eff = combine_n_heat_pumps([data] * 2, [eff] * 2)
 #     plot_heat_pump_envelope(cascaded_system_points, cascaded_system_eff)
 #     plt.show()
+def test_combine_heat_pumps_2():
+    hp = COPNonModulating(np.array([35, 35, 35]), np.array([0, 2, 4]), np.array([9, 10, 11]), np.array([4, 4, 4]),
+                          default_condenser_temperature=35)
+    hp = hp.convert_to_regular_COP(0, 5)
+    cascaded_system_points, cascaded_system_eff = combine_n_heat_pumps([hp._coordinates_] * 2, [hp._data_] * 2)
+    hp = COP(cascaded_system_eff, cascaded_system_points, secondary=True, part_load=True)
+    assert hp._get_max_power(0, 35) == 18
+
+    hp = COPNonModulating(np.array([35, 35, 35]), np.array([0, 2, 4]), np.array([9, 10, 11]), np.array([4, 4, 4]),
+                          default_condenser_temperature=35)
+    hp = hp.convert_to_regular_COP(-15, 31)
+    cascaded_system_points, cascaded_system_eff = combine_n_heat_pumps([hp._coordinates_] * 2, [hp._data_] * 2)
+    hp = COP(cascaded_system_eff, cascaded_system_points, secondary=True, part_load=True)
+
+    assert hp._get_max_power(0, 35) == 18
+    hp = COPNonModulating(np.array([35, 35, 35]), np.array([0, 2, 4]), np.array([10, 10, 10]), np.array([4, 4, 4]),
+                          default_condenser_temperature=35)
+    hp = hp.convert_to_regular_COP(-15, 31)
+    cascaded_system_points, cascaded_system_eff = combine_n_heat_pumps([hp._coordinates_] * 2, [hp._data_] * 2)
+    hp = COP(cascaded_system_eff, cascaded_system_points, secondary=True, part_load=True)
+
+    assert hp._get_max_power(0, 35) == 20
 
 
 def test_combine_heat_pumps():
-    combine_n_heat_pumps([points_HP300, points_HP300, points_HP300], [eff_HP300, eff_HP300, eff_HP300])
-    combine_n_heat_pumps([points_HP300], [eff_HP300])
-    combine_n_heat_pumps([points_HP300, points_HP400], [eff_HP300, eff_HP400])
-    combine_n_heat_pumps([points_HP300, points_HP300_new], [eff_HP300, eff_HP300_new])
+    import pickle
+
+    path = FOLDER.joinpath("test/unit-tests/data/test_combine_heat_pumps.pkl")
+
+    with open(path, 'rb') as f:
+        expected = pickle.load(f)
+
+    actual = [
+        combine_n_heat_pumps([points_HP300, points_HP300, points_HP300], [eff_HP300, eff_HP300, eff_HP300]),
+        combine_n_heat_pumps([points_HP300], [eff_HP300]),
+        combine_n_heat_pumps([points_HP300, points_HP400], [eff_HP300, eff_HP400]),
+        combine_n_heat_pumps([points_HP300, points_HP300_new], [eff_HP300, eff_HP300_new]),
+        combine_n_heat_pumps([points_HP300, points_HP400, points_HP500], [eff_HP300, eff_HP400, eff_HP500]),
+    ]
+
+    for expected_result, actual_result in zip(expected, actual):
+        assert np.allclose(expected_result[0], actual_result[0])
+        assert np.allclose(expected_result[1], actual_result[1])
 
 
 def test_find_optimal_heat_pump_configuration():
