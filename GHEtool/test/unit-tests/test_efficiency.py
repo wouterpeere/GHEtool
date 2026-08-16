@@ -702,14 +702,27 @@ def test_graph_efficiency(monkeypatch):
 #     # eff = [2.53, 2.89, 2.52,
 #     #        2.88, 3.02, 2.68, 3.14, 3.25, 2.89, ]
 #     cop = COP(np.array(eff), np.array(data), part_load=True, secondary=True)
-#     range = np.linspace(35, 49.3, 10)
+#     range = np.linspace(-5, 49.3, 100)
+#     # plot_heat_pump_envelope([[-1.5, 52.5, i] for i in range], [cop.get_COP(-1.5, 52.5, i) for i in range], )
+#     #
+#     # plot_heat_pump_envelope(data, eff)
+#     # plt.show()
+#     hp = COPNonModulating(np.array([35, 35, 35]), np.array([0, 2, 4]), np.array([9, 10, 11]), np.array([4, 4, 4]),
+#                           default_condenser_temperature=35)
+#     hp = hp.convert_to_regular_COP(-10, 35)
+#     cascaded_system_points, cascaded_system_eff = combine_n_heat_pumps([data, hp._coordinates_], [eff, hp._data_])
+#     cop = COP(np.array(cascaded_system_eff), np.array(cascaded_system_points), part_load=True, secondary=True)
+#     plt.figure()
+#     plt.plot(range, cop._get_max_power(range, 35))
+#     plt.show()
 #     plot_heat_pump_envelope([[-1.5, 52.5, i] for i in range], [cop.get_COP(-1.5, 52.5, i) for i in range], )
 #
 #     plot_heat_pump_envelope(data, eff)
 #     plt.show()
-#     cascaded_system_points, cascaded_system_eff = combine_n_heat_pumps([data] * 2, [eff] * 2)
 #     plot_heat_pump_envelope(cascaded_system_points, cascaded_system_eff)
 #     plt.show()
+
+
 def test_combine_heat_pumps_2():
     hp = COPNonModulating(np.array([35, 35, 35]), np.array([0, 2, 4]), np.array([9, 10, 11]), np.array([4, 4, 4]),
                           default_condenser_temperature=35)
@@ -733,9 +746,6 @@ def test_combine_heat_pumps_2():
 
     assert np.isclose(hp._get_max_power(0, 35), 20)
 
-    cascaded_system_points, cascaded_system_eff = combine_n_heat_pumps([hp._coordinates_, points_HP300],
-                                                                       [hp._data_, eff_HP300])
-    
     eff2 = [3.80433719, 3.86231136, 3.92028552, 3.97825969, 4.03623385, 4.09420802, 4.15218218, 4.21015635, 4.26813051,
             4.32610468, 3.80433719, 3.86231136, 3.92028552, 3.97825969, 4.03623385, 4.09420802, 4.15218218, 4.21015635,
             4.26813051, 4.32610468, 3.80433719, 3.86231136, 3.92028552, 3.97825969, 4.03623385, 4.09420802, 4.15218218,
@@ -851,7 +861,7 @@ def test_combine_heat_pumps_2():
         [17., 58.5, 12.]
     ]
     cop = COP(np.array(eff2), np.array(data2), secondary=True, part_load=True)
-    assert np.isclose(cop._get_efficiency(8.5, 32.5, 10), 2)
+    assert np.isclose(cop._get_efficiency(8.5, 32.5, 10), 3.98695581)
 
 
 def test_combine_heat_pumps():
@@ -869,7 +879,9 @@ def test_combine_heat_pumps():
         combine_n_heat_pumps([points_HP300, points_HP300_new], [eff_HP300, eff_HP300_new]),
         combine_n_heat_pumps([points_HP300, points_HP400, points_HP500], [eff_HP300, eff_HP400, eff_HP500]),
     ]
-
+    # with open(path, 'wb') as f:
+    #     pickle.dump(actual, f)
+    #     
     for expected_result, actual_result in zip(expected, actual):
         assert np.allclose(expected_result[0], actual_result[0])
         assert np.allclose(expected_result[1], actual_result[1])
