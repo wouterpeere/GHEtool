@@ -22,6 +22,25 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
 
     NB_OF_SAMPLES = 500
 
+    # Concentration by weight (m/m%)
+    _MM = np.arange(0, 101, 5, dtype=float)
+
+    # Corresponding concentration by volume (v/v%) according to (Melinder, 2007)
+    _VV = {
+        "MEG": np.array([
+            0, 4.4, 8.9, 13.6, 18.1, 22.9, 27.7, 32.6, 37.5, 42.5,
+            47.6, 52.7, 57.8, 62.8, 68.3, 73.6, 78.9, 84.3, 89.7, 95.0, 100
+        ]),
+        "MPG": np.array([
+            0, 4.8, 9.6, 14.5, 19.4, 24.4, 29.4, 34.4, 39.6, 44.7,
+            49.9, 55.0, 60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0, 95.0, 100
+        ]),
+        "MEA": np.array([
+            0, 6.24, 12.39, 18.47, 24.47, 30.39, 36.18, 41.83, 47.33, 52.66,
+            57.83, 62.84, 67.69, 72.38, 76.91, 81.27, 85.46, 89.46, 93.25, 96.79, 100
+        ])
+    }
+
     __slots__ = '_name', '_percentage'
 
     def __init__(self, name: str, percentage: float, mass_percentage: bool = True):
@@ -95,6 +114,10 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
         -------
         Mass percentage : float
         """
+        if self._name in TemperatureDependentFluidData._VV:
+            return np.interp(vol_per, TemperatureDependentFluidData._VV[self._name],
+                             TemperatureDependentFluidData._MM)
+
         mass_density_antifreeze = self._calc_density_antifreeze()
         return vol_per * mass_density_antifreeze / (
                 999.0996087908144 * (100 - vol_per) + mass_density_antifreeze * vol_per) * 100
@@ -114,6 +137,10 @@ class TemperatureDependentFluidData(_FluidData, BaseClass):
         -------
         Volume percentage : float
         """
+        if self._name in TemperatureDependentFluidData._VV:
+            return np.interp(mass_per, TemperatureDependentFluidData._MM,
+                             TemperatureDependentFluidData._VV[self._name], )
+
         mass_density_antifreeze = self._calc_density_antifreeze()
         return mass_per * 999.0996087908144 / (
                 mass_density_antifreeze * (100 - mass_per) + mass_per * 999.0996087908144) * 100
