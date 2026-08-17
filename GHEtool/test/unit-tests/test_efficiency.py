@@ -6,6 +6,7 @@ import pytest
 
 import numpy as np
 
+from GHEtool import FOLDER
 from GHEtool.VariableClasses.Efficiency import *
 from GHEtool.VariableClasses.Efficiency._Efficiency import plot_heat_pump_envelope, combine_n_heat_pumps, \
     _find_optimal_heat_pump_configuration
@@ -701,21 +702,189 @@ def test_graph_efficiency(monkeypatch):
 #     # eff = [2.53, 2.89, 2.52,
 #     #        2.88, 3.02, 2.68, 3.14, 3.25, 2.89, ]
 #     cop = COP(np.array(eff), np.array(data), part_load=True, secondary=True)
-#     range = np.linspace(35, 49.3, 10)
+#     range = np.linspace(-5, 49.3, 100)
+#     # plot_heat_pump_envelope([[-1.5, 52.5, i] for i in range], [cop.get_COP(-1.5, 52.5, i) for i in range], )
+#     #
+#     # plot_heat_pump_envelope(data, eff)
+#     # plt.show()
+#     hp = COPNonModulating(np.array([35, 35, 35]), np.array([0, 2, 4]), np.array([9, 10, 11]), np.array([4, 4, 4]),
+#                           default_condenser_temperature=35)
+#     hp = hp.convert_to_regular_COP(-10, 35)
+#     cascaded_system_points, cascaded_system_eff = combine_n_heat_pumps([data, hp._coordinates_], [eff, hp._data_])
+#     cop = COP(np.array(cascaded_system_eff), np.array(cascaded_system_points), part_load=True, secondary=True)
+#     plt.figure()
+#     plt.plot(range, cop._get_max_power(range, 35))
+#     plt.show()
 #     plot_heat_pump_envelope([[-1.5, 52.5, i] for i in range], [cop.get_COP(-1.5, 52.5, i) for i in range], )
 #
 #     plot_heat_pump_envelope(data, eff)
 #     plt.show()
-#     cascaded_system_points, cascaded_system_eff = combine_n_heat_pumps([data] * 2, [eff] * 2)
 #     plot_heat_pump_envelope(cascaded_system_points, cascaded_system_eff)
 #     plt.show()
 
 
+def test_combine_heat_pumps_2():
+    hp = COPNonModulating(np.array([35, 35, 35]), np.array([0, 2, 4]), np.array([9, 10, 11]), np.array([4, 4, 4]),
+                          default_condenser_temperature=35)
+    hp = hp.convert_to_regular_COP(0, 5)
+    cascaded_system_points, cascaded_system_eff = combine_n_heat_pumps([hp._coordinates_] * 2, [hp._data_] * 2)
+    hp = COP(cascaded_system_eff, cascaded_system_points, secondary=True, part_load=True)
+    assert np.isclose(hp._get_max_power(0, 35), 18)
+
+    hp = COPNonModulating(np.array([35, 35, 35]), np.array([0, 2, 4]), np.array([9, 10, 11]), np.array([4, 4, 4]),
+                          default_condenser_temperature=35)
+    hp = hp.convert_to_regular_COP(-15, 31)
+    cascaded_system_points, cascaded_system_eff = combine_n_heat_pumps([hp._coordinates_] * 2, [hp._data_] * 2)
+    hp = COP(cascaded_system_eff, cascaded_system_points, secondary=True, part_load=True)
+
+    assert np.isclose(hp._get_max_power(0, 35), 18)
+    hp = COPNonModulating(np.array([35, 35, 35]), np.array([0, 2, 4]), np.array([10, 10, 10]), np.array([4, 4, 4]),
+                          default_condenser_temperature=35)
+    hp = hp.convert_to_regular_COP(-15, 31)
+    cascaded_system_points, cascaded_system_eff = combine_n_heat_pumps([hp._coordinates_] * 2, [hp._data_] * 2)
+    hp = COP(cascaded_system_eff, cascaded_system_points, secondary=True, part_load=True)
+
+    assert np.isclose(hp._get_max_power(0, 35), 20)
+
+    eff2 = [3.80433719, 3.86231136, 3.92028552, 3.97825969, 4.03623385, 4.09420802, 4.15218218, 4.21015635, 4.26813051,
+            4.32610468, 3.80433719, 3.86231136, 3.92028552, 3.97825969, 4.03623385, 4.09420802, 4.15218218, 4.21015635,
+            4.26813051, 4.32610468, 3.80433719, 3.86231136, 3.92028552, 3.97825969, 4.03623385, 4.09420802, 4.15218218,
+            4.21015635, 4.26813051, 4.32610468, 3.80433719, 3.86231136, 3.92028552, 3.97825969, 4.03623385, 4.09420802,
+            4.15218218, 4.21015635, 4.26813051, 4.32610468, 3.80433719, 3.86231136, 3.92028552, 3.97825969, 4.03623385,
+            4.09420802, 4.15218218, 4.21015635, 4.26813051, 4.32610468, 3.82245412, 3.86231136, 3.92028552, 3.97825969,
+            4.03623385, 4.09420802, 4.15218218, 4.21015635, 4.26813051, 4.32610468, 3.84564378, 3.86231136, 3.92028552,
+            3.97825969, 4.03623385, 4.09420802, 4.15218218, 4.21015635, 4.26813051, 4.32610468, 3.86883345, 3.86883345,
+            3.92028552, 3.97825969, 4.03623385, 4.09420802, 4.15218218, 4.21015635, 4.26813051, 4.32610468, 3.89202312,
+            3.89202312, 3.92028552, 3.97825969, 4.03623385, 4.09420802, 4.15218218, 4.21015635, 4.26813051, 4.32610468,
+            3.91521278, 3.91521278, 3.92028552, 3.97825969, 4.03623385, 4.09420802, 4.15218218, 4.21015635, 4.26813051,
+            4.32610468]
+    data2 = [
+        [1., 18.5, 11.],
+        [1., 22.94444444, 11.],
+        [1., 27.38888889, 11.],
+        [1., 31.83333333, 11.],
+        [1., 36.27777778, 11.],
+        [1., 40.72222222, 11.],
+        [1., 45.16666667, 11.],
+        [1., 49.61111111, 11.],
+        [1., 54.05555556, 11.],
+        [1., 58.5, 11.],
+        [2.77777778, 18.5, 12.],
+        [2.77777778, 22.94444444, 12.],
+        [2.77777778, 27.38888889, 12.],
+        [2.77777778, 31.83333333, 12.],
+        [2.77777778, 36.27777778, 12.],
+        [2.77777778, 40.72222222, 12.],
+        [2.77777778, 45.16666667, 12.],
+        [2.77777778, 49.61111111, 12.],
+        [2.77777778, 54.05555556, 12.],
+        [2.77777778, 58.5, 12.],
+        [4.55555556, 18.5, 12.],
+        [4.55555556, 22.94444444, 12.],
+        [4.55555556, 27.38888889, 12.],
+        [4.55555556, 31.83333333, 12.],
+        [4.55555556, 36.27777778, 12.],
+        [4.55555556, 40.72222222, 12.],
+        [4.55555556, 45.16666667, 12.],
+        [4.55555556, 49.61111111, 12.],
+        [4.55555556, 54.05555556, 12.],
+        [4.55555556, 58.5, 12.],
+        [6.33333333, 18.5, 12.],
+        [6.33333333, 22.94444444, 12.],
+        [6.33333333, 27.38888889, 12.],
+        [6.33333333, 31.83333333, 12.],
+        [6.33333333, 36.27777778, 12.],
+        [6.33333333, 40.72222222, 12.],
+        [6.33333333, 45.16666667, 12.],
+        [6.33333333, 49.61111111, 12.],
+        [6.33333333, 54.05555556, 12.],
+        [6.33333333, 58.5, 12.],
+        [8.11111111, 18.5, 12.],
+        [8.11111111, 22.94444444, 12.],
+        [8.11111111, 27.38888889, 12.],
+        [8.11111111, 31.83333333, 12.],
+        [8.11111111, 36.27777778, 12.],
+        [8.11111111, 40.72222222, 12.],
+        [8.11111111, 45.16666667, 12.],
+        [8.11111111, 49.61111111, 12.],
+        [8.11111111, 54.05555556, 12.],
+        [8.11111111, 58.5, 12.],
+        [9.88888889, 18.5, 12.],
+        [9.88888889, 22.94444444, 12.],
+        [9.88888889, 27.38888889, 12.],
+        [9.88888889, 31.83333333, 12.],
+        [9.88888889, 36.27777778, 12.],
+        [9.88888889, 40.72222222, 12.],
+        [9.88888889, 45.16666667, 12.],
+        [9.88888889, 49.61111111, 12.],
+        [9.88888889, 54.05555556, 12.],
+        [9.88888889, 58.5, 12.],
+        [11.66666667, 18.5, 12.],
+        [11.66666667, 22.94444444, 12.],
+        [11.66666667, 27.38888889, 12.],
+        [11.66666667, 31.83333333, 12.],
+        [11.66666667, 36.27777778, 12.],
+        [11.66666667, 40.72222222, 12.],
+        [11.66666667, 45.16666667, 12.],
+        [11.66666667, 49.61111111, 12.],
+        [11.66666667, 54.05555556, 12.],
+        [11.66666667, 58.5, 12.],
+        [13.44444444, 18.5, 12.],
+        [13.44444444, 22.94444444, 12.],
+        [13.44444444, 27.38888889, 12.],
+        [13.44444444, 31.83333333, 12.],
+        [13.44444444, 36.27777778, 12.],
+        [13.44444444, 40.72222222, 12.],
+        [13.44444444, 45.16666667, 12.],
+        [13.44444444, 49.61111111, 12.],
+        [13.44444444, 54.05555556, 12.],
+        [13.44444444, 58.5, 12.],
+        [15.22222222, 18.5, 12.],
+        [15.22222222, 22.94444444, 12.],
+        [15.22222222, 27.38888889, 12.],
+        [15.22222222, 31.83333333, 12.],
+        [15.22222222, 36.27777778, 12.],
+        [15.22222222, 40.72222222, 12.],
+        [15.22222222, 45.16666667, 12.],
+        [15.22222222, 49.61111111, 12.],
+        [15.22222222, 54.05555556, 12.],
+        [15.22222222, 58.5, 12.],
+        [17., 18.5, 12.],
+        [17., 22.94444444, 12.],
+        [17., 27.38888889, 12.],
+        [17., 31.83333333, 12.],
+        [17., 36.27777778, 12.],
+        [17., 40.72222222, 12.],
+        [17., 45.16666667, 12.],
+        [17., 49.61111111, 12.],
+        [17., 54.05555556, 12.],
+        [17., 58.5, 12.]
+    ]
+    cop = COP(np.array(eff2), np.array(data2), secondary=True, part_load=True)
+    assert np.isclose(cop._get_efficiency(8.5, 32.5, 10), 3.98695581)
+
+
 def test_combine_heat_pumps():
-    combine_n_heat_pumps([points_HP300, points_HP300, points_HP300], [eff_HP300, eff_HP300, eff_HP300])
-    combine_n_heat_pumps([points_HP300], [eff_HP300])
-    combine_n_heat_pumps([points_HP300, points_HP400], [eff_HP300, eff_HP400])
-    combine_n_heat_pumps([points_HP300, points_HP300_new], [eff_HP300, eff_HP300_new])
+    import pickle
+
+    path = FOLDER.joinpath("test/unit-tests/data/test_combine_heat_pumps.pkl")
+
+    with open(path, 'rb') as f:
+        expected = pickle.load(f)
+
+    actual = [
+        combine_n_heat_pumps([points_HP300, points_HP300, points_HP300], [eff_HP300, eff_HP300, eff_HP300]),
+        combine_n_heat_pumps([points_HP300], [eff_HP300]),
+        combine_n_heat_pumps([points_HP300, points_HP400], [eff_HP300, eff_HP400]),
+        combine_n_heat_pumps([points_HP300, points_HP300_new], [eff_HP300, eff_HP300_new]),
+        combine_n_heat_pumps([points_HP300, points_HP400, points_HP500], [eff_HP300, eff_HP400, eff_HP500]),
+    ]
+    # with open(path, 'wb') as f:
+    #     pickle.dump(actual, f)
+    #     
+    for expected_result, actual_result in zip(expected, actual):
+        assert np.allclose(expected_result[0], actual_result[0])
+        assert np.allclose(expected_result[1], actual_result[1])
 
 
 def test_find_optimal_heat_pump_configuration():
@@ -818,6 +987,63 @@ def test_cop_non_modulating_ranges():
 
     assert 25 == cop._fit_within_range(-5)
     assert 55 == cop._fit_within_range(500)
+
+
+def test_cop_non_modulating_convert():
+    cop_non_mod = COPNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.03, 2.83, 2.54, 2.35, 2.16, 3.26, 3.06, 2.77, 2.6, 2.39, 3.49, 3.3, 3.01, 2.84, 2.64, 2.74, 2.54, 3.26,
+             3.09, 2.89, 3.99, 3.8, 3.51, 3.34, 3.14, 4.25, 4.06, 3.78, 3.6, 3.41]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55,
+    )
+    cop_reg = cop_non_mod.convert_to_regular_COP(-10, 20, 40)  # the higher the number, the more it converges
+
+    # test efficiency
+    assert np.isclose(cop_non_mod.get_COP(0, 35, 1), cop_reg.get_COP(0, 35, 1))
+    assert np.isclose(cop_non_mod.get_COP(0, 15, 1), cop_reg.get_COP(0, 15, 1))
+    assert np.isclose(cop_non_mod.get_COP(0, 45, 1), cop_reg.get_COP(0, 45, 1))
+    assert np.isclose(cop_non_mod.get_COP(5, 35, 1), cop_reg.get_COP(5, 35, 1), rtol=1e-3)
+    assert np.isclose(cop_non_mod.get_COP(-5, 35, 1), cop_reg.get_COP(-5, 35, 1))
+    assert np.isclose(cop_non_mod.get_COP(-5.5, 35, 1), cop_reg.get_COP(-5.5, 35, 1))
+
+    # test max power
+    assert np.isclose(cop_non_mod._get_max_power(0, 35), cop_reg._get_max_power(0, 35))
+    assert np.isclose(cop_non_mod._get_max_power(0, 45), cop_reg._get_max_power(0, 45))
+    assert np.isclose(cop_non_mod._get_max_power(5, 35), cop_reg._get_max_power(5, 35))
+    assert np.isclose(cop_non_mod._get_max_power(-5, 35), cop_reg._get_max_power(-5, 35))
+    assert np.isclose(cop_non_mod._get_max_power(-5.5, 35), cop_reg._get_max_power(-5.5, 35))
+
+
+def test_eer_non_modulating_convert():
+    eer_non_mod = EERNonModulating(
+        np.array([35, 45, 55, 60, 65] * 6),
+        np.repeat([0, 2, 4, 6, 8, 10], 5),
+        np.array(
+            [3.03, 2.83, 2.54, 2.35, 2.16, 3.26, 3.06, 2.77, 2.6, 2.39, 3.49, 3.3, 3.01, 2.84, 2.64, 2.74, 2.54, 3.26,
+             3.09, 2.89, 3.99, 3.8, 3.51, 3.34, 3.14, 4.25, 4.06, 3.78, 3.6, 3.41]),
+        np.array(
+            [3.52, 3.19, 2.86, 2.65, 2.44, 3.69, 3.36, 3.01, 2.8, 2.61, 3.86, 3.51, 3.16, 2.94, 2.76, 4.02, 3.67, 3.3,
+             3.08, 2.88, 4.18, 3.88, 3.44, 3.2, 3.00, 4.33, 3.95, 3.57, 3.33, 3.11]),
+        min_condenser_temperature=25, max_condenser_temperature=55,
+    )
+    eer_reg = eer_non_mod.convert_to_regular_EER(-10, 20, 100)
+
+    # test efficiency
+    assert np.isclose(eer_non_mod.get_EER(35, 0, 1), eer_reg.get_EER(35, 0, 1))
+    assert np.isclose(eer_non_mod.get_EER(35, 7, 1), eer_reg.get_EER(35, 7, 1))
+    assert np.isclose(eer_non_mod.get_EER(35, 17, 1), eer_reg.get_EER(35, 17, 1))
+    assert np.isclose(eer_non_mod.get_EER(45, 10, 1), eer_reg.get_EER(45, 10, 1))
+
+    # test max power
+    assert np.isclose(eer_non_mod._get_max_power(35, 0), eer_reg._get_max_power(35, 0))
+    assert np.isclose(eer_non_mod._get_max_power(35, 7), eer_reg._get_max_power(35, 7))
+    assert np.isclose(eer_non_mod._get_max_power(35, 17), eer_reg._get_max_power(35, 17))
+    assert np.isclose(eer_non_mod._get_max_power(45, 10), eer_reg._get_max_power(45, 10))
 
 
 def test_eer_non_modulating_ranges():

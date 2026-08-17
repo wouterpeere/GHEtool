@@ -3,6 +3,7 @@ import copy
 import numpy as np
 import matplotlib.pyplot as plt
 
+from GHEtool.VariableClasses.Efficiency.COP import COP
 from scipy.interpolate import LinearNDInterpolator, NearestNDInterpolator
 from scipy.spatial import QhullError
 from typing import Union
@@ -180,7 +181,7 @@ class COPNonModulating:
         if secondary_temperature is None:
             _secondary_temperature = self._secondary_temp
 
-        # Ensure a minimum temperature lift of 25 K
+        # Ensure a minimum temperature lift of x K
         _secondary_temperature = np.maximum(_secondary_temperature, primary_temperature + self._min_lift)
 
         # Make sure the temperatures are within the working range of the heat pump
@@ -325,6 +326,39 @@ class COPNonModulating:
             default_evaporator_temperature=default_evaporator_temperature
         )
         return eer
+
+    def convert_to_regular_COP(self, min_evaporator_temperature: float, max_evaporator_temperature: float,
+                               nb_of_elements: int = 10) -> COP:
+        """
+        This function converts the current class to an equivalent COP class by creating an interpolation grid.
+
+        Parameters
+        ----------
+        min_evaporator_temperature : float
+            Minimum evaporator temperature to consider [°C]
+        max_evaporator_temperature : float
+            Maximum evaporator temperature to consider [°C]
+        nb_of_elements : int
+            Number of elements in the interpolation grid [-]
+
+        Returns
+        -------
+        COP
+            COP object with the efficiency of the heat pump
+        """
+
+        eva_temperatures = np.linspace(min_evaporator_temperature, max_evaporator_temperature, nb_of_elements)
+        cond_temperatures = np.linspace(self._min_temperature, self._max_temperature, nb_of_elements)
+
+        data = []
+        eff = []
+        for eva_temp in eva_temperatures:
+            for cond_temp in cond_temperatures:
+                data.append([eva_temp, cond_temp, self._get_max_power(eva_temp, cond_temp)])
+                eff.append(self._get_efficiency(eva_temp, cond_temp))
+
+        return COP(np.array(eff), np.array(data), True, True,
+                   default_secondary_temperature=self._secondary_temp)
 
     def __export__(self):
         return {'type': 'Non-modulating COP'}
