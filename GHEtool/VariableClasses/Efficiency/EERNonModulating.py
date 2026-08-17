@@ -244,7 +244,7 @@ class EERNonModulating:
     def get_EER(self,
                 primary_temperature: Union[float, np.ndarray],
                 secondary_temperature: Union[float, np.ndarray] = None,
-                power: Union[float, np.ndarray] = None) -> np.ndarray:
+                power: Union[float, np.ndarray] = None, **kwargs) -> np.ndarray:
         """
         This function calculates the EER using the quadratic model and the Carnot efficiency.
 
@@ -270,7 +270,7 @@ class EERNonModulating:
         return self._get_efficiency(primary_temperature, secondary_temperature, power)
 
     def get_SEER(self, power: np.ndarray, primary_temperature: np.ndarray,
-                 secondary_temperature: np.ndarray = None) -> float:
+                 secondary_temperature: np.ndarray = None, **kwargs) -> float:
         """
         This function calculates and returns the SEER.
 
@@ -333,7 +333,7 @@ class EERNonModulating:
         return cop
 
     def convert_to_regular_EER(self, min_evaporator_temperature: float, max_evaporator_temperature: float,
-                               nb_of_elements: int = 10) -> EER:
+                               nb_of_elements: int = 10, **kwargs) -> EER:
         """
         This function converts the current class to an equivalent EER class by creating an interpolation grid.
 
